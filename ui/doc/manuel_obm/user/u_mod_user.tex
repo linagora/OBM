@@ -5,19 +5,19 @@
 \clearpage
 \section{Le module \user}
 
-\subsection{Présentation du module \user}
+\subsection{PrÃ©sentation du module \user}
 
-Ce module est une gestion d'utilisateurs, central à l'application \obm.
-Il permet de gérer les utilisateurs de l'application, définir leur profil ou permission et fait partie du socle de base d'\obm.\\
+Ce module est une gestion d'utilisateurs, central Ã  l'application \obm.
+Il permet de gÃ©rer les utilisateurs de l'application, dÃ©finir leur profil ou permission et fait partie du socle de base d'\obm.\\
 
-Lorsque \obm est couplé à \aliamin, la gestion des utilisateurs est déléguée à \aliamin dont c'est le rôle et qui propose une gestion plus riche et étendue.
-\aliamin gère tous les attributs gérés par \obm mais ajoute de nombreuses fonctionnalités comme la gestion des informations de messagerie (différentes adresses, quota, redirection, droits, partages,...), d'accès à Internet, d'appartenance aux domaines Windows (répertoire home, script de logon, disque de montage,..) ainsi que les services associés (Postfix, Cyrus, Squid, Samba,..) et le stockage dans un annuaire LDAP.\\
+Lorsque \obm est couplÃ© Ã  \aliamin, la gestion des utilisateurs est dÃ©lÃ©guÃ©e Ã  \aliamin dont c'est le rÃ´le et qui propose une gestion plus riche et Ã©tendue.
+\aliamin gÃ¨re tous les attributs gÃ©rÃ©s par \obm mais ajoute de nombreuses fonctionnalitÃ©s comme la gestion des informations de messagerie (diffÃ©rentes adresses, quota, redirection, droits, partages,...), d'accÃ¨s Ã  Internet, d'appartenance aux domaines Windows (rÃ©pertoire home, script de logon, disque de montage,..) ainsi que les services associÃ©s (Postfix, Cyrus, Squid, Samba,..) et le stockage dans un annuaire LDAP.\\
 
-Un utilisateur est associé à un profil qui lui confère les permissions sur l'application \obm.\\
+Un utilisateur est associÃ© Ã  un profil qui lui confÃ¨re les permissions sur l'application \obm.\\
 
-\obm gère la notion d'utilisateurs locaux (spécifiques à \obm) ou externes pour faciliter les imports ou synchronisations avec d'autres bases utilisateurs / groupes.\\
+\obm gÃ¨re la notion d'utilisateurs locaux (spÃ©cifiques Ã  \obm) ou externes pour faciliter les imports ou synchronisations avec d'autres bases utilisateurs / groupes.\\
 
-Ce module comporte une composante unique : l'entité Utilisateur.
+Ce module comporte une composante unique : l'entitÃ© Utilisateur.
 
 
 \subsection{Description d'un utilisateur}
@@ -30,27 +30,27 @@ Composantes d'un utilisateur :\\
 \hline
 Login & Identifiant unique de connexion de l'utilisateur \\
 \hline
-Mot de passe & Mot de passe de l'utilisateur. Cette donnée n'est jamais affichée. \obm gère différents formes de chiffrage pour le stockage du mot de passe (voir le guide technique).\\
+Mot de passe & Mot de passe de l'utilisateur. Cette donnÃ©e n'est jamais affichÃ©e. \obm gÃ¨re diffÃ©rents formes de chiffrage pour le stockage du mot de passe (voir le guide technique).\\
 \hline
-Archive & Indicateur d'archivage de l'utilisateur. Un utilisateur archivé ne peut plus se connecter à \obm. \\
+Archive & Indicateur d'archivage de l'utilisateur. Un utilisateur archivÃ© ne peut plus se connecter Ã  \obm. \\
 \hline
 Permissions & Profil de l'utilisateur (indiquant les droits sur l'application)\\
 \hline
-Local & Indique si l'utilisateur est local (spécifique à \obm et non issu d'un imort / export par exemple).\\
+Local & Indique si l'utilisateur est local (spÃ©cifique Ã  \obm et non issu d'un imort / export par exemple).\\
 \hline
 Ext\_id & Identifiant externe pour un utilisateur externe.\\
 \hline
 Nom & Nom de l'utilisateur.\\
 \hline
-Prénom & Prénom de l'utilisateur.\\
+PrÃ©nom & PrÃ©nom de l'utilisateur.\\
 \hline
 Nom & Nom de l'utilisateur.\\
 \hline
 Nom & Nom de l'utilisateur.\\
 \hline
-Tél 1 & Téléphone 1 de l'utilisateur.\\
+TÃ©l 1 & TÃ©lÃ©phone 1 de l'utilisateur.\\
 \hline
-Tél 2 & Téléphone 2 de l'utilisateur.\\
+TÃ©l 2 & TÃ©lÃ©phone 2 de l'utilisateur.\\
 \hline
 Fax 1 & Fax 1 de l'utilisateur.\\
 \hline
@@ -58,9 +58,9 @@ Fax 2 & Fax 2 de l'utilisateur.\\
 \hline
 E-mail & Adresse e-mail de l'utilisateur.\\
 \hline
-Date d'entrée & Date d'entrée de l'utilisateur dans la structure.\\
+Date d'entrÃ©e & Date d'entrÃ©e de l'utilisateur dans la structure.\\
 \hline
-Dernier accès & Date de dernière connexion à \obm.\\
+Dernier accÃ¨s & Date de derniÃ¨re connexion Ã  \obm.\\
 \hline
 Description & Description de l'utilisateur.\\
 \hline
@@ -71,21 +71,21 @@ Groupes membres & Groupes auxquels appartient l'utilisateur.\\
 
 \subsection{Les profils ou permissions utilisateur}
 
-\obm gère les droits d'accès à l'application et aux diverses fonctionnalités par l'intermédiaire des profils utilisateur.
-Un profil est une somme de droits unitaires sur chaque module de l'application. Chaque utilisateur est associé à un profil dont il hérite les droits.\\
+\obm gÃ¨re les droits d'accÃ¨s Ã  l'application et aux diverses fonctionnalitÃ©s par l'intermÃ©diaire des profils utilisateur.
+Un profil est une somme de droits unitaires sur chaque module de l'application. Chaque utilisateur est associÃ© Ã  un profil dont il hÃ©rite les droits.\\
 
-\obm distingue 2 types de données :\\
+\obm distingue 2 types de donnÃ©es :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Données} & \textbf{Description} \\
+\textbf{DonnÃ©es} & \textbf{Description} \\
 \hline
-Non protégée & Donnée consultable et éditable par les utilisateurs ou éditeurs. Par exemple les entités des modules : une société, un contact, une affaire, un événement...\\
+Non protÃ©gÃ©e & DonnÃ©e consultable et Ã©ditable par les utilisateurs ou Ã©diteurs. Par exemple les entitÃ©s des modules : une sociÃ©tÃ©, un contact, une affaire, un Ã©vÃ©nement...\\
 \hline
-Protégée ou d'administration & Donnée modifiable uniquement par un administrateur. Par exemple :
+ProtÃ©gÃ©e ou d'administration & DonnÃ©e modifiable uniquement par un administrateur. Par exemple :
 \begin{itemize}
-\item Les tables de référence globales (pays, sources de données,...).
-\item Les données de référence d'un module (catégorie de contact, catégorie d'événement de l'agenda,...) toujours définies dans les onglets ``Administration'' de chaque module.
+\item Les tables de rÃ©fÃ©rence globales (pays, sources de donnÃ©es,...).
+\item Les donnÃ©es de rÃ©fÃ©rence d'un module (catÃ©gorie de contact, catÃ©gorie d'Ã©vÃ©nement de l'agenda,...) toujours dÃ©finies dans les onglets ``Administration'' de chaque module.
 \item Le contenu de la section ``Administration''.
 \item Les utilisateurs de l'application.
 \end{itemize}\\
@@ -93,39 +93,39 @@ Protégée ou d'administration & Donnée modifiable uniquement par un administrateu
 \end{tabular}
 \vspace{0.3cm}
 
-La définition des profils est à la charge de l'administrateur d'\obm et se définie généralement durant la phase de spécification de mise en oeuvre de l'application.
-\obm propose 3 profils génériques par défaut :\\
+La dÃ©finition des profils est Ã  la charge de l'administrateur d'\obm et se dÃ©finie gÃ©nÃ©ralement durant la phase de spÃ©cification de mise en oeuvre de l'application.
+\obm propose 3 profils gÃ©nÃ©riques par dÃ©faut :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
 \textbf{Profil} & \textbf{Description} \\
 \hline
-user & Utilisateur en consultation. Uniquement les droits de consultation des données non protégées sur l'ensemble des modules.\\
+user & Utilisateur en consultation. Uniquement les droits de consultation des donnÃ©es non protÃ©gÃ©es sur l'ensemble des modules.\\
 \hline
-editor & Editeur ou utilisateur en consultation/édition. Droits de consultation et d'édition des données non protégées sur l'ensemble des modules.\\
+editor & Editeur ou utilisateur en consultation/Ã©dition. Droits de consultation et d'Ã©dition des donnÃ©es non protÃ©gÃ©es sur l'ensemble des modules.\\
 \hline
-admin & Administration. Tous les droits de consultation et d'édition (données non protégées et données d'administration) offerts par \obm.\\
+admin & Administration. Tous les droits de consultation et d'Ã©dition (donnÃ©es non protÃ©gÃ©es et donnÃ©es d'administration) offerts par \obm.\\
 \hline
 \end{tabular}
 
 
 \subsection{La gestion du SSO (authentification unique)}
 
-\obm peut s'intégrer à \aliasuite qui propose une authentification SSO (Single Sign On) ou authentification unique pour diverses applications.
-Dans ce cas la connexion à l'application est déléguée à une application SSO tierce (CAS, application libre dans le cadre d'\aliasuite) et \obm n'a pas a gérer les utilisateurs.
+\obm peut s'intÃ©grer Ã  \aliasuite qui propose une authentification SSO (Single Sign On) ou authentification unique pour diverses applications.
+Dans ce cas la connexion Ã  l'application est dÃ©lÃ©guÃ©e Ã  une application SSO tierce (CAS, application libre dans le cadre d'\aliasuite) et \obm n'a pas a gÃ©rer les utilisateurs.
 
 
 \subsection{Les utilisateurs locaux}
 
-\obm supporte 2 portées d'utilisateurs :\\
+\obm supporte 2 portÃ©es d'utilisateurs :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Portée} & \textbf{Description} \\
+\textbf{PortÃ©e} & \textbf{Description} \\
 \hline
-Local & L'utilisateur a été créé depuis OBM ou n'est destiné qu'à \obm.\\
+Local & L'utilisateur a Ã©tÃ© crÃ©Ã© depuis OBM ou n'est destinÃ© qu'Ã  \obm.\\
 \hline
-Externe & L'utilisateur provient sans doute d'une source externe (import d'une autre application, annuaire LDAP,..). Le champ Ext\_id est dans ce cas une aide ou référence à un identifiant de la source externe. Ceci permet de gérer par des imports / exports ne prenant en compte que les utilisateurs externes, sans toucher aux utilisateurs locaux.\\
+Externe & L'utilisateur provient sans doute d'une source externe (import d'une autre application, annuaire LDAP,..). Le champ Ext\_id est dans ce cas une aide ou rÃ©fÃ©rence Ã  un identifiant de la source externe. Ceci permet de gÃ©rer par des imports / exports ne prenant en compte que les utilisateurs externes, sans toucher aux utilisateurs locaux.\\
 \hline
 \end{tabular}
 
@@ -134,7 +134,7 @@ Externe & L'utilisateur provient sans doute d'une source externe (import d'une a
 
 La consultation d'un utilisateur affiche les groupes auxquels il appartient.
 
-\paragraph{Note :} : L'utilisateur connecté n'apercoit ici que les groupes visibles pour lui (groupes publics et ses propres groupes privés), il ne voit donc par nécessairement l'ensemble des groupes auxquels l'utilisateur consulté appartient.\\
+\paragraph{Note :} : L'utilisateur connectÃ© n'apercoit ici que les groupes visibles pour lui (groupes publics et ses propres groupes privÃ©s), il ne voit donc par nÃ©cessairement l'ensemble des groupes auxquels l'utilisateur consultÃ© appartient.\\
 
 Il est possible de modifier l'appartenance d'un utilisateurs aux groupes directement depuis la fiche de l'utilisateur.
 
@@ -147,9 +147,9 @@ Le module \user comporte 8 sous-menus :
 \hline
 \textbf{Nom} & \textbf{Action / Description} \\
 \hline
-Chercher & Recherche multicritères des utilisateurs \\
+Chercher & Recherche multicritÃ¨res des utilisateurs \\
 \hline
-Nouveau & Créer un nouvel utilisateur local \\
+Nouveau & CrÃ©er un nouvel utilisateur local \\
 \hline
 Consulter & Consulter les informations de l'utilisateur \\
 \hline
@@ -157,9 +157,9 @@ Modifier & Modifier les informations de l'utilisateur\\
 \hline
 Modifier groupes & Modifier l'appartenance de l'utilisateur aux groupes\\
 \hline
-Préférences par défaut & Rétablir les préférences par défaut pour l'utilisateur\\
+PrÃ©fÃ©rences par dÃ©faut & RÃ©tablir les prÃ©fÃ©rences par dÃ©faut pour l'utilisateur\\
 \hline
-Supprimer & Vérifier les liens puis si besoin Supprimer un utilisateur\\
+Supprimer & VÃ©rifier les liens puis si besoin Supprimer un utilisateur\\
 \hline
 Affichage & Personnalisation de l'affichage de la liste des utilisateurs\\
 \hline
@@ -168,7 +168,7 @@ Affichage & Personnalisation de l'affichage de la liste des utilisateurs\\
 
 \subsubsection{Le sous-menu : Chercher}
 
-Ce menu permet d'effectuer une recherche selon différents critères :
+Ce menu permet d'effectuer une recherche selon diffÃ©rents critÃ¨res :
 
 \begin{itemize}
 \item Login
@@ -180,22 +180,22 @@ Ce menu permet d'effectuer une recherche selon différents critères :
 
 \subsubsection{Le sous-menu : Nouveau}
 
-Ce menu permet de créer un nouvel utilisateur.
+Ce menu permet de crÃ©er un nouvel utilisateur.
 
-Un formulaire vierge de création propose la saisie des champs :
+Un formulaire vierge de crÃ©ation propose la saisie des champs :
 
 \begin{itemize}
 \item Login (obligatoire),
 \item Mot de passe,
 \item Profil,
 \item Nom (obligatoire),
-\item Prénom,
+\item PrÃ©nom,
 \item Tel 1,
 \item Tel 2,
 \item Fax 1,
 \item Fax 2,
 \item E-mail.
-\item Date d'entrée.
+\item Date d'entrÃ©e.
 \item Description,
 \end{itemize}
 
@@ -207,7 +207,7 @@ Ce menu permet de retourner en mode consultation de l'utilisateur courant.
 
 \subsubsection{Le sous-menu : Modifier}
 
-L'écran de modification affiche les informations de l'utilisateur courant dans un formulaire.
+L'Ã©cran de modification affiche les informations de l'utilisateur courant dans un formulaire.
 Il est possible de modifier les informations suivantes (uniquement pour les administrateurs) :
 
 \begin{itemize}
@@ -216,24 +216,24 @@ Il est possible de modifier les informations suivantes (uniquement pour les admi
 \item Mot de passe,
 \item Profil,
 \item Nom (obligatoire),
-\item Prénom,
+\item PrÃ©nom,
 \item Tel 1,
 \item Tel 2,
 \item Fax 1,
 \item Fax 2,
 \item E-mail.
-\item Date d'entrée.
+\item Date d'entrÃ©e.
 \item Description,
 \end{itemize}
 
-Pour valider les modifications effectuées il faut cliquer sur le bouton ``valider les modifications''.
+Pour valider les modifications effectuÃ©es il faut cliquer sur le bouton ``valider les modifications''.
 
 
 \subsubsection{Le sous-menu : Modifier groupes}
 
 Ce menu permet la modification de l'appartenance de l'utilisateur aux groupes visibles.\\
 
-Pour valider les modifications effectuées il faut cliquer sur le bouton ``Modifier les groupes de la personne''.
+Pour valider les modifications effectuÃ©es il faut cliquer sur le bouton ``Modifier les groupes de la personne''.
 
 
 \subsubsection{Le sous-menu : Supprimer}
@@ -244,4 +244,4 @@ Ce menu permet la suppression d'un utilisateur (uniquement pour les administrate
 
 \subsubsection{Le sous-menu : Affichage}
 
-Ce menu permet de paramétrer l'affichage de la liste des utilisateurs. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
+Ce menu permet de paramÃ©trer l'affichage de la liste des utilisateurs. Il est possible de choisir les champs Ã  afficher et de rÃ©gler leur ordre d'affichage.

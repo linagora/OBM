@@ -5,11 +5,11 @@
 
 \clearpage
 \section{Project}
-révision : \obm 1.2.4
+rÃ©vision : \obm 1.2.4
 
 Le module \project \obm.
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
 Le module \project utilise 5 tables :
 \begin{itemize}
@@ -27,31 +27,31 @@ Table principale des informations d'un projet.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_name & varchar 128 & Nom du projet & \\
 \hline
 \_shortname & varchar 10 & Nom court du projet & \\
 \hline
-\_tasktype\_id & int 8 & Type de tâche du projet & \\
+\_tasktype\_id & int 8 & Type de tÃ¢che du projet & \\
 \hline
-\_company\_id & int 8 & Société contractante & NULL (projets internes)\\
+\_company\_id & int 8 & SociÃ©tÃ© contractante & NULL (projets internes)\\
 \hline
 \_deal\_id & int 8 & Affaire d'origine & NULL (projets internes)\\
 \hline
-\_soldtime & int 8 & Durée (jours) vendue & \\
+\_soldtime & int 8 & DurÃ©e (jours) vendue & \\
 \hline
-\_estimatedtime & int 8 & Durée (jours) estimée & \\
+\_estimatedtime & int 8 & DurÃ©e (jours) estimÃ©e & \\
 \hline
-\_datebegin & date & Date de début de projet & \\
+\_datebegin & date & Date de dÃ©but de projet & \\
 \hline
 \_dateend & date & Date de fin de projet & \\
 \hline
@@ -63,106 +63,106 @@ Table principale des informations d'un projet.\\
 
 
 \subsection{ProjectTask}
-Table des informations des tâches des projets.\\
+Table des informations des tÃ¢ches des projets.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_project\_id & int 8 & Projet de la tâche & \\
+\_project\_id & int 8 & Projet de la tÃ¢che & \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_label & varchar 128 & Label de la tâche & \\
+\_label & varchar 128 & Label de la tÃ¢che & \\
 \hline
-\_parenttask\_id & int 8 & Tâche mère (ProjectTask) & 0 si racine \\
+\_parenttask\_id & int 8 & TÃ¢che mÃ¨re (ProjectTask) & 0 si racine \\
 \hline
-\_rank & int 8 & Ordre d'affichage de la tâche & \\
+\_rank & int 8 & Ordre d'affichage de la tÃ¢che & \\
 \hline
 \end{tabular}
 
 
 \subsection{ProjectRefTask}
-Table des informations des tâches de référence.\\
+Table des informations des tÃ¢ches de rÃ©fÃ©rence.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_tasktype\_id & int 8 & Type de tâche de la tâche de référence & \\
+\_tasktype\_id & int 8 & Type de tÃ¢che de la tÃ¢che de rÃ©fÃ©rence & \\
 \hline
-\_label & varchar 128 & Label de la tâche de référence & \\
+\_label & varchar 128 & Label de la tÃ¢che de rÃ©fÃ©rence & \\
 \hline
 \end{tabular}
 
 
 \subsection{ProjectUser}
-Table d'affectation (avec informations associées) d'utilisateurs aux tâches d'un projet.
+Table d'affectation (avec informations associÃ©es) d'utilisateurs aux tÃ¢ches d'un projet.
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
 \_project\_id & int 8 & Projet & \\
 \hline
 \_user\_id & int 8 & Utilisateur & \\
 \hline
-\_projecttask\_id & int 8 & Tâche & \\
+\_projecttask\_id & int 8 & TÃ¢che & \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_projectedtime & int 8 & Durée prévue & \\
+\_projectedtime & int 8 & DurÃ©e prÃ©vue & \\
 \hline
-\_missingtime & int 8 & Durée restante estimée & Par Chef P \\
+\_missingtime & int 8 & DurÃ©e restante estimÃ©e & Par Chef P \\
 \hline
 \_validity & timestamp 14 & Date d'estimation d'avancement & \\
 \hline
 \_soldprice & int 8 & Prix de vente de l'utilisateur & \\
 \hline
-\_manager & int 1 & Statut de l'utilisateur dans le projet (si tâche est nulle) & 1 = CP \\
+\_manager & int 1 & Statut de l'utilisateur dans le projet (si tÃ¢che est nulle) & 1 = CP \\
 \hline
 \end{tabular}
 
 \subsubsection{Remarques}
 
-\paragraph{projectuser\_validity} : Date de la dernière modification de l'avancement qui permet de vérifier la crédibilité des informations disponibles sur l'avancement du projet (non implémenté pour l'instant).
-\paragraph{projectuser\_soldprice} : Tarif journalier de cet utilisateur sur cette tâche. Permet une analyse des coûts plus détaillée pour le projet (non implémenté pour l'instant).
+\paragraph{projectuser\_validity} : Date de la derniÃ¨re modification de l'avancement qui permet de vÃ©rifier la crÃ©dibilitÃ© des informations disponibles sur l'avancement du projet (non implÃ©mentÃ© pour l'instant).
+\paragraph{projectuser\_soldprice} : Tarif journalier de cet utilisateur sur cette tÃ¢che. Permet une analyse des coÃ»ts plus dÃ©taillÃ©e pour le projet (non implÃ©mentÃ© pour l'instant).
 \paragraph{projectuser\_manager} : Indique si la personne est chef de projet. Influe sur les droits de modification.\\
 
 
-ProjectUser est en fait la table de liaison entre Tâches et Membres d'un projet.
-L'ajout d'un membre au projet insère un tuple dans cette table avec une tâche nulle. Ainsi, la \textbf{liste des membres d'un projet} est directement tirée de cette table.
+ProjectUser est en fait la table de liaison entre TÃ¢ches et Membres d'un projet.
+L'ajout d'un membre au projet insÃ¨re un tuple dans cette table avec une tÃ¢che nulle. Ainsi, la \textbf{liste des membres d'un projet} est directement tirÃ©e de cette table.
 
-L'information de statut d'un utilisateur (Chef de projet,...) doit être lue dans cet enregistrement dont la tâche est nulle.
+L'information de statut d'un utilisateur (Chef de projet,...) doit Ãªtre lue dans cet enregistrement dont la tÃ¢che est nulle.
 
 \subsection{ProjectStat}
-Table d'historique des informations relatives à l'avancement des projet.\\
+Table d'historique des informations relatives Ã  l'avancement des projet.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -170,51 +170,51 @@ Table d'historique des informations relatives à l'avancement des projet.\\
 \hline
 \_project\_id & int 8 & Projet & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_date & timestamp 14 & Date d'estimation d'avancement & \\
 \hline
-\_useddays & int 8 & Durée passée (jours) sur le projet & \\
+\_useddays & int 8 & DurÃ©e passÃ©e (jours) sur le projet & \\
 \hline
-\_remainingdays & int 8 & Durée restante estimée & Par Chef P \\
+\_remainingdays & int 8 & DurÃ©e restante estimÃ©e & Par Chef P \\
 \hline
 \end{tabular}
 
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \project, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \project, avec le droit d'accÃ¨s requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \textbf{IntitulÃ©} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & read & (Défaut) formulaire de recherche de projets. \\ 
+  index & read & (DÃ©faut) formulaire de recherche de projets. \\ 
  \hline
-  search & read & Résultat de recherche de projets. \\
+  search & read & RÃ©sultat de recherche de projets. \\
  \hline
-  new & write & Formulaire de création d'un projet. \\
+  new & write & Formulaire de crÃ©ation d'un projet. \\
  \hline
-  detailconsult & read & Fiche détail d'un projet. \\
+  detailconsult & read & Fiche dÃ©tail d'un projet. \\
  \hline
   detailupdate & write & Formulaire de modification d'un projet. \\
  \hline
   insert & write & Insertion d'un projet. \\
  \hline
-  update & write & Mise à jour du projet. \\
+  update & write & Mise Ã  jour du projet. \\
  \hline
-  check\_delete & write & Vérification avant suppression du projet. \\
+  check\_delete & write & VÃ©rification avant suppression du projet. \\
  \hline
   delete & write & Suppression du projet. \\
  \hline
-  task & write & Liste des tâches définies et formulaire de nouvelle tâche. \\
+  task & write & Liste des tÃ¢ches dÃ©finies et formulaire de nouvelle tÃ¢che. \\
  \hline
-  task\_add & write & Ajout d'une tâche au projet. \\
+  task\_add & write & Ajout d'une tÃ¢che au projet. \\
  \hline
-  task\_update & write & Modification d'une tâche. \\
+  task\_update & write & Modification d'une tÃ¢che. \\
  \hline
-  task\_del & write & Suppression de tâches. \\
+  task\_del & write & Suppression de tÃ¢ches. \\
  \hline
   dashboard & read & consultation du tableau de bord. \\
  \hline
@@ -228,21 +228,21 @@ Voici la liste des actions du module \project, avec le droit d'accès requis ains
  \hline
   member\_del & write & Suppression de participants au projet. \\
  \hline
-  member\_update & write & Mise à jour d'un participant (statut, chef de projet). \\
+  member\_update & write & Mise Ã  jour d'un participant (statut, chef de projet). \\
  \hline
-  allocate & write & Formulaire d'affectation des participants aux tâches. \\
+  allocate & write & Formulaire d'affectation des participants aux tÃ¢ches. \\
  \hline
-  allocate\_update & write & Mise à jour de l'affectations des participants. \\
+  allocate\_update & write & Mise Ã  jour de l'affectations des participants. \\
  \hline
   advance & write & Formulaire d'avancement d'un projet. \\
  \hline
-  advance\_update & write & Mise à jour de l'avancement du projet. \\
+  advance\_update & write & Mise Ã  jour de l'avancement du projet. \\
  \hline
-  display & read & Ecran de modification des préférences d'affichage. \\
+  display & read & Ecran de modification des prÃ©fÃ©rences d'affichage. \\
  \hline
-  dispref\_display & read & Modifie l'affichage d'un élément. \\
+  dispref\_display & read & Modifie l'affichage d'un Ã©lÃ©ment. \\
  \hline
-  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+  dispref\_level & read & Modifie l'ordre d'affichage d'un Ã©lÃ©ment. \\
  \hline
   document\_add & write & Ajout de liens vers des documents. \\
  \hline

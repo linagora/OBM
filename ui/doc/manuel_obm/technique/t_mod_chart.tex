@@ -5,20 +5,20 @@
 \clearpage
 \section{Diagrammes}
 
-Depuis la version 1.1, \obm intègre un module de génération de diagrammes.
+Depuis la version 1.1, \obm intÃ¨gre un module de gÃ©nÃ©ration de diagrammes.
 
-\obm utilise actuellement la librairie ou le projet Artichow pour la création des diagrammes.
-Le module \chart propose une couche d'abstraction d'utilisation des diagrammes permettant éventuellement de changer de librairie sous-jacente.\\
+\obm utilise actuellement la librairie ou le projet Artichow pour la crÃ©ation des diagrammes.
+Le module \chart propose une couche d'abstraction d'utilisation des diagrammes permettant Ã©ventuellement de changer de librairie sous-jacente.\\
 
-Le module \chart est particulier car il n'apparait pas dans les menus de l'application mais est un service pour les modules devant générer des diagrammes.
-Le module \chart est appelé via une URL, et retourne, sous forme d'image, le diagramme correspondant aux paramètres passés.
+Le module \chart est particulier car il n'apparait pas dans les menus de l'application mais est un service pour les modules devant gÃ©nÃ©rer des diagrammes.
+Le module \chart est appelÃ© via une URL, et retourne, sous forme d'image, le diagramme correspondant aux paramÃ¨tres passÃ©s.
 
 Il n'effectue pas de gestion des droits ou de session.
 
 
-\subsection{Diagrammes proposés}
+\subsection{Diagrammes proposÃ©s}
 
-Artichow étant assez riche, \obm s'enrichi de nouveaux diagrammes au fur et à mesure des besoins.\\
+Artichow Ã©tant assez riche, \obm s'enrichi de nouveaux diagrammes au fur et Ã  mesure des besoins.\\
 
 \begin{tabular}{|p{4cm}|p{4cm}|}
 \hline
@@ -31,13 +31,13 @@ Barres multiples & 1.2.0 \\
 \end{tabular}
 
 
-\subsection{Paramètres et utilisation}
+\subsection{ParamÃ¨tres et utilisation}
 
-\subsubsection{Diagramme à barre simple}
+\subsubsection{Diagramme Ã  barre simple}
 
 \begin{tabular}{|p{2cm}|p{3cm}|p{8cm}|}
 \hline
-\textbf{Paramètre} & \textbf{Valeur} & \textbf{Description}\\
+\textbf{ParamÃ¨tre} & \textbf{Valeur} & \textbf{Description}\\
 \hline
 action & bar & \\ 
 \hline
@@ -45,20 +45,20 @@ title & texte & Titre du diagramme \\
 \hline
 values & tableau & Valeur des points (barres) \\
 \hline
-labels & tableau & Labels affichés des points (barres) \\
+labels & tableau & Labels affichÃ©s des points (barres) \\
 \hline
 xlabels & tableau & Labels de l'axe X \\
 \hline
 \end{tabular}
 
 
-\subsubsection{Diagramme à barres multiples}
+\subsubsection{Diagramme Ã  barres multiples}
 
-\paragraph{Note :} 1 plot correspond à un ensemble de données (1 jeu de barres), 1 bar correspond à une barre. Une barre peut présenter des informations de plusieurs plots (barre découpée en parties ou couleurs, comme le potentiel des factures).\\
+\paragraph{Note :} 1 plot correspond Ã  un ensemble de donnÃ©es (1 jeu de barres), 1 bar correspond Ã  une barre. Une barre peut prÃ©senter des informations de plusieurs plots (barre dÃ©coupÃ©e en parties ou couleurs, comme le potentiel des factures).\\
 
 \begin{tabular}{|p{2cm}|p{3cm}|p{8cm}|}
 \hline
-\textbf{Paramètre} & \textbf{Valeur} & \textbf{Description}\\
+\textbf{ParamÃ¨tre} & \textbf{Valeur} & \textbf{Description}\\
 \hline
 action & bar\_multiple & \\ 
 \hline
@@ -66,24 +66,24 @@ title & texte & Titre du diagramme \\
 \hline
 xlabels & tableau & Labels de l'axe X \\
 \hline
-plots & \multicolumn{2}{|c|}{tableau avec entrées du tableau suivant} \\
+plots & \multicolumn{2}{|c|}{tableau avec entrÃ©es du tableau suivant} \\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-Entrées du hachage plots :\\
+EntrÃ©es du hachage plots :\\
 
 \begin{tabular}{|p{2cm}|p{3cm}|p{8cm}|}
 \hline
-\textbf{Paramètre} & \textbf{Valeur} & \textbf{Description}\\
+\textbf{ParamÃ¨tre} & \textbf{Valeur} & \textbf{Description}\\
 \hline
 values & tableau & values[0] : Valeur des points du 1er plot \\
 \hline
-labels & tableau & labels[0] : Labels affichés des points du 1er plot \\
+labels & tableau & labels[0] : Labels affichÃ©s des points du 1er plot \\
 \hline
-legends & tableau & legend[0] : Légende associée au 1er plot \\
+legends & tableau & legend[0] : LÃ©gende associÃ©e au 1er plot \\
 \hline
-new\_bar & tableau (1|0) & new\_bar[n]=1 indique si plot n affiché dans une nouvelle barre (sinon affiché sur la barre actuelle) \\
+new\_bar & tableau (1|0) & new\_bar[n]=1 indique si plot n affichÃ© dans une nouvelle barre (sinon affichÃ© sur la barre actuelle) \\
 \hline
 \end{tabular}
 

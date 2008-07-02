@@ -8,15 +8,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // labels
-$l_user_pref = "Préférences des utilisateurs";
-$l_user_pref_reset = "Mise à jour de toutes les préférences utilisateurs avec les valeurs par défaut";
-$l_user_pref_update_one = "Mise à jour de la valeur par défaut de la préférence";
+$l_user_pref = "PrÃ©fÃ©rences des utilisateurs";
+$l_user_pref_reset = "Mise Ã  jour de toutes les prÃ©fÃ©rences utilisateurs avec les valeurs par dÃ©faut";
+$l_user_pref_update_one = "Mise Ã  jour de la valeur par dÃ©faut de la prÃ©fÃ©rence";
 
 // Titles
-$l_execute = "Exécute action";
+$l_execute = "ExÃ©cute action";
 $l_help = "Aide";
 
 // Messages (+ javascript)
-$l_update_ok = "Mise à jour des préférences correctement effectuée.";
-$l_update_error = "La mise à jour des préférences a échoué !";
-$l_reset_ok = "Mise à jour des préférences aux valeurs par défaut.";
+$l_update_ok = "Mise Ã  jour des prÃ©fÃ©rences correctement effectuÃ©e.";
+$l_update_error = "La mise Ã  jour des prÃ©fÃ©rences a Ã©chouÃ© !";
+$l_reset_ok = "Mise Ã  jour des prÃ©fÃ©rences aux valeurs par dÃ©faut.";

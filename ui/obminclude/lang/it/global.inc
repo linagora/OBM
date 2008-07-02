@@ -287,7 +287,7 @@ $l_header_month = "Mese";
 $l_header_new_event = "Nuovo Appuntamento";
 
 //time headers
-$l_header_activityreport = "Rapporto di Attività";
+$l_header_activityreport = "Rapporto di AttivitÃ ";
 
 // Debug
 $l_dg_id = "Id";

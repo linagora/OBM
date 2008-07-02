@@ -5,115 +5,115 @@
 \clearpage
 \section{Le module \agenda}
 
-\subsection{Présentation du module \agenda}
+\subsection{PrÃ©sentation du module \agenda}
 
-Ce module est un calendrier partagé. Il permet de gérer son calendrier, ainsi que de consulter voire gérer le planning d'autres utilisateurs.
+Ce module est un calendrier partagÃ©. Il permet de gÃ©rer son calendrier, ainsi que de consulter voire gÃ©rer le planning d'autres utilisateurs.
 
-C'est un outil trés riche, sans équivalent dans le libre au niveau fonctionnel et performances.\\
+C'est un outil trÃ©s riche, sans Ã©quivalent dans le libre au niveau fonctionnel et performances.\\
 
-Il propose différentes vues (annuelle, mensuelle, hebdomadaire, quotidienne) toutes consultables en mode multi-utilisateurs.
-Un outil de gestion de réunion permet le parcours d'un calendrier d'un groupe de personnes en mode plages disponibles.
-Il permet une gestion des droits fine et la délégation de la gestion de son agenda.
-La catégorisation des rendez-vous, les rendez-vous privés, les alertes par mail, tous les types de répétition d'événements sont supportés.\\
+Il propose diffÃ©rentes vues (annuelle, mensuelle, hebdomadaire, quotidienne) toutes consultables en mode multi-utilisateurs.
+Un outil de gestion de rÃ©union permet le parcours d'un calendrier d'un groupe de personnes en mode plages disponibles.
+Il permet une gestion des droits fine et la dÃ©lÃ©gation de la gestion de son agenda.
+La catÃ©gorisation des rendez-vous, les rendez-vous privÃ©s, les alertes par mail, tous les types de rÃ©pÃ©tition d'Ã©vÃ©nements sont supportÃ©s.\\
 
 Un utilisateur peut exporter son agenda au format iCalendar et des connecteurs Evolution et Outlook sont en cours de finalisation pour permettre l'utilisation du calendrier depuis ces outils.\\
 
 
-Les principales entités du module \agenda sont décrites ci-dessous :
+Les principales entitÃ©s du module \agenda sont dÃ©crites ci-dessous :
 
-\subsection{Description d'un événement}
+\subsection{Description d'un Ã©vÃ©nement}
 
-Composantes d'un événement :\\
+Composantes d'un Ã©vÃ©nement :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
 \textbf{Nom} & \textbf{Description} \\
 \hline
-Titre & Titre de votre évenement.\\ 
+Titre & Titre de votre Ã©venement.\\ 
 \hline
-Privé & Visibilité de l'événement qui peut être publique ou privée. Un 
-évenement privé n'est visible que par ses participants.\\
+PrivÃ© & VisibilitÃ© de l'Ã©vÃ©nement qui peut Ãªtre publique ou privÃ©e. Un 
+Ã©venement privÃ© n'est visible que par ses participants.\\
 \hline
-Catégorie & Catégories de l'événement. Les catégories sont gérées dans
+CatÃ©gorie & CatÃ©gories de l'Ã©vÃ©nement. Les catÃ©gories sont gÃ©rÃ©es dans
 la section administration du module \agenda.\\
 \hline
-Utilisateurs & Liste des participants de l'événement. La valeur entre
-paranthèses (A,W ou R) représente l'etat du rendez-vous: A pour accepter, W 
+Utilisateurs & Liste des participants de l'Ã©vÃ©nement. La valeur entre
+paranthÃ¨ses (A,W ou R) reprÃ©sente l'etat du rendez-vous: A pour accepter, W 
 pour
-en attente de réponse, R pour refuser.\\
+en attente de rÃ©ponse, R pour refuser.\\
 \hline
-Date de début & Date et heure de début de l'événement. Dans le cas d'un
-événement répétitif, il s'agit de la date de début de la première occurence de
-l'événement.\\
+Date de dÃ©but & Date et heure de dÃ©but de l'Ã©vÃ©nement. Dans le cas d'un
+Ã©vÃ©nement rÃ©pÃ©titif, il s'agit de la date de dÃ©but de la premiÃ¨re occurence de
+l'Ã©vÃ©nement.\\
 \hline
-Date de fin & Date et heure de fin de l'événement. Dans le cas d'un
-événement répétitif, il s'agit de la date de fin de la première occurence de
-l'événement.\\
+Date de fin & Date et heure de fin de l'Ã©vÃ©nement. Dans le cas d'un
+Ã©vÃ©nement rÃ©pÃ©titif, il s'agit de la date de fin de la premiÃ¨re occurence de
+l'Ã©vÃ©nement.\\
 \hline
-Priorité & Décrit le niveau d'importance d'un événement (Basse, Normale,
+PrioritÃ© & DÃ©crit le niveau d'importance d'un Ã©vÃ©nement (Basse, Normale,
 Haute).\\
 \hline
-Type de répétition & Voir la description des types de répétition.\\
+Type de rÃ©pÃ©tition & Voir la description des types de rÃ©pÃ©tition.\\
 \hline
-Date de fin de répétition & Dans le cas d'un événement répétitif, date jusqu'a
-laquelle l'événement se répétera.\\
+Date de fin de rÃ©pÃ©tition & Dans le cas d'un Ã©vÃ©nement rÃ©pÃ©titif, date jusqu'a
+laquelle l'Ã©vÃ©nement se rÃ©pÃ©tera.\\
 \hline
-Jours de répétition  & Voir la description des types de répétition : type
+Jours de rÃ©pÃ©tition  & Voir la description des types de rÃ©pÃ©tition : type
 hebdomadaire.\\
 \hline
-Description & Description de l'événement.\\
+Description & Description de l'Ã©vÃ©nement.\\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
 
-\subsubsection{Type de répétition}
+\subsubsection{Type de rÃ©pÃ©tition}
 
-Un événement peut être répétitif, c'est à dire qu'il va se répéter suivant un
-fréquence définie lors de sa création. 
-Les differentes répétitions possibles sont :\\
+Un Ã©vÃ©nement peut Ãªtre rÃ©pÃ©titif, c'est Ã  dire qu'il va se rÃ©pÃ©ter suivant un
+frÃ©quence dÃ©finie lors de sa crÃ©ation. 
+Les differentes rÃ©pÃ©titions possibles sont :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{---} & Pas de répétition\\
+\textbf{---} & Pas de rÃ©pÃ©tition\\
 \hline
-\textbf{quotidienne} & Evénement a lieu tous les jours.\\
+\textbf{quotidienne} & EvÃ©nement a lieu tous les jours.\\
 \hline
-\textbf{hebdomadaire} & Evénement a lieu toutes les semaines. Il est possible de préciser les jours de la semaine pour lesquels l'événement doit être indiqué (ex: le mardi et le jeudi).\\
+\textbf{hebdomadaire} & EvÃ©nement a lieu toutes les semaines. Il est possible de prÃ©ciser les jours de la semaine pour lesquels l'Ã©vÃ©nement doit Ãªtre indiquÃ© (ex: le mardi et le jeudi).\\
 \hline
-\textbf{mensuelle (date)} & Evénement a lieu tous les mois à une date donnée (le 4 de chaque mois par exemple).\\
+\textbf{mensuelle (date)} & EvÃ©nement a lieu tous les mois Ã  une date donnÃ©e (le 4 de chaque mois par exemple).\\
 \hline
-\textbf{mensuelle (jour)} & Evénement a lieu tous les mois à un jour donné (exemple tout les seconds lundi du mois).\\
+\textbf{mensuelle (jour)} & EvÃ©nement a lieu tous les mois Ã  un jour donnÃ© (exemple tout les seconds lundi du mois).\\
 \hline
-\textbf{annuelle} & Evénement a lieu tous les ans à la même date.\\
+\textbf{annuelle} & EvÃ©nement a lieu tous les ans Ã  la mÃªme date.\\
 \hline
 \end{tabular}
 
 
-\subsubsection{Les liens d'un événement}
+\subsubsection{Les liens d'un Ã©vÃ©nement}
 
-Actuellement un événement est associé à des utilisateurs.
-Une des évolutions prévues du module agenda est de pouvoir lier aux événements différentes entités comme des documents, des contacts...
+Actuellement un Ã©vÃ©nement est associÃ© Ã  des utilisateurs.
+Une des Ã©volutions prÃ©vues du module agenda est de pouvoir lier aux Ã©vÃ©nements diffÃ©rentes entitÃ©s comme des documents, des contacts...
 
 
 \subsection{Les sous-menus du module \agenda}
 
-Le module \agenda comporte 12 sous-menus (certains contextuels ou accessibles selon les droits d'accès)
+Le module \agenda comporte 12 sous-menus (certains contextuels ou accessibles selon les droits d'accÃ¨s)
 :\\
 
 \begin{tabular}{|p{2.5cm}|p{9.5cm}|}
 \hline
 \textbf{Nom} & \textbf{Action / Description} \\
 \hline
-Nouveau rdv & Créer un nouvel événement \\
+Nouveau rdv & CrÃ©er un nouvel Ã©vÃ©nement \\
 \hline
-Consulter & Consulter les informations d'un événement (et changer sa participation à l'événement si on y est invité).\\
+Consulter & Consulter les informations d'un Ã©vÃ©nement (et changer sa participation Ã  l'Ã©vÃ©nement si on y est invitÃ©).\\
 \hline
-Modifier & Modifier les informations d'un événement.\\
+Modifier & Modifier les informations d'un Ã©vÃ©nement.\\
 \hline
-Supprimer & Supprimer un événement (uniquement pour les administrateurs).\\
+Supprimer & Supprimer un Ã©vÃ©nement (uniquement pour les administrateurs).\\
 \hline
-Année & Affichage de la vue annuelle de l'agenda.\\
+AnnÃ©e & Affichage de la vue annuelle de l'agenda.\\
 \hline
 Mois & Affichage de la vue mensuelle de l'agenda.\\
 \hline
@@ -121,11 +121,11 @@ Semaine & Affichage de la vue hebdomadaire de l'agenda.\\
 \hline
 Jour & Affichage de la vue quotidienne de l'agenda.\\
 \hline
-Nouvelle réunion & Plannifier une nouvelle réunion. Visualisation des créneaux disponibles pour un ensemble d'utilisateurs.\\
+Nouvelle rÃ©union & Plannifier une nouvelle rÃ©union. Visualisation des crÃ©neaux disponibles pour un ensemble d'utilisateurs.\\
 \hline
-Gestion des droits & Gérer les permissions de son agenda.\\
+Gestion des droits & GÃ©rer les permissions de son agenda.\\
 \hline
-Administrer & Administration des informations annexes (catégories d'événements).\\
+Administrer & Administration des informations annexes (catÃ©gories d'Ã©vÃ©nements).\\
 \hline
 Exporter & Exporter l'agenda au format iCalendar.\\
 \hline
@@ -134,187 +134,187 @@ Exporter & Exporter l'agenda au format iCalendar.\\
 
 \subsubsection{Le sous-menu : Nouveau rdv}
 
-Ce menu permet de créer un événement dans l'agenda.
-Il permet de renseigner les différentes informations de l'événement.\\
+Ce menu permet de crÃ©er un Ã©vÃ©nement dans l'agenda.
+Il permet de renseigner les diffÃ©rentes informations de l'Ã©vÃ©nement.\\
 
-Pour insérer l'événement saisi, cliquer sur le bouton ``Enregistrer le rdv''.\\
+Pour insÃ©rer l'Ã©vÃ©nement saisi, cliquer sur le bouton ``Enregistrer le rdv''.\\
 
-La création d'un événement génère un courrier électronique à destination des participants (ayant dans leurs préférences l'envoi d'e-mail activé) les informant de l'événement.\\
+La crÃ©ation d'un Ã©vÃ©nement gÃ©nÃ¨re un courrier Ã©lectronique Ã  destination des participants (ayant dans leurs prÃ©fÃ©rences l'envoi d'e-mail activÃ©) les informant de l'Ã©vÃ©nement.\\
 
 A noter :
 \begin{description}
-\item[Conflits] : L'agenda ne prévient plus lorsque l'événement inséré entre
-en conflit avec un autre événement.
-\item[Forcer la notification par mail] : Si cette case est cochée tous les
-utilisateurs participants à l'événements recevront une notification par mail, y
-compris ceux ayant désactivé l'envoi de mails dans leurs préférences.
+\item[Conflits] : L'agenda ne prÃ©vient plus lorsque l'Ã©vÃ©nement insÃ©rÃ© entre
+en conflit avec un autre Ã©vÃ©nement.
+\item[Forcer la notification par mail] : Si cette case est cochÃ©e tous les
+utilisateurs participants Ã  l'Ã©vÃ©nements recevront une notification par mail, y
+compris ceux ayant dÃ©sactivÃ© l'envoi de mails dans leurs prÃ©fÃ©rences.
 \item[Groupes] : Selectionner un (ou plusieurs) groupes dans cette liste aura pour
 effet de rajouter les membres de ce(s) groupe(s) aux participants de
-l'évenement.
+l'Ã©venement.
 \end{description}
 
 \subsubsection{Le sous-menu : Consulter}
 
-Cette fonctionnalité permet de consulter les details d'un événement. Si vous
-participez à cet événement vous pouvez également modifiez votre participation
-depuis cet écran en précisant votre choix dans la zone "Votre participation à l'événement".
+Cette fonctionnalitÃ© permet de consulter les details d'un Ã©vÃ©nement. Si vous
+participez Ã  cet Ã©vÃ©nement vous pouvez Ã©galement modifiez votre participation
+depuis cet Ã©cran en prÃ©cisant votre choix dans la zone "Votre participation Ã  l'Ã©vÃ©nement".
 
 \subsubsection{Le sous-menu : Modifier}
 
-L'écran de modification affiche les informations de l'événement dans un
+L'Ã©cran de modification affiche les informations de l'Ã©vÃ©nement dans un
 formulaire. Toutes les informations sont modifiables.\\
 
-Pour valider les modifications effectuées il faut cliquer sur le bouton 
+Pour valider les modifications effectuÃ©es il faut cliquer sur le bouton 
 ``Valider les modifications''.
 
 \subsubsection{Le sous-menu : Supprimer}
 
-Permet de supprimer un événement. Cette fonctionnalité est uniquement
+Permet de supprimer un Ã©vÃ©nement. Cette fonctionnalitÃ© est uniquement
 disponible pour l'administrateur.\\
-A noter : Lors de la confirmation de la suppression de l'événement, la
-sélection "Confirmer+forcer l'envoi de mail" permet de notifier par mail
-tous les participants, y compris ceux ayant désactivé l'envoi de mails dans leurs préférences.
+A noter : Lors de la confirmation de la suppression de l'Ã©vÃ©nement, la
+sÃ©lection "Confirmer+forcer l'envoi de mail" permet de notifier par mail
+tous les participants, y compris ceux ayant dÃ©sactivÃ© l'envoi de mails dans leurs prÃ©fÃ©rences.
 
-\subsubsection{Le sous-menu : Année}
+\subsubsection{Le sous-menu : AnnÃ©e}
 
 Ce menu affiche la vue annuelle de votre agenda.
-Les événements sont signalés par des carrés de couleur. Un carré signifie la présence d'un ou plusieurs événements pour le jour en question.\\
+Les Ã©vÃ©nements sont signalÃ©s par des carrÃ©s de couleur. Un carrÃ© signifie la prÃ©sence d'un ou plusieurs Ã©vÃ©nements pour le jour en question.\\
 
-En cliquant sur l'intitulé d'un mois, l'affichage passe en vue mensuelle sur le mois sélectionné.\\
-En cliquant sur la case représentant un jour vous passerez automatiquement
+En cliquant sur l'intitulÃ© d'un mois, l'affichage passe en vue mensuelle sur le mois sÃ©lectionnÃ©.\\
+En cliquant sur la case reprÃ©sentant un jour vous passerez automatiquement
 dans la vue quotidienne de ce jour.
 
 \subsubsection{Le sous-menu : Mois}
 
 Ce menu affiche la vue mensuelle de votre agenda.
-Pour chaque événement est indiqué l'heure de début et l'heure de fin.
-Lorsque la souris survole un événement des informations supplémentaires 
-sont indiquées (type de l'événement, titre, description...).\\
+Pour chaque Ã©vÃ©nement est indiquÃ© l'heure de dÃ©but et l'heure de fin.
+Lorsque la souris survole un Ã©vÃ©nement des informations supplÃ©mentaires 
+sont indiquÃ©es (type de l'Ã©vÃ©nement, titre, description...).\\
 
-Les numéros sur la colonne de gauche représentent les numéros des semaines
+Les numÃ©ros sur la colonne de gauche reprÃ©sentent les numÃ©ros des semaines
 des lignes correspondantes.
-En cliquant sur ces numéros, l'affichage passe en vue hebdomadaire sur la semaine sélectionnée.\\
+En cliquant sur ces numÃ©ros, l'affichage passe en vue hebdomadaire sur la semaine sÃ©lectionnÃ©e.\\
 
-En cliquant sur la date d'une case représentant un jour vous passerez
-automatiquement dans la vue quotidienne pour le jour sélectionné.\\
+En cliquant sur la date d'une case reprÃ©sentant un jour vous passerez
+automatiquement dans la vue quotidienne pour le jour sÃ©lectionnÃ©.\\
 
-En cliquant sur le + d'une case représentant un jour vous accederez au 
-formulaire de prise de rendez vous avec la date de début et de fin 
-pré-remplies pour ce jour.
+En cliquant sur le + d'une case reprÃ©sentant un jour vous accederez au 
+formulaire de prise de rendez vous avec la date de dÃ©but et de fin 
+prÃ©-remplies pour ce jour.
 
 \subsubsection{Le sous-menu : Semaine}
 
 Ce menu affiche la vue hebdomadaire de votre agenda.
-Pour chaque événement est indiqué le titre de l'événement.\\
-Lorsque la souris survole un événement des informations supplémentaires 
-sont indiquées (type de l'événement, titre, description...).\\
-Le numéro en haut à gauche de la vue représente le numéro de la semaine en
+Pour chaque Ã©vÃ©nement est indiquÃ© le titre de l'Ã©vÃ©nement.\\
+Lorsque la souris survole un Ã©vÃ©nement des informations supplÃ©mentaires 
+sont indiquÃ©es (type de l'Ã©vÃ©nement, titre, description...).\\
+Le numÃ©ro en haut Ã  gauche de la vue reprÃ©sente le numÃ©ro de la semaine en
 cours.
-Si deux événements se superposent, ils seront fusionnés dans la vue
+Si deux Ã©vÃ©nements se superposent, ils seront fusionnÃ©s dans la vue
 hebdomadaire.\\
-En cliquant sur l'intitulé d'un jour vous passerez automatiquement dans la vue
-quotidienne pour le sélectionné.\\
-En cliquant sur le + à coté de l'intitulé d'un jour vous accederez au 
-formulaire de prise de rendez vous avec la date de début et de fin 
-pré-remplies pour ce jour.
+En cliquant sur l'intitulÃ© d'un jour vous passerez automatiquement dans la vue
+quotidienne pour le sÃ©lectionnÃ©.\\
+En cliquant sur le + Ã  cotÃ© de l'intitulÃ© d'un jour vous accederez au 
+formulaire de prise de rendez vous avec la date de dÃ©but et de fin 
+prÃ©-remplies pour ce jour.
 
 \subsubsection{Le sous-menu : Jour}
 
 Ce menu affiche la vue quotidienne de votre agenda.
-Pour chaque événement est indiqué le titre de l'événement ainsi que ses
-heures de début et de fin..\\
-Lorsque la souris survole un événement des informations supplémentaires 
-sont indiquées (type de l'événement, titre, description...).\\
+Pour chaque Ã©vÃ©nement est indiquÃ© le titre de l'Ã©vÃ©nement ainsi que ses
+heures de dÃ©but et de fin..\\
+Lorsque la souris survole un Ã©vÃ©nement des informations supplÃ©mentaires 
+sont indiquÃ©es (type de l'Ã©vÃ©nement, titre, description...).\\
 
-Si deux événements se superposent, ils seront fusionnés dans la vue hebdomadaire.\\
+Si deux Ã©vÃ©nements se superposent, ils seront fusionnÃ©s dans la vue hebdomadaire.\\
 
-Le numéro en haut à gauche de la vue représente le numéro de la semaine en cours.
-En cliquant sur ce numéro l'affichage passera automatiquement dans
+Le numÃ©ro en haut Ã  gauche de la vue reprÃ©sente le numÃ©ro de la semaine en cours.
+En cliquant sur ce numÃ©ro l'affichage passera automatiquement dans
 la vue hebdomadaire pour cette semaine.\\
-En cliquant sur le + en dessous de l'intitulé d'un jour vous accederez au 
-formulaire de prise de rendez vous avec la date de début et de fin 
-pré-remplies pour ce jour.
+En cliquant sur le + en dessous de l'intitulÃ© d'un jour vous accederez au 
+formulaire de prise de rendez vous avec la date de dÃ©but et de fin 
+prÃ©-remplies pour ce jour.
 
-\subsubsection{Le sous-menu : Nouvelle réunion}
+\subsubsection{Le sous-menu : Nouvelle rÃ©union}
 
-La gestion des réunions est un outil de planification ou d'aide à la prise de rendez-vous en proposant un affichage par créneaux disponibles.\\
+La gestion des rÃ©unions est un outil de planification ou d'aide Ã  la prise de rendez-vous en proposant un affichage par crÃ©neaux disponibles.\\
 
-Cet outil est idéal pour planifier des réunions entre plusieurs utilisateurs
+Cet outil est idÃ©al pour planifier des rÃ©unions entre plusieurs utilisateurs
 d'\obm.
-Ce menu affiche un formulaire proposant de sélectionner les participants membres de la réunion ainsi que la durée et la date approximative souhaitées.\\
+Ce menu affiche un formulaire proposant de sÃ©lectionner les participants membres de la rÃ©union ainsi que la durÃ©e et la date approximative souhaitÃ©es.\\
 
-Une fois le formulaire validé, l'application affiche une vue hebdomadaire de la date
-choisie représentant la disponibilité globale pour la réunion.
-Les différentes cases de la vue sont alors représentées de trois couleurs différentes dont la légende est indiquée à l'ecran:
+Une fois le formulaire validÃ©, l'application affiche une vue hebdomadaire de la date
+choisie reprÃ©sentant la disponibilitÃ© globale pour la rÃ©union.
+Les diffÃ©rentes cases de la vue sont alors reprÃ©sentÃ©es de trois couleurs diffÃ©rentes dont la lÃ©gende est indiquÃ©e Ã  l'ecran:
 \begin{description}
-\item[Libre] Tous les participants sont disponibles à ce moment là et pour la durée souhaitée.
-\item[Libre mais restreint] Tous les participants sont disponibles à ce moment là mais  pour une durée restreinte inférieure à la durée souhaitée.
-\item[Non disponible] Tous les participants ne sont pas libres à ce moment là.
+\item[Libre] Tous les participants sont disponibles Ã  ce moment lÃ  et pour la durÃ©e souhaitÃ©e.
+\item[Libre mais restreint] Tous les participants sont disponibles Ã  ce moment lÃ  mais  pour une durÃ©e restreinte infÃ©rieure Ã  la durÃ©e souhaitÃ©e.
+\item[Non disponible] Tous les participants ne sont pas libres Ã  ce moment lÃ .
 \end{description}
 
 \subsubsection{Le sous-menu : Gestion des droits}
 
-Ce formulaire vous permettra de gérer les droits de votre agenda.
+Ce formulaire vous permettra de gÃ©rer les droits de votre agenda.
 \begin{description}
-\item[Gestion des permissions de lecture de votre agenda] Cette liste présente
+\item[Gestion des permissions de lecture de votre agenda] Cette liste prÃ©sente
 les personnes ayant le droit de consulter votre agenda. Cependant ils ne
-pourront pas voir le détail de vos rendez-vous de type privé.
-\item[Gestion des permissions d'écriture sur votre agenda] Cette liste présente
-les personnes ayant le droit de gérer votre agenda. Une personne ayant les
-droits d'écriture sur votre agenda pourra accepter ou refuser des rendez-vous pour
-vous et définir les droits sur votre agenda.
-Les événements pris par une personne possédant les droits d'écriture sur votre agenda
-seront automatiquement acceptés.
+pourront pas voir le dÃ©tail de vos rendez-vous de type privÃ©.
+\item[Gestion des permissions d'Ã©criture sur votre agenda] Cette liste prÃ©sente
+les personnes ayant le droit de gÃ©rer votre agenda. Une personne ayant les
+droits d'Ã©criture sur votre agenda pourra accepter ou refuser des rendez-vous pour
+vous et dÃ©finir les droits sur votre agenda.
+Les Ã©vÃ©nements pris par une personne possÃ©dant les droits d'Ã©criture sur votre agenda
+seront automatiquement acceptÃ©s.
 \end{description}
 
-A noter que tout le monde à le droit de vous proposer un rendez-vous, cette
-fonctionnalité ne nécessite aucun droit, libre à vous par la suite d'accepter ou
+A noter que tout le monde Ã  le droit de vous proposer un rendez-vous, cette
+fonctionnalitÃ© ne nÃ©cessite aucun droit, libre Ã  vous par la suite d'accepter ou
 refuser les rendez-vous que l'on vous propose.\\
 
-Pour gérer les droits de l'agenda d'une autre personne (disponible uniquement si
-vous avez les autorisations nécessaires), il vous suffit de selectionner la
-personne dont vous voulez gérer les droits dans le portlet \textbf{Gérer les droits
-de} et de sélectionner la personne en question.
+Pour gÃ©rer les droits de l'agenda d'une autre personne (disponible uniquement si
+vous avez les autorisations nÃ©cessaires), il vous suffit de selectionner la
+personne dont vous voulez gÃ©rer les droits dans le portlet \textbf{GÃ©rer les droits
+de} et de sÃ©lectionner la personne en question.
 
 \subsubsection{Le sous-menu : Administrer}
 
-Ce menu permet l'administration des informations annexes des événements.\\
+Ce menu permet l'administration des informations annexes des Ã©vÃ©nements.\\
 
-Il n'est accessible qu'aux administrateurs et permet de gérer les catégories d'événements.
+Il n'est accessible qu'aux administrateurs et permet de gÃ©rer les catÃ©gories d'Ã©vÃ©nements.
 
 \subsection{Les outils de navigation de l'\agenda}
 
-L'\agenda propose une série d'outils de navigation et d'information offrant une meilleure ergonomie d'utilisation.
+L'\agenda propose une sÃ©rie d'outils de navigation et d'information offrant une meilleure ergonomie d'utilisation.
 
-Ces outils affichés dans des portlets (petites zones rectangulaires situés sur la gauche de l'\agenda dans le thème par défaut) sont décrits ci-dessous :
+Ces outils affichÃ©s dans des portlets (petites zones rectangulaires situÃ©s sur la gauche de l'\agenda dans le thÃ¨me par dÃ©faut) sont dÃ©crits ci-dessous :
 
 \subsubsection{Le portlet : Utilisateurs}
 
 Le premier portlet \textbf{Utilisateurs} indique la liste des utilisateurs dont
-l'\agenda est actuellement affiché.\\
-Pour chaque utilisateur sont indiqués le nom, le prénom ainsi qu'une couleur permettant de différencier les événements de l'utilisateur dans l'\agenda. La couleur d'un utilisateur n'est pas fixe et varie selon le nombre et les utilisateurs affichés.
+l'\agenda est actuellement affichÃ©.\\
+Pour chaque utilisateur sont indiquÃ©s le nom, le prÃ©nom ainsi qu'une couleur permettant de diffÃ©rencier les Ã©vÃ©nements de l'utilisateur dans l'\agenda. La couleur d'un utilisateur n'est pas fixe et varie selon le nombre et les utilisateurs affichÃ©s.
 
 \subsubsection{Le portlet : Utilisateurs}
 
-Le second portlet \textbf{Utilisateurs} permet de sélectionner les utilisateurs
+Le second portlet \textbf{Utilisateurs} permet de sÃ©lectionner les utilisateurs
 dont vous voulez voir l'agenda. La liste ne contient que les personnes dont vous
-pouvez consulter l'agenda. De plus pour des raisons de lisibilité vous ne pouvez
-consulter au maximum que l'agenda de six personnes simultanément.\\
-Lorsque vous consultez l'agenda de personne autres que vous même un lien
-\textbf{Revenir à votre vue} vous permet de revenir à la consultation de votre
+pouvez consulter l'agenda. De plus pour des raisons de lisibilitÃ© vous ne pouvez
+consulter au maximum que l'agenda de six personnes simultanÃ©ment.\\
+Lorsque vous consultez l'agenda de personne autres que vous mÃªme un lien
+\textbf{Revenir Ã  votre vue} vous permet de revenir Ã  la consultation de votre
 agenda.
 
 \subsubsection{Le portlet : Mois en cours}
 
-Ce portlet présente une vue simplifié du mois en cours, il vous propose une aide à la navigation en permettant d'accéder rapidement à n'importe quel jour du mois. La
-date du jour courant est surlignée.
+Ce portlet prÃ©sente une vue simplifiÃ© du mois en cours, il vous propose une aide Ã  la navigation en permettant d'accÃ©der rapidement Ã  n'importe quel jour du mois. La
+date du jour courant est surlignÃ©e.
 
-\subsubsection{Le portlet : Aller à}
+\subsubsection{Le portlet : Aller Ã }
 
-Ce portlet est un raccourci de navigation permettant d'accéder rapidement à :
+Ce portlet est un raccourci de navigation permettant d'accÃ©der rapidement Ã  :
 \begin{itemize}
-\item[N'importe quelle année dans un intervalle de plus ou moins trois ans par
-rapport à l'année en cours.]
-\item[N'importe quel mois de l'année en cours]
-\item[N'importe quelle semaine de l'année en cours]
+\item[N'importe quelle annÃ©e dans un intervalle de plus ou moins trois ans par
+rapport Ã  l'annÃ©e en cours.]
+\item[N'importe quel mois de l'annÃ©e en cours]
+\item[N'importe quelle semaine de l'annÃ©e en cours]
 \end{itemize}

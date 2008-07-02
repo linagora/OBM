@@ -6,10 +6,10 @@
 \clearpage
 \section{Incident}
 
-révision : \obm 2.0 \\
+rÃ©vision : \obm 2.0 \\
 Le module \incident \obm.\\
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
 Le module \incident utilise 4 tables :
 \begin{itemize}
@@ -28,15 +28,15 @@ Table principale des informations d'un incident.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_label & varchar 100 & Nom de l'incident & \\
 \hline
@@ -44,21 +44,21 @@ Table principale des informations d'un incident.\\
 \hline
 \_logger & int 8 & Id de l'utilisateur courant & \\
 \hline
-\_owner  & int 8 & Id de l'utilisateur qui a crée l'incident & \\
+\_owner  & int 8 & Id de l'utilisateur qui a crÃ©e l'incident & \\
 \hline
-\_duration & varchar 4 & Temps totale pour la résolution d'un incident & \\
+\_duration & varchar 4 & Temps totale pour la rÃ©solution d'un incident & \\
 \hline
-\_resolution & text & Solution trouvée.& \\
+\_resolution & text & Solution trouvÃ©e.& \\
 \hline
 \_comment  & text & Commentaire & \\
 \hline
 \_solutiontype\_id & int 8 & Type de solution & \\
 \hline
-\_priority\_id & int 8 & Priorité & \\
+\_priority\_id & int 8 & PrioritÃ© & \\
 \hline
 \_status\_id & int 8 & Etat & \\
 \hline
-\_contract\_id & int 8 & Id du contrat lié à cet incident & \\
+\_contract\_id & int 8 & Id du contrat liÃ© Ã  cet incident & \\
 \hline
 \_archive  & int 2 & Indicateur d'archivage & \\
 \hline
@@ -72,15 +72,15 @@ Table des informations de priorite des incidents.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_label & varchar 32 & Label & \\
 \hline
@@ -97,15 +97,15 @@ Table des informations de priorite des incidents.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_order & int 2 & Ordre & \\
 \hline
@@ -120,15 +120,15 @@ Table des informations de priorite des incidents.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_label & varchar 40 & Label & \\
 \hline
@@ -139,46 +139,46 @@ Table des informations de priorite des incidents.\\
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \incident, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \incident, avec le droit d'accÃ¨s requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \textbf{IntitulÃ©} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & read & (Défaut) formulaire de recherche des incidents. \\ 
+  index & read & (DÃ©faut) formulaire de recherche des incidents. \\ 
  \hline
-  search & read & Résultat de recherche des incidents. \\
+  search & read & RÃ©sultat de recherche des incidents. \\
  \hline
-  new & write & Formulaire de création d'un incident. \\
+  new & write & Formulaire de crÃ©ation d'un incident. \\
  \hline
-  detailconsult & read & Fiche détail d'un incident. \\
+  detailconsult & read & Fiche dÃ©tail d'un incident. \\
  \hline
   detailupdate & write & Formulaire de modification d'un incident. \\
  \hline
   insert & write & Insertion de l'incident. \\
  \hline
-  update & write & Mise à jour de l'incident. \\
+  update & write & Mise Ã  jour de l'incident. \\
  \hline
   delete & write & Suppression de l'incident. \\
  \hline
-  priorite & write & Liste des priorités définies et formulaire de nouvelle priorité. \\
+  priorite & write & Liste des prioritÃ©s dÃ©finies et formulaire de nouvelle prioritÃ©. \\
  \hline
-  priority\_add & write & Ajout d'une priorité . \\
+  priority\_add & write & Ajout d'une prioritÃ© . \\
  \hline
-  priority\_update & write & Modification d'une priorité. \\
+  priority\_update & write & Modification d'une prioritÃ©. \\
  \hline
-  priority\_delete & write & Suppression d'une priorité. \\
+  priority\_delete & write & Suppression d'une prioritÃ©. \\
  \hline
-  status & write & Liste des états définies et formulaire de nouveau état. \\
+  status & write & Liste des Ã©tats dÃ©finies et formulaire de nouveau Ã©tat. \\
  \hline
-  status\_add & write & Ajout d'un état . \\
+  status\_add & write & Ajout d'un Ã©tat . \\
  \hline
-  status\_update & write & Modification d'un état. \\
+  status\_update & write & Modification d'un Ã©tat. \\
  \hline
-  status\_del & write & Suppression d'un état. \\
+  status\_del & write & Suppression d'un Ã©tat. \\
  \hline
-  solutiontype & write & Liste des solutions type définies et formulaire de nouvelle solution type. \\
+  solutiontype & write & Liste des solutions type dÃ©finies et formulaire de nouvelle solution type. \\
  \hline
   solutiontype\_add & write & Ajout d'une solution type. \\
  \hline
@@ -186,11 +186,11 @@ Voici la liste des actions du module \incident, avec le droit d'accès requis ain
  \hline
   solutiontype\_del & write & Suppression d'un type de solution. \\
  \hline
-  display & read & Ecran de modification des préférences d'affichage. \\
+  display & read & Ecran de modification des prÃ©fÃ©rences d'affichage. \\
  \hline
-  dispref\_display & read & Modifie l'affichage d'un élément. \\
+  dispref\_display & read & Modifie l'affichage d'un Ã©lÃ©ment. \\
  \hline
-  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+  dispref\_level & read & Modifie l'ordre d'affichage d'un Ã©lÃ©ment. \\
  
  \hline
 \end{tabular}

@@ -8,7 +8,7 @@
 
 Le module \payment d'\obm.
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
 Le module \payment utilise 3 tables :
 \begin{itemize}
@@ -24,23 +24,23 @@ Table principale des informations d'un paiement.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_company\_id & int 8 & Société client ou fournisseur & \\
+\_company\_id & int 8 & SociÃ©tÃ© client ou fournisseur & \\
 \hline
-\_number & varchar 10 & Numéro du paiement & \\
+\_number & varchar 10 & NumÃ©ro du paiement & \\
 \hline
 \_date & date & Date du paiment & \\
 \hline
-\_expected\_date & date & Date prévue du paiment & \\
+\_expected\_date & date & Date prÃ©vue du paiment & \\
 \hline
 \_amount & double 10,2 & Montant &\\
 \hline
@@ -48,11 +48,11 @@ Table principale des informations d'un paiement.\\
 \hline
 \_paymentkind\_id & int 8 & Moyen de paiement & \\
 \hline
-\_account\_id & int 8 & Compte crédité ou débité & \\
+\_account\_id & int 8 & Compte crÃ©ditÃ© ou dÃ©bitÃ© & \\
 \hline
-\_inout & char 1 & Type entrée ou sortie & (+ entrée, - sortie) \\
+\_inout & char 1 & Type entrÃ©e ou sortie & (+ entrÃ©e, - sortie) \\
 \hline
-\_checked & char 1 & Indicateur de vérification & (1 = 0ui)\\
+\_checked & char 1 & Indicateur de vÃ©rification & (1 = 0ui)\\
 \hline
 \_comment & text (64k) & Commentaire &\\
 \hline
@@ -66,7 +66,7 @@ Table des moyens de paiement.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
 \_shortlabel & char 3 & Label court & \\
 \hline
@@ -87,11 +87,11 @@ Une facture peut avoir plusieurs paiement et un paiement peut couvrir plusieurs 
 \hline
 \_payment\_id & int 8 & Identifiant du paiment & \\
 \hline
-\_amount & double 10,2 & Montant concerné du paiment pour la facture &\\
+\_amount & double 10,2 & Montant concernÃ© du paiment pour la facture &\\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
@@ -103,37 +103,37 @@ Une facture peut avoir plusieurs paiement et un paiement peut couvrir plusieurs 
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \payment, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \payment, avec le droit d'accÃ¨s requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \textbf{IntitulÃ©} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & read & (Défaut) formulaire de recherche des paiments. \\ 
+  index & read & (DÃ©faut) formulaire de recherche des paiments. \\ 
  \hline
-  search & read & Résultat de recherche de paiments. \\
+  search & read & RÃ©sultat de recherche de paiments. \\
  \hline
-  new & write & Formulaire de création d'un paiment. \\
+  new & write & Formulaire de crÃ©ation d'un paiment. \\
  \hline
-  detailconsult & read & Fiche détail d'un paiment. \\
+  detailconsult & read & Fiche dÃ©tail d'un paiment. \\
  \hline
   detailupdate & write & Formulaire de modification d'un paiment. \\
  \hline
-  duplicate & write & Formulaire de création à partir d'une facture existante. \\
+  duplicate & write & Formulaire de crÃ©ation Ã  partir d'une facture existante. \\
  \hline
   insert & write & Insertion d'un paiment. \\
  \hline
-  update & write & Mise à jour d'un paiment. \\
+  update & write & Mise Ã  jour d'un paiment. \\
  \hline
-  check\_delete & write & Vérification avant suppression d'un paiment. \\
+  check\_delete & write & VÃ©rification avant suppression d'un paiment. \\
  \hline
   delete & write & Suppression d'un paiment. \\
  \hline
-  display & read & Ecran de modification des préférences d'affichage. \\
+  display & read & Ecran de modification des prÃ©fÃ©rences d'affichage. \\
  \hline
-  dispref\_display & read & Modifie l'affichage d'un élément. \\
+  dispref\_display & read & Modifie l'affichage d'un Ã©lÃ©ment. \\
  \hline
-  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+  dispref\_level & read & Modifie l'ordre d'affichage d'un Ã©lÃ©ment. \\
  \hline
 \end{tabular}

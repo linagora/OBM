@@ -7,7 +7,7 @@
 
 Le \timemanager \obm  est un module permettant.
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
 Le \timemanager utilise une table :
 \begin{itemize}
@@ -15,35 +15,35 @@ Le \timemanager utilise une table :
 \end{itemize}
 
 \subsubsection{TimeTask}
-Cette table stocke toutes les informations concernant une tâche qui a été saisie par l'utilisateur..\\
+Cette table stocke toutes les informations concernant une tÃ¢che qui a Ã©tÃ© saisie par l'utilisateur..\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
-\_user\_id & int 8 & Id de l'utilisateur ayant effectué l'activité & \\
+\_user\_id & int 8 & Id de l'utilisateur ayant effectuÃ© l'activitÃ© & \\
 \hline
-\_date & timestamp & date de l'activité & \\
+\_date & timestamp & date de l'activitÃ© & \\
 \hline
-\_projecttask\_id & int 8 & Id de la tâche du projet & \\
+\_projecttask\_id & int 8 & Id de la tÃ¢che du projet & \\
 \hline
-\_length & int 2 & Temps travaillé & \\
+\_length & int 2 & Temps travaillÃ© & \\
 \hline
-\_tasktype\_id & int 8 & Type de tâche du projet & \\
+\_tasktype\_id & int 8 & Type de tÃ¢che du projet & \\
 \hline
-\_label & varchar 255 & Commentaire sur l'activité & \\
+\_label & varchar 255 & Commentaire sur l'activitÃ© & \\
 \hline
-\_status & int 1 & Etat : validé 1 / non validé 0 & \\
+\_status & int 1 & Etat : validÃ© 1 / non validÃ© 0 & \\
 \hline
 \end{tabular}
 
@@ -53,33 +53,33 @@ Cette table stocke toutes les informations concernant une tâche qui a été saisie
 
 
 \subsection{Actions, droits, et fonctions}
-Dans cette section seront listées et décrites les actions du module, ainsi que les droits qui leurs sont appliqués et l'intitulé des fonctions executées. 
+Dans cette section seront listÃ©es et dÃ©crites les actions du module, ainsi que les droits qui leurs sont appliquÃ©s et l'intitulÃ© des fonctions executÃ©es. 
 
 \subsubsection{Actions}
 
 Voici la liste des action du module \timemanager, ainsi qu'une description sommaire de chacune d'entre elles.\\
 \begin{tabular}{|c|p{9cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Description} \\
+ \textbf{IntitulÃ©} & \textbf{Description} \\
  \hline
  \hline
- <index> & Action par défaut, elle affiche une vue de la semaine, le formulaire permettant la saisie d'une tâche et la liste déjà saisies pour la semaine. \\ 
+ <index> & Action par dÃ©faut, elle affiche une vue de la semaine, le formulaire permettant la saisie d'une tÃ¢che et la liste dÃ©jÃ  saisies pour la semaine. \\ 
  \hline
- <viewmonth> & Cette action affiche une vue de l'état de la saisie pour un mois. Elle permet de visualiser les parties du mois pour lesquelles la gestion des temps a été remplie.\\ 
+ <viewmonth> & Cette action affiche une vue de l'Ã©tat de la saisie pour un mois. Elle permet de visualiser les parties du mois pour lesquelles la gestion des temps a Ã©tÃ© remplie.\\ 
  \hline
-  <globalview> & Cette action affiche un écran qui permet de visualiser, pour un mois, l'état de remplissage de la gestion des temps pour tous les utilisateurs. Il est possible de valider le mois pour les personnes qui ont entièrement rempli le mois. \\ 
+  <globalview> & Cette action affiche un Ã©cran qui permet de visualiser, pour un mois, l'Ã©tat de remplissage de la gestion des temps pour tous les utilisateurs. Il est possible de valider le mois pour les personnes qui ont entiÃ¨rement rempli le mois. \\ 
  \hline
-  <insert> & Ajoute une tâche saisie dans la base de données. \\
+  <insert> & Ajoute une tÃ¢che saisie dans la base de donnÃ©es. \\
  \hline
-  <validate> & Valide les tâches saisies sur un mois par un utilisateur. Cette action que seul un administrateur peut effectuer empêche ensuite toute modification sur les tâches du mois concerné. \\
+  <validate> & Valide les tÃ¢ches saisies sur un mois par un utilisateur. Cette action que seul un administrateur peut effectuer empÃªche ensuite toute modification sur les tÃ¢ches du mois concernÃ©. \\
  \hline
   <unvalidate> & Annule la validation d'un mois. \\ 
  \hline
- <stats> & Cette action affiche l'écran de statistiques. Il permet de visualiser les informations concernant la répartition du temps de travail entre les différents projets et les différents types de tâches. . \\
+ <stats> & Cette action affiche l'Ã©cran de statistiques. Il permet de visualiser les informations concernant la rÃ©partition du temps de travail entre les diffÃ©rents projets et les diffÃ©rents types de tÃ¢ches. . \\
  \hline
- <delete> & Supprime une tâche.  \\ 
+ <delete> & Supprime une tÃ¢che.  \\ 
  \hline
- <detailupdate> & Affiche un popup permettant de modifier les informations concernant une tâche précédemment saisies. \\ 
+ <detailupdate> & Affiche un popup permettant de modifier les informations concernant une tÃ¢che prÃ©cÃ©demment saisies. \\ 
  \hline
 \end{tabular}
 
@@ -87,10 +87,10 @@ Voici la liste des action du module \timemanager, ainsi qu'une description somma
 
 \subsubsection{Droits}
 
-Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque action ainsi que l'intitulé de ce droit. \\
+Ci-dessous le tableau prÃ©sentant les droits necessaires Ã  l'execution de chaque action ainsi que l'intitulÃ© de ce droit. \\
 \begin{tabular}{|c|c|l|}
  \hline
- \textbf{Action} & \textbf{Code du droit} & \textbf{Intitulé du droit}\\
+ \textbf{Action} & \textbf{Code du droit} & \textbf{IntitulÃ© du droit}\\
  \hline
  \hline
   <index> & time\_read & Droits d'Utilisateur en lecture. \\ 
@@ -99,17 +99,17 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
  \hline
   <globalview> & time\_admin\_read & Droits d'Administrateur en lecture. \\ 
  \hline
-  <insert> & time\_write & Droits d'Utilisateur en écriture. \\
+  <insert> & time\_write & Droits d'Utilisateur en Ã©criture. \\
  \hline
-  <validate> & time\_admin\_write & Droits d'Administrateur en écriture. \\
+  <validate> & time\_admin\_write & Droits d'Administrateur en Ã©criture. \\
  \hline
-  <unvalidate> & time\_admin\_write & Droits d'Administrateur en écriture. \\
+  <unvalidate> & time\_admin\_write & Droits d'Administrateur en Ã©criture. \\
  \hline
   <stats> & time\_read & Droits d'Utilisateur en lecture. \\ 
  \hline
-  <delete> & time\_write & Droits d'Utilisateur en écriture. \\ 
+  <delete> & time\_write & Droits d'Utilisateur en Ã©criture. \\ 
  \hline
-  <detailupdate> & time\_write & Droits d'Utilisateur en écriture. \\ 
+  <detailupdate> & time\_write & Droits d'Utilisateur en Ã©criture. \\ 
  \hline
   <display> & project\_read & Droits d'Utilisateur en ecriture. \\
  \hline
@@ -120,7 +120,7 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
 \end{tabular}
 
 \subsubsection{Fonctions}
- Ci-dessous le tableau présentant la ou les fonctions appelées pour chacune des actions. \\
+ Ci-dessous le tableau prÃ©sentant la ou les fonctions appelÃ©es pour chacune des actions. \\
 \begin{tabular}{|c|c|}
  \hline
  \textbf{Action} & \textbf{Fonction(s)}\\
@@ -202,8 +202,8 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
  \hline 
 \end{tabular}
 
-\subsection{Fonctionalité}
- Dans cette partie seront abordées les fonctionnalités du module \project. Ces fonctionnalités seront étudiés d'un point de vue technique et non utilisateur. Il va donc plus etre sujet du fonctionnement que de l'utilité et de l'utilisation du module.
+\subsection{FonctionalitÃ©}
+ Dans cette partie seront abordÃ©es les fonctionnalitÃ©s du module \project. Ces fonctionnalitÃ©s seront Ã©tudiÃ©s d'un point de vue technique et non utilisateur. Il va donc plus etre sujet du fonctionnement que de l'utilitÃ© et de l'utilisation du module.
 
 \subsubsection{Vue Hebdomadaire}
 
@@ -211,81 +211,81 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
 
  Les etapes de la production de cet affichage sont les suivantes : 
  \begin{itemize}
-  \item{Récupération des informations sur le remplissage de la semaine}
-  \item{Récupération des informations nécessaires à la création du formulaire de saisie}
+  \item{RÃ©cupÃ©ration des informations sur le remplissage de la semaine}
+  \item{RÃ©cupÃ©ration des informations nÃ©cessaires Ã  la crÃ©ation du formulaire de saisie}
   \item{Affichage de la vue}
  \end{itemize}
 
- Donc pour la récupération des données sur les tâches en base, trois fonctions sont utilisées à savoir :
+ Donc pour la rÃ©cupÃ©ration des donnÃ©es sur les tÃ¢ches en base, trois fonctions sont utilisÃ©es Ã  savoir :
  \begin{description}
-  \item{\fonction{run\_query\_task\_one\_week}} : Cette fonction permet de récupérer l'état de remplissage des différents jours de la semaine. 
-  \item{\fonction{run\_query\_search}} : Cette fonction récupére en base de données la liste des tâches déjà saisies pour la semaine.
-  \item{\fonction{run\_query\_valid\_search}} : Cette fonction récupére l'état de validation des différents jours de la semaine. 
+  \item{\fonction{run\_query\_task\_one\_week}} : Cette fonction permet de rÃ©cupÃ©rer l'Ã©tat de remplissage des diffÃ©rents jours de la semaine. 
+  \item{\fonction{run\_query\_search}} : Cette fonction rÃ©cupÃ©re en base de donnÃ©es la liste des tÃ¢ches dÃ©jÃ  saisies pour la semaine.
+  \item{\fonction{run\_query\_valid\_search}} : Cette fonction rÃ©cupÃ©re l'Ã©tat de validation des diffÃ©rents jours de la semaine. 
  \end{description}
 
- Donc pour la récupération des données sur les tâches que l'utilisateur est susceptible de réaliser, trois fonctions sont utilisées à savoir :
+ Donc pour la rÃ©cupÃ©ration des donnÃ©es sur les tÃ¢ches que l'utilisateur est susceptible de rÃ©aliser, trois fonctions sont utilisÃ©es Ã  savoir :
  \begin{description}
-  \item{\fonction{run\_query\_tasktype}} : Cette fonction permet de récupérer la liste des types de tâches que l'utilisateur est susceptible d'effectuer (c'est à dire les tâches non facturées et celles qui sont ratachées à un projet auquel l'utilisateur prend part)
-  \item{\fonction{run\_query\_project}} : Cette fonction récupére en base de données la liste de tous les projets auquels participe l'utilisateur.
-  \item{\fonction{run\_query\_projecttask}} : Cette fonction récupére de la liste des sous-tâches qui composent les projets qui ont été récupérés par la fonction précédente.
+  \item{\fonction{run\_query\_tasktype}} : Cette fonction permet de rÃ©cupÃ©rer la liste des types de tÃ¢ches que l'utilisateur est susceptible d'effectuer (c'est Ã  dire les tÃ¢ches non facturÃ©es et celles qui sont ratachÃ©es Ã  un projet auquel l'utilisateur prend part)
+  \item{\fonction{run\_query\_project}} : Cette fonction rÃ©cupÃ©re en base de donnÃ©es la liste de tous les projets auquels participe l'utilisateur.
+  \item{\fonction{run\_query\_projecttask}} : Cette fonction rÃ©cupÃ©re de la liste des sous-tÃ¢ches qui composent les projets qui ont Ã©tÃ© rÃ©cupÃ©rÃ©s par la fonction prÃ©cÃ©dente.
  \end{description}
 
- A partir des informations générées, on appelle les fonctions :
+ A partir des informations gÃ©nÃ©rÃ©es, on appelle les fonctions :
  \begin{description}
-  \item{\fonction{dis\_time\_links}} : qui affiche les liens vers les semaines précédentes et suivantes.
-  \item{\fonction{dis\_time\_index}} : qui affiche une vue synthétique de la semaine : cet affichage met en évidence l'état de remplissage des différents jours et permet de faire ressortir de façon visible celles qui restent à compléter.
-  \item{\fonction{dis\_form\_addtask}} : qui affiche le formumlaire de saisie si il reste des journées à remplir (cf formulaire de saisie des tâches)
-  \item{\fonction{dis\_time\_list\_result}} : qui affiche la liste des tâches déjà saisies pour la semaine. Il s'agit d'une instance de la classe OBM\_DISPLAY ; l'affichage de cette liste est donc paramétrable depuis l'écran affichage.
-  \item{\fonction{dis\_time\_search\_form}} : qui affiche, pour l'administrateur seulement, une boite de sélection des utilisateurs. Cela lui permet d'intervenir a la place de n'importe quel utilisateur.
+  \item{\fonction{dis\_time\_links}} : qui affiche les liens vers les semaines prÃ©cÃ©dentes et suivantes.
+  \item{\fonction{dis\_time\_index}} : qui affiche une vue synthÃ©tique de la semaine : cet affichage met en Ã©vidence l'Ã©tat de remplissage des diffÃ©rents jours et permet de faire ressortir de faÃ§on visible celles qui restent Ã  complÃ©ter.
+  \item{\fonction{dis\_form\_addtask}} : qui affiche le formumlaire de saisie si il reste des journÃ©es Ã  remplir (cf formulaire de saisie des tÃ¢ches)
+  \item{\fonction{dis\_time\_list\_result}} : qui affiche la liste des tÃ¢ches dÃ©jÃ  saisies pour la semaine. Il s'agit d'une instance de la classe OBM\_DISPLAY ; l'affichage de cette liste est donc paramÃ©trable depuis l'Ã©cran affichage.
+  \item{\fonction{dis\_time\_search\_form}} : qui affiche, pour l'administrateur seulement, une boite de sÃ©lection des utilisateurs. Cela lui permet d'intervenir a la place de n'importe quel utilisateur.
  \end{description}
 
 \subsubsection{Vue mensuelle}
 
- Donc pour la récupération des données sur les tâches qui ont déjà été saisies pour le mois en cours :
+ Donc pour la rÃ©cupÃ©ration des donnÃ©es sur les tÃ¢ches qui ont dÃ©jÃ  Ã©tÃ© saisies pour le mois en cours :
  \begin{description}
-  \item{\fonction{run\_query\_task\_one\_month}} : Cette fonction permet de récupérer les informations sur le remplissage de la gestion des temps pour le mois en cours.
+  \item{\fonction{run\_query\_task\_one\_month}} : Cette fonction permet de rÃ©cupÃ©rer les informations sur le remplissage de la gestion des temps pour le mois en cours.
  \end{description}
 
- A partir des informations récupérées, on appelle les fonctions :
+ A partir des informations rÃ©cupÃ©rÃ©es, on appelle les fonctions :
  \begin{description}
-  \item{\fonction{dis\_time\_links}} : qui affiche les liens vers les mois précédents et suivants.
-  \item{\fonction{dis\_time\_index}} : qui affiche une vue synthétique du mois : cet affichage met en évidence l'état de remplissage des différents jours et permet de faire ressortir de façon visible celles qui restent à compléter. Depuis cet écran, on peut accéder aux vues hebdomadaires des différentes semains du mois.
-  \item{\fonction{dis\_time\_search\_form}} : qui affiche, pour l'administrateur seulement, une boite de sélection des utilisateurs. Cela lui permet d'intervenir a la place de n'importe quel utilisateur.
+  \item{\fonction{dis\_time\_links}} : qui affiche les liens vers les mois prÃ©cÃ©dents et suivants.
+  \item{\fonction{dis\_time\_index}} : qui affiche une vue synthÃ©tique du mois : cet affichage met en Ã©vidence l'Ã©tat de remplissage des diffÃ©rents jours et permet de faire ressortir de faÃ§on visible celles qui restent Ã  complÃ©ter. Depuis cet Ã©cran, on peut accÃ©der aux vues hebdomadaires des diffÃ©rentes semains du mois.
+  \item{\fonction{dis\_time\_search\_form}} : qui affiche, pour l'administrateur seulement, une boite de sÃ©lection des utilisateurs. Cela lui permet d'intervenir a la place de n'importe quel utilisateur.
  \end{description}
 
-\subsubsection{Formulaire de saisie des tâches}
+\subsubsection{Formulaire de saisie des tÃ¢ches}
 
-Afin de faciliter la saisie, l'action sur les listes catégorie ou projet modifie le contenu de ces mêmes listes et de la liste de sous-tâches.
-Deux éléments sont nécessaires pour permettre ce comportement :
+Afin de faciliter la saisie, l'action sur les listes catÃ©gorie ou projet modifie le contenu de ces mÃªmes listes et de la liste de sous-tÃ¢ches.
+Deux Ã©lÃ©ments sont nÃ©cessaires pour permettre ce comportement :
 \begin{itemize}
 \item{l'envoi d'informations sur les projets dans la page web}
-\item{la modification du formulair à l'aide de scrips JavaScript}
+\item{la modification du formulair Ã  l'aide de scrips JavaScript}
 \end{itemize}
 
-On va donc commencer par génerer deux tableaux de donnés qui seront inclus dans la source de la page html : un pour les projets qui pourront apparaitre dans la liste déroulantes, un pour les sous-tâches qui composent ces mêmes projets.
+On va donc commencer par gÃ©nerer deux tableaux de donnÃ©s qui seront inclus dans la source de la page html : un pour les projets qui pourront apparaitre dans la liste dÃ©roulantes, un pour les sous-tÃ¢ches qui composent ces mÃªmes projets.
 
- Ces deux tableaux seront exploités par les scripts qui seront appelés quand l'utilisateur agira sur la liste des catégories ou sur celle des projets :
+ Ces deux tableaux seront exploitÃ©s par les scripts qui seront appelÃ©s quand l'utilisateur agira sur la liste des catÃ©gories ou sur celle des projets :
  \begin{itemize}
-  \item{fill\_tasktype} : met à jour la valeur sélectionnée pour la rendre cohérente avec le projet sélectionnée.
+  \item{fill\_tasktype} : met Ã  jour la valeur sÃ©lectionnÃ©e pour la rendre cohÃ©rente avec le projet sÃ©lectionnÃ©e.
   \item{fill\_projectall} : remplit la liste des projets avec tous les projets auquels l'utilisateur prend part.
-  \item{fill\_project} : remplit cette même liste mais avec seulement les projets qui correspondent au type de tâche sélectionné.
-  \item{fill\_projecttask} : remplit la liste des sous-tâches en fonction du projet sélectionné.
-  \item{select\_default} : sélectionne les valeurs adéquates lors du chargement de l'écran permettant la modification d'un tâche.
+  \item{fill\_project} : remplit cette mÃªme liste mais avec seulement les projets qui correspondent au type de tÃ¢che sÃ©lectionnÃ©.
+  \item{fill\_projecttask} : remplit la liste des sous-tÃ¢ches en fonction du projet sÃ©lectionnÃ©.
+  \item{select\_default} : sÃ©lectionne les valeurs adÃ©quates lors du chargement de l'Ã©cran permettant la modification d'un tÃ¢che.
  \end{itemize}
 
-\subsubsection{Insertion/modification d'une tâche}
+\subsubsection{Insertion/modification d'une tÃ¢che}
 
- La modification des informations dans la base de données se fait en deux étapes
+ La modification des informations dans la base de donnÃ©es se fait en deux Ã©tapes
  \begin{itemize}
-  \item{mise à jour de la base de données} : \fonction{run\_query\_insert} ajoute cette tâche dans la base de données ou \fonction{run\_query\_update} mets à jour la tâche modifiée.
-  \item{validation des journées} : \fonction{run\_query\_validate} marque comme complets les jours que cette modification a fini de remplire ou, au contraire, détecte si une modification a remis en cause le fait qu'une journée soit validée.
+  \item{mise Ã  jour de la base de donnÃ©es} : \fonction{run\_query\_insert} ajoute cette tÃ¢che dans la base de donnÃ©es ou \fonction{run\_query\_update} mets Ã  jour la tÃ¢che modifiÃ©e.
+  \item{validation des journÃ©es} : \fonction{run\_query\_validate} marque comme complets les jours que cette modification a fini de remplire ou, au contraire, dÃ©tecte si une modification a remis en cause le fait qu'une journÃ©e soit validÃ©e.
  \end{itemize}
 
 \subsubsection{Validation d'un mois}
 
- Cette fonctionnalité n'est disponible que pour l'administrateur. Il peut :
+ Cette fonctionnalitÃ© n'est disponible que pour l'administrateur. Il peut :
  \begin{itemize}
-  \item{compléter un mois incomplet}
-  \item{valider un mois} : \fonction{run\_query\_adminvalidate} marque comme validé un mois. Il ne sera alors plus possible de modifier les tâches qui ont été validées.
-  \item{annuler la validation} : \fonction{run\_query\_adminunvalidate} annule cette validation. C'est la seule solution pour pouvoir corriger à nouveau des tâches précedemment vérouillées.
+  \item{complÃ©ter un mois incomplet}
+  \item{valider un mois} : \fonction{run\_query\_adminvalidate} marque comme validÃ© un mois. Il ne sera alors plus possible de modifier les tÃ¢ches qui ont Ã©tÃ© validÃ©es.
+  \item{annuler la validation} : \fonction{run\_query\_adminunvalidate} annule cette validation. C'est la seule solution pour pouvoir corriger Ã  nouveau des tÃ¢ches prÃ©cedemment vÃ©rouillÃ©es.
  \end{itemize}

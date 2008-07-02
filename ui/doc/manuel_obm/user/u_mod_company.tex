@@ -5,99 +5,99 @@
 \clearpage
 \section{Le module \company}
 
-\subsection{Présentation du module \company}
+\subsection{PrÃ©sentation du module \company}
 
-Ce module est une gestion de société, souvent appelée \textbf{pages jaunes} permettant de gérer les clients, fournisseurs, partenaires...\\
+Ce module est une gestion de sociÃ©tÃ©, souvent appelÃ©e \textbf{pages jaunes} permettant de gÃ©rer les clients, fournisseurs, partenaires...\\
 
 C'est un module central dans OBM car de nombreux autres modules utilisent \company (comme Affaire, Projet, Contrat,..).
 
-De nombreux attributs permettent de décrire une société.
-Afin de couvrir des utilisations diverses plusieurs attributs peuvent être désactivés et ne pas apparaître dans l'application.
+De nombreux attributs permettent de dÃ©crire une sociÃ©tÃ©.
+Afin de couvrir des utilisations diverses plusieurs attributs peuvent Ãªtre dÃ©sactivÃ©s et ne pas apparaÃ®tre dans l'application.
 
-Le module \company bénéficie d'une recherche avancée (recherche phonétique et approchée).
+Le module \company bÃ©nÃ©ficie d'une recherche avancÃ©e (recherche phonÃ©tique et approchÃ©e).
 
-\subsection{Description d'une société}
+\subsection{Description d'une sociÃ©tÃ©}
 
-Composantes d'une société :\\
+Composantes d'une sociÃ©tÃ© :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
 \textbf{Nom} & \textbf{Description} \\
 \hline
-Nom & Nom de la société (d'autres noms peuvent être saisis pour les recherches)\\
+Nom & Nom de la sociÃ©tÃ© (d'autres noms peuvent Ãªtre saisis pour les recherches)\\
 \hline
-Numéro & Un numéro de référence pour la société.\\
+NumÃ©ro & Un numÃ©ro de rÃ©fÃ©rence pour la sociÃ©tÃ©.\\
 \hline
-Numéro VAT & Numéro intracommunautaire de la société (obligatoire sur factures).\\
+NumÃ©ro VAT & NumÃ©ro intracommunautaire de la sociÃ©tÃ© (obligatoire sur factures).\\
 \hline
-Source de données & Identification de l'origine de l'information.\\
+Source de donnÃ©es & Identification de l'origine de l'information.\\
 \hline
-Archive & Etat d'archivage de la société. Une société archivée ne pourra plus être modifiée 
+Archive & Etat d'archivage de la sociÃ©tÃ©. Une sociÃ©tÃ© archivÃ©e ne pourra plus Ãªtre modifiÃ©e 
 % %PC
-et n'apparaitra pas dans les résultats de recherche par défaut.\\
+et n'apparaitra pas dans les rÃ©sultats de recherche par dÃ©faut.\\
 \hline
-Type & Classification de la société (client, propect, fournisseur,...).\\
+Type & Classification de la sociÃ©tÃ© (client, propect, fournisseur,...).\\
 \hline
-Secteur d'activité & Secteur d'activité de la société.\\
+Secteur d'activitÃ© & Secteur d'activitÃ© de la sociÃ©tÃ©.\\
 \hline
-Code NAF & Code NAF de la société.\\
+Code NAF & Code NAF de la sociÃ©tÃ©.\\
 \hline
-Responsable & Responsable interne de cette société (commercial, responsable de compte).\\
+Responsable & Responsable interne de cette sociÃ©tÃ© (commercial, responsable de compte).\\
 \hline
-Coordonnées & Adresse, code postal, cedex, ville et pays.\\
+CoordonnÃ©es & Adresse, code postal, cedex, ville et pays.\\
 \hline
-Tel et Fax & Téléphone et fax.\\
+Tel et Fax & TÃ©lÃ©phone et fax.\\
 \hline
-Email & Adresse e-mail de la société (adresse générique).\\
+Email & Adresse e-mail de la sociÃ©tÃ© (adresse gÃ©nÃ©rique).\\
 \hline
-Web & Adresse web de la société (ne pas saisir http://).\\
+Web & Adresse web de la sociÃ©tÃ© (ne pas saisir http://).\\
 \hline
-Catégorie & Catégories de la société. Voir la description des catégories.\\
+CatÃ©gorie & CatÃ©gories de la sociÃ©tÃ©. Voir la description des catÃ©gories.\\
 \hline
-Commentaire & Commentaire sur la société.\\
+Commentaire & Commentaire sur la sociÃ©tÃ©.\\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
 
-Les attributs suivants peuvent être désactivés si non utiles dans une installation d'OBM, et ainsi ne pas apparaître dans l'application :
+Les attributs suivants peuvent Ãªtre dÃ©sactivÃ©s si non utiles dans une installation d'OBM, et ainsi ne pas apparaÃ®tre dans l'application :
 
 \begin{itemize}
-\item Numéro
-\item Numéro VAT Intracommunautaire
+\item NumÃ©ro
+\item NumÃ©ro VAT Intracommunautaire
 \item Type
-\item Secteur d'activité
+\item Secteur d'activitÃ©
 \item Code NAF
-\item Catégories
+\item CatÃ©gories
 \item Ligne Adresse 3
 \item Cedex
 \end{itemize}
 
 
-\subsubsection{Catégories d'une société}
-Les catégories d'une société permettent de classifier et organiser les sociétés.
-Une société peut référencer plusieurs catégories.
+\subsubsection{CatÃ©gories d'une sociÃ©tÃ©}
+Les catÃ©gories d'une sociÃ©tÃ© permettent de classifier et organiser les sociÃ©tÃ©s.
+Une sociÃ©tÃ© peut rÃ©fÃ©rencer plusieurs catÃ©gories.
 
-Les catégories sont administrables par la menu ``Administration'' du module \company, et il est donc possible de les définir selon les besoins.
+Les catÃ©gories sont administrables par la menu ``Administration'' du module \company, et il est donc possible de les dÃ©finir selon les besoins.
 
-Par exemple : des secteurs géographiques, des secteurs d'activité détaillés, une classification interne (selon des produits, cibles...).
+Par exemple : des secteurs gÃ©ographiques, des secteurs d'activitÃ© dÃ©taillÃ©s, une classification interne (selon des produits, cibles...).
 
-Les catégories peuvent être organisées hiérarchiquement (avec une profondeur de 3 niveaux maximum) par exemple :\\
+Les catÃ©gories peuvent Ãªtre organisÃ©es hiÃ©rarchiquement (avec une profondeur de 3 niveaux maximum) par exemple :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
-\hline\textbf{Code catégorie} & \textbf{Label catégorie} \\
+\hline\textbf{Code catÃ©gorie} & \textbf{Label catÃ©gorie} \\
 \hline
 1 & Education\\
 \hline
-1.1 & Universités\\
+1.1 & UniversitÃ©s\\
 \hline
 1.2 & Ecoles\\
 \hline
 1.2.1 & Ecoles publiques\\
 \hline
-1.2.2 & Ecoles privées\\
+1.2.2 & Ecoles privÃ©es\\
 \hline
-1.3 & Lycées\\
+1.3 & LycÃ©es\\
 \hline
 2 & Administrations\\
 \hline
@@ -108,9 +108,9 @@ Les catégories peuvent être organisées hiérarchiquement (avec une profondeur de 
 \end{tabular}
 
 
-\subsubsection{Les liens d'une société}
+\subsubsection{Les liens d'une sociÃ©tÃ©}
 
-Le module \company étant central à OBM, de nombreux liens sont disponibles depuis une société et permettent d'accéder directement aux entités liées à cette société :\\
+Le module \company Ã©tant central Ã  OBM, de nombreux liens sont disponibles depuis une sociÃ©tÃ© et permettent d'accÃ©der directement aux entitÃ©s liÃ©es Ã  cette sociÃ©tÃ© :\\
 
 \begin{itemize}
 \item Contact
@@ -122,124 +122,124 @@ Le module \company étant central à OBM, de nombreux liens sont disponibles depui
 
 \subsection{Les sous-menus du module \company}
 
-Le module \company comporte 7 sous-menus (accessibles selon les droits d'accès) :\\
+Le module \company comporte 7 sous-menus (accessibles selon les droits d'accÃ¨s) :\\
 
 \begin{tabular}{|p{2.5cm}|p{9.5cm}|}
 \hline
 \textbf{Nom} & \textbf{Action / Description} \\
 \hline
-Chercher & Recherche multicritère et avancée des sociétés \\
+Chercher & Recherche multicritÃ¨re et avancÃ©e des sociÃ©tÃ©s \\
 \hline
-Nouveau & Créer une nouvelle société.\\
+Nouveau & CrÃ©er une nouvelle sociÃ©tÃ©.\\
 \hline
-Consulter & Consulter les informations d'une société.\\
+Consulter & Consulter les informations d'une sociÃ©tÃ©.\\
 \hline
-Modifier & Modifier les informations d'une société.\\
+Modifier & Modifier les informations d'une sociÃ©tÃ©.\\
 \hline
-Supprimer & Vérifier les liens puis si besoin Supprimer une société.\\
+Supprimer & VÃ©rifier les liens puis si besoin Supprimer une sociÃ©tÃ©.\\
 \hline
-Administrer & Administration des informations annexes (types, catégories, secteurs d'activité et codes NAF).\\
+Administrer & Administration des informations annexes (types, catÃ©gories, secteurs d'activitÃ© et codes NAF).\\
 \hline
-Affichage & Personnalisation de l'affichage de la liste des société.\\
+Affichage & Personnalisation de l'affichage de la liste des sociÃ©tÃ©.\\
 \hline
 \end{tabular}
 
 
 \subsubsection{Le sous-menu : Chercher}
 
-Ce menu permet d'effectuer une recherche selon différents critères :
+Ce menu permet d'effectuer une recherche selon diffÃ©rents critÃ¨res :
 
 \begin{itemize}
-\item Nom de la société
-\item Téléphone
+\item Nom de la sociÃ©tÃ©
+\item TÃ©lÃ©phone
 \item Type
-\item Catégorie (catégorie exacte ou inclusion des sous-catégories)
-\item Secteur d'activité
+\item CatÃ©gorie (catÃ©gorie exacte ou inclusion des sous-catÃ©gories)
+\item Secteur d'activitÃ©
 \item Code NAF
 \item Code postal
 \item Ville
 \item Pays
 \item Responsable du compte
-\item Source de données
-\item Date de dernière modification (avant / après la date)
+\item Source de donnÃ©es
+\item Date de derniÃ¨re modification (avant / aprÃ¨s la date)
 \item Etat d'archivage
 \end{itemize}
 
-Il est possible d'inclure les sociétés archivées dans les résultats de recherche.
+Il est possible d'inclure les sociÃ©tÃ©s archivÃ©es dans les rÃ©sultats de recherche.
 
-\paragraph{Recherche avancée : phonétique et approchée}
+\paragraph{Recherche avancÃ©e : phonÃ©tique et approchÃ©e}
 
-La recherche sur le nom de la société bénéficie d'une recherche avancée et s'effectue en 2 étapes :\\
+La recherche sur le nom de la sociÃ©tÃ© bÃ©nÃ©ficie d'une recherche avancÃ©e et s'effectue en 2 Ã©tapes :\\
 
 \begin{itemize}
 \item Recherche exacte
-\item Recherche avancée
+\item Recherche avancÃ©e
 \end{itemize}
 \vspace{0.3cm}
 
-La recherche avancée cumule une recherche phonétique et approchée.\\
+La recherche avancÃ©e cumule une recherche phonÃ©tique et approchÃ©e.\\
 
-La recherche phonétique permet de chercher sur la signature sonore du nom (par exemple la recherche d'''Alliacom'' trouvera ``Aliacom'', ou la recherche de ``restorant'' trouvera ``restaurant'').\\
+La recherche phonÃ©tique permet de chercher sur la signature sonore du nom (par exemple la recherche d'''Alliacom'' trouvera ``Aliacom'', ou la recherche de ``restorant'' trouvera ``restaurant'').\\
 
-La recherche avancée est une recherche ne tenant pas compte de divers caracères (par exemple la recherche d'''edf'' trouvera ``E.D.F'', ou la recherche de ``lautre'' trouvera ``l'autre''). Ce mode de recherche s'appuie sur le champ ``Aussi connue comme'', généré automatiquement par l'application.
+La recherche avancÃ©e est une recherche ne tenant pas compte de divers caracÃ¨res (par exemple la recherche d'''edf'' trouvera ``E.D.F'', ou la recherche de ``lautre'' trouvera ``l'autre''). Ce mode de recherche s'appuie sur le champ ``Aussi connue comme'', gÃ©nÃ©rÃ© automatiquement par l'application.
 
 % %PC ne devrait-on pas masquer ce champ ?
 
 \subsubsection{Le sous-menu : Nouveau}
 
-Ce menu permet de créer une société.
+Ce menu permet de crÃ©er une sociÃ©tÃ©.
 
-Pour insérer la société saisie, il faut cliquer sur le bouton ``Enregistrer la société''.
+Pour insÃ©rer la sociÃ©tÃ© saisie, il faut cliquer sur le bouton ``Enregistrer la sociÃ©tÃ©''.
 
-Si des sociétés similaires existent déjà (possédant un nom ressemblant, même racine), avant d'insérer la nouvelle société, \obm affiche une page d'alerte présentant les sociétés similaires et permet de continuer l'insertion ou de l'annuler.
-Ceci est particulièrement utile lorsque une société déjà existante est créée à nouveau, et permet d'éviter la saisie de doublons.
+Si des sociÃ©tÃ©s similaires existent dÃ©jÃ  (possÃ©dant un nom ressemblant, mÃªme racine), avant d'insÃ©rer la nouvelle sociÃ©tÃ©, \obm affiche une page d'alerte prÃ©sentant les sociÃ©tÃ©s similaires et permet de continuer l'insertion ou de l'annuler.
+Ceci est particuliÃ¨rement utile lorsque une sociÃ©tÃ© dÃ©jÃ  existante est crÃ©Ã©e Ã  nouveau, et permet d'Ã©viter la saisie de doublons.
 
-Le champ ``aussi connue sous'' est rempli automatiquement avec une version simplifiée du nom.
+Le champ ``aussi connue sous'' est rempli automatiquement avec une version simplifiÃ©e du nom.
 
 \subsubsection{Le sous-menu : Consulter}
 
-Ce menu permet de consulter la fiche d'une société (accessible uniquement depuis la fiche de la société en mode mise à jour ou suppression).
-Cet écran est aussi accessible depuis les résultats de recherche ou les liens depuis d'autres modules en cliquant sur la société sélectionnée.
+Ce menu permet de consulter la fiche d'une sociÃ©tÃ© (accessible uniquement depuis la fiche de la sociÃ©tÃ© en mode mise Ã  jour ou suppression).
+Cet Ã©cran est aussi accessible depuis les rÃ©sultats de recherche ou les liens depuis d'autres modules en cliquant sur la sociÃ©tÃ© sÃ©lectionnÃ©e.
 
 \subsubsection{Le sous-menu : Modifier}
 
-L'écran de modification affiche les informations de la société dans un formulaire.
+L'Ã©cran de modification affiche les informations de la sociÃ©tÃ© dans un formulaire.
 Toutes les informations sont modifiables.
 
-L'association de catégories à la société courante s'effectue via une fenêtre popup listant les catégories sous forme arborescente et permettant de les sélectionner.\\
+L'association de catÃ©gories Ã  la sociÃ©tÃ© courante s'effectue via une fenÃªtre popup listant les catÃ©gories sous forme arborescente et permettant de les sÃ©lectionner.\\
 
-Pour valider les modifications effectuées il faut cliquer sur le bouton ``valider les modifications''.
+Pour valider les modifications effectuÃ©es il faut cliquer sur le bouton ``valider les modifications''.
 
 
 \subsubsection{Le sous-menu : Supprimer}
-Ce menu permet la vérification des liens de la société et d'indiquer si celle-ci est supprimable.
-Si la société peut être supprimée, un bouton ``Supprimer la société'' est alors affiché.
+Ce menu permet la vÃ©rification des liens de la sociÃ©tÃ© et d'indiquer si celle-ci est supprimable.
+Si la sociÃ©tÃ© peut Ãªtre supprimÃ©e, un bouton ``Supprimer la sociÃ©tÃ©'' est alors affichÃ©.
 
-\paragraph{Pour être supprimée} une société ne doit pas :\\
+\paragraph{Pour Ãªtre supprimÃ©e} une sociÃ©tÃ© ne doit pas :\\
 
 \begin{itemize}
 \item Avoir des contacts
-\item Etre référencée dans les affaires
-\item Etre référencée dans les projets
-\item Etre référencée dans les contrats
-\item Etre référencée dans les documents.
+\item Etre rÃ©fÃ©rencÃ©e dans les affaires
+\item Etre rÃ©fÃ©rencÃ©e dans les projets
+\item Etre rÃ©fÃ©rencÃ©e dans les contrats
+\item Etre rÃ©fÃ©rencÃ©e dans les documents.
 \end{itemize}
 
 % %PC
-Cette fonctionnalité ne doit servir qu'en cas de fausse manipulation suite à la création d'une société. On préfèrera l'option d'archivage pour masquer (dans le mode de consultation standard) une société aux utilisateurs.
+Cette fonctionnalitÃ© ne doit servir qu'en cas de fausse manipulation suite Ã  la crÃ©ation d'une sociÃ©tÃ©. On prÃ©fÃ¨rera l'option d'archivage pour masquer (dans le mode de consultation standard) une sociÃ©tÃ© aux utilisateurs.
 
 
 \subsubsection{Le sous-menu : Administrer}
 
-Ce menu permet l'administration des informations annexes des sociétés :\\
+Ce menu permet l'administration des informations annexes des sociÃ©tÃ©s :\\
 
 \begin{itemize}
 \item Types
-\item Catégories
-\item Secteurs d'activité
+\item CatÃ©gories
+\item Secteurs d'activitÃ©
 \item Codes NAF
 \end{itemize}
 
 \subsubsection{Le sous-menu : Affichage}
 
-Ce menu permet de paramétrer l'affichage de la liste des sociétés. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
+Ce menu permet de paramÃ©trer l'affichage de la liste des sociÃ©tÃ©s. Il est possible de choisir les champs Ã  afficher et de rÃ©gler leur ordre d'affichage.

@@ -6,10 +6,10 @@
 \clearpage
 \section{Entreprise (module \company)}
 
-révision : \obm 2.0.\\
+rÃ©vision : \obm 2.0.\\
 Le module \company d'\obm.\\
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
 Le module \company utilise 4 tables :
 \begin{itemize}
@@ -26,17 +26,17 @@ Table principale des informations d'une entreprise. \\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
 \_domain\_id & int 8 & Domaine d'appartenance & \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_datasource\_id & int 8 &  & \\
 \hline
@@ -58,15 +58,15 @@ Table principale des informations d'une entreprise. \\
 \hline
 \_activity\_id & int 8 &  & \\
 \hline
-\_nafcode\_id & int 8  & Code de la Nomenclature d'Activités Française & \\
+\_nafcode\_id & int 8  & Code de la Nomenclature d'ActivitÃ©s FranÃ§aise & \\
 \hline
 \_marketing\_managerid & int 8  & Identifiant du responsable marketing  & \\
 \hline
 \_address1 & varchar 64 & Adresse  & \\
 \hline
-\_address2 & varchar 64 & Complément d'adresse 1 & \\
+\_address2 & varchar 64 & ComplÃ©ment d'adresse 1 & \\
 \hline
-\_address3 & varchar 64  & Complément d'adresse 2  & \\
+\_address3 & varchar 64  & ComplÃ©ment d'adresse 2  & \\
 \hline
 \_zipcode & varchar 14 & Code postal  & \\
 \hline
@@ -76,19 +76,19 @@ Table principale des informations d'une entreprise. \\
 \hline
 \_country\_iso3166 & char 2 & Pays   & \\
 \hline
-\_phone & varchar 32 & Numéro de téléphone & \\
+\_phone & varchar 32 & NumÃ©ro de tÃ©lÃ©phone & \\
 \hline
-\_fax & varchar 32 & Numéro de fax & \\
+\_fax & varchar 32 & NumÃ©ro de fax & \\
 \hline
 \_web & varchar 64 & Adresse site web &\\
 \hline
 \_email & varchar 64  & Email de contact &\\
 \hline
-\_contact\_number & int 5 & Nombre de contact appartenant à cette entreprise &\\
+\_contact\_number & int 5 & Nombre de contact appartenant Ã  cette entreprise &\\
 \hline
-\_deal\_number & int 5 & Nombre affaire lié à cette entreprise &\\
+\_deal\_number & int 5 & Nombre affaire liÃ© Ã  cette entreprise &\\
 \hline
-\_deal\_total & int 5 & Total des affaires lié à cette entreprise &\\
+\_deal\_total & int 5 & Total des affaires liÃ© Ã  cette entreprise &\\
 \hline
 \_comment & text & Commentaire  &\\
 \hline
@@ -97,44 +97,44 @@ Table principale des informations d'une entreprise. \\
 
 \subsubsection{CompanyActivity}
 
-Table de référence des activités d'une entreprise.\\
+Table de rÃ©fÃ©rence des activitÃ©s d'une entreprise.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_activity\_id & int 8 & Identifiant & Clé primaire \\
+\_activity\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
 \_domain\_id & int 8 & Id du domaine choisi & \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_code & varchar 10 & Code de l'activité de l'entreprise & \\
+\_code & varchar 10 & Code de l'activitÃ© de l'entreprise & \\
 \hline
-\_label & varchar 64 & Label de l'activité de l'entreprise & \\
+\_label & varchar 64 & Label de l'activitÃ© de l'entreprise & \\
 \hline
 \end{tabular}
 
 
 \subsubsection{CompanyType}
 
-Table de référence des types d'entreprise.
+Table de rÃ©fÃ©rence des types d'entreprise.
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
@@ -149,71 +149,71 @@ Table de référence des types d'entreprise.
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \company, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \company, avec le droit d'accÃ¨s requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \textbf{IntitulÃ©} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & read & (Défaut) formulaire de recherche d'entreprise. \\ 
+  index & read & (DÃ©faut) formulaire de recherche d'entreprise. \\ 
  \hline
-  search & read & Résultat de recherche d'entreprise. \\
+  search & read & RÃ©sultat de recherche d'entreprise. \\
  \hline
-  new & write & Formulaire de création d'une entreprise. \\
+  new & write & Formulaire de crÃ©ation d'une entreprise. \\
  \hline
-  detailconsult & read & Fiche détail d'une entreprise. \\
+  detailconsult & read & Fiche dÃ©tail d'une entreprise. \\
  \hline
   detailupdate & write & Formulaire de modification d'une entreprise. \\
  \hline
   insert & write & Insertion d'une entreprise. \\
  \hline
-  update & write & Mise à jour d'une entreprise. \\
+  update & write & Mise Ã  jour d'une entreprise. \\
  \hline
-  check\_delete & write & Vérification avant suppression d'une entreprise. \\
+  check\_delete & write & VÃ©rification avant suppression d'une entreprise. \\
  \hline
   delete & write & Suppression d'une entreprise. \\
  \hline
   admin & read\_admin & Ecran d'administration des entreprises. \\
  \hline
-  activity\_insert & write\_admin & Ajout d'une activité. \\
+  activity\_insert & write\_admin & Ajout d'une activitÃ©. \\
  \hline
-  activity\_update & write\_admin & Modification d'une activité. \\
+  activity\_update & write\_admin & Modification d'une activitÃ©. \\
  \hline
-  activity\_checklink & write\_admin & Vérification avant suppression d'une activité. \\
+  activity\_checklink & write\_admin & VÃ©rification avant suppression d'une activitÃ©. \\
  \hline
-  activity\_delete & write\_admin & Suppression d'une activité. \\
+  activity\_delete & write\_admin & Suppression d'une activitÃ©. \\
  \hline
-  category\_insert & write\_admin & Ajout d'une catégorie d'entreprise. \\
+  category\_insert & write\_admin & Ajout d'une catÃ©gorie d'entreprise. \\
  \hline
-  category\_update & write\_admin & Modification d'une catégorie d'entreprise. \\
+  category\_update & write\_admin & Modification d'une catÃ©gorie d'entreprise. \\
  \hline
-  category\_checklink & write\_admin & Vérification avant suppression d'une catégorie d'entreprise. \\
+  category\_checklink & write\_admin & VÃ©rification avant suppression d'une catÃ©gorie d'entreprise. \\
  \hline
-  category\_delete & write\_admin & Suppression d'une catégorie d'entreprise. \\
+  category\_delete & write\_admin & Suppression d'une catÃ©gorie d'entreprise. \\
  \hline
-  display & read & Ecran de modification des préférences d'affichage. \\
+  display & read & Ecran de modification des prÃ©fÃ©rences d'affichage. \\
  \hline
-  dispref\_display & read & Modifie l'affichage d'un élément. \\
+  dispref\_display & read & Modifie l'affichage d'un Ã©lÃ©ment. \\
  \hline
-  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+  dispref\_level & read & Modifie l'ordre d'affichage d'un Ã©lÃ©ment. \\
  \hline
   nafcode\_insert & write\_admin & Insertion du code NAF. \\
  \hline
-  nafcode\_update & write\_admin & Mise à jour du code NAF. \\
+  nafcode\_update & write\_admin & Mise Ã  jour du code NAF. \\
  \hline
   nafcode\_delete & write\_admin & Suppression du code NAF. \\
  \hline
   type\_insert & write\_admin & Insertion du type d'entreprise. \\
  \hline
-  type\_update & write\_admin & Mise à jour du type d'entreprise. \\
+  type\_update & write\_admin & Mise Ã  jour du type d'entreprise. \\
  \hline
   type\_delete & write\_admin & Suppression du type d'entreprise. \\
  \hline
-  type\_checklink & write\_admin & Vérification avant suppression d'un type d'entreprise. \\
+  type\_checklink & write\_admin & VÃ©rification avant suppression d'un type d'entreprise. \\
  \hline
-  ext\_get\_id & read & Vérification avant suppression d'un type d'entreprise. \\
+  ext\_get\_id & read & VÃ©rification avant suppression d'un type d'entreprise. \\
  \hline
-  document\_add & write & Vérification avant suppresion d'un type d'entreprise. \\
+  document\_add & write & VÃ©rification avant suppresion d'un type d'entreprise. \\
  \hline
 \end{tabular}

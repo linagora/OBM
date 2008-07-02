@@ -5,9 +5,9 @@
 \clearpage
 \section{Le module Gestion des temps}
 
-Ce module permet de suivre l'activité des différents utilisateurs et leur participation aux projets en cours.\\
+Ce module permet de suivre l'activitÃ© des diffÃ©rents utilisateurs et leur participation aux projets en cours.\\
 
-Les principales entités du module \timemanager sont décrites ci-dessous :
+Les principales entitÃ©s du module \timemanager sont dÃ©crites ci-dessous :
 
 \subsection{Description d'une saisie de temps}
 
@@ -17,25 +17,25 @@ Composantes d'une saisie de temps :\\
 \hline
 \textbf{Nom} & \textbf{Description} \\
 \hline
-Date & Date à laquelle a été effectuée la tâche\\
+Date & Date Ã  laquelle a Ã©tÃ© effectuÃ©e la tÃ¢che\\
 \hline
-Durée & Durée du travail sur la tâche exprimée en fraction de journée\\
+DurÃ©e & DurÃ©e du travail sur la tÃ¢che exprimÃ©e en fraction de journÃ©e\\
 \hline
-Catégorie & Catégorie du projet. Celles-ci sont divisées en trois groupes :
+CatÃ©gorie & CatÃ©gorie du projet. Celles-ci sont divisÃ©es en trois groupes :
 \begin{itemize}
-\item Projets facturés
+\item Projets facturÃ©s
 \item Projets internes R\&D,
-\item Tâches non facturées
+\item TÃ¢ches non facturÃ©es
 \end{itemize}
-Les catégories de tâches sont gérées dans le module référentiel de la section administration.\\
+Les catÃ©gories de tÃ¢ches sont gÃ©rÃ©es dans le module rÃ©fÃ©rentiel de la section administration.\\
 \hline
-Projet & Projet imputé. Cette information n'est présente que pour les catégories de tâches ``projets facturés'' et ``projets internes''\\
+Projet & Projet imputÃ©. Cette information n'est prÃ©sente que pour les catÃ©gories de tÃ¢ches ``projets facturÃ©s'' et ``projets internes''\\
 \hline
-Tâche & Tâche du projet imputé. Cette information n'est présente que pour les catégories de tâches ``projets facturés'' et ``projets internes''\\
+TÃ¢che & TÃ¢che du projet imputÃ©. Cette information n'est prÃ©sente que pour les catÃ©gories de tÃ¢ches ``projets facturÃ©s'' et ``projets internes''\\
 \hline
 Commentaire & Descriptif optionnel\\
 \hline
-Statut & Les imputations de temps ont un statut différent en fonction de leur niveau de validation\\
+Statut & Les imputations de temps ont un statut diffÃ©rent en fonction de leur niveau de validation\\
 \hline
 \end{tabular}
 \vspace{0.3cm}
@@ -43,12 +43,12 @@ Statut & Les imputations de temps ont un statut différent en fonction de leur ni
 
 \subsubsection{Description des statuts d'une imputation}
 
-Les imputations ont un statut différent en fonction de leur niveau de validation :\\
+Les imputations ont un statut diffÃ©rent en fonction de leur niveau de validation :\\
 
 \begin{itemize}
-\item Non validée : c'est le cas lorsque la tâche vient d'être saisie.
-\item Validation utilisateur : elle est réalisée automatiquement lorsqu'une journée est complètement remplie.
-\item Validation administrateur elle est réalisée manuellement par l'administrateur qui veut valider le mois d'un utilisateur lorsque celui-ci est entièrement rempli. Il n'est alors plus possible de modifier ces tâches.
+\item Non validÃ©e : c'est le cas lorsque la tÃ¢che vient d'Ãªtre saisie.
+\item Validation utilisateur : elle est rÃ©alisÃ©e automatiquement lorsqu'une journÃ©e est complÃ¨tement remplie.
+\item Validation administrateur elle est rÃ©alisÃ©e manuellement par l'administrateur qui veut valider le mois d'un utilisateur lorsque celui-ci est entiÃ¨rement rempli. Il n'est alors plus possible de modifier ces tÃ¢ches.
 \end{itemize}
 
 
@@ -57,69 +57,69 @@ Les imputations ont un statut différent en fonction de leur niveau de validation
 Le module \timemanager comporte 5 sous-menus :
 
 \begin{itemize}
-\item Semaine : qui permet de voir l'état de remplissage de la gestion des temps pour une semaine choisie, la liste des tâches déjà saisies et de saisir d'autres tâches.
-\item Mois : qui permet de visualiser l'état de remplissage de la gestion des temps pour un mois complet.
-\item Validation : qui permet de chercher des accords par activités,
-de chercher, consulter et modifier l'arborescence des activités de DIOR. 
+\item Semaine : qui permet de voir l'Ã©tat de remplissage de la gestion des temps pour une semaine choisie, la liste des tÃ¢ches dÃ©jÃ  saisies et de saisir d'autres tÃ¢ches.
+\item Mois : qui permet de visualiser l'Ã©tat de remplissage de la gestion des temps pour un mois complet.
+\item Validation : qui permet de chercher des accords par activitÃ©s,
+de chercher, consulter et modifier l'arborescence des activitÃ©s de DIOR. 
 \item Statistiques : qui permet de consulter, modifier, supprimer et de chercher
-les segments d'après leur libellé et département.
-\item Affichage : qui permet de personnaliser l'affichage de la liste de tâches.
+les segments d'aprÃ¨s leur libellÃ© et dÃ©partement.
+\item Affichage : qui permet de personnaliser l'affichage de la liste de tÃ¢ches.
 \end{itemize}
 
 \subsubsection{Le sous-menu : Semaine}
 
-Ce menu permet d'afficher une vue de la semaine, le formulaire permettant la saisie d'une tâche et la liste des tâches déjà saisies pour la semaine.
+Ce menu permet d'afficher une vue de la semaine, le formulaire permettant la saisie d'une tÃ¢che et la liste des tÃ¢ches dÃ©jÃ  saisies pour la semaine.
 
 \subsubsection{Le sous-menu : Mois}
 
-Ce menu permet d'afficher une vue de l'état de la saisie pour un mois. Elle permet de visualiser les parties du mois pour lesquelles la gestion des temps a été remplie.
+Ce menu permet d'afficher une vue de l'Ã©tat de la saisie pour un mois. Elle permet de visualiser les parties du mois pour lesquelles la gestion des temps a Ã©tÃ© remplie.
 
 \subsubsection{Le sous-menu : Validation}
 
-Ce menu affiche un écran qui permet de visualiser, pour un mois,  l'état de remplissage de la gestion des temps pour tous les utilisateurs. Il est possible de valider le mois pour les personnes qui ont entièrement rempli le mois.
+Ce menu affiche un Ã©cran qui permet de visualiser, pour un mois,  l'Ã©tat de remplissage de la gestion des temps pour tous les utilisateurs. Il est possible de valider le mois pour les personnes qui ont entiÃ¨rement rempli le mois.
 
 \subsubsection{Le sous-menu : Statistiques}
 
-Ce menu permet de visualiser les informations concernant la répartition du temps de travail entre les différents projets et les différents types de tâches.
+Ce menu permet de visualiser les informations concernant la rÃ©partition du temps de travail entre les diffÃ©rents projets et les diffÃ©rents types de tÃ¢ches.
 
 \subsubsection{Le sous-menu : Affichage}
 
-Ce menu permet de paramétrer l'affichage de la liste des tâches. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
+Ce menu permet de paramÃ©trer l'affichage de la liste des tÃ¢ches. Il est possible de choisir les champs Ã  afficher et de rÃ©gler leur ordre d'affichage.
 
-\subsection{Saisir une tâche}
+\subsection{Saisir une tÃ¢che}
 
-A partir de l'écran de vue hebdomadaire, il est possible de saisir une tâche pour la semaine en cours.
+A partir de l'Ã©cran de vue hebdomadaire, il est possible de saisir une tÃ¢che pour la semaine en cours.
 Le formulaire permet de remplir les informations suivantes :
 
 \begin{itemize}
 \item Date : il est possible de saisir un ou plusieurs jours de la semaine.
-\item Durée : elle est exprimée en fraction de journées.
-\item Catégorie : indique le type de tâche qui a été réalisé.
-\item Projet : indique le projet pour lequel cette tâche a été réalisée (sauf s'il s'agit d'une tâche non facturée).
-\item Sous-tâche du projet : indique plus précisément pour quelle partie du projet cette tâche a été réalisée.
-\item Commentaire : permet de décrire en quelques mots la tâche réalisée (non obligatoire).
+\item DurÃ©e : elle est exprimÃ©e en fraction de journÃ©es.
+\item CatÃ©gorie : indique le type de tÃ¢che qui a Ã©tÃ© rÃ©alisÃ©.
+\item Projet : indique le projet pour lequel cette tÃ¢che a Ã©tÃ© rÃ©alisÃ©e (sauf s'il s'agit d'une tÃ¢che non facturÃ©e).
+\item Sous-tÃ¢che du projet : indique plus prÃ©cisÃ©ment pour quelle partie du projet cette tÃ¢che a Ã©tÃ© rÃ©alisÃ©e.
+\item Commentaire : permet de dÃ©crire en quelques mots la tÃ¢che rÃ©alisÃ©e (non obligatoire).
 \end{itemize}
 
-Afin de faciliter la saisie, l'action sur les listes catégorie ou projet modifie le contenu de ces mêmes listes et de la liste de sous-tâches. Les différents cas de figures sont :
+Afin de faciliter la saisie, l'action sur les listes catÃ©gorie ou projet modifie le contenu de ces mÃªmes listes et de la liste de sous-tÃ¢ches. Les diffÃ©rents cas de figures sont :
 
 \begin{itemize}
-\item Si une catégorie est sélectionnée, seuls les projets correspondant à cette catégorie restent visibles dans la liste de projets. La liste des sous-tâches est également mise à jour.
-\item Si le projet sélectionné change, la catégorie adéquate est selectionnée dans la liste des catégories. La liste de sous-tâches est aussi mise à jour pour ne contenir que celles qui sont rattachées au projet choisi.
-\item Si la tâche vide est sélectionnée, la liste des projets est mise à jour pour contenir tous les projets auquel participe la personne qui saisit les informations.
+\item Si une catÃ©gorie est sÃ©lectionnÃ©e, seuls les projets correspondant Ã  cette catÃ©gorie restent visibles dans la liste de projets. La liste des sous-tÃ¢ches est Ã©galement mise Ã  jour.
+\item Si le projet sÃ©lectionnÃ© change, la catÃ©gorie adÃ©quate est selectionnÃ©e dans la liste des catÃ©gories. La liste de sous-tÃ¢ches est aussi mise Ã  jour pour ne contenir que celles qui sont rattachÃ©es au projet choisi.
+\item Si la tÃ¢che vide est sÃ©lectionnÃ©e, la liste des projets est mise Ã  jour pour contenir tous les projets auquel participe la personne qui saisit les informations.
 \end{itemize}
 
-L'administrateur a la possibilité de visualiser les informations de n'importe quel utilisateur.
+L'administrateur a la possibilitÃ© de visualiser les informations de n'importe quel utilisateur.
 
 \subsection{Visualiser un mois}
 
-La vue mensuelle permet d'avoir une vue plus globale de l'état de remplissage pour le mois en cours. les jours qui n'ont pas été entièrement remplis apparaissent de façon différente des autres et il est possible de se rendre directement à l'écran de vue hebdomadaire de la semaine voulue.
+La vue mensuelle permet d'avoir une vue plus globale de l'Ã©tat de remplissage pour le mois en cours. les jours qui n'ont pas Ã©tÃ© entiÃ¨rement remplis apparaissent de faÃ§on diffÃ©rente des autres et il est possible de se rendre directement Ã  l'Ã©cran de vue hebdomadaire de la semaine voulue.
 
-L'administrateur, ici aussi, a la possibilité de visualiser le mois de n'importe quel utilisateur.
+L'administrateur, ici aussi, a la possibilitÃ© de visualiser le mois de n'importe quel utilisateur.
 
 \subsection{Valider}
 
-Cette fonctionnalité n'est disponible que pour l'administrateur. Quand un utilisateur a terminé le remplissage des informations pour un mois, l'administrateur peut décider de valider ce mois. Il ne sera alors plus possible de modifier les informations qui ont été validées.
+Cette fonctionnalitÃ© n'est disponible que pour l'administrateur. Quand un utilisateur a terminÃ© le remplissage des informations pour un mois, l'administrateur peut dÃ©cider de valider ce mois. Il ne sera alors plus possible de modifier les informations qui ont Ã©tÃ© validÃ©es.
 
 \subsection{Consulter les statistiques}
 
-L'écran de statistiques permet à l'administrateur de consulter une vue de synthèse des activités des utilisateurs d'\obm sur un mois. Il est possible d'afficher la répartition de l'activité d'un ou de plusieurs utilisateurs par projet ou par type de tâche.
+L'Ã©cran de statistiques permet Ã  l'administrateur de consulter une vue de synthÃ¨se des activitÃ©s des utilisateurs d'\obm sur un mois. Il est possible d'afficher la rÃ©partition de l'activitÃ© d'un ou de plusieurs utilisateurs par projet ou par type de tÃ¢che.

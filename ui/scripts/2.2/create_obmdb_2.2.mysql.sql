@@ -9,7 +9,7 @@
 -------------------------------------------------------------------------------
 -- Global Information table
 -------------------------------------------------------------------------------
-
+SET NAMES 'UTF8';
 --
 -- Table structure for table 'ObmInfo'
 --
@@ -714,7 +714,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_privacy          int(2) NOT NULL default 0,
   calendarevent_date             datetime NOT NULL,
   calendarevent_duration         int(8) NOT NULL default 0,
-  calendarevent_allday	         int(1) NOT NULL default 0,
+  calendarevent_allday	         BOOLEAN NOT NULL DEFAULT FALSE,
   calendarevent_repeatkind       varchar(20) default NULL,
   calendarevent_repeatfrequence  int(3) default NULL,
   calendarevent_repeatdays       varchar(7) default NULL,
@@ -1847,7 +1847,7 @@ CREATE TABLE UserSystem (
 
 
 -----------------------------------------------------------------------------
--- Table contenant les diffÈrents types de rÈseau gÈrables
+-- Table contenant les diff√©rents types de r√©seau g√©rables
 -- en, gros : externe, interne avec patte dessus, interne autre, VPN
 -----------------------------------------------------------------------------
 -- CREATE TABLE Network_kind (
@@ -1875,11 +1875,11 @@ CREATE TABLE UserSystem (
 --  network_psk varchar(255) default NULL
 --);
 -- network_kind : 
--- 0 => rÈseau externe
--- 1 => rÈseau interne sur lequel le securinet a une patte
--- 2 => rÈseau interne sur lequel securinet n'a pas de pattes
--- 3 => rÈseau accessible par VPN 
--- network_psk : preshared key, secret partagÈ pour les VPNs
+-- 0 => r√©seau externe
+-- 1 => r√©seau interne sur lequel le securinet a une patte
+-- 2 => r√©seau interne sur lequel securinet n'a pas de pattes
+-- 3 => r√©seau accessible par VPN 
+-- network_psk : preshared key, secret partag√© pour les VPNs
 
 
 -------------------------------------------------------------------------------

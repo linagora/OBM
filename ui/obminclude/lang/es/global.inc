@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Espa駉l                                                  //
+// OBM - Language : Espa帽ol                                                  //
 //     - File     : global.inc                                               //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -9,25 +9,25 @@
 
 // Common actions
 $l_find = "Buscar";
-$l_back = "Atr醩";
+$l_back = "Atr谩s";
 $l_cancel = "Cancelar";
 $l_close = "Cerrar la ventana";
 $l_update = "Validar las modificaciones";
 $l_validate = "Validar";
-$l_execute = "Ejecutar Acci髇";
+$l_execute = "Ejecutar Acci贸n";
 $l_confirm = "Confirmar";
 $l_add = "Adicionar";
 $l_import_file = "Importar este archivo";
 $l_home = "Casa";
 $l_entity_right = "Administrar permisos para";
-$l_read_permission = "Administraci髇 de permiso de lectura";
-$l_write_permission = "Administraci髇 de permiso de escritura";
+$l_read_permission = "Administraci贸n de permiso de lectura";
+$l_write_permission = "Administraci贸n de permiso de escritura";
 $l_right_validate = "Validar estos permisos";
 $l_right_update_ok = "Nuevos permisos han sido validados";
 $l_creator = "Creador";
-$l_date_creation = "Creaci髇";
+$l_date_creation = "Creaci贸n";
 $l_updater = "Actualizado por";
-$l_date_last_update = "趌tima Actualizaci髇";
+$l_date_last_update = "脷ltima Actualizaci贸n";
 $l_delegation = "Delegation";
 $l_generate = "Generar";
 
@@ -46,7 +46,7 @@ $l_mail_comment = "Mail";
 $l_members = "Miembros";
 $l_rights = "Permisos";
 $l_lang = "Idioma";
-$l_default = "Por Omisi髇";
+$l_default = "Por Omisi贸n";
 $l_status = "Estado";
 $l_archive = "Archivo";
 $l_archive_first = "Arch";
@@ -65,37 +65,37 @@ $l_name = "Nombre";
 $l_kind = "Tipo";
 $l_lastname = "Apellido";
 $l_firstname = "Nombre";
-$l_title = "T韙ulo";
+$l_title = "T铆tulo";
 $l_label = "Etiqueta";
-$l_number = "N鷐ero";
+$l_number = "N煤mero";
 $l_format = "Formato";
 $l_file_format = "File formato";
 $l_file_error = "El archivo no esta disponible (o no ha sido llenado) !";
 $l_file = "Archivo";
 $l_email = "E-mail";
 $l_quota = "Quota";
-$l_invalid_data = "Datos Inv醠idos";
+$l_invalid_data = "Datos Inv谩lidos";
 $l_insert_ok = "Ingreso OK";
 $l_insert_error = "Ingreso ha fallado !";
-$l_update_ok = "Actualizaci髇 OK";
-$l_update_error = "Actualizaci髇 ha fallado !";
-$l_delete_ok = "Eliminaci髇 OK";
-$l_delete_error = "Eliminaci髇 ha fallado !";
-$l_error_permission = "Ud. NO tiene permitido ejecutar esta acci髇";
-$l_error_visibility = "Ud. NO puede tiene acceso a esta informaci髇, es privada.";
+$l_update_ok = "Actualizaci贸n OK";
+$l_update_error = "Actualizaci贸n ha fallado !";
+$l_delete_ok = "Eliminaci贸n OK";
+$l_delete_error = "Eliminaci贸n ha fallado !";
+$l_error_permission = "Ud. NO tiene permitido ejecutar esta acci贸n";
+$l_error_visibility = "Ud. NO puede tiene acceso a esta informaci贸n, es privada.";
 $l_err_reference = "Referencia equivocada. Esta entidad no existe.";
 $l_err_fill = "El campo debe ser llenado";
 $l_color = "Color";
-$l_phone = "Tel閒ono";
-$l_hphone = "Tel閒ono Casa";
-$l_mphone = "Tel閒ono Celular";
+$l_phone = "Tel茅fono";
+$l_hphone = "Tel茅fono Casa";
+$l_mphone = "Tel茅fono Celular";
 $l_fax = "Fax";
-$l_address = "Direcci髇";
-$l_postcode = "C骴igo Postal";
+$l_address = "Direcci贸n";
+$l_postcode = "C贸digo Postal";
 $l_town = "Ciudad";
-$l_expresspostal = "Direcci髇 de correo";
-$l_country = "Pa韘";
-$l_desc = "Descripci髇";
+$l_expresspostal = "Direcci贸n de correo";
+$l_country = "Pa铆s";
+$l_desc = "Descripci贸n";
 $l_priority = "Prioridad";
 $l_region = "Region";
 $l_datasource = "Fuente de Datos";
@@ -122,29 +122,29 @@ $l_active = "Activo";
 $l_new = "Nuevo";
 $l_document_added = " documentos adicionados";
 $l_no_document_added = "No hay documentos adicionados";
-$l_last = "趌timo";
+$l_last = "脷ltimo";
 $l_login = "Ingresar";
 $l_logout = "Salir";
 $l_profile = "Perfil";
-$l_connection_end = "Conexi髇 Finalizada";
+$l_connection_end = "Conexi贸n Finalizada";
 $l_reconnect = "Presione aqui para conectar nuevamente";
-$l_version = "Versi髇";
+$l_version = "Versi贸n";
 $l_aka = "Tambien Conocida como";
-$l_cat_tree = "Arbol de Categor韆s";
-$l_category = "Categor韆";
+$l_cat_tree = "Arbol de Categor铆as";
+$l_category = "Categor铆a";
 $l_aduplicate = "Duplicar";
 $l_kind = "Tipo";
 $l_autocomplete_field = "Search ...";
 $l_fatal_server_err = "Fatal server error, please reload";
 
 // Entities
-$l_company = "Compa耥a";
+$l_company = "Compa帽铆a";
 $l_contact = "Contacto";
 $l_lead = "Lead";
 $l_deal = "Negocio";
 $l_list = "Lista";
 $l_event = "Event";
-$l_publication = "Publicaci髇";
+$l_publication = "Publicaci贸n";
 $l_todo = "Tarea";
 $l_time = "Control de tiempo";
 $l_project = "Proyecto";
@@ -163,7 +163,7 @@ $l_settings = "Opciones";
 
 // OBM_DISPLAY
 $l_entries = "Entradas #";
-$l_page_res = "P醙inas de resultado";
+$l_page_res = "P谩ginas de resultado";
 $l_export = "Exportar";
 $l_export_all = "Exportar Todo";
 $l_field = "Campo";
@@ -182,7 +182,7 @@ $l_last_visit = "Bookmarks";
 // OBM_DISPLAY help screen
 $l_help = "Ayuda";
 $l_help_display_yes = "El campo esta desplegado. Presione este boton si desea no desplegar el campo";
-$l_help_display_no = "El campo NO esta desplegado. Presione este bot髇 si desea desplegar el campo";
+$l_help_display_no = "El campo NO esta desplegado. Presione este bot贸n si desea desplegar el campo";
 $l_help_mandatory = "Este campo es obligatorio";
 $l_help_down  = "Mover el campo abajo";
 $l_help_up = "Mover el campo arriba";
@@ -190,7 +190,7 @@ $l_help_up = "Mover el campo arriba";
 // Javascript common messages
 $l_fill_label = "Tiene que proveer una etiqueta";
 $l_fill_date = "Debe ingresar la fecha";
-$l_invalid_date = "Formato de fecha inv醠ido";
+$l_invalid_date = "Formato de fecha inv谩lido";
 
 // tasktype groups
 $l_tt = "Tipo de Tarea";
@@ -202,12 +202,12 @@ $l_tt_others = "Otra tarea";
 $l_day = "Dia";
 $l_week = "Semana";
 $l_month = "Mes";
-$l_year = "A駉";
+$l_year = "A帽o";
 $l_today = "Hoy";
-$l_period = "Per韔do";
+$l_period = "Per铆odo";
 $l_monthsofyear = array ('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
 $l_monthsofyearshort = array ('ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic');
-$l_daysofweek = array ('Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','S醔ado');
+$l_daysofweek = array ('Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','S谩bado');
 $l_daysofweekshort = array ('Dom','Lun','Mar','Mie','Jue','Vie','Sab');
 $l_daysofweekfirst = array ('D','L','M','M','J','V','S');
 
@@ -216,12 +216,12 @@ $l_daysofweekfirst = array ('D','L','M','M','J','V','S');
 //---------------------------------------------------------------------------//
 
 $l_section_com    = "COMMERCIAL";
-$l_section_prod   = "PRODUCCI覰";
+$l_section_prod   = "PRODUCCI脫N";
 $l_section_compta = "CONTABILIDAD";
 $l_section_user   = "USUARIOS";
-$l_section_admin  = "ADMINISTRACI覰";
+$l_section_admin  = "ADMINISTRACI脫N";
 
-$l_module_company = "Compa耥as";
+$l_module_company = "Compa帽铆as";
 $l_module_contact = "Contactos";
 $l_module_lead = "Leads";
 $l_module_deal = "Negocios";
@@ -229,7 +229,7 @@ $l_module_list = "Listas";
 $l_module_calendar = "Calendario";
 $l_module_todo    = "Tareas";
 $l_module_publication = "Publicaciones";
-$l_module_statistic = "Estad韘ticas";
+$l_module_statistic = "Estad铆sticas";
 
 $l_module_time = "Manejo de tiempo";
 $l_module_project = "Proyectos";
@@ -247,16 +247,16 @@ $l_module_resource = "Recursos";
 $l_module_group = "Grupos";
 $l_module_resourcegroup = "Grupo de Recursos";
 
-$l_module_admin = "Administraci髇";
+$l_module_admin = "Administraci贸n";
 $l_module_admin_lang = "Idioma";
 $l_module_admin_data = "Datos";
 $l_module_admin_pref = "Preferencias";
-$l_module_admin_code = "C骴igo";
+$l_module_admin_code = "C贸digo";
 $l_module_admin_ref = "Referencial";
 $l_module_import = "Importar";
 $l_module_backup = "Respaldo";
 
-$l_header_admin = "Administraci髇";
+$l_header_admin = "Administraci贸n";
 $l_header_import = "Import";
 $l_header_new_f = "Nuevo";
 $l_header_new = "Nuevo";
@@ -294,7 +294,7 @@ $l_header_right = "Manejo de permisos";
 $l_header_man_task = "Tareas";
 $l_header_man_member = "Miembros";
 $l_header_advance = "Progreso";
-$l_header_man_affect = "Asignaci髇";
+$l_header_man_affect = "Asignaci贸n";
 $l_header_add_member = "Nuevo miembro";
 $l_header_dashboard = "Tablero";
 
@@ -305,25 +305,25 @@ $l_header_amp = "Mostrar amp";
 $l_header_func_unused = "Funciones";
 $l_header_clear_sess = "Limpiar sesiones";
 $l_header_pref_update = "Reiniciar preferencias de usuarios";
-$l_header_reset = "Preferencias por omisi髇";
+$l_header_reset = "Preferencias por omisi贸n";
 $l_header_country = "Pais";
 $l_header_datasource = "Fuente de Datos";
 $l_header_tasktype = "Tipo de Tarea";
 $l_header_region = "Regions";
 
-$l_header_day = "D韆";
+$l_header_day = "D铆a";
 $l_header_week = "Semana";
 $l_header_month = "Mes";
-$l_header_year = "A駉";
+$l_header_year = "A帽o";
 $l_header_new_event = "Nueva cita";
 
 //time headers
-$l_header_stats = "Estad韘ticas";
-$l_header_statsmonth = "Estad韘ticas Mensuales";
-$l_header_statsuser = "Estad韘ticas de usuarios";
+$l_header_stats = "Estad铆sticas";
+$l_header_statsmonth = "Estad铆sticas Mensuales";
+$l_header_statsuser = "Estad铆sticas de usuarios";
 $l_header_weeklyview = "Semana";
 $l_header_monthlyview = "Mes";
-$l_header_globalview = "Validaci髇";
+$l_header_globalview = "Validaci贸n";
 $l_header_activityreport = "Informe de actividades";
 
 //document headers
@@ -333,13 +333,13 @@ $l_document_add = "Adicionar documentos";
 ////////////////////////////////////////////////////////
 // Javascript error ////////////////////////////////////
 ////////////////////////////////////////////////////////
-$l_j_copy_privilege_alert = "Imposible utilizar la funcionalidad de copiar: \\nlos derechos son insuficientes para realizar la acci髇. \\nSi usted utiliza mozilla/firefox haga lo siguiente:  \\n - Agregar en el archivo prefs.js su mozilla en la linea :user_pref(\"signed.applets.codebase_principal_support \", true);  \\n - Escriba la siguiente direcci髇 en su navegador about:config, entonces cambiar la llave signed.applets.codebase_principal_support a true.";
+$l_j_copy_privilege_alert = "Imposible utilizar la funcionalidad de copiar: \\nlos derechos son insuficientes para realizar la acci贸n. \\nSi usted utiliza mozilla/firefox haga lo siguiente:  \\n - Agregar en el archivo prefs.js su mozilla en la linea :user_pref(\"signed.applets.codebase_principal_support \", true);  \\n - Escriba la siguiente direcci贸n en su navegador about:config, entonces cambiar la llave signed.applets.codebase_principal_support a true.";
 
 
 //---------------------------------------------------------------------------//
 // Category labels
 //---------------------------------------------------------------------------//
-$l_code = "C骴igo";
+$l_code = "C贸digo";
 $l_c_manage = "Control: ";
 $l_c_new = "Nuevo";
 $l_c_upd = "Actualizar";
@@ -351,8 +351,8 @@ $l_c_can_delete = "borrar es posible";
 $l_c_cant_delete = " borrar NO es posible";
 $l_c_link = "referencias encontradas para ";
 $l_c_link_no = "referencias NO encontradas para ";
-$l_c_j_create = "Debe ingresar un t韙ulo";
-$l_c_j_update = "Una entrada debe ser seleccionada y un nuevo t韙ulo debe ser proveido";
+$l_c_j_create = "Debe ingresar un t铆tulo";
+$l_c_j_update = "Una entrada debe ser seleccionada y un nuevo t铆tulo debe ser proveido";
 $l_c_j_delete = "Una entrada debe ser seleccionada";
 
 
@@ -393,6 +393,6 @@ $l_order_no_bill = "Ordenado";
 
 // Debug levels
 $l_dg_id = "Id";
-$l_dg_param = "Par醡etros";
-$l_dg_sess = "Sesi髇";
+$l_dg_param = "Par谩metros";
+$l_dg_sess = "Sesi贸n";
 $l_dg_sql = "SQL";

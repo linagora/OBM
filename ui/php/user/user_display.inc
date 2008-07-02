@@ -2148,7 +2148,7 @@ function dis_user_import_file_run($params) {
     $user['lastname'] = addslashes(trim($row[$c_lastname]));
     $user['firstname'] = addslashes(trim($row[$c_firstname]));
     $user['login'] = addslashes(trim($row[$c_login]));
-    $user['password'] = addslashes(trim($row[$c_password]));
+    $user['passwd'] = addslashes(trim($row[$c_password]));
     if (trim($row[$c_password_type]) == 'CRYPT') {
       $user['password_type'] = 'CRYPT';
     } else if (trim($row[$c_password_type]) == 'MD5SUM') {

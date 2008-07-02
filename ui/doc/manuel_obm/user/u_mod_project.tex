@@ -5,23 +5,23 @@
 \clearpage
 \section{Le module \project}
 
-révision : \obm 1.2.4
+rÃ©vision : \obm 1.2.4
 
-\subsection{Présentation du module \project}
+\subsection{PrÃ©sentation du module \project}
 
 Ce module est une gestion de projet.\\
 
-Un projet est découpé en tâches auxquelles il est possible d'affecter plusieurs utilisateurs avec des durées déterminées.
+Un projet est dÃ©coupÃ© en tÃ¢ches auxquelles il est possible d'affecter plusieurs utilisateurs avec des durÃ©es dÃ©terminÃ©es.
 En association avec le module de gestion de temps, le module \project permet de suivre la production des utilisateurs participant aux projets en cours.\\
 
-Les principales composantes du module \project sont énumérées ci-dessous et décrites en suivant :
+Les principales composantes du module \project sont Ã©numÃ©rÃ©es ci-dessous et dÃ©crites en suivant :
 
 \begin{itemize}
-\item entité Projet
-\item entité Tâche
-\item entité Tâche de référence
-\item entité Membre
-\item Affectation (affectation des tâches aux membres avec une durée prévue)
+\item entitÃ© Projet
+\item entitÃ© TÃ¢che
+\item entitÃ© TÃ¢che de rÃ©fÃ©rence
+\item entitÃ© Membre
+\item Affectation (affectation des tÃ¢ches aux membres avec une durÃ©e prÃ©vue)
 \item Avancement (suivi de l'avancement du projet par un chef de projet)
 \end{itemize}
 
@@ -35,74 +35,74 @@ Composantes d'un projet :\\
 \hline
 Nom & Nom du projet \\
 \hline
-Nom court & Nom court du projet utilisé pour des affichages synthétiques (ex: vue planning)\\
+Nom court & Nom court du projet utilisÃ© pour des affichages synthÃ©tiques (ex: vue planning)\\
 \hline
-Catégorie & Catégorie du projet. On distingue les catégories de tâches facturées (projets clients) des tâches non facturées (projets internes). Les catégories de tâches sont gérées dans le module référentiel de la section administration.\\
+CatÃ©gorie & CatÃ©gorie du projet. On distingue les catÃ©gories de tÃ¢ches facturÃ©es (projets clients) des tÃ¢ches non facturÃ©es (projets internes). Les catÃ©gories de tÃ¢ches sont gÃ©rÃ©es dans le module rÃ©fÃ©rentiel de la section administration.\\
 \hline
-Société & Pour les projets facturés. Indique le client.\\
+SociÃ©tÃ© & Pour les projets facturÃ©s. Indique le client.\\
 \hline
-Affaire & Pour les projets facturés. Indique l'affaire origine.\\
+Affaire & Pour les projets facturÃ©s. Indique l'affaire origine.\\
 \hline
 Temps vendu & Temps vendu pour un projet commercial.\\
 \hline
-Temps prévu & Temps prévu (peut être différent de vendu) du projet.\\
+Temps prÃ©vu & Temps prÃ©vu (peut Ãªtre diffÃ©rent de vendu) du projet.\\
 \hline
-Archive & Etat d'archivage du projet. Un projet archivé ne pourra plus être modifié.\\
+Archive & Etat d'archivage du projet. Un projet archivÃ© ne pourra plus Ãªtre modifiÃ©.\\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-A un projet sont associés des tâches et des membres.
+A un projet sont associÃ©s des tÃ¢ches et des membres.
 
 
-\subsubsection{Création d'un projet}
-Un projet facturé est créé depuis l'affaire commerciale ayant aboutie à ce projet.
+\subsubsection{CrÃ©ation d'un projet}
+Un projet facturÃ© est crÃ©Ã© depuis l'affaire commerciale ayant aboutie Ã  ce projet.
 
-Un projet non facturé (interne, R et D) se crée directement depuis le module \project.
+Un projet non facturÃ© (interne, R et D) se crÃ©e directement depuis le module \project.
 
-\subsection{Description d'une tâche}
+\subsection{Description d'une tÃ¢che}
 
-Un projet peut être divisé en différentes tâches qui vont permettre un suivi plus précis de l'activité des participants au projet. Il est possible de regrouper plusieurs tâches au sein d'une tâche parente (ex: création, maquettes, modèles dans la tâche parente Infographie).\\
+Un projet peut Ãªtre divisÃ© en diffÃ©rentes tÃ¢ches qui vont permettre un suivi plus prÃ©cis de l'activitÃ© des participants au projet. Il est possible de regrouper plusieurs tÃ¢ches au sein d'une tÃ¢che parente (ex: crÃ©ation, maquettes, modÃ¨les dans la tÃ¢che parente Infographie).\\
 
-Composantes d'une tâche :\\
+Composantes d'une tÃ¢che :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
 \textbf{Nom} & \textbf{Description} \\
 \hline
-Nom & Nom de la tâche \\
+Nom & Nom de la tÃ¢che \\
 \hline
-Tâche parent & référence à la tâche parente si la tâche fait partie d'un groupe de tâches.\\
+TÃ¢che parent & rÃ©fÃ©rence Ã  la tÃ¢che parente si la tÃ¢che fait partie d'un groupe de tÃ¢ches.\\
 \hline
 \end{tabular}
 
 
-\subsection{Les tâches de référence}
+\subsection{Les tÃ¢ches de rÃ©fÃ©rence}
 
-Les tâches de référence ont pour objectif de simplifier et d'homogénéïser la création de tâches pour une catégorie de projets.
-Un projet de catégorie (ou type de tâche) Développement comportera souvent les même tâches (comme : conception, développement, tests,...).\\
+Les tÃ¢ches de rÃ©fÃ©rence ont pour objectif de simplifier et d'homogÃ©nÃ©Ã¯ser la crÃ©ation de tÃ¢ches pour une catÃ©gorie de projets.
+Un projet de catÃ©gorie (ou type de tÃ¢che) DÃ©veloppement comportera souvent les mÃªme tÃ¢ches (comme : conception, dÃ©veloppement, tests,...).\\
 
-Les tâches de référence sont associées à une catégorie de projet.
-A la création d'un projet il est possible de sélectionner simplement des tâches, parmi les tâches de référence de la catégorie de projet, qui seront automatiquement créées.\\
+Les tÃ¢ches de rÃ©fÃ©rence sont associÃ©es Ã  une catÃ©gorie de projet.
+A la crÃ©ation d'un projet il est possible de sÃ©lectionner simplement des tÃ¢ches, parmi les tÃ¢ches de rÃ©fÃ©rence de la catÃ©gorie de projet, qui seront automatiquement crÃ©Ã©es.\\
 
-Les tâches de référence s'administrent via l'interface d'administration du module \project.\\
+Les tÃ¢ches de rÃ©fÃ©rence s'administrent via l'interface d'administration du module \project.\\
 
-Composantes d'une tâche de référence :\\
+Composantes d'une tÃ¢che de rÃ©fÃ©rence :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
 \textbf{Nom} & \textbf{Description} \\
 \hline
-Type de tâche & (ou catégorie de projet) Type de tâche à laquelle est associée la tâche de référence \\
+Type de tÃ¢che & (ou catÃ©gorie de projet) Type de tÃ¢che Ã  laquelle est associÃ©e la tÃ¢che de rÃ©fÃ©rence \\
 \hline
-Label & Nom de la tâche \\
+Label & Nom de la tÃ¢che \\
 \hline
 \end{tabular}
 
 
 \subsection{Description d'un participant}
 
-Des personnes (les membres ou participants) vont être affectées à la réalisation des différentes tâches du projet.\\
+Des personnes (les membres ou participants) vont Ãªtre affectÃ©es Ã  la rÃ©alisation des diffÃ©rentes tÃ¢ches du projet.\\
 
 Composantes d'un participant :\\
 
@@ -117,67 +117,67 @@ Statut & statut du membre (chef de projet, participant) \\
 \end{tabular}
 \vspace{0.3cm}
 
-Lorsqu'un participant est affecté à un projet au rôle de chef de projet (soit affecté à la création initiale du projet, soit positionné en chef de projet en modifiant son statut dans le projet), il est alerté par email.
+Lorsqu'un participant est affectÃ© Ã  un projet au rÃ´le de chef de projet (soit affectÃ© Ã  la crÃ©ation initiale du projet, soit positionnÃ© en chef de projet en modifiant son statut dans le projet), il est alertÃ© par email.
 
 \subsection{Description d'une affectation}
 
-L'affectation permet d'affecter des participants aux différentes tâches en indiquant la durée prévue de réalisation.\\
+L'affectation permet d'affecter des participants aux diffÃ©rentes tÃ¢ches en indiquant la durÃ©e prÃ©vue de rÃ©alisation.\\
 
-Cette affectation peut être modifiée au cours du projet.
+Cette affectation peut Ãªtre modifiÃ©e au cours du projet.
 
 
 \subsection{Description de l'avancement}
 
-L'avancement est l'estimation par le chef de projet du temps restant à passer par chaque utilisateur pour terminer chaque tâche. En fonction de l'avance ou du retard sur une tâche, le temps restant sera souvent différent du temps prévu initial moins le temps déjà passé.
-La comparaison des ces temps permet de connaitre les débordements ou avances du projet de façon globale et par tâche.\\
+L'avancement est l'estimation par le chef de projet du temps restant Ã  passer par chaque utilisateur pour terminer chaque tÃ¢che. En fonction de l'avance ou du retard sur une tÃ¢che, le temps restant sera souvent diffÃ©rent du temps prÃ©vu initial moins le temps dÃ©jÃ  passÃ©.
+La comparaison des ces temps permet de connaitre les dÃ©bordements ou avances du projet de faÃ§on globale et par tÃ¢che.\\
 
-L'avancement peut être estimé régulièrement lors de la réalisation d'un projet.
+L'avancement peut Ãªtre estimÃ© rÃ©guliÃ¨rement lors de la rÃ©alisation d'un projet.
 
 
 \subsection{La consultation d'un projet}
 \label{u_project_consult}
 
-L'accès à l'écran de consultation d'un projet s'effectue depuis l'écran de recherche, depuis les bookmarks ou dernières visites ou depuis le menu Consulter.
+L'accÃ¨s Ã  l'Ã©cran de consultation d'un projet s'effectue depuis l'Ã©cran de recherche, depuis les bookmarks ou derniÃ¨res visites ou depuis le menu Consulter.
 
-La consultation du projet affiche différents types d'informations :\\
+La consultation du projet affiche diffÃ©rents types d'informations :\\
 
 \begin{itemize}
-\item les informations générales : le nom du projet, la société pour qui il est réalisé.
-\item les indicateurs d'avancement : ces indicateurs permettent d'évaluer globalement l'état de réalisation du projet (cf les indicateurs).
-\item le tableau de détail de l'avancement : permet de visualiser plus précisément l'avancement du projet (cf détail de l'avancement).
+\item les informations gÃ©nÃ©rales : le nom du projet, la sociÃ©tÃ© pour qui il est rÃ©alisÃ©.
+\item les indicateurs d'avancement : ces indicateurs permettent d'Ã©valuer globalement l'Ã©tat de rÃ©alisation du projet (cf les indicateurs).
+\item le tableau de dÃ©tail de l'avancement : permet de visualiser plus prÃ©cisÃ©ment l'avancement du projet (cf dÃ©tail de l'avancement).
 \end{itemize}
 
 \subsubsection{Les indicateurs}
 
-Ils sont destinés à permettre un suivi global de l'état d'avancement du projet.
-Les différents indicateurs présents sont :
+Ils sont destinÃ©s Ã  permettre un suivi global de l'Ã©tat d'avancement du projet.
+Les diffÃ©rents indicateurs prÃ©sents sont :
 
 \begin{itemize}
-\item temps vendu/prévu : c'est une estimation, faite au moment ou le projet est crée, du temps qui sera nécessaire à la réalisation du projet.
-\item temps attribué : c'est la somme des temps de travail prévu qui on déjà été affectés aux différents participants au projet.
-\item temps utilisé : cette donnée, calculée à partir des informations collectées par le module \timemanager, est la somme des durées des tâches qui ont déjà été effectuées dans le cadre de ce projet.
-\item temps estimé restant : c'est la somme des temps estimés restants qui ont été saisi dans l'écran d'avancement du projet.
-\item Attribution du temps prévu : c'est le rapport entre le temps attribué et le temps prévu.
-\item Utilisation du temps prévu : c'est le rapport entre le temps utilisé en le temps prévu. Il est ainsi possible d'avoir une idée de la quantité de temps qui a été utilisée.
-\item Avancement du projet : c'est le rapport entre le temps utilisé et une estimation du temps nécessaire pour réaliser l'intégralité du projet (temps utilisé + temps estimé restant).
-\item Evaluation de l'avance retard : C'est un indicateur obtenu en comparant l'utilisation du temps prévu et l'avancement du projet. On peut considérer que si la quantité de temps utilisé est supérieure à l'avancement, le projet aura du retard.
+\item temps vendu/prÃ©vu : c'est une estimation, faite au moment ou le projet est crÃ©e, du temps qui sera nÃ©cessaire Ã  la rÃ©alisation du projet.
+\item temps attribuÃ© : c'est la somme des temps de travail prÃ©vu qui on dÃ©jÃ  Ã©tÃ© affectÃ©s aux diffÃ©rents participants au projet.
+\item temps utilisÃ© : cette donnÃ©e, calculÃ©e Ã  partir des informations collectÃ©es par le module \timemanager, est la somme des durÃ©es des tÃ¢ches qui ont dÃ©jÃ  Ã©tÃ© effectuÃ©es dans le cadre de ce projet.
+\item temps estimÃ© restant : c'est la somme des temps estimÃ©s restants qui ont Ã©tÃ© saisi dans l'Ã©cran d'avancement du projet.
+\item Attribution du temps prÃ©vu : c'est le rapport entre le temps attribuÃ© et le temps prÃ©vu.
+\item Utilisation du temps prÃ©vu : c'est le rapport entre le temps utilisÃ© en le temps prÃ©vu. Il est ainsi possible d'avoir une idÃ©e de la quantitÃ© de temps qui a Ã©tÃ© utilisÃ©e.
+\item Avancement du projet : c'est le rapport entre le temps utilisÃ© et une estimation du temps nÃ©cessaire pour rÃ©aliser l'intÃ©gralitÃ© du projet (temps utilisÃ© + temps estimÃ© restant).
+\item Evaluation de l'avance retard : C'est un indicateur obtenu en comparant l'utilisation du temps prÃ©vu et l'avancement du projet. On peut considÃ©rer que si la quantitÃ© de temps utilisÃ© est supÃ©rieure Ã  l'avancement, le projet aura du retard.
 \end{itemize}
 
-\subsubsection{Détail de l'avancement}
+\subsubsection{DÃ©tail de l'avancement}
 
-Il s'agit d'un tableau indiquant pour chaque participant affecté à une tâche :
+Il s'agit d'un tableau indiquant pour chaque participant affectÃ© Ã  une tÃ¢che :
 
 \begin{itemize}
-\item le temps utilisé : cette valeur est calculée à partir des informations saisies dans le module \timemanager.
-\item temps estimé restant : valeur saisie dans le tableau d'avancement (avancement).
-\item temps prévu : valeur saisie dans le tableau d'avancement (affectation).
+\item le temps utilisÃ© : cette valeur est calculÃ©e Ã  partir des informations saisies dans le module \timemanager.
+\item temps estimÃ© restant : valeur saisie dans le tableau d'avancement (avancement).
+\item temps prÃ©vu : valeur saisie dans le tableau d'avancement (affectation).
 \end{itemize}
 
-Ce tableau indique aussi les sommes de ces valeurs par participant et par groupe de tâches.
+Ce tableau indique aussi les sommes de ces valeurs par participant et par groupe de tÃ¢ches.
 
 \subsubsection{La vue planning}
 
-Il s'agit d'une vue globale de l'activité sur un projet présentant pour chaque participant, le temps passé sur chaque tâche pour un mois donné sous forme de planning.
+Il s'agit d'une vue globale de l'activitÃ© sur un projet prÃ©sentant pour chaque participant, le temps passÃ© sur chaque tÃ¢che pour un mois donnÃ© sous forme de planning.
 
 %%\begin{figure}[h]
   %% \begin{center}
@@ -190,7 +190,7 @@ Il s'agit d'une vue globale de l'activité sur un projet présentant pour chaque p
 
 \subsection{Les alertes par email}
 
-Lorsqu'un participant est affecté à un projet au rôle de chef de projet (soit affecté à la création initiale du projet, soit positionné en chef de projet en modifiant son statut dans le projet), il est alerté par email.
+Lorsqu'un participant est affectÃ© Ã  un projet au rÃ´le de chef de projet (soit affectÃ© Ã  la crÃ©ation initiale du projet, soit positionnÃ© en chef de projet en modifiant son statut dans le projet), il est alertÃ© par email.
 
 
 \subsection{Les sous-menus du module \project}
@@ -201,25 +201,25 @@ Le module \project comporte 10 sous-menus :\\
 \hline
 \textbf{Nom} & \textbf{Action / Description} \\
 \hline
-Chercher & Recherche multicritères des projets \\
+Chercher & Recherche multicritÃ¨res des projets \\
 \hline
-Nouveau & Créer un nouveau projet interne\\
+Nouveau & CrÃ©er un nouveau projet interne\\
 \hline
 Consulter & Consulter les informations d'un projet\\
 \hline
-Modifier & Modifier les informations générales d'un projet\\
+Modifier & Modifier les informations gÃ©nÃ©rales d'un projet\\
 \hline
-Supprimer & Vérifier les liens puis si besoin Supprimer un projet\\
+Supprimer & VÃ©rifier les liens puis si besoin Supprimer un projet\\
 \hline
-Tâches & Gérer (créer / supprimer) les tâches du projet\\
+TÃ¢ches & GÃ©rer (crÃ©er / supprimer) les tÃ¢ches du projet\\
 \hline
-Participants & Gérer (mettre à jour / supprimer) les utilisateurs affectés au projet\\
+Participants & GÃ©rer (mettre Ã  jour / supprimer) les utilisateurs affectÃ©s au projet\\
 \hline
 Ajouter participant & Ajouter des participants au projet\\
 \hline
-Avancement & Actualiser les affectations et l'état d'avancement des différentes tâches pour chaque participant au projet\\
+Avancement & Actualiser les affectations et l'Ã©tat d'avancement des diffÃ©rentes tÃ¢ches pour chaque participant au projet\\
 \hline
-Tableau de bord & Affichage de la synthèse de l'avancement du projet (participants / tâches)\\
+Tableau de bord & Affichage de la synthÃ¨se de l'avancement du projet (participants / tÃ¢ches)\\
 \hline
 Planning & Affichage de la vue planning du projet\\
 \hline
@@ -230,38 +230,38 @@ Affichage & Personnalisation de l'affichage de la liste des projets\\
 
 \subsubsection{Le sous-menu : Chercher}
 
-Ce menu permet d'effectuer une recherche selon différents critères :
+Ce menu permet d'effectuer une recherche selon diffÃ©rents critÃ¨res :
 
 \begin{itemize}
 \item Nom
-\item Nom de la société
-\item Catégorie
+\item Nom de la sociÃ©tÃ©
+\item CatÃ©gorie
 \item Chef de projet
 \item Participant
 \end{itemize}
 
-Il est possible d'inclure les projets archivés et ceux qui n'ont pas été initialisés dans les résultats de recherche.
+Il est possible d'inclure les projets archivÃ©s et ceux qui n'ont pas Ã©tÃ© initialisÃ©s dans les rÃ©sultats de recherche.
 
 \subsubsection{Le sous-menu : Nouveau}
 
-Ce menu permet de créer un projet interne (non facturé).
+Ce menu permet de crÃ©er un projet interne (non facturÃ©).
 
-\paragraph{La création des projets clients ou facturés} s'effectue depuis le module affaire.\\
+\paragraph{La crÃ©ation des projets clients ou facturÃ©s} s'effectue depuis le module affaire.\\
 
 Un formulaire vierge de projet propose la saisie des champs :
 
 \begin{itemize}
 \item Nom (obligatoire),
-\item Catégorie (obligatoire),
-\item Temps prévu (obligatoire),
-\item Tâche,
+\item CatÃ©gorie (obligatoire),
+\item Temps prÃ©vu (obligatoire),
+\item TÃ¢che,
 \item Participant.
 \end{itemize}
 \vspace{0.3cm}
 
-Les champs Tâche et Participant sont facultatifs et permettent un raccourci pour la création directe d'une tâche et d'un participant au projet (pratique pour les projets simple comprenant une seule tâche et une seul participant, comme les formations).\\
+Les champs TÃ¢che et Participant sont facultatifs et permettent un raccourci pour la crÃ©ation directe d'une tÃ¢che et d'un participant au projet (pratique pour les projets simple comprenant une seule tÃ¢che et une seul participant, comme les formations).\\
 
-Si le projet est valide, il est inséré dans la base de données et un message d'acceptation est affiché; sinon le formulaire de saisie de nouveau projet est affiché de nouveau avec un message indiquant la cause de non validité.
+Si le projet est valide, il est insÃ©rÃ© dans la base de donnÃ©es et un message d'acceptation est affichÃ©; sinon le formulaire de saisie de nouveau projet est affichÃ© de nouveau avec un message indiquant la cause de non validitÃ©.
 
 
 \subsubsection{Le sous-menu : Consulter}
@@ -272,72 +272,72 @@ Voir la section \ref{u_project_consult} ``Consultation d'un projet.
 
 \subsubsection{Le sous-menu : Modifier}
 
-L'écran de modification affiche les informations du projet dans un formulaire.
+L'Ã©cran de modification affiche les informations du projet dans un formulaire.
 Il est possible de modifier les informations suivantes :
 
 \begin{itemize}
 \item Nom,
-\item Catégorie,
-\item Temps prévu/vendu,
+\item CatÃ©gorie,
+\item Temps prÃ©vu/vendu,
 \item Archive.
 \end{itemize}
 
-Pour valider les modifications effectuées il faut cliquer sur le bouton``valider les modifications''.
+Pour valider les modifications effectuÃ©es il faut cliquer sur le bouton``valider les modifications''.
 
 
 \subsubsection{Le sous-menu : Supprimer}
 Ce menu permet la suppression d'un projet.
 
-\paragraph{Pour être supprimé} un projet ne doit pas être référencé dans la gestion des temps.
+\paragraph{Pour Ãªtre supprimÃ©} un projet ne doit pas Ãªtre rÃ©fÃ©rencÃ© dans la gestion des temps.
 
 
-\subsubsection{Le sous-menu : Tâches}
+\subsubsection{Le sous-menu : TÃ¢ches}
 
 Ce menu permet de :\\
 \begin{itemize}
-\item Visualiser la liste des tâches ratachées au projet
-\item Saisir de nouvelles tâches
-\item Supprimer des tâches
-\item Modifier des tâches existantes.
+\item Visualiser la liste des tÃ¢ches ratachÃ©es au projet
+\item Saisir de nouvelles tÃ¢ches
+\item Supprimer des tÃ¢ches
+\item Modifier des tÃ¢ches existantes.
 \end{itemize}
 
-\paragraph{L'ajout d'une tâche} ne peut s'effectuer si la tâche référence une tâche parente possédant des affectations. Car les tâches de groupe (ou parentes) ne peuvent pas être affectées à des utilisateurs.
+\paragraph{L'ajout d'une tÃ¢che} ne peut s'effectuer si la tÃ¢che rÃ©fÃ©rence une tÃ¢che parente possÃ©dant des affectations. Car les tÃ¢ches de groupe (ou parentes) ne peuvent pas Ãªtre affectÃ©es Ã  des utilisateurs.
 
-\paragraph{La suppression d'une tâche} ne peut s'effectuer si la tâche (ou une tâche fille de la tâche si elle est parente) est affectée à un utilisateur ou est référencée dans la gestion des temps.
+\paragraph{La suppression d'une tÃ¢che} ne peut s'effectuer si la tÃ¢che (ou une tÃ¢che fille de la tÃ¢che si elle est parente) est affectÃ©e Ã  un utilisateur ou est rÃ©fÃ©rencÃ©e dans la gestion des temps.
 
-\paragraph{La modification d'une tâche} ne peut s'effectuer si :
+\paragraph{La modification d'une tÃ¢che} ne peut s'effectuer si :
 \begin{itemize}
-\item Une tâche parente est indiquée, identique à la tâche elle-même
-\item Une tâche parente est indiquée et que la tâche est elle-même parente
-\item Une tâche parente est indiquée mais possède des affectations (possible uniquement si affectations simultanées)
-\item Une tâche parente est indiquée mais possède elle aussi un parent (possible uniquement si modifications simultanées)
+\item Une tÃ¢che parente est indiquÃ©e, identique Ã  la tÃ¢che elle-mÃªme
+\item Une tÃ¢che parente est indiquÃ©e et que la tÃ¢che est elle-mÃªme parente
+\item Une tÃ¢che parente est indiquÃ©e mais possÃ¨de des affectations (possible uniquement si affectations simultanÃ©es)
+\item Une tÃ¢che parente est indiquÃ©e mais possÃ¨de elle aussi un parent (possible uniquement si modifications simultanÃ©es)
 \end{itemize}
 
 
 \subsubsection{Le sous-menu : Participants}
 
-Ce menu permet de visualiser la liste des utilisateurs référencés pour le projet. Il permet aussi de modifier le statut des participants.
+Ce menu permet de visualiser la liste des utilisateurs rÃ©fÃ©rencÃ©s pour le projet. Il permet aussi de modifier le statut des participants.
 
 
 \subsubsection{Le sous-menu : Ajouter participant}
 
-Ce menu ouvre une fenêtre qui permet de sélectionner des utilisateurs à affecter au projet.
+Ce menu ouvre une fenÃªtre qui permet de sÃ©lectionner des utilisateurs Ã  affecter au projet.
 
 
 \subsubsection{Le sous-menu : Avancement}
 
-Ce menu permet de mettre à jour :\\
+Ce menu permet de mettre Ã  jour :\\
 \begin{itemize}
-\item l'affectation des participants aux différentes tâches. On affecte un participant à une tâche en indiquant le nombre de jours que devrait nécessiter la réalisation de la tâche en question.
-\item l'avancement des participants pour les tâches auquelles ils sont affectés. En indiquant le nombre de jour estimé restant pour accomplir une tâche, il devient possible de détecter les avances ou retards du projet.
+\item l'affectation des participants aux diffÃ©rentes tÃ¢ches. On affecte un participant Ã  une tÃ¢che en indiquant le nombre de jours que devrait nÃ©cessiter la rÃ©alisation de la tÃ¢che en question.
+\item l'avancement des participants pour les tÃ¢ches auquelles ils sont affectÃ©s. En indiquant le nombre de jour estimÃ© restant pour accomplir une tÃ¢che, il devient possible de dÃ©tecter les avances ou retards du projet.
 \end {itemize}
 \vspace{0.3cm}
 
 Il est possible de supprimer une affectation en laissant sa case vide.\\
 
-A l'initialisation d'une nouvelle affectation, si l'avancement (temps estimé restant) n'est pas renseigné il est automatiquement positonné à la durée affectée.
+A l'initialisation d'une nouvelle affectation, si l'avancement (temps estimÃ© restant) n'est pas renseignÃ© il est automatiquement positonnÃ© Ã  la durÃ©e affectÃ©e.
 
 
 \subsubsection{Le sous-menu : Affichage}
 
-Ce menu permet de paramétrer l'affichage de la liste des projets. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
+Ce menu permet de paramÃ©trer l'affichage de la liste des projets. Il est possible de choisir les champs Ã  afficher et de rÃ©gler leur ordre d'affichage.

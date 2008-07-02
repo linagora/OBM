@@ -32,10 +32,10 @@ $l_date = "Datum";
 $l_date_init = "Startdatum";
 $l_after = "nach";
 $l_before = "vor";
-$l_deal_select_company = "Bitte Firma auswählen";
+$l_deal_select_company = "Bitte Firma auswÃ¤hlen";
 $l_number_deal = "Vertragsnummer";
 $l_affect_deal= "Hauptvertrag zuordnen";
-$l_deal_select_parentdeal = "Hauptvertrag auswählen";
+$l_deal_select_parentdeal = "Hauptvertrag auswÃ¤hlen";
 $l_parentdeal="Hauptvertrag";
 
 
@@ -52,21 +52,21 @@ $l_deal_detail = "Vertrags-Detail";
 $l_deal_new_company = "Firma";
 $l_deal_new = "neuer Vertrag";
 $l_deal_insert = "Vertrag anlegen";
-$l_deal_update = "Vertrag ändern";
-$l_deal_delete = "Vertrag löschen";
+$l_deal_update = "Vertrag Ã¤ndern";
+$l_deal_delete = "Vertrag lÃ¶schen";
 $l_deal_archive_update = "Vertrag ablegen";
 $l_parentdeal_infos = "Hauptvertrags-Information";
-$l_parentdeal_deals = "Verträge dieses Hauptvertrags";
+$l_parentdeal_deals = "VertrÃ¤ge dieses Hauptvertrags";
 
 // Actions
 $l_insert = "anlegen Vertrag";
-$l_update = "ändern Vertrag";
-$l_delete = "löschen Vertrag";
+$l_update = "Ã¤ndern Vertrag";
+$l_delete = "lÃ¶schen Vertrag";
 $l_archive_update = "aktualisieren Archiv";
-$l_select_company = "Firma auswählen";
+$l_select_company = "Firma auswÃ¤hlen";
 $l_insert_parent = "anlegen Hauptvertrag";
-$l_update_parent = "ändern Hauptvertrag";
-$l_delete_parent = "löschen Hauptvertrag";
+$l_update_parent = "Ã¤ndern Hauptvertrag";
+$l_delete_parent = "lÃ¶schen Hauptvertrag";
 $l_affect = "zuordnen";
 
 $l_type_delete = "Delete Type";
@@ -77,20 +77,20 @@ $l_status_delete = "Delete State";
 $l_status_insert = "Insert State";
 
 // Messages
-$l_link_contract = "The deal is involved in these Verträge";
-$l_link_contract_no = "The deal isn't involved in any Verträge";
+$l_link_contract = "The deal is involved in these VertrÃ¤ge";
+$l_link_contract_no = "The deal isn't involved in any VertrÃ¤ge";
 $l_link_project = "The deal is involved in these Projekte";
 $l_link_project_no = "The deal isn't involved in any Projekte";
 $l_cant_delete = "The deal can't be deleted !";
 $l_can_delete = "The deal can be deleted.";
 
 $l_updateaffect_ok = "Vertrag zugeordnet";
-$l_found = "Verträge gefunden";
+$l_found = "VertrÃ¤ge gefunden";
 $l_no_found = "No Vertrag found matching the query !";
 $l_archive_ok = "The archives have been updated successfully.";
 $l_archive_error = "The update of the archives has failed !";
 $l_archive_number = "vertrags inserted in the archives.";
-$l_found_parent = "Hauptverträge gefunden";
+$l_found_parent = "HauptvertrÃ¤ge gefunden";
 $l_no_display_parent ="Fill the search fields and press < $l_find > to retrieve the parentdeals"; 
 $l_no_found_parent ="No parentdeal found matching the query !";
 
@@ -115,6 +115,6 @@ $mj_type_create = "You have to enter a new type name to create it !";
 $mj_status_create = "You have to enter a new state name to create it !";
 
 // For the display parameters modification screen
-$l_deal_options = "Anzeige-Optionen für Verträge"; 
-$l_parentdeal_options = "Anzeige-Optionen für Hauptverträge";
+$l_deal_options = "Anzeige-Optionen fÃ¼r VertrÃ¤ge"; 
+$l_parentdeal_options = "Anzeige-Optionen fÃ¼r HauptvertrÃ¤ge";
 

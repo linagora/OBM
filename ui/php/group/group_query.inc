@@ -1150,8 +1150,7 @@ function run_query_group_ext_search($group) {
       group_name $like '$pattern%' 
       $where_privacy
       $multidomain
-      $where_restriction
-    ORDER BY group_name  ";
+      $where_restriction";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_ext_search()");
   $obm_q->query($query);

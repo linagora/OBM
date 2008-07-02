@@ -83,7 +83,7 @@ $l_meeting_legend = "Legend";
 $l_selection = "Selection";
 $l_task = "Task";
 $l_category_filter = "Filter by category";
-$l_events = "Évents";
+$l_events = "Ã‰vents";
 
 $l_collapse_all = "Collapse all";
 $l_expand_all = "Expand all";
@@ -133,7 +133,7 @@ $l_view_type = "View type";
 $l_sendamail = "Force the notification by mail.";
 $l_select_contacts = "You have to select an user or group.";
 $l_select_repeat_day = "You have to select the repetition days.";
-$l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour "; 
+$l_conflict_events = "Le ou les crÃ©neaux horaires choisis sont occupÃ©s pour "; 
 $l_fill_title = "You have to fill the [ $l_title ] field";
 $l_fill_dateend = "You have to fill the [ $l_dateend ] field";
 $l_fill_datebegin = "You have to fill the field [ $l_datebegin ]";

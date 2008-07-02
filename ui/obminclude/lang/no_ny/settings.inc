@@ -9,10 +9,10 @@
 
 $l_cur_settings = "Noverande oppsett";
 $l_auto_display = "Automatisk listing ";
-$l_cur_lang = "Noverande språk";
+$l_cur_lang = "Noverande sprÃ¥k";
 $l_cur_theme = "Noverande fargeval";
-$l_new_settings = "Velg nye parametre her for å endre oppsettet ditt.";
-$l_set_lang = "Velg språk";
+$l_new_settings = "Velg nye parametre her for Ã¥ endre oppsettet ditt.";
+$l_set_lang = "Velg sprÃ¥k";
 $l_set_theme = "Velg fargeval.";
 $l_set_rows = "# Rows displayed per page";
 $l_set_date = "Date format";

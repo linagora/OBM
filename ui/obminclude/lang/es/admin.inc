@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Espa駉l                                                  //
+// OBM - Language : Espa帽ol                                                  //
 //     - File     : admin.inc                                                //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -12,21 +12,21 @@ $l_check = "Revisando";
 $l_database_server = "Motor de Bases de datos";
 $l_database = "Base de datos";
 $l_host = "Servidor";
-$l_session_stats = "Estad韘ticas de sesi髇";
+$l_session_stats = "Estad铆sticas de sesi贸n";
 $l_date = "Fecha";
-$l_lifetime = "Duraci髇 de la sesi髇 de usuario (segundos)";
+$l_lifetime = "Duraci贸n de la sesi贸n de usuario (segundos)";
 $l_user_session = " Registros en ActiveUserObm";
 $l_active_user = "Usuarios Activos";
 $l_login_date = "Fecha de Ingreso";
-$l_last_acces = "趌timo acceso";
-$l_nb_connec = "N鷐ero de Hits";
-$l_last_page = "趌tima p醙ina";
+$l_last_acces = "脷ltimo acceso";
+$l_nb_connec = "N煤mero de Hits";
+$l_last_page = "脷ltima p谩gina";
 $l_user_ip = "IP";
 
 
 // Titles
-$l_admin = "Administraci髇";
-$l_admin_lang = "Administraci髇 de Idioma ";
+$l_admin = "Administraci贸n";
+$l_admin_lang = "Administraci贸n de Idioma ";
 
 // Actions
 $l_help = "Ayuda";

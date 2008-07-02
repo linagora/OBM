@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_number = "Numéro";
+$l_number = "NumÃ©ro";
 $l_label = "Label";
 $l_date_init = "Date Debut";
 $l_parentdeal = "SurAffaire";
@@ -16,19 +16,19 @@ $l_marketing_manager = "Commercial";
 $l_technical_manager = "Technique";
 $l_amount = "Montant";
 $l_margin = "Marge";
-$l_hitrate = "% Réussite";
+$l_hitrate = "% RÃ©ussite";
 $l_commission = "Commission";
 $l_commission_p = "% Commission";
-$l_commission_balanced = "Commission pondérée";
+$l_commission_balanced = "Commission pondÃ©rÃ©e";
 $l_proposal = "Proposition";
-$l_expected = "Prévue";
+$l_expected = "PrÃ©vue";
 $l_quarter = "T";
 $l_sale_delay = "Cycle de vente";
 $l_date_comment = "Date Commentaire";
 $l_todo = "A faire";
-$l_category1 = "Catégorie";
+$l_category1 = "CatÃ©gorie";
 $l_code = "Code";
-$l_role = "Rôle";
+$l_role = "RÃ´le";
 
 // Labels et textes
 $l_other_relation = "Autres relations";
@@ -36,13 +36,13 @@ $l_infos = "Dates et montants";
 $l_minus = "-";
 $l_plus = "+";
 $l_order = "Ordre";
-$l_amount_in = "Montant des entrées";
+$l_amount_in = "Montant des entrÃ©es";
 $l_amount_out = "Montant des sorties";
-$l_potential_balanced = "Potentiel pondéré";
+$l_potential_balanced = "Potentiel pondÃ©rÃ©";
 $l_label_start = "Nom Affaire";
-$l_deal_select_company = "Sélectionner la société avec laquelle l'affaire doit être renseignée.";
-$l_deal_select_parentdeal = "Sélectionner la surAffaire à laquelle l'affaire doit être affectée";
-$l_affect_deal = "Affecter à une surAffaire";
+$l_deal_select_company = "SÃ©lectionner la sociÃ©tÃ© avec laquelle l'affaire doit Ãªtre renseignÃ©e.";
+$l_deal_select_parentdeal = "SÃ©lectionner la surAffaire Ã  laquelle l'affaire doit Ãªtre affectÃ©e";
+$l_affect_deal = "Affecter Ã  une surAffaire";
 $l_no_invoice = "Pas de factures";
 $l_type_manage = "Gestion des Types d'Affaires";
 $l_type_exist = "Types existants";
@@ -51,91 +51,91 @@ $l_type_label = "Type";
 $l_status_manage = "Gestion des Etats d'Affaires";
 $l_status_exist = "Etats existants";
 $l_status_new = "Nouvel Etat";
-$l_invoice_number = "Numéro";
+$l_invoice_number = "NumÃ©ro";
 $l_invoice_label = "Label";
 $l_invoice_ht = "Montant HT";
 $l_invoice_ttc = "Montant TTC";
 $l_invoice_status = "Etat";
 $l_invoice_date = "Date";
-$l_parentdeal_deals = "Affaires appartenant à la SurAffaire";
-$l_forecast = "Prévisionnel";
+$l_parentdeal_deals = "Affaires appartenant Ã  la SurAffaire";
+$l_forecast = "PrÃ©visionnel";
 $l_deal_panel = "Volant d'affaires";
 
 // Actions
-$l_select_deal = "Sélectionner l'Affaire";
+$l_select_deal = "SÃ©lectionner l'Affaire";
 $l_insert = "Enregistrer l'Affaire";
 $l_update = "Modifier l'Affaire";
 $l_delete = "Supprimer l'Affaire";
-$l_select_company = "Sélectionner la société";
+$l_select_company = "SÃ©lectionner la sociÃ©tÃ©";
 $l_affect = "Affecter";
 
 $l_insert_parent = "Enregistrer SurAffaire";
 $l_update_parent = "Modifier SurAffaire";
 $l_delete_parent = "Supprimer SurAffaire";
 
-$l_type_checkdelete = "Vérifier ou Supprimer le Type";
+$l_type_checkdelete = "VÃ©rifier ou Supprimer le Type";
 $l_type_delete = "Supprimer le Type";
 $l_type_update = "Modifier le Type";
-$l_type_insert = "Créer le Type";
-$l_status_checkdelete = "Vérifier ou Supprimer l'état";
-$l_status_delete = "Supprimer l'état";
-$l_status_update = "Modifier l'état";
-$l_status_insert = "Créer l'état";
+$l_type_insert = "CrÃ©er le Type";
+$l_status_checkdelete = "VÃ©rifier ou Supprimer l'Ã©tat";
+$l_status_delete = "Supprimer l'Ã©tat";
+$l_status_update = "Modifier l'Ã©tat";
+$l_status_insert = "CrÃ©er l'Ã©tat";
 $l_add_cats = "Ajouter ces categories";
 
 // Messages
-$l_link_contract = "L'affaire est référencée par des contrats";
-$l_link_contract_no = "L'affaire n'est pas référencée dans les contrats";
-$l_link_project = "L'affaire est référencée par des projets";
-$l_link_project_no = "L'affaire n'est pas référencée dans les projets";
-$l_link_invoice = "L'affaire est référencée par des factures";
-$l_link_invoice_no = "L'affaire n'est pas référencée dans les factures";
-$l_can_delete = "L'affaire peut être supprimée.";
-$l_cant_delete = "L'affaire ne peut être supprimée !";
+$l_link_contract = "L'affaire est rÃ©fÃ©rencÃ©e par des contrats";
+$l_link_contract_no = "L'affaire n'est pas rÃ©fÃ©rencÃ©e dans les contrats";
+$l_link_project = "L'affaire est rÃ©fÃ©rencÃ©e par des projets";
+$l_link_project_no = "L'affaire n'est pas rÃ©fÃ©rencÃ©e dans les projets";
+$l_link_invoice = "L'affaire est rÃ©fÃ©rencÃ©e par des factures";
+$l_link_invoice_no = "L'affaire n'est pas rÃ©fÃ©rencÃ©e dans les factures";
+$l_can_delete = "L'affaire peut Ãªtre supprimÃ©e.";
+$l_cant_delete = "L'affaire ne peut Ãªtre supprimÃ©e !";
 
-$l_link_deal = "La suraffaire possède des affaires";
-$l_cant_delete_parent = "La suraffaire ne peut être supprimée !";
+$l_link_deal = "La suraffaire possÃ¨de des affaires";
+$l_cant_delete_parent = "La suraffaire ne peut Ãªtre supprimÃ©e !";
 
-$l_err_label_empty = "Le label doit être renseigné !";
-$l_err_type_empty = "Le type d'affaire doit être renseigné !";
-$l_err_task_empty = "Le type de tâche de l'affaire doit être renseigné !";
-$l_err_market_empty = "Le responsable commercial doit être renseigné !";
-$l_err_tech_empty = "Le responsable technique doit être renseigné !";
-$l_err_hitrate = "Le pourcentage de réussite doit être entre 0 et 100 !";
-$l_updateaffect_ok = "L'affaire a bien été affectée a une surAffaire.";
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des affaires correspondantes.";
-$l_found = "affaire(s) trouvée(s).";
-$l_no_found = "Aucune affaire ne correspond à ces critères !";
-$l_found_parent = "SurAffaires trouvées";
-$l_no_found_parent = "Aucune SurAffaire ne correspond à ces critères !";
+$l_err_label_empty = "Le label doit Ãªtre renseignÃ© !";
+$l_err_type_empty = "Le type d'affaire doit Ãªtre renseignÃ© !";
+$l_err_task_empty = "Le type de tÃ¢che de l'affaire doit Ãªtre renseignÃ© !";
+$l_err_market_empty = "Le responsable commercial doit Ãªtre renseignÃ© !";
+$l_err_tech_empty = "Le responsable technique doit Ãªtre renseignÃ© !";
+$l_err_hitrate = "Le pourcentage de rÃ©ussite doit Ãªtre entre 0 et 100 !";
+$l_updateaffect_ok = "L'affaire a bien Ã©tÃ© affectÃ©e a une surAffaire.";
+$l_no_display = "Renseigner les critÃ¨res souhaitÃ©s et cliquer sur < Chercher > pour obtenir la liste des affaires correspondantes.";
+$l_found = "affaire(s) trouvÃ©e(s).";
+$l_no_found = "Aucune affaire ne correspond Ã  ces critÃ¨res !";
+$l_found_parent = "SurAffaires trouvÃ©es";
+$l_no_found_parent = "Aucune SurAffaire ne correspond Ã  ces critÃ¨res !";
 
-$l_type_can_delete = "Le type peut être supprimé";
-$l_type_cant_delete = "Le type ne peut être supprimé";
-$l_type_link_deal = "Le type est référencé par ces affaires";
-$l_type_link_deal_no = "Le type n'est pas référencé dans les affaires";
-$l_status_can_delete = "L'état peut être supprimé";
-$l_status_cant_delete = "L'état ne peut être supprimé";
-$l_status_link_deal = "L'état est référencé par ces affaires";
-$l_status_link_deal_no = "L'état n'est pas référencé dans les affaires";
+$l_type_can_delete = "Le type peut Ãªtre supprimÃ©";
+$l_type_cant_delete = "Le type ne peut Ãªtre supprimÃ©";
+$l_type_link_deal = "Le type est rÃ©fÃ©rencÃ© par ces affaires";
+$l_type_link_deal_no = "Le type n'est pas rÃ©fÃ©rencÃ© dans les affaires";
+$l_status_can_delete = "L'Ã©tat peut Ãªtre supprimÃ©";
+$l_status_cant_delete = "L'Ã©tat ne peut Ãªtre supprimÃ©";
+$l_status_link_deal = "L'Ã©tat est rÃ©fÃ©rencÃ© par ces affaires";
+$l_status_link_deal_no = "L'Ã©tat n'est pas rÃ©fÃ©rencÃ© dans les affaires";
 
-$l_help_deal_forecast = "Le prévisionnel regroupe les affaires répondant aux critères : affaire non archivée, avec une estimation de montant et un % de réussite > 0 et < 100.";
+$l_help_deal_forecast = "Le prÃ©visionnel regroupe les affaires rÃ©pondant aux critÃ¨res : affaire non archivÃ©e, avec une estimation de montant et un % de rÃ©ussite > 0 et < 100.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_fill_parentdeal = "Vous devez sélectionner une surAffaire avant de valider.";
+$l_fill_parentdeal = "Vous devez sÃ©lectionner une surAffaire avant de valider.";
 $l_fill_label = "Vous devez renseigner le Label avant de valider.";
 $l_fill_number = "Vous devez renseigner le Numero avant de valider.";
 $l_fill_datealarm = "Vous devez renseigner la date alarme avant de valider.";
-$l_fill_datebegin = "Vous devez renseigner la date de début avant de valider.";
-$l_confirm_datealarm = "La date Alarme est dans le passé ! Confirmer l'action ?";
+$l_fill_datebegin = "Vous devez renseigner la date de dÃ©but avant de valider.";
+$l_confirm_datealarm = "La date Alarme est dans le passÃ© ! Confirmer l'action ?";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 $l_delete_confirm = "Confirmer la suppression de l'affaire ?";
 
-$l_j_type_create = "Vous devez saisir un nom de type pour le créer !";
-$l_j_type_update = "Vous devez sélectionner un type et entrer une modification avant de valider !";
-$l_j_type_delete = "Vous devez sélectionner un type pour vérifier ou supprimer !";
-$l_j_status_create = "Vous devez saisir un nom d'état pour le créer !";
-$l_j_status_update = "Vous devez sélectionner un état et entrer une modification avant de valider !";
-$l_j_status_delete = "Vous devez sélectionner un état pour le vérifier ou supprimer !";
+$l_j_type_create = "Vous devez saisir un nom de type pour le crÃ©er !";
+$l_j_type_update = "Vous devez sÃ©lectionner un type et entrer une modification avant de valider !";
+$l_j_type_delete = "Vous devez sÃ©lectionner un type pour vÃ©rifier ou supprimer !";
+$l_j_status_create = "Vous devez saisir un nom d'Ã©tat pour le crÃ©er !";
+$l_j_status_update = "Vous devez sÃ©lectionner un Ã©tat et entrer une modification avant de valider !";
+$l_j_status_delete = "Vous devez sÃ©lectionner un Ã©tat pour le vÃ©rifier ou supprimer !";
 
 // For the display preferences modification screen 
 $l_deal_display = "Options d'affichage des listes d'affaires";

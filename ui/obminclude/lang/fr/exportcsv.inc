@@ -7,10 +7,10 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_download = "Téléchargement";
-$l_download_active = "Téléchargement en cours";
+$l_download = "TÃ©lÃ©chargement";
+$l_download_active = "TÃ©lÃ©chargement en cours";
 
 $l_invalid_action = "Action invalide";
 
 // Messages
-$l_err_query_banned = "La requête n'est pas autorisée !";
+$l_err_query_banned = "La requÃªte n'est pas autorisÃ©e !";

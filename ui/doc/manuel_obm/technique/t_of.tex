@@ -1,52 +1,52 @@
-% Documentation technique d'OBM : Présentation du framework OF
+% Documentation technique d'OBM : PrÃ©sentation du framework OF
 % ALIACOM Pierre Baudracco
 % $Id$
 
-\section{Spécifications Framework OF}
+\section{SpÃ©cifications Framework OF}
 
-\subsection{Présentation du Framework}
+\subsection{PrÃ©sentation du Framework}
 
-Le développement du framework OF (\obm framework) a pour objectif de simplifier les évolutions et la maintenance d'\obm en traitant de façon générique les problématiques ou fonctionnalités rencontrées.
+Le dÃ©veloppement du framework OF (\obm framework) a pour objectif de simplifier les Ã©volutions et la maintenance d'\obm en traitant de faÃ§on gÃ©nÃ©rique les problÃ©matiques ou fonctionnalitÃ©s rencontrÃ©es.
 
-Son développement est empirique et le framework s'enrichit en suivant le développement d'\obm.
+Son dÃ©veloppement est empirique et le framework s'enrichit en suivant le dÃ©veloppement d'\obm.
 
-Ce n'est donc pas un framework industrialisé général prêt à l'emploi pour toute application web, mais il propose de nombreuses fonctionnalités bien utiles notamment dans les applications web de type gestion.
+Ce n'est donc pas un framework industrialisÃ© gÃ©nÃ©ral prÃªt Ã  l'emploi pour toute application web, mais il propose de nombreuses fonctionnalitÃ©s bien utiles notamment dans les applications web de type gestion.
 
 
 \subsubsection{Organisation et Principes de base}
 
-Les fichiers fournis par le framework sont situés dans le répertoire \fichier{obminclude/of/}.\\
+Les fichiers fournis par le framework sont situÃ©s dans le rÃ©pertoire \fichier{obminclude/of/}.\\
 
-L'idée générale est que tout ce qui est traité dans le framework soit indépendant de l'application elle-même. Ceci se traduit par :\\
+L'idÃ©e gÃ©nÃ©rale est que tout ce qui est traitÃ© dans le framework soit indÃ©pendant de l'application elle-mÃªme. Ceci se traduit par :\\
 \begin{itemize}
-\item Pas d'informations de modules en dur dans le framework (nom ``company'', ``contact'',.. ne doivent jamais apparaître)
-\item Pas d'utilisation de variables globales définies dans un module
+\item Pas d'informations de modules en dur dans le framework (nom ``company'', ``contact'',.. ne doivent jamais apparaÃ®tre)
+\item Pas d'utilisation de variables globales dÃ©finies dans un module
 \end{itemize}
 
 
-\subsubsection{Fonctionnalités proposées}
+\subsubsection{FonctionnalitÃ©s proposÃ©es}
 
 \begin{tabular}{|p{4cm}|p{3cm}|p{6.5cm}|}
 \hline
-\textbf{Fonctionnalité} & \textbf{Fichier} & \textbf{Description} \\
+\textbf{FonctionnalitÃ©} & \textbf{Fichier} & \textbf{Description} \\
 \hline
 session & of\_session.inc & Gestion des sessions web \\
 \hline
 multi domaine & of\_query.inc & Gestion du multi-domaine dans \obm \\
 \hline
-SQL & of\_query.inc & Interface multi-bases de données de création de requêtes SQL \\
+SQL & of\_query.inc & Interface multi-bases de donnÃ©es de crÃ©ation de requÃªtes SQL \\
 \hline
-thèmes & of\_display.inc & Fonctions génériques d'affichage pouvant être surchargées par les thèmes \\
+thÃ¨mes & of\_display.inc & Fonctions gÃ©nÃ©riques d'affichage pouvant Ãªtre surchargÃ©es par les thÃ¨mes \\
 \hline
-gestion des droits & ? & Gestion des droits et ACL sur une entité \\
+gestion des droits & ? & Gestion des droits et ACL sur une entitÃ© \\
 \hline
-appel modules externes & of\_extmod.inc & Fonctionnalités d'appel de modules externes (ex: ajouter un contact à un groupe) \\
+appel modules externes & of\_extmod.inc & FonctionnalitÃ©s d'appel de modules externes (ex: ajouter un contact Ã  un groupe) \\
 \hline
-préférences utilisateurs & of\_query.inc & Gestion des préférences des utilisateurs (paramètres + affichage) \\
+prÃ©fÃ©rences utilisateurs & of\_query.inc & Gestion des prÃ©fÃ©rences des utilisateurs (paramÃ¨tres + affichage) \\
 \hline
-résultats de recherche & of\_display.inc & Classe \variable{of\_display} : Navigation, tri des résultats de recherche \\
+rÃ©sultats de recherche & of\_display.inc & Classe \variable{of\_display} : Navigation, tri des rÃ©sultats de recherche \\
 \hline
-catégories & of\_category.inc & Gestion des catégories des modules \\
+catÃ©gories & of\_category.inc & Gestion des catÃ©gories des modules \\
 \hline
 \end{tabular}
 \vspace{0.3cm}

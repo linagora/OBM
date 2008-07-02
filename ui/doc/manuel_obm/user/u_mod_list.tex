@@ -5,20 +5,20 @@
 \clearpage
 \section{Le module \List}
 
-révision : \obm 2.0.0
+rÃ©vision : \obm 2.0.0
 
-\subsection{Présentation du module \List}
+\subsection{PrÃ©sentation du module \List}
 
 Ce module est une gestion de liste de contacts.
-Il permet de créer des listes ou cibles de contacts en fonction de nombreux critères portant sur les données de la société, du contact ou des abonnements du contact.\\
+Il permet de crÃ©er des listes ou cibles de contacts en fonction de nombreux critÃ¨res portant sur les donnÃ©es de la sociÃ©tÃ©, du contact ou des abonnements du contact.\\
 
-A une liste peuvent être associés des contacts directs et des critères permettant de sélectionner des contacts dynamiquement.
+A une liste peuvent Ãªtre associÃ©s des contacts directs et des critÃ¨res permettant de sÃ©lectionner des contacts dynamiquement.
 
-Les critères peuvent être saisis graphiquement ou par un mode avancé qui autorise l'utilisation directe de requêtes SQL.\\
+Les critÃ¨res peuvent Ãªtre saisis graphiquement ou par un mode avancÃ© qui autorise l'utilisation directe de requÃªtes SQL.\\
 
 La sauvegarde des listes et l'export CSV font de ce module un outil de ciblage complet ouvert vers les autres outils (publipostage,...).
 
-Ce module comporte une composante unique : l'entité Liste.
+Ce module comporte une composante unique : l'entitÃ© Liste.
 
 
 \subsection{Description d'une liste}
@@ -31,116 +31,116 @@ Composantes d'une liste :\\
 \hline
 Nom & Nom de la liste \\
 \hline
-Privée & Visibilité de la liste qui peut être publique ou privée. Une liste privée n'est visible que par son auteur.\\
+PrivÃ©e & VisibilitÃ© de la liste qui peut Ãªtre publique ou privÃ©e. Une liste privÃ©e n'est visible que par son auteur.\\
 \hline
 Sujet & Sujet de la liste.\\
 \hline
 E-mail & Adresse e-mail de la liste, utile pour utilisation en tant que liste de diffusion.\\
 \hline
-Mailing activé & Indicateur de restriction de la liste aux contacts étant notés comme OK pour l'envoi d'e-mail.\\
+Mailing activÃ© & Indicateur de restriction de la liste aux contacts Ã©tant notÃ©s comme OK pour l'envoi d'e-mail.\\
 \hline
-Contacts directs & Contacts associés directement (statiquement) à la liste.\\
+Contacts directs & Contacts associÃ©s directement (statiquement) Ã  la liste.\\
 \hline
-Requête & Critères de sélection des contacts. La requête supporte deux modes, le mode Normal ou le mode expert.\\
+RequÃªte & CritÃ¨res de sÃ©lection des contacts. La requÃªte supporte deux modes, le mode Normal ou le mode expert.\\
 \hline
 \end{tabular}
 
 
-\subsection{Description du champ requête / critères}
+\subsection{Description du champ requÃªte / critÃ¨res}
 \label{u_list_req}
 
-Les critères de ciblage supportent 2 modes de saisie :\\
+Les critÃ¨res de ciblage supportent 2 modes de saisie :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
 \textbf{Mode} & \textbf{Description} \\
 \hline
-Normal & Critères saisis graphiquement par l'interface dédiée \\
+Normal & CritÃ¨res saisis graphiquement par l'interface dÃ©diÃ©e \\
 \hline
-Expert & Une requête SQL est attendue, donc libre de proposer ses critères.\\
+Expert & Une requÃªte SQL est attendue, donc libre de proposer ses critÃ¨res.\\
 \hline
 \end{tabular}
 
 
 \subsubsection{Le mode Normal}
-Le mode normal propose de saisir graphiquement les critères de ciblage.
+Le mode normal propose de saisir graphiquement les critÃ¨res de ciblage.
 
-La fenêtre de critères comporte 3 parties : \\
+La fenÃªtre de critÃ¨res comporte 3 parties : \\
 
 \begin{itemize}
-\item Critères relatifs à la société du contact
-\item Critères relatifs au contact
-\item Critères relatifs aux abonnements du contact
+\item CritÃ¨res relatifs Ã  la sociÃ©tÃ© du contact
+\item CritÃ¨res relatifs au contact
+\item CritÃ¨res relatifs aux abonnements du contact
 \end{itemize}
 \vspace{0.3cm}
 
-\paragraph{Règles de gestion des critères graphiques}.\\
+\paragraph{RÃ¨gles de gestion des critÃ¨res graphiques}.\\
 
 \begin{tabular}{|p{14cm}|}
 \hline
-Les critères de la même fenêtre sont cumulés et liés par des \textbf{ET} logiques.\\
+Les critÃ¨res de la mÃªme fenÃªtre sont cumulÃ©s et liÃ©s par des \textbf{ET} logiques.\\
 \hline
-Pour les critères à choix multiples (à partir de \obm 1.2.5), les choix sélectionnés pour ce critère sont combinés par des \textbf{OU} logiques (valeur parmis celles sélectionnées).\\
+Pour les critÃ¨res Ã  choix multiples (Ã  partir de \obm 1.2.5), les choix sÃ©lectionnÃ©s pour ce critÃ¨re sont combinÃ©s par des \textbf{OU} logiques (valeur parmis celles sÃ©lectionnÃ©es).\\
 \hline
-Entre 2 lignes (ou fenêtre de critères) il est possible de choisir le mode de combinaison logique (\textbf{OU} ou \textbf{ET}) et d'inverser le critère (opérateur \textbf{NOT}).\\
+Entre 2 lignes (ou fenÃªtre de critÃ¨res) il est possible de choisir le mode de combinaison logique (\textbf{OU} ou \textbf{ET}) et d'inverser le critÃ¨re (opÃ©rateur \textbf{NOT}).\\
 \hline
-Un opérateur spécial \textbf{"Exclude"} permet d'ajouter des critères d'exclusions globaux, c'est à dire qui s'appliquent à l'ensemble des critères, peut importe sa position dans la liste des critères.
-Lorsque l'opérateur \textbf{Exclude} est sélectionné, l'opérateur logique de la ligne (\textbf{OU}, \textbf{ET}) n'est plus pris en compte.
+Un opÃ©rateur spÃ©cial \textbf{"Exclude"} permet d'ajouter des critÃ¨res d'exclusions globaux, c'est Ã  dire qui s'appliquent Ã  l'ensemble des critÃ¨res, peut importe sa position dans la liste des critÃ¨res.
+Lorsque l'opÃ©rateur \textbf{Exclude} est sÃ©lectionnÃ©, l'opÃ©rateur logique de la ligne (\textbf{OU}, \textbf{ET}) n'est plus pris en compte.
 \\
 \hline
 \end{tabular}
 
 
-\paragraph{Exemple :} Si à une requête comprenant plusieurs critères, les contacts appartenant à la société X ne doivent pas faire partie du résultat, il suffit de rajouter la ligne de critères d'exclusion (opérateur "Exclude") avec le critère société X, n'importe ou dans la liste des critères.
+\paragraph{Exemple :} Si Ã  une requÃªte comprenant plusieurs critÃ¨res, les contacts appartenant Ã  la sociÃ©tÃ© X ne doivent pas faire partie du rÃ©sultat, il suffit de rajouter la ligne de critÃ¨res d'exclusion (opÃ©rateur "Exclude") avec le critÃ¨re sociÃ©tÃ© X, n'importe ou dans la liste des critÃ¨res.
 
 
 \subsubsection{Le mode Expert}
 
-Le mode expert propose la saisie directe d'une requête SQL.\\
+Le mode expert propose la saisie directe d'une requÃªte SQL.\\
 
-Ce mode nécessite donc la connaissance du language SQL et du modèle de la base de données d'OBM pour être utilisé.
+Ce mode nÃ©cessite donc la connaissance du language SQL et du modÃ¨le de la base de donnÃ©es d'OBM pour Ãªtre utilisÃ©.
 
-\paragraph{Avertissement} Ce mode est réservé aux utilisateurs avertis connaissant le langage SQL et le modèle de base de données d'\obm.
-Attention le modèle de la base de données OBM est susceptible d'évoluer, et certaines requêtes peuvent ne plus être fonctionnelles après une mise à jour d'OBM.
+\paragraph{Avertissement} Ce mode est rÃ©servÃ© aux utilisateurs avertis connaissant le langage SQL et le modÃ¨le de base de donnÃ©es d'\obm.
+Attention le modÃ¨le de la base de donnÃ©es OBM est susceptible d'Ã©voluer, et certaines requÃªtes peuvent ne plus Ãªtre fonctionnelles aprÃ¨s une mise Ã  jour d'OBM.
 
-\paragraph{La Sécurité} est prise en compte. En effet le mode expert permettant un accès SQL direct à la base, et donc potentiellement la saisie de toute commande SQL, les requêtes saisies sont vérifiées avant leur validation.
-Ainsi certains mot clés SQL sont interdits comme : Alter, Drop, Insert, Delete, Update, Create; ou la récupération de certains champs (mots de passe,...).
+\paragraph{La SÃ©curitÃ©} est prise en compte. En effet le mode expert permettant un accÃ¨s SQL direct Ã  la base, et donc potentiellement la saisie de toute commande SQL, les requÃªtes saisies sont vÃ©rifiÃ©es avant leur validation.
+Ainsi certains mot clÃ©s SQL sont interdits comme : Alter, Drop, Insert, Delete, Update, Create; ou la rÃ©cupÃ©ration de certains champs (mots de passe,...).
 
-\paragraph{Les ressources} Une vérification est aussi effectuée sur l'estimation des ressources requises pour la requête afin d'interdire les requêtes trop lourdes, souvent dues à des erreurs. Les paramètres de limite de ressources sont ajustables.
+\paragraph{Les ressources} Une vÃ©rification est aussi effectuÃ©e sur l'estimation des ressources requises pour la requÃªte afin d'interdire les requÃªtes trop lourdes, souvent dues Ã  des erreurs. Les paramÃ¨tres de limite de ressources sont ajustables.
 
 
-\subsubsection{Changement de mode de critères}
+\subsubsection{Changement de mode de critÃ¨res}
 
-Il est possible à tout moment dans une liste de donnée de basculer de mode de sélection de critères.
-Cependant il est important de noter que ceci ne s'effectue pas sans conséquences.
-Lors du changement de mode, un message d'alerte est affiché détaillant ces conséquences.\\
+Il est possible Ã  tout moment dans une liste de donnÃ©e de basculer de mode de sÃ©lection de critÃ¨res.
+Cependant il est important de noter que ceci ne s'effectue pas sans consÃ©quences.
+Lors du changement de mode, un message d'alerte est affichÃ© dÃ©taillant ces consÃ©quences.\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
 \textbf{Bascule} & \textbf{Description} \\
 \hline
-Normal -> Expert & Les critères saisis sont conservés et transformés en requête SQL qui est reprise comme base pour la requête manuelle. Les critères du mode normal sont sauvegardés dans la liste.\\
+Normal -> Expert & Les critÃ¨res saisis sont conservÃ©s et transformÃ©s en requÃªte SQL qui est reprise comme base pour la requÃªte manuelle. Les critÃ¨res du mode normal sont sauvegardÃ©s dans la liste.\\
 \hline
-Expert -> Normal & La requête saisie est perdue. Les critères sont récupérés de la dernière bascule Normal -> Expert, soit du dernier état en mode normal.\\
+Expert -> Normal & La requÃªte saisie est perdue. Les critÃ¨res sont rÃ©cupÃ©rÃ©s de la derniÃ¨re bascule Normal -> Expert, soit du dernier Ã©tat en mode normal.\\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-La modification du mode de sélection des critères n'est validée que lorsque la mise à jour de la liste est validée.
-En cas de problème ou de mauvaise manipulation, il suffit donc de ne pas valider la mise à jour.
+La modification du mode de sÃ©lection des critÃ¨res n'est validÃ©e que lorsque la mise Ã  jour de la liste est validÃ©e.
+En cas de problÃ¨me ou de mauvaise manipulation, il suffit donc de ne pas valider la mise Ã  jour.
  
 
 \subsection{La consultation d'une liste}
 \label{u_list_consult}
 
-L'accès à l'écran de consultation d'une liste s'effectue depuis l'écran de recherche, depuis les bookmarks ou dernières visites ou depuis le menu Consulter.
+L'accÃ¨s Ã  l'Ã©cran de consultation d'une liste s'effectue depuis l'Ã©cran de recherche, depuis les bookmarks ou derniÃ¨res visites ou depuis le menu Consulter.
 
-La consultation d'une liste affiche différents types d'informations :\\
+La consultation d'une liste affiche diffÃ©rents types d'informations :\\
 
 \begin{itemize}
-\item les informations générales : le nom de la liste, le sujet, l'email,...
-\item la liste des contacts directs sélectionnés
-\item la cible complète comprenant les contact correspondant aux critères de recherche plus les contacts directs.
+\item les informations gÃ©nÃ©rales : le nom de la liste, le sujet, l'email,...
+\item la liste des contacts directs sÃ©lectionnÃ©s
+\item la cible complÃ¨te comprenant les contact correspondant aux critÃ¨res de recherche plus les contacts directs.
 \end{itemize}
 
 
@@ -152,19 +152,19 @@ Le module \List comporte les sous-menus suivants :
 \hline
 \textbf{Nom} & \textbf{Action / Description} \\
 \hline
-Chercher & Recherche multicritères des listes \\
+Chercher & Recherche multicritÃ¨res des listes \\
 \hline
-Nouveau & Créer une nouvelle liste \\
+Nouveau & CrÃ©er une nouvelle liste \\
 \hline
-Consulter & Consulter les informations de la liste courante et du résultat de ciblage \\
+Consulter & Consulter les informations de la liste courante et du rÃ©sultat de ciblage \\
 \hline
 Dupliquer & Dupliquer le contenu d'une liste dans une nouvelle liste \\
 \hline
 Modifier & Modifier les informations de la liste courante\\
 \hline
-Supprimer & Vérifier les liens puis si besoin Supprimer une liste\\
+Supprimer & VÃ©rifier les liens puis si besoin Supprimer une liste\\
 \hline
-Ajouter Contact & Permet d'ajouter des contacts directs à la liste\\
+Ajouter Contact & Permet d'ajouter des contacts directs Ã  la liste\\
 \hline
 Affichage & Personnalisation de l'affichage de la liste des listes et de la cible\\
 \hline
@@ -173,7 +173,7 @@ Affichage & Personnalisation de l'affichage de la liste des listes et de la cibl
 
 \subsubsection{Le sous-menu : Chercher}
 
-Ce menu permet d'effectuer une recherche selon différents critères :
+Ce menu permet d'effectuer une recherche selon diffÃ©rents critÃ¨res :
 
 \begin{itemize}
 \item Nom
@@ -185,21 +185,21 @@ Ce menu permet d'effectuer une recherche selon différents critères :
 
 \subsubsection{Le sous-menu : Nouveau}
 
-Ce menu permet de créer une nouvelle liste.
+Ce menu permet de crÃ©er une nouvelle liste.
 
-Un formulaire vierge de création propose la saisie des champs :
+Un formulaire vierge de crÃ©ation propose la saisie des champs :
 
 \begin{itemize}
 \item Nom (obligatoire),
-\item Indicateur de liste privée,
+\item Indicateur de liste privÃ©e,
 \item Sujet (obligatoire),
 \item E-mail,
-\item Indicateur de restriction sur contacts activés pour mailing.
-\item Mode de requête / critères.
+\item Indicateur de restriction sur contacts activÃ©s pour mailing.
+\item Mode de requÃªte / critÃ¨res.
 \end{itemize}
 \vspace{0.3cm}
 
-Le mode de requête / critères est détaillé dans la section \ref{u_list_req}.
+Le mode de requÃªte / critÃ¨res est dÃ©taillÃ© dans la section \ref{u_list_req}.
 
 
 \subsubsection{Le sous-menu : Consulter}
@@ -210,23 +210,23 @@ Voir la section \ref{u_list_consult} ``Consultation d'une liste''.
 
 \subsubsection{Le sous-menu : Dupliquer}
 
-Ce menu permet de créer une nouvelle liste pré-renseignée avec les données de la liste en cours de consultation.
+Ce menu permet de crÃ©er une nouvelle liste prÃ©-renseignÃ©e avec les donnÃ©es de la liste en cours de consultation.
 
 
 \subsubsection{Le sous-menu : Modifier}
 
-L'écran de modification affiche les informations de la liste dans un formulaire.
+L'Ã©cran de modification affiche les informations de la liste dans un formulaire.
 Il est possible de modifier les informations suivantes :
 
 \begin{itemize}
 \item Nom,
 \item Sujet,
 \item Email,
-\item Indicateur de restriction sur contacts activés pour mailing.
-\item Mode de requête / critères.
+\item Indicateur de restriction sur contacts activÃ©s pour mailing.
+\item Mode de requÃªte / critÃ¨res.
 \end{itemize}
 
-Pour valider les modifications effectuées il faut cliquer sur le bouton``valider les modifications''.
+Pour valider les modifications effectuÃ©es il faut cliquer sur le bouton``valider les modifications''.
 
 
 \subsubsection{Le sous-menu : Supprimer}
@@ -235,10 +235,10 @@ Ce menu permet la suppression d'une liste.
 
 \subsubsection{Le sous-menu : Ajouter Contact}
 
-Ce menu permet d'ajouter des contacts directs à une liste.
-Il ouvre une fenêtre qui permet de rechercher et sélectionner les contacts à associer.
+Ce menu permet d'ajouter des contacts directs Ã  une liste.
+Il ouvre une fenÃªtre qui permet de rechercher et sÃ©lectionner les contacts Ã  associer.
 
 
 \subsubsection{Le sous-menu : Affichage}
 
-Ce menu permet de paramétrer l'affichage de la liste des listes et de la liste des contacts résultant du ciblage. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
+Ce menu permet de paramÃ©trer l'affichage de la liste des listes et de la liste des contacts rÃ©sultant du ciblage. Il est possible de choisir les champs Ã  afficher et de rÃ©gler leur ordre d'affichage.

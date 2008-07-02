@@ -59,7 +59,6 @@ function run_query_calendar_detail($calendar_id) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
-
   return $obm_q;
 }
 
@@ -485,7 +484,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $priority = $calendar['priority'];
   $description = $calendar['description'];
   $location = $calendar['location'];
-  ($calendar['all_day'] != 1)?$all_day= '0':$all_day = '1';
+  ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
   $datebegin = of_isodate_convert($calendar['date_begin']);
   $dateend = of_isodate_convert($calendar['date_end']);
   $event_duration = $calendar['event_duration'];
@@ -566,7 +565,7 @@ function run_query_calendar_insert_event_data($calendar) {
     '$repeat_kind',
     '$repeatfrequency',
     '$repeat_days',
-    '$all_day',
+    $all_day,
     '$color',
     $repeat_end,
     '$obm[domain_id]')";
@@ -740,7 +739,7 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   $ts_begin = isodatetime_to_timestamp($calendar['date_begin']);
   $ts_end = isodatetime_to_timestamp($calendar['date_end']);
   $id = $calendar['calendar_id'];
-  if($calendar['all_day'] == 1) {
+  if($calendar['all_day']) {
     $ts_begin = strtotime(date('Y-m-d 00:00:00',$ts_begin));
     $ts_end = strtotime(date('Y-m-d 23:59:59',$ts_end));
   }  
@@ -762,7 +761,7 @@ function check_calendar_decision_conflict($calendar) {
   $e_q = run_query_calendar_detail($event_id);
   $ts_begin = $e_q->f('calendarevent_date');
   $ts_end = $e_q->f('calendarevent_date') + $e_q->f('calendarevent_duration');
-  if($e_q->f('all_day') == 1) {
+  if($e_q->f('all_day')) {
     $ts_begin = strtotime(date('Y-m-d 00:00:00',$ts_begin));
     $ts_end = strtotime(date('Y-m-d 23:59:59',$ts_end));
   }
@@ -943,7 +942,7 @@ function run_query_calendar_update_event_data($calendar) {
   $location = $calendar['location'];
   $datebegin = of_isodate_convert($calendar['date_begin']);
   $event_duration = $calendar['event_duration'];
-  ($calendar['all_day'] != 1)?$all_day= '0':$all_day = '1';
+  ($calendar['all_day'] != 1) ? $all_day = 'FALSE': $all_day = 'TRUE';
   $event_id = $calendar['calendar_id']; 
   if ($calendar['privacy'] != 1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar['repeat_kind'];
@@ -995,7 +994,7 @@ function run_query_calendar_update_event_data($calendar) {
     calendarevent_priority = '$priority',
     calendarevent_privacy = '$privacy', 
     calendarevent_duration = '$event_duration',
-    calendarevent_allday = '$all_day', 
+    calendarevent_allday = $all_day, 
     calendarevent_color = '$color',
     calendarevent_repeatkind = '$repeat_kind',
     calendarevent_repeatfrequence = '$frequency',
@@ -1071,7 +1070,7 @@ function run_query_calendar_quick_event_insert($calendar) {
   $title = $calendar['title'];
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
-  $all_day = $calendar['all_day'];
+  $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
 
   $obm_q = new DB_OBM;
   $query = "INSERT INTO CalendarEvent
@@ -1101,7 +1100,7 @@ function run_query_calendar_quick_event_insert($calendar) {
     '$title', 
     '$datebegin',     
     '$event_duration',
-    '$all_day',
+    $all_day,
     '',
     '',
     '0',
@@ -1189,7 +1188,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $description = $event_q->f('calendarevent_description');
     $properties = $event_q->f('calendarevent_properties');
     $location = $event_q->f('calendarevent_location');
-    ($calendar['all_day'] != 1)?$all_day= '0':$all_day = '1';
+    ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $datebegin = $calendar['date_begin'];
 
     $query = "INSERT INTO CalendarEvent (
@@ -1231,7 +1230,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       'none',
       '$repeatfrequency',
       '$repeat_days',
-      '$all_day',
+      $all_day,
       '$color',
       '$repeat_end',
       '$obm[domain_id]'
@@ -1934,7 +1933,7 @@ function check_calendar_data_form($calendar) {
   $repeat_days = $calendar['repeat_days'];
   $repeatfrequency = $calendar['repeatfrequency'];
   $event_duration = $calendar['event_duration'];
-  ($calendar['all_day'] != 1)?$all_day= '0':$all_day = '1';
+  ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
 
   if (trim($title) == '') {
     $err['msg'] = $l_fill_title;
@@ -1973,7 +1972,7 @@ function check_calendar_data_form($calendar) {
     return false;
   }
 
-  if ($dateend < $datebegin || $event_duration < 0 || ( $all_day !=  1 && $dateend == $datebegin)) {
+  if ($dateend < $datebegin || $event_duration < 0 || ( $all_day && $dateend == $datebegin)) {
     $err['msg'] = $l_err_begin_end;
     return false;
   } 
@@ -2240,7 +2239,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
     WHERE evententity_state = 'A'
       AND calendarevent_repeatkind = 'none' AND
       (($calendarevent_date > $start - calendarevent_duration AND $calendarevent_date < $end) 
-        OR (calendarevent_allday = 1 AND $calendarevent_date >= $day_start - calendarevent_duration AND $calendarevent_date <= $day_end))
+        OR (calendarevent_allday = TRUE AND $calendarevent_date >= $day_start - calendarevent_duration AND $calendarevent_date <= $day_end))
       $where_ent
       $where_event
       $multidomain
@@ -3541,7 +3540,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $old_location = $event_q->f('calendarevent_location');
     $location = $calendar['location'];
     $old_all_day = $event_q->f('calendarevent_allday');
-    ($calendar['all_day'] != 1)?$all_day= '0':$all_day = '1';
+    ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $old_duration = $event_q->f('calendarevent_duration');
     $duration = $calendar['event_duration'];
     $old_repeatkind = $event_q->f('calendarevent_repeatkind');

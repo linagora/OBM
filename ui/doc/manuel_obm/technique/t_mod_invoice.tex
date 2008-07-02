@@ -8,7 +8,7 @@
 
 Le module \invoice \obm.
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
 Le module \invoice utilise 2 tables :
 \begin{itemize}
@@ -23,23 +23,23 @@ Table principale des informations d'une facture.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_company\_id & int 8 & Société client ou fournisseur & \\
+\_company\_id & int 8 & SociÃ©tÃ© client ou fournisseur & \\
 \hline
-\_deal\_id & int 8 & Affaire concernée & \\
+\_deal\_id & int 8 & Affaire concernÃ©e & \\
 \hline
-\_project\_id & int 8 & Projet concerné & \\
+\_project\_id & int 8 & Projet concernÃ© & \\
 \hline
-\_number & varchar 10 & Numéro de la facture & \\
+\_number & varchar 10 & NumÃ©ro de la facture & \\
 \hline
 \_label & varchar 128 & Label & \\
 \hline
@@ -49,7 +49,7 @@ Table principale des informations d'une facture.\\
 \hline
 \_status\_id & int 4 & Etat & \\
 \hline
-\_date & date & Jour de facturation & prévu ou réel \\
+\_date & date & Jour de facturation & prÃ©vu ou rÃ©el \\
 \hline
 \_inout & char 1 & Type client ou fournisseur & (+ client, - fournisseur) \\
 \hline
@@ -61,93 +61,93 @@ Table principale des informations d'une facture.\\
 
 
 \subsection{InvoiceStatus}
-Table des informations des états des factures.\\
+Table des informations des Ã©tats des factures.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
 \_payment & int 1 & Indicateur facture doit avoir des paiements & (1 = Oui) \\
 \hline
-\_created & int 1 & Indicateur facture créée (nécessite numéro et dates) & (1 = Oui) \\
+\_created & int 1 & Indicateur facture crÃ©Ã©e (nÃ©cessite numÃ©ro et dates) & (1 = Oui) \\
 \hline
 \_archive & char 1 & Indicateur facture de cet Etat est archivable & (1 = Oui)\\
 \hline
-\_label & varchar 24 & Label de l'état & \\
+\_label & varchar 24 & Label de l'Ã©tat & \\
 \hline
 \end{tabular}
 
 
-\subsubsection{Valeurs par défaut}
+\subsubsection{Valeurs par dÃ©faut}
 
-Il est possible de gérer ses propres états de factures mais des états par défaut sont définis :\\
+Il est possible de gÃ©rer ses propres Ã©tats de factures mais des Ã©tats par dÃ©faut sont dÃ©finis :\\
 
 \begin{tabular}{|p{3cm}|c|c|c|p{4cm}|}
 \hline
-\textbf{Etat} & \textbf{Paiement} & \textbf{Création} & \textbf{Archivable} & \textbf{Commentaire} \\
+\textbf{Etat} & \textbf{Paiement} & \textbf{CrÃ©ation} & \textbf{Archivable} & \textbf{Commentaire} \\
 \hline
-A créer & & & & \\
+A crÃ©er & & & & \\
 \hline
-Envoyée & X & X & & \\
+EnvoyÃ©e & X & X & & \\
 \hline
-Payée en partie & X & X & & \\
+PayÃ©e en partie & X & X & & \\
 \hline
 Litige & X & X & & \\
 \hline
-Annulée & & X & X & \\
+AnnulÃ©e & & X & X & \\
 \hline
 Pertes et profits & & X & X & \\
 \hline
-Payée & X & X & X & \\
+PayÃ©e & X & X & X & \\
 \hline
 \end{tabular}
 
 \subsubsection{Remarques}
 
-\paragraph{L'ordre d'affichage} des états est : ``Non archivable, Pas de paiements'', ce qui donne l'ordre du tableau ci-dessus.
+\paragraph{L'ordre d'affichage} des Ã©tats est : ``Non archivable, Pas de paiements'', ce qui donne l'ordre du tableau ci-dessus.
 
 
 \subsection{ProjectTerm}
-Table des conditions de règlement ou délais de paiements.
+Table des conditions de rÃ¨glement ou dÃ©lais de paiements.
 
 
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \invoice, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \invoice, avec le droit d'accÃ¨s requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \textbf{IntitulÃ©} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & read & (Défaut) formulaire de recherche de factures. \\ 
+  index & read & (DÃ©faut) formulaire de recherche de factures. \\ 
  \hline
-  search & read & Résultat de recherche de factures. \\
+  search & read & RÃ©sultat de recherche de factures. \\
  \hline
-  new & write & Formulaire de création d'une facture. \\
+  new & write & Formulaire de crÃ©ation d'une facture. \\
  \hline
-  detailconsult & read & Fiche détail d'une facture. \\
+  detailconsult & read & Fiche dÃ©tail d'une facture. \\
  \hline
   detailupdate & write & Formulaire de modification d'une facture. \\
  \hline
-  duplicate & write & Formulaire de création à partir d'une facture existante. \\
+  duplicate & write & Formulaire de crÃ©ation Ã  partir d'une facture existante. \\
  \hline
   insert & write & Insertion d'une facture. \\
  \hline
-  update & write & Mise à jour d'une facture. \\
+  update & write & Mise Ã  jour d'une facture. \\
  \hline
-  check\_delete & write & Vérification avant suppression d'une facture. \\
+  check\_delete & write & VÃ©rification avant suppression d'une facture. \\
  \hline
   delete & write & Suppression d'une facture. \\
  \hline
-  display & read & Ecran de modification des préférences d'affichage. \\
+  display & read & Ecran de modification des prÃ©fÃ©rences d'affichage. \\
  \hline
-  dispref\_display & read & Modifie l'affichage d'un élément. \\
+  dispref\_display & read & Modifie l'affichage d'un Ã©lÃ©ment. \\
  \hline
-  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+  dispref\_level & read & Modifie l'ordre d'affichage d'un Ã©lÃ©ment. \\
  \hline
   document\_add & write & Ajout de liens vers des documents. \\
  \hline

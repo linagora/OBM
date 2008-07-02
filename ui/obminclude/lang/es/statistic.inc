@@ -1,22 +1,22 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Español                                                  //
+// OBM - Language : EspaÃ±ol                                                  //
 //     - File     : statistic.inc                                            //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_statistic = "Estadísticas";
+$l_statistic = "EstadÃ­sticas";
 
-$l_stats_manager = "Estadísticas de Responsables";
-$l_stats_contact_date_evolution = "Estadísticas de Contactos por fecha";
+$l_stats_manager = "EstadÃ­sticas de Responsables";
+$l_stats_contact_date_evolution = "EstadÃ­sticas de Contactos por fecha";
 
 $l_key = "Llave";
 $l_totals = "Total";
 $l_null = "Nada";
-$l_compcat = "Categorias de Compañías";
+$l_compcat = "Categorias de CompaÃ±Ã­as";
 $l_stats_from_list = "For a given set (list)";
 $l_stats_from_all = "For all";
 
-$l_contact_date_evolution_graph = "Evolución del número de contactos (mensual)";
+$l_contact_date_evolution_graph = "EvoluciÃ³n del nÃºmero de contactos (mensual)";

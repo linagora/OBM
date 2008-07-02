@@ -5,37 +5,37 @@
 
 \subsection{Gestion interne des groupes pour un mapping direct}
 \label{of_usergroup}
-rÈvision : \obm 2.1.0\\
+r√©vision : \obm 2.1.0\\
 
-\obm permet la gestion de groupes rÈcursifs (groupes de groupes). Afin de garder un bon niveau de performance dans les recherches d'appartenance des utilisateurs aux groupes, et de permettre l'utilisation d'ACL sur les groupes, \obm maintient un mapping direct entre groupes et utilisateurs.
+\obm permet la gestion de groupes r√©cursifs (groupes de groupes). Afin de garder un bon niveau de performance dans les recherches d'appartenance des utilisateurs aux groupes, et de permettre l'utilisation d'ACL sur les groupes, \obm maintient un mapping direct entre groupes et utilisateurs.
 
-Cette reprÈsentation des groupes ``‡ plat'' permet d'effectuer toute recherche en 1 seule passe et d'Èviter des requÍtes rÈcursives.\\
+Cette repr√©sentation des groupes ``√† plat'' permet d'effectuer toute recherche en 1 seule passe et d'√©viter des requ√™tes r√©cursives.\\
 
-\subsubsection{Groupes privÈs et publics}
+\subsubsection{Groupes priv√©s et publics}
 
-Le mapping direct ‡ plat doit-il contenir uniquement les groupes publics ou l'ensemble des groupes. HypothËses de dÈpart :\\
+Le mapping direct √† plat doit-il contenir uniquement les groupes publics ou l'ensemble des groupes. Hypoth√®ses de d√©part :\\
 \begin{itemize}
-\item Les groupes privÈs ne sont pas intÈgrÈs dans l'annuaire LDAP et donc omis par l'automate
-\item Les ACL ne doivent pas utiliser des groupes privÈs
-\item Nombre de groupes privÈs potentiel sur les trËs gros sites est une inconnue
+\item Les groupes priv√©s ne sont pas int√©gr√©s dans l'annuaire LDAP et donc omis par l'automate
+\item Les ACL ne doivent pas utiliser des groupes priv√©s
+\item Nombre de groupes priv√©s potentiel sur les tr√®s gros sites est une inconnue
 \end{itemize}
 \vspace{0.3cm}
 
-\shadowbox{Choix retenu et implÈmentÈ : of\_usergroup contient groupes publics + privÈs}\\
+\shadowbox{Choix retenu et impl√©ment√© : of\_usergroup contient groupes publics + priv√©s}\\
 
 \begin{tabular}{|p{2cm}|p{3.5cm}|p{8.5cm}|}
 \hline
-\textbf{ModËle ‡ plat} & \textbf{Avantages} & \textbf{MÈthodes pour accÈder aux informations} \\
+\textbf{Mod√®le √† plat} & \textbf{Avantages} & \textbf{M√©thodes pour acc√©der aux informations} \\
 \hline
 groupes publics &
 \begin{itemize}
-\item Les groupes privÈs n'ont pas ‡ Ítre traitÈs par l'automate
-\item Les ACL ne doivent pas utiliser des groupes privÈs
+\item Les groupes priv√©s n'ont pas √† √™tre trait√©s par l'automate
+\item Les ACL ne doivent pas utiliser des groupes priv√©s
 \end{itemize}
 &
 \begin{itemize}
-\item Membres d'un groupe (Agenda) : of\_usergroup pour publics, UserObmGroup + GroupGroup pour privÈs
-\item Recherche user par groupe : of\_usergroup pour publics, UserObmGroup + GroupGroup pour privÈs
+\item Membres d'un groupe (Agenda) : of\_usergroup pour publics, UserObmGroup + GroupGroup pour priv√©s
+\item Recherche user par groupe : of\_usergroup pour publics, UserObmGroup + GroupGroup pour priv√©s
 \item ACL : of\_usergroup
 \item Maj : of\_usergroup maj que si public
 \item Tableau de Maj : traitement standard of\_usergroup
@@ -43,18 +43,18 @@ groupes publics &
 \end{itemize}
 \\
 \hline
-groupes publics + privÈs \textbf{choix retenu} &
+groupes publics + priv√©s \textbf{choix retenu} &
 \begin{itemize}
-\item Ensemble des informations accessible ‡ un seul endroit direct
+\item Ensemble des informations accessible √† un seul endroit direct
 \end{itemize}
 &
 \begin{itemize}
 \item Membres d'un groupe (Agenda) : of\_usergroup
 \item Recherche user par groupe : of\_usergroup
 \item ACL : of\_usergroup avec jointure pour recherche que public
-\item Maj : of\_usergroup systÈmatique : tableau de maj : traitement nÈcessite tri (public) de of\_usergroup
-\item Tableau de Maj : traitement nÈcessite tri (public) de of\_usergroup
-\item Automate : traitement nÈcessite tri (public) de of\_usergroup
+\item Maj : of\_usergroup syst√©matique : tableau de maj : traitement n√©cessite tri (public) de of\_usergroup
+\item Tableau de Maj : traitement n√©cessite tri (public) de of\_usergroup
+\item Automate : traitement n√©cessite tri (public) de of\_usergroup
 \end{itemize}
 \\
 \hline
@@ -62,39 +62,39 @@ groupes publics + privÈs \textbf{choix retenu} &
 \vspace{0.3cm}
 
 
-\subsubsection{CohÈrence des donnÈes}
+\subsubsection{Coh√©rence des donn√©es}
 
-Les donnÈes des liaisons utilisateurs - groupes et groupes - groupes sont donc prÈsentes en redondance dans la base : dans le modËle hiÈrarchique et dans le modËle ‡ plat.\\
+Les donn√©es des liaisons utilisateurs - groupes et groupes - groupes sont donc pr√©sentes en redondance dans la base : dans le mod√®le hi√©rarchique et dans le mod√®le √† plat.\\
 
 \begin{tabular}{|c|c|p{9cm}|}
 \hline
-\textbf{Table} & \textbf{ModËle} & \textbf{Informations} \\
+\textbf{Table} & \textbf{Mod√®le} & \textbf{Informations} \\
 \hline
-UserObmGroup & HiÈrarchique & Appartenance directe des utilisateurs aux groupes\\
+UserObmGroup & Hi√©rarchique & Appartenance directe des utilisateurs aux groupes\\
 \hline
-GroupGroup & HiÈrarchique & Appartenance des groupes aux groupes (rÈcursivitÈ)\\
+GroupGroup & Hi√©rarchique & Appartenance des groupes aux groupes (r√©cursivit√©)\\
 \hline
 of\_usergroup & A plat & Mapping direct des utilisateurs aux groupes (appartenance directe ou indirecte)\\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-\paragraph{CohÈrence en temps rÈel} : Afin de maintenir la cohÈrence entre les 2 modËles, ‡ chaque opÈration portant sur les groupes, opÈration nativement effectuÈe dans le modËle hiÈrarchique, le modËle interne ‡ plat est mis ‡ jour.
+\paragraph{Coh√©rence en temps r√©el} : Afin de maintenir la coh√©rence entre les 2 mod√®les, √† chaque op√©ration portant sur les groupes, op√©ration nativement effectu√©e dans le mod√®le hi√©rarchique, le mod√®le interne √† plat est mis √† jour.
 
 \begin{itemize}
-\item crÈation de groupe
-\item ajout d'utilisateur ‡ un groupe
-\item suppression d'utilisateur ‡ un groupe
-\item ajout de groupe ‡ un groupe
-\item suppression de groupe ‡ un groupe
+\item cr√©ation de groupe
+\item ajout d'utilisateur √† un groupe
+\item suppression d'utilisateur √† un groupe
+\item ajout de groupe √† un groupe
+\item suppression de groupe √† un groupe
 \item suppression de groupe
 \item modification des groupes d'un utilisateur
 \item suppression d'utilisateur
 \end{itemize}
 
 
-\paragraph{Outil de mise ‡ jour de la cohÈrence} : Afin de pallier ‡ tout problËme, un outil permet de recalculer le modËle ‡ plat ‡ partir du modËle hiÈrarchique.
-Cet outil est disponible via le menu 'Dictionnaire->DonnÈes->data\_update(groupe)' ou peut Ítre ÈxÈcutÈ en ligne de commande.
+\paragraph{Outil de mise √† jour de la coh√©rence} : Afin de pallier √† tout probl√®me, un outil permet de recalculer le mod√®le √† plat √† partir du mod√®le hi√©rarchique.
+Cet outil est disponible via le menu 'Dictionnaire->Donn√©es->data\_update(groupe)' ou peut √™tre √©x√©cut√© en ligne de commande.
 
 \shadowbox{
 \begin{minipage}{14cm}
@@ -104,14 +104,14 @@ php admin_data/admin_data_index.php -adata_update -m group
 \end{minipage}
 }
 
-Il est utilisÈ dans le script d'installation ainsi que dans le script de mise ‡ jour de la base de la version 2.0 vers 2.1.
+Il est utilis√© dans le script d'installation ainsi que dans le script de mise √† jour de la base de la version 2.0 vers 2.1.
 
 
-\subsubsection{ImplÈmentation : API fonctions publiques}
+\subsubsection{Impl√©mentation : API fonctions publiques}
 
 \begin{tabular}{|c|p{9cm}|}
 \hline
-\textbf{Nom gÈnÈrique} & \textbf{Fonctions DÈfinies dans} \\
+\textbf{Nom g√©n√©rique} & \textbf{Fonctions D√©finies dans} \\
 \hline
 of\_usergroup & \fichier{obminclude/of/of\_query.inc}\\
 \hline
@@ -119,7 +119,7 @@ of\_usergroup & \fichier{obminclude/of/of\_query.inc}\\
 \vspace{0.3cm}
 
 
-\paragraph{Fonctions de rÈcupÈration de donnÈes} : \\
+\paragraph{Fonctions de r√©cup√©ration de donn√©es} : \\
 
 \shadowbox{
 \begin{minipage}{14cm}
@@ -131,24 +131,24 @@ of_usergroup_get_group_users($g_id, $info=false) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{ParamËtres} & \textbf{Description}\\
+\textbf{Param√®tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|c|}{RÈcupÈration sous forme de tableau des utilisateurs d'un groupe}\\
+\multicolumn{2}{|c|}{R√©cup√©ration sous forme de tableau des utilisateurs d'un groupe}\\
 \hline
 \$g\_id & Id du groupe\\
 \hline
-\$info & Si false (par dÈfaut) retourne tableau d'Id, sinon retourne tableau associatif avec id, nom et prÈnom des utilisateurs\\
+\$info & Si false (par d√©faut) retourne tableau d'Id, sinon retourne tableau associatif avec id, nom et pr√©nom des utilisateurs\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-Array & Tableau (id ou id => id, nom, prÈnom) des utilisateurs membres du groupe\\
+Array & Tableau (id ou id => id, nom, pr√©nom) des utilisateurs membres du groupe\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
 
 
-\paragraph{Fonctions de mise ‡ jour base de donnÈes (internes)} : \\
+\paragraph{Fonctions de mise √† jour base de donn√©es (internes)} : \\
 
 
 \shadowbox{
@@ -161,9 +161,9 @@ of_usergroup_update_group_node($g_id) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{ParamËtres} & \textbf{Description}\\
+\textbf{Param√®tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|c|}{Fonction qui met ‡ jour le mapping interne d'un groupe}\\
+\multicolumn{2}{|c|}{Fonction qui met √† jour le mapping interne d'un groupe}\\
 \hline
 \$g\_id & Id du groupe\\
 \hline
@@ -186,9 +186,9 @@ of_usergroup_update_group_hierarchy($g_id) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{ParamËtres} & \textbf{Description}\\
+\textbf{Param√®tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|c|}{Fonction qui met ‡ jour le mapping interne d'un groupe et de ses parents}\\
+\multicolumn{2}{|c|}{Fonction qui met √† jour le mapping interne d'un groupe et de ses parents}\\
 \hline
 \$g\_id & Id du groupe\\
 \hline

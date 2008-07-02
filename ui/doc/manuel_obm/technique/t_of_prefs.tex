@@ -2,25 +2,25 @@
 % AliaSource Pierre Baudracco
 % $Id$
 
-\subsection{Gestion des préférences utilisateurs}
+\subsection{Gestion des prÃ©fÃ©rences utilisateurs}
 
-Les préférences utilisateurs sont les préférences spécifiques de l'utilisateur comme par exemple le format d'affichage des dates ou le nombre d'enregistrements par page de résultat de recherche.
-Ces préférences sont généralement accessibles et modifiables par l'utilisateur dans le module \settings.
+Les prÃ©fÃ©rences utilisateurs sont les prÃ©fÃ©rences spÃ©cifiques de l'utilisateur comme par exemple le format d'affichage des dates ou le nombre d'enregistrements par page de rÃ©sultat de recherche.
+Ces prÃ©fÃ©rences sont gÃ©nÃ©ralement accessibles et modifiables par l'utilisateur dans le module \settings.
 
-Les fonctionnalités de gestion des préférences utilisateurs sont fournies par le fichier \fichier{of/of\_query.inc}
+Les fonctionnalitÃ©s de gestion des prÃ©fÃ©rences utilisateurs sont fournies par le fichier \fichier{of/of\_query.inc}
 
-\subsubsection{Principe général de gestion}
+\subsubsection{Principe gÃ©nÃ©ral de gestion}
 
-Les préférences utilisateurs sont stockées en base de données dans une table dédiée : UserObmPref.\\
+Les prÃ©fÃ©rences utilisateurs sont stockÃ©es en base de donnÃ©es dans une table dÃ©diÃ©e : UserObmPref.\\
 
-Les préférences d'un utilisateur sont chargées et stockées dans sa session à la connexion de l'utilisateur.\\
+Les prÃ©fÃ©rences d'un utilisateur sont chargÃ©es et stockÃ©es dans sa session Ã  la connexion de l'utilisateur.\\
 
-Les préférences renseignées pour l'utilisateur d'Id 0, représentent les préférences par défaut.
-Depuis \obm 1.0, pour chaque utilisateur, seules les préférences différentes des valeurs par défaut doivent être stockées en base. Sans préférence spécifique, l'utilisateur bénéfice de la préférence par défaut.
+Les prÃ©fÃ©rences renseignÃ©es pour l'utilisateur d'Id 0, reprÃ©sentent les prÃ©fÃ©rences par dÃ©faut.
+Depuis \obm 1.0, pour chaque utilisateur, seules les prÃ©fÃ©rences diffÃ©rentes des valeurs par dÃ©faut doivent Ãªtre stockÃ©es en base. Sans prÃ©fÃ©rence spÃ©cifique, l'utilisateur bÃ©nÃ©fice de la prÃ©fÃ©rence par dÃ©faut.
 
-La récupération des préférenes d'un utilisateur sélectionn les préférences par défaut plus les préférences de l'utilisateur. Si une préférence spécifique de l'utilisateur existe elle se substitue à la préférence par défaut.\\
+La rÃ©cupÃ©ration des prÃ©fÃ©renes d'un utilisateur sÃ©lectionn les prÃ©fÃ©rences par dÃ©faut plus les prÃ©fÃ©rences de l'utilisateur. Si une prÃ©fÃ©rence spÃ©cifique de l'utilisateur existe elle se substitue Ã  la prÃ©fÃ©rence par dÃ©faut.\\
 
-Jusqu'aux versions 0.9.x d'\obm chaque préférence devait être stockée pour chaque utilisateur. La mise à jour était plus simple, mais pour un grand nombre d'utilisateurs cela représentait un volume de données très important (900 Mo sur une base de 1,2 Go !).
+Jusqu'aux versions 0.9.x d'\obm chaque prÃ©fÃ©rence devait Ãªtre stockÃ©e pour chaque utilisateur. La mise Ã  jour Ã©tait plus simple, mais pour un grand nombre d'utilisateurs cela reprÃ©sentait un volume de donnÃ©es trÃ¨s important (900 Mo sur une base de 1,2 Go !).
 
 
 \subsubsection{Table UserObmPref}
@@ -30,24 +30,24 @@ Jusqu'aux versions 0.9.x d'\obm chaque préférence devait être stockée pour chaqu
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_user\_id & int 8 & Identifiant utilisateur & (0 pour valeur par défaut) \\
+\_user\_id & int 8 & Identifiant utilisateur & (0 pour valeur par dÃ©faut) \\
 \hline
-\_option & varchar 50 & Nom de la préférence ou du paramètre & (ex: set\_lang, set\_date,...) \\
+\_option & varchar 50 & Nom de la prÃ©fÃ©rence ou du paramÃ¨tre & (ex: set\_lang, set\_date,...) \\
 \hline
-\_value & varchar 50 & Valeur du paramètre & \\
+\_value & varchar 50 & Valeur du paramÃ¨tre & \\
 \hline
 \end{tabular}
 
 
 \subsubsection{Gestion des modifications et ordre d'affichage}
 
-Les modifications des préférences d'un utilisateur tiennent compte des valeurs par défaut.
+Les modifications des prÃ©fÃ©rences d'un utilisateur tiennent compte des valeurs par dÃ©faut.
 
-Si la modification spécique à l'utilisateur aboutit à la valeur par défaut de la préférence, l'entrée spécifique à l'utilisateur est supprimée.
-Sinon, si l'entrée de l'utilisateur n'existe pas, elle est créée sinon modifiée.
+Si la modification spÃ©cique Ã  l'utilisateur aboutit Ã  la valeur par dÃ©faut de la prÃ©fÃ©rence, l'entrÃ©e spÃ©cifique Ã  l'utilisateur est supprimÃ©e.
+Sinon, si l'entrÃ©e de l'utilisateur n'existe pas, elle est crÃ©Ã©e sinon modifiÃ©e.
 
 
-\subsubsection{Implémentation : API fonctions publiques}
+\subsubsection{ImplÃ©mentation : API fonctions publiques}
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -57,7 +57,7 @@ function get_user_pref($u_id) {
 \end{minipage}
 }
 
-Récupération des préférences de l'utilisateur \$u\_id.
+RÃ©cupÃ©ration des prÃ©fÃ©rences de l'utilisateur \$u\_id.
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -66,10 +66,10 @@ function update_user_pref($user_id, $option, $new_value="") {
 \end{verbatim}
 \end{minipage}
 }
-Mise à jour de la préférence \$option pour l'utilisateur \$user\_id avec la valeur \$new\_value.
+Mise Ã  jour de la prÃ©fÃ©rence \$option pour l'utilisateur \$user\_id avec la valeur \$new\_value.
 
 
-\subsubsection{Implémentation : fonctions utilitaires internes}
+\subsubsection{ImplÃ©mentation : fonctions utilitaires internes}
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -78,7 +78,7 @@ function get_one_user_pref($u_id, $option) {
 \end{verbatim}
 \end{minipage}
 }
-Récupération d'une préférence utilisateur.\\
+RÃ©cupÃ©ration d'une prÃ©fÃ©rence utilisateur.\\
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -87,7 +87,7 @@ function run_query_user_pref_update($user_id, $option, $value) {
 \end{verbatim}
 \end{minipage}
 }
-Mise à jour en base de données d'une préférence utilisateur.\\
+Mise Ã  jour en base de donnÃ©es d'une prÃ©fÃ©rence utilisateur.\\
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -96,7 +96,7 @@ function run_query_user_pref_insert($user_id, $option, $value) {
 \end{verbatim}
 \end{minipage}
 }
-Insertion en base de données d'une préférence utilisateur.\\
+Insertion en base de donnÃ©es d'une prÃ©fÃ©rence utilisateur.\\
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -105,8 +105,8 @@ function reset_preferences_to_default($user_id="") {
 \end{verbatim}
 \end{minipage}
 }
-Re-initialisation des préférences aux valeurs par défaut pour un utilisateur (ou pour tous les utilisateurs si \$user\_id est vide).
-Cette fonction réinitialise aussi les préférences de l'utilisateur.
+Re-initialisation des prÃ©fÃ©rences aux valeurs par dÃ©faut pour un utilisateur (ou pour tous les utilisateurs si \$user\_id est vide).
+Cette fonction rÃ©initialise aussi les prÃ©fÃ©rences de l'utilisateur.
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -115,30 +115,30 @@ function session_load_user_prefs() {
 \end{verbatim}
 \end{minipage}
 }
-Chargement en session des préférences d'un utilisateur.
+Chargement en session des prÃ©fÃ©rences d'un utilisateur.
 
 
 
 
 
 \clearpage
-\subsection{Gestion des préférences d'affichage}
+\subsection{Gestion des prÃ©fÃ©rences d'affichage}
 \label{display_prefs}
 
-Les préférences d'affichage sont les sélections des champs affichés dans chaque résultat de recherche pour chaque utilisateur. Pour chaque module elle sont accessibes et modifiables par le menu "Affichage".
+Les prÃ©fÃ©rences d'affichage sont les sÃ©lections des champs affichÃ©s dans chaque rÃ©sultat de recherche pour chaque utilisateur. Pour chaque module elle sont accessibes et modifiables par le menu "Affichage".
 
-Les fonctionnalités de gestion des préférences d'affichage sont fournies par le fichier \fichier{of/of\_query.inc}
+Les fonctionnalitÃ©s de gestion des prÃ©fÃ©rences d'affichage sont fournies par le fichier \fichier{of/of\_query.inc}
 
-\subsubsection{Principe général de gestion}
+\subsubsection{Principe gÃ©nÃ©ral de gestion}
 
-Les préférences d'affichage sont stockées en base de données dans une table dédiée : DisplayPref.\\
+Les prÃ©fÃ©rences d'affichage sont stockÃ©es en base de donnÃ©es dans une table dÃ©diÃ©e : DisplayPref.\\
 
-Les préférences renseignées pour l'utilisateur d'Id 0, représentent les préférences par défaut.
-Depuis \obm 1.0, pour chaque utilisateur, seules les préférences différentes des valeurs par défaut doivent être stockées en base. Sans préférence spécifique, l'utilisateur bénéfice de la préférence par défaut.
+Les prÃ©fÃ©rences renseignÃ©es pour l'utilisateur d'Id 0, reprÃ©sentent les prÃ©fÃ©rences par dÃ©faut.
+Depuis \obm 1.0, pour chaque utilisateur, seules les prÃ©fÃ©rences diffÃ©rentes des valeurs par dÃ©faut doivent Ãªtre stockÃ©es en base. Sans prÃ©fÃ©rence spÃ©cifique, l'utilisateur bÃ©nÃ©fice de la prÃ©fÃ©rence par dÃ©faut.
 
-La récupération des préférenes d'affichage d'un utilisateur sélectionne les préférences par défaut plus les préférences de l'utilisateur. Si une préférence spécifique de l'utilisateur existe elle se substitue à la préférence par défaut.\\
+La rÃ©cupÃ©ration des prÃ©fÃ©renes d'affichage d'un utilisateur sÃ©lectionne les prÃ©fÃ©rences par dÃ©faut plus les prÃ©fÃ©rences de l'utilisateur. Si une prÃ©fÃ©rence spÃ©cifique de l'utilisateur existe elle se substitue Ã  la prÃ©fÃ©rence par dÃ©faut.\\
 
-Jusqu'aux versions 0.9.x d'\obm chaque préférence devait être stockée pour chaque utilisateur. La mise à jour était plus simple, mais pour un grand nombre d'utilisateurs cela représentait un volume de données très important (900 Mo sur une base de 1,2 Go !).
+Jusqu'aux versions 0.9.x d'\obm chaque prÃ©fÃ©rence devait Ãªtre stockÃ©e pour chaque utilisateur. La mise Ã  jour Ã©tait plus simple, mais pour un grand nombre d'utilisateurs cela reprÃ©sentait un volume de donnÃ©es trÃ¨s important (900 Mo sur une base de 1,2 Go !).
 
 
 \subsubsection{Table DisplayPref}
@@ -148,43 +148,43 @@ Jusqu'aux versions 0.9.x d'\obm chaque préférence devait être stockée pour chaqu
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_user\_id & int 8 & Identifiant utilisateur & (0 pour valeur par défaut) \\
+\_user\_id & int 8 & Identifiant utilisateur & (0 pour valeur par dÃ©faut) \\
 \hline
-\_entity & varchar 32 & Entité concernée (company, contact,...) & \\
+\_entity & varchar 32 & EntitÃ© concernÃ©e (company, contact,...) & \\
 \hline
-\_fieldname & varchar 64 & Nom du champ & champ réel ou calculé \\
+\_fieldname & varchar 64 & Nom du champ & champ rÃ©el ou calculÃ© \\
 \hline
 \_fieldorder & int 8 & Ordre d'affichage & \\
 \hline
-\_display & int 8 & Etat d'affichage & (0: masqué; 1: affiché; 2: obligatoire)\\
+\_display & int 8 & Etat d'affichage & (0: masquÃ©; 1: affichÃ©; 2: obligatoire)\\
 \hline
 \end{tabular}
 
 
 \subsubsection{Champ \_entity}
 
-Le champ entity ne désigne par forcémment un module (\company, \contact,...) mais peut être une vue. Par exemple la liste des contacts dans le module \List (entity=list\_contact) peut être différente de la liste des contacts du module \contact.
+Le champ entity ne dÃ©signe par forcÃ©mment un module (\company, \contact,...) mais peut Ãªtre une vue. Par exemple la liste des contacts dans le module \List (entity=list\_contact) peut Ãªtre diffÃ©rente de la liste des contacts du module \contact.
 
 
-\subsubsection{Les champs calculés}
+\subsubsection{Les champs calculÃ©s}
 
-La colonne fieldname doit contenir une valeur retournée par la requète de recherche. Ce peut être un champ de base de données, mais aussi un champ calculé.
+La colonne fieldname doit contenir une valeur retournÃ©e par la requÃ¨te de recherche. Ce peut Ãªtre un champ de base de donnÃ©es, mais aussi un champ calculÃ©.
 
-L'affichage des champs est générique mais peut être spécialisé par champ (voir la classe of\_display du framework \obm).
+L'affichage des champs est gÃ©nÃ©rique mais peut Ãªtre spÃ©cialisÃ© par champ (voir la classe of\_display du framework \obm).
 
 
 \subsubsection{Gestion des modifications et ordre d'affichage}
 
-Les modifications des préférences d'affichage tiennent compte des valeurs par défaut.
+Les modifications des prÃ©fÃ©rences d'affichage tiennent compte des valeurs par dÃ©faut.
 
-Si la modification spécique à l'utilisateur aboutit à la valeur par défaut de la préférence, l'entrée spécifique à l'utilisateur est supprimée.
-Sinon, si l'entrée de l'utilisateur n'existe pas, elle est créée sinon modifiée.\\
+Si la modification spÃ©cique Ã  l'utilisateur aboutit Ã  la valeur par dÃ©faut de la prÃ©fÃ©rence, l'entrÃ©e spÃ©cifique Ã  l'utilisateur est supprimÃ©e.
+Sinon, si l'entrÃ©e de l'utilisateur n'existe pas, elle est crÃ©Ã©e sinon modifiÃ©e.\\
 
-Dans le cas de l'ordre d'affichage, la modification implique nécessairement 2 champs; le champ modifié directement et le champ déplacé par rebond.
-Pour ces  2 champs, si la modification aboutit à la valeur par défaut, l'entrée spécifique à l'utilisateur est supprimée.
+Dans le cas de l'ordre d'affichage, la modification implique nÃ©cessairement 2 champs; le champ modifiÃ© directement et le champ dÃ©placÃ© par rebond.
+Pour ces  2 champs, si la modification aboutit Ã  la valeur par dÃ©faut, l'entrÃ©e spÃ©cifique Ã  l'utilisateur est supprimÃ©e.
 
 
-\subsubsection{Implémentation : API fonctions publiques}
+\subsubsection{ImplÃ©mentation : API fonctions publiques}
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -194,7 +194,7 @@ function get_display_pref($u_id, $entity, $all=0) {
 \end{minipage}
 }
 
-Récupération des préférences d'affichage de l'utilisateur \$u\_id pour l'entité \$entity. Si \$all vaut 0, les préférences sont limitées aux champs visibles, sinon tous les champs sont retournés (par exemple pour afficher l'écran de personnalisation de l'affichage).\\
+RÃ©cupÃ©ration des prÃ©fÃ©rences d'affichage de l'utilisateur \$u\_id pour l'entitÃ© \$entity. Si \$all vaut 0, les prÃ©fÃ©rences sont limitÃ©es aux champs visibles, sinon tous les champs sont retournÃ©s (par exemple pour afficher l'Ã©cran de personnalisation de l'affichage).\\
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -203,9 +203,9 @@ function update_display_pref($params) {
 \end{verbatim}
 \end{minipage}
 }
-Mises à jour d'une préférence d'affichage (champs \$params[] : fieldname, fieldstatus, fieldorder) de l'utilisateur connecté pour l'entité \$entity.
+Mises Ã  jour d'une prÃ©fÃ©rence d'affichage (champs \$params[] : fieldname, fieldstatus, fieldorder) de l'utilisateur connectÃ© pour l'entitÃ© \$entity.
 
-\subsubsection{Implémentation : fonctions utilitaires internes}
+\subsubsection{ImplÃ©mentation : fonctions utilitaires internes}
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -214,7 +214,7 @@ function get_one_display_pref($u_id, $entity, $field) {
 \end{verbatim}
 \end{minipage}
 }
-Récupération d'une préférence d'affichage d'après le nom du champ.\\
+RÃ©cupÃ©ration d'une prÃ©fÃ©rence d'affichage d'aprÃ¨s le nom du champ.\\
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -223,7 +223,7 @@ run_query_display_pref_update($u_id, $entity, $fieldname, $status, $order="") {
 \end{verbatim}
 \end{minipage}
 }
-Mise à jour en base de données d'une préférence d'affichage.\\
+Mise Ã  jour en base de donnÃ©es d'une prÃ©fÃ©rence d'affichage.\\
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -232,7 +232,7 @@ run_query_display_pref_insert($u_id, $entity, $fieldname, $status, $order) {
 \end{verbatim}
 \end{minipage}
 }
-Insertion en base de données d'une préférence d'affichage.\\
+Insertion en base de donnÃ©es d'une prÃ©fÃ©rence d'affichage.\\
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -241,7 +241,7 @@ run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_level) {
 \end{verbatim}
 \end{minipage}
 }
-Gestion de la modification de l'ordre d'un champ (2 champs impactés) avec gestion de l'effacement ou mise à jour en base.\\
+Gestion de la modification de l'ordre d'un champ (2 champs impactÃ©s) avec gestion de l'effacement ou mise Ã  jour en base.\\
 
 \shadowbox{
 \begin{minipage}{15cm}
@@ -250,13 +250,13 @@ function reset_preferences_to_default($user_id="") {
 \end{verbatim}
 \end{minipage}
 }
-Re-initialisation des préférences aux valeurs par défaut pour un utilisateur (ou pour tous les utilisateurs si \$user\_id est vide).
-Cette fonction réinitialise aussi les préférences de l'utilisateur.
+Re-initialisation des prÃ©fÃ©rences aux valeurs par dÃ©faut pour un utilisateur (ou pour tous les utilisateurs si \$user\_id est vide).
+Cette fonction rÃ©initialise aussi les prÃ©fÃ©rences de l'utilisateur.
 
 
 \subsubsection{Exemple d'utilisation}
 
-Gestion des préférences d'affichage du module \company.\\
+Gestion des prÃ©fÃ©rences d'affichage du module \company.\\
 
 \shadowbox{
 \begin{minipage}{15cm}

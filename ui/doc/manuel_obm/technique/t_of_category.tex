@@ -1,86 +1,86 @@
-% Documentation technique d'OBM : Gestion des catégories
+% Documentation technique d'OBM : Gestion des catÃ©gories
 % ALIACOM Pierre Baudracco
 % $Id$
 
 
-\subsection{Gestion des catégories}
+\subsection{Gestion des catÃ©gories}
 \label{of_category}
 
-révision : \obm 2.0.0
+rÃ©vision : \obm 2.0.0
 
-\obm gère des catégories monovaluées ou multivaluées (n-n) pour plusieurs modules : \company, \contact, \deal... comme les secteurs d'activité, les rôles de société, les types de société...
+\obm gÃ¨re des catÃ©gories monovaluÃ©es ou multivaluÃ©es (n-n) pour plusieurs modules : \company, \contact, \deal... comme les secteurs d'activitÃ©, les rÃ´les de sociÃ©tÃ©, les types de sociÃ©tÃ©...
 
-Toutes ces ``catégories'' fonctionnent selon le même principe et possèdent le même format de stockage.
+Toutes ces ``catÃ©gories'' fonctionnent selon le mÃªme principe et possÃ¨dent le mÃªme format de stockage.
 
-\paragraph{Remarque :} les ``catégories'' traitées ici sont les catégories intégrées à \obm générique. Les fonctionnalités listées ont pour objectif d'aider à la mutualisation de code. Les ``catégories'' définies et spécifiques aux clients sont traitées dans la section \ref{of_userdata}.
+\paragraph{Remarque :} les ``catÃ©gories'' traitÃ©es ici sont les catÃ©gories intÃ©grÃ©es Ã  \obm gÃ©nÃ©rique. Les fonctionnalitÃ©s listÃ©es ont pour objectif d'aider Ã  la mutualisation de code. Les ``catÃ©gories'' dÃ©finies et spÃ©cifiques aux clients sont traitÃ©es dans la section \ref{of_userdata}.
 
-Cette librairie propose une gestion générique des catégories avec liaisons 1-n -mode = mono) ou n-n (mode = multi) offrant :\\
+Cette librairie propose une gestion gÃ©nÃ©rique des catÃ©gories avec liaisons 1-n -mode = mono) ou n-n (mode = multi) offrant :\\
 
 \begin{itemize}
-\item Gestion de catégories avec codes (1.2.10, 3.2,...) et labels
-\item Fonctions de gestion des champs de recherche de catégorie
-\item Fonctions de gestion des champs catégorie dans les formulaires
-\item Affichage en mode arborescence, avec sélection simple ou multiple
+\item Gestion de catÃ©gories avec codes (1.2.10, 3.2,...) et labels
+\item Fonctions de gestion des champs de recherche de catÃ©gorie
+\item Fonctions de gestion des champs catÃ©gorie dans les formulaires
+\item Affichage en mode arborescence, avec sÃ©lection simple ou multiple
 \end{itemize}
 \vspace{0.3cm}
 
-Les fonctionalités de catégories sont fournies par le fichier \fichier{of/of\_category.inc}
+Les fonctionalitÃ©s de catÃ©gories sont fournies par le fichier \fichier{of/of\_category.inc}
 
 
-\subsubsection{Types de catégories}
+\subsubsection{Types de catÃ©gories}
 
-\obm distingue 2 types de catégories :\\
+\obm distingue 2 types de catÃ©gories :\\
 \begin{itemize}
-\item \textbf{mono} : catégories avec liaisons 1-n. L'entité n'est liée qu'à 0 ou 1 des catégories
-\item \textbf{multi} : catégories avec liaisons n-n. L'entité peut être liée à 0, 1  ou n catégories.
+\item \textbf{mono} : catÃ©gories avec liaisons 1-n. L'entitÃ© n'est liÃ©e qu'Ã  0 ou 1 des catÃ©gories
+\item \textbf{multi} : catÃ©gories avec liaisons n-n. L'entitÃ© peut Ãªtre liÃ©e Ã  0, 1  ou n catÃ©gories.
 \end{itemize}
 
-\subsubsection{Modèle de stockage générique}
+\subsubsection{ModÃ¨le de stockage gÃ©nÃ©rique}
 
-Pour une catégorie ``mono'' d'un module, l'entité du module doit contenir un champ référençant la catégorie \variable{entite\_category\_id} (ex \variable{company\_type\_id})et 1 table doit être créée :\\
+Pour une catÃ©gorie ``mono'' d'un module, l'entitÃ© du module doit contenir un champ rÃ©fÃ©renÃ§ant la catÃ©gorie \variable{entite\_category\_id} (ex \variable{company\_type\_id})et 1 table doit Ãªtre crÃ©Ã©e :\\
 
 \begin{itemize}
 \item ModuleCategory (ex: CompanyType)
 \end{itemize}
 \vspace{0.3cm}
 
-Pour une catégorie ``multi'' d'un module, 2 tables doivent être créées :\\
+Pour une catÃ©gorie ``multi'' d'un module, 2 tables doivent Ãªtre crÃ©Ã©es :\\
 
 \begin{itemize}
-\item ModuleCategory (si besoin d'une table catégorie)
+\item ModuleCategory (si besoin d'une table catÃ©gorie)
 \item ModuleCategoryLink (ou table de liaison)
 \end{itemize}
 \vspace{0.3cm}
 
-Table des informations d'une catégorie, ModuleCategoryN (ex: CompanyType) :\\
+Table des informations d'une catÃ©gorie, ModuleCategoryN (ex: CompanyType) :\\
 
 \begin{tabular}{|p{3cm}|c|p{4cm}|p{4cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Id de la catégorie & \\
+\_id & int 8 & Id de la catÃ©gorie & \\
 \hline
-\_code & varchar 10 & Code de la catégorie & ex: 1.0, 1.1, 1.1.4 \\
+\_code & varchar 10 & Code de la catÃ©gorie & ex: 1.0, 1.1, 1.1.4 \\
 \hline
-\_label & varchar 100 & Label de la catégorie & \\
+\_label & varchar 100 & Label de la catÃ©gorie & \\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-Table des informations de liaison d'une catégorie avec un module, ModuleCategoryNLink (ex: CompanyCategory1Link) :\\
+Table des informations de liaison d'une catÃ©gorie avec un module, ModuleCategoryNLink (ex: CompanyCategory1Link) :\\
 
 \begin{tabular}{|p{3cm}|c|p{4cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description}\\
 \hline
-\_category\_id & int 8 & Id de la catégorie\\
+\_category\_id & int 8 & Id de la catÃ©gorie\\
 \hline
-\_company\_id & int 8 & Id de l'entité du module\\
+\_company\_id & int 8 & Id de l'entitÃ© du module\\
 \hline
 \end{tabular}
 
 
-\subsubsection{Implémentation : API fonctions publiques}
+\subsubsection{ImplÃ©mentation : API fonctions publiques}
 
 \paragraph{Fonctions d'affichage} : \\
 
@@ -95,26 +95,26 @@ $first_element="all",$sel_append="") {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|c|}{Fonction d'affichage du champ de recherche de la catégorie pour le formulaire de recherche}\\
+\multicolumn{2}{|c|}{Fonction d'affichage du champ de recherche de la catÃ©gorie pour le formulaire de recherche}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
-\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
+\$cat & catÃ©gorie (ex: ``catÃ©gorie1, ``type'',..)\\
 \hline
-\$cats & tableau des catégories à afficher\\
+\$cats & tableau des catÃ©gories Ã  afficher\\
 \hline
-\$cat\_id & entrée sélectionnée\\
+\$cat\_id & entrÃ©e sÃ©lectionnÃ©e\\
 \hline
-\$first\_element & scalaire ou tableau (none|all) d'éléments à ajouter au <select>\\
+\$first\_element & scalaire ou tableau (none|all) d'Ã©lÃ©ments Ã  ajouter au <select>\\
 \hline
-\$sel\_append & chaine à insérer dans la définition du <select> (ex: code javascript)\\
+\$sel\_append & chaine Ã  insÃ©rer dans la dÃ©finition du <select> (ex: code javascript)\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String XHTML & Block de recherche <select> du champ catégorie pour l'entité\\
+String XHTML & Block de recherche <select> du champ catÃ©gorie pour l'entitÃ©\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -130,26 +130,26 @@ of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_id="", $fi
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|c|}{Fonction d'affichage du champ catégorie pour le formulaire du module \$entity}\\
+\multicolumn{2}{|c|}{Fonction d'affichage du champ catÃ©gorie pour le formulaire du module \$entity}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
-\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
+\$cat & catÃ©gorie (ex: ``catÃ©gorie1, ``type'',..)\\
 \hline
-\$cats & tableau des catégories à afficher\\
+\$cats & tableau des catÃ©gories Ã  afficher\\
 \hline
-\$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entité\\
+\$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entitÃ©\\
 \hline
-\$cat\_id & pour mode ``mono'' entrée catégorie sélectionnée\\
+\$cat\_id & pour mode ``mono'' entrÃ©e catÃ©gorie sÃ©lectionnÃ©e\\
 \hline
-\$first & pour mode ``mono'' scalaire ou tableau (none|all) d'éléments à ajouter au <select>\\
+\$first & pour mode ``mono'' scalaire ou tableau (none|all) d'Ã©lÃ©ments Ã  ajouter au <select>\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String XHTML & Ligne de tableau de formulaire : champ catégorie : select simple ou d'entité\\
+String XHTML & Ligne de tableau de formulaire : champ catÃ©gorie : select simple ou d'entitÃ©\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -165,22 +165,22 @@ of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|c|}{Fonction d'affichage du champ catégorie en consultation du module \$entity}\\
+\multicolumn{2}{|c|}{Fonction d'affichage du champ catÃ©gorie en consultation du module \$entity}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
-\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
+\$cat & catÃ©gorie (ex: ``catÃ©gorie1, ``type'',..)\\
 \hline
-\$cats & tableau des catégories à afficher\\
+\$cats & tableau des catÃ©gories Ã  afficher\\
 \hline
-\$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entité\\
+\$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entitÃ©\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String XHTML & Ligne de tableau (mono) ou block de consultation (multi) du champ catégorie\\
+String XHTML & Ligne de tableau (mono) ou block de consultation (multi) du champ catÃ©gorie\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -196,23 +196,23 @@ of_category_dis_tree($entity, $cat, $params, $action) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|p{13cm}|}{Affichage de l'arborescence de la catégorie ``\$cat'' pour l'entité (souvent module) \$entity.
-Si l'action demandée est du type ext\_get\_cat[1-9]?\_ids, l'affichage propose une sélection par checkbox, sinon une sélection directe unique par lien.}\\
+\multicolumn{2}{|p{13cm}|}{Affichage de l'arborescence de la catÃ©gorie ``\$cat'' pour l'entitÃ© (souvent module) \$entity.
+Si l'action demandÃ©e est du type ext\_get\_cat[1-9]?\_ids, l'affichage propose une sÃ©lection par checkbox, sinon une sÃ©lection directe unique par lien.}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
-\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
+\$cat & catÃ©gorie (ex: ``catÃ©gorie1, ``type'',..)\\
 \hline
 \$params & hachage des informations du module [popup], [ext\_title]\\
 \hline
-\$action & action du module : si de type "ext\_get\_category[1-9]?\_ids", affichage de sélection multiple (par checkbox), sinon sélection par lien simple\\
+\$action & action du module : si de type "ext\_get\_category[1-9]?\_ids", affichage de sÃ©lection multiple (par checkbox), sinon sÃ©lection par lien simple\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String XHTML & Arborescence complète de la catégorie avec sélection\\
+String XHTML & Arborescence complÃ¨te de la catÃ©gorie avec sÃ©lection\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -228,26 +228,26 @@ of_category_dis_admin_form($cat, $cats, $user=false) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|p{13cm}|}{Affichage du formulaire de gestion de la catégorie. Donne les possibilités d'ajouter, de modifier ou de supprimer une entrée.}\\
+\multicolumn{2}{|p{13cm}|}{Affichage du formulaire de gestion de la catÃ©gorie. Donne les possibilitÃ©s d'ajouter, de modifier ou de supprimer une entrÃ©e.}\\
 \hline
-\$cat & catégorie (ex: ``catégorie1, ``type'',..)\\
+\$cat & catÃ©gorie (ex: ``catÃ©gorie1, ``type'',..)\\
 \hline
-\$cats & tableau des catégories à afficher\\
+\$cats & tableau des catÃ©gories Ã  afficher\\
 \hline
 \$user & (utilisation interne pour signaler une categorie utilisateur : true)\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String XHTML & Formulaire de gestio nde la catégorie\\
+String XHTML & Formulaire de gestio nde la catÃ©gorie\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
 
 
-\paragraph{Fonctions bases de données} : \\
+\paragraph{Fonctions bases de donnÃ©es} : \\
 
 \shadowbox{
 \begin{minipage}{14cm}
@@ -259,22 +259,22 @@ of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|c|}{Récupération de la liste des catégories ordonnées selon le code}\\
+\multicolumn{2}{|c|}{RÃ©cupÃ©ration de la liste des catÃ©gories ordonnÃ©es selon le code}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'', ``DealCompany''..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'', ``DealCompany''..)\\
 \hline
-\$catu & catégorie (ex: ``catégorie1, ``type'',..) can be uppercase\\
+\$catu & catÃ©gorie (ex: ``catÃ©gorie1, ``type'',..) can be uppercase\\
 \hline
-\$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entité\\
+\$mode & ``mono'' ou ``multi'' pour indiquer le type de liaison vers l'entitÃ©\\
 \hline
-\$entity\_id & pour mode ``multi''. Si donné, uniquement entrées liées à cette entité\\
+\$entity\_id & pour mode ``multi''. Si donnÃ©, uniquement entrÃ©es liÃ©es Ã  cette entitÃ©\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-Array & Tableau de catégories ordonnées selon le code : [id], [code], [label]\\
+Array & Tableau de catÃ©gories ordonnÃ©es selon le code : [id], [code], [label]\\
 \hline
 \end{tabular}
 \vspace{0.4cm}

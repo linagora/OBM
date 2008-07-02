@@ -211,7 +211,7 @@ Obm.CalendarDayEvent = new Class({
 
   resetTitle: function() {
     var title = this.event.title + ' ';
-    if (this.event.all_day == 0) {
+    if (!this.event.all_day) {
       title = new Date(this.event.time * 1000).format("H:i") + ' ' + title;
     }
     // Display the location only if set
@@ -1143,7 +1143,7 @@ Obm.CalendarQuickForm = new Class({
     this.category.setHTML(evt.event.category);
     this.location.setHTML(evt.event.location);
     this.data.setStyle('display','block');
-    if (this.eventData.all_day != 1) {
+    if (!this.eventData.all_day) {
       this.date.setHTML(date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
     } else {
       this.date.setHTML(date_begin.format('Y/m/d') + '-' + date_end.format('Y/m/d'));
@@ -1183,7 +1183,7 @@ Obm.CalendarQuickForm = new Class({
     this.deleteButton.setStyle('display','none');
     this.editButton.setStyle('display','');
     this.detailButton.setStyle('display','none');    
-    if(this.eventData.all_day != 1) {
+    if(!this.eventData.all_day) {
       this.date.setHTML(date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
     } else {
       this.date.setHTML(date_begin.format('Y/m/d') + '-' + date_end.format('Y/m/d'));

@@ -38,7 +38,7 @@ $l_add = "Add documents";
 $l_noupdate_file = "Do not update file";
 $l_update_file = "Update file";
 
-$l_have_link = "Ce document est lié à divers éléments d'obm";
+$l_have_link = "Ce document est liÃ© Ã  divers Ã©lÃ©ments d'obm";
 // Message
 $l_found = "document(s) found";
 $l_no_found = "No document found matching the query !";

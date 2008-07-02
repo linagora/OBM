@@ -14,8 +14,8 @@ $l_new_password_bis = "Validation nouveau Mot de passe";
 
 // Messages
 $l_wrong_password = "Le mot de passe actuel n'est pas valide !";
-$l_new_password_differ = "Les nouveaux mots de passe saisis diffèrent !";
-$l_password_invalid = "Le mot de passe est invalide - de 4 à 12 caractères (alphanumériques ou -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
+$l_new_password_differ = "Les nouveaux mots de passe saisis diffÃ¨rent !";
+$l_password_invalid = "Le mot de passe est invalide - de 4 Ã  12 caractÃ¨res (alphanumÃ©riques ou -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_password = "Vous devez saisir les mots de passe avant de valider.";

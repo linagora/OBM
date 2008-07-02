@@ -1,39 +1,39 @@
-% Documentation technique d'OBM : Gestion des modèles Odt par défaut
+% Documentation technique d'OBM : Gestion des modÃ¨les Odt par dÃ©faut
 % ALIACOM Vincent Coulette
 % $Id$
 
 
-\subsection{Gestion des modèles Odt par défaut}
+\subsection{Gestion des modÃ¨les Odt par dÃ©faut}
 \label{of_defaultodttemplate}
 
-La gestion des des modèles Odt par défaut a pour but de pouvoir définir des modèles OpenDocument (mais aussi swx) en tant que modèles par défaut utilisables pour l'export openOffice d'une entité. \\
+La gestion des des modÃ¨les Odt par dÃ©faut a pour but de pouvoir dÃ©finir des modÃ¨les OpenDocument (mais aussi swx) en tant que modÃ¨les par dÃ©faut utilisables pour l'export openOffice d'une entitÃ©. \\
 
-Les modèles par défaut sont des documents \obm (donc des fichiers swx ou odt précédemment ajoutés en tant que documents \obm) que l'on définit par défaut et de manière spécifique à un module (ou une entité). Ceci permet de proposer une liste de modèles par défaut parmi lesquels on peut choisir simplement et rapidement le modèle à utiliser dans le formulaire d'export. \\
+Les modÃ¨les par dÃ©faut sont des documents \obm (donc des fichiers swx ou odt prÃ©cÃ©demment ajoutÃ©s en tant que documents \obm) que l'on dÃ©finit par dÃ©faut et de maniÃ¨re spÃ©cifique Ã  un module (ou une entitÃ©). Ceci permet de proposer une liste de modÃ¨les par dÃ©faut parmi lesquels on peut choisir simplement et rapidement le modÃ¨le Ã  utiliser dans le formulaire d'export. \\
 
-Dans la version courante (1.2), seul le module CV est concerné par cette fonctionnalité d'export et par conséquent par la gestion des modèles par défaut, mais d'autres modules sont appelés à implémenter cette fonctionnalité et donc à utiliser les modèles par défaut. \\
+Dans la version courante (1.2), seul le module CV est concernÃ© par cette fonctionnalitÃ© d'export et par consÃ©quent par la gestion des modÃ¨les par dÃ©faut, mais d'autres modules sont appelÃ©s Ã  implÃ©menter cette fonctionnalitÃ© et donc Ã  utiliser les modÃ¨les par dÃ©faut. \\
 
-Les fonctionnalités de gestion des modèles par défaut sont fournies par le fichier \fichier{of/of\_defaultodttemplate.inc}. \\
+Les fonctionnalitÃ©s de gestion des modÃ¨les par dÃ©faut sont fournies par le fichier \fichier{of/of\_defaultodttemplate.inc}. \\
 
-\subsubsection{Modèle de stockage des modèles par défaut}
+\subsubsection{ModÃ¨le de stockage des modÃ¨les par dÃ©faut}
 
-Table des modèles définis par défaut.
+Table des modÃ¨les dÃ©finis par dÃ©faut.
 
 \begin{tabular}{|p{3cm}|c|p{4cm}|p{4cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} \\
 \hline
-\_id & int 8 & Id du modèle par défaut & \\
+\_id & int 8 & Id du modÃ¨le par dÃ©faut & \\
 \hline
-\_entity & varchar 32 & Entité à laquelle est rattaché le modèle \\
+\_entity & varchar 32 & EntitÃ© Ã  laquelle est rattachÃ© le modÃ¨le \\
 \hline
-\_document\_id & int 8 & Id du document \obm servant de modèle & \\
+\_document\_id & int 8 & Id du document \obm servant de modÃ¨le & \\
 \hline
-\_label & varchar 64 & Libellé décrivant le modèle & \\
+\_label & varchar 64 & LibellÃ© dÃ©crivant le modÃ¨le & \\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-\subsubsection{Implémentation : API fonctions publiques}
+\subsubsection{ImplÃ©mentation : API fonctions publiques}
 
 \shadowbox{
 \begin{minipage}{14cm}
@@ -43,7 +43,7 @@ of_get_defaultodttemplates($entity) {
 \end{minipage}
 }
 
-Requête de sélection de modèles définis par défaut pour l'entité \$entity. \\
+RequÃªte de sÃ©lection de modÃ¨les dÃ©finis par dÃ©faut pour l'entitÃ© \$entity. \\
 
 \shadowbox{
 \begin{minipage}{14cm}
@@ -53,5 +53,5 @@ of_defaultodttemplates_dis_admin_form($entity, $defaults_q) {
 \end{minipage}
 }
 
-Affichage de l'écran de consultation, modification, ajout et suppression des modèles par défaut de l'entité \$entity.
-Le paramètre \$defaults\_q est le résultat base de données de la requête exécutée par la fonction \fonction{of\_defaultodttemplates\_dis\_admin\_form}. \\
+Affichage de l'Ã©cran de consultation, modification, ajout et suppression des modÃ¨les par dÃ©faut de l'entitÃ© \$entity.
+Le paramÃ¨tre \$defaults\_q est le rÃ©sultat base de donnÃ©es de la requÃªte exÃ©cutÃ©e par la fonction \fonction{of\_defaultodttemplates\_dis\_admin\_form}. \\

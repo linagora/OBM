@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Español                                                  //
+// OBM - Language : EspaÃ±ol                                                  //
 //     - File     : group.inc                                                //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,17 +29,17 @@ $l_add = "Agregar estos grupos";
 // Messages
 $l_fill_name = "Debe llenar el nombre del grupo";
 $l_resourcegroup_exists = "Este grupo YA existe !";
-$l_j_check_email = "La dirección de correo no es válida !";
+$l_j_check_email = "La direcciÃ³n de correo no es vÃ¡lida !";
 $l_warn_delete = "recursos registrados en este grupo";
-$l_email_exist = "la dirección de correo ya esta siendo utilizada !";
+$l_email_exist = "la direcciÃ³n de correo ya esta siendo utilizada !";
 
-$l_no_display = "Llene los campos de búsqueda y presione < Buscar > para obtener los grupos";
+$l_no_display = "Llene los campos de bÃºsqueda y presione < Buscar > para obtener los grupos";
 $l_no_resource = "No hay recursos registrados.";
 $l_no_resourcegroup_resourcegroup = "No hay grupos registrados.";
 $l_found = "grupos encontrados.";
 $l_resource_member = "recursos registrados.";
 $l_resourcegroup_member = "grupos registrados.";
-$l_no_found = "No hay grupos que coincidan con la búsqueda !";
+$l_no_found = "No hay grupos que coincidan con la bÃºsqueda !";
 $l_add_resource = "Agregar Recursos";
 $l_add_resourcegroup = "Agrgar Grupos (dentro de lo posible)";
 $l_del_resource_sel = "Eliminar estos recursos";
@@ -62,7 +62,7 @@ $l_add_resourcegroup = "Agregar grupos";
 $l_name = "Nombre";
 $l_label = "Etiqueta";
 $l_system_no_priv = "Un grupo del sistema no puede ser privado !";
-$l_cant_delete_public = "Grupos públicos solo pueden ser borrados por el grupo creador !";
+$l_cant_delete_public = "Grupos pÃºblicos solo pueden ser borrados por el grupo creador !";
 $l_only_owner_priv = "Solo el propietario de un grupo puede configurar su privacidad !";
 $l_add_resource = "Agregar recursos";
 $l_add_resourcegroup = "Agregar grupos (de entre la lista de posibles grupos)";

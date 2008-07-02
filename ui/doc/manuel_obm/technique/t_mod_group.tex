@@ -6,9 +6,9 @@
 \clearpage
 \section{Groupe (module \group)}
 
-révision : \obm 2.1.0\\
+rÃ©vision : \obm 2.1.0\\
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
 Le module \group utilise 7 tables :
 
@@ -16,13 +16,13 @@ Le module \group utilise 7 tables :
 \hline
 \textbf{Table} & \textbf{Description} \\
 \hline
-UGroup & le mot clé Group est déjà défini par MySQL \\
+UGroup & le mot clÃ© Group est dÃ©jÃ  dÃ©fini par MySQL \\
 \hline
 UserObmGroup & liaison entre les utilisateurs et les groupes \\
 \hline
 GroupGroup & liaison entre les groupes et les groupes \\
 \hline
-of\_usergroup & stockage des liens direct user - group (utile pour performance de détermination d'appartenance à des groupes hiérarchiques) \\
+of\_usergroup & stockage des liens direct user - group (utile pour performance de dÃ©termination d'appartenance Ã  des groupes hiÃ©rarchiques) \\
 \hline
 P\_UGroup & Automate : production \\
 \hline
@@ -40,21 +40,21 @@ Table principale des informations d'un groupe. \\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
 \_domain\_id & int 8 & Domaine d'appartenance & \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_local & int 1 & Indicateur de groupe local & A exclure des synchronisations \\
 \hline
-\_ext\_id & varchar 24 & Identifiant externe & Utile pour les synchronisations avec données externes\\
+\_ext\_id & varchar 24 & Identifiant externe & Utile pour les synchronisations avec donnÃ©es externes\\
 \hline
 \_samba & int 1 & Indicateur groupe Windows & (1=Oui) \\
 \hline
@@ -62,9 +62,9 @@ Table principale des informations d'un groupe. \\
 \hline
 \_mailing & int 1 & Indicateur pour liste de diffusion externe & Pour export sympa \\
 \hline
-\_system & int 1  & Indicateur de groupe systeme & Groupe ne peut être modifié \\
+\_system & int 1  & Indicateur de groupe systeme & Groupe ne peut Ãªtre modifiÃ© \\
 \hline
-\_privacy & int 2  & Indicateur privé / public & public = 0, privé = 1\\
+\_privacy & int 2  & Indicateur privÃ© / public & public = 0, privÃ© = 1\\
 \hline
 \_name & varchar 32 & Nom & \\
 \hline
@@ -72,54 +72,54 @@ Table principale des informations d'un groupe. \\
 \hline
 \_email & varchar 128 & Adresse email du groupe & \\
 \hline
-\_contacts & text & Liste d'adresses email externes à ajouter & \\
+\_contacts & text & Liste d'adresses email externes Ã  ajouter & \\
 \hline
 \end{tabular}
 
-\subsubsection{Groupes publics / privés : gestion des droits}
+\subsubsection{Groupes publics / privÃ©s : gestion des droits}
 
-Les groupes publics sont visibles par tous les utilisateurs ayant accés au module \group.
-Dans la pratique il s'agit souvent de groupes importés ou synchronisés depuis une source de données externe.
+Les groupes publics sont visibles par tous les utilisateurs ayant accÃ©s au module \group.
+Dans la pratique il s'agit souvent de groupes importÃ©s ou synchronisÃ©s depuis une source de donnÃ©es externe.
 
-Les groupes privés sont créés par les utilisateurs ayant le droit de création de groupe (\$cright\_write) et servent principalement à définir des vues de l'agenda.
+Les groupes privÃ©s sont crÃ©Ã©s par les utilisateurs ayant le droit de crÃ©ation de groupe (\$cright\_write) et servent principalement Ã  dÃ©finir des vues de l'agenda.
 
-\paragraph{Dans la pratique, les droits de gestion des groupes privés doivent être dissociés des droits de gestion de groupes privés}. \\
+\paragraph{Dans la pratique, les droits de gestion des groupes privÃ©s doivent Ãªtre dissociÃ©s des droits de gestion de groupes privÃ©s}. \\
 
-Le modèle générique de gestion des droits d'\obm ne permet pas de dissocier le droit de créér/modifier un groupe en fonction d'un de ses attributs (privé / public).
-Le droit d'écriture sur les groupes \$cright\_write donne le droit de créer/modifier un groupe qu'il soit public ou privé.
+Le modÃ¨le gÃ©nÃ©rique de gestion des droits d'\obm ne permet pas de dissocier le droit de crÃ©Ã©r/modifier un groupe en fonction d'un de ses attributs (privÃ© / public).
+Le droit d'Ã©criture sur les groupes \$cright\_write donne le droit de crÃ©er/modifier un groupe qu'il soit public ou privÃ©.
 
-\obm implémente cette granularité supplémentaire (à partir d'\obm v. 2.0.2) :
+\obm implÃ©mente cette granularitÃ© supplÃ©mentaire (Ã  partir d'\obm v. 2.0.2) :
 \begin{itemize}
-\item avec la règle : droit de gestion groupe public = \variable{\$cright\_write\_admin}
-\item via une fonction dédiée du module groupe qui permet de tester si l'utilisateur connecté à les droits de mise à jour (créer, modifier, supprimer, ajouter ou supprimer des users ou des groupes) sur le groupe consulté.\\
+\item avec la rÃ¨gle : droit de gestion groupe public = \variable{\$cright\_write\_admin}
+\item via une fonction dÃ©diÃ©e du module groupe qui permet de tester si l'utilisateur connectÃ© Ã  les droits de mise Ã  jour (crÃ©er, modifier, supprimer, ajouter ou supprimer des users ou des groupes) sur le groupe consultÃ©.\\
 \end{itemize}
 
-Règles groupes privé / public :\\
+RÃ¨gles groupes privÃ© / public :\\
 
 \begin{tabular}{|p{2cm}|p{3.5cm}|p{8cm}|}
 \hline
 \textbf{Groupe} & \textbf{Droit pour gestion} & \textbf{Description} \\
 \hline
-Privé & \$cright\_write &
+PrivÃ© & \$cright\_write &
 \begin{itemize}
-\item Défini par un utilisateur,
+\item DÃ©fini par un utilisateur,
 \item Ne peut pas avoir d'adresse email 
-\item Utilisé pour les vues d'agenda
+\item UtilisÃ© pour les vues d'agenda
 \end{itemize}
 \\
 \hline
 Public & \$cright\_write\_admin &
 \begin{itemize}
-\item Souvent synchronisé ou créé par import,
+\item Souvent synchronisÃ© ou crÃ©Ã© par import,
 \item Peut devenir une adresse de diffusion (email)
-\item Utilisé par l'ensemble d'\obm
+\item UtilisÃ© par l'ensemble d'\obm
 \end{itemize}
 \\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-Fonction de test des droits de mise à jour :\\
+Fonction de test des droits de mise Ã  jour :\\
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -129,14 +129,14 @@ function check_group_update_rights($params) {
 \end{minipage}
 }\\
 
-Cette fonction est appelée :
+Cette fonction est appelÃ©e :
 \begin{itemize}
 \item par les actions : user\_add, user\_del, group\_add, group\_del
-\item dans la fonction d'affichage d'un groupe pour savoir s'il faut ou non afficher la possibilité de supprimer les utilisateurs de la liste affichée
+\item dans la fonction d'affichage d'un groupe pour savoir s'il faut ou non afficher la possibilitÃ© de supprimer les utilisateurs de la liste affichÃ©e
 \end{itemize}
 \vspace{0.3cm}
 
-Afin de ne pas proposer les menus ``modifier, supprimer,..'' si l'utilisateur n'a pas le droit suffisant sur le groupe, la fonction \fonction{update\_group\_action()} est modifiée afin d'augmenter le droit recquis à \variable{\$cright\_write\_admin} des ces actions si le groupe consulté est public.
+Afin de ne pas proposer les menus ``modifier, supprimer,..'' si l'utilisateur n'a pas le droit suffisant sur le groupe, la fonction \fonction{update\_group\_action()} est modifiÃ©e afin d'augmenter le droit recquis Ã  \variable{\$cright\_write\_admin} des ces actions si le groupe consultÃ© est public.
 
 
 \subsection{UserObmGroup}
@@ -183,12 +183,12 @@ Table de liaison directe User - Group.\\
 
 \subsubsection{Remarques}
 
-\obm gère des groupes hiérarchique (groupes de groupes) récursifs. C'est pratique en terme d'organisation et structuration de ses groupes, mais une hiérarchie de groupe peut être couteuse en performance.
+\obm gÃ¨re des groupes hiÃ©rarchique (groupes de groupes) rÃ©cursifs. C'est pratique en terme d'organisation et structuration de ses groupes, mais une hiÃ©rarchie de groupe peut Ãªtre couteuse en performance.
 \begin{itemize}
-\item Déterminer l'appartenance d'un utilisateur à un groupe nécessite de parcourir toute la hiérarchie : groupes dont l'utilisateur est membre, groupes pères des groupes dont l'utilisateur est membre,... soit rapidement un grand nombre de requêtes récursives.
-\item La gestion des ACL se basant sur des groupes pourra demander la vérification de plusieurs appartenances.
+\item DÃ©terminer l'appartenance d'un utilisateur Ã  un groupe nÃ©cessite de parcourir toute la hiÃ©rarchie : groupes dont l'utilisateur est membre, groupes pÃ¨res des groupes dont l'utilisateur est membre,... soit rapidement un grand nombre de requÃªtes rÃ©cursives.
+\item La gestion des ACL se basant sur des groupes pourra demander la vÃ©rification de plusieurs appartenances.
 \end{itemize}
 
-L'interêt de cette table est de stocker directement à plat tous les membres d'un groupe (membres directs, membres de groupes du groupe,...), afin de permettre une détermination directe et immédiate des membres d'un groupe ou des groupes dont est membre un utilisateur.
+L'interÃªt de cette table est de stocker directement Ã  plat tous les membres d'un groupe (membres directs, membres de groupes du groupe,...), afin de permettre une dÃ©termination directe et immÃ©diate des membres d'un groupe ou des groupes dont est membre un utilisateur.
 
-\paragraph{A l'heure actuelle, \obm 2.1.0pre3} la structure est en base de données mais n'est pas renseignée ou exploitée.
+\paragraph{A l'heure actuelle, \obm 2.1.0pre3} la structure est en base de donnÃ©es mais n'est pas renseignÃ©e ou exploitÃ©e.

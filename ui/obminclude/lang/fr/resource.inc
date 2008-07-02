@@ -8,27 +8,27 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_desc  = "Description";
-$l_qty  = "Capacité/Quantité";
-$l_check_resourcecreate = " entrées créées par cet utilisateur.";
-$l_check_resourceupdate = " entrées modifiées par cet utilisateur.";
+$l_qty  = "CapacitÃ©/QuantitÃ©";
+$l_check_resourcecreate = " entrÃ©es crÃ©Ã©es par cet utilisateur.";
+$l_check_resourceupdate = " entrÃ©es modifiÃ©es par cet utilisateur.";
 $l_no_resource = "Pas de champs ressources dans cette table";
 $l_fill_name = "Vous devez renseigner le nom avant de valider.";
 
 // Item & Property
 $l_rtype = "Type de ressource";
 $l_rtype_manage = "Gestion des types de ressources";
-$l_rtype_property = "Propriété";
+$l_rtype_property = "PropriÃ©tÃ©";
 $l_rtype_kind = "Type";
-$l_rtype_insert = "Créer le type de ressource";
+$l_rtype_insert = "CrÃ©er le type de ressource";
 $l_rtype_update = "Modifier le type de ressource";
-$l_rtype_checkdelete = "Vérifier ou supprimer le type de ressource";
+$l_rtype_checkdelete = "VÃ©rifier ou supprimer le type de ressource";
 $l_ritem = "Accessoire";
 $l_ritem_add = "Ajouter ces accessoires";
 $l_ritem_manage = "Gestion des accessoires";
-$l_ritem_insert = "Créer l'accessoire";
+$l_ritem_insert = "CrÃ©er l'accessoire";
 $l_ritem_update = "Modifier l'accessoire";
 $l_no_item_available = "Aucun accessoire n'est disponible pour cette ressource";
-$l_confirm_delete_item = "Etes-vous sûr de supprimer cet accessoire?";
+$l_confirm_delete_item = "Etes-vous sÃ»r de supprimer cet accessoire?";
 
 // Titres
 $l_resource = "Ressource";
@@ -38,24 +38,24 @@ $l_users = "Utilisateurs";
 // Actions
 $l_insert = "Enregistrer la ressource";
 $l_update = "Modifier la ressource";
-$l_checkdelete = "Vérifier ou Supprimer la ressource";
-$l_reset = "Préférences par défaut";
+$l_checkdelete = "VÃ©rifier ou Supprimer la ressource";
+$l_reset = "PrÃ©fÃ©rences par dÃ©faut";
 $l_delete = "Supprimer la ressource";
 $l_add = "Ajouter ces ressources";
 
 // Messages
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des ressources correspondantes.";
-$l_found = "ressource(s) trouvée(s).";
-$l_no_found = "Aucune ressource ne correspond à ces critères !";
-$l_cant_delete = "La ressource ne peut être supprimée !";
-$l_can_delete = "La ressource peut être supprimée.";
-$l_name_error = "Le nom doit être renseigné !";
-$l_check_samename = "Ces ressources semblent similaires à cette nouvelle entrée !";
-$l_exist_error = "Ce nom est déjà utilisé !";
+$l_no_display = "Renseigner les critÃ¨res souhaitÃ©s et cliquer sur < Chercher > pour obtenir la liste des ressources correspondantes.";
+$l_found = "ressource(s) trouvÃ©e(s).";
+$l_no_found = "Aucune ressource ne correspond Ã  ces critÃ¨res !";
+$l_cant_delete = "La ressource ne peut Ãªtre supprimÃ©e !";
+$l_can_delete = "La ressource peut Ãªtre supprimÃ©e.";
+$l_name_error = "Le nom doit Ãªtre renseignÃ© !";
+$l_check_samename = "Ces ressources semblent similaires Ã  cette nouvelle entrÃ©e !";
+$l_exist_error = "Ce nom est dÃ©jÃ  utilisÃ© !";
 
 $l_add_resources = "Ajouter des ressources";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_j_check_number = "La quantité renseignée n'est pas correct.";
+$l_j_check_number = "La quantitÃ© renseignÃ©e n'est pas correct.";
 
 $l_resource_display = "Options d'affichage des listes de ressources";

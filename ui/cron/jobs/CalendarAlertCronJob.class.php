@@ -61,7 +61,7 @@ class CalendarAlertCronJob extends CronJob{
       $event = $occurrence->event;
       $delta = $this->getAlertDelta($event->id);
       
-      if($occurrence->date >= $date && $occurrence->date <= $date  + $delta) {
+      if($occurrence->date + $this->jobDelta> $date && $occurrence->date <= $date  + $delta) {
         $this->logger->debug("Alert for event ".$event->id." will be sent");
         $consult_link = "$GLOBALS[cgp_host]/calendar/calendar_index.php?action=detailconsult&calendar_id=".$event->id;
         $events[$event->id] = array (
@@ -160,7 +160,7 @@ class CalendarAlertCronJob extends CronJob{
       $title = $nr_q->f("calendarevent_title");
       $privacy = $nr_q->f("calendarevent_privacy");
       $description = $nr_q->f("calendarevent_description"); 
-      $entity_label = $r_q->f("userobm_lastname") ." ".$r_q->f("userobm_firstname");
+      $entity_label = $nr_q->f("userobm_lastname") ." ".$r_q->f("userobm_firstname");
       $location = $nr_q->f("calendarevent_location"); 
       $category1 = $nr_q->f("calendarcategory1_label");
       $priority = $nr_q->f("calendarevent_priority");

@@ -38,7 +38,7 @@ $l_no_found = "Non sono stati trovati Contratto !";
 
 $l_link_incident = "Il contratto ha i seguenti eventi";
 $l_link_incident_no = "Il contratto non ha eventi";
-$l_cant_delete = "Il contratto non può essere eliminato";
+$l_cant_delete = "Il contratto non puÃ² essere eliminato";
 $l_can_delete = "Contratto eliminabile";
 
 $l_type_manage = "Supporto Contratto Tipo management";
@@ -49,7 +49,7 @@ $l_type_delete = "Cancella Tipo";
 $l_type_update = "Aggiorna Tipo";
 $l_type_insert = "Crea Tipo";
 $l_type_can_delete = "Tipo eliminabile";
-$l_type_cant_delete = "Tipo NON può essere eliminato";
+$l_type_cant_delete = "Tipo NON puÃ² essere eliminato";
 $l_type_link_contract = "Tipo richiesto per questi Contratti";
 
 $l_err_label_empty = "Inserisci l'etichetta";

@@ -11,7 +11,7 @@
 require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
-// vérification des entrées à la création de paiements
+// vÃ©rification des entrÃ©es Ã  la crÃ©ation de paiements
 function check_payment (f_pay) {
   if (f_pay.tf_amount.value == \"\") {
     alert (\"$l_no_amount\");

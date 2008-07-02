@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_detail = "Détail";
+$l_detail = "DÃ©tail";
 $l_title = "Fonction";
 $l_add_child_tooltip = "Ajouter un fils";
 $l_zoom = "Zoom";
@@ -23,14 +23,14 @@ $l_ldif_export = "Export LDIF";
 $l_svg_export = "Export SVG";
 
 // Messages
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des organigrammes correspondants.";
-$l_found = "organigrammes trouvés.";
-$l_no_found = "Aucun organigramme ne correspond à ces critères !";
-$l_can_delete = "L'organigramme peut être supprimé.";
-$l_cant_delete = "L'organigramme ne peut être supprimé !";
+$l_no_display = "Renseigner les critÃ¨res souhaitÃ©s et cliquer sur < Chercher > pour obtenir la liste des organigrammes correspondants.";
+$l_found = "organigrammes trouvÃ©s.";
+$l_no_found = "Aucun organigramme ne correspond Ã  ces critÃ¨res !";
+$l_can_delete = "L'organigramme peut Ãªtre supprimÃ©.";
+$l_cant_delete = "L'organigramme ne peut Ãªtre supprimÃ© !";
 $l_fill_name = "Vous devez renseigner le nom de l'organigramme avant de valider.";
 $l_fill_ogroup_name = "Vous devez renseigner le nom de chaque noeuds avant de valider";
-$l_js_delete_node = "Etes-vous sûr de vouloir supprimer ce noeud ?";
+$l_js_delete_node = "Etes-vous sÃ»r de vouloir supprimer ce noeud ?";
 
 // For the display preferences modification screen 
 $l_organizationalchart_display = "Options d'affichage des listes d'organigrammes";

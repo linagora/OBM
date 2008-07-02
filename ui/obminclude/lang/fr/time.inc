@@ -10,13 +10,13 @@
 // Database fields
 $l_date_task="Date";
 $l_task_del="Suppr";
-$l_delete = "Supprimer les t‚ches";
-$l_length="DurÈe";
+$l_delete = "Supprimer les t√¢ches";
+$l_length="Dur√©e";
 $l_total = "Total";
 
-$l_total_period="DurÈe sur la pÈriode";
-$l_total_spent="Temps pÈriode";
-$l_total_before="Total prÈcÈdent";
+$l_total_period="Dur√©e sur la p√©riode";
+$l_total_spent="Temps p√©riode";
+$l_total_before="Total pr√©c√©dent";
 $l_total_after="Total actuel";
 
 $l_task_del="Suppr.";
@@ -28,19 +28,19 @@ $l_valid = "Valider";
 $l_unvalid = "Annuler";
 $l_add = "Ajouter";
 $l_update = "Modifier";
-$l_fill= "complÈter";
+$l_fill= "compl√©ter";
 $l_intern = "Interne";
 
 $l_task = "Tache";
 $l_label = "Label";
-$l_duration = "DurÈe";
+$l_duration = "Dur√©e";
 
-$l_searchtime_display = "Options d'affichage des listes de t‚ches";
-$total_menu = "RÈcapitulatifs";
+$l_searchtime_display = "Options d'affichage des listes de t√¢ches";
+$total_menu = "R√©capitulatifs";
 $total_tasks = "Total par taches";
-$total_companies = "Total par sociÈtÈ";
+$total_companies = "Total par soci√©t√©";
 $total_projects = "Total par projet/affaire";
-$l_pdf_settings = "ParamËtrage du PDF";
+$l_pdf_settings = "Param√®trage du PDF";
 
 // short names for days
 $l_daysofweekshort = array (	'Dim',
@@ -54,33 +54,33 @@ $l_daysofweekshort = array (	'Dim',
 
 // Messages
 $l_projects_manager = "Confirmation de la validation des taches par l'administrateur:";
-$l_found_task = "Voici les t‚ches rÈalisÈes et saisies pour la semaine en cours:";
-$l_found = "Taches trouvÈes.";
+$l_found_task = "Voici les t√¢ches r√©alis√©es et saisies pour la semaine en cours:";
+$l_found = "Taches trouv√©es.";
 $l_no_found = "Aucune tache pour cet utilisateur!";
-$l_fill_addtask = "Saisissez les t‚ches rÈalisÈes pour la semaine en cours.";
-$l_task_list = "RÈcapitulatif des t‚ches de la semaine";
+$l_fill_addtask = "Saisissez les t√¢ches r√©alis√©es pour la semaine en cours.";
+$l_task_list = "R√©capitulatif des t√¢ches de la semaine";
 
 $l_admin_valid = "Ecran de validation administrateur";
 $l_admin_empty = "Il n'y a pas de renseignements pour ce mois";
 
 $l_proj_stats = "Participation aux projets en cours";
-$l_no_proj_stats = "Cette(Ces) personne(s) ne participe(nt) ‡ aucun projet";
-$l_tt_stats = "RÈpartition du temps de travail par type de t‚che";
+$l_no_proj_stats = "Cette(Ces) personne(s) ne participe(nt) √† aucun projet";
+$l_tt_stats = "R√©partition du temps de travail par type de t√¢che";
 $l_no_tt_stats = "Cette(Ces) personne(s) n'utilise(nt) pas la gestion des temps";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_j_select_day = "Vous devez sÈlectionner un jour.";
-$l_j_select_tasktype = "Vous devez sÈlectionner une catÈgorie.";
-$l_j_select_project = "Vous devez sÈlectionner un project pour une t‚che facturÈe.";
-$l_j_select_projecttask = "Vous devez sÈlectionner une t‚che du projet project pour une t‚che facturÈe.";
+$l_j_select_day = "Vous devez s√©lectionner un jour.";
+$l_j_select_tasktype = "Vous devez s√©lectionner une cat√©gorie.";
+$l_j_select_project = "Vous devez s√©lectionner un project pour une t√¢che factur√©e.";
+$l_j_select_projecttask = "Vous devez s√©lectionner une t√¢che du projet project pour une t√¢che factur√©e.";
 $l_delete_confirm = "Confirmer la suppression de ces taches ?";
 
 // PDF related strings
 $l_pdf_no_project_selected = "Selectionnez au moins un projet.";
 $l_pdf_bad_date = "Date incorrecte ou format invalide.";
 $l_pdf_com_date_format = "d/m/Y";
-$l_pdf_title = "RelevÈ d'activitÈ";
-$l_pdf_date = "Document gÈnÈrÈ le :";
+$l_pdf_title = "Relev√© d'activit√©";
+$l_pdf_date = "Document g√©n√©r√© le :";
 $l_pdf_date_format = "d/m/Y H:i";
 $l_pdf_user = "Collaborateur : ";
 $l_pdf_visa_user = "Visa Collaborateur";

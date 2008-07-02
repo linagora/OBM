@@ -20,7 +20,7 @@ $l_user_display = "Options d'affichage des listes d'utilisateurs";
 
 // Contact
 $l_lastname = "Nom";
-$l_firstname = "Prénom";
+$l_firstname = "PrÃ©nom";
 $l_function = "Fonction";
 
 // Actions
@@ -28,37 +28,37 @@ $l_add = "Ajouter ces groupes";
 
 // Messages
 $l_fill_name = "Le nom du groupe doit etre rempli";
-$l_group_exists = "Ce groupe existe déjà !";
+$l_group_exists = "Ce groupe existe dÃ©jÃ  !";
 $l_j_check_email = "L'adresse e-mail n'est pas valide !";
-$l_warn_delete = "utilisateurs enregistrés dans ce groupe";
-$l_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
-$l_system_no_priv = "Un groupe système ne peut être privé !";
-$l_only_owner_priv = "Seul le propriétaire d'un groupe peut le définir privé !";
-$l_err_private_email = "Les groupes privés ne peuvent pas avoir d'adresse E-mail !";
+$l_warn_delete = "utilisateurs enregistrÃ©s dans ce groupe";
+$l_email_exist = "L'adresse E-mail saisie est dÃ©jÃ  utilisÃ©e !";
+$l_system_no_priv = "Un groupe systÃ¨me ne peut Ãªtre privÃ© !";
+$l_only_owner_priv = "Seul le propriÃ©taire d'un groupe peut le dÃ©finir privÃ© !";
+$l_err_private_email = "Les groupes privÃ©s ne peuvent pas avoir d'adresse E-mail !";
 
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les groupes correspondants.";
+$l_no_display = "Renseigner les critÃ¨res souhaitÃ©s et cliquer sur < Chercher > pour obtenir les groupes correspondants.";
 $l_no_user = "Il n'y a pas d'utilisateurs membres.";
 $l_no_group_group = "Il n'y a pas de groupes membres.";
-$l_found = "groupes trouvés.";
+$l_found = "groupes trouvÃ©s.";
 $l_user_member = "utilisateurs membres";
 $l_group_member = "groupes membres.";
-$l_no_found = "Aucun groupe ne correspond à ces critères !";
+$l_no_found = "Aucun groupe ne correspond Ã  ces critÃ¨res !";
 $l_add_user = "Ajouter des utilisateurs";
 $l_add_group = "Ajouter des groupes (parmi la liste des groupes possibles)";
 $l_del_user_sel = "Enlever ces utilisateurs";
 $l_del_group_sel = "Enlever ces groupes";
-$l_user_added = "Utilisateur(s) ajouté(s)";
-$l_user_removed = "Utilisateur(s) enlevé(s)";
-$l_group_added = "Groupe(s) ajouté(s)";
-$l_group_removed = "Groupe(s) enlevé(s)";
-$l_no_user_added = "Pas d'utilisateurs à ajouter";
-$l_no_user_deleted = "Pas d'utilisateurs à supprimer";
-$l_no_group_added = "Pas de groupes à ajouter";
-$l_no_group_deleted = "Pas de groupes à supprimer";
-$l_check_samegroup = "Ces groupes sembles similaires au groupe saisi. Voulez-vous confirmer la création de ce groupe?";
-$l_cant_delete_system = "Les groupes système ne peuvent être supprimés !";
-$l_can_delete = "Le groupe peut être supprimé.";
-$l_cant_delete = "Le groupe ne peut être supprimé !";
-$l_err_system_samba = "La modification des droits windows d'un groupe système n'est pas autorisée.";
-$l_cant_update_smb_group = "Les groupes Windows par défaut sont gérés automatiquement par Aliamin et ne peuvent être modifiés par l'interface.";
+$l_user_added = "Utilisateur(s) ajoutÃ©(s)";
+$l_user_removed = "Utilisateur(s) enlevÃ©(s)";
+$l_group_added = "Groupe(s) ajoutÃ©(s)";
+$l_group_removed = "Groupe(s) enlevÃ©(s)";
+$l_no_user_added = "Pas d'utilisateurs Ã  ajouter";
+$l_no_user_deleted = "Pas d'utilisateurs Ã  supprimer";
+$l_no_group_added = "Pas de groupes Ã  ajouter";
+$l_no_group_deleted = "Pas de groupes Ã  supprimer";
+$l_check_samegroup = "Ces groupes sembles similaires au groupe saisi. Voulez-vous confirmer la crÃ©ation de ce groupe?";
+$l_cant_delete_system = "Les groupes systÃ¨me ne peuvent Ãªtre supprimÃ©s !";
+$l_can_delete = "Le groupe peut Ãªtre supprimÃ©.";
+$l_cant_delete = "Le groupe ne peut Ãªtre supprimÃ© !";
+$l_err_system_samba = "La modification des droits windows d'un groupe systÃ¨me n'est pas autorisÃ©e.";
+$l_cant_update_smb_group = "Les groupes Windows par dÃ©faut sont gÃ©rÃ©s automatiquement par Aliamin et ne peuvent Ãªtre modifiÃ©s par l'interface.";
 $l_add_groups = "Ajouter des groupes";

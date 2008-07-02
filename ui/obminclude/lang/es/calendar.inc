@@ -1,6 +1,6 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : EspaÒol                                                  //
+// OBM - Language : Espa√±ol                                                  //
 //     - File     : calendar.inc                                             //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -11,43 +11,43 @@ $l_calendar = "Agenda";
 $l_users = "Usuarios";
 $l_resources = "Recursos";
 $l_groups = "Grupos";
-$l_title = "TÌtulo";
-$l_location = "UbicaciÛn";
-$l_private_description = "Este evento es privado y no puede ver mas informaciÛn";
+$l_title = "T√≠tulo";
+$l_location = "Ubicaci√≥n";
+$l_private_description = "Este evento es privado y no puede ver mas informaci√≥n";
 $l_high = "Alta";
 $l_low = "Baja";
 $l_medium = "Media";
 $l_go = "Ejecutar";
 $l_hour = "Hora";
-$l_occupied_day = "DÌa Entero";
-$l_event_duration = "DuraciÛn de la ReuniÛn";
+$l_occupied_day = "D√≠a Entero";
+$l_event_duration = "Duraci√≥n de la Reuni√≥n";
 $l_format = "(AAAA-MM-DD)";
-$l_repeat = "RepeticiÛn";
+$l_repeat = "Repetici√≥n";
 $l_periodicity = "Fecuencia";
-$l_repeatkind = "Tipo de RepeticiÛn";
-$l_repeatdays = "Dias de RepeticiÛn (Tipo semanal)";
+$l_repeatkind = "Tipo de Repetici√≥n";
+$l_repeatdays = "Dias de Repetici√≥n (Tipo semanal)";
 $l_repeatdays2 = "Dias a repetir";
 $l_user_right = "Administre los permisos de";
-$l_date_repeatend = "Fecha Final de repeticiÛn";
+$l_date_repeatend = "Fecha Final de repetici√≥n";
 $l_carac = "Propiedades";
-$l_force = "Forzar la inserciÛn del evento";
+$l_force = "Forzar la inserci√≥n del evento";
 $l_everybody = "Todos";
 $l_everyresources = "Todos los recursos";
 $l_all_day = "Todos los dias";
 $l_begin = "Iniciando";
 $l_end = "Final";
-$l_link_events = "eventos vinculados con esta categorÌa.";
-$l_waiting_events = "ReuniÛn en espera";
+$l_link_events = "eventos vinculados con esta categor√≠a.";
+$l_waiting_events = "Reuni√≥n en espera";
 $l_free = "Libre pero restringido";
 $l_possible = "Libre";
 $l_occupied = "No disponible";
 $l_meeting_legend = "Leyenda";
-$l_selection = "SelecciÛn";
+$l_selection = "Selecci√≥n";
 $l_exception = "Exceptions";
 
 $l_accepted = "Aceptar";
 $l_rejected = "Rechazar";
-$l_waiting  = "esperando por confirmaciÛn";
+$l_waiting  = "esperando por confirmaci√≥n";
 $l_short_accepted = "A";
 $l_short_rejected = "R";
 $l_short_waiting  = "Espere";
@@ -75,7 +75,7 @@ $l_select = "Seleccionar";
 $l_repeat_update = "Actualizar todas las ocurrencias de esta cita ";
 $l_go_to = "Ir a";
 $l_refuse = "Rechazar";
-$l_change_state = "Su particiÛn en el evento";
+$l_change_state = "Su partici√≥n en el evento";
 $l_force_insert = "Forzar ingreso";
 $l_refuse_insert = "Rechazar evento";
 $l_cancel_insert = "Espere...";
@@ -83,7 +83,7 @@ $l_too_much_user = "No mas de seis usuarios";
 $l_too_much_resource = "No mas de seis recursos";
 $l_update_warning = "Alerta : algunos conflictos han sido detectados";
 $l_insert_warning = "Alerta : algunos conflictos han sido detectados";
-$l_update_error = "Conflicts han sido detectados, actualizaciÛn cancelada";
+$l_update_error = "Conflicts han sido detectados, actualizaci√≥n cancelada";
 $l_insert_error = "Conflicts han sido detectados, ingreso cancelado";
 $l_sendamail = "Force the notification by mail.";
 $l_calendar_select_group = "Seleccione los grupos.";
@@ -91,24 +91,24 @@ $l_view_type = "Ver tipo";
 
 // Messages
 $l_select_contacts = "Debe seleccionar un usuario o grupo.";
-$l_select_repeat_day = "Debe seleccionar los dÌas de repeticiÛn.";
-$l_confirm_delete ="Esta operaciÛn borrar· todas las ocurrencias de estos eventos para todos los usuarios, esta seguro que desea continuar?";
-$l_conflict_events = "Las horas escogidas est·n ocupadas por"; 
+$l_select_repeat_day = "Debe seleccionar los d√≠as de repetici√≥n.";
+$l_confirm_delete ="Esta operaci√≥n borrar√° todas las ocurrencias de estos eventos para todos los usuarios, esta seguro que desea continuar?";
+$l_conflict_events = "Las horas escogidas est√°n ocupadas por"; 
 $l_fill_title = "Tiene que llenar el campo [ $l_title ] ";
 $l_fill_dateend = "Tiene que llenar el campo [ $l_dateend ]";
 $l_fill_datebegin = "Tiene que llenar el campo [ $l_datebegin ]";
 $l_err_no_calendar_selected = "No ha seleccionado calendario";
 $l_err_begin_end = "Fecha final debe ser posterior a la de inicio !";
-$l_err_end_repeat = "El final de la repeticiÛn debe ser posterior a la fecha de final.";
-$l_err_end_repeat2 = "The duraciÛn m·xima de una repeticiÛn es un aÒo";
-$l_err_end_repeat3 = "La m·xima duraciÛn de una repeticiÛn anual es de 10 aÒos.";
-$l_err_days_repeat = "Debe elegir uno o mas dÌas de repeticiÛn.";
+$l_err_end_repeat = "El final de la repetici√≥n debe ser posterior a la fecha de final.";
+$l_err_end_repeat2 = "The duraci√≥n m√°xima de una repetici√≥n es un a√±o";
+$l_err_end_repeat3 = "La m√°xima duraci√≥n de una repetici√≥n anual es de 10 a√±os.";
+$l_err_days_repeat = "Debe elegir uno o mas d√≠as de repetici√≥n.";
 $l_err_days_repeat_not_weekly = "Solo puede escoger dias de repeticion en repeticiones semanales.";
-$l_err_weekly_repeat = "Para repeticiÛn semanal, el dia final debe estar al menos siete dias despues del evento.";
+$l_err_weekly_repeat = "Para repetici√≥n semanal, el dia final debe estar al menos siete dias despues del evento.";
 $l_event_cant_delete = "Solo puede borrar los eventos propios !";
 
-$l_header_meeting = "Nueva reuniÛn";
-$l_header_admin = "AdministraciÛn";
+$l_header_meeting = "Nueva reuni√≥n";
+$l_header_admin = "Administraci√≥n";
 $l_authorize_list = "Personas autorizadas";
 $l_denie_list = "Personas no autorizadas";
 $l_read_permission = "Manejo de permisos de lectura";
@@ -129,7 +129,7 @@ $l_delete_event_mail_body = "Fecha : ";
 
 $l_update_event_mail_subject = "Evento actualizado en obm";
 $l_delete_event_mail_subject = "Evento borrado de obm";
-$l_confirm_mail = "Confirme+Forzar notificaciÛn";
+$l_confirm_mail = "Confirme+Forzar notificaci√≥n";
 
 $l_unknown = "Desconocido";
 $l_calendar_visible = "Escoja calendarios";
@@ -137,21 +137,21 @@ $l_calendar_displayed = "Calendarios mostrados";
 $l_resource_visible = "Escoja Recursos";
 $l_resource_displayed = "Recursos mostrados";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_interval_null = "DuraciÛn no puede ser nula";
-$mj_fill_title_event = "\\n Debe ingresar un tÌtulo al evento.";
-$mj_fill_time_begin = "\\n Debe ingresar una hora de inicio v·lida.";
+$l_interval_null = "Duraci√≥n no puede ser nula";
+$mj_fill_title_event = "\\n Debe ingresar un t√≠tulo al evento.";
+$mj_fill_time_begin = "\\n Debe ingresar una hora de inicio v√°lida.";
 $mj_fill_time_end = "\\n Debe ingresar una hora final.";
-$mj_fill_valid_time_begin = "\\n Debe ingresar una hora de inicio v·lida.";
-$mj_fill_valid_time_end = "\\n Debe ingresar una hora final v·lida.";
-$mj_delete_confirm = "Confirme la eliminaciÛn del evento?";
-$mj_invalid_day = "El dÌa escogido no existe para el mes seleccionado.";
+$mj_fill_valid_time_begin = "\\n Debe ingresar una hora de inicio v√°lida.";
+$mj_fill_valid_time_end = "\\n Debe ingresar una hora final v√°lida.";
+$mj_delete_confirm = "Confirme la eliminaci√≥n del evento?";
+$mj_invalid_day = "El d√≠a escogido no existe para el mes seleccionado.";
 $mj_date_incompatibility = "La fecha de final o puede ser anterior a la fecha de inicio.";
-$mj_repeat_date_incompatibility = "La fecha del fin de la repeticiÛn no puede estar antes de la fecha de inicio."; 
-$mj_event_delete_confirm = "Confirme la eliminaciÛn del evento ?"; 
-$mj_event_delete_all_confirm = "Confirme la eliminaciÛn del evento y todas sus repeticiones ?"; 
+$mj_repeat_date_incompatibility = "La fecha del fin de la repetici√≥n no puede estar antes de la fecha de inicio."; 
+$mj_event_delete_confirm = "Confirme la eliminaci√≥n del evento ?"; 
+$mj_event_delete_all_confirm = "Confirme la eliminaci√≥n del evento y todas sus repeticiones ?"; 
 
 // Otras Skina
-$l_repeatkind = "Tipo de RepeticiÛn";
+$l_repeatkind = "Tipo de Repetici√≥n";
 $l_confirm = "Confirmar";
 $l_cancel = "Cancelar";
 $l_update = "Actualizar el evento";

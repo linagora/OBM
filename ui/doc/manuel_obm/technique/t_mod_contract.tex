@@ -6,11 +6,11 @@
 \clearpage
 \section{Contrat}
 
-révision : \obm 2.0 \\
+rÃ©vision : \obm 2.0 \\
 Le module \contract \obm.\\
 
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
 Le module \contract utilise 4 tables :
 \begin{itemize}
@@ -28,47 +28,47 @@ Table principale des informations d'un contrat.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
-\_deal\_id & int 8 & Affaire liée au contrat & Facultatif \\
+\_deal\_id & int 8 & Affaire liÃ©e au contrat & Facultatif \\
 \hline
-\_company\_id & int 8 & Société contractante & Client ou fournisseur \\
+\_company\_id & int 8 & SociÃ©tÃ© contractante & Client ou fournisseur \\
 \hline
 \_label & varchar 128 & Nom du contrat & \\
 \hline
-\_number & varchar 20 & Numéro ou référence du contrat & \\
+\_number & varchar 20 & NumÃ©ro ou rÃ©fÃ©rence du contrat & \\
 \hline
 \_datesignature & date & Date de signature & \\
 \hline
-\_datebegin & date & Date de début & \\
+\_datebegin & date & Date de dÃ©but & \\
 \hline
 \_dateexp & date & Date d'expiration & \\
 \hline
 \_daterenew & date & Date de renouvellement & \\
 \hline
-\_datecancel & date & Date de résiliation & Aspect client \\
+\_datecancel & date & Date de rÃ©siliation & Aspect client \\
 \hline
 \_type\_id & int 8 & Type de contrat & \\
 \hline
-\_priority\_id & int 8 & Priorité du contrat & \\
+\_priority\_id & int 8 & PrioritÃ© du contrat & \\
 \hline
-\_status\_id & int 8 & Etat du contrat & (En cours, terminé)\\
+\_status\_id & int 8 & Etat du contrat & (En cours, terminÃ©)\\
 \hline
 \_kind & int 2 & Indicateur : Client ou fournisseur & \$cck\_customer=0, \$cck\_supplier=1\\
 \hline
-\_format & int 2 & Indicateur : par période, durée ou coupons & \$ccf\_period=0, \$ccf\_duration=1, \$ccf\_ticket=2\\
+\_format & int 2 & Indicateur : par pÃ©riode, durÃ©e ou coupons & \$ccf\_period=0, \$ccf\_duration=1, \$ccf\_ticket=2\\
 \hline
 \_ticketnumber & int 8 & Nombre de coupons & (cas contrat par coupons)\\
 \hline
-\_duration & int 8 & Durée du contrat (en Heure) & (cas contrat par durée)\\
+\_duration & int 8 & DurÃ©e du contrat (en Heure) & (cas contrat par durÃ©e)\\
 \hline
 \_autorenewal & int 2 & Indicateur de renouvellement automatique & 1 = oui\\
 \hline
@@ -80,11 +80,11 @@ Table principale des informations d'un contrat.\\
 \hline
 \_marketmanager\_id & int 8 & Responsable commercial interne &\\
 \hline
-\_privacy & int 2 & Visibilité du contrat & 0=public, 1=privé\\
+\_privacy & int 2 & VisibilitÃ© du contrat & 0=public, 1=privÃ©\\
 \hline
 \_archive & int 1 & Indicateur d'archivage & (1 = 0ui)\\
 \hline
-\_clause & text (64k) & Clauses particulières &\\
+\_clause & text (64k) & Clauses particuliÃ¨res &\\
 \hline
 \_comment & text (64k) & Commentaire &\\
 \hline
@@ -93,21 +93,21 @@ Table principale des informations d'un contrat.\\
 	
 \subsection{ContractType}
 
-Table de catégorisation de contrats (table de référence).
+Table de catÃ©gorisation de contrats (table de rÃ©fÃ©rence).
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_label & varchar 40 & Label & \\
 \hline
@@ -116,23 +116,23 @@ Table de catégorisation de contrats (table de référence).
 
 \subsection{ContractPriority}
 
-Table des informations de priorité des contrats (table de référence).\\
+Table des informations de prioritÃ© des contrats (table de rÃ©fÃ©rence).\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
-\_color & varchar 6 & Code couleur associé à la priorité \\
+\_color & varchar 6 & Code couleur associÃ© Ã  la prioritÃ© \\
 \hline
 \_order & int 2 & Ordre d'affichage & \\
 \hline
@@ -143,21 +143,21 @@ Table des informations de priorité des contrats (table de référence).\\
 
 \subsection{ContractStatus}
 
-Table des états des contrats (table de référence).\\
+Table des Ã©tats des contrats (table de rÃ©fÃ©rence).\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_order & int 2 & Order & \\
 \hline
@@ -168,32 +168,32 @@ Table des états des contrats (table de référence).\\
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \contract, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \contract, avec le droit d'accÃ¨s requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \textbf{IntitulÃ©} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & read & (Défaut) formulaire de recherche de contrats. \\ 
+  index & read & (DÃ©faut) formulaire de recherche de contrats. \\ 
  \hline
-  search & read & Résultat de recherche de contrats. \\
+  search & read & RÃ©sultat de recherche de contrats. \\
  \hline
-  new & write & Formulaire de création d'un contrat. \\
+  new & write & Formulaire de crÃ©ation d'un contrat. \\
  \hline
-  detailconsult & read & Fiche détail d'un contrat. \\
+  detailconsult & read & Fiche dÃ©tail d'un contrat. \\
  \hline
   detailupdate & write & Formulaire de modification d'un contrat. \\
  \hline
   insert & write & Insertion d'un contrat. \\
  \hline
-  update & write & Mise à jour du contrat. \\
+  update & write & Mise Ã  jour du contrat. \\
  \hline
-  check\_delete & write & Vérification avant suppression du contrat. \\
+  check\_delete & write & VÃ©rification avant suppression du contrat. \\
  \hline
   delete & write & Suppression du contrat. \\
  \hline
-  priorite & write & Liste des priorites définies et formulaire de nouvelle priorite. \\
+  priorite & write & Liste des priorites dÃ©finies et formulaire de nouvelle priorite. \\
  \hline
   priorite\_add & write & Ajout d'une priorite . \\
  \hline
@@ -201,7 +201,7 @@ Voici la liste des actions du module \contract, avec le droit d'accès requis ain
  \hline
   priorite\_del & write & Suppression d'une priorite. \\
  \hline
-  status & write & Liste des etats définies et formulaire de nouveau etat. \\
+  status & write & Liste des etats dÃ©finies et formulaire de nouveau etat. \\
  \hline
   status\_add & write & Ajout d'un etat . \\
  \hline
@@ -209,7 +209,7 @@ Voici la liste des actions du module \contract, avec le droit d'accès requis ain
  \hline
   status\_del & write & Suppression d'un etat. \\
  \hline
-  type & write & Liste des types définies et formulaire de nouveau type. \\
+  type & write & Liste des types dÃ©finies et formulaire de nouveau type. \\
  \hline
   type\_add & write & Ajout d'un type. \\
  \hline
@@ -217,56 +217,56 @@ Voici la liste des actions du module \contract, avec le droit d'accès requis ain
  \hline
   type\_del & write & Suppression d'un type. \\
  \hline
-  display & read & Ecran de modification des préférences d'affichage. \\
+  display & read & Ecran de modification des prÃ©fÃ©rences d'affichage. \\
  \hline
-  dispref\_display & read & Modifie l'affichage d'un élément. \\
+  dispref\_display & read & Modifie l'affichage d'un Ã©lÃ©ment. \\
  \hline
-  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+  dispref\_level & read & Modifie l'ordre d'affichage d'un Ã©lÃ©ment. \\
  \hline
   document\_add & write & Ajout de liens vers des documents. \\
  \hline
 \end{tabular}
 
 
-\subsubsection{Catégories d'un contrat}
+\subsubsection{CatÃ©gories d'un contrat}
 
-Catégories d'un contrat.\\
+CatÃ©gories d'un contrat.\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
-\hline\textbf{Code catégorie} & \textbf{Label catégorie} \\
+\hline\textbf{Code catÃ©gorie} & \textbf{Label catÃ©gorie} \\
 \hline
-Priorite & Catégorie où l'on retrouve les priorités des contrats qui ont été inséré dans le module Administration.\\
+Priorite & CatÃ©gorie oÃ¹ l'on retrouve les prioritÃ©s des contrats qui ont Ã©tÃ© insÃ©rÃ© dans le module Administration.\\
 \hline
-Etat & Catégorie où l'on retrouve les états des contrats qui ont été inséré dans le module Administration.\\
+Etat & CatÃ©gorie oÃ¹ l'on retrouve les Ã©tats des contrats qui ont Ã©tÃ© insÃ©rÃ© dans le module Administration.\\
 \hline
-Type & Catégorie où l'on retrouve les types des contrats qui ont été inséré dans le module Administration.\\
+Type & CatÃ©gorie oÃ¹ l'on retrouve les types des contrats qui ont Ã©tÃ© insÃ©rÃ© dans le module Administration.\\
 \hline
 
-Contract type & Catégorie permettant de choisir entre les contrats de type Client ou Fournisseurs 
-Dans la base de données on reserve le champ contract\_kind. Ce champ peut avoir les valeurs
-1 (client) ou 2 (fournisseur) ou 0 pour les anciens contrats qui ont été non-actualisé.
+Contract type & CatÃ©gorie permettant de choisir entre les contrats de type Client ou Fournisseurs 
+Dans la base de donnÃ©es on reserve le champ contract\_kind. Ce champ peut avoir les valeurs
+1 (client) ou 2 (fournisseur) ou 0 pour les anciens contrats qui ont Ã©tÃ© non-actualisÃ©.
 Dans le formulaire d'inscription d'un nouveau contrat on trouve dans cette zone deux boutons de type radio
-avec le nom de la variable radio\_kind. On a utilise la variable contract\_kind pour garder la variable qui sort de la base de donnée. Si contract\_kind est égale à 2 alors le bouton avec l'etiquette fournisseur doit être selectionné, et dans le cas contraire le bouton avec l'etiquette client doit être selectionné. Le bouton client est selectionné  par ''default''.
-Dans le module de consultation on trouve cette catégorie au-dessus du module avec les informations de la société sous la forme d'un labelle 'client' ou 'fournisseur'.
+avec le nom de la variable radio\_kind. On a utilise la variable contract\_kind pour garder la variable qui sort de la base de donnÃ©e. Si contract\_kind est Ã©gale Ã  2 alors le bouton avec l'etiquette fournisseur doit Ãªtre selectionnÃ©, et dans le cas contraire le bouton avec l'etiquette client doit Ãªtre selectionnÃ©. Le bouton client est selectionnÃ©  par ''default''.
+Dans le module de consultation on trouve cette catÃ©gorie au-dessus du module avec les informations de la sociÃ©tÃ© sous la forme d'un labelle 'client' ou 'fournisseur'.
 \\
 \hline
-Format & Catégorie où l'on peut choisir entre les contracts de type Coupons ou Durée.
- Pour la catégorie Coupons, le champ avec le nombre de coupons du contract doit être renseigné.
- Pour la catégorie Duree, le champ avec la duree du support (h) doit être renseigné.
-On considere qu'un coupon est égal à une heure de support. Le temps du support du module incident est transformé
+Format & CatÃ©gorie oÃ¹ l'on peut choisir entre les contracts de type Coupons ou DurÃ©e.
+ Pour la catÃ©gorie Coupons, le champ avec le nombre de coupons du contract doit Ãªtre renseignÃ©.
+ Pour la catÃ©gorie Duree, le champ avec la duree du support (h) doit Ãªtre renseignÃ©.
+On considere qu'un coupon est Ã©gal Ã  une heure de support. Le temps du support du module incident est transformÃ©
  en coupons ou en heures de support pour le module contrat.
-La durée disponible du support d'un contrat est égale à la difference entre la durée du support initiale (le nombre 
- d'heures qui ont été vendu) et la durée utilisée (le nombre d'heures qui ont été necessaires pour resoudre les incidents)
-Le nombre de coupons disponibles est égal à la difference entre le nombre de coupons initial ( qui ont été vendus) et la durée utilisée (nombre d'heures qui ont été nécessaires pour résoudre le(s) incident(s)).
-Pour gérer le type du contract (par coupons ou par duree) nous avons utilisé dans la base de donnée le champ
-contract\_ticket , qui peut prendre des valeurs 1 si on a un contrat par coupons ou 2  si on a un contract par durée.
-Le nombre de coupons et le nombre d'heures de support vendues sont enregistrés dans la base de données dans les champs:
+La durÃ©e disponible du support d'un contrat est Ã©gale Ã  la difference entre la durÃ©e du support initiale (le nombre 
+ d'heures qui ont Ã©tÃ© vendu) et la durÃ©e utilisÃ©e (le nombre d'heures qui ont Ã©tÃ© necessaires pour resoudre les incidents)
+Le nombre de coupons disponibles est Ã©gal Ã  la difference entre le nombre de coupons initial ( qui ont Ã©tÃ© vendus) et la durÃ©e utilisÃ©e (nombre d'heures qui ont Ã©tÃ© nÃ©cessaires pour rÃ©soudre le(s) incident(s)).
+Pour gÃ©rer le type du contract (par coupons ou par duree) nous avons utilisÃ© dans la base de donnÃ©e le champ
+contract\_ticket , qui peut prendre des valeurs 1 si on a un contrat par coupons ou 2  si on a un contract par durÃ©e.
+Le nombre de coupons et le nombre d'heures de support vendues sont enregistrÃ©s dans la base de donnÃ©es dans les champs:
 contract\_ticketnumber et contract\_supportduration.
-Les deux champs ne peuvent pas être rempli en même temps avec des valeurs différentes de zéro.
-Dans le formulaire d'inscription d'un nouveau contrat, on trouve trois boutons radios 'Période','Duree' et 'Coupons'. Le champ 'Période' est selectionné à l'état initial.
-Si le champ 'Coupons' est sélectionné un champ texte permettant la saisie du 'Nombre coupons' apparaît.
-En mode consultation ces informations apparaissent dans la zone 'etat': nombre de 'coupons' ou heures' consommées ou disponibles (en foction des heures nécessaires pour la résolution des incidents).
-S'il n'y a pas d'incidents alors le nombre d'heures ou de coupons consommés est égal à zéro.
+Les deux champs ne peuvent pas Ãªtre rempli en mÃªme temps avec des valeurs diffÃ©rentes de zÃ©ro.
+Dans le formulaire d'inscription d'un nouveau contrat, on trouve trois boutons radios 'PÃ©riode','Duree' et 'Coupons'. Le champ 'PÃ©riode' est selectionnÃ© Ã  l'Ã©tat initial.
+Si le champ 'Coupons' est sÃ©lectionnÃ© un champ texte permettant la saisie du 'Nombre coupons' apparaÃ®t.
+En mode consultation ces informations apparaissent dans la zone 'etat': nombre de 'coupons' ou heures' consommÃ©es ou disponibles (en foction des heures nÃ©cessaires pour la rÃ©solution des incidents).
+S'il n'y a pas d'incidents alors le nombre d'heures ou de coupons consommÃ©s est Ã©gal Ã  zÃ©ro.
 
 \\
 \hline

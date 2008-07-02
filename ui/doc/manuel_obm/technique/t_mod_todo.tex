@@ -5,11 +5,11 @@
 
 \clearpage
 \section{Todo}
-rÈvision : \obm 2.0
+r√©vision : \obm 2.0
 
 Le module \todo d'\obm.
 
-\subsection{Organisation de la base de donnÈes}
+\subsection{Organisation de la base de donn√©es}
 
 Le module \todo utilise 1 table :
 \begin{itemize}
@@ -17,35 +17,35 @@ Le module \todo utilise 1 table :
 \end{itemize}
 
 \subsection{Todo}
-Table principale des informations d'une t‚che planifiÈe .\\
+Table principale des informations d'une t√¢che planifi√©e .\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & ClÈ primaire \\
+\_id & int 8 & Identifiant & Cl√© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise ‡ jour & \\
+\_timeupdate & timestamp 14 & Date de mise √† jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de crÈation & \\
+\_timecreate & timestamp 14 & Date de cr√©ation & \\
 \hline
-\_userupdate & int 8 & Id du modificateur de la t‚che & \\
+\_userupdate & int 8 & Id du modificateur de la t√¢che & \\
 \hline
-\_usercreate & int 8 & Id du crÈateur de la t‚che & \\
+\_usercreate & int 8 & Id du cr√©ateur de la t√¢che & \\
 \hline
-\_user & int 8 & Id du crÈateur de la t‚che & \\
+\_user & int 8 & Id du cr√©ateur de la t√¢che & \\
 \hline
-\_date & timestamp & Date de crÈation de la t‚che & \\
+\_date & timestamp & Date de cr√©ation de la t√¢che & \\
 \hline
-\_dateend & timestamp & Date de fin de la t‚che planifiÈe & \\
+\_dateend & timestamp & Date de fin de la t√¢che planifi√©e & \\
 \hline
-\_deadline & timestamp & Date limite de fin de t‚che & \\
+\_deadline & timestamp & Date limite de fin de t√¢che & \\
 \hline
-\_title & varchar 80 & Titre de la t‚che & (de 1 ‡ 5)\\
+\_title & varchar 80 & Titre de la t√¢che & (de 1 √† 5)\\
 \hline
-\_priority & int 8 & PrioritÈ de la t‚che & (de 1 ‡ 5)\\
+\_priority & int 8 & Priorit√© de la t√¢che & (de 1 √† 5)\\
 \hline
-\_status & varchar 32 & Etat de la t‚che & \\
+\_status & varchar 32 & Etat de la t√¢che & \\
 \hline
 \_webpage & varchar 255 & Date de fin de projet & \\
 \hline
@@ -56,29 +56,29 @@ Table principale des informations d'une t‚che planifiÈe .\\
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \todo, avec le droit d'accËs requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \todo, avec le droit d'acc√®s requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{IntitulÈ} & \textbf{Droit} & \textbf{Description} \\
+ \textbf{Intitul√©} & \textbf{Droit} & \textbf{Description} \\
  \hline
-  index & read & (DÈfaut) formulaire de recherche des t‚ches planifiÈes. \\ 
+  index & read & (D√©faut) formulaire de recherche des t√¢ches planifi√©es. \\ 
  \hline
-  detailconsult & read & Fiche dÈtail d'une t‚che planifiÈe. \\
+  detailconsult & read & Fiche d√©tail d'une t√¢che planifi√©e. \\
  \hline
-  detailupdate & write & Formulaire de modification d'une t‚che planifiÈe. \\
+  detailupdate & write & Formulaire de modification d'une t√¢che planifi√©e. \\
  \hline
-  insert & write & Insertion d'une t‚che planifiÈe. \\
+  insert & write & Insertion d'une t√¢che planifi√©e. \\
  \hline
-  update & write & Mise ‡ jour d'une t‚che planifiÈe. \\
+  update & write & Mise √† jour d'une t√¢che planifi√©e. \\
  \hline
-  delete & write & Suppression d'une t‚che planifiÈe. \\
+  delete & write & Suppression d'une t√¢che planifi√©e. \\
  \hline
-  dispref\_display & read &  Modification de l'affichage d'un ÈlÈment.\\
+  dispref\_display & read &  Modification de l'affichage d'un √©l√©ment.\\
  \hline
-  display & read & Ecran de modification des prÈfÈrences d'affichage. \\
+  display & read & Ecran de modification des pr√©f√©rences d'affichage. \\
  \hline
-  dispref\_level & read & Modification de l'ordre d'affichage d'un ÈlÈment. \\
+  dispref\_level & read & Modification de l'ordre d'affichage d'un √©l√©ment. \\
  \hline
   delete\_unique & write &  \\
  \hline

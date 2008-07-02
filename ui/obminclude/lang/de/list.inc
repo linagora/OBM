@@ -10,15 +10,15 @@
 
 $l_list_subject = "Betreff";
 $l_list_insert = "speichern";
-$l_name_list_empty = "Der Listenname muß eingegeben werden";
-$l_name_list_nomatch = "ungültiger Listenname";
-$l_subject_list_empty = "Betreff muß eingegeben werden";
+$l_name_list_empty = "Der Listenname muÃŸ eingegeben werden";
+$l_name_list_nomatch = "ungÃ¼ltiger Listenname";
+$l_subject_list_empty = "Betreff muÃŸ eingegeben werden";
 $l_list_exists = "Mailliste existiert bereits";
 $l_list = "Mailliste";
 
 $l_yes = "ja";
 $l_no = "nein";
-$l_change_auth = "Ändern Berechtigung";
+$l_change_auth = "Ã„ndern Berechtigung";
 
 $l_list_name_short = "Name";
 $l_list_contact = "Kontakt";
@@ -26,8 +26,8 @@ $l_no_list = "Keine Mailliste gefunden";
 $l_no_contact_found = "Kein Kontakt gefunden";
 $l_list_found = "Maillisten gefunden";
 
-$l_add_contact = "Kontakt einfügen";
-$l_del_contact = "Kontakt löschen";
+$l_add_contact = "Kontakt einfÃ¼gen";
+$l_del_contact = "Kontakt lÃ¶schen";
 $l_new_contact1 = "NK";
 $l_list_contact1 = "K";
 $l_list_infos = "Maillisten-Information";

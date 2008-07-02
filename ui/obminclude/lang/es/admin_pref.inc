@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Espa駉l                                                  //
+// OBM - Language : Espa帽ol                                                  //
 //     - File     : admin_pref.inc                                           //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -9,14 +9,14 @@
 
 // labels
 $l_user_pref = "Preferencias de Usuarios";
-$l_user_pref_reset = "Colocar valores por omisi髇 en las preferencias de todos los usuarios";
-$l_user_pref_update_one = "Cambie el valor por omisi髇 de la opci髇 seleccionada" ;
+$l_user_pref_reset = "Colocar valores por omisi贸n en las preferencias de todos los usuarios";
+$l_user_pref_update_one = "Cambie el valor por omisi贸n de la opci贸n seleccionada" ;
 
 // Actions
-$l_execute = "Ejecute Acci髇";
+$l_execute = "Ejecute Acci贸n";
 $l_help = "Ayuda";
 
 // Messages (+ javascript)
 $l_update_ok = "Preferencias actualizadas exitosamente";
-$l_update_error = "Actualizaci髇 de preferencias ha fallado !";
-$l_reset_ok = "Preferencias actualizadas a los valores por omisi髇";
+$l_update_error = "Actualizaci贸n de preferencias ha fallado !";
+$l_reset_ok = "Preferencias actualizadas a los valores por omisi贸n";

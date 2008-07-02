@@ -1,6 +1,6 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Español                                                  //
+// OBM - Language : EspaÃ±ol                                                  //
 //     - File     : admin_lang.inc                                           //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////

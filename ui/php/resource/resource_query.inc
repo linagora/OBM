@@ -147,8 +147,7 @@ function run_query_resource_ext_search($resource) {
     WHERE 
       resource_name LIKE '$pattern%' 
       $multidomain
-      $where_restriction
-    ORDER BY resource_name";
+      $where_restriction";
 
   display_debug_msg($query, $cdg_sql, 'run_query_resource_ext_search()');
   $obm_q->query($query);

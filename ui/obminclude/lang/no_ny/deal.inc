@@ -31,7 +31,7 @@ $l_amount = "Sum";
 $l_contacts = "Kontaktar";
 $l_company = "Firma";
 $l_date_init = "Startdato";
-$l_deal_select_company = "Velg firma det skal inngås avtale med.";
+$l_deal_select_company = "Velg firma det skal inngÃ¥s avtale med.";
 $l_number_deal="Number";
 $l_type_manage = "Deal Kind Management";
 $l_type_exist = "Existing Kinds";
@@ -79,9 +79,9 @@ $l_status_insert = "Insert State";
 // Messages
 $l_updateaffect_ok = "The deal has been successfully affected to a parentdeal";
 $l_error_visibility = "You can't consult this page : the information is private.";
-$l_no_display = "Skriv inn søkekriteria og trykk < Finn > for å finne avtalane";
+$l_no_display = "Skriv inn sÃ¸kekriteria og trykk < Finn > for Ã¥ finne avtalane";
 $l_found = "found (to translate) !";
-$l_no_found = "Ingen avtalar som passa til søket !";
+$l_no_found = "Ingen avtalar som passa til sÃ¸ket !";
 $l_archive_ok = "Arkivet er oppdatert.";
 $l_archive_error = "Arkivet kunne ikkje oppdaterast.";
 $l_archive_number = "avtaler lagt til i arkivet.";
@@ -93,9 +93,9 @@ $l_error_permission = "You have not the rights to access this page.";
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_parentdeal = "\\n You have to select a parentdeal before submitting.";
-$l_fill_label = "\\n Du må fylle inn namn før du legg inn.";
+$l_fill_label = "\\n Du mÃ¥ fylle inn namn fÃ¸r du legg inn.";
 $l_fill_number = "\\n You have to fill the Number before submitting.";
-$l_fill_date = "\\n Du må fylle inn dato før du legg inn.";
+$l_fill_date = "\\n Du mÃ¥ fylle inn dato fÃ¸r du legg inn.";
 $l_invalid_date = "Ugyldig datoformat (MM/DD/YYYY eller YYYY-MM-DD).";
 $l_delete_confirm = "Slette avtale?";
 

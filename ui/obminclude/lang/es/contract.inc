@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Espa駉l                                                  //
+// OBM - Language : Espa帽ol                                                  //
 //     - File     : contract.inc                                             //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,44 +16,44 @@ $l_incident_list = "Incidentes";
 $l_incident_new = "Nuevo";
 $l_ccf_period = "Periodo";
 $l_ccf_ticket = "Tiquetes";
-$l_ccf_duration = "Duraci髇";
+$l_ccf_duration = "Duraci贸n";
 $l_signature = "Firma";
-$l_exp = "Expiraci髇";
-$l_renew = "Renovaci髇";
-$l_date_cancel = "Cancelaci髇";
-$l_autorenewal =" Renovaci髇 Autom醫ica";
+$l_exp = "Expiraci贸n";
+$l_renew = "Renovaci贸n";
+$l_date_cancel = "Cancelaci贸n";
+$l_autorenewal =" Renovaci贸n Autom谩tica";
 $l_priority = "Prioridad";
 $l_type = "Tipo";
-$l_pri_manage = "Administraci髇 de Prioridad de Contratos";
+$l_pri_manage = "Administraci贸n de Prioridad de Contratos";
 $l_pri_exist = "Prioridades Existentes";
 $l_pri_new = "Nueva Prioridad";
-$l_sta_manage = "Administraci髇 de Estado de Contrato";
+$l_sta_manage = "Administraci贸n de Estado de Contrato";
 $l_sta_exist = "Estado Existente";
 $l_sta_new = "Nuevo Estado";
 
 $l_ticket_nb = "# Tiquetes";
 $l_total_ticket ="Tiquetes usados";
 $l_disp_ticket = "Tiquetes disponibles";
-$l_ticket_final = "趌timo"; 
-$l_duration_used ="Duraci髇 usada (h)";
-$l_duration = "Duraci髇 Soporte (h)";
+$l_ticket_final = "脷ltimo"; 
+$l_duration_used ="Duraci贸n usada (h)";
+$l_duration = "Duraci贸n Soporte (h)";
 $l_cck_customer = "Cliente";
 $l_cck_supplier = "Proveedor";
 $l_contract_kind = "Tipo de Contrato";
 $l_contract_select_deal = "Seleccione el Negocio.";
 $l_label_libelle = "Palabra clave de la etiqueta";
-$l_renewalkind = "Tipo de Renovaci髇";
+$l_renewalkind = "Tipo de Renovaci贸n";
 $l_marketing_manager = "Gerente Mercadeo";
-$l_technical_manager = "Gerente T閏nico";
+$l_technical_manager = "Gerente T茅cnico";
 $l_client_manager = "Gerente de Cuenta";
-$l_clause = "Cl醬sula";
+$l_clause = "Cl谩usula";
 $l_company_town = "ciudad";
-$l_company_zipcode = "c骴igo de 醨ea";
-$l_company_expresspostalcode = "c骴igo postal express";
-$l_company_phonenumber = "n鷐ero telef髇ico";
-$l_company_fax = "n鷐ero fax";
-$l_company_web = "direcci髇 web";
-$l_company_email = "correo electr髇ico";
+$l_company_zipcode = "c贸digo de 谩rea";
+$l_company_expresspostalcode = "c贸digo postal express";
+$l_company_phonenumber = "n煤mero telef贸nico";
+$l_company_fax = "n煤mero fax";
+$l_company_web = "direcci贸n web";
+$l_company_email = "correo electr贸nico";
 
 // Actions
 $l_pri_update = "Actualizar Prioridad";
@@ -67,13 +67,13 @@ $l_sta_insert = "Ingresar estado";
 $l_insert = "Ingresar contrato";
 $l_update = "Actualizar contrato";
 $l_delete = "Borrar contrato";
-$l_select_company = "Seleccione compa耥a";
+$l_select_company = "Seleccione compa帽铆a";
 $l_select_contract = "Seleccione el Contrato.";
 
 // Messages
-$l_no_display = "Llene los campos de b鷖queda y presione < Buscar > para obtener los contratos";
+$l_no_display = "Llene los campos de b煤squeda y presione < Buscar > para obtener los contratos";
 $l_found = "contratos encontrados.";
-$l_no_found = "No hay contratos que coincidan con la b鷖queda !";
+$l_no_found = "No hay contratos que coincidan con la b煤squeda !";
 $l_pri_can_delete = "La Prioridad puede ser borrada";
 $l_pri_cant_delete = "La Prioridad NO puede ser borrada";
 $l_pri_link_contract = "La Prioridad esta referenciado por estos incidentes";
@@ -97,18 +97,18 @@ $l_type_can_delete = "EL tipo puede ser borrado.";
 $l_type_cant_delete = "El Tipo NO puede ser borrado !";
 $l_type_link_contract = "El tipo esta involucrado en estos contratos";
 $l_err_label_empty = "Tiene que llenar el nombre !";
-$l_err_duration_empty = "Ud. debe llenar la duraci髇 del Soporte !";
-$l_err_ticket_empty = "Ud. debe llenar el n鷐ero del Tiquete!";
+$l_err_duration_empty = "Ud. debe llenar la duraci贸n del Soporte !";
+$l_err_ticket_empty = "Ud. debe llenar el n煤mero del Tiquete!";
 $l_check_samecontract = "Estos contratos lucen similares a esta nueva entrada !";
-$l_err_daterenew = "Fecha de renovaci髇 no es v醠ida !";
-$l_err_datecancel = "Fecha de cancelaci髇 no es v醠ida !";
-$l_err_date = "Fecha inicial es posterior a la fecha de expiraci髇 !";
+$l_err_daterenew = "Fecha de renovaci贸n no es v谩lida !";
+$l_err_datecancel = "Fecha de cancelaci贸n no es v谩lida !";
+$l_err_date = "Fecha inicial es posterior a la fecha de expiraci贸n !";
 
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_j_select_contract = "Debe generar un contrato !";
 $l_j_type_delete = "Debe seleccionar el tipo a borrar !";
-$l_j_type_update = "Debe seleccionar un Tipo e ingresar la modificaci髇 a enviar !"; 
+$l_j_type_update = "Debe seleccionar un Tipo e ingresar la modificaci贸n a enviar !"; 
 $l_j_type_create = "Debe ingresar el nombre del nuevo tipo a crear !";
 $l_delete_confirm = "Realmente desea borrar el Contrato ?";
 

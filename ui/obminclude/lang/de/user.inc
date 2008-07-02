@@ -23,24 +23,24 @@ $l_perms_admin = "Administrator";
 $l_user = "Benutzer";
 $l_user_detail = "Benutzer-Daten";
 $l_user_new = "Neuer Benutzer";
-$l_user_insert = "Benutzer einfügen";
-$l_user_update = "Benutzer ändern";
-$l_user_delete = "Benutzer löschen";
+$l_user_insert = "Benutzer einfÃ¼gen";
+$l_user_update = "Benutzer Ã¤ndern";
+$l_user_delete = "Benutzer lÃ¶schen";
 $l_delete_userobmphoto = "Delete user's photo";
 
 // Actions
 $l_insert = "anlegen Benutzer";
-$l_update = "ändern Benutzer";
-$l_delete = "löschen Benutzer";
+$l_update = "Ã¤ndern Benutzer";
+$l_delete = "lÃ¶schen Benutzer";
 
 // Messages
 $l_found = "Benutzer gefunden";
 $l_no_found = "No user found matching the query !";
 
 $l_exist_error = "bereits vorhanden";
-$l_login_error = "ungültiger Benutzername!";
-$l_password_error = "ungültiges Passwort!";
-$l_email_error = "ungültige E-Mail-Adresse";
+$l_login_error = "ungÃ¼ltiger Benutzername!";
+$l_password_error = "ungÃ¼ltiges Passwort!";
+$l_email_error = "ungÃ¼ltige E-Mail-Adresse";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
 $l_fill_login = "\\n You have to fill the login before submitting.";

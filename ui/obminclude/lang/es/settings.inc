@@ -1,28 +1,28 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Español                                                  //
+// OBM - Language : EspaÃ±ol                                                  //
 //     - File     : settings.inc                                             //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_cur_settings = "Su configuración actual";
-$l_auto_display = "Despliegue automático de listas";
+$l_cur_settings = "Su configuraciÃ³n actual";
+$l_auto_display = "Despliegue automÃ¡tico de listas";
 $l_cur_lang = "Idioma actual";
 $l_cur_theme = "Tema actual";
-$l_new_settings = "Para cambiar su configuración, seleccione aqui los nuevos parámetros";
+$l_new_settings = "Para cambiar su configuraciÃ³n, seleccione aqui los nuevos parÃ¡metros";
 $l_set_lang = "Seleccione Idioma";
 $l_set_theme = "Seleccione Tema";
 $l_set_menu = "Despliegue de Menu";
-$l_set_rows = "# Filas por página";
+$l_set_rows = "# Filas por pÃ¡gina";
 $l_set_todo = "Orden de las Tareas por realizar";
 $l_set_date = "Formato de Fecha";
 $l_set_commentorder = "Despliegue de Comentario";
 $l_set_cal_interval = "Intervalo de Agenda";
 $l_set_csv_sep = "Separador para exportar CSV";
-$l_set_debug = "Nivel de depuración";
-$l_send_mail = "Acceptar correos electrónicos";
+$l_set_debug = "Nivel de depuraciÃ³n";
+$l_send_mail = "Acceptar correos electrÃ³nicos";
 
 $l_update_ok = "Opciones actualizadas exitosamente";
 
@@ -40,11 +40,11 @@ $l_deadline = "fecha limite";
 
 // Menus
 $l_me_txt = "texto";
-$l_me_ico = "ícono";
-$l_me_both = "texto+ícono";
+$l_me_ico = "Ã­cono";
+$l_me_both = "texto+Ã­cono";
 
 // Comment order
-$l_co_chro = "Cronológicamente";
+$l_co_chro = "CronolÃ³gicamente";
 $l_co_rev = "Inverso";
 
 // CSV Separators

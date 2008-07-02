@@ -3,34 +3,34 @@
 % $Id$
 
 
-\subsection{Gestion des droits ACL sur les entités}
+\subsection{Gestion des droits ACL sur les entitÃ©s}
 \label{acl}
 
-La gestion des droits standards permet de donner les droits sur une action d'un module (créer un rdv). Cependant elle ne permet pas de spécifier des droits particuliers sur une entité identifiée (La société Aliacom, le calendrier d'un utilisateur, une ressource,...). 
+La gestion des droits standards permet de donner les droits sur une action d'un module (crÃ©er un rdv). Cependant elle ne permet pas de spÃ©cifier des droits particuliers sur une entitÃ© identifiÃ©e (La sociÃ©tÃ© Aliacom, le calendrier d'un utilisateur, une ressource,...). 
 
-La gestion des droits ACL est le mécanisme qui complète la gestion des droits standard en ajoutant la posibilité de définir des droits sur une entité identifiée (Définir qui peut consulter le calendrier de l'utilisateur, une ressource,...).
+La gestion des droits ACL est le mÃ©canisme qui complÃ¨te la gestion des droits standard en ajoutant la posibilitÃ© de dÃ©finir des droits sur une entitÃ© identifiÃ©e (DÃ©finir qui peut consulter le calendrier de l'utilisateur, une ressource,...).
 
-La définition des droits sur une entité précise correspond au principe d'ACL (liste de contrôle d'accès).
-Il s'agit de définir les listes d'utilisateurs qui ont le droit de lire ou de modifier l'entité.\\
+La dÃ©finition des droits sur une entitÃ© prÃ©cise correspond au principe d'ACL (liste de contrÃ´le d'accÃ¨s).
+Il s'agit de dÃ©finir les listes d'utilisateurs qui ont le droit de lire ou de modifier l'entitÃ©.\\
 
-L'implémentation de la gestion des droits ACL a été effectuée avec les objectifs suivants :\\
+L'implÃ©mentation de la gestion des droits ACL a Ã©tÃ© effectuÃ©e avec les objectifs suivants :\\
 \begin{itemize}
-\item Système générique : stockage commun des ACL ou droits indépendant du type d'entité
-\item API commune (interrogations base de données, affichage,...)
-\item Solution évolutive
+\item SystÃ¨me gÃ©nÃ©rique : stockage commun des ACL ou droits indÃ©pendant du type d'entitÃ©
+\item API commune (interrogations base de donnÃ©es, affichage,...)
+\item Solution Ã©volutive
 \end{itemize}
 \vspace{0.3cm}
 
-Les fonctionalités d'ACL sont fournies par le fichier \fichier{of/of\_acl.tex}
+Les fonctionalitÃ©s d'ACL sont fournies par le fichier \fichier{of/of\_acl.tex}
 
 \begin{itemize}
-\item Une entité peut être définie publique en lecture ou se voir définir une liste de consommateurs (utilisateurs) en lecture
-\item Une entité peut être définie publique en écriture ou se voir définir une liste de consommateurs (utilisateurs) en écriture
-\item Le type de consommateur groupe n'est pas implémenté (1.0) mais prévu et possible
+\item Une entitÃ© peut Ãªtre dÃ©finie publique en lecture ou se voir dÃ©finir une liste de consommateurs (utilisateurs) en lecture
+\item Une entitÃ© peut Ãªtre dÃ©finie publique en Ã©criture ou se voir dÃ©finir une liste de consommateurs (utilisateurs) en Ã©criture
+\item Le type de consommateur groupe n'est pas implÃ©mentÃ© (1.0) mais prÃ©vu et possible
 \end{itemize}
 
 
-\subsubsection{Modèle de stockage : table EntityRight}
+\subsubsection{ModÃ¨le de stockage : table EntityRight}
 
 Table des informations des ACL.\\
 
@@ -38,49 +38,49 @@ Table des informations des ACL.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_entity & varchar 32 & Nom de l'entité & ``calendar'', ``resource'' \\
+\_entity & varchar 32 & Nom de l'entitÃ© & ``calendar'', ``resource'' \\
 \hline
-\_entity\_id & int 8 & Id de l'entité & \\
+\_entity\_id & int 8 & Id de l'entitÃ© & \\
 \hline
-\_consumer & varchar 32 & Type du consommateur & `user'' ou ``group'' (non implémenté); a qui sont attribués les droits \\
+\_consumer & varchar 32 & Type du consommateur & `user'' ou ``group'' (non implÃ©mentÃ©); a qui sont attribuÃ©s les droits \\
 \hline
 \_consumer\_id & int 8 & Id du consommateur & (si 0, alors public)\\
 \hline
 \_read & int 8 & Droit de lecture (1=Oui) & \\
 \hline
-\_write & int 8 & Droit d'écriture & \\
+\_write & int 8 & Droit d'Ã©criture & \\
 \hline
 \end{tabular}
 
-\paragraph{Définition de droits publics} : La cible public est définie par la valeur 0 dans le champs consumer\_id. Dans ce cas le champ type de consommateur (\_consumer) n'a plus de signification.
+\paragraph{DÃ©finition de droits publics} : La cible public est dÃ©finie par la valeur 0 dans le champs consumer\_id. Dans ce cas le champ type de consommateur (\_consumer) n'a plus de signification.
 
-\paragraph{Accumulation et droits publics} : Si la cible public est positionnée pour les droit de lecture d'une entité, cela prime sur toute autre règle.
-Si pour une entité la cible public est positionnée en lecture mais propose un ``0'' en écriture dans la ligne, cette ligne est neutre pour la définition des droits en écriture. Le droit d'écriture pour la personne sera valable si une autre ACL le précise.
+\paragraph{Accumulation et droits publics} : Si la cible public est positionnÃ©e pour les droit de lecture d'une entitÃ©, cela prime sur toute autre rÃ¨gle.
+Si pour une entitÃ© la cible public est positionnÃ©e en lecture mais propose un ``0'' en Ã©criture dans la ligne, cette ligne est neutre pour la dÃ©finition des droits en Ã©criture. Le droit d'Ã©criture pour la personne sera valable si une autre ACL le prÃ©cise.
 
-En résumé, si l'indicateur public est positionné sur un droit, il définit ce droit; s'il n'est pas positionné, il n'influe pas sur le droit qui sera le résultat des autres acl.
+En rÃ©sumÃ©, si l'indicateur public est positionnÃ© sur un droit, il dÃ©finit ce droit; s'il n'est pas positionnÃ©, il n'influe pas sur le droit qui sera le rÃ©sultat des autres acl.
 
-\paragraph{Indexs} : Pour des raisons de performance, les 4 champs (entity, entity\_id, consumer et consuler\_id) sont indexés.
+\paragraph{Indexs} : Pour des raisons de performance, les 4 champs (entity, entity\_id, consumer et consuler\_id) sont indexÃ©s.
 
 
-\subsubsection{Type d'entité et consommateur définis}
+\subsubsection{Type d'entitÃ© et consommateur dÃ©finis}
 
-Types d'entités définis (version 2.0) :\\
+Types d'entitÃ©s dÃ©finis (version 2.0) :\\
 \begin{itemize}
 \item \textbf{calendar} : calendrier d'un utilisateur (entity\_id est l'id d'un utilisateur)
 \item \textbf{resource} : Ressource
-\item \textbf{mailshare} : Boîte aux lettres partagée
-\item \textbf{mailbox} : Partage de sa propre boîte aux lettres
+\item \textbf{mailshare} : BoÃ®te aux lettres partagÃ©e
+\item \textbf{mailbox} : Partage de sa propre boÃ®te aux lettres
 \end{itemize}
 \vspace{0.3cm}
 
-Types de consommateurs définis (version 2.0) :\\
+Types de consommateurs dÃ©finis (version 2.0) :\\
 \begin{itemize}
 \item \textbf{user} : Utilisateurs
-\item \textbf{group} : Groupe (Non implémenté encore)
+\item \textbf{group} : Groupe (Non implÃ©mentÃ© encore)
 \end{itemize}
 
 
-\subsubsection{Implémentation : API fonctions publiques}
+\subsubsection{ImplÃ©mentation : API fonctions publiques}
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -90,9 +90,9 @@ $right="read", $ids_set="", $real_entity="") {
 \end{verbatim}
 \end{minipage}
 }
-Récupération des entités du type \$entity dont le consommateur \$consumer\_id de type \$consumer a le droit \$right.
-Le résultat peut être restreint à un sous ensemble et(\$ids\_set).
-Pour les entités ``virtuelles'' (n'ayant pas de d'objet propre, comme les calendriers ou les mailbox), le paramètre optionnel \$real\_entity doit être renseigné afin de permettre la génération de requètes correctes (pour les entités calendar et mailbox, l'entité réelle est ``userobm'').
+RÃ©cupÃ©ration des entitÃ©s du type \$entity dont le consommateur \$consumer\_id de type \$consumer a le droit \$right.
+Le rÃ©sultat peut Ãªtre restreint Ã  un sous ensemble et(\$ids\_set).
+Pour les entitÃ©s ``virtuelles'' (n'ayant pas de d'objet propre, comme les calendriers ou les mailbox), le paramÃ¨tre optionnel \$real\_entity doit Ãªtre renseignÃ© afin de permettre la gÃ©nÃ©ration de requÃ¨tes correctes (pour les entitÃ©s calendar et mailbox, l'entitÃ© rÃ©elle est ``userobm'').
 Exemple: Liste des agendas visibles par l'utilisateur pierre, liste restreinte aux membres du groupe commercial.\\
 
 
@@ -104,7 +104,7 @@ $right="read") {
 \end{verbatim}
 \end{minipage}
 }
-Récupération des consommateurs du type \$consumer qui ont le droit \$right sur l'entité \$entity\_id de type \$entity.\\
+RÃ©cupÃ©ration des consommateurs du type \$consumer qui ont le droit \$right sur l'entitÃ© \$entity\_id de type \$entity.\\
 Exemple: Liste des utilisateurs qui ont le droit de voir l'agenda d'un utilisateur.\\
 
 \shadowbox{
@@ -114,8 +114,8 @@ function of_right_dis_admin($entity, $entity_id, $real_entity="") {
 \end{verbatim}
 \end{minipage}
 }
-Fonction d'affichage de l'écran de modification des droits pour l'entité \$entity\_id du type \$entity.
-Renseigner l'entité réelle (\$real\_entity) pour les entités n'ayant pas d'objet propre, comme les entités calendar et mailbox.\\
+Fonction d'affichage de l'Ã©cran de modification des droits pour l'entitÃ© \$entity\_id du type \$entity.
+Renseigner l'entitÃ© rÃ©elle (\$real\_entity) pour les entitÃ©s n'ayant pas d'objet propre, comme les entitÃ©s calendar et mailbox.\\
 
 
 \shadowbox{
@@ -125,5 +125,5 @@ function of_right_update_right($param, $entity, $real_entity="") {
 \end{verbatim}
 \end{minipage}
 }
-Fonction de mise à jour des droits en base de données.
-Renseigner l'entité réelle (\$real\_entity) pour les entités n'ayant pas d'objet propre, comme les entités calendar et mailbox.\\
+Fonction de mise Ã  jour des droits en base de donnÃ©es.
+Renseigner l'entitÃ© rÃ©elle (\$real\_entity) pour les entitÃ©s n'ayant pas d'objet propre, comme les entitÃ©s calendar et mailbox.\\

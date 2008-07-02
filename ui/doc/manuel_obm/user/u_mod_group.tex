@@ -5,18 +5,18 @@
 \clearpage
 \section{Le module \group}
 
-\subsection{Présentation du module \group}
+\subsection{PrÃ©sentation du module \group}
 
 Ce module est une gestion de groupes d'utilisateurs.
-Il permet de créer des groupes d'utilisateurs qui seront utilisés par d'autres modules comme l'agenda, ou lorsque \obm est couplé à \aliamin comme listes de diffusions ou groupes d'utilisateurs de domaine Windows\\
+Il permet de crÃ©er des groupes d'utilisateurs qui seront utilisÃ©s par d'autres modules comme l'agenda, ou lorsque \obm est couplÃ© Ã  \aliamin comme listes de diffusions ou groupes d'utilisateurs de domaine Windows\\
 
-Les groupes peuvent être privés à un utilisateur ou public.
+Les groupes peuvent Ãªtre privÃ©s Ã  un utilisateur ou public.
 
-Un groupe est constitué d'un ensemble de personnes et/ou de groupes (les groupes sont récursifs).\\
+Un groupe est constituÃ© d'un ensemble de personnes et/ou de groupes (les groupes sont rÃ©cursifs).\\
 
-\obm gère la notion de groupes locaux (spécifiques à \obm) ou externes pour faciliter les imports ou synchronisations avec d'autres bases utilisateurs / groupes.\\
+\obm gÃ¨re la notion de groupes locaux (spÃ©cifiques Ã  \obm) ou externes pour faciliter les imports ou synchronisations avec d'autres bases utilisateurs / groupes.\\
 
-Ce module comporte une composante unique : l'entité Groupe.
+Ce module comporte une composante unique : l'entitÃ© Groupe.
 
 
 \subsection{Description d'un groupe}
@@ -29,11 +29,11 @@ Composantes d'un groupe :\\
 \hline
 Nom & Nom du groupe \\
 \hline
-Système & Un groupe système est défini à l'installation ou intégration d'\obm et ne peut être supprimé (ex: le groupe Production). Ces groupes sont utilisés par différents modules d'\obm et sont nécessaires pour le bon fonctionnement de l'aplication. Par défaut \obm définit 3 groupes système (Administration, Commercial et Production).\\
+SystÃ¨me & Un groupe systÃ¨me est dÃ©fini Ã  l'installation ou intÃ©gration d'\obm et ne peut Ãªtre supprimÃ© (ex: le groupe Production). Ces groupes sont utilisÃ©s par diffÃ©rents modules d'\obm et sont nÃ©cessaires pour le bon fonctionnement de l'aplication. Par dÃ©faut \obm dÃ©finit 3 groupes systÃ¨me (Administration, Commercial et Production).\\
 \hline
-Privée & Visibilité du groupe qui peut être public ou privé. Un groupe privé n'est visible (et donc modifiable) que par son créateur. Un groupe public n'est supprimable que par son créateur.\\
+PrivÃ©e & VisibilitÃ© du groupe qui peut Ãªtre public ou privÃ©. Un groupe privÃ© n'est visible (et donc modifiable) que par son crÃ©ateur. Un groupe public n'est supprimable que par son crÃ©ateur.\\
 \hline
-Local & Indique si un groupe est local (spécifique à \obm et non issu d'un imort / export par exemple).\\
+Local & Indique si un groupe est local (spÃ©cifique Ã  \obm et non issu d'un imort / export par exemple).\\
 \hline
 Ext\_id & Identifiant externe pour un groupe externe.\\
 \hline
@@ -41,14 +41,14 @@ Description & Description du groupe.\\
 \hline
 E-mail & Adresse e-mail du groupe, utile pour utilisation en tant que liste de diffusion.\\
 \hline
-Utilisateurs membres & Utilisateurs associés au groupe.\\
+Utilisateurs membres & Utilisateurs associÃ©s au groupe.\\
 \hline
-Groupes membres & Groupes associés ou membres du groupe.\\
+Groupes membres & Groupes associÃ©s ou membres du groupe.\\
 \hline
 \end{tabular}
 
 
-\subsection{La gestion des groupes privés}
+\subsection{La gestion des groupes privÃ©s}
 \label{u_group_priv}
 
 \obm supporte 2 types de groupes :\\
@@ -57,46 +57,46 @@ Groupes membres & Groupes associés ou membres du groupe.\\
 \hline
 \textbf{Type} & \textbf{Description} \\
 \hline
-Public & Groupe visible par tous les utilisateurs. Seul le créateur du groupe a le droit de supprimer le groupe.\\
+Public & Groupe visible par tous les utilisateurs. Seul le crÃ©ateur du groupe a le droit de supprimer le groupe.\\
 \hline
-Privé & Groupe personnel, visible, modifiable et supprimable uniquement par son créateur.\\
+PrivÃ© & Groupe personnel, visible, modifiable et supprimable uniquement par son crÃ©ateur.\\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-La notion de groupe privé implique que plusieurs groupes peuvent avoir le même nom selon les règles suivantes :\\
+La notion de groupe privÃ© implique que plusieurs groupes peuvent avoir le mÃªme nom selon les rÃ¨gles suivantes :\\
 
 \begin{tabular}{|p{8cm}|p{5cm}|}
 \hline
-\textbf{Groupes} & \textbf{Même nom possible} \\
+\textbf{Groupes} & \textbf{MÃªme nom possible} \\
 \hline
 2 groupes publics & Non.\\
 \hline
-1 groupe public et 1 groupe privé & Non.\\
+1 groupe public et 1 groupe privÃ© & Non.\\
 \hline
-2 groupes privés & Oui.\\
+2 groupes privÃ©s & Oui.\\
 \hline
 \end{tabular}
 
 
 \subsection{Les groupes locaux}
 
-\obm supporte 2 portées de groupes :\\
+\obm supporte 2 portÃ©es de groupes :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Portée} & \textbf{Description} \\
+\textbf{PortÃ©e} & \textbf{Description} \\
 \hline
-Local & Le groupe a été créé depuis OBM ou n'est destiné qu'à \obm.\\
+Local & Le groupe a Ã©tÃ© crÃ©Ã© depuis OBM ou n'est destinÃ© qu'Ã  \obm.\\
 \hline
-Externe & Le groupe provient sans doute d'une source externe (import d'une autre application, annuaire LDAP,..). Le champ Ext\_id est dans ce cas une aide ou référence à un identifiant de la source externe. Ceci permet de gérer par des imports / exports ne prenant en compte que les groupes externes, sans toucher aux groupes locaux.\\
+Externe & Le groupe provient sans doute d'une source externe (import d'une autre application, annuaire LDAP,..). Le champ Ext\_id est dans ce cas une aide ou rÃ©fÃ©rence Ã  un identifiant de la source externe. Ceci permet de gÃ©rer par des imports / exports ne prenant en compte que les groupes externes, sans toucher aux groupes locaux.\\
 \hline
 \end{tabular}
 
 
 \subsection{Les membres d'un groupe}
 
-Les groupes gérés par \obm sont récursifs, un groupe peut donc avoir simultanément comme membres :
+Les groupes gÃ©rÃ©s par \obm sont rÃ©cursifs, un groupe peut donc avoir simultanÃ©ment comme membres :
 \begin{itemize}
 \item Des utilisateurs
 \item Des groupes
@@ -111,15 +111,15 @@ Le module \group comporte 8 sous-menus :
 \hline
 \textbf{Nom} & \textbf{Action / Description} \\
 \hline
-Chercher & Recherche multicritères des groupes \\
+Chercher & Recherche multicritÃ¨res des groupes \\
 \hline
-Nouveau & Créer un nouveau groupe (local) \\
+Nouveau & CrÃ©er un nouveau groupe (local) \\
 \hline
 Consulter & Consulter les informations du groupe courant \\
 \hline
 Modifier & Modifier les informations du groupe courant\\
 \hline
-Supprimer & Vérifier les liens puis si besoin Supprimer un groupe\\
+Supprimer & VÃ©rifier les liens puis si besoin Supprimer un groupe\\
 \hline
 Ajouter Groupe & Permet d'ajouter des groupes au groupe\\
 \hline
@@ -132,25 +132,25 @@ Affichage & Personnalisation de l'affichage de la liste des groupes et des membr
 
 \subsubsection{Le sous-menu : Chercher}
 
-Ce menu permet d'effectuer une recherche selon différents critères :
+Ce menu permet d'effectuer une recherche selon diffÃ©rents critÃ¨res :
 
 \begin{itemize}
 \item Nom
 \item Utilisateur membre (Nom de l'utilisateur)
 \item E-mail
-\item Visibilitée ou accès
+\item VisibilitÃ©e ou accÃ¨s
 \end{itemize}
 
 
 \subsubsection{Le sous-menu : Nouveau}
 
-Ce menu permet de créer un nouveau groupe.
+Ce menu permet de crÃ©er un nouveau groupe.
 
-Un formulaire vierge de création propose la saisie des champs :
+Un formulaire vierge de crÃ©ation propose la saisie des champs :
 
 \begin{itemize}
 \item Nom (obligatoire),
-\item Indicateur de groupe privé,
+\item Indicateur de groupe privÃ©,
 \item Description,
 \item E-mail.
 \end{itemize}
@@ -163,37 +163,37 @@ Ce menu permet de retourner en mode consultation du groupe en cours.
 
 \subsubsection{Le sous-menu : Modifier}
 
-L'écran de modification affiche les informations du groupe courant dans un formulaire.
-Il est possible de modifier les informations suivantes, selon les contraintes de nommage et d'accès aux groupes :
+L'Ã©cran de modification affiche les informations du groupe courant dans un formulaire.
+Il est possible de modifier les informations suivantes, selon les contraintes de nommage et d'accÃ¨s aux groupes :
 
 \begin{itemize}
 \item Nom,
-\item Indicateur d'accès (public, privé),
+\item Indicateur d'accÃ¨s (public, privÃ©),
 \item Description,
 \item Email,
 \end{itemize}
 
-Pour valider les modifications effectuées il faut cliquer sur le bouton``valider les modifications''.
+Pour valider les modifications effectuÃ©es il faut cliquer sur le bouton``valider les modifications''.
 
 
 \subsubsection{Le sous-menu : Supprimer}
-Ce menu permet la suppression d'un groupe (selon les restrictions liées aux groupes système et l'accès aux groupex).
+Ce menu permet la suppression d'un groupe (selon les restrictions liÃ©es aux groupes systÃ¨me et l'accÃ¨s aux groupex).
 
 
 \subsubsection{Le sous-menu : Ajouter Utilisateur}
 
-Ce menu permet d'ajouter des utilisateurs à un groupe.
-Il ouvre une fenêtre qui permet de rechercher et sélectionner les utilisateurs à associer.
+Ce menu permet d'ajouter des utilisateurs Ã  un groupe.
+Il ouvre une fenÃªtre qui permet de rechercher et sÃ©lectionner les utilisateurs Ã  associer.
 
 
 \subsubsection{Le sous-menu : Ajouter Groupe}
 
-Ce menu permet d'ajouter des groupes à un groupe.
-Il ouvre une fenêtre qui permet de rechercher et sélectionner les groupes à associer.
+Ce menu permet d'ajouter des groupes Ã  un groupe.
+Il ouvre une fenÃªtre qui permet de rechercher et sÃ©lectionner les groupes Ã  associer.
 
-\paragraph{Note :} cette fenêtre est intelligente et ne propose pas d'associer à un groupe des groupes qui seraient parents du groupe cible.
+\paragraph{Note :} cette fenÃªtre est intelligente et ne propose pas d'associer Ã  un groupe des groupes qui seraient parents du groupe cible.
 
 
 \subsubsection{Le sous-menu : Affichage}
 
-Ce menu permet de paramétrer l'affichage de la liste des groupes et de la liste des utilisateurs membres. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
+Ce menu permet de paramÃ©trer l'affichage de la liste des groupes et de la liste des utilisateurs membres. Il est possible de choisir les champs Ã  afficher et de rÃ©gler leur ordre d'affichage.

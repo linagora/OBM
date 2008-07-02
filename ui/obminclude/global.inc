@@ -1310,11 +1310,6 @@ function get_global_params($table='') {
 
   foreach($parameters as $var => $value) {
 
-    // Ajax parameter
-    if (($parameters['ajax'] == 1 || $parameters['utf8'] == 1) && is_string($value)) {
-     // $value = utf8_decode($value);
-     $value = obm_utf8_decode($value);
-    }
     // Handle automatic checkbox (1,0) paramaters (cba_)
     $key = preg_replace("/^cba_/", '', $var);
     if ($key != $var) {

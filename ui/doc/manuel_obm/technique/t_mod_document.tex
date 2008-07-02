@@ -8,7 +8,7 @@
 
 Le module \doc \obm.
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
 Le module \doc utilise 5 tables :
 \begin{itemize}
@@ -26,29 +26,29 @@ Table principale des informations d'un document.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_title & varchar 255 & Titre du document & Description\\
 \hline
 \_name & varchar 255 & Nom du document & Nom du fichier\\
 \hline
-\_kind & int 8 & Type de document & (répertoire, fichier, lien)\\
+\_kind & int 8 & Type de document & (rÃ©pertoire, fichier, lien)\\
 \hline
 \_mymetype\_id & int 8 & Type Mime du fichier & \\
 \hline
-\_category1\_id & int 8 & Catégorie 1 &\\
+\_category1\_id & int 8 & CatÃ©gorie 1 &\\
 \hline
-\_category2\_id & int 8 & Catégorie 2 &\\
+\_category2\_id & int 8 & CatÃ©gorie 2 &\\
 \hline
-\_privacy & int 1 & Visibilité du Document & Voir aussi \_acl\\
+\_privacy & int 1 & VisibilitÃ© du Document & Voir aussi \_acl\\
 \hline
 \_size & int 15 & Taille du document & en octets \\
 \hline
@@ -56,7 +56,7 @@ Table principale des informations d'un document.\\
 \hline
 \_path & text (64k) & Chemin du document &\\
 \hline
-\_acl & text (64k) & Liste de contrôle d'accés &\\
+\_acl & text (64k) & Liste de contrÃ´le d'accÃ©s &\\
 \hline
 \end{tabular}
 
@@ -66,7 +66,7 @@ Table principale des informations d'un document.\\
 \hline
 \textbf{variable} & \textbf{valeur} & \textbf{Description}\\
 \hline
-\$cdoc\_kind\_dir & 0 & Répertoire \\
+\$cdoc\_kind\_dir & 0 & RÃ©pertoire \\
 \hline
 \$cdoc\_kind\_file & 1 & Fichier \\
 \hline
@@ -77,7 +77,7 @@ Table principale des informations d'un document.\\
 
 \subsection{DocumentEntity}
 
-Table de liaison entre les documents et différentes entités d'\obm.\\
+Table de liaison entre les documents et diffÃ©rentes entitÃ©s d'\obm.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
@@ -85,9 +85,9 @@ Table de liaison entre les documents et différentes entités d'\obm.\\
 \hline
 \_document\_id & int 8 & Identifiant du document & \\
 \hline
-\_entity\_id & int 8 & Identifiant de l'entité & \\
+\_entity\_id & int 8 & Identifiant de l'entitÃ© & \\
 \hline
-\_entity & varchar 255 & Entité (company, contact,...) & \\
+\_entity & varchar 255 & EntitÃ© (company, contact,...) & \\
 \hline
 \end{tabular}
 
@@ -99,15 +99,15 @@ Table des informations de types MIME.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
 \_label & varchar 255 & Label du type MIME & \\
 \hline
@@ -119,82 +119,82 @@ Table des informations de types MIME.\\
 
 
 \subsection{DocumentCategory1}
-Table des informations de catégorisation des documents :  category 1.
-Lien monovalué.\\
+Table des informations de catÃ©gorisation des documents :  category 1.
+Lien monovaluÃ©.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
-\_label & varchar 255 & Label de la catégorie & \\
+\_label & varchar 255 & Label de la catÃ©gorie & \\
 \hline
 \end{tabular}
 
 
 \subsection{DocumentCategory2}
-Table des informations de catégorisation des documents :  category 2.
-Lien monovalué.\\
+Table des informations de catÃ©gorisation des documents :  category 2.
+Lien monovaluÃ©.\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
-\_label & varchar 255 & Label de la catégorie & \\
+\_label & varchar 255 & Label de la catÃ©gorie & \\
 \hline
 \end{tabular}
 
 
-\subsection{Gestion du dépot de documents}
+\subsection{Gestion du dÃ©pot de documents}
 
 \subsubsection{Principe}
 
-Les informations d'un document sont stockées en base de données.
-Les documents eux-même sont stockés sur disque.\\
+Les informations d'un document sont stockÃ©es en base de donnÃ©es.
+Les documents eux-mÃªme sont stockÃ©s sur disque.\\
 
-\obm gère de façon autonome le dépôt de documents; \obm gère automatiquement :
+\obm gÃ¨re de faÃ§on autonome le dÃ©pÃ´t de documents; \obm gÃ¨re automatiquement :
 \begin{itemize}
 \item L'arborescence physique des documents
 \item Le nommage et l'emplacement des documents sur disque
 \end{itemize}
 \vspace{0.3cm}
 
-Ceci permêt d'éviter :
+Ceci permÃªt d'Ã©viter :
 \begin{itemize}
-\item Les problèmes de sécurité d'accès aux fichiers du serveur 
-\item Les problèmes de nommage des documents (jeux de caractères, caractères spéciaux,...) sur disque
+\item Les problÃ¨mes de sÃ©curitÃ© d'accÃ¨s aux fichiers du serveur 
+\item Les problÃ¨mes de nommage des documents (jeux de caractÃ¨res, caractÃ¨res spÃ©ciaux,...) sur disque
 \end{itemize}
 
 
-\subsubsection{Implémentation et gestion par défaut}
+\subsubsection{ImplÃ©mentation et gestion par dÃ©faut}
 
-La racine de l'arborescence des documents sur le serveur est spécifiée par le paramètre de configuration \variable{\$cdocument\_root}.\\
+La racine de l'arborescence des documents sur le serveur est spÃ©cifiÃ©e par le paramÃ¨tre de configuration \variable{\$cdocument\_root}.\\
 
-Par défaut \obm créé 9 répertoires nommés 1, 2, 3, 4, 5, 6, 7, 8 et 9 à la racine du dépôt de documents.
+Par dÃ©faut \obm crÃ©Ã© 9 rÃ©pertoires nommÃ©s 1, 2, 3, 4, 5, 6, 7, 8 et 9 Ã  la racine du dÃ©pÃ´t de documents.
 
-\paragraph{Le chemin d'un document} est calculé en fonction de l'id du document. Le dernier chiffre de l'identifiant du document définit le répertoire de stockage du document.
-Ceci permet de répartir les documents dans plusieurs réperoires.
+\paragraph{Le chemin d'un document} est calculÃ© en fonction de l'id du document. Le dernier chiffre de l'identifiant du document dÃ©finit le rÃ©pertoire de stockage du document.
+Ceci permet de rÃ©partir les documents dans plusieurs rÃ©peroires.
 
-\paragraph{Le nom d'un document} est égal à son id. Ceci évite tout problème de nommage des fichiers.
+\paragraph{Le nom d'un document} est Ã©gal Ã  son id. Ceci Ã©vite tout problÃ¨me de nommage des fichiers.
 
 \paragraph{Exemples} :
 \begin{tabular}{|l|c|l|}
@@ -210,22 +210,22 @@ Ceci permet de répartir les documents dans plusieurs réperoires.
 \end{tabular}
 
 
-\subsubsection{Outil de vérification de cohérence}
+\subsubsection{Outil de vÃ©rification de cohÃ©rence}
 
-\obm fournit un outil de vérification de cohérence entre la base de données et les fichiers dans le dépôt de documents.\\
+\obm fournit un outil de vÃ©rification de cohÃ©rence entre la base de donnÃ©es et les fichiers dans le dÃ©pÃ´t de documents.\\
 
-\textit{ADMINISTRATION -> Données -> action : show\_data, module document}.\\
+\textit{ADMINISTRATION -> DonnÃ©es -> action : show\_data, module document}.\\
 
-Cet Outil référence :
+Cet Outil rÃ©fÃ©rence :
 \begin{itemize}
-\item Les fichiers enregistrés en base de données et non présents sur disque
-\item Les fichiers présents sur disque sans correspondance en base de données
+\item Les fichiers enregistrÃ©s en base de donnÃ©es et non prÃ©sents sur disque
+\item Les fichiers prÃ©sents sur disque sans correspondance en base de donnÃ©es
 \end{itemize}
 
 
 \subsubsection{Modification du stockage des documents}
 
-\obm permet une modification simple de la gestion du dépôt des documents. Une fonction dédiée est utilisée pour calculer le chemin d'un fichier en fonction de son Id. Cette fonction est aisément modifiable.\\
+\obm permet une modification simple de la gestion du dÃ©pÃ´t des documents. Une fonction dÃ©diÃ©e est utilisÃ©e pour calculer le chemin d'un fichier en fonction de son Id. Cette fonction est aisÃ©ment modifiable.\\
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -234,20 +234,20 @@ function get_document_disk_path($id) {
 \end{verbatim}
 \end{minipage}
 }
-Fonction de calcul du chemin physique réel d'un document sur disque.\\
+Fonction de calcul du chemin physique rÃ©el d'un document sur disque.\\
 
-Il est par exemple possible de définir 99 répertoires initiaux (à la place des 9) pour mieux supporter de gros volumes de documents.
+Il est par exemple possible de dÃ©finir 99 rÃ©pertoires initiaux (Ã  la place des 9) pour mieux supporter de gros volumes de documents.
 
 
 \subsubsection{Gestion des liens}
 
-Les liens sont stockés uniquement en base de données sans stockage physique sur disque.
+Les liens sont stockÃ©s uniquement en base de donnÃ©es sans stockage physique sur disque.
 
 
 \subsection{Gestion des types MIME}
 
-A la création ou modification d'un document, le type MIME peut être sélectionné ou laissé par défaut.
-Si le type MIME est laissé par défaut, \obm essaie de déterminer automatiquement le type MIME associé au fichier.
+A la crÃ©ation ou modification d'un document, le type MIME peut Ãªtre sÃ©lectionnÃ© ou laissÃ© par dÃ©faut.
+Si le type MIME est laissÃ© par dÃ©faut, \obm essaie de dÃ©terminer automatiquement le type MIME associÃ© au fichier.
 
 Ceci s'effectue en fonction de l'extention du fichier par exemple.\\
 
@@ -258,96 +258,96 @@ function get_auto_mime_type($document) {
 \end{verbatim}
 \end{minipage}
 }
-Fonction de détermination automatique du type MIME d'un document.\\
+Fonction de dÃ©termination automatique du type MIME d'un document.\\
 
-Si aucun type MIME n'est déterminé (en fonction des types MIME enregistrés en base), le type MIME par défaut est sélectionné selon le paramètre de configuration \variable{\$default\_mime}.
+Si aucun type MIME n'est dÃ©terminÃ© (en fonction des types MIME enregistrÃ©s en base), le type MIME par dÃ©faut est sÃ©lectionnÃ© selon le paramÃ¨tre de configuration \variable{\$default\_mime}.
 
 
-\subsection{Paramètres de configuration du module \doc}
+\subsection{ParamÃ¨tres de configuration du module \doc}
 
 \begin{tabular}{|l|l|l|}
 \hline
-\textbf{Paramètre} & \textbf{par défaut} & \textbf{Description}\\
+\textbf{ParamÃ¨tre} & \textbf{par dÃ©faut} & \textbf{Description}\\
 \hline
-\$cdocument\_root & /var/www/obmdocuments & Racine du dépôt de document sur disque \\
+\$cdocument\_root & /var/www/obmdocuments & Racine du dÃ©pÃ´t de document sur disque \\
 \hline
-\$default\_mime & application/octet-stream & Type MIME par défaut d'un fichier quand non déterminé \\
+\$default\_mime & application/octet-stream & Type MIME par dÃ©faut d'un fichier quand non dÃ©terminÃ© \\
 \hline
 \end{tabular}
 
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \project, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \project, avec le droit d'accÃ¨s requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \textbf{IntitulÃ©} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & read & (Défaut) formulaire de recherche de documents. \\ 
+  index & read & (DÃ©faut) formulaire de recherche de documents. \\ 
  \hline
-  search & read & Résultat de recherche de documents. \\
+  search & read & RÃ©sultat de recherche de documents. \\
  \hline
-  new & write & Formulaire de création d'un document. \\
+  new & write & Formulaire de crÃ©ation d'un document. \\
  \hline
-  new\_dir & write & Formulaire de création d'un répertoire. \\
+  new\_dir & write & Formulaire de crÃ©ation d'un rÃ©pertoire. \\
  \hline
   tree & read & Visualisation en arborescence. \\
  \hline
-  detailconsult & read & Fiche détail d'un document. \\
+  detailconsult & read & Fiche dÃ©tail d'un document. \\
  \hline
   detailupdate & write & Formulaire de modification d'un document. \\
  \hline
   insert & write & Insertion d'un document. \\
  \hline
-  insert\_dir & write & Insertion d'un répertoire. \\
+  insert\_dir & write & Insertion d'un rÃ©pertoire. \\
  \hline
-  update & write & Mise à jour du document. \\
+  update & write & Mise Ã  jour du document. \\
  \hline
-  check\_delete & write & Vérification avant suppression du document. \\
+  check\_delete & write & VÃ©rification avant suppression du document. \\
  \hline
   delete & write & Suppression du document. \\
  \hline
-  dir\_check\_delete & write & Vérification avant suppression du répertoire. \\
+  dir\_check\_delete & write & VÃ©rification avant suppression du rÃ©pertoire. \\
  \hline
-  dir\_delete & write & Suppression du répertoire. \\
+  dir\_delete & write & Suppression du rÃ©pertoire. \\
  \hline
-  admin & write & Ecran d'administartion (gestion des catégories). \\
+  admin & write & Ecran d'administartion (gestion des catÃ©gories). \\
  \hline
-  cat1\_insert & write\_admin & Insertion de la catégorie 1. \\
+  cat1\_insert & write\_admin & Insertion de la catÃ©gorie 1. \\
  \hline
-  cat1\_update & write\_admin & Modification de la catégorie 1. \\
+  cat1\_update & write\_admin & Modification de la catÃ©gorie 1. \\
  \hline
-  cat1\_checklink & write\_admin & Vérification des liens de la catégorie 1. \\
+  cat1\_checklink & write\_admin & VÃ©rification des liens de la catÃ©gorie 1. \\
  \hline
-  cat1\_delete & write\_admin & Suppression de la catégorie 1. \\
+  cat1\_delete & write\_admin & Suppression de la catÃ©gorie 1. \\
  \hline
-  cat2\_insert & write\_admin & Insertion de la catégorie 2. \\
+  cat2\_insert & write\_admin & Insertion de la catÃ©gorie 2. \\
  \hline
-  cat2\_update & write\_admin & Modification de la catégorie 2. \\
+  cat2\_update & write\_admin & Modification de la catÃ©gorie 2. \\
  \hline
-  cat2\_checklink & write\_admin & Vérification des liens de la catégorie 2. \\
+  cat2\_checklink & write\_admin & VÃ©rification des liens de la catÃ©gorie 2. \\
  \hline
-  cat2\_delete & write\_admin & Suppression de la catégorie 2. \\
+  cat2\_delete & write\_admin & Suppression de la catÃ©gorie 2. \\
  \hline
   mime\_insert & write\_admin & Insertion du type MIME. \\
  \hline
   mime\_update & write\_admin & Modification du type MIME. \\
  \hline
-  mime\_checklink & write\_admin & Vérification des liens du type MIME. \\
+  mime\_checklink & write\_admin & VÃ©rification des liens du type MIME. \\
  \hline
   mime\_delete & write\_admin & Suppression du type MIME. \\
  \hline
-  display & read & Ecran de modification des préférences d'affichage. \\
+  display & read & Ecran de modification des prÃ©fÃ©rences d'affichage. \\
  \hline
-  dispref\_display & read & Modifie l'affichage d'un élément. \\
+  dispref\_display & read & Modifie l'affichage d'un Ã©lÃ©ment. \\
  \hline
-  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+  dispref\_level & read & Modifie l'ordre d'affichage d'un Ã©lÃ©ment. \\
  \hline
  \hline
-  ext\_get\_path & read & Appel externe pour sélection d'un chemin. \\
+  ext\_get\_path & read & Appel externe pour sÃ©lection d'un chemin. \\
  \hline
-  ext\_get\_ids & read & Appel externe pour sélection de documents. \\
+  ext\_get\_ids & read & Appel externe pour sÃ©lection de documents. \\
  \hline
 \end{tabular}

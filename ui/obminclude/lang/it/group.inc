@@ -29,10 +29,10 @@ $l_add = "Aggiungi questi  Gruppi";
 
 // Messages
 $l_fill_name = "YInserisci nome del gruppo";
-$l_group_exists = "Il Gruppo gi‡ esiste";
+$l_group_exists = "Il Gruppo gi√† esiste";
 $l_j_check_email = "indirizzo email non valido";
 $l_warn_delete = "Utenti registrati nel Gruppo";
-$l_email_exist = "email gi‡ in uso";
+$l_email_exist = "email gi√† in uso";
 
 $l_no_display = "Riepi i campi di ricerca e premi  < TROVA > per l'elenco dei Gruppi";
 $l_no_user = "Utenti non registrati";

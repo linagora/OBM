@@ -52,19 +52,19 @@ $l_kind_insert = "Legg til kategori";
 // Messages
 $l_company_del_verif_error = " deal(s) are attached to this company : it can't be deleted";
 $l_error_permission = "You have not the rights to access this page";
-$l_no_display = "Skriv inn søkekriteria og trykk < Finn > for å finne firma";
+$l_no_display = "Skriv inn sÃ¸kekriteria og trykk < Finn > for Ã¥ finne firma";
 $l_found = "found (to translate) !";
-$l_no_found = "Ingen firma som passa til søket !";
+$l_no_found = "Ingen firma som passa til sÃ¸ket !";
 $l_kind_del_verif_error = "(ar) av denne typen finst.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_fill_name = "\\n Du må fylle inn namn før du legg inn.";
+$l_fill_name = "\\n Du mÃ¥ fylle inn namn fÃ¸r du legg inn.";
 $l_fill_number = "\\n You have to fill the Number before submitting.";
-$l_fill_postcode = "\\n Du må fylle inn postnummer før du legg inn.";
-$l_fill_address = "\\n Du må fylle inn adressa før du legg inn.";
-$l_fill_phone = "\\n Du må fylle inn telefonnummer før du legg inn.";
+$l_fill_postcode = "\\n Du mÃ¥ fylle inn postnummer fÃ¸r du legg inn.";
+$l_fill_address = "\\n Du mÃ¥ fylle inn adressa fÃ¸r du legg inn.";
+$l_fill_phone = "\\n Du mÃ¥ fylle inn telefonnummer fÃ¸r du legg inn.";
 $l_delete_confirm = "Slett firmaet?"; 
-$l_j_select_company =  "Du må velge eit firma!";
+$l_j_select_company =  "Du mÃ¥ velge eit firma!";
 $lj_check_zip = "Postnummeret er ugyldig.";
 $lj_check_phone = "Telefonnummeret er ugyldig.";
 $lj_check_pphone = "Privatnummeret er ugyldig.";
@@ -72,9 +72,9 @@ $lj_check_mphone = "Mobiltelefonnummeret er ugyldig.";
 $lj_check_fax = "Faksnummeret er ugyldig.";
 $lj_check_email = "E-post-adressa er ugyldig.";
 $lj_check_web = "Webadressa er ugyldig.";
-$mj_kind_delete = "Du må velge ein kategori for å slette den!";
-$mj_kind_update = "Du må velge ein kategori og legge inn eit nytt namn for å oppdatere den!";
-$mj_kind_create = "Du må legge inn eit nytt kategorinamn for å opprette det!"; 
+$mj_kind_delete = "Du mÃ¥ velge ein kategori for Ã¥ slette den!";
+$mj_kind_update = "Du mÃ¥ velge ein kategori og legge inn eit nytt namn for Ã¥ oppdatere den!";
+$mj_kind_create = "Du mÃ¥ legge inn eit nytt kategorinamn for Ã¥ opprette det!"; 
 $mj_kind_delete_confirm = "Slett kategori?";
 
 // For the display parameters modification screen

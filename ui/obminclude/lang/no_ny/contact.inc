@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_contact_name = "Kontaktnamn";
-$l_from_company = "Frå firma";
+$l_from_company = "FrÃ¥ firma";
 $l_lastname = "Etternamn";
 $l_firstname = "Fornamn";
 $l_market = "Person in charge";
@@ -51,13 +51,13 @@ $l_copy = "Copy";
 // Messages
 $l_error_permission = "You have not the rights to access this page";
 $l_error_visibility = "You can't consult this page : the information is private.";
-$l_no_display = "Fyll inn søkefelta og trykk < Finn > for å hente ut kontaktane";
+$l_no_display = "Fyll inn sÃ¸kefelta og trykk < Finn > for Ã¥ hente ut kontaktane";
 $l_found = "found (to translate) !";
-$l_no_found = "Ingen kontaktar passa søket!";
+$l_no_found = "Ingen kontaktar passa sÃ¸ket!";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
-$l_fill_lastname = "\\n Du må fylle inn etternamn før du legg inn.";
-$l_fill_phone = "\\n Du må fylle inn telefonnummer før du legg inn.";
+$l_fill_lastname = "\\n Du mÃ¥ fylle inn etternamn fÃ¸r du legg inn.";
+$l_fill_phone = "\\n Du mÃ¥ fylle inn telefonnummer fÃ¸r du legg inn.";
 $l_delete_confirm = "Slett kontakten?";
 $lj_check_phone = "Telefonnummeret er ugyldig.";
 $lj_check_pphone = "Privatnummeret er ugyldig.";

@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Espa駉l                                                  //
+// OBM - Language : Espa帽ol                                                  //
 //     - File     : publication.inc                                          //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -8,127 +8,127 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_publication_title = "T韙ulo de la Publicaci髇";
+$l_publication_title = "T铆tulo de la Publicaci贸n";
 $l_type = "Tipo";
-$l_renew = "Renovacion Autom醫ica";
-$l_recept = "Modo de Recepci髇";
-$l_reception = "Modo de Recepci髇"; 
-$l_publication_type = "Tipo de Publicaci髇";
+$l_renew = "Renovacion Autom谩tica";
+$l_recept = "Modo de Recepci贸n";
+$l_reception = "Modo de Recepci贸n"; 
+$l_publication_type = "Tipo de Publicaci贸n";
 $l_quantity = "Cantidad";
-$l_header_new_auto = "Renovaci髇";
+$l_header_new_auto = "Renovaci贸n";
 
 // Labels and texts
-$l_type_manage = "Administraci髇 de tipo de Publicaci髇";
+$l_type_manage = "Administraci贸n de tipo de Publicaci贸n";
 $l_type_exist = "Tipos Existentes";
 $l_type_new = "Nuevo Tipo";
 
-$l_renew_manage = "Administraci髇 de Modos de renovaci髇";
-$l_renew_exist = "Modos de renovaci髇 existentes";
-$l_renew_new = "Nuevo modo de renovaci髇";
+$l_renew_manage = "Administraci贸n de Modos de renovaci贸n";
+$l_renew_exist = "Modos de renovaci贸n existentes";
+$l_renew_new = "Nuevo modo de renovaci贸n";
 
-$l_recept_manage = "Administraci髇 de modos de recepci髇";
-$l_recept_exist = "Modos de recepci髇 existentes";
-$l_recept_new = "Nuevo modo de recepci髇";
-$l_auto_sub = "Suscripci髇 autom醫ica";
-$l_contact_category1 = "Categor韆 1 de contacto";
+$l_recept_manage = "Administraci贸n de modos de recepci贸n";
+$l_recept_exist = "Modos de recepci贸n existentes";
+$l_recept_new = "Nuevo modo de recepci贸n";
+$l_auto_sub = "Suscripci贸n autom谩tica";
+$l_contact_category1 = "Categor铆a 1 de contacto";
 
 // Titres
-$l_publication_orig = "exportar para publicaci髇";
+$l_publication_orig = "exportar para publicaci贸n";
 $l_publication_dest = "a publicar";
-$l_subscription = "Suscripci髇";
+$l_subscription = "Suscripci贸n";
 
 // Actions
-$l_insert = "Ingresar la Publicaci髇";
-$l_update = "Actualizar la Publicaci髇";
-$l_checkdelete = "Revisar o Borrar la Publicaci髇";
-$l_delete = "Borrar la Publicaci髇";
+$l_insert = "Ingresar la Publicaci贸n";
+$l_update = "Actualizar la Publicaci贸n";
+$l_checkdelete = "Revisar o Borrar la Publicaci贸n";
+$l_delete = "Borrar la Publicaci贸n";
 
-$l_insert_sub = "Ingresar suscripci髇";
-$l_update_sub = "Actualizar suscripci髇";
-$l_checkdelete_sub = "Verificar o Borrar suscripci髇";
-$l_delete_sub = "borrar suscripci髇";
+$l_insert_sub = "Ingresar suscripci贸n";
+$l_update_sub = "Actualizar suscripci贸n";
+$l_checkdelete_sub = "Verificar o Borrar suscripci贸n";
+$l_delete_sub = "borrar suscripci贸n";
 
 $l_type_update = "Actualizar Tipo";
 $l_type_checkdelete = "Check or Borrar Tipo";
 $l_type_delete = "Borrar Tipo";
 $l_type_insert = "Ingresar Tipo";
 
-$l_renew_update = "Actualizar modo de renovaci髇";
-$l_renew_checkdelete = "Verificar o Borrar modo de renovaci髇";
-$l_renew_delete = "Borrar modo de renovaci髇";
-$l_renew_insert = "Ingresar modo de renovaci髇";
+$l_renew_update = "Actualizar modo de renovaci贸n";
+$l_renew_checkdelete = "Verificar o Borrar modo de renovaci贸n";
+$l_renew_delete = "Borrar modo de renovaci贸n";
+$l_renew_insert = "Ingresar modo de renovaci贸n";
 
-$l_recept_update = "Actualizar modo de recepci髇";
-$l_recept_checkdelete = "Verificar o Borrar modo de recepci髇";
-$l_recept_delete = "Borrar modo de recepci髇";
-$l_recept_insert = "Ingresar modo de recepci髇";
+$l_recept_update = "Actualizar modo de recepci贸n";
+$l_recept_checkdelete = "Verificar o Borrar modo de recepci贸n";
+$l_recept_delete = "Borrar modo de recepci贸n";
+$l_recept_insert = "Ingresar modo de recepci贸n";
 
 // Messages
-$l_no_display = "Llene los campos de b鷖queda y presione < Buscar > para obtener las publicaciones";
+$l_no_display = "Llene los campos de b煤squeda y presione < Buscar > para obtener las publicaciones";
 $l_found = "publicaciones encontradas.";
-$l_no_found = "No hay publicaciones que coincidan con la b鷖queda !";
-$l_delete_ok = "La publicaci髇 ha sido borrada exitosamente.";
-$l_delete_error = "La eliminaci髇 de la publicaci髇 ha fallado !";
-$l_insert_ok = "La publicaci髇 ha sido ingresada exitosamente.";
-$l_insert_error = "El ingreso de la publicaci髇 ha fallado !";
+$l_no_found = "No hay publicaciones que coincidan con la b煤squeda !";
+$l_delete_ok = "La publicaci贸n ha sido borrada exitosamente.";
+$l_delete_error = "La eliminaci贸n de la publicaci贸n ha fallado !";
+$l_insert_ok = "La publicaci贸n ha sido ingresada exitosamente.";
+$l_insert_error = "El ingreso de la publicaci贸n ha fallado !";
 $l_check_samepublication = "Estas publicaciones lucen similares a la nueva entrada!";
-$l_update_ok = "La publicaci髇 ha sido actualizada exitosamente.";
-$l_update_error = "La actualizaci髇 de la publicaci髇 ha fallado !";
-$l_link_contact = "Estos contactos tiene suscripciones a esta publicaci髇";
-$l_link_contact_no = "No existen suscripciones de contactos a esta publicaci髇";
-$l_can_delete = "La publicaci髇 puede ser borrada.";
-$l_cant_delete = "La publicaci髇 NO puede ser borrada !";
+$l_update_ok = "La publicaci贸n ha sido actualizada exitosamente.";
+$l_update_error = "La actualizaci贸n de la publicaci贸n ha fallado !";
+$l_link_contact = "Estos contactos tiene suscripciones a esta publicaci贸n";
+$l_link_contact_no = "No existen suscripciones de contactos a esta publicaci贸n";
+$l_can_delete = "La publicaci贸n puede ser borrada.";
+$l_cant_delete = "La publicaci贸n NO puede ser borrada !";
 $l_type_delete_ok = "El tipo ha sido borrado exitosamente.";
-$l_type_delete_error = "La eliminaci髇 del tipo ha fallado !";
+$l_type_delete_error = "La eliminaci贸n del tipo ha fallado !";
 $l_type_insert_ok = "El tipo ha sido ingresada exitosamente.";
 $l_type_insert_error = "El ingreso del tipo ha fallado !";
 $l_type_update_ok = "El tipo ha sido actualizado exitosamente.";
-$l_type_update_error = "La actualizaci髇 de el tipo ha fallado !";
-$l_type_link_publication = "Estas compa耥as son referenciadas como";
+$l_type_update_error = "La actualizaci贸n de el tipo ha fallado !";
+$l_type_link_publication = "Estas compa帽铆as son referenciadas como";
 $l_type_link_publication_no = "No hay publicaciones referenciadas como";
 $l_type_cant_delete = "The Tipo NO puede ser borrado !";
 $l_type_can_delete = "The Tipo puede ser borrado.";
 
-$l_renew_delete_ok = "Modo de renovaci髇 borrado.";
-$l_renew_delete_error = "Borrado de modo de renovaci髇 cancelado!";
-$l_renew_insert_ok = "Ingreso de Modo de renovaci髇 realizado.";
-$l_renew_insert_error = "Ingreso de modo de renovaci髇 cancelado !";
-$l_renew_update_ok = "Modo de renovaci髇 actualizado";
-$l_renew_update_error = "Actualizaci髇 de modo de renovaci髇 cancelado !";
-$l_renew_link_publication = "Estas publicaciones son de este modo de renovaci髇";
-$l_renew_link_publication_no =  "No hay publicaciones asignadas a este modo de renovaci髇";
-$l_renew_cant_delete =  "Este modo de renovaci髇 NO puede ser borrado !";
-$l_renew_can_delete =  "Este modode renovaci髇  puede ser borrado !";
+$l_renew_delete_ok = "Modo de renovaci贸n borrado.";
+$l_renew_delete_error = "Borrado de modo de renovaci贸n cancelado!";
+$l_renew_insert_ok = "Ingreso de Modo de renovaci贸n realizado.";
+$l_renew_insert_error = "Ingreso de modo de renovaci贸n cancelado !";
+$l_renew_update_ok = "Modo de renovaci贸n actualizado";
+$l_renew_update_error = "Actualizaci贸n de modo de renovaci贸n cancelado !";
+$l_renew_link_publication = "Estas publicaciones son de este modo de renovaci贸n";
+$l_renew_link_publication_no =  "No hay publicaciones asignadas a este modo de renovaci贸n";
+$l_renew_cant_delete =  "Este modo de renovaci贸n NO puede ser borrado !";
+$l_renew_can_delete =  "Este modode renovaci贸n  puede ser borrado !";
 
-$l_recept_delete_ok = "Modo de recepci髇 borrado.";
-$l_recept_delete_error = "Borrado de modo de recepci髇 cancelado!";
-$l_recept_insert_ok = "Ingreso de Modo de recepci髇 realizado.";
-$l_recept_insert_error = "Ingreso de modo de recepci髇 cancelado !";
-$l_recept_update_ok = "Modo de recepci髇 actualizado";
-$l_recept_update_error = "Actualizaci髇 de modo de recepci髇 cancelado !";
-$l_recept_link_publication = "Estas publicaciones son de este modo de recepci髇 ";
-$l_recept_link_publication_no = "No hay publicaciones asignadas a este modo de recepci髇";
+$l_recept_delete_ok = "Modo de recepci贸n borrado.";
+$l_recept_delete_error = "Borrado de modo de recepci贸n cancelado!";
+$l_recept_insert_ok = "Ingreso de Modo de recepci贸n realizado.";
+$l_recept_insert_error = "Ingreso de modo de recepci贸n cancelado !";
+$l_recept_update_ok = "Modo de recepci贸n actualizado";
+$l_recept_update_error = "Actualizaci贸n de modo de recepci贸n cancelado !";
+$l_recept_link_publication = "Estas publicaciones son de este modo de recepci贸n ";
+$l_recept_link_publication_no = "No hay publicaciones asignadas a este modo de recepci贸n";
 $l_recept_cant_delete = "Este modo NO puede ser borrado !";
 $l_recept_can_delete = "Este modo puede ser borrado !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_fill_title = "Debe asignar el T韙ulo antes de enviar.";
-$l_delete_confirm = "Borrar la publicaci髇 ?";
-$l_j_check_year = "El A駉 no es v醠ido.";
-$l_j_fill_lang = "El Idioma no es v醠ido.";
-$l_j_check_lang = "El Idioma no es v醠ido.";
+$l_fill_title = "Debe asignar el T铆tulo antes de enviar.";
+$l_delete_confirm = "Borrar la publicaci贸n ?";
+$l_j_check_year = "El A帽o no es v谩lido.";
+$l_j_fill_lang = "El Idioma no es v谩lido.";
+$l_j_check_lang = "El Idioma no es v谩lido.";
 $l_j_type_delete = "Debe seleccionar un tipo para revisar o borrarlo !";
 $l_j_type_update = "Debe seleccionar el tipo e ingresar un nuevo nombre para actualizarla !";
 $l_j_type_create = "Debe ingresar un nuevo nombre del tipo para crearlo !";
-$l_j_renew_delete = "Debe seleccionar un tipo de renovaci髇 para revisar o borrarlo !";
-$l_j_renew_update = "Debe seleccionar el tipo de renovaci髇 e ingresar un nuevo nombre para actualizarla !";
-$l_j_renew_create = "Debe ingresar un nuevo nombre del tipo de renovaci髇 para crearlo !";
-$l_j_recept_delete = "Seleccione un modo de recepci髇 !";
-$l_j_recept_update = "Seleccione un modo de recepci髇 !";
-$l_j_recept_create = "Ingrese la referencia de el modo de recepci髇 !";
-$l_j_select_publication = "Debe seleccionar una publicaci髇 !";
+$l_j_renew_delete = "Debe seleccionar un tipo de renovaci贸n para revisar o borrarlo !";
+$l_j_renew_update = "Debe seleccionar el tipo de renovaci贸n e ingresar un nuevo nombre para actualizarla !";
+$l_j_renew_create = "Debe ingresar un nuevo nombre del tipo de renovaci贸n para crearlo !";
+$l_j_recept_delete = "Seleccione un modo de recepci贸n !";
+$l_j_recept_update = "Seleccione un modo de recepci贸n !";
+$l_j_recept_create = "Ingrese la referencia de el modo de recepci贸n !";
+$l_j_select_publication = "Debe seleccionar una publicaci贸n !";
 $l_j_fill_quantity = "Especifique una cantidad";
-$l_j_check_quantity = "Ingrese una cantidad v醠ida";
+$l_j_check_quantity = "Ingrese una cantidad v谩lida";
 
 // For the display parameters modification screen
 $l_publication_display = "Mostrar opciones de las listas de publicaciones"; 
@@ -136,5 +136,5 @@ $l_publication_display = "Mostrar opciones de las listas de publicaciones";
 
 // Other Skina
 
-$l_j_check_fax = "El n鷐ero de fax no es v醠ido.";
+$l_j_check_fax = "El n煤mero de fax no es v谩lido.";
 $l_market = "Gerente de Mercadeo";

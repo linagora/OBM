@@ -37,10 +37,10 @@ $l_add_resource = "Ajouter des ressources";
 $l_add_resourcegroup = "Ajouter des groupes (parmi la liste des groupes possibles)";
 $l_del_resource_sel = "Enlever ces ressources";
 $l_del_resourcegroup_sel = "Enlever ces groupes";
-$l_resource_added = "Ressource(s) ajoutée(s)";
-$l_resource_removed = "Ressource(s) enlevée(s)";
-$l_resourcegroup_added = "Groupe(s) ajouté(s)";
-$l_resourcegroup_removed = "Groupe(s) enlevé(s)";
+$l_resource_added = "Ressource(s) ajoutÃ©e(s)";
+$l_resource_removed = "Ressource(s) enlevÃ©e(s)";
+$l_resourcegroup_added = "Groupe(s) ajoutÃ©(s)";
+$l_resourcegroup_removed = "Groupe(s) enlevÃ©(s)";
 
 
 $l_no_display = "Fill the search fields and press < Find > to retrieve the groups";

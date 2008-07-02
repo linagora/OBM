@@ -8,16 +8,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_number = "Numéro";
-$l_company_name = "Nom Société";
+$l_number = "NumÃ©ro";
+$l_company_name = "Nom SociÃ©tÃ©";
 $l_type = "Type";
-$l_activity = "Secteur d'activité";
+$l_activity = "Secteur d'activitÃ©";
 $l_nafcode = "Code NAF";
 $l_market = "Responsable du compte";
 $l_web = "W";
 $l_email = "@M";
-$l_coord = "Coordonnées";
-$l_vat = "Numéro Intracommunautaire";
+$l_coord = "CoordonnÃ©es";
+$l_vat = "NumÃ©ro Intracommunautaire";
 $l_siret = "SIRET";
 
 // Labels et textes
@@ -36,54 +36,54 @@ $l_naf_istitle = "Est un titre";
 
 // Actions
 $l_add = "Ajouter";
-$l_insert = "Enregistrer la Société";
-$l_update = "Modifier la Société";
-$l_checkdelete = "Vérifier ou Supprimer la Société";
-$l_delete = "Supprimer la Société";
+$l_insert = "Enregistrer la SociÃ©tÃ©";
+$l_update = "Modifier la SociÃ©tÃ©";
+$l_checkdelete = "VÃ©rifier ou Supprimer la SociÃ©tÃ©";
+$l_delete = "Supprimer la SociÃ©tÃ©";
 $l_naf_update = "Modifier le Code NAF";
-$l_naf_checkdelete = "Vérifier ou Supprimer le Code NAF";
+$l_naf_checkdelete = "VÃ©rifier ou Supprimer le Code NAF";
 $l_naf_delete = "Supprimer le Code NAF";
-$l_naf_insert = "Créer le Code NAF";
-$l_select_company = "Sélectionner la société";
+$l_naf_insert = "CrÃ©er le Code NAF";
+$l_select_company = "SÃ©lectionner la sociÃ©tÃ©";
 
 // Messages
-$l_err_act_empty = "Le secteur d'activité doit être renseigné !";
+$l_err_act_empty = "Le secteur d'activitÃ© doit Ãªtre renseignÃ© !";
 
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des sociétés correspondantes.";
-$l_found = "sociétés trouvées.";
-$l_no_found = "Aucune société ne correspond à ces critères !";
-$l_check_samecompany = "Ces sociétés semblent similaires à cette nouvelle entrée !";
-$l_link_contact = "La société possède des contacts";
-$l_link_contact_no = "La société n'a pas de contact";
-$l_link_deal = "La société est référencée par des affaires";
-$l_link_deal_no = "La société n'est pas référencée dans les affaires";
-$l_link_contract = "La société est référencée par des contrats";
-$l_link_contract_no = "La société n'est pas référencée dans les contrats";
-$l_link_project = "La société est référencée par des projets";
-$l_link_project_no = "La société n'est pas référencée dans les projets";
-$l_link_invoice = "La société est référencée par des factures";
-$l_link_invoice_no = "La société n'est pas référencée dans les factures";
-$l_cant_delete = "La société ne peut être supprimée !";
-$l_can_delete = "La société peut être supprimée.";
-$l_naf_no = "Pas de codes NAF définis";
-$l_naf_link_company = "Sociétés sont liées à ce code NAF";
-$l_naf_link_company_no = "Pas de sociétés liées à ce code NAF";
-$l_naf_cant_delete = "Le code NAF ne peut être supprimé !";
-$l_naf_can_delete = "Le code NAF peut être supprimé";
+$l_no_display = "Renseigner les critÃ¨res souhaitÃ©s et cliquer sur < Chercher > pour obtenir la liste des sociÃ©tÃ©s correspondantes.";
+$l_found = "sociÃ©tÃ©s trouvÃ©es.";
+$l_no_found = "Aucune sociÃ©tÃ© ne correspond Ã  ces critÃ¨res !";
+$l_check_samecompany = "Ces sociÃ©tÃ©s semblent similaires Ã  cette nouvelle entrÃ©e !";
+$l_link_contact = "La sociÃ©tÃ© possÃ¨de des contacts";
+$l_link_contact_no = "La sociÃ©tÃ© n'a pas de contact";
+$l_link_deal = "La sociÃ©tÃ© est rÃ©fÃ©rencÃ©e par des affaires";
+$l_link_deal_no = "La sociÃ©tÃ© n'est pas rÃ©fÃ©rencÃ©e dans les affaires";
+$l_link_contract = "La sociÃ©tÃ© est rÃ©fÃ©rencÃ©e par des contrats";
+$l_link_contract_no = "La sociÃ©tÃ© n'est pas rÃ©fÃ©rencÃ©e dans les contrats";
+$l_link_project = "La sociÃ©tÃ© est rÃ©fÃ©rencÃ©e par des projets";
+$l_link_project_no = "La sociÃ©tÃ© n'est pas rÃ©fÃ©rencÃ©e dans les projets";
+$l_link_invoice = "La sociÃ©tÃ© est rÃ©fÃ©rencÃ©e par des factures";
+$l_link_invoice_no = "La sociÃ©tÃ© n'est pas rÃ©fÃ©rencÃ©e dans les factures";
+$l_cant_delete = "La sociÃ©tÃ© ne peut Ãªtre supprimÃ©e !";
+$l_can_delete = "La sociÃ©tÃ© peut Ãªtre supprimÃ©e.";
+$l_naf_no = "Pas de codes NAF dÃ©finis";
+$l_naf_link_company = "SociÃ©tÃ©s sont liÃ©es Ã  ce code NAF";
+$l_naf_link_company_no = "Pas de sociÃ©tÃ©s liÃ©es Ã  ce code NAF";
+$l_naf_cant_delete = "Le code NAF ne peut Ãªtre supprimÃ© !";
+$l_naf_can_delete = "Le code NAF peut Ãªtre supprimÃ©";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Vous devez renseigner le Nom avant de valider.";
-$l_delete_confirm = "Confirmer la suppression de la Société ?";
+$l_delete_confirm = "Confirmer la suppression de la SociÃ©tÃ© ?";
 $l_j_check_zip = "Le code postal n'est pas correct.";
-$l_j_check_phone = "Le numéro de téléphone n'est pas correct.";
-$l_j_check_fax = "Le numéro de fax n'est pas correct.";
-$l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
+$l_j_check_phone = "Le numÃ©ro de tÃ©lÃ©phone n'est pas correct.";
+$l_j_check_fax = "Le numÃ©ro de fax n'est pas correct.";
+$l_j_check_email = "L'adresse email n'est pas valide. VÃ©rifiez le domaine.";
 $l_j_check_web = "L'adresse web n'est pas valide.";
-$l_j_cat_deep = "Les catégories ne peuvent pas avoir plus de trois niveaux de profondeur";
-$l_j_naf_delete = "Sélectionnez un code NAF pour le vérifier ou supprimer !";
-$l_j_naf_update = "Vous devez sélectionner un code NAF et entrer une modification avant de valider !";
-$l_j_naf_create = "Vous devez saisir un code NAF pour le créer !";
-$l_j_select_company = "Vous devez sélectionner une société !";
+$l_j_cat_deep = "Les catÃ©gories ne peuvent pas avoir plus de trois niveaux de profondeur";
+$l_j_naf_delete = "SÃ©lectionnez un code NAF pour le vÃ©rifier ou supprimer !";
+$l_j_naf_update = "Vous devez sÃ©lectionner un code NAF et entrer une modification avant de valider !";
+$l_j_naf_create = "Vous devez saisir un code NAF pour le crÃ©er !";
+$l_j_select_company = "Vous devez sÃ©lectionner une sociÃ©tÃ© !";
 
 // For the display preferences modification screen 
-$l_company_display = "Options d'affichage des listes de sociétés";
+$l_company_display = "Options d'affichage des listes de sociÃ©tÃ©s";

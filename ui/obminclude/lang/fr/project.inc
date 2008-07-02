@@ -8,109 +8,109 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_tasktype = "Catégorie";
-$l_task = "Tâche";
+$l_tasktype = "CatÃ©gorie";
+$l_task = "TÃ¢che";
 $l_soldtime = "Temps vendu";
-$l_estimatedtime = "Temps estimé";
+$l_estimatedtime = "Temps estimÃ©";
 $l_shortname = "Nom court";
 
 $l_sold = "Vendu";
-$l_estimated = "Estimé";
-$l_allotted = "Attribué";
-$l_projected = "Prévu";
-$l_used = "Utilisé";
-$l_missing = "Estimé restant";
+$l_estimated = "EstimÃ©";
+$l_allotted = "AttribuÃ©";
+$l_projected = "PrÃ©vu";
+$l_used = "UtilisÃ©";
+$l_missing = "EstimÃ© restant";
 
-$l_alloestimated = "Attribution du temps prévu";
-$l_usedestimated = "Utilisation du temps prévu";
+$l_alloestimated = "Attribution du temps prÃ©vu";
+$l_usedestimated = "Utilisation du temps prÃ©vu";
 $l_progress = "Avancement";
 $l_progeval = "Evaluation de l'avance/retard";
 
-$l_ref = "Référence";
+$l_ref = "RÃ©fÃ©rence";
 $l_project_date = "Date";
-$l_project_duration = "Durée";
+$l_project_duration = "DurÃ©e";
 $l_project_desc = "Description";
 $l_project_tech = "Description technique";
 
 // Labels et textes
-$l_parent = "Tâche parent";
+$l_parent = "TÃ¢che parent";
 $l_soldtime = "Temps vendu";
-$l_projtime = "Temps prévu";
+$l_projtime = "Temps prÃ©vu";
 $l_total = "Total";
-$l_resume = "Résumé";
-$l_tasks = "Tâches";
-$l_reftask_manage = "Gestion des taches de référence"; 
-$l_delete_reftask = "Vous etes sur le point de supprimer une tache de référence, voulez vous continuer?";
-$l_reftask = 'Tâche de référence';
-$l_closing = 'Clôture';
-$l_closing_no = 'Pas de clôture effectuée pour ce projet';
+$l_resume = "RÃ©sumÃ©";
+$l_tasks = "TÃ¢ches";
+$l_reftask_manage = "Gestion des taches de rÃ©fÃ©rence"; 
+$l_delete_reftask = "Vous etes sur le point de supprimer une tache de rÃ©fÃ©rence, voulez vous continuer?";
+$l_reftask = 'TÃ¢che de rÃ©fÃ©rence';
+$l_closing = 'ClÃ´ture';
+$l_closing_no = 'Pas de clÃ´ture effectuÃ©e pour ce projet';
 
 // Titres
 $l_members_info = "Participants au projet";
-$l_progressinfos = "Détail : (temps : utilisé / estimé restant / total prévu)";
-$l_memberstimeinfos = "Renseignez le temps de travail (en jours) prévu pour chaque personne assignée à une tâche";
-$l_fill_advance_form = "Renseignez le temps de travail (en jours) : prévu / estimé restant";
-$l_task_new = "Nouvelle tâche";
-$l_task_update = "Modifier une tâche";
-$l_task_list = "Tâches définies";
-$l_progress_info = "Renseignez le temps de travail (en jours) estimé pour terminer une tâche";
-$l_select_project = "Sélectionner un projet";
+$l_progressinfos = "DÃ©tail : (temps : utilisÃ© / estimÃ© restant / total prÃ©vu)";
+$l_memberstimeinfos = "Renseignez le temps de travail (en jours) prÃ©vu pour chaque personne assignÃ©e Ã  une tÃ¢che";
+$l_fill_advance_form = "Renseignez le temps de travail (en jours) : prÃ©vu / estimÃ© restant";
+$l_task_new = "Nouvelle tÃ¢che";
+$l_task_update = "Modifier une tÃ¢che";
+$l_task_list = "TÃ¢ches dÃ©finies";
+$l_progress_info = "Renseignez le temps de travail (en jours) estimÃ© pour terminer une tÃ¢che";
+$l_select_project = "SÃ©lectionner un projet";
 
 // Mail
 $l_mail_project_subject = "OBM : Projet";
-$l_mail_project_member = "Vous avez été positionnés sur le projet suivant :";
+$l_mail_project_member = "Vous avez Ã©tÃ© positionnÃ©s sur le projet suivant :";
 
 // Actions
-$l_insert = "Créer le projet";
+$l_insert = "CrÃ©er le projet";
 $l_update = "Modifier le Projet";
 $l_delete = "Supprimer le projet";
-$l_task_add = "Ajouter la tâche";
-$l_task_upd = "Modifier la tâche";
-$l_task_del = "Supprimer les tâches sélectionnées";
-$l_progress_update = "Mettre à jour les avancements";
-$l_closing_insert = "Enregistrer la clôture";
-$l_closing_update = "Modifier la clôture Projet";
-$l_closing_delete = "Supprimer la clôture";
+$l_task_add = "Ajouter la tÃ¢che";
+$l_task_upd = "Modifier la tÃ¢che";
+$l_task_del = "Supprimer les tÃ¢ches sÃ©lectionnÃ©es";
+$l_progress_update = "Mettre Ã  jour les avancements";
+$l_closing_insert = "Enregistrer la clÃ´ture";
+$l_closing_update = "Modifier la clÃ´ture Projet";
+$l_closing_delete = "Supprimer la clÃ´ture";
 
 // Messages
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des projets correspondants.";
-$l_found = "projet(s) trouvés.";
-$l_no_found = "Aucun projet ne correspond à ces critères !";
-$l_no_tasks = "Pas de tâches définies";
-$l_no_members = "Pas de participants définis";
-$l_no_allocation = "Les participants du projet n'ont pas été affectés à des tâches";
-$l_link_timetask = "Le projet est renseigné dans la gestion du temps";
-$l_link_timetask_no = "Le projet n'est pas renseigné dans la gestion du temps";
-$l_cant_delete = "Le projet ne peut être supprimé !";
-$l_can_delete = "Le projet peut être supprimé.";
-$l_no_task_del = "Aucune tâche à effacer";
-$l_ptask_same_task = "La tâche parente ne peut être la tâche elle-même !";
-$l_ptask_and_parent = "La tâche est parente et ne peut donc avoir une tâche parente !";
-$l_ptask_has_parent = "La tâche parente a elle-même un parent maintenant !";
-$l_ptask_has_user = "La tâche parente est assignée à des utilisateurs !";
+$l_no_display = "Renseigner les critÃ¨res souhaitÃ©s et cliquer sur < Chercher > pour obtenir la liste des projets correspondants.";
+$l_found = "projet(s) trouvÃ©s.";
+$l_no_found = "Aucun projet ne correspond Ã  ces critÃ¨res !";
+$l_no_tasks = "Pas de tÃ¢ches dÃ©finies";
+$l_no_members = "Pas de participants dÃ©finis";
+$l_no_allocation = "Les participants du projet n'ont pas Ã©tÃ© affectÃ©s Ã  des tÃ¢ches";
+$l_link_timetask = "Le projet est renseignÃ© dans la gestion du temps";
+$l_link_timetask_no = "Le projet n'est pas renseignÃ© dans la gestion du temps";
+$l_cant_delete = "Le projet ne peut Ãªtre supprimÃ© !";
+$l_can_delete = "Le projet peut Ãªtre supprimÃ©.";
+$l_no_task_del = "Aucune tÃ¢che Ã  effacer";
+$l_ptask_same_task = "La tÃ¢che parente ne peut Ãªtre la tÃ¢che elle-mÃªme !";
+$l_ptask_and_parent = "La tÃ¢che est parente et ne peut donc avoir une tÃ¢che parente !";
+$l_ptask_has_parent = "La tÃ¢che parente a elle-mÃªme un parent maintenant !";
+$l_ptask_has_user = "La tÃ¢che parente est assignÃ©e Ã  des utilisateurs !";
 
 $l_del_member_sel = "Enlever ces participants";
-$l_member_added = "participant(s) ajouté(s)";
-$l_member_removed = "participant(s) enlevé(s)";
-$l_no_member_add = "Aucun participant à ajouter";
-$l_no_member_del = "Aucun participant à effacer";
+$l_member_added = "participant(s) ajoutÃ©(s)";
+$l_member_removed = "participant(s) enlevÃ©(s)";
+$l_no_member_add = "Aucun participant Ã  ajouter";
+$l_no_member_del = "Aucun participant Ã  effacer";
 $l_add_member = "Ajouter des participants au projet";
-$l_board_no_data = "Le tableau de bord ne peut être affiché si les tâches ou les participants ne sont pas définis !";
-$l_select_task = "Veuillez sélectionner un tâche";
+$l_board_no_data = "Le tableau de bord ne peut Ãªtre affichÃ© si les tÃ¢ches ou les participants ne sont pas dÃ©finis !";
+$l_select_task = "Veuillez sÃ©lectionner un tÃ¢che";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Vous devez indiquer un nom avant de valider.";
-$l_fill_tt = "Vous devez indiquer la catégorie avant de valider.";
+$l_fill_tt = "Vous devez indiquer la catÃ©gorie avant de valider.";
 $l_fill_soldtime = "Vous devez indiquer le temps vendu avant de valider.";
-$l_fill_estimated = "Vous devez indiquer le temps estimé avant de valider.";
-$l_fill_tasklabel = "Vous devez donner un nom à cette tâche.";
-$l_fill_soldnumber = "Le temps vendu doit être un nombre entier de jours.";
-$l_fill_projected = "Chaque participant avant doit être affecté à au moins une tâche";
-$l_fill_projnumber = "Le temps prévu doit être un nombre entier de jours.";
-$l_fill_missing = "Le temps manquant doit être indiqué pour tous les membres du projet";
-$l_fill_missnumber = "Le temps manquant doit être un nombre entier de jours.";
+$l_fill_estimated = "Vous devez indiquer le temps estimÃ© avant de valider.";
+$l_fill_tasklabel = "Vous devez donner un nom Ã  cette tÃ¢che.";
+$l_fill_soldnumber = "Le temps vendu doit Ãªtre un nombre entier de jours.";
+$l_fill_projected = "Chaque participant avant doit Ãªtre affectÃ© Ã  au moins une tÃ¢che";
+$l_fill_projnumber = "Le temps prÃ©vu doit Ãªtre un nombre entier de jours.";
+$l_fill_missing = "Le temps manquant doit Ãªtre indiquÃ© pour tous les membres du projet";
+$l_fill_missnumber = "Le temps manquant doit Ãªtre un nombre entier de jours.";
 $l_delete_confirm = "Confirmer la suppression du projet ?";
 $l_tolong_shortname = "Le nom court est trop long";
-$l_err_used = "Le temps passé n'est pas correct !";
+$l_err_used = "Le temps passÃ© n'est pas correct !";
 $l_err_remaining = "Le temps restant n'est pas correct !";
 
 // For the display preferences modification screen 

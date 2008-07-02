@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Español                                                  //
+// OBM - Language : EspaÃ±ol                                                  //
 //     - File     : todo.inc                                                 //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -8,9 +8,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_author = "Autor";
-$l_date_create = "Fecha de colocación";
+$l_date_create = "Fecha de colocaciÃ³n";
 $l_deadline = "Fecha Final";
-$l_todotitle = "Título";
+$l_todotitle = "TÃ­tulo";
 $l_content = "Contenido";
 $l_percent = "Progreso %";
 
@@ -24,10 +24,10 @@ $l_no_deadline = "No especificado";
 $l_insert_ok =  "El recordatorio ha sido ingresado exitosamente.";
 $l_insert_error =  "El ingreso del recordatorio ha fallado !";
 $l_delete_ok = "El recordatorio ha sido borrado exitosamente.";
-$l_delete_error = "La eliminación del recordatorio ha fallado !";
+$l_delete_error = "La eliminaciÃ³n del recordatorio ha fallado !";
 
-$l_delete_confirm = "Confirme la eliminación de la entrada";
-$l_j_fill_title = "Llene el título";
+$l_delete_confirm = "Confirme la eliminaciÃ³n de la entrada";
+$l_j_fill_title = "Llene el tÃ­tulo";
 $l_j_fill_deadline = "Llene la fecha final con una valor correcto";
 $l_err_percent = "El progreso debe estar entre 0 y 100";
 

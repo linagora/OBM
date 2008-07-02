@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : EspaÒol                                                  //
+// OBM - Language : Espa√±ol                                                  //
 //     - File     : list.inc                                                 //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -10,7 +10,7 @@
 // Database fields
 $l_subject = "Asunto";
 $l_query = "Pregunta";
-$l_static = "Est·ticos";
+$l_static = "Est√°ticos";
 $l_mode = "Modo";
 
 // Labels and texts
@@ -18,21 +18,21 @@ $l_list_contact = "Tiene un contacto";
 $l_list_display = "Opciones de despliegue para listas de Listas";
 $l_contact_display = "Opciones de despliegue para listas de Contactos";
 $l_list_set = "Configurar Lista";
-$l_list_wizard = "B˙squeda global";
-$l_criterion = "Criterio de B˙squeda";
+$l_list_wizard = "B√∫squeda global";
+$l_criterion = "Criterio de B√∫squeda";
 $l_timebefore = "Actualizado antes";
 $l_timeafter = "Actualizado despues";
 $l_market = "Responsable";
-$l_company_cat1 = "CategorÌa 1";
-$l_contact_cat1 = "CategorÌa 1";
-$l_contact_cat2 = "CategorÌa 2";
+$l_company_cat1 = "Categor√≠a 1";
+$l_contact_cat1 = "Categor√≠a 1";
+$l_contact_cat2 = "Categor√≠a 2";
 $l_expert = "Experto";
 $l_normal = "Normal";
-$l_renew = "RenovaciÛn Automatica";
-$l_recept = "Modo de RecepciÛn";
+$l_renew = "Renovaci√≥n Automatica";
+$l_recept = "Modo de Recepci√≥n";
 $l_mailing = "Solo Correo habilitado";
 $l_contact_archive = "Contactos archivados";
-$l_info_pub = "InformaciÛn de publicaciones";
+$l_info_pub = "Informaci√≥n de publicaciones";
 // Contact
 $l_function = "Puesto";
 $l_service = "Servicio";
@@ -40,8 +40,8 @@ $l_status = "Estado";
 $l_letter = "Encabezado";
 
 //Publication
-$l_publication = "PublicaciÛn";
-$l_title = "TÌtulo";
+$l_publication = "Publicaci√≥n";
+$l_title = "T√≠tulo";
 $l_quantity = "Cantidad";
 
 //Logical
@@ -59,32 +59,32 @@ $l_add = "Adicionar estas listas";
 $l_add_criterion = "Adicionar un criterio";
 
 // Messages
-$l_name_list_nomatch = "Nombre de la lista no es v·lido";
+$l_name_list_nomatch = "Nombre de la lista no es v√°lido";
 $l_check_samelist = "Estas listas lucen similar a la nueva entrada !";
 $l_list_exists = "Lo siento pero esta lista ya existe";
-$l_j_check_email = "DirecciÛn de correo electrÛnico no es v·lido.";
+$l_j_check_email = "Direcci√≥n de correo electr√≥nico no es v√°lido.";
 $l_has_contact = "contatos registrados en esta lista";
 $l_cant_delete = "La lista no puede ser borrada !";
 $l_can_delete =  "La lista puede ser borrada !";
 
-$l_no_display = "Llene los campos de b˙squeda y presione < Buscar > para obtener las listas";
+$l_no_display = "Llene los campos de b√∫squeda y presione < Buscar > para obtener las listas";
 $l_found = "listas encontradas.";
-$l_no_found = "No hay listas correspondientes a su b˙squeda";
+$l_no_found = "No hay listas correspondientes a su b√∫squeda";
 $l_add_contact = "Adicionar contactos" ;
 $l_del_contact_sel = "Remover estos contactos";
 $l_contact_added = "adicionar Contacto(s)";
 $l_contact_removed = "Contacto(s) removidos";
-$l_static_con_found = "contactos est·ticos registrados";
-$l_dyn_con_found = "contactos registrados din·micamente";
-$l_no_static_contact = "No hay contactos est·ticos registrados";
-$l_no_dyn_contact = "No hay contactos registrados din·micamente";
+$l_static_con_found = "contactos est√°ticos registrados";
+$l_dyn_con_found = "contactos registrados din√°micamente";
+$l_no_static_contact = "No hay contactos est√°ticos registrados";
+$l_no_dyn_contact = "No hay contactos registrados din√°micamente";
 
 $l_fill_name = "Debe ingresar el nombre de la lista";
 $l_fill_subject = "El asunto debe ser llenado !";
-$l_invalid_query = "La b˙squeda es inv·lida !";
+$l_invalid_query = "La b√∫squeda es inv√°lida !";
 $l_incoherent_criteria = "Criterios no son coherentes !";
 $l_banned_word = "Palabra prohibida";
-$l_err_list_coh_pub = "$l_info_pub seleccionado mientras el criterio de la publicaciÛn es combinado por una 'Y' ";
-$l_hungry_query = "La b˙squeda necesita demasiados recursos !";
-$l_warning_exp_to_nor = "Alerta, Ud perder· la b˙squeda actual, Continua ? ";
-$l_warning_nor_to_exp = "Alerta, Preservar· el criterio en la b˙squeda pero perder· esto si retorna a modo normal. Continua ?";
+$l_err_list_coh_pub = "$l_info_pub seleccionado mientras el criterio de la publicaci√≥n es combinado por una 'Y' ";
+$l_hungry_query = "La b√∫squeda necesita demasiados recursos !";
+$l_warning_exp_to_nor = "Alerta, Ud perder√° la b√∫squeda actual, Continua ? ";
+$l_warning_nor_to_exp = "Alerta, Preservar√° el criterio en la b√∫squeda pero perder√° esto si retorna a modo normal. Continua ?";

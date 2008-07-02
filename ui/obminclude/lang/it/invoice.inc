@@ -47,9 +47,9 @@ $l_del_payment = "Elimina pagamento";
 $l_del_payment_chosen = "Elimina pagamenti selezionati";
 $l_payments_todel = "Qui withdrawable pagamenti per questa fattura" ;
 $l_invoice_mod = "Modifica Fattura";
-$l_invalid_payment = "Il totale preso da un pagamento Ë maggiore del suo totale";
-$l_too_much_money = "il totale dei pagamenti Ë superiore all'importo complessivo della fattura. Se continui, questa fattura risulter‡ allo stato 'problema'";
-$l_error_try_again = "Ci sono errori !! prego , ripeto l'operzione dell'Ïnizio";
+$l_invalid_payment = "Il totale preso da un pagamento √® maggiore del suo totale";
+$l_too_much_money = "il totale dei pagamenti √® superiore all'importo complessivo della fattura. Se continui, questa fattura risulter√† allo stato 'problema'";
+$l_error_try_again = "Ci sono errori !! prego , ripeto l'operzione dell'√¨nizio";
 $l_try_again = "Prova ancora !";
 
 // Messages
@@ -65,7 +65,7 @@ $l_no_payment_found = "Nessun pagamento corrisponde alla ricerca";
 $lj_check_number = "\\nNumero fattura non valido!";
 $lj_check_money_ht = "\\nTotale senza spese espese non valido";
 $lj_check_money_ttc = "\\nTotale spese incluse non valido";
-$lj_check_amounts = "\\nIl totale spse incluse Ë inferiore al totale senza spese";
+$lj_check_amounts = "\\nIl totale spse incluse √® inferiore al totale senza spese";
 $lj_check_inout = "\\nScelgi un tipo prima di inviare la richiesta";
 $lj_changing_inout = "Non puoi cambiare il tipo di fattura  \\n se sono presenti affari collegati";
 $lj_no_number="\\nInserisci un numero fattura";

@@ -8,19 +8,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // labels
-$l_check = "Vérifications";
+$l_check = "VÃ©rifications";
 $l_database_server = "Serveur SQL";
-$l_database = "Base de données";
-$l_host = "Hôte";
+$l_database = "Base de donnÃ©es";
+$l_host = "HÃ´te";
 $l_session_stats = "Statistiques des Sessions";
 $l_date = "Date";
-$l_lifetime = "Durée d'une session utilisateur (en secondes)"; 
-$l_user_session = " Entrées dans ActiveUserObm";
+$l_lifetime = "DurÃ©e d'une session utilisateur (en secondes)"; 
+$l_user_session = " EntrÃ©es dans ActiveUserObm";
 $l_active_user = "Utilisateurs actuellement actifs";
 $l_login_date = "Date de login";
-$l_last_acces = "Dernier accès";
+$l_last_acces = "Dernier accÃ¨s";
 $l_nb_connec = "Nombre de hits";
-$l_last_page = "Dernière page consultée";
+$l_last_page = "DerniÃ¨re page consultÃ©e";
 $l_user_ip = "IP";
 
 // Titles

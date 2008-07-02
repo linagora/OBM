@@ -1,16 +1,16 @@
-\section{Installation pas à pas d'OBM 2.0.x}
+\section{Installation pas Ã  pas d'OBM 2.0.x}
 
 Cette documentation est valide pour la version 2.0. Seules les
-manipulations spécifiques à OBM sont décrites. Pour l'installation de
-PHP, MySQL, PostgreSQL, Apache ou autres composants libres, des exemples sont proposés correspondant à la version Debian mais il est préférable de vous référer à la documentation de votre distribution.
+manipulations spÃ©cifiques Ã  OBM sont dÃ©crites. Pour l'installation de
+PHP, MySQL, PostgreSQL, Apache ou autres composants libres, des exemples sont proposÃ©s correspondant Ã  la version Debian mais il est prÃ©fÃ©rable de vous rÃ©fÃ©rer Ã  la documentation de votre distribution.
 
 
-\subsection{Hypothèses}
+\subsection{HypothÃ¨ses}
 
 Cette documentation suppose que vous disposez d'un serveur Apache,
-d'un serveur de BD MySQL ou PostgreSQL et de PHP correctement configurés. 
+d'un serveur de BD MySQL ou PostgreSQL et de PHP correctement configurÃ©s. 
 
-Sous Debian, les packages suivants doivent être installés :
+Sous Debian, les packages suivants doivent Ãªtre installÃ©s :
 \begin{description}
 \item[packages php5 ] php5, php5-cgi, php5-mysql ou php5-pgsql (ou, pour php4 : php4, php4-cgi, php4-mysql ou php4-pgsql)
 \item[packages Apache 2 ] apache2 et apache2-common (ou, pour Apache 1 : apache et apache-common)
@@ -19,12 +19,12 @@ Sous Debian, les packages suivants doivent être installés :
 Dans la suite du document, on suppose que la racine d'OBM se trouve
 dans \fichier{/var/www/obm}.
 
-\subsection{Télécharger les sources}
+\subsection{TÃ©lÃ©charger les sources}
 
 L'installation serait plus difficile sans...
 
-Il faut donc télécharger les sources et les décompresser dans
-\fichier{/var/www} (en fait dans le répertoire qui contiendra la
+Il faut donc tÃ©lÃ©charger les sources et les dÃ©compresser dans
+\fichier{/var/www} (en fait dans le rÃ©pertoire qui contiendra la
 racine de votre OBM).
 
 \shadowbox{
@@ -38,8 +38,8 @@ ln -s obm-1.2.2 obm
   \end{minipage}
 }
 
-Changer le propriétaire des fichiers sources d'OBM (nécessaire pour le
-safe\_mode activé dans le module documents). 
+Changer le propriÃ©taire des fichiers sources d'OBM (nÃ©cessaire pour le
+safe\_mode activÃ© dans le module documents). 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -60,17 +60,17 @@ Fichier de configuration de PHP :
 \item[sur RedHat] \fichier{/etc/php.ini}
 \end{description}
 
-La version ligne de commande de PHP doit également être configurée
+La version ligne de commande de PHP doit Ã©galement Ãªtre configurÃ©e
 (certains outils d'administration ou certains scripts d'installation
 sont aussi utilisables dans ce mode de fonctionnement).
 
 \begin{description}
 \item[sur debian] \fichier{/etc/php5/cgi/php.ini}, ou 
-\fichier{/etc/php5/cli/php.ini} sur les version récentes (respectivement \fichier{/etc/php4/cgi/php.ini}, ou \fichier{/etc/php4/cli/php.ini} pour php 4).
+\fichier{/etc/php5/cli/php.ini} sur les version rÃ©centes (respectivement \fichier{/etc/php4/cgi/php.ini}, ou \fichier{/etc/php4/cli/php.ini} pour php 4).
 \end{description}
 
 
-La directive include\_path doit être renseignée ainsi (ou contenir au moins ces chemins) : 
+La directive include\_path doit Ãªtre renseignÃ©e ainsi (ou contenir au moins ces chemins) : 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -80,9 +80,9 @@ include_path = ".:/var/www/obm"
   \end{minipage}
 }
 
-Depuis la version 0.7.3, la directive short\_open\_tag peut être
-positionnée à Off. Pour les versions antérieures, elle doit toutefois
-être positionnée à On.
+Depuis la version 0.7.3, la directive short\_open\_tag peut Ãªtre
+positionnÃ©e Ã  Off. Pour les versions antÃ©rieures, elle doit toutefois
+Ãªtre positionnÃ©e Ã  On.
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -92,7 +92,7 @@ short_open_tag = On (can be switched to Off since OBM 0.7.3)
   \end{minipage}
 }
 
-Les variables globales doivent être automatiquement enregistrées : 
+Les variables globales doivent Ãªtre automatiquement enregistrÃ©es : 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -102,7 +102,7 @@ register_globals = On
   \end{minipage}
 }
 
-La directive Magic\_quote doit être à On :
+La directive Magic\_quote doit Ãªtre Ã  On :
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -112,8 +112,8 @@ magic_quotes_gpc = On
   \end{minipage}
 }
 
-De plus, selon  le propriétaire des fichiers, il faut aussi activer le
-safe\_mode (mais OBM peut fonctionner sans également) : 
+De plus, selon  le propriÃ©taire des fichiers, il faut aussi activer le
+safe\_mode (mais OBM peut fonctionner sans Ã©galement) : 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -123,10 +123,10 @@ safe_mode = On
   \end{minipage}
 }
 
-\subsubsection{Vérification du support Mysql (ou PostgreSQL) par PHP}
+\subsubsection{VÃ©rification du support Mysql (ou PostgreSQL) par PHP}
 
-Selon le serveur de base de données utilisé, une de ces deux lignes
-doit être présente dans votre \fichier{php.ini} : 
+Selon le serveur de base de donnÃ©es utilisÃ©, une de ces deux lignes
+doit Ãªtre prÃ©sente dans votre \fichier{php.ini} : 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -137,26 +137,26 @@ extension=pgsql.so
   \end{minipage}
 }
 
-Cette modification doit être faite pour le module Apache
+Cette modification doit Ãªtre faite pour le module Apache
 \emph{et} pour le mode ligne de commande s'ils utilisent des fichiers
 \fichier{php.ini} distincts.
 
 \subsection{Configuration d'Apache et de PHP}
 
-Les sources d'OBM sont dans le répertoire \fichier{php}, les fichiers
-à inclure sont dans le répertoire \fichier{obminclude}. Depuis la
-version 0.5.2, le répertoire \fichier{obminclude} est en dehors de la
-racine des documents pour des considérations de sécurité.
+Les sources d'OBM sont dans le rÃ©pertoire \fichier{php}, les fichiers
+Ã  inclure sont dans le rÃ©pertoire \fichier{obminclude}. Depuis la
+version 0.5.2, le rÃ©pertoire \fichier{obminclude} est en dehors de la
+racine des documents pour des considÃ©rations de sÃ©curitÃ©.
 
 Pour l'application web OBM, toutes les configurations Apache et PHP se
 font dans le fichier \fichier{httpd.conf} d'Apache.
 
 \subsubsection*{Configurer Apache pour le traitement des fichiers PHP}
 
-Attention, les différents chemins et fichiers peuvent varier entre les distributions et les versions d'apache (apache 1 et 2).
+Attention, les diffÃ©rents chemins et fichiers peuvent varier entre les distributions et les versions d'apache (apache 1 et 2).
 
-\paragraph{Définition du type de fichier .php}
-Éditer le fichier \fichier{apache2.conf} (ou \fichier{httpd.conf} pour Apache 1) et
+\paragraph{DÃ©finition du type de fichier .php}
+Ã‰diter le fichier \fichier{apache2.conf} (ou \fichier{httpd.conf} pour Apache 1) et
 ajouter :
 
 \shadowbox{
@@ -168,7 +168,7 @@ AddType application/x-httpd-php .php
 }
 
 \paragraph{Inclure le module php dans Apache}
-Éditer le fichier \fichier{mods-available/php5.load} (ou \fichier{modules.conf} pour Apache 1) et
+Ã‰diter le fichier \fichier{mods-available/php5.load} (ou \fichier{modules.conf} pour Apache 1) et
 ajouter :
 
 \shadowbox{
@@ -189,18 +189,18 @@ LoadModule php4_module /usr/lib/apache/1.3/libphp4.so
   \end{minipage}
 }
 
-Sous RedHat 8, avec Apache2, vérifier que le
+Sous RedHat 8, avec Apache2, vÃ©rifier que le
 \fichier{/etc/httpd/conf.d/php.conf} est correct.
 
-Nous allons  configurer un \emph{virtual host} pour gérer une instance
+Nous allons  configurer un \emph{virtual host} pour gÃ©rer une instance
 d'OBM (vous pouvez avoir plusieurs \emph{virtuals hosts} sur un seul
 serveur). 
 
-Créer un fichier \fichier{obm} dans le répertoire \fichier{/etc/apache2/sites-available}
+CrÃ©er un fichier \fichier{obm} dans le rÃ©pertoire \fichier{/etc/apache2/sites-available}
 (ou modifier le fichier \fichier{httpd.conf}, ans la section \emph{virtual host}, pour 
 Apache 1).
 
-A l'intérieur de ce fichier, ajoutez les balises :
+A l'intÃ©rieur de ce fichier, ajoutez les balises :
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -211,9 +211,9 @@ A l'intérieur de ce fichier, ajoutez les balises :
   \end{minipage}
 }
 
-Les modifications suivantes sont à apporter entre ces deux balises.
+Les modifications suivantes sont Ã  apporter entre ces deux balises.
 
-Positionner le \emph{Document Root} à /var/www/obm/php.
+Positionner le \emph{Document Root} Ã  /var/www/obm/php.
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -223,25 +223,25 @@ DocumentRoot /var/www/obm/php
   \end{minipage}
 }
 
-\subsubsection*{Répertoires d'include d'OBM}
+\subsubsection*{RÃ©pertoires d'include d'OBM}
 
-Le nom du répertoire d'include (\fichier{obminclude} par défaut) est
-maintenant une variable d'environnement pour permettre à plusieurs
-instances d'OBM basées sur le même répertoire de source de tourner
-simultanément. Seul ce répertoire est à modifier sur chaque instance
-car il contient les réglages spécifiques (thèmes, bases de données,
+Le nom du rÃ©pertoire d'include (\fichier{obminclude} par dÃ©faut) est
+maintenant une variable d'environnement pour permettre Ã  plusieurs
+instances d'OBM basÃ©es sur le mÃªme rÃ©pertoire de source de tourner
+simultanÃ©ment. Seul ce rÃ©pertoire est Ã  modifier sur chaque instance
+car il contient les rÃ©glages spÃ©cifiques (thÃ¨mes, bases de donnÃ©es,
 langues) pour chaque instance.
 
-Cette variable est donc positionnée dans le fichier du virtual host
+Cette variable est donc positionnÃ©e dans le fichier du virtual host
 d'obm \fichier{sites-available/obm} (ou dans le fichier \fichier{httpd.conf}
 pour Apache 1).
 
-Le module \fichier{env} est nécessaire pour positionner cette variable.
-Sous debian, ce module est déjà compilé dans le noyau de apache 2. Il est
-possible de le vérifier avec la commande \variable{apache2 -l} (dans la
-liste des modules renvoyée, il doit y avoir mod\_env.c).
+Le module \fichier{env} est nÃ©cessaire pour positionner cette variable.
+Sous debian, ce module est dÃ©jÃ  compilÃ© dans le noyau de apache 2. Il est
+possible de le vÃ©rifier avec la commande \variable{apache2 -l} (dans la
+liste des modules renvoyÃ©e, il doit y avoir mod\_env.c).
 
-Si le module \fichier{mod\_env} n'est pas compilé dans la version installée
+Si le module \fichier{mod\_env} n'est pas compilÃ© dans la version installÃ©e
 d'apache, il faut le charger. Sous apache 2, vous pouvez utilisez la commande
 \variable{a2enmod env}. Sinon, dans le fichier \fichier{apache2.conf} (ou
 \fichier{httpd.conf}) :
@@ -257,7 +257,7 @@ LoadModule env_module modules/mod_env.so (apache 2 sous Redhat)
 }
 
 Puis renseigner la variable OBM\_INCLUDE\_VAR avec le nom du
-répertoire d'include : 
+rÃ©pertoire d'include : 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -267,10 +267,10 @@ Setenv OBM_INCLUDE_VAR obminclude
   \end{minipage}
 }
 
-Le chemin d'accès au répertoire d'include d'OBM doit être donné
-(D'ailleurs, le répertoire \fichier{obminclude} peut être déplacé) :  
+Le chemin d'accÃ¨s au rÃ©pertoire d'include d'OBM doit Ãªtre donnÃ©
+(D'ailleurs, le rÃ©pertoire \fichier{obminclude} peut Ãªtre dÃ©placÃ©) :  
 
-Renseigner la variable include\_path avec le chemin vers le répertoire
+Renseigner la variable include\_path avec le chemin vers le rÃ©pertoire
 d'include : 
 
 \shadowbox{
@@ -284,7 +284,7 @@ php\_value include\_path ".:/var/www/obm"
 
 \subsubsection*{Alias pour les images}
 
-Il faut installer un alias images vers le répertoire de themes. Depuis 
+Il faut installer un alias images vers le rÃ©pertoire de themes. Depuis 
 la version 2.0, cet alias doit pointer vers le chemin 
 \fichier{/var/www/obm/ressources} : 
 
@@ -296,7 +296,7 @@ Alias /images /var/www/obm/ressources
   \end{minipage}
 }
 
-Pour les versions précédentes d'obm, l'alias est le suivant :
+Pour les versions prÃ©cÃ©dentes d'obm, l'alias est le suivant :
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -308,7 +308,7 @@ Alias /images /var/www/obm/obminclude/themes
 
 \subsubsection*{Directory Index}
 
-Il faut enfin spécifier le fichier par défaut : 
+Il faut enfin spÃ©cifier le fichier par dÃ©faut : 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -318,7 +318,7 @@ DirectoryIndex obm.php
   \end{minipage}
 }
 
-Nous recommandons \textbf{chaudement} d'interdire l'accès direct aux fichiers
+Nous recommandons \textbf{chaudement} d'interdire l'accÃ¨s direct aux fichiers
 \fichier{.inc} :
 
 \shadowbox{
@@ -333,10 +333,10 @@ Nous recommandons \textbf{chaudement} d'interdire l'accès direct aux fichiers
 }
 
 
-\subsubsection*{Section virtual host d'exemple complète}
+\subsubsection*{Section virtual host d'exemple complÃ¨te}
 
-Vérifier que votre IP soit définie comme un \emph{named virtual
-  host} et insérer cette section :
+VÃ©rifier que votre IP soit dÃ©finie comme un \emph{named virtual
+  host} et insÃ©rer cette section :
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -362,30 +362,30 @@ NameVirtualHost 192.168.1.5
 
 Depuis la version 2.0, la configuration d'\obm se trouve dans les 
 fichiers \fichier{conf/obm\_conf.ini} et \fichier{conf/obm\_conf.inc} 
-(Pour les versions précédentes, il s'agit du fichier 
+(Pour les versions prÃ©cÃ©dentes, il s'agit du fichier 
 \fichier{obminclude/obm\_conf.inc}).
 
-Pour créer ces fichiers, copier \fichier{conf/obm\_conf.ini.sample} et 
+Pour crÃ©er ces fichiers, copier \fichier{conf/obm\_conf.ini.sample} et 
 \fichier{conf/obm\_conf.inc.sample} vers dans les nouveaux fichiers 
-\fichier{conf/obm\_conf.ini} et \fichier{conf/obm\_conf.inc}, puis éditer 
+\fichier{conf/obm\_conf.ini} et \fichier{conf/obm\_conf.inc}, puis Ã©diter 
 ces derniers.
 
 
-\subsubsection{Configuration initiale pour la base de données OBM}
+\subsubsection{Configuration initiale pour la base de donnÃ©es OBM}
 
-Éditer le fichier \fichier{obm\_conf.ini} dans \fichier{conf} et
+Ã‰diter le fichier \fichier{obm\_conf.ini} dans \fichier{conf} et
 
 \begin{itemize}
-\item choisir la base de données à utiliser ; 
-\item la déclarer ;
-\item déclarer le nom d'utilisateur et le mot de passe à utiliser.
-\item déclarer l'url d'accès à OBM (\$cgp\_host).
+\item choisir la base de donnÃ©es Ã  utiliser ; 
+\item la dÃ©clarer ;
+\item dÃ©clarer le nom d'utilisateur et le mot de passe Ã  utiliser.
+\item dÃ©clarer l'url d'accÃ¨s Ã  OBM (\$cgp\_host).
 \end{itemize}
 
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
-; Information sur les bases de données
+; Information sur les bases de donnÃ©es
 host = localhost
 dbtype = MYSQL
 db = obm
@@ -397,9 +397,9 @@ password = "aliacom"
   \end{minipage}
 }
 
-Pour modifier des préférences globales (comme cgp\_mail\_enabled par 
-exemple) et déclarer le dépôt de documents (voir \ref{install_doc}), 
-il faut éditer le fichier \fichier{obm\_conf.inc}.
+Pour modifier des prÃ©fÃ©rences globales (comme cgp\_mail\_enabled par 
+exemple) et dÃ©clarer le dÃ©pÃ´t de documents (voir \ref{install_doc}), 
+il faut Ã©diter le fichier \fichier{obm\_conf.inc}.
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -416,11 +416,11 @@ $cgp_mail_enabled = false;
 }
 
 
-\subsubsection{Configurer le dépôt de documents}
+\subsubsection{Configurer le dÃ©pÃ´t de documents}
 \label{install_doc}
 
-Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{conf} (ou 
-dans \fichier{obminclude} pour les versions antérieures à la 2.0).
+Ã‰diter le fichier \fichier{obm\_conf.inc} dans \fichier{conf} (ou 
+dans \fichier{obminclude} pour les versions antÃ©rieures Ã  la 2.0).
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -431,7 +431,7 @@ $cdocument_root = "/var/www/obmdocuments";
 }
 
 
-Créer le répertoire et le faire appartenir à l'utilisateur exécutant le serveur apache (www-data sous Debian).
+CrÃ©er le rÃ©pertoire et le faire appartenir Ã  l'utilisateur exÃ©cutant le serveur apache (www-data sous Debian).
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -443,19 +443,19 @@ chown www-data:www-data /var/www/obmdocuments
 }
 
 
-\subsubsection{Configuration et création de la base de données}
+\subsubsection{Configuration et crÃ©ation de la base de donnÃ©es}
 
-Les scripts de création de la base de données se trouvent dans le
-répertoire \fichier{scripts/2.0}.
+Les scripts de crÃ©ation de la base de donnÃ©es se trouvent dans le
+rÃ©pertoire \fichier{scripts/2.0}.
 
-\subsubsection*{Langue par défaut des données}
+\subsubsection*{Langue par dÃ©faut des donnÃ©es}
 
-Certaines valeurs de références sont insérées par défaut. Ces valeurs
-peuvent être en français (par défaut) ou en anglais. Pour passer de
-l'un à l'autre, il faut éditer le fichier
+Certaines valeurs de rÃ©fÃ©rences sont insÃ©rÃ©es par dÃ©faut. Ces valeurs
+peuvent Ãªtre en franÃ§ais (par dÃ©faut) ou en anglais. Pour passer de
+l'un Ã  l'autre, il faut Ã©diter le fichier
 \fichier{scripts/2.0/install\_obmdb\_2.0.mysql.sh} (ou
 \fichier{scripts/2.0/install\_obmdb\_2.0.pgsql.sh}) pour changer la
-valeur de DATA\_LANG à \texttt{en} : 
+valeur de DATA\_LANG Ã  \texttt{en} : 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -468,9 +468,9 @@ DATA_LANG="en"
 
 \subsubsection{MySQL}
 
-Pré-requis : disposer d'un login/mot de passe valide pour MySQL.
+PrÃ©-requis : disposer d'un login/mot de passe valide pour MySQL.
 
-Exemple de création d'un utilisateur MySQL : 
+Exemple de crÃ©ation d'un utilisateur MySQL : 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -490,8 +490,8 @@ GRANT ALL ON obm.* TO obm@localhost IDENTIFIED BY 'obm';
   \end{minipage}
 }
 
-Le script \fichier{install\_obmdb\_2.0.mysql.sh} gère les différentes
-étapes de création de la base de données. Positionner les bonnes
+Le script \fichier{install\_obmdb\_2.0.mysql.sh} gÃ¨re les diffÃ©rentes
+Ã©tapes de crÃ©ation de la base de donnÃ©es. Positionner les bonnes
 valeurs de login/mot de passe dans le fichier \fichier{conf/obm\_conf.ini} 
 avant de lancer le script :
 
@@ -510,7 +510,7 @@ cd scripts/2.0
 
 OBM supporte PostgreSQL depuis la version 0.7.5.
 
-Création de l'utilisateur obm et de la base de données éponyme :
+CrÃ©ation de l'utilisateur obm et de la base de donnÃ©es Ã©ponyme :
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -521,11 +521,11 @@ create database obm with owner = obm;
   \end{minipage}
 }
 
-\subsubsection*{Jeux de caractères}
+\subsubsection*{Jeux de caractÃ¨res}
 
-Si votre server PostgreSQL n'est pas configuré pour le jeu de
-caractères latin1, éditez le fichier \fichier{scripts/2.0/postgres-pre.sql}
-et décommentez la ligne :
+Si votre server PostgreSQL n'est pas configurÃ© pour le jeu de
+caractÃ¨res latin1, Ã©ditez le fichier \fichier{scripts/2.0/postgres-pre.sql}
+et dÃ©commentez la ligne :
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -535,10 +535,10 @@ et décommentez la ligne :
   \end{minipage}
 }
 
-\subsubsection*{Création de la base Postgres}
+\subsubsection*{CrÃ©ation de la base Postgres}
 
-Le script \fichier{install\_obmdb\_2.0.pgsql.sh} gère toutes les 
-étapes de création de la base de données. Positionner les bonnes
+Le script \fichier{install\_obmdb\_2.0.pgsql.sh} gÃ¨re toutes les 
+Ã©tapes de crÃ©ation de la base de donnÃ©es. Positionner les bonnes
 valeurs de login/mot de passe dans le fichier \fichier{conf/obm\_conf.ini} 
 avant de lancer le script :
 
@@ -553,32 +553,32 @@ cd scripts/2.0
   \end{minipage}
 }
 
-\subsection{Support du système d'authentification CAS (Central Authentication Service)}
+\subsection{Support du systÃ¨me d'authentification CAS (Central Authentication Service)}
 
-\subsubsection{Pré-requis}
+\subsubsection{PrÃ©-requis}
 
 Le support CAS s'appuie sur la librairie cliente PHP, phpCAS (http://esup-phpcas.sourceforge.net/index.html).
 
-Les librairies Curl doivent être installées sur votre système et compilées avec le support de SSL.
+Les librairies Curl doivent Ãªtre installÃ©es sur votre systÃ¨me et compilÃ©es avec le support de SSL.
 Sous Debian, il faut installer les packages : curl, libcurl3, libcurl3-gnutls.  
 
-La version de PHP doit être supérieure à la 4.2.2.
-PHP doit être installé avec le support curl, openssl, domxml et zlib.
+La version de PHP doit Ãªtre supÃ©rieure Ã  la 4.2.2.
+PHP doit Ãªtre installÃ© avec le support curl, openssl, domxml et zlib.
 Sous Debian, il faut installer les packages php4-curl et php4-domxml.
 
-Il est nécessaire d'installer PEAR. Les libariries PEAR::DB et PEAR:Log sont utilisées.
+Il est nÃ©cessaire d'installer PEAR. Les libariries PEAR::DB et PEAR:Log sont utilisÃ©es.
 Sous Debian, il faut installer le packages php4-pear.
 
 \subsubsection{Configuration d'OBM}
 
-Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
+Ã‰diter le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
 
 \begin{itemize}
-\item spécifier le mode d'authentification "CAS"; 
-\item déclarer les paramètres de connection au serveur CAS.
+\item spÃ©cifier le mode d'authentification "CAS"; 
+\item dÃ©clarer les paramÃ¨tres de connection au serveur CAS.
 \end{itemize}
 
-Les variables suivantes du fichier de configuration doivent être rennseignées:
+Les variables suivantes du fichier de configuration doivent Ãªtre rennseignÃ©es:
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -596,9 +596,9 @@ $cas_server_uri = "/cas";
   \end{minipage}
 }
 
-\subsection{Lancer OBM (accéder à obm.php depuis un navigateur)}
+\subsection{Lancer OBM (accÃ©der Ã  obm.php depuis un navigateur)}
 
-D'abord, redémarrer le serveur web apache : 
+D'abord, redÃ©marrer le serveur web apache : 
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -609,6 +609,6 @@ D'abord, redémarrer le serveur web apache :
 }
 
 Si tout marche bien, lancer un navigateur (Firefox par exemple) et
-aller à l'URL : \url{http://yourvirtualhost/}, puis se connecter en
+aller Ã  l'URL : \url{http://yourvirtualhost/}, puis se connecter en
 utilisant le compte \texttt{uadmin/padmin}.
 

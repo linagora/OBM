@@ -52,7 +52,7 @@ $l_impossible_deletion = " alcuni pagamenti sono associati a questo account. Imp
 $l_check_number = "Numero account non valido ! ";
 $l_fill_number = " Inserisci prima il numero ! ";
 $l_fill_bank = "Inserisci prima la Banca !";
-$lj_confirm_no_bank="Questo accoutn non è associato a banche. Click OK per confermare.";
+$lj_confirm_no_bank="Questo accoutn non Ã¨ associato a banche. Click OK per confermare.";
 
 // For the display parameters modification screen
 $l_account_options = "Visualizza le opzioni per la lista di account ";

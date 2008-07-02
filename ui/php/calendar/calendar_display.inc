@@ -1190,7 +1190,7 @@ function dis_calendar_printable_event(&$occurrence, &$calendar_entity, $ts) {
   if($occurrence->event->isPeriodic()) {
     $schedule = "<img src=\"$ico_periodic\" alt=\"[Periodic]\" />";
   }           
-  if($occurrence->event->all_day == 1) {
+  if($occurrence->event->all_day) {
     $schedule .= $l_all_day; 
   } else {
     if(date('Ymd',$occurrence->date) != date('Ymd',$ts)) {
@@ -1912,7 +1912,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $entity_id = $occurrence->id;
   $entity = $occurrence->entity;
   $entity_state = $occurrence->entity_state;
-  $all_day = $event->all_day;
+  $all_day = ($event->all_day)?1:0;
   $entityClass = $calendar_entity[$entity][$entity_id]['class'];
   if ($entity_state == 'W') {
     $entityClass .= '_W';
@@ -1926,7 +1926,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "item:'$item_list'";
   $ed[] = "time:$date";
   $ed[] = "title:'$title'";
-  $ed[] = "all_day:$all_day";
+  $ed[] = "all_day:".$all_day;
   $ed[] = "klass:'$entityClass'"; 
   $ed[] = "description:'$description'";
   $ed[] = "location:'$location'";
@@ -1952,7 +1952,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       }
       break;
     case 'hour' :
-      $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
+      $day = ($all_day) || (date('Ymd',$date + $duration) != date('Ymd',$date));
       $day = $day || (date('H',$date) <  $ccalendar_first_hour);
       $day = $day || (date('H',$date) >=  $ccalendar_last_hour );
       if ($updatable) {
@@ -2375,7 +2375,7 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $ts, $cats
   $entity = $occurrence->entity;
 
   $style = "color:rgb(".$cats_color[$occurrence->event->category1].")";  
-  if($occurrence->event->all_day == 1) {
+  if($occurrence->event->all_day) {
     $schedule = $l_all_day; 
   } else {
     if(date('Ymd',$occurrence->date) != date('Ymd',$ts)) {
@@ -3229,7 +3229,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $start_week_day = strtotime('+1 day', $start_week_day); 
   }
 
-  if ( $all_day == '1' ) {
+  if ( $all_day ) {
     $style = 'display:none;';
     $all_day_checked = "checked=\"checked\"";
   }
@@ -4489,7 +4489,7 @@ function json_event_data($id,$calendar) {
   $element_id = $calendar['element_id'];
   $ent_q = run_query_get_events_attendee(array($id));
   $entities = get_calendar_event_entity($id);
-  $all_day = $calendar['all_day'];
+  $all_day = ($calendar['all_day'])?1:0;
   $date = strtotime($calendar['date_begin']);
   $duration = $calendar['duration'];
   $title = $calendar['title'];
@@ -4537,13 +4537,13 @@ function json_event_data($id,$calendar) {
   
   switch($context)  {
     case 'day' :
-      $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
+      $day = ($all_day) || (date('Ymd',$date + $duration) != date('Ymd',$date));
       $day = $day || (date('H',$date + $duration) < $ccalendar_first_hour);
       $day = $day || (date('H',$date) >= $ccalendar_last_hour );
       $options = array(); 
       break;
     case 'week' :
-      $day = ($all_day == 1) || (date('Ymd',$date + $duration) != date('Ymd',$date));
+      $day = ($all_day) || (date('Ymd',$date + $duration) != date('Ymd',$date));
       $day = $day || (date('H',$date + $duration) < $ccalendar_first_hour);
       $day = $day || (date('H',$date) >= $ccalendar_last_hour );
       $options = array();

@@ -1,48 +1,48 @@
-% Documentation technique d'OBM : Configuration specifique à un site
+% Documentation technique d'OBM : Configuration specifique Ã  un site
 % ALIACOM Pierre Baudracco
 % $Id$
 
-\section{Configuration spécifique d'un site}
+\section{Configuration spÃ©cifique d'un site}
 
-révision : \obm 2.1.0\\
+rÃ©vision : \obm 2.1.0\\
 
-OBM est pensé pour faciliter la personnalisation d'une mise en oeuvre en restant compatible avec le produit générique.
+OBM est pensÃ© pour faciliter la personnalisation d'une mise en oeuvre en restant compatible avec le produit gÃ©nÃ©rique.
 
-Pour ce faire les options de configurations et les données spécifiques d'un site sont situées dans 2 fichiers et un répertoire dédiés.\\
+Pour ce faire les options de configurations et les donnÃ©es spÃ©cifiques d'un site sont situÃ©es dans 2 fichiers et un rÃ©pertoire dÃ©diÃ©s.\\
 
 \begin{tabular}{|p{7cm}|p{5cm}|}
 \hline
-Répertoire de configuration & conf/ \\
+RÃ©pertoire de configuration & conf/ \\
 \hline
-Fichier de configuration système & conf/obm\_conf.ini \\
+Fichier de configuration systÃ¨me & conf/obm\_conf.ini \\
 \hline
 Fichier de configuration de l'application & conf/obm\_conf.inc \\
 \hline
 \end{tabular}
 
 
-\subsection{obm\_conf.ini : Fichier de configuration système}
+\subsection{obm\_conf.ini : Fichier de configuration systÃ¨me}
 
 
 \begin{longtable}{|p{3cm}|p{1cm}|p{2.5cm}|p{8cm}|}
 \hline
-\textbf{Option} & \textbf{Depuis} & \textbf{Défaut} & \textbf{Description} \\
+\textbf{Option} & \textbf{Depuis} & \textbf{DÃ©faut} & \textbf{Description} \\
 \hline
 \hline
-\multicolumn{4}{c}{\textbf{Paramètres globaux}}\\
+\multicolumn{4}{c}{\textbf{ParamÃ¨tres globaux}}\\
 \hline
 \hline
-host & 2.0.0 & localhost & Connexion BD : hôte \\ 
+host & 2.0.0 & localhost & Connexion BD : hÃ´te \\ 
 \hline
 dbtype & 2.0.0 & MYSQL & Connexion BD : type de la BD (MYSQL ou PGSQL) \\ 
 \hline
 db & 2.0.0 & obm & Connexion BD : nom de la BD \\ 
 \hline
-user & 2.0.0 & obm & Connexion BD : login de connexion à la BD \\ 
+user & 2.0.0 & obm & Connexion BD : login de connexion Ã  la BD \\ 
 \hline
-password & 2.0.0 & obm & Connexion BD : mot de passe de connexion à la BD \\ 
+password & 2.0.0 & obm & Connexion BD : mot de passe de connexion Ã  la BD \\ 
 \hline
-lang & 2.0.0 & fr & Langue par défaut \\ 
+lang & 2.0.0 & fr & Langue par dÃ©faut \\ 
 \hline
 obm-ldap & 2.0.0 & false & Utilisation du service ldap \\ 
 \hline
@@ -56,173 +56,173 @@ singleNameSpace & 2.1.0 & false & Utilisation en mono-domaine (1 seul espace de 
 
 \hline
 \hline
-\multicolumn{4}{c}{\textbf{Paramètres de l'automate}}\\
+\multicolumn{4}{c}{\textbf{ParamÃ¨tres de l'automate}}\\
 \hline
 \hline
 ldapServer & 2.0.0 & localhost & Serveur Ldap \\ 
 \hline
-ldapRoot & 2.0.0 & local & Racine de l'arbre LDAP géré par obm-ldap \\ 
+ldapRoot & 2.0.0 & local & Racine de l'arbre LDAP gÃ©rÃ© par obm-ldap \\ 
 \hline
-cyrusPartition & 2.1.0 & false & Gestion de partitions cyrus (séparation des domaines OBM) \\ 
+cyrusPartition & 2.1.0 & false & Gestion de partitions cyrus (sÃ©paration des domaines OBM) \\ 
 \hline
-sambaHomeServer & 2.0.0 & '' & Adresse du serveur Samba stockant les répertoires personnels \\ 
+sambaHomeServer & 2.0.0 & '' & Adresse du serveur Samba stockant les rÃ©pertoires personnels \\ 
 \hline
 \end{longtable}
 
 
 \subsection{obm\_conf.inc : Fichier de configuration de l'application}
 
-Ces paramètres se définissent dans le fichier de configuration conf/obm\_conf.inc. Les valeurs par défaut des paramètres sont positionnées dans le fichier obminclude/global.inc.
+Ces paramÃ¨tres se dÃ©finissent dans le fichier de configuration conf/obm\_conf.inc. Les valeurs par dÃ©faut des paramÃ¨tres sont positionnÃ©es dans le fichier obminclude/global.inc.
 
 \begin{tabular}{|p{7cm}|p{5cm}|}
 \hline
 Fichier de configuration & conf/obm\_conf.inc \\
 \hline
-Fichier de définition des valeurs par défaut & obminclude/global.inc \\
+Fichier de dÃ©finition des valeurs par dÃ©faut & obminclude/global.inc \\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-Liste des paramètres définis :\\
+Liste des paramÃ¨tres dÃ©finis :\\
 
 
 \begin{longtable}{|p{3.7cm}|p{0.8cm}|p{3cm}|p{7cm}|}
 \hline
-\textbf{Option} & \textbf{Depuis} & \textbf{Défaut} & \textbf{Description} \\
+\textbf{Option} & \textbf{Depuis} & \textbf{DÃ©faut} & \textbf{Description} \\
 \hline
 \hline
-\multicolumn{4}{c}{\textbf{Paramètres globaux}}\\
+\multicolumn{4}{c}{\textbf{ParamÃ¨tres globaux}}\\
 \hline
 \hline
-\$cgp\_host & & http://obm/ & Hôte utilisé dans les liens (ex dans les mails envoyés) \\ 
+\$cgp\_host & & http://obm/ & HÃ´te utilisÃ© dans les liens (ex dans les mails envoyÃ©s) \\ 
 \hline
 \$c\_home\_redirect & 1.1.3 & & Redirection pour la page d'accueil (permettant par exemple d'arriver directement sur l'agenda) \\ 
 \hline
 \$c\_multidomain & 2.0.0 & false & utilisation en mode multi-domaine \\ 
 \hline
-\$conf\_lang & 2.0.0 & false & (anciennement \textbf{\$cgp\_site\_include}). Si vrai OBM surcharge les fichiers de langue standard par ceux spéciques définis dans l'arborescence conf/lang/.\\ 
+\$conf\_lang & 2.0.0 & false & (anciennement \textbf{\$cgp\_site\_include}). Si vrai OBM surcharge les fichiers de langue standard par ceux spÃ©ciques dÃ©finis dans l'arborescence conf/lang/.\\ 
 \hline
-\$cgp\_todo\_nb & & 5 & Nombre de Todo affichés \\ 
+\$cgp\_todo\_nb & & 5 & Nombre de Todo affichÃ©s \\ 
 \hline
-\$conf\_display\_max\_rows & 2.1.0 & 200 & Nombre de lignes max autorisé dans résultats affichés \\ 
+\$conf\_display\_max\_rows & 2.1.0 & 200 & Nombre de lignes max autorisÃ© dans rÃ©sultats affichÃ©s \\ 
 \hline
 \$popup\_width & & 620 & Largeur en pixels des popups \\ 
 \hline
 \$popup\_height & & 480 & Hauteur en pixels des popups \\ 
 \hline
-\$cak\_prev & & P & ACCESSKEY pour page précédente \\ 
+\$cak\_prev & & P & ACCESSKEY pour page prÃ©cÃ©dente \\ 
 \hline
 \$cak\_next & & N & ACCESSKEY pour page suivante \\ 
 \hline
-\$cak\_page\_prev & & 4 & ACCESSKEY pour groupe de pages précédent \\ 
+\$cak\_page\_prev & & 4 & ACCESSKEY pour groupe de pages prÃ©cÃ©dent \\ 
 \hline
 \$cak\_page\_prev & & 6 & ACCESSKEY pour groupe de pages suivant \\ 
 \hline
-\$cak\_begin & & B & ACCESSKEY pour début de résultat \\ 
+\$cak\_begin & & B & ACCESSKEY pour dÃ©but de rÃ©sultat \\ 
 \hline
-\$cak\_prev & & E & ACCESSKEY pour fin de résultat \\ 
+\$cak\_prev & & E & ACCESSKEY pour fin de rÃ©sultat \\ 
 \hline
-\$cg\_adm & & 1 & Groupe Administrateur utilisé par section Administration \\ 
+\$cg\_adm & & 1 & Groupe Administrateur utilisÃ© par section Administration \\ 
 \hline
-\$cg\_com & & 2 & Groupe Commercial utilisé par section Commercial \\ 
+\$cg\_com & & 2 & Groupe Commercial utilisÃ© par section Commercial \\ 
 \hline
-\$cg\_prod & & 3 & Groupe Production utilisé par section Production \\ 
+\$cg\_prod & & 3 & Groupe Production utilisÃ© par section Production \\ 
 \hline
-\$cql\_max\_row & & 50 000 & Maximum de lignes de résultat autorisé pour une requête manuelle utilisateur (module \List)\\ 
+\$cql\_max\_row & & 50 000 & Maximum de lignes de rÃ©sultat autorisÃ© pour une requÃªte manuelle utilisateur (module \List)\\ 
 \hline
-\$cql\_max\_cost & & 100 000 & Coût maximum autorisé pour une requête manuelle utilisateur (module \List)\\ 
+\$cql\_max\_cost & & 100 000 & CoÃ»t maximum autorisÃ© pour une requÃªte manuelle utilisateur (module \List)\\ 
 \hline
-\$cgp\_sql\_star & & true & Traite le caractère * comme un joker dans les recherches \\ 
+\$cgp\_sql\_star & & true & Traite le caractÃ¨re * comme un joker dans les recherches \\ 
 \hline
-\$ctu\_sql\_limit & & false & Indique si les requêtes envoyées à la base de données doivent gérer la clause limit afin de restreindre les résultats au niveau base de données à la place de l'affichage \\ 
+\$ctu\_sql\_limit & & false & Indique si les requÃªtes envoyÃ©es Ã  la base de donnÃ©es doivent gÃ©rer la clause limit afin de restreindre les rÃ©sultats au niveau base de donnÃ©es Ã  la place de l'affichage \\ 
 \hline
-\$cmy\_character\_set & & & Indique le jeu de caractères utilisé (base + fichiers). (uniquement pour MySQL 4.1 et +) \\ 
+\$cmy\_character\_set & & & Indique le jeu de caractÃ¨res utilisÃ© (base + fichiers). (uniquement pour MySQL 4.1 et +) \\ 
 \hline
-\$cmy\_charset\_collation & & & Indique la collation du jeu de caractères utilisé (base + fichiers). (uniquement pour MySQL 4.1 et +) \\ 
+\$cmy\_charset\_collation & & & Indique la collation du jeu de caractÃ¨res utilisÃ© (base + fichiers). (uniquement pour MySQL 4.1 et +) \\ 
 \hline
-\$cgp\_mail\_enabled & & false & Indique si l'envoi de mail est activé pour OBM\\
+\$cgp\_mail\_enabled & & false & Indique si l'envoi de mail est activÃ© pour OBM\\
 \hline
-\$cs\_lifetime & & 7200 & Durée de session. Temps d'inactivité avant déconnexion \\ 
+\$cs\_lifetime & & 7200 & DurÃ©e de session. Temps d'inactivitÃ© avant dÃ©connexion \\ 
 \hline
-\$cgp\_sess\_db & & false & Indication de stockage des sessions en base de données \\ 
+\$cgp\_sess\_db & & false & Indication de stockage des sessions en base de donnÃ©es \\ 
 \hline
-\$cgp\_cookie\_name & 1.0.4 & OBM\_Session & Nom du cookie utilisé par \obm \\ 
+\$cgp\_cookie\_name & 1.0.4 & OBM\_Session & Nom du cookie utilisÃ© par \obm \\ 
 \hline
-\$cgp\_cookie\_domain & 1.0.4 & aliacom.local & Domaine de validité du cookie (utilisation avec Aliamin) \\ 
+\$cgp\_cookie\_domain & 1.0.4 & aliacom.local & Domaine de validitÃ© du cookie (utilisation avec Aliamin) \\ 
 \hline
-\$auth\_kind\footnotemark[1] & & 'standalone' & "standalone" pour gérer les
+\$auth\_kind\footnotemark[1] & & 'standalone' & "standalone" pour gÃ©rer les
 authentifications dans la base OBM, "CAS" pour passer par un serveur CAS \\ 
 \hline
-\$cas\_server & & aucune & nom ou IP du serveur CAS. Utilisé seulement
+\$cas\_server & & aucune & nom ou IP du serveur CAS. UtilisÃ© seulement
 si le mode d'authentification est "CAS". \\ 
 \hline
-\$cas\_server\_port & & aucune & port du service CAS sur le serveur. Utilisé seulement si le mode d'authentification est "CAS". \\ 
+\$cas\_server\_port & & aucune & port du service CAS sur le serveur. UtilisÃ© seulement si le mode d'authentification est "CAS". \\ 
 \hline
 \$cas\_server\_uri & & aucune  &  URI du service CAS sur le
-serveur. Utilisé seulement si le mode d'authentification est "CAS".\\  
+serveur. UtilisÃ© seulement si le mode d'authentification est "CAS".\\  
 \hline
-\$password\_encryption & & md5 & Indique le format de stockage des mots de passe en base de données (plain | md5 | crypt) \\ 
+\$password\_encryption & & md5 & Indique le format de stockage des mots de passe en base de donnÃ©es (plain | md5 | crypt) \\ 
 \hline
-\$c\_use\_connectors & & false & Indique l'utilisation de connecteurs (Evolution, Outlook) qui engendre des traitements supplémentaires \\ 
+\$c\_use\_connectors & & false & Indique l'utilisation de connecteurs (Evolution, Outlook) qui engendre des traitements supplÃ©mentaires \\ 
 
 \hline
 \hline
-\multicolumn{4}{c}{\textbf{Paramètres spéciques aux modules}}\\
+\multicolumn{4}{c}{\textbf{ParamÃ¨tres spÃ©ciques aux modules}}\\
 \hline
 \hline
-\$cclipboard\_address & 1.1.0 & tableau & Définition des champs d'adresse à intégrer dans le presse-papier \\ 
+\$cclipboard\_address & 1.1.0 & tableau & DÃ©finition des champs d'adresse Ã  intÃ©grer dans le presse-papier \\ 
 \hline
-\$caf\_company\_name & & false & Indicateur de formatage automatique du nom de société \\ 
+\$caf\_company\_name & & false & Indicateur de formatage automatique du nom de sociÃ©tÃ© \\ 
 \hline
 \$caf\_town & & false & Indicateur de formatage automatique du nom de ville \\ 
 \hline
-\$csearch\_advanced\_default & 1.1.0 & false & Indicateur de sélection de recherche avancée par défaut (société et contact)\\ 
+\$csearch\_advanced\_default & 1.1.0 & false & Indicateur de sÃ©lection de recherche avancÃ©e par dÃ©faut (sociÃ©tÃ© et contact)\\ 
 \hline
-\$cgp\_mailing\_default & & true & Indicateur contact ``activé pour mailing'' par défaut \\ 
+\$cgp\_mailing\_default & & true & Indicateur contact ``activÃ© pour mailing'' par dÃ©faut \\ 
 \hline
-\$ccontact\_private\_default & & false & Indicateur contacts sont privés par défaut \\ 
+\$ccontact\_private\_default & & false & Indicateur contacts sont privÃ©s par dÃ©faut \\ 
 \hline
 \$ccalendar\_public\_groups & & false & Indicateur d'affichage des groupes publics dans l'agenda \\ 
 \hline
 \$ccalendar\_weekstart & & ``monday + 2 hours'' & 1er jour d'une semaine dans l'agenda \\ 
 \hline
-\$ccalendar\_first\_hour & & 8 & Heure de début de journée affichée dans l'agenda \\ 
+\$ccalendar\_first\_hour & & 8 & Heure de dÃ©but de journÃ©e affichÃ©e dans l'agenda \\ 
 \hline
-\$ccalendar\_last\_hour & & 20 & Heure de fin de journée affichée dans l'agenda \\ 
+\$ccalendar\_last\_hour & & 20 & Heure de fin de journÃ©e affichÃ©e dans l'agenda \\ 
 \hline
-\$ccalendar\_max\_users & 2.0.0 & 25 & Nombre maximal d'agendas affichés simultanément \\ 
+\$ccalendar\_max\_users & 2.0.0 & 25 & Nombre maximal d'agendas affichÃ©s simultanÃ©ment \\ 
 \hline
 \$ccalendar\_resource & 2.0.0 & true & Indicateur d'utilisation des ressources \\ 
 \hline
-\$ccalendar\_alerts & 2.1.0 & 5, 10, 15, 30 & Tableau de délais d'alertes proposés avant rdv \\ 
+\$ccalendar\_alerts & 2.1.0 & 5, 10, 15, 30 & Tableau de dÃ©lais d'alertes proposÃ©s avant rdv \\ 
 \hline
 \$ccalendar\_send\_ics & 2.0.3 & true & Indicateur d'envoi d'ics dans mails de rdv \\ 
 \hline
-\$c\_day\_fraction & & 8 & Nombre de fractions d'une journée (gestion des temps)\\ 
+\$c\_day\_fraction & & 8 & Nombre de fractions d'une journÃ©e (gestion des temps)\\ 
 \hline
-\$c\_working\_days & & 0,1,1,1,1,1,0 & Journées travaillées, débute à dimanche (gestion des temps)\\ 
+\$c\_working\_days & & 0,1,1,1,1,1,0 & JournÃ©es travaillÃ©es, dÃ©bute Ã  dimanche (gestion des temps)\\ 
 \hline
 \$c\_week\_first\_day & & 1 & Premier jour de la semaine (0=dimanche, 1=lundi,..) (gestion des temps)\\ 
 \hline
 \$cmail\_incident & & & Adresse e-mail de destination des messages automatiques du module Incident \\ 
 \hline
-\$cdocument\_root & 1.0.0 & /var/www/obmdocs & Chemin du dépôt de document sur disque \\ 
+\$cdocument\_root & 1.0.0 & /var/www/obmdocs & Chemin du dÃ©pÃ´t de document sur disque \\ 
 \hline
-\$default\_path & & / & Répertoire par défaut dans le dépot de documents \\ 
+\$default\_path & & / & RÃ©pertoire par dÃ©faut dans le dÃ©pot de documents \\ 
 \hline
-\$default\_mime & & application/octet-stream & Type mime par défaut des documents \\ 
+\$default\_mime & & application/octet-stream & Type mime par dÃ©faut des documents \\ 
 \hline
 \$tmp\_path & & /tmp & Chemin pour stockage temporaire (module import) \\ 
 \hline
-\$cgroup\_private\_default & & false & Indicateur groupes sont privés par défaut \\ 
+\$cgroup\_private\_default & & false & Indicateur groupes sont privÃ©s par dÃ©faut \\ 
 \hline
-\$cbackup\_path & 1.0.0 & /var/www/obmbackup & Chemin du dépôt de sauvegardes sur disque \\ 
+\$cbackup\_path & 1.0.0 & /var/www/obmbackup & Chemin du dÃ©pÃ´t de sauvegardes sur disque \\ 
 \hline
 \$cdefault\_tax & 2.0.0 & 1.196, 1.055, 1 & tableau des valeurs de TVA \\ 
 
 \hline
 \hline
-\multicolumn{4}{c}{\textbf{Paramètres d'affichage des sections, modules et champs}}\\
+\multicolumn{4}{c}{\textbf{ParamÃ¨tres d'affichage des sections, modules et champs}}\\
 \hline
 \hline
 \$cgp\_show & & Voir \ref{cgp_show_section} et \ref{cgp_show_module} & Indicateurs d'affichage des sections et modules \\ 
@@ -231,16 +231,16 @@ serveur. Utilisé seulement si le mode d'authentification est "CAS".\\
 
 \hline
 \hline
-\multicolumn{4}{c}{\textbf{Définitions des données utilisateurs}}\\
+\multicolumn{4}{c}{\textbf{DÃ©finitions des donnÃ©es utilisateurs}}\\
 \hline
 \hline
-\$cgp\_user & 2.0.0 & Voir \ref{of_userdata} & Définition des catégories et champs utilisateurs \\ 
+\$cgp\_user & 2.0.0 & Voir \ref{of_userdata} & DÃ©finition des catÃ©gories et champs utilisateurs \\ 
 \hline
 \end{longtable}
 
 \footnotetext[1]{L'installation de l'authentification CAS est
-  détaillée dans la documentation Aliamin. En attendant l'unification
-  entre ces deux documentations, merci de vous référer à cette dernière.}
+  dÃ©taillÃ©e dans la documentation Aliamin. En attendant l'unification
+  entre ces deux documentations, merci de vous rÃ©fÃ©rer Ã  cette derniÃ¨re.}
 
 \clearpage
 %%----------------------------------------------------------------------------
@@ -249,52 +249,52 @@ serveur. Utilisé seulement si le mode d'authentification est "CAS".\\
 
 La page de login est configurable depuis \obm 2.0.0
 
-Pour définir une page de login spécifique, il faut créer la page html :
+Pour dÃ©finir une page de login spÃ©cifique, il faut crÃ©er la page html :
 \fichier{conf/themes/login.html} (un exemple basique est disponible : \fichier{conf/themes/login.html.sample}).\\
 
-Il est possible d'utiliser des images spécifiques dans cette page.
-Les images sont à positionner dans le répertoire \fichier{conf/themes/images}.
-Pour les référencer ils faut utiliser des liens de type (le répertoire \fichier{resources/conf} est un lien vers \fichier{conf/themes/images}) :
+Il est possible d'utiliser des images spÃ©cifiques dans cette page.
+Les images sont Ã  positionner dans le rÃ©pertoire \fichier{conf/themes/images}.
+Pour les rÃ©fÃ©rencer ils faut utiliser des liens de type (le rÃ©pertoire \fichier{resources/conf} est un lien vers \fichier{conf/themes/images}) :
 \begin{verbatim}
 <\?php echo C\_IMAGE\_PATH; \?>/../conf/my\_image.png);\\
 \end{verbatim}
 
 \begin{tabular}{|p{7cm}|p{5cm}|}
 \hline
-Page de login spécifique & conf/themes/login.html \\
+Page de login spÃ©cifique & conf/themes/login.html \\
 \hline
-Répertoire des images spécifiques & conf/themes/images/ \\
+RÃ©pertoire des images spÃ©cifiques & conf/themes/images/ \\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-Pour que le login soit fonctionnel, un certain nombre de variables sont à positionner dans la page de login spécifique :\\
+Pour que le login soit fonctionnel, un certain nombre de variables sont Ã  positionner dans la page de login spÃ©cifique :\\
 
 
 \begin{tabular}{|p{4cm}|p{9cm}|}
 \hline
 \$login\_action & URL permettant d'executer l'action de login, a positionner par exemple dans le champ action du formulaire\\
 \hline
-\$sel\_domain & Liste déroulante des domaines existants \\
+\$sel\_domain & Liste dÃ©roulante des domaines existants \\
 \hline
-\$error & message d'erreur si présent\\
+\$error & message d'erreur si prÃ©sent\\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
 A noter que la page de login devra envoyer au serveur le login dans une variable \textbf{login} et le mot
 de passe dans une variable \textbf{password}.
-D'autres variables sont disponibles pour une utilisation dans la page de login spécifique :\\
+D'autres variables sont disponibles pour une utilisation dans la page de login spÃ©cifique :\\
 
 \begin{tabular}{|p{4cm}|p{9cm}|}
 \hline
-\$login\_form\_footer & code javascript exécuté en fin de page (ex: positionnement du curseur)\\
+\$login\_form\_footer & code javascript exÃ©cutÃ© en fin de page (ex: positionnement du curseur)\\
 \hline
 \$obm\_version & Version d'\obm\\
 \hline
-\$login & Dernier login tapé par l'utilisateur \\
+\$login & Dernier login tapÃ© par l'utilisateur \\
 \hline
-\$login & Dernier login tapé par l'utilisateur \\
+\$login & Dernier login tapÃ© par l'utilisateur \\
 \hline
 \$img\_home & Image de la page d'accueil \\
 \hline
@@ -302,15 +302,15 @@ D'autres variables sont disponibles pour une utilisation dans la page de login s
 
 
 %%----------------------------------------------------------------------------
-\subsection{La définition des sections}
+\subsection{La dÃ©finition des sections}
 \label{cgp_show_section}
 
-Pour définir une section dans \obm, il faut la déclarer dans le fichier de configuration.
+Pour dÃ©finir une section dans \obm, il faut la dÃ©clarer dans le fichier de configuration.
 
 
-\subsubsection{Configuration générique par défaut}
+\subsubsection{Configuration gÃ©nÃ©rique par dÃ©faut}
 
-Liste des sections définies par défaut :\\
+Liste des sections dÃ©finies par dÃ©faut :\\
 \begin{itemize}
 \item com
 \item prod
@@ -321,54 +321,54 @@ Liste des sections définies par défaut :\\
 \end{itemize}
 \vspace{0.3cm}
 
-Par défaut toutes les sections pointent vers le premier module de la section.
+Par dÃ©faut toutes les sections pointent vers le premier module de la section.
 
 
 \subsubsection{Personnalisation des sections}
 
-\obm permet de définir :\\
+\obm permet de dÃ©finir :\\
 \begin{itemize}
 \item Ses propres sections
 \item L'ordre d'affichage des sections
-\item Les urls pointées par les sections
-\item Les labels affichés des sections
+\item Les urls pointÃ©es par les sections
+\item Les labels affichÃ©s des sections
 \end{itemize}
 
-\paragraph{Remarque} Le droit d'accès à une section est défini dans les profils.\\
+\paragraph{Remarque} Le droit d'accÃ¨s Ã  une section est dÃ©fini dans les profils.\\
 
-Le tableau \textbf{\$cgp\_show[``section'']} définit les sections utilisées par OBM.
+Le tableau \textbf{\$cgp\_show[``section'']} dÃ©finit les sections utilisÃ©es par OBM.
 
 \paragraph{Sections propres et ordre d'affichage}
 
-Pour ne pas utiliser les sections génériques ou redéfinir l'ordre d'affichage des sections il est nécessaire de ``vider'' ce tableau avant d'y associer de nouvelles valeurs.
+Pour ne pas utiliser les sections gÃ©nÃ©riques ou redÃ©finir l'ordre d'affichage des sections il est nÃ©cessaire de ``vider'' ce tableau avant d'y associer de nouvelles valeurs.
  
-\paragraph{Définition des urls}
+\paragraph{DÃ©finition des urls}
 
-Pour chaque section il est possible de déclarer 2 paramètres, l'''url'' et la ``target''; exemple pour la section ``com'' (définition de \$cgp\_show[``section''][``com'']) ou la section ``webmail'' :\\
+Pour chaque section il est possible de dÃ©clarer 2 paramÃ¨tres, l'''url'' et la ``target''; exemple pour la section ``com'' (dÃ©finition de \$cgp\_show[``section''][``com'']) ou la section ``webmail'' :\\
 
 \begin{tabular}{|p{2.5cm}|p{5.5cm}|p{5cm}|}
 \hline
-\textbf{Paramètre} & \textbf{Défaut} & \textbf{Description} \\
+\textbf{ParamÃ¨tre} & \textbf{DÃ©faut} & \textbf{Description} \\
 \hline
-url & \$path/company/company\_index.php & url pointée par la section \\ 
+url & \$path/company/company\_index.php & url pointÃ©e par la section \\ 
 \hline
 \end{tabular}
 
 \begin{tabular}{|p{2.5cm}|p{5.5cm}|p{5cm}|}
 \hline
-\textbf{Paramètre} & \textbf{Défaut} & \textbf{Description} \\
+\textbf{ParamÃ¨tre} & \textbf{DÃ©faut} & \textbf{Description} \\
 \hline
-url & http://webmail/ & url pointée par la section \\ 
+url & http://webmail/ & url pointÃ©e par la section \\ 
 \hline
-target & \_blanck & Target (ex: ouvrir dans fenêtre externe) \\ 
+target & \_blanck & Target (ex: ouvrir dans fenÃªtre externe) \\ 
 \hline
 \end{tabular}
 
-\paragraph{Définition du label de la section}
-Le label de la section (affiché par l'onglet) est automatiquement la variable de langue \$l\_section\_com (pour la section com).
-Il doit donc être défini dans les fichiers de langues spécifiques, pour les sections non pré-définies par \obm.
+\paragraph{DÃ©finition du label de la section}
+Le label de la section (affichÃ© par l'onglet) est automatiquement la variable de langue \$l\_section\_com (pour la section com).
+Il doit donc Ãªtre dÃ©fini dans les fichiers de langues spÃ©cifiques, pour les sections non prÃ©-dÃ©finies par \obm.
 
-\paragraph{Exemple de définition :} Uniquement section admin
+\paragraph{Exemple de dÃ©finition :} Uniquement section admin
 \begin{verbatim}
 $cgp_show["section"] = ""; // Needed if module order to change
 $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
@@ -378,19 +378,19 @@ $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
 \subsubsection{Evolutions d'\obm}
 
 \begin{itemize}
-\item La configuration des liens des sections est disponible depuis \obm 0.8.1 et a évolué à la version 0.9.0.
-\item A partir d'OBM 0.9.0, aucune section ou paramètre de section ne sont définis en dur dans le code et l'administrateur définit les sections et leurs modules uniquement via le fichier de configuration.
+\item La configuration des liens des sections est disponible depuis \obm 0.8.1 et a Ã©voluÃ© Ã  la version 0.9.0.
+\item A partir d'OBM 0.9.0, aucune section ou paramÃ¨tre de section ne sont dÃ©finis en dur dans le code et l'administrateur dÃ©finit les sections et leurs modules uniquement via le fichier de configuration.
 \end{itemize}
 
 
 %%----------------------------------------------------------------------------
-\subsection{La définition des modules affichés}
+\subsection{La dÃ©finition des modules affichÃ©s}
 \label{cgp_show_module}
 
-\obm permêt de définir, via le fichier de configuration, quels modules sont disponibles et dans quelle section.
+\obm permÃªt de dÃ©finir, via le fichier de configuration, quels modules sont disponibles et dans quelle section.
 
 
-\subsubsection{Configuration générique par défaut}
+\subsubsection{Configuration gÃ©nÃ©rique par dÃ©faut}
 
 \begin{tabular}{|p{2.5cm}|p{4cm}|}
 \hline
@@ -455,26 +455,26 @@ $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
 
 \subsubsection{Personnalisation des modules}
 
-\obm permêt de définir :\\
+\obm permÃªt de dÃ©finir :\\
 \begin{itemize}
-\item Les modules visibles ou utilisés
+\item Les modules visibles ou utilisÃ©s
 \item L'association des modules aux sections
 \item L'ordre d'affichage des modules
 \end{itemize}
 \vspace{0.3cm}
 
-Le tableau \textbf{\$cgp\_show[``module'']} définit les modules utilisées par OBM.
+Le tableau \textbf{\$cgp\_show[``module'']} dÃ©finit les modules utilisÃ©es par OBM.
 
-\subsubsection{Définition des modules visibles}
+\subsubsection{DÃ©finition des modules visibles}
 
-Pour ne pas afficher un module il faut insérer dans le fichier de configuration la ligne :
+Pour ne pas afficher un module il faut insÃ©rer dans le fichier de configuration la ligne :
 
 \begin{verbatim}
 $cgp_show[``module''][``deal''] = false;
 \end{verbatim}
 \vspace{0.3cm}
 
-ou bien re-définir l'ensemble des modules et ne définir que les modules souhaités : 
+ou bien re-dÃ©finir l'ensemble des modules et ne dÃ©finir que les modules souhaitÃ©s : 
 
 \begin{verbatim}  
 $cgp_show[``module''] = "";
@@ -483,23 +483,23 @@ $cgp_show[``module'']["contact"] = "com";
 
 \paragraph{Association des modules aux sections}
 
-La définition \$cgp\_show[``company''] = ``com'' associe le module company à la section com.
+La dÃ©finition \$cgp\_show[``company''] = ``com'' associe le module company Ã  la section com.
 
 \paragraph{Ordre d'affichage des modules}
 
-L'ordre d'affichage des modules dans une section est leur ordre de définition dans le fichier de configuration.
+L'ordre d'affichage des modules dans une section est leur ordre de dÃ©finition dans le fichier de configuration.
 
 
-\subsubsection{Les dépendances entre modules}
+\subsubsection{Les dÃ©pendances entre modules}
 
-Certains modules dépendent d'autres modules et sont automatiquement désactivés par \obm si un des modules dont ils dépendent est désactivé.
-Par exemple le module \deal a besoin du module \company pour fonctionner et sera automatiquement désactivé si le module \company est désactivé.
+Certains modules dÃ©pendent d'autres modules et sont automatiquement dÃ©sactivÃ©s par \obm si un des modules dont ils dÃ©pendent est dÃ©sactivÃ©.
+Par exemple le module \deal a besoin du module \company pour fonctionner et sera automatiquement dÃ©sactivÃ© si le module \company est dÃ©sactivÃ©.
 
-Liste des modules dépendants :\\
+Liste des modules dÃ©pendants :\\
 
 \begin{tabular}{|p{3cm}|p{4cm}|}
 \hline
-\textbf{Module} & \textbf{Module dépendant} \\
+\textbf{Module} & \textbf{Module dÃ©pendant} \\
 \hline
 \multirow{4}{2cm}{\company} & \deal \\ 
 \cline{2-2}
@@ -521,78 +521,78 @@ Liste des modules dépendants :\\
 
 
 %%----------------------------------------------------------------------------
-\subsection{Le paramétrage des champs visibles}
+\subsection{Le paramÃ©trage des champs visibles}
 \label{cgp_hide}
 
-Afin de permettre des utilisations d'\obm d'orientations diverses, certains modules peuvent être paramétrés afin de ne pas afficher et gérer tous les champs prévus.
+Afin de permettre des utilisations d'\obm d'orientations diverses, certains modules peuvent Ãªtre paramÃ©trÃ©s afin de ne pas afficher et gÃ©rer tous les champs prÃ©vus.
 
-\paragraph{Note :} Ceci permêt d'activer / désactiver des champs connus d'\obm. Pour définir de nouvelles données ou champs de façon générique, voir la section \ref{of_userdata}.\\
+\paragraph{Note :} Ceci permÃªt d'activer / dÃ©sactiver des champs connus d'\obm. Pour dÃ©finir de nouvelles donnÃ©es ou champs de faÃ§on gÃ©nÃ©rique, voir la section \ref{of_userdata}.\\
 
 
 
-A partir de la version 0.8 d'\obm, les modules \company, \contact et \deal ont des champs paramétrables.\\
+A partir de la version 0.8 d'\obm, les modules \company, \contact et \deal ont des champs paramÃ©trables.\\
 
-Le tableau \$cgp\_hide[``entity''] définit pour les modules cibles les champs devant être cachés.
-Par défaut tous les champs sont affichés et il faut donc préciser explicitement les champs non souhaités.
+Le tableau \$cgp\_hide[``entity''] dÃ©finit pour les modules cibles les champs devant Ãªtre cachÃ©s.
+Par dÃ©faut tous les champs sont affichÃ©s et il faut donc prÃ©ciser explicitement les champs non souhaitÃ©s.
 
-Pour ne pas afficher un champ il faut insérer dans le fichier de configuration la ligne :
+Pour ne pas afficher un champ il faut insÃ©rer dans le fichier de configuration la ligne :
 
 \begin{verbatim}  
 $cgp_hide[``company''][``company_number''] = true;
 \end{verbatim}  
 
-Lorsqu'un champ est caché, il n'est plus disponible dans les critères de recherche, dans les listes de résultats ni dans les fiches de détail.\\
+Lorsqu'un champ est cachÃ©, il n'est plus disponible dans les critÃ¨res de recherche, dans les listes de rÃ©sultats ni dans les fiches de dÃ©tail.\\
 
-Les noms donnés aux champs du tableau \$cgp\_hide doivent être :\\
+Les noms donnÃ©s aux champs du tableau \$cgp\_hide doivent Ãªtre :\\
 \begin{itemize}
-\item soit \textbf{identiques aux noms des champs} retournés par la requête des listes de résultat, car la classe OBM\_DISPLAY utilise ces noms pour déterminer si les champs doivent être affichés ou non.
-\item soit \textbf{identique au nom de la table liée} si le champ à masquer est un champ d'une table liée. Dans ce cas tous les champs de la table liée seront masqués (exemple : ``companyactivity'' pour masquer l'affichage de tous les champs, label, code,.. concernant les secteurs d'activités d'une société) 
+\item soit \textbf{identiques aux noms des champs} retournÃ©s par la requÃªte des listes de rÃ©sultat, car la classe OBM\_DISPLAY utilise ces noms pour dÃ©terminer si les champs doivent Ãªtre affichÃ©s ou non.
+\item soit \textbf{identique au nom de la table liÃ©e} si le champ Ã  masquer est un champ d'une table liÃ©e. Dans ce cas tous les champs de la table liÃ©e seront masquÃ©s (exemple : ``companyactivity'' pour masquer l'affichage de tous les champs, label, code,.. concernant les secteurs d'activitÃ©s d'une sociÃ©tÃ©) 
 \end{itemize}
 
 
-\subsubsection{Utilisation des champs paramétrables dans \obm}
+\subsubsection{Utilisation des champs paramÃ©trables dans \obm}
 
-Les tests concernant les champs paramétrables, référencés ci-dessous, sont effectués dans différentes parties de l'affichage ainsi que dans certaines requêtes afin d'éviter des traitements inutiles :\\
+Les tests concernant les champs paramÃ©trables, rÃ©fÃ©rencÃ©s ci-dessous, sont effectuÃ©s dans diffÃ©rentes parties de l'affichage ainsi que dans certaines requÃªtes afin d'Ã©viter des traitements inutiles :\\
 
 \begin{itemize}
 \item Affichage du formulaire de recherche (permettre ou non la recherche selon le champ) : test direct ou via \variable{of\_category}
-\item Affichage d'un résultat de recherche (présence du champ ou de la famille de champ dans le résultat de recherche) : test via \variable{OBM\_DISPLAY}
-\item Affichage de la consultation d'une entité : test direct ou via \variable{of\_category}
-\item Affichage du formulaire d'une entité : idem consultation
-\item Requête de listes de catégories ou tables liées : test directs.
+\item Affichage d'un rÃ©sultat de recherche (prÃ©sence du champ ou de la famille de champ dans le rÃ©sultat de recherche) : test via \variable{OBM\_DISPLAY}
+\item Affichage de la consultation d'une entitÃ© : test direct ou via \variable{of\_category}
+\item Affichage du formulaire d'une entitÃ© : idem consultation
+\item RequÃªte de listes de catÃ©gories ou tables liÃ©es : test directs.
 \end{itemize}
 
 \paragraph{tests via \variable{of\_category} :}
 
-\variable{of\_category} reçoit en paramètres l'entité (ex: ``company'') et la catégorie (exemple: ``category1'').
-Le test est effectué sur ``\$category'' et ``\$entity\$category''.
+\variable{of\_category} reÃ§oit en paramÃ¨tres l'entitÃ© (ex: ``company'') et la catÃ©gorie (exemple: ``category1'').
+Le test est effectuÃ© sur ``\$category'' et ``\$entity\$category''.
 
 
 \paragraph{tests via \variable{obm\_display} :}
 
-\variable{obm\_display} affiche les résultats de recherche. Elle reçoit les champs issus des préférences d'affichage.
-Le test est effectué sur le nom du champ reçu, ainsi que sur la base du nom du champ avant le premier ``\_'' (ainsi \variable{\$cgp\_hide[``company''][``companyactivity] = true;} permet de désactiver ``companyactivity\_label'' et ``companyactivity\_code''.
+\variable{obm\_display} affiche les rÃ©sultats de recherche. Elle reÃ§oit les champs issus des prÃ©fÃ©rences d'affichage.
+Le test est effectuÃ© sur le nom du champ reÃ§u, ainsi que sur la base du nom du champ avant le premier ``\_'' (ainsi \variable{\$cgp\_hide[``company''][``companyactivity] = true;} permet de dÃ©sactiver ``companyactivity\_label'' et ``companyactivity\_code''.
 
 
-\subsubsection{Les champs paramétrables du module \company}
+\subsubsection{Les champs paramÃ©trables du module \company}
 
-Liste des champs paramétrables (masquables) du module \company :
+Liste des champs paramÃ©trables (masquables) du module \company :
 
 \begin{verbatim}
 // Company module
-$cgp_hide["company"]["company_number"] = true;  // numéro
-$cgp_hide["company"]["company_vat"] = true;     // numéro intracommunautaire
+$cgp_hide["company"]["company_number"] = true;  // numÃ©ro
+$cgp_hide["company"]["company_vat"] = true;     // numÃ©ro intracommunautaire
 $cgp_hide["company"]["type"] = true;            // type
-$cgp_hide["company"]["activity"] = true;        // secteur d'activité
+$cgp_hide["company"]["activity"] = true;        // secteur d'activitÃ©
 $cgp_hide["company"]["nafcode"] = true;         // code NAF
 $cgp_hide["company"]["company_address3"] = true;       // ligne adresse 3
 $cgp_hide["company"]["company_expresspostal"] = true;  // Cedex
 \end{verbatim}  
 
 
-\subsubsection{Les champs paramétrables du module \contact}
+\subsubsection{Les champs paramÃ©trables du module \contact}
 
-Liste des champs paramétrables (masquables) du module \contact :
+Liste des champs paramÃ©trables (masquables) du module \contact :
 
 \begin{verbatim}
 // Contact module
@@ -607,26 +607,26 @@ $cgp_hide["contact"]["contact_comment3"] = true   // commentaire 3
 \end{verbatim}  
 
 
-\subsubsection{Les champs paramétrables du module \deal}
+\subsubsection{Les champs paramÃ©trables du module \deal}
 
-Liste des champs paramétrables (masquables) du module \deal :
+Liste des champs paramÃ©trables (masquables) du module \deal :
 
 \begin{verbatim}
 // Company module
-$cgp_hide["deal"]["category1"] = true;            // catégorie
+$cgp_hide["deal"]["category1"] = true;            // catÃ©gorie
 \end{verbatim}  
 
 
-\subsubsection{Les dépendances entre modules}
+\subsubsection{Les dÃ©pendances entre modules}
 
-Certains champs apparaissent dans différents modules.
-Par exemple le champ \variable{contact\_function} apparait dans les modules \contact et \List, et ce champ, défini dans le module \contact peut être masqué.
-Pour les champs dépendants, \obm calcule donc automatiquement la visibilité en fonction des dépendances.
-Liste des champs dépendants :\\
+Certains champs apparaissent dans diffÃ©rents modules.
+Par exemple le champ \variable{contact\_function} apparait dans les modules \contact et \List, et ce champ, dÃ©fini dans le module \contact peut Ãªtre masquÃ©.
+Pour les champs dÃ©pendants, \obm calcule donc automatiquement la visibilitÃ© en fonction des dÃ©pendances.
+Liste des champs dÃ©pendants :\\
 
 \begin{tabular}{|p{2.5cm}|p{3.5cm}|p{2.5cm}|p{3.5cm}|}
 \hline
-\textbf{Entité source} & \textbf{Champ source} & \textbf{Entité dépendante} & \textbf{Dépendance} \\
+\textbf{EntitÃ© source} & \textbf{Champ source} & \textbf{EntitÃ© dÃ©pendante} & \textbf{DÃ©pendance} \\
 \hline
 \multirow{3}{2cm}{company} & \multirow{3}{2cm}{company\_address3} & contact & contact\_address3 \\ 
 \cline{3-4}

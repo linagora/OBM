@@ -76,7 +76,7 @@ $l_payment_options = "Opzioni di visualizzazione per elenco dei pagamenti";
 
 // banking check messages :
 $l_not_enough = "Non hai usato tutto l'importo del pagamento  !<BR>";
-$l_too_much = "Il pagamento va oltre la disponibilit‡ di cassa!<BR>";
-$l_trouble_invoice = "Almeno una fattura ha ricevuto troppi soldi....<BR>Lo status Ë  \"trouble\".<BR>Confermi? <BR>";
+$l_too_much = "Il pagamento va oltre la disponibilit√† di cassa!<BR>";
+$l_trouble_invoice = "Almeno una fattura ha ricevuto troppi soldi....<BR>Lo status √®  \"trouble\".<BR>Confermi? <BR>";
 $l_bank_anyway = "Banca del  Pagamento";
 $l_bank_again = "Riparti il banking dall'inizio.";

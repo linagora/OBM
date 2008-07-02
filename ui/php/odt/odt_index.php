@@ -63,10 +63,10 @@ function export2odt($template_full_path, $template_mime_type, $data, $display, $
   
   // setting the object
   if ($OOo->SetZipBinary('zip', true) == false) {
-    // erreur zip non présent
+    // erreur zip non prÃ©sent
   }
   if ($OOo->SetUnzipBinary('unzip', true) == false) {
-    // erreur unzip non présent
+    // erreur unzip non prÃ©sent
   }
   if ($OOo->SetProcessDir('/tmp/') == false) {
     // erreur /tmp inaccessible
@@ -108,7 +108,7 @@ function export2odt($template_full_path, $template_mime_type, $data, $display, $
   else {
     if ($save_path != "") {
       rename($OOo->GetPathnameDoc(), $save_path);
-      // affichage des document sauvés ?????
+      // affichage des document sauvÃ©s ?????
     }
   }
 }

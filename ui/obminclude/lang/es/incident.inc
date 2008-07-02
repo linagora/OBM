@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Español                                                  //
+// OBM - Language : EspaÃ±ol                                                  //
 //     - File     : incident.inc                                             //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -9,10 +9,10 @@
 
 // Fields Referencia
 $l_date = "Fecha";
-$l_logger = "Gerente Técnico";
+$l_logger = "Gerente TÃ©cnico";
 $l_owner = "Responsable";
-$l_duration = "Tiempo tomado para solución";
-$l_solution = "Solución encontrada";
+$l_duration = "Tiempo tomado para soluciÃ³n";
+$l_solution = "SoluciÃ³n encontrada";
 $l_client_manager = "Gerente de Cliente";
 $l_date_before ="Fecha Anterior";
 $l_date_after ="Fecha Posterior";
@@ -29,7 +29,7 @@ $l_call = "Llamar";
 $l_waitcall = "Esperar llamada";
 $l_standby = "Pausado";
 $l_closed = "Cerrado";
-$l_lastupdate = "Fecha de la última actualización";
+$l_lastupdate = "Fecha de la Ãºltima actualizaciÃ³n";
 
 // Action
 $l_select_contract = "Seleccione Contrato";
@@ -41,9 +41,9 @@ $l_delete = "Borrar Incidente";
 $l_mail_incident_new_subject = "OBM : Nuevo incidente";
 
 // Message
-$l_no_display = "Llene los campos de búsqueda y presione < Buscar > para obtener los incidentes";
+$l_no_display = "Llene los campos de bÃºsqueda y presione < Buscar > para obtener los incidentes";
 $l_found = "incidentes encontrados";
-$l_no_found = "No hay incidentes correspondientes a su búsqueda !";
+$l_no_found = "No hay incidentes correspondientes a su bÃºsqueda !";
 $l_can_delete = "El incidente puede ser borrado";
 $l_cant_delete = "El incidente NO puede ser borrado";
 

@@ -28,7 +28,7 @@ function of_get_defaultodttemplates($entity){
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Intégration dans l'OF ??????
+// IntÃ©gration dans l'OF ??????
 // Display the cv administration forms
 // Params :
 //  - $entity : entity name

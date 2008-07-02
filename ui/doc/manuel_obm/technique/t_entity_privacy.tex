@@ -1,39 +1,39 @@
-% Documentation technique d'OBM : Gestion des entités privées
+% Documentation technique d'OBM : Gestion des entitÃ©s privÃ©es
 % ALIACOM Pierre Baudracco
 % $Id$
 
 
 %%\clearpage
-\subsection{Gestion des entités privées, visibilité et droits sur entité}
-révision : \obm 2.1.0\\
+\subsection{Gestion des entitÃ©s privÃ©es, visibilitÃ© et droits sur entitÃ©}
+rÃ©vision : \obm 2.1.0\\
 
-OBM permet de créer des entités privées, soit non visibles par tout le monde.\\
+OBM permet de crÃ©er des entitÃ©s privÃ©es, soit non visibles par tout le monde.\\
 
-La gestion des entités privées est standardisée afin de permettre une évolution possible des règles de visibilité des entités.
-Elle a été repensée et rendue non intrusive depuis \obm 0.8.5.\\
+La gestion des entitÃ©s privÃ©es est standardisÃ©e afin de permettre une Ã©volution possible des rÃ¨gles de visibilitÃ© des entitÃ©s.
+Elle a Ã©tÃ© repensÃ©e et rendue non intrusive depuis \obm 0.8.5.\\
 
-Depuis \obm 2.0.2 certains modules implémentent une séparation des droits entre les entités publiques et privées (gérer des données publiques nécessite des droits plus importants).
+Depuis \obm 2.0.2 certains modules implÃ©mentent une sÃ©paration des droits entre les entitÃ©s publiques et privÃ©es (gÃ©rer des donnÃ©es publiques nÃ©cessite des droits plus importants).
 
 
-\subsubsection{Spécifications de la notion de visibilité}
+\subsubsection{SpÃ©cifications de la notion de visibilitÃ©}
 
-Actuellement une entité est visible par un utilisateur si l'entité est publique (privacy == 0) ou que l'utilisateur en est le créateur.
+Actuellement une entitÃ© est visible par un utilisateur si l'entitÃ© est publique (privacy == 0) ou que l'utilisateur en est le crÃ©ateur.
 
-\paragraph{Base de données :} La table de l'entité doit contenir un champ : \textbf{entite\_privacy} défini comme un entier.
-Les valeurs définies sont :\\
+\paragraph{Base de donnÃ©es :} La table de l'entitÃ© doit contenir un champ : \textbf{entite\_privacy} dÃ©fini comme un entier.
+Les valeurs dÃ©finies sont :\\
 
 \begin{tabular}{|c|c|}
 \hline
 \textbf{Valeur} & \textbf{Description} \\
 \hline
-0 & entité publique \\
+0 & entitÃ© publique \\
 \hline
-1 & entité privée \\
+1 & entitÃ© privÃ©e \\
 \hline
 \end{tabular}
 %%\vspace{0.3cm}
 
-\paragraph{Implémentation du test de visibilité}
+\paragraph{ImplÃ©mentation du test de visibilitÃ©}
 \begin{verbatim}
   $field_pri = "${entity}_privacy";
   $field_uc = "${entity}_usercreate";
@@ -48,9 +48,9 @@ Les valeurs définies sont :\\
 \end{verbatim}
 
 
-\subsubsection{API définie}
+\subsubsection{API dÃ©finie}
 
-Une api très simple (1 fonction définie dans global.inc) est disponible :\\
+Une api trÃ¨s simple (1 fonction dÃ©finie dans global.inc) est disponible :\\
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -60,23 +60,23 @@ function check_privacy($module, $table, $action, $id, $p_uid="") {
 \end{minipage}
 }
 \begin{itemize}
- \item \textbf{\$module} : menu (module) à vérifier.\\
-Exemple : ``CONTACT'', mais \$module peut être utilisé. Indispensable pour récupérer l'information dans le tableau global \$actions
- \item \textbf{\$table} : table ou entité à vérifier.\\
-Exemple : ``Contact''... Attention ce n'est pas toujours le module (ex: ParenDeal dans module deal). L'entité (pour nom des colonnes) est tiré de cette chaîne (lowercase)
- \item \textbf{\$action} : Action à vérifier
- \item \textbf{\$id} : Id de l'entité à vérifier
- \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilité doit être vérifié. Si non donné, l'utilisateur courant est utilisé.
+ \item \textbf{\$module} : menu (module) Ã  vÃ©rifier.\\
+Exemple : ``CONTACT'', mais \$module peut Ãªtre utilisÃ©. Indispensable pour rÃ©cupÃ©rer l'information dans le tableau global \$actions
+ \item \textbf{\$table} : table ou entitÃ© Ã  vÃ©rifier.\\
+Exemple : ``Contact''... Attention ce n'est pas toujours le module (ex: ParenDeal dans module deal). L'entitÃ© (pour nom des colonnes) est tirÃ© de cette chaÃ®ne (lowercase)
+ \item \textbf{\$action} : Action Ã  vÃ©rifier
+ \item \textbf{\$id} : Id de l'entitÃ© Ã  vÃ©rifier
+ \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilitÃ© doit Ãªtre vÃ©rifiÃ©. Si non donnÃ©, l'utilisateur courant est utilisÃ©.
 \end{itemize}
 
 
-\subsubsection{Implémentation dans un module}
+\subsubsection{ImplÃ©mentation dans un module}
 
-\paragraph{Actions soumises au test d'accès :}
-Tout accès à une entité doit être validé (passer le test de visibilité).
-Ceci doit donc être vrai pour les actions de consultations (detailconsult, detailupdate) mais aussi pour toutes les actions sur une entité (update, delete, document\_add...).\\
+\paragraph{Actions soumises au test d'accÃ¨s :}
+Tout accÃ¨s Ã  une entitÃ© doit Ãªtre validÃ© (passer le test de visibilitÃ©).
+Ceci doit donc Ãªtre vrai pour les actions de consultations (detailconsult, detailupdate) mais aussi pour toutes les actions sur une entitÃ© (update, delete, document\_add...).\\
 
-Pour cette raison et pour éviter la répétition de ce test dans un module, le test est effectué une fois en début de module.\\
+Pour cette raison et pour Ã©viter la rÃ©pÃ©tition de ce test dans un module, le test est effectuÃ© une fois en dÃ©but de module.\\
 
 Test pour le module \contact :
 \begin{verbatim}
@@ -88,10 +88,10 @@ if (! check_privacy($module, "Contact", $action, $contact["id"], $uid)) {
 }
 \end{verbatim}
 
-Afin d'être optimal, le test ne requiert un accès à la base de données que lorsque nécessaire.
-Les actions définies du module doivent indiquer si elles sont sujettes à la protection privée (attribut \textbf{Privacy}).\\
+Afin d'Ãªtre optimal, le test ne requiert un accÃ¨s Ã  la base de donnÃ©es que lorsque nÃ©cessaire.
+Les actions dÃ©finies du module doivent indiquer si elles sont sujettes Ã  la protection privÃ©e (attribut \textbf{Privacy}).\\
 
-Définition d'une action sujette à la protection donnée privée.
+DÃ©finition d'une action sujette Ã  la protection donnÃ©e privÃ©e.
 \begin{verbatim}
 // Update
   $actions["CONTACT"]["update"] = array (
@@ -102,8 +102,8 @@ Définition d'une action sujette à la protection donnée privée.
                                      	);
 \end{verbatim}
 
-\paragraph{La fonction de recherche} de l'entité doit aussi tenir compte et intégrer le test de visibilité afin de ne pas afficher les entités non visibles dans les résultats de recherche.
-Une fonction est définie retournant la clause de visibilité pour l'entité demandée.\\
+\paragraph{La fonction de recherche} de l'entitÃ© doit aussi tenir compte et intÃ©grer le test de visibilitÃ© afin de ne pas afficher les entitÃ©s non visibles dans les rÃ©sultats de recherche.
+Une fonction est dÃ©finie retournant la clause de visibilitÃ© pour l'entitÃ© demandÃ©e.\\
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -113,9 +113,9 @@ function sql_obm_entity_privacy($entity, $p_uid="") {
 \end{minipage}
 }
 \begin{itemize}
- \item \textbf{\$entity} : entité à vérifier.\\
+ \item \textbf{\$entity} : entitÃ© Ã  vÃ©rifier.\\
 Exemple : ``contact'', ``deal''
- \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilité doit être vérifié. Si non donné, l'utilisateur courant est utilisé.
+ \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilitÃ© doit Ãªtre vÃ©rifiÃ©. Si non donnÃ©, l'utilisateur courant est utilisÃ©.
 \end{itemize}
 \vspace{0.3cm}
 
@@ -133,7 +133,7 @@ function run_query_contact_search($contact) {
 \end{verbatim}
 
 
-\paragraph{La fonction de récupération} de l'entité (\fonction{run\_query\_entity\_detail()}) doit récuperer le champ en base de données et le présenter sous le nom \textbf{privacy} afin d'être traité de façon générique par l'affichage des informations de l'entité.\\
+\paragraph{La fonction de rÃ©cupÃ©ration} de l'entitÃ© (\fonction{run\_query\_entity\_detail()}) doit rÃ©cuperer le champ en base de donnÃ©es et le prÃ©senter sous le nom \textbf{privacy} afin d'Ãªtre traitÃ© de faÃ§on gÃ©nÃ©rique par l'affichage des informations de l'entitÃ©.\\
 
 Exemple d'utilisation :
 \begin{verbatim}
@@ -143,17 +143,17 @@ Exemple d'utilisation :
 \end{verbatim}
 
 
-\subsubsection{Séparation de droits de gestion public / privé}
+\subsubsection{SÃ©paration de droits de gestion public / privÃ©}
 
-Pour certains modules, il est important de séparer les droits de gestion des données publiques des droits de gestion des données privées (exemple : gérer les groupes publics demande des privilèges supérieurs à la gestion de ses groupes privés).\\
+Pour certains modules, il est important de sÃ©parer les droits de gestion des donnÃ©es publiques des droits de gestion des donnÃ©es privÃ©es (exemple : gÃ©rer les groupes publics demande des privilÃ¨ges supÃ©rieurs Ã  la gestion de ses groupes privÃ©s).\\
 
-Les modules implémentant cette séparation sont listés plus bas.
-Cette séparation implique l'ajout de tests d'autorisation sur les actions detailupdate, update, check\_delete, delete, (user\_add,...).
+Les modules implÃ©mentant cette sÃ©paration sont listÃ©s plus bas.
+Cette sÃ©paration implique l'ajout de tests d'autorisation sur les actions detailupdate, update, check\_delete, delete, (user\_add,...).
 
-Ces tests d'autorisation sont effectués :
+Ces tests d'autorisation sont effectuÃ©s :
 \begin{itemize}
 \item directement dans les fonctions \fonction{check\_module\_data\_form()}
-\item à l'aide d'une fonction définie dans le module en question, du type \fonction{check\_module\_update\_rights()}
+\item Ã  l'aide d'une fonction dÃ©finie dans le module en question, du type \fonction{check\_module\_update\_rights()}
 \end{itemize}
 
 \shadowbox{
@@ -164,15 +164,15 @@ function check_group_update_rights($params) {
 \end{minipage}
 }
 \begin{itemize}
- \item \textbf{\$params} : tableau de paramètres.
+ \item \textbf{\$params} : tableau de paramÃ¨tres.
  \item \textbf{Retourne true || false} : true si les droits sont suffisants
 \end{itemize}
 \vspace{0.3cm}
 
-Cette fonction doit être appelée :
+Cette fonction doit Ãªtre appelÃ©e :
 \begin{itemize}
-\item dans toute action nécessitant la vérification détaillée des droits
-\item dans la fonction (\fonction{update\_module\_action()}) qui met à jour les menus contextuels
+\item dans toute action nÃ©cessitant la vÃ©rification dÃ©taillÃ©e des droits
+\item dans la fonction (\fonction{update\_module\_action()}) qui met Ã  jour les menus contextuels
 \end{itemize}
 
 
@@ -190,19 +190,19 @@ Cette fonction doit être appelée :
 \end{verbatim}
 
 
-\subsubsection{Gestion de la notion de visibilité et conséquences}
+\subsubsection{Gestion de la notion de visibilitÃ© et consÃ©quences}
 
-Une entité créée en tant que privée n'est visible que par son créateur.
-Il faut donc veiller à traiter les entités privés d'un utilisateur lorsque celui-ci doit être supprimé.
+Une entitÃ© crÃ©Ã©e en tant que privÃ©e n'est visible que par son crÃ©ateur.
+Il faut donc veiller Ã  traiter les entitÃ©s privÃ©s d'un utilisateur lorsque celui-ci doit Ãªtre supprimÃ©.
 
-Ces entités peuvent être supprimées ou rendues publiques (la fonction run\_query\_delete\_profile() effectue ce travail).
+Ces entitÃ©s peuvent Ãªtre supprimÃ©es ou rendues publiques (la fonction run\_query\_delete\_profile() effectue ce travail).
 
 
-\subsubsection{Modules gérant la notion de visibilité}
+\subsubsection{Modules gÃ©rant la notion de visibilitÃ©}
 
 \begin{tabular}{|p{3cm}|c|c|c|}
 \hline
-\textbf{Module} & \textbf{Depuis version} & \textbf{Séparation droits} & \textbf{Depuis version} \\
+\textbf{Module} & \textbf{Depuis version} & \textbf{SÃ©paration droits} & \textbf{Depuis version} \\
 \hline
 contact & 0.4.0 & X & 2.1.0\\
 \hline

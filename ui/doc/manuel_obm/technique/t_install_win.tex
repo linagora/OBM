@@ -1,22 +1,22 @@
-\section{Installation pas à pas d'OBM 1.1.x sous Windows}
+\section{Installation pas Ã  pas d'OBM 1.1.x sous Windows}
  
 
 Cette documentation est valide pour la version 1.1.0. Seules les
-manipulations spécifiques à OBM sont décrites. Pour l'installation de
-PHP, MySQL, PostgreSQL, Apache ou autres composants libres, des exemples sont proposés correspondant à la version Windows XP utilsé ave easyPHP mais il est préférable de vous référer à la documentation de votre distribution.
+manipulations spÃ©cifiques Ã  OBM sont dÃ©crites. Pour l'installation de
+PHP, MySQL, PostgreSQL, Apache ou autres composants libres, des exemples sont proposÃ©s correspondant Ã  la version Windows XP utilsÃ© ave easyPHP mais il est prÃ©fÃ©rable de vous rÃ©fÃ©rer Ã  la documentation de votre distribution.
 
 
-\subsection{Hypothèses}
+\subsection{HypothÃ¨ses}
 
 Cette documentation suppose que vous disposez d'un serveur Apache,
-d'un serveur de BD MySQL et de PHP correctement configurés (Apache et mysql et php sont directement inclus dans easyPHP).
+d'un serveur de BD MySQL et de PHP correctement configurÃ©s (Apache et mysql et php sont directement inclus dans easyPHP).
 
 Dans la suite du document, on suppose que la racine d'OBM se trouve
 dans \fichier{c:$\backslash$obm} et qu'easy-php se trouve dans \fichier{c:\textbackslash program files\textbackslash easyPHP$\backslash$ }
-\fichier{note\,:} si le port 80 est occupé et empêche Apache de se lancer, ouvrez un explorateur, 
-allez dans le répertoire d'installation d'easyPHP, puis éditez le fichier httpd.conf du répertoire conf\_files.
+\fichier{note\,:} si le port 80 est occupÃ© et empÃªche Apache de se lancer, ouvrez un explorateur, 
+allez dans le rÃ©pertoire d'installation d'easyPHP, puis Ã©ditez le fichier httpd.conf du rÃ©pertoire conf\_files.
 
-Recherchez la ligne où est inscrit Port 80 et remplacez la par
+Recherchez la ligne oÃ¹ est inscrit Port 80 et remplacez la par
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
@@ -25,37 +25,37 @@ Port 81
   \end{minipage}
 }
 
-\subsection{Télécharger les sources}
+\subsection{TÃ©lÃ©charger les sources}
 
 L'installation serait plus difficile sans...
 
-Il faut donc télécharger les sources et les décompresser dans
-\fichier{c:$\backslash$obm} (en fait dans le répertoire qui contiendra la
+Il faut donc tÃ©lÃ©charger les sources et les dÃ©compresser dans
+\fichier{c:$\backslash$obm} (en fait dans le rÃ©pertoire qui contiendra la
 racine de votre OBM). 
-Vous pouvez télécharger les sources à l'addresse suivante :
+Vous pouvez tÃ©lÃ©charger les sources Ã  l'addresse suivante :
 \begin{verbatim}
 http://obm.aliacom.fr/download.php
 \end{verbatim}
-Pour décompresser l'archive obm-1.1.0.tar.gz, 
-il vous faudra certainement un logiciel de décompression,
- winrar (que vous pouvez télécharger sur www.telecharger.com) ou un autre 
+Pour dÃ©compresser l'archive obm-1.1.0.tar.gz, 
+il vous faudra certainement un logiciel de dÃ©compression,
+ winrar (que vous pouvez tÃ©lÃ©charger sur www.telecharger.com) ou un autre 
 fera parfaitement l'affaire.
-Copiez ensuite les répertoires \fichier{php} et \fichier{obminclude} dans le repertoire \fichier{www} d'easyPHP
+Copiez ensuite les rÃ©pertoires \fichier{php} et \fichier{obminclude} dans le repertoire \fichier{www} d'easyPHP
 
 
 \subsection{Configuration d'Apache et de PHP}
 
 \subsubsection*{virtual host}
-Nous allons  configurer un \emph{virtual host} pour gérer une instance
+Nous allons  configurer un \emph{virtual host} pour gÃ©rer une instance
 d'OBM (vous pouvez avoir plusieurs \emph{virtuals hosts} sur un seul
 serveur). 
 
 Dans la section \emph{virtual host} du \fichier{httpd.conf},
-positionner le \emph{Document Root} à C:$\backslash$obm$\backslash$php. Vous pouvez
-accéder à ce fichier en cliquant sur le cadre en haut à gauche de la fenêtre
-d'easy-php puis sélectionnez configuration et Apache.
-Le virtual Host doit ressembler à ce qui suit. Les fichier de la fin concernent les logs d'erreurs et d'accès à OBM.
-L'ensemble des addresse dépend aussi de la configuration que vous aurez choisi.
+positionner le \emph{Document Root} Ã  C:$\backslash$obm$\backslash$php. Vous pouvez
+accÃ©der Ã  ce fichier en cliquant sur le cadre en haut Ã  gauche de la fenÃªtre
+d'easy-php puis sÃ©lectionnez configuration et Apache.
+Le virtual Host doit ressembler Ã  ce qui suit. Les fichier de la fin concernent les logs d'erreurs et d'accÃ¨s Ã  OBM.
+L'ensemble des addresse dÃ©pend aussi de la configuration que vous aurez choisi.
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -75,7 +75,7 @@ NameVirtualHost <nom_du_virtualhost obm par exemple>
   \end{minipage}
 }
 
-dans ce même fichier, la ligne suivante doit être présente :
+dans ce mÃªme fichier, la ligne suivante doit Ãªtre prÃ©sente :
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -86,16 +86,16 @@ dans ce même fichier, la ligne suivante doit être présente :
 }
 
 
-%\subsubsection*{Répertoires d'include d'OBM}
+%\subsubsection*{RÃ©pertoires d'include d'OBM}
 %
-%Le nom du répertoire d'include (\fichier{obminclude} par défaut) est
-%maintenant une variable d'environnement pour permettre à plusieurs
-%instances d'OBM basées sur le même répertoire de source de tourner
-%simultanément. Seul ce répertoire est à modifier sur chaque instance
-%car il contient les réglages spécifiques (thèmes, bases de données,
+%Le nom du rÃ©pertoire d'include (\fichier{obminclude} par dÃ©faut) est
+%maintenant une variable d'environnement pour permettre Ã  plusieurs
+%instances d'OBM basÃ©es sur le mÃªme rÃ©pertoire de source de tourner
+%simultanÃ©ment. Seul ce rÃ©pertoire est Ã  modifier sur chaque instance
+%car il contient les rÃ©glages spÃ©cifiques (thÃ¨mes, bases de donnÃ©es,
 %langues) pour chaque instance.
 %
-%Cette variable est donc positionnée dans le fichier
+%Cette variable est donc positionnÃ©e dans le fichier
 %\fichier{httpd.conf} d'Apache. Il faut d'abord charger le module
 %\fichier{env} : 
 
@@ -109,7 +109,7 @@ dans ce même fichier, la ligne suivante doit être présente :
 %}
 %
 %Puis renseigner la variable OBM\_INCLUDE\_VAR avec le nom du
-%répertoire d'include : 
+%rÃ©pertoire d'include : 
 
 %\shadowbox{
 %  \begin{minipage}{13cm}
@@ -119,10 +119,10 @@ dans ce même fichier, la ligne suivante doit être présente :
 %  \end{minipage}
 %}
 
-%Le chemin d'accès au répertoire d'include d'OBM doit être donné
-%(D'ailleurs, le répertoire \fichier{obminclude} peut être déplacé) :  
+%Le chemin d'accÃ¨s au rÃ©pertoire d'include d'OBM doit Ãªtre donnÃ©
+%(D'ailleurs, le rÃ©pertoire \fichier{obminclude} peut Ãªtre dÃ©placÃ©) :  
 %
-%ùRenseigner la variable include\_path avec le chemin vers le répertoire
+%Ã¹Renseigner la variable include\_path avec le chemin vers le rÃ©pertoire
 %d'include : 
 %
 %\shadowbox{
@@ -136,7 +136,7 @@ dans ce même fichier, la ligne suivante doit être présente :
 
 %\subsubsection*{Alias pour les images}
 %
-%Il faut installer un alias images vers le répertoire de themes : 
+%Il faut installer un alias images vers le rÃ©pertoire de themes : 
 %Cela se fait en bas du fichier httpd.conf
 %\shadowbox{
 %  \begin{minipage}{13cm}
@@ -148,7 +148,7 @@ dans ce même fichier, la ligne suivante doit être présente :
 
 %\subsubsection*{Directory Index}
 %
-%Il faut enfin spécifier le fichier par défaut : 
+%Il faut enfin spÃ©cifier le fichier par dÃ©faut : 
 %
 %\shadowbox{
 %  \begin{minipage}{13cm}
@@ -158,7 +158,7 @@ dans ce même fichier, la ligne suivante doit être présente :
 %  \end{minipage}
 %}
 
-%Nous recommandons \textbf{chaudement} d'interdire l'accès direct aux fichiers
+%Nous recommandons \textbf{chaudement} d'interdire l'accÃ¨s direct aux fichiers
 %\fichier{.inc} :
 
 %\shadowbox{
@@ -173,10 +173,10 @@ dans ce même fichier, la ligne suivante doit être présente :
 %}
 
 
-%\subsubsection*{Section virtual host d'exemple complète}
+%\subsubsection*{Section virtual host d'exemple complÃ¨te}
 %
-%Vérifier que votre IP soit définie comme un \emph{named virtual
-%  host} et insérer cette section :
+%VÃ©rifier que votre IP soit dÃ©finie comme un \emph{named virtual
+%  host} et insÃ©rer cette section :
 %
 %\shadowbox{
 %  \begin{minipage}{13cm}
@@ -196,7 +196,7 @@ dans ce même fichier, la ligne suivante doit être présente :
 
 \subsubsection*{configuration de php}
 
-Dans le menu d'easyPHP aller dans configurer -> PHP, ou bien editez le fichier \fichier{php.ini} dans le répertoire \fichier{cong\_files} d'easyPHP.
+Dans le menu d'easyPHP aller dans configurer -> PHP, ou bien editez le fichier \fichier{php.ini} dans le rÃ©pertoire \fichier{cong\_files} d'easyPHP.
 
 remplacez la ligne : 
 
@@ -236,9 +236,9 @@ error_reporting = E_ALL & ~E_NOTICE
   \end{minipage}
 }
 
-\fichier{Attention, on suppose toujours OBM enstallé dans c:$\backslash$obm}\\
+\fichier{Attention, on suppose toujours OBM enstallÃ© dans c:$\backslash$obm}\\
 \\
-Vérifier les configurations de register\_global, safe\_mode, magic\_quotes\_gpc
+VÃ©rifier les configurations de register\_global, safe\_mode, magic\_quotes\_gpc
 \shadowbox{
   \begin{minipage}{13cm}
 \begin{verbatim}
@@ -250,7 +250,7 @@ allow_call_time_pass_reference = On
   \end{minipage}
 }
 
-La ligne suivante doit être présente, dans la partie extension.
+La ligne suivante doit Ãªtre prÃ©sente, dans la partie extension.
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -263,23 +263,23 @@ mysql.dll
 
 La configuration d'\obm se trouve dans le fichier \fichier{obminclude$\backslash$obm\_conf.inc}.
 
-Pour le créer, copier le fichier \fichier{obminclude$\backslash$obm\_conf.inc.sample} 
-dans le nouveau fichier \fichier{obminclude$\backslash$obm\_conf.inc}, et éditer ce dernier.
+Pour le crÃ©er, copier le fichier \fichier{obminclude$\backslash$obm\_conf.inc.sample} 
+dans le nouveau fichier \fichier{obminclude$\backslash$obm\_conf.inc}, et Ã©diter ce dernier.
 
 
-\subsubsection{Configuration initiale pour la base de données OBM}
+\subsubsection{Configuration initiale pour la base de donnÃ©es OBM}
 
-Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
+Ã‰diter le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
 
 \begin{itemize}
-\item choisir la base de données à utiliser ; 
-\item la déclarer ;
-\item déclarer le nom d'utilisateur et le mot de passe à utiliser.
-\item déclarer l'url d'accès à OBM (\$cgp\_host).
-\item déclarer le dépôt de documents (voir \ref{install_doc}).
+\item choisir la base de donnÃ©es Ã  utiliser ; 
+\item la dÃ©clarer ;
+\item dÃ©clarer le nom d'utilisateur et le mot de passe Ã  utiliser.
+\item dÃ©clarer l'url d'accÃ¨s Ã  OBM (\$cgp\_host).
+\item dÃ©clarer le dÃ©pÃ´t de documents (voir \ref{install_doc}).
 \end{itemize}
 
-Il est également possible de modifier des préférences globales dans ce
+Il est Ã©galement possible de modifier des prÃ©fÃ©rences globales dans ce
 fichier, comme cgp\_mail\_enabled par exemple.
 
 \shadowbox{
@@ -302,10 +302,10 @@ $cgp_mail_enabled = false;
 }
 
 
-\subsubsection*{Configurer le dépôt de documents}
+\subsubsection*{Configurer le dÃ©pÃ´t de documents}
 \label{install_doc}
 
-Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude}.
+Ã‰diter le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude}.
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -316,7 +316,7 @@ $cdocument_root = "c:\obm\obmdocuments";
 }
 
 
-%Créer le répertoire et le faire appartenir à l'utilisateur exécutant le serveur apache (www-data sous Debian).
+%CrÃ©er le rÃ©pertoire et le faire appartenir Ã  l'utilisateur exÃ©cutant le serveur apache (www-data sous Debian).
 
 %\shadowbox{
 %  \begin{minipage}{13cm}
@@ -328,22 +328,22 @@ $cdocument_root = "c:\obm\obmdocuments";
 %}
 
 
-\subsubsection*{Configuration et création de la base de données}
+\subsubsection*{Configuration et crÃ©ation de la base de donnÃ©es}
 
-Il faut d'abord copier les fichiers de création de la base de donnée dans le répertoire bin de MYSQL. 
+Il faut d'abord copier les fichiers de crÃ©ation de la base de donnÃ©e dans le rÃ©pertoire bin de MYSQL. 
 Pour le faire, ouvrez un explorateur et allez dans \fichier{C:$\backslash$obm$\backslash$scripts$\backslash$1.1$\backslash$}
 Copiez les fichiers \fichier{create\_obmdb\_1.1.mysql.sql},\fichier{obmdb\_test\_values\_1.1.sql},
 \fichier{obmdb\_default\_values\_1.1.sql} dans \fichier{c:$\backslash$program files$\backslash$easyPHP$\backslash$mysql$\backslash$bin}
-Ensuite, copiez les deux fichiers présents dans fr ou en selon la langue que vous préférez vers le même dossier.
+Ensuite, copiez les deux fichiers prÃ©sents dans fr ou en selon la langue que vous prÃ©fÃ©rez vers le mÃªme dossier.
 
-%\subsubsection*{Langue par défaut des données}
+%\subsubsection*{Langue par dÃ©faut des donnÃ©es}
 %
-%Certaines valeurs de références sont insérées par défaut. Ces valeurs
-%peuvent être en français (par défaut) ou en anglais. Pour passer de
-%l'un à l'autre, il faut éditer le fichier
+%Certaines valeurs de rÃ©fÃ©rences sont insÃ©rÃ©es par dÃ©faut. Ces valeurs
+%peuvent Ãªtre en franÃ§ais (par dÃ©faut) ou en anglais. Pour passer de
+%l'un Ã  l'autre, il faut Ã©diter le fichier
 %\fichier{scripts/1.1/install\_obmdb\_1.1.mysql.sh} (ou
 %\fichier{scripts/1.1/install\_obmdb\_1.1.pgsql.sh}) pour changer la
-%valeur de DATA\_LANG à \texttt{en} : 
+%valeur de DATA\_LANG Ã  \texttt{en} : 
 %
 %\shadowbox{
 %  \begin{minipage}{13cm}
@@ -357,8 +357,8 @@ Ensuite, copiez les deux fichiers présents dans fr ou en selon la langue que vou
 %  \end{minipage}
 %}
 
-Ensuite, il faut créer la base de données MySQL :
-lancer le menu démarer, choisir ligne de commande dans programmes ou choisir éxécuter puis taper sur entrée.
+Ensuite, il faut crÃ©er la base de donnÃ©es MySQL :
+lancer le menu dÃ©marer, choisir ligne de commande dans programmes ou choisir Ã©xÃ©cuter puis taper sur entrÃ©e.
 
 Vous devez voir le prompt suivant.
 \shadowbox{
@@ -369,13 +369,13 @@ Vous devez voir le prompt suivant.
 	\end{minipage}
 }
 
-Revenir à la racine et aller dans le répertoire bin de MySQL : 
+Revenir Ã  la racine et aller dans le rÃ©pertoire bin de MySQL : 
 \begin{verbatim}
 cd ..$\backslash$..
 cd program files$\backslash$easyPHP$\backslash$MySQL$\backslash$bin			
 \end{verbatim}
 
-Se connecter à MySQL et créer la base de données:
+Se connecter Ã  MySQL et crÃ©er la base de donnÃ©es:
 
 \shadowbox{
 	\begin{minipage}{13cm}
@@ -386,7 +386,7 @@ Se connecter à MySQL et créer la base de données:
 	\end{minipage}
 }
 
-Remplir la base de données : 
+Remplir la base de donnÃ©es : 
 	
 \shadowbox{
 	\begin{minipage}{13cm}
@@ -401,8 +401,8 @@ Remplir la base de données :
 	\end{minipage}
 }
 
-Il faut ensuite créer un compte utilisateur. On a ici pris l'exemble où la table s'appelle obm, l'utilisateur est obm@localhost 
-et le mot de passe obm. Il faut prendre les mêmes noms que ceux présents dans le fichier \fichier{obm\_conf.inc}
+Il faut ensuite crÃ©er un compte utilisateur. On a ici pris l'exemble oÃ¹ la table s'appelle obm, l'utilisateur est obm@localhost 
+et le mot de passe obm. Il faut prendre les mÃªmes noms que ceux prÃ©sents dans le fichier \fichier{obm\_conf.inc}
 
 \shadowbox{
   \begin{minipage}{13cm}
@@ -416,14 +416,14 @@ GRANT ALL ON obm.* TO obm@localhost IDENTIFIED BY 'obm';
 
 %\subsubsection*{Configuration d'OBM}
 %
-%Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
+%Ã‰diter le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
 %
 %\begin{itemize}
-%\item spécifier le mode d'authentification "CAS"; 
-%\item déclarer les paramètres de connection au serveur CAS.
+%\item spÃ©cifier le mode d'authentification "CAS"; 
+%\item dÃ©clarer les paramÃ¨tres de connection au serveur CAS.
 %\end{itemize}
 %
-%Les variables suivantes du fichier de configuration doivent être rennseignées:
+%Les variables suivantes du fichier de configuration doivent Ãªtre rennseignÃ©es:
 %
 %\shadowbox{
 %  \begin{minipage}{13cm}
@@ -441,13 +441,13 @@ GRANT ALL ON obm.* TO obm@localhost IDENTIFIED BY 'obm';
 %  \end{minipage}
 %}
 
-\subsection{Lancer OBM (accéder à obm.php depuis un navigateur)}
+\subsection{Lancer OBM (accÃ©der Ã  obm.php depuis un navigateur)}
 
-D'abord, redémarrer le serveur web apache à partir d'easyPHP.
+D'abord, redÃ©marrer le serveur web apache Ã  partir d'easyPHP.
 
 Si tout marche bien, lancer un navigateur (Firefox par exemple) et
-aller à l'URL : \url{http://yourvirtualhost/}, puis se connecter en
+aller Ã  l'URL : \url{http://yourvirtualhost/}, puis se connecter en
 utilisant le compte \texttt{uadmin/padmin}.
 
 
-Attention : la création de documents et de backups ne marche pas.
+Attention : la crÃ©ation de documents et de backups ne marche pas.

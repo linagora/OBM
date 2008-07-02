@@ -715,7 +715,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_privacy      integer,
   calendarevent_date         timestamp NOT NULL,
   calendarevent_duration     integer NOT NULL default 0,
-  calendarevent_allday       integer NOT NULL default 0,
+  calendarevent_allday       BOOLEAN DEFAULT FALSE,
   calendarevent_repeatkind   varchar(20) default NULL,
   calendarevent_repeatfrequence  integer default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,

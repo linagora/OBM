@@ -99,33 +99,33 @@ INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate,
 INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (1, null,null,null,1,'2','Appel');
 INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (1, null,null,null,1,'3','Attente Appel');
 INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (1, null,null,null,1,'4','En Pause');
-INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (1, null,null,null,1,'5','Cloturé');
+INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (1, null,null,null,1,'5','CloturÃ©');
 
 
 --
 -- Dumping data for table 'TaskType'
 --
-INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Développement',0);
+INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'DÃ©veloppement',0);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Sav / Maintenance',0);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Formation',0);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Etudes / Conseil',0);
-INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Réseau / Intégration',0);
+INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'RÃ©seau / IntÃ©gration',0);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Infographie',0);
-INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Hébergement',0);
-INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Matériel',0);
+INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'HÃ©bergement',0);
+INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'MatÃ©riel',0);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Autres',0);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Avant vente',2);
-INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Préparation formation',2);
-INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Développements internes',1);
+INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'PrÃ©paration formation',2);
+INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'DÃ©veloppements internes',1);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Projets internes',1);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Auto-Formations,Veille',2);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Garantie contractuelle projets',2);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Divers(direction,autres)',2);
-INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Congés , absences , maladie',2);
-INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Déplacements',2);
+INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'CongÃ©s , absences , maladie',2);
+INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'DÃ©placements',2);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Infographie/Communication',2);
 INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Administratif',2);
-INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Réunions',2);
+INSERT INTO TaskType (tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'RÃ©unions',2);
 
 
 --
@@ -158,33 +158,33 @@ VALUES (1, 'Fichier CSV','csv','text/x-csv');
 --
 -- dump for table  PaymentKind :
 --
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'Ch', 'Chèque');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'Ch', 'ChÃ¨que');
 INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'Vir', 'Virement');
 INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'TIP', 'Titre Interbancaire de Paiement');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'PA', 'Prélèvement Automatique');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'PA', 'PrÃ©lÃ¨vement Automatique');
 INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'FrB', 'Frais bancaires');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'BAO', 'Billet à ordre');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'BAO', 'Billet Ã  ordre');
 INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'LC', 'Lettre de change');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'CB', 'Carte de crédit');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'CB', 'Carte de crÃ©dit');
 
 
 -- Add system Groups
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_name, group_desc, group_email)
 VALUES
-(1, 1, 0, 'Admin', 'groupe système Administration', 'admin');
+(1, 1, 0, 'Admin', 'groupe systÃ¨me Administration', 'admin');
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_name, group_desc, group_email)
 VALUES
-(1, 1, 0, 'Commercial', 'groupe système Commercial', '');
+(1, 1, 0, 'Commercial', 'groupe systÃ¨me Commercial', '');
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_name, group_desc, group_email)
 VALUES
-(1, 1, 0, 'Production', 'groupe système Production', '');
+(1, 1, 0, 'Production', 'groupe systÃ¨me Production', '');
 
 -- Add Country
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AE', 'Emirats Arabes Unis', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AL', 'Albanie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AO', 'Angola', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SA', 'Arabie Saoudite', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AM', 'Arménie', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AM', 'ArmÃ©nie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AU', 'Australie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AZ', 'Azerbaidjan', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BE', 'Belgique', 'FR', '');
@@ -193,7 +193,7 @@ INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BB', 'La Barbade', 'FR', '')
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BJ', 'Benin', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BG', 'Bulgarie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BO', 'Bolivie', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BR', 'Brésil', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BR', 'BrÃ©sil', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BS', 'Bahamas', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BF', 'Burkina Faso', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BY', 'Bielorussie', 'FR', '');
@@ -202,14 +202,14 @@ INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CA', 'Canada', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CH', 'Suisse', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CN', 'Chine', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CO', 'Colombie', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'KP', 'Corée du Nord', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'KP', 'CorÃ©e du Nord', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CR', 'Costa Rica', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CZ', 'Rep.Tchèque', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CZ', 'Rep.TchÃ¨que', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CU', 'Cuba', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CY', 'Chypre', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'DE', 'Allemagne', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'DK', 'Danemark', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'DZ', 'Algérie', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'DZ', 'AlgÃ©rie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ES', 'Espagne', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'EE', 'Estonie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'EC', 'Equateur', 'FR', '');
@@ -222,8 +222,8 @@ INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GT', 'Guatemala', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GE', 'Georgie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GH', 'Ghana', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GL', 'Groenland', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GR', 'Grèce', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GN', 'Guinée', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GR', 'GrÃ¨ce', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GN', 'GuinÃ©e', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'HU', 'Hongrie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'HK', 'Hong Kong', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'JO', 'Jordanie', 'FR', '');
@@ -252,64 +252,64 @@ INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MD', 'Moldova', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MX', 'Mexique', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MU', 'Mauritius', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MW', 'Malawi', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NO', 'Norvège', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NP', 'Népal', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NO', 'NorvÃ¨ge', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NP', 'NÃ©pal', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NI', 'Nicaragua', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NE', 'Nigeria', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NL', 'Pays Bas', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NZ', 'Nouvelle Zélande', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NZ', 'Nouvelle ZÃ©lande', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'OM', 'Oman', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PT', 'Portugal', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PE', 'Pérou', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PE', 'PÃ©rou', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PH', 'Phillipines', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PK', 'Pakistan', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PL', 'Pologne', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PF', 'Polynésie Française', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PF', 'PolynÃ©sie FranÃ§aise', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PR', 'Porto Rico', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PY', 'Paraguay', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AR', 'Argentine', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TW', 'Taiwan', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CF', 'Rép. Centraficaine', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CF', 'RÃ©p. Centraficaine', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CL', 'Chili', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CI', 'Rep. Côte D''ivoire', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'KR', 'Corée du Sud', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ID', 'Indonésie', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CI', 'Rep. CÃ´te D''ivoire', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'KR', 'CorÃ©e du Sud', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ID', 'IndonÃ©sie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MG', 'Madagascar', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ML', 'Mali', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'RO', 'Roumanie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'UY', 'Uruguay', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'RU', 'Russie', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SE', 'Suède', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SE', 'SuÃ¨de', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SM', 'San Marino', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'FI', 'Finlande', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SG', 'Singapour', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SI', 'Slovenie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SK', 'Slovaquie', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SN', 'Sénégal', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SN', 'SÃ©nÃ©gal', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NA', 'Namibie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SY', 'Syrie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TH', 'Thailande', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TG', 'Togo', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TR', 'Turquie', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TT', 'Trinité & Tobago', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TT', 'TrinitÃ© & Tobago', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TN', 'Tunisie', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'UA', 'Ukraine', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'US', 'USA', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'VA', 'Saint-Siège', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'VA', 'Saint-SiÃ¨ge', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'VN', 'Vietnam', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AT', 'Autriche', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'VE', 'Vénézuela', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'VE', 'VÃ©nÃ©zuela', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ZA', 'Afriq. Sud', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ZW', 'Zimbabwe', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BA', 'Bosnie-Herzégovine ', 'FR', '+387');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BA', 'Bosnie-HerzÃ©govine ', 'FR', '+387');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AD', 'Andorre', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CS', 'Serbie-Monténégro', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CS', 'Serbie-MontÃ©nÃ©gro', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CG', 'Congo ', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'LT', 'Lituanie ', 'FR', '');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'FR', 'France ', 'FR', '+33');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'FR', 'France ', 'EN', '+33');
 INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'IQ', 'Irak', 'FR', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MK', '« L''ex République Yougoslave de Macedoine »', 'FR', '');
+INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MK', 'Â« L''ex RÃ©publique Yougoslave de Macedoine Â»', 'FR', '');
 
 UPDATE Country SET country_domain_id = 1;
 UPDATE CompanyType SET companytype_domain_id = 1;

@@ -5,55 +5,55 @@
 \clearpage
 \section{Odt}
 
-Depuis la version 1.2, \obm intègre un module d'export openOffice.
+Depuis la version 1.2, \obm intÃ¨gre un module d'export openOffice.
 
-\obm utilise actuellement la libraire tbsOOo, dérivée de tbs (TinyButStrong) pour l'export openOffice.
+\obm utilise actuellement la libraire tbsOOo, dÃ©rivÃ©e de tbs (TinyButStrong) pour l'export openOffice.
 Le module \odt propose une couche d'abstraction d'utilisation de l'export openOffice.\\
 
-Le module \odt est particulier car il n'apparait pas dans les menus de l'application mais est un service pour les modules devant faire appel à l'export odt.
-Le module \odt est appelé via un formulaire, il se charge de traiter les données reçues et renvoie le document odt (ou sxw) intégrant les données.
-Il peut aussi se contenter de sauvegardé le document exporté à l'adresse spécifiée.
+Le module \odt est particulier car il n'apparait pas dans les menus de l'application mais est un service pour les modules devant faire appel Ã  l'export odt.
+Le module \odt est appelÃ© via un formulaire, il se charge de traiter les donnÃ©es reÃ§ues et renvoie le document odt (ou sxw) intÃ©grant les donnÃ©es.
+Il peut aussi se contenter de sauvegardÃ© le document exportÃ© Ã  l'adresse spÃ©cifiÃ©e.
 
 Il n'effectue pas de gestion des droits ou de session.
 
-\subsection{Paramètres et utilisation}
+\subsection{ParamÃ¨tres et utilisation}
 
-Pour l'instant, une seule action est implémentée, l'export simple.
-Pour utiliser le module il suffit de l'appeler via un formulaire POST en fournissant les paramètres suivants : \\
+Pour l'instant, une seule action est implÃ©mentÃ©e, l'export simple.
+Pour utiliser le module il suffit de l'appeler via un formulaire POST en fournissant les paramÃ¨tres suivants : \\
 
 \begin{tabular}{|p{3cm}|p{5cm}|p{5cm}}
 \hline
-\textbf{Paramètre} & \textbf{Description} & \textbf{Commentaire} \\
+\textbf{ParamÃ¨tre} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-action & Action choisie (mode d'export) & Pour l'instant seule l'action export est implémentée (export basique) \\
+action & Action choisie (mode d'export) & Pour l'instant seule l'action export est implÃ©mentÃ©e (export basique) \\
 \hline
-template & Id du document utilisé comme modèle & Modèle sélectionné parmi les modèles par défaut ou les documents \obm \\
+template & Id du document utilisÃ© comme modÃ¨le & ModÃ¨le sÃ©lectionnÃ© parmi les modÃ¨les par dÃ©faut ou les documents \obm \\
 \hline
-save\_path & Chemin de sauvegarde du document à exporter & Paramètre optionnel (si ce paramètre est laissé vide, le document est affiché) \\
+save\_path & Chemin de sauvegarde du document Ã  exporter & ParamÃ¨tre optionnel (si ce paramÃ¨tre est laissÃ© vide, le document est affichÃ©) \\
 \hline
-data &  Données spécifiques du document à exporter & Formattage décrit dans la section suivante \\
+data &  DonnÃ©es spÃ©cifiques du document Ã  exporter & Formattage dÃ©crit dans la section suivante \\
 \hline
 \end{tabular}
 \\
 
 Il y a donc deux modes d'export : \\
 \begin{itemize}
- \item si le paramètre save\_path n'est pas spécifié, alors le document exporté devient disponbible à l'écran sous la forme d'une boîte de dialogue ouvrir/enregistrer le document.
- \item sinon le document est sauvegardé à l'adresse indiquée (si les droits d'écriture sont valables pour cette adresse).
+ \item si le paramÃ¨tre save\_path n'est pas spÃ©cifiÃ©, alors le document exportÃ© devient disponbible Ã  l'Ã©cran sous la forme d'une boÃ®te de dialogue ouvrir/enregistrer le document.
+ \item sinon le document est sauvegardÃ© Ã  l'adresse indiquÃ©e (si les droits d'Ã©criture sont valables pour cette adresse).
 \end{itemize}
 
-Enfin, le type mime du document est déterminé la type mime du document \obm utilisé : il est donc important de bien spécifier le type (odt ou  sxw) lors de l'upload d'un document. Le type par défaut est sxw (pour garantir la compatibilité avec openOffice 1.XX). \\
+Enfin, le type mime du document est dÃ©terminÃ© la type mime du document \obm utilisÃ© : il est donc important de bien spÃ©cifier le type (odt ou  sxw) lors de l'upload d'un document. Le type par dÃ©faut est sxw (pour garantir la compatibilitÃ© avec openOffice 1.XX). \\
 
-\subsection{Formattage des données}
+\subsection{Formattage des donnÃ©es}
 
 
-La formattage des données doit correspondre au modèle utilisé : ainsi la fonction de formattage est généralement spécifique à chaque entité puisqu'on souhaite afficher des données différentes. \\
+La formattage des donnÃ©es doit correspondre au modÃ¨le utilisÃ© : ainsi la fonction de formattage est gÃ©nÃ©ralement spÃ©cifique Ã  chaque entitÃ© puisqu'on souhaite afficher des donnÃ©es diffÃ©rentes. \\
 
-\subsubsection{Formattage du modèle openOffice}
+\subsubsection{Formattage du modÃ¨le openOffice}
 
-Les données à afficher dans le modèle sont définies selon la syntaxe de tbs, dont le manuel se trouve à l'adresse \variable{http://www.tinybutstrong.com/manual.php} ainsi qu'à quelques spécifités de tbsOOo dont le manuel se trouve à l'adresse \variable{http://www.tinybutstrong.com/tbsooo.php}. \\
+Les donnÃ©es Ã  afficher dans le modÃ¨le sont dÃ©finies selon la syntaxe de tbs, dont le manuel se trouve Ã  l'adresse \variable{http://www.tinybutstrong.com/manual.php} ainsi qu'Ã  quelques spÃ©cifitÃ©s de tbsOOo dont le manuel se trouve Ã  l'adresse \variable{http://www.tinybutstrong.com/tbsooo.php}. \\
 
-Les deux principales règles de syntaxe sont : 
+Les deux principales rÃ¨gles de syntaxe sont : 
 \begin{itemize}
  \item pour une variable simple \\
 \shadowbox{
@@ -63,7 +63,7 @@ Les deux principales règles de syntaxe sont :
 \end{verbatim}
 \end{minipage}
 }
- \item pour un bloc de variables (liste, ou série) \\
+ \item pour un bloc de variables (liste, ou sÃ©rie) \\
 \shadowbox{
 \begin{minipage}{16cm}
 \begin{verbatim}
@@ -77,16 +77,16 @@ Les deux principales règles de syntaxe sont :
 }
 \end{itemize}
 
-\subsubsection{Formattage des données (variables PHP)}
+\subsubsection{Formattage des donnÃ©es (variables PHP)}
 
-Les données suivent un formattage spécial pour pouvoir être exploitées de manière uniforme par le module \odt. \\
-On distingue deux types de données : 
+Les donnÃ©es suivent un formattage spÃ©cial pour pouvoir Ãªtre exploitÃ©es de maniÃ¨re uniforme par le module \odt. \\
+On distingue deux types de donnÃ©es : 
 \begin{itemize}
- \item les variables simples, qui ne sont affichées qu'une fois : titres des rubriques du document, noms de la personne titulaire du document..... Elles sont stockées dans le tableau \variable{data\_vars}.
- \item les variables de block dont on ne connaît pas le nombre à l'avance : ce sont les variables correspondant à des listes d'éléments : par exemple, des références pour un CV (plusieurs variables par référence à chaque fois)... Les tableaux représentant un bloc de données sont stockées dans le tableau \variable{data\_blocks}.
+ \item les variables simples, qui ne sont affichÃ©es qu'une fois : titres des rubriques du document, noms de la personne titulaire du document..... Elles sont stockÃ©es dans le tableau \variable{data\_vars}.
+ \item les variables de block dont on ne connaÃ®t pas le nombre Ã  l'avance : ce sont les variables correspondant Ã  des listes d'Ã©lÃ©ments : par exemple, des rÃ©fÃ©rences pour un CV (plusieurs variables par rÃ©fÃ©rence Ã  chaque fois)... Les tableaux reprÃ©sentant un bloc de donnÃ©es sont stockÃ©es dans le tableau \variable{data\_blocks}.
 \end{itemize}
 
-Ainsi la structure de données à fournir au module odt est la suivante : \\
+Ainsi la structure de donnÃ©es Ã  fournir au module odt est la suivante : \\
 \shadowbox{
 \begin{minipage}{16cm}
 \begin{verbatim}
@@ -104,7 +104,7 @@ $data = {
 }
 \\
 
-Enfin le bloc de données doit être sérialisé, avec la fonction \fonction{serialize} puis encodé avec la fonction \fonction{urlencode}. Lors de la réception des données, le module odt effectue les opérations inverses.  \\
+Enfin le bloc de donnÃ©es doit Ãªtre sÃ©rialisÃ©, avec la fonction \fonction{serialize} puis encodÃ© avec la fonction \fonction{urlencode}. Lors de la rÃ©ception des donnÃ©es, le module odt effectue les opÃ©rations inverses.  \\
 
 
 

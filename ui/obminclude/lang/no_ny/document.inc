@@ -22,7 +22,7 @@ $l_qualdocument = "Quality";
 $l_destdocument = "Mottakar";
 $l_adddocument = "Mottakaradresse";
 $l_vrefdocument = "Din referanse";
-$l_nrefdocument = "Vår referanse";
+$l_nrefdocument = "VÃ¥r referanse";
 $l_objdocument = "Document object";
 $l_salutdocument = "Helsingar";
 $l_corpsdocument = "Corps";
@@ -30,13 +30,13 @@ $l_formpdocument = "Formule de politesse";
 $l_sign1document = "Fyrste underskrift";
 $l_sign2document = "Andre underskrift";
 $l_ccdocument = "Kopi";
-$l_pjdocument = "Pièces jointes";
+$l_pjdocument = "PiÃ¨ces jointes";
 $l_psdocument = "Post Scriptum";
 
 $l_creer = "Opprett";
 $l_annuler = "Annuller";
-$l_recup_doc = "Erreur de récupération du document en base...";
-$l_recupsoc_doc = "Erreur de récupération des donnees de la societe en base...";
+$l_recup_doc = "Erreur de rÃ©cupÃ©ration du document en base...";
+$l_recupsoc_doc = "Erreur de rÃ©cupÃ©ration des donnees de la societe en base...";
 $l_generer = "Generer";
 
 // Messages
@@ -54,6 +54,6 @@ $l_archive_number = "affaires enregistr&eacute;es dans les archives.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_label = "\\n Vous devez renseigner le Label avant de valider.";
-$l_fill_date = "La date doit être renseignée.";
+$l_fill_date = "La date doit Ãªtre renseignÃ©e.";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 $l_delete_confirm = "Confirmer la suppression de l'affaire ?";

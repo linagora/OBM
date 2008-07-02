@@ -8,46 +8,46 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_label_start = "Début du Label";
+$l_label_start = "DÃ©but du Label";
 $l_bank = "Banque"; 
-$l_number = "Numéro";
+$l_number = "NumÃ©ro";
 $l_balance = "Solde";
 $l_initial_balance = "Solde Initial";
 $l_choose_balance_date = "Date de calcul du Solde";
-$l_expected_date = "Date Prévisionnelle";
+$l_expected_date = "Date PrÃ©visionnelle";
 $l_amount = "Montant";
 
-$l_include_expected = "Inclure les opérations prévisionnelles ?";
-$l_in_total ="Total des entrées";
+$l_include_expected = "Inclure les opÃ©rations prÃ©visionnelles ?";
+$l_in_total ="Total des entrÃ©es";
 $l_out_total = "Total des sorties";
-$l_total ="Solde Estimé";
+$l_total ="Solde EstimÃ©";
 $l_old_balance = "Solde Actuel";
-$l_nb_expected_used = " opérations prévisionnelles utilisées pour le calcul.";
-$l_expected = "prévisionnel";
-$l_used_payments = "Paiement utilisés pour calculer le solde";
-$l_used_expected_payments = "Paiement prévisionnels utilisés pour calculer le solde";
-$l_expected_payments = "Paiements prévisionnels";
+$l_nb_expected_used = " opÃ©rations prÃ©visionnelles utilisÃ©es pour le calcul.";
+$l_expected = "prÃ©visionnel";
+$l_used_payments = "Paiement utilisÃ©s pour calculer le solde";
+$l_used_expected_payments = "Paiement prÃ©visionnels utilisÃ©s pour calculer le solde";
+$l_expected_payments = "Paiements prÃ©visionnels";
 $l_payments = "Paiements";
 $l_totals = "Totaux";
 
 // Actions
-$l_insert = "Insérer le Compte";
-$l_update = "Mettre à jour le Compte";
+$l_insert = "InsÃ©rer le Compte";
+$l_update = "Mettre Ã  jour le Compte";
 $l_delete = "Supprimer le Compte";
 $l_delete_confirm = "Etes vous sur de vouloir supprimer ce Compte ?";
 $l_compute_balance = "Calculer le solde";
 
 // Messages 
-$l_no_display = "Remplissez les critères de recherche et appuyez sur <$l_find> pour lancer la recherche";
-$l_found = "Compte(s) trouvé(s).";
-$l_no_found="Aucun Compte ne correspond à votre requête";
-$l_impossible_deletion = " paiements sont liés à ce compte. La suppression est impossible"; // must be used with the number of payments leading...
+$l_no_display = "Remplissez les critÃ¨res de recherche et appuyez sur <$l_find> pour lancer la recherche";
+$l_found = "Compte(s) trouvÃ©(s).";
+$l_no_found="Aucun Compte ne correspond Ã  votre requÃªte";
+$l_impossible_deletion = " paiements sont liÃ©s Ã  ce compte. La suppression est impossible"; // must be used with the number of payments leading...
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_check_number = "Le numéro du compte n\'est pas valide !";
-$l_fill_number = "Vous devez fournir un numéro de compte !";
+$l_check_number = "Le numÃ©ro du compte n\'est pas valide !";
+$l_fill_number = "Vous devez fournir un numÃ©ro de compte !";
 $l_fill_bank = "Vous devez renseigner le champ banque !";
-$l_confirm_no_bank="Ce Compte n\\'est associé à aucune banque. Cliquez sur OK pour confirmer .";
+$l_confirm_no_bank="Ce Compte n\\'est associÃ© Ã  aucune banque. Cliquez sur OK pour confirmer .";
 
 // For the display parameters modification screen
 $l_account_options = "Options d'affichage pour les listes de Comptes"; 

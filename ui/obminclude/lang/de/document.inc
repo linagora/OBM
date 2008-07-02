@@ -15,9 +15,9 @@ $l_document_generate= "TeX-Dokument erzeugen";
 $l_namedocument = "Brief";
 $l_namesoc = "Firma";
 $l_typedocument = "Typ";
-$l_qualdocument = "Qualität";
-$l_destdocument = "Empfänger";
-$l_adddocument = "Empfängeradresse";
+$l_qualdocument = "QualitÃ¤t";
+$l_destdocument = "EmpfÃ¤nger";
+$l_adddocument = "EmpfÃ¤ngeradresse";
 $l_vrefdocument = "Ihr Zeichen";
 $l_nrefdocument = "Unser Zeichen";
 $l_objdocument = "Dokument object";
@@ -32,9 +32,9 @@ $l_psdocument = "Post Scriptum";
 
 $l_creer = "Erzeugt";
 $l_annuler = "Annuliert";
-$l_recup_doc = "Erreur de récupération du Dokument en base...";
-$l_recupsoc_doc = "Erreur de récupération des donnees de la societe en base...";
-$l_generer = "Générer";
+$l_recup_doc = "Erreur de rÃ©cupÃ©ration du Dokument en base...";
+$l_recupsoc_doc = "Erreur de rÃ©cupÃ©ration des donnees de la societe en base...";
+$l_generer = "GÃ©nÃ©rer";
 
 // Messages
 $l_no_display = "Renseigner les crit&egrave;res souhait&eacute;s et cliquer sur < Chercher > pour obtenir la liste des affaires correspondantes.";
@@ -51,6 +51,6 @@ $l_archive_number = "affaires enregistr&eacute;es dans les archives.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_label = "\\n Vous devez renseigner le Label avant de valider.";
-$l_fill_date = "La date doit être renseignée.";
+$l_fill_date = "La date doit Ãªtre renseignÃ©e.";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 $l_delete_confirm = "Confirmer la suppression de l'affaire ?";

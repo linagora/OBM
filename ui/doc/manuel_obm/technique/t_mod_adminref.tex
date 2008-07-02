@@ -4,13 +4,13 @@
 
 
 \clearpage
-\section{Référentiel (module \adminref)}
+\section{RÃ©fÃ©rentiel (module \adminref)}
 
 Le module \adminref d'\obm.
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
-Le module \adminref permet de gérer 3 tables de références :
+Le module \adminref permet de gÃ©rer 3 tables de rÃ©fÃ©rences :
 \begin{itemize}
  \item TaskType
  \item Country
@@ -19,7 +19,7 @@ Le module \adminref permet de gérer 3 tables de références :
 
 \subsection{TaskType}
 
-Table des types de tâche, utilisée par les modules :
+Table des types de tÃ¢che, utilisÃ©e par les modules :
 \begin{itemize}
  \item \deal
  \item \project
@@ -31,42 +31,42 @@ Table des types de tâche, utilisée par les modules :
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
-\_label & varchar 255 & Label du type de tâche & \\
+\_label & varchar 255 & Label du type de tÃ¢che & \\
 \hline
-\_internal & int 1 & Catégorie du type de tâche & \\
+\_internal & int 1 & CatÃ©gorie du type de tÃ¢che & \\
 \hline
 \end{tabular}
 
 
-\subsubsection{Catégories de TaskType}
+\subsubsection{CatÃ©gories de TaskType}
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|}
 \hline
 \textbf{Variable} & \textbf{Valeur} & \textbf{Description} \\
 \hline
-\$ctt\_sales & 0 & Tâches de production \\
+\$ctt\_sales & 0 & TÃ¢ches de production \\
 \hline
-\$ctt\_research & 1 & Tâches de R\&D interne \\
+\$ctt\_research & 1 & TÃ¢ches de R\&D interne \\
 \hline
-\$ctt\_others & 2 & Tâches non liées à la production \\
+\$ctt\_others & 2 & TÃ¢ches non liÃ©es Ã  la production \\
 \hline
 \end{tabular}
 
 
 \subsection{Country}
-Table de référence des pays.\\
+Table de rÃ©fÃ©rence des pays.\\
 
-Table de référence des pays, utilisée par les modules :
+Table de rÃ©fÃ©rence des pays, utilisÃ©e par les modules :
 \begin{itemize}
  \item \company
  \item \contact
@@ -79,9 +79,9 @@ Table de référence des pays, utilisée par les modules :
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
@@ -89,24 +89,24 @@ Table de référence des pays, utilisée par les modules :
 \hline
 \_iso3166 & char 2 & Code ISO 3166 du pays & (FR, IT,..) \\
 \hline
-\_name & varchar 64 & Nom du pays dans la langue indiquée & \\
+\_name & varchar 64 & Nom du pays dans la langue indiquÃ©e & \\
 \hline
 \_lang & char 2 & Langue du nom du pays & \\
 \hline
-\_phone & varchar 5 & Indicateur téléphonique du pays & \\
+\_phone & varchar 5 & Indicateur tÃ©lÃ©phonique du pays & \\
 \hline
 \end{tabular}
 
 \subsubsection{Remarques}
 
-L'identifiant d'un pays est le code ISO 3166. Mais ce n'est pas la clé primaire car un pays peut être présent plusieurs fois. Chaque entrée propose le nom du pays dans une seule langue (référencée par le champ country\_lang).
+L'identifiant d'un pays est le code ISO 3166. Mais ce n'est pas la clÃ© primaire car un pays peut Ãªtre prÃ©sent plusieurs fois. Chaque entrÃ©e propose le nom du pays dans une seule langue (rÃ©fÃ©rencÃ©e par le champ country\_lang).
 
-la clé primaire est le couple (Code ISO 3166, LANG).
+la clÃ© primaire est le couple (Code ISO 3166, LANG).
 
 
 \subsection{DataSource}
 
-Table de référence des sources de données, utilisée par les modules :
+Table de rÃ©fÃ©rence des sources de donnÃ©es, utilisÃ©e par les modules :
 \begin{itemize}
  \item \company
  \item \contact
@@ -118,28 +118,28 @@ Table de référence des sources de données, utilisée par les modules :
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
 \_usercreate & int 8 & Id du createur & \\
 \hline
-\_name & varchar 64 & Nom de la source de données & \\
+\_name & varchar 64 & Nom de la source de donnÃ©es & \\
 \hline
 \end{tabular}
 
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \project, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \project, avec le droit d'accÃ¨s requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \textbf{IntitulÃ©} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
   country & read\_admin & Ecran de gestion des pays.\\ 
@@ -148,28 +148,28 @@ Voici la liste des actions du module \project, avec le droit d'accès requis ains
  \hline
   country\_update & write\_admin & Modification d'un pays. \\
  \hline
-  country\_checklink & write\_admin & Vérification avant suppression d'un pays. \\
+  country\_checklink & write\_admin & VÃ©rification avant suppression d'un pays. \\
  \hline
   country\_delete & write\_admin & Suppression d'un pays. \\
  \hline
-  datasource & read\_admin & Ecran de gestion des sources de données.\\ 
+  datasource & read\_admin & Ecran de gestion des sources de donnÃ©es.\\ 
  \hline
-  datasource\_insert & write\_admin & Ajout d'une source de données. \\
+  datasource\_insert & write\_admin & Ajout d'une source de donnÃ©es. \\
  \hline
-  datasource\_update & write\_admin & Modification d'une source de données. \\
+  datasource\_update & write\_admin & Modification d'une source de donnÃ©es. \\
  \hline
-  datasource\_checklink & write\_admin & Vérification avant suppression d'une source de données. \\
+  datasource\_checklink & write\_admin & VÃ©rification avant suppression d'une source de donnÃ©es. \\
  \hline
-  datasource\_delete & write\_admin & Suppression d'une source de données. \\
+  datasource\_delete & write\_admin & Suppression d'une source de donnÃ©es. \\
  \hline
-  tasktype & read\_admin & Ecran de gestion des types de tâche.\\ 
+  tasktype & read\_admin & Ecran de gestion des types de tÃ¢che.\\ 
  \hline
-  tasktype\_insert & write\_admin & Ajout d'un type de tâche. \\
+  tasktype\_insert & write\_admin & Ajout d'un type de tÃ¢che. \\
  \hline
-  tasktype\_update & write\_admin & Modification d'un type de tâche. \\
+  tasktype\_update & write\_admin & Modification d'un type de tÃ¢che. \\
  \hline
-  tasktype\_checklink & write\_admin & Vérification avant suppression d'un type de tâche. \\
+  tasktype\_checklink & write\_admin & VÃ©rification avant suppression d'un type de tÃ¢che. \\
  \hline
-  tasktype\_delete & write\_admin & Suppression d'un type de tâche. \\
+  tasktype\_delete & write\_admin & Suppression d'un type de tÃ¢che. \\
  \hline
 \end{tabular}

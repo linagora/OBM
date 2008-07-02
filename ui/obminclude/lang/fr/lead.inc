@@ -11,18 +11,18 @@
 $l_insert = "Enregistrer la piste";
 $l_update = "Modifier la piste";
 $l_delete = "Supprimer la piste";
-$l_select_company = "Sélectionner la société";
+$l_select_company = "SÃ©lectionner la sociÃ©tÃ©";
 
 // Messages
-$l_can_delete = "La piste peut être supprimée.";
-$l_cant_delete = "La piste ne peut être supprimée !";
+$l_can_delete = "La piste peut Ãªtre supprimÃ©e.";
+$l_cant_delete = "La piste ne peut Ãªtre supprimÃ©e !";
 
-$l_err_name_empty = "Le nom doit être renseigné !";
-$l_err_source_empty = "La source de piste doit être renseignée !";
-$l_err_market_empty = "Le responsable doit être renseigné !";
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des pistes correspondantes.";
-$l_found = "pistes trouvées.";
-$l_no_found = "Aucune piste ne correspond à ces critères !";
+$l_err_name_empty = "Le nom doit Ãªtre renseignÃ© !";
+$l_err_source_empty = "La source de piste doit Ãªtre renseignÃ©e !";
+$l_err_market_empty = "Le responsable doit Ãªtre renseignÃ© !";
+$l_no_display = "Renseigner les critÃ¨res souhaitÃ©s et cliquer sur < Chercher > pour obtenir la liste des pistes correspondantes.";
+$l_found = "pistes trouvÃ©es.";
+$l_no_found = "Aucune piste ne correspond Ã  ces critÃ¨res !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Vous devez renseigner le Nom avant de valider.";

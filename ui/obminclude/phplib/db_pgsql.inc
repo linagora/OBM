@@ -104,11 +104,20 @@ class DB_Sql {
       $type = PGSQL_ASSOC;
     }
     $this->Record = @pg_fetch_array($this->Query_ID, $this->Row++, $type);
-    
+
     $this->Error = pg_ErrorMessage($this->Link_ID);
     $this->Errno = ($this->Error == "")?0:1;
 
     $stat = is_array($this->Record);
+    if($stat) {
+      $count = $this->num_fields($this->Query_ID);
+      for ($i=0; $i<$count; $i++) {
+        $type = pg_FieldType  ($this->Query_ID, $i);
+        $name = pg_FieldName  ($this->Query_ID, $i);
+        $this->Record[$i] = $this->parse($type, $this->Record[$i]);
+        $this->Record[$name] = $this->Record[$i];
+      }     
+    }
     if (!$stat && $this->Auto_Free) {
       pg_freeresult($this->Query_ID);
       $this->Query_ID = 0;
@@ -251,6 +260,15 @@ class DB_Sql {
       $i++;
      }
     return $return;
+  }
+
+  function parse($type,$data) {
+    switch(strtolower($type)) {
+    case 'bool' :
+      return ($data == 't')? TRUE:FALSE;
+    default :
+      return $data;
+    }
   }
 }
 ?>

@@ -6,33 +6,33 @@
 \subsection{Les actions d'un module}
 \label{actions}
 
-Les actions d'un module représentent les traitements implémentés par ce module. Chaque traitement (consultation, création, modification, recherche,...) est défini par une action.
+Les actions d'un module reprÃ©sentent les traitements implÃ©mentÃ©s par ce module. Chaque traitement (consultation, crÃ©ation, modification, recherche,...) est dÃ©fini par une action.
 
-Chaque action possède des propriétés qui vont définir son comportement (droits d'accès, contexte d'affichage,...).
+Chaque action possÃ¨de des propriÃ©tÃ©s qui vont dÃ©finir son comportement (droits d'accÃ¨s, contexte d'affichage,...).
 
 
 \subsubsection{Gestion des actions par un module}
 
-Les différentes actions proposées par un module sont définies dans le module (fichier \fichier{module\_index.php}.
+Les diffÃ©rentes actions proposÃ©es par un module sont dÃ©finies dans le module (fichier \fichier{module\_index.php}.
 
 \begin{itemize}
-\item La fonction \fonction{get\_module\_action()} appelée en début de module renseigne le tableau global \variable{\$actions}.
+\item La fonction \fonction{get\_module\_action()} appelÃ©e en dÃ©but de module renseigne le tableau global \variable{\$actions}.
 
-\item La fonction \fonction{update\_module\_action()} appelée en fin de module, après les traitements, permet de mettre à jour les actions en fonction du contexte et des résultats du traitement.
+\item La fonction \fonction{update\_module\_action()} appelÃ©e en fin de module, aprÃ¨s les traitements, permet de mettre Ã  jour les actions en fonction du contexte et des rÃ©sultats du traitement.
 \end{itemize}
 
-\subsubsection{Utilité de \fonction{update\_module\_action()}}
+\subsubsection{UtilitÃ© de \fonction{update\_module\_action()}}
 
 \paragraph{Exemple :} pour l'action insertion :
 \begin{itemize}
-\item si l'action est un succès, une nouvelle entité est créée et le module l'affiche directement. Dans ce cas les actions ``modifier'' ou ``supprimer'', qui nécessitent d'être positionné sur une entité, peuvent être affichées
-\item si l'action échoue, n'étant pas positionné sur une entité, ces actions ne doivent pas être affichées.
+\item si l'action est un succÃ¨s, une nouvelle entitÃ© est crÃ©Ã©e et le module l'affiche directement. Dans ce cas les actions ``modifier'' ou ``supprimer'', qui nÃ©cessitent d'Ãªtre positionnÃ© sur une entitÃ©, peuvent Ãªtre affichÃ©es
+\item si l'action Ã©choue, n'Ã©tant pas positionnÃ© sur une entitÃ©, ces actions ne doivent pas Ãªtre affichÃ©es.
 \end{itemize}
 
-\paragraph{Note :} l'affichage du bandeau est effectué après l'appel à \fonction{update\_module\_action()}.
+\paragraph{Note :} l'affichage du bandeau est effectuÃ© aprÃ¨s l'appel Ã  \fonction{update\_module\_action()}.
 
 
-\subsubsection{Schéma de principe global de gestion des actions}
+\subsubsection{SchÃ©ma de principe global de gestion des actions}
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -52,17 +52,17 @@ $display[``header''] = display_menu($module) // affichage du bandeau
 }
 
 
-\subsubsection{Propriétés d'une action}
+\subsubsection{PropriÃ©tÃ©s d'une action}
 
 \begin{tabular}{|p{2cm}|p{5cm}|p{6cm}|}
 \hline
 \textbf{Nom} & \textbf{description} & \textbf{Valeur} \\
 \hline
-Name & label associé & \$l\_header\_find \\ 
+Name & label associÃ© & \$l\_header\_find \\ 
 \hline
 Url & url de l'action & \$path/company/company\_index.php?action=.. \\ 
 \hline
-Right & Droit nécessaire pour exécution & \$cright\_read, \$cright\_write,.. \\ 
+Right & Droit nÃ©cessaire pour exÃ©cution & \$cright\_read, \$cright\_write,.. \\ 
 \hline
 Condition & Condition d'affichage dans menu & array : 'all', 'None', 'action' \\ 
 \hline

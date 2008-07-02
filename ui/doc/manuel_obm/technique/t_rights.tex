@@ -5,73 +5,73 @@
 
 \subsection{Gestion des droits et profils}
 
-La gestion des droits est le mécanisme qui permet le contrôle et l'autorisation des informations accessibles et des actions exécutées par un utilisateur.\\
+La gestion des droits est le mÃ©canisme qui permet le contrÃ´le et l'autorisation des informations accessibles et des actions exÃ©cutÃ©es par un utilisateur.\\
 
-L'implémentation de la gestion des droits a été effectuée avec les objectifs suivants :\\
+L'implÃ©mentation de la gestion des droits a Ã©tÃ© effectuÃ©e avec les objectifs suivants :\\
 \begin{itemize}
-\item Système peu intrusif dans le code (Eliminer ou éviter au maximum les tests de droits d'accès dans le code des modules)
-\item Niveau de granularité à l'action exécutée
-\item Faciliter l'évolution (modification des droits, des profils,...)
-\item Système léger et performant (si possible sans accès à la base de données)
-\item Système sûr.
+\item SystÃ¨me peu intrusif dans le code (Eliminer ou Ã©viter au maximum les tests de droits d'accÃ¨s dans le code des modules)
+\item Niveau de granularitÃ© Ã  l'action exÃ©cutÃ©e
+\item Faciliter l'Ã©volution (modification des droits, des profils,...)
+\item SystÃ¨me lÃ©ger et performant (si possible sans accÃ¨s Ã  la base de donnÃ©es)
+\item SystÃ¨me sÃ»r.
 \end{itemize}
 \vspace{0.3cm}
 
-Les fonctionnalitées proposées en standard (sans code spécifique dans un module) :\\
+Les fonctionnalitÃ©es proposÃ©es en standard (sans code spÃ©cifique dans un module) :\\
 \begin{itemize}
-\item Définition des sections et modules accessibles par profil.
-\item Autorisation d'exécution au niveau de l'action d'un module par profil
-\item Tout accès ou action non défini est interdit
-\item Possibilité de tests plus spécifiques dans un module (ex: champ affiché selon droit précis) par utilisation de l'API de droits dans le module.
+\item DÃ©finition des sections et modules accessibles par profil.
+\item Autorisation d'exÃ©cution au niveau de l'action d'un module par profil
+\item Tout accÃ¨s ou action non dÃ©fini est interdit
+\item PossibilitÃ© de tests plus spÃ©cifiques dans un module (ex: champ affichÃ© selon droit prÃ©cis) par utilisation de l'API de droits dans le module.
 \item API simple de tests de droits.
 \end{itemize}
 
 
 \subsubsection{Principe des droits}
 
-Chaque action (consultation, création, modification,...) de tous les modules d'\obm nécessite une autorisation pour être exécutée.
-La définition des actions des modules précise donc un ``droit élémentaire'' (ex: droit de lecture) nécessaire pour son exécution.\\
+Chaque action (consultation, crÃ©ation, modification,...) de tous les modules d'\obm nÃ©cessite une autorisation pour Ãªtre exÃ©cutÃ©e.
+La dÃ©finition des actions des modules prÃ©cise donc un ``droit Ã©lÃ©mentaire'' (ex: droit de lecture) nÃ©cessaire pour son exÃ©cution.\\
 
-Les droits d'un utilisateur sur un module (ou permission sur un module) sont constitués de l'ensemble des droits élémentaires qu'il possède sur ce module (ex: lecture + écriture sur le module \company).
-Les droits élémentaires étant définis comme des champs de bits, la permission sur un module est une combinaison logique des droits élémentaires.\\
+Les droits d'un utilisateur sur un module (ou permission sur un module) sont constituÃ©s de l'ensemble des droits Ã©lÃ©mentaires qu'il possÃ¨de sur ce module (ex: lecture + Ã©criture sur le module \company).
+Les droits Ã©lÃ©mentaires Ã©tant dÃ©finis comme des champs de bits, la permission sur un module est une combinaison logique des droits Ã©lÃ©mentaires.\\
 
-Les permissions ne sont pas associées directement aux utilisateurs, mais à des profils utilisateurs. Chaque utilisateur d'\obm est associé à un profil.
+Les permissions ne sont pas associÃ©es directement aux utilisateurs, mais Ã  des profils utilisateurs. Chaque utilisateur d'\obm est associÃ© Ã  un profil.
 
 
-\subsubsection{Droits élémentaires}
+\subsubsection{Droits Ã©lÃ©mentaires}
 
-Droits élémentaires définis par \obm :\\
+Droits Ã©lÃ©mentaires dÃ©finis par \obm :\\
 
 \begin{tabular}{|p{3cm}|p{2cm}|p{2cm}|p{5cm}|}
 \hline
 \textbf{Droit} & \textbf{bit} & \textbf{Valeur} & \textbf{Description} \\
 \hline
-\$cright\_read & 0 & 1 & Lecture données simples \\ 
+\$cright\_read & 0 & 1 & Lecture donnÃ©es simples \\ 
 \hline
-\$cright\_own & 1 & 2 & Ecriture données personnelles \\ 
+\$cright\_own & 1 & 2 & Ecriture donnÃ©es personnelles \\ 
 \hline
-\$cright\_write & 2 & 4 & Ecriture données simples \\ 
+\$cright\_write & 2 & 4 & Ecriture donnÃ©es simples \\ 
 \hline
-\$cright\_read\_admin & 3 & 8 & Lecture données admin \\ 
+\$cright\_read\_admin & 3 & 8 & Lecture donnÃ©es admin \\ 
 \hline
-\$cright\_write\_admin & 4 & 16 & Ecriture données admin \\ 
+\$cright\_write\_admin & 4 & 16 & Ecriture donnÃ©es admin \\ 
 \hline
 \end{tabular}
 
-\subsubsection{Permissions : combinaisons de droits élémentaires}
+\subsubsection{Permissions : combinaisons de droits Ã©lÃ©mentaires}
 
-Toute combinaison de droits élémentaires est une permission.
-\obm par commodité définit les permissions des profils par défaut :\\
+Toute combinaison de droits Ã©lÃ©mentaires est une permission.
+\obm par commoditÃ© dÃ©finit les permissions des profils par dÃ©faut :\\
 
 \begin{tabular}{|p{3cm}|p{2.5cm}|p{2.2cm}|p{5cm}|}
 \hline
 \textbf{Permission} & \textbf{Droits (bits)} & \textbf{Valeur (hex)} & \textbf{Description} \\
 \hline
-\$perm\_reader & 0 & 01 & Voir données simples \\ 
+\$perm\_reader & 0 & 01 & Voir donnÃ©es simples \\ 
 \hline
-\$perm\_user & 0+1 & 03 & Voir données simples + écriture données personnelles \\ 
+\$perm\_user & 0+1 & 03 & Voir donnÃ©es simples + Ã©criture donnÃ©es personnelles \\ 
 \hline
-\$perm\_editor & 0+2 & 05 & Lecture + écriture données simples \\ 
+\$perm\_editor & 0+2 & 05 & Lecture + Ã©criture donnÃ©es simples \\ 
 \hline
 \$perm\_admin & 0+2+3+4 & 1D & Tout faire \\ 
 \hline
@@ -80,8 +80,8 @@ Toute combinaison de droits élémentaires est une permission.
 
 \subsubsection{Droits sur un module}
 
-Chaque action d'un module précise un droit élémentaire d'exécution (voir \ref{actions}).
-Exemple pour l'action search du module \user qui nécessite le droit \$cright\_read :\\
+Chaque action d'un module prÃ©cise un droit Ã©lÃ©mentaire d'exÃ©cution (voir \ref{actions}).
+Exemple pour l'action search du module \user qui nÃ©cessite le droit \$cright\_read :\\
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -96,36 +96,36 @@ Exemple pour l'action search du module \user qui nécessite le droit \$cright\_re
 \end{minipage}
 }
 
-Si le droit \$cright\_read est inclus dans la permission de l'utilisateur (de son profil) sur ce module, il pourra exécuter l'action. 
+Si le droit \$cright\_read est inclus dans la permission de l'utilisateur (de son profil) sur ce module, il pourra exÃ©cuter l'action. 
 
 
-\subsubsection{Définition des profils}
+\subsubsection{DÃ©finition des profils}
 
 Un profil est un ensemble de :
 \begin{itemize}
 \item Permissions sur des sections et des modules.
-\item Propriétés
+\item PropriÃ©tÃ©s
 \end{itemize}
 
 \begin{tabular}{|p{5cm}|p{8cm}|}
 \hline
-\textbf{Caractéristique} & \textbf{Contenu} \\
+\textbf{CaractÃ©ristique} & \textbf{Contenu} \\
 \hline
-section (permission) & Tableau des sections. Une valeur à 1 indique onglet affiché pour le profil (l'entrée 'default' définit la valeur pour les sections non listées \\ 
+section (permission) & Tableau des sections. Une valeur Ã  1 indique onglet affichÃ© pour le profil (l'entrÃ©e 'default' dÃ©finit la valeur pour les sections non listÃ©es \\ 
 \hline
-module (permission) & Tableau des modules. Définition des droits à chaque module. L'entrée 'default' définit la valeur pour les modules non listés \\ 
+module (permission) & Tableau des modules. DÃ©finition des droits Ã  chaque module. L'entrÃ©e 'default' dÃ©finit la valeur pour les modules non listÃ©s \\ 
 \hline
-level & Niveau du profil. Un administrateur ou utilisateur ne peut pas créer / modifier / supprimer un utilisateur de privilège plus élevé (niveau 0 = privilège maximum).\\ 
+level & Niveau du profil. Un administrateur ou utilisateur ne peut pas crÃ©er / modifier / supprimer un utilisateur de privilÃ¨ge plus Ã©levÃ© (niveau 0 = privilÃ¨ge maximum).\\ 
 \hline
-level\_managepeers & Capacité du profil à gérer des utilisateurs de même niveau de profil. Si cet indicateur est à true (ou 1), il est possible de gérer des utilisateurs de même niveau, sinon non \\ 
+level\_managepeers & CapacitÃ© du profil Ã  gÃ©rer des utilisateurs de mÃªme niveau de profil. Si cet indicateur est Ã  true (ou 1), il est possible de gÃ©rer des utilisateurs de mÃªme niveau, sinon non \\ 
 \hline
-properties[admin\_realm] & Granularité d'administration (et de possibilité de mise à jour) pour un administrateur. Valeurs possibles : 'user', 'delegation', 'domain'.\\
+properties[admin\_realm] & GranularitÃ© d'administration (et de possibilitÃ© de mise Ã  jour) pour un administrateur. Valeurs possibles : 'user', 'delegation', 'domain'.\\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-Une permission par défaut peut être attribuée à un profil pour les sections et les modules.
-Exemple de définition de profil :\\
+Une permission par dÃ©faut peut Ãªtre attribuÃ©e Ã  un profil pour les sections et les modules.
+Exemple de dÃ©finition de profil :\\
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -157,26 +157,26 @@ $profiles['admin'] = array (
 \end{minipage}
 }
 
-Un utilisateur du profil \textbf{editor} pourra accéder aux sections ``com'', ``prod'' et ``user'' (et uniquement celles-ci) et aura les permissions ``\$perm\_editor'' sur tous les modules.\\
+Un utilisateur du profil \textbf{editor} pourra accÃ©der aux sections ``com'', ``prod'' et ``user'' (et uniquement celles-ci) et aura les permissions ``\$perm\_editor'' sur tous les modules.\\
 
 \paragraph{Personnalisation des profils}
 
-Les profils par défaut peuvent être modifiés ou supprimés et de nouveaux profils peuvent être définis dans le fichier de configuration.
+Les profils par dÃ©faut peuvent Ãªtre modifiÃ©s ou supprimÃ©s et de nouveaux profils peuvent Ãªtre dÃ©finis dans le fichier de configuration.
 
 
-\subsubsection{Implémentation interne d'\obm}
+\subsubsection{ImplÃ©mentation interne d'\obm}
 
-\paragraph{Définition du droit d'accès à une section}
+\paragraph{DÃ©finition du droit d'accÃ¨s Ã  une section}
 
-La définition du droit d'accès nécessaire pour accéder (et voir) une section est précisée dans la définition des sections dans le fichier de configuration (voir section \ref{cgp_show_section}).\\
+La dÃ©finition du droit d'accÃ¨s nÃ©cessaire pour accÃ©der (et voir) une section est prÃ©cisÃ©e dans la dÃ©finition des sections dans le fichier de configuration (voir section \ref{cgp_show_section}).\\
 
-La configuration est interprétée dans le \fichier{obminclude/global\_pref.inc} et renseigne le hashage \variable{\$sections} utilisé par \obm.
+La configuration est interprÃ©tÃ©e dans le \fichier{obminclude/global\_pref.inc} et renseigne le hashage \variable{\$sections} utilisÃ© par \obm.
 
 
-\paragraph{Définition du droit d'accès à un module}
+\paragraph{DÃ©finition du droit d'accÃ¨s Ã  un module}
 
-La définition du droit d'accès à un module est précisée dans la définition des modules dans \fichier{obminclude/global\_pref.inc}.
-Un droit d'accès unitaire est requis (l'utilisateur doit avoir le droit de lecture \variable{\$cright\_read} sur le module \settings pour y accéder dans l'exemple suivant).\\
+La dÃ©finition du droit d'accÃ¨s Ã  un module est prÃ©cisÃ©e dans la dÃ©finition des modules dans \fichier{obminclude/global\_pref.inc}.
+Un droit d'accÃ¨s unitaire est requis (l'utilisateur doit avoir le droit de lecture \variable{\$cright\_read} sur le module \settings pour y accÃ©der dans l'exemple suivant).\\
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -193,10 +193,10 @@ Un droit d'accès unitaire est requis (l'utilisateur doit avoir le droit de lectu
 }
 
 
-\subsubsection{Limitations actuelles du système de droits}
+\subsubsection{Limitations actuelles du systÃ¨me de droits}
 
 \begin{itemize}
-\item Les droits sont donnés sur les actions sans distinction de particularité des données traitées. Il n'est pas possible par exemple de donner le droit de modification de groupes en fonction des caractéristiques du groupe à modifier (ex: pas les groupes système,...). Le droit donné est : modification de groupe OUI ou Non. Ces cas sont donc vérifiés au moment de l'exécution de l'action.
+\item Les droits sont donnÃ©s sur les actions sans distinction de particularitÃ© des donnÃ©es traitÃ©es. Il n'est pas possible par exemple de donner le droit de modification de groupes en fonction des caractÃ©ristiques du groupe Ã  modifier (ex: pas les groupes systÃ¨me,...). Le droit donnÃ© est : modification de groupe OUI ou Non. Ces cas sont donc vÃ©rifiÃ©s au moment de l'exÃ©cution de l'action.
 
-\item L'ajout de profil n'est pas automatiquement pris en compte dans le module \user (pour permettre l'affectation graphique du profil aux utilisateurs, l'apparition dans les sélections...). Cela nécessite du code dans le module.
+\item L'ajout de profil n'est pas automatiquement pris en compte dans le module \user (pour permettre l'affectation graphique du profil aux utilisateurs, l'apparition dans les sÃ©lections...). Cela nÃ©cessite du code dans le module.
 \end{itemize}

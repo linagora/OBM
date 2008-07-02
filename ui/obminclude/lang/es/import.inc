@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Español                                                  //
+// OBM - Language : EspaÃ±ol                                                  //
 //     - File     : import.inc                                               //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -18,9 +18,9 @@ $l_enclosed = "Campos contenidos por";
 $l_mapping = "mapeo de campos";
 $l_field_num = "# campo";
 $l_field = "campo";
-$l_default = "Valor por omisión";
+$l_default = "Valor por omisiÃ³n";
 $l_result = "Resultado";
-$l_info = "Información";
+$l_info = "InformaciÃ³n";
 $l_sample_file = "Archivo de muestra para revisar";
 $l_conflict = "Conflicto";
 $l_nb_insert = "inserciones";
@@ -28,38 +28,38 @@ $l_nb_update = "actualizaciones";
 $l_mailing_ok_msg = "'X', '1', 'Y' para habilitar correos";
 
 // Actions
-$l_insert = "Ingresarar la importación";
-$l_update = "Actualizar la importación";
-$l_delete = "Borrar la importación";
+$l_insert = "Ingresarar la importaciÃ³n";
+$l_update = "Actualizar la importaciÃ³n";
+$l_delete = "Borrar la importaciÃ³n";
 $l_check_file = "Revisar este archivo";
 $l_test_file = "Probar este archivo";
-$l_comp_nothing = "Mantener la compañía actual";
-$l_comp_insert = "Ingresar this compañía";
-$l_comp_update = "Actualizar compañía existente";
+$l_comp_nothing = "Mantener la compaÃ±Ã­a actual";
+$l_comp_insert = "Ingresar this compaÃ±Ã­a";
+$l_comp_update = "Actualizar compaÃ±Ã­a existente";
 $l_con_nothing = "Mantener contacto existente";
 $l_con_insert = "Ingresar este contacto";
 $l_con_update = "Actualizar contacto existente";
 
 // Messages
-$l_name_import_nomatch = "El nombre de la importación no es válido";
-$l_import_exists = "Lo siento pero la importación ya existe";
+$l_name_import_nomatch = "El nombre de la importaciÃ³n no es vÃ¡lido";
+$l_import_exists = "Lo siento pero la importaciÃ³n ya existe";
 $l_check_sameimport = "Estas importaciones lucen similares a la nueva !";
-$l_warn_delete = "Realmente desea borrar esta importación ?";
-$l_import_end = "Importación terminada";
+$l_warn_delete = "Realmente desea borrar esta importaciÃ³n ?";
+$l_import_end = "ImportaciÃ³n terminada";
 $l_lines_processed = "lineas procesadas";
 $l_conflict_detected = "Conflicto detectado";
 $l_invalid_row = "Fila Invalida !";
-$l_invalid_rows = "Filas Inválidas";
+$l_invalid_rows = "Filas InvÃ¡lidas";
 $l_conflict_rows = "Filas en Conflicto";
 
-$l_no_display = "Llene los campos de búsqueda y presione < Buscar > para obtener las importaciones definidas";
+$l_no_display = "Llene los campos de bÃºsqueda y presione < Buscar > para obtener las importaciones definidas";
 $l_found = "importaciones encontradas.";
-$l_no_found = "No hay importaciones que coincidan con la búsqueda !";
+$l_no_found = "No hay importaciones que coincidan con la bÃºsqueda !";
 
-$l_fill_name = "El nombre de la importación debe ser llenado !";
-$l_similar_company = "Compañía similar";
+$l_fill_name = "El nombre de la importaciÃ³n debe ser llenado !";
+$l_similar_company = "CompaÃ±Ã­a similar";
 $l_similar_contact = "Contacto similar";
-$l_company_defaultname = "Compañía sin Nombre";
+$l_company_defaultname = "CompaÃ±Ã­a sin Nombre";
 $l_contact_defaultname = "Contacto sin Apellido";
 
 $l_csvd_sc = ";";

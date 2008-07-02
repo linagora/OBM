@@ -1,26 +1,26 @@
-Détails des tables SQL :
+DÃ©tails des tables SQL :
 ------------------------
 
 - ContratSupport :
   ----------------
 
-* contrat_clause : champ texte permettant de spécifier
+* contrat_clause : champ texte permettant de spÃ©cifier
 le descriptif du contrat, les clauses, ainsi que le  champ
 d'application du contrat.
 
-* contrat_numero : numéro physique sur papier du contrat de support
+* contrat_numero : numÃ©ro physique sur papier du contrat de support
 
 * contrat_comment : pour les commentaires divers, remarques, etc ....
 
 
 - ContratType :
 
-* contrattype_label : definition des différents types de contrat
+* contrattype_label : definition des diffÃ©rents types de contrat
 	Pour l'instant : - annuel
 		         - forfaitaire
-			 - illimité
+			 - illimitÃ©
 			 - 1er incident
-			 - 2ième incident
+			 - 2iÃ¨me incident
 
 - Incident :
 

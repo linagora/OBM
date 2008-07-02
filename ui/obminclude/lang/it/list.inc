@@ -31,7 +31,7 @@ $l_add = "Aggiungi queste liste";
 // Messages
 $l_fill_name = "Inserisci nome lista";
 $l_name_list_nomatch = "Nome lista non valido";
-$l_list_exists = "Lista gi‡ esistente";
+$l_list_exists = "Lista gi√† esistente";
 $l_check_samelist = "Liste simili alla nuova!";
 $l_j_check_email = "Email non valida.";
 $l_has_contact = "Contatti in lista";

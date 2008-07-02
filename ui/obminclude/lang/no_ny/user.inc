@@ -11,7 +11,7 @@ $l_login = "Brukar";
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";
 $l_password = "Passord";
-$l_lastaccess = "Siste pålogging";
+$l_lastaccess = "Siste pÃ¥logging";
 $l_email = "@M";
 $l_perms_user = "Brukar";
 $l_perms_editor = "Redigere";
@@ -32,9 +32,9 @@ $l_delete = "Slett brukaren";
 $l_delete_userobmphoto = "Delete user's photo";
 
 // Messages
-$l_no_display = "Fyll inn søkefeltet og trykk < Finn > for å hente ut brukarar";
+$l_no_display = "Fyll inn sÃ¸kefeltet og trykk < Finn > for Ã¥ hente ut brukarar";
 $l_found = "found (to translate) !";
-$l_no_found = "Ingen brukar passa til søket!";
+$l_no_found = "Ingen brukar passa til sÃ¸ket!";
 
 $l_exist_error = "finst alt";
 $l_login_error = "Ugyldig brukarnamn";
@@ -43,7 +43,7 @@ $l_email_error = "Ugyldig mailadresse";
 $l_change_login_confirm = "Really update user's login ?";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
-$l_fill_login = "\\n Du må fylle inn brukaren før du legg inn.";
-$l_fill_password = "\\n Du må fylle inn passord før du legg inn.";
+$l_fill_login = "\\n Du mÃ¥ fylle inn brukaren fÃ¸r du legg inn.";
+$l_fill_password = "\\n Du mÃ¥ fylle inn passord fÃ¸r du legg inn.";
 $l_delete_confirm = "Slette brukar?";
 $lj_check_email = "Mailadressa er ugyldig.";

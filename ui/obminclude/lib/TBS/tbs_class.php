@@ -2704,7 +2704,7 @@ function tbs_Locator_SectionAddGrp(&$LocR,$Bid,$Type,$Field) {
 
 function tbs_Locator_PrmRead(&$Txt,$Pos,$HtmlTag,$DelimChrs,$BegStr,$EndStr,&$Loc,&$PosEnd) {
 
-	// À mettre dans la classe TBS
+	// Ã€ mettre dans la classe TBS
 	$BegLen = strlen($BegStr);
 	$BegChr = $BegStr[0];
 	$BegIs1 = ($BegLen===1);
@@ -2720,7 +2720,7 @@ function tbs_Locator_PrmRead(&$Txt,$Pos,$HtmlTag,$DelimChrs,$BegStr,$EndStr,&$Lo
 	$PosNend = 0;
 	$PosVal = 0;
 	
-	// Paramètres de vérif de la boucle
+	// ParamÃ¨tres de vÃ©rif de la boucle
 	$PosEnd = strpos($Txt,$EndStr,$Pos);
 	if ($PosEnd===false) return;
 	$Continue = ($Pos<$PosEnd);
@@ -2729,21 +2729,21 @@ function tbs_Locator_PrmRead(&$Txt,$Pos,$HtmlTag,$DelimChrs,$BegStr,$EndStr,&$Lo
 		
 		$Chr = $Txt[$Pos];
 		
-		if ($DelimIdx) { // Lecture dans une chaîne
+		if ($DelimIdx) { // Lecture dans une chaÃ®ne
 
-			if ($Chr===$DelimChr) { // Quote rencontré
-				if ($Chr===$Txt[$Pos+1]) { // Double quote => la chaîne continue en dédoublant le quote
+			if ($Chr===$DelimChr) { // Quote rencontrÃ©
+				if ($Chr===$Txt[$Pos+1]) { // Double quote => la chaÃ®ne continue en dÃ©doublant le quote
 					$Pos++;
-				} else { // Simple quote => fin de la chaîne
+				} else { // Simple quote => fin de la chaÃ®ne
 					$DelimIdx = false;
 				}
 			}
 
-		} else { // Lecture hors chaîne
+		} else { // Lecture hors chaÃ®ne
 			
 			if ($BegCnt===0) {
 				
-				// Analyse des paramètre
+				// Analyse des paramÃ¨tre
 				$CheckChr = false;
 				if ($Chr===' ') {
 					if ($Status===1) {
@@ -2811,10 +2811,10 @@ function tbs_Locator_PrmRead(&$Txt,$Pos,$HtmlTag,$DelimChrs,$BegStr,$EndStr,&$Lo
 		
 		}
 		
-		// Charactère suivant
+		// CharactÃ¨re suivant
 		$Pos++;
 
-		// On vérifie si c'est la fin
+		// On vÃ©rifie si c'est la fin
 		if ($Pos===$PosEnd) {
 			if ($DelimIdx===false) {
 				if ($BegCnt>0) {

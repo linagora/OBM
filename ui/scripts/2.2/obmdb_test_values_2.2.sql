@@ -76,20 +76,20 @@ INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALU
 
 
 -------------------------------------------------------------------------------
--- Remplissage de la table 'MailServer' : déclaration des serveurs de BALs
+-- Remplissage de la table 'MailServer' : dÃ©claration des serveurs de BALs
 -------------------------------------------------------------------------------
 DELETE FROM MailServer;
 
--- Déclaration d'un serveur de BAL sans hôte relais (relayhost)
+-- DÃ©claration d'un serveur de BAL sans hÃ´te relais (relayhost)
 INSERT INTO MailServer (mailserver_host_id, mailserver_imap, mailserver_smtp_in, mailserver_smtp_out) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail'), 1, 0, 0 );
--- Déclaration d'un serveur SMTP entrant sans hôte relais (relayhost)
+-- DÃ©claration d'un serveur SMTP entrant sans hÃ´te relais (relayhost)
 INSERT INTO MailServer (mailserver_host_id, mailserver_imap, mailserver_smtp_in, mailserver_smtp_out) VALUES ( (SELECT host_id FROM Host WHERE host_name='smtp-in'), 0, 1, 0 );
--- Déclaration d'un serveur SMTP sortant sans hôte relais (relayhost)
+-- DÃ©claration d'un serveur SMTP sortant sans hÃ´te relais (relayhost)
 INSERT INTO MailServer (mailserver_host_id, mailserver_imap, mailserver_smtp_in, mailserver_smtp_out) VALUES ( (SELECT host_id FROM Host WHERE host_name='smtp-out'), 0, 0, 1 );
 
 
 -------------------------------------------------------------------------------
--- Remplissage de la table 'DomainMailServer' : déclaration des serveurs de BALs
+-- Remplissage de la table 'DomainMailServer' : dÃ©claration des serveurs de BALs
 -------------------------------------------------------------------------------
 DELETE FROM DomainMailServer;
 
@@ -105,23 +105,23 @@ INSERT INTO DomainMailServer (domainmailserver_domain_id, domainmailserver_mails
 -- Utilisateur de test :
 --  - appartenant au domaine global ;
 --  - ayant le droit mail ;
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_phone, userobm_fax, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description) VALUES ('0', 'test00', 'PLAIN', 'ptest00', 'user', 'User', 'Test 00',  '1050', '513', '23, rue des champs', 'Nolwen du lac', 'Près de la ferme', '31400', 'La ville à Ramon', '05 62 19 24 91', '05 62 19 24 92', '06 55 55 55 55', '1', '1', 'test00\r\nmail.test00', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Chef', 'Rapide', 'Utilisateur appartient au domaine global');
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_address2, userobm_address3, userobm_zipcode, userobm_town, userobm_phone, userobm_fax, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description) VALUES ('0', 'test00', 'PLAIN', 'ptest00', 'user', 'User', 'Test 00',  '1050', '513', '23, rue des champs', 'Nolwen du lac', 'PrÃ¨s de la ferme', '31400', 'La ville Ã  Ramon', '05 62 19 24 91', '05 62 19 24 92', '06 55 55 55 55', '1', '1', 'test00\r\nmail.test00', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Chef', 'Rapide', 'Utilisateur appartient au domaine global');
 
 -- Utilisateur de test :
 --  - appartenant au domaine 1 ;
 --  - ayant le droit mail ;
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description, userobm_vacation_enable, userobm_vacation_message) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test01', 'PLAIN', 'ptest01', 'user', 'User', 'Test 01', '1051', '513', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test01\r\nmail.test01', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Autan en emporte le vent', 'Compris', 'Utilisateur n''appartenant qu''au domaine 1', 1, 'Ceci est le message d''absence');
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_title, userobm_service, userobm_description, userobm_vacation_enable, userobm_vacation_message) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test01', 'PLAIN', 'ptest01', 'user', 'User', 'Test 01', '1051', '513', '23, rue des champs', '31400', 'La ville Ã  Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test01\r\nmail.test01', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Autan en emporte le vent', 'Compris', 'Utilisateur n''appartenant qu''au domaine 1', 1, 'Ceci est le message d''absence');
 
 
 -- Utilisateur de test :
 --  - appartenant au domaine 1 ;
 --  - ayant le droit mail ;
 --  - profil administrateur ;
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_description) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test02', 'PLAIN', 'ptest02', 'admin', 'User', 'Test 02', '1052', '512', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test02\r\ntest02.admin', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Utilisateur n''appartenant qu''au domaine 1');
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_description) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test02', 'PLAIN', 'ptest02', 'admin', 'User', 'Test 02', '1052', '512', '23, rue des champs', '31400', 'La ville Ã  Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test02\r\ntest02.admin', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Utilisateur n''appartenant qu''au domaine 1');
 
 
 -------------------------------------------------------------------------------
--- Remplissage de la table 'UGroup' : Création d'un groupe
+-- Remplissage de la table 'UGroup' : CrÃ©ation d'un groupe
 -------------------------------------------------------------------------------
 DELETE FROM UGroup;
 
@@ -146,11 +146,11 @@ INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, g
 -- 'Utilisateurs du domaine' Group
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 513, 'Utilisateurs du domaine', 'Groupe des utilisateurs du domaine Samba', '', NULL);
 
--- 'Invités du domaine' Group
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 514, 'Invités du domaine', 'Groupe des invités du domaine Samba', '', NULL);
+-- 'InvitÃ©s du domaine' Group
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 514, 'InvitÃ©s du domaine', 'Groupe des invitÃ©s du domaine Samba', '', NULL);
 
--- "Hôtes du domaine' Group
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 515, 'Hôtes du domaine', 'Groupe des hôtes du domaine Samba', '', NULL);
+-- "HÃ´tes du domaine' Group
+INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 515, 'HÃ´tes du domaine', 'Groupe des hÃ´tes du domaine Samba', '', NULL);
 
 -------------------------------------------------------------------------------
 -- Remplissage de la table 'UserObmGroup' :  Positionnement d'utilisateurs dans
@@ -179,8 +179,8 @@ INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES
 
 
 -------------------------------------------------------------------------------
--- Remplissage de la table 'MailServerNetwork' : déclaration des serveurs
--- réseaux locaux des serveurs de BALs
+-- Remplissage de la table 'MailServerNetwork' : dÃ©claration des serveurs
+-- rÃ©seaux locaux des serveurs de BALs
 -------------------------------------------------------------------------------
 DELETE FROM MailServerNetwork;
 
@@ -189,18 +189,18 @@ INSERT INTO MailServerNetwork (mailservernetwork_host_id, mailservernetwork_ip) 
 
 
 -------------------------------------------------------------------------------
--- Remplissage de la table 'MailShare' : Création d'un répertoire partagé
+-- Remplissage de la table 'MailShare' : CrÃ©ation d'un rÃ©pertoire partagÃ©
 -------------------------------------------------------------------------------
 DELETE FROM MailShare;
 
--- Appartenant à tous les domaines
-INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare00', 'Répertoire partagé de test 00, appartenant au domaine 1', 'mailshare00');
+-- Appartenant Ã  tous les domaines
+INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare00', 'RÃ©pertoire partagÃ© de test 00, appartenant au domaine 1', 'mailshare00');
 
 -- Appartenant au domaine 1
-INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare01', 'Répertoire partagé de test 01, appartenant au domaine 2', 'mailshare01');
+INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare01', 'RÃ©pertoire partagÃ© de test 01, appartenant au domaine 2', 'mailshare01');
 
 -------------------------------------------------------------------------------
--- Remplissage de la table 'Samba' : Création d'un domaine windows
+-- Remplissage de la table 'Samba' : CrÃ©ation d'un domaine windows
 -------------------------------------------------------------------------------
 DELETE FROM Samba;
 

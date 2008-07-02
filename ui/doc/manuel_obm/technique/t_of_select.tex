@@ -3,57 +3,57 @@
 % $Id$
 
 
-\subsection{Gestion d'un sélecteur multi-valué riche}
+\subsection{Gestion d'un sÃ©lecteur multi-valuÃ© riche}
 \label{of_select}
 
-Afin d'améliorer l'ergonomie et l'utilisation, \obm propose un nouvel objet sélecteur présentant un affichage plus riche et convivial qu'un widget de type SELECT, avec les fonctionnalités :\\ 
+Afin d'amÃ©liorer l'ergonomie et l'utilisation, \obm propose un nouvel objet sÃ©lecteur prÃ©sentant un affichage plus riche et convivial qu'un widget de type SELECT, avec les fonctionnalitÃ©s :\\ 
 
 \begin{itemize}
-\item Sélection d'entrée dans le sélecteur par recherches
-\item Seules sont affichées les entités sélectionnées
-\item Possibilité de supprimer une entité de l'ensemble
-\item Possibilité de supprimer l'ensemble des entités
-\item Possibilité d'insérer dans l'ensemble des entités de types différents (des utilisateurs + des ressources)
+\item SÃ©lection d'entrÃ©e dans le sÃ©lecteur par recherches
+\item Seules sont affichÃ©es les entitÃ©s sÃ©lectionnÃ©es
+\item PossibilitÃ© de supprimer une entitÃ© de l'ensemble
+\item PossibilitÃ© de supprimer l'ensemble des entitÃ©s
+\item PossibilitÃ© d'insÃ©rer dans l'ensemble des entitÃ©s de types diffÃ©rents (des utilisateurs + des ressources)
 \end{itemize}
 \vspace{0.3cm}
 
-Cet objet est par exemple utilisé par la gestion des droits acl, par la sélection d'utilisateurs et de ressources dans les vues de l'agenda, par la sélection d'utilisateurs et groupes pour un nouvel événement, dans les recherches par type de tâche dans les affaires...\\
+Cet objet est par exemple utilisÃ© par la gestion des droits acl, par la sÃ©lection d'utilisateurs et de ressources dans les vues de l'agenda, par la sÃ©lection d'utilisateurs et groupes pour un nouvel Ã©vÃ©nement, dans les recherches par type de tÃ¢che dans les affaires...\\
 
-Ces fonctionalités sont fournies par le fichier \fichier{of/of\_select.inc}
+Ces fonctionalitÃ©s sont fournies par le fichier \fichier{of/of\_select.inc}
 
 
-\subsubsection{Spécifications techniques du sélecteur of\_select}
+\subsubsection{SpÃ©cifications techniques du sÃ©lecteur of\_select}
 
-\paragraph{Le principe} consiste à gérer un widget multivalué (sel[]) caché, et de gérer simultanément un élément <div> (pour l'affichage) pour chaque entité sélectionnée.
+\paragraph{Le principe} consiste Ã  gÃ©rer un widget multivaluÃ© (sel[]) cachÃ©, et de gÃ©rer simultanÃ©ment un Ã©lÃ©ment <div> (pour l'affichage) pour chaque entitÃ© sÃ©lectionnÃ©e.
 
-L'élément désigne le widget global et doit être le nom donné au container et au widget multivalué (chaque champ input).
+L'Ã©lÃ©ment dÃ©signe le widget global et doit Ãªtre le nom donnÃ© au container et au widget multivaluÃ© (chaque champ input).
 
-Pour chaque entité on trouve :\\
+Pour chaque entitÃ© on trouve :\\
 \begin{itemize}
-\item une ligne de l'élément : <div>
+\item une ligne de l'Ã©lÃ©ment : <div>
 \item un champ input du widget
 \end{itemize}
 \vspace{0.3cm}
 
 La section <div> contient un texte et une image et le clic sur l'image efface automatiquement cette ligne.
-Le champ input est inclus dans le div. La suppression de la ligne div supprime par ce fait le champ input et donc l'entité ou ligne de l'élément.
+Le champ input est inclus dans le div. La suppression de la ligne div supprime par ce fait le champ input et donc l'entitÃ© ou ligne de l'Ã©lÃ©ment.
 
-\paragraph{Le nommage de l'élément} : Une ligne d'élément div doit être unique pour la page.
-Comme il peut y avoir plusieurs éléments dans une même page (exemple: liste d'utilisateurs avec droits de lecture et liste d'utilisateurs avec droits d'écriture dans une page de gestion des droits acl), le nom (ou id) du div doit contenir le nom de l'élément.
-Comme un élément peut contenir plusieurs types d'entités (exemple: utilisateurs et ressources), le nom du div doit contenir le type de l'entité en plus de l'id de l'entité.
+\paragraph{Le nommage de l'Ã©lÃ©ment} : Une ligne d'Ã©lÃ©ment div doit Ãªtre unique pour la page.
+Comme il peut y avoir plusieurs Ã©lÃ©ments dans une mÃªme page (exemple: liste d'utilisateurs avec droits de lecture et liste d'utilisateurs avec droits d'Ã©criture dans une page de gestion des droits acl), le nom (ou id) du div doit contenir le nom de l'Ã©lÃ©ment.
+Comme un Ã©lÃ©ment peut contenir plusieurs types d'entitÃ©s (exemple: utilisateurs et ressources), le nom du div doit contenir le type de l'entitÃ© en plus de l'id de l'entitÃ©.
 
 Principe de nommage.\\
 
 \begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|}
 \hline
-\textbf{Elément} & \textbf{Input (valeur)} & \textbf{Id du div} \\
+\textbf{ElÃ©ment} & \textbf{Input (valeur)} & \textbf{Id du div} \\
 \hline
 sel\_user\_id & data-user-\$id & sel\_user\_id-data-user-\$id \\
 \hline
 \end{tabular}
 
 
-\paragraph{Code XHTML d'un Elément avec 1 ligne} :\\
+\paragraph{Code XHTML d'un ElÃ©ment avec 1 ligne} :\\
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -71,17 +71,17 @@ sel\_user\_id & data-user-\$id & sel\_user\_id-data-user-\$id \\
 }
 
 
-\subsubsection{Liste de résultat vers ensemble d'éléments}
+\subsubsection{Liste de rÃ©sultat vers ensemble d'Ã©lÃ©ments}
 
-\paragraph{Implémentation : module popup}
+\paragraph{ImplÃ©mentation : module popup}
 
-Le module appelé va utiliser les fonctions définies par cette bibliothèque pour renseigner l'élément du module appelant.
+Le module appelÃ© va utiliser les fonctions dÃ©finies par cette bibliothÃ¨que pour renseigner l'Ã©lÃ©ment du module appelant.
 
-C'est le module appelé (popup) qui doit donc inclure la librairie (\fichier{of\_select.inc}).
-Ce module doit aussi ajouter un cas à la fonction \fonction{dis\_data\_module()} (qui gère l'affichage des résultats), pour retourner la valeur à insérer (data-module-\$id) dans l'élément pour une ligne de résultat cochée.
+C'est le module appelÃ© (popup) qui doit donc inclure la librairie (\fichier{of\_select.inc}).
+Ce module doit aussi ajouter un cas Ã  la fonction \fonction{dis\_data\_module()} (qui gÃ¨re l'affichage des rÃ©sultats), pour retourner la valeur Ã  insÃ©rer (data-module-\$id) dans l'Ã©lÃ©ment pour une ligne de rÃ©sultat cochÃ©e.
 
 
-\subsubsection{Implémentation : API fonctions publiques}
+\subsubsection{ImplÃ©mentation : API fonctions publiques}
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -92,7 +92,7 @@ function of_select_fill_from_checkbox(int_form) {
 }
 
 anciennement of\_extmod\_fill\_ext\_element(int\_form)
-Fonction Javascript qui renseigne l'élément de la fenêtre appelante en fonction des cases cochées dans la liste de résultat.
+Fonction Javascript qui renseigne l'Ã©lÃ©ment de la fenÃªtre appelante en fonction des cases cochÃ©es dans la liste de rÃ©sultat.
 Exemple: Liste des utilisateurs qui ont le droit de voir l'agenda d'un utilisateur.
 
-Cette fonction est appelée à la validation (soumission du formulaire) des résultats sélectionnés dans la fenêtre popup.
+Cette fonction est appelÃ©e Ã  la validation (soumission du formulaire) des rÃ©sultats sÃ©lectionnÃ©s dans la fenÃªtre popup.

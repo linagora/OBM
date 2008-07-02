@@ -10,13 +10,13 @@
 
 // Common actions
 $l_find = "Suche";
-$l_back = "Zurück";
+$l_back = "ZurÃ¼ck";
 $l_cancel = "Abbruch";
-$l_close = "Schließen";
-$l_validate = "übernehmen";
-$l_execute = "Ausführen";
-$l_confirm = "Bestätigung";
-$l_add = "Hinzufügen";
+$l_close = "SchlieÃŸen";
+$l_validate = "Ã¼bernehmen";
+$l_execute = "AusfÃ¼hren";
+$l_confirm = "BestÃ¤tigung";
+$l_add = "HinzufÃ¼gen";
 $l_creator = "Ersteller" ;
 $l_date_creation = "Erstellungsdatum";
 $l_updater = "Updated by";
@@ -62,12 +62,12 @@ $l_town = "Ort";
 $l_expresspostal = "Eilzustellung";
 $l_country = "Land";
 $l_desc = "Beschreibung";
-$l_priority = "Priorität";
+$l_priority = "PrioritÃ¤t";
 $l_relation = "Relation";
 $l_datasource = "Data source";
 $l_visibility = "Zugriff";
 $l_private = "Privat";
-$l_public = "Öffentlich";
+$l_public = "Ã–ffentlich";
 $l_local = "Local";
 $l_ext_id = "Id ext";
 $l_aka = "Also known as";
@@ -81,7 +81,7 @@ $l_fatal_server_err = "Fatal server error, please reload";
 $l_company = "Firma";
 $l_contact = "Contact";
 $l_lead = "Lead";
-$l_deal = "Verträge";
+$l_deal = "VertrÃ¤ge";
 $l_list = "Liste";
 $l_event = "Event";
 $l_publication = "Publication";
@@ -102,7 +102,7 @@ $l_settings = "Configuration";
 $l_kind = "Branche";
 
 // OBM_DISPLAY
-$l_entries = "Einträge #";
+$l_entries = "EintrÃ¤ge #";
 $l_page_res = "Ergebnisse";
 $l_export = "Export";
 $l_export_all = "Gesamtexport";
@@ -110,7 +110,7 @@ $l_field = "Feld";
 $l_displayed = "angezeigt";
 $l_order = "Reihenfolge";
 $l_move = "Verschieben";
-$l_mandatory = "Feld muß angezeigt werden";
+$l_mandatory = "Feld muÃŸ angezeigt werden";
 $l_display_no = "nicht anzeigen";
 $l_display_yes = "anzeigen";
 $l_down = "Feld eine Zeile nach oben";
@@ -123,12 +123,12 @@ $l_help_display_no = "Feld wird nicht angezeigt";
 $l_help_mandatory = "Feld wird immer angezeigt";
 $l_help_down = "Feld nach unten schieben";
 $l_help_up = "Feld nach oben schieben";
-$l_document_added = " Dokumente hinzugefügt";
-$l_no_document_added = "keine Dokumente hinzugefügt";
+$l_document_added = " Dokumente hinzugefÃ¼gt";
+$l_no_document_added = "keine Dokumente hinzugefÃ¼gt";
 
 // Javascript common messages
-$l_fill_label = "Label muß eingetragen sein";
-$l_fill_date = "Datum muß eingetragen sein";
+$l_fill_label = "Label muÃŸ eingetragen sein";
+$l_fill_date = "Datum muÃŸ eingetragen sein";
 $l_invalid_date = "Falsches Datumsformat";
 
 // Tasktype groups
@@ -140,7 +140,7 @@ $l_tt_others = "nicht abrechenbare Aufgaben";
 // days and months
 $l_today = "Heute";
 $l_monthsofyear = array (	'Januar','Februar',
-				'März','April','Mai',
+				'MÃ¤rz','April','Mai',
 				'Juni','Juli','August',
 				'September','Oktober','November',
 				'Dezember');
@@ -165,11 +165,11 @@ $l_section_admin  = "Administration";
 $l_module_company = "Firmen";
 $l_module_contact = "Kontakte";
 $l_module_lead = "Lead";
-$l_module_deal = "Verträge";
+$l_module_deal = "VertrÃ¤ge";
 $l_module_list = "Maillisten";
 $l_module_calendar = "Kalender";
 $l_module_todo    = "Aufgaben";
-$l_module_publication  = "Veröffentlichungen";
+$l_module_publication  = "VerÃ¶ffentlichungen";
 $l_module_statistic    = "Statistiken";
 
 $l_module_time = "Zeiterfassung";
@@ -202,8 +202,8 @@ $l_header_export = "Export";
 $l_header_consult = "?Consult";
 $l_header_duplicate = "Duplicate";
 
-$l_header_update = "Ändern";
-$l_header_delete =  "Löschen";
+$l_header_update = "Ã„ndern";
+$l_header_delete =  "LÃ¶schen";
 $l_header_add_contact = "Neuer Kontakt";
 $l_header_add_user = "Neuer Benutzer";
 $l_header_add_group = "Neue Gruppe";
@@ -250,11 +250,11 @@ $l_header_statsuser = "Benutzerstatistik";
 $l_header_weeklyview = "Wochenansicht";
 $l_header_monthlyview = "Monatsansicht";
 $l_header_globalview = "?globalview";
-$l_header_activityreport = "Tätigkeitsbericht";
+$l_header_activityreport = "TÃ¤tigkeitsbericht";
 
 //document headers
 $l_document_new = "Neues Dokument";
-$l_document_add = "Dokument hinzufügen";
+$l_document_add = "Dokument hinzufÃ¼gen";
 
 // Debug
 $l_dg_id = "Id";

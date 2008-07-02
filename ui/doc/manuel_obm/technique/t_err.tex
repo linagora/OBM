@@ -5,23 +5,23 @@
 
 \subsection{Gestion des erreurs dans les formulaires}
 
-Pour proposer une ergonomie avancée pour les utilisateurs, \obm implémente la signalisation des champs de formulaires incorrectement saisis ou invalides lors de la modification de données.
+Pour proposer une ergonomie avancÃ©e pour les utilisateurs, \obm implÃ©mente la signalisation des champs de formulaires incorrectement saisis ou invalides lors de la modification de donnÃ©es.
 
-Le champ en erreur est signalé d'une couleur différente.
+Le champ en erreur est signalÃ© d'une couleur diffÃ©rente.
 
 \subsubsection{Principe de fonctionnement}
 
-La fonction d'un module qui vérifie la validité ou la cohérence des données, \fonction{check\_module\_data\_form()}, lorsqu'une erreur est détectée (par exemple adresse email non valide), renseigne la variable globale \variable{\$err} avec le message d'erreur et le champ en erreur.\\
+La fonction d'un module qui vÃ©rifie la validitÃ© ou la cohÃ©rence des donnÃ©es, \fonction{check\_module\_data\_form()}, lorsqu'une erreur est dÃ©tectÃ©e (par exemple adresse email non valide), renseigne la variable globale \variable{\$err} avec le message d'erreur et le champ en erreur.\\
 
-La fonction du module d'affichage du formulaire de modification ajoute le style \textbf{error} au label du champ en erreur, ainsi celui-ci s'affiche de façon distincte.
-Tous les champs du formulaire se voient stylés par la classe \variable{\$class[nom\_du\_champ]}, mais celle-ci n'est définie que pour le champ en erreur.\\
-Le tableau suivant décrit ce fonctionnement :\\
+La fonction du module d'affichage du formulaire de modification ajoute le style \textbf{error} au label du champ en erreur, ainsi celui-ci s'affiche de faÃ§on distincte.
+Tous les champs du formulaire se voient stylÃ©s par la classe \variable{\$class[nom\_du\_champ]}, mais celle-ci n'est dÃ©finie que pour le champ en erreur.\\
+Le tableau suivant dÃ©crit ce fonctionnement :\\
 
 \begin{tabular}{|p{4cm}|p{10cm}|}
 \hline
 \textbf{Etape (Ou)} & \textbf{Action}\\
 \hline
-Vérification des paramètres transmis
+VÃ©rification des paramÃ¨tres transmis
 \fonction{check\_module\_data\_form()}
 &
 Renseignement de la variable globale \variable{\$err} :
@@ -44,11 +44,11 @@ if (trim($lname) == "") {
 \end{verbatim}
 \end{minipage}\\
 \hline
-Affichage du formulaire à corriger
+Affichage du formulaire Ã  corriger
 \fonction{html\_module\_form()}
 &
 \begin{itemize}
-\item Définition du style erreur pour le champ concerné :
+\item DÃ©finition du style erreur pour le champ concernÃ© :
 \begin{minipage}{8cm}
 \begin{verbatim}
   // Mark the error field

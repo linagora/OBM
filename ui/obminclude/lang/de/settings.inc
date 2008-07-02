@@ -12,10 +12,10 @@
 $l_settings = "Einstellungen";
 $l_cur_settings = "Aktuelle Einstellungen";
 $l_auto_display = "immer Liste aller Werte anzeigen";
-$l_submit = "Best‰tigung";
+$l_submit = "Best√§tigung";
 $l_cur_lang = "aktive Sprachwahl";
 $l_cur_theme = "aktive Themenwahl";
-$l_new_settings = "W‰hlen Sie die neuen Einstellungen";
+$l_new_settings = "W√§hlen Sie die neuen Einstellungen";
 $l_set_lang = "Sprachwahl";
 $l_set_theme = "Themenwahl";
 $l_set_rows = "Anzahl Anzeigezeilen/Seite";

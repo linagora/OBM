@@ -1,2 +1,0 @@
-<script language="php">
-</script>

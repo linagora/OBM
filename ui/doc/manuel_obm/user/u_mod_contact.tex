@@ -5,14 +5,14 @@
 \clearpage
 \section{Le module \contact}
 
-\subsection{Présentation du module \contact}
+\subsection{PrÃ©sentation du module \contact}
 
-Ce module est une gestion de contacts, souvent appelée \textbf{pages blanches} permettant de gérer les personnes...\\
+Ce module est une gestion de contacts, souvent appelÃ©e \textbf{pages blanches} permettant de gÃ©rer les personnes...\\
 
 C'est un module important dans OBM car de nombreux autres modules utilisent \contact (comme \company, \deal,..).
 
-De nombreux attributs permettent de décrire un contact ou une personne.
-Afin de couvrir des utilisations diverses plusieurs attributs peuvent être désactivés et ne pas apparaître dans l'application.
+De nombreux attributs permettent de dÃ©crire un contact ou une personne.
+Afin de couvrir des utilisations diverses plusieurs attributs peuvent Ãªtre dÃ©sactivÃ©s et ne pas apparaÃ®tre dans l'application.
 
 \subsection{Description d'un contact}
 
@@ -24,35 +24,35 @@ Composantes d'un contact :\\
 \hline
 Nom & Nom de la personne\\
 \hline
-Prénom & Prénom de la personne\\
+PrÃ©nom & PrÃ©nom de la personne\\
 \hline
-Genre & Langue, genre et en-tête de lettre utilisés pour la personne.\\
+Genre & Langue, genre et en-tÃªte de lettre utilisÃ©s pour la personne.\\
 \hline
-Source de données & Identification de l'origine de l'information.\\
+Source de donnÃ©es & Identification de l'origine de l'information.\\
 \hline
-Archive & Etat d'archivage du contact. Un contact archivé n'apparaît plus en utilisation (recherche,...) normale de l'application.\\
+Archive & Etat d'archivage du contact. Un contact archivÃ© n'apparaÃ®t plus en utilisation (recherche,...) normale de l'application.\\
 \hline
-Société & Société ou institution de la personne (il est possible de créer des sociétés virtuelles du type ``amis'', ``freelance'' pour enregistrer des contacts indépendants,...).
-Si le module société n'est pas activé, la donnée société devient une simple zone de texte dans le module \contact.\\
+SociÃ©tÃ© & SociÃ©tÃ© ou institution de la personne (il est possible de crÃ©er des sociÃ©tÃ©s virtuelles du type ``amis'', ``freelance'' pour enregistrer des contacts indÃ©pendants,...).
+Si le module sociÃ©tÃ© n'est pas activÃ©, la donnÃ©e sociÃ©tÃ© devient une simple zone de texte dans le module \contact.\\
 \hline
-Fonction & Fonction du contact (dans une liste prédéfinie).\\
+Fonction & Fonction du contact (dans une liste prÃ©dÃ©finie).\\
 \hline
-Titre & Titre de la personne (texte libre, contrairement à fonction).\\
+Titre & Titre de la personne (texte libre, contrairement Ã  fonction).\\
 \hline
 Responsable & Responsable interne de cette personne (commercial, responsable de compte).\\
 \hline
-Catégorie 1 & 1ère classification du contact par Catégories. Voir la description des catégories.\\
+CatÃ©gorie 1 & 1Ã¨re classification du contact par CatÃ©gories. Voir la description des catÃ©gories.\\
 \hline
-Catégorie 2 & 2ème classification du contact par Catégories. Voir la description des catégories.\\
+CatÃ©gorie 2 & 2Ã¨me classification du contact par CatÃ©gories. Voir la description des catÃ©gories.\\
 \hline
-Coordonnées & Adresse, service, code postal, cedex, ville et pays.
-Si aucune information n'est diponible au niveau du contact, ces informations sont récupées de la société du contact et préfixées par "(Société) - ".\\
+CoordonnÃ©es & Adresse, service, code postal, cedex, ville et pays.
+Si aucune information n'est diponible au niveau du contact, ces informations sont rÃ©cupÃ©es de la sociÃ©tÃ© du contact et prÃ©fixÃ©es par "(SociÃ©tÃ©) - ".\\
 \hline
-Tel et Fax & Téléphone et fax. Le téléphone ou le fax de la personne sont affichés entre parenthèses lorsque ils sont issus de la société.\\
+Tel et Fax & TÃ©lÃ©phone et fax. Le tÃ©lÃ©phone ou le fax de la personne sont affichÃ©s entre parenthÃ¨ses lorsque ils sont issus de la sociÃ©tÃ©.\\
 \hline
 Email & Adresse e-mail du contact (2 adresses sont possibles).\\
 \hline
-Activé pour mailing & Prise en compte autorisée dans les diffusions ou publipostages.\\
+ActivÃ© pour mailing & Prise en compte autorisÃ©e dans les diffusions ou publipostages.\\
 \hline
 Commentaire & Commentaire sur le contact.\\
 \hline
@@ -60,80 +60,80 @@ Commentaire & Commentaire sur le contact.\\
 \vspace{0.3cm}
 
 
-Les attributs suivant peuvent être désactivés si non utiles dans une installation d'OBM, et ainsi ne pas apparaître dans l'application :
+Les attributs suivant peuvent Ãªtre dÃ©sactivÃ©s si non utiles dans une installation d'OBM, et ainsi ne pas apparaÃ®tre dans l'application :
 
 \begin{itemize}
 \item Fonction
 \item Titre
-\item Catégories 1
-\item Catégories 2
+\item CatÃ©gories 1
+\item CatÃ©gories 2
 \item Service
-\item Ligne Adresse 3 (dépendant de celui du module \company)
-\item Cedex (dépendant de celui du module \company)
+\item Ligne Adresse 3 (dÃ©pendant de celui du module \company)
+\item Cedex (dÃ©pendant de celui du module \company)
 \end{itemize}
 
 
-\subsubsection{Catégories d'un contact}
-Les catégories d'un contact permettent de classifier et organiser les contacts.
+\subsubsection{CatÃ©gories d'un contact}
+Les catÃ©gories d'un contact permettent de classifier et organiser les contacts.
 
-OBM gère 2 familles de catégories de personnes.
+OBM gÃ¨re 2 familles de catÃ©gories de personnes.
 
-Un contact peut référencer plusieurs catégories dans chacune des 2 familles.
+Un contact peut rÃ©fÃ©rencer plusieurs catÃ©gories dans chacune des 2 familles.
 
-Les catégories sont administrables par la menu ``Administration'' du module \contact, et il est donc possible de les définir selon les besoins.
+Les catÃ©gories sont administrables par la menu ``Administration'' du module \contact, et il est donc possible de les dÃ©finir selon les besoins.
 
-Par exemple : des compétences, des classifications internes (selon les domaines, les revenus, les centres d'intérêts...).
+Par exemple : des compÃ©tences, des classifications internes (selon les domaines, les revenus, les centres d'intÃ©rÃªts...).
 
 
 \subsubsection{Les liens d'un contact}
 
-Le module \contact étant central à OBM de nombreux liens sont disponibles depuis un contact et permettent d'accéder directement aux entités liées à cette personne :\\
+Le module \contact Ã©tant central Ã  OBM de nombreux liens sont disponibles depuis un contact et permettent d'accÃ©der directement aux entitÃ©s liÃ©es Ã  cette personne :\\
 
 \begin{itemize}
-\item direct : Société du contact
+\item direct : SociÃ©tÃ© du contact
 \item multiple : Affaires
-\item multiple : Listes (enregistré en tant que contact statique)
+\item multiple : Listes (enregistrÃ© en tant que contact statique)
 \item multiple : Contrats
 \item multiple : Documents
 \item multiple : Abonnements aux publications
 \end{itemize}
 
 
-\subsection{La gestion des coordonnées des contacts}
+\subsection{La gestion des coordonnÃ©es des contacts}
 
-Les coordonnées affichées des contacts (téléphone, fax, adresse) sont soit ceux du contact directement soit ceux de la société du contact.\\
+Les coordonnÃ©es affichÃ©es des contacts (tÃ©lÃ©phone, fax, adresse) sont soit ceux du contact directement soit ceux de la sociÃ©tÃ© du contact.\\
 
-Si le contact a une de ses coordonnées non remplie c'est la coordonnée correspondante de la société qui est affichée, avec une indication.\\
+Si le contact a une de ses coordonnÃ©es non remplie c'est la coordonnÃ©e correspondante de la sociÃ©tÃ© qui est affichÃ©e, avec une indication.\\
 
-L'adresse est traitée dans sa globalité (adresse1 + adresse2 + adresse3 + code postal + ville + cédex + pays).
+L'adresse est traitÃ©e dans sa globalitÃ© (adresse1 + adresse2 + adresse3 + code postal + ville + cÃ©dex + pays).
 
-\paragraph{Par exemple} si le téléphone du contact est vide, c'est le téléphone de la société qui est affiché entre parenthèses.
-Si l'adresse (complète) du contact est vide c'est l'adresse de la société qui est affichée, préfixée du texte : "(Société) - ".\\
+\paragraph{Par exemple} si le tÃ©lÃ©phone du contact est vide, c'est le tÃ©lÃ©phone de la sociÃ©tÃ© qui est affichÃ© entre parenthÃ¨ses.
+Si l'adresse (complÃ¨te) du contact est vide c'est l'adresse de la sociÃ©tÃ© qui est affichÃ©e, prÃ©fixÃ©e du texte : "(SociÃ©tÃ©) - ".\\
 
-Ceci est valable dans les fiches de détail et les listes de résultats de recherche de contacts (excepté pour l'export CSV des résultats de recherche pour lequel l'indication n'est pas présente).\\
+Ceci est valable dans les fiches de dÃ©tail et les listes de rÃ©sultats de recherche de contacts (exceptÃ© pour l'export CSV des rÃ©sultats de recherche pour lequel l'indication n'est pas prÃ©sente).\\
 
-En mode mise à jour, les coordonnées de la société sont indiquées à la suite des champs de saisie des coordonnées du contact afin de faciliter les modifications en permettant le copier / coller.
+En mode mise Ã  jour, les coordonnÃ©es de la sociÃ©tÃ© sont indiquÃ©es Ã  la suite des champs de saisie des coordonnÃ©es du contact afin de faciliter les modifications en permettant le copier / coller.
 
 
 \subsection{Les sous-menus du module \contact}
 
-Le module \contact comporte 7 sous-menus (accessibles selon les droits d'accès et le contexte) :\\
+Le module \contact comporte 7 sous-menus (accessibles selon les droits d'accÃ¨s et le contexte) :\\
 
 \begin{tabular}{|p{2.5cm}|p{9.5cm}|}
 \hline
 \textbf{Nom} & \textbf{Action / Description} \\
 \hline
-Chercher & Recherche multicritères des contacts \\
+Chercher & Recherche multicritÃ¨res des contacts \\
 \hline
-Nouveau & Créer un nouveau contact.\\
+Nouveau & CrÃ©er un nouveau contact.\\
 \hline
 Consulter & Consulter les informations d'un contact.\\
 \hline
 Modifier & Modifier les informations d'un contact.\\
 \hline
-Supprimer & Vérifier les liens puis si besoin Supprimer un contact.\\
+Supprimer & VÃ©rifier les liens puis si besoin Supprimer un contact.\\
 \hline
-Administrer & Administration des informations annexes (genres, fonctions, catégories 1 et catégories 2).\\
+Administrer & Administration des informations annexes (genres, fonctions, catÃ©gories 1 et catÃ©gories 2).\\
 \hline
 Affichage & Personnalisation de l'affichage de la liste des contacts.\\
 \hline
@@ -142,64 +142,64 @@ Affichage & Personnalisation de l'affichage de la liste des contacts.\\
 
 \subsubsection{Le sous-menu : Chercher}
 
-Ce menu permet d'effectuer une recherche selon différents critères :
+Ce menu permet d'effectuer une recherche selon diffÃ©rents critÃ¨res :
 
 \begin{itemize}
-\item Nom et prénom du contact
-\item Téléphone
+\item Nom et prÃ©nom du contact
+\item TÃ©lÃ©phone
 \item Mail
-\item Société
+\item SociÃ©tÃ©
 \item Code postal
 \item Ville
 \item Pays
 \item Fonction
-\item Catégorie 1
-\item Catégorie 2
+\item CatÃ©gorie 1
+\item CatÃ©gorie 2
 \item Responsable du compte
 \item Etat d'archivage
 \end{itemize}
 
-Il est possible d'inclure les contacts archivés dans les résultats de recherche.
+Il est possible d'inclure les contacts archivÃ©s dans les rÃ©sultats de recherche.
 
 
 \subsubsection{Le sous-menu : Nouveau}
 
-Ce menu permet de créer un contact.
+Ce menu permet de crÃ©er un contact.
 
-Pour insérer le contact saisi il faut cliquer sur le bouton ``Enregistrer le contact''.
+Pour insÃ©rer le contact saisi il faut cliquer sur le bouton ``Enregistrer le contact''.
 
-Si des contacts similaires existent déjà (personnes de même nom et prénom, ou de même nom dans la même société), avant d'insérer la nouvelle personne, \obm affiche une page d'alerte présentant les contacts similaires et permet de continuer l'insertion ou de l'annuler.
-Ceci est particulièrement utile lorsque un contact déjà existant est créée à nouveau, et permet d'éviter la saisie de doublons.
+Si des contacts similaires existent dÃ©jÃ  (personnes de mÃªme nom et prÃ©nom, ou de mÃªme nom dans la mÃªme sociÃ©tÃ©), avant d'insÃ©rer la nouvelle personne, \obm affiche une page d'alerte prÃ©sentant les contacts similaires et permet de continuer l'insertion ou de l'annuler.
+Ceci est particuliÃ¨rement utile lorsque un contact dÃ©jÃ  existant est crÃ©Ã©e Ã  nouveau, et permet d'Ã©viter la saisie de doublons.
 
-\paragraph{Créer un contact depuis \company} : Le module \company permet de créer un contact directement (lien "Nouveau Contact").
-Les informations : société, adresse et téléphone sont alors renseignées par défaut dans la fiche contact avec les valeurs correspondantes de la société.
+\paragraph{CrÃ©er un contact depuis \company} : Le module \company permet de crÃ©er un contact directement (lien "Nouveau Contact").
+Les informations : sociÃ©tÃ©, adresse et tÃ©lÃ©phone sont alors renseignÃ©es par dÃ©faut dans la fiche contact avec les valeurs correspondantes de la sociÃ©tÃ©.
 
 \subsubsection{Le sous-menu : Consulter}
 
-Ce menu permet de consulter la fiche d'un contact (accessible uniquement depuis la fiche du contact en mode mise à jour ou suppression).
-Cet écran est aussi accessible depuis les résultats de recherche ou les liens depuis d'autres modules en cliquant sur le contact sélectionné.
+Ce menu permet de consulter la fiche d'un contact (accessible uniquement depuis la fiche du contact en mode mise Ã  jour ou suppression).
+Cet Ã©cran est aussi accessible depuis les rÃ©sultats de recherche ou les liens depuis d'autres modules en cliquant sur le contact sÃ©lectionnÃ©.
 
 \subsubsection{Le sous-menu : Modifier}
 
-L'écran de modification affiche les informations du contact dans un formulaire.
+L'Ã©cran de modification affiche les informations du contact dans un formulaire.
 Toutes les informations sont modifiables.
 
-L'association de catégories au contact courant s'effectue via une fenêtre popup listant les catégories et permettant de les sélectionner ou en les sélectionnant directement dans la liste affichée.\\
+L'association de catÃ©gories au contact courant s'effectue via une fenÃªtre popup listant les catÃ©gories et permettant de les sÃ©lectionner ou en les sÃ©lectionnant directement dans la liste affichÃ©e.\\
 
-Pour valider les modifications effectuées il faut cliquer sur le bouton ``Modifier le Contact''.
+Pour valider les modifications effectuÃ©es il faut cliquer sur le bouton ``Modifier le Contact''.
 
 
 \subsubsection{Le sous-menu : Supprimer}
-Ce menu permet la vérification des liens du contact et d'indiquer si celui-ci est supprimable.
-Si le contact peut être supprimé, un bouton ``Supprimer le contact'' est alors affiché.
+Ce menu permet la vÃ©rification des liens du contact et d'indiquer si celui-ci est supprimable.
+Si le contact peut Ãªtre supprimÃ©, un bouton ``Supprimer le contact'' est alors affichÃ©.
 
-\paragraph{Pour être supprimé} un contact doit pas :\\
+\paragraph{Pour Ãªtre supprimÃ©} un contact doit pas :\\
 
 \begin{itemize}
-\item Etre référencé dans les affaires
-\item Etre référencé dans les contrats
-\item Etre référencé dans les listes (statiquement)
-\item Etre abonné à des publications.
+\item Etre rÃ©fÃ©rencÃ© dans les affaires
+\item Etre rÃ©fÃ©rencÃ© dans les contrats
+\item Etre rÃ©fÃ©rencÃ© dans les listes (statiquement)
+\item Etre abonnÃ© Ã  des publications.
 \end{itemize}
 
 \subsubsection{Le sous-menu : Administrer}
@@ -207,21 +207,21 @@ Si le contact peut être supprimé, un bouton ``Supprimer le contact'' est alors a
 Ce menu permet l'administration des informations annexes des contacts :\\
 
 \begin{itemize}
-\item Genres (avec la langue, le label et l'en-tête de lettre)
+\item Genres (avec la langue, le label et l'en-tÃªte de lettre)
 \item Fonctions
-\item Catégories 1
-\item Catégories 2
+\item CatÃ©gories 1
+\item CatÃ©gories 2
 \end{itemize}
 
-\paragraph{Gestion des genres : } Le genre d'un contact est défini par 3 informations liées :\\
+\paragraph{Gestion des genres : } Le genre d'un contact est dÃ©fini par 3 informations liÃ©es :\\
 
 \begin{itemize}
-\item La langue du contact, qui une fois choisie donnera accès aux genres labels de cette langue
-\item Le label du genre qui peut être ``M., Mme., Mlle. ou autres'', qui une fois choisi donnera accès aux en-têtes de lettre (ou formule de politesse ou présentation) de ce label 
-\item L'en-tête de lettre, utilisé par exemple dans les diffusions ou publipostages.
+\item La langue du contact, qui une fois choisie donnera accÃ¨s aux genres labels de cette langue
+\item Le label du genre qui peut Ãªtre ``M., Mme., Mlle. ou autres'', qui une fois choisi donnera accÃ¨s aux en-tÃªtes de lettre (ou formule de politesse ou prÃ©sentation) de ce label 
+\item L'en-tÃªte de lettre, utilisÃ© par exemple dans les diffusions ou publipostages.
 \end{itemize}
 
 
 \subsubsection{Le sous-menu : Affichage}
 
-Ce menu permet de paramétrer l'affichage de la liste des contacts. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
+Ce menu permet de paramÃ©trer l'affichage de la liste des contacts. Il est possible de choisir les champs Ã  afficher et de rÃ©gler leur ordre d'affichage.

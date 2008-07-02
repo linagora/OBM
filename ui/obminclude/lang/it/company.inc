@@ -11,7 +11,7 @@
 $l_company_name = "Nome Azienda";
 $l_type = "Tipo";
 $l_market = "Person in charge";
-$l_activity = "Attivit‡";
+$l_activity = "Attivit√†";
 $l_web = "Web";
 $l_email = "E-Mail";
 $l_coord = "Details";
@@ -32,7 +32,7 @@ $l_delete = "Elimina Azienda";
 $l_select_company = "Seleziona Azienda";
 
 // Messages
-$l_err_act_empty = "Scrivi azienda attivit‡";
+$l_err_act_empty = "Scrivi azienda attivit√†";
 
 $l_no_display = "Riempi i  campi  e premi < Trova> per la ricerca";
 $l_found = "Aziende Trovate.";

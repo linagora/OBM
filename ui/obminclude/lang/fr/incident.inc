@@ -9,31 +9,31 @@
 
 // Fields Label
 $l_date = "Date";
-$l_logger = "Récepteur";
+$l_logger = "RÃ©cepteur";
 $l_owner = "Responsable Technique";
-$l_duration = "Durée totale de résolution";
-$l_solution = "Problématique et résolution";
+$l_duration = "DurÃ©e totale de rÃ©solution";
+$l_solution = "ProblÃ©matique et rÃ©solution";
 $l_client_manager = "Responsable Client";
 $l_date_before ="Date Avant";
-$l_date_after ="Date Après";
+$l_date_after ="Date AprÃ¨s";
 $l_archive_new = "Archiver";
-$l_res_duration = "Durée de résolution";
-$l_reference = "Référence";
-$l_resolutiontype = "Type de résolution";
+$l_res_duration = "DurÃ©e de rÃ©solution";
+$l_reference = "RÃ©fÃ©rence";
+$l_resolutiontype = "Type de rÃ©solution";
 
 // Title 
-$l_redhot = "Très Urgent";
+$l_redhot = "TrÃ¨s Urgent";
 $l_hot = "Urgent";
 $l_normal = "Normal";
 $l_low = "Basse";
 $l_open = "Ouvert";
 $l_waitcall = "Attente de retour";
 $l_standby = "En pause";
-$l_closed = "Fermé";
-$l_lastupdate = "Dernière modification";
+$l_closed = "FermÃ©";
+$l_lastupdate = "DerniÃ¨re modification";
 
 // Action
-$l_select_contract = "Sélectionner le contrat";
+$l_select_contract = "SÃ©lectionner le contrat";
 $l_insert = "Enregistrer l'incident";
 $l_update = "Modifier l'incident";
 $l_delete = "Supprimer l'incident";
@@ -41,32 +41,32 @@ $l_delete = "Supprimer l'incident";
 // Mail
 $l_mail_incident_new_subject = "OBM : N. Incident";
 $l_mail_incident_affected_subject = "OBM : Affectation";
-$l_mail_incident_closed_subject = "OBM : Clôture";
+$l_mail_incident_closed_subject = "OBM : ClÃ´ture";
 
-$l_mail_incident_affected_content = "Vous avez été affecté à l'incident";
-$l_mail_incident_closed_content = "a été clos";
+$l_mail_incident_affected_content = "Vous avez Ã©tÃ© affectÃ© Ã  l'incident";
+$l_mail_incident_closed_content = "a Ã©tÃ© clos";
 // Message
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des incidents correspondants.";
-$l_found = "incident(s) trouvé(s).";
-$l_no_found = "Aucun Incident ne correspond à ces critères !";
-$l_can_delete = "L'incident peut être supprimé";
-$l_cant_delete = "L'incident ne peut être supprimé !";
+$l_no_display = "Renseigner les critÃ¨res souhaitÃ©s et cliquer sur < Chercher > pour obtenir la liste des incidents correspondants.";
+$l_found = "incident(s) trouvÃ©(s).";
+$l_no_found = "Aucun Incident ne correspond Ã  ces critÃ¨res !";
+$l_can_delete = "L'incident peut Ãªtre supprimÃ©";
+$l_cant_delete = "L'incident ne peut Ãªtre supprimÃ© !";
 
 // For the display preferences modification screen 
 $l_incident_display = "Options d'affichage des Incidents";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_length_label = "Le champ Label est trop long";
-$l_length_reference = "Le champ Référence est trop long";
-$l_fill_contract = "Vous devez sélectionner un contrat avant de valider.";
-$l_j_select_contract = "Vous devez sélectionner un Contrat!";
+$l_length_reference = "Le champ RÃ©fÃ©rence est trop long";
+$l_fill_contract = "Vous devez sÃ©lectionner un contrat avant de valider.";
+$l_j_select_contract = "Vous devez sÃ©lectionner un Contrat!";
 $l_delete_confirm = "Confirmer la suppression de l'Incident ?";
-$l_date_after_js = "Date Après";
+$l_date_after_js = "Date AprÃ¨s";
 
 // Incident
 $l_incidentstatus_new = "Nouveau";
 $l_incidentstatus_open = "Ouvert";
-$l_incidentstatus_affected = "Affecté";
+$l_incidentstatus_affected = "AffectÃ©";
 $l_incidentstatus_standby = "En attente";
-$l_incidentstatus_solved = "Résolu";
-$l_incidentstatus_closed = "Cloturé";
+$l_incidentstatus_solved = "RÃ©solu";
+$l_incidentstatus_closed = "CloturÃ©";

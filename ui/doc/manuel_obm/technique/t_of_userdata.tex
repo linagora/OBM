@@ -1,51 +1,51 @@
-% Documentation technique d'OBM : Gestion des données utilisateur
+% Documentation technique d'OBM : Gestion des donnÃ©es utilisateur
 % AliaSource Pierre Baudracco
 % $Id$
 
 
-\subsection{Gestion des données spécifiques utilisateurs}
+\subsection{Gestion des donnÃ©es spÃ©cifiques utilisateurs}
 \label{of_userdata}
-révision : \obm 2.0.0\\
+rÃ©vision : \obm 2.0.0\\
 
-\obm permet la gestion de données spécifiques à un site, appelées données utilisateurs, sans modification du modèle de base de données.
+\obm permet la gestion de donnÃ©es spÃ©cifiques Ã  un site, appelÃ©es donnÃ©es utilisateurs, sans modification du modÃ¨le de base de donnÃ©es.
 
-Les types de données pouvant être ajoutées sont :\\
+Les types de donnÃ©es pouvant Ãªtre ajoutÃ©es sont :\\
 
 \begin{tabular}{|p{8cm}|c|}
 \hline
-\textbf{Type de données} & \textbf{Depuis version OBM} \\
+\textbf{Type de donnÃ©es} & \textbf{Depuis version OBM} \\
 \hline
-Catégories multi-valuées & 2.0.0 \\
+CatÃ©gories multi-valuÃ©es & 2.0.0 \\
 \hline
-Catégories mono-valuées & 2.0.0 \\
+CatÃ©gories mono-valuÃ©es & 2.0.0 \\
 \hline
 Champs texte simple & futur \\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-Les fonctionalités de données utilisateurs sont fournies par le fichier \fichier{of/of\_category.inc} et les fonctions sont préfixées par \variable{of\_userdata\_}.
+Les fonctionalitÃ©s de donnÃ©es utilisateurs sont fournies par le fichier \fichier{of/of\_category.inc} et les fonctions sont prÃ©fixÃ©es par \variable{of\_userdata\_}.
 
 
-\subsubsection{Définition de données utilisateurs}
+\subsubsection{DÃ©finition de donnÃ©es utilisateurs}
 
-Les données utilisateurs sont déclarées et définies dans la tableau global \variable{\$cgp\_user}
+Les donnÃ©es utilisateurs sont dÃ©clarÃ©es et dÃ©finies dans la tableau global \variable{\$cgp\_user}
 
-\paragraph{Ajout de catégorie multi-valuée} : ex : ajout de la catégorie ``cat1'' liée aux sociétés. Une même catégorie peut être liée à plusieurs modules.\\
+\paragraph{Ajout de catÃ©gorie multi-valuÃ©e} : ex : ajout de la catÃ©gorie ``cat1'' liÃ©e aux sociÃ©tÃ©s. Une mÃªme catÃ©gorie peut Ãªtre liÃ©e Ã  plusieurs modules.\\
 
 \variable{\$cgp\_user["company"]["category"]["cat1"] = array("mode"=>"multi");}
 
-\paragraph{Ajout de catégorie mono-valuée} : \\
+\paragraph{Ajout de catÃ©gorie mono-valuÃ©e} : \\
 
 \variable{\$cgp\_user["company"]["category"]["cat2"] = array("mode"=>"mono");}
 
 
-\subsubsection{Implémentation : API fonctions publiques}
+\subsubsection{ImplÃ©mentation : API fonctions publiques}
 
-Les fonctions de gestion des données utilisateurs sont celles à intégrer dans les modules d'\obm et proposent un appel unique (wrapper) pour gérer l'ensemble des données utilisateurs (catégories, champs,...).
-Les fonctions de gestion de catégories ou de champs utilisateurs ne doivent donc pas être utilisées directement dans les modules.\\
+Les fonctions de gestion des donnÃ©es utilisateurs sont celles Ã  intÃ©grer dans les modules d'\obm et proposent un appel unique (wrapper) pour gÃ©rer l'ensemble des donnÃ©es utilisateurs (catÃ©gories, champs,...).
+Les fonctions de gestion de catÃ©gories ou de champs utilisateurs ne doivent donc pas Ãªtre utilisÃ©es directement dans les modules.\\
 
-L'implémentation dans un module nécessite en général :
+L'implÃ©mentation dans un module nÃ©cessite en gÃ©nÃ©ral :
 \begin{itemize}
 \item La prise en compte dans le fichier \fichier{module\_index.php}
   \begin{itemize}
@@ -58,7 +58,7 @@ require_once("$obminclude/of/of_category.inc");)
 \end{minipage}
 }
 
-  \item[*] Définition des actions fournies\\
+  \item[*] DÃ©finition des actions fournies\\
 \shadowbox{
 \begin{minipage}{14cm}
 \begin{verbatim}
@@ -91,7 +91,7 @@ of_category_user_action_switch($module, $action, $params);
 
 \begin{tabular}{|p{6cm}|c|}
 \hline
-\textbf{Fonction du module} & \textbf{Fonction de données utilisateurs appelée} \\
+\textbf{Fonction du module} & \textbf{Fonction de donnÃ©es utilisateurs appelÃ©e} \\
 \hline
 \fonction{html\_module\_search\_form()} & \fonction{of\_userdata\_dis\_search()} \\
 \hline
@@ -128,19 +128,19 @@ of_userdata_dis_search($entity, $params) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|c|}{Fonction d'affichage du champ de recherche de la catégorie pour le formulaire de recherche}\\
+\multicolumn{2}{|c|}{Fonction d'affichage du champ de recherche de la catÃ©gorie pour le formulaire de recherche}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
 \hline
-\$params & tableau des paramètres contenant les valeurs des données utilisateurs\\
+\$params & tableau des paramÃ¨tres contenant les valeurs des donnÃ©es utilisateurs\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String XHTML & Block de recherche des données utilisateurs\\
+String XHTML & Block de recherche des donnÃ©es utilisateurs\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -156,19 +156,19 @@ of_userdata_get_url_search_params($entity, $params) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|c|}{Fonction qui retourne la liste des paramètres de recherche des données utilisateurs sous forme d'url}\\
+\multicolumn{2}{|c|}{Fonction qui retourne la liste des paramÃ¨tres de recherche des donnÃ©es utilisateurs sous forme d'url}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
 \hline
-\$params & tableau des paramètres contenant les valeurs des données utilisateurs\\
+\$params & tableau des paramÃ¨tres contenant les valeurs des donnÃ©es utilisateurs\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String url & Block des paramètres utilisateurs : \&amp;sel\_companycategory1=2\&amp;...\\
+String url & Block des paramÃ¨tres utilisateurs : \&amp;sel\_companycategory1=2\&amp;...\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -184,18 +184,18 @@ of_userdata_dis_entity_consult($entity, $ent_id) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|p{13cm}|}{Fonction d'affichage de la zone données utilisateurs (ensemble des champs utilisateurs) en mode consultation pour une entité}\\
+\multicolumn{2}{|p{13cm}|}{Fonction d'affichage de la zone donnÃ©es utilisateurs (ensemble des champs utilisateurs) en mode consultation pour une entitÃ©}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
-\$ent\_id & Id de l'entité affichée\\
+\$ent\_id & Id de l'entitÃ© affichÃ©e\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String XHTML & Block de données utilisateurs en affichage consultation\\
+String XHTML & Block de donnÃ©es utilisateurs en affichage consultation\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -211,20 +211,20 @@ of_userdata_dis_entity_form($entity, $ent_id, $params) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|p{13cm}|}{Fonction d'affichage de la zone données utilisateurs (ensemble des champs utilisateurs) en mode modification (formulaire) pour une entité}\\
+\multicolumn{2}{|p{13cm}|}{Fonction d'affichage de la zone donnÃ©es utilisateurs (ensemble des champs utilisateurs) en mode modification (formulaire) pour une entitÃ©}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
-\$ent\_id & Id de l'entité affichée\\
+\$ent\_id & Id de l'entitÃ© affichÃ©e\\
 \hline
-\$params & Paramètres (permet de préciser des sélections)\\
+\$params & ParamÃ¨tres (permet de prÃ©ciser des sÃ©lections)\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String XHTML & Block de données formulaire\\
+String XHTML & Block de donnÃ©es formulaire\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -240,18 +240,18 @@ of_userdata_dis_hidden_fields($entity, $params) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|p{13cm}|}{Fonction qui retourne les champs utilisateurs sous forme de champs caches pour un formulaire. Utilisé pour faire passer les information utilisateurs sur des écrans intermédiaires, ex : warning avant insertion}\\
+\multicolumn{2}{|p{13cm}|}{Fonction qui retourne les champs utilisateurs sous forme de champs caches pour un formulaire. UtilisÃ© pour faire passer les information utilisateurs sur des Ã©crans intermÃ©diaires, ex : warning avant insertion}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
-\$params & tableau des paramètres contenant les valeurs des données utilisateurs\\
+\$params & tableau des paramÃ¨tres contenant les valeurs des donnÃ©es utilisateurs\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String XHTML & Block de données formulaire\\
+String XHTML & Block de donnÃ©es formulaire\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -267,22 +267,22 @@ of_userdata_dis_admin_form($entity) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|p{13cm}|}{Fonction d'affichage des formulaires d'administrations des données utilisateurs liées à une entité (catégories)}\\
+\multicolumn{2}{|p{13cm}|}{Fonction d'affichage des formulaires d'administrations des donnÃ©es utilisateurs liÃ©es Ã  une entitÃ© (catÃ©gories)}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-String XHTML & Block de données formulaire\\
+String XHTML & Block de donnÃ©es formulaire\\
 \hline
 \end{tabular}
 \vspace{0.4cm}
 
 
-\paragraph{Fonctions bases de données} : \\
+\paragraph{Fonctions bases de donnÃ©es} : \\
 
 \shadowbox{
 \begin{minipage}{14cm}
@@ -294,18 +294,18 @@ of_userdata_query_search($entity, $params) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|p{13cm}|}{Construction des clauses de recherche pour les données utilisateurs (appelée dans la fonction recherche de l'entité : run\_query\_entity\_search())}\\
+\multicolumn{2}{|p{13cm}|}{Construction des clauses de recherche pour les donnÃ©es utilisateurs (appelÃ©e dans la fonction recherche de l'entitÃ© : run\_query\_entity\_search())}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
-\$params & tableau des paramètres contenant les valeurs des données utilisateurs\\
+\$params & tableau des paramÃ¨tres contenant les valeurs des donnÃ©es utilisateurs\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
 \hline
-array & (``where'', ``join'') : clauses WHERE et JOIN à ajouter \\
+array & (``where'', ``join'') : clauses WHERE et JOIN Ã  ajouter \\
 \hline
 \end{tabular}
 \vspace{0.4cm}
@@ -321,15 +321,15 @@ of_userdata_query_update($entity, $ent_id, $params) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|p{13cm}|}{Mise à jour des données utilisateurs pour une entité donnée selon les paramètres passés (appelée dans la fonction de mise à jour de l'entité : run\_query\_entity\_update())}\\
+\multicolumn{2}{|p{13cm}|}{Mise Ã  jour des donnÃ©es utilisateurs pour une entitÃ© donnÃ©e selon les paramÃ¨tres passÃ©s (appelÃ©e dans la fonction de mise Ã  jour de l'entitÃ© : run\_query\_entity\_update())}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
-\$ent\_id & Id de l'entité\\
+\$ent\_id & Id de l'entitÃ©\\
 \hline
-\$params & tableau des paramètres contenant les valeurs des données utilisateurs\\
+\$params & tableau des paramÃ¨tres contenant les valeurs des donnÃ©es utilisateurs\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
@@ -350,13 +350,13 @@ of_userdata_query_delete($entity, $ent_id) {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|p{13cm}|}{Suppression des données utilisateurs pour une entité donnée (appelée suite à la suppression de l'entité)}\\
+\multicolumn{2}{|p{13cm}|}{Suppression des donnÃ©es utilisateurs pour une entitÃ© donnÃ©e (appelÃ©e suite Ã  la suppression de l'entitÃ©)}\\
 \hline
-\$entity & entité (ex: ``company'', ``contact'',..)\\
+\$entity & entitÃ© (ex: ``company'', ``contact'',..)\\
 \hline
-\$ent\_id & Id de l'entité\\
+\$ent\_id & Id de l'entitÃ©\\
 \hline
 \hline
 \textbf{Retour} & \textbf{Description}\\
@@ -367,66 +367,66 @@ True | false & \\
 \vspace{0.4cm}
 
 
-\subsubsection{Gestion des catégories utilisateurs mono ou multi-valuées}
+\subsubsection{Gestion des catÃ©gories utilisateurs mono ou multi-valuÃ©es}
 
-La gestion des catégories utilisateurs est facilitée par un ensemble de fonctions, similaires aux fonctions de gestion des catégories, permettant la gestion automatique de ces catégories utiisateurs.\\
+La gestion des catÃ©gories utilisateurs est facilitÃ©e par un ensemble de fonctions, similaires aux fonctions de gestion des catÃ©gories, permettant la gestion automatique de ces catÃ©gories utiisateurs.\\
 
-Les fonctionalités de catégories utilisateurs sont fournies par le fichier \fichier{of/of\_category.inc} et les fonctions sont préfixées par \variable{of\_category\_user\_}.
+Les fonctionalitÃ©s de catÃ©gories utilisateurs sont fournies par le fichier \fichier{of/of\_category.inc} et les fonctions sont prÃ©fixÃ©es par \variable{of\_category\_user\_}.
 
-\paragraph{Types de catégories}
+\paragraph{Types de catÃ©gories}
 
-\obm distingue 2 types de catégories utilisateurs :\\
+\obm distingue 2 types de catÃ©gories utilisateurs :\\
 \begin{itemize}
-\item \textbf{mono} : catégories avec liaisons 1-n. L'entité n'est liée qu'à 0 ou 1 des catégories
-\item \textbf{multi} : catégories avec liaisons n-n. L'entité peut être liée à 0, 1  ou n catégories.
+\item \textbf{mono} : catÃ©gories avec liaisons 1-n. L'entitÃ© n'est liÃ©e qu'Ã  0 ou 1 des catÃ©gories
+\item \textbf{multi} : catÃ©gories avec liaisons n-n. L'entitÃ© peut Ãªtre liÃ©e Ã  0, 1  ou n catÃ©gories.
 \end{itemize}
 
-\subsubsection{Modèle de stockage générique}
+\subsubsection{ModÃ¨le de stockage gÃ©nÃ©rique}
 
-La principale différence par rapport aux catégories standards d'\obm vient du modèle de stockage.
-Pour l'ensemble des catégories utilisateurs, uniquement 2 tables sont nécesaires et intégrées en standard à \obm, ce qui permet d'ajouter des catégories utilisateurs par simple configuration sans altérer le modèle de données.
+La principale diffÃ©rence par rapport aux catÃ©gories standards d'\obm vient du modÃ¨le de stockage.
+Pour l'ensemble des catÃ©gories utilisateurs, uniquement 2 tables sont nÃ©cesaires et intÃ©grÃ©es en standard Ã  \obm, ce qui permet d'ajouter des catÃ©gories utilisateurs par simple configuration sans altÃ©rer le modÃ¨le de donnÃ©es.
 
-Afin de permettre l'ajout de catégories mono-valuées sans modification du modèle de données, les 2 types de catégories, mono ou multi, sont gérées par une liaison n-n (avec table de liaison, même pour les catégories mono-valuées).\\
+Afin de permettre l'ajout de catÃ©gories mono-valuÃ©es sans modification du modÃ¨le de donnÃ©es, les 2 types de catÃ©gories, mono ou multi, sont gÃ©rÃ©es par une liaison n-n (avec table de liaison, mÃªme pour les catÃ©gories mono-valuÃ©es).\\
 
-\textbf{Category} : Table des informations de catégories : \\
+\textbf{Category} : Table des informations de catÃ©gories : \\
 
 \begin{tabular}{|p{3cm}|c|p{4cm}|p{4cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Id de la catégorie & \\
+\_id & int 8 & Id de la catÃ©gorie & \\
 \hline
 \_domain\_id & int 8 & Id du domaine d'appartenance & \\
 \hline
-\_timeupdate & timestamp & date de mise à jour & \\
+\_timeupdate & timestamp & date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp & date de création & \\
+\_timecreate & timestamp & date de crÃ©ation & \\
 \hline
-\_userupdate & int 8 & utilisateur ayant effectué la mise à jour & \\
+\_userupdate & int 8 & utilisateur ayant effectuÃ© la mise Ã  jour & \\
 \hline
-\_usercreate & int 8 & créateur & \\
+\_usercreate & int 8 & crÃ©ateur & \\
 \hline
-\_category & varchar 24 & Nom de la catégorie & Tous les enregistrements de toutes les catégories sont stockées dans cette table\\
+\_category & varchar 24 & Nom de la catÃ©gorie & Tous les enregistrements de toutes les catÃ©gories sont stockÃ©es dans cette table\\
 \hline
-\_code & varchar 10 & Code de la catégorie & ex: 1.0, 1.1, 1.1.4 \\
+\_code & varchar 10 & Code de la catÃ©gorie & ex: 1.0, 1.1, 1.1.4 \\
 \hline
-\_label & varchar 100 & Label de la catégorie & \\
+\_label & varchar 100 & Label de la catÃ©gorie & \\
 \hline
 \end{tabular}
 \vspace{0.3cm}
 
-\textbf{CategoryLink} : Table des informations de liaison d'une catégorie avec une entité :\\
+\textbf{CategoryLink} : Table des informations de liaison d'une catÃ©gorie avec une entitÃ© :\\
 
 \begin{tabular}{|p{3cm}|c|p{4cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description}\\
 \hline
-\_category\_id & int 8 & Id de la catégorie\\
+\_category\_id & int 8 & Id de la catÃ©gorie\\
 \hline
-\_entity\_id & int 8 & Id de l'entité\\
+\_entity\_id & int 8 & Id de l'entitÃ©\\
 \hline
-\_category & varchar 24 & Nom de ma catégorie\\
+\_category & varchar 24 & Nom de ma catÃ©gorie\\
 \hline
-\_entity & varchar 32 & Nom de l'entité\\
+\_entity & varchar 32 & Nom de l'entitÃ©\\
 \hline
 \end{tabular}

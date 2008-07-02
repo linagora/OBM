@@ -49,7 +49,7 @@ $l_select_contract = "Seleziona il contratto dell'operazione";
 $l_incident_display = "Mostra le opzioni per le Operazioni ";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_length_label = "L'Etichetta è tropo lunga";
+$l_length_label = "L'Etichetta Ã¨ tropo lunga";
 $l_j_select_contract = "Seleziona un contratto";
 $l_delete_confirm="Confermi eliminazione dell'Operazione ?";
 $l_date_after_js ="Data Seguente";

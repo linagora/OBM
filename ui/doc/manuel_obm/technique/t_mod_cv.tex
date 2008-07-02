@@ -8,13 +8,13 @@
 
 Le module \cv d'\obm.
 
-\subsection{Organisation de la base de données}
+\subsection{Organisation de la base de donnÃ©es}
 
 Le module \cv utilise 3 tables :
 \begin{itemize}
  \item CV
  \item ProjectCV
- \item DefaultOdtTemplate pour la gestion des modèles par défaut
+ \item DefaultOdtTemplate pour la gestion des modÃ¨les par dÃ©faut
 \end{itemize}
 
 \subsection{CV}
@@ -24,67 +24,67 @@ Table principale des informations d'un CV.\\
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_id & int 8 & Identifiant & Clé primaire \\
+\_id & int 8 & Identifiant & ClÃ© primaire \\
 \hline
-\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\_timeupdate & timestamp 14 & Date de mise Ã  jour & \\
 \hline
-\_timecreate & timestamp 14 & Date de création & \\
+\_timecreate & timestamp 14 & Date de crÃ©ation & \\
 \hline
 \_userupdate & int 8 & Id du modificateur & \\
 \hline
-\_usercreate & int 8 & Id du créateur & \\
+\_usercreate & int 8 & Id du crÃ©ateur & \\
 \hline
-\_userobm\_id & int 8 & Id de l'utilisateur auquel est rattaché le CV & \\
+\_userobm\_id & int 8 & Id de l'utilisateur auquel est rattachÃ© le CV & \\
 \hline
 \_title & varchar 255 & Titre du CV & \\
 \hline
-\_additionalrefs & text (64k) & Références additionelles stockées selon un formatage particulier &\\
+\_additionalrefs & text (64k) & RÃ©fÃ©rences additionelles stockÃ©es selon un formatage particulier &\\
 \hline
 \_comment & text (64k) & Commentaire &\\
 \hline
 \end{tabular}
 
-\paragraph{CV\_additionalrefs} : Les références additionelles sont séparées avec la chaîne de caractère "[|-bigsep-|]" en base de données de la manière suivante :
+\paragraph{CV\_additionalrefs} : Les rÃ©fÃ©rences additionelles sont sÃ©parÃ©es avec la chaÃ®ne de caractÃ¨re "[|-bigsep-|]" en base de donnÃ©es de la maniÃ¨re suivante :
 \shadowbox{
 \begin{minipage}{16cm}
 \begin{verbatim}
-	[Référence 1][|-bigsep-|][Référence 2][|-bigsep-|]...[|-bigsep-|][Référence n]
+	[RÃ©fÃ©rence 1][|-bigsep-|][RÃ©fÃ©rence 2][|-bigsep-|]...[|-bigsep-|][RÃ©fÃ©rence n]
 \end{verbatim}
 \end{minipage}
 }
-Les éléments de description de la référence sont séparés par la chaîne de caractère "[|-sep-|]" de la manière suivante :
+Les Ã©lÃ©ments de description de la rÃ©fÃ©rence sont sÃ©parÃ©s par la chaÃ®ne de caractÃ¨re "[|-sep-|]" de la maniÃ¨re suivante :
 \shadowbox{
 \begin{minipage}{18cm}
 \begin{verbatim}
-	[Date][|-sep-|][Duree][|-sep-|][Projet][|-sep-|][Rôle][|-sep-|][Description][|-sep-|][Technique]
+	[Date][|-sep-|][Duree][|-sep-|][Projet][|-sep-|][RÃ´le][|-sep-|][Description][|-sep-|][Technique]
 \end{verbatim}
 \end{minipage}
 }
-Une fonction, \fonction{format\_additionalrefs} permet de formater les tableaux d'éléments fournis (Dates, Projets....).
-La fonction \fonction{split\_additionalrefs} permet de séparer les différents éléments dans un tableau à deux dimension (référence, et élément).	
-Notons que les séparateurs [|-bigsep-|] et [|-sep-|] peuvent être facilement changés, en modifiant les variables idoines dans ces deux fonctions.
+Une fonction, \fonction{format\_additionalrefs} permet de formater les tableaux d'Ã©lÃ©ments fournis (Dates, Projets....).
+La fonction \fonction{split\_additionalrefs} permet de sÃ©parer les diffÃ©rents Ã©lÃ©ments dans un tableau Ã  deux dimension (rÃ©fÃ©rence, et Ã©lÃ©ment).	
+Notons que les sÃ©parateurs [|-bigsep-|] et [|-sep-|] peuvent Ãªtre facilement changÃ©s, en modifiant les variables idoines dans ces deux fonctions.
 
 
 \subsection{ProjectCV}
-Table de liaison entre un CV et des projets (références).\\
+Table de liaison entre un CV et des projets (rÃ©fÃ©rences).\\
 
 \begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
 \hline
-\_project\_id & int 8 & Id du Projet & Clé primaire \\
+\_project\_id & int 8 & Id du Projet & ClÃ© primaire \\
 \hline
-\_cv\_id & int 8 & Id du CV & Clé primaire \\
+\_cv\_id & int 8 & Id du CV & ClÃ© primaire \\
 \hline
-\_role & varchar 128 & Rôle de l'utilisateur dans le projet & \\
+\_role & varchar 128 & RÃ´le de l'utilisateur dans le projet & \\
 \hline
 \end{tabular}
 
-\paragraph{Attention} : Comme l'Id du projet et l'Id du CV forment la clef primaire de la table, il ne faut pas qu'un même projet soit ajouté plusieurs fois au même CV. Un contrôle (javascript, fonction \fonction{alreadyAdded()}) lors de l'ajout d'une référence est chargé d'empêcher ce problème.
+\paragraph{Attention} : Comme l'Id du projet et l'Id du CV forment la clef primaire de la table, il ne faut pas qu'un mÃªme projet soit ajoutÃ© plusieurs fois au mÃªme CV. Un contrÃ´le (javascript, fonction \fonction{alreadyAdded()}) lors de l'ajout d'une rÃ©fÃ©rence est chargÃ© d'empÃªcher ce problÃ¨me.
 
 \subsubsection{Remarques}
 
-Le module \cv utilise également la table UserObm en récupérant les informations d'état civil et la formation de l'utilisateur (nom, prénom, adresse, téléphone, formation) ainsi que la table Project où les informations de description du projet (date, durée, description et description technique) sont récupérées.
+Le module \cv utilise Ã©galement la table UserObm en rÃ©cupÃ©rant les informations d'Ã©tat civil et la formation de l'utilisateur (nom, prÃ©nom, adresse, tÃ©lÃ©phone, formation) ainsi que la table Project oÃ¹ les informations de description du projet (date, durÃ©e, description et description technique) sont rÃ©cupÃ©rÃ©es.
 
 \subsection{Fonctions javascript}
 
@@ -92,44 +92,44 @@ Le module \cv utilise également la table UserObm en récupérant les informations 
 \hline
 \textbf{Fonction} & \textbf{Description} & \textbf{Appel} \\
 \hline
-\fonction{newRow(id, name)} & Ajout d'une nouvelle référence dont on fournit le nom et l'id & Fonction appelée par l'action ext\_get\_id\_cv du module \project lors de la sélection d'un projet \\
+\fonction{newRow(id, name)} & Ajout d'une nouvelle rÃ©fÃ©rence dont on fournit le nom et l'id & Fonction appelÃ©e par l'action ext\_get\_id\_cv du module \project lors de la sÃ©lection d'un projet \\
 \hline
-\fonction{alreadyAdded()} & Vérifie si un projet a déjà été rajouté en tant que référence & Fonction appelée par la fonction \fonction{newRow} \\
+\fonction{alreadyAdded()} & VÃ©rifie si un projet a dÃ©jÃ  Ã©tÃ© rajoutÃ© en tant que rÃ©fÃ©rence & Fonction appelÃ©e par la fonction \fonction{newRow} \\
 \hline
-\fonction{newRow2()} & Ajout d'une nouvelle ligne de référence additionelle & Fonction appelée lors d'un clic sur le bouton "Ajouter une référence additionelle" \\
+\fonction{newRow2()} & Ajout d'une nouvelle ligne de rÃ©fÃ©rence additionelle & Fonction appelÃ©e lors d'un clic sur le bouton "Ajouter une rÃ©fÃ©rence additionelle" \\
 \hline
-\fonction{deleteRow(row)} & Efface la ligne du tableau fournie en argument & Appelée via le lien Supprimer (dernière case du tableau) \\
+\fonction{deleteRow(row)} & Efface la ligne du tableau fournie en argument & AppelÃ©e via le lien Supprimer (derniÃ¨re case du tableau) \\
 \hline
-\fonction{showHide(nb)} & Affiche et cache les champs correspondants dans le formulaire d'export & Appelée lors d'un clic sur les boutons radio de choix de type de modèle  \\
+\fonction{showHide(nb)} & Affiche et cache les champs correspondants dans le formulaire d'export & AppelÃ©e lors d'un clic sur les boutons radio de choix de type de modÃ¨le  \\
 \hline
 \end{tabular}
 
 \subsection{Actions et droits}
 
-Voici la liste des actions du module \cv, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+Voici la liste des actions du module \cv, avec le droit d'accÃ¨s requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
 \begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \textbf{IntitulÃ©} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & read & (Défaut) formulaire de recherche de CV. \\ 
+  index & read & (DÃ©faut) formulaire de recherche de CV. \\ 
  \hline
-  search & read & Résultat de recherche de CV. \\
+  search & read & RÃ©sultat de recherche de CV. \\
  \hline
-  new & write & Formulaire de création d'un CV. \\
+  new & write & Formulaire de crÃ©ation d'un CV. \\
  \hline
   duplicate & write & Duplication d'un CV (formulaire de modification avec nouvel utilisateur). \\
  \hline
-  detailconsult & read & Fiche détail d'un CV. \\
+  detailconsult & read & Fiche dÃ©tail d'un CV. \\
  \hline
   detailupdate & write & Formulaire de modification d'un CV. \\
  \hline
   insert & write & Insertion d'un CV. \\
  \hline
-  update & write & Mise à jour d'un CV. \\
+  update & write & Mise Ã  jour d'un CV. \\
  \hline
-  check\_delete & write & Vérification avant suppression d'un CV. \\
+  check\_delete & write & VÃ©rification avant suppression d'un CV. \\
  \hline
   delete & write & Suppression d'un CV. \\
  \hline
@@ -137,12 +137,12 @@ Voici la liste des actions du module \cv, avec le droit d'accès requis ainsi qu'
  \hline
   export & read & Export d'un CV (appel du module Odt). \\
  \hline
-  admin & read\_admin & Accès à l'écran de gestion des modèles Odt par défaut pour l'export du module CV. \\
+  admin & read\_admin & AccÃ¨s Ã  l'Ã©cran de gestion des modÃ¨les Odt par dÃ©faut pour l'export du module CV. \\
  \hline
-  display & read & Ecran de modification des préférences d'affichage. \\
+  display & read & Ecran de modification des prÃ©fÃ©rences d'affichage. \\
  \hline
-  dispref\_display & read & Modifie l'affichage d'un élément. \\
+  dispref\_display & read & Modifie l'affichage d'un Ã©lÃ©ment. \\
  \hline
-  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+  dispref\_level & read & Modifie l'ordre d'affichage d'un Ã©lÃ©ment. \\
  \hline
 \end{tabular}

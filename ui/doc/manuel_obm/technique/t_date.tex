@@ -5,25 +5,25 @@
 
 \subsection{Gestion des dates}
 
-Les problèmes de format des dates sont génériques et particulièrement sensibles dans une application comme \obm fonctionnant avec différentes bases de données et permettant à chaque utilisateur de sélectionner sa propre langue.\\
+Les problÃ¨mes de format des dates sont gÃ©nÃ©riques et particuliÃ¨rement sensibles dans une application comme \obm fonctionnant avec diffÃ©rentes bases de donnÃ©es et permettant Ã  chaque utilisateur de sÃ©lectionner sa propre langue.\\
 
-Afin de simplifier la gestion des dates \obm définit un cadre avec des règles d'utilisation des dates et une api.
+Afin de simplifier la gestion des dates \obm dÃ©finit un cadre avec des rÃ¨gles d'utilisation des dates et une api.
 
-\subsubsection{Cadre général et règles d'utilisation}
+\subsubsection{Cadre gÃ©nÃ©ral et rÃ¨gles d'utilisation}
 
 \begin{tabular}{|p{7cm}|p{7cm}|}
 \hline
-\textbf{Règles} & \textbf{Implications} \\
+\textbf{RÃ¨gles} & \textbf{Implications} \\
 \hline
-\obm récupére les dates de la base de données au format \textbf{Timestamp Unix}. & La BD doit savoir retourner une date au format \textbf{Timestamp Unix}.
+\obm rÃ©cupÃ©re les dates de la base de donnÃ©es au format \textbf{Timestamp Unix}. & La BD doit savoir retourner une date au format \textbf{Timestamp Unix}.
 Voir :
 \begin{itemize}
 \item \fonction{sql\_date\_format()}
 \end{itemize}\\
 \hline
-\obm propose des fonctions de formattage des dates récupérées tenant compte des paramètres utilisateur.
+\obm propose des fonctions de formattage des dates rÃ©cupÃ©rÃ©es tenant compte des paramÃ¨tres utilisateur.
 &
-Toute date récupérée de la BD doit utiliser une des fonctions de formattage avant affichage.
+Toute date rÃ©cupÃ©rÃ©e de la BD doit utiliser une des fonctions de formattage avant affichage.
 Voir :
 \begin{itemize}
 \item \fonction{date\_format()}
@@ -31,18 +31,18 @@ Voir :
 \item \fonction{datetime\_format()}
 \end{itemize}\\
 \hline
-\obm reçoit les dates à insérer en BD au format ISO ``\textbf{AAAA-MM-JJ HH:MM:SS}''
+\obm reÃ§oit les dates Ã  insÃ©rer en BD au format ISO ``\textbf{AAAA-MM-JJ HH:MM:SS}''
 &
-La BD doit accepter en entrée des dates au format ISO.
-La fonction \fonction{calendar()} permet de générer les champs de saisie de date. Un champ de date est divisé en deux parties:
+La BD doit accepter en entrÃ©e des dates au format ISO.
+La fonction \fonction{calendar()} permet de gÃ©nÃ©rer les champs de saisie de date. Un champ de date est divisÃ© en deux parties:
 \begin{itemize}
 \item Un champ de saisie
 \item Un popup calendrier
 \end{itemize}
-La fonction javascript \fonction{live\_check\_date()} permet de convertir la date saisie au format ISO. Ces fonctions sont définies dans le fichier \fichier{calendar\_js.inc}
+La fonction javascript \fonction{live\_check\_date()} permet de convertir la date saisie au format ISO. Ces fonctions sont dÃ©finies dans le fichier \fichier{calendar\_js.inc}
 \\
 \hline
-OBM acceptant en simultané des langues différentes pour les utilisateurs, propose des labels pour le nom des mois, et jours de semaine.
+OBM acceptant en simultanÃ© des langues diffÃ©rentes pour les utilisateurs, propose des labels pour le nom des mois, et jours de semaine.
 &
 Voir :
 \begin{itemize}
@@ -56,11 +56,11 @@ Voir :
 \end{tabular}
 
 
-\subsubsection{Récupération de date au format Timestamp Unix}
+\subsubsection{RÃ©cupÃ©ration de date au format Timestamp Unix}
 
-\paragraph{Implémentation multi-base de données}
+\paragraph{ImplÃ©mentation multi-base de donnÃ©es}
 
-\fonction{sql\_date\_format()} définie dans le fichier \fichier{global\_query.inc} :
+\fonction{sql\_date\_format()} dÃ©finie dans le fichier \fichier{global\_query.inc} :
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -87,7 +87,7 @@ function sql_date_format($db_type, $field, $as="") {
 \end{verbatim}
 \end{minipage}
 }
-\paragraph{Utilisation} dans une requète :\\
+\paragraph{Utilisation} dans une requÃ¨te :\\
 
 \shadowbox{
 \begin{minipage}{13cm}
@@ -109,7 +109,7 @@ popup de saisie de date.
 \begin{minipage}{13cm}
 \begin{verbatim}
 	Syntaxe:
-	<script>calendar(nom_du_champ,variable_php [,champ_à_comparer])</script>
+	<script>calendar(nom_du_champ,variable_php [,champ_Ã _comparer])</script>
 	
 	Exemple:
 	<script>calendar('tf_date_begin','$datebegin', 'tf_date_end')</script>
@@ -117,8 +117,8 @@ popup de saisie de date.
 \end{minipage}
 }
 
-Dans cette exemple, le nom du champ de saisie sera tf\_date\_begin et sera affecté à la variable \$datebegin. \\
-Le troisième paramètre, optionel, est le champ à laquel la date saisie sera comparé. Si la date de saisie est supérieur à la date comparé, cette dernière prendra la valeur de la date saisie. \\
+Dans cette exemple, le nom du champ de saisie sera tf\_date\_begin et sera affectÃ© Ã  la variable \$datebegin. \\
+Le troisiÃ¨me paramÃ¨tre, optionel, est le champ Ã  laquel la date saisie sera comparÃ©. Si la date de saisie est supÃ©rieur Ã  la date comparÃ©, cette derniÃ¨re prendra la valeur de la date saisie. \\
 
-Lors de la saisie d'une date, la fonction \fonction{live\_check\_date()} transforme la date au format ISO si son format est valide (en fonction des préférences utilisateur) et si la date est valide. \\
-Dans le cas de non validité, l'application retourne un message d'erreur à l'utilisateur.
+Lors de la saisie d'une date, la fonction \fonction{live\_check\_date()} transforme la date au format ISO si son format est valide (en fonction des prÃ©fÃ©rences utilisateur) et si la date est valide. \\
+Dans le cas de non validitÃ©, l'application retourne un message d'erreur Ã  l'utilisateur.

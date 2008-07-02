@@ -4,27 +4,27 @@
 
 \section{Gestion des sauvegardes}
 
-Depuis la version 1.0, OBM intègre un module graphique de sauvegarde des données.
+Depuis la version 1.0, OBM intÃ¨gre un module graphique de sauvegarde des donnÃ©es.
 
-La sauvegarde génère une archive des données de la base de données et stocke cette archive dans un dépôt de sauvegardes.\\
+La sauvegarde gÃ©nÃ¨re une archive des donnÃ©es de la base de donnÃ©es et stocke cette archive dans un dÃ©pÃ´t de sauvegardes.\\
 
-Les sauvegardes ne sont pas stockées en base de données mais uniquement sur disque pour des questions de cohérence.
+Les sauvegardes ne sont pas stockÃ©es en base de donnÃ©es mais uniquement sur disque pour des questions de cohÃ©rence.
 Les informations de sauvegarde sont contenues dans le nom du fichier de sauvegarde (date, version).
-Le module \backup lit donc ses informations depuis le système de fichiers (liste des sauvegardes,..).
+Le module \backup lit donc ses informations depuis le systÃ¨me de fichiers (liste des sauvegardes,..).
 
 
-\subsection{Les options de paramétrage}
+\subsection{Les options de paramÃ©trage}
 
 \begin{tabular}{|p{6cm}|p{8cm}|}
 \hline
-Dépôt des sauvegardes & \$cbackup\_path \\
+DÃ©pÃ´t des sauvegardes & \$cbackup\_path \\
 \hline
-Nom des fichiers de sauvegarde (fixé) & obmdb-AAAAMMJJ-HHMMSS-version.dump \\
+Nom des fichiers de sauvegarde (fixÃ©) & obmdb-AAAAMMJJ-HHMMSS-version.dump \\
 \hline
 \end{tabular}
 
 
-\subsection{L'implémentation selon la base de données}
+\subsection{L'implÃ©mentation selon la base de donnÃ©es}
 
 \subsubsection{MySQL}
 
@@ -43,17 +43,17 @@ Sauvegarde & mysqldump -u \textit{user} -p\textit{password} \textit{db} > fichie
 
 \subsubsection{PostgreSQL}
 
-Avec Postgres il n'est pas possible de détruire une base de données ayant des connexions ouvertes (donc par exemple celle utilisée par \obm).
-Il n'est pas possible depuis \obm de fermer toutes les connexions actives (il pourrait etre possible que l'utilisateur connecté n'ait plus de connexions, mais impossible d'agir sur celles des autres utilisateurs).
+Avec Postgres il n'est pas possible de dÃ©truire une base de donnÃ©es ayant des connexions ouvertes (donc par exemple celle utilisÃ©e par \obm).
+Il n'est pas possible depuis \obm de fermer toutes les connexions actives (il pourrait etre possible que l'utilisateur connectÃ© n'ait plus de connexions, mais impossible d'agir sur celles des autres utilisateurs).
 
-La restauration s'effectue donc en supprimant d'abord toutes les données de toutes les tables (pas de suppression / création de base de données).\\
+La restauration s'effectue donc en supprimant d'abord toutes les donnÃ©es de toutes les tables (pas de suppression / crÃ©ation de base de donnÃ©es).\\
 
 
 \begin{tabular}{|p{4cm}|p{10cm}|}
 \hline
 Sauvegarde & pg\_dump -U \textit{user} \textit{db} -f fichier\\
 \hline
-\multirow{2}{2cm}{Restauration} & Effacement de toutes les données des tables d'\obm \\ 
+\multirow{2}{2cm}{Restauration} & Effacement de toutes les donnÃ©es des tables d'\obm \\ 
 \cline{2-2}
 & psql -U \textit{user} \textit{db} < fichier \\
 \hline

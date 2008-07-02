@@ -50,6 +50,7 @@ class DB_Sql {
 
   /* public: constructor */
   function DB_Sql($query = "") {
+      $this->query('SET NAMES UTF-8'); 
       $this->query($query);
   }
 
@@ -88,7 +89,6 @@ class DB_Sql {
         return 0;
       }
     }
-    
     return $this->Link_ID;
   }
 

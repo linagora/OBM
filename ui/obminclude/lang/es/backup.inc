@@ -1,6 +1,6 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Español                                                  //
+// OBM - Language : EspaÃ±ol                                                  //
 //     - File     : backup.inc                                               //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -9,19 +9,19 @@
 
 // Labels et textes
 $l_file = "Archivo";
-$l_size = "Tamaño";
+$l_size = "TamaÃ±o";
 $l_bytes = "bytes";
 
 // Message
-$l_no_display = "Llene los campos de búsqueda y presione < Buscar > para obtener las copias de respaldo";
+$l_no_display = "Llene los campos de bÃºsqueda y presione < Buscar > para obtener las copias de respaldo";
 $l_found = "copia de respaldo encontrada";
-$l_no_found = "No se ha encontrado copia de respaldo correspondiente a la búsqueda !";
+$l_no_found = "No se ha encontrado copia de respaldo correspondiente a la bÃºsqueda !";
 $l_restore_ok = "La copia de respaldo ha sido restaurada exitosamente.";
 $l_restore_error = "La copia de respaldo restoration ha fallado !";
 
-$l_create_backup_error = "La creación de la copia de respaldo ha fallado !";
-$l_delete_file_error = "La eliminación de la copia de respaldo ha fallado !";
-$l_err_backup_name = "El nombre del archivo de respaldo no es válido !";
+$l_create_backup_error = "La creaciÃ³n de la copia de respaldo ha fallado !";
+$l_delete_file_error = "La eliminaciÃ³n de la copia de respaldo ha fallado !";
+$l_err_backup_name = "El nombre del archivo de respaldo no es vÃ¡lido !";
 $l_err_backup_file = "El archivo de respaldo no puede ser leida !";
 $l_can_delete = "La copia de respaldo puede ser borrada.";
 $l_cant_delete = "La copia de respaldo NO puede ser borrada !";

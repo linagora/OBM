@@ -39,7 +39,7 @@ $l_login_error = "Nome utente non valido!";
 $l_password_error = "Passoword noon valida!";
 $l_email_error = "Email non valida";
 $l_lname_error = "Nome non valido !";
-$l_exist_error = "gi‡ esistente";
+$l_exist_error = "gi√† esistente";
 $l_check_sameuser = "Utenti simili a nuovo!";
 
 $l_add_users = "AAggiungi Utenti";

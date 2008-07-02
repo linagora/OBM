@@ -6,68 +6,68 @@
 \subsection{Gestion du multi-domaine}
 \label{of_domain}
 
-\obm intègre la fonctionnalité multi-domaine depuis la version 2.0.
-Le multi-domaine permet de gérer dans une même instance d'\obm plusieurs espaces de données totalement cloisonnés.\\
+\obm intÃ¨gre la fonctionnalitÃ© multi-domaine depuis la version 2.0.
+Le multi-domaine permet de gÃ©rer dans une mÃªme instance d'\obm plusieurs espaces de donnÃ©es totalement cloisonnÃ©s.\\
 
-Le multi-domaine peut être activé ou désactivé. Il est intégré de la sorte qu'il n'y ait aucun impact pour les sites n'utilisant pas la fonctionnalité.\\
+Le multi-domaine peut Ãªtre activÃ© ou dÃ©sactivÃ©. Il est intÃ©grÃ© de la sorte qu'il n'y ait aucun impact pour les sites n'utilisant pas la fonctionnalitÃ©.\\
 
-Les fonctionalités de multi-domaine sont fournies par le fichier \fichier{of/of\_query.inc}.
+Les fonctionalitÃ©s de multi-domaine sont fournies par le fichier \fichier{of/of\_query.inc}.
 
-\subsubsection{Multi-domaine, données et utilisateurs}
+\subsubsection{Multi-domaine, donnÃ©es et utilisateurs}
 
-Chaque données dans \obm est soit globale, soit appartient à un domaine unique.\\
+Chaque donnÃ©es dans \obm est soit globale, soit appartient Ã  un domaine unique.\\
 
-Dans un fonctionnement mono-domaine, les données de domaine ne sont pas utilisées et sont renseignées soit à 0 soit à null (non renseignées).\\
+Dans un fonctionnement mono-domaine, les donnÃ©es de domaine ne sont pas utilisÃ©es et sont renseignÃ©es soit Ã  0 soit Ã  null (non renseignÃ©es).\\
 
 Dans un fonctionnement multi-domaine, le \textbf{domaine 0} est un domaine particulier.\\
 
-Pour les objets pouvant être globaux (définis dans le domaine 0) il doit y avoir unicité de la clé (login pour user,...) dans l'espace domaine local + domaine global.
-La seule possibilité de doublon est pour 2 domaines locaux.\\ 
+Pour les objets pouvant Ãªtre globaux (dÃ©finis dans le domaine 0) il doit y avoir unicitÃ© de la clÃ© (login pour user,...) dans l'espace domaine local + domaine global.
+La seule possibilitÃ© de doublon est pour 2 domaines locaux.\\ 
 
-Pour les hôtes, l'adresse IP doit être unique tous domaines confondus.
+Pour les hÃ´tes, l'adresse IP doit Ãªtre unique tous domaines confondus.
 
 \begin{tabular}{|p{4cm}|p{10cm}|}
 \hline
-\textbf{Donnée} & \textbf{Description}\\
+\textbf{DonnÃ©e} & \textbf{Description}\\
 \hline
 Utilisateur domaine 0 & C'est un super-administrateur, il :
 \begin{itemize}
-\item peut gérer les domaines
-\item peut gérer les utilisateurs de tous les domaines
-\item peut voir toutes les données de tous les domaines
-\item peut gérer les données transverses de référence (d'id 0)
-\item au niveau LDAP il est créé dans tous les domaines (bals,..)
+\item peut gÃ©rer les domaines
+\item peut gÃ©rer les utilisateurs de tous les domaines
+\item peut voir toutes les donnÃ©es de tous les domaines
+\item peut gÃ©rer les donnÃ©es transverses de rÃ©fÃ©rence (d'id 0)
+\item au niveau LDAP il est crÃ©Ã© dans tous les domaines (bals,..)
 \end{itemize}
 \vspace{0.3cm}
 
-Pour la création de données en base : quand il se loggue il choisit un domaine :
+Pour la crÃ©ation de donnÃ©es en base : quand il se loggue il choisit un domaine :
 \begin{itemize}
-\item domaine global : il ne peut créer que les données qui permettent de sélectionner un domaine :
+\item domaine global : il ne peut crÃ©er que les donnÃ©es qui permettent de sÃ©lectionner un domaine :
   \begin{itemize}
   \item user
   \item host
   \item mailshare
   \end{itemize}
-\item domaine spécifique : il agit comme un utilisateur du domaine donc limité aux données du domaine.
+\item domaine spÃ©cifique : il agit comme un utilisateur du domaine donc limitÃ© aux donnÃ©es du domaine.
 \end{itemize}
 
 \\
 \hline
 Utilisateur domaine != 0 & C'est un utilisateur de son domaine :
 \begin{itemize}
-\item il est limité (consultation / modification) à son domaine
-\item toute donnée créée appartient à son domaine
+\item il est limitÃ© (consultation / modification) Ã  son domaine
+\item toute donnÃ©e crÃ©Ã©e appartient Ã  son domaine
 \end{itemize}
 \\
 \hline
-Entité domaine 0 & C'est une entité transverse, elle :
+EntitÃ© domaine 0 & C'est une entitÃ© transverse, elle :
 \begin{itemize}
 \item est visible dans tous les domaines
-\item n'est gérée que par un super-administrateur
+\item n'est gÃ©rÃ©e que par un super-administrateur
 \end{itemize}
 \\
 \hline
-Entité domaine != 0 & C'est une entité de son domaine :
+EntitÃ© domaine != 0 & C'est une entitÃ© de son domaine :
 \begin{itemize}
 \item elle est accessible par les utilisateurs du domaine (selon droits) et super-administrateurs
 \item elle est modifiable par les utilisateurs du domaine (selon droits)
@@ -77,21 +77,21 @@ Entité domaine != 0 & C'est une entité de son domaine :
 \end{tabular}
 \vspace{0.3cm}
 
-Il n'est pas possible à un super-administrateur d'insérer des données (autres que référence) ou d'avoir des entités de domaine 0 pour éviter les cas de données de domaines différents liées entre-elles (ex: contact d'un domaine ou public lié à une société de domaine différent).\\
+Il n'est pas possible Ã  un super-administrateur d'insÃ©rer des donnÃ©es (autres que rÃ©fÃ©rence) ou d'avoir des entitÃ©s de domaine 0 pour Ã©viter les cas de donnÃ©es de domaines diffÃ©rents liÃ©es entre-elles (ex: contact d'un domaine ou public liÃ© Ã  une sociÃ©tÃ© de domaine diffÃ©rent).\\
 
-L'utilisation d'OBM-LDAP, OBM-MAIL ou OBM-SAMBA (dès que l'automate entre en jeu) nécessite la définition d'un domaine, même si un seul domaine est utilisé.\\
+L'utilisation d'OBM-LDAP, OBM-MAIL ou OBM-SAMBA (dÃ¨s que l'automate entre en jeu) nÃ©cessite la dÃ©finition d'un domaine, mÃªme si un seul domaine est utilisÃ©.\\
 
-Au niveau des hôtes :
+Au niveau des hÃ´tes :
 - pour la messagerie :
-Il est nécessaire de choisir un hôte comme serveur de messagerie.
-La liste des hôtes proposée est l'aggrégation des hôtes du domaine OBM et des hôtes du domaine global (cas serveur hébèrge plusieurs domaines).
+Il est nÃ©cessaire de choisir un hÃ´te comme serveur de messagerie.
+La liste des hÃ´tes proposÃ©e est l'aggrÃ©gation des hÃ´tes du domaine OBM et des hÃ´tes du domaine global (cas serveur hÃ©bÃ¨rge plusieurs domaines).
 
 - pour samba
-Une machine ne peut appartenir qu'à un seul domaine windows.
-Donc les hôtes déclarés dans le domaine global ne pourront pas être déclarés comme une machine windows.
+Une machine ne peut appartenir qu'Ã  un seul domaine windows.
+Donc les hÃ´tes dÃ©clarÃ©s dans le domaine global ne pourront pas Ãªtre dÃ©clarÃ©s comme une machine windows.
 
 
-\subsubsection{Table Domain et stockage dans les données}
+\subsubsection{Table Domain et stockage dans les donnÃ©es}
 
 
 \begin{tabular}{|p{3cm}|c|p{8cm}|}
@@ -112,22 +112,22 @@ Donc les hôtes déclarés dans le domaine global ne pourront pas être déclarés com
 \vspace{0.3cm}
 
 Les champs \textbf{domain\_name} et \textbf{\_alias} n'apparaissent que dans le cadre D'OBM-LDAP, OBM-Mail ou OBM-Samba.
-Le champ domain\_name n'est pas modifiable via l'interface (car nécessite une intervention sur la conf des services ldap, cyrus).\\
+Le champ domain\_name n'est pas modifiable via l'interface (car nÃ©cessite une intervention sur la conf des services ldap, cyrus).\\
 
 
 
-Chaque table d'entité (hors tables de liaison) doit contenir un champ référençant le domaine :\\
+Chaque table d'entitÃ© (hors tables de liaison) doit contenir un champ rÃ©fÃ©renÃ§ant le domaine :\\
 
 \begin{tabular}{|p{3cm}|c|p{4cm}|}
 \hline
 \textbf{Champs} & \textbf{Type} & \textbf{Description}\\
 \hline
-\_domain\_id & int 8 & Id du domaine de l'entité\\
+\_domain\_id & int 8 & Id du domaine de l'entitÃ©\\
 \hline
 \end{tabular}
 
 
-\subsubsection{Implémentation : API fonctions publiques}
+\subsubsection{ImplÃ©mentation : API fonctions publiques}
 
 \paragraph{Fonctions d'affichage} : \\
 
@@ -138,7 +138,7 @@ of_domain_get_list() {
 \end{verbatim}
 \end{minipage}
 }
-Fonction qui retourne la liste des domaines dans un tableau. Le domaine ``0'' global est ajouté.\\
+Fonction qui retourne la liste des domaines dans un tableau. Le domaine ``0'' global est ajoutÃ©.\\
 
 
 \shadowbox{
@@ -161,15 +161,15 @@ of_domain_get_entity_domain_id($id, $entityu, $ptable="") {
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline
-\textbf{Paramètres} & \textbf{Description}\\
+\textbf{ParamÃ¨tres} & \textbf{Description}\\
 \hline
-\multicolumn{2}{|c|}{Fonction qui récupère le domaine id d'une entité}\\
+\multicolumn{2}{|c|}{Fonction qui rÃ©cupÃ¨re le domaine id d'une entitÃ©}\\
 \hline
-\$id & id de l'entité\\
+\$id & id de l'entitÃ©\\
 \hline
-\$entityu & entité (majuscule pour nom de table) (ex: ``Company'', ``contact'',..)\\
+\$entityu & entitÃ© (majuscule pour nom de table) (ex: ``Company'', ``contact'',..)\\
 \hline
-\$ptable & nom de table (si différent de \$entityu) (ex: ``UGroup'')\\
+\$ptable & nom de table (si diffÃ©rent de \$entityu) (ex: ``UGroup'')\\
 \hline
 \end{tabular}
 \vspace{0.4cm}

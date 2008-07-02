@@ -15,16 +15,16 @@ $l_new_settings = "Pour changer votre configuration, Selectionner ici les nouvea
 $l_set_lang = "Choisissez votre langue";
 $l_set_theme = "Choisissez votre theme";
 $l_set_menu = "Affichage des menus";
-$l_set_rows = "# lignes affichÈes par page";
-$l_set_todo = "Ordre d'affichage des t‚ches";
+$l_set_rows = "# lignes affich√©es par page";
+$l_set_todo = "Ordre d'affichage des t√¢ches";
 $l_set_date_upd = "Format de saisie de date";
 $l_set_date = "Format d'affichage de date";
 $l_set_commentorder = "Affichage des commentaires";
-$l_set_display_days = "Calendrier : Jours affichÈs";
+$l_set_display_days = "Calendrier : Jours affich√©s";
 $l_set_cal_interval = "Calendrier : Intervalle";
-$l_set_cal_first_hour = "Calendrier : Heure de dÈbut";
+$l_set_cal_first_hour = "Calendrier : Heure de d√©but";
 $l_set_cal_last_hour = "Calendrier : Heure de fin";
-$l_set_csv_sep = "SÈparateur pour export CSV";
+$l_set_csv_sep = "S√©parateur pour export CSV";
 $l_set_debug = "Niveau de debug";
 $l_send_mail = "Accepter les e-mail";
 
@@ -41,8 +41,8 @@ $l_deadline = "date limite";
 
 // Menus
 $l_me_txt = "texte";
-$l_me_ico = "icÙne";
-$l_me_both = "texte+icÙne";
+$l_me_ico = "ic√¥ne";
+$l_me_both = "texte+ic√¥ne";
 
 // Comment order
 $l_co_chro = "Chronologique";

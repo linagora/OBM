@@ -1,16 +1,16 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Español                                                  //
+// OBM - Language : EspaÃ±ol                                                  //
 //     - File     : user.inc                                                 //
 // 2006-02-24 Jaime E. Gomez H.   jgomez@skinatech.com                       //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_desc  = "Descripción";
+$l_desc  = "DescripciÃ³n";
 $l_qty  = "Cantidad";
 $l_check_resourcecreate = " entradas que pertenecen a este usuario.";
-$l_check_resourceupdate = " últimas entradas actualizadas por este usuario.";
+$l_check_resourceupdate = " Ãºltimas entradas actualizadas por este usuario.";
 $l_no_resource = "No hay campos de recursos en esta tabla";
 $l_fill_name = "Debe proveer un nombre antes de enviar.";
 
@@ -39,14 +39,14 @@ $l_confirm_delete_item = "Do you realy want to delete this item ?";
 $l_insert = "Insert el recurso";
 $l_update = "Update el recurso";
 $l_checkdelete = "Check or Delete el recurso";
-$l_reset = "colocar valores por omisión en preferencias de recursos";
+$l_reset = "colocar valores por omisiÃ³n en preferencias de recursos";
 $l_delete = "Delete el recurso";
 $l_add = "Agregar estos recursos";
 
 // Messages
-$l_no_display = "Llene los campos de búsqueda y presione < Buscar > para obtener los recursos";
+$l_no_display = "Llene los campos de bÃºsqueda y presione < Buscar > para obtener los recursos";
 $l_found = "recurso(s) encontrados.";
-$l_no_found = "No hay recursos que coincidan con la búsqueda !";
+$l_no_found = "No hay recursos que coincidan con la bÃºsqueda !";
 $l_cant_delete = "El recurso NO puede ser borrado !";
 $l_can_delete = "El recurso puede ser borrado.";
 $l_name_error = "El nombre debe ser indicado!";
@@ -56,6 +56,6 @@ $l_exist_error = "ya existe";
 $l_add_resources = "Agregar recursos";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_j_check_number = "La cantidad no es válida.";
+$l_j_check_number = "La cantidad no es vÃ¡lida.";
 
 $l_resource_display = "Mostrar opciones para listas de recursos";
