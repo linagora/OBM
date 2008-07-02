@@ -50,7 +50,7 @@ class DB_Sql {
 
   /* public: constructor */
   function DB_Sql($query = "") {
-      $this->query('SET NAMES UTF-8'); 
+      $this->query('SET NAMES UTF8'); 
       $this->query($query);
   }
 

@@ -56,7 +56,7 @@ class DB_OBM extends DB_Sql {
     $this->User     = "$obmdb_user";
     $this->Password = "$obmdb_password";
 
-    $this->query($query);
+    parent::__construct($query);
   }
 
   // AliaSource : Set the total rows number (case query is constraint by limit)
