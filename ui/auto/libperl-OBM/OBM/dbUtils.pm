@@ -32,6 +32,13 @@ sub dbState {
 
 		# On teste si la connexion a reussie
 		if( $dbh ) {
+            SWITCH: {
+                if( $dbType eq 'mysql' ) {
+                    $dbh->{'mysql_enable_utf8'} = 1;
+                    $dbh->do('SET NAMES utf8');
+                }
+            }
+
 			return 1;
 		}else {
 			return 0;

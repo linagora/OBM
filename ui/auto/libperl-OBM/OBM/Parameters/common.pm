@@ -15,7 +15,7 @@ use FindBin qw($Bin);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_regexp = qw($regexp_email $regexp_email_left $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain $regexp_login $regexp_ip);
-@EXPORT_db = qw($userDb $userPasswd $dbName $db);
+@EXPORT_db = qw($userDb $userPasswd $dbName $db $dbType);
 @EXPORT = (@EXPORT_const, @EXPORT_db, @EXPORT_command, @EXPORT_regexp, @EXPORT_dir);
 @EXPORT_OK = qw();
 
@@ -235,8 +235,8 @@ $tmpOBM = "/tmp";
 #
 # Utilitaire de recodage des caracteres de latin1->UTF8
 # Préciser l'encodage du système (apache)
-$defaultCharSet = "ISO-8859-1";
-#$defaultCharSet = "UTF8";
+#$defaultCharSet = "ISO-8859-1";
+$defaultCharSet = "UTF8";
 $recode = "/usr/bin/recode l1..utf8";
 
 #
