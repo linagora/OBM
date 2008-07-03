@@ -261,32 +261,61 @@ sub updateDbEntity {
         return 0;
     }
 
-    my $dbMailShareDesc = $self->{"mailShareDbDesc"};
-    if( !defined($dbMailShareDesc) ) {
+    my $dbEntry = $self->{"mailShareDbDesc"};
+    if( !defined($dbEntry) ) {
         return 0;
     }
 
     &OBM::toolBox::write_log( "[Entities::obmMailshare]: MAJ de la boite a lettre partagee ".$self->getEntityDescription()." dans les tables de production", "W" );
 
+
+    # Champs de la BD qui ne sont pas mis à jour car champs références
+    my $exceptFields = '^(mailshare_id)$';
+
     # MAJ de l'entité dans la table de production
-    my $query = "REPLACE INTO P_MailShare SET ";
-    my $first = 1;
-    while( my( $columnName, $columnValue ) = each(%{$dbMailShareDesc}) ) {
-        if( !$first ) {
-            $query .= ", ";
+    my @updateFields;
+    my @whereFields;
+    while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
+        if( $columnName =~ /$exceptFields/ ) {
+            push( @whereFields, $columnName."=".$dbHandler->quote($columnValue) );
         }else {
-            $first = 0;
+            push( @updateFields, $columnName."=".$dbHandler->quote($columnValue) );
+        }
+    }
+
+    my $query = 'UPDATE P_MailShare SET '.join( ', ', @updateFields ).' WHERE '.join( ' AND ', @whereFields );
+    &OBM::toolBox::write_log( '[Entities::obmMailshare]: '.$query, 'W', 3 );
+    
+    
+    my $queryResult;
+    my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+
+    if( !defined($result) ) {
+        &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettre partagee : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
+        return 0;
+
+    }elsif( $result == 0 ) {
+        my @fields;
+        my @fieldsValues;
+        while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
+            push( @fields, $columnName );
+            push( @fieldsValues, $dbHandler->quote($columnValue) );
         }
 
-        $query .= $columnName."=".$dbHandler->quote($columnValue);
+        $query = 'INSERT INTO P_MailShare ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')';
+        &OBM::toolBox::write_log( '[Entities::obmMailshare]: '.$query, 'W', 3 );
+
+        $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+        if( !defined($result) ) {
+            &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettre partagee : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
+            return 0;
+        }elsif( $result != 1 ) {
+            &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettre partagee : boite a lettre partagee inseree '.$result.' fois dans les tables de production !', 'W', 2 );
+            return 0;
+        }
     }
 
-    my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
-        return 0;
-    }
-
+    &OBM::toolBox::write_log( '[Entities::obmMailshare]: MAJ des tables de production reussie', 'W', 2 );
 
     return 1;
 }

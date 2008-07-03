@@ -570,7 +570,8 @@ sub updateDbEntityPassword {
         &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
         return 0;
     }
-    
+
+    &OBM::toolBox::write_log( '[Entities::obmUser]: MAJ des tables de production reussie', 'W', 2 );
 
     return 1;
 }
