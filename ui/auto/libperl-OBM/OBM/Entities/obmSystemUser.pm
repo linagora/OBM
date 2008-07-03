@@ -101,7 +101,7 @@ sub getEntity {
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W', 2 );
         return 0;
     }
 
@@ -122,7 +122,7 @@ sub getEntity {
 
     # On execute la requete
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W', 2 );
         return 0;
     }
 

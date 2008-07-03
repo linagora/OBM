@@ -102,7 +102,7 @@ sub getEntity {
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
@@ -123,7 +123,7 @@ sub getEntity {
 
     # On exécute la requête
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 

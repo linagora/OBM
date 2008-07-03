@@ -113,7 +113,7 @@ sub getEntity {
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
@@ -135,7 +135,7 @@ sub getEntity {
 
     # On exécute la requête
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
@@ -164,7 +164,7 @@ sub getEntity {
 
     # On exécute la requête
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
@@ -514,7 +514,7 @@ sub updateDbEntityLinks {
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
@@ -524,7 +524,7 @@ sub updateDbEntityLinks {
     &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
 
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
@@ -558,7 +558,7 @@ sub updateDbEntityPassword {
     &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
 
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
@@ -567,7 +567,7 @@ sub updateDbEntityPassword {
     &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
 
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
     }
 
@@ -1437,7 +1437,7 @@ sub getHostIpById {
     # On execute la requete
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W' );
+        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return undef;
     }
 
