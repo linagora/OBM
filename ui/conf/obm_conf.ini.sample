@@ -5,11 +5,11 @@
 ; Parameters are set like : key = value
 ; Comments are lines beginning with ";"
 ; OBM Automate need the [global] for the perl section (beware : php is permissive)
-
+;
 [global]
 ; General information
 title = OBM
-
+;
 ; example : for https://extranet.aliasource.fr/obm/ 
 ; external-url = extranet.aliasource.fr
 ; external-protocol = https
@@ -17,7 +17,7 @@ title = OBM
 external-url = obm
 external-protocol = http
 obm-prefix = /
-
+;
 ; Database infos
 host = localhost
 ; dbtype = PGSQL
@@ -26,54 +26,54 @@ db = obm
 user = obm
 ; Password must be enclosed with "
 password = "aliasource"
-
+;
 ; Default language
 lang = fr
-
+;
 ; Enabled OBM module
 obm-ldap = true
 obm-mail = true
 obm-samba = false
 obm-web = false
 obm-contact = false
-
+;
 ; singleNameSpace mode allow only one domain
 ; login are 'login' and not 'login@domain'
 ; Going multi-domain from mono domain needs system work (ldap, cyrus,...)
 ; Multi-domain disabled by default
 singleNameSpace = false
-
+;
 ; renameUserMailbox mode allow to rename user mailbox
 ; need Cyrus 2.2 or greater and the Cyrus parameter 'allowusermoves: yes'
 renameUserMailbox = false
-
+;
 ; backupRoot is the directory used to store backup data
 backupRoot = "/var/lib/obm/backup"
-
-
+;
+;
 [automate]
 ; Automate specific parameters
-
+;
 ; Log level
 logLevel = 2
-
+;
 ; LDAP server address
 ldapServer = localhost
-
+;
 ; LDAP Root
 ; Exemple : 'aliasource,local' means that the root DN is: 'dc=aliasource,dc=local' 
 ldapRoot = local
-
+;
 ; Enable Cyrus partition support
 ; if cyrusPartition is enable, a dedicated Cyrus partition is created for each OBM domain
 ; Going cyrusPartition enabled from cyrusPartition disabled needs system work
 cyrusPartition = true
-
+;
 ; ldapAllMainMailAddress :
 ;    false : publish user mail address only if mail right is enable - default
 ;    true : publish main user mail address, even if mail right is disable
 ldapAllMainMailAddress = false
-
+;
 ; userMailboxDefaultFolders are IMAP folders who are automaticaly created
 ; at user creation ( must be enclosed with " and in IMAP UTF-7 modified encoding)
 ; Small convertion table
@@ -83,16 +83,16 @@ ldapAllMainMailAddress = false
 ; & -> &
 ; Example : userMailboxDefaultFolders = "Envoy&AOk-s,Corbeille,Brouillons,El&AOk-ments ind&AOk-sirables"
 userMailboxDefaultFolders = ""
-
+;
 ; shareMailboxDefaultFolders are IMAP folders who are automaticaly created
 ; at share creation ( must be enclosed with " and in IMAP UTF-7 modified
 ; encoding)
 shareMailboxDefaultFolders = ""
-
+;
 ; oldSidMapping mode is for compatibility with Aliamin and old install
 ; Modifying this on a running system need Samba domain work (re-register host,
 ; ACL...) 
 ; For new one, leave this to 'false'
 oldSidMapping = false
-
+;
 ; EOF
