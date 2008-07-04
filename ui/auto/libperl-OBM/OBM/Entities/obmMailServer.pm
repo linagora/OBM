@@ -15,7 +15,6 @@ require OBM::Ldap::utils;
 require OBM::toolBox;
 require OBM::dbUtils;
 use URI::Escape;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
 sub new {
@@ -202,10 +201,10 @@ sub getLdapDnPrefix {
 sub createLdapEntry {
     my $self = shift;
     my ( $ldapEntry ) = @_;
-    my $entry = $self->{"postfixConf"};
+    my $entry = $self->{'postfixConf'};
 
 
-    if( !defined($entry->{"postfixconf_name"}) ) {
+    if( !defined($entry->{'postfixconf_name'}) ) {
         return 0;
     }
 
@@ -213,33 +212,33 @@ sub createLdapEntry {
     #
     # Les parametres nécessaires
     $ldapEntry->add(
-        objectClass => $self->{"objectclass"},
-        cn => to_utf8({ -string => $entry->{"postfixconf_name"}, -charset => $defaultCharSet })
+        objectClass => $self->{'objectclass'},
+        cn => $entry->{'postfixconf_name'}
     );
 
     # Les domaines de messagerie
-    if( $entry->{"postfixconf_mail_domains"} ) {
-        $ldapEntry->add( myDestination => $entry->{"postfixconf_mail_domains"} );
+    if( $entry->{'postfixconf_mail_domains'} ) {
+        $ldapEntry->add( myDestination => $entry->{'postfixconf_mail_domains'} );
     }
 
     # Le domaine
-    if( $entry->{"postfixconf_domain"} ) {
-        $ldapEntry->add( obmDomain => to_utf8({ -string => $entry->{"postfixconf_domain"}, -charset => $defaultCharSet }) );
+    if( $entry->{'postfixconf_domain'} ) {
+        $ldapEntry->add( obmDomain => $entry->{'postfixconf_domain'} );
     }
 
     # Les hôtes IMAP
-    if( $entry->{"postfixconf_imap_srv"} ) {
-        $ldapEntry->add( imapHost => $entry->{"postfixconf_imap_srv"} );
+    if( $entry->{'postfixconf_imap_srv'} ) {
+        $ldapEntry->add( imapHost => $entry->{'postfixconf_imap_srv'} );
     }
 
     # Les hôtes SMTP-in
-    if( $entry->{"postfixconf_smtpin_srv"} ) {
-        $ldapEntry->add( smtpInHost => $entry->{"postfixconf_smtpin_srv"} );
+    if( $entry->{'postfixconf_smtpin_srv'} ) {
+        $ldapEntry->add( smtpInHost => $entry->{'postfixconf_smtpin_srv'} );
     }
 
     # Les hôtes SMTP-out
-    if( $entry->{"postfixconf_smtpout_srv"} ) {
-        $ldapEntry->add( smtpOutHost => $entry->{"postfixconf_smtpout_srv"} );
+    if( $entry->{'postfixconf_smtpout_srv'} ) {
+        $ldapEntry->add( smtpOutHost => $entry->{'postfixconf_smtpout_srv'} );
     }
 
     return 1;

@@ -15,7 +15,6 @@ require OBM::Ldap::utils;
 require OBM::toolBox;
 require OBM::dbUtils;
 use URI::Escape;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
 sub new {
@@ -169,10 +168,10 @@ sub getLdapDnPrefix {
 sub createLdapEntry {
     my $self = shift;
     my ( $ldapEntry ) = @_;
-    my $entry = $self->{"sambaConf"};
+    my $entry = $self->{'sambaConf'};
 
 
-    if( !defined($entry->{"sambaConf_domain_name"}) || !defined($entry->{"sambaConf_domain_sid"}) ) {
+    if( !defined($entry->{'sambaConf_domain_name'}) || !defined($entry->{'sambaConf_domain_sid'}) ) {
         return 0;
     }
 
@@ -180,9 +179,9 @@ sub createLdapEntry {
     #
     # Les paramètres nécessaires
     $ldapEntry->add(
-        objectClass => $self->{"objectclass"},
-        sambaSID => $entry->{"sambaConf_domain_sid"},
-        sambaDomainName => to_utf8({ -string => $entry->{"sambaConf_domain_name"}, -charset => $defaultCharSet })
+        objectClass => $self->{'objectclass'},
+        sambaSID => $entry->{'sambaConf_domain_sid'},
+        sambaDomainName => $entry->{'sambaConf_domain_name'}
     );
 
 

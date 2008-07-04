@@ -17,7 +17,6 @@ require OBM::toolBox;
 require OBM::dbUtils;
 require OBM::Samba::utils;
 use URI::Escape;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
 sub new {
@@ -728,172 +727,172 @@ sub createLdapEntry {
 
         $ldapEntry->add(
             objectClass => $self->getLdapObjectclass(),
-            uid => to_utf8({ -string => $dbEntry->{userobm_login}, -charset => $defaultCharSet }),
-            uidNumber => $entryProp->{"userobm_uid"},
-            gidNumber => $dbEntry->{"userobm_gid"},
-            loginShell => $entryProp->{userobm_shell}
+            uid => $dbEntry->{'userobm_login'},
+            uidNumber => $entryProp->{'userobm_uid'},
+            gidNumber => $dbEntry->{'userobm_gid'},
+            loginShell => $entryProp->{'userobm_shell'}
         );
     }else {
         return 0;
     }
 
     # Le nom complet
-    if( $entryProp->{userobm_full_name} ) {
-        $ldapEntry->add( cn => to_utf8({ -string => $entryProp->{userobm_full_name}, -charset => $defaultCharSet }) );
-        $ldapEntry->add( displayName => to_utf8({ -string => $entryProp->{userobm_full_name}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'userobm_full_name'} ) {
+        $ldapEntry->add( cn => $entryProp->{'userobm_full_name'} );
+        $ldapEntry->add( displayName => $entryProp->{'userobm_full_name'} );
     }
 
     # Le nom
-    if( $dbEntry->{userobm_lastname} ) {
-        $ldapEntry->add( sn => to_utf8({ -string => $dbEntry->{userobm_lastname}, -charset => $defaultCharSet }) );
+    if( $dbEntry->{'userobm_lastname'} ) {
+        $ldapEntry->add( sn => $dbEntry->{userobm_lastname} );
     }
 
     # Le prénom
-    if( $dbEntry->{userobm_firstname} ) {
-        $ldapEntry->add( givenName => to_utf8({ -string => $dbEntry->{userobm_firstname}, -charset => $defaultCharSet }) );
+    if( $dbEntry->{'userobm_firstname'} ) {
+        $ldapEntry->add( givenName => $dbEntry->{'userobm_firstname'} );
     }
 
     # Le répertoire personnel
-    if( $entryProp->{userobm_homedir} ) {
-        $ldapEntry->add( homeDirectory => to_utf8({ -string => $entryProp->{userobm_homedir}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'userobm_homedir'} ) {
+        $ldapEntry->add( homeDirectory => $entryProp->{'userobm_homedir'} );
     }
 
     # Le mot de passe
-    if( $entryProp->{userobm_crypt_passwd} ) {
-        $ldapEntry->add( userPassword => $entryProp->{userobm_crypt_passwd} );
+    if( $entryProp->{'userobm_crypt_passwd'} ) {
+        $ldapEntry->add( userPassword => $entryProp->{'userobm_crypt_passwd'} );
     }
 
     # Le téléphone
-    if( $entryProp->{userobm_phone} ) {
-        $ldapEntry->add( telephoneNumber => $entryProp->{userobm_phone} );
+    if( $entryProp->{'userobm_phone'} ) {
+        $ldapEntry->add( telephoneNumber => $entryProp->{'userobm_phone'} );
     }
 
     # Le fax
-    if( $entryProp->{userobm_fax} ) {
-        $ldapEntry->add( facsimileTelephoneNumber => $entryProp->{userobm_fax} );
+    if( $entryProp->{'userobm_fax'} ) {
+        $ldapEntry->add( facsimileTelephoneNumber => $entryProp->{'userobm_fax'} );
     }
 
     # Le mobile
-    if( $dbEntry->{userobm_mobile} ) {
-        $ldapEntry->add( mobile => $dbEntry->{userobm_mobile} );
+    if( $dbEntry->{'userobm_mobile'} ) {
+        $ldapEntry->add( mobile => $dbEntry->{'userobm_mobile'} );
     }
 
     # Le titre
-    if( $dbEntry->{userobm_title} ) {
-        $ldapEntry->add( title => to_utf8({ -string => $dbEntry->{userobm_title}, -charset => $defaultCharSet }) );
+    if( $dbEntry->{'userobm_title'} ) {
+        $ldapEntry->add( title => $dbEntry->{'userobm_title'} );
     }
 
     # Le service
-    if( $dbEntry->{userobm_service} ) {
-        $ldapEntry->add( ou => to_utf8({ -string => $dbEntry->{userobm_service}, -charset => $defaultCharSet }) );
+    if( $dbEntry->{'userobm_service'} ) {
+        $ldapEntry->add( ou => $dbEntry->{'userobm_service'} );
     }
 
     # La description
-    if( $dbEntry->{userobm_description} ) {
-        $ldapEntry->add( description => to_utf8({ -string => $dbEntry->{userobm_description}, -charset => $defaultCharSet }) );
+    if( $dbEntry->{'userobm_description'} ) {
+        $ldapEntry->add( description => $dbEntry->{'userobm_description'} );
     }
 
     # L'accés web
-    if( $dbEntry->{userobm_web_perms} ) {
-        $ldapEntry->add( webAccess => $dbEntry->{userobm_web_perms} );
+    if( $dbEntry->{'userobm_web_perms'} ) {
+        $ldapEntry->add( webAccess => $dbEntry->{'userobm_web_perms'} );
     }
 
     # La boîte à lettres de l'utilisateur
-    if( $entryProp->{userobm_mailbox_ldap_name} ) {
-        $ldapEntry->add( mailBox => $entryProp->{userobm_mailbox_ldap_name} );
+    if( $entryProp->{'userobm_mailbox_ldap_name'} ) {
+        $ldapEntry->add( mailBox => $entryProp->{'userobm_mailbox_ldap_name'} );
     }
 
     # Le serveur de BAL local
-    if( $entryProp->{userobm_mailLocalServer} ) {
-        $ldapEntry->add( mailBoxServer => $entryProp->{userobm_mailLocalServer} );
+    if( $entryProp->{'userobm_mailLocalServer'} ) {
+        $ldapEntry->add( mailBoxServer => $entryProp->{'userobm_mailLocalServer'} );
     }
 
     # L'acces mail
-    if( $entryProp->{userobm_mail_perms} ) {
-        $ldapEntry->add( mailAccess => "PERMIT" );
+    if( $entryProp->{'userobm_mail_perms'} ) {
+        $ldapEntry->add( mailAccess => 'PERMIT' );
     }else {
-        $ldapEntry->add( mailAccess => "REJECT" );
+        $ldapEntry->add( mailAccess => 'REJECT' );
     }
 
     # La limite aux domaines locaux
-    if( $entryProp->{userobm_mailLocalOnly} ) {
-        $ldapEntry->add( mailLocalOnly => $entryProp->{userobm_mailLocalOnly} );
+    if( $entryProp->{'userobm_mailLocalOnly'} ) {
+        $ldapEntry->add( mailLocalOnly => $entryProp->{'userobm_mailLocalOnly'} );
     }
     
     # Les adresses mails
-    if( $entryProp->{"email"} ) {
-        $ldapEntry->add( mail => $entryProp->{"email"} );
+    if( $entryProp->{'email'} ) {
+        $ldapEntry->add( mail => $entryProp->{'email'} );
     }
     
     # Les adresses mail secondaires
-    if( $entryProp->{"emailAlias"} ) {
-        $ldapEntry->add( mailAlias => $entryProp->{"emailAlias"} );
+    if( $entryProp->{'emailAlias'} ) {
+        $ldapEntry->add( mailAlias => $entryProp->{'emailAlias'} );
     }
     
     # L'adresse postale
-    if( $entryProp->{userobm_address} ) {
+    if( $entryProp->{'userobm_address'} ) {
         # Thunderbird, IceDove... : ne comprennent que cet attribut
-        $ldapEntry->add( street => to_utf8({ -string => $entryProp->{userobm_address}, -charset => $defaultCharSet }) );
+        $ldapEntry->add( street => $entryProp->{'userobm_address'} );
         # Outlook : ne comprend que cet attribut
         # Outlook Express : préfère celui-là à 'street'
-        $ldapEntry->add( postalAddress => to_utf8({ -string => $entryProp->{userobm_address}, -charset => $defaultCharSet }) );
+        $ldapEntry->add( postalAddress => $entryProp->{'userobm_address'} );
     }
     
     # Le code postal
-    if( $dbEntry->{userobm_zipcode} ) {
-        $ldapEntry->add( postalCode => to_utf8({ -string => $dbEntry->{userobm_zipcode}, -charset => $defaultCharSet }) );
+    if( $dbEntry->{'userobm_zipcode'} ) {
+        $ldapEntry->add( postalCode => $dbEntry->{'userobm_zipcode'} );
     }
     
     # La ville
-    if( $dbEntry->{userobm_town} ) {
-        $ldapEntry->add( l => to_utf8({ -string => $dbEntry->{userobm_town}, -charset => $defaultCharSet }) );
+    if( $dbEntry->{'userobm_town'} ) {
+        $ldapEntry->add( l => $dbEntry->{'userobm_town'} );
     }
 
     # La visibilité
-    if( $entryProp->{userobm_hidden} ) {
-        $ldapEntry->add( hiddenUser => $entryProp->{userobm_hidden} );
+    if( $entryProp->{'userobm_hidden'} ) {
+        $ldapEntry->add( hiddenUser => $entryProp->{'userobm_hidden'} );
     }
 
     # Le domaine
-    if( $entryProp->{userobm_domain} ) {
-        $ldapEntry->add( obmDomain => to_utf8({ -string => $entryProp->{userobm_domain}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'userobm_domain'} ) {
+        $ldapEntry->add( obmDomain => $entryProp->{'userobm_domain'} );
     }
 
     # Le SID de l'utilisateur
-    if( $entryProp->{userobm_samba_sid} ) {
-        $ldapEntry->add( sambaSID => to_utf8({ -string => $entryProp->{userobm_samba_sid}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'userobm_samba_sid'} ) {
+        $ldapEntry->add( sambaSID => $entryProp->{'userobm_samba_sid'} );
     }
 
     # Le SID du groupe de l'utilisateur
-    if( $entryProp->{userobm_samba_group_sid} ) {
-        $ldapEntry->add( sambaPrimaryGroupSID => to_utf8({ -string => $entryProp->{userobm_samba_group_sid}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'userobm_samba_group_sid'} ) {
+        $ldapEntry->add( sambaPrimaryGroupSID => $entryProp->{'userobm_samba_group_sid'} );
     }
 
     # Les flags de l'utilisateur
-    if( $entryProp->{userobm_samba_flags} ) {
-        $ldapEntry->add( sambaAcctFlags => to_utf8({ -string => $entryProp->{userobm_samba_flags}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'userobm_samba_flags'} ) {
+        $ldapEntry->add( sambaAcctFlags => $entryProp->{'userobm_samba_flags'} );
     }
 
     # Le mot de passe
-    if( $entryProp->{userobm_samba_lm_password} ) {
-        $ldapEntry->add( sambaLMPassword => to_utf8({ -string => $entryProp->{userobm_samba_lm_password}, -charset => $defaultCharSet }) );
-        $ldapEntry->add( sambaNTPassword => to_utf8({ -string => $entryProp->{userobm_samba_nt_password}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'userobm_samba_lm_password'} ) {
+        $ldapEntry->add( sambaLMPassword => $entryProp->{'userobm_samba_lm_password'} );
+        $ldapEntry->add( sambaNTPassword => $entryProp->{'userobm_samba_nt_password'} );
     }
 
     # Le script de session
-    if( $entryProp->{userobm_samba_logon_script} ) {
-        $ldapEntry->add( sambaLogonScript => to_utf8({ -string => $entryProp->{userobm_samba_logon_script}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'userobm_samba_logon_script'} ) {
+        $ldapEntry->add( sambaLogonScript => $entryProp->{'userobm_samba_logon_script'} );
     }
 
     # Le répertoire personnel et la lettre du lecteur associé
-    if( $entryProp->{userobm_samba_home_drive} && $entryProp->{userobm_samba_home} ) {
-        $ldapEntry->add( sambaHomeDrive => to_utf8({ -string => $entryProp->{userobm_samba_home_drive}, -charset => $defaultCharSet }) );
-        $ldapEntry->add( sambaHomePath => to_utf8({ -string => $entryProp->{userobm_samba_home}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'userobm_samba_home_drive'} && $entryProp->{'userobm_samba_home'} ) {
+        $ldapEntry->add( sambaHomeDrive => $entryProp->{'userobm_samba_home_drive'} );
+        $ldapEntry->add( sambaHomePath => $entryProp->{'userobm_samba_home'} );
     }
 
     # Le répertoire du profil W2k
-    if( $entryProp->{userobm_samba_user_profile} ) {
-        $ldapEntry->add( sambaProfilePath => to_utf8({ -string => $entryProp->{userobm_samba_user_profile}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'userobm_samba_user_profile'} ) {
+        $ldapEntry->add( sambaProfilePath => $entryProp->{'userobm_samba_user_profile'} );
     }
 
 
@@ -916,9 +915,9 @@ sub updateLdapEntryDn {
     }
 
     # L'UID
-    if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{"userobm_login"}, $ldapEntry, "uid" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{'userobm_login'}, $ldapEntry, 'uid' ) ) {
         # Si cet attribut est modifié, son DN doit aussi être mis à jour
-        $ldapEntry->add( newrdn => to_utf8( { -string => $self->getLdapDnPrefix( "new" ), -charset => $defaultCharSet } ) );
+        $ldapEntry->add( newrdn => $self->getLdapDnPrefix( 'new' ) );
         $update = 1;
     }
 
@@ -1359,7 +1358,7 @@ sub getSieveVacation {
         $vacationMsg .= "\"".$boxEmailsAlias->[$i]."\"";
     }
 
-    $vacationMsg .= " ] \"".to_utf8( { -string => $boxVacationMessage, -charset => $defaultCharSet } )."\";\n";
+    $vacationMsg .= " ] \"".$boxVacationMessage."\";\n";
 
 
     return $vacationMsg;

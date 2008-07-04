@@ -15,7 +15,6 @@ require OBM::Ldap::utils;
 require OBM::toolBox;
 require OBM::dbUtils;
 require OBM::Samba::utils;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
 sub new {
@@ -476,16 +475,16 @@ sub getLdapObjectclass {
 sub createLdapEntry {
     my $self = shift;
     my ( $ldapEntry ) = @_;
-    my $dbEntry = $self->{groupDbDesc};
-    my $entryProp = $self->{"properties"};
-    my $entryLinks = $self->{groupLinks};
+    my $dbEntry = $self->{'groupDbDesc'};
+    my $entryProp = $self->{'properties'};
+    my $entryLinks = $self->{'groupLinks'};
 
     # Les paramètres nécessaires
-    if( $dbEntry->{group_name} && $dbEntry->{group_gid} ) {
+    if( $dbEntry->{'group_name'} && $dbEntry->{'group_gid'} ) {
         $ldapEntry->add(
             objectClass => $self->getLdapObjectclass(),
-            cn => to_utf8({ -string => $dbEntry->{group_name}, -charset => $defaultCharSet }),
-            gidNumber => $dbEntry->{group_gid}
+            cn => $dbEntry->{'group_name'},
+            gidNumber => $dbEntry->{'group_gid'}
         );
 
     }else {
@@ -493,60 +492,60 @@ sub createLdapEntry {
     }
 
     # Les membres
-    if( $self->isLinks() && $#{$entryLinks->{group_users}} != -1 ) {
-        $ldapEntry->add( memberUid => $entryLinks->{group_users} );
+    if( $self->isLinks() && $#{$entryLinks->{'group_users'}} != -1 ) {
+        $ldapEntry->add( memberUid => $entryLinks->{'group_users'} );
     }
 
     # Les contacts
-    if( $self->isLinks() && $#{$entryLinks->{group_contacts}} != -1 ) {
-        $ldapEntry->add( mailBox => $entryLinks->{group_contacts} );
+    if( $self->isLinks() && $#{$entryLinks->{'group_contacts'}} != -1 ) {
+        $ldapEntry->add( mailBox => $entryLinks->{'group_contacts'} );
     }
 
     # La description
-    if( $dbEntry->{group_desc} ) {
-        $ldapEntry->add( description => to_utf8({ -string => $dbEntry->{group_desc}, -charset => $defaultCharSet }) );       
+    if( $dbEntry->{'group_desc'} ) {
+        $ldapEntry->add( description => $dbEntry->{'group_desc'} );       
     }
 
     # L'acces mail
-    if( $entryProp->{group_mailperms} ) {
-        $ldapEntry->add( mailAccess => "PERMIT" );
+    if( $entryProp->{'group_mailperms'} ) {
+        $ldapEntry->add( mailAccess => 'PERMIT' );
     }else {
-        $ldapEntry->add( mailAccess => "REJECT" );
+        $ldapEntry->add( mailAccess => 'REJECT' );
     }
 
     # Les adresses mails
-    if( $entryProp->{"email"} ) {
-        $ldapEntry->add( mail => $entryProp->{"email"} );
+    if( $entryProp->{'email'} ) {
+        $ldapEntry->add( mail => $entryProp->{'email'} );
     }
 
     # Les adresses mails secondaires
-    if( $entryProp->{"emailAlias"} ) {
-        $ldapEntry->add( mailAlias => $entryProp->{"emailAlias"} );
+    if( $entryProp->{'emailAlias'} ) {
+        $ldapEntry->add( mailAlias => $entryProp->{'emailAlias'} );
     }
             
     # Le domaine
-    if( $entryProp->{group_domain} ) {
-        $ldapEntry->add( obmDomain => to_utf8({ -string => $entryProp->{group_domain}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'group_domain'} ) {
+        $ldapEntry->add( obmDomain => $entryProp->{'group_domain'} );
     }
 
     # Le SID du groupe
-    if( $entryProp->{group_samba_sid} ) {
-        $ldapEntry->add( sambaSID => $entryProp->{group_samba_sid} );
+    if( $entryProp->{'group_samba_sid'} ) {
+        $ldapEntry->add( sambaSID => $entryProp->{'group_samba_sid'} );
     }
 
     # Le type du groupe
-    if( $entryProp->{group_samba_type} ) {
-        $ldapEntry->add( sambaGroupType => $entryProp->{group_samba_type} );
+    if( $entryProp->{'group_samba_type'} ) {
+        $ldapEntry->add( sambaGroupType => $entryProp->{'group_samba_type'} );
     }
 
     # Le nom du groupe
-    if( $entryProp->{group_samba_name} ) {
-        $ldapEntry->add( displayName => to_utf8({ -string => $entryProp->{group_samba_name}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'group_samba_name'} ) {
+        $ldapEntry->add( displayName => $entryProp->{'group_samba_name'} );
     }
 
     # La liste des utilisateurs Samba
-    if( $self->isLinks() && $#{$entryLinks->{group_samba_users}} != -1 ) {
-        $ldapEntry->add( sambaSIDList => $entryLinks->{group_samba_users} );
+    if( $self->isLinks() && $#{$entryLinks->{'group_samba_users'}} != -1 ) {
+        $ldapEntry->add( sambaSIDList => $entryLinks->{'group_samba_users'} );
     }
 
     return 1;

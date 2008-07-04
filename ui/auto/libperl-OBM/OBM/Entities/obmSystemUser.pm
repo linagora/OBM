@@ -16,7 +16,6 @@ require OBM::passwd;
 require OBM::toolBox;
 require OBM::dbUtils;
 use URI::Escape;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
 sub new {
@@ -254,26 +253,26 @@ sub createLdapEntry {
     # On construit la nouvelle entree
     #
     # Les parametres nécessaires
-    if( $entry->{"user_login"} && $entry->{"user_firstname"} && $entry->{"user_lastname"} && $entry->{"user_uid"} && defined($entry->{"user_gid"})  && $entry->{"user_homedir"} ) {
+    if( $entry->{'user_login'} && $entry->{'user_firstname'} && $entry->{'user_lastname'} && $entry->{'user_uid'} && defined($entry->{'user_gid'})  && $entry->{'user_homedir'} ) {
 
         my $longName;
-        if( $entry->{"user_firstname"} ) {
-            $longName = $entry->{"user_firstname"}." ".$entry->{"user_lastname"};
+        if( $entry->{'user_firstname'} ) {
+            $longName = $entry->{'user_firstname'}.' '.$entry->{'user_lastname'};
         }else {
-            $longName = $entry->{"user_lastname"};
+            $longName = $entry->{'user_lastname'};
         }
                 
         $ldapEntry->add(
-            objectClass => $self->{"objectclass"},
-            uid => to_utf8({ -string => $entry->{"user_login"}, -charset => $defaultCharSet }),
-            cn => to_utf8({ -string => $longName, -charset => $defaultCharSet }),
-            sn => to_utf8({ -string => $entry->{"user_lastname"}, -charset => $defaultCharSet }),
-            uidNumber => $entry->{"user_uid"},
-            gidNumber => $entry->{"user_gid"},
-            homeDirectory => $entry->{"user_homedir"},
-            loginShell => "/bin/bash",
+            objectClass => $self->{'objectclass'},
+            uid => $entry->{'user_login'},
+            cn => $longName,
+            sn => $entry->{'user_lastname'},
+            uidNumber => $entry->{'user_uid'},
+            gidNumber => $entry->{'user_gid'},
+            homeDirectory => $entry->{'user_homedir'},
+            loginShell => '/bin/bash',
             userpassword => $userPasswd,
-            obmDomain => to_utf8({ -string => $entry->{"user_domain"}, -charset => $defaultCharSet })
+            obmDomain => $entry->{'user_domain'}
         );
 
     }else {

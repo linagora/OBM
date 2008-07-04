@@ -16,7 +16,6 @@ require OBM::toolBox;
 require OBM::dbUtils;
 require OBM::passwd;
 use URI::Escape;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
 sub new {
@@ -347,15 +346,15 @@ sub getLdapObjectclass {
 sub createLdapEntry {
     my $self = shift;
     my ( $ldapEntry ) = @_;
-    my $dbEntry = $self->{hostDbDesc};
-    my $entryProp = $self->{hostDesc};
-    my $entryLinks = $self->{hostLinks};
+    my $dbEntry = $self->{'hostDbDesc'};
+    my $entryProp = $self->{'hostDesc'};
+    my $entryLinks = $self->{'hostLinks'};
 
     # Les paramètres nécessaires
-    if( $dbEntry->{host_name} ) {
+    if( $dbEntry->{'host_name'} ) {
         $ldapEntry->add(
             objectClass => $self->getLdapObjectclass(),
-            cn => $dbEntry->{host_name}
+            cn => $dbEntry->{'host_name'}
         );
 
     }else {
@@ -363,46 +362,46 @@ sub createLdapEntry {
     }
 
     # La description
-    if( $dbEntry->{host_description} ) {
-        $ldapEntry->add( description => to_utf8({ -string => $dbEntry->{host_description}, -charset => $defaultCharSet }) );
+    if( $dbEntry->{'host_description'} ) {
+        $ldapEntry->add( description => $dbEntry->{'host_description'} );
     }
 
     # L'adresse IP
-    if( $entryProp->{host_ip} ) {
-        $ldapEntry->add( ipHostNumber => $entryProp->{host_ip} );
+    if( $entryProp->{'host_ip'} ) {
+        $ldapEntry->add( ipHostNumber => $entryProp->{'host_ip'} );
     }
 
     # Le domaine OBM
-    if( $entryProp->{host_domain} ) {
-        $ldapEntry->add( obmDomain => to_utf8({ -string => $entryProp->{host_domain}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'host_domain'} ) {
+        $ldapEntry->add( obmDomain => $entryProp->{'host_domain'} );
     }
 
     # Le nom windows
-    if( $entryProp->{host_login} ) {
-        $ldapEntry->add( uid => to_utf8({ -string => $entryProp->{host_login}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'host_login'} ) {
+        $ldapEntry->add( uid => $entryProp->{'host_login'} );
     }
 
     # Le SID de l'hôte
-    if( $entryProp->{host_samba_sid} ) {
-        $ldapEntry->add( sambaSID => to_utf8({ -string => $entryProp->{host_samba_sid}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'host_samba_sid'} ) {
+        $ldapEntry->add( sambaSID => $entryProp->{'host_samba_sid'} );
     }
 
     # Le groupe de l'hôte
-    if( $entryProp->{host_samba_group_sid} ) {
-        $ldapEntry->add( sambaPrimaryGroupSID => to_utf8({ -string => $entryProp->{host_samba_group_sid}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'host_samba_group_sid'} ) {
+        $ldapEntry->add( sambaPrimaryGroupSID => $entryProp->{'host_samba_group_sid'} );
     }
 
     # Les flags de l'hôte Samba
-    if( $entryProp->{host_samba_flags} ) {
-        $ldapEntry->add( sambaAcctFlags => to_utf8({ -string => $entryProp->{host_samba_flags}, -charset => $defaultCharSet }) );
+    if( $entryProp->{'host_samba_flags'} ) {
+        $ldapEntry->add( sambaAcctFlags => $entryProp->{'host_samba_flags'} );
     }
 
     # Les mots de passes windows
-    if( $entryProp->{host_lm_passwd} ) {
-        $ldapEntry->add( sambaLMPassword => $entryProp->{host_lm_passwd} );
+    if( $entryProp->{'host_lm_passwd'} ) {
+        $ldapEntry->add( sambaLMPassword => $entryProp->{'host_lm_passwd'} );
     }
-    if( $entryProp->{host_nt_passwd} ) {
-        $ldapEntry->add( sambaNTPassword => $entryProp->{host_nt_passwd} );
+    if( $entryProp->{'host_nt_passwd'} ) {
+        $ldapEntry->add( sambaNTPassword => $entryProp->{'host_nt_passwd'} );
     }
 
     return 1;

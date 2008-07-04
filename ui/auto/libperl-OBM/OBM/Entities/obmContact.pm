@@ -14,7 +14,6 @@ require OBM::Ldap::utils;
 require OBM::toolBox;
 require OBM::dbUtils;
 use URI::Escape;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
 sub new {
@@ -252,12 +251,12 @@ sub createLdapEntry {
     my $entry = $self->{"contactDesc"};
 
     # Les paramètres nécessaires
-    if( $entry->{"contact_uid"} ) {
+    if( $entry->{'contact_uid'} ) {
         $ldapEntry->add(
-            objectClass => $self->{"typeDesc"}->{"objectclass"},
-            uid => to_utf8({ -string => $entry->{"contact_uid"}, -charset => $defaultCharSet }),
-            cn => to_utf8({ -string => $entry->{"contact_common_name"}, -charset => $defaultCharSet}),
-            displayName => to_utf8({ -string => $entry->{"contact_common_name"}, -charset => $defaultCharSet})
+            objectClass => $self->{'typeDesc'}->{'objectclass'},
+            uid => $entry->{'contact_uid'},
+            cn => $entry->{'contact_common_name'},
+            displayName => $entry->{'contact_common_name'}
         );
 
     }else {
@@ -265,97 +264,97 @@ sub createLdapEntry {
     }
 
     # Le prénom
-    if( $entry->{"contact_firstname"} ) {
-        $ldapEntry->add( givenName => to_utf8({ -string => $entry->{"contact_firstname"}, -charset => $defaultCharSet }) );
+    if( $entry->{'contact_firstname'} ) {
+        $ldapEntry->add( givenName => $entry->{'contact_firstname'} );
     }
 
     # Le nom
-    if( $entry->{"contact_lastname"} ) {
-        $ldapEntry->add( sn => to_utf8({ -string => $entry->{"contact_lastname"}, -charset => $defaultCharSet }) );
+    if( $entry->{'contact_lastname'} ) {
+        $ldapEntry->add( sn => $entry->{"contact_lastname"} );
     }
 
     # Le titre
-    if( $entry->{"contact_title"} ) {
-        $ldapEntry->add( title => to_utf8({ -string => $entry->{"contact_title"}, -charset => $defaultCharSet }) );
+    if( $entry->{'contact_title'} ) {
+        $ldapEntry->add( title => $entry->{'contact_title'} );
     }
 
     # La description
-    if( $entry->{"contact_comment"} ) {
-        $ldapEntry->add( description => to_utf8({ -string => $entry->{"contact_comment"}, -charset => $defaultCharSet }) );
+    if( $entry->{'contact_comment'} ) {
+        $ldapEntry->add( description => $entry->{'contact_comment'} );
     }
 
     # Le téléphone
-    if( $entry->{"contact_phone"} ) {
-        $ldapEntry->add( telephoneNumber => $entry->{"contact_phone"} );
+    if( $entry->{'contact_phone'} ) {
+        $ldapEntry->add( telephoneNumber => $entry->{'contact_phone'} );
     }
 
     # Le fax
-    if( $entry->{"contact_fax"} ) {
-        $ldapEntry->add( facsimileTelephoneNumber => $entry->{"contact_fax"} );
+    if( $entry->{'contact_fax'} ) {
+        $ldapEntry->add( facsimileTelephoneNumber => $entry->{'contact_fax'} );
     }
 
     # Le mobile
-    if( $entry->{"contact_mobilephone"} ) {
-        $ldapEntry->add( mobile => $entry->{"contact_mobilephone"} );
+    if( $entry->{'contact_mobilephone'} ) {
+        $ldapEntry->add( mobile => $entry->{'contact_mobilephone'} );
     }
 
     # La société
-    if( $entry->{"company_name"} ) {
-        $ldapEntry->add( o => to_utf8({ -string => $entry->{"company_name"}, -charset => $defaultCharSet }) );
-    }elsif($entry->{"contact_company"}) {
-        $ldapEntry->add( o => to_utf8({ -string => $entry->{"contact_company"}, -charset => $defaultCharSet }) );
+    if( $entry->{'company_name'} ) {
+        $ldapEntry->add( o => $entry->{'company_name'} );
+    }elsif($entry->{'contact_company'}) {
+        $ldapEntry->add( o => $entry->{'contact_company'} );
     }
 
     # Le service
-    if( $entry->{"contact_service"} ) {
-        $ldapEntry->add( ou => to_utf8({ -string => $entry->{"contact_service"}, -charset => $defaultCharSet }) );
+    if( $entry->{'contact_service'} ) {
+        $ldapEntry->add( ou => $entry->{'contact_service'} );
     }
 
     # L'e-mail
-    if( $entry->{"contact_email"} ) {
-        $ldapEntry->add( mail => to_utf8({ -string => $entry->{"contact_email"}, -charset => $defaultCharSet }) );
+    if( $entry->{'contact_email'} ) {
+        $ldapEntry->add( mail => $entry->{'contact_email'} );
     }
 
     # L'adresse
-    if( $entry->{"contact_address1"} || $entry->{"contact_address2"} || $entry->{"contact_address3"} ) {
-        my $address = "";
+    if( $entry->{'contact_address1'} || $entry->{'contact_address2'} || $entry->{'contact_address3'} ) {
+        my $address = '';
 
-        if( defined( $entry->{"contact_address1"} ) ) {
-            $address .= $entry->{"contact_address1"};
+        if( defined( $entry->{'contact_address1'} ) ) {
+            $address .= $entry->{'contact_address1'};
         }
 
         if( defined( $address ) ) {
             $address .= "\r\n";
         }
 
-        if( defined( $entry->{"contact_address2"} ) ) {
-            $address .= $entry->{"contact_address2"};
+        if( defined( $entry->{'contact_address2'} ) ) {
+            $address .= $entry->{'contact_address2'};
         }
 
         if( defined( $address ) ) {
             $address .= "\r\n";
         }
 
-        if( defined( $entry->{"contact_address3"} ) ) {
-            $address .= $entry->{"contact_address3"};
+        if( defined( $entry->{'contact_address3'} ) ) {
+            $address .= $entry->{'contact_address3'};
         }   
 
         # Thunderbird, IceDove... : ne comprennent que cet attribut
-        $ldapEntry->add( street => to_utf8({ -string => $address,  -charset => $defaultCharSet }) );
+        $ldapEntry->add( street => $address );
         # Outlook : ne comprend que cet attribut
         # Outlook Express : préfère celui-là à 'street'
-        $ldapEntry->add( postalAddress => to_utf8({ -string => $address,  -charset => $defaultCharSet }) );
+        $ldapEntry->add( postalAddress => $address );
 
     }
 
     # Le code postal
-    if( $entry->{"contact_zipcode"} ) {
-        $ldapEntry->add( postalCode => to_utf8({ -string => $entry->{"contact_zipcode"}, -charset => $defaultCharSet }) );
+    if( $entry->{'contact_zipcode'} ) {
+        $ldapEntry->add( postalCode => $entry->{'contact_zipcode'} );
     }
 
     # La ville
-    if( $entry->{"contact_town"} ) {
-        $ldapEntry->add( l => to_utf8({ -string => $entry->{"contact_town"}, -charset => $defaultCharSet }) );
+    if( $entry->{'contact_town'} ) {
+        $ldapEntry->add( l => $entry->{"contact_town"} );
     }
 
     return 1;
@@ -365,7 +364,7 @@ sub createLdapEntry {
 sub updateLdapEntryDn {
     my $self = shift;
     my( $ldapEntry ) = @_;
-    my $dbContactDesc = $self->{contactDbDesc};
+    my $dbContactDesc = $self->{'contactDbDesc'};
     my $update = 0;
 
     if( !defined($ldapEntry) ) {
@@ -379,7 +378,7 @@ sub updateLdapEntryDn {
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry ) = @_;
-    my $entry = $self->{"contactDesc"};
+    my $entry = $self->{'contactDesc'};
 
 
     if( !defined($ldapEntry) ) {

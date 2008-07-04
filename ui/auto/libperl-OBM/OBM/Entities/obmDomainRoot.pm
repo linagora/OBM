@@ -12,7 +12,6 @@ use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getL
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
 sub new {
@@ -83,15 +82,15 @@ sub getLdapDnPrefix {
 sub createLdapEntry {
     my $self = shift;
     my( $ldapEntry ) = @_;
-    my $entry = $self->{"domainDesc"};
+    my $entry = $self->{'domainDesc'};
 
 
     # On construit la nouvelle entree
-    if( $entry->{"domain_label"} ) {
+    if( $entry->{'domain_label'} ) {
         $ldapEntry->add(
-            objectClass => $self->{"objectclass"},
-            dc => to_utf8( { -string => $entry->{"domain_dn"}, -charset => $defaultCharSet } ),
-            o => to_utf8( { -string => $entry->{"domain_label"}, -charset => $defaultCharSet } )
+            objectClass => $self->{'objectclass'},
+            dc => $entry->{'domain_dn'},
+            o => $entry->{'domain_label'}
         );
 
     }else {
@@ -99,8 +98,8 @@ sub createLdapEntry {
     }
 
     # La description
-    if( $entry->{"domain_desc"} ) {
-        $ldapEntry->add( description => to_utf8({ -string => $entry->{"domain_desc"}, -charset => $defaultCharSet }) );
+    if( $entry->{'domain_desc'} ) {
+        $ldapEntry->add( description => $entry->{'domain_desc'} );
     }
 
     return 1;

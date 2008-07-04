@@ -14,7 +14,6 @@ require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::toolBox;
 require OBM::dbUtils;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 
 sub new {
@@ -52,18 +51,18 @@ sub new {
     }
 
 
-    $obmMailshareAttr{"links"} = $links;
-    $obmMailshareAttr{"toDelete"} = $deleted;
+    $obmMailshareAttr{'links'} = $links;
+    $obmMailshareAttr{'toDelete'} = $deleted;
 
-    $obmMailshareAttr{"type"} = $OBM::Parameters::ldapConf::MAILSHARE;
-    $obmMailshareAttr{"entityRightType"} = "MailShare";
-    $obmMailshareAttr{"archive"} = 0;
-    $obmMailshareAttr{"sieve"} = 0;
+    $obmMailshareAttr{'type'} = $OBM::Parameters::ldapConf::MAILSHARE;
+    $obmMailshareAttr{'entityRightType'} = 'MailShare';
+    $obmMailshareAttr{'archive'} = 0;
+    $obmMailshareAttr{'sieve'} = 0;
 
     # Définition de la représentation LDAP de ce type
-    $obmMailshareAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{objectclass};
-    $obmMailshareAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{dn_prefix};
-    $obmMailshareAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{dn_value};
+    $obmMailshareAttr{'objectclass'} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{objectclass};
+    $obmMailshareAttr{'dnPrefix'} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{dn_prefix};
+    $obmMailshareAttr{'dnValue'} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{dn_value};
 
     bless( \%obmMailshareAttr, $self );
 }
@@ -73,9 +72,9 @@ sub getEntity {
     my $self = shift;
     my( $dbHandler, $domainDesc ) = @_;
 
-    my $mailShareId = $self->{"objectId"};
+    my $mailShareId = $self->{'objectId'};
     if( !defined($mailShareId) ) {
-        &OBM::toolBox::write_log( "[Entities::obmMailshare]: aucun identifiant de partage de messagerie definit", "W" );
+        &OBM::toolBox::write_log( '[Entities::obmMailshare]: aucun identifiant de partage de messagerie definit', 'W' );
         return 0;
     }
 
@@ -462,52 +461,52 @@ sub getLdapDnPrefix {
 sub createLdapEntry {
     my $self = shift;
     my ( $ldapEntry ) = @_;
-    my $entry = $self->{"properties"};
+    my $entry = $self->{'properties'};
 
     # Les parametres necessaires
-    if( $entry->{"mailshare_name"} ) {
+    if( $entry->{'mailshare_name'} ) {
         $ldapEntry->add(
-            objectClass => $self->{"objectclass"},
-            cn => $entry->{"mailshare_name"}
+            objectClass => $self->{'objectclass'},
+            cn => $entry->{'mailshare_name'}
         );
 
     }else {
         return 0;
     }
 
-    if( $entry->{"mailshare_mailbox"} ) {
-        $ldapEntry->add( mailBox => $entry->{"mailshare_mailbox"} );
+    if( $entry->{'mailshare_mailbox'} ) {
+        $ldapEntry->add( mailBox => $entry->{'mailshare_mailbox'} );
     }
 
-    if( $entry->{"mailshare_description"} ) {
-        $ldapEntry->add( description => to_utf8({ -string => $entry->{"mailshare_description"}, -charset => $defaultCharSet }) );
+    if( $entry->{'mailshare_description'} ) {
+        $ldapEntry->add( description => $entry->{'mailshare_description'} );
     }
 
     # Le serveur de BAL local
-    if( $entry->{"mailShare_mailLocalServer"} ) {
-        $ldapEntry->add( mailBoxServer => $entry->{"mailShare_mailLocalServer"} );
+    if( $entry->{'mailShare_mailLocalServer'} ) {
+        $ldapEntry->add( mailBoxServer => $entry->{'mailShare_mailLocalServer'} );
     }
 
     # Les adresses mails
-    if( $entry->{"email"} ) {
-        $ldapEntry->add( mail => $entry->{"email"} );
+    if( $entry->{'email'} ) {
+        $ldapEntry->add( mail => $entry->{'email'} );
     }
 
     # Les adresses mails secondaires
-    if( $entry->{"emailAlias"} ) {
-        $ldapEntry->add( mailAlias => $entry->{"emailAlias"} );
+    if( $entry->{'emailAlias'} ) {
+        $ldapEntry->add( mailAlias => $entry->{'emailAlias'} );
     }
 
     # L'acces mail
-    if( $entry->{"mailshare_mailperms"} ) {
-        $ldapEntry->add( mailAccess => "PERMIT" );
+    if( $entry->{'mailshare_mailperms'} ) {
+        $ldapEntry->add( mailAccess => 'PERMIT' );
     }else {
-        $ldapEntry->add( mailAccess => "REJECT" );
+        $ldapEntry->add( mailAccess => 'REJECT' );
     }
 
     # Le domaine
-    if( $entry->{"mailshare_domain"} ) {
-        $ldapEntry->add( obmDomain => to_utf8({ -string => $entry->{"mailshare_domain"}, -charset => $defaultCharSet }) );
+    if( $entry->{'mailshare_domain'} ) {
+        $ldapEntry->add( obmDomain => $entry->{'mailshare_domain'} );
     }
 
 
