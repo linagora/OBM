@@ -59,6 +59,7 @@ function run_query_calendar_detail($calendar_id) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
+
   return $obm_q;
 }
 
@@ -70,6 +71,7 @@ function run_query_calendar_detail($calendar_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_get_user_name($users='') {
   global $cdg_sql;
+
   $multidomain = sql_multidomain('userobm');
 
   $in = "'".implode ("','", $users)."'";
@@ -192,6 +194,7 @@ function run_query_calendar_get_allusers($users_array,$groups_array) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_resourcegroup($group) {
   global $cdg_sql, $ctype_resource;
+
   if (is_array($group) && count($group) > 0) {
     
     $multidomain = sql_multidomain('rgroup');
@@ -221,6 +224,7 @@ function run_query_resource_resourcegroup($group) {
 //   - $group[] : Group parameters
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_get_group_resource($group) {
+
   $obm_q = run_query_resource_resourcegroup($group);
   $resources = array();
   if(is_object($obm_q)) {
@@ -238,6 +242,7 @@ function run_query_calendar_get_group_resource($group) {
 //   - $calendar : Calendar params
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_decision($calendar) {
+
   $entity_id = $calendar['entity_id'];
   $entity = $calendar['entity_kind'];
   $event_id = $calendar['calendar_id'];
@@ -254,9 +259,10 @@ function run_query_calendar_insert_decision($calendar) {
 //   - $user_id  : User id
 //   - $state    : New state to set (A, W or R)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state, $force = false){
+function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state, $force = false) {
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
+
   if ($entity_id == '') {
     $entity_id = $obm['uid'];
   }
@@ -1676,7 +1682,7 @@ function store_calendar_entities($entities_q) {
       $entity_tab['resource'][$id] = array(
         'name'  => $resource_q->f('resource_name'),
         'class' => "eventOwner$i",
-        'image' => ${"ico_calendar_user".$i},
+        'image' => ${'ico_calendar_user'.$i},
         'type'  => 'resource',
         'id'    => $id
       );
@@ -1691,7 +1697,7 @@ function store_calendar_entities($entities_q) {
       $entity_tab['resourcegroup'][$id] = array(
         'name'  => $resourcegroup_q->f('resource_name'),
         'class' => "calendarEventBg$i",
-        'image' => ${"ico_calendar_user".$i},
+        'image' => ${'ico_calendar_user'.$i},
         'type'  => 'resourcegroup',
         'id'    => $id,
         'group' => $resourcegroup_q->f('resource_group'),
@@ -2258,8 +2264,10 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
 //   - $start           : timestamp of start date
 //   - $end             : timestamp of end date
 //   - $calendar_entity : array of entities elements to display
+//   - $status          : array of event status to get ('A', 'R', 'W')
+//   - $category_filter : category
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$category_filter = '') {
+function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $status, $category_filter='') {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -2268,7 +2276,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
   $calendarevent_date_l = sql_date_format($db_type,'calendarevent_date','calendarevent_date');
 
   $multidomain = sql_multidomain('calendarevent');
-  if($category_filter != '') {
+  if ($category_filter != '') {
     $filter = " AND calendarcategory1_id = '$category_filter' ";
   }
   if (is_array($calendar_entity['user'])
@@ -2283,7 +2291,21 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       && (count($calendar_entity['resourcegroup']) > 0) ) {
     $has_resourcegroup = true;
   }
-  
+
+  $first = true;
+  if (is_array($status)
+      && (count($status) > 0) ) {
+    foreach ($status as $one_status) {
+      if ($first) {
+	$where_status = "AND (evententity_state = '$one_status'";
+	$first = false;
+      } else {
+	$where_status .= " OR evententity_state = '$one_status'";
+      }
+    }
+    $where_status .= ')';
+  }
+
   if ($has_user) {
     $where_user .= "( evententity_entity_id IN (";
     foreach($calendar_entity['user'] as $id => $prop) {
@@ -2345,7 +2367,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       LEFT JOIN CalendarCategory1
         ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
-    WHERE (evententity_state = 'A' OR evententity_state = 'W')
+    WHERE 1=1
+      $where_status
       $filter
       AND calendarevent_repeatkind = 'none'
       AND $calendarevent_date >= $start - calendarevent_duration
@@ -2376,14 +2399,15 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
       LEFT JOIN CalendarCategory1
         ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
-    WHERE (evententity_state = 'A' OR evententity_state = 'W')
+    WHERE 1=1
+      $where_status
       $filter
       AND calendarevent_repeatkind = 'none'
       AND $calendarevent_date >= $start - calendarevent_duration
       AND $calendarevent_date <= $end
       $where_ent
       $multidomain
-      $union
+    $union
       ORDER BY calendarevent_date, evententity_entity, evententity_entity_id
 ";
 
@@ -2396,10 +2420,12 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity,$cate
 ///////////////////////////////////////////////////////////////////////////////
 // Return all not rejected events in a week of users or/and groups
 // Parameters:
-//   - $calendar          : calendar params
+//   - $start           : timestamp of start date
+//   - $end             : timestamp of end date
 //   - $calendar_entity : array of entities elements to display
+//   - $status          : array of event status to get ('A', 'R', 'W')
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_repeat_events($start, $end, $calendar_entity, $category_filter='') {
+function run_query_calendar_repeat_events($start, $end, $calendar_entity, $status, $category_filter='') {
   global $cdg_sql;
   
   $obm_q = new DB_OBM;
@@ -2409,7 +2435,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
   $calendarevent_date_l = sql_date_format($db_type,'calendarevent_date','calendarevent_date');
   $calendarevent_endrepeat_l = sql_date_format($db_type,'calendarevent_endrepeat','calendarevent_endrepeat');
   $multidomain = sql_multidomain('calendarevent');
-  if($category_filter != '') {
+  if ($category_filter != '') {
     $filter = " AND calendarcategory1_id = '$category_filter' ";
   }
   if (is_array($calendar_entity['user'])
@@ -2419,6 +2445,20 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
   if (is_array($calendar_entity['resource'])
       && (count($calendar_entity['resource']) > 0) ) {
     $has_resource = true;
+  }
+
+  $first = true;
+  if (is_array($status)
+      && (count($status) > 0) ) {
+    foreach ($status as $one_status) {
+      if ($first) {
+	$where_status = "AND (evententity_state = '$one_status'";
+	$first = false;
+      } else {
+	$where_status .= " OR evententity_state = '$one_status'";
+      }
+    }
+    $where_status .= ')';
   }
 
   if ($has_user) {
@@ -2491,6 +2531,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
         ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
    WHERE calendarevent_repeatkind != 'none'
+      $where_status
       $filter
       AND $calendarevent_date <= $end 
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
@@ -2525,8 +2566,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $categ
         ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
     WHERE calendarevent_repeatkind != 'none'
+      $where_status
       $filter
-      AND evententity_state = 'A'
       AND $calendarevent_date <= $end 
       AND ($calendarevent_endrepeat >= $start - calendarevent_duration
       OR $calendarevent_endrepeat = '0' OR calendarevent_endrepeat IS NULL)
@@ -2687,12 +2728,12 @@ function get_one_event_user_alert($event_id, $user_id = null) {
 //   - $end_time        : timestamp of end date
 //   - $calendar_entity :
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_events_model($start_time, $end_time, $calendar_entity,$category_filter='', $unique=false) {
+function calendar_events_model($start_time, $end_time, $calendar_entity, $status=array('A'), $category_filter='', $unique=false) {
   global $day_duration;
 
   $day_duration = 86400;
   // Get all non repeating events and construct occurences & events model
-  $nr_q = run_query_calendar_no_repeat_events($start_time,$end_time,$calendar_entity,$category_filter);
+  $nr_q = run_query_calendar_no_repeat_events($start_time,$end_time,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
   $of->setBegin($start_time);
   $of->setEnd($end_time);
@@ -2725,7 +2766,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
   }
   
   // Get all repeating events and construct occurences & events model
-  $r_q = run_query_calendar_repeat_events($start_time,$end_time,$calendar_entity,$category_filter);
+  $r_q = run_query_calendar_repeat_events($start_time,$end_time,$calendar_entity, $status, $category_filter);
   while ($r_q->next_record()) {
     $id = $r_q->f('calendarevent_id');
     $title = $r_q->f('calendarevent_title');
@@ -2744,7 +2785,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     $repeatfrequence = $r_q->f('calendarevent_repeatfrequence');
     $repeatdays = $r_q->f('calendarevent_repeatdays');
     $entity_id = $r_q->f('evententity_entity_id');
-    $entity_state = $nr_q->f('evententity_state');
+    $entity_state = $r_q->f('evententity_state');
     $all_day = $r_q->f('calendarevent_allday');    
     $owner = $r_q->f('calendarevent_owner');
     if (!$endrepeat) {
@@ -2769,20 +2810,20 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
     if ($addOcc) {
       switch ($repeatkind) {
         case 'daily' :
-          calendar_daily_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity);	
-          break; 
+          calendar_daily_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          break;
         case 'weekly' :
-          calendar_weekly_repeatition($date,$event_start,$end_date,$repeatdays,$repeatfrequence,$event,$entity_id,$entity); 
+          calendar_weekly_repeatition($date,$event_start,$end_date,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
           break;
         case 'monthlybyday' :
-          $stored = calendar_monthlybyday_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity); 
+          $stored = calendar_monthlybyday_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
           break;
         case 'monthlybydate' :
-          $stored = calendar_monthlybydate_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity);
+          $stored = calendar_monthlybydate_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
           break;
         case 'yearly' :
-          $stored = calendar_yearly_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity);
-          break;	
+          $stored = calendar_yearly_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          break;
       }
     }
   }
@@ -2827,8 +2868,9 @@ function calendar_events_model($start_time, $end_time, $calendar_entity,$categor
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity) {
+function calendar_daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity, $entity_state) {
   global $day_duration;
+
   $day_duration = 86400;
   $temp_date = $date;
   if ($temp_date < $start_time) {
@@ -2842,7 +2884,7 @@ function calendar_daily_repeatition($date,$start_time,$end_date,$repeatfrequence
   }
   while ($temp_date < $end_date ) {
     $of = &OccurrenceFactory::getInstance();
-    $of->addOccurrence($event, $temp_date, $entity, $entity_id);
+    $of->addOccurrence($event, $temp_date, $entity, $entity_id, $entity_state);
     $temp_date = strtotime("+$repeatfrequence days",$temp_date);
   }
 }
@@ -2853,7 +2895,7 @@ function calendar_daily_repeatition($date,$start_time,$end_date,$repeatfrequence
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$event,$entity_id,$entity) {
+function calendar_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$event,$entity_id,$entity, $entity_state) {
   global $day_duration, $ccalendar_weekstart;
 
   $temp_date = get_calendar_date_day_of_week($date, $ccalendar_weekstart);
@@ -2878,7 +2920,7 @@ function calendar_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$re
         if ($current_date >= $start_time && $current_date < $end_date 
             && $current_date >= $date) {
           $of = &OccurrenceFactory::getInstance();
-          $of->addOccurrence($event, $current_date, $entity, $entity_id);
+          $of->addOccurrence($event, $current_date, $entity, $entity_id, $entity_state);
 	}
       }
     } 
@@ -2892,7 +2934,7 @@ function calendar_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$re
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity) {
+function calendar_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity, $entity_state) {
   global $day_duration,$ccalendar_weekstart;
 
   $temp_date = $date;
@@ -2924,7 +2966,7 @@ function calendar_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfr
        && $event_end >= $start_time
        && $current_date < $end_date) {
       $of = &OccurrenceFactory::getInstance();
-      $of->addOccurrence($event, $current_date, $entity, $entity_id);
+      $of->addOccurrence($event, $current_date, $entity, $entity_id, $entity_state);
     }
     $ts_cur = strtotime("+$repeatfrequence months", $ts_cur);
   }	
@@ -2936,7 +2978,7 @@ function calendar_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfr
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity) {  
+function calendar_monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity, $entity_state) {  
   global $day_duration;
 
   $temp_date = $date;
@@ -2959,7 +3001,7 @@ function calendar_monthlybydate_repeatition($date,$start_time,$end_date,$repeatf
   $ts_date = strtotime("+$hour_diff hours +$min_diff minutes",$ts_date);
   while ($ts_date < $end_date) {
     $of = &OccurrenceFactory::getInstance();
-    $of->addOccurrence($event, $ts_date, $entity, $entity_id);
+    $of->addOccurrence($event, $ts_date, $entity, $entity_id, $entity_state);
     $ts_date = strtotime("+$repeatfrequence months",$ts_date);
   }  
 }
@@ -2970,8 +3012,9 @@ function calendar_monthlybydate_repeatition($date,$start_time,$end_date,$repeatf
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity) {  
+function calendar_yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity, $entity_state) {
   global $day_duration;
+
   $temp_date = $date;    
   if ($temp_date < $start_time) {
     $temp_date = strtotime(date('Y-m-01',$start_time));
@@ -2991,7 +3034,7 @@ function calendar_yearly_repeatition($date,$start_time,$end_date,$repeatfrequenc
   $ts_date = strtotime("+$hour_diff hours +$min_diff minutes",$ts_date);
   while ($ts_date < $end_date) {
     $of = &OccurrenceFactory::getInstance();
-    $of->addOccurrence($event, $ts_date, $entity, $entity_id);
+    $of->addOccurrence($event, $ts_date, $entity, $entity_id, $entity_state);
     $ts_date = strtotime("+$repeatfrequence years",$ts_date);
   }
 }
@@ -3083,6 +3126,7 @@ function run_query_calendar_get_bookmark_property($id) {
   return $return;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Insert a calendar view
 // Parameters:
@@ -3092,29 +3136,29 @@ function run_query_calendar_insert_view($calendar) {
   global $cdg_sql, $obm;
   global $c_all;
 
-  $calendar_bookmarkproperties = array("category", "cal_range", "cal_view");
+  $calendar_bookmarkproperties = array('category', 'cal_range', 'cal_view');
 
   $obm_q = new DB_OBM;
-  $user_id = $obm["uid"];
+  $user_id = $obm['uid'];
 
-  $label = $calendar["view_label"];
+  $label = $calendar['view_label'];
   // Category
-  $category = $calendar["category_filter"];
+  $category = $calendar['category_filter'];
   if (empty($category)) {
     $category = $c_all;
   }
   
   // Entity
-  $group = $calendar["entity"]["group"][0];
+  $group = $calendar['entity']['group'][0];
   if (empty($group)) {
-    $users = is_array($calendar["entity"]["user"]) ? implode(",", array_unique($calendar["entity"]["user"])) : "" ;
-    array_push($calendar_bookmarkproperties, "users");
+    $users = is_array($calendar['entity']['user']) ? implode(',', array_unique($calendar['entity']['user'])) : '';
+    array_push($calendar_bookmarkproperties, 'users');
   } else {
-    array_push($calendar_bookmarkproperties, "group");
+    array_push($calendar_bookmarkproperties, 'group');
   }
-  $resources = is_array($calendar["entity"]["resource"]) ? implode(",", array_unique($calendar["entity"]["resource"])) : "" ;
+  $resources = is_array($calendar['entity']['resource']) ? implode(',', array_unique($calendar['entity']['resource'])) : '';
   if (!empty($resources)) {
-    array_push($calendar_bookmarkproperties, "resources");
+    array_push($calendar_bookmarkproperties, 'resources');
   }
 
   // Range
@@ -3140,7 +3184,7 @@ function run_query_calendar_insert_view($calendar) {
     AND obmbookmark_entity='calendar'";
   $obm_q->query($query);
   $obm_q->next_record();
-  $obmbookmark_id = $obm_q->f("obmbookmark_id");
+  $obmbookmark_id = $obm_q->f('obmbookmark_id');
 
   // Insert ObmBookmark properties 
   if (is_array($calendar_bookmarkproperties)) {
@@ -3174,7 +3218,7 @@ function run_query_calendar_delete_view($calendar) {
 
   $obm_q = new DB_OBM;
 
-  $id = $calendar["view_id"];
+  $id = $calendar['view_id'];
 
   // Delete view
   $query = "DELETE FROM ObmBookmark WHERE obmbookmark_id='$id'";

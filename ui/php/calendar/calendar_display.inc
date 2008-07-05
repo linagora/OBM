@@ -677,7 +677,8 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
     }
   } while ($whole_month == TRUE);   
 
-  $occurrences = calendar_events_model($start_time, $current_time, $calendar_entity,$category_filter);
+  $status = array('A', 'W');
+  $occurrences = calendar_events_model($start_time, $current_time, $calendar_entity, $status, $category_filter);
   
   if (is_array($occurrences)) {
     $week_duration = 86400*7;
@@ -764,7 +765,8 @@ function dis_calendar_month_printable($calendar, $calendar_entity,$writable_enti
   $nb_res = count($calendar_entity['resource']);
   $nb_ent = $nb_user + $nb_res;
 
-  calendar_events_model($start_time,strtotime('+1 month',$start_time), $calendar_entity,$category_filter);
+  $status = array('A');
+  calendar_events_model($start_time,strtotime('+1 month',$start_time), $calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
 
   // Display the day of a week
@@ -949,7 +951,8 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
       $week_cal .= '</tr>';
     }
   }
-  $occurrences = calendar_events_model($start_week_day,strtotime('+7 days',$start_week_day),$calendar_entity,$category_filter);
+  $status = array('A', 'W');
+  $occurrences = calendar_events_model($start_week_day,strtotime('+7 days',$start_week_day),$calendar_entity, $status, $category_filter);
   $w = date('w',$start_week_day);
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
@@ -1071,7 +1074,8 @@ function dis_calendar_week_printable($calendar, $calendar_entity,$writable_entit
 function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, $category_filter) {
   global $ccalendar_first_hour, $ccalendar_last_hour;
   
-  calendar_events_model($start_time,$end_time,$calendar_entity,$category_filter);
+  $status = array('A');
+  calendar_events_model($start_time,$end_time,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance(); 
   $day_duration = 86400;
   $interval = $_SESSION['set_cal_interval']; 
@@ -1267,8 +1271,9 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
     }
   }
 
-  $occurrences = calendar_events_model($ts_date,strtotime('+1 day', $ts_date), $calendar_entity,$category_filter);
-  if(is_array($occurrences)) {
+  $status = array('A', 'W');
+  $occurrences = calendar_events_model($ts_date,strtotime('+1 day', $ts_date), $calendar_entity, $status, $category_filter);
+  if (is_array($occurrences)) {
     $options = array();
     foreach($occurrences as $occurrence) {
       $dis_event .= dis_calendar_event($occurrence, 'hour',$calendar_entity,$writable_entity,$options);
@@ -1523,7 +1528,8 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   
   $category_filter = $calendar['category_filter'];
 
-  $occurrences = calendar_events_model($start_time, $end_time,$calendar_entity,$category_filter,true);
+  $status = array('A');
+  $occurrences = calendar_events_model($start_time, $end_time,$calendar_entity, $status, $category_filter,true);
   $today_mark = false;
   $charset = mb_internal_encoding();
 
@@ -1743,7 +1749,8 @@ function dis_calendar_list_print($calendar, $calendar_entity, $writable_entity) 
   $prev_month = of_isodate_format(strtotime('-1 month', $ts_date));
 
   $list_title = "$start_week - $end_week"; 
-  $occurrences = calendar_events_model($start_week_day,strtotime('+7 days',$start_week_day),$calendar_entity,$category_filter,true);
+  $status = array('A');
+  $occurrences = calendar_events_model($start_week_day,strtotime('+7 days',$start_week_day), $calendar_entity, $status, $category_filter,true);
   $today_mark = false;
   $charset = mb_internal_encoding();
   // Set separator (if not set in setting => ;)
@@ -2028,7 +2035,8 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
    
   $day_duration = 86400;
 
-  $events = calendar_events_model($start_time,$end_time, $calendar_entity,$category_filter);
+  $status = array('A');
+  $events = calendar_events_model($start_time,$end_time, $calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
 
   $cats1 = of_category_get_ordered('calendar', 'category1');
@@ -2283,7 +2291,8 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
 function dis_calendar_planning_view($start_time, $end_time, $calendar_entity, $category_filter) {
   global $l_daysofweekfirst,$l_daysofweek;
   
-  calendar_events_model($start_time,$end_time,$calendar_entity,$category_filter);
+  $status = array('A');
+  calendar_events_model($start_time,$end_time,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance(); 
   $day_duration = 86400;
 
@@ -4152,7 +4161,8 @@ function dis_calendar_free_interval($calendar, $entity_store) {
   $start_week = calendar_localizeDate('week', $start_week_time);
   $end_week = calendar_localizeDate('week', $end_week_time);
   $display_date = "$start_week - $end_week"; 
-  calendar_events_model($start_week_day,$end_week_time,$entity_store);
+  $status = array('A');
+  calendar_events_model($start_week_day,$end_week_time,$entity_store, $status);
   $of = &OccurrenceFactory::getInstance();
   $day_duration = 86400; 
   /* Week Days headers */
