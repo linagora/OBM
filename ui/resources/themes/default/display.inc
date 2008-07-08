@@ -402,14 +402,14 @@ function display_head_theme($p_module) {
   obm.vars.labels.fatalServerErr = '".phpStringToJsString($l_fatal_server_err)."';
   
   window.onresize= function() {
-    while(obm.resize.\$chain && obm.resize.\$chain.length > 0) {
+    while(obm.resize.chains && obm.resize.chains.length > 0) {
       obm.resize.callChain();
     }
   }
 
   obm.initialize.chain(datePickerGenerator);
-  window.addEvent('domready', function () {
-    while(obm.initialize.\$chain && obm.initialize.\$chain.length > 0) {
+  window.onDomReady( function () {
+    while(obm.initialize.chains && obm.initialize.chains.length > 0) {
       obm.initialize.callChain();
     }
   });
