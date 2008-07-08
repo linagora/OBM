@@ -368,7 +368,7 @@ function display_head_theme($p_module) {
 
   return "$headers_e
 <head>
-  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
+  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
   <title>$l_obm_title - $p_module</title>
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css\" />
   $dis_extra_css
@@ -402,14 +402,14 @@ function display_head_theme($p_module) {
   obm.vars.labels.fatalServerErr = '".phpStringToJsString($l_fatal_server_err)."';
   
   window.onresize= function() {
-    while(obm.resize.chains && obm.resize.chains.length > 0) {
+    while(obm.resize.\$chain && obm.resize.\$chain.length > 0) {
       obm.resize.callChain();
     }
   }
 
   obm.initialize.chain(datePickerGenerator);
-  window.onDomReady( function () {
-    while(obm.initialize.chains && obm.initialize.chains.length > 0) {
+  window.addEvent('domready', function () {
+    while(obm.initialize.\$chain && obm.initialize.\$chain.length > 0) {
       obm.initialize.callChain();
     }
   });
