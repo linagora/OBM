@@ -739,7 +739,7 @@ CREATE TABLE EventEntity (
   evententity_entity_id    integer NOT NULL default 0,
   evententity_entity       varchar(32) NOT NULL default '',
   evententity_state        char(1) NOT NULL default '',
-  evententity_required     integer NOT NULL default 0,
+  evententity_required     boolean NOT NULL default FALSE,
   PRIMARY KEY (evententity_event_id,evententity_entity_id,evententity_entity)
 );
 
