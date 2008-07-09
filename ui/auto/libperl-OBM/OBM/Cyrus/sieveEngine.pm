@@ -237,7 +237,7 @@ sub _doWork {
         }
 
         # On supprime le script local
-        &OBM::utils::execCmd( "/bin/rm -f ".$localSieveScriptName );   
+        unlink( $localSieveScriptName );
     }else {
         &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: suppression du script Sieve pour l'utilisateur '".$mailBoxName."'", "W" );
     }
