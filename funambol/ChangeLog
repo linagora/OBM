@@ -1,3 +1,41 @@
+2008-07-11  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Use new obm-sync client
+	
+	* .classpath:
+	* build/build_deploy_vm.sh:
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.beginSync):
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper..getRecurrence),
+	(CalendarHelper..getRecurrenceFromFoundation),
+	(CalendarHelper..isUserRefused), (CalendarHelper..refuseEvent):
+	* src/java/fr/aliasource/funambol/utils/ContactHelper.java:
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager), (CalendarManager.CalendarManager),
+	(CalendarManager.getBinding), (CalendarManager.logIn),
+	(CalendarManager.initUserEmail),
+	(CalendarManager.getRefusedItemKeys),
+	(CalendarManager.getItemFromId), (CalendarManager.removeItem),
+	(CalendarManager.updateItem), (CalendarManager.addItem),
+	(CalendarManager.getEventTwinKeys), (CalendarManager.getSync),
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.fillObmEventWithVEvent),
+	(CalendarManager.parseStart):
+	* src/java/fr/aliasource/obm/items/manager/ContactManager.java:
+	(ContactManager), (ContactManager.ContactManager),
+	(ContactManager.initRestriction), (ContactManager.logIn),
+	(ContactManager.getAllItemKeys), (ContactManager.getBinding),
+	(ContactManager.getNewItemKeys),
+	(ContactManager.getDeletedItemKeys),
+	(ContactManager.getUpdatedItemKeys),
+	(ContactManager.getItemFromId), (ContactManager.removeItem),
+	(ContactManager.updateItem), (ContactManager.addItem),
+	(ContactManager.getContactTwinKeys), (ContactManager.getSync),
+	(ContactManager.obmContactTofoundation),
+	(ContactManager.foundationContactToObm):
+	* src/java/fr/aliasource/obm/items/manager/ObmManager.java:
+
 2008-04-25  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	fix brain bug : s/endsWith/startsWith to detect indented vcal

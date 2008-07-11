@@ -3,7 +3,8 @@ package fr.aliasource.obm.items.manager;
 import java.util.List;
 import java.util.Map;
 
-import fr.aliacom.obm.wauth.AccessToken;
+import org.obm.sync.auth.AccessToken;
+
 import fr.aliasource.funambol.utils.Helper;
 
 public abstract class ObmManager {

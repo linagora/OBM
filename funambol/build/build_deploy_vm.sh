@@ -11,9 +11,9 @@ funambol_path=/usr/lib/funambol-6.5.1/funambol
 
 ant pack && \
 
-scp_vm.sh $1 ../output/obm-0.1.1/lib/obm-0.1.1.jar 
+scp_vm.sh $1 ../output/obm-0.1.1/lib/obm-0.1.1.jar ../lib/obm-sync-client.jar ../lib/commons-http* ../lib/commons-codec*
 connect_vm.sh $1 <<EOF
-cp obm-0.1.1.jar ${funambol_path}/WEB-INF/lib
+cp obm-0.1.1.jar commons-http* commons-codec* obm-sync-client.jar ${funambol_path}/WEB-INF/lib
 /etc/init.d/obm-tomcat restart
 exit
 EOF

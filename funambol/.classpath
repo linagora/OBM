@@ -3,24 +3,21 @@
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="src" path="tests"/>
 	<classpathentry kind="lib" path="lib/activation.jar"/>
-	<classpathentry kind="lib" path="lib/axis-ant.jar"/>
-	<classpathentry kind="lib" path="lib/axis.jar"/>
 	<classpathentry kind="lib" path="lib/commons-discovery.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/funambol-admin-dev.jar"/>
 	<classpathentry kind="lib" path="lib/funambol-server.jar"/>
-	<classpathentry kind="lib" path="lib/jaxrpc.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/obm-sync-client.jar"/>
-	<classpathentry kind="lib" path="lib/saaj.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
-	<classpathentry kind="lib" path="lib/wsdl4j.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/core-framework-6.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/foundation-6.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/pim-framework-6.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/server-framework-6.5.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

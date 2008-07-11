@@ -4,17 +4,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.sync.calendar.Attendee;
+import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventRecurrence;
 
 import com.funambol.common.pim.calendar.RecurrencePattern;
 import com.funambol.common.pim.calendar.RecurrencePatternException;
-
-import fr.aliacom.obm.wcalendar.Attendee;
-import fr.aliacom.obm.wcalendar.Event;
-import fr.aliacom.obm.wcalendar.EventRecurrence;
 
 public class CalendarHelper extends Helper {
 
@@ -140,13 +140,13 @@ public class CalendarHelper extends Helper {
 		RecurrencePattern result = null;
 
 		int interval = obmrec.getFrequence();
-		java.util.Calendar cend = obmrec.getEnd();
+		Date cend = obmrec.getEnd();
 		boolean noEndDate = true;
 		Date endrec = dend;
 
 		if (cend != null) {
 			noEndDate = false;
-			endrec = cend.getTime();
+			endrec = cend;
 		}
 
 		String sPatternStart = getUTCFormat(dstart);
@@ -324,7 +324,7 @@ public class CalendarHelper extends Helper {
 			cEndRec.add(Calendar.YEAR, 2049);
 			//cEndRec = null;
 		}
-		recurrence.setEnd(cEndRec);
+		recurrence.setEnd(cEndRec.getTime());
 
 		switch (rec.getTypeId()) {
 		case RecurrencePattern.TYPE_DAYLY:
@@ -366,10 +366,10 @@ public class CalendarHelper extends Helper {
 		return result;
 	}
 
-	public static boolean isUserRefused(String userEmail, Attendee[] attendees) {
-		for (int i = 0; i < attendees.length; i++) {
-			if (attendees[i].getEmail().equals(userEmail)
-					&& attendees[i].getStatus().equals("REFUSED")) {
+	public static boolean isUserRefused(String userEmail, List<Attendee> list) {
+		for (Attendee at : list) {
+			if (at.getEmail().equals(userEmail)
+					&& at.getStatus().equals("REFUSED")) {
 				return true;
 			}
 		}
@@ -378,9 +378,9 @@ public class CalendarHelper extends Helper {
 
 	public static void refuseEvent(Event event, String userEmail) {
 		if (event.getAttendees() != null) {
-			for (int i = 0; i < event.getAttendees().length; i++) {
-				if (event.getAttendees(i).getEmail().equals(userEmail)) {
-					event.getAttendees(i).setStatus("REFUSED");
+			for (Attendee at : event.getAttendees()) {
+				if (at.getEmail().equals(userEmail)) {
+					at.setStatus("REFUSED");
 					break;
 				}
 			}

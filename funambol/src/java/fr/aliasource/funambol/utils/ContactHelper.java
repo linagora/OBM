@@ -2,6 +2,8 @@ package fr.aliasource.funambol.utils;
 
 import java.util.List;
 
+import org.obm.sync.book.Contact;
+
 import com.funambol.common.pim.contact.Address;
 import com.funambol.common.pim.contact.BusinessDetail;
 import com.funambol.common.pim.contact.ContactDetail;
@@ -9,8 +11,6 @@ import com.funambol.common.pim.contact.Email;
 import com.funambol.common.pim.contact.Note;
 import com.funambol.common.pim.contact.Phone;
 import com.funambol.common.pim.contact.Title;
-
-import fr.aliacom.obm.wcontact.Contact;
 
 public class ContactHelper extends Helper {
 

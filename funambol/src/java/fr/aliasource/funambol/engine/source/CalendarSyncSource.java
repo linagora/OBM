@@ -52,9 +52,8 @@ public class CalendarSyncSource extends ObmSyncSource {
 		try {
 			manager.logIn(context.getPrincipal().getUser().getUsername(),
 					context.getPrincipal().getUser().getPassword());
-			manager.initUserEmail();
-
 			manager.setCalendar(manager.getToken().getUser());
+			manager.initUserEmail();
 			manager.initRestriction(getRestrictions());
 
 			super.beginSync(context);

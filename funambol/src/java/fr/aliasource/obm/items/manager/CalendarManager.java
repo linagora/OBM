@@ -1,6 +1,5 @@
 package fr.aliasource.obm.items.manager;
 
-import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,30 +8,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.xml.rpc.ServiceException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.sync.auth.AccessToken;
+import org.obm.sync.auth.AuthFault;
+import org.obm.sync.auth.ServerFault;
+import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.client.calendar.CalendarClient;
+import org.obm.sync.items.CalendarChanges;
+import org.obm.sync.locators.CalendarLocator;
 
 import com.funambol.framework.logging.FunambolLogger;
 import com.funambol.framework.logging.FunambolLoggerFactory;
 
-import fr.aliacom.obm.CalendarServiceLocator;
-import fr.aliacom.obm.ecalendar.CalendarBindingStub;
-import fr.aliacom.obm.fault.AuthFault;
-import fr.aliacom.obm.fault.ServerFault;
-import fr.aliacom.obm.wauth.AccessToken;
-import fr.aliacom.obm.wcalendar.CalendarSync;
-import fr.aliacom.obm.wcalendar.Event;
-import fr.aliacom.obm.wcalendar.EventRecurrence;
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.CalendarHelper;
 import fr.aliasource.funambol.utils.Helper;
 
 public class CalendarManager extends ObmManager {
 
-	private CalendarBindingStub binding;
-	private AccessToken token;
+	private CalendarClient binding;
 	private String calendar;
 	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
 	private String userEmail;
@@ -41,15 +37,8 @@ public class CalendarManager extends ObmManager {
 
 	public CalendarManager(String obmAddress) {
 
-		try {
-			CalendarServiceLocator calendarLocator = new CalendarServiceLocator();
-			calendarLocator.setCalendarEndpointAddress(obmAddress);
-			CalendarBindingStub calendarBinding = (CalendarBindingStub) calendarLocator
-					.getCalendar();
-			binding = calendarBinding;
-		} catch (ServiceException e) {
-			logger.error(e.getMessage(), e);
-		}
+		CalendarLocator calendarLocator = new CalendarLocator();
+		binding = calendarLocator.locate(obmAddress.replace("/Calendar", ""));
 	}
 
 	public void initRestriction(int restrictions) {
@@ -64,7 +53,7 @@ public class CalendarManager extends ObmManager {
 		this.calendar = calendar;
 	}
 
-	public CalendarBindingStub getBinding() {
+	public CalendarClient getBinding() {
 		return binding;
 	}
 
@@ -75,14 +64,7 @@ public class CalendarManager extends ObmManager {
 	//
 
 	public void logIn(String user, String pass) throws OBMException {
-		token = null;
-		try {
-			token = binding.logUserIn(user, pass);
-		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
-			throw new OBMException(e.getMessage());
-		}
+		token = binding.login(user, pass);
 		if (token == null) {
 			throw new OBMException("OBM Login refused for user : " + user);
 		}
@@ -92,12 +74,12 @@ public class CalendarManager extends ObmManager {
 		// userEmail = "nicolas.lascombes@aliasource.fr";
 
 		try {
+			logger.info("getUserEmail(" + calendar + ", " + token.getUser()
+					+ ")");
 			userEmail = binding.getUserEmail(token, calendar, token.getUser());
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
 			throw new OBMException(e.getMessage());
 		}
 	}
@@ -122,18 +104,14 @@ public class CalendarManager extends ObmManager {
 
 	public String[] getRefusedItemKeys(Timestamp since) throws OBMException {
 
-		Calendar d = Calendar.getInstance();
-		d.setTime(since);
-
+		Date d = new Date(since.getTime());
 		String[] keys = null;
 
 		try {
-			keys = binding.getRefusedKeys(token, calendar, d).getKey();
+			keys = binding.getRefusedKeys(token, calendar, d).getKeys();
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
 			throw new OBMException(e.getMessage());
 		}
 
@@ -165,8 +143,6 @@ public class CalendarManager extends ObmManager {
 				throw new OBMException(e.getMessage());
 			} catch (ServerFault e) {
 				throw new OBMException(e.getMessage());
-			} catch (RemoteException e) {
-				throw new OBMException(e.getMessage());
 			}
 		}
 
@@ -184,7 +160,7 @@ public class CalendarManager extends ObmManager {
 			// log.info(" attendees size : "+event.getAttendees().length );
 			// log.info(" owner : "+event.getOwner()+" calendar : "+calendar);
 			if (event.getAttendees() == null
-					|| event.getAttendees().length == 1) {
+					|| event.getAttendees().size() == 1) {
 				// no attendee (only the owner)
 				binding.removeEvent(token, calendar, key);
 			} else {
@@ -196,8 +172,6 @@ public class CalendarManager extends ObmManager {
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
 			throw new OBMException(e.getMessage());
 		}
 	}
@@ -213,8 +187,6 @@ public class CalendarManager extends ObmManager {
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
 			throw new OBMException(e.getMessage());
 		}
 
@@ -234,12 +206,10 @@ public class CalendarManager extends ObmManager {
 		try {
 			String uid = binding.createEvent(token, calendar,
 					foundationCalendarToObmEvent(event, type));
-			evt = binding.findEvent(token, calendar, uid);
+			evt = binding.getEventFromId(token, calendar, uid);
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
 			throw new OBMException(e.getMessage());
 		}
 
@@ -258,20 +228,16 @@ public class CalendarManager extends ObmManager {
 
 		Event evt = foundationCalendarToObmEvent(event, type);
 
-		// log.info(" look twin of :
-		// "+c.getFirstName()+","+c.getLastName()+","+c.getCompany());
 		if (evt == null) {
 			return new String[0];
 		}
 
 		try {
 			evt.setUid(null);
-			keys = binding.getEventTwinKeys(token, calendar, evt).getKey();
+			keys = binding.getEventTwinKeys(token, calendar, evt).getKeys();
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
 			throw new OBMException(e.getMessage());
 		}
 
@@ -281,21 +247,18 @@ public class CalendarManager extends ObmManager {
 	// ---------------- Private methods ----------------------------------
 
 	private void getSync(Timestamp since) throws OBMException {
-		Calendar d = null;
+		Date d = null;
 		if (since != null) {
-			d = Calendar.getInstance();
-			d.setTime(since);
+			d = new Date(since.getTime());
 		}
 
-		CalendarSync sync = null;
+		CalendarChanges sync = null;
 		// get modified items
 		try {
 			sync = binding.getSync(token, calendar, d);
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (RemoteException e) {
 			throw new OBMException(e.getMessage());
 		}
 
@@ -316,7 +279,7 @@ public class CalendarManager extends ObmManager {
 		for (Event e : updated) {
 			logger.info("getSync: " + e.getTitle() + ", d: "
 					+ e.getDate().getTime());
-			if (e.getClassification() == 1
+			if (e.getPrivacy() == 1
 					&& !calendar.equals(user)
 					|| (CalendarHelper.isUserRefused(userEmail, e
 							.getAttendees()))) {
@@ -353,12 +316,12 @@ public class CalendarManager extends ObmManager {
 		event.getUid().setPropertyValue(obmevent.getUid());
 
 		logger.info("bd -> pda - obmToFound: " + obmevent.getTitle()
-				+ " date: " + obmevent.getDate().getTime());
-		Date dstart = obmevent.getDate().getTime();
+				+ " date: " + obmevent.getDate());
+		Date dstart = obmevent.getDate();
 
 		logger.info("bd -> pda - utcFormat : "
 				+ CalendarHelper.getUTCFormat(dstart));
-		
+
 		Date dend = null;
 		if (!obmevent.isAllday()) {
 			event.getDtStart().setPropertyValue(
@@ -388,23 +351,23 @@ public class CalendarManager extends ObmManager {
 			event.getDtEnd()
 					.setPropertyValue(CalendarHelper.getUTCFormat(dend));
 		}
-		
+
 		if (obmevent.getAlert() != -1 && obmevent.getAlert() != 0) {
 			com.funambol.common.pim.calendar.Reminder remind = new com.funambol.common.pim.calendar.Reminder();
-			
+
 			remind.setMinutes(obmevent.getAlert() / 60);
 			remind.setActive(true);
 			event.setReminder(remind);
-		
+
 		} else {
 			com.funambol.common.pim.calendar.Reminder remind = new com.funambol.common.pim.calendar.Reminder();
 			remind.setActive(false);
 			event.setReminder(remind);
 		}
 		/*
-		logger.info("alert import:"+event.getReminder());
-		logger.info("alert import:"+obmevent.getAlert());
-		*/
+		 * logger.info("alert import:"+event.getReminder()); logger.info("alert
+		 * import:"+obmevent.getAlert());
+		 */
 		event.setAllDay(new Boolean(obmevent.isAllday()));
 
 		event.getSummary().setPropertyValue(obmevent.getTitle());
@@ -413,7 +376,7 @@ public class CalendarManager extends ObmManager {
 		event.getCategories().setPropertyValue(obmevent.getCategory());
 		event.getLocation().setPropertyValue(obmevent.getLocation());
 
-		if (obmevent.getClassification() == 1) {
+		if (obmevent.getPrivacy() == 1) {
 			event.getAccessClass().setPropertyValue(new Short((short) 2)); // olPrivate
 		} else {
 			event.getAccessClass().setPropertyValue(new Short((short) 0)); // olNormal
@@ -438,7 +401,7 @@ public class CalendarManager extends ObmManager {
 
 		}
 		event.setMileage(new Integer(0));
-		
+
 		return calendar;
 	}
 
@@ -499,11 +462,11 @@ public class CalendarManager extends ObmManager {
 			prodId = calendar.getProdId().getPropertyValueAsString();
 		}
 		logger.info("prodId: " + prodId);
-		
+
 		Date dstart = parseStart(prodId, foundation, event);
 		Date dend = parseEnd(prodId, foundation, event);
 		Date dalarm = null;
-		
+
 		if (dend.getTime() != dstart.getTime()) {
 			int fix = 0;
 			// le rdv s'affiche sur 1 jour de plus dans obm si la duration
@@ -513,21 +476,22 @@ public class CalendarManager extends ObmManager {
 					&& ((dend.getTime() - dstart.getTime()) % 86400) == 0) {
 				fix = 1;
 			}
-			event.setDuration((int) ((dend.getTime() - dstart.getTime()) / 1000)
+			event
+					.setDuration((int) ((dend.getTime() - dstart.getTime()) / 1000)
 							- fix);
 		} else {
 			event.setDuration(3600);
 		}
-		
-		if (foundation.getReminder() != null && foundation.getReminder().getMinutes() != 0) {
+
+		if (foundation.getReminder() != null
+				&& foundation.getReminder().getMinutes() != 0) {
 			event.setAlert(foundation.getReminder().getMinutes() * 60);
 		} else {
 			event.setAlert(0);
 		}
-		
+
 		logger.info("alert export : " + event.getAlert());
-		
-		
+
 		if (foundation.getSummary() != null) {
 			event.setTitle(foundation.getSummary().getPropertyValueAsString());
 		} else {
@@ -560,9 +524,9 @@ public class CalendarManager extends ObmManager {
 				&& Helper.nullToEmptyString(
 						foundation.getAccessClass().getPropertyValueAsString())
 						.equals("0")) { // olNormal
-			event.setClassification(0); // public
+			event.setPrivacy(0); // public
 		} else {
-			event.setClassification(1); // private
+			event.setPrivacy(1); // private
 		}
 
 		EventRecurrence recurrence = null;
@@ -576,10 +540,10 @@ public class CalendarManager extends ObmManager {
 			recurrence.setFrequence(1);
 		}
 		event.setRecurrence(recurrence);
-		
+
 		if (foundation.getReminder() != null)
 			logger.info("alert Reminder:" + foundation.getReminder());
-		
+
 		return event;
 	}
 
@@ -597,16 +561,8 @@ public class CalendarManager extends ObmManager {
 		String dtStart = foundation.getDtStart().getPropertyValueAsString();
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		Date utcDate = CalendarHelper.getDateFromUTCString(dtStart);
-		cal.setTime(utcDate);
 
-		if (foundation.getAllDay() && "Blackberry".equals(prodId)) {
-
-			// logger.info("bb detected, adding 1 day to dtstart");
-			// cal.add(Calendar.DAY_OF_MONTH, 1);
-			// logger.info("utcDate: " + utcDate + " prev dtstart: " + dtStart
-			// + " new dtstart: " + cal.getTime());
-		}
-		event.setDate(cal);
+		event.setDate(utcDate);
 		return cal.getTime();
 	}
 
