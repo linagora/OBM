@@ -110,7 +110,7 @@ Obm.CalendarDayEventExtension = new Class({
 /******************************************************************************
  * Calendar event object, can be dragged but have no graphical representation
  * of it's duration (eg bar in month view or all day event)
- ******************************************************************************/
+ *****************************************************************************/
 Obm.CalendarDayEvent = new Class({
   
   setOptions: function(options){
@@ -124,7 +124,7 @@ Obm.CalendarDayEvent = new Class({
     }, options || {});
   },
 
-  
+
   initialize: function(eventData,options) {
     this.setOptions(options);
     this.event = eventData;
@@ -165,8 +165,8 @@ Obm.CalendarDayEvent = new Class({
           obm.calendarManager.unlock();
           obm.calendarManager.moveEventTo(this.element.id,this.element.getLeft(),this.element.getTop());
         }
-      }.bind(this)     
-    };   
+      }.bind(this)
+    };
 
     this.drag = this.element.makeDraggable(dragOptions);
   },
@@ -192,7 +192,7 @@ Obm.CalendarDayEvent = new Class({
     this.resetTitle();
   },
 
-  // Add extension (arrow) to avent extensions
+  // Add extension (arrow) to event extensions
   setExtension: function(time) {
     var eventTime = time * 1000;
     var calendarStartTime = obm.calendarManager.startTime * 1000;
@@ -255,7 +255,7 @@ Obm.CalendarDayEvent = new Class({
       time.setHours(d.getHours());
       time.setMinutes(d.getMinutes());
       time = Math.floor(time.getTime()/1000);
-    } 
+    }
     return time;
   },
 
@@ -348,6 +348,14 @@ Obm.CalendarDayEvent = new Class({
     if( (this.element.offsetLeft + width) > this.options.context.right ) {
       width = this.options.context.right - this.element.offsetLeft;
     }
+    // Waiting events add a border
+    status = this.event.status;
+    if (status == 'W') {
+      status_size = 2;
+    } else {
+      status_size = 0;
+    }
+    width -= status_size;
     this.element.setStyle('width',width + 'px');
   },
 
@@ -550,6 +558,14 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     if((this.element.getTop() + height) > this.options.context.bottom) {
       height = this.options.context.bottom - this.element.getTop();
     }
+    // Waiting events add a border
+    status = this.event.status;
+    if (status == 'W') {
+      status_size = 2;
+    } else {
+      status_size = 0;
+    }
+    height -= status_size;
     this.element.setStyle('height',height + 'px');
   },
 
@@ -638,21 +654,15 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     }
   },
 
-  conflict: function(size, position, status) {
+  conflict: function(size, position) {
     hr = $(this.element.parentNode);
     var modulo       = hr.clientWidth%size;
     var correctWidth = (modulo > position ? 1 : 0);
     var correctPos   = (modulo > position ? position : modulo);
-    // Waiting events add a border
-    if (status == 'W') {
-      status_size = 2;
-    } else {
-      status_size = 0;
-    }
     if (size > 1)
-      this.setWidth(Math.floor(hr.clientWidth/size)+correctWidth - status_size);
+      this.setWidth(Math.floor(hr.clientWidth/size)+correctWidth);
     else
-      this.setWidth(hr.clientWidth - status_size);
+      this.setWidth(hr.clientWidth);
     this.setMargin(Math.floor(hr.clientWidth/size)*position+correctPos);
   },
 
@@ -908,7 +918,7 @@ Obm.CalendarManager = new Class({
     // REDRAWING EVENTS
     for(var i in resize) {
       evt = this.events.get(i);
-      evt.conflict(resize[i].unit.size,resize[i].position, evt.event.status);
+      evt.conflict(resize[i].unit.size,resize[i].position);
     }
   },
  
