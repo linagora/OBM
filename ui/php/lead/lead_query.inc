@@ -19,6 +19,7 @@ function run_query_lead_search($params) {
   $sql_order_field = $params['sql_order_field'];
 
   $text = sql_search_text_parse($params['text']);
+  $company_id = $params['company_id'];
   $company = sql_search_text_parse($params['company']);
   $date_after = of_isodate_convert($params['date_after'],true);
   $date_before = of_isodate_convert($params['date_before'],true);
@@ -51,7 +52,11 @@ function run_query_lead_search($params) {
     $where .= "$and (lead_name $like '%$text%'
                      OR lead_comment $like '%$text%')";
   }
-  if ($company != '') {
+   if (($company_id != '') && ($company_id > 0)) {
+    $where .= " $and lead_company_id = '$company_id'";
+    $and = 'AND';
+  }
+ if ($company != '') {
     $where .= sql_global_company_name_advanced_search($company, $like);
     $join_comp = "LEFT JOIN Company ON lead_company_id=company_id";
     $and = 'AND';
@@ -226,9 +231,13 @@ function run_query_lead_insert($params) {
     $usercomment = $params['usercomment'];
     $comment = "$datecomment:$usercomment:$add_comment";
   }
-  
+
+  // Get domain id from Company. If no company, from user
   $domain_id = of_domain_get_entity_domain_id($company_id, 'Company');
-	
+  if (! ($domain_id > 0)) {
+    $domain_id = $obm['domain_id'];
+  }
+
   $query = "INSERT INTO Lead (
     lead_domain_id,
     lead_timeupdate,

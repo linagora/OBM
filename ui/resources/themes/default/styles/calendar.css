@@ -210,8 +210,11 @@
   border-bottom: rgb(102, 140, 217);
 }
 .eventOwner_W {
-  color: rgb(41, 82, 163);
+  color: #fff;
+  background-color: rgb(102, 140, 217);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner_W h1, li.eventOwner_W, .eventOwner_W .handle {
   background-color: rgb(41, 82, 163);
@@ -227,8 +230,11 @@
   border-bottom: rgb(216, 102, 102);
 }
 .eventOwner0_W {
-  color: rgb(163, 41, 41);
+  color: #fff;
+  background-color: rgb(216, 102, 102);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner0_W h1, li.eventOwner0_W, .eventOwner0_W .handle {
   background-color: rgb(163, 41, 41);
@@ -244,8 +250,11 @@
   border-bottom: rgb(163, 41, 41);
 }
 .eventOwner1_W {
-  color: rgb(82, 41, 163);
+  color: #fff;
+  background-color: rgb(140, 102, 217);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner1_W h1, li.eventOwner1_W, .eventOwner1_W .handle {
   background-color: rgb(82, 41, 163);
@@ -261,8 +270,11 @@
   border-bottom: rgb(101, 173, 137);
 }
 .eventOwner2_W {
-  color: rgb(40, 117, 78);
+  color: #fff;
+  background-color: rgb(101, 173, 137);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner2_W h1, li.eventOwner2_W, .eventOwner2_W .handle {
   background-color: rgb(40, 117, 78);
@@ -278,8 +290,11 @@
   border-bottom: rgb(191, 191, 77);
 }
 .eventOwner3_W {
-  color: rgb(136, 136, 14);
+  color: #fff;
+  background-color: rgb(191, 191, 77);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner3_W h1, li.eventOwner3_W, .eventOwner3_W .handle {
   background-color: rgb(136, 136, 14);
@@ -295,8 +310,11 @@
   border-bottom: rgb(230, 128, 77);
 }
 .eventOwner4_W {
-  color: rgb(177, 68, 14);
+  color: #fff;
+  background-color: rgb(230, 128, 77);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner4_W h1, li.eventOwner4_W, .eventOwner4_W .handle {
   background-color: rgb(177, 68, 14);
@@ -312,8 +330,11 @@
   border-bottom: rgb(137, 151, 165);
 }
 .eventOwner5_W {
-  color: rgb(78, 93, 108);
+  color: #fff;
+  background-color: rgb(137, 151, 165);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner5_W h1, li.eventOwner5_W, .eventOwner5_W .handle {
   background-color: rgb(78, 93, 108);
@@ -329,8 +350,11 @@
   border-bottom: rgb(167, 167, 125);
 }
 .eventOwner6_W {
-  color: rgb(110, 110, 65);
+  color: #fff;
+  background-color: rgb(167, 167, 125);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner6_W h1, li.eventOwner6_W, .eventOwner6_W .handle {
   background-color: rgb(110, 110, 65);
@@ -346,8 +370,11 @@
   border-bottom: rgb(163, 41, 41);
 }
 .eventOwner7_W {
-  color: rgb(177, 54, 95);
+  color: #fff;
+  background-color: rgb(230, 115, 153);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner7_W h1, li.eventOwner7_W, .eventOwner7_W .handle {
   background-color: rgb(177, 54, 95);
@@ -363,8 +390,11 @@
   border-bottom: rgb(102, 140, 179);
 }
 .eventOwner8_W {
-  color: rgb(41, 82, 122);
+  color: #fff;
+  background-color: rgb(102, 140, 179);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner8_W h1, li.eventOwner8_W, .eventOwner8_W .handle {
   background-color: rgb(41, 82, 122);
@@ -380,8 +410,11 @@
   border-bottom: rgb(76, 176, 82);
 }
 .eventOwner9_W {
-  color: rgb(13, 120, 19);
+  color: #fff;
+  background-color: rgb(76, 176, 82);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner9_W h1, li.eventOwner9_W, .eventOwner9_W .handle {
   background-color: rgb(13, 120, 19);
@@ -397,8 +430,11 @@
   border-bottom: rgb(224, 194, 64);
 }
 .eventOwner10_W {
-  color: rgb(171, 139, 0);
+  color: #fff;
+  background-color: rgb(224, 194, 64);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner10_W h1, li.eventOwner10_W, .eventOwner10_W .handle {
   background-color: rgb(171, 139, 0);
@@ -414,8 +450,11 @@
   border-bottom: rgb(190, 148, 148);
 }
 .eventOwner11_W {
-  color: rgb(134, 90, 90);
+  color: #fff;
+  background-color: rgb(190, 148, 148);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner11_W h1, li.eventOwner11_W, .eventOwner11_W .handle {
   background-color: rgb(134, 90, 90);
@@ -431,8 +470,11 @@
   border-bottom: rgb(148, 162, 190);
 }
 .eventOwner12_W {
-  color: rgb(90, 105, 134);
+  color: #fff;
+  background-color: rgb(148, 162, 190);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner12_W h1, li.eventOwner12_W, .eventOwner12_W .handle {
   background-color: rgb(90, 105, 134);
@@ -448,8 +490,11 @@
   border-bottom: rgb(196, 168, 131);
 }
 .eventOwner13_W {
-  color: rgb(141, 111, 71);
+  color: #fff;
+  background-color: rgb(196, 168, 131);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner13_W h1, li.eventOwner13_W, .eventOwner13_W .handle {
   background-color: rgb(141, 111, 71);
@@ -465,8 +510,11 @@
   border-bottom: rgb(163, 41, 41);
 }
 .eventOwner14_W {
-  color: rgb(122, 54, 122);
+  color: #fff;
+  background-color: rgb(179, 115, 179);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner14_W h1, li.eventOwner14_W, .eventOwner14_W .handle {
   background-color: rgb(122, 54, 122);
@@ -482,8 +530,11 @@
   border-bottom: rgb(89, 191, 179);
 }
 .eventOwner15_W {
-  color: rgb(27, 136, 122);
+  color: #fff;
+  background-color: rgb(89, 191, 179);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner15_W h1, li.eventOwner15_W, .eventOwner15_W .handle {
   background-color: rgb(27, 136, 122);
@@ -499,8 +550,11 @@
   border-bottom: rgb(140, 191, 64);
 }
 .eventOwner16_W {
-  color: rgb(82, 136, 0);
+  color: #fff;
+  background-color: rgb(140, 191, 64);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner16_W h1, li.eventOwner16_W, .eventOwner16_W .handle {
   background-color: rgb(82, 136, 0);
@@ -516,8 +570,11 @@
   border-bottom: rgb(242, 166, 64);
 }
 .eventOwner17_W {
-  color: rgb(190, 109, 0);
+  color: #fff;
+  background-color: rgb(242, 166, 64);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner17_W h1, li.eventOwner17_W, .eventOwner17_W .handle {
   background-color: rgb(190, 109, 0);
@@ -533,8 +590,11 @@
   border-bottom: rgb(169, 146, 169);
 }
 .eventOwner18_W {
-  color: rgb(112, 87, 112);
+  color: #fff;
+  background-color: rgb(169, 146, 169);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner18_W h1, li.eventOwner18_W, .eventOwner18_W .handle {
   background-color: rgb(112, 87, 112);
@@ -550,8 +610,11 @@
   border-bottom: rgb(133, 170, 165);
 }
 .eventOwner19_W {
-  color: rgb(74, 113, 108);
+  color: #fff;
+  background-color: rgb(133, 170, 165);
   border: 1px dotted;
+  opacity: 0.5;
+  filter: alpha(opacity=50);
 }
 .eventOwner19_W h1, li.eventOwner19_W, .eventOwner19_W .handle {
   background-color: rgb(74, 113, 108);

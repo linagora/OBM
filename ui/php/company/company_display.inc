@@ -450,9 +450,8 @@ function html_company_search_list($comp_q, $prefs, $company, $popup) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_links($co_q) {
-  global $ico_contact;
   global $ico_document,$ico_add, $ico_project, $ico_contract, $ico_lead;
-  global $ico_invoice, $ico_payment, $ico_deal;
+  global $ico_contact, $ico_invoice, $ico_payment, $ico_deal;
   global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
   global $l_module_lead, $l_module_contract, $l_module_invoice;
   global $l_module_document, $l_module_payment, $l_document_add;
@@ -507,8 +506,8 @@ function html_company_links($co_q) {
   // Lead
   if ($cgp_show['module']['lead']) {
     $nb_lead = get_global_linked_element_nb('Lead', $id, 'company', 1);
-    $url_lead_list = url_prepare("$path/lead/lead_index.php?action=search&amp;company_id=$id&amp;tf_company=$uname");
-    $url_lead_new = url_prepare("$path/lead/lead_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
+    $url_lead_list = url_prepare("$path/lead/lead_index.php?action=search&amp;company_id=$id&amp;company_id=$id");
+    $url_lead_new = url_prepare("$path/lead/lead_index.php?action=new&amp;company_id=$id&amp;company_id=$id");
     $block_lead = "
 <div class=\"portlet\" id=\"companyLead\">
 <h1>$l_module_lead</h1>
