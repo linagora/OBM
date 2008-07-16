@@ -583,7 +583,13 @@ sub _imapSetMailboxAcls {
 
     # Obtention de la liste des sous-répertoires de la boite
     my $boxPattern = $boxPrefix.$boxName;
-    $boxPattern =~ s/(@.*)$/*$1/;
+    my @boxStruct = $cyrusSrvConn->listmailbox( $boxPattern, '' );
+    if( $cyrusSrvConn->error ) {
+        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a l'obtention des ACLs de la BAL : ".$cyrusSrvConn->error(), "W" );
+        return 1;
+    }
+
+    $boxPattern =~ s/(@.*)$/\/*$1/;
     my @boxStruct = $cyrusSrvConn->listmailbox( $boxPattern, '' );
     if( $cyrusSrvConn->error ) {
         &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a l'obtention des ACLs de la BAL : ".$cyrusSrvConn->error(), "W" );
