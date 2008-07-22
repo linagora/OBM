@@ -4,14 +4,10 @@
 #     - Desc : OBM Database 2.2 installation script                           #
 # 2005-06-08 AliaSource                                                       #
 ###############################################################################
-# $Id$
-###############################################################################
 
 source `dirname $0`/obm-sh.lib
 
 # Lecture des parametres de connexion a la BD
-get_val host
-H=$VALUE
 get_val dbtype
 DBTYPE=$VALUE
 get_val user
