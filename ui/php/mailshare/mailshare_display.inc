@@ -51,12 +51,9 @@ function dis_data_mailshare(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == 'mailshare_email') {
-    $main_domain = $obm['domain_name'];
-
     $email = $OD->data_set->f('mailshare_email');
     if (strcmp($email ,'') != 0) {
-      $emails = explode("\n",$email);
-      $email = trim($emails[0])."@$main_domain";
+      $email = get_entity_email($email, $OD->data_set->f("domain_name"));
       $res['url'] = "mailto:$email";
       $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\"/>$email";
       $res['txt_name'] = "$email";
