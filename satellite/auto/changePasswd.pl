@@ -253,3 +253,95 @@ if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
 &OBM::toolBox::write_log( "Execution du script terminee", "WC", 0 );
 
 exit !$errorCode;
+
+# Perldoc
+=head1 NAME
+
+changePasswd.pl - OBM administration tool to manipulate user password
+
+=head1 SYNOPSIS
+
+  # Prompt for old and new password, update only LDAP 'userPassword' attribute
+  $ changePasswd.pl --login <LOGIN> --domain <DOMAIN_ID> --interactiv
+
+  # Prompt for new password, don't check old, update only LDAP 'userPassword'
+  # attribute
+  $ changePasswd.pl --login <LOGIN> --domain <DOMAIN_ID> --interactiv --no-old
+
+  # Prompt for old and new password, update :
+  #     - LDAP 'userPassword' attribute
+  #     - LDAP 'sambaNTPassword' and 'sambaLMPassword' attributes
+  #     - SQL 'userobm_password' and 'userobm_password_type' column for
+  #     'UserObm' and 'P_UserObm' tables
+  $ changePasswd.pl --login <LOGIN> --domain <DOMAIN_ID> --interactiv --unix --samba --sql
+
+  # Pass new and old password on command line, update only LDAP 'userPassword'
+  # attribute
+  $ changePasswd.pl --login <LOGIN> --domain <DOMAIN_ID> --type <PWD_TYPE> --passwd <NEW_PASSWD> --old-passwd <OLD_PASSWD>
+
+  # Pass only new password on command line, update only LDAP 'userPassword'
+  # attribute
+  $ changePasswd.pl --login <LOGIN> --domain <DOMAIN_ID> --type <PWD_TYPE> --passwd <NEW_PASSWD> --no-old
+
+  # Typical Samba usage for 'smb.conf' 'passwd program' option
+  $ changePasswd.pl --login %u --domain <DOMAIN_ID> --interactiv --unix --sql --no-old
+  # 'smb.conf' 'passwd chat' sample :
+  passwd chat = *New*password:* %n*Re-type*new*password:* %n*
+
+=head1 DESCRIPTION
+
+This script allow modify OBM password in all of his forms (LDAP, SQL).
+
+=head1 COMMANDS
+
+=over 4
+
+=item C<login> : B<needed>
+
+=over 4
+
+=item only left part of login (before '@' for multi-domains)
+
+=item modify password for this user
+
+=back
+
+=item C<domain> : B<needed>
+
+=over 4
+
+=item domain BD ID
+
+=back
+
+=item C<sql> : change user BD password
+
+=item C<unix> : change user 'userPassword' LDAP attribute
+
+=item C<samba> : change 'sambaNTPassword' and 'sambaLMPassword' LDAP attributes
+
+=item C<no-old> : change password without verifying old
+
+=item C<interactiv> : prompt for passwords
+
+=item C<type> : password type for non interactive change
+
+=over 4
+
+=item B<PLAIN> : plain password
+
+=back
+
+=item C<passwd> : new password
+
+=item C<old-passwd> : old password
+
+=back
+
+Options 'type', 'passwd' and 'old-passwd' are exclusive with 'interactiv'.
+
+Option 'interactiv' have priority on 'type', 'passwd' and 'old-passwd'.
+
+Options 'sql', 'unix' and 'samba' can be used at the same time.
+
+This script generate log via syslog.

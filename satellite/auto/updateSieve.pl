@@ -48,7 +48,7 @@ sub getParameter {
         &OBM::toolBox::write_log( "Parametre --domain manquant", "W" );
         return 1;
     }else {
-        if( $$parameters{"domain"} !~ /^[0-9]+$/ ) {
+        if( $$parameters{"domain"} !~ /$regexp_domain/ ) {
             &OBM::toolBox::write_log( "Parametre --domain invalide", "W" );
             return 1;
         }
@@ -100,3 +100,43 @@ if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
 &OBM::toolBox::write_log( "Execution du script terminee", "WC", 0 );
 
 exit !$errorCode;
+
+# Perldoc
+
+=head1 NAME
+
+updateSieve.pl - OBM administration tool to update user Sieve script
+
+=head1 SYNOPSIS
+
+  # Update Sieve script for user
+  $ updateSieve.pl --login <LOGIN> --domain <DOMAIN_ID>
+
+=head1 DESCRIPTION
+
+This script is used bt OBM-UI to real-time Sieve operations like vacation or
+redirection.
+
+Allow users to modify their Sieve script without admin validation.
+
+=head1 COMMANDS
+
+=over 4
+
+=item C<login> : only left part of login (before '@' for multi-domains)
+
+=item C<domain> : domain BD ID
+
+=back
+
+This script is used for :
+
+=over 4
+
+=item enable/disable vacation
+
+=item enable/disable redirection
+
+=back
+
+This script generate log via syslog.
