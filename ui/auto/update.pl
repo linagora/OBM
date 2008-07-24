@@ -125,3 +125,66 @@ if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
 &OBM::toolBox::write_log( "", "C" );
 
 exit 0
+
+# Perldoc
+
+=head1 NAME
+
+update.pl - OBM administration tool , alter ego of Cyrus::IMAP::Shell
+
+=head1 SYNOPSIS
+
+  # Domain global update
+  $ update.pl --domain <DOMAIN_ID> --global
+
+  # Domain incremental update
+  $ update.pl --domain <DOMAIN_ID> --incremental
+
+  # Domain incremental update - only updates done by an admin
+  $ update.pl --domain <DOMAIN_ID> --user <USER_ID> --incremental
+
+  # Domain incremental update - only updates done for a delegation
+  $ update.pl --domain <DOMAIN_ID> --delegation <DELEGATION> --incremental
+
+  # Display help
+  $ update.pl --help
+
+=head1 DESCRIPTION
+
+This script is used by OBM-UI when an admin apply updates.
+
+Global update apply all datas for a domain in the system regardless of BD
+updates.
+
+Incremental update apply only updates mark by the scope. It's possible to apply
+updates for only a particular user or for a delegation.
+
+=head1 COMMANDS
+
+=over 4
+
+=item C<help> : display help
+
+=item C<domain> : B<needed>
+
+=over 4
+
+=item domain BD ID
+
+=back
+
+=item C<global> : global update
+
+=item C<incremental> : incremental update
+
+=item C<user> : apply updates done by only this user
+
+=item C<delegation> : apply update done by only this delegation
+
+=back
+
+Global update by default.
+
+Parameters 'user' and 'delegation' are exclusive.
+
+This script generate log via syslog.

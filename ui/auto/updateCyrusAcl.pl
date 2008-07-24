@@ -62,7 +62,7 @@ sub getParameter {
         print STDERR "Paramètre '--domain' manquant.\nCe paramètre indique l'ID BD du domaine de l'entité à mettre à jour.\n";
         return 1;
     }else {
-        if( $$parameters{"domain"} !~ /^[0-9]+$/ ) {
+        if( $$parameters{"domain"} !~ /$regexp_domain/ ) {
             &OBM::toolBox::write_log( "Parametre --domain invalide", "W" );
             print STDERR "Paramètre '--domain' invalide.\nCe paramètre indique l'ID BD du domaine de l'entité à mettre à jour.\n";
             return 1;
@@ -115,3 +115,56 @@ if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
 
 exit !$errorCode;
 
+# Perldoc
+
+=head1 NAME
+
+updateCyrusAcl.pl - OBM administration tool to update Cyrus ACL
+
+=head1 SYNOPSIS
+
+  # Update user mailbox ACLs
+  $ updateCyrusAcl.pl --type mailbox --name <LOGIN> --domain <DOMAIN_ID>
+
+  # Update mailshare ACLs
+  $ updateCyrusAcl.pl --type mailshare --name <MAILSHARE_NAME> --domain <DOMAIN_ID>
+
+=head1 DESCRIPTION
+
+This script is used by OBM-UI to real-time update Cyrus ACLs.
+
+Allow users to modify their mailbox ACLs without admin validation.
+
+Allow mailshare admins to modify mailshare ACLs without admin validation.
+
+=head1 COMMANDS
+
+=over 4
+
+=item C<type> :
+
+=over 4
+
+=item B<mailbox> : update mailbox ACL
+
+=item B<mailshare> : update mailshare ACL
+
+=back
+
+=item C<name> :
+
+=over 4
+
+=item B<LOGIN>, only left part of login (before '@' for multi-domains), if type
+is 'mailbox'
+
+=item B<MAILSHARE_NAME>, only left part of mailshare name (before '@' for
+multi-domains), if type is 'mailshare'
+
+=back
+
+=item C<domain> : domain BD ID
+
+=back
+
+This script generate log via syslog.

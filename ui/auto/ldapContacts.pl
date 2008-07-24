@@ -241,3 +241,35 @@ if( !&OBM::dbUtils::dbState( 'disconnect', \$dbHandler ) ) {
 &OBM::toolBox::write_log( '', 'C' );
 
 exit 0;
+
+# Perldoc
+
+=head1 NAME
+
+ldapContacts.pl - OBM administration to publish public contact in LDAP
+
+=head1 SYNOPSIS
+
+    # Publish all public contacts for all OBM domains
+    $ ldapContacts.pl --global
+
+    # Incrmental LDAP public contacts update for last script execution
+    $ ldapContacts.pl --incremental
+
+=head1 COMMANDS
+
+=over 4
+
+=item C<global> : global public contacts update
+
+=item C<incremental> : incremental public contacts update
+
+=item C<help> : display help
+
+=back
+
+This script must be run from con.
+
+This script will do nothing if 'obm-contact' option, from 'obm_conf.ini', is false.
+
+This script generate log via syslog.
