@@ -78,20 +78,22 @@ sub getParameter {
 
 
 # On prepare le log
-&OBM::toolBox::write_log( "update.pl: ", "O" );
+my ($scriptname) = ($0=~'.*/([^/]+)');
+&OBM::toolBox::write_log( $scriptname.': ', 'O', 0 );
 
 # Traitement des paramètres
-&OBM::toolBox::write_log( "Analyse des parametres du script", "W" );
+&OBM::toolBox::write_log( 'Analyse des parametres du script', 'W', 3 );
 my %parameters;
 getParameter( \%parameters );
 
 # On se connecte a la base
 my $dbHandler;
+&OBM::toolBox::write_log( 'Connexion a la base de donnees OBM', 'W', 3 );
 if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
     if( defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+        &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees : '.$dbHandler->err, 'WC', 0 );
     }else {
-        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : erreur inconnue", "WC" );
+        &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees : erreur inconnue', 'WC', 0 );
     }
 
     exit 1;

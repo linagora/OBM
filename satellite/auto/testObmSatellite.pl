@@ -110,21 +110,22 @@ sub updateServer {
 
 
 # On prepare le log
-&OBM::toolBox::write_log( "testObmSatellite: ", "O" );
+my ($scriptname) = ($0=~'.*/([^/]+)');
+&OBM::toolBox::write_log( $scriptname.': ', 'O', 0 );
 
 # Vérification des paramètres du script
-&OBM::toolBox::write_log( "Analyse des parametres du script", "W" );
+&OBM::toolBox::write_log( "Analyse des parametres du script", "W", 3 );
 my %parameters;
 if( !getParameter( \%parameters ) ) {
-    &OBM::toolBox::write_log( "Affichage de l'aide ou mauvais parmetres...", "WC" );
+    &OBM::toolBox::write_log( "Affichage de l'aide ou mauvais parametres...", "WC", 0 );
     exit 1;
 }
 
 # On se connecte a la base
 my $dbHandler;
-&OBM::toolBox::write_log( "Connexion a la base de donnees OBM", "W" );
+&OBM::toolBox::write_log( "Connexion a la base de donnees OBM", "W", 3 );
 if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+    &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnees : ".$dbHandler->err, "WC", 0 );
     exit 1;
 }
 
@@ -134,7 +135,7 @@ my $query = "SELECT i.host_name, i.host_ip, j.mailserver_imap, j.mailserver_smtp
 # On execute la requete
 my $queryResult;
 if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-    &OBM::toolBox::write_log( 'Probleme lors de l\'execution de la requete : '.$dbHandler->err, 'WC' );
+    &OBM::toolBox::write_log( 'Probleme lors de l\'execution de la requete : '.$dbHandler->err, 'WC', 0 );
     exit 1;
 }
 

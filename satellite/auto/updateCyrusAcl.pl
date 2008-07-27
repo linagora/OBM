@@ -74,10 +74,11 @@ sub getParameter {
 
 
 # On prepare le log
-&OBM::toolBox::write_log( "UpdateBalAcl: ", "O" );
+my ($scriptname) = ($0=~'.*/([^/]+)');
+&OBM::toolBox::write_log( $scriptname.': ', 'O', 0 );
 
 # Traitement des paramètrs
-&OBM::toolBox::write_log( "Analyse des parametres du script", "W" );
+&OBM::toolBox::write_log( 'Analyse des parametres du script', 'W', 3 );
 my %parameters;
 if( getParameter( \%parameters ) ) {
     &OBM::toolBox::write_log( "", "C" );
@@ -87,9 +88,9 @@ if( getParameter( \%parameters ) ) {
 
 # On se connecte àla base
 my $dbHandler;
-&OBM::toolBox::write_log( "Connexion a la base de donnees OBM", "W" );
-if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+&OBM::toolBox::write_log( 'Connexion a la base de donnees OBM', 'W', 3 );
+if( !&OBM::dbUtils::dbState( 'connect', \$dbHandler ) ) {
+    &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees : '.$dbHandler->err, 'WC', 0 );
     exit 1;
 }
 
