@@ -45,7 +45,7 @@ sub getParameter {
         print 'Script permettant de faire une synchronisation des contacts publics d\'OBM dans une branche de l\'annuaire LDAP (ou=contacts par défaut)'."\n\n";
 
         print 'Veuillez indiquer le critere de mise a jour :'."\n";
-        print "\tSyntaxe: $0 [--global | --incremental]\n";
+        print "Syntaxe: $0 [--global | --incremental]\n";
         print "\t".'--global : Fait une mise a jour globale des contacts ;'."\n";
         print "\t".'--incremental : Fait une mise a jour incrementale du domaine (Option par defaut)'."\n";
 
@@ -268,7 +268,7 @@ ldapContacts.pl - OBM administration to publish public contact in LDAP
 
 =back
 
-This script must be run from con.
+This script must be run by system cron.
 
 This script will do nothing if 'obm-contact' option, from 'obm_conf.ini', is false.
 

@@ -28,17 +28,35 @@ sub getParameter {
     my( $parameters ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "login=s", "domain=s", "type=s", "passwd=s", "old-passwd=s", "unix", "samba", "sql", "interactiv", "no-old" );
+    GetOptions( $parameters, "login=s", "domain=s", "type=s", "passwd=s", "old-passwd=s", "unix", "samba", "sql", "interactiv", "no-old", "help" );
+
+
+    if( $$parameters{help} ) {
+        return 2;
+    }
 
 
     if( !$$parameters{login} ) {
         &OBM::toolBox::write_log( "Parametre --login manquant", "WC", 0 );
-        exit 1;
+        return 1;
 
     }else {
         if( !($$parameters{login} =~ /$regexp_login/) ) {
             &OBM::toolBox::write_log( "Parametre --login invalide", "W", 0 );
-            exit 1;
+            return 1;
+        }
+    }
+
+
+    # Vérification des paramètres
+    if( !$$parameters{domain} ) {
+        &OBM::toolBox::write_log( "Parametre --domain manquant", "WC", 0 );
+        return 1;
+
+    }else {
+        if( $$parameters{domain} !~ /$regexp_domain/ ) {
+            &OBM::toolBox::write_log( "Parametre --domain incorrect", "WC", 0 );
+            return 1;
         }
     }
 
@@ -52,22 +70,19 @@ sub getParameter {
 
         if( !$$parameters{type} ) {
             &OBM::toolBox::write_log( "Type du mot de passe non specifie.", "WC", 0 );
-            exit 1;
+            return 1;
+
         }else {
             &OBM::toolBox::write_log( "Type du mot de passe : ".$$parameters{type}, "W", 3 );
             last SWITCH;
         }
     }
 
-    # Vérification des paramètres
-    if( !$$parameters{domain} ) {
-        &OBM::toolBox::write_log( "Parametre --domain manquant", "WC", 0 );
-        exit 1;
-    }else {
-        if( $$parameters{domain} !~ /$regexp_domain/ ) {
-            &OBM::toolBox::write_log( "Parametre --domain incorrect", "WC", 0 );
-            exit 1;
-        }
+
+    # Si auncun mot de passe n'est specifié
+    if( !$$parameters{interactiv} && !$$parameters{passwd} ) {
+        &OBM::toolBox::write_log( "Mot de passe non indiqué sur la ligne de commande, utilisation du  mode interactif", "WC", 0 );
+        $$parameters{interactiv} = 1;
     }
 
 
@@ -77,7 +92,7 @@ sub getParameter {
             if( !$$parameters{interactiv} && !$$parameters{"old-passwd"} ) {
                 &OBM::toolBox::write_log( "Mode non interactif - l'ancien mot de passe doit etre specifie sur la ligne de commande", "WC", 0 );
 
-                exit 1;
+                return 1;
             }
 
             if( $$parameters{interactiv} ) {
@@ -113,7 +128,7 @@ sub getParameter {
         if( !$$parameters{interactiv} && !$$parameters{passwd} ) {
             &OBM::toolBox::write_log( "Mode non interactif - vous devez indiquer le mot de passe sur la ligne de commande", "WC", 0 );
 
-            exit 1;
+            return 1;
         }
 
         # Si les 2 formes de mots de passés sont specifiées
@@ -148,7 +163,7 @@ sub getParameter {
 
             if( $newPasswd ne $newPasswd2 ) {
                 &OBM::toolBox::write_log( "Mode interactif - les nouveaux mots de passes ne correspondent pas", "WC", 0 );
-                exit 1;
+                return 1;
 
             }else {
                 $$parameters{passwd} = $newPasswd;
@@ -164,8 +179,12 @@ sub getParameter {
 
     # Vérification syntaxique du mot de passe
     if( $$parameters{passwd} !~ /$regexp_passwd/ ) {
-        &OBM::toolBox::write_log( "Syntaxe du nouvau mot de passe incorrecte", "WC", 2 );
-        exit 1;
+        if( $$parameters{interactiv} ) {
+            print STDERR 'Le nouveau mot de passe ne respecte pas la syntaxe requise - \''.$regexp_passwd."'\n";
+        }
+        &OBM::toolBox::write_log( 'Le nouveau mot de passe ne respecte pas la syntaxe requise - \''.$regexp_passwd.'\'', "WC", 2 );
+
+        exit 2;
     }
 
     # En niveau 4 de log on logge le mot de passe !
@@ -193,7 +212,7 @@ sub getParameter {
                 &OBM::toolBox::write_log( "Modification du mot de passe Samba", "W", 2 );
             }else {
                 &OBM::toolBox::write_log( "Erreur: pour pouvoir modifier les mots de passes Samba, le mot de passe doit etre disponible en PLAIN", "WC", 0 );
-                exit 1;
+                return 1;
             }
         }else {
            &OBM::toolBox::write_log( "Pas de modification du mot de passe Samba", "W", 2 );
@@ -208,6 +227,7 @@ sub getParameter {
         }
     }
 
+    return 0;
 }
 
 
@@ -217,7 +237,18 @@ sub getParameter {
 # Traitement des paramètres
 &OBM::toolBox::write_log( "Analyse des parametres du script", "W", 3 );
 my %parameters;
-if( getParameter( \%parameters ) ) {
+my $getParamRet = getParameter( \%parameters );
+if( ($getParamRet == 2) || ($parameters{'interactiv'} && $getParamRet) ) {
+    &OBM::toolBox::write_log( 'Affichage de l\'aide', 'WC' );
+    print STDERR 'Script permettant de mettre à jour les mots de passes SQL et/ou LDAP'."\n";
+    print STDERR 'Pour plus d\'informations : perldoc path_to/changePasswd.pl'."\n";
+    print STDERR 'Syntaxe :'."\n";
+    print STDERR "\t".'changePasswd.pl --login LOGIN --domain DOMAIN_ID --interactiv [--no-old] [--unix|--samba|--sql]'."\n";
+    print STDERR "\t".'changePasswd.pl --login LOGIN --domain DOMAIN_ID --type PASSWD_TYPE --passwd NEW_PASSWD [--no-old|--old-passwd OLD_PASSWD] [--unix|--samba|--sql]'."\n";
+    print STDERR 'By default, only unix passwd is update'."\n";
+    exit 0;
+
+}elsif( $getParamRet ) {
     &OBM::toolBox::write_log( "", "C" );
     exit 1;
 }
@@ -338,9 +369,15 @@ This script allow modify OBM password in all of his forms (LDAP, SQL).
 
 =back
 
+If none of 'passwd' and 'interactiv' options are specified, then script run in
+interactive mode.
+
 Options 'type', 'passwd' and 'old-passwd' are exclusive with 'interactiv'.
 
-Option 'interactiv' have priority on 'type', 'passwd' and 'old-passwd'.
+Mode non interactive have priority on 'interactiv' option.
+
+Interactive mode password type is 'PLAIN'. On non interactive mode, password type must be
+indicate.
 
 Options 'sql', 'unix' and 'samba' can be used at the same time.
 
