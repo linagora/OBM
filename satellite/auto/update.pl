@@ -124,7 +124,7 @@ if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
 &OBM::toolBox::write_log( "Fin du traitement", "W" );
 &OBM::toolBox::write_log( "", "C" );
 
-exit 0
+exit 0;
 
 # Perldoc
 
