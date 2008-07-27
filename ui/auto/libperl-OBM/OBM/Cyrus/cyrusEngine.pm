@@ -590,7 +590,7 @@ sub _imapSetMailboxAcls {
     }
 
     $boxPattern =~ s/(@.*)$/\/*$1/;
-    my @boxStruct = $cyrusSrvConn->listmailbox( $boxPattern, '' );
+    @boxStruct = $cyrusSrvConn->listmailbox( $boxPattern, '' );
     if( $cyrusSrvConn->error ) {
         &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a l'obtention des ACLs de la BAL : ".$cyrusSrvConn->error(), "W" );
         return 1;

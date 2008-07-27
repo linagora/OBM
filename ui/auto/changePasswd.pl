@@ -36,6 +36,7 @@ sub getParameter {
     }
 
 
+    # Vérification du paramètre 'login'
     if( !$$parameters{login} ) {
         &OBM::toolBox::write_log( "Parametre --login manquant", "WC", 0 );
         return 1;
@@ -48,7 +49,7 @@ sub getParameter {
     }
 
 
-    # Vérification des paramètres
+    # Vérification du paramètre 'domain'
     if( !$$parameters{domain} ) {
         &OBM::toolBox::write_log( "Parametre --domain manquant", "WC", 0 );
         return 1;
@@ -232,14 +233,15 @@ sub getParameter {
 
 
 # On prépare le log
-&OBM::toolBox::write_log( "changePasswd.pl: ", "O", 0 );
+my ($scriptname) = ($0=~'.*/([^/]+)');
+&OBM::toolBox::write_log( $scriptname.': ', "O", 0 );
 
 # Traitement des paramètres
 &OBM::toolBox::write_log( "Analyse des parametres du script", "W", 3 );
 my %parameters;
 my $getParamRet = getParameter( \%parameters );
 if( ($getParamRet == 2) || ($parameters{'interactiv'} && $getParamRet) ) {
-    &OBM::toolBox::write_log( 'Affichage de l\'aide', 'WC' );
+    &OBM::toolBox::write_log( 'Affichage de l\'aide', 'WC', 2 );
     print STDERR 'Script permettant de mettre à jour les mots de passes SQL et/ou LDAP'."\n";
     print STDERR 'Pour plus d\'informations : perldoc path_to/changePasswd.pl'."\n";
     print STDERR 'Syntaxe :'."\n";
@@ -255,12 +257,12 @@ if( ($getParamRet == 2) || ($parameters{'interactiv'} && $getParamRet) ) {
 
 # On se connecte a la base
 my $dbHandler;
-&OBM::toolBox::write_log( "Connexion a la base de donnees OBM", "W" );
+&OBM::toolBox::write_log( "Connexion a la base de donnees OBM", "W", 3 );
 if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
     if( defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : ".$dbHandler->err, "WC" );
+        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnees : ".$dbHandler->err, "WC", 0 );
     }else {
-        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnee : erreur inconnue", "WC" );
+        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnees : erreur inconnue", "WC", 0 );
     }
 
     exit 2;
@@ -276,7 +278,7 @@ if( defined($updatePasswd) ) {
 
 # On referme la connexion à la base
 if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "W" );
+    &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "W", 1 );
 }
 
 
