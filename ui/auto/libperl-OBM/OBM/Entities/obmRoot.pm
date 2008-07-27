@@ -18,7 +18,7 @@ sub new {
     my $self = shift;
     my( $links, $deleted ) = @_;
 
-    my %ldapEngineAttr = (
+    my %obmRootAttr = (
         type => undef,
         links => undef,
         toDelete => undef,
@@ -36,17 +36,17 @@ sub new {
     }
 
 
-    $ldapEngineAttr{"links"} = $links;
-    $ldapEngineAttr{"toDelete"} = $deleted;
+    $obmRootAttr{"links"} = $links;
+    $obmRootAttr{"toDelete"} = $deleted;
 
-    $ldapEngineAttr{"type"} = $OBM::Parameters::ldapConf::ROOT;
+    $obmRootAttr{"type"} = $OBM::Parameters::ldapConf::ROOT;
 
     # Définition de la représentation LDAP de ce type
-    $ldapEngineAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$ldapEngineAttr{"type"}}->{objectclass};
-    $ldapEngineAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$ldapEngineAttr{"type"}}->{dn_prefix};
-    $ldapEngineAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$ldapEngineAttr{"type"}}->{dn_value};
+    $obmRootAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmRootAttr{"type"}}->{objectclass};
+    $obmRootAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmRootAttr{"type"}}->{dn_prefix};
+    $obmRootAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmRootAttr{"type"}}->{dn_value};
 
-    bless( \%ldapEngineAttr, $self );
+    bless( \%obmRootAttr, $self );
 }
 
 
