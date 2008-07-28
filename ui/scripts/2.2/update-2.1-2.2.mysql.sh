@@ -19,7 +19,7 @@ DB=$VALUE
 
 mysqldump -u $U -p$P  --default-character-set='UTF8' ${DB} > ${HOME}/migration.sql 
 success=$?
-sed "s/ CHARSET=latin1/ CHARSET=utf8/g" ${HOME}/migration.sql > ${HOME}/migration.sql.utf8
+sed "s/ ENGINE=MyISAM CHARSET=latin1/ ENGINE=InnoDB CHARSET=utf8/g" ${HOME}/migration.sql > ${HOME}/migration.sql.utf8
 mv ${HOME}/migration.sql.utf8 ${HOME}/migration.sql
 
 
@@ -30,7 +30,7 @@ test ${success} -eq 0 || {
 
 echo "utf-8 encoded dump stored in ${HOME}/migration.sql"
 
-mysqladmin -u $U -p$P drop ${DB}
+mysqladmin -u $U -p$P -f drop ${DB}
 
 mysqladmin -u $U -p$P --default-character-set='UTF8' create ${DB}
 

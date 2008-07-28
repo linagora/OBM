@@ -25,8 +25,10 @@ INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('update_lock', '0');
 -------------------------------------------------------------------------------
 DELETE FROM UserObm;
 
+-- Global Domain
+INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virtual', TRUE);
 -- Global ADMIN
-INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid) VALUES (0, 'admin0','admin','PLAIN','admin', 'Admin Lastname', 'Firstname', '1000', '512');
+INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid) VALUES ((SELECT domain_id From Domain), 'admin0','admin','PLAIN','admin', 'Admin Lastname', 'Firstname', '1000', '512');
 
 
 -------------------------------------------------------------------------------
@@ -50,7 +52,7 @@ INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainprope
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default, domainproperty_readonly) VALUES ('last_public_contact_export','timestamp', 0, 1);
 
 -- Fill the initial update_state for each Domain
-INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) VALUES (0, 'update_state', 1);
+INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) VALUES ((SELECT domain_id From Domain), 'update_state', 1);
 
 -------------------------------------------------------------------------------
 -- Remplissage de la table 'UserSystem' : Utilisateurs systeme

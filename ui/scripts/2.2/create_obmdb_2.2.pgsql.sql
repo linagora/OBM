@@ -141,7 +141,7 @@ CREATE TABLE UserObm (
   userobm_samba_home          varchar(255) default '',
   userobm_samba_home_drive    char(2) default '',
   userobm_samba_logon_script  varchar(128) default '',
-  userobm_host_id             integer default 0,
+  userobm_host_id             integer default NULL,
   userobm_description         varchar(255),
   userobm_location            varchar(255),
   userobm_education           varchar(255),
@@ -166,7 +166,7 @@ CREATE TABLE UserObmPref (
 -- New table 'DisplayPref'
 --
 CREATE TABLE DisplayPref (
-  display_user_id     integer NOT NULL DEFAULT 0,
+  display_user_id     integer DEFAULT NULL,
   display_entity      varchar(32) NOT NULL DEFAULT '',
   display_fieldname   varchar(64) NOT NULL DEFAULT '',
   display_fieldorder  integer DEFAULT NULL,
@@ -511,7 +511,7 @@ CREATE TABLE Lead (
   lead_source_id   integer default 0,
   lead_manager_id  integer default 0,
   lead_company_id  integer NOT NULL DEFAULT 0,
-  lead_contact_id  integer NOT NULL DEFAULT 0,
+  lead_contact_id  integer DEFAULT NULL,
   lead_privacy     integer DEFAULT 0,
   lead_name        varchar(64),
   lead_date        date,
@@ -561,14 +561,14 @@ CREATE TABLE Deal (
   deal_datebegin            date,
   deal_parentdeal_id        integer,
   deal_type_id              integer,
-  deal_region_id            integer DEFAULT 0 NOT NULL,
+  deal_region_id            integer DEFAULT NULL,
   deal_tasktype_id          integer,
   deal_company_id           integer DEFAULT 0 NOT NULL,
   deal_contact1_id          integer,
   deal_contact2_id          integer,
   deal_marketingmanager_id  integer,
   deal_technicalmanager_id  integer,
-  deal_source_id            integer DEFAULT 0 NOT NULL,
+  deal_source_id            integer DEFAULT NULL,
   deal_source               varchar(64),
   deal_dateproposal         date,
   deal_dateexpected         date,
@@ -648,7 +648,7 @@ CREATE TABLE DealCompany (
   dealcompany_usercreate  integer default 0,
   dealcompany_deal_id     integer NOT NULL default 0,
   dealcompany_company_id  integer NOT NULL default 0,
-  dealcompany_role_id     integer NOT NULL default 0,
+  dealcompany_role_id     integer default NULL,
   PRIMARY KEY (dealcompany_id)
 );
 CREATE INDEX dealcompany_idx_deal ON DealCompany (dealcompany_deal_id);
@@ -719,7 +719,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_repeatkind   varchar(20) default NULL,
   calendarevent_repeatfrequence  integer default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,
-  calendarevent_endrepeat    timestamp NOT NULL,
+  calendarevent_endrepeat    timestamp default NULL,
   calendarevent_color        varchar(7),
   calendarevent_description  text,
   calendarevent_properties   text,
@@ -888,7 +888,7 @@ CREATE TABLE Subscription (
   subscription_usercreate       integer,
   subscription_quantity       	integer,
   subscription_renewal          integer NOT NULL,
-  subscription_reception_id     integer NOT NULL,
+  subscription_reception_id     integer DEFAULT NULL,
   subscription_date_begin       timestamp,
   subscription_date_end         timestamp,
   PRIMARY KEY (subscription_id)
@@ -927,7 +927,7 @@ CREATE TABLE Document (
   document_title       	 varchar(255) DEFAULT NULL,
   document_name        	 varchar(255) DEFAULT NULL,
   document_kind        	 integer DEFAULT NULL,
-  document_mimetype_id	 integer NOT NULL DEFAULT 0,
+  document_mimetype_id	 integer DEFAULT NULL,
   document_privacy     	 integer NOT NULL DEFAULT 0,
   document_size        	 integer DEFAULT NULL,
   document_author      	 varchar(255) DEFAULT NULL,
@@ -1069,7 +1069,7 @@ CREATE TABLE ProjectClosing (
   projectclosing_timeupdate   timestamp,
   projectclosing_timecreate   timestamp,
   projectclosing_userupdate   integer,
-  projectclosing_usercreate   integer NOT NULL,
+  projectclosing_usercreate   integer DEFAULT NULL,
   projectclosing_date         timestamp NOT NULL,
   projectclosing_used         integer NOT NULL,
   projectclosing_remaining    integer NOT NULL,
@@ -1185,8 +1185,8 @@ CREATE TABLE Contract (
   contract_daterenew         date DEFAULT NULL,
   contract_datecancel        date DEFAULT NULL,
   contract_type_id           integer DEFAULT NULL,
-  contract_priority_id       integer DEFAULT 0 NOT NULL,
-  contract_status_id         integer DEFAULT 0 NOT NULL,
+  contract_priority_id       integer DEFAULT NULL,
+  contract_status_id         integer DEFAULT NULL,
   contract_kind              integer DEFAULT 0 NULL,
   contract_format            integer DEFAULT 0 NULL,
   contract_ticketnumber      integer DEFAULT 0 NULL,
@@ -1371,9 +1371,9 @@ CREATE TABLE Payment (
   payment_timecreate      timestamp,
   payment_userupdate      integer,
   payment_usercreate      integer,
-  payment_company_id      integer NOT NULL,
+  payment_company_id      integer DEFAULT NULL,
   payment_account_id      integer,
-  payment_paymentkind_id  integer NOT NULL,
+  payment_paymentkind_id  integer DEFAULT NULL,
   payment_amount          decimal(10,2) DEFAULT '0.0' NOT NULL,
   payment_date            date,
   payment_inout           char(1) NOT NULL DEFAULT '+',
@@ -1453,7 +1453,7 @@ CREATE TABLE UGroup (
   group_gid         integer,
   group_mailing     integer DEFAULT 0,
   group_delegation  varchar(64) DEFAULT '',
-  group_manager_id  integer DEFAULT 0,
+  group_manager_id  integer DEFAULT NULL,
   group_name        varchar(32) NOT NULL,
   group_desc        varchar(128),
   group_email       varchar(128),
@@ -1703,6 +1703,7 @@ CREATE TABLE Domain (
   domain_name           varchar(128),
   domain_alias          text,
   domain_mail_server_id integer DEFAULT NULL,
+  domain_global         boolean default false,
   PRIMARY KEY (domain_id)
 );
 
@@ -1917,6 +1918,935 @@ CREATE TABLE Updatedlinks (
   PRIMARY KEY (updatedlinks_id)
 );
 
+--
+-- Foreign Keys
+--
 
+-- Foreign key from account_domain_id to domain_id
+ALTER TABLE Account ADD CONSTRAINT account_domain_id_domain_id_fkey FOREIGN KEY (account_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from account_usercreate to userobm_id
+ALTER TABLE Account ADD CONSTRAINT account_usercreate_userobm_id_fkey FOREIGN KEY (account_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from account_userupdate to userobm_id
+ALTER TABLE Account ADD CONSTRAINT account_userupdate_userobm_id_fkey FOREIGN KEY (account_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from activeuserobm_userobm_id to userobm_id
+ALTER TABLE ActiveUserObm ADD CONSTRAINT activeuserobm_userobm_id_userobm_id_fkey FOREIGN KEY (activeuserobm_userobm_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from cv_domain_id to domain_id
+ALTER TABLE CV ADD CONSTRAINT cv_domain_id_domain_id_fkey FOREIGN KEY (cv_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from cv_userobm_id to userobm_id
+ALTER TABLE CV ADD CONSTRAINT cv_userobm_id_userobm_id_fkey FOREIGN KEY (cv_userobm_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from cv_userupdate to userobm_id
+ALTER TABLE CV ADD CONSTRAINT cv_userupdate_userobm_id_fkey FOREIGN KEY (cv_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from cv_usercreate to userobm_id
+ALTER TABLE CV ADD CONSTRAINT cv_usercreate_userobm_id_fkey FOREIGN KEY (cv_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from calendaralert_event_id to calendarevent_id
+ALTER TABLE CalendarAlert ADD CONSTRAINT calendaralert_event_id_calendarevent_id_fkey FOREIGN KEY (calendaralert_event_id) REFERENCES CalendarEvent(calendarevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from calendaralert_user_id to userobm_id
+ALTER TABLE CalendarAlert ADD CONSTRAINT calendaralert_user_id_userobm_id_fkey FOREIGN KEY (calendaralert_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from calendaralert_userupdate to userobm_id
+ALTER TABLE CalendarAlert ADD CONSTRAINT calendaralert_userupdate_userobm_id_fkey FOREIGN KEY (calendaralert_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from calendaralert_usercreate to userobm_id
+ALTER TABLE CalendarAlert ADD CONSTRAINT calendaralert_usercreate_userobm_id_fkey FOREIGN KEY (calendaralert_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from calendarcategory1_domain_id to domain_id
+ALTER TABLE CalendarCategory1 ADD CONSTRAINT calendarcategory1_domain_id_domain_id_fkey FOREIGN KEY (calendarcategory1_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from calendarcategory1_userupdate to userobm_id
+ALTER TABLE CalendarCategory1 ADD CONSTRAINT calendarcategory1_userupdate_userobm_id_fkey FOREIGN KEY (calendarcategory1_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from calendarcategory1_usercreate to userobm_id
+ALTER TABLE CalendarCategory1 ADD CONSTRAINT calendarcategory1_usercreate_userobm_id_fkey FOREIGN KEY (calendarcategory1_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from calendarevent_domain_id to domain_id
+ALTER TABLE CalendarEvent ADD CONSTRAINT calendarevent_domain_id_domain_id_fkey FOREIGN KEY (calendarevent_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from calendarevent_owner to userobm_id
+ALTER TABLE CalendarEvent ADD CONSTRAINT calendarevent_owner_userobm_id_fkey FOREIGN KEY (calendarevent_owner) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from calendarevent_userupdate to userobm_id
+ALTER TABLE CalendarEvent ADD CONSTRAINT calendarevent_userupdate_userobm_id_fkey FOREIGN KEY (calendarevent_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from calendarevent_usercreate to userobm_id
+ALTER TABLE CalendarEvent ADD CONSTRAINT calendarevent_usercreate_userobm_id_fkey FOREIGN KEY (calendarevent_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from calendarevent_category1_id to calendarcategory1_id
+ALTER TABLE CalendarEvent ADD CONSTRAINT calendarevent_category1_id_calendarcategory1_id_fkey FOREIGN KEY (calendarevent_category1_id) REFERENCES CalendarCategory1(calendarcategory1_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from calendarexception_event_id to calendarevent_id
+ALTER TABLE CalendarException ADD CONSTRAINT calendarexception_event_id_calendarevent_id_fkey FOREIGN KEY (calendarexception_event_id) REFERENCES CalendarEvent(calendarevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from calendarexception_userupdate to userobm_id
+ALTER TABLE CalendarException ADD CONSTRAINT calendarexception_userupdate_userobm_id_fkey FOREIGN KEY (calendarexception_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from calendarexception_usercreate to userobm_id
+ALTER TABLE CalendarException ADD CONSTRAINT calendarexception_usercreate_userobm_id_fkey FOREIGN KEY (calendarexception_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from category_domain_id to domain_id
+ALTER TABLE Category ADD CONSTRAINT category_domain_id_domain_id_fkey FOREIGN KEY (category_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from category_userupdate to userobm_id
+ALTER TABLE Category ADD CONSTRAINT category_userupdate_userobm_id_fkey FOREIGN KEY (category_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from category_usercreate to userobm_id
+ALTER TABLE Category ADD CONSTRAINT category_usercreate_userobm_id_fkey FOREIGN KEY (category_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from categorylink_category_id to category_id
+ALTER TABLE CategoryLink ADD CONSTRAINT categorylink_category_id_category_id_fkey FOREIGN KEY (categorylink_category_id) REFERENCES Category(category_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from company_domain_id to domain_id
+ALTER TABLE Company ADD CONSTRAINT company_domain_id_domain_id_fkey FOREIGN KEY (company_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from company_userupdate to userobm_id
+ALTER TABLE Company ADD CONSTRAINT company_userupdate_userobm_id_fkey FOREIGN KEY (company_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from company_usercreate to userobm_id
+ALTER TABLE Company ADD CONSTRAINT company_usercreate_userobm_id_fkey FOREIGN KEY (company_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from company_datasource_id to datasource_id
+ALTER TABLE Company ADD CONSTRAINT company_datasource_id_datasource_id_fkey FOREIGN KEY (company_datasource_id) REFERENCES DataSource(datasource_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from company_type_id to companytype_id
+ALTER TABLE Company ADD CONSTRAINT company_type_id_companytype_id_fkey FOREIGN KEY (company_type_id) REFERENCES CompanyType(companytype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from company_activity_id to companyactivity_id
+ALTER TABLE Company ADD CONSTRAINT company_activity_id_companyactivity_id_fkey FOREIGN KEY (company_activity_id) REFERENCES CompanyActivity(companyactivity_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from company_nafcode_id to companynafcode_id
+ALTER TABLE Company ADD CONSTRAINT company_nafcode_id_companynafcode_id_fkey FOREIGN KEY (company_nafcode_id) REFERENCES CompanyNafCode(companynafcode_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from company_marketingmanager_id to userobm_id
+ALTER TABLE Company ADD CONSTRAINT company_marketingmanager_id_userobm_id_fkey FOREIGN KEY (company_marketingmanager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from companyactivity_domain_id to domain_id
+ALTER TABLE CompanyActivity ADD CONSTRAINT companyactivity_domain_id_domain_id_fkey FOREIGN KEY (companyactivity_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from companyactivity_userupdate to userobm_id
+ALTER TABLE CompanyActivity ADD CONSTRAINT companyactivity_userupdate_userobm_id_fkey FOREIGN KEY (companyactivity_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from companyactivity_usercreate to userobm_id
+ALTER TABLE CompanyActivity ADD CONSTRAINT companyactivity_usercreate_userobm_id_fkey FOREIGN KEY (companyactivity_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from companynafcode_domain_id to domain_id
+ALTER TABLE CompanyNafCode ADD CONSTRAINT companynafcode_domain_id_domain_id_fkey FOREIGN KEY (companynafcode_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from companynafcode_userupdate to userobm_id
+ALTER TABLE CompanyNafCode ADD CONSTRAINT companynafcode_userupdate_userobm_id_fkey FOREIGN KEY (companynafcode_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from companynafcode_usercreate to userobm_id
+ALTER TABLE CompanyNafCode ADD CONSTRAINT companynafcode_usercreate_userobm_id_fkey FOREIGN KEY (companynafcode_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from companytype_domain_id to domain_id
+ALTER TABLE CompanyType ADD CONSTRAINT companytype_domain_id_domain_id_fkey FOREIGN KEY (companytype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from companytype_userupdate to userobm_id
+ALTER TABLE CompanyType ADD CONSTRAINT companytype_userupdate_userobm_id_fkey FOREIGN KEY (companytype_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from companytype_usercreate to userobm_id
+ALTER TABLE CompanyType ADD CONSTRAINT companytype_usercreate_userobm_id_fkey FOREIGN KEY (companytype_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contact_domain_id to domain_id
+ALTER TABLE Contact ADD CONSTRAINT contact_domain_id_domain_id_fkey FOREIGN KEY (contact_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contact_company_id to company_id
+ALTER TABLE Contact ADD CONSTRAINT contact_company_id_company_id_fkey FOREIGN KEY (contact_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contact_userupdate to userobm_id
+ALTER TABLE Contact ADD CONSTRAINT contact_userupdate_userobm_id_fkey FOREIGN KEY (contact_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contact_usercreate to userobm_id
+ALTER TABLE Contact ADD CONSTRAINT contact_usercreate_userobm_id_fkey FOREIGN KEY (contact_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contact_datasource_id to datasource_id
+ALTER TABLE Contact ADD CONSTRAINT contact_datasource_id_datasource_id_fkey FOREIGN KEY (contact_datasource_id) REFERENCES DataSource(datasource_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contact_kind_id to kind_id
+ALTER TABLE Contact ADD CONSTRAINT contact_kind_id_kind_id_fkey FOREIGN KEY (contact_kind_id) REFERENCES Kind(kind_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contact_marketingmanager_id to userobm_id
+ALTER TABLE Contact ADD CONSTRAINT contact_marketingmanager_id_userobm_id_fkey FOREIGN KEY (contact_marketingmanager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contact_function_id to contactfunction_id
+ALTER TABLE Contact ADD CONSTRAINT contact_function_id_contactfunction_id_fkey FOREIGN KEY (contact_function_id) REFERENCES ContactFunction(contactfunction_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contactfunction_domain_id to domain_id
+ALTER TABLE ContactFunction ADD CONSTRAINT contactfunction_domain_id_domain_id_fkey FOREIGN KEY (contactfunction_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contactfunction_userupdate to userobm_id
+ALTER TABLE ContactFunction ADD CONSTRAINT contactfunction_userupdate_userobm_id_fkey FOREIGN KEY (contactfunction_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contactfunction_usercreate to userobm_id
+ALTER TABLE ContactFunction ADD CONSTRAINT contactfunction_usercreate_userobm_id_fkey FOREIGN KEY (contactfunction_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contactlist_list_id to list_id
+ALTER TABLE ContactList ADD CONSTRAINT contactlist_list_id_list_id_fkey FOREIGN KEY (contactlist_list_id) REFERENCES List(list_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contactlist_contact_id to contact_id
+ALTER TABLE ContactList ADD CONSTRAINT contactlist_contact_id_contact_id_fkey FOREIGN KEY (contactlist_contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contract_domain_id to domain_id
+ALTER TABLE Contract ADD CONSTRAINT contract_domain_id_domain_id_fkey FOREIGN KEY (contract_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contract_deal_id to deal_id
+ALTER TABLE Contract ADD CONSTRAINT contract_deal_id_deal_id_fkey FOREIGN KEY (contract_deal_id) REFERENCES Deal(deal_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contract_company_id to company_id
+ALTER TABLE Contract ADD CONSTRAINT contract_company_id_company_id_fkey FOREIGN KEY (contract_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contract_userupdate to userobm_id
+ALTER TABLE Contract ADD CONSTRAINT contract_userupdate_userobm_id_fkey FOREIGN KEY (contract_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contract_usercreate to userobm_id
+ALTER TABLE Contract ADD CONSTRAINT contract_usercreate_userobm_id_fkey FOREIGN KEY (contract_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contract_type_id to contracttype_id
+ALTER TABLE Contract ADD CONSTRAINT contract_type_id_contracttype_id_fkey FOREIGN KEY (contract_type_id) REFERENCES ContractType(contracttype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contract_priority_id to contractpriority_id
+ALTER TABLE Contract ADD CONSTRAINT contract_priority_id_contractpriority_id_fkey FOREIGN KEY (contract_priority_id) REFERENCES ContractPriority(contractpriority_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contract_status_id to contractstatus_id
+ALTER TABLE Contract ADD CONSTRAINT contract_status_id_contractstatus_id_fkey FOREIGN KEY (contract_status_id) REFERENCES ContractStatus(contractstatus_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contract_contact1_id to contact_id
+ALTER TABLE Contract ADD CONSTRAINT contract_contact1_id_contact_id_fkey FOREIGN KEY (contract_contact1_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contract_contact2_id to contact_id
+ALTER TABLE Contract ADD CONSTRAINT contract_contact2_id_contact_id_fkey FOREIGN KEY (contract_contact2_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contract_techmanager_id to userobm_id
+ALTER TABLE Contract ADD CONSTRAINT contract_techmanager_id_userobm_id_fkey FOREIGN KEY (contract_techmanager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contract_marketmanager_id to userobm_id
+ALTER TABLE Contract ADD CONSTRAINT contract_marketmanager_id_userobm_id_fkey FOREIGN KEY (contract_marketmanager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contractpriority_domain_id to domain_id
+ALTER TABLE ContractPriority ADD CONSTRAINT contractpriority_domain_id_domain_id_fkey FOREIGN KEY (contractpriority_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contractpriority_userupdate to userobm_id
+ALTER TABLE ContractPriority ADD CONSTRAINT contractpriority_userupdate_userobm_id_fkey FOREIGN KEY (contractpriority_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contractpriority_usercreate to userobm_id
+ALTER TABLE ContractPriority ADD CONSTRAINT contractpriority_usercreate_userobm_id_fkey FOREIGN KEY (contractpriority_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contractstatus_domain_id to domain_id
+ALTER TABLE ContractStatus ADD CONSTRAINT contractstatus_domain_id_domain_id_fkey FOREIGN KEY (contractstatus_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contractstatus_userupdate to userobm_id
+ALTER TABLE ContractStatus ADD CONSTRAINT contractstatus_userupdate_userobm_id_fkey FOREIGN KEY (contractstatus_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contractstatus_usercreate to userobm_id
+ALTER TABLE ContractStatus ADD CONSTRAINT contractstatus_usercreate_userobm_id_fkey FOREIGN KEY (contractstatus_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contracttype_domain_id to domain_id
+ALTER TABLE ContractType ADD CONSTRAINT contracttype_domain_id_domain_id_fkey FOREIGN KEY (contracttype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contracttype_userupdate to userobm_id
+ALTER TABLE ContractType ADD CONSTRAINT contracttype_userupdate_userobm_id_fkey FOREIGN KEY (contracttype_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contracttype_usercreate to userobm_id
+ALTER TABLE ContractType ADD CONSTRAINT contracttype_usercreate_userobm_id_fkey FOREIGN KEY (contracttype_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from country_domain_id to domain_id
+ALTER TABLE Country ADD CONSTRAINT country_domain_id_domain_id_fkey FOREIGN KEY (country_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from country_userupdate to userobm_id
+ALTER TABLE Country ADD CONSTRAINT country_userupdate_userobm_id_fkey FOREIGN KEY (country_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from country_usercreate to userobm_id
+ALTER TABLE Country ADD CONSTRAINT country_usercreate_userobm_id_fkey FOREIGN KEY (country_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from datasource_domain_id to domain_id
+ALTER TABLE DataSource ADD CONSTRAINT datasource_domain_id_domain_id_fkey FOREIGN KEY (datasource_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from datasource_userupdate to userobm_id
+ALTER TABLE DataSource ADD CONSTRAINT datasource_userupdate_userobm_id_fkey FOREIGN KEY (datasource_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from datasource_usercreate to userobm_id
+ALTER TABLE DataSource ADD CONSTRAINT datasource_usercreate_userobm_id_fkey FOREIGN KEY (datasource_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from deal_domain_id to domain_id
+ALTER TABLE Deal ADD CONSTRAINT deal_domain_id_domain_id_fkey FOREIGN KEY (deal_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from deal_parentdeal_id to parentdeal_id
+ALTER TABLE Deal ADD CONSTRAINT deal_parentdeal_id_parentdeal_id_fkey FOREIGN KEY (deal_parentdeal_id) REFERENCES ParentDeal(parentdeal_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from deal_company_id to company_id
+ALTER TABLE Deal ADD CONSTRAINT deal_company_id_company_id_fkey FOREIGN KEY (deal_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from deal_userupdate to userobm_id
+ALTER TABLE Deal ADD CONSTRAINT deal_userupdate_userobm_id_fkey FOREIGN KEY (deal_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from deal_usercreate to userobm_id
+ALTER TABLE Deal ADD CONSTRAINT deal_usercreate_userobm_id_fkey FOREIGN KEY (deal_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from deal_type_id to dealtype_id
+ALTER TABLE Deal ADD CONSTRAINT deal_type_id_dealtype_id_fkey FOREIGN KEY (deal_type_id) REFERENCES DealType(dealtype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from deal_region_id to region_id
+ALTER TABLE Deal ADD CONSTRAINT deal_region_id_region_id_fkey FOREIGN KEY (deal_region_id) REFERENCES Region(region_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from deal_tasktype_id to tasktype_id
+ALTER TABLE Deal ADD CONSTRAINT deal_tasktype_id_tasktype_id_fkey FOREIGN KEY (deal_tasktype_id) REFERENCES TaskType(tasktype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from deal_contact1_id to contact_id
+ALTER TABLE Deal ADD CONSTRAINT deal_contact1_id_contact_id_fkey FOREIGN KEY (deal_contact1_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from deal_contact2_id to contact_id
+ALTER TABLE Deal ADD CONSTRAINT deal_contact2_id_contact_id_fkey FOREIGN KEY (deal_contact2_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from deal_marketingmanager_id to userobm_id
+ALTER TABLE Deal ADD CONSTRAINT deal_marketingmanager_id_userobm_id_fkey FOREIGN KEY (deal_marketingmanager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from deal_technicalmanager_id to userobm_id
+ALTER TABLE Deal ADD CONSTRAINT deal_technicalmanager_id_userobm_id_fkey FOREIGN KEY (deal_technicalmanager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from deal_source_id to leadsource_id
+ALTER TABLE Deal ADD CONSTRAINT deal_source_id_leadsource_id_fkey FOREIGN KEY (deal_source_id) REFERENCES LeadSource(leadsource_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from dealcompany_deal_id to deal_id
+ALTER TABLE DealCompany ADD CONSTRAINT dealcompany_deal_id_deal_id_fkey FOREIGN KEY (dealcompany_deal_id) REFERENCES Deal(deal_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from dealcompany_company_id to company_id
+ALTER TABLE DealCompany ADD CONSTRAINT dealcompany_company_id_company_id_fkey FOREIGN KEY (dealcompany_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from dealcompany_role_id to dealcompanyrole_id
+ALTER TABLE DealCompany ADD CONSTRAINT dealcompany_role_id_dealcompanyrole_id_fkey FOREIGN KEY (dealcompany_role_id) REFERENCES DealCompanyRole(dealcompanyrole_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from dealcompany_userupdate to userobm_id
+ALTER TABLE DealCompany ADD CONSTRAINT dealcompany_userupdate_userobm_id_fkey FOREIGN KEY (dealcompany_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from dealcompany_usercreate to userobm_id
+ALTER TABLE DealCompany ADD CONSTRAINT dealcompany_usercreate_userobm_id_fkey FOREIGN KEY (dealcompany_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from dealcompanyrole_domain_id to domain_id
+ALTER TABLE DealCompanyRole ADD CONSTRAINT dealcompanyrole_domain_id_domain_id_fkey FOREIGN KEY (dealcompanyrole_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from dealcompanyrole_userupdate to userobm_id
+ALTER TABLE DealCompanyRole ADD CONSTRAINT dealcompanyrole_userupdate_userobm_id_fkey FOREIGN KEY (dealcompanyrole_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from dealcompanyrole_usercreate to userobm_id
+ALTER TABLE DealCompanyRole ADD CONSTRAINT dealcompanyrole_usercreate_userobm_id_fkey FOREIGN KEY (dealcompanyrole_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from dealstatus_domain_id to domain_id
+ALTER TABLE DealStatus ADD CONSTRAINT dealstatus_domain_id_domain_id_fkey FOREIGN KEY (dealstatus_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from dealstatus_userupdate to userobm_id
+ALTER TABLE DealStatus ADD CONSTRAINT dealstatus_userupdate_userobm_id_fkey FOREIGN KEY (dealstatus_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from dealstatus_usercreate to userobm_id
+ALTER TABLE DealStatus ADD CONSTRAINT dealstatus_usercreate_userobm_id_fkey FOREIGN KEY (dealstatus_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from dealtype_domain_id to domain_id
+ALTER TABLE DealType ADD CONSTRAINT dealtype_domain_id_domain_id_fkey FOREIGN KEY (dealtype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from dealtype_userupdate to userobm_id
+ALTER TABLE DealType ADD CONSTRAINT dealtype_userupdate_userobm_id_fkey FOREIGN KEY (dealtype_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from dealtype_usercreate to userobm_id
+ALTER TABLE DealType ADD CONSTRAINT dealtype_usercreate_userobm_id_fkey FOREIGN KEY (dealtype_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from defaultodttemplate_domain_id to domain_id
+ALTER TABLE DefaultOdtTemplate ADD CONSTRAINT defaultodttemplate_domain_id_domain_id_fkey FOREIGN KEY (defaultodttemplate_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from defaultodttemplate_document_id to document_id
+ALTER TABLE DefaultOdtTemplate ADD CONSTRAINT defaultodttemplate_document_id_document_id_fkey FOREIGN KEY (defaultodttemplate_document_id) REFERENCES Document(document_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from deleted_user_id to userobm_id
+ALTER TABLE Deleted ADD CONSTRAINT deleted_user_id_userobm_id_fkey FOREIGN KEY (deleted_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from deleted_domain_id to domain_id
+ALTER TABLE Deleted ADD CONSTRAINT deleted_domain_id_domain_id_fkey FOREIGN KEY (deleted_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from display_user_id to userobm_id;
+ALTER TABLE DisplayPref ADD CONSTRAINT display_user_id_userobm_id_fkey FOREIGN KEY (display_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from document_domain_id to domain_id
+ALTER TABLE Document ADD CONSTRAINT document_domain_id_domain_id_fkey FOREIGN KEY (document_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from document_userupdate to userobm_id
+ALTER TABLE Document ADD CONSTRAINT document_userupdate_userobm_id_fkey FOREIGN KEY (document_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from document_usercreate to userobm_id
+ALTER TABLE Document ADD CONSTRAINT document_usercreate_userobm_id_fkey FOREIGN KEY (document_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from document_mimetype_id to documentmimetype_id
+ALTER TABLE Document ADD CONSTRAINT document_mimetype_id_documentmimetype_id_fkey FOREIGN KEY (document_mimetype_id) REFERENCES DocumentMimeType(documentmimetype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from documententity_document_id to document_id
+ALTER TABLE DocumentEntity ADD CONSTRAINT documententity_document_id_document_id_fkey FOREIGN KEY (documententity_document_id) REFERENCES Document(document_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from documentmimetype_domain_id to domain_id
+ALTER TABLE DocumentMimeType ADD CONSTRAINT documentmimetype_domain_id_domain_id_fkey FOREIGN KEY (documentmimetype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from documentmimetype_userupdate to userobm_id
+ALTER TABLE DocumentMimeType ADD CONSTRAINT documentmimetype_userupdate_userobm_id_fkey FOREIGN KEY (documentmimetype_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from documentmimetype_usercreate to userobm_id
+ALTER TABLE DocumentMimeType ADD CONSTRAINT documentmimetype_usercreate_userobm_id_fkey FOREIGN KEY (documentmimetype_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from domain_userupdate to userobm_id
+ALTER TABLE Domain ADD CONSTRAINT domain_userupdate_userobm_id_fkey FOREIGN KEY (domain_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from domain_usercreate to userobm_id
+ALTER TABLE Domain ADD CONSTRAINT domain_usercreate_userobm_id_fkey FOREIGN KEY (domain_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from domain_mail_server_id to mailserver_id
+ALTER TABLE Domain ADD CONSTRAINT domain_mail_server_id_mailserver_id_fkey FOREIGN KEY (domain_mail_server_id) REFERENCES MailServer(mailserver_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from domainmailserver_domain_id to domain_id
+ALTER TABLE DomainMailServer ADD CONSTRAINT domainmailserver_domain_id_domain_id_fkey FOREIGN KEY (domainmailserver_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from domainmailserver_mailserver_id to mailserver_id
+ALTER TABLE DomainMailServer ADD CONSTRAINT domainmailserver_mailserver_id_mailserver_id_fkey FOREIGN KEY (domainmailserver_mailserver_id) REFERENCES MailServer(mailserver_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from domainpropertyvalue_domain_id to domain_id
+ALTER TABLE DomainPropertyValue ADD CONSTRAINT domainpropertyvalue_domain_id_domain_id_fkey FOREIGN KEY (domainpropertyvalue_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from evententity_event_id to calendarevent_id
+ALTER TABLE EventEntity ADD CONSTRAINT evententity_event_id_calendarevent_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES CalendarEvent(calendarevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from evententity_userupdate to userobm_id
+ALTER TABLE EventEntity ADD CONSTRAINT evententity_userupdate_userobm_id_fkey FOREIGN KEY (evententity_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from evententity_usercreate to userobm_id
+ALTER TABLE EventEntity ADD CONSTRAINT evententity_usercreate_userobm_id_fkey FOREIGN KEY (evententity_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from groupgroup_parent_id to group_id
+ALTER TABLE GroupGroup ADD CONSTRAINT groupgroup_parent_id_group_id_fkey FOREIGN KEY (groupgroup_parent_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from groupgroup_child_id to group_id
+ALTER TABLE GroupGroup ADD CONSTRAINT groupgroup_child_id_group_id_fkey FOREIGN KEY (groupgroup_child_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from host_domain_id to domain_id
+ALTER TABLE Host ADD CONSTRAINT host_domain_id_domain_id_fkey FOREIGN KEY (host_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from host_userupdate to userobm_id
+ALTER TABLE Host ADD CONSTRAINT host_userupdate_userobm_id_fkey FOREIGN KEY (host_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from host_usercreate to userobm_id
+ALTER TABLE Host ADD CONSTRAINT host_usercreate_userobm_id_fkey FOREIGN KEY (host_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from import_domain_id to domain_id
+ALTER TABLE Import ADD CONSTRAINT import_domain_id_domain_id_fkey FOREIGN KEY (import_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from import_userupdate to userobm_id
+ALTER TABLE Import ADD CONSTRAINT import_userupdate_userobm_id_fkey FOREIGN KEY (import_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from import_usercreate to userobm_id
+ALTER TABLE Import ADD CONSTRAINT import_usercreate_userobm_id_fkey FOREIGN KEY (import_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from import_datasource_id to datasource_id
+ALTER TABLE Import ADD CONSTRAINT import_datasource_id_datasource_id_fkey FOREIGN KEY (import_datasource_id) REFERENCES DataSource(datasource_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from import_marketingmanager_id to userobm_id
+ALTER TABLE Import ADD CONSTRAINT import_marketingmanager_id_userobm_id_fkey FOREIGN KEY (import_marketingmanager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incident_domain_id to domain_id
+ALTER TABLE Incident ADD CONSTRAINT incident_domain_id_domain_id_fkey FOREIGN KEY (incident_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from incident_contract_id to contract_id
+ALTER TABLE Incident ADD CONSTRAINT incident_contract_id_contract_id_fkey FOREIGN KEY (incident_contract_id) REFERENCES Contract(contract_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from incident_userupdate to userobm_id
+ALTER TABLE Incident ADD CONSTRAINT incident_userupdate_userobm_id_fkey FOREIGN KEY (incident_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incident_usercreate to userobm_id
+ALTER TABLE Incident ADD CONSTRAINT incident_usercreate_userobm_id_fkey FOREIGN KEY (incident_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incident_priority_id to incidentpriority_id
+ALTER TABLE Incident ADD CONSTRAINT incident_priority_id_incidentpriority_id_fkey FOREIGN KEY (incident_priority_id) REFERENCES IncidentPriority(incidentpriority_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incident_status_id to incidentstatus_id
+ALTER TABLE Incident ADD CONSTRAINT incident_status_id_incidentstatus_id_fkey FOREIGN KEY (incident_status_id) REFERENCES IncidentStatus(incidentstatus_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incident_resolutiontype_id to incidentresolutiontype_id
+ALTER TABLE Incident ADD CONSTRAINT incident_resolutiontype_id_incidentresolutiontype_id_fkey FOREIGN KEY (incident_resolutiontype_id) REFERENCES IncidentResolutionType(incidentresolutiontype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incident_logger to userobm_id
+ALTER TABLE Incident ADD CONSTRAINT incident_logger_userobm_id_fkey FOREIGN KEY (incident_logger) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incident_owner to userobm_id
+ALTER TABLE Incident ADD CONSTRAINT incident_owner_userobm_id_fkey FOREIGN KEY (incident_owner) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incidentpriority_domain_id to domain_id
+ALTER TABLE IncidentPriority ADD CONSTRAINT incidentpriority_domain_id_domain_id_fkey FOREIGN KEY (incidentpriority_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from incidentpriority_userupdate to userobm_id
+ALTER TABLE IncidentPriority ADD CONSTRAINT incidentpriority_userupdate_userobm_id_fkey FOREIGN KEY (incidentpriority_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incidentpriority_usercreate to userobm_id
+ALTER TABLE IncidentPriority ADD CONSTRAINT incidentpriority_usercreate_userobm_id_fkey FOREIGN KEY (incidentpriority_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incidentresolutiontype_domain_id to domain_id
+ALTER TABLE IncidentResolutionType ADD CONSTRAINT incidentresolutiontype_domain_id_domain_id_fkey FOREIGN KEY (incidentresolutiontype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from incidentresolutiontype_userupdate to userobm_id
+ALTER TABLE IncidentResolutionType ADD CONSTRAINT incidentresolutiontype_userupdate_userobm_id_fkey FOREIGN KEY (incidentresolutiontype_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incidentresolutiontype_usercreate to userobm_id
+ALTER TABLE IncidentResolutionType ADD CONSTRAINT incidentresolutiontype_usercreate_userobm_id_fkey FOREIGN KEY (incidentresolutiontype_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incidentstatus_domain_id to domain_id
+ALTER TABLE IncidentStatus ADD CONSTRAINT incidentstatus_domain_id_domain_id_fkey FOREIGN KEY (incidentstatus_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from incidentstatus_userupdate to userobm_id
+ALTER TABLE IncidentStatus ADD CONSTRAINT incidentstatus_userupdate_userobm_id_fkey FOREIGN KEY (incidentstatus_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from incidentstatus_usercreate to userobm_id
+ALTER TABLE IncidentStatus ADD CONSTRAINT incidentstatus_usercreate_userobm_id_fkey FOREIGN KEY (incidentstatus_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from invoice_domain_id to domain_id
+ALTER TABLE Invoice ADD CONSTRAINT invoice_domain_id_domain_id_fkey FOREIGN KEY (invoice_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from invoice_company_id to company_id
+ALTER TABLE Invoice ADD CONSTRAINT invoice_company_id_company_id_fkey FOREIGN KEY (invoice_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from invoice_project_id to project_id
+ALTER TABLE Invoice ADD CONSTRAINT invoice_project_id_project_id_fkey FOREIGN KEY (invoice_project_id) REFERENCES Project(project_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from invoice_deal_id to deal_id
+ALTER TABLE Invoice ADD CONSTRAINT invoice_deal_id_deal_id_fkey FOREIGN KEY (invoice_deal_id) REFERENCES Deal(deal_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from invoice_userupdate to userobm_id
+ALTER TABLE Invoice ADD CONSTRAINT invoice_userupdate_userobm_id_fkey FOREIGN KEY (invoice_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from invoice_usercreate to userobm_id
+ALTER TABLE Invoice ADD CONSTRAINT invoice_usercreate_userobm_id_fkey FOREIGN KEY (invoice_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from kind_domain_id to domain_id
+ALTER TABLE Kind ADD CONSTRAINT kind_domain_id_domain_id_fkey FOREIGN KEY (kind_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from kind_userupdate to userobm_id
+ALTER TABLE Kind ADD CONSTRAINT kind_userupdate_userobm_id_fkey FOREIGN KEY (kind_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from kind_usercreate to userobm_id
+ALTER TABLE Kind ADD CONSTRAINT kind_usercreate_userobm_id_fkey FOREIGN KEY (kind_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from lead_domain_id to domain_id
+ALTER TABLE Lead ADD CONSTRAINT lead_domain_id_domain_id_fkey FOREIGN KEY (lead_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from lead_company_id to company_id
+ALTER TABLE Lead ADD CONSTRAINT lead_company_id_company_id_fkey FOREIGN KEY (lead_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from lead_userupdate to userobm_id
+ALTER TABLE Lead ADD CONSTRAINT lead_userupdate_userobm_id_fkey FOREIGN KEY (lead_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from lead_usercreate to userobm_id
+ALTER TABLE Lead ADD CONSTRAINT lead_usercreate_userobm_id_fkey FOREIGN KEY (lead_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from lead_source_id to leadsource_id
+ALTER TABLE Lead ADD CONSTRAINT lead_source_id_leadsource_id_fkey FOREIGN KEY (lead_source_id) REFERENCES LeadSource(leadsource_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from lead_manager_id to userobm_id
+ALTER TABLE Lead ADD CONSTRAINT lead_manager_id_userobm_id_fkey FOREIGN KEY (lead_manager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from lead_contact_id to contact_id
+ALTER TABLE Lead ADD CONSTRAINT lead_contact_id_contact_id_fkey FOREIGN KEY (lead_contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from lead_status_id to leadstatus_id
+ALTER TABLE Lead ADD CONSTRAINT lead_status_id_leadstatus_id_fkey FOREIGN KEY (lead_status_id) REFERENCES LeadStatus(leadstatus_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from leadsource_domain_id to domain_id
+ALTER TABLE LeadSource ADD CONSTRAINT leadsource_domain_id_domain_id_fkey FOREIGN KEY (leadsource_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from leadsource_userupdate to userobm_id
+ALTER TABLE LeadSource ADD CONSTRAINT leadsource_userupdate_userobm_id_fkey FOREIGN KEY (leadsource_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from leadsource_usercreate to userobm_id
+ALTER TABLE LeadSource ADD CONSTRAINT leadsource_usercreate_userobm_id_fkey FOREIGN KEY (leadsource_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from leadstatus_domain_id to domain_id
+ALTER TABLE LeadStatus ADD CONSTRAINT leadstatus_domain_id_domain_id_fkey FOREIGN KEY (leadstatus_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from leadstatus_userupdate to userobm_id
+ALTER TABLE LeadStatus ADD CONSTRAINT leadstatus_userupdate_userobm_id_fkey FOREIGN KEY (leadstatus_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from leadstatus_usercreate to userobm_id
+ALTER TABLE LeadStatus ADD CONSTRAINT leadstatus_usercreate_userobm_id_fkey FOREIGN KEY (leadstatus_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from list_domain_id to domain_id
+ALTER TABLE List ADD CONSTRAINT list_domain_id_domain_id_fkey FOREIGN KEY (list_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from list_userupdate to userobm_id
+ALTER TABLE List ADD CONSTRAINT list_userupdate_userobm_id_fkey FOREIGN KEY (list_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from list_usercreate to userobm_id
+ALTER TABLE List ADD CONSTRAINT list_usercreate_userobm_id_fkey FOREIGN KEY (list_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from mailserver_host_id to host_id
+ALTER TABLE MailServer ADD CONSTRAINT mailserver_host_id_host_id_fkey FOREIGN KEY (mailserver_host_id) REFERENCES Host(host_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from mailserver_userupdate to userobm_id
+ALTER TABLE MailServer ADD CONSTRAINT mailserver_userupdate_userobm_id_fkey FOREIGN KEY (mailserver_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from mailserver_usercreate to userobm_id
+ALTER TABLE MailServer ADD CONSTRAINT mailserver_usercreate_userobm_id_fkey FOREIGN KEY (mailserver_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from mailserver_relayhost_id to Host
+ALTER TABLE MailServer ADD CONSTRAINT mailserver_relayhost_id_host_id_fkey FOREIGN KEY (mailserver_relayhost_id) REFERENCES Host(host_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from mailshare_domain_id to domain_id
+ALTER TABLE MailShare ADD CONSTRAINT mailshare_domain_id_domain_id_fkey FOREIGN KEY (mailshare_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from mailshare_mail_server_id to mailserver_id
+ALTER TABLE MailShare ADD CONSTRAINT mailshare_mail_server_id_mailserver_id_fkey FOREIGN KEY (mailshare_mail_server_id) REFERENCES MailServer(mailserver_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from mailshare_userupdate to userobm_id
+ALTER TABLE MailShare ADD CONSTRAINT mailshare_userupdate_userobm_id_fkey FOREIGN KEY (mailshare_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from mailshare_usercreate to userobm_id
+ALTER TABLE MailShare ADD CONSTRAINT mailshare_usercreate_userobm_id_fkey FOREIGN KEY (mailshare_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from ogroup_domain_id to domain_id
+ALTER TABLE OGroup ADD CONSTRAINT ogroup_domain_id_domain_id_fkey FOREIGN KEY (ogroup_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from ogroup_organizationalchart_id to organizationalchart_id
+ALTER TABLE OGroup ADD CONSTRAINT ogroup_organizationalchart_id_organizationalchart_id_fkey FOREIGN KEY (ogroup_organizationalchart_id) REFERENCES OrganizationalChart(organizationalchart_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from ogroup_parent_id to ogroup_id
+ALTER TABLE OGroup ADD CONSTRAINT ogroup_parent_id_ogroup_id_fkey FOREIGN KEY (ogroup_parent_id) REFERENCES OGroup(ogroup_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from ogroup_userupdate to userobm_id
+ALTER TABLE OGroup ADD CONSTRAINT ogroup_userupdate_userobm_id_fkey FOREIGN KEY (ogroup_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from ogroup_usercreate to userobm_id
+ALTER TABLE OGroup ADD CONSTRAINT ogroup_usercreate_userobm_id_fkey FOREIGN KEY (ogroup_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from ogroupentity_ogroup_id to ogroup_id
+ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_ogroup_id_ogroup_id_fkey FOREIGN KEY (ogroupentity_ogroup_id) REFERENCES OGroup(ogroup_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from ogroupentity_domain_id to domain_id
+ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_domain_id_domain_id_fkey FOREIGN KEY (ogroupentity_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from ogroupentity_userupdate to userobm_id
+ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_userupdate_userobm_id_fkey FOREIGN KEY (ogroupentity_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from ogroupentity_usercreate to userobm_id
+ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_usercreate_userobm_id_fkey FOREIGN KEY (ogroupentity_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from obmbookmark_user_id to userobm_id
+ALTER TABLE ObmBookmark ADD CONSTRAINT obmbookmark_user_id_userobm_id_fkey FOREIGN KEY (obmbookmark_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from obmbookmarkproperty_bookmark_id to obmbookmark_id
+ALTER TABLE ObmBookmarkProperty ADD CONSTRAINT obmbookmarkproperty_bookmark_id_obmbookmark_id_fkey FOREIGN KEY (obmbookmarkproperty_bookmark_id) REFERENCES ObmBookmark(obmbookmark_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from organizationalchart_domain_id to domain_id
+ALTER TABLE OrganizationalChart ADD CONSTRAINT organizationalchart_domain_id_domain_id_fkey FOREIGN KEY (organizationalchart_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from organizationalchart_userupdate to userobm_id
+ALTER TABLE OrganizationalChart ADD CONSTRAINT organizationalchart_userupdate_userobm_id_fkey FOREIGN KEY (organizationalchart_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from organizationalchart_usercreate to userobm_id
+ALTER TABLE OrganizationalChart ADD CONSTRAINT organizationalchart_usercreate_userobm_id_fkey FOREIGN KEY (organizationalchart_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from parentdeal_domain_id to domain_id
+ALTER TABLE ParentDeal ADD CONSTRAINT parentdeal_domain_id_domain_id_fkey FOREIGN KEY (parentdeal_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from parentdeal_userupdate to userobm_id
+ALTER TABLE ParentDeal ADD CONSTRAINT parentdeal_userupdate_userobm_id_fkey FOREIGN KEY (parentdeal_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from parentdeal_usercreate to userobm_id
+ALTER TABLE ParentDeal ADD CONSTRAINT parentdeal_usercreate_userobm_id_fkey FOREIGN KEY (parentdeal_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from parentdeal_marketingmanager_id to userobm_id
+ALTER TABLE ParentDeal ADD CONSTRAINT parentdeal_marketingmanager_id_userobm_id_fkey FOREIGN KEY (parentdeal_marketingmanager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from parentdeal_technicalmanager_id to userobm_id
+ALTER TABLE ParentDeal ADD CONSTRAINT parentdeal_technicalmanager_id_userobm_id_fkey FOREIGN KEY (parentdeal_technicalmanager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from payment_domain_id to domain_id
+ALTER TABLE Payment ADD CONSTRAINT payment_domain_id_domain_id_fkey FOREIGN KEY (payment_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from payment_account_id to account_id
+ALTER TABLE Payment ADD CONSTRAINT payment_account_id_account_id_fkey FOREIGN KEY (payment_account_id) REFERENCES Account(account_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from payment_userupdate to userobm_id
+ALTER TABLE Payment ADD CONSTRAINT payment_userupdate_userobm_id_fkey FOREIGN KEY (payment_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from payment_usercreate to userobm_id
+ALTER TABLE Payment ADD CONSTRAINT payment_usercreate_userobm_id_fkey FOREIGN KEY (payment_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from payment_company_id to company_id
+ALTER TABLE Payment ADD CONSTRAINT payment_company_id_company_id_fkey FOREIGN KEY (payment_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from payment_paymentkind_id to paymentkind_id
+ALTER TABLE Payment ADD CONSTRAINT payment_paymentkind_id_paymentkind_id_fkey FOREIGN KEY (payment_paymentkind_id) REFERENCES PaymentKind(paymentkind_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from paymentinvoice_invoice_id to invoice_id
+ALTER TABLE PaymentInvoice ADD CONSTRAINT paymentinvoice_invoice_id_invoice_id_fkey FOREIGN KEY (paymentinvoice_invoice_id) REFERENCES Invoice(invoice_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from paymentinvoice_payment_id to payment_id
+ALTER TABLE PaymentInvoice ADD CONSTRAINT paymentinvoice_payment_id_payment_id_fkey FOREIGN KEY (paymentinvoice_payment_id) REFERENCES Payment(payment_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from paymentinvoice_usercreate to userobm_id
+ALTER TABLE PaymentInvoice ADD CONSTRAINT paymentinvoice_usercreate_userobm_id_fkey FOREIGN KEY (paymentinvoice_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from paymentinvoice_userupdate to userobm_id
+ALTER TABLE PaymentInvoice ADD CONSTRAINT paymentinvoice_userupdate_userobm_id_fkey FOREIGN KEY (paymentinvoice_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from paymentkind_domain_id to domain_id
+ALTER TABLE PaymentKind ADD CONSTRAINT paymentkind_domain_id_domain_id_fkey FOREIGN KEY (paymentkind_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from project_domain_id to domain_id
+ALTER TABLE Project ADD CONSTRAINT project_domain_id_domain_id_fkey FOREIGN KEY (project_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from project_deal_id to deal_id
+ALTER TABLE Project ADD CONSTRAINT project_deal_id_deal_id_fkey FOREIGN KEY (project_deal_id) REFERENCES Deal(deal_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from project_company_id to company_id
+ALTER TABLE Project ADD CONSTRAINT project_company_id_company_id_fkey FOREIGN KEY (project_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from project_userupdate to userobm_id
+ALTER TABLE Project ADD CONSTRAINT project_userupdate_userobm_id_fkey FOREIGN KEY (project_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from project_usercreate to userobm_id
+ALTER TABLE Project ADD CONSTRAINT project_usercreate_userobm_id_fkey FOREIGN KEY (project_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from project_tasktype_id to tasktype_id
+ALTER TABLE Project ADD CONSTRAINT project_tasktype_id_tasktype_id_fkey FOREIGN KEY (project_tasktype_id) REFERENCES TaskType(tasktype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from project_type_id to dealtype_id
+ALTER TABLE Project ADD CONSTRAINT project_type_id_dealtype_id_fkey FOREIGN KEY (project_type_id) REFERENCES DealType(dealtype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from projectcv_project_id to project_id
+ALTER TABLE ProjectCV ADD CONSTRAINT projectcv_project_id_project_id_fkey FOREIGN KEY (projectcv_project_id) REFERENCES Project(project_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from projectcv_cv_id to cv_id
+ALTER TABLE ProjectCV ADD CONSTRAINT projectcv_cv_id_cv_id_fkey FOREIGN KEY (projectcv_cv_id) REFERENCES CV(cv_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from projectclosing_project_id to project_id
+ALTER TABLE ProjectClosing ADD CONSTRAINT projectclosing_project_id_project_id_fkey FOREIGN KEY (projectclosing_project_id) REFERENCES Project(project_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from projectclosing_userupdate to userobm_id
+ALTER TABLE ProjectClosing ADD CONSTRAINT projectclosing_userupdate_userobm_id_fkey FOREIGN KEY (projectclosing_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from projectclosing_usercreate to userobm_id
+ALTER TABLE ProjectClosing ADD CONSTRAINT projectclosing_usercreate_userobm_id_fkey FOREIGN KEY (projectclosing_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from projectreftask_tasktype_id to tasktype_id
+ALTER TABLE ProjectRefTask ADD CONSTRAINT projectreftask_tasktype_id_tasktype_id_fkey FOREIGN KEY (projectreftask_tasktype_id) REFERENCES TaskType(tasktype_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from projectreftask_userupdate to userobm_id
+ALTER TABLE ProjectRefTask ADD CONSTRAINT projectreftask_userupdate_userobm_id_fkey FOREIGN KEY (projectreftask_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from projectreftask_usercreate to userobm_id
+ALTER TABLE ProjectRefTask ADD CONSTRAINT projectreftask_usercreate_userobm_id_fkey FOREIGN KEY (projectreftask_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from projecttask_project_id to project_id
+ALTER TABLE ProjectTask ADD CONSTRAINT projecttask_project_id_project_id_fkey FOREIGN KEY (projecttask_project_id) REFERENCES Project(project_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from projecttask_parenttask_id to projecttask_id
+ALTER TABLE ProjectTask ADD CONSTRAINT projecttask_parenttask_id_projecttask_id_fkey FOREIGN KEY (projecttask_parenttask_id) REFERENCES ProjectTask(projecttask_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from projecttask_userupdate to userobm_id
+ALTER TABLE ProjectTask ADD CONSTRAINT projecttask_userupdate_userobm_id_fkey FOREIGN KEY (projecttask_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from projecttask_usercreate to userobm_id
+ALTER TABLE ProjectTask ADD CONSTRAINT projecttask_usercreate_userobm_id_fkey FOREIGN KEY (projecttask_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from projectuser_project_id to project_id
+ALTER TABLE ProjectUser ADD CONSTRAINT projectuser_project_id_project_id_fkey FOREIGN KEY (projectuser_project_id) REFERENCES Project(project_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from projectuser_user_id to userobm_id
+ALTER TABLE ProjectUser ADD CONSTRAINT projectuser_user_id_userobm_id_fkey FOREIGN KEY (projectuser_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from projectuser_userupdate to userobm_id
+ALTER TABLE ProjectUser ADD CONSTRAINT projectuser_userupdate_userobm_id_fkey FOREIGN KEY (projectuser_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from projectuser_usercreate to userobm_id
+ALTER TABLE ProjectUser ADD CONSTRAINT projectuser_usercreate_userobm_id_fkey FOREIGN KEY (projectuser_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from publication_domain_id to domain_id
+ALTER TABLE Publication ADD CONSTRAINT publication_domain_id_domain_id_fkey FOREIGN KEY (publication_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from publication_userupdate to userobm_id
+ALTER TABLE Publication ADD CONSTRAINT publication_userupdate_userobm_id_fkey FOREIGN KEY (publication_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from publication_usercreate to userobm_id
+ALTER TABLE Publication ADD CONSTRAINT publication_usercreate_userobm_id_fkey FOREIGN KEY (publication_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from publication_type_id to publicationtype_id
+ALTER TABLE Publication ADD CONSTRAINT publication_type_id_publicationtype_id_fkey FOREIGN KEY (publication_type_id) REFERENCES PublicationType(publicationtype_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from publicationtype_domain_id to domain_id
+ALTER TABLE PublicationType ADD CONSTRAINT publicationtype_domain_id_domain_id_fkey FOREIGN KEY (publicationtype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from publicationtype_userupdate to userobm_id
+ALTER TABLE PublicationType ADD CONSTRAINT publicationtype_userupdate_userobm_id_fkey FOREIGN KEY (publicationtype_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from publicationtype_usercreate to userobm_id
+ALTER TABLE PublicationType ADD CONSTRAINT publicationtype_usercreate_userobm_id_fkey FOREIGN KEY (publicationtype_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from rgroup_domain_id to domain_id
+ALTER TABLE RGroup ADD CONSTRAINT rgroup_domain_id_domain_id_fkey FOREIGN KEY (rgroup_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from rgroup_userupdate to userobm_id
+ALTER TABLE RGroup ADD CONSTRAINT rgroup_userupdate_userobm_id_fkey FOREIGN KEY (rgroup_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from rgroup_usercreate to userobm_id
+ALTER TABLE RGroup ADD CONSTRAINT rgroup_usercreate_userobm_id_fkey FOREIGN KEY (rgroup_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from region_domain_id to domain_id
+ALTER TABLE Region ADD CONSTRAINT region_domain_id_domain_id_fkey FOREIGN KEY (region_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from region_userupdate to userobm_id
+ALTER TABLE Region ADD CONSTRAINT region_userupdate_userobm_id_fkey FOREIGN KEY (region_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from region_usercreate to userobm_id
+ALTER TABLE Region ADD CONSTRAINT region_usercreate_userobm_id_fkey FOREIGN KEY (region_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from resource_domain_id to domain_id
+ALTER TABLE Resource ADD CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from resourcegroup_rgroup_id to rgroup_id
+ALTER TABLE ResourceGroup ADD CONSTRAINT resourcegroup_rgroup_id_rgroup_id_fkey FOREIGN KEY (resourcegroup_rgroup_id) REFERENCES RGroup(rgroup_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from resourcegroup_resource_id to resource_id
+ALTER TABLE ResourceGroup ADD CONSTRAINT resourcegroup_resource_id_resource_id_fkey FOREIGN KEY (resourcegroup_resource_id) REFERENCES Resource(resource_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from resourceitem_domain_id to domain_id
+ALTER TABLE ResourceItem ADD CONSTRAINT resourceitem_domain_id_domain_id_fkey FOREIGN KEY (resourceitem_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from resourceitem_resourcetype_id to resourcetype_id
+ALTER TABLE ResourceItem ADD CONSTRAINT resourceitem_resourcetype_id_resourcetype_id_fkey FOREIGN KEY (resourceitem_resourcetype_id) REFERENCES ResourceType(resourcetype_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from resourcetype_domain_id to domain_id
+ALTER TABLE ResourceType ADD CONSTRAINT resourcetype_domain_id_domain_id_fkey FOREIGN KEY (resourcetype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from samba_domain_id to domain_id
+ALTER TABLE Samba ADD CONSTRAINT samba_domain_id_domain_id_fkey FOREIGN KEY (samba_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from subscription_domain_id to domain_id
+ALTER TABLE Subscription ADD CONSTRAINT subscription_domain_id_domain_id_fkey FOREIGN KEY (subscription_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from subscription_publication_id to publication_id
+ALTER TABLE Subscription ADD CONSTRAINT subscription_publication_id_publication_id_fkey FOREIGN KEY (subscription_publication_id) REFERENCES Publication(publication_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from subscription_contact_id to contact_id
+ALTER TABLE Subscription ADD CONSTRAINT subscription_contact_id_contact_id_fkey FOREIGN KEY (subscription_contact_id) REFERENCES Contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from subscription_userupdate to userobm_id
+ALTER TABLE Subscription ADD CONSTRAINT subscription_userupdate_userobm_id_fkey FOREIGN KEY (subscription_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from subscription_usercreate to userobm_id
+ALTER TABLE Subscription ADD CONSTRAINT subscription_usercreate_userobm_id_fkey FOREIGN KEY (subscription_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from subscription_reception_id to subscriptionreception_id
+ALTER TABLE Subscription ADD CONSTRAINT subscription_reception_id_subscriptionreception_id_fkey FOREIGN KEY (subscription_reception_id) REFERENCES SubscriptionReception(subscriptionreception_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from subscriptionreception_domain_id to domain_id
+ALTER TABLE SubscriptionReception ADD CONSTRAINT subscriptionreception_domain_id_domain_id_fkey FOREIGN KEY (subscriptionreception_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from subscriptionreception_userupdate to userobm_id
+ALTER TABLE SubscriptionReception ADD CONSTRAINT subscriptionreception_userupdate_userobm_id_fkey FOREIGN KEY (subscriptionreception_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from subscriptionreception_usercreate to userobm_id
+ALTER TABLE SubscriptionReception ADD CONSTRAINT subscriptionreception_usercreate_userobm_id_fkey FOREIGN KEY (subscriptionreception_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from tasktype_domain_id to domain_id
+ALTER TABLE TaskType ADD CONSTRAINT tasktype_domain_id_domain_id_fkey FOREIGN KEY (tasktype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from tasktype_userupdate to userobm_id
+ALTER TABLE TaskType ADD CONSTRAINT tasktype_userupdate_userobm_id_fkey FOREIGN KEY (tasktype_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from tasktype_usercreate to userobm_id
+ALTER TABLE TaskType ADD CONSTRAINT tasktype_usercreate_userobm_id_fkey FOREIGN KEY (tasktype_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from timetask_user_id to userobm_id
+ALTER TABLE TimeTask ADD CONSTRAINT timetask_user_id_userobm_id_fkey FOREIGN KEY (timetask_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from timetask_projecttask_id to projecttask_id
+ALTER TABLE TimeTask ADD CONSTRAINT timetask_projecttask_id_projecttask_id_fkey FOREIGN KEY (timetask_projecttask_id) REFERENCES ProjectTask(projecttask_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from timetask_tasktype_id to tasktype_id
+ALTER TABLE TimeTask ADD CONSTRAINT timetask_tasktype_id_tasktype_id_fkey FOREIGN KEY (timetask_tasktype_id) REFERENCES TaskType(tasktype_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from timetask_userupdate to userobm_id
+ALTER TABLE TimeTask ADD CONSTRAINT timetask_userupdate_userobm_id_fkey FOREIGN KEY (timetask_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from timetask_usercreate to userobm_id
+ALTER TABLE TimeTask ADD CONSTRAINT timetask_usercreate_userobm_id_fkey FOREIGN KEY (timetask_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from todo_domain_id to domain_id
+ALTER TABLE Todo ADD CONSTRAINT todo_domain_id_domain_id_fkey FOREIGN KEY (todo_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from todo_user to userobm_id
+ALTER TABLE Todo ADD CONSTRAINT todo_user_userobm_id_fkey FOREIGN KEY (todo_user) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from todo_userupdate to userobm_id
+ALTER TABLE Todo ADD CONSTRAINT todo_userupdate_userobm_id_fkey FOREIGN KEY (todo_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from todo_usercreate to userobm_id
+ALTER TABLE Todo ADD CONSTRAINT todo_usercreate_userobm_id_fkey FOREIGN KEY (todo_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from group_domain_id to domain_id
+ALTER TABLE UGroup ADD CONSTRAINT group_domain_id_domain_id_fkey FOREIGN KEY (group_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from group_userupdate to userobm_id
+ALTER TABLE UGroup ADD CONSTRAINT group_userupdate_userobm_id_fkey FOREIGN KEY (group_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from group_usercreate to userobm_id
+ALTER TABLE UGroup ADD CONSTRAINT group_usercreate_userobm_id_fkey FOREIGN KEY (group_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from group_manager_id to userobm_id
+ALTER TABLE UGroup ADD CONSTRAINT group_manager_id_userobm_id_fkey FOREIGN KEY (group_manager_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from updated_domain_id to domain_id
+ALTER TABLE Updated ADD CONSTRAINT updated_domain_id_domain_id_fkey FOREIGN KEY (updated_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from updated_user_id to userobm_id
+ALTER TABLE Updated ADD CONSTRAINT updated_user_id_userobm_id_fkey FOREIGN KEY (updated_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from updatedlinks_domain_id to domain_id
+ALTER TABLE Updatedlinks ADD CONSTRAINT updatedlinks_domain_id_domain_id_fkey FOREIGN KEY (updatedlinks_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from updatedlinks_user_id to userobm_id
+ALTER TABLE Updatedlinks ADD CONSTRAINT updatedlinks_user_id_userobm_id_fkey FOREIGN KEY (updatedlinks_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from userobm_domain_id to domain_id
+ALTER TABLE UserObm ADD CONSTRAINT userobm_domain_id_domain_id_fkey FOREIGN KEY (userobm_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from userobm_userupdate to userobm_id
+ALTER TABLE UserObm ADD CONSTRAINT userobm_userupdate_userobm_id_fkey FOREIGN KEY (userobm_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from userobm_usercreate to userobm_id
+ALTER TABLE UserObm ADD CONSTRAINT userobm_usercreate_userobm_id_fkey FOREIGN KEY (userobm_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from userobm_mail_server_id to mailserver_id
+ALTER TABLE UserObm ADD CONSTRAINT userobm_mail_server_id_mailserver_id_fkey FOREIGN KEY (userobm_mail_server_id) REFERENCES MailServer(mailserver_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from userobm_host_id to host_id
+ALTER TABLE UserObm ADD CONSTRAINT userobm_host_id_host_id_fkey FOREIGN KEY (userobm_host_id) REFERENCES Host(host_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from userobm_photo_id to document_id
+ALTER TABLE UserObm ADD CONSTRAINT userobm_photo_id_document_id_fkey FOREIGN KEY (userobm_photo_id) REFERENCES Document(document_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from userobmgroup_group_id to group_id
+ALTER TABLE UserObmGroup ADD CONSTRAINT userobmgroup_group_id_group_id_fkey FOREIGN KEY (userobmgroup_group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from userobmgroup_userobm_id to userobm_id
+ALTER TABLE UserObmGroup ADD CONSTRAINT userobmgroup_userobm_id_userobm_id_fkey FOREIGN KEY (userobmgroup_userobm_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from userobmpref_user_id to userobm_id
+ALTER TABLE UserObmPref ADD CONSTRAINT userobmpref_user_id_userobm_id_fkey FOREIGN KEY (userobmpref_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from userobm_sessionlog_userobm_id to userobm_id
+ALTER TABLE UserObm_SessionLog ADD CONSTRAINT userobm_sessionlog_userobm_id_userobm_id_fkey FOREIGN KEY (userobm_sessionlog_userobm_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from of_usergroup_group_id to group_id
+ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_group_id_group_id_fkey FOREIGN KEY (of_usergroup_group_id) REFERENCES UGroup(group_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from of_usergroup_user_id to userobm_id
+ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_user_id_userobm_id_fkey FOREIGN KEY (of_usergroup_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 COMMIT;

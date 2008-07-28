@@ -5,1945 +5,2819 @@
 --/////////////////////////////////////////////////////////////////////////////
 -- $Id$
 --/////////////////////////////////////////////////////////////////////////////
-
 -------------------------------------------------------------------------------
 -- Global Information table
 -------------------------------------------------------------------------------
 SET NAMES 'UTF8';
---
--- Table structure for table 'ObmInfo'
---
-CREATE TABLE ObmInfo (
-  obminfo_name   varchar(32) NOT NULL default '',
-  obminfo_value  varchar(255) default '',
-  PRIMARY KEY (obminfo_name)
-);
 
+SET FOREIGN_KEY_CHECKS=0;
+--
+-- Table structure for table `Account`
+--
 
--------------------------------------------------------------------------------
--- User, Preferences tables
--------------------------------------------------------------------------------
+DROP TABLE IF EXISTS Account;
+CREATE TABLE Account (
+  account_id int(8) NOT NULL auto_increment,
+  account_domain_id int(8) default '0',
+  account_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  account_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  account_userupdate int(8) default NULL,
+  account_usercreate int(8) default NULL,
+  account_bank varchar(60) NOT NULL default '',
+  account_number varchar(11) NOT NULL default '0',
+  account_balance double(15,2) NOT NULL default '0.00',
+  account_today double(15,2) NOT NULL default '0.00',
+  account_comment varchar(100) default NULL,
+  account_label varchar(40) NOT NULL default '',
+  PRIMARY KEY  (account_id),
+  KEY account_domain_id_domain_id_fkey (account_domain_id),
+  KEY account_usercreate_userobm_id_fkey (account_usercreate),
+  KEY account_userupdate_userobm_id_fkey (account_userupdate),
+  CONSTRAINT account_userupdate_userobm_id_fkey FOREIGN KEY (account_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT account_domain_id_domain_id_fkey FOREIGN KEY (account_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT account_usercreate_userobm_id_fkey FOREIGN KEY (account_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'ObmSession'
+-- Table structure for table `ActiveUserObm`
 --
-CREATE TABLE ObmSession (
-  obmsession_sid         varchar(32) NOT NULL default '',
-  obmsession_timeupdate  timestamp(14),
-  obmsession_name        varchar(32) NOT NULL default '',
-  obmsession_data        text,
-  PRIMARY KEY (obmsession_sid, obmsession_name)
-);
 
-
---
--- Table structure for table 'ActiveUserObm'
---
+DROP TABLE IF EXISTS ActiveUserObm;
 CREATE TABLE ActiveUserObm (
-  activeuserobm_sid            varchar(32) NOT NULL default '',
-  activeuserobm_session_name   varchar(32) NOT NULL default '',
-  activeuserobm_userobm_id     int(11) default NULL,
-  activeuserobm_timeupdate     timestamp(14),
-  activeuserobm_timecreate     timestamp(14),
-  activeuserobm_nb_connexions  int(11) NOT NULL default 0,
-  activeuserobm_lastpage       varchar(64) NOT NULL default '0',
-  activeuserobm_ip             varchar(32) NOT NULL default '0',
-  PRIMARY KEY (activeuserobm_sid)
-);
-
-
---
--- Table structure for table 'UserObm_SessionLog'
---
-CREATE TABLE UserObm_SessionLog (
-  userobm_sessionlog_sid            varchar(32) NOT NULL default '',
-  userobm_sessionlog_session_name   varchar(32) NOT NULL default '',
-  userobm_sessionlog_userobm_id     int(11) default NULL,
-  userobm_sessionlog_timeupdate     timestamp(14),
-  userobm_sessionlog_timecreate     timestamp(14),
-  userobm_sessionlog_nb_connexions  int(11) NOT NULL default 0,
-  userobm_sessionlog_lastpage       varchar(32) NOT NULL default '0',
-  userobm_sessionlog_ip             varchar(32) NOT NULL default '0',
-  PRIMARY KEY (userobm_sessionlog_sid)
-);
-
+  activeuserobm_sid varchar(32) NOT NULL default '',
+  activeuserobm_session_name varchar(32) NOT NULL default '',
+  activeuserobm_userobm_id int(11) default NULL,
+  activeuserobm_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  activeuserobm_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  activeuserobm_nb_connexions int(11) NOT NULL default '0',
+  activeuserobm_lastpage varchar(64) NOT NULL default '0',
+  activeuserobm_ip varchar(32) NOT NULL default '0',
+  PRIMARY KEY  (activeuserobm_sid),
+  KEY activeuserobm_userobm_id_userobm_id_fkey (activeuserobm_userobm_id),
+  CONSTRAINT activeuserobm_userobm_id_userobm_id_fkey FOREIGN KEY (activeuserobm_userobm_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'UserObm'
+-- Table structure for table `CV`
 --
-CREATE TABLE UserObm (
-  userobm_id                  int(8) auto_increment,
-  userobm_domain_id           int(8) default 0,
-  userobm_timeupdate          timestamp(14),
-  userobm_timecreate          timestamp(14),
-  userobm_userupdate          int(8),
-  userobm_usercreate          int(8),
-  userobm_local               int(1) default 1,
-  userobm_ext_id              varchar(16),
-  userobm_system              int(1) default 0,
-  userobm_archive             int(1) not null default 0,
-  userobm_timelastaccess      timestamp(14),
-  userobm_login               varchar(32) DEFAULT '' NOT NULL,
-  userobm_nb_login_failed     int(2) DEFAULT 0,
-  userobm_password_type       char(6) DEFAULT 'PLAIN' NOT NULL,
-  userobm_password            varchar(64) DEFAULT '' NOT NULL,
-  userobm_password_dateexp    date,
-  userobm_account_dateexp     date,
-  userobm_perms               varchar(254),
-  userobm_delegation_target   varchar(64) DEFAULT '',
-  userobm_delegation          varchar(64) DEFAULT '',
-  userobm_calendar_version    timestamp(14),
-  userobm_uid                 int(8),
-  userobm_gid                 int(8),
-  userobm_datebegin           date,
-  userobm_hidden              int(1) default 0,
-  userobm_kind                varchar(12),
-  userobm_lastname            varchar(64) default '',
-  userobm_firstname           varchar(64) default '',
-  userobm_title               varchar(64) default '',
-  userobm_sound               varchar(64),
-  userobm_company             varchar(64),
-  userobm_direction           varchar(64),
-  userobm_service             varchar(64),
-  userobm_address1            varchar(64),
-  userobm_address2            varchar(64),
-  userobm_address3            varchar(64),
-  userobm_zipcode             varchar(14),
-  userobm_town                varchar(64),
-  userobm_expresspostal       varchar(16),
-  userobm_country_iso3166     char(2) DEFAULT '0',
-  userobm_phone               varchar(32) DEFAULT '',
-  userobm_phone2              varchar(32) DEFAULT '',
-  userobm_mobile              varchar(32) DEFAULT '',
-  userobm_fax                 varchar(32) DEFAULT '',
-  userobm_fax2                varchar(32) DEFAULT '',
-  userobm_web_perms           int(1) default 0,
-  userobm_web_list 	      text default NULL,  
-  userobm_web_all	      int(1) default 0,
-  userobm_mail_perms          int(1) default 0,
-  userobm_mail_ext_perms      int(1) default 0,
-  userobm_email               text DEFAULT '',
-  userobm_mail_server_id      int(8) default NULL,
-  userobm_mail_quota          int(8) default 0,
-  userobm_mail_quota_use      int(8) default 0,
-  userobm_mail_login_date     timestamp(14),
-  userobm_nomade_perms        int(1) default 0,
-  userobm_nomade_enable       int(1) default 0,
-  userobm_nomade_local_copy   int(1) default 0,
-  userobm_nomade_datebegin    timestamp(14),
-  userobm_nomade_dateend      timestamp(14),
-  userobm_email_nomade        varchar(64) default '',
-  userobm_vacation_enable     int(1) default 0,
-  userobm_vacation_datebegin  timestamp(14),
-  userobm_vacation_dateend    timestamp(14),
-  userobm_vacation_message    text default '',
-  userobm_samba_perms         int(1) default 0,
-  userobm_samba_home          varchar(255) default '',
-  userobm_samba_home_drive    char(2) default '',
-  userobm_samba_logon_script  varchar(128) default '',
-  userobm_host_id             int(8) default 0,
-  userobm_description         varchar(255),
-  userobm_location            varchar(255),
-  userobm_education           varchar(255),
-  userobm_photo_id            int(8),
-  PRIMARY KEY (userobm_id),
-  INDEX k_login_user (userobm_login),
-  INDEX k_uid_user (userobm_uid)
-);
 
+DROP TABLE IF EXISTS CV;
+CREATE TABLE CV (
+  cv_id int(8) NOT NULL auto_increment,
+  cv_domain_id int(8) default '0',
+  cv_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  cv_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  cv_userupdate int(8) default NULL,
+  cv_usercreate int(8) default NULL,
+  cv_userobm_id int(8) NOT NULL,
+  cv_title varchar(255) default NULL,
+  cv_additionnalrefs text,
+  cv_comment text,
+  PRIMARY KEY  (cv_id),
+  KEY cv_domain_id_domain_id_fkey (cv_domain_id),
+  KEY cv_userobm_id_userobm_id_fkey (cv_userobm_id),
+  KEY cv_userupdate_userobm_id_fkey (cv_userupdate),
+  KEY cv_usercreate_userobm_id_fkey (cv_usercreate),
+  CONSTRAINT cv_usercreate_userobm_id_fkey FOREIGN KEY (cv_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT cv_domain_id_domain_id_fkey FOREIGN KEY (cv_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT cv_userobm_id_userobm_id_fkey FOREIGN KEY (cv_userobm_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT cv_userupdate_userobm_id_fkey FOREIGN KEY (cv_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'UserObmPref'
+-- Table structure for table `CalendarAlert`
 --
-CREATE TABLE UserObmPref (
-   userobmpref_user_id  int(8) DEFAULT 0 NOT NULL,
-   userobmpref_option   varchar(50) NOT NULL,
-   userobmpref_value    varchar(50) NOT NULL
-);
 
-
---
--- New table 'DisplayPref'
---
-CREATE TABLE DisplayPref (
-  display_user_id     int(8) NOT NULL default 0,
-  display_entity      varchar(32) NOT NULL default '',
-  display_fieldname   varchar(64) NOT NULL default '',
-  display_fieldorder  int(3) unsigned default NULL,
-  display_display     int(1) unsigned NOT NULL default 1,
-  PRIMARY KEY (display_user_id, display_entity, display_fieldname),
-  INDEX idx_user (display_user_id),
-  INDEX idx_entity (display_entity)
-) TYPE=MyISAM;
-
-
---
--- Table structure for table 'Category'
---
-CREATE TABLE Category (
-  category_id          int(8) auto_increment,
-  category_domain_id   int(8) NOT NULL default 0,
-  category_timeupdate  timestamp(14),
-  category_timecreate  timestamp(14),
-  category_userupdate  int(8) NOT NULL default 0,
-  category_usercreate  int(8) NOT NULL default 0,
-  category_category    varchar(24) NOT NULL default '',
-  category_code        varchar(10) NOT NULL default '',
-  category_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (category_id),
-  INDEX cat_idx_cat (category_category)
-);
-
-
---
--- Table structure for table 'CategoryLink'
---
-CREATE TABLE CategoryLink (
-  categorylink_category_id int(8) NOT NULL default 0,
-  categorylink_entity_id   int(8) NOT NULL default 0,
-  categorylink_category    varchar(24) NOT NULL default '',
-  categorylink_entity      varchar(32) NOT NULL default '',
-  PRIMARY KEY (categorylink_category_id, categorylink_entity_id),
-  INDEX catl_idx_ent (categorylink_entity_id),
-  INDEX catl_idx_cat (categorylink_category)
-);
-
-
---
--- Table structure for table 'ObmBookmark'
---
-CREATE TABLE ObmBookmark (
-  obmbookmark_id          int(8) auto_increment,
-  obmbookmark_user_id     int(8) NOT NULL,
-  obmbookmark_label       varchar(48) NOT NULL default '',
-  obmbookmark_entity      varchar(24) NOT NULL default '',
-  PRIMARY KEY (obmbookmark_id),
-  INDEX bkm_idx_user (obmbookmark_user_id)
-);
-
-
---
--- Table structure for table 'ObmBookmarkProperty'
---
-CREATE TABLE ObmBookmarkProperty (
-  obmbookmarkproperty_id           int(8) auto_increment,
-  obmbookmarkproperty_bookmark_id  int(8) NOT NULL,
-  obmbookmarkproperty_property     varchar(64) NOT NULL default '',
-  obmbookmarkproperty_value        varchar(64) NOT NULL default '',
-  PRIMARY KEY (obmbookmarkproperty_id),
-  INDEX bkmprop_idx_bkm (obmbookmarkproperty_bookmark_id)
-);
-
-
--------------------------------------------------------------------------------
--- References Tables
--------------------------------------------------------------------------------
---
--- Table structure for the table 'DataSource'
---
-CREATE TABLE DataSource (
-  datasource_id          int(8) auto_increment,
-  datasource_domain_id   int(8) default 0,
-  datasource_timeupdate  timestamp(14),
-  datasource_timecreate  timestamp(14),
-  datasource_userupdate  int(8),
-  datasource_usercreate  int(8),
-  datasource_name        varchar(64),
-  PRIMARY KEY (datasource_id)
-);
-
-
---
--- Table structure for the table 'Country'
---
-CREATE TABLE Country (
-  country_domain_id   int(8) default 0,
-  country_timeupdate  timestamp(14),
-  country_timecreate  timestamp(14),
-  country_userupdate  int(8),
-  country_usercreate  int(8),
-  country_iso3166     char(2) NOT NULL,
-  country_name        varchar(64),
-  country_lang        char(2) NOT NULL,
-  country_phone       varchar(4),
-  PRIMARY KEY (country_iso3166, country_lang)
-);
-
-
--- 
--- Table structure for table 'Region'
---
-CREATE TABLE Region (
-  region_id          int(8) auto_increment,
-  region_domain_id   int(8) default 0,
-  region_timeupdate  timestamp(14),
-  region_timecreate  timestamp(14),
-  region_userupdate  int(8),
-  region_usercreate  int(8),
-  region_code        varchar(10) default '', 
-  region_label       varchar(64),
-  PRIMARY KEY (region_id)
-);
-
-
--------------------------------------------------------------------------------
--- Company module tables
--------------------------------------------------------------------------------
--- 
--- Table structure for table 'CompanyType'
---
-CREATE TABLE CompanyType (
-  companytype_id          int(8) auto_increment,
-  companytype_domain_id   int(8) default 0,
-  companytype_timeupdate  timestamp(14),
-  companytype_timecreate  timestamp(14),
-  companytype_userupdate  int(8),
-  companytype_usercreate  int(8),
-  companytype_code        varchar(10) default '', 
-  companytype_label       char(12),
-  PRIMARY KEY (companytype_id)
-);
-
-
--- 
--- Table structure for table 'CompanyActivity'
---
-CREATE TABLE CompanyActivity (
-  companyactivity_id          int(8) auto_increment,
-  companyactivity_domain_id   int(8) default 0,
-  companyactivity_timeupdate  timestamp(14),
-  companyactivity_timecreate  timestamp(14),
-  companyactivity_userupdate  int(8),
-  companyactivity_usercreate  int(8),
-  companyactivity_code        varchar(10) default '', 
-  companyactivity_label       varchar(64),
-  PRIMARY KEY (companyactivity_id)
-);
-
-
--- 
--- Table structure for table 'CompanyNafCode'
---
-CREATE TABLE CompanyNafCode (
-  companynafcode_id          int(8) auto_increment,
-  companynafcode_domain_id   int(8) default 0,
-  companynafcode_timeupdate  timestamp(14),
-  companynafcode_timecreate  timestamp(14),
-  companynafcode_userupdate  int(8),
-  companynafcode_usercreate  int(8),
-  companynafcode_title       int(1) NOT NULL DEFAULT 0,
-  companynafcode_code        varchar(4),
-  companynafcode_label       varchar(128),
-  PRIMARY KEY (companynafcode_id)
-);
-
-
---
--- Table structure for table 'Company'
---
-CREATE TABLE Company (
-  company_id                   int(8) auto_increment,
-  company_domain_id            int(8) default 0,
-  company_timeupdate           timestamp(14),
-  company_timecreate           timestamp(14),
-  company_userupdate           int(8),
-  company_usercreate           int(8),
-  company_datasource_id        int(8) DEFAULT 0,
-  company_number               varchar(32),
-  company_vat                  varchar(20),
-  company_siret                varchar(14),
-  company_archive              char(1) DEFAULT '0' NOT NULL,
-  company_name                 varchar(96) DEFAULT '' NOT NULL,
-  company_aka                  varchar(255),
-  company_sound                varchar(48),
-  company_type_id              int(8),
-  company_activity_id          int(8),
-  company_nafcode_id           int(8),
-  company_marketingmanager_id  int(8),
-  company_address1             varchar(64),
-  company_address2             varchar(64),
-  company_address3             varchar(64),
-  company_zipcode              varchar(14),
-  company_town                 varchar(64),
-  company_expresspostal        varchar(16),
-  company_country_iso3166      char(2) DEFAULT '0',
-  company_phone                varchar(32),
-  company_fax                  varchar(32),
-  company_web                  varchar(64),
-  company_email                varchar(64),
-  company_contact_number       int(5) DEFAULT 0 NOT NULL,
-  company_deal_number          int(5) DEFAULT 0 NOT NULL,
-  company_deal_total           int(5) DEFAULT 0 NOT NULL,
-  company_comment              text,
-  PRIMARY KEY (company_id)
-);
-
-
--------------------------------------------------------------------------------
--- Contact module tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'Contact'
---
-CREATE TABLE Contact (
-  contact_id                   int(8) auto_increment,
-  contact_domain_id            int(8) default 0,
-  contact_timeupdate           timestamp(14),
-  contact_timecreate           timestamp(14),
-  contact_userupdate           int(8),
-  contact_usercreate           int(8),
-  contact_datasource_id        int(8) DEFAULT 0,
-  contact_company_id           int(8),
-  contact_company              varchar(64),
-  contact_kind_id              int(8),
-  contact_marketingmanager_id  int(8),
-  contact_lastname             varchar(64) DEFAULT '' NOT NULL,
-  contact_firstname            varchar(64),
-  contact_aka                  varchar(255),
-  contact_sound                varchar(48),
-  contact_service              varchar(64),
-  contact_address1             varchar(64),
-  contact_address2             varchar(64),
-  contact_address3             varchar(64),
-  contact_zipcode              varchar(14),
-  contact_town                 varchar(64),
-  contact_expresspostal        varchar(16),
-  contact_country_iso3166      char(2) DEFAULT '0',
-  contact_function_id          int(8),
-  contact_title                varchar(64),
-  contact_phone                varchar(32),
-  contact_homephone            varchar(32),
-  contact_mobilephone          varchar(32),
-  contact_fax                  varchar(32),
-  contact_email                varchar(128),
-  contact_email2               varchar(128),
-  contact_mailing_ok           char(1) DEFAULT '0',
-  contact_newsletter           char(1) DEFAULT '0',
-  contact_archive              char(1) DEFAULT '0',
-  contact_privacy              int(2) NOT NULL DEFAULT 0,
-  contact_date                 timestamp(14),
-  contact_comment              text,
-  contact_comment2             text,
-  contact_comment3             text,
-  PRIMARY KEY (contact_id)
-);
-
-
---
--- Table structure for table 'Kind'
---
-CREATE TABLE Kind (
-  kind_id          int(8) auto_increment,
-  kind_domain_id   int(8) default 0,
-  kind_timeupdate  timestamp(14),
-  kind_timecreate  timestamp(14),
-  kind_userupdate  int(8),
-  kind_usercreate  int(8),
-  kind_minilabel   varchar(64),
-  kind_header      varchar(64),
-  kind_lang        char(2),
-  kind_default     int(1) NOT NULL DEFAULT 0,
-  PRIMARY KEY (kind_id)
-);
-
-
---
--- Table structure for the table 'ContactFunction'
---
-CREATE TABLE ContactFunction (
-  contactfunction_id          int(8) auto_increment,
-  contactfunction_domain_id   int(8) default 0,
-  contactfunction_timeupdate  timestamp(14),
-  contactfunction_timecreate  timestamp(14),
-  contactfunction_userupdate  int(8),
-  contactfunction_usercreate  int(8),
-  contactfunction_code        varchar(10) default '',
-  contactfunction_label       varchar(64),
-  PRIMARY KEY (contactfunction_id)
-);
-
-
--------------------------------------------------------------------------------
--- Lead module tables
--------------------------------------------------------------------------------
---
--- Table structure for the table 'LeadSource'
---
-CREATE TABLE LeadSource (
-  leadsource_id          int(8) auto_increment,
-  leadsource_domain_id   int(8) default 0,
-  leadsource_timeupdate  timestamp(14),
-  leadsource_timecreate  timestamp(14),
-  leadsource_userupdate  int(8),
-  leadsource_usercreate  int(8),
-  leadsource_code        varchar(10) default '',
-  leadsource_label       varchar(100) NOT NULL default '',
-  PRIMARY KEY (leadsource_id)
-);
-
-
---
--- Table structure for table 'LeadStatus'
---
-CREATE TABLE LeadStatus (
-  leadstatus_id          int(2) auto_increment,
-  leadstatus_domain_id   int(8) default 0,
-  leadstatus_timeupdate  timestamp(14),
-  leadstatus_timecreate  timestamp(14),
-  leadstatus_userupdate  int(8),
-  leadstatus_usercreate  int(8),
-  leadstatus_code        varchar(10),
-  leadstatus_label       varchar(24),
-  PRIMARY KEY (leadstatus_id)
-);
-
-
---
--- Table structure for the table 'Lead'
---
-CREATE TABLE Lead (
-  lead_id          int(8) auto_increment,
-  lead_domain_id   int(8) default 0,
-  lead_timeupdate  timestamp(14),
-  lead_timecreate  timestamp(14),
-  lead_userupdate  int(8),
-  lead_usercreate  int(8),
-  lead_source_id   int(8),
-  lead_manager_id  int(8),
-  lead_company_id  int(8) NOT NULL DEFAULT 0,
-  lead_contact_id  int(8) NOT NULL DEFAULT 0,
-  lead_privacy     int(2) NOT NULL DEFAULT 0,
-  lead_name        varchar(64),
-  lead_date        date,
-  lead_datealarm   date,
-  lead_status_id   int(2),
-  lead_archive     char(1) DEFAULT '0',
-  lead_todo        varchar(128),
-  lead_comment     text,
-  PRIMARY KEY (lead_id)
-);
-
-
--------------------------------------------------------------------------------
--- Deal module tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'ParentDeal'
---
-CREATE TABLE ParentDeal (
-  parentdeal_id                   int(8) auto_increment,
-  parentdeal_domain_id            int(8) default 0,
-  parentdeal_timeupdate           timestamp(14),
-  parentdeal_timecreate           timestamp(14),
-  parentdeal_userupdate           int(8),
-  parentdeal_usercreate           int(8),
-  parentdeal_label                varchar(128) NOT NULL,
-  parentdeal_marketingmanager_id  int(8),
-  parentdeal_technicalmanager_id  int(8),
-  parentdeal_archive              char(1) DEFAULT '0',
-  parentdeal_comment              text,
-  PRIMARY KEY (parentdeal_id)
-);
-
-
---
--- Table structure for table 'Deal'
---
-CREATE TABLE Deal (
-  deal_id                   int(8) auto_increment,
-  deal_domain_id            int(8) default 0,
-  deal_timeupdate           timestamp(14),
-  deal_timecreate           timestamp(14),
-  deal_userupdate           int(8),
-  deal_usercreate           int(8),
-  deal_number               varchar(32),
-  deal_label                varchar(128),
-  deal_datebegin            date,
-  deal_parentdeal_id        int(8),
-  deal_type_id              int(8),
-  deal_region_id            int(8) DEFAULT 0 NOT NULL,
-  deal_tasktype_id          int(8),
-  deal_company_id           int(8) DEFAULT 0 NOT NULL,
-  deal_contact1_id          int(8),
-  deal_contact2_id          int(8),
-  deal_marketingmanager_id  int(8),
-  deal_technicalmanager_id  int(8),
-  deal_source_id            int(8) DEFAULT 0 NOT NULL,
-  deal_source               varchar(64),
-  deal_dateproposal         date,
-  deal_dateexpected         date,
-  deal_datealarm            date,
-  deal_dateend              date,
-  deal_amount               decimal(12,2),
-  deal_margin               decimal(12,2),
-  deal_commission           decimal(5,2) DEFAULT 0,
-  deal_hitrate              int(3) DEFAULT 0,
-  deal_status_id            int(2),
-  deal_archive              char(1) DEFAULT '0',
-  deal_todo                 varchar(128),
-  deal_privacy              int(2) NOT NULL DEFAULT 0,
-  deal_comment              text,
-  PRIMARY KEY (deal_id)
-);
-
-
---
--- Table structure for table 'DealStatus'
---
-CREATE TABLE DealStatus (
-  dealstatus_id          int(2) auto_increment,
-  dealstatus_domain_id   int(8) default 0,
-  dealstatus_timeupdate  timestamp(14),
-  dealstatus_timecreate  timestamp(14),
-  dealstatus_userupdate  int(8),
-  dealstatus_usercreate  int(8),
-  dealstatus_label       varchar(24),
-  dealstatus_order       int(2),
-  dealstatus_hitrate     char(3),
-  PRIMARY KEY (dealstatus_id)
-);
-
-
---
--- Table structure for table 'DealType'
---
-CREATE TABLE DealType (
-  dealtype_id          int(8) auto_increment,
-  dealtype_domain_id   int(8) default 0,
-  dealtype_timeupdate  timestamp(14),
-  dealtype_timecreate  timestamp(14),
-  dealtype_userupdate  int(8),
-  dealtype_usercreate  int(8),
-  dealtype_inout       varchar(1) DEFAULT '-',
-  dealtype_code        varchar(10),
-  dealtype_label       varchar(16),
-  PRIMARY KEY (dealtype_id)
-);
-
-
---
--- Table structure for the table 'DealCompanyRole'
---
-CREATE TABLE DealCompanyRole (
-  dealcompanyrole_id          int(8) auto_increment,
-  dealcompanyrole_domain_id   int(8) default 0,
-  dealcompanyrole_timeupdate  timestamp(14),
-  dealcompanyrole_timecreate  timestamp(14),
-  dealcompanyrole_userupdate  int(8) default NULL,
-  dealcompanyrole_usercreate  int(8) default NULL,
-  dealcompanyrole_code        varchar(10) default '',
-  dealcompanyrole_label       varchar(64) NOT NULL default '',
-  PRIMARY KEY (dealcompanyrole_id)
-);
-
-
---
--- Table structure for the table 'DealCompany'
---
-CREATE TABLE DealCompany (
-  dealcompany_id          int(8) auto_increment,
-  dealcompany_timeupdate  timestamp(14),
-  dealcompany_timecreate  timestamp(14),
-  dealcompany_userupdate  int(8) default NULL,
-  dealcompany_usercreate  int(8) default NULL,
-  dealcompany_deal_id     int(8) NOT NULL default 0,
-  dealcompany_company_id  int(8) NOT NULL default 0,
-  dealcompany_role_id     int(8) NOT NULL default 0,
-  PRIMARY KEY (dealcompany_id),
-  INDEX dealcompany_idx_deal (dealcompany_deal_id)
-);
-
-
--------------------------------------------------------------------------------
--- List module tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'List'
---
-CREATE TABLE List (
-  list_id          	 int(8) auto_increment,
-  list_domain_id     int(8) default 0,
-  list_timeupdate  	 timestamp(14),
-  list_timecreate  	 timestamp(14),
-  list_userupdate  	 int(8),
-  list_usercreate  	 int(8),
-  list_privacy     	 int(2) NOT NULL DEFAULT 0,
-  list_name        	 varchar(64) NOT NULL,
-  list_subject     	 varchar(128),
-  list_email       	 varchar(128),
-  list_mode       	 int(1) DEFAULT 0,
-  list_mailing_ok  	 int(1) DEFAULT 0,
-  list_contact_archive	 int(1) DEFAULT 0,
-  list_info_publication  int(1) DEFAULT 0,
-  list_static_nb   	 int(10) DEFAULT 0,
-  list_query_nb    	 int(10) DEFAULT 0,
-  list_query       	 text,
-  list_structure   	 text, 
-  PRIMARY KEY (list_id),
-  UNIQUE list_name (list_name)
-);
-
-
---
--- Table structure for table 'ContactList'
---
-CREATE TABLE ContactList (
-  contactlist_list_id     int(8) DEFAULT 0 NOT NULL,
-  contactlist_contact_id  int(8) DEFAULT 0 NOT NULL
-);
-
--------------------------------------------------------------------------------
--- Calendar module tables
--------------------------------------------------------------------------------
---
--- Table structure for the table  'CalendarEvent'
---
-CREATE TABLE CalendarEvent (
-  calendarevent_id               int(8) auto_increment,
-  calendarevent_domain_id        int(8) default 0,
-  calendarevent_timeupdate       timestamp(14),
-  calendarevent_timecreate       timestamp(14),
-  calendarevent_userupdate       int(8) default NULL,
-  calendarevent_usercreate       int(8) default NULL,
-  calendarevent_owner	         int(8) default NULL, 
-  calendarevent_ext_id           varchar(32) DEFAULT '', 
-  calendarevent_title            varchar(255) default NULL,
-  calendarevent_location         varchar(100) default NULL,
-  calendarevent_category1_id     int(8) default 0,
-  calendarevent_priority         int(2) default NULL,
-  calendarevent_privacy          int(2) NOT NULL default 0,
-  calendarevent_date             datetime NOT NULL,
-  calendarevent_duration         int(8) NOT NULL default 0,
-  calendarevent_allday	         BOOLEAN NOT NULL DEFAULT FALSE,
-  calendarevent_repeatkind       varchar(20) default NULL,
-  calendarevent_repeatfrequence  int(3) default NULL,
-  calendarevent_repeatdays       varchar(7) default NULL,
-  calendarevent_endrepeat        datetime,
-  calendarevent_color            varchar(7),
-  calendarevent_description      text,
-  calendarevent_properties       text,
-  PRIMARY KEY (calendarevent_id)
-);
-
-
---
--- Table structure for the table  'EntityEvent'
---
-CREATE TABLE EventEntity (
-  evententity_timeupdate   timestamp(14),
-  evententity_timecreate   timestamp(14),
-  evententity_userupdate   int(8) default NULL,
-  evententity_usercreate   int(8) default NULL,
-  evententity_event_id     int(8) NOT NULL default 0,
-  evententity_entity_id    int(8) NOT NULL default 0,
-  evententity_entity       varchar(32) NOT NULL default 0,
-  evententity_state        char(1) NOT NULL default 0,
-  evententity_required     int(1) NOT NULL default 0,
-  PRIMARY KEY (evententity_event_id,evententity_entity_id,evententity_entity)
-);
-
---
--- Table structure for table 'CalendarException'
---
-CREATE TABLE CalendarException (
-  calendarexception_timeupdate  timestamp(14),
-  calendarexception_timecreate  timestamp(14),
-  calendarexception_userupdate  int(8) default NULL,
-  calendarexception_usercreate  int(8) default NULL,
-  calendarexception_event_id    int(8),
-  calendarexception_date        datetime NOT NULL,
-  PRIMARY KEY (calendarexception_event_id,calendarexception_date)
-);
-
-
---
--- Table structure for table 'CalendarAlert'
---
+DROP TABLE IF EXISTS CalendarAlert;
 CREATE TABLE CalendarAlert (
-  calendaralert_timeupdate  timestamp(14),
-  calendaralert_timecreate  timestamp(14),
-  calendaralert_userupdate  int(8) default NULL,
-  calendaralert_usercreate  int(8) default NULL,
-  calendaralert_event_id    int(8),
-  calendaralert_user_id     int(8),
-  calendaralert_duration    int(8) NOT NULL default 0,
-  INDEX idx_calendaralert_user (calendaralert_user_id)
-);
-
+  calendaralert_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  calendaralert_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  calendaralert_userupdate int(8) default NULL,
+  calendaralert_usercreate int(8) default NULL,
+  calendaralert_event_id int(8) default NULL,
+  calendaralert_user_id int(8) default NULL,
+  calendaralert_duration int(8) NOT NULL default '0',
+  KEY idx_calendaralert_user (calendaralert_user_id),
+  KEY calendaralert_event_id_calendarevent_id_fkey (calendaralert_event_id),
+  KEY calendaralert_userupdate_userobm_id_fkey (calendaralert_userupdate),
+  KEY calendaralert_usercreate_userobm_id_fkey (calendaralert_usercreate),
+  CONSTRAINT calendaralert_usercreate_userobm_id_fkey FOREIGN KEY (calendaralert_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT calendaralert_event_id_calendarevent_id_fkey FOREIGN KEY (calendaralert_event_id) REFERENCES CalendarEvent (calendarevent_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT calendaralert_userupdate_userobm_id_fkey FOREIGN KEY (calendaralert_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT calendaralert_user_id_userobm_id_fkey FOREIGN KEY (calendaralert_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'CalendarCategory1'
+-- Table structure for table `CalendarCategory1`
 --
+
+DROP TABLE IF EXISTS CalendarCategory1;
 CREATE TABLE CalendarCategory1 (
-  calendarcategory1_id          int(8) auto_increment,
-  calendarcategory1_domain_id   int(8) default 0,
-  calendarcategory1_timeupdate  timestamp(14),
-  calendarcategory1_timecreate  timestamp(14),
-  calendarcategory1_userupdate  int(8) default NULL,
-  calendarcategory1_usercreate  int(8) default NULL,
-  calendarcategory1_code        varchar(10) default '',
-  calendarcategory1_label       varchar(128) default NULL,
-  calendarcategory1_color       char(6),
-  PRIMARY KEY (calendarcategory1_id)
-);
+  calendarcategory1_id int(8) NOT NULL auto_increment,
+  calendarcategory1_domain_id int(8) default '0',
+  calendarcategory1_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  calendarcategory1_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  calendarcategory1_userupdate int(8) default NULL,
+  calendarcategory1_usercreate int(8) default NULL,
+  calendarcategory1_code varchar(10) default '',
+  calendarcategory1_label varchar(128) default NULL,
+  calendarcategory1_color char(6) default NULL,
+  PRIMARY KEY  (calendarcategory1_id),
+  KEY calendarcategory1_domain_id_domain_id_fkey (calendarcategory1_domain_id),
+  KEY calendarcategory1_userupdate_userobm_id_fkey (calendarcategory1_userupdate),
+  KEY calendarcategory1_usercreate_userobm_id_fkey (calendarcategory1_usercreate),
+  CONSTRAINT calendarcategory1_usercreate_userobm_id_fkey FOREIGN KEY (calendarcategory1_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT calendarcategory1_domain_id_domain_id_fkey FOREIGN KEY (calendarcategory1_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT calendarcategory1_userupdate_userobm_id_fkey FOREIGN KEY (calendarcategory1_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'EntityRight'
+-- Table structure for table `CalendarEvent`
 --
-CREATE TABLE EntityRight (
-  entityright_entity        varchar(32) NOT NULL default '',
-  entityright_entity_id     int(8) NOT NULL default 0,
-  entityright_consumer      varchar(32) NOT NULL default '',
-  entityright_consumer_id   int(8) NOT NULL default 0,
-  entityright_read          int(1) NOT NULL default 0,
-  entityright_write         int(1) NOT NULL default 0,
-  entityright_admin         int(1) NOT NULL default 0,
-  PRIMARY KEY (entityright_entity, entityright_entity_id, entityright_consumer, entityright_consumer_id),
-  INDEX entright_idx_ent_id (entityright_entity_id),
-  INDEX entright_idx_ent (entityright_entity),
-  INDEX entright_idx_con_id (entityright_consumer_id),
-  INDEX entright_idx_con (entityright_consumer)
-);
 
-
--------------------------------------------------------------------------------
--- Todo
--------------------------------------------------------------------------------
--- Create new table
-CREATE TABLE Todo (
-  todo_id          int(8) auto_increment,
-  todo_domain_id   int(8) default 0,
-  todo_timeupdate  timestamp(14),
-  todo_timecreate  timestamp(14),
-  todo_userupdate  int(8),
-  todo_usercreate  int(8),
-  todo_user        int(8),
-  todo_privacy     int(2) NOT NULL DEFAULT 0,
-  todo_date        timestamp(14),
-  todo_deadline    timestamp(14),
-  todo_dateend     timestamp(14),
-  todo_priority    int(8),
-  todo_percent     int(8),
-  todo_title       varchar(80),
-  todo_status      varchar(32),
-  todo_webpage     varchar(255),
-  todo_content     text,
-  PRIMARY KEY (todo_id)
-);
-
-
--------------------------------------------------------------------------------
--- Publication module tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'Publication'
---
-CREATE TABLE Publication (
-  publication_id             int(8) auto_increment,
-  publication_domain_id      int(8) default 0,
-  publication_timeupdate     timestamp(14),
-  publication_timecreate     timestamp(14),
-  publication_userupdate     int(8),
-  publication_usercreate     int(8),
-  publication_title          varchar(64) NOT NULL,
-  publication_type_id        int(8),
-  publication_year           int(4),
-  publication_lang           varchar(30),
-  publication_desc           text,
-  PRIMARY KEY (publication_id)
-);
+DROP TABLE IF EXISTS CalendarEvent;
+CREATE TABLE CalendarEvent (
+  calendarevent_id int(8) NOT NULL auto_increment,
+  calendarevent_domain_id int(8) default '0',
+  calendarevent_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  calendarevent_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  calendarevent_userupdate int(8) default NULL,
+  calendarevent_usercreate int(8) default NULL,
+  calendarevent_owner int(8) default NULL,
+  calendarevent_ext_id varchar(32) default '',
+  calendarevent_title varchar(255) default NULL,
+  calendarevent_location varchar(100) default NULL,
+  calendarevent_category1_id int(8) default '0',
+  calendarevent_priority int(2) default NULL,
+  calendarevent_privacy int(2) NOT NULL default '0',
+  calendarevent_date datetime NOT NULL,
+  calendarevent_duration int(8) NOT NULL default '0',
+  calendarevent_allday tinyint(1) NOT NULL default '0',
+  calendarevent_repeatkind varchar(20) default NULL,
+  calendarevent_repeatfrequence int(3) default NULL,
+  calendarevent_repeatdays varchar(7) default NULL,
+  calendarevent_endrepeat datetime default NULL,
+  calendarevent_color varchar(7) default NULL,
+  calendarevent_description text,
+  calendarevent_properties text,
+  PRIMARY KEY  (calendarevent_id),
+  KEY calendarevent_domain_id_domain_id_fkey (calendarevent_domain_id),
+  KEY calendarevent_owner_userobm_id_fkey (calendarevent_owner),
+  KEY calendarevent_userupdate_userobm_id_fkey (calendarevent_userupdate),
+  KEY calendarevent_usercreate_userobm_id_fkey (calendarevent_usercreate),
+  KEY calendarevent_category1_id_calendarcategory1_id_fkey (calendarevent_category1_id),
+  CONSTRAINT calendarevent_category1_id_calendarcategory1_id_fkey FOREIGN KEY (calendarevent_category1_id) REFERENCES CalendarCategory1 (calendarcategory1_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT calendarevent_domain_id_domain_id_fkey FOREIGN KEY (calendarevent_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT calendarevent_owner_userobm_id_fkey FOREIGN KEY (calendarevent_owner) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT calendarevent_usercreate_userobm_id_fkey FOREIGN KEY (calendarevent_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT calendarevent_userupdate_userobm_id_fkey FOREIGN KEY (calendarevent_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'PublicationType'
+-- Table structure for table `CalendarException`
 --
-CREATE TABLE PublicationType (
-  publicationtype_id          int(8) auto_increment,
-  publicationtype_domain_id   int(8) default 0,
-  publicationtype_timeupdate  timestamp(14),
-  publicationtype_timecreate  timestamp(14),
-  publicationtype_userupdate  int(8),
-  publicationtype_usercreate  int(8),
-  publication_code            varchar(10) default '',
-  publicationtype_label       varchar(64),
-  PRIMARY KEY (publicationtype_id)
-);
 
-
---
--- Table structure for table 'Subscription'
---
-CREATE TABLE Subscription (
-  subscription_id               int(8) auto_increment,
-  subscription_domain_id        int(8) default 0,
-  subscription_publication_id 	int(8) NOT NULL,
-  subscription_contact_id       int(8) NOT NULL,
-  subscription_timeupdate       timestamp(14),
-  subscription_timecreate       timestamp(14),
-  subscription_userupdate       int(8),
-  subscription_usercreate       int(8),
-  subscription_quantity       	int(8),
-  subscription_renewal          int(1) DEFAULT 0 NOT NULL,
-  subscription_reception_id     int(8) DEFAULT 0 NOT NULL,
-  subscription_date_begin       timestamp(14),
-  subscription_date_end         timestamp(14),
-  PRIMARY KEY (subscription_id)
-);
-
+DROP TABLE IF EXISTS CalendarException;
+CREATE TABLE CalendarException (
+  calendarexception_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  calendarexception_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  calendarexception_userupdate int(8) default NULL,
+  calendarexception_usercreate int(8) default NULL,
+  calendarexception_event_id int(8) NOT NULL default '0',
+  calendarexception_date datetime NOT NULL,
+  PRIMARY KEY  (calendarexception_event_id,calendarexception_date),
+  KEY calendarexception_userupdate_userobm_id_fkey (calendarexception_userupdate),
+  KEY calendarexception_usercreate_userobm_id_fkey (calendarexception_usercreate),
+  CONSTRAINT calendarexception_usercreate_userobm_id_fkey FOREIGN KEY (calendarexception_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT calendarexception_event_id_calendarevent_id_fkey FOREIGN KEY (calendarexception_event_id) REFERENCES CalendarEvent (calendarevent_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT calendarexception_userupdate_userobm_id_fkey FOREIGN KEY (calendarexception_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'SubscriptionReception'
+-- Table structure for table `Category`
 --
-CREATE TABLE SubscriptionReception ( 
-  subscriptionreception_id          int(8) auto_increment,
-  subscriptionreception_domain_id   int(8) default 0,
-  subscriptionreception_timeupdate  timestamp(14),
-  subscriptionreception_timecreate  timestamp(14),
-  subscriptionreception_userupdate  int(8),
-  subscriptionreception_usercreate  int(8),
-  subscriptionreception_code        varchar(10) default '',
-  subscriptionreception_label       char(12),
-  PRIMARY KEY (subscriptionreception_id)
-);	
 
+DROP TABLE IF EXISTS Category;
+CREATE TABLE Category (
+  category_id int(8) NOT NULL auto_increment,
+  category_domain_id int(8) default NULL,
+  category_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  category_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  category_userupdate int(8) default NULL,
+  category_usercreate int(8) default NULL,
+  category_category varchar(24) NOT NULL default '',
+  category_code varchar(10) NOT NULL default '',
+  category_label varchar(100) NOT NULL default '',
+  PRIMARY KEY  (category_id),
+  KEY cat_idx_cat (category_category),
+  KEY category_domain_id_domain_id_fkey (category_domain_id),
+  KEY category_userupdate_userobm_id_fkey (category_userupdate),
+  KEY category_usercreate_userobm_id_fkey (category_usercreate),
+  CONSTRAINT category_usercreate_userobm_id_fkey FOREIGN KEY (category_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT category_domain_id_domain_id_fkey FOREIGN KEY (category_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT category_userupdate_userobm_id_fkey FOREIGN KEY (category_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--------------------------------------------------------------------------------
--- Document module tables
--------------------------------------------------------------------------------
 --
--- Table structure for table 'Document'
+-- Table structure for table `CategoryLink`
 --
+
+DROP TABLE IF EXISTS CategoryLink;
+CREATE TABLE CategoryLink (
+  categorylink_category_id int(8) NOT NULL default '0',
+  categorylink_entity_id int(8) NOT NULL default '0',
+  categorylink_category varchar(24) NOT NULL default '',
+  categorylink_entity varchar(32) NOT NULL default '',
+  PRIMARY KEY  (categorylink_category_id,categorylink_entity_id),
+  KEY catl_idx_ent (categorylink_entity_id),
+  KEY catl_idx_cat (categorylink_category),
+  CONSTRAINT categorylink_category_id_category_id_fkey FOREIGN KEY (categorylink_category_id) REFERENCES Category (category_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Company`
+--
+
+DROP TABLE IF EXISTS Company;
+CREATE TABLE Company (
+  company_id int(8) NOT NULL auto_increment,
+  company_domain_id int(8) default '0',
+  company_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  company_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  company_userupdate int(8) default NULL,
+  company_usercreate int(8) default NULL,
+  company_datasource_id int(8) default '0',
+  company_number varchar(32) default NULL,
+  company_vat varchar(20) default NULL,
+  company_siret varchar(14) default NULL,
+  company_archive char(1) NOT NULL default '0',
+  company_name varchar(96) NOT NULL default '',
+  company_aka varchar(255) default NULL,
+  company_sound varchar(48) default NULL,
+  company_type_id int(8) default NULL,
+  company_activity_id int(8) default NULL,
+  company_nafcode_id int(8) default NULL,
+  company_marketingmanager_id int(8) default NULL,
+  company_address1 varchar(64) default NULL,
+  company_address2 varchar(64) default NULL,
+  company_address3 varchar(64) default NULL,
+  company_zipcode varchar(14) default NULL,
+  company_town varchar(64) default NULL,
+  company_expresspostal varchar(16) default NULL,
+  company_country_iso3166 char(2) default '0',
+  company_phone varchar(32) default NULL,
+  company_fax varchar(32) default NULL,
+  company_web varchar(64) default NULL,
+  company_email varchar(64) default NULL,
+  company_contact_number int(5) NOT NULL default '0',
+  company_deal_number int(5) NOT NULL default '0',
+  company_deal_total int(5) NOT NULL default '0',
+  company_comment text,
+  PRIMARY KEY  (company_id),
+  KEY company_domain_id_domain_id_fkey (company_domain_id),
+  KEY company_userupdate_userobm_id_fkey (company_userupdate),
+  KEY company_usercreate_userobm_id_fkey (company_usercreate),
+  KEY company_datasource_id_datasource_id_fkey (company_datasource_id),
+  KEY company_type_id_companytype_id_fkey (company_type_id),
+  KEY company_activity_id_companyactivity_id_fkey (company_activity_id),
+  KEY company_nafcode_id_companynafcode_id_fkey (company_nafcode_id),
+  KEY company_marketingmanager_id_userobm_id_fkey (company_marketingmanager_id),
+  CONSTRAINT company_marketingmanager_id_userobm_id_fkey FOREIGN KEY (company_marketingmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT company_activity_id_companyactivity_id_fkey FOREIGN KEY (company_activity_id) REFERENCES CompanyActivity (companyactivity_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT company_datasource_id_datasource_id_fkey FOREIGN KEY (company_datasource_id) REFERENCES DataSource (datasource_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT company_domain_id_domain_id_fkey FOREIGN KEY (company_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT company_nafcode_id_companynafcode_id_fkey FOREIGN KEY (company_nafcode_id) REFERENCES CompanyNafCode (companynafcode_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT company_type_id_companytype_id_fkey FOREIGN KEY (company_type_id) REFERENCES CompanyType (companytype_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT company_usercreate_userobm_id_fkey FOREIGN KEY (company_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT company_userupdate_userobm_id_fkey FOREIGN KEY (company_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CompanyActivity`
+--
+
+DROP TABLE IF EXISTS CompanyActivity;
+CREATE TABLE CompanyActivity (
+  companyactivity_id int(8) NOT NULL auto_increment,
+  companyactivity_domain_id int(8) default '0',
+  companyactivity_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  companyactivity_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  companyactivity_userupdate int(8) default NULL,
+  companyactivity_usercreate int(8) default NULL,
+  companyactivity_code varchar(10) default '',
+  companyactivity_label varchar(64) default NULL,
+  PRIMARY KEY  (companyactivity_id),
+  KEY companyactivity_domain_id_domain_id_fkey (companyactivity_domain_id),
+  KEY companyactivity_userupdate_userobm_id_fkey (companyactivity_userupdate),
+  KEY companyactivity_usercreate_userobm_id_fkey (companyactivity_usercreate),
+  CONSTRAINT companyactivity_usercreate_userobm_id_fkey FOREIGN KEY (companyactivity_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT companyactivity_domain_id_domain_id_fkey FOREIGN KEY (companyactivity_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT companyactivity_userupdate_userobm_id_fkey FOREIGN KEY (companyactivity_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CompanyNafCode`
+--
+
+DROP TABLE IF EXISTS CompanyNafCode;
+CREATE TABLE CompanyNafCode (
+  companynafcode_id int(8) NOT NULL auto_increment,
+  companynafcode_domain_id int(8) default '0',
+  companynafcode_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  companynafcode_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  companynafcode_userupdate int(8) default NULL,
+  companynafcode_usercreate int(8) default NULL,
+  companynafcode_title int(1) NOT NULL default '0',
+  companynafcode_code varchar(4) default NULL,
+  companynafcode_label varchar(128) default NULL,
+  PRIMARY KEY  (companynafcode_id),
+  KEY companynafcode_domain_id_domain_id_fkey (companynafcode_domain_id),
+  KEY companynafcode_userupdate_userobm_id_fkey (companynafcode_userupdate),
+  KEY companynafcode_usercreate_userobm_id_fkey (companynafcode_usercreate),
+  CONSTRAINT companynafcode_usercreate_userobm_id_fkey FOREIGN KEY (companynafcode_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT companynafcode_domain_id_domain_id_fkey FOREIGN KEY (companynafcode_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT companynafcode_userupdate_userobm_id_fkey FOREIGN KEY (companynafcode_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CompanyType`
+--
+
+DROP TABLE IF EXISTS CompanyType;
+CREATE TABLE CompanyType (
+  companytype_id int(8) NOT NULL auto_increment,
+  companytype_domain_id int(8) default '0',
+  companytype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  companytype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  companytype_userupdate int(8) default NULL,
+  companytype_usercreate int(8) default NULL,
+  companytype_code varchar(10) default '',
+  companytype_label char(12) default NULL,
+  PRIMARY KEY  (companytype_id),
+  KEY companytype_domain_id_domain_id_fkey (companytype_domain_id),
+  KEY companytype_userupdate_userobm_id_fkey (companytype_userupdate),
+  KEY companytype_usercreate_userobm_id_fkey (companytype_usercreate),
+  CONSTRAINT companytype_usercreate_userobm_id_fkey FOREIGN KEY (companytype_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT companytype_domain_id_domain_id_fkey FOREIGN KEY (companytype_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT companytype_userupdate_userobm_id_fkey FOREIGN KEY (companytype_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Contact`
+--
+
+DROP TABLE IF EXISTS Contact;
+CREATE TABLE Contact (
+  contact_id int(8) NOT NULL auto_increment,
+  contact_domain_id int(8) default '0',
+  contact_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  contact_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  contact_userupdate int(8) default NULL,
+  contact_usercreate int(8) default NULL,
+  contact_datasource_id int(8) default '0',
+  contact_company_id int(8) default NULL,
+  contact_company varchar(64) default NULL,
+  contact_kind_id int(8) default NULL,
+  contact_marketingmanager_id int(8) default NULL,
+  contact_lastname varchar(64) NOT NULL default '',
+  contact_firstname varchar(64) default NULL,
+  contact_aka varchar(255) default NULL,
+  contact_sound varchar(48) default NULL,
+  contact_service varchar(64) default NULL,
+  contact_address1 varchar(64) default NULL,
+  contact_address2 varchar(64) default NULL,
+  contact_address3 varchar(64) default NULL,
+  contact_zipcode varchar(14) default NULL,
+  contact_town varchar(64) default NULL,
+  contact_expresspostal varchar(16) default NULL,
+  contact_country_iso3166 char(2) default '0',
+  contact_function_id int(8) default NULL,
+  contact_title varchar(64) default NULL,
+  contact_phone varchar(32) default NULL,
+  contact_homephone varchar(32) default NULL,
+  contact_mobilephone varchar(32) default NULL,
+  contact_fax varchar(32) default NULL,
+  contact_email varchar(128) default NULL,
+  contact_email2 varchar(128) default NULL,
+  contact_mailing_ok char(1) default '0',
+  contact_newsletter char(1) default '0',
+  contact_archive char(1) default '0',
+  contact_privacy int(2) NOT NULL default '0',
+  contact_date timestamp NOT NULL default '0000-00-00 00:00:00',
+  contact_comment text,
+  contact_comment2 text,
+  contact_comment3 text,
+  PRIMARY KEY  (contact_id),
+  KEY contact_domain_id_domain_id_fkey (contact_domain_id),
+  KEY contact_company_id_company_id_fkey (contact_company_id),
+  KEY contact_userupdate_userobm_id_fkey (contact_userupdate),
+  KEY contact_usercreate_userobm_id_fkey (contact_usercreate),
+  KEY contact_datasource_id_datasource_id_fkey (contact_datasource_id),
+  KEY contact_kind_id_kind_id_fkey (contact_kind_id),
+  KEY contact_marketingmanager_id_userobm_id_fkey (contact_marketingmanager_id),
+  KEY contact_function_id_contactfunction_id_fkey (contact_function_id),
+  CONSTRAINT contact_function_id_contactfunction_id_fkey FOREIGN KEY (contact_function_id) REFERENCES ContactFunction (contactfunction_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contact_company_id_company_id_fkey FOREIGN KEY (contact_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contact_datasource_id_datasource_id_fkey FOREIGN KEY (contact_datasource_id) REFERENCES DataSource (datasource_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contact_domain_id_domain_id_fkey FOREIGN KEY (contact_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contact_kind_id_kind_id_fkey FOREIGN KEY (contact_kind_id) REFERENCES Kind (kind_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contact_marketingmanager_id_userobm_id_fkey FOREIGN KEY (contact_marketingmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contact_usercreate_userobm_id_fkey FOREIGN KEY (contact_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contact_userupdate_userobm_id_fkey FOREIGN KEY (contact_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ContactFunction`
+--
+
+DROP TABLE IF EXISTS ContactFunction;
+CREATE TABLE ContactFunction (
+  contactfunction_id int(8) NOT NULL auto_increment,
+  contactfunction_domain_id int(8) default '0',
+  contactfunction_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  contactfunction_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  contactfunction_userupdate int(8) default NULL,
+  contactfunction_usercreate int(8) default NULL,
+  contactfunction_code varchar(10) default '',
+  contactfunction_label varchar(64) default NULL,
+  PRIMARY KEY  (contactfunction_id),
+  KEY contactfunction_domain_id_domain_id_fkey (contactfunction_domain_id),
+  KEY contactfunction_userupdate_userobm_id_fkey (contactfunction_userupdate),
+  KEY contactfunction_usercreate_userobm_id_fkey (contactfunction_usercreate),
+  CONSTRAINT contactfunction_usercreate_userobm_id_fkey FOREIGN KEY (contactfunction_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contactfunction_domain_id_domain_id_fkey FOREIGN KEY (contactfunction_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contactfunction_userupdate_userobm_id_fkey FOREIGN KEY (contactfunction_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ContactList`
+--
+
+DROP TABLE IF EXISTS ContactList;
+CREATE TABLE ContactList (
+  contactlist_list_id int(8) NOT NULL default '0',
+  contactlist_contact_id int(8) NOT NULL default '0',
+  KEY contactlist_list_id_list_id_fkey (contactlist_list_id),
+  KEY contactlist_contact_id_contact_id_fkey (contactlist_contact_id),
+  CONSTRAINT contactlist_contact_id_contact_id_fkey FOREIGN KEY (contactlist_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contactlist_list_id_list_id_fkey FOREIGN KEY (contactlist_list_id) REFERENCES List (list_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Contract`
+--
+
+DROP TABLE IF EXISTS Contract;
+CREATE TABLE Contract (
+  contract_id int(8) NOT NULL auto_increment,
+  contract_domain_id int(8) default '0',
+  contract_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  contract_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  contract_userupdate int(8) default NULL,
+  contract_usercreate int(8) default NULL,
+  contract_deal_id int(8) default NULL,
+  contract_company_id int(8) default NULL,
+  contract_label varchar(128) default NULL,
+  contract_number varchar(20) default NULL,
+  contract_datesignature date default NULL,
+  contract_datebegin date default NULL,
+  contract_dateexp date default NULL,
+  contract_daterenew date default NULL,
+  contract_datecancel date default NULL,
+  contract_type_id int(8) default NULL,
+  contract_priority_id int(8) default NULL,
+  contract_status_id int(8) default NULL,
+  contract_kind int(2) default NULL,
+  contract_format int(2) default NULL,
+  contract_ticketnumber int(8) default NULL,
+  contract_duration int(8) default NULL,
+  contract_autorenewal int(2) default NULL,
+  contract_contact1_id int(8) default NULL,
+  contract_contact2_id int(8) default NULL,
+  contract_techmanager_id int(8) default NULL,
+  contract_marketmanager_id int(8) default NULL,
+  contract_privacy int(2) default '0',
+  contract_archive int(1) default '0',
+  contract_clause text,
+  contract_comment text,
+  PRIMARY KEY  (contract_id),
+  KEY contract_domain_id_domain_id_fkey (contract_domain_id),
+  KEY contract_deal_id_deal_id_fkey (contract_deal_id),
+  KEY contract_company_id_company_id_fkey (contract_company_id),
+  KEY contract_userupdate_userobm_id_fkey (contract_userupdate),
+  KEY contract_usercreate_userobm_id_fkey (contract_usercreate),
+  KEY contract_type_id_contracttype_id_fkey (contract_type_id),
+  KEY contract_priority_id_contractpriority_id_fkey (contract_priority_id),
+  KEY contract_status_id_contractstatus_id_fkey (contract_status_id),
+  KEY contract_contact1_id_contact_id_fkey (contract_contact1_id),
+  KEY contract_contact2_id_contact_id_fkey (contract_contact2_id),
+  KEY contract_techmanager_id_userobm_id_fkey (contract_techmanager_id),
+  KEY contract_marketmanager_id_userobm_id_fkey (contract_marketmanager_id),
+  CONSTRAINT contract_marketmanager_id_userobm_id_fkey FOREIGN KEY (contract_marketmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contract_company_id_company_id_fkey FOREIGN KEY (contract_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contract_contact1_id_contact_id_fkey FOREIGN KEY (contract_contact1_id) REFERENCES Contact (contact_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contract_contact2_id_contact_id_fkey FOREIGN KEY (contract_contact2_id) REFERENCES Contact (contact_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contract_deal_id_deal_id_fkey FOREIGN KEY (contract_deal_id) REFERENCES Deal (deal_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contract_domain_id_domain_id_fkey FOREIGN KEY (contract_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contract_priority_id_contractpriority_id_fkey FOREIGN KEY (contract_priority_id) REFERENCES ContractPriority (contractpriority_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contract_status_id_contractstatus_id_fkey FOREIGN KEY (contract_status_id) REFERENCES ContractStatus (contractstatus_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contract_techmanager_id_userobm_id_fkey FOREIGN KEY (contract_techmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contract_type_id_contracttype_id_fkey FOREIGN KEY (contract_type_id) REFERENCES ContractType (contracttype_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contract_usercreate_userobm_id_fkey FOREIGN KEY (contract_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contract_userupdate_userobm_id_fkey FOREIGN KEY (contract_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ContractPriority`
+--
+
+DROP TABLE IF EXISTS ContractPriority;
+CREATE TABLE ContractPriority (
+  contractpriority_id int(8) NOT NULL auto_increment,
+  contractpriority_domain_id int(8) default '0',
+  contractpriority_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  contractpriority_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  contractpriority_userupdate int(8) default NULL,
+  contractpriority_usercreate int(8) default NULL,
+  contractpriority_code varchar(10) default '',
+  contractpriority_color varchar(6) default NULL,
+  contractpriority_label varchar(64) default NULL,
+  PRIMARY KEY  (contractpriority_id),
+  KEY contractpriority_domain_id_domain_id_fkey (contractpriority_domain_id),
+  KEY contractpriority_userupdate_userobm_id_fkey (contractpriority_userupdate),
+  KEY contractpriority_usercreate_userobm_id_fkey (contractpriority_usercreate),
+  CONSTRAINT contractpriority_usercreate_userobm_id_fkey FOREIGN KEY (contractpriority_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contractpriority_domain_id_domain_id_fkey FOREIGN KEY (contractpriority_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contractpriority_userupdate_userobm_id_fkey FOREIGN KEY (contractpriority_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ContractStatus`
+--
+
+DROP TABLE IF EXISTS ContractStatus;
+CREATE TABLE ContractStatus (
+  contractstatus_id int(8) NOT NULL auto_increment,
+  contractstatus_domain_id int(8) default '0',
+  contractstatus_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  contractstatus_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  contractstatus_userupdate int(8) default NULL,
+  contractstatus_usercreate int(8) default NULL,
+  contractstatus_code varchar(10) default '',
+  contractstatus_label varchar(64) default NULL,
+  PRIMARY KEY  (contractstatus_id),
+  KEY contractstatus_domain_id_domain_id_fkey (contractstatus_domain_id),
+  KEY contractstatus_userupdate_userobm_id_fkey (contractstatus_userupdate),
+  KEY contractstatus_usercreate_userobm_id_fkey (contractstatus_usercreate),
+  CONSTRAINT contractstatus_usercreate_userobm_id_fkey FOREIGN KEY (contractstatus_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contractstatus_domain_id_domain_id_fkey FOREIGN KEY (contractstatus_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contractstatus_userupdate_userobm_id_fkey FOREIGN KEY (contractstatus_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ContractType`
+--
+
+DROP TABLE IF EXISTS ContractType;
+CREATE TABLE ContractType (
+  contracttype_id int(8) NOT NULL auto_increment,
+  contracttype_domain_id int(8) default '0',
+  contracttype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  contracttype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  contracttype_userupdate int(8) default NULL,
+  contracttype_usercreate int(8) default NULL,
+  contracttype_code varchar(10) default '',
+  contracttype_label varchar(64) default NULL,
+  PRIMARY KEY  (contracttype_id),
+  KEY contracttype_domain_id_domain_id_fkey (contracttype_domain_id),
+  KEY contracttype_userupdate_userobm_id_fkey (contracttype_userupdate),
+  KEY contracttype_usercreate_userobm_id_fkey (contracttype_usercreate),
+  CONSTRAINT contracttype_usercreate_userobm_id_fkey FOREIGN KEY (contracttype_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contracttype_domain_id_domain_id_fkey FOREIGN KEY (contracttype_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contracttype_userupdate_userobm_id_fkey FOREIGN KEY (contracttype_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Country`
+--
+
+DROP TABLE IF EXISTS Country;
+CREATE TABLE Country (
+  country_domain_id int(8) default '0',
+  country_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  country_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  country_userupdate int(8) default NULL,
+  country_usercreate int(8) default NULL,
+  country_iso3166 char(2) NOT NULL,
+  country_name varchar(64) default NULL,
+  country_lang char(2) NOT NULL,
+  country_phone varchar(4) default NULL,
+  PRIMARY KEY  (country_iso3166,country_lang),
+  KEY country_domain_id_domain_id_fkey (country_domain_id),
+  KEY country_userupdate_userobm_id_fkey (country_userupdate),
+  KEY country_usercreate_userobm_id_fkey (country_usercreate),
+  CONSTRAINT country_usercreate_userobm_id_fkey FOREIGN KEY (country_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT country_domain_id_domain_id_fkey FOREIGN KEY (country_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT country_userupdate_userobm_id_fkey FOREIGN KEY (country_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DataSource`
+--
+
+DROP TABLE IF EXISTS DataSource;
+CREATE TABLE DataSource (
+  datasource_id int(8) NOT NULL auto_increment,
+  datasource_domain_id int(8) default '0',
+  datasource_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  datasource_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  datasource_userupdate int(8) default NULL,
+  datasource_usercreate int(8) default NULL,
+  datasource_name varchar(64) default NULL,
+  PRIMARY KEY  (datasource_id),
+  KEY datasource_domain_id_domain_id_fkey (datasource_domain_id),
+  KEY datasource_userupdate_userobm_id_fkey (datasource_userupdate),
+  KEY datasource_usercreate_userobm_id_fkey (datasource_usercreate),
+  CONSTRAINT datasource_usercreate_userobm_id_fkey FOREIGN KEY (datasource_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT datasource_domain_id_domain_id_fkey FOREIGN KEY (datasource_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT datasource_userupdate_userobm_id_fkey FOREIGN KEY (datasource_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Deal`
+--
+
+DROP TABLE IF EXISTS Deal;
+CREATE TABLE Deal (
+  deal_id int(8) NOT NULL auto_increment,
+  deal_domain_id int(8) default '0',
+  deal_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  deal_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  deal_userupdate int(8) default NULL,
+  deal_usercreate int(8) default NULL,
+  deal_number varchar(32) default NULL,
+  deal_label varchar(128) default NULL,
+  deal_datebegin date default NULL,
+  deal_parentdeal_id int(8) default NULL,
+  deal_type_id int(8) default NULL,
+  deal_region_id int(8) default NULL,
+  deal_tasktype_id int(8) default NULL,
+  deal_company_id int(8) NOT NULL default '0',
+  deal_contact1_id int(8) default NULL,
+  deal_contact2_id int(8) default NULL,
+  deal_marketingmanager_id int(8) default NULL,
+  deal_technicalmanager_id int(8) default NULL,
+  deal_source_id int(8) default NULL,
+  deal_source varchar(64) default NULL,
+  deal_dateproposal date default NULL,
+  deal_dateexpected date default NULL,
+  deal_datealarm date default NULL,
+  deal_dateend date default NULL,
+  deal_amount decimal(12,2) default NULL,
+  deal_margin decimal(12,2) default NULL,
+  deal_commission decimal(5,2) default '0.00',
+  deal_hitrate int(3) default '0',
+  deal_status_id int(2) default NULL,
+  deal_archive char(1) default '0',
+  deal_todo varchar(128) default NULL,
+  deal_privacy int(2) NOT NULL default '0',
+  deal_comment text,
+  PRIMARY KEY  (deal_id),
+  KEY deal_domain_id_domain_id_fkey (deal_domain_id),
+  KEY deal_parentdeal_id_parentdeal_id_fkey (deal_parentdeal_id),
+  KEY deal_company_id_company_id_fkey (deal_company_id),
+  KEY deal_userupdate_userobm_id_fkey (deal_userupdate),
+  KEY deal_usercreate_userobm_id_fkey (deal_usercreate),
+  KEY deal_type_id_dealtype_id_fkey (deal_type_id),
+  KEY deal_region_id_region_id_fkey (deal_region_id),
+  KEY deal_tasktype_id_tasktype_id_fkey (deal_tasktype_id),
+  KEY deal_contact1_id_contact_id_fkey (deal_contact1_id),
+  KEY deal_contact2_id_contact_id_fkey (deal_contact2_id),
+  KEY deal_marketingmanager_id_userobm_id_fkey (deal_marketingmanager_id),
+  KEY deal_technicalmanager_id_userobm_id_fkey (deal_technicalmanager_id),
+  KEY deal_source_id_leadsource_id_fkey (deal_source_id),
+  CONSTRAINT deal_source_id_leadsource_id_fkey FOREIGN KEY (deal_source_id) REFERENCES LeadSource (leadsource_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT deal_company_id_company_id_fkey FOREIGN KEY (deal_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT deal_contact1_id_contact_id_fkey FOREIGN KEY (deal_contact1_id) REFERENCES Contact (contact_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT deal_contact2_id_contact_id_fkey FOREIGN KEY (deal_contact2_id) REFERENCES Contact (contact_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT deal_domain_id_domain_id_fkey FOREIGN KEY (deal_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT deal_marketingmanager_id_userobm_id_fkey FOREIGN KEY (deal_marketingmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT deal_parentdeal_id_parentdeal_id_fkey FOREIGN KEY (deal_parentdeal_id) REFERENCES ParentDeal (parentdeal_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT deal_region_id_region_id_fkey FOREIGN KEY (deal_region_id) REFERENCES Region (region_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT deal_tasktype_id_tasktype_id_fkey FOREIGN KEY (deal_tasktype_id) REFERENCES TaskType (tasktype_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT deal_technicalmanager_id_userobm_id_fkey FOREIGN KEY (deal_technicalmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT deal_type_id_dealtype_id_fkey FOREIGN KEY (deal_type_id) REFERENCES DealType (dealtype_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT deal_usercreate_userobm_id_fkey FOREIGN KEY (deal_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT deal_userupdate_userobm_id_fkey FOREIGN KEY (deal_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DealCompany`
+--
+
+DROP TABLE IF EXISTS DealCompany;
+CREATE TABLE DealCompany (
+  dealcompany_id int(8) NOT NULL auto_increment,
+  dealcompany_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  dealcompany_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  dealcompany_userupdate int(8) default NULL,
+  dealcompany_usercreate int(8) default NULL,
+  dealcompany_deal_id int(8) NOT NULL,
+  dealcompany_company_id int(8) NOT NULL,
+  dealcompany_role_id int(8) default NULL,
+  PRIMARY KEY  (dealcompany_id),
+  KEY dealcompany_idx_deal (dealcompany_deal_id),
+  KEY dealcompany_company_id_company_id_fkey (dealcompany_company_id),
+  KEY dealcompany_role_id_dealcompanyrole_id_fkey (dealcompany_role_id),
+  KEY dealcompany_userupdate_userobm_id_fkey (dealcompany_userupdate),
+  KEY dealcompany_usercreate_userobm_id_fkey (dealcompany_usercreate),
+  CONSTRAINT dealcompany_usercreate_userobm_id_fkey FOREIGN KEY (dealcompany_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT dealcompany_company_id_company_id_fkey FOREIGN KEY (dealcompany_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT dealcompany_deal_id_deal_id_fkey FOREIGN KEY (dealcompany_deal_id) REFERENCES Deal (deal_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT dealcompany_role_id_dealcompanyrole_id_fkey FOREIGN KEY (dealcompany_role_id) REFERENCES DealCompanyRole (dealcompanyrole_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT dealcompany_userupdate_userobm_id_fkey FOREIGN KEY (dealcompany_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DealCompanyRole`
+--
+
+DROP TABLE IF EXISTS DealCompanyRole;
+CREATE TABLE DealCompanyRole (
+  dealcompanyrole_id int(8) NOT NULL auto_increment,
+  dealcompanyrole_domain_id int(8) default '0',
+  dealcompanyrole_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  dealcompanyrole_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  dealcompanyrole_userupdate int(8) default NULL,
+  dealcompanyrole_usercreate int(8) default NULL,
+  dealcompanyrole_code varchar(10) default '',
+  dealcompanyrole_label varchar(64) NOT NULL default '',
+  PRIMARY KEY  (dealcompanyrole_id),
+  KEY dealcompanyrole_domain_id_domain_id_fkey (dealcompanyrole_domain_id),
+  KEY dealcompanyrole_userupdate_userobm_id_fkey (dealcompanyrole_userupdate),
+  KEY dealcompanyrole_usercreate_userobm_id_fkey (dealcompanyrole_usercreate),
+  CONSTRAINT dealcompanyrole_usercreate_userobm_id_fkey FOREIGN KEY (dealcompanyrole_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT dealcompanyrole_domain_id_domain_id_fkey FOREIGN KEY (dealcompanyrole_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT dealcompanyrole_userupdate_userobm_id_fkey FOREIGN KEY (dealcompanyrole_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DealStatus`
+--
+
+DROP TABLE IF EXISTS DealStatus;
+CREATE TABLE DealStatus (
+  dealstatus_id int(2) NOT NULL auto_increment,
+  dealstatus_domain_id int(8) default '0',
+  dealstatus_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  dealstatus_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  dealstatus_userupdate int(8) default NULL,
+  dealstatus_usercreate int(8) default NULL,
+  dealstatus_label varchar(24) default NULL,
+  dealstatus_order int(2) default NULL,
+  dealstatus_hitrate char(3) default NULL,
+  PRIMARY KEY  (dealstatus_id),
+  KEY dealstatus_domain_id_domain_id_fkey (dealstatus_domain_id),
+  KEY dealstatus_userupdate_userobm_id_fkey (dealstatus_userupdate),
+  KEY dealstatus_usercreate_userobm_id_fkey (dealstatus_usercreate),
+  CONSTRAINT dealstatus_usercreate_userobm_id_fkey FOREIGN KEY (dealstatus_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT dealstatus_domain_id_domain_id_fkey FOREIGN KEY (dealstatus_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT dealstatus_userupdate_userobm_id_fkey FOREIGN KEY (dealstatus_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DealType`
+--
+
+DROP TABLE IF EXISTS DealType;
+CREATE TABLE DealType (
+  dealtype_id int(8) NOT NULL auto_increment,
+  dealtype_domain_id int(8) default '0',
+  dealtype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  dealtype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  dealtype_userupdate int(8) default NULL,
+  dealtype_usercreate int(8) default NULL,
+  dealtype_inout varchar(1) default '-',
+  dealtype_code varchar(10) default NULL,
+  dealtype_label varchar(16) default NULL,
+  PRIMARY KEY  (dealtype_id),
+  KEY dealtype_domain_id_domain_id_fkey (dealtype_domain_id),
+  KEY dealtype_userupdate_userobm_id_fkey (dealtype_userupdate),
+  KEY dealtype_usercreate_userobm_id_fkey (dealtype_usercreate),
+  CONSTRAINT dealtype_usercreate_userobm_id_fkey FOREIGN KEY (dealtype_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT dealtype_domain_id_domain_id_fkey FOREIGN KEY (dealtype_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT dealtype_userupdate_userobm_id_fkey FOREIGN KEY (dealtype_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DefaultOdtTemplate`
+--
+
+DROP TABLE IF EXISTS DefaultOdtTemplate;
+CREATE TABLE DefaultOdtTemplate (
+  defaultodttemplate_id int(8) NOT NULL auto_increment,
+  defaultodttemplate_domain_id int(8) default '0',
+  defaultodttemplate_entity varchar(32) default NULL,
+  defaultodttemplate_document_id int(8) NOT NULL,
+  defaultodttemplate_label varchar(64) default '',
+  PRIMARY KEY  (defaultodttemplate_id),
+  KEY defaultodttemplate_domain_id_domain_id_fkey (defaultodttemplate_domain_id),
+  KEY defaultodttemplate_document_id_document_id_fkey (defaultodttemplate_document_id),
+  CONSTRAINT defaultodttemplate_document_id_document_id_fkey FOREIGN KEY (defaultodttemplate_document_id) REFERENCES Document (document_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT defaultodttemplate_domain_id_domain_id_fkey FOREIGN KEY (defaultodttemplate_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Deleted`
+--
+
+DROP TABLE IF EXISTS Deleted;
+CREATE TABLE Deleted (
+  deleted_id int(8) NOT NULL auto_increment,
+  deleted_domain_id int(8) default NULL,
+  deleted_user_id int(8) default NULL,
+  deleted_delegation varchar(64) default '',
+  deleted_table varchar(32) default NULL,
+  deleted_entity_id int(8) default NULL,
+  deleted_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (deleted_id),
+  KEY deleted_user_id_userobm_id_fkey (deleted_user_id),
+  KEY deleted_domain_id_domain_id_fkey (deleted_domain_id),
+  CONSTRAINT deleted_domain_id_domain_id_fkey FOREIGN KEY (deleted_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT deleted_user_id_userobm_id_fkey FOREIGN KEY (deleted_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DeletedCalendarEvent`
+--
+
+DROP TABLE IF EXISTS DeletedCalendarEvent;
+CREATE TABLE DeletedCalendarEvent (
+  deletedcalendarevent_id int(8) NOT NULL auto_increment,
+  deletedcalendarevent_event_id int(8) default NULL,
+  deletedcalendarevent_user_id int(8) default NULL,
+  deletedcalendarevent_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (deletedcalendarevent_id),
+  KEY idx_dce_event (deletedcalendarevent_event_id),
+  KEY idx_dce_user (deletedcalendarevent_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DeletedContact`
+--
+
+DROP TABLE IF EXISTS DeletedContact;
+CREATE TABLE DeletedContact (
+  deletedcontact_contact_id int(8) NOT NULL default '0',
+  deletedcontact_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (deletedcontact_contact_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DeletedTodo`
+--
+
+DROP TABLE IF EXISTS DeletedTodo;
+CREATE TABLE DeletedTodo (
+  deletedtodo_todo_id int(8) NOT NULL default '0',
+  deletedtodo_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (deletedtodo_todo_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DeletedUser`
+--
+
+DROP TABLE IF EXISTS DeletedUser;
+CREATE TABLE DeletedUser (
+  deleteduser_user_id int(8) NOT NULL default '0',
+  deleteduser_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (deleteduser_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DisplayPref`
+--
+
+DROP TABLE IF EXISTS DisplayPref;
+CREATE TABLE DisplayPref (
+  display_user_id int(8) NOT NULL default '0',
+  display_entity varchar(32) NOT NULL default '',
+  display_fieldname varchar(64) NOT NULL default '',
+  display_fieldorder int(3) unsigned default NULL,
+  display_display int(1) unsigned NOT NULL default '1',
+  PRIMARY KEY  (display_user_id,display_entity,display_fieldname),
+  KEY idx_user (display_user_id),
+  KEY idx_entity (display_entity),
+  CONSTRAINT display_user_id_userobm_id_fkey FOREIGN KEY (display_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Document`
+--
+
+DROP TABLE IF EXISTS Document;
 CREATE TABLE Document (
-  document_id          	 int(8) auto_increment,
-  document_domain_id     int(8) default 0,
-  document_timeupdate  	 timestamp(14),
-  document_timecreate  	 timestamp(14),
-  document_userupdate  	 int(8) default NULL,
-  document_usercreate  	 int(8) default NULL,
-  document_title       	 varchar(255) default NULL,
-  document_name        	 varchar(255) default NULL,
-  document_kind        	 int(2) default NULL,
-  document_mimetype_id	 int(8) not null default 0,
-  document_privacy     	 int(2) not null default 0,
-  document_size        	 int(15) default NULL,
-  document_author      	 varchar(255) default NULL,
-  document_path        	 text default NULL,
-  document_acl        	 text default NULL,
-  PRIMARY KEY (document_id)
-);
-
-
---
--- Table structure for table 'DocumentMimeType'
---
-CREATE TABLE DocumentMimeType (
-  documentmimetype_id          int(8) auto_increment,
-  documentmimetype_domain_id   int(8) default 0,
-  documentmimetype_timeupdate  timestamp(14),
-  documentmimetype_timecreate  timestamp(14),
-  documentmimetype_userupdate  int(8) default NULL,
-  documentmimetype_usercreate  int(8) default NULL,
-  documentmimetype_label       varchar(255) default NULL,
-  documentmimetype_extension   varchar(10) default NULL,
-  documentmimetype_mime        varchar(255) default NULL,
-  PRIMARY KEY (documentmimetype_id)
-);
-
+  document_id int(8) NOT NULL auto_increment,
+  document_domain_id int(8) default '0',
+  document_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  document_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  document_userupdate int(8) default NULL,
+  document_usercreate int(8) default NULL,
+  document_title varchar(255) default NULL,
+  document_name varchar(255) default NULL,
+  document_kind int(2) default NULL,
+  document_mimetype_id int(8) default NULL,
+  document_privacy int(2) NOT NULL default '0',
+  document_size int(15) default NULL,
+  document_author varchar(255) default NULL,
+  document_path text,
+  document_acl text,
+  PRIMARY KEY  (document_id),
+  KEY document_domain_id_domain_id_fkey (document_domain_id),
+  KEY document_userupdate_userobm_id_fkey (document_userupdate),
+  KEY document_usercreate_userobm_id_fkey (document_usercreate),
+  KEY document_mimetype_id_documentmimetype_id_fkey (document_mimetype_id),
+  CONSTRAINT document_mimetype_id_documentmimetype_id_fkey FOREIGN KEY (document_mimetype_id) REFERENCES DocumentMimeType (documentmimetype_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT document_domain_id_domain_id_fkey FOREIGN KEY (document_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT document_usercreate_userobm_id_fkey FOREIGN KEY (document_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT document_userupdate_userobm_id_fkey FOREIGN KEY (document_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'DocumentEntity'
+-- Table structure for table `DocumentEntity`
 --
+
+DROP TABLE IF EXISTS DocumentEntity;
 CREATE TABLE DocumentEntity (
-  documententity_document_id  int(8) NOT NULL,
-  documententity_entity_id    int(8) NOT NULL,
-  documententity_entity       varchar(255) NOT NULL,
-  PRIMARY KEY (documententity_document_id, documententity_entity_id, documententity_entity)
-);
+  documententity_document_id int(8) NOT NULL,
+  documententity_entity_id int(8) NOT NULL,
+  documententity_entity varchar(255) NOT NULL,
+  PRIMARY KEY  (documententity_document_id,documententity_entity_id,documententity_entity),
+  CONSTRAINT documententity_document_id_document_id_fkey FOREIGN KEY (documententity_document_id) REFERENCES Document (document_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Table structure for table `DocumentMimeType`
+--
 
--------------------------------------------------------------------------------
--- Project module tables
--------------------------------------------------------------------------------
+DROP TABLE IF EXISTS DocumentMimeType;
+CREATE TABLE DocumentMimeType (
+  documentmimetype_id int(8) NOT NULL auto_increment,
+  documentmimetype_domain_id int(8) default '0',
+  documentmimetype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  documentmimetype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  documentmimetype_userupdate int(8) default NULL,
+  documentmimetype_usercreate int(8) default NULL,
+  documentmimetype_label varchar(255) default NULL,
+  documentmimetype_extension varchar(10) default NULL,
+  documentmimetype_mime varchar(255) default NULL,
+  PRIMARY KEY  (documentmimetype_id),
+  KEY documentmimetype_domain_id_domain_id_fkey (documentmimetype_domain_id),
+  KEY documentmimetype_userupdate_userobm_id_fkey (documentmimetype_userupdate),
+  KEY documentmimetype_usercreate_userobm_id_fkey (documentmimetype_usercreate),
+  CONSTRAINT documentmimetype_usercreate_userobm_id_fkey FOREIGN KEY (documentmimetype_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT documentmimetype_domain_id_domain_id_fkey FOREIGN KEY (documentmimetype_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT documentmimetype_userupdate_userobm_id_fkey FOREIGN KEY (documentmimetype_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
--- Table structure for table 'Project'
+-- Table structure for table `Domain`
 --
+
+DROP TABLE IF EXISTS Domain;
+CREATE TABLE Domain (
+  domain_id int(8) NOT NULL auto_increment,
+  domain_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  domain_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  domain_usercreate int(8) default NULL,
+  domain_userupdate int(8) default NULL,
+  domain_label varchar(32) NOT NULL,
+  domain_description varchar(255) default NULL,
+  domain_name varchar(128) default NULL,
+  domain_alias text,
+  domain_mail_server_id int(8) default NULL,
+  domain_global tinyint(1) default '0',
+  PRIMARY KEY  (domain_id),
+  KEY domain_userupdate_userobm_id_fkey (domain_userupdate),
+  KEY domain_usercreate_userobm_id_fkey (domain_usercreate),
+  KEY domain_mail_server_id_mailserver_id_fkey (domain_mail_server_id),
+  CONSTRAINT domain_mail_server_id_mailserver_id_fkey FOREIGN KEY (domain_mail_server_id) REFERENCES MailServer (mailserver_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT domain_usercreate_userobm_id_fkey FOREIGN KEY (domain_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT domain_userupdate_userobm_id_fkey FOREIGN KEY (domain_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DomainMailServer`
+--
+
+DROP TABLE IF EXISTS DomainMailServer;
+CREATE TABLE DomainMailServer (
+  domainmailserver_domain_id int(8) NOT NULL default '0',
+  domainmailserver_mailserver_id int(8) NOT NULL,
+  domainmailserver_role varchar(16) NOT NULL default 'imap',
+  KEY domainmailserver_domain_id_domain_id_fkey (domainmailserver_domain_id),
+  KEY domainmailserver_mailserver_id_mailserver_id_fkey (domainmailserver_mailserver_id),
+  CONSTRAINT domainmailserver_mailserver_id_mailserver_id_fkey FOREIGN KEY (domainmailserver_mailserver_id) REFERENCES MailServer (mailserver_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT domainmailserver_domain_id_domain_id_fkey FOREIGN KEY (domainmailserver_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DomainProperty`
+--
+
+DROP TABLE IF EXISTS DomainProperty;
+CREATE TABLE DomainProperty (
+  domainproperty_key varchar(255) NOT NULL,
+  domainproperty_type varchar(32) default NULL,
+  domainproperty_default varchar(64) default NULL,
+  domainproperty_readonly int(1) default '0',
+  PRIMARY KEY  (domainproperty_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `DomainPropertyValue`
+--
+
+DROP TABLE IF EXISTS DomainPropertyValue;
+CREATE TABLE DomainPropertyValue (
+  domainpropertyvalue_domain_id int(8) NOT NULL,
+  domainpropertyvalue_property_key varchar(255) NOT NULL,
+  domainpropertyvalue_value varchar(255) NOT NULL,
+  PRIMARY KEY  (domainpropertyvalue_domain_id,domainpropertyvalue_property_key),
+  CONSTRAINT domainpropertyvalue_domain_id_domain_id_fkey FOREIGN KEY (domainpropertyvalue_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `EntityRight`
+--
+
+DROP TABLE IF EXISTS EntityRight;
+CREATE TABLE EntityRight (
+  entityright_entity varchar(32) NOT NULL default '',
+  entityright_entity_id int(8) NOT NULL default '0',
+  entityright_consumer varchar(32) NOT NULL default '',
+  entityright_consumer_id int(8) NOT NULL default '0',
+  entityright_read int(1) NOT NULL default '0',
+  entityright_write int(1) NOT NULL default '0',
+  entityright_admin int(1) NOT NULL default '0',
+  PRIMARY KEY  (entityright_entity,entityright_entity_id,entityright_consumer,entityright_consumer_id),
+  KEY entright_idx_ent_id (entityright_entity_id),
+  KEY entright_idx_ent (entityright_entity),
+  KEY entright_idx_con_id (entityright_consumer_id),
+  KEY entright_idx_con (entityright_consumer)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `EventEntity`
+--
+
+DROP TABLE IF EXISTS EventEntity;
+CREATE TABLE EventEntity (
+  evententity_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  evententity_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  evententity_userupdate int(8) default NULL,
+  evententity_usercreate int(8) default NULL,
+  evententity_event_id int(8) NOT NULL default '0',
+  evententity_entity_id int(8) NOT NULL default '0',
+  evententity_entity varchar(32) NOT NULL default '0',
+  evententity_state char(1) NOT NULL default '0',
+  evententity_required tinyint(1) NOT NULL default '0',
+  PRIMARY KEY  (evententity_event_id,evententity_entity_id,evententity_entity),
+  KEY evententity_userupdate_userobm_id_fkey (evententity_userupdate),
+  KEY evententity_usercreate_userobm_id_fkey (evententity_usercreate),
+  CONSTRAINT evententity_usercreate_userobm_id_fkey FOREIGN KEY (evententity_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT evententity_event_id_calendarevent_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES CalendarEvent (calendarevent_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT evententity_userupdate_userobm_id_fkey FOREIGN KEY (evententity_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `GroupGroup`
+--
+
+DROP TABLE IF EXISTS GroupGroup;
+CREATE TABLE GroupGroup (
+  groupgroup_parent_id int(8) NOT NULL default '0',
+  groupgroup_child_id int(8) NOT NULL default '0',
+  PRIMARY KEY  (groupgroup_parent_id,groupgroup_child_id),
+  KEY groupgroup_child_id_group_id_fkey (groupgroup_child_id),
+  CONSTRAINT groupgroup_child_id_group_id_fkey FOREIGN KEY (groupgroup_child_id) REFERENCES UGroup (group_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT groupgroup_parent_id_group_id_fkey FOREIGN KEY (groupgroup_parent_id) REFERENCES UGroup (group_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Host`
+--
+
+DROP TABLE IF EXISTS Host;
+CREATE TABLE Host (
+  host_id int(8) NOT NULL auto_increment,
+  host_domain_id int(8) default '0',
+  host_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  host_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  host_userupdate int(8) default NULL,
+  host_usercreate int(8) default NULL,
+  host_uid int(8) default NULL,
+  host_gid int(8) default NULL,
+  host_samba int(1) default '0',
+  host_name varchar(32) NOT NULL,
+  host_ip varchar(16) default NULL,
+  host_delegation varchar(64) default '',
+  host_description varchar(128) default NULL,
+  host_web_perms int(1) default '0',
+  host_web_list text,
+  host_web_all int(1) default '0',
+  host_ftp_perms int(1) default '0',
+  host_firewall_perms varchar(128) default NULL,
+  PRIMARY KEY  (host_id),
+  UNIQUE KEY host_name (host_name),
+  UNIQUE KEY k_uid_host (host_uid),
+  KEY host_domain_id_domain_id_fkey (host_domain_id),
+  KEY host_userupdate_userobm_id_fkey (host_userupdate),
+  KEY host_usercreate_userobm_id_fkey (host_usercreate),
+  CONSTRAINT host_usercreate_userobm_id_fkey FOREIGN KEY (host_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT host_domain_id_domain_id_fkey FOREIGN KEY (host_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT host_userupdate_userobm_id_fkey FOREIGN KEY (host_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Import`
+--
+
+DROP TABLE IF EXISTS Import;
+CREATE TABLE `Import` (
+  import_id int(8) NOT NULL auto_increment,
+  import_domain_id int(8) default '0',
+  import_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  import_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  import_userupdate int(8) default NULL,
+  import_usercreate int(8) default NULL,
+  import_name varchar(64) NOT NULL,
+  import_datasource_id int(8) default '0',
+  import_marketingmanager_id int(8) default NULL,
+  import_separator varchar(3) default NULL,
+  import_enclosed char(1) default NULL,
+  import_desc text,
+  PRIMARY KEY  (import_id),
+  UNIQUE KEY import_name (import_name),
+  KEY import_domain_id_domain_id_fkey (import_domain_id),
+  KEY import_userupdate_userobm_id_fkey (import_userupdate),
+  KEY import_usercreate_userobm_id_fkey (import_usercreate),
+  KEY import_datasource_id_datasource_id_fkey (import_datasource_id),
+  KEY import_marketingmanager_id_userobm_id_fkey (import_marketingmanager_id),
+  CONSTRAINT import_marketingmanager_id_userobm_id_fkey FOREIGN KEY (import_marketingmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT import_datasource_id_datasource_id_fkey FOREIGN KEY (import_datasource_id) REFERENCES DataSource (datasource_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT import_domain_id_domain_id_fkey FOREIGN KEY (import_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT import_usercreate_userobm_id_fkey FOREIGN KEY (import_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT import_userupdate_userobm_id_fkey FOREIGN KEY (import_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Incident`
+--
+
+DROP TABLE IF EXISTS Incident;
+CREATE TABLE Incident (
+  incident_id int(8) NOT NULL auto_increment,
+  incident_domain_id int(8) default '0',
+  incident_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  incident_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  incident_userupdate int(8) default NULL,
+  incident_usercreate int(8) default NULL,
+  incident_contract_id int(8) NOT NULL,
+  incident_label varchar(100) default NULL,
+  incident_reference varchar(32) default NULL,
+  incident_date timestamp NOT NULL default '0000-00-00 00:00:00',
+  incident_priority_id int(8) default '0',
+  incident_status_id int(8) default '0',
+  incident_resolutiontype_id int(11) default '0',
+  incident_logger int(8) default NULL,
+  incident_owner int(8) default NULL,
+  incident_duration char(4) default '0',
+  incident_archive char(1) NOT NULL default '0',
+  incident_comment text,
+  incident_resolution text,
+  PRIMARY KEY  (incident_id),
+  KEY incident_domain_id_domain_id_fkey (incident_domain_id),
+  KEY incident_contract_id_contract_id_fkey (incident_contract_id),
+  KEY incident_userupdate_userobm_id_fkey (incident_userupdate),
+  KEY incident_usercreate_userobm_id_fkey (incident_usercreate),
+  KEY incident_priority_id_incidentpriority_id_fkey (incident_priority_id),
+  KEY incident_status_id_incidentstatus_id_fkey (incident_status_id),
+  KEY incident_resolutiontype_id_incidentresolutiontype_id_fkey (incident_resolutiontype_id),
+  KEY incident_logger_userobm_id_fkey (incident_logger),
+  KEY incident_owner_userobm_id_fkey (incident_owner),
+  CONSTRAINT incident_owner_userobm_id_fkey FOREIGN KEY (incident_owner) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT incident_contract_id_contract_id_fkey FOREIGN KEY (incident_contract_id) REFERENCES Contract (contract_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT incident_domain_id_domain_id_fkey FOREIGN KEY (incident_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT incident_logger_userobm_id_fkey FOREIGN KEY (incident_logger) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT incident_priority_id_incidentpriority_id_fkey FOREIGN KEY (incident_priority_id) REFERENCES IncidentPriority (incidentpriority_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT incident_resolutiontype_id_incidentresolutiontype_id_fkey FOREIGN KEY (incident_resolutiontype_id) REFERENCES IncidentResolutionType (incidentresolutiontype_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT incident_status_id_incidentstatus_id_fkey FOREIGN KEY (incident_status_id) REFERENCES IncidentStatus (incidentstatus_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT incident_usercreate_userobm_id_fkey FOREIGN KEY (incident_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT incident_userupdate_userobm_id_fkey FOREIGN KEY (incident_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `IncidentPriority`
+--
+
+DROP TABLE IF EXISTS IncidentPriority;
+CREATE TABLE IncidentPriority (
+  incidentpriority_id int(8) NOT NULL auto_increment,
+  incidentpriority_domain_id int(8) default '0',
+  incidentpriority_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  incidentpriority_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  incidentpriority_userupdate int(8) default NULL,
+  incidentpriority_usercreate int(8) default NULL,
+  incidentpriority_code varchar(10) default '',
+  incidentpriority_label varchar(32) default NULL,
+  incidentpriority_color char(6) default NULL,
+  PRIMARY KEY  (incidentpriority_id),
+  KEY incidentpriority_domain_id_domain_id_fkey (incidentpriority_domain_id),
+  KEY incidentpriority_userupdate_userobm_id_fkey (incidentpriority_userupdate),
+  KEY incidentpriority_usercreate_userobm_id_fkey (incidentpriority_usercreate),
+  CONSTRAINT incidentpriority_usercreate_userobm_id_fkey FOREIGN KEY (incidentpriority_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT incidentpriority_domain_id_domain_id_fkey FOREIGN KEY (incidentpriority_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT incidentpriority_userupdate_userobm_id_fkey FOREIGN KEY (incidentpriority_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `IncidentResolutionType`
+--
+
+DROP TABLE IF EXISTS IncidentResolutionType;
+CREATE TABLE IncidentResolutionType (
+  incidentresolutiontype_id int(8) NOT NULL auto_increment,
+  incidentresolutiontype_domain_id int(8) default '0',
+  incidentresolutiontype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  incidentresolutiontype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  incidentresolutiontype_userupdate int(8) default NULL,
+  incidentresolutiontype_usercreate int(8) default NULL,
+  incidentresolutiontype_code varchar(10) default '',
+  incidentresolutiontype_label varchar(32) default NULL,
+  PRIMARY KEY  (incidentresolutiontype_id),
+  KEY incidentresolutiontype_domain_id_domain_id_fkey (incidentresolutiontype_domain_id),
+  KEY incidentresolutiontype_userupdate_userobm_id_fkey (incidentresolutiontype_userupdate),
+  KEY incidentresolutiontype_usercreate_userobm_id_fkey (incidentresolutiontype_usercreate),
+  CONSTRAINT incidentresolutiontype_usercreate_userobm_id_fkey FOREIGN KEY (incidentresolutiontype_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT incidentresolutiontype_domain_id_domain_id_fkey FOREIGN KEY (incidentresolutiontype_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT incidentresolutiontype_userupdate_userobm_id_fkey FOREIGN KEY (incidentresolutiontype_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `IncidentStatus`
+--
+
+DROP TABLE IF EXISTS IncidentStatus;
+CREATE TABLE IncidentStatus (
+  incidentstatus_id int(8) NOT NULL auto_increment,
+  incidentstatus_domain_id int(8) default '0',
+  incidentstatus_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  incidentstatus_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  incidentstatus_userupdate int(8) default NULL,
+  incidentstatus_usercreate int(8) default NULL,
+  incidentstatus_code varchar(10) default '',
+  incidentstatus_label varchar(32) default NULL,
+  PRIMARY KEY  (incidentstatus_id),
+  KEY incidentstatus_domain_id_domain_id_fkey (incidentstatus_domain_id),
+  KEY incidentstatus_userupdate_userobm_id_fkey (incidentstatus_userupdate),
+  KEY incidentstatus_usercreate_userobm_id_fkey (incidentstatus_usercreate),
+  CONSTRAINT incidentstatus_usercreate_userobm_id_fkey FOREIGN KEY (incidentstatus_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT incidentstatus_domain_id_domain_id_fkey FOREIGN KEY (incidentstatus_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT incidentstatus_userupdate_userobm_id_fkey FOREIGN KEY (incidentstatus_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Invoice`
+--
+
+DROP TABLE IF EXISTS Invoice;
+CREATE TABLE Invoice (
+  invoice_id int(8) NOT NULL auto_increment,
+  invoice_domain_id int(8) default '0',
+  invoice_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  invoice_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  invoice_userupdate int(8) default NULL,
+  invoice_usercreate int(8) default NULL,
+  invoice_company_id int(8) NOT NULL,
+  invoice_deal_id int(8) default NULL,
+  invoice_project_id int(8) default NULL,
+  invoice_number varchar(10) default '0',
+  invoice_label varchar(40) NOT NULL default '',
+  invoice_amount_ht double(10,2) default NULL,
+  invoice_amount_ttc double(10,2) default NULL,
+  invoice_status_id int(4) NOT NULL default '0',
+  invoice_date date NOT NULL default '0000-00-00',
+  invoice_expiration_date date default NULL,
+  invoice_payment_date date default NULL,
+  invoice_inout char(1) default NULL,
+  invoice_credit_memo int(1) NOT NULL default '0',
+  invoice_archive char(1) NOT NULL default '0',
+  invoice_comment text,
+  PRIMARY KEY  (invoice_id),
+  KEY invoice_domain_id_domain_id_fkey (invoice_domain_id),
+  KEY invoice_company_id_company_id_fkey (invoice_company_id),
+  KEY invoice_project_id_project_id_fkey (invoice_project_id),
+  KEY invoice_deal_id_deal_id_fkey (invoice_deal_id),
+  KEY invoice_userupdate_userobm_id_fkey (invoice_userupdate),
+  KEY invoice_usercreate_userobm_id_fkey (invoice_usercreate),
+  CONSTRAINT invoice_usercreate_userobm_id_fkey FOREIGN KEY (invoice_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT invoice_company_id_company_id_fkey FOREIGN KEY (invoice_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT invoice_deal_id_deal_id_fkey FOREIGN KEY (invoice_deal_id) REFERENCES Deal (deal_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT invoice_domain_id_domain_id_fkey FOREIGN KEY (invoice_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT invoice_project_id_project_id_fkey FOREIGN KEY (invoice_project_id) REFERENCES Project (project_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT invoice_userupdate_userobm_id_fkey FOREIGN KEY (invoice_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Kind`
+--
+
+DROP TABLE IF EXISTS Kind;
+CREATE TABLE Kind (
+  kind_id int(8) NOT NULL auto_increment,
+  kind_domain_id int(8) default '0',
+  kind_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  kind_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  kind_userupdate int(8) default NULL,
+  kind_usercreate int(8) default NULL,
+  kind_minilabel varchar(64) default NULL,
+  kind_header varchar(64) default NULL,
+  kind_lang char(2) default NULL,
+  kind_default int(1) NOT NULL default '0',
+  PRIMARY KEY  (kind_id),
+  KEY kind_domain_id_domain_id_fkey (kind_domain_id),
+  KEY kind_userupdate_userobm_id_fkey (kind_userupdate),
+  KEY kind_usercreate_userobm_id_fkey (kind_usercreate),
+  CONSTRAINT kind_usercreate_userobm_id_fkey FOREIGN KEY (kind_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT kind_domain_id_domain_id_fkey FOREIGN KEY (kind_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT kind_userupdate_userobm_id_fkey FOREIGN KEY (kind_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Lead`
+--
+
+DROP TABLE IF EXISTS Lead;
+CREATE TABLE Lead (
+  lead_id int(8) NOT NULL auto_increment,
+  lead_domain_id int(8) default '0',
+  lead_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  lead_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  lead_userupdate int(8) default NULL,
+  lead_usercreate int(8) default NULL,
+  lead_source_id int(8) default NULL,
+  lead_manager_id int(8) default NULL,
+  lead_company_id int(8) NOT NULL default '0',
+  lead_contact_id int(8) default NULL,
+  lead_privacy int(2) NOT NULL default '0',
+  lead_name varchar(64) default NULL,
+  lead_date date default NULL,
+  lead_datealarm date default NULL,
+  lead_status_id int(2) default NULL,
+  lead_archive char(1) default '0',
+  lead_todo varchar(128) default NULL,
+  lead_comment text,
+  PRIMARY KEY  (lead_id),
+  KEY lead_domain_id_domain_id_fkey (lead_domain_id),
+  KEY lead_company_id_company_id_fkey (lead_company_id),
+  KEY lead_userupdate_userobm_id_fkey (lead_userupdate),
+  KEY lead_usercreate_userobm_id_fkey (lead_usercreate),
+  KEY lead_source_id_leadsource_id_fkey (lead_source_id),
+  KEY lead_manager_id_userobm_id_fkey (lead_manager_id),
+  KEY lead_contact_id_contact_id_fkey (lead_contact_id),
+  KEY lead_status_id_leadstatus_id_fkey (lead_status_id),
+  CONSTRAINT lead_status_id_leadstatus_id_fkey FOREIGN KEY (lead_status_id) REFERENCES LeadStatus (leadstatus_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT lead_company_id_company_id_fkey FOREIGN KEY (lead_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT lead_contact_id_contact_id_fkey FOREIGN KEY (lead_contact_id) REFERENCES Contact (contact_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT lead_domain_id_domain_id_fkey FOREIGN KEY (lead_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT lead_manager_id_userobm_id_fkey FOREIGN KEY (lead_manager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT lead_source_id_leadsource_id_fkey FOREIGN KEY (lead_source_id) REFERENCES LeadSource (leadsource_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT lead_usercreate_userobm_id_fkey FOREIGN KEY (lead_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT lead_userupdate_userobm_id_fkey FOREIGN KEY (lead_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `LeadSource`
+--
+
+DROP TABLE IF EXISTS LeadSource;
+CREATE TABLE LeadSource (
+  leadsource_id int(8) NOT NULL auto_increment,
+  leadsource_domain_id int(8) default '0',
+  leadsource_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  leadsource_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  leadsource_userupdate int(8) default NULL,
+  leadsource_usercreate int(8) default NULL,
+  leadsource_code varchar(10) default '',
+  leadsource_label varchar(100) NOT NULL default '',
+  PRIMARY KEY  (leadsource_id),
+  KEY leadsource_domain_id_domain_id_fkey (leadsource_domain_id),
+  KEY leadsource_userupdate_userobm_id_fkey (leadsource_userupdate),
+  KEY leadsource_usercreate_userobm_id_fkey (leadsource_usercreate),
+  CONSTRAINT leadsource_usercreate_userobm_id_fkey FOREIGN KEY (leadsource_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT leadsource_domain_id_domain_id_fkey FOREIGN KEY (leadsource_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT leadsource_userupdate_userobm_id_fkey FOREIGN KEY (leadsource_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `LeadStatus`
+--
+
+DROP TABLE IF EXISTS LeadStatus;
+CREATE TABLE LeadStatus (
+  leadstatus_id int(2) NOT NULL auto_increment,
+  leadstatus_domain_id int(8) default '0',
+  leadstatus_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  leadstatus_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  leadstatus_userupdate int(8) default NULL,
+  leadstatus_usercreate int(8) default NULL,
+  leadstatus_code varchar(10) default NULL,
+  leadstatus_label varchar(24) default NULL,
+  PRIMARY KEY  (leadstatus_id),
+  KEY leadstatus_domain_id_domain_id_fkey (leadstatus_domain_id),
+  KEY leadstatus_userupdate_userobm_id_fkey (leadstatus_userupdate),
+  KEY leadstatus_usercreate_userobm_id_fkey (leadstatus_usercreate),
+  CONSTRAINT leadstatus_usercreate_userobm_id_fkey FOREIGN KEY (leadstatus_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT leadstatus_domain_id_domain_id_fkey FOREIGN KEY (leadstatus_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT leadstatus_userupdate_userobm_id_fkey FOREIGN KEY (leadstatus_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `List`
+--
+
+DROP TABLE IF EXISTS List;
+CREATE TABLE List (
+  list_id int(8) NOT NULL auto_increment,
+  list_domain_id int(8) default '0',
+  list_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  list_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  list_userupdate int(8) default NULL,
+  list_usercreate int(8) default NULL,
+  list_privacy int(2) NOT NULL default '0',
+  list_name varchar(64) NOT NULL,
+  list_subject varchar(128) default NULL,
+  list_email varchar(128) default NULL,
+  list_mode int(1) default '0',
+  list_mailing_ok int(1) default '0',
+  list_contact_archive int(1) default '0',
+  list_info_publication int(1) default '0',
+  list_static_nb int(10) default '0',
+  list_query_nb int(10) default '0',
+  list_query text,
+  list_structure text,
+  PRIMARY KEY  (list_id),
+  UNIQUE KEY list_name (list_name),
+  KEY list_domain_id_domain_id_fkey (list_domain_id),
+  KEY list_userupdate_userobm_id_fkey (list_userupdate),
+  KEY list_usercreate_userobm_id_fkey (list_usercreate),
+  CONSTRAINT list_usercreate_userobm_id_fkey FOREIGN KEY (list_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT list_domain_id_domain_id_fkey FOREIGN KEY (list_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT list_userupdate_userobm_id_fkey FOREIGN KEY (list_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `MailServer`
+--
+
+DROP TABLE IF EXISTS MailServer;
+CREATE TABLE MailServer (
+  mailserver_id int(8) NOT NULL auto_increment,
+  mailserver_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  mailserver_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  mailserver_userupdate int(8) default NULL,
+  mailserver_usercreate int(8) default NULL,
+  mailserver_host_id int(8) NOT NULL default '0',
+  mailserver_relayhost_id int(8) default NULL,
+  mailserver_imap int(1) default '0',
+  mailserver_smtp_in int(1) default '0',
+  mailserver_smtp_out int(1) default '0',
+  PRIMARY KEY  (mailserver_id),
+  KEY mailserver_host_id_host_id_fkey (mailserver_host_id),
+  KEY mailserver_userupdate_userobm_id_fkey (mailserver_userupdate),
+  KEY mailserver_usercreate_userobm_id_fkey (mailserver_usercreate),
+  KEY mailserver_relayhost_id_host_id_fkey (mailserver_relayhost_id),
+  CONSTRAINT mailserver_relayhost_id_host_id_fkey FOREIGN KEY (mailserver_relayhost_id) REFERENCES Host (host_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT mailserver_host_id_host_id_fkey FOREIGN KEY (mailserver_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT mailserver_usercreate_userobm_id_fkey FOREIGN KEY (mailserver_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT mailserver_userupdate_userobm_id_fkey FOREIGN KEY (mailserver_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `MailServerNetwork`
+--
+
+DROP TABLE IF EXISTS MailServerNetwork;
+CREATE TABLE MailServerNetwork (
+  mailservernetwork_host_id int(8) NOT NULL default '0',
+  mailservernetwork_ip varchar(16) NOT NULL default ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `MailShare`
+--
+
+DROP TABLE IF EXISTS MailShare;
+CREATE TABLE MailShare (
+  mailshare_id int(8) NOT NULL auto_increment,
+  mailshare_domain_id int(8) default '0',
+  mailshare_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  mailshare_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  mailshare_userupdate int(8) default NULL,
+  mailshare_usercreate int(8) default NULL,
+  mailshare_name varchar(32) default NULL,
+  mailshare_archive int(1) NOT NULL default '0',
+  mailshare_quota int(11) NOT NULL default '0',
+  mailshare_mail_server_id int(8) default '0',
+  mailshare_delegation varchar(64) default '',
+  mailshare_description varchar(255) default NULL,
+  mailshare_email text,
+  PRIMARY KEY  (mailshare_id),
+  KEY mailshare_domain_id_domain_id_fkey (mailshare_domain_id),
+  KEY mailshare_mail_server_id_mailserver_id_fkey (mailshare_mail_server_id),
+  KEY mailshare_userupdate_userobm_id_fkey (mailshare_userupdate),
+  KEY mailshare_usercreate_userobm_id_fkey (mailshare_usercreate),
+  CONSTRAINT mailshare_usercreate_userobm_id_fkey FOREIGN KEY (mailshare_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT mailshare_domain_id_domain_id_fkey FOREIGN KEY (mailshare_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT mailshare_mail_server_id_mailserver_id_fkey FOREIGN KEY (mailshare_mail_server_id) REFERENCES MailServer (mailserver_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT mailshare_userupdate_userobm_id_fkey FOREIGN KEY (mailshare_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `OGroup`
+--
+
+DROP TABLE IF EXISTS OGroup;
+CREATE TABLE OGroup (
+  ogroup_id int(8) NOT NULL auto_increment,
+  ogroup_domain_id int(8) default '0',
+  ogroup_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  ogroup_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  ogroup_userupdate int(8) default NULL,
+  ogroup_usercreate int(8) default NULL,
+  ogroup_organizationalchart_id int(8) NOT NULL,
+  ogroup_parent_id int(8) NOT NULL,
+  ogroup_name varchar(32) NOT NULL,
+  ogroup_level varchar(16) default NULL,
+  PRIMARY KEY  (ogroup_id),
+  KEY ogroup_domain_id_domain_id_fkey (ogroup_domain_id),
+  KEY ogroup_organizationalchart_id_organizationalchart_id_fkey (ogroup_organizationalchart_id),
+  KEY ogroup_parent_id_ogroup_id_fkey (ogroup_parent_id),
+  KEY ogroup_userupdate_userobm_id_fkey (ogroup_userupdate),
+  KEY ogroup_usercreate_userobm_id_fkey (ogroup_usercreate),
+  CONSTRAINT ogroup_usercreate_userobm_id_fkey FOREIGN KEY (ogroup_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT ogroup_domain_id_domain_id_fkey FOREIGN KEY (ogroup_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT ogroup_organizationalchart_id_organizationalchart_id_fkey FOREIGN KEY (ogroup_organizationalchart_id) REFERENCES OrganizationalChart (organizationalchart_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT ogroup_parent_id_ogroup_id_fkey FOREIGN KEY (ogroup_parent_id) REFERENCES OGroup (ogroup_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT ogroup_userupdate_userobm_id_fkey FOREIGN KEY (ogroup_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `OGroupEntity`
+--
+
+DROP TABLE IF EXISTS OGroupEntity;
+CREATE TABLE OGroupEntity (
+  ogroupentity_id int(8) NOT NULL auto_increment,
+  ogroupentity_domain_id int(8) default '0',
+  ogroupentity_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  ogroupentity_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  ogroupentity_userupdate int(8) default NULL,
+  ogroupentity_usercreate int(8) default NULL,
+  ogroupentity_ogroup_id int(8) NOT NULL,
+  ogroupentity_entity_id int(8) NOT NULL,
+  ogroupentity_entity varchar(32) NOT NULL,
+  PRIMARY KEY  (ogroupentity_id),
+  KEY ogroupentity_ogroup_id_ogroup_id_fkey (ogroupentity_ogroup_id),
+  KEY ogroupentity_domain_id_domain_id_fkey (ogroupentity_domain_id),
+  KEY ogroupentity_userupdate_userobm_id_fkey (ogroupentity_userupdate),
+  KEY ogroupentity_usercreate_userobm_id_fkey (ogroupentity_usercreate),
+  CONSTRAINT ogroupentity_usercreate_userobm_id_fkey FOREIGN KEY (ogroupentity_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT ogroupentity_domain_id_domain_id_fkey FOREIGN KEY (ogroupentity_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT ogroupentity_ogroup_id_ogroup_id_fkey FOREIGN KEY (ogroupentity_ogroup_id) REFERENCES OGroup (ogroup_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT ogroupentity_userupdate_userobm_id_fkey FOREIGN KEY (ogroupentity_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ObmBookmark`
+--
+
+DROP TABLE IF EXISTS ObmBookmark;
+CREATE TABLE ObmBookmark (
+  obmbookmark_id int(8) NOT NULL auto_increment,
+  obmbookmark_user_id int(8) NOT NULL,
+  obmbookmark_label varchar(48) NOT NULL default '',
+  obmbookmark_entity varchar(24) NOT NULL default '',
+  PRIMARY KEY  (obmbookmark_id),
+  KEY bkm_idx_user (obmbookmark_user_id),
+  CONSTRAINT obmbookmark_user_id_userobm_id_fkey FOREIGN KEY (obmbookmark_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ObmBookmarkProperty`
+--
+
+DROP TABLE IF EXISTS ObmBookmarkProperty;
+CREATE TABLE ObmBookmarkProperty (
+  obmbookmarkproperty_id int(8) NOT NULL auto_increment,
+  obmbookmarkproperty_bookmark_id int(8) NOT NULL,
+  obmbookmarkproperty_property varchar(64) NOT NULL default '',
+  obmbookmarkproperty_value varchar(64) NOT NULL default '',
+  PRIMARY KEY  (obmbookmarkproperty_id),
+  KEY bkmprop_idx_bkm (obmbookmarkproperty_bookmark_id),
+  CONSTRAINT obmbookmarkproperty_bookmark_id_obmbookmark_id_fkey FOREIGN KEY (obmbookmarkproperty_bookmark_id) REFERENCES ObmBookmark (obmbookmark_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ObmInfo`
+--
+
+DROP TABLE IF EXISTS ObmInfo;
+CREATE TABLE ObmInfo (
+  obminfo_name varchar(32) NOT NULL default '',
+  obminfo_value varchar(255) default '',
+  PRIMARY KEY  (obminfo_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ObmSession`
+--
+
+DROP TABLE IF EXISTS ObmSession;
+CREATE TABLE ObmSession (
+  obmsession_sid varchar(32) NOT NULL default '',
+  obmsession_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  obmsession_name varchar(32) NOT NULL default '',
+  obmsession_data text,
+  PRIMARY KEY  (obmsession_sid,obmsession_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `OrganizationalChart`
+--
+
+DROP TABLE IF EXISTS OrganizationalChart;
+CREATE TABLE OrganizationalChart (
+  organizationalchart_id int(8) NOT NULL auto_increment,
+  organizationalchart_domain_id int(8) default '0',
+  organizationalchart_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  organizationalchart_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  organizationalchart_userupdate int(8) default NULL,
+  organizationalchart_usercreate int(8) default NULL,
+  organizationalchart_name varchar(32) NOT NULL,
+  organizationalchart_description varchar(64) default NULL,
+  organizationalchart_archive int(1) NOT NULL default '0',
+  PRIMARY KEY  (organizationalchart_id),
+  KEY organizationalchart_domain_id_domain_id_fkey (organizationalchart_domain_id),
+  KEY organizationalchart_userupdate_userobm_id_fkey (organizationalchart_userupdate),
+  KEY organizationalchart_usercreate_userobm_id_fkey (organizationalchart_usercreate),
+  CONSTRAINT organizationalchart_usercreate_userobm_id_fkey FOREIGN KEY (organizationalchart_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT organizationalchart_domain_id_domain_id_fkey FOREIGN KEY (organizationalchart_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT organizationalchart_userupdate_userobm_id_fkey FOREIGN KEY (organizationalchart_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_Domain`
+--
+
+DROP TABLE IF EXISTS P_Domain;
+CREATE TABLE P_Domain (
+  domain_id int(8) NOT NULL auto_increment,
+  domain_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  domain_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  domain_usercreate int(8) default NULL,
+  domain_userupdate int(8) default NULL,
+  domain_label varchar(32) NOT NULL,
+  domain_description varchar(255) default NULL,
+  domain_name varchar(128) default NULL,
+  domain_alias text,
+  domain_mail_server_id int(8) default NULL,
+  domain_global tinyint(1) default '0',
+  PRIMARY KEY  (domain_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_EntityRight`
+--
+
+DROP TABLE IF EXISTS P_EntityRight;
+CREATE TABLE P_EntityRight (
+  entityright_entity varchar(32) NOT NULL default '',
+  entityright_entity_id int(8) NOT NULL default '0',
+  entityright_consumer varchar(32) NOT NULL default '',
+  entityright_consumer_id int(8) NOT NULL default '0',
+  entityright_read int(1) NOT NULL default '0',
+  entityright_write int(1) NOT NULL default '0',
+  entityright_admin int(1) NOT NULL default '0',
+  PRIMARY KEY  (entityright_entity,entityright_entity_id,entityright_consumer,entityright_consumer_id),
+  KEY entright_idx_ent_id (entityright_entity_id),
+  KEY entright_idx_ent (entityright_entity),
+  KEY entright_idx_con_id (entityright_consumer_id),
+  KEY entright_idx_con (entityright_consumer)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_GroupGroup`
+--
+
+DROP TABLE IF EXISTS P_GroupGroup;
+CREATE TABLE P_GroupGroup (
+  groupgroup_parent_id int(8) NOT NULL default '0',
+  groupgroup_child_id int(8) NOT NULL default '0',
+  PRIMARY KEY  (groupgroup_parent_id,groupgroup_child_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_Host`
+--
+
+DROP TABLE IF EXISTS P_Host;
+CREATE TABLE P_Host (
+  host_id int(8) NOT NULL auto_increment,
+  host_domain_id int(8) default '0',
+  host_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  host_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  host_userupdate int(8) default NULL,
+  host_usercreate int(8) default NULL,
+  host_uid int(8) default NULL,
+  host_gid int(8) default NULL,
+  host_samba int(1) default '0',
+  host_name varchar(32) NOT NULL,
+  host_ip varchar(16) default NULL,
+  host_delegation varchar(64) default '',
+  host_description varchar(128) default NULL,
+  host_web_perms int(1) default '0',
+  host_web_list text,
+  host_web_all int(1) default '0',
+  host_ftp_perms int(1) default '0',
+  host_firewall_perms varchar(128) default NULL,
+  PRIMARY KEY  (host_id),
+  UNIQUE KEY host_name (host_name),
+  UNIQUE KEY k_uid_host (host_uid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_MailServer`
+--
+
+DROP TABLE IF EXISTS P_MailServer;
+CREATE TABLE P_MailServer (
+  mailserver_id int(8) NOT NULL auto_increment,
+  mailserver_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  mailserver_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  mailserver_userupdate int(8) default NULL,
+  mailserver_usercreate int(8) default NULL,
+  mailserver_host_id int(8) NOT NULL default '0',
+  mailserver_relayhost_id int(8) default NULL,
+  mailserver_imap int(1) default '0',
+  mailserver_smtp_in int(1) default '0',
+  mailserver_smtp_out int(1) default '0',
+  PRIMARY KEY  (mailserver_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_MailServerNetwork`
+--
+
+DROP TABLE IF EXISTS P_MailServerNetwork;
+CREATE TABLE P_MailServerNetwork (
+  mailservernetwork_host_id int(8) NOT NULL default '0',
+  mailservernetwork_ip varchar(16) NOT NULL default ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_MailShare`
+--
+
+DROP TABLE IF EXISTS P_MailShare;
+CREATE TABLE P_MailShare (
+  mailshare_id int(8) NOT NULL auto_increment,
+  mailshare_domain_id int(8) default '0',
+  mailshare_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  mailshare_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  mailshare_userupdate int(8) default NULL,
+  mailshare_usercreate int(8) default NULL,
+  mailshare_name varchar(32) default NULL,
+  mailshare_archive int(1) NOT NULL default '0',
+  mailshare_quota int(11) NOT NULL default '0',
+  mailshare_mail_server_id int(8) default '0',
+  mailshare_delegation varchar(64) default '',
+  mailshare_description varchar(255) default NULL,
+  mailshare_email text,
+  PRIMARY KEY  (mailshare_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_Samba`
+--
+
+DROP TABLE IF EXISTS P_Samba;
+CREATE TABLE P_Samba (
+  samba_domain_id int(8) default '0',
+  samba_name varchar(255) NOT NULL default '',
+  samba_value varchar(255) NOT NULL default ''
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_UGroup`
+--
+
+DROP TABLE IF EXISTS P_UGroup;
+CREATE TABLE P_UGroup (
+  group_id int(8) NOT NULL auto_increment,
+  group_domain_id int(8) default '0',
+  group_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  group_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  group_userupdate int(8) default NULL,
+  group_usercreate int(8) default NULL,
+  group_system int(1) default '0',
+  group_privacy int(2) default '0',
+  group_local int(1) default '1',
+  group_ext_id varchar(24) default NULL,
+  group_samba int(1) default '0',
+  group_gid int(8) default NULL,
+  group_mailing int(1) default '0',
+  group_delegation varchar(64) default '',
+  group_manager_id int(8) default NULL,
+  group_name varchar(32) NOT NULL,
+  group_desc varchar(128) default NULL,
+  group_email varchar(128) default NULL,
+  group_contacts text,
+  PRIMARY KEY  (group_id),
+  UNIQUE KEY group_gid (group_gid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_UserObm`
+--
+
+DROP TABLE IF EXISTS P_UserObm;
+CREATE TABLE P_UserObm (
+  userobm_id int(8) NOT NULL auto_increment,
+  userobm_domain_id int(8) default NULL,
+  userobm_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  userobm_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_userupdate int(8) default NULL,
+  userobm_usercreate int(8) default NULL,
+  userobm_local int(1) default '1',
+  userobm_ext_id varchar(16) default NULL,
+  userobm_system int(1) default '0',
+  userobm_archive int(1) NOT NULL default '0',
+  userobm_timelastaccess timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_login varchar(32) NOT NULL default '',
+  userobm_nb_login_failed int(2) default '0',
+  userobm_password_type char(6) NOT NULL default 'PLAIN',
+  userobm_password varchar(64) NOT NULL default '',
+  userobm_password_dateexp date default NULL,
+  userobm_account_dateexp date default NULL,
+  userobm_perms varchar(254) default NULL,
+  userobm_delegation_target varchar(64) default '',
+  userobm_delegation varchar(64) default '',
+  userobm_calendar_version timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_uid int(8) default NULL,
+  userobm_gid int(8) default NULL,
+  userobm_datebegin date default NULL,
+  userobm_hidden int(1) default '0',
+  userobm_kind varchar(12) default NULL,
+  userobm_lastname varchar(64) default '',
+  userobm_firstname varchar(64) default '',
+  userobm_title varchar(64) default '',
+  userobm_sound varchar(64) default NULL,
+  userobm_company varchar(64) default NULL,
+  userobm_direction varchar(64) default NULL,
+  userobm_service varchar(64) default NULL,
+  userobm_address1 varchar(64) default NULL,
+  userobm_address2 varchar(64) default NULL,
+  userobm_address3 varchar(64) default NULL,
+  userobm_zipcode varchar(14) default NULL,
+  userobm_town varchar(64) default NULL,
+  userobm_expresspostal varchar(16) default NULL,
+  userobm_country_iso3166 char(2) default '0',
+  userobm_phone varchar(32) default '',
+  userobm_phone2 varchar(32) default '',
+  userobm_mobile varchar(32) default '',
+  userobm_fax varchar(32) default '',
+  userobm_fax2 varchar(32) default '',
+  userobm_web_perms int(1) default '0',
+  userobm_web_list text,
+  userobm_web_all int(1) default '0',
+  userobm_mail_perms int(1) default '0',
+  userobm_mail_ext_perms int(1) default '0',
+  userobm_email text,
+  userobm_mail_server_id int(8) default NULL,
+  userobm_mail_quota int(8) default '0',
+  userobm_mail_quota_use int(8) default '0',
+  userobm_mail_login_date timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_nomade_perms int(1) default '0',
+  userobm_nomade_enable int(1) default '0',
+  userobm_nomade_local_copy int(1) default '0',
+  userobm_nomade_datebegin timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_nomade_dateend timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_email_nomade varchar(64) default '',
+  userobm_vacation_enable int(1) default '0',
+  userobm_vacation_datebegin timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_vacation_dateend timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_vacation_message text,
+  userobm_samba_perms int(1) default '0',
+  userobm_samba_home varchar(255) default '',
+  userobm_samba_home_drive char(2) default '',
+  userobm_samba_logon_script varchar(128) default '',
+  userobm_host_id int(8) default NULL,
+  userobm_description varchar(255) default NULL,
+  userobm_location varchar(255) default NULL,
+  userobm_education varchar(255) default NULL,
+  userobm_photo_id int(8) default NULL,
+  PRIMARY KEY  (userobm_id),
+  KEY k_login_user (userobm_login),
+  KEY k_uid_user (userobm_uid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_UserObmGroup`
+--
+
+DROP TABLE IF EXISTS P_UserObmGroup;
+CREATE TABLE P_UserObmGroup (
+  userobmgroup_group_id int(8) NOT NULL default '0',
+  userobmgroup_userobm_id int(8) NOT NULL default '0',
+  PRIMARY KEY  (userobmgroup_group_id,userobmgroup_userobm_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `P_of_usergroup`
+--
+
+DROP TABLE IF EXISTS P_of_usergroup;
+CREATE TABLE P_of_usergroup (
+  of_usergroup_group_id int(8) NOT NULL default '0',
+  of_usergroup_user_id int(8) NOT NULL default '0',
+  PRIMARY KEY  (of_usergroup_group_id,of_usergroup_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ParentDeal`
+--
+
+DROP TABLE IF EXISTS ParentDeal;
+CREATE TABLE ParentDeal (
+  parentdeal_id int(8) NOT NULL auto_increment,
+  parentdeal_domain_id int(8) default '0',
+  parentdeal_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  parentdeal_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  parentdeal_userupdate int(8) default NULL,
+  parentdeal_usercreate int(8) default NULL,
+  parentdeal_label varchar(128) NOT NULL,
+  parentdeal_marketingmanager_id int(8) default NULL,
+  parentdeal_technicalmanager_id int(8) default NULL,
+  parentdeal_archive char(1) default '0',
+  parentdeal_comment text,
+  PRIMARY KEY  (parentdeal_id),
+  KEY parentdeal_domain_id_domain_id_fkey (parentdeal_domain_id),
+  KEY parentdeal_userupdate_userobm_id_fkey (parentdeal_userupdate),
+  KEY parentdeal_usercreate_userobm_id_fkey (parentdeal_usercreate),
+  KEY parentdeal_marketingmanager_id_userobm_id_fkey (parentdeal_marketingmanager_id),
+  KEY parentdeal_technicalmanager_id_userobm_id_fkey (parentdeal_technicalmanager_id),
+  CONSTRAINT parentdeal_technicalmanager_id_userobm_id_fkey FOREIGN KEY (parentdeal_technicalmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT parentdeal_domain_id_domain_id_fkey FOREIGN KEY (parentdeal_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT parentdeal_marketingmanager_id_userobm_id_fkey FOREIGN KEY (parentdeal_marketingmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT parentdeal_usercreate_userobm_id_fkey FOREIGN KEY (parentdeal_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT parentdeal_userupdate_userobm_id_fkey FOREIGN KEY (parentdeal_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Payment`
+--
+
+DROP TABLE IF EXISTS Payment;
+CREATE TABLE Payment (
+  payment_id int(8) NOT NULL auto_increment,
+  payment_domain_id int(8) default '0',
+  payment_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  payment_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  payment_userupdate int(8) default NULL,
+  payment_usercreate int(8) default NULL,
+  payment_company_id int(8) default NULL,
+  payment_account_id int(8) default NULL,
+  payment_paymentkind_id int(8) default NULL,
+  payment_amount double(10,2) NOT NULL default '0.00',
+  payment_date date default NULL,
+  payment_inout char(1) NOT NULL default '+',
+  payment_number varchar(24) default '',
+  payment_checked char(1) NOT NULL default '0',
+  payment_gap double(10,2) NOT NULL default '0.00',
+  payment_comment text,
+  PRIMARY KEY  (payment_id),
+  KEY payment_domain_id_domain_id_fkey (payment_domain_id),
+  KEY payment_account_id_account_id_fkey (payment_account_id),
+  KEY payment_userupdate_userobm_id_fkey (payment_userupdate),
+  KEY payment_usercreate_userobm_id_fkey (payment_usercreate),
+  KEY payment_company_id_company_id_fkey (payment_company_id),
+  KEY payment_paymentkind_id_paymentkind_id_fkey (payment_paymentkind_id),
+  CONSTRAINT payment_paymentkind_id_paymentkind_id_fkey FOREIGN KEY (payment_paymentkind_id) REFERENCES PaymentKind (paymentkind_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT payment_account_id_account_id_fkey FOREIGN KEY (payment_account_id) REFERENCES Account (account_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT payment_company_id_company_id_fkey FOREIGN KEY (payment_company_id) REFERENCES Company (company_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT payment_domain_id_domain_id_fkey FOREIGN KEY (payment_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT payment_usercreate_userobm_id_fkey FOREIGN KEY (payment_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT payment_userupdate_userobm_id_fkey FOREIGN KEY (payment_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `PaymentInvoice`
+--
+
+DROP TABLE IF EXISTS PaymentInvoice;
+CREATE TABLE PaymentInvoice (
+  paymentinvoice_invoice_id int(8) NOT NULL,
+  paymentinvoice_payment_id int(8) NOT NULL,
+  paymentinvoice_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  paymentinvoice_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  paymentinvoice_userupdate int(8) default NULL,
+  paymentinvoice_usercreate int(8) default NULL,
+  paymentinvoice_amount double(10,2) NOT NULL default '0.00',
+  PRIMARY KEY  (paymentinvoice_invoice_id,paymentinvoice_payment_id),
+  KEY paymentinvoice_payment_id_payment_id_fkey (paymentinvoice_payment_id),
+  KEY paymentinvoice_usercreate_userobm_id_fkey (paymentinvoice_usercreate),
+  KEY paymentinvoice_userupdate_userobm_id_fkey (paymentinvoice_userupdate),
+  CONSTRAINT paymentinvoice_userupdate_userobm_id_fkey FOREIGN KEY (paymentinvoice_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT paymentinvoice_invoice_id_invoice_id_fkey FOREIGN KEY (paymentinvoice_invoice_id) REFERENCES Invoice (invoice_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT paymentinvoice_payment_id_payment_id_fkey FOREIGN KEY (paymentinvoice_payment_id) REFERENCES Payment (payment_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT paymentinvoice_usercreate_userobm_id_fkey FOREIGN KEY (paymentinvoice_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `PaymentKind`
+--
+
+DROP TABLE IF EXISTS PaymentKind;
+CREATE TABLE PaymentKind (
+  paymentkind_id int(8) NOT NULL auto_increment,
+  paymentkind_domain_id int(8) default '0',
+  paymentkind_shortlabel varchar(3) NOT NULL default '',
+  paymentkind_label varchar(40) NOT NULL default '',
+  PRIMARY KEY  (paymentkind_id),
+  KEY paymentkind_domain_id_domain_id_fkey (paymentkind_domain_id),
+  CONSTRAINT paymentkind_domain_id_domain_id_fkey FOREIGN KEY (paymentkind_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Project`
+--
+
+DROP TABLE IF EXISTS Project;
 CREATE TABLE Project (
-  project_id             int(8) auto_increment,
-  project_domain_id      int(8) default 0,
-  project_timeupdate     timestamp(14),
-  project_timecreate     timestamp(14),
-  project_userupdate     int(8),
-  project_usercreate     int(8),
-  project_name           varchar(128),
-  project_shortname      varchar(10),
-  project_type_id        int(8),
-  project_tasktype_id    int(8),
-  project_company_id     int(8),
-  project_deal_id        int(8),
-  project_soldtime       int(8) DEFAULT NULL,
-  project_estimatedtime  int(8) DEFAULT NULL,
-  project_datebegin      date,
-  project_dateend        date,
-  project_archive        char(1) DEFAULT '0',
-  project_comment        text,
-  project_reference_date varchar(32),
-  project_reference_duration varchar(16),
+  project_id int(8) NOT NULL auto_increment,
+  project_domain_id int(8) default '0',
+  project_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  project_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  project_userupdate int(8) default NULL,
+  project_usercreate int(8) default NULL,
+  project_name varchar(128) default NULL,
+  project_shortname varchar(10) default NULL,
+  project_type_id int(8) default NULL,
+  project_tasktype_id int(8) default NULL,
+  project_company_id int(8) default NULL,
+  project_deal_id int(8) default NULL,
+  project_soldtime int(8) default NULL,
+  project_estimatedtime int(8) default NULL,
+  project_datebegin date default NULL,
+  project_dateend date default NULL,
+  project_archive char(1) default '0',
+  project_comment text,
+  project_reference_date varchar(32) default NULL,
+  project_reference_duration varchar(16) default NULL,
   project_reference_desc text,
   project_reference_tech text,
-  PRIMARY KEY (project_id),
-  INDEX project_idx_comp (project_company_id),
-  INDEX project_idx_deal (project_deal_id)
-);
-
-
---
--- Table structure for table 'ProjectTask'
---
-CREATE TABLE ProjectTask (
-  projecttask_id             int(8) auto_increment,
-  projecttask_project_id     int(8) NOT NULL,
-  projecttask_timeupdate     timestamp(14),
-  projecttask_timecreate     timestamp(14),
-  projecttask_userupdate     int(8) default NULL,
-  projecttask_usercreate     int(8) default NULL,
-  projecttask_label          varchar(128) default NULL,
-  projecttask_parenttask_id  int(8) default 0,
-  projecttask_rank           int(8) default NULL,
-  projecttask_datebegin      date,
-  projecttask_dateend        date,
-  PRIMARY KEY (projecttask_id),
-  INDEX pt_idx_pro (projecttask_project_id)
-);
+  PRIMARY KEY  (project_id),
+  KEY project_idx_comp (project_company_id),
+  KEY project_idx_deal (project_deal_id),
+  KEY project_domain_id_domain_id_fkey (project_domain_id),
+  KEY project_userupdate_userobm_id_fkey (project_userupdate),
+  KEY project_usercreate_userobm_id_fkey (project_usercreate),
+  KEY project_tasktype_id_tasktype_id_fkey (project_tasktype_id),
+  KEY project_type_id_dealtype_id_fkey (project_type_id),
+  CONSTRAINT project_type_id_dealtype_id_fkey FOREIGN KEY (project_type_id) REFERENCES DealType (dealtype_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT project_company_id_company_id_fkey FOREIGN KEY (project_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT project_deal_id_deal_id_fkey FOREIGN KEY (project_deal_id) REFERENCES Deal (deal_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT project_domain_id_domain_id_fkey FOREIGN KEY (project_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT project_tasktype_id_tasktype_id_fkey FOREIGN KEY (project_tasktype_id) REFERENCES TaskType (tasktype_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT project_usercreate_userobm_id_fkey FOREIGN KEY (project_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT project_userupdate_userobm_id_fkey FOREIGN KEY (project_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'ProjectReferenceTask'
+-- Table structure for table `ProjectCV`
 --
-CREATE TABLE ProjectRefTask (
-  projectreftask_id          int(8) auto_increment,
-  projectreftask_timeupdate  timestamp(14),
-  projectreftask_timecreate  timestamp(14),
-  projectreftask_userupdate  int(8) default NULL,
-  projectreftask_usercreate  int(8) default NULL,
-  projectreftask_tasktype_id int(8),
-  projectreftask_label       varchar(128) default NULL,
-  PRIMARY KEY (projectreftask_id)
-);
 
---
--- Table structure for table 'ProjectUser'
---
-CREATE TABLE ProjectUser (
-  projectuser_id              int(8) auto_increment,
-  projectuser_project_id      int(8) NOT NULL,
-  projectuser_user_id         int(8) NOT NULL,
-  projectuser_projecttask_id  int(8),
-  projectuser_timeupdate      timestamp(14),
-  projectuser_timecreate      timestamp(14),
-  projectuser_userupdate      int(8) default NULL,
-  projectuser_usercreate      int(8) default NULL,
-  projectuser_projectedtime   float default NULL,
-  projectuser_missingtime     float default NULL,
-  projectuser_validity        timestamp(14),
-  projectuser_soldprice       int(8) default NULL,
-  projectuser_manager         int(1) default NULL,
-  PRIMARY KEY (projectuser_id),
-  INDEX pu_idx_pro (projectuser_project_id),
-  INDEX pu_idx_user (projectuser_user_id),
-  INDEX pu_idx_pt (projectuser_projecttask_id)
-);
-
-
---
--- Table structure for table 'ProjectClosing'
---
-CREATE TABLE ProjectClosing (
-  projectclosing_id           int(8) auto_increment,
-  projectclosing_project_id   int(8) NOT NULL,
-  projectclosing_timeupdate   timestamp(14),
-  projectclosing_timecreate   timestamp(14),
-  projectclosing_userupdate   int(8),
-  projectclosing_usercreate   int(8) NOT NULL,
-  projectclosing_date         timestamp(14) NOT NULL,
-  projectclosing_used         int(8) NOT NULL,
-  projectclosing_remaining    int(8) NOT NULL,
-  projectclosing_type         int(8),
-  projectclosing_comment      text,
-  PRIMARY KEY (projectclosing_id)
-);
-
-
-----------------------------------------------------------------------------
--- CV table
-----------------------------------------------------------------------------
-
-CREATE TABLE CV (
-  cv_id              int(8) auto_increment,
-  cv_domain_id       int(8) default 0,
-  cv_timeupdate      timestamp(14),
-  cv_timecreate      timestamp(14),
-  cv_userupdate      int(8),
-  cv_usercreate      int(8),
-  cv_userobm_id      int(8) NOT NULL,
-  cv_title           varchar(255),
-  cv_additionnalrefs text,
-  cv_comment         text,
-  PRIMARY KEY(cv_id)
-);
-
-
-----------------------------------------------------------------------------
--- ProjectCV table
-----------------------------------------------------------------------------
-
+DROP TABLE IF EXISTS ProjectCV;
 CREATE TABLE ProjectCV (
-  projectcv_project_id  int(8) NOT NULL,
-  projectcv_cv_id       int(8) NOT NULL,
-  projectcv_role        varchar(128) DEFAULT '',
-  PRIMARY KEY(projectcv_project_id, projectcv_cv_id)
-);
-
-
-----------------------------------------------------------------------------
--- DefaultOdtTemplate table
-----------------------------------------------------------------------------
-
-CREATE TABLE DefaultOdtTemplate (
-  defaultodttemplate_id           int(8) auto_increment,
-  defaultodttemplate_domain_id    int(8) DEFAULT 0,
-  defaultodttemplate_entity       varchar(32),
-  defaultodttemplate_document_id  int(8) NOT NULL,
-  defaultodttemplate_label        varchar(64) DEFAULT '',
-  PRIMARY KEY(defaultodttemplate_id)
-);
-
-
--------------------------------------------------------------------------------
--- Timemanagement tables
--------------------------------------------------------------------------------
---
--- Task table
---
-CREATE TABLE TimeTask (
-  timetask_id              int(8) auto_increment,
-  timetask_timeupdate      timestamp(14),
-  timetask_timecreate      timestamp(14),
-  timetask_userupdate      int(8) default NULL,
-  timetask_usercreate      int(8) default NULL,
-  timetask_user_id         int(8) default NULL,
-  timetask_date            timestamp(14) NOT NULL,
-  timetask_projecttask_id  int(8) default NULL,
-  timetask_length          float default NULL,
-  timetask_tasktype_id     int(8) default NULL,
-  timetask_label           varchar(255) default NULL,
-  timetask_status          int(1) default NULL,
-  PRIMARY KEY (timetask_id),
-  INDEX tt_idx_pt (timetask_projecttask_id)
-) TYPE=MyISAM;
-
+  projectcv_project_id int(8) NOT NULL,
+  projectcv_cv_id int(8) NOT NULL,
+  projectcv_role varchar(128) default '',
+  PRIMARY KEY  (projectcv_project_id,projectcv_cv_id),
+  KEY projectcv_cv_id_cv_id_fkey (projectcv_cv_id),
+  CONSTRAINT projectcv_cv_id_cv_id_fkey FOREIGN KEY (projectcv_cv_id) REFERENCES CV (cv_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT projectcv_project_id_project_id_fkey FOREIGN KEY (projectcv_project_id) REFERENCES Project (project_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- TaskType table
+-- Table structure for table `ProjectClosing`
 --
-CREATE TABLE TaskType (
-  tasktype_id          int(8) auto_increment,
-  tasktype_domain_id   int(8) default 0,
-  tasktype_timeupdate  timestamp(14),
-  tasktype_timecreate  timestamp(14),
-  tasktype_userupdate  int(8) default NULL,
-  tasktype_usercreate  int(8) default NULL,
-  tasktype_internal    int(1) NOT NULL,
-  tasktype_code        varchar(10),
-  tasktype_label       varchar(32) default NULL,
-  PRIMARY KEY (tasktype_id)
-) TYPE=MyISAM;
 
-
--------------------------------------------------------------------------------
--- Support tables
--------------------------------------------------------------------------------
---
--- New table 'Contract'
---
-CREATE TABLE Contract (
-  contract_id                int(8) auto_increment,
-  contract_domain_id         int(8) default 0,
-  contract_timeupdate        timestamp(14),
-  contract_timecreate        timestamp(14),
-  contract_userupdate        int(8) default NULL,
-  contract_usercreate        int(8) default NULL,
-  contract_deal_id           int(8) default NULL,
-  contract_company_id        int(8) default NULL,
-  contract_label             varchar(128) default NULL,
-  contract_number            varchar(20) default NULL,
-  contract_datesignature     date default NULL ,
-  contract_datebegin         date default NULL,
-  contract_dateexp           date default NULL,
-  contract_daterenew         date default NULL,
-  contract_datecancel        date default NULL,
-  contract_type_id           int(8) default NULL,
-  contract_priority_id       int(8) NOT NULL default 0,
-  contract_status_id         int(8) NOT NULL default 0,
-  contract_kind              int(2) NULL default 0,
-  contract_format            int(2) NULL default 0,
-  contract_ticketnumber      int(8) NULL default 0,
-  contract_duration          int(8) NULL default 0,
-  contract_autorenewal       int(2) NULL default 0,
-  contract_contact1_id       int(8) default NULL,
-  contract_contact2_id       int(8) default NULL,
-  contract_techmanager_id    int(8) default NULL,
-  contract_marketmanager_id  int(8) default NULL,
-  contract_privacy           int(2) NULL default 0,
-  contract_archive           int(1) default 0,
-  contract_clause            text,
-  contract_comment           text,
-  PRIMARY KEY (contract_id)
-) TYPE=MyISAM;
-
+DROP TABLE IF EXISTS ProjectClosing;
+CREATE TABLE ProjectClosing (
+  projectclosing_id int(8) NOT NULL auto_increment,
+  projectclosing_project_id int(8) NOT NULL,
+  projectclosing_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  projectclosing_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  projectclosing_userupdate int(8) default NULL,
+  projectclosing_usercreate int(8) default NULL,
+  projectclosing_date timestamp NOT NULL default '0000-00-00 00:00:00',
+  projectclosing_used int(8) NOT NULL,
+  projectclosing_remaining int(8) NOT NULL,
+  projectclosing_type int(8) default NULL,
+  projectclosing_comment text,
+  PRIMARY KEY  (projectclosing_id),
+  KEY projectclosing_project_id_project_id_fkey (projectclosing_project_id),
+  KEY projectclosing_userupdate_userobm_id_fkey (projectclosing_userupdate),
+  KEY projectclosing_usercreate_userobm_id_fkey (projectclosing_usercreate),
+  CONSTRAINT projectclosing_usercreate_userobm_id_fkey FOREIGN KEY (projectclosing_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT projectclosing_project_id_project_id_fkey FOREIGN KEY (projectclosing_project_id) REFERENCES Project (project_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT projectclosing_userupdate_userobm_id_fkey FOREIGN KEY (projectclosing_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- New table 'ContractType'
+-- Table structure for table `ProjectRefTask`
 --
-CREATE TABLE ContractType (
-  contracttype_id          int(8) auto_increment,
-  contracttype_domain_id   int(8) default 0,
-  contracttype_timeupdate  timestamp(14),
-  contracttype_timecreate  timestamp(14),
-  contracttype_userupdate  int(8) default NULL,
-  contracttype_usercreate  int(8) default NULL,
-  contracttype_code        varchar(10) default '',
-  contracttype_label       varchar(64) default NULL,
-  PRIMARY KEY (contracttype_id)
-) TYPE=MyISAM;
 
-
---
--- New table 'ContractPriority'
---
-CREATE TABLE ContractPriority (
-  contractpriority_id          int(8) auto_increment,
-  contractpriority_domain_id   int(8) default 0,
-  contractpriority_timeupdate  timestamp(14),
-  contractpriority_timecreate  timestamp(14),
-  contractpriority_userupdate  int(8) default NULL,
-  contractpriority_usercreate  int(8) default NULL,
-  contractpriority_code        varchar(10) default '',
-  contractpriority_color       varchar(6) default NULL,
-  contractpriority_label       varchar(64) default NULL,
-  PRIMARY KEY (contractpriority_id)
-);
-
+DROP TABLE IF EXISTS ProjectRefTask;
+CREATE TABLE ProjectRefTask (
+  projectreftask_id int(8) NOT NULL auto_increment,
+  projectreftask_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  projectreftask_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  projectreftask_userupdate int(8) default NULL,
+  projectreftask_usercreate int(8) default NULL,
+  projectreftask_tasktype_id int(8) default NULL,
+  projectreftask_label varchar(128) default NULL,
+  PRIMARY KEY  (projectreftask_id),
+  KEY projectreftask_tasktype_id_tasktype_id_fkey (projectreftask_tasktype_id),
+  KEY projectreftask_userupdate_userobm_id_fkey (projectreftask_userupdate),
+  KEY projectreftask_usercreate_userobm_id_fkey (projectreftask_usercreate),
+  CONSTRAINT projectreftask_usercreate_userobm_id_fkey FOREIGN KEY (projectreftask_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT projectreftask_tasktype_id_tasktype_id_fkey FOREIGN KEY (projectreftask_tasktype_id) REFERENCES TaskType (tasktype_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT projectreftask_userupdate_userobm_id_fkey FOREIGN KEY (projectreftask_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- New table 'ContractStatus'
+-- Table structure for table `ProjectTask`
 --
-CREATE TABLE ContractStatus (
-  contractstatus_id          int(8) auto_increment,
-  contractstatus_domain_id   int(8) default 0,
-  contractstatus_timeupdate  timestamp(14),
-  contractstatus_timecreate  timestamp(14),
-  contractstatus_userupdate  int(8) default NULL,
-  contractstatus_usercreate  int(8) default NULL,
-  contractstatus_code        varchar(10) default '',
-  contractstatus_label       varchar(64) default NULL,
-PRIMARY KEY (contractstatus_id)
-);
 
-
---
--- New table 'Incident'
---
-CREATE TABLE Incident (
-  incident_id                 int(8) auto_increment,
-  incident_domain_id          int(8) DEFAULT 0,
-  incident_timeupdate         timestamp(14),
-  incident_timecreate         timestamp(14),
-  incident_userupdate         int(8) DEFAULT NULL,
-  incident_usercreate         int(8) DEFAULT NULL,
-  incident_contract_id        int(8) NOT NULL,
-  incident_label              varchar(100) DEFAULT NULL,
-  incident_reference          varchar(32) DEFAULT NULL,
-  incident_date               timestamp(14),
-  incident_priority_id        int(8) DEFAULT 0,
-  incident_status_id          int(8) DEFAULT 0,
-  incident_resolutiontype_id  integer DEFAULT 0,
-  incident_logger             int(8) DEFAULT NULL,
-  incident_owner              int(8) DEFAULT NULL,
-  incident_duration           char(4) DEFAULT '0',
-  incident_archive            char(1) NOT NULL DEFAULT '0',
-  incident_comment            text, 
-  incident_resolution         text,
-  PRIMARY KEY (incident_id)
-) TYPE=MyISAM;
-
+DROP TABLE IF EXISTS ProjectTask;
+CREATE TABLE ProjectTask (
+  projecttask_id int(8) NOT NULL auto_increment,
+  projecttask_project_id int(8) NOT NULL,
+  projecttask_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  projecttask_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  projecttask_userupdate int(8) default NULL,
+  projecttask_usercreate int(8) default NULL,
+  projecttask_label varchar(128) default NULL,
+  projecttask_parenttask_id int(8) default '0',
+  projecttask_rank int(8) default NULL,
+  projecttask_datebegin date default NULL,
+  projecttask_dateend date default NULL,
+  PRIMARY KEY  (projecttask_id),
+  KEY pt_idx_pro (projecttask_project_id),
+  KEY projecttask_parenttask_id_projecttask_id_fkey (projecttask_parenttask_id),
+  KEY projecttask_userupdate_userobm_id_fkey (projecttask_userupdate),
+  KEY projecttask_usercreate_userobm_id_fkey (projecttask_usercreate),
+  CONSTRAINT projecttask_usercreate_userobm_id_fkey FOREIGN KEY (projecttask_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT projecttask_parenttask_id_projecttask_id_fkey FOREIGN KEY (projecttask_parenttask_id) REFERENCES ProjectTask (projecttask_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT projecttask_project_id_project_id_fkey FOREIGN KEY (projecttask_project_id) REFERENCES Project (project_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT projecttask_userupdate_userobm_id_fkey FOREIGN KEY (projecttask_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- New table 'IncidentPriority'
+-- Table structure for table `ProjectUser`
 --
-CREATE TABLE IncidentPriority (
-  incidentpriority_id          int(8) auto_increment,
-  incidentpriority_domain_id   int(8) default 0,
-  incidentpriority_timeupdate  timestamp(14),
-  incidentpriority_timecreate  timestamp(14),
-  incidentpriority_userupdate  int(8) default NULL,
-  incidentpriority_usercreate  int(8) default NULL,
-  incidentpriority_code        varchar(10) default '',
-  incidentpriority_label       varchar(32) default NULL,
-  incidentpriority_color       char(6),
-  PRIMARY KEY (incidentpriority_id)
-) TYPE=MyISAM;
 
-
---
--- New table 'IncidentStatus'
---
-CREATE TABLE IncidentStatus (
-  incidentstatus_id          int(8) auto_increment,
-  incidentstatus_domain_id   int(8) default 0,
-  incidentstatus_timeupdate  timestamp(14),
-  incidentstatus_timecreate  timestamp(14),
-  incidentstatus_userupdate  int(8) default NULL,
-  incidentstatus_usercreate  int(8) default NULL,
-  incidentstatus_code        varchar(10) default '',
-  incidentstatus_label       varchar(32) default NULL,
-  PRIMARY KEY (incidentstatus_id)
-) TYPE=MyISAM;
-
+DROP TABLE IF EXISTS ProjectUser;
+CREATE TABLE ProjectUser (
+  projectuser_id int(8) NOT NULL auto_increment,
+  projectuser_project_id int(8) NOT NULL,
+  projectuser_user_id int(8) NOT NULL,
+  projectuser_projecttask_id int(8) default NULL,
+  projectuser_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  projectuser_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  projectuser_userupdate int(8) default NULL,
+  projectuser_usercreate int(8) default NULL,
+  projectuser_projectedtime float default NULL,
+  projectuser_missingtime float default NULL,
+  projectuser_validity timestamp NOT NULL default '0000-00-00 00:00:00',
+  projectuser_soldprice int(8) default NULL,
+  projectuser_manager int(1) default NULL,
+  PRIMARY KEY  (projectuser_id),
+  KEY pu_idx_pro (projectuser_project_id),
+  KEY pu_idx_user (projectuser_user_id),
+  KEY pu_idx_pt (projectuser_projecttask_id),
+  KEY projectuser_userupdate_userobm_id_fkey (projectuser_userupdate),
+  KEY projectuser_usercreate_userobm_id_fkey (projectuser_usercreate),
+  CONSTRAINT projectuser_usercreate_userobm_id_fkey FOREIGN KEY (projectuser_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT projectuser_project_id_project_id_fkey FOREIGN KEY (projectuser_project_id) REFERENCES Project (project_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT projectuser_userupdate_userobm_id_fkey FOREIGN KEY (projectuser_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT projectuser_user_id_userobm_id_fkey FOREIGN KEY (projectuser_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- New table 'IncidentResolutionType'
+-- Table structure for table `Publication`
 --
-CREATE TABLE IncidentResolutionType (
-  incidentresolutiontype_id          int(8) auto_increment,
-  incidentresolutiontype_domain_id   int(8) default 0,
-  incidentresolutiontype_timeupdate  timestamp(14),
-  incidentresolutiontype_timecreate  timestamp(14),
-  incidentresolutiontype_userupdate  int(8) default NULL,
-  incidentresolutiontype_usercreate  int(8) default NULL,
-  incidentresolutiontype_code        varchar(10) default '',
-  incidentresolutiontype_label       varchar(32) default NULL,
-PRIMARY KEY (incidentresolutiontype_id)
-);
 
-
--------------------------------------------------------------------------------
--- Accounting Section tables
--------------------------------------------------------------------------------
---
--- New table 'Invoice'
---
-CREATE TABLE Invoice ( 
-  invoice_id                int(8) auto_increment,
-  invoice_domain_id         int(8) default 0,
-  invoice_timeupdate        timestamp(14),
-  invoice_timecreate        timestamp(14),
-  invoice_userupdate        int(8),
-  invoice_usercreate        int(8),
-  invoice_company_id        int(8) NOT NULL,
-  invoice_deal_id           int(8) default NULL,
-  invoice_project_id        int(8) default NULL,
-  invoice_number            varchar(10) DEFAULT '0',
-  invoice_label             varchar(40) NOT NULL DEFAULT '',
-  invoice_amount_ht         double(10,2),
-  invoice_amount_ttc        double(10,2),
-  invoice_status_id         int(4) DEFAULT 0 NOT NULL,
-  invoice_date              date not NULL DEFAULT '0000-00-00',
-  invoice_expiration_date   date,
-  invoice_payment_date      date,
-  invoice_inout             char(1),
-  invoice_credit_memo       int(1) NOT NULL DEFAULT 0,
-  invoice_archive           char(1) NOT NULL DEFAULT '0',
-  invoice_comment           text,
-  PRIMARY KEY (invoice_id)
-);
-
+DROP TABLE IF EXISTS Publication;
+CREATE TABLE Publication (
+  publication_id int(8) NOT NULL auto_increment,
+  publication_domain_id int(8) default '0',
+  publication_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  publication_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  publication_userupdate int(8) default NULL,
+  publication_usercreate int(8) default NULL,
+  publication_title varchar(64) NOT NULL,
+  publication_type_id int(8) default NULL,
+  publication_year int(4) default NULL,
+  publication_lang varchar(30) default NULL,
+  publication_desc text,
+  PRIMARY KEY  (publication_id),
+  KEY publication_domain_id_domain_id_fkey (publication_domain_id),
+  KEY publication_userupdate_userobm_id_fkey (publication_userupdate),
+  KEY publication_usercreate_userobm_id_fkey (publication_usercreate),
+  KEY publication_type_id_publicationtype_id_fkey (publication_type_id),
+  CONSTRAINT publication_type_id_publicationtype_id_fkey FOREIGN KEY (publication_type_id) REFERENCES PublicationType (publicationtype_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT publication_domain_id_domain_id_fkey FOREIGN KEY (publication_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT publication_usercreate_userobm_id_fkey FOREIGN KEY (publication_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT publication_userupdate_userobm_id_fkey FOREIGN KEY (publication_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- New table 'Payment'
+-- Table structure for table `PublicationType`
 --
-CREATE TABLE Payment (
-  payment_id              int(8) auto_increment,
-  payment_domain_id       int(8) default 0,
-  payment_timeupdate      timestamp(14),
-  payment_timecreate      timestamp(14),
-  payment_userupdate      int(8),
-  payment_usercreate      int(8),
-  payment_company_id      int(8) NOT NULL,
-  payment_account_id      int(8),
-  payment_paymentkind_id  int(8) NOT NULL,
-  payment_amount          double(10,2) DEFAULT '0.0' NOT NULL,
-  payment_date            date,
-  payment_inout           char(1) NOT NULL DEFAULT '+',
-  payment_number          varchar(24) DEFAULT '',
-  payment_checked         char(1) NOT NULL DEFAULT '0',
-  payment_gap             double(10,2) DEFAULT '0.0' NOT NULL,
-  payment_comment         text,
-  PRIMARY KEY (payment_id)
-);
 
-
---
--- New table 'PaymentKind'
---
-CREATE TABLE PaymentKind (
-  paymentkind_id          int(8) auto_increment,
-  paymentkind_domain_id   int(8) default 0,
-  paymentkind_shortlabel  varchar(3) NOT NULL DEFAULT '',
-  paymentkind_label       varchar(40) NOT NULL DEFAULT '',
-  PRIMARY KEY (paymentkind_id)
-);
-
+DROP TABLE IF EXISTS PublicationType;
+CREATE TABLE PublicationType (
+  publicationtype_id int(8) NOT NULL auto_increment,
+  publicationtype_domain_id int(8) default '0',
+  publicationtype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  publicationtype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  publicationtype_userupdate int(8) default NULL,
+  publicationtype_usercreate int(8) default NULL,
+  publication_code varchar(10) default '',
+  publicationtype_label varchar(64) default NULL,
+  PRIMARY KEY  (publicationtype_id),
+  KEY publicationtype_domain_id_domain_id_fkey (publicationtype_domain_id),
+  KEY publicationtype_userupdate_userobm_id_fkey (publicationtype_userupdate),
+  KEY publicationtype_usercreate_userobm_id_fkey (publicationtype_usercreate),
+  CONSTRAINT publicationtype_usercreate_userobm_id_fkey FOREIGN KEY (publicationtype_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT publicationtype_domain_id_domain_id_fkey FOREIGN KEY (publicationtype_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT publicationtype_userupdate_userobm_id_fkey FOREIGN KEY (publicationtype_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- New table 'PaymentInvoice'
+-- Table structure for table `RGroup`
 --
-CREATE TABLE PaymentInvoice (
-  paymentinvoice_invoice_id  int(8) NOT NULL,
-  paymentinvoice_payment_id  int(8) NOT NULL,
-  paymentinvoice_timeupdate  timestamp(14),
-  paymentinvoice_timecreate  timestamp(14),
-  paymentinvoice_userupdate  int(8),
-  paymentinvoice_usercreate  int(8),
-  paymentinvoice_amount      double (10,2) NOT NULL DEFAULT '0',
-  PRIMARY KEY (paymentinvoice_invoice_id,paymentinvoice_payment_id)
-);
 
-
---
--- New table 'Account'
---
-CREATE TABLE Account (
-  account_id	      int(8) auto_increment,
-  account_domain_id   int(8) default 0,
-  account_timeupdate  timestamp(14),
-  account_timecreate  timestamp(14),
-  account_userupdate  int(8),
-  account_usercreate  int(8),
-  account_bank	      varchar(60) DEFAULT '' NOT NULL,
-  account_number      varchar(11) DEFAULT '0' NOT NULL,
-  account_balance     double(15,2) DEFAULT '0.00' NOT NULL,
-  account_today	      double(15,2) DEFAULT '0.00' NOT NULL,
-  account_comment     varchar(100),
-  account_label	      varchar(40) NOT NULL DEFAULT '',
-  PRIMARY KEY (account_id)
-);
-
-
--------------------------------------------------------------------------------
--- Group module tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'UGroup' (cause Group is a reserved keyword)
---
-CREATE TABLE UGroup (
-  group_id          int(8) auto_increment,
-  group_domain_id   int(8) default 0,
-  group_timeupdate  timestamp(14),
-  group_timecreate  timestamp(14),
-  group_userupdate  int(8),
-  group_usercreate  int(8),
-  group_system      int(1) DEFAULT 0,
-  group_privacy     int(2) NULL DEFAULT 0, 
-  group_local       int(1) DEFAULT 1,
-  group_ext_id      varchar(24),
-  group_samba       int(1) DEFAULT 0,
-  group_gid         int(8),
-  group_mailing     int(1) DEFAULT 0,
-  group_delegation  varchar(64) DEFAULT '',
-  group_manager_id  int(8) DEFAULT 0,
-  group_name        varchar(32) NOT NULL,
-  group_desc        varchar(128),
-  group_email       varchar(128),
-  group_contacts    text,
-  PRIMARY KEY (group_id),
-  UNIQUE KEY group_gid (group_gid)
-);
-
-
---
--- Table structure for table 'UserObmGroup'
---
-CREATE TABLE UserObmGroup (
-  userobmgroup_group_id    int(8) DEFAULT 0 NOT NULL,
-  userobmgroup_userobm_id  int(8) DEFAULT 0 NOT NULL,
-  PRIMARY KEY (userobmgroup_group_id, userobmgroup_userobm_id)
-);
-
-
---
--- Table structure for table 'GroupGroup'
---
-CREATE TABLE GroupGroup (
-  groupgroup_parent_id  int(8) DEFAULT 0 NOT NULL,
-  groupgroup_child_id   int(8) DEFAULT 0 NOT NULL,
-  PRIMARY KEY (groupgroup_parent_id, groupgroup_child_id)
-);
-
-
---
--- Table structure for table 'of_usergroup'
---
-CREATE TABLE of_usergroup (
-  of_usergroup_group_id    int(8) DEFAULT 0 NOT NULL,
-  of_usergroup_user_id     int(8) DEFAULT 0 NOT NULL,
-  PRIMARY KEY (of_usergroup_group_id, of_usergroup_user_id)
-);
-
-
---
--- Table structure for the table 'OrganizationalChart'
---
-CREATE TABLE OrganizationalChart (
-  organizationalchart_id			      int(8) auto_increment,
-  organizationalchart_domain_id     int(8) default 0,
-  organizationalchart_timeupdate    timestamp(14),
-  organizationalchart_timecreate		timestamp(14),
-  organizationalchart_userupdate    int(8),
-  organizationalchart_usercreate    int(8),
-  organizationalchart_name          varchar(32) not null,
-  organizationalchart_description   varchar(64),
-  organizationalchart_archive       int(1) not null default 0,
-  PRIMARY KEY (organizationalchart_id)
-);
-
-
---
--- Table structure for the table 'OGroup'
---
-CREATE TABLE OGroup (
-  ogroup_id					               int(8) auto_increment,
-  ogroup_domain_id                 int(8) default 0,
-  ogroup_timeupdate	             	 timestamp(14),
-  ogroup_timecreate	             	 timestamp(14),
-  ogroup_userupdate                int(8),
-  ogroup_usercreate                int(8),
-  ogroup_organizationalchart_id    int(8) not null,
-  ogroup_parent_id                 int(8) not null,
-  ogroup_name                      varchar(32) not null,
-  ogroup_level                     varchar(16),
-  PRIMARY KEY (ogroup_id)
-);
-
-
---
--- Table structure for the table 'OGroupEntity'
---
-CREATE TABLE OGroupEntity (
-  ogroupentity_id                  int(8) auto_increment,
-  ogroupentity_domain_id           int(8) default 0,
-  ogroupentity_timeupdate          timestamp(14),
-  ogroupentity_timecreate          timestamp(14),
-  ogroupentity_userupdate          int(8),
-  ogroupentity_usercreate          int(8),
-  ogroupentity_ogroup_id           int(8) not null,
-  ogroupentity_entity_id           int(8) not null,
-  ogroupentity_entity              varchar(32) not null,
-  PRIMARY KEY (ogroupentity_id)
-);
-
-
--------------------------------------------------------------------------------
--- Import module tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'Import'
---
-CREATE TABLE Import (
-  import_id                   int(8) auto_increment,
-  import_domain_id            int(8) default 0,
-  import_timeupdate           timestamp(14),
-  import_timecreate           timestamp(14),
-  import_userupdate           int(8),
-  import_usercreate           int(8),
-  import_name                 varchar(64) NOT NULL,
-  import_datasource_id        int(8) DEFAULT 0,
-  import_marketingmanager_id  int(8),
-  import_separator            varchar(3),
-  import_enclosed             char(1),
-  import_desc                 text,
-  PRIMARY KEY (import_id),
-  UNIQUE (import_name)
-);
-
-
--------------------------------------------------------------------------------
--- Tables needed for Connectors sync
--------------------------------------------------------------------------------
---
--- Table structure for the table 'DeletedCalendarEvent'
---
-CREATE TABLE DeletedCalendarEvent (
-  deletedcalendarevent_id         int(8) auto_increment,
-  deletedcalendarevent_event_id   int(8),
-  deletedcalendarevent_user_id    int(8),
-  deletedcalendarevent_timestamp  timestamp(14),
-  PRIMARY KEY (deletedcalendarevent_id),
-  INDEX idx_dce_event (deletedcalendarevent_event_id),
-  INDEX idx_dce_user (deletedcalendarevent_user_id)
-);
-
-
---
--- Table structure for the table 'DeletedContact'
---
-CREATE TABLE DeletedContact (
-  deletedcontact_contact_id  int(8),
-  deletedcontact_timestamp   timestamp(14),
-  PRIMARY KEY (deletedcontact_contact_id)
-);
-
-
---
--- Table structure for the table 'DeletedUser'
---
-CREATE TABLE DeletedUser (
-  deleteduser_user_id    int(8),
-  deleteduser_timestamp  timestamp(14),
-  PRIMARY KEY (deleteduser_user_id)
-);
-
-
---
--- Table structure for the table 'DeletedTodo'
---
-CREATE TABLE DeletedTodo (
-  deletedtodo_todo_id    int(8),
-  deletedtodo_timestamp  timestamp(14),
-  PRIMARY KEY (deletedtodo_todo_id)
-);
-
-
--------------------------------------------------------------------------------
--- Tables needed for Resource module
--------------------------------------------------------------------------------
---
--- Table structure for table 'Resource'
---
-CREATE TABLE Resource (
-  resource_id                int(8) auto_increment,
-  resource_domain_id         int(8) default 0,
-  resource_rtype_id          int(8),
-  resource_timeupdate        timestamp(14),
-  resource_timecreate        timestamp(14),
-  resource_userupdate        int(8),
-  resource_usercreate        int(8),
-  resource_name              varchar(32) DEFAULT '' NOT NULL,
-  resource_description       varchar(255),
-  resource_qty               int(8) DEFAULT 0,
-  PRIMARY KEY (resource_id),
-  UNIQUE k_label_resource (resource_name)
-);
-
---
--- Table structure for table 'RGroup'
---
+DROP TABLE IF EXISTS RGroup;
 CREATE TABLE RGroup (
-  rgroup_id          int(8) auto_increment,
-  rgroup_domain_id   int(8) default 0,
-  rgroup_timeupdate  timestamp(14),
-  rgroup_timecreate  timestamp(14),
-  rgroup_userupdate  int(8),
-  rgroup_usercreate  int(8),
-  rgroup_privacy     int(2) NULL DEFAULT 0,
-  rgroup_name        varchar(32) NOT NULL,
-  rgroup_desc        varchar(128),
-  PRIMARY KEY (rgroup_id)
-);
+  rgroup_id int(8) NOT NULL auto_increment,
+  rgroup_domain_id int(8) default '0',
+  rgroup_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  rgroup_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  rgroup_userupdate int(8) default NULL,
+  rgroup_usercreate int(8) default NULL,
+  rgroup_privacy int(2) default '0',
+  rgroup_name varchar(32) NOT NULL,
+  rgroup_desc varchar(128) default NULL,
+  PRIMARY KEY  (rgroup_id),
+  KEY rgroup_domain_id_domain_id_fkey (rgroup_domain_id),
+  KEY rgroup_userupdate_userobm_id_fkey (rgroup_userupdate),
+  KEY rgroup_usercreate_userobm_id_fkey (rgroup_usercreate),
+  CONSTRAINT rgroup_usercreate_userobm_id_fkey FOREIGN KEY (rgroup_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT rgroup_domain_id_domain_id_fkey FOREIGN KEY (rgroup_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT rgroup_userupdate_userobm_id_fkey FOREIGN KEY (rgroup_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'ResourceGroup'
+-- Table structure for table `Region`
 --
+
+DROP TABLE IF EXISTS Region;
+CREATE TABLE Region (
+  region_id int(8) NOT NULL auto_increment,
+  region_domain_id int(8) default '0',
+  region_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  region_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  region_userupdate int(8) default NULL,
+  region_usercreate int(8) default NULL,
+  region_code varchar(10) default '',
+  region_label varchar(64) default NULL,
+  PRIMARY KEY  (region_id),
+  KEY region_domain_id_domain_id_fkey (region_domain_id),
+  KEY region_userupdate_userobm_id_fkey (region_userupdate),
+  KEY region_usercreate_userobm_id_fkey (region_usercreate),
+  CONSTRAINT region_usercreate_userobm_id_fkey FOREIGN KEY (region_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT region_domain_id_domain_id_fkey FOREIGN KEY (region_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT region_userupdate_userobm_id_fkey FOREIGN KEY (region_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Resource`
+--
+
+DROP TABLE IF EXISTS Resource;
+CREATE TABLE Resource (
+  resource_id int(8) NOT NULL auto_increment,
+  resource_domain_id int(8) default '0',
+  resource_rtype_id int(8) default NULL,
+  resource_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  resource_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  resource_userupdate int(8) default NULL,
+  resource_usercreate int(8) default NULL,
+  resource_name varchar(32) NOT NULL default '',
+  resource_description varchar(255) default NULL,
+  resource_qty int(8) default '0',
+  PRIMARY KEY  (resource_id),
+  UNIQUE KEY k_label_resource (resource_name),
+  KEY resource_domain_id_domain_id_fkey (resource_domain_id),
+  CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain (domain_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ResourceGroup`
+--
+
+DROP TABLE IF EXISTS ResourceGroup;
 CREATE TABLE ResourceGroup (
-  resourcegroup_rgroup_id    int(8) DEFAULT 0 NOT NULL,
-  resourcegroup_resource_id  int(8) DEFAULT 0 NOT NULL
-);
+  resourcegroup_rgroup_id int(8) NOT NULL default '0',
+  resourcegroup_resource_id int(8) NOT NULL default '0',
+  KEY resourcegroup_rgroup_id_rgroup_id_fkey (resourcegroup_rgroup_id),
+  KEY resourcegroup_resource_id_resource_id_fkey (resourcegroup_resource_id),
+  CONSTRAINT resourcegroup_resource_id_resource_id_fkey FOREIGN KEY (resourcegroup_resource_id) REFERENCES Resource (resource_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT resourcegroup_rgroup_id_rgroup_id_fkey FOREIGN KEY (resourcegroup_rgroup_id) REFERENCES RGroup (rgroup_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for the table 'ResourceType'
+-- Table structure for table `ResourceItem`
 --
-CREATE TABLE ResourceType (
-  resourcetype_id					int(8) auto_increment,
-  resourcetype_domain_id	int(8) DEFAULT 0,	
-  resourcetype_label			varchar(32) NOT NULL,
-  resourcetype_property		varchar(32),
-  resourcetype_pkind				int(1) DEFAULT 0 NOT NULL,
-  PRIMARY KEY (resourcetype_id)
-);
 
---
--- Table structure for the table 'ResourceItem'
---
+DROP TABLE IF EXISTS ResourceItem;
 CREATE TABLE ResourceItem (
-  resourceitem_id								int(8) auto_increment,
-  resourceitem_domain_id				int(8) DEFAULT 0,
-  resourceitem_label						varchar(32) NOT NULL,
-  resourceitem_resourcetype_id	int(8) NOT NULL,
-  resourceitem_description			text,
-  PRIMARY KEY (resourceitem_id)
-);
-
--------------------------------------------------------------------------------
--- Tables needed for Domain module
--------------------------------------------------------------------------------
---
--- Table structure for table 'Domain'
---
-CREATE TABLE Domain (
-  domain_id             int(8) auto_increment,
-  domain_timeupdate     timestamp(14),
-  domain_timecreate     timestamp(14),
-  domain_usercreate     int(8),
-  domain_userupdate     int(8),
-  domain_label          varchar(32) NOT NULL,
-  domain_description    varchar(255),
-  domain_name           varchar(128),
-  domain_alias          text,
-  domain_mail_server_id int(8) DEFAULT NULL,
-  PRIMARY KEY (domain_id)
-);
+  resourceitem_id int(8) NOT NULL auto_increment,
+  resourceitem_domain_id int(8) default '0',
+  resourceitem_label varchar(32) NOT NULL,
+  resourceitem_resourcetype_id int(8) NOT NULL,
+  resourceitem_description text,
+  PRIMARY KEY  (resourceitem_id),
+  KEY resourceitem_domain_id_domain_id_fkey (resourceitem_domain_id),
+  KEY resourceitem_resourcetype_id_resourcetype_id_fkey (resourceitem_resourcetype_id),
+  CONSTRAINT resourceitem_resourcetype_id_resourcetype_id_fkey FOREIGN KEY (resourceitem_resourcetype_id) REFERENCES ResourceType (resourcetype_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT resourceitem_domain_id_domain_id_fkey FOREIGN KEY (resourceitem_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'DomainProperty'
+-- Table structure for table `ResourceType`
 --
-CREATE TABLE DomainProperty (
-  domainproperty_key       varchar(255) NOT NULL,
-  domainproperty_type      varchar(32),
-  domainproperty_default   varchar(64),
-  domainproperty_readonly  int(1) DEFAULT 0,
-  PRIMARY KEY (domainproperty_key)
-);
+
+DROP TABLE IF EXISTS ResourceType;
+CREATE TABLE ResourceType (
+  resourcetype_id int(8) NOT NULL auto_increment,
+  resourcetype_domain_id int(8) default '0',
+  resourcetype_label varchar(32) NOT NULL,
+  resourcetype_property varchar(32) default NULL,
+  resourcetype_pkind int(1) NOT NULL default '0',
+  PRIMARY KEY  (resourcetype_id),
+  KEY resourcetype_domain_id_domain_id_fkey (resourcetype_domain_id),
+  CONSTRAINT resourcetype_domain_id_domain_id_fkey FOREIGN KEY (resourcetype_domain_id) REFERENCES Domain (domain_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table 'DomainPropertyValue'
+-- Table structure for table `Samba`
 --
-CREATE TABLE DomainPropertyValue (
-  domainpropertyvalue_domain_id    int(8) NOT NULL,
-  domainpropertyvalue_property_key varchar(255)  NOT NULL,
-  domainpropertyvalue_value        varchar(255) NOT NULL,
-  PRIMARY KEY (domainpropertyvalue_domain_id, domainpropertyvalue_property_key)
-);
 
-
--------------------------------------------------------------------------------
--- OBM-Mail, OBM-LDAP tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'Host'
---
-CREATE TABLE Host (
-  host_id               int(8) NOT NULL auto_increment,
-  host_domain_id        int(8) default 0,
-  host_timeupdate       timestamp(14),
-  host_timecreate       timestamp(14),
-  host_userupdate       int(8),
-  host_usercreate       int(8),
-  host_uid              int(8),
-  host_gid              int(8),
-  host_samba            int(1) DEFAULT 0,
-  host_name             varchar(32) NOT NULL,
-  host_ip               varchar(16),
-  host_delegation       varchar(64) DEFAULT '',
-  host_description      varchar(128),
-  host_web_perms        int(1) default 0,
-  host_web_list         text default '',
-  host_web_all		int(1) default 0,
-  host_ftp_perms        int(1) default 0,
-  host_firewall_perms   varchar(128),
-  PRIMARY KEY (host_id),
-  UNIQUE host_name (host_name),
-  UNIQUE KEY k_uid_host (host_uid)
-);
-
-
---
--- Storage for stats
---
-CREATE TABLE Stats (
-  stats_name   varchar(32) NOT NULL default '',
-  stats_value  varchar(255) NOT NULL default '',
-  PRIMARY KEY (stats_name)
-);
-
-
---
--- Mail server declaration table
---
-CREATE TABLE MailServer (
-  mailserver_id            int(8) NOT NULL auto_increment,
-  mailserver_timeupdate    timestamp(14),
-  mailserver_timecreate    timestamp(14),
-  mailserver_userupdate    int(8),
-  mailserver_usercreate    int(8),
-  mailserver_host_id       int(8) NOT NULL default 0,
-  mailserver_relayhost_id  int(8) default NULL,
-  mailserver_imap          int(1) default 0,
-  mailserver_smtp_in       int(1) default 0,
-  mailserver_smtp_out      int(1) default 0,
-  PRIMARY KEY (mailserver_id)
-);
-
-
---
--- Domain - Mail server link table
---
-CREATE TABLE DomainMailServer (
-  domainmailserver_domain_id      int(8) NOT NULL default 0,
-  domainmailserver_mailserver_id  int(8) NOT NULL,
-  domainmailserver_role           varchar(16) NOT NULL default 'imap'
-);
-
-
---
--- Mail server network declaration table
---
-CREATE TABLE MailServerNetwork (
-  mailservernetwork_host_id   int(8) NOT NULL default 0,
-  mailservernetwork_ip              varchar(16) NOT NULL default ''
-);
-
-
---
--- Samba parameters table
---
+DROP TABLE IF EXISTS Samba;
 CREATE TABLE Samba (
-  samba_domain_id  int(8) default 0,
-  samba_name      varchar(255) NOT NULL default '',
-  samba_value     varchar(255) NOT NULL default ''
-);
-
-
---
--- Shared bals table
---
-CREATE TABLE MailShare (
-  mailshare_id             int(8) NOT NULL auto_increment,
-  mailshare_domain_id      int(8) default 0,
-  mailshare_timeupdate     timestamp(14),
-  mailshare_timecreate     timestamp(14),
-  mailshare_userupdate     int(8),
-  mailshare_usercreate     int(8),
-  mailshare_name           varchar(32),
-  mailshare_archive        int(1) not null default 0,
-  mailshare_quota          int default 0 NOT NULL,
-  mailshare_mail_server_id int(8) default 0,  
-  mailshare_delegation     varchar(64) DEFAULT '',
-  mailshare_description    varchar(255),
-  mailshare_email          text default NULL,
-  PRIMARY KEY (mailshare_id)
-);
-
-
-CREATE TABLE UserSystem (
-  usersystem_id         int(8) NOT NULL auto_increment,
-  usersystem_login      varchar(32) NOT NULL default '',
-  usersystem_password   varchar(32) NOT NULL default '',
-  usersystem_uid        varchar(6) default NULL,
-  usersystem_gid        varchar(6) default NULL,
-  usersystem_homedir    varchar(32) NOT NULL default '/tmp',
-  usersystem_lastname   varchar(32) default NULL,
-  usersystem_firstname  varchar(32) default NULL,
-  usersystem_shell      varchar(32) default NULL,
-  PRIMARY KEY (usersystem_id),
-  UNIQUE KEY k_login_user (usersystem_login)
-);
-
-
------------------------------------------------------------------------------
--- Table contenant les différents types de réseau gérables
--- en, gros : externe, interne avec patte dessus, interne autre, VPN
------------------------------------------------------------------------------
--- CREATE TABLE Network_kind (
--- 	network_kind_id int(11) NOT NULL,
--- 	network_kind_label varchar(10)
--- );
-
-
------------------------------------------------------------------------------
--- Table contenant les parametres reseaux du securinet
------------------------------------------------------------------------------
--- CREATE TABLE Network (
---  network_timeupdate timestamp(14),
---  network_userupdate int(8),
---  network_kind int(2) default NULL,
---  network_interface varchar(10) default NULL,
---  network_hostname varchar(20) default NULL,
---  network_localdomain varchar(64) default NULL,
---  network_ip varchar(16) default NULL,
---  network_network varchar(16) NOT NULL,
---  network_mask varchar(16) NOT NULL,
---  network_gateway varchar(16) default NULL,
---  network_dns varchar(16) default NULL,
---  network_name varchar(255) default NULL,
---  network_psk varchar(255) default NULL
---);
--- network_kind : 
--- 0 => réseau externe
--- 1 => réseau interne sur lequel le securinet a une patte
--- 2 => réseau interne sur lequel securinet n'a pas de pattes
--- 3 => réseau accessible par VPN 
--- network_psk : preshared key, secret partagé pour les VPNs
-
-
--------------------------------------------------------------------------------
--- OBM-Mail, OBM-LDAP Production tables (used by automate)
--------------------------------------------------------------------------------
-
-CREATE TABLE P_Domain like Domain;
-CREATE TABLE P_UserObm like UserObm;
-CREATE TABLE P_UGroup like UGroup;
-CREATE TABLE P_of_usergroup like of_usergroup;
-CREATE TABLE P_UserObmGroup like UserObmGroup;
-CREATE TABLE P_GroupGroup like GroupGroup;
-CREATE TABLE P_Host like Host;
-CREATE TABLE P_Samba like Samba;
-CREATE TABLE P_MailServer like MailServer;
-CREATE TABLE P_MailServerNetwork like MailServerNetwork;
-CREATE TABLE P_MailShare like MailShare;
-CREATE TABLE P_EntityRight like EntityRight;
--- CREATE TABLE P_Network like Network;
-
-
--------------------------------------------------------------------------------
--- Tables needed for Automate work
--------------------------------------------------------------------------------
---
--- Table structure for the table 'Deleted'
---
-CREATE TABLE Deleted (
-  deleted_id         int(8) auto_increment,
-  deleted_domain_id  int(8),
-  deleted_user_id    int(8),
-  deleted_delegation varchar(64) DEFAULT '',
-  deleted_table      varchar(32),
-  deleted_entity_id  int(8),
-  deleted_timestamp  timestamp(14),
-  PRIMARY KEY (deleted_id)
-);
-
+  samba_domain_id int(8) default '0',
+  samba_name varchar(255) NOT NULL default '',
+  samba_value varchar(255) NOT NULL default '',
+  KEY samba_domain_id_domain_id_fkey (samba_domain_id),
+  CONSTRAINT samba_domain_id_domain_id_fkey FOREIGN KEY (samba_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for the table 'Updated'
+-- Table structure for table `Stats`
 --
+
+DROP TABLE IF EXISTS Stats;
+CREATE TABLE Stats (
+  stats_name varchar(32) NOT NULL default '',
+  stats_value varchar(255) NOT NULL default '',
+  PRIMARY KEY  (stats_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Subscription`
+--
+
+DROP TABLE IF EXISTS Subscription;
+CREATE TABLE Subscription (
+  subscription_id int(8) NOT NULL auto_increment,
+  subscription_domain_id int(8) default '0',
+  subscription_publication_id int(8) NOT NULL,
+  subscription_contact_id int(8) NOT NULL,
+  subscription_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  subscription_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  subscription_userupdate int(8) default NULL,
+  subscription_usercreate int(8) default NULL,
+  subscription_quantity int(8) default NULL,
+  subscription_renewal int(1) NOT NULL default '0',
+  subscription_reception_id int(8) default NULL,
+  subscription_date_begin timestamp NOT NULL default '0000-00-00 00:00:00',
+  subscription_date_end timestamp NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (subscription_id),
+  KEY subscription_domain_id_domain_id_fkey (subscription_domain_id),
+  KEY subscription_publication_id_publication_id_fkey (subscription_publication_id),
+  KEY subscription_contact_id_contact_id_fkey (subscription_contact_id),
+  KEY subscription_userupdate_userobm_id_fkey (subscription_userupdate),
+  KEY subscription_usercreate_userobm_id_fkey (subscription_usercreate),
+  KEY subscription_reception_id_subscriptionreception_id_fkey (subscription_reception_id),
+  CONSTRAINT subscription_reception_id_subscriptionreception_id_fkey FOREIGN KEY (subscription_reception_id) REFERENCES SubscriptionReception (subscriptionreception_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT subscription_contact_id_contact_id_fkey FOREIGN KEY (subscription_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT subscription_domain_id_domain_id_fkey FOREIGN KEY (subscription_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT subscription_publication_id_publication_id_fkey FOREIGN KEY (subscription_publication_id) REFERENCES Publication (publication_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT subscription_usercreate_userobm_id_fkey FOREIGN KEY (subscription_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT subscription_userupdate_userobm_id_fkey FOREIGN KEY (subscription_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `SubscriptionReception`
+--
+
+DROP TABLE IF EXISTS SubscriptionReception;
+CREATE TABLE SubscriptionReception (
+  subscriptionreception_id int(8) NOT NULL auto_increment,
+  subscriptionreception_domain_id int(8) default '0',
+  subscriptionreception_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  subscriptionreception_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  subscriptionreception_userupdate int(8) default NULL,
+  subscriptionreception_usercreate int(8) default NULL,
+  subscriptionreception_code varchar(10) default '',
+  subscriptionreception_label char(12) default NULL,
+  PRIMARY KEY  (subscriptionreception_id),
+  KEY subscriptionreception_domain_id_domain_id_fkey (subscriptionreception_domain_id),
+  KEY subscriptionreception_userupdate_userobm_id_fkey (subscriptionreception_userupdate),
+  KEY subscriptionreception_usercreate_userobm_id_fkey (subscriptionreception_usercreate),
+  CONSTRAINT subscriptionreception_usercreate_userobm_id_fkey FOREIGN KEY (subscriptionreception_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT subscriptionreception_domain_id_domain_id_fkey FOREIGN KEY (subscriptionreception_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT subscriptionreception_userupdate_userobm_id_fkey FOREIGN KEY (subscriptionreception_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `TaskType`
+--
+
+DROP TABLE IF EXISTS TaskType;
+CREATE TABLE TaskType (
+  tasktype_id int(8) NOT NULL auto_increment,
+  tasktype_domain_id int(8) default '0',
+  tasktype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  tasktype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  tasktype_userupdate int(8) default NULL,
+  tasktype_usercreate int(8) default NULL,
+  tasktype_internal int(1) NOT NULL,
+  tasktype_code varchar(10) default NULL,
+  tasktype_label varchar(32) default NULL,
+  PRIMARY KEY  (tasktype_id),
+  KEY tasktype_domain_id_domain_id_fkey (tasktype_domain_id),
+  KEY tasktype_userupdate_userobm_id_fkey (tasktype_userupdate),
+  KEY tasktype_usercreate_userobm_id_fkey (tasktype_usercreate),
+  CONSTRAINT tasktype_usercreate_userobm_id_fkey FOREIGN KEY (tasktype_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT tasktype_domain_id_domain_id_fkey FOREIGN KEY (tasktype_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT tasktype_userupdate_userobm_id_fkey FOREIGN KEY (tasktype_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `TimeTask`
+--
+
+DROP TABLE IF EXISTS TimeTask;
+CREATE TABLE TimeTask (
+  timetask_id int(8) NOT NULL auto_increment,
+  timetask_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  timetask_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  timetask_userupdate int(8) default NULL,
+  timetask_usercreate int(8) default NULL,
+  timetask_user_id int(8) default NULL,
+  timetask_date timestamp NOT NULL default '0000-00-00 00:00:00',
+  timetask_projecttask_id int(8) default NULL,
+  timetask_length float default NULL,
+  timetask_tasktype_id int(8) default NULL,
+  timetask_label varchar(255) default NULL,
+  timetask_status int(1) default NULL,
+  PRIMARY KEY  (timetask_id),
+  KEY tt_idx_pt (timetask_projecttask_id),
+  KEY timetask_user_id_userobm_id_fkey (timetask_user_id),
+  KEY timetask_tasktype_id_tasktype_id_fkey (timetask_tasktype_id),
+  KEY timetask_userupdate_userobm_id_fkey (timetask_userupdate),
+  KEY timetask_usercreate_userobm_id_fkey (timetask_usercreate),
+  CONSTRAINT timetask_usercreate_userobm_id_fkey FOREIGN KEY (timetask_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT timetask_projecttask_id_projecttask_id_fkey FOREIGN KEY (timetask_projecttask_id) REFERENCES ProjectTask (projecttask_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT timetask_tasktype_id_tasktype_id_fkey FOREIGN KEY (timetask_tasktype_id) REFERENCES TaskType (tasktype_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT timetask_userupdate_userobm_id_fkey FOREIGN KEY (timetask_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT timetask_user_id_userobm_id_fkey FOREIGN KEY (timetask_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Todo`
+--
+
+DROP TABLE IF EXISTS Todo;
+CREATE TABLE Todo (
+  todo_id int(8) NOT NULL auto_increment,
+  todo_domain_id int(8) default '0',
+  todo_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  todo_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  todo_userupdate int(8) default NULL,
+  todo_usercreate int(8) default NULL,
+  todo_user int(8) default NULL,
+  todo_privacy int(2) NOT NULL default '0',
+  todo_date timestamp NOT NULL default '0000-00-00 00:00:00',
+  todo_deadline timestamp NOT NULL default '0000-00-00 00:00:00',
+  todo_dateend timestamp NOT NULL default '0000-00-00 00:00:00',
+  todo_priority int(8) default NULL,
+  todo_percent int(8) default NULL,
+  todo_title varchar(80) default NULL,
+  todo_status varchar(32) default NULL,
+  todo_webpage varchar(255) default NULL,
+  todo_content text,
+  PRIMARY KEY  (todo_id),
+  KEY todo_domain_id_domain_id_fkey (todo_domain_id),
+  KEY todo_user_userobm_id_fkey (todo_user),
+  KEY todo_userupdate_userobm_id_fkey (todo_userupdate),
+  KEY todo_usercreate_userobm_id_fkey (todo_usercreate),
+  CONSTRAINT todo_usercreate_userobm_id_fkey FOREIGN KEY (todo_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT todo_domain_id_domain_id_fkey FOREIGN KEY (todo_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT todo_userupdate_userobm_id_fkey FOREIGN KEY (todo_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT todo_user_userobm_id_fkey FOREIGN KEY (todo_user) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `UGroup`
+--
+
+DROP TABLE IF EXISTS UGroup;
+CREATE TABLE UGroup (
+  group_id int(8) NOT NULL auto_increment,
+  group_domain_id int(8) default '0',
+  group_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  group_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  group_userupdate int(8) default NULL,
+  group_usercreate int(8) default NULL,
+  group_system int(1) default '0',
+  group_privacy int(2) default '0',
+  group_local int(1) default '1',
+  group_ext_id varchar(24) default NULL,
+  group_samba int(1) default '0',
+  group_gid int(8) default NULL,
+  group_mailing int(1) default '0',
+  group_delegation varchar(64) default '',
+  group_manager_id int(8) default NULL,
+  group_name varchar(32) NOT NULL,
+  group_desc varchar(128) default NULL,
+  group_email varchar(128) default NULL,
+  group_contacts text,
+  PRIMARY KEY  (group_id),
+  UNIQUE KEY group_gid (group_gid),
+  KEY group_domain_id_domain_id_fkey (group_domain_id),
+  KEY group_userupdate_userobm_id_fkey (group_userupdate),
+  KEY group_usercreate_userobm_id_fkey (group_usercreate),
+  KEY group_manager_id_userobm_id_fkey (group_manager_id),
+  CONSTRAINT group_manager_id_userobm_id_fkey FOREIGN KEY (group_manager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT group_domain_id_domain_id_fkey FOREIGN KEY (group_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT group_usercreate_userobm_id_fkey FOREIGN KEY (group_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT group_userupdate_userobm_id_fkey FOREIGN KEY (group_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Updated`
+--
+
+DROP TABLE IF EXISTS Updated;
 CREATE TABLE Updated (
-  updated_id         int(8) auto_increment,
-  updated_domain_id  int(8),
-  updated_user_id    int(8),
-  updated_delegation varchar(64) DEFAULT '',
-  updated_table      varchar(32),
-  updated_entity_id  int(8),
-  updated_type       char(1),
-  PRIMARY KEY (updated_id)
-);
-
+  updated_id int(8) NOT NULL auto_increment,
+  updated_domain_id int(8) default NULL,
+  updated_user_id int(8) default NULL,
+  updated_delegation varchar(64) default '',
+  updated_table varchar(32) default NULL,
+  updated_entity_id int(8) default NULL,
+  updated_type char(1) default NULL,
+  PRIMARY KEY  (updated_id),
+  KEY updated_domain_id_domain_id_fkey (updated_domain_id),
+  KEY updated_user_id_userobm_id_fkey (updated_user_id),
+  CONSTRAINT updated_user_id_userobm_id_fkey FOREIGN KEY (updated_user_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT updated_domain_id_domain_id_fkey FOREIGN KEY (updated_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for the table 'Updatedlinks'
+-- Table structure for table `Updatedlinks`
 --
+
+DROP TABLE IF EXISTS Updatedlinks;
 CREATE TABLE Updatedlinks (
-  updatedlinks_id         int(8) auto_increment,
-  updatedlinks_domain_id  int(8),
-  updatedlinks_user_id    int(8),
-  updatedlinks_delegation varchar(64),
-  updatedlinks_table      varchar(32),
-  updatedlinks_entity     varchar(32),
-  updatedlinks_entity_id  int(8),
-  PRIMARY KEY (updatedlinks_id)
-);
+  updatedlinks_id int(8) NOT NULL auto_increment,
+  updatedlinks_domain_id int(8) default NULL,
+  updatedlinks_user_id int(8) default NULL,
+  updatedlinks_delegation varchar(64) default NULL,
+  updatedlinks_table varchar(32) default NULL,
+  updatedlinks_entity varchar(32) default NULL,
+  updatedlinks_entity_id int(8) default NULL,
+  PRIMARY KEY  (updatedlinks_id),
+  KEY updatedlinks_domain_id_domain_id_fkey (updatedlinks_domain_id),
+  KEY updatedlinks_user_id_userobm_id_fkey (updatedlinks_user_id),
+  CONSTRAINT updatedlinks_user_id_userobm_id_fkey FOREIGN KEY (updatedlinks_user_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT updatedlinks_domain_id_domain_id_fkey FOREIGN KEY (updatedlinks_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `UserObm`
+--
+
+DROP TABLE IF EXISTS UserObm;
+CREATE TABLE UserObm (
+  userobm_id int(8) NOT NULL auto_increment,
+  userobm_domain_id int(8) default NULL,
+  userobm_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  userobm_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_userupdate int(8) default NULL,
+  userobm_usercreate int(8) default NULL,
+  userobm_local int(1) default '1',
+  userobm_ext_id varchar(16) default NULL,
+  userobm_system int(1) default '0',
+  userobm_archive int(1) NOT NULL default '0',
+  userobm_timelastaccess timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_login varchar(32) NOT NULL default '',
+  userobm_nb_login_failed int(2) default '0',
+  userobm_password_type char(6) NOT NULL default 'PLAIN',
+  userobm_password varchar(64) NOT NULL default '',
+  userobm_password_dateexp date default NULL,
+  userobm_account_dateexp date default NULL,
+  userobm_perms varchar(254) default NULL,
+  userobm_delegation_target varchar(64) default '',
+  userobm_delegation varchar(64) default '',
+  userobm_calendar_version timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_uid int(8) default NULL,
+  userobm_gid int(8) default NULL,
+  userobm_datebegin date default NULL,
+  userobm_hidden int(1) default '0',
+  userobm_kind varchar(12) default NULL,
+  userobm_lastname varchar(64) default '',
+  userobm_firstname varchar(64) default '',
+  userobm_title varchar(64) default '',
+  userobm_sound varchar(64) default NULL,
+  userobm_company varchar(64) default NULL,
+  userobm_direction varchar(64) default NULL,
+  userobm_service varchar(64) default NULL,
+  userobm_address1 varchar(64) default NULL,
+  userobm_address2 varchar(64) default NULL,
+  userobm_address3 varchar(64) default NULL,
+  userobm_zipcode varchar(14) default NULL,
+  userobm_town varchar(64) default NULL,
+  userobm_expresspostal varchar(16) default NULL,
+  userobm_country_iso3166 char(2) default '0',
+  userobm_phone varchar(32) default '',
+  userobm_phone2 varchar(32) default '',
+  userobm_mobile varchar(32) default '',
+  userobm_fax varchar(32) default '',
+  userobm_fax2 varchar(32) default '',
+  userobm_web_perms int(1) default '0',
+  userobm_web_list text,
+  userobm_web_all int(1) default '0',
+  userobm_mail_perms int(1) default '0',
+  userobm_mail_ext_perms int(1) default '0',
+  userobm_email text,
+  userobm_mail_server_id int(8) default NULL,
+  userobm_mail_quota int(8) default '0',
+  userobm_mail_quota_use int(8) default '0',
+  userobm_mail_login_date timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_nomade_perms int(1) default '0',
+  userobm_nomade_enable int(1) default '0',
+  userobm_nomade_local_copy int(1) default '0',
+  userobm_nomade_datebegin timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_nomade_dateend timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_email_nomade varchar(64) default '',
+  userobm_vacation_enable int(1) default '0',
+  userobm_vacation_datebegin timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_vacation_dateend timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_vacation_message text,
+  userobm_samba_perms int(1) default '0',
+  userobm_samba_home varchar(255) default '',
+  userobm_samba_home_drive char(2) default '',
+  userobm_samba_logon_script varchar(128) default '',
+  userobm_host_id int(8) default NULL,
+  userobm_description varchar(255) default NULL,
+  userobm_location varchar(255) default NULL,
+  userobm_education varchar(255) default NULL,
+  userobm_photo_id int(8) default NULL,
+  PRIMARY KEY  (userobm_id),
+  KEY k_login_user (userobm_login),
+  KEY k_uid_user (userobm_uid),
+  KEY userobm_domain_id_domain_id_fkey (userobm_domain_id),
+  KEY userobm_userupdate_userobm_id_fkey (userobm_userupdate),
+  KEY userobm_usercreate_userobm_id_fkey (userobm_usercreate),
+  KEY userobm_mail_server_id_mailserver_id_fkey (userobm_mail_server_id),
+  KEY userobm_host_id_host_id_fkey (userobm_host_id),
+  KEY userobm_photo_id_document_id_fkey (userobm_photo_id),
+  CONSTRAINT userobm_photo_id_document_id_fkey FOREIGN KEY (userobm_photo_id) REFERENCES Document (document_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT userobm_domain_id_domain_id_fkey FOREIGN KEY (userobm_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT userobm_host_id_host_id_fkey FOREIGN KEY (userobm_host_id) REFERENCES Host (host_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT userobm_mail_server_id_mailserver_id_fkey FOREIGN KEY (userobm_mail_server_id) REFERENCES MailServer (mailserver_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT userobm_usercreate_userobm_id_fkey FOREIGN KEY (userobm_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT userobm_userupdate_userobm_id_fkey FOREIGN KEY (userobm_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `UserObmGroup`
+--
+
+DROP TABLE IF EXISTS UserObmGroup;
+CREATE TABLE UserObmGroup (
+  userobmgroup_group_id int(8) NOT NULL default '0',
+  userobmgroup_userobm_id int(8) NOT NULL default '0',
+  PRIMARY KEY  (userobmgroup_group_id,userobmgroup_userobm_id),
+  KEY userobmgroup_userobm_id_userobm_id_fkey (userobmgroup_userobm_id),
+  CONSTRAINT userobmgroup_userobm_id_userobm_id_fkey FOREIGN KEY (userobmgroup_userobm_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT userobmgroup_group_id_group_id_fkey FOREIGN KEY (userobmgroup_group_id) REFERENCES UGroup (group_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `UserObmPref`
+--
+
+DROP TABLE IF EXISTS UserObmPref;
+CREATE TABLE UserObmPref (
+  userobmpref_user_id int(8) default NULL,
+  userobmpref_option varchar(50) NOT NULL,
+  userobmpref_value varchar(50) NOT NULL,
+  KEY userobmpref_user_id_userobm_id_fkey (userobmpref_user_id),
+  CONSTRAINT userobmpref_user_id_userobm_id_fkey FOREIGN KEY (userobmpref_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `UserObm_SessionLog`
+--
+
+DROP TABLE IF EXISTS UserObm_SessionLog;
+CREATE TABLE UserObm_SessionLog (
+  userobm_sessionlog_sid varchar(32) NOT NULL default '',
+  userobm_sessionlog_session_name varchar(32) NOT NULL default '',
+  userobm_sessionlog_userobm_id int(11) default NULL,
+  userobm_sessionlog_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  userobm_sessionlog_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  userobm_sessionlog_nb_connexions int(11) NOT NULL default '0',
+  userobm_sessionlog_lastpage varchar(32) NOT NULL default '0',
+  userobm_sessionlog_ip varchar(32) NOT NULL default '0',
+  PRIMARY KEY  (userobm_sessionlog_sid),
+  KEY userobm_sessionlog_userobm_id_userobm_id_fkey (userobm_sessionlog_userobm_id),
+  CONSTRAINT userobm_sessionlog_userobm_id_userobm_id_fkey FOREIGN KEY (userobm_sessionlog_userobm_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `UserSystem`
+--
+
+DROP TABLE IF EXISTS UserSystem;
+CREATE TABLE UserSystem (
+  usersystem_id int(8) NOT NULL auto_increment,
+  usersystem_login varchar(32) NOT NULL default '',
+  usersystem_password varchar(32) NOT NULL default '',
+  usersystem_uid varchar(6) default NULL,
+  usersystem_gid varchar(6) default NULL,
+  usersystem_homedir varchar(32) NOT NULL default '/tmp',
+  usersystem_lastname varchar(32) default NULL,
+  usersystem_firstname varchar(32) default NULL,
+  usersystem_shell varchar(32) default NULL,
+  PRIMARY KEY  (usersystem_id),
+  UNIQUE KEY k_login_user (usersystem_login)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `of_usergroup`
+--
+
+DROP TABLE IF EXISTS of_usergroup;
+CREATE TABLE of_usergroup (
+  of_usergroup_group_id int(8) NOT NULL default '0',
+  of_usergroup_user_id int(8) NOT NULL default '0',
+  PRIMARY KEY  (of_usergroup_group_id,of_usergroup_user_id),
+  KEY of_usergroup_user_id_userobm_id_fkey (of_usergroup_user_id),
+  CONSTRAINT of_usergroup_user_id_userobm_id_fkey FOREIGN KEY (of_usergroup_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT of_usergroup_group_id_group_id_fkey FOREIGN KEY (of_usergroup_group_id) REFERENCES UGroup (group_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+SET FOREIGN_KEY_CHECKS=1;

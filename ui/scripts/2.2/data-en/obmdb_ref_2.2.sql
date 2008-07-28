@@ -1,6 +1,6 @@
 --/////////////////////////////////////////////////////////////////////////////
---// OBM - File : obmdb_ref_2.1.sql                                          //
---//     - Desc : English Database Referential 2.1                           //
+--// OBM - File : obmdb_ref_2.NULL.sql                                          //
+--//     - Desc : English Database Referential 2.NULL                           //
 --// 2007-04-23 AliaSource                                                   //
 --/////////////////////////////////////////////////////////////////////////////
 -- $Id$
@@ -10,319 +10,302 @@
 --
 -- Dumping data for table 'CompanyType'
 --
-INSERT INTO CompanyType (companytype_domain_id, companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES (1, null,null,2,null,'Customer');
-INSERT INTO CompanyType (companytype_domain_id, companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES (1, null,null,2,null,'Supplier');
-INSERT INTO CompanyType (companytype_domain_id, companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES (1, null,null,2,null,'Partner');
-INSERT INTO CompanyType (companytype_domain_id, companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES (1, null,null,2,null,'Prospect');
-INSERT INTO CompanyType (companytype_domain_id, companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES (1, null,null,2,null,'Media');
+INSERT INTO CompanyType (companytype_domain_id, companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Customer');
+INSERT INTO CompanyType (companytype_domain_id, companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Supplier');
+INSERT INTO CompanyType (companytype_domain_id, companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Partner');
+INSERT INTO CompanyType (companytype_domain_id, companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Prospect');
+INSERT INTO CompanyType (companytype_domain_id, companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Media');
 
 
 --
 -- Dumping data for table 'CompanyActivity'
 --
-INSERT INTO CompanyActivity (companyactivity_domain_id, companyactivity_timeupdate, companyactivity_timecreate, companyactivity_userupdate, companyactivity_usercreate, companyactivity_label) VALUES (1, null,null,2,null,'Education');
-INSERT INTO CompanyActivity (companyactivity_domain_id, companyactivity_timeupdate, companyactivity_timecreate, companyactivity_userupdate, companyactivity_usercreate, companyactivity_label) VALUES (1, null,null,2,null,'Industry');
+INSERT INTO CompanyActivity (companyactivity_domain_id, companyactivity_timeupdate, companyactivity_timecreate, companyactivity_userupdate, companyactivity_usercreate, companyactivity_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Education');
+INSERT INTO CompanyActivity (companyactivity_domain_id, companyactivity_timeupdate, companyactivity_timecreate, companyactivity_userupdate, companyactivity_usercreate, companyactivity_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Industry');
 
 
 ---
 -- Dumping data for table 'Kind'
 --
-INSERT INTO Kind (kind_domain_id, kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_lang, kind_minilabel, kind_header) VALUES (1, null,null,2,null,'EN','Mr','Mister');
-INSERT INTO Kind (kind_domain_id, kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_lang, kind_minilabel, kind_header) VALUES (1, null,null,2,null,'EN','Mrs','Madam');
-INSERT INTO Kind (kind_domain_id, kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_lang, kind_minilabel, kind_header) VALUES (1, null,null,2,null,'EN','Miss','Miss');
+INSERT INTO Kind (kind_domain_id, kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_lang, kind_minilabel, kind_header) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'EN','Mr','Mister');
+INSERT INTO Kind (kind_domain_id, kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_lang, kind_minilabel, kind_header) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'EN','Mrs','Madam');
+INSERT INTO Kind (kind_domain_id, kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_lang, kind_minilabel, kind_header) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'EN','Miss','Miss');
 
 
 --
 -- Dumping data for table 'DealStatus'
 --
-INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES (1, null,null,2,null, 'CONTACT',1,null);
-INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES (1, null,null,2,null, 'RDV',2,null);
-INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES (1, null,null,2,null, 'Waiting for Proposal',3,null);
-INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES (1, null,null,2,null, 'PROPOSAL',4,null);
-INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES (1, null,null,2,null, 'SIGNED',5,'100');
-INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES (1, null,null,2,null,'DONE',6,'100');
-INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES (1, null,null,2,null,'INVOICE',7,'100');
-INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES (1, null,null,2,null,'PAYED',8,'100');
-INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES (1, null,null,2,null, 'LOST',9,'0');
-INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES (1, null,null,2,null, 'DISCONTINUED',10,'0');
+INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL, 'CONTACT',1,NULL);
+INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL, 'RDV',2,NULL);
+INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL, 'Waiting for Proposal',3,NULL);
+INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL, 'PROPOSAL',4,NULL);
+INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL, 'SIGNED',5,'100');
+INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'DONE',6,'100');
+INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'INVOICE',7,'100');
+INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'PAYED',8,'100');
+INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL, 'LOST',9,'0');
+INSERT INTO DealStatus (dealstatus_domain_id, dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label, dealstatus_order, dealstatus_hitrate) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL, 'DISCONTINUED',10,'0');
 
 
 --
 -- Dumping data for table 'DealType'
 --
-INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES (1, null,null,2,null,'SALE','+');
-INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES (1, null,null,2,null,'PURCHASE','-');
-INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES (1, null,null,2,null,'MEDIA','-');
-INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES (1, null,null,2,null,'SOCIAL','-');
-INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES (1, null,null,2,null,'JURIDICAL','-');
+INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'SALE','+');
+INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'PURCHASE','-');
+INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'MEDIA','-');
+INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'SOCIAL','-');
+INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'JURIDICAL','-');
 
 
 --
 -- dump for table 'CalendarCategory1'
 --
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES (1, null,null,null,1,'RDV');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES (1, null,null,null,1,'Training');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES (1, null,null,null,1,'Commercial');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES (1, null,null,null,1,'Meeting');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES (1, null,null,null,1,'Phone call');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES (1, null,null,null,1,'Support');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES (1, null,null,null,1,'Intervention');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES (1, null,null,null,1,'Personal');
+INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'RDV');
+INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Training');
+INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Commercial');
+INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Meeting');
+INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Phone call');
+INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Support');
+INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Intervention');
+INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Personal');
 
 
 --
 -- Dumping data for table 'ContractPriority'
 --
-INSERT INTO ContractPriority (contractpriority_domain_id, contractpriority_color, contractpriority_code, contractpriority_label) VALUES (1, 'FF0000', '1', 'High');
-INSERT INTO ContractPriority (contractpriority_domain_id, contractpriority_color, contractpriority_code, contractpriority_label) VALUES (1, 'FFA0A0', '2', 'Normal');
-INSERT INTO ContractPriority (contractpriority_domain_id, contractpriority_color, contractpriority_code, contractpriority_label) VALUES (1, 'FFF0F0', '3', 'Low');
+INSERT INTO ContractPriority (contractpriority_domain_id, contractpriority_color, contractpriority_code, contractpriority_label) VALUES ((SELECT domain_id From Domain), 'FF0000', '1', 'High');
+INSERT INTO ContractPriority (contractpriority_domain_id, contractpriority_color, contractpriority_code, contractpriority_label) VALUES ((SELECT domain_id From Domain), 'FFA0A0', '2', 'Normal');
+INSERT INTO ContractPriority (contractpriority_domain_id, contractpriority_color, contractpriority_code, contractpriority_label) VALUES ((SELECT domain_id From Domain), 'FFF0F0', '3', 'Low');
 
 
 --
 -- Dumping data for table 'ContractStatus'
 --
-INSERT INTO ContractStatus (contractstatus_domain_id, contractstatus_code, contractstatus_label) VALUES (1, '1', 'Open');
-INSERT INTO ContractStatus (contractstatus_domain_id, contractstatus_code, contractstatus_label) VALUES (1, '2', 'Close');
+INSERT INTO ContractStatus (contractstatus_domain_id, contractstatus_code, contractstatus_label) VALUES ((SELECT domain_id From Domain), '1', 'Open');
+INSERT INTO ContractStatus (contractstatus_domain_id, contractstatus_code, contractstatus_label) VALUES ((SELECT domain_id From Domain), '2', 'Close');
 
 
 --
 -- Dumping data for table 'IncidentPriority'
 --
-INSERT INTO IncidentPriority (incidentpriority_domain_id, incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES (1, null,null,null,1,1,'FF0000','Red Hot');
-INSERT INTO IncidentPriority (incidentpriority_domain_id, incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES (1, null,null,null,1,2,'EE9D00','Hot');
-INSERT INTO IncidentPriority (incidentpriority_domain_id, incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES (1, null,null,null,1,3,'550000', 'Normal');
-INSERT INTO IncidentPriority (incidentpriority_domain_id, incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES (1, null,null,null,1,4,'000000','Low');
+INSERT INTO IncidentPriority (incidentpriority_domain_id, incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,1,1,'FF0000','Red Hot');
+INSERT INTO IncidentPriority (incidentpriority_domain_id, incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,1,2,'EE9D00','Hot');
+INSERT INTO IncidentPriority (incidentpriority_domain_id, incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,1,3,'550000', 'Normal');
+INSERT INTO IncidentPriority (incidentpriority_domain_id, incidentpriority_timeupdate, incidentpriority_timecreate, incidentpriority_userupdate, incidentpriority_usercreate, incidentpriority_code,incidentpriority_color,incidentpriority_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,1,4,'000000','Low');
 
 
 --
 -- Dumping data for table 'IncidentStatus'
 --
-INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (1, null,null,null,1,'1','Open');
-INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (1, null,null,null,1,'2','Call');
-INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (1, null,null,null,1,'3','Wait for Call');
-INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (1, null,null,null,1,'4','Paused');
-INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES (1, null,null,null,1,'5','Closed');
+INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,1,'1','Open');
+INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,1,'2','Call');
+INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,1,'3','Wait for Call');
+INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,1,'4','Paused');
+INSERT INTO IncidentStatus (incidentstatus_domain_id, incidentstatus_timeupdate, incidentstatus_timecreate, incidentstatus_userupdate, incidentstatus_usercreate, incidentstatus_code,incidentstatus_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,1,'5','Closed');
 
 
 --
 -- Dumping data for table 'TaskType'
 --
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Development',0);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Support / Assistance',0);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Learning course',0);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Studies',0);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Network / Integration',0);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Graphics',0);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Others',0);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Hosting',0);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Hardware',0);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Before selling',2);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Support making',2);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Internal development',1);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Internal project',1);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Self formation',2);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Contract garanty',2);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Miscellaneaous(direction,others)',2);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Holydays,...',2);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Outgoings',2);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Graphics/Communication',2);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Administrative',2);
-INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES (1, 'Meetings',2);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Development',0);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Support / Assistance',0);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Learning course',0);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Studies',0);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Network / Integration',0);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Graphics',0);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Others',0);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Hosting',0);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Hardware',0);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Before selling',2);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Support making',2);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Internal development',1);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Internal project',1);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Self formation',2);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Contract garanty',2);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Miscellaneaous(direction,others)',2);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Holydays,...',2);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Outgoings',2);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Graphics/Communication',2);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Administrative',2);
+INSERT INTO TaskType(tasktype_domain_id, tasktype_label, tasktype_internal) VALUES ((SELECT domain_id From Domain), 'Meetings',2);
 
 
 --
 -- Dumping data for table 'DocumentMimeType'
 --
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'Html File','html','text/html');
+VALUES ((SELECT domain_id From Domain), 'Html File','html','text/html');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'PNG Image','png','image/png');
+VALUES ((SELECT domain_id From Domain), 'PNG Image','png','image/png');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'Gif Image','gif','image/gif');
+VALUES ((SELECT domain_id From Domain), 'Gif Image','gif','image/gif');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'JPG Image','jpg','image/jpg');
+VALUES ((SELECT domain_id From Domain), 'JPG Image','jpg','image/jpg');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'PDF File','pdf','application/pdf');
+VALUES ((SELECT domain_id From Domain), 'PDF File','pdf','application/pdf');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'Excel File','xls','application/vnd.ms-excel');
+VALUES ((SELECT domain_id From Domain), 'Excel File','xls','application/vnd.ms-excel');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'Text File','txt','text/plain');
+VALUES ((SELECT domain_id From Domain), 'Text File','txt','text/plain');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'Word File','doc','application/msword');
+VALUES ((SELECT domain_id From Domain), 'Word File','doc','application/msword');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'Binary File','exe','application/octet-stream');
+VALUES ((SELECT domain_id From Domain), 'Binary File','exe','application/octet-stream');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'PowerPoint File','ppt','application/vnd.ms-powerpoint');
+VALUES ((SELECT domain_id From Domain), 'PowerPoint File','ppt','application/vnd.ms-powerpoint');
 INSERT INTO DocumentMimeType (documentmimetype_domain_id, documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1, 'CSV File','csv','text/c-xsv');
+VALUES ((SELECT domain_id From Domain), 'CSV File','csv','text/c-xsv');
 
 
 --
 -- dump for table  PaymentKind :
 --
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1,'Ch', 'Cheque');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'C.T', 'credit transfert');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'TIP', 'Titre Interbancaire de Paiement');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'PA', 'Prélèvement Automatique');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'FrB', 'Frais bancaires');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'BAO', 'Billet à ordre');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'LC', 'Lettre de change');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES (1, 'CC', 'Credit Card');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain),'Ch', 'Cheque');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'C.T', 'credit transfert');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'TIP', 'Titre Interbancaire de Paiement');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'PA', 'Prélèvement Automatique');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'FrB', 'Frais bancaires');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'BAO', 'Billet à ordre');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'LC', 'Lettre de change');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'CC', 'Credit Card');
 
 
 -- Add system Groups
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_name, group_desc, group_email) VALUES
-(1, 1, 0, 'Admin', 'Administration system group', 'admin');
+((SELECT domain_id From Domain), 1, 0, 'Admin', 'Administration system group', 'admin');
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_name, group_desc, group_email) VALUES
-(1, 1, 0, 'Commercial', 'Commercial system group', '');
+((SELECT domain_id From Domain), 1, 0, 'Commercial', 'Commercial system group', '');
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_name, group_desc, group_email) VALUES
-(1, 1, 0, 'Production', 'Production system group', '');
+((SELECT domain_id From Domain), 1, 0, 'Production', 'Production system group', '');
 
 -- Add Country 
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AE', 'Emirats Arabes Unis', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AL', 'Albanie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AO', 'Angola', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SA', 'Arabie Saoudite', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AM', 'Arménie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AU', 'Australie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AZ', 'Azerbaidjan', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BE', 'Belgique', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BD', 'Bangladesh', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BB', 'La Barbade', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BJ', 'Benin', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BG', 'Bulgarie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BO', 'Bolivie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BR', 'Brésil', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BS', 'Bahamas', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BF', 'Burkina Faso', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BY', 'Bielorussie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CM', 'Cameroun', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CA', 'Canada', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CH', 'Suisse', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CN', 'Chine', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CO', 'Colombie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'KP', 'Corée du Nord', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CR', 'Costa Rica', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CZ', 'Rep.Tchèque', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CU', 'Cuba', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CY', 'Chypre', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'DE', 'Allemagne', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'DK', 'Danemark', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'DZ', 'Algérie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ES', 'Espagne', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'EE', 'Estonie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'EC', 'Equateur', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'EG', 'Egypte', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'LI', 'Liechtenstein', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GA', 'Gabon', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GB', 'Royaume Uni', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GI', 'Gibraltar', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GT', 'Guatemala', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GE', 'Georgie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GH', 'Ghana', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GL', 'Groenland', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GR', 'Grèce', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'GN', 'Guinée', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'HU', 'Hongrie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'HK', 'Hong Kong', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'JO', 'Jordanie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'HR', 'Croatie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'IT', 'Italie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'IL', 'Israel', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'IN', 'Inde', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'IR', 'Iran', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'IE', 'Irlande', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'IS', 'Islande', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'JP', 'Japon', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'JM', 'Jamaique', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'KZ', 'Kazakhstan', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'KE', 'Kenya', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'KW', 'Koweit', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'LU', 'Luxembourg', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'LY', 'Libye', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'LB', 'Liban', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'LK', 'Sri Lanka', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'LV', 'Lettonie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MT', 'Malte', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MA', 'Maroc', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MY', 'Malaisie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MC', 'Monaco', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MD', 'Moldova', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MX', 'Mexique', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MU', 'Mauritius', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MW', 'Malawi', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NO', 'Norvège', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NP', 'Népal', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NI', 'Nicaragua', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NE', 'Nigeria', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NL', 'Pays Bas', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NZ', 'Nouvelle Zélande', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'OM', 'Oman', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PT', 'Portugal', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PE', 'Pérou', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PH', 'Phillipines', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PK', 'Pakistan', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PL', 'Pologne', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PF', 'Polynésie Française', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PR', 'Porto Rico', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'PY', 'Paraguay', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AR', 'Argentine', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TW', 'Taiwan', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CF', 'Rép. Centraficaine', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CL', 'Chili', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CI', 'Rep. Côte D''ivoire', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'KR', 'Corée du Sud', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ID', 'Indonésie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MG', 'Madagascar', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ML', 'Mali', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'RO', 'Roumanie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'UY', 'Uruguay', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'RU', 'Russie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SE', 'Suède', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SM', 'San Marino', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'FI', 'Finlande', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SG', 'Singapour', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SI', 'Slovenie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SK', 'Slovaquie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SN', 'Sénégal', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'NA', 'Namibie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'SY', 'Syrie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TH', 'Thailande', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TG', 'Togo', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TR', 'Turquie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TT', 'Trinité & Tobago', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'TN', 'Tunisie', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'UA', 'Ukraine', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'US', 'USA', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'VA', 'Saint-Siège', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'VN', 'Vietnam', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AT', 'Autriche', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'VE', 'Vénézuela', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ZA', 'Afriq. Sud', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'ZW', 'Zimbabwe', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'BA', 'Bosnie-Herzégovine ', 'EN', '+387');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'AD', 'Andorre', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CS', 'Serbie-Monténégro', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'CG', 'Congo ', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'IQ', 'Irak', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'LT', 'Lituanie ', 'EN', '');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'FR', 'France ', 'EN', '+33');
-INSERT INTO Country VALUES (1, NULL, NULL,NULL, 0, 'MK', '« L''ex République Yougoslave de Macedoine »', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AE', 'Emirats Arabes Unis', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AL', 'Albanie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AO', 'Angola', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'SA', 'Arabie Saoudite', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AM', 'Arménie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AU', 'Australie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AZ', 'Azerbaidjan', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BE', 'Belgique', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BD', 'Bangladesh', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BB', 'La Barbade', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BJ', 'Benin', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BG', 'Bulgarie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BO', 'Bolivie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BR', 'Brésil', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BS', 'Bahamas', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BF', 'Burkina Faso', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BY', 'Bielorussie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CM', 'Cameroun', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CA', 'Canada', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CH', 'Suisse', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CN', 'Chine', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CO', 'Colombie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'KP', 'Corée du Nord', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CR', 'Costa Rica', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CZ', 'Rep.Tchèque', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CU', 'Cuba', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CY', 'Chypre', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'DE', 'Allemagne', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'DK', 'Danemark', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'DZ', 'Algérie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'ES', 'Espagne', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'EE', 'Estonie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'EC', 'Equateur', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'EG', 'Egypte', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'LI', 'Liechtenstein', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'GA', 'Gabon', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'GB', 'Royaume Uni', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'GI', 'Gibraltar', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'GT', 'Guatemala', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'GE', 'Georgie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'GH', 'Ghana', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'GL', 'Groenland', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'GR', 'Grèce', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'GN', 'Guinée', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'HU', 'Hongrie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'HK', 'Hong Kong', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'JO', 'Jordanie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'HR', 'Croatie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'IT', 'Italie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'IL', 'Israel', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'IN', 'Inde', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'IR', 'Iran', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'IE', 'Irlande', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'IS', 'Islande', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'JP', 'Japon', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'JM', 'Jamaique', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'KZ', 'Kazakhstan', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'KE', 'Kenya', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'KW', 'Koweit', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'LU', 'Luxembourg', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'LY', 'Libye', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'LB', 'Liban', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'LK', 'Sri Lanka', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'LV', 'Lettonie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MT', 'Malte', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MA', 'Maroc', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MY', 'Malaisie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MC', 'Monaco', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MD', 'Moldova', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MX', 'Mexique', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MU', 'Mauritius', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MW', 'Malawi', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'NO', 'Norvège', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'NP', 'Népal', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'NI', 'Nicaragua', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'NE', 'Nigeria', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'NL', 'Pays Bas', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'NZ', 'Nouvelle Zélande', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'OM', 'Oman', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'PT', 'Portugal', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'PE', 'Pérou', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'PH', 'Phillipines', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'PK', 'Pakistan', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'PL', 'Pologne', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'PF', 'Polynésie Française', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'PR', 'Porto Rico', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'PY', 'Paraguay', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AR', 'Argentine', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'TW', 'Taiwan', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CF', 'Rép. Centraficaine', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CL', 'Chili', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CI', 'Rep. Côte D''ivoire', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'KR', 'Corée du Sud', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'ID', 'Indonésie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MG', 'Madagascar', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'ML', 'Mali', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'RO', 'Roumanie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'UY', 'Uruguay', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'RU', 'Russie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'SE', 'Suède', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'SM', 'San Marino', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'FI', 'Finlande', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'SG', 'Singapour', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'SI', 'Slovenie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'SK', 'Slovaquie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'SN', 'Sénégal', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'NA', 'Namibie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'SY', 'Syrie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'TH', 'Thailande', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'TG', 'Togo', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'TR', 'Turquie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'TT', 'Trinité & Tobago', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'TN', 'Tunisie', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'UA', 'Ukraine', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'US', 'USA', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'VA', 'Saint-Siège', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'VN', 'Vietnam', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AT', 'Autriche', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'VE', 'Vénézuela', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'ZA', 'Afriq. Sud', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'ZW', 'Zimbabwe', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'BA', 'Bosnie-Herzégovine ', 'EN', '+387');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AD', 'Andorre', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CS', 'Serbie-Monténégro', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'CG', 'Congo ', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'IQ', 'Irak', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'LT', 'Lituanie ', 'EN', '');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'FR', 'France ', 'EN', '+33');
+INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MK', '« L''ex République Yougoslave de Macedoine »', 'EN', '');
 
-
-UPDATE Country SET country_domain_id = 1;
-UPDATE CompanyType SET companytype_domain_id = 1;
-UPDATE CompanyActivity SET companyactivity_domain_id = 1;
-UPDATE CompanyNafCode SET companynafcode_domain_id = 1;
-UPDATE Kind SET kind_domain_id = 1;
-UPDATE DealStatus SET dealstatus_domain_id = 1;
-UPDATE DealType SET dealtype_domain_id = 1;
-UPDATE CalendarCategory1 SET calendarcategory1_domain_id = 1;
-UPDATE DocumentMimeType SET documentmimetype_domain_id = 1;
-UPDATE TaskType SET tasktype_domain_id = 1;
-UPDATE ContractPriority SET contractpriority_domain_id = 1;
-UPDATE ContractStatus SET contractstatus_domain_id = 1;
-UPDATE IncidentPriority SET incidentpriority_domain_id = 1;
-UPDATE IncidentStatus SET incidentstatus_domain_id = 1;
-UPDATE PaymentKind SET paymentkind_domain_id = 1;
-UPDATE UGroup SET group_domain_id = 1;

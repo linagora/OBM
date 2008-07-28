@@ -6,7 +6,5 @@
 -- $Id$
 --/////////////////////////////////////////////////////////////////////////////
 
-insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '01', 'Naf Code equivalence in english ?');
-insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '012A', 'Naf Code example');
-
-UPDATE CompanyNafCode SET companynafcode_domain_id = 1;
+insert into CompanyNafCode (companynafcode_domain_id, companynafcode_title, companynafcode_code, companynafcode_label) values ((SELECT domain_id From Domain), '1', '01', 'Naf Code equivalence in english ?');
+insert into CompanyNafCode (companynafcode_domain_id, companynafcode_title, companynafcode_code, companynafcode_label) values ((SELECT domain_id From Domain), '0', '012A', 'Naf Code example');
