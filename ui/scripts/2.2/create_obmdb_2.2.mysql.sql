@@ -18,7 +18,7 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS Account;
 CREATE TABLE Account (
   account_id int(8) NOT NULL auto_increment,
-  account_domain_id int(8) default '0',
+  account_domain_id int(8) NOT NULL,
   account_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   account_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   account_userupdate int(8) default NULL,
@@ -64,7 +64,7 @@ CREATE TABLE ActiveUserObm (
 DROP TABLE IF EXISTS CV;
 CREATE TABLE CV (
   cv_id int(8) NOT NULL auto_increment,
-  cv_domain_id int(8) default '0',
+  cv_domain_id int(8) NOT NULL,
   cv_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   cv_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   cv_userupdate int(8) default NULL,
@@ -114,7 +114,7 @@ CREATE TABLE CalendarAlert (
 DROP TABLE IF EXISTS CalendarCategory1;
 CREATE TABLE CalendarCategory1 (
   calendarcategory1_id int(8) NOT NULL auto_increment,
-  calendarcategory1_domain_id int(8) default '0',
+  calendarcategory1_domain_id int(8) NOT NULL,
   calendarcategory1_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   calendarcategory1_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   calendarcategory1_userupdate int(8) default NULL,
@@ -138,7 +138,7 @@ CREATE TABLE CalendarCategory1 (
 DROP TABLE IF EXISTS CalendarEvent;
 CREATE TABLE CalendarEvent (
   calendarevent_id int(8) NOT NULL auto_increment,
-  calendarevent_domain_id int(8) default '0',
+  calendarevent_domain_id int(8) NOT NULL,
   calendarevent_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   calendarevent_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   calendarevent_userupdate int(8) default NULL,
@@ -147,7 +147,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_ext_id varchar(32) default '',
   calendarevent_title varchar(255) default NULL,
   calendarevent_location varchar(100) default NULL,
-  calendarevent_category1_id int(8) default '0',
+  calendarevent_category1_id int(8) default NULL,
   calendarevent_priority int(2) default NULL,
   calendarevent_privacy int(2) NOT NULL default '0',
   calendarevent_date datetime NOT NULL,
@@ -183,7 +183,7 @@ CREATE TABLE CalendarException (
   calendarexception_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   calendarexception_userupdate int(8) default NULL,
   calendarexception_usercreate int(8) default NULL,
-  calendarexception_event_id int(8) NOT NULL default '0',
+  calendarexception_event_id int(8) NOT NULL,
   calendarexception_date datetime NOT NULL,
   PRIMARY KEY  (calendarexception_event_id,calendarexception_date),
   KEY calendarexception_userupdate_userobm_id_fkey (calendarexception_userupdate),
@@ -224,8 +224,8 @@ CREATE TABLE Category (
 
 DROP TABLE IF EXISTS CategoryLink;
 CREATE TABLE CategoryLink (
-  categorylink_category_id int(8) NOT NULL default '0',
-  categorylink_entity_id int(8) NOT NULL default '0',
+  categorylink_category_id int(8) NOT NULL,
+  categorylink_entity_id int(8) NOT NULL,
   categorylink_category varchar(24) NOT NULL default '',
   categorylink_entity varchar(32) NOT NULL default '',
   PRIMARY KEY  (categorylink_category_id,categorylink_entity_id),
@@ -241,12 +241,12 @@ CREATE TABLE CategoryLink (
 DROP TABLE IF EXISTS Company;
 CREATE TABLE Company (
   company_id int(8) NOT NULL auto_increment,
-  company_domain_id int(8) default '0',
+  company_domain_id int(8) NOT NULL,
   company_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   company_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   company_userupdate int(8) default NULL,
   company_usercreate int(8) default NULL,
-  company_datasource_id int(8) default '0',
+  company_datasource_id int(8) default NULL,
   company_number varchar(32) default NULL,
   company_vat varchar(20) default NULL,
   company_siret varchar(14) default NULL,
@@ -299,7 +299,7 @@ CREATE TABLE Company (
 DROP TABLE IF EXISTS CompanyActivity;
 CREATE TABLE CompanyActivity (
   companyactivity_id int(8) NOT NULL auto_increment,
-  companyactivity_domain_id int(8) default '0',
+  companyactivity_domain_id int(8) NOT NULL,
   companyactivity_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   companyactivity_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   companyactivity_userupdate int(8) default NULL,
@@ -322,7 +322,7 @@ CREATE TABLE CompanyActivity (
 DROP TABLE IF EXISTS CompanyNafCode;
 CREATE TABLE CompanyNafCode (
   companynafcode_id int(8) NOT NULL auto_increment,
-  companynafcode_domain_id int(8) default '0',
+  companynafcode_domain_id int(8) NOT NULL,
   companynafcode_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   companynafcode_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   companynafcode_userupdate int(8) default NULL,
@@ -346,7 +346,7 @@ CREATE TABLE CompanyNafCode (
 DROP TABLE IF EXISTS CompanyType;
 CREATE TABLE CompanyType (
   companytype_id int(8) NOT NULL auto_increment,
-  companytype_domain_id int(8) default '0',
+  companytype_domain_id int(8) NOT NULL,
   companytype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   companytype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   companytype_userupdate int(8) default NULL,
@@ -369,12 +369,12 @@ CREATE TABLE CompanyType (
 DROP TABLE IF EXISTS Contact;
 CREATE TABLE Contact (
   contact_id int(8) NOT NULL auto_increment,
-  contact_domain_id int(8) default '0',
+  contact_domain_id int(8) NOT NULL,
   contact_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   contact_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   contact_userupdate int(8) default NULL,
   contact_usercreate int(8) default NULL,
-  contact_datasource_id int(8) default '0',
+  contact_datasource_id int(8) default NULL,
   contact_company_id int(8) default NULL,
   contact_company varchar(64) default NULL,
   contact_kind_id int(8) default NULL,
@@ -433,7 +433,7 @@ CREATE TABLE Contact (
 DROP TABLE IF EXISTS ContactFunction;
 CREATE TABLE ContactFunction (
   contactfunction_id int(8) NOT NULL auto_increment,
-  contactfunction_domain_id int(8) default '0',
+  contactfunction_domain_id int(8) NOT NULL,
   contactfunction_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   contactfunction_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   contactfunction_userupdate int(8) default NULL,
@@ -455,8 +455,8 @@ CREATE TABLE ContactFunction (
 
 DROP TABLE IF EXISTS ContactList;
 CREATE TABLE ContactList (
-  contactlist_list_id int(8) NOT NULL default '0',
-  contactlist_contact_id int(8) NOT NULL default '0',
+  contactlist_list_id int(8) NOT NULL,
+  contactlist_contact_id int(8) NOT NULL,
   KEY contactlist_list_id_list_id_fkey (contactlist_list_id),
   KEY contactlist_contact_id_contact_id_fkey (contactlist_contact_id),
   CONSTRAINT contactlist_contact_id_contact_id_fkey FOREIGN KEY (contactlist_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -470,7 +470,7 @@ CREATE TABLE ContactList (
 DROP TABLE IF EXISTS Contract;
 CREATE TABLE Contract (
   contract_id int(8) NOT NULL auto_increment,
-  contract_domain_id int(8) default '0',
+  contract_domain_id int(8) NOT NULL,
   contract_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   contract_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   contract_userupdate int(8) default NULL,
@@ -534,7 +534,7 @@ CREATE TABLE Contract (
 DROP TABLE IF EXISTS ContractPriority;
 CREATE TABLE ContractPriority (
   contractpriority_id int(8) NOT NULL auto_increment,
-  contractpriority_domain_id int(8) default '0',
+  contractpriority_domain_id int(8) NOT NULL,
   contractpriority_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   contractpriority_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   contractpriority_userupdate int(8) default NULL,
@@ -558,7 +558,7 @@ CREATE TABLE ContractPriority (
 DROP TABLE IF EXISTS ContractStatus;
 CREATE TABLE ContractStatus (
   contractstatus_id int(8) NOT NULL auto_increment,
-  contractstatus_domain_id int(8) default '0',
+  contractstatus_domain_id int(8) NOT NULL,
   contractstatus_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   contractstatus_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   contractstatus_userupdate int(8) default NULL,
@@ -581,7 +581,7 @@ CREATE TABLE ContractStatus (
 DROP TABLE IF EXISTS ContractType;
 CREATE TABLE ContractType (
   contracttype_id int(8) NOT NULL auto_increment,
-  contracttype_domain_id int(8) default '0',
+  contracttype_domain_id int(8) NOT NULL,
   contracttype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   contracttype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   contracttype_userupdate int(8) default NULL,
@@ -603,7 +603,7 @@ CREATE TABLE ContractType (
 
 DROP TABLE IF EXISTS Country;
 CREATE TABLE Country (
-  country_domain_id int(8) default '0',
+  country_domain_id int(8) NOT NULL,
   country_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   country_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   country_userupdate int(8) default NULL,
@@ -628,7 +628,7 @@ CREATE TABLE Country (
 DROP TABLE IF EXISTS DataSource;
 CREATE TABLE DataSource (
   datasource_id int(8) NOT NULL auto_increment,
-  datasource_domain_id int(8) default '0',
+  datasource_domain_id int(8) NOT NULL,
   datasource_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   datasource_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   datasource_userupdate int(8) default NULL,
@@ -650,7 +650,7 @@ CREATE TABLE DataSource (
 DROP TABLE IF EXISTS Deal;
 CREATE TABLE Deal (
   deal_id int(8) NOT NULL auto_increment,
-  deal_domain_id int(8) default '0',
+  deal_domain_id int(8) NOT NULL,
   deal_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   deal_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   deal_userupdate int(8) default NULL,
@@ -662,7 +662,7 @@ CREATE TABLE Deal (
   deal_type_id int(8) default NULL,
   deal_region_id int(8) default NULL,
   deal_tasktype_id int(8) default NULL,
-  deal_company_id int(8) NOT NULL default '0',
+  deal_company_id int(8) NOT NULL,
   deal_contact1_id int(8) default NULL,
   deal_contact2_id int(8) default NULL,
   deal_marketingmanager_id int(8) default NULL,
@@ -745,7 +745,7 @@ CREATE TABLE DealCompany (
 DROP TABLE IF EXISTS DealCompanyRole;
 CREATE TABLE DealCompanyRole (
   dealcompanyrole_id int(8) NOT NULL auto_increment,
-  dealcompanyrole_domain_id int(8) default '0',
+  dealcompanyrole_domain_id int(8) NOT NULL,
   dealcompanyrole_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   dealcompanyrole_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   dealcompanyrole_userupdate int(8) default NULL,
@@ -768,7 +768,7 @@ CREATE TABLE DealCompanyRole (
 DROP TABLE IF EXISTS DealStatus;
 CREATE TABLE DealStatus (
   dealstatus_id int(2) NOT NULL auto_increment,
-  dealstatus_domain_id int(8) default '0',
+  dealstatus_domain_id int(8) NOT NULL,
   dealstatus_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   dealstatus_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   dealstatus_userupdate int(8) default NULL,
@@ -792,7 +792,7 @@ CREATE TABLE DealStatus (
 DROP TABLE IF EXISTS DealType;
 CREATE TABLE DealType (
   dealtype_id int(8) NOT NULL auto_increment,
-  dealtype_domain_id int(8) default '0',
+  dealtype_domain_id int(8) NOT NULL,
   dealtype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   dealtype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   dealtype_userupdate int(8) default NULL,
@@ -816,7 +816,7 @@ CREATE TABLE DealType (
 DROP TABLE IF EXISTS DefaultOdtTemplate;
 CREATE TABLE DefaultOdtTemplate (
   defaultodttemplate_id int(8) NOT NULL auto_increment,
-  defaultodttemplate_domain_id int(8) default '0',
+  defaultodttemplate_domain_id int(8) NOT NULL,
   defaultodttemplate_entity varchar(32) default NULL,
   defaultodttemplate_document_id int(8) NOT NULL,
   defaultodttemplate_label varchar(64) default '',
@@ -868,7 +868,7 @@ CREATE TABLE DeletedCalendarEvent (
 
 DROP TABLE IF EXISTS DeletedContact;
 CREATE TABLE DeletedContact (
-  deletedcontact_contact_id int(8) NOT NULL default '0',
+  deletedcontact_contact_id int(8) NOT NULL,
   deletedcontact_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (deletedcontact_contact_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -879,7 +879,7 @@ CREATE TABLE DeletedContact (
 
 DROP TABLE IF EXISTS DeletedTodo;
 CREATE TABLE DeletedTodo (
-  deletedtodo_todo_id int(8) NOT NULL default '0',
+  deletedtodo_todo_id int(8) NOT NULL,
   deletedtodo_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (deletedtodo_todo_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -890,7 +890,7 @@ CREATE TABLE DeletedTodo (
 
 DROP TABLE IF EXISTS DeletedUser;
 CREATE TABLE DeletedUser (
-  deleteduser_user_id int(8) NOT NULL default '0',
+  deleteduser_user_id int(8) NOT NULL,
   deleteduser_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (deleteduser_user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -901,12 +901,14 @@ CREATE TABLE DeletedUser (
 
 DROP TABLE IF EXISTS DisplayPref;
 CREATE TABLE DisplayPref (
-  display_user_id int(8) NOT NULL default '0',
+  display_id int(8) NOT NULL auto_increment, 
+  display_user_id int(8) default NULL,
   display_entity varchar(32) NOT NULL default '',
   display_fieldname varchar(64) NOT NULL default '',
   display_fieldorder int(3) unsigned default NULL,
   display_display int(1) unsigned NOT NULL default '1',
-  PRIMARY KEY  (display_user_id,display_entity,display_fieldname),
+  PRIMARY KEY  (display_id),
+  UNIQUE KEY displaypref_key (display_user_id,display_entity,display_fieldname),
   KEY idx_user (display_user_id),
   KEY idx_entity (display_entity),
   CONSTRAINT display_user_id_userobm_id_fkey FOREIGN KEY (display_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -919,7 +921,7 @@ CREATE TABLE DisplayPref (
 DROP TABLE IF EXISTS Document;
 CREATE TABLE Document (
   document_id int(8) NOT NULL auto_increment,
-  document_domain_id int(8) default '0',
+  document_domain_id int(8) NOT NULL,
   document_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   document_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   document_userupdate int(8) default NULL,
@@ -964,7 +966,7 @@ CREATE TABLE DocumentEntity (
 DROP TABLE IF EXISTS DocumentMimeType;
 CREATE TABLE DocumentMimeType (
   documentmimetype_id int(8) NOT NULL auto_increment,
-  documentmimetype_domain_id int(8) default '0',
+  documentmimetype_domain_id int(8) NOT NULL,
   documentmimetype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   documentmimetype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   documentmimetype_userupdate int(8) default NULL,
@@ -1013,7 +1015,7 @@ CREATE TABLE Domain (
 
 DROP TABLE IF EXISTS DomainMailServer;
 CREATE TABLE DomainMailServer (
-  domainmailserver_domain_id int(8) NOT NULL default '0',
+  domainmailserver_domain_id int(8) NOT NULL NOT NULL,
   domainmailserver_mailserver_id int(8) NOT NULL,
   domainmailserver_role varchar(16) NOT NULL default 'imap',
   KEY domainmailserver_domain_id_domain_id_fkey (domainmailserver_domain_id),
@@ -1055,9 +1057,9 @@ CREATE TABLE DomainPropertyValue (
 DROP TABLE IF EXISTS EntityRight;
 CREATE TABLE EntityRight (
   entityright_entity varchar(32) NOT NULL default '',
-  entityright_entity_id int(8) NOT NULL default '0',
+  entityright_entity_id int(8) NOT NULL,
   entityright_consumer varchar(32) NOT NULL default '',
-  entityright_consumer_id int(8) NOT NULL default '0',
+  entityright_consumer_id int(8) NOT NULL,
   entityright_read int(1) NOT NULL default '0',
   entityright_write int(1) NOT NULL default '0',
   entityright_admin int(1) NOT NULL default '0',
@@ -1078,8 +1080,8 @@ CREATE TABLE EventEntity (
   evententity_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   evententity_userupdate int(8) default NULL,
   evententity_usercreate int(8) default NULL,
-  evententity_event_id int(8) NOT NULL default '0',
-  evententity_entity_id int(8) NOT NULL default '0',
+  evententity_event_id int(8) NOT NULL,
+  evententity_entity_id int(8) NOT NULL,
   evententity_entity varchar(32) NOT NULL default '0',
   evententity_state char(1) NOT NULL default '0',
   evententity_required tinyint(1) NOT NULL default '0',
@@ -1097,8 +1099,8 @@ CREATE TABLE EventEntity (
 
 DROP TABLE IF EXISTS GroupGroup;
 CREATE TABLE GroupGroup (
-  groupgroup_parent_id int(8) NOT NULL default '0',
-  groupgroup_child_id int(8) NOT NULL default '0',
+  groupgroup_parent_id int(8) NOT NULL,
+  groupgroup_child_id int(8) NOT NULL,
   PRIMARY KEY  (groupgroup_parent_id,groupgroup_child_id),
   KEY groupgroup_child_id_group_id_fkey (groupgroup_child_id),
   CONSTRAINT groupgroup_child_id_group_id_fkey FOREIGN KEY (groupgroup_child_id) REFERENCES UGroup (group_id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -1112,7 +1114,7 @@ CREATE TABLE GroupGroup (
 DROP TABLE IF EXISTS Host;
 CREATE TABLE Host (
   host_id int(8) NOT NULL auto_increment,
-  host_domain_id int(8) default '0',
+  host_domain_id int(8) NOT NULL,
   host_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   host_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   host_userupdate int(8) default NULL,
@@ -1147,13 +1149,13 @@ CREATE TABLE Host (
 DROP TABLE IF EXISTS Import;
 CREATE TABLE `Import` (
   import_id int(8) NOT NULL auto_increment,
-  import_domain_id int(8) default '0',
+  import_domain_id int(8) NOT NULL,
   import_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   import_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   import_userupdate int(8) default NULL,
   import_usercreate int(8) default NULL,
   import_name varchar(64) NOT NULL,
-  import_datasource_id int(8) default '0',
+  import_datasource_id int(8) default NULL,
   import_marketingmanager_id int(8) default NULL,
   import_separator varchar(3) default NULL,
   import_enclosed char(1) default NULL,
@@ -1179,7 +1181,7 @@ CREATE TABLE `Import` (
 DROP TABLE IF EXISTS Incident;
 CREATE TABLE Incident (
   incident_id int(8) NOT NULL auto_increment,
-  incident_domain_id int(8) default '0',
+  incident_domain_id int(8) NOT NULL,
   incident_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   incident_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   incident_userupdate int(8) default NULL,
@@ -1188,9 +1190,9 @@ CREATE TABLE Incident (
   incident_label varchar(100) default NULL,
   incident_reference varchar(32) default NULL,
   incident_date timestamp NOT NULL default '0000-00-00 00:00:00',
-  incident_priority_id int(8) default '0',
-  incident_status_id int(8) default '0',
-  incident_resolutiontype_id int(11) default '0',
+  incident_priority_id int(8) default NULL,
+  incident_status_id int(8) default NULL,
+  incident_resolutiontype_id int(11) default NULL,
   incident_logger int(8) default NULL,
   incident_owner int(8) default NULL,
   incident_duration char(4) default '0',
@@ -1225,7 +1227,7 @@ CREATE TABLE Incident (
 DROP TABLE IF EXISTS IncidentPriority;
 CREATE TABLE IncidentPriority (
   incidentpriority_id int(8) NOT NULL auto_increment,
-  incidentpriority_domain_id int(8) default '0',
+  incidentpriority_domain_id int(8) NOT NULL,
   incidentpriority_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   incidentpriority_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   incidentpriority_userupdate int(8) default NULL,
@@ -1249,7 +1251,7 @@ CREATE TABLE IncidentPriority (
 DROP TABLE IF EXISTS IncidentResolutionType;
 CREATE TABLE IncidentResolutionType (
   incidentresolutiontype_id int(8) NOT NULL auto_increment,
-  incidentresolutiontype_domain_id int(8) default '0',
+  incidentresolutiontype_domain_id int(8) NOT NULL,
   incidentresolutiontype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   incidentresolutiontype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   incidentresolutiontype_userupdate int(8) default NULL,
@@ -1272,7 +1274,7 @@ CREATE TABLE IncidentResolutionType (
 DROP TABLE IF EXISTS IncidentStatus;
 CREATE TABLE IncidentStatus (
   incidentstatus_id int(8) NOT NULL auto_increment,
-  incidentstatus_domain_id int(8) default '0',
+  incidentstatus_domain_id int(8) NOT NULL,
   incidentstatus_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   incidentstatus_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   incidentstatus_userupdate int(8) default NULL,
@@ -1295,7 +1297,7 @@ CREATE TABLE IncidentStatus (
 DROP TABLE IF EXISTS Invoice;
 CREATE TABLE Invoice (
   invoice_id int(8) NOT NULL auto_increment,
-  invoice_domain_id int(8) default '0',
+  invoice_domain_id int(8) NOT NULL,
   invoice_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   invoice_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   invoice_userupdate int(8) default NULL,
@@ -1307,7 +1309,7 @@ CREATE TABLE Invoice (
   invoice_label varchar(40) NOT NULL default '',
   invoice_amount_ht double(10,2) default NULL,
   invoice_amount_ttc double(10,2) default NULL,
-  invoice_status_id int(4) NOT NULL default '0',
+  invoice_status_id int(4) NOT NULL,
   invoice_date date NOT NULL default '0000-00-00',
   invoice_expiration_date date default NULL,
   invoice_payment_date date default NULL,
@@ -1337,7 +1339,7 @@ CREATE TABLE Invoice (
 DROP TABLE IF EXISTS Kind;
 CREATE TABLE Kind (
   kind_id int(8) NOT NULL auto_increment,
-  kind_domain_id int(8) default '0',
+  kind_domain_id int(8) NOT NULL,
   kind_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   kind_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   kind_userupdate int(8) default NULL,
@@ -1362,14 +1364,14 @@ CREATE TABLE Kind (
 DROP TABLE IF EXISTS Lead;
 CREATE TABLE Lead (
   lead_id int(8) NOT NULL auto_increment,
-  lead_domain_id int(8) default '0',
+  lead_domain_id int(8) NOT NULL,
   lead_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   lead_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   lead_userupdate int(8) default NULL,
   lead_usercreate int(8) default NULL,
   lead_source_id int(8) default NULL,
   lead_manager_id int(8) default NULL,
-  lead_company_id int(8) NOT NULL default '0',
+  lead_company_id int(8) NOT NULL,
   lead_contact_id int(8) default NULL,
   lead_privacy int(2) NOT NULL default '0',
   lead_name varchar(64) default NULL,
@@ -1405,7 +1407,7 @@ CREATE TABLE Lead (
 DROP TABLE IF EXISTS LeadSource;
 CREATE TABLE LeadSource (
   leadsource_id int(8) NOT NULL auto_increment,
-  leadsource_domain_id int(8) default '0',
+  leadsource_domain_id int(8) NOT NULL,
   leadsource_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   leadsource_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   leadsource_userupdate int(8) default NULL,
@@ -1428,7 +1430,7 @@ CREATE TABLE LeadSource (
 DROP TABLE IF EXISTS LeadStatus;
 CREATE TABLE LeadStatus (
   leadstatus_id int(2) NOT NULL auto_increment,
-  leadstatus_domain_id int(8) default '0',
+  leadstatus_domain_id int(8) NOT NULL,
   leadstatus_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   leadstatus_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   leadstatus_userupdate int(8) default NULL,
@@ -1451,7 +1453,7 @@ CREATE TABLE LeadStatus (
 DROP TABLE IF EXISTS List;
 CREATE TABLE List (
   list_id int(8) NOT NULL auto_increment,
-  list_domain_id int(8) default '0',
+  list_domain_id int(8) NOT NULL,
   list_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   list_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   list_userupdate int(8) default NULL,
@@ -1489,7 +1491,7 @@ CREATE TABLE MailServer (
   mailserver_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   mailserver_userupdate int(8) default NULL,
   mailserver_usercreate int(8) default NULL,
-  mailserver_host_id int(8) NOT NULL default '0',
+  mailserver_host_id int(8) NOT NULL,
   mailserver_relayhost_id int(8) default NULL,
   mailserver_imap int(1) default '0',
   mailserver_smtp_in int(1) default '0',
@@ -1511,7 +1513,7 @@ CREATE TABLE MailServer (
 
 DROP TABLE IF EXISTS MailServerNetwork;
 CREATE TABLE MailServerNetwork (
-  mailservernetwork_host_id int(8) NOT NULL default '0',
+  mailservernetwork_host_id int(8) NOT NULL,
   mailservernetwork_ip varchar(16) NOT NULL default ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1522,7 +1524,7 @@ CREATE TABLE MailServerNetwork (
 DROP TABLE IF EXISTS MailShare;
 CREATE TABLE MailShare (
   mailshare_id int(8) NOT NULL auto_increment,
-  mailshare_domain_id int(8) default '0',
+  mailshare_domain_id int(8) NOT NULL,
   mailshare_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   mailshare_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   mailshare_userupdate int(8) default NULL,
@@ -1530,7 +1532,7 @@ CREATE TABLE MailShare (
   mailshare_name varchar(32) default NULL,
   mailshare_archive int(1) NOT NULL default '0',
   mailshare_quota int(11) NOT NULL default '0',
-  mailshare_mail_server_id int(8) default '0',
+  mailshare_mail_server_id int(8) default NULL,
   mailshare_delegation varchar(64) default '',
   mailshare_description varchar(255) default NULL,
   mailshare_email text,
@@ -1552,7 +1554,7 @@ CREATE TABLE MailShare (
 DROP TABLE IF EXISTS OGroup;
 CREATE TABLE OGroup (
   ogroup_id int(8) NOT NULL auto_increment,
-  ogroup_domain_id int(8) default '0',
+  ogroup_domain_id int(8) NOT NULL,
   ogroup_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   ogroup_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   ogroup_userupdate int(8) default NULL,
@@ -1581,7 +1583,7 @@ CREATE TABLE OGroup (
 DROP TABLE IF EXISTS OGroupEntity;
 CREATE TABLE OGroupEntity (
   ogroupentity_id int(8) NOT NULL auto_increment,
-  ogroupentity_domain_id int(8) default '0',
+  ogroupentity_domain_id int(8) NOT NULL,
   ogroupentity_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   ogroupentity_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   ogroupentity_userupdate int(8) default NULL,
@@ -1661,7 +1663,7 @@ CREATE TABLE ObmSession (
 DROP TABLE IF EXISTS OrganizationalChart;
 CREATE TABLE OrganizationalChart (
   organizationalchart_id int(8) NOT NULL auto_increment,
-  organizationalchart_domain_id int(8) default '0',
+  organizationalchart_domain_id int(8) NOT NULL,
   organizationalchart_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   organizationalchart_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   organizationalchart_userupdate int(8) default NULL,
@@ -1705,9 +1707,9 @@ CREATE TABLE P_Domain (
 DROP TABLE IF EXISTS P_EntityRight;
 CREATE TABLE P_EntityRight (
   entityright_entity varchar(32) NOT NULL default '',
-  entityright_entity_id int(8) NOT NULL default '0',
+  entityright_entity_id int(8) NOT NULL,
   entityright_consumer varchar(32) NOT NULL default '',
-  entityright_consumer_id int(8) NOT NULL default '0',
+  entityright_consumer_id int(8) NOT NULL,
   entityright_read int(1) NOT NULL default '0',
   entityright_write int(1) NOT NULL default '0',
   entityright_admin int(1) NOT NULL default '0',
@@ -1724,8 +1726,8 @@ CREATE TABLE P_EntityRight (
 
 DROP TABLE IF EXISTS P_GroupGroup;
 CREATE TABLE P_GroupGroup (
-  groupgroup_parent_id int(8) NOT NULL default '0',
-  groupgroup_child_id int(8) NOT NULL default '0',
+  groupgroup_parent_id int(8) NOT NULL,
+  groupgroup_child_id int(8) NOT NULL,
   PRIMARY KEY  (groupgroup_parent_id,groupgroup_child_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1736,7 +1738,7 @@ CREATE TABLE P_GroupGroup (
 DROP TABLE IF EXISTS P_Host;
 CREATE TABLE P_Host (
   host_id int(8) NOT NULL auto_increment,
-  host_domain_id int(8) default '0',
+  host_domain_id int(8) NOT NULL,
   host_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   host_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   host_userupdate int(8) default NULL,
@@ -1769,7 +1771,7 @@ CREATE TABLE P_MailServer (
   mailserver_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   mailserver_userupdate int(8) default NULL,
   mailserver_usercreate int(8) default NULL,
-  mailserver_host_id int(8) NOT NULL default '0',
+  mailserver_host_id int(8) NOT NULL,
   mailserver_relayhost_id int(8) default NULL,
   mailserver_imap int(1) default '0',
   mailserver_smtp_in int(1) default '0',
@@ -1783,7 +1785,7 @@ CREATE TABLE P_MailServer (
 
 DROP TABLE IF EXISTS P_MailServerNetwork;
 CREATE TABLE P_MailServerNetwork (
-  mailservernetwork_host_id int(8) NOT NULL default '0',
+  mailservernetwork_host_id int(8) NOT NULL,
   mailservernetwork_ip varchar(16) NOT NULL default ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1794,7 +1796,7 @@ CREATE TABLE P_MailServerNetwork (
 DROP TABLE IF EXISTS P_MailShare;
 CREATE TABLE P_MailShare (
   mailshare_id int(8) NOT NULL auto_increment,
-  mailshare_domain_id int(8) default '0',
+  mailshare_domain_id int(8) NOT NULL,
   mailshare_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   mailshare_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   mailshare_userupdate int(8) default NULL,
@@ -1802,7 +1804,7 @@ CREATE TABLE P_MailShare (
   mailshare_name varchar(32) default NULL,
   mailshare_archive int(1) NOT NULL default '0',
   mailshare_quota int(11) NOT NULL default '0',
-  mailshare_mail_server_id int(8) default '0',
+  mailshare_mail_server_id int(8) default NULL,
   mailshare_delegation varchar(64) default '',
   mailshare_description varchar(255) default NULL,
   mailshare_email text,
@@ -1815,7 +1817,7 @@ CREATE TABLE P_MailShare (
 
 DROP TABLE IF EXISTS P_Samba;
 CREATE TABLE P_Samba (
-  samba_domain_id int(8) default '0',
+  samba_domain_id int(8) NOT NULL,
   samba_name varchar(255) NOT NULL default '',
   samba_value varchar(255) NOT NULL default ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1827,7 +1829,7 @@ CREATE TABLE P_Samba (
 DROP TABLE IF EXISTS P_UGroup;
 CREATE TABLE P_UGroup (
   group_id int(8) NOT NULL auto_increment,
-  group_domain_id int(8) default '0',
+  group_domain_id int(8) NOT NULL,
   group_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   group_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   group_userupdate int(8) default NULL,
@@ -1940,8 +1942,8 @@ CREATE TABLE P_UserObm (
 
 DROP TABLE IF EXISTS P_UserObmGroup;
 CREATE TABLE P_UserObmGroup (
-  userobmgroup_group_id int(8) NOT NULL default '0',
-  userobmgroup_userobm_id int(8) NOT NULL default '0',
+  userobmgroup_group_id int(8) NOT NULL,
+  userobmgroup_userobm_id int(8) NOT NULL,
   PRIMARY KEY  (userobmgroup_group_id,userobmgroup_userobm_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1951,8 +1953,8 @@ CREATE TABLE P_UserObmGroup (
 
 DROP TABLE IF EXISTS P_of_usergroup;
 CREATE TABLE P_of_usergroup (
-  of_usergroup_group_id int(8) NOT NULL default '0',
-  of_usergroup_user_id int(8) NOT NULL default '0',
+  of_usergroup_group_id int(8) NOT NULL,
+  of_usergroup_user_id int(8) NOT NULL,
   PRIMARY KEY  (of_usergroup_group_id,of_usergroup_user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1963,7 +1965,7 @@ CREATE TABLE P_of_usergroup (
 DROP TABLE IF EXISTS ParentDeal;
 CREATE TABLE ParentDeal (
   parentdeal_id int(8) NOT NULL auto_increment,
-  parentdeal_domain_id int(8) default '0',
+  parentdeal_domain_id int(8) NOT NULL,
   parentdeal_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   parentdeal_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   parentdeal_userupdate int(8) default NULL,
@@ -1993,7 +1995,7 @@ CREATE TABLE ParentDeal (
 DROP TABLE IF EXISTS Payment;
 CREATE TABLE Payment (
   payment_id int(8) NOT NULL auto_increment,
-  payment_domain_id int(8) default '0',
+  payment_domain_id int(8) NOT NULL,
   payment_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   payment_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   payment_userupdate int(8) default NULL,
@@ -2053,7 +2055,7 @@ CREATE TABLE PaymentInvoice (
 DROP TABLE IF EXISTS PaymentKind;
 CREATE TABLE PaymentKind (
   paymentkind_id int(8) NOT NULL auto_increment,
-  paymentkind_domain_id int(8) default '0',
+  paymentkind_domain_id int(8) NOT NULL,
   paymentkind_shortlabel varchar(3) NOT NULL default '',
   paymentkind_label varchar(40) NOT NULL default '',
   PRIMARY KEY  (paymentkind_id),
@@ -2068,7 +2070,7 @@ CREATE TABLE PaymentKind (
 DROP TABLE IF EXISTS Project;
 CREATE TABLE Project (
   project_id int(8) NOT NULL auto_increment,
-  project_domain_id int(8) default '0',
+  project_domain_id int(8) NOT NULL,
   project_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   project_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   project_userupdate int(8) default NULL,
@@ -2182,7 +2184,7 @@ CREATE TABLE ProjectTask (
   projecttask_userupdate int(8) default NULL,
   projecttask_usercreate int(8) default NULL,
   projecttask_label varchar(128) default NULL,
-  projecttask_parenttask_id int(8) default '0',
+  projecttask_parenttask_id int(8) default NULL,
   projecttask_rank int(8) default NULL,
   projecttask_datebegin date default NULL,
   projecttask_dateend date default NULL,
@@ -2235,7 +2237,7 @@ CREATE TABLE ProjectUser (
 DROP TABLE IF EXISTS Publication;
 CREATE TABLE Publication (
   publication_id int(8) NOT NULL auto_increment,
-  publication_domain_id int(8) default '0',
+  publication_domain_id int(8) NOT NULL,
   publication_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   publication_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   publication_userupdate int(8) default NULL,
@@ -2263,7 +2265,7 @@ CREATE TABLE Publication (
 DROP TABLE IF EXISTS PublicationType;
 CREATE TABLE PublicationType (
   publicationtype_id int(8) NOT NULL auto_increment,
-  publicationtype_domain_id int(8) default '0',
+  publicationtype_domain_id int(8) NOT NULL,
   publicationtype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   publicationtype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   publicationtype_userupdate int(8) default NULL,
@@ -2286,7 +2288,7 @@ CREATE TABLE PublicationType (
 DROP TABLE IF EXISTS RGroup;
 CREATE TABLE RGroup (
   rgroup_id int(8) NOT NULL auto_increment,
-  rgroup_domain_id int(8) default '0',
+  rgroup_domain_id int(8) NOT NULL,
   rgroup_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   rgroup_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   rgroup_userupdate int(8) default NULL,
@@ -2310,7 +2312,7 @@ CREATE TABLE RGroup (
 DROP TABLE IF EXISTS Region;
 CREATE TABLE Region (
   region_id int(8) NOT NULL auto_increment,
-  region_domain_id int(8) default '0',
+  region_domain_id int(8) NOT NULL,
   region_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   region_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   region_userupdate int(8) default NULL,
@@ -2333,7 +2335,7 @@ CREATE TABLE Region (
 DROP TABLE IF EXISTS Resource;
 CREATE TABLE Resource (
   resource_id int(8) NOT NULL auto_increment,
-  resource_domain_id int(8) default '0',
+  resource_domain_id int(8) NOT NULL,
   resource_rtype_id int(8) default NULL,
   resource_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   resource_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
@@ -2354,8 +2356,8 @@ CREATE TABLE Resource (
 
 DROP TABLE IF EXISTS ResourceGroup;
 CREATE TABLE ResourceGroup (
-  resourcegroup_rgroup_id int(8) NOT NULL default '0',
-  resourcegroup_resource_id int(8) NOT NULL default '0',
+  resourcegroup_rgroup_id int(8) NOT NULL,
+  resourcegroup_resource_id int(8) NOT NULL,
   KEY resourcegroup_rgroup_id_rgroup_id_fkey (resourcegroup_rgroup_id),
   KEY resourcegroup_resource_id_resource_id_fkey (resourcegroup_resource_id),
   CONSTRAINT resourcegroup_resource_id_resource_id_fkey FOREIGN KEY (resourcegroup_resource_id) REFERENCES Resource (resource_id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -2369,7 +2371,7 @@ CREATE TABLE ResourceGroup (
 DROP TABLE IF EXISTS ResourceItem;
 CREATE TABLE ResourceItem (
   resourceitem_id int(8) NOT NULL auto_increment,
-  resourceitem_domain_id int(8) default '0',
+  resourceitem_domain_id int(8) NOT NULL,
   resourceitem_label varchar(32) NOT NULL,
   resourceitem_resourcetype_id int(8) NOT NULL,
   resourceitem_description text,
@@ -2387,7 +2389,7 @@ CREATE TABLE ResourceItem (
 DROP TABLE IF EXISTS ResourceType;
 CREATE TABLE ResourceType (
   resourcetype_id int(8) NOT NULL auto_increment,
-  resourcetype_domain_id int(8) default '0',
+  resourcetype_domain_id int(8) NOT NULL,
   resourcetype_label varchar(32) NOT NULL,
   resourcetype_property varchar(32) default NULL,
   resourcetype_pkind int(1) NOT NULL default '0',
@@ -2402,7 +2404,7 @@ CREATE TABLE ResourceType (
 
 DROP TABLE IF EXISTS Samba;
 CREATE TABLE Samba (
-  samba_domain_id int(8) default '0',
+  samba_domain_id int(8) NOT NULL,
   samba_name varchar(255) NOT NULL default '',
   samba_value varchar(255) NOT NULL default '',
   KEY samba_domain_id_domain_id_fkey (samba_domain_id),
@@ -2427,7 +2429,7 @@ CREATE TABLE Stats (
 DROP TABLE IF EXISTS Subscription;
 CREATE TABLE Subscription (
   subscription_id int(8) NOT NULL auto_increment,
-  subscription_domain_id int(8) default '0',
+  subscription_domain_id int(8) NOT NULL,
   subscription_publication_id int(8) NOT NULL,
   subscription_contact_id int(8) NOT NULL,
   subscription_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
@@ -2461,7 +2463,7 @@ CREATE TABLE Subscription (
 DROP TABLE IF EXISTS SubscriptionReception;
 CREATE TABLE SubscriptionReception (
   subscriptionreception_id int(8) NOT NULL auto_increment,
-  subscriptionreception_domain_id int(8) default '0',
+  subscriptionreception_domain_id int(8) NOT NULL,
   subscriptionreception_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   subscriptionreception_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   subscriptionreception_userupdate int(8) default NULL,
@@ -2484,7 +2486,7 @@ CREATE TABLE SubscriptionReception (
 DROP TABLE IF EXISTS TaskType;
 CREATE TABLE TaskType (
   tasktype_id int(8) NOT NULL auto_increment,
-  tasktype_domain_id int(8) default '0',
+  tasktype_domain_id int(8) NOT NULL,
   tasktype_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   tasktype_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   tasktype_userupdate int(8) default NULL,
@@ -2539,7 +2541,7 @@ CREATE TABLE TimeTask (
 DROP TABLE IF EXISTS Todo;
 CREATE TABLE Todo (
   todo_id int(8) NOT NULL auto_increment,
-  todo_domain_id int(8) default '0',
+  todo_domain_id int(8) NOT NULL,
   todo_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   todo_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   todo_userupdate int(8) default NULL,
@@ -2573,7 +2575,7 @@ CREATE TABLE Todo (
 DROP TABLE IF EXISTS UGroup;
 CREATE TABLE UGroup (
   group_id int(8) NOT NULL auto_increment,
-  group_domain_id int(8) default '0',
+  group_domain_id int(8) NOT NULL,
   group_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   group_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   group_userupdate int(8) default NULL,
@@ -2746,8 +2748,8 @@ CREATE TABLE UserObm (
 
 DROP TABLE IF EXISTS UserObmGroup;
 CREATE TABLE UserObmGroup (
-  userobmgroup_group_id int(8) NOT NULL default '0',
-  userobmgroup_userobm_id int(8) NOT NULL default '0',
+  userobmgroup_group_id int(8) NOT NULL,
+  userobmgroup_userobm_id int(8) NOT NULL,
   PRIMARY KEY  (userobmgroup_group_id,userobmgroup_userobm_id),
   KEY userobmgroup_userobm_id_userobm_id_fkey (userobmgroup_userobm_id),
   CONSTRAINT userobmgroup_userobm_id_userobm_id_fkey FOREIGN KEY (userobmgroup_userobm_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -2760,9 +2762,12 @@ CREATE TABLE UserObmGroup (
 
 DROP TABLE IF EXISTS UserObmPref;
 CREATE TABLE UserObmPref (
+  userobmpref_id int(8) auto_increment,
   userobmpref_user_id int(8) default NULL,
   userobmpref_option varchar(50) NOT NULL,
   userobmpref_value varchar(50) NOT NULL,
+  PRIMARY KEY  (userobmpref_id),
+  UNIQUE KEY userobmpref_key (userobmpref_user_id, userobmpref_option),
   KEY userobmpref_user_id_userobm_id_fkey (userobmpref_user_id),
   CONSTRAINT userobmpref_user_id_userobm_id_fkey FOREIGN KEY (userobmpref_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -2811,8 +2816,8 @@ CREATE TABLE UserSystem (
 
 DROP TABLE IF EXISTS of_usergroup;
 CREATE TABLE of_usergroup (
-  of_usergroup_group_id int(8) NOT NULL default '0',
-  of_usergroup_user_id int(8) NOT NULL default '0',
+  of_usergroup_group_id int(8) NOT NULL,
+  of_usergroup_user_id int(8) NOT NULL,
   PRIMARY KEY  (of_usergroup_group_id,of_usergroup_user_id),
   KEY of_usergroup_user_id_userobm_id_fkey (of_usergroup_user_id),
   CONSTRAINT of_usergroup_user_id_userobm_id_fkey FOREIGN KEY (of_usergroup_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,

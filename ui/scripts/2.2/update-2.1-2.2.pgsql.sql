@@ -4,6 +4,10 @@
 
 -- Domain
 ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
+-- Global Domain
+INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virtual', TRUE);
+UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
+UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
 -- CalendarEvent
 
@@ -15,8 +19,78 @@ ALTER TABLE evententity ALTER COLUMN evententity_required DROP DEFAULT;
 ALTER TABLE evententity ALTER COLUMN evententity_required TYPE BOOLEAN USING CASE evententity_required WHEN 1 THEN TRUE ELSE FALSE END;
 ALTER TABLE evententity ALTER COLUMN evententity_required SET DEFAULT FALSE;
 
+-- Preferences
+ALTER TABLE DisplayPref DROP CONSTRAINT displaypref_pkey;
+ALTER TABLE DisplayPref ADD CONSTRAINT displaypref_key  UNIQUE (display_user_id, display_entity, display_fieldname);
+ALTER TABLE DisplayPref ADD COLUMN display_id serial PRIMARY KEY;
+
 -- NOT NULL to NULL Convertion
--- Deal
+ALTER TABLE UserObm ALTER COLUMN userobm_domain_id SET NOT NULL;
+ALTER TABLE UserObmPref ALTER COLUMN userobmpref_user_id DROP NOT NULL;
+ALTER TABLE UserObmPref ALTER COLUMN userobmpref_user_id SET default NULL;
+ALTER TABLE DataSource ALTER COLUMN datasource_domain_id SET NOT NULL;
+ALTER TABLE Country ALTER COLUMN country_domain_id SET NOT NULL;
+ALTER TABLE Region ALTER COLUMN region_domain_id SET NOT NULL;
+ALTER TABLE CompanyType ALTER COLUMN companytype_domain_id SET NOT NULL;
+ALTER TABLE CompanyActivity ALTER COLUMN companyactivity_domain_id SET NOT NULL;
+ALTER TABLE CompanyNafCode ALTER COLUMN companynafcode_domain_id SET NOT NULL;
+ALTER TABLE Company ALTER COLUMN company_domain_id SET NOT NULL;
+ALTER TABLE Company ALTER COLUMN company_datasource_id SET default NULL;
+ALTER TABLE Contact ALTER COLUMN contact_domain_id SET NOT NULL;
+ALTER TABLE Contact ALTER COLUMN contact_datasource_id SET default NULL;
+ALTER TABLE Kind ALTER COLUMN kind_domain_id SET NOT NULL;
+ALTER TABLE ContactFunction ALTER COLUMN contactfunction_domain_id SET NOT NULL;
+ALTER TABLE LeadSource ALTER COLUMN leadsource_domain_id SET NOT NULL;
+ALTER TABLE LeadStatus ALTER COLUMN leadstatus_domain_id SET NOT NULL;
+ALTER TABLE Lead ALTER COLUMN lead_domain_id SET NOT NULL;
+ALTER TABLE Lead ALTER COLUMN lead_source_id SET default NULL;
+ALTER TABLE Lead ALTER COLUMN lead_manager_id SET default NULL;
+ALTER TABLE ParentDeal ALTER COLUMN parentdeal_domain_id SET NOT NULL;
+ALTER TABLE Deal ALTER COLUMN deal_domain_id SET NOT NULL;
+ALTER TABLE DealStatus ALTER COLUMN dealstatus_domain_id SET NOT NULL;
+ALTER TABLE DealType ALTER COLUMN dealtype_domain_id SET NOT NULL;
+ALTER TABLE DealCompanyRole ALTER COLUMN dealcompanyrole_domain_id SET NOT NULL;
+ALTER TABLE List ALTER COLUMN list_domain_id SET NOT NULL;
+ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_domain_id SET NOT NULL;
+ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_category1_id SET default NULL;
+ALTER TABLE CalendarCategory1 ALTER COLUMN calendarcategory1_domain_id SET NOT NULL;
+ALTER TABLE Todo ALTER COLUMN todo_domain_id SET NOT NULL;
+ALTER TABLE Publication ALTER COLUMN publication_domain_id SET NOT NULL;
+ALTER TABLE PublicationType ALTER COLUMN publicationtype_domain_id SET NOT NULL;
+ALTER TABLE Subscription ALTER COLUMN subscription_domain_id SET NOT NULL;
+ALTER TABLE Document ALTER COLUMN document_domain_id SET NOT NULL;
+ALTER TABLE DocumentMimeType ALTER COLUMN documentmimetype_domain_id SET NOT NULL;
+ALTER TABLE Project ALTER COLUMN project_domain_id SET NOT NULL;
+ALTER TABLE ProjectTask ALTER COLUMN projecttask_parenttask_id SET default NULL;
+ALTER TABLE CV ALTER COLUMN cv_domain_id SET NOT NULL;
+ALTER TABLE DefaultOdtTemplate ALTER COLUMN defaultodttemplate_domain_id SET NOT NULL;
+ALTER TABLE TaskType ALTER COLUMN tasktype_domain_id SET NOT NULL;
+ALTER TABLE Contract ALTER COLUMN contract_domain_id SET NOT NULL;
+ALTER TABLE ContractType ALTER COLUMN contracttype_domain_id SET NOT NULL;
+ALTER TABLE ContractPriority ALTER COLUMN contractpriority_domain_id SET NOT NULL;
+ALTER TABLE ContractStatus ALTER COLUMN contractstatus_domain_id SET NOT NULL;
+ALTER TABLE Incident ALTER COLUMN incident_domain_id SET NOT NULL;
+ALTER TABLE Incident ALTER COLUMN incident_priority_id SET default NULL;
+ALTER TABLE Incident ALTER COLUMN incident_status_id SET default NULL;
+ALTER TABLE Incident ALTER COLUMN incident_resolutiontype_id SET default NULL;
+ALTER TABLE IncidentPriority ALTER COLUMN incidentpriority_domain_id SET NOT NULL;
+ALTER TABLE IncidentStatus ALTER COLUMN incidentstatus_domain_id SET NOT NULL;
+ALTER TABLE IncidentResolutionType ALTER COLUMN incidentresolutiontype_domain_id SET NOT NULL;
+ALTER TABLE Payment ALTER COLUMN payment_domain_id SET NOT NULL;
+ALTER TABLE PaymentKind ALTER COLUMN paymentkind_domain_id SET NOT NULL;
+ALTER TABLE Account ALTER COLUMN account_domain_id SET NOT NULL;
+ALTER TABLE UGroup ALTER COLUMN group_domain_id SET NOT NULL;
+ALTER TABLE OrganizationalChart ALTER COLUMN organizationalchart_domain_id SET NOT NULL;
+ALTER TABLE OGroup ALTER COLUMN ogroup_domain_id SET NOT NULL;
+ALTER TABLE OGroupEntity ALTER COLUMN ogroupentity_domain_id SET NOT NULL;
+ALTER TABLE Import ALTER COLUMN import_domain_id SET NOT NULL;
+ALTER TABLE Import ALTER COLUMN import_datasource_id SET default NULL;
+ALTER TABLE Resource ALTER COLUMN resource_domain_id SET NOT NULL;
+ALTER TABLE RGroup ALTER COLUMN rgroup_domain_id SET NOT NULL;
+ALTER TABLE Host ALTER COLUMN host_domain_id SET NOT NULL;
+ALTER TABLE Samba ALTER COLUMN samba_domain_id SET NOT NULL;
+ALTER TABLE MailShare ALTER COLUMN mailshare_domain_id SET NOT NULL;
+ALTER TABLE MailShare ALTER COLUMN mailshare_mail_server_id SET default NULL;
 ALTER TABLE deal ALTER COLUMN deal_region_id DROP DEFAULT;
 ALTER TABLE deal ALTER COLUMN deal_region_id DROP NOT NULL;
 ALTER TABLE deal ALTER COLUMN deal_region_id SET DEFAULT NULL;
@@ -26,43 +100,35 @@ ALTER TABLE deal ALTER COLUMN deal_source_id SET DEFAULT NULL;
 ALTER TABLE dealcompany ALTER COLUMN dealcompany_role_id DROP DEFAULT;
 ALTER TABLE dealcompany ALTER COLUMN dealcompany_role_id DROP NOT NULL;
 ALTER TABLE dealcompany ALTER COLUMN dealcompany_role_id SET DEFAULT NULL;
--- Contract
 ALTER TABLE contract ALTER COLUMN contract_priority_id DROP DEFAULT;
 ALTER TABLE contract ALTER COLUMN contract_priority_id DROP NOT NULL;
 ALTER TABLE contract ALTER COLUMN contract_priority_id SET DEFAULT NULL;
 ALTER TABLE contract ALTER COLUMN contract_status_id DROP DEFAULT;
 ALTER TABLE contract ALTER COLUMN contract_status_id DROP NOT NULL;
 ALTER TABLE contract ALTER COLUMN contract_status_id SET DEFAULT NULL;
--- Document
 ALTER TABLE document ALTER COLUMN document_mimetype_id DROP DEFAULT;
 ALTER TABLE document ALTER COLUMN document_mimetype_id DROP NOT NULL;
 ALTER TABLE document ALTER COLUMN document_mimetype_id SET DEFAULT NULL;
--- Lead
 ALTER TABLE lead ALTER COLUMN lead_contact_id DROP DEFAULT;
 ALTER TABLE lead ALTER COLUMN lead_contact_id DROP NOT NULL;
 ALTER TABLE lead ALTER COLUMN lead_contact_id SET DEFAULT NULL;
--- Payment
 ALTER TABLE payment ALTER COLUMN payment_company_id DROP DEFAULT;
 ALTER TABLE payment ALTER COLUMN payment_company_id DROP NOT NULL;
 ALTER TABLE payment ALTER COLUMN payment_company_id SET DEFAULT NULL;
 ALTER TABLE payment ALTER COLUMN payment_paymentkind_id DROP DEFAULT;
 ALTER TABLE payment ALTER COLUMN payment_paymentkind_id DROP NOT NULL;
 ALTER TABLE payment ALTER COLUMN payment_paymentkind_id SET DEFAULT NULL;
--- Project
 ALTER TABLE projectclosing ALTER COLUMN projectclosing_usercreate DROP DEFAULT;
 ALTER TABLE projectclosing ALTER COLUMN projectclosing_usercreate DROP NOT NULL;
 ALTER TABLE projectclosing ALTER COLUMN projectclosing_usercreate SET DEFAULT NULL;
--- Subscription
 ALTER TABLE subscription ALTER COLUMN subscription_reception_id DROP DEFAULT;
 ALTER TABLE subscription ALTER COLUMN subscription_reception_id DROP NOT NULL;
 ALTER TABLE subscription ALTER COLUMN subscription_reception_id SET DEFAULT NULL;
--- User
-ALTER TABLE UserObm ALTER COLUMN userobm_host_id DROP DEFAULT;
-ALTER TABLE UserObm ALTER COLUMN userobm_host_id SET DEFAULT NULL;
+ALTER TABLE userobm ALTER COLUMN userobm_host_id DROP DEFAULT;
+ALTER TABLE userobm ALTER COLUMN userobm_host_id SET DEFAULT NULL;
 ALTER TABLE displaypref ALTER COLUMN display_user_id DROP DEFAULT;
 ALTER TABLE displaypref ALTER COLUMN display_user_id DROP NOT NULL;
 ALTER TABLE displaypref ALTER COLUMN display_user_id SET DEFAULT NULL;
--- Group
 ALTER TABLE UGroup ALTER COLUMN group_manager_id DROP DEFAULT;
 ALTER TABLE UGroup ALTER COLUMN group_manager_id SET DEFAULT NULL;
 

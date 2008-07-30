@@ -3,13 +3,128 @@
 --
 -- Domain
 ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
+-- Global Domain
+INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virtual', TRUE);
+UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
+UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
 -- CalendarEvent
 ALTER TABLE CalendarEvent MODIFY COLUMN calendarevent_allday BOOLEAN DEFAULT FALSE;
 ALTER TABLE EventEntity MODIFY COLUMN evententity_required BOOLEAN DEFAULT FALSE;
 
--- NOT NULL to NULL Convertion
+-- Preferences
+ALTER TABLE DisplayPref DROP PRIMARY KEY;
+ALTER TABLE DisplayPref ADD CONSTRAINT displaypref_key  UNIQUE (display_user_id, display_entity, display_fieldname);
+ALTER TABLE DisplayPref ADD COLUMN display_id int(8) auto_increment PRIMARY KEY FIRST;
 
+-- Set Defaults 
+ALTER TABLE Account MODIFY COLUMN account_domain_id int(8) NOT NULL ;
+ALTER TABLE CV MODIFY COLUMN cv_domain_id int(8) NOT NULL ;
+ALTER TABLE CalendarCategory1 MODIFY COLUMN calendarcategory1_domain_id int(8) NOT NULL ;
+ALTER TABLE CalendarEvent MODIFY COLUMN calendarevent_domain_id int(8) NOT NULL ;
+ALTER TABLE CalendarEvent MODIFY COLUMN calendarevent_category1_id int(8)  default NULL;
+ALTER TABLE CalendarException MODIFY COLUMN calendarexception_event_id int(8) NOT NULL ;
+ALTER TABLE CategoryLink MODIFY COLUMN categorylink_category_id int(8) NOT NULL ;
+ALTER TABLE CategoryLink MODIFY COLUMN categorylink_entity_id int(8) NOT NULL ;
+ALTER TABLE Company MODIFY COLUMN company_domain_id int(8) NOT NULL ;
+ALTER TABLE Company MODIFY COLUMN company_datasource_id int(8)  default NULL;
+ALTER TABLE CompanyActivity MODIFY COLUMN companyactivity_domain_id int(8) NOT NULL ;
+ALTER TABLE CompanyNafCode MODIFY COLUMN companynafcode_domain_id int(8) NOT NULL ;
+ALTER TABLE CompanyType MODIFY COLUMN companytype_domain_id int(8) NOT NULL ;
+ALTER TABLE Contact MODIFY COLUMN contact_domain_id int(8) NOT NULL ;
+ALTER TABLE Contact MODIFY COLUMN contact_datasource_id int(8)  default NULL;
+ALTER TABLE ContactFunction MODIFY COLUMN contactfunction_domain_id int(8) NOT NULL ;
+ALTER TABLE ContactList MODIFY COLUMN contactlist_list_id int(8) NOT NULL ;
+ALTER TABLE ContactList MODIFY COLUMN contactlist_contact_id int(8) NOT NULL ;
+ALTER TABLE Contract MODIFY COLUMN contract_domain_id int(8) NOT NULL ;
+ALTER TABLE ContractPriority MODIFY COLUMN contractpriority_domain_id int(8) NOT NULL ;
+ALTER TABLE ContractStatus MODIFY COLUMN contractstatus_domain_id int(8) NOT NULL ;
+ALTER TABLE ContractType MODIFY COLUMN contracttype_domain_id int(8) NOT NULL ;
+ALTER TABLE Country MODIFY COLUMN country_domain_id int(8) NOT NULL ;
+ALTER TABLE DataSource MODIFY COLUMN datasource_domain_id int(8) NOT NULL ;
+ALTER TABLE Deal MODIFY COLUMN deal_domain_id int(8) NOT NULL ;
+ALTER TABLE Deal MODIFY COLUMN deal_company_id int(8) NOT NULL ;
+ALTER TABLE DealCompanyRole MODIFY COLUMN dealcompanyrole_domain_id int(8) NOT NULL ;
+ALTER TABLE DealStatus MODIFY COLUMN dealstatus_domain_id int(8) NOT NULL ;
+ALTER TABLE DealType MODIFY COLUMN dealtype_domain_id int(8) NOT NULL ;
+ALTER TABLE DefaultOdtTemplate MODIFY COLUMN defaultodttemplate_domain_id int(8) NOT NULL ;
+ALTER TABLE DeletedContact MODIFY COLUMN deletedcontact_contact_id int(8) NOT NULL ;
+ALTER TABLE DeletedTodo MODIFY COLUMN deletedtodo_todo_id int(8) NOT NULL ;
+ALTER TABLE DeletedUser MODIFY COLUMN deleteduser_user_id int(8) NOT NULL ;
+ALTER TABLE DisplayPref MODIFY COLUMN display_user_id int(8)  default NULL;
+ALTER TABLE Document MODIFY COLUMN document_domain_id int(8) NOT NULL ;
+ALTER TABLE DocumentMimeType MODIFY COLUMN documentmimetype_domain_id int(8) NOT NULL ;
+ALTER TABLE DomainMailServer MODIFY COLUMN domainmailserver_domain_id int(8) NOT NULL ;
+ALTER TABLE EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
+ALTER TABLE EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
+ALTER TABLE EventEntity MODIFY COLUMN evententity_event_id int(8) NOT NULL ;
+ALTER TABLE EventEntity MODIFY COLUMN evententity_entity_id int(8) NOT NULL ;
+ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
+ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_child_id int(8) NOT NULL ;
+ALTER TABLE Host MODIFY COLUMN host_domain_id int(8) NOT NULL ;
+ALTER TABLE `Import` MODIFY COLUMN import_domain_id int(8) NOT NULL ;
+ALTER TABLE `Import` MODIFY COLUMN import_datasource_id int(8)  default NULL;
+ALTER TABLE Incident MODIFY COLUMN incident_domain_id int(8) NOT NULL ;
+ALTER TABLE Incident MODIFY COLUMN incident_priority_id int(8)  default NULL;
+ALTER TABLE Incident MODIFY COLUMN incident_status_id int(8)  default NULL;
+ALTER TABLE Incident MODIFY COLUMN incident_resolutiontype_id int(11)  default NULL;
+ALTER TABLE IncidentPriority MODIFY COLUMN incidentpriority_domain_id int(8) NOT NULL ;
+ALTER TABLE IncidentResolutionType MODIFY COLUMN incidentresolutiontype_domain_id int(8) NOT NULL ;
+ALTER TABLE IncidentStatus MODIFY COLUMN incidentstatus_domain_id int(8) NOT NULL ;
+ALTER TABLE Invoice MODIFY COLUMN invoice_domain_id int(8) NOT NULL ;
+ALTER TABLE Invoice MODIFY COLUMN invoice_status_id int(4) NOT NULL ;
+ALTER TABLE Kind MODIFY COLUMN kind_domain_id int(8) NOT NULL ;
+ALTER TABLE Lead MODIFY COLUMN lead_domain_id int(8) NOT NULL ;
+ALTER TABLE Lead MODIFY COLUMN lead_company_id int(8) NOT NULL ;
+ALTER TABLE LeadSource MODIFY COLUMN leadsource_domain_id int(8) NOT NULL ;
+ALTER TABLE LeadStatus MODIFY COLUMN leadstatus_domain_id int(8) NOT NULL ;
+ALTER TABLE List MODIFY COLUMN list_domain_id int(8) NOT NULL ;
+ALTER TABLE MailServer MODIFY COLUMN mailserver_host_id int(8) NOT NULL ;
+ALTER TABLE MailServerNetwork MODIFY COLUMN mailservernetwork_host_id int(8) NOT NULL ;
+ALTER TABLE MailShare MODIFY COLUMN mailshare_domain_id int(8) NOT NULL ;
+ALTER TABLE MailShare MODIFY COLUMN mailshare_mail_server_id int(8)  default NULL;
+ALTER TABLE OGroup MODIFY COLUMN ogroup_domain_id int(8) NOT NULL ;
+ALTER TABLE OGroupEntity MODIFY COLUMN ogroupentity_domain_id int(8) NOT NULL ;
+ALTER TABLE OrganizationalChart MODIFY COLUMN organizationalchart_domain_id int(8) NOT NULL ;
+ALTER TABLE P_EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
+ALTER TABLE P_EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
+ALTER TABLE P_GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
+ALTER TABLE P_GroupGroup MODIFY COLUMN groupgroup_child_id int(8) NOT NULL ;
+ALTER TABLE P_Host MODIFY COLUMN host_domain_id int(8) NOT NULL ;
+ALTER TABLE P_MailServer MODIFY COLUMN mailserver_host_id int(8) NOT NULL ;
+ALTER TABLE P_MailServerNetwork MODIFY COLUMN mailservernetwork_host_id int(8) NOT NULL ;
+ALTER TABLE P_MailShare MODIFY COLUMN mailshare_domain_id int(8) NOT NULL ;
+ALTER TABLE P_MailShare MODIFY COLUMN mailshare_mail_server_id int(8)  default NULL;
+ALTER TABLE P_Samba MODIFY COLUMN samba_domain_id int(8) NOT NULL ;
+ALTER TABLE P_UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
+ALTER TABLE P_UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
+ALTER TABLE P_UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
+ALTER TABLE P_of_usergroup MODIFY COLUMN of_usergroup_group_id int(8) NOT NULL ;
+ALTER TABLE P_of_usergroup MODIFY COLUMN of_usergroup_user_id int(8) NOT NULL ;
+ALTER TABLE ParentDeal MODIFY COLUMN parentdeal_domain_id int(8) NOT NULL ;
+ALTER TABLE Payment MODIFY COLUMN payment_domain_id int(8) NOT NULL ;
+ALTER TABLE PaymentKind MODIFY COLUMN paymentkind_domain_id int(8) NOT NULL ;
+ALTER TABLE Project MODIFY COLUMN project_domain_id int(8) NOT NULL ;
+ALTER TABLE ProjectTask MODIFY COLUMN projecttask_parenttask_id int(8)  default NULL;
+ALTER TABLE Publication MODIFY COLUMN publication_domain_id int(8) NOT NULL ;
+ALTER TABLE PublicationType MODIFY COLUMN publicationtype_domain_id int(8) NOT NULL ;
+ALTER TABLE RGroup MODIFY COLUMN rgroup_domain_id int(8) NOT NULL ;
+ALTER TABLE Region MODIFY COLUMN region_domain_id int(8) NOT NULL ;
+ALTER TABLE Resource MODIFY COLUMN resource_domain_id int(8) NOT NULL ;
+ALTER TABLE ResourceGroup MODIFY COLUMN resourcegroup_rgroup_id int(8) NOT NULL ;
+ALTER TABLE ResourceGroup MODIFY COLUMN resourcegroup_resource_id int(8) NOT NULL ;
+ALTER TABLE ResourceItem MODIFY COLUMN resourceitem_domain_id int(8) NOT NULL ;
+ALTER TABLE ResourceType MODIFY COLUMN resourcetype_domain_id int(8) NOT NULL ;
+ALTER TABLE Samba MODIFY COLUMN samba_domain_id int(8) NOT NULL ;
+ALTER TABLE Subscription MODIFY COLUMN subscription_domain_id int(8) NOT NULL ;
+ALTER TABLE SubscriptionReception MODIFY COLUMN subscriptionreception_domain_id int(8) NOT NULL ;
+ALTER TABLE TaskType MODIFY COLUMN tasktype_domain_id int(8) NOT NULL ;
+ALTER TABLE Todo MODIFY COLUMN todo_domain_id int(8) NOT NULL ;
+ALTER TABLE UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
+ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
+ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
+ALTER TABLE of_usergroup MODIFY COLUMN of_usergroup_group_id int(8) NOT NULL ;
+ALTER TABLE of_usergroup MODIFY COLUMN of_usergroup_user_id int(8) NOT NULL ;
 ALTER TABLE Category MODIFY COLUMN category_usercreate int(8) DEFAULT NULL;
 ALTER TABLE Category MODIFY COLUMN category_userupdate int(8) DEFAULT NULL;
 ALTER TABLE Deal MODIFY COLUMN deal_region_id int(8) DEFAULT NULL;
@@ -26,6 +141,7 @@ ALTER TABLE ProjectClosing MODIFY COLUMN projectclosing_usercreate int(8) DEFAUL
 ALTER TABLE Subscription MODIFY COLUMN subscription_reception_id int(8) DEFAULT NULL;
 ALTER TABLE UserObm MODIFY COLUMN userobm_host_id int(8) DEFAULT NULL;
 ALTER TABLE UGroup MODIFY COLUMN group_manager_id int(8) DEFAULT NULL;
+
 --
 -- Prepare value for foreign keys
 --
