@@ -2347,7 +2347,7 @@ CREATE TABLE Resource (
   PRIMARY KEY  (resource_id),
   UNIQUE KEY k_label_resource (resource_name),
   KEY resource_domain_id_domain_id_fkey (resource_domain_id),
-  CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain (domain_id) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -2395,7 +2395,7 @@ CREATE TABLE ResourceType (
   resourcetype_pkind int(1) NOT NULL default '0',
   PRIMARY KEY  (resourcetype_id),
   KEY resourcetype_domain_id_domain_id_fkey (resourcetype_domain_id),
-  CONSTRAINT resourcetype_domain_id_domain_id_fkey FOREIGN KEY (resourcetype_domain_id) REFERENCES Domain (domain_id) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT resourcetype_domain_id_domain_id_fkey FOREIGN KEY (resourcetype_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
