@@ -1198,8 +1198,20 @@ UPDATE Region SET region_usercreate = NULL WHERE region_usercreate NOT IN (SELEC
 ALTER TABLE Region ADD CONSTRAINT region_usercreate_userobm_id_fkey FOREIGN KEY (region_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from resource_domain_id to domain_id
-UPDATE Resource SET resource_domain_id = NULL WHERE resource_domain_id NOT IN (SELECT domain_id FROM Domain) AND resource_domain_id IS NOT NULL;
-ALTER TABLE Resource ADD CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE SET NULL;
+DELETE FROM Resource WHERE resource_domain_id NOT IN (SELECT domain_id FROM Domain) AND resource_domain_id IS NOT NULL;
+ALTER TABLE Resource ADD CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from resource_userupdate to userobm_id
+UPDATE Resource SET resource_usercreate = NULL WHERE resource_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND resource_usercreate IS NOT NULL;
+ALTER TABLE Resource ADD CONSTRAINT resource_userupdate_userobm_id_fkey FOREIGN KEY (resource_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+
+-- Foreign key from resource_usercreate to userobm_id
+UPDATE Resource SET resource_usercreate = NULL WHERE resource_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND resource_usercreate IS NOT NULL;
+ALTER TABLE Resource ADD CONSTRAINT resource_usercreate_userobm_id_fkey FOREIGN KEY (resource_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+
+-- Foreign key from resource_rtype_id to resourcetype_id
+UPDATE Resource SET resource_rtype_id = NULL WHERE resource_rtype_id NOT IN (SELECT resourcetype_id FROM ResourceType) AND resource_rtype_id IS NOT NULL;
+ALTER TABLE Resource ADD CONSTRAINT resource_rtype_id_resourcetype_id_fkey FOREIGN KEY (resource_rtype_id) REFERENCES ResourceType (resourcetype_id) ON DELETE SET NULL ON UPDATE CASCADE
 
 -- Foreign key from resourcegroup_rgroup_id to rgroup_id
 DELETE FROM ResourceGroup WHERE resourcegroup_rgroup_id NOT IN (SELECT rgroup_id FROM RGroup) AND resourcegroup_rgroup_id IS NOT NULL;
@@ -1219,7 +1231,7 @@ ALTER TABLE ResourceItem ADD CONSTRAINT resourceitem_resourcetype_id_resourcetyp
 
 -- Foreign key from resourcetype_domain_id to domain_id
 UPDATE ResourceType SET resourcetype_domain_id = NULL WHERE resourcetype_domain_id NOT IN (SELECT domain_id FROM Domain) AND resourcetype_domain_id IS NOT NULL;
-ALTER TABLE ResourceType ADD CONSTRAINT resourcetype_domain_id_domain_id_fkey FOREIGN KEY (resourcetype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ResourceType ADD CONSTRAINT resourcetype_domain_id_domain_id_fkey FOREIGN KEY (resourcetype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from samba_domain_id to domain_id
 DELETE FROM Samba WHERE samba_domain_id NOT IN (SELECT domain_id FROM Domain) AND samba_domain_id IS NOT NULL;

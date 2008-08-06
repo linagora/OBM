@@ -2711,7 +2711,16 @@ ALTER TABLE Region ADD CONSTRAINT region_userupdate_userobm_id_fkey FOREIGN KEY 
 ALTER TABLE Region ADD CONSTRAINT region_usercreate_userobm_id_fkey FOREIGN KEY (region_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from resource_domain_id to domain_id
-ALTER TABLE Resource ADD CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE Resource ADD CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+
+-- Foreign key from resource_userupdate to userobm_id
+ALTER TABLE Resource ADD CONSTRAINT resource_userupdate_userobm_id_fkey FOREIGN KEY (resource_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+
+-- Foreign key from resource_usercreate to userobm_id
+ALTER TABLE Resource ADD CONSTRAINT resource_usercreate_userobm_id_fkey FOREIGN KEY (resource_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+
+-- Foreign key from resource_rtype_id to resourcetype_id
+ALTER TABLE Resource ADD CONSTRAINT resource_rtype_id_resourcetype_id_fkey FOREIGN KEY (resource_rtype_id) REFERENCES ResourceType (resourcetype_id) ON DELETE SET NULL ON UPDATE CASCADE
 
 -- Foreign key from resourcegroup_rgroup_id to rgroup_id
 ALTER TABLE ResourceGroup ADD CONSTRAINT resourcegroup_rgroup_id_rgroup_id_fkey FOREIGN KEY (resourcegroup_rgroup_id) REFERENCES RGroup(rgroup_id) ON UPDATE CASCADE ON DELETE CASCADE;

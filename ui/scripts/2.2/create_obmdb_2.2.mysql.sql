@@ -2347,7 +2347,11 @@ CREATE TABLE Resource (
   PRIMARY KEY  (resource_id),
   UNIQUE KEY k_label_resource (resource_name),
   KEY resource_domain_id_domain_id_fkey (resource_domain_id),
-  CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT resource_userupdate_userobm_id_fkey FOREIGN KEY (resource_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT resource_usercreate_userobm_id_fkey FOREIGN KEY (resource_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT resource_rtype_id_resourcetype_id_fkey FOREIGN KEY (resource_rtype_id) REFERENCES ResourceType (resourcetype_id) ON DELETE SET NULL ON UPDATE CASCADE
+
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

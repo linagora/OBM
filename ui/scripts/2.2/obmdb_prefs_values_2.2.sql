@@ -29,10 +29,10 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_display','no');
 
 -- # Rows displayed in a result page
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_rows','2NULL');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_rows','20');
 
 -- Default Data Source
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_dsrc','NULL');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_dsrc','0');
 
 -- Date Input
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_date_upd','m/d/Y');
@@ -41,7 +41,7 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_date','Y-m-d');
 
 -- Comment display order
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_commentorder','NULL');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_commentorder','0');
 
 -- Calendar Interval
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_cal_interval','2');
@@ -50,7 +50,7 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_csv_sep',';');
 
 -- Debug Level
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_debug','NULL');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_debug','0');
 
 -- Mail enabled
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_mail','yes');
@@ -62,7 +62,7 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_cal_first_hour','8');
 
 -- Calendar last hour
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_cal_last_hour','2NULL');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_cal_last_hour','20');
 
 -- Todo sort order
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_todo','todo_priority');
