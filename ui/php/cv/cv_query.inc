@@ -121,13 +121,14 @@ CV detail query execution
 function run_query_cv_detail($id) {
   global $cdg_sql;  
 
+  $id = sql_parse_id($id, true);
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $timeupdate = sql_date_format($db_type, "cv_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "cv_timecreate", "timecreate");
 
   $multidomain = sql_multidomain("cv"); 
-  $query = "SELECT * FROM CV WHERE cv_id = '$id' $multidomain";
+  $query = "SELECT * FROM CV WHERE cv_id $id $multidomain";
 
   /*SELECT *,
       p.userobm_lastname as lastname,
@@ -166,7 +167,7 @@ function run_query_cv_refs_detail($id) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-
+  $id = sql_parse_id($id, true);
   // order
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "project_name";
 
@@ -180,7 +181,7 @@ function run_query_cv_refs_detail($id) {
   FROM CV
     JOIN ProjectCV ON cv_id=projectcv_cv_id
     JOIN Project ON projectcv_project_id=project_id
-  WHERE cv_id = '$id'
+  WHERE cv_id $id 
     $multidomain
   $order_q";
 
@@ -201,9 +202,9 @@ function run_query_cv_insert($cv) {
 
   // CV insertion
   
-  $uid = $obm["uid"];
+  $uid = sql_parse_id($obm["uid"]);
   $title = $cv["title"];
-  $user_id = $cv["user_id"];
+  $user_id = sql_parse_id($cv["user_id"]);
   $additionalrefs = $cv["additionalrefs"];
   $comment = $cv["comment"];
   $timecreate = date("Y-m-d H:i:s");
@@ -221,10 +222,10 @@ function run_query_cv_insert($cv) {
     VALUES (
       null,
       '$timecreate', 
-      '$uid',
-      '$uid',
+      $uid,
+      $uid,
       '$title',
-      '$user_id',
+      $user_id,
       '$additionalrefs',
       '$comment',
       $obm[domain_id]
@@ -265,14 +266,16 @@ function run_query_cv_insert($cv) {
 */
 function run_query_cv_insert_projectcv($project_id, $cv_id, $role) {
   global $cdg_sql;
+  $project_id = sql_parse_id($project_id);
+  $cv_id = sql_parse_id($cv_id);
 
   $query = "INSERT INTO ProjectCV
      (projectcv_project_id,
       projectcv_cv_id,
       projectcv_role)
     VALUES (
-      '$project_id',
-      '$cv_id', 
+      $project_id,
+      $cv_id, 
       '$role')";
 
   display_debug_msg($query, $cdg_sql, "run_query_cv_insert_projectcv()");
@@ -291,21 +294,21 @@ function run_query_cv_insert_projectcv($project_id, $cv_id, $role) {
 function run_query_cv_update($cv) {
   global $obm, $cdg_sql, $ccf_ticket, $ccf_duration;
 
-  $id = $cv["cv_id"];
-  $uid = $obm["uid"];
+  $id = sql_parse_id($cv["cv_id"], true);
+  $uid = sql_parse_id($obm["uid"]);
   $title = $cv["title"];
-  $user_id = $cv["user_id"];
+  $user_id = sql_parse_id($cv["user_id"]);
   $additionalrefs = $cv["additionalrefs"];
   $comment = $cv["comment"];
   $multidomain = sql_multidomain("cv"); 
   
   $query = "UPDATE CV SET
       cv_timeupdate = '". date("Y-m-d H:i:s")."',
-      cv_userupdate = '$uid',
+      cv_userupdate = $uid,
       cv_title = '$title',
       cv_additionnalrefs = '$additionalrefs',
       cv_comment = '$comment'
-    WHERE cv_id = '$id'
+    WHERE cv_id = $id
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_cv_update(1)");
@@ -339,14 +342,14 @@ function run_query_cv_delete($p_id) {
   global $cdg_sql;
   
   $obm_q = new DB_OBM;
-  
+  $p_id = sql_parse_id($p_id, true); 
   // delete the projectcv
-  $query = "DELETE FROM ProjectCV WHERE projectcv_cv_id='$p_id'";
+  $query = "DELETE FROM ProjectCV WHERE projectcv_cv_id $p_id"; 
   display_debug_msg($query, $cdg_sql, "run_query_cv_delete(1)");
   $ret = $obm_q->query($query);
   
   // delete the CV
-  $query = "DELETE FROM CV WHERE cv_id='$p_id'";
+  $query = "DELETE FROM CV WHERE cv_id $p_id"; 
   display_debug_msg($query, $cdg_sql, "run_query_cv_delete(2)");
   $ret = $obm_q->query($query);
 
@@ -364,8 +367,9 @@ function run_query_cv_delete($p_id) {
 function run_query_cv_id($cv, $timecreate, $uid) {
   global $cdg_sql;
 
+  $uid = sql_parse_id($uid, true);
   $title = $cv["title"];
-  $user_id = $cv["user_id"];
+  $user_id = sql_parse_id($cv["user_id"], true);
   $additionalrefs = $cv["additionalrefs"];
   $comment = $cv["comment"];
 
@@ -375,9 +379,9 @@ function run_query_cv_id($cv, $timecreate, $uid) {
       cv_id
     FROM CV
     WHERE cv_title = '$title'
-      AND cv_userobm_id = '$user_id'
+      AND cv_userobm_id $user_id 
       AND cv_timecreate = '$timecreate'
-      AND cv_usercreate = '$uid'
+      AND cv_usercreate $uid 
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_cv_id()");
@@ -440,7 +444,7 @@ function run_query_user_detail($user_id){
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  
+  $user_id = sql_parse_id($user_id, true); 
   $multidomain = sql_multidomain("userobm"); 
   $query = "SELECT
     userobm_login,
@@ -450,7 +454,7 @@ function run_query_user_detail($user_id){
     userobm_phone,
     userobm_education
   FROM UserObm
-  WHERE userobm_id='$user_id'
+  WHERE userobm_id $user_id 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_user_detail()");
@@ -471,7 +475,7 @@ function run_query_defaultodttemplate_insert($cv) {
   global $obm, $cdg_sql;
 
   $entity = "cv";
-  $document_id = $cv["defaultodttemplate_document_id"];
+  $document_id = sql_parse_id($cv["defaultodttemplate_document_id"]);
   $label = $cv["defaultodttemplate_label"];
 
   $query = "INSERT INTO DefaultOdtTemplate (
@@ -481,9 +485,9 @@ function run_query_defaultodttemplate_insert($cv) {
     defaultodttemplate_domain_id
   ) VALUES (
     '$entity',
-    '$document_id',
+    $document_id,
     '$label',
-    '$obm[domain_id]')";
+    $obm[domain_id])";
 
   display_debug_msg($query, $cdg_sql, "run_query_defaultodttemplate_insert()");
   $obm_q = new DB_OBM;
@@ -501,13 +505,13 @@ function run_query_defaultodttemplate_update($cv) {
   global $cdg_sql;
 
   $label = $cv["defaultodttemplate_label"];
-  $id = $cv["defaultodttemplate"];
+  $id = sql_parse_id($cv["defaultodttemplate"], true);
   $multidomain = sql_multidomain("defaultodttemplate");
 
   $query = "UPDATE DefaultOdtTemplate SET
       defaultodttemplate_label='$label'
     WHERE
-      defaultodttemplate_id='$id'
+      defaultodttemplate_id $id 
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_defaultodttemplate_update()");
@@ -525,10 +529,11 @@ function run_query_defaultodttemplate_update($cv) {
 function run_query_defaultodttemplate_delete($id) {
   global $cdg_sql;
 
+  $id = sql_parse_id($id, true);
   $multidomain = sql_multidomain("defaultodttemplate");
   $query = "DELETE
     FROM DefaultOdtTemplate
-    WHERE defaultodttemplate_id='$id'
+    WHERE defaultodttemplate_id $id 
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_defaultodttemplate_delete()");

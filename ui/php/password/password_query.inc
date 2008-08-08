@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_password($u_id) {
   global $cdg_sql;
-
+  $u_id = sql_parse_id($u_id, true);
   $query = "SELECT userobm_id,
       userobm_domain_id,
       userobm_login,
@@ -23,7 +23,7 @@ function run_query_password($u_id) {
       userobm_password_type,
       userobm_samba_perms
     FROM UserObm
-    WHERE userobm_id='$u_id'";
+    WHERE userobm_id $u_id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_password()');
   $obm_q = new DB_OBM;
@@ -51,7 +51,8 @@ function run_query_password_update($password, $uid, $usr_q) {
   $domain_id = $usr_q->f('userobm_domain_id');
   $samba_perms = $usr_q->f('userobm_samba_perms');
   $new_pass = stripslashes(trim($password['new_password']));
-
+  $did = sql_parse_id($domain_id, true);
+  $uid = sql_parse_id($uid, true);
   if ($password_encryption == 'CRYPT') {
     $new_passwd_crypt = crypt($new_pass);
   } else if ($password_encryption == 'MD5SUM') {
@@ -67,7 +68,7 @@ function run_query_password_update($password, $uid, $usr_q) {
   $query = "UPDATE UserObm SET
     userobm_password='$new_passwd_crypt',
     userobm_password_type='$password_encryption'
-  WHERE userobm_id = '$uid'";
+  WHERE userobm_id $uid ";
 
   display_debug_msg("DB_OBM : $query", $cdg_sql, 'run_query_password_update()');
   // Update database update
@@ -76,7 +77,7 @@ function run_query_password_update($password, $uid, $usr_q) {
 
   // Update 'P_UserObm' ands system ONLY if the user already exist in
   // 'P_UserObm'
-  $query = "SELECT count(*) AS nb_user FROM P_UserObm WHERE userobm_login='".$login."' AND userobm_domain_id='".$domain_id."'";
+  $query = "SELECT count(*) AS nb_user FROM P_UserObm WHERE userobm_login='".$login."' AND userobm_domain_id $domain_id";
   $error = $usr_q->query($query);
   $usr_q->next_record();
 
@@ -85,7 +86,7 @@ function run_query_password_update($password, $uid, $usr_q) {
     $query = "UPDATE P_UserObm SET
       userobm_password='$new_passwd_crypt',
       userobm_password_type='$password_encryption'
-    WHERE userobm_id = '$uid'";
+    WHERE userobm_id $uid ";
 
     $retour = $usr_q->query($query);
 

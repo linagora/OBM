@@ -61,12 +61,14 @@ function run_query_invoice_search ($invoice) {
     $where .= ' AND (';
     $or = '';
     foreach ($status as $s_id) {
-      $where .= "$or invoice_status_id='$s_id'";
+      $s_id = sql_parse_id($s_id, true);
+      $where .= "$or invoice_status_id $s_id ";
       $or = ' OR';
     }
     $where .= ')';
   } else if (($status != '') && ($status != "$c_all")) {
-    $where .= " AND invoice_status_id = '$status'";
+    $status = sql_parse_id($status, true);
+    $where .= " AND invoice_status_id $status ";
   }
   if ($date_after != '') {
     $where .= " AND invoice_$date_field >= '$date_after'";
@@ -81,25 +83,29 @@ function run_query_invoice_search ($invoice) {
     $where .= " AND invoice_credit_memo = '$credit_memo'";
   }
   if ($comp_id != '') {
-    $where .= " AND invoice_company_id = '$comp_id'";
+    $comp_id = sql_parse_id($comp_id, true);
+    $where .= " AND invoice_company_id $comp_id ";
   }
   if ($company != '') {
     $where .= sql_global_company_name_advanced_search($company, $like);
     $join_comp = "LEFT JOIN Company ON invoice_company_id=company_id";
   }
   if ($deal_id != '') {
-    $where .= " AND (invoice_deal_id = '$deal_id'
-                     OR project_deal_id = '$deal_id')";
+    $deal_id = sql_parse_id($deal_id, true);
+    $where .= " AND (invoice_deal_id $deal_id 
+                     OR project_deal_id $deal_id )";
     $join_project = "LEFT JOIN Project ON invoice_project_id=project_id";
   }
   if ($project_new_id != '') {
-    $where .= " AND invoice_project_id = '$project_new_id'";
+    $project_new_id = sql_parse_id($project_new_id, true);
+    $where .= " AND invoice_project_id $project_new_id ";
   }
   if (is_array($sel_tt)) {
     $where .= ' AND (';
     $or = '';
     foreach ($sel_tt as $tt_id) {
-      $where .= "$or project_tasktype_id='$tt_id' OR deal_tasktype_id='$tt_id'";
+      $tt_id = sql_parse_id($tt_id, true);
+      $where .= "$or project_tasktype_id $tt_id OR deal_tasktype_id $tt_id ";
       $or = ' OR';
     }
     $where .= ')';
@@ -107,9 +113,9 @@ function run_query_invoice_search ($invoice) {
     $join_deal = "LEFT JOIN Deal ON invoice_deal_id=deal_id";
   }
   if ($archive != '1') {
-    $where .= " AND invoice_archive = '0'";
+    $where .= " AND invoice_archive = 0";
   } elseif($cgp_archive_only) {
-    $where .= " AND invoice_archive = '1'";
+    $where .= " AND invoice_archive = 1";
   }
   $whereq = "WHERE $where";
 
@@ -167,7 +173,7 @@ function run_query_invoice_detail($p_invoice_id) {
   $timeupdate = sql_date_format($db_type, 'invoice_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'invoice_timecreate', 'timecreate');
   $multidomain = sql_multidomain('invoice');
-	
+  $p_invoice_id = sql_parse_id($p_invoice_id, true);	
   // XXXXX ???? exporter le calcul des paiements a par (pour eviter group by)
   $query = "SELECT Invoice.*,
       $date,
@@ -189,7 +195,7 @@ function run_query_invoice_detail($p_invoice_id) {
       LEFT OUTER join PaymentInvoice ON invoice_id=paymentinvoice_invoice_id
       LEFT JOIN UserObm as c ON invoice_usercreate=c.userobm_id
       LEFT JOIN UserObm as u ON invoice_userupdate=u.userobm_id
-    WHERE invoice_id='$p_invoice_id' $multidomain
+    WHERE invoice_id $p_invoice_id $multidomain
     GROUP BY Invoice.invoice_id, invoice_timeupdate, invoice_timecreate,
       invoice_userupdate, invoice_usercreate, invoice_company_id,
       invoice_deal_id, invoice_project_id, invoice_number, invoice_label,
@@ -213,14 +219,14 @@ function run_query_invoice_insert($invoice) {
   global $cdg_sql, $obm;
 
   $now = date('Y-m-d H:i:s');
-  $uid = $obm['uid'];
-  $domain_id = $obm['domain_id'];
+  $uid = sql_parse_id($obm['uid']);
+  $domain_id = sql_parse_id($obm['domain_id']);
 	
   $label = $invoice['label'];
   $number = $invoice['number'];
   $ht = $invoice['amount_ht'];
   $ttc = $invoice['amount_ttc'];
-  $status = $invoice['status'];
+  $status = sql_parse_id($invoice['status']);
   $date = ($invoice['date'] ? "'".of_isodate_convert($invoice['date'])."'" : 'null');
   $expiration_date = ($invoice['expiration_date'] ? "'".of_isodate_convert($invoice['expiration_date'])."'" : 'null');
   $payment_date = ($invoice['payment_date'] ? "'".of_isodate_convert($invoice['payment_date'])."'" : 'null');
@@ -235,17 +241,17 @@ function run_query_invoice_insert($invoice) {
   $comp_id = $invoice['company_new_id'];
   if ($comp_id < 1) { $comp_id = $invoice['company_id']; }
   if ($comp_id == '') { $comp_id = '0'; }
+  $comp_id = sql_parse_id($comp_id);
   $deal_id = $invoice['deal_new_id'];
   if ($deal_id < 1) { $deal_id = $invoice['deal_id']; }
   if ($deal_id == '') { $deal_id = '0'; }
+  $deal_id = sql_parse_id($deal_id);
   $project_new_id = $invoice['project_new_id'];
   if ($project_new_id < 1) { $project_new_id = $invoice['project_id']; }
   if ($project_new_id == '') { $project_new_id = '0'; }
-
-  if ($status == ''){
-    $status = '0';
-  }
-  $arch = ($invoice['archive'] == '1' ? '1' : '0');
+  $project_new_id = sql_parse_id($project_new_id);
+  $status = sql_parse_id($status);
+  $arch = sql_parse_int($invoice['archive']);
 
   $query = "INSERT INTO Invoice (
       invoice_domain_id,
@@ -269,26 +275,26 @@ function run_query_invoice_insert($invoice) {
       invoice_credit_memo,
       invoice_archive)
     VALUES (
-     '$domain_id',
+     $domain_id,
       null,
      '$now',
      null,
-     '$uid',
-     '$comp_id',
-     '$deal_id',
-     '$project_new_id',
+     $uid,
+     $comp_id,
+     $deal_id,
+     $project_new_id,
      '$number',
      '$label',
      '$ht', 
      '$ttc',
-     '$status',
+     $status,
      '$comment',
      $date,
      $expiration_date,
      $payment_date,
      '$inout',
      '$credit_memo',
-     '$arch')"; 
+     $arch)"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_invoice_insert()');
   $obm_q = new DB_OBM;
@@ -305,23 +311,20 @@ function run_query_invoice_update($invoice) {
   global $obm, $cdg_sql;
 
   $now = date('Y-m-d H:i:s');
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
 
-  $id = $invoice['invoice_id'];
+  $id = sql_parse_id($invoice['invoice_id'], true);
   $label = $invoice['label'];
   $number = $invoice['number'];
-  $arch = ($invoice['archive'] == '1' ? '1' : '0');
+  $arch = sql_parse_int($invoice['archive']);
   $ht = $invoice['amount_ht'];
   $ttc = $invoice['amount_ttc'];
-  $status = $invoice['status'];
+  $status = sql_parse_id($invoice['status'], true);
   $date = ($invoice['date'] ? "'".of_isodate_convert($invoice['date'])."'" : 'null');
   $expiration_date = ($invoice['expiration_date'] ? "'".of_isodate_convert($invoice['expiration_date'])."'" : 'null');
   $payment_date = ($invoice['payment_date'] ? "'".of_isodate_convert($invoice['payment_date'])."'" : 'null');
   $inout = $invoice['inout'];
   $credit_memo = $invoice['credit_memo'];
-  if ($status == ''){
-    $status = '0';
-  }
   $comment = $invoice['comment'];
   $add_comment = $invoice['add_comment'];
   if ($add_comment != '') {
@@ -332,26 +335,28 @@ function run_query_invoice_update($invoice) {
   $comp_id = $invoice['company_new_id'];
   if ($comp_id < 1) { $comp_id = $invoice['company_id']; }
   if ($comp_id == '') { $comp_id = '0'; }
+  $comp_id = sql_parse_id($comp_id);
   $deal_id = $invoice['deal_new_id'];
   if ($deal_id < 1) { $deal_id = $invoice['deal_id']; }
   if ($deal_id == '') { $deal_id = '0'; }
+  $deal_id = sql_parse_id($deal_id);
   $project_new_id = $invoice['project_new_id'];
   if ($project_new_id < 1) { $project_new_id = $invoice['project_id']; }
   if ($project_new_id == '') { $project_new_id = '0'; }
-
+  $project_new_id = sql_parse_id($project_new_id);
   $multidomain = sql_multidomain('invoice');
 
   $query = "UPDATE Invoice SET
       invoice_timeupdate='$now',
-      invoice_userupdate='$uid',
-      invoice_company_id='$comp_id',
-      invoice_deal_id='$deal_id',
-      invoice_project_id='$project_new_id',
+      invoice_userupdate=$uid,
+      invoice_company_id=$comp_id,
+      invoice_deal_id=$deal_id,
+      invoice_project_id=$project_new_id,
       invoice_number='$number',
       invoice_label='$label',
       invoice_amount_ht='$ht',
       invoice_amount_ttc='$ttc',
-      invoice_status_id='$status',
+      invoice_status_id=$status,
       invoice_comment='$comment',
       invoice_date=$date,
       invoice_expiration_date=$expiration_date,
@@ -359,7 +364,7 @@ function run_query_invoice_update($invoice) {
       invoice_inout='$inout',
       invoice_credit_memo='$credit_memo',
       invoice_archive='$arch'
-    WHERE invoice_id='$id' $multidomain";
+    WHERE invoice_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_invoice_update()');
   $obm_q = new DB_OBM;
@@ -434,7 +439,7 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
   $db_type = $obm_q->type;
   $date = sql_date_format($db_type, 'payment_date', 'payment_date');
   $multidomain = sql_multidomain('payment');
-
+  $p_invoice = sql_parse_id($p_invoice, true);
   $query = "SELECT
       paymentinvoice_amount,
       payment_id,
@@ -489,10 +494,10 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_delete($p_id) {
   global $cdg_sql;
-  
+  $id = sql_parse_id($id, true); 
   $multidomain = sql_multidomain('invoice');
   $query = "DELETE FROM Invoice 
-		WHERE invoice_id='$p_id' $multidomain";
+		WHERE invoice_id $p_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_invoice_delete()');
   $obm_q = new DB_OBM;
@@ -513,12 +518,12 @@ function run_query_invoice_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_linked_invoice_payment($p_id) {
   global $cdg_sql;
-
+  $p_id = sql_parse_id($p_id, true);
   $multidomain = sql_multidomain('payment');
   $query = "SELECT distinct payment_id 
     FROM Payment
       LEFT JOIN PaymentInvoice ON payment_id=paymentinvoice_payment_id
-    WHERE paymentinvoice_invoice_id='$p_id' $multidomain";
+    WHERE paymentinvoice_invoice_id $p_id $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -535,10 +540,10 @@ function run_query_invoice_deal_get_inout($p_deal_id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('deal');
-
+  $p_deal_id = sql_parse_id($p_deal_id, true);
   $query = "SELECT dealtype_inout
     FROM Deal, DealType
-    WHERE deal_id = '$p_deal_id'
+    WHERE deal_id $p_deal_id 
       AND deal_type_id = dealtype_id $multidomain";
 
   $obm_q = new DB_OBM;
@@ -560,7 +565,8 @@ function get_invoice_nb_having_number ($number, $id='') {
   global $cdg_sql;
 
   if ($id != '') {
-    $where_id = "AND invoice_id != '$id'";
+    $id = sql_parse_id($id, true, true);
+    $where_id = "AND invoice_id $id ";
   }
 	
   $multidomain = sql_multidomain('invoice');
@@ -616,7 +622,8 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
     $w_tt .= ' AND (';
     $or = '';
     foreach ($sel_tt as $tt_id) {
-      $w_tt .= "$or project_tasktype_id='$tt_id' OR deal_tasktype_id='$tt_id'";
+      $tt_id = sql_parse_id($tt_id, true);
+      $w_tt .= "$or project_tasktype_id $tt_id OR deal_tasktype_id $tt_id ";
       $or = ' OR';
     }
     $w_tt .= ')';
@@ -630,7 +637,8 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
     $w_st .= ' AND (';
     $or = '';
     foreach ($status as $s_id=>$s_label) {
-      $w_st .= "$or invoice_status_id='$s_id'";
+      $s_id = sql_parse_id($s_id, true);
+      $w_st .= "$or invoice_status_id $s_id ";
       $or = ' OR';
     }
     $w_st .= ')';

@@ -23,7 +23,7 @@ function dis_tools_update_detail() {
 
   // Determine which domain to display, and which admin realm
   // For domain 0, only 'domain' realm and loop through all domains
-  if ($obm['domain_id'] == '0') {
+  if ($obm['domain_global'] === true) {
     $admin_realm = array('domain');
     $domains = of_domain_get_list();
 
@@ -40,11 +40,9 @@ function dis_tools_update_detail() {
     }
   }
   $update_ok = check_tools_update_context_ok($params);
-
   // Loop through all domains
   foreach ($domains as $domain_id => $domain) {
-    $has_domain_upd = check_tools_update_need_global_update($domain_id);
-
+    $has_domain_upd = check_tools_update_need_global_update($domain_id, $domain['global']);
     // Loop through all udpates 'realms' (user, delegation, domain)
     foreach ($admin_realm as $realm) {
       $has_update = false;
@@ -60,7 +58,7 @@ function dis_tools_update_detail() {
       foreach ($entities as $entity=>$db_info) {
 	$dis_entity = ${"l_$entity"};
 	if ($cgp_show['module']["$entity"]) {
-          $nb = run_query_tools_perform_scope($db_info,$realm,$domain_id);
+          $nb = run_query_tools_perform_scope($db_info,$realm,$domain_id, $domain['global']);
           if ( $nb['diff'] > 0 ) {
 	    $has_update = true;
 	  }
@@ -86,7 +84,7 @@ function dis_tools_update_detail() {
 	  $update_type = 'global';
 	}
 	// Domain 0 allow only "global" update
-	if ($obm['domain_id'] == '0') {
+	if ($obm['domain_global'] === true) {
 	  $update_type = 'global';
 	}
 
@@ -127,8 +125,7 @@ function dis_tools_update_detail() {
 	set_update_state($domain_id, 0);
 	$dis_button = "$l_upd_not_needed";
       }
-
-      $dis_domain .= "
+      $dis_domain = "
       <div class=\"detail extra\">
       <h1>$domain[label] : $dis_detail_title</h1>
       $dis_realm_board

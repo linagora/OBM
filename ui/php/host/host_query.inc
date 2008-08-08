@@ -96,7 +96,7 @@ function run_query_host_detail($id) {
   $timeupdate = sql_date_format($db_type,'host_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type,'host_timecreate', 'timecreate');
   $multidomain = sql_multidomain('host');
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT *,
       $timecreate,
       $timeupdate,
@@ -111,7 +111,7 @@ function run_query_host_detail($id) {
          LEFT JOIN UserObm as uo ON host_id=uo.userobm_host_id
          LEFT JOIN MailServer ON host_id=mailserver_host_id
          LEFT JOIN Domain ON host_domain_id = domain_id
-    WHERE host_id = '$id'
+    WHERE host_id $id 
       $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_host_detail()');
   $obm_q->query($query) ;
@@ -133,11 +133,11 @@ function run_query_host_insert($host) {
   $domain_id = $obm['domain_id'];
   $name = $host['name'];
   $ip = $host['ip'];
-  $samba = ($host['samba'] == 1) ? 1 : 0;
-  $web_perms = ($host['web_perms'] == 1) ? 1 : 0;
-  $ftp_perms = ($host['ftp_perms'] == 1) ? 1 : 0;
-  $firewall_perms = ($host['firewall_perms'] == 1) ? 1 : 0;
-  $web_all = ($host['web_all'] == 1) ? 1 : 0;
+  $samba = sql_parse_int($host['samba']);
+  $web_perms = sql_parse_int($host['web_perms']);
+  $ftp_perms = sql_parse_int($host['ftp_perms']);
+  $firewall_perms = sql_parse_int($host['firewall_perms']);
+  $web_all = $host['web_all'];
   $list = $host['web_list'];
   $desc = $host['desc'];
   $now = date('Y-m-d H:i:s');
@@ -146,10 +146,10 @@ function run_query_host_insert($host) {
   $host_uid = get_first_user_free_uid();
   $host_gid = $cg_gid_host;
 
-  if (isset($host['domain']) && $obm['domain'] == 0) {
-    $domain_id = $host['domain'];
+  if (isset($host['domain']) && $obm['domain_global']) {
+    $domain_id = sql_parse_id($host['domain']);
   } else {
-    $domain_id = $obm['domain_id'];
+    $domain_id = sql_parse_id($obm['domain_id']);
   }
 
   // Delegation handling
@@ -175,30 +175,28 @@ function run_query_host_insert($host) {
   VALUES (null,
     '$now',
     null,
-    '$obm[uid]',
-    '$domain_id',
+    $obm[uid],
+    $domain_id,
     '$host_uid',
     '$host_gid',
-    '$samba',
+    $samba,
     '$name'
     $q_delegation[value],
     '$ip',
     '$desc',
-    '$web_perms',
+    $web_perms,
     '$web_list',
     '$web_all',    
-    '$ftp_perms',
-    '$firewall_perms')";
+    $ftp_perms,
+    $firewall_perms)";
 
   display_debug_msg($query, $cdg_sql, 'run_query_host_insert(1)');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // Mise a jour du lien user s'il a ete précisé
-  $user_id = $host['user_id'];
+  $user_id = sql_parse_id($host['user_id'], true);
   // Cas ou il n'y a pas de lien
-  if ($user_id == '') 
-    $user_id = 0;
     
   if ($retour && $user_id != 0) {
 
@@ -208,17 +206,16 @@ function run_query_host_insert($host) {
     FROM Host
     WHERE
       host_timecreate='$now' and
-      host_userupdate is null and
-      host_usercreate='$obm[uid]' and
+      host_usercreate $obm[uid] and
       host_uid='$host_uid' and
       host_gid='$host_gid' and
-      host_samba='$samba' and
+      host_samba=$samba and
       host_name='$name' and
       host_ip='$ip' and
       host_description='$desc' and
-      host_web_perms='$web_perms' and
-      host_ftp_perms='$ftp_perms' and
-      host_firewall_perms='$firewall_perms'
+      host_web_perms=$web_perms and
+      host_ftp_perms=$ftp_perms and
+      host_firewall_perms=$firewall_perms
       $multidomain";
 
     display_debug_msg($query, $cdg_sql, 'run_query_host_insert(2)');
@@ -227,15 +224,15 @@ function run_query_host_insert($host) {
     // Mise a jour du lien
     if ($retour) {
       $obm_q->next_record();
-      $host_id = $obm_q->f('host_id');
+      $host_id = sql_parse_id($obm_q->f('host_id'));
 
       $multidomain = sql_multidomain('userobm');
       $query = "UPDATE UserObm 
       SET userobm_timeupdate='$now',
-          userobm_userupdate='$obm[uid]',
-          userobm_host_id='$host_id'
+          userobm_userupdate=$obm[uid],
+          userobm_host_id=$host_id
       WHERE
-          userobm_id='$user_id' $multidomain";
+          userobm_id $user_id $multidomain";
 
       display_debug_msg($query, $cdg_sql, 'run_query_host_insert(3)');
       $retour = $obm_q->query($query);
@@ -255,15 +252,15 @@ function run_query_host_insert($host) {
 function run_query_host_update($host) {
   global $obm, $cdg_sql;
 
-  $id = $host['host_id'];
+  $id = sql_parse_id($host['host_id'], true);
   $name = $host['name'];
   $ip = $host['ip'];
-  $samba = ($host['samba'] == 1) ? 1 : 0;
-  $web_perms = $host['web_perms'];
-  $ftp_perms = $host['ftp_perms'];
+  $samba = sql_parse_int($host['samba']);
+  $web_perms = sql_parse_int($host['web_perms']);
+  $ftp_perms = sql_parse_int($host['ftp_perms']);
   $web_all = $host['web_all'];  
   $web_list = $host['web_list'];
-  $firewall_perms = $host['firewall_perms'];
+  $firewall_perms = sql_parse_int($host['firewall_perms']);
   $desc = $host['desc'];
   $now = date('Y-m-d H:i:s');
   $multidomain = sql_multidomain('host');
@@ -273,25 +270,25 @@ function run_query_host_update($host) {
 
   $query = "UPDATE Host SET
     host_timeupdate='$now',
-    host_userupdate='$obm[uid]',
-    host_samba='$samba',
+    host_userupdate=$obm[uid],
+    host_samba=$samba,
     host_name='$name',
     host_ip='$ip',
     host_description='$desc',
-    host_web_perms='$web_perms',
+    host_web_perms=$web_perms,
     host_web_all='$web_all',
-    host_web_list='$web_list',    
-    host_ftp_perms='$ftp_perms',
-    host_firewall_perms='$firewall_perms'
+    host_web_list=$web_list,    
+    host_ftp_perms=$ftp_perms,
+    host_firewall_perms=$firewall_perms
     $q_delegation
-  WHERE host_id='$id' $multidomain";
+  WHERE host_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_host_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // Mise a jour du lien user s'il a ete précisé
-  $user_id = $host['user_id'];
+  $user_id = sql_parse_id($host['user_id'], true);
   if ($retour) {
 
     // Suppression de l'ancien lien user=>host
@@ -300,20 +297,18 @@ function run_query_host_update($host) {
         userobm_userupdate='$obm[uid]',
         userobm_host_id='0'
     WHERE
-        userobm_host_id='$id'";
+        userobm_host_id $id ";
     $retour = $obm_q->query($query);
 
-    // Cas ou il n'y a plus de lien
-    if ($user_id == '') 
-      $user_id = 0;
     if ($retour && $user_id != 0) {
+      $id = sql_parse_id($id);
       // Creation du nouveau lien user=>host
       $query = "UPDATE UserObm 
       SET userobm_timeupdate='$now',
-          userobm_userupdate='$obm[uid]',
-          userobm_host_id='$id'
+          userobm_userupdate=$obm[uid],
+          userobm_host_id=$id
       WHERE
-          userobm_id='$user_id'";
+          userobm_id $user_id ";
 
       display_debug_msg($query, $cdg_sql, 'run_query_host_update()');
       $retour = $obm_q->query($query);
@@ -334,39 +329,25 @@ function run_query_host_delete($p_id) {
 
   // Delete the Host
   $multidomain = sql_multidomain('host');
-  $query = "DELETE FROM Host WHERE host_id='$p_id' $multidomain";
+  $sel_id = sql_parse_id($p_id, true);
+  $query = "DELETE FROM Host WHERE host_id $p_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_host_delete()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+    $now = date('Y-m-d H:i:s');
   // Mise a jour du lien vers user
-  if ($retour) {
-    $obm_q->next_record();
-    $host_id = $obm_q->f('host_id');
-
-    $multidomain = sql_multidomain('userobm');
-    $query = "UPDATE UserObm
-    SET userobm_timeupdate='$now',
-        userobm_userupdate='$obm[uid]',
-        userobm_host_id='0'
-    WHERE
-        userobm_host_id='$p_id' $multidomain";
-
-    display_debug_msg($query, $cdg_sql, 'run_query_host_delete()');
-    $retour = $obm_q->query($query);
-  }
-
   // If this host exists in Prod table, Insert it in Deleted table
-  $query = "SELECT host_id, host_delegation FROM P_Host WHERE host_id='$p_id'";
+  $query = "SELECT host_id, host_delegation FROM P_Host WHERE host_id='$sel_id'";
   display_debug_msg($query, $cdg_sql, 'run_query_host_delete(auto)');
   $obm_q->query($query);
   $obm_q->next_record();
   $delegation = $obm_q->f('host_delegation');
 
   if ($obm_q->num_rows() > 0) {
-    $uid = $obm['uid'];
-    $domain_id = $obm['domain_id'];
-    $now = date('Y-m-d H:i:s');
+    $uid = sql_parse_id($obm['uid']);
+    $ins_id = sql_parse_id($p_id);
+    $domain_id = sql_parse_id($obm['domain_id']);
 
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
@@ -376,11 +357,11 @@ function run_query_host_delete($p_id) {
       deleted_entity_id,
       deleted_timestamp)
     VALUES (
-      '$domain_id',
-      '$uid',
+      $domain_id,
+      $uid,
       '$delegation',
       'Host',
-      '$p_id',
+      $p_id,
       '$now')";
     display_debug_msg($query, $cdg_sql, 'run_query_host_delete(auto)');
     $retour = $obm_q->query($query);
@@ -401,12 +382,12 @@ function get_host_info($id) {
   if ($id == '') {
     return false;
   }
-
+  $id = sql_parse_id($id, true);
   $multidomain = sql_multidomain('host');
   $query = "SELECT *
     FROM Host
       LEFT JOIN MailServer ON mailserver_host_id = host_id
-    WHERE host_id='$id' $multidomain";
+    WHERE host_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_host_info()');
   $obm_q = new DB_OBM;
@@ -435,7 +416,8 @@ function get_host_name_exists($name, $id='') {
   global $cdg_sql;
 
   if ($id != '') {
-    $where_id = "host_id != '$id' AND";
+    $id = sql_parse_id($id, true, true);
+    $where_id = "host_id $id AND";
   }
 
   $multidomain = sql_multidomain('host');
@@ -471,7 +453,8 @@ function run_query_check_host($id, $name, $desc) {
   $like = sql_casei_like($db_type);
 
   if ($id != '') {
-    $where_id = "host_id != '$id' AND";
+    $id = sql_parse_id($id, true, true);
+    $where_id = "host_id $id AND";
   }
 
   // If name is short, we test equality, else similarity

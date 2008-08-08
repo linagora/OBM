@@ -498,13 +498,10 @@ function run_query_user_insert($user) {
   }
 
 
-  if (isset($user['domain']) && $obm['domain'] == 0) {
+  if (isset($user['domain']) && $obm['domain_global']) {
     $domain_id = $user['domain'];
   } else {
     $domain_id = $obm['domain_id'];
-  }
-  if ($domain_id == 0) {
-    $profile == 'admin';
   }
   $query = "INSERT INTO UserObm (
     userobm_domain_id,
@@ -956,7 +953,7 @@ function run_query_user_update($p_id, $user) {
 
       if ($retour) {
         // Get the user domain if admin in domain 0 or domain not set
-        if ((!isset($obm['domain_id'])) || ($obm['domain_id'] == '') || ($obm['domain_id'] == '0')) {
+        if ((!isset($obm['domain_id'])) || ($obm['domain_id'] == '') || ($obm['domain_global'])) {
           $query = "SELECT userobm_domain_id FROM UserObm WHERE userobm_id='$p_id'";
           display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
           $retour = $obm_q->query($query);
@@ -1806,8 +1803,8 @@ function check_user_data_form($p_id, &$user) {
   } else {
     $domain_id = $obm['domain_id'];
   }
-  $where_multidomain = "AND (userobm_domain_id = '$domain_id' OR userobm_domain_id = 0)";
-  $query = "SELECT * FROM UserObm WHERE userobm_login='$login' $where_multidomain ";
+  $where_multidomain = "AND (domain_id = '$domain_id' OR domain_global = true)";
+  $query = "SELECT * FROM UserObm LEFT JOIN Domain on domain_id = userobm_domain_id WHERE userobm_login='$login' $where_multidomain ";
   if ($p_id > 0) {
     $query .= " AND userobm_id!='$p_id'";
   }

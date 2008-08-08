@@ -38,7 +38,34 @@ function sql_date_format($db_type, $field, $as='') {
   return $ret;
 }
 
-
+/**
+ * Return an int if id is numeric elser return NULL 
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function sql_parse_id($id, $select=false, $not=false) {
+  if($select) {
+    if($not) {
+      return (is_numeric($id) && $id > 0)?'!= '.(int)$id:'IS NOT NULL';
+    } else {
+      return (is_numeric($id) && $id > 0)?'= '.(int)$id:'IS NULL';
+    }
+  } else {
+    return (is_numeric($id) && $id > 0)?(int)$id:'NULL';
+  }
+}
+/**
+ * Return an int if $int is numeric elser return 0
+ * 
+ * @param mixed $int 
+ * @access public
+ * @return void
+ */
+function sql_parse_int($int) {
+  return (is_numeric($id))?(int)$id:0;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Return the sql word corresponding to case incensitive like
 // Parameters:
@@ -257,22 +284,19 @@ function sql_obm_entity_privacy($entity, $p_uid='') {
 // Returns:
 //   - sql where clause for domain (empty for superadmin)
 ///////////////////////////////////////////////////////////////////////////////
-function sql_multidomain($entity, $and=true, $extended=false) {
+function sql_multidomain($entity, $and=true) {
   global $obm;
 
   $where = '';
 
   // If user is multidomain, no restrictions on domain
-  if ($obm['domain_id'] == 0) {
+  if ($obm['domain_global'] === true) {
     return $where;
   } else {
     $domain_id = $obm['domain_id'];
   }
   if ($and) {
     $wand = 'AND';
-  }
-  if ($extended) {
-    $wext = "OR ${entity}_domain_id=0";
   }
   $where = "$wand (${entity}_domain_id='$domain_id' $wext)";
 
@@ -313,20 +337,18 @@ function of_domain_get_list() {
   $obm_q = new DB_OBM;
   $query = "SELECT domain_id,
       domain_label,
-      domain_name
+      domain_name,
+      domain_global
     FROM Domain";
   display_debug_msg($query, $cdg_sql, 'of_domain_get_list()');
   $obm_q->query($query);
 
-  $domain = array();
-  $domain['0']['id'] = '0';
-  $domain['0']['label'] = 'Global';
-  $domain['0']['name'] = '';
   while($obm_q->next_record()) {
     $id = $obm_q->f('domain_id');
     $domain[$id]['id'] = $id;
     $domain[$id]['label'] = $obm_q->f('domain_label');
     $domain[$id]['name'] = $obm_q->f('domain_name');
+    $domain[$id]['global'] = $obm_q->f('domain_global');
   }
 
   return $domain;
@@ -339,10 +361,10 @@ function of_domain_get_list() {
  * @param mixed $domain_id : domain_id
  * @return mailserver array
  **/
-function of_domain_get_domain_mailserver($role='imap', $domain_id=0) {
+function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
   global $cdg_sql;
 
-  if ($domain_id != 0) {
+  if (!is_null($domain_id)) {
     $where_domain = "domainmailserver_domain_id='$domain_id'";
     $and = 'AND';
   }
@@ -396,12 +418,12 @@ function of_domain_get_domain_mailserver($role='imap', $domain_id=0) {
 function of_domain_get_domain_infos($d_id, $get_properties=false) {
   global $cdg_sql;
 
-  if ($d_id > 0) {
     $obm_q = new DB_OBM;
     $query = "SELECT domain_id,
       domain_label,
       domain_name,
       domain_alias,
+      domain_global,
       domain_mail_server_id
     FROM Domain
     WHERE domain_id = '$d_id'";
@@ -414,6 +436,7 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
     $domain['name'] = $obm_q->f('domain_name');
     $domain['alias'] = $obm_q->f('domain_alias');
     $domain['mailserver'] = $obm_q->f('domain_mail_server_id');
+    $domain['global'] = $obm_q->f('domain_global');
 
     if ($get_properties) {
       $query = "SELECT * FROM DomainPropertyValue
@@ -426,12 +449,6 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
 	$domain[$prop] = $value;
       }
     }
-
-  } else {
-    $domain['id'] = '0';
-    $domain['label'] = 'Global';
-    $domain['name'] = 'global.local';
-  }
 
   return $domain;
 }
@@ -764,9 +781,9 @@ function get_display_pref($u_id, $entity, $all=0) {
   
   $query = "SELECT *
     FROM DisplayPref
-    WHERE (display_user_id='0' OR display_user_id='$u_id')
+    WHERE (display_user_id IS NULL OR display_user_id='$u_id')
       AND display_entity='$entity'
-    ORDER BY display_user_id, display_fieldorder"; 
+    ORDER BY display_user_id DESC, display_fieldorder"; 
 
   display_debug_msg($query, $cdg_sql, 'get_display_pref()');
   $obm_q = new DB_OBM;
@@ -841,10 +858,10 @@ function get_one_display_pref($u_id, $entity, $fieldname) {
   
   $query = "SELECT *
     FROM DisplayPref
-    WHERE (display_user_id='0' OR display_user_id='$u_id')
+    WHERE (display_user_id IS NULL OR display_user_id='$u_id')
       AND display_entity='$entity'
       AND display_fieldname='$fieldname'
-    ORDER BY display_user_id"; 
+    ORDER BY display_user_id DESC"; 
 
   display_debug_msg($query, $cdg_sql, 'get_one_display_pref()');
   $obm_q = new DB_OBM;
@@ -1029,10 +1046,10 @@ function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_l
       display_fieldname,
       display_display
     FROM DisplayPref
-    WHERE (display_user_id='$u_id' OR display_user_id='0')
+    WHERE (display_user_id='$u_id' OR display_user_id IS NULL)
       AND display_entity='$entity'
       AND display_fieldorder='$fieldorder'
-    ORDER BY display_user_id";
+    ORDER BY display_user_id DESC";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'run_query_display_pref_level_update()');
@@ -1052,7 +1069,7 @@ function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_l
       display_fieldname,
       display_display
     FROM DisplayPref
-    WHERE display_user_id='0'
+    WHERE display_user_id IS NULL
       AND display_entity='$entity'
       AND display_fieldorder='$new_level'";
 
@@ -1127,7 +1144,7 @@ function reset_preferences_to_default($user_id='') {
   if ($user_id > 0) {
     $where_user = "userobmpref_user_id = '$user_id'";
   } else if ($user_id == '') {
-    $where_user = "userobmpref_user_id != 0";
+    $where_user = "userobmpref_user_id IS NOT NULL";
   } else {
     return false;
   }
@@ -1144,7 +1161,7 @@ function reset_preferences_to_default($user_id='') {
   if ($user_id > 0) {
     $where_user = "display_user_id = '$user_id'";
   } else if ($user_id == '') {
-    $where_user = "display_user_id != 0";
+    $where_user = "display_user_id IS NOT NULL";
   } else {
     return false;
   }
@@ -1170,8 +1187,8 @@ function get_user_pref($u_id) {
 
   $query = "SELECT *
     FROM UserObmPref
-    WHERE (userobmpref_user_id='0' OR userobmpref_user_id='$u_id')
-    ORDER BY userobmpref_user_id, userobmpref_option"; 
+    WHERE (userobmpref_user_id IS NULL OR userobmpref_user_id='$u_id')
+    ORDER BY userobmpref_user_id DESC, userobmpref_option"; 
 
   display_debug_msg($query, $cdg_sql, 'get_user_pref()');
   $obm_q = new DB_OBM;
@@ -1183,7 +1200,7 @@ function get_user_pref($u_id) {
     $option = $obm_q->f('userobmpref_option');
     $value = $obm_q->f('userobmpref_value');
 
-    if ($user_id > 0) {
+    if ($user_id != NULL) {
       // Some options do not have default value (eg: last visited entities)
       // Note if user value different from default value
       if ( ($prefs[$option]['value'] != $value) ) {
@@ -1214,9 +1231,9 @@ function get_one_user_pref($u_id, $option) {
   
   $query = "SELECT *
     FROM UserObmPref
-    WHERE (userobmpref_user_id='0' OR userobmpref_user_id='$u_id')
+    WHERE (userobmpref_user_id IS NULL OR userobmpref_user_id='$u_id')
       AND userobmpref_option='$option'
-    ORDER BY userobmpref_user_id"; 
+    ORDER BY userobmpref_user_id DESC"; 
 
   display_debug_msg($query, $cdg_sql, 'get_one_user_pref()');
   $obm_q = new DB_OBM;
@@ -1805,7 +1822,7 @@ function get_entity_email($mail=null, $domain=null, $first_only=true, $separator
     $domain = $e['domain_name'];
   }
 
-  if(is_null($domain) && $obm['domain_id'] != 0) {
+  if(is_null($domain) && $obm['domain_global'] === false) {
     $domain = $obm['domain_name'];
   }    
   $mail = explode("\r\n",$mail);

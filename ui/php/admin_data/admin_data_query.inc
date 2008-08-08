@@ -38,11 +38,11 @@ function get_admin_data_company_list() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_admin_data_company_contact_number($id) {
   global $cdg_sql;
-
+  $id = sql_parse_id( $id);
   $query = "SELECT count(contact_id) as nb
     FROM Contact
-    WHERE contact_company_id='$id'
-      AND contact_archive='0'";
+    WHERE contact_company_id=$id
+      AND contact_archive=0";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -62,9 +62,11 @@ function get_admin_data_company_contact_number($id) {
 function get_admin_data_company_active_deal_number($id) {
   global $cdg_sql;
 
+  $id = sql_parse_id( $id);
+
   $query = "SELECT count(deal_id) as nb
     FROM Deal
-    WHERE deal_company_id='$id' AND deal_archive='0'";
+    WHERE deal_company_id=$id AND deal_archive=0";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -84,9 +86,10 @@ function get_admin_data_company_active_deal_number($id) {
 function get_admin_data_company_total_deal_number($id) {
   global $cdg_sql;
 
+  $id = sql_parse_id( $id);
   $query = "SELECT count(deal_id) as nb
     FROM Deal
-    WHERE deal_company_id='$id'";
+    WHERE deal_company_id=$id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -108,12 +111,16 @@ function get_admin_data_company_total_deal_number($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function update_admin_data_one_company($id, $con_num, $deal_num, $deal_total) {
   global $cdg_sql;
+  $con_num = sql_parse_int( $con_num);
+  $deal_num = sql_parse_int( $deal_num);
+  $deal_total = sql_parse_int( $deal_total);
+  $id = sql_parse_id( $id);
 
   $query = "UPDATE Company SET
-      company_contact_number='$con_num',
-      company_deal_number='$deal_num',
-      company_deal_total='$deal_total'
-    WHERE company_id='$id'";
+      company_contact_number=$con_num,
+      company_deal_number=$deal_num,
+      company_deal_total=$deal_total
+    WHERE company_id=$id";
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;
@@ -153,10 +160,12 @@ function get_admin_data_deal_list() {
 ///////////////////////////////////////////////////////////////////////////////
 function update_admin_data_one_deal($id, $hitrate) {
   global $cdg_sql;
-
+  
+  $id = sql_parse_id( $id);
+  $hitrate = sql_parse_int( $hitrate);
   $query = "UPDATE Deal SET
-      deal_hitrate='$hitrate'
-    WHERE deal_id='$id'";
+      deal_hitrate=$hitrate
+    WHERE deal_id=$id";
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;
@@ -201,12 +210,16 @@ function get_admin_data_list_list() {
 ///////////////////////////////////////////////////////////////////////////////
 function update_admin_data_one_list($id, $sta_nb, $dyn_nb, $new_query) {
   global $cdg_sql;
-
+  
+  $sta_nb = sql_parse_int( $sta_nb);
+  $dyn_nb = sql_parse_int( $dyn_nb);
+  $id = sql_parse_id( $id);
+  
   $query = "UPDATE List SET
-      list_static_nb='$sta_nb',
-      list_query_nb='$dyn_nb',
+      list_static_nb=$sta_nb,
+      list_query_nb=$dyn_nb,
       list_query='$new_query'
-    WHERE list_id='$id'";
+    WHERE list_id=$id";
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;
@@ -362,11 +375,11 @@ function update_admin_data_sound_aka_one_company($id, $aka, $sound) {
   global $cdg_sql;
 
   $aka_s = addslashes($aka);
-
+  $id = sql_parse_id( $id, true);
   $query = "UPDATE Company SET
       company_aka='$aka_s',
       company_sound='$sound'
-    WHERE company_id='$id'";
+    WHERE company_id $id"; 
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;
@@ -387,11 +400,11 @@ function update_admin_data_sound_aka_one_contact($id, $aka, $sound) {
   global $cdg_sql;
 
   $aka_s = addslashes($aka);
-
+  $id = sql_parse_id( $id, true);
   $query = "UPDATE Contact SET
       contact_aka='$aka_s',
       contact_sound='$sound'
-    WHERE contact_id='$id'";
+    WHERE contact_id $id"; 
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;

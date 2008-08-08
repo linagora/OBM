@@ -103,7 +103,7 @@ function run_query_mailserver_detail($id) {
   $timeupdate = sql_date_format($db_type,'mailserver_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type,'mailserver_timecreate', 'timecreate');
   $multidomain = sql_multidomain('host');
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT *,
       $timecreate,
       $timeupdate,
@@ -116,7 +116,7 @@ function run_query_mailserver_detail($id) {
          LEFT JOIN UserObm as c ON mailserver_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON mailserver_userupdate=u.userobm_id
          LEFT JOIN Host ON mailserver_host_id=host_id
-    WHERE mailserver_id = '$id'
+    WHERE mailserver_id $id 
       $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_mailserver_detail()');
   $obm_q->query($query) ;
@@ -136,10 +136,11 @@ function run_query_mailserver_insert($params) {
   global $obm, $cdg_sql;
 
   $now = date('Y-m-d H:i:s');
-  $host_id = $params['host_id'];
-  $imap = ($params['imap'] == 1) ? 1 : 0;
-  $smtp_in = ($params['smtp_in'] == 1) ? 1 : 0;
-  $smtp_out = ($params['smtp_out'] == 1) ? 1 : 0;
+  $uid = sql_parse_id($obm['uid'], true);
+  $host_id = sql_parse_id($params['host_id']);
+  $imap = sql_parse_int($params['imap']);
+  $smtp_in = sql_parse_int($params['smtp_in']);
+  $smtp_out = sql_parse_int($params['smtp_out']);
 
   $query = "INSERT INTO MailServer (mailserver_timeupdate,
     mailserver_timecreate,
@@ -152,11 +153,11 @@ function run_query_mailserver_insert($params) {
   VALUES (null,
     '$now',
     null,
-    '$obm[uid]',
-    '$host_id',
-    '$imap',
-    '$smtp_in',
-    '$smtp_out')";
+    $obm[uid],
+    $host_id,
+    $imap,
+    $smtp_in,
+    $smtp_out)";
 
   display_debug_msg($query, $cdg_sql, 'run_query_mailserver_insert()');
   $obm_q = new DB_OBM;
@@ -165,12 +166,11 @@ function run_query_mailserver_insert($params) {
   if ($retour) {
     $multidomain = sql_multidomain('host');
     // Get the inserted mailserver id
-    $query = "SELECT mailserver_id
+    $query = "SELECT MAX(mailserver_id) as mailserver_id
     FROM MailServer
       LEFT JOIN Host on mailserver_host_id=host_id
     WHERE
-      mailserver_timecreate='$now'
-      AND mailserver_host_id='$host_id'
+      mailserver_usercreate $uid 
       $multidomain";
 
     display_debug_msg($query, $cdg_sql, 'run_query_mailserver_insert()');
@@ -192,19 +192,19 @@ function run_query_mailserver_insert($params) {
 function run_query_mailserver_update($params) {
   global $obm, $cdg_sql;
 
-  $id = $params['mailserver_id'];
-  $imap = ($params['imap'] == 1) ? 1 : 0;
-  $smtp_in = ($params['smtp_in'] == 1) ? 1 : 0;
-  $smtp_out = ($params['smtp_out'] == 1) ? 1 : 0;
+  $id = sql_parse_id($params['mailserver_id'], true);
+  $imap = sql_parse_int($params['imap']);
+  $smtp_in = sql_parse_int($params['smtp_in']);
+  $smtp_out = sql_parse_int($params['smtp_out']);
   $now = date('Y-m-d H:i:s');
 
   $query = "UPDATE MailServer SET
     mailserver_timeupdate='$now',
-    mailserver_userupdate='$obm[uid]',
-    mailserver_imap='$imap',
-    mailserver_smtp_in='$smtp_in',
-    mailserver_smtp_out='$smtp_out'
-  WHERE mailserver_id='$id'";
+    mailserver_userupdate=$obm[uid],
+    mailserver_imap=$imap,
+    mailserver_smtp_in=$smtp_in,
+    mailserver_smtp_out=$smtp_out
+  WHERE mailserver_id $id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_mailserver_update()');
   $obm_q = new DB_OBM;
@@ -222,9 +222,9 @@ function run_query_mailserver_update($params) {
  **/
 function run_query_mailserver_delete($m_id) {
   global $cdg_sql;
-
+  $m_id = sql_parse_id($m_id, true);
   $query = "DELETE FROM MailServer
-    WHERE mailserver_id='$m_id'";
+    WHERE mailserver_id $m_id ";
   display_debug_msg($query, $cdg_sql, 'run_query_mailserver_delete()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -244,14 +244,15 @@ function check_mailserver_host_is_mailserver($host_id, $id=false) {
   global $cdg_sql;
 
   if ($id) {
-    $where = "AND mailserver_id != '$id'";
+    $id = sql_parse_id($id, true, true);
+    $where = "AND mailserver_id $id ";
   }
-
+  $host_id = sql_parse_id($host_id, true);
   $multidomain = sql_multidomain('host');
   $query = "SELECT mailserver_id
     FROM MailServer
       JOIN Host ON mailserver_host_id = host_id
-    WHERE mailserver_host_id = '$host_id'
+    WHERE mailserver_host_id $host_id 
           $where
           $multidomain";
   display_debug_msg($query, $cdg_sql, 'check_mailserver_host_is_mailserver()');
@@ -312,11 +313,11 @@ function check_can_delete_mailserver($m_id) {
   global $l_link_domain, $l_link_domain_no, $l_link_user, $l_link_user_no;
 
   $delete_ok = true;
-
+  $m_id = sql_parse_id($m_id, true);
   // Links from Domain
   $query = "SELECT *
     FROM DomainMailServer
-    WHERE domainmailserver_mailserver_id='$m_id'";
+    WHERE domainmailserver_mailserver_id $m_id ";
   display_debug_msg($query, $cdg_sql, 'check_can_delete_mailserver(1)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -327,7 +328,7 @@ function check_can_delete_mailserver($m_id) {
   } else {
     $query = "SELECT *
     FROM Domain
-    WHERE domain_mail_server_id='$m_id'";
+    WHERE domain_mail_server_id $m_id ";
     display_debug_msg($query, $cdg_sql, 'check_can_delete_mailserver(2)');
     $obm_q->query($query);
     $nb = $obm_q->num_rows();
@@ -342,7 +343,7 @@ function check_can_delete_mailserver($m_id) {
   // Links from Users
   $query = "SELECT count(*) as nb
     FROM UserObm
-    WHERE userobm_mail_server_id='$m_id'";
+    WHERE userobm_mail_server_id $m_id ";
   display_debug_msg($query, $cdg_sql, 'check_can_delete_mailserver(3)');
   $obm_q->query($query);
   $obm_q->next_record();

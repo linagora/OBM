@@ -262,11 +262,11 @@ class Auth {
 	  $d = of_domain_get_domain_infos($obm['domain_id'], true);
 	  $obm['domain_label'] = $d['label'];
           $obm['domain_name'] = $d['name'];
+          $obm['domain_global'] = $d['global'];
           $obm['mailserver'] = $d['mailserver'];
           $obm['group_admin'] = $d['group_admin'];
           $obm['group_com'] = $d['group_com'];
           $obm['group_prod'] = $d['group_prod'];
-
 	  // OBM : in OBM each time is in seconds. this->lifetime too.
 	  $this->auth["exp"] = time() + $this->lifetime;
 	  $this->auth["refresh"] = time() + (60 * $this->refresh);
@@ -386,7 +386,7 @@ class Perm {
           'default' => $perm_admin)
       );
     }
-    if ($obm["domain_id"] == 0) {
+    if ($obm["domain_global"]) {
       $profiles[$obm["profile"]] = 
         array (
           'section' => array (

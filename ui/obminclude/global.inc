@@ -43,7 +43,7 @@ $cak_begin = 'B';
 $cak_end = 'E';
 
 // Default domain id
-$c_default_domain = 1;
+$c_default_domain = 2;
 
 // Query limits (for user queries)
 $cql_max_row = 50000;    // Maximum rows to be returned

@@ -17,7 +17,8 @@ function get_control_user_infos($domain_id="") {
   global $cdg_sql;
 
   if ($domain_id > 0) {
-    $where_domain = "AND userobm_domain_id='$domain_id'";
+    $domain_id = sql_parse_id($domain_id, true);
+    $where_domain = "AND userobm_domain_id $domain_id"; 
   }
 
   // get # users
@@ -31,7 +32,7 @@ function get_control_user_infos($domain_id="") {
 
   // get # archive users
   $query = "SELECT count(*) FROM P_UserObm
-    WHERE userobm_archive='1'
+    WHERE userobm_archive=1
       $where_domain";
 
   display_debug_msg($query, $cdg_sql, "get_control_user_infos(2)");
@@ -52,7 +53,8 @@ function get_control_group_infos($domain_id="") {
   global $cdg_sql;
 
   if ($domain_id > 0) {
-    $where_domain = "AND group_domain_id='$domain_id'";
+    $domain_id = sql_parse_id($domain_id, true);
+    $where_domain = "AND group_domain_id $domain_id"; 
   }
 
   // get # groups
@@ -67,7 +69,7 @@ function get_control_group_infos($domain_id="") {
   // get # private groups
 
   $query = "SELECT count(*) FROM P_UGroup
-    WHERE group_privacy = '1'
+    WHERE group_privacy = 1
       $where_domain";
   display_debug_msg($query, $cdg_sql, "get_control_group_infos(2)");
   $obm_q = new DB_OBM;
@@ -88,7 +90,8 @@ function get_control_mailshare_infos($domain_id="") {
   global $cdg_sql;
 
   if ($domain_id > 0) {
-    $where_domain = "WHERE mailshare_domain_id='$domain_id'";
+    $domain_id = sql_parse_id($domain_id, true);
+    $where_domain = "WHERE mailshare_domain_id $domain_id"; 
   }
 
   $query = "SELECT count(*) FROM P_MailShare $where_domain";

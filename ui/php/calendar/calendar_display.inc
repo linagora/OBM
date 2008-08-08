@@ -3723,7 +3723,7 @@ function html_calendar_waiting_events($obm_wait) {
   global $l_users, $l_title, $l_location, $l_priority, $l_category,$l_high;
   global $l_dateend,$l_change_state,$l_validate,$l_user, $l_resource, $l_owner;
   global $l_wait,$l_low,$l_medium,$l_datebegin,$l_daysofweekshort,$l_update;
-  global  $l_carac,$l_accept,$l_refuse,$l_periodic,$l_yes,$l_no;
+  global  $l_carac,$l_accept,$l_refuse,$l_periodic,$l_yes,$l_no,$path;
    
   while ($obm_wait->next_record()) {
     $old_entity = $current_entity;

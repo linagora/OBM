@@ -20,7 +20,7 @@ function run_query_incident_search($incident) {
 
   $sql_order_dir = $incident['sql_order_dir'];
   $sql_order_field = $incident['sql_order_field'];
-  
+
   $text = sql_search_text_parse($incident['text']);
   $lincident = sql_search_text_parse($incident['lincident']);
   $lcontract = sql_search_text_parse($incident['lcontract']);
@@ -37,7 +37,7 @@ function run_query_incident_search($incident) {
   $archive = $incident['archive'];
   $reference = sql_search_text_parse($incident['reference']);
   $multidomain = sql_multidomain('incident');
-	
+
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
@@ -47,38 +47,42 @@ function run_query_incident_search($incident) {
 
   $where = '1=1';
   if ($text != '') {
-     $where .= " AND (Incident.incident_label $like '%$text%'
-       OR Incident.incident_reference $like '%$text%'
-       OR Incident.incident_comment $like '%$text%'
-       OR Incident.incident_resolution $like '%$text%')";
+    $where .= " AND (Incident.incident_label $like '%$text%'
+      OR Incident.incident_reference $like '%$text%'
+      OR Incident.incident_comment $like '%$text%'
+      OR Incident.incident_resolution $like '%$text%')";
   }
   if ($lincident != '') {
-     $where .= " AND Incident.incident_label $like '%$lincident%'";
+    $where .= " AND Incident.incident_label $like '%$lincident%'";
   }
   if ($reference != '') {
-     $where .= " AND Incident.incident_reference $like '$reference'";
+    $where .= " AND Incident.incident_reference $like '$reference'";
   }
   if ($i_id != '') {
-     $where .= " AND Incident.incident_id $like '$i_id'";
+    $i_id = sql_parse_id($i_id, true);
+    $where .= " AND Incident.incident_id $i_id ";
   }
   if ($owner != $c_all && ($owner != '')) {
-     $where .=" AND (Incident.incident_owner = '$owner') ";
+    $owner = sql_parse_id($owner, true);
+    $where .=" AND (Incident.incident_owner $owner ) ";
   }
   if ($logger != $c_all && ($logger != '')) {
-     $where .=" AND (Incident.incident_logger = '$logger') ";
+    $logger = sql_parse_id($logger, true);
+    $where .=" AND (Incident.incident_logger $logger ) ";
   }
   if ($dateafter !='') {
-     $where .=" AND (Incident.incident_date >= '$dateafter') ";
+    $where .=" AND (Incident.incident_date >= '$dateafter') ";
   }
   if ($datebefore !='') {
-     $where .=" AND (Incident.incident_date <= '$datebefore') ";
+    $where .=" AND (Incident.incident_date <= '$datebefore') ";
   }
   if ($contract_id != '') {
-     $where .= " AND incident_contract_id = '$contract_id'";
+    $contract_id = sql_parse_id($contract_id, true);
+    $where .= " AND incident_contract_id = '$contract_id'";
   }
   if ($lcontract != '') {
-     $where .= " AND contract_label $like '$lcontract%'";
-     $join_contr = 'LEFT JOIN Contract ON incident_contract_id=contract_id';
+    $where .= " AND contract_label $like '$lcontract%'";
+    $join_contr = 'LEFT JOIN Contract ON incident_contract_id=contract_id';
   }
   if ($company != '') {
     $where .= sql_global_company_name_advanced_search($company, $like);
@@ -87,20 +91,23 @@ function run_query_incident_search($incident) {
   }
   $join_priority = 'LEFT JOIN IncidentPriority ON incident_priority_id=incidentpriority_id';
   if (($priority != $c_all) && ($priority != '')) { 
-    $where .= " AND Incident.incident_priority_id = '$priority'";
+    $priority = sql_parse_id($priority, true);
+    $where .= " AND Incident.incident_priority_id $priority ";
   }
   if (($status != $c_all) && ($status != '')) { 
-    $where .= " AND Incident.incident_status_id = '$status'";
+    $status = sql_parse_id($status, true);
+    $where .= " AND Incident.incident_status_id $status ";
   }
   $join_resolutiontype = 'LEFT JOIN IncidentResolutionType ON incident_resolutiontype_id=incidentresolutiontype_id';
   if (($resolutiontype != $c_all) && ($resolutiontype != '')) {
-    $where .= " AND Incident.incident_resolutiontype_id = '$resolutiontype'";
+    $resolutiontype = sql_parse_id($resolutiontype, true);
+    $where .= " AND Incident.incident_resolutiontype_id $resolutiontype ";
   }
 
   if ($archive != '1') {
-    $where .= " AND Incident.incident_archive = '0'";
+    $where .= " AND Incident.incident_archive = 0";
   } elseif($cgp_archive_only) {
-    $where .= " AND Incident.incident_archive = '1'";
+    $where .= " AND Incident.incident_archive = 1";
   }
 
   // User defined data
@@ -118,39 +125,39 @@ function run_query_incident_search($incident) {
   $orderq .= " ORDER BY $order $sql_order_dir, incidentpriority_code";
 
   $select = "SELECT
-      Incident.incident_id as id,
-      incident_id,
-      incident_timeupdate,
-      incident_contract_id,
-      incident_label,
-      incident_reference,
-      incident_date,
-      incident_priority_id,
-      incidentpriority_label as incident_priority,
-      incidentpriority_color,
-      incident_status_id as incident_status,
-      incidentresolutiontype_label as resolutiontype_label,
-      incident_logger,
-      incident_owner,
-      incident_archive,
-      incident_duration,
-      $date,
-      $timeupdate,
-      contract_label,
-      u1.userobm_lastname as incident_logger_lastname,
-      u2.userobm_lastname as incident_owner_lastname,
-      Company.company_name as incident_company_name
+    Incident.incident_id as id,
+    incident_id,
+    incident_timeupdate,
+    incident_contract_id,
+    incident_label,
+    incident_reference,
+    incident_date,
+    incident_priority_id,
+    incidentpriority_label as incident_priority,
+    incidentpriority_color,
+    incident_status_id as incident_status,
+    incidentresolutiontype_label as resolutiontype_label,
+    incident_logger,
+    incident_owner,
+    incident_archive,
+    incident_duration,
+    $date,
+    $timeupdate,
+    contract_label,
+    u1.userobm_lastname as incident_logger_lastname,
+    u2.userobm_lastname as incident_owner_lastname,
+    Company.company_name as incident_company_name
     FROM Incident";
 
   $left_join = "
-         LEFT JOIN Contract ON incident_contract_id=contract_id
-         LEFT JOIN Company ON contract_company_id=company_id
-         LEFT JOIN UserObm as u1 ON incident_logger=u1.userobm_id
-         LEFT JOIN UserObm as u2 ON incident_owner=u2.userobm_id
-         $join_priority
-         $join_status
-         $join_resolutiontype
-         $join_userdata";
+    LEFT JOIN Contract ON incident_contract_id=contract_id
+    LEFT JOIN Company ON contract_company_id=company_id
+    LEFT JOIN UserObm as u1 ON incident_logger=u1.userobm_id
+    LEFT JOIN UserObm as u2 ON incident_owner=u2.userobm_id
+    $join_priority
+    $join_status
+    $join_resolutiontype
+    $join_userdata";
 
   $query = "$select $left_join $whereq $orderq $limit";
 
@@ -184,43 +191,43 @@ function run_query_incident_detail($id) {
   $datebegin = sql_date_format($db_type, 'contract_datebegin', 'datebegin');
   $dateexp = sql_date_format($db_type, 'contract_dateexp', 'dateexp');
   $multidomain = sql_multidomain('incident');
-	
+  $id = sql_parse_id($id, true);
   $query = "SELECT *,
-        u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
-        u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        incidentpriority_label,
-        incident_status_id,
-        incidentresolutiontype_label,
-        $date,
-        $timeupdate,
-        $timecreate,
-        c.userobm_login as usercreate,
-        u.userobm_login as userupdate,
-        company_name,
-        contract_id,
-        contract_label,
-        contract_number,
-        $datebegin,
-        $dateexp,
-        contractstatus_label,
-        c1.contact_lastname as lname_c1, c1.contact_firstname as fname_c1,
-        c1.contact_phone as phone_c1, c1.contact_email as email_c1,
-        c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2,
-        c2.contact_phone as phone_c2, c2.contact_email as email_c2
-      FROM Incident
-        LEFT JOIN Contract on incident_contract_id=contract_id
-        LEFT JOIN ContractStatus on contract_status_id=contractstatus_id
-        LEFT JOIN Company on contract_company_id=company_id
-        LEFT JOIN UserObm u1 on incident_logger=u1.userobm_id
-        LEFT JOIN UserObm u2 on incident_owner=u2.userobm_id
-        LEFT JOIN IncidentPriority on incident_priority_id=incidentpriority_id
-        LEFT JOIN IncidentResolutionType on incident_resolutiontype_id=incidentresolutiontype_id
-        LEFT JOIN UserObm as c on incident_usercreate=c.userobm_id
-        LEFT JOIN UserObm as u on incident_userupdate=u.userobm_id
-        LEFT JOIN Contact c1 on contract_contact1_id=c1.contact_id
-        LEFT JOIN Contact c2 on contract_contact2_id=c2.contact_id
-      WHERE incident_id='$id' $multidomain";
- 
+    u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
+    u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
+    incidentpriority_label,
+    incident_status_id,
+    incidentresolutiontype_label,
+    $date,
+    $timeupdate,
+    $timecreate,
+    c.userobm_login as usercreate,
+    u.userobm_login as userupdate,
+    company_name,
+    contract_id,
+    contract_label,
+    contract_number,
+    $datebegin,
+    $dateexp,
+    contractstatus_label,
+    c1.contact_lastname as lname_c1, c1.contact_firstname as fname_c1,
+    c1.contact_phone as phone_c1, c1.contact_email as email_c1,
+    c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2,
+    c2.contact_phone as phone_c2, c2.contact_email as email_c2
+    FROM Incident
+    LEFT JOIN Contract on incident_contract_id=contract_id
+    LEFT JOIN ContractStatus on contract_status_id=contractstatus_id
+    LEFT JOIN Company on contract_company_id=company_id
+    LEFT JOIN UserObm u1 on incident_logger=u1.userobm_id
+    LEFT JOIN UserObm u2 on incident_owner=u2.userobm_id
+    LEFT JOIN IncidentPriority on incident_priority_id=incidentpriority_id
+    LEFT JOIN IncidentResolutionType on incident_resolutiontype_id=incidentresolutiontype_id
+    LEFT JOIN UserObm as c on incident_usercreate=c.userobm_id
+    LEFT JOIN UserObm as u on incident_userupdate=u.userobm_id
+    LEFT JOIN Contact c1 on contract_contact1_id=c1.contact_id
+    LEFT JOIN Contact c2 on contract_contact2_id=c2.contact_id
+    WHERE incident_id $id $multidomain";
+
   display_debug_msg($query, $cdg_sql, 'run_query_incident_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
@@ -240,24 +247,24 @@ function run_query_incident_insert($incident) {
   global $cdg_sql, $cgp_host, $obm;
   global $cmail_incident, $l_mail_incident_new_subject, $l_status, $l_contract;
 
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
   $now = date('Y-m-d H:i:s');
-  $domain_id = $obm['domain_id'];
-	
+  $domain_id = sql_parse_id($obm['domain_id']);
+
   $contract_id = $incident['contract_new_id'];
   if ($contract_id < 1) {
     $contract_id = $incident['contract_id'];
   }
-
+  $contract_id = sql_parse_id($contract_id);
   $lincident = $incident['lincident'];
   $reference = $incident['reference'];
-  $owner = ($incident['owner'] ? "'".$incident['owner']."'" : 'null');
-  $logger = ($incident['logger'] ? "'".$incident['logger']."'" : 'null');
-  $archive = ($incident['archive'] == '1' ? '1' : '0');
+  $owner = sql_parse_id($incident['owner']);
+  $logger = sql_parse_id($incident['logger']);
+  $archive = sql_parse_int($incident['archive']);
   $solu = $incident['solution'];
-  $priority = $incident['priority'];
-  $status = $incident['status'];
-  $reso = $incident['resolutiontype'];
+  $priority = sql_parse_id($incident['priority']);
+  $status = sql_parse_id($incident['status']);
+  $reso = sql_parse_id($incident['resolutiontype']);
   $date = of_isodate_convert($incident['date']);
   $hour = $incident['hour'];
   $add_duration = $incident['add_duration'];
@@ -288,25 +295,25 @@ function run_query_incident_insert($incident) {
     incident_duration,
     incident_archive,
     incident_resolution)
-  VALUES (
-    '$domain_id',
-    null,
-    '$now',
-    null,
-    '$uid',
-    '$lincident',
-    '$reference',
-    '$contract_id',
-    '$call_date',
-    '$priority',
-    '$status',
-    '$reso',
-    '$comment',
-    $logger,
-    $owner,
-    '$add_duration',
-    '$archive',
-    '$solu')";
+    VALUES (
+      $domain_id,
+      null,
+      '$now',
+      null,
+      $uid,
+      '$lincident',
+      '$reference',
+      $contract_id,
+      '$call_date',
+      $priority,
+      $status,
+      $reso,
+      '$comment',
+      $logger,
+      $owner,
+      '$add_duration',
+      $archive,
+      '$solu')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_incident_insert()');
   $obm_q = new DB_OBM;
@@ -327,9 +334,9 @@ function run_query_incident_insert($incident) {
     $subject = "$l_mail_incident_new_subject : $company_name : $label_mail";
     $message = "$cgp_host/incident/incident_index.php?action=detailconsult&incident_id=$i_id
 
-$l_status: $status
-$l_contract: $contract
-$comment";
+      $l_status: $status
+      $l_contract: $contract
+      $comment";
     send_mail($subject, $message, array($logger, $owner), array("$cmail_incident"), 1);
   }
 
@@ -351,28 +358,29 @@ function run_query_incident_id($incident) {
   if ($contract_id < 1) {
     $contract_id = $incident['contract_id'];
   }
+  $contract_id = sql_parse_id($contract_id, true);
   $lincident = $incident['lincident'];
-  $owner = ($incident['owner'] ? "='".$incident['owner']."'" : ' is null');
-  $logger = ($incident['logger'] ? "='".$incident['logger']."'" : ' is null');
+  $owner = sql_parse_id($incident['owner'], true);
+  $logger = sql_parse_id($incident['logger'], true);
   $date = of_isodate_convert($incident['date']);
-  $pri = ($incident['priority'] ? "='".$incident['priority']."'" : ' is null');
-  $status = (isset($incident['status']) ? "='".$incident['status']."'" : ' is null');
+  $pri = sql_parse_id($incident['priority'], true);
+  $status = sql_parse_id($incident['status'], true);
   $hour = $incident['hour'];
   $call_date = "$date $hour:0:0";
-  $archive = ($incident['archive'] == '1' ? '1' : '0');
+  $archive = sql_parse_int($incident['archive']);
   $multidomain = sql_multidomain('incident');
 
-  $query = "SELECT incident_id
+  $query = "SELECT MAX(incident_id) as incident_id
     FROM Incident
-    WHERE incident_contract_id='$contract_id'
-      AND incident_label = '$lincident'
-      AND incident_owner $owner
-      AND incident_logger $logger
-      AND incident_date='$call_date'
-      AND incident_priority_id $pri
-      AND incident_status_id $status
-      AND incident_archive='$archive'
-      $multidomain";
+    WHERE incident_contract_id $contract_id 
+    AND incident_label = '$lincident'
+    AND incident_owner $owner
+    AND incident_logger $logger
+    AND incident_date='$call_date'
+    AND incident_priority_id $pri
+    AND incident_status_id $status
+    AND incident_archive=$archive
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql,'run_query_incident_id()');
   $obm_q = new DB_OBM;
@@ -431,19 +439,20 @@ function run_query_incident_update($incident) {
   if ($contract_id < 1) {
     $contract_id = $incident['contract_id'];
   }
-  $id = $incident['incident_id'];
+  $contract_id = sql_parse_id($contract_id);
+  $id = sql_parse_id($incident['incident_id'], true);
   $lincident = $incident['lincident'];
   $reference = $incident['reference'];
-  $owner = ($incident['owner'] ? "='".$incident['owner']."'" : '= null');
-  $logger = ($incident['logger'] ? "='".$incident['logger']."'" : '= null');
+  $owner = sql_parse_id($incident['owner']);
+  $logger = sql_parse_id($incident['logger']);
   $solu = $incident['solution'];
-  $priority = $incident['priority'];
-  $status = $incident['status'];
-  $reso = $incident['resolutiontype'];
+  $priority = sql_parse_id($incident['priority']);
+  $status = sql_parse_id($incident['status']);
+  $reso = sql_parse_id($incident['resolutiontype']);
   $date = of_isodate_convert($incident['date']);
   $hour = $incident['hour'];
   $duration = $incident['duration'];
-  $archive = ($incident['archive'] == '1' ? '1' : '0');
+  $archive = sql_parse_int($incident['archive']);
   $call_date = "$date $hour:0:0";
   $comment = $incident['comment'];
   $add_comment = $incident['add_comment'];
@@ -460,28 +469,28 @@ function run_query_incident_update($incident) {
   }
   if ($inc_info['status_id'] != $cincident_status['closed'] 
     && $status == $cincident_status['closed']) {
-    $closed = true;  
-  }
+      $closed = true;  
+    }
 
   $multidomain = sql_multidomain('incident');
-  
+
   $query = "UPDATE Incident SET
-      incident_timeupdate='". date('Y-m-d H:i:s')."',
-      incident_userupdate='".$obm['uid']."',
-      incident_logger $logger,
-      incident_owner $owner,
+    incident_timeupdate='". date('Y-m-d H:i:s')."',
+      incident_userupdate=$obm[uid],
+      incident_logger=$logger,
+      incident_owner=$owner,
       incident_label='$lincident',
       incident_reference='$reference',
       incident_date='$call_date', 
-      incident_priority_id='$priority',
-      incident_status_id='$status',
-      incident_resolutiontype_id='$reso',
+      incident_priority_id=$priority,
+      incident_status_id=$status,
+      incident_resolutiontype_id=$reso,
       incident_resolution = '$solu',
       incident_duration = '$duration',
       incident_comment='$comment',
-      incident_archive='$archive',
-      incident_contract_id = '$contract_id'
-    WHERE incident_id='$id' $multidomain";
+      incident_archive=$archive,
+      incident_contract_id=$contract_id
+      WHERE incident_id $id $multidomain";
 
   $inc_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'run_query_incident_update()');
@@ -491,17 +500,17 @@ function run_query_incident_update($incident) {
     if($owner_changed) {
       $label_mail = stripslashes($lincident);
       $subject = "$l_mail_incident_affected_subject : $label_mail";
-      $message = "$l_mail_incident_affected_content : $cgp_host/incident/incident_index.php?action=detailconsult&incident_id=$id";
+      $message = "$l_mail_incident_affected_content : $cgp_host/incident/incident_index.php?action=detailconsult&incident_id=$incident[incident_id]";
       send_mail($subject, $message,  array($incident['owner']), array(), 1);
     }
     if($closed) {
       $label_mail = stripslashes($lincident);
       $subject = "$l_mail_incident_closed_subject : $label_mail";
-      $message = "$cgp_host/incident/incident_index.php?action=detailconsult&incident_id=$id $l_mail_incident_closed_content";
-      
+      $message = "$cgp_host/incident/incident_index.php?action=detailconsult&incident_id=$incident[incident_id] $l_mail_incident_closed_content";
+
       send_mail($subject, $message, array($incident['owner']), array("$cmail_incident"), 1);
     }
-    $ret = of_userdata_query_update('incident', $id, $incident);
+    $ret = of_userdata_query_update('incident', $incident['incident_id'], $incident);
   }
 
   return $ret;
@@ -515,13 +524,13 @@ function run_query_incident_update($incident) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_incident_delete($i_id) {
   global $cdg_sql;
- 
+
   $ret = of_userdata_query_delete('incident', $i_id);
   $multidomain = sql_multidomain('incident');
-
+  $i_id = sql_parse_id($i_id, true);
   $query = "DELETE FROM Incident 
-    WHERE incident_id='$i_id'
-      $multidomain";
+    WHERE incident_id $i_id 
+    $multidomain";
 
   $i_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'run_query_incident_delete()');
@@ -542,23 +551,23 @@ function run_query_incident_owner($archive = false) {
   global $cdg_sql;
 
   if (! $archive) {
-    $where_arch .= " incident_archive='0'";
+    $where_arch .= " incident_archive=0";
   }
 
-	$multidomain = sql_multidomain('incident');
+  $multidomain = sql_multidomain('incident');
 
   if ($where_arch != '') {
     $where = "WHERE $where_arch $multidomain";
   } else {
-  	$where = "WHERE 1=1 $multidomain";
+    $where = "WHERE 1=1 $multidomain";
   }
-	
+
   $query = "SELECT DISTINCT
-      userobm_id,
-      userobm_lastname,
-      userobm_firstname
+    userobm_id,
+    userobm_lastname,
+    userobm_firstname
     FROM Incident
-      LEFT JOIN UserObm ON incident_owner=userobm_id
+    LEFT JOIN UserObm ON incident_owner=userobm_id
     $where
     ORDER BY userobm_lastname";
 
@@ -581,23 +590,23 @@ function run_query_incident_logger($archive = false) {
   global $cdg_sql;
 
   if (! $archive) {
-    $where_arch .= " incident_archive='0'";
+    $where_arch .= " incident_archive=0";
   }
 
-	$multidomain = sql_multidomain('incident');
+  $multidomain = sql_multidomain('incident');
 
   if ($where_arch != '') {
     $where = "WHERE $where_arch $multidomain";
   } else {
-  	$where = "WHERE 1=1 $multidomain";
+    $where = "WHERE 1=1 $multidomain";
   }
-	
+
   $query = "SELECT DISTINCT
-      userobm_id,
-      userobm_lastname,
-      userobm_firstname
+    userobm_id,
+    userobm_lastname,
+    userobm_firstname
     FROM Incident
-      LEFT JOIN UserObm ON incident_logger=userobm_id
+    LEFT JOIN UserObm ON incident_logger=userobm_id
     $where
     ORDER BY userobm_lastname";
 
@@ -617,25 +626,25 @@ function run_query_incident_logger($archive = false) {
 function get_incident_info($id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain('incident');
-
+  $multidomain = sql_multidomain('incident');
+  $id = sql_parse_id($id, true);
   $query = "SELECT
-      incident_id,
-      incident_label,
-      incident_status_id,
-      incident_owner,
-      contract_label,
-      company_name
+    incident_id,
+    incident_label,
+    incident_status_id,
+    incident_owner,
+    contract_label,
+    company_name
     FROM Incident
-      LEFT JOIN Contract on incident_contract_id=contract_id
-      LEFT JOIN Company on contract_company_id=company_id
-    WHERE incident_id='$id' $multidomain";
+    LEFT JOIN Contract on incident_contract_id=contract_id
+    LEFT JOIN Company on contract_company_id=company_id
+    WHERE incident_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  
+
   $res['incident_id'] = $obm_q->f('incident_id');
   $res['label'] = $obm_q->f('incident_label');
   $status = get_incident_status();

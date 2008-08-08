@@ -66,8 +66,6 @@ function run_query_admin_active_user($delay) {
   if ($delay > 0) {
     $date_limit = date("Y-m-d H:i:s",time() - $delay);
     $where_date = "and ActiveUserObm.activeuserobm_timeupdate >= '$date_limit'";
-  } else {
-    $date_limit = 0;
   }
 
   $obm_q = new DB_OBM;

@@ -46,31 +46,41 @@ function run_query_contract_search($contract) {
   
   $where .= sql_obm_entity_privacy("contract");
 
-  if (($type != $c_all) && ($type != ""))
-    $where .= " AND contract_type_id = '$type'";
-
-  if ($num != "")
+  if (($type != $c_all) && ($type != "")){ 
+    $type = sql_parse_id( $type, true);
+    $where .= " AND contract_type_id $type"; 
+  }
+  if ($num != "") {
     $where .= " AND (contract_number $like '%$num%')";
+  }
 
-  if (($status != $c_all) && ($status != ""))
-    $where .= " AND (contract_status_id = '$status')";
+  if (($status != $c_all) && ($status != "")) {
+    $status = sql_parse_id( $status, true);
+    $where .= " AND (contract_status_id $status)"; 
+  }
 
-  if (($contract_kind != $c_all) && ($contract_kind != ""))
-    $where .= " AND (contract_kind = '$contract_kind')";
+  if (($contract_kind != $c_all) && ($contract_kind != "")) {
+    $contract_kind = sql_parse_id( $contract_kind, true);
+    $where .= " AND (contract_kind $contract_kind)"; 
+  }
 
-  if (($priority != $c_all) && ($priority != ""))
-    $where .= " AND (contract_priority_id = '$priority')";
+  if (($priority != $c_all) && ($priority != "")) {
+    $priority = sql_parse_id(  $priority, true);
+    $where .= " AND (contract_priority_id $priority)"; 
+  }
 
   if ($comp != "") {
     $where .= sql_global_company_name_advanced_search($comp, $like);
     $join_comp = "LEFT JOIN Company ON contract_company_id=company_id";
   }
   if ($company_id != "") {
-    $where .= " and contract_company_id = '$company_id'";
+    $company_id = sql_parse_id( $company_id, true);
+    $where .= " and contract_company_id $company_id"; 
   }
   if ($contact_id != "") {
-    $where .= " AND (contract_contact1_id = '$contact_id'
-                     OR contract_contact2_id = '$contact_id')";
+    $contact_id = sql_parse_id( $contact_id, true);
+    $where .= " AND (contract_contact1_id $contact_id 
+                     OR contract_contact2_id $contact_id)"; 
   }
   if ($dateafter != "")
     $where .= " AND (contract_dateexp >= '$dateafter')";
@@ -82,16 +92,18 @@ function run_query_contract_search($contract) {
     $where .= " AND (contract_label $like '%$label%')";
   
   if (($manager != $c_all) && ($manager != "")) {
-    $where .= " AND (contract_techmanager_id='$manager'
-                    OR contract_marketmanager_id='$manager') ";
+    $manager = sql_parse_id( $manager, true);
+    $where .= " AND (contract_techmanager_id $manager 
+                    OR contract_marketmanager_id $manager) ";
   }
   if ($deal != "") {
-    $where .= " AND (contract_deal_id = '$deal')";
+    $deal = sql_parse_id( $deal, true);
+    $where .= " AND (contract_deal_id $deal)"; 
   }
   if ($archive != "1") {
-    $where .= " AND contract_archive = '0'";
+    $where .= " AND contract_archive = 0";
   } elseif ($cgp_archive_only) {
-    $where .= " AND contract_archive = '1'";
+    $where .= " AND contract_archive = 1";
   }
 
   $whereq = "WHERE $where $multidomain";
@@ -162,7 +174,7 @@ function run_query_contract_search($contract) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_detail($id) {
   global $cdg_sql;  
-
+  $id = sql_parse_id( $id, true);
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $datebegin = sql_date_format($db_type, "contract_datebegin", "datebegin");
@@ -215,7 +227,7 @@ function run_query_contract_detail($id) {
          LEFT JOIN Deal on contract_deal_id=deal_id
          LEFT JOIN UserObm as c on contract_usercreate=c.userobm_id
          LEFT JOIN UserObm as u on contract_userupdate=u.userobm_id
-    WHERE contract_id = '$id' $multidomain";
+    WHERE contract_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -232,18 +244,15 @@ function run_query_contract_insert($contract) {
   global $display, $cdg_sql, $cgp_show, $obm;
 
   $vis = ($contract["privacy"]==1)?1:0;
-  $uid = $obm["uid"];
-  $domain_id = $obm["domain_id"];
+  $uid = sql_parse_id( $obm["uid"]);
+  $domain_id = sql_parse_id( $obm["domain_id"]);
   $label = $contract["label"];
-  $comp_id = $contract["company_id"];
+  $comp_id = sql_parse_id( $contract["company_id"]);
   $deal_id = $contract["deal_new_id"];
   if ($deal_id < 1) {
     $deal_id = $contract["deal_id"];
   }
-  // In case deal module not used, to avoid postgres error
-  if ($deal_id == "") {
-    $deal_id = "0";
-  }
+  $deal_id = sql_parse_id( $deal_id);
   $num = $contract["number"];
   $clause = $contract["clause"];
   $datesignature = ($contract["datesignature"] ? "'".$contract["datesignature"]."'" : "null");
@@ -251,18 +260,18 @@ function run_query_contract_insert($contract) {
   $dateexp = ($contract["dateexp"] ? "'".of_isodate_convert($contract["dateexp"])."'" : "null");
   $daterenew = ($contract["daterenew"] ? "'".of_isodate_convert($contract["daterenew"])."'" : "null");
   $datecancel = ($contract["datecancel"] ? "'".of_isodate_convert($contract["datecancel"])."'" : "null");
-  $priority = ($contract["priority"] ? $contract["priority"] : "0");
-  $status = $contract["status"];
-  $contract_kind = $contract["kind"];
+  $priority = sql_parse_id( $contract["priority"]);
+  $status = sql_parse_id( $contract["status"]);
+  $contract_kind = sql_parse_id( $contract["kind"]);
   $format = $contract["format"];
-  $ticket_nb = ($contract["ticket_nb"] ? $contract["ticket_nb"] : "0");
-  $duration = $contract["duration"];
-  $autorenew = ($contract["autorenew"] ? $contract["autorenew"] : "0");
-  $sel_type = $contract["type"];
-  $con1 = ($contract["con1"] ? $contract["con1"] : "0");
-  $con2 = ($contract["con2"] ? $contract["con2"] : "0");
-  $tech = ($contract["tech"] ? $contract["tech"] : "0");
-  $market = ($contract["market"] ? $contract["market"] : "0");
+  $ticket_nb = sql_parse_int( $contract["ticket_nb"]);
+  $duration = sql_parse_int( $contract["duration"]);
+  $autorenew = sql_parse_int( $contract["autorenew"]);
+  $sel_type = sql_parse_id( $contract["type"]);
+  $con1 = sql_parse_id( $contract["con1"]);
+  $con2 = sql_parse_id( $contract["con2"]);
+  $tech = sql_parse_id( $contract["tech"]);
+  $market = sql_parse_id( $contract["market"]);
   $add_comment = $contract["add_comment"];
   if ($add_comment != "") {
     $datecomment = of_isodate_convert($contract["datecomment"]);
@@ -305,33 +314,33 @@ function run_query_contract_insert($contract) {
     VALUES (
       null,
       '". date("Y-m-d H:i:s") ."', 
-      '$uid',
-      '$uid',
-      '$domain_id',
-      '$vis',  
+      $uid,
+      $uid,
+      $domain_id,
+      $vis,  
       '$label',
-      '$deal_id',
-      '$comp_id',
+      $deal_id,
+      $comp_id,
       '$num',
-      '$priority',      
-      '$status',
+      $priority,      
+      $status,
       $datesignature,
       $datebegin,
       $dateexp,
       $daterenew,
       $datecancel,
-      '$sel_type',
-      '$autorenew',
-      '$contract_kind',    
+      $sel_type,
+      $autorenew,
+      $contract_kind,    
       '$format',  
       '$ticket_nb',  
-      '$duration',  
-      '$con1',
-      '$con2',
-      '$tech',
-      '$market',
+      $duration,  
+      $con1,
+      $con2,
+      $tech,
+      $market,
       '$clause',
-      '$archive',    
+      $archive,    
       '$comment')";
 
   display_debug_msg($query, $cdg_sql);
@@ -351,7 +360,7 @@ function run_query_contract_update($contract) {
   global $obm, $cdg_sql, $ccf_ticket, $ccf_duration;
 
   $vis = ($contract["privacy"]==1)?1:0;
-  $id = $contract["contract_id"];
+  $id = sql_parse_id( $contract["contract_id"], true);
   $num = $contract["number"];
   $label = $contract["label"];
   $datesignature = ($contract["datesignature"] ? "'".of_isodate_convert($contract["datesignature"])."'" : "null");
@@ -359,27 +368,27 @@ function run_query_contract_update($contract) {
   $dateexp = ($contract["dateexp"] ? "'".of_isodate_convert($contract["dateexp"])."'" : "null");
   $daterenew = ($contract["daterenew"] ? "'".of_isodate_convert($contract["daterenew"])."'" : "null");
   $datecancel = ($contract["datecancel"] ? "'".of_isodate_convert($contract["datecancel"])."'" : "null");
-  $priority = ($contract["priority"] ? $contract["priority"] : "0");
+  $priority = sql_parse_id( $contract["priority"]);
   $status = $contract["status"];
-  $contract_kind = $contract["kind"];
-  $type = $contract["type"];
-  $autorenew = ($contract["autorenew"] ? $contract["autorenew"] : "0");
+  $contract_kind = sql_parse_id( $contract["kind"]);
+  $type = sql_parse_id( $contract["type"]);
+  $autorenew = sql_parse_int( $contract["autorenew"]);
   $format = $contract["format"];
   if ($format == $ccf_ticket) {
-    $ticket_nb = ($contract["ticket_nb"] ? $contract["ticket_nb"] : "0");
+    $ticket_nb = sql_parse_int( $contract["ticket_nb"]);
   } else {
     $ticket_nb = 0;
   }
   if ($format == $ccf_duration) {
-    $duration = $contract["duration"];
+    $duration = sql_parse_int( $contract["duration"]);
   } else {
     $duration = 0;
   }
-  $company_id = $contract["company_id"];
-  $con1 = ($contract["con1"] ? $contract["con1"] : "0");
-  $con2 = ($contract["con2"] ? $contract["con2"] : "0");
-  $tech = ($contract["tech"] ? $contract["tech"] : "0");
-  $market = ($contract["market"] ? $contract["market"] : "0");
+  $company_id = sql_parse_id( $contract["company_id"]);
+  $con1 = sql_parse_id( $contract["con1"]);
+  $con2 = sql_parse_id( $contract["con2"]);
+  $tech = sql_parse_id( $contract["tech"]);
+  $market = sql_parse_id( $contract["market"]);
   $comment = $contract["comment"];
   $add_comment = $contract["add_comment"];
   if ($add_comment != "") {
@@ -393,41 +402,39 @@ function run_query_contract_update($contract) {
     $deal_id = $contract["deal_id"];
   }
   // In case deal module not used, to avoid postgres error
-  if ($deal_id == "") {
-    $deal_id = "0";
-  }
+  $deal_id = sql_parse_id( $deal_id);
   $archive = ($contract["archive"] == "1" ? "1" : "0");
   $multidomain = sql_multidomain("contract");
 	  
   $query = "UPDATE Contract SET
       contract_timeupdate = '". date("Y-m-d H:i:s")."',
-      contract_userupdate = '".$obm["uid"]."',
-      contract_privacy = '$vis',
+      contract_userupdate = ".$obm["uid"].",
+      contract_privacy = $vis,
       contract_number = '$num',
       contract_label = '$label',
-      contract_deal_id = '$deal_id',
-      contract_priority_id = '$priority',
-      contract_status_id = '$status',
-      contract_kind = '$contract_kind',
+      contract_deal_id = $deal_id,
+      contract_priority_id = $priority,
+      contract_status_id = $status,
+      contract_kind = $contract_kind,
       contract_format = '$format',
-      contract_autorenewal = '$autorenew',
-      contract_ticketnumber = '$ticket_nb',
-      contract_duration = '$duration',
+      contract_autorenewal = $autorenew,
+      contract_ticketnumber = $ticket_nb,
+      contract_duration = $duration,
       contract_datesignature = $datesignature,
       contract_datebegin = $datebegin,
       contract_dateexp = $dateexp,
       contract_daterenew = $daterenew,
       contract_datecancel = $datecancel,
-      contract_type_id = '$type',
-      contract_company_id = '$company_id',
-      contract_contact1_id = '$con1',
-      contract_contact2_id = '$con2',
-      contract_marketmanager_id = '$market',
-      contract_techmanager_id = '$tech',
+      contract_type_id = $type,
+      contract_company_id = $company_id,
+      contract_contact1_id = $con1,
+      contract_contact2_id = $con2,
+      contract_marketmanager_id = $market,
+      contract_techmanager_id = $tech,
       contract_comment = '$comment',
       contract_clause = '$clause',
-      contract_archive = '$archive'
-    WHERE contract_id = '$id' $multidomain";
+      contract_archive = $archive
+    WHERE contract_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_update()");
   $obm_q = new DB_OBM;
@@ -436,7 +443,6 @@ function run_query_contract_update($contract) {
   return $ret;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Delete query execution
 // Parameters:
@@ -444,9 +450,9 @@ function run_query_contract_update($contract) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_delete($p_id) {
   global $cdg_sql;
-  
+  $p_id = sql_parse_id($p_id, true); 
   $multidomain = sql_multidomain("contract");
-  $query = "DELETE FROM Contract WHERE contract_id='$p_id' $multidomain";
+  $query = "DELETE FROM Contract WHERE contract_id $p_id $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -469,12 +475,12 @@ function run_query_contract_manager($archive = false) {
   if (! $archive) {
     $where_arch .= " contract_archive=0";
   }
-	$multidomain = sql_multidomain("userobm");
+  $multidomain = sql_multidomain("userobm");
   if ($where_arch != "") {
     $where = "WHERE $where_arch $multidomain";
   } else {
   	$where = "WHERE 1=1 $multidomain";
-	}
+  }
 
 		
   $query = "SELECT DISTINCT
@@ -512,12 +518,12 @@ function run_query_contract_incident($id) {
   
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("incident");
-  
+  $id = sql_parse_id($id, true); 
   $query = "SELECT
       incident_id,
       incident_duration
     FROM Incident
-    WHERE incident_contract_id = '$id' $multidomain
+    WHERE incident_contract_id $id $multidomain
     ORDER BY incident_timecreate";
  
   display_debug_msg($query, $cdg_sql);
@@ -587,10 +593,11 @@ function run_query_contract_priority_insert($contract) {
     contractpriority_code,
     contractpriority_color,
     contractpriority_label)
-	values ('null',
+    values (
+    null,
     '".date("Y-m-d H:i:s")."',
     ".$obm["uid"].",
-    '$obm[domain_id]',
+    $obm[domain_id],
     '$code',
     '$color',
     '$label')";
@@ -643,9 +650,9 @@ function run_query_contract_priority_delete($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("contractpriority");
-	
+  $id = sql_parse_id($id, true);  
   $query = "DELETE FROM ContractPriority 
-		WHERE contractpriority_id='$id' $multidomain";
+		WHERE contractpriority_id $id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_priority_delete()");
   $sta_q = new DB_OBM;
@@ -663,13 +670,13 @@ function run_query_contract_priority_delete($id) {
 function run_query_contract_priority_links($p_id) {
   global $cdg_sql;
 
-	$multidomain = sql_multidomain("contract");
-
+  $multidomain = sql_multidomain("contract");
+  $p_id = sql_parse_id($p_id, true);
   $query = "SELECT
       contract_id, 
       contract_label
     FROM Contract 
-    WHERE contract_priority_id='$p_id' $multidomain";
+    WHERE contract_priority_id $p_id' $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_priority_links()");
   $pri_q = new DB_OBM;
@@ -688,10 +695,10 @@ function run_query_contract_status_insert($contract) {
   global $cdg_sql, $obm;
 
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $obm["uid"];
+  $usercreate = sql_parse_id($obm["uid"]);
   $label = $contract["status_label"];
   $code = $contract["status_code"];
-  $domain_id = $obm["domain_id"];
+  $domain_id = sql_parse_id($obm["domain_id"]);
 	
   $query = "INSERT INTO ContractStatus (
     contractstatus_timecreate,
@@ -701,8 +708,8 @@ function run_query_contract_status_insert($contract) {
     contractstatus_code)
   values (
     '$timecreate',
-    '$usercreate',
-    '$domain_id',
+    $usercreate,
+    $domain_id,
     '$label',
     '$code')";
 
@@ -724,8 +731,8 @@ function run_query_contract_status_update($contract) {
   global $obm, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $obm["uid"];
-  $status = $contract["status"];
+  $userupdate = sql_parse_id($obm["uid"]);
+  $status = sql_parse_id($contract["status"], true);
   $label = $contract["status_label"];
   $code = $contract["status_code"];
   $multidomain = sql_multidomain("contractstatus");
@@ -733,9 +740,9 @@ function run_query_contract_status_update($contract) {
   $query = "UPDATE ContractStatus SET
     contractstatus_label='$label',
     contractstatus_timeupdate='$timeupdate',
-    contractstatus_userupdate='$userupdate',
+    contractstatus_userupdate=$userupdate,
     contractstatus_code='$code'
-  WHERE contractstatus_id='$status'
+  WHERE contractstatus_id $status' 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_status_update()");
@@ -753,10 +760,10 @@ function run_query_contract_status_update($contract) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_status_delete($id) {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   $multidomain = sql_multidomain("contractstatus");
   $query = "DELETE FROM ContractStatus 
-		WHERE contractstatus_id='$id' $multidomain";
+		WHERE contractstatus_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_status_delete()");
   $sta_q = new DB_OBM;
@@ -775,12 +782,12 @@ function run_query_contract_status_links($s_id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("contract");
-
+  $s_id = sql_parse_id($s_id, true);
   $query = "SELECT
       contract_id, 
       contract_label
     FROM Contract 
-    WHERE contract_status_id='$s_id' $multidomain";
+    WHERE contract_status_id $s_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_status_links()");
   $sta_q = new DB_OBM;
@@ -799,11 +806,11 @@ function get_contract_priority_label($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("contractpriority");
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT
       contractpriority_label
     FROM ContractPriority
-    WHERE contractpriority_id='$id' $multidomain";
+    WHERE contractpriority_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_contract_priority_label()");
   $obm_q = new DB_OBM;
@@ -824,11 +831,11 @@ function get_contract_status_label($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("contractstatus");
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT
       contractstatus_label
     FROM ContractStatus
-    WHERE contractstatus_id='$id' $multidomain";
+    WHERE contractstatus_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_contract_status_label()");
   $obm_q = new DB_OBM;
@@ -867,7 +874,7 @@ function run_query_company_info($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("company");
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT
       company_name, 
       company_marketingmanager_id, 
@@ -875,7 +882,7 @@ function run_query_company_info($id) {
       company_zipcode,
       company_town 
     FROM Company 
-    WHERE company_id='$id' $multidomain";
+    WHERE company_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_company_info()");
   $obm_q = new DB_OBM;
@@ -893,14 +900,14 @@ function run_query_contact_contract($p_company_id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("contact");
-
+  $p_company_id = sql_parse_id($p_company_id, true);
   $query = "SELECT
       contact_id,
       contact_lastname,
       contact_firstname,
       contact_phone 
     FROM Contact 
-    WHERE contact_company_id='$p_company_id' $multidomain";
+    WHERE contact_company_id $p_company_id $multidomain";
   
   display_debug_msg($query, $cdg_sql, "run_query_contact_contract()");
   $obm_q = new DB_OBM;
@@ -949,7 +956,7 @@ function run_query_contract_type_insert($contract) {
   global $cdg_sql, $obm;
 	
   $label = $contract["type_label"];
-  $domain_id = $obm["domain_id"];
+  $domain_id = sql_parse_id($obm["domain_id"]);
 	
   $query = "INSERT INTO ContractType (
     contracttype_timeupdate,
@@ -959,8 +966,8 @@ function run_query_contract_type_insert($contract) {
     contracttype_label)
   VALUES (null,
     '".date("Y-m-d H:i:s")."',
-    '".$obm["uid"]."',
-    '$domain_id',
+    ".$obm["uid"].",
+    $domain_id,
     '$label')";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_type_insert()");
@@ -979,7 +986,7 @@ function run_query_contract_type_insert($contract) {
 function run_query_contract_type_update($contract) {
   global $obm, $cdg_sql;
 
-  $type = $contract["type"];
+  $type = sql_parse_id($contract["type"], true);
   $label = $contract["type_label"];
   $multidomain = sql_multidomain("contracttype");
 
@@ -987,7 +994,7 @@ function run_query_contract_type_update($contract) {
       contracttype_label='$label',
       contracttype_timeupdate='".date("Y-m-d H:i:s")."',
       contracttype_userupdate='".$obm["uid"]."'
-    WHERE contracttype_id='$type'
+    WHERE contracttype_id $type 
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_type_update()");
@@ -1007,8 +1014,8 @@ function run_query_contract_type_delete($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("contracttype");
-	
-  $query = "DELETE FROM ContractType WHERE contracttype_id='$id' $multidomain";
+  $id = sql_parse_id($id, true);  
+  $query = "DELETE FROM ContractType WHERE contracttype_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_type_delete()");
   $obm_q = new DB_OBM;
@@ -1027,12 +1034,12 @@ function run_query_contract_type_links($t_id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("contract");
-
+  $t_id = sql_parse_id($t_id, true);
   $query = "SELECT
       contract_id, 
       contract_label
     FROM Contract
-    WHERE contract_type_id='$t_id'
+    WHERE contract_type_id $t_id 
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_type_links()");
@@ -1052,11 +1059,11 @@ function get_contract_type_label($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("contracttype");
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT
       contracttype_label
     FROM ContractType
-    WHERE contracttype_id='$id'
+    WHERE contracttype_id $id 
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_contract_type_label()");
@@ -1078,12 +1085,12 @@ function get_contract_info($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("contract");
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT
       contract_id,
       contract_name,
     FROM Contract
-    WHERE contract_id='$id'
+    WHERE contract_id $id 
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_contract_info()");
@@ -1109,18 +1116,18 @@ function run_query_contract_id($contract) {
   global $cdg_sql;
 
   $label = $contract["label"];
-  $comp_id = $contract["company_id"];
+  $comp_id = sql_parse_id($contract["company_id"], true);
   $num = $contract["number"];
   $clause = $contract["clause"];
   $datebegin = of_isodate_convert($contract["datebegin"],true);
   $dateexp = of_isodate_convert($contract["dateexp"],true);
-  $priority = $contract["priority"];
-  $status = $contract["status"];
-  $contract_kind = $contract["kind"];
+  $priority = sql_parse_id($contract["priority"], true);
+  $status = sql_parse_id($contract["status"], true);
+  $contract_kind = sql_parse_id($contract["kind"], true);
   $format = $contract["format"];
   $ticket_nb = $contract["ticket_nb"];
-  $duration = $contract["duration"];
-  $sel_type = $contract["type"];
+  $duration = sql_parse_int($contract["duration"]);
+  $sel_type = sql_parse_id($contract["type"], true);
   $multidomain = sql_multidomain("contract");
 	
   // comment not searched because processed before stored in db
@@ -1132,9 +1139,9 @@ function run_query_contract_id($contract) {
       and contract_datebegin ='$datebegin'
       and contract_dateexp = '$dateexp'
       and contract_clause = '$clause'
-      and contract_company_id = '$comp_id'
-      and contract_priority_id = '$priority'
-      and contract_status_id = '$status' $multidomain";
+      and contract_company_id $comp_id 
+      and contract_priority_id $priority 
+      and contract_status_id $status $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_id()");
   $obm_q = new DB_OBM;
@@ -1163,7 +1170,8 @@ function run_query_check_contract($c_id, $name) {
 
   $where_id = "";
   if ($c_id != "") {
-    $where_id = "AND contract_id!='$c_id'";
+    $c_id = sql_parse_id($c_id, true, true);
+    $where_id = "AND contract_id $c_id"; 
   }
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;

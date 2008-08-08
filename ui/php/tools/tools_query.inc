@@ -74,7 +74,7 @@ function exec_tools_update_update($tools) {
   $update_type = $tools['update_type'];
 
   // Force global update from Domain 0
-  if ($obm['domain_id'] == '0') {
+  if ($obm['domain_global'] === true) {
     $update_type == 'global';
   }
 
@@ -115,7 +115,6 @@ function check_tools_update_context_ok($params) {
   $domain_id = $params['domain_id'];
   $update_type = $params['update_type'];
   $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
-
   // Check user admin rights (default to domain if not set)
   if ((! isset($admin_realm)) || ($admin_realm == '')) {
     $admin_realm = array('domain');
@@ -123,11 +122,12 @@ function check_tools_update_context_ok($params) {
 
   // if trying to exec an update
   // Check update type is allowed (global need domain 0 or 'domain' realm)
-  if (($update_type == 'global')
-     && (($domain_id != 0)
-	 && (! in_array('domain', $admin_realm)))) {
-    $err['msg'] = $l_error_permission;
-    return false;
+  if ($update_type == 'global' && isset($domain_id)) {
+    $domain = of_domain_get_domain_infos($domain_id);
+    if (($domain['global'] === false) && (! in_array('domain', $admin_realm))) {
+      $err['msg'] = $l_error_permission;
+      return false;
+    }
   }
   
   // Check if update is locked
@@ -155,7 +155,7 @@ function check_tools_update_context_ok($params) {
  * @param $domain_id : Domain id
  * @return (true | false) : true if global update needed
  */
-function check_tools_update_need_global_update($domain_id=0) {
+function check_tools_update_need_global_update($domain_id = NULL, $domain_global = false) {
   global $cdg_sql, $obm;
 
   $e1 = array();
@@ -163,109 +163,75 @@ function check_tools_update_need_global_update($domain_id=0) {
 
   $obm_q = new DB_OBM;
 
-  if ($domain_id != 0) {
-    $where = "WHERE domain_id = '$domain_id'";
+  if (!is_null($domain_id) && $domain_global === false) {
+    $where = "AND Domain.domain_id = '$domain_id'";
   }
 
   // Domain table check
-  $select = "SELECT domain_id,
-      domain_name,
-      domain_alias,
-      domain_mail_server_id";
-
-  // Get infos from Update table
-  $query = "$select FROM Domain $where";
+  $query = "SELECT 
+    count(*) as diff
+    FROM Domain LEFT JOIN P_Domain ON P_Domain.domain_id = Domain.domain_id
+    WHERE ( Domain.domain_name != P_Domain.domain_name 
+        OR (Domain.domain_name IS NULL AND P_Domain.domain_name IS NOT NULL)
+        OR (Domain.domain_name IS NOT NULL AND P_Domain.domain_name IS NULL)
+        OR Domain.domain_alias != P_Domain.domain_alias
+        OR (Domain.domain_alias IS NULL AND P_Domain.domain_alias IS NOT NULL) 
+        OR (Domain.domain_alias IS NOT NULL AND P_Domain.domain_alias IS NULL) 
+        OR Domain.domain_mail_server_id != P_Domain.domain_mail_server_id
+        OR (Domain.domain_mail_server_id IS NULL AND P_Domain.domain_mail_server_id IS NOT NULL)
+        OR (Domain.domain_mail_server_id IS NOT NULL AND P_Domain.domain_mail_server_id IS NULL))
+    $where";
+  
+  $obm_q->query($query);
   display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $id = $obm_q->f('0');  // Id
-    $e = $obm_q->Record;
-    foreach ($e as $fname => $fvalue) {
-      // keep only column name (remove column number entries)
-      if ((int)($fname) !== $fname) {
-	$e1[$id][$fname] = $fvalue;
-      }
-    }
+  $obm_q->next_record();
+  if($obm_q->f('diff') > 0) {
+    return true;
   }
-
-  // Get infos from Production table
-  $query = "$select FROM P_Domain $where";
-  display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
-  $retour = $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $id = $obm_q->f('0');  // Id
-    $e = $obm_q->Record;
-    foreach ($e as $fname => $fvalue) {
-      // keep only column name (remove column number entries)
-      if ((int)($fname) !== $fname) {
-	$e2[$id][$fname] = $fvalue;
-      }
-    }
-  }
-
-  // Check for differences
-  foreach ($e1 as $id => $row) {
-    if (! array_key_exists($id, $e2)) {
-      return true;
-    } else {
-      foreach($row as $fname => $fvalue) {
-	if ($e2[$id][$fname] != $fvalue) {
-	  return true;
-	}
-      }
-    }
-  }
-
   // Samba table check
-  if ($domain_id != 0) {
-    $where = "WHERE samba_domain_id = '$domain_id'";
+  if (!is_null($domain_id) && !$domain_global) {
+    $where = "AND Samba.samba_domain_id = '$domain_id'";
   }
-
-  // Get infos from Update table
-  $query = "SELECT * FROM Samba $where ORDER BY samba_domain_id, samba_name";
+  
+  // Get infos from Update table;
+  $query = " SELECT
+    count(*) as diff
+    FROM Samba LEFT JOIN P_Samba ON Samba.samba_domain_id = P_Samba.samba_domain_id
+    AND Samba.samba_name = P_Samba.samba_name
+    WHERE (Samba.samba_value != P_Samba.samba_value 
+    OR (Samba.samba_value IS NULL AND P_Samba.samba_value IS NOT NULL)
+    OR (Samba.samba_value IS NOT NULL AND P_Samba.samba_value IS NULL))
+    $where
+  ";
   display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
   $retour = $obm_q->query($query);
 
-  while($obm_q->next_record()) {
-    $id = $obm_q->f('0');  // Id
-    $e = $obm_q->Record;
-    foreach ($e as $fname => $fvalue) {
-      // keep only column name (remove column number entries)
-      if ((int)($fname) !== $fname) {
-	$e1[$id][$fname] = $fvalue;
-      }
-    }
+  $obm_q->next_record();
+  if($obm_q->f('diff') > 0) {
+    return true;
   }
 
-  // Get infos from Production table
-  $query = "SELECT * FROM P_Samba $where ORDER BY samba_domain_id, samba_name";
+    // Samba table check
+  if (!is_null($domain_id) && !$domain_global) {
+    $where = "AND P_Samba.samba_domain_id = '$domain_id'";
+  }
+
+  // Get infos from Update table;
+  $query = " SELECT
+    count(*) as diff
+    FROM P_Samba LEFT JOIN Samba ON Samba.samba_domain_id = P_Samba.samba_domain_id
+    AND Samba.samba_name = P_Samba.samba_name
+    WHERE (Samba.samba_value != P_Samba.samba_value 
+    OR (Samba.samba_value IS NULL AND P_Samba.samba_value IS NOT NULL)
+    OR (Samba.samba_value IS NOT NULL AND P_Samba.samba_value IS NULL))
+    $where
+  ";
   display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
   $retour = $obm_q->query($query);
 
-  while($obm_q->next_record()) {
-    $id = $obm_q->f('0');  // Id
-    $e = $obm_q->Record;
-    foreach ($e as $fname => $fvalue) {
-      // keep only column name (remove column number entries)
-      if ((int)($fname) !== $fname) {
-	$e2[$id][$fname] = $fvalue;
-      }
-    }
-  }
-
-  // Check for differences
-  foreach ($e1 as $id => $row) {
-    if (! array_key_exists($id, $e2)) {
-      return true;
-    } else {
-      foreach($row as $fname => $fvalue) {
-	if ($e2[$id][$fname] != $fvalue) {
-	  return true;
-	}
-      }
-    }
+  $obm_q->next_record();
+  if($obm_q->f('diff') > 0) {
+    return true;
   }
 
   return false;
@@ -281,7 +247,7 @@ function check_tools_update_need_global_update($domain_id=0) {
  * @access public
  * @return void
  */
-function run_query_tools_perform_scope(&$metadata, $realm, $domain, $update = false) {
+function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global = false, $update = false) {
   global $obm, $obmdb_dbtype;
   $rules = array('update' => array('1=1'), 'delete' => array('1=1'), 'purge' => array('1=1'));
   $del_rules = array('1=1'); 
@@ -304,7 +270,7 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $update = fa
     default:
       break;
   }
-  if ($domain != 0) {
+  if ($domain_global) {
     $rules['update'][] = "Current.$metadata[prefix]_domain_id = $domain";
     $rules['delete'][] = "Current.deleted_domain_id = $domain";
     $rules['purge'][] = "updated_domain_id = $domain";
@@ -364,6 +330,8 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
     if(strpos(strtolower($field['flags']),'primary') === false) {
       if(!isset($metadata['exclude'][str_replace($metadata['prefix'].'_','',$field['name'])])) { 
         $diff[] = "Production.$field[name] != Current.$field[name]";
+        $diff[] = "(Production.$field[name] IS NULL AND Current.$field[name] IS NOT NULL)";
+        $diff[] = "(Production.$field[name] IS NOT NULL AND Current.$field[name] IS NULL)";
       }
     } else {
       $diff[] = "Production.$field[name] IS NULL";
@@ -432,6 +400,8 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   foreach ($fields as $field) {
     if(strpos(strtolower($field['flags']),'primary') === false) {
       $diff[] = "Production.$field[name] != Link.$field[name]";
+        $diff[] = "(Production.$field[name] IS NULL AND Link.$field[name] IS NOT NULL)";
+        $diff[] = "(Production.$field[name] IS NOT NULL AND Link.$field[name] IS NULL)";
     } else {
       $diff[] = "Production.$field[name] IS NULL";
       $diff[] = "Link.$field[name] IS NULL";
@@ -507,6 +477,8 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
     if(strpos(strtolower($field['flags']),'primary') === false) {
       if(!isset($metadata['exclude'][str_replace($metadata['prefix'].'_','',$field['name'])])) { 
         $diff[] = "Production.$field[name] != Current.$field[name]";
+        $diff[] = "(Production.$field[name] IS NULL AND Current.$field[name] IS NOT NULL)";
+        $diff[] = "(Production.$field[name] IS NOT NULL AND Current.$field[name] IS NULL)";
       }
     } else {
       $diff[] = "Production.$field[name] IS NULL";
@@ -575,7 +547,9 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
   $fields = $obm_qm->metadata($metadata['link']['table'], false);
   foreach ($fields as $field) {
     if(strpos(strtolower($field['flags']),'primary') === false) {
-      $diff[] = "Production.$field[name] != Link.$field[name]";
+      $diff[] = "(Production.$field[name] != Link.$field[name])";
+      $diff[] = "(Production.$field[name] IS NULL AND Link.$field[name] IS NOT NULL)";
+      $diff[] = "(Production.$field[name] IS NOT NULL AND Link.$field[name] IS NULL)";
     } else {
       $diff[] = "Production.$field[name] IS NULL";
       $diff[] = "Link.$field[name] IS NULL";

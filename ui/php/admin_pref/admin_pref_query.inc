@@ -18,7 +18,7 @@ function get_admin_pref_default_user_pref() {
 
   $query = "SELECT *
             FROM UserObmPref
-            WHERE userobmpref_user_id = '0'
+            WHERE userobmpref_user_id IS NULL
             ORDER BY userobmpref_option";
 
   display_debug_msg($query, $cdg_sql, "get_admin_pref_default_user_pref()");
@@ -39,10 +39,10 @@ function get_admin_pref_default_user_pref() {
 function get_admin_pref_userpref_value($option) {
   global $obm, $cdg_sql;
 
-  $uid = $obm["uid"];
+  $uid = sql_parse_id( $obm["uid"], true);
   $query = "SELECT userobmpref_value
             FROM UserObmPref
-            WHERE userobmpref_user_id = '$uid'
+            WHERE userobmpref_user_id  $uid 
               AND userobmpref_option = '$option'";
 
   display_debug_msg($query, $cdg_sql, "get_admin_pref_userpref_value()");

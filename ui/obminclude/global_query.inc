@@ -673,7 +673,7 @@ function run_query_global_insert_document($params, $id, $entity) {
   $url = '';
   $privacy = '0';
 
-  if (isset($params['domain']) && $obm['domain'] == 0) {
+  if (isset($params['domain']) && $obm['domain_global']) {
     $domain_id = $params['domain'];
   } else {
     $domain_id = $obm['domain_id'];

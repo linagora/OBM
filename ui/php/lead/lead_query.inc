@@ -74,21 +74,24 @@ function run_query_lead_search($params) {
     }
   }
   if (($source != '') && ($source != "$c_all")) {
-    $where .= " $and lead_source_id = '$source'";
+    $source = sql_parse_id($source, true);
+    $where .= " $and lead_source_id $source ";
     $and = 'AND';
   }
   if (($status != '') && ($status != "$c_all")) {
-    $where .= " $and lead_status_id = '$status'";
+    $status = sql_parse_id($status, true);
+    $where .= " $and lead_status_id $status ";
     $and = 'AND';
   }
   if (($manager != '') && ($manager != "$c_all")) {
-    $where .= " $and lead_manager_id = '$manager'";
+    $manager = sql_parse_id($manager, true);
+    $where .= " $and lead_manager_id $manager ";
     $and = 'AND';
   }
   if ($archive != '1') {
-    $where .= " $and lead_archive='0'";
+    $where .= " $and lead_archive=0";
   } elseif($cgp_archive_only) {
-    $where .= " $and lead_archive='1'";
+    $where .= " $and lead_archive=1";
     $and = 'AND';
   }
 
@@ -159,7 +162,7 @@ function run_query_lead_detail($p_id) {
   $manager_name[] = array('type' => 'field', 'value' => 'm.userobm_firstname');
   $concat_manager = sql_string_concat($db_type, $manager_name);
   $multidomain = sql_multidomain('lead');
-	
+  $p_id = sql_parse_id($p_id, true);	
   $query = "SELECT Lead.*,
       $timeupdate,
       $timecreate,
@@ -181,7 +184,7 @@ function run_query_lead_detail($p_id) {
          LEFT JOIN UserObm as c ON lead_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON lead_userupdate=u.userobm_id
          LEFT JOIN UserObm as m ON lead_manager_id=m.userobm_id
-    WHERE lead_id='$p_id'
+    WHERE lead_id $p_id 
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_lead_detail()');
@@ -201,25 +204,27 @@ function run_query_lead_insert($params) {
   global $obm, $cdg_sql;
 
   $now = date('Y-m-d H:i:s');
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
 	
   $company_id = $params['company_new_id'];
   if ($company_id < 1) {
     $company_id = $params['company_id'];
   }
+  $company_id = sql_parse_id($company_id);
   $contact_id = $params['contact_new_id'];
   if ($contact_id < 1) {
     $contact_id = $params['contact_id'];
   }
-  $source_id = $params['source'];
-  $status_id = $params['status'];
-  $manager_id = $params['manager'];
+  $contact_id = sql_parse_id($contact_id);
+  $source_id = sql_parse_id($params['source']);
+  $status_id = sql_parse_id($params['status']);
+  $manager_id = sql_parse_id($params['manager']);
   $name = $params['name'];
   $date = ($params['date'] ? "'".of_isodate_convert($params['date'])."'" : 'null');
   $datealarm = ($params['datealarm'] ? "'".of_isodate_convert($params['datealarm'])."'" : 'null');
   $todo = $params['todo'];
-  $archive = ($params['archive'] == '1' ? '1' : '0');
-  $privacy = ($params['privacy'] == '1' ? '1' : '0');
+  $archive = sql_parse_int($params['archive']);
+  $privacy = sql_parse_int($params['privacy']);
 
   $add_comment = $params['add_comment'];
   if ($add_comment != '') {
@@ -237,7 +242,7 @@ function run_query_lead_insert($params) {
   if (! ($domain_id > 0)) {
     $domain_id = $obm['domain_id'];
   }
-
+  $domain_id = sql_parse_id($domain_id);
   $query = "INSERT INTO Lead (
     lead_domain_id,
     lead_timeupdate,
@@ -257,16 +262,16 @@ function run_query_lead_insert($params) {
     lead_todo,
     lead_comment)
    VALUES (
-    '$domain_id',
+    $domain_id,
     null,
     '$now',
     null,
-    '$uid',
-    '$source_id',
-    '$status_id',
-    '$manager_id',
-    '$company_id',
-    '$contact_id',
+    $uid,
+    $source_id,
+    $status_id,
+    $manager_id,
+    $company_id,
+    $contact_id,
     '$privacy',
     '$name',
     $date,
@@ -280,18 +285,13 @@ function run_query_lead_insert($params) {
   $retour = $obm_q->query($query);
 
   $datep = ($params['date'] ? "='".of_isodate_convert($params['date'])."'" : 'is null');
-
+  $uid = sql_parse_id($uid, true);
+  $domain_id = sql_parse_id($domain_id, true); 
   // Get the lead id inserted
-  $query = "SELECT lead_id
+  $query = "SELECT MAX(lead_id) as lead_id
     FROM Lead
-    WHERE lead_company_id = '$company_id'
-      AND lead_contact_id = '$contact_id'
-      AND lead_source_id = '$source_id'
-      AND lead_manager_id = '$manager_id'
-      AND lead_date $datep
-      AND lead_name = '$name'
-      AND lead_comment = '$comment'
-      AND lead_domain_id='$domain_id'";
+    WHERE lead_usercreate $usercreate
+      AND lead_domain_id $domain_id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_lead_insert(2)');
   $obm_q->query($query);
@@ -312,19 +312,21 @@ function run_query_lead_update($pid, $params) {
   global $obm, $cdg_sql;
 
   $now = date('Y-m-d H:i:s');
-  $uid = $obm['uid'];
-
+  $uid = sql_parse_id($obm['uid']);
+  $pid = sql_parse_id($pid, true);
   $company_id = $params['company_new_id'];
   if ($company_id < 1) {
     $company_id = $params['company_id'];
   }
+  $company_id = sql_parse_id($company_id);
   $contact_id = $params['contact_new_id'];
   if ($contact_id < 1) {
     $contact_id = $params['contact_id'];
   }
-  $source_id = $params['source'];
-  $status_id = $params['status'];
-  $manager_id = $params['manager'];
+  $contact_id = sql_parse_id($contact_id);
+  $source_id = sql_parse_id($params['source']);
+  $status_id = sql_parse_id($params['status']);
+  $manager_id = sql_parse_id($params['manager']);
   $name = $params['name'];
   $date = ($params['date'] ? "'".of_isodate_convert($params['date'])."'" : 'null');
   $datealarm = ($params['datealarm'] ? "'".of_isodate_convert($params['datealarm'])."'" : 'null');
@@ -344,18 +346,16 @@ function run_query_lead_update($pid, $params) {
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
 
-  $domain_id = of_domain_get_entity_domain_id($company_id, 'Company');
   $multidomain = sql_multidomain('lead');
 	
   $query = "UPDATE Lead SET
     lead_timeupdate='$now',
-    lead_userupdate='$uid',
-    lead_source_id='$source_id',
-    lead_status_id='$status_id',
-    lead_domain_id='$domain_id',
-    lead_company_id='$company_id',
-    lead_contact_id='$contact_id',
-    lead_manager_id='$manager_id',
+    lead_userupdate=$uid,
+    lead_source_id=$source_id,
+    lead_status_id=$status_id,
+    lead_company_id=$company_id,
+    lead_contact_id=$contact_id,
+    lead_manager_id=$manager_id,
     lead_name='$name',
     lead_date=$date,
     lead_datealarm=$datealarm,
@@ -363,7 +363,7 @@ function run_query_lead_update($pid, $params) {
     lead_archive='$archive',
     lead_privacy='$privacy',
     lead_comment='$comment'
-  WHERE lead_id='$pid'
+  WHERE lead_id $pid 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_lead_update()');
@@ -383,7 +383,7 @@ function get_lead_managers($archive = false) {
   global $cdg_sql;
 
   if (! $archive) {
-    $where_arch .= " lead_archive='0'";
+    $where_arch .= " lead_archive=0";
   }
 
   if ($where_arch != '') {
@@ -513,8 +513,8 @@ function run_query_lead_delete($p_id) {
 
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('lead');
-	
-  $query = "DELETE FROM Lead WHERE lead_id='$p_id' $multidomain";
+  $p_id = sql_parse_id($p_id, true);	
+  $query = "DELETE FROM Lead WHERE lead_id $p_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_lead_delete()');
   $retour = $obm_q->query($query);
 

@@ -314,6 +314,11 @@ function get_incident_params() {
   
   get_global_params_document($params);
 
+  if (strcmp(substr($params['logger'], 0, 10),'data-user-') == 0) {
+    $data = explode('-', $params['logger']);
+    $params['logger'] = $data[2];
+  }
+
   return $params;
 }
 

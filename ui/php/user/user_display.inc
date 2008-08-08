@@ -234,7 +234,7 @@ function html_user_search_form($user) {
       <option value=\"$k_profile\"> $profile</option>";
   }
 
-  if ($obm["domain_id"] == 0) {
+  if ($obm["domain_global"]) {
     $sel_domain = of_domain_dis_select($domain_id, "all");
     $dis_domain = "<label>$l_domain<br />
       $sel_domain
@@ -1154,7 +1154,7 @@ function html_user_form($usr_q, $user, $field='') {
 
   // Domain (can't be updated, so only on insert)
   if (($action == "new" || $action == "insert")
-      && $obm["domain_id"] == 0 ) {
+      && $obm["domain_global"]) {
     $sel_domain = of_domain_dis_select($domain_id);
     $dis_domain = "<tr>
       <th>$l_domain</th>

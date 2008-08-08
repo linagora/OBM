@@ -22,17 +22,17 @@ function run_query_company_search($company) {
   $sql_order_field = $company['sql_order_field'];
   
   $fuzzy = $company['fuzzy'];
-  $archive = $company['archive'];
+  $archive = ( $company['archive']);
   $name = sql_search_text_parse($company['name']);
   $number = sql_search_text_parse($company['number']);
   $phone = sql_search_text_parse($company['phone']);
   $town = sql_search_text_parse($company['town']);
   $ctry = $company['country'];
-  $type = $company['type'];
-  $act = $company['activity'];
-  $naf = $company['naf'];
-  $market = $company['market'];
-  $dsrc = $company['datasource'];
+  $type = ( $company['type']);
+  $act = ( $company['activity']);
+  $naf = ( $company['naf']);
+  $market = ( $company['market']);
+  $dsrc = ( $company['datasource']);
   $zip = sql_search_text_parse($company['zip']);
   $dateafter = of_isodate_convert($company['date_after'],true);
   $datebefore = of_isodate_convert($company['date_before'],true);
@@ -54,23 +54,23 @@ function run_query_company_search($company) {
     $and = 'AND';
   }
   if (($type != $c_all) && ($type != '')) { 
-    $where .= " $and company_type_id='$type'";
+    $where .= " $and company_type_id=$type";
     $and = 'and';
   }
   if (($act != $c_all) && ($act != '')) { 
-    $where .= " $and company_activity_id='$act'";
+    $where .= " $and company_activity_id=$act";
     $and = 'AND';
   }
   if (($naf != $c_all) && ($naf != '')) { 
-    $where .= " $and company_nafcode_id='$naf'";
+    $where .= " $and company_nafcode_id=$naf";
     $and = 'AND';
   }
   if (($market != $c_all) && ($market != '')) { 
-    $where .= " $and company_marketingmanager_id='$market'";
+    $where .= " $and company_marketingmanager_id=$market";
     $and = 'AND';
   }
   if (($dsrc != $c_all) && ($dsrc != '')) { 
-    $where .= " $and company_datasource_id='$dsrc'";
+    $where .= " $and company_datasource_id=$dsrc";
     $and = 'AND';
   }
   if ($phone != '') {
@@ -102,10 +102,10 @@ function run_query_company_search($company) {
 
   // Get only not archived by default
   if ($archive != '1') {
-    $where .= " $and company_archive='0'";
+    $where .= " $and company_archive=0";
     $and = 'AND';
   } elseif($cgp_archive_only) {
-    $where .= " $and company_archive='1'";
+    $where .= " $and company_archive=1";
     $and = 'AND';
   }
 
@@ -231,6 +231,7 @@ function run_query_company_detail($p_id) {
   $timeupdate = sql_date_format($db_type, 'company_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'company_timecreate', 'timecreate');
   $lang = get_lang();
+  $p_id = sql_parse_id( $p_id, true);
 
   $query = "SELECT *,
       $timeupdate,
@@ -249,7 +250,7 @@ function run_query_company_detail($p_id) {
          LEFT JOIN DataSource ON company_datasource_id=datasource_id
          LEFT JOIN UserObm as c ON company_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON company_userupdate=u.userobm_id
-    WHERE company_id='$p_id' $multidomain";
+    WHERE company_id $p_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_detail()');
   $obm_q->query($query);
@@ -269,9 +270,9 @@ function run_query_company_detail($p_id) {
 function run_query_company_insert($company) {
   global $obm, $cdg_sql;
 
-  $uid = $obm['uid'];
+  $uid = sql_parse_id( $obm['uid']);
   $now = date('Y-m-d H:i:s');
-  $domain_id = $obm['domain_id'];
+  $domain_id = sql_parse_id( $obm['domain_id']);
 	
   $number = $company['number'];
   $vat = $company['vat'];
@@ -287,11 +288,11 @@ function run_query_company_insert($company) {
     }
   }
   $sound = phonetic_key($name);
-  $dsrc = ($company['datasource'] != '' ? $company['datasource'] : '0');
-  $type = ($company['type'] != '' ? $company['type'] : '0');
-  $act = ($company['activity'] != '' ? $company['activity'] : '0');
-  $naf = ($company['naf'] != '' ? $company['naf'] : '0');
-  $market = $company['market'];
+  $dsrc = sql_parse_id( $company['datasource']); 
+  $type = sql_parse_id( $company['type']); 
+  $act = sql_parse_id( $company['activity']); 
+  $naf = sql_parse_id( $company['naf']); 
+  $market = sql_parse_id( $company['market']);
   $ad1 = $company['ad1'];
   $ad2 = $company['ad2'];
   $ad3 = $company['ad3'];
@@ -346,12 +347,12 @@ function run_query_company_insert($company) {
     company_email,
     company_comment)
   VALUES (
-    '$domain_id',
+    $domain_id,
     null,
     '$now',
     null,
-    '$uid',
-    '$dsrc',
+    $uid,
+    $dsrc,
     '$number',
     '$vat',
     '$siret',
@@ -359,10 +360,10 @@ function run_query_company_insert($company) {
     '$name',
     '$aka',
     '$sound',
-    '$type',
-    '$act',
-    '$naf',
-    '$market',
+    $type,
+    $act,
+    $naf,
+    $market,
     '$ad1',
     '$ad2',
     '$ad3',
@@ -380,26 +381,9 @@ function run_query_company_insert($company) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  if ($type != 0) {
-    $type_sql = "AND company_type_id='$type'";
-  }
-  if ($market != 0) {
-    $marquet_sql = "AND company_marketingmanager_id='$market'";
-  }
-  if ($act != 0) {
-    $act_sql = "AND company_activity_id='$act'";
-  }
-
   // Get the company id
-  $query = "SELECT company_id as id
-    FROM Company
-    WHERE company_name = '$name'
-      AND company_timecreate='$now'
-      $type_sql
-      $marquet_sql
-      $act_sql
-      AND company_phone = '$phone'
-      AND company_zipcode = '$zip'";
+  $query = "SELECT MAX(company_id) as id
+    FROM Company";
   
   display_debug_msg($query, $cdg_sql, 'run_query_company_insert(2)');
   $obm_q->query($query);
@@ -439,14 +423,14 @@ function run_query_company_update($cid, $company) {
     }
   }
   $sound = phonetic_key($name);
-  $dsrc = $company['datasource'];
-  $type = $company['type']; 
-  if ($type != '') $upd_type = "company_type_id='$type',";
-  $act = $company['activity'];
-  if ($act != '') $upd_act = "company_activity_id='$act',";
-  $naf = $company['naf'];
-  if ($naf != '') $upd_naf = "company_nafcode_id='$naf',";
-  $market = $company['market'];
+  $dsrc = sql_parse_id( $company['datasource']);
+  $type = sql_parse_id( $company['type']); 
+  $upd_type = "company_type_id=$type,";
+  $act = sql_parse_id( $company['activity']);
+  $upd_act = "company_activity_id=$act,";
+  $naf = sql_parse_id( $company['naf']);
+  $upd_naf = "company_nafcode_id=$naf,";
+  $market = sql_parse_id( $company['market']);
   $ad1 = $company['ad1'];
   $ad2 = $company['ad2'];
   $ad3 = $company['ad3'];
@@ -466,11 +450,11 @@ function run_query_company_update($cid, $company) {
     $comment .= "\n$datecomment:$usercomment:$add_comment";
   }
   $multidomain = sql_multidomain('company');
-	
+  $cid_sql = sql_parse_id($cid, true);  
   $query = "UPDATE Company SET
     company_timeupdate='". date('Y-m-d H:i:s') ."',
-    company_userupdate='". $obm['uid'] ."',
-    company_datasource_id='$dsrc',
+    company_userupdate=". $obm['uid'] .",
+    company_datasource_id=$dsrc,
     company_number='$number',
     company_vat='$vat',
     company_siret='$siret',
@@ -481,7 +465,7 @@ function run_query_company_update($cid, $company) {
     $upd_type
     $upd_act
     $upd_naf
-    company_marketingmanager_id='$market',
+    company_marketingmanager_id=$market,
     company_address1='$ad1',
     company_address2='$ad2',
     company_address3='$ad3',
@@ -494,7 +478,7 @@ function run_query_company_update($cid, $company) {
     company_web='$web',
     company_email='$email',
     company_comment='$comment'
-  WHERE company_id='$cid'
+  WHERE company_id $cid_sql' 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_update()');
@@ -524,9 +508,10 @@ function run_query_company_delete($p_id) {
   run_query_global_delete_document_links($p_id, 'company');
 
   $ret = of_userdata_query_delete('company', $p_id);
+  $p_id = sql_parse_id( $p_id, true);
 
   $query = "DELETE FROM Company
-    WHERE company_id='$p_id'
+    WHERE company_id $p_id 
       $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_company_delete()');
   $retour = $obm_q->query($query);
@@ -547,7 +532,8 @@ function run_query_check_company($p_id, $name, $zip) {
 
   $where_id = '';
   if ($p_id != '') {
-    $where_id = "AND company_id!='$p_id'";
+    $p_id = sql_parse_id( $p_id, true, true);
+    $where_id = "AND company_id $p_id"; 
   }
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -600,11 +586,11 @@ function run_query_company_nafcode_insert($company) {
   global $cdg_sql, $obm;
 
   $timecreate = date('Y-m-d H:i:s');
-  $usercreate = $obm['uid'];
+  $usercreate = sql_parse_id( $obm['uid']);
   $title = (isset($company['naf_title']) ? $company['naf_title'] : '0');
   $code = $company['naf_code'];
   $label = $company['naf_label'];
-  $domain_id = $obm['domain_id'];
+  $domain_id = sql_parse_id( $obm['domain_id']);
 
   $query = "INSERT INTO CompanyNafCode (
       companynafcode_timecreate,
@@ -615,8 +601,8 @@ function run_query_company_nafcode_insert($company) {
       companynafcode_label)
     VALUES (
       '$timecreate',
-      '$usercreate',
-      '$domain_id',
+      $usercreate,
+      $domain_id,
       '$title',
       '$code',
       '$label')";
@@ -638,8 +624,8 @@ function run_query_company_nafcode_update($company) {
   global $obm, $cdg_sql;
 
   $timeupdate = date('Y-m-d H:i:s');
-  $userupdate = $obm['uid'];
-  $id = $company['naf'];
+  $userupdate = sql_parse_id( $obm['uid']);
+  $id = sql_parse_id( $company['naf'], true);
   $code = $company['naf_code'];
   $title = (isset($company['naf_title']) ? $company['naf_title'] : '0');
   $label = $company['naf_label'];
@@ -649,10 +635,10 @@ function run_query_company_nafcode_update($company) {
       companynafcode_code='$code',
       companynafcode_label='$label',
       companynafcode_timeupdate='$timeupdate',
-      companynafcode_userupdate='$userupdate',
+      companynafcode_userupdate=$userupdate,
       companynafcode_title=$title
     WHERE
-      companynafcode_id='$id' $multidomain";
+      companynafcode_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_nafcode_update()');
   $obm_q = new DB_OBM;
@@ -671,8 +657,9 @@ function run_query_company_nafcode_delete($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('companynafcode');
-	
-  $query = "DELETE FROM CompanyNafCode WHERE companynafcode_id='$id' $multidomain";
+  $id = sql_parse_id( $id, true);	
+
+  $query = "DELETE FROM CompanyNafCode WHERE companynafcode_id $id $multidomain";
 	
   display_debug_msg($query, $cdg_sql, 'run_query_company_nafcode_delete()');
   $obm_q = new DB_OBM;
@@ -692,9 +679,10 @@ function run_query_company_nafcode_links($p_id) {
 
   $multidomain = sql_multidomain('company');
 
+  $p_id = sql_parse_id( $p_id, true);
   $query = "SELECT company_name, company_id, company_nafcode_id
     FROM Company
-    WHERE company_nafcode_id='$p_id' $multidomain";
+    WHERE company_nafcode_id $p_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_nafcode_links()');
   $obm_q = new DB_OBM;
@@ -713,11 +701,11 @@ function get_company_nafcode_label($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('companynafcode');
-
+  $id = sql_parse_id( $id, true);
   $query = "SELECT companynafcode_code,
       companynafcode_label
     FROM CompanyNafCode
-    WHERE companynafcode_id='$id' $multidomain";
+    WHERE companynafcode_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_company_nafcode_label()');
   $obm_q = new DB_OBM;

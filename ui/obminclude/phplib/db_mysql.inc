@@ -114,6 +114,8 @@ class DB_Sql {
     }
 
     // Store the query string - PB Aliacom
+    //TODO : REPLACE = NULL by IS NULL IN SELECT
+    //CRAAAPPPPPYYYY 
     $this->obm_query = $Query_String;
 
     # New query, discard previous result.

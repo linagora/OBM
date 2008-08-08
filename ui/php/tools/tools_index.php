@@ -132,7 +132,7 @@ function get_tools_params() {
   // Get global params
   $params = get_global_params('Tools');
 
-  if ($obm['domain_id'] == '0') {
+  if ($obm['domain_global'] === true) {
     $params['domain_id'] = (isset($params['domain_id']) ? $params['domain_id'] : $obm['domain_id']);
   } else {
     $params['domain_id'] = $obm['domain_id'];

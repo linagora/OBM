@@ -176,7 +176,7 @@ function html_host_search_list($obm_q, $pref_q, $host) {
     $ext_widget_text = $host['ext_widget_text'];
     $ext_id = $host['ext_id'];
     $ext_title = urlencode(stripslashes($host['ext_title']));
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_title&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_title&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
   $name = urlencode(stripslashes($host['name']));
@@ -466,7 +466,7 @@ function html_host_form($action, $host_q, $host, $field='') {
 
   // Domain (can't be updated, so only on insert)
   if (($action == 'new' || $action == 'insert')
-      && $obm['domain_id'] == 0 ) {
+      && $obm['domain_global']) {
     $sel_domain = of_domain_dis_select($domain_id);
     $dis_domain = "<tr>
       <th>$l_domain</th>

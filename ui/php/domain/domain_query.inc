@@ -33,12 +33,12 @@ function run_query_domain_search($domain, $restriction='') {
   }
 
   if ((trim($where) != '') || (trim($where_restriction) != '')) {
-    $whereq = " WHERE $where $where_restriction";
+    $whereq = "AND $where $where_restriction";
   }
 
   $select = "SELECT distinct Domain.*,
     domain_id as id
-    FROM Domain";
+    FROM Domain WHERE domain_global = false $whereq";
 
 
   // ORDER construction
@@ -76,7 +76,7 @@ function run_query_domain_detail($p_id) {
   $db_type = $obm_q->type;
   $timeupdate = sql_date_format($db_type, 'domain_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'domain_timecreate', 'timecreate');
-
+  $p_id = sql_parse_id($p_id, true);
   $query = "SELECT Domain.*,
     $timeupdate,
     $timecreate,
@@ -88,7 +88,7 @@ function run_query_domain_detail($p_id) {
     LEFT JOIN Host ON host_id = mailserver_host_id
     LEFT JOIN UserObm as c ON domain_usercreate=c.userobm_id
     LEFT JOIN UserObm as u ON domain_userupdate=u.userobm_id
-    WHERE domain_id='$p_id'";
+    WHERE domain_id $p_id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_domain_detail()');
   $obm_q->query($query);
@@ -108,13 +108,13 @@ function run_query_domain_detail($p_id) {
 function run_query_domain_insert($domain) {
   global $obm, $cdg_sql;
 
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
   $now = date('Y-m-d H:i:s');
   $label = $domain['label'];
   $desc = $domain['desc'];
   $domain_name = $domain['domain_name'];
   $alias = $domain['alias'];
-  $mail_server_id = $domain['mail_server_id'];
+  $mail_server_id = sql_parse_id($domain['mail_server_id']);
   $query = "INSERT INTO Domain (
     domain_timeupdate,
     domain_timecreate,
@@ -129,11 +129,11 @@ function run_query_domain_insert($domain) {
       null,
       '$now',
       null,
-      '$uid',
+      $uid,
       '$label',
       '$desc',
       '$domain_name',
-      '$mail_server_id',
+      $mail_server_id,
       '$alias')";
   display_debug_msg($query, $cdg_sql, 'run_query_domain_insert(1)');
   $obm_q = new DB_OBM;
@@ -168,8 +168,8 @@ function run_query_domain_insert($domain) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_replace_properties($domain_id,$domain) {
   global $cdg_sql;
-
-  $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id = '$domain_id'";
+  $domain_id = sql_parse_id($domain_id, true);
+  $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id $domain_id ";
   display_debug_msg($query, $cdg_sql, 'run_query_domain_replace_properties()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -189,7 +189,7 @@ function run_query_domain_replace_properties($domain_id,$domain) {
         domainpropertyvalue_property_key,
         domainpropertyvalue_value)
         VALUES (
-          '$domain_id',
+          $domain_id,
           '$key',
           '$value'
         )";
@@ -208,21 +208,21 @@ function run_query_domain_replace_properties($domain_id,$domain) {
 function run_query_domain_update($d_id, $domain) {
   global $obm, $cdg_sql;
 
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
   $now = date('Y-m-d H:i:s');
   $label = $domain['label'];
   $desc = $domain['desc'];
   $alias = $domain['alias'];
-  $mail_server_id = $domain['mail_server_id'];
-
+  $mail_server_id = sql_parse_id($domain['mail_server_id']);
+  $d_id = sql_parse_id($d_id, true);
   $query = "UPDATE Domain SET
     domain_timeupdate='$now',
-    domain_userupdate='$uid',
+    domain_userupdate=$uid,
     domain_label='$label',
     domain_description='$desc',
-    domain_mail_server_id='$mail_server_id',
+    domain_mail_server_id=$mail_server_id,
     domain_alias='$alias'
-    WHERE domain_id='$d_id'";
+    WHERE domain_id $d_id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_domain_update()');
   $obm_q = new DB_OBM;
@@ -242,18 +242,8 @@ function run_query_domain_delete($p_id) {
   global $cdg_sql, $c_use_connectors;
 
   $obm_q = new DB_OBM;
-
-  // Clean DomainPropertyValue
-  $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, 'run_query_domain_delete()');
-  $retour = $obm_q->query($query);
-
-  // Clean DomainMailServer
-  $query = "DELETE FROM DomainMailServer WHERE domainmailserver_domain_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, 'run_query_domain_delete()');
-  $retour = $obm_q->query($query);
-
-  $query = "DELETE FROM Domain WHERE domain_id='$p_id'";
+  $p_id = sql_parse_id($p_id, true);
+  $query = "DELETE FROM Domain WHERE domain_id $p_id ";
   display_debug_msg($query, $cdg_sql, 'run_query_domain_delete()');
   $retour = $obm_q->query($query);
 
@@ -312,7 +302,8 @@ function run_query_domain_get_used_name($alias, $name=null, $id=null) {
   if(!empty($id)) {
     $d = of_domain_get_domain_infos($id);
     array_push($aliases,$d['name']);
-    $dquery = " AND domain_id != $id "; 
+    $id = sql_parse_id($id, true, true);
+    $dquery = " AND domain_id $id "; 
   } elseif(!empty($name)) {
     array_push($aliases,$name);    
   }
@@ -365,9 +356,10 @@ function run_query_domain_get_users_aliases($aliases, $id) {
       $group_query[] = "group_email LIKE '%@$alias'";
       $regexp[] = "($alias)";
     }
-    $where_user .= " AND userobm_domain_id = $id";
-    $where_group .= " AND group_domain_id = $id";
-    $where_mailshare .= " AND mailshare_domain_id = $id";
+    $id = sql_parse_id($id, true);
+    $where_user .= " AND userobm_domain_id $id"; 
+    $where_group .= " AND group_domain_id $id"; 
+    $where_mailshare .= " AND mailshare_domain_id $id"; 
 
     $query = "SELECT userobm_email as mail FROM UserObm WHERE (".implode(' OR ', $user_query).") $where_user
       UNION
@@ -455,10 +447,10 @@ function check_domain_can_add_domain() {
  * @return Number of users in a domain
  **/
 function get_linked_user_domain($domain_id) {
-
+  $domain_id = sql_parse_id($domain_id, true);
   $nb = get_query_count("SELECT count(userobm_id) as nb
     FROM UserObm
-    WHERE userobm_domain_id='$domain_id'");
+    WHERE userobm_domain_id $domain_id ");
 
   return $nb;
 }
@@ -471,10 +463,10 @@ function get_linked_user_domain($domain_id) {
  * @return Number of hosts in a domain
  **/
 function get_linked_host_domain($domain_id) {
-
+  $domain_id = sql_parse_id($domain_id, true);
   $nb = get_query_count("SELECT count(host_id) as nb
     FROM Host
-    WHERE host_domain_id='$domain_id'");
+    WHERE host_domain_id $domain_id ");
 
   return $nb;
 }
@@ -498,10 +490,10 @@ function check_domain_can_add_mailserver($params) {
   $test_q = new DB_OBM;
   while ($cpt < $params['mailserver_nb']) {
     $cpt++;
-    $m_id = $params["mailserver$cpt"];
+    $m_id = sql_parse_id($params["mailserver$cpt"], true);
     $query = "SELECT count(*) as nb FROM MailServer
-      WHERE mailserver_id='$m_id'
-      AND mailserver_$role='1'";
+      WHERE mailserver_id $m_id 
+      AND mailserver_$role=1";
     display_debug_msg($query, $cdg_sql, 'check_domain_can_add_mailserver()');
     $test_q->query($query);
     $test_q->next_record();
@@ -552,11 +544,12 @@ function check_domain_can_delete_mailserver($params) {
  * @return Number of users in a domain
  **/
 function get_domain_linked_user_mailserver($domain_id, $mailserver_id) {
-
+  $domain_id = sql_parse_id($domain_id, true);
+  $mailserver_id = sql_parse_id($mailserver_id, true);
   $nb = get_query_count("SELECT count(userobm_id) as nb
     FROM UserObm
-    WHERE userobm_domain_id='$domain_id'
-    AND userobm_mail_server_id='$mailserver_id'");
+    WHERE userobm_domain_id $domain_id 
+    AND userobm_mail_server_id $mailserver_id ");
 
   return $nb;
 }
@@ -574,18 +567,20 @@ function get_domain_mailservers($role, $domain_id='') {
   global $cdg_sql;
 
   if ($domain_id > 0) {
+    $domain_id = sql_parse_id($domain_id, true);
     // For one domain specified (domain update), global or domain mailserver
-    $where_domain = "AND (host_domain_id='$domain_id' OR host_domain_id=0)";
+    $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
   } else {
     // New domain (no id specified), host from domain 0
-    $where_domain = "AND (host_domain_id=0)";
+    $where_domain = "AND (domain_global = true)";
   }
 
   $obm_q = new DB_OBM;
   $query = "SELECT *
     FROM MailServer
     LEFT JOIN Host on mailserver_host_id = host_id
-    WHERE mailserver_$role = '1'
+    LEFT JOIN Domain ON domain_id = host_domain_id
+    WHERE mailserver_$role = 1
     $where_domain";
   display_debug_msg($query, $cdg_sql, 'get_domain_mailserver_list()');
   $obm_q->query($query);
@@ -609,10 +604,10 @@ function get_domain_mailservers($role, $domain_id='') {
 // Parameters:
 //   - $domain_id : domain_id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_domain_properties($domain_id=0) {
+function run_query_domain_properties($domain_id = NULL) {
   global $cdg_sql;
 
-  if ($domain_id != 0) {
+  if (!is_null($domain_id)) {
     $val = 'domainpropertyvalue_value,';
     $join = " LEFT JOIN DomainPropertyValue
       ON domainproperty_key = domainpropertyvalue_property_key
@@ -644,17 +639,18 @@ function run_query_domain_properties($domain_id=0) {
 function run_query_domain_mailserver_insert($params) {
   global $obm, $cdg_sql;
 
-  $id = $params['domain_id'];
+  $sel_id = sql_parse_id($params['domain_id'], true);
+  $ins_id = sql_parse_id($params['domain_id']);
   $role = $params['role'];
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $params['mailserver_nb']) {
     $cpt++;
-    $m_id = $params["mailserver$cpt"];
+    $m_id = sql_parse_id($params["mailserver$cpt"], true);
 
     $query = "SELECT * FROM DomainMailServer
-      WHERE domainmailserver_domain_id='$id'
-      AND domainmailserver_mailserver_id='$m_id'
+      WHERE domainmailserver_domain_id $id 
+      AND domainmailserver_mailserver_id $m_id 
       AND domainmailserver_role='$role'";
 
     display_debug_msg($query, $cdg_sql, 'run_query_domain_mailserver_insert(1)');
@@ -667,7 +663,7 @@ function run_query_domain_mailserver_insert($params) {
         domainmailserver_domain_id,
         domainmailserver_mailserver_id,
         domainmailserver_role)
-        VALUES ('$id', '$m_id', '$role')";
+        VALUES ($id, $m_id, '$role')";
 
       display_debug_msg($query, $cdg_sql, 'run_query_domain_mailserver_insert(2)');
       $obm_q = new DB_OBM;
@@ -689,12 +685,12 @@ function run_query_domain_mailserver_insert($params) {
 function run_query_domain_mailserver_delete($params) {
   global $obm, $cdg_sql;
 
-  $id = $params['domain_id'];
-  $mailserver_id = $params['mail_server_id'];
+  $id = sql_parse_id($params['domain_id'], true);
+  $mailserver_id = sql_parse_id($params['mail_server_id'], true);
   $role = $params['role'];
   $query = "DELETE FROM DomainMailServer
-    WHERE domainmailserver_domain_id='$id'
-    AND domainmailserver_mailserver_id='$mailserver_id'
+    WHERE domainmailserver_domain_id $id 
+    AND domainmailserver_mailserver_id $mailserver_id 
     AND domainmailserver_role='$role'";
 
   display_debug_msg($query, $cdg_sql, 'run_query_domain_mailserver_delete()');

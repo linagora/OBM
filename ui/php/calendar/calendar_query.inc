@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_detail($calendar_id) {
   global $cdg_sql;
-
+  $calendar_id = sql_parse_id( $calendar_id, true);
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type; 
   $timeupdate = sql_date_format($db_type, 'calendarevent_timeupdate', 'timeupdate');
@@ -54,7 +54,7 @@ function run_query_calendar_detail($calendar_id) {
       LEFT JOIN UserObm AS c ON calendarevent_usercreate = c.userobm_id
       LEFT JOIN UserObm AS u ON calendarevent_userupdate = u.userobm_id
       LEFT JOIN UserObm AS o ON calendarevent_owner = o.userobm_id
-    WHERE calendarevent_id = '$calendar_id' $multidomain";
+    WHERE calendarevent_id  $calendar_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_detail()');
   $obm_q->query($query);
@@ -74,8 +74,8 @@ function run_query_calendar_get_user_name($users='') {
 
   $multidomain = sql_multidomain('userobm');
 
-  $in = "'".implode ("','", $users)."'";
-
+  $in = "'".implode (",", $users)."'";
+  
   $obm_q = new DB_OBM;
   $query = "SELECT userobm_lastname, userobm_firstname, userobm_id
             FROM UserObm
@@ -98,7 +98,7 @@ function run_query_calendar_get_resource_label($resources) {
   global $cdg_sql;
   
   if (count($resources) > 0) {
-    $in = "'".implode ("','", $resources)."'";
+    $in = "'".implode (",", $resources)."'";
     $where = " resource_id IN ($in)";
     $and = true;
   }
@@ -124,13 +124,13 @@ function run_query_calendar_get_resource_label($resources) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_get_resource_property($r_id) {
   global $cdg_sql;
-
+  $r_id = sql_parse_id( $r_id, true);
   $multidomain = sql_multidomain('resource');
   $obm_q = new DB_OBM;
   $query = "SELECT resourcetype_property 
     FROM ResourceType 
     LEFT JOIN Resource ON resource_rtype_id=resourcetype_id
-    WHERE resource_id='$r_id' $multidomain";
+    WHERE resource_id $r_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_resource_property()');
   $obm_q->query($query);
@@ -262,10 +262,8 @@ function run_query_calendar_insert_decision($calendar) {
 function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state, $force = false) {
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
-
-  if ($entity_id == '') {
-    $entity_id = $obm['uid'];
-  }
+  $event_id = sql_parse_id( $event_id, true);
+  $entity_id = sql_parse_id( $obm['uid'], true);
   if (!$force && ($obm['uid'] != $entity_id || $entity != 'user')) {
     if ($entity == 'user') {
       $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
@@ -281,9 +279,9 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
 
   $query = "UPDATE EventEntity 
             SET evententity_state = '$state'
-            WHERE evententity_entity_id = $entity_id
+            WHERE evententity_entity_id  $entity_id 
               AND evententity_entity = '$entity'
-              AND evententity_event_id = '$event_id'";
+              AND evententity_event_id  $event_id'"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
   $obm_q = new DB_OBM;
@@ -354,12 +352,12 @@ function run_query_calendar_waiting_events() {
       ";
 
   if (is_array($writable_cal) && (count($writable_cal['ids'])>0)) {
-    $query .= "OR ( entity_id IN ('".implode("','",$writable_cal['ids'])."') AND entity_entity = 'user')";    
+    $query .= "OR ( entity_id IN ('".implode(",",$writable_cal['ids'])."') AND entity_entity = 'user')";    
   }
   if (is_array($writable_res) && (count($writable_res['ids'])>0)) {
-    $query .= "OR ( entity_id IN ('".implode("','",$writable_res['ids'])."') AND entity_entity = 'resource')";
+    $query .= "OR ( entity_id IN ('".implode(",",$writable_res['ids'])."') AND entity_entity = 'resource')";
   }
-  $query .= " OR (entity_id = '$uid' AND entity_entity = 'user')) ORDER BY entity_entity, entity_label, calendarevent_date"; 
+  $query .= " OR (entity_id = $uid AND entity_entity = 'user')) ORDER BY entity_entity, entity_label, calendarevent_date"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_waiting_events()');
   $obm_q->query($query);
 
@@ -375,8 +373,8 @@ function run_query_calendar_waiting_events() {
 function run_query_calendar_delete_event_entity($calendar, $users = null) {
   global $cdg_sql;
 
-  $e_id = $calendar['calendar_id'];
-  $query = "DELETE FROM EventEntity WHERE evententity_event_id = '$e_id'";
+  $e_id = sql_parse_id( $calendar['calendar_id'], true);
+  $query = "DELETE FROM EventEntity WHERE evententity_event_id  $e_id"; 
   if (is_array($users)) {
     if (count($users) != 0) {
       $query .= " AND (evententity_entity != 'user' OR evententity_entity_id IN (".implode(",",$users)."))";
@@ -486,8 +484,8 @@ function run_query_calendar_insert_event_data($calendar) {
     $owner = $calendar['owner'];
   }
   $title = $calendar['title'];
-  $category1_id = $calendar['category1'];
-  $priority = $calendar['priority'];
+  $category1_id = sql_parse_id( $calendar['category1']);
+  $priority = sql_parse_int( $calendar['priority']);
   $description = $calendar['description'];
   $location = $calendar['location'];
   ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
@@ -564,9 +562,9 @@ function run_query_calendar_insert_event_data($calendar) {
     '$description',
     '$properties',
     '$location',
-    '$category1_id',
-    '$priority',
-    '$privacy',
+    $category1_id,
+    $priority,
+    $privacy,
     '$event_duration',		
     '$repeat_kind',
     '$repeatfrequency',
@@ -574,7 +572,7 @@ function run_query_calendar_insert_event_data($calendar) {
     $all_day,
     '$color',
     $repeat_end,
-    '$obm[domain_id]')";
+    $obm[domain_id])";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
   $obm_q->query($query);
@@ -585,7 +583,7 @@ function run_query_calendar_insert_event_data($calendar) {
       AND calendarevent_date='$datebegin' 
       AND calendarevent_title='$title'
       AND calendarevent_duration='$event_duration'
-      AND calendarevent_domain_id='$obm[domain_id]'
+      AND calendarevent_domain_id=$obm[domain_id]
       ORDER BY calendarevent_id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
   $obm_q->query($query);
@@ -620,8 +618,9 @@ function run_query_calendar_insert_event_data($calendar) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $state) {
   global $cdg_sql, $obm;
-
-  $uid = $obm['uid'];
+  $event_id = $event_id;
+  $entity_id = sql_parse_id( $entity_id);
+  $uid = sql_parse_id( $obm['uid']);
   $query = "INSERT INTO EventEntity (
     evententity_timecreate,
     evententity_usercreate,
@@ -632,9 +631,9 @@ function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $
     evententity_state) 
   VALUES (
     NOW(),
-    '$uid',
-    '$event_id',
-    '$entity_id',
+    $uid,
+    $event_id,
+    $entity_id,
     '$entity',
     '0',
     '$state')";
@@ -791,14 +790,14 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
 
   $datebegin = $calendar['date_begin'];
   $dateend = $calendar['date_end'];
-  $event_id = $calendar['calendar_id'];
+  $event_id =  $calendar['calendar_id'];
   $groups = $sel_entity_id['group'];
   $mail = $calendar['mail'];
   $mail_title = stripslashes($calendar['title']);
   $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
 
-  if($calendar['task_new_id']) $task_id = $calendar['task_new_id']; 
-  else $task_id = $calendar['task_id'];
+  if($calendar['task_new_id']) $task_id =  $calendar['task_new_id']; 
+  else $task_id =  $calendar['task_id'];
 
   $user_group_array = array();
 
@@ -851,8 +850,8 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
         deletedcalendarevent_user_id,
         deletedcalendarevent_timestamp)
       VALUES (
-        '$event_id',
-        '$u_id',
+        $event_id,
+        $u_id,
         '$now')";
 	display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_update(1)');
 	$retour = $obm_q->query($query);
@@ -863,8 +862,8 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
     if (count($new_users) > 0) {
       foreach($new_users as $u_id) {
 	$query = "DELETE FROM DeletedCalendarEvent
-      WHERE deletedcalendarevent_event_id = '$event_id'
-        AND deletedcalendarevent_user_id = '$u_id'";
+      WHERE deletedcalendarevent_event_id = $event_id
+        AND deletedcalendarevent_user_id = $u_id";
 	display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_update(2)');
 	$retour = $obm_q->query($query);
       }
@@ -892,7 +891,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, 
     }
   }
   
-  $query = "DELETE FROM EventEntity WHERE 1=1 $qusers $rresources AND evententity_event_id = '$event_id'";
+  $query = "DELETE FROM EventEntity WHERE 1=1 $qusers $rresources AND evententity_event_id = $event_id";
   $db = new DB_OBM;
   $db->query($query);
 
@@ -940,16 +939,16 @@ function run_query_calendar_update_event_data($calendar) {
   $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
   if(is_numeric($calendar['owner']) && $calendar['owner'] >= 0) {
-    $owner = "calendarevent_owner = '$calendar[owner]',";
+    $owner = "calendarevent_owner = $calendar[owner],";
   }
-  $category1_id = $calendar['category1'];
+  $category1_id = sql_parse_id( $calendar['category1']);
   $priority = $calendar['priority'];
   $description = $calendar['description'];
   $location = $calendar['location'];
   $datebegin = of_isodate_convert($calendar['date_begin']);
   $event_duration = $calendar['event_duration'];
   ($calendar['all_day'] != 1) ? $all_day = 'FALSE': $all_day = 'TRUE';
-  $event_id = $calendar['calendar_id']; 
+  $event_id = sql_parse_id( $calendar['calendar_id'], true); 
   if ($calendar['privacy'] != 1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
@@ -990,13 +989,13 @@ function run_query_calendar_update_event_data($calendar) {
   $query = "UPDATE CalendarEvent SET
     calendarevent_timeupdate = '$now',
     $owner
-    calendarevent_userupdate = '$obm[uid]', 
+    calendarevent_userupdate = $obm[uid], 
     calendarevent_title = '$title', 
     calendarevent_date = '$datebegin',     
     calendarevent_description = '$description',
     calendarevent_properties = '$properties', 
     calendarevent_location = '$location',
-    calendarevent_category1_id = '$category1_id',
+    calendarevent_category1_id = $category1_id,
     calendarevent_priority = '$priority',
     calendarevent_privacy = '$privacy', 
     calendarevent_duration = '$event_duration',
@@ -1007,12 +1006,12 @@ function run_query_calendar_update_event_data($calendar) {
     calendarevent_repeatdays = '$repeat_days',
     calendarevent_endrepeat = $repeat_end
   WHERE
-    calendarevent_id = '$event_id'";
+    calendarevent_id  $event_id"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
   $obm_q->query($query);
 
-  $query = "DELETE FROM CalendarException WHERE calendarexception_event_id = '$event_id'";
+  $query = "DELETE FROM CalendarException WHERE calendarexception_event_id  $event_id'"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(2)');
   $obm_q->query($query);
 
@@ -1046,16 +1045,16 @@ function run_query_calendar_quick_event_update($calendar) {
   $title = $calendar['title'];
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
-  $event_id = $calendar['calendar_id']; 
+  $event_id = sql_parse_id($calendar['calendar_id'], true); 
   $obm_q = new DB_OBM;
   $query = "UPDATE CalendarEvent SET
     calendarevent_timeupdate = '$now',
-    calendarevent_userupdate = '$obm[uid]', 
+    calendarevent_userupdate = $obm[uid], 
     calendarevent_title = '$title', 
     calendarevent_date = '$datebegin',     
     calendarevent_duration = '$event_duration'
   WHERE
-  calendarevent_id = '$event_id' $multidomain";
+  calendarevent_id  $event_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
   $obm_q->query($query);  
 }
@@ -1101,23 +1100,23 @@ function run_query_calendar_quick_event_insert($calendar) {
    )
   VALUES (
     '$now',
-    '$obm[uid]', 
-    '$obm[uid]', 
+    $obm[uid], 
+    $obm[uid], 
     '$title', 
     '$datebegin',     
     '$event_duration',
     $all_day,
     '',
     '',
-    '0',
+    0,
     'none',
-    '1',
+    1,
     'NOW()',
     '',
     '',
     NULL,
-    '2',
-    '$obm[domain_id]'
+    2,
+    $obm[domain_id]
   )";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_insert_event_data()');
   $obm_q->query($query);
@@ -1145,16 +1144,17 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
 
   $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
-  $id = $calendar['calendar_id'];
+  $id =  $calendar['calendar_id'];
   $olddatebegin = $calendar['old_date_begin'];
   $event_duration = $calendar['duration'];
   
   $obm_q = new DB_OBM;
 
+  $sql_id = sql_parse_id($id, true);
   $query = "UPDATE CalendarEvent SET calendarevent_timeupdate = NOW() WHERE calendarevent_id = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(0)');
   $obm_q->query($query);
-
+  $sql_id = sql_parse_id($id);
   $query = "INSERT INTO CalendarException (
       calendarexception_usercreate,
       calendarexception_timecreate ,   
@@ -1163,21 +1163,22 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       calendarexception_event_id,
       calendarexception_date)
       VALUES (
-        '$obm[uid]',
+        $obm[uid],
         '$now',
-        '$obm[uid]',
+        $obm[uid],
         '$now',
-        '$id',
+        $id,
         '$olddatebegin'
       )";
-
+  
+  $sql_id = sql_parse_id($id, true);
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(1)');
   $obm_q->query($query);
   $query = "Update CalendarEvent SET
-    calendarevent_userupdate = '$obm[uid]',
+    calendarevent_userupdate = $obm[uid],
     calendarevent_timeupdate = NOW()
     WHERE
-    calendarevent_id = '$id'";
+    calendarevent_id  $sql_id"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(2)');
   $obm_q->query($query);
@@ -1188,8 +1189,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $repeat_days = $event_q->f('calendarevent_repeatdays');
     $repeat_end = $event_q->f('calendarevent_endrepeat');
     $repeatfrequency = $event_q->f('calendarevent_repeatfrequence');  
-    $category1_id = $event_q->f('calendarevent_category1_id');
-    $priority = $event_q->f('calendarevent_priority');
+    $category1_id = sql_parse_id( $event_q->f('calendarevent_category1_id'));
+    $priority = sql_parse_int( $event_q->f('calendarevent_priority'));
     $color = $event_q->f('calendarevent_color');
     $description = $event_q->f('calendarevent_description');
     $properties = $event_q->f('calendarevent_properties');
@@ -1222,16 +1223,16 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     VALUES (
       '$now',
       '$now',
-      '$obm[uid]',
-      '$obm[uid]',
+      $obm[uid],
+      $obm[uid],
       '$title',
       '$datebegin',
       '$description',
       '$properties',
       '$location',
-      '$category1_id',
-      '$priority',
-      '$privacy',
+      $category1_id,
+      $priority,
+      $privacy,
       '$event_duration',		
       'none',
       '$repeatfrequency',
@@ -1312,6 +1313,8 @@ function run_query_calendar_event_alert_insert($event_id, $user_id, $alerts) {
   if (! is_array($alerts) && $alerts > 0) {
     $alerts = array($alerts => $alerts);
   }
+  $event_id = sql_parse_id($event_id);
+  $user_id = sql_parse_id($user_id);
 
   if (is_array($alerts) && count($alerts) > 0) {
     $obm_q = new DB_OBM;
@@ -1324,9 +1327,9 @@ function run_query_calendar_event_alert_insert($event_id, $user_id, $alerts) {
         calendaralert_duration)
       VALUES (
         '$now',
-        '$obm[uid]',
-        '$event_id',
-        '$user_id',
+        $obm[uid],
+        $event_id,
+        $user_id,
         '$dur')";
       display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_alert_insert(0)');
       $obm_q->query($query);
@@ -1351,7 +1354,7 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
   $obm_q = new DB_OBM;
   
   if ($user_id > 0) {
-    $where_user = "AND calendaralert_user_id = '$user_id'";
+    $where_user = "AND calendaralert_user_id = $user_id";
   }
 
   $query = "DELETE FROM CalendarAlert
@@ -1413,43 +1416,31 @@ function run_query_calendar_delete($calendar) {
   global $ccalendar_resource_admin, $l_resource_allocated;
 
   $obm_q = new DB_OBM;
-  $event_id = $calendar['calendar_id'];
+  $event_id =  $calendar['calendar_id'];
   $mail = $calendar['mail']; 
   
   $users_array = get_calendar_event_users_info($event_id);
-
+  
   $multidomain = sql_multidomain('calendarevent');
   $query = "SELECT calendarevent_title
     FROM CalendarEvent
-    WHERE calendarevent_id = '$event_id' $multidomain";
+    WHERE calendarevent_id = $event_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(1)');
   $obm_q->query($query);
   $obm_q->next_record();
   $title = $obm_q->f('calendarevent_title');
 
   // Resources display
-  $query = "SELECT evententity_entity_id FROM EventEntity WHERE evententity_event_id = '$event_id' AND evententity_entity = 'resource'";
+  $query = "SELECT evententity_entity_id FROM EventEntity WHERE evententity_event_id = $event_id AND evententity_entity = 'resource'";
   $obm_q->query($query);
   $resources = array();
   while ($obm_q->next_record()) {
     array_push($resources, $obm_q->f('evententity_entity_id'));
   }
   
-  $query = "DELETE FROM CalendarException WHERE calendarexception_event_id = '$event_id'";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
-  $obm_q->query($query);
-  $query = "DELETE FROM CalendarAlert WHERE calendaralert_event_id = '$event_id'";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(3)');
-  $obm_q->query($query);  
-  $query = "DELETE FROM EventEntity WHERE evententity_event_id = '$event_id'";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(4)');
-  $obm_q->query($query);
   $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = '$event_id'";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
   $obm_q->query($query);
-
-  // Alerts
-  run_query_calendar_event_alert_delete($event_id);
 
   // If connectors in use
   if ($c_use_connectors) {
@@ -1723,6 +1714,7 @@ function get_calendar_event_info($id,$attendees=true) {
   if ($id == '') {
     return false;
   }
+  $id = sql_parse_id( $id, true);
   if($attendees) {
     $a_sql = 'LEFT JOIN EventEntity ON evententity_event_id = calendarevent_id';
   }
@@ -1732,7 +1724,7 @@ function get_calendar_event_info($id,$attendees=true) {
   $multidomain = sql_multidomain('calendarevent');
   $query = "SELECT *, $calendarevent_date_l FROM CalendarEvent 
             $a_sql
-            WHERE calendarevent_id='$id'
+            WHERE calendarevent_id $id 
             $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_calendar_event_info()');
@@ -1762,13 +1754,14 @@ function get_calendar_event_users_info($id) {
 
   $users_array = array();
 
+  $id = sql_parse_id( $id, true);
   if ($id == '') {
     return $users_array;
   }
 
   $query = "SELECT evententity_entity_id
     FROM EventEntity
-    WHERE evententity_event_id = '$id' AND evententity_entity = 'user'";
+    WHERE evententity_event_id $id AND evententity_entity = 'user'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1791,7 +1784,7 @@ function get_calendar_event_entity($calendar_id) {
 
   // XXXX Optimisation possible : 1 seule requete pour toutes les entites
   $multidomain = sql_multidomain('userobm');
-
+  $calendar_id = sql_parse_id( $calendar_id, true);
   $query = "SELECT DISTINCT
     userobm_id,
     userobm_lastname,
@@ -1802,7 +1795,7 @@ function get_calendar_event_entity($calendar_id) {
   FROM EventEntity
     LEFT JOIN UserObm ON evententity_entity_id = userobm_id
   WHERE 
-    evententity_event_id = '$calendar_id' AND 
+    evententity_event_id $calendar_id AND 
     evententity_entity = 'user'
     $multidomain";
 
@@ -1829,7 +1822,7 @@ function get_calendar_event_entity($calendar_id) {
   FROM EventEntity
     LEFT JOIN Resource ON evententity_entity_id = resource_id
   WHERE 
-    evententity_event_id = '$calendar_id'
+    evententity_event_id $calendar_id 
     AND evententity_entity = 'resource'
     $multidomain";
 
@@ -1858,7 +1851,7 @@ function get_calendar_event_entity($calendar_id) {
     LEFT JOIN ProjectTask ON evententity_entity_id = projecttask_id
     LEFT JOIN Project ON projecttask_project_id = project_id
   WHERE 
-    evententity_event_id = '$calendar_id'
+    evententity_event_id $calendar_id 
     AND evententity_entity = 'task'
     $multidomain";
 
@@ -2436,7 +2429,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
   $calendarevent_endrepeat_l = sql_date_format($db_type,'calendarevent_endrepeat','calendarevent_endrepeat');
   $multidomain = sql_multidomain('calendarevent');
   if ($category_filter != '') {
-    $filter = " AND calendarcategory1_id = '$category_filter' ";
+    $category_filter = sql_parse_id( $category_filter);
+    $filter = " AND calendarcategory1_id = $category_filter ";
   }
   if (is_array($calendar_entity['user'])
       && (count($calendar_entity['user']) > 0) ) {
@@ -2667,6 +2661,7 @@ function run_query_get_one_event_exception($calendar_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
+  $calendar_id = sql_parse_id( $calendar_id, true);
   $calendarexception_date = sql_date_format($obm_q->type,'calendarexception_date');
   $calendarexception_date_l = sql_date_format($obm_q->type,'calendarexception_date','calendarexception_date');  
 
@@ -2674,7 +2669,7 @@ function run_query_get_one_event_exception($calendar_id) {
     calendarexception_event_id,
     $calendarexception_date_l
    FROM CalendarException
-   WHERE calendarexception_event_id='$calendar_id'"; 
+   WHERE calendarexception_event_id $calendar_id"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_get_one_event_exception()');
   $obm_q->query($query);
@@ -2696,15 +2691,16 @@ function get_one_event_user_alert($event_id, $user_id = null) {
 
   $alerts = array();
   $obm_q = new DB_OBM;
-  
+  $event_id = sql_parse_id($event_id, true); 
   $query = "SELECT
     calendaralert_duration,
     calendaralert_user_id
    FROM CalendarAlert
-   WHERE calendaralert_event_id='$event_id' "; 
+   WHERE calendaralert_event_id $event_id"; 
 
   if($user_id) {
-    $query .= "AND calendaralert_user_id='$user_id'";
+    $user_id = sql_parse_id($user_id, true);
+    $query .= "AND calendaralert_user_id $user_id"; 
   }
 
   display_debug_msg($query, $cdg_sql, 'get_one_event_user_alert()');
@@ -3139,7 +3135,6 @@ function run_query_calendar_insert_view($calendar) {
   $calendar_bookmarkproperties = array('category', 'cal_range', 'cal_view');
 
   $obm_q = new DB_OBM;
-  $user_id = $obm['uid'];
 
   $label = $calendar['view_label'];
   // Category
@@ -3167,24 +3162,26 @@ function run_query_calendar_insert_view($calendar) {
   // View
   $cal_view = $_SESSION['cal_view'];
 
+  $user_id = sql_parse_id($obm['uid']);
   // Insert ObmBookmark
   $query = "INSERT INTO ObmBookmark(
     obmbookmark_user_id,
     obmbookmark_label,
     obmbookmark_entity) VALUES (
-    '$user_id',
+    $user_id,
     '$label',
     'calendar')";
   $obm_q->query($query);
 
+  $user_id = sql_parse_id($obm['uid'], true);
   // Select obmbookmark_id
   $query = "SELECT obmbookmark_id FROM ObmBookmark
-    WHERE obmbookmark_user_id='$user_id'
+    WHERE obmbookmark_user_id $user_id 
     AND obmbookmark_label='$label'
     AND obmbookmark_entity='calendar'";
   $obm_q->query($query);
   $obm_q->next_record();
-  $obmbookmark_id = $obm_q->f('obmbookmark_id');
+  $obmbookmark_id = sql_parse_id( $obm_q->f('obmbookmark_id'));
 
   // Insert ObmBookmark properties 
   if (is_array($calendar_bookmarkproperties)) {
@@ -3193,7 +3190,7 @@ function run_query_calendar_insert_view($calendar) {
         obmbookmarkproperty_bookmark_id,
         obmbookmarkproperty_property,
         obmbookmarkproperty_value) VALUES (
-        '$obmbookmark_id',
+        $obmbookmark_id,
         '$property',
         '".${$property}."')";
       $obm_q->query($query);
@@ -3218,14 +3215,10 @@ function run_query_calendar_delete_view($calendar) {
 
   $obm_q = new DB_OBM;
 
-  $id = $calendar['view_id'];
+  $id = sql_parse_id( $calendar['view_id'], true);
 
   // Delete view
-  $query = "DELETE FROM ObmBookmark WHERE obmbookmark_id='$id'";
-  $obm_q->query($query);
-
-  // Delete view properties
-  $query = "DELETE FROM ObmBookmarkProperty WHERE obmbookmarkproperty_bookmark_id='$id'";
+  $query = "DELETE FROM ObmBookmark WHERE obmbookmark_id $id"; 
   $obm_q->query($query);
 
   $message = "\"obmbookmark_id\": \"$id\"";
@@ -3902,13 +3895,14 @@ function run_query_calendar_reset($id) {
   global $cdg_sql, $obm;
   $obm_q = new DB_OBM;
   $calendar['mail'] = false;
-  
+  $id =  $id; 
   $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
   $writable = $writable['ids'];
   # Delete all events where the user is the owner and an attendee and all events where the owner
   # is writable and the user is the only attendee
+  $sql_id = sql_parse_id($id, true);
   $query = "SELECT calendarevent_id FROM CalendarEvent LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
-            WHERE (calendarevent_owner = $id AND evententity_entity_id = $id AND evententity_entity = 'user')
+            WHERE (calendarevent_owner $sql_id AND evententity_entity_id $sql_id AND evententity_entity = 'user')
             UNION
             SELECT calendarevent_id FROM CalendarEvent LEFT JOIN EventEntity ON calendarevent_id = evententity_event_id
             WHERE calendarevent_owner IN  (".implode(',',$writable).") AND evententity_entity = 'user'
@@ -3922,7 +3916,7 @@ function run_query_calendar_reset($id) {
   }
 
   # Refuse all other events
-  $query = "SELECT evententity_event_id FROM EventEntity WHERE evententity_entity_id = $id and evententity_entity = 'user'
+  $query = "SELECT evententity_event_id FROM EventEntity WHERE evententity_entity_id $id and evententity_entity = 'user'
             AND evententity_state != 'R'";
   $obm_q->query($query);
   while($obm_q->next_record()) {
@@ -3931,7 +3925,7 @@ function run_query_calendar_reset($id) {
   # Delete all alerts
 
   $query = "DELETE FROM CalendarAlert WHERE calendaralert_event_id NOT IN (SELECT evententity_event_id FROM EventEntity) 
-                  OR calendaralert_user_id = $id";
+                  OR calendaralert_user_id $id"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset()');
   $obm_q->query($query);
 }
