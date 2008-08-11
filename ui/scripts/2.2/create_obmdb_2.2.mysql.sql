@@ -1560,7 +1560,7 @@ CREATE TABLE OGroup (
   ogroup_userupdate int(8) default NULL,
   ogroup_usercreate int(8) default NULL,
   ogroup_organizationalchart_id int(8) NOT NULL,
-  ogroup_parent_id int(8) NOT NULL,
+  ogroup_parent_id int(8),
   ogroup_name varchar(32) NOT NULL,
   ogroup_level varchar(16) default NULL,
   PRIMARY KEY  (ogroup_id),

@@ -1526,7 +1526,7 @@ CREATE TABLE OGroup (
   ogroup_userupdate                integer,
   ogroup_usercreate                integer,
   ogroup_organizationalchart_id    integer not null,
-  ogroup_parent_id                 integer not null,
+  ogroup_parent_id                 integer,
   ogroup_name                      varchar(32) not null,
   ogroup_level                     varchar(16),
   PRIMARY KEY (ogroup_id)

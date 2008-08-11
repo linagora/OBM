@@ -8,6 +8,9 @@ INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_nam
 UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
+-- OGroup
+ALTER TABLE OGroup MODIFY COLUMN ogroup_parent_id int(8);
+
 -- CalendarEvent
 ALTER TABLE CalendarEvent MODIFY COLUMN calendarevent_allday BOOLEAN DEFAULT FALSE;
 ALTER TABLE EventEntity MODIFY COLUMN evententity_required BOOLEAN DEFAULT FALSE;

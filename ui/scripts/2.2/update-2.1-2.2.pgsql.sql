@@ -9,6 +9,9 @@ INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_nam
 UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
+-- OGroup
+ALTER TABLE OGroup ALTER COLUMN ogroup_parent_id DROP NOT NULL;
+
 -- CalendarEvent
 
 ALTER TABLE calendarevent ALTER COLUMN calendarevent_allday DROP DEFAULT;
