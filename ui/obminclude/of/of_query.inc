@@ -64,7 +64,7 @@ function sql_parse_id($id, $select=false, $not=false) {
  * @return void
  */
 function sql_parse_int($int) {
-  return (is_numeric($id))?(int)$id:0;
+  return (is_numeric($int))?(int)$int:0;
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Return the sql word corresponding to case incensitive like
