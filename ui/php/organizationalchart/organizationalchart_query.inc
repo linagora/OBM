@@ -242,11 +242,11 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
                 ogroupentity_ogroup_id,
                 ogroupentity_entity_id,
                 ogroupentity_entity) VALUES (
-                  $domain_id,
+                  $ins_domain_id,
                   null,
                   '$now',
                   null,
-                  $uid,
+                  $ins_uid,
                   $ogroup_id,
                   $id,
                   '$entity')";

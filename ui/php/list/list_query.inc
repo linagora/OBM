@@ -168,7 +168,7 @@ function run_query_list_insert($list) {
   $email = $list["email"];
   $mode = $list["mode"];
   $list_query = addslashes($list["query"]);
-  $mailing_ok = sql_parse_int($list["mailing_ok"]0);
+  $mailing_ok = sql_parse_int($list["mailing_ok"]);
   $contact_arch = sql_parse_int($list["contact_archive"]);
   $info_pub = sql_parse_int($list["info_pub"]);
   if (isset($list["criteria"])) {

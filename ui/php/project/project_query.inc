@@ -46,7 +46,8 @@ function run_query_project_search($params) {
   }
 
   if ($company) {
-    $where .= " AND project_company_id = '$company'";
+    $company = sql_parse_id($company, true);
+    $where .= " AND project_company_id $company ";
   }
 
   if ($company_name != '') {
@@ -55,15 +56,18 @@ function run_query_project_search($params) {
   }
 
   if ($deal) {
-    $where .= " AND project_deal_id = '$deal'";
+    $deal = sql_parse_id($deal, true);
+    $where .= " AND project_deal_id $deal ";
   }
 
   if ($type_id != 0) {
-    $where .= " AND project_type_id = '$type_id'";
+    $type_id = sql_parse_id($type_id, true);
+    $where .= " AND project_type_id $type_id ";
   }
 
   if ($tt != 0) {
-    $where .= " AND project_tasktype_id = '$tt'";
+    $tt = sql_parse_id($tt, true);
+    $where .= " AND project_tasktype_id $tt ";
   }
 
   if ($date != '') {
@@ -78,16 +82,18 @@ function run_query_project_search($params) {
   }
 
   if (($member != '') && ($member != $c_all)) {
+    $member = $member;
     $join_member = "LEFT JOIN ProjectUser as Member ON project_id=Member.projectuser_project_id";
-    $where .= " AND Member.projectuser_user_id = '$member'
+    $where .= " AND Member.projectuser_user_id $member 
                 AND Member.projectuser_projecttask_id is null";
   }
 
   if (($manager != '') && ($manager != $c_all)) {
+    $manager = sql_parse_id($manager, true);
     $join_member = "LEFT JOIN ProjectUser as Member
                       ON project_id=Member.projectuser_project_id
                         AND Member.projectuser_manager = 1";
-    $where .= " AND Member.projectuser_user_id = '$manager'
+    $where .= " AND Member.projectuser_user_id $manager 
                 AND Member.projectuser_projecttask_id is null";
   }
 
@@ -154,6 +160,7 @@ function run_query_project_detail($p_id) {
   $timecreate = sql_date_format($db_type, 'project_timecreate', 'timecreate');
   $multidomain = sql_multidomain('project');
 	
+  $p_id = sql_parse_id($p_id, true);
   $query = "SELECT
       project_id,
       project_name,
@@ -190,7 +197,7 @@ function run_query_project_detail($p_id) {
          LEFT JOIN TaskType ON project_tasktype_id=tasktype_id
          LEFT JOIN UserObm as c ON project_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON project_userupdate=u.userobm_id
-    WHERE project_id=$p_id $multidomain";
+    WHERE project_id $p_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_detail');
   $obm_q->query($query);
@@ -213,7 +220,7 @@ function run_query_project_allocation_and_time($p_id) {
 
   $frac = $c_day_fraction;
   $multidomain = sql_multidomain('userobm');	
-  
+  $p_id = sql_parse_id($p_id, true); 
   // We first get Times from Allocated Tasks
   $query = "
     SELECT
@@ -230,10 +237,10 @@ function run_query_project_allocation_and_time($p_id) {
     LEFT JOIN TimeTask
       on timetask_projecttask_id = projecttask_id
       and timetask_user_id = userobm_id
-    WHERE projectuser_project_id = '$p_id' $multidomain
-      AND ( (projectuser_projectedtime != '0'
+    WHERE projectuser_project_id $p_id $multidomain
+      AND ( (projectuser_projectedtime != 0
              AND projectuser_projectedtime is not null)
-          OR (projectuser_missingtime != '0'
+          OR (projectuser_missingtime != 0
              AND projectuser_missingtime is not null) )
     GROUP BY userobm_id, projecttask_id, projected_time, missing_time
 ";
@@ -269,7 +276,7 @@ function run_query_project_allocation_and_time($p_id) {
       LEFT JOIN ProjectUser
         ON projectuser_projecttask_id = projecttask_id
         AND projectuser_user_id = userobm_id
-    WHERE projecttask_project_id = '$p_id'
+    WHERE projecttask_project_id $p_id 
       AND projectuser_projectedtime is null
       AND projectuser_missingtime is null
     GROUP BY userobm_id, projecttask_id, projecttask_project_id";
@@ -299,18 +306,18 @@ function run_query_project_allocation_and_time($p_id) {
 function run_query_project_insert($params) {
   global $obm, $cdg_sql;
 
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
   $date_now = date('Y-m-d H:i:s');
-  $domain_id = $obm['domain_id'];
+  $domain_id = sql_parse_id($obm['domain_id']);
   $name = $params['name'];
   $soldtime = ($params['soldtime'] ? "'".$params['soldtime']."'" : 'null');
   $estimated = ($params['estimated'] ? "'".$params['estimated']."'" : 'null');
-  $type_id = $params['type_id'];
-  $tt = $params['tt'];
-  $comp = ($params['company_id'] ? "'".$params['company_id']."'" : 'null');
-  $deal = ($params['deal_id'] ? "'".$params['deal_id']."'" : 'null');
+  $type_id = sql_parse_id($params['type_id']);
+  $tt = sql_parse_id($params['tt']);
+  $comp = sql_parse_id($params['company_id']);
+  $deal = sql_parse_id($params['deal_id']);
   $task = trim($params['tasklabel']);
-  $member = $params['member'];
+  $member = sql_parse_id($params['member']);
   $datebegin = ($params['datebegin'] ? "'".of_isodate_convert($params['datebegin'])."'" : 'null');
   $dateend = ($params['dateend'] ? "'".of_isodate_convert($params['dateend'])."'" : 'null');
   $project_reference_date = $params['reference_date'];
@@ -353,19 +360,19 @@ function run_query_project_insert($params) {
   VALUES (null,
     '$date_now',
     null,
-    '$uid',
-    '$domain_id',
+    $uid,
+    $domain_id,
     '$name',
     '$shortname',
-    '$type_id',
-    '$tt',
+    $type_id,
+    $tt,
     $comp,
     $deal,
     $soldtime,
     $estimated,
     $datebegin,
     $dateend,
-    '$archive',
+    $archive,
     '$project_reference_date',
     '$project_reference_duration',
     '$project_reference_desc',
@@ -378,11 +385,9 @@ function run_query_project_insert($params) {
 
   // get the id of the inserted project. Date is to insure correct project
   // is selected (and not similar from the same deal)
-  $query = "SELECT project_id
+  $query = "SELECT MAX(project_id) as project_id
             FROM Project
-            WHERE project_name = '$name'
-              AND project_tasktype_id = '$tt'
-              AND project_timecreate = '$date_now'";
+            WHERE project_usercreate = $uid";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_insert (get Id)');
   $obm_q->query($query);
@@ -395,6 +400,7 @@ function run_query_project_insert($params) {
     return $pid;
   }
 
+  $id = sql_parse_id($id);
   // If a task has been given, We create a task for this project
   if ($task != '') {
     $query = "
@@ -406,12 +412,12 @@ function run_query_project_insert($params) {
       projecttask_parenttask_id,
       projecttask_rank)
     VALUES (
-      '$pid',
+      $id,
       '$date_now',
-      '$uid',
+      $uid,
       '$task',
-      '0',
-      '1')";
+      0,
+      1)";
 
     display_debug_msg($query, $cdg_sql, 'run_query_project_insert (create task)');
     $retour = $obm_q->query($query);
@@ -427,22 +433,20 @@ function run_query_project_insert($params) {
       projecttask_parenttask_id,
       projecttask_rank)
     SELECT 
-      '$pid',
+      $id,
       '$date_now',
-      '$uid',
+      $uid,
       projectreftask_label,
-      '0',
-      '1'
+      0,
+      1
     FROM ProjectRefTask
     WHERE
       projectreftask_id IN (".implode(',',$ref_task).')';
       display_debug_msg($query, $cdg_sql, 'run_query_project_insert (create ref task)');
       $retour = $obm_q->query($query);
   }
-
   // If a member has been given, We insert it
-  if ($member > 0) {
-
+  if (is_numeric($member)) {
     // We affect the member to this project (projecttask null)
     $query = "
       INSERT INTO ProjectUser 
@@ -454,11 +458,11 @@ function run_query_project_insert($params) {
          projectuser_manager
         )
       VALUES
-        ('$pid',
-        '$member',
+        ($id,
+        $member,
         null,
         '$date_now',
-        '$uid',
+        $uid,
         '1')";
 
     display_debug_msg($query, $cdg_sql, 'run_query_project_insert (add member)');
@@ -469,15 +473,17 @@ function run_query_project_insert($params) {
 
     // We get the projecttask_id if a project task has been filled
     if ($task != '') {
+      $id = sql_parse_id($pid, true);
       $query = "
         SELECT projecttask_id
         FROM ProjectTask
-        WHERE projecttask_project_id = '$pid'";
+        WHERE projecttask_project_id $id ";
 
       display_debug_msg($query, $cdg_sql, 'run_query_short_create(get task)');
       $obm_q->query($query);
       $obm_q->next_record();
-      $pt_id = "'".$obm_q->f('projecttask_id')."'";
+      $pt_id = sql_parse_id($obm_q->f('projecttask_id'));
+      $id = sql_parse_id($pid);
 
       // We affect the member to this projecttask
       $query = "
@@ -492,11 +498,11 @@ function run_query_project_insert($params) {
          projectuser_validity
         )
       VALUES
-        ('$pid',
+        ($id,
         '$member',
         $pt_id,
         '$date_now',
-        '$uid',
+        $uid,
         $estimated,
         $estimated,
         '$date_now')";
@@ -520,26 +526,21 @@ function run_query_project_insert($params) {
 function run_query_project_update($pid, $params) {
   global $obm, $cdg_sql;
 
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
   $name = $params['name'];
   $soldtime = ($params['soldtime'] ? "'".$params['soldtime']."'" : 'null');
   $estimated = ($params['estimated'] ? "'".$params['estimated']."'" : 'null');
-  $type_id = $params['type_id'];
-  $tt = $params['tt'];
+  $type_id = sql_parse_id($params['type_id']);
+  $tt = sql_parse_id($params['tt']);
   $datebegin = ($params['datebegin'] ? "'".of_isodate_convert($params['datebegin'])."'" : 'null');
   $dateend = ($params['dateend'] ? "'".of_isodate_convert($params['dateend'])."'" : 'null');
   $reference_date = $params['reference_date'];
   $reference_duration = $params['reference_duration'];
   $reference_desc = $params['reference_desc'];
   $reference_tech = $params['reference_tech'];
-  $archive = ($params['archive'] == '1' ? '1' : '0');
+  $archive = sql_parse_int($params['archive']);
   $shortname = $params['shortname'];
-
-  if ($archive) {
-    $arch = '1';
-  } else {
-    $arch = '0';
-  }
+  $pid = sql_parse_id($pid, true);
   $comment = $params['comment'];
   $add_comment = $params['add_comment'];
   if ($add_comment != '') {
@@ -550,11 +551,11 @@ function run_query_project_update($pid, $params) {
   $multidomain = sql_multidomain('project');
   $query = "UPDATE Project SET
       project_timeupdate='". date('Y-m-d H:i:s') ."',
-      project_userupdate='$uid',
+      project_userupdate=$uid,
       project_name='$name',
       project_shortname='$shortname',
-      project_type_id='$type_id',
-      project_tasktype_id='$tt',
+      project_type_id=$type_id,
+      project_tasktype_id=$tt,
       project_soldtime=$soldtime,
       project_estimatedtime=$estimated,
       project_datebegin=$datebegin,
@@ -563,9 +564,9 @@ function run_query_project_update($pid, $params) {
       project_reference_duration='$reference_duration',
       project_reference_desc='$reference_desc',
       project_reference_tech='$reference_tech',
-      project_archive='$arch',
+      project_archive=$archve,
       project_comment='$comment'
-    WHERE project_id='$pid' $multidomain";
+    WHERE project_id $pid $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_update');
   $obm_q = new DB_OBM;
@@ -583,13 +584,13 @@ function run_query_project_update($pid, $params) {
 function get_project_linked_project_timetask_nb($p_id) {
   global $cdg_sql;
   $multidomain = sql_multidomain('project');
-
+  $p_id = sql_parse_id($p_id, true);
   $obm_q = new DB_OBM;
   $query = "SELECT count(timetask_id) as nb
     FROM TimeTask,
     ProjectTask,
     Project
-    WHERE projecttask_project_id = '$p_id'
+    WHERE projecttask_project_id $p_id 
       AND projecttask_project_id = project_id
       AND timetask_projecttask_id = projecttask_id $multidomain";
 
@@ -614,21 +615,21 @@ function run_query_project_delete($p_id) {
 
   // Delete all links to documents
   run_query_global_delete_document_links($p_id, 'project');
-
+  $p_id = sql_parse_id($p_id, true);
   // Delete all users associations to the project
   $query = "DELETE FROM ProjectUser 
-		WHERE projectuser_project_id='$p_id'";
+		WHERE projectuser_project_id $p_id ";
   display_debug_msg($query, $cdg_sql, 'run_query_project_delete(1)');
   $retour = $obm_q->query($query);
 
   // Delete all task assigned to the project
-  $query = "DELETE FROM ProjectTask WHERE projecttask_project_id='$p_id'";
+  $query = "DELETE FROM ProjectTask WHERE projecttask_project_id $p_id ";
   display_debug_msg($query, $cdg_sql, 'run_query_project_delete(2)');
   $retour = $obm_q->query($query);
 
   // Delete the project
   $multidomain_project = sql_multidomain('project');
-  $query = "DELETE FROM Project WHERE project_id='$p_id' $multidomain_project";
+  $query = "DELETE FROM Project WHERE project_id $p_id $multidomain_project";
   display_debug_msg($query, $cdg_sql, 'run_query_project_delete(3)');
   $retour = $obm_q->query($query);
 
@@ -678,11 +679,11 @@ function run_query_project_name($pid) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('project');
-
+  $pid = sql_parse_id($pid, true);
   $query = "
     SELECT project_name
     FROM Project
-    WHERE project_id = '$pid' $multidomain";
+    WHERE project_id $pid $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_name');
   $obm_q = new DB_OBM;
@@ -708,10 +709,10 @@ function run_query_project_name($pid) {
 function run_query_project_task_insert($params) {
   global $cdg_sql, $obm;
 
-  $pid = $params['project_id'];
-  $ptask = $params['ptask'];
+  $pid = sql_parse_id($params['project_id']);
+  $ptask = sql_parse_id($params['ptask'], true);
   $tasklabel = trim($params['tasklabel']);
-  $ref_task = $params['reftask_id'];
+  $ref_task = sql_parse_id($params['reftask_id']);
   $search_q = new DB_OBM;
 
   // If a parent task has been given, check that there are no links from
@@ -724,13 +725,13 @@ function run_query_project_task_insert($params) {
       SELECT projectuser_user_id
       FROM ProjectUser
       JOIN UserObm ON projectuser_user_id = userobm_id
-      WHERE projectuser_projecttask_id = '$ptask' $multidomain";
+      WHERE projectuser_projecttask_id $ptask $multidomain";
 
     display_debug_msg($query, $cdg_sql, 'run_query_project_task_insert(1)');
     $search_q->query($query);
   }
-
-  if (($ptask == 0) or ($search_q->nf() == 0))  {
+  $ptask = sql_parse_id($params['ptask']);
+  if (!is_numeric($ptask) or ($search_q->nf() == 0))  {
     $obm_q = new DB_OBM;
     if ($tasklabel != '') {
       $query = "
@@ -742,12 +743,12 @@ function run_query_project_task_insert($params) {
           projecttask_parenttask_id,
           projecttask_rank)
         VALUES (
-          '$pid',
+          $pid,
           '". date('Y-m-d H:i:s') ."',
-          '". $obm['uid'] ."',
+          $obm[uid],
           '$tasklabel',
-          '$ptask',
-          '1')";
+          $ptask,
+          1)";
 
       display_debug_msg($query, $cdg_sql, 'run_query_project_task_insert(2)');
       $obm_q->query($query);
@@ -762,12 +763,12 @@ function run_query_project_task_insert($params) {
         projecttask_parenttask_id,
         projecttask_rank)
         SELECT 
-        '$pid',
+        $pid,
         '". date('Y-m-d H:i:s') ."',
-        '$uid',
+        $uid,
         projectreftask_label,
-        '$ptask',
-        '1' FROM ProjectRefTask WHERE
+        $ptask,
+        1 FROM ProjectRefTask WHERE
         projectreftask_id IN (".implode(',',$ref_task).')';
       display_debug_msg($query, $cdg_sql, 'run_query_project_insert (create ref task)');
       $obm_q->query($query);
@@ -788,19 +789,19 @@ function run_query_project_task_insert($params) {
 function run_query_project_task_update($params) {
   global $obm, $cdg_sql;
 
-  $task = $params['task'];
-  $ptask = $params['ptask'];
+  $task = sql_parse_id($params['task'], true);
+  $ptask = sql_parse_id($params['ptask']);
   $tasklabel = $params['tasklabel'];
 
   $query = "
       UPDATE ProjectTask SET
         projecttask_timeupdate='". date('Y-m-d H:i:s') ."',
-        projecttask_userupdate='". $obm['uid'] ."',
+        projecttask_userupdate=$obm[uid],
         projecttask_label='$tasklabel',
-        projecttask_parenttask_id='$ptask',
-        projecttask_rank='1'
+        projecttask_parenttask_id=$ptask,
+        projecttask_rank=1
       WHERE
-        projecttask_id='$task'";
+        projecttask_id $task ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_task_update(2)');
   $obm_q = new DB_OBM;
@@ -826,7 +827,7 @@ function run_query_project_task_delete($params) {
   $multidomain = sql_multidomain('project');
   while ($cpt < $params['tsk_nb']) {
     $cpt++;
-    $tsk_id = $params["tsk$cpt"];
+    $tsk_id = sql_parse_id($params["tsk$cpt"], true);
     
     // Check that neither the task to be deleted or its children tasks are
     // assigned to users
@@ -835,7 +836,7 @@ function run_query_project_task_delete($params) {
       FROM ProjectUser, ProjectTask, Project
       WHERE projectuser_projecttask_id = projecttask_id
         AND projecttask_project_id = project_id
-        AND (projecttask_id='$tsk_id' OR projecttask_parenttask_id='$tsk_id')
+        AND (projecttask_id $tsk_id OR projecttask_parenttask_id $tsk_id )
         $multidomain ";
     
     display_debug_msg($query, $cdg_sql, 'run_query_project_task_delete(1)');
@@ -853,7 +854,7 @@ function run_query_project_task_delete($params) {
         SELECT timetask_id
         FROM TimeTask, ProjectTask
         WHERE timetask_projecttask_id = projecttask_id
-          AND (projecttask_id='$tsk_id' or projecttask_parenttask_id='$tsk_id')";
+          AND (projecttask_id $tsk_id or projecttask_parenttask_id $tsk_id )";
     
       display_debug_msg($query, $cdg_sql, 'run_query_project_task_delete(2)');
       $search_q = new DB_OBM;
@@ -869,8 +870,8 @@ function run_query_project_task_delete($params) {
       $query = "
         DELETE
         FROM ProjectTask
-        WHERE projecttask_id = '$tsk_id'
-          OR  projecttask_parenttask_id = '$tsk_id'";
+        WHERE projecttask_id $tsk_id 
+          OR  projecttask_parenttask_id $tsk_id ";
 
       display_debug_msg($query, $cdg_sql, 'run_query_project_task_delete(3)');
       $obm_q = new DB_OBM;
@@ -893,21 +894,22 @@ function run_query_project_task_delete($params) {
 function run_query_project_memberlist_insert($params) {
   global $cdg_sql, $obm;
 
-  $id = $params['project_id'];
+  $sel_id = sql_parse_id($params['project_id'], true);
+  $ins_id = sql_parse_id($params['project_id']);
   $cpt = 0;
   $cpt_ins = 0;
   $multidomain = sql_multidomain('userobm');
 	  
   while ($cpt < $params['mem_nb']) {
     $cpt++;
-    $mem_id = $params["mem$cpt"];
+    $mem_id = sql_parse_id($params["mem$cpt"], true);
 
     $query = "
       SELECT *
       FROM ProjectUser
       JOIN UserObm ON projectuser_user_id = userobm_id
-      WHERE projectuser_project_id = '$id'
-        AND projectuser_user_id = '$mem_id' $multidomain";
+      WHERE projectuser_project_id $sel_id 
+        AND projectuser_user_id $mem_id $multidomain";
 
     display_debug_msg($query, $cdg_sql, 'run_query_project_memberlist_insert(2)');
     $test_q = new DB_OBM;
@@ -915,6 +917,7 @@ function run_query_project_memberlist_insert($params) {
     
     // If the entry doesn't already exist, we insert it
     if ($test_q->num_rows() == 0) {
+      $mem_id = sql_parse_id($params["mem$cpt"]);
       $query = "
         INSERT INTO ProjectUser 
           (projectuser_user_id,
@@ -926,11 +929,11 @@ function run_query_project_memberlist_insert($params) {
            projectuser_manager
           )
         VALUES
-          ('$mem_id',
-          '$id',
+          ($mem_id,
+          $ins_id,
           null,
           '".date('Y-m-d H:i:s')."',
-          ". $obm['uid'] .",
+          $obm[uid],
           0,
           0)";
 
@@ -953,7 +956,7 @@ function run_query_project_memberlist_insert($params) {
 function run_query_project_memberlist_delete($params) {
   global $cdg_sql;
 
-  $id = $params['project_id'];
+  $id = sql_parse_id($params['project_id'], true);
   $cpt = 0;
   $cpt_del = 0;
   $multidomain = sql_multidomain('userobm');
@@ -963,16 +966,16 @@ function run_query_project_memberlist_delete($params) {
 
   while ($cpt < $params['mem_nb']) {
     $cpt++;
-    $mem_id = $params["mem$cpt"];
+    $mem_id = sql_parse_id($params["mem$cpt"], true);
 
     // Check if the user has filled time management for this project
     $query = "
         SELECT timetask_id
         FROM TimeTask, ProjectTask, UserObm
-        WHERE timetask_user_id = '$mem_id'
+        WHERE timetask_user_id $mem_id 
           AND userobm_id = timetask_user_id
           AND timetask_projecttask_id = projecttask_id
-          AND projecttask_project_id = '$id' $multidomain";
+          AND projecttask_project_id $id $multidomain";
     
     display_debug_msg($query, $cdg_sql, 'run_query_project_member_delete(2b)');
     $search_q->query($query);
@@ -981,8 +984,8 @@ function run_query_project_memberlist_delete($params) {
       $query = "
         DELETE
         FROM ProjectUser
-        WHERE projectuser_project_id = '$id'
-          AND projectuser_user_id = '$mem_id'";
+        WHERE projectuser_project_id $id 
+          AND projectuser_user_id $mem_id ";
       
       display_debug_msg($query, $cdg_sql, 'run_query_project_memberlist_delete(3b)');
       $retour = $obm_q->query($query);
@@ -1004,15 +1007,15 @@ function run_query_project_memberlist_delete($params) {
 function run_query_project_memberstatus_change($params) {
   global $cdg_sql;
 
-  $p_id = $params['project_id'];
-  $m_id = $params['user_id'];
+  $p_id = sql_parse_id($params['project_id'], true);
+  $m_id = sql_parse_id($params['user_id'], true);
   $m_val = $params['user_status'];
 		
   $query = "
     UPDATE ProjectUser
     SET projectuser_manager = '$m_val'
-    WHERE projectuser_user_id = '$m_id'
-      AND projectuser_project_id = '$p_id'
+    WHERE projectuser_user_id $m_id 
+      AND projectuser_project_id $p_id 
       AND projectuser_projecttask_id is null";
 
   $obm_q = new DB_OBM;
@@ -1035,7 +1038,7 @@ function run_query_project_allocation($p_id) {
 
   $frac = $c_day_fraction;
   $multidomain = sql_multidomain('userobm');
-	
+  $p_id = sql_parse_id($p_id, true);	
   $query = "
     SELECT
       userobm_id,
@@ -1047,7 +1050,7 @@ function run_query_project_allocation($p_id) {
         ON projectuser_projecttask_id = projecttask_id
       LEFT JOIN UserObm
         ON projectuser_user_id = userobm_id
-    WHERE projectuser_project_id = '$p_id'
+    WHERE projectuser_project_id $p_id 
       AND projectuser_projectedtime is not null $multidomain
     GROUP BY userobm_id, projectuser_projecttask_id, projected_time, missing_time
     ";
@@ -1068,7 +1071,8 @@ function run_query_project_allocation($p_id) {
 function run_query_project_allocate_update($params) {
   global $cdg_sql, $obm;
 
-  $p_id = $params['project_id'];
+  $sel_id = sql_parse_id($params['project_id'], true);
+  $ins_id = sql_parse_id($params['project_id']);
   $new = $params['projected'];
   $uid = $obm['uid'];  
   $date_now = date('Y-m-d H:i:s');
@@ -1082,7 +1086,7 @@ function run_query_project_allocate_update($params) {
       projectuser_missingtime as mt_miss
     FROM ProjectUser
     JOIN Project ON project_id = projectuser_project_id
-    WHERE projectuser_project_id = '$p_id'
+    WHERE projectuser_project_id $sel_id 
       $multidomain
     ORDER by mt_user, mt_task";
 
@@ -1107,13 +1111,16 @@ function run_query_project_allocate_update($params) {
 
       $tnew = ($new[$m_id][$t_id] != '')  ? 1 : 0;
       $told = (isset ($old[$m_id][$t_id])) ? 1 : 0;
-    
+      $sel_tid = sql_parse_id($t_id, true);
+      $sel_mid = sql_parse_id($m_id, true);
+      $ins_tid = sql_parse_id($t_id); 
+      $ins_mid = sql_parse_id($m_id); 
       // if an allocation existed, but has been removed
       if (!($tnew) and ($told)) {
 	$query = "
         DELETE from ProjectUser
-        WHERE projectuser_user_id = '$m_id'
-          AND projectuser_projecttask_id = '$t_id'";
+        WHERE projectuser_user_id $sel_mid 
+          AND projectuser_projecttask_id $sel_tid ";
 
  	display_debug_msg($query, $cdg_sql, 'run_query_project_allocate_update(2)');
 	$obm_q->query($query);
@@ -1132,11 +1139,11 @@ function run_query_project_allocate_update($params) {
 	$query = "
          UPDATE ProjectUser
          SET projectuser_timeupdate = '$date_now',
-             projectuser_userupdate = '$uid',
+             projectuser_userupdate = $uid,
              projectuser_projectedtime = '$proj'
              $set_miss_time
-         WHERE projectuser_user_id = '$m_id'
-           AND projectuser_projecttask_id = '$t_id'";
+         WHERE projectuser_user_id $sel_mid 
+           AND projectuser_projecttask_id $sel_tid ";
 
 	display_debug_msg($query, $cdg_sql, 'run_query_project_allocate_update(3)');
 	$obm_q->query($query);
@@ -1155,11 +1162,11 @@ function run_query_project_allocate_update($params) {
            projectuser_missingtime
           )
         VALUES
-          ('$m_id',
-           '$p_id',
-           '$t_id',
+          ($ins_mid,
+           $ins_id,
+           $ins_tid,
            '$date_now',
-           '$uid',
+           $uid,
            '$proj',
            '$proj'
           )";
@@ -1182,7 +1189,8 @@ function run_query_project_allocate_update($params) {
 function run_query_project_advance_update($params) {
   global $cdg_sql, $obm;
 
-  $p_id = $params['project_id'];
+  $sel_id = sql_parse_id($params['project_id'], true);
+  $ins_id = sql_parse_id($params['project_id']);
   $new = $params['projected'];
   $uid = $obm['uid'];  
   $date_now = date('Y-m-d H:i:s');
@@ -1197,7 +1205,7 @@ function run_query_project_advance_update($params) {
       projectuser_missingtime as mt_miss
     FROM ProjectUser
     JOIN Project on projectuser_project_id = project_id
-    WHERE projectuser_project_id = '$p_id'
+    WHERE projectuser_project_id $sel_id 
       $multidomain
     ORDER by mt_user, mt_task";
 
@@ -1224,13 +1232,16 @@ function run_query_project_advance_update($params) {
       $proj_old = (isset ($old[$m_id][$t_id])) ? $old[$m_id][$t_id] : 0;
       $miss_new = ($miss_tab[$m_id][$t_id] > 0) ? $miss_tab[$m_id][$t_id] : 0;
       $miss_old = ($old_miss_tab[$m_id][$t_id] > 0) ? $old_miss_tab[$m_id][$t_id] : 0;
-
+      $sel_tid = sql_parse_id($t_id, true);
+      $sel_mid = sql_parse_id($m_id, true);
+      $ins_tid = sql_parse_id($t_id); 
+      $ins_mid = sql_parse_id($m_id); 
       // if an entry existed, but has been removed, we delete it
       if (!($proj_new) && !($miss_new) && ($proj_old || $miss_old)) {
 	$query = "
         DELETE FROM ProjectUser
-        WHERE projectuser_user_id = '$m_id'
-          AND projectuser_projecttask_id = '$t_id'";
+        WHERE projectuser_user_id $sel_mid 
+          AND projectuser_projecttask_id $sel_tid ";
 
  	display_debug_msg($query, $cdg_sql, 'run_query_project_allocate_update(2)');
 	$obm_q->query($query);
@@ -1248,11 +1259,11 @@ function run_query_project_advance_update($params) {
 	$query = "
          UPDATE ProjectUser
          SET projectuser_timeupdate = '$date_now',
-             projectuser_userupdate = '$uid',
+             projectuser_userupdate = $uid,
              projectuser_projectedtime = '$proj_new',
              projectuser_missingtime = '$set_miss_time'
-         WHERE projectuser_user_id = '$m_id'
-           AND projectuser_projecttask_id = '$t_id'";
+         WHERE projectuser_user_id $sel_mid 
+           AND projectuser_projecttask_id $sel_tid ";
 
 	display_debug_msg($query, $cdg_sql, 'run_query_project_allocate_update(3)');
 	$obm_q->query($query);
@@ -1277,11 +1288,11 @@ function run_query_project_advance_update($params) {
            projectuser_missingtime
           )
         VALUES
-          ('$m_id',
-           '$p_id',
-           '$t_id',
+          ($ins_mid,
+           $ins_id,
+           $ins_tid,
            '$date_now',
-           '$uid',
+           $uid,
            '$proj_new',
            '$set_miss_time'
           )";
@@ -1307,13 +1318,14 @@ function run_query_project_statlog($p_id) {
   $uid = $obm['uid'];
   $frac = $c_day_fraction;
   $multidomain = sql_multidomain('project');
-	
+  $p_id = sql_parse_id($p_id, true);	
+  
   $query = "
     SELECT (sum(timetask_length)/8) as time_used, project_id
       FROM TimeTask, ProjectTask, Project
     WHERE timetask_projecttask_id = projecttask_id
     AND project_id = projecttask_project_id
-    AND project_id = '$p_id' $multidomain
+    AND project_id $p_id $multidomain
     GROUP BY project_id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_statlog(1)');
@@ -1326,7 +1338,7 @@ function run_query_project_statlog($p_id) {
   $multidomain = sql_multidomain('userobm');
   $query = "SELECT sum(projectuser_missingtime) as time_left,projectuser_project_id
             FROM ProjectUser JOIN UserObm ON projectuser_user_id = userobm_id
-            WHERE projectuser_project_id = '$p_id' $multidomain
+            WHERE projectuser_project_id $p_id $multidomain
             GROUP BY projectuser_project_id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_statlog(2)');
@@ -1335,26 +1347,6 @@ function run_query_project_statlog($p_id) {
   $obm_q->next_record();
 
   $time_left = $obm_q->f('time_left');
-	
-  /*  $query = "
-    INSERT INTO ProjectStat (
-      projectstat_project_id,
-      projectstat_usercreate,
-      projectstat_date,
-      projectstat_useddays,
-      projectstat_remainingdays)
-    VALUES (
-      '$p_id',
-      '$uid',
-      '". date("Y-m-d H:i:s") ."',
-      '$time_used',
-      '$time_left'
-    )";
-
-   display_debug_msg($query, $cdg_sql, "run_query_project_statlog(4)");
-   $obm_q = new DB_OBM;
-   $retour = $obm_q->query($query);
-  */
 
   return $retour;
 }
@@ -1372,6 +1364,7 @@ function run_query_project_tasks($pid) {
   $db_type = $obm_q->type;
   $if_parentgroup = sql_if($db_type, "(projecttask_parenttask_id != 0)", 'projecttask_parenttask_id', 'projecttask_id');
   $multidomain = sql_multidomain('project');
+  $pid = sql_parse_id($pid, true);
 
   $query = "
     SELECT
@@ -1381,7 +1374,7 @@ function run_query_project_tasks($pid) {
       $if_parentgroup as parent_group
     FROM ProjectTask
     JOIN Project ON project_id = projecttask_project_id
-    WHERE project_id = '$pid' $multidomain
+    WHERE project_id $pid $multidomain
     ORDER BY parent_group, parent_id, projecttask_rank";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_tasks');
@@ -1401,7 +1394,7 @@ function run_query_project_members($p_id = 0) {
   global $cdg_sql;
   
   $multidomain = sql_multidomain('userobm');
-  
+  $p_id = sql_parse_id($p_id, true); 
   if ($p_id) {
     $query = "
       SELECT
@@ -1411,7 +1404,7 @@ function run_query_project_members($p_id = 0) {
         projectuser_manager as member_manager
       FROM ProjectUser
      LEFT JOIN UserObm ON projectuser_user_id = userobm_id
-     WHERE projectuser_project_id = '$p_id'
+     WHERE projectuser_project_id $p_id 
         AND projectuser_projecttask_id is null
 	$multidomain
      GROUP BY member_id, member_firstname, member_lastname, member_manager
@@ -1448,12 +1441,12 @@ function get_project_participants($p_id = 0) {
   global $cdg_sql;
   
   $multidomain = sql_multidomain('project');
-  
+  $p_id = sql_parse_id($p_id, true); 
   $query = "
     SELECT
       projectuser_user_id
     FROM ProjectUser JOIN Project on projectuser_project_id = project_id
-      WHERE project_id = '$p_id' $multidomain";
+      WHERE project_id $p_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_participants(1)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -1471,7 +1464,7 @@ function get_project_participants($p_id = 0) {
     FROM TimeTask, ProjectTask, Project
     WHERE timetask_projecttask_id = projecttask_id
     AND project_id = projecttask_project_id
-    AND projecttask_project_id = '$p_id' $multidomain";
+    AND projecttask_project_id $p_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_participants(2)');
   $obm_q->query($query);
 
@@ -1498,7 +1491,7 @@ function get_project_info($id) {
   $datebegin = sql_date_format($db_type, 'project_datebegin', 'project_datebegin');
   $dateend = sql_date_format($db_type, 'project_dateend', 'project_dateend');
   $multidomain = sql_multidomain('project');
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT
       project_id,
       project_name,
@@ -1517,7 +1510,7 @@ function get_project_info($id) {
       LEFT JOIN TaskType on project_tasktype_id=tasktype_id
       LEFT JOIN Deal on project_deal_id=deal_id
       LEFT JOIN Company on project_company_id=company_id
-    WHERE project_id=$id $multidomain";
+    WHERE project_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_project_info()');
   $obm_q->query($query);
@@ -1552,9 +1545,10 @@ function get_project_closing($id, $clo_id='') {
   $db_type = $obm_q->type;
   $date = sql_date_format($db_type, 'projectclosing_date', 'date');
   $multidomain = sql_multidomain('project');
-
+  $id = sql_parse_id($id, true);
   if (($clo_id != '') && ($clo_id > 0)) {
-    $where_clo_id = "AND projectclosing_id='$clo_id'";
+    $clo_id = sql_parse_id($clo_id, true);
+    $where_clo_id = "AND projectclosing_id $clo_id ";
   }
   $query = "SELECT
       projectclosing_id,
@@ -1566,7 +1560,7 @@ function get_project_closing($id, $clo_id='') {
     FROM ProjectClosing
       LEFT JOIN Project ON projectclosing_project_id=project_id
       LEFT JOIN UserObm ON projectclosing_usercreate=userobm_id
-    WHERE projectclosing_project_id='$id'
+    WHERE projectclosing_project_id $id 
       $where_clo_id $multidomain
     ORDER BY projectclosing_date";
 
@@ -1593,9 +1587,9 @@ function get_project_closing($id, $clo_id='') {
 function run_query_project_closing_insert($params) {
   global $obm, $cdg_sql;
 
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
   $date_now = date('Y-m-d H:i:s');
-  $project_id = $params['project_id'];
+  $project_id = sql_parse_id($params['project_id']);
   $used = $params['used'];
   $remaining = $params['remaining'];
   $date = of_isodate_convert($params['date']);
@@ -1611,11 +1605,11 @@ function run_query_project_closing_insert($params) {
     projectclosing_used,
     projectclosing_remaining,
     projectclosing_comment)
-  VALUES ('$project_id',
+  VALUES ($project_id,
     null,
     '$date_now',
     null,
-    '$uid',
+    $uid,
     '$date',
     '$used',
     '$remaining',
@@ -1624,15 +1618,12 @@ function run_query_project_closing_insert($params) {
   display_debug_msg($query, $cdg_sql, 'run_query_project_closing_insert');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-
+  $uid = sql_parse_id($obm['uid'], true);
   // get the id of the inserted project. Date is to insure correct project
   // is selected (and not similar from the same deal)
-  $query = "SELECT projectclosing_id
+  $query = "SELECT MAX(projectclosing_id) as projectclosing_id
             FROM ProjectClosing
-            WHERE projectclosing_project_id = '$project_id'
-              AND projectclosing_date = '$date'
-              AND projectclosing_used = '$used'
-              AND projectclosing_remaining = '$remaining'";
+              projectclosing_usercreate $uid ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_closing_insert (get Id)');
   $obm_q->query($query);
@@ -1703,15 +1694,15 @@ function project_manager_rights($uid, $params, $project_q) {
     return true;
   }
 
-  $pid = $params['project_id'];
+  $pid = sql_parse_id($params['project_id'], true);
   $multidomain = sql_multidomain('project');
 	
   $query = "
     SELECT projectuser_id
     FROM ProjectUser
       JOIN Project ON project_id = projectuser_project_id
-    WHERE project_id = '$pid'
-      AND projectuser_manager != '0'
+    WHERE project_id $pid 
+      AND projectuser_manager != 0
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'project_manager_rights(managers)');
@@ -1894,11 +1885,11 @@ function project_is_task_parent($tid) {
     return false;
   }
   $multidomain = sql_multidomain('project');
-	
+  $tid = sql_parse_id($tid, true);	
   $query = "SELECT projecttask_id
     FROM ProjectTask
     JOIN Project on project_id = projecttask_project_id
-    WHERE projecttask_parenttask_id = '$tid' $multidomain";
+    WHERE projecttask_parenttask_id $tid $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'project_is_task_parent()');
   $t_q = new DB_OBM;
@@ -1923,10 +1914,10 @@ function project_task_has_parent($tid) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('project');
-
+  $tid = sql_parse_id($tid, true);
   $query = "SELECT projecttask_parenttask_id
     FROM ProjectTask JOIN Project on project_id = projecttask_project_id
-    WHERE projecttask_id = $tid $multidomain";
+    WHERE projecttask_id $tid $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'project_task_has_parent()');
   $t_q = new DB_OBM;
@@ -1952,10 +1943,10 @@ function project_task_has_user($tid) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('userobm');
-
+  $tid = sql_parse_id($tid, true);
   $query = "SELECT projectuser_id
     FROM ProjectUser JOIN UserObm ON userobm_id = projectuser_user_id
-    WHERE projectuser_projecttask_id = '$tid' $multidomain";
+    WHERE projectuser_projecttask_id $tid $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'project_task_has_user()');
   $t_q = new DB_OBM;
@@ -2009,7 +2000,7 @@ function run_query_project_month_planning($params) {
   $year = substr($params['date'],0,4);
   $month = substr($params['date'],4,2);
   $day = 1;
-  $id = $params['project_id'];
+  $id = sql_parse_id($params['project_id'], true);
   // First and last days of month
   $month_begin = date('Ymd', mktime(0,0,0,$month, 1, $year));
   $month_end = date('Ymd', mktime(23,0,0,$month+1, $day-1, $year));
@@ -2035,8 +2026,7 @@ function run_query_project_month_planning($params) {
     JOIN Project ON projecttask_project_id = project_id
     WHERE timetask_date >= '$month_begin' 
       AND timetask_date <= '$month_end'
-      AND project_id = $id
-			$multidomain
+      AND project_id $id $multidomain
       GROUP BY  project_id,project_name,date, timetask_status,id,label,
       userobm_id,userobm_lastname,userobm_firstname
 ";
@@ -2074,7 +2064,7 @@ function run_query_project_tasks_by_users($params) {
   JOIN ProjectUser ON projectuser_projecttask_id = projecttask_id
   WHERE project_archive='0'
     AND projectuser_user_id IN ($uids)
-    AND projectuser_projectedtime != '0'
+    AND projectuser_projectedtime != 0
     $multidomain
   GROUP BY project_tasktype_id, project_id, project_name, company_name, 
     projecttask_id, projecttask_label
@@ -2133,7 +2123,7 @@ function run_query_project_reftasks(){
   JOIN TaskType ON projectreftask_tasktype_id = tasktype_id
   WHERE $multidomain 
   GROUP BY projectreftask_id,projectreftask_label,tasktype_id,
-    tasktype_label,tasktype_internal
+    tasktype_label,tasktype_internal, projectreftask_tasktype_id
   ORDER BY projectreftask_tasktype_id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_used_tasktype()');
@@ -2152,8 +2142,8 @@ function run_query_project_reftasks(){
 function run_query_project_reftask_insert($params) {
   global $cdg_sql, $cdg_param, $obm;
 
-  $uid = $obm['uid'];
-  $tasktype = $params['tasktype'];
+  $uid = sql_parse_id($obm['uid']);
+  $tasktype = sql_parse_id($params['tasktype']);
   $label = $params['reftask_label'];
 	
   // TODO faire une fonction check_param_reftask_update
@@ -2170,8 +2160,8 @@ function run_query_project_reftask_insert($params) {
     VALUE (
     '0',
     NOW(),
-    '$uid',
-    '$tasktype',
+    $uid,
+    $tasktype,
     '$label'
     )";
 
@@ -2190,10 +2180,10 @@ function run_query_project_reftask_insert($params) {
 function run_query_project_reftask_update($params) {
   global $cdg_sql, $cdg_param, $obm;
 
-  $uid = $obm['uid'];
-  $tasktype = $params['tasktype'];
+  $uid = sql_parse_id($obm['uid']);
+  $tasktype = sql_parse_id($params['tasktype']);
   $label = $params['reftask_label'];
-  $id = $params['reftask'];
+  $id = sql_parse_id($params['reftask'], true);
   
   // TODO faire une fonction check_param_reftask_update
   if (($tasktype == '') or ($label == '')) {
@@ -2202,10 +2192,10 @@ function run_query_project_reftask_update($params) {
 
   $query = "UPDATE ProjectRefTask 
   SET projectreftask_label = '$label',
-    projectreftask_tasktype_id = '$tasktype',
-    projectreftask_userupdate = '$uid',
+    projectreftask_tasktype_id = $tasktype,
+    projectreftask_userupdate = $uid,
     projectreftask_timeupdate = NOW()
-    WHERE projectreftask_id = '$id'";
+    WHERE projectreftask_id $id ";
     
   display_debug_msg($query, $cdg_sql, 'run_query_project_reftask_update()');
   $obm_q = new DB_OBM;
@@ -2222,11 +2212,11 @@ function run_query_project_reftask_update($params) {
 function run_query_project_reftask_delete($params) {
   global $cdg_sql, $cdg_param;
 
-  $id = $params['reftask'];
+  $id = sql_parse_id($params['reftask'], true);
 
   $query = "DELETE
     FROM ProjectRefTask
-    WHERE projectreftask_id = '$id'";
+    WHERE projectreftask_id $id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_reftask_delete()');
   $obm_q= new DB_OBM;

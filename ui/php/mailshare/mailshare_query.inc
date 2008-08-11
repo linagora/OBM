@@ -260,7 +260,7 @@ function run_query_mailshare_delete($p_id) {
   $retour = $obm_q->query($query);
 
   // If this mailshare exists in Prod table, Insert it in Deleted table
-  $query = "SELECT mailshare_id, mailshare_delegation FROM P_MailShare WHERE mailshare_id $p_id"; 
+  $query = "SELECT mailshare_id, mailshare_delegation FROM P_MailShare WHERE mailshare_id $id"; 
   display_debug_msg($query, $cdg_sql, 'run_query_mailshare_delete(auto)');
   $obm_q->query($query);
   $obm_q->next_record();

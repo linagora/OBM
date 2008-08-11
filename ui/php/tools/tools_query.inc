@@ -190,7 +190,8 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
   }
   // Samba table check
   if (!is_null($domain_id) && !$domain_global) {
-    $where = "AND Samba.samba_domain_id = '$domain_id'";
+    $did = sql_parse_id($domain_id, true);
+    $where = "AND Samba.samba_domain_id $did ";
   }
   
   // Get infos from Update table;
@@ -213,7 +214,8 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
 
     // Samba table check
   if (!is_null($domain_id) && !$domain_global) {
-    $where = "AND P_Samba.samba_domain_id = '$domain_id'";
+    $did = sql_parse_id($domain_id, true);
+    $where = "AND P_Samba.samba_domain_id $did ";
   }
 
   // Get infos from Update table;
@@ -252,14 +254,15 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global = fa
   $rules = array('update' => array('1=1'), 'delete' => array('1=1'), 'purge' => array('1=1'));
   $del_rules = array('1=1'); 
   $like = sql_casei_like($obmdb_dbtype); 
-  
+  $uid = sql_parse_id($obm['uid'], true);
+  $did = sql_parse_id($domain, true); 
   switch ($realm) {
     case 'user':
-      $rules['update'][] = "(Current.$metadata[prefix]_userupdate = $obm[uid] OR 
-                  (Current.$metadata[prefix]_userupdate IS NULL AND Current.$metadata[prefix]_usercreate = $obm[uid]))";
-      $rules['delete'][] = "Current.deleted_user_id = $obm[uid]";
-      $rules['purge'][] = "updated_user_id = $obm[uid]";
-      $rules['purgelinks'][] = "updatedlinks_user_id = $obm[uid]";
+      $rules['update'][] = "(Current.$metadata[prefix]_userupdate $obm[uid] OR 
+                  (Current.$metadata[prefix]_userupdate IS NULL AND Current.$metadata[prefix]_usercreate $obm[uid]))"; 
+      $rules['delete'][] = "Current.deleted_user_id $obm[uid]"; 
+      $rules['purge'][] = "updated_user_id $obm[uid]"; 
+      $rules['purgelinks'][] = "updatedlinks_user_id $obm[uid]"; 
       break;
     case 'delegation':
       $rules['update'][] = "Current.$metadata[prefix]_delegation $like '$obm[delegation]%'" ;
@@ -271,10 +274,10 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global = fa
       break;
   }
   if ($domain_global) {
-    $rules['update'][] = "Current.$metadata[prefix]_domain_id = $domain";
-    $rules['delete'][] = "Current.deleted_domain_id = $domain";
-    $rules['purge'][] = "updated_domain_id = $domain";
-    $rules['purgelinks'][] = "updatedlinks_domain_id = $domain";
+    $rules['update'][] = "Current.$metadata[prefix]_domain_id $domain"; 
+    $rules['delete'][] = "Current.deleted_domain_id $domain"; 
+    $rules['purge'][] = "updated_domain_id $domain"; 
+    $rules['purgelinks'][] = "updatedlinks_domain_id $domain"; 
   }
 
   if(is_array($metadata['rules'])) {
@@ -459,11 +462,11 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
   * PURGE 
   */
   
-  $query = "DELETE FROM Updated WHERE updated_domain_id = '$userdata[domain]'
+  $query = "DELETE FROM Updated WHERE updated_domain_id = $userdata[domain]
       AND updated_table = '$metadata[table]' AND ".implode(' AND ', $rules['purge'])."";
   display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(purge)');
   $obm_qm->query($query);
-  $query = "DELETE FROM Updatedlinks WHERE updatedlinks_domain_id = '$userdata[domain]'
+  $query = "DELETE FROM Updatedlinks WHERE updatedlinks_domain_id = $userdata[domain]
       AND updatedlinks_table = '$metadata[table]' AND ".implode(' AND ', $rules['purgelinks'])."";
   display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(purge)');
   $obm_qm->query($query);

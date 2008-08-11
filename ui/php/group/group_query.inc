@@ -248,7 +248,7 @@ function run_query_group_insert($group) {
 
   $id = $group["group_id"];
   $system = sql_parse_int($group["system"]);
-  $samba = sql_parse_int($group["samba");
+  $samba = sql_parse_int($group["samba"]);
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
@@ -415,7 +415,7 @@ function run_query_group_delete($p_id) {
 
   $ret = of_userdata_query_delete("group", $p_id);
 
-
+  $obm_q = new DB_OBM;
   // Delete the Group
   $multidomain = sql_multidomain("group");
   $query = "DELETE FROM UGroup WHERE group_id='$p_id' $multidomain";
@@ -424,7 +424,7 @@ function run_query_group_delete($p_id) {
   $id = sql_parse_id($p_id, true);
   // If the Group exists in Prod table AND is public, Insert it in Deleted table
   $query = "SELECT group_id, group_delegation FROM P_UGroup
-    WHERE group_id $p_id AND group_privacy=0";
+    WHERE group_id $id AND group_privacy=0";
   display_debug_msg($query, $cdg_sql, "run_query_group_delete(auto)");
   $obm_q->query($query);
   $obm_q->next_record();
@@ -775,7 +775,7 @@ function get_group_name_exists($name, $id='') {
   $query = "SELECT group_id, group_name
     FROM UGroup
     WHERE group_name='$name'
-      AND (group_privacy=0 OR group_usercreate='$obm[uid]')
+      AND (group_privacy=0 OR group_usercreate=$obm[uid])
       $where_id
       $multidomain";
 
@@ -832,7 +832,7 @@ function run_query_group_check($id, $name, $desc) {
   $query = "SELECT distinct group_id, group_name, group_desc
      FROM UGroup
      WHERE
-       (group_privacy=0 OR group_usercreate $obm[uid] )
+       (group_privacy=0 OR group_usercreate=$obm[uid] )
        AND ($wname $wdesc)
        $where_id
        $multidomain";
@@ -1115,8 +1115,8 @@ function run_query_group_ext_search($group) {
   $limit = $group['limit'];
   if(isset($group["first_row"])) $first_row = $group["first_row"] - 1;
   else $first_row = 0;
-
-  $where_privacy = "AND (group_privacy = 0 OR (group_privacy = 1 AND group_usercreate $obm[uid] ))";
+  $uid = sql_parse_id($uid, true);
+  $where_privacy = "AND (group_privacy = 0 OR (group_privacy = 1 AND group_usercreate $uid ))";
 
   if ($restriction == "user") {
     $uid = $obm["uid"];

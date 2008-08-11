@@ -30,7 +30,7 @@ function run_query_todo_search($params) {
   $dateafter = of_isodate_convert($params['date_after'],true);
   $datebefore = of_isodate_convert($params['date_before'],true);
 
-  $uid = $obm['uid'];;
+  $uid = sql_parse_id($obm['uid'], true);
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'todo_priority';
   $sql_order_dir = (strcmp($sql_order_dir,'') != 0) ? $sql_order_dir : 'desc';
 
@@ -58,7 +58,7 @@ function run_query_todo_search($params) {
     $where .= " AND todo_$date_field < '$datebefore'";
   }
 
-  $whereq = "WHERE todo_user = '$uid'
+  $whereq = "WHERE todo_user $uid 
     $where
     $multidomain";
 
@@ -105,7 +105,7 @@ function run_query_todo_search($params) {
 function run_query_todo_detail($todo) {
   global $cdg_sql;
 
-  $t_id = $todo['todo_id'];
+  $t_id = sql_parse_id($todo['todo_id'], true);
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
@@ -133,7 +133,7 @@ function run_query_todo_detail($todo) {
        LEFT JOIN UserObm as uu ON todo_userupdate = uu.userobm_id
        LEFT JOIN UserObm as u ON todo_user = u.userobm_id,
      UserObm as Author
-  WHERE todo_id = '$t_id'
+  WHERE todo_id $t_id 
     $multidomain
     AND Author.userobm_id = todo_usercreate";
 
@@ -155,7 +155,7 @@ function run_query_todo_insert($todo) {
   global $cdg_sql, $obm;
 
   $now = date('Y-m-d H:i:s');
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
   $title = $todo['title'];
   $users = $todo['userid'];
   $priority = $todo['priority'];
@@ -165,13 +165,13 @@ function run_query_todo_insert($todo) {
   }
   $deadline = of_isodate_convert($todo['deadline'],true);
   $content = $todo['content'];
-  $domain_id = $obm['domain_id'];
+  $domain_id = sql_parse_id($obm['domain_id']);
 
   $obm_q = new DB_OBM;
 
   if (is_array($users)) {
     foreach ($users as $user) {
-
+      $user = sql_parse_id($user);
       $query = "INSERT INTO Todo (
         todo_timeupdate,
         todo_timecreate,
@@ -188,10 +188,10 @@ function run_query_todo_insert($todo) {
       VALUES (
         '$now',
         '$now',
-        '$uid',
-        '$uid',
-        '$domain_id',
-        '$user',
+        $uid,
+        $uid,
+        $domain_id,
+        $user,
         '$now',
         '$deadline',
         '$priority',
@@ -204,19 +204,17 @@ function run_query_todo_insert($todo) {
     }
 
     if ($retour) {
-      if (in_array($uid, $users)) {
+      if (in_array($obm['uid'], $users)) {
 	$where_user = "AND todo_user ='$uid'";
       } else {
 	$where_user = "";
       }
-      $query = "SELECT todo_id
-      FROM Todo
-      WHERE todo_timeupdate = '$now'
+      $uid = sql_parse_id($obm['uid'], true);
+      $query = "SELECT MAX(todo_id) as todo_id
+        FROM Todo WHERE 
+        1=1
         $where_user
-        AND todo_domain_id = '$domain_id'
-        AND todo_deadline ='$deadline'
-        AND todo_percent ='$percent'
-        AND todo_title = '$title'";
+        AND todo_usercreate $uid";
 
       display_debug_msg($query, $cdg_sql, 'run_query_todo_insert(2)');
       $obm_q->query($query);
@@ -224,7 +222,7 @@ function run_query_todo_insert($todo) {
       $id = $obm_q->f('todo_id');
     }
 
-    if (in_array($uid, $users)) {
+    if (in_array($obm['uid'], $users)) {
       $retour = $id;
     } else {
       $retour = 'other_user';
@@ -246,11 +244,11 @@ function run_query_todo_update($todo) {
 
   $now = date('Y-m-d H:i:s');
 
-  $t_id = $todo['todo_id'];
-  $uid = $obm['uid'];
+  $t_id = sql_parse_id($todo['todo_id'], true);
+  $uid = sql_parse_id($obm['uid']);
   $title = $todo['title'];
   $users = $todo['userid'];
-  $user = $users[0];
+  $user = sql_parse_id($users[0]);
   $priority = $todo['priority'];
   $deadline = of_isodate_convert($todo['deadline'],true);
   $content = $todo['content'];
@@ -263,14 +261,14 @@ function run_query_todo_update($todo) {
 		
   $query = "UPDATE Todo SET
     todo_timeupdate = '$now',
-    todo_userupdate = '$uid',
-    todo_user = '$user',
+    todo_userupdate = $uid,
+    todo_user = $user,
     todo_deadline = '$deadline',
     todo_priority = '$priority',
-    todo_percent = '$percent',
+    todo_percent = $percent,
     todo_title = '$title',
     todo_content = '$content'
-  WHERE todo_id = '$t_id' $multidomain";
+  WHERE todo_id $t_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_todo_update()');
   $obm_q = new DB_OBM;
@@ -295,19 +293,20 @@ function run_query_todo_delete($parms) {
 
     if ($id_todo != '') {
       $id_todo = substr($id_todo, 1);
-    
+      $sel_id = sql_parse_id($id_todo, true); 
       if ($val == 'on') {
-        $query = "DELETE FROM Todo WHERE todo_id = '$id_todo' $multidomain";
+        $query = "DELETE FROM Todo WHERE todo_id $sel_id $multidomain";
 	display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(1)');
         $obm_q = new DB_OBM;
         $obm_q->query($query);
 
 	// If connectors in use
 	if ($c_use_connectors) {
+          $ins_id = sql_parse_id($id_todo);
 	  $now = date('Y-m-d H:i:s');
 	  $query = "INSERT INTO
             DeletedTodo (deletedtodo_todo_id, deletedtodo_timestamp)
-            VALUES ('$id_todo', '$now')";
+            VALUES ($ins_id, '$now')";
 	  display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(2)');
 	  $retour = $obm_q->query($query);
 	}
@@ -326,8 +325,8 @@ function run_query_todo_delete_unique($t_id) {
   global $cdg_sql, $c_use_connectors;
 
   $multidomain = sql_multidomain('todo');
-
-  $query = "DELETE FROM Todo WHERE todo_id = '$t_id' $multidomain";
+  $id = sql_parse_id($t_id, true);
+  $query = "DELETE FROM Todo WHERE todo_id $id $multidomain";
   
   display_debug_msg($query, $cdg_sql, 'run_query_todo_delete_unique(1)');
   $obm_q = new DB_OBM;
@@ -335,10 +334,11 @@ function run_query_todo_delete_unique($t_id) {
 
   // If connectors in use
   if ($c_use_connectors) {
+    $id = sql_parse_id($t_id);
     $now = date('Y-m-d H:i:s');
     $query = "INSERT INTO
       DeletedTodo (deletedtodo_todo_id, deletedtodo_timestamp)
-      VALUES ('$t_id', '$now')";
+      VALUES ($t_id, '$now')";
 
     display_debug_msg($query, $cdg_sql, 'run_query_todo_delete_unique(2)');
     $retour = $obm_q->query($query);

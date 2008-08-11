@@ -176,12 +176,12 @@ function run_query_document_insert(&$document) {
     $document["mime"] = $mime;
   }
   $mime = sql_parse_id($mime);
+
   // If document is a link, set the name as the url
   if ($kind == $cdoc_kind_link) {
     $name = $url;
     $document["name"] = $name;
   }
-
   $query = "INSERT INTO Document (
     document_timeupdate,
     document_timecreate,
@@ -271,7 +271,7 @@ function run_query_document_id($document) {
   $size = $document["size"];
   $multidomain = sql_multidomain("document");
 	
-  $query = "SELECT MAX(document_id)
+  $query = "SELECT MAX(document_id) as document_id
     FROM Document
     WHERE 
       document_title='$title'
@@ -941,7 +941,7 @@ function run_query_document_insert_dir($document) {
     '$path',
     $cdoc_kind_dir,
     0,
-    0,
+    NULL,
     0)";
 
   display_debug_msg($query, $cdg_sql, "run_query_document_insert_dir()");

@@ -17,11 +17,9 @@ function run_query_time_task_list($time) {
   global $c_day_fraction, $cdg_sql;
 
   $date = $time['date'];
-  $user_id = $time['user_id'];
+  $user_id = sql_parse_id($time['user_id'], true);
 
-  //if ($time['interval'] == 'week') {
-    $array_date = get_time_week_point($date);
-  //}
+  $array_date = get_time_week_point($date);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -61,7 +59,7 @@ function run_query_time_task_list($time) {
     WHERE timetask_tasktype_id = tasktype_id
       AND timetask_date >='". $array_date[0] ."' 
       AND timetask_date <'". $array_date[1] ."'
-      AND timetask_user_id = '$user_id'
+      AND timetask_user_id $user_id 
     ORDER BY timetask_date
 ";
 
@@ -282,7 +280,8 @@ function run_query_time_valid_search($time) {
 
   // user_id : array -> size 1 or more 
   if (sizeof($time['user_ids']) == 1) {
-    $query .= " AND timetask_user_id = '". $time['user_id'] . "'";
+    $time['user_ids'] = sql_parse_id($time['user_ids'], true);
+    $query .= " AND timetask_user_id $time[user_ids] ";
   } else {
     $users_list = time_array_to_list($time['user_ids']);
     $query .= " AND timetask_user_id in $users_list";
@@ -314,7 +313,7 @@ function run_query_time_get_task($id) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $datetask = sql_date_format($db_type, 'timetask_date', 'date_task');
-
+  $id = sql_parse_id($id, true);
   $query = "
     SELECT
       TimeTask.*,
@@ -322,7 +321,7 @@ function run_query_time_get_task($id) {
       projecttask_project_id as timetask_project_id  
     FROM TimeTask
       LEFT JOIN ProjectTask ON timetask_projecttask_id = projecttask_id
-    WHERE timetask_id = '$id'";
+    WHERE timetask_id $id ";
   
   display_debug_msg($query, $cdg_sql, 'run_query_time_get_task');
   $obm_q->query($query);
@@ -342,11 +341,11 @@ function run_query_time_insert($task) {
 
   $valid_date = run_query_time_valid_search($task);
   $day = $task['day'];
-  $ttype = $task['tasktype'];
-  $projecttask = ($task['projecttask'] == 0) ? 'null' : $task['projecttask'];
+  $ttype = sql_parse_id($task['tasktype']);
+  $projecttask = sql_parse_id($task['projecttask']);
   $time = $task['time'];
   $label = $task['label'];
-  $user_id = $task['user_id'];
+  $user_id = sql_parse_id($task['user_id']);
 
   if ( $ttype != 0 ) {
     // for navigators wich doesn't support HTML 4 => <option disabled>
@@ -369,12 +368,12 @@ function run_query_time_insert($task) {
          null,
          '" . date('Y-m-d H:i:s') . "',
          null,
-         '$obm[uid]',
-         '$user_id',
+         $obm[uid],
+         $user_id,
          '$key',
          $projecttask,
          '$time',
-         '$ttype',
+         $ttype,
          '$label',
          0)";
 
@@ -400,12 +399,12 @@ function run_query_time_insert($task) {
          null,
          '" . date('Y-m-d H:i:s') . "',
          null,
-         '$obm[uid]',
-         '$user_id',
+         $obm[uid],
+         $user_id,
          '$date',
          $projecttask,
          '$time',
-         '$ttype',
+         $ttype,
          '$label',
          0)";
 
@@ -426,9 +425,9 @@ function run_query_time_insert($task) {
 function run_query_time_update($task) {
   global $cdg_sql;
 
-  $id = $task['task_id'];
-  $ttype = $task['tasktype'];
-  $projecttask = $task['projecttask'];
+  $id = sql_parse_id($task['task_id'], true);
+  $ttype = sql_parse_id($task['tasktype']);
+  $projecttask = sql_parse_id($task['projecttask']);
   $time = $task['time'];
   $label = $task['label'];
   $day = $task['day'];
@@ -436,11 +435,11 @@ function run_query_time_update($task) {
   $query = "
   UPDATE TimeTask SET
     timetask_date='$day',
-    timetask_tasktype_id='$ttype',
+    timetask_tasktype_id=$ttype,
     timetask_length='$time',
     timetask_label='$label',
-    timetask_projecttask_id='$projecttask'
-  WHERE timetask_id='$id'";
+    timetask_projecttask_id=$projecttask
+  WHERE timetask_id $id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_update');
   $obm_q = new DB_OBM;
@@ -460,9 +459,9 @@ function run_query_time_delete($parms) {
     $id_task = strstr($key,'_'); 
     if ( $id_task != '' ) {  // if we have an id task
       $id_task = substr($id_task, 1);  
-    
+      $id_task = sql_parse_id($id_task, true); 
       if ($val == 'on') { 
-        $query = "DELETE FROM TimeTask WHERE timetask_id = '$id_task'";
+        $query = "DELETE FROM TimeTask WHERE timetask_id $id_task ";
 	display_debug_msg($query, $cdg_sql, 'run_query_time_delete');
         $obm_q = new DB_OBM;
         $obm_q->query($query);
@@ -483,13 +482,13 @@ function run_query_time_validate($who) {
 
   // to see if a day is full
   $cdf = $c_day_fraction;
-
+  $who = sql_parse_id($who, true);
   // look for days that can be validated
   // an array is made with the result
   // should use subselect (mysql 4.1 and further)
   $query = "select timetask_date
             from TimeTask
-            where timetask_user_id = '$who'
+            where timetask_user_id $who 
             and timetask_status = 0
             group by timetask_date
             having sum(timetask_length) = '$cdf'";
@@ -514,7 +513,7 @@ function run_query_time_validate($who) {
     // validate dates that are fully filled
     $query = "update TimeTask
               set timetask_status = 1
-              where timetask_user_id=$who
+              where timetask_user_id $who 
               and timetask_date in $date_list";
     
     display_debug_msg($query, $cdg_sql, 'run_query_time_validate(2)');
@@ -526,7 +525,7 @@ function run_query_time_validate($who) {
   // ie. if a task has been updated...
   $query = "select timetask_date
             from TimeTask
-            where timetask_user_id = '$who'
+            where timetask_user_id $who 
             and timetask_status != 2
             group by timetask_date
             having sum(timetask_length) != '$cdf'";
@@ -551,7 +550,7 @@ function run_query_time_validate($who) {
     // validate dates that are fully filled
     $query = "update TimeTask
               set timetask_status = 0
-              where timetask_user_id = '$who'
+              where timetask_user_id $who 
               and timetask_date in $date_list";
     
     display_debug_msg($query, $cdg_sql, 'run_query_time_validate(4)');
@@ -581,12 +580,12 @@ function run_query_time_adminvalidate($time) {
   $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
   $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
-  $user_id = $time['user_id'];
+  $user_id = sql_parse_id($time['user_id'], true);
 
   $query = "
     update TimeTask
     set timetask_status = 2
-    where timetask_user_id = '$user_id'
+    where timetask_user_id $user_id 
       and timetask_date >= '$month_begin' 
       and timetask_date <= '$month_end'";
 
@@ -617,12 +616,12 @@ function run_query_time_adminunvalidate($time) {
   $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
   $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
-  $user_id = $time['user_id'];
+  $user_id = sql_parse_id($time['user_id'], true);
 
   $query = "
     update TimeTask
     set timetask_status = 1
-    where timetask_user_id = '$user_id'
+    where timetask_user_id $user_id 
       and timetask_date >= '$month_begin' 
       and timetask_date <= '$month_end'";
 
@@ -703,7 +702,7 @@ function run_query_time_task_one_month($time) {
   $month_begin = of_isodate_format(mktime(0,0,0,$month, 1, $year));
   $month_end = of_isodate_format(mktime(23,0,0,$month+1, $day-1, $year));
 
-  $user_id = $time['user_id'];
+  $user_id = sql_parse_id($time['user_id'], true);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -719,7 +718,7 @@ function run_query_time_task_one_month($time) {
     WHERE timetask_date >= '$month_begin' 
       and timetask_date <= '$month_end'
       and timetask_user_id = userobm_id
-      and timetask_user_id = $user_id
+      and timetask_user_id $user_id 
     GROUP by timetask_user_id, date, timetask_status
     ORDER by date";
   
@@ -821,7 +820,7 @@ function run_query_time_task_one_week($time) {
 
   $week = get_time_week_point($time['date']);
 
-  $user_id = $time['user_id'];
+  $user_id = sql_parse_id($time['user_id'], true);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -835,7 +834,7 @@ function run_query_time_task_one_week($time) {
     FROM TimeTask
     WHERE timetask_date >= '$week[0]' 
       and timetask_date <= '$week[1]'
-      and timetask_user_id = $user_id
+      and timetask_user_id $user_id 
     GROUP by date
     ORDER by date";
 
@@ -852,7 +851,7 @@ function run_query_time_task_one_week($time) {
 function run_query_time_ra_projects($time) {
   global $cdg_sql;
 
-  $uid = $time['user_id'];
+  $uid = sql_parse_id($time['user_id'], true);
   $projs = implode(',', $time['projects']);
 
   $query = "
@@ -869,8 +868,8 @@ function run_query_time_ra_projects($time) {
     WHERE project_archive='0'
       AND projectuser_projecttask_id = projecttask_id
       AND projecttask_project_id = project_id
-      AND projectuser_user_id = '$uid'
-      AND projectuser_missingtime != '0'
+      AND projectuser_user_id $uid 
+      AND projectuser_missingtime != 0
       AND project_id IN ($projs)
       ORDER BY project_id, project_tasktype_id, company_name, project_name";
 
@@ -889,13 +888,14 @@ function run_query_time_used_tasktype($uid = 0) {
   global $cdg_sql, $ctt_sales, $ctt_research, $ctt_others;
 
   if ($uid) {
+    $uid = sql_parse_id($uid, true);
     $query = "
       SELECT DISTINCT TaskType.*
       FROM TaskType, Project, ProjectUser
       WHERE tasktype_id = project_tasktype_id
         AND project_id = projectuser_project_id
-        AND project_archive = '0'
-        AND projectuser_user_id = '$uid'
+        AND project_archive = 0
+        AND projectuser_user_id $uid 
         AND projectuser_projecttask_id is not null
       ORDER BY tasktype_internal, tasktype_label";
 
@@ -937,7 +937,7 @@ function run_query_time_used_tasktype($uid = 0) {
 function run_query_time_project($time) {
   global $cdg_sql;
 
-  $uid = $time['user_id'];
+  $uid = sql_parse_id($time['user_id'], true);
 
   $query = "
     SELECT distinct
@@ -953,8 +953,8 @@ function run_query_time_project($time) {
     WHERE project_archive='0'
       AND projectuser_projecttask_id = projecttask_id
       AND projecttask_project_id = project_id
-      AND projectuser_user_id = '$uid'
-      AND projectuser_missingtime != '0'
+      AND projectuser_user_id $uid 
+      AND projectuser_missingtime != 0
       ORDER BY project_tasktype_id, project_shortname, company_name, project_name";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_project');
@@ -975,7 +975,7 @@ function run_query_time_project($time) {
 function run_query_time_projecttask($time) {
   global $cdg_sql;
 
-  $uid = $time['user_id'];
+  $uid = sql_parse_id($time['user_id'], true);
 
   $obm_q= new DB_OBM;
   $db_type = $obm_q->type;
@@ -996,7 +996,7 @@ function run_query_time_projecttask($time) {
        ON a.projecttask_parenttask_id = b.projecttask_id,
        ProjectUser
     WHERE projectuser_projecttask_id = a.projecttask_id
-      AND projectuser_user_id = $uid
+      AND projectuser_user_id $uid 
       AND projectuser_missingtime != 0
       ORDER BY a.projecttask_project_id, a.projecttask_parenttask_id, a.projecttask_label";
 

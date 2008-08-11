@@ -132,7 +132,7 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
     FROM RGroup
     WHERE 
       rgroup_name LIKE '$pattern%'
-      AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = '$obm[uid]'))
+      AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = $obm[uid]))
       $multidomain
       $where_restriction
     ORDER BY rgroup_name ";
@@ -149,7 +149,7 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
     FROM RGroup
     WHERE 
       rgroup_name LIKE '$pattern%' 
-      AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = '$obm[uid]'))
+      AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = $obm[uid]))
       $multidomain
       $where_restriction
     ORDER BY rgroup_name";
@@ -170,14 +170,14 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
 function run_query_resourcegroup_search_possible_children($group) {
   global $cdg_sql, $ctype_resource;
   
-  $id = $group["ext_id"];
+  $id = sql_parse_id($group["ext_id"], true, true);
   $name = $group["name"];
   $resource = $group["resource"];
   $sql_order_field = $group["sql_order_field"];
   $sql_order_dir = $group["sql_order_dir"];
   $multidomain = sql_multidomain("rgroup");
 	
-  $parents = get_group_parents($id);
+  $parents = get_group_parents($group["ext_id"]);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -194,7 +194,8 @@ function run_query_resourcegroup_search_possible_children($group) {
     $where .= " and C.resource_name $like '$resource%'";
   }
   while (list ($key, $g_id) = each($parents)) {
-    $where .= " and rgroup_id != '$g_id'";
+    $g_id = sql_parse_id($g_id, true, true);
+    $where .= " and rgroup_id $g_id ";
   }
     
   $query = "SELECT DISTINCT RGroup.*, rgroup_id as id,
@@ -208,7 +209,7 @@ function run_query_resourcegroup_search_possible_children($group) {
       LEFT JOIN UserObm as A ON RGroup.rgroup_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON RGroup.rgroup_userupdate=B.userobm_id
     WHERE rgroup_name $like '$name%'
-      AND rgroup_id != '$id'
+      AND rgroup_id $id 
       $where $multidomain";
 
   // ORDER construction
@@ -237,6 +238,7 @@ function run_query_resourcegroup_detail($id) {
   $timeupdate = sql_date_format($db_type,"RGroup.rgroup_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"RGroup.rgroup_timecreate", "timecreate");
 
+  $id = sql_parse_id($id, true);
   $query = "SELECT *,
       rgroup_privacy as privacy,
       $timecreate,
@@ -246,7 +248,7 @@ function run_query_resourcegroup_detail($id) {
     FROM RGroup
          LEFT JOIN UserObm as c ON rgroup_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON rgroup_userupdate=u.userobm_id
-    WHERE rgroup_id = '$id'
+    WHERE rgroup_id $id 
       $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_detail()");
   $obm_q->query($query);
@@ -264,12 +266,11 @@ function run_query_resourcegroup_detail($id) {
 function run_query_resourcegroup_insert($group) {
   global $cdg_sql, $ctype_resource, $obm;
 
-  $id = $group["resourcegroup_id"];
   $name = $group["name"];
   $desc = $group["desc"];
-  $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
+  $priv = sql_parse_int($group["privacy"]);
   $now = date("Y-m-d H:i:s");
-  $domain_id = $obm["domain_id"];
+  $domain_id = sql_parse_id($obm["domain_id"]);
 	
   $query = "INSERT INTO RGroup (
     rgroup_timeupdate,
@@ -284,9 +285,9 @@ function run_query_resourcegroup_insert($group) {
     null,
     '$now',
     null,
-    '$obm[uid]',
-    '$domain_id',
-    '$priv',
+    $obm[uid],
+    $domain_id,
+    $priv,
     '$name',
     '$desc'
   )";
@@ -313,7 +314,6 @@ function run_query_resourcegroup_id($group) {
 
   $name = $group["name"];
   $desc = $group["desc"];
-  $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
   $multidomain = sql_multidomain("rgroup");
 	
   $query = "SELECT rgroup_id
@@ -345,20 +345,20 @@ function run_query_resourcegroup_id($group) {
 function run_query_resourcegroup_update($group) {
   global $obm, $cdg_sql, $ctype_resource;
 
-  $id = $group["resourcegroup_id"];
+  $id = sql_parse_id($group["resourcegroup_id"], true);
   $name = $group["name"];
   $desc = $group["desc"];
-  $priv = (isset($group["privacy"]) ? $group["privacy"] : '0');
+  $priv = sql_parse_int($group["privacy"]);
   $now = date("Y-m-d H:i:s");
   $multidomain = sql_multidomain("rgroup");
   
   $query = "UPDATE RGroup set
     rgroup_timeupdate='$now',
-    rgroup_userupdate='$obm[uid]',
-    rgroup_privacy='$priv',
+    rgroup_userupdate=$obm[uid],
+    rgroup_privacy=$priv,
     rgroup_name='$name',
     rgroup_desc='$desc'
-  WHERE rgroup_id='$id' $multidomain";
+  WHERE rgroup_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_update()");
   $obm_q = new DB_OBM;
@@ -376,26 +376,12 @@ function run_query_resourcegroup_update($group) {
 function run_query_resourcegroup_delete($p_id) {
   global $cdg_sql;
 
-  // Delete all resources registrations to this group
-  $query = "DELETE FROM ResourceGroup WHERE resourcegroup_rgroup_id='$p_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_delete(1)");
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  // Delete all groups registration referencing this group
-/*
-  $query = "delete from ResourceGroupResourceGroup
-    where resourcegroupresourcegroup_child_id='$p_id'
-      or resourcegroupresourcegroup_parent_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-*/
-
+  $p_id = sql_parse_id($p_id, true);
   // Delete the Group
   $multidomain = sql_multidomain("rgroup");
-  $query = "DELETE FROM RGroup WHERE rgroup_id='$p_id' $multidomain";
+  $query = "DELETE FROM RGroup WHERE rgroup_id $p_id $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_delete(2)");
+  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   return $retour;
@@ -412,15 +398,19 @@ function run_query_resourcegroup_resourcegroup_insert($group) {
   global $obm, $cdg_sql;
 
   $id = $group["resourcegroup_id"];
+  $sel_id = sql_parse_id($group["resourcegroup_id"], true);
+  $ins_id = sql_parse_id($group["resourcegroup_id"]);
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $group["resource_nb"]) {
     $cpt++;
     $u_id = $group["resource$cpt"];
+    $sel_uid = sql_parse_id($group["resource$cpt"], true);
+    $ins_uid = sql_parse_id($group["resource$cpt"]);
 
     $query = "SELECT * FROM ResourceGroup
-      WHERE resourcegroup_rgroup_id='$id'
-        AND resourcegroup_resource_id='$u_id'";
+      WHERE resourcegroup_rgroup_id $sel_id 
+        AND resourcegroup_resource_id $sel_uid ";
     display_debug_msg($query, $cdg_sql);
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
@@ -430,7 +420,7 @@ function run_query_resourcegroup_resourcegroup_insert($group) {
       $query = "INSERT INTO ResourceGroup
       (resourcegroup_rgroup_id,
        resourcegroup_resource_id)
-      VALUES ($id, $u_id)";
+      VALUES ($ins_id, $ins_uid)";
 
       display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_resourcegroup_insert()");
       $obm_q = new DB_OBM;
@@ -452,16 +442,16 @@ function run_query_resourcegroup_resourcegroup_insert($group) {
 function run_query_resourcegroup_resourcegroup_delete($group) {
   global $cdg_sql;
 
-  $id = $group["resourcegroup_id"];
+  $id = sql_parse_id($group["resourcegroup_id"], true);
   $cpt = 0;
   $cpt_del = 0;
   while ($cpt < $group["resource_nb"]) {
     $cpt++;
-    $r_id = $group["resource$cpt"];
+    $r_id = sql_parse_id($group["resource$cpt"], true);
 
     $query = "DELETE FROM ResourceGroup
-      WHERE resourcegroup_rgroup_id='$id'
-        AND resourcegroup_resource_id='$r_id'";
+      WHERE resourcegroup_rgroup_id $id 
+        AND resourcegroup_resource_id $r_id ";
     display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_resourcegroup_delete()");
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
@@ -482,8 +472,9 @@ function run_query_resourcegroup_resourcegroup_delete($group) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resourcegroupresourcegroup_insert($group) {
   global $cdg_sql;
-
   $id = $group["resourcegroup_id"];
+  $sel_id = sql_parse_id($group["resourcegroup_id"], true);
+  $ins_id = sql_parse_id($group["resourcegroup_id"]);
   $cpt = 0;
   $cpt_ins = 0;
 
@@ -492,10 +483,12 @@ function run_query_resourcegroupresourcegroup_insert($group) {
   while ($cpt < $group["resourcegroup_nb"]) {
     $cpt++;
     $g_id = $group["resourcegroup_$cpt"];
+    $sel_gid = sql_parse_id($group["resourcegroup_$cpt"], true);
+    $ins_gid = sql_parse_id($group["resourcegroup_$cpt"]);
 
     $query = "SELECT * FROM ResourceGroupResourceGroup
-      WHERE resourcegroupresourcegroup_parent_id='$id'
-        AND resourcegroupresourcegroup_child_id='$g_id'";
+      WHERE resourcegroupresourcegroup_parent_id $sel_id 
+        AND resourcegroupresourcegroup_child_id $sel_gid ";
     display_debug_msg($query, $cdg_sql);
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
@@ -508,7 +501,7 @@ function run_query_resourcegroupresourcegroup_insert($group) {
         $query = "INSERT INTO ResourceGroupResourceGroup
         (resourcegroupresourcegroup_parent_id,
         resourcegroupresourcegroup_child_id)
-      VALUES ($id, $g_id)";
+      VALUES ($ins_id, $ins_gid)";
 
       display_debug_msg($query, $cdg_sql, "run_query_resourcegroupresourcegroup_insert()");
       $obm_q = new DB_OBM;
@@ -530,16 +523,16 @@ function run_query_resourcegroupresourcegroup_insert($group) {
 function run_query_resourcegroupresourcegroup_delete($group) {
   global $cdg_sql;
 
-  $id = $group["resourcegroup_id"];
+  $id = sql_parse_id($group["resourcegroup_id"], true);
   $cpt = 0;
   $cpt_del = 0;
   while ($cpt < $group["resourcegroup_nb"]) {
     $cpt++;
-    $g_id = $group["resourcegroup_$cpt"];
+    $g_id = sql_parse_id($group["resourcegroup_$cpt"], true);
 
     $query = "DELETE FROM ResourceGroupResourceGroup
-      WHERE resourcegroupresourcegroup_parent_id='$id'
-        AND resourcegroupresourcegroup_child_id='$g_id'";
+      WHERE resourcegroupresourcegroup_parent_id $id 
+        AND resourcegroupresourcegroup_child_id $g_id ";
 
     display_debug_msg($query, $cdg_sql, "run_query_resourcegroupresourcegroup_delete()");
     $obm_q = new DB_OBM;
@@ -565,7 +558,7 @@ function run_query_resource_resourcegroup($group) {
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
 
-  $id = $group["resourcegroup_id"];
+  $id = sql_parse_id($group["resourcegroup_id"], true);
   $entity = $group["entity"];
   $sql_order_field = $group["sql_order_field"];
   $sql_order_dir = $group["sql_order_dir"];
@@ -586,7 +579,7 @@ function run_query_resource_resourcegroup($group) {
          resource_description as resourcegroup_resource_desc,
          resource_qty as resourcegroup_resource_qty
       FROM ResourceGroup LEFT JOIN Resource ON resourcegroup_resource_id=resource_id
-      WHERE resourcegroup_rgroup_id='$id'
+      WHERE resourcegroup_rgroup_id $id 
          $order
          $limit";
 
@@ -608,7 +601,7 @@ function run_query_resourcegroup_resourcegroup($group) {
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
 
-  $id = $group["resourcegroup_id"];
+  $id = sql_parse_id($group["resourcegroup_id"], true);
   $entity = $group["entity"];
   $sql_order_field = $group["sql_order_field"];
   $sql_order_dir = $group["sql_order_dir"];
@@ -629,7 +622,7 @@ function run_query_resourcegroup_resourcegroup($group) {
          rgroup_name,
          rgroup_desc
       FROM ResourceGroupResourceGroup LEFT JOIN RGroup ON resourcegroupresourcegroup_child_id=rgroup_id
-      WHERE resourcegroupresourcegroup_parent_id='$id' 
+      WHERE resourcegroupresourcegroup_parent_id $id 
          $order
          $limit";
 
@@ -647,10 +640,10 @@ function run_query_resourcegroup_resourcegroup($group) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_resourcegroup_nb_resource($id) {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT count(*)
     FROM ResourceGroup
-    WHERE resourcegroup_rgroup_id='$id'";
+    WHERE resourcegroup_rgroup_id $id ";
 
   display_debug_msg($query, $cdg_sql, "get_resourcegroup_nb_resource()");
   $obm_q = new DB_OBM;
@@ -673,8 +666,8 @@ function get_resourcegroup_info($id) {
     return false;
   }
   $multidomain = sql_multidomain("rgroup");
-		
-  $query = "SELECT * FROM RGroup WHERE rgroup_id='$id' $multidomain";
+  $id = sql_parse_id($id, true);	
+  $query = "SELECT * FROM RGroup WHERE rgroup_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_resourcegroup_info()");
   $obm_q = new DB_OBM;
@@ -700,7 +693,8 @@ function get_resourcegroup_name_exists($name, $id="") {
   global $cdg_sql, $obm, $ctype_resource;
 
   if ($id != "") {
-    $where_id = "AND rgroup_id!='$id'";
+    $id = sql_parse_id($id, true, true);
+    $where_id = "AND rgroup_id $id ";
   }
 
   $multidomain = sql_multidomain("rgroup");
@@ -708,7 +702,7 @@ function get_resourcegroup_name_exists($name, $id="") {
   $query = "SELECT rgroup_id, rgroup_name
     FROM RGroup
     WHERE rgroup_name='$name'
-      AND (rgroup_privacy=0 OR rgroup_usercreate='$obm[uid]')
+      AND (rgroup_privacy=0 OR rgroup_usercreate=$obm[uid])
       $where_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_resourcegroup_name_exists()");
@@ -764,7 +758,7 @@ function run_query_resourcegroup_check($id, $name, $desc) {
   $query = "SELECT distinct rgroup_id, rgroup_name, rgroup_desc
      FROM RGroup
      WHERE
-       (rgroup_privacy=0 OR rgroup_usercreate='$obm[uid]')
+       (rgroup_privacy=0 OR rgroup_usercreate=$obm[uid])
        AND ($wname $wdesc)
        $where_id $multidomain";
 
@@ -837,9 +831,9 @@ function check_resourcegroup_data_form($group) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_resourcegroup_parents($id) {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   $query = "select resourcegroupresourcegroup_parent_id
-    from ResourceGroupResourceGroup where resourcegroupresourcegroup_child_id='$id'";
+    from ResourceGroupResourceGroup where resourcegroupresourcegroup_child_id $id ";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

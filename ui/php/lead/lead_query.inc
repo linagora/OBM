@@ -290,7 +290,7 @@ function run_query_lead_insert($params) {
   // Get the lead id inserted
   $query = "SELECT MAX(lead_id) as lead_id
     FROM Lead
-    WHERE lead_usercreate $usercreate
+    WHERE lead_usercreate $uid 
       AND lead_domain_id $domain_id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_lead_insert(2)');

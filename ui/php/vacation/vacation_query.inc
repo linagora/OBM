@@ -21,7 +21,7 @@ function run_query_vacation_detail($u_id) {
 
   $vacation_datebegin = sql_date_format($db_type, 'UserObm.userobm_vacation_datebegin', 'vacation_datebegin');
   $vacation_dateend = sql_date_format($db_type, 'UserObm.userobm_vacation_dateend', 'vacation_dateend');
-
+  $u_id = sql_parse_id($u_id, true);
   $query = "SELECT 
     $vacation_datebegin,
     $vacation_dateend , 
@@ -32,7 +32,7 @@ function run_query_vacation_detail($u_id) {
     userobm_vacation_enable,
     userobm_vacation_message
   FROM UserObm
-  WHERE userobm_id = '$u_id'";
+  WHERE userobm_id $u_id ";
     
   display_debug_msg($query, $cdg_sql, "run_query_vacation_detail()");
   $obm_q->query($query);
@@ -70,7 +70,7 @@ function run_query_vacation_update($params, $u_id) {
     $params['vacation_datebegin'] = '0';
     $params['vacation_dateend'] = '0';
   }    
-  $enabled = $params["enabled"] == 1 ? "1": "0";
+  $enabled = sql_parse_int($params["enabled"]);
   $message_update = ", userobm_vacation_message='".addslashes($params["message"])."'";
   $time_begin = $params["time_begin"].":".$params["min_begin"].":00";
   $time_end = $params["time_end"].":".$params["min_end"].":00";
@@ -78,22 +78,22 @@ function run_query_vacation_update($params, $u_id) {
   $vacation_dateend = ($params['vacation_dateend'] ? "'".of_isodate_convert($params['vacation_dateend'])." $time_end'" : '0');
   $message_update .= ", userobm_vacation_datebegin=".$vacation_datebegin;
   $message_update .= ", userobm_vacation_dateend=".$vacation_dateend;
-
+  $u_id = sql_parse_id($u_id, true);
 
   // Update done in real-time, so updating UserObm AND P_UserObm
   $query = "UPDATE UserObm
-    SET userobm_vacation_enable = '$enabled'
+    SET userobm_vacation_enable = $enabled
     $message_update
-    WHERE userobm_id = '$u_id'";
+    WHERE userobm_id $u_id ";
     
   display_debug_msg($query, $cdg_sql, "run_query_vacation_update()");
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
 
   $query = "UPDATE P_UserObm
-    SET userobm_vacation_enable = '$enabled'
+    SET userobm_vacation_enable = $enabled
     $message_update
-    WHERE userobm_id = '$u_id'";
+    WHERE userobm_id $u_id ";
 
   display_debug_msg($query, $cdg_sql, "run_query_vacation_update()");
   $obm_q = new DB_OBM;

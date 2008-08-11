@@ -137,7 +137,7 @@ function run_query_host_insert($host) {
   $web_perms = sql_parse_int($host['web_perms']);
   $ftp_perms = sql_parse_int($host['ftp_perms']);
   $firewall_perms = sql_parse_int($host['firewall_perms']);
-  $web_all = $host['web_all'];
+  $web_all = sql_parse_int($host['web_all']);
   $list = $host['web_list'];
   $desc = $host['desc'];
   $now = date('Y-m-d H:i:s');
@@ -186,7 +186,7 @@ function run_query_host_insert($host) {
     '$desc',
     $web_perms,
     '$web_list',
-    '$web_all',    
+    $web_all,    
     $ftp_perms,
     $firewall_perms)";
 
@@ -258,7 +258,7 @@ function run_query_host_update($host) {
   $samba = sql_parse_int($host['samba']);
   $web_perms = sql_parse_int($host['web_perms']);
   $ftp_perms = sql_parse_int($host['ftp_perms']);
-  $web_all = $host['web_all'];  
+  $web_all = sql_parse_int($host['web_all']);  
   $web_list = $host['web_list'];
   $firewall_perms = sql_parse_int($host['firewall_perms']);
   $desc = $host['desc'];
@@ -276,8 +276,8 @@ function run_query_host_update($host) {
     host_ip='$ip',
     host_description='$desc',
     host_web_perms=$web_perms,
-    host_web_all='$web_all',
-    host_web_list=$web_list,    
+    host_web_all=$web_all,
+    host_web_list='$web_list',    
     host_ftp_perms=$ftp_perms,
     host_firewall_perms=$firewall_perms
     $q_delegation
@@ -330,7 +330,7 @@ function run_query_host_delete($p_id) {
   // Delete the Host
   $multidomain = sql_multidomain('host');
   $sel_id = sql_parse_id($p_id, true);
-  $query = "DELETE FROM Host WHERE host_id $p_id $multidomain";
+  $query = "DELETE FROM Host WHERE host_id $sel_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_host_delete()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -338,7 +338,7 @@ function run_query_host_delete($p_id) {
     $now = date('Y-m-d H:i:s');
   // Mise a jour du lien vers user
   // If this host exists in Prod table, Insert it in Deleted table
-  $query = "SELECT host_id, host_delegation FROM P_Host WHERE host_id='$sel_id'";
+  $query = "SELECT host_id, host_delegation FROM P_Host WHERE host_id $sel_id ";
   display_debug_msg($query, $cdg_sql, 'run_query_host_delete(auto)');
   $obm_q->query($query);
   $obm_q->next_record();
@@ -361,7 +361,7 @@ function run_query_host_delete($p_id) {
       $uid,
       '$delegation',
       'Host',
-      $p_id,
+      $ins_id,
       '$now')";
     display_debug_msg($query, $cdg_sql, 'run_query_host_delete(auto)');
     $retour = $obm_q->query($query);
