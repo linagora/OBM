@@ -429,7 +429,7 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
   if ($right != 'all') {
     $where_right = "AND entityright_$right = 1";
   }
-
+  $user_id = sql_parse_id($user_id, true);
   $query = "SELECT
       $e_id as id,
       $e_label as label,
@@ -437,8 +437,8 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
     FROM EntityRight
       LEFT JOIN $table_entity as e ON entityright_entity_id = $e_id
     WHERE entityright_entity = '$entity'
-      AND ( (entityright_consumer = 'user' AND (entityright_consumer_id = '$user_id' OR entityright_consumer_id = 0))
-        OR (entityright_consumer = 'group'  AND (entityright_consumer_id IN (SELECT of_usergroup_group_id FROM of_usergroup WHERE of_usergroup_user_id = '$user_id')
+      AND ( (entityright_consumer = 'user' AND (entityright_consumer_id $user_id OR entityright_consumer_id = 0))
+        OR (entityright_consumer = 'group'  AND (entityright_consumer_id IN (SELECT of_usergroup_group_id FROM of_usergroup WHERE of_usergroup_user_id $user_id )
             OR entityright_consumer_id = 0)))
         $where_right
     GROUP BY id, label, entityright_entity
@@ -621,7 +621,7 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
   $obm_q = new DB_OBM;
   $query = "DELETE
     FROM EntityRight
-    WHERE entityright_entity_id = '$eid'
+    WHERE entityright_entity_id ".sql_parse_id($eid, true)."
       AND entityright_entity = '$entity'";
   display_debug_msg($query, $cdg_sql, 'of_right_update_right(1)');
   $obm_q->query($query);
@@ -632,8 +632,8 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
     $accept_write = array();
   }
   if ($public_read || $public_write) {
-    $pr = ($public_read ? 1 : 0);
-    $pw = ($public_write ? 1 : 0);
+    $pr = sql_parse_int($public_read);
+    $pw = sql_parse_int($public_write);
     $query = "INSERT INTO EntityRight (
       entityright_entity,
       entityright_entity_id,
@@ -643,11 +643,11 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
       entityright_write
     ) VALUES (
       '$entity',
-      '$eid',
+      ".sql_parse_id($eid).",
       'user',
-      '0',
-      '$pr',
-      '$pw')";
+      0,
+      $pr,
+      $pw)";
     display_debug_msg($query, $cdg_sql, 'of_right_update_right(2)');
     $obm_q->query($query);
   }
@@ -657,7 +657,7 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
     foreach ($accept_read as $key => $ref) {
       if (preg_match($consumer_ereg,$ref,$matches)) {
         $consumer = $matches[1];
-        $id = $matches[2];          
+        $id = sql_parse_id($matches[2]);          
 	$w = (in_array($ref, $accept_write) ? 1 : 0);
 	$a = (in_array($ref, $accept_admin) ? 1 : 0);
 	$query = "INSERT INTO EntityRight (
@@ -670,12 +670,12 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
           entityright_admin
         ) VALUES (
           '$entity',
-          '$eid',
+          ".sql_parse_id($eid).",
           '$consumer',
-          '$id',
-          '1',
-          '$w',
-          '$a')";
+          $id,
+          1,
+          $w,
+          $a)";
 	display_debug_msg($query, $cdg_sql, 'of_right_update_right(3)');
 	$obm_q->query($query);
       }
@@ -688,7 +688,7 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
       if (preg_match($consumer_ereg,$ref,$matches)) {
         if (! in_array($ref, $accept_read)) {
           $consumer = $matches[1];
-          $id = $matches[2];          
+          $id = sql_parse_id($matches[2]);          
 	  $a = (in_array($ref, $accept_admin) ? 1 : 0);
 	  $query = "INSERT INTO EntityRight (
             entityright_entity,
@@ -699,11 +699,11 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
             entityright_admin
           ) VALUES (
             '$entity',
-            '$eid',
+            ".sql_parse_id($eid).",
             '$consumer',
-            '$id',
+            $id,
             '1',
-            '$a')";
+            $a)";
 	  display_debug_msg($query, $cdg_sql, 'of_right_update_right(4)');
 	  $obm_q->query($query);
 	}
@@ -717,7 +717,7 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
       if ((! in_array($ref, $accept_read))
         && (! in_array($ref, $accept_write))) {
         $consumer = $matches[1];
-        $id = $matches[2];
+        $id = sql_parse_id($matches[2]);
         $query = "INSERT INTO EntityRight (
           entityright_entity,
           entityright_entity_id,
@@ -726,10 +726,10 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
           entityright_admin
         ) VALUES (
           '$entity',
-          '$eid',
+          ".sql_parse_id($eid).",
           '$consumer',
-          '$id',
-          '1')";
+          $id,
+          1)";
         display_debug_msg($query, $cdg_sql, 'of_right_update_right(5)');
         $obm_q->query($query);
       }

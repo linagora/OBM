@@ -447,7 +447,7 @@ class Vcalendar_Reader_VCS {
     }
     $query = 'SELECT id, mail, cn
               FROM ('.$entityTable.') as Entity WHERE (1 = 0 '.$cn.' '.$mail.') 
-              AND domain_id = '.$GLOBALS['obm']['domain_id'].'
+              AND domain_id '.sql_parse_id($GLOBALS['obm']['domain_id'], true).'
               GROUP BY id';
     $db->query($query);
     while($db->next_record()) {

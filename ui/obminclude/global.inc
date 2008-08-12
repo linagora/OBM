@@ -1522,8 +1522,9 @@ function check_privacy($module, $table, $action, $id='', $p_uid='') {
   $field_pri = "${entity}_privacy";
   $field_uc = "${entity}_usercreate";
   $field_id = "${entity}_id";
+  $id = sql_parse_id($id, true);
 
-  $query = "SELECT $field_pri, $field_uc FROM $table WHERE $field_id = '$id'";
+  $query = "SELECT $field_pri, $field_uc FROM $table WHERE $field_id $id";
   display_debug_msg($query, $cdg_sql, "${entity}_search()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);

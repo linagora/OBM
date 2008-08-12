@@ -87,21 +87,24 @@ class OBM_User_Sql extends CT_Sql {
     $table = $this->database_table;
     $lastpage = "$module:$action";
     // update duration of visit
+    $uid = sql_parse_id($u_id);
     $uquery = "UPDATE $table SET
-        activeuserobm_userobm_id = '$u_id',
+        activeuserobm_userobm_id = $uid,
         activeuserobm_timeupdate = '$now',
         activeuserobm_nb_connexions = activeuserobm_nb_connexions + 1,
         activeuserobm_lastpage = '$lastpage'
       WHERE activeuserobm_sid = '$id'
         and activeuserobm_session_name = '$name'";
 
+    $uid = sql_parse_id($u_id, true);
     $squery = "SELECT count(*)
       FROM $table
-      WHERE activeuserobm_userobm_id = '$u_id'
+      WHERE activeuserobm_userobm_id $uid 
         and activeuserobm_timeupdate = '$now'
         and activeuserobm_sid = '$id'
         and activeuserobm_session_name = '$name'";
 
+    $uid = sql_parse_id($u_id);
     $iquery = "INSERT INTO $table (
         activeuserobm_sid,
         activeuserobm_session_name,
@@ -111,7 +114,7 @@ class OBM_User_Sql extends CT_Sql {
         activeuserobm_nb_connexions,
         activeuserobm_lastpage,
         activeuserobm_ip
-      ) VALUES ('$id', '$name', '$u_id', '$now', '$now', 1, '$lastpage', '$REMOTE_ADDR')";
+      ) VALUES ('$id', '$name', $uid, '$now', '$now', 1, '$lastpage', '$REMOTE_ADDR')";
 
     $this->db->query($uquery);
 
@@ -199,7 +202,7 @@ class OBM_Challenge_Auth extends Auth {
       FROM $user_table
       LEFT JOIN Domain ON userobm_domain_id = domain_id      
       WHERE userobm_login = '$user_login'
-        AND userobm_archive = '0'
+        AND userobm_archive = 0
         $where_domain";
     $class = $this->database_class;
     $this->db = new $class;

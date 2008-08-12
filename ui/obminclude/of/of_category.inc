@@ -793,10 +793,11 @@ function of_category_get_ordered($entity, $catu, $mode="multi", $entity_id=0,$ta
 
   // If an entity id is given, restrict categories to those of this entry
   if ( ($mode == "multi") && ($entity_id > 0)) {
+    $entity_id = sql_parse_id($entity_id, true);
     $query = "SELECT $table.*
       FROM $linktable
         LEFT JOIN $table ON $linkfield_cat = $field_id
-      WHERE $linkfield_ent = '$entity_id' $multidomain
+      WHERE $linkfield_ent $entity_id $multidomain
       ORDER BY $field_code, $field_label";
   } else {
     $query = "SELECT * FROM $table WHERE 1=1 $multidomain ORDER BY $field_code, $field_label";
@@ -849,7 +850,7 @@ function of_category_query_insert($entity, $catu, $params,$table=false) {
 
   $cat = strtolower($catu);
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $obm["uid"];
+  $usercreate = sql_parse_id($obm["uid"]);
   $cat_label = $params["${cat}_label"];
   $cat_code = $params["${cat}_code"];
   if(!$table) {
@@ -861,7 +862,7 @@ function of_category_query_insert($entity, $catu, $params,$table=false) {
   $field_label = $field_prefix."label";
   $field_code = $field_prefix."code";
   $field_domain = $field_prefix."domain_id";
-  $domain_id = $obm["domain_id"];
+  $domain_id = sql_parse_id($obm["domain_id"]);
 	
   $query = "INSERT INTO $table (
     $field_timecreate,
@@ -871,8 +872,8 @@ function of_category_query_insert($entity, $catu, $params,$table=false) {
     $field_code)
   VALUES (
     '$timecreate',
-    '$usercreate',
-    '$domain_id',
+    $usercreate,
+    $domain_id,
     '$cat_label',
     '$cat_code')";
 
@@ -904,13 +905,14 @@ function of_category_query_insert_link($entity, $cat, $entity_id, $cat_id,$table
     $linktable = $table."Link";
     $linkfield_ent = $entity.$cat."link_".$entity."_id";
     $linkfield_cat = $entity.$cat."link_category_id";
-		
+    $entity_id = sql_parse_id($entity_id);
+    $cat_id = sql_parse_id($cat_id);    
     $query = "INSERT INTO $linktable (
        $linkfield_ent,
        $linkfield_cat)
      VALUES (
-       '$entity_id',
-       '$cat_id')";
+       $entity_id,
+       $cat_id)";
     display_debug_msg($query, $cdg_sql, "of_category_query_insert_link()");
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
@@ -951,14 +953,14 @@ function of_category_query_update($entity, $catu, $params,$table=false) {
   $field_label = $field_prefix."label";
   $field_code = $field_prefix."code";
   $multidomain = sql_multidomain(strtolower($table));
-	
+  $cat_id = sql_parse_id($cat_id, true);	
   $query = "UPDATE $table SET
     $field_timeupdate = '$timeupdate',
     $field_userupdate = '$userupdate',
     $field_label = '$cat_label',
     $field_code = '$cat_code'
   WHERE
-    $field_id='$cat_id'
+    $field_id $cat_id 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, "of_category_query_update()");
@@ -995,7 +997,8 @@ function of_category_query_delete($entity, $catu, $params,$table=false) {
   $multidomain = sql_multidomain(strtolower($table));
 
   if ($id != '') {
-    $query = "DELETE FROM $table WHERE $field_id ='$id' $multidomain";
+    $id = sql_parse_id($id, true);
+    $query = "DELETE FROM $table WHERE $field_id $id $multidomain";
 
     display_debug_msg($query, $cdg_sql, "of_category_query_delete()");
     $obm_q = new DB_OBM;
@@ -1025,10 +1028,10 @@ function of_category_query_delete_link($entity, $cat, $entity_id,$table=false) {
   }
   $linktable = $table."Link";
   $linkfield_ent = $entity.$cat."link_".$entity."_id";
-
+  $entity_id = sql_parse_id($entity_id, true);
   $query = "DELETE
     FROM $linktable 
-    WHERE $linkfield_ent = '$entity_id'";
+    WHERE $linkfield_ent $entity_id ";
 
   display_debug_msg($query, $cdg_sql, "of_category_query_delete_link()");
   $obm_q = new DB_OBM;
@@ -1067,15 +1070,15 @@ function of_category_query_links($entity, $cat, $p_id, $mode="multi",$table=fals
   }
   $entityfield_id = $entityfield_prefix."id";
   $entityfield_cat = $entityfield_prefix.$cat."_id";
-	
+  $p_id = sql_parse_id($p_id, true);	
   if ($mode == "mono") {
     $query = "SELECT $entityfield_id
       FROM $entitytable
-      WHERE $entityfield_cat = '$p_id' $multidomain";
+      WHERE $entityfield_cat $p_id $multidomain";
   } else {
     $query = "SELECT $linkfield_ent
       FROM $linktable
-      WHERE $linkfield_cat = '$p_id'";
+      WHERE $linkfield_cat $p_id ";
   }
 
   display_debug_msg($query, $cdg_sql, "of_category_query_links()");
@@ -1124,24 +1127,23 @@ function of_category_get_entitycategories($entity, $cat, $entity_id, $mode="mult
   $entityfield_cat = $entityfield_prefix.$cat."_id";
   $multidomain = sql_multidomain(strtolower($table));
 	
+  $entity_id = sql_parse_id($entity_id, true);
   if ($mode == "mono") {
     $query = "SELECT $field_id, $field_label, $field_code 
       FROM $entitytable, $table 
       WHERE $entityfield_cat = $field_id
-        AND $entityfield_id = '$entity_id' $multidomain";
+        AND $entityfield_id $entity_id $multidomain";
   } else {
     $query = "SELECT $field_id, $field_label, $field_code 
       FROM $linktable, $table 
       WHERE $linkfield_cat = $field_id 
-        AND $linkfield_ent = '$entity_id' $multidomain
+        AND $linkfield_ent $entity_id $multidomain
       ORDER BY $field_id";
   }
 
   display_debug_msg($query, $cdg_sql, "of_category_get_entitycategories()");
   $cat_q = new DB_OBM;
-  if ($entity_id != "") {
-    $cat_q->query($query);
-  }
+  $cat_q->query($query);
 
   while ($cat_q->next_record()) {
     $id = $cat_q->f($field_id);
@@ -1180,10 +1182,10 @@ function of_category_get_label($entity, $cat, $id,$table=false) {
   $field_id = $field_prefix."id";
   $field_label = $field_prefix."label";
   $multidomain = sql_multidomain(strtolower($table));
-	
+  $id = sql_parse_id($id, true);	
   $query = "SELECT $field_label 
     FROM $table 
-    WHERE $field_id = '$id' $multidomain";
+    WHERE $field_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "of_category_get_label()");
   $obm_q = new DB_OBM;
@@ -2218,10 +2220,11 @@ function of_category_user_get_ordered($cat, $entity="", $entity_id=0) {
 
   // If an entity id is given, restrict categories to those of this entry
   if ( $entity_id > 0) {
+    $entity_id = sql_parse_id($entity_id, true);
     $query = "SELECT Category.*
       FROM CategoryLink
         LEFT JOIN Category ON categorylink_category_id = category_id
-      WHERE categorylink_entity_id = '$entity_id'
+      WHERE categorylink_entity_id $entity_id 
         AND categorylink_entity = '$entity'
         AND categorylink_category = '$cat'
         $multidomain
@@ -2283,13 +2286,13 @@ function of_category_user_get_entitycategories($entity, $category, $entity_id) {
 
   $cats = array();
   $multidomain = sql_multidomain("Category");
-
+  $entity_id = sql_parse_id($entity_id, true);
   $query = "SELECT category_id, category_code, category_label 
       FROM CategoryLink
         JOIN Category ON categorylink_category_id=category_id
       WHERE categorylink_entity='$entity'
         AND categorylink_category='$category'
-        AND categorylink_entity_id='$entity_id'
+        AND categorylink_entity_id $entity_id 
         $multidomain
       ORDER BY category_id";
 
@@ -2329,10 +2332,10 @@ function of_category_user_query_insert($params) {
 
   $category = $params["category"];
   $timecreate = date("Y-m-d H:i:s");
-  $usercreate = $obm["uid"];
+  $usercreate = sql_parse_id($obm["uid"]);
   $cat_label = $params["category_label"];
   $cat_code = $params["category_code"];
-  $domain_id = $obm["domain_id"];
+  $domain_id = sql_parse_id($obm["domain_id"]);
 	
   $query = "INSERT INTO Category (
     category_domain_id,
@@ -2344,11 +2347,11 @@ function of_category_user_query_insert($params) {
     Category_code,
     Category_label)
   VALUES (
-    '$domain_id',
+    $domain_id,
     null,
     '$timecreate',
-    '$usercreate',
-    '$usercreate',
+    $usercreate,
+    $usercreate,
     '$category',
     '$cat_code',
     '$cat_label')";
@@ -2373,19 +2376,19 @@ function of_category_user_query_update($params) {
 
   $category = $params["category"];
   $timeupdate = date("Y-m-d H:i:s");
-  $userupdate = $obm["uid"];
-  $cat_id = $params["category_id"];
+  $userupdate = sql_parse_id($obm["uid"]);
+  $cat_id = sql_parse_id($params["category_id"], true);
   $cat_label = $params["category_label"];
   $cat_code = $params["category_code"];
   $multidomain = sql_multidomain("Category");
 	
   $query = "UPDATE Category SET
     category_timeupdate = '$timeupdate',
-    category_userupdate = '$userupdate',
+    category_userupdate = $userupdate,
     category_label = '$cat_label',
     category_code = '$cat_code'
   WHERE
-    category_id='$cat_id'
+    category_id $cat_id 
     AND category_category = '$category'
     $multidomain";
 
@@ -2407,13 +2410,13 @@ function of_category_user_query_update($params) {
 function of_category_user_query_delete($params) {
   global $cdg_sql;
 
-  $category_id = $params["category_id"];
+  $category_id = sql_parse_id($params["category_id"], true);
   $category = $params["category"];
   $multidomain = sql_multidomain("Category");
 
   if ($category_id > 0) {
     $query = "DELETE FROM Category
-    WHERE category_id ='$category_id'
+    WHERE category_id $category_id 
       AND category_category = '$category'
       $multidomain";
 
@@ -2449,8 +2452,8 @@ function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id, 
       $nb = 0;
       $query = "SELECT count(*) as nb
        FROM CategoryLink
-       WHERE categorylink_category_id='$cat_id'
-         AND categorylink_entity_id='$entity_id'
+       WHERE categorylink_category_id ".sql_parse_id($cat_id, true)." 
+         AND categorylink_entity_id ".sql_parse_id($entity_id, true)." 
          AND categorylink_category='$cat'
          AND categorylink_entity='$entity'";
 
@@ -2462,15 +2465,16 @@ function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id, 
 	return $nb;
       }
     }
-
+    $cat_id = sql_parse_id($cat_id);
+    $entity_id = sql_parse_id($entity_id);
     $query = "INSERT INTO CategoryLink (
        categorylink_category_id,
        categorylink_entity_id,
        categorylink_category,
        categorylink_entity
      ) VALUES (
-       '$cat_id',
-       '$entity_id',
+       $cat_id,
+       $entity_id,
        '$cat',
        '$entity')";
     display_debug_msg($query, $cdg_sql, "of_category_user_query_insert_link()");
@@ -2492,12 +2496,12 @@ function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id, 
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_user_query_delete_link($entity, $entity_id) {
   global $cdg_sql;
-
+  $entity_id = sql_parse_id($entity_id, true);
   $query = "DELETE
     FROM CategoryLink
     WHERE
       categorylink_entity='$entity'
-      AND categorylink_entity_id='$entity_id'";
+      AND categorylink_entity_id $entity_id ";
 
   display_debug_msg($query, $cdg_sql, "of_category_user_query_delete_link()");
   $obm_q = new DB_OBM;
@@ -2517,11 +2521,11 @@ function of_category_user_query_delete_link($entity, $entity_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_user_get_links($category, $p_id) {
   global $cdg_sql;
-
+  $p_id = sql_parse_id($p_id, true);
   $query = "SELECT categorylink_entity_id,
         categorylink_entity
       FROM CategoryLink
-      WHERE categorylink_category_id = '$p_id'
+      WHERE categorylink_category_id $p_id 
         AND categorylink_category = '$category'
       ORDER by categorylink_entity";
 
@@ -2556,7 +2560,8 @@ function of_category_user_get_infos($cat_id) {
     if (count($cat_id) > 0) {
       $or = "";
       foreach ($cat_id as $one_id) {
-	$where_cat .= " $or category_id = '$one_id'";
+        $one_id = sql_parse_id($one_id, true);
+	$where_cat .= " $or category_id $one_id ";
 	$or = "OR";
       }
     } else {
@@ -2564,7 +2569,8 @@ function of_category_user_get_infos($cat_id) {
     }
   } else {
     if ($cat_id > 0) {
-      $where_cat .= "category_id = '$cat_id'";
+      $cat_id = sql_parse_id($cat_id, true);
+      $where_cat .= "category_id $cat_id ";
     } else {
       return $cat;
     }

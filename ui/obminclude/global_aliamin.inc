@@ -34,15 +34,18 @@ function get_email_used($emails, $id='', $gid='', $mid='') {
     }
   }
   if ($id != '') {
-    $where_user = " AND userobm_id != '$id'";
+    $id = sql_parse_id($id, true, true);
+    $where_user = " AND userobm_id $id ";
   }
   $where_user .= sql_multidomain('userobm');
   if ($gid != '') {
-    $where_group = " AND group_id != '$gid'";
+    $gid = sql_parse_id($gid, true, true);
+    $where_group = " AND group_id $gid ";
   }
   $where_group .= sql_multidomain('group');
   if ($mid != '') {
-    $where_mailshare = " AND mailshare_id != '$mid'";
+    $mid = sql_parse_id($mid, true, true);
+    $where_mailshare = " AND mailshare_id $mid ";
   }
   $where_mailshare .= sql_multidomain('mailshare');
 
@@ -81,7 +84,8 @@ function get_last_host_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT host_name FROM Host WHERE host_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT host_name FROM Host WHERE host_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_host_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -252,7 +256,8 @@ function get_ip_used($id='') {
   $ips = array();
 
   if ($id != '') {
-    $where_id = "WHERE host_id != '$id'";
+    $id = sql_parse_id($id, true, true);
+    $where_id = "WHERE host_id $id ";
   }
   $query = "SELECT host_name, host_ip
     FROM Host
@@ -283,10 +288,10 @@ function get_update_state($domain_id='no') {
   if ($domain_id == 'no') {
     $domain_id = $obm['domain_id'];
   }
-
+  $domain_id = sql_parse_id($domain_id, true);
   $query = "SELECT domainpropertyvalue_value as value
     FROM DomainPropertyValue
-    WHERE domainpropertyvalue_domain_id='$domain_id'
+    WHERE domainpropertyvalue_domain_id $domain_id 
      AND domainpropertyvalue_property_key = 'update_state'";
   display_debug_msg($query, $cdg_sql, 'get_update_state()');
   $obm_q = new DB_OBM;
@@ -310,10 +315,11 @@ function set_update_state($domain_id='no', $state=1) {
   if ($domain_id == 'no') {
     $domain_id = $obm['domain_id'];
   }
+  $domain_id = sql_parse_id($domain_id, true);
 
   $query = "UPDATE DomainPropertyValue
     SET domainpropertyvalue_value = '$state'
-    WHERE domainpropertyvalue_domain_id='$domain_id'
+    WHERE domainpropertyvalue_domain_id $domain_id 
       AND domainpropertyvalue_property_key = 'update_state'";
 
   display_debug_msg($query, $cdg_sql, 'set_update_state($state)');

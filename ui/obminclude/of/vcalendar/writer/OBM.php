@@ -62,12 +62,12 @@ class Vcalendar_Writer_OBM {
     $eventData = NULL;
     if($this->lazyRead) {
       if(($organizer = $vevent->get('organizer'))) {
-        $owner = "OR calendarevent_owner = '".$organizer."'";
+        $owner = "OR calendarevent_owner ".sql_parse_id($organizer, true)."";
       }
       $query = "SELECT calendarevent_id as id
       FROM CalendarEvent WHERE calendarevent_title =  '".addslashes($vevent->get('summary'))."'
       AND calendarevent_date = '".$vevent->get('dtstart')."' AND
-      (calendarevent_owner = ".$GLOBALS['obm']['uid']." $owner)";
+      (calendarevent_owner ".sql_parse_id($GLOBALS['obm']['uid'], true)." $owner)";
       $this->db->query($query);
       if($this->db->nf() > 0) {
         $this->db->next_record();
@@ -197,7 +197,7 @@ class Vcalendar_Writer_OBM {
     $name = addslashes(array_shift($categories));
     $query = "SELECT calendarcategory1_id as id FROM CalendarCategory1 WHERE
                      calendarcategory1_label = '$name' AND 
-                     calendarcategory1_domain_id = ".$GLOBALS['obm']['domain_id'];
+                     calendarcategory1_domain_id ".sql_parse_id($GLOBALS['obm']['domain_id'], true);
     $this->db->query($query);
     if($this->db->next_record()) {
       return $this->db->f('id');

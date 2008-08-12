@@ -35,10 +35,10 @@ function get_obm_info($info) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_global_company_contact_number_update($comp_id) {
   global $cdg_sql;
-
+  $comp_id = sql_parse_id($comp_id, true);
   $query = "SELECT count(*) as nb
       FROM Contact
-      WHERE contact_company_id='$comp_id'
+      WHERE contact_company_id $comp_id 
         AND contact_archive = '0'";
 
   display_debug_msg($query, $cdg_sql, 'run_query_global_company_contact_number_update()');
@@ -49,7 +49,7 @@ function run_query_global_company_contact_number_update($comp_id) {
 
   $query = "UPDATE Company
     SET company_contact_number='$nb'
-    WHERE company_id='$comp_id'";
+    WHERE company_id $comp_id ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_global_company_contact_number_update()');
   $retour = $obm_q->query($query);
@@ -217,17 +217,18 @@ function get_global_tasktype($tt_cat='', $tt_ids='') {
   if (($tt_cat == '') || ($tt_cat == 'all')) {
     $query .= '';
   } elseif ($tt_cat == 'project') {
-    $where .= "AND (tasktype_internal = '$ctt_sales'
-                      or tasktype_internal = '$ctt_research')";
+    $where .= "AND (tasktype_internal = $ctt_sales
+                      or tasktype_internal = $ctt_research)";
   } else {
-    $where .= "AND tasktype_internal = '$tt_cat'";
+    $where .= "AND tasktype_internal = $tt_cat";
   }
 
   if (is_array($tt_ids)) {
     $where .= ' AND ';
     $where .= '(';
     foreach($tt_ids as $id) {
-      $where .= "$or tasktype_id = '$id'";
+      $id = sql_parse_id($id, true);
+      $where .= "$or tasktype_id $id ";
       $or = ' OR';
     }
     $where .= ')';
@@ -235,7 +236,8 @@ function get_global_tasktype($tt_cat='', $tt_ids='') {
     if ($where != '') {
       $where .= ' AND ';
     }
-    $where .= " tasktype_id = '$tt_ids'";
+    $tt_ids = sql_parse_id($tt_ids, true);
+    $where .= " tasktype_id $tt_ids ";
   }
   
   $query .= " WHERE 1 = 1 $multidomain $where ";
@@ -272,14 +274,14 @@ function get_global_tasktype($tt_cat='', $tt_ids='') {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_linked_element_nb($element, $id, $entity, $arch='') {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   $lelement = strtolower($element);
   $query = "SELECT count(${lelement}_id) as nb
     FROM $element
-    WHERE ${lelement}_${entity}_id = '$id'";
+    WHERE ${lelement}_${entity}_id $id ";
 
   if (! $arch) {
-    $query .= " AND ${lelement}_archive='0'";
+    $query .= " AND ${lelement}_archive=0";
   }
 
   $obm_q = new DB_OBM;
@@ -303,11 +305,11 @@ function get_global_linked_element_nb($element, $id, $entity, $arch='') {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_linked_deal_nb($id, $entity, $arch='', $entity2='') {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   if ($entity2 != '') {
-    $where_ent = "(deal_${entity}_id = '$id' OR deal_${entity2}_id = '$id')";
+    $where_ent = "(deal_${entity}_id $id OR deal_${entity2}_id $id )";
   } else {
-    $where_ent = "deal_${entity}_id = '$id'";
+    $where_ent = "deal_${entity}_id $id ";
   }
 
   $query = "SELECT count(deal_id) as nb
@@ -315,7 +317,7 @@ function get_global_linked_deal_nb($id, $entity, $arch='', $entity2='') {
     WHERE $where_ent";
 
   if (! $arch) {
-    $query .= " AND deal_archive='0'";
+    $query .= " AND deal_archive=0";
   }
 
   $obm_q = new DB_OBM;
@@ -338,13 +340,13 @@ function get_global_linked_deal_nb($id, $entity, $arch='', $entity2='') {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_linked_project_nb($id, $entity, $arch='') {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT count(project_id) as nb
     FROM Project
-    WHERE project_${entity}_id = '$id'";
+    WHERE project_${entity}_id $id ";
 
   if (! $arch) {
-    $query .= " AND project_archive='0'";
+    $query .= " AND project_archive=0";
   }
 
   $obm_q = new DB_OBM;
@@ -368,11 +370,11 @@ function get_global_linked_project_nb($id, $entity, $arch='') {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_linked_contract_nb($id, $entity, $arch='', $entity2='') {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   if ($entity2 != '') {
-    $where_ent = "(contract_${entity}_id = '$id' OR contract_${entity2}_id = '$id')";
+    $where_ent = "(contract_${entity}_id $id OR contract_${entity2}_id $id )";
   } else {
-    $where_ent = "contract_${entity}_id = '$id'";
+    $where_ent = "contract_${entity}_id $id ";
   }
 
   $query = "SELECT count(contract_id) as nb
@@ -380,7 +382,7 @@ function get_global_linked_contract_nb($id, $entity, $arch='', $entity2='') {
     WHERE $where_ent";
 
   if (! $arch) {
-    $query .= " AND contract_archive='0'";
+    $query .= " AND contract_archive=0";
   }
 
   $obm_q = new DB_OBM;
@@ -403,13 +405,13 @@ function get_global_linked_contract_nb($id, $entity, $arch='', $entity2='') {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_linked_incident_nb($id, $entity, $arch='') {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT count(incident_id) as nb
     FROM Incident
-    WHERE incident_{$entity}_id = '$id'";
+    WHERE incident_{$entity}_id $id ";
 
   if (! $arch) {
-    $query .= " AND incident_archive='0'";
+    $query .= " AND incident_archive=0";
   }
 
   $obm_q = new DB_OBM;
@@ -432,20 +434,20 @@ function get_global_linked_incident_nb($id, $entity, $arch='') {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_linked_invoice_nb($id, $entity, $arch='') {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   if ($entity == 'deal') {
     $query = "SELECT count(invoice_id) as nb
       FROM Invoice
         LEFT JOIN Project on invoice_project_id=project_id
-      WHERE (invoice_deal_id = '$id'
-        OR project_deal_id = '$id')";
+      WHERE (invoice_deal_id $id 
+        OR project_deal_id $id )";
   } else {
     $query = "SELECT count(invoice_id) as nb
     FROM Invoice
-    WHERE invoice_${entity}_id = '$id'";
+    WHERE invoice_${entity}_id $id ";
   }
   if (! $arch) {
-    $query .= " AND invoice_archive='0'";
+    $query .= " AND invoice_archive=0";
   }
 
   $obm_q = new DB_OBM;
@@ -467,15 +469,15 @@ function get_global_linked_invoice_nb($id, $entity, $arch='') {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_linked_payment_nb($id, $entity) {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   if ($entity == 'invoice') {
     $query = "SELECT count(paymentinvoice_payment_id) as nb
       FROM PaymentInvoice
-      WHERE paymentinvoice_invoice_id = '$id'";
+      WHERE paymentinvoice_invoice_id $id ";
   } else {
     $query = "SELECT count(payment_id) as nb
     FROM Payment
-    WHERE payment_${entity}_id = '$id'";
+    WHERE payment_${entity}_id $id ";
   }
 
   $obm_q = new DB_OBM;
@@ -499,11 +501,11 @@ function get_global_linked_payment_nb($id, $entity) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_global_document_nb($id,$entity) {
   global $cdg_sql;
-
+  $id = sql_parse_id($id, true);
   $query = "SELECT count(*) as nb
     FROM DocumentEntity
     WHERE documententity_entity = '$entity'
-      AND documententity_entity_id = '$id'"; 
+      AND documententity_entity_id $id "; 
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -529,31 +531,34 @@ function run_query_global_insert_documents_links($ids, $entity) {
   if($id == '') {
     $id = $ids['ext_id'];
   }
+  $sid = sql_parse_id($id, true);
+  $iid = sql_parse_id($id);
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $ids['doc_nb']) {
     $cpt++;
-    $d_id = $ids["doc$cpt"];
+    $d_id = sql_parse_id($ids["doc$cpt"], true);
     
     $query = "SELECT *
       FROM DocumentEntity
       WHERE documententity_entity='$entity'
-        AND documententity_entity_id='$id'
-        AND documententity_document_id = '$d_id'";
+        AND documententity_entity_id $id 
+        AND documententity_document_id $d_id ";
     display_debug_msg($query, $cdg_sql, 'run_query_global_insert_documents_links(1)');
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
     
     // If the entry doesn't already exist, we insert it
     if ($test_q->num_rows() == 0) {
+      $d_id = sql_parse_id($ids["doc$cpt"]);
       $query = "INSERT INTO DocumentEntity (
         	documententity_entity,
 	       documententity_entity_id,
 	       documententity_document_id
        )VALUES (    
 	       '$entity',
-	       '$id',
-	       '$d_id'
+	       $iid,
+	       $d_id
       )";
       display_debug_msg($query, $cdg_sql, 'run_query_global_insert_documents_links(2)');
       $obm_q = new DB_OBM;
@@ -580,15 +585,16 @@ function run_query_global_delete_document_links($ent_id, $entity, $doc_id='') {
     return true;
   }
   $where = '1=0';
-
   if ($ent_id != '') {
-    $where .= " AND documententity_entity_id = '$ent_id'";
+    $ent_id = sql_parse_id($ent_id, true);
+    $where .= " AND documententity_entity_id $ent_id ";
   }
   if ($entity != '') {
     $where .= " AND documententity_entity = '$entity'";
   }
   if ($doc_id != '') {
-    $where .= " AND documententity_document_id = '$doc_id'";
+    $doc_id = sql_parse_id($doc_id, true);
+    $where .= " AND documententity_document_id $doc_id ";
   }
 
   $query = "DELETE FROM DocumentEntity WHERE $where";
@@ -618,10 +624,10 @@ function run_query_global_delete_document($doc_id) {
 
   // Delete the file
   run_query_global_document_delete_file($doc_id);
-
+  $doc_id = sql_parse_id($doc_id, true);
   // Delete the database entry
   $query = "DELETE FROM Document 
-		WHERE document_id='$doc_id' $multidomain";
+		WHERE document_id $doc_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_global_delete_document()');
   $obm_q = new DB_OBM;
@@ -659,24 +665,24 @@ function run_query_global_document_delete_file($id) {
 function run_query_global_insert_document($params, $id, $entity) {
   global $cdg_sql, $obm, $l_create_file_error;
 
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
   $now = date('Y-m-d H:i:s');
 
   $title = $params['title'];
   $usr_q = get_user_info($uid);
   $author = $usr_q['lastname'].' '.$usr_q['firstname'];
-  $mime = $params['type'];
+  $mime = sql_parse_id($params['type']);
   $name = $params['file_name'];
   $path = '/';
-  $size = $params['size'];
+  $size = sql_parse_int($params['size']);
   $kind = '1'; // 1 means upload file
   $url = '';
   $privacy = '0';
 
   if (isset($params['domain']) && $obm['domain_global']) {
-    $domain_id = $params['domain'];
+    $domain_id = sql_parse_id($params['domain']);
   } else {
-    $domain_id = $obm['domain_id'];
+    $domain_id = sql_parse_id($obm['domain_id']);
   }
 
   $query = "INSERT INTO Document (
@@ -697,30 +703,26 @@ function run_query_global_insert_document($params, $id, $entity) {
       null,
       '$now',
       null,
-      '$uid',
-      '$domain_id',
+      $uid,
+      $domain_id,
       '$title',
       '$author',
       '$name',
       '$path',
-      '$kind',
-      '$size',
-      '$mime',
-      '$privacy'
+      $kind,
+      $size,
+      $mime,
+      $privacy
     )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_global_insert_document(1)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  
+  $uid = sql_parse_id($obm['uid'], true);
   // Get document id
-  $query = "SELECT document_id
+  $query = "SELECT MAX(document_id) as document_id
     FROM Document
-    WHERE document_title='$title'
-      AND document_author='$author'
-      AND document_name='$name'
-      AND document_path='$path'
-      AND document_size='$size'"; 
+    WHERE document_usercreate $uid"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_global_insert_document(2)');
   $obm_q->query($query); 
@@ -737,7 +739,8 @@ function run_query_global_insert_document($params, $id, $entity) {
       // If error, delete file
       run_query_global_delete_document($id); // todo
     } else {
-      $entity_id = $params[$entity.'_id'];
+      $entity_id = sql_parse_id($params[$entity.'_id']);
+      $iid = sql_parse_id($iid);
       // Insert links
       $query = "INSERT INTO DocumentEntity (
         documententity_entity,
@@ -745,8 +748,8 @@ function run_query_global_insert_document($params, $id, $entity) {
         documententity_document_id
        )VALUES (    
         '$entity',
-        '$entity_id',
-        '$id')";
+        $entity_id,
+        $id)";
       display_debug_msg($query, $cdg_sql, 'run_query_global_insert_document(3)');
       $obm_q->query($query); 
       return $id;
@@ -770,22 +773,22 @@ function run_query_global_update_document($params, $id) {
   global $obm, $cdg_sql;
   global  $l_delete_file_error, $l_create_file_error;
 
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid']);
   $now = date('Y-m-d H:i:s');
   
   $mime = $params['type'];
   $name = $params['file_name'];
   $path = '/';
-  $size = $params['size'];
+  $size = sql_parse_int($params['size']);
   $title = $params['title'];
-
+  $iid = sql_parse_id($id, true);
   $query = "UPDATE Document SET
      document_timeupdate='$now',
-     document_userupdate='$uid',
-     document_size='$size',
+     document_userupdate=$uid,
+     document_size=$size,
      document_name='$name',
      document_title='$title'
-   WHERE document_id='$id'";
+   WHERE document_id $id ";
   
   display_debug_msg($query, $cdg_sql, 'run_query_document_update()');
   $obm_q = new DB_OBM;
@@ -823,7 +826,7 @@ function global_session_load_user_todos($p_todo='todo_priority') {
       todo_id,
       todo_title
     FROM Todo
-    WHERE todo_user = '$uid'
+    WHERE todo_user $uid 
     AND todo_percent < 100
     ORDER BY $order
     $limit";
@@ -861,7 +864,8 @@ function get_last_company_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT company_name FROM Company WHERE company_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT company_name FROM Company WHERE company_id $id ";
     $obm_q = new DB_OBM;
     display_debug_msg($query, $cdg_sql, 'get_last_company_text()');
     $obm_q->query($query);
@@ -882,7 +886,8 @@ function get_last_contact_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "SELECT contact_lastname FROM Contact WHERE contact_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT contact_lastname FROM Contact WHERE contact_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_contact_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -903,7 +908,8 @@ function get_last_lead_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT lead_name FROM Lead WHERE lead_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT lead_name FROM Lead WHERE lead_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_lead_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -924,7 +930,8 @@ function get_last_deal_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT deal_label FROM Deal WHERE deal_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT deal_label FROM Deal WHERE deal_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_deal_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -945,9 +952,10 @@ function get_last_parentdeal_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
+    $id = sql_parse_id($id, true);
     $query = "SELECT parentdeal_label
     FROM ParentDeal
-    WHERE parentdeal_id='$id'";
+    WHERE parentdeal_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_parentdeal_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -968,7 +976,8 @@ function get_last_list_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "SELECT list_name FROM List WHERE list_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT list_name FROM List WHERE list_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_list_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -989,9 +998,10 @@ function get_last_publication_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
+    $id = sql_parse_id($id, true);
     $query = "SELECT publication_title
       FROM Publication
-      WHERE publication_id='$id'";
+      WHERE publication_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_publication_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -1011,7 +1021,8 @@ function get_last_project_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT project_name FROM Project WHERE project_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT project_name FROM Project WHERE project_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_project_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -1031,7 +1042,8 @@ function get_last_contract_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "SELECT contract_label FROM Contract WHERE contract_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT contract_label FROM Contract WHERE contract_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_contract_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -1051,7 +1063,8 @@ function get_last_incident_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "SELECT incident_label FROM Incident WHERE incident_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT incident_label FROM Incident WHERE incident_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_incident_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -1071,7 +1084,8 @@ function get_last_document_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT document_name FROM Document WHERE document_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT document_name FROM Document WHERE document_id $id ";
     $obm_q = new DB_OBM;
     display_debug_msg($query, $cdg_sql, 'get_last_document_text()');
     $obm_q->query($query);
@@ -1092,7 +1106,8 @@ function get_last_account_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT account_label FROM Account WHERE account_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT account_label FROM Account WHERE account_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_account_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -1112,7 +1127,8 @@ function get_last_invoice_text($id) {
   global $cdg_sql;
   
   if ($id > 0) {
-    $query = "SELECT invoice_label FROM Invoice WHERE invoice_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT invoice_label FROM Invoice WHERE invoice_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_invoice_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -1131,7 +1147,8 @@ function get_last_resource_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT resource_name FROM Resource WHERE resource_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT resource_name FROM Resource WHERE resource_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_resource_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -1150,7 +1167,8 @@ function get_last_resourcegroup_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT rgroup_name FROM RGroup WHERE rgroup_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT rgroup_name FROM RGroup WHERE rgroup_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_resourcegroup_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -1170,7 +1188,8 @@ function get_last_mailshare_text($id) {
   global $cdg_sql;
 
   if ($id > 0) {
-    $query = "SELECT mailshare_name FROM MailShare WHERE mailshare_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT mailshare_name FROM MailShare WHERE mailshare_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_mailshare_text()');
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -1193,8 +1212,8 @@ function get_last_payment_text($id) {
     $obm_q = new DB_OBM;
     $db_type = $obm_q->type;
     $date = sql_date_format($db_type, 'payment_date', 'date');
-
-    $query = "SELECT $date, payment_amount FROM Payment WHERE payment_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT $date, payment_amount FROM Payment WHERE payment_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_payment_text()');
     $obm_q->query($query);
     $obm_q->next_record();
@@ -1215,8 +1234,8 @@ function get_last_domain_text($id) {
   if ($id > 0) {
     $obm_q = new DB_OBM;
     $db_type = $obm_q->type;
-
-    $query = "SELECT domain_name FROM Domain WHERE domain_id='$id'";
+    $id = sql_parse_id($id, true);
+    $query = "SELECT domain_name FROM Domain WHERE domain_id $id ";
     display_debug_msg($query, $cdg_sql, 'get_last_domain_text()');
     $obm_q->query($query);
     $obm_q->next_record();
@@ -1240,7 +1259,8 @@ function get_global_email_used($id='', $gid='', $lid='') {
 
   $mails = array();
   if ($id != '') {
-    $where_id = "WHERE userobm_id != '$id'";
+    $id = sql_parse_id($id, true, true);
+    $where_id = "WHERE userobm_id $id ";
   }
   $query = "SELECT userobm_lastname, userobm_firstname, userobm_email
     FROM UserObm
@@ -1261,7 +1281,8 @@ function get_global_email_used($id='', $gid='', $lid='') {
   }
 
   if ($gid != '') {
-    $where_gid = "WHERE group_id != '$gid'";
+    $gid = sql_parse_id($gid, true, true);
+    $where_gid = "WHERE group_id $gid ";
   }
   $query = "SELECT group_name, group_email
     FROM UGroup
@@ -1278,7 +1299,8 @@ function get_global_email_used($id='', $gid='', $lid='') {
   }
 
   if ($lid != '') {
-    $where_lid = "WHERE list_id != '$lid'";
+    $lid = sql_parse_id($lid, true, true);
+    $where_lid = "WHERE list_id $lid ";
   }
   $query = "SELECT list_name, list_email
     FROM List
@@ -1350,7 +1372,7 @@ function global_freeze_user($params) {
   global $cdg_sql, $c_nb_login_failed, $c_frozen_duration, $c_login_interval;
 
   $login = $params['login'];
-  $domain = $params['domain'];
+  $domain = sql_parse_id($params['domain'], true);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -1361,8 +1383,8 @@ function global_freeze_user($params) {
     $lastaccess,
     userobm_nb_login_failed
     FROM UserObm WHERE userobm_login='$login'
-    AND userobm_domain_id='$domain'
-    AND userobm_archive='0'";
+    AND userobm_domain_id $domain 
+    AND userobm_archive=0";
   $obm_q->query($query);
   $obm_q->next_record();
   $uid = $obm_q->f('userobm_id');
@@ -1375,20 +1397,21 @@ function global_freeze_user($params) {
     // user is freeze and frozen time is outdated
     if ( ($nb_login_failed == $c_nb_login_failed && $now > $timelastaccess + $c_frozen_duration) ||
          ($nb_login_failed < $c_nb_login_failed && $now > $timelastaccess + $c_login_interval) ) {
+      $uid = sql_parse_id($uid, true);
       $query = "UPDATE UserObm SET
-        userobm_nb_login_failed='1',
+        userobm_nb_login_failed=1,
         userobm_timelastaccess=NOW()
-      WHERE userobm_id='$uid'";
+      WHERE userobm_id $uid ";
     } else if ($nb_login_failed < $c_nb_login_failed) {
       // increase nb_login_failed 
       $query = "UPDATE UserObm SET
         userobm_nb_login_failed=userobm_nb_login_failed+1,
         userobm_timelastaccess=NOW()
-      WHERE userobm_id='$uid'";
+      WHERE userobm_id $uid ";
     } else {
       $query = "UPDATE UserObm SET
         userobm_timelastaccess=NOW()
-      WHERE userobm_id='$uid'";
+      WHERE userobm_id $uid ";
     } 
   }
 
@@ -1411,11 +1434,12 @@ function global_unfreeze_user($uid) {
   $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
 
   if ($uid > 0) {
+    $uid = sql_parse_id($uid, true);
     $query = "SELECT userobm_id,
       $lastaccess,
       userobm_nb_login_failed
     FROM UserObm
-    WHERE userobm_id='$uid'";
+    WHERE userobm_id $uid ";
     $obm_q->query($query);
     $obm_q->next_record();
     $uid = $obm_q->f('userobm_id');
@@ -1427,7 +1451,7 @@ function global_unfreeze_user($uid) {
       $query = "UPDATE UserObm SET
         userobm_nb_login_failed='0',
         userobm_timelastaccess=NOW()
-      WHERE userobm_id='$uid'";
+      WHERE userobm_id $uid ";
       $obm_q->query($query);
       return true;
     } else {
