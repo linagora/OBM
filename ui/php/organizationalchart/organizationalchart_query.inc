@@ -182,7 +182,7 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
           AND ogroup_timecreate='$now'
           AND ogroup_usercreate $sel_uid 
           AND ogroup_organizationalchart_id $sel_organizationalchart_id 
-          AND ogroup_level=$parent_level";
+          AND ogroup_level='$parent_level'";
 
         display_debug_msg($query, $cdg_sql, "run_query_organizational_chart_ogroup_insert(ogroup_id)");
         $obm_q->query($query);
@@ -300,7 +300,37 @@ function run_query_organizationalchart_update($id, $organizationalchart) {
   return $retour;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Deletion Organizational Chart Entities query execution
+// Parameters:
+//   - $id : organizational chart id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_organizational_chart_entity_delete($id) {
+  global $cdg_sql, $obm;
 
+  $sel_obm_q = new DB_OBM;
+  $del_obm_q = new DB_OBM;
+
+  // Get ogroup_id
+  $ogroup_query = "SELECT ogroup_id 
+    FROM OGroup 
+    WHERE ogroup_organizationalchart_id='$id'";
+  display_debug_msg($ogroup_query, $cdg_sql, "run_query_organizational_chart_entity_delete(1)");
+  $sel_obm_q->query($ogroup_query);
+
+  while($sel_obm_q->next_record()) {
+    $ogroup_id = $sel_obm_q->f("ogroup_id");
+    
+    $remove_ogroupentity_query = "DELETE FROM OGroupEntity WHERE ogroupentity_ogroup_id='$ogroup_id'";
+    display_debug_msg($remove_ogroupentity_query, $cdg_sql, "run_query_organizational_chart_entity_delete(2)");
+    $del_obm_q->query($remove_ogroupentity_query);
+
+    $remove_ogroup_query = "DELETE FROM OGroup WHERE ogroup_id='$ogroup_id'";
+    display_debug_msg($remove_ogroup_query, $cdg_sql, "run_query_organizational_chart_entity_delete(3)");
+    $del_obm_q->query($remove_ogroup_query);
+
+  }
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Detail query execution
 // Parameters :
@@ -477,7 +507,7 @@ function run_query_organizationalchart_root_node($organizationalchart_id) {
     $query = "SELECT *
       FROM OGroup
       WHERE ogroup_organizationalchart_id $organizationalchart_id 
-      AND ogroup_parent_id=0";
+      AND ogroup_parent_id IS NULL";
     $obm_q = new DB_OBM;
 
     display_debug_msg($query, $cdg_sql, "run_query_organizationalchart_root_node()");

@@ -1312,7 +1312,7 @@ function update_user_pref($user_id, $option, $new_value='') {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_pref_insert($user_id, $option, $value) {
   global $cdg_sql;
-  $user_id = sql_parse_id($user_id, true);
+  $user_id = sql_parse_id($user_id);
   $query = "INSERT INTO UserObmPref (
     userobmpref_user_id,
     userobmpref_option,

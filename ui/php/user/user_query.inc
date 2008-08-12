@@ -247,11 +247,11 @@ function run_query_user_ext_search($user) {
       userobm_email
     FROM UserObm
     WHERE (
-      userobm_lastname LIKE $pattern%
-      OR userobm_login LIKE $pattern% 
-      OR userobm_firstname LIKE $pattern% 
-      OR userobm_email LIKE $pattern% )
-      AND userobm_archive = '0'
+      userobm_lastname LIKE '$pattern%' 
+      OR userobm_login LIKE '$pattern%' 
+      OR userobm_firstname LIKE '$pattern%' 
+      OR userobm_email LIKE  '$pattern%' )
+      AND userobm_archive = 0
       $multidomain
       $where_restriction
     ORDER BY  userobm_lastname, userobm_firstname
@@ -414,7 +414,7 @@ function run_query_user_insert($user) {
   if ($cgp_use['service']['mail']) {
     $mail_perms = sql_parse_int($user['mail_perms']);
     $mail_ext_perms = sql_parse_int($user['mail_ext_perms']);
-    $mail_server_id = sql_parse_id($user['mail_server_id'], true);
+    $mail_server_id = sql_parse_id($user['mail_server_id']);
     $mail_quota = $user['mail_quota'];
     if ($mail_quota == '') {
       $mail_quota = '0';
@@ -622,7 +622,7 @@ function run_query_user_insert($user) {
         // Update userobm_photo_id
         $doc_id = sql_parse_id($doc_id);
         $uid = sql_parse_id($uid, true);
-        $query = "UPDATE UserObm SET userobm_photo_id=$doc_id WHERE userobm_id $id"; 
+        $query = "UPDATE UserObm SET userobm_photo_id=$doc_id WHERE userobm_id $uid"; 
         display_debug_msg($query, $cdg_sql, 'run_query_user_insert(3)');
         $obm_q->query($query);
       }

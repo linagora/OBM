@@ -813,7 +813,7 @@ function run_query_global_update_document($params, $id) {
 function global_session_load_user_todos($p_todo='todo_priority') {
   global $cdg_sql, $cgp_todo_nb, $todos, $obm;
 
-  $uid = $obm['uid'];
+  $uid = sql_parse_id($obm['uid'], true);
 
   $limit = sql_limit($db_type, $cgp_todo_nb, 0);
   $order = ($p_todo != '' ? $p_todo : 'todo_priority');
@@ -1442,7 +1442,7 @@ function global_unfreeze_user($uid) {
     WHERE userobm_id $uid ";
     $obm_q->query($query);
     $obm_q->next_record();
-    $uid = $obm_q->f('userobm_id');
+    $uid = sql_parse_id($obm_q->f('userobm_id'), true);
     $timelastaccess = $obm_q->f('timelastaccess');
     $nb_login_failed = $obm_q->f('userobm_nb_login_failed');
 

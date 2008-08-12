@@ -168,8 +168,8 @@ function run_query_domain_insert($domain) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_replace_properties($domain_id,$domain) {
   global $cdg_sql;
-  $domain_id = sql_parse_id($domain_id, true);
-  $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id $domain_id ";
+  $d_id = sql_parse_id($domain_id, true);
+  $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id $d_id ";
   display_debug_msg($query, $cdg_sql, 'run_query_domain_replace_properties()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -184,6 +184,7 @@ function run_query_domain_replace_properties($domain_id,$domain) {
     }
 
     if ($value != '') {
+      $domain_id = sql_parse_id($domain_id);
       $query = "INSERT INTO DomainPropertyValue (
         domainpropertyvalue_domain_id,
         domainpropertyvalue_property_key,
@@ -214,7 +215,7 @@ function run_query_domain_update($d_id, $domain) {
   $desc = $domain['desc'];
   $alias = $domain['alias'];
   $mail_server_id = sql_parse_id($domain['mail_server_id']);
-  $d_id = sql_parse_id($d_id, true);
+  $did = sql_parse_id($d_id, true);
   $query = "UPDATE Domain SET
     domain_timeupdate='$now',
     domain_userupdate=$uid,
@@ -222,7 +223,7 @@ function run_query_domain_update($d_id, $domain) {
     domain_description='$desc',
     domain_mail_server_id=$mail_server_id,
     domain_alias='$alias'
-    WHERE domain_id $d_id ";
+    WHERE domain_id $did ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_domain_update()');
   $obm_q = new DB_OBM;
@@ -649,7 +650,7 @@ function run_query_domain_mailserver_insert($params) {
     $m_id = sql_parse_id($params["mailserver$cpt"], true);
 
     $query = "SELECT * FROM DomainMailServer
-      WHERE domainmailserver_domain_id $id 
+      WHERE domainmailserver_domain_id $sel_id 
       AND domainmailserver_mailserver_id $m_id 
       AND domainmailserver_role='$role'";
 
@@ -659,11 +660,12 @@ function run_query_domain_mailserver_insert($params) {
 
     // If the entry doesn't already exist, we insert it
     if ($test_q->num_rows() == 0) {
+      $m_id = sql_parse_id($params["mailserver$cpt"]);
       $query = "INSERT INTO DomainMailServer (
         domainmailserver_domain_id,
         domainmailserver_mailserver_id,
         domainmailserver_role)
-        VALUES ($id, $m_id, '$role')";
+        VALUES ($ins_id, $m_id, '$role')";
 
       display_debug_msg($query, $cdg_sql, 'run_query_domain_mailserver_insert(2)');
       $obm_q = new DB_OBM;
@@ -675,7 +677,51 @@ function run_query_domain_mailserver_insert($params) {
   return $cpt_ins;
 }
 
+/**
+ * Get default data from global domain and make a copy into the new domain
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function run_query_domain_init_data($id) {
+  global $obm, $cdg_sql;
+  $db = new DB_OBM;
+  $tables = array ('CompanyNafCode', 'CompanyActivity', 'CompanyType', 'Kind', 'DealType',
+                   'DealStatus', 'CalendarCategory1', 'DocumentMimeType', 'TaskType', 'ContractStatus',
+                   'ContractPriority', 'IncidentStatus', 'IncidentPriority', 'PaymentKind');
+  $query = "INSERT INTO %s (%s) SELECT %s FROM %s JOIN Domain ON %s = domain_id WHERE domain_global = true GROUP BY %s
+    ";
+  foreach ($tables as $table ) {
+    $dynamicfields = array();
+    $staticfields = array();
+    $domain_field = null;
+    $fields = $db->metadata($table, false);
+    foreach ($fields as $field) {
+      if(strpos(strtolower($field['flags']),'primary') === false) {
+        if(strpos(strtolower($field['name']),'domain_id') !==false) {
+          $staticfields[$field['name']] = $id;
+          $domain_field = $field['name'];
+        } elseif (strpos(strtolower($field['name']),'timeupdate') !==false) {
+          $staticfields[$field['name']] = 'NULL';
+        } elseif (strpos(strtolower($field['name']),'timecreate') !==false) {
+          $staticfields[$field['name']] = 'NOW()';
+        } elseif (strpos(strtolower($field['name']),'userupdate') !==false) {
+          $staticfields[$field['name']] = 'NULL';
+        } elseif (strpos(strtolower($field['name']),'usercreate') !==false) {
+          $staticfields[$field['name']] = $obm['uid'];
+        } else {
+          $dynamicfields[] = $field['name'];
+        }
+      }
+    }
+    $squery = sprintf($query, $table, implode(', ',array_merge($dynamicfields,array_keys($staticfields))), 
+                                      implode(', ', array_merge($dynamicfields, array_values($staticfields))),
+                                      $table, $domain_field, implode(', ', $dynamicfields));
+    $db->query($squery);
+  }
 
+}
 /**
  * Query execution : DomainMailServer deletion
  *
