@@ -2700,7 +2700,7 @@ function get_one_event_user_alert($event_id, $user_id = null) {
 
   if($user_id) {
     $user_id = sql_parse_id($user_id, true);
-    $query .= "AND calendaralert_user_id $user_id"; 
+    $query .= " AND calendaralert_user_id $user_id"; 
   }
 
   display_debug_msg($query, $cdg_sql, 'get_one_event_user_alert()');
