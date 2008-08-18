@@ -621,7 +621,7 @@ function run_query_user_insert($user) {
       if ($doc_id > 0) {
         // Update userobm_photo_id
         $doc_id = sql_parse_id($doc_id);
-        $uid = sql_parse_id($uid, true);
+        $uid = sql_parse_id($id, true);
         $query = "UPDATE UserObm SET userobm_photo_id=$doc_id WHERE userobm_id $uid"; 
         display_debug_msg($query, $cdg_sql, 'run_query_user_insert(3)');
         $obm_q->query($query);
@@ -994,7 +994,7 @@ function run_query_user_update($p_id, $user) {
 
   // Update photo
   if(isset($user['file_tmp']) && $user['file_tmp'] != '') {
-    $user['title'] = $login;
+    $user['title'] = $user['login'];
 
     // Select user photo
     $query = "SELECT userobm_photo_id FROM UserObm WHERE userobm_id $id ";
