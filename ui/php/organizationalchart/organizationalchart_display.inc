@@ -1492,19 +1492,31 @@ function organizationalchart_json_event($usr_q) {
   global $display, $obm, $cgp_use;
 
   $userobm_email = $usr_q->f("userobm_email");
-  $email = get_entity_email($usr_q->f("userobm_email"));
+  // $email = get_entity_email($usr_q->f("userobm_email"));
 
+  if( get_last_domain_text($usr_q->f("userobm_domain_id")) != "") {
+    $main_domain = get_last_domain_text($usr_q->f("userobm_domain_id"));
+  } else {
+    $main_domain = $obm["domain_name"];
+  }  
+  $email = get_entity_email($usr_q->f("userobm_email"),$main_domain, false);
 
   if (strlen($email) > 30 ) {
     $email = substr($email, 0, 30)."...";
   }
 
+  $name = phpStringToJsString($usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname"));
+  $title = phpStringToJsString($usr_q->f("userobm_title"));
+  $phone = phpStringToJsString($usr_q->f("userobm_phone"));
+  $mphone = phpStringToJsString($usr_q->f("userobm_mobile"));
+  $email = phpStringToJsString($email);
+
   $info[] = "id:".$usr_q->f("userobm_id");
-  $info[] = "name:'".$usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname")."'";
+  $info[] = "name:'$name'";
   $info[] = "photo:'".$usr_q->f("userobm_photo_id")."'";
-  $info[] = "title:'".$usr_q->f("userobm_title")."'";
-  $info[] = "phone:'".$usr_q->f("userobm_phone")."'";
-  $info[] = "mphone:'".$usr_q->f("userobm_mobile")."'";
+  $info[] = "title:'$title'";
+  $info[] = "phone:'$phone'";
+  $info[] = "mphone:'$mphone'";
   $info[] = "email:'$email'";
 
   $json = implode(",",$info);
