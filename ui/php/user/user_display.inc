@@ -477,7 +477,7 @@ function html_user_consult($obm_q) {
   $delegation_target = $obm_q->f("userobm_delegation_target");
   $delegation = $obm_q->f("userobm_delegation");
   $desc = $obm_q->f("userobm_description");
-  $datebegin = $obm_q->f("userobm_datebegin");
+  $datebegin = of_date_format($obm_q->f("datebegin"));
   $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
   $archive = ($obm_q->f("userobm_archive") == '1' ? $l_yes : $l_no);
   $hidden = ($obm_q->f("userobm_hidden") == '1' ? $l_yes : $l_no);
@@ -523,8 +523,8 @@ function html_user_consult($obm_q) {
   $nomade_enable = $obm_q->f("userobm_nomade_enable");
   $nomade_local_copy = $obm_q->f("userobm_nomade_local_copy");
   $vacation_enable = $obm_q->f("userobm_vacation_enable");
-  $vacation_datebegin = of_datetime_format($obm_q->f("vacation_datebegin"), 1);
-  $vacation_dateend = of_datetime_format($obm_q->f("vacation_dateend"), 1);
+  $vacation_datebegin = of_datetime_format($obm_q->f("userobm_vacation_datebegin"), 1);
+  $vacation_dateend = of_datetime_format($obm_q->f("userobm_vacation_dateend"), 1);
   $vacation_message = stripslashes($obm_q->f("userobm_vacation_message"));
   $smb_perms = $obm_q->f("userobm_samba_perms");
   $smb_home = $obm_q->f("userobm_samba_home");
@@ -1033,8 +1033,8 @@ function html_user_form($usr_q, $user, $field='') {
     // vacation
     $vacation_enable = $usr_q->f("userobm_vacation_enable");
     $vacation_message = stripslashes($usr_q->f("userobm_vacation_message"));
-    $vacation_datebegin = $usr_q->f("vacation_datebegin");
-    $vacation_dateend = $usr_q->f("vacation_dateend");
+    $vacation_datebegin = $usr_q->f("userobm_vacation_datebegin");
+    $vacation_dateend = $usr_q->f("userobm_vacation_dateend");
     $hourbegin = date("H",$vacation_datebegin);
     $minbegin = date("i",$vacation_datebegin);
     $hourend = date("H",$vacation_dateend);

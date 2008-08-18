@@ -278,6 +278,8 @@ function run_query_user_detail($p_id) {
   $timecreate = sql_date_format($db_type, 'UserObm.userobm_timecreate', 'timecreate');
   $datebegin = sql_date_format($db_type, 'UserObm.userobm_datebegin', 'datebegin');
   $lastaccess = sql_date_format($db_type, 'UserObm.userobm_timelastaccess', 'userobm_timelastaccess');
+  $vacation_datebegin = sql_date_format($db_type, 'UserObm.userobm_vacation_datebegin', 'userobm_vacation_datebegin');
+  $vacation_dateend = sql_date_format($db_type, 'UserObm.userobm_vacation_dateend', 'userobm_vacation_dateend');
   $multidomain = sql_multidomain('UserObm.userobm');
   $p_id = sql_parse_id($p_id, true);	
   $query = "SELECT UserObm.*,
@@ -285,6 +287,8 @@ function run_query_user_detail($p_id) {
       $timecreate,
       $datebegin,
       $lastaccess,
+      $vacation_datebegin,
+      $vacation_dateend,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
       domain_label,
@@ -791,8 +795,13 @@ function run_query_user_update($p_id, $user) {
   if ($cgp_use['service']['mail_vacation']) {
     $vacation_enable = sql_parse_int($user['vacation_enable']);
     $vacation_message = $user['vacation_message'];
+    $vacation_datebegin = ($user['vacation_datebegin'] ? "'".of_isodate_convert($user['vacation_datebegin'])." ".$user['time_begin'].":".$user['min_begin'].":00'" : 'null');
+    $vacation_dateend = ($user['vacation_dateend'] ? "'".of_isodate_convert($user['vacation_dateend'])." ".$user['time_end'].":".$user['min_end'].":00'" : 'null');
+    $vacation_message = $user['vacation_message'];
     $query_mail_vacation = ",
     userobm_vacation_enable=$vacation_enable,
+    userobm_vacation_datebegin=$vacation_datebegin,
+    userobm_vacation_dateend=$vacation_dateend,
     userobm_vacation_message='$vacation_message'";
   }
 
