@@ -419,7 +419,8 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
     $ctt[2]['value'] = 'userobm_firstname';
     $e_label = sql_string_concat($db_type, $ctt);
     $u = get_user_info($user_id);
-    $union = "UNION SELECT '$u[id]' as id, '$u[lastname] $u[firstname]' as label, '$entity' as entityright_entity" ;
+    $u_label = addslashes("$u[lastname] $u[firstname]");    
+    $union = "UNION SELECT '$u[id]' as id, '$u_label' as label, '$entity' as entityright_entity" ;
   } else {
     $table_entity = "$entityu";
     $e_id = "e.${entity}_id";
