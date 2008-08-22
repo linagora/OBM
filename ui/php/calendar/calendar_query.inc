@@ -1011,7 +1011,7 @@ function run_query_calendar_update_event_data($calendar) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
   $obm_q->query($query);
 
-  $query = "DELETE FROM CalendarException WHERE calendarexception_event_id  $event_id'"; 
+  $query = "DELETE FROM CalendarException WHERE calendarexception_event_id  $event_id"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(2)');
   $obm_q->query($query);
 
