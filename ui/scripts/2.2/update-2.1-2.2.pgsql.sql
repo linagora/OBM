@@ -9,6 +9,13 @@ INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_nam
 UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
+-- P_Domain
+ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
+-- Global Domain
+INSERT INTO P_Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virtual', TRUE);
+UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
+UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
+
 -- OGroup
 ALTER TABLE OGroup ALTER COLUMN ogroup_parent_id DROP NOT NULL;
 
