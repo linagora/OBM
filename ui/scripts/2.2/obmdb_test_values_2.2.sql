@@ -14,14 +14,12 @@
 -- Create first user domain
 --
 INSERT INTO Domain (
-  domain_id,
   domain_timecreate,
   domain_usercreate,
   domain_label,
   domain_description,
   domain_name)
 VALUES (
-  1,
   '2007-04-23 11:45:59',
   0,
   'Domain 1',
