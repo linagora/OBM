@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId _log);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -39,10 +39,10 @@ sub new {
 
 
     if( !defined($links) || !defined($deleted) || !defined($hostId) ) {
-        croak( "Usage: PACKAGE->new(LINKS, DELETED, HOSTID)" );
-
+        $self->_log( 'Usage: PACKAGE->new(LINKS, DELETED, HOSTID)', 1 );
+        return undef;
     }elsif( $hostId !~ /^\d+$/ ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: identifiant d'hote incorrect", "W" );
+        $self->_log( "[Entities::obmHost]: identifiant d'hote incorrect", 2 );
         return undef;
     }else {
         $obmHostAttr{"objectId"} = $hostId;
@@ -70,18 +70,18 @@ sub getEntity {
 
     my $hostId = $self->{"objectId"};
     if( !defined($hostId) ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: aucun identifiant d'hote definit", "W" );
+        $self->_log( '[Entities::obmHost]: aucun identifiant d\'hote definit', 3 );
         return 0;
     }
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: connecteur a la base de donnee invalide", "W" );
+        $self->_log( '[Entities::obmHost]: connecteur a la base de donnee invalide', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: description de domaine OBM incorrecte", "W" );
+        $self->_log( '[Entities::obmHost]: description de domaine OBM incorrecte', 3 );
         return 0;
 
     }else {
@@ -100,7 +100,7 @@ sub getEntity {
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
+        $self->_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
         return 0;
     }
 
@@ -108,10 +108,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: pas d'hote d'identifiant : ".$hostId, "W" );
+        $self->_log( '[Entities::obmHost]: pas d\'hote d\'identifiant : '.$hostId, 3 );
         return 0;
     }elsif( $numRows > 1 ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: plusieurs hotes d'identifiant : ".$hostId." ???", "W" );
+        $self->_log( '[Entities::obmHost]: plusieurs hotes d\'identifiant : '.$hostId.' ???', 3 );
         return 0;
     }
 
@@ -120,7 +120,7 @@ sub getEntity {
 
     # On exécute la requête
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
+        $self->_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
         return 0;
     }
 
@@ -132,9 +132,9 @@ sub getEntity {
     $self->{"hostDbDesc"} = $dbEntry;
 
     if( $self->getDelete() ) {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: gestion de l'hote supprime : ".$self->getEntityDescription(), "W" );
+        $self->_log( '[Entities::obmHost]: suppression de l\'hote : '.$self->getEntityDescription(), 1 );
     }else {
-        &OBM::toolBox::write_log( "[Entities::obmHost]: gestion de l'hote : ".$self->getEntityDescription(), "W" );
+        $self->_log( '[Entities::obmHost]: gestion de l\'hote : '.$self->getEntityDescription(), 1 );
     }
 
     # On range les résultats calculés dans la structure de données dédiée
@@ -156,7 +156,7 @@ sub getEntity {
         $self->{hostDesc}->{host_samba_flags} = "[W]";
 
         if( &OBM::passwd::getNTLMPasswd( $dbEntry->{host_name}, \$self->{hostDesc}->{"host_lm_passwd"}, \$self->{hostDesc}->{"host_nt_passwd"} ) ) {
-            &OBM::toolBox::write_log( "[Entities::obmHost]: probleme lors de la generation du mot de passe de l'hote : ".$self->getEntityDescription(), "W" );
+            $self->_log( '[Entities::obmHost]: probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getEntityDescription(), 2 );
             return 0;
         }
 
@@ -188,7 +188,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    &OBM::toolBox::write_log( '[Entities::obmHost]: MAJ de l\'hote '.$self->getEntityDescription().' dans les tables de production', 'W' );
+    $self->_log( '[Entities::obmHost]: MAJ de l\'hote '.$self->getEntityDescription().' dans les tables de production', 1 );
 
     # Champs de la BD qui ne sont pas mis à jour car champs références
     my $exceptFields = '^(host_id)$';
@@ -211,7 +211,7 @@ sub updateDbEntity {
     my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
                                                                               
     if( !defined($result) ) {
-        &OBM::toolBox::write_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
+        $self->_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
         return 0;
 
     }elsif( $result == 0 ) {
@@ -226,15 +226,15 @@ sub updateDbEntity {
 
         $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
         if( !defined($result) ) {
-            &OBM::toolBox::write_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
+            $self->_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
             return 0;
         }elsif( $result != 1 ) {
-            &OBM::toolBox::write_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : hote insere '.$result.' fois dans les tables de production !', 'W', 2 );
+            $self->_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : hote insere '.$result.' fois dans les tables de production !', 2 );
             return 0;
         }
     }
 
-    &OBM::toolBox::write_log( '[Entities::obmHost]: MAJ des tables de production reussie', 'W', 2 );
+    $self->_log( '[Entities::obmHost]: MAJ des tables de production reussie', 2 );
 
     return 1;
 }
@@ -248,7 +248,7 @@ sub updateDbEntityLinks {
 #        return 0;
 #    }
 #
-#    &OBM::toolBox::write_log( "[Entities::obmHost]: MAJ des liens de l'hote ".$self->getEntityDescription()." dans les tables de production", "W" );
+#    $self->_log( "[Entities::obmHost]: MAJ des liens de l'hote ".$self->getEntityDescription()." dans les tables de production", 1 );
 
     return 1;
 }

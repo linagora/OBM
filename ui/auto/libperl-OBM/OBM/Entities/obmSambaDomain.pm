@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId _log);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -60,12 +60,12 @@ sub getEntity {
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "[Entities::obmSambaDomain]: connecteur a la base de donnee invalide", "W" );
+        $self->_log( '[Entities::obmSambaDomain]: connecteur a la base de donnee invalide', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "[Entities::obmSambaDomain]: description de domaine OBM incorrecte", "W" );
+        $self->_log( '[Entities::obmSambaDomain]: description de domaine OBM incorrecte', 3 );
         return 0;
 
     }else {
@@ -74,7 +74,7 @@ sub getEntity {
     }
 
 
-    &OBM::toolBox::write_log( "[Entities::obmSambaDomain]: gestion de la configuration du domaine Samba, domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    $self->_log( '[Entities::obmSambaDomain]: gestion de la configuration du domaine Samba, domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
 
 
     $self->{"sambaConf"}->{"sambaConf_domain"} = $domainDesc->{"domain_label"};

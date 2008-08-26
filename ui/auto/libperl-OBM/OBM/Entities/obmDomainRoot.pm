@@ -1,6 +1,6 @@
 package OBM::Entities::obmDomainRoot;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 $debug = 1;
 
@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId _log);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -31,19 +31,19 @@ sub new {
 
 
     if( !defined($links) || !defined($deleted) ) {
-        croak( "Usage: PACKAGE->new(LINKS, DELETED)" );
-
+        $self->_log( 'Usage: PACKAGE->new(LINKS, DELETED)', 1 );
+        return undef;
     }
 
-    $obmDomainRootAttr{"links"} = $links;
-    $obmDomainRootAttr{"toDelete"} = $deleted;
+    $obmDomainRootAttr{'links'} = $links;
+    $obmDomainRootAttr{'toDelete'} = $deleted;
 
-    $obmDomainRootAttr{"type"} = $OBM::Parameters::ldapConf::DOMAINROOT;
+    $obmDomainRootAttr{'type'} = $OBM::Parameters::ldapConf::DOMAINROOT;
 
     # Définition de la représentation LDAP de ce type
-    $obmDomainRootAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmDomainRootAttr{"type"}}->{objectclass};
-    $obmDomainRootAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmDomainRootAttr{"type"}}->{dn_prefix};;
-    $obmDomainRootAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmDomainRootAttr{"type"}}->{dn_value};
+    $obmDomainRootAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmDomainRootAttr{'type'}}->{objectclass};
+    $obmDomainRootAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmDomainRootAttr{'type'}}->{dn_prefix};;
+    $obmDomainRootAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmDomainRootAttr{'type'}}->{dn_value};
 
     bless( \%obmDomainRootAttr, $self );
 }
@@ -53,15 +53,15 @@ sub getEntity {
     my $self = shift;
     my( $domainDesc ) = @_;
 
-    if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "[Entities::obmDomainRoot]: description de domaine OBM incorrecte", "W" );
+    if( !defined($domainDesc->{'domain_id'}) || ($domainDesc->{'domain_id'} !~ /^\d+$/) ) {
+        $self->_log( '[Entities::obmDomainRoot]: description de domaine OBM incorrecte', 3 );
         return 0;
     }else {
         # On positionne l'identifiant du domaine de l'entité
-        $self->{"domainId"} = $domainDesc->{"domain_id"};
+        $self->{'domainId'} = $domainDesc->{'domain_id'};
     }
 
-    $self->{"domainDesc"} = $domainDesc;
+    $self->{'domainDesc'} = $domainDesc;
 
     return 1;
 }
@@ -71,8 +71,8 @@ sub getLdapDnPrefix {
     my $self = shift;
     my $dnPrefix = undef;
 
-    if( defined($self->{"dnPrefix"}) && defined($self->{"domainDesc"}->{$self->{"dnValue"}}) ) {
-        $dnPrefix = $self->{"dnPrefix"}."=".$self->{"domainDesc"}->{"domain_dn"};
+    if( defined($self->{'dnPrefix'}) && defined($self->{'domainDesc'}->{$self->{'dnValue'}}) ) {
+        $dnPrefix = $self->{'dnPrefix'}.'='.$self->{'domainDesc'}->{'domain_dn'};
     }
 
     return $dnPrefix;
@@ -124,7 +124,7 @@ sub updateLdapEntryDn {
 sub updateLdapEntry {
     my $self = shift;
     my( $ldapEntry, $objectclassDesc ) = @_;
-    my $entry = $self->{"domainDesc"};
+    my $entry = $self->{'domainDesc'};
 
     require OBM::Entities::entitiesUpdateState;
     my $update = OBM::Entities::entitiesUpdateState->new();
@@ -135,11 +135,11 @@ sub updateLdapEntry {
     }
 
 
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"domain_label"}, $ldapEntry, "o" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{'domain_label'}, $ldapEntry, 'o' ) ) {
         $update->setUpdate();
     }
 
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"domain_desc"}, $ldapEntry, "description" ) ) {
+    if( &OBM::Ldap::utils::modifyAttr( $entry->{'domain_desc'}, $ldapEntry, 'description' ) ) {
         $update->setUpdate();
     }
 

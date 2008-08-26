@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId _log);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -38,12 +38,11 @@ sub new {
 
 
     if( !defined($links) || !defined($deleted) || !defined($userId) ) {
-        croak( "Usage: PACKAGE->new(LINKS, DELETED, USERID)" );
-
-    }elsif( $userId !~ /^\d+$/ ) {
-        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: identifiant d'utilisateur incorrect", "W" );
+        $self->_log( 'Usage: PACKAGE->new(LINKS, DELETED, USERID)', 1 );
         return undef;
-
+    }elsif( $userId !~ /^\d+$/ ) {
+        $self->_log( '[Entities::obmSystemUser]: identifiant d\'utilisateur incorrect', 2 );
+        return undef;
     }else {
         $obmSystemUserAttr{"objectId"} = $userId;
     }
@@ -71,18 +70,18 @@ sub getEntity {
 
     my $userId = $self->{"objectId"};
     if( !defined($userId) ) {
-        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: aucun identifiant d'utilisateur systeme definit", "W" );
+        $self->_log( '[Entities::obmSystemUser]: aucun identifiant d\'utilisateur systeme definit', 3 );
         return 0;
     }
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: connecteur a la base de donnee invalide", "W" );
+        $self->_log( '[Entities::obmSystemUser]: connecteur a la base de donnee invalide', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: description de domaine OBM incorrecte", "W" );
+        $self->_log( '[Entities::obmSystemUser]: description de domaine OBM incorrecte', 3 );
         return 0;
 
     }else {
@@ -100,7 +99,7 @@ sub getEntity {
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W', 2 );
+        $self->_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 2 );
         return 0;
     }
 
@@ -108,10 +107,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: pas d'utilisateur d'identifiant : ".$userId, "W" );
+        $self->_log( '[Entities::obmSystemUser]: pas d\'utilisateur d\'identifiant : '.$userId, 3 );
         return 0;
     }elsif( $numRows > 1 ) {
-        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: plusieurs utilisateurs d'identifiant : ".$userId." ???", "W" );
+        $self->_log( '[Entities::obmSystemUser]: plusieurs utilisateurs d\'identifiant : '.$userId.' ???', 3 );
         return 0;
     }
 
@@ -121,7 +120,7 @@ sub getEntity {
 
     # On execute la requete
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W', 2 );
+        $self->_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 2 );
         return 0;
     }
 
@@ -129,9 +128,8 @@ sub getEntity {
     my( $user_id, $user_login, $user_password, $user_uid, $user_gid, $user_homedir, $user_lastname, $user_firstname, $user_shell ) = $queryResult->fetchrow_array();
     $queryResult->finish();
 
-    # Positionnement du flag archive
-        &OBM::toolBox::write_log( "[Entities::obmSystemUser]: gestion de l'utilisateur '".$user_login."', domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
+    $self->_log( '[Entities::obmSystemUser]: gestion de l\'utilisateur \''.$user_login.'\', domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
         
     # On cree la structure correspondante a l'utilisateur
     # Cette structure est composee des valeurs recuperees dans la base

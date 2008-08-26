@@ -21,6 +21,7 @@ $VERSION = "1.0";
                     getEntityId
                     makeEntityEmail
                     getMailboxDefaultFolders
+                    _log
                );
 
 
@@ -131,4 +132,24 @@ sub getMailboxDefaultFolders {
     my $entryProp = $self->{"properties"};
 
     return $self->{"properties"}->{mailbox_folders};
+}
+
+
+sub _log {
+    my $self = shift;
+    my( $text, $level ) = @_;
+    require OBM::Tools::obmLog;
+
+    if( !defined($text) ) {
+        return 1;
+    }
+
+    if( !defined($level) || ($level !~ /^[0-9]+$/) ) {
+        $level = 0;
+    }
+
+    my $logObject = OBM::Tools::obmLog->instance();
+    $logObject->writeLog( $text, $level, undef );
+
+    return 0;
 }

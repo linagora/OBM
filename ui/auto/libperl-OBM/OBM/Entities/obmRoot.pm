@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId _log);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -55,7 +55,7 @@ sub getEntity {
     my( $name, $description, $domainDesc ) = @_;
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "[Entities::obmRoot]: description de domaine OBM incorrecte", "W" );
+        $self->_log( '[Entities::obmRoot]: description de domaine OBM incorrecte', 3 );
         return 0;
     }else {
         # On positionne l'identifiant du domaine de l'entité
@@ -65,7 +65,7 @@ sub getEntity {
     if( defined($name) ) {
         $self->{"nodeDesc"}->{"name"} = $name;
     }else {
-        &OBM::toolBox::write_log( "[Entities::obmRoot]: nom de noeud invalide", "W" );
+        $self->_log( '[Entities::obmRoot]: nom de noeud invalide', 3 );
         return 0;
     }
 

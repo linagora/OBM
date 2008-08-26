@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId _log);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -36,8 +36,8 @@ sub new {
 
 
     if( !defined($links) || !defined($deleted) ) {
-        croak( "Usage: PACKAGE->new(LINKS)" );
-
+        $self->_log( 'Usage: PACKAGE->new(LINKS)', 1 );
+        return undef;
     }
 
     $obmMailServerConfAttr{"links"} = $links;
@@ -60,12 +60,12 @@ sub getEntity {
 
 
     if( !defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "[Entities::obmMailServer]: connecteur a la base de donnee invalide", "W" );
+        $self->_log( '[Entities::obmMailServer]: connecteur a la base de donnee invalide', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        &OBM::toolBox::write_log( "[Entities::obmMailServer]: description de domaine OBM incorrecte", "W" );
+        $self->_log( '[Entities::obmMailServer]: description de domaine OBM incorrecte', 3 );
         return 0;
 
     }else {
@@ -74,7 +74,7 @@ sub getEntity {
     }
 
 
-    &OBM::toolBox::write_log( "[Entities::obmMailServer]: gestion de la configuration de postfix, domaine '".$domainDesc->{"domain_label"}."'", "W" );
+    $self->_log( '[Entities::obmMailServer]: gestion de la configuration de postfix, domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
 
     $self->{"postfixConf"}->{"postfixconf_name"} = $domainDesc->{"domain_label"};
     $self->{"postfixConf"}->{"postfixconf_domain"} = $domainDesc->{"domain_label"};
@@ -92,7 +92,7 @@ sub getEntity {
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
+        $self->_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 2 );
         return 0;
     }
 
