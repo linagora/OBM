@@ -85,3 +85,86 @@ sub destroy {
 
     return 0;
 }
+
+# Perldoc
+
+=head1 NAME
+
+OBM::Tools::obmLog - Logger object
+
+=head1 SYNOPSIS
+
+    use OBM::Tools::obmLog
+
+    # Initialise a new logger object or get the already initialized object
+    my $logger = OBM::Tools::obmLog->instance();
+
+    # Write a new message with a level priority set to 2
+    $logger->writeLog( 'My message', 2 );
+
+=head1 DESCRIPTION
+
+This object is used to write message into log files througth a unique way.
+
+It use the 'OBM::Parameters::common::facility_log' as syslog facility and
+'OBM::Parameters::common::logLevel' as default log level.
+
+By default, message use the 'notice' syslog priority
+
+The default log level can be set via ithe 'logLevel' directive of
+'obm_conf.ini'.
+
+Only message with a lesser or equal level will be logged via syslog.
+
+Available level are :
+
+=over 4
+
+=item 0 : only critical informations (script name, critical errors...) ;
+
+=item 1 : basics informations ;
+
+=item 2 : advanced informations - default level ;
+
+=item 3 : low debug informations ;
+
+=item 4 : high debug informations.
+
+=back
+
+=head1 CONSTRUCTOR
+
+instance ()
+
+    Initialise a new logger object or get the already initialized object.
+
+    Use current script name as 'logId', which is the first word on the syslog
+    messages.
+
+instance ( myWord )
+
+    Initialise a new logger object or get the already initialized object.
+
+    Use 'myWord' as 'logId', which is the first word on the syslog messages.
+
+=head1 METHODS
+
+=head2 PUBLICS
+
+writeLog ( $text, $level, $priority )
+
+    write 'text' as 'level' and 'priority'.
+
+    If no 'priority' set, 'notice' is used.
+
+    if no 'level' set, '0' is used.
+
+destroy ()
+
+    close syslog connection
+
+=head2 PRIVATE
+
+_openLog ()
+
+    try to establish a syslog connection
