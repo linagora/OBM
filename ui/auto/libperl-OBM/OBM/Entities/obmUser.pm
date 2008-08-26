@@ -108,7 +108,6 @@ sub getEntity {
 
 
     my $query = "SELECT COUNT(*) FROM ".$userObmTable." LEFT JOIN ".$mailServerTable." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
-    &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
@@ -130,7 +129,6 @@ sub getEntity {
 
     # Obtention de la description BD de l'utilisateur
     $query = "SELECT * FROM ".$userObmTable." WHERE userobm_id=".$userId;
-    &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
 
     # On exécute la requête
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
@@ -159,7 +157,6 @@ sub getEntity {
                     LEFT JOIN P_".$userObmTable." k ON k.userobm_id=j.userobm_id
                     WHERE j.userobm_id=".$userId;
     }
-    &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
 
     # On exécute la requête
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
@@ -460,7 +457,6 @@ sub updateDbEntity {
     }
     
     my $query = 'UPDATE P_UserObm SET '.join( ', ', @updateFields ).' WHERE '.join( ' AND ', @whereFields );
-    &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
 
 
     my $queryResult;
@@ -479,7 +475,6 @@ sub updateDbEntity {
         }
 
         $query = 'INSERT INTO P_UserObm ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')';
-        &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
 
         $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
         if( !defined($result) ) {
@@ -509,8 +504,6 @@ sub updateDbEntityLinks {
 
     # On supprime les liens actuels de la table de production
     my $query = "DELETE FROM P_EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"objectId"};
-    &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
-
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
@@ -520,8 +513,6 @@ sub updateDbEntityLinks {
 
     # On copie les nouveaux droits
     $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"objectId"};
-    &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
-
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
@@ -554,8 +545,6 @@ sub updateDbEntityPassword {
     
 
     my $query = "UPDATE UserObm SET userobm_password_type=".$dbHandler->quote($passwordDesc->{newPasswordType}).", userobm_password=".$dbHandler->quote($passwordDesc->{newPassword})." WHERE userobm_id=".$self->{objectId};
-    &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
-
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
@@ -563,8 +552,6 @@ sub updateDbEntityPassword {
 
 
     $query = "UPDATE P_UserObm SET userobm_password_type=".$dbHandler->quote($passwordDesc->{newPasswordType}).", userobm_password=".$dbHandler->quote($passwordDesc->{newPassword})." WHERE userobm_id=".$self->{objectId};
-    &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
-
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
@@ -1430,9 +1417,6 @@ sub getHostIpById {
     }
 
     my $query = "SELECT host_ip FROM ".$hostTable." WHERE host_id='".$hostId."'";
-    &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
-
-
     # On execute la requete
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {

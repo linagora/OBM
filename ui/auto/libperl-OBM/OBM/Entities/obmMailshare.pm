@@ -101,8 +101,6 @@ sub getEntity {
     }
 
     my $query = "SELECT COUNT(*) FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
-    &OBM::toolBox::write_log( '[Entities::obmMailshare]: '.$query, 'W', 3 );
-
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
@@ -123,8 +121,6 @@ sub getEntity {
 
     # Obtention de la description BD de l'utilisateur
     $query = "SELECT * FROM ".$mailShareTable." WHERE mailshare_id=".$mailShareId;
-    &OBM::toolBox::write_log( '[Entities::obmMailshare]: '.$query, 'W', 3 );
-
     # On execute la requete
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
@@ -142,8 +138,6 @@ sub getEntity {
     # La requete a exécuter - obtention des informations sur le répertoire
     # partagé
     $query = "SELECT * FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
-    &OBM::toolBox::write_log( '[Entities::obmMailshare]: '.$query, 'W', 3 );
-
     # On exécute la requête
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
@@ -286,9 +280,6 @@ sub updateDbEntity {
     }
 
     my $query = 'UPDATE P_MailShare SET '.join( ', ', @updateFields ).' WHERE '.join( ' AND ', @whereFields );
-    &OBM::toolBox::write_log( '[Entities::obmMailshare]: '.$query, 'W', 3 );
-    
-    
     my $queryResult;
     my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
 
@@ -305,8 +296,6 @@ sub updateDbEntity {
         }
 
         $query = 'INSERT INTO P_MailShare ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')';
-        &OBM::toolBox::write_log( '[Entities::obmMailshare]: '.$query, 'W', 3 );
-
         $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
         if( !defined($result) ) {
             &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettre partagee : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
@@ -337,8 +326,6 @@ sub updateDbEntityLinks {
 
     # On supprime les liens actuels de la table de production
     my $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"objectId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
-    &OBM::toolBox::write_log( '[Entities::obmMailshare]: '.$query, 'W', 3 );
-
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
@@ -347,8 +334,6 @@ sub updateDbEntityLinks {
 
     # On copie les nouveaux droits
     $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"objectId"};
-    &OBM::toolBox::write_log( '[Entities::obmMailshare]: '.$query, 'W', 3 );
-
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         return 0;
@@ -717,9 +702,7 @@ sub getHostIpById {
     }
 
     my $query = "SELECT host_ip FROM ".$hostTable." WHERE host_id='".$hostId."'";
-    &OBM::toolBox::write_log( '[Entities::obmMailshare]: '.$query, 'W', 3 );
-
-    # On execute la requete
+    # On exécute la requête
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
         &OBM::toolBox::write_log( '[Entities::obmMailshare]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );

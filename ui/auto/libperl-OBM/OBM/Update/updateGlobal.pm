@@ -211,7 +211,7 @@ sub _doGlobalUpdate {
     }
 
 
-    # Uniquement pour le metadomaine
+    # Uniquement pour le métadomaine
     if( $self->{"domain"} == 0 ) {
         # Traitement des entités de type 'utilisateur système'
         my $query = "SELECT usersystem_id FROM UserSystem";

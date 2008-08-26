@@ -519,9 +519,12 @@ sub _doWork {
                 &OBM::toolBox::write_log( "[Ldap::ldapEngine]: creation du DN '".$newDn."'", "W" );
 
                 $ldapEntry->dn( to_utf8( { -string => $newDn, -charset => $defaultCharSet } ) );
-            }
 
-            if( $self->updateLdapEntity($ldapEntry) ) {
+                if( $self->updateLdapEntity($ldapEntry) ) {
+                    return 0;
+                }
+            }else {
+                &OBM::toolBox::write_log( '[Ldap::ldapEngine]: probleme a la generation de la representation LDAP de l\'objet : '.$object->getEntityDescription(), 'W', 1 );
                 return 0;
             }
 

@@ -209,7 +209,6 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
               WHERE
                 domainpropertyvalue_domain_id='.$domain->{'domain_id'}.' AND
                 domainpropertyvalue_property_key=\'last_public_contact_export\'';
-    &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
 
     my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
     if( !defined($result) ) {
@@ -220,7 +219,6 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
                     (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value)
                   VALUES
                     ('.$domain->{'domain_id'}.', \'last_public_contact_export\', \''.$timeStamp.'\')';
-        &OBM::toolBox::write_log( '[Entities::obmUser]: '.$query, 'W', 3 );
 
         if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
             &OBM::toolBox::write_log( 'Probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );

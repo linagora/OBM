@@ -10,6 +10,7 @@
 package OBM::dbUtils;
 
 use OBM::Parameters::common;
+require OBM::toolBox;
 require DBI;
 require Exporter;
 
@@ -75,6 +76,7 @@ sub execQuery {
 	}else {
 		# On prépare la rêquete, puis on l'exécute et analyse la valeur
 		# retour.
+        &OBM::toolBox::write_log( '[dbUtils]: requete a executer : \''.$query.'\'', 'W', 3 );
 		$sth = $dbh->prepare( $query );
 		my $rv = $sth->execute();
 

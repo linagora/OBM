@@ -97,7 +97,6 @@ sub getEntity {
 
 
     my $query = "SELECT COUNT(*) FROM ".$hostTable." WHERE host_id=".$hostId;
-    &OBM::toolBox::write_log( '[Entities::obmHost]: '.$query, 'W', 3 );
 
     my $queryResult;
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
@@ -118,7 +117,6 @@ sub getEntity {
 
     # La requête à exécuter - obtention des informations sur l'hôte
     $query = "SELECT * FROM ".$hostTable." WHERE host_id=".$hostId;
-    &OBM::toolBox::write_log( '[Entities::obmHost]: '.$query, 'W', 3 );
 
     # On exécute la requête
     if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
@@ -207,7 +205,6 @@ sub updateDbEntity {
     }
 
     my $query = 'UPDATE P_Host SET '.join( ', ', @updateFields ).' WHERE '.join( ' AND ', @whereFields );
-    &OBM::toolBox::write_log( '[Entities::obmHost]: '.$query, 'W', 3 );
 
 
     my $queryResult;
@@ -226,7 +223,6 @@ sub updateDbEntity {
         }
 
         $query = 'INSERT INTO P_Host ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')';
-        &OBM::toolBox::write_log( '[Entities::obmHost]: '.$query, 'W', 3 );
 
         $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
         if( !defined($result) ) {
