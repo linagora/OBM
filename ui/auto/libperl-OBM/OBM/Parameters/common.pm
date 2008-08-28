@@ -11,7 +11,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $renameUserMailbox $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $renameUserMailbox $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_regexp = qw($regexp_email $regexp_email_left $regexp_rootLdap $regexp_login $regexp_passwd $regexp_domain $regexp_login $regexp_ip);
@@ -106,6 +106,8 @@ if( !defined($logLevel) || ($logLevel !~ /^[0-9]+$/) ) {
 }
 $facility_log = "local1";
 
+# Le login de l'administrateur LDAP
+$ldapAdminLogin = "ldapadmin";
 # Le serveur LDAP
 $ldapServer = $cfgFile->val( 'automate', 'ldapServer' );
 if( !defined($ldapServer) ) {

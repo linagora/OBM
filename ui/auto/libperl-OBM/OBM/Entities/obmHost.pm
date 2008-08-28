@@ -12,8 +12,7 @@ use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLi
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
-require OBM::toolBox;
-require OBM::dbUtils;
+require OBM::Tools::obmDbHandler;
 require OBM::passwd;
 use URI::Escape;
 
@@ -66,7 +65,7 @@ sub new {
 
 sub getEntity {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     my $hostId = $self->{"objectId"};
     if( !defined($hostId) ) {
@@ -75,6 +74,7 @@ sub getEntity {
     }
 
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         $self->_log( '[Entities::obmHost]: connecteur a la base de donnee invalide', 3 );
         return 0;
@@ -99,8 +99,7 @@ sub getEntity {
     my $query = "SELECT COUNT(*) FROM ".$hostTable." WHERE host_id=".$hostId;
 
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -119,8 +118,7 @@ sub getEntity {
     $query = "SELECT * FROM ".$hostTable." WHERE host_id=".$hostId;
 
     # On exécute la requête
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmHost]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -168,7 +166,7 @@ sub getEntity {
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
     if( $self->isLinks() ) {
-        $self->getEntityLinks( $dbHandler, $domainDesc );
+        $self->getEntityLinks( $domainDesc );
     }
 
     return 1;
@@ -177,8 +175,8 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
-    my( $dbHandler ) = @_;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         return 0;
     }
@@ -208,10 +206,10 @@ sub updateDbEntity {
 
 
     my $queryResult;
-    my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+    my $result = $dbHandler->execQuery( $query, \$queryResult );
                                                                               
     if( !defined($result) ) {
-        $self->_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+        $self->_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote', 2 );
         return 0;
 
     }elsif( $result == 0 ) {
@@ -224,9 +222,9 @@ sub updateDbEntity {
 
         $query = 'INSERT INTO P_Host ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')';
 
-        $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+        $result = $dbHandler->execQuery( $query, \$queryResult );
         if( !defined($result) ) {
-            $self->_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+            $self->_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote', 2 );
             return 0;
         }elsif( $result != 1 ) {
             $self->_log( '[Entities::obmHost]: probleme a la mise a jour de l\'hote : hote insere '.$result.' fois dans les tables de production !', 2 );
@@ -242,8 +240,8 @@ sub updateDbEntity {
 
 sub updateDbEntityLinks {
     my $self = shift;
-    my( $dbHandler ) = @_;
 
+#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
 #    if( !defined($dbHandler) ) {
 #        return 0;
 #    }
@@ -256,7 +254,7 @@ sub updateDbEntityLinks {
 
 sub getEntityLinks {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     return 1;
 }

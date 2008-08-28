@@ -11,9 +11,9 @@ use strict;
 use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId makeEntityEmail getMailboxDefaultFolders _log);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
+require OBM::Tools::obmDbHandler;
 require OBM::Ldap::utils;
 require OBM::toolBox;
-require OBM::dbUtils;
 
 
 sub new {
@@ -69,7 +69,7 @@ sub new {
 
 sub getEntity {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     my $mailShareId = $self->{'objectId'};
     if( !defined($mailShareId) ) {
@@ -78,6 +78,7 @@ sub getEntity {
     }
 
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         $self->_log( '[Entities::obmMailshare]: connecteur a la base de donnee invalide', 3 );
         return 0;
@@ -101,8 +102,7 @@ sub getEntity {
 
     my $query = "SELECT COUNT(*) FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -121,8 +121,7 @@ sub getEntity {
     # Obtention de la description BD de l'utilisateur
     $query = "SELECT * FROM ".$mailShareTable." WHERE mailshare_id=".$mailShareId;
     # On execute la requete
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -138,8 +137,7 @@ sub getEntity {
     # partagé
     $query = "SELECT * FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
     # On exécute la requête
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -169,7 +167,7 @@ sub getEntity {
             last SWITCH;
         }
 
-        $localServerIp = $self->getHostIpById( $dbHandler, $dbMailShareDesc->{"mailserver_host_id"} );
+        $localServerIp = $self->getHostIpById( $dbMailShareDesc->{"mailserver_host_id"} );
         if( !defined($localServerIp) ) {
             $self->_log( '[Entities::obmMailshare]: droit mail du repertoire partage : \''.$dbMailShareDesc->{'mailshare_name'}.'\' - annule, serveur inconnu !', 2 );
             $self->{"properties"}->{"mailshare_mailperms"} = 0;
@@ -240,7 +238,7 @@ sub getEntity {
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
     if( $self->isLinks() ) {
-        $self->getEntityLinks( $dbHandler, $domainDesc );
+        $self->getEntityLinks( $domainDesc );
     }
 
 
@@ -250,8 +248,8 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
-    my( $dbHandler ) = @_;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         return 0;
     }
@@ -280,10 +278,10 @@ sub updateDbEntity {
 
     my $query = 'UPDATE P_MailShare SET '.join( ', ', @updateFields ).' WHERE '.join( ' AND ', @whereFields );
     my $queryResult;
-    my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+    my $result = $dbHandler->execQuery( $query, \$queryResult );
 
     if( !defined($result) ) {
-        $self->_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettre partagee : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+        $self->_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettres partagee', 2 );
         return 0;
 
     }elsif( $result == 0 ) {
@@ -295,9 +293,9 @@ sub updateDbEntity {
         }
 
         $query = 'INSERT INTO P_MailShare ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')';
-        $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+        $result = $dbHandler->execQuery( $query, \$queryResult );
         if( !defined($result) ) {
-            $self->_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettre partagee : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+            $self->_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettre partagee', 2 );
             return 0;
 
         }elsif( $result != 1 ) {
@@ -314,9 +312,9 @@ sub updateDbEntity {
 
 sub updateDbEntityLinks {
     my $self = shift;
-    my( $dbHandler ) = @_;
     my $queryResult;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         return 0;
     }
@@ -325,16 +323,14 @@ sub updateDbEntityLinks {
 
     # On supprime les liens actuels de la table de production
     my $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"objectId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
 
     # On copie les nouveaux droits
     $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"objectId"};
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmMailshare]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -345,9 +341,9 @@ sub updateDbEntityLinks {
 
 sub getEntityLinks {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
-    $self->_getEntityMailShareAcl( $dbHandler, $domainDesc );
+    $self->_getEntityMailShareAcl( $domainDesc );
 
     # On précise que les liens de l'entité sont aussi à mettre à jour.
     $self->{"links"} = 1;
@@ -392,7 +388,7 @@ sub getEntityDescription {
 
 sub _getEntityMailShareAcl {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
     my $mailShareId = $self->{"objectId"};
 
     if( !$self->{"properties"}->{"mailshare_mailperms"} ) {
@@ -423,7 +419,7 @@ sub _getEntityMailShareAcl {
         $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".$entityRightTable." WHERE entityright_entity_id=".$mailShareId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
 
         # On recupere la definition des ACL
-        $self->{"properties"}->{"user_mailshare_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domainDesc, \%rightDef, $mailShareId );
+        $self->{"properties"}->{"user_mailshare_acl"} = &OBM::toolBox::getEntityRight( $domainDesc, \%rightDef, $mailShareId );
     }
 
     return 1;
@@ -682,7 +678,7 @@ sub getMailboxAcl {
 
 sub getHostIpById {
     my $self = shift;
-    my( $dbHandler, $hostId ) = @_;
+    my( $hostId ) = @_;
 
     if( !defined($hostId) ) {
         $self->_log( '[Entities::obmMailshare]: identifiant de l\'hote non défini !', 2 );
@@ -690,7 +686,10 @@ sub getHostIpById {
     }elsif( $hostId !~ /^[0-9]+$/ ) {
         $self->_log( '[Entities::obmMailshare]: identifiant de l\'hote \''.$hostId.'\' incorrect !', 2 );
         return undef;
-    }elsif( !defined($dbHandler) ) {
+    }
+    
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
         $self->_log( '[Entities::obmMailshare]: connection a la base de donnees incorrect !', 2 );
         return undef;
     }
@@ -703,8 +702,7 @@ sub getHostIpById {
     my $query = "SELECT host_ip FROM ".$hostTable." WHERE host_id='".$hostId."'";
     # On exécute la requête
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmMailshare]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return undef;
     }
 

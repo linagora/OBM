@@ -28,6 +28,7 @@ require OBM::Entities::obmMailshare;
 require OBM::Entities::obmMailServer;
 require OBM::Entities::obmSambaDomain;
 require OBM::Update::utils;
+require OBM::Tools::obmDbHandler;
 use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost _doSystemUser _doSambaDomain _doMailServer _deleteDbEntity _tableNamePrefix);
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
@@ -35,7 +36,7 @@ use OBM::Parameters::ldapConf;
 
 sub new {
     my $self = shift;
-    my( $dbHandler, $parameters ) = @_;
+    my( $parameters ) = @_;
 
     # Définition des attributs de l'objet
     my %updateAttr = (
@@ -44,21 +45,25 @@ sub new {
         domain => undef,
         delegation => undef,
         global => undef,
-        dbHandler => undef,
         domainList => undef,
         engine => undef
     );
 
 
-    if( !defined($dbHandler) || !defined($parameters) ) {
+    if( !defined($parameters) ) {
         croak( "Usage: PACKAGE->new(DBHANDLER, PARAMLIST)" );
     }elsif( !exists($parameters->{"user"}) && !exists($parameters->{"domain"}) && !exists($parameters->{"delegation" }) ) {
         croak( "Usage: PARAMLIST: table de hachage avec les cles 'user', 'domain' et 'delegation'" );
     }
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::updateGlobal]: connecteur a la base de donnee invalide', 'W', 3 );
+        return undef;
+    }
+
     # Initialisation de l'objet
     $updateAttr{"global"} = $parameters->{"global"};
-    $updateAttr{"dbHandler"} = $dbHandler;
 
     # Identifiant utilisateur
     if( defined($parameters->{"user"}) ) {
@@ -66,8 +71,7 @@ sub new {
 
         my $query = "SELECT userobm_login FROM UserObm WHERE userobm_id=".$updateAttr{"user"};
         my $queryResult;
-        if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-            &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+        if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
             return 0;
         }
 
@@ -89,11 +93,11 @@ sub new {
 
 
     # Obtention des informations sur les domaines nécessaires
-    $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"dbHandler"}, $updateAttr{"domain"} );
+    $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"domain"} );
 
 
     # Obtention des serveurs LDAP par domaines
-    &OBM::Update::utils::getLdapServer( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+    &OBM::Update::utils::getLdapServer( $updateAttr{"domainList"} );
 
 
     # Initialisation du moteur LDAP
@@ -103,16 +107,16 @@ sub new {
     }
 
     # Paramétrage des serveurs IMAP par domaine
-    &OBM::Update::utils::getCyrusServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
-    if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} ) ) {
+    &OBM::Update::utils::getCyrusServers( $updateAttr{"domainList"} );
+    if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"domainList"} ) ) {
         return undef;
     }
 
     # Paramétrage des serveurs SMTP-in par domaine
-    &OBM::Update::utils::getSmtpInServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+    &OBM::Update::utils::getSmtpInServers( $updateAttr{"domainList"} );
 
     # Paramétrage des serveurs SMTP-out par domaine
-    &OBM::Update::utils::getSmtpOutServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+    &OBM::Update::utils::getSmtpOutServers( $updateAttr{"domainList"} );
 
     # Initialisation du moteur Cyrus
     $updateAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $updateAttr{"domainList"} );
@@ -210,13 +214,17 @@ sub _doGlobalUpdate {
         return 0;
     }
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::updateGlobal]: connecteur a la base de donnee invalide', 'W', 3 );
+        return 0;
+    }
 
     # Uniquement pour le métadomaine
     if( $self->{"domain"} == 0 ) {
         # Traitement des entités de type 'utilisateur système'
         my $query = "SELECT usersystem_id FROM UserSystem";
-        if( !defined(&OBM::dbUtils::execQuery( $query, $self->{'dbHandler'}, \$queryResult )) ) {
-            &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+        if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
             return 0;
         }
 
@@ -227,9 +235,9 @@ sub _doGlobalUpdate {
             if( $return ) {
                 # La MAJ de l'entité s'est bien passée, on met a jour la BD de
                 # travail
-                $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+                $updateDbReturn = $object->updateDbEntity();
                 if( $object->isLinks() ) {
-                    $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+                    $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks();
                 }
 
                 if( !$updateDbReturn ) {
@@ -251,9 +259,9 @@ sub _doGlobalUpdate {
 
     if( $return ) {
         # La MAJ de l'entité s'est bien passée, on met a jour la BD de travail
-        $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        $updateDbReturn = $object->updateDbEntity();
         if( $object->isLinks() ) {
-            $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+            $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks();
         }
 
         if( !$updateDbReturn ) {
@@ -272,9 +280,9 @@ sub _doGlobalUpdate {
 
     if( $return ) {
         # La MAJ de l'entité s'est bien passée, on met a jour la BD de travail
-        $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+        $updateDbReturn = $object->updateDbEntity();
         if( $object->isLinks() ) {
-            $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+            $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks();
         }
 
         if( !$updateDbReturn ) {
@@ -313,8 +321,7 @@ sub _doGlobalUpdate {
 
     # Traitement des entités de type 'hote'
     my $query = "SELECT host_id FROM Host WHERE host_domain_id=".$self->{"domain"};
-    if( !defined(&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -324,9 +331,9 @@ sub _doGlobalUpdate {
         my $return = $self->_runEngines( $object );
         if( $return ) {
             # La MAJ de l'entité s'est bien passée, on met a jour la BD de travail
-            $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            $updateDbReturn = $object->updateDbEntity();
             if( $object->isLinks() ) {
-                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks();
             }
 
             if( !$updateDbReturn ) {
@@ -342,8 +349,7 @@ sub _doGlobalUpdate {
 
     # Traitement des entités de type 'utilisateur'
     $query = "SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"};
-    if( !defined(&OBM::dbUtils::execQuery( $query, $self->{"dbHandler"}, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -354,9 +360,9 @@ sub _doGlobalUpdate {
         if( $return ) {
             # La MAJ de l'entité s'est bien passée, on met a jour la BD de
             # travail
-            $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            $updateDbReturn = $object->updateDbEntity();
             if( $object->isLinks() ) {
-                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks();
             }
 
             if( !$updateDbReturn ) {
@@ -372,8 +378,7 @@ sub _doGlobalUpdate {
 
     # Traitement des entités de type 'groupe'
     $query = "SELECT group_id FROM UGroup WHERE group_privacy=0 AND group_domain_id=".$self->{"domain"};
-    if( !defined(&OBM::dbUtils::execQuery( $query, $self->{'dbHandler'}, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -384,9 +389,9 @@ sub _doGlobalUpdate {
         if( $return ) {
             # La MAJ de l'entité s'est bien passée, on met a jour la BD de
             # travail
-            $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            $updateDbReturn = $object->updateDbEntity();
             if( $object->isLinks() ) {
-                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks();
             }
 
             if( !$updateDbReturn ) {
@@ -402,8 +407,7 @@ sub _doGlobalUpdate {
 
     # Traitement des entités de type 'mailshare'
     $query = "SELECT mailshare_id FROM MailShare WHERE mailshare_domain_id=".$self->{"domain"};
-    if( !defined(&OBM::dbUtils::execQuery( $query, $self->{'dbHandler'}, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -414,9 +418,9 @@ sub _doGlobalUpdate {
         if( $return ) {
             # La MAJ de l'entité s'est bien passée, on met a jour la BD de
             # travail
-            $updateDbReturn = $object->updateDbEntity( $self->{"dbHandler"} );
+            $updateDbReturn = $object->updateDbEntity();
             if( $object->isLinks() ) {
-                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks( $self->{"dbHandler"} );
+                $updateDbReturn = !$updateDbReturn || $object->updateDbEntityLinks();
             }
 
             if( !$updateDbReturn ) {
@@ -449,14 +453,19 @@ sub _doGlobalDelete {
         return 0;
     }
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::updateGlobal]: connecteur a la base de donnee invalide', 'W', 3 );
+        return 0;
+    }
+
 
     &OBM::toolBox::write_log( "[Update::updateGlobal]: detection des suppressions en BD pour le domaine '".$domainDesc->{"domain_label"}."'", "W" );
 
 
     # Traitement des entités de type 'hote'
     my $query = "SELECT host_id FROM P_Host WHERE host_domain_id=".$self->{"domain"}." AND host_id NOT IN (SELECT host_id FROM Host WHERE host_domain_id=".$self->{"domain"}.")";
-    if( !defined(&OBM::dbUtils::execQuery( $query, $self->{'dbHandler'}, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -470,8 +479,7 @@ sub _doGlobalDelete {
 
     # Traitement des entités de type 'utilisateur'
     $query = "SELECT userobm_id FROM P_UserObm WHERE userobm_domain_id=".$self->{"domain"}." AND userobm_id NOT IN (SELECT userobm_id FROM UserObm WHERE userobm_domain_id=".$self->{"domain"}.")";
-    if( !defined(&OBM::dbUtils::execQuery( $query, $self->{'dbHandler'}, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -485,8 +493,7 @@ sub _doGlobalDelete {
 
     # Traitement des entités de type 'groupe'
     $query = "SELECT group_id FROM P_UGroup WHERE group_domain_id=".$self->{"domain"}." AND group_privacy=0 AND group_id NOT IN (SELECT group_id FROM UGroup WHERE group_domain_id=".$self->{"domain"}." AND group_privacy=0)";
-    if( !defined(&OBM::dbUtils::execQuery( $query, $self->{'dbHandler'}, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -500,8 +507,7 @@ sub _doGlobalDelete {
 
     # Traitement des entités de type 'mailshare'
     $query = "SELECT mailshare_id FROM P_MailShare WHERE mailshare_domain_id=".$self->{"domain"}." AND mailshare_id NOT IN (SELECT mailshare_id FROM MailShare WHERE mailshare_domain_id=".$self->{"domain"}.")";
-    if( !defined(&OBM::dbUtils::execQuery( $query, $self->{'dbHandler'}, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -520,10 +526,11 @@ sub _doGlobalDelete {
 sub _updateDbDomain {
     my $self = shift;
 
-    if( !defined($self->{'dbHandler'}) ) {
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::updateGlobal]: connecteur a la base de donnee invalide', 'W', 3 );
         return 0;
     }
-    my $dbHandler = $self->{'dbHandler'};
 
     if( !defined($self->{'domain'}) || ($self->{'domain'} !~ /^\d+$/) ) {
         &OBM::toolBox::write_log( '[Update::updateGlobal]: pas de domaine indique pour la MAJ totale', 'W' );
@@ -535,56 +542,48 @@ sub _updateDbDomain {
     # Les informations du domaine
     my $query = 'DELETE FROM P_Domain WHERE Domain_id='.$domainId;
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
     $query = 'INSERT INTO P_Domain SELECT * FROM Domain WHERE domain_id='.$domainId;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
 
     # Les hôtes serveurs de mails
     $query = 'DELETE FROM P_MailServer WHERE mailserver_host_id IN (SELECT host_id FROM P_Host WHERE host_domain_id='.$domainId.')';
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
     $query = 'INSERT INTO P_MailServer SELECT * FROM MailServer WHERE mailserver_host_id IN (SELECT host_id FROM Host WHERE host_domain_id='.$domainId.')';
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
 
     # Les informations associées aux hôtes serveurs de mails
     $query = 'DELETE FROM P_MailServerNetwork WHERE mailservernetwork_host_id IN (SELECT host_id FROM P_Host WHERE host_domain_id='.$domainId.')';
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
     $query = 'INSERT INTO P_MailServerNetwork SELECT * FROM MailServerNetwork WHERE mailservernetwork_host_id IN (SELECT host_id FROM Host WHERE host_domain_id='.$domainId.')';
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
 
     # Les informations du domaine Samba
     $query = 'DELETE FROM P_Samba WHERE samba_domain_id='.$domainId;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
     $query = 'INSERT INTO P_Samba SELECT * FROM Samba WHERE samba_domain_id='.$domainId;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateGlobal]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -600,10 +599,11 @@ sub _cleanUpdateDbTable {
     my $self = shift;
     my $queryResult;
 
-    if( !defined($self->{"dbHandler"}) ) {
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::updateGlobal]: connecteur a la base de donnee invalide', 'W', 3 );
         return 0;
     }
-    my $dbHandler = $self->{"dbHandler"};
 
     if( !defined($self->{domain}) ) {
         return 0;
@@ -619,14 +619,7 @@ sub _cleanUpdateDbTable {
         $query .= " AND updatedlinks_delegation=\"".$self->{delegation}."\"";
     }
     &OBM::toolBox::write_log( "[Update::updateGlobal]: purge de la table 'Updated'", "W" );
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $query =~ s/\s+/ /g;
-
-        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
-        if( defined($dbHandler->err) ) {
-           &OBM::toolBox::write_log( '[Update::updateGlobal]: '.$dbHandler->err, 'W' );
-        }
-
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -640,14 +633,7 @@ sub _cleanUpdateDbTable {
         $query .= " AND updatedlinks_delegation=\"".$self->{delegation}."\"";
     }
     &OBM::toolBox::write_log( "[Update::updateGlobal]: purge de la table 'Updatedlinks'", "W" );
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $query =~ s/\s+/ /g;
-
-        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
-        if( defined($dbHandler->err) ) {
-            &OBM::toolBox::write_log( '[Update::updateGlobal]: '.$dbHandler->err, 'W' );
-        }
-
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -661,14 +647,7 @@ sub _cleanUpdateDbTable {
         $query .= " AND deleted_delegation=\"".$self->{delegation}."\"";
     }
     &OBM::toolBox::write_log( "[Update::updateGlobal]: purge de la table 'Deleted'", "W" );
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $query =~ s/\s+/ /g;
-
-        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
-        if( defined($dbHandler->err) ) {
-            &OBM::toolBox::write_log( '[Update::updateGlobal]: '.$dbHandler->err, 'W' );
-        }
-
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 

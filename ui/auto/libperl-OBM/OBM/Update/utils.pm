@@ -12,12 +12,14 @@ use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 require OBM::toolBox;
 require OBM::dbUtils;
+require OBM::Tools::obmDbHandler;
 
 
 sub getDomains {
-    my( $dbHandler, $obmDomainId ) = @_;
+    my( $obmDomainId ) = @_;
     my @domainList;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         &OBM::toolBox::write_log( "[Update::utils]: connection à la base de donnée incorrecte !", "W" );
         return undef;
@@ -55,7 +57,7 @@ sub getDomains {
 
     # On execute la requete concernant les domaines
     my $queryDomainResult;
-    if( !defined(&OBM::dbUtils::execQuery( $queryDomain, $dbHandler, \$queryDomainResult )) ) {
+    if( !defined($dbHandler->execQuery( $queryDomain, \$queryDomainResult )) ) {
         &OBM::toolBox::write_log( '[Update::utils]: probleme lors de l\'execution de la requete.', 'W' );
         if( defined($queryDomainResult) ) {
             &OBM::toolBox::write_log( "[Update::utils]: ".$queryDomainResult->err, "W" );
@@ -91,7 +93,13 @@ sub getDomains {
 
 
 sub getLdapServer {
-    my( $dbHandler, $domainList ) = @_;
+    my( $domainList ) = @_;
+
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::utils]: connecteur a la base de donnee invalide', 'W', 3 );
+        return 0;
+    }
 
     if( !defined($ldapAdminLogin) ) {
         return 0;
@@ -104,11 +112,8 @@ sub getLdapServer {
 
         # On execute la requete concernant l'administrateur LDAP associé
         my $queryLdapAdminResult;
-        if( !defined(&OBM::toolBox::execQuery( $queryLdapAdmin, $dbHandler, \$queryLdapAdminResult )) ) {
-            &OBM::toolBox::write_log( '[Update::utils]: probleme lors de l\'execution de la requete.', 'W' );
-            if( defined($queryLdapAdminResult) ) {
-                &OBM::toolBox::write_log( '[Update::utils]: '.$queryLdapAdminResult->err, 'W' );
-            }
+        if( !defined($dbHandler->execQuery( $queryLdapAdmin, \$queryLdapAdminResult )) ) {
+            next;
         }elsif( my( $ldapAdminPasswd ) = $queryLdapAdminResult->fetchrow_array ) {
             $domainList->[$i]->{"ldap_admin_server"} = $ldapServer;
             $domainList->[$i]->{"ldap_admin_login"} = $ldapAdminLogin;
@@ -123,7 +128,13 @@ sub getLdapServer {
 
 
 sub getCyrusServers {
-    my( $dbHandler, $domainList ) = @_;
+    my( $domainList ) = @_;
+
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::utils]: connecteur a la base de donnee invalide', 'W', 3 );
+        return 1;
+    }
 
     for( my $i=0; $i<=$#$domainList; $i++ ) {
         if( $domainList->[$i]->{"meta_domain"} ) {
@@ -135,8 +146,7 @@ sub getCyrusServers {
 
         # On execute la requete
         my $queryResult;
-        if( !defined(&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult )) ) {
-            &OBM::toolBox::write_log( '[Update::utils]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+        if( !defined($dbHandler->execQuery( $srvQuery, \$queryResult )) ) {
             next;
         }
 
@@ -156,7 +166,13 @@ sub getCyrusServers {
 
 
 sub getSmtpInServers {
-    my( $dbHandler, $domainList ) = @_;
+    my( $domainList ) = @_;
+
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::utils]: connecteur a la base de donnee invalide', 'W', 3 );
+        return 1;
+    }
 
     for( my $i=0; $i<=$#$domainList; $i++ ) {
         if( $domainList->[$i]->{"meta_domain"} ) {
@@ -168,8 +184,7 @@ sub getSmtpInServers {
 
         # On execute la requete
         my $queryResult;
-        if( !defined(&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult )) ) {
-            &OBM::toolBox::write_log( '[Update::utils]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+        if( !defined($dbHandler->execQuery( $srvQuery, \$queryResult )) ) {
             next;
         }
 
@@ -189,7 +204,13 @@ sub getSmtpInServers {
 
 
 sub getSmtpOutServers {
-    my( $dbHandler, $domainList ) = @_;
+    my( $domainList ) = @_;
+
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::utils]: connecteur a la base de donnee invalide', 'W', 3 );
+        return 1;
+    }
 
     for( my $i=0; $i<=$#$domainList; $i++ ) {
         if( $domainList->[$i]->{"meta_domain"} ) {
@@ -201,8 +222,7 @@ sub getSmtpOutServers {
 
         # On exécute la requête
         my $queryResult;
-        if( !defined(&OBM::dbUtils::execQuery( $srvQuery, $dbHandler, \$queryResult )) ) {
-            &OBM::toolBox::write_log( '[Update::utils]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+        if( !defined($dbHandler->execQuery( $srvQuery, \$queryResult )) ) {
             next;
         }
 
@@ -241,8 +261,9 @@ sub findDomainbyId {
 
 
 sub getUserIdFromUserLoginDomain {
-    my( $dbHandler, $userLogin, $domainId ) = @_;
+    my( $userLogin, $domainId ) = @_;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         &OBM::toolBox::write_log( "[Update::utils]: connection à la base de donnees incorrecte !", "W" );
         return undef;
@@ -260,12 +281,7 @@ sub getUserIdFromUserLoginDomain {
 
     my $query = "SELECT userobm_id FROM UserObm WHERE userobm_login=".$dbHandler->quote($userLogin)." AND userobm_domain_id=".$domainId;
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::utils]: probleme lors de l\'execution de la requete.', 'W' );
-        if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( '[Update::utils]: '.$queryResult->err, 'W' );
-        }
-
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return undef;
     }
 
@@ -277,8 +293,9 @@ sub getUserIdFromUserLoginDomain {
 
 
 sub getMailshareIdFromMailshareNameDomain {
-    my( $dbHandler, $mailshareName, $domainId ) = @_;
+    my( $mailshareName, $domainId ) = @_;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         &OBM::toolBox::write_log( "[Update::utils] connection à la base de donnees incorrecte :", "W" );
         return undef;
@@ -296,12 +313,7 @@ sub getMailshareIdFromMailshareNameDomain {
 
     my $query = "SELECT mailshare_id FROM MailShare WHERE mailshare_name=".$dbHandler->quote($mailshareName)." AND mailshare_domain_id=".$domainId;
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::utils]: probleme lors de l\'execution de la requete.', 'W' );
-        if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( '[Update::utils]: '.$queryResult->err, 'W' );
-        }
-
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return undef;
     }
 

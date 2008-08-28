@@ -12,9 +12,8 @@ use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getL
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
+require OBM::Tools::obmDbHandler;
 require OBM::passwd;
-require OBM::toolBox;
-require OBM::dbUtils;
 use URI::Escape;
 
 
@@ -66,7 +65,7 @@ sub new {
 
 sub getEntity {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     my $userId = $self->{"objectId"};
     if( !defined($userId) ) {
@@ -75,6 +74,7 @@ sub getEntity {
     }
 
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         $self->_log( '[Entities::obmSystemUser]: connecteur a la base de donnee invalide', 3 );
         return 0;
@@ -98,8 +98,7 @@ sub getEntity {
     my $query = "SELECT COUNT(*) FROM ".$yserSystemTable." WHERE usersystem_id=".$userId;
 
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -119,8 +118,7 @@ sub getEntity {
     $query = "SELECT usersystem_id, usersystem_login, usersystem_password, usersystem_uid, usersystem_gid, usersystem_homedir, usersystem_lastname, usersystem_firstname, usersystem_shell FROM ".$yserSystemTable." WHERE usersystem_id=".$userId;
 
     # On execute la requete
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmSystemUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -154,9 +152,9 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
-    my( $dbHandler ) = @_;
     # Pas de table de production pour les entités de type utilisateur système
 
+#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
 #    if( !defined($dbHandler) ) {
 #        return 0;
 #    }
@@ -167,9 +165,9 @@ sub updateDbEntity {
 
 sub updateDbEntityLinks {
     my $self = shift;
-    my( $dbHandler ) = @_;
     # Pas de table de production pour les entités de type utilisateur système
 
+#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
 #    if( !defined($dbHandler) ) {
 #        return 0;
 #    }
@@ -180,7 +178,7 @@ sub updateDbEntityLinks {
 
 sub getEntityLinks {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     return 1;
 }

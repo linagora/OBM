@@ -19,11 +19,10 @@ require OBM::Entities::obmUser;
 
 sub new {
     my $self = shift;
-    my( $dbHandler, $parameters ) = @_;
+    my( $parameters ) = @_;
 
     # Définition des attributs de l'objet
     my %updateSieveAttr = (
-        dbHandler => undef,
         userLogin => undef,
         userId => undef,
         userObject => undef,
@@ -32,18 +31,16 @@ sub new {
         engine => undef
     );
 
-    if( !defined($dbHandler) || !defined($parameters) ) {
+    if( !defined($parameters) ) {
         croak( "[Update::updateSieve]: Usage: PACKAGE->new(DBHANDLER, PARAMLIST)" );
     }
-
-    $updateSieveAttr{dbHandler} = $dbHandler;
 
     $updateSieveAttr{userLogin} = $parameters->{login};
     $updateSieveAttr{domainId} = $parameters->{domain};
 
 
     # Obtention du userId BD
-    $updateSieveAttr{userId} = &OBM::Update::utils::getUserIdFromUserLoginDomain( $updateSieveAttr{dbHandler}, $updateSieveAttr{userLogin}, $updateSieveAttr{domainId} );
+    $updateSieveAttr{userId} = &OBM::Update::utils::getUserIdFromUserLoginDomain( $updateSieveAttr{userLogin}, $updateSieveAttr{domainId} );
     if( !defined($updateSieveAttr{userId}) ) {
         &OBM::toolBox::write_log( "[Update::updateSieve]: utilisateur '".$updateSieveAttr{userLogin}."' inconnu", "W" );
         return undef;
@@ -51,11 +48,11 @@ sub new {
 
 
     # Obtention des informations sur les domaines nécessaires
-    $updateSieveAttr{domainList} = &OBM::Update::utils::getDomains( $updateSieveAttr{dbHandler}, $updateSieveAttr{domainId} );
+    $updateSieveAttr{domainList} = &OBM::Update::utils::getDomains( $updateSieveAttr{domainId} );
 
     # Paramétrage des serveurs IMAP par domaine
-    &OBM::Update::utils::getCyrusServers( $updateSieveAttr{"dbHandler"}, $updateSieveAttr{"domainList"} );
-    if( !&OBM::imapd::getAdminImapPasswd( $updateSieveAttr{"dbHandler"}, $updateSieveAttr{"domainList"} ) ) {
+    &OBM::Update::utils::getCyrusServers( $updateSieveAttr{"domainList"} );
+    if( !&OBM::imapd::getAdminImapPasswd( $updateSieveAttr{"domainList"} ) ) {
         return undef;
     }
 
@@ -80,7 +77,7 @@ sub new {
         return undef;
     }
 
-    if( !$updateSieveAttr{userObject}->getEntity( $updateSieveAttr{dbHandler}, &OBM::Update::utils::findDomainbyId( $updateSieveAttr{domainList}, $updateSieveAttr{domainId} ) ) ) {
+    if( !$updateSieveAttr{userObject}->getEntity( &OBM::Update::utils::findDomainbyId( $updateSieveAttr{domainList}, $updateSieveAttr{domainId} ) ) ) {
         &OBM::toolBox::write_log( "[Update::updateSieve]: erreur a la mise a jour de l'utilisateur.", "W" );
         return undef;
     }

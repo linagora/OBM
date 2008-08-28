@@ -17,10 +17,9 @@ require OBM::Cyrus::cyrusEngine;
 
 sub new {
     my $self = shift;
-    my( $dbHandler, $parameters ) = @_;
+    my( $parameters ) = @_;
 
     my %updateAclAttr = (
-        dbHandler => undef,
         name => undef,
         type => undef,
         id => undef,
@@ -30,20 +29,18 @@ sub new {
         engine => undef
     );
 
-    if( !defined($dbHandler) || !defined($parameters) ) {
+    if( !defined($parameters) ) {
         croak( "[Update::updateCyrusAcl]: Usage: PACKAGE->new(DBHANDLER, PARAMLIST)" );
     }
-
-    $updateAclAttr{dbHandler} = $dbHandler;
 
     $updateAclAttr{domainId} = $parameters->{domain};
     $updateAclAttr{name} = $parameters->{name};
     $updateAclAttr{type} = $parameters->{type};
 
     if( $updateAclAttr{type} =~ /^mailbox$/ ) {
-        $updateAclAttr{id} = &OBM::Update::utils::getUserIdFromUserLoginDomain( $updateAclAttr{dbHandler}, $updateAclAttr{name}, $updateAclAttr{domainId} );
+        $updateAclAttr{id} = &OBM::Update::utils::getUserIdFromUserLoginDomain( $updateAclAttr{name}, $updateAclAttr{domainId} );
     }elsif( $updateAclAttr{type} =~ /^mailshare$/ ) {
-        $updateAclAttr{id} = &OBM::Update::utils::getMailshareIdFromMailshareNameDomain( $updateAclAttr{dbHandler}, $updateAclAttr{name}, $updateAclAttr{domainId} );
+        $updateAclAttr{id} = &OBM::Update::utils::getMailshareIdFromMailshareNameDomain( $updateAclAttr{name}, $updateAclAttr{domainId} );
     }
 
     if( !defined($updateAclAttr{id}) ) {
@@ -52,11 +49,11 @@ sub new {
     }
 
     # Obtention des informations sur les domaines nécessaires
-    $updateAclAttr{domainList} = &OBM::Update::utils::getDomains( $updateAclAttr{dbHandler}, $updateAclAttr{domainId} );
+    $updateAclAttr{domainList} = &OBM::Update::utils::getDomains( $updateAclAttr{domainId} );
 
     # Paramétrage des serveurs IMAP par domaine
-    &OBM::Update::utils::getCyrusServers( $updateAclAttr{"dbHandler"}, $updateAclAttr{"domainList"} );
-    if( !&OBM::imapd::getAdminImapPasswd( $updateAclAttr{"dbHandler"}, $updateAclAttr{"domainList"} ) ) {
+    &OBM::Update::utils::getCyrusServers( $updateAclAttr{"domainList"} );
+    if( !&OBM::imapd::getAdminImapPasswd( $updateAclAttr{"domainList"} ) ) {
         return undef;
     }
 
@@ -80,7 +77,7 @@ sub new {
         return undef;
     }
 
-    if( !$updateAclAttr{object}->getEntity( $updateAclAttr{dbHandler}, &OBM::Update::utils::findDomainbyId( $updateAclAttr{domainList}, $updateAclAttr{domainId} ) ) ) {
+    if( !$updateAclAttr{object}->getEntity( &OBM::Update::utils::findDomainbyId( $updateAclAttr{domainList}, $updateAclAttr{domainId} ) ) ) {
         &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: erreur a l'initialisation de l'utilisateur.", "W" );
         return undef;
     }
@@ -94,7 +91,6 @@ sub update {
     my $self = shift;
     my $object = $self->{object};
     my $cyrusEngine = $self->{"engine"}->{"cyrusEngine"};
-    my $dbHandler = $self->{dbHandler};
 
     &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: mise a jour des ACL de l'entite ".$object->getEntityDescription(), "W" );
     if( !$cyrusEngine->updateAcl($object) ) {
@@ -103,7 +99,7 @@ sub update {
     }
 
     &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: mise a jour en BD des ACLs de l'entite ".$object->getEntityDescription(), "W" );
-    if( !$object->updateDbEntityLinks($dbHandler) ) {
+    if( !$object->updateDbEntityLinks() ) {
         &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: erreur lors de la mise a jour de la BD", "W" );
         return 0;
     }

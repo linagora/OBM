@@ -27,6 +27,7 @@ require OBM::Entities::obmMailshare;
 require OBM::Entities::obmMailServer;
 require OBM::Entities::obmSambaDomain;
 require OBM::Update::utils;
+require OBM::Tools::obmDbHandler;
 use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost _deleteDbEntity _tableNamePrefix);
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
@@ -34,7 +35,7 @@ use OBM::Parameters::ldapConf;
 
 sub new {
     my $self = shift;
-    my( $dbHandler, $parameters ) = @_;
+    my( $parameters ) = @_;
 
     # Définition des attributs de l'objet
     my %updateAttr = (
@@ -43,21 +44,25 @@ sub new {
         domain => undef,
         delegation => undef,
         global => undef,
-        dbHandler => undef,
         domainList => undef,
         engine => undef
     );
 
 
-    if( !defined($dbHandler) || !defined($parameters) ) {
+    if( !defined($parameters) ) {
         croak( "Usage: PACKAGE->new(DBHANDLER, PARAMLIST)" );
     }elsif( !exists($parameters->{"user"}) && !exists($parameters->{"domain"}) && !exists($parameters->{"delegation" }) ) {
         croak( "Usage: PARAMLIST: table de hachage avec les cles 'user', 'domain' et 'delegation'" );
     }
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::updateIncremental]: connecteur a la base de donnee invalide', 'W', 3 );
+        return undef;
+    }
+
     # Initialisation de l'objet
     $updateAttr{"global"} = $parameters->{"global"};
-    $updateAttr{"dbHandler"} = $dbHandler;
 
     # Identifiant utilisateur
     if( defined($parameters->{"user"}) ) {
@@ -65,8 +70,7 @@ sub new {
 
         my $query = "SELECT userobm_login FROM UserObm WHERE userobm_id=".$updateAttr{"user"};
         my $queryResult;
-        if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-            &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution d\'une requete SQL : '.$self->{'dbHandler'}->err, 'W' );
+        if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
             return 0;
         }
 
@@ -88,11 +92,11 @@ sub new {
 
 
     # Obtention des informations sur les domaines nécessaires
-    $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"dbHandler"}, $updateAttr{"domain"} );
+    $updateAttr{"domainList"} = &OBM::Update::utils::getDomains( $updateAttr{"domain"} );
 
 
     # Obtention des serveurs LDAP par domaines
-    &OBM::Update::utils::getLdapServer( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+    &OBM::Update::utils::getLdapServer( $updateAttr{"domainList"} );
 
 
     # Initialisation du moteur LDAP
@@ -102,16 +106,16 @@ sub new {
     }
 
     # Paramétrage des serveurs IMAP par domaine
-    &OBM::Update::utils::getCyrusServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
-    if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} ) ) {
+    &OBM::Update::utils::getCyrusServers( $updateAttr{"domainList"} );
+    if( !&OBM::imapd::getAdminImapPasswd( $updateAttr{"domainList"} ) ) {
         return undef;
     }
 
     # Paramétrage des serveurs SMTP-in par domaine
-    &OBM::Update::utils::getSmtpInServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+    &OBM::Update::utils::getSmtpInServers( $updateAttr{"domainList"} );
 
     # Paramétrage des serveurs SMTP-out par domaine
-    &OBM::Update::utils::getSmtpOutServers( $updateAttr{"dbHandler"}, $updateAttr{"domainList"} );
+    &OBM::Update::utils::getSmtpOutServers( $updateAttr{"domainList"} );
 
     # Initialisation du moteur Cyrus
     $updateAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $updateAttr{"domainList"} );
@@ -233,8 +237,9 @@ sub _incrementalUpdate {
     my $globalReturn = 1;
 
 
-    my $dbHandler = $self->{"dbHandler"};
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::updateIncremental]: connecteur a la base de donnee invalide', 'W', 3 );
         return 0;
     }
 
@@ -246,8 +251,7 @@ sub _incrementalUpdate {
     }
 
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete : '.$queryResult->err, 'W' );
+    if( !defined($dbHandler->execQuery( $sqlQuery, \$queryResult )) ) {
         return 0;
     }
 
@@ -263,8 +267,7 @@ sub _incrementalUpdate {
         }
 
         my $queryResult2;
-        if( !defined(&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult2 )) ) {
-            &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete : '.$queryResult->err, 'W' );
+        if( !defined($dbHandler->execQuery( $sqlQuery, \$queryResult2 )) ) {
             return 0;
         }
         my( $numRows ) = $queryResult2->fetchrow_array();
@@ -328,9 +331,9 @@ sub _incrementalUpdate {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met à jour la BD de
             # travail
-            $return = $object->updateDbEntity( $self->{"dbHandler"} );
+            $return = $object->updateDbEntity();
             if( $return && $object->isLinks() ) {
-                $return = $object->updateDbEntityLinks( $self->{"dbHandler"} );
+                $return = $object->updateDbEntityLinks();
             }
 
             if( $return ) {
@@ -356,8 +359,7 @@ sub _incrementalUpdate {
         $sqlQuery .= " WHERE ".$sqlFilter->[1];
     }
 
-    if( !defined(&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete : '.$queryResult->err, 'W' );
+    if( !defined($dbHandler->execQuery( $sqlQuery, \$queryResult )) ) {
         return 0;
     }
 
@@ -396,7 +398,7 @@ sub _incrementalUpdate {
         if( $return ) {
             # La MAJ de l'entité c'est bien passée, on met a jour la BD de
             # travail
-            $return = $object->updateDbEntityLinks( $self->{"dbHandler"} );
+            $return = $object->updateDbEntityLinks();
 
             if( $return ) {
                 # MAJ de la BD de travail ok, on nettoie les tables de MAJ
@@ -422,19 +424,19 @@ sub _incrementalDelete {
 
 
     # Traitement des entités à supprimer
-    my $dbHandler = $self->{"dbHandler"};
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::updateIncremental]: connecteur a la base de donnee invalide', 'W', 3 );
+        return 0;
+    }
+
     my $queryResult;
     my $sqlQuery = "SELECT deleted_id, deleted_table, deleted_entity_id FROM Deleted";
     if( defined($sqlFilter) ) {
         $sqlQuery .= " WHERE ".$sqlFilter;
     }
 
-    if( !defined(&OBM::dbUtils::execQuery( $sqlQuery, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete', 'W' );
-        if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$queryResult->err, 'W' );
-        }
-
+    if( !defined($dbHandler->execQuery( $sqlQuery, \$queryResult )) ) {
         return 0;
     }
 
@@ -505,15 +507,15 @@ sub _updateIncrementalTable {
     }
 
 
-    my $dbHandler = $self->{"dbHandler"};
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::updateIncremental]: connecteur a la base de donnee invalide', 'W', 3 );
+        return 0;
+    }
+
     my $deleteQueryResult;
     my $query = "DELETE FROM ".$table." WHERE ".lc($table)."_id=".$id;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$deleteQueryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
-        if( defined($deleteQueryResult) ) {
-            &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$deleteQueryResult->err, 'W' );
-        }
-
+    if( !defined($dbHandler->execQuery( $query, \$deleteQueryResult )) ) {
         return 0;
     }
 
@@ -524,21 +526,28 @@ sub _updateIncrementalTable {
 sub _updateUpdatedLinks {
     my $self = shift;
     my ( $object ) = @_;
-    my $dbHandler = $self->{"dbHandler"};
-    my( $domain, $user, $delegation ) = @_;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::updateIncremental]: connecteur a la base de donnee invalide', 'W', 3 );
+        return 0;
+    }
+
+    my $domain;
     if( !defined($self->{domain}) ) {
         return 0;
     }else {
         $domain = $self->{domain};
     }
 
+    my $user;
     if( !defined($self->{user}) ) {
         $user = "NULL";
     }else {
         $user = $self->{user};
     }
 
+    my $delegation;
     if( !defined($self->{delegation}) ) {
         $delegation = "";
     }else {
@@ -565,13 +574,7 @@ sub _updateUpdatedLinks {
                 LEFT JOIN Updatedlinks ON of_usergroup_group_id=updatedlinks_entity_id AND updatedlinks_table=\"UGroup\" AND updatedlinks_domain_id=".$domain."
                 WHERE updatedlinks_entity_id is null AND of_usergroup_user_id=".$object->getEntityId();
 
-            if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-                $query =~ s/\s+/ /g;
-                &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
-                if( defined($queryResult) ) {
-                    &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$queryResult->err, 'W' );
-                }
-
+            if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
                 return 0;
             }
 
@@ -592,13 +595,7 @@ sub _updateUpdatedLinks {
                 LEFT JOIN Updatedlinks ON updatedlinks_entity_id=entityright_entity_id AND updatedlinks_table=\"MailShare\"
                 WHERE updatedlinks_entity_id is null AND entityright_consumer=\"user\" AND entityright_consumer_id=".$object->getEntityId()." AND entityright_entity=\"MailShare\"";
 
-            if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-                $query =~ s/\s+/ /g;
-                &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
-                if( defined($queryResult) ) {
-                    &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$queryResult->err, 'W' );
-                }
-
+            if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
                 return 0;
             }
 
@@ -619,13 +616,7 @@ sub _updateUpdatedLinks {
                 LEFT JOIN Updatedlinks ON updatedlinks_entity_id=entityright_entity_id AND updatedlinks_table=\"mailbox\"
                 WHERE updatedlinks_entity_id is null AND entityright_consumer=\"user\" AND entityright_consumer_id=".$object->getEntityId()." AND entityright_entity=\"mailbox\"";
 
-            if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-                $query =~ s/\s+/ /g;
-                &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete \''.$query.'\'', 'W' );
-                if( defined($queryResult) ) {
-                    &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$queryResult->err, 'W' );
-                }
-
+            if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
                 return 0;
             }
         }

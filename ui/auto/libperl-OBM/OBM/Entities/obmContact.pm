@@ -12,8 +12,7 @@ use OBM::Entities::commonEntities qw(_log);
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
-require OBM::toolBox;
-require OBM::dbUtils;
+require OBM::Tools::obmDbHandler;
 use URI::Escape;
 
 
@@ -64,10 +63,11 @@ sub new {
 
 sub getEntity {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
     my $contactId = $self->{"contactId"};
 
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         $self->_log( "[Entities::obmContact]: connecteur a la base de donnee invalide", 3 );
         return 0;
@@ -86,8 +86,7 @@ sub getEntity {
     my $query = "SELECT COUNT(*) FROM Contact WHERE contact_id=".$contactId;
 
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmContact]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -102,12 +101,11 @@ sub getEntity {
         return 0;
     }
 
-    # La requete a executer - obtention des informations sur l'hote
+    # La requête a exécuter - obtention des informations sur l'hôte
     $query = "SELECT * FROM Contact LEFT JOIN Company ON contact_company_id=company_id WHERE contact_id=".$contactId;
 
-    # On execute la requete
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmContact]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 2 );
+    # On exécute la requête
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -146,7 +144,7 @@ sub getEntity {
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
     if( $self->isLinks() ) {
-        $self->getEntityLinks( $dbHandler, $domainDesc );
+        $self->getEntityLinks( $domainDesc );
     }
 
     return 1;
@@ -155,7 +153,6 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
-    my( $dbHandler ) = @_;
 
     return 1;
 }
@@ -163,7 +160,7 @@ sub updateDbEntity {
 
 sub getEntityLinks {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     return 1;
 }

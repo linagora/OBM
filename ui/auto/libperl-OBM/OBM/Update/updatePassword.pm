@@ -18,11 +18,10 @@ require OBM::Entities::obmUser;
 
 sub new {
     my $self = shift;
-    my( $dbHandler, $parameters ) = @_;
+    my( $parameters ) = @_;
 
     # Définition des attributs de l'objet
     my %updatePasswdAttr = (
-        dbHandler => undef,
         oldPassword => undef,
         newPasswordDesc => undef,
         userLogin => undef,
@@ -33,11 +32,9 @@ sub new {
         engine => undef
     );
 
-    if( !defined($dbHandler) || !defined($parameters) ) {
+    if( !defined($parameters) ) {
         croak( "[Update::updatePassword]: Usage: PACKAGE->new(DBHANDLER, PARAMLIST)" );
     }
-
-    $updatePasswdAttr{dbHandler} = $dbHandler;
 
 
     if( !$parameters->{"no-old"} ) {
@@ -55,7 +52,7 @@ sub new {
 
 
     # Obtention du userId BD
-    $updatePasswdAttr{userId} = &OBM::Update::utils::getUserIdFromUserLoginDomain( $updatePasswdAttr{dbHandler}, $updatePasswdAttr{userLogin}, $updatePasswdAttr{domainId} );
+    $updatePasswdAttr{userId} = &OBM::Update::utils::getUserIdFromUserLoginDomain( $updatePasswdAttr{userLogin}, $updatePasswdAttr{domainId} );
     if( !defined($updatePasswdAttr{userId}) ) {
         &OBM::toolBox::write_log( "[Update::updatePassword]: utilisateur '".$updatePasswdAttr{userLogin}."' inconnu", "W" );
         return undef;
@@ -63,10 +60,10 @@ sub new {
 
 
     # Obtention des informations sur les domaines nécessaires
-    $updatePasswdAttr{domainList} = &OBM::Update::utils::getDomains( $updatePasswdAttr{dbHandler}, $updatePasswdAttr{domainId} );
+    $updatePasswdAttr{domainList} = &OBM::Update::utils::getDomains( $updatePasswdAttr{domainId} );
 
     # Obtention des serveurs LDAP par domaines
-    &OBM::Update::utils::getLdapServer( $updatePasswdAttr{dbHandler}, $updatePasswdAttr{domainList} );
+    &OBM::Update::utils::getLdapServer( $updatePasswdAttr{domainList} );
 
     # Initialisation du moteur LDAP
     $updatePasswdAttr{engine}->{ldapEngine} = OBM::Ldap::ldapEngine->new( $updatePasswdAttr{domainList} );
@@ -88,7 +85,7 @@ sub new {
         return undef;
     }
 
-    if( !$updatePasswdAttr{userObject}->getEntity( $updatePasswdAttr{dbHandler}, &OBM::Update::utils::findDomainbyId( $updatePasswdAttr{domainList}, $updatePasswdAttr{domainId} ) ) ) {
+    if( !$updatePasswdAttr{userObject}->getEntity( &OBM::Update::utils::findDomainbyId( $updatePasswdAttr{domainList}, $updatePasswdAttr{domainId} ) ) ) {
         &OBM::toolBox::write_log( "[Update::updatePassword]: erreur a l'initialisation de l'utilisateur.", "W" );
         return undef;
     }
@@ -116,7 +113,7 @@ sub update {
     }
 
 
-    if( !$userObject->updateDbEntityPassword( $self->{dbHandler}, $self->{newPasswordDesc} ) ) {
+    if( !$userObject->updateDbEntityPassword( $self->{newPasswordDesc} ) ) {
         return 0;
     }
 

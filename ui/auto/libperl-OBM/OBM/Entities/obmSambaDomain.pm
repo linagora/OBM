@@ -12,8 +12,7 @@ use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getL
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
-require OBM::toolBox;
-require OBM::dbUtils;
+require OBM::Tools::obmDbHandler;
 use URI::Escape;
 
 
@@ -56,13 +55,8 @@ sub new {
 
 sub getEntity {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
-
-    if( !defined($dbHandler) ) {
-        $self->_log( '[Entities::obmSambaDomain]: connecteur a la base de donnee invalide', 3 );
-        return 0;
-    }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
         $self->_log( '[Entities::obmSambaDomain]: description de domaine OBM incorrecte', 3 );
@@ -88,10 +82,10 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
-    my( $dbHandler ) = @_;
     # Pas de tables de production pour le type obmSambaDomain. Ces informations
     # font parties des informations de domaines
 
+#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
 #    if( !defined($dbHandler) ) {
 #        return 0;
 #    }
@@ -102,10 +96,10 @@ sub updateDbEntity {
 
 sub updateDbEntityLinks {
     my $self = shift;
-    my( $dbHandler ) = @_;
     # Pas de tables de production pour le type obmSambaDomain. Ces informations
     # font parties des informations de domaines
 
+#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
 #    if( !defined($dbHandler) ) {
 #        return 0;
 #    }
@@ -117,7 +111,7 @@ sub updateDbEntityLinks {
 
 sub getEntityLinks {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     return 1;
 }

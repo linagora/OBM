@@ -67,6 +67,8 @@ sub writeLog {
             $self->_openLog();
         }
 
+        $text =~ s/\s+/ /g;
+        $text =~ s/\t+/ /g;
         Sys::Syslog::syslog( $priority, $text );
     }
 

@@ -11,9 +11,8 @@ use strict;
 use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId _log);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
+require OBM::Tools::obmDbHandler;
 require OBM::Ldap::utils;
-require OBM::toolBox;
-require OBM::dbUtils;
 use URI::Escape;
 
 
@@ -56,9 +55,10 @@ sub new {
 
 sub getEntity {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         $self->_log( '[Entities::obmMailServer]: connecteur a la base de donnee invalide', 3 );
         return 0;
@@ -91,8 +91,7 @@ sub getEntity {
     my $query = "SELECT i.host_name, k.domainmailserver_role FROM Host i, MailServer j, DomainMailServer k WHERE i.host_id=j.mailserver_host_id AND j.mailserver_id=k.domainmailserver_mailserver_id AND k.domainmailserver_domain_id=".$self->{"domainId"};
 
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -122,10 +121,10 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
-    my( $dbHandler ) = @_;
     # Pas de tables de production pour le type obmMailServer. Ces informations
     # font parties des informations de domaines
 
+#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
 #    if( !defined($dbHandler) ) {
 #        return 0;
 #    }
@@ -136,10 +135,10 @@ sub updateDbEntity {
 
 sub updateDbEntityLinks {
     my $self = shift;
-    my( $dbHandler ) = @_;
     # Pas de tables de production pour le type obmMailServer. Ces informations
     # font parties des informations de domaines
     
+#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
 #    if( !defined($dbHandler) ) {
 #        return 0;
 #    }
@@ -150,7 +149,7 @@ sub updateDbEntityLinks {
 
 sub getEntityLinks {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     return 1;
 }

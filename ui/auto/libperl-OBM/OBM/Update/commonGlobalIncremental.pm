@@ -131,7 +131,7 @@ sub _doUser {
     }
 
     my $userObject = OBM::Entities::obmUser->new( $links, $delete, $userId );
-    my $return = $userObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
+    my $return = $userObject->getEntity( &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -157,7 +157,7 @@ sub _doGroup {
     }
 
     my $groupObject = OBM::Entities::obmGroup->new( $links, $delete, $groupId );
-    my $return = $groupObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
+    my $return = $groupObject->getEntity( &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -183,7 +183,7 @@ sub _doMailShare {
     }
 
     my $mailShareObject = OBM::Entities::obmMailshare->new( $links, $delete, $mailshareId );
-    my $return = $mailShareObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
+    my $return = $mailShareObject->getEntity( &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -209,7 +209,7 @@ sub _doHost {
     }
 
     my $hostObject = OBM::Entities::obmHost->new( $links, $delete, $hostId );
-    my $return = $hostObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
+    my $return = $hostObject->getEntity( &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -231,7 +231,7 @@ sub _doSystemUser {
     }
 
     my $systemUserObject = OBM::Entities::obmSystemUser->new( $links, $delete, $systemUserId );
-    my $return = $systemUserObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
+    my $return = $systemUserObject->getEntity( &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -253,7 +253,7 @@ sub _doSambaDomain {
     }
 
     my $sambaDomainObject = OBM::Entities::obmSambaDomain->new( $links, $delete );
-    my $return = $sambaDomainObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
+    my $return = $sambaDomainObject->getEntity( &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }
@@ -275,7 +275,7 @@ sub _doMailServer {
     }
 
     my $mailServerObject = OBM::Entities::obmMailServer->new( $links, $delete );
-    my $return = $mailServerObject->getEntity( $self->{"dbHandler"}, &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
+    my $return = $mailServerObject->getEntity( &OBM::Update::utils::findDomainbyId( $self->{"domainList"}, $self->{"domain"} ) );
     if( !$return ) {
         return undef;
     }

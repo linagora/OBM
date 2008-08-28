@@ -140,16 +140,6 @@ sub _log {
     my( $text, $level ) = @_;
     require OBM::Tools::obmLog;
 
-    if( !defined($text) ) {
-        return 1;
-    }
-
-    if( !defined($level) || ($level !~ /^[0-9]+$/) ) {
-        $level = 0;
-    }
-
     my $logObject = OBM::Tools::obmLog->instance();
-    $logObject->writeLog( $text, $level, undef );
-
-    return 0;
+    return $logObject->writeLog( $text, $level, undef );
 }

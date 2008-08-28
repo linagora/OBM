@@ -17,7 +17,7 @@ require Sys::Syslog;
 require Exporter;
 
 @ISA = qw(Exporter);
-@EXPORT_function = qw(write_log makeConfigFile getLastUid getLastGid getGroupUsersMailEnable getGroupUsers getGroupUsersSID makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains);
+@EXPORT_function = qw(write_log makeConfigFile getLastUid getLastGid makeEntityMailAddress getEntityRight aclUpdated getHostIpById getHostNameById getMailServerList getDomains);
 @EXPORT = (@EXPORT_function);
 @EXPORT_OK = qw();
 
@@ -239,186 +239,6 @@ sub getLastGid {
 }
 
 
-#------------------------------------------------------------------------------
-# Cette fonction permet de recuperer le login de tous les utilisateurs ayant
-# droit aux mails et faisant partie du groupe dont l'Id est passe en parametre.
-#------------------------------------------------------------------------------
-# Parametres :
-#	$groupId : ID du groupe dont on souhaite recuperer la liste des logins
-#	$dbHandler : reference a l'objet de gestion de la connexion a la base
-#
-# Retour :
-#	reference a un tableau contenant un login par case.
-#------------------------------------------------------------------------------
-sub getGroupUsersMailEnable {
-    my( $groupId, $dbHandler ) = @_;
-
-    return getGroupUsers( $groupId, $dbHandler, "AND i.userobm_mail_perms=1" );
-}
-
-
-#------------------------------------------------------------------------------
-# Cette fonction permet de recuperer le login de tous les utilisateurs
-# faisant partie du groupe dont l'Id est passe en parametre.
-#------------------------------------------------------------------------------
-# Parametres :
-#	$groupId : ID du groupe dont on souhaite recuperer la liste des logins
-#	$dbHandler : reference a l'objet de gestion de la connexion a la base
-#   $sqlRequest : filter SQL permettant de faire le choix des utilisateurs
-#   a recuperer plus finement
-#
-# Retour :
-#	reference a un tableau contenant un login par case.
-#------------------------------------------------------------------------------
-sub getGroupUsers {
-    my( $groupId, $dbHandler, $sqlRequest ) = @_;
-
-    my @tabResult;
-    my $queryResult;
-
-    #
-    # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = "SELECT i.userobm_login FROM P_UserObm i, P_UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id=i.userobm_id";
-
-    if( defined( $sqlRequest ) && ($sqlRequest ne "") ) {
-        $query .= " ".$sqlRequest;
-    }
-    
-    #
-    # On execute la requete
-    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
-        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
-        if( defined($queryResult) ) {
-            write_log( $queryResult->err, 'W' );
-        }
-
-        write_log( "", "C" );
-        exit 1;
-    }
-    #
-    # On stocke le resultat dans le tableau des resultats
-    while( my( $userLogin ) = $queryResult->fetchrow_array )
-    {
-        push( @tabResult, $userLogin );
-    }
-
-    #
-    # Recuperation de la liste des utilisateurs du groupe id : $groupId.
-    $query = "SELECT groupgroup_child_id FROM P_GroupGroup WHERE groupgroup_parent_id=".$groupId;
-    #
-    # On execute la requete
-    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
-        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
-        if( defined($queryResult) ) {
-            write_log( $queryResult->err, 'W' );
-        }
-
-        write_log( "", "C" );
-        exit 1;
-    }
-    #
-    # On traite les resultats
-    while( my( $groupGroupId ) = $queryResult->fetchrow_array )
-    {
-        my $userGroupTmp = getGroupUsers( $groupGroupId, $dbHandler, $sqlRequest );
-
-        for( my $i=0; $i<=$#$userGroupTmp; $i++ )
-        {
-            my $j =0;
-            while( ($j<=$#tabResult) && ($$userGroupTmp[$i] ne $tabResult[$j]) )
-            {
-                $j++;
-            }
-
-            if( $j>$#tabResult )
-            {
-                push( @tabResult, $$userGroupTmp[$i] );
-            }
-        }
-    }
-    
-    return \@tabResult;
-}
-
-
-#------------------------------------------------------------------------------
-# Cette fonction permet de recuperer le SID de tous les utilisateurs
-# faisant partie du groupe dont l'Id est passe en parametre.
-#------------------------------------------------------------------------------
-# Parametres :
-#	$groupId : ID du groupe dont on souhaite recuperer la liste des logins
-#	$dbHandler : reference a l'objet de gestion de la connexion a la base
-#   $baseDN : DN de reference pour les groupes
-#
-# Retour :
-#	reference a un tableau contenant un SID par case.
-#------------------------------------------------------------------------------
-sub getGroupUsersSID {
-    my( $groupId, $dbHandler, $SID ) = @_;
-
-    my @tabResult;
-    my $queryResult;
-
-    #
-    # Recuperation de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = "SELECT i.userobm_uid FROM P_UserObm i, P_UserObmGroup j WHERE j.userobmgroup_group_id=".$groupId." AND j.userobmgroup_userobm_id= i.userobm_id";
-    #
-    # On execute la requete
-    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
-        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
-        if( defined($queryResult) ) {
-            write_log( $queryResult->err, 'W' );
-        }
-
-        write_log( "", "C" );
-        exit 1;
-    }
-    #
-    # On stocke le resultat dans le tableau des resultats
-    while( my( $userSID ) = $queryResult->fetchrow_array )
-    {
-        push( @tabResult, getUserSID( $SID, $userSID ) );
-    }
-
-    #
-    # Recuperation de la liste des utilisateurs du groupe id : $groupId.
-    $query = "SELECT groupgroup_child_id FROM P_GroupGroup WHERE groupgroup_parent_id=".$groupId;
-    #
-    # On execute la requete
-    if( !defined(execQuery( $query, $dbHandler, \$queryResult )) ) {
-        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
-        if( defined($queryResult) ) {
-            write_log( $queryResult->err, "W" );
-        }
-
-        write_log( "", "C" );
-        exit 1;
-    }
-    #
-    # On traite les resultats
-    while( my( $groupGroupId ) = $queryResult->fetchrow_array )
-    {
-        my $userGroupTmp = getGroupUsersSID( $groupGroupId, $dbHandler, $SID );
-
-        for( my $i=0; $i<=$#$userGroupTmp; $i++ )
-        {
-            my $j =0;
-            while( ($j<=$#tabResult) && ($$userGroupTmp[$i] ne $tabResult[$j]) )
-            {
-                $j++;
-            }
-
-            if( $j>$#tabResult )
-            {
-                push( @tabResult, $$userGroupTmp[$i] );
-            }
-        }
-    }
-    
-    return \@tabResult;
-}
-
-
 sub makeEntityMailAddress {
     my( $mailPrefix, $domain ) = @_;
     my @mailList;
@@ -450,19 +270,25 @@ sub makeEntityMailAddress {
 # une entité.
 #------------------------------------------------------------------------------
 sub getEntityRight {
-    my ( $dbHandler, $domain, $rightDef, $shareId ) = @_;
+    my ( $domain, $rightDef, $shareId ) = @_;
     my %entityTemplate = ( "read", 0, "writeonly", 0, "write", 0 );
     my %usersList;
 
 
-    if( !defined($dbHandler) || !defined($rightDef) ||  !defined($shareId) ) {
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        write_log( 'Echec: connecteur a la base de donnee invalide', 'W', 3 );
+        return undef;
+    }
+
+    if( !defined($rightDef) ||  !defined($shareId) ) {
         return undef;
     }
 
 
     # On execute la requete
-    if( !defined(execQuery( $rightDef->{"public"}->{"sqlQuery"}, $dbHandler, \$queryResult )) ) {
-        write_log( 'Echec : probleme lors de l\'execution de la requete : '.$queryResult->err, 'W' );
+    if( !defined($dbHandler->execQuery( $rightDef->{"public"}->{"sqlQuery"}, \$queryResult )) ) {
         return undef;
     }
 
@@ -509,8 +335,7 @@ sub getEntityRight {
         }
 
         # On execute la requête correspondant au droit
-        if( !defined(execQuery( $rightDef->{$right}->{"sqlQuery"}, $dbHandler, \$queryResult )) ) {
-            write_log( 'Echec : probleme lors de l\'execution de la requete : '.$queryResult->err, 'W' );
+        if( !defined($dbHandler->execQuery( $rightDef->{$right}->{"sqlQuery"}, \$queryResult )) ) {
             return undef;
         }
 
@@ -729,9 +554,11 @@ sub getMailServerList {
 # Permet d'obtenir la liste des domaines OBM
 #------------------------------------------------------------------------------
 sub getDomains {
-    my( $dbHandler, $obmDomainId ) = @_;
+    my( $obmDomainId ) = @_;
     my $domainList = &OBM::utils::cloneStruct(OBM::Parameters::toolBoxConf::domainList);
 
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         write_log( "Connection à la base de donnée incorrect !", "W" );
         return undef;
@@ -764,12 +591,7 @@ sub getDomains {
 
     # On execute la requete concernant les domaines
     my $queryDomainResult;
-    if( !defined(execQuery( $queryDomain, $dbHandler, \$queryDomainResult )) ) {
-        write_log( 'Probleme lors de l\'execution de la requete.', 'W' );
-        if( defined($queryDomainResult) ) {
-            write_log( $queryDomainResult->err, "W" );
-        }
-
+    if( !defined($dbHandler->execQuery( $queryDomain, \$queryDomainResult )) ) {
         return undef;
     }
 

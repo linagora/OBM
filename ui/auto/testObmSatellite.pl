@@ -2,6 +2,7 @@
 
 require 5.003;
 require OBM::toolBox;
+require OBM::Tools::obmDbHandler;
 use Net::Telnet;
 use Getopt::Long;
 use strict;
@@ -122,10 +123,9 @@ if( !getParameter( \%parameters ) ) {
 }
 
 # On se connecte a la base
-my $dbHandler;
-&OBM::toolBox::write_log( "Connexion a la base de donnees OBM", "W", 3 );
-if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnees : ".$dbHandler->err, "WC", 0 );
+my $dbHandler = OBM::Tools::obmDbHandler->instance();
+if( !defined($dbHandler) ) {
+    &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
     exit 1;
 }
 
@@ -134,8 +134,7 @@ my $query = "SELECT i.host_name, i.host_ip, j.mailserver_imap, j.mailserver_smtp
 
 # On execute la requete
 my $queryResult;
-if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-    &OBM::toolBox::write_log( 'Probleme lors de l\'execution de la requete : '.$dbHandler->err, 'WC', 0 );
+if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
     exit 1;
 }
 
@@ -180,11 +179,7 @@ while( my( $serverName, $serverIp, $imapSrv, $smtpInSrv, $smtpOutSrv ) = $queryR
 }
 
 # Deconnexion de la BD
-&OBM::toolBox::write_log( "Deconnexion de la base de donnees OBM", "W" );
-if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "W" );
-}
-
+$dbHandler->destroy();
 
 # Fin de MAJ des MTA
 &OBM::toolBox::write_log( "Fin de mise a jour des MTA", "W" );

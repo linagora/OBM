@@ -12,9 +12,9 @@ use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLi
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
+require OBM::Tools::obmDbHandler;
 require OBM::passwd;
 require OBM::toolBox;
-require OBM::dbUtils;
 require OBM::Samba::utils;
 use URI::Escape;
 
@@ -74,7 +74,7 @@ sub new {
 
 sub getEntity {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     my $userId = $self->{"objectId"};
     if( !defined($userId) ) {
@@ -83,6 +83,7 @@ sub getEntity {
     }
 
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         $self->_log( '[Entities::obmUser]: connecteur a la base de donnee invalide', 3 );
         return 0;
@@ -109,8 +110,7 @@ sub getEntity {
     my $query = "SELECT COUNT(*) FROM ".$userObmTable." LEFT JOIN ".$mailServerTable." ON userobm_mail_server_id=mailserver_id WHERE userobm_id=".$userId;
 
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -130,8 +130,7 @@ sub getEntity {
     $query = "SELECT * FROM ".$userObmTable." WHERE userobm_id=".$userId;
 
     # On exécute la requête
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -158,8 +157,7 @@ sub getEntity {
     }
 
     # On exécute la requête
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -264,7 +262,7 @@ sub getEntity {
             last SWITCH;
         }
 
-        $localServerIp = $self->getHostIpById( $dbHandler, $dbUserMoreDesc->{mailserver_host_id} );
+        $localServerIp = $self->getHostIpById( $dbUserMoreDesc->{mailserver_host_id} );
         if( !defined($localServerIp) ) {
             $self->_log( '[Entities::obmUser]: droit mail de l\'utilisateur \''.$dbUserDesc->{'userobm_login'}.'\', domaine \''.$domainDesc->{'domain_label'}.'\' - annule, serveur inconnu !', 2 );
             $self->{"properties"}->{userobm_mail_perms} = 0;
@@ -418,7 +416,7 @@ sub getEntity {
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
     if( $self->isLinks() ) {
-        $self->getEntityLinks( $dbHandler, $domainDesc );
+        $self->getEntityLinks( $domainDesc );
     }
 
 
@@ -428,8 +426,8 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
-    my( $dbHandler ) = @_;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         return 0;
     }
@@ -459,10 +457,10 @@ sub updateDbEntity {
 
 
     my $queryResult;
-    my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+    my $result = $dbHandler->execQuery( $query, \$queryResult );
 
     if( !defined($result) ) {
-        $self->_log( '[Entities::obmUser]: probleme a la mise a jour de l\'utilisateur : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+        $self->_log( '[Entities::obmUser]: probleme a la mise a jour de l\'utilisateur', 2 );
         return 0;
 
     }elsif( $result == 0 ) {
@@ -475,9 +473,9 @@ sub updateDbEntity {
 
         $query = 'INSERT INTO P_UserObm ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')';
 
-        $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+        $result = $dbHandler->execQuery( $query, \$queryResult );
         if( !defined($result) ) {
-            $self->_log( '[Entities::obmUser]: probleme a la mise a jour de l\'utilisateur : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+            $self->_log( '[Entities::obmUser]: probleme a la mise a jour de l\'utilisateur', 2 );
             return 0;
         }elsif( $result != 1 ) {
             $self->_log( '[Entities::obmGroup]: probleme a la mise a jour de l\'utilisateur : utiisateur insere '.$result.' fois dans les tables de production !', 2 );
@@ -493,8 +491,8 @@ sub updateDbEntity {
 
 sub updateDbEntityLinks {
     my $self = shift;
-    my( $dbHandler ) = @_;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         return 0;
     }
@@ -504,16 +502,14 @@ sub updateDbEntityLinks {
     # On supprime les liens actuels de la table de production
     my $query = "DELETE FROM P_EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"objectId"};
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
 
     # On copie les nouveaux droits
     $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"objectId"};
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmUser]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -524,9 +520,10 @@ sub updateDbEntityLinks {
 
 sub updateDbEntityPassword {
     my $self = shift;
-    my( $dbHandler, $passwordDesc ) = @_;
+    my( $passwordDesc ) = @_;
     my $queryResult;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) || (ref($passwordDesc) ne "HASH") ) {
         return 0;
     }
@@ -544,15 +541,13 @@ sub updateDbEntityPassword {
     
 
     my $query = "UPDATE UserObm SET userobm_password_type=".$dbHandler->quote($passwordDesc->{newPasswordType}).", userobm_password=".$dbHandler->quote($passwordDesc->{newPassword})." WHERE userobm_id=".$self->{objectId};
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
 
     $query = "UPDATE P_UserObm SET userobm_password_type=".$dbHandler->quote($passwordDesc->{newPasswordType}).", userobm_password=".$dbHandler->quote($passwordDesc->{newPassword})." WHERE userobm_id=".$self->{objectId};
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -564,9 +559,9 @@ sub updateDbEntityPassword {
 
 sub getEntityLinks {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
-    $self->_getEntityMailboxAcl( $dbHandler, $domainDesc );
+    $self->_getEntityMailboxAcl( $domainDesc );
 
     # On précise que les liens de l'entité sont aussi à mettre à jour.
     $self->{"links"} = 1;
@@ -612,7 +607,7 @@ sub getEntityDescription {
 
 sub _getEntityMailboxAcl {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
     my $dbEntry = $self->{userDbDesc};
     my $entryProp = $self->{"properties"};
     my $userId = $self->{"objectId"};
@@ -642,7 +637,7 @@ sub _getEntityMailboxAcl {
         $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".$entityRightTable." WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
 
         # On recupere la definition des ACL
-        $self->{"userLinks"}->{"userobm_mailbox_acl"} = &OBM::toolBox::getEntityRight( $dbHandler, $domainDesc, \%rightDef, $userId );
+        $self->{"userLinks"}->{"userobm_mailbox_acl"} = &OBM::toolBox::getEntityRight( $domainDesc, \%rightDef, $userId );
     }
 
     return 1;
@@ -1397,7 +1392,7 @@ sub dump {
 
 sub getHostIpById {
     my $self = shift;
-    my( $dbHandler, $hostId ) = @_;
+    my( $hostId ) = @_;
 
     if( !defined($hostId) ) {
         $self->_log( '[Entities::obmUser]: identifiant de l\'hote non défini !', 3 );
@@ -1405,7 +1400,10 @@ sub getHostIpById {
     }elsif( $hostId !~ /^[0-9]+$/ ) {
         $self->_log( '[Entities::obmUser]: identifiant de l\'hote \''.$hostId.'\' incorrect !', 3 );
         return undef;
-    }elsif( !defined($dbHandler) ) {
+    }
+    
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
         $self->_log( '[Entities::obmUser]: connection a la base de donnee incorrect !', 3 );
         return undef;
     }
@@ -1418,8 +1416,7 @@ sub getHostIpById {
     my $query = "SELECT host_ip FROM ".$hostTable." WHERE host_id='".$hostId."'";
     # On execute la requete
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmUser]: probleme lors de l\'execution de la requete : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return undef;
     }
 

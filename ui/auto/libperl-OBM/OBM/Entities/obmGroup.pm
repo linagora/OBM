@@ -12,8 +12,7 @@ use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLi
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
-require OBM::toolBox;
-require OBM::dbUtils;
+require OBM::Tools::obmDbHandler;
 require OBM::Samba::utils;
 
 
@@ -66,7 +65,7 @@ sub new {
 
 sub getEntity {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     my $groupId = $self->{objectId};
     if( !defined($groupId) ) {
@@ -75,6 +74,7 @@ sub getEntity {
     }
 
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         $self->_log( '[Entities::obmGroup]: connecteur a la base de donnee invalide', 3 );
         return 0;
@@ -97,8 +97,7 @@ sub getEntity {
     my $query = 'SELECT COUNT(*) FROM '.$uGroupTable.' WHERE group_id='.$groupId;
 
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmGroup]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -119,8 +118,7 @@ sub getEntity {
     $query = "SELECT * FROM ".$uGroupTable." WHERE group_id=".$groupId;
 
     # On execute la requete
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmGroup]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -173,7 +171,7 @@ sub getEntity {
     # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
     # cette entité
     if( $self->isLinks() ) {
-        $self->getEntityLinks( $dbHandler, $domainDesc );
+        $self->getEntityLinks( $domainDesc );
     }
 
     return 1;
@@ -182,8 +180,8 @@ sub getEntity {
 
 sub updateDbEntity {
     my $self = shift;
-    my( $dbHandler ) = @_;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         return 0;
     }
@@ -214,10 +212,10 @@ sub updateDbEntity {
 
 
     my $queryResult;
-    my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+    my $result = $dbHandler->execQuery( $query, \$queryResult );
 
     if( !defined($result) ) {
-        $self->_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+        $self->_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe', 2 );
         return 0;
 
     }elsif( $result == 0 ) {
@@ -230,9 +228,9 @@ sub updateDbEntity {
 
         $query = 'INSERT INTO P_UGroup ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')'; 
         
-        $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+        $result = $dbHandler->execQuery( $query, \$queryResult );
         if( !defined($result) ) {
-            $self->_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+            $self->_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe', 2 );
             return 0;
         }elsif( $result != 1 ) {
             $self->_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : groupe insere '.$result.' fois dans les tables de production !', 2 );
@@ -248,10 +246,11 @@ sub updateDbEntity {
 
 sub updateDbEntityLinks {
     my $self = shift;
-    my( $dbHandler ) = @_;
     my $queryResult;
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
+        $self->_log( "[Entities::obmContact]: connecteur a la base de donnee invalide", 3 );
         return 0;
     }
 
@@ -261,8 +260,7 @@ sub updateDbEntityLinks {
     # utilisateurs/groupes
     my $query = 'DELETE FROM P_of_usergroup WHERE of_usergroup_group_id='.$self->{objectId};
 
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmGroup]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -270,8 +268,7 @@ sub updateDbEntityLinks {
     # On copie les nouveaux droits
     $query = 'INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_group_id='.$self->{objectId};
 
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmGroup]: probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -283,19 +280,19 @@ sub updateDbEntityLinks {
 
 sub getEntityLinks {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
     # Récupération des membres du groupe
-    $self->{groupLinks}->{group_users} = $self->_getGroupUsers( $dbHandler, $domainDesc, undef, undef );
+    $self->{groupLinks}->{group_users} = $self->_getGroupUsers( $domainDesc, undef, undef );
 
     # Gestion des utilisateurs de la liste ayant droit au mail
     if( $self->{"properties"}->{group_mailperms} ) {
-        $self->{groupLinks}->{group_contacts} = $self->_getGroupUsersMailEnable( $dbHandler, $domainDesc );
+        $self->{groupLinks}->{group_contacts} = $self->_getGroupUsersMailEnable( $domainDesc );
     }
 
     # Gestion des utilisateurs de la liste ayant le droit Samba
     if( $self->{"properties"}->{group_samba} ) {
-        $self->{groupLinks}->{group_samba_users} = $self->_getGroupUsersSid( $dbHandler, $domainDesc );
+        $self->{groupLinks}->{group_samba_users} = $self->_getGroupUsersSid( $domainDesc );
     }
 
     # On précise que les liens de l'entité sont aussi à mettre à jour.
@@ -342,9 +339,9 @@ sub getEntityDescription {
 
 sub _getGroupUsersMailEnable {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
-    my $loginList = $self->_getGroupUsers( $dbHandler, $domainDesc, undef, "AND i.userobm_mail_perms=1" );
+    my $loginList = $self->_getGroupUsers( $domainDesc, undef, "AND i.userobm_mail_perms=1" );
 
     for( my $i=0; $i<=$#$loginList; $i++ ) {
         $loginList->[$i] .= "@".$domainDesc->{domain_name};
@@ -356,9 +353,9 @@ sub _getGroupUsersMailEnable {
 
 sub _getGroupUsersSid {
     my $self = shift;
-    my( $dbHandler, $domainDesc ) = @_;
+    my( $domainDesc ) = @_;
 
-    my $uidList = $self->_getGroupUsers( $dbHandler, $domainDesc, "userobm_uid", "AND i.userobm_samba_perms=1" );
+    my $uidList = $self->_getGroupUsers( $domainDesc, "userobm_uid", "AND i.userobm_samba_perms=1" );
 
     for( my $i=0; $i<=$#$uidList; $i++ ) {
         $uidList->[$i] = $domainDesc->{domain_samba_sid}."-".$uidList->[$i];
@@ -370,10 +367,11 @@ sub _getGroupUsersSid {
 
 sub _getGroupUsers {
     my $self = shift;
-    my( $dbHandler, $domainDesc, $sqlResultColumn, $sqlRequest ) = @_;
+    my( $domainDesc, $sqlResultColumn, $sqlRequest ) = @_;
     my $groupId = $self->{objectId};
 
 
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
         return undef;
     }
@@ -404,8 +402,8 @@ sub _getGroupUsers {
 
     # On exécute la requête
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        $self->_log( '[Entities::obmGroup]: probleme SQL lors de l\'obtention des utilisateurs du groupe : '.$queryResult->err.' - '.$dbHandler->errstr, 2 );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( '[Entities::obmGroup]: probleme lors de l\'obtention des utilisateurs du groupe', 2 );
         return undef;
     }
 
