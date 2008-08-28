@@ -7,6 +7,7 @@
 
 use strict;
 require OBM::toolBox;
+require OBM::Tools::obmDbHandler;
 require OBM::Update::updateCyrusAcl;
 use OBM::Parameters::common;
 use Getopt::Long;
@@ -87,15 +88,14 @@ if( getParameter( \%parameters ) ) {
 
 
 # On se connecte àla base
-my $dbHandler;
-&OBM::toolBox::write_log( 'Connexion a la base de donnees OBM', 'W', 3 );
-if( !&OBM::dbUtils::dbState( 'connect', \$dbHandler ) ) {
-    &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees : '.$dbHandler->err, 'WC', 0 );
+my $dbHandler = OBM::Tools::obmDbHandler->instance();
+if( !defined($dbHandler) ) {
+    &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
     exit 1;
 }
 
 
-my $updateCyrusAcl = OBM::Update::updateCyrusAcl->new( $dbHandler, \%parameters );
+my $updateCyrusAcl = OBM::Update::updateCyrusAcl->new( \%parameters );
 my $errorCode = 0;
 if( defined($updateCyrusAcl) ) {
      $errorCode = $updateCyrusAcl->update();
@@ -105,10 +105,7 @@ if( defined($updateCyrusAcl) ) {
 
 
 # On referme la connexion àla base
-&OBM::toolBox::write_log( "Deconnexion de la base de donnees OBM", "W" );
-if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "W" );
-}
+$dbHandler->destroy();
 
 
 # On ferme le log

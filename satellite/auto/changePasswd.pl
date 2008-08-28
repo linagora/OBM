@@ -14,6 +14,7 @@
 use strict;
 require OBM::toolBox;
 require OBM::dbUtils;
+require OBM::Tools::obmDbHandler;
 require OBM::Update::updatePassword;
 use OBM::Parameters::common;
 use Getopt::Long;
@@ -256,20 +257,14 @@ if( ($getParamRet == 2) || ($parameters{'interactiv'} && $getParamRet) ) {
 }
 
 # On se connecte a la base
-my $dbHandler;
-&OBM::toolBox::write_log( "Connexion a la base de donnees OBM", "W", 3 );
-if( !&OBM::dbUtils::dbState( "connect", \$dbHandler ) ) {
-    if( defined($dbHandler) ) {
-        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnees : ".$dbHandler->err, "WC", 0 );
-    }else {
-        &OBM::toolBox::write_log( "Probleme lors de l'ouverture de la base de donnees : erreur inconnue", "WC", 0 );
-    }
-
+my $dbHandler = OBM::Tools::obmDbHandler->instance();
+if( !defined($dbHandler) ) {
+    &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
     exit 2;
 }
 
 
-my $updatePasswd = OBM::Update::updatePassword->new( $dbHandler, \%parameters );
+my $updatePasswd = OBM::Update::updatePassword->new( \%parameters );
 my $errorCode = 0;
 if( defined($updatePasswd) ) {
     $errorCode = $updatePasswd->update();
@@ -277,9 +272,7 @@ if( defined($updatePasswd) ) {
 
 
 # On referme la connexion à la base
-if( !&OBM::dbUtils::dbState( "disconnect", \$dbHandler ) ) {
-    &OBM::toolBox::write_log( "Probleme lors de la fermeture de la base de donnees...", "W", 1 );
-}
+$dbHandler->destroy();
 
 
 # On ferme le log

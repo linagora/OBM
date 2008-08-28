@@ -11,6 +11,7 @@ use Getopt::Long;
 require OBM::Ldap::ldapEngine;
 require OBM::Update::utils;
 require OBM::Entities::obmContact;
+require OBM::Tools::obmDbHandler;
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
@@ -63,25 +64,19 @@ my %parameters;
 &getParameter( \%parameters );
 
 # On se connecte à la base
-my $dbHandler;
-&OBM::toolBox::write_log( 'Connexion a la base de donnees OBM', 'W', 3 );
-if( !&OBM::dbUtils::dbState( 'connect', \$dbHandler ) ) {
-    if( defined($dbHandler) ) {
-        &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees : '.$dbHandler->err, 'WC', 0 );
-    }else {
-        &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees : erreur inconnue', 'WC', 0 );
-    }
-
+my $dbHandler = OBM::Tools::obmDbHandler->instance();
+if( !defined($dbHandler) ) {
+    &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
     exit 1;
 }
 
 
 # Obtention de la liste des domaines
 &OBM::toolBox::write_log( 'Obtention des domaines OBM', 'W' );
-my $domainList = &OBM::Update::utils::getDomains( $dbHandler, undef );
+my $domainList = &OBM::Update::utils::getDomains( undef );
 
 # Obtention des serveurs LDAP par domaines
-&OBM::Update::utils::getLdapServer( $dbHandler, $domainList );
+&OBM::Update::utils::getLdapServer( $domainList );
 
 # On démarre un moteur LDAP
 &OBM::toolBox::write_log( 'Initialisation du moteur LDAP', 'W' );
@@ -110,8 +105,7 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
                         AND domainpropertyvalue_property_key = \'last_public_contact_export\'
                         LIMIT 1';
         my $queryResult;
-        if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-            &OBM::toolBox::write_log( 'Probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
+        if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
             exit 1;
         }
 
@@ -146,8 +140,7 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
                     WHERE UNIX_TIMESTAMP(deletedcontact_timestamp) > \''.$timeStamp.'\')';
 
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( 'Probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         exit 1;
     }
     
@@ -182,8 +175,7 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
                     AND contact_archive=\'0\'
                     AND contact_domain_id=\''.$domain->{'domain_id'}.'\'
                     AND UNIX_TIMESTAMP(contact_timeupdate) > \''.$timeStamp.'\'';
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( 'Probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         exit 1;
     }
     
@@ -191,7 +183,7 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
         my $object = OBM::Entities::obmContact->new( 0, 0, $contactId );
         &OBM::toolBox::write_log( 'Ajout de l\'objet : '.$object->getEntityDescription(), 'W', 2 );
 
-        if( !$object->getEntity( $dbHandler, $domain ) ) {
+        if( !$object->getEntity( $domain ) ) {
             &OBM::toolBox::write_log( 'Erreur: description LDAP de l\'objet invalide : '.$object->getEntityDescription(), 'W', 1 );
             next;
         }
@@ -210,9 +202,8 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
                 domainpropertyvalue_domain_id='.$domain->{'domain_id'}.' AND
                 domainpropertyvalue_property_key=\'last_public_contact_export\'';
 
-    my $result = &OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult );
+    my $result = $dbHandler->execQuery( $query, \$queryResult );
     if( !defined($result) ) {
-        &OBM::toolBox::write_log( 'Probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
         exit 1;
     }elsif( $result == 0 ) {
         $query = 'INSERT INTO DomainPropertyValue
@@ -220,8 +211,7 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
                   VALUES
                     ('.$domain->{'domain_id'}.', \'last_public_contact_export\', \''.$timeStamp.'\')';
 
-        if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-            &OBM::toolBox::write_log( 'Probleme lors de l\'execution d\'une requete SQL : '.$dbHandler->err.' - '.$dbHandler->errstr, 'W', 2 );
+        if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
             exit 1;
         }
     }
@@ -231,9 +221,7 @@ for( my $i=0; $i<=$#{$domainList}; $i++ ) {
 $ldapEngine->destroy();
 
 # On referme la connexion à la base
-if( !&OBM::dbUtils::dbState( 'disconnect', \$dbHandler ) ) {
-    &OBM::toolBox::write_log( 'Probleme lors de la fermeture de la base de donnees...', 'W' );
-}
+$dbHandler->destroy();
 
 # On ferme le log
 &OBM::toolBox::write_log( 'Fin du traitement', 'W' );
