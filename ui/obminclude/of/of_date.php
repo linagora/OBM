@@ -131,6 +131,12 @@ class Of_Date extends DateTime {
       '08' => 'aug', '09' => 'sep', '10' => 'oct', '11' => 'nov', '12' => 'dec');
 
 
+  private static $_options = array(
+    'outputdatetime' => 'm/d/Y H:i:s',
+    'outputdate' => 'm/d/Y',
+    'inputdatetime' => 'm/d/Y H:i:s',
+    'inputdate' => 'd/m/Y'
+  );
   public function __construct($time=null) {
     if(is_numeric($time)) {
       $time = "@$time";
@@ -156,6 +162,26 @@ class Of_Date extends DateTime {
       default :
         return $this->format($part);
     }
+  }
+
+  /**
+   * Get the date time formated with the outdatetime option
+   * 
+   * @access public
+   * @return void
+   */
+  public function getOutputDateTime() {
+    return $this->get(self::$_options['outputdatetime']);
+  }
+
+  /**
+   * Get the date formated with the outdatetime option
+   * 
+   * @access public
+   * @return void
+   */
+  public function getOutputDate() {
+    return $this->get(self::$_options['outputdate']);
   }
 
   /**
@@ -1209,6 +1235,58 @@ class Of_Date extends DateTime {
       elseif($data['second'] < $this->format(self::SECOND)) return 1;
     }
     return 0;    
+  }
+
+  /**
+   * Compare a part of a date to the current object part. 
+   * and return an array containing the difference between both
+   * date
+   * If part is null all given parts of the given date
+   * will be compare.
+   * 
+   * @param string $part  part to set
+   * @param integer|string|array|Of_Date $time to set
+   * @param string $format format of the $date param
+   * @return of_Date
+   */   
+  function _diff($parts,$date, $format) {
+    $data = self::_parse($parts, $date, $format);
+    $diff = array();
+    if(isset($data['timestamp'])) {
+      $diff['timestamp'] = $data['timestamp'] - $this->format(self::TIMESTAMP);
+    }     
+    if(isset($data['year'])) {
+      $diff['year'] = $data['year'] - $this->format(self::YEAR);
+    } 
+    if(isset($data['month'])) {
+      $diff['month'] = $data['month'] - $this->format(self::MONTH);
+    } 
+    if(isset($data['dayofyear'])) {
+      $diff['dayofyear'] = $data['dayofyear'] - $this->format(self::DAY_OF_YEAR);
+    } 
+    if(isset($data['week'])) {
+      $diff['week'] = $data['week'] - $this->format(self::WEEK);
+    } 
+    if(isset($data['day'])) {
+      $diff['day'] =  $data['day'] - $this->format(self::DAY);
+    } 
+    if(isset($data['weekday'])) {
+      $diff['weekday'] = ($data['weekday'] - $this->format(self::WEEKDAY_DIGIT) + 7) % 7 ;
+    } 
+    if(isset($data['hour'])) {
+      $diff['hour'] =  $data['hour'] - $this->format(self::HOUR);
+    } 
+    if(isset($data['minute'])) {
+      $diff['minute'] =  $data['minute'] - $this->format(self::MINUTE);
+    } 
+    if(isset($data['second'])) {
+      $diff['second'] =  $data['second'] - $this->format(self::SECOND);
+    }
+    if(count($diff) == 1) {
+      return array_pop($diff);
+    } else {
+      return $diff;
+    }
   }
 
   /**

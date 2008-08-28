@@ -362,11 +362,10 @@ function of_domain_get_list() {
  * @return mailserver array
  **/
 function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
-  global $cdg_sql;
-
-  if (!is_null($domain_id)) {
+  global $cdg_sql, $obm;
+  if (!is_null($domain_id) &&  !$obm['domain_global']) {
     $domain_id = sql_parse_id($domain_id, true);
-    $where_domain = "domainmailserver_domain_id $domain_id ";
+    $where_domain = "domain_id $domain_id OR domain_global = true";
     $and = 'AND';
   }
   if ($role != '') {
@@ -386,6 +385,7 @@ function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
     host_name,
     host_ip
     FROM DomainMailServer
+    LEFT JOIN Domain ON domainmailserver_domain_id = domain_id
     LEFT JOIN MailServer ON domainmailserver_mailserver_id=mailserver_id
     LEFT JOIN Host ON mailserver_host_id=host_id
     $where";
@@ -571,7 +571,7 @@ function of_domain_html_select($domains, $domain_id='', $first_element='', $sel_
  **/
 function of_domain_dis_mailserver_select($role, $sel_id='', $domain_id='') {
 
-  $dms = of_domain_get_domain_mailserver($role, $domain_id='');
+  $dms = of_domain_get_domain_mailserver($role, $domain_id);
 
   // select
   $sel = "<select id=\"sel_mail_server_id\" name=\"sel_mail_server_id\">";
