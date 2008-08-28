@@ -11,7 +11,6 @@ use base qw(Exporter);
 
 
 require OBM::toolBox;
-require OBM::dbUtils;
 require OBM::Postfix::smtpInRemoteEngine;
 require OBM::Postfix::smtpOutRemoteEngine;
 require OBM::Update::utils;
@@ -37,10 +36,11 @@ $VERSION = "1.0";
 sub _updateState {
     my $self = shift;
 
-    if( !defined($self->{"dbHandler"}) ) {
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::commonGlobalIncremental]: connecteur a la base de donnee invalide', 'W', 3 );
         return 0;
     }
-    my $dbHandler = $self->{"dbHandler"};
 
     if( !defined($self->{"domain"}) || ($self->{"domain"} !~ /^\d+$/) ) {
         &OBM::toolBox::write_log( "[Update::commonGlobalIncremental]: pas de domaine indique pour la MAJ totale", "W" );
@@ -50,8 +50,7 @@ sub _updateState {
    
     my $query = "UPDATE DomainPropertyValue SET domainpropertyvalue_value=0 WHERE domainpropertyvalue_property_key='update_state' AND domainpropertyvalue_domain_id=".$domainId;
     my $queryResult;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::commonGlobalIncremental]: probleme lors de l\'execution de la requete : '.$dbHandler->err, 'W' );
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 
@@ -302,15 +301,15 @@ sub _deleteDbEntity {
 
 
     # On supprime les informations de l'entité de la table de travail
-    my $dbHandler = $self->{"dbHandler"};
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        &OBM::toolBox::write_log( '[Update::commonGlobalIncremental]: connecteur a la base de donnee invalide', 'W', 3 );
+        return 0;
+    }
+
     my $queryResult;
     my $query = "DELETE FROM P_".$table." WHERE ".$columnPrefix."_id=".$id;
-    if( !defined(&OBM::dbUtils::execQuery( $query, $dbHandler, \$queryResult )) ) {
-        &OBM::toolBox::write_log( '[Update::updateIncremental]: probleme lors de l\'execution de la requete', 'W' );
-        if( defined($queryResult) ) {
-            &OBM::toolBox::write_log( '[Update::updateIncremental]: '.$queryResult->err, 'W' );
-        }
-
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 0;
     }
 

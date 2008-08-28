@@ -11,7 +11,6 @@ use strict;
 
 require OBM::toolBox;
 require OBM::imapd;
-require OBM::dbUtils;
 require OBM::Ldap::ldapEngine;
 require OBM::Cyrus::cyrusEngine;
 require OBM::Cyrus::sieveEngine;

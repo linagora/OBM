@@ -11,7 +11,6 @@ use strict;
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 require OBM::toolBox;
-require OBM::dbUtils;
 require OBM::Tools::obmDbHandler;
 
 

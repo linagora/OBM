@@ -11,7 +11,6 @@ package OBM::toolBox;
 
 use OBM::Parameters::common;
 use OBM::Parameters::toolBoxConf;
-use OBM::dbUtils;
 require OBM::utils;
 require Sys::Syslog;
 require Exporter;

@@ -9,7 +9,6 @@ require Exporter;
 use strict;
 
 require OBM::toolBox;
-require OBM::dbUtils;
 require OBM::imapd;
 require OBM::Update::utils;
 require OBM::Cyrus::cyrusEngine;
