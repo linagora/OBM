@@ -38,7 +38,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   if (function_exists($calendar_function)) {
     $block = $calendar_function($calendar, $calendar_entity,$writable_entity,$date);
     $block .= dis_calendar_quick_form($calendar);
-    $display['print_url'] = "$path/calendar/calendar_index.php?cal_view=printable&amp;date=".$calendar['date'];
+    $display['print_url'] = "$path/calendar/calendar_index.php?cal_view=printable&amp;date=".$calendar['date']->getIso();
   } else {
     $block .= dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity);
   }
@@ -72,39 +72,39 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   $block = "
   <div style=\"margin-top:-10px;\">
   <div class=\"SB LF NM\" style=\"margin-left:10px;\">
-  <a href=\"$path/calendar/calendar_index.php?cal_view=agenda&amp;date=$date\">
+  <a href=\"$path/calendar/calendar_index.php?cal_view=agenda&amp;date=".$date->getIso()."\">
   <img 
   title=\"$l_view_agenda_desc\" 
   src=\"$ico_agenda_view\" alt=\"$l_day\"/> 
   </a>
-  <a href=\"$path/calendar/calendar_index.php?cal_view=printable&amp;date=$date\">
+  <a href=\"$path/calendar/calendar_index.php?cal_view=printable&amp;date=".$date->getIso()."\">
   <img 
   title=\"$l_view_printable_desc\" 
   src=\"$ico_printable_view\" alt=\"$l_week\" />
   </a>
-  <a href=\"$path/calendar/calendar_index.php?cal_view=planning&amp;date=$date\">
+  <a href=\"$path/calendar/calendar_index.php?cal_view=planning&amp;date=".$date->getIso()."\">
   <img
   title=\"$l_view_planning_desc\" 
   src=\"$ico_planning_view\" alt=\"$l_month\" />
   </a>
-  <a href=\"$path/calendar/calendar_index.php?cal_view=list&amp;date=$date\">
+  <a href=\"$path/calendar/calendar_index.php?cal_view=list&amp;date=".$date->getIso()."\">
   <img
   title=\"$l_view_list_desc\" 
    src=\"$ico_list_view\" alt=\"$l_list\" />
   </a>  
   </div>
   <div id=\"calendarCalRange\" class=\"SB LF NM\" style=\"margin-left:10px;\">
-  <a href=\"$path/calendar/calendar_index.php?cal_range=day&amp;date=$date\">
+  <a href=\"$path/calendar/calendar_index.php?cal_range=day&amp;date=".$date->getIso()."\">
   <img
   title=\"$l_view_day_desc\" 
   src=\"$ico_day_view\" alt=\"$l_day\" />
   </a>
-  <a href=\"$path/calendar/calendar_index.php?cal_range=week&amp;date=$date\">
+  <a href=\"$path/calendar/calendar_index.php?cal_range=week&amp;date=".$date->getIso()."\">
   <img
   title=\"$l_view_week_desc\" 
   src=\"$ico_week_view\" alt=\"$l_week\" />
   </a>
-  <a href=\"$path/calendar/calendar_index.php?cal_range=month&amp;date=$date\">
+  <a href=\"$path/calendar/calendar_index.php?cal_range=month&amp;date=".$date->getIso()."\">
   <img
   title=\"$l_view_month_desc\" 
   src=\"$ico_month_view\" alt=\"$l_month\" />
@@ -156,9 +156,9 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   global $l_meeting_legend, $l_possible, $l_free, $l_occupied;
   global $l_calendar_displayed, $l_resource_displayed,$c_all,$l_event_color_tt;
   global $action,$ico_delete,$output_target,$l_color,$l_users,$l_events;
-
-  $iso_date = $calendar['date'];
   global $mono_user;
+
+  $iso_date = $calendar['date']->getIso();
   if (count($calendar_entity) == 1 && is_array($calendar_entity['user'])
      && count($calendar_entity['user']) == 1) {
     $colorTemplate = 'event';
@@ -241,7 +241,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
   global $ico_group, $l_calendar;
 
-  $iso_date = $calendar['date'];
+  $iso_date = $calendar['date']->getIso();
   $this_group = $calendar['entity']['group_view'];
   $category_filter = $calendar['category_filter'];
   $group_privacy = $calendar['group_privacy'];
@@ -319,7 +319,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   $sel_cat1 = of_category_html_select('calendar', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
 
   $dis_back_myview = "<a href=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_back_mono</a>";
-  $dis_go_today = "<a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format()."\" >$l_today</a>";
+  $dis_go_today = "<a href=\"$path/calendar/calendar_index.php?date=\" >$l_today</a>";
   
   $block = "
     <div class=\"portlet\" id=\"calendarSelection\">
@@ -393,106 +393,87 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
 function html_calendar_bar_date_selector($calendar) {
   global $ccalendar_weekstart,$ico_ok, $path;
   global $l_go, $l_go_to, $l_daysofweekfirst;
-
-  $iso_date = $calendar['date'];
-  $ts_date = strtotime($iso_date);
-
-  $this_month = of_date_get_month($ts_date);
-  $this_year = of_date_get_year($ts_date);
-
-  $start_time = strtotime('-3 month', $ts_date);
-  $month_time = $start_time;
-  $check_week = $ts_date;
-  $start_week_time = get_calendar_date_day_of_week($start_time, $ccalendar_weekstart);
-  $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
-  $end_time = strtotime('+9 month', $ts_date);
-  $dis_month = calendar_localizeDate ('month', $ts_date);
-  $start_week_day = strtotime($ccalendar_weekstart);
-  $start_day = get_calendar_date_day_of_week(strtotime("$this_year-$this_month-01"), $ccalendar_weekstart);
-
-  $whole_month = TRUE;
-
+  
+  $date = $calendar['date'];
+  $date_end = clone $date; 
+  $date_end->addMonth(9);
   // Week Selection
-  do {
-    $weekdate = of_isodate_format($start_week_time);
-    $select_week1 = calendar_localizeDate('week_jump', $start_week_time);
-    $select_week2 = calendar_localizeDate('week_jump', $end_week_time);
-    if (($check_week >= $start_week_time) && ($check_week <= $end_week_time)) {
-      $sel_week .= "
-        <option value=\"calendar_index.php?cal_range=week&amp;date=$weekdate\" selected=\"selected\">$select_week1 - $select_week2</option>";
+  $current = clone $date;
+  $current->subMonth(3)->setWeekday($ccalendar_weekstart);
+  $end = clone $current;
+  $end->addDay(6);
+   while ($current->compare($date_end) < 0) {
+    $label = calendar_localizeDate('week_jump', $current).' - '.calendar_localizeDate('week_jump', $end);
+    $iso = $current->getIso();
+    if ($current->compareWeek($date) == 0) {
+      $sel_week .= "<option value=\"calendar_index.php?cal_range=week&amp;date=$iso\" selected=\"selected\">$label</option>";
     } else {
-      $sel_week .= "
-        <option value=\"calendar_index.php?cal_range=week&amp;date=$weekdate\">$select_week1 - $select_week2</option>";
+      $sel_week .= "<option value=\"calendar_index.php?cal_range=week&amp;date=$iso\">$label</option>";
     }
-    $start_week_time = strtotime ('+1 week', $start_week_time);
-    $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
-  } while ($start_week_time <= $end_time);
+    $current->addWeek(1);
+    $end->addWeek(1);
+  }
 
+  $current = clone $date;
+  $current->subMonth(3);
   // Month Selection
-  for ($i=0; $i<12; $i++) {
-    $monthdate = of_isodate_format($month_time);
-    $month_month = date('m', $month_time);
-    $select_month = calendar_localizeDate('month', $month_time);
-    if ($month_month == $this_month) {
-      $sel_month .= "<option value=\"calendar_index.php?cal_range=month&amp;date=$monthdate\" selected=\"selected\">$select_month</option>\n";
+  while($current->compare($date_end) < 0) {
+    $label = calendar_localizeDate('month', $current);
+    $iso = $current->getIso();
+    if ($current->compareMonth($date) == 0) {
+      $sel_month .= "<option value=\"calendar_index.php?cal_range=month&amp;date=$iso\" selected=\"selected\">$label</option>\n";
     } else {
-      $sel_month .= "<option value=\"calendar_index.php?cal_range=month&amp;date=$monthdate\">$select_month</option>\n";
+      $sel_month .= "<option value=\"calendar_index.php?cal_range=month&amp;date=$iso\">$label</option>\n";
     }
-    $month_time = strtotime ('+1 month', $month_time);
+    $current->addMonth(1);
   }
 
+  $current = clone $date;
+  $current->setWeekday($ccalendar_weekstart);
+  $end = clone $current;
+  $end->addDay(6);
   // Minicalendar Head
-  for ($i=0; $i<7; $i++) {
-    $day_num = date('w', $start_week_day);
-    $day = $l_daysofweekfirst[$day_num];
+  while($current->compare($end) <= 0) {
+    $day = $current->get(Of_Date::WEEKDAY_NARROW);
     $dis_minical_head .= "<td>$day</td>\n";
-    $start_week_day = strtotime('+1 day', $start_week_day);
+    $current->addDay(1);
   }
+
 
   // Minicalendar
-  $i = 0;
-  do {
-    if ($i == 0) $dis_minical .= "<tr>\n";
-    $day = date ('j', $start_day);
-    $iso_day = of_isodate_format($start_day);
+  $current = clone $date;
+  $current->setDay(1)->setWeekday($ccalendar_weekstart);
+  $end = clone $current;
+  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1);
+  while($current->compare($end) < 0) {
+    if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "<tr>\n";
+    $day = $current->get(Of_Date::DAY);
+    $iso = $current->getIso();
     $check_month = of_date_get_month($start_day);
-
-    if ($check_month != $this_month) {
-      $dis_minical .= "<td class=\"downlight\" onclick=\"window.location.href='calendar_index.php?cal_range=day&amp;date=$iso_day'\"
-        onmouseout=\"this.className='downlight'\" onmouseover=\"this.className='hover'\">
-        $day
-        </td>";
+    if ($current->isToday()) {
+      $klass = 'highlight';
+    } elseif ($current->compareMonth($date)!= 0) {
+      $klass = 'downlight';
     } else {
-      if (of_isodate_format() == $iso_day) {
-        $dis_minical .= "<td class=\"highlight\" onclick=\"window.location.href='calendar_index.php?cal_range=day&amp;date=$iso_day'\" 
-          onmouseout=\"this.className='highlight'\" onmouseover=\"this.className='hover'\">
-          $day
-          </td>";
-      } else {
-        $dis_minical .= "<td onclick=\"window.location.href='calendar_index.php?cal_range=day&amp;date=$iso_day'\" 
-          onmouseout=\"this.className=''\" onmouseover=\"this.className='hover'\">
-          $day
-          </td>";
-      }
+      $klass = '';
     }
-    $start_day = strtotime('+1 day', $start_day);
-    $i++;
-    if ($i == 7) {
-      $dis_minical .= "</tr>\n";
-      $i = 0;
-      $checkagain = of_date_get_month($start_day);
-      if ($checkagain != $this_month) $whole_month = FALSE;
-    }
-  } while ($whole_month == TRUE);
-
+    $dis_minical .= "<td class=\"$klass\" onclick=\"window.location.href='calendar_index.php?cal_range=day&amp;date=$iso'\"
+      onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\">
+      $day
+      </td>";
+    $current->addDay(1);
+    if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "</tr>\n";
+  } 
+  $label = calendar_localizeDate ('month', $date);
+  $current = new Of_Date();
   $block = "
   <div class=\"portlet\" id=\"calendarMiniCal\">
     <h1>
-    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime('-1 year',$ts_date))."\">&lt;&lt;</a>
-    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime('-1 month',$ts_date))."\">&lt;</a>
-    $dis_month
-    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime('+1 month',$ts_date))."\">&gt;</a>
-    <a href=\"$path/calendar/calendar_index.php?date=".of_isodate_format(strtotime('+1 year',$ts_date))."\">&gt;&gt;</a>
+    <a href=\"$path/calendar/calendar_index.php?date=".$current->setDateIso($date)->subYear(1)->getIso()."\">&lt;&lt;</a>
+    <a href=\"$path/calendar/calendar_index.php?date=".$current->setDateIso($date)->subMonth(1)->getIso()."\">&lt;</a>
+    $label
+    <a href=\"$path/calendar/calendar_index.php?date=".$current->setDateIso($date)->addMonth(1)->getIso()."\">&gt;</a>
+    <a href=\"$path/calendar/calendar_index.php?date=".$current->setDateIso($date)->addYear(1)->getIso()."\">&gt;&gt;</a>
     </h1>
     <div>
       <table class=\"miniCalendar\">
@@ -525,7 +506,6 @@ function html_calendar_bar_date_selector($calendar) {
   return $block;
 }
 
-
 /**
  * HTML for the view selector portlet
  *
@@ -542,7 +522,7 @@ function html_calendar_view_selector($calendar, $my_views) {
   global $ico_delete, $ico_add, $ico_popup_close;
 
   $view_id = $calendar['view_id'];
-  $iso_date = $calendar['date'];
+  $iso = $calendar['date']->getIso();
 
   while($my_views->next_record()) {
     $id =  $my_views->f('obmbookmark_id');
@@ -569,7 +549,7 @@ function html_calendar_view_selector($calendar, $my_views) {
     <form action=\"calendar_index.php\" method=\"get\">
       <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\"
         onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-        <option value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\" >
+        <option value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\" >
           $l_select_view
         </option>
         $sel_view
@@ -611,74 +591,51 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension;
   global $l_private,$l_daysofweek, $l_previous, $l_next;
 
-  $iso_date = $calendar['date'];
+  $date = clone $calendar['date'];
+  $date->setDay(1)->setWeekday($ccalendar_weekstart);
   $category_filter = $calendar['category_filter'];
-  $ts_date = strtotime($iso_date);
-  $this_month = of_date_get_month($ts_date);
-  $this_year = of_date_get_year($ts_date);
-  $start_month = strtotime("$this_year-$this_month-01");
-  $start_time = get_calendar_date_day_of_week($start_month, $ccalendar_weekstart);
-  // days to add to first day displayed to complete month view
-  // 6 (to have complete month) + first days of next month
-  $next_month = of_isodate_format(strtotime('+1 month',$ts_date));
-  $next_year = of_isodate_format(strtotime('+1 year',$ts_date));
-  $prev_year = of_isodate_format(strtotime('-1 year',$ts_date));
-  $prev_month = of_isodate_format(strtotime('-1 month',$ts_date));
 
-  $display_date = calendar_localizeDate('month', $ts_date);
-  $start_week_day = strtotime($ccalendar_weekstart);
-  $whole_month = TRUE;
-  $nb_user = count($calendar_entity['user']);
-  $nb_res = count($calendar_entity['resource']);
-  $nb_ent = $nb_user + $nb_res;
-  $td_width = floor(100 / $nb_ent).'px';
-
-
-  // Display the day of a week
-  for ($i=0; $i<7; $i++) {
-    $day_num = date('w', $start_week_day);
-    $day = $l_daysofweek[$day_num];
-    $dis_day_head .= "<td>$day</td>";
-    $start_week_day = strtotime('+1 day', $start_week_day);
+  $current = clone $date;
+  $end = clone $current;
+  $end->addDay(6);
+  while($current->compare($end) <= 0) {
+    $day = $current->get(Of_Date::WEEKDAY_NARROW);
+    $dis_minical_head .= "<td>$day</td>\n";
+    $current->addDay(1);
   }
 
   $current_time = $start_time;
   $i = 0;
-  do {
-    $this_day = date('j', $current_time);
-    $iso_day = of_isodate_format($current_time);
-    $check_month = of_date_get_month ($current_time);
-    if ($check_month != $this_month) {
-      $bgclass = "class=\"downlight\"";
-    } elseif (of_isodate_format(time()) == $iso_day) {
-      $bgclass = "class=\"highlight\"";
-    } else {
-      $bgclass = '';
-    } 
-    if ($i == 0) {
-      $week_num = get_calendar_week_num($current_time); 
+
+  $current = clone $date;
+  $end = clone $date;
+  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1);
+  while($current->compare($end) < 0) {
+    $iso = $current->getIso();
+    $day = $current->get(Of_Date::DAY);
+    if ($current->compareWeekday($ccalendar_weekstart) == 0) {
+      $label = $current->get(Of_Date::WEEK);
       $dis_month_cal .= "
       <tr>
         <th>
-        <a href=\"calendar_index.php?cal_range=week&amp;date=$iso_day\" >$week_num</a>
+        <a href=\"calendar_index.php?cal_range=week&amp;date=$isoy\" >$label</a>
         </th>";
     }
-
-    $dis_month_cal .= "<td id=\"day-".($current_time - $start_time)."\" $bgclass>
-      <h2><a href=\"calendar_index.php?cal_range=day&amp;date=$iso_day\">$this_day</a></h2>";
-    $dis_month_cal .= '</td>';
-    $current_time = strtotime('+1 day', $current_time); 
-    $i++;
-    if ($i == 7) { 
-      $dis_month_cal .= "</tr>\n";
-      $i = 0;
-      $checkagain = of_date_get_month($current_time);
-      if ($checkagain != $this_month) $whole_month = FALSE;	
+    if ($current->isToday()) {
+      $klass = 'highlight';
+    } elseif ($current->compareMonth($calendar['date']) != 0) {
+      $klass = 'downlight';
+    } else {
+      $klass = '';
     }
-  } while ($whole_month == TRUE);   
+    $dis_month_cal .= "<td id=\"day-".($current->getTimestamp() - $date->getTimestamp())."\" class=\"$klass\">
+      <h2><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></h2>";
+    $current->addDay(1);
+    if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_month_cal .= "</tr>\n";
+  } 
 
   $status = array('A', 'W');
-  $occurrences = calendar_events_model($start_time, $current_time, $calendar_entity, $status, $category_filter);
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter);
   
   if (is_array($occurrences)) {
     $week_duration = 86400*7;
@@ -689,13 +646,16 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
     }
   }
 
+  $label = calendar_localizeDate('month', $calendar['date']);
+  $current = new Of_Date();
+
   $block = "
   <h1>
-    <a href=\"calendar_index.php?date=$prev_year\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-    $display_date
-    <a href=\"calendar_index.php?date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_year\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subYear(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addYear(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
   </h1> 
   <table class=\"calendar month\">
     <colgroup span=\"1\" />
@@ -715,7 +675,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
     obm.vars.images.extension = '$ico_extension';
     showWaitingPanel('calendarBody');
     obm.initialize.chain(function () {
-      obm.calendarManager = new Obm.CalendarManager($start_time);
+      obm.calendarManager = new Obm.CalendarManager(".$date->getTimestamp().");
       obm.calendarManager.lock();
       $dis_event
       obm.calendarManager.unlock();
@@ -744,58 +704,45 @@ function dis_calendar_month_printable($calendar, $calendar_entity,$writable_enti
   global $l_daysofweek, $l_previous, $l_next, $l_all_day, $l_location;
   global $l_task, $l_private;
 
-  $day_duration = 86400;
-  $iso_date = $calendar['date'];
   $category_filter = $calendar['category_filter'];
-  $ts_date = strtotime($iso_date);
-  $this_month = of_date_get_month($ts_date);
-  $this_year = of_date_get_year($ts_date);
-  $start_month = strtotime("$this_year-$this_month-01");
-  $start_time = get_calendar_date_day_of_week($start_month, $ccalendar_weekstart);
+  $date = clone $calendar['date'];
+  $date->setDay(1)->setWeekday($ccalendar_weekstart);
 
-  $next_month = of_isodate_format(strtotime('+1 month',$ts_date));
-  $next_year = of_isodate_format(strtotime('+1 year',$ts_date));
-  $prev_year = of_isodate_format(strtotime('-1 year',$ts_date));
-  $prev_month = of_isodate_format(strtotime('-1 month',$ts_date));
-
-  $display_date = calendar_localizeDate('month', $ts_date);
-  $start_week_day = strtotime($ccalendar_weekstart);
-  $whole_month = TRUE;
-  $nb_user = count($calendar_entity['user']);
-  $nb_res = count($calendar_entity['resource']);
-  $nb_ent = $nb_user + $nb_res;
-
-  $status = array('A');
-  calendar_events_model($start_time,strtotime('+1 month',$start_time), $calendar_entity, $status, $category_filter);
-  $of = &OccurrenceFactory::getInstance();
-
-  // Display the day of a week
-  for ($i=0; $i<7; $i++) {
-    $day_num = date('w', $start_week_day);
-    $day = $l_daysofweek[$day_num];
-    $dis_day_head .= "<td>$day</td>";
-    $start_week_day = strtotime('+1 day', $start_week_day);
+  $current = clone $date;
+  $end = clone $current;
+  $end->addDay(6);
+  while($current->compare($end) <= 0) {
+    $day = $current->get(Of_Date::WEEKDAY_NARROW);
+    $dis_minical_head .= "<td>$day</td>\n";
+    $current->addDay(1);
   }
 
-  $current_time = $start_time;
-  $i = 0;
-  do {
-    $this_day = date('j', $current_time);
-    $iso_day = of_isodate_format($current_time);
-    $check_month = of_date_get_month ($current_time);
-    if ($check_month != $this_month) {
-      $bgclass="class=\"downlight\"";
-    } elseif (of_isodate_format(time()) == $iso_day) {
-      $bgclass="class=\"highlight\"";
-    } else {
-      $bgclass='';
-    } 
-    if ($i == 0) {
-      $week_num = get_calendar_week_num($current_time); 
+  $current = clone $date;
+  $end = clone $date;
+  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1);
+  $status = array('A');
+  calendar_events_model($date,$end, $calendar_entity, $status, $category_filter);
+  $of = &OccurrenceFactory::getInstance();
+  
+  while($current->compare($end) < 0) {
+    $iso = $current->getIso();
+    $day = $current->get(Of_Date::DAY);
+    if ($current->compareWeekday($ccalendar_weekstart) == 0) {
+      $label = $current->get(Of_Date::WEEK);
       $dis_month_cal .= "
-      <tr><th>$week_num</th>";
+      <tr>
+        <th>
+        <a href=\"calendar_index.php?cal_range=week&amp;date=$isoy\" >$label</a>
+        </th>";
     }
-    $occurrences = $of->getPeriodOccurrences($current_time,$day_duration);
+    if ($current->isToday()) {
+      $klass = 'highlight';
+    } elseif ($current->compareMonth($calendar['date']) != 0) {
+      $klass = 'downlight';
+    } else {
+      $klass = '';
+    }
+    $occurrences = $of->getPeriodOccurrences($current);
     $events_list = '';
     if($occurrences != null) {
       foreach($occurrences as $occurrence) {
@@ -821,7 +768,7 @@ function dis_calendar_month_printable($calendar, $calendar_entity,$writable_enti
           $schedule .= "<img src=\"$ico_periodic\" alt=\"[Periodic]\" />";
         }        
         if (!$occurrence->event->all_day) {
-          $schedule .= date('H:i',$occurrence->date) .'-'. date('H:i',$occurrence->date + $occurrence->event->duration);
+          $schedule .= $occurrence->date->get(Of_Date::TIME_SHORT) .'-'. $occurrence->end->get(Of_Date::TIME_SHORT);
         } else {
           $schedule .= $l_all_day;
         }
@@ -835,27 +782,24 @@ function dis_calendar_month_printable($calendar, $calendar_entity,$writable_enti
       }
     }
     $dis_month_cal .= "
-      <td id=\"day-".($current_time - $start_time)."\" $bgclass>
-      <h3>$this_day</h3>
+      <td id=\"day-".($current->getTimestamp() - $date->getTimestamp())."\" class=\"$klass\">
+      <h3>$day</h3>
       $events_list
       </td>";
-    $current_time = strtotime('+1 day', $current_time); 
-    $i++;
-    if ($i == 7) { 
-      $dis_month_cal .= "</tr>\n";
-      $i = 0;
-      $checkagain = of_date_get_month($current_time);
-      if ($checkagain != $this_month) $whole_month = FALSE;	
-    }
-  } while ($whole_month == TRUE);   
+    $current->addDay(1);
+    if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_month_cal .= "</tr>\n";
+  }
+  $label = calendar_localizeDate('month', $calendar['date']);
+  $current = new Of_Date();
+
 
   $block = "
   <h1>
-    <a href=\"calendar_index.php?date=$prev_year\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-    $display_date
-    <a href=\"calendar_index.php?date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_year\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subYear(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addYear(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
   </h1> 
   <table class=\"calendar month\">
     <colgroup span=\"1\" />
@@ -887,90 +831,66 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension;
   global $ccalendar_first_hour, $ccalendar_last_hour;
  
-  $ts_date = strtotime($calendar['date']);
-  $category_filter = $calendar['category_filter'];
-  $time_unit = 60 / $_SESSION['set_cal_interval'];
-  $time_unit_sec = 3600 / $_SESSION['set_cal_interval'];
-  $week_num = get_calendar_week_num($ts_date);
-  $next_week = of_isodate_format(strtotime('+1 week', $ts_date));
-  $next_month = of_isodate_format(strtotime('+1 month', $ts_date));
-  $prev_week = of_isodate_format(strtotime('-1 week', $ts_date));
-  $prev_month = of_isodate_format(strtotime('-1 month', $ts_date));
 
   $display_days = $_SESSION['set_cal_display_days'];
   if (empty($display_days)) $display_days = '1111111';
-  $start_week_day = get_calendar_date_day_of_week($ts_date, $ccalendar_weekstart);
-  $end_week_time = $start_week_day + ((6 * 24 + $ccalendar_last_hour) * 3600);
-  $start_week_time = strtotime("+$ccalendar_first_hour hours",$start_week_day);
-  
-  $start_week = calendar_localizeDate('week', $start_week_time);
-  $end_week = calendar_localizeDate('week', $end_week_time);
-  
-  $display_date = "$start_week - $end_week"; 
-  
-  $day_duration = 86400;
-  $k = 0; 
-  $width = 0;
-  // Week Days headers : loop day by day
-  for ($ts = $start_week_time; $ts < $end_week_time; $ts = strtotime('+1 day',$ts) ) {
-    if (strcmp(substr($display_days,$k,1),'1')==0) {
-      $iso_date = of_isodate_format($ts);
-      $this_date_l = calendar_localizeDate('week_list', $ts);
-      $week_day_list .= "
-      <td>
-        <a href=\"calendar_index.php?cal_range=day&amp;date=$iso_date\">$this_date_l</a>
-      </td>";
-      $week_day_event_list .= "
-      <th id=\"day-".($ts - $start_week_time)."\">
-      </th>";
-      $width++;
+  $category_filter = $calendar['category_filter'];
+  $date = clone $calendar['date'];
+  $date->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(7);
+
+  $size = 0;
+  $current = clone $date;
+  while($current->compare($end) < 0) {
+    if($display_days[$current->get(Of_Date::WEEKDAY_DIGIT)] == 1) {
+      $day = calendar_localizeDate('week_list', $current);
+      $iso = $current->getIso();
+      $week_day_list .= "<td><a href=\"calendar_index.php?cal_range=day&amp;date=$iso_date\">$day</a></td>\n";
+      $week_day_event_list .= "<th id=\"day-".($current->getTimestamp() - $date->getTimestamp())."\"> </th>";
+      $size++;
     }
-    $k++;
+    $current->addDay(1);
   }
-  $day_width = ceil(98/$width);
+
+  $width = ceil(98/$size);
+
   // Week Calendar content
-  for ($j = $ccalendar_first_hour; $j < $ccalendar_last_hour; $j++) {
-    
-    $delta = $j - $ccalendar_first_hour;
-    for ($k=0; $k<$_SESSION['set_cal_interval']; $k++) {
-      if ($k==0) {
-        $week_cal .= "\n<tr onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\"><th>".($j).':00</th>';
-	//        $week_cal .= "\n<tr><th>".($j).":00</th>";
-      } else {
-	$week_cal .= "\n<tr onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\"><th></th>";
-	//        $week_cal .= "\n<tr><th></th>";
+  while ($current->compareHour($ccalendar_last_hour) < 0) {
+    $current->setDateIso($date);
+    if($current->compareMinute(0) == 0) $label = $current->get(Of_Date::TIME_SHORT);
+    else $label = '';
+    $week_cal .= "<tr onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\"><th>$label</th>";
+    while($current->compareDateIso($end) != 0) {
+      if($display_days[$current->get(Of_Date::WEEKDAY_DIGIT)] == 1) {
+        $week_cal .= "<td id=\"time-".$current->getTimestamp()."\"></td>";
       }
-      $delta2 = $k * $time_unit;
-      for ($i=0; $i<7; $i ++) {
-        if (strcmp(substr($display_days,$i,1),'1')==0) {
-          $current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);
-          $iso_date = of_isodate_format($current_time);
-          $week_cal .= "<td id=\"time-$current_time\"></td>";
-        }
-      }
-      $week_cal .= '</tr>';
+      $current->addDay(1);
     }
+    $current->addMinute(60/$_SESSION['set_cal_interval']);
+    if($current->compareMinute(0) == 0) $week_cal .= '</tr>';
   }
   $status = array('A', 'W');
-  $occurrences = calendar_events_model($start_week_day,strtotime('+7 days',$start_week_day),$calendar_entity, $status, $category_filter);
-  $w = date('w',$start_week_day);
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
-      $day_num = (date('w', $occurrence->date) - $w +7)%7;
-      if ($display_days[$day_num] == 1) {
+      if ($display_days[$occurrence->date->get(Of_Date::WEEKDAY_DIGIT)] == 1) {
         $dis_event .= dis_calendar_event($occurrence, 'hour', $calendar_entity, $writable_entity);
       }
     }
   }
 
+  $label = calendar_localizeDate('week', $date).' - '.calendar_localizeDate('week', $end->subDay(1));
+  $current = new Of_Date();
+
   $block = "
   <h1>
-    <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$prev_week\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-    $display_date
-    <a href=\"calendar_index.php?date=$next_week\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_month\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
-    </h1>
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+  </h1>
   <style>
     .week tbody td{
       width: $day_width%;
@@ -981,7 +901,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
     <colgroup span=\"7\" id=\"calendarEventContext\" />
     <thead onDblClick=\"obm.calendarQuickForm.compute(event, 'week');\">
     <tr>
-    <td id=\"calendarHourCol\">$week_num</td>
+    <td id=\"calendarHourCol\">".$date->get(Of_Date::WEEK)."</td>
     $week_day_list
     </tr>
     <tr id=\"calendarHead\">
@@ -998,9 +918,9 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
     obm.vars.images.periodic = '$ico_periodic';
     obm.vars.images.meeting = '$ico_meeting';
     obm.vars.images.extension = '$ico_extension';
-    obm.vars.consts.timeUnit = $time_unit_sec;
+    obm.vars.consts.timeUnit = ".(3600/$_SESSION['set_cal_interval']).";
     obm.initialize.chain(function () {
-      obm.calendarManager = new Obm.CalendarManager($start_week_time);
+      obm.calendarManager = new Obm.CalendarManager(".$date->getTimestamp().");
       obm.calendarManager.lock();
       $dis_event
       obm.calendarManager.unlock();
@@ -1025,41 +945,27 @@ function dis_calendar_week_printable($calendar, $calendar_entity,$writable_entit
   global $ccalendar_weekstart, $obm, $ico_far_next, $ico_far_previous;
   global $ccalendar_first_hour;
 
-  $ts_date = strtotime($calendar['date']);
   $category_filter = $calendar['category_filter'];
-  $week_num = get_calendar_week_num($ts_date);
-  $next_week = of_isodate_format(strtotime('+1 week', $ts_date));
-  $next_month = of_isodate_format(strtotime('+1 month', $ts_date));
-  $prev_week = of_isodate_format(strtotime('-1 week', $ts_date));
-  $prev_month = of_isodate_format(strtotime('-1 month', $ts_date));
-  $start_week_day = get_calendar_date_day_of_week($ts_date, $ccalendar_weekstart);
-  $end_week_time = $start_week_day + ((6 * 24 + $ccalendar_last_hour) * 3600);
-  $start_week_time = strtotime("+$ccalendar_first_hour hours",$start_week_day);
-  $start_week = calendar_localizeDate('week', $start_week_time);
-  $end_week = calendar_localizeDate('week', $end_week_time);
-  $end_time = strtotime('+7 days', $start_week_day);
-  $display_date = "$start_week - $end_week"; 
-  $display_days = $_SESSION['set_cal_display_days'];
-  if (empty($display_days)) $display_days = '1111111';
-  // FIXME Only work with the 'with or without week end' feature
-  if($display_days == '1111100') {
-    $end_time = strtotime('+5 days', $start_week_day);
-  }  
-  $dis_print = dis_calendar_printable_view ($start_week_day, $end_time, $calendar_entity, $category_filter);
+  $date = clone $calendar['date'];
+  $date->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(7);  
+  $dis_print = dis_calendar_printable_view ($date, $end, $calendar_entity, $category_filter);
+  $label = calendar_localizeDate('week', $date).' - '.calendar_localizeDate('week', $end->subDay(1))." ($l_week ".$date->get(Of_Date::WEEK).")";
+  $current = new Of_Date();
 
   $block = "
   <h1>
-    <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$prev_week\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-    $display_date ($l_week $week_num)
-    <a href=\"calendar_index.php?date=$next_week\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_month\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
   </h1>
   $dis_print";
 
   return $block;
 }
-
 
 /**
  *  
@@ -1071,32 +977,31 @@ function dis_calendar_week_printable($calendar, $calendar_entity,$writable_entit
  * @access public
  * @return void
  */
-function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, $category_filter) {
+function dis_calendar_printable_view ($date, $end, $calendar_entity, $category_filter) {
   global $ccalendar_first_hour, $ccalendar_last_hour;
   
   $status = array('A');
-  calendar_events_model($start_time,$end_time,$calendar_entity, $status, $category_filter);
+  calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance(); 
   $day_duration = 86400;
   $interval = $_SESSION['set_cal_interval']; 
   $ts_interval = 3600 / $interval;
   $span = ($ccalendar_last_hour - $ccalendar_first_hour)*$interval;
   $td_width = floor(100/$span);
-
-
+  
+  $current = clone $date;
+  $current->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
   // Week Calendar content
-  for($ts = $start_time; $ts < $end_time; $ts += $day_duration ) {
-    $first_hour = strtotime(date("Y-m-d $ccalendar_first_hour:00:00", $ts));
-    $this_date_l = calendar_localizeDate('week_list', $ts);  
+  while ($current->compare($end) < 0) {
     $dis_printable_day = array();
     $dis_printable_day = array();
     foreach($calendar_entity as $entity => $entities) {
       foreach($entities as $id => $data) {
         $view = array();
-        $occurrences = $of->getPeriodOccurrences($ts,$day_duration,array($entity => array($id)));
+        $occurrences = $of->getPeriodOccurrences($current,null,array($entity => array($id)));
         if(is_array($occurrences)) {
           foreach($occurrences as $occurrence) {
-            $key = floor(($occurrence->date - $first_hour) / $ts_interval);
+            $key = floor(($occurrence->date->getTimestamp() - $current->getTimestamp()) / $ts_interval);
             if($key < 0) $key = 0;
             if($key > $span) $key = $span;
             $view[$key][] = $occurrence;
@@ -1107,18 +1012,18 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
           for($i=0; $i <= $span; $i++) {
             if(isset($view[$i])) {
               $occurrence = array_shift($view[$i]);
-              $event = dis_calendar_printable_event($occurrence, $calendar_entity, $ts);
+              $event = dis_calendar_printable_event($occurrence, $calendar_entity, $current);
               if($occurrence->event->all_day || $i == $span) {
                 $dur = 0;
                 array_unshift($dis_printable_day,"<td style='width:".($td_width*$span)."%;' colspan='$span'>$event</td>");
               } else {
-                $dur = floor((($occurrence->date + $occurrence->event->duration) - $first_hour) / $ts_interval) - $i;
-                if($dur >= $span) $dur = $span ;
-                if($dur <= 0) {
+                $duration = floor(($occurrence->end->getTimestamp() - $current->getTimestamp()) / $ts_interval) - $i;
+                if($duration >= $span) $dur = $span ;
+                if($duration <= 0) {
                   $view[$span][] = $occurrence;
-                  $dur = 1;
+                  $duration = 1;
                 } else {
-                  $dis_printable_line .= "<td style='width:".($td_width*$dur)."%;' colspan='$dur'>$event</td>";
+                  $dis_printable_line .= "<td style='width:".($td_width*$duration)."%;' colspan='$duration'>$event</td>";
                 }
               }
               if(empty($view[$i])) {
@@ -1136,7 +1041,9 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
       }
     }
     if(($rowspan = count($dis_printable_day)) == 0) $rowspan = 1;  
-    $dis_printable_view .= "<tr><th rowspan='$rowspan' class=\"NW\">$this_date_l</th>".implode('</tr><tr>',$dis_printable_day).'</tr>';
+    $label = calendar_localizeDate('week_list', $current);  
+    $dis_printable_view .= "<tr><th rowspan='$rowspan' class=\"NW\">$label</th>".implode('</tr><tr>',$dis_printable_day).'</tr>';
+    $current->addDay(1);
   }
   for ($j = 0; $j < $span; $j++) {
     $min = str_pad((60/$interval) * ($j % $interval),2,0);
@@ -1163,7 +1070,7 @@ function dis_calendar_printable_view ($start_time, $end_time, $calendar_entity, 
  * @access public
  * @return void
  */
-function dis_calendar_printable_event(&$occurrence, &$calendar_entity, $ts) {
+function dis_calendar_printable_event(&$occurrence, &$calendar_entity, $date) {
   global $obm, $path;
   global $l_private, $l_location, $l_all_day;
   global $l_task, $l_private, $l_user;
@@ -1197,18 +1104,18 @@ function dis_calendar_printable_event(&$occurrence, &$calendar_entity, $ts) {
   if($occurrence->event->all_day) {
     $schedule .= $l_all_day; 
   } else {
-    if(date('Ymd',$occurrence->date) != date('Ymd',$ts)) {
-      $beg = of_datetime_format($occurrence->date);
+    if($occurrence->date->compareDateIso($date) != 0) {
+      $begining = $occurrence->date->get();//FIXME
     } else {
-      $beg = date('H:i',$occurrence->date);
+      $begining = $occurrence->date->get(Of_Date::TIME_SHORT);
     }
-    if(date('Ymd',$occurrence->date + $occurrence->event->duration) != date('Ymd',$ts)) {
-      $end = of_datetime_format($occurrence->date + $occurrence->event->duration);
+    if($occurrence->end->compareDateIso($date) != 0) {
+      $ending = $occurrence->end->get();//FIXME
     } else {
-      $end = date('H:i',$occurrence->date + $occurrence->event->duration);
+      $ending = $occurrence->date->get(Of_Date::TIME_SHORT);
     }
     
-    $schedule .=  "$beg - $end";              
+    $schedule .=  "$begining - $ending";              
   }
   $event_data = "
     <div class=\"printableEvent $klass\" $bgColor>
@@ -1233,66 +1140,47 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension;
   global $l_private, $l_all_day, $l_previous, $l_next;
 
-  $iso_date = $calendar['date'];
   $category_filter = $calendar['category_filter'];
-  $ts_date = strtotime($iso_date);
-
-  $tomorrow_date = of_isodate_format(strtotime('+1 day', $ts_date));
-  $next_week = of_isodate_format(strtotime('+1 week', $ts_date));
-  $yesterday_date = of_isodate_format(strtotime('-1 day', $ts_date));
-  $prev_week  = of_isodate_format(strtotime('-1 week', $ts_date));
-
-  $time_unit = 60 / $_SESSION['set_cal_interval'];
-  $time_unit_sec = 3600 / $_SESSION['set_cal_interval'];
-  $week_num = get_calendar_week_num($ts_date);
-
-  $start_time = strtotime("+$ccalendar_first_hour hours",$ts_date);
-  $end_time = strtotime("+$ccalendar_last_hour hours",$ts_date);
-
-  $display_date = calendar_localizeDate('day', $ts_date);
-
-  $nb_user = count($calendar_entity['user']);
-  $nb_res = count($calendar_entity['resource']);
-  $nb_ent = $nb_user + $nb_res;
-  
+  $date = $calendar['date'];
+  $date->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(1);
+  $current = clone $date;  
 
   // Display Calendar
-  for ($i = $ccalendar_first_hour; $i < $ccalendar_last_hour; $i++) {
-    for ($k=0; $k<$_SESSION['set_cal_interval']; $k++) {
-      if ($k==0) {
-	$day_cal .= "\n<tr><th>$i:00</th>"; 
-      } else {
-	$day_cal .= "\n<tr><th></th>"; 
-      }
-      $delta2 = $k * $time_unit;
-      $current_time = strtotime("+$i hours +$delta2 minutes",$ts_date);   
-
-      $day_cal .= "<td id=\"time-$current_time\"></td></tr>";
-    }
+  while($current->compareHour($ccalendar_last_hour) < 0) {
+    if($current->compareMinute(0) == 0) $label = $current->get(Of_Date::TIME_SHORT);
+    else $label = '';    
+    $day_cal .= "\n<tr><th>$label</th><td id=\"time-".$current->getTimestamp()."\"></td></tr>";
+    $current->addMinute(60/$_SESSION['set_cal_interval']);
   }
 
   $status = array('A', 'W');
-  $occurrences = calendar_events_model($ts_date,strtotime('+1 day', $ts_date), $calendar_entity, $status, $category_filter);
+  $occurrences = calendar_events_model($current, $end, $calendar_entity, $status, $category_filter);
   if (is_array($occurrences)) {
     $options = array();
     foreach($occurrences as $occurrence) {
       $dis_event .= dis_calendar_event($occurrence, 'hour',$calendar_entity,$writable_entity,$options);
     }
   }
+
+  $label = calendar_localizeDate('day', $date);
+  $current = new Of_Date();
+
   $block = "
   <h1>
-    <a href=\"calendar_index.php?date=$prev_week\"><img src=\"$ico_far_previous\" alt=\"[$l_Previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$yesterday_date\"><img src=\"$ico_previous\" alt=\"[$l_Previous]\" /></a>     
-    $display_date
-    <a href=\"calendar_index.php?date=$tomorrow_date\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_week\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
-  </h1> 
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subDay(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addDay(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+  </h1>    
   <table class=\"calendar day\">
     <colgroup span=\"1\" />
     <colgroup span=\"1\" id=\"calendarEventContext\" />
     <thead onDblClick=\"obm.calendarQuickForm.compute(event, 'day');\">
     <tr id=\"calendarHead\">
-    <td id=\"calendarHourCol\">$week_num</td><th id=\"day-0\"></th>
+    <td id=\"calendarHourCol\">".$date->get(Of_Date::WEEK)."</td><th id=\"day-0\"></th>
     </tr>    
     </thead>
     <tbody id=\"calendarBody\" onDblClick=\"obm.calendarQuickForm.compute(event, 'day');\">
@@ -1304,9 +1192,9 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
     obm.vars.images.periodic = '$ico_periodic';
     obm.vars.images.meeting = '$ico_meeting';
     obm.vars.images.extension = '$ico_extension';
-    obm.vars.consts.timeUnit = $time_unit_sec;
+    obm.vars.consts.timeUnit = ".(3600/$_SESSION['set_cal_interval']).";    
     obm.initialize.chain(function () {
-      obm.calendarManager = new Obm.CalendarManager($start_time);
+      obm.calendarManager = new Obm.CalendarManager(".$date->getTimestamp().");
       obm.calendarManager.lock()
       $dis_event
       obm.calendarManager.unlock();
@@ -1374,30 +1262,24 @@ function dis_calendar_day_printable($calendar, $calendar_entity,$writable_entity
  */
 function dis_calendar_day_list($calendar, $calendar_entity, $writable_entity) {
   global $ico_previous, $ico_next, $l_previous, $l_next, $ico_far_next, $ico_far_previous;
-  $iso_date = $calendar['date'];
-  $ts_date = strtotime($iso_date);
 
-  $start_time = strtotime("+$ccalendar_first_hour hours",$start_week_day);
-  $end_time = strtotime('+7 days',$start_week_day);
-
-  $tomorrow_date = of_isodate_format(strtotime('+1 day', $ts_date));
-  $next_week = of_isodate_format(strtotime('+1 week', $ts_date));
-  $yesterday_date = of_isodate_format(strtotime('-1 day', $ts_date));
-  $prev_week  = of_isodate_format(strtotime('-1 week', $ts_date));
-
-  $display_date = calendar_localizeDate('day', $ts_date);
-
-  $end_time =  strtotime('+1 day', $ts_date);
-
-  $block = "<h1>
-    <a href=\"calendar_index.php?date=$prev_week\"><img src=\"$ico_far_previous\" alt=\"[$l_Previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$yesterday_date\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-    $display_date
-    <a href=\"calendar_index.php?date=$tomorrow_date\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_week\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
-  </h1>";
+  $date = $calendar['date']->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(1);
   
-  $block .= dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $ts_date, $end_time);
+  $label = calendar_localizeDate('day', $date);
+  $current = new Of_Date();
+
+  $block = "
+  <h1>
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subDay(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addDay(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+  </h1> ";  
+  
+  $block .= dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end);
   return $block;
 }
 
@@ -1414,38 +1296,24 @@ function dis_calendar_week_list($calendar, $calendar_entity, $writable_entity) {
   global $ico_previous, $ico_next, $l_previous, $l_next, $ico_far_next, $ico_far_previous;
   global $ccalendar_weekstart, $ccalendar_first_hour, $ccalendar_last_hour;
 
-  $iso_date = $calendar['date'];
-  $ts_date = strtotime($iso_date);
+  $category_filter = $calendar['category_filter'];
+  $date = clone $calendar['date'];
+  $date->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(7);
 
-  $start_week_day = get_calendar_date_day_of_week($ts_date, $ccalendar_weekstart);
-  $end_week_time = $start_week_day + ((6 * 24 + $ccalendar_last_hour) * 3600);
+  $label = calendar_localizeDate('week', $date).' - '.calendar_localizeDate('week', $end->subDay(1));
+  $current = new Of_Date();
 
-  $start_time = strtotime("+$ccalendar_first_hour hours",$start_week_day);
-  $end_time = strtotime('+7 days',$start_week_day);
-  
-  $start_week = calendar_localizeDate('week', $start_time);
-  $end_week = calendar_localizeDate('week', $end_week_time);
-
-  $next_week = of_isodate_format(strtotime('+1 week',$ts_date));
-  $next_month = of_isodate_format(strtotime('+1 month', $ts_date));
-  $prev_week = of_isodate_format(strtotime('-1 week',$ts_date));
-  $prev_month = of_isodate_format(strtotime('-1 month', $ts_date));
-
-  $list_title = "$start_week - $end_week"; 
-  $display_days = $_SESSION['set_cal_display_days'];
-  if (empty($display_days)) $display_days = '1111111';
-  // FIXME Only work with the 'with or without week end' feature
-  if($display_days == '1111100') {
-    $end_time = strtotime('+5 days', $start_week_day);
-  }  
-  $block = "<h1>
-    <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$prev_week\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-    $list_title
-    <a href=\"calendar_index.php?date=$next_week\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_month\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+  $block = "
+  <h1>
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
   </h1>";
-  $block .= dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $start_time, $end_time);
+  $block .= dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end);
 
   return $block;
 }
@@ -1462,29 +1330,24 @@ function dis_calendar_week_list($calendar, $calendar_entity, $writable_entity) {
  */
 function dis_calendar_month_list($calendar, $calendar_entity, $writable_entity) {
   global $ico_previous, $ico_next, $l_previous, $l_next, $ico_far_next, $ico_far_previous;
-  $iso_date = $calendar['date'];
-  $ts_date = strtotime($iso_date);
-
-  $this_month = of_date_get_month($ts_date);
-  $this_year = of_date_get_year($ts_date);
-  $start_time = strtotime("$this_year-$this_month-01");
-  $end_time = strtotime('+1 month',$start_time);
-  $next_month = of_isodate_format(strtotime('+1 month',$ts_date));
-  $next_year = of_isodate_format(strtotime('+1 year',$ts_date));
-  $prev_year = of_isodate_format(strtotime('-1 year',$ts_date));
-  $prev_month = of_isodate_format(strtotime('-1 month',$ts_date));
-
-  $display_date = calendar_localizeDate('month', $ts_date);
   
-  $block = "<h1>
-    <a href=\"calendar_index.php?date=$prev_year\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-    $display_date
-    <a href=\"calendar_index.php?date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_year\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
-  </h1>";
+  $date = clone $calendar['date'];
+  $date->setDay(1)->setHour(0)->setMinute(0)->setSecond(0);
+  $category_filter = $calendar['category_filter'];
+  $end = clone $date;
+  $end->addMonth(1);
+  $label = calendar_localizeDate('month', $calendar['date']);
+  $current = new Of_Date();
+  $block = "
+  <h1>
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subYear(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addYear(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+  </h1>"; 
     
-  $block .= dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $start_time, $end_time);
+  $block .= dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end);
   return $block;
 }
 
@@ -1495,7 +1358,7 @@ function dis_calendar_month_list($calendar, $calendar_entity, $writable_entity) 
  * @param mixed $calendar_entity 
  * @return event list HTML code
  */
-function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $start_time, $end_time) {
+function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end) {
   global $l_desc;
   global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
   global $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
@@ -1529,14 +1392,14 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   $category_filter = $calendar['category_filter'];
 
   $status = array('A');
-  $occurrences = calendar_events_model($start_time, $end_time,$calendar_entity, $status, $category_filter,true);
+  $occurrences = calendar_events_model($date, $end,$calendar_entity, $status, $category_filter,true);
   $today_mark = false;
   $charset = mb_internal_encoding();
 
   // Sort occurrences by date (cause repeat and no repeat events)
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
-      $d = strtotime(date('Y-m-d', $occurrence->date));
+      $d = $occurrence->date->get(Of_Date::DATE_MEDIUM);
       if(!is_array($ocs[$d])) { $ocs[$d] = array();}
       array_push($ocs[$d],$occurrence);
     }
@@ -1544,32 +1407,24 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   if (is_array($ocs)) {
     ksort($ocs);
     foreach($ocs as $key => $occurrence) {
-      if ($i%2 == 0) {
-        $class = "class=\"pair\"";
-      } else {
-        $class = '';
-      }
+      $current = new Of_Date($key, Of_Date::DATE_MEDIUM);  
+      if ($i%2 == 0) $klass = "pair"; else $class = '';
       $i ++;
-      
-      $day_text_evt = of_date_in_letter($key);
-      $day_evt = date('Y-m-d', $key);
-      $today = strtotime(date('Y-m-d'));
-      if ($today == $key) {
-        $class="class=\"highlight\"";
-      }
+      $label = $current->get(Of_Date::WEEKDAY_NARROW);
+      if ($current->isToday())$class="class=\"highlight\"";
 
       $dis_events .= "
-        <tr $class>
-          <td><a href=\"calendar_index.php?cal_range=day&amp;date=$day_evt\">$day_text_evt</a></td>
+        <tr class=\"$klass\">
+          <td><a href=\"calendar_index.php?cal_range=day&amp;date=".$current->getIso()."\">$label</a></td>
           <td>";
 
       foreach($occurrence as $k => $v) {
         $event = $v->event;
         $date = $v->date;
-        $hour_begin = of_date_get_full_hour($date);
+        $hour = $v->date->get(Of_Date::HOUR);
+        $end = $v->end;
         $ev_id = $event->id;
-	      $title = $event->title;
-        $duration = $event->duration;
+        $title = $event->title;
         $location = $event->location;
         $attendee = $event->attendee;
         $category = $event->category1;
@@ -1638,8 +1493,8 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
             $br = '<br />';
           }
         }        
-        $date_begin = of_datetime_format($date);
-        $date_end = of_datetime_format($date+$duration); 
+        $date_begin = $date->getOutputDateTime();
+        $date_end = $end->$date->getOutputDateTime(); 
         $j++;
 	$js .= "
 	div = $('evt-$date-$ev_id');
@@ -1931,7 +1786,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "entity_id:$entity_id"; 
   $ed[] = "duration:$duration";
   $ed[] = "item:'$item_list'";
-  $ed[] = "time:$date";
+  $ed[] = "time:".$date->getTimestamp();
   $ed[] = "title:'$title'";
   $ed[] = "all_day:".$all_day;
   $ed[] = "klass:'$entityClass'"; 
@@ -1959,9 +1814,9 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       }
       break;
     case 'hour' :
-      $day = ($all_day) || (date('Ymd',$date + $duration) != date('Ymd',$date));
-      $day = $day || (date('H',$date) <  $ccalendar_first_hour);
-      $day = $day || (date('H',$date) >=  $ccalendar_last_hour );
+      $day = ($all_day) || ($end->compareDateIso($date) == 0);
+      $day = $day || ($date->compareHour($ccalendar_first_hour) <  O);
+      $day = $day || ($date->compareHour($ccalendar_first_hour) > 0 );
       if ($updatable) {
         $options[] = 'draggable:true';
         $options[] = 'resizable:true';
@@ -2012,33 +1867,17 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
   global $ccalendar_weekstart, $l_week, $l_all_day;
   global $l_private,$l_daysofweekfirst,$l_daysofweek, $l_previous, $l_next;
 
-  $iso_date = $calendar['date'];
-  $category_filter = $calendar['category_filter'];
-  $ts_date = strtotime($iso_date);  
-  $this_month = of_date_get_month($ts_date);
-  $this_year = of_date_get_year($ts_date);
-  $start_time = strtotime("$this_year-$this_month-01");
-  $end_time = strtotime('+1 month', $start_time);
-  $next_month = of_isodate_format(strtotime('+1 month',$ts_date));
-  $next_year = of_isodate_format(strtotime('+1 year',$ts_date));
-  $prev_year = of_isodate_format(strtotime('-1 year',$ts_date));
-  $prev_month = of_isodate_format(strtotime('-1 month',$ts_date));
-
-  $first_day_of_week = date('w', strtotime($ccalendar_weekstart));
-  $display_date = calendar_localizeDate('month', $ts_date);  
-  $start_week_day = strtotime($ccalendar_weekstart);
-
-  $nb_user = count($calendar_entity['user']);
-  $nb_res = count($calendar_entity['resource']);
-  
-  $nb_ent = $nb_user + $nb_res;
-   
-  $day_duration = 86400;
+  $date = clone $calendar['date'];
+  $date->setDay(1);
+  $current = clone $date;
+  $end = clone $date;
+  $end->addMonth(1);
 
   $status = array('A');
-  $events = calendar_events_model($start_time,$end_time, $calendar_entity, $status, $category_filter);
+  $events = calendar_events_model($current,$end, $calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
 
+  $category_filter = $calendar['category_filter'];
   $cats1 = of_category_get_ordered('calendar', 'category1');
   $nb = count($cats1);
   $colors = random_color($nb);
@@ -2046,37 +1885,38 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
     $cats_color[$cat_info['label']] = $colors[$key];
   }
   $current_time = $start_time;
-  $day_amount = 0;
-  while($current_time < $end_time) {
-    $day_amount++;
-    $day_num = date('w', $current_time);
-    $this_day = date('j', $current_time);
-    $day_label = $l_daysofweekfirst[$day_num];
-    $day_long_label = $l_daysofweek[$day_num];
-    $iso_day = of_isodate_format($current_time);
 
-    $empty = !$of->periodHaveOccurrences($current_time,$day_duration);
-    $line0 .= "<th>$day_label</th>\n";
-    $line1 .= "<th><a href=\"calendar_index.php?cal_range=day&amp;date=$iso_day\">$this_day</a></th>\n";
-    if($day_num == $first_day_of_week || $current_time == $start_time) {
-      $week_num = get_calendar_week_num($current_time);  
-      $span = ((($first_day_of_week + 6) - $day_num) % 7) + 1;
-      if ($span >= 3) {
-        $line2 .= "<th colspan=\"$span\">$l_week <a href=\"calendar_index.php?cal_range=week&amp;date=$iso_day\">$week_num</a></th>";
-      } else {
-        $line2 .= "<th colspan=\"$span\"><a href=\"calendar_index.php?cal_range=week&amp;date=$iso_day\">$week_num</a></th>";
-      }
+
+
+  $day_amount = 0;
+  while($current->compare($end) < 0) {
+    $day_amount++;
+    $iso = $current->getIso();
+    $label = $current->get(Of_Date::WEEKDAY_NARROW);
+    $day = $current->getDay();
+    $description = $current->get(Of_Date::WEEKDAY_NAME);
+    $empty = !$of->periodHaveOccurrences($current);
+    $line0 .= "<th>$label</th>\n";
+    $line1 .= "<th><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></th>\n";
+    if($current->compareWeekday($ccalendar_weekstart) == 0) {
+      $week = $current->getWeek();  
+      $line2 .= "<th colspan=\"7\">$l_week <a href=\"calendar_index.php?cal_range=week&amp;date=$iso\">$week</a></th>";
+    }elseif($current->compareDay(1) == 0) {
+      $week = $current->getWeek();  
+      $span = $current->diffWeekday($ccalendar_weekstart);
+      if ($span >= 3) $line2 .= "<th colspan=\"$span\">$l_week <a href=\"calendar_index.php?cal_range=week&amp;date=$iso\">$week</a></th>";
+      else $line2 .= "<th colspan=\"$span\"><a href=\"calendar_index.php?cal_range=week&amp;date=$iso\">$week</a></th>";
     }
     foreach ($calendar_entity as $type => $entity) {
       foreach ($entity as $id => $properties) {
         $haveevent = false;
         $line_id = $type.' '.$id;
         if($empty) {
-          $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?cal_range=day&date=$iso_day'\"></td>";
+          $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?cal_range=day&date=$iso'\">&nbsp;</td>";
         } else {
           $today_events = array();
           $day_content = '';
-          $occurrences = $of->getPeriodOccurrences($current_time,$day_duration,array($type => array($id)));
+          $occurrences = $of->getPeriodOccurrences($current, null,array($type => array($id)));
           if ($occurrences != null) {
             $haveevent = true;
             foreach ($occurrences as $occurrence) {
@@ -2114,21 +1954,21 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
           if($haveevent) {
             $hidden_div .= "
               <div id=\"$id-$this_day\" class=\"infoPopup\" style=\"border: 1px solid black;\">
-               <h1>$day_long_label $this_day</h1>
+              <h1>$description $day</h1>
                <ul>
                ".implode($today_events)."
                </ul>
               </div>";            
-            $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?cal_range=day&date=$iso_day'\" class=\"eventOwner\"
-               onmouseover=\"toggleInfo(this,'$id-$this_day',1); return true;\"
-               onmouseout=\"toggleInfo(this,'$id-$this_day',0); return true;\">$day_content</td>";
+            $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?cal_range=day&date=$iso'\" class=\"eventOwner\"
+               onmouseover=\"toggleInfo(this,'$id-$day',1); return true;\"
+               onmouseout=\"toggleInfo(this,'$id-$day',0); return true;\">$day_content</td>";
           } else {
-            $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?cal_range=day&date=$iso_day'\"></td>";
+            $line[$line_id] .= "<td onclick=\"window.location.href='calendar_index.php?cal_range=day&date=$iso'\"></td>";
           }
         }
       }
     }
-    $current_time = strtotime('+1 day', $current_time); 
+    $current->addDay(1); 
   }
   foreach ($calendar_entity as $type => $entity) {
     foreach ($entity as $id => $properties) {
@@ -2136,18 +1976,20 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
       $d_l .= '<tr><th>'.$properties['name'].'</th>'.$line[$line_id].'</tr>';
     }  
   } 
+  $label = calendar_localizeDate('month', $calendar['date']);
+  $current = new Of_Date();
 
   $block = "
   <style>
     $css
   </style>
   <h1>
-    <a href=\"calendar_index.php?date=$prev_year\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-    $display_date
-    <a href=\"calendar_index.php?date=$next_month\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_year\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
-  </h1>   
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subYear(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addYear(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+  </h1> 
   <table class=\"planning\">
   <colgroup>
   </colgroup>
@@ -2195,36 +2037,28 @@ function dis_calendar_week_planning($calendar, $calendar_entity, $writable_entit
   global $ccalendar_weekstart, $obm, $ico_far_next, $ico_far_previous;
   global $ccalendar_first_hour;
 
-  $ts_date = strtotime($calendar['date']);
-  $category_filter = $calendar['category_filter'];
-  $week_num = get_calendar_week_num($ts_date);
-  $next_week = of_isodate_format(strtotime('+1 week', $ts_date));
-  $next_month = of_isodate_format(strtotime('+1 month', $ts_date));
-  $prev_week = of_isodate_format(strtotime('-1 week', $ts_date));
-  $prev_month = of_isodate_format(strtotime('-1 month', $ts_date));
-  $start_week_day = get_calendar_date_day_of_week($ts_date, $ccalendar_weekstart);
-  $end_week_time = $start_week_day + ((6 * 24 + $ccalendar_last_hour) * 3600);
-  $start_week_time = strtotime("+$ccalendar_first_hour hours",$start_week_day);
-  $start_week = calendar_localizeDate('week', $start_week_time);
-  $end_week = calendar_localizeDate('week', $end_week_time);
-  $end_time = strtotime('+7 days', $start_week_day);
-
-  $display_date = "$start_week - $end_week"; 
+  // FIXME MAKE IT WORK
   $display_days = $_SESSION['set_cal_display_days'];
   if (empty($display_days)) $display_days = '1111111';
-  // FIXME Only work with the 'with or without week end' feature
-  if($display_days == '1111100') {
-    $end_time = strtotime('+5 days', $start_week_day);
-  }  
-  $dis_planning = dis_calendar_planning_view ($start_week_day, $end_time, $calendar_entity, $category_filter);
+
+  $category_filter = $calendar['category_filter'];
+  $date = clone $calendar['date'];
+  $date->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(7);
+  
+  $dis_planning = dis_calendar_planning_view ($date, $end, $calendar_entity, $category_filter);
+
+  $label = calendar_localizeDate('week', $date).' - '.calendar_localizeDate('week', $end->subDay(1));
+  $current = new Of_Date();
 
   $block = "
   <h1>
-    <a href=\"calendar_index.php?date=$prev_month\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$prev_week\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
-    $display_date ($l_week $week_num)
-    <a href=\"calendar_index.php?date=$next_week\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_month\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
   </h1>
   $dis_planning 
   ";
@@ -2245,33 +2079,25 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
   global $path, $ico_next, $ico_previous, $l_previous, $l_next;
   global $obm, $ico_far_next, $ico_far_previous;
 
-  $ts_date = strtotime($calendar['date']);
   $category_filter = $calendar['category_filter'];
+  $date = $calendar['date'];
+  $date->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(1);
 
-  $iso_date = $calendar['date'];
-  $category_filter = $calendar['category_filter'];
-  $ts_date = strtotime($iso_date);
+  $dis_planning = dis_calendar_planning_view ($date, $end, $calendar_entity, $category_filter);
 
-  $tomorrow_date = of_isodate_format(strtotime('+1 day', $ts_date));
-  $next_week = of_isodate_format(strtotime('+1 week', $ts_date));
-  $yesterday_date = of_isodate_format(strtotime('-1 day', $ts_date));
-  $prev_week  = of_isodate_format(strtotime('-1 week', $ts_date));
-  
-  $start_time = $ts_date;
-  $end_time = strtotime('+1 day',$ts_date);
-
-  $display_date = calendar_localizeDate('day', $ts_date);
-
-  $dis_planning = dis_calendar_planning_view ($start_time, $end_time, $calendar_entity, $category_filter);
+  $label = calendar_localizeDate('day', $date);
+  $current = new Of_Date();
 
   $block = "
   <h1>
-    <a href=\"calendar_index.php?date=$prev_week\"><img src=\"$ico_far_previous\" alt=\"[$l_Previous]\" /></a>     
-    <a href=\"calendar_index.php?date=$yesterday_date\"><img src=\"$ico_previous\" alt=\"[$l_Previous]\" /></a>     
-    $display_date
-    <a href=\"calendar_index.php?date=$tomorrow_date\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=$next_week\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
-  </h1>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getIso()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subDay(1)->getIso()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addDay(1)->getIso()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getIso()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+  </h1>    
   $dis_planning";
 
   return $block;
@@ -2288,7 +2114,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
  * @access public
  * @return void
  */
-function dis_calendar_planning_view($start_time, $end_time, $calendar_entity, $category_filter) {
+function dis_calendar_planning_view($date, $end, $calendar_entity, $category_filter) {
   global $l_daysofweekfirst,$l_daysofweek;
   
   $status = array('A');
@@ -2305,14 +2131,15 @@ function dis_calendar_planning_view($start_time, $end_time, $calendar_entity, $c
   }
   
   $day_amount = 0;
-  for($ts = $start_time; $ts < $end_time; $ts += $day_duration ) {
+  $current = clone $date;
+  while ($current->compare($end) < 0) {
     $day_amount++;
-    $day_num = date('w', $ts);
-    $this_day = date('j', $ts);
-    $day_label = $l_daysofweek[$day_num];
-    $iso_day = of_isodate_format($ts);
-    $line0 .= "<th>$day_label</th>\n";
-    $line1 .= "<th><a href=\"calendar_index.php?cal_range=day&amp;date=$iso_day\">$this_day</a></th>\n";
+    $day = $current->get(Of_Date::DAY);
+    $label = $current->get(Of_Date::WEEKDAY_NAME);
+    $iso = $current->getIso();
+    $line0 .= "<th>$label</th>\n";
+    $line1 .= "<th><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></th>\n";
+    $current->addDay(1);
   }
 
   $td_width = ceil(90/$day_amount);
@@ -2321,18 +2148,20 @@ function dis_calendar_planning_view($start_time, $end_time, $calendar_entity, $c
   foreach($calendar_entity as $entity => $entities) {
     foreach($entities as $id => $data) {
       $dis_planning_view .= '<tr><th>'.$data['name'].'</th>';
-      for($ts = $start_time; $ts < $end_time; $ts += $day_duration ) {
+      $current = clone $date;
+      while($current->compare($end) < 0) {
         $view = array();
-        $occurrences = $of->getPeriodOccurrences($ts,$day_duration,array($entity => array($id)));
+        $occurrences = $of->getPeriodOccurrences($current,null,array($entity => array($id)));
         if(is_array($occurrences)) {
           $dis_planning_view .= "<td style=\"width:$td_width%\"><ul>";
           foreach($occurrences as $occurrence) {
-            $dis_planning_view .= dis_calendar_planning_event($occurrence, $calendar_entity, $ts,$cats_color);
+            $dis_planning_view .= dis_calendar_planning_event($occurrence, $calendar_entity, $current ,$cats_color);
           }
           $dis_planning_view .= '</ul></td>';
         } else {
           $dis_planning_view .= "<td style=\"width:$td_width%\">&nbsp;</td>";
         }
+        $current->addDay(1);
       }
       $dis_planning_view .= '</tr>';
     }
@@ -2366,7 +2195,7 @@ function dis_calendar_planning_view($start_time, $end_time, $calendar_entity, $c
  * @access public
  * @return void
  */
-function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $ts, $cats_color) {
+function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $cats_color) {
   global $obm, $path;
   global $l_private, $l_location, $l_all_day;
   global $l_task, $l_user, $l_resource, $l_private;
@@ -2387,12 +2216,11 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $ts, $cats
   if($occurrence->event->all_day) {
     $schedule = $l_all_day; 
   } else {
-    if(date('Ymd',$occurrence->date) != date('Ymd',$ts)) {
-      $beg = of_datetime_format($occurrence->date);
+    if($occurrence->date->compareDateIso($date) != 0) {
+      $schedule = $occurrence->date->getOutputDateTime();
     } else {
-      $beg = date('H:i',$occurrence->date);
+      $schedule = $occurrence->date->get(Of_Date::TIME_SHORT);
     }
-    $schedule =  "$beg";              
   }
 
   $event_data = "
@@ -2402,7 +2230,6 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $ts, $cats
 
   return $event_data;  
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Conflicts
@@ -2443,17 +2270,17 @@ function html_calendar_dis_conflict($calendar, $c_q) {
       $location = $l_private;
     }
 
-    $date_begin = $c_q->f('calendarevent_date');
+    $begin = new Of_Date($c_q->f('calendarevent_date'));
     $all_day = $c_q->f('calendarevent_allday');
-    $date_end = $c_q->f('calendarevent_date') + $c_q->f('calendarevent_duration');
+    $end = new Of_Date($c_q->f('calendarevent_date') + $c_q->f('calendarevent_duration'));
 
     if ($all_day) {
       $dis_all_day = "<tr><td colspan=\"2\" class=\"detailLabel\">$l_all_day</td></tr>";
-      $date_b = of_isodate_format($date_begin);
-      $date_e = of_isodate_format($date_end);
+      $begin = $begin->getOutputDate();
+      $end = $end->getOutputDate();
     } else {
-      $date_b = of_datetime_format($date_begin);
-      $date_e = of_datetime_format($date_end);
+      $begin = $begin->getOutputDateTime();
+      $end = $end->getOutputDateTime();
     }       
     $dis_conflict .= "
       <tr>
@@ -2549,7 +2376,6 @@ function dis_calendar_event_consult($id) {
   return $block;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML : Display Calendar Event Consult
 // Parameters:
@@ -2638,16 +2464,18 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $display['title'] = $l_private;
 
   }
-
   $all_day = $event_q->f('calendarevent_allday');
+  $begin = new Of_Date($event_q->f('calendarevent_date'));
+  $end = new Of_Date($event_q->f('calendarevent_date') + $event_q->f('calendarevent_duration'));
+  var_dump($begin->get(Of_Date::TIMEZONE_NAME));
   if ($all_day) {
     $dis_all_day = "<tr><th>$l_all_day</th><td></td></tr>";
-    $datebegin = of_date_format($event_q->f('calendarevent_date'));
-    $dateend = of_date_format($event_q->f('calendarevent_date') + $event_q->f('calendarevent_duration'));
+    $begin = $begin->getOutputDate();
+    $end = $end->getOutputDate();
   } else {
-    $datebegin = of_datetime_format($event_q->f('calendarevent_date'));
-    $dateend = of_datetime_format($event_q->f('calendarevent_date') + $event_q->f('calendarevent_duration'));
-  }
+    $begin = $begin->getOutputDateTime();
+    $end = $end->getOutputDateTime();
+  }     
   $privacy = $event_q->f('calendarevent_privacy') == 1? $l_yes : $l_no;
 
 
@@ -2655,7 +2483,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $kind = $GLOBALS['l_'.$event_q->f('calendarevent_repeatkind')];
     $kind_unit = $GLOBALS['l_'.$event_q->f('calendarevent_repeatkind').'_unit'];
     $repeat_days = $event_q->f('calendarevent_repeatdays'); 
-    $repeat_end = of_date_format($event_q->f('calendarevent_endrepeat'));
+    $repeat_end = new Of_Date($event_q->f('calendarevent_endrepeat'));
+    $repeat_end = $repeat_end->getOutputDate();
     if( $event_q->f('calendarevent_repeatfrequence') == 1 ) {
       $repeatfrequency = sprintf($kind_unit,'');
     } else {
@@ -2663,17 +2492,13 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     }
 
     while($exception_q->next_record()) {
-      $date_exception[] = of_date_format($exception_q->f('calendarexception_date')); 
+      $date = new Of_Date($exception_q->f('calendarexception_date'));
+      $date_exception[] = $date->getOutputDate();
     }
     if($event_q->f('calendarevent_repeatkind') == 'weekly') {
-      $start_week_day = strtotime($ccalendar_weekstart);
-      for ($i=0; $i<7; $i++) {
-        $day_num = date('w', $start_week_day);
-        $day = $l_daysofweekshort[$day_num];
-        if (strcmp(substr($repeat_days,$i,1),'1')==0) {
-          $dis_repeat_days .= "$day ";
-        }
-        $start_week_day = strtotime('+1 day', $start_week_day); 
+      $date = new Of_Date($ccalendar_weekstart);
+      for($i = 0; $i < strlen($repeat_days); $i++) {
+        if($repeat_days[$i] == 1) $repeat_days = $date->setWeekday($i)->get(Of_Date::WEEKDAY_NAME).' ';
       }
       $dis_repeat_days = "
       <tr>
@@ -2862,11 +2687,11 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
    $dis_all_day
     <tr>
      <th>$l_datebegin :</th>
-     <td>$datebegin</td>
+     <td>$begin</td>
     </tr>
     <tr>
      <th>$l_dateend :</th>
-     <td>$dateend</td>       
+     <td>$end</td>       
     </tr>
     <tr>
      <th>$l_priority :</th>
@@ -3024,7 +2849,7 @@ function dis_calendar_quick_form($calendar) {
 
   return $block;
 }
-
+//FIXME HERE
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
 // Parameters:

@@ -66,6 +66,7 @@ class Of_Date extends DateTime {
   const TIMESTAMP      = 'U';              // U - unix timestamp
 
   // additional formats
+  const DATABASE_DATE  = 'Y-m-d H:i:s';
   const ERA            = 'ERA';            // --- short name of era, locale aware,
   const ERA_NAME       = 'ERA_NAME';       // --- full name of era, locale aware,
   const DATES          = 'DATES';          // --- standard date, locale aware
@@ -137,7 +138,7 @@ class Of_Date extends DateTime {
     'inputdatetime' => 'm/d/Y H:i:s',
     'inputdate' => 'd/m/Y'
   );
-  public function __construct($time=null) {
+  public function __construct($time=null, $timezone=null) {
     if(is_numeric($time)) {
       $time = "@$time";
     }
@@ -1426,7 +1427,7 @@ class Of_Date extends DateTime {
    * @return void
    */
   public function toString() {
-    return $this->get(self::ISO_8601);
+    return $this->get(self::DATABASE_DATE);
   }
 
   /**

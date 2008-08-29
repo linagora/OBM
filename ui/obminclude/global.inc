@@ -723,6 +723,7 @@ if ($path == '') {
 }
 
 
+set_include_path(get_include_path().":../$path/$obminclude/lib");
 //those functions must be defined before the global_query and global display
 //includes.
 ///////////////////////////////////////////////////////////////////////////////

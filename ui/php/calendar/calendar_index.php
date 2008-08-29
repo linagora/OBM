@@ -20,7 +20,7 @@
 // - rights_admin    -- access rights screen
 // - rights_update   -- Update calendar access rights
 ///////////////////////////////////////////////////////////////////////////////
-
+$microtimestart = microtime(true);
 $path = '..';
 $module = 'calendar';
 $obminclude = getenv('OBM_INCLUDE_VAR');
@@ -30,6 +30,8 @@ include("$obminclude/global.inc");
 $params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
+require_once('Zend/Date.php');
+require_once("$obminclude/of/of_date.php");
 $params = get_calendar_params();
 
 // Get user preferences if set for hour display range 
@@ -60,14 +62,6 @@ if (isset($params['cal_range'])) {
   $cal_range = 'week';
 }
 ///////////////////////////////////////////////////////////////////////////////
-// specifique import ICS
-///////////////////////////////////////////////////////////////////////////////
-define('CRLF',"\r\n");
-define('RFC2445_CRLF',               "\r\n");
-define('RFC2445_WSP',                "\t ");
-define('RFC2445_FOLDED_LINE_LENGTH', 75);
-$ics_event_priority_to_obm = array(1 => 3, 2 => 3, 3 => 3, 4 => 2, 5 => 2, 6 => 2, 7 => 1, 8 => 1, 9 => 1) ;
-///////////////////////////////////////////////////////////////////////////////
 
 $extra_css[] = $css_calendar;
 $extra_js_include[] = 'calendar.js';
@@ -78,7 +72,6 @@ require('calendar_display.inc');
 require_once('calendar_js.inc');
 require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
-
 get_calendar_action();
 update_calendar_action();
 $perm->check_permissions($module, $action);
@@ -160,7 +153,9 @@ if (($action == 'insert') || ($action == 'update')
 // We copy the entity array structure to the parameter hash
 $params['entity'] = $cal_entity_id;
 $params['category_filter'] = $cal_category_filter;
-
+//FIXME
+$y = new Of_Date();
+$x = new Of_Date();
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -250,7 +245,7 @@ if ($action == 'index') {
       $mail_data = run_query_prepare_event_mail($params, $action);
       calendar_send_mail($mail_data);
       $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
-      $params["date"] = of_isodate_convert(strtotime($params["date_begin"]));
+      $params["date"] = $params["date_begin"];
       $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
     }
   } else {
@@ -302,7 +297,7 @@ if ($action == 'index') {
       check_calendar_data_form($params)) {
     $c = get_calendar_event_info($params['calendar_id'],false); 
     if ( (!$params['force']) 
-         && !(date('Y-m-d h:i:s',$c['calendarevent_date']) == $params['date_begin'] && $c['calendarevent_duration'] == $params['event_duration'])
+         && !($c['calendarevent_date']->equals($params['date_begin']) && $c['calendarevent_duration'] == $params['event_duration'])
 	 && ($conflicts = check_calendar_conflict($params, $entities)) ) {
       $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
       $display['msg'] .= display_err_msg("$l_event : $l_update_error");
@@ -312,7 +307,7 @@ if ($action == 'index') {
       run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
       calendar_send_mail($mail_data);
       $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
-      $params["date"] = of_isodate_convert(strtotime($params["date_begin"]));
+      $params["date"] = $params["date_begin"];
       $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
     }
   } else {
@@ -547,7 +542,9 @@ if (!$params['ajax']) {
 }
 display_page($display);
 
+$microtimestop = microtime(true);
 
+echo $microtimestop - $microtimestart;
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $params hash, Calendar parameters transmited
 // returns : $params hash with parameters set
@@ -562,57 +559,53 @@ function get_calendar_params() {
   if ($params['group_view'] == '') {
     $params['group_view'] = $params['group_id'];
   }
-
+  //FIXME
   $params['date'] = of_isodate_convert($params['date']);
-  $params['date_begin'] = of_isodate_convert($params['date_begin'],true);
-  $params['date_end'] = of_isodate_convert($params['date_end'],true);
+  $params['date'] = new Of_Date($params['date']);
   $params['repeat_end'] = of_isodate_convert($params['repeat_end'],true);
+  if(!is_null($params['repeat_end'])) {
+    $params['repeat_end'] = new Of_Date($params['repeat_end']);
+  }
+  $params['date_begin'] = of_isodate_convert($params['date_begin'],true);
+  if(!is_null($params['date_begin'])) {
+    $params['date_begin'] = new Of_Date($params['date_begin']);
+  }
+  $params['date_end'] = of_isodate_convert($params['date_end'],true);
+  if(!is_null($params['date_end'])) {
+    $params['date_end'] = new Of_Date($params['date_end']);
+  }
+  if (isset($params['time_begin']) && !is_null($params['date_begin'])) {
+    $params['date_begin']->setHour($params['time_begin']);
+    $params['date_begin']->setMinute($params['min_begin']);
+  } elseif(!is_null($params['date_begin'])) {
+    $params['date_begin']->setHour($ccalendar_first_hour);
+  }
+  if (isset($params['time_end']) &&  !is_null($params['date_end'])) {
+    $params['date_end']->setHour($params['time_end']);
+    $params['date_end']->setMinute($params['min_end']);
+  } elseif(!is_null($params['date_end'])) {
+    $params['date_end']->setHour($ccalendar_last_hour);
+  }
+
   // New meeting event duration
   if (isset($params['time_duration'])) {
     $params['meeting_duration'] = $params['time_duration'];
     if (isset($params['min_duration'])) {
       $params['meeting_duration'] += $params['min_duration']/60;
-    }
+    } 
   }
-
-  // New appointment hours
-  if (isset($params['time_begin'])) {
-    $start_hour = $params['time_begin'];
-  } else {
-    $start_hour = $ccalendar_first_hour;
-  }
-  if (isset($params['min_begin'])) {
-    $start_min = $params['min_begin'];
-  } else {
-    $start_min = '00';
-  }
-  if (isset($params['time_end'])) {
-    $end_hour = $params['time_end'];
-  } else {
-    $end_hour = $ccalendar_last_hour;
-  }
-  if (isset($params['min_end'])) {
-    $end_min = $params['min_end'];
-  } else {
-    $end_min = '00';
-  }
-  if (strlen($params['date_begin']) == 10) {
-    $params['date_begin'] .= " $start_hour:$start_min:00";
-  }
-  if (strlen($params['date_end']) == 10) {
-    $params['date_end'] .= " $end_hour:$end_min:00";
-  }
-  
-  if (($params['date_end'] != '') && ($params['date_begin'] != '')) {
-    $params['event_duration'] = strtotime($params['date_end']) - strtotime($params['date_begin']);
+  if (!is_null($params['date_end']) && !is_null($params['date_begin'])) {
+    $clone = clone $params['date_end'];
+    $params['event_duration'] = $clone->subDate($params['date_begin'])->getTimestamp();
     if($params['event_duration'] <= 0) {
       $params['event_duration'] = 59;
     }
   } else {
     $params['event_duration'] = 0;
   }
-  if (($params['date_begin']) && $params['date_end'] == '' && $params['duration']) {
-    $params['date_end'] = date('Y-m-d H:i:s',strtotime($params['date_begin']) + $params['duration']);
+  if (!is_null($params['date_begin']) && is_null($params['date_end']) && isset($params['duration'])) {
+    $clone = clone $params['date_begin'];
+    $params['date_end'] = $clone->addSecond($params['duration']);
   } 
   // repeat days
   for ($i=0; $i<7; $i++) {
@@ -732,7 +725,6 @@ function get_calendar_action() {
 
   $id = $params['calendar_id'];
   $date = $params['date'];
-
   // Index
   $actions['calendar']['index'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=index",
@@ -766,7 +758,7 @@ function get_calendar_action() {
   // Detail Consult
   $actions['calendar']['detailconsult'] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=$id&amp;date=$date",
+    'Url'      => "$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=$id&amp;date=".$date->getIso(),
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
   );
@@ -774,7 +766,7 @@ function get_calendar_action() {
   // Detail Update
   $actions['calendar']['detailupdate'] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id&amp;date=$date",
+    'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id&amp;date=".$date->getIso(),
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult','update_alert','update_decision') 
   );
@@ -782,7 +774,7 @@ function get_calendar_action() {
   // Duplicate
   $actions['calendar']['duplicate'] = array (
     'Name'     => $l_header_duplicate,
-    'Url'      => "$path/calendar/calendar_index.php?action=duplicate&amp;calendar_id=$id&amp;date=$date",
+    'Url'      => "$path/calendar/calendar_index.php?action=duplicate&amp;calendar_id=$id&amp;date=".$date->getIso(),
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
   );
@@ -790,14 +782,14 @@ function get_calendar_action() {
   // Check Delete
   $actions['calendar']['check_delete'] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/calendar/calendar_index.php?action=check_delete&amp;calendar_id=$id&amp;date=$date",
+    'Url'      => "$path/calendar/calendar_index.php?action=check_delete&amp;calendar_id=$id&amp;date=".$date->getIso(),
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult')
                                      		 );
 
   // Delete
   $actions['calendar']['delete'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=delete&amp;calendar_id=$id&amp;date=$date",
+    'Url'      => "$path/calendar/calendar_index.php?action=delete&amp;calendar_id=$id&amp;date=".$date->getIso(),
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      		 );

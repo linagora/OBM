@@ -584,7 +584,7 @@ function run_query_global_delete_document_links($ent_id, $entity, $doc_id='') {
   if(!$ent_id && !$entity && !$doc_id) {
     return true;
   }
-  $where = '1=0';
+  $where = '1=1';
   if ($ent_id != '') {
     $ent_id = sql_parse_id($ent_id, true);
     $where .= " AND documententity_entity_id $ent_id ";

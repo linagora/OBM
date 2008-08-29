@@ -20,8 +20,6 @@ function run_query_calendar_detail($calendar_id) {
   $db_type = $obm_q->type; 
   $timeupdate = sql_date_format($db_type, 'calendarevent_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'calendarevent_timecreate', 'timecreate');
-  $calendarevent_date = sql_date_format($db_type,'calendarevent_date','calendarevent_date');
-  $calendarevent_endrepeat = sql_date_format($db_type,'calendarevent_endrepeat', 'calendarevent_endrepeat');
   $multidomain = sql_multidomain('calendarevent');
   $query = "SELECT DISTINCT
       calendarevent_id,
@@ -46,8 +44,8 @@ function run_query_calendar_detail($calendar_id) {
       calendarevent_repeatdays,
       calendarevent_allday,
       calendarevent_color,
-      $calendarevent_endrepeat,
-      $calendarevent_date
+      calendarevent_endrepeat,
+      calendarevent_date
     FROM  
       CalendarEvent
       LEFT JOIN CalendarCategory1 ON calendarevent_category1_id = calendarcategory1_id
@@ -318,8 +316,6 @@ function run_query_calendar_waiting_events() {
       ) 
     );
   $entity_label = sql_string_concat($db_type,$concat);
-  $calendarevent_endrepeat = sql_date_format($db_type,'calendarevent_endrepeat','calendarevent_endrepeat'); 
-  $calendarevent_date = sql_date_format($db_type,'calendarevent_date','calendarevent_date');    
   $query = "SELECT 
       u.userobm_lastname as usercreate_lastname,
       u.userobm_firstname as usercreate_firstname,
@@ -335,8 +331,8 @@ function run_query_calendar_waiting_events() {
       calendarevent_repeatkind,
       calendarevent_repeatdays,
       calendarevent_duration,
-      $calendarevent_endrepeat,
-      $calendarevent_date		   
+      calendarevent_endrepeat,
+      calendarevent_date		   
     FROM CalendarEvent
       LEFT JOIN CalendarCategory1 ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id  = evententity_event_id
@@ -402,11 +398,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
   global $l_add_event_mail_head,$l_add_event_mail_subject;
 
   $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
-  $mail  = $calendar['mail'];
   $groups = $sel_entity_id['group'];
-  $mail_title = stripslashes($calendar['title']);
-  $datebegin = $calendar['date_begin'];
-  $dateend = $calendar['date_end'];
   if ($calendar['task_new_id']) $task_id = $calendar['task_new_id']; 
   else $task_id = $calendar['task_id'];
   // Get the final user list (merge group)
@@ -477,7 +469,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
 function run_query_calendar_insert_event_data($calendar) {
   global $cdg_sql, $obm;
 
-  $now = date('Y-m-d H:i:s');
+  $now = Of_Date::today();
   if(!is_numeric($calendar['owner']) || $calendar['owner'] <= 0) {
     $owner = $obm['uid'];
   } else {
@@ -489,14 +481,13 @@ function run_query_calendar_insert_event_data($calendar) {
   $description = $calendar['description'];
   $location = $calendar['location'];
   ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
-  $datebegin = of_isodate_convert($calendar['date_begin']);
-  $dateend = of_isodate_convert($calendar['date_end']);
+  $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['event_duration'];
   if ($calendar['privacy']!=1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
   if(isset($calendar['repeat_end'])) {
-    $repeat_end = "'".of_isodate_convert($calendar['repeat_end'])."'";
+    $repeat_end = "'$calendar[repeat_end]'";
   } else {
     $repeat_end = 'NULL';
   }  
@@ -591,14 +582,13 @@ function run_query_calendar_insert_event_data($calendar) {
   $id = $obm_q->f('calendarevent_id');
   $calendar['calendar_id'] = $id;
     
-  $timebegin = strtotime($datebegin);
-  $hour = date('H', $timebegin);
-  $min = date('i',$timebegin);
+  $hour = $datebegin->getHour();
+  $minute = $datebegin->getMinute();
   if($repeat_kind != 'none' && is_array($date_exception)) {
     foreach(array_unique($date_exception) as $key => $value) {
       if($value != '') {
-        $value = of_isodate_convert($value);
-        $calendar['old_date_begin'] = date('Y-m-d H:i:s',strtotime("+$hour hours +$min minutes",strtotime($value)));        
+        $value = new Of_Date($value);
+        $calendar['old_date_begin'] = $value->setHour($hour)->setMinute($minute);        
         run_query_calendar_event_exception_insert($calendar);
       }
     }
@@ -732,7 +722,7 @@ function search_user_by_name($lastname, $firstname) {
   }
 }
 
-
+//FIXME HERE
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurrence of each event,
 // Parameters:
@@ -741,14 +731,14 @@ function search_user_by_name($lastname, $firstname) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_calendar_conflict($calendar, $sel_entity_id) {
 
-  $ts_begin = isodatetime_to_timestamp($calendar['date_begin']);
-  $ts_end = isodatetime_to_timestamp($calendar['date_end']);
+  $begin = clone $calendar['date_begin'];
+  $end = clone $calendar['date_end'];
   $id = $calendar['calendar_id'];
   if($calendar['all_day']) {
-    $ts_begin = strtotime(date('Y-m-d 00:00:00',$ts_begin));
-    $ts_end = strtotime(date('Y-m-d 23:59:59',$ts_end));
+    $begin->setHour(0)->setMinute(0)->setSecond(0); 
+    $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
   }  
-  $obm_q = run_query_calendar_conflict_events($ts_begin, $ts_end, $sel_entity_id, $id);
+  $obm_q = run_query_calendar_conflict_events($begin, $end, $sel_entity_id, $id);
   if ($obm_q->nf() == 0) {
     return false;
   }
@@ -1733,7 +1723,7 @@ function get_calendar_event_info($id,$attendees=true) {
   while($obm_q->next_record()) {
     $e['usercreate'] = $obm_q->f('calendarevent_usercreate');
     $e['owner'] = $obm_q->f('calendarevent_owner');
-    $e['date'] = $obm_q->f('calendarevent_date');
+    $e['date'] = new  Zend_Date($obm_q->f('calendarevent_date'),Zend_Date::TIMESTAMP);
     $e['duration'] = $obm_q->f('calendarevent_duration');
     if($obm_q->f('evententity_entity_id') && $attendees) {
       $e['attendees'][$obm_q->f('evententity_entity')][] = $obm_q->f('evententity_entity_id');
@@ -1895,9 +1885,6 @@ function check_calendar_data_quick_form($calendar) {
   if (trim($datebegin) == '') {
     $err['msg'] = $l_fill_datebegin;
     return false;
-  } else if (preg_match($php_regexp_isodatetime, $datebegin) == 0) {
-    $err['msg'] = "$l_datebegin : $l_invalid_date"; 
-    return false;
   }
   
   // End Date check
@@ -2008,32 +1995,20 @@ function check_calendar_data_form($calendar) {
 // more can be added as needed but trying to keep it small while we can
 // Parameters:
 //   - $format : format of the wished result
-//   - $timestamp : time to format
+//   - $date : time to format
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_localizeDate($format, $timestamp) {
- global $l_daysofweek, $l_daysofweekshort;
- global $l_monthsofyear, $l_monthsofyearshort;
+function calendar_localizeDate($format, $date) {
 
- $day = '%A %e %B %Y';
- $week = '%e %B %Y';
- $week_list = '%a %e';
- $week_jump = '%e %b';
- $month = '%B %Y';
- $month_list = '%A %e %B';
+ $day = Of_Date::OBM_DATE_DAY;
+ $week = Of_Date::OBM_DATE_WEEK;
+ $week_list = Of_Date::OBM_DATE_WEEK_LIST;
+ $week_jump = Of_Date::OBM_DATE_WEEK_JUMP;
+ $month = Of_Date::OBM_DATE_MONTH;
+ $month_list = Of_Date::OBM_DATE_MONTH_LIST;
+ if(is_object($date)) {
 
- $year = date('Y', $timestamp);
- $months = date('n', $timestamp)-1;
- $days = date('j', $timestamp);
- $dayofweek = date('w', $timestamp);
-	
- $date = str_replace('%Y', $year, ${$format});
- $date = str_replace('%e', $days, $date);
- $date = str_replace('%B', $l_monthsofyear[$months], $date);
- $date = str_replace('%b', $l_monthsofyearshort[$months], $date);
- $date = str_replace('%A', $l_daysofweek[$dayofweek], $date);
- $date = str_replace('%a', $l_daysofweekshort[$dayofweek], $date);
-	
- return $date;	
+ return $date->get(${$format});	
+ }
 }
 
 
@@ -2227,7 +2202,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
       $select_user
       $select_resource
       calendarcategory1_label,
-      $calendarevent_date_l,
+      calendarevent_date,
       calendarevent_duration,
       calendarevent_allday
     FROM CalendarEvent
@@ -3461,7 +3436,7 @@ Class OccurrenceFactory {
    * @access public
    * @return boolean
    */
-  function periodHaveOccurrences($time, $duration, $entityFilter=null) {
+  function periodHaveOccurrences($time, $duration = null, $entityFilter=null) {
     foreach($this->occurrences as $evtOccurrences) {
       foreach($evtOccurrences as $occurrence) {
         if(!$entityFilter || ( 
@@ -3493,7 +3468,7 @@ Class OccurrenceFactory {
    * @access public
    * @return boolean
    */
-  function getPeriodOccurrences($time, $duration, $entityFilter=null, $eventFilter=0) {
+  function getPeriodOccurrences($time, $duration = null, $entityFilter=null, $eventFilter=0) {
     $occurrences = array();
     foreach($this->occurrences as $evtOccurrences) {
       foreach($evtOccurrences as $occurrence) {
