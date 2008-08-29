@@ -21,29 +21,6 @@ require Exporter;
 $debug=1;
 
 
-# Permet d'exécuter une commande système et de retourner le code retour de
-# celle-ci
-sub execCmd {
-    local( $cmd, $verbose ) = @_;
-
-    my $pid;
-
-    if( $pid = fork ) {
-        waitpid($pid, 0);
-    }else {
-        if( $verbose ) {
-            exec( $cmd ) or return -1;
-        }else {
-            exec($cmd." > /dev/null 2>&1") or return -1;
-        }
-    }
-
-    # on retourne la valeur retournee par le programme execute
-    my $retour = $? >> 8;
-    return $retour;
-}
-
-
 # Permet de cloner une structure complexe
 sub cloneStruct {
     my( $structRef ) = @_;
