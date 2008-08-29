@@ -11,7 +11,7 @@ package OBM::toolBox;
 
 use OBM::Parameters::common;
 use OBM::Parameters::toolBoxConf;
-require OBM::utils;
+require OBM::Tools::perlUtils;
 require Sys::Syslog;
 require Exporter;
 
@@ -368,7 +368,7 @@ sub getEntityRight {
 sub computeRight {
     my( $usersList ) = @_;
     use OBM::Parameters::cyrusConf;
-    my $rightList = &OBM::utils::cloneStruct(OBM::Parameters::cyrusConf::boxRight);
+    my $rightList = &OBM::Tools::perlUtils::cloneStruct(OBM::Parameters::cyrusConf::boxRight);
 
     while( my( $userName, $right ) = each( %$usersList ) ) {
         if( $right->{"write"} ) {
@@ -554,7 +554,7 @@ sub getMailServerList {
 #------------------------------------------------------------------------------
 sub getDomains {
     my( $obmDomainId ) = @_;
-    my $domainList = &OBM::utils::cloneStruct(OBM::Parameters::toolBoxConf::domainList);
+    my $domainList = &OBM::Tools::perlUtils::cloneStruct(OBM::Parameters::toolBoxConf::domainList);
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
@@ -565,7 +565,7 @@ sub getDomains {
 
 
     # Création du meta-domaine
-    $domainList[0] = &OBM::utils::cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
+    $domainList[0] = &OBM::Tools::perlUtils::cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
     $domainList[0]->{"meta_domain"} = 1;
     $domainList[0]->{"domain_id"} = 0;
     $domainList[0]->{"domain_label"} = "metadomain";
@@ -595,7 +595,7 @@ sub getDomains {
     }
 
     while( my( $domainId, $domainLabel, $domainDesc, $domainName, $domainAlias, $domainSambaSid, $domainSambaPdc ) = $queryDomainResult->fetchrow_array ) {
-        my $currentDomain = &OBM::utils::cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
+        my $currentDomain = &OBM::Tools::perlUtils::cloneStruct(OBM::Parameters::toolBoxConf::domainDesc);
         $currentDomain->{'meta_domain'} = 0;
         $currentDomain->{'domain_id'} = $domainId;
         $currentDomain->{'domain_label'} = $domainLabel;

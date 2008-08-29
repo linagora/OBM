@@ -1,5 +1,5 @@
 #########################################################################
-# OBM           - File : OBM::utils.pm (Perl Module)                    #
+# OBM           - File : perlUtils.pm (Perl Module)                     #
 #               - Desc : Librairie Perl pour OBM                        #
 #               Les fonctions communes n'ayant pas de dependances       #
 #########################################################################
@@ -7,7 +7,7 @@
 #########################################################################
 # $Id$   #
 #########################################################################
-package OBM::utils;
+package OBM::Tools::perlUtils;
 
 use Storable qw(dclone);
 require Exporter;

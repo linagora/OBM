@@ -14,7 +14,7 @@ use OBM::Parameters::ldapConf;
 require Net::LDAP;
 require Net::LDAP::Entry;
 require OBM::toolBox;
-require OBM::utils;
+require OBM::Tools::perlUtils;
 require OBM::Entities::obmRoot;
 require OBM::Entities::obmDomainRoot;
 require OBM::Entities::obmNode;
@@ -46,7 +46,7 @@ sub new {
         $ldapEngineAttr{"domainList"} = $domainList;
     }
 
-    $ldapEngineAttr{"ldapStruct"} = &OBM::utils::cloneStruct($OBM::Parameters::ldapConf::ldapStruct),
+    $ldapEngineAttr{"ldapStruct"} = &OBM::Tools::perlUtils::cloneStruct($OBM::Parameters::ldapConf::ldapStruct),
     $ldapEngineAttr{"typeDesc"} = $OBM::Parameters::ldapConf::attributeDef;
 
     bless( \%ldapEngineAttr, $self );
@@ -263,7 +263,7 @@ sub _initTree {
             }
 
             &OBM::toolBox::write_log( "[Ldap::ldapEngine]: creation de la structure pour le domaine '".$self->{"domainList"}->[$j]->{"domain_dn"}."'", "W" );
-            my $currentDomainBranch = &OBM::utils::cloneStruct( $ldapStruct->{"template"}->[$i] );
+            my $currentDomainBranch = &OBM::Tools::perlUtils::cloneStruct( $ldapStruct->{"template"}->[$i] );
 
             # On positionne le nom en fonction du domaine, afin de
             # pouvoir créer le DN

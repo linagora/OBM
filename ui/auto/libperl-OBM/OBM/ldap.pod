@@ -8,7 +8,7 @@ OBM::ldap - Fait les operations sur les entitées LDAP utilisées par Aliamin
  use OBM::Parameters::ldapConf;
  use Net::LDAP;
  use Net::LDAP::Entry;
- require OBM::utils;
+ require OBM::Tools::perlUtils;
  use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 
 =head1 DESCRIPTION
