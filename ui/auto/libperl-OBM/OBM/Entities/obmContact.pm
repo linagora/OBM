@@ -8,7 +8,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(_log);
+use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 use OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -36,14 +36,14 @@ sub new {
         $self->_log( 'Usage: PACKAGE->new(LINKS, DELETED, CONTACTID)', 1 );
         return undef;
     }elsif( $contactId !~ /^\d+$/ ) {
-        $self->_log( "[Entities::obmContact]: Identifiant de contact incorrect", 2 );
+        $self->_log( 'identifiant de contact incorrect', 2 );
         return undef;
     }else {
         $obmContactAttr{"contactId"} = $contactId;
     }
 
     if( defined($domainId) && ($domainId !~ /^\d+$/) ) {
-        $self->_log( "[Entities::obmContact]: Identifiant de domaine incorrect", 2 );
+        $self->_log( 'identifiant de domaine incorrect', 2 );
         return undef;
     }elsif( defined($domainId) ) {
         $obmContactAttr{"domainId"} = $domainId;
@@ -69,12 +69,12 @@ sub getEntity {
 
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
-        $self->_log( "[Entities::obmContact]: connecteur a la base de donnee invalide", 3 );
+        $self->_log( 'connecteur a la base de donnee invalide', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        $self->_log( "[Entities::obmContact]: description de domaine OBM incorrecte", 3 );
+        $self->_log( 'description de domaine OBM incorrecte', 3 );
         return 0;
 
     }else {
@@ -94,10 +94,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        $self->_log( '[Entities::obmContact]: pas de contact d\'identifiant : '.$contactId, 3 );
+        $self->_log( 'pas de contact d\'identifiant : '.$contactId, 3 );
         return 0;
     }elsif( $numRows > 1 ) {
-        $self->_log( "[Entities::obmContact]: plusieurs contacts d'identifiant : ".$contactId." ???", 3 );
+        $self->_log( 'plusieurs contacts d\'identifiant : '.$contactId.' ???', 3 );
         return 0;
     }
 
@@ -129,9 +129,9 @@ sub getEntity {
 
     # Action effectuée
     if( $self->getDelete() ) {
-        $self->_log( '[Entities::obmContact]: gestion du contact supprime \''.$contactCommonName.'\', domaine \''.$domainDesc->{"domain_label"}.'\'', 1 );
+        $self->_log( 'gestion du contact supprime \''.$contactCommonName.'\', domaine \''.$domainDesc->{"domain_label"}.'\'', 1 );
     }else {
-        $self->_log( '[Entities::obmContact]: gestion du contact \''.$contactCommonName.'\', domaine \''.$domainDesc->{'domain_label'}.'\', ID \''.$contactId.'\'', 1 );
+        $self->_log( 'gestion du contact \''.$contactCommonName.'\', domaine \''.$domainDesc->{'domain_label'}.'\', ID \''.$contactId.'\'', 1 );
     }
 
     # On stocke les informations utiles dans la structure de donnees des

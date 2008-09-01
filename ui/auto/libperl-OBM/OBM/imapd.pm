@@ -9,7 +9,7 @@
 package OBM::imapd;
 
 require OBM::toolBox;
-require OBM::Tools::perlutils;
+require OBM::Tools::perlUtils;
 require OBM::Tools::obmDbHandler;
 use OBM::Parameters::cyrusConf;
 require Exporter;
@@ -27,7 +27,7 @@ $debug=1;
 
 sub getAdminImapPasswd {
     my( $domainList ) = @_;
-    my $cyrusAdmin = &OBM::Tools::perlutils::cloneStruct(OBM::Parameters::cyrusConf::cyrusAdmin);
+    my $cyrusAdmin = &OBM::Tools::perlUtils::cloneStruct(OBM::Parameters::cyrusConf::cyrusAdmin);
 
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {

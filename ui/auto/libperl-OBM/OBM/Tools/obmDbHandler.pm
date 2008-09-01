@@ -11,6 +11,7 @@ use strict;
 use base qw( Class::Singleton );
 require DBI;
 require OBM::Parameters::common;
+use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub _new_instance {
@@ -30,16 +31,6 @@ sub _new_instance {
 }
 
 
-sub _log {
-    my $self = shift;
-    my( $text, $level ) = @_;
-    require OBM::Tools::obmLog;
-    
-    my $logObject = OBM::Tools::obmLog->instance();
-    return $logObject->writeLog( $text, $level, undef );
-}
-
-
 sub _getDriver {
     my $self = shift;
 
@@ -54,7 +45,7 @@ sub _getDriver {
             last SWITCH;
         }
 
-        $self->_log( '[Tools::obmDbHandler]: driver pour les SGBD de type \''.$self->{'dbType'}.'\' inconnu', 1 );
+        $self->_log( 'driver pour les SGBD de type \''.$self->{'dbType'}.'\' inconnu', 1 );
         return 1;
     }
 
@@ -88,45 +79,45 @@ sub execQuery {
 
 
     if( !defined($query) ) {
-        $self->_log( '[Tools::obmDbHandler]: requete SQL non definie !', 3 );
+        $self->_log( 'requete SQL non definie !', 3 );
 
         $$sth = undef;
         return undef;
     }
 
     if( $self->_dbConnect() ) {
-        $self->_log( '[Tools::obmDbHandler]: erreur lors de la connexion a la BD', 3 );
+        $self->_log( 'erreur lors de la connexion a la BD', 3 );
 
         $$sth = undef;
         return undef;
     }
 
-    $self->_log( '[Tools::obmDbHandler]: requete a executer : \''.$query.'\'', 3 );
+    $self->_log( 'requete a executer : \''.$query.'\'', 3 );
 
     my $dbHandler = $self->{'dbHandler'};
     $$sth = $dbHandler->prepare( $query );
     my $rv = $$sth->execute();
 
     if( !defined($rv) ) {
-        $self->_log( '[Tools::obmDbHandler]: erreur lors de l\'execution de la requete', 3 );
+        $self->_log( 'erreur lors de l\'execution de la requete', 3 );
         if( defined($$sth) ) {
-            $self->_log( '[Tools::obmDbHandler]: '.$$sth->err().' - '.$$sth->errstr(), 3 );
+            $self->_log( $$sth->err().' - '.$$sth->errstr(), 3 );
         }
         return undef;
     }
 
     if( defined($$sth->{NUM_OF_FIELDS}) ) {
         # SELECT SQL request
-        $self->_log( '[Tools::obmDbHandler]: requete de type \'SELECT\', nombre de tuples affectes par la requete non defini', 4 );
+        $self->_log( 'requete de type \'SELECT\', nombre de tuples affectes par la requete non defini', 4 );
         return 0;
     }
 
     if( $rv == -1 ) {
-        $self->_log( '[Tools::obmDbHandler]: nombre de tuples affectes par la requete non defini', 4 );
+        $self->_log( 'nombre de tuples affectes par la requete non defini', 4 );
         return 0;
     }
 
-    $self->_log( '[Tools::obmDbHandler]: '.$rv.' tuple(s) affecte(s) par la requete', 4 );
+    $self->_log( $rv.' tuple(s) affecte(s) par la requete', 4 );
 
     return $rv;
 }
@@ -137,7 +128,7 @@ sub quote {
     my( $string ) = @_;
 
     if( $self->_dbConnect() ) {
-        $self->_log( '[Tools::obmDbHandler]: erreur lors de la connexion a la BD', 3 );
+        $self->_log( 'erreur lors de la connexion a la BD', 3 );
 
         return undef;
     }
@@ -145,7 +136,7 @@ sub quote {
     my $dbHandler = $self->{'dbHandler'};
     my $quotedString = $dbHandler->quote($string);
 
-    $self->_log( '[Tools::obmDbHandler]: chaine apres mise en forme pour le SGBD : '.$quotedString, 4 );
+    $self->_log( 'chaine apres mise en forme pour le SGBD : '.$quotedString, 4 );
 
     return $quotedString
 }
@@ -156,16 +147,16 @@ sub _dbConnect {
     my $dbHandler = $self->{'dbHandler'};
 
     if( defined($dbHandler) && $dbHandler->ping() ) {
-        $self->_log( '[Tools::obmDbHandler]: connexion a la BD deja etablie', 4 );
+        $self->_log( 'connexion a la BD deja etablie', 4 );
         return 0;
     }
 
     if( !defined($self->{'dbDriver'}) && $self->_getDriver() ) {
-        $self->_log( '[Tools::obmDbHandler]: driver inconnu pour les SGBD de type \''.$self->{'dbType'}.'\', connexion impossible', 0 );
+        $self->_log( 'driver inconnu pour les SGBD de type \''.$self->{'dbType'}.'\', connexion impossible', 0 );
         return 0;
     }
 
-    $self->_log( '[Tools::obmDbHandler]: connexion a la BD \''.$self->{'dbName'}.'\', en tant que \''.$self->{'dbUser'}.'\'', 1 );
+    $self->_log( 'connexion a la BD \''.$self->{'dbName'}.'\', en tant que \''.$self->{'dbUser'}.'\'', 1 );
     $dbHandler = DBI->connect( 'dbi:'.$self->{'dbDriver'}.':database='.$self->{'dbName'}.';host='.$self->{'dbHost'}, $self->{'dbUser'}, $self->{'dbPassword'} );
 
     if( !$dbHandler ) {
@@ -186,11 +177,11 @@ sub _dbDisconnect {
 
     if( defined($dbHandler) && $dbHandler->ping() ) {
         if( !$dbHandler->{'AutoCommit'} ) {
-            $self->_log( '[Tools::obmDbHandler]: pas d\'auto-commit, rollback des eventuelles transactions en attentes', 2 );
+            $self->_log( 'pas d\'auto-commit, rollback des eventuelles transactions en attentes', 2 );
             $dbHandler->rollback();
         }
 
-        $self->_log( '[Tools::obmDbHandler]: deconnexion de la BD', 1 );
+        $self->_log( 'deconnexion de la BD', 1 );
         $dbHandler->disconnect();
     }
 

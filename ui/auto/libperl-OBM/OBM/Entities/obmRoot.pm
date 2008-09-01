@@ -8,7 +8,8 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId _log);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
+use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -55,7 +56,7 @@ sub getEntity {
     my( $name, $description, $domainDesc ) = @_;
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        $self->_log( '[Entities::obmRoot]: description de domaine OBM incorrecte', 3 );
+        $self->_log( 'description de domaine OBM incorrecte', 3 );
         return 0;
     }else {
         # On positionne l'identifiant du domaine de l'entité
@@ -65,7 +66,7 @@ sub getEntity {
     if( defined($name) ) {
         $self->{"nodeDesc"}->{"name"} = $name;
     }else {
-        $self->_log( '[Entities::obmRoot]: nom de noeud invalide', 3 );
+        $self->_log( 'nom de noeud invalide', 3 );
         return 0;
     }
 
@@ -167,17 +168,4 @@ sub updateLdapEntryLinks {
     }
 
     return $update;
-}
-
-
-sub dump {
-    my $self = shift;
-    my @desc;
-
-    push( @desc, $self );
-    
-    require Data::Dumper;
-    print Data::Dumper->Dump( \@desc );
-
-    return 1;
 }

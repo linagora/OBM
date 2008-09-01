@@ -21,7 +21,7 @@ $VERSION = "1.0";
                     getEntityId
                     makeEntityEmail
                     getMailboxDefaultFolders
-                    _log
+                    getHostIpById
                );
 
 
@@ -135,11 +135,46 @@ sub getMailboxDefaultFolders {
 }
 
 
-sub _log {
+sub getHostIpById {
     my $self = shift;
-    my( $text, $level ) = @_;
-    require OBM::Tools::obmLog;
+    my( $hostId ) = @_;
 
-    my $logObject = OBM::Tools::obmLog->instance();
-    return $logObject->writeLog( $text, $level, undef );
+    if( !defined($hostId) ) {
+        $self->_log( 'identifiant de l\'hote non défini !', 3 );
+        return undef;
+    }elsif( $hostId !~ /^[0-9]+$/ ) {
+        $self->_log( 'identifiant de l\'hote \''.$hostId.'\' incorrect !', 3 );
+        return undef;
+    }
+    
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connection a la base de donnee incorrect !', 3 );
+        return undef;
+    }
+
+    my $hostTable = "Host";
+    if( $self->getDelete() ) {
+        $hostTable = "P_".$hostTable;
+    }
+
+    my $query = "SELECT host_ip FROM ".$hostTable." WHERE host_id='".$hostId."'";
+    # On execute la requete
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        return undef;
+    }
+
+    if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
+        $self->_log( 'identifiant de l\'hote \''.$hostId.'\' inconnu !', 3 );
+
+        $queryResult->finish;
+        return undef;
+    }else{
+        $queryResult->finish;
+        return $hostIp;
+    }
+
+    return undef;
+
 }

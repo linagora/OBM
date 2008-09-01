@@ -8,7 +8,8 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId makeEntityEmail getMailboxDefaultFolders _log);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId makeEntityEmail getMailboxDefaultFolders getHostIpById);
+use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -47,7 +48,7 @@ sub new {
         $self->_log( 'Usage: PACKAGE->new(LINKS, DELETED, USERID)', 1 );
         return undef;
     }elsif( $userId !~ /^\d+$/ ) {
-        $self->_log( '[Entities::obmUser]: identifiant d\'utilisateur incorrect', 2 );
+        $self->_log( 'identifiant d\'utilisateur incorrect', 2 );
         return undef;
     }else {
         $obmUserAttr{"objectId"} = $userId;
@@ -78,19 +79,19 @@ sub getEntity {
 
     my $userId = $self->{"objectId"};
     if( !defined($userId) ) {
-        $self->_log( '[Entities::obmUser]: aucun identifiant d\'utilisateur definit', 3 );
+        $self->_log( 'aucun identifiant d\'utilisateur definit', 3 );
         return 0;
     }
 
 
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
-        $self->_log( '[Entities::obmUser]: connecteur a la base de donnee invalide', 3 );
+        $self->_log( 'connecteur a la base de donnee invalide', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        $self->_log( '[Entities::obmUser]: description de domaine OBM incorrecte', 3 );
+        $self->_log( 'description de domaine OBM incorrecte', 3 );
         return 0;
 
     }else {
@@ -118,10 +119,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        $self->_log( '[Entities::obmUser]: pas d\'utilisateur d\'identifiant : '.$userId, 3 );
+        $self->_log( 'pas d\'utilisateur d\'identifiant : '.$userId, 3 );
         return 0;
     }elsif( $numRows > 1 ) {
-        $self->_log( '[Entities::obmUser]: plusieurs utilisateurs d\'identifiant : '.$userId.' ???', 3 );
+        $self->_log( 'plusieurs utilisateurs d\'identifiant : '.$userId.' ???', 3 );
         return 0;
     }
 
@@ -169,13 +170,13 @@ sub getEntity {
 
     # Action effectuée
     if( $self->getDelete() ) {
-        $self->_log( '[Entities::obmUser]: chargement de l\'utilisateur supprime : '.$self->getEntityDescription(), 1 );
+        $self->_log( 'chargement de l\'utilisateur supprime : '.$self->getEntityDescription(), 1 );
 
     }elsif( $dbUserDesc->{userobm_archive} ) {
-        $self->_log( '[Entities::obmUser]: chargement de l\'utilisateur archive : '.$self->getEntityDescription(), 1 );
+        $self->_log( 'chargement de l\'utilisateur archive : '.$self->getEntityDescription(), 1 );
 
     }else {
-        $self->_log( '[Entities::obmUser]: chargement de l\'utilisateur : '.$self->getEntityDescription(), 1 );
+        $self->_log( 'chargement de l\'utilisateur : '.$self->getEntityDescription(), 1 );
 
     }
 
@@ -257,14 +258,14 @@ sub getEntity {
         }
 
         if( $dbUserDesc->{userobm_domain_id} == 0 ) {
-            $self->_log( '[Entities::obmUser]: droit mail de l\'utilisateur : '.$self->getEntityDescription().' - annule, pas de droit mail dans le domaine \'metadomain\'', 2 );
+            $self->_log( 'droit mail de l\'utilisateur : '.$self->getEntityDescription().' - annule, pas de droit mail dans le domaine \'metadomain\'', 2 );
             $self->{"properties"}->{userobm_mail_perms} = 0;
             last SWITCH;
         }
 
         $localServerIp = $self->getHostIpById( $dbUserMoreDesc->{mailserver_host_id} );
         if( !defined($localServerIp) ) {
-            $self->_log( '[Entities::obmUser]: droit mail de l\'utilisateur \''.$dbUserDesc->{'userobm_login'}.'\', domaine \''.$domainDesc->{'domain_label'}.'\' - annule, serveur inconnu !', 2 );
+            $self->_log( 'droit mail de l\'utilisateur \''.$dbUserDesc->{'userobm_login'}.'\', domaine \''.$domainDesc->{'domain_label'}.'\' - annule, serveur inconnu !', 2 );
             $self->{"properties"}->{userobm_mail_perms} = 0;
             last SWITCH;
         }
@@ -272,7 +273,7 @@ sub getEntity {
         # Gestion des adresses de l'utilisateur
         my $return = $self->makeEntityEmail( $dbUserDesc->{userobm_email}, $domainDesc->{domain_name}, $domainDesc->{domain_alias} );
         if( $return == 0 ) {
-            $self->_log( '[Entities::obmUser]: droit mail de l\'utilisateur : '.$self->getEntityDescription().' - annule, pas d\'adresses mails valides', 2 );
+            $self->_log( 'droit mail de l\'utilisateur : '.$self->getEntityDescription().' - annule, pas d\'adresses mails valides', 2 );
             $self->{"properties"}->{userobm_mail_perms} = 0;
             last SWITCH;
         }
@@ -378,7 +379,7 @@ sub getEntity {
         # Le mot de passe
         my $errorCode = &OBM::passwd::getNTLMPasswd( $dbUserDesc->{userobm_password}, \$self->{"properties"}->{userobm_samba_lm_password}, \$self->{"properties"}->{userobm_samba_nt_password} );
         if( $errorCode ) {
-            $self->_log( '[Entities::obmUser]: probleme lors de la generation du mot de passe windows de l\'utilisateur : '.$self->getEntityDescription(), 2 );
+            $self->_log( 'probleme lors de la generation du mot de passe windows de l\'utilisateur : '.$self->getEntityDescription(), 2 );
             return 0;
         }
 
@@ -437,7 +438,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    $self->_log( '[Entities::obmUser]: MAJ de l\'utilisateur '.$self->getEntityDescription().' dans les tables de production', 1 );
+    $self->_log( 'MAJ de l\'utilisateur '.$self->getEntityDescription().' dans les tables de production', 1 );
 
     # Champs de la BD qui ne sont pas mis à jour car champs références
     my $exceptFields = '^(userobm_id)$';
@@ -460,7 +461,7 @@ sub updateDbEntity {
     my $result = $dbHandler->execQuery( $query, \$queryResult );
 
     if( !defined($result) ) {
-        $self->_log( '[Entities::obmUser]: probleme a la mise a jour de l\'utilisateur', 2 );
+        $self->_log( 'probleme a la mise a jour de l\'utilisateur', 2 );
         return 0;
 
     }elsif( $result == 0 ) {
@@ -475,7 +476,7 @@ sub updateDbEntity {
 
         $result = $dbHandler->execQuery( $query, \$queryResult );
         if( !defined($result) ) {
-            $self->_log( '[Entities::obmUser]: probleme a la mise a jour de l\'utilisateur', 2 );
+            $self->_log( 'probleme a la mise a jour de l\'utilisateur', 2 );
             return 0;
         }elsif( $result != 1 ) {
             $self->_log( '[Entities::obmGroup]: probleme a la mise a jour de l\'utilisateur : utiisateur insere '.$result.' fois dans les tables de production !', 2 );
@@ -483,7 +484,7 @@ sub updateDbEntity {
         }
     }
 
-    $self->_log( '[Entities::obmUser]: MAJ des tables de production reussie', 2 );
+    $self->_log( 'MAJ des tables de production reussie', 2 );
  
     return 1;
 }
@@ -497,7 +498,7 @@ sub updateDbEntityLinks {
         return 0;
     }
 
-    $self->_log( '[Entities::obmUser]: MAJ des liens de l\'utilisateur '.$self->getEntityDescription().' dans les tables de production', 1 );
+    $self->_log( 'MAJ des liens de l\'utilisateur '.$self->getEntityDescription().' dans les tables de production', 1 );
 
     # On supprime les liens actuels de la table de production
     my $query = "DELETE FROM P_EntityRight WHERE entityright_consumer='user' AND entityright_entity='mailbox' AND entityright_entity_id=".$self->{"objectId"};
@@ -537,7 +538,7 @@ sub updateDbEntityPassword {
     }
 
 
-    $self->_log( '[Entities::obmUser]: mise a jour du mot de passe SQL de l\'utilisateur : '.$self->getEntityDescription(), 1 );
+    $self->_log( 'mise a jour du mot de passe SQL de l\'utilisateur : '.$self->getEntityDescription(), 1 );
     
 
     my $query = "UPDATE UserObm SET userobm_password_type=".$dbHandler->quote($passwordDesc->{newPasswordType}).", userobm_password=".$dbHandler->quote($passwordDesc->{newPassword})." WHERE userobm_id=".$self->{objectId};
@@ -551,7 +552,7 @@ sub updateDbEntityPassword {
         return 0;
     }
 
-    $self->_log( '[Entities::obmUser]: MAJ des tables de production reussie', 2 );
+    $self->_log( 'MAJ des tables de production reussie', 2 );
 
     return 1;
 }
@@ -1175,7 +1176,7 @@ sub updateLdapEntryPassword {
 
     
     if( $passwordDesc->{unix} ) {
-        $self->_log( '[Entities::obmUser]: mise a jour du mot de passe unix de l\'utilisateur : '.$self->getEntityDescription(), 1 );
+        $self->_log( 'mise a jour du mot de passe unix de l\'utilisateur : '.$self->getEntityDescription(), 1 );
         if( &OBM::Ldap::utils::modifyAttr( &OBM::passwd::convertPasswd( $passwordDesc->{newPasswordType}, $passwordDesc->{newPassword} ), $ldapEntry, "userPassword" ) ) {
             $update = 1;
         }
@@ -1183,14 +1184,14 @@ sub updateLdapEntryPassword {
 
     
     if( $passwordDesc->{samba} ) {
-        $self->_log( '[Entities::obmUser]: mise a jour du mot de passe samba de l\'utilisateur : '.$self->getEntityDescription(), 1 );
+        $self->_log( 'mise a jour du mot de passe samba de l\'utilisateur : '.$self->getEntityDescription(), 1 );
 
         my $userSambaLMPassword;
         my $userSambaNTPassword;
 
         my $errorCode = &OBM::passwd::getNTLMPasswd( $passwordDesc->{newPassword}, \$userSambaLMPassword, \$userSambaNTPassword );
         if( $errorCode ) {
-            $self->_log( '[Entities::obmUser]: probleme lors de la generation du mot de passe windows de l\'utilisateur : '.$self->getEntityDescription(), 1 );
+            $self->_log( 'probleme lors de la generation du mot de passe windows de l\'utilisateur : '.$self->getEntityDescription(), 1 );
             return 0;
         }
 
@@ -1375,62 +1376,3 @@ sub getSieveNomade {
 
     return $nomadeMsg;
 }
-
-
-sub dump {
-    my $self = shift;
-    my @desc;
-
-    push( @desc, $self );
-    
-    require Data::Dumper;
-    print Data::Dumper->Dump( \@desc );
-
-    return 1;
-}
-
-
-sub getHostIpById {
-    my $self = shift;
-    my( $hostId ) = @_;
-
-    if( !defined($hostId) ) {
-        $self->_log( '[Entities::obmUser]: identifiant de l\'hote non défini !', 3 );
-        return undef;
-    }elsif( $hostId !~ /^[0-9]+$/ ) {
-        $self->_log( '[Entities::obmUser]: identifiant de l\'hote \''.$hostId.'\' incorrect !', 3 );
-        return undef;
-    }
-    
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
-        $self->_log( '[Entities::obmUser]: connection a la base de donnee incorrect !', 3 );
-        return undef;
-    }
-
-    my $hostTable = "Host";
-    if( $self->getDelete() ) {
-        $hostTable = "P_".$hostTable;
-    }
-
-    my $query = "SELECT host_ip FROM ".$hostTable." WHERE host_id='".$hostId."'";
-    # On execute la requete
-    my $queryResult;
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return undef;
-    }
-
-    if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
-        $self->_log( '[Entities::obmUser]: identifiant de l\'hote \''.$hostId.'\' inconnu !', 3 );
-
-        $queryResult->finish;
-        return undef;
-    }else{
-        $queryResult->finish;
-        return $hostIp;
-    }
-
-    return undef;
-
-}
-

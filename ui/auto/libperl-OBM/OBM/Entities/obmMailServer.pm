@@ -8,7 +8,8 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId _log);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
+use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Tools::obmDbHandler;
@@ -60,12 +61,12 @@ sub getEntity {
 
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
-        $self->_log( '[Entities::obmMailServer]: connecteur a la base de donnee invalide', 3 );
+        $self->_log( 'connecteur a la base de donnee invalide', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        $self->_log( '[Entities::obmMailServer]: description de domaine OBM incorrecte', 3 );
+        $self->_log( 'description de domaine OBM incorrecte', 3 );
         return 0;
 
     }else {
@@ -74,7 +75,7 @@ sub getEntity {
     }
 
 
-    $self->_log( '[Entities::obmMailServer]: gestion de la configuration de postfix, domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
+    $self->_log( 'gestion de la configuration de postfix, domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
 
     $self->{"postfixConf"}->{"postfixconf_name"} = $domainDesc->{"domain_label"};
     $self->{"postfixConf"}->{"postfixconf_domain"} = $domainDesc->{"domain_label"};
@@ -341,17 +342,4 @@ sub getMailboxSieve {
     my $self = shift;
 
     return $self->{"sieve"};
-}
-
-
-sub dump {
-    my $self = shift;
-    my @desc;
-
-    push( @desc, $self );
-    
-    require Data::Dumper;
-    print Data::Dumper->Dump( \@desc );
-
-    return 1;
 }

@@ -8,7 +8,8 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId _log);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
+use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -40,7 +41,7 @@ sub new {
         $self->_log( 'Usage: PACKAGE->new(LINKS, DELETED, USERID)', 1 );
         return undef;
     }elsif( $userId !~ /^\d+$/ ) {
-        $self->_log( '[Entities::obmSystemUser]: identifiant d\'utilisateur incorrect', 2 );
+        $self->_log( 'identifiant d\'utilisateur incorrect', 2 );
         return undef;
     }else {
         $obmSystemUserAttr{"objectId"} = $userId;
@@ -69,19 +70,19 @@ sub getEntity {
 
     my $userId = $self->{"objectId"};
     if( !defined($userId) ) {
-        $self->_log( '[Entities::obmSystemUser]: aucun identifiant d\'utilisateur systeme definit', 3 );
+        $self->_log( 'aucun identifiant d\'utilisateur systeme definit', 3 );
         return 0;
     }
 
 
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
-        $self->_log( '[Entities::obmSystemUser]: connecteur a la base de donnee invalide', 3 );
+        $self->_log( 'connecteur a la base de donnee invalide', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        $self->_log( '[Entities::obmSystemUser]: description de domaine OBM incorrecte', 3 );
+        $self->_log( 'description de domaine OBM incorrecte', 3 );
         return 0;
 
     }else {
@@ -106,10 +107,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        $self->_log( '[Entities::obmSystemUser]: pas d\'utilisateur d\'identifiant : '.$userId, 3 );
+        $self->_log( 'pas d\'utilisateur d\'identifiant : '.$userId, 3 );
         return 0;
     }elsif( $numRows > 1 ) {
-        $self->_log( '[Entities::obmSystemUser]: plusieurs utilisateurs d\'identifiant : '.$userId.' ???', 3 );
+        $self->_log( 'plusieurs utilisateurs d\'identifiant : '.$userId.' ???', 3 );
         return 0;
     }
 
@@ -127,7 +128,7 @@ sub getEntity {
     $queryResult->finish();
 
 
-    $self->_log( '[Entities::obmSystemUser]: gestion de l\'utilisateur \''.$user_login.'\', domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
+    $self->_log( 'gestion de l\'utilisateur \''.$user_login.'\', domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
         
     # On cree la structure correspondante a l'utilisateur
     # Cette structure est composee des valeurs recuperees dans la base
@@ -377,17 +378,4 @@ sub getMailboxSieve {
     my $self = shift;
 
     return $self->{"sieve"};
-}
-
-
-sub dump {
-    my $self = shift;
-    my @desc;
-
-    push( @desc, $self );
-    
-    require Data::Dumper;
-    print Data::Dumper->Dump( \@desc );
-
-    return 1;
 }

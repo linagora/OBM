@@ -8,7 +8,8 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId makeEntityEmail _log);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId makeEntityEmail);
+use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -41,7 +42,7 @@ sub new {
         $self->_log( 'Usage: PACKAGE->new(LINKS, DELETED, GROUPID)', 1 );
         return undef;
     }elsif( $groupId !~ /^\d+$/ ) {
-        $self->_log( '[Entities::obmGroup]: identifiant de groupe incorrect', 2 );
+        $self->_log( 'identifiant de groupe incorrect', 2 );
         return undef;
     }else {
         $obmGroupAttr{objectId} = $groupId;
@@ -69,19 +70,19 @@ sub getEntity {
 
     my $groupId = $self->{objectId};
     if( !defined($groupId) ) {
-        $self->_log( '[Entities::obmGroup]: aucun identifiant de groupe defini', 3 );
+        $self->_log( 'aucun identifiant de groupe defini', 3 );
         return 0;
     }
 
 
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
-        $self->_log( '[Entities::obmGroup]: connecteur a la base de donnee invalide', 3 );
+        $self->_log( 'connecteur a la base de donnee invalide', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{domain_id}) || ($domainDesc->{domain_id} !~ /^\d+$/) ) {
-        $self->_log( '[Entities::obmGroup]: description de domaine OBM incorrecte', 3 );
+        $self->_log( 'description de domaine OBM incorrecte', 3 );
         return 0;
 
     }else {
@@ -105,11 +106,11 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        $self->_log( '[Entities::obmGroup]: pas de groupe d\'identifiant : '.$groupId, 3 );
+        $self->_log( 'pas de groupe d\'identifiant : '.$groupId, 3 );
         return 0;
 
     }elsif( $numRows > 1 ) {
-        $self->_log( '[Entities::obmGroup]: plusieurs groupes d\'identifiant : '.$groupId.' ???', 3 );
+        $self->_log( 'plusieurs groupes d\'identifiant : '.$groupId.' ???', 3 );
         return 0;
     }
 
@@ -130,9 +131,9 @@ sub getEntity {
     $self->{groupDbDesc} = $dbGroupDesc;
 
     if( $self->getDelete() ) {
-        $self->_log( '[Entities::obmGroup]: suppression du groupe : '.$self->getEntityDescription(), 1 );
+        $self->_log( 'suppression du groupe : '.$self->getEntityDescription(), 1 );
     }else {
-        $self->_log( '[Entities::obmGroup]: gestion du groupe : '.$self->getEntityDescription(), 1 );
+        $self->_log( 'gestion du groupe : '.$self->getEntityDescription(), 1 );
     }
 
     # On range les resultats calculés dans la structure de données dédiée
@@ -157,7 +158,7 @@ sub getEntity {
         $self->{'properties'}->{'group_samba_sid'} =
         &OBM::Samba::utils::getGroupSID( $domainDesc->{'domain_samba_sid'}, $dbGroupDesc->{'group_gid'} );
         if( !defined($self->{'properties'}->{'group_samba_sid'}) ) {
-            $self->_log( '[Entities::obmGroup]: annulation du droit Samba du groupe : '.$self->getEntityDescription().' - SID non definit', 2 );
+            $self->_log( 'annulation du droit Samba du groupe : '.$self->getEntityDescription().' - SID non definit', 2 );
             $self->{'properties'}->{'group_samba'} = 0;
         }else {
             $self->{'properties'}->{'group_samba_type'} = 2;
@@ -191,7 +192,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    $self->_log( '[Entities::obmGroup]: MAJ du groupe '.$self->getEntityDescription().' dans les tables de production', 1 );
+    $self->_log( 'MAJ du groupe '.$self->getEntityDescription().' dans les tables de production', 1 );
 
 
     # Champs de la BD qui ne sont pas mis à jour car champs références
@@ -215,7 +216,7 @@ sub updateDbEntity {
     my $result = $dbHandler->execQuery( $query, \$queryResult );
 
     if( !defined($result) ) {
-        $self->_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe', 2 );
+        $self->_log( 'probleme a la mise a jour du groupe', 2 );
         return 0;
 
     }elsif( $result == 0 ) {
@@ -230,15 +231,15 @@ sub updateDbEntity {
         
         $result = $dbHandler->execQuery( $query, \$queryResult );
         if( !defined($result) ) {
-            $self->_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe', 2 );
+            $self->_log( 'probleme a la mise a jour du groupe', 2 );
             return 0;
         }elsif( $result != 1 ) {
-            $self->_log( '[Entities::obmGroup]: probleme a la mise a jour du groupe : groupe insere '.$result.' fois dans les tables de production !', 2 );
+            $self->_log( 'probleme a la mise a jour du groupe : groupe insere '.$result.' fois dans les tables de production !', 2 );
             return 0;
         }
     }
 
-    $self->_log( '[Entities::obmGroup]: MAJ des tables de production reussie', 2 );
+    $self->_log( 'MAJ des tables de production reussie', 2 );
 
     return 1;
 }
@@ -254,7 +255,7 @@ sub updateDbEntityLinks {
         return 0;
     }
 
-    $self->_log( '[Entities::obmGroup]: MAJ des liens du groupe '.$self->getEntityDescription().' dans les tables de production', 1 );
+    $self->_log( 'MAJ des liens du groupe '.$self->getEntityDescription().' dans les tables de production', 1 );
 
     # On supprime les liens actuels de la table de production des liens
     # utilisateurs/groupes
@@ -272,7 +273,7 @@ sub updateDbEntityLinks {
         return 0;
     }
 
-    $self->_log( '[Entities::obmGroup]: MAJ des tables de production reussie', 2 );
+    $self->_log( 'MAJ des tables de production reussie', 2 );
 
     return 1;
 }
@@ -384,7 +385,7 @@ sub _getGroupUsers {
         $sqlResultColumn = "userobm_login";
     }
 
-    $self->_log( '[Entities::obmGroup]: obtention des utilisateurs du groupe : '.$self->getEntityDescription(), 1 );
+    $self->_log( 'obtention des utilisateurs du groupe : '.$self->getEntityDescription(), 1 );
 
     my $userObmTable = "UserObm";
     my $userObmGroupTable = "of_usergroup";
@@ -403,7 +404,7 @@ sub _getGroupUsers {
     # On exécute la requête
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( '[Entities::obmGroup]: probleme lors de l\'obtention des utilisateurs du groupe', 2 );
+        $self->_log( 'probleme lors de l\'obtention des utilisateurs du groupe', 2 );
         return undef;
     }
 
@@ -413,7 +414,7 @@ sub _getGroupUsers {
         push( @tabResult, $userLogin );
     }
 
-    $self->_log( '[Entities::obmGroup]: '.eval{$#tabResult+1}.' utilisateurs font partis du groupe', 3 );
+    $self->_log( eval{$#tabResult+1}.' utilisateurs font partis du groupe', 3 );
 
     return \@tabResult;
 }
@@ -682,19 +683,6 @@ sub updateLdapEntryLinks {
     }
 
     return $update;
-}
-
-
-sub dump {
-    my $self = shift;
-    my @desc;
-
-    push( @desc, $self );
-    
-    require Data::Dumper;
-    print Data::Dumper->Dump( \@desc );
-
-    return 1;
 }
 
 

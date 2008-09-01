@@ -8,7 +8,8 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId makeEntityEmail getMailboxDefaultFolders _log);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId makeEntityEmail getMailboxDefaultFolders getHostIpById);
+use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Tools::obmDbHandler;
@@ -42,7 +43,7 @@ sub new {
         $self->_log( 'Usage: PACKAGE->new(LINKS, MAILSHAREID)', 1 );
         return undef;
     }elsif( $mailShareId !~ /^\d+$/ ) {
-        $self->_log( '[Entities::obmMailshare]: identifiant de BAL partagee incorrect', 2 );
+        $self->_log( 'identifiant de BAL partagee incorrect', 2 );
         return undef;
     }else {
         $obmMailshareAttr{"objectId"} = $mailShareId;
@@ -73,19 +74,19 @@ sub getEntity {
 
     my $mailShareId = $self->{'objectId'};
     if( !defined($mailShareId) ) {
-        $self->_log( '[Entities::obmMailshare]: aucun identifiant de partage de messagerie defini', 3 );
+        $self->_log( 'aucun identifiant de partage de messagerie defini', 3 );
         return 0;
     }
 
 
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
     if( !defined($dbHandler) ) {
-        $self->_log( '[Entities::obmMailshare]: connecteur a la base de donnee invalide', 3 );
+        $self->_log( 'connecteur a la base de donnee invalide', 3 );
         return 0;
     }
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        $self->_log( '[Entities::obmMailshare]: description de domaine OBM incorrecte', 3 );
+        $self->_log( 'description de domaine OBM incorrecte', 3 );
         return 0;
     }else {
         # On positionne l'identifiant du domaine de l'entité
@@ -110,10 +111,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $numRows == 0 ) {
-        $self->_log( '[Entities::obmMailshare]: pas de BAL partagee d\'identifiant : '.$mailShareId, 3 );
+        $self->_log( 'pas de BAL partagee d\'identifiant : '.$mailShareId, 3 );
         return 0;
     }elsif( $numRows > 1 ) {
-        $self->_log( '[Entities::obmMailshare]: plusieurs BAL partagees d\'identifiant : '.$mailShareId." ???", 3 );
+        $self->_log( 'plusieurs BAL partagees d\'identifiant : '.$mailShareId." ???", 3 );
         return 0;
     }
 
@@ -146,10 +147,10 @@ sub getEntity {
     $queryResult->finish();
 
     if( $self->getDelete() ) {
-        $self->_log( '[Entities::obmMailshare]: suppression de la BAL partagee : \''.$dbMailShareDesc->{'mailshare_name'}.'\', domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
+        $self->_log( 'suppression de la BAL partagee : \''.$dbMailShareDesc->{'mailshare_name'}.'\', domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
     
     }else {
-        $self->_log( '[Entities::obmMailshare]: gestion de la BAL partagee : \''.$dbMailShareDesc->{'mailshare_name'}.'\', domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
+        $self->_log( 'gestion de la BAL partagee : \''.$dbMailShareDesc->{'mailshare_name'}.'\', domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
 
     }
 
@@ -169,7 +170,7 @@ sub getEntity {
 
         $localServerIp = $self->getHostIpById( $dbMailShareDesc->{"mailserver_host_id"} );
         if( !defined($localServerIp) ) {
-            $self->_log( '[Entities::obmMailshare]: droit mail du repertoire partage : \''.$dbMailShareDesc->{'mailshare_name'}.'\' - annule, serveur inconnu !', 2 );
+            $self->_log( 'droit mail du repertoire partage : \''.$dbMailShareDesc->{'mailshare_name'}.'\' - annule, serveur inconnu !', 2 );
             $self->{"properties"}->{"mailshare_mailperms"} = 0;
             last SWITCH;
         }
@@ -177,7 +178,7 @@ sub getEntity {
         # Gestion des adresses de la boîte à lettres partagée
         my $return = $self->makeEntityEmail( $dbMailShareDesc->{"mailshare_email"}, $domainDesc->{"domain_name"}, $domainDesc->{"domain_alias"} );
         if( $return == 0 ) {
-            $self->_log( '[Entities::obmMailshare]: droit mail du repertoire partage : \''.$dbMailShareDesc->{'mailshare_name'}.'\' - annule, pas d\'adresses mails valides', 2 );
+            $self->_log( 'droit mail du repertoire partage : \''.$dbMailShareDesc->{'mailshare_name'}.'\' - annule, pas d\'adresses mails valides', 2 );
             $self->{"properties"}->{"mailshare_mailperms"} = 0;
             last SWITCH;
         }
@@ -259,7 +260,7 @@ sub updateDbEntity {
         return 0;
     }
 
-    $self->_log( '[Entities::obmMailshare]: MAJ de la boite a lettre partagee '.$self->getEntityDescription().' dans les tables de production', 1 );
+    $self->_log( 'MAJ de la boite a lettre partagee '.$self->getEntityDescription().' dans les tables de production', 1 );
 
 
     # Champs de la BD qui ne sont pas mis à jour car champs références
@@ -281,7 +282,7 @@ sub updateDbEntity {
     my $result = $dbHandler->execQuery( $query, \$queryResult );
 
     if( !defined($result) ) {
-        $self->_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettres partagee', 2 );
+        $self->_log( 'probleme a la mise a jour de la boite a lettres partagee', 2 );
         return 0;
 
     }elsif( $result == 0 ) {
@@ -295,16 +296,16 @@ sub updateDbEntity {
         $query = 'INSERT INTO P_MailShare ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')';
         $result = $dbHandler->execQuery( $query, \$queryResult );
         if( !defined($result) ) {
-            $self->_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettre partagee', 2 );
+            $self->_log( 'probleme a la mise a jour de la boite a lettre partagee', 2 );
             return 0;
 
         }elsif( $result != 1 ) {
-            $self->_log( '[Entities::obmMailshare]: probleme a la mise a jour de la boite a lettre partagee : boite a lettre partagee inseree '.$result.' fois dans les tables de production !', 2 );
+            $self->_log( 'probleme a la mise a jour de la boite a lettre partagee : boite a lettre partagee inseree '.$result.' fois dans les tables de production !', 2 );
             return 0;
         }
     }
 
-    $self->_log( '[Entities::obmMailshare]: MAJ des tables de production reussie', 2 );
+    $self->_log( 'MAJ des tables de production reussie', 2 );
 
     return 1;
 }
@@ -319,7 +320,7 @@ sub updateDbEntityLinks {
         return 0;
     }
 
-    $self->_log( '[Entities::obmMailshare]: MAJ des liens de la boite a lettre partagee '.$self->getEntityDescription().' dans les tables de production', 1 );
+    $self->_log( 'MAJ des liens de la boite a lettre partagee '.$self->getEntityDescription().' dans les tables de production', 1 );
 
     # On supprime les liens actuels de la table de production
     my $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"objectId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
@@ -589,19 +590,6 @@ sub updateLdapEntryLinks {
 }
 
 
-sub dump {
-    my $self = shift;
-    my @desc;
-
-    push( @desc, $self );
-    
-    require Data::Dumper;
-    print Data::Dumper->Dump( \@desc );
-
-    return 1;
-}
-
-
 sub getMailServerId {
     my $self = shift;
     my $mailServerId = undef;
@@ -673,47 +661,4 @@ sub getMailboxAcl {
     }
 
     return $mailShareAcl;
-}
-
-
-sub getHostIpById {
-    my $self = shift;
-    my( $hostId ) = @_;
-
-    if( !defined($hostId) ) {
-        $self->_log( '[Entities::obmMailshare]: identifiant de l\'hote non défini !', 2 );
-        return undef;
-    }elsif( $hostId !~ /^[0-9]+$/ ) {
-        $self->_log( '[Entities::obmMailshare]: identifiant de l\'hote \''.$hostId.'\' incorrect !', 2 );
-        return undef;
-    }
-    
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
-        $self->_log( '[Entities::obmMailshare]: connection a la base de donnees incorrect !', 2 );
-        return undef;
-    }
-
-    my $hostTable = "Host";
-    if( $self->getDelete() ) {
-        $hostTable = "P_".$hostTable;
-    }
-
-    my $query = "SELECT host_ip FROM ".$hostTable." WHERE host_id='".$hostId."'";
-    # On exécute la requête
-    my $queryResult;
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return undef;
-    }
-
-    if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
-        $self->_log( '[Entities::obmMailshare]: identifiant de l\'hote \''.$hostId.'\' inconnu !', 2 );
-        $queryResult->finish;
-        return undef;
-    }else{
-        $queryResult->finish;
-        return $hostIp;
-    }
-
-    return undef;
 }

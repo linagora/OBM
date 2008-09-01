@@ -8,7 +8,8 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId _log);
+use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
+use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
@@ -59,7 +60,7 @@ sub getEntity {
 
 
     if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        $self->_log( '[Entities::obmSambaDomain]: description de domaine OBM incorrecte', 3 );
+        $self->_log( 'description de domaine OBM incorrecte', 3 );
         return 0;
 
     }else {
@@ -68,7 +69,7 @@ sub getEntity {
     }
 
 
-    $self->_log( '[Entities::obmSambaDomain]: gestion de la configuration du domaine Samba, domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
+    $self->_log( 'gestion de la configuration du domaine Samba, domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
 
 
     $self->{"sambaConf"}->{"sambaConf_domain"} = $domainDesc->{"domain_label"};
@@ -267,17 +268,4 @@ sub getMailboxSieve {
     my $self = shift;
 
     return $self->{"sieve"};
-}
-
-
-sub dump {
-    my $self = shift;
-    my @desc;
-
-    push( @desc, $self );
-    
-    require Data::Dumper;
-    print Data::Dumper->Dump( \@desc );
-
-    return 1;
 }
