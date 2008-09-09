@@ -1854,7 +1854,8 @@ function check_user_data_form($p_id, &$user) {
       }
       // la cible de delegation est dans la cible de delegation de l'admin
       if (isset($obm['delegation']) && ($obm['delegation'] != '')) {
-	if (strpos($delegation_target, $obm['delegation']) !== 0) {
+	if (($delegation_target != '') &&
+	    (strpos($delegation_target, $obm['delegation']) !== 0)) {
 	  $err['msg'] = "$l_err_delegation_target_outside_target ($obm[delegation])";
 	  $err['field'] = 'delegation_target';
 	  return false;

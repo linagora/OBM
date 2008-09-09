@@ -1904,7 +1904,7 @@ function dis_user_import_index() {
   global $l_mail, $l_email, $l_quota, $l_email_nomade, $l_access_nomade;
   global $l_title, $l_phone, $l_mphone, $l_fax, $l_company, $l_direction;
   global $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
-  global $l_desc, $l_group;
+  global $l_desc, $l_group, $l_delegation;
   global $l_import_msg, $l_file_format, $l_perms, $l_local_copy;
 
   $block = "
@@ -1945,12 +1945,14 @@ function dis_user_import_index() {
     <th>29</th>
     <th>30</th>
     <th>31</th>
+    <th>32</th>
   </tr>
   <tr>
     <th>$l_kind</th>
     <th>$l_lastname</th>
     <th>$l_firstname</th>
     <th>$l_profile</th>
+    <th>$l_delegation</th>
     <th>$l_login</th>
     <th>$l_password</th>
     <th>$l_password_type</th>
@@ -1985,6 +1987,7 @@ function dis_user_import_index() {
     <td>BAUD</td>
     <td>Pierre</td>
     <td>admin</td>
+    <td>dele</td>
     <td>pierre</td>
     <td>mot</td>
     <td>PLAIN</td>
@@ -2061,9 +2064,8 @@ function html_user_import_file() {
  **/
 function dis_user_import_file_run($params) {
   global $obm, $display, $err, $ccscd_tab, $l_user, $l_header_import, $l_group;
-  global $l_login, $l_lastname, $l_firstname, $l_email, $l_login_in_use;
-  global $l_file_error;
-
+  global $l_delegation, $l_login, $l_lastname, $l_firstname, $l_email;
+  global $l_login_in_use, $l_file_error;
 
   $file = $params['file_saved'];
   if ($file == '') {
@@ -2084,6 +2086,7 @@ function dis_user_import_file_run($params) {
   $c_lastname = $cpt++;
   $c_firstname = $cpt++;
   $c_profile = $cpt++;
+  $c_delegation = $cpt++;
   $c_login = $cpt++;
   $c_password = $cpt++;
   $c_password_type = $cpt++;
@@ -2119,6 +2122,7 @@ function dis_user_import_file_run($params) {
   <thead>
   <tr>
     <th>$l_login</th>
+    <th>$l_delegation</th>
     <th>$l_lastname</th>
     <th>$l_firstname</th>
     <th>$l_email</th>
@@ -2147,6 +2151,7 @@ function dis_user_import_file_run($params) {
     $user['kind'] = addslashes(trim($row[$c_kind]));
     $user['lastname'] = addslashes(trim($row[$c_lastname]));
     $user['firstname'] = addslashes(trim($row[$c_firstname]));
+    $user['delegation'] = addslashes(trim($row[$c_delegation]));
     $user['login'] = addslashes(trim($row[$c_login]));
     $user['passwd'] = addslashes(trim($row[$c_password]));
     if (trim($row[$c_password_type]) == 'CRYPT') {
@@ -2156,6 +2161,7 @@ function dis_user_import_file_run($params) {
     } else {
       $user['password_type'] = 'PLAIN';
     }
+    $user['passwd'] = $user['password'];
     if (in_array(trim($row[$c_mail]), $array_true)) {
       $user['mail_perms'] = 1;
       $user['mail_server_id'] = $obm['mailserver'];
@@ -2233,6 +2239,7 @@ function dis_user_import_file_run($params) {
     $dis_import .= "
     <tr>
       <td>$user[login]</td>
+      <td>$user[delegation]</td>
       <td>$user[lastname]</td>
       <td>$user[firstname]</td>
       <td>$user[email]</td>
