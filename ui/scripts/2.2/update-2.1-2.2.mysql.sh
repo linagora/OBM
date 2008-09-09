@@ -19,7 +19,13 @@ DB=$VALUE
 
 mysqldump -u $U -p$P  --default-character-set='UTF8' ${DB} > ${HOME}/migration.sql 
 success=$?
-sed "s/ ENGINE=MyISAM CHARSET=latin1/ ENGINE=InnoDB CHARSET=utf8/g" ${HOME}/migration.sql > ${HOME}/migration.sql.utf8
+
+# Transform MyISAM to InnoDB
+sed "s/ ENGINE=MyISAM/ ENGINE=InnoDB/g " ${HOME}/migration.sql > ${HOME}/migration.sql.utf8
+mv ${HOME}/migration.sql.utf8 ${HOME}/migration.sql
+
+# Transform Charset latin1 to UTF8
+sed "s/ CHARSET=latin1/ CHARSET=utf8 COLLATE=utf8_general_ci/g " ${HOME}/migration.sql > ${HOME}/migration.sql.utf8
 mv ${HOME}/migration.sql.utf8 ${HOME}/migration.sql
 
 

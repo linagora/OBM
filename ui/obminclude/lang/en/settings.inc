@@ -7,7 +7,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_cur_settings = "Your actual Setup";
+$l_cur_settings = "Your current settings";
 $l_auto_display = "Automatic listing display";
 $l_submit = "Validate";
 $l_cur_lang = "Your current language";

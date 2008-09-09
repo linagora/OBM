@@ -14,13 +14,13 @@ $l_mailing = "Mailing address";
 
 // Labels et textes
 $l_nb_user = "# Users";
-$l_group_user = "Having as user";
+$l_group_user = "Containing user";
 $l_group_display = "Display options for Groups lists";
 $l_user_display = "Display options for Users lists";
 
 // Contact
-$l_lastname = "Lastname";
-$l_firstname = "Firstname";
+$l_lastname = "Last name";
+$l_firstname = "First name";
 $l_function = "Function";
 
 // Actions

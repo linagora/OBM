@@ -27,11 +27,11 @@ $l_write_permission = "Write access management";
 $l_admin_permission = "Admin access management";
 $l_right_validate = "Validate these rights";
 $l_right_update_ok = "New rights validated";
-$l_infos = "Informations";
-$l_creator = "Creator";
-$l_date_creation = "Creation";
-$l_updater = "Updated by";
-$l_date_last_update = "Last Update";
+$l_infos = "Information";
+$l_creator = "Created by";
+$l_date_creation = "Created on";
+$l_updater = "Last updated by";
+$l_date_last_update = "Last updated on";
 $l_delegation = "Delegation";
 $l_print = "Print";
 $l_transparent = "Transparent";
@@ -77,8 +77,8 @@ $l_next = "Next";
 $l_text = "Text";
 $l_name = "Name";
 $l_kind = "Kind";
-$l_lastname = "Lastname";
-$l_firstname = "Firstname";
+$l_lastname = "Last name";
+$l_firstname = "First name";
 $l_title = "Title";
 $l_label = "Label";
 $l_number = "Number";
@@ -164,9 +164,9 @@ $l_items = "Items";
 $l_received = "Received";
 $l_emitted = "Emitted";
 $l_recursive = "Recursive";
-$l_hour = "Hour";
+$l_hour = "Time";
 $l_type ="Type";
-$l_autocomplete_field = "Search ...";
+$l_autocomplete_field = "Search...";
 $l_fatal_server_err = "Fatal server error, please reload";
 
 // Entities
@@ -216,8 +216,8 @@ $l_permission_denied = $l_insufficient_permission;
 $l_last_visit = "Last visits";
 
 // OBM_DISPLAY
-$l_entries = "Entries #";
-$l_page_res = "Result pages";
+$l_entries = "# Entries:";
+$l_page_res = "Results pages";
 $l_export = "Export";
 $l_export_all = "Export All";
 $l_field = "Field";
@@ -234,11 +234,11 @@ $l_unselect_all = "Unselect all";
 
 // OBM_DISPLAY help screen
 $l_help = "Help";
-$l_help_display_yes = "The field is displayed. Click on this button if you want the field not to be displayed";
-$l_help_display_no = "The field is not displayed. Click on this button if you want the field to be displayed";
+$l_help_display_yes = "This field is displayed. Click on this button if you want the field not to be displayed";
+$l_help_display_no = "This field is not displayed. Click on this button if you want the field to be displayed";
 $l_help_mandatory = "This field is mandatory";
-$l_help_down  = "Move the field down";
-$l_help_up = "Move the field up";
+$l_help_down  = "Move the field up";
+$l_help_up = "Move the field down";
 $l_document_added = " added documents";
 $l_no_document_added = "No documents added";
 
@@ -254,9 +254,9 @@ $l_invalid_date_year = "Invalid year";
 
 // Tasktype groups
 $l_tt = "Task Type";
-$l_tt_sales = "Factured Tasks";
+$l_tt_sales = "Billed Tasks";
 $l_tt_research = "Internal Projects";
-$l_tt_others = "Not Factured Tasks";
+$l_tt_others = "Non Billed Tasks";
 
 // Days and months
 $l_day = "Day";
@@ -267,7 +267,7 @@ $l_year = "Year";
 $l_today = "Today";
 $l_period = "Period";
 $l_monthsofyear = array('January','February', 'March','April','May','June','July','August','September','October','November','December');
-$l_monthsofyearshort = array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec');
+$l_monthsofyearshort = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 $l_daysofweek = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
 $l_daysofweekshort = array('Sun','Mon','Tue','Wed','Thu','Fri','Sat');
 $l_daysofweekfirst = array ('S','M','T','W','T','F','S');
@@ -278,10 +278,10 @@ $l_daysofweekfirst = array ('S','M','T','W','T','F','S');
 
 $l_section_com    = "Commercial";
 $l_section_prod   = "Production";
-$l_section_compta = "Accoutancy";
+$l_section_compta = "Accounting";
 $l_section_user   = "Users";
 $l_section_admin  = "Administration";
-$l_section_dic    = "Dictionnary";
+$l_section_dic    = "Dictionary";
 $l_section_my  = "My account";
 
 $l_module_company = "Companies";
@@ -361,7 +361,7 @@ $l_header_closing = "Closings";
 $l_header_closing_new = "New closing";
 
 $l_header_new_child = "New linked Deal";
-$l_header_new_parent = "New ParentDeal";
+$l_header_new_parent = "New Parent Deal";
 
 $l_header_reconcile = "Reconcile";
 $l_header_compute_balance = "Compute balance";
@@ -439,8 +439,8 @@ $l_c_j_delete = "An entry must be selected";
 //---------------------------------------------------------------------------//
 // OF messages
 //---------------------------------------------------------------------------//
-$l_of_right_err_auth = "Insufficient rights to update rights !";
-$l_of_right_err_empty = "The object reference is missing !";
+$l_of_right_err_auth = "Insufficient rights to update rights!";
+$l_of_right_err_empty = "The object reference is missing!";
 
 //---------------------------------------------------------------------------//
 // Home page portlets

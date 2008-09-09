@@ -121,17 +121,21 @@ if ($action == 'index') {
 
 } elseif ($action == 'stats') {
 //////////////////////////////////////////////////////////////////////////////
-  // interval is week -- see if we may need to use others intervals
-  $params['interval'] = 'month';
-  $statproj = get_time_stat_project($params);
-  $stattt = get_time_stat_tasktype($params);
-  $display['detail'] = dis_time_nav_date($params);
-  if ($perm->check_right('time', $cright_read_admin)) {
-    $display['features'] .= dis_time_group_select($params, get_private_groups($obm['uid']));
-    $display['features'] .= dis_user_select($params, run_query_userobm_active(), 1);
+  if (check_time_date_form($params)) {
+    get_time_params_date_range($params);
+    $statproj = get_time_stat_project($params);
+    $stattt = get_time_stat_tasktype($params);
+    $display['detail'] = dis_time_date_menu($params);
+    if ($perm->check_right('time', $cright_read_admin)) {
+      $display['features'] .= dis_time_group_select($params, get_private_groups($obm['uid']));
+      $display['features'] .= dis_user_select($params, get_time_active_user($params), 1);
+    }
+    $display['detail'] .= dis_time_stats_project($statproj, $params);
+    $display['detail'] .= dis_time_stats_tasktype($stattt, $params);
+  } else {
+    $display['msg'] .= display_err_msg($err['msg']);
+    $display['detail'] = dis_time_date_menu($params);
   }
-  $display['detail'] .= dis_time_stats_project($statproj, $params);
-  $display['detail'] .= dis_time_stats_tasktype($stattt, $params);
 
 } elseif ($action == 'display') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -214,14 +218,14 @@ function get_time_params() {
 // Update session and parameters
 ///////////////////////////////////////////////////////////////////////////////
 function update_time_session_params() {
-  global $params, $obm, $c_all;
+  global $params, $obm, $c_none;
   
-  // If group selected is ALL, reset group
-  if ($params['group_id'] == $c_all) {
-    $_SESSION['group_id'] = '';
+  // If group selected is None, reset group
+  if ($params['group_id'] == $c_none) {
+    $_SESSION['group_id'] = $c_none;
   } else if ($params['group_id'] > 0) {
-    // If group selected is not ALL, get group users
-    if ($params['group_id'] != $c_all) {
+    // If group selected is not None, get group users
+    if ($params['group_id'] != $c_none) {
       $params['user_ids'] = of_usergroup_get_group_users($params['group_id']);
       $_SESSION['group_id'] = $params['group_id'];
     }
@@ -231,7 +235,8 @@ function update_time_session_params() {
 
   // We retrieve the selected users if any, else we get them from sessiom
   // or from selected user (alone) or we set it to uid
-  if (! isset($params['user_ids'])) {
+  if ((! isset($params['user_ids'])) ||
+      ((is_array($params['user_ids'])) && (count($params['user_ids'])==0))) {
     if (isset($_SESSION['sess_users'])) {
       if (is_array($_SESSION['sess_users'])) {
 	$params['user_ids'] = $_SESSION['sess_users'];

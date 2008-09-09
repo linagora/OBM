@@ -344,8 +344,7 @@ function run_query_calendar_waiting_events() {
     WHERE 
       evententity_state = 'W'
       AND ( 1=0
-      $multidomain
-      ";
+      $multidomain";
 
   if (is_array($writable_cal) && (count($writable_cal['ids'])>0)) {
     $query .= "OR ( entity_id IN ('".implode(",",$writable_cal['ids'])."') AND entity_entity = 'user')";    

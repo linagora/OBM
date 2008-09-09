@@ -319,7 +319,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     }
   </script>
   <form method=\"post\" name=\"f_mod_right\"
-    action=\"".url_prepare($_SERVER['PHP_SELF'])."\">
+    action=\"$path/$module/${module}_index.php\">
 
   <fieldset class=\"detail infos\">
   <legend>$l_read_permission</legend>

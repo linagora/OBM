@@ -12,12 +12,12 @@ $l_password = "Password";
 $l_lastaccess = "Last access";
 $l_phone2 = "$l_phone 2";
 $l_fax2 = "$l_fax 2";
-$l_email = "@M";
+$l_email = "Email address";
 $l_datebegin = "Entry date";
 $l_perms_user = "User";
 $l_perms_editor = "Editor";
 $l_perms_admin = "Administrator";
-$l_infos = "Informations";
+$l_infos = "Information";
 $l_check_usercreate = " entries owned by this user.";
 $l_check_userupdate = " entries last updated by this user.";
 $l_no_user = "No user fields in this table";
@@ -33,7 +33,7 @@ $l_nomade = "Mail forwarding";
 $l_access_nomade = "Mail forwarding";
 $l_perms = "Allowed";
 $l_local_copy = "Local copy";
-$l_vacation = "Message d'absence";
+$l_vacation = "Vacation message";
 $l_vacation_message = "Message";
 $l_vacation_datebegin = "From";
 $l_vacation_dateend = "To";
@@ -58,21 +58,21 @@ $l_add = "Add these users";
 
 // Messages
 $l_no_display = "Fill the search fields and press < Find > to retrieve the users";
-$l_found = "users found.";
+$l_found = "users found";
 $l_no_found = "No user found matching the query !";
 $l_reset_ok = "User's preferences reseted to default values";
 $l_can_delete = "The user can be deleted.";
 $l_cant_delete = "The user can't be deleted !";
 $l_link_timetask = "The user is referenced on project in time management";
 $l_link_timetask_no = "The user is not referenced on projects in time management";
-$l_login_error = "Invalid login !";
+$l_login_error = "Invalid login!";
 $l_login_in_use = "This login is already used !";
 $l_password_empty = "The password must be fill and valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
 $l_password_error = "The password is not valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
 $l_profile_privilege_error = "Insufficients privileges to update this profile level !";
 $l_last_admin_error = "The last admin profile can't be updated !";
 $l_mail_perms_error = "The mail must be activated to allow external email !";
-$l_mail_server_error = "An email server must be set !";
+$l_mail_server_error = "An email server must be set!";
 
 $l_email_error = "The email given is not valid !";
 $l_email_empty = "An email address must be given to activate the mail !";
@@ -102,7 +102,7 @@ $l_err_delegation_target_profile = "This profile don't support delegation target
 
 $l_add_users = "Add users";
 
-// JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
+// JavaScript Messages (special characters must be escaped with \ -> \\)
 $l_fill_login = "You have to fill the login before submitting.";
 $l_fill_password = "You have to fill the password before submitting.";
 $l_delete_confirm = "Really delete the user?";

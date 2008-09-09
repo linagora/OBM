@@ -103,11 +103,11 @@ function dis_time_index($time) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Time navigation by date
-// Parameters:
-//   - $time : parameter hash
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display Time navigation by date
+ *
+ * @param mixed $time : parameter hash
+ **/
 function dis_time_nav_date($time) {
   global $cdg_param, $c_dst_err, $l_monthsofyear;
   global $ico_previous, $ico_next;
@@ -134,8 +134,6 @@ function dis_time_nav_date($time) {
 
   if ($interval == 'week') {
 
-    $tot_width = 500;
-
     // get the current start and end of week
     $d_start_week = of_date_get_first_day_week($iso_date);
     $d_end_week = $d_start_week+6*86400;
@@ -149,24 +147,93 @@ function dis_time_nav_date($time) {
 
   } else if ($interval == 'month') {
 
-    $tot_width = (in_array($action, $no_user)) ? 200 : 400;
-
     $month = of_date_get_month($ts_date);
     $year = of_date_get_year($ts_date);
     $d_prev = of_isodate_format(mktime(0,0,0,$month-1,1,$year));
     $d_next = of_isodate_format(mktime(0,0,0,$month+1,1,$year));
-    $title = "$user ". $l_monthsofyear[$month-1] . " $year";;
+    $title = "$user ". $l_monthsofyear[$month-1] . " $year";
   }
 
-    $url_prev = url_prepare("time_index.php?action=$link_action&amp;date=$d_prev");
-    $url_next = url_prepare("time_index.php?action=$link_action&amp;date=$d_next");
+  $url_prev = url_prepare("time_index.php?action=$link_action&amp;date=$d_prev");
+  $url_next = url_prepare("time_index.php?action=$link_action&amp;date=$d_next");
 
-    $block = "
-    <h1>
-    <a href=\"$url_prev\"><img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>     
+  $block = "
+  <h1>
+    <a href=\"$url_prev\"><img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>
     $title
-    <a href=\"$url_next\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>     
-    </h1>";
+    <a href=\"$url_next\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>
+  </h1>";
+
+  return $block;
+}
+
+
+/**
+ * Display Time navigation date full menu (month, week, specific date select)
+ *
+ * @param mixed $time : parameter hash
+ **/
+function dis_time_date_menu($params) {
+  global $cdg_param, $c_dst_err, $l_monthsofyear, $l_date, $l_execute;
+  global $ico_previous, $ico_next;
+
+  $action = $params['action'];
+  $interval = $params['interval'];
+
+  $iso_date_begin = $params['date_begin'];
+  $iso_date_end = $params['date_end'];
+  $ts_date_begin = strtotime($iso_date_begin);
+  $ts_date_end = strtotime($iso_date_end);
+
+  // Calculate infos for Week menu
+  // get the current start and end of week
+  $d_start_week = of_date_get_first_day_week($iso_date_begin);
+  $d_end_week = $d_start_week+6*86400;
+  $hum_date_start = of_date_format($d_start_week);
+  $hum_date_end = of_date_format($d_end_week);
+  $week_title = "$user $hum_date_start - $hum_date_end";
+  // get the previous and next beginning of week
+  $d_week_prev = of_isodate_format($d_start_week-7*86400);
+  $d_week_next = of_isodate_format($d_start_week+7*86400+$c_dst_err); // prevent DST bug
+  
+  // Calculate infos for month menu
+  $month = of_date_get_month($ts_date_begin);
+  $year = of_date_get_year($ts_date_begin);
+  $d_month_prev = of_isodate_format(mktime(0,0,0,$month-1,1,$year));
+  $d_month_next = of_isodate_format(mktime(0,0,0,$month+1,1,$year));
+  $month_title = "$user ". $l_monthsofyear[$month-1] . " $year";
+
+  // Calculate infos for dates menu
+  $date_begin = of_date_upd_format($iso_date_begin, true);
+  $date_end = of_date_upd_format($iso_date_end, true);
+
+  // Title (date range)
+  $dis_date_begin = of_date_format($ts_date_begin);
+  $dis_date_end = of_date_format($ts_date_end);
+
+  $url_week_prev = url_prepare("time_index.php?action=$action&amp;interval=week&amp;date=$d_week_prev");
+  $url_week_next = url_prepare("time_index.php?action=$action&amp;interval=week&amp;date=$d_week_next");
+  $url_month_prev = url_prepare("time_index.php?action=$action&amp;interval=month&amp;date=$d_month_prev");
+  $url_month_next = url_prepare("time_index.php?action=$action&amp;interval=month&amp;date=$d_month_next");
+
+  $block = "
+  <form class=\"search\" method=\"get\" name=\"f_search\" action=\"$url\">
+    <a href=\"$url_month_prev\"><img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>
+    $month_title
+    <a href=\"$url_month_next\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>
+
+    <a href=\"$url_week_prev\"><img src=\"$ico_previous\" alt=\"[Previous Week]\" /></a>
+    $week_title
+    <a href=\"$url_week_next\"><img src=\"$ico_next\" alt=\"[Next Week]\" /></a>
+
+    $l_date
+      <input type=\"text\" name=\"tf_date\" value=\"$date_begin\" class=\"datePicker\"/>
+      <input type=\"text\" name=\"tf_date_end\" value=\"$date_end\" class=\"datePicker\"/>
+      <input name=\"action\" type=\"hidden\" value=\"stats\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
+  </form>
+    <h1> $dis_date_begin - $dis_date_end </h1>
+";
 
   return $block;
 }
@@ -178,7 +245,7 @@ function dis_time_nav_date($time) {
 //   - $obm_q    : tasks list to display 
 //   - $time[] : time hash
 ///////////////////////////////////////////////////////////////////////////////
-function dis_time_planning_week($obm_q,$time) {;
+function dis_time_planning_week($obm_q,$time) {
   global $c_working_days, $c_day_fraction, $c_dst_err, $l_daysofweekshort;
 
   while ($obm_q->next_record())  {
@@ -240,124 +307,6 @@ function dis_time_planning_week($obm_q,$time) {;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the planning for a month
-// Parameters : 
-//   - $obm_q    : tasks list to display 
-//   - $time[] : time hash
-///////////////////////////////////////////////////////////////////////////////
-function dis_time_planning_month($obm_q, $time) {
-  global $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
-
-  $col_width = 20;
-  $time_length = 0;
-  $time_worked = 0;
-  $span = 0;
-  $nb_worked_days = array_sum($c_working_days);
-
-  $iso_date = $time['date'];
-  $ts_date = strtotime($iso_date);
-  $month = of_date_get_month($ts_date);
-  $year = of_date_get_year($ts_date);
-
-  // first day of the month in second
-  $first_day_sec = mktime(0,0,0,$month, 1, $year);
-  $last_day_sec = mktime(23,0,0,$month+1, 0, $year);
-  $day_in_sec = $first_day_sec;
-  $dow = date('w', $day_in_sec);
-  $obm_dow = ($dow - $c_week_first_day + 7) % 7;
-
-  // Fill the day array -------------------------------------------------------
-  $day = 1;
-  while ($day_in_sec < $last_day_sec) {
-    $fday = ($day>9) ? "$day" : "0$day";
-    $array_res["$fday"]['length'] = 0;
-    $array_res["$fday"]['dow'] = $dow;
-    $array_res["$fday"]['obm_dow'] = $obm_dow;
-    $day++;
-
-    $day_in_sec += 86400;
-    $dow = date('w', $day_in_sec);
-    $obm_dow = ($dow - $c_week_first_day + 7) % 7;
-  }
-
-  while ($obm_q->next_record())  {
-    $day = date('d', $obm_q->f('date'));
-    $status = $obm_q->f('timetask_status');
-    $array_res["$day"]['length'] = $obm_q->f('total_length');
-  }
-
-  // Display ------------------------------------------------------------------
-  $month_length = count($array_res);
-
-  // Display the array
-  while (list($day,$val) = each($array_res)) {
-    // Not working days
-    if ($c_working_days[$val['dow']] == 0) {
-      $line1 .= "<td width=\"$col_width\" class=\"timeOffday\">$day</td>\n";
-      $line2 .= "<td class=\"timeOffday\">&nbsp;</td>\n";
-
-    } else {
-      // Working days
-      $line1 .= "<td width=\"$col_width\" class=\"timeWorkday\">$day</td>\n";
-
-      if ($val['length'] == $c_day_fraction) {
-	$class = "class=\"timeValid\"";
-      } else {
-	$class = "class=\"timeUnvalid\"";
-      }
-      $line2 .= "
-        <td $class>".$val['length']."/$c_day_fraction</td>";
-    }
-
-    // handle the 3rd line
-    if ($val['obm_dow'] == 0) {
-      $time_length = 0;
-      $time_worked = 0;
-      $span = 1;
-    } else {
-      if ($c_working_days[$val['dow']] == 1) {
-	$time_length += $c_day_fraction;
-      }
-      $time_worked += $val['length'];
-      $span += 1;
-    }
-
-    // last day of the week 
-    if (($val['obm_dow'] == 6) or ($day == $month_length)) {
-      $week = get_time_week_point("$year-$month-$day");
-      $url = url_prepare("time_index.php?action=index&amp;date=".$week[0]);
-      
-      if ($time_length != $time_worked) {
-	$class = "class=\"timeUnvalid\"";
-      } else {
-	$class = "class=\"timeValid\"";
-      }
-      
-      $line3 .= "
-          <td $class colspan=\"$span\"><a href=\"$url\">$l_fill</a></td>";
-    }
-  }
-  
-  $block = "
-  <div class=\"timeCenter\">
-    <table class=\"timeMonth\">
-    <tr>
-      $line1
-    </tr>
-    <tr>
-      $line2
-    </tr>
-    <tr>
-      $line3
-    </tr>
-    </table>
-  <div>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display the planning according to the interval given
 // Parameters:
 //   - $time[] : time hash
@@ -372,8 +321,6 @@ function dis_time_planning($time) {
   } else if ($time['interval'] == 'month') {
     $obm_q = run_query_time_user_month_planning($time);
     $block = dis_time_user_planning($obm_q, $time);
-    //$obm_q = run_query_time_project_month_planning($time);
-    //$block =  dis_time_project_planning($obm_q, $time) ;
   }
 
   return $block;
@@ -524,7 +471,7 @@ function dis_time_user_planning($obm_q, $time) {
  * @param $multi if false, mono select else select multi
  **/
 function dis_user_select($time, $usr_q, $multi=false) {
-  global $l_see, $l_user, $l_all, $c_all;
+  global $l_see, $l_user, $l_all, $c_all, $c_none;
 
   $sel_user_ids = $time['user_ids'];
 
@@ -575,7 +522,7 @@ function dis_user_select($time, $usr_q, $multi=false) {
     </fieldset>
     <fieldset class=\"buttons\">
       <input type=\"hidden\" name=\"date\" value=\"".$time['date']."\" />
-      <input type=\"hidden\" name=\"group_id\" value=\"$c_all\" />
+      <input type=\"hidden\" name=\"group_id\" value=\"$c_none\" />
       <input type=\"hidden\" name=\"action\" value=\"$act\" />
       <input type=\"submit\" name=\"submit\" value=\"$l_see\" />
       $dis_button_all
@@ -595,7 +542,7 @@ function dis_user_select($time, $usr_q, $multi=false) {
  * @param $multi if false, mono select else select multi
  **/
 function dis_time_group_select($time, $groups, $multi=false) {
-  global $path, $c_all, $ico_add, $l_time, $l_group;
+  global $obm, $path, $c_none, $ico_add, $l_time, $l_group;
   global $l_select_group, $l_public_group_members, $l_private_group_members;
 
   $iso_date = $time['date'];
@@ -610,13 +557,13 @@ function dis_time_group_select($time, $groups, $multi=false) {
     $action = 'index';
 
   // private group Select
-  if ($sel_group_id == $c_all) {
+  if ($sel_group_id == $c_none) {
     $sel_group = "<option selected=\"selected\">$l_select_group</option>";
   } else {
-    $sel_group = "<option value=\"time_index.php?action=$action&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_select_group</option>";
+    $sel_group = "<option value=\"time_index.php?action=$action&amp;group_id=$c_none&amp;sel_user_id[]=$obm[uid]&amp;date=$iso_date\">$l_select_group</option>";
   }
   $selected = false;
-  if( isset($groups) ) {
+  if (isset($groups)) {
     // Don't compute private group if none defined
     foreach ($groups as $g_id => $one_group) {
       $gname = $one_group['name'];
@@ -629,7 +576,7 @@ function dis_time_group_select($time, $groups, $multi=false) {
     }
   }
 
-  if (($sel_group_id > 0) && ($sel_group_id != $c_all)) {
+  if (($sel_group_id > 0) && ($sel_group_id != $c_none)) {
     $g_public_name = get_last_group_text($sel_group_id);
   } 
 
@@ -666,15 +613,9 @@ function dis_time_group_select($time, $groups, $multi=false) {
       new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {mode: 'mono',
         locked: 'true', resetable: 'true', selectfunction:'sel_public_group(\"$iso_date\", element, \"$action\")'});
     });
-  </script>    
+  </script>
 ";
 
-
-
-
-
-  
-  
   return $block;
 }
 
@@ -1345,6 +1286,7 @@ function dis_time_display_pref($prefs) {
   $block .= $dis_pref->dis_pref_help();
   return $block;
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 //  Display the Activity Report Form

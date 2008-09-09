@@ -113,6 +113,9 @@ $ccalendar_send_ics = true;
 // Calendar hour fraction (minutes select granularity)
 $ccalendar_hour_fraction = 4;
 
+// Time : Worked days in a week (start at sunday)
+$c_working_days = array(0,1,1,1,1,1,0);
+
 // Generic E-mail for Incident module
 //$cmail_incident = 'support@mydomain';
 

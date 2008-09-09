@@ -65,7 +65,7 @@ $l_occupied = "Unavailable";
 $l_daily = "daily";
 $l_daily_unit = "Every %s days";
 $l_weekly = "weekly";
-$l_weekly_unit = "Every %s weekx";
+$l_weekly_unit = "Every %s weeks";
 $l_monthlybydate = "monthly (date)";
 $l_monthlybyday_unit = "Every %s months";
 $l_monthlybyday = "monthly (day)";
@@ -83,7 +83,7 @@ $l_meeting_legend = "Legend";
 $l_selection = "Selection";
 $l_task = "Task";
 $l_category_filter = "Filter by category";
-$l_events = "Évents";
+$l_events = "Events";
 
 $l_collapse_all = "Collapse all";
 $l_expand_all = "Expand all";
@@ -116,29 +116,29 @@ $l_W = "W";
 $l_R = "R";
 $l_force = "Force the event insertion";
 $l_carac = "Caracteristics";
-$l_meeting_perform = "Seek for free crenels";
+$l_meeting_perform = "Seek for free time slots";
 
 $l_event_color_tt = "Event's colors are the ones defined during the event creation.";
 
 $l_confirm_delete ="This operation will remove this occurence of this event for all the users, are you sure to want to continue?";
 $l_confirm = "Confirm";
 $l_cancel = "Cancel";
-$l_update_warning = "Warning : some conflicts have been detected";
-$l_insert_warning = "Warning : some conflicts have been detected";
+$l_update_warning = "Warning: some conflicts have been detected";
+$l_insert_warning = "Warning: some conflicts have been detected";
 $l_update_error = "Conflicts have been detected, update cancelled";
 $l_insert_error = "Conflicts have been detected, insertion cancelled";
 $l_view_type = "View type";
 
 // Messages
-$l_sendamail = "Force the notification by mail.";
-$l_select_contacts = "You have to select an user or group.";
+$l_sendamail = "Force notification by mail.";
+$l_select_contacts = "You have to select a user or group.";
 $l_select_repeat_day = "You have to select the repetition days.";
 $l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour "; 
 $l_fill_title = "You have to fill the [ $l_title ] field";
 $l_fill_dateend = "You have to fill the [ $l_dateend ] field";
 $l_fill_datebegin = "You have to fill the field [ $l_datebegin ]";
 $l_err_no_calendar_selected = "No calendar selected";
-$l_err_begin_end = "End date must be after begin date !";
+$l_err_begin_end = "End date must be after begin date!";
 $l_err_end_repeat = "Repetion end must be after end date";
 $l_err_end_repeat2 = "The max duration of a repetition is one year";
 $l_err_end_repeat3 = "The max duration of a repetition is ten years when the repetition kind is yearly";
@@ -146,12 +146,12 @@ $l_err_days_repeat = "You must check one or more repetition day.";
 $l_err_days_repeat_not_weekly = "You can give repetition days only on weekly repetition.";
 $l_err_weekly_repeat = "For weekly repetition, the end of the repetition must at least be seven day after the end of the event.";
 $l_err_repeatfrequency = "Frequency is invalid";
-$l_event_cant_delete = "You can only delete your own events !";
+$l_event_cant_delete = "You can only delete your own events!";
 
 $l_fill_view_label = "You have to fill the [$l_view_label] field";
-$l_confirm_delete_view = "Do you realy want to delete this view ?";
-$l_no_sel_view = "Can't delete : no selected view";
-$l_conflict_view_label = "$l_view_label : Conflict has been detected";
+$l_confirm_delete_view = "Do you realy want to delete this view?";
+$l_no_sel_view = "Can't delete: no selected view";
+$l_conflict_view_label = "$l_view_label: Conflict has been detected";
 
 $l_unknown="Inconnu";
 
@@ -170,13 +170,13 @@ $l_authorize = "Authorize";
 $l_deny = "&gt;&gt;&gt;&gt;";
 $l_periodic = "Periodic";
 //Mail
-$l_add_event_mail_head = "New event on OBM :";
-$l_update_event_mail_head = "Event updated on OBM :";
-$l_delete_event_mail_head = "Event deleted on OBM :";
+$l_add_event_mail_head = "New event on OBM:";
+$l_update_event_mail_head = "Event updated on OBM:";
+$l_delete_event_mail_head = "Event deleted on OBM:";
 
 $l_today_date = "Today";
-$l_update_event_mail_body = "Instead of : ";
-$l_delete_event_mail_body = "Date : ";
+$l_update_event_mail_body = "Instead of: ";
+$l_delete_event_mail_body = "Date: ";
 $l_confirm_mail = "Confirm+Force notification";
 $l_add_event_mail_subject = "New event on obm";
 $l_update_event_mail_subject = "Updated event on obm";
@@ -204,32 +204,32 @@ $l_view_day_desc = 'Day view ';
 $l_view_month_desc = 'Month_view';
 $l_expand_all = "Expand All";
 $l_edit_full = "Advanced";
-$l_confirm_delete_all ="This operation will remove all the occurences of this event for all the users, are you sure to want to continue?";
+$l_confirm_delete_all ="This operation will remove all occurences of this event for all the users, are you sure to want to continue?";
 $l_ics_insert = 'Import';
 $l_ics_file = 'ICS file to import';
 $l_add_exception_mail_body = 'Updated event on OBM: %s';
 $l_delete_exception_mail_subject = 'Updated event on OBM: %s';
 $l_update_state_mail_subject = 'Attendees update on OBM event: %s';
 
-$l_resource_group_search = "Crenel is free if";
+$l_resource_group_search = "Slot is free if";
 $l_resources_one_freebusy = "One resource is free by group";
 $l_resources_all_freebusy = "All resources are free";
   
 $l_add_event_mail_body = 
-"This mail was automaticly sent by OBM
+"This email was automatically sent by OBM
 ------------------------------------------------------------------
-NEW RENDEZVOUS
+NEW APPOINTMENT
 ------------------------------------------------------------------
 
-You are invited to participate to a rendezvous from %s to %s,
-and which subject is %s (location : %s).
+You are invited to participate to an appointment from %s to %s,
+on the subject of %s (location: %s).
 
 
-:: More information about this rendezvous : 
+:: More information about this appointment : 
 %s
-:: To accept this rendezvous : 
+:: To accept this appointment : 
 %s
-:: To refuse this rendezvous : 
+:: To refuse this appointment : 
 %s
 
 -------------------------------------------------------------------
@@ -237,16 +237,16 @@ This message was sent on %s at %s by %s %s from OBM
 %s";
 
 $l_add_resource_mail_body = 
-"This mail was automaticly sent by OBM
+"This email was automatically sent by OBM
 ------------------------------------------------------------------
-NEW RESOURCE RESERVATION !
+NEW RESOURCE RESERVATION!
 ------------------------------------------------------------------
 
 A new resource reservation was scheduled on %s to %s for %s
 (location: %s).
 
 
-:: To accpet or refuse this reservation : 
+:: To accept or refuse this reservation: 
 %s
 
 -------------------------------------------------------------------
@@ -254,19 +254,19 @@ This message was sent on %s at %s by %s %s from OBM
 %s";
 
 $l_update_event_mail_body = 
-"This mail was automaticly sent by OBM
+"This email was automatically sent by OBM
 ------------------------------------------------------------------
-UPDATED RENDEZVOUS !
+UPDATED APPOINTMENT!
 ------------------------------------------------------------------
 
-The rendezvous %s, initially scheduled from %s to %s,(location %s),
-was updated and will take place from %s to %s (location : %s).
+The appointment %s, initially scheduled from %s to %s (location %s),
+was updated and will take place from %s to %s (location: %s).
 
-:: More information about this modifications : 
+:: More information about this update: 
 %s
-:: To accept those modifications : 
+:: To accept this update: 
 %s
-:: To refuse those modifications : 
+:: To refuse this update: 
 %s
 
 -------------------------------------------------------------------
@@ -274,16 +274,16 @@ This message was sent on %s at %s by %s %s from OBM
 %s";
 
 $l_update_resource_mail_body = 
-"This mail was automaticly sent by OBM
+"This email was automatically sent by OBM
 ------------------------------------------------------------------
-UPDATED RESOURCE RESERVATION !
+UPDATED RESOURCE RESERVATION!
 ------------------------------------------------------------------
 
-The resource reservation %s initialy scheduled from %s to %s
-(location: %s) was modified and will take place from %s to %s
+The resource reservation %s, initially scheduled from %s to %s
+(location: %s) was updated and will take place from %s to %s
 (location: %s).
 
-:: To accept or refuse those modifications : 
+:: To accept or refuse this update: 
 %s
 
 -------------------------------------------------------------------
@@ -291,15 +291,15 @@ This message was sent on %s at %s by %s %s from OBM
 %s";
 
 $l_delete_event_mail_body = 
-"This mail was automaticly sent by OBM
+"This email was automatically sent by OBM
 ------------------------------------------------------------------
-DELETED RENDEZVOUS !
+DELETED APPOINTMENT!
 ------------------------------------------------------------------
 
-The rendezvous %s, initialy scheduled on %s to %s (location : %s),
+The appointment %s, initially scheduled on %s to %s (location: %s),
 was deleted.
 
-:: To contact the organiser of this event : 
+:: To contact the organiser of this event: 
 %s
 
 -------------------------------------------------------------------
@@ -307,15 +307,15 @@ This message was sent on %s at %s by %s %s from OBM
 %s";
 
 $l_delete_resource_mail_body = 
-"This mail was automaticly sent by OBM
+"This email was automatically sent by OBM
 ------------------------------------------------------------------
-CANCELED RESOURCE RESERVATION !
+CANCELLED RESOURCE RESERVATION !
 ------------------------------------------------------------------
 
-The resource reservation %s, initialy scheduled from %s to %s
+The resource reservation %s, initially scheduled from %s to %s
 (location: %s), was cancelled.
 
-:: To contact the organiser of this event : 
+:: To contact the organiser of this event: 
 %s
 
 -------------------------------------------------------------------
@@ -323,15 +323,15 @@ This message was sent on %s at %s by %s %s from OBM
 %s";
 
 $l_delete_exception_mail_body = 
-"This mail was automaticly sent by OBM
+"This email was automatically sent by OBM
 ------------------------------------------------------------------
-OCCURENCE(S) RESTORED !
+OCCURENCE(S) RESTORED!
 ------------------------------------------------------------------
 
-One or more occurrences of the rendezvous %s, initialy cancelled 
+One or more occurrences of the appointment %s, initially cancelled 
 (%s) were restored.
 
-:: For more informations : 
+:: For more information: 
 %s
 
 -------------------------------------------------------------------
@@ -339,15 +339,15 @@ This message was sent on %s at %s by %s %s from OBM
 %s";
 
 $l_add_exception_mail_body = 
-"This mail was automaticly sent by OBM
+"This email was automatically sent by OBM
 ------------------------------------------------------------------
-OCCURENCE(S) CANCELLED !
+OCCURENCE(S) CANCELLED!
 ------------------------------------------------------------------
 
-One or more occurrences of the rendezvous %s, initialy scheduled
-on %s were canceled.
+One or more occurrences of the appointment %s, initially scheduled
+on %s were cancelled.
 
-:: For more informations : 
+:: For more information: 
 %s
 
 -------------------------------------------------------------------
@@ -355,14 +355,14 @@ This message was sent on %s at %s by %s %s from OBM
 %s";
 
 $l_update_state_mail_body = 
-"This mail was automaticly sent by OBM
+"This email was automatically sent by OBM
 ------------------------------------------------------------------
 ATTENDEE STATE UPDATED
 ------------------------------------------------------------------
 
 The attendee %s to %s have changed to %s.
 
-:: For more information about this rendezvous : 
+:: For more information about this appointment: 
 %s
 
 -------------------------------------------------------------------
@@ -370,14 +370,14 @@ This message was sent on %s at %s by %s %s from OBM
 %s";
 
 $l_alert_mail_body = 
-"This mail was automaticly sent by OBM
+"This email was automatically sent by OBM
 ------------------------------------------------------------------
-IMPENDING RENDEZVOUS
+IMPENDING APPOINTEMENT
 ------------------------------------------------------------------
 
-The rendezvous %s(%s) will take place in %s minutes (location: %s).
+The appointment %s(%s) will take place in %s minutes (location: %s).
 
-:: For more information about this rendezvous : 
+:: For more information about this appointment: 
 %s
 
 -------------------------------------------------------------------
