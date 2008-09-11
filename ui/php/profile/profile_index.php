@@ -127,6 +127,7 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
+  //TODO
   if (check_can_delete_profile($params['profile_id'])) {
     $display['msg'] .= display_info_msg($ok_msg, false);
     $display['detail'] = dis_can_delete_profile($params['profile_id']);
@@ -138,6 +139,7 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
+  //TODO
   if (check_can_delete_profile($params['profile_id'])) {
     $retour = run_query_profile_delete($params['profile_id']);
     if ($retour) {
@@ -224,6 +226,7 @@ function get_profile_action() {
 //  	'Url'      => "$path/profile/profile_index.php?action=search",
 //  	'Right'    => $cright_read,
 //  	'Condition'=> array ('None') );
+  //FIXME
   
   // New
   $actions['profile']['new'] = array (
@@ -279,6 +282,7 @@ function get_profile_action() {
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') );
 
+  //FIXME
 //  // Display
 //    $actions['profile']['display'] = array (
 //      'Name'     => $l_header_display,
@@ -297,6 +301,7 @@ function get_profile_action() {
 //      'Url'      => "$path/profile/profile_index.php?action=dispref_level",
 //      'Right'    => $cright_read,
 //      'Condition'=> array ('None') );
+//FIXME
 }
 
 
