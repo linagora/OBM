@@ -6,126 +6,45 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: profile_display.inc,v 1.198 2007/02/20 15:16:10 mehdi Exp $          //
 ///////////////////////////////////////////////////////////////////////////////
- 
-//---------------------------------------------------------------------------//
-// Fields that appear in result lists                                        //
-//---------------------------------------------------------------------------//
-// Direct fields
-$fieldnames['profile_name'] = 'Nom';
+
+
+//FIXME
+$l_module_name = "Module";
+//$l_name = "Nom";
+$l_right_default =
+$l_right_read = "Lecture";
+$l_right_write = "Ecriture";
+$l_right_own = "Proprio";
+$l_right_read_admin = "Lecture Adm";
+$l_right_write_admin = "Ecriture Adm";
+//FIXME
 
 /**
- * Display profile specific dataset fields
+ * Produce HTML Profile List content
  *
- * @param OBM_DISPLAY $OD
- * @param string $fieldname : field to display
- * @param bool $link_ok : true if links must be displayed
- * @return array : hash with 'name', 'url', 'align' values
- */
-function dis_data_profile(&$OD, $fieldname, $link_ok) {
-  global $path;
-  
-  if ($fieldname == 'profile_name') {
-  	if ($OD->data_set->f($fieldname) == '') {
-  		$res['name'] = '-';
-  	}
-  	
-    if ($OD->display_ext == 'get_id') {
-      $res['url'] = 'javascript:check_get_id('.$OD->data_set->f('profile_id').",'".addslashes($OD->data_set->f('profile_name'))."');";
-    } else if ($OD->display_ext == 'get_id_url') {
-      $res['url'] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f('profile_id').');';
-    } else if ($OD->display_ext == 'get_id_cv') {
-      $res['url'] = 'javascript:check_get_id_cv('.$OD->data_set->f('profile_id').",'".addslashes($OD->data_set->f('profile_name'))."');";
-    } else {
-      $res['url'] = "$path/profile/profile_index.php?action=detailconsult&amp;profile_id=".$OD->data_set->f('profile_id');
-    }
-  }
-
-  else if (in_array($fieldname, array('profile_timecreate', 'profile_timecreate'))) {
-    $date = $OD->data_set->f($fieldname);
-    $res['name'] = of_date_format($date);
-  }
-  
-  /*
-  else if ($fieldname == 'profile_archive') {
-    $res['align'] = 'center';
-    if ($OD->data_set->f($fieldname)) {
-      $res['name'] = 'X';
-    } else {
-      $res['name'] = '&nbsp;';
-      $res['txt_name'] = ' ';
-    }
-  }
-*/
-  return $res;
-}
-
-/**
- * XHTML Display the profile Search result
- *
- * @param array $obm_q list of profiles
- * @param unknown_type $prefs fields to display in the list of profiles 
- * @param array $profile profile search criteria
+ * @param DB_OBM $profile_q
  * @return string xHTML
  */
-function html_profile_search_list($obm_q, $prefs, $profile) {
-  global $l_close;
-
-  $popup = $profile['popup'];
-  $archive = $profile['archive'];
-  
-  if ($popup) {
-    $ext_action = $profile["ext_action"];
-    $ext_url = $profile["ext_url"];
-    $ext_id = $profile["ext_id"];
-    $ext_target = $profile["ext_target"];
-    $ext_widget = $profile["ext_widget"];
-    $ext_widget_text = $profile["ext_widget_text"];
-    $ext_element = $profile["ext_element"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
-  }
-
-  $url = url_prepare("user_index.php?action=search&amp;tf_name=$profile[name]&amp;cba_archive=$archive$url_ext");
-  
-  $profiles_d = new OBM_DISPLAY("DATA", $prefs, "user");
-  if ($popup) {
-    //    if ($ext_action == "ext_get_ids") {
-    $profiles_d->display_link = false;
-    $profiles_d->data_cb_text = "X";
-    $profiles_d->data_idfield = "userobm_id";
-    $profiles_d->data_cb_name = "data-u-";
-    if ($ext_element != "") {
-      $profiles_d->data_cb_name = "";
-      $profiles_d->data_form_head = "
-      <form onsubmit=\"of_select_fill_from_checkbox(this); return false;\">";
-    } elseif ($ext_widget != "") {
-      $profiles_d->data_form_head = "
-      <form onsubmit=\"fill_ext_form(this); return false;\">";
-    } else {
-      $profiles_d->data_form_head = "
-      <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
-    }
-    $profiles_d->data_form_end = "
-      <div class=\"buttons\">
-        <input type=\"submit\" value=\"$l_add\" />
-        <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
-        <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-      </div>
-      </form>";
-
-    $display_popup_end = "
-      <p>
-      <a href=\"\" onclick='window.close();'>$l_close</a>
-      </p>";
-  }
-  $profiles_d->data_set = $obm_q;
-  $profiles_d->data_header = "both";
-  $profiles_d->data_url = $url;
-
-  // --- HTML Template --------------------------------------------------------
-  $block .= $profiles_d->display("dis_data_profile");
-  $block .= $display_popup_end;
-
-  return $block;
+function html_profile_list ($profile_q) {
+	$block = '';
+	
+	$block .= "<div class=\"result\"><table>
+    <thead><tr><td>Nom</td></tr></thead><tbody>";
+	
+	while ($profile_q->next_record()) {
+		$profile_name = $profile_q->f('profile_name');
+		if ($profile_name == '')
+		  $profile_name = '-';
+		
+		$url_consult = url_prepare("profile_index.php?action=detailconsult&amp;profile_id=". $profile_q->f('profile_id'));
+		$block .= "<tr>
+		  <td><a href=\"$url_consult\">$profile_name</a></td>
+		</tr>";
+	}
+	
+	$block .= "</tbody></table></div>";
+	
+	return $block;
 }
 
 /**
@@ -158,6 +77,12 @@ function html_profile_form($action, $params, $profile = array()) {
  * @return string xHTML
  */
 function html_profile_superform($params, $action, $profile = array()) {
+	global $cright_list;
+	
+	// labels
+  foreach ($cright_list as $right_name) { global ${'l_right_'. $right_name}; }
+	global $l_right_default, $l_name, $l_module_name;
+	
 	$obm_modules = get_obm_modules();
 	
   // --------------------------
@@ -205,25 +130,23 @@ function html_profile_superform($params, $action, $profile = array()) {
   }
 	
      // --------------------------
-     // begin make $function_make_right_field
-  
-  $checked_condition = 'if (isset($rights[$module_name][$right_name])
-      && $rights[$module_name][$right_name])';
-  $parameters_make_right_field = '$rights, $module_name, $right_name';
+     // begin make $function_make_checkbox_field
+     
+  $checked_condition = 'if ($checked)';
+  $parameters_make_checkbox_field = '$name, $checked, $ext';
   
   if ($action == 'consult') {
-    $function_make_right_field = create_function($parameters_make_right_field,
+    $function_make_checkbox_field = create_function($parameters_make_checkbox_field,
       $checked_condition. ' return \'X\';
-      return \'\';');
+      return \'&nbsp;\';');
   } else {
-    $function_make_right_field = create_function($parameters_make_right_field,
+    $function_make_checkbox_field = create_function($parameters_make_checkbox_field,
       $checked_condition. ' $checked = "checked=\"checked\""; 
-      return "<label for=\"cbx_${module_name}_${right_name}\" class=\"block\">
-      <input type=\"checkbox\" name=\"cba_${module_name}_right_${right_name}\"
-      id=\"cbx_${module_name}_${right_name}\" $checked /></label>";');
+      return "<label for=\"cbx_$name\" class=\"block\">
+      <input type=\"checkbox\" name=\"cba_$name\" id=\"cbx_$name\" $checked $ext/></label>";');
   }
   
-      // end make $function_make_right_field 
+      // end make $function_make_checkbox_field 
       // --------------------------
   
   // end prepare fields
@@ -244,36 +167,63 @@ function html_profile_superform($params, $action, $profile = array()) {
   <div class=\"detail infos\">
     <table>
       <tbody>
-        <tr><th>Nom</th><td>$field[name]</td></tr>
+        <tr><th>$l_name</th><td>$field[name]</td></tr>
       </tbody>
     </table>
   </div>";
+  
+  $block_rights_header = '';
+  foreach ($cright_list as $right_name) {
+    $block_rights_header .= "<td>". ${'l_right_'. $right_name}. "</td>";
+  }
+  
+  $block .= "<div class=\"result extra\">
+    <h1>Permissions par défaut</h1>
+    <table><thead>
+      <tr>$block_rights_header</tr>
+      </thead>
+      <tbody>
+      <tr class=\"C\">";
+  
+  foreach ($cright_list as $right_name) {
+  	$right_value = isset($value['rights']['default']) && $value['rights']['default'][$right_name];
+  	$block .= '<td>'. $function_make_checkbox_field('default_right_'. $right_name, $right_value, ''). '</td>';
+  }
+  
+  $block .= "</tr>
+      </tbody>
+    </table>
+  </div>";
+  
   
   $block .= "<div class=\"result extra\">";
   
   foreach ($obm_modules as $section_name => $modules) {
     $block .= "<h1>". $GLOBALS['l_section_'. $section_name]. "</h1>";
-    $block .= "<input type=\"checkbox\" /> Désactiver la section";
+    $block .= "<input type=\"checkbox\" /> Désactiver la section"; //FIXME truc à compléter
     
+    //FIXME labels
 	  $block .= "<table><thead>
-	      <tr><td>Nom module</td>
-	        <td>Lecture</td>
-	        <td>Ecriture</td>
-	        <td>Lecture admin</td>
-	        <td>Ecriture admin</td>
-	        <td>Propriétaire</td>
+	      <tr><td>$l_module_name</td>
+          <td>$l_right_default</td>
+	        $block_rights_header
 	      </tr>
 	    </thead><tbody>";
 	  
 	  $i = 0;
   	foreach ($modules as $module_name) {
-      $block .= "<tr". ($i%2 == 1 ? ' class="pair"':''). "><td>". $GLOBALS['l_module_'. $module_name]. "</td>"
-        . "<td class=\"C\">". $function_make_right_field($value['rights'], $module_name, 'read'). "</td>"
-        . "<td class=\"C\">". $function_make_right_field($value['rights'], $module_name, 'write'). "</td>"
-        . "<td class=\"C\">". $function_make_right_field($value['rights'], $module_name, 'read_admin'). "</td>"
-        . "<td class=\"C\">". $function_make_right_field($value['rights'], $module_name, 'write_admin'). "</td>"
-        . "<td class=\"C\">". $function_make_right_field($value['rights'], $module_name, 'own'). "</td>"
-        . "</tr>";
+      $block .= "<tr". ($i%2 == 1 ? ' class="pair"':''). "><td>". $GLOBALS['l_module_'. $module_name]. "</td>";
+      
+      $block .= "<td class=\"C\">". $function_make_checkbox_field($module_name. '_default',
+        !isset($value['rights'][$module_name]), "onclick=\"select_default('$module_name')\""). "</td>";
+      
+      foreach ($cright_list as $right_name) {
+      	$checked = isset($value['rights'][$module_name][$right_name]) && $value['rights'][$module_name][$right_name];
+      	$block .= "<td class=\"C\">". $function_make_checkbox_field($module_name. '_right_'. $right_name,
+      	  $checked, "onclick=\"select_right('$module_name')\""). "</td>";
+      }
+      
+      $block .= "</tr>";
       $i += 1;
   	}
   	
@@ -292,12 +242,12 @@ function html_profile_superform($params, $action, $profile = array()) {
   if ($action != 'consult') {
 	  $form_block = '';
 	  
-	  $form_block .= "<form action=\"\" method=\"get\">";
+	  $form_block .= "<form action=\"\" method=\"post\">";
 	  $form_block .= $block;
     $form_block .= "<input type=\"hidden\" name=\"action\" value=\"$action\"/>";
     $form_block .= "<input type=\"hidden\" name=\"profile_id\" value=\"$params[profile_id]\"/>";
     $form_block .= "<div class=\"buttons\">";
-    $form_block .= "<input type=\"submit\" />";
+    $form_block .= "<input type=\"submit\" />"; // FIXME label bouton
     $form_block .= "</div>";
 	  $form_block .= "</form>";
   

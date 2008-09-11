@@ -1,8 +1,8 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : profile_index.php                                //
-//     - Desc : Organizational Chart Index File                              //
-// 2007-02-26 David PHAN                                                     //
+// OBM - File : profile_index.php                                            //
+//     - Desc : Profile Index File                                           //
+// 2008-09-10 Christophe LIOU KEE ON                                         //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: profile_index.php,v 1.78 2007/02/19 14:32:51 mehdi Exp $ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,6 +19,7 @@ include("$obminclude/global_pref.inc");
 
 require('profile_display.inc');
 require('profile_query.inc');
+require('profile_js.inc');
 include("$obminclude/of/of_category.inc");
 
 get_profile_action();
@@ -41,21 +42,6 @@ $action = $next_action;
 
 if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
-  //$display['search'] = dis_profile_search_form($params);
-  if ($_SESSION['set_display'] == 'yes') {
-    $do_next = true;
-    $next_action = 'search';
-  } else {
-    $display['msg'] .= display_info_msg($l_no_display);
-  }
-  
-  // FIXME
-  $do_next = true;
-  $next_action = 'search';
-  
-} elseif ($action == 'search') {
-///////////////////////////////////////////////////////////////////////////////
-//  $display['search'] = dis_profile_search_form($params);
 
   $prefs = get_display_pref($obm['uid'], 'profile', 0);
   $obm_q = run_query_profile_search($params);
@@ -65,7 +51,7 @@ if ($action == 'index' || $action == '') {
     $display['msg'] .= display_warn_msg($l_no_found);
   } else {
     $display['msg'] .= display_info_msg($count.' '.$l_found);
-    $display['result'] = html_profile_search_list($obm_q, $prefs, $params);
+    $display['result'] = html_profile_list($obm_q);
   }
 
 } elseif ($action == 'new') {
@@ -234,10 +220,10 @@ function get_profile_action() {
   	'Condition'=> array ('all') );
   
   // Search
-  $actions['profile']['search'] = array (
-  	'Url'      => "$path/profile/profile_index.php?action=search",
-  	'Right'    => $cright_read,
-  	'Condition'=> array ('None') );
+//  $actions['profile']['search'] = array (
+//  	'Url'      => "$path/profile/profile_index.php?action=search",
+//  	'Right'    => $cright_read,
+//  	'Condition'=> array ('None') );
   
   // New
   $actions['profile']['new'] = array (
@@ -293,24 +279,24 @@ function get_profile_action() {
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') );
 
-  // Display
-    $actions['profile']['display'] = array (
-      'Name'     => $l_header_display,
-      'Url'      => "$path/profile/profile_index.php?action=display",
-      'Right'    => $cright_read,
-      'Condition'=> array ('all') );
-  
-  // Display Preferences
-    $actions['profile']['dispref_display'] = array (
-      'Url'      => "$path/profile/profile_index.php?action=dispref_display",
-      'Right'    => $cright_read,
-      'Condition'=> array ('None') );
-  
-  // Display Level
-    $actions['profile']['dispref_level']  = array (
-      'Url'      => "$path/profile/profile_index.php?action=dispref_level",
-      'Right'    => $cright_read,
-      'Condition'=> array ('None') );
+//  // Display
+//    $actions['profile']['display'] = array (
+//      'Name'     => $l_header_display,
+//      'Url'      => "$path/profile/profile_index.php?action=display",
+//      'Right'    => $cright_read,
+//      'Condition'=> array ('all') );
+//  
+//  // Display Preferences
+//    $actions['profile']['dispref_display'] = array (
+//      'Url'      => "$path/profile/profile_index.php?action=dispref_display",
+//      'Right'    => $cright_read,
+//      'Condition'=> array ('None') );
+//  
+//  // Display Level
+//    $actions['profile']['dispref_level']  = array (
+//      'Url'      => "$path/profile/profile_index.php?action=dispref_level",
+//      'Right'    => $cright_read,
+//      'Condition'=> array ('None') );
 }
 
 
