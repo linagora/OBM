@@ -43,7 +43,7 @@ $action = $next_action;
 if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
 
-  $prefs = get_display_pref($obm['uid'], 'profile', 0);
+  //$prefs = get_display_pref($obm['uid'], 'profile', 0);
   $obm_q = run_query_profile_search($params);
   $count = $obm_q->num_rows_total();
   
