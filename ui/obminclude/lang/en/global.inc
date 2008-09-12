@@ -417,6 +417,9 @@ $l_header_activityreport = "Activity Report";
 $l_document_new = "New document";
 $l_document_add = "Link some documents";
 
+//Profile headers
+$l_header_properties = "Properties";
+
 //---------------------------------------------------------------------------//
 // Category labels
 //---------------------------------------------------------------------------//

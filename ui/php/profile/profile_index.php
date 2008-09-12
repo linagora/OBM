@@ -245,7 +245,7 @@ function get_profile_params() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_profile_action() {
   global $params, $actions, $path, $view;
-  global $l_header_find, $l_header_new, $l_header_display, $l_header_consult;
+  global $l_header_find, $l_header_new, $l_header_display, $l_header_consult, $l_header_properties;
   global $l_header_update, $l_header_delete, $l_ldif_export, $l_svg_export, $l_pdf_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
@@ -306,7 +306,28 @@ function get_profile_action() {
     'Url'      => "$path/profile/profile_index.php?action=update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') );
-
+  
+  // Properties == Properties Consult
+  $actions['profile']['properties'] = array (
+  	'Name'		=> $l_header_properties,
+  	'Url'		=> "$path/profile/profile_index.php?action=propertiesconsult&amp;profile_id=$id",
+  	'Right'		=> $cright_read,
+  	'Condition'	=> array('detailconsult') );
+  
+  // Properties Update
+  $actions['profile']['propertiesupdate'] = array (
+  	'Name'		=> $l_header_update,
+  	'Url'		=> "$path/profile/profile_index.php?action=propertiesupdate&amp;profile_id=$id",
+  	'Right'		=> $cright_write_admin,
+  	'Condition'	=> array('propertiesconsult') );
+  
+  // Properties Consult
+  $actions['profile']['propertiesconsult'] = array (
+  	'Name'		=> $l_header_consult,
+  	'Url'		=> "$path/profile/profile_index.php?action=propertiesconsult&amp;profile_id=$id",
+  	'Right'		=> $cright_read,
+  	'Condition' => array('propertiesupdate') );
+  	
   // Check Delete
   $actions['profile']['check_delete'] = array (
     'Name'     => $l_header_delete,

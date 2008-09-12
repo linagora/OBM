@@ -1,3 +1,8 @@
+DROP TABLE IF EXISTS ProfileModule;
+DROP TABLE IF EXISTS ProfileSection;
+DROP TABLE IF EXISTS ProfileProperty;
+DROP TABLE IF EXISTS ProfilePropertyValue;
+DROP TABLE IF EXISTS Profile;
 
 --
 -- Table structure for table `Profile`
@@ -18,7 +23,6 @@ CREATE TABLE Profile (
 --
 -- Table structure for table `ProfileModule`
 --
-
 DROP TABLE IF EXISTS ProfileModule;
 CREATE TABLE ProfileModule (
   profilemodule_id int(8) NOT NULL auto_increment,
@@ -53,8 +57,8 @@ DROP TABLE IF EXISTS ProfileProperty;
 CREATE TABLE ProfileProperty (
   profileproperty_id int(8) NOT NULL auto_increment,
   profileproperty_domain_id int(8) NOT NULL,
-  profileproperty_property_name varchar(32) NOT NULL default '',
-  PRIMARY KEY (profileproperty_id),
+  profileproperty_name varchar(32) NOT NULL default '',
+  PRIMARY KEY (profileproperty_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -66,9 +70,9 @@ CREATE TABLE ProfilePropertyValue (
   profilepropertyvalue_id int(8) NOT NULL auto_increment,
   profilepropertyvalue_domain_id int(8) NOT NULL,
   profilepropertyvalue_profile_id int(8) default NULL,
+  profilepropertyvalue_property_id int(8) default NULL,
   profilepropertyvalue_property_value varchar(32) NOT NULL default '',
   PRIMARY KEY (profilepropertyvalue_id),
-  CONSTRAINT profilepropertyvalue_profile_id_profile_id_fkey FOREIGN KEY (profilepropertyvalue_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT profilepropertyvalue_profile_id_profile_id_fkey FOREIGN KEY (profilepropertyvalue_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty (profileproperty_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-

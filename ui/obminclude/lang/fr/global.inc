@@ -429,6 +429,9 @@ $l_header_activityreport = "Relevé d'activité";
 $l_document_new = "Nouveau document";
 $l_document_add = "Lier des documents";
 
+//Profile headers
+$l_header_properties = "Propriétés";
+
 ////////////////////////////////////////////////////////
 // Javascript error ////////////////////////////////////
 ////////////////////////////////////////////////////////
