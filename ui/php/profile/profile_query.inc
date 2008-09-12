@@ -147,6 +147,7 @@ function get_profile_full_data ($profile_id) {
   $res = array();
   
   $profile_q = run_query_profile_search($search_params);
+  $profile_q->next_record();
   $res = array(
     'id' => $profile_q->f('profile_id'),
     'name' => $profile_q->f('profile_name'),
