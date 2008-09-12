@@ -334,6 +334,7 @@ $l_module_import = "Import";
 $l_module_backup = "Sauvegarde";
 $l_module_mailserver = "Serveurs de mail";
 $l_module_samba = "Serveur Samba (Windows PDC)";
+$l_module_profile = "Profils utilisateurs";
 
 $l_module_settings = "Configuration";
 $l_module_password = "Mot de passe";

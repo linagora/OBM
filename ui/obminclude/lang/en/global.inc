@@ -327,6 +327,7 @@ $l_module_tools = "Update tools";
 $l_module_control = "Dashboard";
 $l_module_mailserver = "Mail servers";
 $l_module_samba = "Samba Server";
+$l_module_profile = "User profiles";
 
 $l_module_settings = "Settings";
 $l_module_password = "Password";

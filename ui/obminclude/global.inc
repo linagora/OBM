@@ -219,8 +219,9 @@ $profiles['user'] = array (
     'user' => 1,
     'my' => 1),
   'module' => array (
-    'default' => $perm_user,
-    'calendar' => $perm_editor),
+		     'default' => 0, //$perm_user,
+    'calendar' => $perm_editor,
+    ),
   'level' => 3,
   'access_restriction' => 'ALLOW_ALL',
   'access_exeptions' => array()
@@ -391,6 +392,7 @@ if ($cgp_use['service']['mail_vacation']) {
 if ($cgp_use['service']['mail']) {
   $cgp_show['module']['mailbox'] = 'my';
 }
+$cgp_show['module']['profile'] = 'admin';
 
 if (!$cgp_use['service']['ldap']) {
   $cgp_show['module']['tools'] = false;

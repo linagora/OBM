@@ -405,3 +405,10 @@ if ($cgp_show["module"]["organizationalchart"]) {
                                     'Url' => "$path/organizationalchart/organizationalchart_index.php",
 			            'Right'=> $cright_read);
 }
+
+if ($cgp_show["module"]["profile"]) {
+  $modules["profile"] = array('Name'  => $l_module_profile,
+			      'Ico'   => "$ico_profile",
+			      'Url'   => "$path/profile/profile_index.php",
+			      'Right' => $cright_read);
+}
