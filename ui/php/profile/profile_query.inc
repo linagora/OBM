@@ -15,8 +15,15 @@ $cprofilemodule_sql_ext = array(
                  profilemodule_right,
                  ',
     'join' => 'LEFT JOIN ProfileModule ON profilemodule_profile_id = profile_id '. sql_multidomain('profilemodule'),
-    'where' => '',
-    'next_record' => false
+    'where' => ''
+    );
+    
+$cprofilesection_sql_ext = array(
+    'select' => 'profilesection_section_name,
+                 profilesection_show,
+                 ',
+    'join' => 'LEFT JOIN ProfileModule ON profilesection_profile_id = profile_id '. sql_multidomain('profilesection'),
+    'where' => ''
     );
 
 /**
@@ -27,30 +34,20 @@ $cprofilemodule_sql_ext = array(
  * @return DB_OBM
  */
 function run_query_profile_detail ($profile_id, $sql_ext = null) {
-  if ($sql_ext == null) {
-    $sql_ext = array();
-    $sql_ext['next_record'] = true;
-  }
+  $obm_q = run_query_profile_search (array('profile_id' => $profile_id));
   
-  $profile_id = sql_parse_id($profile_id, true);
-  $sql_ext['where'] .= " AND profile_id $profile_id";
+  $obm_q->next_record();
   
-  return run_query_profile_search (array(), $sql_ext);
+  return $obm_q;
 }
 
 /**
  * Search Profile data
  *
  * @param array $params
- * @param array $sql_ext SQL query extension parameters
- *                       array('select' => string,
- *                             'join' => string,
- *                             'where' => string,
- *                             'next_record' => bool, // do next_record or not
- *                            )
  * @return DB_OBM
  */
-function run_query_profile_search ($params, $sql_ext = null) {
+function run_query_profile_search ($params) {
   global $cdg_sql;
   
   $obm_q = new DB_OBM;
@@ -60,6 +57,9 @@ function run_query_profile_search ($params, $sql_ext = null) {
   $timecreate = sql_date_format($db_type, 'profile_timecreate', 'timecreate');
   $multidomain = sql_multidomain('profile');
   
+  if (!empty($params['profile_id']))
+    $where .= ' AND profile_id = '. sql_parse_id($params['profile_id']);
+  
   $query = "SELECT 
         profile_id,
         profile_name,
@@ -67,22 +67,53 @@ function run_query_profile_search ($params, $sql_ext = null) {
         profile_timecreate,
         
         c.userobm_login as usercreate,
-        u.userobm_login as userupdate,
-        $sql_ext[select]
-        1
+        u.userobm_login as userupdate
       FROM Profile
         LEFT JOIN UserObm as c ON profile_usercreate=c.userobm_id
         LEFT JOIN UserObm as u ON profile_userupdate=u.userobm_id
+      WHERE 1=1
+        $where
+        $multidomain";
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_profile_detail()');
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+/**
+ * Search Profile data with join extension
+ *
+ * @param array $params
+ * @param array $sql_ext SQL query extension parameters
+ *                       array('select' => string,
+ *                             'join' => string,
+ *                             'where' => string,
+ *                             'next_record' => bool, // do next_record or not
+ *                            )
+ * 
+ * @return DB_OBM
+ */
+function run_query_profile_join_search ($params, $sql_ext = null) {
+  global $cdg_sql;
+  
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  
+  $multidomain = sql_multidomain('profile');
+  
+  $query = "SELECT 
+        profile_id,
+        $sql_ext[select]
+        1
+      FROM Profile
         $sql_ext[join]
       WHERE 1=1
         $sql_ext[where]
         $multidomain";
   
-  display_debug_msg($query, $cdg_sql, 'run_query_profile_detail()');
+  display_debug_msg($query, $cdg_sql, 'run_query_profile_join_search()');
   $obm_q->query($query);
-  
-  if ($sql_ext == null || $sql_ext['next_record'])
-    $obm_q->next_record();
 
   return $obm_q;
 }
@@ -108,29 +139,33 @@ function run_query_profile_search ($params, $sql_ext = null) {
  */
 function get_profile_full_data ($profile_id) {
   global $cprofilemodule_sql_ext;
+  global $cprofilsection_sql_ext;
   global $cright_list; // right constants
   foreach ($cright_list as $right_name) { global ${'cright_'. $right_name}; }
-  	
-  $obm_q = run_query_profile_detail($profile_id, $cprofilemodule_sql_ext);
+  
+  $search_params = array('profile_id' => $profile_id);
+  $res = array();
+  
+  $profile_q = run_query_profile_search($search_params);
+  $res = array(
+    'id' => $profile_q->f('profile_id'),
+    'name' => $profile_q->f('profile_name'),
+    );
 	
   $modules = array();
   
-  while ($obm_q->next_record()) {
-  	$profile_name = $obm_q->f('profile_name');
-  	
-  	$modules[$obm_q->f('profilemodule_module_name')]['right'] = $obm_q->f('profilemodule_right');
+  $modules_q = run_query_profile_join_search($search_params, $cprofilemodule_sql_ext);
+  
+  while ($modules_q->next_record()) {
+  	$modules[$modules_q->f('profilemodule_module_name')]['right'] = $modules_q->f('profilemodule_right');
   	
     foreach ($cright_list as $right_name) {
-    	$modules[$obm_q->f('profilemodule_module_name')][$right_name]
-    	  = $obm_q->f('profilemodule_right') & ${'cright_'. $right_name};
+    	$res['modules_right'][$modules_q->f('profilemodule_module_name')][$right_name]
+    	  = $modules_q->f('profilemodule_right') & ${'cright_'. $right_name};
     }
   }
   
-  return array(
-    'id' => $profile_id,
-    'name' => $profile_name,
-    'modules_right' => $modules,
-    );
+  return $res;
 }
 
 /**
@@ -140,11 +175,13 @@ function get_profile_full_data ($profile_id) {
  */
 function get_obm_profiles () {
 	global $cprofilemodule_sql_ext;
+	// TODO
 	
-  $obm_q = run_query_profile_search(array(), $cprofilemodule_sql_ext);
+	/*
+  $obm_q = run_query_profile_join_search(array(), $cprofilemodule_sql_ext);
   
   $obm_profiles = array();
-  /*
+  
   $profiles['admin'] = array (
     'section' => array (
       'default' => 1),
@@ -156,13 +193,13 @@ function get_obm_profiles () {
     'access_restriction' => 'ALLOW_ALL',
     'access_exeptions' => array()
   );
-  */
   while ($obm_q->next_record()) {
   	$obm_profiles[$obm_q->f('profile_name')]['module'][$obm_q->f('profilemodule_module_name')]
   	  = $obm_q->f('profilemodule_right');
   }
   
   return $obm_profiles;
+  */
 }
 
 function check_profile_data_form($params) {
@@ -466,6 +503,32 @@ function get_obm_modules () {
   }
   
   return $obm_modules;
+}
+
+function run_query_profilesection_list ($profile_id) {
+  global $cdg_sql;
+  
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  
+  $multidomain = sql_multidomain('profilesection');
+  
+  $query = "SELECT 
+        profilesection_id,
+        profilesection_section_name,
+        profilesection_show
+      FROM ProfileSection
+      WHERE 1=1
+        profilesection_profile_id = $profile_id
+        $multidomain";
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_profilesection_list()');
+  $obm_q->query($query);
+  
+  if ($sql_ext == null || $sql_ext['next_record'])
+    $obm_q->next_record();
+
+  return $obm_q;
 }
 
 ?>
