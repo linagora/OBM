@@ -712,6 +712,10 @@ $php_regexp_daily_virus_db = "/^daily\.cvd.*$/";
 $php_regexp_virus_db_update = "/^ClamAV update process started at.*$/";
 $php_regexp_virus_db_version = "(version: (.*),)sU";
 
+// Profile
+$php_regexp_profile_name = "/^[A-Za-z0-9][A-Za-z0-9-._]{1,64}$/"; // profile name
+$js_regexp_profile_name = "/^[A-Za-z0-9][A-Za-z0-9-._]{1,64}$/";
+
 
 $global_dis_debug_msg = '';
 $global_dis_debug_param = '';

@@ -213,7 +213,22 @@ function get_obm_profiles () {
 }
 
 function check_profile_data_form($params) {
-	return true; // TODO
+	global $err;
+	global $php_regexp_profile_name;
+	global $l_profile_name_empty;
+	global $l_profile_name_error;
+	
+	if (strlen($params['name']) == 0) {
+		$err['msg'] = $l_profile_name_empty;
+    	$err['field'] = 'name';
+    	return false;
+	} else if (!preg_match($php_regexp_profile_name, $params['name'])) {
+		$err['msg'] = $l_profile_name_error;
+    	$err['field'] = 'name';
+		return false;
+	} else {	
+		return true;
+	}
 }
 
 /**

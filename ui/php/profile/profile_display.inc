@@ -126,7 +126,7 @@ function html_profile_superform($params, $action, $profile = array()) {
   
 	
   if ($action == 'insert' || $action == 'update') {
-    $field['name'] = "<input type=\"text\" name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$value[name]\" />";
+    $field['name'] = "<input type=\"text\" name=\"tf_name\" maxlength=\"64\" size=\"32\" value=\"$value[name]\" />";
   } else if ($action == 'consult') {
     $field['name'] = $value['name'];
   }
@@ -243,7 +243,7 @@ function html_profile_superform($params, $action, $profile = array()) {
   if ($action != 'consult') {
 	  $form_block = '';
 	  
-	  $form_block .= "<form action=\"\" method=\"post\">";
+	  $form_block .= "<form action=\"\" method=\"post\" onsubmit=\"if (check_profile(this)) return true; else return false;\">";
 	  $form_block .= $block;
     $form_block .= "<input type=\"hidden\" name=\"action\" value=\"$action\"/>";
     $form_block .= "<input type=\"hidden\" name=\"profile_id\" value=\"$params[profile_id]\"/>";

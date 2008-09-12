@@ -7,6 +7,7 @@
 // $Id: organizationalchart_js.inc,v 1.35 2007/02/20 15:16:10 mehdi Exp $ //
 ///////////////////////////////////////////////////////////////////////////////
 
+// Actions on form
 $extra_js = '
 
 function select_default (module_name) {
@@ -23,4 +24,24 @@ function select_right (module_name) {
 
 ';
 
+// Validate form
+$extra_js .= "
+
+function check_profile (form) {
+	
+	// Check profile name is not empty
+	if (trim(form.ts_name.value) == \"\") {
+		 alert(\"$l_profile_name_empty\"+\"test\");
+		 return false;
+	}
+	
+	// Check profile name is valid
+	if (!trim(form.ts_name.value).match(new RegExp($js_regexp_profile_name))) {
+		alert(\"$l_profile_name_error\");
+		return false;
+	}
+	
+	return true;
+}
+";
 ?>
