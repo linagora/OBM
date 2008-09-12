@@ -609,36 +609,39 @@ sub getEntityDescription {
 sub _getEntityMailboxAcl {
     my $self = shift;
     my( $domainDesc ) = @_;
-    my $dbEntry = $self->{userDbDesc};
-    my $entryProp = $self->{"properties"};
-    my $userId = $self->{"objectId"};
+    my $dbEntry = $self->{'userDbDesc'};
+    my $entryProp = $self->{'properties'};
+    my $userId = $self->{'objectId'};
 
-    if( $entryProp->{"userobm_mail_perms"} ) {
-        my $entityType = $self->{"entityRightType"};
+    if( $entryProp->{'userobm_mail_perms'} ) {
+        my $entityType = $self->{'entityRightType'};
         my %rightDef;
 
-        my $userObmTable = "UserObm";
-        my $entityRightTable = "EntityRight";
+        my $userObmTable = 'UserObm';
+        my $entityRightTable = 'EntityRight';
         if( $self->getDelete() ) {
-            $userObmTable = "P_".$userObmTable;
-            $entityRightTable = "P_".$entityRightTable;
+            $userObmTable = 'P_'.$userObmTable;
+            $entityRightTable = 'P_'.$entityRightTable;
         }
 
 
-        $rightDef{"read"}->{"compute"} = 1;
-        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM ".$userObmTable." i, ".$entityRightTable." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{'read'}->{'compute'} = 1;
+        $rightDef{'read'}->{'sqlQuery'} = 'SELECT i.userobm_id, i.userobm_login FROM '.$userObmTable.' i, '.$entityRightTable.' j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id='.$userId.' AND j.entityright_entity=\''.$entityType.'\'';
 
-        $rightDef{"writeonly"}->{"compute"} = 1;
-        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login FROM ".$userObmTable." i, ".$entityRightTable." j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id=".$userId." AND j.entityright_entity='".$entityType."'";
+        $rightDef{'writeonly'}->{'compute'} = 1;
+        $rightDef{'writeonly'}->{'sqlQuery'} = 'SELECT i.userobm_id, i.userobm_login FROM '.$userObmTable.' i, '.$entityRightTable.' j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id='.$userId.' AND j.entityright_entity=\''.$entityType.'\'';
 
-        $rightDef{"write"}->{"compute"} = 1;
-        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_id, userobm_login FROM ".$userObmTable." LEFT JOIN ".$entityRightTable." ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity='".$entityType."' WHERE entityright_entity_id=".$userId." OR userobm_id=".$userId;
+        $rightDef{'write'}->{'compute'} = 1;
+        $rightDef{'write'}->{'sqlQuery'} = 'SELECT userobm_id, userobm_login FROM '.$userObmTable.' LEFT JOIN '.$entityRightTable.' ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity=\''.$entityType.'\' WHERE entityright_entity_id='.$userId.' OR userobm_id='.$userId;
 
-        $rightDef{"public"}->{"compute"} = 0;
-        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write FROM ".$entityRightTable." WHERE entityright_entity_id=".$userId." AND entityright_entity='".$entityType."' AND entityright_consumer_id=0";
+        $rightDef{'admin'}->{'compute'} = 1;
+        $rightDef{'admin'}->{'sqlQuery'} = 'SELECT userobm_id, userobm_login FROM '.$userObmTable.' LEFT JOIN '.$entityRightTable.' ON entityright_admin=1 AND entityright_consumer_id=userobm_id AND entityright_entity=\''.$entityType.'\' WHERE entityright_entity_id='.$userId.' OR userobm_id='.$userId;
+
+        $rightDef{'public'}->{'compute'} = 0;
+        $rightDef{'public'}->{'sqlQuery'} = 'SELECT entityright_read, entityright_write FROM '.$entityRightTable.' WHERE entityright_entity_id='.$userId.' AND entityright_entity=\''.$entityType.'\' AND entityright_consumer_id=0';
 
         # On recupere la definition des ACL
-        $self->{"userLinks"}->{"userobm_mailbox_acl"} = &OBM::toolBox::getEntityRight( $domainDesc, \%rightDef, $userId );
+        $self->{'userLinks'}->{'userobm_mailbox_acl'} = &OBM::toolBox::getEntityRight( $domainDesc, \%rightDef, $userId );
     }
 
     return 1;

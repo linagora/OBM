@@ -270,7 +270,7 @@ sub makeEntityMailAddress {
 #------------------------------------------------------------------------------
 sub getEntityRight {
     my ( $domain, $rightDef, $shareId ) = @_;
-    my %entityTemplate = ( "read", 0, "writeonly", 0, "write", 0 );
+    my %entityTemplate = ( 'read', 0, 'writeonly', 0, 'write', 0, 'admin', 0 );
     my %usersList;
 
 
@@ -371,14 +371,51 @@ sub computeRight {
     my $rightList = &OBM::Tools::perlUtils::cloneStruct(OBM::Parameters::cyrusConf::boxRight);
 
     while( my( $userName, $right ) = each( %$usersList ) ) {
-        if( $right->{"write"} ) {
-            $rightList->{"write"}->{$userName} = $usersList->{$userName}->{"userId"};
-        }elsif( $right->{"read"} && $right->{"writeonly"} ) {
-            $rightList->{"write"}->{$userName} = $usersList->{$userName}->{"userId"};
-        }elsif( $right->{"read"} ) {
-            $rightList->{"read"}->{$userName} = $usersList->{$userName}->{"userId"};
-        }elsif( $right->{"writeonly"} ) {
-            $rightList->{"writeonly"}->{$userName} = $usersList->{$userName}->{"userId"};
+        SWITCH: {
+            if( $right->{'write'} && $right->{'admin'} ) {
+                $rightList->{'writeAdmin'}->{$userName} = $usersList->{$userName}->{'userId'};
+                last SWITCH;
+            }
+            
+            if( $right->{"write"} && !$right->{'admin'} ) {
+                $rightList->{"write"}->{$userName} = $usersList->{$userName}->{"userId"};
+                last SWITCH;
+            }
+            
+            if( $right->{"read"} && $right->{"writeonly"} && $right->{'admin'} ) {
+                $rightList->{"writeAdmin"}->{$userName} = $usersList->{$userName}->{"userId"};
+                last SWITCH;
+            }
+            
+            if( $right->{"read"} && $right->{"writeonly"} && !$right->{'admin'} ) {
+                $rightList->{"write"}->{$userName} = $usersList->{$userName}->{"userId"};
+                last SWITCH;
+            }
+            
+            if( $right->{"read"} && $right->{'admin'} ) {
+                $rightList->{"readAdmin"}->{$userName} = $usersList->{$userName}->{"userId"};
+                last SWITCH;
+            }
+            
+            if( $right->{"read"} && !$right->{'admin'} ) {
+                $rightList->{"read"}->{$userName} = $usersList->{$userName}->{"userId"};
+                last SWITCH;
+            }
+            
+            if( $right->{"writeonly"} && $right->{'admin'} ) {
+                $rightList->{"writeonlyAdmin"}->{$userName} = $usersList->{$userName}->{"userId"};
+                last SWITCH;
+            }
+            
+            if( $right->{"writeonly"} && !$right->{'admin'} ) {
+                $rightList->{"writeonly"}->{$userName} = $usersList->{$userName}->{"userId"};
+                last SWITCH;
+            }
+
+            if( !$right->{"read"} && !$right->{"writeonly"} && !$right->{"write"} && $right->{'admin'} ) {
+                $rightList->{"admin"}->{$userName} = $usersList->{$userName}->{"userId"};
+                last SWITCH;
+            }
         }
     }
 

@@ -19,12 +19,15 @@ use constant cyrusAdminLogin => "cyrus";
 
 
 use constant definedRight => {
-    none => "none",
-    read => "lrs",
-    writeonly => "li",
-    write => "lrswicd",
-    admin => "dc",
-    post => "p"
+    none => 'none',
+    read => 'lrs',
+    readAdmin => 'lrsc',
+    writeonly => 'li',
+    writeonlyAdmin => 'lic',
+    write => 'lrswid',
+    writeAdmin => 'lrswidc',
+    admin => 'lc',
+    post => 'p'
 };
 
 # Les clés des tables de hachage sont les identifiants utilisateurs, les valeurs

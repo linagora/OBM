@@ -15,6 +15,7 @@ require Net::LDAP;
 require Net::LDAP::Entry;
 require OBM::toolBox;
 require OBM::Tools::perlUtils;
+require OBM::Tools::commonMethods;
 require OBM::Entities::obmRoot;
 require OBM::Entities::obmDomainRoot;
 require OBM::Entities::obmNode;
@@ -41,7 +42,8 @@ sub new {
 
 
     if( !defined($domainList) ) {
-        croak( "Usage: PACKAGE->new(DOMAINLIST)" );
+        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: liste des domaines OBM non definie", "W", 1 );
+        return undef;
     }else {
         $ldapEngineAttr{"domainList"} = $domainList;
     }
@@ -102,34 +104,6 @@ sub destroy {
     &OBM::toolBox::write_log( "[Ldap::ldapEngine]: arret du moteur", "W" );
 
     return $self->_disconnectLdapSrv();
-}
-
-
-sub dump {
-    my $self = shift;
-    my( $what ) = @_;
-    my @desc;
-
-    if( !defined($what) ) {
-        return 0;
-    }
-
-    SWITCH: {
-        if( lc($what) eq "ldapstruct" ) {
-            push( @desc, $self->{"ldapStruct"} );
-            last SWITCH;
-        }
-
-        if( lc($what) eq "all" ) {
-            push( @desc, $self );
-            last SWITCH;
-        }
-    }
-
-    require Data::Dumper;
-    print Data::Dumper->Dump( \@desc );
-
-    return 1;
 }
 
 

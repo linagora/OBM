@@ -32,12 +32,15 @@ sub new {
 
     # Definition des droits
     $cyrusEngineAttr{"rightDefinition"} = {
-        none => "none",
-        read => "lrs",
-        writeonly => "li",
-        write => "lrswicd",
-        admin => "dc",
-        post => "p"
+        none => 'none',
+        read => 'lrs',
+        readAdmin => 'lrsc',
+        writeonly => 'li',
+        writeonlyAdmin => 'lic',
+        write => 'lrswid',
+        writeAdmin => 'lrswidc',
+        admin => 'lc',
+        post => 'p'
     };
 
     bless( \%cyrusEngineAttr, $self );
@@ -336,7 +339,6 @@ sub updateAcl {
     # Récupération de la description du serveur de la boîte à traiter
     my $cyrusSrv = $self->_findCyrusSrvbyId( $object->{"domainId"}, $object->getMailServerId() );
     if( !defined($cyrusSrv) ) {
-    print "ppp\n";
         return 0;
     }
 
@@ -590,7 +592,7 @@ sub _imapSetMailboxAcls {
     }
 
     $boxPattern =~ s/(@.*)$/\/*$1/;
-    @boxStruct = $cyrusSrvConn->listmailbox( $boxPattern, '' );
+    push( @boxStruct, $cyrusSrvConn->listmailbox( $boxPattern, '' ) );
     if( $cyrusSrvConn->error ) {
         &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a l'obtention des ACLs de la BAL : ".$cyrusSrvConn->error(), "W" );
         return 1;
