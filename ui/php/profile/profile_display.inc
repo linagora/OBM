@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-//FIXME
+//FIXME To put in lang files
 $l_module_name = "Module";
 //$l_name = "Nom";
 $l_right_default =
@@ -80,8 +80,10 @@ function html_profile_superform($params, $action, $profile = array()) {
 	global $cright_list;
 	
 	// labels
+  global $l_right_default, $l_name, $l_module_name;
+  
+  // table column names
   foreach ($cright_list as $right_name) { global ${'l_right_'. $right_name}; }
-	global $l_right_default, $l_name, $l_module_name;
 	
 	$obm_modules = get_obm_modules();
 	
@@ -202,7 +204,6 @@ function html_profile_superform($params, $action, $profile = array()) {
     $block .= "<h1>". $GLOBALS['l_section_'. $section_name]. "</h1>";
     $block .= "<input type=\"checkbox\" /> Désactiver la section"; //FIXME truc à compléter
     
-    //FIXME labels
 	  $block .= "<table><thead>
 	      <tr><td>$l_module_name</td>
           <td>$l_right_default</td>

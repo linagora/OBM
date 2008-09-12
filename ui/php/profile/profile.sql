@@ -45,3 +45,30 @@ CREATE TABLE ProfileSection (
   CONSTRAINT profilesection_profile_id_profile_id_fkey FOREIGN KEY (profilesection_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Table structure for table `ProfileProperty`
+--
+
+DROP TABLE IF EXISTS ProfileProperty;
+CREATE TABLE ProfileProperty (
+  profileproperty_id int(8) NOT NULL auto_increment,
+  profileproperty_domain_id int(8) NOT NULL,
+  profileproperty_property_name varchar(32) NOT NULL default '',
+  PRIMARY KEY (profileproperty_id),
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ProfilePropertyValue`
+--
+
+DROP TABLE IF EXISTS ProfilePropertyValue;
+CREATE TABLE ProfilePropertyValue (
+  profilepropertyvalue_id int(8) NOT NULL auto_increment,
+  profilepropertyvalue_domain_id int(8) NOT NULL,
+  profilepropertyvalue_profile_id int(8) default NULL,
+  profilepropertyvalue_property_value varchar(32) NOT NULL default '',
+  PRIMARY KEY (profilepropertyvalue_id),
+  CONSTRAINT profilepropertyvalue_profile_id_profile_id_fkey FOREIGN KEY (profilepropertyvalue_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
