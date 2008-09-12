@@ -505,30 +505,4 @@ function get_obm_modules () {
   return $obm_modules;
 }
 
-function run_query_profilesection_list ($profile_id) {
-  global $cdg_sql;
-  
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  
-  $multidomain = sql_multidomain('profilesection');
-  
-  $query = "SELECT 
-        profilesection_id,
-        profilesection_section_name,
-        profilesection_show
-      FROM ProfileSection
-      WHERE 1=1
-        profilesection_profile_id = $profile_id
-        $multidomain";
-  
-  display_debug_msg($query, $cdg_sql, 'run_query_profilesection_list()');
-  $obm_q->query($query);
-  
-  if ($sql_ext == null || $sql_ext['next_record'])
-    $obm_q->next_record();
-
-  return $obm_q;
-}
-
 ?>
