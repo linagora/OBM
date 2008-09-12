@@ -157,12 +157,21 @@ function get_profile_full_data ($profile_id) {
   $modules_q = run_query_profile_join_search($search_params, $cprofilemodule_sql_ext);
   
   while ($modules_q->next_record()) {
-  	$modules[$modules_q->f('profilemodule_module_name')]['right'] = $modules_q->f('profilemodule_right');
+  	$module_name = $modules_q->f('profilemodule_module_name');
+  	$res['modules_right'][$module_name]['right'] = $modules_q->f('profilemodule_right');
   	
     foreach ($cright_list as $right_name) {
-    	$res['modules_right'][$modules_q->f('profilemodule_module_name')][$right_name]
+    	$res['modules_right'][$module_name][$right_name]
     	  = $modules_q->f('profilemodule_right') & ${'cright_'. $right_name};
     }
+  }
+  
+  $sections = array();
+  
+  $sections_q = run_query_profile_join_search($search_params, $cprofilesection_sql_ext);
+  
+  while ($sections_q->next_record()) {
+    $res['sections_show'][$sections_q->f('profilesection_section_name')] = $sections_q->f('profilesection_show');
   }
   
   return $res;
