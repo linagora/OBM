@@ -126,6 +126,16 @@ if ($action == 'index' || $action == '') {
   else
     $next_action = 'detailupdate';
 
+} else if ($action == 'properties_consult') {
+///////////////////////////////////////////////////////////////////////////////
+  $properties = get_properties_data($params['profile_id']);
+  $display['detail'] = html_properties_consult($params, $properties);
+  
+} else if ($action == 'properties_update') {
+///////////////////////////////////////////////////////////////////////////////
+  $properties = get_properties_data($params['profile_id']);
+  $display['detail'] = html_properties_form($action, $params, $properties);
+  
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   //TODO
@@ -310,23 +320,23 @@ function get_profile_action() {
   // Properties == Properties Consult
   $actions['profile']['properties'] = array (
   	'Name'		=> $l_header_properties,
-  	'Url'		=> "$path/profile/profile_index.php?action=propertiesconsult&amp;profile_id=$id",
+  	'Url'		=> "$path/profile/profile_index.php?action=properties_consult&amp;profile_id=$id",
   	'Right'		=> $cright_read,
   	'Condition'	=> array('detailconsult') );
   
   // Properties Update
-  $actions['profile']['propertiesupdate'] = array (
+  $actions['profile']['properties_update'] = array (
   	'Name'		=> $l_header_update,
-  	'Url'		=> "$path/profile/profile_index.php?action=propertiesupdate&amp;profile_id=$id",
+  	'Url'		=> "$path/profile/profile_index.php?action=properties_update&amp;profile_id=$id",
   	'Right'		=> $cright_write_admin,
-  	'Condition'	=> array('propertiesconsult') );
+  	'Condition'	=> array('properties_consult') );
   
   // Properties Consult
-  $actions['profile']['propertiesconsult'] = array (
+  $actions['profile']['properties_consult'] = array (
   	'Name'		=> $l_header_consult,
-  	'Url'		=> "$path/profile/profile_index.php?action=propertiesconsult&amp;profile_id=$id",
+  	'Url'		=> "$path/profile/profile_index.php?action=properties_consult&amp;profile_id=$id",
   	'Right'		=> $cright_read,
-  	'Condition' => array('propertiesupdate') );
+  	'Condition' => array('properties_update') );
   	
   // Check Delete
   $actions['profile']['check_delete'] = array (
