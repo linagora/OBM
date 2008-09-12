@@ -153,7 +153,7 @@ function run_query_profile_join_search ($params, $sql_ext = null) {
  */
 function get_profile_full_data ($profile_id) {
   global $cprofilemodule_sql_ext;
-  global $cprofilsection_sql_ext;
+  global $cprofilesection_sql_ext;
   global $cright_list; // right constants
   foreach ($cright_list as $right_name) { global ${'cright_'. $right_name}; }
   
@@ -196,7 +196,7 @@ function get_profile_full_data ($profile_id) {
     }
     
     if (!isset($res['sections_show'][$section_name]))
-      $res['sections_show'][$section_name]['show'] = false; 
+      $res['sections_show'][$section_name] = false; 
   }
   
   return $res;
@@ -395,13 +395,11 @@ function run_query_profile_update ($params, $initial_profile) {
   	}
   }
   
-  /*
-  if (!isset($initial_profile['modules_right']['default']['right']))
+  if ($initial_profile['modules_right']['default']['default'])
     $insert[] = 'default';
-  else if (($initial_profile['modules_right']['default']['right']) != ($form_rights['default'])) {
+  else if (($initial_profile['modules_right']['default']['right']) != ($params['modules_right']['default']['right'])) {
     $update[] = 'default';
-  } 
-  */
+  }
   
   foreach ($delete as $module_name) {
     run_query_profilemodule_delete($query_value['profile_id'], $module_name);
@@ -418,6 +416,37 @@ function run_query_profile_update ($params, $initial_profile) {
   }
   
   // end update profile rights
+  // --------------------------
+  
+  
+  // --------------------------
+  // begin update profile sections
+  
+  $insert = array();
+  $delete = array();
+  
+  foreach ($obm_modules as $section_name => $modules) {
+    $exists_in_db = $initial_profile['sections_show'][$section_name];
+    $new_value = $params['sections_show'][$section_name];
+    
+    if ($exists_in_db && !$new_value) {
+    	$delete[] = $section_name;
+    }
+    
+    if (!$exists_in_db && $new_value) {
+    	$insert[] = $section_name;
+    }
+  }
+  
+  foreach ($delete as $section_name) {
+    run_query_profilesection_delete($query_value['profile_id'], $section_name);
+  }
+  
+  foreach ($insert as $section_name) {
+    run_query_profilesection_insert($query_value['profile_id'], $section_name, 1);
+  }
+  
+  // end update profile sections
   // --------------------------
   
   return true;
@@ -489,6 +518,53 @@ function run_query_profilemodule_delete ($profile_id, $module_name) {
       $profilemodule_multidomain";
   
   display_debug_msg($query, $cdg_sql, 'run_query_profilemodule_delete()');
+  
+  return $obm_q->query($query);
+}
+
+/**
+ * Insert a section show
+ *
+ * @param integer $profile_id
+ * @param string $section_name
+ * @param integer $show_value
+ */
+function run_query_profilesection_insert ($profile_id, $section_name, $show_value) {
+  global $obm, $cdg_sql;
+  
+  $domain_id = sql_parse_id( $obm['domain_id']);
+  $obm_q = new DB_OBM;
+  
+  $query = "INSERT INTO ProfileSection (profilesection_section_name,
+    profilesection_domain_id,
+    profilesection_profile_id,
+    profilesection_show) VALUES ('$section_name',
+    $domain_id,
+    $profile_id,
+    $show_value
+    )";
+  display_debug_msg($query, $cdg_sql, 'run_query_profilesection_insert()');
+  
+  return $obm_q->query($query);
+}
+
+/**
+ * Delete a section show
+ *
+ * @param integer $profile_id
+ * @param string $section_name
+ */
+function run_query_profilesection_delete ($profile_id, $section_name) {
+  global $obm, $cdg_sql;
+  
+  $profilesection_multidomain = sql_multidomain('profilesection'); 
+  $obm_q = new DB_OBM;
+  
+  $query = "DELETE FROM ProfileSection WHERE profilesection_section_name = '$section_name'
+      AND profilesection_profile_id = '$profile_id'
+      $profilesection_multidomain";
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_profilesection_delete()');
   
   return $obm_q->query($query);
 }

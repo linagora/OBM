@@ -225,10 +225,10 @@ function get_profile_params() {
           $params['modules_right'][$module_name]['right'] = 0;
         }
         
-        if (isset($params["${module_name}_show"]))
-          $params['sections_show'][$module_name] = true;
+        if (isset($params["${section_name}_show"]))
+          $params['sections_show'][$section_name] = true;
         else
-          $params['sections_show'][$module_name] = false;
+          $params['sections_show'][$section_name] = false;
       }
       
 		  foreach ($params as $k => $v) {

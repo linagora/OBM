@@ -141,7 +141,7 @@ function html_profile_superform($params, $action, $profile = array()) {
   } else {
     $function_make_checkbox_field = create_function($parameters_make_checkbox_field,
       $checked_condition. ' $checked = "checked=\"checked\""; 
-      return "<label for=\"cbx_$name\" class=\"block\">
+      return "<label for=\"cbx_$name\">
       <input type=\"checkbox\" name=\"cba_$name\" id=\"cbx_$name\" $checked $ext/></label>";');
   }
   
@@ -168,7 +168,7 @@ function html_profile_superform($params, $action, $profile = array()) {
   
   foreach ($cright_list as $right_name) {
   	$ename = 'default_right_'. $right_name;
-  	$right_value = isset($value['rights']['default']) && $value['rights']['default'][$right_name];
+  	$right_value = $value['modules_right']['default'][$right_name];
   	$block_default_perm .= '<tr><td class=\"C\">'. $function_make_checkbox_field($ename, $right_value, '')
   	  . "</td><td><label for=\"cbx_$ename\">". ${'l_right_'. $right_name}. "</a></td></tr>";
   }
@@ -190,7 +190,7 @@ function html_profile_superform($params, $action, $profile = array()) {
       
   $block = "
   <style>
-    label.block {
+    table.perms label {
       display:block;
       border:1px solid #D2D2D2;
     }
@@ -224,7 +224,7 @@ function html_profile_superform($params, $action, $profile = array()) {
     $block_table = '';
     //$block_table .= "<input type=\"checkbox\" /> Désactiver la section"; //FIXME truc à compléter
     
-	  $block_table .= "<table><thead>
+	  $block_table .= "<table class=\"perms\"><thead>
 	      <tr><td>$l_module_name</td>
           <td>$l_right_default</td>
 	        $block_rights_header
@@ -251,13 +251,14 @@ function html_profile_superform($params, $action, $profile = array()) {
   	
     $block_table .= "</tbody></table>";
     
-    $checked = $value['sections_show'][$module_name];
-    $block .= "<div class=\"detail extra\">
+    $checked = $value['sections_show'][$section_name];
+    $block .= "<div class=\"detail extra\"\">
       <h1>". $GLOBALS['l_section_'. $section_name]. "</h1>
       <table>
-        <tr><th>Désactiver</th><td>". $function_make_checkbox_field($module_name. '_show',
-          $checked, "onclick=\"select_right('$module_name')\""). "</td></tr>
-      </table>
+        <tbody>
+        <tr><td>". $function_make_checkbox_field($section_name. '_show',
+          $checked, ''). "Désactiver</td><td></td></tr>
+      <tbody></table>
       $block_table</div>";
   }
   
