@@ -21,6 +21,7 @@ require('profile_display.inc');
 require('profile_query.inc');
 require('profile_js.inc');
 include("$obminclude/of/of_category.inc");
+$params = get_profile_params();
 
 get_profile_action();
 $perm->check_permissions($module, $action);
@@ -194,9 +195,46 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_profile_params() {
-
   // Get global params
   $params = get_global_params('profile');
+  
+  $action = $params['action'];
+  
+  if (function_exists('get_obm_modules')) {
+    global $cright_list; // right constants
+    foreach ($cright_list as $right_name) { global ${'cright_'. $right_name}; }
+    
+	  $obm_modules = get_obm_modules();
+	  $params['modules_right'] = array();
+    $params['sections_show'] = array();
+	  
+	  if ($action == 'insert' || $action == 'update') {
+      foreach ($obm_modules as $section_name => $modules) {
+        foreach ($modules as $module_name) {
+          $params['modules_right'][$module_name]['default'] = isset($params["${module_name}_default"]);
+          $params['modules_right'][$module_name]['right'] = 0;
+        }
+        
+        if (isset($params["${module_name}_show"]))
+          $params['sections_show'][$module_name] = true;
+        else
+          $params['sections_show'][$module_name] = false;
+      }
+      
+		  foreach ($params as $k => $v) {
+		    $matches = array();
+		    if (preg_match('/(.+)_right_(.+)/', $k, $matches)) {
+		      $module_name = $matches[1];
+		      $right_name = $matches[2];
+		      
+		      if (!isset($params['modules_right'][$module_name]))
+		        $params['modules_right'][$module_name]['right'] = 0;
+		        
+		      $params['modules_right'][$module_name]['right'] += ${'cright_'. $right_name};
+		    }
+		  }
+	  }
+	}
 
   return $params;
 }

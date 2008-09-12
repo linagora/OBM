@@ -11,12 +11,14 @@
 //FIXME To put in lang files
 $l_module_name = "Module";
 //$l_name = "Nom";
-$l_right_default =
+$l_right_default = "Par défaut";
 $l_right_read = "Lecture";
 $l_right_write = "Ecriture";
 $l_right_own = "Proprio";
 $l_right_read_admin = "Lecture Adm";
 $l_right_write_admin = "Ecriture Adm";
+$l_default_permissions = "Permissions par défaut";
+$l_general_properties = "Propriétés principal";
 //FIXME
 
 /**
@@ -82,6 +84,9 @@ function html_profile_superform($params, $action, $profile = array()) {
 	// labels
   global $l_right_default, $l_name, $l_module_name;
   
+  // titles
+  global $l_default_permissions, $l_general_properties;
+  
   // table column names
   foreach ($cright_list as $right_name) { global ${'l_right_'. $right_name}; }
 	
@@ -92,7 +97,8 @@ function html_profile_superform($params, $action, $profile = array()) {
 	
   if ($action == 'consult' || $action == 'update') {
 	  $value['name'] = $profile['name'];
-	  $value['rights'] = $profile['modules_right'];
+    $value['modules_right'] = $profile['modules_right'];
+    $value['sections_show'] = $profile['sections_show'];
   }
   
   // end init $value with database parameters
@@ -102,22 +108,13 @@ function html_profile_superform($params, $action, $profile = array()) {
   // begin init $value with passed parameters
   
 	if ($action == 'insert' || $action == 'update') {
-	  if (isset($params['name'])) {
+	  if ($params['action'] == 'insert' || $params['action'] == 'update') {
 	    $value['name'] = $params['name'];
-		    
-		  foreach ($profile['modules_right'] as $module_name => $rights) {
-		  	foreach ($rights as $right_name => $right_value) {
-		  		if ($right_name != 'right') {
-			  		if (isset($params["${module_name}_right_${$right_name}"]))
-			  		  $value['rights'][$module_name][$right_name] = true;
-			  		else
-		          $value['rights'][$module_name][$right_name] = false;
-		      }
-		  	}
-		  }
+	    $value['modules_right'] = $params['modules_right'];
+      $value['sections_show'] = $params['sections_show'];
     }
 	}
-
+  
   // end init $value with passed parameters
   // --------------------------
   
@@ -159,52 +156,75 @@ function html_profile_superform($params, $action, $profile = array()) {
   // begin init $block
   
   $block = '';
+  
+      // --------------------------
+      // begin make $block_default_perm
+  
+  $block_default_perm = '';
+  $block_default_perm .= "
+    <table class=\"default_perm\">
+      <tbody>
+      ";
+  
+  foreach ($cright_list as $right_name) {
+  	$ename = 'default_right_'. $right_name;
+  	$right_value = isset($value['rights']['default']) && $value['rights']['default'][$right_name];
+  	$block_default_perm .= '<tr><td class=\"C\">'. $function_make_checkbox_field($ename, $right_value, '')
+  	  . "</td><td><label for=\"cbx_$ename\">". ${'l_right_'. $right_name}. "</a></td></tr>";
+  }
+  
+  $block_default_perm .= "
+      </tbody>
+    </table>
+  ";
+  
+      // end make $block_default_perm
+      // --------------------------
+      
+      // --------------------------
+      // begin make $block_
+      
+  
+      // end make $block_
+      // --------------------------
+      
   $block = "
   <style>
     label.block {
       display:block;
       border:1px solid #D2D2D2;
     }
+    .default_perm label {
+      text-align:right;
+      border:0px;
+    }
   </style>
   <div class=\"detail infos\">
+    <h1>$l_general_properties</h1>
     <table>
       <tbody>
         <tr><th>$l_name</th><td>$field[name]</td></tr>
       </tbody>
     </table>
+  </div>
+  <div class=\"detail infos\">
+    <h1>$l_default_permissions</h1>
+    $block_default_perm
   </div>";
+  
+  
+  $block .= "<div class=\"result extra\">";
   
   $block_rights_header = '';
   foreach ($cright_list as $right_name) {
     $block_rights_header .= "<td>". ${'l_right_'. $right_name}. "</td>";
   }
   
-  $block .= "<div class=\"result extra\">
-    <h1>Permissions par défaut</h1>
-    <table><thead>
-      <tr>$block_rights_header</tr>
-      </thead>
-      <tbody>
-      <tr class=\"C\">";
-  
-  foreach ($cright_list as $right_name) {
-  	$right_value = isset($value['rights']['default']) && $value['rights']['default'][$right_name];
-  	$block .= '<td>'. $function_make_checkbox_field('default_right_'. $right_name, $right_value, ''). '</td>';
-  }
-  
-  $block .= "</tr>
-      </tbody>
-    </table>
-  </div>";
-  
-  
-  $block .= "<div class=\"result extra\">";
-  
   foreach ($obm_modules as $section_name => $modules) {
-    $block .= "<h1>". $GLOBALS['l_section_'. $section_name]. "</h1>";
-    $block .= "<input type=\"checkbox\" /> Désactiver la section"; //FIXME truc à compléter
+    $block_table = '';
+    //$block_table .= "<input type=\"checkbox\" /> Désactiver la section"; //FIXME truc à compléter
     
-	  $block .= "<table><thead>
+	  $block_table .= "<table><thead>
 	      <tr><td>$l_module_name</td>
           <td>$l_right_default</td>
 	        $block_rights_header
@@ -213,22 +233,32 @@ function html_profile_superform($params, $action, $profile = array()) {
 	  
 	  $i = 0;
   	foreach ($modules as $module_name) {
-      $block .= "<tr". ($i%2 == 1 ? ' class="pair"':''). "><td>". $GLOBALS['l_module_'. $module_name]. "</td>";
+      $block_table .= "<tr". ($i%2 == 1 ? ' class="pair"':''). "><td>". $GLOBALS['l_module_'. $module_name]. "</td>";
       
-      $block .= "<td class=\"C\">". $function_make_checkbox_field($module_name. '_default',
-        !isset($value['rights'][$module_name]), "onclick=\"select_default('$module_name')\""). "</td>";
+      $checked = !isset($value['modules_right']) || $value['modules_right'][$module_name]['default'];
+      $block_table .= "<td class=\"C\">". $function_make_checkbox_field($module_name. '_default',
+        $checked, "onclick=\"select_default('$module_name')\""). "</td>";
       
       foreach ($cright_list as $right_name) {
-      	$checked = isset($value['rights'][$module_name][$right_name]) && $value['rights'][$module_name][$right_name];
-      	$block .= "<td class=\"C\">". $function_make_checkbox_field($module_name. '_right_'. $right_name,
+      	$checked = $value['modules_right'][$module_name][$right_name];
+      	$block_table .= "<td class=\"C\">". $function_make_checkbox_field($module_name. '_right_'. $right_name,
       	  $checked, "onclick=\"select_right('$module_name')\""). "</td>";
       }
       
-      $block .= "</tr>";
+      $block_table .= "</tr>";
       $i += 1;
   	}
   	
-    $block .= "</tbody></table>";
+    $block_table .= "</tbody></table>";
+    
+    $checked = $value['sections_show'][$module_name];
+    $block .= "<div class=\"detail extra\">
+      <h1>". $GLOBALS['l_section_'. $section_name]. "</h1>
+      <table>
+        <tr><th>Désactiver</th><td>". $function_make_checkbox_field($module_name. '_show',
+          $checked, "onclick=\"select_right('$module_name')\""). "</td></tr>
+      </table>
+      $block_table</div>";
   }
   
   $block .= "</div>";
