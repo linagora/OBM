@@ -288,9 +288,9 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Select All waiting Events
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Select All waiting Events
+ **/
 function run_query_calendar_waiting_events() {
   global $obm, $cdg_sql;
 
@@ -301,10 +301,14 @@ function run_query_calendar_waiting_events() {
   $writable_res = of_right_entity_for_user('Resource', $uid, 'write');
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  $calendarevent_endrepeat = sql_date_format($db_type,'calendarevent_endrepeat','calendarevent_endrepeat'); 
+  $calendarevent_date = sql_date_format($db_type,'calendarevent_date','calendarevent_date');    
+
+
   $concat = array (
     array (
       'type' => 'field',
-      'value' => 'userobm_lastname'
+      'value' => 'UserObm.userobm_lastname'
       ),
     array (
       'type' => 'string',
@@ -312,47 +316,76 @@ function run_query_calendar_waiting_events() {
       ),
     array (
       'type' => 'field',
-      'value' => 'userobm_firstname'
+      'value' => 'UserObm.userobm_firstname'
       ) 
     );
   $entity_label = sql_string_concat($db_type,$concat);
-  $query = "SELECT 
+
+  $query = "SELECT
       u.userobm_lastname as usercreate_lastname,
       u.userobm_firstname as usercreate_firstname,
-      entity_label, 
-      entity_id,
-      entity_entity,
-      calendarevent_id,		  
-      calendarevent_title, 
-      calendarevent_location, 
+      $entity_label AS entity_label,
+      UserObm.userobm_id AS entity_id,
+      'user' AS entity_entity,
+      calendarevent_id,
+      calendarevent_title,
+      calendarevent_location,
       calendarcategory1_label,
       calendarevent_privacy,
       calendarevent_priority,
       calendarevent_repeatkind,
       calendarevent_repeatdays,
       calendarevent_duration,
-      calendarevent_endrepeat,
-      calendarevent_date		   
+      $calendarevent_endrepeat,
+      $calendarevent_date
     FROM CalendarEvent
       LEFT JOIN CalendarCategory1 ON calendarevent_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON calendarevent_id  = evententity_event_id
-      LEFT JOIN (
-        SELECT $entity_label AS entity_label, userobm_id AS entity_id, 'user' AS entity_entity FROM UserObm 
-        UNION SELECT resource_name AS entity_label, resource_id AS entity_id, 'resource' AS entity_entity FROM Resource
-      ) AS Entity  ON evententity_entity_id = entity_id AND evententity_entity = entity_entity
+      LEFT JOIN UserObm on evententity_entity='user' AND evententity_entity_id=userobm_id
       LEFT JOIN UserObm u ON calendarevent_owner = u.userobm_id
-    WHERE 
+    WHERE
       evententity_state = 'W'
       AND ( 1=0
-      $multidomain";
-
+      $multidomain
+      ";
   if (is_array($writable_cal) && (count($writable_cal['ids'])>0)) {
-    $query .= "OR ( entity_id IN ('".implode(",",$writable_cal['ids'])."') AND entity_entity = 'user')";    
+    $query .= "OR ( evententity_entity_id IN ('".implode("','",$writable_cal['ids'])."') AND evententity_entity = 'user')";    
   }
+  $query .= " OR (evententity_entity_id = '$uid' AND evententity_entity = 'user'))";
+
   if (is_array($writable_res) && (count($writable_res['ids'])>0)) {
-    $query .= "OR ( entity_id IN ('".implode(",",$writable_res['ids'])."') AND entity_entity = 'resource')";
+    $query .= "
+    UNION
+    SELECT
+      u.userobm_lastname as usercreate_lastname,
+      u.userobm_firstname as usercreate_firstname,
+      resource_name AS entity_label,
+      resource_id AS entity_id,
+      'resource' AS entity_entity,
+      calendarevent_id,
+      calendarevent_title,
+      calendarevent_location,
+      calendarcategory1_label,
+      calendarevent_privacy,
+      calendarevent_priority,
+      calendarevent_repeatkind,
+      calendarevent_repeatdays,
+      calendarevent_duration,
+      $calendarevent_endrepeat,
+      $calendarevent_date
+    FROM CalendarEvent
+      LEFT JOIN CalendarCategory1 ON calendarevent_category1_id = calendarcategory1_id
+      LEFT JOIN EventEntity ON calendarevent_id  = evententity_event_id
+      LEFT JOIN Resource on evententity_entity='resource' AND evententity_entity_id=resource_id
+      LEFT JOIN UserObm u ON calendarevent_owner = u.userobm_id
+    WHERE
+      evententity_state = 'W'
+      AND ( 1=0
+      $multidomain
+      ";
+    $query .= "OR ( evententity_entity_id IN ('".implode("','",$writable_res['ids'])."') AND evententity_entity = 'resource'))";
   }
-  $query .= " OR (entity_id = $uid AND entity_entity = 'user')) ORDER BY entity_entity, entity_label, calendarevent_date"; 
+  $query .= " ORDER BY entity_entity, entity_label, calendarevent_date"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_waiting_events()');
   $obm_q->query($query);
 
