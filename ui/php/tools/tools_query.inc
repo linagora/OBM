@@ -138,7 +138,7 @@ function check_tools_update_context_ok($params) {
   }
 
   // An update must not already running
-  $ps = shell_exec("$cmd_check_update");
+  $ps = shell_exec($cmd_check_update);
 
   if ($ps) {
     $err['msg'] = $l_upd_already_running;

@@ -30,7 +30,6 @@ include("$obminclude/global.inc");
 $params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
-require_once('Zend/Date.php');
 require_once("$obminclude/of/of_date.php");
 $params = get_calendar_params();
 
