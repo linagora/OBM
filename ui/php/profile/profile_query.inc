@@ -601,13 +601,34 @@ function get_obm_modules () {
 }
 
 /**
- * Get profile properties list
+ * Get a profile properties
  *
+ * @param $profile_id : profile_id
  * @return DB_OBM
  */
-function run_query_profileproperty_list () {
+function run_query_profileproperty_list ($profile_id = NULL) {
   global $cdg_sql;
   
+  if (!is_null($profile_id)) {
+    $val = 'profilepropertyvalue_property_value,';
+    $join = " LEFT JOIN ProfilePropertyValue
+    	ON profileproperty_id = profilepropertyvalue_property_id
+    	AND profilepropertyvalue_profile_id = '$profile_id'";
+  }
+  $query = "SELECT
+  $val
+  profileproperty_name,
+  profileproperty_type,
+  profileproperty_default,
+  profileproperty_readonly
+  FROM ProfileProperty $join";
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_profile_properties()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  return $obm_q;
+  /*
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   
@@ -620,16 +641,18 @@ function run_query_profileproperty_list () {
   
   $query = "SELECT 
         profileproperty_id,
-        profileproperty_property_name,
+        profileproperty_name,"+/*
         profileproperty_timeupdate,
-        profileproperty_timecreate,
-        
-        c.userobm_login as usercreate,
+        profileproperty_timecreate,*/
+        /*
+        "c.userobm_login as usercreate,
         u.userobm_login as userupdate
       FROM ProfileProperty
         LEFT JOIN UserObm as c ON profileproperty_usercreate=c.userobm_id
         LEFT JOIN UserObm as u ON profileproperty_userupdate=u.userobm_id
-      WHERE 1=1
+        LEFT JOIN ProfilePropertyValue as pp ON profileproperty_id=pp.profilepropertyvalue_property_id
+        LEFT JOIN Profile as p on pp.profilepropertyvalue_profile_id=p.profile_id
+      WHERE p.profile_id=$profile_id
         $where
         $multidomain";
   
@@ -637,17 +660,19 @@ function run_query_profileproperty_list () {
   $obm_q->query($query);
 
   return $obm_q;
+  */
 }
 
 /**
  * Get profiles property data array
  *
+ * @param integer profile id
  * @return array
  */
-function get_profileproperty_list () {
-	$res = array();
+function get_profileproperty_list ($profile_id) {
+  $res = array();
 	
-  $obm_q = run_query_profileproperty_list();
+  $obm_q = run_query_profileproperty_list($profile_id);
   
   while ($obm_q->next_record()) {
   	$res[]['property_name'] = $obm_q->f('profileproperty_name');

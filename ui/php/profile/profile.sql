@@ -56,6 +56,9 @@ CREATE TABLE ProfileSection (
 DROP TABLE IF EXISTS ProfileProperty;
 CREATE TABLE ProfileProperty (
   profileproperty_id int(8) NOT NULL auto_increment,
+  profileproperty_type varchar(32) default NULL,
+  profileproperty_default varchar(64) default NULL,
+  profileproperty_readonly int(1) default '0',
   profileproperty_domain_id int(8) NOT NULL,
   profileproperty_name varchar(32) NOT NULL default '',
   PRIMARY KEY (profileproperty_id)

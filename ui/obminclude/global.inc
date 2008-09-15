@@ -209,6 +209,14 @@ $perm_editor = '05';
 $perm_admin = '1D';
 
 //------------------------------//
+// Default profiles properties  //
+//------------------------------//
+$profile_level	= 3;
+$profile_level_managepeers = 0;
+$profile_access_restriction = 'ALLOW_ALL';
+$profile_access_exeptions = array();
+
+//------------------------------//
 // Default Profiles definitions //
 //------------------------------//
 $profiles['user'] = array (

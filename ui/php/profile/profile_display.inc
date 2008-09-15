@@ -312,4 +312,81 @@ function dis_profile_display_pref($prefs) {
   return $block;
 }
 
+/**
+ * Display profile properties options
+ * 
+ * @param params
+ * @param array of properties
+ * @return String
+ */
+function html_properties_consult($params, $properties) {
+  $block = '';
+	
+  $block .= "<div class=\"detail infos\">
+  	<h1>Propriétés</h1>
+  	<table><tbody>";
+  foreach ($properties as $name => $value) {
+    if ($name == 'access_exeptions') {
+      $block .= "<tr><th>Exceptions</th><td>TODO</td></tr>";
+      foreach ($properties[$name] as $exception_name => $exception_value) {
+        $block .= "<tr>
+          <th>$exception_name</th><td>$exception_value</td>
+          </tr>";
+      }
+    } else {
+      $block .= "<tr>
+        <th>$name</th><td>$value</td>
+        </tr>";
+    }
+  }
+  $block .= "</tbody></table><p class=\"LC\"></p></div>";
+  
+  return $block;
+}
+
+/**
+ * Produce a profile properties form
+ * 
+ * @param $action
+ * @param $params
+ * @param $properties
+ */
+function html_properties_form($action, $params, $properties) {
+  $block = '';
+  
+  $block .= "<div class=\"detail infos\"\">
+    <h1>Propriétés</h1>
+    <table>
+	<thead><tbody>";
+  foreach ($properties as $name => $value) {
+    if ($name == 'access_exeptions') {
+      $block .= "<tr><th>Exceptions</th><td>TODO</td></tr>";
+      foreach ($properties[$name] as $exception_name => $exception_value) {
+        $block .= "<tr>
+          <th>$exception_name</th><td><input type=\"text\" length=\"32\" maxlength=\"32\" value=\"$exception_value\" /></td>
+          </tr>";
+      }
+    } else {
+      $block .= "<tr>
+        <th>$name</th><td><input type=\"text\" length=\"32\" maxlength=\"32\" value=\"$value\" /></td>
+        </tr>";
+    }
+  }
+  $block .= "</tbody></table><p class=\"LC\"></p></div>";
+  
+  $form_block = "";
+  
+  $form_block .= "<form action=\"\" method=\"post\">";
+	  $form_block .= $block;
+    $form_block .= "<input type=\"hidden\" name=\"action\" value=\"$action\"/>";
+    $form_block .= "<input type=\"hidden\" name=\"profile_id\" value=\"$params[profile_id]\"/>";
+    $form_block .= "<div class=\"buttons\">";
+    $form_block .= "<input type=\"submit\" />"; // FIXME label bouton
+    $form_block .= "</div>";
+	  $form_block .= "</form>";
+  
+    $block = $form_block;
+    
+    return $block;
+}
 ?>

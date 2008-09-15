@@ -128,12 +128,36 @@ if ($action == 'index' || $action == '') {
 
 } else if ($action == 'properties_consult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $properties = get_properties_data($params['profile_id']);
+  $properties = get_profileproperty_list($params['profile_id']);
+  
+  //DEBUG -----------------------------------
+  /*foreach ($properties as $index => $value) {
+    echo "\$properties[$index] = $value";
+  }*/
+  //------------------------------------------
+  if ($properties.length == 0) {
+    // get default properties
+    global $profile_level, $profile_level_managepeers, $profile_access_restriction, $profile_access_exeptions;
+    $properties = array (
+      'level'              => $profile_level,
+      'level_managepeers'  => $profile_level_managepeers,
+      'access_restriction' => $profile_access_restriction,
+      'access_exeptions'   => $profile_access_exeptions);
+  }
   $display['detail'] = html_properties_consult($params, $properties);
   
 } else if ($action == 'properties_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  $properties = get_properties_data($params['profile_id']);
+  $properties = get_profileproperty_list($params['profile_id']);
+if ($properties.length == 0) {
+    // get default properties
+    global $profile_level, $profile_level_managepeers, $profile_access_restriction, $profile_access_exeptions;
+    $properties = array (
+      'level'              => $profile_level,
+      'level_managepeers'  => $profile_level_managepeers,
+      'access_restriction' => $profile_access_restriction,
+      'access_exeptions'   => $profile_access_exeptions);
+  }
   $display['detail'] = html_properties_form($action, $params, $properties);
   
 } elseif ($action == 'check_delete') {
