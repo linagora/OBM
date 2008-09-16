@@ -242,17 +242,34 @@ function check_profile_data_form($params) {
 	global $l_profile_name_empty;
 	global $l_profile_name_error;
 	
+	$return = true;
+	
+	// Check profile name
 	if (strlen($params['name']) == 0) {
 		$err['msg'] = $l_profile_name_empty;
     	$err['field'] = 'name';
-    	return false;
+    	$return = false;
 	} else if (!preg_match($php_regexp_profile_name, $params['name'])) {
 		$err['msg'] = $l_profile_name_error;
     	$err['field'] = 'name';
-		return false;
-	} else {	
-		return true;
+		$return = false;
 	}
+	
+	// check value properties
+	foreach($params['profile_properties'] as $property_name => $property_value ) {
+	  if ($property_value['readonly'] != 1) {
+    	  global ${'l_'.$property_name.'_empty'};
+    	  if (strlen($params[$property_name]) == 0) {
+    	    echo "erreur";
+    	    $err['msg'] = ${'l_'.$property_name.'_empty'};
+    	    $err['field'] = $property_name;
+    	    $return = false;
+    	  }
+	  }
+	  // TODO other validations
+	}
+	
+	return $return;
 }
 
 /**
@@ -601,6 +618,30 @@ function get_obm_modules () {
 }
 
 /**
+ * Get profile properties name and default values
+ * 
+ * @return DB_OBM
+ */
+function get_profile_properties() {
+  global $cdg_sql;
+  
+  $join = " LEFT JOIN ProfilePropertyValue
+    ON profileproperty_id = profilepropertyvalue_property_id";
+
+  $query = "SELECT
+    profileproperty_name,
+    profileproperty_default,
+    profileproperty_readonly
+  FROM ProfileProperty $join";
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_profile_properties()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  return $obm_q;
+}
+
+/**
  * Get a profile properties
  *
  * @param $profile_id : profile_id
@@ -661,24 +702,6 @@ function run_query_profileproperty_list ($profile_id = NULL) {
 
   return $obm_q;
   */
-}
-
-/**
- * Get profiles property data array
- *
- * @param integer profile id
- * @return array
- */
-function get_profileproperty_list ($profile_id) {
-  $res = array();
-	
-  $obm_q = run_query_profileproperty_list($profile_id);
-  
-  while ($obm_q->next_record()) {
-  	$res[]['property_name'] = $obm_q->f('profileproperty_name');
-  }
-  
-  return $res;
 }
 
 ?>

@@ -128,37 +128,13 @@ if ($action == 'index' || $action == '') {
 
 } else if ($action == 'properties_consult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $properties = get_profileproperty_list($params['profile_id']);
-  
-  //DEBUG -----------------------------------
-  /*foreach ($properties as $index => $value) {
-    echo "\$properties[$index] = $value";
-  }*/
-  //------------------------------------------
-  if ($properties.length == 0) {
-    // get default properties
-    global $profile_level, $profile_level_managepeers, $profile_access_restriction, $profile_access_exeptions;
-    $properties = array (
-      'level'              => $profile_level,
-      'level_managepeers'  => $profile_level_managepeers,
-      'access_restriction' => $profile_access_restriction,
-      'access_exeptions'   => $profile_access_exeptions);
-  }
-  $display['detail'] = html_properties_consult($params, $properties);
+  $properties_q = run_query_profileproperty_list($params['profile_id']);
+  $display['detail'] = html_properties_consult($params, $properties_q);
   
 } else if ($action == 'properties_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  $properties = get_profileproperty_list($params['profile_id']);
-if ($properties.length == 0) {
-    // get default properties
-    global $profile_level, $profile_level_managepeers, $profile_access_restriction, $profile_access_exeptions;
-    $properties = array (
-      'level'              => $profile_level,
-      'level_managepeers'  => $profile_level_managepeers,
-      'access_restriction' => $profile_access_restriction,
-      'access_exeptions'   => $profile_access_exeptions);
-  }
-  $display['detail'] = html_properties_form($action, $params, $properties);
+  $properties_q = run_query_profileproperty_list($params['profile_id']);
+  $display['detail'] = html_properties_form($action, $params, $properties_q);
   
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -267,6 +243,21 @@ function get_profile_params() {
 		      $params['modules_right'][$module_name]['right'] += ${'cright_'. $right_name};
 		    }
 		  }
+	  }
+	}
+	
+	// Get profile properties params
+	if (function_exists('get_profile_properties')) {
+	  $profile_properties_q = get_profile_properties();
+	  $params['profile_properties'] = array();
+	  
+	  while ($profile_properties_q->next_record()) {
+	    $property_name = $profile_properties_q->f('profileproperty_name');
+	    $default_value = $profile_properties_q->f('profileproperty_default');
+	    $readonly = $profile_properties_q->f('profileproperty_readonly');
+	    
+	    $params['profile_properties'][$property_name]['default'] = $default_value;
+	    $params['profile_properties'][$property_name]['readonly'] = $readonly;
 	  }
 	}
 

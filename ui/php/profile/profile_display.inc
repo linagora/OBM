@@ -82,7 +82,7 @@ function html_profile_superform($params, $action, $profile = array()) {
 	global $cright_list;
 	
 	// labels
-  global $l_right_default, $l_name, $l_module_name;
+  global $l_right_default, $l_name, $l_module_name, $l_properties;
   
   // titles
   global $l_default_permissions, $l_general_properties;
@@ -149,7 +149,7 @@ function html_profile_superform($params, $action, $profile = array()) {
       // --------------------------
   
   // end prepare fields
-	// --------------------------
+  // --------------------------
   
 	
   // --------------------------
@@ -157,8 +157,8 @@ function html_profile_superform($params, $action, $profile = array()) {
   
   $block = '';
   
-      // --------------------------
-      // begin make $block_default_perm
+  // --------------------------
+  // begin make $block_default_perm
   
   $block_default_perm = '';
   $block_default_perm .= "
@@ -178,16 +178,39 @@ function html_profile_superform($params, $action, $profile = array()) {
     </table>
   ";
   
-      // end make $block_default_perm
-      // --------------------------
+  // end make $block_default_perm
+  // --------------------------
       
-      // --------------------------
-      // begin make $block_
-      
+  // --------------------------
+  // begin make $properties_block
   
-      // end make $block_
-      // --------------------------
+  $properties_block = "<table>";
+  
+  foreach ($params['profile_properties'] as $property_name => $property_value ) {
+    if ($property_value['readonly'] != 1) {
+      global ${'l_'.$property_name};
       
+      if ($action == 'insert') {
+        $property_val = $property_value['default'];
+      } else if ($action == 'update') {
+        $property_val = $params[$property_name];
+      }
+      
+      $field[$property_name] = "<input type=\"text\" name=\"tf_$property_name\" value=\"$property_val\" />";
+      
+      if ($action != 'consult') {
+        $properties_block .= "<tr><th>".${'l_'.$property_name}."</th><td>$field[$property_name]</td></tr>";
+      } else {
+        $properties_block .= "<tr><th>".${'l_'.$property_name}."</th><td>$property_val</td></tr>";
+      }
+    }
+  }
+  
+  $properties_block .= "</table>";
+  
+  // End $properties_block
+  // --------------------------
+  
   $block = "
   <style>
     table.perms label {
@@ -206,6 +229,10 @@ function html_profile_superform($params, $action, $profile = array()) {
         <tr><th>$l_name</th><td>$field[name]</td></tr>
       </tbody>
     </table>
+  </div>
+  <div class=\"detail infos\">
+    <h1>$l_properties</h1>
+    $properties_block
   </div>
   <div class=\"detail infos\">
     <h1>$l_default_permissions</h1>
@@ -319,29 +346,39 @@ function dis_profile_display_pref($prefs) {
  * @param array of properties
  * @return String
  */
-function html_properties_consult($params, $properties) {
-  $block = '';
-	
-  $block .= "<div class=\"detail infos\">
-  	<h1>Propriétés</h1>
-  	<table><tbody>";
-  foreach ($properties as $name => $value) {
-    if ($name == 'access_exeptions') {
-      $block .= "<tr><th>Exceptions</th><td>TODO</td></tr>";
-      foreach ($properties[$name] as $exception_name => $exception_value) {
-        $block .= "<tr>
-          <th>$exception_name</th><td>$exception_value</td>
-          </tr>";
+function html_properties_consult($params, $properties_q) {
+global $l_properties;
+  
+  while($properties_q->next_record()) {
+    $readonly = $properties_q->f('profileproperty_readonly');
+    if ($readonly != '1') {
+      $name = $properties_q->f('profileproperty_name');
+      $value = $properties_q->f('profilepropertyvalue_property_value');
+      $default = $properties_q->f('profileproperty_default');
+      echo "name : $name, value : $value, default_value : $default";
+      if (empty($value)) {
+        $value = $default;
       }
-    } else {
-      $block .= "<tr>
-        <th>$name</th><td>$value</td>
-        </tr>";
+      $plabel = $GLOBALS["l_$name"];
+      
+      $properties_block .= "
+      	<tr>
+      	<th>$plabel</th>
+      	<td>$value</td>
+      	</tr>";
     }
   }
-  $block .= "</tbody></table><p class=\"LC\"></p></div>";
+  if ($properties_block != '') {
+    $properties_block = "
+    	<fieldset class=\"detail infos\">
+    	<legend>$l_properties</legend>
+    	<table>
+    	$properties_block
+    	</table>
+    	</fieldset>";
+  }
   
-  return $block;
+  return $properties_block;
 }
 
 /**
@@ -351,33 +388,42 @@ function html_properties_consult($params, $properties) {
  * @param $params
  * @param $properties
  */
-function html_properties_form($action, $params, $properties) {
-  $block = '';
+function html_properties_form($action, $params, $properties_q) {
+  global $l_properties;
   
-  $block .= "<div class=\"detail infos\"\">
-    <h1>Propriétés</h1>
-    <table>
-	<thead><tbody>";
-  foreach ($properties as $name => $value) {
-    if ($name == 'access_exeptions') {
-      $block .= "<tr><th>Exceptions</th><td>TODO</td></tr>";
-      foreach ($properties[$name] as $exception_name => $exception_value) {
-        $block .= "<tr>
-          <th>$exception_name</th><td><input type=\"text\" length=\"32\" maxlength=\"32\" value=\"$exception_value\" /></td>
-          </tr>";
+  while($properties_q->next_record()) {
+    $readonly = $properties_q->f('profileproperty_readonly');
+    if ($readonly != '1') {
+      $name = $properties_q->f('profileproperty_name');
+      $value = $properties_q->f('profilepropertyvalue_property_value');
+      $default = $properties_q->f('profileproperty_default');
+      echo "name : $name, value : $value, default_value : $default";
+      if (empty($value)) {
+        $value = $default;
       }
-    } else {
-      $block .= "<tr>
-        <th>$name</th><td><input type=\"text\" length=\"32\" maxlength=\"32\" value=\"$value\" /></td>
-        </tr>";
+      $plabel = $GLOBALS["l_$name"];
+      
+      $properties_block .= "
+      	<tr>
+      	<th>$plabel</th>
+      	<td><input type=\"text\" name=\"$name\" value=\"$value\" /></td>
+      	</tr>";
     }
   }
-  $block .= "</tbody></table><p class=\"LC\"></p></div>";
+  if ($properties_block != '') {
+    $properties_block = "
+    	<fieldset class=\"detail infos\">
+    	<legend>$l_properties</legend>
+    	<table>
+    	$properties_block
+    	</table>
+    	</fieldset>";
+  }
   
   $form_block = "";
   
   $form_block .= "<form action=\"\" method=\"post\">";
-	  $form_block .= $block;
+	  $form_block .= $properties_block;
     $form_block .= "<input type=\"hidden\" name=\"action\" value=\"$action\"/>";
     $form_block .= "<input type=\"hidden\" name=\"profile_id\" value=\"$params[profile_id]\"/>";
     $form_block .= "<div class=\"buttons\">";
