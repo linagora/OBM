@@ -355,7 +355,7 @@ function run_query_profile_replace_properties($profile_id,$params) {
   global $cdg_sql;
   $p_id = sql_parse_id($profile_id, true);
   $query = "DELETE FROM ProfilePropertyValue WHERE profilepropertyvalue_profile_id $p_id ";
-  display_debug_msg($query, $cdg_sql, 'run_query_profile_replace_properties()');
+  display_debug_msg($query, $cdg_sql, 'run_query_profile_replace_properties(DELETE)');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -382,6 +382,7 @@ function run_query_profile_replace_properties($profile_id,$params) {
             '$value'
           )";
         $obm_q->query($query);
+        display_debug_msg($query, $cdg_sql, 'run_query_profile_replace_properties(INSERT)');
       }
     }
   }
