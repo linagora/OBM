@@ -59,7 +59,6 @@ CREATE TABLE ProfileProperty (
   profileproperty_type varchar(32) default NULL,
   profileproperty_default varchar(64) default NULL,
   profileproperty_readonly int(1) default '0',
-  profileproperty_domain_id int(8) NOT NULL,
   profileproperty_name varchar(32) NOT NULL default '',
   PRIMARY KEY (profileproperty_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -71,7 +70,6 @@ CREATE TABLE ProfileProperty (
 DROP TABLE IF EXISTS ProfilePropertyValue;
 CREATE TABLE ProfilePropertyValue (
   profilepropertyvalue_id int(8) NOT NULL auto_increment,
-  profilepropertyvalue_domain_id int(8) NOT NULL,
   profilepropertyvalue_profile_id int(8) default NULL,
   profilepropertyvalue_property_id int(8) default NULL,
   profilepropertyvalue_property_value varchar(32) NOT NULL default '',

@@ -201,7 +201,7 @@ function html_profile_superform($params, $action, $profile = array()) {
       if ($action != 'consult') {
         $properties_block .= "<tr><th>".${'l_'.$property_name}."</th><td>$field[$property_name]</td></tr>";
       } else {
-        $properties_block .= "<tr><th>".${'l_'.$property_name}."</th><td>$property_val</td></tr>";
+        $properties_block .= "<tr><th>".${'l_'.$property_name}."</th><td>".$profile['properties'][$property_name]['value']."</td></tr>";
       }
     }
   }
