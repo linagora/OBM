@@ -57,15 +57,13 @@ function html_profile_list ($profile_q) {
  * @return string xHTML
  */
 function html_profile_consult($params, $profile) {
-	return html_profile_superform($params, 'consult', $profile);
+  return html_profile_superform($params, 'consult', $profile);
 }
 
 function html_profile_form($action, $params, $profile = array()) {
-	if ($action == 'new')
-	  $action = 'insert';
+  if ($action == 'new') { $action = 'insert'; }
 	  
-  if ($action == 'detailupdate')
-    $action = 'update';
+  if ($action == 'detailupdate') { $action = 'update'; }
 	
   return html_profile_superform($params, $action, $profile);
 }
@@ -79,9 +77,12 @@ function html_profile_form($action, $params, $profile = array()) {
  * @return string xHTML
  */
 function html_profile_superform($params, $action, $profile = array()) {
-	global $cright_list;
+  
+  /////////// Init /////////////////////////////////////////////// BEGIN
+  
+  global $cright_list;
 	
-	// labels
+  // labels
   global $l_right_default, $l_name, $l_module_name, $l_properties;
   
   // titles
@@ -90,47 +91,53 @@ function html_profile_superform($params, $action, $profile = array()) {
   // table column names
   foreach ($cright_list as $right_name) { global ${'l_right_'. $right_name}; }
 	
-	$obm_modules = get_obm_modules();
+  $obm_modules = get_obm_modules();
 	
-  // --------------------------
-  // begin init $value with database parameters
-	
+  // init $value with database parameters
   if ($action == 'consult' || $action == 'update') {
-	  $value['name'] = $profile['name'];
+	$value['name']          = $profile['name'];
     $value['modules_right'] = $profile['modules_right'];
     $value['sections_show'] = $profile['sections_show'];
+    $value['properties']    = $profile['properties'];
   }
   
-  // end init $value with database parameters
-  // --------------------------
-	
-  // --------------------------
-  // begin init $value with passed parameters
+  // init $value with passed parameters  
+  if ( ($action == 'insert' || $action == 'update') &&
+       ($params['action'] == 'insert' || $params['action'] == 'update')
+     ) {
+	$value['name']          = $params['name'];
+	$value['modules_right'] = $params['modules_right'];
+    $value['sections_show'] = $params['sections_show'];
+    $value['properties']    = $params['properties'];
+  } else if ($action == 'insert') {
+    $value['properties']    = $params['properties'];
+  }
+  /////////// Init /////////////////////////////////////////////// END
+
+  /////////// Prepare fields ///////////////////////////////////// BEGIN
   
-	if ($action == 'insert' || $action == 'update') {
-	  if ($params['action'] == 'insert' || $params['action'] == 'update') {
-	    $value['name'] = $params['name'];
-	    $value['modules_right'] = $params['modules_right'];
-      $value['sections_show'] = $params['sections_show'];
-    }
-	}
-  
-  // end init $value with passed parameters
-  // --------------------------
-  
-  // --------------------------
-  // begin prepare fields
-  
-	
   if ($action == 'insert' || $action == 'update') {
+    
+    // Profile name
     $field['name'] = "<input type=\"text\" name=\"tf_name\" maxlength=\"64\" size=\"32\" value=\"$value[name]\" />";
+    
+    // Profile properties
+    foreach ($value['properties'] as $pp_name => $pp_value) {
+      $field[$pp_name] = "<input type=\"text\" name=\"tf_$pp_name\" value=\"$pp_value[value]\" />";
+    }
+    
   } else if ($action == 'consult') {
+    
+    // Profile name
     $field['name'] = $value['name'];
+    
+    // Profile properties
+    foreach ($value['properties'] as $pp_name => $pp_value) {
+      $field[$pp_name] = $pp_value['value'];
+    }
   }
-	
-     // --------------------------
-     // begin make $function_make_checkbox_field
-     
+  
+  // make $function_make_checkbox_field
   $checked_condition = 'if ($checked)';
   $parameters_make_checkbox_field = '$name, $checked, $ext';
   
@@ -144,74 +151,12 @@ function html_profile_superform($params, $action, $profile = array()) {
       return "<label for=\"cbx_$name\">
       <input type=\"checkbox\" name=\"cba_$name\" id=\"cbx_$name\" $checked $ext/></label>";');
   }
+  /////////// Prepare fields ///////////////////////////////////// END
   
-      // end make $function_make_checkbox_field 
-      // --------------------------
+  /////////// Make HTML blocks /////////////////////////////////// BEGIN
   
-  // end prepare fields
-  // --------------------------
-  
-	
-  // --------------------------
-  // begin init $block
-  
-  $block = '';
-  
-  // --------------------------
-  // begin make $block_default_perm
-  
-  $block_default_perm = '';
-  $block_default_perm .= "
-    <table class=\"default_perm\">
-      <tbody>
-      ";
-  
-  foreach ($cright_list as $right_name) {
-  	$ename = 'default_right_'. $right_name;
-  	$right_value = $value['modules_right']['default'][$right_name];
-  	$block_default_perm .= '<tr><td class=\"C\">'. $function_make_checkbox_field($ename, $right_value, '')
-  	  . "</td><td><label for=\"cbx_$ename\">". ${'l_right_'. $right_name}. "</a></td></tr>";
-  }
-  
-  $block_default_perm .= "
-      </tbody>
-    </table>
-  ";
-  
-  // end make $block_default_perm
-  // --------------------------
-      
-  // --------------------------
-  // begin make $properties_block
-  
-  $properties_block = "<table>";
-  
-  foreach ($params['profile_properties'] as $property_name => $property_value ) {
-    if ($property_value['readonly'] != 1) {
-      global ${'l_'.$property_name};
-      
-      if ($action == 'insert') {
-        $property_val = $property_value['default'];
-      } else if ($action == 'update') {
-        $property_val = $params[$property_name];
-      }
-      
-      $field[$property_name] = "<input type=\"text\" name=\"tf_$property_name\" value=\"$property_val\" />";
-      
-      if ($action != 'consult') {
-        $properties_block .= "<tr><th>".${'l_'.$property_name}."</th><td>$field[$property_name]</td></tr>";
-      } else {
-        $properties_block .= "<tr><th>".${'l_'.$property_name}."</th><td>".$profile['properties'][$property_name]['value']."</td></tr>";
-      }
-    }
-  }
-  
-  $properties_block .= "</table>";
-  
-  // End $properties_block
-  // --------------------------
-  
-  $block = "
+  // Custom CSS styles
+  $block_style = "
   <style>
     table.perms label {
       display:block;
@@ -221,7 +166,10 @@ function html_profile_superform($params, $action, $profile = array()) {
       text-align:right;
       border:0px;
     }
-  </style>
+  </style>";
+  
+  // Profile name
+  $block_name = "
   <div class=\"detail infos\">
     <h1>$l_general_properties</h1>
     <table>
@@ -229,18 +177,42 @@ function html_profile_superform($params, $action, $profile = array()) {
         <tr><th>$l_name</th><td>$field[name]</td></tr>
       </tbody>
     </table>
-  </div>
-  <div class=\"detail infos\">
-    <h1>$l_properties</h1>
-    $properties_block
-  </div>
-  <div class=\"detail infos\">
-    <h1>$l_default_permissions</h1>
-    $block_default_perm
   </div>";
   
+  // Profile properties
+  $block_properties = "
+  <div class=\"detail infos\">
+    <h1>$l_properties</h1>
+    <table>
+      <tbody>";
+      foreach ($value['properties'] as $pp_name => $pp_value) {
+        global ${'l_'.$pp_name};
+        $block_properties .= "<tr><th>".${'l_'.$pp_name}."</th><td>".$field[$pp_name]."</td></tr>";
+      }
+  $block_properties .= "
+  	  </tbody>
+  	</table>
+  </div>";
   
-  $block .= "<div class=\"result extra\">";
+  // Profile default permissions
+  $block_defaultPerm = "
+  <div class=\"detail infos\">
+    <h1>$l_default_permissions</h1>
+    <table class=\"default_perm\">
+      <tbody>";
+      foreach ($cright_list as $right_name) {
+  	    $ename = 'default_right_'. $right_name;
+  	    $right_value = $value['modules_right']['default'][$right_name];
+  	    $block_defaultPerm .= '<tr><td class=\"C\">'. $function_make_checkbox_field($ename, $right_value, '')
+  	      . "</td><td><label for=\"cbx_$ename\">". ${'l_right_'. $right_name}. "</a></td></tr>";
+      }
+  $block_defaultPerm .= "
+      </tbody>
+    </table>
+  </div>";
+  
+  // Profile section/modules
+  $block_sectionsModules .= "<div class=\"result extra\">";
   
   $block_rights_header = '';
   foreach ($cright_list as $right_name) {
@@ -279,7 +251,7 @@ function html_profile_superform($params, $action, $profile = array()) {
     $block_table .= "</tbody></table>";
     
     $checked = $value['sections_show'][$section_name];
-    $block .= "<div class=\"detail extra\"\">
+    $block_sectionsModules .= "<div class=\"detail extra\"\">
       <h1>". $GLOBALS['l_section_'. $section_name]. "</h1>
       <table>
         <tbody>
@@ -289,33 +261,30 @@ function html_profile_superform($params, $action, $profile = array()) {
       $block_table</div>";
   }
   
-  $block .= "</div>";
+  $block_sectionsModules .= "</div>";
   
-  // end init $block
-  // --------------------------
+  // Concatenate blocks
+  $block =  $block_style
+           .$block_name
+           .$block_properties
+           .$block_defaultPerm
+           .$block_sectionsModules;
   
-  
-  // --------------------------
-  // begin make form
-  
+  // Build profile form
   if ($action != 'consult') {
-	  $form_block = '';
-	  
-	  $form_block .= "<form action=\"\" method=\"post\" onsubmit=\"if (check_profile(this)) return true; else return false;\">";
-	  $form_block .= $block;
+    $form_block = '';  
+	$form_block .= "<form action=\"\" method=\"post\" onsubmit=\"if (check_profile(this)) return true; else return false;\">";
+	$form_block .= $block;
     $form_block .= "<input type=\"hidden\" name=\"action\" value=\"$action\"/>";
     $form_block .= "<input type=\"hidden\" name=\"profile_id\" value=\"$params[profile_id]\"/>";
     $form_block .= "<div class=\"buttons\">";
     $form_block .= "<input type=\"submit\" />"; // FIXME label bouton
     $form_block .= "</div>";
-	  $form_block .= "</form>";
+	$form_block .= "</form>";
   
     $block = $form_block;
   }
-  
-  // end make form
-  // --------------------------
-  
+  /////////// Make HTML blocks /////////////////////////////////// END
   return $block;
 }
 

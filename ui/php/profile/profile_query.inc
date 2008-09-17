@@ -204,7 +204,9 @@ function get_profile_full_data ($profile_id) {
   $properties_q = run_query_profileproperty_list($profile_id);
   
   while ($properties_q->next_record()) {
-    $res['properties'][$properties_q->f('profileproperty_name')]['value'] = $properties_q->f('profilepropertyvalue_property_value');
+    if ($properties_q->f('profileproperty_readonly') != 1) {
+      $res['properties'][$properties_q->f('profileproperty_name')]['value'] = $properties_q->f('profilepropertyvalue_property_value');
+    }
   }
   
   return $res;
@@ -264,17 +266,25 @@ function check_profile_data_form($params) {
 	}
 	
 	// check value properties
-	foreach($params['profile_properties'] as $property_name => $property_value ) {
+	foreach($params['properties'] as $property_name => $property_value ) {
+	  
 	  if ($property_value['readonly'] != 1) {
     	  global ${'l_'.$property_name.'_empty'};
+    	  global ${'php_regexp_profile_'.$property_name};
+    	  
     	  if (strlen($params[$property_name]) == 0) {
-    	    echo "erreur";
     	    $err['msg'] = ${'l_'.$property_name.'_empty'};
+    	    $err['field'] = $property_name;
+    	    $return = false;
+    	    
+    	  } else if (!preg_match(${'php_regexp_profile_'.$property_name}, $params[$property_name])) {
+    	    global ${'l_profile_'.$property_name.'_error'};
+    	    
+    	    $err['msg'] = ${'l_profile_'.$property_name.'_error'};
     	    $err['field'] = $property_name;
     	    $return = false;
     	  }
 	  }
-	  // TODO other validations
 	}
 	
 	return $return;
@@ -518,6 +528,14 @@ function run_query_profile_update ($params, $initial_profile) {
   }
   
   // end update profile sections
+  // --------------------------
+  
+  // --------------------------
+  // begin update profile properties
+  
+  run_query_profile_replace_properties($query_value['profile_id'],$params);
+  
+  // end update profile properties
   // --------------------------
   
   return true;

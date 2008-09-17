@@ -247,17 +247,27 @@ function get_profile_params() {
 	}
 	
 	// Get profile properties params
-	if (function_exists('get_profile_properties')) {
-	  $profile_properties_q = get_profile_properties();
-	  $params['profile_properties'] = array();
+	if (function_exists('run_query_profileproperty_list')) {
+	  
+	  $profile_id = NULL;
+	  if (isset($params['profile_id'])) { $profile_id = $params['profile_id']; }
+	  
+	  $profile_properties_q = run_query_profileproperty_list($profile_id);
+	  $params['properties'] = array();
 	  
 	  while ($profile_properties_q->next_record()) {
-	    $property_name = $profile_properties_q->f('profileproperty_name');
-	    $default_value = $profile_properties_q->f('profileproperty_default');
-	    $readonly = $profile_properties_q->f('profileproperty_readonly');
-	    
-	    $params['profile_properties'][$property_name]['default'] = $default_value;
-	    $params['profile_properties'][$property_name]['readonly'] = $readonly;
+	    if ($profile_properties_q->f('profileproperty_readonly') != 1) {
+    	  $property_name = $profile_properties_q->f('profileproperty_name');
+    	  $default_value = $profile_properties_q->f('profileproperty_default');
+    	  $readonly      = $profile_properties_q->f('profileproperty_readonly');
+    	  $value         = $profile_properties_q->f('profilepropertyvalue_property_value');
+    	  
+    	  if (empty($value)) { echo "get default value"; $value = $default_value; }
+
+    	  $params['properties'][$property_name]['default']  = $default_value;
+    	  $params['properties'][$property_name]['readonly'] = $readonly;
+    	  $params['properties'][$property_name]['value']    = $value;
+	    }
 	  }
 	}
 

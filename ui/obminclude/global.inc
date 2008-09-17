@@ -209,14 +209,6 @@ $perm_editor = '05';
 $perm_admin = '1D';
 
 //------------------------------//
-// Default profiles properties  //
-//------------------------------//
-$profile_level	= 3;
-$profile_level_managepeers = 0;
-$profile_access_restriction = 'ALLOW_ALL';
-$profile_access_exeptions = array();
-
-//------------------------------//
 // Default Profiles definitions //
 //------------------------------//
 $profiles['user'] = array (
@@ -721,8 +713,12 @@ $php_regexp_virus_db_update = "/^ClamAV update process started at.*$/";
 $php_regexp_virus_db_version = "(version: (.*),)sU";
 
 // Profile
-$php_regexp_profile_name = "/^[A-Za-z0-9][A-Za-z0-9-._]{1,64}$/"; // profile name
+$php_regexp_profile_name = "/^[A-Za-z0-9][A-Za-z0-9-._]{1,64}$/";
 $js_regexp_profile_name = "/^[A-Za-z0-9][A-Za-z0-9-._]{1,64}$/";
+
+$php_regexp_profile_level = "/^[0-9]+$/";
+$php_regexp_profile_level_managepeers = "/^[01]$/";
+$php_regexp_profile_access_restriction = "/^ALLOW_ALL|DENY_ALL$/"; // TODO
 
 
 $global_dis_debug_msg = '';
