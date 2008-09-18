@@ -62,8 +62,12 @@ function html_profile_consult($params, $profile) {
 
 function html_profile_form($action, $params, $profile = array()) {
   if ($action == 'new') { $action = 'insert'; }
-	  
-  if ($action == 'detailupdate') { $action = 'update'; }
+  
+  if ($action == 'detailupdate' && ($profile['profile_id'] > 0 || $params['profile_id'])) {
+    $action = 'update';
+  } else if ($action == 'detailupdate') {
+    $action = 'insert';
+  }
 	
   return html_profile_superform($params, $action, $profile);
 }
@@ -149,7 +153,7 @@ function html_profile_superform($params, $action, $profile = array()) {
     $function_make_checkbox_field = create_function($parameters_make_checkbox_field,
       $checked_condition. ' $checked = "checked=\"checked\""; 
       return "<label for=\"cbx_$name\">
-      <input type=\"checkbox\" name=\"cba_$name\" id=\"cbx_$name\" $checked $ext/></label>";');
+      <input type=\"checkbox\" name=\"cba_$name\" id=\"cbx_$name\" value=\"1\" $checked $ext/></label>";');
   }
   /////////// Prepare fields ///////////////////////////////////// END
   

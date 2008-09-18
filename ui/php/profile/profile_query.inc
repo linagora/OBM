@@ -287,6 +287,13 @@ function check_profile_data_form($params) {
 	  }
 	}
 	
+	// check default perm
+	global $cright_list;
+	
+	foreach($cright_list as $right_name) {
+	  
+	}
+	
 	return $return;
 }
 
@@ -467,11 +474,9 @@ function run_query_profile_update ($params, $initial_profile) {
   		} else {
   			if ($new_right != 0) {
   				$insert[] = $module_name;
-  			}
-  			
-  			if (!$is_new_default) {
+  			} else if (!$is_new_default) {
   				$insert[] = $module_name;
-        }
+            }
   		}
   	}
   }

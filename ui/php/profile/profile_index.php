@@ -218,11 +218,6 @@ function get_profile_params() {
 	  $params['modules_right'] = array();
     $params['sections_show'] = array();
 	  
-    // get default perms value from form when updating
-    if ($action == 'update') {
-      // FIXME
-      $params['modules_right']['default'][$right_name] = $params['default_right_'.$right_name];
-    }
 	  if ($action == 'insert' || $action == 'update') {
       foreach ($obm_modules as $section_name => $modules) {
         foreach ($modules as $module_name) {
@@ -242,10 +237,12 @@ function get_profile_params() {
 		      $module_name = $matches[1];
 		      $right_name = $matches[2];
 		      
-		      if (!isset($params['modules_right'][$module_name]))
+		      if (!isset($params['modules_right'][$module_name])) {
 		        $params['modules_right'][$module_name]['right'] = 0;
+		      }
 		        
 		      $params['modules_right'][$module_name]['right'] += ${'cright_'. $right_name};
+		      $params['modules_right'][$module_name][$right_name] = $params[$module_name.'_right_'.$right_name];
 		    }
 		  }
 	  }
@@ -270,7 +267,7 @@ function get_profile_params() {
     	  if (empty($value)) { $value = $default_value; }
     	  
     	  // get properties value from form when updating
-    	  if ($action == 'update') {
+    	  if ($action == 'update' || $action == 'insert') {
     	    $value = $params[$property_name];
     	  }
 
