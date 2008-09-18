@@ -185,7 +185,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
   global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all, $l_firstname;
-  global $display, $c_all, $profiles, $l_recursive;
+  global $display, $c_all, $profiles, $l_recursive, $obm;
   
   $login = $user["login"];
   $profile = $user["profile"];

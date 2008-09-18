@@ -1452,40 +1452,24 @@ function run_query_calendar_delete($calendar) {
   $obm_q->next_record();
   $title = $obm_q->f('calendarevent_title');
 
-  // Resources display
-  $query = "SELECT evententity_entity_id FROM EventEntity WHERE evententity_event_id = $event_id AND evententity_entity = 'resource'";
-  $obm_q->query($query);
-  $resources = array();
-  while ($obm_q->next_record()) {
-    array_push($resources, $obm_q->f('evententity_entity_id'));
-  }
-  
-  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = '$event_id'";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
-  $obm_q->query($query);
-
   // If connectors in use
   if ($c_use_connectors) {
     $now = date('Y-m-d H:i:s');
-    
-    // We purge the individual user entries
-    $query = "DELETE FROM DeletedCalendarEvent
-      WHERE deletedcalendarevent_event_id = '$event_id'";
-    display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(6)');
-    $retour = $obm_q->query($query);
-
-    // We note the event deletion
-    $query = "INSERT INTO DeletedCalendarEvent (
-        deletedcalendarevent_event_id,
-        deletedcalendarevent_user_id,
-        deletedcalendarevent_timestamp)
-      VALUES (
-        '$event_id',
-        null,
-        '$now')";
-    display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(7)');
-    $retour = $obm_q->query($query);
+    $query = "SELECT evententity_entity_id FROM EventEntity WHERE evententity_event_id = $event_id AND evententity_entity = 'user'";
+    $obm_q->query($query);
+    $users = array();
+    while ($obm_q->next_record()) {
+      // We note the event deletion
+      $query = "INSERT INTO DeletedCalendarEvent (deletedcalendarevent_event_id, deletedcalendarevent_user_id, deletedcalendarevent_timestamp)
+                VALUES ($event_id, ".$obm_q->f('evententity_entity_id').", '$now')";
+      display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
+      $retour = $obm_q->query($query);
+    }
   }
+  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = $event_id";
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
+  $obm_q->query($query);
+
 
 }
 

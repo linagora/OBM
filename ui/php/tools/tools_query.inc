@@ -249,7 +249,7 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
  * @access public
  * @return void
  */
-function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global = false, $update = false) {
+function run_query_tools_perform_scope(&$metadata, $realm, $domain, $update = false) {
   global $obm, $obmdb_dbtype;
   $rules = array('update' => array('1=1'), 'delete' => array('1=1'), 'purge' => array('1=1'));
   $del_rules = array('1=1'); 
@@ -258,11 +258,11 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global = fa
   $did = sql_parse_id($domain, true); 
   switch ($realm) {
     case 'user':
-      $rules['update'][] = "(Current.$metadata[prefix]_userupdate $obm[uid] OR 
-                  (Current.$metadata[prefix]_userupdate IS NULL AND Current.$metadata[prefix]_usercreate $obm[uid]))"; 
-      $rules['delete'][] = "Current.deleted_user_id $obm[uid]"; 
-      $rules['purge'][] = "updated_user_id $obm[uid]"; 
-      $rules['purgelinks'][] = "updatedlinks_user_id $obm[uid]"; 
+      $rules['update'][] = "(Current.$metadata[prefix]_userupdate $uid OR 
+                  (Current.$metadata[prefix]_userupdate IS NULL AND Current.$metadata[prefix]_usercreate $uid))"; 
+      $rules['delete'][] = "Current.deleted_user_id $uid"; 
+      $rules['purge'][] = "updated_user_id $uid"; 
+      $rules['purgelinks'][] = "updatedlinks_user_id $uid"; 
       break;
     case 'delegation':
       $rules['update'][] = "Current.$metadata[prefix]_delegation $like '$obm[delegation]%'" ;
@@ -586,13 +586,13 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
       $userdata[uid],
       '$userdata[delegation]',
       '$metadata[table]',
-      $primaries[current],
+      '$metadata[prefix]',
       Link.".$metadata['link']['id']." 
     FROM P_".$metadata['link']['table']." as Link 
       JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
       LEFT JOIN ".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")
-      GROUP BY Link.".$metadata['link']['id'];
+      GROUP BY $primaries[current], Link.".$metadata['link']['id'];
 
   display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links)');
   $obm_qm->query($query);
