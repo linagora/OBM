@@ -249,7 +249,7 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
  * @access public
  * @return void
  */
-function run_query_tools_perform_scope(&$metadata, $realm, $domain, $update = false) {
+function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=false, $update = false) {
   global $obm, $obmdb_dbtype;
   $rules = array('update' => array('1=1'), 'delete' => array('1=1'), 'purge' => array('1=1'));
   $del_rules = array('1=1'); 
@@ -273,11 +273,11 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $update = fa
     default:
       break;
   }
-  if ($domain_global) {
-    $rules['update'][] = "Current.$metadata[prefix]_domain_id $domain"; 
-    $rules['delete'][] = "Current.deleted_domain_id $domain"; 
-    $rules['purge'][] = "updated_domain_id $domain"; 
-    $rules['purgelinks'][] = "updatedlinks_domain_id $domain"; 
+  if (!$global) {
+    $rules['update'][] = "Current.$metadata[prefix]_domain_id $did"; 
+    $rules['delete'][] = "Current.deleted_domain_id $did"; 
+    $rules['purge'][] = "updated_domain_id $did"; 
+    $rules['purgelinks'][] = "updatedlinks_domain_id $did"; 
   }
 
   if(is_array($metadata['rules'])) {
@@ -619,7 +619,7 @@ function store_update_data($params) {
 
   $domain_id = $params['domain_id'];
   $realm = $params['realm'];
-
+  $d = of_domain_get_domain_infos($domain_id);
   $has_update = false;
 
   // Process entities
@@ -628,7 +628,7 @@ function store_update_data($params) {
     $field = $db_info[1];
     $exclude_fields = $db_info[2];
     if ($cgp_show['module']["$entity"]) {
-      $nb = run_query_tools_perform_scope($db_info,$realm,$domain_id,true); 
+      $nb = run_query_tools_perform_scope($db_info,$realm,$domain_id, $d['global'], true); 
       if($nb > 0) {
         $has_update = true;
       }
