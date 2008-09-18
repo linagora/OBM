@@ -220,7 +220,7 @@ function get_profile_params() {
 	  
     // get default perms value from form when updating
     if ($action == 'update') {
-      echo "default right $right_name = ".$params['default_right_'.$right_name];
+      // FIXME
       $params['modules_right']['default'][$right_name] = $params['default_right_'.$right_name];
     }
 	  if ($action == 'insert' || $action == 'update') {
@@ -267,7 +267,7 @@ function get_profile_params() {
     	  $readonly      = $profile_properties_q->f('profileproperty_readonly');
     	  $value         = $profile_properties_q->f('profilepropertyvalue_property_value');
     	  
-    	  if (empty($value)) { echo "get default value"; $value = $default_value; }
+    	  if (empty($value)) { $value = $default_value; }
     	  
     	  // get properties value from form when updating
     	  if ($action == 'update') {
