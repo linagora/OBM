@@ -695,30 +695,6 @@ function get_obm_modules () {
 }
 
 /**
- * Get profile properties name and default values
- * 
- * @return DB_OBM
- */
-function get_profile_properties() {
-  global $cdg_sql;
-  
-  $join = " LEFT JOIN ProfilePropertyValue
-    ON profileproperty_id = profilepropertyvalue_property_id";
-
-  $query = "SELECT
-    profileproperty_name,
-    profileproperty_default,
-    profileproperty_readonly
-  FROM ProfileProperty $join";
-  
-  display_debug_msg($query, $cdg_sql, 'get_profile_properties()');
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  
-  return $obm_q;
-}
-
-/**
  * Get a profile properties
  *
  * @param $profile_id : profile_id
