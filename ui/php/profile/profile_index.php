@@ -66,7 +66,7 @@ if ($action == 'index' || $action == '') {
   
   if(check_user_defined_rules() && check_profile_data_form($params)) {
     $params['profile_id'] = run_query_profile_insert($params);
-    if($profile_id > 0) {
+    if($params['profile_id'] > 0) {
       $display['msg'] .= display_ok_msg("$l_profile : $l_insert_ok");
       $its_ok = true;
     } else {
@@ -218,6 +218,11 @@ function get_profile_params() {
 	  $params['modules_right'] = array();
     $params['sections_show'] = array();
 	  
+    // get default perms value from form when updating
+    if ($action == 'update') {
+      echo "default right $right_name = ".$params['default_right_'.$right_name];
+      $params['modules_right']['default'][$right_name] = $params['default_right_'.$right_name];
+    }
 	  if ($action == 'insert' || $action == 'update') {
       foreach ($obm_modules as $section_name => $modules) {
         foreach ($modules as $module_name) {
@@ -263,6 +268,11 @@ function get_profile_params() {
     	  $value         = $profile_properties_q->f('profilepropertyvalue_property_value');
     	  
     	  if (empty($value)) { echo "get default value"; $value = $default_value; }
+    	  
+    	  // get properties value from form when updating
+    	  if ($action == 'update') {
+    	    $value = $params[$property_name];
+    	  }
 
     	  $params['properties'][$property_name]['default']  = $default_value;
     	  $params['properties'][$property_name]['readonly'] = $readonly;

@@ -706,7 +706,7 @@ function get_profile_properties() {
     profileproperty_readonly
   FROM ProfileProperty $join";
   
-  display_debug_msg($query, $cdg_sql, 'run_query_profile_properties()');
+  display_debug_msg($query, $cdg_sql, 'get_profile_properties()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   
@@ -737,7 +737,7 @@ function run_query_profileproperty_list ($profile_id = NULL) {
   profileproperty_id
   FROM ProfileProperty $join";
   
-  display_debug_msg($query, $cdg_sql, 'run_query_profile_properties()');
+  display_debug_msg($query, $cdg_sql, 'run_query_profileproperty_list()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   
