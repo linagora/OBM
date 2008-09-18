@@ -233,6 +233,7 @@ $dis_theme = '';
 while ($entry = $theme_dir->read()) {
   $dotcase = strcmp($entry, '.'); 
   if (!preg_match("/^\..*$/",$entry) && strcmp($entry,'images') && is_dir($theme_dir->path."/".$entry)) {
+		${"preview_".$entry}="$resources_path/themes/$entry/images/preview_theme.gif"; 	  
     $dis_theme .= "
       <a href=\"settings_index.php?theme=$entry\">
       <img src=\"".${"preview_".$entry}."\" alt=\"[Theme $entry]\" style=\"height:20%;width:20%;\"
