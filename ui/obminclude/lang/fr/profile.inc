@@ -24,3 +24,5 @@ $l_access_restriction_empty = "Le champ Restriction d'accès est vide. Veuillez 
 $l_profile_level_error = "Erreur sur le champ Niveau. Veuillez le remplir avec un entier positif !";
 $l_profile_level_managepeers_error = "Erreur sur le champ Niveau de gestion pairs. Les valeurs acceptés sont 0 ou 1 !";
 $l_profile_access_restriction_error = "Erreur sur le champ Restriction d'accès. Les valeurs acceptés sont ALLOW_ALL ou DENY_ALL !";
+
+$l_profile_default_permission_empty = "Erreur sur les permissions par défaut. Veuillez cocher au moins une permission !";

@@ -290,9 +290,20 @@ function check_profile_data_form($params) {
 	// check default perm
 	global $cright_list;
 	
-	foreach($cright_list as $right_name) {
-	  
-	}
+	$count = 0;
+	
+    foreach ($params as $k => $v) {
+      $matches = array();
+      if (preg_match('/default_right_(.+)/', $k)) {
+        $count++;
+      }
+    }
+    
+    if ($count == 0) {
+      global $l_profile_default_permission_empty;
+      $err['msg'] = $l_profile_default_permission_empty;
+      $return = false;
+    }
 	
 	return $return;
 }

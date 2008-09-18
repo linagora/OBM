@@ -24,3 +24,5 @@ $l_access_restriction_empty = "The field Access restriction exceptions is empty.
 $l_profile_level_error = "Error on Level field. Please enter a positive integer !";
 $l_profile_level_managepeers_error = "Error on Manage same level users field. Please enter 0 or 1 !";
 $l_profile_access_restriction_error = "Error on Access restriction field. Please enter ALLOW_ALL or DENY_ALL !";
+
+$l_profile_default_permission_empty = "Default permission error. Please choose at least one permission !";
