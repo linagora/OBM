@@ -247,6 +247,7 @@ function get_profile_params() {
 	  $profile_properties_q = run_query_profileproperty_list($profile_id);
 	  $params['properties'] = array();
 	  
+	  $i = 0; // <--- Array index for properties which contains multiple value
 	  while ($profile_properties_q->next_record()) {
 	    if ($profile_properties_q->f('profileproperty_readonly') != 1) {
     	  $property_name = $profile_properties_q->f('profileproperty_name');
@@ -256,14 +257,14 @@ function get_profile_params() {
     	  
     	  if (empty($value)) { $value = $default_value; }
     	  
-    	  // get properties value from form when updating
+    	  // get properties value from form when updating or inserting
     	  if ($action == 'update' || $action == 'insert') {
     	    $value = $params[$property_name];
     	  }
 
     	  $params['properties'][$property_name]['default']  = $default_value;
     	  $params['properties'][$property_name]['readonly'] = $readonly;
-    	  $params['properties'][$property_name]['value']    = $value;
+    	  $params['properties'][$property_name]['value'] = $value;
 	    }
 	  }
 	}

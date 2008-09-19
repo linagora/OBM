@@ -269,10 +269,12 @@ function check_profile_data_form($params) {
 	foreach($params['properties'] as $property_name => $property_value ) {
 	  
 	  if ($property_value['readonly'] != 1) {
-    	  global ${'l_'.$property_name.'_empty'};
+    	  
     	  global ${'php_regexp_profile_'.$property_name};
     	  
-    	  if (strlen($params[$property_name]) == 0) {
+    	  if ($property_name != "admin_realm" && strlen($params[$property_name]) == 0) {
+    	    global ${'l_'.$property_name.'_empty'};
+    	    
     	    $err['msg'] = ${'l_'.$property_name.'_empty'};
     	    $err['field'] = $property_name;
     	    $return = false;

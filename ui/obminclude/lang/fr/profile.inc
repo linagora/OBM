@@ -12,6 +12,7 @@ $l_level = "Niveau";
 $l_level_managepeers = "Gestion d'utilisateurs de même niveau";
 $l_access_restriction = "Restriction d'accès";
 $l_access_exeptions = "Exceptions de restriction d'accès";
+$l_admin_realm = "Étendue de l'administration";
 
 // Messages d'erreurs
 $l_profile_name_error = "Le nom du profil est invalide, veuillez saisir de 1 à 64 caractères alphanumériques ou '_' '.' '-' !";
@@ -24,5 +25,9 @@ $l_access_restriction_empty = "Le champ Restriction d'accès est vide. Veuillez 
 $l_profile_level_error = "Erreur sur le champ Niveau. Veuillez le remplir avec un entier positif !";
 $l_profile_level_managepeers_error = "Erreur sur le champ Niveau de gestion pairs. Les valeurs acceptés sont 0 ou 1 !";
 $l_profile_access_restriction_error = "Erreur sur le champ Restriction d'accès. Les valeurs acceptés sont ALLOW_ALL ou DENY_ALL !";
+$l_profile_admin_realm_error = "Erreur sur le champ Étendue de l'administration, veuillez saisir de 1 à 64 caractères alphanumériques ou '_' '.' '-' séparés par un espace!";
 
 $l_profile_default_permission_empty = "Erreur sur les permissions par défaut. Veuillez cocher au moins une permission !";
+
+// Infos
+$l_admin_realm_info = "* Les valeurs acceptés pour Étendue de l'administration sont :<blockquote><i>user</i>, <i>delegation</i>, <i>domain</i></blockquote>ou bien une combinaison de ces valeurs séparés par un espace.";

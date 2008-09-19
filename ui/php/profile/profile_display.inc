@@ -127,7 +127,7 @@ function html_profile_superform($params, $action, $profile = array()) {
     
     // Profile properties
     foreach ($value['properties'] as $pp_name => $pp_value) {
-      $field[$pp_name] = "<input type=\"text\" name=\"tf_$pp_name\" value=\"$pp_value[value]\" />";
+        $field[$pp_name] = "<input type=\"text\" name=\"tf_$pp_name\" value=\"$pp_value[value]\" />";
     }
     
   } else if ($action == 'consult') {
@@ -137,7 +137,7 @@ function html_profile_superform($params, $action, $profile = array()) {
     
     // Profile properties
     foreach ($value['properties'] as $pp_name => $pp_value) {
-      $field[$pp_name] = $pp_value['value'];
+        $field[$pp_name] = $pp_value['value'];
     }
   }
   
@@ -170,6 +170,10 @@ function html_profile_superform($params, $action, $profile = array()) {
       text-align:right;
       border:0px;
     }
+    .blockRight {
+    	text-align: left;
+    	float: right;
+    }
   </style>";
   
   // Profile name
@@ -190,8 +194,12 @@ function html_profile_superform($params, $action, $profile = array()) {
     <table>
       <tbody>";
       foreach ($value['properties'] as $pp_name => $pp_value) {
-        global ${'l_'.$pp_name};
-        $block_properties .= "<tr><th>".${'l_'.$pp_name}."</th><td>".$field[$pp_name]."</td></tr>";
+          global ${'l_'.$pp_name};
+          $block_properties .= "<tr><th>".${'l_'.$pp_name}."</th><td>".$field[$pp_name]."</td></tr>";
+          if ($action != "consult" && $pp_name == "admin_realm") {
+            global ${'l_'.$pp_name."_info"};
+            $block_properties .= "<tr><td colspan=\"2\"><div class=\"blockRight\">".${'l_'.$pp_name."_info"}."</div></td></tr>";
+          }
       }
   $block_properties .= "
   	  </tbody>
