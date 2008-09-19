@@ -18,7 +18,11 @@ sub getParameter {
     my( $parameters ) = @_;
 
     # Analyse de la ligne de commande
-    &GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "global", "incremental", "help" );
+    my $return = GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "global", "incremental", "help" );
+
+    if( !$return ) {
+        $parameters->{"help"} = 1;
+    }
 
 
     if( !exists($parameters->{"domain"}) ) {
