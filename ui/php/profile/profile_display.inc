@@ -196,10 +196,10 @@ function html_profile_superform($params, $action, $profile = array()) {
       foreach ($value['properties'] as $pp_name => $pp_value) {
           global ${'l_'.$pp_name};
           $block_properties .= "<tr><th>".${'l_'.$pp_name}."</th><td>".$field[$pp_name]."</td></tr>";
-          if ($action != "consult" && $pp_name == "admin_realm") {
+          /*if ($action != "consult" && $pp_name == "admin_realm") {
             global ${'l_'.$pp_name."_info"};
             $block_properties .= "<tr><td colspan=\"2\"><div class=\"blockRight\">".${'l_'.$pp_name."_info"}."</div></td></tr>";
-          }
+          }*/
       }
   $block_properties .= "
   	  </tbody>
@@ -264,13 +264,21 @@ function html_profile_superform($params, $action, $profile = array()) {
     
     $checked = $value['sections_show'][$section_name];
     $block_sectionsModules .= "<div class=\"detail extra\"\">
-      <h1>". $GLOBALS['l_section_'. $section_name]. "</h1>
-      <table>
-        <tbody>
-        <tr><td>". $function_make_checkbox_field($section_name. '_show',
-          $checked, ''). "Désactiver</td><td></td></tr>
-      <tbody></table>
-      $block_table</div>";
+      <h1>". $GLOBALS['l_section_'. $section_name]. "</h1>";
+    if( ( !$value['sections_show'][$section_name] && ($params['action'] != "detailconsult" && $params['action'] != "update") )|| $value['sections_show'][$section_name] ) {
+      $block_sectionsModules .= "<div class=\"R\">Désactiver&nbsp;". $function_make_checkbox_field($section_name. '_show',
+          $checked, '')."</div>";
+    }
+    
+    if( 
+        ($params['action'] != 'detailconsult' && $params['action'] != 'update')
+        || ( 
+             ( ($params['action'] == 'detailconsult' || $params['action']) && !$value['sections_show'][$section_name] )
+           )
+      ) {
+      $block_sectionsModules .= $block_table;
+    }
+    $block_sectionsModules .= "</div>";
   }
   
   $block_sectionsModules .= "</div>";
