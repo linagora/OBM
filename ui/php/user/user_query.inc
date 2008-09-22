@@ -35,12 +35,15 @@ function run_query_user_search($user) {
   $group = sql_search_text_parse($user['group']);
   $archive = $user['archive'];
   $phone = $user['phone'];
+  $exp = $user['exp'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
+	$dateexp = sql_date_format($db_type, 'userobm_account_dateexp', 'dateexp');
+	$diff = "TIMESTAMPDIFF(DAY,now(),userobm_account_dateexp)";
   $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
   $multidomain = sql_multidomain('userobm');
 
@@ -112,12 +115,18 @@ function run_query_user_search($user) {
        OR userobm_mobile like '%$phone%')";
   }
 
+	// if a time of expiration has been specified, get it  
+  if (trim($exp) != '') {
+     if (trim($where) != '') $where .= ' AND';
+     $where .= " $diff<$exp";
+  }
+
   // If a description indication has been specified, get it
   if (trim($desc) != '') {
      if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_description like '%$desc%'";
   }
-
+  
   // If a group indication has been specified, get it
   if (trim($group) != '') {
      if (trim($where) != '') $where .= ' AND';
@@ -153,6 +162,7 @@ function run_query_user_search($user) {
       domain_label,
       domain_name,
       $datebegin,
+			$dateexp,
       $lastaccess
     FROM UserObm 
     LEFT JOIN Domain ON userobm_domain_id = domain_id
@@ -277,6 +287,7 @@ function run_query_user_detail($p_id) {
   $timeupdate = sql_date_format($db_type, 'UserObm.userobm_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'UserObm.userobm_timecreate', 'timecreate');
   $datebegin = sql_date_format($db_type, 'UserObm.userobm_datebegin', 'datebegin');
+  $dateexp = sql_date_format($db_type, 'UserObm.userobm_account_dateexp', 'dateexp');
   $lastaccess = sql_date_format($db_type, 'UserObm.userobm_timelastaccess', 'userobm_timelastaccess');
   $vacation_datebegin = sql_date_format($db_type, 'UserObm.userobm_vacation_datebegin', 'userobm_vacation_datebegin');
   $vacation_dateend = sql_date_format($db_type, 'UserObm.userobm_vacation_dateend', 'userobm_vacation_dateend');
@@ -286,6 +297,7 @@ function run_query_user_detail($p_id) {
       $timeupdate,
       $timecreate,
       $datebegin,
+      $dateexp,
       $lastaccess,
       $vacation_datebegin,
       $vacation_dateend,
@@ -358,6 +370,7 @@ function run_query_user_insert($user) {
   $hidden = sql_parse_int($user['hidden']);
   $kind = $user['kind'];
   $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
+  $dateexp = ($user['dateexp'] ? "'".of_isodate_convert($user['dateexp'])."'" : 'null');
   $lname = $user['lastname'];
   $fname = $user['firstname'];
   $title = $user['title'];
@@ -523,6 +536,7 @@ function run_query_user_insert($user) {
     userobm_archive,
     userobm_hidden,
     userobm_datebegin,
+    userobm_account_dateexp,
     userobm_kind,
     userobm_lastname,
     userobm_firstname,
@@ -566,6 +580,7 @@ function run_query_user_insert($user) {
     $archive,
     $hidden,
     $datebegin,
+    $dateexp,
     '$kind',
     '$lname',
     '$fname',
@@ -708,6 +723,7 @@ function run_query_user_update($p_id, $user) {
   $profile = $user['profile'];
   $archive = sql_parse_int($user['archive']);
   $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
+  $dateexp = (($user['dateexp'] && $user['noexperie']) ? "'".of_isodate_convert($user['dateexp'])."'" : 'null');
   $hidden = sql_parse_int($user['hidden']);
   $kind = $user['kind'];
   $lname = $user['lastname'];
@@ -922,6 +938,7 @@ function run_query_user_update($p_id, $user) {
     userobm_archive=$archive,
     userobm_hidden=$hidden,
     userobm_datebegin=$datebegin,
+    userobm_account_dateexp=$dateexp,
     userobm_kind='$kind',
     userobm_lastname='$lname',
     userobm_firstname='$fname',

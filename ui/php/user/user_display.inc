@@ -29,6 +29,7 @@ $fieldnames["userobm_mobile"] = $l_mphone;
 $fieldnames["userobm_fax"] = $l_fax;
 $fieldnames["userobm_fax2"] = $l_fax2;
 $fieldnames["datebegin"] = $l_datebegin;
+$fieldnames["userobm_account_dateexp"] = $l_dateexp;
 $fieldnames["timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_web_perms"] = $l_web;
 $fieldnames["userobm_email"] = $l_email;
@@ -172,6 +173,10 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
     $datebegin = $OD->data_set->f($fieldname);
     $res["name"] = of_date_format($datebegin, 1);
   }
+  else if ($fieldname == "dateexp") {
+    $dateexp = $OD->data_set->f($fieldname);
+    $res["name"] = of_date_format($dateexp, 1);
+  }
 
   return $res;
 }
@@ -184,7 +189,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
-  global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all, $l_firstname;
+  global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all, $l_firstname, $l_exp;
   global $display, $c_all, $profiles, $l_recursive, $obm;
   
   $login = $user["login"];
@@ -197,6 +202,7 @@ function html_user_search_form($user) {
   $desc = $user["desc"];
   $group = $user["group"];
   $delegation = stripslashes($user["delegation"]);
+  $exp = $user['exp'];
   $archive = ($user["archive"] == "1" ? "checked" : "");
   $recursive = ($user["recursive"] == "1" ? "checked" : "");
   $popup = $user["popup"];
@@ -279,6 +285,10 @@ function html_user_search_form($user) {
       <input type=\"text\" name=\"tf_desc\" size=\"16\" maxlength=\"32\"
       value=\"$desc\" />
     </label>
+    <label>$l_exp<br />
+      <input type=\"text\" name=\"tf_exp\" size=\"16\" maxlength=\"32\"
+      value=\"$exp\" />
+    </label>
     <label>$l_group<br />
       <input type=\"text\" name=\"tf_group\" size=\"16\" maxlength=\"32\"
       value=\"$group\" />
@@ -346,6 +356,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
   $email = $user["email"];
   $delegation = urlencode($user["delegation"]);
   $desc = urlencode($user["desc"]);
+  $exp = urlencode($user['exp']);
   $group = urlencode($user["group"]);
   $archive = $user["archive"];
 
@@ -363,7 +374,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
   }
 
-  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext");
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_exp=$exp&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext");
 
   $user_d = new OBM_DISPLAY("DATA", $prefs, "user");
   if ($popup) {
@@ -448,7 +459,7 @@ function dis_user_consult($user) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
-  global $l_domain, $l_user, $l_lastaccess, $l_archive, $l_datebegin, $l_desc;
+  global $l_domain, $l_user, $l_lastaccess, $l_archive, $l_datebegin, $l_dateexp, $l_desc;
   global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal, $l_title;
   global $l_delegation_target, $l_delegation, $l_direction, $l_service;
   global $l_company, $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_email;
@@ -477,7 +488,8 @@ function html_user_consult($obm_q) {
   $delegation_target = $obm_q->f("userobm_delegation_target");
   $delegation = $obm_q->f("userobm_delegation");
   $desc = $obm_q->f("userobm_description");
-  $datebegin = of_date_format($obm_q->f("datebegin"));
+  $datebegin = of_date_format($obm_q->f("datebegin"), true);
+  $dateexp = of_date_format($obm_q->f("dateexp"), true);
   $lastaccess = of_datetime_format($obm_q->f("userobm_timelastaccess"), 1);
   $archive = ($obm_q->f("userobm_archive") == '1' ? $l_yes : $l_no);
   $hidden = ($obm_q->f("userobm_hidden") == '1' ? $l_yes : $l_no);
@@ -792,6 +804,10 @@ function html_user_consult($obm_q) {
     <td>$datebegin</td>
   </tr>
   <tr>
+  <tr>
+    <th>$l_dateexp</th>
+    <td>$dateexp</td>
+  </tr>
     <th>$l_lastaccess</th>
     <td>$lastaccess</td>
   </tr>
@@ -955,7 +971,7 @@ function html_user_group_consult($usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($usr_q, $user, $field='') {
   global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
-  global $l_user, $l_title, $l_archive, $l_datebegin, $l_insert, $l_update;
+  global $l_user, $l_title, $l_archive, $l_datebegin, $l_dateexp, $l_noexperie, $l_insert, $l_update;
   global $l_delegation_target, $l_hidden, $l_photo; 
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_company, $l_direction, $l_service, $l_address;
@@ -970,7 +986,7 @@ function html_user_form($usr_q, $user, $field='') {
   global $path, $display, $cgp_use, $action, $profiles;
   global $obm, $c_default_domain, $c_renameUserMailbox, $l_domain, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
-
+	
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
     // infos
@@ -988,6 +1004,8 @@ function html_user_form($usr_q, $user, $field='') {
     $delegation = $usr_q->f("userobm_delegation");
     $desc = $usr_q->f("userobm_description");
     $datebegin = of_date_upd_format($usr_q->f("userobm_datebegin"),true);
+    $dateexp = of_date_upd_format($usr_q->f("userobm_account_dateexp"),true);
+		if(isset($dateexp)){$noexperie = " checked=\"checked\" ";};
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
     $hidden = ($usr_q->f("userobm_hidden") == "1" ? " checked" : "");
     $photo_id = $usr_q->f("userobm_photo_id");
@@ -1075,6 +1093,7 @@ function html_user_form($usr_q, $user, $field='') {
   if (isset($user["title"])) { $title = stripslashes($user["title"]); }
   if (isset($user["email"])) { $email = $user["email"]; }
   if (isset($user["datebegin"])) { $datebegin = of_date_upd_format($user["datebegin"],true); }
+  if (isset($user["dateexp"])) { $dateexp = of_date_upd_format($user["dateexp"],true); $noexperie = " checked=\"checked\"";}
   if (isset($user["delegation_target"])) { $delegation_target = stripslashes($user["delegation_target"]); }
   if (isset($user["delegation"])) { $delegation = stripslashes($user["delegation"]); }
   if (isset($user["desc"])) { $desc = $user["desc"]; }
@@ -1140,6 +1159,11 @@ function html_user_form($usr_q, $user, $field='') {
   if ($field != "") {
     $class[$field] = "error";
   }
+
+	// Default exp is hidden
+	if (!isset($dateexp))	{
+		$showexp="display:none";
+	}
 
   // login (can't be updated, so only on insert)
   if (($action == "new") || ($action == "insert")) {
@@ -1468,7 +1492,15 @@ function html_user_form($usr_q, $user, $field='') {
         $('delegationTargetBlock').addClass('H');
         $('delegationTargetField').value = '';
       }
-    }
+		}
+		function showExpiration()	{
+			var Props = $('noexperie').getProperty('checked');			
+			if(Props==true){
+				$('exp').setProperty('style','');
+			}else{
+				$('exp').setProperty('style','display:none');
+			}	
+		}
   </script>
   <table>
   <tr>
@@ -1516,6 +1548,14 @@ function html_user_form($usr_q, $user, $field='') {
   <tr>
     <th class=\"$class[datebegin]\">$l_datebegin</th>
     <td><input type=\"text\" name=\"tf_datebegin\" value=\"$datebegin\" class=\"datePicker\"/></td>
+  </tr>
+  <tr>
+    <th class=\"$class[noexperie]\">$l_noexperie</th>
+    <td><input id=\"noexperie\" name=\"cba_noexperie\" type=\"checkbox\" value=\"1\" $noexperie onclick='javascript:showExpiration();'/></td>
+  </tr>
+  <tr id=\"exp\" style=\"$showexp\">
+    <th class=\"$class[dateexp]\">$l_dateexp</th>
+    <td><input type=\"text\" name=\"tf_dateexp\" value=\"$dateexp\" class=\"datePicker\"/></td>
   </tr>
   $block_photo
   $block_photo_detail
@@ -1632,6 +1672,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $fname = $user["firstname"];
   $title = $user["title"];
   $datebegin = $user["datebegin"];
+  $dateexp = $user["dateexp"];
   $email = $user["email"];
   $desc = $user["desc"];
   $archive = $user["archive"];
@@ -1706,6 +1747,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
   <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
   <input type=\"hidden\" name=\"tf_datebegin\" value=\"$datebegin\" />
+  <input type=\"hidden\" name=\"tf_dateexp\" value=\"$dateexp\" />
   <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
   <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
   <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
