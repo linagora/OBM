@@ -700,7 +700,7 @@ function get_obm_modules () {
   }
   
   foreach ($cgp_show['module'] as $module_name => $section_name) {
-    if ($section_name && trim($section_name) != '')
+    if ($section_name != 'false' && trim($section_name) != '')
       $obm_modules[$section_name][] = $module_name;
   }
   

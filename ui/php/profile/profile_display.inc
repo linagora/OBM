@@ -265,16 +265,14 @@ function html_profile_superform($params, $action, $profile = array()) {
     $checked = $value['sections_show'][$section_name];
     $block_sectionsModules .= "<div class=\"detail extra\"\">
       <h1>". $GLOBALS['l_section_'. $section_name]. "</h1>";
+    
     if( ( !$value['sections_show'][$section_name] && ($params['action'] != "detailconsult" && $params['action'] != "update") )|| $value['sections_show'][$section_name] ) {
       $block_sectionsModules .= "<div class=\"R\">Désactiver&nbsp;". $function_make_checkbox_field($section_name. '_show',
           $checked, '')."</div>";
     }
     
-    if( 
-        ($params['action'] != 'detailconsult' && $params['action'] != 'update')
-        || ( 
-             ( ($params['action'] == 'detailconsult' || $params['action']) && !$value['sections_show'][$section_name] )
-           )
+    if( ($params['action'] != 'detailconsult' && $params['action'] != 'update')
+        || ( (($params['action'] == 'detailconsult' || $params['action'] == 'update') && !$value['sections_show'][$section_name]) )
       ) {
       $block_sectionsModules .= $block_table;
     }
