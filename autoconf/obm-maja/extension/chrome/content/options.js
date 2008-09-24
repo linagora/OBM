@@ -38,11 +38,63 @@ var scriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
                              .createInstance(Components.interfaces.mozIJSSubScriptLoader);
 
 scriptLoader.loadSubScript("chrome://obmmaja/content/utils.js");
+scriptLoader.loadSubScript("chrome://obmmaja/content/UtilsOBM.js");
 
 var obmmaja = {
   
   resetAutoconf: function() {
     utils._setPreference("config.obm.autoconfigStatus", 0, "user" );
   },
+  resetExtension: function() {
+    var extensionManager = Components.classes["@mozilla.org/extensions/manager;1"]
+                                   .getService(Components.interfaces.nsIExtensionManager);
+    var inconnue = {};
+    var TabItems = extensionManager.getItemList(2,inconnue);
+    for( var i=0;i<TabItems.length;i++) {
+      extensionManager.uninstallItem(TabItems[i].id);
+    }
+  },
+  visibleValid: function() {
+    var checkAutoconf = document.getElementById("resetAutoconf").getAttribute("checked");
+    var checkExtension = document.getElementById("resetExtension").getAttribute("checked");
+    if (checkAutoconf || checkExtension) {
+      var accept = document.documentElement.getButton("accept");
+      accept.setAttribute("hidden", "false");
+    }else{
+      var accept = document.documentElement.getButton("accept");
+      accept.setAttribute("hidden", "true");
+    }
+  },
+  resetAction:  function()  {
+    var checkAutoconf = document.getElementById("resetAutoconf").getAttribute("checked");
+    var checkExtension = document.getElementById("resetExtension").getAttribute("checked");
+    if(checkAutoconf){
+      this.resetAutoconf();
+    }
+    if(checkExtension){
+      this.resetExtension();
+    }
+    var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+                                    .getService(Components.interfaces.nsIPromptService);
+                                    
+    // restart now/later ?
+    var check = {value: false};
+    var flags = promptService.BUTTON_TITLE_IS_STRING * promptService.BUTTON_POS_0 +
+                promptService.BUTTON_TITLE_IS_STRING * promptService.BUTTON_POS_1;
 
+    var title = UtilsOBM.getLocalizedFileMessage("obmmaja/locale/obmmaja.properties","obmreinittitle");
+    var message = UtilsOBM.getLocalizedFileMessage("obmmaja/locale/obmmaja.properties","obmreinitmessage");
+    var rightnow = UtilsOBM.getLocalizedFileMessage("obmmaja/locale/obmmaja.properties","obmreinitrightnow");
+    var later = UtilsOBM.getLocalizedFileMessage("obmmaja/locale/obmmaja.properties","obmreinitlater");
+    var button = promptService.confirmEx(window, title,
+     message, flags, rightnow , later, "", null, check);
+
+    if (button == 0) {
+      // restart now
+      var nsIAppStartup = Components.interfaces.nsIAppStartup;
+      Components.classes["@mozilla.org/toolkit/app-startup;1"]
+            .getService(nsIAppStartup)
+            .quit(nsIAppStartup.eForceQuit | nsIAppStartup.eRestart);   
+   }
+  } 
 };
