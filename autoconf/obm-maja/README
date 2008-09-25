@@ -11,7 +11,10 @@ La fonction setPreferences n'est appelée que si extensions.pablomaja.versionOnLa
 Si la fonction setPreferences est appelée elle positionne la pref extensions.pablomaja.versionOnLastMaj à la version actuelle de l'extension.
 
 
-Dans la fenêtre d'option de l'extension il est possible de réinitialiser l'autoconfiguration totale de Thunderbird.
+Dans la fenêtre d'option de l'extension il est possible de réinitialiser
+l'autoconfiguration totale de Thunderbird, ou de demander la dés-installation de
+toutes les extensions TB (ou les 2 opérations en même temps).
+.
 La pref config.obm.autoconfStatus est remise à 0.
 
 
