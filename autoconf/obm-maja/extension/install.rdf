@@ -4,9 +4,10 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>{912dfb00-4684-11dd-ae16-0800200c9a66}</em:id>
     <em:name>OBM MAJA</em:name>
-    <em:version>1.0.0</em:version>
+    <em:version>1.1.0</em:version>
     <em:creator>Nicolas Lascombes</em:creator>
-    <em:description>Mise &#x61; jour automatique</em:description>
+    <em:description>Permet de g&#xe9;rer la configuration locale et les
+    extensions install&#xe9;s via l'auto-configuration</em:description>
     <em:optionsURL>chrome://obmmaja/content/options.xul</em:optionsURL>
     <!--<em:iconURL>chrome://obmmaja/skin/icasso.png</em:iconURL>-->
     <em:targetApplication>
