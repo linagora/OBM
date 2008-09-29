@@ -34,8 +34,10 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-var scriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
-                             .createInstance(Components.interfaces.mozIJSSubScriptLoader);
+const Cc = Components.classes;
+const Ci = Components.interfaces;
+
+var scriptLoader = Cc["@mozilla.org/moz/jssubscript-loader;1"].createInstance(Ci.mozIJSSubScriptLoader);
 
 scriptLoader.loadSubScript("chrome://obmmaja/content/utils.js");
 scriptLoader.loadSubScript("chrome://obmmaja/content/UtilsOBM.js");
@@ -46,21 +48,31 @@ var obmmaja = {
     utils._setPreference("config.obm.autoconfigStatus", 0, "user" );
   },
   resetExtension: function() {
-    var extensionManager = Components.classes["@mozilla.org/extensions/manager;1"]
-                                   .getService(Components.interfaces.nsIExtensionManager);
+    var extensionManager = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
     var inconnue = {};
     var TabItems = extensionManager.getItemList(2,inconnue);
     for( var i=0;i<TabItems.length;i++) {
       extensionManager.uninstallItem(TabItems[i].id);
     }
   },
+  resetPrefs: function() {
+  	//unset all user prefs
+  	var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+  	var prefs = prefService.getChildList("",{});
+  	for ( var i=0; i < prefs.length; i++) {
+  		if (prefService.prefHasUserValue(prefs[i])) {
+    		prefService.clearUserPref(prefs[i]);
+    	}
+   	}
+  },
   visibleValid: function() {
     var checkAutoconf = document.getElementById("resetAutoconf").getAttribute("checked");
     var checkExtension = document.getElementById("resetExtension").getAttribute("checked");
-    if (checkAutoconf || checkExtension) {
+    var checkPrefs = document.getElementById("resetPrefs").getAttribute("checked");
+    if (checkAutoconf || checkExtension || checkPrefs) {
       var accept = document.documentElement.getButton("accept");
       accept.setAttribute("hidden", "false");
-    }else{
+    } else {
       var accept = document.documentElement.getButton("accept");
       accept.setAttribute("hidden", "true");
     }
@@ -68,14 +80,17 @@ var obmmaja = {
   resetAction:  function()  {
     var checkAutoconf = document.getElementById("resetAutoconf").getAttribute("checked");
     var checkExtension = document.getElementById("resetExtension").getAttribute("checked");
-    if(checkAutoconf){
+    var checkPrefs = document.getElementById("resetPrefs").getAttribute("checked");
+    if (checkAutoconf) {
       this.resetAutoconf();
     }
-    if(checkExtension){
+    if (checkExtension) {
       this.resetExtension();
     }
-    var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-                                    .getService(Components.interfaces.nsIPromptService);
+    if (checkPrefs) {
+      this.resetPrefs();
+    }
+    var promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
                                     
     // restart now/later ?
     var check = {value: false};
@@ -91,9 +106,8 @@ var obmmaja = {
 
     if (button == 0) {
       // restart now
-      var nsIAppStartup = Components.interfaces.nsIAppStartup;
-      Components.classes["@mozilla.org/toolkit/app-startup;1"]
-            .getService(nsIAppStartup)
+      var nsIAppStartup = Ci.nsIAppStartup;
+      Cc["@mozilla.org/toolkit/app-startup;1"].getService(nsIAppStartup)
             .quit(nsIAppStartup.eForceQuit | nsIAppStartup.eRestart);   
    }
   } 

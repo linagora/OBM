@@ -1,3 +1,4 @@
 <!ENTITY prefwindow.title "OBM MAJA pr&#xe9;f&#xe9;rences">
 <!ENTITY prefwindow.resetAutonconf.label "R&#xe9;initialiser l'autoconfiguration">
-<!ENTITY prefwindow.resetExtension.label "R&#xe9;initialiser les Extension">
+<!ENTITY prefwindow.resetExtension.label "R&#xe9;initialiser les extensions">
+<!ENTITY prefwindow.resetPrefs.label "R&#xe9;initialiser les pr&#xe9;f&#xe9;rences">

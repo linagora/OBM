@@ -1,3 +1,4 @@
 <!ENTITY prefwindow.title "OBM MAJA preferences">
 <!ENTITY prefwindow.resetAutonconf.label "Reset Autoconf">
-<!ENTITY prefwindow.resetExtension.label "Reset Extension">
+<!ENTITY prefwindow.resetExtension.label "Reset Extensions">
+<!ENTITY prefwindow.resetPrefs.label "Reset Preferences">

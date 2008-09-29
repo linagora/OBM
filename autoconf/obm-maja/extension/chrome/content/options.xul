@@ -43,6 +43,7 @@
   <vbox id="avbox">
     <checkbox id = "resetAutoconf" label="&prefwindow.resetAutonconf.label;" oncommand="obmmaja.visibleValid();" />
     <checkbox id = "resetExtension" label="&prefwindow.resetExtension.label;" oncommand="obmmaja.visibleValid();" />
+    <checkbox id = "resetPrefs" label="&prefwindow.resetPrefs.label;" oncommand="obmmaja.visibleValid();" />
     <button dlgtype="accept" hidden="true"/>
     <button dlgtype="cancel"/>
 </vbox>
