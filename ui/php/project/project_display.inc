@@ -49,6 +49,10 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
     }
   }
 
+  else if (($fieldname == 'project_company') && $link_ok) {
+    $res['url'] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f('project_company_id');
+  }
+
   else if ($fieldname == 'project_archive') {
     $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {

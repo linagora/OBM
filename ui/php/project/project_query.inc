@@ -110,6 +110,7 @@ function run_query_project_search($params) {
       project_shortname,
       project_soldtime,
       project_estimatedtime,
+      project_company_id,
       company_name as project_company,
       dealtype_code as type_code,
       dealtype_label as project_type,
