@@ -132,6 +132,43 @@ $cgroup_private_default = true;
 // default taxes values
 $cdefault_tax = array ('TVA 19,6' => 1.196, 'TVA 5,5' => 1.055, 'Pas de TVA' => 1);
 
+//  default Right values
+$cgp_default_right = array (
+  'Resource' => array (
+      'public' => array(
+        'acces' => -1,
+        'read' => -1,
+        'write' => -1,
+        'admin' => 0
+      )
+    ),
+  'MailShare' => array (
+      'public' => array(
+        'acces' => 1,
+        'read' => 0,
+        'write' => 0,
+        'admin' => 0
+      )
+    ),
+  'mailbox' => array (
+      'public' => array(
+        'acces' => 1,
+        'read' => 0,
+        'write' => 0,
+        'admin' => 0
+      )
+    ),
+  'calendar' => array (
+      'public' => array(
+        'acces' => 1,
+        'read' => 0,
+        'write' => 0,
+        'admin' => 0
+      )
+    )
+  );
+
+
 //----------------------//
 // Profiles definitions //
 //----------------------//

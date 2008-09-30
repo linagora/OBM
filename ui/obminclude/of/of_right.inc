@@ -27,7 +27,7 @@ function of_right_dis_admin($entity, $entity_id, $real_entity='') {
 
   $consumers = of_right_consumer_for_entity($entity, $entity_id);
 
-  return html_dis_right_admin($consumers, $entity_id);
+  return html_dis_right_admin($consumers, $entity_id, $entity);
 }
 
 
@@ -87,22 +87,22 @@ function html_entityadmin_bar($writable_entity,$entity_id, $entity) {
 //   - $consumers : array of all consumers for the entity
 //   - $entity_id : entity selected
 ///////////////////////////////////////////////////////////////////////////////
-function html_dis_right_admin(&$consumers, $entity_id) {
+function html_dis_right_admin(&$consumers, $entity_id, $entity) {
   global $l_authorize_list,$l_read_permission, $l_write_permission, $l_acces_permission;
   global $l_right_validate ,$l_authorize,$l_deny, $ico_delete;
   global $l_public,$l_admin_permission, $module;
   global $path, $ico_add, $l_users, $l_groups;
+  global $cgp_default_right;
 
   $l_userSearch = phpStringToJsString("$l_users...");
   foreach ($consumers['consumer'] as $one_consumer) {
     $id = $one_consumer['id'];
-    $entity = $one_consumer['entity'];
+    $consumer = $one_consumer['entity'];
     $label = $one_consumer['label'];
     $write = $one_consumer['write'];
     $read = $one_consumer['read'];
     $admin = $one_consumer['admin'];
     $acces = $one_consumer['acces'];
-
     if ($id == 0) {
       if ($read == 1) {
         $style_read = 'visibility:hidden;';
@@ -118,54 +118,55 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       }
     } else {
       if ($write == 1) {
-	$sel_id = "data-$entity-$id";
-	$div_id = "sel_accept_write-data-$entity-$id";
-        ${'dis_'.$entity.'_write_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_accept_".$entity."_write');\"><img src=\"$ico_delete\"></a>
+	$sel_id = "data-$consumer-$id";
+	$div_id = "sel_accept_write-data-$consumer-$id";
+        ${'dis_'.$consumer.'_write_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_accept_".$consumer."_write');\"><img src=\"$ico_delete\"></a>
         $label
        <input value=\"$sel_id\" name=\"sel_accept_write[]\" type=\"hidden\" />
        </div>";
       }
       if ($read == 1) {
-	$sel_id = "data-$entity-$id";
-	$div_id = "sel_accept_read-data-$entity-$id";
-        ${'dis_'.$entity.'_read_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_accept_".$entity."_read');\"><img src=\"$ico_delete\"></a>
+	$sel_id = "data-$consumer-$id";
+	$div_id = "sel_accept_read-data-$consumer-$id";
+        ${'dis_'.$consumer.'_read_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_accept_".$consumer."_read');\"><img src=\"$ico_delete\"></a>
         $label
        <input value=\"$sel_id\" name=\"sel_accept_read[]\" type=\"hidden\" />
        </div>";
       }
       if ($admin == 1) {
-	$sel_id = "data-$entity-$id";
-        $div_id = "sel_accept_admin-data-$entity-$id";
-        ${'dis_'.$entity.'_admin_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_accept_".$entity."_admin');\"><img src=\"$ico_delete\"></a>
+	$sel_id = "data-$consumer-$id";
+        $div_id = "sel_accept_admin-data-$consumer-$id";
+        ${'dis_'.$consumer.'_admin_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_accept_".$consumer."_admin');\"><img src=\"$ico_delete\"></a>
         $label
        <input value=\"$sel_id\" name=\"sel_accept_admin[]\" type=\"hidden\" />
        </div>";
       }      
       if ($acces == 1) {
-	$sel_id = "data-$entity-$id";
-        $div_id = "sel_accept_acces-data-$entity-$id";
-        ${'dis_'.$entity.'_acces_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_accept_".$entity."_acces');\"><img src=\"$ico_delete\"></a>
+	$sel_id = "data-$consumer-$id";
+        $div_id = "sel_accept_acces-data-$consumer-$id";
+        ${'dis_'.$consumer.'_acces_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_accept_".$consumer."_acces');\"><img src=\"$ico_delete\"></a>
         $label
        <input value=\"$sel_id\" name=\"sel_accept_acces[]\" type=\"hidden\" />
        </div>";
       }
     }
   }
+  if($cgp_default_right[$entity]['public']['read'] != -1 || ($read == 1 && $id == 0)){ 
+    $block_consumer_read_public = "
+      <td class=\"detailLabel\">
+      $l_public
+      </td>
+      <td class=\"detailForm\" id=\"cb_read_public\">
+      <input onchange=\"togglePrivacy(this,'readRightBox');\" onclick=\"togglePrivacy(this,'readRightBox')\"
+      name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
+      </td>";
+  }
 
-  $block_consumer_read_public = "
-    <td class=\"detailLabel\">
-    $l_public
-    </td>
-    <td class=\"detailForm\" id=\"cb_read_public\">
-    <input onchange=\"togglePrivacy(this,'readRightBox');\" onclick=\"togglePrivacy(this,'readRightBox')\"
-    name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
-    </td>";
-
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
+  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
     $popup_user_add_button = "
     <a id=\"lnk_accept_read\" href=\"#\" onclick=\"return popup('$url');
       return false;\">
@@ -214,15 +215,16 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </td>
     </tr>";
 
-   $block_consumer_acces_public = "
-    <td class=\"detailLabel\">
-    $l_public
-    </td>
-    <td class=\"detailForm\" id=\"cb_acces_public\">
-    <input onchange=\"togglePrivacy(this,'accesRightBox');\" onclick=\"togglePrivacy(this,'accesRightBox')\"
-    name=\"cb_acces_public\" value=\"1\" type=\"checkbox\" $public_acces_checked />
-    </td>";
-
+  if($cgp_default_right[$entity]['public']['acces'] != -1 || ($acces == 1 && $id == 0)){ 
+     $block_consumer_acces_public = "
+      <td class=\"detailLabel\">
+      $l_public
+      </td>
+      <td class=\"detailForm\" id=\"cb_acces_public\">
+      <input onchange=\"togglePrivacy(this,'accesRightBox');\" onclick=\"togglePrivacy(this,'accesRightBox')\"
+      name=\"cb_acces_public\" value=\"1\" type=\"checkbox\" $public_acces_checked />
+      </td>";
+  }
     $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_acces";
     $popup_user_add_button = "
     <a id=\"lnk_accept_acces\" href=\"#\" onclick=\"return popup('$url');
@@ -273,16 +275,16 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     </tr>";
 
 
-   $block_consumer_write_public = "
-    <tr>
-    <td class=\"detailLabel\">
-    $l_public
-    </td>
-    <td class=\"detailForm\" id=\"cb_write_public\">
-    <input onchange=\"togglePrivacy(this,'writeRightBox');\" onclick=\"togglePrivacy(this,'writeRightBox')\"
-    name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked />
-    </td>";
-
+  if($cgp_default_right[$entity]['public']['write'] != -1 || ($write == 1 && $id == 0)){ 
+     $block_consumer_write_public = "
+      <td class=\"detailLabel\">
+      $l_public
+      </td>
+      <td class=\"detailForm\" id=\"cb_write_public\">
+      <input onchange=\"togglePrivacy(this,'writeRightBox');\" onclick=\"togglePrivacy(this,'writeRightBox')\"
+      name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked style=\"$public_write_checked_visibility\" />
+      </td>";
+  }
     $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
     $popup_user_add_button = "
       <a id=\"lnk_accept_write\" href=\"#\" onclick=\"return popup('$url');\">
@@ -397,9 +399,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   <fieldset class=\"detail infos\">
   <legend>$l_read_permission</legend>
   <table>
-  <tr>
     $block_consumer_read_public
-  </tr>
   <tbody style=\"$style_read\" id=\"readRightBox\">
     $block_consumer_read
   </tbody>
@@ -409,7 +409,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   <fieldset class=\"detail infos\">
   <legend>$l_write_permission</legend>
   <table>
-  <tr>
+  <tr style=\"$public_write_checked_visibility\" >
     $block_consumer_write_public
   </tr>
   <tbody style=\"$style_write\" id=\"writeRightBox\">
@@ -421,7 +421,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   <fieldset class=\"detail infos\">
   <legend>$l_acces_permission</legend>
   <table>
-  <tr>
+  <tr style=\"$public_acces_checked_visibility\" >
     $block_consumer_acces_public
   </tr>
   <tbody style=\"$style_acces\" id=\"accesRightBox\">
@@ -663,6 +663,21 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
   return $ret_array;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Read Default Rights given by conf.
+// Parameters:
+//   - $param  : hash entry with entity and right values
+//   - $entity : entity type to update
+//   - $real_entity : [optionnal] if set, real data entity (eg mailbox->user)
+///////////////////////////////////////////////////////////////////////////////
+function of_right_default($params, $entity, $real_entity='',$check_perms=true) {
+  global $cgp_default_right;
+  $params['write_public'] = ($cgp_default_right[$entity]['public']['write'] == -1)? 0:$cgp_default_right[$entity]['public']['write'];
+  $params['read_public'] = ($cgp_default_right[$entity]['public']['read'] == -1)? 0:$cgp_default_right[$entity]['public']['read'];;
+  $params['acces_public'] = ($cgp_default_right[$entity]['public']['acces'] == -1)? 0:$cgp_default_right[$entity]['public']['acces'];
+  of_right_update_right($params, $entity, $real_entity,$check_perms);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Update Rights given to users.
