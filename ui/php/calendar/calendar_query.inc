@@ -777,6 +777,21 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Check right user ,
+// Parameters:
+//   - sel_entity_id : selected entities id
+///////////////////////////////////////////////////////////////////////////////
+function check_acces_entity($consumers) {
+  
+  $obm_q = run_query_acces_entity();
+
+  $acces_entity = of_right_entity_for_user('RightEntity', $obm['uid'], 'acces','', $real_entity);
+
+  $no_acces=array_diff($consumers,$acces_entity);
+  
+  return $no_acces;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurrence of each event

@@ -284,13 +284,13 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   }
 
   $user_text = phpStringToJsString($l_search_users);
-  $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction_calendar=calendar";
+  $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;filter_entity=calendar";
   $user_add_button = "
     <a href=\"javascript: return false;\" 
     onclick=\"popup('$url_user','$user_text');
   return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>";
 
-  $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;restriction_calendar=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path.'/calendar/calendar_index.php')."&amp;ext_target=$l_calendar&amp;iso_date=$iso_date";
+  $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;filter_entity=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path.'/calendar/calendar_index.php')."&amp;ext_target=$l_calendar&amp;iso_date=$iso_date";
   $group_add_button = "
     <a href=\"javascript: return false;\" 
     onclick=\"popup('$url_group', '');
@@ -298,7 +298,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
 
   if ($ccalendar_resource) {
     $resource_text = phpStringToJsString($l_search_resources);
-    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;restriction=user";
+    $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;filter_entity=Resource";
     $resource_add_button = "    
       <a href=\"javascript: return false;\"
       onclick=\"popup('$url_resource','');
@@ -313,7 +313,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     </legend>
     <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />";
 
-    $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {restriction:'user', defaultText:'$resource_text'});";
+    $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {filter_entity:'Resource', defaultText:'$resource_text'});";
   }
   $cats1 = of_category_get_ordered('calendar', 'category1');
   $sel_cat1 = of_category_html_select('calendar', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
@@ -373,8 +373,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   <script type=\"text/javascript\">
     obm.vars.images.update = '$ico_group';
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {restriction:'calendar', defaultText:'$user_text'})
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {restriction:'calendar', mode: 'mono',
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {filter_entity:'calendar', filter_pattern:'read', defaultText:'$user_text'})
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {filter_entity:'calendar', filter_pattern:'read', mode: 'mono',
         locked: 'true', resetable: 'true', selectfunction:'sel_public_group(\"$iso_date\", element, this.inputField.value)'});
       $resource_js
     });
@@ -2875,7 +2875,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_task;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
-  global $l_alerts, $l_alerts_time, $l_color;
+  global $l_alerts, $l_alerts_time, $l_color ;
 
   $time_unit = 60 / $_SESSION['set_cal_interval'];  
   $repeatfrequency = 1;
@@ -3097,7 +3097,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $hourend = $hourbegin + 1;
   }
 
-  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id&amp;filter_entity=calendar&amp;filter_pattern=acces";
   $user_add_button = "
     <a href=\"javascript: return false;\" 
       onclick=\"popup('$url','');
@@ -3253,7 +3253,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       }
     }
 
-    $url = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
+    $url = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id&amp;filter_entity=Resource&amp;filter_pattern=acces";
     $resource_add_button = "
     <a href=\"javascript: return false;\" 
       onclick=\"popup('$url','');
@@ -3530,8 +3530,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   </form>
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch');
-      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&form=event', 'sel_resource_id', 'resourceSearch');
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'acces'});
+      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&form=event', 'sel_resource_id', 'resourceSearch',{filter_entity:'Resource', filter_pattern:'acces'});
       new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');
     });
   </script>"; 
@@ -3927,7 +3927,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     </tr>
   </table>
   </fieldset>   
-  $dis_block_resource
+    $dis_block_resource
   <fieldset class=\"buttons\">
     $dis_button
   </fieldset>    

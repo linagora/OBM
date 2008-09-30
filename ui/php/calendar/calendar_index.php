@@ -234,7 +234,8 @@ if ($action == 'index') {
   }
   if (check_calendar_data_form($params)) {
     if ( (!$params['force'])
-	 && ($conflicts = check_calendar_conflict($params, $entities)) ) {
+        && ($conflicts = check_calendar_conflict($params, $entities)) 
+        && ($no_acces = check_acces_entity($entities['user']))) {
       $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
       $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
       $display['detail'] = dis_calendar_event_form($action, $params, '',$entities);
