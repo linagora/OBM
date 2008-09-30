@@ -802,6 +802,7 @@ CREATE TABLE EntityRight (
   entityright_entity_id    integer NOT NULL,
   entityright_consumer     varchar(32) NOT NULL default '',
   entityright_consumer_id  integer NOT NULL,
+  entityright_acces         integer NOT NULL default 0,
   entityright_read         integer NOT NULL default 0,
   entityright_write        integer NOT NULL default 0,
   entityright_admin        integer NOT NULL default 0,

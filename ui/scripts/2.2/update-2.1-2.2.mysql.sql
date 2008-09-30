@@ -67,6 +67,7 @@ ALTER TABLE Document MODIFY COLUMN document_domain_id int(8) NOT NULL ;
 ALTER TABLE DocumentMimeType MODIFY COLUMN documentmimetype_domain_id int(8) NOT NULL ;
 ALTER TABLE DomainMailServer MODIFY COLUMN domainmailserver_domain_id int(8) NOT NULL ;
 ALTER TABLE EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
+ALTER TABLE EntityRight ADD entityright_acces int(1) NOT NULL default 0;
 ALTER TABLE EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
 ALTER TABLE EventEntity MODIFY COLUMN evententity_event_id int(8) NOT NULL ;
 ALTER TABLE EventEntity MODIFY COLUMN evententity_entity_id int(8) NOT NULL ;

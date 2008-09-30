@@ -1060,6 +1060,7 @@ CREATE TABLE EntityRight (
   entityright_entity_id int(8) NOT NULL,
   entityright_consumer varchar(32) NOT NULL default '',
   entityright_consumer_id int(8) NOT NULL,
+  entityright_acces int(1) NOT NULL default '0',
   entityright_read int(1) NOT NULL default '0',
   entityright_write int(1) NOT NULL default '0',
   entityright_admin int(1) NOT NULL default '0',

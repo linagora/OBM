@@ -119,6 +119,8 @@ obm.AutoComplete.Search = new Class({
       locked: false,                   // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
       resetable: false,                // only in 'mono' mode : reset field value
       restriction: null,               // obm needs
+      filter_entity: null,            // obm needs
+      filter_pattern: 'read',            // obm needs
       fieldText: obm.vars.labels.autocompleteField,          // default text displayed when empty field
       extension: null,                  // obm needs
       name: null
@@ -302,7 +304,7 @@ obm.AutoComplete.Search = new Class({
       this.requestId++;
       new Ajax(this.url, {
         method: 'post',
-        postBody: 'pattern='+this.currentValue+'&limit='+(this.options.results*3)+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
+        postBody: 'pattern='+this.currentValue+'&limit='+(this.options.results*3)+'&filter_pattern='+this.options.filter_pattern+'&filter_entity='+this.options.filter_entity+'&restriction='+this.options.restrictions+'&extension='+this.options.extension,
         onFailure:this.onFailure.bindAsEventListener(this),
         onComplete:this.onNewRequestSuccess.bindAsEventListener(this,[this.requestId])
       }).request();
@@ -317,7 +319,7 @@ obm.AutoComplete.Search = new Class({
         var requestNbr = ((this.options.results*2)>unknownResultsNbr ? unknownResultsNbr : this.options.results*2);
         new Ajax(this.url, {
           method: 'post',
-          postBody: 'pattern='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+requestNbr+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
+          postBody: 'pattern='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+requestNbr+'&filter_pattern='+this.options.filter_pattern+'&filter_entity='+this.options.filter_entity+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
           onFailure:this.onFailure.bindAsEventListener(this),
           onComplete:this.onCacheRequestSuccess.bindAsEventListener(this)
         }).request();
