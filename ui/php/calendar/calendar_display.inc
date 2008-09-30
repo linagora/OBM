@@ -1770,6 +1770,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
 
   $duration = $event->duration;
   $date = $occurrence->date;
+  $end = $occurrence->end;
   $id = $event->id;
   $entity_id = $occurrence->id;
   $entity = $occurrence->entity;
@@ -1837,7 +1838,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   if ($all_day) {
     $head .= $title;
   } else {
-    $head .= date('H:i',$date);
+    $head .= $date->get(Of_Date::TIME_SHORT);
   }
   
   $opt = '{'.implode(',',$options).'}';

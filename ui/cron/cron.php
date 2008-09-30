@@ -20,5 +20,4 @@ set_error_handler('errorHandler');
 
 $cron = new Cron($jobsPath);
 $cron->process();
-
 ?>

@@ -104,25 +104,29 @@ class CalendarAlertCronJob extends CronJob{
    */
   function deleteDeprecatedAlerts($date) {
     $obm_q = new DB_OBM;
+    $obm2_q = new DB_OBM;
     $db_type = $obm_q->type;
     $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat");
     $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
 
     $this->logger->debug("Deleting alerts older than ".date("Y-m-d H:i:s",$date));
-
+    $query = "
+      SELECT calendaralert_user_id, calendaralert_event_id FROM CalendarAlert
+      LEFT JOIN CalendarEvent ON calendarevent_id = calendaralert_event_id 
+      WHERE 
+      calendarevent_id IS NULL 
+      OR ($calendarevent_date + calendaralert_duration < $date AND calendarevent_repeatkind = 'none')
+      OR ($calendarevent_endrepeat + calendaralert_duration < $date AND calendarevent_repeatkind != 'none')";
     $obm_q = new DB_OBM;
-    $query = "DELETE FROM CalendarAlert WHERE calendaralert_event_id IN
-      ( SELECT calendarevent_id FROM CalendarEvent   
-        WHERE  calendarevent_repeatkind = 'none'
-          AND $calendarevent_date <  $date
-      ) OR calendaralert_event_id IN
-      ( SELECT calendarevent_id FROM CalendarEvent 
-        WHERE calendarevent_repeatkind != 'none'
-          AND $calendarevent_endrepeat  < $date
-        )";
     $this->logger->core($query);
     $obm_q->query($query);
-    $this->logger->info($obm_q->affected_rows()." alerts deleted");
+    while($obm_q->next_record()) {
+      $query = "DELETE FROM CalendarAlert WHERE calendaralert_event_id = ".$obm_q->f('calendaralert_event_id')."
+                AND calendaralert_user_id = ".$obm_q->f('calendaralert_event_id');
+      $this->logger->core($query);
+      $obm2_q->query($query);
+    }
+    $this->logger->info($obm_q->nf()." alerts deleted");
   }
 
   /**
@@ -294,7 +298,6 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
   $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date");
 
-  $multidomain = sql_multidomain("calendarevent");
 
   $query = "SELECT
       calendarevent_id,
@@ -322,7 +325,6 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       AND ($calendarevent_date - calendaralert_duration) >= $start
       AND ($calendarevent_date - calendaralert_duration) <=  $end
       AND  calendaralert_duration > 0
-      $multidomain
       ORDER BY calendarevent_date
 ";
 
@@ -347,7 +349,6 @@ function run_query_calendar_repeat_alerts($start, $end) {
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
   $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date");
   $calendarevent_endrepeat_l = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat");
-  $multidomain = sql_multidomain("calendarevent");
 
   $query = "SELECT
       calendarevent_id,
@@ -379,7 +380,6 @@ function run_query_calendar_repeat_alerts($start, $end) {
       AND (($calendarevent_endrepeat  - calendaralert_duration) >= $start
       OR $calendarevent_endrepeat = '0')
       AND  calendaralert_duration > 0
-      $multidomain
     ORDER BY calendarevent_date"; 
 
   Logger::log($query,L_CORE,"calendaralertcronjob");

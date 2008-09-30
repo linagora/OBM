@@ -113,9 +113,6 @@ class DB_Sql {
       return 0; /* we already complained in connect() about that. */
     }
 
-    // Store the query string - PB Aliacom
-    //TODO : REPLACE = NULL by IS NULL IN SELECT
-    //CRAAAPPPPPYYYY 
     $this->obm_query = $Query_String;
 
     # New query, discard previous result.
@@ -395,6 +392,43 @@ class DB_Sql {
       $i++;
      }
    return $return;
+  }
+
+  function xquery($query, $hide_error='') {
+    preg_match_all('/#[\w_]+(\((?:(?>[^()]+)|(?1))*\))?/', $query, $pcodes);
+    $translate = array();
+    foreach($pcodes[0] as $pcode) {
+      $translate= array_merge($translate,$this->interpret($pcode));
+    }
+    $query = strtr($query, $translate);
+    $this->query($query, $hide_error);
+  }
+  
+  function interpret($code) {
+    preg_match_all("/(#)?([^ (,]+)(\(((?:(?>[^()]+)|(?3))*)\))?/",$string, $match);
+    $return = array();
+    foreach($match[0] as $key => $pattern) {
+      if(!empty($match[3][$key])) {
+        $args = $this->interpret($match[4][$key]);
+      } else {
+        $args = NULL;
+      }
+      if(!empty($match[1][$key])) {
+        if(!is_null($args)) {
+          $pcode = $this->$match[2][$key]($args);
+        } else {
+          $pcode = $this->$match[2][$key];
+        } 
+      }else  {
+        if(!is_null($args)) {
+          $pcode = $match[2][$key].'('.implode(',', $args).')';
+        } else {
+          $pcode = $match[2][$key];
+        }
+      }
+      $return[$pattern] = $pcode;
+    }
+    return $return;
   }
 }
 ?>

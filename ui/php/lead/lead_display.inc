@@ -145,7 +145,7 @@ function html_lead_search_form($params, $sources, $status, $managers) {
   $sel_manager .= '</select>';
 
   $block = "
-  <form method=\"get\" name=\"f_search\" action=\"lead_index.php?action=search\" class=\"search\">
+  <form method=\"post\" name=\"f_search\" action=\"lead_index.php?action=search\" class=\"search\">
 
     <label>$l_text<br />
      <input name=\"tf_text\" size=\"24\" value=\"$text\" />
@@ -595,7 +595,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
 
   // --- HTML Template --------------------------------------------------------
   $block .= "
-    <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_lead(this)) return true; else return false;\" action=\"".url_prepare('lead_index.php')."\">
+    <form method=\"post\" name=\"f_entity\" onsubmit=\"if (check_lead(this)) return true; else return false;\" action=\"".url_prepare('lead_index.php')."\">
 
 <fieldset class=\"detail infos\">
     <legend>$l_lead</legend>
@@ -683,7 +683,7 @@ function dis_can_delete_lead($p_id) {
 
   $url = url_prepare('lead_index.php');
 
-  $dis_back = "<form name=\"form_back\" method=\"get\" action=\"$url\">
+  $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
     <input type=\"hidden\" name=\"lead_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_back\" />
