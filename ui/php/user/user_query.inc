@@ -635,6 +635,9 @@ function run_query_user_insert($user) {
   }
 
   if ($id > 0) {
+    $user['entity_id'] = $id;
+    of_right_default($user,'mailbox','userobm',false);
+    of_right_default($user,'calendar','userobm',false);
     $ret = of_userdata_query_update('user', $id, $user);
     // Insert user's photo
     if(isset($user['file_tmp']) && $user['file_tmp'] != '') {

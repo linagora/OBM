@@ -268,7 +268,7 @@ function run_query_resource_insert($resource) {
   if ($retour) {
     $id = get_resource_id($name);
     $resource['entity_id'] = $id;
-    of_right_update_right($resource, 'Resource', '',false) ;
+    of_right_default($resource, 'Resource', '',false) ;
   }
 
   return $id;
