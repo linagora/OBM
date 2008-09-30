@@ -164,7 +164,7 @@ class CalendarAlertCronJob extends CronJob{
       $title = $nr_q->f("calendarevent_title");
       $privacy = $nr_q->f("calendarevent_privacy");
       $description = $nr_q->f("calendarevent_description"); 
-      $entity_label = $nr_q->f("userobm_lastname") ." ".$r_q->f("userobm_firstname");
+      $entity_label = $nr_q->f("userobm_lastname") ." ".$nr_q->f("userobm_firstname");
       $location = $nr_q->f("calendarevent_location"); 
       $category1 = $nr_q->f("calendarcategory1_label");
       $priority = $nr_q->f("calendarevent_priority");
