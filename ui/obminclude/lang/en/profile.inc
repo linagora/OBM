@@ -31,3 +31,21 @@ $l_profile_default_permission_empty = "Default permission error. Please choose a
 
 // Infos
 $l_admin_realm_info = "* Accepted values for Admin realm field are :<blockquote><i>user</i>, <i>delegation</i>, <i>domain</i></blockquote>or a combined succession of these value separated by a space character.";
+
+$l_profile_delete_warning = "Removing this profile is not permitted ! At least one user remain.";
+
+// Labels de formulaires
+$l_module_name = "Module";
+$l_right_default = "By default";
+$l_right_read = "Read";
+$l_right_write = "Write";
+$l_right_own = "Own";
+$l_right_read_admin = "Read Adm";
+$l_right_write_admin = "Write Adm";
+$l_default_permissions = "Default permissions";
+$l_general_properties = "Main property";
+$l_section_disable = "Disable";
+$l_section_enable = "Enable";
+$l_active_section = "Enable sections";
+$l_section_all = "All";
+$l_section_none = "None";

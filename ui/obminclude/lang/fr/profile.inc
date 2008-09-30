@@ -31,3 +31,21 @@ $l_profile_default_permission_empty = "Erreur sur les permissions par défaut. V
 
 // Infos
 $l_admin_realm_info = "* Les valeurs acceptés pour Étendue de l'administration sont :<blockquote><i>user</i>, <i>delegation</i>, <i>domain</i></blockquote>ou bien une combinaison de ces valeurs séparés par un espace.";
+
+$l_profile_delete_warning = "Suppression du profil non permise ! Au moins un utilisateur est affecté au profil.";
+
+// Labels de formulaires
+$l_module_name = "Module";
+$l_right_default = "Par défaut";
+$l_right_read = "Lecture";
+$l_right_write = "Ecriture";
+$l_right_own = "Proprio";
+$l_right_read_admin = "Lecture Adm";
+$l_right_write_admin = "Ecriture Adm";
+$l_default_permissions = "Permissions par défaut";
+$l_general_properties = "Propriété principale";
+$l_section_disable = "Désactiver";
+$l_section_enable = "Activer";
+$l_active_section = "Activer sections";
+$l_section_all = "Toutes";
+$l_section_none = "Aucune";

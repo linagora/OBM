@@ -72,3 +72,87 @@ INSERT INTO UserSystem VALUES (3,'samba','m#Pa!NtA','106','65534','/','SAMBA','L
 -- utilisateur 'obmsatellite', mot de passe 'mG4_Zdnh' - doit avoir le droit de
 -- lecture sur l'arborescence d'OBM
 INSERT INTO UserSystem VALUES (4,'obmsatellite','mG4_Zdnh','200','65534','/','OBM Satellite','LDAP Reader','/bin/false');
+
+
+--------------------------------------------------------------------------------
+-- Remplissage des tables relatives aux profils utilisateurs
+--------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Default Profile properties
+-------------------------------------------------------------------------------
+DELETE FROM ProfileProperty;
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('update_state', 'integer', 1, 1);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level', 'integer', 3);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level_managepeers', 'integer', 0);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('access_restriction', 'text', 'ALLOW_ALL');
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('admin_realm', 'text', '');
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('last_public_contact_export', 'timestamp', 0, 1);
+
+-------------------------------------------------------------------------------
+-- Default Profiles
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Admin Profile
+INSERT INTO Profile (profile_timeupdate, profile_timecreate, profile_userupdate, profile_usercreate, profile_domain_id, profile_name) values (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, (select domain_id from Domain where domain_name='global.virtual'), 'admin');
+
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='admin'), (select profileproperty_id from ProfileProperty where profileproperty_name='level'), '1');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='admin'), (select profileproperty_id from ProfileProperty where profileproperty_name='level_managepeers'), '1');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='admin'), (select profileproperty_id from ProfileProperty where profileproperty_name='access_restriction'), 'ALLOW_ALL');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='admin'), (select profileproperty_id from ProfileProperty where profileproperty_name='admin_realm'), 'user delegation domain');
+
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('default', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='admin'), 1);
+
+INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='admin'), 29);
+INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('domain', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='admin'), 0);
+
+-------------------------------------------------------------------------------
+-- Admin_delegue Profile
+INSERT INTO Profile (profile_timeupdate, profile_timecreate, profile_userupdate, profile_usercreate, profile_domain_id, profile_name) values (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, (select domain_id from Domain where domain_name='global.virtual'), 'admin_delegue');
+
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='admin_delegue'), (select profileproperty_id from ProfileProperty where profileproperty_name='level'), '2');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='admin_delegue'), (select profileproperty_id from ProfileProperty where profileproperty_name='level_managepeers'), '1');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='admin_delegue'), (select profileproperty_id from ProfileProperty where profileproperty_name='access_restriction'), 'ALLOW_ALL');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='admin_delegue'), (select profileproperty_id from ProfileProperty where profileproperty_name='admin_realm'), 'user delegation');
+
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('default', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='admin_delegue'), 1);
+
+INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='admin_delegue'), 29);
+INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('domain', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='admin_delegue'), 0);
+
+-------------------------------------------------------------------------------
+-- Editor Profile
+INSERT INTO Profile (profile_timeupdate, profile_timecreate, profile_userupdate, profile_usercreate, profile_domain_id, profile_name) values (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, (select domain_id from Domain where domain_name='global.virtual'), 'editor');
+
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='editor'), (select profileproperty_id from ProfileProperty where profileproperty_name='level'), '3');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='editor'), (select profileproperty_id from ProfileProperty where profileproperty_name='level_managepeers'), '0');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='editor'), (select profileproperty_id from ProfileProperty where profileproperty_name='access_restriction'), 'ALLOW_ALL');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='editor'), (select profileproperty_id from ProfileProperty where profileproperty_name='admin_realm'), '');
+
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('default', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='editor'), 0);
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('com', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='editor'), 1);
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('prod', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='editor'), 1);
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('user', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='editor'), 1);
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('my', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='editor'), 1);
+
+INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='editor'), 5);
+
+-------------------------------------------------------------------------------
+-- User Profile
+INSERT INTO Profile (profile_timeupdate, profile_timecreate, profile_userupdate, profile_usercreate, profile_domain_id, profile_name) values (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, (select domain_id from Domain where domain_name='global.virtual'), 'user');
+
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='user'), (select profileproperty_id from ProfileProperty where profileproperty_name='level'), '4');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='user'), (select profileproperty_id from ProfileProperty where profileproperty_name='level_managepeers'), '0');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='user'), (select profileproperty_id from ProfileProperty where profileproperty_name='access_restriction'), 'ALLOW_ALL');
+INSERT into ProfilePropertyValue (profilepropertyvalue_profile_id, profilepropertyvalue_property_id, profilepropertyvalue_property_value) values ((select profile_id from Profile where profile_name='user'), (select profileproperty_id from ProfileProperty where profileproperty_name='admin_realm'), '');
+
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('default', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='user'), 0);
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('com', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='user'), 1);
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('prod', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='user'), 1);
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('user', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='user'), 1);
+INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('my', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='user'), 1);
+
+INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='user'), 0);
+INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('calendar', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='user'), 5);
+INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('mailbox', (select domain_id from Domain where domain_name='global.virtual'), (select profile_id from Profile where profile_name='user'), 5);

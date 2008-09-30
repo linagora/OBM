@@ -23,8 +23,8 @@ if ($obmdb_dbtype == $db_type_pgsql) {
 }
 
 require_once("$obminclude/phplib/ct_sql.inc");
-require_once("$obminclude/of/of_session.inc");
 require_once("$obminclude/of/of_query.inc");
+require_once("$obminclude/of/of_session.inc");
 require_once("$obminclude/of/of_display.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,6 @@ class DB_OBM extends DB_Sql {
       return $this->num_rows();
   }
 }
-
 
 class OBM_User_Sql extends CT_Sql {
   var $database_class = "DB_OBM";         // Which database to connect...

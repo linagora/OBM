@@ -8,18 +8,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-//FIXME To put in lang files
-$l_module_name = "Module";
-//$l_name = "Nom";
-$l_right_default = "Par défaut";
-$l_right_read = "Lecture";
-$l_right_write = "Ecriture";
-$l_right_own = "Proprio";
-$l_right_read_admin = "Lecture Adm";
-$l_right_write_admin = "Ecriture Adm";
-$l_default_permissions = "Permissions par défaut";
-$l_general_properties = "Propriétés principal";
-//FIXME
+global $l_module_name;
+global $l_right_default;
+global $l_right_read;
+global $l_right_write;
+global $l_right_own;
+global $l_right_read_admin;
+global $l_right_write_admin;
+global $l_default_permissions;
+global $l_general_properties;
+
 
 /**
  * Produce HTML Profile List content
@@ -88,6 +86,7 @@ function html_profile_superform($params, $action, $profile = array()) {
 	
   // labels
   global $l_right_default, $l_name, $l_module_name, $l_properties;
+  global $l_section_disable;
   
   // titles
   global $l_default_permissions, $l_general_properties;
@@ -101,6 +100,7 @@ function html_profile_superform($params, $action, $profile = array()) {
   if ($action == 'consult' || $action == 'update') {
 	$value['name']          = $profile['name'];
     $value['modules_right'] = $profile['modules_right'];
+    $value['default_section_show'] = $profile['sections_show']['default'];
     $value['sections_show'] = $profile['sections_show'];
     $value['properties']    = $profile['properties'];
   }
@@ -111,6 +111,7 @@ function html_profile_superform($params, $action, $profile = array()) {
      ) {
 	$value['name']          = $params['name'];
 	$value['modules_right'] = $params['modules_right'];
+	$value['default_section_show'] = $params['sections_show']['default'];
     $value['sections_show'] = $params['sections_show'];
     $value['properties']    = $params['properties'];
   } else if ($action == 'insert') {
@@ -141,6 +142,23 @@ function html_profile_superform($params, $action, $profile = array()) {
     }
   }
   
+  // Default Sections show
+  $checked_rd1 = "";
+  $checked_rd2 = "";
+  if (!isset($value['default_section_show']) || $value['default_section_show']) {
+    $checked_rd1 .= "checked=\"checked\"";
+  } else {
+    $checked_rd2 .= "checked=\"checked\"";
+  }
+  
+  if ($action != 'consult') {
+    $field['default_section_show_true'] = "<input type=\"radio\" name=\"rd_default_section_show\" value=\"1\" $checked_rd1 onchange=\"setSectionState('active')\" />";
+    $field['default_section_show_false'] = "<input type=\"radio\" name=\"rd_default_section_show\" value=\"0\" $checked_rd2 onchange=\"setSectionState('deactive')\" />";
+  } else {
+    $field['default_section_show_true'] = ($checked_rd1 == "checked=\"checked\"" ? "X" : ""); 
+    $field['default_section_show_false'] = ($checked_rd2 == "checked=\"checked\"" ? "X" : "");
+  }
+  
   // make $function_make_checkbox_field
   $checked_condition = 'if ($checked)';
   $parameters_make_checkbox_field = '$name, $checked, $ext';
@@ -152,12 +170,21 @@ function html_profile_superform($params, $action, $profile = array()) {
   } else {
     $function_make_checkbox_field = create_function($parameters_make_checkbox_field,
       $checked_condition. ' $checked = "checked=\"checked\""; 
-      return "<label for=\"cbx_$name\">
-      <input type=\"checkbox\" name=\"cba_$name\" id=\"cbx_$name\" value=\"1\" $checked $ext/></label>";');
+      return "<input type=\"checkbox\" name=\"cba_$name\" id=\"cbx_$name\" value=\"1\" $checked $ext/>";');
   }
   /////////// Prepare fields ///////////////////////////////////// END
   
   /////////// Make HTML blocks /////////////////////////////////// BEGIN
+  
+  // Custom JavaScript
+  $block_js = "<script type=\"text/javascript\" language=\"JavaScript\">";
+  if (!isset($value['default_section_show']) || $value['default_section_show']) {
+    $sectionAction = "active";
+    } else {
+    $sectionAction = "deactive";
+  }
+  $block_js .= "setSectionState('$sectionAction');
+  	</script>";
   
   // Custom CSS styles
   $block_style = "
@@ -174,6 +201,13 @@ function html_profile_superform($params, $action, $profile = array()) {
     	text-align: left;
     	float: right;
     }
+    table.allSections {
+    	text-align: center;
+    	width: auto;
+   	}
+   	table.allSections tr td {
+   		vertical-align: top;
+   	}
   </style>";
   
   // Profile name
@@ -224,7 +258,17 @@ function html_profile_superform($params, $action, $profile = array()) {
   </div>";
   
   // Profile section/modules
-  $block_sectionsModules .= "<div class=\"result extra\">";
+  global $l_active_section, $l_section_all, $l_section_none;
+  $block_allSections = "<div class=\"detail\" style=\"clear: left\">";
+  $block_allSections .= "<h1>$l_active_section</h1>
+    <table class=\"allSections\"><tbody>
+      <tr><td><label>$l_section_all<br />$field[default_section_show_true]</label></td>
+          <td><label>$l_section_none<br />$field[default_section_show_false]</label></td>
+      </tr>
+    </tbody></table>
+  </div>";
+  
+  $block_sectionsModules = "<div class=\"result\">";
   
   $block_rights_header = '';
   foreach ($cright_list as $right_name) {
@@ -233,7 +277,6 @@ function html_profile_superform($params, $action, $profile = array()) {
   
   foreach ($obm_modules as $section_name => $modules) {
     $block_table = '';
-    //$block_table .= "<input type=\"checkbox\" /> Désactiver la section"; //FIXME truc à compléter
     
 	  $block_table .= "<table class=\"perms\"><thead>
 	      <tr><td>$l_module_name</td>
@@ -262,20 +305,28 @@ function html_profile_superform($params, $action, $profile = array()) {
   	
     $block_table .= "</tbody></table>";
     
-    $checked = $value['sections_show'][$section_name];
+    if ($value['sections_show']['default']) {
+      $checked = ($value['sections_show'][$section_name] ? false : true);
+    } else {
+      $checked = ($value['sections_show'][$section_name] ? true : false);
+    }
     $block_sectionsModules .= "<div class=\"detail extra\"\">
       <h1>". $GLOBALS['l_section_'. $section_name]. "</h1>";
     
-    if( ( !$value['sections_show'][$section_name] && ($params['action'] != "detailconsult" && $params['action'] != "update") )|| $value['sections_show'][$section_name] ) {
-      $block_sectionsModules .= "<div class=\"R\">Désactiver&nbsp;". $function_make_checkbox_field($section_name. '_show',
-          $checked, '')."</div>";
-    }
+
+     if ($action != 'consult' || ($action == 'consult' && ($value['sections_show']['default'] && $checked))
+                              || ($action == 'consult' && (!$value['sections_show']['default'] && $checked))) {
+     
+       $block_sectionsModules .= "<div><label for=\"cbx_$section_name\" class=\"activeSection\"></label>"
+                                 .$function_make_checkbox_field($section_name. '_show', $checked, '')
+                                 ."</div>";
+     }
+
+     if ($action != 'consult' || ($action == 'consult' && ($value['sections_show']['default'] && !$checked))
+                              || ($action == 'consult' && (!$value['sections_show']['default'] && $checked))) {
+       $block_sectionsModules .= $block_table;
+     }
     
-    if( ($params['action'] != 'detailconsult' && $params['action'] != 'update')
-        || ( (($params['action'] == 'detailconsult' || $params['action'] == 'update') && !$value['sections_show'][$section_name]) )
-      ) {
-      $block_sectionsModules .= $block_table;
-    }
     $block_sectionsModules .= "</div>";
   }
   
@@ -286,7 +337,9 @@ function html_profile_superform($params, $action, $profile = array()) {
            .$block_name
            .$block_properties
            .$block_defaultPerm
-           .$block_sectionsModules;
+           .$block_allSections
+           .$block_sectionsModules
+           .$block_js;
   
   // Build profile form
   if ($action != 'consult') {

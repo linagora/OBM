@@ -211,6 +211,7 @@ $perm_admin = '1D';
 //------------------------------//
 // Default Profiles definitions //
 //------------------------------//
+
 $profiles['user'] = array (
   'section' => array (
     'default' => 0,
@@ -251,7 +252,7 @@ $profiles['admin'] = array (
   'level_managepeers' => 1,
   'access_restriction' => 'ALLOW_ALL',
   'access_exeptions' => array()
-);
+); 
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -407,6 +408,7 @@ $cgp_user = array();
 
 require_once('conf/obm_conf.inc');
 require_once("$obminclude/phplib/obmlib.inc");
+
 
 define('C_IMAGE_PATH',$cgp_host.'images');
 

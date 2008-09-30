@@ -142,6 +142,87 @@ ALTER TABLE displaypref ALTER COLUMN display_user_id SET DEFAULT NULL;
 ALTER TABLE UGroup ALTER COLUMN group_manager_id DROP DEFAULT;
 ALTER TABLE UGroup ALTER COLUMN group_manager_id SET DEFAULT NULL;
 
+--
+-- Add tables structures around Profiles
+--
+
+--
+-- Table structure for table 'Profile'
+--
+
+CREATE TABLE Profile (
+	profile_id			serial,
+	profile_domain_id	integer NOT NULL,
+	profile_timeupdate	timestamp,
+	profile_timecreate	timestamp,
+	profile_userupdate	integer default null,
+	profile_usercreate  integer default null,
+	profile_name		varchar(64) default null,
+	PRIMARY KEY (profile_id)
+);
+
+--
+-- Table structure for table 'ProfileModule'
+--
+
+CREATE TABLE ProfileModule (
+	profilemodule_id			serial,
+	profilemodule_domain_id		integer NOT NULL,
+	profilemodule_profile_id	integer default NULL,
+	profilemodule_module_name	varchar(16) NOT NULL default '',
+	profilemodule_right			integer default NULL,
+	PRIMARY KEY (profilemodule_id)
+);
+
+--
+-- Table structure for table `ProfileSection`
+--
+
+CREATE TABLE ProfileSection (
+	profilesection_id			serial,
+	profilesection_domain_id	integer NOT NULL,
+	profilesection_profile_id	integer default NULL,
+	profilesection_section_name	varchar(16) NOT NULL default '',
+	profilesection_show			smallint default NULL,
+	PRIMARY KEY (profilesection_id)
+);
+
+--
+-- Table structure for table `ProfileProperty`
+--
+
+CREATE TABLE ProfileProperty (
+	profileproperty_id 			serial,
+	profileproperty_type		varchar(32) default NULL,
+	profileproperty_default		varchar(64) default NULL,
+	profileproperty_readonly	smallint default 0,
+	profileproperty_name		varchar(32) NOT NULL default '',
+	PRIMARY KEY (profileproperty_id)
+);
+
+--
+-- Table structure for table `ProfilePropertyValue`
+--
+
+CREATE TABLE ProfilePropertyValue (
+	profilepropertyvalue_id				serial,
+	profilepropertyvalue_profile_id		integer default NULL,
+	profilepropertyvalue_property_id	integer default NULL,
+	profilepropertyvalue_property_value	varchar(32) NOT NULL default '',
+	PRIMARY KEY (profilepropertyvalue_id)
+);
+
+-------------------------------------------------------------------------------
+-- Default Profile properties
+-------------------------------------------------------------------------------
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('update_state', 'integer', 1, 1);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level', 'integer', 3);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level_managepeers', 'integer', 0);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('access_restriction', 'text', 'ALLOW_ALL');
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('admin_realm', 'text', '');
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('last_public_contact_export', 'timestamp', 0, 1);
+
+
 -- Foreign key from account_domain_id to domain_id
 DELETE FROM Account WHERE account_domain_id NOT IN (SELECT domain_id FROM Domain) AND account_domain_id IS NOT NULL;
 ALTER TABLE Account ADD CONSTRAINT account_domain_id_domain_id_fkey FOREIGN KEY (account_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -1192,15 +1273,15 @@ ALTER TABLE Resource ADD CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KE
 
 -- Foreign key from resource_userupdate to userobm_id
 UPDATE Resource SET resource_usercreate = NULL WHERE resource_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND resource_usercreate IS NOT NULL;
-ALTER TABLE Resource ADD CONSTRAINT resource_userupdate_userobm_id_fkey FOREIGN KEY (resource_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+ALTER TABLE Resource ADD CONSTRAINT resource_userupdate_userobm_id_fkey FOREIGN KEY (resource_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- Foreign key from resource_usercreate to userobm_id
 UPDATE Resource SET resource_usercreate = NULL WHERE resource_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND resource_usercreate IS NOT NULL;
-ALTER TABLE Resource ADD CONSTRAINT resource_usercreate_userobm_id_fkey FOREIGN KEY (resource_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+ALTER TABLE Resource ADD CONSTRAINT resource_usercreate_userobm_id_fkey FOREIGN KEY (resource_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- Foreign key from resource_rtype_id to resourcetype_id
 UPDATE Resource SET resource_rtype_id = NULL WHERE resource_rtype_id NOT IN (SELECT resourcetype_id FROM ResourceType) AND resource_rtype_id IS NOT NULL;
-ALTER TABLE Resource ADD CONSTRAINT resource_rtype_id_resourcetype_id_fkey FOREIGN KEY (resource_rtype_id) REFERENCES ResourceType (resourcetype_id) ON DELETE SET NULL ON UPDATE CASCADE
+ALTER TABLE Resource ADD CONSTRAINT resource_rtype_id_resourcetype_id_fkey FOREIGN KEY (resource_rtype_id) REFERENCES ResourceType (resourcetype_id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- Foreign key from resourcegroup_rgroup_id to rgroup_id
 DELETE FROM ResourceGroup WHERE resourcegroup_rgroup_id NOT IN (SELECT rgroup_id FROM RGroup) AND resourcegroup_rgroup_id IS NOT NULL;
@@ -1391,3 +1472,14 @@ ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_group_id_group_id_fkey FORE
 DELETE FROM of_usergroup WHERE of_usergroup_user_id NOT IN (SELECT userobm_id FROM UserObm) AND of_usergroup_user_id IS NOT NULL;
 ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_user_id_userobm_id_fkey FOREIGN KEY (of_usergroup_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+-- Foreign key from profilemodule_profile_id to profile_id
+ALTER TABLE ProfileModule ADD CONSTRAINT profilemodule_profile_id_profile_id_fkey FOREIGN KEY (profilemodule_profile_id) REFERENCES Profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from profilesection_profile_id to profile_id
+ALTER TABLE ProfileSection ADD CONSTRAINT profilesection_profile_id_profile_id_fkey FOREIGN KEY (profilesection_profile_id) REFERENCES Profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from profilepropertyvalue_profile_id to profile_id
+ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profile_id_profile_id_fkey FOREIGN KEY (profilepropertyvalue_profile_id) REFERENCES Profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from profilepropertyvalue_property_id to profileproperty_id
+ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty(profileproperty_id) ON UPDATE CASCADE ON DELETE CASCADE;

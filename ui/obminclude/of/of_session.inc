@@ -377,7 +377,10 @@ class Auth {
 class Perm {
 
   function Perm () {
-    global $profiles,$obm,$perm_admin, $perm_user;
+    global $profiles, $obm, $perm_admin, $perm_user;
+
+	$profiles = get_all_profiles();
+
     if (! isset($profiles["admin"])) {
       $profiles["admin"] = array (
         'section' => array (
@@ -404,7 +407,8 @@ class Perm {
             'password' => $perm_admin,
             'settings' => $perm_admin,
             'tools' => $perm_admin,
-            'group' => $perm_user
+            'group' => $perm_user,
+			'profile' => $perm_admin
           ),
           'properties' => array (
             'admin_realm' => array ('domain')
@@ -415,6 +419,7 @@ class Perm {
     }
   }
 
+
   //-------------------------------------------------------------------------//
   // Return the profile access right of the section given as parameter       //
   // Parameters:
@@ -422,8 +427,8 @@ class Perm {
   //-------------------------------------------------------------------------//
   function get_section_rights($section) {
     global $profiles, $obm;
-
-    $profile = $obm["profile"];
+	
+	$profile = $obm["profile"];
     if (isset($profiles[$profile]['section'][$section])) {
       return $profiles[$profile]['section'][$section];
     } else {
@@ -440,13 +445,15 @@ class Perm {
   //-------------------------------------------------------------------------//
   function get_module_rights($module) {
     global $profiles, $obm;
-
-    $profile = $obm["profile"];
+	
+	$profile = $obm["profile"];
 
     if (isset($profiles[$profile]['module'][$module])) {
       return hexdec($profiles[$profile]['module'][$module]);
+		
     } else {
       return hexdec($profiles[$profile]['module']['default']);
+		
     }
  
     return $module_right;

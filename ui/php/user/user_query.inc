@@ -336,7 +336,8 @@ function run_query_user_detail($p_id) {
 //   $id : new user id if ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_insert($user) {
-  global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
+  //global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
+  global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
   $now = date('Y-m-d H:i:s');
@@ -378,6 +379,7 @@ function run_query_user_insert($user) {
   $desc = $user['desc'];
 
   // Target Delegation handling (if updated user as delegation admin realm)
+  $profiles = get_profile_list();
   $admin_realm = $profiles[$profile]['properties']['admin_realm'];
   if (is_array($admin_realm)) {
     if (in_array('delegation', $admin_realm)) {
@@ -712,7 +714,8 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
 //     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_update($p_id, $user) {
-  global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
+  //global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
+  global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
   global $c_renameUserMailbox, $cmd_ldap_passwd;
 
@@ -738,6 +741,7 @@ function run_query_user_update($p_id, $user) {
   $photo_id = sql_parse_id($user['photo_id']);
 
   // Target Delegation handling (if updated user as delegation admin realm)
+  $profiles = get_profile_list();
   $admin_realm = $profiles[$profile]['properties']['admin_realm'];
   if (is_array($admin_realm)) {
     if (in_array('delegation', $admin_realm)) {
@@ -1509,7 +1513,8 @@ function check_user_data_form($p_id, &$user) {
   global $php_regexp_home, $php_regexp_drive, $l_err_home, $l_err_drive;
   global $php_regexp_password;
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
-  global $obm, $profiles, $cgp_use, $c_imagetype;
+  //global $obm, $profiles, $cgp_use, $c_imagetype;
+  global $obm, $cgp_use, $c_imagetype;
   global $c_max_image_size;
   global $l_err_delegation_target_outside_domain, $l_err_delegation_target_outside_target;
   global $l_err_delegation_outside_domain, $l_err_delegation_outside_target;
@@ -1550,6 +1555,8 @@ function check_user_data_form($p_id, &$user) {
   $smb_home_drive = $user['smb_home_drive'];
   $smb_logon = $user['smb_logon'];
   $file = $user['file_tmp'];
+  
+  $profiles = get_profile_list();
   
   // We can't handle a user with a more privileged profile
   // Or same privilege with 'impair' profile
@@ -1947,9 +1954,12 @@ function get_linked_user_timetask_nb($p_id) {
 //   true if the user can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_user_can_delete($params) {
-  global $obm, $profiles, $err, $ok_msg;
+  //global $obm, $profiles, $err, $ok_msg;
+  global $obm, $err, $ok_msg;
   global $l_profile_privilege_error, $l_link_timetask, $l_link_timetask_no;
 
+  $profiles = get_profile_list();
+  
   $delete_ok = true;
 
   // Links from Time management (referencing projects)
@@ -2084,6 +2094,65 @@ function run_query_user_delete_profile($user_id)  {
     WHERE ogroupentity_entity='user' AND ogroupentity_entity_id $user_id ";
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(OrganizationalChart)');
   $obm_q->query($query);
+}
+
+/**
+ * Return profile list [$name][id] => id
+ * 					   [$name][properties][admin_realm] => array
+ * 					   [$name][level] => level
+ * 					   [$name][level_managepeers] => level_managepeers
+ * 					   [$name][access_restriction] => access_restriction
+ * 					   [$name][module][default | $module_name] => false|section_name
+ * 					   [$name][section][default | $section_name] => ...
+ * 
+ **/
+function get_profile_list() {
+  global $cdg_sql;
+  
+  $profiles = array();
+  $query = "SELECT profile_id, profile_name
+    FROM Profile";
+
+  display_debug_msg($query, $cdg_sql, 'get_profile_list()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f('profile_id');
+    $name = trim($obm_q->f('profile_name'));
+    $profiles[$name]['id'] = $id;
+/*    
+    // Get admin_realm properties
+    $query = "SELECT profilepropertyvalue_property_value
+    	FROM ProfilePropertyValue
+    	LEFT JOIN ProfileProperty ON profilepropertyvalue_property_id = profileproperty_id
+    	WHERE profilepropertyvalue_profile_id = $id AND profileproperty_name = 'admin_realm'";
+    display_debug_msg($query, $cdg_sql, 'get_admin_realm(profile_id = '.$id.')');
+    $admin_realm_q = new DB_OBM;
+    $admin_realm_q->query($query);
+    $admin_realm_rough_value = $admin_realm_q->f('profilepropertyvalue_property_value');
+    $profiles[$name]['properties']['admin_realm'] = explode(" ", $admin_realm_rough_value);
+    
+    // Get other properties (level, level_managepeers, access_restriction)
+    $query = "SELECT profilepropertyvalue_property_value, profileproperty_name
+    	FROM ProfilePropertyValue
+    	LEFT JOIN ProfileProperty ON profilepropertyvalue_property_id = profileproperty_id
+    	WHERE profilepropertyvalue_profile_id = $id AND profileproperty_name <> 'admin_realm'";
+    display_debug_msg($query, $cdg_sql, 'get_profile_properties(profile_id = '.$id.')');
+    $properties_q = new DB_OBM;
+    $properties_q->query($query);
+    while ($properties_q->next_record()) {
+      $profiles[$name][$properties_q->f('profileproperty_name')][$properties_q->f('profilepropertyvalue_property_value')];
+    }
+  }
+  
+  return $profiles;
+*/
+ 
+    $profiles[$name] = get_profile_full_data($id);
+    $profiles[$name]['properties']['admin_realm'] = explode(" ", $profiles[$name]['properties']['admin_realm']);
+  }
+  return $profiles;
 }
 
 ?>

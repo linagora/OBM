@@ -1923,6 +1923,74 @@ CREATE TABLE Updatedlinks (
   PRIMARY KEY (updatedlinks_id)
 );
 
+
+--
+-- Table structure for table 'Profile'
+--
+
+CREATE TABLE Profile (
+	profile_id			serial,
+	profile_domain_id	integer NOT NULL,
+	profile_timeupdate	timestamp,
+	profile_timecreate	timestamp,
+	profile_userupdate	integer default null,
+	profile_usercreate  integer default null,
+	profile_name		varchar(64) default null,
+	PRIMARY KEY (profile_id)
+);
+
+--
+-- Table structure for table 'ProfileModule'
+--
+
+CREATE TABLE ProfileModule (
+	profilemodule_id			serial,
+	profilemodule_domain_id		integer NOT NULL,
+	profilemodule_profile_id	integer default NULL,
+	profilemodule_module_name	varchar(16) NOT NULL default '',
+	profilemodule_right			integer default NULL,
+	PRIMARY KEY (profilemodule_id)
+);
+
+--
+-- Table structure for table `ProfileSection`
+--
+
+CREATE TABLE ProfileSection (
+	profilesection_id			serial,
+	profilesection_domain_id	integer NOT NULL,
+	profilesection_profile_id	integer default NULL,
+	profilesection_section_name	varchar(16) NOT NULL default '',
+	profilesection_show			smallint default NULL,
+	PRIMARY KEY (profilesection_id)
+);
+
+--
+-- Table structure for table `ProfileProperty`
+--
+
+CREATE TABLE ProfileProperty (
+	profileproperty_id 			serial,
+	profileproperty_type		varchar(32) default NULL,
+	profileproperty_default		varchar(64) default NULL,
+	profileproperty_readonly	smallint default 0,
+	profileproperty_name		varchar(32) NOT NULL default '',
+	PRIMARY KEY (profileproperty_id)
+);
+
+--
+-- Table structure for table `ProfilePropertyValue`
+--
+
+CREATE TABLE ProfilePropertyValue (
+	profilepropertyvalue_id				serial,
+	profilepropertyvalue_profile_id		integer default NULL,
+	profilepropertyvalue_property_id	integer default NULL,
+	profilepropertyvalue_property_value	varchar(32) NOT NULL default '',
+	PRIMARY KEY (profilepropertyvalue_id)
+);
+
+
 --
 -- Foreign Keys
 --
@@ -2862,5 +2930,18 @@ ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_group_id_group_id_fkey FORE
 
 -- Foreign key from of_usergroup_user_id to userobm_id
 ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_user_id_userobm_id_fkey FOREIGN KEY (of_usergroup_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from profilemodule_profile_id to profile_id
+ALTER TABLE ProfileModule ADD CONSTRAINT profilemodule_profile_id_profile_id_fkey FOREIGN KEY (profilemodule_profile_id) REFERENCES Profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from profilesection_profile_id to profile_id
+ALTER TABLE ProfileSection ADD CONSTRAINT profilesection_profile_id_profile_id_fkey FOREIGN KEY (profilesection_profile_id) REFERENCES Profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from profilepropertyvalue_profile_id to profile_id
+ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profile_id_profile_id_fkey FOREIGN KEY (profilepropertyvalue_profile_id) REFERENCES Profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from profilepropertyvalue_property_id to profileproperty_id
+ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty(profileproperty_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
 
 COMMIT;

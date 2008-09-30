@@ -135,11 +135,11 @@ if ($conf_modules && file_exists("$path/../conf/modules/$module.inc")) {
   include_once("conf/modules/$module.inc");
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Sections definitions
 ///////////////////////////////////////////////////////////////////////////////
-while (list($sec,$value) = each($cgp_show["section"])) {
+//while (list($sec,$value) = each($cgp_show['section'])) { // <-- BUG, Why ???
+foreach ($cgp_show['section'] as $sec => $value) {
   if ($value) {
     $sec_right = $value["right"];
     if ($sec_right == "") {
@@ -151,7 +151,6 @@ while (list($sec,$value) = each($cgp_show["section"])) {
                            'Right'=> $sec_right);
   }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Modules definition

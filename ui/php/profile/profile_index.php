@@ -76,8 +76,10 @@ if ($action == 'index' || $action == '') {
     $display['msg'] = display_warn_msg($l_invalid_data . " : " . $err['msg']);
   }
   
-  if ($its_ok)
-    $next_action = 'detailconsult';
+  if ($its_ok) {
+    $params['profile_id'] = NULL;
+    $next_action = 'index';
+  }
   else
     $next_action = 'detailupdate';
     
@@ -129,31 +131,25 @@ if ($action == 'index' || $action == '') {
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   //TODO
+  $do_next = true;
   if (check_can_delete_profile($params['profile_id'])) {
-    $display['msg'] .= display_info_msg($ok_msg, false);
-    $display['detail'] = dis_can_delete_profile($params['profile_id']);
+    $next_action = 'delete';
   } else {
-    $display['msg'] .= display_warn_msg($err['msg'], false);
-    $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    $display['detail'] = dis_profile_consult($params, $view);
+    $display['msg'] .= display_warn_msg($l_profile_delete_warning);
+    $next_action = 'detailconsult';
   }
 
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
   //TODO
-  if (check_can_delete_profile($params['profile_id'])) {
+  $do_next = true;
     $retour = run_query_profile_delete($params['profile_id']);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_profile : $l_delete_ok");
     } else {
       $display['msg'] .= display_err_msg("$l_profile : $l_delete_error");
     }
-    $display['search'] = dis_profile_search_form($params);
-  } else {
-    $display['msg'] .= display_warn_msg($err['msg'], false);
-    $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    $display['detail'] = dis_profile_consult($params, $view);
-  }
+    $next_action = "index";
 
 } elseif ($action == 'display') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -209,16 +205,26 @@ function get_profile_params() {
     $params['sections_show'] = array();
 	  
 	  if ($action == 'insert' || $action == 'update') {
-      foreach ($obm_modules as $section_name => $modules) {
-        foreach ($modules as $module_name) {
-          $params['modules_right'][$module_name]['default'] = isset($params["${module_name}_default"]);
-          $params['modules_right'][$module_name]['right'] = 0;
+	    
+	    if (isset($params['default_section_show']) && $params['default_section_show'] == 1) {
+          $params['default_section_show'] = true;
+          $params['sections_show']['default'] = true;
+        }
+        if (isset($params['default_section_show']) && $params['default_section_show'] == 0) {
+          $params['default_section_show'] = false;
+          $params['sections_show']['default'] = false;
         }
         
+        foreach ($obm_modules as $section_name => $modules) {
+          foreach ($modules as $module_name) {
+            $params['modules_right'][$module_name]['default'] = isset($params["${module_name}_default"]);
+            $params['modules_right'][$module_name]['right'] = 0;
+          }
+        
         if (isset($params["${section_name}_show"]))
-          $params['sections_show'][$section_name] = true;
+          $params['sections_show'][$section_name] = ($params['default_section_show'] ? false : true);
         else
-          $params['sections_show'][$section_name] = false;
+          $params['sections_show'][$section_name] = ($params['default_section_show'] ? true : false); 
       }
       
 		  foreach ($params as $k => $v) {

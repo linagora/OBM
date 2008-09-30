@@ -190,7 +190,8 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
   global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all, $l_firstname, $l_exp;
-  global $display, $c_all, $profiles, $l_recursive, $obm;
+  //global $display, $c_all, $profiles, $l_recursive, $obm;
+  global $display, $c_all, $l_recursive, $obm;
   
   $login = $user["login"];
   $profile = $user["profile"];
@@ -234,10 +235,16 @@ function html_user_search_form($user) {
     $display["title"] = $ext_title;
   }
 
+  /* Old
   foreach ($profiles as $k_profile => $one_profile) {
     $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
     $block_profile .= "
       <option value=\"$k_profile\"> $profile</option>";
+  }*/
+
+  foreach ($user['profiles'] as $k_profile => $one_profile) {
+    $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
+    $block_profile .= "<option value=\"$k_profile\">$profile</option>";
   }
 
   if ($obm["domain_global"]) {
@@ -471,7 +478,10 @@ function html_user_consult($obm_q) {
   global $l_vacation_dateend,$l_mail_server,$perm, $cright_write_admin;
   global $l_enabled, $l_disabled, $l_web_consult_list, $l_photo, $module;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
-  global $obm, $cgp_use, $profiles, $path, $display, $l_yes, $l_no;
+  //global $obm, $cgp_use, $profiles, $path, $display, $l_yes, $l_no;
+  global $obm, $cgp_use, $path, $display, $l_yes, $l_no;
+  
+  $profiles = get_all_profiles();
 
   $id = $obm_q->f("userobm_id");
   $domain_label = ($obm_q->f("domain_label") != "" ? $obm_q->f("domain_label") : "GLOBAL");
@@ -983,7 +993,8 @@ function html_user_form($usr_q, $user, $field='') {
   global $l_vacation_dateend, $l_mail_server;
   global $l_enabled, $l_disabled, $l_web_consult_list,$path;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
-  global $path, $display, $cgp_use, $action, $profiles;
+  //global $path, $display, $cgp_use, $action, $profiles;
+  global $path, $display, $cgp_use, $action;
   global $obm, $c_default_domain, $c_renameUserMailbox, $l_domain, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
 	
@@ -1439,6 +1450,7 @@ function html_user_form($usr_q, $user, $field='') {
   }
 
   // Profiles
+  /* Old
   foreach ($profiles as $k_profile => $one_profile) {
     $admin_realm = $profiles[$k_profile]['properties']['admin_realm'];
     if(is_array($admin_realm) && in_array('delegation', $admin_realm)) {
@@ -1456,6 +1468,25 @@ function html_user_form($usr_q, $user, $field='') {
     $dis_profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;    
     $block_profile .= "
       <option value=\"$k_profile\"$selected>$dis_profile</option>";
+  }*/
+  
+  // Profiles
+  foreach ($user['profiles'] as $k_profile => $one_profile) {
+    $admin_realm = $one_profile['properties']['admin_realm'];
+    if (is_array($admin_realm) && in_array('delegation', $admin_realm)) {
+      $onselect .= "profiles['$k_profile'] = true\n";
+      if (!isset($delegation_class) || $profile == $k_profile) $delegation_class = '';
+    } else {
+      $onselect .= "profiles['$k_profile'] = false\n";
+      if (!isset($delegation_class) || $profile == $k_profile) $delegation_class = 'H';
+    }
+    if ($profile == $k_profile) {
+      $selected = " selected";
+    } else {
+      $selected = "";
+    }
+    $dis_profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
+    $block_profile .= "<option value=\"$k_profile\"$selected>$dis_profile</option>";
   }
 
   $dis_delegation_target = "

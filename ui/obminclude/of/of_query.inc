@@ -731,7 +731,7 @@ function of_delegation_query_update_clause($field, $value) {
 ///////////////////////////////////////////////////////////////////////////////
 function of_delegation_check_update_rights($params, $current_delegation) {
   global $obm, $cgp_use, $profiles;
-
+  
   if ($cgp_use['property']['delegation']) {
     $id = $params['id'];
     $action = $params['action'];
@@ -2690,4 +2690,244 @@ if ( !function_exists('sys_get_temp_dir') ) {
     }
   }
 }
+
+
+/************************************************************************
+ ** Groups of functions that makes a profile list with full data
+/************************************************************************/
+
+
+/**
+ * get obm modules
+ *
+ * @return $obm_modules
+ */
+function get_modules() {
+  global $cgp_show;
+  
+  $obm_modules = array();
+  
+  foreach ($cgp_show['section'] as $section_name => $url) {
+    $obm_modules[$section_name] = array();
+  }
+  
+  foreach ($cgp_show['module'] as $module_name => $section_name) {
+    if ($section_name != 'false' && trim($section_name) != '')
+      $obm_modules[$section_name][] = $module_name;
+  }
+  
+  return $obm_modules;
+}
+
+/**
+ * Search Profile data
+ *
+ * @param array $params
+ * @return DB_OBM
+ */
+function run_of_query_profile_search ($params) {
+  global $cdg_sql;
+  
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  
+  $timeupdate = sql_date_format($db_type, 'profile_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'profile_timecreate', 'timecreate');
+  $multidomain = sql_multidomain('profile');
+  
+  if (!empty($params['profile_id']))
+    $where .= ' AND profile_id = '. sql_parse_id($params['profile_id']);
+  
+  $query = "SELECT 
+        profile_id,
+        profile_name,
+        profile_timeupdate,
+        profile_timecreate,
+        
+        c.userobm_login as usercreate,
+        u.userobm_login as userupdate
+      FROM Profile
+        LEFT JOIN UserObm as c ON profile_usercreate=c.userobm_id
+        LEFT JOIN UserObm as u ON profile_userupdate=u.userobm_id
+      WHERE 1=1
+        $where
+        $multidomain";
+  
+  display_debug_msg($query, $cdg_sql, 'run_of_query_profile_detail()');
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+/**
+ * Search Profile data with join extension
+ *
+ * @param array $params
+ * @param array $sql_ext SQL query extension parameters
+ *                       array('select' => string,
+ *                             'join' => string,
+ *                             'where' => string,
+ *                             'next_record' => bool, // do next_record or not
+ *                            )
+ * 
+ * @return DB_OBM
+ */
+function run_of_query_profile_join_search ($params, $sql_ext = null) {
+  global $cdg_sql;
+  
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  
+  $where = '';
+  
+  if (!empty($params['profile_id']))
+    $where .= ' AND profile_id = '. sql_parse_id($params['profile_id']);
+  
+  $query = "SELECT 
+        profile_id,
+        $sql_ext[select]
+        1
+      FROM Profile
+        $sql_ext[join]
+      WHERE 1=1
+        $where
+        $sql_ext[where]";
+  
+  display_debug_msg($query, $cdg_sql, 'run_of_query_profile_join_search()');
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+/**
+ * Get a profile properties
+ *
+ * @param $profile_id : profile_id
+ * @return DB_OBM
+ */
+function run_of_query_profileproperty_list ($profile_id = NULL) {
+  global $cdg_sql;
+  
+  if (!is_null($profile_id)) {
+    $val = 'profilepropertyvalue_property_value,';
+    $join = " LEFT JOIN ProfilePropertyValue
+    	ON profileproperty_id = profilepropertyvalue_property_id
+    	AND profilepropertyvalue_profile_id = '$profile_id'";
+  }
+  $query = "SELECT
+  $val
+  profileproperty_name,
+  profileproperty_type,
+  profileproperty_default,
+  profileproperty_readonly,
+  profileproperty_id
+  FROM ProfileProperty $join";
+  
+  display_debug_msg($query, $cdg_sql, 'run_of_query_profileproperty_list()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  return $obm_q;
+}
+
+/**
+ * Get full data for one profile
+ *
+ * @param integer $profile_id
+ * @return array
+ */
+function get_profile_data ($profile_id, $domain_id, $global_domain_id) {
+  $cprofilemodule_sql_ext = array(
+    'select' => 'profilemodule_module_name,
+                 profilemodule_right,
+                 ',
+    'join' => 'LEFT JOIN ProfileModule ON profilemodule_profile_id = profile_id ',
+    'where' => " AND (profilemodule_domain_id=$domain_id OR profilemodule_domain_id=$global_domain_id)"
+    );
+  $cprofilesection_sql_ext = array(
+    'select' => 'profilesection_section_name,
+                 profilesection_show,
+                 ',
+    'join' => 'LEFT JOIN ProfileSection ON profilesection_profile_id = profile_id ',
+    'where' => " AND (profilesection_domain_id=$domain_id OR profilesection_domain_id=$global_domain_id)"
+    );
+  $cright_list = array('read', 'own', 'write', 'read_admin', 'write_admin');
+
+  foreach ($cright_list as $right_name) { global ${'cright_'. $right_name}; }
+  
+  $obm_modules = get_modules();
+  
+  $search_params = array('profile_id' => $profile_id);
+  $res = array();
+  
+  
+  
+  $modules_q = run_of_query_profile_join_search($search_params, $cprofilemodule_sql_ext);
+  
+  while ($modules_q->next_record()) {
+  	$module_name = $modules_q->f('profilemodule_module_name');
+  	$res['module'][$module_name] = dechex($modules_q->f('profilemodule_right'));
+  	
+  }
+  
+  $sections_q = run_of_query_profile_join_search($search_params, $cprofilesection_sql_ext);
+  
+  while ($sections_q->next_record()) {
+    $res['section'][$sections_q->f('profilesection_section_name')] = ( $sections_q->f('profilesection_show') == '1' ? true : false) ;
+  }
+  // Load profile properties
+  $properties_q = run_of_query_profileproperty_list($profile_id);
+  
+  while ($properties_q->next_record()) {
+    if ($properties_q->f('profileproperty_readonly') != 1 && $properties_q->f('profileproperty_name') == 'admin_realm') {
+      $res['properties'][$properties_q->f('profileproperty_name')] = $properties_q->f('profilepropertyvalue_property_value');
+    } else if ($properties_q->f('profileproperty_readonly') != 1) {
+      if ($properties_q->f('profileproperty_name') == 'access_restriction') {
+        $res[$properties_q->f('profileproperty_name')] = $properties_q->f('profilepropertyvalue_property_value');
+      } else {
+        $res[$properties_q->f('profileproperty_name')] = intval($properties_q->f('profilepropertyvalue_property_value'));
+      }
+    }
+  }
+  return $res;
+}
+
+/**
+ * Return all profiles 
+ * 
+ * @return array of profiles
+ **/
+function get_all_profiles() {
+  global $cdg_sql, $obm;
+  
+  $domain_id = sql_parse_id($obm['domain_id']);
+  
+  // get global domain id
+  $query = "SELECT domain_id from Domain where domain_name='global.virtual'";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $global_domain_id = $obm_q->f('domain_id');
+    
+  if(!isset($_SESSION['profiles'])) {
+    $profiles = array();
+    $query = "SELECT profile_id, profile_name FROM Profile 
+      WHERE profile_domain_id=$domain_id OR profile_domain_id=$global_domain_id";
+  
+    display_debug_msg($query, $cdg_sql, 'get_all_profiles()');
+    $obm_q->query($query);
+  
+    while ($obm_q->next_record()) {
+      $id = $obm_q->f('profile_id');
+      $name = trim($obm_q->f('profile_name'));
+      //$profiles[$name]['id'] = $id;
+   
+      $profiles[$name] = get_profile_data($id, $domain_id, $global_domain_id);
+      $profiles[$name]['properties']['admin_realm'] = explode(" ", $profiles[$name]['properties']['admin_realm']);
+    }
+    $_SESSION['profiles'] = $profiles;
+  }
+  return $_SESSION['profiles'];
+}
+
 ?>

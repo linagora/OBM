@@ -32,6 +32,7 @@ $params = get_user_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require_once("$obminclude/of/of_category.inc");
+require("../profile/profile_query.inc");
 require("user_display.inc");
 require("user_query.inc");
 require("user_js.inc");
@@ -47,6 +48,8 @@ update_last_visit("user", $params["user_id"], $action);
 
 page_close();
 
+// get Profile list (name and id)
+$params['profiles'] = get_profile_list();
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
@@ -288,6 +291,7 @@ function get_user_params() {
       }
     }
     $params['group_nb'] = $nb_group;
+    
   }
   
   if (isset ($_FILES['fi_file'])) {

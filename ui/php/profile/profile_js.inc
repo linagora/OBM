@@ -24,6 +24,21 @@ function select_right (module_name) {
 
 ';
 
+$extra_js .= "
+function setSectionState(state) {
+    var elements = \$ES('.activeSection');
+    for (var i=0; i<elements.length; i++) {
+      elem =elements[i];
+      elem.empty();
+      if (state == 'active') {
+        elem.innerHTML = '$l_section_disable';
+      } else {
+        elem.innerHTML = '$l_section_enable';
+      }
+    }
+}
+";
+
 // Validate form
 $extra_js .= "
 
@@ -43,5 +58,6 @@ function check_profile (form) {
 	
 	return true;
 }
+
 ";
 ?>
