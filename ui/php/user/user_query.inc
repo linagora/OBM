@@ -14,7 +14,7 @@
 //     keys used  : name, perms
 //   - $sql_order_field : infos for order clause
 //   - $sql_order_dir : direction for order clause (asc, desc)
-//   - $restriction : if and which restriction to set (eg calendar readable)
+//   - $filter_entity : if and which filter_entity to set (eg calendar readable)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_search($user) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
@@ -23,7 +23,8 @@ function run_query_user_search($user) {
   $sql_order_dir = $user['sql_order_dir'];
   $sql_order_field = $user['sql_order_field'];
 
-  $restriction = $user['restriction_calendar'];
+  $filter_entity = $user['filter_entity'];
+  $filter_pattern = $user['filter_pattern'];
   $login = sql_search_text_parse($user['login']);
   $profile = $user['profile'];
   $domain_id = $user['domain'];
@@ -42,23 +43,23 @@ function run_query_user_search($user) {
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
-	$dateexp = sql_date_format($db_type, 'userobm_account_dateexp', 'dateexp');
-	$diff = "TIMESTAMPDIFF(DAY,now(),userobm_account_dateexp)";
+  $dateexp = sql_date_format($db_type, 'userobm_account_dateexp', 'dateexp');
+  $diff = "TIMESTAMPDIFF(DAY,now(),userobm_account_dateexp)";
   $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
   $multidomain = sql_multidomain('userobm');
 
-  if ($restriction == 'calendar') {
-    $users = of_right_entity_for_user('calendar', $obm['uid'], 'read','','userobm');
+  if ($filter_entity == 'calendar') {
+    $users = of_right_entity_for_user('calendar', $obm['uid'], $filter_pattern,'','userobm');
     if ((is_array($users['ids'])) && (count($users['ids']) > 0)) {
-      $where_restriction = " AND (userobm_id IN ($obm[uid], ";
+      $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
       foreach($users['ids'] as $u_id) {
-	$where_restriction .= "$coma'$u_id'";
+	$where_filter_entity .= "$coma'$u_id'";
 	$coma = ',';
       }
-      $where_restriction .= '))';
+      $where_filter_entity .= '))';
     } else {
       // If no users have given $uid with read right, return empty set
-      $where_restriction = ' AND userobm_id < 0';
+      $where_filter_entity = ' AND userobm_id < 0';
     }
   }
 
@@ -151,8 +152,8 @@ function run_query_user_search($user) {
     $join_userdata = $userdata['join'];
   }
 
-  if ((trim($where) != '') || (trim($where_restriction) != '')) {
-    $whereq = " WHERE $where $where_restriction $multidomain";
+  if ((trim($where) != '') || (trim($where_filter_entity) != '')) {
+    $whereq = " WHERE $where $where_filter_entity $multidomain";
   } else {
     $whereq = " WHERE 1=1 $multidomain";
   }
@@ -162,7 +163,7 @@ function run_query_user_search($user) {
       domain_label,
       domain_name,
       $datebegin,
-			$dateexp,
+      $dateexp,
       $lastaccess
     FROM UserObm 
     LEFT JOIN Domain ON userobm_domain_id = domain_id
@@ -210,7 +211,8 @@ function run_query_user_ext_search($user) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $pattern = $user['pattern'];
-  $restriction = $user['restriction'];
+  $filter_entity = $user['filter_entity'];
+  $filter_pattern = $user['filter_pattern'];
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('UserObm.userobm');
 
@@ -218,18 +220,18 @@ function run_query_user_ext_search($user) {
   if(isset($user['first_row'])) $first_row = $user['first_row'] - 1;
   else $first_row = 0;
 
-  if ($restriction == 'calendar') {
-    $users = of_right_entity_for_user('calendar', $obm['uid'], 'read','','userobm');
+  if ($filter_entity == 'calendar') {
+    $users = of_right_entity_for_user('calendar', $obm['uid'], $filter_pattern,'','userobm');
     if ((is_array($users['ids'])) && (count($users['ids']) > 0)) {
-      $where_restriction = " AND (userobm_id IN ($obm[uid], ";
+      $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
       foreach($users['ids'] as $u_id) {
-	$where_restriction .= "$coma'$u_id'";
+	$where_filter_entity .= "$coma'$u_id'";
 	$coma = ',';
       }
-      $where_restriction .= '))';
+      $where_filter_entity .= '))';
     } else {
       // If no users have given $uid with read right, return empty set
-      $where_restriction = ' AND userobm_id < 0';
+      $where_filter_entity = ' AND userobm_id < 0';
     }
   }
 
@@ -243,7 +245,7 @@ function run_query_user_ext_search($user) {
       OR userobm_email LIKE '$pattern%' )
       AND userobm_archive = 0
       $multidomain
-      $where_restriction";
+      $where_filter_entity";
 
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->query($query);
@@ -263,7 +265,7 @@ function run_query_user_ext_search($user) {
       OR userobm_email LIKE  '$pattern%' )
       AND userobm_archive = 0
       $multidomain
-      $where_restriction
+      $where_filter_entity
     ORDER BY  userobm_lastname, userobm_firstname
     LIMIT $limit OFFSET $first_row";
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');

@@ -207,8 +207,13 @@ function html_user_search_form($user) {
   $archive = ($user["archive"] == "1" ? "checked" : "");
   $recursive = ($user["recursive"] == "1" ? "checked" : "");
   $popup = $user["popup"];
-  if ($user["restriction_calendar"]) {
-    $dis_restriction = "<input name=\"restriction_calendar\" type=\"hidden\" value=\"calendar\" />";
+  if ($user["filter_entity"]) {
+    $dis_filter_entity = "<input name=\"filter_entity\" type=\"hidden\" value=\"$user[filter_entity]\" />";
+    if($user['filter_pattern'])
+      $dis_filter_entity .= "<input name=\"filter_pattern\" type=\"hidden\" value=\"$user[filter_pattern]\" />";
+    else
+      $dis_filter_entity .= "<input name=\"filter_pattern\" type=\"hidden\" value=\"read\" />";
+
   }
 
   // User defined data
@@ -308,7 +313,7 @@ function html_user_search_form($user) {
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
-      $dis_restriction
+      $dis_filter_entity
       $ext
     </label>
     <p class=\"CL\" />
@@ -328,7 +333,7 @@ function dis_user_search_list($user) {
   global $display, $obm;
 
   $popup = $user["popup"];
-  $restriction = $user["restriction_calendar"];
+  $filter_entity = $user["filter_entity"];
   $obm_q = run_query_user_search($user);
 
   $prefs = get_display_pref($obm["uid"], "user");
