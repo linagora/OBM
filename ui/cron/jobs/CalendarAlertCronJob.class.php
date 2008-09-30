@@ -115,8 +115,8 @@ class CalendarAlertCronJob extends CronJob{
       LEFT JOIN CalendarEvent ON calendarevent_id = calendaralert_event_id 
       WHERE 
       calendarevent_id IS NULL 
-      OR ($calendarevent_date + calendaralert_duration < $date AND calendarevent_repeatkind = 'none')
-      OR ($calendarevent_endrepeat + calendaralert_duration < $date AND calendarevent_repeatkind != 'none')";
+      OR ($calendarevent_date - calendaralert_duration < $date AND calendarevent_repeatkind = 'none')
+      OR ($calendarevent_endrepeat - calendaralert_duration < $date AND calendarevent_repeatkind != 'none')";
     $obm_q = new DB_OBM;
     $this->logger->core($query);
     $obm_q->query($query);
