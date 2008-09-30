@@ -69,8 +69,13 @@ function html_resource_search_form($resource) {
   $popup = $resource['popup'];
   $sel_rtype = $resource['rtype'];
 
-  if ($resource['restriction']) {
-    $dis_restriction = "<input name=\"restriction\" type=\"hidden\" value=\"user\">";
+  if ($resource['filter_entity']) {
+    $dis_filter_entity = "<input name=\"filter_entity\" type=\"hidden\" value=\"$resource[filter_entity]\">";
+    if($resource['filter_pattern'])
+      $dis_filter_pattern = "<input name=\"filter_pattern\" type=\"hidden\" value=\"$resource[filter_pattern]\">";
+    else
+      $dis_filter_pattern = "<input name=\"filter_pattern\" type=\"hidden\" value=\"read\">";
+
   }
 
   if ($popup) {
@@ -86,7 +91,7 @@ function html_resource_search_form($resource) {
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
-	          <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">
+	    <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
     if ($ext_title == '') {
       $ext_title = $l_add_resources;
@@ -140,7 +145,8 @@ function html_resource_search_form($resource) {
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
-      $dis_restriction
+      $dis_filter_entity
+      $dis_filter_pattern
       $ext&nbsp;
     </label>
     <p class=\"CL\" />
@@ -161,7 +167,7 @@ function dis_resource_search_list($resource) {
   global $display, $obm;
 
   $popup = $resource['popup'];
-  $restriction = $resource['restriction'];
+  $filter_entity = $resource['filter_entity'];
 
   $prefs = get_display_pref($obm['uid'], 'resource');
   $obm_q = run_query_resource_search($resource);

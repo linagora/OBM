@@ -14,7 +14,7 @@
 //     keys used  : name, perms
 //   - $sql_order_field : infos for order clause
 //   - $sql_order_dir : direction for order clause (asc, desc)
-//   - $restriction : if and which restriction to set (eg user (who can read))
+//   - $filter_entity : if and which restriction to set (eg resource (who can read))
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_search($resource) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
@@ -28,7 +28,8 @@ function run_query_resource_search($resource) {
   $sql_order_dir = $resource['sql_order_dir'];
   $sql_order_field = $resource['sql_order_field'];
   
-  $restriction = $resource['restriction'];
+  $filter_entity = $resource['filter_entity'];
+  $filter_pattern = $resource['filter_pattern'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -36,17 +37,19 @@ function run_query_resource_search($resource) {
   $limit = sql_limit($db_type);
   $multidomain = sql_multidomain('resource');
 	
-  if ($restriction == 'user') {
+  if ($filter_entity == 'Resource') {
+    $where_filter_entity = 'AND (1=0';
     $uid = $obm['uid'];
-    $rs = of_right_entity_for_user('Resource', $uid, 'read');
+    $rs = of_right_entity_for_user('Resource', $uid, $filter_pattern);
     if ((is_array($rs['ids'])) && (count($rs['ids']) > 0)) {
-      $where_restriction = " AND (resource_id IN (";
+      $where_filter_entity .= " OR resource_id IN (";
       foreach($rs['ids'] as $r_id) {
-	$where_restriction .= "$coma'$r_id'";
+	$where_filter_entity .= "$coma'$r_id'";
 	$coma = ',';
       }
-      $where_restriction .= '))';
+      $where_filter_entity .= ')';
     }
+    $where_filter_entity .= ')';
   }
 
   $select = "SELECT Resource.*, resource_id as id, resourcetype_label
@@ -82,8 +85,8 @@ function run_query_resource_search($resource) {
   }
 
 
-  if ((trim($where) != '') || (trim($where_restriction) != '')) {
-    $whereq = " WHERE $where $where_restriction";
+  if ((trim($where) != '') || (trim($where_filter_entity) != '')) {
+    $whereq = " WHERE $where $where_filter_entity";
   }
 
   // ORDER construction
@@ -120,7 +123,8 @@ function run_query_resource_ext_search($resource) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $pattern = $resource['pattern'];
-  $restriction = $resource['restriction'];
+  $filter_entity = $resource['filter_entity'];
+  $filter_pattern = $resource['filter_pattern'];
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('Resource');
 
@@ -128,17 +132,19 @@ function run_query_resource_ext_search($resource) {
   if(isset($resource['first_row'])) $first_row = $resource['first_row'] - 1;
   else $first_row = 0;
 
-  if ($restriction == 'user') {
+  if ($filter_entity == 'Resource') {
     $uid = $obm['uid'];
-    $rs = of_right_entity_for_user('Resource', $uid, 'read');
+    $where_filter_entity = 'AND (1=0';
+    $rs = of_right_entity_for_user('Resource', $uid, $filter_pattern);
     if ((is_array($rs['ids'])) && (count($rs['ids']) > 0)) {
-      $where_restriction = " AND (resource_id IN (";
+      $where_filter_entity .= " OR resource_id IN (";
       foreach($rs['ids'] as $r_id) {
-	$where_restriction .= "$coma'$r_id'";
+	$where_filter_entity .= "$coma'$r_id'";
 	$coma = ',';
       }
-      $where_restriction .= '))';
+      $where_filter_entity .= ')';
     }
+    $where_filter_entity .= ')';
   }
 
   $query = "SELECT 
@@ -148,7 +154,7 @@ function run_query_resource_ext_search($resource) {
     WHERE 
       resource_name LIKE '$pattern%' 
       $multidomain
-      $where_restriction";
+      $where_filter_entity";
 
   display_debug_msg($query, $cdg_sql, 'run_query_resource_ext_search()');
   $obm_q->query($query);
@@ -168,7 +174,7 @@ function run_query_resource_ext_search($resource) {
     WHERE 
       resource_name LIKE '$pattern%' 
       $multidomain
-      $where_restriction
+      $where_filter_entity
     GROUP BY resource_id, resource_name, resource_qty, resource_rtype_id, resourcetype_property, resourcetype_pkind 
     ORDER BY resource_name
     LIMIT $limit OFFSET $first_row";
