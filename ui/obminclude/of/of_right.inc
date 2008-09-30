@@ -88,7 +88,7 @@ function html_entityadmin_bar($writable_entity,$entity_id, $entity) {
 //   - $entity_id : entity selected
 ///////////////////////////////////////////////////////////////////////////////
 function html_dis_right_admin(&$consumers, $entity_id) {
-  global $l_authorize_list,$l_read_permission, $l_write_permission;
+  global $l_authorize_list,$l_read_permission, $l_write_permission, $l_acces_permission;
   global $l_right_validate ,$l_authorize,$l_deny, $ico_delete;
   global $l_public,$l_admin_permission, $module;
   global $path, $ico_add, $l_users, $l_groups;
@@ -101,6 +101,7 @@ function html_dis_right_admin(&$consumers, $entity_id) {
     $write = $one_consumer['write'];
     $read = $one_consumer['read'];
     $admin = $one_consumer['admin'];
+    $acces = $one_consumer['acces'];
 
     if ($id == 0) {
       if ($read == 1) {
@@ -110,6 +111,10 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       if ($write == 1) {
         $style_write = 'visibility:hidden;';
         $public_write_checked = "checked=\"checked\"";
+      }
+      if ($acces == 1) {
+        $style_acces = 'visibility:hidden;';
+        $public_acces_checked = "checked=\"checked\"";
       }
     } else {
       if ($write == 1) {
@@ -139,6 +144,15 @@ function html_dis_right_admin(&$consumers, $entity_id) {
        <input value=\"$sel_id\" name=\"sel_accept_admin[]\" type=\"hidden\" />
        </div>";
       }      
+      if ($acces == 1) {
+	$sel_id = "data-$entity-$id";
+        $div_id = "sel_accept_acces-data-$entity-$id";
+        ${'dis_'.$entity.'_acces_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_accept_".$entity."_acces');\"><img src=\"$ico_delete\"></a>
+        $label
+       <input value=\"$sel_id\" name=\"sel_accept_acces[]\" type=\"hidden\" />
+       </div>";
+      }
     }
   }
 
@@ -199,6 +213,65 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       $block_group_buttons_read
     </td>
     </tr>";
+
+   $block_consumer_acces_public = "
+    <td class=\"detailLabel\">
+    $l_public
+    </td>
+    <td class=\"detailForm\" id=\"cb_acces_public\">
+    <input onchange=\"togglePrivacy(this,'accesRightBox');\" onclick=\"togglePrivacy(this,'accesRightBox')\"
+    name=\"cb_acces_public\" value=\"1\" type=\"checkbox\" $public_acces_checked />
+    </td>";
+
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_acces";
+    $popup_user_add_button = "
+    <a id=\"lnk_accept_acces\" href=\"#\" onclick=\"return popup('$url');
+      return false;\">
+      <img src=\"$ico_add\" alt=\"[Add]\" />
+      </a>";
+    if($module != 'mailbox' && $module != 'mailshare') {
+      $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_acces";
+      $popup_group_add_button = "
+        <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
+         <img src=\"$ico_add\" alt=\"[Add]\" />
+         </a>";
+      $block_group_acces = "
+        <tr>
+        <td class=\"detailLabel\">
+        $l_groups
+        $popup_group_add_button
+        </td>
+        <td>
+        <input type=\"text\" id=\"groupAccesSearch\" autocomplete=\"off\" /> 
+        </td>
+        </tr>";
+      $block_group_buttons_acces = "
+      <fieldset id='sel_accept_group_acces'>
+      <legend>$l_groups</legend>
+      $dis_group_acces_ok
+      </fieldset>";        
+    }
+    $block_consumer_acces = "
+    <tr>
+    <td class=\"detailLabel\">
+    $l_users
+    $popup_user_add_button
+    </td>
+    <td>
+    <input type=\"text\" id=\"userAccesSearch\" autocomplete=\"off\" /> 
+    </td>
+    </tr>
+    $block_group_acces
+    <tr>
+    <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_acces\">
+      <fieldset id='sel_accept_user_acces'>
+      <legend>$l_users</legend>
+      $dis_user_acces_ok
+      </fieldset>
+      $block_group_buttons_acces
+    </td>
+    </tr>";
+
 
    $block_consumer_write_public = "
     <tr>
@@ -346,6 +419,18 @@ function html_dis_right_admin(&$consumers, $entity_id) {
   </fieldset>
 
   <fieldset class=\"detail infos\">
+  <legend>$l_acces_permission</legend>
+  <table>
+  <tr>
+    $block_consumer_acces_public
+  </tr>
+  <tbody style=\"$style_acces\" id=\"accesRightBox\">
+    $block_consumer_acces
+  </tbody>
+  </table>
+  </fieldset>
+
+  <fieldset class=\"detail infos\">
   <legend>$l_admin_permission</legend>
   <table>
   <tbody>
@@ -365,9 +450,11 @@ function html_dis_right_admin(&$consumers, $entity_id) {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_admin', 'userAdminSearch', {name:'sel_accept_admin'});
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_write', 'userWriteSearch', {name:'sel_accept_write'});
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_read', 'userReadSearch', {name:'sel_accept_read'});
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_acces', 'userAccesSearch', {name:'sel_accept_acces'});
       new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_admin', 'groupAdminSearch', {name:'sel_accept_admin'});
       new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_write', 'groupWriteSearch', {name:'sel_accept_write'});
       new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_read', 'groupReadSearch', {name:'sel_accept_read'});
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_acces', 'groupAccesSearch', {name:'sel_accept_acces'});
     });
   </script>
 ";
@@ -448,7 +535,6 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
 
   display_debug_msg($query, $cdg_sql, 'of_right_entity_for_user()');
   $obm_q->query($query);
-
   while($obm_q->next_record()) {
     $id = $obm_q->f('id');
     if ( ($ids_set == '')
@@ -533,6 +619,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
       entityright_consumer_id,
       entityright_read,
       entityright_write,
+      entityright_acces,
       entityright_admin
     FROM EntityRight
       LEFT JOIN ($table_consumer) as entity ON entityright_consumer_id = entitydata_id AND entityright_consumer = entitydata_kind
@@ -549,6 +636,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
     $entity = $obm_q->f('consumer');
     $read = $obm_q->f('entityright_read');
     $write = $obm_q->f('entityright_write');
+    $acces = $obm_q->f('entityright_acces');
     $admin = $obm_q->f('entityright_admin');
     $id_array[] = $id;
     $con_array[] = array(
@@ -558,6 +646,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
                          'entity' => $entity,
 			 'read' => $read,
 			 'write' => $write,
+			 'acces' => $acces,
 			 'admin' => $admin
 			 );
   }
@@ -590,15 +679,20 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
   $eid = $param['entity_id'];
   $accept_write = $param['accept_write'];
   $accept_read = $param['accept_read'];
+  $accept_acces = $param['accept_acces'];
   $accept_admin = $param['accept_admin'];
   $public_write = $param['write_public'];
   $public_read = $param['read_public'];
+  $public_acces = $param['acces_public'];
 
   if (! is_array($accept_read)) {
     $accept_read = array();
   }
   if (! is_array($accept_write)) {
     $accept_write = array();
+  }
+  if (! is_array($accept_acces)) {
+    $accept_acces = array();
   }
   if (! is_array($accept_admin)) {
     $accept_admin = array();
@@ -607,6 +701,7 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
   $accept_admin = array_unique($accept_admin);
   $accept_write = array_unique($accept_write);
   $accept_read = array_unique($accept_read);
+  $accept_acces = array_unique($accept_acces);
 
   // Rights on external objects : defined by module access
   // Rights on userobm entity : user need write right on the entity
@@ -632,33 +727,40 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
   if( $public_write) {
     $accept_write = array();
   }
-  if ($public_read || $public_write) {
+  if( $public_acces) {
+    $accept_acces = array();
+  }
+  if ($public_read || $public_write || $public_acces) {
     $pr = sql_parse_int($public_read);
     $pw = sql_parse_int($public_write);
+    $px = ($public_write ? sql_parse_int($public_write) : sql_parse_int($public_acces));
     $query = "INSERT INTO EntityRight (
       entityright_entity,
       entityright_entity_id,
       entityright_consumer,
       entityright_consumer_id,
       entityright_read,
-      entityright_write
+      entityright_write,
+      entityright_acces
     ) VALUES (
       '$entity',
       ".sql_parse_id($eid).",
       'user',
       0,
       $pr,
-      $pw)";
+      $pw,
+      $px)";
     display_debug_msg($query, $cdg_sql, 'of_right_update_right(2)');
     $obm_q->query($query);
   }
 
-  if (! $public_read) {
+  if (! $public_acces) {
     // Insert all read entries (with write right correctly set)
-    foreach ($accept_read as $key => $ref) {
+    foreach ($accept_acces as $key => $ref) {
       if (preg_match($consumer_ereg,$ref,$matches)) {
         $consumer = $matches[1];
-        $id = sql_parse_id($matches[2]);          
+        $id = sql_parse_id($matches[2]);        
+	$r = (in_array($ref, $accept_read) ? 1 : 0);
 	$w = (in_array($ref, $accept_write) ? 1 : 0);
 	$a = (in_array($ref, $accept_admin) ? 1 : 0);
 	$query = "INSERT INTO EntityRight (
@@ -666,6 +768,7 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
           entityright_entity_id,
           entityright_consumer,
           entityright_consumer_id,
+          entityright_acces,
           entityright_read,
           entityright_write,
           entityright_admin
@@ -675,6 +778,7 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
           '$consumer',
           $id,
           1,
+          $r,
           $w,
           $a)";
 	display_debug_msg($query, $cdg_sql, 'of_right_update_right(3)');
@@ -683,19 +787,22 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
     }
   }
 
-  if (! $public_write) {
-    // Insert all write entries not already done by the read loop
-    foreach ($accept_write as $key => $ref) {
+  if (! $public_read) {
+    // Insert all read entries not already done by the acces loop
+    foreach ($accept_read as $key => $ref) {
       if (preg_match($consumer_ereg,$ref,$matches)) {
-        if (! in_array($ref, $accept_read)) {
+        if (! in_array($ref, $accept_acces)) {
           $consumer = $matches[1];
           $id = sql_parse_id($matches[2]);          
+	  $w = (in_array($ref, $accept_write) ? 1 : 0);
+	  $x = (in_array($ref, $accept_write) ? 1 : 0);
 	  $a = (in_array($ref, $accept_admin) ? 1 : 0);
 	  $query = "INSERT INTO EntityRight (
             entityright_entity,
             entityright_entity_id,
             entityright_consumer,
             entityright_consumer_id,
+            entityright_read,
             entityright_write,
             entityright_admin
           ) VALUES (
@@ -703,6 +810,40 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
             ".sql_parse_id($eid).",
             '$consumer',
             $id,
+            1,
+            $w,
+            $a)";
+	  display_debug_msg($query, $cdg_sql, 'of_right_update_right(3)');
+	  $obm_q->query($query);
+        }
+      }
+    }
+  }
+
+  if (! $public_write) {
+    // Insert all write entries not already done by the read loop
+    foreach ($accept_write as $key => $ref) {
+      if (preg_match($consumer_ereg,$ref,$matches)) {
+        if (! in_array($ref, $accept_acces)
+          && (! in_array($ref, $accept_read))) {
+          $consumer = $matches[1];
+          $id = sql_parse_id($matches[2]);          
+	  $x = 1;
+	  $a = (in_array($ref, $accept_admin) ? 1 : 0);
+	  $query = "INSERT INTO EntityRight (
+            entityright_entity,
+            entityright_entity_id,
+            entityright_consumer,
+            entityright_consumer_id,
+            entityright_acces,
+            entityright_write,
+            entityright_admin
+          ) VALUES (
+            '$entity',
+            ".sql_parse_id($eid).",
+            '$consumer',
+            $id,
+            $x,
             '1',
             $a)";
 	  display_debug_msg($query, $cdg_sql, 'of_right_update_right(4)');
@@ -715,7 +856,8 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
   foreach ($accept_admin as $key => $ref) {
     $ref_ent = substr($ref, 0, 10);
     if (preg_match($consumer_ereg,$ref,$matches)) {
-      if ((! in_array($ref, $accept_read))
+      if ((! in_array($ref, $accept_acces))
+        && (! in_array($ref, $accept_read)) 
         && (! in_array($ref, $accept_write))) {
         $consumer = $matches[1];
         $id = sql_parse_id($matches[2]);

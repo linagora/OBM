@@ -198,6 +198,7 @@ $l_alert_mail_subject = "Événement imminent : %s";
 
 $l_event_color_tt = "Les couleurs utilisées sont celles définies lors de la création des événements.";
 
+
 $l_resource_group_search = "La plage est considérée libre si";
 $l_resources_one_freebusy = "Une ressource est libre dans chaque groupe";
 $l_resources_all_freebusy = "Toutes les ressources sont libres";
