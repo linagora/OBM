@@ -61,7 +61,7 @@ class CalendarAlertCronJob extends CronJob{
       $event = $occurrence->event;
       $delta = $this->getAlertDelta($event->id);
       
-      if($occurrence->date + $this->jobDelta> $date && $occurrence->date <= $date  + $delta) {
+      if($occurrence->date > $date && $occurrence->date <= $date  + $this->jobDelta) {
         $this->logger->debug("Alert for event ".$event->id." will be sent");
         $consult_link = "$GLOBALS[cgp_host]/calendar/calendar_index.php?action=detailconsult&calendar_id=".$event->id;
         $events[$event->id] = array (
@@ -90,7 +90,7 @@ class CalendarAlertCronJob extends CronJob{
       }
     }    
 
-    $this->deleteDeprecatedAlerts($date + $this->jobDelta - 1);
+    $this->deleteDeprecatedAlerts($date + $this->jobDelta);
 
     return true;
   }
@@ -115,8 +115,8 @@ class CalendarAlertCronJob extends CronJob{
       LEFT JOIN CalendarEvent ON calendarevent_id = calendaralert_event_id 
       WHERE 
       calendarevent_id IS NULL 
-      OR ($calendarevent_date - calendaralert_duration < $date AND calendarevent_repeatkind = 'none')
-      OR ($calendarevent_endrepeat - calendaralert_duration < $date AND calendarevent_repeatkind != 'none')";
+      OR ($calendarevent_date - calendaralert_duration <= $date AND calendarevent_repeatkind = 'none')
+      OR ($calendarevent_endrepeat - calendaralert_duration <= $date AND calendarevent_repeatkind != 'none')";
     $obm_q = new DB_OBM;
     $this->logger->core($query);
     $obm_q->query($query);
@@ -140,8 +140,8 @@ class CalendarAlertCronJob extends CronJob{
   function getAlerts($start_time, $end_time) {
     $this->logger->debug("Getting alerts between ".date("Y-m-d H:i:s",$start_time)." and ".date("Y-m-d H:i:s",$end_time));
     $of = &OccurrenceFactory::getInstance();
-    $of->setBegin($start_time);
-    $of->setEnd($end_time);
+    $of->setBegin($start_time - 1);
+    $of->setEnd($end_time + 1);
     $this->getSimpleAlerts($start_time, $end_time);
     $this->getReccurentAlerts($start_time, $end_time);
   }
