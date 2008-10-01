@@ -28,7 +28,7 @@
     <p id="aliasource">
     <a href="http://www.obm.org">OBM.org</a>
     </p>
-    <h1>OBM $obm_version</h1>
+    <h1>$l_obm_title $obm_version</h1>
     <img src="$img_home" alt="OBM $obm_version" />
     <p class="error"></p>
     <form name="login" method="post" action="$login_action">
