@@ -3694,7 +3694,11 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     if(is_array($old_resources)) {
       $mail_datas['remove_resource'] = true;
     }
-    $old_attendees = array_diff($entities['user']['ids'], array($obm['uid']));
+    if (is_array($entities['user']['ids'])) {
+      $old_attendees = array_diff($entities['user']['ids'], array($obm['uid']));
+    } else {
+      $old_attendees = array();
+    }
     $mail_datas['remove_attendee'] = true;    
   } elseif ($action == 'quick_delete') {
     if($event_q->f('calendarevent_repeatkind') != 'none') {
@@ -3702,7 +3706,11 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       $new_exceptions[] = $calendar['old_date_begin'];  
       $entities = get_calendar_event_entity($calendar['calendar_id']); 
       $old_resources = $entities['resource']['ids'];
-      $attendees = array_diff($entities['user']['ids'], array($obm['uid']));
+      if (is_array($entities['user']['ids'])) {
+	$attendees = array_diff($entities['user']['ids'], array($obm['uid']));
+      } else {
+	$attendees = array();
+      }
       $mail_datas['add_exception'] = true;
     } else {
       $old_title = $event_q->f('calendarevent_title');
@@ -3714,7 +3722,11 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       if(is_array($old_resources)) {
         $mail_datas['remove_resource'] = true;
       }
-      $old_attendees = array_diff($entities['user']['ids'], array($obm['uid']));
+      if (is_array($entities['user']['ids'])) {
+	$old_attendees = array_diff($entities['user']['ids'], array($obm['uid']));
+      } else {
+	$old_attendees = array();
+      }
       $mail_datas['remove_attendee'] = true;    
     }
   } elseif ($action == 'quick_update') {
