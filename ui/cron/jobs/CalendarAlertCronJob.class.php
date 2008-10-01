@@ -90,7 +90,7 @@ class CalendarAlertCronJob extends CronJob{
       }
     }    
 
-    $this->deleteDeprecatedAlerts($date + $delta);
+    $this->deleteDeprecatedAlerts($date + $this->jobDelta - 1);
 
     return true;
   }
@@ -122,7 +122,7 @@ class CalendarAlertCronJob extends CronJob{
     $obm_q->query($query);
     while($obm_q->next_record()) {
       $query = "DELETE FROM CalendarAlert WHERE calendaralert_event_id = ".$obm_q->f('calendaralert_event_id')."
-                AND calendaralert_user_id = ".$obm_q->f('calendaralert_event_id');
+                AND calendaralert_user_id = ".$obm_q->f('calendaralert_user_id');
       $this->logger->core($query);
       $obm2_q->query($query);
     }
