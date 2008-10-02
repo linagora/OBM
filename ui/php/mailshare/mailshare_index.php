@@ -95,8 +95,8 @@ if ($action == 'ext_get_id') {
     if ($params['confirm'] == $c_yes) {
       $id = run_query_mailshare_insert($params);
       if ($id > 0) {
-	$params['mailshare_id'] = $id;
-	set_update_state();
+        $params['mailshare_id'] = $id;
+        set_update_state();
         $display['msg'] .= display_ok_msg("$l_mailshare : $l_insert_ok");
       } else {
         $display['msg'] .= display_err_msg("$l_mailshare : $l_insert_error");
@@ -182,7 +182,7 @@ if ($action == 'ext_get_id') {
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
   if (of_right_update_right($params, 'MailShare')) {
-    set_update_state();
+    update_mailshare_acl( $obm['uid'], $obm['domain_id'] );
     $display['msg'] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
     $display['msg'] .= display_warn_msg($err['msg']);
