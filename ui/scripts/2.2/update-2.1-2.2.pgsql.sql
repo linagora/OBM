@@ -152,12 +152,12 @@ ALTER TABLE UGroup ALTER COLUMN group_manager_id SET DEFAULT NULL;
 --
 
 CREATE TABLE Profile (
-	profile_id			serial,
+	profile_id		serial,
 	profile_domain_id	integer NOT NULL,
 	profile_timeupdate	timestamp,
 	profile_timecreate	timestamp,
 	profile_userupdate	integer default null,
-	profile_usercreate  integer default null,
+	profile_usercreate      integer default null,
 	profile_name		varchar(64) default null,
 	PRIMARY KEY (profile_id)
 );
@@ -167,11 +167,11 @@ CREATE TABLE Profile (
 --
 
 CREATE TABLE ProfileModule (
-	profilemodule_id			serial,
+	profilemodule_id		serial,
 	profilemodule_domain_id		integer NOT NULL,
 	profilemodule_profile_id	integer default NULL,
 	profilemodule_module_name	varchar(16) NOT NULL default '',
-	profilemodule_right			integer default NULL,
+	profilemodule_right		integer default NULL,
 	PRIMARY KEY (profilemodule_id)
 );
 
@@ -1472,6 +1472,15 @@ ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_group_id_group_id_fkey FORE
 -- Foreign key from of_usergroup_user_id to userobm_id
 DELETE FROM of_usergroup WHERE of_usergroup_user_id NOT IN (SELECT userobm_id FROM UserObm) AND of_usergroup_user_id IS NOT NULL;
 ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_user_id_userobm_id_fkey FOREIGN KEY (of_usergroup_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from profilemodule_profile_id to profile_id
+ALTER TABLE Profile ADD CONSTRAINT profile_domain_id_domain_id_fkey FOREIGN KEY (profile_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from profile_userupdate to userobm_id
+ALTER TABLE Profile ADD CONSTRAINT profile_userupdate_userobm_id_fkey FOREIGN KEY (profile_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from profile_usercreate to userobm_id
+ALTER TABLE Profile ADD CONSTRAINT profile_usercreate_userobm_id_fkey FOREIGN KEY (profile_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from profilemodule_profile_id to profile_id
 ALTER TABLE ProfileModule ADD CONSTRAINT profilemodule_profile_id_profile_id_fkey FOREIGN KEY (profilemodule_profile_id) REFERENCES Profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
