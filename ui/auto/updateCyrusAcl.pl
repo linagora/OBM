@@ -49,7 +49,7 @@ sub getParameter {
         return 1;
     }else {
         if( $$parameters{"name"} !~ /$regexp_login/ ) {
-            &OBM::toolBox::write_log( "Parametre --login invalide", "W" );
+            &OBM::toolBox::write_log( "Parametre --name invalide", "W" );
             print STDERR "Paramètre '--name' invalide.\nCe paramètre est :\n";
             print STDERR "\tle login d'un utilisateur si le paramètre '--type' vaut 'mailbox'\n";
             print STDERR "\tle nom d'un répertoire partagé si le paramètre '--type' vaut 'mailshare'\n";
