@@ -589,43 +589,37 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
 
   if ($consumer == 'user' || $consumer == 'all' ) {
 
-    $table_consumer = 'UserObm';
-    $c_id = 'userobm_id';
     $ctt[0]['type'] = 'field';
     $ctt[0]['value'] = 'userobm_lastname';
     $ctt[1]['type'] = 'string';
     $ctt[1]['value'] = ' ';
     $ctt[2]['type'] = 'field';
     $ctt[2]['value'] = 'userobm_firstname';
-    $c_label = sql_string_concat($db_type, $ctt);
-    $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'user' as entitydata_kind FROM UserObm";
-    $u = get_user_info($user_id);
-  }
-  if ($consumer == 'group' || $consumer == 'all' ) {
-    $table_consumer = 'UGroup';
-    $c_id = 'group_id';
-    $c_label = 'group_name';
-    $entity_table[] = "Select $c_label as entitydata_label, $c_id as entitydata_id, 'group' as entitydata_kind FROM UGroup";
+    $user_label = sql_string_concat($db_type, $ctt);
   }
 
   if ($right != 'all') {
     $where_right = "AND entityright_$right = 1";
   }
-  $table_consumer = implode(' UNION ', $entity_table);
+
+  $if_id = sql_if($db_type, "(entityright_consumer = 'user')", "userobm_id", "group_id");
+  $if_label = sql_if($db_type, "(entityright_consumer = 'user')", "$user_label", "group_name");
+
   $query = "SELECT
-      entitydata_id as id,
-      entitydata_label as label,
-      entitydata_kind as consumer,
+      $if_id as id,
+      $if_label as label,
+      entityright_consumer,
       entityright_consumer_id,
       entityright_read,
       entityright_write,
-      entityright_acces,
       entityright_admin
     FROM EntityRight
-      LEFT JOIN ($table_consumer) as entity ON entityright_consumer_id = entitydata_id AND entityright_consumer = entitydata_kind
+      LEFT JOIN UserObm ON entityright_consumer = 'user' AND entityright_consumer_id = userobm_id
+      LEFT JOIN UGroup ON entityright_consumer = 'group' AND entityright_consumer_id = group_id
     WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity'
       $where_right
-    ORDER BY entitydata_kind, entitydata_label";
+    ORDER BY entityright_consumer, label";
+
   display_debug_msg($query, $cdg_sql, 'of_right_consumer_for_entity()');
   $obm_q->query($query);
   $ret_array = array();
@@ -633,10 +627,9 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
     $id = $obm_q->f('id');
     $label = $obm_q->f('label');
     $entity_id = $obm_q->f('entityright_entity_id');
-    $entity = $obm_q->f('consumer');
+    $entity = $obm_q->f('entityright_consumer');
     $read = $obm_q->f('entityright_read');
     $write = $obm_q->f('entityright_write');
-    $acces = $obm_q->f('entityright_acces');
     $admin = $obm_q->f('entityright_admin');
     $id_array[] = $id;
     $con_array[] = array(
@@ -646,7 +639,6 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
                          'entity' => $entity,
 			 'read' => $read,
 			 'write' => $write,
-			 'acces' => $acces,
 			 'admin' => $admin
 			 );
   }

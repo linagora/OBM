@@ -1617,32 +1617,32 @@ function get_entity_info($id, $entity) {
     $c_label = sql_string_concat($db_type, $ctt);
     $c_email = 'userobm_email';
     $c_domain = 'userobm_domain_id';
-    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id,
-      $c_id as entitydata_id, 'user' as entity_kind FROM UserObm";
+    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, $c_id as entitydata_id, 'user' as entity_kind
+      FROM UserObm WHERE userobm_id='$id'";
   } elseif ($entity == 'group') {
     $table_entity = 'UGroup';
     $c_id = 'group_id';
     $c_label = 'group_name';
     $c_email = 'group_email';
     $c_domain = 'group_domain_id';
-    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id,
-      $c_id as entitydata_id, 'group' as entity_kind FROM UGroup";
+    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id,v$c_id as entitydata_id, 'group' as entity_kind
+      FROM UGroup WHERE group_id='$id'";
   } elseif ($entity == 'resource') {
     $table_entity = 'Resource';
     $c_id = 'resource_id';
     $c_label = 'resource_name';
     $c_email = 'NULL';
     $c_domain = 'resource_domain_id';
-    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, 
-      $c_id as entitydata_id, 'resource' as entity_kind FROM Resource";
+    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, $c_id as entitydata_id, 'resource' as entity_kind
+      FROM Resource WHERE resource_id='$id'";
   } elseif ($entity == 'mailshare') {
     $table_entity = 'MailShare';
     $c_id = 'mailshare_id';
     $c_label = 'mailshare_name';
     $c_email = 'mailshare_email';
     $c_domain = 'mailshare_domain_id';
-    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id,
-      $c_id as entitydata_id, 'mailshare' as entity_kind FROM MailShare";
+    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, $c_id as entitydata_id, 'mailshare' as entity_kind
+      FROM MailShare WHERE mailshare_id='$id'";
   }
 
   $query = "SELECT Entity.*, domain_name as entity_domain
