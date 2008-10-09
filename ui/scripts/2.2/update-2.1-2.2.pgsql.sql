@@ -48,7 +48,7 @@ ALTER TABLE Company ALTER COLUMN company_domain_id SET NOT NULL;
 ALTER TABLE Company ALTER COLUMN company_datasource_id SET default NULL;
 ALTER TABLE Contact ALTER COLUMN contact_domain_id SET NOT NULL;
 ALTER TABLE Contact ALTER COLUMN contact_datasource_id SET default NULL;
-ALTER TABLE EntityRight ADD COLUMN entityright_acces TYPE INTEGER not null DEFAULT 0;
+ALTER TABLE EntityRight ADD COLUMN entityright_acces INTEGER not null DEFAULT 0;
 ALTER TABLE Kind ALTER COLUMN kind_domain_id SET NOT NULL;
 ALTER TABLE ContactFunction ALTER COLUMN contactfunction_domain_id SET NOT NULL;
 ALTER TABLE LeadSource ALTER COLUMN leadsource_domain_id SET NOT NULL;
@@ -1493,3 +1493,7 @@ ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profile_id_
 
 -- Foreign key from profilepropertyvalue_property_id to profileproperty_id
 ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty(profileproperty_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+-- module 'profile'
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);

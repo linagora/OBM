@@ -49,3 +49,5 @@ $l_section_enable = "Activer";
 $l_active_section = "Activer sections";
 $l_section_all = "Toutes";
 $l_section_none = "Aucune";
+$l_found = "profiles trouvés.";
+$l_no_found = "Aucun profile ne correspond à ces critères !";

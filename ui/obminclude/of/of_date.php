@@ -96,6 +96,13 @@ class Of_Date extends DateTime {
   const OBM_DATE_MONTH          = 'F Y';
   const OBM_DATE_MONTH_LIST     = 'l j F';
 
+  //OBM_ERROR AND WARNING
+  const WARN_EMPTY_DATE         = 1;
+  const ERR_INVALID_DATE        = 2;
+
+  //DATE OCNSTANT
+  const DAYDURATION             = 86400;
+  
   //D => EE, l => EEEE, w => eee. 
   //n => M, F => MMMM, M => MMM,
   //For parse compliance this is not the case here 
@@ -133,16 +140,54 @@ class Of_Date extends DateTime {
 
 
   private static $_options = array(
-    'outputdatetime' => 'm/d/Y H:i:s',
-    'outputdate' => 'm/d/Y',
-    'inputdatetime' => 'm/d/Y H:i:s',
-    'inputdate' => 'd/m/Y'
+    'outputdatetime' => 'd/m/Y H:i:s',
+    'outputdate' => 'd/m/Y',
+    'inputdatetime' => 'd/m/Y H:i:s',
+    'inputdate' => 'd/m/Y',
+    'timezone' => 'Asia/Tokyo'
   );
+
+  private $_error;
+
   public function __construct($time=null, $timezone=null) {
     if(is_numeric($time)) {
       $time = "@$time";
     }
-    parent::__construct($time);
+    if(empty($time)) {
+      $this->_error = self::WARN_EMPTY_DATE;
+    }
+    try {
+      if(!is_null($timezone)) {
+        $timezone = new DateTimeZone($timezone);
+        parent::__construct($time, $timezone);
+      } else {
+        parent::__construct($time,new DateTimeZone(self::$_options['timezone']));
+      }
+      $this->setTimezone(new DateTimeZone(self::$_options['timezone']));
+    } catch (Exception $e) {
+      $this->error =self::ERR_INVALID_DATE;
+    }
+
+  }
+
+  /**
+   * setDefaultTimezone 
+   * 
+   * @access public
+   * @return void
+   */
+  public function setDefaultTimezone() {
+    $this->setTimezone(new DateTimeZone(self::$_options['timezone']));
+  }
+
+  /**
+   * Return the current stored error 
+   * 
+   * @access public
+   * @return void
+   */
+  public function error() {
+    return $this->_error;
   }
 
   /**
@@ -166,7 +211,7 @@ class Of_Date extends DateTime {
   }
 
   /**
-   * Get the date time formated with the outdatetime option
+   * Get the date time formated with the outputdatetime option
    * 
    * @access public
    * @return void
@@ -176,13 +221,44 @@ class Of_Date extends DateTime {
   }
 
   /**
-   * Get the date formated with the outdatetime option
+   * Get the date formated with the outputdate option
    * 
    * @access public
    * @return void
    */
   public function getOutputDate() {
     return $this->get(self::$_options['outputdate']);
+  }
+
+
+  /**
+   * Get the date time formated with the inputdatetime option
+   * 
+   * @access public
+   * @return void
+   */
+  public function getInputDateTime() {
+    return $this->get(self::$_options['inputdatetime']);
+  }
+
+  /**
+   * Get the date formated with the inputdate option
+   * 
+   * @access public
+   * @return void
+   */
+  public function getInputDate() {
+    return $this->get(self::$_options['inputdate']);
+  }
+
+  /**
+   * Returns this object's iso date .
+   * This function does not return the iso as an object.
+   *
+   * @return integer|string  UNIX iso
+   */
+  public function getURL() {
+    return urlencode($this->format(self::ISO_8601));
   }
 
   /**
@@ -235,6 +311,18 @@ class Of_Date extends DateTime {
    */
   public function compare($date, $part=null, $format=null) {
     return $this->_compare($part, $date, $format);
+  }  
+
+  /**
+   * Compares the current object part with the givent date
+   *
+   * @param  integer|string|array|Of_Date  $date  Date to compare 
+   * @param string $part  Part to compare OPTIONAL
+   * @param string $format Format of the input string OPTIONAL
+   * @return integer  0 = equal, 1 = later, -1 = earlier
+   */
+  public function equals($date, $part=null, $format=null) {
+    return $this->_compare($part, $date, $format) == 0;
   }  
 
   /**
@@ -406,7 +494,7 @@ class Of_Date extends DateTime {
    * @return integer|string  UNIX iso
    */
   public function getIso() {
-    return urlencode($this->format(self::ISO_8601));
+    return $this->format(self::ISO_8601);
   }
 
   /**
@@ -1197,7 +1285,9 @@ class Of_Date extends DateTime {
   function _compare($parts,$date, $format) { 
     $data = self::_parse($parts, $date, $format);
     if(isset($data['timestamp'])) {
-      return strcmp($this->format(self::TIMESTAMP), $data['timestamp']);
+      if($data['timestamp'] > $this->format(self::TIMESTAMP)) return -1;
+      elseif((int)$data['timestamp'] < $this->format(self::TIMESTAMP)) return 1;
+      return 0;
     } 
     if(isset($data['year'])) {
       if($data['year'] > $this->format(self::YEAR)) return -1;
@@ -1208,8 +1298,8 @@ class Of_Date extends DateTime {
       elseif($data['month'] < $this->format(self::MONTH)) return 1;
     } 
     if(isset($data['dayofyear'])) {
-      if($data['dayofyear'] > $this->format(self::DAY_OF_YEAR)) return -1;
-      elseif($data['dayofyear'] < $this->format(self::DAY_OF_YEAR)) return 1;
+      if($data['dayofyear'] > $this->format(self::DAYOFYEAR)) return -1;
+      elseif($data['dayofyear'] < $this->format(self::DAYOFYEAR)) return 1;
     } 
     if(isset($data['week'])) {
       if($data['week'] > $this->format(self::WEEK)) return -1;
@@ -1254,34 +1344,34 @@ class Of_Date extends DateTime {
     $data = self::_parse($parts, $date, $format);
     $diff = array();
     if(isset($data['timestamp'])) {
-      $diff['timestamp'] = $data['timestamp'] - $this->format(self::TIMESTAMP);
+      $diff['timestamp'] = $this->format(self::TIMESTAMP) - $data['timestamp'] ;
     }     
     if(isset($data['year'])) {
-      $diff['year'] = $data['year'] - $this->format(self::YEAR);
+      $diff['year'] = $this->format(self::YEAR) - $data['year'];
     } 
     if(isset($data['month'])) {
-      $diff['month'] = $data['month'] - $this->format(self::MONTH);
+      $diff['month'] = $this->format(self::MONTH) - $data['month'];
     } 
     if(isset($data['dayofyear'])) {
-      $diff['dayofyear'] = $data['dayofyear'] - $this->format(self::DAY_OF_YEAR);
+      $diff['dayofyear'] =  $this->format(self::DAYOFYEAR) - $data['dayofyear'];
     } 
     if(isset($data['week'])) {
-      $diff['week'] = $data['week'] - $this->format(self::WEEK);
+      $diff['week'] =  $this->format(self::WEEK) - $data['week'];
     } 
     if(isset($data['day'])) {
-      $diff['day'] =  $data['day'] - $this->format(self::DAY);
+      $diff['day'] =   $this->format(self::DAY) - $data['day'];
     } 
     if(isset($data['weekday'])) {
-      $diff['weekday'] = ($data['weekday'] - $this->format(self::WEEKDAY_DIGIT) + 7) % 7 ;
+      $diff['weekday'] = ($this->format(self::WEEKDAY_DIGIT - $data['weekday']) + 7) % 7 ;
     } 
     if(isset($data['hour'])) {
-      $diff['hour'] =  $data['hour'] - $this->format(self::HOUR);
+      $diff['hour'] =   $this->format(self::HOUR) - $data['hour'];
     } 
     if(isset($data['minute'])) {
-      $diff['minute'] =  $data['minute'] - $this->format(self::MINUTE);
+      $diff['minute'] =   $this->format(self::MINUTE) - $data['minute'];
     } 
     if(isset($data['second'])) {
-      $diff['second'] =  $data['second'] - $this->format(self::SECOND);
+      $diff['second'] =   $this->format(self::SECOND) - $data['second'];
     }
     if(count($diff) == 1) {
       return array_pop($diff);
@@ -1427,7 +1517,10 @@ class Of_Date extends DateTime {
    * @return void
    */
   public function toString() {
-    return $this->get(self::DATABASE_DATE);
+    $this->setTimezone(new DateTimeZone('GMT'));
+    $date = $this->get(self::DATABASE_DATE);
+    $this->setTimezone(new DateTimeZone(self::$_options['timezone']));
+    return $date;
   }
 
   /**

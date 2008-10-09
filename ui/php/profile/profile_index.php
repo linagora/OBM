@@ -34,55 +34,40 @@ page_close();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-$do_next = true;
-$next_action = $action;
-
-while ($do_next) {
-$do_next = false;
-$action = $next_action;
-
 if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
-
-  //$prefs = get_display_pref($obm['uid'], 'profile', 0);
-  $obm_q = run_query_profile_search($params);
-  $count = $obm_q->num_rows_total();
-  
-  if ($count == 0) {
-    $display['msg'] .= display_warn_msg($l_no_found);
+  $display['search'] = dis_profile_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_profile_search_list($params);
   } else {
-    $display['msg'] .= display_info_msg($count.' '.$l_found);
-    $display['result'] = html_profile_list($obm_q);
+    $display['msg'] .= display_info_msg($l_no_display);
   }
 
+} elseif ($action == 'search') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['search'] = dis_profile_search_form($params);
+  $display['result'] = dis_profile_search_list($params);
+  
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = html_profile_form($action, $params);
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  $do_next = true;
-  $its_ok = false;
-  
   if(check_user_defined_rules() && check_profile_data_form($params)) {
     $params['profile_id'] = run_query_profile_insert($params);
     if($params['profile_id'] > 0) {
       $display['msg'] .= display_ok_msg("$l_profile : $l_insert_ok");
-      $its_ok = true;
+      $profile = get_profile_full_data($params['profile_id']);
+      $display['detail'] = html_profile_consult($params, $profile);
     } else {
       $display['msg'] .= display_err_msg("$l_profile : $l_insert_error");
+      $display['detail'] = html_profile_form($action, $params, null);
     }
   } else {
     $display['msg'] = display_warn_msg($l_invalid_data . " : " . $err['msg']);
+    $display['detail'] = html_profile_form($action, $params, null);
   }
-  
-  if ($its_ok) {
-    $params['profile_id'] = NULL;
-    $next_action = 'index';
-  }
-  else
-    $next_action = 'detailupdate';
-    
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
   $profile = get_profile_full_data($params['profile_id']);
@@ -107,49 +92,36 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  $do_next = true;
-  $its_ok = false;
-  
   $initial_profile = get_profile_full_data($params['profile_id']);
-  
+
   if(check_user_defined_rules() && check_profile_data_form($params)) {
     if (run_query_profile_update($params, $initial_profile)) {
       $display['msg'] .= display_ok_msg("$l_profile : $l_update_ok");
-      $its_ok = true;
+      $profile = get_profile_full_data($params['profile_id']);
+      $display['detail'] = html_profile_consult($params, $profile);
     } else {
       $display['msg'] .= display_err_msg("$l_profile : $l_update_error");
+      $display['detail'] = html_profile_form($action, $params, $profile);
     }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . " : " . $err['msg']);
+    $display['detail'] = html_profile_form($action, $params, $profile);
   }
   
-  if ($its_ok)
-    $next_action = 'detailconsult';
-  else
-    $next_action = 'detailupdate';
-
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  //TODO
-  $do_next = true;
   if (check_can_delete_profile($params['profile_id'])) {
-    $next_action = 'delete';
-  } else {
-    $display['msg'] .= display_warn_msg($l_profile_delete_warning);
-    $next_action = 'detailconsult';
-  }
-
-} elseif ($action == 'delete') {
-///////////////////////////////////////////////////////////////////////////////
-  //TODO
-  $do_next = true;
     $retour = run_query_profile_delete($params['profile_id']);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_profile : $l_delete_ok");
     } else {
       $display['msg'] .= display_err_msg("$l_profile : $l_delete_error");
-    }
-    $next_action = "index";
+    }    
+  } else {
+    $display['msg'] .= display_warn_msg($l_profile_delete_warning);
+    $profile = get_profile_full_data($params['profile_id']);
+    $display['detail'] = html_profile_consult($params, $profile);
+  }
 
 } elseif ($action == 'display') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,10 +139,7 @@ if ($action == 'index' || $action == '') {
   update_display_pref($entity, $fieldname, $fieldstatus, $fieldorder);
   $prefs = get_display_pref($obm['uid'], 'profile', 1);
   $display['detail'] = dis_profile_display_pref($prefs);
-
 }
-
-} // end while
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
@@ -298,12 +267,11 @@ function get_profile_action() {
   	'Right'    => $cright_read,
   	'Condition'=> array ('all') );
   
-  // Search
-//  $actions['profile']['search'] = array (
-//  	'Url'      => "$path/profile/profile_index.php?action=search",
-//  	'Right'    => $cright_read,
-//  	'Condition'=> array ('None') );
-  //FIXME
+// Search
+  $actions['profile']['search'] = array (
+  	'Url'      => "$path/profile/profile_index.php?action=search",
+  	'Right'    => $cright_read,
+  	'Condition'=> array ('None') );
   
   // New
   $actions['profile']['new'] = array (

@@ -260,8 +260,6 @@ function run_query_calendar_insert_decision($calendar) {
 function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state, $force = false) {
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
-  $event_id = sql_parse_id( $event_id, true);
-  $entity_id = sql_parse_id( $obm['uid'], true);
   if (!$force && ($obm['uid'] != $entity_id || $entity != 'user')) {
     if ($entity == 'user') {
       $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
@@ -275,11 +273,13 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
     } 
   }
 
+  $event_id = sql_parse_id( $event_id, true);
+  $entity_id = sql_parse_id( $entity_id, true);
   $query = "UPDATE EventEntity 
             SET evententity_state = '$state'
             WHERE evententity_entity_id  $entity_id 
               AND evententity_entity = '$entity'
-              AND evententity_event_id  $event_id'"; 
+              AND evententity_event_id  $event_id"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
   $obm_q = new DB_OBM;
@@ -422,7 +422,7 @@ function run_query_calendar_delete_event_entity($calendar, $users = null) {
 //   - $sel_entity_id : List entitis id ['user'] ['resource']
 //   - $event_id      : var to get the id to be returned
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_add_event($calendar, $sel_entity_id, &$event_id) {
+function run_query_calendar_add_event($calendar, $sel_entity_id, $event_id) {
   global $obm, $ccalendar_resource_admin, $ccalendar_send_ics;
   global $l_from, $l_to, $l_date, $l_resource_allocated;
   global $l_add_event_mail_head,$l_add_event_mail_subject;
@@ -799,8 +799,9 @@ function check_calendar_decision_conflict($calendar) {
   $user['user'] = $calendar['user_id'];
   $event_id = $calendar['calendar_id'];
   $e_q = run_query_calendar_detail($event_id);
-  $begin = new Of_Date($e_q->f('calendarevent_date'));
-  $end = new Of_Date($e_q->f('calendarevent_date') + $e_q->f('calendarevent_duration'));
+  $begin = new Of_Date($e_q->f('calendarevent_date'),'GMT');
+  $end = clone $begin;
+  $end->addSecond($e_q->f('calendarevent_duration'));
   if($e_q->f('all_day')) {
     $begin->setHour(0)->setMinute(0)->setSecond(0); 
     $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
@@ -818,7 +819,7 @@ function check_calendar_decision_conflict($calendar) {
 //   - $calendar      : Calendar params
 //   - $sel_entity_id : List entitis id ['user'] ['resource']
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_event_update($calendar, $sel_entity_id, &$event_id, $reset_state) {
+function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $reset_state) {
   global $c_use_connectors, $obm, $l_date;
   global $l_update_event_mail_head,$l_update_event_mail_subject,$l_update_event_mail_body,$l_to,$l_from;
   global $ccalendar_resource_admin, $l_resource_allocated;
@@ -1046,9 +1047,6 @@ function run_query_calendar_update_event_data($calendar) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(2)');
   $obm_q->query($query);
   
-  $timebegin = strtotime($datebegin);
-  $hour = date('H', $timebegin);
-  $min = date('i',$timebegin);
   if($repeat_kind != 'none' && is_array($date_exception)) {
     foreach(array_unique($date_exception) as $key => $value) {
       if($value != '') {
@@ -1220,7 +1218,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $repeat_kind = $event_q->f('calendarevent_repeatkind');
     $repeat_days = $event_q->f('calendarevent_repeatdays');
     if($event_q->f('calendarevent_endrepeat')) {
-      $repeat_end = new Of_Date($event_q->f('calendarevent_endrepeat'));
+      $repeat_end = new Of_Date($event_q->f('calendarevent_endrepeat'), 'GMT');
       $repeat_end = "'$repeat_end'";
     } else {
       $repeat_end = "NULL";
@@ -1754,9 +1752,10 @@ function get_calendar_event_info($id,$attendees=true) {
   while($obm_q->next_record()) {
     $e['usercreate'] = $obm_q->f('calendarevent_usercreate');
     $e['owner'] = $obm_q->f('calendarevent_owner');
-    $e['date'] = new  Of_Date($obm_q->f('calendarevent_date'));
+    $e['date'] = new  Of_Date($obm_q->f('calendarevent_date'), 'GMT');
     $e['duration'] = $obm_q->f('calendarevent_duration');
-    $e['end'] = new Of_Date($obm_q->f('calendarevent_date') + $obm_q->f('calendarevent_duration'));
+    $e['end'] = clone $e['date'];
+    $e['end']->addSecond($obm_q->f('calendarevent_duration'));
     if($obm_q->f('evententity_entity_id') && $attendees) {
       $e['attendees'][$obm_q->f('evententity_entity')][] = $obm_q->f('evententity_entity_id');
     }
@@ -1944,8 +1943,8 @@ function check_calendar_data_form($calendar) {
   global $l_err_end_repeat3, $l_err_days_repeat, $l_err_days_repeat_not_weekly;
   
   $title = $calendar['title'];
-  $datebegin = $calendar['date_begin'];
-  $dateend = $calendar['date_end'];
+  $begin = $calendar['date_begin'];
+  $end = $calendar['date_end'];
   $repeat_end = $calendar['repeat_end'];
   $kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
@@ -1959,19 +1958,19 @@ function check_calendar_data_form($calendar) {
   }
   
   // Begin Date check
-  if (trim($datebegin) == '') {
+  if ($begin->error() == Of_Date::WARN_EMPTY_DATE) {
     $err['msg'] = $l_fill_datebegin;
     return false;
-  } else if (preg_match($php_regexp_isodatetime, $datebegin) == 0) {
+  } else if ($begin->error() == Of_Date::ERR_INVALID_DATE) {
     $err['msg'] = "$l_datebegin : $l_invalid_date"; 
     return false;
   }
   
   // End Date check
-  if (trim($dateend) == '') {
+  if ($end->error() == Of_Date::WARN_EMPTY_DATE) {
     $err['msg'] = $l_fill_dateend;
     return false;
-  } else if (preg_match($php_regexp_isodatetime, $dateend) == 0) {
+  } else if ($end->error() == Of_Date::ERR_INVALID_DATE) {
     $err['msg'] = "$l_dateend : $l_invalid_date"; 
     return false;
   }
@@ -1979,7 +1978,7 @@ function check_calendar_data_form($calendar) {
   // Repeatition check
   if ($kind != 'none') {
     // End repeat Date check
-    if (($repeat_end != '') && (preg_match($php_regexp_isodate, $repeat_end) == 0)) {
+    if ($repeat_end->error() != Of_Date::WARN_EMPTY_DATE && $repeat_end->error() == Of_Date::ERR_INVALID_DATE) {
       $err['msg'] = "$l_date_repeatend : $l_invalid_date"; 
       return false;
     }
@@ -1990,12 +1989,12 @@ function check_calendar_data_form($calendar) {
     return false;
   }
 
-  if ($dateend < $datebegin || $event_duration < 0 || ( $all_day && $dateend == $datebegin)) {
+  if ($end->compare($begin) < 0 || $event_duration < 0 || ( $all_day && $end->compare($begin) == 0)) {
     $err['msg'] = $l_err_begin_end;
     return false;
   } 
   
-  if (trim($repeat_end) != '' && $dateend>$repeat_end && $kind != 'none') {
+  if ($repeat_end->error() != Of_Date::WARN_EMPTY_DATE && $end->compare($repeat_end) > 0 && $kind != 'none') {
     $err['msg'] =  $l_err_end_repeat;
     return false;
   }
@@ -2011,8 +2010,8 @@ function check_calendar_data_form($calendar) {
     $err['msg'] = $l_err_days_repeat_not_weekly;
     return false;
   }
-
-  if ($kind == 'weekly' && strtotime('+ 1 week',strtotime($dateend)) > strtotime($repeat_end)) {
+  $clone = clone $end;
+  if ($kind == 'weekly' && $clone->addWeek(1)->compare($repeat_end) > 0) {
     $err['msg'] = $l_err_weekly_repeat;
     return false;
   }
@@ -2715,7 +2714,7 @@ function get_one_event_user_alert($event_id, $user_id = null) {
   return $alerts;
 }
 
-
+//FIXME
 ///////////////////////////////////////////////////////////////////////////////
 // Return a table of Events between two dates
 // Parameters: 
@@ -2723,15 +2722,15 @@ function get_one_event_user_alert($event_id, $user_id = null) {
 //   - $end_time        : timestamp of end date
 //   - $calendar_entity :
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_events_model($start_time, $end_time, $calendar_entity, $status=array('A'), $category_filter='', $unique=false) {
+function calendar_events_model($start, $end, $calendar_entity, $status=array('A'), $category_filter='', $unique=false) {
   global $day_duration;
 
   $day_duration = 86400;
   // Get all non repeating events and construct occurences & events model
-  $nr_q = run_query_calendar_no_repeat_events($start_time,$end_time,$calendar_entity, $status, $category_filter);
+  $nr_q = run_query_calendar_no_repeat_events($start,$end,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
-  $of->setBegin($start_time);
-  $of->setEnd($end_time);
+  $of->setBegin($start);
+  $of->setEnd($end);
   while ($nr_q->next_record()) {
     $id = $nr_q->f('calendarevent_id');
     $title = $nr_q->f('calendarevent_title');
@@ -2741,7 +2740,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity, $status
     $location = $nr_q->f('calendarevent_location'); 
     $category1 = $nr_q->f('calendarcategory1_label');
     $priority = $nr_q->f('calendarevent_priority');
-    $date = $nr_q->f('calendarevent_date');
+    $date = new Of_Date($nr_q->f('calendarevent_date'),'GMT');
     $color = $nr_q->f('calendarevent_color');
     $duration = $nr_q->f('calendarevent_duration');
     $all_day = $nr_q->f('calendarevent_allday');
@@ -2750,7 +2749,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity, $status
     $entity_state = $nr_q->f('evententity_state');
     $owner = $nr_q->f('calendarevent_owner');
     if (isset($of->events[$id])) {
-      $event = &$of->events[$id];
+      $event = $of->events[$id];
       if (!$unique) {
 	$of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
       }
@@ -2761,7 +2760,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity, $status
   }
   
   // Get all repeating events and construct occurences & events model
-  $r_q = run_query_calendar_repeat_events($start_time,$end_time,$calendar_entity, $status, $category_filter);
+  $r_q = run_query_calendar_repeat_events($start,$end,$calendar_entity, $status, $category_filter);
   while ($r_q->next_record()) {
     $id = $r_q->f('calendarevent_id');
     $title = $r_q->f('calendarevent_title');
@@ -2770,10 +2769,10 @@ function calendar_events_model($start_time, $end_time, $calendar_entity, $status
     $properties = $r_q->f('calendarevent_properties');
     $location = $r_q->f('calendarevent_location');
     $category1 = $r_q->f('calendarcategory1_label');
-    $date = $r_q->f('calendarevent_date');
+    $date = new Of_Date($r_q->f('calendarevent_date'), 'GMT');
     $duration = $r_q->f('calendarevent_duration');
     $repeatkind = $r_q->f('calendarevent_repeatkind');
-    $endrepeat = $r_q->f('calendarevent_endrepeat');
+    $endrepeat = new Of_Date($r_q->f('calendarevent_endrepeat'), 'GMT');
     $entity = $r_q->f('evententity_entity');
     $all_day = $r_q->f('calendarevent_allday');
     $color = $r_q->f('calendarevent_color');
@@ -2784,40 +2783,37 @@ function calendar_events_model($start_time, $end_time, $calendar_entity, $status
     $all_day = $r_q->f('calendarevent_allday');    
     $owner = $r_q->f('calendarevent_owner');
     if (!$endrepeat) {
-      $endrepeat = $end_time;
+      $endrepeat = $end;
     }
     $addOcc = true;
     if (isset($of->events[$id])) {
-      $event = &$of->events[$id];
+      $event = $of->events[$id];
       if ($unique) { 
         $addOcc = false;
       }
     } else {
       $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$color);
     }
-    $event_start =  $start_time ;
-    $delta_t = date('H',$date) * 3600 + date('i',$date) * 60 + date('s',$date);
-    $delta = $delta_t + $duration;
-    $delta = floor($delta/$day_duration);
-    $event_start -= strtotime( "-$delta day", $event_start);
-    $end_date = ($endrepeat < $end_time) ? $endrepeat : $end_time;
-    $end_date = strtotime('+'.($delta_t + 1).' seconds',$end_date);
+    $event_start = clone $start;
+    $event_start->subSecond($duration)->setHour(0)->setMinute(0)->setSecond(0);
+    $event_end = ($end->compare($endrepeat) > 0)? clone $endrepeat: clone $end; 
+    $event_end->addSecond($duration)->setHour($date)->setMinute($date)->setSecond($date);
     if ($addOcc) {
       switch ($repeatkind) {
         case 'daily' :
-          calendar_daily_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          calendar_daily_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
           break;
         case 'weekly' :
-          calendar_weekly_repeatition($date,$event_start,$end_date,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          calendar_weekly_repeatition($date,$event_start,$event_end,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
           break;
         case 'monthlybyday' :
-          $stored = calendar_monthlybyday_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          $stored = calendar_monthlybyday_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
           break;
         case 'monthlybydate' :
-          $stored = calendar_monthlybydate_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          $stored = calendar_monthlybydate_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
           break;
         case 'yearly' :
-          $stored = calendar_yearly_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+          $stored = calendar_yearly_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
           break;
       }
     }
@@ -2827,9 +2823,9 @@ function calendar_events_model($start_time, $end_time, $calendar_entity, $status
   if (count($of->events) > 0) {
 
     // Handle exceptions : remove occurences from the model
-    $exception_q = run_query_get_events_exception(array_keys($of->events),$start_time,$end_time);
+    $exception_q = run_query_get_events_exception(array_keys($of->events),$start,$end);
     while($exception_q->next_record()) {
-      $of->removeOccurrences($exception_q->f('calendarexception_event_id'), $exception_q->f('calendarexception_date'));
+      $of->removeOccurrences($exception_q->f('calendarexception_event_id'), new Of_Date($exception_q->f('calendarexception_date'), 'GMT'));
     }
 
     // Add attendees to events
@@ -2850,7 +2846,7 @@ function calendar_events_model($start_time, $end_time, $calendar_entity, $status
           $entity_label = $attendee_q->f('project_name').'-'.$attendee_q->f('projecttask_label');
           break;
       }
-      $event = &$of->events[$id];
+      $event = $of->events[$id];
       $event->addAttendee($entity,$entity_id,$entity_label,$entity_state);
     }
   }
@@ -2863,24 +2859,25 @@ function calendar_events_model($start_time, $end_time, $calendar_entity, $status
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity, $entity_state) {
+function calendar_daily_repeatition($date,$start,$end,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {
   global $day_duration;
-
-  $day_duration = 86400;
-  $temp_date = $date;
-  if ($temp_date < $start_time) {
-    $temp_date = ceil(($start_time - $date) / $day_duration);
-    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start_time);
-    $min_diff = of_date_get_min($date) - of_date_get_min($start_time);
-    if ($temp_date > 0) {
-      $temp_date = ($temp_date % $repeatfrequence);
+  $current = clone $date;
+  if ($current->compare($start) < 0) {
+    $gmt = new DateTimeZone('GMT');
+    $current->setTimezone($gmt);
+    $start->setTimezone($gmt);
+    $diff = ceil($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
+    if ($diff > 0) {
+      $diff = ($diff % $repeatfrequence);
     }	    
-    $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
+    $current->setDateIso($start)->subDay($diff);
+    $current->setDefaultTimeZone();
+    $start->setDefaultTimeZone();
   }
-  while ($temp_date < $end_date ) {
+  while ($current->compare($end) < 0) {
     $of = &OccurrenceFactory::getInstance();
-    $of->addOccurrence($event, $temp_date, $entity, $entity_id, $entity_state);
-    $temp_date = strtotime("+$repeatfrequence days",$temp_date);
+    $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
+    $current->addDay($repeatfrequence);
   }
 }
 
@@ -2890,36 +2887,38 @@ function calendar_daily_repeatition($date,$start_time,$end_date,$repeatfrequence
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$event,$entity_id,$entity, $entity_state) {
+function calendar_weekly_repeatition($date,$start,$end_date,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {
   global $day_duration, $ccalendar_weekstart;
+  
+  $current = clone $date;
+  $current->setWeekday($ccalendar_weekstart);
+  if ($current->compare($start) < 0) {
+    $gmt = new DateTimeZone('GMT');
+    $current->setTimezone($gmt);
+    $start->setTimezone($gmt);
+    $diff = ceil($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
+    if ($diff > 0) {
+      $diff = ($diff % ($repeatfrequence * 7));
+    }	    
+    $current->setDateIso($start)->subDay($diff);
+    $current->setDefaultTimeZone();
+    $start->setDefaultTimeZone();
+  }
 
-  $temp_date = get_calendar_date_day_of_week($date, $ccalendar_weekstart);
-  $temp_date = strtotime('+'.of_date_get_hour($date).' hours +'.date('i',$date).' minutes',$temp_date);
-  if ($temp_date < $start_time) {
-    $temp_date = ceil(($start_time - $temp_date) / $day_duration);
-    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start_time);
-    $min_diff = date('i',$date) - date('i',$start_time);
-    $temp_date = ($temp_date % ($repeatfrequence * 7));
-    if ($temp_date == '') $temp_date = 0;
-    $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
-  }
-  $num = (date('w', $temp_date) - date('w', strtotime($ccalendar_weekstart)) +7)%7;
-  for ($i=0; $i<strlen($repeatdays);$i++) {;
-    $k = ($i+$num)%7;
-    $repeat_days[$i]=substr($repeatdays, $k, 1);
-  }
-  while ($temp_date < $end_date) {
-    foreach ($repeat_days as $delta_day => $repeatition) {	  
-      if ($repeatition == 1) {
-        $current_date = strtotime("+$delta_day days",$temp_date);
-        if ($current_date >= $start_time && $current_date < $end_date 
-            && $current_date >= $date) {
+  $days = str_split($repeatdays);
+  if($start->compare($date) < 0) $start = $date;
+  while ($current->compare($end) < 0) {
+    $current->setWeekday($ccalendar_weekstart);
+    foreach ($days as $num => $repeat) {	
+      if ($repeat == 1) {
+        $current->setWeekday($num);
+        if($current->compare($start) >= 0 && $current->compare($end) < 0) {
           $of = &OccurrenceFactory::getInstance();
-          $of->addOccurrence($event, $current_date, $entity, $entity_id, $entity_state);
+          $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
 	}
       }
     } 
-    $temp_date = strtotime("+$repeatfrequence weeks",$temp_date);
+    $current->addWeek($repeatfrequence);
   }	
 }
 
@@ -2929,7 +2928,7 @@ function calendar_weekly_repeatition($date,$start_time,$end_date,$repeatdays,$re
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity, $entity_state) {
+function calendar_monthlybyday_repeatition($date,$start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {
   global $day_duration,$ccalendar_weekstart;
 
   $temp_date = $date;
@@ -2937,16 +2936,16 @@ function calendar_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfr
   $num = (date('w', $date) - $start_week +7)%7;
   $monthlybyday = ceil(date('d',$date) / 7);
   $event_end = $date + $event->duration;
-  if ($event_end < $start_time) {
-    $month_diff = (of_date_get_year($start_time) - of_date_get_year($temp_date)) * 12;
-    $month_diff += of_date_get_month($start_time) - of_date_get_month($temp_date);
-    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start_time);
-    $min_diff = of_date_get_min($date) - of_date_get_min($start_time);
+  if ($event_end < $start) {
+    $month_diff = (of_date_get_year($start) - of_date_get_year($temp_date)) * 12;
+    $month_diff += of_date_get_month($start) - of_date_get_month($temp_date);
+    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start);
+    $min_diff = of_date_get_min($date) - of_date_get_min($start);
     $month_diff = $month_diff % ($repeatfrequence);
     if ($month_diff > 0) {
       $month_diff = $repeatfrequence - $month_diff;
     }
-    $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $start_time);
+    $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $start);
   }
   $hour_diff = of_date_get_hour($date);
   $min_diff = of_date_get_min($date);
@@ -2958,7 +2957,7 @@ function calendar_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfr
     $current_date = strtotime("+ $day_diff days +$hour_diff hours +$min_diff minutes",$ts_cur);
     $event_end = $current_date + $event->duration;
     if (of_date_get_month($ts_cur) == of_date_get_month($current_date)
-       && $event_end >= $start_time
+       && $event_end >= $start
        && $current_date < $end_date) {
       $of = &OccurrenceFactory::getInstance();
       $of->addOccurrence($event, $current_date, $entity, $entity_id, $entity_state);
@@ -2973,16 +2972,16 @@ function calendar_monthlybyday_repeatition($date,$start_time,$end_date,$repeatfr
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity, $entity_state) {  
+function calendar_monthlybydate_repeatition($date,$start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {  
   global $day_duration;
 
   $temp_date = $date;
-  if ($temp_date < $start_time) {
-    $temp_date = strtotime(date('Y-m-01',$start_time));
-    $month_diff = (of_date_get_year($start_time) - of_date_get_year($date)) * 12;
-    $month_diff += of_date_get_month($start_time) - of_date_get_month($date);
-    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start_time);
-    $min_diff = of_date_get_min($date) - of_date_get_min($start_time);
+  if ($temp_date < $start) {
+    $temp_date = strtotime(date('Y-m-01',$start));
+    $month_diff = (of_date_get_year($start) - of_date_get_year($date)) * 12;
+    $month_diff += of_date_get_month($start) - of_date_get_month($date);
+    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start);
+    $min_diff = of_date_get_min($date) - of_date_get_min($start);
     $month_diff = $month_diff % ($repeatfrequence);
     if ($month_diff > 0) {
       $month_diff = $repeatfrequence - $month_diff;
@@ -3007,16 +3006,16 @@ function calendar_monthlybydate_repeatition($date,$start_time,$end_date,$repeatf
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$event,$entity_id,$entity, $entity_state) {
+function calendar_yearly_repeatition($date,$start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {
   global $day_duration;
 
   $temp_date = $date;    
-  if ($temp_date < $start_time) {
-    $temp_date = strtotime(date('Y-m-01',$start_time));
-    $month_diff = (of_date_get_year($start_time) - of_date_get_year($date)) * 12;
-    $month_diff += of_date_get_month($start_time) - of_date_get_month($date);
-    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start_time);
-    $min_diff = of_date_get_min($date) - of_date_get_min($start_time);
+  if ($temp_date < $start) {
+    $temp_date = strtotime(date('Y-m-01',$start));
+    $month_diff = (of_date_get_year($start) - of_date_get_year($date)) * 12;
+    $month_diff += of_date_get_month($start) - of_date_get_month($date);
+    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start);
+    $min_diff = of_date_get_min($date) - of_date_get_min($start);
     $month_diff = $month_diff % ($repeatfrequence*12);
     if ($month_diff > 0) {
       $month_diff = $repeatfrequence*12 - $month_diff;
@@ -3320,6 +3319,7 @@ Class Event {
 Class Occurrence {
   var $event;
   var $date;
+  var $end;
   var $entity;
   var $id;
   var $entity_state;
@@ -3335,9 +3335,9 @@ Class Occurrence {
    * @access public
    * @return void
    */
-  function Occurrence(&$event, $date, $entity, $id, $state) {
-    $this->event = &$event;
-    $this->date = new Of_Date($date);
+  function Occurrence($event, $date, $entity, $id, $state) {
+    $this->event = $event;
+    $this->date = $date;
     $this->end = clone $this->date;
     $this->end->addSecond($event->duration);
     $this->entity = $entity;
@@ -3395,10 +3395,10 @@ Class OccurrenceFactory {
    * @access public
    * @return void
    */
-  function addOccurrence(&$event, $date, $entity, $id, $state='A') {
-    if ($date < $this->end && ($date + $event->duration) > $this->begin) {
+  function addOccurrence($event, $date, $entity, $id, $state='A') {
+    if ($date->compare($this->end) < 0 && ($date->getTimestamp() + $event->duration) > $this->begin->getTimestamp()) {
       $this->occurrences[$event->id][] = &new Occurrence($event, $date, $entity, $id, $state);
-      $this->events[$event->id] = &$event;
+      $this->events[$event->id] = $event;
     }
   }
 
@@ -3412,7 +3412,7 @@ Class OccurrenceFactory {
    */
   function removeOccurrences($id, $date) {
     foreach($this->occurrences[$id] as $key => $occurrence) {
-      if(date('Ymd',$date) == date('Ymd',$occurrence->date)) {
+      if($occurrence->date->compareDateIso($date) == 0) {
         unset($this->occurrences[$id][$key]); 
       }
     }
@@ -3432,7 +3432,7 @@ Class OccurrenceFactory {
     return $return;
   }
 
-  function &getInstance() {
+  static function getInstance() {
     static $singleton = null;
     if (is_null($singleton)) {
       $singleton = new OccurrenceFactory();
@@ -3462,7 +3462,11 @@ Class OccurrenceFactory {
    * @access public
    * @return boolean
    */
-  function periodHaveOccurrences($time, $duration = null, $entityFilter=null) {
+  function periodHaveOccurrences($begin, $end  = null, $entityFilter=null) {
+    if(is_null($end)) {
+      $end = clone $begin;
+      $end->addDay(1);
+    }    
     foreach($this->occurrences as $evtOccurrences) {
       foreach($evtOccurrences as $occurrence) {
         if(!$entityFilter || ( 
@@ -3471,9 +3475,12 @@ Class OccurrenceFactory {
              in_array($occurrence->id,$entityFilter[$occurrence->entity])))) {
           $eventDuration = $occurrence->event->duration;
           $eventDate = $occurrence->date;
+          $eventEnd = $occurrence->end;
           $eventAllDay = $occurrence->event->all_day;
-          if(($eventAllDay && date('Ymd',$time) == date('Ymd',$eventDate)) 
-              || ($time < ($eventDate + $eventDuration) && ($time + $duration) > $eventDate)) {
+          if($eventAllDay && $begin->compareDateIso($eventEnd) <= 0 && $end->compareDateIso($eventBegin) >= 0) {
+            return true;
+          } 
+          if(!$eventAllDay && $begin->compare($eventEnd) < 0 && $end->compareDateIso($eventBegin) > 0) {
             return true;
           }
         }
@@ -3494,8 +3501,12 @@ Class OccurrenceFactory {
    * @access public
    * @return boolean
    */
-  function getPeriodOccurrences($time, $duration = null, $entityFilter=null, $eventFilter=0) {
+  function getPeriodOccurrences($begin, $end = null, $entityFilter=null, $eventFilter=0) {
     $occurrences = array();
+    if(is_null($end)) {
+      $end = clone $begin;
+      $end->addDay(1);
+    }
     foreach($this->occurrences as $evtOccurrences) {
       foreach($evtOccurrences as $occurrence) {
         if(!$entityFilter || ( 
@@ -3503,16 +3514,14 @@ Class OccurrenceFactory {
              count($entityFilter[$occurrence->entity]) == 0 || 
              in_array($occurrence->id,$entityFilter[$occurrence->entity])))) {
           $eventDuration = $occurrence->event->duration;
-          $eventDate = $occurrence->date;
+          $eventBegin = $occurrence->date;
+          $eventEnd = $occurrence->end;
           $eventAllDay = $occurrence->event->all_day;
-          if(($eventFilter == 0 || ($eventFilter == 1 && !$eventAllDay) || ($eventFilter == 2 && $eventAllDay))
-            && (($eventAllDay && date('Ymd',$time) == date('Ymd',$eventDate)) 
-            || ($time < ($eventDate + $eventDuration) && ($time + $duration) > $eventDate))) {
-            if($eventAllDay) {
-              array_unshift($occurrences,$occurrence);
-            } else {
-              array_push($occurrences,$occurrence);
-            }
+          if($eventAllDay && $eventFilter != 1 && $begin->compareDateIso($eventEnd) <= 0 && $end->compareDateIso($eventBegin) >= 0) {
+            array_unshift($occurrences,$occurrence);
+          } 
+          if(!$eventAllDay && $eventFilter != 2 && $begin->compare($eventEnd) < 0 && $end->compareDateIso($eventBegin) > 0) {
+            array_push($occurrences,$occurrence);
           }
         }
       }

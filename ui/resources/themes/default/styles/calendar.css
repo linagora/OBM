@@ -20,6 +20,7 @@
   border: 1px solid #aaa; 
   border-collapse: collapse;	
   border-spacing: 0;
+  empty-cells: show;
 }
 
 .calendar tbody td {

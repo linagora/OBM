@@ -43,6 +43,7 @@ class DB_Sql {
   
   /* public: constructor */
   function DB_Sql($query = "") {
+      $this->query("SET TIME ZONE 'GMT'");
       $this->query($query);
   }
 
@@ -308,16 +309,44 @@ class DB_Sql {
     return $return;
   }  
 
+  var $LIKE = 'ILIKE';
+
+  /**
+   * ADDSECONDS 
+   * 
+   * @param mixed $args 
+   * @access public
+   * @return void
+   */
   function ADDSECONDS($args) {
     $date = current($args);
     $seconds = next($args);
-    return "TIMESTAMP $date + INTERVAL '1 SECOND' * $seconds";
+    return "(TIMESTAMP $date + INTERVAL '1 SECOND' * $seconds)";
   }
 
+  /**
+   * SUBSECONDS 
+   * 
+   * @param mixed $args 
+   * @access public
+   * @return void
+   */
   function SUBSECONDS($args) {
     $date = current($args);
     $seconds = next($args);
-    return "TIMESTAMP $date - INTERVAL '1 SECOND' * $seconds";
+    return "(TIMESTAMP $date - INTERVAL '1 SECOND' * $seconds)";
+  }  
+  
+  /**
+   * TIMESTAMP 
+   * 
+   * @param mixed $args 
+   * @access public
+   * @return void
+   */
+  function TIMESTAMP($args) {
+    $date = current($args);
+    return "EXTRACT(EPOCH from $date)";
   }  
 }
 ?>

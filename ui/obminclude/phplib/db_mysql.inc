@@ -51,6 +51,7 @@ class DB_Sql {
   /* public: constructor */
   function DB_Sql($query = "") {
       $this->query('SET NAMES UTF8'); 
+      $this->query("SET TIME_ZONE='+00:00'"); 
       $this->query($query);
   }
 
@@ -429,6 +430,46 @@ class DB_Sql {
       $return[$pattern] = $pcode;
     }
     return $return;
+  }
+
+  var LIKE = 'ILIKE';
+
+  /**
+   * ADDSECONDS 
+   * 
+   * @param mixed $args 
+   * @access public
+   * @return void
+   */
+  function ADDSECONDS($args) {
+    $date = current($args);
+    $seconds = next($args);
+    return "TIMESTAMPADD(SECOND,$seconds,$date)";
+  }
+
+  /**
+   * SUBSECONDS 
+   * 
+   * @param mixed $args 
+   * @access public
+   * @return void
+   */
+  function SUBSECONDS($args) {
+    $date = current($args);
+    $seconds = next($args);
+    return "TIMESTAMPADD(SECOND,-$seconds,$date)";
+  }    
+
+  /**
+   * TIMESTAMP 
+   * 
+   * @param mixed $args 
+   * @access public
+   * @return void
+   */
+  function TIMESTAMP($args) {
+    $date = current($args);
+    return "UNIX_TIMESTAMP($date)";
   }
 }
 ?>

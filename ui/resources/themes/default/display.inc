@@ -354,7 +354,7 @@ function display_head_theme($p_module) {
 
   if (is_array($extra_css)) {
     foreach($extra_css as $css_file) {
-      $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\" />";
+      $dis_extra_css .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\" />";
     }
   } elseif (isset($extra_css)) {
     $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$extra_css\" />";

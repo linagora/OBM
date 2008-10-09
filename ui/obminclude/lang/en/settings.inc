@@ -50,3 +50,5 @@ $l_co_rev = "Reverse";
 
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";
+$l_with_weekend = "Including week-end";
+$l_without_weekend = "Without including week-end";

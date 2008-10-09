@@ -297,7 +297,7 @@ if ($action == 'index') {
       check_calendar_data_form($params)) {
     $c = get_calendar_event_info($params['calendar_id'],false); 
     if ( (!$params['force']) 
-         && !($c['calendarevent_date']->equals($params['date_begin']) && $c['calendarevent_duration'] == $params['event_duration'])
+         && !($c['date']->equals($params['date_begin']) && $c['calendarevent_duration'] == $params['event_duration'])
 	 && ($conflicts = check_calendar_conflict($params, $entities)) ) {
       $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
       $display['msg'] .= display_err_msg("$l_event : $l_update_error");
@@ -577,8 +577,6 @@ function get_calendar_params() {
   if (isset($params['time_begin']) && !is_null($params['date_begin'])) {
     $params['date_begin']->setHour($params['time_begin']);
     $params['date_begin']->setMinute($params['min_begin']);
-  } elseif(!is_null($params['date_begin'])) {
-    $params['date_begin']->setHour($ccalendar_first_hour);
   }
   if (isset($params['time_end']) &&  !is_null($params['date_end'])) {
     $params['date_end']->setHour($params['time_end']);
@@ -586,19 +584,17 @@ function get_calendar_params() {
   } elseif(!is_null($params['date_end'])) {
     $params['date_end']->setHour($ccalendar_last_hour);
   }
-
   // New meeting event duration
   if (isset($params['time_duration'])) {
-    $params['meeting_duration'] = $params['time_duration'];
+    $params['meeting_duration'] = $params['time_duration'] * 3600;
     if (isset($params['min_duration'])) {
-      $params['meeting_duration'] += $params['min_duration']/60;
+      $params['meeting_duration'] += $params['min_duration'] * 60;
     } 
   }
   if (!is_null($params['date_end']) && !is_null($params['date_begin'])) {
-    $clone = clone $params['date_end'];
-    $params['event_duration'] = $clone->subDate($params['date_begin'])->getTimestamp();
+    $params['event_duration'] = $params['date_end']->diffTimestamp($params['date_begin']);
     if($params['event_duration'] <= 0) {
-      $params['event_duration'] = 59;
+      $params['event_duration'] = 0;
     }
   } else {
     $params['event_duration'] = 0;
@@ -607,6 +603,11 @@ function get_calendar_params() {
     $clone = clone $params['date_begin'];
     $params['date_end'] = $clone->addSecond($params['duration']);
   } 
+  if (is_array($params['date_exception'])) {
+    foreach($params['date_exception'] as $key => $exception) {
+      $params['date_exception'][$key] = new Of_Date($exception);
+    }
+  }
   // repeat days
   for ($i=0; $i<7; $i++) {
     if (isset($params["repeatday_$i"])) {
@@ -758,7 +759,7 @@ function get_calendar_action() {
   // Detail Consult
   $actions['calendar']['detailconsult'] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=$id&amp;date=".$date->getIso(),
+    'Url'      => "$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=$id&amp;date=".$date->getURL(),
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
   );
@@ -766,7 +767,7 @@ function get_calendar_action() {
   // Detail Update
   $actions['calendar']['detailupdate'] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id&amp;date=".$date->getIso(),
+    'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id&amp;date=".$date->getURL(),
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult','update_alert','update_decision') 
   );
@@ -774,7 +775,7 @@ function get_calendar_action() {
   // Duplicate
   $actions['calendar']['duplicate'] = array (
     'Name'     => $l_header_duplicate,
-    'Url'      => "$path/calendar/calendar_index.php?action=duplicate&amp;calendar_id=$id&amp;date=".$date->getIso(),
+    'Url'      => "$path/calendar/calendar_index.php?action=duplicate&amp;calendar_id=$id&amp;date=".$date->getURL(),
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
   );
@@ -782,14 +783,14 @@ function get_calendar_action() {
   // Check Delete
   $actions['calendar']['check_delete'] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/calendar/calendar_index.php?action=check_delete&amp;calendar_id=$id&amp;date=".$date->getIso(),
+    'Url'      => "$path/calendar/calendar_index.php?action=check_delete&amp;calendar_id=$id&amp;date=".$date->getURL(),
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult')
                                      		 );
 
   // Delete
   $actions['calendar']['delete'] = array (
-    'Url'      => "$path/calendar/calendar_index.php?action=delete&amp;calendar_id=$id&amp;date=".$date->getIso(),
+    'Url'      => "$path/calendar/calendar_index.php?action=delete&amp;calendar_id=$id&amp;date=".$date->getURL(),
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      		 );

@@ -1,4 +1,4 @@
---/////////////////////////////////////////////////////////////////////////////
+
 -- OBM - File : obm_prefs_values_2.1.sql                                     //
 --     - Desc : Insertion of Preferences values (database independant)       //
 -- 2NULL07-04-23 Pierre Baudracco                                               //
@@ -434,6 +434,8 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'publication', 'publication_year', 3, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'publication', 'publication_lang', 4, 1);
 
+-- module 'profile'
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
 
 -- module 'resource'
 

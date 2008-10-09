@@ -19,7 +19,7 @@ class Vcalendar_Utils {
         fclose($handle);
         if(trim($match[1]) == '1.0') {
           return 'vcs';
-        } elseif($match[1] == '2.0') {
+        } elseif(trim($match[1]) == '2.0') {
           return 'ics';
         }
       }

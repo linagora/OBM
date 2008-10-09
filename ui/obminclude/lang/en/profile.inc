@@ -49,3 +49,5 @@ $l_section_enable = "Enable";
 $l_active_section = "Enable sections";
 $l_section_all = "All";
 $l_section_none = "None";
+$l_found = "profiles found.";
+$l_no_found = "No profile found matching the query !";
