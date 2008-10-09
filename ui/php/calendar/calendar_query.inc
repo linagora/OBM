@@ -1941,6 +1941,7 @@ function check_calendar_data_form($calendar) {
   global $l_invalid_date, $l_datebegin, $l_dateend, $l_date_repeatend;
   global $l_err_begin_end, $l_err_end_repeat,$l_err_end_repeat2,$l_err_repeatfrequency;
   global $l_err_end_repeat3, $l_err_days_repeat, $l_err_days_repeat_not_weekly;
+  global $l_err_monthly_dateend_repeat, $l_err_yearly_dateend_repeat;
   
   $title = $calendar['title'];
   $begin = $calendar['date_begin'];
@@ -1983,8 +1984,8 @@ function check_calendar_data_form($calendar) {
       return false;
     }
   }
-  
-  if (!is_numeric($repeatfrequency) ||  $repeatfrequency < 1) {
+
+  if (!is_numeric($repeatfrequency) || $repeatfrequency < 1) {
     $err['msg'] = $l_err_repeatfrequency;
     return false;
   }
@@ -2010,9 +2011,23 @@ function check_calendar_data_form($calendar) {
     $err['msg'] = $l_err_days_repeat_not_weekly;
     return false;
   }
+
   $clone = clone $end;
+  // Weekly repetition end >= date end + 1 week
   if ($kind == 'weekly' && $clone->addWeek(1)->compare($repeat_end) > 0) {
     $err['msg'] = $l_err_weekly_repeat;
+    return false;
+  }
+
+  // Monthly repetition end >= date end + 1 month
+  if ((($kind == 'monthlybydate') || ($kind == 'monthlybyday')) && $clone->addWeek(1)->compare($repeat_end) > 0) {
+    $err['msg'] = $l_err_monthly_dateend_repeat;
+    return false;
+  }
+
+  // Yearly repetition end >= date end + 1 year
+  if ($kind == 'yearly' && $clone->addYear(1)->compare($repeat_end) > 0) {
+    $err['msg'] = $l_err_yearly_dateend_repeat;
     return false;
   }
 

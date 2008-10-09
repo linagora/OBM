@@ -43,6 +43,11 @@ function run_query_lead_search($params) {
   $manager_name[] = array('type' => 'field', 'value' => 'userobm_firstname');
   $concat_manager = sql_string_concat($db_type, $manager_name);
 
+  $contact_name[] = array('type' => 'field', 'value' => 'contact_lastname');
+  $contact_name[] = array('type' => 'string', 'value' => ' ');
+  $contact_name[] = array('type' => 'field', 'value' => 'contact_firstname');
+  $concat_contact = sql_string_concat($db_type, $contact_name);
+
   $where .= sql_obm_entity_privacy('lead');
 
   $and = 'AND';
@@ -118,9 +123,12 @@ function run_query_lead_search($params) {
     company_phone,
     leadsource_label,
     leadstatus_label,
+    contact_id,
+    $concat_contact as lead_contact,
     $concat_manager as manager
   FROM Lead
     LEFT JOIN Company ON lead_company_id=company_id
+    LEFT JOIN Contact ON lead_contact_id=contact_id
     LEFT JOIN LeadSource ON lead_source_id=leadsource_id
     LEFT JOIN LeadStatus ON lead_status_id=leadstatus_id
     LEFT JOIN UserObm ON lead_manager_id=userobm_id

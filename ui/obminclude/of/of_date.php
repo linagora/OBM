@@ -272,7 +272,7 @@ class Of_Date extends DateTime {
 
   public function set($date, $part=null, $format=null) {
     
-    return $this->_set($part, $date, $format); 
+    return $this->_set($part, $date, $format);
   }
 
   /**
@@ -576,7 +576,7 @@ class Of_Date extends DateTime {
    */
 
   public function setYear($year, $format=null) {
-    return $this->_set(self::YEAR,  $year, $format); 
+    return $this->_set(self::YEAR, $year, $format); 
   }
 
   /**
@@ -588,7 +588,7 @@ class Of_Date extends DateTime {
    */  
 
   public function addYear($year, $format=null) {
-    return $this->_add(self::YEAR,  $year, $format); 
+    return $this->_add(self::YEAR, $year, $format); 
   }
 
   /**
@@ -600,7 +600,7 @@ class Of_Date extends DateTime {
    */  
 
   public function subYear($year, $format=null) {
-    return $this->_sub(self::YEAR,  $year, $format); 
+    return $this->_sub(self::YEAR, $year, $format); 
   }
 
   /**
@@ -611,7 +611,7 @@ class Of_Date extends DateTime {
    * @return integer  0 = equal, 1 = later, -1 = earlier
    */
   public function compareYear($year, $format=null) {
-    return $this->_compare(self::YEAR,  $year, $format);
+    return $this->_compare(self::YEAR, $year, $format);
   }  
 
   /**
@@ -622,7 +622,7 @@ class Of_Date extends DateTime {
    * @return integer  difference in years 
    */
   public function diffYear($year, $format=null) {
-    return $this->_diff(self::YEAR,  $year, $format);
+    return $this->_diff(self::YEAR, $year, $format);
   }  
 
   /**
@@ -645,7 +645,7 @@ class Of_Date extends DateTime {
    */
 
   public function setMonth($month, $format=null) {
-    return $this->_set(self::MONTH,  $month, $format); 
+    return $this->_set(self::MONTH, $month, $format); 
   }
 
   /**
@@ -657,7 +657,7 @@ class Of_Date extends DateTime {
    */  
 
   public function addMonth($month, $format=null) {
-    return $this->_add(self::MONTH,  $month, $format); 
+    return $this->_add(self::MONTH, $month, $format); 
   }
 
   /**
@@ -669,7 +669,7 @@ class Of_Date extends DateTime {
    */  
 
   public function subMonth($month, $format=null) {
-    return $this->_sub(self::MONTH,  $month, $format); 
+    return $this->_sub(self::MONTH, $month, $format); 
   }
 
   /**
@@ -680,7 +680,7 @@ class Of_Date extends DateTime {
    * @return integer  0 = equal, 1 = later, -1 = earlier
    */
   public function compareMonth($month, $format=null) {
-    return $this->_compare(self::MONTH,  $month, $format);
+    return $this->_compare(self::MONTH, $month, $format);
   }  
 
   /**
@@ -691,7 +691,7 @@ class Of_Date extends DateTime {
    * @return integer  difference in months 
    */
   public function diffMonth($month, $format=null) {
-    return $this->_diff(self::MONTH,  $month, $format);
+    return $this->_diff(self::MONTH, $month, $format);
   }    
 
   /**
@@ -714,7 +714,7 @@ class Of_Date extends DateTime {
    */
 
   public function setDay($day, $format=null) {
-    return $this->_set(self::DAY,  $day, $format); 
+    return $this->_set(self::DAY, $day, $format); 
   }
 
   /**
@@ -726,7 +726,7 @@ class Of_Date extends DateTime {
    */  
 
   public function addDay($day, $format=null) {
-    return $this->_add(self::DAY,  $day, $format); 
+    return $this->_add(self::DAY, $day, $format); 
   }
 
   /**
@@ -738,7 +738,7 @@ class Of_Date extends DateTime {
    */  
 
   public function subDay($day, $format=null) {
-    return $this->_sub(self::DAY,  $day, $format); 
+    return $this->_sub(self::DAY, $day, $format); 
   }
 
   /**
@@ -749,8 +749,8 @@ class Of_Date extends DateTime {
    * @return integer  0 = equal, 1 = later, -1 = earlier
    */
   public function compareDay($day, $format=null) {
-    return $this->_compare(self::DAY,  $day, $format);
-  }  
+    return $this->_compare(self::DAY, $day, $format);
+  }
 
   /**
    * difference between two days
@@ -760,8 +760,8 @@ class Of_Date extends DateTime {
    * @return integer  difference in days 
    */
   public function diffDay($day, $format=null) {
-    return $this->_diff(self::DAY,  $day, $format);
-  }  
+    return $this->_diff(self::DAY, $day, $format);
+  }
 
 
   /**
@@ -784,7 +784,7 @@ class Of_Date extends DateTime {
    */
 
   public function setWeekday($weekday, $format=null) {
-    return $this->_set(self::WEEKDAY_DIGIT,  $weekday, $format); 
+    return $this->_set(self::WEEKDAY_DIGIT, $weekday, $format); 
   }
 
   /**
@@ -796,7 +796,7 @@ class Of_Date extends DateTime {
    */  
 
   public function addWeekday($weekday, $format=null) {
-    return $this->_add(self::WEEKDAY_DIGIT,  $weekday, $format); 
+    return $this->_add(self::WEEKDAY_DIGIT, $weekday, $format);
   }
 
   /**
@@ -808,7 +808,7 @@ class Of_Date extends DateTime {
    */  
 
   public function subWeekday($weekday, $format=null) {
-    return $this->_sub(self::WEEKDAY_DIGIT,  $weekday, $format); 
+    return $this->_sub(self::WEEKDAY_DIGIT, $weekday, $format);
   }
 
   /**
@@ -819,8 +819,8 @@ class Of_Date extends DateTime {
    * @return integer  0 = equal, 1 = later, -1 = earlier
    */
   public function compareWeekday($weekday, $format=null) {
-    return $this->_compare(self::WEEKDAY_DIGIT,  $weekday, $format);
-  }  
+    return $this->_compare(self::WEEKDAY_DIGIT, $weekday, $format);
+  }
 
   /**
    * difference between two weekdays
@@ -830,8 +830,8 @@ class Of_Date extends DateTime {
    * @return integer  difference in weekdays 
    */
   public function diffWeekday($weekday, $format=null) {
-    return $this->_diff(self::WEEKDAY_DIGIT,  $weekday, $format);
-  }  
+    return $this->_diff(self::WEEKDAY_DIGIT, $weekday, $format);
+  }
 
 
   /**
@@ -854,7 +854,7 @@ class Of_Date extends DateTime {
    */
 
   public function setDayOfYear($dayofyear, $format=null) {
-    return $this->_set(self::DAYOFYEAR,  $dayofyear, $format); 
+    return $this->_set(self::DAYOFYEAR, $dayofyear, $format);
   }
 
   /**
@@ -866,7 +866,7 @@ class Of_Date extends DateTime {
    */  
 
   public function addDayOfYear($dayofyear, $format=null) {
-    return $this->_add(self::DAYOFYEAR,  $dayofyear, $format); 
+    return $this->_add(self::DAYOFYEAR, $dayofyear, $format);
   }
 
   /**
@@ -878,7 +878,7 @@ class Of_Date extends DateTime {
    */  
 
   public function subDayOfYear($dayofyear, $format=null) {
-    return $this->_sub(self::DAYOFYEAR,  $dayofyear, $format); 
+    return $this->_sub(self::DAYOFYEAR, $dayofyear, $format);
   }
 
   /**
@@ -889,8 +889,8 @@ class Of_Date extends DateTime {
    * @return integer  0 = equal, 1 = later, -1 = earlier
    */
   public function compareDayOfYear($dayofyear, $format=null) {
-    return $this->_compare(self::DAYOFYEAR,  $dayofyear, $format);
-  }  
+    return $this->_compare(self::DAYOFYEAR, $dayofyear, $format);
+  }
 
   /**
    * difference between two dayofyears
@@ -900,8 +900,8 @@ class Of_Date extends DateTime {
    * @return integer  difference in dayofyears 
    */
   public function diffDayOfYear($dayofyear, $format=null) {
-    return $this->_diff(self::DAYOFYEAR,  $dayofyear, $format);
-  }    
+    return $this->_diff(self::DAYOFYEAR, $dayofyear, $format);
+  }
 
 
   /**
@@ -924,7 +924,7 @@ class Of_Date extends DateTime {
    */
 
   public function setHour($hour, $format=null) {
-    return $this->_set(self::HOUR,  $hour, $format); 
+    return $this->_set(self::HOUR, $hour, $format);
   }
 
   /**
@@ -936,7 +936,7 @@ class Of_Date extends DateTime {
    */  
 
   public function addHour($hour, $format=null) {
-    return $this->_add(self::HOUR,  $hour, $format); 
+    return $this->_add(self::HOUR, $hour, $format);
   }
 
   /**
@@ -948,7 +948,7 @@ class Of_Date extends DateTime {
    */  
 
   public function subHour($hour, $format=null) {
-    return $this->_sub(self::HOUR,  $hour, $format); 
+    return $this->_sub(self::HOUR, $hour, $format);
   }
 
   /**
@@ -959,8 +959,8 @@ class Of_Date extends DateTime {
    * @return integer  0 = equal, 1 = later, -1 = earlier
    */
   public function compareHour($hour, $format=null) {
-    return $this->_compare(self::HOUR,  $hour, $format);
-  }  
+    return $this->_compare(self::HOUR, $hour, $format);
+  }
 
   /**
    * difference between two hours
@@ -970,8 +970,8 @@ class Of_Date extends DateTime {
    * @return integer  difference in hours 
    */
   public function diffHour($hour, $format=null) {
-    return $this->_diff(self::HOUR,  $hour, $format);
-  }    
+    return $this->_diff(self::HOUR, $hour, $format);
+  }
 
   /**
    * Returns this object's internal minute .
@@ -993,7 +993,7 @@ class Of_Date extends DateTime {
    */
 
   public function setMinute($minute, $format=null) {
-    return $this->_set(self::MINUTE,  $minute, $format); 
+    return $this->_set(self::MINUTE, $minute, $format);
   }
 
   /**
@@ -1005,7 +1005,7 @@ class Of_Date extends DateTime {
    */  
 
   public function addMinute($minute, $format=null) {
-    return $this->_add(self::MINUTE,  $minute, $format); 
+    return $this->_add(self::MINUTE, $minute, $format);
   }
 
   /**
@@ -1017,7 +1017,7 @@ class Of_Date extends DateTime {
    */  
 
   public function subMinute($minute, $format=null) {
-    return $this->_sub(self::MINUTE,  $minute, $format); 
+    return $this->_sub(self::MINUTE, $minute, $format);
   }
 
   /**
@@ -1028,8 +1028,8 @@ class Of_Date extends DateTime {
    * @return integer  0 = equal, 1 = later, -1 = earlier
    */
   public function compareMinute($minute, $format=null) {
-    return $this->_compare(self::MINUTE,  $minute, $format);
-  }  
+    return $this->_compare(self::MINUTE, $minute, $format);
+  }
 
   /**
    * difference between two minutes
@@ -1039,7 +1039,7 @@ class Of_Date extends DateTime {
    * @return integer  difference in minutes 
    */
   public function diffMinute($minute, $format=null) {
-    return $this->_diff(self::MINUTE,  $minute, $format);
+    return $this->_diff(self::MINUTE, $minute, $format);
   }
 
 
@@ -1063,7 +1063,7 @@ class Of_Date extends DateTime {
    */
 
   public function setSecond($second, $format=null) {
-    return $this->_set(self::SECOND,  $second, $format); 
+    return $this->_set(self::SECOND, $second, $format);
   }
 
   /**
@@ -1075,7 +1075,7 @@ class Of_Date extends DateTime {
    */  
 
   public function addSecond($second, $format=null) {
-    return $this->_add(self::SECOND,  $second, $format); 
+    return $this->_add(self::SECOND, $second, $format);
   }
 
   /**
@@ -1087,7 +1087,7 @@ class Of_Date extends DateTime {
    */  
 
   public function subSecond($second, $format=null) {
-    return $this->_sub(self::SECOND,  $second, $format); 
+    return $this->_sub(self::SECOND, $second, $format);
   }
 
   /**
@@ -1098,8 +1098,8 @@ class Of_Date extends DateTime {
    * @return integer  0 = equal, 1 = later, -1 = earlier
    */
   public function compareSecond($second, $format=null) {
-    return $this->_compare(self::SECOND,  $second, $format);
-  }  
+    return $this->_compare(self::SECOND, $second, $format);
+  }
 
   /**
    * difference between two seconds
@@ -1109,7 +1109,7 @@ class Of_Date extends DateTime {
    * @return integer  difference in seconds 
    */
   public function diffSecond($second, $format=null) {
-    return $this->_diff(self::SECOND,  $second, $format);
+    return $this->_diff(self::SECOND, $second, $format);
   }
 
 
@@ -1133,7 +1133,7 @@ class Of_Date extends DateTime {
    */
 
   public function setWeek($week, $format=null) {
-    return $this->_set(self::WEEK,  $week, $format); 
+    return $this->_set(self::WEEK, $week, $format);
   }
 
   /**
@@ -1145,7 +1145,7 @@ class Of_Date extends DateTime {
    */  
 
   public function addWeek($week, $format=null) {
-    return $this->_add(self::WEEK,  $week, $format); 
+    return $this->_add(self::WEEK, $week, $format);
   }
 
   /**
@@ -1157,7 +1157,7 @@ class Of_Date extends DateTime {
    */  
 
   public function subWeek($week, $format=null) {
-    return $this->_sub(self::WEEK,  $week, $format); 
+    return $this->_sub(self::WEEK, $week, $format);
   }
 
   /**
@@ -1168,8 +1168,8 @@ class Of_Date extends DateTime {
    * @return integer  0 = equal, 1 = later, -1 = earlier
    */
   public function compareWeek($week, $format=null) {
-    return $this->_compare(self::WEEK,  $week, $format);
-  }  
+    return $this->_compare(self::WEEK, $week, $format);
+  }
 
   /**
    * difference between two weeks
@@ -1179,7 +1179,7 @@ class Of_Date extends DateTime {
    * @return integer  difference in weeks 
    */
   public function diffWeek($week, $format=null) {
-    return $this->_diff(self::WEEK,  $week, $format);
+    return $this->_diff(self::WEEK, $week, $format);
   }
 
   /**
@@ -1192,13 +1192,13 @@ class Of_Date extends DateTime {
    * @param string $format format of the $date param
    * @return of_Date
    */   
-  function _set($parts,$date, $format) { 
+  function _set($parts,$date, $format) {
     if(strpos(self::TIMESTAMP, $parts) !== FALSE) {
       $parts = self::ISO_8601;
     }
     $data = self::_parse($parts, $date, $format);
-    if((isset($data['day']) && $data['day'] !== FALSE) || 
-      (isset($data['day']) && $data['month'] !== FALSE) || 
+    if((isset($data['day']) && $data['day'] !== FALSE) ||
+      (isset($data['day']) && $data['month'] !== FALSE) ||
       (isset($data['year']) && $data['year'] !== FALSE)) {
       $day = (isset($data['day']) && $data['day'] !== FALSE)?$data['day']:$this->format(self::DAY);
       $month = (isset($data['month']) && $data['month'] !== FALSE)?$data['month']:$this->format(self::MONTH_SHORT);
@@ -1228,7 +1228,7 @@ class Of_Date extends DateTime {
    * If part is null all given parts of the given date
    * will be add to current object.
    * 
-   * @param string $part  part to set
+   * @param string $part part to set
    * @param integer|string|array|Of_Date $time to set
    * @param string $format format of the $date param
    * @return of_Date

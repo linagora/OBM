@@ -145,6 +145,8 @@ $l_err_end_repeat3 = "The max duration of a repetition is ten years when the rep
 $l_err_days_repeat = "You must check one or more repetition day.";
 $l_err_days_repeat_not_weekly = "You can give repetition days only on weekly repetition.";
 $l_err_weekly_repeat = "For weekly repetition, the end of the repetition must at least be seven day after the end of the event.";
+$l_err_monthly_dateend_repeat = "Monthly repetition date end must be at least one month later than the event date end.";
+$l_err_yearly_dateend_repeat = "Yearly repetition date end must be at least one year later than the event date end.";
 $l_err_repeatfrequency = "Frequency is invalid";
 $l_event_cant_delete = "You can only delete your own events!";
 
@@ -153,7 +155,7 @@ $l_confirm_delete_view = "Do you realy want to delete this view?";
 $l_no_sel_view = "Can't delete: no selected view";
 $l_conflict_view_label = "$l_view_label: Conflict has been detected";
 
-$l_unknown="Inconnu";
+$l_unknown = "Inconnu";
 
 $l_header_planning = "Planning";
 $l_header_meeting = "New meeting";

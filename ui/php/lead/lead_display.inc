@@ -1,7 +1,7 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : lead_index.php                                               //
-//     - Desc : lead display File                                            //
+// OBM - File : lead_index.php
+//     - Desc : lead display File
 // 2006-05-19 Aliacom - PB
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -21,6 +21,7 @@ $fieldnames['datealarm'] = $l_alarm;
 $fieldnames['company_name'] = $l_company;
 $fieldnames['company_zipcode'] = $l_postcode;
 $fieldnames['company_phone'] = $l_phone;
+$fieldnames['lead_contact'] = $l_contact;
 $fieldnames['lead_todo'] = $l_todo;
 $fieldnames['manager'] = $l_manager;
 
@@ -49,6 +50,10 @@ function dis_data_lead(&$OD, $fieldname, $link_ok) {
 
   elseif ($fieldname == 'company_name') {
     $res['url'] = "$path/company/company_index.php?action=detailconsult&amp;company_id=".$OD->data_set->f('lead_company_id');
+  }
+
+  elseif ($fieldname == 'lead_contact') {
+    $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('contact_id');
   }
 
   else if ($fieldname == 'lead_archive') {

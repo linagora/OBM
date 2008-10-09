@@ -157,6 +157,8 @@ $l_err_end_repeat3 = "La durée maximum d'une répétition est de 10 ans lorsque
 $l_err_days_repeat = "Vous devez spécifier des jours de répétitions.";
 $l_err_days_repeat_not_weekly = "Vous ne pouvez préciser des jours de répétition qu'en mode de répétition hebdomadaire.";
 $l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de répétition doit au moins être de 7 jours supérieure à celle de fin d'événement.";
+$l_err_monthly_dateend_repeat = "La date de fin de répétition mensuelle doit être au moins de 1 mois supérieure à la date de fin de l'événement.";
+$l_err_yearly_dateend_repeat = "La date de fin de répétition annuelle doit être au moins de 1 an supérieure à la date de fin de l'événement.";
 $l_err_repeatfrequency = "La fréquence est invalide";
 $l_event_cant_delete = "Vous ne pouvez supprimer que vos événements !";
 

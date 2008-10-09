@@ -507,7 +507,7 @@ function html_company_links($co_q) {
   if ($cgp_show['module']['lead']) {
     $nb_lead = get_global_linked_element_nb('Lead', $id, 'company', 1);
     $url_lead_list = url_prepare("$path/lead/lead_index.php?action=search&amp;company_id=$id&amp;company_id=$id");
-    $url_lead_new = url_prepare("$path/lead/lead_index.php?action=new&amp;company_id=$id&amp;company_id=$id");
+    $url_lead_new = url_prepare("$path/lead/lead_index.php?action=new&amp;company_id=$id&amp;company_id=$id&amp;company_name=$name");
     $block_lead = "
 <div class=\"portlet\" id=\"companyLead\">
 <h1>$l_module_lead</h1>
