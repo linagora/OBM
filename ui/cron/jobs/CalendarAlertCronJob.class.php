@@ -59,7 +59,7 @@ class CalendarAlertCronJob extends CronJob{
 
     foreach($occurrences as $occurrence) {
       $event = $occurrence->event;
-      $delta = $this->getAlertDelta($event->id);
+      $delta = $this->getAlertDelta($event->id, current($event->attendee["user"]));
       
       if($occurrence->date > $date && $occurrence->date <= $date  + $this->jobDelta) {
         $this->logger->debug("Alert for event ".$event->id." will be sent");
@@ -272,8 +272,8 @@ class CalendarAlertCronJob extends CronJob{
    * @access public
    * @return void
    */
-  function getAlertDelta($id) {
-    $query = "SELECT calendaralert_duration from CalendarAlert WHERE calendaralert_event_id = '$id'";
+  function getAlertDelta($id, $user_id) {
+    $query = "SELECT calendaralert_duration from CalendarAlert WHERE calendaralert_event_id = '$id' and calendaralert_user_id = $user_id";
     $obm_q = new DB_OBM;
     $this->logger->core($query);
     $obm_q->query($query);
