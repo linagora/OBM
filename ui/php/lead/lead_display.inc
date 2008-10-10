@@ -475,6 +475,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
     $datealarm = ($datealarm != 0) ? of_date_upd_format($datealarm) : '';
     $todo = $l_q->f('lead_todo');
     $archive = $l_q->f('lead_archive');
+    $archive = ($archive == '1' ? "checked = \"checked\"" : '');
     $comment = $l_q->f('lead_comment');
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
@@ -504,7 +505,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
   if (isset($params['name'])) { $name = $params['name']; }
   if (isset($params['date'])) { $date = of_date_upd_format($params['date']); }
   if (isset($params['datealarm'])) { $datealarm = of_date_upd_format($params['datealarm']); }
-  if (isset($params['archive'])) { $archive = ($parms['archive'] == 1 ? 'checked' : ''); }
+  if (isset($params['archive'])) { $archive = ($params['archive'] == 1 ? 'checked="checked"' : ''); }
   if (isset($params['todo'])) { $todo = stripslashes($params['todo']); }
   if (isset($params['comment'])) { $comment = stripslashes($params['comment']); }
   if (isset($params['add_comment'])) { $add_comment = stripslashes($params['add_comment']); }
