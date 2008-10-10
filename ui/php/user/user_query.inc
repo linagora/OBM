@@ -479,7 +479,7 @@ function run_query_user_insert($user) {
     userobm_vacation_message';
     $query_values_mail_vacation = ",
     $vacation_enable,
-    '$vacation_message'";
+    '".addslashes($vacation_message)."'";
   }
 
   // Section Samba
@@ -827,7 +827,7 @@ function run_query_user_update($p_id, $user) {
     userobm_vacation_enable=$vacation_enable,
     userobm_vacation_datebegin=$vacation_datebegin,
     userobm_vacation_dateend=$vacation_dateend,
-    userobm_vacation_message='$vacation_message'";
+    userobm_vacation_message='".addslashes($vacation_message)."'";
   }
 
   // Section Samba
