@@ -675,7 +675,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
     obm.vars.images.extension = '$ico_extension';
     showWaitingPanel('calendarBody');
     obm.initialize.chain(function () {
-      obm.calendarManager = new Obm.CalendarManager(".$date->getTimestamp().");
+      obm.calendarManager = new Obm.CalendarManager(".$date->getTimestamp().",".$date->get('Z').");
       obm.calendarManager.lock();
       $dis_event
       obm.calendarManager.unlock();
@@ -920,7 +920,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
     obm.vars.images.extension = '$ico_extension';
     obm.vars.consts.timeUnit = ".(3600/$_SESSION['set_cal_interval']).";
     obm.initialize.chain(function () {
-      obm.calendarManager = new Obm.CalendarManager(".$date->getTimestamp().");
+      obm.calendarManager = new Obm.CalendarManager(".$date->getTimestamp().",".$date->get('Z').");
       obm.calendarManager.lock();
       $dis_event
       obm.calendarManager.unlock();
@@ -1194,7 +1194,7 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
     obm.vars.images.extension = '$ico_extension';
     obm.vars.consts.timeUnit = ".(3600/$_SESSION['set_cal_interval']).";    
     obm.initialize.chain(function () {
-      obm.calendarManager = new Obm.CalendarManager(".$date->getTimestamp().");
+      obm.calendarManager = new Obm.CalendarManager(".$date->getTimestamp().",".$date->get('Z').");
       obm.calendarManager.lock()
       $dis_event
       obm.calendarManager.unlock();
@@ -1781,13 +1781,13 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     $entityClass .= '_W';
   }
   $eventColor = $event->color;
-
   $ed[] = "id:$id";
   $ed[] = "entity:'$entity'";
   $ed[] = "entity_id:$entity_id"; 
   $ed[] = "duration:$duration";
   $ed[] = "item:'$item_list'";
   $ed[] = "time:".$date->getTimestamp();
+  $ed[] = 'tzOffset:'.$date->get('Z');
   $ed[] = "title:'$title'";
   $ed[] = "all_day:".$all_day;
   $ed[] = "klass:'$entityClass'"; 
@@ -1816,7 +1816,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
     case 'hour' :
       $day = ($all_day) || ($end->compareDateIso($date) != 0);
       $day = $day || ($date->compareHour($ccalendar_first_hour) <  O);
-      $day = $day || ($date->compareHour($ccalendar_last_hour) > 0 );
+      $day = $day || ($date->compareHour($ccalendar_last_hour) >= 0 );
       if ($updatable) {
         $options[] = 'draggable:true';
         $options[] = 'resizable:true';
@@ -4277,6 +4277,7 @@ function json_event_data($id,$calendar) {
   $ed[] = 'id:'.$id;
   $ed[] = 'duration:'.$duration;
   $ed[] = 'time:'.$date->getTimestamp();
+  $ed[] = 'tzOffset:'.$date->get('Z');
   $ed[] = 'all_day:'.$all_day;
   $ed[] = "title:'$title'";
   $ed[] = "attendees:[".implode(',',$attendees)."]";
@@ -4294,13 +4295,13 @@ function json_event_data($id,$calendar) {
     case 'day' :
       $day = ($all_day) || ($end->compareDateIso($date) != 0);
       $day = $day || ($date->compareHour($ccalendar_first_hour) <  O);
-      $day = $day || ($date->compareHour($ccalendar_last_hour) > 0 );
+      $day = $day || ($date->compareHour($ccalendar_last_hour) >= 0 );
       $options = array(); 
       break;
     case 'week' :
       $day = ($all_day) || ($end->compareDateIso($date) != 0);
       $day = $day || ($date->compareHour($ccalendar_first_hour) <  O);
-      $day = $day || ($date->compareHour($ccalendar_last_hour) > 0 );
+      $day = $day || ($date->compareHour($ccalendar_last_hour) >= 0 );
       $options = array();
       break;
     case 'month' :

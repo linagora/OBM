@@ -128,6 +128,7 @@ Obm.CalendarDayEvent = new Class({
   initialize: function(eventData,options) {
     this.setOptions(options);
     this.event = eventData;
+    this.setTzOffset(this.event.tzOffset);
     this.size = 1;
     this.length = 1;
     this.hidden = 0;
@@ -138,6 +139,10 @@ Obm.CalendarDayEvent = new Class({
     this.setTime(this.event.time);
     this.setDuration(this.event.duration);
     this.switchColor(obm.vars.conf.calendarColor);
+  },
+
+  setTzOffset: function(offset) {
+    this.event.tzOffset = offset + (new Date(this.event.time * 1000).getTimezoneOffset() * 60);
   },
 
   makeDraggable: function() {
@@ -212,7 +217,7 @@ Obm.CalendarDayEvent = new Class({
   resetTitle: function() {
     var title = this.event.title + ' ';
     if (!this.event.all_day) {
-      title = new Date(this.event.time * 1000).format("H:i") + ' ' + title;
+      title = new Date((this.event.time + this.event.tzOffset) * 1000).format("H:i") + ' ' + title;
     }
     // Display the location only if set
     if (this.event.location != '') {
@@ -232,12 +237,14 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setTime: function(time) {
-    var myDate = new Date(time * 1000);
-    var startDate = new Date(obm.calendarManager.startTime * 1000);
+    var myDate = new Date((time + this.event.tzOffset) * 1000);
+    console.log(myDate.getTime()/1000);
+    var startDate = new Date((obm.calendarManager.startTime + obm.calendarManager.tzOffset) * 1000);
     myDate.setHours(startDate.getHours());
     myDate.setMinutes(startDate.getMinutes());
     myDate.setSeconds(startDate.getSeconds());
     origin = Math.floor((myDate.getTime() - startDate.getTime())/1000);
+    console.log(myDate.getTime()/1000, startDate.getTime()/1000 );
     if (this.setOrigin(origin)) {
       this.event.time = this.guessEventTime(time);
     } else {
@@ -370,7 +377,7 @@ Obm.CalendarDayEvent = new Class({
     date_begin = new Date(this.event.time * 1000);
     date_end = new Date(this.event.time * 1000 + this.event.duration * 1000);    
     query = 'calendar_id=' + this.event.id;
-    query += '&date_begin=' + date_begin.format('Y-m-d H:i:s');
+    query += '&date_begin=' + date_begin.format('O');
     query += '&duration=' + this.event.duration;
     query += '&title=' + this.event.title;
     return query;
@@ -464,6 +471,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   initialize: function(eventData,options) {
     this.setOptions(options);
     this.event = eventData;
+    this.setTzOffset(this.event.tzOffset);
     this.extensions = new Array();
     this.size = 1;
     this.length = 1;
@@ -521,10 +529,11 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
       location = '(' + this.event.location + ')';
     }
     var title = this.event.title + ' ';
-    var time = new Date(this.event.time * 1000).format("H:i");
     if (this.event.duration <= this.options.unit) {
-      time = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
-      title = '';
+      var time = new Date((this.event.time + this.event.tzOffset) * 1000).format("H:i") + ' ' + title; 
+      var title = '';
+    } else {
+      var time = new Date((this.event.time + this.event.tzOffset) * 1000).format("H:i");
     }
     this.element.setProperty('title', this.event.title + ' ' + location);
     this.timeContainer.setHTML(time);
@@ -686,8 +695,9 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
 
 Obm.CalendarManager = new Class({
 
-  initialize: function(startTime) {
+  initialize: function(startTime, tzOffset) {
     this.startTime = startTime;
+    this.tzOffset = tzOffset;
     this.events = new Hash();
     this.times = new Hash();
     this.redrawLock = false;
@@ -953,6 +963,7 @@ Obm.CalendarManager = new Class({
         if(ivent.state == 'A') {
           obm.calendarManager.unregister(id);
           evt.event.id = ivent.id;
+          evt.setTzOffset(ievent.tzOffset);
           evt.setDuration(ivent.duration);
           evt.setTime(ivent.time);
           obm.calendarManager.register(id);           

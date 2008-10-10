@@ -2254,8 +2254,8 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
       $join_resource
     WHERE evententity_state = 'A'
       AND calendarevent_repeatkind = 'none' AND
-      (($calendarevent_date > $start - calendarevent_duration AND $calendarevent_date < $end) 
-        OR (calendarevent_allday = TRUE AND $calendarevent_date >= $day_start - calendarevent_duration AND $calendarevent_date <= $day_end))
+      ((calendarevent_date > #SUBSECONDS('$start', calendarevent_duration) AND calendarevent_date < '$end') 
+        OR (calendarevent_allday = TRUE AND calendarevent_date >= #SUBSECONDS('$start', calendarevent_duration) AND calendarevent_date <= '$end'))
       $where_ent
       $where_event
       $multidomain

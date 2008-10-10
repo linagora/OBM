@@ -144,7 +144,7 @@ class Of_Date extends DateTime {
     'outputdate' => 'd/m/Y',
     'inputdatetime' => 'd/m/Y H:i:s',
     'inputdate' => 'd/m/Y',
-    'timezone' => 'Asia/Tokyo'
+    'timezone' => 'America/Phoenix'
   );
 
   private $_error;
