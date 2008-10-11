@@ -260,22 +260,22 @@ sub _incrementalUpdate {
         }
 
         # Doit-on mettre à jour les liens de l'entité
-        my $query = "SELECT COUNT(*) FROM Updatedlinks WHERE updatedlinks_table='".$updatedTable."'";
+        $sqlQuery = "SELECT updatedlinks_id FROM Updatedlinks WHERE updatedlinks_table='".$updatedTable."' AND updatedlinks_entity_id=".$updatedEntityId;
         if( defined($sqlFilter->[1]) ) {
-            $query .= " AND ".$sqlFilter->[1];
+            $sqlQuery .= " AND ".$sqlFilter->[1];
         }
 
         my $queryResult2;
         if( !defined($dbHandler->execQuery( $sqlQuery, \$queryResult2 )) ) {
             return 0;
         }
-        my( $numRows ) = $queryResult2->fetchrow_array();
+        my( $updatedlinksId ) = $queryResult2->fetchrow_array();
         $queryResult2->finish();
 
         my $object;
         SWITCH: {
             if( lc($updatedTable) eq "userobm" ) {
-                if( $numRows ) {
+                if( $updatedlinksId ) {
                     # Mise à jour de l'entité avec ses liaisons
                     $object = $self->_doUser( 1, 0, $updatedEntityId );
                 }else {
@@ -286,7 +286,7 @@ sub _incrementalUpdate {
             }
 
             if( lc($updatedTable) eq "ugroup" ) {
-                if( $numRows ) {
+                if( $updatedlinksId ) {
                     # Mise à jour de l'entité avec ses liaisons
                     $object = $self->_doGroup( 1, 0, $updatedEntityId );
                 }else {
@@ -297,7 +297,7 @@ sub _incrementalUpdate {
             }
 
             if( lc($updatedTable) eq "mailshare" ) {
-                if( $numRows ) {
+                if( $updatedlinksId ) {
                     # Mise à jour de l'entité avec ses liaisons
                     $object = $self->_doMailShare( 1, 0, $updatedEntityId );
                 }else {
@@ -308,7 +308,7 @@ sub _incrementalUpdate {
             }
 
             if( lc($updatedTable) eq "host" ) {
-                if( $numRows ) {
+                if( $updatedlinksId ) {
                     # Mise à jour de l'entité avec ses liaisons
                     $object = $self->_doHost( 1, 0, $updatedEntityId );
                 }else {
@@ -323,12 +323,12 @@ sub _incrementalUpdate {
 
         my $return = $self->_runEngines( $object );
 
-        if( $return == 2 ) {
+        if( $object->updateLinkedEntity() ) {
             $return = $self->_updateUpdatedLinks( $object );
         }
 
         if( $return ) {
-            # La MAJ de l'entité c'est bien passée, on met à jour la BD de
+            # La MAJ de l'entité s'est bien passée, on met à jour la BD de
             # travail
             $return = $object->updateDbEntity();
             if( $return && $object->isLinks() ) {
@@ -338,7 +338,7 @@ sub _incrementalUpdate {
             if( $return ) {
                 # MAJ de la BD de travail ok, on nettoie les tables de MAJ
                 # incrémentales
-                $return = $self->_updateIncrementalTable( "Updated", $updatedId );
+                $return = $self->_updateIncrementalTable( "Updated", $updatedlinksId );
 
                 if( $return && $object->isLinks() ) {
                     $return = $self->_updateIncrementalTable( "Updatedlinks", $updatedId );
@@ -559,7 +559,7 @@ sub _updateUpdatedLinks {
             my $queryResult;
 
             # Obtention des groupes impactés par le changement d'identifiant
-            &OBM::toolBox::write_log( "[Update::updateIncremental]: programmation de la mise a jour des liens des groupes liees a l'entite renommee", "W" );
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: programmation de la mise a jour des liens des groupes liees a l'entite mise a jour", "W" );
             my $query = "INSERT INTO Updatedlinks
                 (updatedlinks_domain_id, updatedlinks_user_id, updatedlinks_delegation, updatedlinks_table, updatedlinks_entity, updatedlinks_entity_id)
                 SELECT
@@ -580,7 +580,7 @@ sub _updateUpdatedLinks {
 
             # Obtention des partages de messagerie impactés par le changement
             # d'identifiant
-            &OBM::toolBox::write_log( "[Update::updateIncremental]: programmation de la mise a jour des liens des repertoires partages liees a l'entite renommee", "W" );
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: programmation de la mise a jour des liens des repertoires partages liees a l'entite mise a jour", "W" );
             $query = "INSERT INTO Updatedlinks
                 (updatedlinks_domain_id, updatedlinks_user_id, updatedlinks_delegation, updatedlinks_table, updatedlinks_entity, updatedlinks_entity_id)
                 SELECT
@@ -601,7 +601,7 @@ sub _updateUpdatedLinks {
 
             # Obtention des partages de messagerie impactés par le changement
             # d'identifiant
-            &OBM::toolBox::write_log( "[Update::updateIncremental]: programmation de la mise a jour des liens des utilisateurs liees a l'entite renommee", "W" );
+            &OBM::toolBox::write_log( "[Update::updateIncremental]: programmation de la mise a jour des liens des utilisateurs liees a l'entite mise a jour", "W" );
             $query = "INSERT INTO Updatedlinks
                 (updatedlinks_domain_id, updatedlinks_user_id, updatedlinks_delegation, updatedlinks_table, updatedlinks_entity, updatedlinks_entity_id)
                 SELECT

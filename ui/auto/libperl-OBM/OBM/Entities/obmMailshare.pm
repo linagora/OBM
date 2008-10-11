@@ -8,7 +8,18 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId makeEntityEmail getMailboxDefaultFolders getHostIpById);
+use OBM::Entities::commonEntities qw(
+            getType
+            setDelete
+            getDelete
+            getArchive
+            getLdapObjectclass
+            isLinks
+            getEntityId
+            makeEntityEmail
+            getMailboxDefaultFolders
+            updateLinkedEntity
+            );
 use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
@@ -130,6 +141,12 @@ sub getEntity {
     my $dbMailShareDesc = $queryResult->fetchrow_hashref();
     $queryResult->finish();
 
+    # Si pas de nom de BAL partagée, traitement impossible
+    if( !defined($dbMailShareDesc->{"mailshare_name"}) ) {
+        &OBM::toolBox::write_log( "[Entities::obmMailshare]: nom de la BAL partagee non definit, traitemant impossible !", "W" );
+        return 0;
+    }
+
     # On stocke la description BD utile pour la MAJ des tables
     $self->{"mailShareDbDesc"} = $dbMailShareDesc;
 
@@ -164,14 +181,14 @@ sub getEntity {
     my $localServerIp;
     SWITCH: {
         if( !$dbMailShareDesc->{"mailshare_email"} ) {
-            $self->{"properties"}->{"mailshare_mailperms"} = 0;
+            $self->{"properties"}->{"mailshare_mail_perms"} = 0;
             last SWITCH;
         }
 
         $localServerIp = $self->getHostIpById( $dbMailShareDesc->{"mailserver_host_id"} );
         if( !defined($localServerIp) ) {
             $self->_log( 'droit mail du repertoire partage : \''.$dbMailShareDesc->{'mailshare_name'}.'\' - annule, serveur inconnu !', 2 );
-            $self->{"properties"}->{"mailshare_mailperms"} = 0;
+            $self->{"properties"}->{"mailshare_mail_perms"} = 0;
             last SWITCH;
         }
 
@@ -179,58 +196,58 @@ sub getEntity {
         my $return = $self->makeEntityEmail( $dbMailShareDesc->{"mailshare_email"}, $domainDesc->{"domain_name"}, $domainDesc->{"domain_alias"} );
         if( $return == 0 ) {
             $self->_log( 'droit mail du repertoire partage : \''.$dbMailShareDesc->{'mailshare_name'}.'\' - annule, pas d\'adresses mails valides', 2 );
-            $self->{"properties"}->{"mailshare_mailperms"} = 0;
+            $self->{"properties"}->{"mailshare_mail_perms"} = 0;
             last SWITCH;
         }
 
-        $self->{"properties"}->{"mailshare_mailperms"} = 1;
+        $self->{"properties"}->{"mailshare_mail_perms"} = 1;
     }
 
-    if( $self->{"properties"}->{"mailshare_mailperms"} ) {
-        # Gestion de la BAL destination
-        #   valeur dans LDAP
-        $self->{"properties"}->{"mailshare_mailbox"} = "+".$dbMailShareDesc->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
-        #   nom de la BAL Cyrus
-        $self->{"properties"}->{"mailshare_mailbox_name"} = $dbMailShareDesc->{"mailshare_name"};
-        if( !$singleNameSpace ) {
-            $self->{"properties"}->{"mailshare_mailbox_name"} .= "@".$domainDesc->{"domain_name"};
-        }
+    # Gestion de la BAL destination
+    #   valeur dans LDAP
+    $self->{"properties"}->{"mailshare_mailbox"} = "+".$dbMailShareDesc->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
+    #   nom de la BAL Cyrus
+    $self->{"properties"}->{"mailshare_mailbox_name"} = $dbMailShareDesc->{"mailshare_name"};
+    if( !$singleNameSpace ) {
+        $self->{"properties"}->{"mailshare_mailbox_name"} .= "@".$domainDesc->{"domain_name"};
+    }
 
-        # Partition Cyrus associée à cette BAL
-        if( $OBM::Parameters::common::cyrusDomainPartition ) {
-            $self->{"properties"}->{"mailShare_partition"} = $domainDesc->{"domain_dn"};
-            $self->{"properties"}->{"mailShare_partition"} =~ s/\./_/g;
-            $self->{"properties"}->{"mailShare_partition"} =~ s/-/_/g;
-        }
+    # Partition Cyrus associée à cette BAL
+    if( $OBM::Parameters::common::cyrusDomainPartition ) {
+        $self->{"properties"}->{"mailShare_partition"} = $domainDesc->{"domain_dn"};
+        $self->{"properties"}->{"mailShare_partition"} =~ s/\./_/g;
+        $self->{"properties"}->{"mailShare_partition"} =~ s/-/_/g;
+    }
 
-        # Gestion du quota
-        $self->{"properties"}->{"mailshare_mailbox_quota"} = $dbMailShareDesc->{"mailshare_quota"}*1024;
+    # Gestion du quota
+    $self->{"properties"}->{"mailshare_mailbox_quota"} = $dbMailShareDesc->{"mailshare_quota"}*1024;
 
-        # Gestion des sous-répertoires de la BAL a créer
-        if( defined($shareMailboxDefaultFolders) ) {
-            foreach my $folderTree ( split( ',', $shareMailboxDefaultFolders ) ) {
-                if( $folderTree !~ /(^[",]$)|(^$)/ ) {
-                    my $folderName = $dbMailShareDesc->{"mailshare_name"};
-                    foreach my $folder ( split( '/', $folderTree ) ) {
-                        $folder =~ s/^\s+//;
+    # Gestion des sous-répertoires de la BAL a créer
+    if( defined($shareMailboxDefaultFolders) ) {
+        foreach my $folderTree ( split( ',', $shareMailboxDefaultFolders ) ) {
+            if( $folderTree !~ /(^[",]$)|(^$)/ ) {
+                my $folderName = $dbMailShareDesc->{"mailshare_name"};
+                foreach my $folder ( split( '/', $folderTree ) ) {
+                    $folder =~ s/^\s+//;
 
-                        $folderName .= '/'.$folder;
-                        if( !$singleNameSpace ) {
-                            push( @{$self->{"properties"}->{mailbox_folders}}, $folderName.'@'.$domainDesc->{domain_name} );
-                        }else {
-                            push( @{$self->{"properties"}->{mailbox_folders}}, $folderName );
-                        }
+                    $folderName .= '/'.$folder;
+                    if( !$singleNameSpace ) {
+                        push( @{$self->{"properties"}->{mailbox_folders}}, $folderName.'@'.$domainDesc->{domain_name} );
+                    }else {
+                        push( @{$self->{"properties"}->{mailbox_folders}}, $folderName );
                     }
                 }
             }
         }
-
-        # On ajoute le serveur de mail associé
-        $self->{"properties"}->{"mailShare_mailLocalServer"} = "lmtp:".$localServerIp.":24";
-
-        # Gestion du serveur de mail
-        $self->{"properties"}->{"mailShare_server"} = $dbMailShareDesc->{"mailserver_host_id"};
     }
+
+    # On ajoute le serveur de mail associé
+    if( defined($localServerIp) ) {
+        $self->{"properties"}->{"mailShare_mailLocalServer"} = "lmtp:".$localServerIp.":24";
+    }
+
+    # Gestion du serveur de mail
+    $self->{"properties"}->{"mailShare_server"} = $dbMailShareDesc->{"mailserver_host_id"};
 
 
     # On positionne l'identifiant du domaine de l'entité
@@ -392,7 +409,7 @@ sub _getEntityMailShareAcl {
     my( $domainDesc ) = @_;
     my $mailShareId = $self->{'objectId'};
 
-    if( !$self->{'properties'}->{'mailshare_mailperms'} ) {
+    if( !$self->{'properties'}->{'mailshare_mail_perms'} ) {
         $self->{'properties'}->{'user_mailshare_acl'} = undef;
 
     }else {
@@ -408,19 +425,54 @@ sub _getEntityMailShareAcl {
         }
 
         $rightDef{'read'}->{'compute'} = 1;
-        $rightDef{'read'}->{'sqlQuery'} = 'SELECT i.userobm_id, i.userobm_login FROM '.$userObmTable.' i, '.$entityRightTable.' j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id='.$mailShareId.' AND j.entityright_entity=\''.$entityType.'\'';
+        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login
+                FROM ".$userObmTable." i, ".$entityRightTable." j
+                WHERE i.userobm_id=j.entityright_consumer_id
+                    AND i.userobm_archive=0
+                    AND i.userobm_mail_perms=1
+                    AND j.entityright_write=0
+                    AND j.entityright_read=1
+                    AND j.entityright_entity_id=".$mailShareId."
+                    AND j.entityright_entity='".$entityType."'";
 
         $rightDef{'writeonly'}->{'compute'} = 1;
-        $rightDef{'writeonly'}->{'sqlQuery'} = 'SELECT i.userobm_id, i.userobm_login FROM '.$userObmTable.' i, '.$entityRightTable.' j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id='.$mailShareId.' AND j.entityright_entity=\''.$entityType.'\'';
+        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login
+                FROM ".$userObmTable." i, ".$entityRightTable." j
+                WHERE i.userobm_id=j.entityright_consumer_id
+                    AND i.userobm_archive=0
+                    AND i.userobm_mail_perms=1
+                    AND j.entityright_write=1
+                    AND j.entityright_read=0
+                    AND j.entityright_entity_id=".$mailShareId."
+                    AND j.entityright_entity='".$entityType."'";
 
         $rightDef{'write'}->{'compute'} = 1;
-        $rightDef{'write'}->{'sqlQuery'} = 'SELECT i.userobm_id, i.userobm_login FROM '.$userObmTable.' i, '.$entityRightTable.' j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=1 AND j.entityright_entity_id='.$mailShareId.' AND j.entityright_entity=\''.$entityType.'\'';
+        $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login
+                FROM ".$userObmTable." i, ".$entityRightTable." j
+                WHERE i.userobm_id=j.entityright_consumer_id
+                    AND i.userobm_archive=0
+                    AND i.userobm_mail_perms=1
+                    AND j.entityright_write=1
+                    AND j.entityright_read=1
+                    AND j.entityright_entity_id=".$mailShareId."
+                    AND j.entityright_entity='".$entityType."'";
 
         $rightDef{'admin'}->{'compute'} = 1;
-        $rightDef{'admin'}->{'sqlQuery'} = 'SELECT i.userobm_id, i.userobm_login FROM '.$userObmTable.' i, '.$entityRightTable.' j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_admin=1 AND j.entityright_entity_id='.$mailShareId.' AND j.entityright_entity=\''.$entityType.'\'';
+        $rightDef{'admin'}->{'sqlQuery'} = 'SELECT i.userobm_id, i.userobm_login
+                FROM '.$userObmTable.' i, '.$entityRightTable.' j
+                WHERE i.userobm_id=j.entityright_consumer_id
+                    AND i.userobm_archive=0
+                    AND i.userobm_mail_perms=1
+                    AND j.entityright_admin=1
+                    AND j.entityright_entity_id='.$mailShareId.'
+                    AND j.entityright_entity=\''.$entityType.'\'';
 
         $rightDef{'public'}->{'compute'} = 0;
-        $rightDef{'public'}->{'sqlQuery'} = 'SELECT entityright_read, entityright_write FROM '.$entityRightTable.' WHERE entityright_entity_id='.$mailShareId.' AND entityright_entity=\''.$entityType.'\' AND entityright_consumer_id=0';
+        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write
+                FROM ".$entityRightTable."
+                WHERE entityright_entity_id=".$mailShareId."
+                    AND entityright_entity='".$entityType."'
+                    AND entityright_consumer_id=0";
 
         # On recupere la definition des ACL
         $self->{'properties'}->{'user_mailshare_acl'} = &OBM::toolBox::getEntityRight( $domainDesc, \%rightDef, $mailShareId );
@@ -482,7 +534,7 @@ sub createLdapEntry {
     }
 
     # L'acces mail
-    if( $entry->{'mailshare_mailperms'} ) {
+    if( $entry->{'mailshare_mail_perms'} ) {
         $ldapEntry->add( mailAccess => 'PERMIT' );
     }else {
         $ldapEntry->add( mailAccess => 'REJECT' );
@@ -548,10 +600,10 @@ sub updateLdapEntry {
     }
 
     # L'acces au mail
-    if( $entry->{"mailshare_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
+    if( $entry->{"mailshare_mail_perms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
         $update->setUpdate();
 
-    }elsif( !$entry->{"mailshare_mailperms"} && (&OBM::Ldap::utils::modifyAttr( "REJECT", $ldapEntry, "mailAccess" )) ) {
+    }elsif( !$entry->{"mailshare_mail_perms"} && (&OBM::Ldap::utils::modifyAttr( "REJECT", $ldapEntry, "mailAccess" )) ) {
         $update->setUpdate();
 
     }
@@ -593,13 +645,19 @@ sub updateLdapEntryLinks {
 }
 
 
+sub isMailActive {
+    my $self = shift;
+    my $entryProp =  $self->{"properties"};
+
+    return $entryProp->{mailshare_mail_perms};
+}
+
+
 sub getMailServerId {
     my $self = shift;
     my $mailServerId = undef;
 
-    if( $self->{"properties"}->{"mailshare_mailperms"} ) {
-        $mailServerId = $self->{"properties"}->{"mailShare_server"};
-    }
+    $mailServerId = $self->{"properties"}->{"mailShare_server"};
 
     return $mailServerId;
 }
@@ -616,7 +674,12 @@ sub getMailboxName {
     my $self = shift;
     my $mailShareName = undef;
 
-    if( $self->{"properties"}->{"mailshare_mailperms"} ) {
+    # Pour l'instant le seul moyen de mettre en BD un mailshare sans l'activer
+    # est de l'insérer avec un serveur mail à NULL. Pour ne pas que ce soit une
+    # erreur pour l'automate, on conditionne le nom de la BAL au fait que le
+    # droit mail est actif car dans ce cas là, ce n'est qu'un warning pour
+    # l'automate
+    if( $self->isMailActive() ) {
         $mailShareName = $self->{"properties"}->{"mailshare_mailbox_name"};
     }
 
@@ -628,9 +691,7 @@ sub getMailboxPartition {
     my $self = shift;
     my $mailSharePartition = undef;
 
-    if( $self->{"properties"}->{"mailshare_mailperms"} ) {
-        $mailSharePartition = $self->{"properties"}->{"mailShare_partition"};
-    }
+    $mailSharePartition = $self->{"properties"}->{"mailShare_partition"};
 
     return $mailSharePartition;
 }
@@ -647,9 +708,7 @@ sub getMailboxQuota {
     my $self = shift;
     my $mailShareQuota = undef;
 
-    if( $self->{"properties"}->{"mailshare_mailperms"} ) {
-        $mailShareQuota = $self->{"properties"}->{"mailshare_mailbox_quota"};
-    }
+    $mailShareQuota = $self->{"properties"}->{"mailshare_mailbox_quota"};
 
     return $mailShareQuota;
 }
@@ -659,7 +718,7 @@ sub getMailboxAcl {
     my $self = shift;
     my $mailShareAcl = undef;
 
-    if( $self->{"properties"}->{"mailshare_mailperms"} ) {
+    if( !$self->getArchive() && $self->isMailActive() ) {
         $mailShareAcl = $self->{"properties"}->{"user_mailshare_acl"};
     }
 

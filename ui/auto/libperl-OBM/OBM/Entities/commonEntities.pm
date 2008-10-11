@@ -19,6 +19,7 @@ $VERSION = "1.0";
                     getLdapObjectclass
                     isLinks
                     getEntityId
+                    isMailActive
                     makeEntityEmail
                     getMailboxDefaultFolders
                     getHostIpById
@@ -74,6 +75,13 @@ sub getEntityId {
     my $self = shift;
 
     return $self->{objectId};
+}
+
+
+sub isMailActive {
+    my $self = shift;
+
+    return 0;
 }
 
 
@@ -177,4 +185,18 @@ sub getHostIpById {
 
     return undef;
 
+}
+
+
+sub getMailServerId {
+    my $self = shift;
+
+    return undef;
+}
+
+
+sub updateLinkedEntity {
+    my $self = shift;
+
+    return 0;
 }

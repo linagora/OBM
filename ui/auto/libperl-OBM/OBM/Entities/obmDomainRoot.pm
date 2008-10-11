@@ -8,7 +8,18 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive getLdapObjectclass isLinks getEntityId);
+use OBM::Entities::commonEntities qw(
+            getType
+            setDelete
+            getDelete
+            getArchive
+            getLdapObjectclass
+            isLinks
+            getEntityId
+            isMailActive
+            getMailServerId
+            updateLinkedEntity
+            );
 use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;

@@ -350,6 +350,12 @@ sub update {
         return 0;
     }
 
+    # Si l'objet n'a pas le droit mail, on ne fait rien
+    if( !$object->isMailActive() ) {
+        &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: droit mail desactive pour l'objet : ".$object->getEntityDescription(), "W" );
+        return 1;
+    }
+
     # Si cette entité n'a pas d'interaction avec Sieve
     if( !$object->getMailboxSieve() ) {
         &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: pas de compte SIEVE definit pour l'objet : ".$object->getEntityDescription(), 'W' );

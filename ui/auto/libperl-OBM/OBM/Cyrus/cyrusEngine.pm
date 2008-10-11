@@ -708,7 +708,7 @@ sub _createMailbox {
         }
 
         $cyrusSrvConn->rename( $boxPrefix.$currentBoxName, $boxPrefix.$newBoxName, $boxPartition );
-        $returnCode = 2;
+        $returnCode = 1;
     }else {
         $action = "create";
 

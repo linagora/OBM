@@ -8,7 +8,16 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId makeEntityEmail getMailboxDefaultFolders getHostIpById);
+use OBM::Entities::commonEntities qw(
+            getType
+            setDelete
+            getDelete
+            getArchive
+            isLinks
+            getEntityId
+            makeEntityEmail
+            getMailboxDefaultFolders
+            );
 use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
@@ -139,6 +148,12 @@ sub getEntity {
     my $dbUserDesc = $queryResult->fetchrow_hashref();
     $queryResult->finish();
 
+    # Si pas de login défini, traitemant impossible
+    if( !defined($dbUserDesc->{userobm_login}) ) {
+        &OBM::toolBox::write_log( "[Entities::obmUser]: login non defini, traitemant impossible !", "W" );
+        return 0;
+    }
+
     # On stocke la description BD utile pour la MAJ des tables
     $self->{"userDbDesc"} = $dbUserDesc;
 
@@ -150,7 +165,7 @@ sub getEntity {
                     LEFT JOIN ".$mailServerTable." i ON j.userobm_mail_server_id=i.mailserver_id
                     WHERE j.userobm_id=".$userId;
     }else {
-        $query = "SELECT i.mailserver_host_id, k.userobm_login as current_userobm_login
+        $query = "SELECT i.mailserver_host_id, k.userobm_login as current_userobm_login, k.userobm_mail_perms as current_userobm_mail_perms, k.userobm_archive as current_userobm_archive
                     FROM ".$userObmTable." j
                     LEFT JOIN ".$mailServerTable." i ON j.userobm_mail_server_id=i.mailserver_id
                     LEFT JOIN P_".$userObmTable." k ON k.userobm_id=j.userobm_id
@@ -181,6 +196,29 @@ sub getEntity {
     }
 
 
+    # Le entités liées doivent-elles être mise à jour
+    $self->{"properties"}->{'update_linked_entity'} = 0;
+
+    # Si :
+    #   l'utilisateur existe déjà
+    #   et le flag Archive a changé,
+    # nous devons traiter les liens de l'entité
+    if( defined($dbUserMoreDesc->{'current_userobm_archive'}) && ($dbUserMoreDesc->{'current_userobm_archive'} != $dbUserDesc->{'userobm_archive'}) ) {
+        $self->{'links'} = 0E0;
+        $self->{"properties"}->{'update_linked_entity'} = 1;
+    }
+
+    # Si :
+    #   l'utilisateur existe déjà
+    #   et le droit mail a changé,
+    # nous devons traiter les liens de l'entité
+    if( defined($dbUserMoreDesc->{'current_userobm_mail_perms'}) && ($dbUserMoreDesc->{'current_userobm_mail_perms'} != $dbUserDesc->{'userobm_mail_perms'})
+ ) {
+        $self->{'links'} = '0E0';
+        $self->{"properties"}->{'update_linked_entity'} = 1;
+    }
+
+
     # On range les résultats dans la structure de données des résultats
     $self->{"properties"}->{userobm_domain} = $domainDesc->{domain_label};
 
@@ -188,6 +226,12 @@ sub getEntity {
         $self->{"properties"}->{current_userobm_login} = $dbUserDesc->{userobm_login};
     }elsif( defined($dbUserMoreDesc->{current_userobm_login}) ) {
         $self->{"properties"}->{current_userobm_login} = $dbUserMoreDesc->{current_userobm_login};
+    }
+
+    # Si le login de l'utilisateur est modifié, nous devons traiter les liens de
+    # l'entité
+    if( defined($self->{"properties"}->{current_userobm_login}) && ($self->{"properties"}->{current_userobm_login} ne $dbUserDesc->{userobm_login}) ) {
+        $self->{"properties"}->{'update_linked_entity'} = 1;
     }
 
     $self->{"properties"}->{userobm_crypt_passwd} = &OBM::passwd::convertPasswd( $dbUserDesc->{userobm_password_type}, $dbUserDesc->{userobm_password} );
@@ -251,7 +295,12 @@ sub getEntity {
     # Gestion du droit de messagerie de l'utilisateur
     $self->{"properties"}->{userobm_mail_perms} = $dbUserDesc->{userobm_mail_perms};
 
-    my $localServerIp;
+    # Gestion de la livraison du courrier
+    $self->{"properties"}->{userobm_mailLocalServer} = $self->getHostIpById( $dbHandler, $dbUserMoreDesc->{mailserver_host_id} );
+    if( defined($self->{"properties"}->{userobm_mailLocalServer}) ) {
+        $self->{"properties"}->{userobm_mailLocalServer} = 'lmtp:'.$self->{"properties"}->{userobm_mailLocalServer}.':24';
+    }
+
     SWITCH: {
         if( !$self->{"properties"}->{userobm_mail_perms} ) {
             last SWITCH;
@@ -263,8 +312,7 @@ sub getEntity {
             last SWITCH;
         }
 
-        $localServerIp = $self->getHostIpById( $dbUserMoreDesc->{mailserver_host_id} );
-        if( !defined($localServerIp) ) {
+        if( !defined($self->{"properties"}->{userobm_mailLocalServer}) ) {
             $self->_log( 'droit mail de l\'utilisateur \''.$dbUserDesc->{'userobm_login'}.'\', domaine \''.$domainDesc->{'domain_label'}.'\' - annule, serveur inconnu !', 2 );
             $self->{"properties"}->{userobm_mail_perms} = 0;
             last SWITCH;
@@ -282,41 +330,30 @@ sub getEntity {
     }
 
     # Gestion du droit de messagerie
-    if( $self->{"properties"}->{userobm_mail_perms} ) {
-        # Limite la messagerie aux domaines locaux
-        if( !$dbUserDesc->{userobm_mail_ext_perms} ) {
-            $self->{"properties"}->{userobm_mailLocalOnly} = "local_only";
-        }
+    #
+    # Limite la messagerie aux domaines locaux
+    if( !$dbUserDesc->{userobm_mail_ext_perms} ) {
+        $self->{"properties"}->{userobm_mailLocalOnly} = "local_only";
+    }
 
-        # Gestion de la BAL destination
-        #   valeur dans LDAP
-        $self->{"properties"}->{userobm_mailbox_ldap_name} = $dbUserDesc->{userobm_login}."@".$domainDesc->{domain_name};
+    # Gestion de la BAL destination
+    #   valeur dans LDAP
+    $self->{"properties"}->{userobm_mailbox_ldap_name} = $dbUserDesc->{userobm_login}."@".$domainDesc->{domain_name};
 
-        # Nom de la BAL Cyrus
-        # Son nouveau nom - qui peut si on ne le change pas et que la
-        # BAL existe déjà, ou qu'on supprime l'entrée, être le même que
-        # l'ancien
-        $self->{"properties"}->{new_userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
-        if( !$singleNameSpace ) {
-            $self->{"properties"}->{new_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
-        }
+    # Nom de la BAL Cyrus
+    # Son nouveau nom - qui peut si on ne le change pas et que la
+    # BAL existe déjà, ou qu'on supprime l'entrée, être le même que
+    # l'ancien
+    $self->{"properties"}->{new_userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
+    if( !$singleNameSpace ) {
+        $self->{"properties"}->{new_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
+    }
 
-        if( !$self->getDelete() ) {
-            if( defined($dbUserMoreDesc->{current_userobm_login}) ) {
-                # Si l'utilisateur existe déjà dans la tables P_UserObm, on
-                # récupère le nom actuel de sa BAL
-                $self->{"properties"}->{current_userobm_mailbox_cyrus_name} = $dbUserMoreDesc->{current_userobm_login};
-
-                if( !$singleNameSpace ) {
-                    $self->{"properties"}->{current_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
-                }
-
-            }
-
-        }else {
-            # En cas de suppression de l'utilisateur, la BAL 'new' est la
-            # même que la BAL 'current'
-            $self->{"properties"}->{current_userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
+    if( !$self->getDelete() ) {
+        if( defined($dbUserMoreDesc->{current_userobm_login}) ) {
+            # Si l'utilisateur existe déjà dans la tables P_UserObm, on
+            # récupère le nom actuel de sa BAL
+            $self->{"properties"}->{current_userobm_mailbox_cyrus_name} = $dbUserMoreDesc->{current_userobm_login};
 
             if( !$singleNameSpace ) {
                 $self->{"properties"}->{current_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
@@ -324,45 +361,51 @@ sub getEntity {
 
         }
 
-        # Partition Cyrus associée à cette BAL
-        if( $OBM::Parameters::common::cyrusDomainPartition ) {
-            $self->{"properties"}->{userobm_mailbox_partition} = $domainDesc->{domain_dn};
-            $self->{"properties"}->{userobm_mailbox_partition} =~ s/\./_/g;
-            $self->{"properties"}->{userobm_mailbox_partition} =~ s/-/_/g;
+    }else {
+        # En cas de suppression de l'utilisateur, la BAL 'new' est la
+        # même que la BAL 'current'
+        $self->{"properties"}->{current_userobm_mailbox_cyrus_name} = $dbUserDesc->{userobm_login};
+
+        if( !$singleNameSpace ) {
+            $self->{"properties"}->{current_userobm_mailbox_cyrus_name} .= "@".$domainDesc->{domain_name};
         }
 
-        # Gestion du serveur de mail
-        $self->{"properties"}->{userobm_mailbox_server} = $dbUserMoreDesc->{mailserver_host_id};
+    }
 
-        # Gestion du quota
-        $self->{"properties"}->{userobm_mailbox_quota} = $dbUserDesc->{userobm_mail_quota}*1024;
+    # Partition Cyrus associée à cette BAL
+    if( $OBM::Parameters::common::cyrusDomainPartition ) {
+        $self->{"properties"}->{userobm_mailbox_partition} = $domainDesc->{domain_dn};
+        $self->{"properties"}->{userobm_mailbox_partition} =~ s/\./_/g;
+        $self->{"properties"}->{userobm_mailbox_partition} =~ s/-/_/g;
+    }
 
-        # Gestion des sous-répertoires de la BAL a créer
-        if( defined($userMailboxDefaultFolders) ) {
-            foreach my $folderTree ( split( ',', $userMailboxDefaultFolders ) ) {
-                if( $folderTree !~ /(^[",]$)|(^$)/ ) {
-                    my $folderName = $dbUserDesc->{userobm_login};
-                    foreach my $folder ( split( '/', $folderTree ) ) {
-                        $folder =~ s/^\s+//;
+    # Gestion du serveur de mail
+    $self->{"properties"}->{userobm_mailbox_server} = $dbUserMoreDesc->{mailserver_host_id};
 
-                        $folderName .= '/'.$folder;
-                        if( !$singleNameSpace ) {
-                            push( @{$self->{"properties"}->{mailbox_folders}}, $folderName.'@'.$domainDesc->{domain_name} );
-                        }else {
-                            push( @{$self->{"properties"}->{mailbox_folders}}, $folderName );
-                        }
+    # Gestion du quota
+    $self->{"properties"}->{userobm_mailbox_quota} = $dbUserDesc->{userobm_mail_quota}*1024;
+
+    # Gestion des sous-répertoires de la BAL a créer
+    if( defined($userMailboxDefaultFolders) ) {
+        foreach my $folderTree ( split( ',', $userMailboxDefaultFolders ) ) {
+            if( $folderTree !~ /(^[",]$)|(^$)/ ) {
+                my $folderName = $dbUserDesc->{userobm_login};
+                foreach my $folder ( split( '/', $folderTree ) ) {
+                    $folder =~ s/^\s+//;
+
+                    $folderName .= '/'.$folder;
+                    if( !$singleNameSpace ) {
+                        push( @{$self->{"properties"}->{mailbox_folders}}, $folderName.'@'.$domainDesc->{domain_name} );
+                    }else {
+                        push( @{$self->{"properties"}->{mailbox_folders}}, $folderName );
                     }
                 }
             }
         }
-
-        # Gestion de la livraison du courrier
-        $self->{"properties"}->{userobm_mailLocalServer} = "lmtp:".$localServerIp.":24";
-
-        # Gestion du message d'absence
-        $self->{"properties"}->{userobm_vacation_message} = uri_unescape($dbUserDesc->{userobm_vacation_message});
     }
 
+    # Gestion du message d'absence
+    $self->{"properties"}->{userobm_vacation_message} = uri_unescape($dbUserDesc->{userobm_vacation_message});
 
     if( $ldapAllMainMailAddress && !$self->{"properties"}->{userobm_mail_perms} ) {
         # Si la personne n'a pas le droit mail, mais a une/des adresses mails
@@ -565,7 +608,9 @@ sub getEntityLinks {
     $self->_getEntityMailboxAcl( $domainDesc );
 
     # On précise que les liens de l'entité sont aussi à mettre à jour.
-    $self->{"links"} = 1;
+    if( !$self->isLinks() ) {
+        $self->{"links"} = 1;
+    }
 
     return 1;
 }
@@ -626,19 +671,57 @@ sub _getEntityMailboxAcl {
 
 
         $rightDef{'read'}->{'compute'} = 1;
-        $rightDef{'read'}->{'sqlQuery'} = 'SELECT i.userobm_id, i.userobm_login FROM '.$userObmTable.' i, '.$entityRightTable.' j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=0 AND j.entityright_read=1 AND j.entityright_entity_id='.$userId.' AND j.entityright_entity=\''.$entityType.'\'';
+        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login
+                FROM ".$userObmTable." i, ".$entityRightTable." j
+                WHERE i.userobm_id=j.entityright_consumer_id
+                    AND i.userobm_archive=0
+                    AND i.userobm_mail_perms=1
+                    AND j.entityright_write=0 AND j.entityright_read=1
+                    AND j.entityright_entity_id=".$userId."
+                    AND j.entityright_entity='".$entityType."'";
 
         $rightDef{'writeonly'}->{'compute'} = 1;
-        $rightDef{'writeonly'}->{'sqlQuery'} = 'SELECT i.userobm_id, i.userobm_login FROM '.$userObmTable.' i, '.$entityRightTable.' j WHERE i.userobm_id=j.entityright_consumer_id AND j.entityright_write=1 AND j.entityright_read=0 AND j.entityright_entity_id='.$userId.' AND j.entityright_entity=\''.$entityType.'\'';
+        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login
+                FROM ".$userObmTable." i, ".$entityRightTable." j
+                WHERE i.userobm_id=j.entityright_consumer_id
+                    AND i.userobm_archive=0
+                    AND i.userobm_mail_perms=1
+                    AND j.entityright_write=1
+                    AND j.entityright_read=0
+                    AND j.entityright_entity_id=".$userId."
+                    AND j.entityright_entity='".$entityType."'";
 
         $rightDef{'write'}->{'compute'} = 1;
-        $rightDef{'write'}->{'sqlQuery'} = 'SELECT userobm_id, userobm_login FROM '.$userObmTable.' LEFT JOIN '.$entityRightTable.' ON entityright_write=1 AND entityright_read=1 AND entityright_consumer_id=userobm_id AND entityright_entity=\''.$entityType.'\' WHERE entityright_entity_id='.$userId.' OR userobm_id='.$userId;
+        $rightDef{"write"}->{"sqlQuery"} = "SELECT userobm_id, userobm_login
+                FROM ".$userObmTable."
+                LEFT JOIN ".$entityRightTable."
+                    ON entityright_write=1
+                    AND entityright_read=1
+                    AND entityright_consumer_id=userobm_id
+                    AND entityright_entity='".$entityType."'
+                WHERE (entityright_entity_id=".$userId."
+                    AND userobm_archive=0
+                    AND userobm_mail_perms=1)
+                OR userobm_id=".$userId;
 
         $rightDef{'admin'}->{'compute'} = 1;
-        $rightDef{'admin'}->{'sqlQuery'} = 'SELECT userobm_id, userobm_login FROM '.$userObmTable.' LEFT JOIN '.$entityRightTable.' ON entityright_admin=1 AND entityright_consumer_id=userobm_id AND entityright_entity=\''.$entityType.'\' WHERE entityright_entity_id='.$userId.' OR userobm_id='.$userId;
+        $rightDef{'admin'}->{'sqlQuery'} = 'SELECT userobm_id, userobm_login
+                FROM '.$userObmTable.'
+                LEFT JOIN '.$entityRightTable.'
+                    ON entityright_admin=1
+                    AND entityright_consumer_id=userobm_id
+                    AND entityright_entity=\''.$entityType.'\'
+                WHERE (entityright_entity_id='.$userId.'
+                    AND userobm_archive=0
+                    AND userobm_mail_perms=1)
+                OR userobm_id='.$userId;
 
         $rightDef{'public'}->{'compute'} = 0;
-        $rightDef{'public'}->{'sqlQuery'} = 'SELECT entityright_read, entityright_write FROM '.$entityRightTable.' WHERE entityright_entity_id='.$userId.' AND entityright_entity=\''.$entityType.'\' AND entityright_consumer_id=0';
+        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write
+                FROM ".$entityRightTable."
+                WHERE entityright_entity_id=".$userId."
+                    AND entityright_entity='".$entityType."'
+                    AND entityright_consumer_id=0";
 
         # On recupere la definition des ACL
         $self->{'userLinks'}->{'userobm_mailbox_acl'} = &OBM::toolBox::getEntityRight( $domainDesc, \%rightDef, $userId );
@@ -1210,15 +1293,21 @@ sub updateLdapEntryPassword {
 }
 
 
+sub isMailActive {
+    my $self = shift;
+    my $entryProp = $self->{"properties"};
+
+    return $entryProp->{userobm_mail_perms};
+}
+
+
 sub getMailServerId {
     my $self = shift;
     my $mailServerId = undef;
     my $dbEntry = $self->{userDbDesc};
     my $entryProp = $self->{"properties"};
 
-    if( $entryProp->{userobm_mail_perms} ) {
-        $mailServerId = $entryProp->{userobm_mailbox_server};
-    }
+    $mailServerId = $entryProp->{userobm_mailbox_server};
 
     return $mailServerId;
 }
@@ -1246,12 +1335,10 @@ sub getMailboxName {
     my $entryProp = $self->{"properties"};
 
 
-    if( $entryProp->{userobm_mail_perms} ) {
-        if( lc($which) =~ /^new$/ ) {
-            $mailBoxName = $entryProp->{new_userobm_mailbox_cyrus_name};
-        }elsif( lc($which) =~ /^current$/ ) {
-            $mailBoxName = $entryProp->{current_userobm_mailbox_cyrus_name};
-        }
+    if( lc($which) =~ /^new$/ ) {
+        $mailBoxName = $entryProp->{new_userobm_mailbox_cyrus_name};
+    }elsif( lc($which) =~ /^current$/ ) {
+        $mailBoxName = $entryProp->{current_userobm_mailbox_cyrus_name};
     }
 
     return $mailBoxName;
@@ -1264,9 +1351,7 @@ sub getMailboxPartition {
     my $dbEntry = $self->{userDbDesc};
     my $entryProp = $self->{"properties"};
 
-    if( $entryProp->{userobm_mail_perms} ) {
-        $mailboxPartition = $entryProp->{userobm_mailbox_partition};
-    }
+    $mailboxPartition = $entryProp->{userobm_mailbox_partition};
 
     return $mailboxPartition;
 }
@@ -1278,9 +1363,7 @@ sub getMailboxQuota {
     my $dbEntry = $self->{userDbDesc};
     my $entryProp = $self->{"properties"};
 
-    if( $entryProp->{userobm_mail_perms} ) {
-        $mailBoxQuota = $entryProp->{userobm_mailbox_quota};
-    }
+    $mailBoxQuota = $entryProp->{userobm_mailbox_quota};
 
     return $mailBoxQuota;
 }
@@ -1293,7 +1376,7 @@ sub getMailboxAcl {
     my $entryProp = $self->{"properties"};
     my $entryLinks = $self->{userLinks};
 
-    if( $entryProp->{userobm_mail_perms} ) {
+    if( !$self->getArchive() && $self->isMailActive() ) {
         $mailBoxAcl = $entryLinks->{userobm_mailbox_acl};
     }
 
@@ -1378,4 +1461,12 @@ sub getSieveNomade {
     }
 
     return $nomadeMsg;
+}
+
+
+sub updateLinkedEntity {
+    my $self = shift;
+    my $entryProp = $self->{"properties"};
+
+    return $entryProp->{'update_linked_entity'};
 }

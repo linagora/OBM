@@ -8,7 +8,18 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Entities::commonEntities qw(getType setDelete getDelete getArchive isLinks getEntityId makeEntityEmail);
+use OBM::Entities::commonEntities qw(
+            getType
+            setDelete
+            getDelete
+            getArchive
+            isLinks
+            getEntityId
+            isMailActive
+            makeEntityEmail
+            getMailServerId
+            updateLinkedEntity
+            );
 use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
 require OBM::Parameters::ldapConf;
@@ -395,7 +406,7 @@ sub _getGroupUsers {
     }
 
     # Récupération de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = 'SELECT i.'.$sqlResultColumn.' FROM '.$userObmTable.' i, '.$userObmGroupTable.' j WHERE j.of_usergroup_group_id='.$groupId.' AND j.of_usergroup_user_id=i.userobm_id';
+    my $query = 'SELECT i.'.$sqlResultColumn.' FROM '.$userObmTable.' i, '.$userObmGroupTable.' j WHERE j.of_usergroup_group_id='.$groupId.' AND j.of_usergroup_user_id=i.userobm_id AND i.userobm_archive=0';
 
     if( defined( $sqlRequest ) && ($sqlRequest ne "") ) {
         $query .= " ".$sqlRequest;
