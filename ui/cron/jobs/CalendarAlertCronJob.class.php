@@ -59,7 +59,7 @@ class CalendarAlertCronJob extends CronJob{
 
     foreach($occurrences as $occurrence) {
       $event = $occurrence->event;
-      $delta = $this->getAlertDelta($event->id, current($event->attendee["user"]));
+      $delta = $this->getAlertDelta($event->id, key($event->attendee["user"]));
       
       if($occurrence->date > $date && $occurrence->date <= $date  + $this->jobDelta) {
         $this->logger->debug("Alert for event ".$event->id." will be sent");
