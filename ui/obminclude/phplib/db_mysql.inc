@@ -432,7 +432,7 @@ class DB_Sql {
     return $return;
   }
 
-  var LIKE = 'ILIKE';
+  var $LIKE = 'ILIKE';
 
   /**
    * ADDSECONDS 
