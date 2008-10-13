@@ -406,7 +406,7 @@ class DB_Sql {
   }
   
   function interpret($code) {
-    preg_match_all("/(#)?([^ (,]+)(\(((?:(?>[^()]+)|(?3))*)\))?/",$string, $match);
+    preg_match_all("/(#)?([^ (,][^(,]*)(\(((?:(?>[^()]+)|(?3))*)\))?/",$code, $match);
     $return = array();
     foreach($match[0] as $key => $pattern) {
       if(!empty($match[3][$key])) {
