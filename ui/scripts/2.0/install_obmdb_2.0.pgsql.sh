@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ###############################################################################
 # OBM - File : install_obmdb_1.2.pgsql.sh                                     #
 #     - Desc : PostgreSQL Database 1.2 installation script                    #

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ###############################################################################
 # OBM - File : install_obmdb_2.0.sh                                           #
 #     - Desc : MySQL Database 2.0 installation script                         #
