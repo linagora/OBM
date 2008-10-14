@@ -383,6 +383,8 @@ $l_header_compute_balance = "Calculez solde";
 
 $l_header_add_contact = "Ajouter contact";
 
+$l_header_batch = "Traitement par lots";
+
 // Agenda 
 $l_header_right = "Gestion des droits";
 

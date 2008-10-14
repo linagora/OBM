@@ -2160,4 +2160,253 @@ function get_profile_list() {
   return $profiles;
 }
 
+function check_batch_processing_data($params) {
+  global $err;
+  global $l_batch_no_user_error, $l_nomade_without_mail_perms, $l_nomade_perms_error, $l_nomade_local_copy_error, $l_quota_error;
+  global $l_user;
+  global $php_regexp_quota;
+  
+  $u_id = $params['data-u-id'];
+  
+  // Check if there are selected users
+  if (!isset($u_id)) {
+    $err['msg'] = $l_batch_no_user_error; 
+    return false;    
+  }
+  
+  
+  // Check if data forms are not conflicting
+  $mail_perms = $params['mail_perms'];
+  $mail_quota = $params['mail_quota'];
+  $nomade_perms = $params['nomade_perms'];
+  $nomade_enable = $params['nomade_enable'];
+  $nomade_local_copy = $params['nomade_local_copy'];
+  
+  if ($nomade_perms === '1' && $mail_perms === '0') {
+    $err['msg'] = $l_nomade_without_mail_perms;
+    return false;
+  }
+  
+  if ($nomade_enable === '1' && $nomade_perms === '0') {
+    $err['msg'] = $l_nomade_perms_error;
+    return false;
+  }
+  
+  if ($nomade_local_copy === '1' && ($nomade_perms === '0' || $nomade_enable === '0')) {
+    $err['msg'] = $l_nomade_local_copy_error;
+    return false;
+  }
+  
+  if ( $mail_quota != '' && !preg_match($php_regexp_quota, $mail_quota)) {
+    $err['msg'] = "$mail_quota : $l_quota_error";
+    return false;
+  }
+
+  return true;
+}
+
+function run_query_user_data_batch($params) {
+  
+  $mail_perms = $params['mail_perms'];
+  $mail_quota = $params['mail_quota'];
+  $nomade_perms = $params['nomade_perms'];
+  $nomade_enable = $params['nomade_enable'];
+  $nomade_local_copy = $params['nomade_local_copy'];
+  $u_id = $params['data-u-id'];
+  
+  $check = array();
+  
+  if ($mail_perms == '1') {
+    $check[] = "userobm_email = '' OR userobm_email IS NULL"; 
+  }
+  
+  if ($nomade_perms == '1' && !isset($mail_perms)) {
+    $check[] = "userobm_mail_perms = '' OR userobm_mail_perms IS NULL";
+  }
+  
+  if ($nomade_enable == '1' && $nomade_perms == '1') {
+    $check[] = "userobm_email_nomade = '' OR userobm_email_nomade IS NULL";
+  }
+  
+  if ($nomade_enable == '1' && !isset($nomade_perms)) {
+    $check[] = "userobm_nomade_perms = '' OR userobm_nomade_perms IS NULL OR userobm_email_nomade = '' OR userobm_email_nomade IS NULL";
+  }
+  
+  if ($nomade_local_copy == '1' && (!isset($nomade_perms) || (!isset($nomade_enable)))) {
+    $check[] = "userobm_nomade_perms = '' OR userobm_nomade_perms IS NULL OR userobm_nomade_enable = '' OR userobm_nomade_enable IS NULL";
+  }
+  
+  $query = "";
+  $users_id_error = array();
+  if (sizeof($check) > 0) {
+    $query = "SELECT userobm_id FROM UserObm WHERE (".implode(' OR ', $check).") AND userobm_id IN (".implode(', ', $u_id).")";
+    $obm_q = new DB_OBM;
+    
+    $obm_q->query($query);
+    while ($obm_q->next_record()) {
+      $users_id_error[] = $obm_q->f('userobm_id');
+    }
+  }
+  return $users_id_error;
+}
+
+function check_users_error_data($params, $users_id_error) {
+  global $err;
+  global $l_user;
+  global $l_email_empty, $l_nomade_without_mail_perms, $l_nomade_perms_error, $l_email_nomad_error, $l_nomade_local_copy_error;
+  
+  $mail_perms = $params['mail_perms'];
+  $nomade_perms = $params['nomade_perms'];
+  $nomade_enable = $params['nomade_enable'];
+  $nomade_local_copy = $params['nomade_local_copy'];
+  $check = array();
+
+  // Users who haven't email address if mail perms are activated
+  if ($mail_perms == '1') {
+    $check['email'] = "userobm_email = '' OR userobm_email IS NULL";
+  }
+  
+  // Users who haven't mail perms if nomade perms are activated
+  if ($nomade_perms == '1' && !isset($mail_perms)) {
+    $check['mail_perms'] = "userobm_mail_perms = '' OR userobm_mail_perms IS NULL";
+  }
+  
+  // Users who haven't email nomade if nomade is enable or nomade perms are activated
+  if ($nomade_enable == '1' && $nomade_perms == '1') {
+    $check['email_nomade'] = "userobm_email_nomade = '' OR userobm_email_nomade IS NULL";
+  }
+  if ($nomade_enable == '1' && !isset($nomade_perms)) {
+    $check['nomade_perms'] = "userobm_nomade_perms = '' OR userobm_nomade_perms IS NULL OR userobm_email_nomade = '' OR userobm_email_nomade IS NULL";
+  }
+  
+  // Users who havent't nomade perms or nomade enable if nomade local copy is activated
+  if ($nomade_local_copy == '1' && (!isset($nomade_perms) || (!isset($nomade_enable)))) {
+    $check['nomade_local_copy'] = "userobm_nomade_perms = '' OR userobm_nomade_perms IS NULL OR userobm_nomade_enable = '' OR userobm_nomade_enable IS NULL";
+  }
+  
+  $obm_q = new DB_OBM;
+  $msg_error = "";
+  foreach ($check as $err_type => $where) {
+    $query = "SELECT userobm_login, userobm_nomade_perms FROM UserObm WHERE ($where) AND userobm_id IN(".implode(', ', $users_id_error).")";
+    $obm_q->query($query);
+    while ($obm_q->next_record()) {
+      if ($err_type == "email") { $err['msg'] = $l_email_empty; }
+      if ($err_type == "mail_perms") {$err['msg'] = $l_nomade_without_mail_perms; }
+      if ($err_type == "nomade_perms") {
+        if ($obm_q->f('userobm_nomade_perms') == 1) {
+          $err['msg'] = $l_email_nomad_error;
+        } else {
+          $err['msg'] = $l_nomade_perms_error;
+        }
+      }
+      if ($err_type == "email_nomade") {$err['msg'] = $l_email_nomad_error; }
+      if ($err_type == "nomade_local_copy") {$err['msg'] = $l_nomade_local_copy_error; }
+      $msg_error .= $err['msg']."&nbsp;$l_user&nbsp;".$obm_q->f('userobm_login')."<br />";
+    }
+  }
+  $err['msg'] = $msg_error;
+}
+
+function run_query_batch_processing_update($params, $users_id) {
+  // user
+  $archive = $params['archive'];
+  $profile = $params["profile_name"];
+  
+  // Mail
+  $mail_perms = $params['mail_perms'];
+  $mail_quota = $params['mail_quota'];
+  
+  // Nomade
+  $nomade_perms = $params['nomade_perms'];
+  $nomade_enable = $params['nomade_enable'];
+  $nomade_local_copy = $params['nomade_local_copy'];
+  
+  // Coords
+  $is_phone_up = bool($params['to_update_phone']);
+  $is_phone2_up = bool($params['to_update_phone2']);
+  $is_mobile_up = bool($params['to_update_mobile']);
+  $is_fax_up = bool($params['to_update_fax']);
+  $is_fax2_up = bool($params['to_update_fax2']);
+  $is_company_up = bool($params['to_update_company']);
+  $is_direction_up = bool($params['to_update_direction']);
+  $is_service_up = bool($params['to_update_service']);
+  $is_address1_up = bool($params['to_update_address1']);
+  $is_address2_up = bool($params['to_update_address2']);
+  $is_address3_up = bool($params['to_update_address3']);
+  $is_zipcode_up = bool($params['to_update_zipcode']);
+  $is_town_up = bool($params['to_update_town']);
+  $is_expresspostal_up = bool($params['to_update_expresspostal']);
+  
+  $phone = "".$params['phone'];
+  $phone2 = "".$params['phone2'];
+  $mobile = "".$params['mobile'];
+  $fax = "".$params['fax'];
+  $fax2 = "".$params['fax2'];
+  $company = "".$params['company'];
+  $direction = "".$params['direction'];
+  $service = "".$params['service'];
+  $address1 = "".$params['address1'];
+  $address2 = "".$params['address2'];
+  $address3 = "".$params['address3'];
+  $zipcode = "".$params['zipcode'];
+  $town = "".$params['town'];
+  $expresspostal = "".$params['expresspostal'];
+  
+  $set = array();
+  
+  // User
+  if (isset($archive)) { $set[] = "userobm_archive=$archive"; }
+  if (isset($profile)) { $set[] = "userobm_perms='$profile'"; }
+  
+  // Mail
+  if (isset($mail_perms)) {
+    $set[] = "userobm_mail_perms=$mail_perms";
+    if ($mail_perms == '0') {
+      $set[] = "userobm_vacation_enable=0";
+      $set[] = "userobm_nomade_perms=0";
+      $set[] = "userobm_nomade_enable=0";
+      $set[] = "userobm_nomade_local_copy=0";
+    }
+  }
+  if (isset($mail_quota)) { $set[] = "userobm_mail_quota=$mail_quota"; }
+  
+  // Nomade
+  if (isset($nomade_perms)) { $set[] = "userobm_nomade_perms=$nomade_perms"; }
+  if (isset($nomade_enable)) { $set[] = "userobm_nomade_enable=$nomade_enable"; }
+  if (isset($nomade_local_copy)) { $set[] = "userobm_nomade_local_copy=$nomade_local_copy"; }
+  
+  // Coords
+  if ($is_phone_up) { $set[] = "userobm_phone='$phone'"; }
+  if ($is_phone2_up) { $set[] = "userobm_phone2='$phone2'"; }
+  if ($is_mobile_up) { $set[] = "userobm_mobile='$mobile'"; }
+  if ($is_fax_up) { $set[] = "userobm_fax='$fax'"; }
+  if ($is_fax2_up) { $set[] = "userobm_fax2='$fax2'"; }
+  if ($is_company_up) { $set[] = "userobm_company='$company'"; }
+  if ($is_direction_up) { $set[] = "userobm_direction='$direction'"; }
+  if ($is_service_up) { $set[] = "userobm_service='$service'"; }
+  if ($is_address1_up) { $set[] = "userobm_address1='$address1'"; }
+  if ($is_address2_up) { $set[] = "userobm_address2='$address2'"; }
+  if ($is_address3_up) { $set[] = "userobm_address3='$address3'"; }
+  if ($is_zipcode_up) { $set[] = "userobm_zipcode='$zipcode'"; }
+  if ($is_town_up) { $set[] = "userobm_town='$town'"; }
+  if ($is_expresspostal_up) { $set[] = "userobm_expresspostal='$expresspostal'"; }
+  
+  if (sizeof($set) > 0) {
+    $query = "UPDATE UserObm SET ".implode(', ', $set)." WHERE userobm_id IN (".implode(', ', $users_id).")";
+    $obm_q = new DB_OBM;
+    
+    return $obm_q->query($query);
+  } else {
+    return true;
+  }
+}
+
+function bool($var) {
+    switch (strtolower($var)) {
+        case ("true"): return true;
+        case ("false"): return false;
+        default: return false;
+    }
+}
+
 ?>

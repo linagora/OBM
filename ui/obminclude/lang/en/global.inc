@@ -370,6 +370,8 @@ $l_header_duplicate = "Duplicate";
 
 $l_header_add_contact = "Add contact";
 
+$l_header_batch = "Batch processing";
+
 // Project Agenda
 $l_header_right = "Right management";
 

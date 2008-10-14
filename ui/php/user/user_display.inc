@@ -190,7 +190,6 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
   global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all, $l_firstname, $l_exp;
-  //global $display, $c_all, $profiles, $l_recursive, $obm;
   global $display, $c_all, $l_recursive, $obm;
   
   $login = $user["login"];
@@ -207,6 +206,9 @@ function html_user_search_form($user) {
   $archive = ($user["archive"] == "1" ? "checked" : "");
   $recursive = ($user["recursive"] == "1" ? "checked" : "");
   $popup = $user["popup"];
+  $next_action = $user['next_action'];
+  $user_action = $user['action'];
+  
   if ($user["filter_entity"]) {
     $dis_filter_entity = "<input name=\"filter_entity\" type=\"hidden\" value=\"$user[filter_entity]\" />";
     if($user['filter_pattern'])
@@ -240,12 +242,11 @@ function html_user_search_form($user) {
     $display["title"] = $ext_title;
   }
 
-  /* Old
-  foreach ($profiles as $k_profile => $one_profile) {
-    $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
-    $block_profile .= "
-      <option value=\"$k_profile\"> $profile</option>";
-  }*/
+  if ($user_action == "search_batch_user" || $user_action == "sel_batch_users") {
+    $form_action = "<input name=\"action\" type=\"hidden\" value=\"sel_batch_users\" />";
+  } else {
+    $form_action = "<input name=\"action\" type=\"hidden\" value=\"search\" />";
+  }
 
   foreach ($user['profiles'] as $k_profile => $one_profile) {
     $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
@@ -310,7 +311,7 @@ function html_user_search_form($user) {
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </label>
     <label>&nbsp;<br />
-      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      $form_action
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $dis_filter_entity
@@ -334,6 +335,7 @@ function dis_user_search_list($user) {
 
   $popup = $user["popup"];
   $filter_entity = $user["filter_entity"];
+  
   $obm_q = run_query_user_search($user);
 
   $prefs = get_display_pref($obm["uid"], "user");
@@ -359,7 +361,7 @@ function dis_user_search_list($user) {
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_list($obm_q, $prefs, $user, $popup) {
-  global $l_close, $l_add;
+  global $l_close, $l_add, $l_edit_users;
 
   $login = urlencode($user["login"]);
   $lname = urlencode($user["lastname"]);
@@ -427,7 +429,24 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";
+      
+  } else if ($user['action'] == "sel_batch_users") {
+    $user_d->display_link = false;
+    $user_d->data_cb_text = "X";
+    $user_d->data_idfield = "userobm_id";
+    $user_d->data_cb_name = "data-u-";
+    
+    $user_d->data_form_head = "
+      <form method=\"post\" action=\"".url_prepare("user_index.php")."\">";
+    $user_d->data_form_end = "
+      <div class=\"buttons\">
+        <input type=\"submit\" value=\"$l_edit_users\" />
+        <input type=\"hidden\" name=\"action\" value=\"edit_batch_values\" />
+      </div>
+      </form>";
+    
   }
+  
   $user_d->data_set = $obm_q;
   $user_d->data_header = "both";
   $user_d->data_url = $url;
@@ -2469,6 +2488,241 @@ function dis_user_mail_field($values,$class) {
   return $email_block;
 }
 
+function html_user_batch_form($params) {
+  // Globalize detail header
+  global $l_user, $l_mail, $l_nomade, $l_coord;
+  // Globalize form labels
+  global $l_archive, $l_profile, $l_quota, $l_perms, $l_enabled, $l_local_copy;
+  global $l_phone, $l_mphone, $l_fax, $l_company, $l_direction, $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
+  // other
+  global $l_yes, $l_no, $l_do_batch_processing;
+  
+  $l_phone2 = $l_phone." 2";
+  $l_fax2 = $l_fax." 2";
+  $l_address2 = $l_address." 2";
+  $l_address3 = $l_address." 3";
+  
+  $profiles = get_profile_list();
+  
+  $sel_default = array('label' => '-----', 'value' => '');
+  $selected = "selected=\"selected\"";
+  
+  $archive = $params['archive'];
+  $profile = $params['profile_name'];
+  $mail_perms = $params['mail_perms'];
+  $mail_quota = $params['mail_quota'];
+  $nomade_perms = $params['nomade_perms'];
+  $nomade_enable = $params['nomade_enable'];
+  $nomade_local_copy = $params['nomade_local_copy'];
+  
+  $archive_block = "
+  <select name=\"sel_archive\">
+  	<option value=\"$sel_default[value]\" ".(!isset($archive) ? $selected : "").">$sel_default[label]</option>
+  	<option value=\"0\" ".($archive=='0' ? $selected : "").">$l_no</option>
+  	<option value=\"1\" ".($archive=='1' ? $selected : "").">$l_yes</option>
+  </select>
+  ";
+  
+  $profile_block = "
+  <select name=\"sel_profile_name\">
+  	<option value=\"$sel_default[value]\" ".(!isset($profile_id) ? $selected : "").">$sel_default[label]</option>
+  ";
+  foreach($profiles as $profile_name => $profile_value) {
+    $profile_block .= "<option value=\"$profile_name\" ".($profile_name==$profile ? $selected : "").">$profile_name</option>";
+  }
+  
+  $mail_perms_block = "
+  <select name=\"sel_mail_perms\">
+  	<option value=\"$sel_default[value]\" ".(!isset($mail_perms) ? $selected : "").">$sel_default[label]</option>
+  	<option value=\"0\" ".($mail_perms=='0' ? $selected : "").">$l_no</option>
+  	<option value=\"1\" ".($mail_perms=='1' ? $selected : "").">$l_yes</option>
+  </select>
+  ";
+  
+  $mail_quota_block = "
+  <input type=\"text\" name=\"tf_mail_quota\" value=\"$mail_quota\" size=\"6\" maxlength=\"6\" />
+  ";
+  
+  $nomade_perms_block = "
+  <select name=\"sel_nomade_perms\">
+  	<option value=\"$sel_default[value]\" ".(!isset($nomade_perms) ? $selected : "").">$sel_default[label]</option>
+  	<option value=\"0\" ".($nomade_perms=='0' ? $selected : "").">$l_no</option>
+  	<option value=\"1\" ".($nomade_perms=='1' ? $selected : "").">$l_yes</option>
+  </select>
+  ";
+  
+  $nomade_enable_block = "
+  <select name=\"sel_nomade_enable\">
+  	<option value=\"$sel_default[value]\" ".(!isset($nomade_enable) ? $selected : "").">$sel_default[label]</option>
+  	<option value=\"0\" ".($nomade_enable=='0' ? $selected : "").">$l_no</option>
+  	<option value=\"1\" ".($nomade_enable=='1' ? $selected : "").">$l_yes</option>
+  </select>
+  ";
+  
+  $nomade_local_copy_block = "
+  <select name=\"sel_nomade_local_copy\">
+  	<option value=\"$sel_default[value]\" ".(!isset($nomade_local_copy) ? $selected : "").">$sel_default[label]</option>
+  	<option value=\"0\" ".($nomade_local_copy=='0' ? $selected : "").">$l_no</option>
+  	<option value=\"1\" ".($nomade_local_copy=='1' ? $selected : "").">$l_yes</option>
+  </select>
+  ";
+  
+  $buttons_block = "
+    <input type=\"hidden\" name=\"action\" value=\"batch_processing\" />
+  	<input type=\"submit\" value=\"$l_do_batch_processing\" />
+  ";
+  if (!isset($params['data-u-id'])) {
+    foreach ($params as $params_name => $params_value) {
+      if (! preg_match("/^data-u-[0-9]+$/", $params_name)) {
+        continue;
+      } else if ($params_value == 'on') {
+        $user_id = substr($params_name, strlen('data-u-'));
+        $buttons_block .= "
+        <input type=\"hidden\" name=\"data-u-id"."[]\" value=\"$user_id\" />
+        ";
+      }
+    }
+  } else {
+    foreach ($params['data-u-id'] as $u_id) {
+      $buttons_block .= "
+      <input type=\"hidden\" name=\"data-u-id"."[]\" value=\"$u_id\" />
+      ";
+    }
+  }
+  
+  $form_block = "
+  <fieldset class=\"detail infos\">
+	<legend>$l_user</legend>
+	<table>
+	  <tr>
+	  	<th>$l_archive</th>
+	  	<td>$archive_block</td>
+	  </tr><tr>
+	    <th>$l_profile</th>
+	    <td>$profile_block</td>
+	  </tr>
+	 </table>
+  </fieldset>
+  <fieldset class=\"detail infos\">
+    <legend>$l_mail</legend>
+    <table>
+      <tr>
+        <th>$l_mail</th>
+        <td>$mail_perms_block</td>
+      </tr><tr>
+        <th>$l_quota</th>
+        <td>$mail_quota_block</td>
+      </tr>
+    </table>
+  </fieldset>
+  <fieldset class=\"detail infos\">
+    <legend>$l_nomade</legend>
+    <table>
+      <tr>
+        <th>$l_perms</th>
+        <td>$nomade_perms_block</td>
+      </tr><tr>
+        <th>$l_enabled</th>
+        <td>$nomade_enable_block</td>
+      </tr><tr>
+        <th>$l_local_copy</th>
+        <td>$nomade_local_copy_block</th>
+      </tr>
+    </table>
+  </fieldset>
+  <fieldset class=\"detail infos\">
+    <legend>$l_coord</legend>
+    <table id=\"coord\">
+      <tr id=\"phone\">
+        <th>$l_phone</th>
+        <td>".disp_tf_coord('phone', 32, $params)."</td>
+      </tr><tr id=\"phone2\">
+        <th>$l_phone2</th>
+        <td>".disp_tf_coord('phone2', 32, $params)."</td>
+      </tr><tr id=\"mobile\">
+        <th>$l_mphone</th>
+        <td>".disp_tf_coord('mobile', 32, $params)."</td>
+      </tr><tr id=\"fax\">
+        <th>$l_fax</th>
+        <td>".disp_tf_coord('fax', 32, $params)."</td>
+      </tr><tr id=\"fax2\">
+        <th>$l_fax2</th>
+        <td>".disp_tf_coord('fax2', 32, $params)."</td>
+      </tr><tr id=\"company\">
+        <th>$l_company</th>
+        <td>".disp_tf_coord('company', 64, $params)."</td>
+      </tr><tr id=\"direction\">
+        <th>$l_direction</th>
+        <td>".disp_tf_coord('direction', 64, $params)."</td>
+      </tr><tr id=\"service\">
+        <th>$l_service</th>
+        <td>".disp_tf_coord('service', 64, $params)."</td>
+      </tr><tr id=\"address1\">
+        <th>$l_address</th>
+        <td>".disp_tf_coord('address1', 64, $params)."</td>
+      </tr><tr id=\"address2\">
+        <th>$l_address2</th>
+        <td>".disp_tf_coord('address2', 64, $params)."</td>
+      </tr><tr id=\"address3\">
+        <th>$l_address3</th>
+        <td>".disp_tf_coord('address3', 64, $params)."</td>
+      </tr><tr id=\"zipcode\">
+        <th>$l_postcode</th>
+        <td>".disp_tf_coord('zipcode', 14, $params)."</td>
+      </tr><tr id=\"town\">
+        <th>$l_town</th>
+        <td>".disp_tf_coord('town', 64, $params)."</td>
+      </tr><tr id=\"expresspostal\">
+        <th>$l_expresspostal</th>
+        <td>".disp_tf_coord('expresspostal', 16, $params)."</td>
+      </tr>
+    </table>
+  </fieldset>
+  <fieldset class=\"buttons\">
+  	$buttons_block
+  </fieldset>
+  ";
+        
+  $js_block = "
+  <script type=\"text/javascript\">
+  	fill_coords();
+  </script>
+  ";
+  
+  $style_block = "
+  <style>
+  	.icons {
+  		padding-left: 0.3em;
+  	}
+  </style>
+  ";
+  
+  $form_block = "
+  $style_block
+  <form method=\"post\">
+  	$form_block
+  	$js_block
+  </form>
+  ";
+  
+  return $form_block;
+}
 
-
+// Display tf_ coord function
+function disp_tf_coord($name, $size, $params) {
+  
+  $field_to_update = "to_update_$name";
+  if (!isset($params[$field_to_update])) {
+    $value = 'false';
+  } else {
+    $value = $params[$field_to_update];
+  }
+  
+  $block = "
+  	<input type=\"hidden\" name=\"$field_to_update\" value=\"$value\" />
+  	<input type=\"text\" name=\"tf_$name\" size=\"$size\" maxlengt=\"$size\" value=\"$params[$name]\" />
+  ";
+  
+  return $block;
+}
 ?>

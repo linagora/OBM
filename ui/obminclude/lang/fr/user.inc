@@ -72,6 +72,10 @@ $l_add = "Ajouter ces utilisateurs";
 
 $l_add_users = "Ajouter des utilisateurs";
 
+$l_edit_users = "Éditer les propriétés utilisateurs";
+
+$l_do_batch_processing = "Lancer le traitement par lots";
+
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des utilisateurs correspondants.";
 $l_found = "utilisateurs trouvés.";
@@ -116,6 +120,7 @@ $l_err_delegation_target_outside_target = "La délégation d'administration doit
 $l_err_delegation_target_profile = "Ce profil d'utilisateur ne peut avoir de délégation d'administration !";
 $l_fill_vacation_datebegin = "Vous devez renseigner la date de début du message d'absence avant de valider";
 $l_fill_vacation_dateend = "Vous devez renseigner la date de fin du message d'absence avant de valider";
+$l_batch_no_user_error = "Aucun utilisateur n'est sélectionné pour le traitement par lots";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";

@@ -19,6 +19,7 @@
 // - delete          -- $user_id    -- delete the user
 // - group_consult   -- $user_id    -- show the user groups form
 // - group_update    -- $user_id    -- update the user groups
+// - batch_process   --             -- Batch processing for users
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple users (return id) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -255,6 +256,45 @@ if ($action == "ext_get_ids") {
   update_display_pref($params);
   $prefs = get_display_pref($obm['uid'], 'user', 1);
   $display['detail'] = dis_user_display_pref($prefs);
+  
+} else if ($action == 'search_batch_user') {
+///////////////////////////////////////////////////////////////////////////////
+  $display["search"] = html_user_search_form($params);
+  if ($_SESSION['set_display'] == "yes") {
+    $display["result"] = dis_user_search_list($params);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
+  
+} else if ($action == 'sel_batch_users') {
+///////////////////////////////////////////////////////////////////////////////
+  $display["search"] = html_user_search_form($params);
+  $display["result"] = dis_user_search_list($params);
+  
+} else if ($action == 'edit_batch_values') {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = html_user_batch_form($params);
+  
+} else if ($action == 'batch_processing') {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_batch_processing_data($params)) {
+    $users_id_error = run_query_user_data_batch($params);
+    $users_id = array_diff($params['data-u-id'], $users_id_error);    
+    $retour = run_query_batch_processing_update($params, $users_id);
+    if ($retour) {
+      $display['msg'] .= display_ok_msg("$l_header_batch : $l_update_ok");
+      if (sizeof($users_id_error) > 0) {
+        check_users_error_data($params, $users_id_error);
+        $display["msg"] .= display_warn_msg($err['msg'], false);
+      }
+    } else {
+      $display['msg'] .= display_err_msg("$l_header_batch : $l_update_error");
+      $display['detail'] = html_user_batch_form($params);
+    }
+  } else {
+    $display["msg"] .= display_warn_msg($err['msg'], false);
+    $display["detail"] = html_user_batch_form($params);
+  }
 }
 
 of_category_user_action_switch($module, $action, $params);
@@ -329,7 +369,7 @@ function get_user_action() {
   global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin,$l_header_import;
-  global $l_header_upd_group,$l_header_admin, $l_header_reset;
+  global $l_header_upd_group,$l_header_admin, $l_header_reset, $l_header_batch;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   
   of_category_user_module_action('user');
@@ -496,7 +536,35 @@ function get_user_action() {
     'Right'    => $cright_read_admin,
     'Condition'=> array ('all')
                                                  );
+                                                 
+// Search Batch user : Users selection
+  $actions['user']['search_batch_user'] = array (
+    'Name'     => $l_header_batch,
+    'Url'      => "$path/user/user_index.php?action=search_batch_user&amp;next_action=sel_batch_users",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('all')
+                                                 );
 
+// Choose batch values
+  $actions['user']['sel_batch_users'] = array (
+    'Url'      => "$path/user/user_index.php?action=sel_batch_users",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array('None')
+    );
+    
+// Edit batch values
+  $actions['user']['edit_batch_values'] = array (
+    'Url'      => "$path/user/user_index.php?action=edit_batch_values",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array('None')
+    );
+    
+// Batch processing
+  $actions['user']['batch_processing'] = array (
+    'Url'	   => "$path/user/user_index.php?action=batch_processing",
+    'Right'	   => $cright_write_admin,
+    'Condition'=> array('None')
+  );
 }
 
 

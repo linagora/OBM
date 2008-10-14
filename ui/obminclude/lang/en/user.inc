@@ -59,6 +59,10 @@ $l_reset = "Reset user's preferences";
 $l_delete = "Delete the User";
 $l_add = "Add these users";
 
+$l_edit_users = "Edit users properties";
+
+$l_do_batch_processing = "Do batch processing";
+
 // Messages
 $l_no_display = "Fill the search fields and press < Find > to retrieve the users";
 $l_found = "users found";
@@ -102,6 +106,8 @@ $l_image_size_error = "The photo image max size is 96px x 96px and must not exce
 $l_err_delegation_target_outside_domain = "The delegation target must be in the domain delegation !";
 $l_err_delegation_target_outside_target = "The delegation target must be in your delegation target !";
 $l_err_delegation_target_profile = "This profile don't support delegation target !";
+
+$l_batch_no_user_error = "Any users for batch processing is selected";
 
 $l_add_users = "Add users";
 
