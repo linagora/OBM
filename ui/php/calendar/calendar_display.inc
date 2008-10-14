@@ -449,7 +449,6 @@ function html_calendar_bar_date_selector($calendar) {
     if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "<tr>\n";
     $day = $current->get(Of_Date::DAY);
     $iso = $current->getURL();
-    $check_month = of_date_get_month($start_day);
     if ($current->isToday()) {
       $klass = 'highlight';
     } elseif ($current->compareMonth($date)!= 0) {
@@ -607,8 +606,8 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
   $current_time = $start_time;
   $i = 0;
   $current = clone $date;
-  $end = clone $date;
-  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1);
+  $end = clone $calendar['date'];
+  $end->addMonth(1)->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0)->addWeek(1);  
   while($current->compare($end) < 0) {
     $iso = $current->getURL();
     $day = $current->get(Of_Date::DAY);
@@ -1408,11 +1407,10 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
     ksort($ocs);
     foreach($ocs as $key => $occurrence) {
       $current = new Of_Date($key);  
-      if ($i%2 == 0) $klass = "pair"; else $class = '';
+      if ($i%2 == 0) $klass = "pair"; else $klass = '';
       $i ++;
       $label = $current->get(Of_Date::WEEKDAY_NARROW);
-      if ($current->isToday())$class="class=\"highlight\"";
-
+      if ($current->isToday())$klass="class=\"highlight\"";
       $dis_events .= "
         <tr class=\"$klass\">
           <td><a href=\"calendar_index.php?cal_range=day&amp;date=".$current->getURL()."\">$label</a></td>
@@ -1870,6 +1868,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
   $date = clone $calendar['date'];
   $date->setDay(1);
   $current = clone $date;
+  $current->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addMonth(1);
 
@@ -1885,7 +1884,6 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
     $cats_color[$cat_info['label']] = $colors[$key];
   }
   $current_time = $start_time;
-
 
 
   $day_amount = 0;

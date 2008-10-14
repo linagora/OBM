@@ -16,6 +16,7 @@ include("$obminclude/global.inc");
 $params = get_obm_params();
 include_once('obm_query.inc');
 require("$obminclude/of/of_right.inc");
+require("$obminclude/of/of_date.inc");
 
 $OBM_Session = $params['OBM_Session'];
 if ($action == '') { $action = 'home'; }
@@ -172,74 +173,59 @@ function dis_logout_detail() {
 // Display The calendar specific portal layer.                               //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_portal() {
-  global $ico_big_calendar,$path;
+  global $ico_big_calendar,$path,$ccalendar_first_hour;
   global $l_module_calendar,$l_daysofweekfirst,$l_my_calendar,$l_waiting_events;
   global $obm, $ccalendar_weekstart, $day_duration, $modules;
 
   $obm_q = run_query_calendar_waiting_events() ;
   $num = $obm_q->num_rows();
 
-  $ts_date = time();  
-  $this_month = of_date_get_month($ts_date);
-  $this_year = of_date_get_year($ts_date);
-  $start_time = get_calendar_date_day_of_week(strtotime("$this_year-$this_month-01"), $ccalendar_weekstart);
-  $end_time = strtotime('+1 month +6 days', $start_time);
-
-  $current_time = $start_time; 
+  $date = new Of_Date();
+  $start = clone $date;
+  $start->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $end = clone $start;
+  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1)->setHour(0)->setMinute(0)->setSecond(0);
   $calendar_entity['user'] = array($obm['uid'] => array('dummy'));
-  calendar_events_model($start_time,$end_time, $calendar_entity);
+  calendar_events_model($start,$end, $calendar_entity);
   $of = &OccurrenceFactory::getInstance();
-  $whole_month = TRUE;
-  $num_of_events = 0;
 
   // Minicalendar
-  $i = 0;
-  do {
-    if ($i == 0) $dis_minical .= '<tr>';
-    $day = date ('j', $current_time);
-    $iso_day = of_isodate_format($current_time);
-    $check_month = of_date_get_month($current_time);
-    $have_occurrence = $of->periodHaveOccurrences(strtotime($iso_day), $day_duration);
+  // Minicalendar
+  $current = clone $start;
+  $current->setHour(0)->setMinute(0)->setSecond(0);
+  while($current->compare($end) < 0) {
+    if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "<tr>\n";
+    $day = $current->get(Of_Date::DAY);
+    $iso = $current->getURL();
+    $have_occurrence = $of->periodHaveOccurrences($current);
     if ($have_occurrence) {
       $klass = 'hyperlight';
     } else {
       $klass = '';
+    }    
+    if ($current->isToday()) {
+      $klass .= ' highlight';
+    } elseif ($current->compareMonth($date)!= 0) {
+      $klass .= ' downlight';
     }
-    if ($check_month != $this_month) {
-      $dis_minical .= "<td class=\"downlight $klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?cal_range=day&amp;date=$iso_day'\"
-        onmouseout=\"this.className='downlight $klass'\" onmouseover=\"this.className='hover'\">
-        $day
-        </td>";
-    } else {
-      if (of_isodate_format() == $iso_day) {
-        $dis_minical .= "<td class=\"highlight $klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?cal_range=day&amp;date=$iso_day'\" 
-          onmouseout=\"this.className='highlight $klass'\" onmouseover=\"this.className='hover'\">
-          $day
-          </td>";
-      } else {
-        $dis_minical .= "<td class=\"$klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?cal_range=day&amp;date=$iso_day'\" 
-          onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\">
-          $day
-          </td>";
-      }
-    }
-    $current_time = strtotime('+1 day', $current_time);
-    $i++;
-    if ($i == 7) {
-      $dis_minical .= "</tr>\n";
-      $i = 0;
-      $checkagain = of_date_get_month($current_time);
-      if ($checkagain != $this_month) $whole_month = FALSE;
-    }
-  } while ($whole_month == TRUE);
-  
-  // Minicalendar Head
-  for ($i=0; $i<7; $i++) {
-    $day_num = date('w', $current_time);
-    $day = $l_daysofweekfirst[$day_num];
-    $dis_minical_head .= "<td class=\"calendarHead\">$day</td>\n";
-    $current_time = strtotime('+1 day', $current_time); 
+    $dis_minical .= "<td class=\"$klass\" onclick=\"window.location.href='$path/calendar/calendar_index.php?cal_range=day&amp;date=$iso'\"
+      onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\">
+      $day
+      </td>";
+    $current->addDay(1);
+    if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "</tr>\n";
   } 
+
+  $current = clone $start;
+  $current->setWeekday($ccalendar_weekstart);
+  $end = clone $current;
+  $end->addDay(6);
+  // Minicalendar Head
+  while($current->compare($end) <= 0) {
+    $day = $current->get(Of_Date::WEEKDAY_NARROW);
+    $dis_minical_head .= "<td>$day</td>\n";
+    $current->addDay(1);
+  }
   $block = "
    <div class=\"summaryBox\"> 
    <h1><img src=\"$ico_big_calendar\" alt=\"Calendar\" />$l_module_calendar</h1>

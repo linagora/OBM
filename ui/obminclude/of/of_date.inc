@@ -144,7 +144,7 @@ class Of_Date extends DateTime {
     'outputdate' => 'd/m/Y',
     'inputdatetime' => 'd/m/Y H:i:s',
     'inputdate' => 'd/m/Y',
-    'timezone' => 'America/Phoenix'
+    'timezone' => 'Europe/Paris'
   );
 
   private $_error;
@@ -1198,7 +1198,7 @@ class Of_Date extends DateTime {
     }
     $data = self::_parse($parts, $date, $format);
     if((isset($data['day']) && $data['day'] !== FALSE) ||
-      (isset($data['day']) && $data['month'] !== FALSE) ||
+      (isset($data['month']) && $data['month'] !== FALSE) ||
       (isset($data['year']) && $data['year'] !== FALSE)) {
       $day = (isset($data['day']) && $data['day'] !== FALSE)?$data['day']:$this->format(self::DAY);
       $month = (isset($data['month']) && $data['month'] !== FALSE)?$data['month']:$this->format(self::MONTH_SHORT);
@@ -1217,6 +1217,7 @@ class Of_Date extends DateTime {
       (isset($data['weekday']) && $data['weekday'] !== FALSE)) {
       $week = (isset($data['week']) && $data['week'] !== FALSE)?$data['week']:$this->format(self::WEEK);
       $weekday = (isset($data['weekday']) && $data['weekday'] !== FALSE)?$data['weekday']:$this->format(self::WEEKDAY_DIGIT);
+      $weekday = ($weekday == 0)?7:$weekday;
       $this->setISODate($this->format('Y'),$week, $weekday);
     }  
     return $this;
@@ -1477,6 +1478,18 @@ class Of_Date extends DateTime {
     return $dateArray;
   }
 
+
+  /**
+   * eval 
+   * 
+   * @param mixed $string 
+   * @access public
+   * @return void
+   */
+  function custom($string) {
+    $this->modify($string);
+    return $this;
+  }
 
   /**
    * Convert a Of_Date into an array 

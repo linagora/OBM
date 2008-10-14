@@ -30,7 +30,7 @@ include("$obminclude/global.inc");
 $params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
-require_once("$obminclude/of/of_date.php");
+require_once("$obminclude/of/of_date.inc");
 $params = get_calendar_params();
 
 // Get user preferences if set for hour display range 
@@ -153,7 +153,6 @@ if (($action == 'insert') || ($action == 'update')
 $params['entity'] = $cal_entity_id;
 $params['category_filter'] = $cal_category_filter;
 //FIXME
-$y = new Of_Date();
 $x = new Of_Date();
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //

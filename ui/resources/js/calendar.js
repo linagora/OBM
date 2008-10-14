@@ -963,7 +963,7 @@ Obm.CalendarManager = new Class({
         if(ivent.state == 'A') {
           obm.calendarManager.unregister(id);
           evt.event.id = ivent.id;
-          evt.setTzOffset(ievent.tzOffset);
+          evt.setTzOffset(ivent.tzOffset);
           evt.setDuration(ivent.duration);
           evt.setTime(ivent.time);
           obm.calendarManager.register(id);           
