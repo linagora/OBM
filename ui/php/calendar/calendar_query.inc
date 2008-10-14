@@ -2262,7 +2262,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
     ORDER BY calendarevent_date";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_conflict_events(()');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
 
   return $obm_q;
 }
