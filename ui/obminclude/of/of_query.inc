@@ -1604,6 +1604,7 @@ function get_entity_info($id, $entity) {
     $entiy = 'user';
   }
   $id = sql_parse_id($id, true);
+
   if ($entity == 'user') {
 
     $table_entity = 'UserObm';
@@ -1618,7 +1619,7 @@ function get_entity_info($id, $entity) {
     $c_email = 'userobm_email';
     $c_domain = 'userobm_domain_id';
     $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, $c_id as entitydata_id, 'user' as entity_kind
-      FROM UserObm WHERE userobm_id='$id'";
+      FROM UserObm WHERE userobm_id $id";
   } elseif ($entity == 'group') {
     $table_entity = 'UGroup';
     $c_id = 'group_id';
@@ -1626,7 +1627,7 @@ function get_entity_info($id, $entity) {
     $c_email = 'group_email';
     $c_domain = 'group_domain_id';
     $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id,v$c_id as entitydata_id, 'group' as entity_kind
-      FROM UGroup WHERE group_id='$id'";
+      FROM UGroup WHERE group_id $id";
   } elseif ($entity == 'resource') {
     $table_entity = 'Resource';
     $c_id = 'resource_id';
@@ -1634,7 +1635,7 @@ function get_entity_info($id, $entity) {
     $c_email = 'NULL';
     $c_domain = 'resource_domain_id';
     $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, $c_id as entitydata_id, 'resource' as entity_kind
-      FROM Resource WHERE resource_id='$id'";
+      FROM Resource WHERE resource_id $id";
   } elseif ($entity == 'mailshare') {
     $table_entity = 'MailShare';
     $c_id = 'mailshare_id';
@@ -1642,7 +1643,7 @@ function get_entity_info($id, $entity) {
     $c_email = 'mailshare_email';
     $c_domain = 'mailshare_domain_id';
     $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, $c_id as entitydata_id, 'mailshare' as entity_kind
-      FROM MailShare WHERE mailshare_id='$id'";
+      FROM MailShare WHERE mailshare_id $id";
   }
 
   $query = "SELECT Entity.*, domain_name as entity_domain
