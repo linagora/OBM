@@ -121,6 +121,10 @@ $l_err_delegation_target_profile = "Ce profil d'utilisateur ne peut avoir de dé
 $l_fill_vacation_datebegin = "Vous devez renseigner la date de début du message d'absence avant de valider";
 $l_fill_vacation_dateend = "Vous devez renseigner la date de fin du message d'absence avant de valider";
 $l_batch_no_user_error = "Aucun utilisateur n'est sélectionné pour le traitement par lots";
+$l_phone_error = "Le numéro de téléphone est incorrect";
+$l_fax_error = "Le numéro de fax est incorrect";
+$l_zip_error = "Le code postal est incorrect";
+$l_expresspostal_error = "Cedex est incorrect";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";

@@ -2161,10 +2161,12 @@ function get_profile_list() {
 }
 
 function check_batch_processing_data($params) {
+  
   global $err;
   global $l_batch_no_user_error, $l_nomade_without_mail_perms, $l_nomade_perms_error, $l_nomade_local_copy_error, $l_quota_error;
   global $l_user;
-  global $php_regexp_quota;
+  global $php_regexp_quota, $php_regexp_phone, $php_regexp_fax, $php_regexp_zip,$php_regexp_number, $php_regexp_profile_name;
+  global $l_phone_error, $l_fax_error, $l_zip_error, $l_expresspostal_error, $l_lname_error;
   
   $u_id = $params['data-u-id'];
   
@@ -2201,12 +2203,60 @@ function check_batch_processing_data($params) {
     $err['msg'] = "$mail_quota : $l_quota_error";
     return false;
   }
+  
+  // check data
 
+  // Profile
+  if ($params['profile_name'] != '' && !preg_match($php_regexp_profile_name, $params['profile_name'])) {
+    $err['msg'] = "$params[profile_name] : $l_lname_error";
+    return false;
+  }
+  // Phone
+  if ($params['phone'] != '' && !preg_match($php_regexp_phone, $params['phone'])) {
+    $err['msg'] = "$params[phone] : $l_phone_error";
+    return false;
+  }
+  
+  // Phone2
+  if ($params['phone2'] != '' && !preg_match($php_regexp_phone, $params['phone2'])) {
+    $err['msg'] = "$params[phone2] : $l_phone_error";
+    return false;
+  }
+  
+  // Mobile
+  if ($params['mobile'] != '' && !preg_match($php_regexp_phone, $params['mobile'])) {
+    $err['msg'] = "$params[mobile] : $l_phone_error";
+    return false;
+  }
+  
+  // fax
+  if ($params['fax'] != '' && !preg_match($php_regexp_fax, $params['fax'])) {
+    $err['msg'] = "$params[fax] : $l_fax_error";
+    return false;
+  }
+  
+  // fax2
+  if ($params['fax2'] != '' && !preg_match($php_regexp_fax, $params['fax2'])) {
+    $err['msg'] = "$params[fax2] : $l_fax_error";
+    return false;
+  }
+  
+  // zipcode
+  if ($params['zipcode'] != '' && !preg_match($php_regexp_zip, $params['zipcode'])) {
+    $err['msg'] = "$params[zipcode] : $l_zip_error";
+    return false;
+  }
+  
+  // Express postal
+  if ($params['expresspostal'] != '' && !preg_match($php_regexp_number, $params['expresspostal'])) {
+    $err['msg'] = "$params[expresspostal] : $l_expresspostal_error";
+    return false;
+  }
   return true;
 }
 
 function run_query_user_data_batch($params) {
-  
+
   $mail_perms = $params['mail_perms'];
   $mail_quota = $params['mail_quota'];
   $nomade_perms = $params['nomade_perms'];
@@ -2403,8 +2453,10 @@ function run_query_batch_processing_update($params, $users_id) {
 
 function bool($var) {
     switch (strtolower($var)) {
-        case ("true"): return true;
-        case ("false"): return false;
+        case ("true"):
+        case (true): return true;
+        case ("false"):
+        case (false): return false;
         default: return false;
     }
 }

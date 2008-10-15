@@ -111,6 +111,11 @@ $l_batch_no_user_error = "Any users for batch processing is selected";
 
 $l_add_users = "Add users";
 
+$l_phone_error = "The phone number is not correct";
+$l_fax_error = "The fax number is not correct";
+$l_zip_error = "Zip code is not correct";
+$l_expresspostal_error = "Express postal code is incorrect";
+
 // JavaScript Messages (special characters must be escaped with \ -> \\)
 $l_fill_login = "You have to fill the login before submitting.";
 $l_fill_password = "You have to fill the password before submitting.";

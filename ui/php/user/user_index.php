@@ -24,30 +24,52 @@
 // - ext_get_ids     --                -- select multiple users (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
+$debug = 1;
 $path = "..";
 $module = "user";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
+
+$acts = array('help', 'batch_processing');
+
 include("$obminclude/global.inc");
+
 $params = get_user_params();
-page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
-include("$obminclude/global_pref.inc");
+$mode = $params["mode"];
+
+
+
 require_once("$obminclude/of/of_category.inc");
-require("../profile/profile_query.inc");
-require("user_display.inc");
-require("user_query.inc");
-require("user_js.inc");
-require("$obminclude/of/of_right.inc"); // needed by call from calendar
 
-// detailconsult can be accessed without user_id (-> display current user)
-if (($action == "detailconsult") && (! $params["user_id"])) $params["user_id"] = $obm["uid"];
-
-get_user_action();
-$perm->check_permissions($module, $action);
-
-update_last_visit("user", $params["user_id"], $action);
-
-page_close();
+switch ($mode) {
+  case "txt":
+    include("$obminclude/global_pref.inc");
+    require("../profile/profile_query.inc");
+    require("user_display.inc");
+    require("user_query.inc");
+    $retour = parse_user_arg($argv);
+    if (!$retour) { exit; }
+    break;
+  case "html":
+    page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+    include("$obminclude/global_pref.inc");
+    require("../profile/profile_query.inc");
+    require("user_display.inc");
+    require("user_query.inc");
+    require("user_js.inc");
+    require("$obminclude/of/of_right.inc"); // needed by call from calendar
+    
+    // detailconsult can be accessed without user_id (-> display current user)
+    if (($action == "detailconsult") && (! $params["user_id"])) $params["user_id"] = $obm["uid"];
+    
+    get_user_action();
+    $perm->check_permissions($module, $action);
+    
+    update_last_visit("user", $params["user_id"], $action);
+    
+    page_close();
+    break;
+}
 
 // get Profile list (name and id)
 $params['profiles'] = get_profile_list();
@@ -292,25 +314,40 @@ if ($action == "ext_get_ids") {
       $display['detail'] = html_user_batch_form($params);
     }
   } else {
-    $display["msg"] .= display_warn_msg($err['msg'], false);
+    $display["msg"] .= display_err_msg($err['msg'], false);
     $display["detail"] = html_user_batch_form($params);
   }
 }
 
-of_category_user_action_switch($module, $action, $params);
+switch($params['mode']) {
+  case 'txt':
+    $display["msg"] = str_replace("<br /></p>", "\n\n", $display["msg"]);
+    $display["msg"] = str_replace("<br />", "\nWARNING : ", $display["msg"]);
+    $display["msg"] = str_replace("&nbsp;", " ", $display["msg"]);
+    $display["msg"] = str_replace("</p>", "\n", $display["msg"]);
+    $display["msg"] = str_replace("<p class=\"message ok\">", "OK : ", $display["msg"]);
+    $display["msg"] = str_replace("<p class=\"message warning\">", "WARNING : ", $display["msg"]);
+    $display["msg"] = str_replace("<p class=\"message error\">", "ERROR : ", $display["msg"]);
+    echo "\n$display[msg]";
+    echo "bye...\n";
+    break;
+  case 'html':
+    of_category_user_action_switch($module, $action, $params);
 
-///////////////////////////////////////////////////////////////////////////////
-// Display
-///////////////////////////////////////////////////////////////////////////////
-$display['head'] = display_head($l_user);
-if (! $params['popup']) {
-  update_user_action();
-  $display['header'] = display_menu($module);
+    ///////////////////////////////////////////////////////////////////////////////
+    // Display
+    ///////////////////////////////////////////////////////////////////////////////
+    $display['head'] = display_head($l_user);
+    if (! $params['popup']) {
+      update_user_action();
+      $display['header'] = display_menu($module);
+    }
+    $display['end'] = display_end();
+    
+    display_page($display);
+        
+    break;
 }
-$display['end'] = display_end();
-
-display_page($display);
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Stores User parameters transmited in $params hash
@@ -357,6 +394,10 @@ function get_user_params() {
 
     $params['email'] = implode("\r\n", $email_aliases);
   }
+  
+  if ($params['mode'] == "" || $params['mode'] != "html") {
+    $params['mode'] = "txt";
+  }
 
   return $params;
 }
@@ -377,14 +418,14 @@ function get_user_action() {
 // Index
   $actions['user']['index'] = array (
     'Name'     => $l_header_find,
-    'Url'      => "$path/user/user_index.php?action=index",
+    'Url'      => "$path/user/user_index.php?action=index&amp;mode=html",
     'Right'    => $cright_read,
     'Condition'=> array ('all')
                                     );
 
 // Get Ids
   $actions['user']['ext_get_ids'] = array (
-    'Url'      => "$path/user/user_index.php?action=ext_get_ids",
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;mode=html",
     'Right'    => $cright_read,
     'Condition'=> array ('none'),
     'popup' => 1
@@ -392,7 +433,7 @@ function get_user_action() {
                                     
 // Get Ids
   $actions['user']['ext_get_id'] = array (
-    'Url'      => "$path/user/user_index.php?action=ext_get_id",
+    'Url'      => "$path/user/user_index.php?action=ext_get_id&amp;mode=html",
     'Right'    => $cright_read,
     'Condition'=> array ('none'),
     'popup' => 1
@@ -401,34 +442,34 @@ function get_user_action() {
 // New
   $actions['user']['new'] = array (
     'Name'     => $l_header_new,
-    'Url'      => "$path/user/user_index.php?action=new",
+    'Url'      => "$path/user/user_index.php?action=new&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display','dispref_display','dispref_level', 'delete')
                                   );
 
 // Search
   $actions['user']['search'] = array (
-    'Url'      => "$path/user/user_index.php?action=search",
+    'Url'      => "$path/user/user_index.php?action=search&amp;mode=html",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                   );
 // Search
   $actions['user']['ext_search'] = array (
-    'Url'      => "$path/user/user_index.php?action=ext_search",
+    'Url'      => "$path/user/user_index.php?action=ext_search&amp;mode=html",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
   );  
 
 // Get user id from external window (js)
   $actions['user']['getsearch'] = array (
-    'Url'      => "$path/user/user_index.php?action=search",
+    'Url'      => "$path/user/user_index.php?action=search&amp;mode=html",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                   );
 // Detail Consult
   $actions['user']['detailconsult'] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/user/user_index.php?action=detailconsult&amp;user_id=".$params['user_id'],
+    'Url'      => "$path/user/user_index.php?action=detailconsult&amp;user_id=".$params['user_id']."&amp;mode=html",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'group_consult', 'group_update')
                                   );
@@ -436,21 +477,21 @@ function get_user_action() {
 // Detail Update
   $actions['user']['detailupdate'] = array (
      'Name'     => $l_header_update,
-     'Url'      => "$path/user/user_index.php?action=detailupdate&amp;user_id=".$params['user_id'],
+     'Url'      => "$path/user/user_index.php?action=detailupdate&amp;user_id=".$params['user_id']."&amp;mode=html",
      'Right'    => $cright_write_admin,
      'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update')
                                      	   );
 
 // Insert
   $actions['user']['insert'] = array (
-    'Url'      => "$path/user/user_index.php?action=insert",
+    'Url'      => "$path/user/user_index.php?action=insert&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
 // Update
   $actions['user']['update'] = array (
-    'Url'      => "$path/user/user_index.php?action=update",
+    'Url'      => "$path/user/user_index.php?action=update&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
@@ -458,14 +499,14 @@ function get_user_action() {
 // Group Consult
   $actions['user']['group_consult'] = array (
     'Name'     => $l_header_upd_group,
-    'Url'      => "$path/user/user_index.php?action=group_consult&amp;user_id=".$params['user_id'],
+    'Url'      => "$path/user/user_index.php?action=group_consult&amp;user_id=".$params['user_id']."&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update')
                                      );
 
 // Group Update
   $actions['user']['group_update'] = array (
-    'Url'      => "$path/user/user_index.php?action=group_update",
+    'Url'      => "$path/user/user_index.php?action=group_update&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                      );
@@ -473,7 +514,7 @@ function get_user_action() {
 // Reset
   $actions['user']['reset'] = array (
     'Name'     => $l_header_reset,
-    'Url'      => "$path/user/user_index.php?action=reset&amp;user_id=".$params['user_id'],
+    'Url'      => "$path/user/user_index.php?action=reset&amp;user_id=".$params['user_id']."&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'group_consult', 'group_update') 
                                     );
@@ -481,14 +522,14 @@ function get_user_action() {
 // Check Delete
   $actions['user']['check_delete'] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/user/user_index.php?action=check_delete&amp;user_id=".$params['user_id'],
+    'Url'      => "$path/user/user_index.php?action=check_delete&amp;user_id=".$params['user_id']."&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update') 
                                      	   );
 
 // Delete
   $actions['user']['delete'] = array (
-    'Url'      => "$path/user/user_index.php?action=delete",
+    'Url'      => "$path/user/user_index.php?action=delete&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                      );
@@ -496,20 +537,20 @@ function get_user_action() {
 // Display
   $actions['user']['display'] = array (
     'Name'     => $l_header_display,
-    'Url'      => "$path/user/user_index.php?action=display",
+    'Url'      => "$path/user/user_index.php?action=display&amp;mode=html",
     'Right'    => $cright_read,
     'Condition'=> array ('all')
                                       	 );
 
 // Display
   $actions['user']['dispref_display'] = array (
-    'Url'      => "$path/user/user_index.php?action=dispref_display",
+    'Url'      => "$path/user/user_index.php?action=dispref_display&amp;mode=html",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                       	 );
 // Display
   $actions['user']['dispref_level'] = array (
-    'Url'      => "$path/user/user_index.php?action=dispref_level",
+    'Url'      => "$path/user/user_index.php?action=dispref_level&amp;mode=html",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                       	 );
@@ -517,14 +558,14 @@ function get_user_action() {
 // Import
   $actions['user']['import'] = array (
     'Name'     => $l_header_import,
-    'Url'      => "$path/user/user_index.php?action=import",
+    'Url'      => "$path/user/user_index.php?action=import&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('all')
                                                  );
 
 // Import file
   $actions['user']['import_file'] = array (
-    'Url'      => "$path/user/user_index.php?action=import_file",
+    'Url'      => "$path/user/user_index.php?action=import_file&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                                  );
@@ -532,7 +573,7 @@ function get_user_action() {
 // Admin
   $actions['user']['admin'] = array (
     'Name'     => $l_header_admin,
-    'Url'      => "$path/user/user_index.php?action=admin",
+    'Url'      => "$path/user/user_index.php?action=admin&amp;mode=html",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('all')
                                                  );
@@ -540,28 +581,28 @@ function get_user_action() {
 // Search Batch user : Users selection
   $actions['user']['search_batch_user'] = array (
     'Name'     => $l_header_batch,
-    'Url'      => "$path/user/user_index.php?action=search_batch_user&amp;next_action=sel_batch_users",
+    'Url'      => "$path/user/user_index.php?action=search_batch_user&amp;next_action=sel_batch_users&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('all')
                                                  );
 
 // Choose batch values
   $actions['user']['sel_batch_users'] = array (
-    'Url'      => "$path/user/user_index.php?action=sel_batch_users",
+    'Url'      => "$path/user/user_index.php?action=sel_batch_users&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array('None')
     );
     
 // Edit batch values
   $actions['user']['edit_batch_values'] = array (
-    'Url'      => "$path/user/user_index.php?action=edit_batch_values",
+    'Url'      => "$path/user/user_index.php?action=edit_batch_values&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array('None')
     );
     
 // Batch processing
   $actions['user']['batch_processing'] = array (
-    'Url'	   => "$path/user/user_index.php?action=batch_processing",
+    'Url'	   => "$path/user/user_index.php?action=batch_processing&amp;mode=html",
     'Right'	   => $cright_write_admin,
     'Condition'=> array('None')
   );
@@ -577,22 +618,228 @@ function update_user_action() {
   $id = $params['user_id'];
   if ($id > 0) {
     // Detail Consult
-    $actions['user']['detailconsult']['Url'] = "$path/user/user_index.php?action=detailconsult&amp;user_id=$id";
+    $actions['user']['detailconsult']['Url'] = "$path/user/user_index.php?action=detailconsult&amp;user_id=$id&amp;mode=html";
     $actions['user']['detailconsult']['Condition'][] = 'insert';
 
     // Detail Update
-    $actions['user']['detailupdate']['Url'] = "$path/user/user_index.php?action=detailupdate&amp;user_id=$id";
+    $actions['user']['detailupdate']['Url'] = "$path/user/user_index.php?action=detailupdate&amp;user_id=$id&amp;mode=html";
     $actions['user']['detailupdate']['Condition'][] = 'insert';
 
     // Check Delete
-    $actions['user']['check_delete']['Url'] = "$path/user/user_index.php?action=check_delete&amp;user_id=$id";
+    $actions['user']['check_delete']['Url'] = "$path/user/user_index.php?action=check_delete&amp;user_id=$id&amp;mode=html";
     $actions['user']['check_delete']['Condition'][] = 'insert';
 
     // Group Consult
-    $actions['user']['group_consult']['Url'] = "$path/user/user_index.php?action=group_consult&amp;user_id=$id";
+    $actions['user']['group_consult']['Url'] = "$path/user/user_index.php?action=group_consult&amp;user_id=$id&amp;mode=html";
     $actions['user']['group_consult']['Condition'][] = 'insert';
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Argument parsing                                                         //
+///////////////////////////////////////////////////////////////////////////////
+function parse_user_arg($argv) {
+  global $debug, $acts, $target_modules;
+  global $params, $action, $module;
+
+  $params["to_update_phone"] = false;
+  $params["to_update_phone2"] = false;
+  $params["to_update_mobile"] = false;
+  $params["to_update_fax"] = false;
+  $params["to_update_fax2"] = false;
+  $params["to_update_company"] = false;
+  $params["to_update_direction"] = false;
+  $params["to_update_service"] = false;
+  $params["to_update_address1"] = false;
+  $params["to_update_address2"] = false;
+  $params["to_update_address3"] = false;
+  $params["to_update_zipcode"] = false;
+  $params["to_update_town"] = false;
+  $params["to_update_expresspostal"] = false;
+  
+  // We skip the program name [0]
+  next($argv);
+  while (list ($nb, $val) = each ($argv)) {
+    switch($val) {
+    case '-h':
+    case '--help':
+      $params["action"] = "help";
+      dis_user_help($params["mode"]);
+      return true;
+      break;
+    case '-a':
+      list($nb2, $val2) = each ($argv);
+      if (in_array($val2, $acts)) {
+        $params["action"] = $val2;
+        if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
+      } else {
+	    dis_user_command_use("Invalid action ($val2)");
+	    return false;
+      }
+      break;
+    case '-u':
+      list($nb2, $val2) = each ($argv);
+      $params["data-u-id"] = get_users_id($nb2, $argv);
+      if ($params["data-u-id"] === false) {
+        dis_user_command_use("Invalid user id");
+        return false;
+      }
+      break;
+    case '-A':
+      list($nb2, $val2) = each ($argv);
+      $params['archive'] = get_int_from_bool($val2);
+      if ($params['archive'] === false) {
+        dis_user_command_use("Invalid archive value ($val2)");
+        return false;
+      }
+      break;
+    case '-P':
+      list($nb2, $val2) = each($argv);
+      $params['profile_name'] = $val2;
+      break;
+    case '-M':
+      list($nb2, $val2) = each ($argv);
+      $params['mail_perms'] = get_int_from_bool($val2);
+      if ($params['mail_perms'] === false) {
+        dis_user_command_use("Invalid mail permissions value ($val2)");
+        return false;
+      }
+      break;
+    case '-Mq':
+      list($nb2, $val2) = each ($argv);
+      $params['mail_quota'] = $val2;
+      break;
+    case '-N':
+      list($nb2, $val2) = each ($argv);
+      $params['nomade_perms'] = get_int_from_bool($val2);
+      if ($params['nomade_perms'] === false) {
+        dis_user_command_use("Invalid nomade permissions value ($val2)");
+        return false;
+      }
+      break;
+    case '-Ne':
+      list($nb2, $val2) = each ($argv);
+      $params['nomade_enable'] = get_int_from_bool($val2);
+      if ($params['nomade_enable'] === false) {
+        dis_user_command_use("Invalid nomade enable value ($val2)");
+        return false;
+      }
+      break;
+    case '-Nc':
+      list($nb2, $val2) = each ($argv);
+      $params['nomade_local_copy'] = get_int_from_bool($val2);
+      if ($params['nomade_local_copy'] === false) {
+        dis_user_command_use("Invalid nomade local copy value ($val2)");
+        return false;
+      }
+      break;
+    case '-phone':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_phone"] = true;
+      $params['phone'] = $val2;
+      break;
+    case '-phone2':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_phone2"] = true;
+      $params['phone2'] = $val2;
+      break;
+    case '-mobile':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_mobile"] = true;
+      $params['mobile'] = $val2;
+      break;
+    case '-fax':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_fax"] = true;
+      $params['fax'] = $val2;
+      break;
+    case '-fax2':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_fax2"] = true;
+      $params['fax2'] = $val2;
+      break;
+    case '-company':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_company"] = true;
+      $params['company'] = $val2;
+      break;
+    case '-direction':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_direction"] = true;
+      $params['direction'] = $val2;
+      break;
+    case '-service':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_service"] = true;
+      $params['service'] = $val2;
+      break;
+    case '-address':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_address1"] = true;
+      $params['address1'] = $val2;
+      break;
+    case '-address2':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_address2"] = true;
+      $params['address2'] = $val2;
+      break;
+    case '-address3':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_address3"] = true;
+      $params['address3'] = $val2;
+      break;
+    case '-zipcode':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_zipcode"] = true;
+      $params['zipcode'] = $val2;
+      break;
+    case '-town':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_town"] = true;
+      $params['town'] = $val2;
+      break;
+    case '-expresspostal':
+      list($nb2, $val2) = each ($argv);
+      $params["to_update_expresspostal"] = true;
+      $params['expresspostal'] = $val2;
+      break;
+    }
+  }
+
+  if (! $params["action"]) $params["action"] = "batch_processing";
+  $action = $params["action"];
+  return true;
+}
+
+function get_users_id($begin_index, $args) {
+  $str_users_id = "";
+  for ($end_index=$begin_index; $end_index<sizeof($args); $end_index++) {
+    $coma_pos = strpos($args[$end_index], ",");
+    $coma_pre_pos = strpos($args[$end_index-1], ",");
+    if (strpos($args[$end_index], "-") === 0) {
+      break;
+    }
+    if ($coma_pos!==false || $coma_pos===false && $coma_pre_pos!==false || $coma_pos===false && $end_index===$begin_index) {
+      $str_users_id .= $args[$end_index];
+    }
+  }
+  $users_id = explode(",", $str_users_id);
+  foreach ($users_id as $u_id) {
+    if (intval($u_id)==0) {
+      return false;
+    }
+  }
+  return $users_id;
+}
+
+function get_int_from_bool($val) {
+  if ($val=='0'||$val=='false'||$val=='off') {
+    return '0';
+  } else if ($val=='1'||$val=='true'||$val=='on') {
+    return '1';
+  } else {
+    return false;
+  }
+}
 
 ?>
