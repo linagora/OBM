@@ -178,9 +178,6 @@ function html_profile_form($action, $params, $profile = array()) {
   return html_profile_superform($params, $action, $profile);
 }
 
-html_profile_consult($profile_q) {
-
-}
 
 
 
