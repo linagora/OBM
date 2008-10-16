@@ -10,6 +10,7 @@ require OBM::toolBox;
 require OBM::Tools::obmDbHandler;
 require OBM::Update::updateCyrusAcl;
 use OBM::Parameters::common;
+use OBM::Parameters::regexp;
 use Getopt::Long;
 
 

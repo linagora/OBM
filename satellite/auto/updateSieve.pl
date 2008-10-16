@@ -18,6 +18,7 @@ require OBM::toolBox;
 require OBM::Tools::obmDbHandler;
 require OBM::Update::updateSieve;
 use OBM::Parameters::common;
+use OBM::Parameters::regexp;
 use Getopt::Long;
 
 $ENV{PATH}=$automateOBM;
