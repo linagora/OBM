@@ -21,6 +21,7 @@ use OBM::Entities::commonEntities qw(
             );
 use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
+use OBM::Parameters::regexp;
 require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::Tools::obmDbHandler;

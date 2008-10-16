@@ -134,13 +134,13 @@ sub new {
 }
 
 
-sub destroy {
+sub DESTROY {
     my $self = shift;
 
     my $engines = $self->{"engine"};
     while( my( $engineType, $engine ) = each(%{$engines}) ) {
         if( defined($engine) ) {
-            $engine->destroy();
+            $engine->DESTROY();
         }
     }
 }
@@ -301,7 +301,7 @@ sub _doGlobalUpdate {
         $return = $updateMailSrv->init();
         if( $return ) {
             $return = $updateMailSrv->update( "add" );
-            $updateMailSrv->destroy();
+            $updateMailSrv->DESTROY();
     
             if( $return ) {
                 # Si tout s'est bien passé, il faut rétablir les connexions à Cyrus

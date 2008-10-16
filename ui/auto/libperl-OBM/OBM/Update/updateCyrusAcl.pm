@@ -107,9 +107,9 @@ sub update {
 }
 
 
-sub destroy {
+sub DESTROY {
     my $self = shift;
     my $cyrusEngine = $self->{"engine"}->{"cyrusEngine"};
 
-    $cyrusEngine->destroy();
+    $cyrusEngine->DESTROY();
 }

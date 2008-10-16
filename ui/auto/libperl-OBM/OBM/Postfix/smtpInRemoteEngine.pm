@@ -66,7 +66,7 @@ sub init {
 }
 
 
-sub destroy {
+sub DESTROY {
     my $self = shift;
 
     &OBM::toolBox::write_log( "[Postfix::smtpInRemoteEngine]: arret du moteur", "W" );

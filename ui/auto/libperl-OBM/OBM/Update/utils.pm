@@ -9,6 +9,7 @@ require Exporter;
 use strict;
 
 use OBM::Parameters::common;
+use OBM::Parameters::regexp;
 use OBM::Parameters::ldapConf;
 require OBM::toolBox;
 require OBM::Tools::obmDbHandler;

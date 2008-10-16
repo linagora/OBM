@@ -191,7 +191,7 @@ sub _dbDisconnect {
 }
 
 
-sub destroy {
+sub DESTROY {
     my $self = shift;
 
     $self->_dbDisconnect();

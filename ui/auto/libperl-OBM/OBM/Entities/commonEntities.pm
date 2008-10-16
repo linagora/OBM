@@ -86,7 +86,7 @@ sub isMailActive {
 
 
 sub makeEntityEmail {
-    require OBM::Parameters::common;
+    require OBM::Parameters::regexp;
     my $self = shift;
     my( $mailAddress, $mainDomain, $domainAlias ) = @_;
     my $totalEmails = 0;
@@ -101,13 +101,13 @@ sub makeEntityEmail {
     
     for( my $i=0; $i<=$#email; $i++ ) {
         SWITCH: {
-            if( $email[$i] =~ /$OBM::Parameters::common::regexp_email/ ) {
+            if( $email[$i] =~ /$OBM::Parameters::regexp::regexp_email/ ) {
                 $emails{$email[$i]} = 1;
                 $totalEmails++;
                 last SWITCH;
             }
 
-            if( $email[$i] =~ /$OBM::Parameters::common::regexp_email_left/ ) {
+            if( $email[$i] =~ /$OBM::Parameters::regexp::regexp_email_left/ ) {
                 $emails{$email[$i]."@".$mainDomain} = 1;
                 $totalEmails++;
 

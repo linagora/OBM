@@ -16,6 +16,7 @@ require OBM::toolBox;
 require OBM::Tools::obmDbHandler;
 require OBM::Update::updatePassword;
 use OBM::Parameters::common;
+use OBM::Parameters::regexp;
 use Getopt::Long;
 use Unicode::MapUTF8 qw(from_utf8);
 

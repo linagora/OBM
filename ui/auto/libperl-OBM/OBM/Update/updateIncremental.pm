@@ -133,13 +133,13 @@ sub new {
 }
 
 
-sub destroy {
+sub DESTROY {
     my $self = shift;
 
     my $engines = $self->{"engine"};
     while( my( $engineType, $engine ) = each(%{$engines}) ) {
         if( defined($engine) ) {
-            $engine->destroy();
+            $engine->DESTROY();
         }
     }
 }

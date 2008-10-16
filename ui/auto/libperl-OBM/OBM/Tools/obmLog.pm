@@ -77,7 +77,7 @@ sub writeLog {
 }
 
 
-sub destroy {
+sub DESTROY {
     my $self = shift;
 
     if( $self->{'logOpen'} ) {
@@ -161,7 +161,7 @@ writeLog ( $text, $level, $priority )
 
     if no 'level' set, '0' is used.
 
-destroy ()
+DESTROY ()
 
     close syslog connection
 

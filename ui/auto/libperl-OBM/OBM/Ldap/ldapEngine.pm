@@ -89,7 +89,7 @@ sub init {
         # On vérifie l'arboréscence
         &OBM::toolBox::write_log( "[Ldap::ldapEngine]: verification de l'arborescence de l'annuaire LDAP", "W" );
         if( !$self->checkLdapTree( $self->{"ldapStruct"} ) ) {
-            $self->destroy();
+            $self->DESTROY();
             return 0;
         }
     }
@@ -98,7 +98,7 @@ sub init {
 }
 
 
-sub destroy {
+sub DESTROY {
     my $self = shift;
 
     &OBM::toolBox::write_log( "[Ldap::ldapEngine]: arret du moteur", "W" );

@@ -74,7 +74,7 @@ sub _doRemoteConf {
         $return = $updateMailSrv->update();
     }
 
-    $updateMailSrv->destroy();
+    $updateMailSrv->DESTROY();
 
     return $return;
 }

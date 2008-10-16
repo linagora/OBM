@@ -63,7 +63,7 @@ sub init {
 }
 
 
-sub destroy {
+sub DESTROY {
     my $self = shift;
 
     &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: arret du moteur", "W" );
