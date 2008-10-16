@@ -5,6 +5,14 @@
 # Should saslauthd run automatically on startup? (default: no)
 START=yes
 
+# Description of this saslauthd instance. Recommended.
+# (suggestion: SASL Authentication Daemon)
+DESC="SASL Authentication Daemon"
+
+# Short name of this saslauthd instance. Strongly recommended.
+# (suggestion: saslauthd)
+NAME="saslauthd"
+
 # Which authentication mechanisms should saslauthd use? (default: pam)
 #
 # Available options in this Debian package:
@@ -35,4 +43,4 @@ THREADS=5
 #
 # Example for postfix users: "-c -m /var/spool/postfix/var/run/saslauthd"
 # Note: See /usr/share/doc/sasl2-bin/README.Debian
-OPTIONS="-c"
+OPTIONS="-c -m /var/run/saslauthd"
