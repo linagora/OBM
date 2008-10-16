@@ -1209,8 +1209,8 @@ class Of_Date extends DateTime {
       (isset($data['minute']) && $data['minute'] !== FALSE) ||
       (isset($data['second']) && $data['second'] !== FALSE)) {
       $hour = (isset($data['hour']) && $data['hour'] !== FALSE)?$data['hour']:$this->format(self::HOUR);
-      $minute = (isset($data['minute']) && $data['minute'] !== FALSE)?$data['hour']:$this->format(self::MINUTE);
-      $second = (isset($data['second']) && $data['second'] !== FALSE)?$data['hour']:$this->format(self::SECOND);
+      $minute = (isset($data['minute']) && $data['minute'] !== FALSE)?$data['minute']:$this->format(self::MINUTE);
+      $second = (isset($data['second']) && $data['second'] !== FALSE)?$data['second']:$this->format(self::SECOND);
       $this->setTime($hour,$minute, $second);
     }
     if((isset($data['week']) && $data['week'] !== FALSE) ||
