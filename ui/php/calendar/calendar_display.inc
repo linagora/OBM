@@ -5465,7 +5465,6 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
   var $calendar_first_hour;
   var $calendar_last_hour;
   var $calendar_nb_hours;
-  var $calendar_weekstart;
   var $week_num;
   var $nb_out_events;
   var $nbcol;
@@ -5490,13 +5489,16 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
     $this->calendar_entity = $calendar_entity;
 
     $date = clone $calendar['date'];
-    $end = clone $date;
 
     if ($this->range == 'week') {
+      $begin = clone $date;
+      $begin->setWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+      $end = clone $begin;
       $end->addDay(7);
-      $this->display_date = calendar_localizeDate('week', $date).' - '
+      $this->display_date = calendar_localizeDate('week', $begin).' - '
         .calendar_localizeDate('week', $end->subDay(1));
     } else { 
+      $end = clone $date;
       $end->addDay(1);
       $this->display_date = calendar_localizeDate('day', $date); 
     }
