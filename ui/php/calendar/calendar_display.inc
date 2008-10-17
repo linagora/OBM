@@ -1155,7 +1155,7 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
   }
 
   $status = array('A', 'W');
-  $occurrences = calendar_events_model($current, $end, $calendar_entity, $status, $category_filter);
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter);
   if (is_array($occurrences)) {
     $options = array();
     foreach($occurrences as $occurrence) {
