@@ -31,8 +31,9 @@ $params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 require_once("$obminclude/of/of_date.inc");
-$params = get_calendar_params();
+require_once("$obminclude/lib/Zend/Pdf.php");
 
+$params = get_calendar_params();
 // Get user preferences if set for hour display range 
 if (isset($_SESSION['set_cal_first_hour'])) {
   $ccalendar_first_hour = $_SESSION['set_cal_first_hour'];
@@ -513,6 +514,20 @@ if ($action == 'index') {
     $display['msg'] .= display_err_msg("$l_file_format $l_unknown");
     $display['detail'] .= dis_icalendar_import($params);
   }
+
+} elseif ($action == 'pdf_export_form') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_calendar_pdf_options($params, $cal_range, $cal_view);
+
+} elseif ($action == 'pdf_export') {
+///////////////////////////////////////////////////////////////////////////////
+  $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
+  if (count($entities,COUNT_RECURSIVE) <= 4) {
+    $entities['user']  = array($obm['uid']);
+    $params['sel_user_id'] = array($obm['uid']);
+  }
+  dis_calendar_pdf_view($params, $cal_entity_id, $cal_range, $cal_view);
+  exit();
 }
 
 $_SESSION['cal_entity_id'] = $cal_entity_id;
@@ -538,7 +553,8 @@ if (!$params['ajax']) {
   json_ok_msg("$l_view : $l_delete_ok");
   echo "({".$display['json'].",$msg})";
   exit();
-}
+
+} 
 display_page($display);
 
 $microtimestop = microtime(true);
@@ -949,6 +965,21 @@ $actions['calendar']['insert_view'] = array (
 // Delete view
 $actions['calendar']['delete_view'] = array (
   'Url'      => "$path/calendar/calendar_index.php?action=delete_view",
+  'Right'    => $cright_read,
+  'Condition'=> array ('None')
+                                  	  );
+
+// PDF export options form
+$actions['calendar']['pdf_export_form'] = array (
+  'Url'      => "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=$date&output_target=print",
+  'Right'    => $cright_read,
+  'Popup'    => 1,
+  'Condition'=> array("None")
+                                          );
+
+// PDF export
+$actions['calendar']['pdf_export'] = array (
+  'Url'      => "$path/calendar/calendar_index.php?action=pdf_export",
   'Right'    => $cright_read,
   'Condition'=> array ('None')
                                   	  );

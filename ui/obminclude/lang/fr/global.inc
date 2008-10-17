@@ -239,6 +239,10 @@ $l_down = "Déscendre le champ d'une ligne";
 $l_up = "Monter le champ d'une ligne";
 $l_select_all = "Tout sélectionner";
 $l_unselect_all = "Tout désélectionner";
+$l_pagelayout = "Orientation";
+$l_pagelayout_portrait = "Portrait";
+$l_pagelayout_landscape = "Paysage";
+
 // Global display
 $l_last_visit = "Dernières visites";
 

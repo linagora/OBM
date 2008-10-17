@@ -171,6 +171,10 @@ $c_max_image_size = array('width' => '96',
                           'height' => '96',
                           'size' => '100000');
 
+// Page layout
+$c_pagelayout_portrait = 'portrait';
+$c_pagelayout_landscape = 'landscape';
+
 // Freeze
 $c_nb_login_failed = 10;
 $c_login_interval = 10;

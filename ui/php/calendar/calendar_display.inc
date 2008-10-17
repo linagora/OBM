@@ -38,7 +38,9 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   if (function_exists($calendar_function)) {
     $block = $calendar_function($calendar, $calendar_entity,$writable_entity,$date);
     $block .= dis_calendar_quick_form($calendar);
-    $display['print_url'] = "$path/calendar/calendar_index.php?cal_view=printable&amp;date=".$calendar['date']->getURL();
+    // $display['print_url'] = "$path/calendar/calendar_index.php?cal_view=printable&amp;date=".$calendar['date']->getURL();
+    $display['print_url'] = "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=".$calendar['date']->getURL()."&amp;output_target=print";
+
   } else {
     $block .= dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity);
   }
@@ -1409,7 +1411,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
       $current = new Of_Date($key);  
       if ($i%2 == 0) $klass = "pair"; else $klass = '';
       $i ++;
-      $label = $current->get(Of_Date::WEEKDAY_NARROW);
+      $label = $current->get(Of_Date::OBM_DATE_MONTH_LIST);
       if ($current->isToday())$klass="class=\"highlight\"";
       $dis_events .= "
         <tr class=\"$klass\">
@@ -1492,7 +1494,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
           }
         }        
         $date_begin = $date->getOutputDateTime();
-        $date_end = $end->$date->getOutputDateTime(); 
+        $date_end = $end->getOutputDateTime(); 
         $j++;
 	$js .= "
 	div = $('evt-$date-$ev_id');
@@ -4399,4 +4401,1750 @@ Class Item {
     $this->property_value = $property_value;
   }
 }
+
+
+/**
+ * Calendar PDF export options
+ * ex: page layout portrait|landscape
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function dis_calendar_pdf_options($calendar, $p_range, $p_view) { 
+  global $l_print, $l_pagelayout, $l_pagelayout_portrait, $l_pagelayout_landscape;
+  global $c_pagelayout_portrait, $c_pagelayout_landscape;
+  global $ccalendar_first_hour, $ccalendar_last_hour, $ccalendar_weekstart;
+  global $l_first_hour, $l_last_hour, $l_daysofweekshort, $l_display_details;
+  global $l_one_day_per_page, $l_display_days ;
+
+  if ($p_view == 'list') {
+    $block_detail = "
+    <tr>
+      <th>$l_display_details</th>
+      <td>
+        <input type=\"checkbox\" name=\"cba_showdetails\" value=\"1\">
+      </td>
+    </tr><tr>
+      <th>$l_one_day_per_page</th>
+      <td>
+        <input type=\"checkbox\" name=\"cba_onedayperpage\" value=\"1\">
+      </td>
+    </tr>"; 
+  }
+
+  if ($p_view == 'agenda' && $p_range != 'month') {
+    $dis_hour_b = "<select name=\"cal_first_hour\" id=\"cal_first_hour\" style=\"width:4em;\">";
+    for ($current_hour=0; $current_hour<24; $current_hour++) {
+      if ($current_hour == $_SESSION['set_cal_first_hour']) {
+        $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+      } else {
+        $dis_hour_b .= "<option value=\"$current_hour\">$current_hour</option>";
+      }
+    }
+    $dis_hour_b .= "</select>"; 
+
+    $dis_hour_e = "<select name=\"cal_last_hour\" id=\"cal_last_hour\" style=\"width:4em;\">";
+    for ($current_hour=1; $current_hour<=24; $current_hour++) {
+      if ($current_hour == $_SESSION['set_cal_last_hour']) {
+        $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+      } else {
+        $dis_hour_e .= "<option value=\"$current_hour\">$current_hour</option>";
+      }
+    }
+    $dis_hour_e .= "</select>";  
+
+    // Week options
+    if ($p_range == 'week'){
+      $display_days = $_SESSION['set_cal_display_days'];
+      if (empty($display_days)) $display_days = '1111111';
+
+      $start_week_day = strtotime($ccalendar_weekstart);
+      for ($i=0; $i<7; $i++) {
+        $day_num = date('w', $start_week_day);
+        $day = $l_daysofweekshort[$day_num];
+        $cba_id = "cba_repeatday_$i";
+        $dis_list_day .= "<input type=\"checkbox\" id=\"$cba_id\" name=\"$cba_id\" value=\"1\"";
+        if (strcmp(substr($display_days,$i,1),'1')==0) {
+          $dis_list_day .= " checked = \"checked\"";
+        }
+        $dis_list_day .= " /> $day";
+
+        $start_week_day = strtotime('+1 day', $start_week_day); 
+      }
+
+      $block_week = "
+      <tr>
+        <th>$l_one_day_per_page</th>
+        <td>
+          <input type=\"checkbox\" name=\"cba_onedayperpage\" value=\"1\">
+        </td>
+      </tr><tr id=\"display_days\">  
+        <th>$l_display_days</th>
+        <td>$dis_list_day</td>
+      </tr>";
+    }
+
+    $block_detail = "
+      <tr>
+        <th>$l_first_hour</th>
+        <td>$dis_hour_b</td>
+      </tr><tr>
+        <th>$l_last_hour</th>
+        <td>$dis_hour_e</td>
+      </tr>
+      $block_week";
+  }
+
+  $date = $calendar["date"];
+
+  $block = "<form action=\"\" method=\"get\" onsubmit=\"return check_calendar_pdf_options();\">
+    <div class=\"detail extra\">
+      <h1>Options</h1>
+      <table>
+        <tr>
+          <th>$l_pagelayout</th>
+          <td>
+            <select name=\"sel_pagelayout\">
+              <option value=\"$c_pagelayout_portrait\">$l_pagelayout_portrait</option>
+              <option value=\"$c_pagelayout_landscape\">$l_pagelayout_landscape</option>
+            </select>
+          </td>
+        </tr>
+        $block_detail
+      </table>
+    </div>
+    <div class=\"buttons\">
+      <input type=\"hidden\" name=\"action\" value=\"pdf_export\">
+      <input type=\"hidden\" name=\"date\" value=\"$date\">
+      <input type=\"submit\" value=\"$l_print\"/>
+    </div>
+  </form>";
+
+  return $block;
+}
+
+
+/**
+ * Calendar PDF Export
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function dis_calendar_pdf_view($calendar, &$sel_entity_id, $p_range, $p_view) {
+  global $display, $path, $ccalendar_max_users, $obm;
+  global $l_module_calendar;
+
+  $group_view = $calendar['entity']['group_view'];
+  $entity_readable = get_calendar_entity_readable();
+  $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users, $entity_readable);
+
+  $sel_entity_id = $visible_entities_id;
+  // we restore the selected group for session storage
+  $sel_entity_id['group_view'] = $group_view;
+
+  $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
+  $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view.'_pdf';
+
+  $calendar_function($calendar, $calendar_entity);
+
+}
+
+
+/**
+ * Calendar Month PDF
+ * view agenda
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function dis_calendar_month_agenda_pdf($calendar, $calendar_entity) {
+  global $ccalendar_weekstart, $ccalendar_first_hour;
+
+  $date = clone $calendar['date'];
+  $date->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1);
+
+  $category_filter = $calendar['category_filter'];
+  $status = array('A', 'W');
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter);
+
+  foreach($occurrences as $occurrence){
+    $c = clone $occurrence->date;
+    $c->setHour(0)->setMinute(0)->setSecond(0);
+    $id = $c->getTimestamp();
+    if(!is_array($updated[$id])) $updated[$id] = array();
+    array_push($updated[$id], $occurrence);
+  }
+
+  $pdf = new CalendarPdfMonthAgenda($calendar, $calendar_entity, $updated);
+  $pdf->drawCalendar();
+  $pdf->download();
+
+}
+
+
+/**
+ * Calendar Week PDF
+ * view agenda
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function dis_calendar_week_agenda_pdf($calendar, $calendar_entity) {
+  global $ccalendar_first_hour, $ccalendar_last_hour, $ccalendar_weekstart;
+
+  $date = clone $calendar['date'];
+  $date->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(7);
+
+  $status = array('A', 'W');
+  $category_filter = $calendar['category_filter'];
+
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
+
+  while($date->compare($end) < 0) {
+    $columns[$date->getTimestamp()] = array();
+    $date->addDay(1);
+  }
+
+  $time_unit = 60 / $_SESSION['set_cal_interval']; 
+
+  // events per columns
+  foreach($occurrences as $occurrence) {
+    $iso = clone $occurrence->date;
+    $iso->setHour(0)->setMinute(0)->setSecond(0);
+    if($occurrence->event->all_day == 1) {
+      $columns[$iso->getTimestamp()]['allday'][] = $occurrence;
+    } else {
+      $begin = clone $occurrence->date;
+      $begin->setMinute($begin->getMinute() - ($begin->getMinute()%$time_unit))->setSecond(0);
+      while($begin->compare($occurrence->end->getTimestamp()) < 0) {
+        $columns[$iso->getTimestamp()][$begin->getIso()][] = $occurrence;
+        $begin->addMinute($time_unit);
+      }
+    }
+  }
+
+  $updated = array();
+  foreach($columns as $date => $column){
+    $updated[$date] = check_conflict($column);
+  }
+  $pdf = new CalendarPdfDayAgenda('week', $updated, $calendar_entity, $calendar);
+  $pdf->drawCalendar();
+  $pdf->download();
+}
+
+
+/**
+ * Calendar Day PDF
+ * view agenda
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function dis_calendar_day_agenda_pdf($calendar, $calendar_entity) {
+  
+  $date = $calendar['date'];
+  $date->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(1);
+
+  $category_filter = $calendar['category_filter'];
+  $status = array('A', 'W');
+  $occurrences = calendar_events_model($date,$end, $calendar_entity, $status, $category_filter);
+  $id = $date->getTimestamp();
+  $columns[$id] = array();
+
+  $time_unit = 60 / $_SESSION['set_cal_interval']; 
+  foreach($occurrences as $occurrence) {
+    if($occurrence->event->all_day == 1) {
+      $columns[$id]['allday'][] = $occurrence;
+    } else {
+      $begin = clone $occurrence->date;
+      $begin->setMinute($begin->getMinute() - ($begin->getMinute()%$time_unit))->setSecond(0);
+      while($begin->compare($occurrence->end->getTimestamp()) < 0) {
+        $columns[$id][$begin->getIso()][] = $occurrence;
+        $begin->addMinute($time_unit);
+      }
+    }
+  }
+
+  $updated = array();
+  foreach($columns as $date => $column){
+    $updated[$date] = check_conflict($column);
+  }
+
+  $pdf = new CalendarPdfDayAgenda('day', $updated, $calendar_entity, $calendar);
+  $pdf->drawCalendar();
+  $pdf->download();
+
+}
+
+
+/**
+ * Calendar Month PDF
+ * view list
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function dis_calendar_month_list_pdf($calendar, $calendar_entity) {
+  global $ccalendar_weekstart, $ccalendar_first_hour;
+
+  $date = clone $calendar['date'];
+  $date->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1);
+
+  $category_filter = $calendar['category_filter'];
+  $status = array('A');
+
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
+
+  $pdf = new CalendarPdfList('month', $calendar, $calendar_entity, $occurrences);
+  $pdf->drawCalendar();
+  $pdf->download();
+
+}
+
+
+/**
+ * Calendar Week PDF
+ * view list
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function dis_calendar_week_list_pdf($calendar, $calendar_entity) {
+  global $ccalendar_first_hour, $ccalendar_weekstart;
+
+  $date = clone $calendar['date'];
+  $date->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(7);
+  $category_filter = $calendar['category_filter'];
+  $status = array('A');
+
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
+
+  $pdf = new CalendarPdfList('week', $calendar, $calendar_entity, $occurrences);
+  $pdf->drawCalendar();
+  $pdf->download();
+}
+
+
+/**
+ * Calendar Day PDF
+ * view list
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+
+function dis_calendar_day_list_pdf($calendar, $calendar_entity) {
+  global $ccalendar_first_hour;
+
+  $date = $calendar['date'];
+  $date->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(1);
+
+  $category_filter = $calendar['category_filter'];
+  $status = array('A');
+
+  $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
+
+  $pdf = new CalendarPdfList('day', $calendar, $calendar_entity, $occurrences);
+  $pdf->drawCalendar();
+  $pdf->download();
+
+}
+
+
+/**
+ * Calculate events conflicts 
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+function check_conflict($column){ // FIXME
+
+  //Evénement à mettre à jour
+  $updated = array();
+  foreach($column as $date => $cell) {
+    //Position utilisé dans le groupe d'événement en cours de traitement
+    $usedPositions = array();
+    //Position de l'événement en cours de traitement
+    $position = 0;
+    //Pour chaque case
+    foreach ($cell as $key => $occurrence) {
+      $event = $occurrence->event;
+        // Coordonnée de l'événement en cours de traitement
+        unset($coordinate);
+        // Si cette événement n'est pas déjà taité
+        if(!($coordinate = &$updated[$event->id])) {
+          // Si il n'y a aucune position utilisé, on définit l'unité de fractionnement à 100 % de la cellule
+          if(empty($usedPositions))  {
+            unset($unit);
+            $unit = array('value' => 1);
+          }
+          // Si il y a des position utilisé, on cherche la première position libre
+          while(isset($usedPositions[$position])) $position ++;
+        
+          // Par défaut la fin de l'événement = position (n'occupe qu'une seule unité de fractionnement de la céllule).
+          unset($end);
+          $end = array('value' => $position);
+          // Si on est en train de traiter le dernier élément de la céllule
+          if(count($cell) == ($key + 1)) {
+            // Définis la taille occupé par l'événement comme étant le nombre de position libre a la suite
+            // (en vérifiant que ce nombre est inféreur au nombre de position totale).
+            while($end['value'] < $unit['value'] && !isset($usedPositions[$end['value']])) $end['value']++;
+          }
+          // Si l'événement s'étend jusqu'a la dernière position, on fait en sorte que si le nombre
+          // de position libre augmente il s'agrandit également.
+          if($end['value'] == $unit['value']) $end = &$unit;
+          // On définis les coordonnées de l'événement
+          unset($coordinate);
+          $coordinate = array('position' => $position, 'unit' => &$unit, 'end' => &$end, 'occurrence' => $occurrence);
+          $updated[$event->id] = &$coordinate;
+        }
+        $usedPositions[$coordinate['position']] = true;        
+        // On peuple Updated
+        // Si la l'unité de fractionnement est inférieur au nombre d'événement dans la cellule, on augmente la taille de la cellule
+        if(count($cell) > $unit['value']) $unit['value'] = count($cell);
+        // Si un événement viens se placer après l'événement en cours on 'détache' la fin de l'événement
+        // du nombre de position disponible
+        if(($coordinate['position'] + 1) < count($cell) && ($key + 1) < count($cell)) {
+          unset($coordinate['end']);
+          $coordinate['end'] = array('value' => $coordinate['position'] + 1);      
+	}
+    }
+  }
+  unset($coordinate);
+  $return = array();
+  foreach($updated as $id => $coordinate) {
+    $size = $coordinate['end']['value'] - $coordinate['position'];
+    $coordinate['occurrence']->position = $coordinate['position'];
+    $coordinate['occurrence']->size = $size / $coordinate['unit']['value'];
+    $coordinate['occurrence']->unit = $coordinate['unit']['value'];
+    $return[] = $coordinate['occurrence'];
+
+  }
+
+  return $return;
+}
+
+
+/**
+ * CalendarPdf Class
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+Class CalendarPdf{
+
+  public $pdf, $page, $page_orientation, $margin;
+  public $waiting_alpha, $class, $font, $font_size, $obm_logo;
+  public $content_x0, $content_y0;
+  public $content_x1, $content_y1;
+  public $calendar_weekstart;
+  public $tmp_filename;
+  public $calendar, $calendar_entity;
+  public $editor;
+
+  function __construct($calendar, $calendar_entity){
+    global $ccalendar_weekstart, $ico_obm_org, $path;
+
+    // Page orientation
+    $page_layout = $calendar['pagelayout'];
+
+    if ($page_layout == 'portrait'){
+      $page_size = explode(':', Zend_Pdf_Page::SIZE_A4);
+      $this->page_orientation = 'A4';
+    } else {
+      $page_size = explode(':', Zend_Pdf_Page::SIZE_A4_LANDSCAPE);
+      $this->page_orientation = 'A4-LANDSCAPE';
+    }
+
+    // Zend PDF
+    $this->pdf = new Zend_Pdf();
+    $this->margin = 30;
+
+    // Page Coord.
+    $page_x = $page_size[0];
+    $page_y = $page_size[1];
+    $this->content_x0 = $this->margin;
+    $this->content_y0 = $this->margin;
+    $this->content_x1 = $page_x - $this->margin;
+    $this->content_y1 = $page_y - $this->margin; 
+
+    // Calendar top (2*$this->margin = header height);
+    $this->calendar_y1 = $this->content_y1 - 2*$this->margin; 
+
+    // Style
+    $this->font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
+    $this->font_size = 8;
+    $this->class = array(
+      "eventOwner" => array("title" => "#2952A3", "background" => "#668CD9"),
+      "eventOwner0" => array("title" => "#A32929", "background" => "#D86666"),
+      "eventOwner1" => array("title" => "#5229A3", "background" => "#8C66D9"),
+      "eventOwner2" => array("title" => "#28754E", "background" => "#65AD89"),
+      "eventOwner3" => array("title" => "#88880E", "background" => "#BFBF4D"),
+      "eventOwner4" => array("title" => "#B1440E", "background" => "#E6804D"),
+      "eventOwner5" => array("title" => "#4E5D6C", "background" => "#8997A5"),
+      "eventOwner6" => array("title" => "#6E6E41", "background" => "#A7A77D"),
+      "eventOwner7" => array("title" => "#B1365F", "background" => "#E67399"),
+      "eventOwner8" => array("title" => "#29527A", "background" => "#668CB3"),
+      "eventOwner9" => array("title" => "#0D7813", "background" => "#4CB052"),
+      "eventOwner10" => array("title" => "#AB8B00", "background" => "#E0C240"),
+      "eventOwner11" => array("title" => "#865A5A", "background" => "#BE9494"),
+      "eventOwner12" => array("title" => "#5A6986", "background" => "#94A2BE"),
+      "eventOwner13" => array("title" => "#8D6F47", "background" => "#C4A883"),
+      "eventOwner14" => array("title" => "#7A367A", "background" => "#B373B3"),
+      "eventOwner15" => array("title" => "#1B887A", "background" => "#59BFB3"),
+      "eventOwner16" => array("title" => "#528800", "background" => "#8CBF40"),
+      "eventOwner17" => array("title" => "#BE6D00", "background" => "#F2A640"),
+      "eventOwner18" => array("title" => "#705770", "background" => "#A992A9"),
+      "eventOwner19" => array("title" => "#4A716C", "background" => "#85AAA5")
+    ); 
+    $this->waiting_alpha = 0.5;
+
+    // FIXME : obm_logo path $ico_obm_org !!
+    $this->obm_logo = Zend_Pdf_Image::imageWithPath("$path/../resources/themes/default/images/logo_obm_org.jpg");
+
+    $this->calendar_weekstart = $ccalendar_weekstart;
+    $this->tmp_filename = tempnam("/tmp", "obm_") ;
+
+    $this->calendar = $calendar;
+    $this->calendar_entity = $calendar_entity;
+
+    $userinfo = get_entity_info($obm['uid'], 'user');
+    $this->editor = $userinfo['label'];
+
+  }
+
+
+  /**
+   * add a new page
+   * with header & legend
+   */
+  function addPage($header=true, $legend=true) {
+    $this->pdf->pages[] = $this->pdf->newPage($this->page_orientation);
+    $this->page = $this->pdf->pages[sizeof($this->pdf->pages)-1];
+    $this->page->setFont($this->font, $this->font_size);
+    if ($header) $this->setHeader();
+    if ($legend) $this->setLegend();
+  }
+
+
+  /**
+   * draw pdf header at top left
+   */
+  function setHeader() {
+    global $l_calendar, $l_category, $l_all_f, $obm;
+
+
+    // OBM Logo
+    $this->page->drawImage(
+      $this->obm_logo,
+      $this->content_x0,
+      $this->content_y1-34,
+      $this->content_x0+85,
+      $this->content_y1+14);
+    $this->page->setFillColor(new Zend_Pdf_Color_Html('#3D3D3D'));
+
+    // PDF Title
+    $this->page->drawText(
+      "$l_calendar $this->display_date",
+      $this->content_x0+90,
+      $this->content_y1,
+      'UTF-8');
+
+    // Editor
+    $this->page->drawText(
+      $this->editor,
+      $this->content_x0+90,
+      $this->content_y1-$this->font_size,
+      'UTF 8');
+
+    // Date creation
+    $today = new Of_Date();
+    $today->getDateIso();
+    $this->page->drawText(
+      $today,
+      $this->content_x0+90,
+      $this->content_y1-2*$this->font_size,
+      'UTF-8');
+
+    // Category
+    if (!empty($this->calendar["category_filter"])){
+      $category = of_category_get_label("calendar", "category1", $this->calendar["category_filter"]);
+    } else {
+      $category = $l_all_f; 
+    }
+    $display_category = "$l_category: $category";
+    $this->page->drawText(
+      $display_category,
+      $this->content_x0+90,
+      $this->content_y1-3*$this->font_size,
+      'UTF-8');
+  }
+
+
+  /**
+   * draw pdf legend at bottom left
+   */
+  function setLegend(){
+    $i=0;
+    foreach($this->calendar_entity as $users) {
+      foreach($users as $user){
+        $username = $user["name"];
+        $class = $this->class[$user["class"]];
+        $this->page->setFillColor(new Zend_Pdf_Color_Html($class["title"]));
+        $x0 = $this->content_x0 +$i;
+        $y0 = $this->content_y0;
+        $x1 = $x0 + 90;
+        $y1 = $y0 + $this->font_size;
+        $this->page->drawRectangle($x0+2 , $y0-1, $x1, $y1+1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
+        $this->page->drawText($username, $x0+4, $y0, 'UTF-8');
+        $i+=90;
+      }
+    }
+  }
+
+
+  /**
+   * set PDF metadata
+   * available : Title, Author, Subject, Keywords,
+   *             Creator, Producer, CreationDate,
+   *             ModDate, Trapped
+   *  
+   */
+  function setMetadata() {
+    global $l_calendar, $l_obm_title, $obm_version;
+
+    $this->pdf->properties['Title'] = $l_calendar;
+    $this->pdf->properties['Subject'] = $this->display_date;
+    $this->pdf->properties['Author'] = $this->editor;
+    $this->pdf->properties['Creator'] = $this->editor;
+    $this->pdf->properties['Producer'] = "$l_obm_title $obm_version";
+    $this->pdf->properties['CreationDate'] = "D:".date('YmdHis');
+  }
+
+
+  /**
+   * draw page number at bottom right
+   */
+  function setPageNb() {
+    $total = sizeof($this->pdf->pages);
+    foreach($this->pdf->pages as $index => $page) {
+      $cur = $index+1;
+      $this->pdf->pages[$index]->setFillColor(new Zend_Pdf_Color_Html('#3D3D3D'));
+      $this->pdf->pages[$index]->drawText("$cur/$total", $this->content_x1, $this->content_y0, 'UTF-8');
+    }
+  }
+
+
+  /**
+   * Download PDF
+   */
+  function download() {
+    global $l_obm_title, $l_calendar;
+
+    $filename = str_replace(" ", "_", "$l_obm_title $l_calendar $this->display_date.pdf");
+
+    $this->setPageNb();
+    $this->setMetadata();
+
+    $this->pdf->save($this->tmp_filename);
+    $file = fopen($this->tmp_filename, "r");
+    header("Content-Type: application/octet-stream") ;
+    header("Content-Disposition: attachment; filename=\"$filename\";");
+    header("Cache-Control: maxage=3600");
+    header('Pragma: public');
+    fpassthru($file) ;
+    fclose($file) ;
+  
+    unlink($this->tmp_filename);
+  }
+
+  /**
+   * Return string width
+   */
+  function getStringWidth($string) {
+    $drawingString = iconv('UTF-8', 'UTF-16BE//IGNORE', $string);
+    $characters = array();
+    for ($i = 0; $i < strlen($drawingString); $i++) {
+      $characters[] = (ord($drawingString[$i++]) << 8) | ord($drawingString[$i]);
+    }
+    $glyphs = $this->font->glyphNumbersForCharacters($characters);
+    $widths = $this->font->widthsForGlyphs($glyphs);
+    $stringWidth = (array_sum($widths) / $this->font->getUnitsPerEm()) * $this->font_size;
+
+    return $stringWidth;
+  }
+
+}
+
+
+/**
+ * CalendarPdfMonth Class
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+Class CalendarPdfMonthAgenda Extends CalendarPdf{
+
+  var $calendar_x0;
+  var $calendar_y0;
+  var $calendar_x1;
+  var $calendar_y1;
+  var $col_width;
+  var $min_col_height;
+  var $col_height;
+  var $current_y;
+  var $updated;
+  var $daysofweek;
+  var $calendar_first_hour;
+  var $usedPosition;
+
+  function __construct($calendar, $calendar_entity, $updated){
+    global $l_daysofweekl, $ccalendar_first_hour;
+
+    parent::__construct($calendar, $calendar_entity);
+
+    $this->calendar_x0 = $this->content_x0 + 10;
+    $this->calendar_y0 = $this->content_y0 + 18;
+    $this->calendar_x1 = $this->content_x1;
+    $this->col_width = ($this->calendar_x1 - $this->calendar_x0)/7;
+    $this->min_col_height = ($this->calendar_y1 - $this->calendar_y0)/5;
+    $this->col_height = $this->min_col_height;
+    $this->current_y = 0;
+
+    // Display date
+    $this->display_date = calendar_localizeDate('month', $this->calendar['date']);
+
+    $this->calendar_first_hour = $ccalendar_first_hour;
+    $this->updated = $updated;
+    $this->daysofweek = $l_daysofweek;
+    $this->calendar_entity = $calendar_entity;
+
+    $this->addPage();
+
+  }
+
+
+  /**
+   * draw days label + background
+   */
+  function drawDays(){
+
+    $this->page->setFillColor(new Zend_Pdf_Color_Html('#EEEEEE'));
+    $this->page->drawRectangle(
+      $this->calendar_x0,
+      $this->calendar_y1+$this->font_size,
+      $this->calendar_x1,
+      $this->calendar_y1+2*$this->font_size+2,
+      Zend_Pdf_Page::SHAPE_DRAW_FILL);
+
+    $date = clone $this->calendar['date'];
+    $date->setWeekday($this->calendar_weekstart)->setHour($this->calendar_first_hour)->setMinute(0)->setSecond(0);
+    $end = clone $date;
+    $end->addDay(7);
+    $current = clone $date;
+
+    $i=0;
+
+    while($current->compare($end) < 0) {
+        $day = calendar_localizeDate('week_list', $current);
+        $this->page->setFillColor(new Zend_Pdf_Color_Html('#3D3D3D'));
+        $this->page->drawText(
+          $day,
+          $this->calendar_x0+$i*$this->col_width+$this->col_width/2-($this->getStringWidth($day)/2),
+          $this->calendar_y1+$this->font_size+2,
+          'UTF-8');
+      $i++;
+      $current->addDay(1);
+    }
+  }
+
+
+  /**
+   * draw calendar grid + events
+   */
+  function drawCalendar(){
+
+    $date = clone $this->calendar['date'];
+    $date->setDay(1)->setWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+    $end = clone $date;
+    $end->addMonth(1)->setWeekday($this->calendar_weekstart)->addWeek(1);
+    $current = clone $date;
+
+    // days bar
+    $this->drawDays();
+
+    $i = 0;
+    $w = 0;
+    while($current->compare($end) < 0) {
+
+      // Style
+      if ($current->isToday()) {
+        $bgcolor = new Zend_Pdf_Color_Html('#FDDAA4');
+      } elseif ($current->compareMonth($this->calendar['date']) != 0) {
+        $bgcolor = new Zend_Pdf_Color_Html('#EFF0F2');
+      } else {
+        $bgcolor = new Zend_Pdf_Color_Html('#FFFFFF');
+      }
+
+      // draw one week
+      if ($current->compareWeekday($this->calendar_weekstart) == 0) {
+        $nb_events=0;
+        $end_week_time = $current->getTimestamp() + ((6 * 24 + $this->calendar_last_hour) * 3600);
+
+        for($s=$current->getTimestamp();$s<=$end_week_time;$s+=86400){
+          $nb_events = max($nb_events, sizeof($this->updated[$s])); // max events per day
+        }
+
+        $this->col_height = $this->font_size*($nb_events+2);
+        if ($this->col_height< $this->min_col_height){
+          $this->col_height = $this->min_col_height;
+        }
+        $this->current_y += $this->col_height;
+
+        $endofday = $this->calendar_y1-$this->current_y;
+        if ($endofday < ($this->content_y0+$this->font_size)) {
+          $this->addPage();
+          $this->drawDays();
+          $this->current_y = $this->col_height;
+        }
+
+        // Draw current week events
+       $day=0;
+       $this_w = clone $current;
+       $end_week_time = clone $current;
+       $end_week_time->addDay(6);
+
+       for($s=$this_w->getTimestamp();$s<=$end_week_time->getTimestamp();$s+=86400){
+         if(is_array($this->updated[$s])){
+           $this->addEvents($this->updated[$s], $day);
+         }
+         $day++;
+       }
+
+        // week num
+        $week_num = $current->get(Of_Date::WEEK);
+        $this->page->setFillColor(new Zend_Pdf_Color_Html('#368397'));
+        $this->page->drawText(
+          $week_num,
+          $this->content_x0, 
+          $this->calendar_y1-$this->current_y+$this->col_height-($this->col_height/2),
+          'UTF-8');
+        $w++;
+
+      }
+
+      // one day
+      $this->page->setFillColor($bgcolor);
+      $this->page->setLineColor(new Zend_Pdf_Color_Html('#DEDEDE'));
+      $x0 = $this->calendar_x0+$i*$this->col_width;
+      $y0 = $this->calendar_y1-$this->current_y;
+      $x1 = $x0 + $this->col_width;
+      $y1 = $y0 + $this->col_height;
+      $this->page->drawRectangle($x0, $y0, $x1, $y1);
+      // $this->page->drawLine($x1, $y0, $x1, $y1);
+
+      // day label
+      $day = $current->get(Of_Date::DAY);
+      $this->page->setFillColor(new Zend_Pdf_Color_Html('#CCCCCC'));
+      $this->page->drawRectangle(
+        $this->calendar_x0+$i*$this->col_width,
+        $this->calendar_y1-$this->current_y+$this->col_height+$this->font_size,
+        $this->calendar_x0+$i*$this->col_width+$this->col_width,
+        $this->calendar_y1-$this->current_y+$this->col_height-2,
+        Zend_Pdf_Page::SHAPE_DRAW_FILL);
+      $this->page->setFillColor(new Zend_Pdf_Color_Html('#368397'));
+      $this->page->drawText(
+        $day,
+        $this->calendar_x0+$i*$this->col_width + 2,
+        $this->calendar_y1-$this->current_y+$this->col_height,
+        'UTF-8');
+
+      $i++;
+
+      $current->addDay(1);
+
+      if ($current->compareWeekday($this->calendar_weekstart) == 0) {
+        $i=0;
+      }
+    }
+
+    $this->drawEvents();
+
+  }
+
+
+  function drawEvents() {
+
+    $this->current_y = 0;
+    $page = 0;
+    $this->page = $this->pdf->pages[$page];
+    $date = clone $this->calendar['date'];
+    $date->setDay(1)->setWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+    $end = clone $date;
+    $end->addMonth(1)->setWeekday($this->calendar_weekstart)->addWeek(1);
+    $current = clone $date;
+
+    $w = 0;
+    while($current->compare($end) < 0) {
+      if ($current->compareWeekday($this->calendar_weekstart) == 0) {
+        $nb_events=0;
+        $end_week_time = $current->getTimestamp() + ((6 * 24 + $this->calendar_last_hour) * 3600);
+
+        for($s=$current->getTimestamp();$s<=$end_week_time;$s+=86400){
+          $nb_events = max($nb_events, sizeof($this->updated[$s])); // max events per day
+        }
+
+        $this->col_height = $this->font_size*($nb_events+2);
+        if ($this->col_height< $this->min_col_height){
+          $this->col_height = $this->min_col_height;
+        }
+        $this->current_y += $this->col_height;
+
+        $endofday = $this->calendar_y1-$this->current_y;
+        if ($endofday < ($this->content_y0+$this->font_size)) {
+          $page++;
+          $this->page = $this->pdf->pages[$page];
+          $this->current_y = $this->col_height;
+        }
+
+        // Draw current week events
+        $day=0;
+        $this_w = clone $current;
+        $end_week_time = clone $current;
+        $end_week_time->addDay(6);
+
+        for($s=$this_w->getTimestamp();$s<=$end_week_time->getTimestamp();$s+=86400){
+          if(is_array($this->updated[$s])){
+            $this->addEvents($this->updated[$s], $day);
+          }
+          $day++;
+        }
+        $w++;
+
+      }
+
+      $current->addDay(1);
+    }
+
+
+  }
+
+
+  /**
+   * add an event
+   */
+  function addEvents($occurrences, $day){
+    global $l_private, $obm;
+    $cur = 0;
+
+    foreach($occurrences as $occurrence){
+      $title = "";
+      $id = $occurrence->id;
+      $color = $occurrence->event->color;
+      $entity = $this->calendar_entity[$occurrence->entity][$id];
+      $class = $this->class[$entity["class"]];
+      $attendee = $occurrence->event->attendee;
+
+      if ($occurrence->event->isMeeting()){
+        $title = "ii ";
+      }
+      if (!$occurrence->event->all_day){
+        $title .= $occurrence->date->get(Of_Date::TIME_SHORT);
+      }
+
+      if ($occurrence->event->privacy && !(in_array($obm['uid'],$attendee['user']))) {
+        $title = $l_private;
+      } else {
+        $title .= $occurrence->event->title;
+      }
+
+      if (!empty($color) && sizeof($this->calendar_entity)==1) {
+        $title_color = $color;
+      } else {
+        $title_color = $class["title"];
+      }
+
+      $curday = $occurrence->date->getDay();
+
+      if (is_array($this->usedPosition[$curday])) {
+        while (in_array($cur, $this->usedPosition[$curday])) {
+          $cur++;
+        }
+      }
+
+      $this->page->setFillColor(new Zend_Pdf_Color_Html($title_color));
+      $x0 = $this->calendar_x0+$day*$this->col_width;
+      $y0 = $this->calendar_y1-$this->current_y+$this->col_height-$this->font_size*$cur-2;
+      $x1 = $x0+$this->col_width;
+
+      if ($this->is_multi_days_event($occurrence)) {
+        $begin = clone $occurrence->date;
+        while($begin->compare($occurrence->end) < 0) {
+          $x1 +=$this->col_width;
+          $begin->addDay(1);
+          if (!is_array($this->usedPosition[$begin->getDay()])) {
+            $this->usedPosition[$begin->getDay()] = array();
+          }
+          array_push($this->usedPosition[$begin->getDay()], $cur);
+        }
+      }
+
+
+
+      if ($occurrence->entity_state == "W") {
+        $this->page->setAlpha($this->waiting_alpha);
+      } else {
+        $this->page->setAlpha(1);
+      }
+
+      while($this->getStringWidth($title) > $x1-$x0) {
+         $title = substr($title, 0, -1); 
+      }
+      if ($x1 > $this->calendar_x1) $x1 = $this->calendar_x1;
+
+      $this->page->drawRectangle($x0,$y0,$x1,$y0-$this->font_size,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+      $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
+      $this->page->drawText($title,
+        $this->calendar_x0+$day*$this->col_width+2, 
+        $y0-$this->font_size+1, 'UTF-8');
+      $cur++;
+    }
+  }
+
+  function is_multi_days_event($occurrence) { 
+    $day_begin = $occurrence->date;
+    $day_end = $occurrence->end;
+    if ($day_begin->getDay() != $day_end->getDay() 
+      && $day_end->get(Of_Date::TIME_SHORT) != "00:00") {
+      return true;
+    }
+
+    return false;
+  }
+
+}
+
+
+/**
+ * CalendarPdfDay Class
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+Class CalendarPdfDayAgenda Extends CalendarPdf{
+
+  var $col_width;
+  var $range;
+  var $updated;
+  var $calendar_entity;
+  var $calendar_first_hour;
+  var $calendar_last_hour;
+  var $calendar_nb_hours;
+  var $calendar_weekstart;
+  var $week_num;
+  var $nb_out_events;
+  var $nbcol;
+  var $current_out_event;
+  var $usedPosition;
+
+  function __construct($range, $updated, $calendar_entity, $calendar){
+
+    parent::__construct($calendar, $calendar_entity);
+
+    // Page Coord.
+    $this->calendar_x0 = $this->content_x0 + $this->margin;
+    $this->calendar_y0 = $this->content_y0 + 2*$this->font_size;
+    $this->calendar_x1 = $this->content_x1;
+
+    // Calendar
+    $this->updated = $updated;
+    $this->range = $range;
+    $this->calendar_first_hour = $calendar['cal_first_hour'];
+    $this->calendar_last_hour = $calendar['cal_last_hour'];
+    $this->calendar_nb_hours = $this->calendar_last_hour - $this->calendar_first_hour;
+    $this->calendar_entity = $calendar_entity;
+
+    $date = clone $calendar['date'];
+    $end = clone $date;
+
+    if ($this->range == 'week') {
+      $end->addDay(7);
+      $this->display_date = calendar_localizeDate('week', $date).' - '
+        .calendar_localizeDate('week', $end->subDay(1));
+    } else { 
+      $end->addDay(1);
+      $this->display_date = calendar_localizeDate('day', $date); 
+    }
+
+    $this->week_num = $date->get(Of_Date::WEEK); 
+
+    $this->getNbOutEvents();
+    $this->allday_height = (1+$this->nb_out_events) * $this->font_size;
+    $this->onedayperpage = $calendar['onedayperpage'];
+
+    if ($this->range == "week") {
+      $display_days = $calendar['repeat_days'];
+      $i=0;
+      foreach($this->updated as $date => $column){
+        if (!$display_days[$i]) unset($this->updated[$date]);
+        $i++;
+      }
+
+      if ($this->onedayperpage){
+        $this->nbcol = 1;
+      } else {
+        $this->nbcol = sizeof($this->updated);
+      }
+
+    } elseif ($this->range == "day") {
+      $this->nbcol = 1;
+    }
+
+    $this->col_width = ($this->calendar_x1 - $this->calendar_x0)/$this->nbcol;
+    $this->col_height = ($this->calendar_y1-$this->calendar_y0-$this->allday_height)/$this->calendar_nb_hours;
+
+    $this->addPage();
+
+  }
+
+
+  /**
+   * draw calendar
+   */
+  function drawCalendar() {
+
+    $this->day_x=0;
+    $this->drawGrid();
+    $current = new Of_Date();
+
+    foreach($this->updated as $date => $column){
+      $this->current_out_event=0;
+
+      $d = clone $current;
+      $d->setTimestamp($date);
+
+      // Day label
+      if ($this->onedayperpage || $this->range == "day") {
+        // long title
+        $this_date_l = calendar_localizeDate('day', $d);
+      } else {
+        // short title
+        $this_date_l = calendar_localizeDate('week_list', $d);
+      }
+
+      $this->page->setFillColor(new Zend_Pdf_Color_Html('#368397'));
+      $this->page->drawText($this_date_l, $this->calendar_x0+$this->day_x+10, $this->calendar_y1+2, 'UTF-8');
+
+      // draw events
+      $this->addEvents($column);
+      $this->day_x+=$this->col_width;
+
+      if ($this->onedayperpage && sizeof($this->pdf->pages)<sizeof($this->updated)) {
+        $this->day_x = 0;
+        $this->addPage();
+        $this->drawGrid();
+      }
+
+    }
+  }
+
+
+  /**
+   * draw calendar grid
+   */
+  function drawGrid(){
+
+    // Cal. borders
+    // ligth gray on hour label and day label
+    $this->page->setFillColor(new Zend_Pdf_Color_Html('#F5F5F5'));
+    $this->page->drawRectangle(
+      $this->content_x0, $this->calendar_y0,
+      $this->calendar_x0, $this->calendar_y1+$this->font_size*2,
+      Zend_Pdf_Page::SHAPE_DRAW_FILL);
+    $this->page->drawRectangle(
+      $this->content_x0, $this->calendar_y1,
+      $this->content_x1, $this->calendar_y1+$this->font_size*2,
+      Zend_Pdf_Page::SHAPE_DRAW_FILL);
+
+    // day label y separator
+    $this->page->setLineColor(new Zend_Pdf_Color_Html('#DEDEDE'));
+    $this->page->drawLine(
+      $this->content_x0, $this->calendar_y1,
+      $this->calendar_x1, $this->calendar_y1);
+
+    // Display hours
+    for($i=0;$i<=$this->calendar_nb_hours;$i++){
+
+      // coords
+      $y = $this->calendar_y0+$i*$this->col_height;
+
+      // hour
+      $this->page->setLineColor(new Zend_Pdf_Color_Html('#DEDEDE'));
+      $this->page->drawLine($this->content_x0, $y, $this->calendar_x1, $y);
+
+      // 1/2 hour
+      if ($this->calendar_y0+$i*$this->col_height+$this->col_height/2 < $this->calendar_y1-$this->allday_height){
+        $this->page->setLineColor(new Zend_Pdf_Color_Html('#EEEEEE'));
+        $this->page->drawLine($this->calendar_x0-10, $y+$this->col_height/2, $this->calendar_x1, $y+$this->col_height/2);
+      }
+      // label
+      if ($this->calendar_y0+$i*$this->col_height-$this->font_size > $this->calendar_y0){
+        $this->page->setFillColor(new Zend_Pdf_Color_Html('#3D3D3D'));
+        $this->page->drawText($this->calendar_last_hour-$i.":00", $this->content_x0, $y-$this->font_size, 'UTF-8');
+      }
+    }
+
+    // Display day y separator
+    for($i=0;$i<=$this->nbcol;$i++){
+      $this->page->setLineColor(new Zend_Pdf_Color_Html('#DEDEDE'));
+      $this->page->drawLine(
+        $this->calendar_x0+$i*$this->col_width, $this->calendar_y0,
+        $this->calendar_x0+$i*$this->col_width, $this->calendar_y1);
+    }
+
+    // Display week num
+    $this->page->setFillColor(new Zend_Pdf_Color_Html('#3D3D3D'));
+    $this->page->drawText($this->week_num, $this->content_x0+2, $this->calendar_y1+2, 'UTF-8');
+
+  }
+
+
+  /**
+   * add an event to the PDF
+   */
+  function addEvents($events) {
+    global $l_private, $obm;
+
+    foreach($events as $event){
+      $id = $event->id;
+      $all_day = $event->event->all_day;
+      $entity = $this->calendar_entity[$event->entity][$id];
+      $class = $this->class[$entity["class"]];
+      $background = $class["background"];
+      $duration = $event->event->duration;
+      $date = $event->date->get(Of_Date::TIME_SHORT);
+      $color = $event->event->color;
+      $attendee = $event->event->attendee;
+      
+      if (!empty($color) && sizeof($this->calendar_entity)==1) {
+        $bg_color = $color;
+        $title_color = $color;
+      } else {
+        $bg_color = $class["background"];
+        $title_color = $class["title"];
+      } 
+
+      if ($event->event->privacy && !(in_array($obm['uid'],$attendee['user']))) {
+        $title = $l_private;
+      } else {
+        $title = $event->event->title;
+      }
+
+      if ($event->entity_state == "W") {
+        $this->page->setAlpha($this->waiting_alpha);
+      } else {
+        $this->page->setAlpha(1);
+      }
+
+      if ($all_day || $this->isOutOfTimeInterval($event)) {
+        $x0 = $this->calendar_x0+$this->day_x;
+
+        $curday = $event->date->getDay();
+        if (is_array($this->usedPosition[$curday])) {
+          while (in_array($this->current_out_event, $this->usedPosition[$curday])) {
+            $this->current_out_event++;
+          }
+        }
+
+        $x1 = $x0 + $this->col_width;
+        $y0 = $this->calendar_y1-($this->current_out_event)*$this->font_size;
+        $y1 = $y0 - $this->font_size;
+
+        if ($this->isOutOfTimeInterval($event)) $title = $event->date->get(Of_Date::TIME_SHORT)." $title";
+
+        // event width on multiple days
+        // only if next days are displayed
+        if (!$this->onedayperpage){
+         $begin = clone $event->date;
+         while($begin->compare($event->end) < 0) {
+           $begin->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
+           if (array_key_exists($begin->getTimestamp(), $this->updated)) {
+             if ($this->range != "day" && $event->end->getTimestamp() > $begin->getTimestamp()) {
+               $x1 +=$this->col_width;
+               if (!is_array($this->usedPosition[$begin->getDay()])) {
+                 $this->usedPosition[$begin->getDay()] = array();
+               }
+               array_push($this->usedPosition[$begin->getDay()], $this->current_out_event);
+             }
+           }
+         }
+        }
+
+        while($this->getStringWidth($title) > $x1-$x0) {
+          $title = substr($title, 0, -1); 
+        }
+        $this->page->setFillColor(new Zend_Pdf_Color_Html($title_color));
+        $this->page->drawRectangle($x0, $y0, $x1, $y1, Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
+        $this->page->drawText($title, $x0+2, $y1+1, 'UTF-8');
+        $this->current_out_event++;
+
+      } else {
+        $margin = $event->position * $this->col_width/$event->unit;
+        $x0 = $this->calendar_x0+$this->day_x+$margin;
+        $x1 = $x0 + $this->col_width*$event->size;
+
+        // place le début de l'événement à la minute près
+        //$begin = $event->date->getHour()+$event->date->getMinute()/60; // ex 08h30 == 8.5
+
+        $time_unit = 60 / $_SESSION['set_cal_interval']; 
+
+        $datebegin = clone $event->date;
+        $datebegin->setMinute($datebegin->getMinute() - ($datebegin->getMinute()%$time_unit))->setSecond(0);
+        $begin = $datebegin->getHour()+$datebegin->getMinute()/60; 
+
+        $dateend = clone $event->end;
+        $dateend->setMinute($dateend->getMinute() + ($dateend->getMinute()%$time_unit))->setSecond(0);
+        $end = $dateend->getHour()+$dateend->getMinute()/60; 
+        if($end > $this->calendar_last_hour) $end = $this->calendar_last_hour;
+
+        $y1 = $this->calendar_y1-$this->allday_height-($begin - $this->calendar_first_hour)*$this->col_height;
+        $y0 = $y1-($end-$begin)*$this->col_height;
+
+        if ($event->event->duration < 2700) {
+          $dis_header = "$date $title";
+          $dis_title = "";
+        } else {
+          $dis_header = $date;
+          $dis_title = $title;
+        }
+
+        // event title
+        while($this->getStringWidth($dis_title) > $event->size*$this->col_width) {
+          $dis_title = substr($dis_title, 0, -1); 
+        }
+        $this->page->setFillColor(new Zend_Pdf_Color_Html($bg_color));
+        $this->page->drawRectangle($x0,$y0,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
+        $this->page->drawText($dis_title, $x0+2, $y1-2*$this->font_size, 'UTF-8');
+
+        // event header
+        while($this->getStringWidth($dis_header) > $event->size*$this->col_width) {
+          $dis_header = substr($dis_header, 0, -1); 
+        }
+        $this->page->setFillColor(new Zend_Pdf_Color_Html($title_color));
+        $this->page->drawRectangle($x0,$y1-$this->font_size-2,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
+        $this->page->drawText($dis_header, $x0+2, $y1-$this->font_size, 'UTF-8');
+      }
+
+    }
+  }
+
+
+  /**
+   * count max allday + out of time interval occurrence 
+   */
+  function getNbOutEvents() {
+    foreach($this->updated as $date => $column){
+      $allday = 0;
+      foreach($column as $key => $occurrence){
+	if($occurrence->event->all_day || $this->isOutOfTimeInterval($occurrence)){
+          $allday++;
+        }
+      }
+      $this->nb_out_events = max($this->nb_out_events, $allday);
+    }
+  }
+
+
+  /**
+   * 
+   */
+  function isOutOfTimeInterval($occurrence){ 
+    if ($occurrence->event->all_day) return false;
+
+    // out of time interval
+    $hour_begin = $occurrence->date->getHour();
+    if ($hour_begin < $this->calendar_first_hour || $hour_begin >= $this->calendar_last_hour) {
+      return true;
+    }
+
+    // event on x days
+    $day_begin = $occurrence->date->getDay();
+    $d = clone $occurrence->date;
+    $d->addTimestamp($occurrence->event->duration);
+    $day_end = $d->getDay();
+
+    if ($day_begin != $day_end) {
+      return true;
+    }
+
+    return false;
+  
+  }
+}
+
+
+/**
+ * CalendarPdfList Class
+ * 
+ * @param 
+ * @access public
+ * @return void
+ */
+Class CalendarPdfList Extends CalendarPdf{
+
+  var $calendar_x0, $calendar_y0;
+  var $calendar_x1, $calendar_y1;
+  var $occurrences;
+
+  function __construct($range, $calendar, $calendar_entity, $occurrences){
+    global $ccalendar_first_hour;
+
+    parent::__construct($calendar, $calendar_entity);
+
+    $this->calendar_x0 = $this->content_x0;
+    $this->calendar_y0 = $this->content_y0;
+    $this->calendar_x1 = $this->content_x1;
+    $this->occurrences = $occurrences;
+    $this->calendar_entity = $calendar_entity;
+
+    $date = $calendar['date'];
+    $end = clone $date;
+
+    if ($range == 'week') {
+      $end->addDay(7);
+      $this->display_date = calendar_localizeDate('week', $date).' - '
+        .calendar_localizeDate('week', $end->subDay(1));
+    } else {
+      $this->display_date = calendar_localizeDate($range, $date);
+    }
+
+    $this->onedayperpage = $calendar['onedayperpage'];
+    $this->showdetails = $calendar['showdetails'];
+
+    $this->addPage(true, false);
+  }
+
+
+  /**
+   * draw calendar grid + events 
+   */
+  function drawCalendar(){
+
+    $this->drawHeader();
+    $ocs = $this->sortOccurrences();
+    $d = new Of_Date();
+
+    if (is_array($ocs)) {
+      ksort($ocs);
+      foreach($ocs as $key => $occurrence) {
+        $d->setTimestamp($key);
+
+        // background color
+        if ($this->onedayperpage){
+          $color = "#FFFFFF";
+        } else {
+          if ($i%2 == 0) {
+            $color = "#DEDEDE";
+          } else {
+            $color = '#FFFFFF';
+          }
+          $i ++;
+          if ($d->isToday()) {
+            $color = '#F4F3C5';
+          }
+        } 
+
+        $day_text_evt = $d->get(Of_Date::OBM_DATE_MONTH_LIST);
+
+        $col_height = sizeof($occurrence)*$this->font_size;
+
+        if ($this->showdetails) {
+          $col_height += 9*$this->font_size*sizeof($occurrence);
+        }
+
+	$endofday = $this->current_y-$col_height;
+        if ($endofday<$this->content_y0+$this->font_size || $this->onedayperpage) {
+          $this->addPage(true, false);
+          $this->drawHeader();
+          $this->current_y = $this->calendar_y1-$this->font_size-1 ;
+          $endofday = $this->content_y0+$this->font_size;
+        }
+
+        // one day
+        $this->page->setFillColor(new Zend_Pdf_Color_Html($color));
+        $this->page->drawRectangle(
+          $this->content_x0,
+          $this->current_y+$this->font_size,
+          $this->content_x1,
+          $endofday,
+          Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $this->page->setFillColor(new Zend_Pdf_Color_Html("#368397"));
+        $this->page->drawText(
+          $day_text_evt,
+          $this->content_x0+2,
+          $this->current_y+1,
+          'UTF-8');
+
+        // draw events
+        $this->addEvents($occurrence);
+
+        // new y
+        $this->current_y -= $col_height +$this->font_size;
+
+      }
+    }
+  }
+
+
+  /**
+   * Sort occurrences by date (cause repeat and no repeat events)
+   */
+  function sortOccurrences(){
+
+    if (is_array($this->occurrences)) {
+      foreach($this->occurrences as $occurrence) {
+        $id = $occurrence->date->setHour(0)->setMinute(0)->setSecond(0);
+        if(!is_array($ocs[$id->getTimestamp()])) { $ocs[$id->getTimestamp()] = array();}
+        array_push($ocs[$id->getTimestamp()],$occurrence);
+      }
+    }
+
+    return $ocs;
+  }
+
+
+  /**
+   * draw list header
+   */
+  function drawHeader(){
+    global $l_date, $l_event;
+
+    // calendar header
+    $this->page->setFillColor(new Zend_Pdf_Color_Html("#C2C2C2"));
+    $this->page->drawRectangle(
+      $this->content_x0,
+      $this->calendar_y1-1,
+      $this->content_x1,
+      $this->calendar_y1+$this->font_size+1,
+      Zend_Pdf_Page::SHAPE_DRAW_FILL);
+
+    $this->page->setFillColor(new Zend_Pdf_Color_Html("#3D3D3D"));
+    $this->page->drawText($l_date, $this->content_x0+2, $this->calendar_y1+1, 'UTF-8');
+    $this->page->drawText($l_event, $this->content_x0+150, $this->calendar_y1+1, 'UTF-8');
+
+    $this->current_y = $this->calendar_y1-$this->font_size-1;
+
+  }
+  
+
+  /**
+   * add an event to the PDF
+   */
+  function addEvents($occurrences){
+    global $obm, $l_private;
+    global $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
+    global $l_category,$l_datebegin, $l_dateend, $l_repeat,$l_attendees, $l_title, $l_location;;
+    global $l_resources, $l_items, $l_desc;
+
+    $sel_user = $this->calendar_entity['user'];
+    $sel_user_id = array();
+    if (is_array($sel_user)) {
+      while(list($key, $val) = each($sel_user)) {
+       $sel_user_id[$key] = $val['class'];
+      }
+    }
+
+    $sel_res = $this->calendar_entity['resource'];
+    $sel_res_id = array();
+    if (is_array($sel_res)) {
+      while(list($key, $val) = each($sel_res)) {
+       $sel_res_id[$key] = $val['class'];
+      }
+    }
+
+    $evt_y = $this->current_y;
+    foreach($occurrences as $key => $occurrence){
+      $event = $occurrence->event;
+      $date = $occurrence->date;
+      $hour = $occurrence->date->get(Of_Date::TIME_SHORT);
+      $end = $occurrence->end;
+      $title = $event->title;
+      $attendee = $event->attendee;
+      $properties = $event->properties;
+      $dis_attendees = array();
+      $dis_user = "";
+      $dis_res = "";
+      $dis_resources = array();
+      $separator = "";
+
+      if ($event->privacy && !(in_array($obm['uid'],$attendee['user']))) {
+        $title = $l_private;
+      }
+
+      if ($event->isMeeting()) {
+        $title = "&& $title";
+      }
+
+      if ($event->isPeriodic()) {
+        $title = "R $title";
+      } 
+
+      if (is_array($attendee['user']))
+      foreach($attendee['user'] as $at_id => $at_name) {
+        if (array_key_exists($at_id, $sel_user_id)) {
+          $dis_user .= "$separator$at_name";
+          $separator = ', ';
+        }
+        array_push($dis_attendees, $at_name);
+      }
+
+      if(is_array($attendee['resource'])) {
+        foreach($attendee['resource'] as $at_id => $at_name) {
+          if (array_key_exists($at_id, $sel_res_id)) {
+            $dis_res .= "$separator$at_name";
+            $separator = ', ';
+          }             
+          array_push($dis_resources, $at_name);
+        }
+      }
+
+      if ($properties != '') {
+        $charset = mb_internal_encoding();
+        $dom = new DOMDocument("1.0", "$charset");
+        $item = $dom->saveXML()."$properties";
+        $xml = parse_item($item);
+        if (is_object($xml)) {
+          foreach($xml->resource as $value) {
+            if (!empty($value->item)) {
+              if (!empty($value->property_value)) {
+                 $block_property = "($value->property_name:$value->property_value)";
+              } else {
+                 $block_property = '';
+              }
+              $item_list .= "$value->res_name $block_property".
+                nl2br($value->item);
+            }
+          }
+        }
+      }
+
+      if ($evt_y-$key*$this->font_size < $this->content_y0+$this->font_size) {
+        $this->addPage(true, false);
+        $this->drawHeader();
+        $evt_y = $this->current_y+$key*$this->font_size;
+      }
+
+      // Event title
+      $this->page->setFillColor(new Zend_Pdf_Color_Html("#368397"));
+      $this->page->drawText(
+        "$hour - $title",
+         $this->content_x0+150,
+         $evt_y-$key*$this->font_size,
+         'UTF-8');
+
+      // Event attendees + resources
+      $this->page->drawText(
+        $dis_user.$dis_res,
+        $this->calendar_x1-strlen($dis_user.$dis_res)*5,
+        $evt_y-$key*$this->font_size,
+        'UTF-8');        
+
+      if ($this->showdetails) {
+        $date_begin = $date->getOutputDateTime();
+        $date_end = $end->getOutputDateTime(); 
+        $repeat = $event->repeat;
+        if ($repeat == 'none') {
+	  $dis_repeat = '';
+        } else {
+	  $dis_repeat = ${"l_$repeat"};
+        }
+        $location = $event->location;
+        $category = $event->category1;
+        $description = $event->description;
+
+        $details = array(
+          "$l_datebegin" => "$date_begin", 
+          "$l_dateend" => "$date_end", 
+          "$l_repeat" => "$dis_repeat", 
+          "$l_category" => "$category",
+          "$l_location" => "$location", 
+          "$l_desc" => "$description",
+          "$l_attendees" => $dis_attendees, 
+          "$l_resources" => $dis_resources,
+          "$l_items" => "$item_list"); 
+
+        $details_height = (sizeof($details)+sizeof($dis_attendees)+sizeof($dis_resources)-2)*$this->font_size;
+
+        // left bar
+        $x0 = $this->content_x0+170;
+        $y0 = $evt_y-$key*$this->font_size;
+        $x1 = $x0+3;
+        $y1 = $y0-$this->font_size-$details_height;
+
+        $this->page->setFillColor(new Zend_Pdf_Color_Html("#B3B3B3"));
+        $this->page->drawRectangle($x0, $y0, $x1, $y1, Zend_Pdf_Page::SHAPE_DRAW_FILL);
+
+        // details list
+        $this->page->setFillColor(new Zend_Pdf_Color_Html("#3D3D3D"));
+        $i=0;
+        foreach($details as $label => $value){
+          $this->page->drawText(
+            $label,
+            $x0+5,
+            $y0-$this->font_size-$i*$this->font_size,
+            'UTF-8');
+          if (is_array($value)){
+            if (sizeof($value)==0) $i++;
+            foreach($value as $array_value){
+              $this->page->drawText(
+                $array_value,
+                $x0+80,
+                $y0-$this->font_size-$i*$this->font_size,
+                'UTF-8');
+              $i++;
+            }
+          } else {
+            $this->page->drawText(
+              $value,
+              $x0+80,
+              $y0-$this->font_size-$i*$this->font_size,
+              'UTF-8');
+             $i++;
+          }
+        }
+        $evt_y -= $i*$this->font_size;
+      }
+    }
+  }
+
+}
+
 ?>

@@ -74,6 +74,11 @@ $l_from = "du";
 $l_to = "au";
 $l_periodic = "Périodique";
 
+// PDF Options
+$l_display_details = "Afficher les détails";
+$l_one_day_per_page = "Un jour par page";
+$l_display_days = "Jours affichés";
+
 $l_conflicts = "Conflit(s) rencontré(s)";
 $l_date = "Date";
 $l_user = "Utilisateur";
@@ -84,6 +89,9 @@ $l_edit_full = "Compléter";
 $l_collapse_all = "Tout réduire";
 $l_expand_all = "Tout développer";
 $l_today_date = "Date du jour";
+
+$l_first_hour = "Heure de début";
+$l_last_hour = "Heure de fin";
 
 // actions 
 $l_meeting_perform = "Rechercher les créneaux libres";
@@ -143,6 +151,7 @@ $l_view_month_desc = "Voir les événements sur un mois";
 // Messages
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez sélectionner le ou les jours de répétition";
+$l_select_pdf_day = "Vous devez sélectionner un jour";
 $l_confirm_delete_all = "Cette opération va supprimer toutes les occurences de cet événement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
 $l_confirm_delete = "Cette opération va supprimer cette occurence de l'événement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
 $l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour ";

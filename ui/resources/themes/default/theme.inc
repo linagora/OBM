@@ -99,6 +99,7 @@ $ico_ok             = "$theme_path/ico_validate.gif";
 $ico_nok            = "$theme_path/ico_delete.gif";
 $ico_lock           = "$theme_path/ico_lock.gif";
 $ico_obm            = "$theme_path/logo_obm.gif";
+$ico_obm_org        = "$theme_path/logo_obm_org.jpg";
 $ico_print          = "$theme_path/ico_print.gif";
 $ico_web            = "$theme_path/ico_web.gif";
 $ico_mail           = "$theme_path/ico_mail.gif";

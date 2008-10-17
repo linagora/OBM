@@ -231,6 +231,9 @@ $l_down = "Move the field down one row";
 $l_up = "Move the field up one row";
 $l_select_all = "Select all";
 $l_unselect_all = "Unselect all";
+$l_pagelayout = "Orientation";
+$l_pagelayout_portrait = "Portrait";
+$l_pagelayout_landscape = "Landscape";
 
 // OBM_DISPLAY help screen
 $l_help = "Help";

@@ -11,6 +11,32 @@ require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
 
+
+function check_calendar_pdf_options() {
+  var hour_begin = parseInt($('cal_first_hour').value);
+  var hour_end = parseInt($('cal_last_hour').value);
+  var display_days = $('display_days');
+
+  if (hour_end <= hour_begin) {
+    alert('$l_err_begin_end');
+    return false;
+  }
+
+  if(display_days) {
+    for(var i=0;i<7;i++) {
+      var day = $('cba_repeatday_'+i);
+      if(day.getProperty('checked')) {
+        return true;
+      }
+    }
+    alert('$l_select_pdf_day');
+    return false;
+  }
+
+  return true;
+}
+
+
 function sel_public_group(date, element, label) {
   var item_id = element.getProperty('id').split('-');
   var id = item_id[item_id.length - 1];

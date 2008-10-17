@@ -85,6 +85,11 @@ $l_task = "Task";
 $l_category_filter = "Filter by category";
 $l_events = "Events";
 
+// PDF Options
+$l_display_details = "Display details";
+$l_one_day_per_page = "One day per page";
+$l_display_days = "Display days";
+
 $l_collapse_all = "Collapse all";
 $l_expand_all = "Expand all";
 $l_edit = "Edit";
@@ -95,6 +100,9 @@ $l_select_view = "Select view";
 $l_view_label = "View label";
 $l_view_save = "Save view";
 $l_view_delete = "Delete view";
+
+$l_first_hour = "Hour begin";
+$l_last_hour = "Hour end";
 
 // actions 
 $l_insert = "Insert the event";
@@ -133,6 +141,7 @@ $l_view_type = "View type";
 $l_sendamail = "Force notification by mail.";
 $l_select_contacts = "You have to select a user or group.";
 $l_select_repeat_day = "You have to select the repetition days.";
+$l_select_pdf_day = "You have to select one day";
 $l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour "; 
 $l_fill_title = "You have to fill the [ $l_title ] field";
 $l_fill_dateend = "You have to fill the [ $l_dateend ] field";
