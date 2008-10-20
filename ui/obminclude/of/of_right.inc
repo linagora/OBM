@@ -482,6 +482,9 @@ function html_dis_right_admin(&$consumers, $entity_id, $entity) {
 function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set='', $real_entity='') {
   global $cdg_sql, $obm;
 
+  // GLOBAL - superman has all rights on entities
+  global $cright_write_admin;
+  
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
@@ -513,7 +516,20 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
     $e_id = "e.${entity}_id";
     $e_label = "e.${entity}_name";
   }
-
+  
+  // BEGIN - superman has all rights on entities
+  
+  // IF asked right check AND admin && current user is admin
+  if ($right == 'admin' && (Perm::get_module_rights($entityu) & $cright_write_admin) == $cright_write_admin ) {
+    $multidomain = sql_multidomain($r_entity);
+    $union_admin = "UNION SELECT $e_id AS id, $e_label AS label,
+      '$entity' as entityright_entity
+      FROM $table_entity AS e
+      WHERE 1=1 $multidomain";
+  }
+  
+  // END - superman has all rights on entities
+    
   if ($right != 'all') {
     $where_right = "AND entityright_$right = 1";
   }
@@ -531,10 +547,12 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
         $where_right
     GROUP BY id, label, entityright_entity
     $union
+    $union_admin
     ORDER BY entityright_entity, label";
 
   display_debug_msg($query, $cdg_sql, 'of_right_entity_for_user()');
   $obm_q->query($query);
+
   while($obm_q->next_record()) {
     $id = $obm_q->f('id');
     if ( ($ids_set == '')
@@ -574,9 +592,56 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
 ///////////////////////////////////////////////////////////////////////////////
 function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $right='all') {
   global $cdg_sql;
-
+  
+  // GLOBAL - superman has all rights on entities
+  global $profiles, $cright_write_admin;
+  
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  
+  // BEGIN - superman has all rights on entities
+  
+  if ($consumer == 'user' || $consumer == 'all') {
+    foreach ($profiles as $profile_name => $profile) {
+      if (isset($profile['module'][$entity])) {
+        $module_right = hexdec($profile['module'][$entity]);
+      } else {
+        $module_right = hexdec($profile['module']['default']);
+      }
+      
+	    if ( ($module_right & $cright_write_admin) == $cright_write_admin ) {
+  	  	$admin_profiles[] = $profile_name;
+	    }
+    }
+    
+    $multidomain = sql_multidomain('userobm');
+    
+    $ctt = array();
+    $ctt[0]['type'] = 'field';
+    $ctt[0]['value'] = 'userobm_lastname';
+    $ctt[1]['type'] = 'string';
+    $ctt[1]['value'] = ' ';
+    $ctt[2]['type'] = 'field';
+    $ctt[2]['value'] = 'userobm_firstname';
+    $user_label = sql_string_concat($db_type, $ctt);
+    
+    $union_admin = "UNION SELECT
+        userobm_id as id,
+        $user_label AS label,
+        'user' AS entityright_consumer,
+        userobm_id AS entityright_consumer_id,
+        0 AS entityright_read,
+        0 AS entityright_write,
+        1 AS entityright_admin
+      FROM UserObm
+      WHERE
+        userobm_perms IN ('". join('\',\'', $admin_profiles). "')
+        $multidomain
+      ";
+  }
+  
+  // END - superman has all rights on entities
+  
   if(count($entity_id) == 0) {
     return array('ids' => array(), 'entity' => array());
   }
@@ -588,7 +653,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
   $con_array = array();
 
   if ($consumer == 'user' || $consumer == 'all' ) {
-
+    $ctt = array();
     $ctt[0]['type'] = 'field';
     $ctt[0]['value'] = 'userobm_lastname';
     $ctt[1]['type'] = 'string';
@@ -618,11 +683,13 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
       LEFT JOIN UGroup ON entityright_consumer = 'group' AND entityright_consumer_id = group_id
     WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity'
       $where_right
+    $union_admin
     ORDER BY entityright_consumer, label";
 
   display_debug_msg($query, $cdg_sql, 'of_right_consumer_for_entity()');
   $obm_q->query($query);
   $ret_array = array();
+  $id_array = array();
   while($obm_q->next_record()) {
     $id = $obm_q->f('id');
     $label = $obm_q->f('label');
@@ -631,16 +698,23 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
     $read = $obm_q->f('entityright_read');
     $write = $obm_q->f('entityright_write');
     $admin = $obm_q->f('entityright_admin');
-    $id_array[] = $id;
-    $con_array[] = array(
-			 'id'    => $id,
-			 'label' => $label,
-                         'entity_id' => $entity_id,
-                         'entity' => $entity,
-			 'read' => $read,
-			 'write' => $write,
-			 'admin' => $admin
-			 );
+
+    if (!in_array($id, $id_array)) {
+      $id_array[] = $id;
+      $con_array[] = array(
+			   'id'    => $id,
+			   'label' => $label,
+         'entity_id' => $entity_id,
+         'entity' => $entity,
+         'read' => $read,
+         'write' => $write,
+         'admin' => $admin
+       );
+    } else {
+    	// superman bonus
+    	$con_array[array_search($id, $id_array)]['read'] |= $read;
+      $con_array[array_search($id, $id_array)]['write'] |= $write;
+    }
   }
 
   $ret_array['ids'] = array();
@@ -651,7 +725,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
   if (is_array($con_array)) {
     $ret_array['consumer'] = $con_array;
   }
-
+  
   return $ret_array;
 }
 
@@ -900,9 +974,47 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
 ///////////////////////////////////////////////////////////////////////////////
 function of_right_users_for_entity($entity, $entity_id, $right='all') {
   global $cdg_sql;
-
+  
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  
+  // GLOBAL - superman has all rights on entities
+  global $profiles, $cright_write_admin;
+  
+  // BEGIN - superman has all rights on entities
+  
+  {
+    foreach ($profiles as $profile_name => $profile) {
+      if (isset($profile['module'][$entity])) {
+        $module_right = hexdec($profile['module'][$entity]);
+      } else {
+        $module_right = hexdec($profile['module']['default']);
+      }
+      
+      if ( ($module_right & $cright_write_admin) == $cright_write_admin ) {
+        $admin_profiles[] = $profile_name;
+      }
+    }
+    
+    $multidomain = sql_multidomain('userobm');
+    
+    $union_admin = "UNION SELECT
+        userobm_firstname,
+        userobm_lastname,
+        userobm_id,
+        1 AS entityright_read,
+        1 AS entityright_write,
+        1 AS entityright_admin
+      FROM UserObm
+      WHERE
+        userobm_perms IN ('". join('\',\'', $admin_profiles). "')
+        $multidomain
+      ";
+        $union_admin='';
+  }
+      
+  // END - superman has all rights on entities
+  
   if(count($entity_id) == 0) {
     return array('ids' => array(), 'entity' => array());
   }
@@ -936,6 +1048,9 @@ function of_right_users_for_entity($entity, $entity_id, $right='all') {
     LEFT JOIN of_usergroup ON userobm_id = of_usergroup_user_id 
     LEFT JOIN EntityRight ON (of_usergroup_group_id = entityright_consumer_id AND entityright_consumer = 'group') 
     WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity' $where_right
+    
+    $union_admin
+    
     ORDER BY userobm_firstname, userobm_lastname 
 ";
 
@@ -949,15 +1064,23 @@ function of_right_users_for_entity($entity, $entity_id, $right='all') {
     $read = $obm_q->f('entityright_read');
     $write = $obm_q->f('entityright_write');
     $admin = $obm_q->f('entityright_admin');
-    $id_array[] = $id;
-    $con_array[] = array(
-			 'id'    => $id,
-			 'label' => $label,
-			 'entity_id' => $entity_id,
-			 'read' => $read,
-			 'write' => $write,
-                         'admin' => $admin
-			 );
+    
+    if (!in_array($id, $id_array)) {
+      $id_array[] = $id;
+      $con_array[] = array(
+         'id'    => $id,
+         'label' => $label,
+         'entity_id' => $entity_id,
+         'read' => $read,
+         'write' => $write,
+         'admin' => $admin
+        );
+    } else {
+      // superman bonus
+      $con_array[array_search($id, $id_array)]['read'] |= $read;
+      $con_array[array_search($id, $id_array)]['write'] |= $write;
+    }
+
   }
 
   $ret_array['ids'] = array();
