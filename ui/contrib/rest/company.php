@@ -80,7 +80,7 @@ function get_company_detail() {
   // foreach data, create xml node, add it to company node
   foreach ($datas as $data) {
     foreach ($data as $name => $value) {
-      $new_node = $xml_doc->createElement($name, utf8_encode($value)) ;
+      $new_node = $xml_doc->createElement($name, utf8_encode(htmlspecialchars($value, ENT_COMPAT, "UTF-8"))) ;
       $entity_node->appendChild($new_node) ;
     }
   }
