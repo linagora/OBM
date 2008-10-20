@@ -574,7 +574,7 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
   if (is_array($ent_array)) {
     $ret_array['entity'] = $ent_array;
   }
-
+  
   return $ret_array;
 }
 
@@ -594,25 +594,15 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
   global $cdg_sql;
   
   // GLOBAL - superman has all rights on entities
-  global $profiles, $cright_write_admin;
+  global $cright_write_admin, $obm;
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   
   // BEGIN - superman has all rights on entities
   
-  if ($consumer == 'user' || $consumer == 'all') {
-    foreach ($profiles as $profile_name => $profile) {
-      if (isset($profile['module'][$entity])) {
-        $module_right = hexdec($profile['module'][$entity]);
-      } else {
-        $module_right = hexdec($profile['module']['default']);
-      }
-      
-	    if ( ($module_right & $cright_write_admin) == $cright_write_admin ) {
-  	  	$admin_profiles[] = $profile_name;
-	    }
-    }
+  if (($consumer == 'user' || $consumer == 'all')
+    &&  (Perm::get_module_rights($entity) & $cright_write_admin) == $cright_write_admin) {
     
     $multidomain = sql_multidomain('userobm');
     
@@ -635,7 +625,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
         1 AS entityright_admin
       FROM UserObm
       WHERE
-        userobm_perms IN ('". join('\',\'', $admin_profiles). "')
+        userobm_id = $obm[uid]
         $multidomain
       ";
   }
@@ -698,7 +688,7 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
     $read = $obm_q->f('entityright_read');
     $write = $obm_q->f('entityright_write');
     $admin = $obm_q->f('entityright_admin');
-
+    
     if (!in_array($id, $id_array)) {
       $id_array[] = $id;
       $con_array[] = array(
@@ -979,38 +969,25 @@ function of_right_users_for_entity($entity, $entity_id, $right='all') {
   $db_type = $obm_q->type;
   
   // GLOBAL - superman has all rights on entities
-  global $profiles, $cright_write_admin;
+  global $cright_write_admin, $obm;
   
   // BEGIN - superman has all rights on entities
   
-  {
-    foreach ($profiles as $profile_name => $profile) {
-      if (isset($profile['module'][$entity])) {
-        $module_right = hexdec($profile['module'][$entity]);
-      } else {
-        $module_right = hexdec($profile['module']['default']);
-      }
-      
-      if ( ($module_right & $cright_write_admin) == $cright_write_admin ) {
-        $admin_profiles[] = $profile_name;
-      }
-    }
-    
+  if ((Perm::get_module_rights($entity) & $cright_write_admin) == $cright_write_admin) {
     $multidomain = sql_multidomain('userobm');
     
     $union_admin = "UNION SELECT
         userobm_firstname,
         userobm_lastname,
         userobm_id,
-        1 AS entityright_read,
-        1 AS entityright_write,
+        0 AS entityright_read,
+        0 AS entityright_write,
         1 AS entityright_admin
       FROM UserObm
       WHERE
-        userobm_perms IN ('". join('\',\'', $admin_profiles). "')
+        userobm_id = $obm[uid]
         $multidomain
       ";
-        $union_admin='';
   }
       
   // END - superman has all rights on entities
