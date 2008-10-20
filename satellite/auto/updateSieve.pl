@@ -49,7 +49,7 @@ sub getParameter {
         &OBM::toolBox::write_log( "Parametre --domain manquant", "W" );
         return 1;
     }else {
-        if( $$parameters{"domain"} !~ /$regexp_domain/ ) {
+        if( $$parameters{"domain"} !~ /$regexp_domain_id/ ) {
             &OBM::toolBox::write_log( "Parametre --domain invalide", "W" );
             return 1;
         }

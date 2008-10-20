@@ -56,7 +56,7 @@ sub getParameter {
         return 1;
 
     }else {
-        if( $$parameters{domain} !~ /$regexp_domain/ ) {
+        if( $$parameters{domain} !~ /$regexp_domain_id/ ) {
             &OBM::toolBox::write_log( "Parametre --domain incorrect", "WC", 0 );
             return 1;
         }

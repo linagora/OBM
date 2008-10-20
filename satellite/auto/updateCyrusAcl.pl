@@ -64,7 +64,7 @@ sub getParameter {
         print STDERR "Paramètre '--domain' manquant.\nCe paramètre indique l'ID BD du domaine de l'entité à mettre à jour.\n";
         return 1;
     }else {
-        if( $$parameters{"domain"} !~ /$regexp_domain/ ) {
+        if( $$parameters{"domain"} !~ /$regexp_domain_id/ ) {
             &OBM::toolBox::write_log( "Parametre --domain invalide", "W" );
             print STDERR "Paramètre '--domain' invalide.\nCe paramètre indique l'ID BD du domaine de l'entité à mettre à jour.\n";
             return 1;
