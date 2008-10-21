@@ -238,13 +238,11 @@ Obm.CalendarDayEvent = new Class({
 
   setTime: function(time) {
     var myDate = new Date(time * 1000);
-    console.log(myDate.getTime()/1000);
     var startDate = new Date(obm.calendarManager.startTime * 1000);
     myDate.setHours(startDate.getHours());
     myDate.setMinutes(startDate.getMinutes());
     myDate.setSeconds(startDate.getSeconds());
     origin = Math.floor((myDate.getTime() - startDate.getTime())/1000);
-    console.log(myDate.getTime()/1000, startDate.getTime()/1000 );
     if (this.setOrigin(origin)) {
       this.event.time = this.guessEventTime(time);
     } else {

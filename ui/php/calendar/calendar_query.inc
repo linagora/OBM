@@ -2780,7 +2780,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('A'
     $entity_state = $r_q->f('evententity_state');
     $all_day = $r_q->f('calendarevent_allday');    
     $owner = $r_q->f('calendarevent_owner');
-    if (!$endrepeat) {
+    if ($endrepeat->error() == Of_Date::WARN_EMPTY_DATE) {
       $endrepeat = $end;
     }
     $addOcc = true;

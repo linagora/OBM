@@ -41,6 +41,7 @@ $l_category5 = "catégorie 5";
 $l_date_after = "Date Après";
 $l_date_before = "Date Avant";
 $l_mailing_ok_first = "Mail.";
+$l_birthday = "Date de naissance";
 
 // Actions
 $l_j_check_date = "Remplissez la date avec une date valide";
@@ -83,6 +84,8 @@ $l_kind_link_contact = "Ces contacts sont du genre";
 $l_kind_link_contact_no = "Pas de contacts du genre";
 $l_kind_cant_delete = "Le genre ne peut être supprimé !";
 $l_kind_can_delete = "Le genre peut être supprimé.";
+
+$l_birthday_event_title = "Anniversaire de %s";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_lastname = "Vous devez renseigner le Nom avant de valider.";

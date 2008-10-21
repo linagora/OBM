@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 //---------------------------------------------------------------------------//
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
@@ -730,7 +729,7 @@ function dis_contact_consult($contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_header($co_q, $funcs) {
   global $l_company, $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title;
-  global $l_contact, $l_market, $l_archive, $l_date, $l_no_date;
+  global $l_contact, $l_market, $l_archive, $l_date, $l_no_date, $l_birthday;
   global $cgp_show, $cgp_hide, $l_yes, $l_no;
   global $display, $path, $action;
 
@@ -749,8 +748,15 @@ function html_contact_header($co_q, $funcs) {
   $aka = $co_q->f('contact_aka');
   $archive = ($co_q->f('contact_archive') == 1 ? $l_yes : $l_no);
   $date = $co_q->f('contact_date');
-  $date = ($date != 0) ? of_date_format($date) : $l_no_date; 
- 
+  $date = ($date != 0) ? of_date_format($date) : $l_no_date;
+  
+  if ($co_q->f('contact_birthday')) {
+    $birthday = new Of_Date($co_q->f('contact_birthday'));
+    $birthday = $birthday->getOutputDate();
+  } else {
+    $birthday = $l_no_date;
+  }
+  
   // Display Aka only if non empty
   if ($aka != '') {
     $dis_aka = "
@@ -766,6 +772,7 @@ function html_contact_header($co_q, $funcs) {
   $show_title = (! $cgp_hide['contact']['contact_title']);
   $show_resp = (! $cgp_hide['contact']['responsible']);
   $show_date = (! $cgp_hide['contact']['contact_date']);
+  $show_birthday = (! $cgp_hide['contact']['contact_birthday']);
 
   $display['title'] = "$lname $fname";
 
@@ -802,7 +809,16 @@ function html_contact_header($co_q, $funcs) {
       <th>$l_date</th>
       <td>$date</td>";
   }
-
+  
+  // Birthday consult field
+  if ($show_birthday) {
+    $block_birthday = "
+    <tr>
+      <th>$l_birthday</th>
+      <td>$birthday</td>
+    ";
+  }
+  
   // --- HTML Template --------------------------------------------------------
 
   $block = "
@@ -831,6 +847,7 @@ function html_contact_header($co_q, $funcs) {
     $block_title
     $block_resp
     $block_date
+    $block_birthday
     </tr>
     </table>
     </div>"; 
@@ -886,7 +903,7 @@ function html_contact_view_main($co_q) {
   $com  = beautify_comment(nl2br($co_q->f('contact_comment')));
   $com2 = beautify_comment(nl2br($co_q->f('contact_comment2')));
   $com3 = beautify_comment(nl2br($co_q->f('contact_comment3')));
-
+  
   $newline = "\\r\\n";
   if (($ad1 == '') && ($ad2 == '') && ($ad3 == '') && ($zip == '')
       && ($town == '') && ($cdx == '') && ($ctry_name == '')) {
@@ -995,7 +1012,7 @@ function html_contact_view_main($co_q) {
   if (($email != '') && (in_array('email', $cclipboard_address))) {
     $copy .= "$l_email : " . addslashes($email).$newline;
   }
-
+  
   // Service field
   if ($show_service) {
     $block_service = "
@@ -1294,6 +1311,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   global $l_comment1, $l_add_comment1, $l_upd_comment1;
   global $l_comment2, $l_add_comment2, $l_upd_comment2,$l_yes;
   global $l_comment3, $l_add_comment3, $l_upd_comment3,$l_lang;
+  global $l_birthday;
   global $l_datasource, $l_archive, $l_private, $l_coord, $l_contact, $l_market;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
@@ -1312,6 +1330,13 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $mark = $co_q->f('contact_marketingmanager_id');
     $date = $co_q->f('contact_date');
     $date = of_date_upd_format($date, true);
+    
+    if ($co_q->f('contact_birthday')) {
+      $birthday = $co_q->f('contact_birthday');
+      $birthday = new Of_Date($birthday);
+      $birthday = $birthday->getOutputDate();
+    }
+    
     $lname = $co_q->f('contact_lastname');
     $fname = $co_q->f('contact_firstname');
     $aka = $co_q->f('contact_aka');
@@ -1405,6 +1430,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   if (isset($contact['kind'])) { $kind = $contact['kind']; }
   if (isset($contact['market'])) { $mark = $contact['market']; }
   if (isset($contact['date'])) { $date = of_date_upd_format($contact['date'],true); }
+  if (isset($contact['birthday'])) { $birthday = of_date_upd_format($contact['birthday'],true); }
   if (isset($contact['lname'])) { $lname = stripslashes($contact['lname']); }
   if (isset($contact['fname'])) { $fname = stripslashes($contact['fname']); }
   if (isset($contact['aka'])) { $aka = stripslashes($contact['aka']); }
@@ -1449,6 +1475,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   $show_cdx = (! $cgp_hide['contact']['contact_expresspostal']);
   $show_comment2 = (! $cgp_hide['contact']['contact_comment2']);
   $show_comment3 = (! $cgp_hide['contact']['contact_comment3']);
+  $show_birthday = (! $cgp_hide['contact']['birthday']);
 
   // User defined data
   $block_userdata = of_userdata_dis_entity_form('contact', $id, $contact);
@@ -1499,6 +1526,15 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       <td>
         <input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/>
       </td>
+    </tr>";
+  }
+  
+  // Birthday form field
+  if ($show_birthday) {
+    $block_birthday = "
+    <tr>
+      <th>$l_birthday</th>
+      <td><input type=\"text\" name=\"tf_birthday\" value=\"$birthday\" class=\"datePicker\"/></td>
     </tr>";
   }
 
@@ -1729,7 +1765,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
 
   // --- HTML Template --------------------------------------------------------
   $block = "$script";
-
+  
   $block .= "
     <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare('contact_index.php')."\">
 
@@ -1782,6 +1818,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $block_resp
     $block_date
     $block_userdata
+    $block_birthday
     </table>
     </fieldset>
    

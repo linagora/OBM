@@ -28,6 +28,7 @@ $l_comment3 = "Comment 3";
 $l_date_after = "Inscription date after";
 $l_date_before = "Inscription date before";
 $l_mailing_ok_first = "Mail.";
+$l_birthday = "Birth day";
 
 // Labels and texts
 $l_contact_name = "Contact Name";
@@ -81,6 +82,8 @@ $l_kind_link_company_no = "No company referenced as";
 $l_kind_cant_delete = "The Kind can't be deleted !";
 $l_kind_can_delete = "The Kind can be deleted.";
 
+$l_birthday_event_title = "%s's birthday";
+
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
 $l_fill_lastname = "You have to fill the Lastname before submitting.";
 $l_fill_company = "You have to select a company before submitting.";
@@ -106,3 +109,4 @@ $l_renewal = "Automatic renewal";
 $l_recept = "Reception mode";
 $l_quantity = "Quantity";
 $l_no_found_subscription = "No subscription found for this contact !";
+

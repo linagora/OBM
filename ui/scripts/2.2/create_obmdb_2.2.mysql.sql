@@ -404,6 +404,7 @@ CREATE TABLE Contact (
   contact_archive char(1) default '0',
   contact_privacy int(2) NOT NULL default '0',
   contact_date timestamp NOT NULL default '0000-00-00 00:00:00',
+  contact_birthday_id int(8) NULL,
   contact_comment text,
   contact_comment2 text,
   contact_comment3 text,
@@ -416,6 +417,7 @@ CREATE TABLE Contact (
   KEY contact_kind_id_kind_id_fkey (contact_kind_id),
   KEY contact_marketingmanager_id_userobm_id_fkey (contact_marketingmanager_id),
   KEY contact_function_id_contactfunction_id_fkey (contact_function_id),
+  KEY contact_birthday_id_fkey (contact_birthday_id),
   CONSTRAINT contact_function_id_contactfunction_id_fkey FOREIGN KEY (contact_function_id) REFERENCES ContactFunction (contactfunction_id) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT contact_company_id_company_id_fkey FOREIGN KEY (contact_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT contact_datasource_id_datasource_id_fkey FOREIGN KEY (contact_datasource_id) REFERENCES DataSource (datasource_id) ON DELETE SET NULL ON UPDATE CASCADE,
@@ -423,7 +425,8 @@ CREATE TABLE Contact (
   CONSTRAINT contact_kind_id_kind_id_fkey FOREIGN KEY (contact_kind_id) REFERENCES Kind (kind_id) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT contact_marketingmanager_id_userobm_id_fkey FOREIGN KEY (contact_marketingmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT contact_usercreate_userobm_id_fkey FOREIGN KEY (contact_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT contact_userupdate_userobm_id_fkey FOREIGN KEY (contact_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT contact_userupdate_userobm_id_fkey FOREIGN KEY (contact_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT contact_birthday_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES CalendarEvent (calendarevent_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
