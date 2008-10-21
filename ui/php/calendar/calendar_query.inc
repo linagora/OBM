@@ -2979,31 +2979,24 @@ function calendar_monthlybydate_repeatition($date,$start,$end,$repeatfrequence,$
 // Parameters:
 //   - $date : timestamp
 ///////////////////////////////////////////////////////////////////////////////
-function calendar_yearly_repeatition($date,$start,$end_date,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {
+function calendar_yearly_repeatition($date,$start,$end,$repeatfrequence,$event,$entity_id,$entity, $entity_state) {
   global $day_duration;
 
-  $temp_date = $date;    
-  if ($temp_date < $start) {
-    $temp_date = strtotime(date('Y-m-01',$start));
-    $month_diff = (of_date_get_year($start) - of_date_get_year($date)) * 12;
-    $month_diff += of_date_get_month($start) - of_date_get_month($date);
-    $hour_diff = of_date_get_hour($date) - of_date_get_hour($start);
-    $min_diff = of_date_get_min($date) - of_date_get_min($start);
-    $month_diff = $month_diff % ($repeatfrequence*12);
-    if ($month_diff > 0) {
-      $month_diff = $repeatfrequence*12 - $month_diff;
+  $current = clone $date;
+  if ($current->compare($start) < 0) {
+    $diff = $start->getYear() - $current->getYear();
+    if ($diff > 0) {
+      $diff = $diff  % $repeatfrequence;
     }
-    $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $temp_date);
-  }
-  $hour_diff = of_date_get_hour($date);
-  $min_diff = of_date_get_min($date);
-  $ts_date = strtotime(date('Y-m-'.date('d',$date),$temp_date));
-  $ts_date = strtotime("+$hour_diff hours +$min_diff minutes",$ts_date);
-  while ($ts_date < $end_date) {
+    $current->setYear($start)->subYear($diff); 
+  } 
+    
+  while ($current->compareDateIso($end) < 0) {
     $of = &OccurrenceFactory::getInstance();
-    $of->addOccurrence($event, $ts_date, $entity, $entity_id, $entity_state);
-    $ts_date = strtotime("+$repeatfrequence years",$ts_date);
-  }
+    $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
+    $current->addYear($repeatfrequence);
+  }  
+  
 }
 
 
