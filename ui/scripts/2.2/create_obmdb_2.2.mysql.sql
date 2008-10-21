@@ -404,7 +404,7 @@ CREATE TABLE Contact (
   contact_archive char(1) default '0',
   contact_privacy int(2) NOT NULL default '0',
   contact_date timestamp NOT NULL default '0000-00-00 00:00:00',
-  contact_birthday_id int(8) NULL,
+  contact_birthday_id int(8) default NULL,
   contact_comment text,
   contact_comment2 text,
   contact_comment3 text,

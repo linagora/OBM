@@ -1494,6 +1494,10 @@ ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profile_id_
 -- Foreign key from profilepropertyvalue_property_id to profileproperty_id
 ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty(profileproperty_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+-- Foreign key from contact_birthday_id to calendarevent_id
+ALTER TABLE Contact ADD CONSTRAINT contact_birthday_id_calendarevent_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES CalendarEvent(calendarevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
 -- DATA
 
 -- module 'profile'

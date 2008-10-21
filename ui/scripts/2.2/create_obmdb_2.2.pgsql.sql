@@ -430,6 +430,7 @@ CREATE TABLE Contact (
   contact_comment              text,
   contact_comment2             text,
   contact_comment3             text,
+  contact_birthday_id          integer,
   PRIMARY KEY (contact_id)
 );
 
@@ -2151,6 +2152,9 @@ ALTER TABLE Contact ADD CONSTRAINT contact_marketingmanager_id_userobm_id_fkey F
 
 -- Foreign key from contact_function_id to contactfunction_id
 ALTER TABLE Contact ADD CONSTRAINT contact_function_id_contactfunction_id_fkey FOREIGN KEY (contact_function_id) REFERENCES ContactFunction(contactfunction_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from contact_birthday_id to calendarevent_id
+ALTER TABLE Contact ADD CONSTRAINT contact_birthday_id_calendarevent_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES CalendarEvent(calendarevent_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from contactfunction_domain_id to domain_id
 ALTER TABLE ContactFunction ADD CONSTRAINT contactfunction_domain_id_domain_id_fkey FOREIGN KEY (contactfunction_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
