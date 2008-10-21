@@ -474,7 +474,7 @@ function get_user_action() {
 // Detail Consult
   $actions['user']['detailconsult'] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/user/user_index.php?action=detailconsult&amp;user_id=".$params['user_id']."",
+    'Url'      => "$path/user/user_index.php?action=detailconsult&amp;user_id=".$params['user_id'],
     'Right'    => $cright_read_admin,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'group_consult', 'group_update')
                                   );
@@ -482,7 +482,7 @@ function get_user_action() {
 // Detail Update
   $actions['user']['detailupdate'] = array (
      'Name'     => $l_header_update,
-     'Url'      => "$path/user/user_index.php?action=detailupdate&amp;user_id=".$params['user_id']."",
+     'Url'      => "$path/user/user_index.php?action=detailupdate&amp;user_id=".$params['user_id'],
      'Right'    => $cright_write_admin,
      'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update')
                                      	   );
@@ -504,7 +504,7 @@ function get_user_action() {
 // Group Consult
   $actions['user']['group_consult'] = array (
     'Name'     => $l_header_upd_group,
-    'Url'      => "$path/user/user_index.php?action=group_consult&amp;user_id=".$params['user_id']."",
+    'Url'      => "$path/user/user_index.php?action=group_consult&amp;user_id=".$params['user_id'],
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update')
                                      );
@@ -519,7 +519,7 @@ function get_user_action() {
 // Reset
   $actions['user']['reset'] = array (
     'Name'     => $l_header_reset,
-    'Url'      => "$path/user/user_index.php?action=reset&amp;user_id=".$params['user_id']."",
+    'Url'      => "$path/user/user_index.php?action=reset&amp;user_id=".$params['user_id'],
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'group_consult', 'group_update') 
                                     );
@@ -527,7 +527,7 @@ function get_user_action() {
 // Check Delete
   $actions['user']['check_delete'] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/user/user_index.php?action=check_delete&amp;user_id=".$params['user_id']."",
+    'Url'      => "$path/user/user_index.php?action=check_delete&amp;user_id=".$params['user_id'],
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update') 
                                      	   );

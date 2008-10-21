@@ -506,7 +506,7 @@ function get_group_action() {
 // Sel user add : Users selection
   $actions["group"]["sel_user_add"] = array (
     'Name'     => $l_header_add_user,
-    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$params["group_id"]."&amp;ext_target=$l_group&amp;mode=html",
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$params["group_id"]."&amp;ext_target=$l_group",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_group,
@@ -633,7 +633,7 @@ function update_group_action() {
       $actions['group']['check_delete']['Condition'][] = 'insert';
 
       // Sel User add
-      $actions['group']['sel_user_add']['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group&amp;mode=html";
+      $actions['group']['sel_user_add']['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group";
       $actions['group']['sel_user_add']['Condition'][] = 'insert';
 
       // Sel group add : Groups selection

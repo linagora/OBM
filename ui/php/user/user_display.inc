@@ -63,7 +63,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
       $res["url"] = "javascript:check_user_get_id_url('$ext_url',".$OD->data_set->f("userobm_id").");";
     } else {
       if ($link_ok && $perm->check_right($module, $cright_read_admin))
-        $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id")."&amp;mode=html";
+        $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
     }
   }
 
@@ -313,7 +313,6 @@ function html_user_search_form($user) {
       $form_action
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
-      <input type=\"hidden\" name=\"mode\" value=\"html\" />
       $dis_filter_entity
       $ext
     </label>
@@ -388,7 +387,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
   }
 
-  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_exp=$exp&amp;tf_group=$group&amp;cba_archive=$archive&amp;mode=html$url_userdata$url_ext");
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_exp=$exp&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext");
 
   $user_d = new OBM_DISPLAY("DATA", $prefs, "user");
   if ($popup) {
@@ -413,7 +412,6 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
         <input type=\"submit\" value=\"$l_add\" />
         <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-        <input type=\"hidden\" name=\"mode\" value=\"html\" />
       </div>
       </form>";
 
@@ -443,7 +441,6 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
       <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_edit_users\" />
         <input type=\"hidden\" name=\"action\" value=\"edit_batch_values\" />
-        <input type=\"hidden\" name=\"mode\" value=\"html\" />
       </div>
       </form>";
     
@@ -990,7 +987,6 @@ function html_user_group_consult($usr_q) {
   <fieldset class=\"buttons\">
   <input type=\"hidden\" name=\"user_id\" value=\"$id\" />
   <input type=\"hidden\" name=\"action\" value=\"group_update\" />
-  <input type=\"hidden\" name=\"mode\" value=\"html\" />
   <input type=\"submit\" value=\"$l_update_group\" />
   </fieldset>
   </form>";
@@ -1453,13 +1449,11 @@ function html_user_form($usr_q, $user, $field='') {
   // Buttons
   if (($action == "new") || ($action == "insert")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-    <input type=\"hidden\" name=\"mode\" value=\"html\" />
       <input type=\"submit\" value=\"$l_insert\" />";
 
   } elseif (($action=="detailupdate") || ($action=="update")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"user_id\" value=\"$id\" />
-      <input type=\"hidden\" name=\"mode\" value=\"html\" />
       <input type=\"submit\" value=\"$l_update\" />";
   }
 
@@ -1877,7 +1871,6 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     action=\"" . url_prepare("user_index.php") . "\">
     $hidden_fields
     <input type=\"hidden\" name=\"action\" value=\"new\" />
-    <input type=\"hidden\" name=\"mode\" value=\"html\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>
  </div>";
@@ -1901,14 +1894,12 @@ function dis_user_can_delete($p_id) {
   $dis_back = "<form name=\"form_back\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
     <input type=\"hidden\" name=\"user_id\" value=\"$p_id\" />
-    <input type=\"hidden\" name=\"mode\" value=\"html\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
   $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"user_id\" value=\"$p_id\" />
-    <input type=\"hidden\" name=\"mode\" value=\"html\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";
@@ -2156,7 +2147,6 @@ function html_user_import_file() {
     </table>
     <fieldset class=\"buttons\">
       <input type=\"submit\" name=\"submit\" value=\"$l_import_file\" />
-      <input type=\"hidden\" name=\"mode\" value=\"html\" />
     </fielset>
     </form>
     </div>";
@@ -2578,7 +2568,6 @@ function html_user_batch_form($params) {
   
   $buttons_block = "
     <input type=\"hidden\" name=\"action\" value=\"batch_processing\" />
-    <input type=\"hidden\" name=\"mode\" value=\"html\" />
   	<input type=\"submit\" value=\"$l_do_batch_processing\" />
   ";
   if (!isset($params['data-u-id'])) {

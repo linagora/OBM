@@ -680,7 +680,7 @@ function get_project_action() {
 // Select members : Lists selection
   $actions['project']['sel_member'] = array (
     'Name'     => $l_header_add_member,
-    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_member)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path.'/project/project_index.php')."&amp;ext_id=".$params['project_id']."&amp;ext_target=$l_project&amp;mode=html",
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_member)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path.'/project/project_index.php')."&amp;ext_id=".$params['project_id']."&amp;ext_target=$l_project",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_project,
@@ -866,7 +866,7 @@ function update_project_action() {
   $actions['project']['member']['Url'] = "$path/project/project_index.php?action=member&amp;project_id=".$params['project_id'];
 
   // Select Member
-  $actions['project']['sel_member']['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_member)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path.'/project/project_index.php')."&amp;ext_id=".$params['project_id']."&amp;ext_target=$l_project&amp;mode=html";
+  $actions['project']['sel_member']['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_member)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path.'/project/project_index.php')."&amp;ext_id=".$params['project_id']."&amp;ext_target=$l_project";
 
   // Time Allocation
   $actions['project']['allocate']['Url'] = "$path/project/project_index.php?action=allocate&amp;project_id=".$params['project_id'];
