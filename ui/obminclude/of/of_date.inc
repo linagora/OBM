@@ -11,7 +11,7 @@ class Of_Date extends DateTime {
 
   const WEEKDAY        = 'l';              // l - full day name - locale aware, Monday - Sunday
   const WEEKDAY_SHORT  = 'D';              // --- 3 letter day of week - locale aware, Mon-Sun
-  const WEEKDAY_NARROW = 'WEEKDAY_NARROW'; // --- 1 letter day name - locale aware, M-S
+  const WEEKDAY_NARROW = 'X';                 // --- 1 letter day name - locale aware, M-S
   const WEEKDAY_NAME   = 'D';              // D - abbreviated day name, 1-3 letters - locale aware, Mon-Sun
 
   const WEEKDAY_8601   = 'N';              // N - digit weekday ISO 8601, 1-7 1 = monday, 7=sunday
@@ -22,7 +22,7 @@ class Of_Date extends DateTime {
 
   // month formats
   const MONTH          = 'm';              // m - 2 digit month, 01-12
-  const MONTH_SHORT    = 'n ';             // n - 1 digit month, no leading zeros, 1-12
+  const MONTH_SHORT    = 'n';             // n - 1 digit month, no leading zeros, 1-12
 
   const MONTH_DAYS     = 't';              // t - Number of days this month
 
@@ -92,6 +92,7 @@ class Of_Date extends DateTime {
   const OBM_DATE_DAY            = 'l j F Y';
   const OBM_DATE_WEEK           = 'j F Y';
   const OBM_DATE_WEEK_LIST      = 'D j';
+  const OBM_DATE_WEEK_LONG      = 'l j';
   const OBM_DATE_WEEK_JUMP      = 'j M';
   const OBM_DATE_MONTH          = 'F Y';
   const OBM_DATE_MONTH_LIST     = 'l j F';
@@ -208,6 +209,46 @@ class Of_Date extends DateTime {
       default :
         return $this->format($part);
     }
+  }
+
+  /**
+   * Returns a date part or a date part.
+   * locale aware
+   *  
+   * @param mixed $part  Part to get
+   * @access public
+   * @return void
+   */
+  public function localize($part) {
+    $parts = str_split($part);
+    $string = '';
+    foreach($parts as $digit) {
+      switch ($digit) {
+      case self::WEEKDAY :
+        $string .= $GLOBALS['l_daysofweek'][$this->get(self::WEEKDAY_DIGIT)];
+        break;
+      case self::WEEKDAY_SHORT :
+        $string .= $GLOBALS['l_daysofweekshort'][$this->get(self::WEEKDAY_DIGIT)];
+        break;
+      case self::WEEKDAY_NARROW :
+        $string .= $GLOBALS['l_daysofweekfirst'][$this->get(self::WEEKDAY_DIGIT)];
+        break;
+      case self::WEEKDAY_NAME :
+        $string .= $GLOBALS['l_daysofweek'][$this->get(self::WEEKDAY_DIGIT)];
+        break;
+      case self::MONTH_NAME :
+        $string .= $GLOBALS['l_monthsofyear'][$this->get(self::MONTH_SHORT) - 1];
+        break;
+      case self::MONTH_NAME_SHORT :
+        $string .= $GLOBALS['l_monthsofyearshort'][$this->get(self::MONTH_SHORT) - 1];
+        break;
+      case self::MONTH_NAME_NARROW :
+        break;
+      default :
+        $string .= $this->get($digit);
+      }
+    }
+    return $string ;
   }
 
   /**
@@ -1557,5 +1598,13 @@ class Of_Date extends DateTime {
     $day = $this->format('Y-m-d');
     $today = self::today()->format('Y-m-d');
     return ($day == $today);
+  }
+
+  public static function cmp($d1, $d2) {
+    return $d1->compare($d2);
+  }
+
+  public static function cmpDate($d1, $d2) {
+    return $d1->compareDateIso($d2);
   }
 }

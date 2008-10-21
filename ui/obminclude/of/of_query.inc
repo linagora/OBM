@@ -2388,6 +2388,9 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
   if ($reci_list != '') {
     // as we don't have a mean to encode the subject, we drop its accentsr
     $subject = mb_encode_mimeheader($subject, "ISO-8859-1", "Q","\n");
+    echo "<pre>";
+    var_dump($msg);
+    echo "</pre>";
     mail ($reci_list, $subject, $msg, $headers);         
   }
 }
@@ -2406,10 +2409,10 @@ function run_query_get_recipients($recipients, $force) {
   if ($force != 1) {
     $mail_filter = "
       AND (up1.userobmpref_value = 'yes' OR
-      (up2.userobmpref_value = 'yes' AND up1.userobmpref_value is null))";
+      (up2.userobmpref_value = 'yes' AND up1.userobmpref_value IS NULL))";
     $join = "LEFT JOIN UserObmPref as up1 ON up1.userobmpref_user_id=userobm_id
       AND up1.userobmpref_option = 'set_mail'
-      LEFT JOIN UserObmPref as up2 on up2.userobmpref_user_id=0
+      LEFT JOIN UserObmPref as up2 on up2.userobmpref_user_id IS NULL
       AND up2.userobmpref_option = 'set_mail'";
   }
   $coma = '';
@@ -2930,5 +2933,4 @@ function get_all_profiles() {
   }
   return $_SESSION['profiles'];
 }
-
 ?>

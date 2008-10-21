@@ -802,7 +802,7 @@ CREATE TABLE EntityRight (
   entityright_entity_id    integer NOT NULL,
   entityright_consumer     varchar(32) NOT NULL default '',
   entityright_consumer_id  integer NOT NULL,
-  entityright_acces         integer NOT NULL default 0,
+  entityright_access         integer NOT NULL default 0,
   entityright_read         integer NOT NULL default 0,
   entityright_write        integer NOT NULL default 0,
   entityright_admin        integer NOT NULL default 0,
@@ -1948,7 +1948,7 @@ CREATE TABLE ProfileModule (
 	profilemodule_id			serial,
 	profilemodule_domain_id		integer NOT NULL,
 	profilemodule_profile_id	integer default NULL,
-	profilemodule_module_name	varchar(16) NOT NULL default '',
+	profilemodule_module_name	varchar(64) NOT NULL default '',
 	profilemodule_right			integer default NULL,
 	PRIMARY KEY (profilemodule_id)
 );
@@ -1961,7 +1961,7 @@ CREATE TABLE ProfileSection (
 	profilesection_id			serial,
 	profilesection_domain_id	integer NOT NULL,
 	profilesection_profile_id	integer default NULL,
-	profilesection_section_name	varchar(16) NOT NULL default '',
+	profilesection_section_name	varchar(64) NOT NULL default '',
 	profilesection_show			smallint default NULL,
 	PRIMARY KEY (profilesection_id)
 );
@@ -1973,7 +1973,7 @@ CREATE TABLE ProfileSection (
 CREATE TABLE ProfileProperty (
 	profileproperty_id 			serial,
 	profileproperty_type		varchar(32) default NULL,
-	profileproperty_default		varchar(64) default NULL,
+	profileproperty_default		text default NULL,
 	profileproperty_readonly	smallint default 0,
 	profileproperty_name		varchar(32) NOT NULL default '',
 	PRIMARY KEY (profileproperty_id)
@@ -1987,7 +1987,7 @@ CREATE TABLE ProfilePropertyValue (
 	profilepropertyvalue_id				serial,
 	profilepropertyvalue_profile_id		integer default NULL,
 	profilepropertyvalue_property_id	integer default NULL,
-	profilepropertyvalue_property_value	varchar(32) NOT NULL default '',
+	profilepropertyvalue_property_value	text NOT NULL default '',
 	PRIMARY KEY (profilepropertyvalue_id)
 );
 

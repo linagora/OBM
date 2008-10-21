@@ -323,7 +323,7 @@ if ($cgp_show['module']['calendar']) {
   // days to display in the week view
   $display_days = $_SESSION['set_cal_display_days'];
   $start_week_day = strtotime($ccalendar_weekstart);
-  if( $display_days == '1111100') {
+  if( $display_days == '0111110') {
     $without = 'selected="selected"';
   } else {
     $with = 'selected="selected"';
@@ -354,7 +354,7 @@ if ($cgp_show['module']['calendar']) {
     <td>
     <select name='sel_display_days'>
     <option $with value='1111111'>$l_with_weekend</option>
-    <option $without value='1111100'>$l_without_weekend</option>
+    <option $without value='0111110'>$l_without_weekend</option>
     </select>
     </td>
   </tr>

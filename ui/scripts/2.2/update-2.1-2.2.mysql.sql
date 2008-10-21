@@ -67,7 +67,7 @@ ALTER TABLE Document MODIFY COLUMN document_domain_id int(8) NOT NULL ;
 ALTER TABLE DocumentMimeType MODIFY COLUMN documentmimetype_domain_id int(8) NOT NULL ;
 ALTER TABLE DomainMailServer MODIFY COLUMN domainmailserver_domain_id int(8) NOT NULL ;
 ALTER TABLE EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
-ALTER TABLE EntityRight ADD entityright_acces int(1) NOT NULL default 0;
+ALTER TABLE EntityRight ADD entityright_access int(1) NOT NULL default 0;
 ALTER TABLE EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
 ALTER TABLE EventEntity MODIFY COLUMN evententity_event_id int(8) NOT NULL ;
 ALTER TABLE EventEntity MODIFY COLUMN evententity_entity_id int(8) NOT NULL ;
@@ -181,7 +181,7 @@ CREATE TABLE ProfileModule (
   profilemodule_id int(8) NOT NULL auto_increment,
   profilemodule_domain_id int(8) NOT NULL,
   profilemodule_profile_id int(8) default NULL,
-  profilemodule_module_name varchar(16) NOT NULL default '',
+  profilemodule_module_name varchar(64) NOT NULL default '',
   profilemodule_right int(2) default NULL,
   PRIMARY KEY (profilemodule_id),
   CONSTRAINT profilemodule_profile_id_profile_id_fkey FOREIGN KEY (profilemodule_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -195,7 +195,7 @@ CREATE TABLE ProfileSection (
   profilesection_id int(8) NOT NULL auto_increment,
   profilesection_domain_id int(8) NOT NULL,
   profilesection_profile_id int(8) default NULL,
-  profilesection_section_name varchar(16) NOT NULL default '',
+  profilesection_section_name varchar(64) NOT NULL default '',
   profilesection_show tinyint(1) default NULL,
   PRIMARY KEY (profilesection_id),
   CONSTRAINT profilesection_profile_id_profile_id_fkey FOREIGN KEY (profilesection_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -208,7 +208,7 @@ CREATE TABLE ProfileSection (
 CREATE TABLE ProfileProperty (
   profileproperty_id int(8) NOT NULL auto_increment,
   profileproperty_type varchar(32) default NULL,
-  profileproperty_default varchar(64) default NULL,
+  profileproperty_default text default NULL,
   profileproperty_readonly int(1) default '0',
   profileproperty_name varchar(32) NOT NULL default '',
   PRIMARY KEY (profileproperty_id)
@@ -222,7 +222,7 @@ CREATE TABLE ProfilePropertyValue (
   profilepropertyvalue_id int(8) NOT NULL auto_increment,
   profilepropertyvalue_profile_id int(8) default NULL,
   profilepropertyvalue_property_id int(8) default NULL,
-  profilepropertyvalue_property_value varchar(32) NOT NULL default '',
+  profilepropertyvalue_property_value text NOT NULL default '',
   PRIMARY KEY (profilepropertyvalue_id),
   CONSTRAINT profilepropertyvalue_profile_id_profile_id_fkey FOREIGN KEY (profilepropertyvalue_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty (profileproperty_id) ON DELETE CASCADE ON UPDATE CASCADE

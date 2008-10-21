@@ -62,7 +62,7 @@ function dis_admin_index($mode, $lifetime) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   global $l_check, $l_database_server, $l_database,$l_last_page,$l_user_ip,$l_execute;
-  global $l_session_stats, $l_session, $l_user_session, $l_lifetime, $l_active_user, $l_login_date, $l_last_acces,$l_nb_connec;
+  global $l_session_stats, $l_session, $l_user_session, $l_lifetime, $l_active_user, $l_login_date, $l_last_access,$l_nb_connec;
   global $obm_version, $l_version, $l_date, $l_host, $l_domain, $c_singleNameSpace;
 
   $date = of_datetime_format();
@@ -77,7 +77,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   $nbua = $obm_u->nf();
   $list_user = '';
   while ($obm_u->next_record()) {
-    $last_acces = of_datetime_format($obm_u->f('timeupdate'));
+    $last_access = of_datetime_format($obm_u->f('timeupdate'));
     $login = $obm_u->f('userobm_login');
     $login_date = of_datetime_format($obm_u->f('timecreate'));
     $nb_con = $obm_u->f('activeuserobm_nb_connexions');
@@ -87,7 +87,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
       <tr>
       <td>$login</td>
       <td>$login_date</td>
-      <td>$last_acces</td>
+      <td>$last_access</td>
       <td>$nb_con</td>
       <td>$lastpage</td>
       <td>$ip</td>
@@ -163,7 +163,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     <tr> 
       <th>$l_active_user</th>
       <th>$l_login_date</th>
-      <th>$l_last_acces</th>
+      <th>$l_last_access</th>
       <th>$l_nb_connec</th>
       <th>$l_last_page</th>
       <th>$l_user_ip</th>

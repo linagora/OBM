@@ -324,7 +324,7 @@ if ($cgp_show["module"]["payment"]) {
 if ($cgp_show["module"]["user"]) {
   $modules["user"] = array('Name'=> $l_module_user,
                                    'Ico' => "$ico_user",
-                                   'Url' => "$path/user/user_index.php?mode=html",
+                                   'Url' => "$path/user/user_index.php",
                                    'Right'=> $cright_read);
 }
 if ($cgp_show["module"]["resource"]) {

@@ -48,7 +48,7 @@ ALTER TABLE Company ALTER COLUMN company_domain_id SET NOT NULL;
 ALTER TABLE Company ALTER COLUMN company_datasource_id SET default NULL;
 ALTER TABLE Contact ALTER COLUMN contact_domain_id SET NOT NULL;
 ALTER TABLE Contact ALTER COLUMN contact_datasource_id SET default NULL;
-ALTER TABLE EntityRight ADD COLUMN entityright_acces INTEGER not null DEFAULT 0;
+ALTER TABLE EntityRight ADD COLUMN entityright_access INTEGER not null DEFAULT 0;
 ALTER TABLE Kind ALTER COLUMN kind_domain_id SET NOT NULL;
 ALTER TABLE ContactFunction ALTER COLUMN contactfunction_domain_id SET NOT NULL;
 ALTER TABLE LeadSource ALTER COLUMN leadsource_domain_id SET NOT NULL;
@@ -170,7 +170,7 @@ CREATE TABLE ProfileModule (
 	profilemodule_id		serial,
 	profilemodule_domain_id		integer NOT NULL,
 	profilemodule_profile_id	integer default NULL,
-	profilemodule_module_name	varchar(16) NOT NULL default '',
+	profilemodule_module_name	varchar(64) NOT NULL default '',
 	profilemodule_right		integer default NULL,
 	PRIMARY KEY (profilemodule_id)
 );
@@ -183,7 +183,7 @@ CREATE TABLE ProfileSection (
 	profilesection_id			serial,
 	profilesection_domain_id	integer NOT NULL,
 	profilesection_profile_id	integer default NULL,
-	profilesection_section_name	varchar(16) NOT NULL default '',
+	profilesection_section_name	varchar(64) NOT NULL default '',
 	profilesection_show			smallint default NULL,
 	PRIMARY KEY (profilesection_id)
 );
@@ -195,7 +195,7 @@ CREATE TABLE ProfileSection (
 CREATE TABLE ProfileProperty (
 	profileproperty_id 			serial,
 	profileproperty_type		varchar(32) default NULL,
-	profileproperty_default		varchar(64) default NULL,
+	profileproperty_default		text default NULL,
 	profileproperty_readonly	smallint default 0,
 	profileproperty_name		varchar(32) NOT NULL default '',
 	PRIMARY KEY (profileproperty_id)
@@ -209,7 +209,7 @@ CREATE TABLE ProfilePropertyValue (
 	profilepropertyvalue_id				serial,
 	profilepropertyvalue_profile_id		integer default NULL,
 	profilepropertyvalue_property_id	integer default NULL,
-	profilepropertyvalue_property_value	varchar(32) NOT NULL default '',
+	profilepropertyvalue_property_value	text NOT NULL default '',
 	PRIMARY KEY (profilepropertyvalue_id)
 );
 
@@ -1494,6 +1494,7 @@ ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profile_id_
 -- Foreign key from profilepropertyvalue_property_id to profileproperty_id
 ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty(profileproperty_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+-- DATA
 
 -- module 'profile'
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);

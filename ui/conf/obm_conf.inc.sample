@@ -136,7 +136,7 @@ $cdefault_tax = array ('TVA 19,6' => 1.196, 'TVA 5,5' => 1.055, 'Pas de TVA' => 
 $cgp_default_right = array (
   'Resource' => array (
       'public' => array(
-        'acces' => -1,
+        'access' => 1,
         'read' => -1,
         'write' => -1,
         'admin' => 0
@@ -144,7 +144,7 @@ $cgp_default_right = array (
     ),
   'MailShare' => array (
       'public' => array(
-        'acces' => 1,
+        'access' => 1,
         'read' => 0,
         'write' => 0,
         'admin' => 0
@@ -152,7 +152,7 @@ $cgp_default_right = array (
     ),
   'mailbox' => array (
       'public' => array(
-        'acces' => 1,
+        'access' => 1,
         'read' => 0,
         'write' => 0,
         'admin' => 0
@@ -160,8 +160,8 @@ $cgp_default_right = array (
     ),
   'calendar' => array (
       'public' => array(
-        'acces' => 1,
-        'read' => 0,
+        'access' => 1,
+        'read' => 1,
         'write' => 0,
         'admin' => 0
       )

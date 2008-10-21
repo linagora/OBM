@@ -217,7 +217,7 @@ Obm.CalendarDayEvent = new Class({
   resetTitle: function() {
     var title = this.event.title + ' ';
     if (!this.event.all_day) {
-      title = new Date((this.event.time + this.event.tzOffset) * 1000).format("H:i") + ' ' + title;
+      title = new Date(this.event.time * 1000).format("H:i") + ' ' + title;
     }
     // Display the location only if set
     if (this.event.location != '') {
@@ -237,9 +237,9 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setTime: function(time) {
-    var myDate = new Date((time + this.event.tzOffset) * 1000);
+    var myDate = new Date(time * 1000);
     console.log(myDate.getTime()/1000);
-    var startDate = new Date((obm.calendarManager.startTime + obm.calendarManager.tzOffset) * 1000);
+    var startDate = new Date(obm.calendarManager.startTime * 1000);
     myDate.setHours(startDate.getHours());
     myDate.setMinutes(startDate.getMinutes());
     myDate.setSeconds(startDate.getSeconds());
@@ -530,10 +530,10 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     }
     var title = this.event.title + ' ';
     if (this.event.duration <= this.options.unit) {
-      var time = new Date((this.event.time + this.event.tzOffset) * 1000).format("H:i") + ' ' + title; 
+      var time = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
       var title = '';
     } else {
-      var time = new Date((this.event.time + this.event.tzOffset) * 1000).format("H:i");
+      var time = new Date(this.event.time * 1000).format("H:i");
     }
     this.element.setProperty('title', this.event.title + ' ' + location);
     this.timeContainer.setHTML(time);
@@ -1238,7 +1238,7 @@ Obm.CalendarQuickForm = new Class({
     if(action) {
       this.gotoURI += '&action='+action;
     }
-    this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+this.eventData.date_begin+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value);
+    this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value);
     window.location.href = 'calendar_index.php?'+this.gotoURI;
   }
 });
