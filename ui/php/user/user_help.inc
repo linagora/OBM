@@ -46,7 +46,7 @@ batch_processing | -u (int[, int...])	| Perform batch processing for users id
 				 | -town (str)			| Town name
 				 | -expresspostal (str)	| Express postal code
 -------------------------------------------------------------------------------
-txt: php user_index.php -a batch_processing -u 4,25, 7,8 -A off -P a_profile -M true -Mq 512 -N 1 -Ne false -Nc 0 -tel 0504030201 -company "My company"
+txt: php user_index.php -a batch_processing -u 4,25, 7,8 -A off -P a_profile -M true -Mq 512 -N 1 -Ne false -Nc 0 -phone 0504030201 -company "My company"
 ===============================================================================
 
 
