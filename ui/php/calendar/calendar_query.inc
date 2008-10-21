@@ -612,15 +612,10 @@ function run_query_calendar_insert_event_data($calendar) {
   $id = $obm_q->f('calendarevent_id');
   $calendar['calendar_id'] = $id;
     
-  $hour = $datebegin->getHour();
-  $minute = $datebegin->getMinute();
   if($repeat_kind != 'none' && is_array($date_exception)) {
-    foreach(array_unique($date_exception) as $key => $value) {
-      if($value != '') {
-        $value = new Of_Date($value);
-        $calendar['old_date_begin'] = $value->setHour($hour)->setMinute($minute);        
-        run_query_calendar_event_exception_insert($calendar);
-      }
+    foreach($date_exception as $key => $value) {
+      $calendar['old_date_begin'] = $value->setHour($datebegin)->setMinute($datebegin);        
+      run_query_calendar_event_exception_insert($calendar);
     }
   }
 
@@ -780,15 +775,13 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 // Parameters:
 //   - sel_entity_id : selected entities id
 ///////////////////////////////////////////////////////////////////////////////
-function check_acces_entity($consumers) {
+function check_access_entity($consumers) {
   
-  $obm_q = run_query_acces_entity();
+  $access_entity = of_right_entity_for_user('calendar', $obm['uid'], 'access','', 'userobm');
 
-  $acces_entity = of_right_entity_for_user('RightEntity', $obm['uid'], 'acces','', $real_entity);
-
-  $no_acces=array_diff($consumers,$acces_entity);
+  $no_access=array_diff($consumers,$access_entity);
   
-  return $no_acces;
+  return $no_access;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1048,13 +1041,9 @@ function run_query_calendar_update_event_data($calendar) {
   $obm_q->query($query);
   
   if($repeat_kind != 'none' && is_array($date_exception)) {
-    foreach(array_unique($date_exception) as $key => $value) {
-      if($value != '') {
-        $value = of_isodate_convert($value);
-        $old_datebegin =  new Of_Date($value);
-        $calendar['old_date_begin'] = $old_datebegin->setHour($datebegin)->setMinute($datebegin);        
-        run_query_calendar_event_exception_insert($calendar);
-      }
+    foreach($date_exception as $key => $value) {
+      $calendar['old_date_begin'] = $value->setHour($datebegin)->setMinute($datebegin);        
+      run_query_calendar_event_exception_insert($calendar);
     }
   }
 }
@@ -2053,7 +2042,7 @@ function calendar_localizeDate($format, $date) {
  $month_list = Of_Date::OBM_DATE_MONTH_LIST;
  if(is_object($date)) {
 
- return $date->get(${$format});	
+ return $date->localize(${$format});	
  }
 }
 
@@ -2438,10 +2427,6 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $calendarevent_endrepeat = sql_date_format($db_type,'calendarevent_endrepeat');
-  $calendarevent_date = sql_date_format($db_type,'calendarevent_date');
-  $calendarevent_date_l = sql_date_format($db_type,'calendarevent_date','calendarevent_date');
-  $calendarevent_endrepeat_l = sql_date_format($db_type,'calendarevent_endrepeat','calendarevent_endrepeat');
   $multidomain = sql_multidomain('calendarevent');
   if ($category_filter != '') {
     $category_filter = sql_parse_id( $category_filter);
@@ -2675,12 +2660,10 @@ function run_query_get_one_event_exception($calendar_id) {
 
   $obm_q = new DB_OBM;
   $calendar_id = sql_parse_id( $calendar_id, true);
-  $calendarexception_date = sql_date_format($obm_q->type,'calendarexception_date');
-  $calendarexception_date_l = sql_date_format($obm_q->type,'calendarexception_date','calendarexception_date');  
 
   $query = "SELECT
     calendarexception_event_id,
-    $calendarexception_date_l
+    calendarexception_date
    FROM CalendarException
    WHERE calendarexception_event_id $calendar_id"; 
 
@@ -2911,15 +2894,14 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
     $gmt = new DateTimeZone('GMT');
     $current->setTimezone($gmt);
     $start->setTimezone($gmt);
-    $diff = ceil($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
+    $diff = ceil($start->diffTimestamp($current) / Of_Date::DAYDURATION); 
     if ($diff > 0) {
       $diff = ($diff % ($repeatfrequence * 7));
     }	    
-    $current->setDateIso($start)->subDay($diff);
     $current->setDefaultTimeZone();
-    $start->setDefaultTimeZone();
+    $start->setDefaultTimeZone();    
+    $current->setDateIso($start)->subDay($diff);
   }
-
   $days = str_split($repeatdays);
   if($start->compare($date) < 0) $start = $date;
   while ($current->compare($end) < 0) {
@@ -2947,6 +2929,7 @@ function calendar_monthlybyday_repeatition($date,$start,$end,$repeatfrequence,$e
   global $day_duration,$ccalendar_weekstart;
 
   $current = clone $date;
+  $current->setDay(1);
   if ($current->compare($start) < 0) {
     $diff = ($start->getYear() - $current->getYear()) * 12 + ($start->getMonth() - $current->getMonth());
     if ($diff > 0) {
@@ -3540,7 +3523,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   global $l_add_exception_mail_body, $l_add_exception_mail_subject;
   global $l_delete_exception_mail_body, $l_delete_exception_mail_subject;
   global $l_update_state_mail_subject, $l_update_state_mail_body;
-  global $l_A, $l_W, $l_R;
+  global $l_accepted, $l_rejected, $l_waiting;
 
   $mail_datas = array('reset_state' => false, 'reset_resource_state' => false, 
                 'add_attendee' => false, 'remove_attendee' => false,
@@ -3567,37 +3550,44 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     if(!$event_q) {
       $event_q = run_query_calendar_detail($calendar['calendar_id']);
     }
+
     
-    $old_title = $event_q->f('calendarevent_title');
-    $title = $calendar['title'];
-    $old_datebegin = of_datetime_format($event_q->f('calendarevent_date'));
-    $datebegin =  of_datetime_format(strtotime($calendar['date_begin']));
-    $old_dateend = of_datetime_format($event_q->f('calendarevent_date') + $event_q->f('calendarevent_duration'));
-    $dateend = of_datetime_format(strtotime($calendar['date_end']));
+
+
+    $oldtitle = $event_q->f('calendarevent_title');
+    $old_start = new Of_Date($event_q->f('calendarevent_date'), 'GMT');
+    $old_end = clone $old_start;
+    $old_end->addSecond($event_q->f('calendarevent_duration'));
     $old_location = $event_q->f('calendarevent_location');
-    $location = $calendar['location'];
     $old_all_day = $event_q->f('calendarevent_allday');
-    ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $old_duration = $event_q->f('calendarevent_duration');
-    $duration = $calendar['event_duration'];
     $old_repeatkind = $event_q->f('calendarevent_repeatkind');
-    $repeatkind = $calendar['repeat_kind'];
     $old_repeatdays = $event_q->f('calendarevent_repeatdays');
-    $repeatdays = $calendar['repeat_days'];
-    $old_repeatend = of_datetime_format($event_q->f('calendarevent_endrepeat'));
-    $repeatend = of_datetime_format(strtotime($calendar['repeat_end']));
+    $old_repeatend = new Of_Date($event_q->f('calendarevent_endrepeat'),'GMT');
     $old_repeatfrequence = $event_q->f('calendarevent_repeatfrequence');
+    $title = $calendar['title'];
+    $start =  $calendar['date_begin'];
+    $end = $calendar['date_end'];
+    $location = $calendar['location'];
+    ($calendar['all_day'] != 1)? $all_day = FALSE : $all_day = TRUE;
+    $duration = $calendar['event_duration'];
+    $repeatkind = $calendar['repeat_kind'];
+    $repeatdays = $calendar['repeat_days'];
+    $repeatend = $calendar['repeat_end'];
     $repeatfrequence = $calendar['repeatfrequency'];
     $owner = $event_q->f('owner_lastname').' '.$event_q->f('owner_firstname');
 
     $mail_datas['reset_state'] = (($location != $old_location) || $mail_datas['reset_state']);
     $mail_datas['reset_state'] = (($all_day != $old_all_day) || $mail_datas['reset_state']);
-    $mail_datas['reset_state'] = (($datebegin != $old_datebegin) || $mail_datas['reset_state']);
+    $mail_datas['reset_state'] = (($start->compare($old_start) != 0) || $mail_datas['reset_state']);
     $mail_datas['reset_state'] = (($duration != $old_duration) || $mail_datas['reset_state']);
     $mail_datas['reset_state'] = (($repeatkind != $old_repeatkind) || $mail_datas['reset_state']);
-    $mail_datas['reset_state'] = (($repeatdays != $old_repeatdays) || $mail_datas['reset_state']);
-    $mail_datas['reset_state'] = (($repeatend != $old_repeatend) || $mail_datas['reset_state']);
-    $mail_datas['reset_state'] = (($repeatfrequence != $old_repeatfrequence) || $mail_datas['reset_state']);
+    if($repeatkind != 'none') {
+      $mail_datas['reset_state'] = (($repeatdays != $old_repeatdays) || $mail_datas['reset_state']);
+      $mail_datas['reset_state'] = (($repeatend->compare($old_repeatend) != 0) || $mail_datas['reset_state']);
+      $mail_datas['reset_state'] = (($repeatfrequence != $old_repeatfrequence) || $mail_datas['reset_state']);
+    }
+
 
     $date_exception = array();
     $exceptions = array(); 
@@ -3649,19 +3639,12 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     }
     
     if(!$mail_datas['reset_state']) {
-      if(is_array($calendar['date_exception'])) {
-        $date_exception = array_unique($calendar['date_exception']);
-      }
+      $date_exception = $calendar['date_exception'];
       while($exceptions_q->next_record()) {
-        $exceptions[] = of_date_format($exceptions_q->f('calendarexception_date'));
+        $exceptions[] = new Of_Date($exceptions_q->f('calendarexception_date'), 'GMT');
       }
-      foreach($date_exception as $value) {
-        if($value != '') {
-          $p_exceptions[] = $value; 
-        }
-      }
-      $old_exceptions = array_diff($exceptions,$p_exceptions);
-      $new_exceptions = array_diff($p_exceptions,$exceptions);
+      $old_exceptions = array_udiff($exceptions,$date_exception, array('Of_Date', 'cmpDate'));
+      $new_exceptions = array_udiff($date_exception,$exceptions, array('Of_Date', 'cmpDate'));
       if(count($old_exceptions) > 0) {
         $mail_datas['remove_exception'] = true;
       }
@@ -3679,14 +3662,15 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       $mail_datas['add_resource'] = true;
     }
     $title = $calendar['title'];
-    $datebegin =  of_datetime_format(strtotime($calendar['date_begin']));
-    $dateend = of_datetime_format(strtotime($calendar['date_end']));
+    $start =  $calendar['date_begin'];
+    $end = $calendar['date_end'];
     $location = $calendar['location'];
   } elseif ($action == 'delete') {
     $event_q = run_query_calendar_detail($calendar['calendar_id']);
     $old_title = $event_q->f('calendarevent_title');
-    $old_datebegin = of_datetime_format($event_q->f('calendarevent_date'));
-    $old_dateend = of_datetime_format($event_q->f('calendarevent_date') + $event_q->f('calendarevent_duration'));
+    $old_start = new Of_Date($event_q->f('calendarevent_date'), 'GMT');
+    $old_end = clone $start;
+    $old_end->addSecond($event_q->f('calendarevent_duration'));
     $old_location = $event_q->f('calendarevent_location');
     $entities = get_calendar_event_entity($calendar['calendar_id']); 
     $old_resources = $entities['resource']['ids'];
@@ -3713,8 +3697,9 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       $mail_datas['add_exception'] = true;
     } else {
       $old_title = $event_q->f('calendarevent_title');
-      $old_datebegin = of_datetime_format($event_q->f('calendarevent_date'));
-      $old_dateend = of_datetime_format($event_q->f('calendarevent_date') + $event_q->f('calendarevent_duration'));
+      $old_start = new Of_Date($event_q->f('calendarevent_date'), 'GMT');
+      $old_end = clone $old_start;
+      $old_end->addSecond($event_q->f('calendarevent_duration'));
       $old_location = $event_q->f('calendarevent_location');
       $entities = get_calendar_event_entity($calendar['calendar_id']); 
       $old_resources = $entities['resource']['ids'];
@@ -3730,14 +3715,16 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     }
   } elseif ($action == 'quick_update') {
     $old_title = $event_q->f('calendarevent_title');
-    $title = $calendar['title'];
-    $old_datebegin = of_datetime_format($event_q->f('calendarevent_date'));
-    $datebegin =  of_datetime_format(strtotime($calendar['date_begin']));
+    $old_start = new Of_Date($event_q->f('calendarevent_date'), 'GMT');
     $old_duration = $event_q->f('calendarevent_duration');
+    $old_end = clone $old_start;
+    $old_end->addSecond($event_q->f('calendarevent_duration'));
+    $title = $calendar['title'];
+    $start =  $calendar['date_begin'];
     $duration = $calendar['duration'];
-    $old_dateend = of_datetime_format($event_q->f('calendarevent_date') + $event_q->f('calendarevent_duration'));
-    $dateend = of_datetime_format(strtotime($calendar['date_begin']) + $duration);
-    $mail_datas['reset_state'] = (($datebegin != $old_datebegin) || $mail_datas['reset_state']);
+    $end = clone $start;
+    $end->addSecond($duration);
+    $mail_datas['reset_state'] = (($start != $old_start) || $mail_datas['reset_state']);
     $mail_datas['reset_state'] = (($duration != $old_duration) || $mail_datas['reset_state']);
     $entities = get_calendar_event_entity($calendar['calendar_id']); 
     $resources = $entities['resource']['ids'];
@@ -3751,20 +3738,21 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       $decision = $calendar['decision_event'];
       $event_q = run_query_calendar_detail($calendar['calendar_id']);
       $title = $event_q->f('calendarevent_title');
-      $datebegin = of_datetime_format($event_q->f('calendarevent_date'));
+      $start = new Of_Date($event_q->f('calendarevent_date'), 'GMT');
       $entityinfo = get_entity_info($calendar['entity_id'],$calendar['entity_kind']);
 
       $attendees = array($event_q->f('calendarevent_owner'));
       $mail_datas['update_decision'] = true;
     }
   }
+  $date = new Of_Date();
   if($mail_datas['reset_state']) {
     $mail_datas['mails']['reset_state'] = array (
       'subject' => sprintf($l_update_event_mail_subject,$old_title),
-      'message' => sprintf($l_update_event_mail_body, $old_title, $old_datebegin, 
-                           $old_dateend, $old_location, $datebegin, $dateend, 
+      'message' => sprintf($l_update_event_mail_body, $old_title, $old_start->getOutputDateTime(), 
+                           $old_end->getOutputDateTime(), $old_location, $start->getOutputDateTime(), $end->getOutputDateTime(), 
                            $location,$consult_link,$accept_link,$refuse_link,
-                           of_date_format(), date('H:i'), $userinfo['firstname'],
+                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                            $userinfo['lastname'],$cgp_host),
       'recipients' => $attendees
     );
@@ -3774,10 +3762,10 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $rattendees = array_diff($rattendees['ids'], array($obm['uid']));
     $mail_datas['mails']['reset_resource_state'] = array (
       'subject' => sprintf($l_update_event_mail_subject,$old_title),
-      'message' => sprintf($l_update_resource_mail_body, $old_title, $old_datebegin, 
-                           $old_dateend, $old_location, $datebegin, $dateend, 
+      'message' => sprintf($l_update_resource_mail_body, $old_title, $old_start->getOutputDateTime(), 
+                           $old_end->getOutputDateTime(), $old_location, $start->getOutputDateTime(), $end->getOutputDateTime(), 
                            $location,$consult_link,
-                           of_date_format(), date('H:i'), $userinfo['firstname'],
+                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                            $userinfo['lastname'],$cgp_host),
       'recipients' => $rattendees
     );
@@ -3794,9 +3782,9 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     }
     $mail_datas['mails']['add_attendee'] = array (
       'subject' => sprintf($l_add_event_mail_subject,$title),
-      'message' => sprintf($l_add_event_mail_body, $datebegin, $dateend, 
+      'message' => sprintf($l_add_event_mail_body, $start->getOutputDateTime(), $end->getOutputDateTime(), 
                            $title, $location, $consult_link,$accept_link,$refuse_link,
-                           of_date_format(), date('H:i'), $userinfo['firstname'],
+                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                            $userinfo['lastname'],$cgp_host),
       'recipients' => $new_attendees,
       'h_file' => $h_file
@@ -3807,9 +3795,9 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $rattendees = array_diff($rattendees['ids'], array($obm['uid']));    
     $mail_datas['mails']['add_resource'] = array (
       'subject' => sprintf($l_add_event_mail_subject,$title),
-      'message' => sprintf($l_add_resource_mail_body, $datebegin, $dateend, 
+      'message' => sprintf($l_add_resource_mail_body, $start->getOutputDateTime(), $end->getOutputDateTime() ,
                            $title, $location, $consult_link,
-                           of_date_format(), date('H:i'), $userinfo['firstname'],
+                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                            $userinfo['lastname'],$cgp_host),
       'recipients' => $rattendees
     );
@@ -3818,9 +3806,9 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   if ($mail_datas['remove_attendee']) {
     $mail_datas['mails']['remove_attendee'] = array (
       'subject' => sprintf($l_delete_event_mail_subject,$old_title),
-      'message' => sprintf($l_delete_event_mail_body, $old_title, $old_datebegin, 
-                           $old_dateend, $old_location,$userinfo['email'], 
-                           of_date_format(), date('H:i'), $userinfo['firstname'],
+      'message' => sprintf($l_delete_event_mail_body, $old_title, $old_start->getOutputDateTime(), 
+                           $old_end->getOutputDateTime(), $old_location,$userinfo['email'], 
+                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                            $userinfo['lastname'],$cgp_host),
       'recipients' => $old_attendees
     );
@@ -3830,9 +3818,8 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $rattendees = array_diff($rattendees['ids'], array($obm['uid']));    
     $mail_datas['mails']['remove_resource'] = array (
       'subject' => sprintf($l_delete_event_mail_subject,$old_title),
-      'message' => sprintf($l_delete_resource_mail_body, $old_title, $old_datebegin, 
-                           $old_dateend, $old_location,$userinfo['email'], 
-                           of_date_format(), date('H:i'), $userinfo['firstname'],
+      'message' => sprintf($l_delete_resource_mail_body, $old_title, $old_start->getOutputDateTime(), 
+                           $old_end->getOutputDateTime(), $old_location,$userinfo['email'], 
                            $userinfo['lastname'],$cgp_host),
       'recipients' => $rattendees
     );
@@ -3844,7 +3831,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $mail_datas['mails']['add_exception'] = array (
       'subject' => sprintf($l_add_exception_mail_subject,$title),
       'message' => sprintf($l_add_exception_mail_body,$title,implode(', ', $new_exceptions),$consult_link, 
-                           of_date_format(), date('H:i'), $userinfo['firstname'],
+                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                            $userinfo['lastname'],$cgp_host),
       'recipients' => $attendees
     );
@@ -3856,7 +3843,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $mail_datas['mails']['remove_exception'] = array (
       'subject' => sprintf($l_delete_exception_mail_subject,$title),
       'message' => sprintf($l_delete_exception_mail_body,$title,implode(', ', $old_exceptions),$consult_link, 
-                           of_date_format(), date('H:i'), $userinfo['firstname'],
+                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                            $userinfo['lastname'],$cgp_host),
       'recipients' => $attendees
     );
@@ -3864,13 +3851,13 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   if ($mail_datas['update_decision']) {
     switch ($decision) {
     case 'A':
-      $decision_label = $l_A;
+      $decision_label = $l_accepted;
       break;
     case 'W':
-      $decision_label = $l_W;
+      $decision_label = $l_waiting;
       break;
     case 'R':
-      $decision_label = $l_R;
+      $decision_label = $l_rejected;
       break;
     default:
       $decision_label = $decision;
@@ -3880,7 +3867,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       'subject' => sprintf($l_update_state_mail_subject,$title),
       'message' => sprintf($l_update_state_mail_body, $entityinfo['label'],
                            $title, $decision_label, $consult_link, 
-                           of_date_format(), date('H:i'), $userinfo['firstname'],
+                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                            $userinfo['lastname'],$cgp_host),
       'recipients' => $attendees
     );

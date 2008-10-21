@@ -235,7 +235,7 @@ if ($action == 'index') {
   if (check_calendar_data_form($params)) {
     if ( (!$params['force'])
         && ($conflicts = check_calendar_conflict($params, $entities)) 
-        && ($no_acces = check_acces_entity($entities['user']))) {
+        && ($no_access = check_access_entity($entities['user']))) {
       $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
       $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
       $display['detail'] = dis_calendar_event_form($action, $params, '',$entities);
@@ -619,8 +619,13 @@ function get_calendar_params() {
     $params['date_end'] = $clone->addSecond($params['duration']);
   } 
   if (is_array($params['date_exception'])) {
-    foreach($params['date_exception'] as $key => $exception) {
-      $params['date_exception'][$key] = new Of_Date($exception);
+    $exceptions = array_unique($params['date_exception']);
+    $params['date_exception'] = array();
+    foreach($exceptions as $key => $exception) {
+      if(trim($exception) != '') {
+        $exception = of_isodate_convert($exception);
+        $params['date_exception'][$key] = new Of_Date($exception);
+      }
     }
   }
   // repeat days
