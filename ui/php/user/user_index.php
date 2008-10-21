@@ -395,10 +395,15 @@ function get_user_params() {
     $params['email'] = implode("\r\n", $email_aliases);
   }
   
-  if ($params['mode'] == "" || $params['mode'] != "html") {
-    $params['mode'] = "txt";
+  if ($params['mode'] == "" || $params['mode'] != "txt") {
+    $params['mode'] = "html";
   }
-
+  
+  // Detection of command line mode
+  global $argv;
+  if (isset($argv)) {
+  	$params['mode'] = "txt";
+  }
   return $params;
 }
 
