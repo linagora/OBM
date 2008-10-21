@@ -10,127 +10,9 @@
 
 $cright_list = array('read', 'own', 'write', 'read_admin', 'write_admin');
 
-$cprofilemodule_sql_ext = array(
-  'select' => 'profilemodule_module_name,
-  profilemodule_right,
-  ',
-  'join' => 'LEFT JOIN ProfileModule ON profilemodule_profile_id = profile_id '. sql_multidomain('profilemodule'),
-  'where' => ''
-);
 
-$cprofilesection_sql_ext = array(
-  'select' => 'profilesection_section_name,
-  profilesection_show,
-  ',
-  'join' => 'LEFT JOIN ProfileSection ON profilesection_profile_id = profile_id '. sql_multidomain('profilesection'),
-  'where' => ''
-);
-
-$cprofilepropertyvalue_sql_ext = array(
-  'select' => 'profilepropertyvalue_value,
-  profileproperty_profil_id,
-  ',
-  'join' => 'LEFT JOIN ProfilePropertyValue ON profileproperty_profil_id = profile_id '. sql_multidomain('profilepropertyvalue'),
-  'where' => ''
-);
-
-/**
- * Get Profile detail data
- *
- * @param Integer $profile_id
- * @param array $sql_ext SQL query extension (see run_query_profile_search())
- * @return DB_OBM
- */
-function run_query_profile_detail ($profile_id, $sql_ext = null) {
-  $obm_q = run_query_profile_search (array('profile_id' => $profile_id));
-
-  $obm_q->next_record();
-
-  return $obm_q;
-}
-
-/**
- * Search Profile data
- *
- * @param array $params
- * @return DB_OBM
- */
-function run_query_profile_search ($params) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-
-  $multidomain = sql_multidomain('profile');
-
-  if (!empty($params['profile_id']))
-    $where .= ' AND profile_id = '. sql_parse_id($params['profile_id']);
-  if (!empty($params['name']))
-    $where .= " AND profile_name #LIKE '$params[name]%'";
-
-  $query = "SELECT 
-    profile_id,
-    profile_name,
-    #TIMESTAMP(profile_timeupdate) as profile_timeupdate,
-    #TIMESTAMP(profile_timecreate) as profile_timecreate,
-    c.userobm_login as usercreate,
-    u.userobm_login as userupdate
-    FROM Profile
-    LEFT JOIN UserObm as c ON profile_usercreate=c.userobm_id
-    LEFT JOIN UserObm as u ON profile_userupdate=u.userobm_id
-    WHERE 1=1
-    $where
-    $multidomain";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_profile_search()');
-  $obm_q->xquery($query);
-
-  return $obm_q;
-}
-
-/**
- * Search Profile data with join extension
- *
- * @param array $params
- * @param array $sql_ext SQL query extension parameters
- *                       array('select' => string,
- *                             'join' => string,
- *                             'where' => string,
- *                             'next_record' => bool, // do next_record or not
- *                            )
- * 
- * @return DB_OBM
- */
-function run_query_profile_join_search ($params, $sql_ext = null) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-
-  $multidomain = sql_multidomain('profile');
-
-  $where = '';
-
-  if (!empty($params['profile_id']))
-    $where .= ' AND profile_id = '. sql_parse_id($params['profile_id']);
-
-  $query = "SELECT 
-    profile_id,
-    $sql_ext[select]
-    1
-    FROM Profile
-    $sql_ext[join]
-    WHERE 1=1
-    $where
-    $sql_ext[where]
-    $multidomain";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_profile_join_search()');
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
+///////////////////////////////////////////////////////////////////////////////
+// Data Query Upper Layer
 
 /**
  * Get profile modules right list
@@ -151,25 +33,21 @@ function run_query_profile_join_search ($params, $sql_ext = null) {
  * )
  */
 function get_profile_full_data ($profile_id) {
-  global $cprofilemodule_sql_ext;
-  global $cprofilesection_sql_ext;
   global $cright_list; // right constants
 
   foreach ($cright_list as $right_name) { global ${'cright_'. $right_name}; }
 
   $obm_modules = get_obm_modules();
-
-  $search_params = array('profile_id' => $profile_id);
+  
   $res = array();
 
-  $profile_q = run_query_profile_search($search_params);
-  $profile_q->next_record();
+  $profile_q = run_query_profile_detail($profile_id);
   $res = array(
     'id' => $profile_q->f('profile_id'),
     'name' => $profile_q->f('profile_name'),
   );
 
-  $modules_q = run_query_profile_join_search($search_params, $cprofilemodule_sql_ext);
+  $modules_q = run_query_profilemodule_list($profile_id);
 
   while ($modules_q->next_record()) {
     $module_name = $modules_q->f('profilemodule_module_name');
@@ -182,7 +60,7 @@ function get_profile_full_data ($profile_id) {
     }
   }
 
-  $sections_q = run_query_profile_join_search($search_params, $cprofilesection_sql_ext);
+  $sections_q = run_query_profilesection_list($profile_id);
 
   while ($sections_q->next_record()) {
     $res['sections_show'][$sections_q->f('profilesection_section_name')] = $sections_q->f('profilesection_show');
@@ -222,94 +100,100 @@ function get_profile_full_data ($profile_id) {
 }
 
 
-function check_profile_data_form($params) {
-  global $err;
-  global $php_regexp_profile_name;
-  global $l_profile_name_empty;
-  global $l_profile_name_error;
+///////////////////////////////////////////////////////////////////////////////
+// Misc. query functions
 
-  $return = true;
-
-  // Check profile name
-  if (strlen($params['name']) == 0) {
-    $err['msg'] = $l_profile_name_empty;
-    $err['field'] = 'name';
-    $return = false;
-  } else if (!preg_match($php_regexp_profile_name, $params['name'])) {
-    $err['msg'] = $l_profile_name_error;
-    $err['field'] = 'name';
-    $return = false;
-  }
-
-  // check properties
-  foreach($params['properties'] as $property_name => $property_value ) {
-
-    if ($property_value['readonly'] != 1
-      &&
-      $property_value['default'] != $params[$property_name]) {
-
-        global ${'php_regexp_profile_'.$property_name};
-
-        if (strlen($params[$property_name]) == 0) {
-          global ${'l_'.$property_name.'_empty'};
-
-          $err['msg'] = ${'l_'.$property_name.'_empty'};
-          $err['field'] = $property_name;
-          $return = false;
-
-        } else if ( !preg_match(${'php_regexp_profile_'.$property_name}, $params[$property_name]) ) {
-          global ${'l_profile_'.$property_name.'_error'};
-
-          $err['msg'] = ${'l_profile_'.$property_name.'_error'};
-          $err['field'] = $property_name;
-          $return = false;
-        }
-      }
-  }
-
-  // check default perm
-  global $cright_list;
-
-  $count = 0;
-
-  foreach ($params as $k => $v) {
-    $matches = array();
-    if (preg_match('/default_right_(.+)/', $k)) {
-      $count++;
-    }
-  }
-
-  if ($count == 0) {
-    global $l_profile_default_permission_empty;
-    $err['msg'] = $l_profile_default_permission_empty;
-    $return = false;
-  }
-
-  return $return;
-}
-
-/*
- * Check if profile is used by users
+/**
+ * Get Activated OBM Modules data array
+ *
+ * @return array
+ * 
+ *   array(
+ *      $section_name =>
+ *        array(
+ *           $module_name,
+ *           ...
+ *        )
+ *      ...
+ *   )
  */
-function check_can_delete_profile($profile_id) {
-  global $cdg_sql;
-  $nb_users = 0;
+function get_obm_modules () {
+  global $cgp_show;
 
-  $query = "SELECT count(userobm_perms) as count
-    FROM UserObm
-    WHERE userobm_perms = (SELECT profile_name FROM Profile WHERE profile_id=$profile_id)";
+  $obm_modules = array();
 
-  $obm_q = new DB_OBM;
-
-  display_debug_msg($query, $cdg_sql, "check_can_delete_profile(id=$profile_id)");
-  $obm_q->query($query);
-
-  while ($obm_q->next_record()) {
-    $nb_users = $obm_q->f('count');
+  foreach ($cgp_show['section'] as $section_name => $url) {
+    $obm_modules[$section_name] = array();
   }
 
-  return ($nb_users > 0 ? false : true);
+  foreach ($cgp_show['module'] as $module_name => $section_name) {
+    if ($section_name != 'false' && trim($section_name) != '')
+      $obm_modules[$section_name][] = $module_name;
+  }
+
+  return $obm_modules;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// SQL query functions
+
+/**
+ * Get Profile detail data
+ *
+ * @param Integer $profile_id
+ * @param array $sql_ext SQL query extension (see internal_profile_select())
+ * @return DB_OBM
+ */
+function run_query_profile_detail ($profile_id, $sql_ext = null) {
+  $obm_q = internal_profile_select (array('profile_id' => $profile_id), 'run_query_profile_detail()');
+
+  $obm_q->next_record();
+
+  return $obm_q;
+}
+
+
+/**
+ * Search Profile data
+ *
+ * @param array $params
+ * @return DB_OBM
+ */
+function run_query_profile_search ($params) {
+  return internal_profile_select ($params, 'run_query_profile_search()');
+}
+
+
+/**
+ * Retrieve profile modules concerning profile with $profile_id
+ *
+ * @param Integer $profile_id
+ * @return DB_OBM
+ */
+function run_query_profilemodule_list ($profile_id) {
+  global $cprofilemodule_sql_ext;
+	
+  $search_params = array('profile_id' => $profile_id);
+  
+	return internal_profile_joinselect($search_params, $cprofilemodule_sql_ext, 'run_query_profilemodule_list()');
+}
+
+
+/**
+ * Retrieve profile section concerning profile with $profile_id
+ *
+ * @param Integer $profile_id
+ * @return DB_OBM
+ */
+function run_query_profilesection_list ($profile_id) {
+  global $cprofilesection_sql_ext;
+  
+  $search_params = array('profile_id' => $profile_id);
+  
+  return internal_profile_joinselect($search_params, $cprofilesection_sql_ext, 'run_query_profilesection_list()');
+}
+
 
 /**
  * Delete a profile
@@ -401,6 +285,7 @@ function run_query_profile_insert ($params) {
 
   return $profile_id;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // profile insert query execution
@@ -732,37 +617,6 @@ function run_query_profileproperties_delete($profile_id) {
 }
 
 /**
- * Get Activated OBM Modules data array
- *
- * @return array
- * 
- *   array(
- *      $section_name =>
- *        array(
- *           $module_name,
- *           ...
- *        )
- *      ...
- *   )
- */
-function get_obm_modules () {
-  global $cgp_show;
-
-  $obm_modules = array();
-
-  foreach ($cgp_show['section'] as $section_name => $url) {
-    $obm_modules[$section_name] = array();
-  }
-
-  foreach ($cgp_show['module'] as $module_name => $section_name) {
-    if ($section_name != 'false' && trim($section_name) != '')
-      $obm_modules[$section_name][] = $module_name;
-  }
-
-  return $obm_modules;
-}
-
-/**
  * Get a profile properties
  *
  * @param $profile_id : profile_id
@@ -789,6 +643,220 @@ function run_query_profileproperty_list ($profile_id = NULL) {
   display_debug_msg($query, $cdg_sql, 'run_query_profileproperty_list()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Checking functions
+
+function check_profile_data_form($params) {
+  global $err;
+  global $php_regexp_profile_name;
+  global $l_profile_name_empty;
+  global $l_profile_name_error;
+
+  $return = true;
+
+  // Check profile name
+  if (strlen($params['name']) == 0) {
+    $err['msg'] = $l_profile_name_empty;
+    $err['field'] = 'name';
+    $return = false;
+  } else if (!preg_match($php_regexp_profile_name, $params['name'])) {
+    $err['msg'] = $l_profile_name_error;
+    $err['field'] = 'name';
+    $return = false;
+  }
+
+  // check properties
+  foreach($params['properties'] as $property_name => $property_value ) {
+
+    if ($property_value['readonly'] != 1
+      &&
+      $property_value['default'] != $params[$property_name]) {
+
+        global ${'php_regexp_profile_'.$property_name};
+
+        if (strlen($params[$property_name]) == 0) {
+          global ${'l_'.$property_name.'_empty'};
+
+          $err['msg'] = ${'l_'.$property_name.'_empty'};
+          $err['field'] = $property_name;
+          $return = false;
+
+        } else if ( !preg_match(${'php_regexp_profile_'.$property_name}, $params[$property_name]) ) {
+          global ${'l_profile_'.$property_name.'_error'};
+
+          $err['msg'] = ${'l_profile_'.$property_name.'_error'};
+          $err['field'] = $property_name;
+          $return = false;
+        }
+      }
+  }
+
+  // check default perm
+  global $cright_list;
+
+  $count = 0;
+
+  foreach ($params as $k => $v) {
+    $matches = array();
+    if (preg_match('/default_right_(.+)/', $k)) {
+      $count++;
+    }
+  }
+
+  if ($count == 0) {
+    global $l_profile_default_permission_empty;
+    $err['msg'] = $l_profile_default_permission_empty;
+    $return = false;
+  }
+
+  return $return;
+}
+
+/*
+ * Check if profile is used by users
+ */
+function check_can_delete_profile($profile_id) {
+  global $cdg_sql;
+  $nb_users = 0;
+
+  $query = "SELECT count(userobm_perms) as count
+    FROM UserObm
+    WHERE userobm_perms = (SELECT profile_name FROM Profile WHERE profile_id=$profile_id)";
+
+  $obm_q = new DB_OBM;
+
+  display_debug_msg($query, $cdg_sql, "check_can_delete_profile(id=$profile_id)");
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $nb_users = $obm_q->f('count');
+  }
+
+  return ($nb_users > 0 ? false : true);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Internal query functions
+//
+// Warning :
+// it is not recommend to edit these functions
+// better copy and paste internal code content in the standard OBM layer
+
+
+// internal_profile_joinselect's data atom unity
+
+$cprofilemodule_sql_ext = array(
+  'select' => 'profilemodule_module_name,
+  profilemodule_right,
+  ',
+  'join' => 'LEFT JOIN ProfileModule ON profilemodule_profile_id = profile_id '. sql_multidomain('profilemodule'),
+  'where' => ''
+);
+
+$cprofilesection_sql_ext = array(
+  'select' => 'profilesection_section_name,
+  profilesection_show,
+  ',
+  'join' => 'LEFT JOIN ProfileSection ON profilesection_profile_id = profile_id '. sql_multidomain('profilesection'),
+  'where' => ''
+);
+
+$cprofilepropertyvalue_sql_ext = array(
+  'select' => 'profilepropertyvalue_value,
+  profileproperty_profil_id,
+  ',
+  'join' => 'LEFT JOIN ProfilePropertyValue ON profileproperty_profil_id = profile_id '. sql_multidomain('profilepropertyvalue'),
+  'where' => ''
+);
+
+/**
+ * Search Profile data with join extension
+ *
+ * @param array $params
+ * @param array $sql_ext SQL query extension parameters
+ *                       array('select' => string,
+ *                             'join' => string,
+ *                             'where' => string,
+ *                             'next_record' => bool, // do next_record or not
+ *                            )
+ * @param String $displayed_debug_msg string displayed by display_debug_msg OBM function
+ * 
+ * @return DB_OBM
+ */
+function internal_profile_joinselect ($params, $sql_ext = null, $displayed_debug_msg = 'internal_profile_joinselect()') {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $multidomain = sql_multidomain('profile');
+
+  $where = '';
+
+  if (!empty($params['profile_id']))
+    $where .= ' AND profile_id = '. sql_parse_id($params['profile_id']);
+
+  $query = "SELECT 
+    profile_id,
+    $sql_ext[select]
+    1
+    FROM Profile
+    $sql_ext[join]
+    WHERE 1=1
+    $where
+    $sql_ext[where]
+    $multidomain";
+
+  display_debug_msg($query, $cdg_sql, $displayed_debug_msg);
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+/**
+ * Search Profile data
+ *
+ * @param array $params
+ * @param String $displayed_debug_msg string displayed by display_debug_msg OBM function
+ * 
+ * @return DB_OBM
+ */
+function internal_profile_select ($params, $displayed_debug_msg = 'internal_profile_select()') {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $multidomain = sql_multidomain('profile');
+
+  if (!empty($params['profile_id']))
+    $where .= ' AND profile_id = '. sql_parse_id($params['profile_id']);
+  if (!empty($params['name']))
+    $where .= " AND profile_name #LIKE '$params[name]%'";
+
+  $query = "SELECT 
+    profile_id,
+    profile_name,
+    #TIMESTAMP(profile_timeupdate) as profile_timeupdate,
+    #TIMESTAMP(profile_timecreate) as profile_timecreate,
+    c.userobm_login as usercreate,
+    u.userobm_login as userupdate
+    FROM Profile
+    LEFT JOIN UserObm as c ON profile_usercreate=c.userobm_id
+    LEFT JOIN UserObm as u ON profile_userupdate=u.userobm_id
+    WHERE 1=1
+    $where
+    $multidomain";
+
+  display_debug_msg($query, $cdg_sql, $displayed_debug_msg);
+  $obm_q->xquery($query);
 
   return $obm_q;
 }
