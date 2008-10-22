@@ -444,9 +444,9 @@ function html_calendar_bar_date_selector($calendar) {
 
   // Minicalendar
   $current = clone $date;
-  $current->setDay(1)->setWeekday($ccalendar_weekstart);
-  $end = clone $current;
-  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1);
+  $current->setDay(2)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addMonth(1)->setDay(8)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   while($current->compare($end) < 0) {
     if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "<tr>\n";
     $day = $current->get(Of_Date::DAY);
@@ -593,7 +593,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
   global $l_private,$l_daysofweek, $l_previous, $l_next;
 
   $date = clone $calendar['date'];
-  $date->setDay(1)->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+  $date->setDay(2)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $category_filter = $calendar['category_filter'];
 
   $current = clone $date;
@@ -601,13 +601,13 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
   $end->addDay(6);
   while($current->compare($end) <= 0) {
     $day = $current->localize(Of_Date::WEEKDAY_NARROW);
-    $dis_minical_head .= "<td>$day</td>\n";
+    $dis_month_head .= "<td>$day</td>\n";
     $current->addDay(1);
   }
 
   $current = clone $date;
   $end = clone $calendar['date'];
-  $end->addMonth(1)->setDay(1)->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0)->addWeek(1);  
+  $end->addMonth(1)->setDay(8)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   while($current->compare($end) < 0) {
     $iso = $current->getURL();
     $day = $current->get(Of_Date::DAY);
@@ -660,7 +660,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
     <colgroup span=\"1\" />
     <colgroup span=\"7\" id=\"calendarEventContext\" />
     <thead>
-    <tr><td id=\"calendarHourCol\"></td>$dis_day_head</tr>
+    <tr><td id=\"calendarHourCol\"></td>$dis_month_head</tr>
     </tr>
     </thead>
     <tbody id=\"calendarBody\" onDblClick=\"obm.calendarQuickForm.compute(event, 'month');\">
@@ -2042,7 +2042,7 @@ function dis_calendar_week_planning($calendar, $calendar_entity, $writable_entit
 
   $category_filter = $calendar['category_filter'];
   $date = clone $calendar['date'];
-  $date->setDay(1)->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+  $date->setWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(7);
   
@@ -2134,7 +2134,7 @@ function dis_calendar_planning_view($date, $end, $calendar_entity, $category_fil
   while ($current->compare($end) < 0) {
     $day_amount++;
     $day = $current->get(Of_Date::DAY);
-    $label = $current->label(Of_Date::WEEKDAY_NAME);
+    $label = $current->localize(Of_Date::WEEKDAY_NAME);
     $iso = $current->getURL();
     $line0 .= "<th>$label</th>\n";
     $line1 .= "<th><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></th>\n";
@@ -4565,10 +4565,9 @@ function dis_calendar_month_agenda_pdf($calendar, $calendar_entity) {
   global $ccalendar_weekstart, $ccalendar_first_hour;
 
   $date = clone $calendar['date'];
-  $date->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
-  $end = clone $date;
-  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1);
-
+  $date->setDay(2)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $calendar['date'];
+  $end->addMonth(1)->setDay(8)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $category_filter = $calendar['category_filter'];
   $status = array('A', 'W');
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter);
@@ -4701,9 +4700,9 @@ function dis_calendar_month_list_pdf($calendar, $calendar_entity) {
   global $ccalendar_weekstart, $ccalendar_first_hour;
 
   $date = clone $calendar['date'];
-  $date->setDay(1)->setWeekday($ccalendar_weekstart)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
+  $date->setDay(1)->setHour($ccalendar_first_hour)->setMinute(0)->setSecond(0);
   $end = clone $date;
-  $end->addMonth(1)->setWeekday($ccalendar_weekstart)->addWeek(1);
+  $end->addMonth(1);
 
   $category_filter = $calendar['category_filter'];
   $status = array('A');
@@ -5137,7 +5136,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $this->current_y = 0;
 
     // Display date
-    $this->display_date = calendar_localizeDate('month', $this->calendar['date']);
+    $this->display_date = $this->calendar['date']->localize(Of_Date::OBM_DATE_MONTH);
 
     $this->calendar_first_hour = $ccalendar_first_hour;
     $this->updated = $updated;
@@ -5190,9 +5189,9 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
   function drawCalendar(){
 
     $date = clone $this->calendar['date'];
-    $date->setDay(1)->setWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
-    $end = clone $date;
-    $end->addMonth(1)->setWeekday($this->calendar_weekstart)->addWeek(1);
+    $date->setDay(2)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+    $end = clone $this->calendar['date'];
+    $end->addMonth(1)->setDay(8)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $current = clone $date;
 
     // days bar
@@ -5304,9 +5303,9 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $page = 0;
     $this->page = $this->pdf->pages[$page];
     $date = clone $this->calendar['date'];
-    $date->setDay(1)->setWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
-    $end = clone $date;
-    $end->addMonth(1)->setWeekday($this->calendar_weekstart)->addWeek(1);
+    $date->setDay(2)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+    $end = clone $this->calendar['date'];
+    $end->addMonth(1)->setDay(8)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $current = clone $date;
 
     $w = 0;
