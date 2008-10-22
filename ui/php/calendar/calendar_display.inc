@@ -5189,9 +5189,9 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
   function drawCalendar(){
 
     $date = clone $this->calendar['date'];
-    $date->setDay(2)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+    $date->setDay(2)->custom('-1 '.$this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $end = clone $this->calendar['date'];
-    $end->addMonth(1)->setDay(8)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+    $end->addMonth(1)->setDay(8)->custom('-1 '.$this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $current = clone $date;
 
     // days bar
@@ -5231,19 +5231,6 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
           $this->drawDays();
           $this->current_y = $this->col_height;
         }
-
-        // Draw current week events
-       $day=0;
-       $this_w = clone $current;
-       $end_week_time = clone $current;
-       $end_week_time->addDay(6);
-
-       for($s=$this_w->getTimestamp();$s<=$end_week_time->getTimestamp();$s+=86400){
-         if(is_array($this->updated[$s])){
-           $this->addEvents($this->updated[$s], $day);
-         }
-         $day++;
-       }
 
         // week num
         $week_num = $current->get(Of_Date::WEEK);
@@ -5303,9 +5290,9 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $page = 0;
     $this->page = $this->pdf->pages[$page];
     $date = clone $this->calendar['date'];
-    $date->setDay(2)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+    $date->setDay(2)->custom('-1 '.$this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $end = clone $this->calendar['date'];
-    $end->addMonth(1)->setDay(8)->custom('-1 '.$ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+    $end->addMonth(1)->setDay(8)->custom('-1 '.$this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $current = clone $date;
 
     $w = 0;
