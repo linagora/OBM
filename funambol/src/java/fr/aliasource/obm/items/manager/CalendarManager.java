@@ -16,7 +16,7 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.client.calendar.CalendarClient;
-import org.obm.sync.items.CalendarChanges;
+import org.obm.sync.items.EventChanges;
 import org.obm.sync.locators.CalendarLocator;
 
 import com.funambol.framework.logging.FunambolLogger;
@@ -252,7 +252,7 @@ public class CalendarManager extends ObmManager {
 			d = new Date(since.getTime());
 		}
 
-		CalendarChanges sync = null;
+		EventChanges sync = null;
 		// get modified items
 		try {
 			sync = binding.getSync(token, calendar, d);
