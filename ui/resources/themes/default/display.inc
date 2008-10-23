@@ -376,6 +376,7 @@ function display_head_theme($p_module) {
   <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/date.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js\" ></script>
 
   $js_include

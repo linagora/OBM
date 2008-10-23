@@ -416,7 +416,7 @@ function html_project_planning($obm_q, $params) {
     $days["$fday"]['obm_dow'] = $obm_dow;
     $day++;
 
-    $day_in_sec += 86400;
+    $day_in_sec = strtotime("+1 day", $day_in_sec);
     $dow = date('w', $day_in_sec);
     $obm_dow = ($dow - $c_week_first_day + 7) % 7;
   }

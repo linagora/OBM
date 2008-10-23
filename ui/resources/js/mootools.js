@@ -172,7 +172,7 @@ $native.generic = function(prop){
 	};
 };
 
-$native(Function, Array, String, Number);
+$native(Function, Array, String, Number, Date);
 
 /*
 Class: Abstract

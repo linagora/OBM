@@ -122,7 +122,7 @@ String.prototype.pad = function(l, s, t){
 Number.prototype.pad = function(l,s,t) { 
   return this.toString().pad(l,s,t);
 }
-
+/*
 Date.prototype.format = function(pattern) {    
   if (!this.valueOf())
     return ;
@@ -152,4 +152,4 @@ Date.prototype.getTimezone = function() {
     offset = offset.pad(4,'0');
   }
   return offset; 
-}
+}*/
