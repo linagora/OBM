@@ -19,6 +19,9 @@ UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_gl
 -- OGroup
 ALTER TABLE OGroup ALTER COLUMN ogroup_parent_id DROP NOT NULL;
 
+-- Contact
+ALTER TABLE Contact ADD COLUMN contact_birthday_id INTEGER default NULL;
+
 -- CalendarEvent
 
 ALTER TABLE calendarevent ALTER COLUMN calendarevent_allday DROP DEFAULT;

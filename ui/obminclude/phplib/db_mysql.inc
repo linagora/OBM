@@ -396,29 +396,34 @@ class DB_Sql {
   }
 
   function xquery($query, $hide_error='') {
+    $query = self::xParser($query);
+    $this->query($query, $hide_error);
+  }
+  
+  static function xParser($query) {
     preg_match_all('/#[\w_]+(\((?:(?>[^()]+)|(?1))*\))?/', $query, $pcodes);
     $translate = array();
     foreach($pcodes[0] as $pcode) {
       $translate= array_merge($translate,$this->interpret($pcode));
     }
     $query = strtr($query, $translate);
-    $this->query($query, $hide_error);
-  }
-  
-  function interpret($code) {
+    return $query;
+  } 
+
+  static function interpret($code) {
     preg_match_all("/(#)?([^ (,][^(,]*)(\(((?:(?>[^()]+)|(?3))*)\))?/",$code, $match);
     $return = array();
     foreach($match[0] as $key => $pattern) {
       if(!empty($match[3][$key])) {
-        $args = $this->interpret($match[4][$key]);
+        $args = self::interpret($match[4][$key]);
       } else {
         $args = NULL;
       }
       if(!empty($match[1][$key])) {
         if(!is_null($args)) {
-          $pcode = $this->$match[2][$key]($args);
+          $pcode = self::$match[2][$key]($args);
         } else {
-          $pcode = $this->$match[2][$key];
+          $pcode = self::$match[2][$key];
         } 
       }else  {
         if(!is_null($args)) {
@@ -432,7 +437,7 @@ class DB_Sql {
     return $return;
   }
 
-  var $LIKE = 'ILIKE';
+  static $LIKE = 'ILIKE';
 
   /**
    * ADDSECONDS 
@@ -441,7 +446,7 @@ class DB_Sql {
    * @access public
    * @return void
    */
-  function ADDSECONDS($args) {
+  static function ADDSECONDS($args) {
     $date = current($args);
     $seconds = next($args);
     return "TIMESTAMPADD(SECOND,$seconds,$date)";
@@ -454,7 +459,7 @@ class DB_Sql {
    * @access public
    * @return void
    */
-  function SUBSECONDS($args) {
+  static function SUBSECONDS($args) {
     $date = current($args);
     $seconds = next($args);
     return "TIMESTAMPADD(SECOND,-$seconds,$date)";
@@ -467,7 +472,7 @@ class DB_Sql {
    * @access public
    * @return void
    */
-  function TIMESTAMP($args) {
+  static function TIMESTAMP($args) {
     $date = current($args);
     return "UNIX_TIMESTAMP($date)";
   }

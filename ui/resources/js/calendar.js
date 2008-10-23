@@ -15,7 +15,7 @@ Obm.CalendarDayEventExtension = new Class({
   },
 
   setOrigin: function(origin) {
-    var hr = $(this.options.type+'-'+origin);
+    var hr = $(this.options.type+'_'+origin);
     this.origin = origin;
     this.element.remove();
     hr.adopt(this.element);
@@ -29,7 +29,7 @@ Obm.CalendarDayEventExtension = new Class({
 
 
   buildExtension: function() {
-    id = this.parentEvent.element.id+'-extension-'+origin;
+    id = this.parentEvent.element.id+'_extension_'+origin;
     this.element = new Element('div').addClass('event')
                                      .addClass(this.event.klass)
                                      .setProperty('id',id)
@@ -177,10 +177,10 @@ Obm.CalendarDayEvent = new Class({
   },
 
   buildEvent: function() {
-    id = this.event.id+'-'+this.event.entity+'-'+this.event.entity_id+'-'+this.event.time;
+    id = this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
     this.element = new Element('div').addClass('event')
                                      .addClass(this.event.klass)
-                                     .setProperty('id','event-'+id)
+                                     .setProperty('id','event_'+id)
                                      .setProperty('title', this.event.title)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
@@ -239,9 +239,13 @@ Obm.CalendarDayEvent = new Class({
   setTime: function(time) {
     var myDate = new Date(time * 1000);
     var startDate = new Date(obm.calendarManager.startTime * 1000);
-    myDate.setHours(startDate.getHours());
-    myDate.setMinutes(startDate.getMinutes());
-    myDate.setSeconds(startDate.getSeconds());
+    startDate.setHours(0);
+    startDate.setMinutes(0);
+    startDate.setSeconds(0)
+    myDate.setHours(0);
+    myDate.setMinutes(0);
+    myDate.setSeconds(0);
+
     origin = Math.floor((myDate.getTime() - startDate.getTime())/1000);
     if (this.setOrigin(origin)) {
       this.event.time = this.guessEventTime(time);
@@ -274,7 +278,7 @@ Obm.CalendarDayEvent = new Class({
       this.hidden = 0;
       this.setSize(this.size);
     }
-    var hr = $(this.options.type+'-'+origin);
+    var hr = $(this.options.type+'_'+origin);
     this.origin = origin;
     this.element.remove();
     hr.adopt(this.element);
@@ -290,7 +294,7 @@ Obm.CalendarDayEvent = new Class({
 
   resizeLine: function(lineElem) {
       if(!$(lineElem)) {
-        var hr = $(this.options.type + '-' + this.origin);
+        var hr = $(this.options.type + '_' + this.origin);
         var lineElem = hr.parentNode;
       }
       var thead = $(lineElem).getFirst();
@@ -393,7 +397,7 @@ Obm.CalendarDayEvent = new Class({
         extensionDate.setDate(startDate.getDate() + this.size);
         var extensionOrigin = Math.floor(extensionDate.getTime()/1000) - obm.calendarManager.startTime;
         dayEnd = 6;
-        if($(this.options.type+'-'+extensionOrigin)) {
+        if($(this.options.type+'_'+extensionOrigin)) {
           this.extensions.push(new Obm.CalendarDayEventExtension(this,extensionSize, extensionOrigin));
         } else {
           this.length -= extensionSize;
@@ -484,10 +488,10 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   },
   
   buildEvent: function() {
-    id = this.event.id+'-'+this.event.entity+'-'+this.event.entity_id+'-'+this.event.time;
+    id = this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
     this.element = new Element('div').addClass('event')
                                      .addClass(this.event.klass)
-                                     .setProperty('id','event-'+id)
+                                     .setProperty('id','event_'+id)
                                      .setProperty('title', this.event.title)
                                      .injectInside(document.body);
     this.dragHandler = new Element('h1')
@@ -623,7 +627,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   },
 
   setOrigin: function(origin) {
-    hr = $(this.options.type+'-'+origin);
+    hr = $(this.options.type+'_'+origin);
     if(hr) {
       this.origin = origin;
       this.element.remove();
@@ -815,10 +819,15 @@ Obm.CalendarManager = new Class({
     var minDelta = Math.floor(secDelta / 60);
     secDelta = secDelta - (minDelta * 60);
     var startDate = new Date(this.startTime * 1000);
+    console.log('start : ',startDate);
     startDate.setDate(startDate.getDate() + dayDelta);
+    console.log('start : ',startDate, 'ajout : ', dayDelta);
     startDate.setHours(startDate.getHours() + hourDelta);
+    console.log('start : ',startDate, 'ajout : ', hourDelta);
     startDate.setMinutes(startDate.getMinutes() + minDelta);
+    console.log('start : ',startDate, 'ajout : ', minDelta);
     startDate.setSeconds(startDate.getSeconds() + secDelta);
+    console.log('start : ',startDate, 'ajout : ', secDelta);
     time = Math.floor(startDate.getTime() / 1000);
     guessedTime = evt.guessEventTime(time);
     if (evt.event.time != guessedTime) {
@@ -953,10 +962,10 @@ Obm.CalendarManager = new Class({
     var events = resp.eventsData;
     if(resp.error == 0) {
       showOkMessage(resp.message);
-      var str = resp.elementId.split('-');
+      var str = resp.elementId.split('_');
       for(var i=0;i< events.length;i++) {
         var ivent = events[i].event;
-        var id = str[0]+'-'+str[1] +'-'+ivent.entity+'-'+ivent.entity_id+'-'+str[4];
+        var id = str[0]+'_'+str[1] +'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
         var evt = obm.calendarManager.events.get(id);
         if(ivent.state == 'A') {
           obm.calendarManager.unregister(id);
@@ -1039,10 +1048,10 @@ Obm.CalendarManager = new Class({
     var events = resp.eventsData;
     if(resp.error == 0) {
       showOkMessage(resp.message);
-      var str = resp.elementId.split('-');
+      var str = resp.elementId.split('_');
       for(var i=0;i< events.length;i++) {
         ivent = events[i].event;
-        var id = str[0]+'-'+str[1] +'-'+ivent.entity+'-'+ivent.entity_id+'-'+str[4];
+        var id = str[0]+'_'+str[1] +'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
         var evt = obm.calendarManager.events.get(id);
         if (evt) {
           obm.calendarManager.unregister(id);
@@ -1104,7 +1113,7 @@ Obm.CalendarQuickForm = new Class({
       }
       target = $(target.parentNode);
     }
-    var str = target.id.split('-');
+    var str = target.id.split('_');
     if(str.length <= 1) {
       return false;
     }
@@ -1115,7 +1124,7 @@ Obm.CalendarQuickForm = new Class({
     } else if (type == 'day') {
       this.setDefaultFormValues(str[1].toInt() + obm.calendarManager.startTime,1, context);
     } else {
-      var elId = 'event-' + str[1] + '-' + str[2] + '-' + str[3] + '-' + str[4];
+      var elId = 'event_' + str[1] + '_' + str[2] + '_' + str[3] + '_' + str[4];
       var evt = obm.calendarManager.events.get(elId);
       this.setFormValues(evt,context);
     }

@@ -111,9 +111,9 @@ $ccalendar_public_groups = true;
 // Calendar : First day of the week
 $phpversion = substr(phpversion(),0,1);
 if ($phpversion >= 5) {
-  $ccalendar_weekstart = 'monday';
+  $ccalendar_weekstart = 'sunday';
 } else {
-  $ccalendar_weekstart = 'monday + 2 hours'; // +2h to fix a DST php4 bug //
+  $ccalendar_weekstart = 'sunday + 2 hours'; // +2h to fix a DST php4 bug //
 }
 
 // calendar alert values (seconds => label or minutes displayed)
@@ -750,9 +750,12 @@ set_include_path(get_include_path().":../$path/$obminclude/lib");
 //   - $debug (opt) : debug flag required
 ///////////////////////////////////////////////////////////////////////////////
 function display_debug_msg($msg, $debug=0, $function_name='') {
-  global $global_dis_debug_msg,$cdg_exe;
+  global $global_dis_debug_msg,$cdg_sql;
 
   if (($_SESSION['set_debug'] > 0) && (($_SESSION['set_debug'] & $debug) == $debug)) {
+    if($debug == $cdg_sql) {
+      $msg = DB_OBM::xParser($msg);
+    }
     $global_dis_debug_msg .= "<b>$function_name</b> : $msg<hr />";
   }
 

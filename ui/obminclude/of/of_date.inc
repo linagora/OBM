@@ -1286,7 +1286,7 @@ class Of_Date extends DateTime {
       } 
       $str .= " +$value $part";
     }
-    $this->modify($str);
+    $this->custom($str);
     return $this;
   }
   /**
@@ -1310,7 +1310,7 @@ class Of_Date extends DateTime {
       }
       $str .= " -$value $part";
     }
-    $this->modify($str);
+    $this->custom($str);
     return $this;    
   }
 
@@ -1326,46 +1326,47 @@ class Of_Date extends DateTime {
    */   
   function _compare($parts,$date, $format) { 
     $data = self::_parse($parts, $date, $format);
+
     if(isset($data['timestamp'])) {
-      if($data['timestamp'] > $this->format(self::TIMESTAMP)) return -1;
-      elseif((int)$data['timestamp'] < $this->format(self::TIMESTAMP)) return 1;
+      if((float)$data['timestamp'] > (float)$this->format(self::TIMESTAMP)) return -1;
+      elseif((float)$data['timestamp'] < (float)$this->format(self::TIMESTAMP)) return 1;
       return 0;
     } 
     if(isset($data['year'])) {
-      if($data['year'] > $this->format(self::YEAR)) return -1;
-      elseif((int)$data['year'] < $this->format(self::YEAR)) return 1;
+      if((float)$data['year'] > (float)$this->format(self::YEAR)) return -1;
+      elseif((float)$data['year'] < (float)$this->format(self::YEAR)) return 1;
     } 
     if(isset($data['month'])) {
-      if($data['month'] > $this->format(self::MONTH)) return -1;
-      elseif($data['month'] < $this->format(self::MONTH)) return 1;
+      if((float)$data['month'] > (float)$this->format(self::MONTH)) return -1;
+      elseif((float)$data['month'] < (float)$this->format(self::MONTH)) return 1;
     } 
     if(isset($data['dayofyear'])) {
-      if($data['dayofyear'] > $this->format(self::DAYOFYEAR)) return -1;
-      elseif($data['dayofyear'] < $this->format(self::DAYOFYEAR)) return 1;
+      if((float)$data['dayofyear'] > (float)$this->format(self::DAYOFYEAR)) return -1;
+      elseif((float)$data['dayofyear'] < (float)$this->format(self::DAYOFYEAR)) return 1;
     } 
     if(isset($data['week'])) {
-      if($data['week'] > $this->format(self::WEEK)) return -1;
-      elseif($data['week'] < $this->format(self::WEEK)) return 1;
+      if((float)$data['week'] > (float)$this->format(self::WEEK)) return -1;
+      elseif((float)$data['week'] < (float)$this->format(self::WEEK)) return 1;
     } 
     if(isset($data['day'])) {
-      if($data['day'] > $this->format(self::DAY)) return -1;
-      elseif($data['day'] < $this->format(self::DAY)) return 1;
+      if((float)$data['day'] > (float)$this->format(self::DAY)) return -1;
+      elseif((float)$data['day'] < (float)$this->format(self::DAY)) return 1;
     } 
     if(isset($data['weekday'])) {
-      if($data['weekday'] > $this->format(self::WEEKDAY_DIGIT)) return -1;
-      elseif($data['weekday'] < $this->format(self::WEEKDAY_DIGIT)) return 1;
+      if((float)$data['weekday'] > (float)$this->format(self::WEEKDAY_DIGIT)) return -1;
+      elseif((float)$data['weekday'] < (float)$this->format(self::WEEKDAY_DIGIT)) return 1;
     } 
     if(isset($data['hour'])) {
-      if($data['hour'] > $this->format(self::HOUR)) return -1;
-      elseif($data['hour'] < $this->format(self::HOUR)) return 1;
+      if((float)$data['hour'] > (float)$this->format(self::HOUR)) return -1;
+      elseif((float)$data['hour'] < (float)$this->format(self::HOUR)) return 1;
     } 
     if(isset($data['minute'])) {
-      if($data['minute'] > $this->format(self::MINUTE)) return -1;
-      elseif($data['minute'] < $this->format(self::MINUTE)) return 1;
+      if((float)$data['minute'] > (float)$this->format(self::MINUTE)) return -1;
+      elseif((float)$data['minute'] < (float)$this->format(self::MINUTE)) return 1;
     } 
     if(isset($data['second'])) {
-      if($data['second'] > $this->format(self::SECOND)) return -1;
-      elseif($data['second'] < $this->format(self::SECOND)) return 1;
+      if((float)$data['second'] > (float)$this->format(self::SECOND)) return -1;
+      elseif((float)$data['second'] < (float)$this->format(self::SECOND)) return 1;
     }
     return 0;    
   }
@@ -1529,6 +1530,7 @@ class Of_Date extends DateTime {
    */
   function custom($string) {
     $this->modify($string);
+    $this->modify('');
     return $this;
   }
 
