@@ -677,7 +677,7 @@ function run_query_group_user_group($group) {
     domain_name
   FROM UserObmGroup LEFT JOIN UserObm ON userobmgroup_userobm_id=userobm_id
   LEFT JOIN Domain ON domain_id = userobm_domain_id
-  WHERE userobmgroup_group_id $id 
+  WHERE userobmgroup_group_id $id AND userobm_archive != 1
   $order
   $limit";
 

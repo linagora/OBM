@@ -2047,10 +2047,12 @@ function get_all_users_id_from_group($g_id) {
     $users = array_merge($users, $gusers);
   }
 
-  // Users members of this group
+  // Not archived users members of this group
+  $join = "LEFT JOIN UserObm on userobm_id=userobmgroup_userobm_id";
+  $where_user_not_archived = "AND userobm_archive != 1";
   $query = "SELECT userobmgroup_userobm_id as user_id
-    FROM UserObmGroup
-    WHERE userobmgroup_group_id $g_id ";
+     FROM UserObmGroup $join
+     WHERE userobmgroup_group_id $g_id $where_user_not_archived";
 
   $obm_q = new DB_OBM; 
   display_debug_msg($query, $cdg_sql, 'get_all_users_id_from_group(2)');
@@ -2204,10 +2206,10 @@ function of_usergroup_update_group_node($g_id) {
   $multidomain = sql_multidomain('userobm');
   $users_id = get_all_users_id_from_group($g_id);
   $ret = false;
-  $g_id = sql_parse_id($g_id, true);
+  $g_id_bis = sql_parse_id($g_id, true);
   // Delete current internal association
   $query = "DELETE FROM of_usergroup
-    WHERE of_usergroup_group_id $g_id ";
+    WHERE of_usergroup_group_id $g_id_bis ";
   display_debug_msg($query, $cdg_sql, 'of_usergroup_update_group_node(delete)');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -2261,6 +2263,66 @@ function of_usergroup_update_group_hierarchy($g_id) {
   return $ret;
 }
 
+/**
+ * Delete a user from of_usergroup.
+ * Beware if used under unchecked circuntances this might
+ * break the UGroup/of_usergroup sync
+ *
+ * @param $g_id group id
+ * @return false if problem
+ * @access public
+ */
+function of_usergroup_delete_user_hierarchy($u_id, $is_array=false) {
+  global $cdg_sql;
+  
+  
+  if (! ($u_id > 0) && !$is_array) {
+    return false;
+  }
+  
+  // Delete current internal association
+  if (!$is_array) {
+    $query = "DELETE FROM of_usergroup WHERE of_usergroup_user_id=$u_id";
+  } else {
+    $query = "DELETE FROM of_usergroup WHERE of_usergroup_user_id IN (".implode(', ', $u_id).")";
+  }
+  display_debug_msg($query, $cdg_sql, 'of_usergroup_delete_user_hierarchy(delete)');
+  $obm_q = new DB_OBM;
+  $ret = $obm_q->query($query);
+  
+  return $ret;
+}
+
+/**
+ * Reset the user hierarchy and rebuild it.
+ * This is a performance killer
+ *
+ * @param $g_id group id
+ * @return false if problem
+ * @access public
+ */
+function of_usergroup_update_user_hierarchy($u_id, $is_array=false) {
+   global $cdg_sql;
+   
+   if (! ($u_id > 0) && !$is_array) {
+     return false;
+   }
+   
+   if (!$is_array) {
+     $query = "SELECT userobmgroup_group_id FROM UserObmGroup WHERE userobmgroup_userobm_id=$u_id";
+   } else {
+     $query = "SELECT userobmgroup_group_id FROM UserObmGroup WHERE userobmgroup_userobm_id IN (".implode(', ', $u_id).")";
+   }
+   display_debug_msg($query, $cdg_sql, 'of_usergroup_update_user_hierarchy(delete)');
+   $obm_q = new DB_OBM;
+   $obm_q->query($query);
+   while($obm_q->next_record()) {
+     $g_id = $obm_q->f('userobmgroup_group_id');
+     of_usergroup_update_group_hierarchy($g_id);
+   }
+   
+   return $ret;
+}
 
 //--- Mail global functions -------------------------------------------------//
 

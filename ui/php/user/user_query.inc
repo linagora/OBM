@@ -744,6 +744,8 @@ function run_query_user_update($p_id, $user) {
   }
   $multidomain = sql_multidomain('userobm');
   $photo_id = sql_parse_id($user['photo_id']);
+  
+  $u = get_user_info($p_id);
 
   // Target Delegation handling (if updated user as delegation admin realm)
   $profiles = get_profile_list();
@@ -1022,9 +1024,11 @@ function run_query_user_update($p_id, $user) {
 
   }
 
-  // If the user is archived, we unsubscribe it from all Groups
-  if ($archive == '1') {
-    $retour = run_query_user_unsubscribe_all_groups($p_id);
+  // If the user is archived, we unsubscribe it from of_usergroup table only
+  if ($archive == '1' && $u['archive'] == 0) {
+    of_usergroup_delete_user_hierarchy($p_id);
+  } elseif($archive == '0' && $u['archive'] == 1) {
+    of_usergroup_update_user_hierarchy($p_id);
   }
 
   // Update photo
@@ -2160,6 +2164,12 @@ function get_profile_list() {
   return $profiles;
 }
 
+/**
+ * Check if batch processing data form are not conflicting
+ *
+ * @param array $params
+ * @return boolean
+ */
 function check_batch_processing_data($params) {
   
   global $err;
@@ -2255,6 +2265,12 @@ function check_batch_processing_data($params) {
   return true;
 }
 
+/**
+ * Query execution - Return users that cannot be updated by batch processing
+ *
+ * @param array $params
+ * @return $users_id_error
+ */
 function run_query_user_data_batch($params) {
 
   $mail_perms = $params['mail_perms'];
@@ -2300,6 +2316,13 @@ function run_query_user_data_batch($params) {
   return $users_id_error;
 }
 
+/**
+ * Check the type of error for each users that cannot be updated by batch processing
+ * and return the error message to be displayed.
+ *
+ * @param unknown_type $params
+ * @param unknown_type $users_id_error
+ */
 function check_users_error_data($params, $users_id_error) {
   global $err;
   global $l_user;
@@ -2357,6 +2380,13 @@ function check_users_error_data($params, $users_id_error) {
   $err['msg'] = $msg_error;
 }
 
+/**
+ * Query execution - Update data for each selected and valid users
+ *
+ * @param array $params
+ * @param array $users_id
+ * @return unknown
+ */
 function run_query_batch_processing_update($params, $users_id) {
   // user
   $archive = $params['archive'];
@@ -2441,16 +2471,46 @@ function run_query_batch_processing_update($params, $users_id) {
   if ($is_town_up) { $set[] = "userobm_town='$town'"; }
   if ($is_expresspostal_up) { $set[] = "userobm_expresspostal='$expresspostal'"; }
   
+  $obm_q = new DB_OBM;
+  
+  // Get users who have actual value of there archive state different of archive state data form 
+  if (isset($archive)) {
+    $users = array();
+    $query = "SELECT userobm_id FROM UserObm WHERE userobm_id IN (".implode(', ', $users_id).") AND userobm_archive != $archive";
+    $obm_q->query($query);
+    while($obm_q->next_record()) {
+      $users[] = $obm_q->f('userobm_id');
+    }
+  }
+  
+  // Update users data
   if (sizeof($set) > 0) {
     $query = "UPDATE UserObm SET ".implode(', ', $set)." WHERE userobm_id IN (".implode(', ', $users_id).")";
-    $obm_q = new DB_OBM;
-    
-    return $obm_q->query($query);
+    $retour = $obm_q->query($query);
   } else {
     return true;
   }
+  
+  // Update users/group links in of_usergroup table
+  if ($retour) {
+    if (isset($users) && count($users) > 0) {
+      if ($archive == '1') {
+        of_usergroup_delete_user_hierarchy($users, true);
+      } else if ($archive == '0') {
+        of_usergroup_update_user_hierarchy($users, true);
+      }
+    }
+  }
+  
+  return $retour;
 }
 
+/**
+ * Function which transform a mixed boolean to real boolean
+ *
+ * @param mixed $var
+ * @return boolean
+ */
 function bool($var) {
     switch (strtolower($var)) {
         case ("true"):
