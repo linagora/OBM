@@ -425,8 +425,7 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
     domain_label,
     domain_name,
     domain_alias,
-    domain_global,
-    domain_mail_server_id
+    domain_global
     FROM Domain
     WHERE domain_id $d_id ";
   display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_infos()');
@@ -437,7 +436,7 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
   $domain['label'] = $obm_q->f('domain_label');
   $domain['name'] = $obm_q->f('domain_name');
   $domain['alias'] = $obm_q->f('domain_alias');
-  $domain['mailserver'] = $obm_q->f('domain_mail_server_id');
+  $domain['mailserver'] = null;
   $domain['global'] = $obm_q->f('domain_global');
 
   if ($get_properties) {

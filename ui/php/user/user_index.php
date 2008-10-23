@@ -33,6 +33,7 @@ if ($obminclude == "") $obminclude = "obminclude";
 $acts = array('help', 'batch_processing');
 
 include("$obminclude/global.inc");
+require("$obminclude/../conf/hooks/user/mailchooser.inc"); // FIXME
 
 $params = get_user_params();
 $mode = $params["mode"];
@@ -73,6 +74,8 @@ switch ($mode) {
 
 // get Profile list (name and id)
 $params['profiles'] = get_profile_list();
+
+$params = get_user_params_mail_server_id($params);
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //

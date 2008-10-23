@@ -692,8 +692,8 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
   if ($group_id > 0) {
     $g_id = sql_parse_id($group_id, true);
     $query = "DELETE FROM UserObmGroup
-    WHERE userobmgroup_userobm_id $sel_id 
-      and userobmgroup_group_id $group_id ";
+    WHERE userobmgroup_userobm_id $sel_user 
+      and userobmgroup_group_id $g_id ";
 
     display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
     $obm_q = new DB_OBM;
@@ -2519,6 +2519,79 @@ function bool($var) {
         case (false): return false;
         default: return false;
     }
+}
+
+// FUNCTION - automatic mail server chooser hooks
+function has_mail_server_auto () {
+  global $obm;
+  
+  {
+    $obm_q = new DB_OBM();
+    $query = "SELECT domain_mail_server_auto FROM Domain WHERE domain_id = $obm[domain_id]";
+    display_debug_msg($query, $cdg_sql, 'has_mail_server_auto()');
+    $obm_q->query($query);
+    
+    if ($obm_q->num_rows() == 1) {
+      $obm_q->next_record();
+      
+      if ($obm_q->f('domain_mail_server_auto')) return true;
+    }
+  }
+  
+  return false;
+}
+
+// FUNCTION - automatic mail server chooser hooks
+function get_user_params_mail_server_id ($params) {
+  global $cdg_sql, $obm, $c_mailchooser_hooks;
+
+  if (!isset($c_mailchooser_hooks)) return $params;
+  
+  if (isset($params['domain']) && $params['domain_global']) {
+    $domain_id = sql_parse_id($params['domain']);
+  } else {
+    $domain_id = sql_parse_id($obm['domain_id']);
+  }
+  
+  if ($params['mail_server_id'] == 'auto') {
+    unset($params['mail_server_id']);
+    
+    $obm_q = new DB_OBM();
+    $query = "SELECT domain_mail_server_auto FROM Domain WHERE domain_id = $domain_id";
+    display_debug_msg($query, $cdg_sql, 'get_user_params_mail_server_id()');
+    $obm_q->query($query);
+    
+    if ($obm_q->num_rows() == 1) {
+      $obm_q->next_record();
+      
+      if ($obm_q->f('domain_mail_server_auto'))
+      foreach ($c_mailchooser_hooks as $hook) {
+        if ($hook['id'] == $obm_q->f('domain_mail_server_auto')) {
+          $hook_function = 'hook_user_mailchooser_'. $hook['hook_function'];
+          $hook_result = $hook_function($params);
+        }
+      }
+    }
+    
+    if ($hook_result) {
+      if (isset($hook_result['mailserver_id'])) {
+        $params['mail_server_id'] = $hook_result['mailserver_id'];
+      } else {
+        $query = "SELECT mailserver_id FROM MailServer
+          JOIN Host ON mailserver_host_id = host_id
+          WHERE host_name = '$hook_result[hostname]'";
+        display_debug_msg($query, $cdg_sql, 'get_user_params_mail_server_id(search)');
+        $obm_q->query($query);
+        
+        if ($obm_q->num_rows() == 1) {
+          $obm_q->next_record();
+          $params['mail_server_id'] = $obm_q->f('mailserver_id');
+        }
+      }
+    }
+  }
+  
+  return $params;
 }
 
 ?>

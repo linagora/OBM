@@ -155,14 +155,17 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
   global $l_host, $l_ip, $l_role, $l_mail_servers, $l_header_delete;
 
+  // GLOBAL - automatic mail server chooser hooks
+  global $c_mailchooser_hooks;
+  
   $id = $obm_q->f('domain_id');
   $label = $obm_q->f('domain_label');
   $desc = $obm_q->f('domain_description');
   $domain_name = $obm_q->f('domain_name');
   $alias = $obm_q->f('domain_alias');
-  $mail_server_id = $obm_q->f('domain_mail_server_id');
+  $mail_server_auto = $obm_q->f('domain_mail_server_auto');
   $mail_server_host_name = $obm_q->f('mailserver_hostname');
-
+  
   if ($cgp_use['service']['mail']) {
     $dis_mailserver = "<tr>
       <th>$l_mail_server</th>
@@ -170,7 +173,18 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
     if ($mail_server_id) {
       $dis_mailserver .= "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&mailserver_id=$mail_server_id\">$mail_server_host_name</a>";
     } else {
-      $dis_mailserver .= '-';
+      $no_mailserver = '-';
+      
+      // BEGIN - automatic mail server chooser hooks
+      if (isset($c_mailchooser_hooks) && $mail_server_auto) {
+        foreach ($c_mailchooser_hooks as $hook) {
+          if ($hook['id'] == $mail_server_auto)
+            $no_mailserver = $hook['name'];
+        }
+      }
+      // END - automatic mail server chooser hooks
+      
+      $dis_mailserver .= $no_mailserver;
     }
     $dis_mailserver .= '</td>
     </tr>';
@@ -235,7 +249,7 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
      </table>
      </div>";
   }
-
+  
   $display['detailInfo'] = display_record_info($obm_q);
   $display['title'] = $label;
 
@@ -287,14 +301,14 @@ function html_domain_form($dom_q,$properties_q, $domain) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
   global $l_insert, $l_update,$l_mail_server;
   global $display, $cgp_use,$l_properties;
-
+  
   // if update mode and first time value are taken from database
   if ($domain['action'] == 'detailupdate') {
     $id = $dom_q->f('domain_id');
     $label = $dom_q->f('domain_label');
     $desc = $dom_q->f('domain_description');
     $domain_name = $dom_q->f('domain_name');
-    $mail_server_id = $dom_q->f('domain_mail_server_id');
+    $mail_server_auto = $dom_q->f('domain_mail_server_auto');
     $alias = $dom_q->f('domain_alias');
     while($properties_q->next_record()) {
       ${$properties_q->f('domainproperty_key')} = $properties_q->f('domainpropertyvalue_value');
@@ -307,7 +321,7 @@ function html_domain_form($dom_q,$properties_q, $domain) {
   if (isset($domain['label'])) { $label = $domain['label']; }
   if (isset($domain['desc'])) { $desc = $domain['desc']; }
   if (isset($domain['domain_name'])) { $domain_name = $domain['domain_name']; }
-  if (isset($domain['mail_server_id'])) { $mail_server_id = $domain['mail_server_id']; }
+  if (isset($domain['mail_server_auto'])) { $mail_server_auto = $domain['mail_server_auto']; }
   if (isset($domain['alias'])) { $alias = $domain['alias']; }
 
   while($properties_q->next_record()) {
@@ -349,12 +363,21 @@ function html_domain_form($dom_q,$properties_q, $domain) {
   }
   
   if ($cgp_use['service']['mail']) {
+    $mail_server_selected = $mail_server_id;
+    
+    // BEGIN - automatic mail server chooser hooks
+    
+    if ($mail_server_auto)
+      $mail_server_selected = "a$mail_server_auto";
+      
+    // END - automatic mail server chooser hooks
+    
     // Mail server selection
     $dis_mailserver = "
     <tr>
       <th class=\"$class[mail_server]\">$l_mail_server</th>
       <td>
-      ".dis_domain_mailserver_select('imap', "$mail_server_id", ($id == '')?'0':$id)."
+      ".dis_domain_mailserver_select('imap', "$mail_server_selected", ($id == '')?'0':$id)."
       </td>
     </tr>";
   }
@@ -412,21 +435,28 @@ function html_domain_form($dom_q,$properties_q, $domain) {
  * @param $domain_id : restrict list to mail server in this domain
  **/
 function dis_domain_mailserver_select($role, $sel_id='', $domain_id='') {
-
+  // GLOBAL - automatic mail server chooser hooks
+  global $c_mailchooser_hooks;
+  
+  // BEGIN - automatic mail server chooser hooks
+  
+  if (isset($c_mailchooser_hooks)) {
+    $block_mailchooser = '';
+    foreach ($c_mailchooser_hooks as $hook) {
+      $block_mailchooser .= "<option value=\"a$hook[id]\"";
+      if ("a$hook[id]" == $sel_id)
+        { $block_mailchooser .= " selected=\"selected\""; }
+      $block_mailchooser .= ">$hook[name]</option>";
+    }
+  }
+  
+  // END - automatic mail server chooser hooks
+  
   $ms = get_domain_mailservers($role, $domain_id);
 
   // select
   $sel = "<select id=\"sel_mail_server_id\" name=\"sel_mail_server_id\">";
-  if (is_array($ms)) {
-    foreach ($ms as $m) {
-      $id = $m['id'];
-      $name = htmlentities($m['name']);
-      $sel .= "<option value=\"$id\"";
-      if ($id == $sel_id) { $sel .= " selected=\"selected\""; }
-      $sel .= ">$name</option>";
-    }
-  }
-  $sel .= '</select>';
+  $sel .= "$block_mailchooser</select>";
 
   return $sel;
 }

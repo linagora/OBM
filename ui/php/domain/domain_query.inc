@@ -80,12 +80,13 @@ function run_query_domain_detail($p_id) {
   $query = "SELECT Domain.*,
     $timeupdate,
     $timecreate,
-    host_name as mailserver_hostname,
+    -- host_name as mailserver_hostname,
+    domain_mail_server_auto,
     c.userobm_login as usercreate,
     u.userobm_login as userupdate
     FROM Domain
-    LEFT JOIN MailServer ON mailserver_id = domain_mail_server_id
-    LEFT JOIN Host ON host_id = mailserver_host_id
+    -- LEFT JOIN MailServer ON mailserver_id = domain_mail_server_id
+    -- LEFT JOIN Host ON host_id = mailserver_host_id
     LEFT JOIN UserObm as c ON domain_usercreate=c.userobm_id
     LEFT JOIN UserObm as u ON domain_userupdate=u.userobm_id
     WHERE domain_id $p_id ";
@@ -114,7 +115,8 @@ function run_query_domain_insert($domain) {
   $desc = $domain['desc'];
   $domain_name = $domain['domain_name'];
   $alias = $domain['alias'];
-  $mail_server_id = sql_parse_id($domain['mail_server_id']);
+  $mail_server_auto = sql_parse_id($domain['mail_server_auto']);
+  
   $query = "INSERT INTO Domain (
     domain_timeupdate,
     domain_timecreate,
@@ -123,7 +125,7 @@ function run_query_domain_insert($domain) {
     domain_label,
     domain_description,
     domain_name,
-    domain_mail_server_id,
+    domain_mail_server_auto,
     domain_alias)
     VALUES (
       null,
@@ -133,7 +135,7 @@ function run_query_domain_insert($domain) {
       '$label',
       '$desc',
       '$domain_name',
-      $mail_server_id,
+      $mail_server_auto,
       '$alias')";
   display_debug_msg($query, $cdg_sql, 'run_query_domain_insert(1)');
   $obm_q = new DB_OBM;
@@ -214,14 +216,14 @@ function run_query_domain_update($d_id, $domain) {
   $label = $domain['label'];
   $desc = $domain['desc'];
   $alias = $domain['alias'];
-  $mail_server_id = sql_parse_id($domain['mail_server_id']);
+  $mail_server_auto = sql_parse_id($domain['mail_server_auto']);
   $did = sql_parse_id($d_id, true);
   $query = "UPDATE Domain SET
     domain_timeupdate='$now',
     domain_userupdate=$uid,
     domain_label='$label',
     domain_description='$desc',
-    domain_mail_server_id=$mail_server_id,
+    domain_mail_server_auto=$mail_server_auto,
     domain_alias='$alias'
     WHERE domain_id $did ";
 

@@ -9,10 +9,14 @@
 
 $l_domain_name = "Nom de domaine";
 $l_alias = "Alias";
-$l_mail_server = "Serveur de mail par défaut";
+$l_mail_server = "Choix du serveur de mail";
 $l_mail_servers = "Serveurs de mail";
 
 $l_update_state = "Etat de mise à jour";
+
+// Mail chooser labels
+$l_mailboxchoice_lest_boxes = "gérant le moins de boîtes mail";
+$l_mailboxchoice_lest_used_memory = "utilisant le moins d'espace mémoire";
 
 // Actions
 $l_insert = "Insérer le domaine";

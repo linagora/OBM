@@ -4,6 +4,9 @@
 
 -- Domain
 ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
+ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
+ALTER TABLE Domain ADD COLUMN domain_mail_server_auto int(2) default NULL;
+
 -- Global Domain
 INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virtual', TRUE);
 UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
@@ -757,10 +760,6 @@ ALTER TABLE Domain ADD CONSTRAINT domain_userupdate_userobm_id_fkey FOREIGN KEY 
 -- Foreign key from domain_usercreate to userobm_id
 UPDATE Domain SET domain_usercreate = NULL WHERE domain_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND domain_usercreate IS NOT NULL;
 ALTER TABLE Domain ADD CONSTRAINT domain_usercreate_userobm_id_fkey FOREIGN KEY (domain_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from domain_mail_server_id to mailserver_id
-UPDATE Domain SET domain_mail_server_id = NULL WHERE domain_mail_server_id NOT IN (SELECT mailserver_id FROM MailServer) AND domain_mail_server_id IS NOT NULL;
-ALTER TABLE Domain ADD CONSTRAINT domain_mail_server_id_mailserver_id_fkey FOREIGN KEY (domain_mail_server_id) REFERENCES MailServer(mailserver_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from domainmailserver_domain_id to domain_id
 DELETE FROM DomainMailServer WHERE domainmailserver_domain_id NOT IN (SELECT domain_id FROM Domain) AND domainmailserver_domain_id IS NOT NULL;

@@ -326,18 +326,7 @@ function check_can_delete_mailserver($m_id) {
     $delete_ok = false;
     $err['msg'] .= $l_link_domain;
   } else {
-    $query = "SELECT *
-    FROM Domain
-    WHERE domain_mail_server_id $m_id ";
-    display_debug_msg($query, $cdg_sql, 'check_can_delete_mailserver(2)');
-    $obm_q->query($query);
-    $nb = $obm_q->num_rows();
-    if ($nb > 0) {
-      $delete_ok = false;
-      $err['msg'] .= $l_link_domain;
-    } else {
-      $ok_msg .= $l_link_domain_no;
-    }
+    $ok_msg .= $l_link_domain_no;
   }
 
   // Links from Users

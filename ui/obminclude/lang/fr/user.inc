@@ -60,6 +60,7 @@ $l_smb_home_drive = "Lecteur home";
 $l_smb_logon = "Script de logon";
 $l_group_member = "Membre des groupes";
 $l_password_type = "Chiffrage mdp";
+$l_mailserver_auto = "Automatique";
 
 // Actions
 $l_insert = "Enregistrer l'utilisateur";

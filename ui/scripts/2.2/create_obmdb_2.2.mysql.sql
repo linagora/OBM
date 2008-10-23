@@ -1001,13 +1001,11 @@ CREATE TABLE Domain (
   domain_description varchar(255) default NULL,
   domain_name varchar(128) default NULL,
   domain_alias text,
-  domain_mail_server_id int(8) default NULL,
+  domain_mail_server_auto int(2) default NULL,
   domain_global tinyint(1) default '0',
   PRIMARY KEY  (domain_id),
   KEY domain_userupdate_userobm_id_fkey (domain_userupdate),
   KEY domain_usercreate_userobm_id_fkey (domain_usercreate),
-  KEY domain_mail_server_id_mailserver_id_fkey (domain_mail_server_id),
-  CONSTRAINT domain_mail_server_id_mailserver_id_fkey FOREIGN KEY (domain_mail_server_id) REFERENCES MailServer (mailserver_id) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT domain_usercreate_userobm_id_fkey FOREIGN KEY (domain_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT domain_userupdate_userobm_id_fkey FOREIGN KEY (domain_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

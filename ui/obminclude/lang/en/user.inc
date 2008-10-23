@@ -49,6 +49,7 @@ $l_smb_home_drive = "Home drive";
 $l_smb_logon = "Logon script";
 $l_group_member = "Member of groups";
 $l_password_type = "Password Crypt";
+$l_mailserver_auto = "Automatic";
 
 // Actions
 $l_insert = "Insert the User";

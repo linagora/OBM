@@ -177,9 +177,7 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
         OR Domain.domain_alias != P_Domain.domain_alias
         OR (Domain.domain_alias IS NULL AND P_Domain.domain_alias IS NOT NULL) 
         OR (Domain.domain_alias IS NOT NULL AND P_Domain.domain_alias IS NULL) 
-        OR Domain.domain_mail_server_id != P_Domain.domain_mail_server_id
-        OR (Domain.domain_mail_server_id IS NULL AND P_Domain.domain_mail_server_id IS NOT NULL)
-        OR (Domain.domain_mail_server_id IS NOT NULL AND P_Domain.domain_mail_server_id IS NULL))
+        )
     $where";
   
   $obm_q->query($query);

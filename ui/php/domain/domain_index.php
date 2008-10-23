@@ -30,6 +30,7 @@ include("$obminclude/global_pref.inc");
 require('domain_display.inc');
 require('domain_query.inc');
 require('domain_js.inc');
+require("$obminclude/../conf/hooks/user/mailchooser.inc"); // FIXME
 
 if ($action == '') $action = 'index';
 get_domain_action();
@@ -226,6 +227,12 @@ function get_domain_params() {
     }
     $params['alias'] = implode("\r\n",$aliases);
   }
+  
+  if (!empty($params['mail_server_id']) && $params['mail_server_id'][0] == 'a') {
+    $params['mail_server_auto'] = str_replace('a', '', $params['mail_server_id']) + 0;
+    unset($params['mail_server_id']);
+  }
+  
   return $params;
 }
 

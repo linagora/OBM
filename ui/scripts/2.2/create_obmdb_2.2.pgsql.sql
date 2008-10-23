@@ -1709,7 +1709,7 @@ CREATE TABLE Domain (
   domain_description    varchar(255),
   domain_name           varchar(128),
   domain_alias          text,
-  domain_mail_server_id integer default NULL,
+  domain_mail_server_auto integer default NULL,
   domain_global         boolean default false,
   PRIMARY KEY (domain_id)
 );
@@ -2377,9 +2377,6 @@ ALTER TABLE Domain ADD CONSTRAINT domain_userupdate_userobm_id_fkey FOREIGN KEY 
 
 -- Foreign key from domain_usercreate to userobm_id
 ALTER TABLE Domain ADD CONSTRAINT domain_usercreate_userobm_id_fkey FOREIGN KEY (domain_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from domain_mail_server_id to mailserver_id
-ALTER TABLE Domain ADD CONSTRAINT domain_mail_server_id_mailserver_id_fkey FOREIGN KEY (domain_mail_server_id) REFERENCES MailServer(mailserver_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from domainmailserver_domain_id to domain_id
 ALTER TABLE DomainMailServer ADD CONSTRAINT domainmailserver_domain_id_domain_id_fkey FOREIGN KEY (domainmailserver_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;

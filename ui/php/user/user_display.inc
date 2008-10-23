@@ -1016,6 +1016,7 @@ function html_user_form($usr_q, $user, $field='') {
   global $l_vacation_dateend, $l_mail_server;
   global $l_enabled, $l_disabled, $l_web_consult_list,$path;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
+  global $l_mailserver_auto;
   //global $path, $display, $cgp_use, $action, $profiles;
   global $path, $display, $cgp_use, $action;
   global $obm, $c_default_domain, $c_renameUserMailbox, $l_domain, $l_header_new, $l_hour;
@@ -1253,6 +1254,16 @@ function html_user_form($usr_q, $user, $field='') {
     // Mail server can't be changed if set
     if (! $mail_server_host_name) {
       $dis_mailserver = of_domain_dis_mailserver_select('imap', $mail_server_id, $obm['domain_id']);
+      
+      // BEGIN - automatic mail server chooser hooks
+      
+      if (has_mail_server_auto()) {
+        $dis_mailserver = preg_replace('/(<select [^>]+>)/',
+          "\\1 <option value=\"auto\">$l_mailserver_auto</option>", $dis_mailserver);
+      }
+      
+      // END - automatic mail server chooser hooks
+    
     } else {
       $dis_mailserver = "
       <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server_id\">$mail_server_host_name</a>
@@ -2743,4 +2754,5 @@ function dis_user_command_use($disp) {
   echo "\n$disp\n";
   echo "Try -h for help\n\n";
 }
+
 ?>
