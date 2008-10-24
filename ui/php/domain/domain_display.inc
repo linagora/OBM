@@ -476,9 +476,8 @@ function dis_domain_can_delete($p_id) {
   $dis_back = "<a href=\"$path/domain/domain_index.php?action=detailconsult&amp;domain_id=$p_id\">$l_back</a>";
 
   $dis_delete = "
-  <a href=\"$path/domain/domain_index.php?action=delete&amp;domain_id=$p_id\" onclick=\"return confirm_del(this.form);\">
-  $l_delete 
-  </a>";
+  <input type=\"submit\" value=\"$l_delete\" />
+  ";
 
   $infos_q = run_query_domain_detail($p_id);
   $title = $infos_q->f('domain_label');
@@ -486,10 +485,14 @@ function dis_domain_can_delete($p_id) {
   $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
+  <form action=\"$path/domain/domain_index.php\" method=\"post\" onsubmit=\"return confirm_del(this)\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"domain_id\" value=\"$p_id\" />
     <div class=\"buttons\">
       $dis_delete
       $dis_back
     </div>
+  </form>
 ";
   return $block;
 }

@@ -48,7 +48,11 @@ function show_hide_add_button() {
               }).setProperty('id','addDomainButton').adopt(new Element('img').setProperty('src','$ico_add'))));     
     }
   }
-}  
+}
+
+function confirm_del(form) {
+  return confirm('$l_domain_confirm_delete');
+}
   ";
   
 ?>

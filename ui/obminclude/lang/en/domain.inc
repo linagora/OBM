@@ -59,4 +59,5 @@ $l_name_in_use = "Those name or aliases are already in use";
 $l_alias_user_used = "Cannot change or remove aliases used in email adress";
 // JavaScript Messages
 $l_fill_title = "You have to fill the Title before submitting.";
+$l_domain_confirm_delete = "CAUTION : You will delete a profile ! This operation is irreversible.\\nContinue anyway ?";
 
