@@ -10,18 +10,17 @@ class ContactExpiration extends CronJob {
    */
   var $logger;
   
+  const EXPIRATION_TIME = 6;
+  
   function mustExecute($date) {
-    global $cgp_use;
-    if ($cgp_use["service"]["user"]) {
-      $hours = date('G');
-      return ($hours == 6);
-    } else {
-     return false;
-    }
+    if (self::EXPIRATION_TIME == 0) return false;
+    
+    $hours = date('G');
+    return ($hours == 6);
   }
 
   function execute($date) {
-    $this->logger->debug('Delete contacts where archived since 6 months');
+    $this->logger->debug('Delete contacts where archived since '. self::EXPIRATION_TIME. ' months');
     $enable = $this->EachOldArchivedContact($this, 'DeleteContact');
   }
   
@@ -37,7 +36,7 @@ class ContactExpiration extends CronJob {
     $obm_q = new DB_OBM;
     $query = "SELECT contact_id FROM Contact
       WHERE contact_archive = '1'
-        AND #MONTHDIFF(contact_timeupdate,now()) >= 6";
+        AND #MONTHDIFF(contact_timeupdate,now()) >= ". self::EXPIRATION_TIME;
     $this->logger->core($query);
     $obm_q->xquery($query);
     
@@ -80,6 +79,7 @@ class ContactExpiration extends CronJob {
     run_query_global_delete_document_links($c_id, 'contact');    
     $ret = of_userdata_query_delete('contact', $c_id);
     
+    
     // BEGIN birthday support
     
     $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = '$birthday_id'";
@@ -87,6 +87,7 @@ class ContactExpiration extends CronJob {
     $obm_q->query($query);
     
     // END birthday support
+    
     
     $query = "DELETE FROM Contact WHERE contact_id $sql_id";
     $this->logger->core($query);

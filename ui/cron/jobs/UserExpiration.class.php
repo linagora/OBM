@@ -6,13 +6,8 @@ class UserExpiration extends CronJob {
   var $logger;
   
   function mustExecute($date) {
-    global $cgp_use;
-    if ($cgp_use["service"]["user"]) {
-      $hours = date('G');
-      return ($hours == 6);
-    } else {
-     return false;
-		}
+    $hours = date('G');
+    return ($hours == 6);
   }
 
   function execute($date) {
