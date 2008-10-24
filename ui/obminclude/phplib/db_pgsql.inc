@@ -353,5 +353,35 @@ class DB_Sql {
     $date = current($args);
     return "EXTRACT(EPOCH from $date)";
   }  
+
+  /**
+   * MONTHDIFF 
+   * 
+   * @param mixed $args 
+   * @access public
+   * @return void
+   */
+  static function MONTHDIFF($args) {
+    $start = next($args);
+    $end = next($args);
+    
+    return "(EXTRACT(MONTH from AGE($end,$start)) + EXTRACT(YEAR from AGE($end,$start)) * 12)";
+  }
+  
+  /**
+   * DAYDIFF 
+   * 
+   * @param mixed $args 
+   * @access public
+   * @return void
+   */
+  static function DAYDIFF($args) {
+    $seconds_in_a_day = 3600 * 24;
+    
+    $start = current($args);
+    $end = next($args);
+    
+    return "FLOOR(EXTRACT(EPOCH from AGE($end,$start))/$seconds_in_a_day)";
+  }
 }
 ?>

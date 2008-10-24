@@ -904,10 +904,6 @@ function get_linked_contact_publication_nb($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_delete($p_id) {
   global $cdg_sql, $c_use_connectors;
-  
-  $c = get_contact_info($p_id);
-  $comp_id =  $c['company_id'];
-  $multidomain = sql_multidomain('contact');
 
   // Hook : Pre
   if (function_exists('hook_pre_run_query_contact_delete')) {
@@ -915,30 +911,34 @@ function run_query_contact_delete($p_id) {
       return false;
     }
   }
-
+  
+  $obm_q = new DB_OBM;
+  
   $sql_id = sql_parse_id($p_id, true);
+  $multidomain = sql_multidomain('contact');
+  
+  $query = "SELECT contact_company_id, contact_birthday_id
+    FROM Contact
+    WHERE contact_id $sql_id $multidomain";
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_delete(select)');
+  $retour = $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $comp_id =  $obm_q->f('contact_company_id');
+  $birthday_id =  $obm_q->f('contact_birthday_id');
   
   run_query_global_delete_document_links($p_id, 'contact');    
   $ret = of_userdata_query_delete('contact', $p_id);
   
   // BEGIN birthday support
   
-  $old_contact = run_query_contact_detail($p_id);
-  $old_birthday = $old_contact->f('contact_birthday');
-  if ($old_birthday) {
-    $old_birthday = new Of_Date($old_birthday);
-  } else {
-    $old_birthday = null;
-  }
-  
-  run_query_contact_birthday_update(null, null,
-    $old_contact->f('contact_birthday_id'), null, $old_birthday, null);
+  run_query_contact_birthday_update(null, null, $birthday_id, null, null, null);
     
   // END birthday support
   
   $query = "DELETE FROM Contact WHERE contact_id $sql_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_delete(1)');
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   // If connectors in use
@@ -1530,6 +1530,19 @@ function run_query_contact_subscription_nb($id) {
 /**
  * Update contact birthday
  *
+ * When new need : - $contact_id
+ *                 - $contact_usercreate
+ *                 - $contact_fullname
+ *                 - $new_value
+ *                 - set $event_id to null
+ * 
+ * When exists need : - $event_id
+ *                    - $old_value
+ *                    - $new_value
+ * 
+ * When delete : - need $event_id
+ *               - set $new_value to null
+ * 
  * @param Integer $contact_id
  * @param Integer $contact_usercreate
  * @param Integer $event_id
@@ -1545,16 +1558,16 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
   
 	list($nope_event, $insert_event, $update_event, $delete_event) = array(0,1,2,3);
 	
-	if ($old_value) {
-		if (!$new_value) {
-		  $do = $delete_event;
-		} else if ($new_value != $old_value) {
-			$do = $update_event;
-		}
+	if ($event_id == null) {
+    if ($new_value != null) {
+      $do = $insert_event;
+    }
 	} else {
-		if ($new_value) {
-			$do = $insert_event;
-		}
+    if ($new_value == null) {
+      $do = $delete_event;
+    } else if ($new_value != $old_value) {
+      $do = $update_event;
+    }
 	}
 	
   $obm_q = new DB_OBM;
@@ -1567,7 +1580,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
 	switch ($do) {
 		case $insert_event:
 			$duration = 3600*24;
-			$title = sprintf($l_birthday_event_title, $contact_fullname);
+			$title = str_replace('\'', '\\\'', sprintf($l_birthday_event_title, $contact_fullname));
 			
 			$query = "INSERT INTO CalendarEvent
 			(calendarevent_timeupdate,
@@ -1600,7 +1613,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
 			'',
 			'',
 			'',
-			'9',
+			NULL,
 			'2',
 			'0',
 			'$duration',
@@ -1612,7 +1625,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
       NULL,
 			'$obm[domain_id]')";
 			
-			$obm_q->query($query);
+			$obm_q->xquery($query);
       display_debug_msg($query, $cdg_sql, 'run_query_contact_birthday_update(insert event)');
 			
       $query = "SELECT calendarevent_id FROM CalendarEvent
@@ -1623,7 +1636,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
           AND calendarevent_owner = '$contact_usercreate'
           AND calendarevent_title = '$title'";
       
-      $obm_q->query($query);
+      $obm_q->xquery($query);
       display_debug_msg($query, $cdg_sql, "run_query_contact_birthday_update(get insert id)");
       
       if ($obm_q->num_rows() == 1) {

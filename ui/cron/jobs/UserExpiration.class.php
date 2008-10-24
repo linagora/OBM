@@ -27,9 +27,9 @@ class UserExpiration extends CronJob {
 
     $obm_q = new DB_OBM;
 		$query = "UPDATE UserObm SET userobm_archive=1 
-						WHERE TIMESTAMPDIFF(DAY,now(),userobm_account_dateexp)<0";
+						WHERE #DAYDIFF(now(),userobm_account_dateexp)<0";
     $this->logger->core($query);
-    $obm_q->query($query);
+    $obm_q->xquery($query);
     $this->logger->info($obm_q->affected_rows()." alerts Disable");
 	}
 
@@ -38,9 +38,9 @@ class UserExpiration extends CronJob {
 
     $obm_q = new DB_OBM;
 		$query = "UPDATE Userobm set userobm_archive=0 
-						WHERE TIMESTAMPDIFF(DAY,now(),userobm_account_dateexp)>=0 AND userobm_archive=1";
+						WHERE #DAYDIFF(now(),userobm_account_dateexp)>=0 AND userobm_archive=1";
     $this->logger->core($query);
-    $obm_q->query($query);
+    $obm_q->xquery($query);
     $this->logger->info($obm_q->affected_rows()." alerts Enable");
 	}
 }

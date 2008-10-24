@@ -476,5 +476,33 @@ class DB_Sql {
     $date = current($args);
     return "UNIX_TIMESTAMP($date)";
   }
+
+  /**
+   * MONTHDIFF 
+   * 
+   * @param mixed $args 
+   * @access public
+   * @return void
+   */
+  static function MONTHDIFF($args) {
+    $start = current($args);
+    $end = next($args);
+    
+    return "TIMESTAMPDIFF(MONTH,$start,$end)";
+  }
+  
+  /**
+   * DAYDIFF 
+   * 
+   * @param mixed $args 
+   * @access public
+   * @return void
+   */
+  static function DAYDIFF($args) {
+    $start = current($args);
+    $end = next($args);
+    
+    return "TIMESTAMPDIFF(DAY,$start,$end)";
+  }
 }
 ?>
