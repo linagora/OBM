@@ -404,7 +404,7 @@ class DB_Sql {
     preg_match_all('/#[\w_]+(\((?:(?>[^()]+)|(?1))*\))?/', $query, $pcodes);
     $translate = array();
     foreach($pcodes[0] as $pcode) {
-      $translate= array_merge($translate,$this->interpret($pcode));
+      $translate= array_merge($translate,self::interpret($pcode));
     }
     $query = strtr($query, $translate);
     return $query;
