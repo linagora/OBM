@@ -35,6 +35,7 @@ $l_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
 $l_system_no_priv = "Un groupe système ne peut être privé !";
 $l_only_owner_priv = "Seul le propriétaire d'un groupe peut le définir privé !";
 $l_err_private_email = "Les groupes privés ne peuvent pas avoir d'adresse E-mail !";
+$l_warn_group_diff_privacy = "Certains groupes n'ont pas été ajoutés. Vous essayez d'ajouter des groupes privés dans le groupe publique !";
 
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les groupes correspondants.";
 $l_no_user = "Il n'y a pas d'utilisateurs membres.";

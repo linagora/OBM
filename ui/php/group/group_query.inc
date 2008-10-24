@@ -9,7 +9,7 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Group Search query execution 
+// Group Search query execution
 // Parameters :
 //   - $group[]      : list search criteria
 //     keys used     : name, user
@@ -17,13 +17,13 @@
 function run_query_group_search($group) {
   global $cdg_sql, $ctu_sql_limit;
   global $c_public, $c_private;
-  
+
   $name = sql_search_text_parse($group["name"]);
   $delegation = sql_search_text_parse($group["delegation"]);
   $email = sql_search_text_parse($group["email"]);
   $privacy = $group["privacy"];
   $user = sql_search_text_parse($group["user"]);
-  
+
   $sql_order_field = $group["sql_order_field"];
   $sql_order_dir = $group["sql_order_dir"];
 
@@ -34,7 +34,7 @@ function run_query_group_search($group) {
   $timeupdate = sql_date_format($db_type,"UGroup.group_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"UGroup.group_timecreate", "timecreate");
   $multidomain = sql_multidomain("group");
-	
+
   $where = "group_name $like '$name%'";
   if ($user != '') {
     $join_user = "
@@ -51,67 +51,67 @@ function run_query_group_search($group) {
   }
   if ($privacy == $c_public) {
     $where .= " AND group_privacy = 0";
-  } elseif ($privacy == $c_private) { 
+  } elseif ($privacy == $c_private) {
     $where .= " AND group_privacy = 1";
   }
   // only the one which are allowed (ie. publics )
   $where .=  " AND " .sql_obm_entity_privacy("group");
-    
+
   $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
   $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "group_name";
   $orderq .= " ORDER BY $order $sql_order_dir";
 
-  $query = "SELECT  
-      group_id as id,
-      group_id,
-      group_domain_id,
-      group_system,
-      group_privacy,
-      group_local,
-      group_ext_id,
-      group_samba,
-      group_gid,
-      group_mailing,
-      group_delegation,
-      group_manager_id,
-      group_name,
-      group_desc,
-      group_email,
-      group_contacts,
-      $timecreate,
-      $timeupdate,
-      A.userobm_login as usercreate,
-      B.userobm_login as userupdate,
-      count(usergroup.of_usergroup_user_id) as group_nb_user
-    FROM UGroup
-      LEFT JOIN of_usergroup usergroup ON of_usergroup_group_id=group_id
-      LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
-      LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
-      $join_user
-    $whereq
-    GROUP BY group_id,
-      group_domain_id,
-      group_system,
-      group_privacy,
-      group_local,
-      group_ext_id,
-      group_samba,
-      group_gid,
-      group_mailing,
-      group_delegation,
-      group_manager_id,
-      group_name,
-      group_desc,
-      group_email,
-      group_contacts,
-      timecreate,
-      timeupdate,
-      usercreate,
-      userupdate
-    $orderq
-    $limit";
+  $query = "SELECT
+  group_id as id,
+  group_id,
+  group_domain_id,
+  group_system,
+  group_privacy,
+  group_local,
+  group_ext_id,
+  group_samba,
+  group_gid,
+  group_mailing,
+  group_delegation,
+  group_manager_id,
+  group_name,
+  group_desc,
+  group_email,
+  group_contacts,
+  $timecreate,
+  $timeupdate,
+  A.userobm_login as usercreate,
+  B.userobm_login as userupdate,
+  count(usergroup.of_usergroup_user_id) as group_nb_user
+  FROM UGroup
+  LEFT JOIN of_usergroup usergroup ON of_usergroup_group_id=group_id
+  LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
+  LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
+  $join_user
+  $whereq
+  GROUP BY group_id,
+  group_domain_id,
+  group_system,
+  group_privacy,
+  group_local,
+  group_ext_id,
+  group_samba,
+  group_gid,
+  group_mailing,
+  group_delegation,
+  group_manager_id,
+  group_name,
+  group_desc,
+  group_email,
+  group_contacts,
+  timecreate,
+  timeupdate,
+  usercreate,
+  userupdate
+  $orderq
+  $limit";
 
   if ($ctu_sql_limit) {
     $count = get_query_count("SELECT count(*) FROM UGroup $join_user $whereq");
@@ -128,14 +128,14 @@ function run_query_group_search($group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Possible children Group Search query execution 
+// Possible children Group Search query execution
 // Parameters :
 //   - $group[]      : list search criteria
 //     keys used     : name, user
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_search_possible_children($group) {
   global $cdg_sql;
-  
+
   $id = $group["ext_id"];
   $name = $group["name"];
   $delegation = sql_search_text_parse($group["delegation"]);
@@ -153,7 +153,7 @@ function run_query_group_search_possible_children($group) {
   $timeupdate = sql_date_format($db_type,"UGroup.group_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"UGroup.group_timecreate", "timecreate");
   $multidomain = sql_multidomain("group");
-	
+
   // WHERE Clause
 
   // only the one which are allowed (ie. publics )
@@ -172,21 +172,21 @@ function run_query_group_search_possible_children($group) {
     $g_id = sql_parse_id($g_id, true, true);
     $where .= " AND group_id $g_id ";
   }
-  $id = sql_parse_id($id, true, true); 
+  $id = sql_parse_id($id, true, true);
   $query = "SELECT DISTINCT UGroup.*, group_id as id,
-      $timecreate,
-      $timeupdate,
-      A.userobm_login as usercreate,
-      B.userobm_login as userupdate
-    FROM UGroup
-      LEFT JOIN UserObmGroup ON group_id=UserObmGroup_group_id
-      LEFT JOIN UserObm as C ON UserObmGroup.userobmgroup_userobm_id=C.userobm_id
-      LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
-      LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
-    WHERE group_name $like '$name%'
-      AND group_id $id 
-      $where
-      $multidomain";
+  $timecreate,
+  $timeupdate,
+  A.userobm_login as usercreate,
+  B.userobm_login as userupdate
+  FROM UGroup
+  LEFT JOIN UserObmGroup ON group_id=UserObmGroup_group_id
+  LEFT JOIN UserObm as C ON UserObmGroup.userobmgroup_userobm_id=C.userobm_id
+  LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
+  LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
+  WHERE group_name $like '$name%'
+  AND group_id $id
+  $where
+  $multidomain";
 
   // ORDER construction
 
@@ -214,22 +214,22 @@ function run_query_group_detail($id) {
   $timeupdate = sql_date_format($db_type,"UGroup.group_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"UGroup.group_timecreate", "timecreate");
   $multidomain = sql_multidomain("group");
-	
+
   $query = "SELECT *,
-      group_privacy as privacy,
-      group_mailing as mailing,
-      $timecreate,
-      $timeupdate,
-      c.userobm_login as usercreate,
-      u.userobm_login as userupdate,
-      m.userobm_lastname,
-      m.userobm_firstname
-    FROM UGroup
-         LEFT JOIN UserObm as c ON group_usercreate=c.userobm_id
-         LEFT JOIN UserObm as u ON group_userupdate=u.userobm_id
-         LEFT JOIN UserObm as m ON group_manager_id=m.userobm_id
-    WHERE group_id $id 
-      $multidomain";
+  group_privacy as privacy,
+  group_mailing as mailing,
+  $timecreate,
+  $timeupdate,
+  c.userobm_login as usercreate,
+  u.userobm_login as userupdate,
+  m.userobm_lastname,
+  m.userobm_firstname
+  FROM UGroup
+  LEFT JOIN UserObm as c ON group_usercreate=c.userobm_id
+  LEFT JOIN UserObm as u ON group_userupdate=u.userobm_id
+  LEFT JOIN UserObm as m ON group_manager_id=m.userobm_id
+  WHERE group_id $id
+  $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_group_detail()");
   $obm_q->query($query);
   $obm_q->next_record();
@@ -256,7 +256,7 @@ function run_query_group_insert($group) {
   $mailing = sql_parse_int($group["mailing"]);
   $now = date("Y-m-d H:i:s");
   $gid = get_first_group_free_gid();
-  $domain_id = sql_parse_id($obm["domain_id"]);	
+  $domain_id = sql_parse_id($obm["domain_id"]);
   if ($priv == 1) {
     $mailing = 0;
     $samba = 0;
@@ -267,35 +267,35 @@ function run_query_group_insert($group) {
   $q_delegation = of_delegation_query_insert_clauses('group_delegation', stripslashes($group["delegation"]));
 
   $query = "INSERT INTO UGroup (
-    group_timeupdate,
-    group_timecreate,
-    group_userupdate,
-    group_usercreate,
-    group_domain_id,
-    group_system,
-    group_samba,
-    group_privacy,
-    group_gid,
-    group_name
-    $q_delegation[field],
-    group_desc,
-    group_email,
-    group_mailing
+  group_timeupdate,
+  group_timecreate,
+  group_userupdate,
+  group_usercreate,
+  group_domain_id,
+  group_system,
+  group_samba,
+  group_privacy,
+  group_gid,
+  group_name
+  $q_delegation[field],
+  group_desc,
+  group_email,
+  group_mailing
   ) VALUES (
-    null,
-    '$now',
-    null,
-    $obm[uid],
-    $domain_id,
-    $system,
-    $samba,
-    $priv,
-    '$gid',
-    '$name'
-    $q_delegation[value],
-    '$desc',
-    '$email',
-    $mailing
+  null,
+  '$now',
+  null,
+  $obm[uid],
+  $domain_id,
+  $system,
+  $samba,
+  $priv,
+  '$gid',
+  '$name'
+  $q_delegation[value],
+  '$desc',
+  '$email',
+  $mailing
   )";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_insert()");
@@ -328,15 +328,15 @@ function run_query_group_id($group) {
   $email = $group["email"];
   $priv = sql_parse_int($group["privacy"]);
   $multidomain = sql_multidomain("group");
-	
+
   $query = "SELECT MAX(group_id) as  group_id
-    FROM UGroup
-    WHERE group_system=$system
-      AND group_name='$name'
-      AND group_privacy=$priv
-      AND group_desc='$desc'
-      AND group_email='$email'
-      $multidomain";
+  FROM UGroup
+  WHERE group_system=$system
+  AND group_name='$name'
+  AND group_privacy=$priv
+  AND group_desc='$desc'
+  AND group_email='$email'
+  $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_id()");
   $obm_q = new DB_OBM;
@@ -381,18 +381,18 @@ function run_query_group_update($group) {
   $q_delegation = of_delegation_query_update_clause('group_delegation', stripslashes($group["delegation"]));
 
   $query = "UPDATE UGroup SET
-    group_timeupdate='$now',
-    group_userupdate=$obm[uid],
-    group_samba=$samba,
-    group_privacy=$priv,
-    group_name='$name',
-    group_desc='$desc',
-    group_email='$email',
-    group_mailing='$mailing',
-    group_manager_id=$manager
-    $q_delegation
-  WHERE group_id $id 
-    $multidomain";
+  group_timeupdate='$now',
+  group_userupdate=$obm[uid],
+  group_samba=$samba,
+  group_privacy=$priv,
+  group_name='$name',
+  group_desc='$desc',
+  group_email='$email',
+  group_mailing='$mailing',
+  group_manager_id=$manager
+  $q_delegation
+  WHERE group_id $id
+  $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_update()");
   $obm_q = new DB_OBM;
@@ -424,7 +424,7 @@ function run_query_group_delete($p_id) {
   $id = sql_parse_id($p_id, true);
   // If the Group exists in Prod table AND is public, Insert it in Deleted table
   $query = "SELECT group_id, group_delegation FROM P_UGroup
-    WHERE group_id $id AND group_privacy=0";
+  WHERE group_id $id AND group_privacy=0";
   display_debug_msg($query, $cdg_sql, "run_query_group_delete(auto)");
   $obm_q->query($query);
   $obm_q->next_record();
@@ -437,19 +437,19 @@ function run_query_group_delete($p_id) {
     $now = date("Y-m-d H:i:s");
 
     $query = "INSERT INTO Deleted (
-      deleted_domain_id,
-      deleted_user_id,
-      deleted_delegation,
-      deleted_table,
-      deleted_entity_id,
-      deleted_timestamp)
+    deleted_domain_id,
+    deleted_user_id,
+    deleted_delegation,
+    deleted_table,
+    deleted_entity_id,
+    deleted_timestamp)
     VALUES (
-      $domain_id,
-      $uid,
-      '$delegation',
-      'UGroup',
-      $p_id,
-      '$now')";
+    $domain_id,
+    $uid,
+    '$delegation',
+    'UGroup',
+    $p_id,
+    '$now')";
     display_debug_msg($query, $cdg_sql, "run_query_group_delete(auto)");
     $retour = $obm_q->query($query);
   }
@@ -463,12 +463,12 @@ function run_query_group_delete($p_id) {
  *
  * @param mixed $group[] : group hash info : keys used : id, user_nb, userX
  * @result number of users inserted
-**/
+ **/
 function run_query_group_usergroup_insert($group) {
   global $obm, $cdg_sql;
 
   $sel_id = sql_parse_id($group['group_id'], true);
-  $ins_id = sql_parse_id($group['group_id']); 
+  $ins_id = sql_parse_id($group['group_id']);
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $group["user_nb"]) {
@@ -476,18 +476,18 @@ function run_query_group_usergroup_insert($group) {
     $u_id = sql_parse_id($group["user$cpt"], true);
 
     $query = "SELECT * FROM UserObmGroup
-      WHERE userobmgroup_group_id $sel_id 
-        AND userobmgroup_userobm_id $u_id ";
+    WHERE userobmgroup_group_id $sel_id
+    AND userobmgroup_userobm_id $u_id ";
     display_debug_msg($query, $cdg_sql, "run_query_group_usergroup_insert(1)");
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
-    
+
     // If the entry doesn't already exist, we insert it
     if ($test_q->num_rows() == 0) {
       $u_id = sql_parse_id($group["user$cpt"]);
       $query = "INSERT INTO UserObmGroup (
-        userobmgroup_group_id,
-        userobmgroup_userobm_id)
+      userobmgroup_group_id,
+      userobmgroup_userobm_id)
       VALUES ($ins_id, $u_id)";
 
       display_debug_msg($query, $cdg_sql, 'run_query_group_usergroup_insert(2)');
@@ -523,8 +523,8 @@ function run_query_group_usergroup_delete($group) {
     $u_id = sql_parse_id($group["user$cpt"], true);
 
     $query = "DELETE FROM UserObmGroup
-      WHERE userobmgroup_group_id $id 
-        AND userobmgroup_userobm_id $u_id ";
+    WHERE userobmgroup_group_id $id
+    AND userobmgroup_userobm_id $u_id ";
     display_debug_msg($query, $cdg_sql, "run_query_group_usergroup_delete()");
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
@@ -552,8 +552,8 @@ function run_query_group_group_insert($group) {
   global $cdg_sql;
 
   $sel_id = sql_parse_id($group['group_id'], true);
-  $ins_id = sql_parse_id($group['group_id']);   
-  
+  $id = sql_parse_id($group['group_id']);
+
   $cpt = 0;
   $cpt_ins = 0;
 
@@ -563,27 +563,28 @@ function run_query_group_group_insert($group) {
 
   while ($cpt < $group["group_nb"]) {
     $cpt++;
-    $g_id = sql_parse_id($group["group_$cpt"], true);
+    $sel_g_id = sql_parse_id($group["group_$cpt"], true);
+    $g_id = sql_parse_id($group["group_$cpt"]);
 
-    $query = "SELECT group_privacy, groupgroup_child_id FROM 
-      UGroup
-      LEFT JOIN GroupGroup ON groupgroup_parent_id $sel_id AND groupgroup_child_id = group_id
-      WHERE group_id $g_id ";
+    $query = "SELECT group_privacy, groupgroup_child_id FROM
+    UGroup
+    LEFT JOIN GroupGroup ON groupgroup_parent_id $sel_id AND groupgroup_child_id = group_id
+    WHERE group_id $sel_g_id ";
     display_debug_msg($query, $cdg_sql, "run_query_group_group_insert(1)");
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
-    $test_q->next_record(); 
+    $test_q->next_record();
     // If the entry doesn't already exist, doesn't create a loop,
     // and child group is same privacy as parent, insert it
     if ( (!$test_q->f("groupgroup_child_id"))
-         && (! in_array($g_id, $parents))
-         && ($id != $g_id)
-         && ($privacy == 1 || $test_q->f("group_privacy") != 1)
-       ) {
-        $query = "INSERT INTO GroupGroup (
-          groupgroup_parent_id,
-          groupgroup_child_id)
-        VALUES ($ins_id, $g_id)";
+    && (! in_array($g_id, $parents))
+    && ($id != $g_id)
+    && ($privacy == 1 || $test_q->f("group_privacy") != 1)
+    ) {
+      $query = "INSERT INTO GroupGroup (
+      groupgroup_parent_id,
+      groupgroup_child_id)
+      VALUES ($id, $g_id)";
 
       display_debug_msg($query, $cdg_sql, "run_query_group_group_insert(2)");
       $obm_q = new DB_OBM;
@@ -618,8 +619,8 @@ function run_query_group_group_delete($group) {
     $g_id = sql_parse_id($group["group_$cpt"], true);
 
     $query = "DELETE FROM GroupGroup
-      WHERE groupgroup_parent_id $id 
-        AND groupgroup_child_id $g_id ";
+    WHERE groupgroup_parent_id $id
+    AND groupgroup_child_id $g_id ";
 
     display_debug_msg($query, $cdg_sql, "run_query_group_group_delete()");
     $obm_q = new DB_OBM;
@@ -646,7 +647,7 @@ function run_query_group_group_delete($group) {
 function run_query_group_user_group($group) {
   global $cdg_sql;
 
-  $obm_q = new DB_OBM; 
+  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type,'', '',  'group_user');
 
@@ -660,21 +661,21 @@ function run_query_group_user_group($group) {
   } else {
     $order = "ORDER BY userobm_lastname";
   }
-	
+
   $query = "SELECT
-    userobmgroup_userobm_id as group_user_id,
-    userobmgroup_userobm_id as id,
-    userobm_timeupdate as group_user_timeupdate,
-    userobm_timecreate as group_user_timecreate,
-    userobm_userupdate as group_user_userupdate,
-    userobm_usercreate as group_user_usercreate,
-    userobm_login as group_user_login,
-    userobm_lastname as group_user_lastname,
-    userobm_firstname as group_user_firstname,
-    userobm_phone as group_user_phone,
-    userobm_email as group_user_email,
-    userobm_hidden,
-    domain_name
+  userobmgroup_userobm_id as group_user_id,
+  userobmgroup_userobm_id as id,
+  userobm_timeupdate as group_user_timeupdate,
+  userobm_timecreate as group_user_timecreate,
+  userobm_userupdate as group_user_userupdate,
+  userobm_usercreate as group_user_usercreate,
+  userobm_login as group_user_login,
+  userobm_lastname as group_user_lastname,
+  userobm_firstname as group_user_firstname,
+  userobm_phone as group_user_phone,
+  userobm_email as group_user_email,
+  userobm_hidden,
+  domain_name
   FROM UserObmGroup LEFT JOIN UserObm ON userobmgroup_userobm_id=userobm_id
   LEFT JOIN Domain ON domain_id = userobm_domain_id
   WHERE userobmgroup_group_id $id AND userobm_archive != 1
@@ -696,7 +697,7 @@ function run_query_group_user_group($group) {
 function run_query_group_group($group) {
   global $cdg_sql;
 
-  $obm_q = new DB_OBM; 
+  $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $limit = sql_limit($db_type);
 
@@ -712,22 +713,22 @@ function run_query_group_group($group) {
   }
 
   $query = "SELECT
-    groupgroup_child_id as child_id,
-    groupgroup_child_id as id,
-    group_timeupdate,
-    group_timecreate,
-    group_userupdate,
-    group_usercreate,
-    group_id,
-    group_name,
-    group_desc,
-    group_email
+  groupgroup_child_id as child_id,
+  groupgroup_child_id as id,
+  group_timeupdate,
+  group_timecreate,
+  group_userupdate,
+  group_usercreate,
+  group_id,
+  group_name,
+  group_desc,
+  group_email
   FROM GroupGroup LEFT JOIN UGroup ON groupgroup_child_id=group_id
-  WHERE groupgroup_parent_id $id 
+  WHERE groupgroup_parent_id $id
   $order
   $limit";
 
-  $obm_q = new DB_OBM; 
+  $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_group_group()");
   $obm_q->query($query);
   return $obm_q;
@@ -743,7 +744,7 @@ function get_group_nb_user($id) {
   global $cdg_sql;
   $id = sql_parse_id($id, true);
   $query = "SELECT count(*) FROM UserObmGroup
-    WHERE userobmgroup_group_id $id ";
+  WHERE userobmgroup_group_id $id ";
 
   display_debug_msg($query, $cdg_sql, "get_group_nb_user()");
   $obm_q = new DB_OBM;
@@ -769,15 +770,15 @@ function get_group_name_exists($name, $id='') {
     $id = sql_parse_id($id, true, true);
     $where_id = "and group_id $id ";
   }
-	
+
   $multidomain = sql_multidomain("group");
-	
+
   $query = "SELECT group_id, group_name
-    FROM UGroup
-    WHERE group_name='$name'
-      AND (group_privacy=0 OR group_usercreate=$obm[uid])
-      $where_id
-      $multidomain";
+  FROM UGroup
+  WHERE group_name='$name'
+  AND (group_privacy=0 OR group_usercreate=$obm[uid])
+  $where_id
+  $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_group_name_exists()");
   $obm_q = new DB_OBM;
@@ -830,17 +831,69 @@ function run_query_group_check($id, $name, $desc) {
   if ($wdesc != "") $wdesc = "or $wdesc";
 
   $query = "SELECT distinct group_id, group_name, group_desc
-     FROM UGroup
-     WHERE
-       (group_privacy=0 OR group_usercreate=$obm[uid] )
-       AND ($wname $wdesc)
-       $where_id
-       $multidomain";
+  FROM UGroup
+  WHERE
+  (group_privacy=0 OR group_usercreate=$obm[uid] )
+  AND ($wname $wdesc)
+  $where_id
+  $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_check()");
   $obm_q->query($query);
 
   return $obm_q;
+}
+
+/**
+ * Check if childs group can be added to a parent group.
+ * This function return the number of groups addable and
+ * number of groups that cannot be add in case of inserting
+ * private group into a public group.
+ *
+ * @param array $params
+ * @return array $nb_grp
+ */
+function run_query_group_group_checking($group) {
+  $nb_group = array("add" => 0, "diff_privacy" => 0);
+  $id = sql_parse_id($group['group_id']);
+
+  $child_nb = $group['group_nb'];
+
+  $g = get_group_info($id);
+
+  $childs_id = array();
+  for ($i=1; $i<=$child_nb; $i++) {
+    $childs_id[] = $group["group_$i"];
+  }
+
+  $childs_privacy = array();
+  if (count($childs_id) > 0) {
+    $query = "SELECT group_privacy, group_id FROM UGroup where group_id IN (".implode(',', $childs_id).")";
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    while ($obm_q->next_record()) {
+      $childs_privacy[$obm_q->f('group_id')] = $obm_q->f('group_privacy');
+    }
+
+    for($i=1; $i<=$child_nb; $i++) {
+
+      // Check if a child_group is not same as group
+      $child_g_id = $group["group_$i"];
+
+      if ($child_g_id != $id) {
+
+        // This child group is potentialy addable
+        $nb_group["add"]++;
+
+        // If group is public and child group is private
+        // we count it.
+        if ($g['privacy'] == 0 && $childs_privacy[$child_g_id] == 1) {
+          $nb_group["diff_privacy"]++;
+        }
+      }
+    }
+  }
+  return $nb_group;
 }
 
 
@@ -899,11 +952,11 @@ function check_group_update_rights($params, $g='') {
 
     // Allow public group handling only if write_admin right
     if (($g['privacy'] != 1)
-	&& (! $perm->check_right('group', $cright_write_admin))) {
+    && (! $perm->check_right('group', $cright_write_admin))) {
       $err['msg'] .= $l_err_public_rights;
       return false;
     }
-  
+
     // We forbid to update Window system groups
     $gid = $g['gid'];
     if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
@@ -954,27 +1007,27 @@ function check_group_data_form(&$group) {
     $err['field'] = 'name';
     return false;
   }
-  
+
   if ($cgp_use['service']['mail']) {
     if ($email != '') {
       $um = array();
       $em = strtok($email, "\r\n");
       while ($em) {
         if (! preg_match($php_regexp_email_name, $em) && !preg_match($php_regexp_email, $em)) {
-	  $err['msg'] .= "$em : $l_email_error";
-	  $err['field'] = 'email';
-	  return false;
+          $err['msg'] .= "$em : $l_email_error";
+          $err['field'] = 'email';
+          return false;
         }
 
-	// Email address not already used by this user
-	if (in_array($em, $um)) {
-	  $err['msg'] = "$l_email_exist : $em ";
-	  $err['field'] = 'email';
-	  return false;
+        // Email address not already used by this user
+        if (in_array($em, $um)) {
+          $err['msg'] = "$l_email_exist : $em ";
+          $err['field'] = 'email';
+          return false;
         }
         $emails[] = $em;
-	array_push($um, $em);
-	$em = strtok("\r\n");
+        array_push($um, $em);
+        $em = strtok("\r\n");
       }
       $mails = get_email_used($emails, '', $id);
       if(!empty($mails)) {
@@ -1052,7 +1105,7 @@ function check_group_can_delete($p_id) {
     $err["msg"] .= "$l_cant_delete_system";
     $delete_ok = false;
   } else if (($lgroup["privacy"] == "0") &&
-	     (! $perm->check_right('group', $cright_write_admin))) {
+  (! $perm->check_right('group', $cright_write_admin))) {
     $err["msg"] .= $l_err_public_rights;
     $err['field'] = 'privacy';
     $delete_ok = false;
@@ -1076,13 +1129,13 @@ function get_group_parents($id) {
   global $cdg_sql;
   $id = sql_parse_id($id, true);
   $query = "SELECT groupgroup_parent_id
-    FROM GroupGroup
-    WHERE groupgroup_child_id $id ";
+  FROM GroupGroup
+  WHERE groupgroup_child_id $id ";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
- 
+
   $parents = array();
   while ($obm_q->next_record()) {
     $g_id = $obm_q->f("groupgroup_parent_id");
@@ -1096,8 +1149,8 @@ function get_group_parents($id) {
 
 
 /**
- * Search group from a single field 
- * 
+ * Search group from a single field
+ *
  * @param mixed $group
  * @access public
  * @return array of 'length' => DB query results nb, and 'datas' => DB Search results
@@ -1124,8 +1177,8 @@ function run_query_group_ext_search($group) {
     if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
       $where_restriction = " AND (group_id IN (";
       foreach($rs["ids"] as $r_id) {
-	$where_restriction .= "$coma'$r_id'";
-	$coma = ",";
+        $where_restriction .= "$coma'$r_id'";
+        $coma = ",";
       }
       $where_restriction .= "))";
     }
@@ -1133,31 +1186,31 @@ function run_query_group_ext_search($group) {
     $where_privacy = " AND group_privacy=0";
   }
 
-  $query = "SELECT 
-      count(*) as resultscount
-    FROM UGroup
-    WHERE 
-      group_name $like '$pattern%' 
-      $where_privacy
-      $multidomain
-      $where_restriction";
+  $query = "SELECT
+  count(*) as resultscount
+  FROM UGroup
+  WHERE
+  group_name $like '$pattern%'
+  $where_privacy
+  $multidomain
+  $where_restriction";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_ext_search()");
   $obm_q->query($query);
   $obm_q->next_record();
   $resultsCount = $obm_q->f("resultscount");
-  $query = "SELECT 
-      group_id,
-      group_name,
-      group_desc
-    FROM UGroup
-    WHERE 
-      group_name $like '$pattern%' 
-      $where_privacy
-      $multidomain
-      $where_restriction
-    ORDER BY group_name
-    LIMIT $limit OFFSET $first_row";
+  $query = "SELECT
+  group_id,
+  group_name,
+  group_desc
+  FROM UGroup
+  WHERE
+  group_name $like '$pattern%'
+  $where_privacy
+  $multidomain
+  $where_restriction
+  ORDER BY group_name
+  LIMIT $limit OFFSET $first_row";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_ext_search()");
   $obm_q->query($query);

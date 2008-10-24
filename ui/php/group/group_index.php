@@ -234,14 +234,19 @@ if (($action == 'index') || ($action == '')) {
 } elseif ($action == "group_add") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_update_rights($params)) {
-    if ($params["group_nb"] > 0) {
+    $nb_grp = run_query_group_group_checking($params);
+    if ($nb_grp['add'] > 0) {
       $nb = run_query_group_group_insert($params);
       // Set update state only if updated group is public
       $g = get_group_info($params['group_id']);
       if ($g['privacy'] == 0) {
-	set_update_state();
+	    set_update_state();
       }
-      $display["msg"] .= display_ok_msg("$nb $l_group_added");
+      if ($nb_grp['diff_privacy'] == 0) {
+        $display["msg"] .= display_ok_msg("$nb $l_group_added");
+      } else {
+        $display["msg"] .= display_warn_msg($l_warn_group_diff_privacy);
+      }
     } else {
       $display["msg"] .= display_err_msg($l_no_group_added);
     }
