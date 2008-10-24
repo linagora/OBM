@@ -1908,11 +1908,10 @@ function dis_user_can_delete($p_id) {
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
-  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\">
+  $dis_delete = "<form name=\"form_delete\" method=\"post\" action=\"$url\" onsubmit=\"return confirm_del(this)\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"user_id\" value=\"$p_id\" />
-    <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    <input type=\"submit\" value=\"$l_delete\" />
     </form>";
 
   $display["msg"] .= display_ok_msg($l_can_delete);

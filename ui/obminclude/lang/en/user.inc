@@ -120,7 +120,7 @@ $l_expresspostal_error = "Express postal code is incorrect";
 // JavaScript Messages (special characters must be escaped with \ -> \\)
 $l_fill_login = "You have to fill the login before submitting.";
 $l_fill_password = "You have to fill the password before submitting.";
-$l_delete_confirm = "Really delete the user?";
+$l_delete_confirm = "CAUTION : You will delete a user ! This operation is irreversible.\\nContinue anyway ?";
 $l_j_check_email = "The email address is not valid.";
 $l_change_login_confirm = "Really update user's login ?";
 

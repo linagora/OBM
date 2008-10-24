@@ -69,11 +69,8 @@ if ($params["ext_element"] != "") {
 
 
 $extra_js .= "
-function valider_suppression() {
-  if (confirm (\"$l_delete_confirm\"))
-    return true;
-  else
-    return false;
+function confirm_del(form) {
+  return confirm('$l_delete_confirm');
 }
 
 function check_user(form) {

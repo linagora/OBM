@@ -130,7 +130,7 @@ $l_expresspostal_error = "Cedex est incorrect";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";
 $l_fill_password = "Vous devez renseigner le mot de passe avant de valider.";
-$l_delete_confirm = "Confirmer la suppression de l'utilisateur ?";
+$l_delete_confirm = "ATTENTION : Vous allez supprimer un utilisateur ! Cette opération est irréversible.\\nVoulez-vous continuer ?";
 $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
 $l_change_login_confirm = "Vous avez modifié le login de l'utilisateur.\\nIl est *impératif* que l'utilisateur dont le login a été modifié soit déconnecté de toutes applications liées à OBM lors de la validation de cette modification (OBM, client de messagerie, webmail, connecteur).\\nConfirmer le changement d'identifiant ?";
 
