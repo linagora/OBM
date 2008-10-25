@@ -498,7 +498,7 @@ function check_mailshare_data_form($mailshare) {
   $id = $mailshare['mailshare_id'];
   $name = strtolower($mailshare['name']);
   $quota = $mailshare['quota'];
-  $email = $mailshare['email'];
+  $email = stripslashes($mailshare['email']);
   $desc = $mailshare['desc'];
 
   // MANDATORY: Mailshare name not empty

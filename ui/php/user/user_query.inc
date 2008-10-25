@@ -1539,7 +1539,7 @@ function check_user_data_form($p_id, &$user) {
   $lname = $user['lastname'];
   $fname = $user['firstname'];
   $title = $user['title'];
-  $email = $user['email'];
+  $email = stripslashes($user['email']);
   $phone = $user['phone'];
   $phone2 = $user['phone2'];
   $mobile = $user['mobile'];
@@ -1690,22 +1690,23 @@ function check_user_data_form($p_id, &$user) {
       while ($em) {
 
         if (! preg_match($php_regexp_email_name, $em) && !preg_match($php_regexp_email, $em)) {
-	  $err['msg'] .= "$em : $l_email_error";
-	  $err['field'] = 'email';
-	  return false;
+          $err['msg'] .= "$em : $l_email_error";
+          $err['field'] = 'email';
+          return false;
         }
 
-	// Email address not already used by this user
-	if (in_array($em, $um)) {
-	  $err['msg'] = "$l_uemail_exist : $em";
-	  $err['field'] = 'email';
-	  return false;
+        // Email address not already used by this user
+        if (in_array($em, $um)) {
+          $err['msg'] = "$l_uemail_exist : $em";
+          $err['field'] = 'email';
+          return false;
         }
         $emails[] = $em;
-	array_push($um, $em);
-	$em = strtok("\r\n");
+        array_push($um, $em);
+        $em = strtok("\r\n");
       }
       $mails = get_email_used($emails, $id);
+
       if(!empty($mails)) {
         $err['msg'] = "$l_email_exist : $mails ";
         $err['field'] = 'email';

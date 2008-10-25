@@ -25,7 +25,7 @@ function make_profiles() {
   global $profiles, $cdg_sql;
   global $obm;
 
-  $query = "SELECT domain_id from Domain where domain_name='global.virtual'";
+  $query = "SELECT domain_id from Domain where domain_name='global.virt'";
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();

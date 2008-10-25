@@ -320,7 +320,7 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field='') {
   if (isset($mailshare['name'])) { $name = strtolower(stripslashes($mailshare['name'])); }
   if (isset($mailshare['delegation'])) { $delegation = stripslashes($mailshare['delegation']); }
   if (isset($mailshare['quota'])) { $quota = $mailshare['quota']; }
-  if (isset($mailshare['email'])) { $email = $mailshare['email']; }
+  if (isset($mailshare['email'])) { $email = stripslashes($mailshare['email']); }
   if (isset($mailshare['desc'])) { $desc = stripslashes($mailshare['desc']); }
   if (isset($user['mail_server_id'])) { $mail_server_id = $user['mail_server_id']; }
   if (isset($user['mail_server_hostname'])) { $mail_server_host_name = $user['mail_server_hostname']; }  
@@ -602,7 +602,7 @@ function dis_mailshare_mail_field($values) {
         <a onclick=\"remove_element(this.parentNode,'mailshareMailHome');show_hide_add_button();return false\" href=\"\">
          <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
         </a>        
-        <input name='tf_email[]' value='$mail' /> @ $sel_alias
+        <input name='tf_email[]' value=\"$mail\" /> @ $sel_alias
         </div>";
       $count ++;
     }

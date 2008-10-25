@@ -135,8 +135,47 @@ function get_samba_info() {
 //   - $uid : first free uid
 ///////////////////////////////////////////////////////////////////////////////
 function get_first_user_free_uid($first_id=false) {
-  global $cdg_sql, $c_first_uid;
+  global $cdg_sql;
   $uids = array();
+
+  $query = "
+    SELECT obminfo_value as uid_max_used
+    FROM ObmInfo
+    WHERE obminfo_name = 'uid_max_used'
+    ORDER BY obminfo_value";
+  display_debug_msg($query, $cdg_sql, 'get_first_user_free_uid()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $uid_max_used = $obm_q->f('uid_max_used');
+  }
+
+  if( is_null($uid_max_used) ) {
+    $uid_max_used = get_first_user_free_uid_from_bd($first_id);
+    $query = "
+      INSERT INTO ObmInfo
+      (obminfo_name, obminfo_value)
+      VALUES ('uid_max_used', '".$uid_max_used."');";
+    display_debug_msg($query, $cdg_sql, 'get_first_user_free_uid()');
+    $obm_q->query($query);
+  }
+
+  $new_uid = $uid_max_used + 1;
+
+  $query = "
+    UPDATE ObmInfo
+    SET obminfo_value='".$new_uid."'
+    WHERE obminfo_name='uid_max_used'";
+  display_debug_msg($query, $cdg_sql, 'get_first_user_free_uid()');
+  $obm_q->query($query);
+
+  return $new_uid;
+}
+
+
+function get_first_user_free_uid_from_bd($first_id=false) {
+  global $c_first_uid;
 
   if( $first_id===false ) {
     $first_id = $c_first_uid;
@@ -178,7 +217,6 @@ function get_first_user_free_uid($first_id=false) {
     WHERE group_gid >= '$first_id'
     ORDER BY group_gid";
   display_debug_msg($query, $cdg_sql, 'get_first_user_free_uid()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   while( $obm_q->next_record() ) {
@@ -193,16 +231,7 @@ function get_first_user_free_uid($first_id=false) {
   $uids = array_unique($uids);
   sort($uids);
 
-  $cpt = $c_first_uid;
-
-  // On se place sur le premier element
-  reset($uids);
-  while ( ($uid = current($uids)) && ($uid == $cpt) ) {
-    $cpt++;
-    next($uids);
-  }
-
-  return $cpt;
+  return end($uids);
 }
 
 

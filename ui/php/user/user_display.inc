@@ -556,7 +556,7 @@ function html_user_consult($obm_q) {
     $main_domain = $obm["domain_name"];
   }  
   if($obm_q->f('userobm_hidden') != 1 || $perm->check_right($module, $cright_write_admin)) {
-    $email = get_entity_email($obm_q->f("userobm_email"),$main_domain, false);
+    $email = get_entity_email($obm_q->f("userobm_email"), $main_domain, false);
   } else {
     $email = '';
   }
@@ -1126,12 +1126,12 @@ function html_user_form($usr_q, $user, $field='') {
   if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
   if (isset($user["title"])) { $title = stripslashes($user["title"]); }
-  if (isset($user["email"])) { $email = $user["email"]; }
+  if (isset($user["email"])) { $email = stripslashes($user["email"]); }
   if (isset($user["datebegin"])) { $datebegin = of_date_upd_format($user["datebegin"],true); }
   if (isset($user["dateexp"])) { $dateexp = of_date_upd_format($user["dateexp"],true); $noexperie = " checked=\"checked\"";}
   if (isset($user["delegation_target"])) { $delegation_target = stripslashes($user["delegation_target"]); }
   if (isset($user["delegation"])) { $delegation = stripslashes($user["delegation"]); }
-  if (isset($user["desc"])) { $desc = $user["desc"]; }
+  if (isset($user["desc"])) { $desc = stripslashes($user["desc"]); }
   if (isset($user["archive"])) { $archive = ($user["archive"] == '1' ? "checked" : ""); }
   if (isset($user["hidden"])) { $hidden = ($user["hidden"] == '1' ? "checked" : ""); }
   if (isset($user["photo_id"])) { $photo_id = $user["photo_id"]; }
@@ -2449,7 +2449,7 @@ function dis_user_mail_field($values,$class) {
         <a onclick=\"remove_element(this.parentNode,'userMailHome');show_hide_add_button();return false\" href=\"\">
          <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
         </a>        
-        <input name='tf_email[]' value='$mail' /> @ $sel_alias
+        <input name='tf_email[]' value=\"$mail\" /> @ $sel_alias
         </div>";
       $count ++;
     }

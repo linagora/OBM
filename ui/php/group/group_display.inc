@@ -1203,7 +1203,7 @@ function dis_group_mail_field($values,$class) {
         <a onclick=\"remove_element(this.parentNode,'groupMailHome'); show_hide_add_button();return false\" href=\"\">
          <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
         </a>        
-        <input name='tf_email[]' value='$mail' /> @ $sel_alias
+        <input name='tf_email[]' value=\"$mail\" /> @ $sel_alias
         </div>";
       $count ++;
     }

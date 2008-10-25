@@ -8,14 +8,14 @@ ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
 ALTER TABLE Domain ADD COLUMN domain_mail_server_auto integer default NULL;
 
 -- Global Domain
-INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virtual', TRUE);
+INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
 UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
 -- P_Domain
 ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
 -- Global Domain
-INSERT INTO P_Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virtual', TRUE);
+INSERT INTO P_Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
 UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
@@ -148,6 +148,7 @@ ALTER TABLE displaypref ALTER COLUMN display_user_id DROP NOT NULL;
 ALTER TABLE displaypref ALTER COLUMN display_user_id SET DEFAULT NULL;
 ALTER TABLE UGroup ALTER COLUMN group_manager_id DROP DEFAULT;
 ALTER TABLE UGroup ALTER COLUMN group_manager_id SET DEFAULT NULL;
+ALTER TABLE P_EntityRight ADD COLUMN entityright_acces INTEGER not null DEFAULT 0;
 
 --
 -- Add tables structures around Profiles

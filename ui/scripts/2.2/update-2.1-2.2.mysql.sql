@@ -8,14 +8,14 @@ ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
 ALTER TABLE Domain ADD COLUMN domain_mail_server_auto int(2) default NULL;
 
 -- Global Domain
-INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virtual', TRUE);
+INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
 UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
 -- P_Domain
 ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
 -- Global Domain
-INSERT INTO P_Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virtual', TRUE);
+INSERT INTO P_Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
 UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
@@ -105,6 +105,7 @@ ALTER TABLE OGroup MODIFY COLUMN ogroup_domain_id int(8) NOT NULL ;
 ALTER TABLE OGroupEntity MODIFY COLUMN ogroupentity_domain_id int(8) NOT NULL ;
 ALTER TABLE OrganizationalChart MODIFY COLUMN organizationalchart_domain_id int(8) NOT NULL ;
 ALTER TABLE P_EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
+ALTER TABLE P_EntityRight ADD entityright_acces int(1) NOT NULL default 0;
 ALTER TABLE P_EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
 ALTER TABLE P_GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
 ALTER TABLE P_GroupGroup MODIFY COLUMN groupgroup_child_id int(8) NOT NULL ;

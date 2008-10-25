@@ -986,7 +986,7 @@ function check_group_data_form(&$group) {
   $name = $group['name'];
   $samba = $group['samba'];
   $desc = $group['desc'];
-  $email = $group['email'];
+  $email = stripslashes($group['email']);
   $priv = $group['privacy'];
   $g = get_group_info($id);
   $usercreate = $g['usercreate'];
