@@ -141,9 +141,7 @@ class Of_Date extends DateTime {
 
 
   private static $_options = array(
-    'outputdatetime' => 'd/m/Y H:i:s',
     'outputdate' => 'd/m/Y',
-    'inputdatetime' => 'd/m/Y H:i:s',
     'inputdate' => 'd/m/Y',
     'timezone' => 'Europe/Paris'
   );
@@ -181,6 +179,15 @@ class Of_Date extends DateTime {
     $this->setTimezone(new DateTimeZone(self::$_options['timezone']));
   }
 
+  /**
+   * setDefaultTimezone 
+   * 
+   * @access public
+   * @return void
+   */
+  static public function getDefaultTimezone() {
+    return self::$_options['timezone'];
+  }
   /**
    * Return the current stored error 
    * 
@@ -258,7 +265,7 @@ class Of_Date extends DateTime {
    * @return void
    */
   public function getOutputDateTime() {
-    return $this->get(self::$_options['outputdatetime']);
+    return $this->get(self::$_options['outputdate'].' '.self::TIME_MEDIUM);
   }
 
   /**
@@ -279,7 +286,7 @@ class Of_Date extends DateTime {
    * @return void
    */
   public function getInputDateTime() {
-    return $this->get(self::$_options['inputdatetime']);
+    return $this->get(self::$_options['inputdate'].' '.self::TIME_MEDIUM);
   }
 
   /**

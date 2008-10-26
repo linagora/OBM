@@ -2965,7 +2965,7 @@ function get_all_profiles() {
   $domain_id = sql_parse_id($obm['domain_id']);
   
   // get global domain id
-  $query = "SELECT domain_id from Domain where domain_name='global.virtual'";
+  $query = "SELECT domain_id from Domain where domain_global=TRUE";
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
