@@ -136,7 +136,6 @@ function get_samba_info() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_first_user_free_uid($first_id=false) {
   global $cdg_sql;
-  $uids = array();
 
   $query = "
     SELECT obminfo_value as uid_max_used
@@ -176,6 +175,7 @@ function get_first_user_free_uid($first_id=false) {
 
 function get_first_user_free_uid_from_bd($first_id=false) {
   global $c_first_uid;
+  $uids = array();
 
   if( $first_id===false ) {
     $first_id = $c_first_uid;
@@ -230,8 +230,13 @@ function get_first_user_free_uid_from_bd($first_id=false) {
   // l'interface...
   $uids = array_unique($uids);
   sort($uids);
+  if( $uibBdMax = end($uids) ) {
+    if( $uibBdMax > $first_id ) {
+      $first_id = $uibBdMax;
+    }
+  }
 
-  return end($uids);
+  return $first_id;
 }
 
 
