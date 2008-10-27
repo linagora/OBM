@@ -9,6 +9,7 @@
 
 // Labels et textes
 $l_label_start = "Label start";
+$l_bank = "Bank"; 
 $l_number = "Number";
 $l_balance = "Balance";
 $l_initial_balance = "Creation Balance";
@@ -40,10 +41,10 @@ $l_no_found="No account corresponding to your query";
 $l_impossible_deletion = " payments are associated with this account. Deletion is impossible"; // must be used with the number of payments leading...
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$lj_check_number = "\\nThe account number is not valid!";
-$lj_fill_number = "You have to fill the number before submitting!";
-$lj_fill_bank = "You have to fill the bank field before submitting!";
-$lj_confirm_no_bank="This account has no associated bank. Click on OK to confirm.";
+$l_check_number = "\\nThe account number is not valid!";
+$l_fill_number = "You have to fill the number before submitting!";
+$l_fill_bank = "You have to fill the bank field before submitting!";
+$l_confirm_no_bank="This account has no associated bank. Click on OK to confirm.";
 
 // For the display parameters modification screen
 $l_account_options = "Display options for accounts list"; 

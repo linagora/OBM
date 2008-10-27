@@ -203,7 +203,6 @@ function run_query_account_search_payments ($p_account_id, $p_date_before = "") 
   $p_account_id = sql_parse_id($p_account_id, true);
 
   $query = "select *, payment_id as id,
-    payment_expected_date as payment_expect_date,
     payment_amount
     from Payment
     where payment_account_id $p_account_id $multidomain";
@@ -211,7 +210,6 @@ function run_query_account_search_payments ($p_account_id, $p_date_before = "") 
   if ($p_date_before != "") {
     $query .= " and payment_date <= '$p_date_before'";
   }
-  $query .= " and payment_paid = '1'"; // payed payments only
 
   display_debug_msg($query, $cdg_sql, "run_query_account_search_payments()");
   $obm_q = new DB_OBM;
