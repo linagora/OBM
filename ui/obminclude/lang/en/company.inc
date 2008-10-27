@@ -82,6 +82,7 @@ $l_j_check_fax = "The fax number is not valid.";
 $l_j_check_email = "The email address is not valid.";
 $l_j_check_web = "The web address is not valid.";
 $l_j_select_company = "You have to select a company !";
+$l_j_naf_create = "You have to input a NAF code for create it !";
 
 // For the display parameters modification screen
 $l_company_display = "Display options for companies lists"; 

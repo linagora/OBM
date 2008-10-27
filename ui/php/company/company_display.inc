@@ -1553,7 +1553,7 @@ function html_company_nafcode_form($naf_q) {
   </table>
   </div>    
   <form id=\"form_nafcode_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  onsubmit=\"return check_company_naf_new(this)\">
   <table>
   <thead>
   <tr>
@@ -1564,7 +1564,7 @@ function html_company_nafcode_form($naf_q) {
   <tr>
   <td>$l_naf_istitle</td>    
   <td>$l_naf_code</td>
-  <td>$l_naf_label</td>    
+  <td>$l_naf_label</td>
   </tr>       
   <tr>
   <td><input type=\"checkbox\" name=\"cba_naf_title\" value=\"1\" /></td>
