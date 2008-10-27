@@ -53,7 +53,7 @@ function check_admin_ref_dsrc_upd(form, sel_del_dsrc)
 ///////////////////////////////////////////////////////////////////////////////
 function check_admin_ref_dsrc_new(form)
 {
-   if (form.tf_name.value != \"\")
+   if (form.tf_dsrc_name.value != \"\")
       return true;
    else
    {

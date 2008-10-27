@@ -287,7 +287,7 @@ function html_admin_ref_datasource_form($dsrc_q) {
   </tbody>
   </table>
   </div>    
-  <form id=\"form_datasource_new\" action=\"\" method=\"post\" onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  <form id=\"form_datasource_new\" action=\"\" method=\"post\" onsubmit=\"return check_admin_ref_dsrc_new(this)\">
   <table>
   <thead>
   <tr>
