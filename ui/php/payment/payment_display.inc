@@ -355,6 +355,7 @@ function html_payment_consult($p_q, $invs) {
   $ad1 = $p_q->f('company_address1');
   $zip = $p_q->f('company_zipcode');
   $town = $p_q->f('company_town');
+  $account = $p_q->f('account_label');
 
   if ($inout == '+') {
     $dis_inout = $l_received;
