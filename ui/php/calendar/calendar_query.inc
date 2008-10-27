@@ -3756,16 +3756,18 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   }
   if($mail_datas['reset_resource_state']) {
     $rattendees =  of_right_users_for_entity('resource', $resources, 'write');
-    $rattendees = array_diff($rattendees['ids'], array($obm['uid']));
-    $mail_datas['mails']['reset_resource_state'] = array (
-      'subject' => sprintf($l_update_event_mail_subject,$old_title),
-      'message' => sprintf($l_update_resource_mail_body, $old_title, $old_start->getOutputDateTime(), 
-                           $old_end->getOutputDateTime(), $old_location, $start->getOutputDateTime(), $end->getOutputDateTime(), 
-                           $location,$consult_link,
-                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
-                           $userinfo['lastname'],$cgp_host),
-      'recipients' => $rattendees
-    );
+    if(!in_array($obm['uid'], $rattendees['ids'])) {
+      $rattendees = array_diff($rattendees['ids'], array($obm['uid']));
+      $mail_datas['mails']['reset_resource_state'] = array (
+        'subject' => sprintf($l_update_event_mail_subject,$old_title),
+        'message' => sprintf($l_update_resource_mail_body, $old_title, $old_start->getOutputDateTime(), 
+                             $old_end->getOutputDateTime(), $old_location, $start->getOutputDateTime(), $end->getOutputDateTime(), 
+                             $location,$consult_link,
+                             $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
+                             $userinfo['lastname'],$cgp_host),
+        'recipients' => $rattendees
+      );
+    }
   }   
   if ($mail_datas['add_attendee']) {
     if ($ccalendar_send_ics) {
@@ -3789,16 +3791,17 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   }
   if ($mail_datas['add_resource']) {
     $rattendees =  of_right_users_for_entity('resource', $new_resources, 'write');
-    $rattendees = array_diff($rattendees['ids'], array($obm['uid']));    
-    $mail_datas['mails']['add_resource'] = array (
-      'subject' => sprintf($l_add_event_mail_subject,$title),
-      'message' => sprintf($l_add_resource_mail_body, $start->getOutputDateTime(), $end->getOutputDateTime() ,
-                           $title, $location, $consult_link,
-                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
-                           $userinfo['lastname'],$cgp_host),
-      'recipients' => $rattendees
-    );
-
+    if(!in_array($obm['uid'], $rattendees['ids'])) {
+      $rattendees = array_diff($rattendees['ids'], array($obm['uid']));    
+      $mail_datas['mails']['add_resource'] = array (
+        'subject' => sprintf($l_add_event_mail_subject,$title),
+        'message' => sprintf($l_add_resource_mail_body, $start->getOutputDateTime(), $end->getOutputDateTime() ,
+                             $title, $location, $consult_link,
+                             $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
+                             $userinfo['lastname'],$cgp_host),
+        'recipients' => $rattendees
+      );
+    }
   }
   if ($mail_datas['remove_attendee']) {
     $mail_datas['mails']['remove_attendee'] = array (
@@ -3812,14 +3815,16 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   }
   if ($mail_datas['remove_resource']) {
     $rattendees =  of_right_users_for_entity('resource', $old_resources, 'write');
-    $rattendees = array_diff($rattendees['ids'], array($obm['uid']));    
-    $mail_datas['mails']['remove_resource'] = array (
-      'subject' => sprintf($l_delete_event_mail_subject,$old_title),
-      'message' => sprintf($l_delete_resource_mail_body, $old_title, $old_start->getOutputDateTime(), 
-                           $old_end->getOutputDateTime(), $old_location,$userinfo['email'], 
-                           $userinfo['lastname'],$cgp_host),
-      'recipients' => $rattendees
-    );
+    if(!in_array($obm['uid'], $rattendees['ids'])) {
+      $rattendees = array_diff($rattendees['ids'], array($obm['uid']));    
+      $mail_datas['mails']['remove_resource'] = array (
+        'subject' => sprintf($l_delete_event_mail_subject,$old_title),
+        'message' => sprintf($l_delete_resource_mail_body, $old_title, $old_start->getOutputDateTime(), 
+                             $old_end->getOutputDateTime(), $old_location,$userinfo['email'], 
+                             $userinfo['lastname'],$cgp_host),
+        'recipients' => $rattendees
+      );
+    }
   }  
   if ($mail_datas['add_exception']) {
     $rattendees =  of_right_users_for_entity('resource', $resources, 'write');
