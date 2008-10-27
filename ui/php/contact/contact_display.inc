@@ -2137,7 +2137,7 @@ function html_contact_kind_form($kind_q) {
   </div>  
 
   <form id=\"form_kind_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  onsubmit=\"return check_contact_kind_new(this)\">
   <table>
   <thead>
   <tr>

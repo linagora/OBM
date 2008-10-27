@@ -113,9 +113,9 @@ function check_contact_kind_upd(form, sel_del)
 ///////////////////////////////////////////////////////////////////////////////
 function check_contact_kind_new(form)
 {
-   if ( (trim(form.tf_lang.value) == \"\")
-        || (trim(form.tf_label.value) == \"\")
-        || (trim(form.tf_header.value) == \"\") ) {
+   if ( (trim(form.tf_kind_lang.value) == \"\")
+        || (trim(form.tf_kind_label.value) == \"\")
+        || (trim(form.tf_kind_header.value) == \"\") ) {
       alert(\"$l_j_kind_create\");
       return false;
    } else {
