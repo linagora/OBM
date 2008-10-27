@@ -167,11 +167,19 @@ function get_global_lead_sources() {
  **/
 function get_global_deal_types() {
   global $cdg_sql;
+
   $ret = array();
   $multidomain = sql_multidomain('dealtype');
+
+  if ($order != '') {
+    $order_sql = ", $order";
+  } else {
+    $order_sql = ", dealtype_code, dealtype_label";
+  }
+
   $query = "SELECT * FROM DealType
     WHERE 1=1 $multidomain
-    ORDER BY dealtype_inout, dealtype_code, dealtype_label";
+    ORDER BY dealtype_inout $order_sql";
 
   display_debug_msg($query, $cdg_sql, 'get_global_deal_types()');
   $obm_q = new DB_OBM;

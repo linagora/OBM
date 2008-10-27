@@ -221,7 +221,7 @@ function dis_deal_index($deal='') {
   $archive = $deal['archive'];
 
   $usr_q = run_query_deal_manager($archive);
-  $types = get_global_deal_types();
+  $types = get_global_deal_types('dealtype_label');
   $regions = of_category_get_ordered('', 'region');
   $tts = get_global_tasktype($ctt_sales);
   $roles = of_category_get_ordered('DealCompany', 'role');
@@ -244,7 +244,7 @@ function dis_deal_search_form($deal='') {
   $archive = $deal['archive'];
 
   $usr_q = run_query_deal_manager($archive);
-  $types = get_global_deal_types();
+  $types = get_global_deal_types('dealtype_label');
   $regions = of_category_get_ordered('', 'region');
   $tts = get_global_tasktype($ctt_sales);
   $roles = of_category_get_ordered('DealCompany', 'role');
@@ -1075,11 +1075,11 @@ function dis_deal_form($deal) {
     $comp_q = '';
   }
 
-  $types = get_global_deal_types();
+  $types = get_global_deal_types('dealtype_label');
   $tts = get_global_tasktype($ctt_sales);
   $sources = get_global_lead_sources();
-  $users_c = of_usergroup_get_group_users($obm['group_com'], true, $users);
-  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, $users);
+  $users_c = of_usergroup_get_group_users($obm['group_com'], true, $users, 'userobm_lastname');
+  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, $users, 'userobm_lastname');
   $sta_q = run_query_deal_status_list();
   $con_q = run_query_deal_contact($deal['company_id']);
   $regions = of_category_get_ordered('', 'region');
@@ -3272,7 +3272,7 @@ function dis_deal_parentdeal_consult($deal) {
   $prefs = get_display_pref ($obm['uid'], 'deal');
   $deal_q = run_query_deal_search($deal, 0);
   $num_rows = $deal_q->num_rows();
-  $types = get_global_deal_types();
+  $types = get_global_deal_types('dealtype_label');
   $tts = get_global_tasktype($ctt_sales);
   $status_q = run_query_deal_status_list();
   $usr_q = run_query_deal_manager($archive);

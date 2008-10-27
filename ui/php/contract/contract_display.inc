@@ -755,8 +755,8 @@ function dis_contract_form($action,$contract,$param_company) {
   $contact_q = run_query_contact_contract($comp_id);
   $prio_q = run_query_contract_priority();
   $status_q = run_query_contract_status();
-  $users_c = of_usergroup_get_group_users($obm['group_com'], true, $users);
-  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, $users);
+  $users_c = of_usergroup_get_group_users($obm['group_com'], true, $users, 'userobm_lastname');
+  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, $users, 'userobm_lastname');
   $type_q = run_query_contract_type();
  
   $block = html_contract_form($action,$contract_q,$type_q, $users_c, $users_p, $company_q, $contact_q, $contract, $prio_q, $status_q);

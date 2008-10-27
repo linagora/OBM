@@ -562,7 +562,7 @@ function dis_incident_form($action, $incident) {
   }
 
   $usr_q = run_query_userobm_active($users);
-  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, $users);
+  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, $users, 'userobm_lastname');
 
   $pri = of_category_get_ordered("incident", "priority");
   $sta = get_incident_status();

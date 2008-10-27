@@ -966,7 +966,7 @@ function dis_company_form($action, $company) {
   if ($company['company_id'] > 0) {
     $uids[] = $comp_q->f('company_marketingmanager_id');
   }
-  $users = of_usergroup_get_group_users($obm['group_com'], true, $uids);
+  $users = of_usergroup_get_group_users($obm['group_com'], true, $uids, 'userobm_lastname');
   $ctry_q = run_query_global_country_for_lang();
   
   $block = html_company_form($action, $comp_q, $dsrc_q, $types, $acts, $naf_q, $users, $ctry_q, $company);

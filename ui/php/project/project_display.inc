@@ -1140,7 +1140,7 @@ function html_project_form($action, $project_q, $project) {
   global $ctt_sales, $ctt_research, $ctt_others,$l_other;
   global $l_tt_sales, $l_tt_research, $l_tt_others,$path;
 
-  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, array($obm['uid']));
+  $users_p = of_usergroup_get_group_users($obm['group_prod'], true, array($obm['uid']), 'userobm_lastname');
 
   if ($action == 'detailupdate') {
     $pid = $project_q->f('project_id');
@@ -1205,7 +1205,7 @@ function html_project_form($action, $project_q, $project) {
 
   if (($action == 'new') || ($action == 'insert')) {
     // member select
-    $mbs = of_usergroup_get_group_users($obm['group_prod'], true);
+    $mbs = of_usergroup_get_group_users($obm['group_prod'], true, array(), 'userobm_lastname');
     $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
       <option value=\"$c_undef\">$l_undef</option>\n";
     if (is_array($mbs)) {

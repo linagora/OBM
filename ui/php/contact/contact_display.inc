@@ -1281,7 +1281,7 @@ function dis_contact_form($action, $co_q, $contact) {
   if ($contact['market'] > 0) {
     $uids[] = $contact['market'];
   }
-  $users = of_usergroup_get_group_users($obm['group_com'], true, $uids);
+  $users = of_usergroup_get_group_users($obm['group_com'], true, $uids, 'userobm_lastname');
   $ctry_q = run_query_global_country_for_lang();
   $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact);
 
