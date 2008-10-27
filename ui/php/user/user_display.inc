@@ -659,10 +659,6 @@ function html_user_consult($obm_q) {
       <th>$l_mail</th>
       <td>$mail_state</td>
     </tr>
-<!--    <tr>
-      <th>$l_mail_ext</th>
-      <td>$mail_ext_state</td>
-    </tr> -->
     <tr>
       <th>$l_mail_server</th>
       <td>";
@@ -1270,35 +1266,54 @@ function html_user_form($usr_q, $user, $field='') {
       <input type=\"hidden\" name=\"sel_mail_server_id\" value=\"$mail_server_id\" />
       <input type=\"hidden\" name=\"sel_mail_server_hostname\" value=\"$mail_server_host_name\" />";
     }
+    if($mail_state) {
+      $externalKlass = 'H';
+      $externalEnabled = 'disabled="disabled"';
+    } else {
+      $internalKlass = 'H';
+    }
     $main_domain = $obm["domain_name"];
     $mail_section = "
-  <fieldset class=\"detail infos\">
+  <fieldset class=\"detail infos\" id=\"userMail\">
   <legend>$l_mail</legend>
-
   <table>
-  <tr>
-    <th class=\"$class[mail_perms]\">$l_mail</th>
-    <td><input name=\"cb_mail_perms\" type=\"checkbox\" value=\"1\" $mail_state /></td>
-  </tr>
-<!--  <tr>
-    <th class=\"$class[mail_ext_perms]\">$l_mail_ext</th>
-    <td><input name=\"cb_mail_ext_perms\" type=\"checkbox\" value=\"1\" $mail_ext_state /></td>
-  </tr> -->
-  <tr>
-    <th class=\"$class[mail_server]\">$l_mail_server</th>
-    <td>$dis_mailserver</td>
-  </tr>
+    <tr>
+      <th class=\"$class[mail_perms]\">$l_mail</th>
+      <td><input name=\"cb_mail_perms\" type=\"checkbox\" id=\"userMailActive\" onclick=\"switch_mail_mode();\" value=\"1\" $mail_state /></td>
+    </tr>          
+  </table>
+  <table id=\"userInternalMail\" class='$internalKlass'>
+    <tr id=\"user_mail\">
+      <th class=\"$class[mail_server]\">$l_mail_server</th>
+      <td>$dis_mailserver</td>
+    </tr>
+    <tr>
     $dis_mail
-  </tr>
-  <tr>
+    </tr>        
+    <tr id=\"user_mail\">
     <th class=\"$class[mail_quota]\">$l_quota</th>
     <td><input name=\"tf_mail_quota\" maxlength=\"6\" size=\"6\" value=\"$mail_quota\" /></td>
-  </tr>
+    </tr>      
   </table>
+  <table id=\"userExternalMail\" class='$externalKlass'>
+    <tr>
+      <th class=\"$class[email]\">$l_email</th>
+      <td><input type=\"text\" name=\"ta_email\" $externalEnabled value=\"$email\" /></td>
+    </tr>  
+  </table>
+  <script type='text/javascript'>
+    var internal = $('userInternalMail');
+    var external = $('userExternalMail');
+    if($('userMailActive').checked == true) {
+      external.remove();
+    } else {
+      internal.remove();  
+    }
+  </script>
   </fieldset>";
   } else {
   $mail_section = "
-    <fieldset class=\"detail infos\">
+    <fieldset class=\"detail infos\"  id=\"user_external_mail\">
     <legend>$l_mail</legend>
     <table>    
     <tr>

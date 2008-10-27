@@ -1468,9 +1468,13 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
         if(display == 0) {
           resource.setStyle('display','none');       
         } else {
-          resource.setStyle('left',container.getLeft()+'px')   
-          resource.setStyle('top',(container.getTop()+container.offsetHeight)+'px')   
-          resource.setStyle('display','block');
+          if(container.getLeft() + resource.getStyle('width').toInt() < window.innerWidth ) {
+            resource.setStyle('left',container.getLeft()+'px')   
+          } else {
+            resource.setStyle('left',container.getLeft() - resource.getStyle('width').toInt() +'px')   
+          }
+          resource.setstyle('top',(container.gettop()+container.offsetheight)+'px')   
+          resource.setstyle('display','block');
         }
       } 
     }
@@ -1691,48 +1695,37 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Conflicts
-// Parameters:
+// display conflicts
+// parameters:
 //   - $calendar : calendar hash
 //   - $c_q    : conflict list (events)
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_dis_conflict($calendar, $c_q) {
+function html_calendar_dis_conflict($calendar, $conflicts) {
   global $l_title, $l_location, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
   global $l_private, $obm;
   
-  $readable_calendars = of_right_entity_for_user('calendar', $obm['uid'], 'read', '', 'userobm');
-  $readable_resources = of_right_entity_for_user('Resource', $obm['uid'], 'read', '');
-  
-  while ($c_q->next_record()) {
+  $readable['user'] = of_right_entity_for_user('calendar', $obm['uid'], 'read', '', 'userobm');
+  $readable['resource'] = of_right_entity_for_user('Resource', $obm['uid'], 'read', '');
+  foreach($conflicts as $conflict) {
     $private = true;
-    $entity = $c_q->f('evententity_entity');
-    if($entity == 'user') {
-      $name = $c_q->f('userobm_lastname').' '.$c_q->f('userobm_firstname');
-      if (((in_array($c_q->f('userobm_id'),$readable_calendars['ids']) || in_array($c_q->f('calendarevent_owner'),$readable_calendars['ids']))&& $c_q->f('calendarevent_privacy') != '1')
-          || $c_q->f('calendarevent_owner') == $obm['uid'] || $c_q->f('userobm_id') == $obm['uid']){
+    $id = $conflict->event->id;
+    $name  = $conflict->event->attendee[$conflict->entity][$conflict->id];
+    if (((in_array($conflict->id, $readable[$conflict->entity]['ids']) || in_array($conflict->event->owner,$readable['user']['ids']))
+      && $conflict->event->privacy != '1') || $conflict->event->owner == $obm['uid'] || ($conflict->id == $obm['uid'] && $conflict->entity == 'user')) {
         $private = false;   
-      }
-    } elseif($entity == 'resource') {
-      $name = $c_q->f('resource_name');
-      if (((in_array($c_q->f('resource_id'),$readable_resources['ids']) || in_array($c_q->f('calendarevent_owner'),$readable_calendars['ids']))&& $c_q->f('calendarevent_privacy') != '1')
-          || $c_q->f('calendarevent_owner') == $obm['uid'] || $c_q->f('userobm_id') == $obm['uid']){
-        $private = false;
-      }
-    }
-    $id = $c_q->f('calendarevent_id'); 
+      }    
     if(!$private) {
-      $title = $c_q->f('calendarevent_title');
-      $location = $c_q->f('calendarevent_location');
+      $title = $conflict->event->title;
+      $location = $conflict->event->location;
     } else {
       $title = $l_private;
       $location = $l_private;
     }
 
-    $all_day = $c_q->f('calendarevent_allday');
-    $begin = new Of_Date($c_q->f('calendarevent_date'), 'GMT');
-    $end = clone $begin;
-    $end->addSecond($c_q->f('calendarevent_duration'));
+    $all_day = $conflict->event->all_day;
+    $begin = $conflict->date;
+    $end = $conflict->end;
 
     if ($all_day) {
       $dis_all_day = "<tr><td colspan=\"2\" class=\"detailLabel\">$l_all_day</td></tr>";

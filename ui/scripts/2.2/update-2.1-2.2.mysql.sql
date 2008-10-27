@@ -24,6 +24,7 @@ ALTER TABLE OGroup MODIFY COLUMN ogroup_parent_id int(8);
 
 -- CalendarEvent
 ALTER TABLE CalendarEvent MODIFY COLUMN calendarevent_allday BOOLEAN DEFAULT FALSE;
+ALTER TABLE CalendarEvent ADD COLUMN calendarevent_timezone VARCHAR(255) DEFAULT 'GMT';
 ALTER TABLE EventEntity MODIFY COLUMN evententity_required BOOLEAN DEFAULT FALSE;
 
 -- Preferences

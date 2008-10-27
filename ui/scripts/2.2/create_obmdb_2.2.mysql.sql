@@ -144,6 +144,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_userupdate int(8) default NULL,
   calendarevent_usercreate int(8) default NULL,
   calendarevent_owner int(8) default NULL,
+  calendarevent_timezone varchar(255) default 'GMT',
   calendarevent_ext_id varchar(32) default '',
   calendarevent_title varchar(255) default NULL,
   calendarevent_location varchar(100) default NULL,

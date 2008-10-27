@@ -207,6 +207,21 @@ function set_toUpdate(name) {
     }
   }
 }
+
+function switch_mail_mode() {
+  if($('userMailActive').checked == true) {
+    external.remove();
+    external.addClass('H');
+    internal.removeClass('H');
+    internal.injectInside($('userMail'));
+
+  } else {
+    internal.remove();
+    internal.addClass('H');
+    external.removeClass('H');
+    external.injectInside($('userMail'));
+  }
+}
 ";
 
 ?>
