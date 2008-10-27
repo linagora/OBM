@@ -1682,23 +1682,6 @@ CREATE TABLE OrganizationalChart (
   CONSTRAINT organizationalchart_userupdate_userobm_id_fkey FOREIGN KEY (organizationalchart_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
--------------------------------------------------------------------------------
--- OBM-Mail, OBM-LDAP Production tables (used by automate)
--------------------------------------------------------------------------------
-CREATE TABLE P_Domain like Domain;
-CREATE TABLE P_UserObm like UserObm;
-CREATE TABLE P_UGroup like UGroup;
-CREATE TABLE P_of_usergroup like of_usergroup;
-CREATE TABLE P_UserObmGroup like UserObmGroup;
-CREATE TABLE P_GroupGroup like GroupGroup;
-CREATE TABLE P_Host like Host;
-CREATE TABLE P_Samba like Samba;
-CREATE TABLE P_MailServer like MailServer;
-CREATE TABLE P_MailServerNetwork like MailServerNetwork;
-CREATE TABLE P_MailShare like MailShare;
-CREATE TABLE P_EntityRight like EntityRight;
-
 --
 -- Table structure for table `ParentDeal`
 --
@@ -2648,5 +2631,21 @@ CREATE TABLE ProfilePropertyValue (
   CONSTRAINT profilepropertyvalue_profile_id_profile_id_fkey FOREIGN KEY (profilepropertyvalue_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty (profileproperty_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-------------------------------------------------------------------------------
+-- OBM-Mail, OBM-LDAP Production tables (used by automate)
+-------------------------------------------------------------------------------
+CREATE TABLE P_Domain like Domain;
+CREATE TABLE P_UserObm like UserObm;
+CREATE TABLE P_UGroup like UGroup;
+CREATE TABLE P_of_usergroup like of_usergroup;
+CREATE TABLE P_UserObmGroup like UserObmGroup;
+CREATE TABLE P_GroupGroup like GroupGroup;
+CREATE TABLE P_Host like Host;
+CREATE TABLE P_Samba like Samba;
+CREATE TABLE P_MailServer like MailServer;
+CREATE TABLE P_MailServerNetwork like MailServerNetwork;
+CREATE TABLE P_MailShare like MailShare;
+CREATE TABLE P_EntityRight like EntityRight;
 
 SET FOREIGN_KEY_CHECKS=1;

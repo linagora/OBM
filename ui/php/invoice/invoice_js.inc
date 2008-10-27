@@ -87,11 +87,8 @@ function check_invoice(f_inv) {
 
 
 // deletion confirm 
-function valider_suppression() {
-  if (confirm (\"$l_delete_confirm\"))
-    return true;
-  else
-    return false;
+function confirm_del() {
+  return confirm (\"$l_delete_confirm\");
 }
 
 

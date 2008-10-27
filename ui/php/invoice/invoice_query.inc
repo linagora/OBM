@@ -494,10 +494,10 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_delete($p_id) {
   global $cdg_sql;
-  $id = sql_parse_id($id, true); 
+  $id = sql_parse_id($p_id, true); 
   $multidomain = sql_multidomain('invoice');
   $query = "DELETE FROM Invoice 
-		WHERE invoice_id $p_id $multidomain";
+		WHERE invoice_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_invoice_delete()');
   $obm_q = new DB_OBM;
