@@ -1629,7 +1629,7 @@ function html_contract_priority_form($pri_q) {
   </table>
   </div>    
   <form id=\"form_priority_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  onsubmit=\"return check_contract_priority_new(this)\">
   <table>
   <thead>
   <tr>
@@ -1796,7 +1796,7 @@ while ($sta_q->next_record()) {
   </table>
   </div>    
   <form id=\"form_status_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  onsubmit=\"return check_contract_status_new(this)\">
   <table>
   <thead>
   <tr>
@@ -1967,7 +1967,7 @@ $block = "
   </table>
   </div>    
   <form id=\"form_type_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category_new(this.tf_${cat}_label,'$jslabel')\">
+  onsubmit=\"return check_contract_type_new(this)\">
   <table>
   <thead>
   <tr>

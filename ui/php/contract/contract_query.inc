@@ -652,7 +652,7 @@ function run_query_contract_priority_delete($id) {
   $multidomain = sql_multidomain("contractpriority");
   $id = sql_parse_id($id, true);  
   $query = "DELETE FROM ContractPriority 
-		WHERE contractpriority_id $id' $multidomain";
+		WHERE contractpriority_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_priority_delete()");
   $sta_q = new DB_OBM;
@@ -676,7 +676,7 @@ function run_query_contract_priority_links($p_id) {
       contract_id, 
       contract_label
     FROM Contract 
-    WHERE contract_priority_id $p_id' $multidomain";
+    WHERE contract_priority_id $p_id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_contract_priority_links()");
   $pri_q = new DB_OBM;

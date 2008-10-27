@@ -101,7 +101,9 @@ function check_contract_priority_upd(form,formd)
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_priority_new(form)
 {
-   if (form.tf_pri.value != \"\")
+   if (form.tf_priority_label.value != \"\"
+       && form.tf_priority_code.value != \"\"
+       && form.tf_priority_color.value != \"\")
       return true;
    else
    {
@@ -150,7 +152,8 @@ function check_contract_status_upd(form,formd)
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_status_new(form)
 {
-   if (form.tf_status.value != \"\")
+   if (form.tf_status_label.value != \"\"
+       && form.tf_status_code.value != \"\")
       return true;
    else
    {
@@ -213,7 +216,7 @@ function show_kind_contract(form) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_contract_type_new(form)
 {
-  if (form.tf_label.value != \"\")
+  if (form.tf_type_label.value != \"\")
     return true;
   else
   {
