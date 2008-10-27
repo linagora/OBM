@@ -16,14 +16,14 @@ $c_mailchooser_hooks = array(
 
   array(
     'id'            => 1,
-    'hook_function' => 'lest_boxes',
-    'name'          => $l_mailboxchoice_lest_boxes,
+    'hook_function' => 'least_boxes',
+    'name'          => $l_mailboxchoice_least_boxes
   ),
   
   array(
     'id'            => 2,
-    'hook_function' => 'lest_used_memory',
-    'name'          => $l_mailboxchoice_lest_used_memory,
+    'hook_function' => 'least_used_memory',
+    'name'          => $l_mailboxchoice_least_used_memory
   ),
 
 );
@@ -55,7 +55,7 @@ Array
 
 
 */
-function hook_user_mailchooser_lest_boxes ($form) {
+function hook_user_mailchooser_least_boxes ($form) {
   global $cdg_sql, $obm;
   
   $sel_id = sql_parse_id($obm['domain_id'], true);
@@ -78,7 +78,7 @@ function hook_user_mailchooser_lest_boxes ($form) {
   return array('mailserver_id' => $obm_q->f('mailserver_id'));
 }
 
-function hook_user_mailchooser_lest_used_memory ($form) {
+function hook_user_mailchooser_least_used_memory ($form) {
   global $cdg_sql, $obm;
   
   $sel_id = sql_parse_id($obm['domain_id'], true);

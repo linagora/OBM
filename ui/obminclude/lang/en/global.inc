@@ -492,3 +492,4 @@ $l_dg_sql = "SQL";
 $l_dg_exe = "Exec";
 
 $l_all_aliases = "All aliases";
+$l_timezone = "Timezone";

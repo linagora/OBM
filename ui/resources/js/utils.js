@@ -122,34 +122,3 @@ String.prototype.pad = function(l, s, t){
 Number.prototype.pad = function(l,s,t) { 
   return this.toString().pad(l,s,t);
 }
-/*
-Date.prototype.format = function(pattern) {    
-  if (!this.valueOf())
-    return ;
-  var d = this;
-
-  return pattern.replace(/(Y|m|d|H|i|s|c|O)/gi,
-    function($1) {
-      switch ($1.toLowerCase()) {
-      case 'y':   return d.getFullYear();
-      case 'm':   return (d.getMonth() + 1).pad(2,'0');
-      case 'd':   return d.getDate().pad(2,'0');
-      case 'h':   return h = d.getHours().pad(2,'0');
-      case 'i':   return d.getMinutes().pad(2,'0');
-      case 's':   return d.getSeconds().pad(2,'0');
-      case 'c':   return d.format('y-m-dTh:i:s O');
-      case 'o':   return d.getTimezone();
-    }
-  });
-}
-
-Date.prototype.getTimezone = function() {    
-  var offset = - (this.getTimezoneOffset()/6)*10;
-  if(offset >= 0) {
-    offset = offset.pad(4,'0');
-    offset = '+' + offset
-  } else {
-    offset = offset.pad(4,'0');
-  }
-  return offset; 
-}*/

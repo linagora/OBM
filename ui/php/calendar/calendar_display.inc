@@ -583,7 +583,7 @@ function html_calendar_view_selector($calendar, $my_views) {
 function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity) { 
   global $ico_previous, $ico_next, $ico_far_next, $ico_far_previous;
   global $ccalendar_weekstart, $ccalendar_first_hour;
-  global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension;
+  global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension, $ico_private;
   global $l_private,$l_daysofweek, $l_previous, $l_next;
 
   $date = clone $calendar['date'];
@@ -665,10 +665,11 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
     obm.vars.images.resize = '$ico_resize';
     obm.vars.images.periodic = '$ico_periodic';
     obm.vars.images.meeting = '$ico_meeting';
+    obm.vars.images.private = '$ico_private';
     obm.vars.images.extension = '$ico_extension';
     showWaitingPanel('calendarBody');
     obm.initialize.chain(function () {
-      obm.calendarManager = new Obm.CalendarManager(".$date->setHour($ccalendar_first_hour)->getTimestamp().",".$date->get('Z').");
+      obm.calendarManager = new Obm.CalendarManager(".$date->setHour($ccalendar_first_hour)->getTimestamp().",'".$date->getOption('timezone')."');
       obm.calendarManager.lock();
       $dis_event
       obm.calendarManager.unlock();
@@ -691,7 +692,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
 function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) {
   global $path, $ico_next, $ico_previous, $l_previous, $l_next;
   global $ccalendar_weekstart, $ico_far_next, $ico_far_previous;
-  global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension;
+  global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension,$ico_private;
   global $ccalendar_first_hour, $ccalendar_last_hour;
  
 
@@ -782,10 +783,11 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
     obm.vars.images.resize = '$ico_resize';
     obm.vars.images.periodic = '$ico_periodic';
     obm.vars.images.meeting = '$ico_meeting';
+    obm.vars.images.private = '$ico_private';
     obm.vars.images.extension = '$ico_extension';
     obm.vars.consts.timeUnit = ".(3600/$_SESSION['set_cal_interval']).";
     obm.initialize.chain(function () {
-      obm.calendarManager = new Obm.CalendarManager(".$date->setHour($ccalendar_first_hour)->getTimestamp().",".$date->get('Z').");
+      obm.calendarManager = new Obm.CalendarManager(".$date->setHour($ccalendar_first_hour)->getTimestamp().",'".$date->getOption('timezone')."');
       obm.calendarManager.lock();
       $dis_event
       obm.calendarManager.unlock();
@@ -804,7 +806,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
 function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
   global $ico_previous, $ico_next, $ico_far_next, $ico_far_previous;
   global $ccalendar_first_hour, $ccalendar_last_hour;
-  global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension;
+  global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension,$ico_private;
   global $l_private, $l_all_day, $l_previous, $l_next;
 
   $category_filter = $calendar['category_filter'];
@@ -858,10 +860,11 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
     obm.vars.images.resize = '$ico_resize';
     obm.vars.images.periodic = '$ico_periodic';
     obm.vars.images.meeting = '$ico_meeting';
+    obm.vars.images.private = '$ico_private';
     obm.vars.images.extension = '$ico_extension';
     obm.vars.consts.timeUnit = ".(3600/$_SESSION['set_cal_interval']).";    
     obm.initialize.chain(function () {
-      obm.calendarManager = new Obm.CalendarManager(".$date->setHour($ccalendar_first_hour)->getTimestamp().",".$date->get('Z').");
+      obm.calendarManager = new Obm.CalendarManager(".$date->setHour($ccalendar_first_hour)->getTimestamp().",'".$date->getOption('timezone')."');
       obm.calendarManager.lock()
       $dis_event
       obm.calendarManager.unlock();
@@ -954,7 +957,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   global $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
   global $l_date, $l_resources, $l_items, $l_event, $ico_search,$ccalendar_first_hour;
   global $l_expand_all, $l_collapse_all,$ccalendar_last_hour,$ccalendar_weekstart;
-  global $ico_periodic_alt, $ico_meeting_alt;
+  global $ico_periodic_alt, $ico_meeting_alt, $ico_private_alt;
 
   $sel_user = $calendar_entity['user'];
   $sel_user_id = array();
@@ -1048,7 +1051,10 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
               }
             }
           }
-          if ($event->isMeeting()) {
+          if($event->isPrivate()) {
+            $title = "<img src=\"$ico_private_alt\" alt=\"[Private]\" /> $title";
+          }
+          if($event->isMeeting()) {
             $title = "<img src=\"$ico_meeting_alt\" alt=\"[Meeting]\" /> $title";
           }
           if ($event->isPeriodic()) {
@@ -1171,7 +1177,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
  */
 function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entity, $options=array()) {
   global $obm, $ccalendar_first_hour, $ccalendar_last_hour;
-  global $ico_resize, $ico_periodic, $ico_meeting;
+  global $ico_resize, $ico_periodic, $ico_meeting, $ico_private;
   global $l_user, $l_resource, $l_task, $l_private;
   global $output_target;
 
@@ -1236,7 +1242,6 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "duration:$duration";
   $ed[] = "item:'$item_list'";
   $ed[] = "time:".$date->getTimestamp();
-  $ed[] = 'tzOffset:'.$date->get('Z');
   $ed[] = "title:'$title'";
   $ed[] = "all_day:".$all_day;
   $ed[] = "klass:'$entityClass'"; 
@@ -1273,6 +1278,11 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       break;
   }
 
+  if ($event->isPrivate()) {
+    $ed[] = 'private:true';
+  } else {
+    $ed[] = 'private:false';
+  }
   if ($event->isMeeting()) {
     $ed[] = 'meeting:true';
   } else {
@@ -1647,6 +1657,7 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
   global $obm, $path;
   global $l_private, $l_location, $l_all_day;
   global $l_task, $l_user, $l_resource, $l_private;
+  global $ico_meeting, $ico_periodic, $ico_private;
 
   $location = '';
   if ($occurrence->event->privacy == 1 && !(in_array($obm['uid'],$occurrence->event->attendee['user']))) {
@@ -3727,7 +3738,6 @@ function json_event_data($id,$calendar) {
   $ed[] = 'id:'.$id;
   $ed[] = 'duration:'.$duration;
   $ed[] = 'time:'.$date->getTimestamp();
-  $ed[] = 'tzOffset:'.$date->get('Z');
   $ed[] = 'all_day:'.$all_day;
   $ed[] = "title:'$title'";
   $ed[] = "attendees:[".implode(',',$attendees)."]";

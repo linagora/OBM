@@ -1219,6 +1219,7 @@ DELETE FROM ProjectTask WHERE projecttask_project_id NOT IN (SELECT project_id F
 ALTER TABLE ProjectTask ADD CONSTRAINT projecttask_project_id_project_id_fkey FOREIGN KEY (projecttask_project_id) REFERENCES Project(project_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from projecttask_parenttask_id to projecttask_id
+UPDATE ProjectTask SET projecttask_parenttask_id = NULL WHERE projecttask_parenttask_id = 0;
 DELETE FROM ProjectTask WHERE projecttask_parenttask_id NOT IN (SELECT projecttask_id FROM (SELECT projecttask_id FROM ProjectTask) AS Parent) AND projecttask_parenttask_id IS NOT NULL;
 ALTER TABLE ProjectTask ADD CONSTRAINT projecttask_parenttask_id_projecttask_id_fkey FOREIGN KEY (projecttask_parenttask_id) REFERENCES ProjectTask(projecttask_id) ON UPDATE CASCADE ON DELETE CASCADE;
 

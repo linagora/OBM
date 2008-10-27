@@ -4524,6 +4524,7 @@ Drag.Base = new Class({
 		for (var z in this.options.modifiers){
 			if (!this.options.modifiers[z]) continue;
 			this.value.now[z] = this.element.getStyle(this.options.modifiers[z]).toInt();
+			this.value.start[z] = this.element.getStyle(this.options.modifiers[z]).toInt();
 			this.mouse.pos[z] = event.page[z] - this.value.now[z];
 			if (limit && limit[z]){
 				for (var i = 0; i < 2; i++){
@@ -4564,7 +4565,18 @@ Drag.Base = new Class({
 					this.out = true;
 				}
 			}
-			if (this.options.grid[z]) this.value.now[z] -= (this.value.now[z] % this.options.grid[z]);
+			if (this.options.grid[z]) { 
+                          
+                          var delta = this.value.now[z] - this.value.start[z];
+                          var clip = delta % this.options.grid[z];
+                          if(delta > 0 && clip > (this.options.grid[z]/2)) {
+                            this.value.now[z] -= clip - this.options.grid[z];
+                          } else if(delta < 0 && clip < -(this.options.grid[z]/2)) {
+                            this.value.now[z] -= clip + this.options.grid[z];
+                          } else {
+                            this.value.now[z] -= clip;
+                          }
+                        }
 			this.element.setStyle(this.options.modifiers[z], this.value.now[z] + this.options.unit);
 		}
 		this.fireEvent('onDrag', this.element);

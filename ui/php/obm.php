@@ -16,7 +16,6 @@ include("$obminclude/global.inc");
 $params = get_obm_params();
 include_once('obm_query.inc');
 require("$obminclude/of/of_right.inc");
-require("$obminclude/of/of_date.inc");
 
 $OBM_Session = $params['OBM_Session'];
 if ($action == '') { $action = 'home'; }

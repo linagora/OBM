@@ -3264,6 +3264,10 @@ Class Event {
     return ($this->repeat != 'none');
   }
 
+  function isPrivate() {
+    return ($this->privacy == 1);
+  }
+
   /**
    * Add an attendee to the event 
    * 

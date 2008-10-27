@@ -13,8 +13,8 @@ $l_mail_server = "Mail server choice";
 $l_mail_servers = "Mail servers";
 
 // Mail chooser labels
-$l_mailboxchoice_lest_boxes = "having less mailboxes";
-$l_mailboxchoice_lest_used_memory = "using less memory";
+$l_mailboxchoice_least_boxes = "having less mailboxes";
+$l_mailboxchoice_least_used_memory = "using less memory";
 
 // Actions
 $l_insert = "Insert the domain";

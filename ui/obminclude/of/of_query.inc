@@ -1354,6 +1354,7 @@ function run_query_user_pref_update($user_id, $option, $value) {
 ///////////////////////////////////////////////////////////////////////////////
 function session_load_user_prefs() {
   global $obm, $last_v,$ccalendar_last_hour,$ccalendar_first_hour;
+  global $ctimezone;
 
   // We reset $last_v in case of session persistence (changing user)
   $last_v = array();
@@ -1387,7 +1388,10 @@ function session_load_user_prefs() {
   if (!isset($_SESSION['set_cal_last_hour'])) {
     $_SESSION['set_cal_last_hour'] = $ccalendar_last_hour;
   }
-
+  if(!isset($_SESSION['set_timezone'])) {
+    $_SESSION['set_timezone'] = $ctimezone;
+  }
+  
 }
 
 

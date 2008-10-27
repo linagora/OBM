@@ -513,3 +513,4 @@ $l_dg_sql = "SQL";
 $l_dg_exe = "Exec";
 
 $l_all_aliases = "Tous les alias";
+$l_timezone = "Fuseau horaire";

@@ -71,14 +71,22 @@ if ($params['form_user_pref']) {
 
   if ($params['date'] != '') {
     $_SESSION['set_date'] = $params['date'];
+    Of_Date::setOption('outputdate',$params['timezone']);
     update_user_pref($obm['uid'], 'set_date', $_SESSION['set_date']);
   }
   
   if ($params['date_upd'] != '') {
     $_SESSION['set_date_upd'] = $params['date_upd'];
+    Of_Date::setOption('inputedate',$params['timezone']);
     update_user_pref($obm['uid'], 'set_date_upd', $_SESSION['set_date_upd']);
   }
   
+  if ($params['timezone'] != '') {
+    $_SESSION['set_timezone'] = $params['timezone'];
+    Of_Date::setOption('timezone',$params['timezone']);
+    update_user_pref($obm['uid'], 'set_timezone', $_SESSION['set_timezone']);
+  }
+
   if ($params['commentorder'] != '') {
     $_SESSION['set_commentorder'] = $params['commentorder'];
     update_user_pref($obm['uid'], 'set_commentorder', $_SESSION['set_commentorder']);
@@ -378,6 +386,14 @@ if ($cgp_show['module']['calendar']) {
 ";
 }
 
+$timezone_identifiers = DateTimeZone::listIdentifiers();
+foreach($timezone_identifiers as $tz) {
+  if($tz == Of_Date::getOption('timezone')) {
+    $timezones .= "<option selected='selected' value='$tz'>$tz</option>";
+  } else {
+    $timezones .= "<option value='$tz'>$tz</option>";
+  }
+}
 $display['detail'] .= "
   <tr>
   <th>$l_set_csv_sep</th>
@@ -407,6 +423,17 @@ $display['detail'] .= "
     <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_txt\" $da_txt />$l_da_txt</span>
   </td>
   </tr>
+  <table>
+  <tr>
+  <td>$l_timezone</td>
+  <td>
+    <select name='timezone'>
+      $timezones
+    </select>
+  </td>
+  <td>
+  </td>
+  </tr>  
   </table>
   </fieldset>  
   <fieldset class=\"buttons\">

@@ -146,9 +146,12 @@ class Of_Date extends DateTime {
     'timezone' => 'Europe/Paris'
   );
 
+  private static $_loaded = false;
+
   private $_error;
 
   public function __construct($time=null, $timezone=null) {
+    self::loadOptions();
     if(is_numeric($time)) {
       $time = "@$time";
     }
@@ -170,6 +173,48 @@ class Of_Date extends DateTime {
   }
 
   /**
+   * loadOptions 
+   * 
+   * @static
+   * @access private
+   * @return void
+   */
+  static private function loadOptions() {
+    if(!self::$_loaded) {
+      self::setOption('outputdate',$_SESSION['set_date']);
+      self::setOption('inputedate',$_SESSION['set_date_upd']);
+      self::setOption('timezone',$_SESSION['set_timezone']);
+      self::$_loaded = true;
+    }
+  }
+
+  /**
+   * Set the default Options 
+   * 
+   * @param mixed $option 
+   * @param mixed $value 
+   * @static
+   * @access public
+   * @return void
+   */
+  static public function setOption($option, $value) {
+    self::$_options[$option] = $value;
+  }
+
+  /**
+   * get the default  
+   * 
+   * @param mixed $option 
+   * @param mixed $value 
+   * @static
+   * @access public
+   * @return void
+   */
+  static public function getOption($option) {
+    self::loadOptions();
+    return self::$_options[$option];
+  }
+  /**
    * setDefaultTimezone 
    * 
    * @access public
@@ -179,15 +224,6 @@ class Of_Date extends DateTime {
     $this->setTimezone(new DateTimeZone(self::$_options['timezone']));
   }
 
-  /**
-   * setDefaultTimezone 
-   * 
-   * @access public
-   * @return void
-   */
-  static public function getDefaultTimezone() {
-    return self::$_options['timezone'];
-  }
   /**
    * Return the current stored error 
    * 

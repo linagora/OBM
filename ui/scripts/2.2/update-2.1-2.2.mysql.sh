@@ -16,7 +16,6 @@ P=$VALUE
 get_val db
 DB=$VALUE
 
-
 mysqldump -u $U -p$P  --default-character-set='UTF8' ${DB} > ${HOME}/migration.sql 
 success=$?
 

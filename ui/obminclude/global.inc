@@ -111,9 +111,9 @@ $ccalendar_public_groups = true;
 // Calendar : First day of the week
 $phpversion = substr(phpversion(),0,1);
 if ($phpversion >= 5) {
-  $ccalendar_weekstart = 'sunday';
+  $ccalendar_weekstart = 'monday';
 } else {
-  $ccalendar_weekstart = 'sunday + 2 hours'; // +2h to fix a DST php4 bug //
+  $ccalendar_weekstart = 'monday + 2 hours'; // +2h to fix a DST php4 bug //
 }
 
 // calendar alert values (seconds => label or minutes displayed)
@@ -412,6 +412,7 @@ $cgp_user = array();
 
 require_once('conf/obm_conf.inc');
 require_once("$obminclude/phplib/obmlib.inc");
+require_once("$obminclude/of/of_date.inc");
 
 
 define('C_IMAGE_PATH',$cgp_host.'images');
@@ -738,7 +739,6 @@ if ($path == '') {
   else 
     $path = '..';
 }
-
 
 set_include_path(get_include_path().":../$path/$obminclude/lib");
 //those functions must be defined before the global_query and global display

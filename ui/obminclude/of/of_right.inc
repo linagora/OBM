@@ -484,7 +484,6 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
 
   // GLOBAL - superman has all rights on entities
   global $cright_write_admin;
-  $a = microtime(true);
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
@@ -574,8 +573,6 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
   if (is_array($ent_array)) {
     $ret_array['entity'] = $ent_array;
   }
-  $b = microtime(true);
-  var_dump($b - $a);
   return $ret_array;
 }
 

@@ -142,12 +142,13 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setTzOffset: function(offset) {
-    this.event.tzOffset = offset + (new Date(this.event.time * 1000).getTimezoneOffset() * 60);
+    this.event.tzOffset = offset + (new Obm.DateTime(this.event.time * 1000).getTimezoneOffset() * 60);
   },
 
   makeDraggable: function() {
     var dragOptions = {
       handle: this.dragHandler,
+      grid: {'y' : obm.calendarManager.defaultHeight + 1, 'x' : obm.calendarManager.defaultWidth - 1},
       limit: {
         'x': [this.options.context.left,this.options.context.right - obm.calendarManager.defaultWidth],
         'y': [this.options.context.top,this.options.context.bottom]
@@ -217,7 +218,7 @@ Obm.CalendarDayEvent = new Class({
   resetTitle: function() {
     var title = this.event.title + ' ';
     if (!this.event.all_day) {
-      title = new Date(this.event.time * 1000).format("H:i") + ' ' + title;
+      title = new Obm.DateTime(this.event.time * 1000).format("H:i") + ' ' + title;
     }
     // Display the location only if set
     if (this.event.location != '') {
@@ -237,8 +238,8 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setTime: function(time) {
-    var myDate = new Date(time * 1000);
-    var startDate = new Date(obm.calendarManager.startTime * 1000);
+    var myDate = new Obm.DateTime(time * 1000);
+    var startDate = new Obm.DateTime(obm.calendarManager.startTime * 1000);
     startDate.setHours(0);
     startDate.setMinutes(0);
     startDate.setSeconds(0)
@@ -259,8 +260,8 @@ Obm.CalendarDayEvent = new Class({
   
   guessEventTime: function(time) {
     if (this.event.time) {
-      var time = new Date(time * 1000);
-      d = new Date(this.event.time * 1000);
+      var time = new Obm.DateTime(time * 1000);
+      d = new Obm.DateTime(this.event.time * 1000);
       time.setHours(d.getHours());
       time.setMinutes(d.getMinutes());
       time = Math.floor(time.getTime()/1000);
@@ -312,10 +313,10 @@ Obm.CalendarDayEvent = new Class({
 
   setDuration: function(duration) {
     this.event.duration = duration;
-    startTime = new Date(this.event.time * 1000);
+    startTime = new Obm.DateTime(this.event.time * 1000);
     startTime.setHours(0);
     startTime = startTime.getTime()/1000;
-    endTime = new Date((this.event.time + this.event.duration)*1000);
+    endTime = new Obm.DateTime((this.event.time + this.event.duration)*1000);
     endTime = endTime.getTime()/1000;
     var dayDuration = Math.ceil((endTime - startTime) / 86400);
     this.setSize(dayDuration);
@@ -376,8 +377,8 @@ Obm.CalendarDayEvent = new Class({
   },
 
   toQueryString: function() {
-    date_begin = new Date(this.event.time * 1000);
-    date_end = new Date(this.event.time * 1000 + this.event.duration * 1000);    
+    date_begin = new Obm.DateTime(this.event.time * 1000);
+    date_end = new Obm.DateTime(this.event.time * 1000 + this.event.duration * 1000);    
     query = 'calendar_id=' + this.event.id;
     query += '&date_begin=' + date_begin.format('O');
     query += '&duration=' + this.event.duration;
@@ -387,13 +388,13 @@ Obm.CalendarDayEvent = new Class({
   
   drawExtensions: function() {
     if(this.size != 1) {
-      dayBegin = (new Date(this.event.time * 1000).getDay() + this.hidden - obm.vars.consts.weekStart + 7) % 7; 
+      dayBegin = (new Obm.DateTime(this.event.time * 1000).getDay() + this.hidden - obm.vars.consts.weekStart + 7) % 7; 
       dayEnd = (dayBegin + this.size + 6) % 7;
-      var startDate = new Date((obm.calendarManager.startTime + this.origin) * 1000);
+      var startDate = new Obm.DateTime((obm.calendarManager.startTime + this.origin) * 1000);
       while(dayEnd < dayBegin || this.size > 7) {
         var extensionSize = dayEnd + 1;
         this.size -= extensionSize;
-        var extensionDate = new Date(startDate.getTime());
+        var extensionDate = new Obm.DateTime(startDate.getTime());
         extensionDate.setDate(startDate.getDate() + this.size);
         var extensionOrigin = Math.floor(extensionDate.getTime()/1000) - obm.calendarManager.startTime;
         dayEnd = 6;
@@ -532,10 +533,10 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
     }
     var title = this.event.title + ' ';
     if (this.event.duration <= this.options.unit) {
-      var time = new Date(this.event.time * 1000).format("H:i") + ' ' + title; 
+      var time = new Obm.DateTime(this.event.time * 1000).format("H:i") + ' ' + title; 
       var title = '';
     } else {
-      var time = new Date(this.event.time * 1000).format("H:i");
+      var time = new Obm.DateTime(this.event.time * 1000).format("H:i");
     }
     this.element.setProperty('title', this.event.title + ' ' + location);
     this.timeContainer.setHTML(time);
@@ -583,6 +584,7 @@ Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
   makeResizable: function() {
     var resizeOptions = {
       handle: this.resizeHandler,
+      grid: {'y' : obm.calendarManager.defaultHeight + 1},
       limit: {
         'x': [obm.calendarManager.defaultWidth,obm.calendarManager.defaultWidth],
         'y': [obm.calendarManager.defaultHeight,this.options.context.bottom]
@@ -810,7 +812,7 @@ Obm.CalendarManager = new Class({
   moveEventTo: function(id,left,top) {
     var evt = this.events.get(id);
     var xDelta = Math.round((left-evt.options.context.left)/this.defaultWidth);
-    var yDelta = Math.floor((top-evt.options.context.top)/this.defaultHeight);
+    var yDelta = Math.round((top-evt.options.context.top)/this.defaultHeight);
     var secDelta = xDelta*evt.options.xUnit + yDelta*evt.options.yUnit;
     var dayDelta = Math.floor(secDelta / 86400);
     secDelta = secDelta - (dayDelta * 86400);
@@ -818,24 +820,19 @@ Obm.CalendarManager = new Class({
     secDelta = secDelta - (hourDelta * 3600);
     var minDelta = Math.floor(secDelta / 60);
     secDelta = secDelta - (minDelta * 60);
-    var startDate = new Date(this.startTime * 1000);
-    console.log('start : ',startDate);
+    var startDate = new Obm.DateTime(this.startTime * 1000);
     startDate.setDate(startDate.getDate() + dayDelta);
-    console.log('start : ',startDate, 'ajout : ', dayDelta);
     startDate.setHours(startDate.getHours() + hourDelta);
-    console.log('start : ',startDate, 'ajout : ', hourDelta);
     startDate.setMinutes(startDate.getMinutes() + minDelta);
-    console.log('start : ',startDate, 'ajout : ', minDelta);
     startDate.setSeconds(startDate.getSeconds() + secDelta);
-    console.log('start : ',startDate, 'ajout : ', secDelta);
     time = Math.floor(startDate.getTime() / 1000);
     guessedTime = evt.guessEventTime(time);
     if (evt.event.time != guessedTime) {
       eventData = new Object();
       eventData.calendar_id = evt.event.id;
       eventData.element_id = id;
-      eventData.date_begin = new Date(guessedTime * 1000).format('c');
-      eventData.old_date_begin = new Date(evt.event.time * 1000).format('c');
+      eventData.date_begin = new Obm.DateTime(guessedTime * 1000).format('c');
+      eventData.old_date_begin = new Obm.DateTime(evt.event.time * 1000).format('c');
       eventData.duration = evt.event.duration;
       eventData.title = evt.event.title;
       eventData.all_day = evt.event.all_day;
@@ -854,7 +851,7 @@ Obm.CalendarManager = new Class({
       eventData = new Object();
       eventData.calendar_id = evt.event.id;
       eventData.element_id = id;
-      eventData.date_begin = new Date(evt.event.time * 1000).format('c');
+      eventData.date_begin = new Obm.DateTime(evt.event.time * 1000).format('c');
       eventData.old_date_begin = eventData.date_begin;
       eventData.duration = size*evt.options.yUnit;
       eventData.title = evt.event.title;
@@ -1139,15 +1136,15 @@ Obm.CalendarQuickForm = new Class({
   }, 
   
   setFormValues: function(evt, context) {
-    var date_begin = new Date(evt.event.time * 1000);
-    var date_end = new Date((evt.event.time + evt.event.duration) * 1000);    
+    var date_begin = new Obm.DateTime(evt.event.time * 1000);
+    var date_end = new Obm.DateTime((evt.event.time + evt.event.duration) * 1000);    
     this.form.tf_title.value = evt.event.title;
     this.eventData.calendar_id = evt.event.id;
     this.eventData.entity_id = evt.event.entity_id;
     this.eventData.entity = evt.event.entity;
     this.eventData.all_day = evt.event.all_day;
     this.eventData.date_begin = date_begin.format('c');
-    this.eventData.old_date_begin = new Date(evt.event.time * 1000).format('c');
+    this.eventData.old_date_begin = new Obm.DateTime(evt.event.time * 1000).format('c');
     this.eventData.duration = evt.event.duration;
     this.eventData.context = context;
     this.eventData.element_id = evt.element.id;
@@ -1189,8 +1186,8 @@ Obm.CalendarQuickForm = new Class({
   },
 
   setDefaultFormValues: function(time, allDay,context) {
-    var date_begin = new Date(time * 1000);
-    var date_end = new Date((time + 3600) * 1000);  
+    var date_begin = new Obm.DateTime(time * 1000);
+    var date_end = new Obm.DateTime((time + 3600) * 1000);  
     this.form.tf_title.value = '';
     this.eventData.calendar_id = '';
     this.eventData.entity_id = '';

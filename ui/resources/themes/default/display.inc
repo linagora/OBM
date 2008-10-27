@@ -376,10 +376,7 @@ function display_head_theme($p_module) {
   <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/date.js\" ></script>
   <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js\" ></script>
-
-  $js_include
   <script type=\"text/javascript\">
   //<![CDATA[
   obm.vars.images.minus = '$ico_minus';
@@ -392,6 +389,8 @@ function display_head_theme($p_module) {
   obm.vars.consts.popupHeight = '$popup_height';
   obm.vars.consts.popupWidth = '$popup_width';
   obm.vars.consts.weekStart = $c_week_first_day;
+  obm.vars.consts.resourcePath = '$resources_path';
+  obm.vars.consts.timeZone = '".Of_Date::getOption('timezone')."';
   obm.vars.labels.monthsShort = $monthShort;
   obm.vars.labels.months = $monthLong;
   obm.vars.labels.dayShort = $daysShort;
@@ -401,7 +400,13 @@ function display_head_theme($p_module) {
   obm.vars.labels.transparent = '".phpStringToJsString($l_transparent)."';
   obm.vars.labels.autocompleteField = '".phpStringToJsString($l_autocomplete_field)."'
   obm.vars.labels.fatalServerErr = '".phpStringToJsString($l_fatal_server_err)."';
-  
+  // ]]>
+  </script> 
+
+  $js_include
+
+  <script type=\"text/javascript\">
+  //<![CDATA[
   window.onresize= function() {
     while(obm.resize.chains && obm.resize.chains.length > 0) {
       obm.resize.callChain();
@@ -418,6 +423,7 @@ function display_head_theme($p_module) {
   $extra_js
   // ]]>
   </script>
+
 </head>
 
 <body onload=\"if (document.f_search) {
@@ -425,7 +431,6 @@ function display_head_theme($p_module) {
   } else if (document.f_entity) {
     document.f_entity.elements[0].focus();
   } \">
-
 "
 .display_debug()
 ;

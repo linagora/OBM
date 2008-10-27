@@ -20,7 +20,6 @@
 // - rights_admin    -- access rights screen
 // - rights_update   -- Update calendar access rights
 ///////////////////////////////////////////////////////////////////////////////
-$microtimestart = microtime(true);
 $path = '..';
 $module = 'calendar';
 $obminclude = getenv('OBM_INCLUDE_VAR');
@@ -30,7 +29,6 @@ include("$obminclude/global.inc");
 $params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
-require_once("$obminclude/of/of_date.inc");
 require_once("$obminclude/lib/Zend/Pdf.php");
 
 $params = get_calendar_params();
@@ -64,6 +62,9 @@ if (isset($params['cal_range'])) {
 ///////////////////////////////////////////////////////////////////////////////
 
 $extra_css[] = $css_calendar;
+$extra_js_include[] = 'bin/org.obm.tz.TZParser.nocache.js';
+//$extra_js_include[] = 'bin/org.obm.tz.TZParser.nocache.js';
+$extra_js_include[] = 'date.js';
 $extra_js_include[] = 'calendar.js';
 $extra_js_include[] = 'colorpicker.js';
 
@@ -153,8 +154,6 @@ if (($action == 'insert') || ($action == 'update')
 // We copy the entity array structure to the parameter hash
 $params['entity'] = $cal_entity_id;
 $params['category_filter'] = $cal_category_filter;
-//FIXME
-$x = new Of_Date();
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -557,9 +556,7 @@ if (!$params['ajax']) {
 } 
 display_page($display);
 
-$microtimestop = microtime(true);
 
-echo $microtimestop - $microtimestart;
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $params hash, Calendar parameters transmited
 // returns : $params hash with parameters set
