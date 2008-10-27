@@ -101,7 +101,7 @@ function check_admin_ref_ctry_upd(form, sel_del_ctry)
 ///////////////////////////////////////////////////////////////////////////////
 function check_admin_ref_ctry_new(form)
 {
-   if (form.tf_name.value != \"\")
+   if (form.tf_ctry_name.value != \"\")
       return true;
    else
    {
