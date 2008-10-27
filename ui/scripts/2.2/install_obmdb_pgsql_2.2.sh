@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/su postgres
 
 test $# -eq 4 || {
     echo "usage: $0 db user password lang"
@@ -29,11 +29,19 @@ echo "  Create new $DB database"
 
 createdb -O ${user} --encoding=UTF-8 ${db}
 
+psql ${db} <<EOF
+CREATE LANGUAGE plpgsql;
+\q
+EOF
+
 psql -U ${user} ${db} -f \
 create_obmdb_2.2.pgsql.sql > /tmp/data_insert.log 2>&1
 
 psql -U ${user} ${db} -f \
 obmdb_default_values_2.2.sql >> /tmp/data_insert.log 2>&1
+
+psql -U ${user} ${db} -f \
+obmdb_triggers_2.2.pgsql.sql >> /tmp/data_insert.log 2>&1
 
 echo "  Dictionnary data insertion"
 psql -U ${user} ${db} -f \

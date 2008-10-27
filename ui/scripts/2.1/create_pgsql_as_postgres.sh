@@ -30,7 +30,7 @@ psql -U ${user} ${db} -f data-en/obmdb_nafcode_2.1.sql
 psql -U ${user} ${db} -f obmdb_prefs_values_2.1.sql
 
 psql -U ${user} ${db} <<EOF
-UPDATE UserObmPref set userobmpref_value='en' where userobmpref_option='set_lang'
+UPDATE UserObmPref set userobmpref_value='fr' where userobmpref_option='set_lang'
 \q
 EOF
 

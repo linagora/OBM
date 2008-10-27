@@ -9,7 +9,7 @@ source `dirname $0`/obm-sh.lib
 
 # Lecture des parametres de connexion a la BD
 get_val dbtype
-DBTYPE=$VALUE
+DBTYPE=`echo $VALUE | tr A-Z a-z`
 get_val user
 U=$VALUE
 get_val password
@@ -32,12 +32,7 @@ locate_php_interp
 echo "*** Document repository creation"
 $PHP install_document_2.2.php || (echo $?; exit $?)
 
-if [ $DBTYPE == "MYSQL" ]; then
-  ./install_obmdb_mysql_2.2.sh ${DB} ${U} ${P} ${OBM_LANG}
-elif [ $DBTYPE == "PGSQL" ]; then
-  su postgres -c "./install_obmdb_pgsql_2.2.sh ${DB} ${U} ${P} ${OBM_LANG}"
-fi
-
+./install_obmdb_${DBTYPE}_2.2.sh ${DB} ${U} ${P} ${OBM_LANG}
 
 echo "*** Data checking and validation"
 

@@ -7,6 +7,8 @@ ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
 ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
 ALTER TABLE Domain ADD COLUMN domain_mail_server_auto integer default NULL;
 
+SELECT setval('domain_domain_id_seq', max(domain_id)) FROM Domain;
+
 -- Global Domain
 INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
 UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
@@ -15,7 +17,7 @@ UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_glob
 -- P_Domain
 ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
 -- Global Domain
-INSERT INTO P_Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
+INSERT INTO P_Domain (domain_id, domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (CURRVAL('domain_domain_id_seq'), NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
 UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
