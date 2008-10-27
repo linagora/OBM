@@ -951,9 +951,9 @@ function dis_calendar_month_list($calendar, $calendar_entity, $writable_entity) 
  * @return event list HTML code
  */
 function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end) {
-  global $l_desc;
+  global $obm;
   global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
-  global $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
+  global $l_desc, $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
   global $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
   global $l_date, $l_resources, $l_items, $l_event, $ico_search,$ccalendar_first_hour;
   global $l_expand_all, $l_collapse_all,$ccalendar_last_hour,$ccalendar_weekstart;
@@ -1660,7 +1660,7 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
   global $ico_meeting, $ico_periodic, $ico_private;
 
   $location = '';
-  if ($occurrence->event->privacy == 1 && !(in_array($obm['uid'],$occurrence->event->attendee['user']))) {
+  if ($occurrence->event->privacy == 1 && !(array_key_exists($obm['uid'],$occurrence->event->attendee['user']))) {
     $title = $l_private;
   } else {
     $title = $occurrence->event->title;

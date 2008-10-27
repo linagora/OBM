@@ -213,7 +213,8 @@
 .eventOwner_W {
   color: #fff;
   background-color: rgb(102, 140, 217);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -233,7 +234,8 @@
 .eventOwner0_W {
   color: #fff;
   background-color: rgb(216, 102, 102);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -253,7 +255,8 @@
 .eventOwner1_W {
   color: #fff;
   background-color: rgb(140, 102, 217);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -273,7 +276,8 @@
 .eventOwner2_W {
   color: #fff;
   background-color: rgb(101, 173, 137);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -293,7 +297,8 @@
 .eventOwner3_W {
   color: #fff;
   background-color: rgb(191, 191, 77);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -313,7 +318,8 @@
 .eventOwner4_W {
   color: #fff;
   background-color: rgb(230, 128, 77);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -333,7 +339,8 @@
 .eventOwner5_W {
   color: #fff;
   background-color: rgb(137, 151, 165);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -353,7 +360,8 @@
 .eventOwner6_W {
   color: #fff;
   background-color: rgb(167, 167, 125);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -373,7 +381,8 @@
 .eventOwner7_W {
   color: #fff;
   background-color: rgb(230, 115, 153);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -393,7 +402,8 @@
 .eventOwner8_W {
   color: #fff;
   background-color: rgb(102, 140, 179);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -413,7 +423,8 @@
 .eventOwner9_W {
   color: #fff;
   background-color: rgb(76, 176, 82);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -433,7 +444,8 @@
 .eventOwner10_W {
   color: #fff;
   background-color: rgb(224, 194, 64);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -453,7 +465,8 @@
 .eventOwner11_W {
   color: #fff;
   background-color: rgb(190, 148, 148);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -473,7 +486,8 @@
 .eventOwner12_W {
   color: #fff;
   background-color: rgb(148, 162, 190);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -493,7 +507,8 @@
 .eventOwner13_W {
   color: #fff;
   background-color: rgb(196, 168, 131);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -513,7 +528,8 @@
 .eventOwner14_W {
   color: #fff;
   background-color: rgb(179, 115, 179);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -533,7 +549,8 @@
 .eventOwner15_W {
   color: #fff;
   background-color: rgb(89, 191, 179);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -553,7 +570,8 @@
 .eventOwner16_W {
   color: #fff;
   background-color: rgb(140, 191, 64);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -573,7 +591,8 @@
 .eventOwner17_W {
   color: #fff;
   background-color: rgb(242, 166, 64);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -593,7 +612,8 @@
 .eventOwner18_W {
   color: #fff;
   background-color: rgb(169, 146, 169);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
@@ -613,7 +633,8 @@
 .eventOwner19_W {
   color: #fff;
   background-color: rgb(133, 170, 165);
-  border: 1px dotted;
+  border-left: 1px dotted;
+  border-right: 1px dotted;
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
