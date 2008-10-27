@@ -30,7 +30,10 @@ $l_can_delete = "The organizational chart can be deleted";
 $l_cant_delete = "The organizational chart can't be deleted";
 $l_fill_name = "You have to fill the organizational chart name before submitting.";
 $l_fill_ogroup_name = "You have to fill the all node name before submitting.";
+
+// JavaScript messages
 $l_js_delete_node = "Do you realy want to delete this node ?";
+$l_js_delete_chart = "Do you really want to delete this organizational chart ?";
 
 // For the display preferences modification screen 
 $l_organizationalchart_display = "Display options for organizational charts lists";

@@ -30,7 +30,10 @@ $l_can_delete = "L'organigramme peut être supprimé.";
 $l_cant_delete = "L'organigramme ne peut être supprimé !";
 $l_fill_name = "Vous devez renseigner le nom de l'organigramme avant de valider.";
 $l_fill_ogroup_name = "Vous devez renseigner le nom de chaque noeuds avant de valider";
-$l_js_delete_node = "Etes-vous sûr de vouloir supprimer ce noeud ?";
+
+// Messages Javascript
+$l_js_delete_node = "Êtes-vous sûr de vouloir supprimer ce noeud ?";
+$l_js_delete_chart = "Êtes-vous sûr de vouloir supprimer cet organigramme ?";
 
 // For the display preferences modification screen 
 $l_organizationalchart_display = "Options d'affichage des listes d'organigrammes";

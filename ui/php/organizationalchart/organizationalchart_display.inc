@@ -427,11 +427,11 @@ function dis_can_delete_organizationalchart($id) {
   $display["msg"] .= display_ok_msg($l_can_delete);
 
   $block .= "
+  <form action=\"$path/organizationalchart/organizationalchart_index.php\" method=\"post\" onsubmit=\"return confirm_del()\">
+  <input type=\"hidden\" name=\"action\" value=\"delete\" />
+  <imput type=\"hidden\" name=\"organizationalchart_id\" value=\"$id\" />
   <div class=\"buttons\">
-  <a href=\"$path/organizationalchart/organizationalchart_index.php?action=delete&amp;organizationalchart_id=$id\" 
-    onclick=\"return confirm_company_del(this.form);\">
-  $l_delete 
-  </a>
+  <input type=\"submit\" value=\"$l_delete\" />
   <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$id\">$l_back</a>
   </div>";
 

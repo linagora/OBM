@@ -247,5 +247,9 @@ function del_entity(level) {
   }
 }
 
+function confirm_del() {
+  return confirm('$l_js_delete_chart');
+}
+
 ";
 ?>
