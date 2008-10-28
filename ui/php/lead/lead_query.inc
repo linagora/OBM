@@ -460,7 +460,7 @@ function get_lead_status() {
 ///////////////////////////////////////////////////////////////////////////////
 function check_lead_data_form($id, $params) {
   global $php_regexp_isodate;
-  global $l_fill_name;
+  global $l_fill_name, $l_fill_company;
   global $l_fill_date, $l_date, $l_alarm, $l_invalid_date;
   global $err, $l_exist_error;
 
@@ -472,6 +472,7 @@ function check_lead_data_form($id, $params) {
   $contact_id = $params['contact_id'];
   $contact_new_id = $params['contact_new_id'];
   $kind = $params['kind'];
+  $company = $params['company_new_name'];
 
   // MANDATORY: Name must be set
   if (trim($name) == '') {
@@ -488,6 +489,12 @@ function check_lead_data_form($id, $params) {
   // Date check
   if (($datealarm != '') && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
     $err['msg'] = "$l_alarm : $datealarm : $l_invalid_date"; 
+    return false;
+  }
+  
+  // Company check
+  if (trim($company) == '') {
+    $err['msg'] = $l_fill_company;
     return false;
   }
 

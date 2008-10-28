@@ -27,6 +27,7 @@ $l_no_found = "Aucune piste ne correspond à ces critères !";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Vous devez renseigner le Nom avant de valider.";
 $l_fill_datealarm = "Vous devez renseigner la date alarme avant de valider.";
+$l_fill_company = "Vous devez renseigner la société avant de valider !";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 $l_delete_confirm = "Confirmer la suppression de la piste ?";
 

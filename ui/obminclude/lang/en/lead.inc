@@ -29,6 +29,7 @@ $l_no_found = "No lead found matching the query !";
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_name = "You have to fill the Name !";
 $l_fill_datealarm = "You have to fill the Alarm date !";
+$l_fill_company = "You have to fill the Company !";
 $l_invalid_date = "Invalid Date Format (MM/JJ/AAAA or AAAA-MM-JJ).";
 $l_delete_confirm = "Confirm the lead deletion ?";
 
