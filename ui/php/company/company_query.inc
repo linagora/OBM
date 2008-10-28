@@ -478,7 +478,7 @@ function run_query_company_update($cid, $company) {
     company_web='$web',
     company_email='$email',
     company_comment='$comment'
-  WHERE company_id $cid_sql' 
+  WHERE company_id $cid_sql
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_update()');
