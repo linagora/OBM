@@ -2912,7 +2912,7 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     $reftask_list
     </tbody>
     </table>
-    <form name=\"form_reftask_new\" method=\"post\" action=\"\">
+    <form name=\"form_reftask_new\" method=\"post\" action=\"\" onsubmit=\"return (check_task_new(this) && check_tasktype(this.sel_tasktype))\">
     <table>
     <thead>
     <tr>
@@ -2930,7 +2930,7 @@ function dis_project_reftask_form($reftask_q,$tasktype_q) {
     <tfoot>
     <tr>
     <td>
-    <input type=\"submit\" name=\"sub_reftask\" value=\"$l_c_insert\" onclick=\"if (check_category_new(this.form.tf_reftask_label,'$l_reftask') && check_tasktype(this.form.sel_tasktype)) return true; else return false;\" />
+    <input type=\"submit\" name=\"sub_reftask\" value=\"$l_c_insert\" />
     </td>
     </tr>
     </table>
