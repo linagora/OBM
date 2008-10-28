@@ -15,6 +15,12 @@ echo "dbtype: ${dbtype}"
 
 locate_php_interp
 
-`dirname $0`/update-2.1-2.2.${dbtype}.sh
+`dirname $0`/update-2.1-2.2.${dbtype}.sh || {
+  #echo "TEST Error running update-2.1-2.2.${dbtype}.sh abort."
+  echo "Error running update-2.1-2.2.sh abort."
+  exit 1
+}
 
 $PHP `dirname $0`/update-2.1-2.2.php
+
+exit 0
