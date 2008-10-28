@@ -22,6 +22,9 @@ $l_payment_account = "Account ";
 $l_paid = "Paid";
 $l_unpaid = "Not Paid";
 $l_already_paid = "Already paid";
+$l_kind_manage = "Payment kinds management";
+$l_kind_label = "Label";
+$l_kind_short_label = "Short label";
 
 // invoice
 $l_no_invoice = "No invoices related to this payment";
@@ -37,6 +40,7 @@ $l_update = "Update Payment";
 $l_delete = "Delete Payment";
 $l_delete_confirm = "Confirm the deletion of this payment ?";
 $l_delete_invoice = "Delete";
+$l_kind_delete = "Delete payment kind";
 
 $l_payment_infos = "View Payment";
 $l_payment_mod = "Modify Payment";
@@ -54,6 +58,10 @@ $l_cant_delete = "The payment can't be deleted !";
 $l_can_delete = "The payment can be deleted.";
 $l_invoice_added = "The connection with the invoice has been created";
 $l_no_invoice_added = "The connection with the invoice has failed !";
+$l_err_kind = "Payment kind has not been added !;
+$l_err_del_kind = "Payment kind has not been deleted !";
+$l_fill_kind_label = "The payment kind label have to be filled !";
+$l_fill_kind_short_label = "The payment kind short label have to be filled !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_no_number = "\\nThe payment number is not valid!";

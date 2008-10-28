@@ -28,6 +28,24 @@ function check_payment (f_pay) {
    return true;
 }
 
-
+// Vérification à l'insertion d'un nouveau mode de paiement
+function check_kind_new(form) {
+  var errMsg='';
+  var ret=true;
+  if (form.tf_kind_label.value == '') {
+    errMsg += '$l_j_fill_kind_label\\n';
+    ret = false;
+  }
+  if (form.tf_kind_short_label.value == '') {
+    errMsg += '$l_j_fill_kind_short_label';
+    ret = false;
+  }
+  
+  if (!ret) {
+    alert(errMsg);
+  }
+  
+  return ret;
+}
 ";
 ?>

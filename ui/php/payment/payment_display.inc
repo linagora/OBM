@@ -862,5 +862,111 @@ function dis_payment_display_pref ($prefs) {
   return $block;
 }
 
+/**
+ * Display the payment administration panel
+ *
+ * @return String $block
+ */
+function dis_payment_admin_index() {
+  $kinds = get_payment_kinds();
+  $block = dis_payment_kinds_form($kinds);
+  return $block;
+}
+
+/**
+ * Display the kinds of payment form
+ *
+ * @param array $kinds
+ * @return String $block
+ */
+function dis_payment_kinds_form($kinds) {
+  global $l_kind_manage;
+  global $l_kind_label, $l_kind_short_label;
+  global $l_kind_delete;
+  global $ico_delete, $ico_ok;
+  global $l_c_j_update, $l_c_insert, $l_c_new;
+  
+  // get current domain id
+  $domain_id = $_SESSION['obm']['domain_id'];
+  
+  foreach($kinds as $kind) {
+    $k_id = $kind['id'];
+    $k_label = $kind['label'];
+    $k_short_label = $kind['shortlabel'];
+    
+    $kinds_list .= "
+    <tr>
+    <td>
+    <input type=\"hidden\" id=\"kind_$k_id\" value=\"$k_id\" />
+    <a href=\"?action=kind_delete&amp;kind=$k_id\">
+    <img src=\"$ico_delete\" alt=\"$l_kind_delete\" title=\"$l_kind_delete\" />
+    </a>
+    </td>
+    <td>
+    <input type=\"text\" id=\"tf_kind_label_$k_id\" value=\"$k_label\" maxlength=\"40\" />
+    </td>
+    <td>
+    <input type=\"text\" id=\"tf_kind_short_label_$k_id\" value=\"$k_short_label\" maxlength=\"3\" />
+    </td>
+    <td>
+    <a href=\"#\" onclick=\"return updateLine($k_id, 'kind')\">
+    <img src=\"$ico_ok\" alt=\"$l_c_j_update\" title=\"$l_c_j_update\" />
+    </a>
+    </td>
+    </tr>
+    ";
+    
+  }
+  
+  $block = "
+  	<div class=\"detail admin\">
+ 		<h1>$l_kind_manage</h1>
+ 		<form id=\"form_kind_update\" method=\"post\" action=\"?action=kind_update\">
+ 		<input type=\"hidden\" name=\"tf_kind_label\" value=\"\" />
+ 		<input type=\"hidden\" name=\"tf_kind_short_label\" value=\"\" />
+ 		<input type=\"hidden\" name=\"kind\" value=\"\" />
+ 		</form>
+ 		
+ 		<table>
+ 		<thead>
+ 		  <tr>
+ 		  <td colspan=\"4\">&nbsp;</td>
+ 		  </tr>
+ 		  <tr>
+ 		  <td colspan=\"2\">$l_kind_label</td>
+ 		  <td colspan=\"2\">$l_kind_short_label</td>
+ 		  </tr>
+ 		</thead>
+ 		<tbody>$kinds_list</tbody>
+ 		</table>
+ 		
+ 		<form name=\"form_kind_new\" method=\"post\" action=\"\" onsubmit=\"return check_kind_new(this)\">
+ 		<table>
+ 		<thead>
+ 		<tr>
+ 		<td colspan=\"2\">$l_c_new</td>
+ 		</tr>
+ 		</thead>
+ 		<tbody>
+ 		<tr>
+ 		<td>$l_kind_label <br /> <input type=\"text\" name=\"tf_kind_label\" maxlength=\"40\" /></td>
+ 		<td>$l_kind_short_label <br /> <input type=\"text\" name=\"tf_kind_short_label\" maxlength=\"3\" /></td>
+ 		</tr>
+ 		</tbody>
+ 		<tfoot>
+ 		<tr>
+ 		<td colspan=\"2\">
+ 		<input type=\"submit\" name=\"sub_kind\" value=\"$l_c_insert\" />
+ 		</td>
+ 		</tr>
+ 		</tfoot>
+ 		</table>
+ 		<input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
+ 		</form>
+ 	</div>
+  ";
+ 		
+  return $block;
+}
 
 ?>

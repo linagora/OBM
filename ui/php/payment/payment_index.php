@@ -172,8 +172,54 @@ if ($action == 'index') {
   update_display_pref($params);
   $prefs = get_display_pref($obm['uid'], 'payment', 1);
   $display['detail'] = dis_payment_display_pref($prefs);
+  
+} elseif ($action == 'admin') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_payment_admin_index();
+  
+} elseif ($action == 'kind_update') {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_payment_kind($params)) {
+    $retour = run_query_payment_kind_update($params);
+    if ($retour) {
+      $display['msg'] .= display_ok_msg("$l_kind : $l_update_ok");
+      $display['detail'] = dis_payment_admin_index();
+    } else {
+      $display['msg'] .= display_err_msg("$l_err_kind");
+      $display['detail'] = dis_payment_admin_index();
+    }
+  } else {
+    $display['msg'] .= display_warn_msg("$l_kind : $err[msg]");
+    $display['detail'] = dis_payment_admin_index();
+  }
+  
+} elseif ($action == 'kind_insert') {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_payment_kind($params)) {
+    $retour = run_query_payment_kind_insert($params);
+    if ($retour) {
+      $display['msg'] .= display_ok_msg("$l_kind : $l_insert_ok");
+      $display['detail'] = dis_payment_admin_index();
+    } else {
+      $display['msg'] .= display_err_msg("$l_err_kind");
+      $display['detail'] = dis_payment_admin_index();
+    }
+  } else {
+    $display['msg'] .= display_warn_msg("$l_kind : $err[msg]");
+    $display['detail'] = dis_payment_admin_index();
+  }
+  
+} elseif ($action == 'kind_delete') {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_payment_kind_delete($params);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("$l_kind : $l_delete_ok");
+    $display['detail'] = dis_payment_admin_index();
+  } else {
+    $display['msg'] .= display_err_msg("$l_err_del_kind");
+    $display['detail'] = dis_payment_admin_index();
+  }
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
@@ -380,6 +426,27 @@ function get_payment_action() {
     'Right'    => $cright_read, 
     'Condition'=> array ('None') 
                                       	        );
+
+// Kind update
+  $actions['payment']['kind_update'] = array (
+    'Url'    => "$path/payment/payment_index.php?action=kind_update",
+    'Right'  => $cright_write_admin,
+    'Condition'  => array('None')
+  );
+  
+  // Kind Insert
+  $actions['payment']['kind_insert'] = array (
+    'Url'    => "$path/payment/payment_index.php?action=kind_insert",
+    'Right'  => $cright_write_admin,
+    'Condition'  => array('None')
+  );
+  
+  // Kind Delete
+  $actions['payment']['kind_delete'] = array (
+    'Url'    => "$path/payment/payment_index.php?action=kind_delete",
+    'Right'  => $cright_write_admin,
+    'Condition'  => array('None')
+  );
 
 }
 

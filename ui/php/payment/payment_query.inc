@@ -824,5 +824,76 @@ function run_query_payment_delete($p_id) {
   return $retour;
 }
 
+/**
+ * Check payment kinds values
+ *
+ * @param unknown_type $params
+ */
+function check_payment_kind($params) {
+  global $err;
+  global $l_fill_kind_label, $l_fill_kind_short_label;
+  
+  $label = $params['kind_label'];
+  $short_label = $params['kind_short_label'];
+  
+  if (trim($label) == '') {
+    $err['msg'] .= $l_fill_kind_label;
+    return false;
+  }
+  if (trim($short_label) == '') {
+    $err['msg'] .= $l_fill_kind_short_label;
+    return false;
+  }
+  
+  return true;
+}
+
+/**
+ * Update Payment kind
+ *
+ * @param array $params
+ */
+function run_query_payment_kind_update($params) {
+  $id = $params['kind'];
+  $label = $params['kind_label'];
+  $short_label = $params['kind_short_label'];
+  
+  $k_id = sql_parse_id($id, true);
+  $domain_id = sql_multidomain('paymentkind');
+  $query = "UPDATE PaymentKind SET paymentkind_label='$label', paymentkind_shortlabel='$short_label'
+  			WHERE paymentkind_id $k_id $domain_id";
+  
+  $obm_q = new DB_OBM;
+  
+  return $obm_q->query($query);
+}
+
+/**
+ * Insert Payment kind
+ *
+ * @param unknown_type $params
+ */
+function run_query_payment_kind_insert($params) {
+  $label = $params['kind_label'];
+  $short_label = $params['kind_short_label'];
+  
+  $domain_id = (isset($_SESSION['obm']['domain_id']) ? $_SESSION['obm']['domain_id'] : 'NULL');
+  
+  $query = "INSERT INTO PaymentKind (paymentkind_shortlabel, paymentkind_label, paymentkind_domain_id)
+  			VALUES ('$short_label', '$label', $domain_id)";
+  			
+  $obm_q = new DB_OBM;
+  
+  return $obm_q->query($query);
+}
+
+function run_query_payment_kind_delete($params) {
+  $id = $params['kind'];
+  $k_id = sql_parse_id($id, true);
+  $query = "DELETE FROM Paymentkind WHERE paymentkind_id $k_id";
+  
+  // TODO Delete payment kind only if it is not used
+  return false;
+}
 
 ?>
