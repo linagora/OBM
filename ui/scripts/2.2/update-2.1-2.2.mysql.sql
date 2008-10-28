@@ -142,6 +142,7 @@ ALTER TABLE Todo MODIFY COLUMN todo_domain_id int(8) NOT NULL ;
 ALTER TABLE UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
 ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
 ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
+ALTER TABLE UserObmPref MODIFY COLUMN userobmpref_user_id int(8) NULL ;
 ALTER TABLE of_usergroup MODIFY COLUMN of_usergroup_group_id int(8) NOT NULL ;
 ALTER TABLE of_usergroup MODIFY COLUMN of_usergroup_user_id int(8) NOT NULL ;
 ALTER TABLE Category MODIFY COLUMN category_usercreate int(8) DEFAULT NULL;
@@ -1507,11 +1508,8 @@ ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_user_id_userobm_id_fkey FOR
 -- UPDATE Contact SET contact_birthday_id = NULL WHERE contact_birthday_id NOT IN (SELECT calendarevent_id FROM CalendarEvent) AND contact_birthday_id IS NOT NULL;
 ALTER TABLE Contact ADD CONSTRAINT contact_birthday_id_calendarevent_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES CalendarEvent(calendarevent_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
--- module 'profile'
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
-
 -- User prefs 
-INSERT INTO UserObmPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
 
 -- Timezone 
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
