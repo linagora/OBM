@@ -69,7 +69,6 @@ ALTER TABLE DefaultOdtTemplate MODIFY COLUMN defaultodttemplate_domain_id int(8)
 ALTER TABLE DeletedContact MODIFY COLUMN deletedcontact_contact_id int(8) NOT NULL ;
 ALTER TABLE DeletedTodo MODIFY COLUMN deletedtodo_todo_id int(8) NOT NULL ;
 ALTER TABLE DeletedUser MODIFY COLUMN deleteduser_user_id int(8) NOT NULL ;
-ALTER TABLE DisplayPref MODIFY COLUMN display_user_id int(8)  default NULL;
 ALTER TABLE Document MODIFY COLUMN document_domain_id int(8) NOT NULL ;
 ALTER TABLE DocumentMimeType MODIFY COLUMN documentmimetype_domain_id int(8) NOT NULL ;
 ALTER TABLE DomainMailServer MODIFY COLUMN domainmailserver_domain_id int(8) NOT NULL ;

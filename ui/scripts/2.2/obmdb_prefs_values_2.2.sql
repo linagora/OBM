@@ -40,6 +40,9 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Date
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_date','Y-m-d');
 
+-- Date
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
+
 -- Comment display order
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_commentorder','0');
 
