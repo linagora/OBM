@@ -1508,3 +1508,6 @@ ALTER TABLE Contact ADD CONSTRAINT contact_birthday_id_calendarevent_id_fkey FOR
 
 -- module 'profile'
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
+
+-- Timezone 
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');

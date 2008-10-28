@@ -40,7 +40,7 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Date
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_date','Y-m-d');
 
--- Date
+-- Timezone 
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
 
 -- Comment display order
