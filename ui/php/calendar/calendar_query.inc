@@ -284,6 +284,17 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+
+	if ($retour) {
+		$now = date('Y-m-d H:i:s');
+		$query = "UPDATE CalendarEvent
+							SET calendarevent_timeupdate = '$now'
+							WHERE calendarevent_id = '$event_id'";
+
+		display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');
+	 	$retour = $obm_q->query($query);
+  }
+  
   return $retour;    
 }
 
