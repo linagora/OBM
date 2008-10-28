@@ -163,6 +163,7 @@ $ico_organizationalchart_view_current = "$theme_path/ico_organizationalchart_vie
 
 // Company Icons
 $ico_clipboard      = "$theme_path/ico_clipboard.gif";
+$ico_google         = "$theme_path/ico_google.jpg";
 
 
 // Project Icons

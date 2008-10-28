@@ -807,7 +807,7 @@ function html_company_consult($co_q) {
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult_address($co_q) {
-  global $ico_contact, $ico_contact_new;
+  global $ico_contact, $ico_contact_new, $ico_google;
   global $l_name, $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment;
   global $l_company, $l_coord,$ico_mail,$ico_web;
@@ -919,6 +919,8 @@ function html_company_consult_address($co_q) {
   } else {
     $link_web = '&nbsp;';
   }
+
+  $map_address = urlencode("$ad1 $zip $town $ctry_name");
   
   // --- HTML Template --------------------------------------------------------
 

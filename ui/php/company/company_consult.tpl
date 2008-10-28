@@ -4,6 +4,7 @@
     <tr>
       <th>$l_address 1
         <a href="#" onclick="company_copy_clip($copy);return false;"  title="Copy" ><img alt="Copy" src="$ico_clipboard" /></a>
+        <a target="_blank" href="http://maps.google.fr/maps?f=q&amp;hl=fr&amp;q=$map_address&amp;t=h&amp;z=14&amp;source=embed"><img alt="Map" src="$ico_google"></a>
         :</th>
       <td>$ad1</td>
     </tr>
