@@ -38,8 +38,10 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   if (function_exists($calendar_function)) {
     $block = $calendar_function($calendar, $calendar_entity,$writable_entity,$date);
     $block .= dis_calendar_quick_form($calendar);
-    // $display['print_url'] = "$path/calendar/calendar_index.php?cal_view=printable&amp;date=".$calendar['date']->getURL();
-    $display['print_url'] = "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=".$calendar['date']->getURL()."&amp;output_target=print";
+    $calendar_function_pdf = $calendar_function."_pdf";
+    if (function_exists($calendar_function_pdf)) {
+      $display['print_url'] = "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=".$calendar['date']->getURL()."&amp;output_target=print";
+    }
 
   } else {
     $block .= dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity);
