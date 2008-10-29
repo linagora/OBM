@@ -43,10 +43,6 @@ obm-contact = false
 ; Multi-domain disabled by default
 singleNameSpace = false
 ;
-; renameUserMailbox mode allow to rename user mailbox
-; need Cyrus 2.2 or greater and the Cyrus parameter 'allowusermoves: yes'
-renameUserMailbox = false
-;
 ; backupRoot is the directory used to store backup data
 backupRoot = "/var/lib/obm/backup"
 ;
@@ -58,7 +54,7 @@ backupRoot = "/var/lib/obm/backup"
 logLevel = 2
 ;
 ; LDAP server address
-ldapServer = localhost
+ldapServer = ldap://localhost
 ;
 ; LDAP Root
 ; Exemple : 'aliasource,local' means that the root DN is: 'dc=aliasource,dc=local' 
