@@ -1,3 +1,12 @@
+2008-10-30  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Fix dt start calculation
+	
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager.addItem),
+	(CalendarManager.obmEventToFoundationCalendar),
+	(CalendarManager.parseStart):
+
 2008-07-11  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	Use new obm-sync client

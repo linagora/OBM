@@ -204,8 +204,8 @@ public class CalendarManager extends ObmManager {
 		Event evt = null;
 
 		try {
-			String uid = binding.createEvent(token, calendar,
-					foundationCalendarToObmEvent(event, type));
+			Event forCreate = foundationCalendarToObmEvent(event, type);
+			String uid = binding.createEvent(token, calendar, forCreate);
 			evt = binding.getEventFromId(token, calendar, uid);
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
@@ -315,12 +315,11 @@ public class CalendarManager extends ObmManager {
 
 		event.getUid().setPropertyValue(obmevent.getUid());
 
-		logger.info("bd -> pda - obmToFound: " + obmevent.getTitle()
-				+ " date: " + obmevent.getDate());
+		logger
+				.info("bd -> pda - obmToFound: " + obmevent.getTitle()
+						+ " date: " + obmevent.getDate() + " "
+						+ obmevent.getDuration());
 		Date dstart = obmevent.getDate();
-
-		logger.info("bd -> pda - utcFormat : "
-				+ CalendarHelper.getUTCFormat(dstart));
 
 		Date dend = null;
 		if (!obmevent.isAllday()) {
@@ -351,6 +350,7 @@ public class CalendarManager extends ObmManager {
 			event.getDtEnd()
 					.setPropertyValue(CalendarHelper.getUTCFormat(dend));
 		}
+		logger.info("computed dt end: " + dend);
 
 		if (obmevent.getAlert() != -1 && obmevent.getAlert() != 0) {
 			com.funambol.common.pim.calendar.Reminder remind = new com.funambol.common.pim.calendar.Reminder();
@@ -561,7 +561,7 @@ public class CalendarManager extends ObmManager {
 		String dtStart = foundation.getDtStart().getPropertyValueAsString();
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		Date utcDate = CalendarHelper.getDateFromUTCString(dtStart);
-
+		cal.setTime(utcDate);
 		event.setDate(utcDate);
 		return cal.getTime();
 	}
