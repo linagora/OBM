@@ -215,6 +215,7 @@ if (($action == 'index') || ($action == '')) {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display['head'] = display_head($l_import);
+$display["header"] = display_menu($module);
 $display['end'] = display_end();
 
 display_page($display);
