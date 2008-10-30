@@ -1511,3 +1511,42 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 
 -- Timezone 
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
+
+
+
+-- Char to boolean
+ALTER TABLE userobm ALTER COLUMN userobm_archive DROP DEFAULT;
+ALTER TABLE userobm ALTER COLUMN userobm_archive TYPE SMALLINT USING CASE userobm_archive WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE company ALTER COLUMN company_archive DROP DEFAULT;
+ALTER TABLE company ALTER COLUMN company_archive TYPE SMALLINT USING CASE company_archive WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE contact ALTER COLUMN contact_mailing_ok DROP DEFAULT;
+ALTER TABLE contact ALTER COLUMN contact_mailing_ok TYPE SMALLINT USING CASE contact_mailing_ok WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE contact ALTER COLUMN contact_newsletter DROP DEFAULT;
+ALTER TABLE contact ALTER COLUMN contact_newsletter TYPE SMALLINT USING CASE contact_newsletter WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE contact ALTER COLUMN contact_archive DROP DEFAULT;
+ALTER TABLE contact ALTER COLUMN contact_archive TYPE SMALLINT USING CASE contact_archive WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE lead ALTER COLUMN lead_archive DROP DEFAULT;
+ALTER TABLE lead ALTER COLUMN lead_archive TYPE SMALLINT USING CASE lead_archive WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE parentdeal ALTER COLUMN parentdeal_archive DROP DEFAULT;
+ALTER TABLE parentdeal ALTER COLUMN parentdeal_archive TYPE SMALLINT USING CASE parentdeal_archive WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE deal ALTER COLUMN deal_archive DROP DEFAULT;
+ALTER TABLE deal ALTER COLUMN deal_archive TYPE SMALLINT USING CASE deal_archive WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE project ALTER COLUMN project_archive DROP DEFAULT;
+ALTER TABLE project ALTER COLUMN project_archive TYPE SMALLINT USING CASE project_archive WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE incident ALTER COLUMN incident_archive DROP DEFAULT;
+ALTER TABLE incident ALTER COLUMN incident_archive TYPE SMALLINT USING CASE incident_archive WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE invoice ALTER COLUMN invoice_archive DROP DEFAULT;
+ALTER TABLE invoice ALTER COLUMN invoice_archive TYPE SMALLINT USING CASE invoice_archive WHEN '1' THEN 1 ELSE 0 END;
+
+ALTER TABLE payment ALTER COLUMN payment_checked DROP DEFAULT;
+ALTER TABLE payment ALTER COLUMN payment_checked TYPE SMALLINT USING CASE payment_checked WHEN '1' THEN 1 ELSE 0 END;
