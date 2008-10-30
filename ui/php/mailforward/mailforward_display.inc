@@ -125,7 +125,7 @@ function html_forward_form($usr_q, $forward, $field='') {
 
   $block = "
     <form method=\"post\" name=\"form_forward\"
-      onSubmit=\"if (check_user(this)) return true; else return false;\"
+      onSubmit=\"return check_mailforward(this);\"
       action=\"" . url_prepare('mailforward_index.php') . "\">
 
     <fieldset class=\"detail extra\">

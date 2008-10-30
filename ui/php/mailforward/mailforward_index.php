@@ -22,6 +22,7 @@ page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => '
 include("$obminclude/global_pref.inc");
 require('mailforward_display.inc');
 require('mailforward_query.inc');
+require('mailforward_js.inc');
 
 if ($action == '') $action = 'index';
 get_forward_action();
