@@ -12,6 +12,7 @@ BEGIN;
 -------------------------------------------------------------------------------
 -- Global Information table
 -------------------------------------------------------------------------------
+
 --
 -- Table structure for table 'ObmInfo'
 --
@@ -1993,7 +1994,258 @@ CREATE TABLE ProfilePropertyValue (
 	PRIMARY KEY (profilepropertyvalue_id)
 );
 
+--
+-- Table structure for table `Service`
+--
 
+CREATE TABLE Service (
+  service_id                                    serial,
+  service_key                                   varchar(255),
+  UNIQUE (service_key),
+  PRIMARY KEY (service_id)
+);
+
+--
+-- Table structure for table `ServiceProperty`
+--
+CREATE TABLE ServiceProperty (
+  serviceproperty_id                            serial,
+  serviceproperty_service_id                    integer NOT NULL,
+  serviceproperty_key                           varchar(255),
+  serviceproperty_default                       text,
+  serviceproperty_type                          varchar(255),
+  serviceproperty_min                           smallint,
+  serviceproperty_max                           smallint,
+  UNIQUE (serviceproperty_key),
+  PRIMARY KEY (serviceproperty_id),
+  CONSTRAINT serviceproperty_service_id_service_id_fkey FOREIGN KEY (serviceproperty_service_id) REFERENCES Service (service_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table `ServicePropertyDomain`
+--
+CREATE TABLE ServicePropertyDomain (
+  servicepropertydomain_id                      integer NOT NULL,
+  PRIMARY KEY (servicepropertydomain_id),
+  CONSTRAINT servicepropertydomain_id_serviceproperty_id_fkey FOREIGN KEY (servicepropertydomain_id) REFERENCES ServiceProperty (serviceproperty_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table `ServicePropertyHost`
+--
+CREATE TABLE ServicePropertyHost (
+  servicepropertyhost_id                        integer NOT NULL,
+  PRIMARY KEY (servicepropertyhost_id),
+  CONSTRAINT servicepropertyhost_id_serviceproperty_id_fkey FOREIGN KEY (servicepropertyhost_id) REFERENCES ServiceProperty (serviceproperty_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table `DomainServicePropertyValue`
+--
+CREATE TABLE DomainServiceValue (
+  domainservicevalue_serviceproperty_id integer NOT NULL,
+  domainservicevalue_domain_id          integer NOT NULL,
+  domainservicevalue_value              text,
+  PRIMARY KEY (domainservicevalue_serviceproperty_id,domainservicevalue_domain_id),
+  CONSTRAINT domainservicevalue_serviceproperty_id_serviceproperty_id_fkey FOREIGN KEY (domainservicevalue_serviceproperty_id) REFERENCES ServicePropertyDomain (servicepropertydomain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT domainservicevalue_domain_id_domain_id_fkey FOREIGN KEY (domainservicevalue_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table `HostServicePropertyValue`
+--
+CREATE TABLE HostServiceValue (
+  hostservicevalue_serviceproperty_id   integer,
+  hostservicevalue_host_id              integer,
+  hostservicevalue_value                text,
+  PRIMARY KEY (hostservicevalue_serviceproperty_id,hostservicevalue_host_id),
+  CONSTRAINT hostservicevalue_serviceproperty_id_serviceproperty_id_fkey FOREIGN KEY (hostservicevalue_serviceproperty_id) REFERENCES ServicePropertyHost (servicepropertyhost_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT hostservicevalue_host_id_host_id_fkey FOREIGN KEY (hostservicevalue_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table `ServiceDomain`
+--
+CREATE TABLE ServiceDomain (
+  servicedomain_id                              integer,
+  PRIMARY KEY (servicedomain_id),
+  CONSTRAINT servicedomain_id_service_id_fkey FOREIGN KEY (servicedomain_id) REFERENCES Service (service_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table `ServiceHost`
+--
+CREATE TABLE ServiceHost (
+  servicehost_id                                integer,
+  PRIMARY KEY (servicehost_id),
+  CONSTRAINT servicehost_id_service_id_fkey FOREIGN KEY (servicehost_id) REFERENCES Service (service_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table `DomainService`
+--
+CREATE TABLE DomainService (
+  domainservice_service_id                      integer,
+  domainservice_domain_id                       integer,
+  PRIMARY KEY (domainservice_service_id,domainservice_domain_id),
+  CONSTRAINT domainservice_service_id_domainservice_domain_id_fkey FOREIGN KEY (domainservice_service_id) REFERENCES ServiceDomain (servicedomain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT domainservice_domain_id_domain_id_fkey FOREIGN KEY (domainservice_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table `DomainService`
+--
+CREATE TABLE HostService (
+  hostservice_service_id                        integer,
+  hostservice_host_id                           integer,
+  PRIMARY KEY (hostservice_service_id,hostservice_host_id),
+  CONSTRAINT hostservice_service_id_hostservice_host_id_fkey FOREIGN KEY (hostservice_service_id) REFERENCES ServiceHost (servicehost_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT hostservice_host_id_host_id_fkey FOREIGN KEY (hostservice_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+
+---
+--- Address
+---
+CREATE TABLE Address (
+  address_id                                    serial,
+  address_domain_id                             integer NOT NULL,
+  address_street1                               varchar(255),
+  address_street2                               varchar(255),
+  address_street3                               varchar(2555),
+  address_zipcode                               varchar(14),
+  address_town                                  varchar(128),
+  address_expresspostal                         varchar(16),
+  address_country                               char(2),
+  address_im                                    varchar(255),
+  address_label                                 varchar(255),
+  PRIMARY KEY (address_id),
+  CONSTRAINT address_domain_id_domain_id_fkey FOREIGN KEY (address_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- Phone
+---
+CREATE TABLE Phone (
+  phone_id                                      serial,
+  phone_domain_id                               integer NOT NULL,  
+  phone_label                                   varchar(255) NOT NULL,
+  phone_number                                  varchar(32),
+  PRIMARY KEY (phone_id),
+  CONSTRAINT phone_domain_id_domain_id_fkey FOREIGN KEY (phone_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- Website
+---
+CREATE TABLE Website (
+  website_id                                    serial,
+  website_domain_id                             integer NOT NULL,  
+  website_label                                 varchar(255) NOT NULL,
+  website_number                                varchar(32),
+  PRIMARY KEY (website_id),
+  CONSTRAINT website_domain_id_domain_id_fkey FOREIGN KEY (website_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- Email
+---
+CREATE TABLE Email (
+  email_id                                      serial,
+  email_domain_id                               integer NOT NULL,
+  email_label                                   varchar(255) NOT NULL,
+  email_address                                 varchar(255),
+  PRIMARY KEY (email_id),
+  CONSTRAINT email_domain_id_domain_id_fkey FOREIGN KEY (email_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+---
+--- ContactAddress
+---
+CREATE TABLE ContactAddress (
+  contactaddress_address_id                     integer NOT NULL,
+  contactaddress_contact_id                     integer NOT NULL,
+  PRIMARY KEY(contactaddress_contact_id,contactaddress_address_id),
+  CONSTRAINT contactaddress_address_id_address_id_fkey FOREIGN KEY (contactaddress_address_id) REFERENCES Address (address_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contactaddress_contact_id_contact_id_fkey FOREIGN KEY (contactaddress_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- ContactPhone
+---
+CREATE TABLE ContactPhone (
+  contactphone_phone_id                         integer NOT NULL,
+  contactphone_contact_id                       integer NOT NULL,
+  PRIMARY KEY(contactphone_contact_id,contactphone_phone_id),
+  CONSTRAINT contactphone_phone_id_phone_id_fkey FOREIGN KEY (contactphone_phone_id) REFERENCES Phone (phone_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contactphone_contact_id_contact_id_fkey FOREIGN KEY (contactphone_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- ContactWebsite
+---
+CREATE TABLE ContactWebsite (
+  contactwebsite_website_id                     integer NOT NULL,
+  contactwebsite_contact_id                     integer NOT NULL,
+  PRIMARY KEY(contactwebsite_contact_id,contactwebsite_website_id),
+  CONSTRAINT contactwebsite_website_id_website_id_fkey FOREIGN KEY (contactwebsite_website_id) REFERENCES Website (website_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contactwebsite_contact_id_contact_id_fkey FOREIGN KEY (contactwebsite_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- ContactEmail
+---
+CREATE TABLE ContactEmail (
+  contactemail_email_id                         integer NOT NULL,
+  contactemail_contact_id                       integer NOT NULL,
+  PRIMARY KEY(contactemail_contact_id,contactemail_email_id),
+  CONSTRAINT contactemail_email_id_email_id_fkey FOREIGN KEY (contactemail_email_id) REFERENCES Email (email_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contactemail_contact_id_contact_id_fkey FOREIGN KEY (contactemail_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- CompanyAddress
+---
+CREATE TABLE CompanyAddress (
+  companyaddress_address_id                     integer NOT NULL,
+  companyaddress_company_id                     integer NOT NULL,
+  PRIMARY KEY(companyaddress_company_id,companyaddress_address_id),
+  CONSTRAINT companyaddress_address_id_address_id_fkey FOREIGN KEY (companyaddress_address_id) REFERENCES Address (address_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT companyaddress_company_id_company_id_fkey FOREIGN KEY (companyaddress_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- CompanyPhone
+---
+CREATE TABLE CompanyPhone (
+  companyphone_phone_id                         integer NOT NULL,
+  companyphone_company_id                       integer NOT NULL,
+  PRIMARY KEY(companyphone_company_id,companyphone_phone_id),
+  CONSTRAINT companyphone_phone_id_phone_id_fkey FOREIGN KEY (companyphone_phone_id) REFERENCES Phone (phone_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT companyphone_company_id_company_id_fkey FOREIGN KEY (companyphone_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- CompanyWebsite
+---
+CREATE TABLE CompanyWebsite (
+  companywebsite_website_id                     integer NOT NULL,
+  companywebsite_company_id                     integer NOT NULL,
+  PRIMARY KEY(companywebsite_company_id,companywebsite_website_id),
+  CONSTRAINT companywebsite_website_id_website_id_fkey FOREIGN KEY (companywebsite_website_id) REFERENCES Website (website_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT companywebsite_company_id_company_id_fkey FOREIGN KEY (companywebsite_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- CompanyEmail
+---
+CREATE TABLE CompanyEmail (
+  companyemail_email_id                         integer NOT NULL,
+  companyemail_company_id                       integer NOT NULL,
+  PRIMARY KEY(companyemail_company_id,companyemail_email_id),
+  CONSTRAINT companyemail_email_id_email_id_fkey FOREIGN KEY (companyemail_email_id) REFERENCES Email (email_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT companyemail_company_id_company_id_fkey FOREIGN KEY (companyemail_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 --
 -- Foreign Keys
 --
