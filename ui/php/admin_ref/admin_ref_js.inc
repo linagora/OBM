@@ -149,7 +149,7 @@ function check_admin_ref_tt_upd(form, sel_del_tt)
 ///////////////////////////////////////////////////////////////////////////////
 function check_admin_ref_tt_new(form)
 {
-   if (form.tf_label.value != \"\")
+   if (form.tf_tt_label.value != \"\")
       return true;
    else
    {
