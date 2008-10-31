@@ -432,6 +432,8 @@ CREATE TABLE Contact (
   contact_comment2             text,
   contact_comment3             text,
   contact_birthday_id          integer,
+  contact_collected            boolean default FALSE, 
+  contact_origin               varchar(255) not null, 
   PRIMARY KEY (contact_id)
 );
 

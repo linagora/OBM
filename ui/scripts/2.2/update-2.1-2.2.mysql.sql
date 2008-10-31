@@ -349,6 +349,11 @@ ALTER TABLE DisplayPref ADD COLUMN display_id int(8) auto_increment PRIMARY KEY 
 
 -- Contact
 ALTER TABLE Contact ADD COLUMN contact_birthday_id int(8) default NULL;
+ALTER TABLE Contact ADD COLUMN contact_collected int(1) default false;
+ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
+UPDATE Contact SET contact_origin='obm21';
+ALTER TABLE Contact MODIFY COLUMN contact_origin VARCHAR(255) NOT NULL;
+
 
 -- Set Defaults 
 ALTER TABLE Account MODIFY COLUMN account_domain_id int(8) NOT NULL ;

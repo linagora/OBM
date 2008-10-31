@@ -270,6 +270,11 @@ ALTER TABLE OGroup ALTER COLUMN ogroup_parent_id DROP NOT NULL;
 
 -- Contact
 ALTER TABLE Contact ADD COLUMN contact_birthday_id INTEGER default NULL;
+ALTER TABLE Contact ADD COLUMN contact_collected BOOLEAN default FALSE;
+ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
+UPDATE Contact SET contact_origin='obm21';
+ALTER TABLE Contact ALTER COLUMN contact_origin SET DEFAULT NOT NULL;
+
 
 -- CalendarEvent
 

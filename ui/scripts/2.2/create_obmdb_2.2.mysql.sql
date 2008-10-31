@@ -599,6 +599,8 @@ CREATE TABLE Contact (
   contact_comment text,
   contact_comment2 text,
   contact_comment3 text,
+  contact_collected int(1) default 0,
+  contact_origin varchar(255) not null, 
   PRIMARY KEY  (contact_id),
   KEY contact_domain_id_domain_id_fkey (contact_domain_id),
   KEY contact_company_id_company_id_fkey (contact_company_id),
