@@ -442,7 +442,7 @@ function html_calendar_bar_date_selector($calendar) {
   $current = clone $date;
   $current->setDay(1)->addDay(1)->subWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
-  $end->addMonth(1)->setDay(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+  $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   while($current->compare($end) < 0) {
     if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "<tr>\n";
     $day = $current->get(Of_Date::DAY);
@@ -603,7 +603,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
 
   $current = clone $date;
   $end = clone $calendar['date'];
-  $end->addMonth(1)->setDay(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+  $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   while($current->compare($end) < 0) {
     $iso = $current->getURL();
     $day = $current->get(Of_Date::DAY);
@@ -4021,7 +4021,7 @@ function dis_calendar_month_agenda_pdf($calendar, $calendar_entity) {
   $date = clone $calendar['date'];
   $date->setDay(1)->addDay(1)->subWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $calendar['date'];
-  $end->addMonth(1)->setDay(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+  $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $category_filter = $calendar['category_filter'];
   $status = array('A', 'W');
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter);
@@ -4646,7 +4646,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $date = clone $this->calendar['date'];
     $date->setDay(1)->addDay(1)->subWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $end = clone $this->calendar['date'];
-    $end->addMonth(1)->setDay(1)->subDay(1)->addWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+    $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $current = clone $date;
 
     // days bar
@@ -4747,7 +4747,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $date = clone $this->calendar['date'];
     $date->setDay(1)->addDay(1)->subWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $end = clone $this->calendar['date'];
-    $end->addMonth(1)->setDay(1)->subDay(1)->addWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
+    $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $current = clone $date;
 
     $w = 0;

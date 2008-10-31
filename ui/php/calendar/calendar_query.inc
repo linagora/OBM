@@ -771,13 +771,15 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
-  if($calendar['all_day']) {
-    $begin->setHour(0)->setMinute(0)->setSecond(0); 
-    $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
-  }  
+  $begin->setHour(0)->setMinute(0)->setSecond(0); 
+  $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
 
   $cal_entities = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
+  $of = &OccurrenceFactory::getInstance(); 
+  if(!$calendar['all_day']) {
+    $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $calendar['date_end']);
+  }
   if(isset($calendar['calendar_id'])) {
     $event_id = $calendar["calendar_id"];
     foreach($occurrences as $occurrence) {
