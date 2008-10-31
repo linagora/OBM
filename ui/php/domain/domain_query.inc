@@ -17,7 +17,7 @@ function run_query_domain_search($domain, $restriction='') {
 
   $sql_order_dir = $domain['sql_order_dir'];
   $sql_order_field = $domain['sql_order_field'];
-  $text = sql_search_text_parse($incident['text']);
+  $text = sql_search_text_parse($domain['text']);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -26,14 +26,16 @@ function run_query_domain_search($domain, $restriction='') {
 
   $where = '';
 
-  // If a login indication has been specified, get it
+  // If a domain label has been specified, get it
   if (trim($text) != '') {
     $where .= " domain_label $like '$text%'
       OR domain_description like '$text%'";
   }
 
-  if ((trim($where) != '') || (trim($where_restriction) != '')) {
-    $whereq = "AND $where $where_restriction";
+  //if ((trim($where) != '') || (trim($where_restriction) != '')) {
+  if (trim($where) != '') {
+    //$whereq = "AND $where $where_restriction";
+    $whereq = "AND $where";
   }
 
   $select = "SELECT distinct Domain.*,
@@ -51,7 +53,11 @@ function run_query_domain_search($domain, $restriction='') {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct domain_id) FROM Domain $whereq");
+    if (trim($text) != '') {
+      $count = get_query_count("SELECT count(distinct domain_id) FROM Domain WHERE $where");
+    } else {
+      $count = get_query_count("SELECT count(distinct domain_id) FROM Domain");
+    }
     $obm_q->set_num_rows_total($count);
   }
 
