@@ -274,8 +274,6 @@ $obmdb_password = $ini_array['password'];
 $c_singleNameSpace = $ini_array['singleNameSpace'];
 
 // Allow user mailbox rename
-$c_renameUserMailbox = $ini_array['renameUserMailbox'];
-
 // Backup root
 if (is_null($ini_array['backupRoot'])) {
     $cbackup_root = "/var/lib/obm/backup";
@@ -665,6 +663,7 @@ $set_date_default = $cda_iso;
 $set_commentorder_default = $cco_chro;
 $set_debug_default = 0;
 $set_cal_interval_default = 2;
+$set_timezone_default = 'Europe/Paris';
 
 // JavaScript and PHP Fields masks (PCRE regexp)
 $js_regexp_phone="/^[0-9+x \(\)-\.]+$/"; // digits + SPACE ( ) - phone number
