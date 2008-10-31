@@ -243,6 +243,9 @@ if ($action == 'index') {
       $params["calendar_id"] = $event_id;
       $mail_data = run_query_prepare_event_mail($params, $action);
       calendar_send_mail($mail_data);
+      if ($params['date_begin'] < date('Y-m-d H:')) {
+	$display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
+      }
       $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
       $params["date"] = $params["date_begin"];
       $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
@@ -254,15 +257,16 @@ if ($action == 'index') {
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_access($params["calendar_id"], "all")) {
+  if (check_calendar_access($params['calendar_id'], 'all')) {
     $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
   } else {
     $display['msg'] .= display_err_msg($err['msg']);
-  } 
+  }
+
 } elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params['calendar_id'] > 0) {  
-    if (check_calendar_access($params["calendar_id"], "all")) {
+    if (check_calendar_access($params['calendar_id'], 'all')) {
       $eve_q = run_query_calendar_detail($params['calendar_id']);
       $entities = get_calendar_event_entity($params['calendar_id']);
       $display['detailInfo'] = display_record_info($eve_q);
@@ -296,7 +300,7 @@ if ($action == 'index') {
       check_calendar_data_form($params)) {
     $c = get_calendar_event_info($params['calendar_id'],false); 
     if ( (!$params['force']) 
-         && !($c['date']->equals($params['date_begin']) && $c['calendarevent_duration'] == $params['event_duration'])
+         && !($c['date']->equals($params['date_begin']) && $c['event_duration'] == $params['event_duration'])
 	 && ($conflicts = check_calendar_conflict($params, $entities)) ) {
       $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
       $display['msg'] .= display_err_msg("$l_event : $l_update_error");
@@ -322,7 +326,7 @@ if ($action == 'index') {
     $eve_q = run_query_calendar_detail($id);
     $mail_data = run_query_prepare_event_mail($params, $action, $eve_q);
     run_query_quick_attendee_update($params,$eve_q);    
-    if($eve_q->f('calendarevent_repeatkind') == 'none') {
+    if($eve_q->f('event_repeatkind') == 'none') {
       run_query_calendar_quick_event_update($params);
     } else {
       $id = run_query_calendar_event_exception_insert($params,$eve_q);
@@ -360,7 +364,7 @@ if ($action == 'index') {
     $eve_q = run_query_calendar_detail($id);    
     json_event_data($id,$params);
     $mail_data = run_query_prepare_event_mail($params, $action, $eve_q);
-    if($eve_q->f('calendarevent_repeatkind') == 'none') {      
+    if($eve_q->f('event_repeatkind') == 'none') {      
       run_query_calendar_delete($params);
     } else {
       run_query_calendar_event_exception_insert($params);
@@ -377,19 +381,28 @@ if ($action == 'index') {
 
 } elseif ($action == 'update_decision') {
 ///////////////////////////////////////////////////////////////////////////////
-  $mail_data = run_query_prepare_event_mail($params, $action);
-  $retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
-  if ($retour) {
-    calendar_send_mail($mail_data);
-    $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
+  if (check_calendar_event_participation($params)) {
+    $mail_data = run_query_prepare_event_mail($params, $action);
+    $retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
+    if ($retour) {
+      calendar_send_mail($mail_data);
+      $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
+    } else {
+      $display['msg'] .= display_err_msg("$l_event  : $err[msg]");
+    }
+    if (check_calendar_access($params['calendar_id'], 'all')) {
+      $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    } else {
+      $display['msg'] .= display_err_msg($err['msg']);
+    }
   } else {
-    $display['msg'] .= display_err_msg("$l_event  : $err[msg]");
+    if (check_calendar_access($params['calendar_id'], 'all')) {
+      $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    } else {
+      $display['msg'] .= display_err_msg($err['msg']);
+    }
   }
-  if (check_calendar_access($params["calendar_id"], "all")) {
-    $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
-  } else {
-    $display['msg'] .= display_err_msg($err['msg']);
-  }
+
 } elseif ($action == 'update_alert') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_calendar_event_alert_insert($params['calendar_id'], $params['user_id'],array($params['alert'] => 'dummy'));

@@ -275,26 +275,26 @@ CREATE TABLE CV (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `CalendarAlert`
+-- Table structure for table `EventAlert`
 --
 
-DROP TABLE IF EXISTS CalendarAlert;
-CREATE TABLE CalendarAlert (
-  calendaralert_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  calendaralert_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
-  calendaralert_userupdate int(8) default NULL,
-  calendaralert_usercreate int(8) default NULL,
-  calendaralert_event_id int(8) default NULL,
-  calendaralert_user_id int(8) default NULL,
-  calendaralert_duration int(8) NOT NULL default '0',
-  KEY idx_calendaralert_user (calendaralert_user_id),
-  KEY calendaralert_event_id_calendarevent_id_fkey (calendaralert_event_id),
-  KEY calendaralert_userupdate_userobm_id_fkey (calendaralert_userupdate),
-  KEY calendaralert_usercreate_userobm_id_fkey (calendaralert_usercreate),
-  CONSTRAINT calendaralert_usercreate_userobm_id_fkey FOREIGN KEY (calendaralert_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT calendaralert_event_id_calendarevent_id_fkey FOREIGN KEY (calendaralert_event_id) REFERENCES CalendarEvent (calendarevent_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT calendaralert_userupdate_userobm_id_fkey FOREIGN KEY (calendaralert_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT calendaralert_user_id_userobm_id_fkey FOREIGN KEY (calendaralert_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+DROP TABLE IF EXISTS EventAlert;
+CREATE TABLE EventAlert (
+  eventalert_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  eventalert_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  eventalert_userupdate int(8) default NULL,
+  eventalert_usercreate int(8) default NULL,
+  eventalert_event_id   int(8) default NULL,
+  eventalert_user_id    int(8) default NULL,
+  eventalert_duration   int(8) NOT NULL default 0,
+  KEY idx_eventalert_user (eventalert_user_id),
+  KEY eventalert_event_id_event_id_fkey (eventalert_event_id),
+  KEY eventalert_userupdate_userobm_id_fkey (eventalert_userupdate),
+  KEY eventalert_usercreate_userobm_id_fkey (eventalert_usercreate),
+  CONSTRAINT eventalert_usercreate_userobm_id_fkey FOREIGN KEY (eventalert_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT eventalert_event_id_event_id_fkey FOREIGN KEY (eventalert_event_id) REFERENCES Event (event_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT eventalert_userupdate_userobm_id_fkey FOREIGN KEY (eventalert_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT eventalert_user_id_userobm_id_fkey FOREIGN KEY (eventalert_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -322,66 +322,71 @@ CREATE TABLE CalendarCategory1 (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `CalendarEvent`
+-- Table structure for table `Event`
 --
 
-DROP TABLE IF EXISTS CalendarEvent;
-CREATE TABLE CalendarEvent (
-  calendarevent_id int(8) NOT NULL auto_increment,
-  calendarevent_domain_id int(8) NOT NULL,
-  calendarevent_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  calendarevent_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
-  calendarevent_userupdate int(8) default NULL,
-  calendarevent_usercreate int(8) default NULL,
-  calendarevent_owner int(8) default NULL,
-  calendarevent_timezone varchar(255) default 'GMT',
-  calendarevent_ext_id varchar(32) default '',
-  calendarevent_title varchar(255) default NULL,
-  calendarevent_location varchar(100) default NULL,
-  calendarevent_category1_id int(8) default NULL,
-  calendarevent_priority int(2) default NULL,
-  calendarevent_privacy int(2) NOT NULL default '0',
-  calendarevent_date datetime NOT NULL,
-  calendarevent_duration int(8) NOT NULL default '0',
-  calendarevent_allday tinyint(1) NOT NULL default '0',
-  calendarevent_repeatkind varchar(20) default NULL,
-  calendarevent_repeatfrequence int(3) default NULL,
-  calendarevent_repeatdays varchar(7) default NULL,
-  calendarevent_endrepeat datetime default NULL,
-  calendarevent_color varchar(7) default NULL,
-  calendarevent_description text,
-  calendarevent_properties text,
-  PRIMARY KEY  (calendarevent_id),
-  KEY calendarevent_domain_id_domain_id_fkey (calendarevent_domain_id),
-  KEY calendarevent_owner_userobm_id_fkey (calendarevent_owner),
-  KEY calendarevent_userupdate_userobm_id_fkey (calendarevent_userupdate),
-  KEY calendarevent_usercreate_userobm_id_fkey (calendarevent_usercreate),
-  KEY calendarevent_category1_id_calendarcategory1_id_fkey (calendarevent_category1_id),
-  CONSTRAINT calendarevent_category1_id_calendarcategory1_id_fkey FOREIGN KEY (calendarevent_category1_id) REFERENCES CalendarCategory1 (calendarcategory1_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT calendarevent_domain_id_domain_id_fkey FOREIGN KEY (calendarevent_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT calendarevent_owner_userobm_id_fkey FOREIGN KEY (calendarevent_owner) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT calendarevent_usercreate_userobm_id_fkey FOREIGN KEY (calendarevent_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT calendarevent_userupdate_userobm_id_fkey FOREIGN KEY (calendarevent_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+DROP TABLE IF EXISTS Event;
+CREATE TABLE Event (
+  event_id              int(8) NOT NULL auto_increment,
+  event_domain_id       int(8) NOT NULL,
+  event_timeupdate      timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  event_timecreate      timestamp NOT NULL default '0000-00-00 00:00:00',
+  event_userupdate      int(8) default NULL,
+  event_usercreate      int(8) default NULL,
+  event_ext_id          varchar(255) default '',
+  event_type            enum('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY') default 'VEVENT',
+  event_origin          varchar(255) default NULL,
+  event_owner           int(8) default NULL,
+  event_timezone        varchar(255) default 'GMT',
+  event_opacity         enum('OPAQUE', 'TRANSPARENT') default 'OPAQUE',
+  event_title           varchar(255) default NULL,
+  event_location        varchar(100) default NULL,
+  event_category1_id    int(8) default NULL,
+  event_priority        int(2) default NULL,
+  event_privacy         int(2) NOT NULL default '0',
+  event_date            datetime NOT NULL,
+  event_duration        int(8) NOT NULL default '0',
+  event_allday          boolean default false,
+  event_repeatkind      varchar(20) default NULL,
+  event_repeatfrequence int(3) default NULL,
+  event_repeatdays      varchar(7) default NULL,
+  event_endrepeat       datetime default NULL,
+  event_color           varchar(7) default NULL,
+  event_completed       datetime NOT NULL,
+  event_url             text,
+  event_description     text,
+  event_properties      text,
+  PRIMARY KEY (event_id),
+  KEY event_domain_id_domain_id_fkey (event_domain_id),
+  KEY event_owner_userobm_id_fkey (event_owner),
+  KEY event_userupdate_userobm_id_fkey (event_userupdate),
+  KEY event_usercreate_userobm_id_fkey (event_usercreate),
+  KEY event_category1_id_calendarcategory1_id_fkey (event_category1_id),
+  CONSTRAINT event_category1_id_calendarcategory1_id_fkey FOREIGN KEY (event_category1_id) REFERENCES CalendarCategory1 (calendarcategory1_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT event_domain_id_domain_id_fkey FOREIGN KEY (event_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT event_owner_userobm_id_fkey FOREIGN KEY (event_owner) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT event_usercreate_userobm_id_fkey FOREIGN KEY (event_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT event_userupdate_userobm_id_fkey FOREIGN KEY (event_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `CalendarException`
+-- Table structure for table `EventException`
 --
 
-DROP TABLE IF EXISTS CalendarException;
-CREATE TABLE CalendarException (
-  calendarexception_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  calendarexception_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
-  calendarexception_userupdate int(8) default NULL,
-  calendarexception_usercreate int(8) default NULL,
-  calendarexception_event_id int(8) NOT NULL,
-  calendarexception_date datetime NOT NULL,
-  PRIMARY KEY  (calendarexception_event_id,calendarexception_date),
-  KEY calendarexception_userupdate_userobm_id_fkey (calendarexception_userupdate),
-  KEY calendarexception_usercreate_userobm_id_fkey (calendarexception_usercreate),
-  CONSTRAINT calendarexception_usercreate_userobm_id_fkey FOREIGN KEY (calendarexception_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT calendarexception_event_id_calendarevent_id_fkey FOREIGN KEY (calendarexception_event_id) REFERENCES CalendarEvent (calendarevent_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT calendarexception_userupdate_userobm_id_fkey FOREIGN KEY (calendarexception_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+DROP TABLE IF EXISTS EventException;
+CREATE TABLE EventException (
+  eventexception_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  eventexception_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  eventexception_userupdate int(8) default NULL,
+  eventexception_usercreate int(8) default NULL,
+  eventexception_event_id   int(8) NOT NULL,
+  eventexception_date       datetime NOT NULL,
+  PRIMARY KEY (eventexception_event_id,eventexception_date),
+  KEY eventexception_userupdate_userobm_id_fkey (eventexception_userupdate),
+  KEY eventexception_usercreate_userobm_id_fkey (eventexception_usercreate),
+  CONSTRAINT eventexception_usercreate_userobm_id_fkey FOREIGN KEY (eventexception_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT eventexception_event_id_eventevent_id_fkey FOREIGN KEY (eventexception_event_id) REFERENCES Event (event_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT eventexception_userupdate_userobm_id_fkey FOREIGN KEY (eventexception_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -619,7 +624,7 @@ CREATE TABLE Contact (
   CONSTRAINT contact_marketingmanager_id_userobm_id_fkey FOREIGN KEY (contact_marketingmanager_id) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT contact_usercreate_userobm_id_fkey FOREIGN KEY (contact_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT contact_userupdate_userobm_id_fkey FOREIGN KEY (contact_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT contact_birthday_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES CalendarEvent (calendarevent_id) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT contact_birthday_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES Event (event_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1053,7 +1058,7 @@ CREATE TABLE DeletedCalendarEvent (
   deletedcalendarevent_event_id int(8) default NULL,
   deletedcalendarevent_user_id int(8) default NULL,
   deletedcalendarevent_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (deletedcalendarevent_id),
+  PRIMARY KEY (deletedcalendarevent_id),
   KEY idx_dce_event (deletedcalendarevent_event_id),
   KEY idx_dce_user (deletedcalendarevent_user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1275,16 +1280,17 @@ CREATE TABLE EventEntity (
   evententity_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
   evententity_userupdate int(8) default NULL,
   evententity_usercreate int(8) default NULL,
-  evententity_event_id int(8) NOT NULL,
-  evententity_entity_id int(8) NOT NULL,
-  evententity_entity varchar(32) NOT NULL default '0',
-  evententity_state char(1) NOT NULL default '0',
-  evententity_required tinyint(1) NOT NULL default '0',
+  evententity_event_id   int(8) NOT NULL,
+  evententity_entity_id  int(8) NOT NULL,
+  evententity_entity     varchar(32) NOT NULL default '0',
+  evententity_state      enum('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS') default 'NEEDS-ACTION',
+  evententity_required   enum('CHAIR', 'REQ', 'OPT', 'NON') default 'REQ',
+  evententity_percent    float default 0,
   PRIMARY KEY  (evententity_event_id,evententity_entity_id,evententity_entity),
   KEY evententity_userupdate_userobm_id_fkey (evententity_userupdate),
   KEY evententity_usercreate_userobm_id_fkey (evententity_usercreate),
   CONSTRAINT evententity_usercreate_userobm_id_fkey FOREIGN KEY (evententity_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT evententity_event_id_calendarevent_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES CalendarEvent (calendarevent_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT evententity_event_id_event_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES Event (event_id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT evententity_userupdate_userobm_id_fkey FOREIGN KEY (evententity_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

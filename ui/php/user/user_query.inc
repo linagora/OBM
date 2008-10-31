@@ -2052,13 +2052,13 @@ function run_query_user_delete_profile($user_id)  {
   $cdesc[0]['type'] = 'string';
   $cdesc[0]['value'] = "$l_attendee : $name\r\n";
   $cdesc[1]['type'] = 'field';
-  $cdesc[1]['value'] = 'calendarevent_description';
+  $cdesc[1]['value'] = 'event_description';
   $concat = sql_string_concat($db_type, $cdesc);
-  $query = "UPDATE CalendarEvent
-    SET calendarevent_description = $concat,
-      calendarevent_timeupdate = '$now'
-    WHERE calendarevent_owner $user_id 
-      OR calendarevent_id IN (
+  $query = "UPDATE Event
+    SET event_description = $concat,
+      event_timeupdate = '$now'
+    WHERE event_owner $user_id 
+      OR event_id IN (
         SELECT evententity_event_id as event_id
         FROM EventEntity
         WHERE evententity_entity = 'user'
@@ -2066,7 +2066,7 @@ function run_query_user_delete_profile($user_id)  {
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
   $obm_q->query($query);
   
-  $query = "UPDATE CalendarEvent SET calendarevent_owner = $obm[uid] WHERE calendarevent_owner $user_id";
+  $query = "UPDATE Event SET event_owner = $obm[uid] WHERE event_owner $user_id";
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
   $obm_q->query($query);
 
@@ -2078,12 +2078,18 @@ function run_query_user_delete_profile($user_id)  {
   $obm_q->query($query);
 
   // Remove all Events that have non attendees !
-  $query = "DELETE FROM CalendarEvent
-     WHERE calendarevent_id NOT IN (
+  $query = "DELETE FROM Event
+     WHERE event_id NOT IN (
        SELECT distinct evententity_event_id
        FROM EventEntity
        WHERE evententity_entity = 'user')"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
+  $obm_q->query($query);
+
+  // Remove all Event Alerts
+  $query = "DELETE FROM EventAlert
+     WHERE eventalert_user_id = '$user_id'";
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EventAlerts)");
   $obm_q->query($query);
 
   // Remove all acl to the user and user's one

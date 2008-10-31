@@ -1734,6 +1734,13 @@ function check_project_form($pid, $params) {
   global $l_fill_name, $l_fill_tt, $l_fill_estimated, $l_fill_soldtime;
   global $err, $php_regexp_number,$l_tolong_shortname;
 
+  // Hook : Pre
+  if (function_exists('hook_pre_check_project_form')) {
+    if (! hook_pre_check_project_form($params)) {
+      return false;
+    }
+  }
+
   $name = $params['name'];
   $company = $params['company_id'];
   $tt = $params['tt'];

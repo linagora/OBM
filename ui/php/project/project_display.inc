@@ -282,6 +282,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
   $manager = $project['manager'];
   $member = $project['member'];
   $archive = $project['archive'];
+  $company_id = $project['company_id'];
 
   if ($popup) {
     $ext_action = $project['ext_action'];
@@ -293,12 +294,12 @@ function html_project_search_list($proj_q, $prefs, $project) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;cba_archive=$archive$url_ext");
+  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;cba_archive=$archive&amp;company_id=$company_id$url_ext");
 
   $proj_d = new OBM_DISPLAY('DATA', $prefs, 'project');
   if ($popup) {
     $proj_d->display_link = false;
-    if ($ext_action == 'ext_get_id_cv'){
+    if ($ext_action == 'ext_get_id_cv') {
       $proj_d->display_ext = 'get_id_cv';
     }
     else {
@@ -1139,6 +1140,11 @@ function html_project_form($action, $project_q, $project) {
   global $display, $obm, $c_php_isodate_format,$l_shortname, $l_header_new;
   global $ctt_sales, $ctt_research, $ctt_others,$l_other;
   global $l_tt_sales, $l_tt_research, $l_tt_others,$path;
+
+  // Hook : Pre
+  if (function_exists('hook_pre_dis_project_form')) {
+    $project = hook_pre_dis_project_form($project);
+  }
 
   $users_p = of_usergroup_get_group_users($obm['group_prod'], true, array($obm['uid']), 'userobm_lastname');
 

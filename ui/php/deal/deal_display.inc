@@ -641,6 +641,7 @@ function html_deal_links($deal_q) {
   $project = $deal_q->f('deal_project_status');
   $market = $deal_q->f('deal_marketingmanager_id');
   $tech = $deal_q->f('deal_technicalmanager_id');
+  $number = $deal_q->f('deal_number');
 
   // parent deal
   if ($pid > 0) {
@@ -664,7 +665,7 @@ function html_deal_links($deal_q) {
 
     // New project allowed only if hitrate = 100
     if ($hitrate == '100') {
-      $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;deal_id=$id&amp;deal_label=$label&amp;company_id=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id&amp;sel_type_id=$type_id");
+      $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;deal_id=$id&amp;deal_label=$label&amp;company_id=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id&amp;sel_type_id=$type_id&amp;shortname=$number");
       $dis_ico_project .= "
         <li><a href=\"$url_pro_new\"><img src=\"$ico_add\" alt=\"\" /></a>
             <a href=\"$url_pro_new\">$l_new</a></li>";

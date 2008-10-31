@@ -338,7 +338,7 @@ function run_query_contact_detail($p_id) {
   $timecreate = sql_date_format($db_type, 'contact_timecreate', 'timecreate');
   $lang = get_lang();
   $date = sql_date_format($db_type, 'contact_date', 'contact_date');
-  $birthday = sql_date_format($db_type, 'bd.calendarevent_date', 'contact_birthday');
+  $birthday = sql_date_format($db_type, 'bd.event_date', 'contact_birthday');
   $multidomain = sql_multidomain('contact');
 
   if ($cgp_show['module']['company']) {
@@ -392,7 +392,7 @@ function run_query_contact_detail($p_id) {
         LEFT JOIN DataSource ON contact_datasource_id=datasource_id
         LEFT JOIN UserObm as c ON contact_usercreate=c.userobm_id
         LEFT JOIN UserObm as u ON contact_userupdate=u.userobm_id
-        LEFT JOIN CalendarEvent as bd ON contact_birthday_id = bd.calendarevent_id
+        LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id
       WHERE
         contact_id $p_id 
         $multidomain";
@@ -1573,7 +1573,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
   $obm_q = new DB_OBM;
 
   $multidomain_contact = sql_multidomain('contact');
-  $multidomain_calendarevent = sql_multidomain('calendarevent');
+  $multidomain_event = sql_multidomain('event');
   
   $now = Of_Date::today();
   
@@ -1582,27 +1582,27 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
 			$duration = 3600*24;
 			$title = str_replace('\'', '\\\'', sprintf($l_birthday_event_title, $contact_fullname));
 			
-			$query = "INSERT INTO CalendarEvent
-			(calendarevent_timeupdate,
-			calendarevent_timecreate,
-			calendarevent_usercreate,
-			calendarevent_owner,
-			calendarevent_title,
-			calendarevent_date,
-			calendarevent_description,
-			calendarevent_properties,
-			calendarevent_location,
-			calendarevent_category1_id,
-			calendarevent_priority,
-			calendarevent_privacy,
-			calendarevent_duration,
-			calendarevent_repeatkind,
-			calendarevent_repeatfrequence,
-			calendarevent_repeatdays,
-			calendarevent_allday,
-			calendarevent_color,
-			calendarevent_endrepeat,
-			calendarevent_domain_id)
+			$query = "INSERT INTO Event
+			(event_timeupdate,
+			event_timecreate,
+			event_usercreate,
+			event_owner,
+			event_title,
+			event_date,
+			event_description,
+			event_properties,
+			event_location,
+			event_category1_id,
+			event_priority,
+			event_privacy,
+			event_duration,
+			event_repeatkind,
+			event_repeatfrequence,
+			event_repeatdays,
+			event_allday,
+			event_color,
+			event_endrepeat,
+			event_domain_id)
 			VALUES
 			('$now',
 			'$now',
@@ -1628,13 +1628,13 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
 			$obm_q->xquery($query);
       display_debug_msg($query, $cdg_sql, 'run_query_contact_birthday_update(insert event)');
 			
-      $query = "SELECT calendarevent_id FROM CalendarEvent
+      $query = "SELECT event_id FROM Event
         WHERE
-          calendarevent_timeupdate = '$now'
-          AND calendarevent_timecreate = '$now'
-          AND calendarevent_usercreate = '$contact_usercreate'
-          AND calendarevent_owner = '$contact_usercreate'
-          AND calendarevent_title = '$title'";
+          event_timeupdate = '$now'
+          AND event_timecreate = '$now'
+          AND event_usercreate = '$contact_usercreate'
+          AND event_owner = '$contact_usercreate'
+          AND event_title = '$title'";
       
       $obm_q->xquery($query);
       display_debug_msg($query, $cdg_sql, "run_query_contact_birthday_update(get insert id)");
@@ -1643,7 +1643,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
       	$obm_q->next_record();
       	
         $sql_id = sql_parse_id($contact_id);
-      	$insert_event_id = $obm_q->f('calendarevent_id');
+      	$insert_event_id = $obm_q->f('event_id');
         $query = "UPDATE Contact
           SET contact_birthday_id = $insert_event_id
           WHERE
@@ -1678,10 +1678,10 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
 			
     case $update_event:
       $sql_id = sql_parse_id($event_id);
-      $query = "UPDATE CalendarEvent SET calendarevent_date = '$new_value'
+      $query = "UPDATE Event SET event_date = '$new_value'
       WHERE
-        calendarevent_id = $sql_id
-        $multidomain_calendarevent";
+        event_id = $sql_id
+        $multidomain_event";
         
       $obm_q->query($query);
       display_debug_msg($query, $cdg_sql, 'run_query_contact_birthday_update(update event)');
@@ -1690,8 +1690,8 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
       
     case $delete_event:
       $sql_id = sql_parse_id($event_id);
-      $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = $sql_id
-        $multidomain_calendarevent";
+      $query = "DELETE FROM Event WHERE event_id = $sql_id
+        $multidomain_event";
       
       $obm_q->query($query);
       display_debug_msg($query, $cdg_sql, 'run_query_contact_birthday_update(delete event)');

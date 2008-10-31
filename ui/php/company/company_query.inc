@@ -119,7 +119,7 @@ function run_query_company_search($company) {
   if (($where != '') || ($where_name != '')) {
     $whereq = " WHERE $where_name $where $multidomain";
   } else {
-    $whereq = " WHERE 1=1 AND $multidomain";
+    $whereq = " WHERE 1=1 $multidomain";
   }
 
   // ORDER construction
@@ -200,7 +200,7 @@ function run_query_company_search($company) {
     $sound = phonetic_key($name);
     $where_name = " ($where_name OR company_aka $like '%$auto_aka%'
                  OR company_sound = '$sound')";
-    $whereq = " WHERE $where_name $where";
+    $whereq = " WHERE $where_name $where $multidomain";
     if ($ctu_sql_limit) {
       $count = get_query_count("SELECT count(distinct company_id) FROM Company $left_join $whereq");
       $obm_q->set_num_rows_total($count);

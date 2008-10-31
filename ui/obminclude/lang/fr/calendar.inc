@@ -83,7 +83,7 @@ $l_conflicts = "Conflit(s) rencontré(s)";
 $l_date = "Date";
 $l_user = "Utilisateur";
 $l_back_mono = "Revenir à ma vue";
-$l_edit = "Editer";
+$l_edit = "Modifier";
 $l_edit_full = "Compléter";
 
 $l_collapse_all = "Tout réduire";
@@ -95,7 +95,7 @@ $l_last_hour = "Heure de fin";
 
 // actions 
 $l_meeting_perform = "Rechercher les créneaux libres";
-$l_insert = "Enregistrer le rdv";
+$l_insert = "Enregistrer l'événement";
 $l_accept = "Accepter";
 $l_reject = "Refuser";
 $l_select = "Sélectionner";
@@ -115,9 +115,9 @@ $l_update_error = "Des conflits ont été détectés, mise à jour annulée";
 $l_insert_error = "Des conflits ont été détectés, insertion annulée";
 $l_sendamail = "Forcer la notification par mail";
 $l_calendar_select_group = "Sélectionner les groupes.";
-$l_A = "A";
-$l_W = "E";
-$l_R = "R";
+$l_A = "Accepté";
+$l_W = "Attente";
+$l_R = "Refusé";
 
 $l_view = "Vue";
 $l_views = "Vues";
@@ -158,6 +158,7 @@ $l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour ";
 $l_fill_title = "Veuillez remplir le champ [ $l_title ]";
 $l_fill_dateend = "Veuillez remplir le champ [ $l_dateend ]";
 $l_fill_datebegin = "Veuillez remplir le champ [ $l_datebegin ]";
+$l_warn_date_past = "La date de début de l'événement est dans le passé";
 $l_err_no_calendar_selected = "Aucun agenda séléctionné";
 $l_err_begin_end = "La date de fin doit être supérieure à la date de début";
 $l_err_end_repeat = "La fin de répétition doit être supérieure à la date de fin";
@@ -177,7 +178,7 @@ $l_no_sel_view = "Suppression impossible : aucune vue sélectionnée";
 $l_conflict_view_label = "$l_view_label : Un conflit a été détecté";
 
 $l_header_planning = "Planning";
-$l_header_meeting = "Nouvelle réunion";
+$l_header_meeting = "Recherche disponibilités";
 $l_header_waiting_events = "Evts en attente";
 $l_authorize_list = "Personnes autorisées";
 $l_denie_list = "Personnes non-autorisées";
@@ -220,15 +221,20 @@ $l_add_event_mail_body =
 NOUVEAU RENDEZ-VOUS !
 ------------------------------------------------------------------
 
-Vous êtes invité à participer à un rendez-vous du %s au %s,
-qui a pour sujet %s (lieu : %s).
+Vous êtes invité à participer à un rendez-vous
 
+du    : %s
+au    : %s
+sujet : %s
+lieu  : %s
 
-:: Pour plus de détails sur le rendez-vous : 
+:: Pour plus de détails : 
 %s
-:: Pour accepter ce rendez-vous : 
+
+:: Pour accepter : 
 %s
-:: Pour refuser ce rendez-vous : 
+
+:: Pour refuser : 
 %s
 
 -------------------------------------------------------------------
@@ -258,14 +264,16 @@ $l_update_event_mail_body =
 RENDEZ-VOUS MODIFIÉ !
 ------------------------------------------------------------------
 
-Le rendez-vous %s,  initialement prévu du %s au %s, (lieu : %s),
+Le rendez-vous %s, initialement prévu du %s au %s, (lieu : %s),
 a été modifié et se déroulera du %s au %s (lieu : %s).
 
-:: Pour plus de détails sur les modifications : 
+:: Pour plus de détails : 
 %s
-:: Pour accepter les modifications de ce rendez-vous :
+
+:: Pour accepter les modifications :
 %s
-:: Pour refuser les modifications de ce rendez-vous : 
+
+:: Pour refuser les modifications : 
 %s
 
 -------------------------------------------------------------------
@@ -359,7 +367,7 @@ $l_update_state_mail_body =
 PARTICIPATION AU RENDEZ-VOUS
 ------------------------------------------------------------------
 
-La participation de %s à l'événement %s est %s.
+La participation de %s à l'événement %s est : %s.
 
 :: Pour plus de détails sur l'événement : 
 %s
@@ -390,14 +398,14 @@ $l_resource_displayed = "Ressources choisies";
 $l_resource_allocated = "Ressources allouées";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_interval_null = "La durée ne peux pas être nulle";
-$mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";
+$mj_fill_title_event = "\\n Vous devez saisir un titre pour l'événement.";
 $mj_fill_time_begin = "\\n Vous devez saisir une heure de début.";
 $mj_fill_time_end = "\\n Vous devez saisir une heure de fin.";
 $mj_fill_valid_time_begin = "\\n Vous devez saisir une heure de début valide.";
 $mj_fill_valid_time_end = "\\n Vous devez saisir une heure de fin valide.";
-$mj_delete_confirm = "Confirmer la suppression du rdv ?";
+$mj_delete_confirm = "Confirmer la suppression de l'événement ?";
 $mj_invalid_day = "Ce jour n'existe pas pour le mois sélectionné.";
 $mj_date_incompatibility = "La date de fin ne peut être antérieure a la date de début.";
 $mj_repeat_date_incompatibility = "La date de fin de répétition ne peut être antérieure a la date de début."; 
-$mj_event_delete_confirm = "Confirmer la suppression du rdv ?"; 
-$mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses répétitions ?"; 
+$mj_event_delete_confirm = "Confirmer la suppression de l'événement ?"; 
+$mj_event_delete_all_confirm = "Confirmer la suppression de l'événement et de toutes ses répétitions ?"; 

@@ -421,7 +421,7 @@ $l_header_day = "Jour";
 $l_header_week = "Semaine";
 $l_header_month = "Mois";
 $l_header_year = "Année";
-$l_header_new_event = "Nouveau rdv";
+$l_header_new_event = "Nouveau Evt";
 
 //time headers
 $l_header_stats = "Statistiques";

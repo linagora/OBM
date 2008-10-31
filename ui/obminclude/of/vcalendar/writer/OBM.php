@@ -49,11 +49,11 @@ class Vcalendar_Writer_OBM {
 
     } else {
 
-      if($this->haveAccess($eventData->f('calendarevent_owner'))) {
-        $this->updateEvent($eventData->f('calendarevent_id'), $vevent);
+      if($this->haveAccess($eventData->f('event_owner'))) {
+        $this->updateEvent($eventData->f('event_id'), $vevent);
       } else {
         // FIXME WHAT TO DO??
-        $this->updateAttendees($eventData->f('calendarevent_id'),$vevent);
+        $this->updateAttendees($eventData->f('event_id'),$vevent);
       }
     }
   }
@@ -62,12 +62,12 @@ class Vcalendar_Writer_OBM {
     $eventData = NULL;
     if($this->lazyRead) {
       if(($organizer = $vevent->get('organizer'))) {
-        $owner = "OR calendarevent_owner ".sql_parse_id($organizer, true)."";
+        $owner = "OR event_owner ".sql_parse_id($organizer, true)."";
       }
-      $query = "SELECT calendarevent_id as id
-      FROM CalendarEvent WHERE calendarevent_title =  '".addslashes($vevent->get('summary'))."'
-      AND calendarevent_date = '".$vevent->get('dtstart')."' AND
-      (calendarevent_owner ".sql_parse_id($GLOBALS['obm']['uid'], true)." $owner)";
+      $query = "SELECT event_id as id
+      FROM Event WHERE event_title =  '".addslashes($vevent->get('summary'))."'
+      AND event_date = '".$vevent->get('dtstart')."' AND
+      (event_owner ".sql_parse_id($GLOBALS['obm']['uid'], true)." $owner)";
       $this->db->query($query);
       if($this->db->nf() > 0) {
         $this->db->next_record();

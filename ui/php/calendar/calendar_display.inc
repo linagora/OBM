@@ -238,7 +238,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   global $l_selection, $l_users,$l_resources, $l_validate,$l_category_filter;
   global $l_search_users, $l_search_resources,$l_private_group_members, $l_public_group_members;
   global $l_group_members, $l_select_group,$l_back_mono, $l_private, $l_public;
-  global $ico_group, $l_calendar;
+  global $ico_group, $l_calendar, $l_add;
 
   $iso = $calendar['date']->getURL();
   $this_group = $calendar['entity']['group_view'];
@@ -359,6 +359,9 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
     </fieldset>
     $dis_block_resource
+    <fieldset class=\"detail extra\">
+    <legend>$l_add</legend>
+    </fieldset>
     <div id=\"sel_ent\">
     </div>
     <fieldset class=\"buttons\">
@@ -629,7 +632,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
     if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_month_cal .= "</tr>\n";
   } 
 
-  $status = array('A', 'W');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter);
   
   if (is_array($occurrences)) {
@@ -738,7 +741,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
     $current->addMinute(60/$_SESSION['set_cal_interval']);
     if($current->compareMinute(0) == 0) $week_cal .= '</tr>';
   }
-  $status = array('A', 'W');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
@@ -826,7 +829,7 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
     $current->addMinute(60/$_SESSION['set_cal_interval']);
   }
 
-  $status = array('A', 'W');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter);
   if (is_array($occurrences)) {
     $options = array();
@@ -985,7 +988,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   
   $category_filter = $calendar['category_filter'];
 
-  $status = array('A');
+  $status = array('ACCEPTED');
   $occurrences = calendar_events_model($date, $end,$calendar_entity, $status, $category_filter,true);
   $today_mark = false;
   $charset = mb_internal_encoding();
@@ -1234,7 +1237,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $entity_state = $occurrence->entity_state;
   $all_day = ($event->all_day)?1:0;
   $entityClass = $calendar_entity[$entity][$entity_id]['class'];
-  if ($entity_state == 'W') {
+  if ($entity_state == 'NEEDS-ACTION') {
     $entityClass .= '_W';
   }
   $eventColor = $event->color;
@@ -1335,7 +1338,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
   $end = clone $date;
   $end->addMonth(1);
 
-  $status = array('A');
+  $status = array('ACCEPTED');
   $events = calendar_events_model($current,$end, $calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance();
 
@@ -1581,7 +1584,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
 function dis_calendar_planning_view($date, $end, $calendar_entity, $category_filter) {
   global $l_daysofweekfirst,$l_daysofweek;
   
-  $status = array('A');
+  $status = array('ACCEPTED');
   calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   $of = &OccurrenceFactory::getInstance(); 
   $day_duration = 86400;
@@ -1696,6 +1699,7 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
   return $event_data;  
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // display conflicts
 // parameters:
@@ -1795,9 +1799,9 @@ function html_calendar_conflict_form($calendar) {
    <input type=\"hidden\" name=\"cba_force\" value=\"1\" />
    <input type=\"hidden\" name=\"rd_decision_event\" value=\"\" />
    <div class=\"detailButton\">
-    <input type=\"submit\" value=\"$l_force_insert\" onclick=\"this.form.rd_decision_event.value='A';\"/>
-    <input type=\"submit\" value=\"$l_refuse_insert\" onclick=\"this.form.rd_decision_event.value='R';\"/> 
-    <input type=\"submit\" value=\"$l_cancel_insert\" onclick=\"this.form.rd_decision_event.value='W';\"/>   
+    <input type=\"submit\" value=\"$l_force_insert\" onclick=\"this.form.rd_decision_event.value='ACCEPTED';\"/>
+    <input type=\"submit\" value=\"$l_refuse_insert\" onclick=\"this.form.rd_decision_event.value='DECLINED';\"/> 
+    <input type=\"submit\" value=\"$l_cancel_insert\" onclick=\"this.form.rd_decision_event.value='NEEDS-ACTION';\"/>   
    </div>
   </form>";
 
@@ -1831,6 +1835,7 @@ function dis_calendar_event_consult($id) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML : Display Calendar Event Consult
 // Parameters:
@@ -1850,24 +1855,24 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
   global $l_A, $l_R, $l_W;
 
-  $id = $event_q->f('calendarevent_id');
+  $id = $event_q->f('event_id');
   $writable_users = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
   $administrable_users = 
   $writable_resources = of_right_entity_for_user('Resource', $obm['uid'], 'write');
   
-  if ($event_q->f('calendarevent_privacy') == 0 || 
-      $event_q->f('calendarevent_owner') == $obm['uid'] ||
+  if ($event_q->f('event_privacy') == 0 || 
+      $event_q->f('event_owner') == $obm['uid'] ||
       in_array($obm['uid'],$entities['user']['ids'])) {
 
-    $title = $event_q->f('calendarevent_title');
-    $location = $event_q->f('calendarevent_location');
+    $title = $event_q->f('event_title');
+    $location = $event_q->f('event_location');
     $cats1 = of_category_get_entitycategories('calendar', 'category1', $id, 'mono');
-    $owner = $event_q->f('calendarevent_owner');
+    $owner = $event_q->f('event_owner');
     $owner_lastname = $event_q->f('owner_lastname');
     $owner_firstname = $event_q->f('owner_firstname');
-    $priority = $event_q->f('calendarevent_priority'); 
-    $properties = $event_q->f('calendarevent_properties');
-    $description = $event_q->f('calendarevent_description');
+    $priority = $event_q->f('event_priority'); 
+    $properties = $event_q->f('event_properties');
+    $description = $event_q->f('event_description');
     if ($properties != '') {
       $charset = mb_internal_encoding();
       $item = "<?xml version='1.0' encoding='$charset'?>".$properties;
@@ -1919,10 +1924,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $display['title'] = $l_private;
 
   }
-  $all_day = $event_q->f('calendarevent_allday');
-  $begin = new Of_Date($event_q->f('calendarevent_date'), 'GMT');
+  $all_day = $event_q->f('event_allday');
+  $begin = new Of_Date($event_q->f('event_date'), 'GMT');
   $end = clone $begin;
-  $end->addSecond($event_q->f('calendarevent_duration'));
+  $end->addSecond($event_q->f('event_duration'));
   if ($all_day) {
     $dis_all_day = "<tr><th>$l_all_day</th><td></td></tr>";
     $begin = $begin->getOutputDate();
@@ -1931,22 +1936,22 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $begin = $begin->getOutputDateTime();
     $end = $end->getOutputDateTime();
   }     
-  $privacy = $event_q->f('calendarevent_privacy') == 1? $l_yes : $l_no;
+  $privacy = $event_q->f('event_privacy') == 1? $l_yes : $l_no;
 
 
-  if ($event_q->f('calendarevent_repeatkind') != 'none') {
-    $kind = $GLOBALS['l_'.$event_q->f('calendarevent_repeatkind')];
-    $kind_unit = $GLOBALS['l_'.$event_q->f('calendarevent_repeatkind').'_unit'];
-    $repeat_days = $event_q->f('calendarevent_repeatdays'); 
-    $repeat_end = new Of_Date($event_q->f('calendarevent_endrepeat'), 'GMT');
+  if ($event_q->f('event_repeatkind') != 'none') {
+    $kind = $GLOBALS['l_'.$event_q->f('event_repeatkind')];
+    $kind_unit = $GLOBALS['l_'.$event_q->f('event_repeatkind').'_unit'];
+    $repeat_days = $event_q->f('event_repeatdays'); 
+    $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
     $repeat_end = $repeat_end->getOutputDate();
-    if( $event_q->f('calendarevent_repeatfrequence') == 1 ) {
+    if( $event_q->f('event_repeatfrequence') == 1 ) {
       $repeatfrequency = sprintf($kind_unit,'');
     } else {
-      $repeatfrequency = sprintf($kind_unit,$event_q->f('calendarevent_repeatfrequence'));
+      $repeatfrequency = sprintf($kind_unit,$event_q->f('event_repeatfrequence'));
     }
 
-    if($event_q->f('calendarevent_repeatkind') == 'weekly') {
+    if($event_q->f('event_repeatkind') == 'weekly') {
       $date = new Of_Date();
       $days = str_split($repeat_days);
       foreach($days as $i => $repeat) {
@@ -1994,13 +1999,13 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     foreach ($attendee['entity'] as $u_id => $entity) {
       $label = $entity['label'];
       $state = $entity['state'];
-      $A = '';
-      $W = '';
-      $R = '';
+      $ACCEPTED = '';
+      ${'NEEDS-ACTION'} = '';
+      $DECLINED = '';
       if ($obm['uid'] == $u_id || in_array($u_id,$writable_users['ids'])) {
         $$state = "checked=\"checked\"";
-        $urld= "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
-        $urla= "$path/calendar/calendar_index.php?action=update_alert&calendar_id=$id&user_id=$u_id";
+        $urld = "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
+        $urla = "$path/calendar/calendar_index.php?action=update_alert&calendar_id=$id&user_id=$u_id";
         $sel_alert = '';
         foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
           if($alerts[$u_id] == $alert_sec) {
@@ -2015,22 +2020,21 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         <td>$label</td>
         <td>$sel_alert</td>
         <td class=\"C\">
-        <input $A type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"A\" onclick=\"window.location='$urld&rd_decision_event=A'\" /><span>$l_A</span>
-	<input $W type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"W\" onclick=\"window.location='$urld&rd_decision_event=W'\" /><span>$l_W</span>
-        <input $R type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"R\" onclick=\"window.location='$urld&rd_decision_event=R'\" /><span>$l_R</span>
+        <input $ACCEPTED type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_A</span>
+	<input ${'NEEDS-ACTION'} type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_W</span>
+        <input $DECLINED type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_R</span>
         </td>
-        </tr>
-        ";
+        </tr>";
         $$state = '';
       } else {
-        $A = 'class="disabled"';
-        $W = 'class="disabled"';
-        $R = 'class="disabled"';
+        $ACCEPTED = 'class="disabled"';
+        ${'NEEDS-ACTION'} = 'class="disabled"';
+        $DECLINED = 'class="disabled"';
         $$state = '';
         $dis_user_list .= "<tr><td>$label</td><td></td><td class=\"C\">
-        <input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"A\" onclick=\"window.location='$urld&rd_decision_event=A'\" /><span $A>$l_A</span>
-	<input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"W\" onclick=\"window.location='$urld&rd_decision_event=W'\" /><span $W>$l_W</span>
-        <input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"R\" onclick=\"window.location='$urld&rd_decision_event=R'\" /><span $R>$l_R</span>
+        <input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_A</span>
+	<input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_W</span>
+        <input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_R</span>
           </td></tr>";
       }
     }
@@ -2078,11 +2082,11 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
           <tr>
           <td>$label $property[$r_id]</td>
           <td class=\"C\">
-          <input $A type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"A\" onclick=\"window.location='$url&rd_decision_event=A'\" />$l_A
-          <input $W type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"W\" onclick=\"window.location='$url&rd_decision_event=W'\" />$l_W
-          <input $R type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"R\" onclick=\"window.location='$url&rd_decision_event=R'\" />$l_R
+          <input $ACCEPTED type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"ACCEPTED\" onclick=\"window.location='$url&rd_decision_event=ACCEPTED'\" />$l_A
+          <input ${'NEEDS-ACTION'} type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$url&rd_decision_event=NEEDS-ACTION'\" />$l_W
+          <input $DECLINED type=\"radio\" name=\"rd_resource_decision_$r_id\" value=\"DECLINED\" onclick=\"window.location='$url&rd_decision_event=DECLINED'\" />$l_R
           </td>
-          </tr>  
+          </tr>
         ";
           $$state = '';
         } else {
@@ -2097,12 +2101,11 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         <tr>
         <td>$l_resources</td><td>$l_state</td>
         </tr>
-        </thead>      
+        </thead>
         $dis_resource_list
         </table>
-        </div>";      
+        </div>";
     }
-
   }
 
 
@@ -2114,15 +2117,15 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   <tr>
     <th>$l_title :</th>
     <td>$title</td>
-  </tr>  
+  </tr>
   <tr>
     <th>$l_owner :</th>
     <td>$owner_lastname $owner_firstname</td>
-  </tr> 
+  </tr>
   <tr>
     <th>$l_location :</th>
     <td>$location</td>
-  </tr>  
+  </tr>
 
   $block_category1
   </table>
@@ -2130,11 +2133,11 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
   <div class=\"detail infos\">
   <h1>$l_carac</h1>
-  <table>  
+  <table>
      <tr>
       <th>$l_private :</th>
       <td>$privacy</td>
-    </tr>  
+    </tr>
    $dis_all_day
     <tr>
      <th>$l_datebegin :</th>
@@ -2142,14 +2145,14 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     </tr>
     <tr>
      <th>$l_dateend :</th>
-     <td>$end</td>       
+     <td>$end</td>
     </tr>
     <tr>
      <th>$l_priority :</th>
      <td>$priority</td>
-    </tr>      
+    </tr>
    </table>
-   </div>  
+   </div>
   $repeat_block
   <div class=\"detail infos\">
   <h1>$l_users</h1>
@@ -2161,7 +2164,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   </thead>
   $dis_user_list
   </table>
-  </div>   
+  </div>
   <p class=\"LC\" />
   $dis_resource_block
   $dis_item_list
@@ -2330,36 +2333,36 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $repeatfrequency = 1;
 
   if (($action == 'detailupdate') || ($action == 'duplicate')) {
-    $title = htmlspecialchars($event_q->f('calendarevent_title'));
-    $location = htmlspecialchars($event_q->f('calendarevent_location'));
-    $cat1 = $event_q->f('calendarevent_category1_id');
-    $owner = $event_q->f('calendarevent_owner');
+    $title = htmlspecialchars($event_q->f('event_title'));
+    $location = htmlspecialchars($event_q->f('event_location'));
+    $cat1 = $event_q->f('event_category1_id');
+    $owner = $event_q->f('event_owner');
     $owner_lastname = $event_q->f('owner_lastname');
     $owner_firstname = $event_q->f('owner_firstname');
-    $priority = $event_q->f('calendarevent_priority');
-    $properties = $event_q->f('calendarevent_properties');
-    $desc = $event_q->f('calendarevent_description');
+    $priority = $event_q->f('event_priority');
+    $properties = $event_q->f('event_properties');
+    $desc = $event_q->f('event_description');
     if ($properties != '') {
       $charset = mb_internal_encoding();
       $item = "<?xml version='1.0' encoding='$charset'?>$properties";
     } else {
       $item = '';
     }
-    $begin = new Of_Date($event_q->f('calendarevent_date'), 'GMT');
+    $begin = new Of_Date($event_q->f('event_date'), 'GMT');
     $end = clone $begin;
-    $end = $end->addSecond($event_q->f('calendarevent_duration'));
-    $all_day = $event_q->f('calendarevent_allday');
-    $color = $event_q->f('calendarevent_color');
-    $privacy = $event_q->f('calendarevent_privacy');
-    $repeat_kind = $event_q->f('calendarevent_repeatkind');
-    $repeat_days = $event_q->f('calendarevent_repeatdays');
-    $repeatfrequency = $event_q->f('calendarevent_repeatfrequence');
+    $end = $end->addSecond($event_q->f('event_duration'));
+    $all_day = $event_q->f('event_allday');
+    $color = $event_q->f('event_color');
+    $privacy = $event_q->f('event_privacy');
+    $repeat_kind = $event_q->f('event_repeatkind');
+    $repeat_days = $event_q->f('event_repeatdays');
+    $repeatfrequency = $event_q->f('event_repeatfrequence');
     if ($repeat_kind != 'none') {
-      $repeat_end = new Of_Date($event_q->f('calendarevent_endrepeat'), 'GMT');
+      $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
     }
     $t_id = $tasks['ids'][0];
     $t_name = $tasks['entity'][$t_id]['label'];
-    $id = $event_q->f('calendarevent_id');
+    $id = $event_q->f('event_id');
 
     while($exception_q->next_record()) {
       $date_exception[] = new Of_Date($exception_q->f('calendarexception_date'), 'GMT'); 
@@ -2478,9 +2481,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   for ($i=0; $i<7; $i++) {
     $day = $week->localize(Of_Date::WEEKDAY_NARROW) ;
     if (strcmp(substr($repeat_days,$i,1),'1') ==0) {
-      $dis_repeat_day .= "<input type=\"checkbox\" name=\"cba_repeatday_".$i."\" value=\"1\" checked = \"checked\"/> $day";
+      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" name=\"cba_repeatday_".$i."\" value=\"1\" checked = \"checked\"/>$day</span> ";
     } else {
-      $dis_repeat_day .= "<input type=\"checkbox\" name=\"cba_repeatday_".$i."\" value=\"1\" /> $day";
+      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" name=\"cba_repeatday_".$i."\" value=\"1\" />$day</span> ";
     }
     $week->addDay(1);
   }
@@ -2980,7 +2983,7 @@ function html_calendar_waiting_events($obm_wait) {
       <tbody>";
     }
 
-    switch ($obm_wait->f('calendarevent_priority') ) {;
+    switch ($obm_wait->f('event_priority') ) {;
       case 1 : 
 	$priority = $l_low;
 	break;
@@ -2992,21 +2995,21 @@ function html_calendar_waiting_events($obm_wait) {
 	break;
     }
 	
-    if ($obm_wait->f('calendarevent_repeatkind') != 'none') {
+    if ($obm_wait->f('event_repeatkind') != 'none') {
       $periodic = $l_yes;
     } else {
       $periodic = $l_no;
     }
 
     $user_create = $obm_wait->f('usercreate_firstname').' '.$obm_wait->f('usercreate_lastname');
-    $begin = new Of_Date($obm_wait->f('calendarevent_date'), 'GMT');
+    $begin = new Of_Date($obm_wait->f('event_date'), 'GMT');
     $end = clone $begin;
-    $end->addSecond($obm_wait->f('calendarevent_duration'));
+    $end->addSecond($obm_wait->f('event_duration'));
     $block .= "
     <tr>
-     <td><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$obm_wait->f('calendarevent_id')."\">".$obm_wait->f('calendarevent_title')."</a></td>
+     <td><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$obm_wait->f('event_id')."\">".$obm_wait->f('event_title')."</a></td>
      <td>$periodic</td> 
-     <td>".$obm_wait->f('calendarevent_location')."</td>
+     <td>".$obm_wait->f('event_location')."</td>
      <td>".$obm_wait->f('calendarcategory1_label')."</td>
      <td>$priority</td>
      <td>$user_create</td>
@@ -3015,7 +3018,7 @@ function html_calendar_waiting_events($obm_wait) {
      <td>
       <form method=\"get\" action=\"calendar_index.php\">
        <input type=\"hidden\" name=\"action\" value=\"decision\" />      
-       <input type=\"hidden\" name=\"calendar_id\" value=\"".$obm_wait->f('calendarevent_id')."\" />
+       <input type=\"hidden\" name=\"calendar_id\" value=\"".$obm_wait->f('event_id')."\" />
        <input type=\"hidden\" name=\"entity_kind\" value=\"$current_entity_entity\" />
        <input type=\"hidden\" name=\"entity_id\" value=\"$current_entity\" />
        <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onclick=\"this.form.submit()\" />$l_accept</span><br />
@@ -3371,7 +3374,7 @@ function dis_calendar_free_interval($calendar, $entity_store) {
     $have_resource_grp = false;
   }
 
-  $status = array('A');
+  $status = array('ACCEPTED');
   calendar_events_model($date,$end,$entity_store, $status);
   $of = &OccurrenceFactory::getInstance();
   $current = clone $date;
@@ -4023,7 +4026,7 @@ function dis_calendar_month_agenda_pdf($calendar, $calendar_entity) {
   $end = clone $calendar['date'];
   $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $category_filter = $calendar['category_filter'];
-  $status = array('A', 'W');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter);
 
   foreach($occurrences as $occurrence){
@@ -4058,7 +4061,7 @@ function dis_calendar_week_agenda_pdf($calendar, $calendar_entity) {
   $end = clone $date;
   $end->addDay(7);
 
-  $status = array('A', 'W');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   $category_filter = $calendar['category_filter'];
 
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
@@ -4112,7 +4115,7 @@ function dis_calendar_day_agenda_pdf($calendar, $calendar_entity) {
   $end->addDay(1);
 
   $category_filter = $calendar['category_filter'];
-  $status = array('A', 'W');
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date,$end, $calendar_entity, $status, $category_filter);
   $id = $date->getTimestamp();
   $columns[$id] = array();
@@ -4160,7 +4163,7 @@ function dis_calendar_month_list_pdf($calendar, $calendar_entity) {
   $end->addMonth(1);
 
   $category_filter = $calendar['category_filter'];
-  $status = array('A');
+  $status = array('ACCEPTED');
 
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
 
@@ -4187,7 +4190,7 @@ function dis_calendar_week_list_pdf($calendar, $calendar_entity) {
   $end = clone $date;
   $end->addDay(7);
   $category_filter = $calendar['category_filter'];
-  $status = array('A');
+  $status = array('ACCEPTED');
 
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
 
@@ -4215,7 +4218,7 @@ function dis_calendar_day_list_pdf($calendar, $calendar_entity) {
   $end->addDay(1);
 
   $category_filter = $calendar['category_filter'];
-  $status = array('A');
+  $status = array('ACCEPTED');
 
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
 
