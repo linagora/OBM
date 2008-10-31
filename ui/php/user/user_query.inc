@@ -797,7 +797,7 @@ function run_query_user_update($p_id, $user) {
     $mail_perms = sql_parse_int($user['mail_perms']);
     $mail_ext_perms = sql_parse_int($user['mail_ext_perms']);
     $mail_server_id = sql_parse_id($user['mail_server_id']);
-    $mail_quota = $user['mail_quota'];
+    $mail_quota = (isset($user['mail_quota']) ? $user['mail_quota'] : 0);
     $query_mail = ",
     userobm_mail_perms=$mail_perms,
     userobm_mail_ext_perms=$mail_ext_perms,
