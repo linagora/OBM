@@ -2110,7 +2110,6 @@ CREATE TABLE HostService (
 ---
 CREATE TABLE Address (
   address_id                                    serial,
-  address_domain_id                             integer NOT NULL,
   address_street1                               varchar(255),
   address_street2                               varchar(255),
   address_street3                               varchar(2555),
@@ -2120,8 +2119,7 @@ CREATE TABLE Address (
   address_country                               char(2),
   address_im                                    varchar(255),
   address_label                                 varchar(255),
-  PRIMARY KEY (address_id),
-  CONSTRAINT address_domain_id_domain_id_fkey FOREIGN KEY (address_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (address_id)
 );
 
 ---
@@ -2129,11 +2127,9 @@ CREATE TABLE Address (
 ---
 CREATE TABLE Phone (
   phone_id                                      serial,
-  phone_domain_id                               integer NOT NULL,  
   phone_label                                   varchar(255) NOT NULL,
   phone_number                                  varchar(32),
-  PRIMARY KEY (phone_id),
-  CONSTRAINT phone_domain_id_domain_id_fkey FOREIGN KEY (phone_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (phone_id)
 );
 
 ---
@@ -2141,11 +2137,9 @@ CREATE TABLE Phone (
 ---
 CREATE TABLE Website (
   website_id                                    serial,
-  website_domain_id                             integer NOT NULL,  
   website_label                                 varchar(255) NOT NULL,
   website_number                                varchar(32),
-  PRIMARY KEY (website_id),
-  CONSTRAINT website_domain_id_domain_id_fkey FOREIGN KEY (website_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (website_id)
 );
 
 ---
@@ -2153,12 +2147,21 @@ CREATE TABLE Website (
 ---
 CREATE TABLE Email (
   email_id                                      serial,
-  email_domain_id                               integer NOT NULL,
   email_label                                   varchar(255) NOT NULL,
   email_address                                 varchar(255),
-  PRIMARY KEY (email_id),
-  CONSTRAINT email_domain_id_domain_id_fkey FOREIGN KEY (email_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
+  PRIMARY KEY (email_id)
 );
+
+---
+--- IM
+---
+CREATE TABLE IM (
+  im_id                                         serial,
+  im_label                                      varchar(255) NOT NULL,
+  im_address                                    varchar(255),
+  PRIMARY KEY (im_id)
+);
+
 ---
 --- ContactAddress
 ---
@@ -2201,6 +2204,17 @@ CREATE TABLE ContactEmail (
   PRIMARY KEY(contactemail_contact_id,contactemail_email_id),
   CONSTRAINT contactemail_email_id_email_id_fkey FOREIGN KEY (contactemail_email_id) REFERENCES Email (email_id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT contactemail_contact_id_contact_id_fkey FOREIGN KEY (contactemail_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+---
+--- ContactIM
+---
+CREATE TABLE ContactIM (
+  contactim_im_id                               integer NOT NULL,
+  contactim_contact_id                          integer NOT NULL,
+  PRIMARY KEY(contactim_contact_id,contactim_im_id),
+  CONSTRAINT contactim_im_id_im_id_fkey FOREIGN KEY (contactim_im_id) REFERENCES IM (im_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contactim_contact_id_contact_id_fkey FOREIGN KEY (contactim_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ---
