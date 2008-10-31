@@ -22,7 +22,7 @@ function run_query_mailserver_search($params) {
   $multidomain = sql_multidomain('host');
 
   $host_name = sql_search_text_parse($params['host_name']);
-  $host_ip = sql_search_text_parse($params['host_ip']);
+  $host_ip = sql_search_text_parse($params['ip']);
   $imap = $params['imap'];
   $smtp_in = $params['smtp_in'];
   $smtp_out = $params['smtp_out'];
@@ -36,10 +36,10 @@ function run_query_mailserver_search($params) {
 
   $where = '(1=1)';
   if ($host_name != '') {
-    $where .= " AND host_name $like '$name%'";
+    $where .= " AND host_name $like '$host_name%'";
   }
   if ($host_ip != '') {
-    $where .= " AND host_ip $like '%$ip%'";
+    $where .= " AND host_ip $like '%$host_ip%'";
   }
   if ($imap != '') {
     $where .= ' AND mailserver_imap = 1';
