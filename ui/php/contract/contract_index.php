@@ -109,7 +109,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_contract_form("", $params)) {
     // If the context (same contracts) was confirmed ok, we proceed
-    if ($hd_confirm == $c_yes) {
+    if ($params['confirm'] == $c_yes) {
       $params["contract_id"] = run_query_contract_insert($params);
       $display["detail"] = dis_contract_consult($params);
       // If first try, we warn the user if some contracts seem similar
