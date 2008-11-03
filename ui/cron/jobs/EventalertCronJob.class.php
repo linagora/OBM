@@ -13,7 +13,7 @@ $day_duration = DAY_DURATION;
  * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
  * @license GPL 2.0
  */
-class EventalertCronJob extends CronJob{
+class EventAlertCronJob extends CronJob{
 
   var $jobDelta = 120;
 
