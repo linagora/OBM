@@ -35,7 +35,7 @@ CREATE TABLE ServiceProperty (
 CREATE TABLE ServicePropertyDomain (
   servicepropertydomain_id                      int(8) NOT NULL,
   PRIMARY KEY (servicepropertydomain_id),
-  KEY servicepropertydomain_id_serviceproperty_id_fkey (servicepropertydomain_id)
+  KEY servicepropertydomain_id_serviceproperty_id_fkey (servicepropertydomain_id),
   CONSTRAINT servicepropertydomain_id_serviceproperty_id_fkey FOREIGN KEY (servicepropertydomain_id) REFERENCES ServiceProperty (serviceproperty_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -138,7 +138,7 @@ CREATE TABLE Address (
   address_country                               char(2),
   address_im                                    varchar(255),
   address_label                                 varchar(255),
-  PRIMARY KEY (address_id),
+  PRIMARY KEY (address_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ---
@@ -338,6 +338,7 @@ UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_gl
 ALTER TABLE OGroup MODIFY COLUMN ogroup_parent_id int(8);
 
 
+-------------------------------------------------------------------------------
 --
 -- CalendarEvent + Todo to Event
 --
@@ -461,12 +462,11 @@ SELECT
   calendarevent_properties
 FROM CalendarEvent;
 
-DROP Table CalendarEvent;
-
 
 -- Table EventEntity
 
 ALTER TABLE EventEntity ADD COLUMN evententity_state2 enum('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS') default 'NEEDS-ACTION';
+UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state!='A' AND evententity_state!='W' AND evententity_state!='R';
 UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state='A';
 UPDATE EventEntity set evententity_state2 = 'NEEDS-ACTION' where evententity_state='W';
 UPDATE EventEntity set evententity_state2 = 'DECLINED' where evententity_state='R';
@@ -562,7 +562,7 @@ CREATE TABLE EventException (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Clean CalendarException before migration to EventException
--- Foreign key from calendarexception_event_id to calendarevent_id
+-- Foreign key from calendarexception_event_id to event_id
 DELETE FROM CalendarException WHERE calendarexception_event_id NOT IN (SELECT event_id FROM Event) AND calendarexception_event_id IS NOT NULL;
 
 -- Foreign key from calendarexception_userupdate to userobm_id
@@ -588,6 +588,12 @@ SELECT
 FROM CalendarException;
 
 
+DROP Table CalendarEvent;
+DROP Table CalendarAlert;
+DROP Table CalendarException;
+-------------------------------------------------------------------------------
+
+
 -- Preferences
 ALTER TABLE DisplayPref DROP PRIMARY KEY;
 ALTER TABLE DisplayPref ADD CONSTRAINT displaypref_key  UNIQUE (display_user_id, display_entity, display_fieldname);
@@ -605,7 +611,6 @@ ALTER TABLE Contact MODIFY COLUMN contact_origin VARCHAR(255) NOT NULL;
 ALTER TABLE Account MODIFY COLUMN account_domain_id int(8) NOT NULL ;
 ALTER TABLE CV MODIFY COLUMN cv_domain_id int(8) NOT NULL ;
 ALTER TABLE CalendarCategory1 MODIFY COLUMN calendarcategory1_domain_id int(8) NOT NULL ;
-ALTER TABLE CalendarException MODIFY COLUMN calendarexception_event_id int(8) NOT NULL ;
 ALTER TABLE CategoryLink MODIFY COLUMN categorylink_category_id int(8) NOT NULL ;
 ALTER TABLE CategoryLink MODIFY COLUMN categorylink_entity_id int(8) NOT NULL ;
 ALTER TABLE Company MODIFY COLUMN company_domain_id int(8) NOT NULL ;
@@ -2010,8 +2015,8 @@ ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_group_id_group_id_fkey FORE
 DELETE FROM of_usergroup WHERE of_usergroup_user_id NOT IN (SELECT userobm_id FROM UserObm) AND of_usergroup_user_id IS NOT NULL;
 ALTER TABLE of_usergroup ADD CONSTRAINT of_usergroup_user_id_userobm_id_fkey FOREIGN KEY (of_usergroup_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
--- Foreign key from contact_birthday_id to calendarevent_id
--- UPDATE Contact SET contact_birthday_id = NULL WHERE contact_birthday_id NOT IN (SELECT calendarevent_id FROM CalendarEvent) AND contact_birthday_id IS NOT NULL;
+-- Foreign key from contact_birthday_id to event_id
+-- UPDATE Contact SET contact_birthday_id = NULL WHERE contact_birthday_id NOT IN (SELECT event_id FROM Event) AND contact_birthday_id IS NOT NULL;
 ALTER TABLE Contact ADD CONSTRAINT contact_birthday_id_event_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- User prefs 

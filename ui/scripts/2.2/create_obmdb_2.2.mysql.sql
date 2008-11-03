@@ -1041,7 +1041,7 @@ CREATE TABLE Deleted (
   deleted_table varchar(32) default NULL,
   deleted_entity_id int(8) default NULL,
   deleted_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (deleted_id),
+  PRIMARY KEY (deleted_id),
   KEY deleted_user_id_userobm_id_fkey (deleted_user_id),
   KEY deleted_domain_id_domain_id_fkey (deleted_domain_id),
   CONSTRAINT deleted_domain_id_domain_id_fkey FOREIGN KEY (deleted_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -1049,18 +1049,18 @@ CREATE TABLE Deleted (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `DeletedCalendarEvent`
+-- Table structure for table `DeletedEvent`
 --
 
-DROP TABLE IF EXISTS DeletedCalendarEvent;
-CREATE TABLE DeletedCalendarEvent (
-  deletedcalendarevent_id int(8) NOT NULL auto_increment,
-  deletedcalendarevent_event_id int(8) default NULL,
-  deletedcalendarevent_user_id int(8) default NULL,
-  deletedcalendarevent_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY (deletedcalendarevent_id),
-  KEY idx_dce_event (deletedcalendarevent_event_id),
-  KEY idx_dce_user (deletedcalendarevent_user_id)
+DROP TABLE IF EXISTS DeletedEvent;
+CREATE TABLE DeletedEvent (
+  deletedevent_id int(8) NOT NULL auto_increment,
+  deletedevent_event_id int(8) default NULL,
+  deletedevent_user_id int(8) default NULL,
+  deletedevent_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY (deletedevent_id),
+  KEY idx_dce_event (deletedevent_event_id),
+  KEY idx_dce_user (deletedevent_user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

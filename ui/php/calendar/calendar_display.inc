@@ -1966,7 +1966,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
     // Exception
     while($exception_q->next_record()) {
-      $date = new Of_Date($exception_q->f('calendarexception_date'), 'GMT');
+      $date = new Of_Date($exception_q->f('eventexception_date'), 'GMT');
       $block_exception_detail = $date->getOutputDate()."<br />";
     }
     $repeat_block = "
@@ -2365,7 +2365,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $id = $event_q->f('event_id');
 
     while($exception_q->next_record()) {
-      $date_exception[] = new Of_Date($exception_q->f('calendarexception_date'), 'GMT'); 
+      $date_exception[] = new Of_Date($exception_q->f('eventexception_date'), 'GMT'); 
     }
     // Alerts
     if (is_array($alerts) && isset($alerts[$owner])) {
@@ -2376,7 +2376,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     if ($action == 'duplicate') {
       $dis_title = "$title ($l_header_new)";
     }
-
   }
 
   // If parameters have been given, they supercede the default action value

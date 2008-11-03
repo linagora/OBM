@@ -62,7 +62,7 @@ class Vcalendar_Reader_OBM {
     if(count($this->vevents) > 0) {
       $exceptions = run_query_get_events_exception(array_keys($this->vevents));
       while($exceptions->next_record()) {
-        $this->addExdate($this->vevents[$exceptions->f('calendarexception_event_id')] , $exceptions->f('calendarexception_date'));
+        $this->addExdate($this->vevents[$exceptions->f('eventexception_event_id')] , $exceptions->f('eventexception_date'));
       }    
     }
     return $this->document;

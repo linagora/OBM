@@ -4,7 +4,7 @@ define('DAY_DURATION',86400);
 global $day_duration;
 $day_duration = DAY_DURATION;
 /**
- * CalendarAlertCronJob 
+ * EventAlertCronJob 
  * 
  * @uses CronJob
  * @package 
@@ -13,7 +13,7 @@ $day_duration = DAY_DURATION;
  * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
  * @license GPL 2.0
  */
-class CalendarAlertCronJob extends CronJob{
+class EventalertCronJob extends CronJob{
 
   var $jobDelta = 120;
 
@@ -111,18 +111,18 @@ class CalendarAlertCronJob extends CronJob{
 
     $this->logger->debug("Deleting alerts older than ".date("Y-m-d H:i:s",$date));
     $query = "
-      SELECT calendaralert_user_id, calendaralert_event_id FROM CalendarAlert
-      LEFT JOIN CalendarEvent ON calendarevent_id = calendaralert_event_id 
+      SELECT eventalert_user_id, eventalert_event_id FROM EventAlert
+      LEFT JOIN CalendarEvent ON calendarevent_id = eventalert_event_id 
       WHERE 
       calendarevent_id IS NULL 
-      OR ($calendarevent_date - calendaralert_duration <= $date AND calendarevent_repeatkind = 'none')
-      OR ($calendarevent_endrepeat - calendaralert_duration <= $date AND calendarevent_repeatkind != 'none')";
+      OR ($calendarevent_date - eventalert_duration <= $date AND calendarevent_repeatkind = 'none')
+      OR ($calendarevent_endrepeat - eventalert_duration <= $date AND calendarevent_repeatkind != 'none')";
     $obm_q = new DB_OBM;
     $this->logger->core($query);
     $obm_q->query($query);
     while($obm_q->next_record()) {
-      $query = "DELETE FROM CalendarAlert WHERE calendaralert_event_id = ".$obm_q->f('calendaralert_event_id')."
-                AND calendaralert_user_id = ".$obm_q->f('calendaralert_user_id');
+      $query = "DELETE FROM EventAlert WHERE eventalert_event_id = ".$obm_q->f('eventalert_event_id')."
+                AND eventalert_user_id = ".$obm_q->f('eventalert_user_id');
       $this->logger->core($query);
       $obm2_q->query($query);
     }
@@ -260,7 +260,7 @@ class CalendarAlertCronJob extends CronJob{
       $exception_q = run_query_get_events_exception(array_keys($of->events),$start_time,$end_time);
       $this->logger->debug($exception_q->nf()." exceptions founded");
       while($exception_q->next_record()) {
-        $of->removeOccurrences($exception_q->f('calendarexception_event_id'), $exception_q->f('calendarexception_date'));
+        $of->removeOccurrences($exception_q->f('eventexception_event_id'), $exception_q->f('eventexception_date'));
       }
     }
   }
@@ -273,13 +273,13 @@ class CalendarAlertCronJob extends CronJob{
    * @return void
    */
   function getAlertDelta($id, $user_id) {
-    $query = "SELECT calendaralert_duration from CalendarAlert WHERE calendaralert_event_id = '$id' and calendaralert_user_id = $user_id";
+    $query = "SELECT eventalert_duration FROM EventAlert WHERE eventalert_event_id = '$id' AND eventalert_user_id = $user_id";
     $obm_q = new DB_OBM;
     $this->logger->core($query);
     $obm_q->query($query);
     $obm_q->next_record();
-    $this->logger->debug("Reminder delta for event ".$id." is ".$obm_q->f('calendaralert_duration')." seconds");
-    return $obm_q->f('calendaralert_duration');
+    $this->logger->debug("Reminder delta for event ".$id." is ".$obm_q->f('eventalert_duration')." seconds");
+    return $obm_q->f('eventalert_duration');
   }
 
 }
@@ -310,25 +310,25 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       evententity_entity_id,
       evententity_entity,
       evententity_state,
-      $calendarevent_date_l - calendaralert_duration as calendarevent_date,
-      calendaralert_duration,
+      $calendarevent_date_l - eventalert_duration as calendarevent_date,
+      eventalert_duration,
       calendarevent_duration,
       calendarevent_allday,
       userobm_lastname,
       userobm_firstname
-    FROM CalendarAlert
-      JOIN CalendarEvent ON calendarevent_id = calendaralert_event_id  
-      JOIN EventEntity ON calendarevent_id = evententity_event_id AND calendaralert_user_id = evententity_entity_id AND evententity_entity = 'user'
+    FROM EventAlert
+      JOIN CalendarEvent ON calendarevent_id = eventalert_event_id  
+      JOIN EventEntity ON calendarevent_id = evententity_event_id AND eventalert_user_id = evententity_entity_id AND evententity_entity = 'user'
       JOIN UserObm ON userobm_id = evententity_entity_id
     WHERE evententity_state = 'A'
       AND calendarevent_repeatkind = 'none'
-      AND ($calendarevent_date - calendaralert_duration) >= $start
-      AND ($calendarevent_date - calendaralert_duration) <=  $end
-      AND  calendaralert_duration > 0
+      AND ($calendarevent_date - eventalert_duration) >= $start
+      AND ($calendarevent_date - eventalert_duration) <=  $end
+      AND  eventalert_duration > 0
       ORDER BY calendarevent_date
 ";
 
-  Logger::log($query,L_CORE,"calendaralertcronjob");
+  Logger::log($query,L_CORE,"eventalertcronjob");
   $obm_q->query($query);
   return $obm_q;
 }
@@ -356,8 +356,8 @@ function run_query_calendar_repeat_alerts($start, $end) {
       calendarevent_privacy,
       calendarevent_description, 
       calendarevent_location, 
-      $calendarevent_date_l - calendaralert_duration as calendarevent_date,
-      calendaralert_duration,
+      $calendarevent_date_l - eventalert_duration as calendarevent_date,
+      eventalert_duration,
       calendarevent_duration,
       calendarevent_repeatkind,
       $calendarevent_endrepeat_l,
@@ -370,19 +370,19 @@ function run_query_calendar_repeat_alerts($start, $end) {
       calendarevent_allday,
       userobm_lastname,
       userobm_firstname
-    FROM CalendarAlert
-      JOIN CalendarEvent ON calendarevent_id = calendaralert_event_id
-      JOIN EventEntity ON calendarevent_id = evententity_event_id AND calendaralert_user_id = evententity_entity_id AND evententity_entity = 'user'
+    FROM EventAlert
+      JOIN CalendarEvent ON calendarevent_id = eventalert_event_id
+      JOIN EventEntity ON calendarevent_id = evententity_event_id AND eventalert_user_id = evententity_entity_id AND evententity_entity = 'user'
       JOIN UserObm ON userobm_id = evententity_entity_id
     WHERE calendarevent_repeatkind != 'none'
       AND evententity_state = 'A'
-      AND ($calendarevent_date  - calendaralert_duration) <= $end 
-      AND (($calendarevent_endrepeat  - calendaralert_duration) >= $start
+      AND ($calendarevent_date  - eventalert_duration) <= $end 
+      AND (($calendarevent_endrepeat  - eventalert_duration) >= $start
       OR $calendarevent_endrepeat = '0')
-      AND  calendaralert_duration > 0
+      AND eventalert_duration > 0
     ORDER BY calendarevent_date"; 
 
-  Logger::log($query,L_CORE,"calendaralertcronjob");
+  Logger::log($query,L_CORE,'eventalertcronjob');
   $obm_q->query($query);
   return $obm_q;
 }

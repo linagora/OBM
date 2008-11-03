@@ -276,16 +276,251 @@ UPDATE Contact SET contact_origin='obm21';
 ALTER TABLE Contact ALTER COLUMN contact_origin SET DEFAULT NOT NULL;
 
 
--- CalendarEvent
+-------------------------------------------------------------------------------
+--
+-- CalendarEvent + Todo to Event
+--
 
-ALTER TABLE calendarevent ALTER COLUMN calendarevent_allday DROP DEFAULT;
-ALTER TABLE calendarevent ALTER COLUMN calendarevent_allday TYPE BOOLEAN USING CASE calendarevent_allday WHEN 1 THEN TRUE ELSE FALSE END;
-ALTER TABLE calendarevent ALTER COLUMN calendarevent_allday SET DEFAULT FALSE;
-ALTER TABLE calendarevent ALTER COLUMN calendarevent_endrepeat SET DEFAULT NULL;
-ALTER TABLE calendarevent ADD COLUMN calendarevent_timezone VARCHAR(255) DEFAULT 'GMT';
-ALTER TABLE evententity ALTER COLUMN evententity_required DROP DEFAULT;
-ALTER TABLE evententity ALTER COLUMN evententity_required TYPE BOOLEAN USING CASE evententity_required WHEN 1 THEN TRUE ELSE FALSE END;
-ALTER TABLE evententity ALTER COLUMN evententity_required SET DEFAULT FALSE;
+-- Event Creation
+CREATE TABLE Event (
+  event_id           	serial,
+  event_domain_id    	integer NOT NULL,
+  event_timeupdate   	timestamp,
+  event_timecreate   	timestamp,
+  event_userupdate   	integer,
+  event_usercreate   	integer,
+  event_ext_id       	varchar(255) default '', 
+  event_type            enum('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY') default 'VEVENT',
+  event_origin          varchar(255) default NULL,
+  event_owner           integer default NULL,    
+  event_timezone        varchar(255) default 'GMT',    
+  event_opacity         enum('OPAQUE', 'TRANSPARENT') default 'OPAQUE',
+  event_title           varchar(255) default NULL,
+  event_location        varchar(100) default NULL,
+  event_category1_id    integer default NULL,
+  event_priority        integer,
+  event_privacy         integer,
+  event_date            timestamp NOT NULL,
+  event_duration        integer NOT NULL default 0,
+  event_allday          BOOLEAN default FALSE,
+  event_repeatkind      varchar(20) default NULL,
+  event_repeatfrequence integer default NULL,
+  event_repeatdays      varchar(7) default NULL,
+  event_endrepeat       timestamp default NULL,
+  event_color           varchar(7),
+  event_completed       timestamp NOT NULL,
+  event_url             text,
+  event_description     text,
+  event_properties      text,
+  PRIMARY KEY (event_id)
+);
+-- Foreign key from event_domain_id to domain_id
+ALTER TABLE Event ADD CONSTRAINT event_domain_id_domain_id_fkey FOREIGN KEY (event_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- Foreign key from event_owner to userobm_id
+ALTER TABLE Event ADD CONSTRAINT event_owner_userobm_id_fkey FOREIGN KEY (event_owner) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- Foreign key from event_userupdate to userobm_id
+ALTER TABLE Event ADD CONSTRAINT event_userupdate_userobm_id_fkey FOREIGN KEY (event_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+-- Foreign key from event_usercreate to userobm_id
+ALTER TABLE Event ADD CONSTRAINT event_usercreate_userobm_id_fkey FOREIGN KEY (event_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+-- Foreign key from event_category1_id to calendarcategory1_id
+ALTER TABLE Event ADD CONSTRAINT event_category1_id_calendarcategory1_id_fkey FOREIGN KEY (event_category1_id) REFERENCES CalendarCategory1(calendarcategory1_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Clean CalendarEvent before migration to Event
+-- Foreign key domain_id
+DELETE FROM CalendarEvent WHERE calendarevent_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarevent_domain_id IS NOT NULL;
+-- Foreign key from calendarevent_userupdate to userobm_id
+UPDATE CalendarEvent SET calendarevent_userupdate = NULL WHERE calendarevent_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_userupdate IS NOT NULL;
+-- Foreign key from calendarevent_usercreate to userobm_id
+UPDATE CalendarEvent SET calendarevent_usercreate = NULL WHERE calendarevent_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_usercreate IS NOT NULL;
+-- Foreign key from calendarevent_owner to userobm_id
+DELETE FROM CalendarEvent WHERE calendarevent_owner NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_owner IS NOT NULL;
+-- Foreign key from calendarevent_category1_id to calendarcategory1_id
+UPDATE CalendarEvent SET calendarevent_category1_id = NULL WHERE calendarevent_category1_id NOT IN (SELECT calendarcategory1_id FROM CalendarCategory1) AND calendarevent_category1_id IS NOT NULL;
+
+
+INSERT INTO Event (event_id,
+  event_domain_id, 
+  event_timeupdate,
+  event_timecreate,
+  event_userupdate,
+  event_usercreate,
+  event_ext_id,
+  event_type,
+  event_origin,
+  event_owner,
+  event_timezone,
+  event_opacity,
+  event_title,
+  event_location,
+  event_category1_id,
+  event_priority,
+  event_privacy,
+  event_date,
+  event_duration,
+  event_allday,
+  event_repeatkind,
+  event_repeatfrequence,
+  event_repeatdays,
+  event_endrepeat,
+  event_color,
+  event_completed,
+  event_url,
+  event_description,
+  event_properties)
+SELECT
+  calendarevent_id,
+  calendarevent_domain_id, 
+  calendarevent_timeupdate,
+  calendarevent_timecreate,
+  calendarevent_userupdate,
+  calendarevent_usercreate,
+  calendarevent_ext_id,
+  'VEVENT',
+  'migration',
+  calendarevent_owner,
+  'Europe/Paris',
+  'OPAQUE',
+  calendarevent_title,
+  calendarevent_location,
+  calendarevent_category1_id,
+  calendarevent_priority,
+  calendarevent_privacy,
+  calendarevent_date,
+  calendarevent_duration,
+  calendarevent_allday,
+  calendarevent_repeatkind,
+  calendarevent_repeatfrequence,
+  calendarevent_repeatdays,
+  calendarevent_endrepeat,
+  calendarevent_color,
+  NULL,
+  NULL,
+  calendarevent_description,
+  calendarevent_properties
+FROM CalendarEvent;
+
+
+-- Table EventEntity
+
+ALTER TABLE EventEntity ADD COLUMN evententity_state2 enum('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS') default 'NEEDS-ACTION';
+UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state!='A' AND evententity_state!='W' AND evententity_state!='R';
+UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state='A';
+UPDATE EventEntity set evententity_state2 = 'NEEDS-ACTION' where evententity_state='W';
+UPDATE EventEntity set evententity_state2 = 'DECLINED' where evententity_state='R';
+ALTER TABLE EventEntity DROP COLUMN evententity_state;
+ALTER TABLE EventEntity RENAME COLUMN evententity_state2 TO evententity_state;
+
+ALTER TABLE EventEntity ALTER COLUMN evententity_required TYPE enum('CHAIR', 'REQ', 'OPT', 'NON');
+ALTER TABLE EventEntity ALTER COLUMN evententity_required SET DEFAULT 'REQ';
+UPDATE EventEntity set evententity_required = 'REQ';
+
+ALTER TABLE EventEntity ADD COLUMN evententity_percent float default 0;
+
+
+-- Foreign key from evententity_event_id to event_id
+DELETE FROM EventEntity WHERE evententity_event_id NOT IN (SELECT event_id FROM Event) AND evententity_event_id IS NOT NULL;
+ALTER TABLE EventEntity ADD CONSTRAINT evententity_event_id_event_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from evententity_userupdate to userobm_id
+UPDATE EventEntity SET evententity_userupdate = NULL WHERE evententity_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND evententity_userupdate IS NOT NULL;
+ALTER TABLE EventEntity ADD CONSTRAINT evententity_userupdate_userobm_id_fkey FOREIGN KEY (evententity_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from evententity_usercreate to userobm_id
+UPDATE EventEntity SET evententity_usercreate = NULL WHERE evententity_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND evententity_usercreate IS NOT NULL;
+ALTER TABLE EventEntity ADD CONSTRAINT evententity_usercreate_userobm_id_fkey FOREIGN KEY (evententity_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+-- Table EventAlert
+
+CREATE TABLE EventAlert (
+  eventalert_timeupdate  timestamp,
+  eventalert_timecreate  timestamp,
+  eventalert_userupdate  integer default NULL,
+  eventalert_usercreate  integer default NULL,
+  eventalert_event_id    integer,
+  eventalert_user_id     integer,
+  eventalert_duration    integer NOT NULL default 0
+);
+CREATE INDEX idx_eventalert_user ON EventAlert (eventalert_user_id);
+ALTER TABLE EventAlert ADD CONSTRAINT eventalert_event_id_eventevent_id_fkey FOREIGN KEY (eventalert_event_id) REFERENCES EventEvent(eventevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE EventAlert ADD CONSTRAINT eventalert_user_id_userobm_id_fkey FOREIGN KEY (eventalert_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE EventAlert ADD CONSTRAINT eventalert_userupdate_userobm_id_fkey FOREIGN KEY (eventalert_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE EventAlert ADD CONSTRAINT eventalert_usercreate_userobm_id_fkey FOREIGN KEY (eventalert_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Clean CalendarAlert before migration to EventAlert
+-- Foreign key from calendaralert_event_id to event_id
+DELETE FROM CalendarAlert WHERE calendaralert_event_id NOT IN (SELECT event_id FROM Event) AND calendaralert_event_id IS NOT NULL;
+-- Foreign key from calendaralert_user_id to userobm_id
+DELETE FROM CalendarAlert WHERE calendaralert_user_id NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_user_id IS NOT NULL;
+-- Foreign key from calendaralert_userupdate to userobm_id
+UPDATE CalendarAlert SET calendaralert_userupdate = NULL WHERE calendaralert_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_userupdate IS NOT NULL;
+-- Foreign key from calendaralert_usercreate to userobm_id
+UPDATE CalendarAlert SET calendaralert_usercreate = NULL WHERE calendaralert_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_usercreate IS NOT NULL;
+
+
+INSERT INTO EventAlert (eventalert_timeupdate,
+  eventalert_timecreate,
+  eventalert_userupdate,
+  eventalert_usercreate,
+  eventalert_event_id,
+  eventalert_user_id,
+  eventalert_duration)
+SELECT
+  calendaralert_timeupdate,
+  calendaralert_timecreate,
+  calendaralert_userupdate,
+  calendaralert_usercreate,
+  calendaralert_event_id,
+  calendaralert_user_id,
+  calendaralert_duration
+FROM CalendarAlert;
+
+
+-- Table EventException
+
+CREATE TABLE EventException (
+  eventexception_timeupdate   timestamp,
+  eventexception_timecreate   timestamp,
+  eventexception_userupdate   integer default NULL,
+  eventexception_usercreate   integer default NULL,
+  eventexception_event_id     integer,
+  eventexception_date         timestamp NOT NULL,
+  PRIMARY KEY (eventexception_event_id,eventexception_date)
+);
+ALTER TABLE EventException ADD CONSTRAINT eventexception_event_id_eventevent_id_fkey FOREIGN KEY (eventexception_event_id) REFERENCES EventEvent(eventevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE EventException ADD CONSTRAINT eventexception_userupdate_userobm_id_fkey FOREIGN KEY (eventexception_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE EventException ADD CONSTRAINT eventexception_usercreate_userobm_id_fkey FOREIGN KEY (eventexception_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Clean CalendarException before migration to EventException
+-- Foreign key from calendarexception_event_id to calendarevent_id
+DELETE FROM CalendarException WHERE calendarexception_event_id NOT IN (SELECT calendarevent_id FROM CalendarEvent) AND calendarexception_event_id IS NOT NULL;
+-- Foreign key from calendarexception_userupdate to userobm_id
+UPDATE CalendarException SET calendarexception_userupdate = NULL WHERE calendarexception_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_userupdate IS NOT NULL;
+-- Foreign key from calendarexception_usercreate to userobm_id
+UPDATE CalendarException SET calendarexception_usercreate = NULL WHERE calendarexception_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_usercreate IS NOT NULL;
+
+
+INSERT INTO EventException (eventexception_timeupdate,
+  eventexception_timecreate,
+  eventexception_userupdate,
+  eventexception_usercreate,
+  eventexception_event_id,
+  eventexception_date)
+SELECT
+  calendarexception_timeupdate,
+  calendarexception_timecreate,
+  calendarexception_userupdate,
+  calendarexception_usercreate,
+  calendarexception_event_id,
+  calendarexception_date
+FROM CalendarException;
+
+
+DROP Table CalendarEvent;
+DROP Table CalendarAlert;
+DROP Table CalendarException;
+-------------------------------------------------------------------------------
+
 
 -- Preferences
 ALTER TABLE DisplayPref DROP CONSTRAINT displaypref_pkey;
@@ -320,8 +555,6 @@ ALTER TABLE DealStatus ALTER COLUMN dealstatus_domain_id SET NOT NULL;
 ALTER TABLE DealType ALTER COLUMN dealtype_domain_id SET NOT NULL;
 ALTER TABLE DealCompanyRole ALTER COLUMN dealcompanyrole_domain_id SET NOT NULL;
 ALTER TABLE List ALTER COLUMN list_domain_id SET NOT NULL;
-ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_domain_id SET NOT NULL;
-ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_category1_id SET default NULL;
 ALTER TABLE CalendarCategory1 ALTER COLUMN calendarcategory1_domain_id SET NOT NULL;
 ALTER TABLE Todo ALTER COLUMN todo_domain_id SET NOT NULL;
 ALTER TABLE Publication ALTER COLUMN publication_domain_id SET NOT NULL;
@@ -515,22 +748,6 @@ ALTER TABLE CV ADD CONSTRAINT cv_userupdate_userobm_id_fkey FOREIGN KEY (cv_user
 UPDATE CV SET cv_usercreate = NULL WHERE cv_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND cv_usercreate IS NOT NULL;
 ALTER TABLE CV ADD CONSTRAINT cv_usercreate_userobm_id_fkey FOREIGN KEY (cv_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
--- Foreign key from calendaralert_event_id to calendarevent_id
-DELETE FROM CalendarAlert WHERE calendaralert_event_id NOT IN (SELECT calendarevent_id FROM CalendarEvent) AND calendaralert_event_id IS NOT NULL;
-ALTER TABLE CalendarAlert ADD CONSTRAINT calendaralert_event_id_calendarevent_id_fkey FOREIGN KEY (calendaralert_event_id) REFERENCES CalendarEvent(calendarevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from calendaralert_user_id to userobm_id
-DELETE FROM CalendarAlert WHERE calendaralert_user_id NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_user_id IS NOT NULL;
-ALTER TABLE CalendarAlert ADD CONSTRAINT calendaralert_user_id_userobm_id_fkey FOREIGN KEY (calendaralert_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from calendaralert_userupdate to userobm_id
-UPDATE CalendarAlert SET calendaralert_userupdate = NULL WHERE calendaralert_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_userupdate IS NOT NULL;
-ALTER TABLE CalendarAlert ADD CONSTRAINT calendaralert_userupdate_userobm_id_fkey FOREIGN KEY (calendaralert_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from calendaralert_usercreate to userobm_id
-UPDATE CalendarAlert SET calendaralert_usercreate = NULL WHERE calendaralert_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_usercreate IS NOT NULL;
-ALTER TABLE CalendarAlert ADD CONSTRAINT calendaralert_usercreate_userobm_id_fkey FOREIGN KEY (calendaralert_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
 -- Foreign key from calendarcategory1_domain_id to domain_id
 DELETE FROM CalendarCategory1 WHERE calendarcategory1_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarcategory1_domain_id IS NOT NULL;
 ALTER TABLE CalendarCategory1 ADD CONSTRAINT calendarcategory1_domain_id_domain_id_fkey FOREIGN KEY (calendarcategory1_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -542,38 +759,6 @@ ALTER TABLE CalendarCategory1 ADD CONSTRAINT calendarcategory1_userupdate_userob
 -- Foreign key from calendarcategory1_usercreate to userobm_id
 UPDATE CalendarCategory1 SET calendarcategory1_usercreate = NULL WHERE calendarcategory1_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_usercreate IS NOT NULL;
 ALTER TABLE CalendarCategory1 ADD CONSTRAINT calendarcategory1_usercreate_userobm_id_fkey FOREIGN KEY (calendarcategory1_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from calendarevent_domain_id to domain_id
-DELETE FROM CalendarEvent WHERE calendarevent_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarevent_domain_id IS NOT NULL;
-ALTER TABLE CalendarEvent ADD CONSTRAINT calendarevent_domain_id_domain_id_fkey FOREIGN KEY (calendarevent_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from calendarevent_owner to userobm_id
-DELETE FROM CalendarEvent WHERE calendarevent_owner NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_owner IS NOT NULL;
-ALTER TABLE CalendarEvent ADD CONSTRAINT calendarevent_owner_userobm_id_fkey FOREIGN KEY (calendarevent_owner) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from calendarevent_userupdate to userobm_id
-UPDATE CalendarEvent SET calendarevent_userupdate = NULL WHERE calendarevent_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_userupdate IS NOT NULL;
-ALTER TABLE CalendarEvent ADD CONSTRAINT calendarevent_userupdate_userobm_id_fkey FOREIGN KEY (calendarevent_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from calendarevent_usercreate to userobm_id
-UPDATE CalendarEvent SET calendarevent_usercreate = NULL WHERE calendarevent_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_usercreate IS NOT NULL;
-ALTER TABLE CalendarEvent ADD CONSTRAINT calendarevent_usercreate_userobm_id_fkey FOREIGN KEY (calendarevent_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from calendarevent_category1_id to calendarcategory1_id
-UPDATE CalendarEvent SET calendarevent_category1_id = NULL WHERE calendarevent_category1_id NOT IN (SELECT calendarcategory1_id FROM CalendarCategory1) AND calendarevent_category1_id IS NOT NULL;
-ALTER TABLE CalendarEvent ADD CONSTRAINT calendarevent_category1_id_calendarcategory1_id_fkey FOREIGN KEY (calendarevent_category1_id) REFERENCES CalendarCategory1(calendarcategory1_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from calendarexception_event_id to calendarevent_id
-DELETE FROM CalendarException WHERE calendarexception_event_id NOT IN (SELECT calendarevent_id FROM CalendarEvent) AND calendarexception_event_id IS NOT NULL;
-ALTER TABLE CalendarException ADD CONSTRAINT calendarexception_event_id_calendarevent_id_fkey FOREIGN KEY (calendarexception_event_id) REFERENCES CalendarEvent(calendarevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from calendarexception_userupdate to userobm_id
-UPDATE CalendarException SET calendarexception_userupdate = NULL WHERE calendarexception_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_userupdate IS NOT NULL;
-ALTER TABLE CalendarException ADD CONSTRAINT calendarexception_userupdate_userobm_id_fkey FOREIGN KEY (calendarexception_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from calendarexception_usercreate to userobm_id
-UPDATE CalendarException SET calendarexception_usercreate = NULL WHERE calendarexception_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_usercreate IS NOT NULL;
-ALTER TABLE CalendarException ADD CONSTRAINT calendarexception_usercreate_userobm_id_fkey FOREIGN KEY (calendarexception_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from category_domain_id to domain_id
 DELETE FROM Category WHERE category_domain_id NOT IN (SELECT domain_id FROM Domain) AND category_domain_id IS NOT NULL;
@@ -998,18 +1183,6 @@ ALTER TABLE DomainMailServer ADD CONSTRAINT domainmailserver_mailserver_id_mails
 -- Foreign key from domainpropertyvalue_domain_id to domain_id
 DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id NOT IN (SELECT domain_id FROM Domain) AND domainpropertyvalue_domain_id IS NOT NULL;
 ALTER TABLE DomainPropertyValue ADD CONSTRAINT domainpropertyvalue_domain_id_domain_id_fkey FOREIGN KEY (domainpropertyvalue_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from evententity_event_id to calendarevent_id
-DELETE FROM EventEntity WHERE evententity_event_id NOT IN (SELECT calendarevent_id FROM CalendarEvent) AND evententity_event_id IS NOT NULL;
-ALTER TABLE EventEntity ADD CONSTRAINT evententity_event_id_calendarevent_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES CalendarEvent(calendarevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from evententity_userupdate to userobm_id
-UPDATE EventEntity SET evententity_userupdate = NULL WHERE evententity_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND evententity_userupdate IS NOT NULL;
-ALTER TABLE EventEntity ADD CONSTRAINT evententity_userupdate_userobm_id_fkey FOREIGN KEY (evententity_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from evententity_usercreate to userobm_id
-UPDATE EventEntity SET evententity_usercreate = NULL WHERE evententity_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND evententity_usercreate IS NOT NULL;
-ALTER TABLE EventEntity ADD CONSTRAINT evententity_usercreate_userobm_id_fkey FOREIGN KEY (evententity_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from groupgroup_parent_id to group_id
 DELETE FROM GroupGroup WHERE groupgroup_parent_id NOT IN (SELECT group_id FROM UGroup) AND groupgroup_parent_id IS NOT NULL;

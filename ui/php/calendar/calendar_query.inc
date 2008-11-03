@@ -1131,7 +1131,7 @@ function run_query_calendar_update_event_data($calendar) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
   $obm_q->query($query);
 
-  $query = "DELETE FROM CalendarException WHERE calendarexception_event_id $event_id"; 
+  $query = "DELETE FROM EventException WHERE eventexception_event_id $event_id"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(2)');
   $obm_q->query($query);
   
@@ -1273,13 +1273,13 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(0)');
   $obm_q->query($query);
   $sql_id = sql_parse_id($id);
-  $query = "INSERT INTO CalendarException (
-      calendarexception_usercreate,
-      calendarexception_timecreate ,   
-      calendarexception_userupdate,
-      calendarexception_timeupdate,
-      calendarexception_event_id,
-      calendarexception_date)
+  $query = "INSERT INTO EventException (
+      eventexception_usercreate,
+      eventexception_timecreate ,   
+      eventexception_userupdate,
+      eventexception_timeupdate,
+      eventexception_event_id,
+      eventexception_date)
       VALUES (
         $obm[uid],
         '$now',
@@ -1445,12 +1445,12 @@ function run_query_calendar_event_alert_insert($event_id, $user_id, $alerts) {
   if (is_array($alerts) && count($alerts) > 0) {
     $obm_q = new DB_OBM;
     foreach ($alerts as $dur => $label) {
-      $query = "INSERT INTO CalendarAlert (
-        calendaralert_timecreate,
-        calendaralert_usercreate,
-        calendaralert_event_id,
-        calendaralert_user_id,
-        calendaralert_duration)
+      $query = "INSERT INTO EventAlert (
+        eventalert_timecreate,
+        eventalert_usercreate,
+        eventalert_event_id,
+        eventalert_user_id,
+        eventalert_duration)
       VALUES (
         '$now',
         $obm[uid],
@@ -1480,11 +1480,11 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
   $obm_q = new DB_OBM;
   
   if ($user_id > 0) {
-    $where_user = "AND calendaralert_user_id = $user_id";
+    $where_user = "AND eventalert_user_id = $user_id";
   }
 
-  $query = "DELETE FROM CalendarAlert
-    WHERE calendaralert_event_id = '$event_id'
+  $query = "DELETE FROM EventAlert
+    WHERE eventalert_event_id = '$event_id'
       $where_user";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_alert_delete()');
   $obm_q->query($query);
@@ -2737,16 +2737,16 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
   $obm_q = new DB_OBM;
   $event_list = implode(',',$events);
   if(!is_null($start_time)) {
-    $start = "AND calendarexception_date > '$start_time'";
+    $start = "AND eventexception_date > '$start_time'";
   }
   if(!is_null($end_time)) {
-    $end = "AND calendarexception_date < '$end_time'";
+    $end = "AND eventexception_date < '$end_time'";
   }
   $query = "SELECT
-    calendarexception_event_id,
-    calendarexception_date
-   FROM CalendarException
-   WHERE calendarexception_event_id IN ($event_list) 
+    eventexception_event_id,
+    eventexception_date
+   FROM EventException
+   WHERE eventexception_event_id IN ($event_list) 
    $start $end";
   display_debug_msg($query, $cdg_sql, 'run_query_get_events_exception()');
   $obm_q->query($query);
@@ -2768,10 +2768,10 @@ function run_query_get_one_event_exception($calendar_id) {
   $calendar_id = sql_parse_id( $calendar_id, true);
 
   $query = "SELECT
-    calendarexception_event_id,
-    calendarexception_date
-   FROM CalendarException
-   WHERE calendarexception_event_id $calendar_id"; 
+    eventexception_event_id,
+    eventexception_date
+   FROM EventException
+   WHERE eventexception_event_id $calendar_id"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_get_one_event_exception()');
   $obm_q->query($query);
@@ -2795,22 +2795,22 @@ function get_one_event_user_alert($event_id, $user_id = null) {
   $obm_q = new DB_OBM;
   $event_id = sql_parse_id($event_id, true); 
   $query = "SELECT
-    calendaralert_duration,
-    calendaralert_user_id
-   FROM CalendarAlert
-   WHERE calendaralert_event_id $event_id"; 
+    eventalert_duration,
+    eventalert_user_id
+   FROM EventAlert
+   WHERE eventalert_event_id $event_id"; 
 
   if($user_id) {
     $user_id = sql_parse_id($user_id, true);
-    $query .= " AND calendaralert_user_id $user_id"; 
+    $query .= " AND eventalert_user_id $user_id"; 
   }
 
   display_debug_msg($query, $cdg_sql, 'get_one_event_user_alert()');
   $obm_q->query($query);
 
   while ($obm_q->next_record()) {
-    $dur = $obm_q->f('calendaralert_duration');
-    $id = $obm_q->f('calendaralert_user_id');
+    $dur = $obm_q->f('eventalert_duration');
+    $id = $obm_q->f('eventalert_user_id');
     $dur_min = $dur / 60;
     $alerts[$id] = $dur;
   }
@@ -2936,7 +2936,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     // Handle exceptions : remove occurences from the model
     $exception_q = run_query_get_events_exception(array_keys($of->events),$start,$end);
     while($exception_q->next_record()) {
-      $of->removeOccurrences($exception_q->f('calendarexception_event_id'), new Of_Date($exception_q->f('calendarexception_date'), 'GMT'));
+      $of->removeOccurrences($exception_q->f('eventexception_event_id'), new Of_Date($exception_q->f('eventexception_date'), 'GMT'));
     }
 
     // Add attendees to events
@@ -3764,7 +3764,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
         $date_exception = array();
       }
       while($exceptions_q->next_record()) {
-        $exceptions[] = new Of_Date($exceptions_q->f('calendarexception_date'), 'GMT');
+        $exceptions[] = new Of_Date($exceptions_q->f('eventexception_date'), 'GMT');
       }
       $old_exceptions = array_udiff($exceptions,$date_exception, array('Of_Date', 'cmpDate'));
       $new_exceptions = array_udiff($date_exception,$exceptions, array('Of_Date', 'cmpDate'));
@@ -4051,8 +4051,8 @@ function run_query_calendar_reset($id) {
   }
   # Delete all alerts
 
-  $query = "DELETE FROM CalendarAlert WHERE calendaralert_event_id NOT IN (SELECT evententity_event_id FROM EventEntity) 
-                  OR calendaralert_user_id $id"; 
+  $query = "DELETE FROM EventAlert WHERE eventalert_event_id NOT IN (SELECT evententity_event_id FROM EventEntity) 
+                  OR eventalert_user_id $id"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset()');
   $obm_q->query($query);
 }
