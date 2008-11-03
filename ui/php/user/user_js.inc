@@ -91,7 +91,6 @@ function check_user(form) {
   // Check the email
   if (form.tf_email !== undefined) {
     lemail = form.tf_email.value;
-    alert('after lemail init');
     if ((lemail != \"\") && (check_email(lemail) == null)) {
       alert (\"$l_j_check_email\");
       return false;
