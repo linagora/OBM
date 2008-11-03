@@ -88,12 +88,22 @@ function check_user(form) {
     }
   }
 
-  // Check the email
-  if (form.tf_email !== undefined) {
-    lemail = form.tf_email.value;
-    if ((lemail != \"\") && (check_email(lemail) == null)) {
-      alert (\"$l_j_check_email\");
-      return false;
+  // Check emails
+  if (form['tf_email[]'] !== undefined && form.cb_mail_perms.checked) {
+    if(form['tf_email[]'].length > 0) {
+      for (var i=0; i<form['tf_email[]'].length; i++) {
+        lemail = form['tf_email[]'][i].value;
+        if ((lemail != \"\") && (check_email(lemail) == null)) {
+          alert (\"$l_j_check_email\");
+          return false;
+        }
+      }
+    } else {
+      lemail = form['tf_email[]'].value;
+      if ((lemail != \"\") && (check_email(lemail) == null)) {
+        alert (\"$l_j_check_email\");
+        return false;
+      }
     }
   }
   
