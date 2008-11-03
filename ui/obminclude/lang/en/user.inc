@@ -116,6 +116,8 @@ $l_phone_error = "The phone number is not correct";
 $l_fax_error = "The fax number is not correct";
 $l_zip_error = "Zip code is not correct";
 $l_expresspostal_error = "Express postal code is incorrect";
+$l_coord_same_phone_error = "You have to enter different phone numbers !";
+$l_coord_same_fax_error = "You have to enter different fax numbers !";
 
 // JavaScript Messages (special characters must be escaped with \ -> \\)
 $l_fill_login = "You have to fill the login before submitting.";
@@ -123,7 +125,8 @@ $l_fill_password = "You have to fill the password before submitting.";
 $l_delete_confirm = "CAUTION : You will delete a user ! This operation is irreversible.\\nContinue anyway ?";
 $l_j_check_email = "The email address is not valid.";
 $l_change_login_confirm = "Really update user's login ?";
-
+$l_j_coord_same_phone_error = "You have to enter different phone numbers !";
+$l_j_coord_same_fax_error = "You have to enter different fax numbers !";
 
 $l_user_display = "Display options for users lists"; 
 

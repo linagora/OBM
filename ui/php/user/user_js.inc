@@ -74,7 +74,6 @@ function confirm_del(form) {
 }
 
 function check_user(form) {
-
   // MANDATORY : Check that Login is not empty
   if (trim(form.tf_login.value) == \"\") {
     alert (\"$l_fill_login\");
@@ -95,6 +94,36 @@ function check_user(form) {
 
   return true;
 }
+
+// Check if phone and phone2 fields haven't the same number
+function check_phoneFax_number(form) {
+  var errMsg ='';
+  var ret = true;
+  
+  var phone1 = form.tf_phone.value;
+  var phone2 = form.tf_phone2.value;
+  var fax1 = form.tf_fax.value;
+  var fax2 = form.tf_fax2.value;
+
+  // Check phones number
+  if (phone1 != '' && phone2 != '' && phone1 == phone2) {
+    errMsg += '$l_j_coord_same_phone_error\\n';
+    ret = false
+  }
+  
+  // Check faxes number
+  if (fax1 != '' && fax2 != '' && fax1 == fax2) {
+    errMsg += '$l_j_coord_same_fax_error';
+    ret = false
+  }
+  
+  if (!ret) {
+    alert(errMsg);
+  }
+  
+  return ret;
+}
+
 
 function delete_user_photo() {
   $('block_photo_detail').remove();

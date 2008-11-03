@@ -126,6 +126,8 @@ $l_phone_error = "Le numéro de téléphone est incorrect";
 $l_fax_error = "Le numéro de fax est incorrect";
 $l_zip_error = "Le code postal est incorrect";
 $l_expresspostal_error = "Cedex est incorrect";
+$l_coord_same_phone_error = "Vous devez saisir des numéros de téléphone différents !";
+$l_coord_same_fax_error = "Vous devez saisir des numéros de fax différents !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";
@@ -133,6 +135,8 @@ $l_fill_password = "Vous devez renseigner le mot de passe avant de valider.";
 $l_delete_confirm = "ATTENTION : Vous allez supprimer un utilisateur ! Cette opération est irréversible.\\nVoulez-vous continuer ?";
 $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
 $l_change_login_confirm = "Vous avez modifié le login de l'utilisateur.\\nIl est *impératif* que l'utilisateur dont le login a été modifié soit déconnecté de toutes applications liées à OBM lors de la validation de cette modification (OBM, client de messagerie, webmail, connecteur).\\nConfirmer le changement d'identifiant ?";
+$l_j_coord_same_phone_error = "Vous devez saisir des numéros de téléphone différents !";
+$l_j_coord_same_fax_error = "Vous devez saisir des numéros de fax différents !";
 
 $l_user_display = "Options d'affichage des listes d'utilisateurs";
 

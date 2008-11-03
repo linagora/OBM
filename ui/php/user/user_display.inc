@@ -1557,7 +1557,7 @@ function html_user_form($usr_q, $user, $field='') {
   $block = "
   <form method=\"post\" name=\"f_entity\"
     enctype=\"multipart/form-data\"
-    onsubmit=\"if (check_user(this)) return true; else return false;\"
+    onsubmit=\"return (check_phoneFax_number(this) && check_user(this));\"
     action=\"" . url_prepare("user_index.php") . "\">
   <fieldset class=\"detail infos\">
   <legend>$l_user</legend>

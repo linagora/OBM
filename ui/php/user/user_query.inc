@@ -1841,7 +1841,7 @@ function check_user_data_form($p_id, &$user) {
       $err['msg'] = $l_image_size_error;
       $err['field'] = 'file';
       return false;
-    } 
+    }
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -1923,6 +1923,41 @@ function check_user_data_form($p_id, &$user) {
     }
   }         
 
+  // Check the phones and faxes number are not the same
+  if (!check_user_phone_fax($user)) {
+    return false;
+  }
+  
+  return true;
+}
+
+/**
+ * Check the phones and faxes number are not the same
+ *
+ * @param array $user
+ * @return boolean
+ */
+function check_user_phone_fax($user) {
+  global $l_coord_same_phone_error, $l_coord_same_fax_error;
+  global $err;
+  
+  $phone1 = (isset($user['phone']) ? trim($user['phone']) : '');
+  $phone2 = (isset($user['phone2']) ? trim($user['phone2']) : '');
+  $fax1 = (isset($user['fax']) ? trim($user['fax']) : '');
+  $fax2 = (isset($user['fax2']) ? trim($user['fax2']) : '');
+  
+  if ($phone1 != '' && $phone2 != '' && $phone1 == $phone2) {
+    $err['msg'] = $l_coord_same_phone_error;
+    $err['field'] = 'phone2';
+    return false; 
+  }
+  
+  if ($fax1 != '' && $fax2 != '' && $fax1 == $fax2) {
+    $err['msg'] = $l_coord_same_fax_error;
+    $err['field'] = 'fax2';
+    return false; 
+  }
+  
   return true;
 }
 
@@ -2269,6 +2304,12 @@ function check_batch_processing_data($params) {
     $err['msg'] = "$params[expresspostal] : $l_expresspostal_error";
     return false;
   }
+  
+  // Check the phones and faxes number are not the same
+  if (!check_user_phone_fax($params)) {
+    return false;
+  }
+  
   return true;
 }
 
