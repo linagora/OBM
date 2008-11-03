@@ -74,6 +74,7 @@ function confirm_del(form) {
 }
 
 function check_user(form) {
+
   // MANDATORY : Check that Login is not empty
   if (trim(form.tf_login.value) == \"\") {
     alert (\"$l_fill_login\");
@@ -81,17 +82,22 @@ function check_user(form) {
   }
 
   // UPDATE : check if login change
-  if ((form.tf_old_login.value != \"\") && (form.tf_login.value != form.tf_old_login.value)) {
-    return confirm(\"$l_change_login_confirm\");
+  if ((form.tf_old_login !== undefined) && (form.tf_old_login.value != \"\") && (form.tf_login.value != form.tf_old_login.value)) {
+    if (!confirm(\"$l_change_login_confirm\")) {
+      return false;
+    }
   }
 
   // Check the email
-  lemail = form.tf_email.value;
-  if ((lemail != \"\") && (check_email(lemail) == null)) {
-    alert (\"$l_j_check_email\");
-    return false;
+  if (form.tf_email !== undefined) {
+    lemail = form.tf_email.value;
+    alert('after lemail init');
+    if ((lemail != \"\") && (check_email(lemail) == null)) {
+      alert (\"$l_j_check_email\");
+      return false;
+    }
   }
-
+  
   return true;
 }
 
