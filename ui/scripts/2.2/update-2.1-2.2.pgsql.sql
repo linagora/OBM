@@ -281,6 +281,8 @@ ALTER TABLE Contact ALTER COLUMN contact_origin SET DEFAULT NOT NULL;
 -- CalendarEvent + Todo to Event
 --
 
+CREATE TYPE vcomponent AS ENUM ('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY');
+CREATE TYPE vopacity AS ENUM ('OPAQUE', 'TRANSPARENT');
 -- Event Creation
 CREATE TABLE Event (
   event_id           	serial,
@@ -290,11 +292,11 @@ CREATE TABLE Event (
   event_userupdate   	integer,
   event_usercreate   	integer,
   event_ext_id       	varchar(255) default '', 
-  event_type            enum('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY') default 'VEVENT',
+  event_type            vcomponent default 'VEVENT',
   event_origin          varchar(255) default NULL,
   event_owner           integer default NULL,    
   event_timezone        varchar(255) default 'GMT',    
-  event_opacity         enum('OPAQUE', 'TRANSPARENT') default 'OPAQUE',
+  event_opacity         vopacity default 'OPAQUE',
   event_title           varchar(255) default NULL,
   event_location        varchar(100) default NULL,
   event_category1_id    integer default NULL,
@@ -387,7 +389,7 @@ SELECT
   calendarevent_privacy,
   calendarevent_date,
   calendarevent_duration,
-  calendarevent_allday,
+  CAST(calendarevent_allday AS BOOLEAN),
   calendarevent_repeatkind,
   calendarevent_repeatfrequence,
   calendarevent_repeatdays,
@@ -401,8 +403,8 @@ FROM CalendarEvent;
 
 
 -- Table EventEntity
-
-ALTER TABLE EventEntity ADD COLUMN evententity_state2 enum('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS') default 'NEEDS-ACTION';
+CREATE TYPE vpartstat AS ENUM ('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS');
+ALTER TABLE EventEntity ADD COLUMN evententity_state2 vpartstat default 'NEEDS-ACTION';
 UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state!='A' AND evententity_state!='W' AND evententity_state!='R';
 UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state='A';
 UPDATE EventEntity set evententity_state2 = 'NEEDS-ACTION' where evententity_state='W';
@@ -410,8 +412,10 @@ UPDATE EventEntity set evententity_state2 = 'DECLINED' where evententity_state='
 ALTER TABLE EventEntity DROP COLUMN evententity_state;
 ALTER TABLE EventEntity RENAME COLUMN evententity_state2 TO evententity_state;
 
-ALTER TABLE EventEntity ALTER COLUMN evententity_required TYPE enum('CHAIR', 'REQ', 'OPT', 'NON');
-ALTER TABLE EventEntity ALTER COLUMN evententity_required SET DEFAULT 'REQ';
+CREATE TYPE vrole AS ENUM ('CHAIR', 'REQ', 'OPT', 'NON');
+ALTER TABLE EventEntity ADD COLUMN evententity_required2 vrole default 'REQ';
+ALTER TABLE EventEntity DROP COLUMN evententity_required;
+ALTER TABLE EventEntity RENAME COLUMN evententity_required2 TO evententity_required;
 UPDATE EventEntity set evententity_required = 'REQ';
 
 ALTER TABLE EventEntity ADD COLUMN evententity_percent float default 0;
@@ -442,7 +446,7 @@ CREATE TABLE EventAlert (
   eventalert_duration    integer NOT NULL default 0
 );
 CREATE INDEX idx_eventalert_user ON EventAlert (eventalert_user_id);
-ALTER TABLE EventAlert ADD CONSTRAINT eventalert_event_id_eventevent_id_fkey FOREIGN KEY (eventalert_event_id) REFERENCES EventEvent(eventevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE EventAlert ADD CONSTRAINT eventalert_event_id_event_id_fkey FOREIGN KEY (eventalert_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE EventAlert ADD CONSTRAINT eventalert_user_id_userobm_id_fkey FOREIGN KEY (eventalert_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE EventAlert ADD CONSTRAINT eventalert_userupdate_userobm_id_fkey FOREIGN KEY (eventalert_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 ALTER TABLE EventAlert ADD CONSTRAINT eventalert_usercreate_userobm_id_fkey FOREIGN KEY (eventalert_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
@@ -487,7 +491,7 @@ CREATE TABLE EventException (
   eventexception_date         timestamp NOT NULL,
   PRIMARY KEY (eventexception_event_id,eventexception_date)
 );
-ALTER TABLE EventException ADD CONSTRAINT eventexception_event_id_eventevent_id_fkey FOREIGN KEY (eventexception_event_id) REFERENCES EventEvent(eventevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE EventException ADD CONSTRAINT eventexception_event_id_event_id_fkey FOREIGN KEY (eventexception_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE EventException ADD CONSTRAINT eventexception_userupdate_userobm_id_fkey FOREIGN KEY (eventexception_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 ALTER TABLE EventException ADD CONSTRAINT eventexception_usercreate_userobm_id_fkey FOREIGN KEY (eventexception_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
@@ -1469,7 +1473,7 @@ UPDATE OGroupEntity SET ogroupentity_usercreate = NULL WHERE ogroupentity_usercr
 ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_usercreate_userobm_id_fkey FOREIGN KEY (ogroupentity_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from obmbookmark_user_id to userobm_id
-UPDATE ObmBookmark SET obmbookmark_user_id = NULL WHERE obmbookmark_user_id NOT IN (SELECT userobm_id FROM UserObm) AND obmbookmark_user_id IS NOT NULL;
+DELETE FROM ObmBookmark WHERE obmbookmark_user_id NOT IN (SELECT userobm_id FROM UserObm) AND obmbookmark_user_id IS NOT NULL;
 ALTER TABLE ObmBookmark ADD CONSTRAINT obmbookmark_user_id_userobm_id_fkey FOREIGN KEY (obmbookmark_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from obmbookmarkproperty_bookmark_id to obmbookmark_id
@@ -1617,6 +1621,7 @@ DELETE FROM ProjectTask WHERE projecttask_project_id NOT IN (SELECT project_id F
 ALTER TABLE ProjectTask ADD CONSTRAINT projecttask_project_id_project_id_fkey FOREIGN KEY (projecttask_project_id) REFERENCES Project(project_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from projecttask_parenttask_id to projecttask_id
+UPDATE ProjectTask SET projecttask_parenttask_id = NULL WHERE projecttask_parenttask_id = 0;
 DELETE FROM ProjectTask WHERE projecttask_parenttask_id NOT IN (SELECT projecttask_id FROM ProjectTask) AND projecttask_parenttask_id IS NOT NULL;
 ALTER TABLE ProjectTask ADD CONSTRAINT projecttask_parenttask_id_projecttask_id_fkey FOREIGN KEY (projecttask_parenttask_id) REFERENCES ProjectTask(projecttask_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
@@ -1701,7 +1706,7 @@ DELETE FROM Resource WHERE resource_domain_id NOT IN (SELECT domain_id FROM Doma
 ALTER TABLE Resource ADD CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from resource_userupdate to userobm_id
-UPDATE Resource SET resource_usercreate = NULL WHERE resource_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND resource_usercreate IS NOT NULL;
+UPDATE Resource SET resource_userupdate = NULL WHERE resource_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND resource_userupdate IS NOT NULL;
 ALTER TABLE Resource ADD CONSTRAINT resource_userupdate_userobm_id_fkey FOREIGN KEY (resource_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- Foreign key from resource_usercreate to userobm_id
@@ -1922,8 +1927,8 @@ ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profile_id_
 -- Foreign key from profilepropertyvalue_property_id to profileproperty_id
 ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty(profileproperty_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
--- Foreign key from contact_birthday_id to calendarevent_id
-ALTER TABLE Contact ADD CONSTRAINT contact_birthday_id_calendarevent_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES CalendarEvent(calendarevent_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- Foreign key from contact_birthday_id to event_id
+ALTER TABLE Contact ADD CONSTRAINT contact_birthday_id_event_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 -- DATA

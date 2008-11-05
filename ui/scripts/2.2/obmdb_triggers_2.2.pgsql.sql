@@ -438,23 +438,23 @@ END
 CREATE TRIGGER list_created BEFORE INSERT ON list FOR EACH ROW EXECUTE PROCEDURE on_list_create();
 CREATE TRIGGER list_changed BEFORE UPDATE ON list FOR EACH ROW EXECUTE PROCEDURE on_list_change();
 
-UPDATE calendarevent SET calendarevent_timecreate=NOW() WHERE calendarevent_timecreate IS NULL;
-ALTER TABLE calendarevent ALTER COLUMN calendarevent_timecreate SET DEFAULT NOW();
+UPDATE event SET event_timecreate=NOW() WHERE event_timecreate IS NULL;
+ALTER TABLE event ALTER COLUMN event_timecreate SET DEFAULT NOW();
 
-CREATE OR REPLACE FUNCTION on_calendarevent_change() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_event_change() RETURNS trigger AS '
 BEGIN
-new.calendarevent_timeupdate := current_timestamp;
+new.event_timeupdate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE OR REPLACE FUNCTION on_calendarevent_create() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_event_create() RETURNS trigger AS '
 BEGIN
-new.calendarevent_timecreate := current_timestamp;
+new.event_timecreate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE TRIGGER calendarevent_created BEFORE INSERT ON calendarevent FOR EACH ROW EXECUTE PROCEDURE on_calendarevent_create();
-CREATE TRIGGER calendarevent_changed BEFORE UPDATE ON calendarevent FOR EACH ROW EXECUTE PROCEDURE on_calendarevent_change();
+CREATE TRIGGER event_created BEFORE INSERT ON event FOR EACH ROW EXECUTE PROCEDURE on_event_create();
+CREATE TRIGGER event_changed BEFORE UPDATE ON event FOR EACH ROW EXECUTE PROCEDURE on_event_change();
 
 UPDATE evententity SET evententity_timecreate=NOW() WHERE evententity_timecreate IS NULL;
 ALTER TABLE evententity ALTER COLUMN evententity_timecreate SET DEFAULT NOW();
@@ -474,41 +474,41 @@ END
 CREATE TRIGGER evententity_created BEFORE INSERT ON evententity FOR EACH ROW EXECUTE PROCEDURE on_evententity_create();
 CREATE TRIGGER evententity_changed BEFORE UPDATE ON evententity FOR EACH ROW EXECUTE PROCEDURE on_evententity_change();
 
-UPDATE calendarexception SET calendarexception_timecreate=NOW() WHERE calendarexception_timecreate IS NULL;
-ALTER TABLE calendarexception ALTER COLUMN calendarexception_timecreate SET DEFAULT NOW();
+UPDATE eventexception SET eventexception_timecreate=NOW() WHERE eventexception_timecreate IS NULL;
+ALTER TABLE eventexception ALTER COLUMN eventexception_timecreate SET DEFAULT NOW();
 
-CREATE OR REPLACE FUNCTION on_calendarexception_change() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_eventexception_change() RETURNS trigger AS '
 BEGIN
-new.calendarexception_timeupdate := current_timestamp;
+new.eventexception_timeupdate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE OR REPLACE FUNCTION on_calendarexception_create() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_eventexception_create() RETURNS trigger AS '
 BEGIN
-new.calendarexception_timecreate := current_timestamp;
+new.eventexception_timecreate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE TRIGGER calendarexception_created BEFORE INSERT ON calendarexception FOR EACH ROW EXECUTE PROCEDURE on_calendarexception_create();
-CREATE TRIGGER calendarexception_changed BEFORE UPDATE ON calendarexception FOR EACH ROW EXECUTE PROCEDURE on_calendarexception_change();
+CREATE TRIGGER eventexception_created BEFORE INSERT ON eventexception FOR EACH ROW EXECUTE PROCEDURE on_eventexception_create();
+CREATE TRIGGER eventexception_changed BEFORE UPDATE ON eventexception FOR EACH ROW EXECUTE PROCEDURE on_eventexception_change();
 
-UPDATE calendaralert SET calendaralert_timecreate=NOW() WHERE calendaralert_timecreate IS NULL;
-ALTER TABLE calendaralert ALTER COLUMN calendaralert_timecreate SET DEFAULT NOW();
+UPDATE eventalert SET eventalert_timecreate=NOW() WHERE eventalert_timecreate IS NULL;
+ALTER TABLE eventalert ALTER COLUMN eventalert_timecreate SET DEFAULT NOW();
 
-CREATE OR REPLACE FUNCTION on_calendaralert_change() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_eventalert_change() RETURNS trigger AS '
 BEGIN
-new.calendaralert_timeupdate := current_timestamp;
+new.eventalert_timeupdate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE OR REPLACE FUNCTION on_calendaralert_create() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_eventalert_create() RETURNS trigger AS '
 BEGIN
-new.calendaralert_timecreate := current_timestamp;
+new.eventalert_timecreate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE TRIGGER calendaralert_created BEFORE INSERT ON calendaralert FOR EACH ROW EXECUTE PROCEDURE on_calendaralert_create();
-CREATE TRIGGER calendaralert_changed BEFORE UPDATE ON calendaralert FOR EACH ROW EXECUTE PROCEDURE on_calendaralert_change();
+CREATE TRIGGER eventalert_created BEFORE INSERT ON eventalert FOR EACH ROW EXECUTE PROCEDURE on_eventalert_create();
+CREATE TRIGGER eventalert_changed BEFORE UPDATE ON eventalert FOR EACH ROW EXECUTE PROCEDURE on_eventalert_change();
 
 UPDATE calendarcategory1 SET calendarcategory1_timecreate=NOW() WHERE calendarcategory1_timecreate IS NULL;
 ALTER TABLE calendarcategory1 ALTER COLUMN calendarcategory1_timecreate SET DEFAULT NOW();

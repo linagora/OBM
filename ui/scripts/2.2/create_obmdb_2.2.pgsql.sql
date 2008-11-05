@@ -708,6 +708,8 @@ CREATE TABLE ContactList (
 --
 -- Table structure for the table 'Event'
 --
+CREATE TYPE vcomponent AS ENUM ('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY');
+CREATE TYPE vopacity AS ENUM ('OPAQUE', 'TRANSPARENT');
 CREATE TABLE Event (
   event_id           	serial,
   event_domain_id    	integer NOT NULL,
@@ -716,11 +718,11 @@ CREATE TABLE Event (
   event_userupdate   	integer,
   event_usercreate   	integer,
   event_ext_id       	varchar(255) default '', 
-  event_type            enum('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY') default 'VEVENT',
+  event_type            vcomponent default 'VEVENT',
   event_origin          varchar(255) default NULL,
   event_owner           integer default NULL,    
   event_timezone        varchar(255) default 'GMT',    
-  event_opacity         enum('OPAQUE', 'TRANSPARENT') default 'OPAQUE',
+  event_opacity         vopacity default 'OPAQUE',
   event_title           varchar(255) default NULL,
   event_location        varchar(100) default NULL,
   event_category1_id    integer default NULL,
@@ -745,6 +747,8 @@ CREATE TABLE Event (
 --
 -- Table structure for the table  'EventEntity'
 --
+CREATE TYPE vpartstat AS ENUM ('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS');
+CREATE TYPE vrole AS ENUM ('CHAIR', 'REQ', 'OPT', 'NON');
 CREATE TABLE EventEntity (
   evententity_timeupdate timestamp,
   evententity_timecreate timestamp,
@@ -753,8 +757,8 @@ CREATE TABLE EventEntity (
   evententity_event_id   integer NOT NULL,
   evententity_entity_id  integer NOT NULL,
   evententity_entity     varchar(32) NOT NULL default '',
-  evententity_state      enum('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS') default 'NEEDS-ACTION',
-  evententity_required   enum('CHAIR', 'REQ', 'OPT', 'NON') default 'REQ',
+  evententity_state      vpartstat default 'NEEDS-ACTION',
+  evententity_required   vrole default 'REQ',
   evententity_percent    float default 0,
   PRIMARY KEY (evententity_event_id,evententity_entity_id,evententity_entity)
 );

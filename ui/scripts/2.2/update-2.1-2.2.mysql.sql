@@ -1583,7 +1583,7 @@ UPDATE OGroupEntity SET ogroupentity_usercreate = NULL WHERE ogroupentity_usercr
 ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_usercreate_userobm_id_fkey FOREIGN KEY (ogroupentity_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from obmbookmark_user_id to userobm_id
-UPDATE ObmBookmark SET obmbookmark_user_id = NULL WHERE obmbookmark_user_id NOT IN (SELECT userobm_id FROM UserObm) AND obmbookmark_user_id IS NOT NULL;
+DELETE FROM ObmBookmark WHERE obmbookmark_user_id NOT IN (SELECT userobm_id FROM UserObm) AND obmbookmark_user_id IS NOT NULL;
 ALTER TABLE ObmBookmark ADD CONSTRAINT obmbookmark_user_id_userobm_id_fkey FOREIGN KEY (obmbookmark_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from obmbookmarkproperty_bookmark_id to obmbookmark_id
@@ -1816,7 +1816,7 @@ DELETE FROM Resource WHERE resource_domain_id NOT IN (SELECT domain_id FROM Doma
 ALTER TABLE Resource ADD CONSTRAINT resource_domain_id_domain_id_fkey FOREIGN KEY (resource_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from resource_userupdate to userobm_id
-UPDATE Resource SET resource_usercreate = NULL WHERE resource_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND resource_usercreate IS NOT NULL;
+UPDATE Resource SET resource_userupdate = NULL WHERE resource_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND resource_userupdate IS NOT NULL;
 ALTER TABLE Resource ADD CONSTRAINT resource_userupdate_userobm_id_fkey FOREIGN KEY (resource_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- Foreign key from resource_usercreate to userobm_id
