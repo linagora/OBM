@@ -353,7 +353,7 @@ CREATE TABLE Event (
   event_usercreate      int(8) default NULL,
   event_ext_id          varchar(255) default '',
   event_type            enum('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY') default 'VEVENT',
-  event_origin          varchar(255) default NULL,
+  event_origin          varchar(255) NOT NULL default '',
   event_owner           int(8) default NULL,
   event_timezone        varchar(255) default 'GMT',
   event_opacity         enum('OPAQUE', 'TRANSPARENT') default 'OPAQUE',
@@ -370,7 +370,7 @@ CREATE TABLE Event (
   event_repeatdays      varchar(7) default NULL,
   event_endrepeat       datetime default NULL,
   event_color           varchar(7) default NULL,
-  event_completed       datetime NOT NULL,
+  event_completed       datetime,
   event_url             text,
   event_description     text,
   event_properties      text,
@@ -588,9 +588,36 @@ SELECT
 FROM CalendarException;
 
 
-DROP Table CalendarEvent;
+--
+-- Table `DeletedEvent`
+--
+
+CREATE TABLE DeletedEvent (
+  deletedevent_id        int(8) NOT NULL auto_increment,
+  deletedevent_event_id  int(8) default NULL,
+  deletedevent_user_id   int(8) default NULL,
+  deletedevent_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY (deletedevent_id),
+  KEY idx_dce_event (deletedevent_event_id),
+  KEY idx_dce_user (deletedevent_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO DeletedEvent (deletedevent_id,
+  deletedevent_event_id,
+  deletedevent_user_id,
+  deletedevent_timestamp)
+SELECT
+  deletedcalendarevent_id,
+  deletedcalendarevent_event_id,
+  deletedcalendarevent_user_id,
+  deletedcalendarevent_timestamp
+FROM DeletedCalendarEvent;
+
+
+DROP Table DeletedCalendarEvent;
 DROP Table CalendarAlert;
 DROP Table CalendarException;
+DROP Table CalendarEvent;
 -------------------------------------------------------------------------------
 
 

@@ -3,11 +3,12 @@
 # Converts OBM DB to UTF-8, and runs 2.1 to 2.2 schema upgrade
 #
 
+echo "Postgres update shell script"
+
 test ${USER} = "postgres" || {
     echo "$0 must run as postgres user"
     exit 1
 }
-
 # to ensure things defaulting to system locale don't fail
 export LC_ALL=en_US.UTF-8
 

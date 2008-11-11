@@ -74,6 +74,7 @@ function run_query_calendar_get_user_name($users='') {
   $multidomain = sql_multidomain('userobm');
 
   $in = "'".implode (",", $users)."'";
+  $in = implode (",", $users);
   
   $obm_q = new DB_OBM;
   $query = "SELECT userobm_lastname, userobm_firstname, userobm_id
@@ -620,6 +621,7 @@ function run_query_calendar_insert_event_data($calendar) {
     event_timecreate,                         
     event_usercreate,
     event_type,
+    event_origin,
     event_owner,
     event_timezone,
     event_title, 
@@ -643,6 +645,7 @@ function run_query_calendar_insert_event_data($calendar) {
     '$now',
     '$obm[uid]',
     'VEVENT',
+    'ui',
     '$owner',
     '".Of_Date::getOption('timezone')."', 
     '$title',
@@ -667,8 +670,7 @@ function run_query_calendar_insert_event_data($calendar) {
   
   $query = "SELECT MAX(event_id) as event_id
     FROM Event
-    WHERE event_timecreate = '$now'
-      AND event_date='$datebegin' 
+    WHERE event_date='$datebegin' 
       AND event_title='$title'
       AND event_duration='$event_duration'
       AND event_domain_id=$obm[domain_id]
@@ -718,7 +720,7 @@ function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $
     $event_id,
     $entity_id,
     '$entity',
-    '0',
+    'REQ',
     '$state')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_entity_user_event()');
@@ -1196,6 +1198,7 @@ function run_query_calendar_quick_event_insert($calendar) {
     (event_timecreate,
      event_usercreate,
      event_type,
+     event_origin,
      event_owner,
      event_timezone,
      event_title,
@@ -1218,7 +1221,8 @@ function run_query_calendar_quick_event_insert($calendar) {
     '$now',
     $obm[uid],
     'VEVENT',
-    $obm[uid],
+    'ui_ajax',
+     $obm[uid],
     '".Of_Date::getOption('timezone')."', 
     '$title', 
     '$datebegin',     
@@ -1238,7 +1242,10 @@ function run_query_calendar_quick_event_insert($calendar) {
   )";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_insert_event_data()');
   $obm_q->query($query);
-  $query = "SELECT MAX(event_id) as max_id FROM Event";
+  $query = "SELECT MAX(event_id) as max_id
+    FROM Event
+    WHERE event_title='$title'
+      AND event_date='$datebegin'";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
   $obm_q->query($query);
   $obm_q->next_record(); 

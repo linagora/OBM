@@ -293,7 +293,7 @@ CREATE TABLE Event (
   event_usercreate   	integer,
   event_ext_id       	varchar(255) default '', 
   event_type            vcomponent default 'VEVENT',
-  event_origin          varchar(255) default NULL,
+  event_origin          varchar(255) NOT NULL default '',
   event_owner           integer default NULL,    
   event_timezone        varchar(255) default 'GMT',    
   event_opacity         vopacity default 'OPAQUE',
@@ -310,7 +310,7 @@ CREATE TABLE Event (
   event_repeatdays      varchar(7) default NULL,
   event_endrepeat       timestamp default NULL,
   event_color           varchar(7),
-  event_completed       timestamp NOT NULL,
+  event_completed       timestamp,
   event_url             text,
   event_description     text,
   event_properties      text,
@@ -401,6 +401,7 @@ SELECT
   calendarevent_properties
 FROM CalendarEvent;
 
+SELECT setval('event_event_id_seq', max(event_id)) FROM Event;
 
 -- Table EventEntity
 CREATE TYPE vpartstat AS ENUM ('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS');
@@ -520,9 +521,37 @@ SELECT
 FROM CalendarException;
 
 
-DROP Table CalendarEvent;
+--
+-- Table `DeletedEvent`
+--
+
+CREATE TABLE DeletedEvent (
+  deletedevent_id         serial,
+  deletedevent_event_id   integer,
+  deletedevent_user_id    integer,
+  deletedevent_timestamp  timestamp
+);
+create INDEX idx_dce_event_id ON DeletedEvent (deletedevent_event_id);
+create INDEX idx_dce_user_id ON DeletedEvent (deletedevent_user_id);
+
+INSERT INTO DeletedEvent (deletedevent_id,
+  deletedevent_event_id,
+  deletedevent_user_id,
+  deletedevent_timestamp)
+SELECT
+  deletedcalendarevent_id,
+  deletedcalendarevent_event_id,
+  deletedcalendarevent_user_id,
+  deletedcalendarevent_timestamp
+FROM DeletedCalendarEvent;
+
+SELECT setval('deletedevent_deletedevent_id_seq', max(deletedevent_id)) FROM DeletedEvent;
+
+
+DROP Table DeletedCalendarEvent;
 DROP Table CalendarAlert;
 DROP Table CalendarException;
+DROP Table CalendarEvent;
 -------------------------------------------------------------------------------
 
 

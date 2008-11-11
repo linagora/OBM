@@ -4,6 +4,9 @@
 #
 
 # to ensure things defaulting to system locale don't fail
+
+echo "MySQL update shell script"
+
 export LC_ALL=en_US.UTF-8
 
 source `dirname $0`/obm-sh.lib

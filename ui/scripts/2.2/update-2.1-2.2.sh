@@ -1,8 +1,8 @@
 #!/bin/bash
 ###############################################################################
-# OBM - File : install_obmdb_2.2.sh                                           #
-#     - Desc : OBM Database 2.2 installation script                           #
-# 2005-06-08 AliaSource                                                       #
+# OBM - File : update-2.1-2.2.sh                                              #
+#     - Desc : OBM Database 2.1 to 2.2 update script                          #
+# 2008-06-08 AliaSource                                                       #
 ###############################################################################
 
 source `dirname $0`/obm-sh.lib

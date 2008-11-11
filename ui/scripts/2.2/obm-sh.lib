@@ -7,7 +7,7 @@ function get_val() {
 
 # Locate php-cli interprete and sets $PHP
 function locate_php_interp() {
-    PHP=`which php4 2> /dev/null`
+    PHP=`which php5 2> /dev/null`
     if [ $? != 0 ]; then
 	PHP=`which php 2> /dev/null`
 	if [ $? != 0 ]; then
