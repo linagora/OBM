@@ -403,6 +403,68 @@ FROM CalendarEvent;
 
 SELECT setval('event_event_id_seq', max(event_id)) FROM Event;
 
+-- Clean Todo before migration to Event
+-- Foreign key from todo_domain_id to domain_id
+DELETE FROM Todo WHERE todo_domain_id NOT IN (SELECT domain_id FROM Domain) AND todo_domain_id IS NOT NULL;
+-- Foreign key from todo_user to userobm_id
+DELETE FROM Todo WHERE todo_user NOT IN (SELECT userobm_id FROM UserObm) AND todo_user IS NOT NULL;
+-- Foreign key from todo_userupdate to userobm_id
+UPDATE Todo SET todo_userupdate = NULL WHERE todo_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND todo_userupdate IS NOT NULL;
+-- Foreign key from todo_usercreate to userobm_id
+UPDATE Todo SET todo_usercreate = NULL WHERE todo_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND todo_usercreate IS NOT NULL;
+
+INSERT INTO Event (
+  event_domain_id, 
+  event_timeupdate,
+  event_timecreate,
+  event_userupdate,
+  event_usercreate,
+  event_type,
+  event_origin,
+  event_owner,
+  event_timezone,
+  event_opacity,
+  event_title,
+  event_priority,
+  event_privacy,
+  event_date,
+  event_duration,
+  event_allday,
+  event_repeatkind,
+  event_repeatfrequence,
+  event_repeatdays,
+  event_endrepeat,
+  event_color,
+  event_completed,
+  event_url,
+  event_description)
+SELECT
+  todo_domain_id,
+  todo_timeupdate,
+  todo_timecreate,
+  todo_userupdate,
+  todo_usercreate,
+  'VTODO',
+  'migration',
+  todo_user,
+  'Europe/Paris',
+  'OPAQUE',
+  todo_title,
+  todo_priority,
+  todo_privacy,
+  todo_deadline,
+  3600,
+  FALSE,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  todo_deadline,
+  NULL,
+  todo_content
+FROM Todo;
+
 -- Table EventEntity
 CREATE TYPE vpartstat AS ENUM ('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS');
 ALTER TABLE EventEntity ADD COLUMN evententity_state2 vpartstat default 'NEEDS-ACTION';
@@ -589,7 +651,6 @@ ALTER TABLE DealType ALTER COLUMN dealtype_domain_id SET NOT NULL;
 ALTER TABLE DealCompanyRole ALTER COLUMN dealcompanyrole_domain_id SET NOT NULL;
 ALTER TABLE List ALTER COLUMN list_domain_id SET NOT NULL;
 ALTER TABLE CalendarCategory1 ALTER COLUMN calendarcategory1_domain_id SET NOT NULL;
-ALTER TABLE Todo ALTER COLUMN todo_domain_id SET NOT NULL;
 ALTER TABLE Publication ALTER COLUMN publication_domain_id SET NOT NULL;
 ALTER TABLE PublicationType ALTER COLUMN publicationtype_domain_id SET NOT NULL;
 ALTER TABLE Subscription ALTER COLUMN subscription_domain_id SET NOT NULL;
@@ -1838,22 +1899,6 @@ ALTER TABLE TimeTask ADD CONSTRAINT timetask_userupdate_userobm_id_fkey FOREIGN 
 -- Foreign key from timetask_usercreate to userobm_id
 UPDATE TimeTask SET timetask_usercreate = NULL WHERE timetask_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND timetask_usercreate IS NOT NULL;
 ALTER TABLE TimeTask ADD CONSTRAINT timetask_usercreate_userobm_id_fkey FOREIGN KEY (timetask_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from todo_domain_id to domain_id
-DELETE FROM Todo WHERE todo_domain_id NOT IN (SELECT domain_id FROM Domain) AND todo_domain_id IS NOT NULL;
-ALTER TABLE Todo ADD CONSTRAINT todo_domain_id_domain_id_fkey FOREIGN KEY (todo_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from todo_user to userobm_id
-DELETE FROM Todo WHERE todo_user NOT IN (SELECT userobm_id FROM UserObm) AND todo_user IS NOT NULL;
-ALTER TABLE Todo ADD CONSTRAINT todo_user_userobm_id_fkey FOREIGN KEY (todo_user) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from todo_userupdate to userobm_id
-UPDATE Todo SET todo_userupdate = NULL WHERE todo_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND todo_userupdate IS NOT NULL;
-ALTER TABLE Todo ADD CONSTRAINT todo_userupdate_userobm_id_fkey FOREIGN KEY (todo_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from todo_usercreate to userobm_id
-UPDATE Todo SET todo_usercreate = NULL WHERE todo_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND todo_usercreate IS NOT NULL;
-ALTER TABLE Todo ADD CONSTRAINT todo_usercreate_userobm_id_fkey FOREIGN KEY (todo_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from group_domain_id to domain_id
 DELETE FROM UGroup WHERE group_domain_id NOT IN (SELECT domain_id FROM Domain) AND group_domain_id IS NOT NULL;

@@ -16,7 +16,7 @@
 function run_query_calendar_detail($calendar_id) {
   global $cdg_sql;
 
-  $calendar_id = sql_parse_id( $calendar_id, true);
+  $calendar_id = sql_parse_id($calendar_id, true);
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type; 
   $timeupdate = sql_date_format($db_type, 'event_timeupdate', 'timeupdate');
@@ -53,7 +53,9 @@ function run_query_calendar_detail($calendar_id) {
       LEFT JOIN UserObm AS c ON event_usercreate = c.userobm_id
       LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
       LEFT JOIN UserObm AS o ON event_owner = o.userobm_id
-    WHERE event_id  $calendar_id $multidomain";
+    WHERE event_type='VEVENT'
+      AND event_id $calendar_id
+      $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_detail()');
   $obm_q->query($query);
@@ -406,7 +408,8 @@ function run_query_calendar_waiting_events() {
       LEFT JOIN UserObm on evententity_entity='user' AND evententity_entity_id=userobm_id
       LEFT JOIN UserObm u ON event_owner = u.userobm_id
     WHERE
-      evententity_state = 'NEEDS-ACTION'
+      event_type='VEVENT'
+      AND evententity_state = 'NEEDS-ACTION'
       AND ( 1=0
       $multidomain
 ";
@@ -441,7 +444,8 @@ function run_query_calendar_waiting_events() {
       LEFT JOIN Resource on evententity_entity='resource' AND evententity_entity_id=resource_id
       LEFT JOIN UserObm u ON event_owner = u.userobm_id
     WHERE
-      evententity_state = 'NEEDS-ACTION'
+      event_type='VEVENT'
+      AND evententity_state = 'NEEDS-ACTION'
       AND ( 1=0
       $multidomain
 ";
@@ -1128,7 +1132,7 @@ function run_query_calendar_update_event_data($calendar) {
     event_repeatdays = '$repeat_days',
     event_endrepeat = $repeat_end
   WHERE
-    event_id  $event_id"; 
+    event_id $event_id"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
   $obm_q->query($query);
@@ -1170,7 +1174,7 @@ function run_query_calendar_quick_event_update($calendar) {
     event_date = '$datebegin',     
     event_duration = '$event_duration'
   WHERE
-  event_id  $event_id $multidomain";
+  event_id $event_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
   $obm_q->query($query);  
 }
@@ -1303,7 +1307,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     event_userupdate = $obm[uid],
     event_timeupdate = NOW()
     WHERE
-    event_id  $sql_id"; 
+    event_id $sql_id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(2)');
   $obm_q->query($query);
@@ -1332,6 +1336,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       event_timeupdate,                         
       event_timecreate,                         
       event_usercreate,
+      event_type,
+      event_origin,
       event_owner,
       event_timezone,
       event_title, 
@@ -1355,6 +1361,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       '$now',
       '$now',
       $obm[uid],
+      'VEVENT',
+      'ui',
       $obm[uid],
       '".Of_Date::getOption('timezone')."', 
       '$title',
@@ -2330,7 +2338,7 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
 
   $query = "SELECT
       event_id,
-      event_owner,;
+      event_owner,
       event_title,
       event_privacy,
       event_description,
@@ -2350,7 +2358,8 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
       LEFT JOIN EventEntity ON event_id = evententity_event_id
       $join_user
       $join_resource
-    WHERE evententity_state = 'ACCEPTED'
+    WHERE event_type='VEVENT'
+      AND evententity_state = 'ACCEPTED'
       AND event_repeatkind = 'none' AND
       ((event_date > #SUBSECONDS('$start', event_duration) AND event_date < '$end') 
         OR (event_allday = TRUE AND event_date >= #SUBSECONDS('$start', event_duration) AND event_date <= '$end'))
@@ -2474,7 +2483,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       LEFT JOIN CalendarCategory1
         ON event_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON event_id = evententity_event_id
-    WHERE 1=1
+    WHERE event_type='VEVENT'
       $where_status
       $filter
       AND event_repeatkind = 'none'
@@ -2507,7 +2516,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       LEFT JOIN CalendarCategory1
         ON event_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON event_id = evententity_event_id
-    WHERE 1=1
+    WHERE event_type='VEVENT'
       $where_status
       $filter
       AND event_repeatkind = 'none'
@@ -2636,7 +2645,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       LEFT JOIN CalendarCategory1
         ON event_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON event_id = evententity_event_id
-   WHERE event_repeatkind != 'none'
+   WHERE event_type='VEVENT' 
+      AND event_repeatkind != 'none'
       $where_status
       $filter
       AND event_date <= '$end' 
@@ -2672,7 +2682,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       LEFT JOIN CalendarCategory1
         ON event_category1_id = calendarcategory1_id
       LEFT JOIN EventEntity ON event_id = evententity_event_id
-    WHERE event_repeatkind != 'none'
+    WHERE event_type='VEVENT'
+      AND event_repeatkind != 'none'
       $where_status
       $filter
       AND event_date <= '$end' 
@@ -4036,10 +4047,10 @@ function run_query_calendar_reset($id) {
   # is writable and the user is the only attendee
   $sql_id = sql_parse_id($id, true);
   $query = "SELECT event_id FROM Event LEFT JOIN EventEntity ON event_id = evententity_event_id
-            WHERE (event_owner $sql_id AND evententity_entity_id $sql_id AND evententity_entity = 'user')
+            WHERE (event_type='VEVENT' AND event_owner $sql_id AND evententity_entity_id $sql_id AND evententity_entity = 'user')
             UNION
             SELECT event_id FROM Event LEFT JOIN EventEntity ON event_id = evententity_event_id
-            WHERE event_owner IN  (".implode(',',$writable).") AND evententity_entity = 'user'
+            WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).") AND evententity_entity = 'user'
             GROUP BY event_id HAVING MAX(evententity_entity_id) = MIN(evententity_entity_id)";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset()');
   $obm_q->query($query);

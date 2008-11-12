@@ -57,4 +57,13 @@ test ${success} -eq 0 || {
 }
 echo "[DONE]"
 
+echo "Reloading default 2.2 preferences..."
+mysql -u $U -p$P  --default-character-set='UTF8' ${DB} <  ./obmdb_prefs_values_2.2.sql >/dev/null
+success=$?
+test ${success} -eq 0 || {
+    echo "Error reloading default 2.2 preferences."
+    exit 1
+}
+echo "[DONE]"
+
 exit 0

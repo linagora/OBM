@@ -70,5 +70,14 @@ test ${success} -eq 0 || {
 }
 echo "[DONE]"
 
+echo "Reloading default 2.2 preferences..."
+psql -U ${U} ${DB} -f ./obmdb_prefs_values_2.2.sql >>/tmp/update_obm.log 2>&1
+success=$?
+test ${success} -eq 0 || {
+    echo "Error reloading default 2.2 preferences."
+    exit 1
+}
+echo "[DONE]"
+
 
 exit 0
