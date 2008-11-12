@@ -1,8 +1,8 @@
---/////////////////////////////////////////////////////////////////////////////
---// OBM - File : obmdb_ref_2.(SELECT domain_id From Domain).sql                                          //
---//     - Desc : French Database Referential 2.(SELECT domain_id From Domain)                            //
---// 2007-04-23 AliaSource - PB                                              //
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
+-- // OBM - File : obmdb_ref_2.(SELECT domain_id From Domain).sql                                          //
+-- //     - Desc : French Database Referential 2.(SELECT domain_id From Domain)                            //
+-- // 2007-04-23 AliaSource - PB                                              //
+-- /////////////////////////////////////////////////////////////////////////////
 
 
 --

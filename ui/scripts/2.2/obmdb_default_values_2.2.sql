@@ -1,15 +1,15 @@
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
 -- OBM - File : obm_default_values_2.1.sql                                   //
 --     - Desc : Insertion of Default values (database independant)           //
 -- 2007-04-23 Pierre Baudracco                                               //
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
 -- $Id$
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Default Information (table ObmInfo)
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 
 -- Update DB version
 DELETE FROM ObmInfo where obminfo_name='db_version';
@@ -20,9 +20,9 @@ DELETE FROM ObmInfo where obminfo_name='update_lock';
 INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('update_lock', '0');
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Default Admin 0 creation
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM UserObm;
 
 -- Global Domain
@@ -31,9 +31,9 @@ INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_nam
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid) VALUES ((SELECT domain_id From Domain), 'admin0','admin','PLAIN','admin', 'Admin Lastname', 'Firstname', '1000', '512');
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Default Domain properties
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM DomainProperty;
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default, domainproperty_readonly) VALUES ('update_state','integer', 1, 1);
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default) VALUES ('max_users','integer', 0);
@@ -54,11 +54,11 @@ INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainprope
 -- Fill the initial update_state for each Domain
 INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) VALUES ((SELECT domain_id From Domain), 'update_state', 1);
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Remplissage de la table 'UserSystem' : Utilisateurs systeme
 -- La modification des valeurs de cette table a des impact sur la configuration
 -- système
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM UserSystem;
 
 -- utilisateur 'cyrus', mot de passe 'cyrus' - doit être administrateur Cyrus
@@ -74,13 +74,13 @@ INSERT INTO UserSystem VALUES (3,'samba','m#Pa!NtA','106','65534','/','SAMBA','L
 INSERT INTO UserSystem VALUES (4,'obmsatellite','mG4_Zdnh','200','65534','/','OBM Satellite','LDAP Reader','/bin/false');
 
 
---------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 -- Remplissage des tables relatives aux profils utilisateurs
---------------------------------------------------------------------------------
+-- ------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Default Profile properties
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM ProfileProperty;
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('update_state', 'integer', 1, 1);
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level', 'integer', 3);
@@ -89,11 +89,11 @@ INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profile
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('admin_realm', 'text', '');
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('last_public_contact_export', 'timestamp', 0, 1);
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Default Profiles
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Admin Profile
 INSERT INTO Profile (profile_timeupdate, profile_timecreate, profile_userupdate, profile_usercreate, profile_domain_id, profile_name) values (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, (select domain_id from Domain where domain_name='global.virt'), 'admin');
 
@@ -107,7 +107,7 @@ INSERT into ProfileSection (profilesection_section_name, profilesection_domain_i
 INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='admin'), 29);
 INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('domain', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='admin'), 0);
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Admin_delegue Profile
 INSERT INTO Profile (profile_timeupdate, profile_timecreate, profile_userupdate, profile_usercreate, profile_domain_id, profile_name) values (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, (select domain_id from Domain where domain_name='global.virt'), 'admin_delegue');
 
@@ -121,7 +121,7 @@ INSERT into ProfileSection (profilesection_section_name, profilesection_domain_i
 INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='admin_delegue'), 29);
 INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('domain', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='admin_delegue'), 0);
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Editor Profile
 INSERT INTO Profile (profile_timeupdate, profile_timecreate, profile_userupdate, profile_usercreate, profile_domain_id, profile_name) values (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, (select domain_id from Domain where domain_name='global.virt'), 'editor');
 
@@ -138,7 +138,7 @@ INSERT into ProfileSection (profilesection_section_name, profilesection_domain_i
 
 INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='editor'), 5);
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- User Profile
 INSERT INTO Profile (profile_timeupdate, profile_timecreate, profile_userupdate, profile_usercreate, profile_domain_id, profile_name) values (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, (select domain_id from Domain where domain_name='global.virt'), 'user');
 

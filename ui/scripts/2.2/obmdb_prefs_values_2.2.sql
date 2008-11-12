@@ -2,14 +2,14 @@
 -- OBM - File : obm_prefs_values_2.1.sql                                     //
 --     - Desc : Insertion of Preferences values (database independant)       //
 -- 2NULL07-04-23 Pierre Baudracco                                               //
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
 -- $Id:$
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Default User preferences values (table UserObmPref)
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- user NULL represent default values (affected to new users for ex:)
 --
 
@@ -71,7 +71,7 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_todo','todo_priority');
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Default values for the table 'DisplayPref'
 -- user NULL represent default values (affected to new users for ex:)
 --

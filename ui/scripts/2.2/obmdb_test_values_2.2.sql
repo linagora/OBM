@@ -1,15 +1,15 @@
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
 -- OBM - File : obmdb_test_values_2.1.sql                                    //
 --     - Desc : Insertion of Test values (database independant)              //
 -- 2005-06-08 Pierre Baudracco                                               //
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
 -- $Id$
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Test : Domain
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 --
 -- Create first user domain
 --
@@ -31,9 +31,9 @@ VALUES (
 INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) SELECT domain_id, 'update_state', 1 FROM Domain;
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Test : User
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- USER domain 1
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid) VALUES (1, 'user1','user','PLAIN','user', 'Zizou', 'John', '1001', '513');
 
@@ -44,9 +44,9 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid) VALUES (1, 'admin1','admin','PLAIN','admin', 'Chief', 'James', '1003', '513');
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Test Company
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM Company;
 
 INSERT INTO Company (company_domain_id, company_timecreate, company_usercreate, company_number,company_archive,company_name, company_type_id, company_address1, company_address2, company_zipcode, company_town, company_phone, company_fax, company_web, company_email) VALUES (1, null,2,'MonNumero123',0,'MaSociete',3,'mon adresse l1','mon adresse l2','31520','MaVille','00 11 22 33 44','44 33 22 11 00','www.myweb.fr','info@mydomain.fr');
@@ -54,17 +54,17 @@ INSERT INTO Company (company_domain_id, company_timecreate, company_usercreate, 
 INSERT INTO Company (company_domain_id, company_timecreate, company_usercreate, company_number,company_archive,company_name, company_type_id, company_address1, company_address2, company_zipcode, company_town, company_phone, company_fax, company_web, company_email) VALUES (1,null,2,'MyRef123',0,'MyCompany',3,'my address l1','my address l2','31520','MyTown','00 11 22 33 44','44 33 22 11 00','www.myweb.fr','info@mydomain.fr');
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Test : Contact
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM Contact;
 
 INSERT INTO Contact (contact_domain_id, contact_company_id, contact_kind_id, contact_lastname, contact_firstname, contact_address1,contact_address2, contact_zipcode, contact_town, contact_title, contact_phone, contact_email, contact_archive,contact_comment) VALUES (1,1,1,'Rabbit','Roger','ad1','ad2','31520','Ramonville','Manager','01 01 01 02 03','roger@rabbit.com','0','comment');
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Test : Host
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 
 DELETE FROM Host;
 
@@ -73,9 +73,9 @@ INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALU
 INSERT INTO Host (host_uid, host_gid, host_name, host_ip, host_description) VALUES ('1502', '1000', 'smtp-out', '10.0.0.10', 'SMTP sortant');
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Remplissage de la table 'MailServer' : déclaration des serveurs de BALs
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM MailServer;
 
 -- Déclaration d'un serveur de BAL sans hôte relais (relayhost)
@@ -86,9 +86,9 @@ INSERT INTO MailServer (mailserver_host_id, mailserver_imap, mailserver_smtp_in,
 INSERT INTO MailServer (mailserver_host_id, mailserver_imap, mailserver_smtp_in, mailserver_smtp_out) VALUES ( (SELECT host_id FROM Host WHERE host_name='smtp-out'), 0, 0, 1 );
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Remplissage de la table 'DomainMailServer' : déclaration des serveurs de BALs
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM DomainMailServer;
 
 -- Assignation du serveur SMTP entrant au domain 'Domain 1'
@@ -97,9 +97,9 @@ INSERT INTO DomainMailServer (domainmailserver_domain_id, domainmailserver_mails
 INSERT INTO DomainMailServer (domainmailserver_domain_id, domainmailserver_mailserver_id, domainmailserver_role) VALUES ( (SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT i.mailserver_id FROM MailServer i, Host j WHERE i.mailserver_host_id=j.host_id AND j.host_name='srv-mail'), 'imap' );
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Test User creation
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Utilisateur de test :
 --  - appartenant au domaine global ;
 --  - ayant le droit mail ;
@@ -118,9 +118,9 @@ INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, us
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password_type, userobm_password, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid, userobm_address1, userobm_zipcode, userobm_town, userobm_phone, userobm_phone2, userobm_fax, userobm_fax2, userobm_mobile, userobm_mail_perms, userobm_mail_ext_perms, userobm_email, userobm_mail_server_id, userobm_description) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), 'test02', 'PLAIN', 'ptest02', 'admin', 'User', 'Test 02', '1052', '512', '23, rue des champs', '31400', 'La ville à Raymond', '05 62 19 24 91', '123', '05 62 19 24 92', '+33 5 62 19 24 91', '06 55 55 55 55', '1', '1', 'test02\r\ntest02.admin', (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'Utilisateur n''appartenant qu''au domaine 1');
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Remplissage de la table 'UGroup' : Création d'un groupe
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM UGroup;
 
 -- Admin Group
@@ -150,10 +150,10 @@ INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, g
 -- "Hôtes du domaine' Group
 INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_local, group_ext_id, group_samba, group_gid, group_name, group_desc, group_email, group_contacts) VALUES (1, 1, 0, 0, NULL, 1, 515, 'Hôtes du domaine', 'Groupe des hôtes du domaine Samba', '', NULL);
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Remplissage de la table 'UserObmGroup' :  Positionnement d'utilisateurs dans
 -- les groupes
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM UserObmGroup;
 
 -- Members of group 'Admin' : 'test01' 'test02'
@@ -176,19 +176,19 @@ INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES
 INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES ((SELECT group_id FROM UGroup WHERE group_name='grpTest01'), (SELECT userobm_id FROM UserObm WHERE userobm_login='test01'));
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Remplissage de la table 'MailServerNetwork' : déclaration des serveurs
 -- réseaux locaux des serveurs de BALs
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM MailServerNetwork;
 
 INSERT INTO MailServerNetwork (mailservernetwork_host_id, mailservernetwork_ip) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail'), '127.0.0.1' );
 INSERT INTO MailServerNetwork (mailservernetwork_host_id, mailservernetwork_ip) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail'), '10.0.0.0/24' );
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Remplissage de la table 'MailShare' : Création d'un répertoire partagé
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM MailShare;
 
 -- Appartenant à tous les domaines
@@ -197,9 +197,9 @@ INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_
 -- Appartenant au domaine 1
 INSERT INTO MailShare (mailshare_domain_id, mailshare_mail_server_id, mailshare_name, mailshare_description, mailshare_email) VALUES ((SELECT domain_id FROM Domain WHERE domain_label='Domain 1'), (SELECT mailserver_id FROM MailServer JOIN Host ON host_id=mailserver_host_id WHERE host_name='srv-mail'), 'mailShare01', 'Répertoire partagé de test 01, appartenant au domaine 2', 'mailshare01');
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Remplissage de la table 'Samba' : Création d'un domaine windows
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM Samba;
 
 INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( 1, 'samba_domain', 'TEST-DOMAIN' );
@@ -209,9 +209,9 @@ INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( 1, 'samb
 INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( 1, 'samba_home_def', '\\\\PDCTEST\\%u' );
 INSERT INTO Samba ( samba_domain_id, samba_name, samba_value ) VALUES ( 1, 'samba_home_drive_def', 'P' );
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Remplissage de la table 'EntityRight' : Gestion des droits
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 DELETE FROM EntityRight;
 
 INSERT INTO EntityRight ( entityright_entity, entityright_entity_id, entityright_consumer, entityright_consumer_id, entityright_read, entityright_write, entityright_admin ) VALUES ( 'MailShare', (SELECT mailshare_id FROM MailShare WHERE mailshare_name='mailShare00'), 'user', (SELECT userobm_id FROM UserObm WHERE userobm_login='admin1'), 0, 0, 1 );

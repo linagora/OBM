@@ -1,10 +1,10 @@
----
---- New table
----
+--
+-- New table
+--
 
----
---- Service
----
+--
+-- Service
+--
 CREATE TABLE Service (
   service_id                                    int(8) NOT NULL auto_increment,
   service_key                                   varchar(255),
@@ -123,9 +123,9 @@ CREATE TABLE HostService (
   CONSTRAINT hostservice_host_id_host_id_fkey FOREIGN KEY (hostservice_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- Address
----
+--
+-- Address
+--
 DROP TABLE IF EXISTS Address;
 CREATE TABLE Address (
   address_id                                    int(8) NOT NULL auto_increment,
@@ -141,9 +141,9 @@ CREATE TABLE Address (
   PRIMARY KEY (address_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- Phone
----
+--
+-- Phone
+--
 DROP TABLE IF EXISTS Phone;
 CREATE TABLE Phone (
   phone_id                                      int(8) NOT NULL auto_increment,
@@ -152,9 +152,9 @@ CREATE TABLE Phone (
   PRIMARY KEY (phone_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- Website
----
+--
+-- Website
+--
 DROP TABLE IF EXISTS Website;
 CREATE TABLE Website (
   website_id                                    int(8) NOT NULL auto_increment,
@@ -163,9 +163,9 @@ CREATE TABLE Website (
   PRIMARY KEY (website_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- Email
----
+--
+-- Email
+--
 DROP TABLE IF EXISTS Email;
 CREATE TABLE Email (
   email_id                                      int(8) NOT NULL auto_increment,
@@ -175,9 +175,9 @@ CREATE TABLE Email (
   KEY email_address (email_address)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- Instant Messaging
----
+--
+-- Instant Messaging
+--
 DROP TABLE IF EXISTS IM;
 CREATE TABLE IM (
   im_id                                         int(8) NOT NULL auto_increment,
@@ -186,9 +186,9 @@ CREATE TABLE IM (
   PRIMARY KEY (im_id),
   KEY im_address (im_address)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
----
---- ContactAddress
----
+--
+-- ContactAddress
+--
 DROP TABLE IF EXISTS ContactAddress;
 CREATE TABLE ContactAddress (
   contactaddress_address_id                     int(8) NOT NULL,
@@ -200,9 +200,9 @@ CREATE TABLE ContactAddress (
   CONSTRAINT contactaddress_contact_id_contact_id_fkey FOREIGN KEY (contactaddress_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- ContactPhone
----
+--
+-- ContactPhone
+--
 DROP TABLE IF EXISTS ContactPhone;
 CREATE TABLE ContactPhone (
   contactphone_phone_id                         int(8) NOT NULL,
@@ -214,9 +214,9 @@ CREATE TABLE ContactPhone (
   CONSTRAINT contactphone_contact_id_contact_id_fkey FOREIGN KEY (contactphone_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- ContactWebsite
----
+--
+-- ContactWebsite
+--
 DROP TABLE IF EXISTS ContactWebsite;
 CREATE TABLE ContactWebsite (
   contactwebsite_website_id                     int(8) NOT NULL,
@@ -228,9 +228,9 @@ CREATE TABLE ContactWebsite (
   CONSTRAINT contactwebsite_contact_id_contact_id_fkey FOREIGN KEY (contactwebsite_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- ContactEmail
----
+--
+-- ContactEmail
+--
 DROP TABLE IF EXISTS ContactEmail;
 CREATE TABLE ContactEmail (
   contactemail_email_id                         int(8) NOT NULL,
@@ -242,9 +242,9 @@ CREATE TABLE ContactEmail (
   CONSTRAINT contactemail_contact_id_contact_id_fkey FOREIGN KEY (contactemail_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- ContactIM
----
+--
+-- ContactIM
+--
 DROP TABLE IF EXISTS ContactIM;
 CREATE TABLE ContactIM (
   contactim_im_id                               int(8) NOT NULL,
@@ -256,9 +256,9 @@ CREATE TABLE ContactIM (
   CONSTRAINT contactim_contact_id_contact_id_fkey FOREIGN KEY (contactim_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- CompanyAddress
----
+--
+-- CompanyAddress
+--
 DROP TABLE IF EXISTS CompanyAddress;
 CREATE TABLE CompanyAddress (
   companyaddress_address_id                     int(8) NOT NULL,
@@ -270,9 +270,9 @@ CREATE TABLE CompanyAddress (
   CONSTRAINT companyaddress_company_id_company_id_fkey FOREIGN KEY (companyaddress_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- CompanyPhone
----
+--
+-- CompanyPhone
+--
 DROP TABLE IF EXISTS CompanyPhone;
 CREATE TABLE CompanyPhone (
   companyphone_phone_id                         int(8) NOT NULL,
@@ -284,9 +284,9 @@ CREATE TABLE CompanyPhone (
   CONSTRAINT companyphone_company_id_company_id_fkey FOREIGN KEY (companyphone_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- CompanyWebsite
----
+--
+-- CompanyWebsite
+--
 DROP TABLE IF EXISTS CompanyWebsite;
 CREATE TABLE CompanyWebsite (
   companywebsite_website_id                     int(8) NOT NULL,
@@ -298,9 +298,9 @@ CREATE TABLE CompanyWebsite (
   CONSTRAINT companywebsite_company_id_company_id_fkey FOREIGN KEY (companywebsite_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
----
---- CompanyEmail
----
+--
+-- CompanyEmail
+--
 DROP TABLE IF EXISTS CompanyEmail;
 CREATE TABLE CompanyEmail (
   companyemail_email_id                         int(8) NOT NULL,
@@ -338,7 +338,7 @@ UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_gl
 ALTER TABLE OGroup MODIFY COLUMN ogroup_parent_id int(8);
 
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 --
 -- CalendarEvent + Todo to Event
 --
@@ -680,7 +680,7 @@ DROP Table DeletedCalendarEvent;
 DROP Table CalendarAlert;
 DROP Table CalendarException;
 DROP Table CalendarEvent;
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 
 
 -- Preferences
@@ -893,9 +893,9 @@ CREATE TABLE ProfilePropertyValue (
   CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty (profileproperty_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 -- Default Profile properties
--------------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('update_state', 'integer', 1, 1);
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level', 'integer', 3);
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level_managepeers', 'integer', 0);

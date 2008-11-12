@@ -1,10 +1,10 @@
---/////////////////////////////////////////////////////////////////////////////
---// OBM - File : obmdb_nafcode_2.1.sql                                      //
---//     - Desc : French Database NAF Code Referential 2.1 insertion script  //
---// 2005-06-08 AliaSource - PB                                              //
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
+-- // OBM - File : obmdb_nafcode_2.1.sql                                      //
+-- //     - Desc : French Database NAF Code Referential 2.1 insertion script  //
+-- // 2005-06-08 AliaSource - PB                                              //
+-- /////////////////////////////////////////////////////////////////////////////
 -- $Id$
---/////////////////////////////////////////////////////////////////////////////
+-- /////////////////////////////////////////////////////////////////////////////
 
 insert into CompanyNafCode (companynafcode_domain_id, companynafcode_title, companynafcode_code, companynafcode_label) values ((SELECT domain_id FROM Domain), '1', '01', 'Agriculture, chasse, services annexes');
 insert into CompanyNafCode (companynafcode_domain_id, companynafcode_title, companynafcode_code, companynafcode_label) values ((SELECT domain_id FROM Domain), '0', '011A', 'Culture de céréales ; cultures industrielles');
