@@ -53,7 +53,7 @@ switch ($action) {
     $display['detail'] = dis_admin_index($params["mode"], $cs_lifetime);
     break;
   case "clear_sess":
-    dis_admin_clear_sess($params["mode"], $cs_lifetime);
+    $display['detail'] = dis_admin_clear_sess($params["mode"], $cs_lifetime);
     break;
   default:
     echo "No action specified !";

@@ -204,8 +204,11 @@ function dis_admin_clear_sess($mode, $lifetime) {
     run_query_admin_activeuserobm_delete($obm_q->f('activeuserobm_sid'));
   }
 
+  $block = "";
   if ($mode == 'html') {
-    dis_admin_index($mode, $ltime);
+    $block .= dis_admin_index($mode, $ltime);
   }
+  
+  return $block;
 }
 ?>
