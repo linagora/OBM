@@ -228,13 +228,16 @@ function html_user_search_form($user) {
     $ext_target = $user["ext_target"];
     $ext_widget = $user["ext_widget"];
     $ext_element = $user["ext_element"];
+    $ext_container = $user["ext_container"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\" />
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\" />
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\" />
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
             <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\" />
-	    <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\" />
-            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\" />";
+	          <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\" />
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\" />
+            <input name=\"ext_container\" type=\"hidden\" value=\"$ext_container\" />";
+
     if ($ext_title == "") {
       $ext_title = $l_add_users;
     }
@@ -384,7 +387,8 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $ext_widget = $user["ext_widget"];
     $ext_widget_text = $user["ext_widget_text"];
     $ext_element = $user["ext_element"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text";
+    $ext_container = $user["ext_container"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;ext_container=$ext_container";
   }
 
   $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_exp=$exp&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext");

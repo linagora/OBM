@@ -123,6 +123,7 @@ obm.AutoComplete.Search = new Class({
       filter_pattern: 'read',            // obm needs
       fieldText: obm.vars.labels.autocompleteField,          // default text displayed when empty field
       extension: null,                  // obm needs
+      resultValue: Class.empty(),		// obm needs
       name: null
     }, options || {});
   },
@@ -160,7 +161,11 @@ obm.AutoComplete.Search = new Class({
                      .addEvent('keypress', this.monoModeOnKeyPress.bindWithEvent(this));
 
     } else {
-      this.validateResultValue = this.addResultValue;
+	    if (this.options.resultValue != Class.empty()) {
+	      this.validateResultValue = this.options.resultValue;
+	    } else {
+	      this.validateResultValue = this.addResultValue;
+	    }
       this.resetFunc = this.reset;
       this.textChangedFunc = this.resetResultBox;
     }

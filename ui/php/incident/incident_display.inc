@@ -188,8 +188,7 @@ function html_incident_search_form($owner_q,$logger_q, $pri, $sta, $reso, $incid
   // --- html template --------------------------------------------------------
 
   $block = "
-  <form  class=\"search\" method=\"get\" name=\"f_search\" action=\"" .
-    url_prepare("incident_index.php") . " \">
+  <form  class=\"search\" method=\"get\" name=\"f_search\" action=\"".url_prepare("incident_index.php")."\">
 
     <label>$l_text<br />
       <input type=\"text\" name=\"tf_text\" size=\"16\" value=\"$text\" />

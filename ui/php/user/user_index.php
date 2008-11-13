@@ -38,10 +38,6 @@ require("$obminclude/../conf/hooks/user/mailchooser.inc"); // FIXME
 $params = get_user_params();
 $mode = $params["mode"];
 
-
-
-require_once("$obminclude/of/of_category.inc");
-
 switch ($mode) {
   case "txt":
     include("$obminclude/global_pref.inc");
@@ -58,6 +54,7 @@ switch ($mode) {
     require("user_display.inc");
     require("user_query.inc");
     require("user_js.inc");
+    require_once("$obminclude/of/of_category.inc");
     require("$obminclude/of/of_right.inc"); // needed by call from calendar
     
     // detailconsult can be accessed without user_id (-> display current user)
@@ -71,6 +68,7 @@ switch ($mode) {
     page_close();
     break;
 }
+
 
 // get Profile list (name and id)
 $params['profiles'] = get_profile_list();

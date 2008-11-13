@@ -90,11 +90,20 @@ function html_entityadmin_bar($writable_entity,$entity_id, $entity) {
 function html_dis_right_admin(&$consumers, $entity_id, $entity) {
   global $l_authorize_list,$l_read_permission, $l_write_permission, $l_access_permission;
   global $l_right_validate ,$l_authorize,$l_deny, $ico_delete;
-  global $l_public,$l_admin_permission, $module;
-  global $path, $ico_add, $l_users, $l_groups;
+  global $l_public,$l_admin_permission, $module, $l_unselect_all, $l_select_all;
+  global $path, $ico_add, $l_users, $l_groups, $l_header_right;
   global $cgp_default_right;
 
   $l_userSearch = phpStringToJsString("$l_users...");
+  for ($i=0; $i<count($consumers['consumer']); $i++) {
+    $con_id = $consumers['consumer'][$i]['id'];
+    if ( ($con_id == 0 || $con_id == NULL) && $i != 0) {
+      $consumer = $consumers['consumer'][$i];
+      $consumers['consumer'][$i] = $consumers['consumer'][0];
+      $consumers['consumer'][0] = $consumer;
+      break;
+    }
+  }
   foreach ($consumers['consumer'] as $one_consumer) {
     $id = $one_consumer['id'];
     $consumer = $one_consumer['entity'];
@@ -103,360 +112,387 @@ function html_dis_right_admin(&$consumers, $entity_id, $entity) {
     $read = $one_consumer['read'];
     $admin = $one_consumer['admin'];
     $access = $one_consumer['access'];
-    if ($id == 0) {
+    if ($id == 0 || $id == NULL) {
       if ($read == 1) {
-        $style_read = 'visibility:hidden;';
+        $disabled_read = 'disabled="true"';
         $public_read_checked = "checked=\"checked\"";
+        $style_read = 'visibility: hidden';
       }
       if ($write == 1) {
-        $style_write = 'visibility:hidden;';
+        $disabled_write = 'disabled="true"';
         $public_write_checked = "checked=\"checked\"";
+        $disabled_read = 'disabled="true"';
+        $public_read_checked = "checked=\"checked\"";
+        $style_write = 'visibility: hidden';
+        $style_read = 'visibility: hidden';
       }
       if ($access == 1) {
-        $style_access = 'visibility:hidden;';
+        $disabled_access = 'disabled="true"';
         $public_access_checked = "checked=\"checked\"";
+        $style_access = 'visibility: hidden';
       }
     } else {
       if ($write == 1) {
-        $sel_id = "data-$consumer-$id";
-        $div_id = "sel_accept_write-data-$consumer-$id";
-        ${'dis_'.$consumer.'_write_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_accept_".$consumer."_write');\"><img src=\"$ico_delete\"></a>
-          $label
-          <input value=\"$sel_id\" name=\"sel_accept_write[]\" type=\"hidden\" />
-          </div>";
+        $checked_write = 'checked="checked"';
+        if ($read == 0) {
+          $checked_read = 'checked="checked"';
+        }
+      } else {
+        $checked_write = '';
       }
       if ($read == 1) {
-        $sel_id = "data-$consumer-$id";
-        $div_id = "sel_accept_read-data-$consumer-$id";
-        ${'dis_'.$consumer.'_read_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_accept_".$consumer."_read');\"><img src=\"$ico_delete\"></a>
-          $label
-          <input value=\"$sel_id\" name=\"sel_accept_read[]\" type=\"hidden\" />
-          </div>";
+        $checked_read = 'checked="checked"';
+      } else {
+        if ($write == 0) {
+          $checked_read = '';
+        }
       }
       if ($admin == 1) {
-        $sel_id = "data-$consumer-$id";
-        $div_id = "sel_accept_admin-data-$consumer-$id";
-        ${'dis_'.$consumer.'_admin_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_accept_".$consumer."_admin');\"><img src=\"$ico_delete\"></a>
-          $label
-          <input value=\"$sel_id\" name=\"sel_accept_admin[]\" type=\"hidden\" />
-          </div>";
-      }      
-      if ($access == 1) {
-        $sel_id = "data-$consumer-$id";
-        $div_id = "sel_accept_access-data-$consumer-$id";
-        ${'dis_'.$consumer.'_access_ok'} .= "<div class=\"elementRow\" id=\"$div_id\">
-          <a href=\"javascript: remove_element('$div_id','sel_accept_".$consumer."_access');\"><img src=\"$ico_delete\"></a>
-          $label
-          <input value=\"$sel_id\" name=\"sel_accept_access[]\" type=\"hidden\" />
-          </div>";
+        $checked_admin = 'checked="checked"';
+      } else {
+        $checked_admin = '';
       }
+      if ($access == 1) {
+        $checked_access = 'checked="checked"';
+      } else {
+        $checked_access = '';
+      }
+      
+      $sel_id = 'data-'.$consumer.'-'.$id;
+      $tr_id = 'sel_accept_'.$consumer.'-'.$sel_id;
+      ${'dis_'.$consumer} .= "
+      	<tr id=\"$tr_id\">
+      	  <td>
+      	    <a href=\"javascript: remove_element('$tr_id','perms');\"><img src=\"$ico_delete\"></a>
+      	    $label
+      	  </td>
+      	  <td>
+      	    <a href=\"#\" onclick=\"select_all_perms('$tr_id')\">$l_select_all</a>/<a href=\"#\" onclick=\"unselect_all_perms('$tr_id')\">$l_unselect_all</a>
+      	  </td>
+      	  <td class=\"cell_perms_access\">
+      	    <input style=\"$style_access\" type=\"checkbox\" name=\"cb_accept_access[]\" value=\"$sel_id\" $checked_access $disabled_access/>
+      	  </td>
+      	  <td class=\"cell_perms_read\">
+      	    <input style=\"$style_read\" type=\"checkbox\" name=\"cb_accept_read[]\" value=\"$sel_id\" $checked_read $disabled_read/>
+      	  </td>
+      	  <td class=\"cell_perms_write\">
+      	    <input style=\"$style_write\" type=\"checkbox\" name=\"cb_accept_write[]\" onclick=\"apply_checked_read(this, '$tr_id')\" onchange=\"apply_checked_read(this, '$tr_id')\" value=\"$sel_id\" $checked_write $disabled_write/>
+      	  </td>
+      	  <td>
+      	    <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin />
+      	  </td>
+      	</tr>
+      ";
     }
   }
   if($cgp_default_right[$entity]['public']['read'] != -1 || ($read == 1 && $id == 0)){ 
     $block_consumer_read_public = "
-      <td class=\"detailLabel\">
-      $l_public
-      </td>
-      <td class=\"detailForm\" id=\"cb_read_public\">
-      <input onchange=\"togglePrivacy(this,'readRightBox');\" onclick=\"togglePrivacy(this,'readRightBox')\"
+      <span id=\"cb_read_public\">
+      <input onchange=\"togglePrivacy(this,'cell_perms_read');\" onclick=\"togglePrivacy(this,'cell_perms_read')\"
       name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
-      </td>";
+      </span>";
+  } else {
+    $block_consumer_read_public = "&nbsp;";
   }
-
-  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
+  if($cgp_default_right[$entity]['public']['access'] != -1 || ($access == 1 && $id == 0)) { 
+    $block_consumer_access_public = "
+      <span id=\"cb_access_public\">
+      <input onchange=\"togglePrivacy(this,'cell_perms_access');\" onclick=\"togglePrivacy(this,'cell_perms_access')\"
+      name=\"cb_access_public\" value=\"1\" type=\"checkbox\" $public_access_checked />
+      </span>";
+  } else {
+    $block_consumer_access_public = "&nbsp;";
+  }
+  if($cgp_default_right[$entity]['public']['write'] != -1 || ($write == 1 && $id == 0)){ 
+    $block_consumer_write_public = "
+      <span id=\"cb_write_public\">
+      <input onchange=\"togglePrivacy(this,'cell_perms_write'); apply_checked_read(this, 'public_perms')\" onclick=\"togglePrivacy(this,'cell_perms_write'); apply_checked_read(this, 'public_perms')\"
+      name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked style=\"$public_write_checked_visibility\" />
+      </span>";
+  } else {
+    $block_consumer_write_public = "&nbsp;";
+  }
+  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_user&amp;ext_container=table";
   $popup_user_add_button = "
     <a id=\"lnk_accept_read\" href=\"#\" onclick=\"return popup('$url');
   return false;\">
     <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
   if($module != 'mailbox' && $module != 'mailshare') {
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group&amp;ext_container=table";
     $popup_group_add_button = "
       <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
       </a>";
-    $block_group_read = "
-      <tr>
-      <td class=\"detailLabel\">
-      $l_groups
-      $popup_group_add_button
-      </td>
-      <td>
-      <input type=\"text\" id=\"groupReadSearch\" autocomplete=\"off\" /> 
-      </td>
-      </tr>";
-    $block_group_buttons_read = "
-      <fieldset id='sel_accept_group_read'>
-      <legend>$l_groups</legend>
-      $dis_group_read_ok
-      </fieldset>";        
   }
-  $block_consumer_read = "
-    <tr>
-    <td class=\"detailLabel\">
-    $l_users
-    $popup_user_add_button
-    </td>
-    <td>
-    <input type=\"text\" id=\"userReadSearch\" autocomplete=\"off\" /> 
-    </td>
-    </tr>
-    $block_group_read
-    <tr>
-    <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_read\">
-    <fieldset id='sel_accept_user_read'>
-    <legend>$l_users</legend>
-    $dis_user_read_ok
-    </fieldset>
-    $block_group_buttons_read
-    </td>
-    </tr>";
-
-  if($cgp_default_right[$entity]['public']['access'] != -1 || ($access == 1 && $id == 0)){ 
-    $block_consumer_access_public = "
-      <td class=\"detailLabel\">
-      $l_public
-      </td>
-      <td class=\"detailForm\" id=\"cb_access_public\">
-      <input onchange=\"togglePrivacy(this,'accessRightBox');\" onclick=\"togglePrivacy(this,'accessRightBox')\"
-      name=\"cb_access_public\" value=\"1\" type=\"checkbox\" $public_access_checked />
-      </td>";
-  }
-  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_access";
-  $popup_user_add_button = "
-    <a id=\"lnk_accept_access\" href=\"#\" onclick=\"return popup('$url');
-  return false;\">
-    <img src=\"$ico_add\" alt=\"[Add]\" />
-    </a>";
-  if($module != 'mailbox' && $module != 'mailshare') {
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_access";
-    $popup_group_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
-      <img src=\"$ico_add\" alt=\"[Add]\" />
-      </a>";
-    $block_group_access = "
-      <tr>
-      <td class=\"detailLabel\">
-      $l_groups
-      $popup_group_add_button
-      </td>
-      <td>
-      <input type=\"text\" id=\"groupAccessSearch\" autocomplete=\"off\" /> 
-      </td>
-      </tr>";
-    $block_group_buttons_access = "
-      <fieldset id='sel_accept_group_access'>
-      <legend>$l_groups</legend>
-      $dis_group_access_ok
-      </fieldset>";        
-  }
-  $block_consumer_access = "
-    <tr>
-    <td class=\"detailLabel\">
-    $l_users
-    $popup_user_add_button
-    </td>
-    <td>
-    <input type=\"text\" id=\"userAccessSearch\" autocomplete=\"off\" /> 
-    </td>
-    </tr>
-    $block_group_access
-    <tr>
-    <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_access\">
-    <fieldset id='sel_accept_user_access'>
-    <legend>$l_users</legend>
-    $dis_user_access_ok
-    </fieldset>
-    $block_group_buttons_access
-    </td>
-    </tr>";
-
-
-  if($cgp_default_right[$entity]['public']['write'] != -1 || ($write == 1 && $id == 0)){ 
-    $block_consumer_write_public = "
-      <td class=\"detailLabel\">
-      $l_public
-      </td>
-      <td class=\"detailForm\" id=\"cb_write_public\">
-      <input onchange=\"togglePrivacy(this,'writeRightBox');\" onclick=\"togglePrivacy(this,'writeRightBox')\"
-      name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked style=\"$public_write_checked_visibility\" />
-      </td>";
-  }
-  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
-  $popup_user_add_button = "
-    <a id=\"lnk_accept_write\" href=\"#\" onclick=\"return popup('$url');\">
-    <img src=\"$ico_add\" alt=\"[Add]\" />
-    </a>";
-  if($module != 'mailbox' && $module != 'mailshare') {
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
-    $popup_group_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
-      <img src=\"$ico_add\" alt=\"[Add]\" />
-      </a>";
-    $block_group_write = "
-      <tr>
-      <td class=\"detailLabel\">
-      $l_groups
-      $popup_group_add_button
-      </td>
-      <td>
-      <input type=\"text\" id=\"groupWriteSearch\" autocomplete=\"off\" /> 
-      </td>
-      </tr>";
-    $block_group_buttons_write = "      
-      <fieldset id='sel_accept_group_write'>
-      <legend>$l_groups</legend>
-      $dis_group_write_ok
-      </fieldset>";
-  }
-  $block_consumer_write = "
-    <tr>
-    <td class=\"detailLabel\">
-    $l_users
-    $popup_user_add_button
-    </td>
-    <td>
-    <input type=\"text\" id=\"userWriteSearch\" autocomplete=\"off\" /> 
-    </td>
-    </tr>
-    $block_group_write
-    <tr>
-    <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_write\">
-    <fieldset id='sel_accept_user_write'>
-    <legend>$l_users</legend>
-    $dis_user_write_ok
-    </fieldset>
-    $block_group_buttons_write
-    </td>
-    </tr>";
-
-  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
-  $popup_user_add_button = "
-    <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
-    <img src=\"$ico_add\" alt=\"[Add]\" />
-    </a>";
-  if($module != 'mailbox' && $module != 'mailshare') {
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_admin";
-    $popup_group_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
-      <img src=\"$ico_add\" alt=\"[Add]\" />
-      </a>";
-    $block_group_admin = "    
-      <tr>
-      <td class=\"detailLabel\">
-      $l_groups
-      $popup_group_add_button
-      </td>
-      <td>
-      <input type=\"text\" id=\"groupAdminSearch\" autocomplete=\"off\" /> 
-      </td>
-      </tr>";
-    $block_group_buttons_admin =  "      
-      <fieldset id='sel_accept_group_admin'>
-      <legend>$l_groups</legend>
-      $dis_group_admin_ok
-      </fieldset>  ";
-  }
-  $block_consumer_admin = "
-    <tr>
-    <td class=\"detailLabel\">
-    $l_users
-    $popup_user_add_button
-    </td>
-    <td>
-    <input type=\"text\" id=\"userAdminSearch\" autocomplete=\"off\" /> 
-    </td>
-    </tr>
-    $block_group_admin
-    <tr>
-    <tr>
-    <td colspan=\"2\" class=\"detailForm\" id=\"sel_accept_admin\">
-    <fieldset id='sel_accept_user_admin'>
-    <legend>$l_users</legend>
-    $dis_user_admin_ok
-    </fieldset>
-    $block_group_buttons_admin
-    </td>
-    </tr>";
-
-
-  $block = "
-    <script type=\"text/javascript\">
-function togglePrivacy(formElement, dataElement) {
-  if(formElement.checked) {
-    $(dataElement).setStyle('visibility','hidden');
-} else {
-  $(dataElement).setStyle('visibility','');
-}
-}
-  </script>
-  <form method=\"post\" name=\"f_mod_right\"
-    action=\"$path/$module/${module}_index.php\">
-
-  <fieldset class=\"detail infos\">
-  <legend>$l_read_permission</legend>
-  <table>
-    $block_consumer_read_public
-  <tbody style=\"$style_read\" id=\"readRightBox\">
-    $block_consumer_read
-  </tbody>
-  </table>
-  </fieldset>
-
-  <fieldset class=\"detail infos\">
-  <legend>$l_write_permission</legend>
-  <table>
-  <tr style=\"$public_write_checked_visibility\" >
-    $block_consumer_write_public
-  </tr>
-  <tbody style=\"$style_write\" id=\"writeRightBox\">
-    $block_consumer_write
-  </tbody>
-  </table>
-  </fieldset>
-
-  <fieldset class=\"detail infos\">
-  <legend>$l_access_permission</legend>
-  <table>
-  <tr style=\"$public_access_checked_visibility\" >
-    $block_consumer_access_public
-  </tr>
-  <tbody style=\"$style_access\" id=\"accessRightBox\">
-    $block_consumer_access
-  </tbody>
-  </table>
-  </fieldset>
-
-  <fieldset class=\"detail infos\">
-  <legend>$l_admin_permission</legend>
-  <table>
+    
+  $block_public_perms = "
   <tbody>
-    $block_consumer_admin
+    <tr id=\"public_perms\" class=\"pair\">
+    <th>$l_public</th>
+    <td>&nbsp;</td>
+    <td>$block_consumer_access_public</td>
+  	<td>$block_consumer_read_public</td>
+  	<td>$block_consumer_write_public</td>
+  	<td>&nbsp;</td>
+  ";
+  	
+  $block_users = "
+  <tbody id='sel_user'>
+    <tr>
+      <th>$l_users</th>
+      <th colspan=\"5\">
+        <input type=\"text\" id=\"userSearch\" autocomplete=\"off\" />
+        $popup_user_add_button
+      </th>
+    </tr>
   </tbody>
-  </table>
-  </fieldset>
-
-  <fieldset class=\"buttons\">
-    <input type=\"hidden\" name=\"entity_id\" value=\"$entity_id\" />
-    <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
-    <input type=\"submit\" value=\"$l_right_validate\" />
-  </fieldset>
+  <tbody id='sel_accept_user'>
+    $dis_user
+  </tbody>
+  ";
+  
+  if($module != 'mailbox' && $module != 'mailshare') {
+    $block_groups = "
+    <tbody id='sel_group'>
+      <tr>
+        <th>$l_groups</th>
+        <th colspan=\"5\">
+          <input type=\"text\" id=\"groupSearch\" autocomplete=\"off\" />
+          $popup_group_add_button
+        </th>
+      </tr>
+    </tbody>
+    <tbody id='sel_accept_group'>
+      $dis_group
+    </tbody>
+    ";
+  }
+    
+  $block = "
+  <script type=\"text/javascript\">
+    function togglePrivacy(formElement, dataElements) {
+      var elements = \$ES('td.'+dataElements);
+      
+      if(formElement.checked) {
+        for (var i=0; i<elements.length; i++) {
+          var cb_field = elements[i].getElement('input');
+          cb_field.setProperty('disabled', true);
+          cb_field.setStyle('visibility', 'hidden');
+        }
+      } else {
+        for (var i=0; i<elements.length; i++) {
+          var cb_field = elements[i].getElement('input');
+          cb_field.setProperty('disabled', false);
+          cb_field.setStyle('visibility', 'visible');
+        }
+      }
+    }
+    
+    function select_all_perms(tr_id) {
+      var tr_element = $(tr_id);
+      
+      var td_elements = tr_element.getChildren();
+      for (var i=0; i<td_elements.length; i++) {
+          var td_element = td_elements[i];
+          var cb_element = td_element.getElement('input');
+          if (cb_element !== false && cb_element.getProperty('type') == 'checkbox') {
+            cb_element.setProperty('checked', true);
+          }
+      }
+    }
+    
+    function unselect_all_perms(tr_id) {
+        var tr_element = $(tr_id);
+        
+        var td_elements = tr_element.getChildren();
+        for (var i=0; i<td_elements.length; i++) {
+          var td_element = td_elements[i];
+          var cb_element = td_element.getElement('input');
+          if (cb_element !== false && cb_element.getProperty('type') == 'checkbox') {
+            cb_element.setProperty('checked', false);
+          }
+        }
+    }
+    
+    function apply_checked_read(formElement, tr_id) {
+    
+      if (tr_id != 'public_perms') {
+        var td_elements = $(tr_id).getChildren();
+        
+        if (formElement.checked) {
+          for (var i=0; i<td_elements.length; i++) {
+            var td_element = td_elements[i];
+            if (td_element.hasClass('cell_perms_read')) {
+              var cb_read = td_element.getElement('input');
+              if (cb_read !== false && cb_read.getProperty('type') == 'checkbox') {
+                cb_read.checked = true;
+              }
+            }
+          }
+        }
+      } else if (formElement.checked) {
+        var cb_public_read = $('cb_read_public').getElement('input');
+        if (cb_public_read !== false && cb_public_read.getProperty('type') == 'checkbox') {
+          cb_public_read.checked = true;
+          togglePrivacy(cb_public_read,'cell_perms_read');
+        }
+      }
+    }
+    
+    function apply_backgroud() {
+      var tbody_blocks = new Array($('sel_accept_user'), $('sel_accept_group'));
+      
+      for (var i=0; i < tbody_blocks.length; i++) {
+        var tbody = tbody_blocks[i];
+        var tr_elements = (tbody !== false ? tbody.getChildren() : new Array());
+        for (var j=0; j < tr_elements.length; j++) {
+          if ( (j % 2) == 0) {
+            tr_elements[j].addClass('pair');
+          }
+        }
+      }
+    }
+  </script>
+  
+  <form method=\"post\" name=\"f_mod_right\" action=\"$path/$module/${module}_index.php\">
+    <table class=\"spreadSheet\">
+      <colgroup class=\"highlight\"/>
+      <thead>
+        <tr>
+          <th colspan=\"2\">$l_header_right</th>
+          <th>$l_access_permission</th>
+          <th>$l_read_permission</th>
+          <th>$l_write_permission</th>
+          <th>$l_admin_permission</th>
+        </tr>
+      </thead>
+      $block_public_perms
+      $block_users
+      $block_groups
+    </table>
+    <fieldset class=\"buttons\">
+      <input type=\"hidden\" name=\"entity_id\" value=\"$entity_id\" />
+      <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
+      <input type=\"submit\" value=\"$l_right_validate\" />
+    </fieldset>
   </form>
-<script type=\"text/javascript\">
-obm.initialize.chain(function () {
-  new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_admin', 'userAdminSearch', {name:'sel_accept_admin'});
-  new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_write', 'userWriteSearch', {name:'sel_accept_write'});
-  new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_read', 'userReadSearch', {name:'sel_accept_read'});
-  new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user_access', 'userAccessSearch', {name:'sel_accept_access'});
-  new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_admin', 'groupAdminSearch', {name:'sel_accept_admin'});
-  new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_write', 'groupWriteSearch', {name:'sel_accept_write'});
-  new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_read', 'groupReadSearch', {name:'sel_accept_read'});
-  new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group_access', 'groupAccessSearch', {name:'sel_accept_access'});
-});
-</script>
+  
+  <script type=\"text/javascript\">
+  
+    apply_backgroud();
+    
+    var resultValue = function (element, extension) {
+      var accept_read = this.name[0];
+      var accept_write = this.name[1];
+      var accept_access = this.name[2];
+      var accept_admin = this.name[3];
+      var item_id = element.getProperty('id');
+      var id = item_id.substr(('item_').length,item_id.length);
+      var entity = this.selectedBox.id;
+      var tr_id = entity +'-'+ id;
+      var text = $(item_id+'_label').innerHTML;
+      if (!$(tr_id)) {
+        element.addClass(\"selected\");
+        var result = new Element('tr');
+        result.setProperties({'id': tr_id});
+        result.injectInside(this.selectedBox);
+        if (this.selectedBox.getChildren().length % 2 != 0) {
+          result.addClass('pair');
+        }
+        new Element('td').adopt(
+          new Element('a').setProperty('href', '#').adopt(
+            new Element('img').setProperty('src', obm.vars.images.del)
+          ).addEvent('mousedown',
+            function() {
+              var item = \$(item_id);
+              if (item) { item.removeClass(\"selected\"); }
+              remove_element(tr_id, entity);
+            }.bind(this)
+          )
+        ).appendText(' ' + text).injectInside(result);
+        
+        var cb_read = $('cb_read_public');
+        var accept_read_style = 'visible';
+        var accept_read_disabled = false;
+        if (cb_read!==false && cb_read.getElement('input').checked) {
+          accept_read_disabled = true;
+          accept_read_style = 'hidden';
+        }
+        
+        var cb_write = $('cb_write_public');
+        var accept_write_style = 'visible';
+        var accept_write_disabled = false;
+        if (cb_write!==false && cb_write.getElement('input').checked) {
+          accept_write_disabled = true;
+          accept_write_style = 'hidden';
+        }
+        
+        var cb_access = $('cb_access_public');
+        var accept_access_style = 'visible';
+        var accept_access_disabled = false;
+        if (cb_access!==false && cb_access.getElement('input').checked) {
+          accept_access_disabled = true;
+          accept_access_style = 'hidden';
+        }
+        
+        new Element('td').adopt(
+          new Element('a').setProperty('href', '#')
+                          .setProperty('onclick', 'select_all_perms(\''+tr_id+'\')').appendText('$l_select_all')          
+        ).appendText('/').adopt(
+          new Element('a').setProperty('href', '#')
+                          .setProperty('onclick', 'unselect_all_perms(\''+tr_id+'\')').appendText('$l_unselect_all')
+        ).injectInside(result);
+        
+        new Element('td').addClass('cell_perms_access').adopt(
+          new Element('input').setProperty('type', 'checkbox')
+                              .setProperty('name', accept_access+'[]')
+                              .setProperty('value', id)
+                              .setProperty('disabled', accept_access_disabled)
+        ).setStyle('visibility', accept_access_style).injectInside(result);
+        
+        new Element('td').addClass('cell_perms_read').adopt(
+          new Element('input').setProperty('type', 'checkbox')
+                              .setProperty('name', accept_read+'[]')
+                              .setProperty('value', id)
+                              .setProperty('disabled', accept_read_disabled)
+        ).setStyle('visibility', accept_read_style).injectInside(result);
+        
+        new Element('td').addClass('cell_perms_write').adopt(
+          new Element('input').setProperty('type', 'checkbox')
+                              .setProperty('name', accept_write+'[]')
+                              .setProperty('value', id)
+                              .setProperty('disabled', accept_write_disabled)
+                              .setProperty('onclick', 'apply_checked_read(this, \''+tr_id+'\')')
+                              .setProperty('onchange', 'apply_checked_read(this, \''+tr_id+'\')')
+        ).setStyle('visibility', accept_write_style).injectInside(result);
+        
+        new Element('td').adopt(
+          new Element('input').setProperty('type', 'checkbox')
+                              .setProperty('name', accept_admin+'[]')
+                              .setProperty('value', id)
+        ).injectInside(result);
+        
+      } else {
+        this.inputField.blur();
+        this.resetFunc();
+        this.inputField.focus();
+      }
+      eval(this.options.selectfunction);
+    }
+    
+    var sel_perms = new Array('cb_accept_read', 'cb_accept_write', 'cb_accept_access', 'cb_accept_admin');
+    obm.initialize.chain(function () {
+      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user', 'userSearch', {name: sel_perms, resultValue: resultValue});
+      ";
+      if($module != 'mailbox' && $module != 'mailshare') {
+        $block .= "      
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group', 'groupSearch', {name: sel_perms, resultValue: resultValue});
+      ";
+      }
+      $block .="
+    });
+  </script>
 ";
 
   return $block;
@@ -1035,6 +1071,7 @@ function of_right_users_for_entity($entity, $entity_id, $right='all') {
   display_debug_msg($query, $cdg_sql, 'of_right_users_for_entity()');
   $obm_q->query($query);
   $ret_array = array();
+  $id_array = array();
   while($obm_q->next_record()) {
     $id = $obm_q->f('userobm_id');
     $label = $obm_q->f('userobm_lastname').' '.$obm_q->f('userobm_firstname');

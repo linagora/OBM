@@ -183,6 +183,7 @@ function html_group_search_form ($group) {
     $ext_id = $group['ext_id'];
     $ext_title = stripslashes($group['ext_title']);
     $ext_element =  $group['ext_element'];
+    $ext_container = $group['ext_container'];
 
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
       <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
@@ -191,7 +192,8 @@ function html_group_search_form ($group) {
       <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
       <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
       <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">      
-      <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+      <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">
+      <input name=\"ext_container\" type=\"hidden\" value=\"$ext_container\" />";
     if ($ext_title == '') {
       $ext_title = $l_add_groups;
     }
@@ -299,7 +301,8 @@ function html_group_search_group($obm_q, $prefs, $group) {
     $ext_element = $group['ext_element'];
     $ext_title = urlencode(stripslashes($group['ext_title']));
     $restriction_calendar = $group['restriction_calendar'];
-    $url_ext = "&amp;restriction_calendar=$restriction_calendar&amp;popup=1&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_titled&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;child_res=$child_res";
+    $ext_container = $group['ext_container'];
+    $url_ext = "&amp;restriction_calendar=$restriction_calendar&amp;popup=1&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_titled&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;child_res=$child_res&amp;ext_container=$ext_container";
   }
 
   $name = urlencode(stripslashes($group['name']));
