@@ -188,7 +188,7 @@ function get_admin_action() {
      'Name'     => $l_header_clear_sess,
      'Url'      => "$path/admin/admin_index.php?action=clear_sess&amp;mode=html",
      'Right'    => $cright_write_admin,
-     'Condition'=> array ('all') 
+     'Condition'=> array ('None') 
                                     );
 }
 
