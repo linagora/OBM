@@ -213,7 +213,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   <ul>
     $dis_legend
   </ul>
-  <input type=\"hidden\" name=\"date\" value=\"$iso\" />
+  <input type=\"hidden\" name=\"date\" value=\"".$calendar['date']->getIso()."\" />
   <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
   <input type=\"hidden\" name=\"new_group\" value=\"1\" />
   <input type=\"hidden\" name=\"new_sel\" value=\"1\" />    
@@ -328,7 +328,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <fieldset class=\"detail extra\">
     <legend>$l_category_filter</legend>
       $sel_cat1 
-      <input type=\"hidden\" name=\"date\" value=\"$iso\" />
+      <input type=\"hidden\" name=\"date\" value=\"".$calendar['date']->getIso()."\" />
     </fieldset>
     </form>
 
@@ -353,7 +353,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     $user_add_button
     </legend>
     <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"user\" autocomplete=\"off\" />
-    <input type=\"hidden\" name=\"date\" value=\"$iso\" />
+    <input type=\"hidden\" name=\"date\" value=\"".$calendar['date']->getIso()."\" />
     <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
     <input type=\"hidden\" name=\"new_group\" value=\"1\" />
     <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
