@@ -231,12 +231,12 @@ function run_query_account_search_expected_payments($p_account_id, $p_date_befor
   $p_account_id = sql_parse_id($p_account_id, true);
 
   $query = "select *, payment_id as id,
-    payment_expected_date as payment_expect_date
+    payment_date as payment_expect_date
     from Payment where payment_account_id $p_account_id $multidomain";
   if ($p_date_before != "") {
-    $query .= " and payment_expected_date <= '$p_date_before'";
+    $query .= " and payment_date <= '$p_date_before'";
   }
-  $query .= " and payment_paid = 0 "; // expected payments only
+  $query .= " and payment_checked = 0 "; // expected payments only
 
   display_debug_msg ($query, $cdg_sql, "run_query_account_search_expected_payments()");
   $obm_q = new DB_OBM; 
