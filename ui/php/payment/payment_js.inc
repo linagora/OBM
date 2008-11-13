@@ -47,5 +47,12 @@ function check_kind_new(form) {
   
   return ret;
 }
+
+// Copy a field value into another field
+function copyFieldValue(sourceField, targetField) {
+  if (sourceField !== undefined && targetField !== undefined) {
+    targetField.value = sourceField.value;
+  }
+}
 ";
 ?>

@@ -773,7 +773,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
     <table>
     <tr>
       <th>$l_amount</th>
-      <td><input type=\"text\" id=\"tf_amount\" name=\"tf_amount\" size=\"13\" maxlength=\"13\" value=\"$amount\" onChange=\"this.form.tf_amount_invoice.value=this.value;\" /></td>
+      <td><input type=\"text\" id=\"tf_amount\" name=\"tf_amount\" size=\"13\" maxlength=\"13\" value=\"$amount\" onChange=\"copyFieldValue(this, this.form.tf_amount_invoice)\" /></td>
     </tr>
     $dis_invoice
     <tr>
