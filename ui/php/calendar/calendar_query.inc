@@ -278,13 +278,13 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
     } 
   }
 
-  $event_id = sql_parse_id( $event_id, true);
-  $entity_id = sql_parse_id( $entity_id, true);
+  $event_id = sql_parse_id($event_id, true);
+  $entity_id = sql_parse_id($entity_id, true);
   $query = "UPDATE EventEntity 
             SET evententity_state = '$state'
             WHERE evententity_entity_id  $entity_id 
               AND evententity_entity = '$entity'
-              AND evententity_event_id  $event_id"; 
+              AND evententity_event_id $event_id"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
   $obm_q = new DB_OBM;
@@ -294,7 +294,7 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
     $now = date('Y-m-d H:i:s');
     $query = "UPDATE Event
       SET event_timeupdate = '$now'
-      WHERE event_id = '$event_id'";
+      WHERE event_id $event_id";
 
     display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');
     $retour = $obm_q->query($query);
