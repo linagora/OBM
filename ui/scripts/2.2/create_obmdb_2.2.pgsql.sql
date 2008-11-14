@@ -728,7 +728,7 @@ CREATE TABLE Event (
   event_category1_id    integer default NULL,
   event_priority        integer,
   event_privacy         integer,
-  event_date            timestamp NOT NULL,
+  event_date            timestamp NULL,
   event_duration        integer NOT NULL default 0,
   event_allday          BOOLEAN default FALSE,
   event_repeatkind      varchar(20) default NULL,

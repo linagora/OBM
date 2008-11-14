@@ -266,6 +266,8 @@ UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_glob
 
 -- P_Domain
 ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
+ALTER TABLE P_Domain DROP COLUMN domain_mail_server_id;
+ALTER TABLE P_Domain ADD COLUMN domain_mail_server_auto int(2) default NULL;
 -- Global Domain
 INSERT INTO P_Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
 UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
@@ -717,6 +719,7 @@ ALTER TABLE UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
 ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
 ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
 ALTER TABLE UserObmPref MODIFY COLUMN userobmpref_user_id int(8) NULL ;
+ALTER TABLE UserObmPref ADD COLUMN userobmpref_id int(8) NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (userobmpref_id);
 ALTER TABLE of_usergroup MODIFY COLUMN of_usergroup_group_id int(8) NOT NULL ;
 ALTER TABLE of_usergroup MODIFY COLUMN of_usergroup_user_id int(8) NOT NULL ;
 ALTER TABLE Category MODIFY COLUMN category_usercreate int(8) DEFAULT NULL;

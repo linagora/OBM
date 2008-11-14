@@ -24,7 +24,7 @@ mysqldump -u $U -p$P  --default-character-set='UTF8' ${DB} > ${HOME}/migration-b
 echo "Running 2.1 -> 2.2 schema upgrade script..."
 mysql -u $U -p$P  --default-character-set='UTF8' ${DB} <  ./update-2.1-2.2.mysql.sql >/dev/null
 echo "Updated data dump stored in ${HOME}/migration.sql"
-mysqldump -u $U -p$P -tn  --default-character-set='UTF8' ${DB} > ${HOME}/migration.sql 
+mysqldump -u $U -p$P -tcn  --default-character-set='UTF8' ${DB} > ${HOME}/migration.sql 
 success=$?
 
 test ${success} -eq 0 || {

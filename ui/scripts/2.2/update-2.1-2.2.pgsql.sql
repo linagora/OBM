@@ -260,6 +260,8 @@ UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_glob
 
 -- P_Domain
 ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
+ALTER TABLE P_Domain DROP COLUMN domain_mail_server_id;
+ALTER TABLE P_Domain ADD COLUMN domain_mail_server_auto integer default NULL;
 -- Global Domain
 INSERT INTO P_Domain (domain_id, domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (CURRVAL('domain_domain_id_seq'), NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
 UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
@@ -302,7 +304,7 @@ CREATE TABLE Event (
   event_category1_id    integer default NULL,
   event_priority        integer,
   event_privacy         integer,
-  event_date            timestamp NOT NULL,
+  event_date            timestamp NULL,
   event_duration        integer NOT NULL default 0,
   event_allday          BOOLEAN default FALSE,
   event_repeatkind      varchar(20) default NULL,
@@ -626,6 +628,8 @@ ALTER TABLE DisplayPref ADD COLUMN display_id serial PRIMARY KEY;
 ALTER TABLE UserObm ALTER COLUMN userobm_domain_id SET NOT NULL;
 ALTER TABLE UserObmPref ALTER COLUMN userobmpref_user_id DROP NOT NULL;
 ALTER TABLE UserObmPref ALTER COLUMN userobmpref_user_id SET default NULL;
+ALTER TABLE UserObmPref ADD COLUMN userobmpref_id serial;
+ALTER TABLE UserObmPref ADD PRIMARY KEY (userobmpref_id);
 ALTER TABLE DataSource ALTER COLUMN datasource_domain_id SET NOT NULL;
 ALTER TABLE Country ALTER COLUMN country_domain_id SET NOT NULL;
 ALTER TABLE Region ALTER COLUMN region_domain_id SET NOT NULL;
