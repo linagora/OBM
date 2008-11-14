@@ -13,7 +13,7 @@
 // Mail chooser hooks list
 
 $c_mailchooser_hooks = array(
-
+/*
   array(
     'id'            => 1,
     'hook_function' => 'least_boxes',
@@ -25,7 +25,7 @@ $c_mailchooser_hooks = array(
     'hook_function' => 'least_used_memory',
     'name'          => $l_mailboxchoice_least_used_memory
   ),
-
+*/
 );
 
 /*
@@ -55,6 +55,7 @@ Array
 
 
 */
+
 function hook_user_mailchooser_least_boxes ($form) {
   global $cdg_sql, $obm;
   

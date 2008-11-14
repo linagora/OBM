@@ -437,18 +437,24 @@ function html_domain_form($dom_q,$properties_q, $domain) {
 function dis_domain_mailserver_select($role, $sel_id='', $domain_id='') {
   // GLOBAL - automatic mail server chooser hooks
   global $c_mailchooser_hooks;
+  global $l_mailboxchoice_least_boxes, $l_mailboxchoice_least_used_memory;
   
   // BEGIN - automatic mail server chooser hooks
+  
+  $selected = " selected=\"selected\"";
   
   if (isset($c_mailchooser_hooks)) {
     $block_mailchooser = '';
     foreach ($c_mailchooser_hooks as $hook) {
       $block_mailchooser .= "<option value=\"a$hook[id]\"";
       if ("a$hook[id]" == $sel_id)
-        { $block_mailchooser .= " selected=\"selected\""; }
+        { $block_mailchooser .= $selected; }
       $block_mailchooser .= ">$hook[name]</option>";
     }
   }
+  $block_mailchooser .= "
+  <option value=\"a98\"". ($sel_id == 'a98' ? $selected : ''). ">$l_mailboxchoice_least_boxes</option>
+  <option value=\"a99\"". ($sel_id == 'a99' ? $selected : ''). ">$l_mailboxchoice_least_used_memory</option>";
   
   // END - automatic mail server chooser hooks
   

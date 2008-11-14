@@ -365,7 +365,7 @@ function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
   global $cdg_sql, $obm;
   if (!is_null($domain_id) &&  !$obm['domain_global']) {
     $domain_id = sql_parse_id($domain_id, true);
-    $where_domain = "domain_id $domain_id OR domain_global = true";
+    $where_domain = "(domain_id $domain_id OR domain_global = true)";
     $and = 'AND';
   }
   if ($role != '') {

@@ -2621,11 +2621,17 @@ function get_user_params_mail_server_id ($params) {
     if ($obm_q->num_rows() == 1) {
       $obm_q->next_record();
       
-      if ($obm_q->f('domain_mail_server_auto'))
-      foreach ($c_mailchooser_hooks as $hook) {
-        if ($hook['id'] == $obm_q->f('domain_mail_server_auto')) {
-          $hook_function = 'hook_user_mailchooser_'. $hook['hook_function'];
-          $hook_result = $hook_function($params);
+      if ($obm_q->f('domain_mail_server_auto')) {
+        foreach ($c_mailchooser_hooks as $hook) {
+          if ($hook['id'] == $obm_q->f('domain_mail_server_auto')) {
+            $hook_function = 'hook_user_mailchooser_'. $hook['hook_function'];
+            $hook_result = $hook_function($params);
+          }
+        }
+        if ($obm_q->f('domain_mail_server_auto') == '98') {
+          $hook_result = run_query_user_mailchooser_least_boxes();
+        } else if ($obm_q->f('domain_mail_server_auto') == '99') {
+          $hook_result = run_query_user_user_mailchooser_least_used_memory();
         }
       }
     }
@@ -2649,6 +2655,57 @@ function get_user_params_mail_server_id ($params) {
   }
   
   return $params;
+}
+
+// FUNCTION - automatic mail server chooser static hook
+function run_query_user_mailchooser_least_boxes () {
+  global $cdg_sql, $obm;
+  
+  $sel_id = sql_parse_id($obm['domain_id'], true);
+  
+  $query = "
+    SELECT
+      domainmailserver_mailserver_id as mailserver_id,
+      COUNT(*) AS mailbox_count
+    FROM DomainMailServer
+    LEFT JOIN UserObm u ON domainmailserver_mailserver_id = userobm_mail_server_id
+    WHERE domainmailserver_domain_id $sel_id
+      AND domainmailserver_role = 'imap'
+    GROUP BY domainmailserver_mailserver_id
+    ORDER BY mailbox_count ASC
+    ";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_user_mailchooser_least_boxes()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  return array('mailserver_id' => $obm_q->f('mailserver_id'));
+}
+
+// FUNCTION - automatic mail server chooser static hook
+function run_query_user_user_mailchooser_least_used_memory () {
+  global $cdg_sql, $obm;
+  
+  $sel_id = sql_parse_id($obm['domain_id'], true);
+  
+  $query = "SELECT
+      domainmailserver_mailserver_id as mailserver_id,
+      SUM(userobm_mail_quota_use) AS used_memory
+    FROM DomainMailServer
+    LEFT JOIN UserObm u ON domainmailserver_mailserver_id = userobm_mail_server_id
+    WHERE domainmailserver_domain_id $sel_id
+      AND domainmailserver_role = 'imap'
+    GROUP BY domainmailserver_mailserver_id
+    ORDER BY used_memory ASC
+    ";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_user_user_mailchooser_least_used_memory()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  return array('mailserver_id' => $obm_q->f('mailserver_id'));
 }
 
 ?>
