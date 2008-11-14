@@ -128,6 +128,7 @@ $l_zip_error = "Le code postal est incorrect";
 $l_expresspostal_error = "Cedex est incorrect";
 $l_coord_same_phone_error = "Vous devez saisir des numéros de téléphone différents !";
 $l_coord_same_fax_error = "Vous devez saisir des numéros de fax différents !";
+$l_user_delete_himself_error = "Vous ne pouvez pas vous supprimer vous-même !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";

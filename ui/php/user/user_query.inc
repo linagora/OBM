@@ -2002,10 +2002,19 @@ function check_user_can_delete($params) {
   //global $obm, $profiles, $err, $ok_msg;
   global $obm, $err, $ok_msg;
   global $l_profile_privilege_error, $l_link_timetask, $l_link_timetask_no;
+  global $l_user_delete_himself_error;
 
   $profiles = get_profile_list();
   
   $delete_ok = true;
+  
+  // Check if this user is'nt to try to delete himself
+  $current_uid = $obm['uid'];
+  $uid = $params['user_id'];
+  if ($uid == $current_uid) {
+    $delete_ok = false;
+    $err['msg'] .= $l_user_delete_himself_error;
+  }
 
   // Links from Time management (referencing projects)
   $nb = get_linked_user_timetask_nb($params['user_id']);

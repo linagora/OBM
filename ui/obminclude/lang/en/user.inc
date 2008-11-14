@@ -118,6 +118,7 @@ $l_zip_error = "Zip code is not correct";
 $l_expresspostal_error = "Express postal code is incorrect";
 $l_coord_same_phone_error = "You have to enter different phone numbers !";
 $l_coord_same_fax_error = "You have to enter different fax numbers !";
+$l_user_delete_himself_error = "You cannot delete yourself !";
 
 // JavaScript Messages (special characters must be escaped with \ -> \\)
 $l_fill_login = "You have to fill the login before submitting.";
