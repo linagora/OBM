@@ -1019,7 +1019,7 @@ function html_user_form($usr_q, $user, $field='') {
   global $l_mailserver_auto;
   //global $path, $display, $cgp_use, $action, $profiles;
   global $path, $display, $cgp_use, $action;
-  global $obm, $c_default_domain, $c_renameUserMailbox, $l_domain, $l_header_new, $l_hour;
+  global $obm, $c_default_domain, $l_domain, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
 	
   // if update mode and first time value are taken from database
@@ -1203,9 +1203,6 @@ function html_user_form($usr_q, $user, $field='') {
   // login (can't be updated, so only on insert)
   if (($action == "new") || ($action == "insert")) {
     $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />";
-  } elseif (!$c_renameUserMailbox) {
-    $dis_login = "$login
-                  <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />";
   } else {
     $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />
                   <input type=\"hidden\" name=\"tf_old_login\" value=\"$old_login\" />";
@@ -1309,9 +1306,9 @@ function html_user_form($usr_q, $user, $field='') {
     var internal = $('userInternalMail');
     var external = $('userExternalMail');
     if($('userMailActive').checked == true) {
-      external.remove();
+      external.dispose();
     } else {
-      internal.remove();  
+      internal.dispose();  
     }
   </script>
   </fieldset>";

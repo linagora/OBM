@@ -44,7 +44,7 @@ function run_query_user_search($user) {
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
   $dateexp = sql_date_format($db_type, 'userobm_account_dateexp', 'dateexp');
-  $diff = "TIMESTAMPDIFF(DAY,now(),userobm_account_dateexp)";
+  $diff = "#DAYDIFF(now(),userobm_account_dateexp)";
   $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
   $multidomain = sql_multidomain('userobm');
 
@@ -193,7 +193,7 @@ function run_query_user_search($user) {
 
   if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg($query, $cdg_sql, 'run_query_user_search()');
-    $obm_q->query($query);
+    $obm_q->xquery($query);
   }
 
   return $obm_q;
@@ -722,7 +722,7 @@ function run_query_user_update($p_id, $user) {
   //global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
-  global $c_renameUserMailbox, $cmd_ldap_passwd;
+  global $cmd_ldap_passwd;
 
   // Connect to the BD
   $obm_q = new DB_OBM;
@@ -739,9 +739,7 @@ function run_query_user_update($p_id, $user) {
   $title = $user['title'];
   $email = $user['email'];
   $desc = $user['desc'];
-  if ($c_renameUserMailbox) {
-    $user_update_q = "userobm_login='".strtolower($user['login'])."',";
-  }
+  $user_update_q = "userobm_login='".strtolower($user['login'])."',";
   $multidomain = sql_multidomain('userobm');
   $photo_id = sql_parse_id($user['photo_id']);
   
