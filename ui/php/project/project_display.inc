@@ -1571,7 +1571,7 @@ function html_project_task_form($ptask_q, $project) {
    $js_script
    <form method=\"post\" name=\"f_entity\"
      onsubmit=\"if (check_taskadd(this)) return true; else return false;\"
-     action=\"". url_prepare('project_index.php') ."\">
+     action=\"".url_prepare('project_index.php')."\">
     
     <fieldset class=\"detail infos\"> 
     <legend>$l_task_new</legend>
@@ -1607,7 +1607,7 @@ function html_project_task_form($ptask_q, $project) {
 
   <form method=\"post\" name=\"form_taskupd\"
      onsubmit=\"if (check_taskupd(this)) return true; else return false;\"
-     action=\"". url_prepare('project_index.php') ."\">
+     action=\"".url_prepare('project_index.php')."\">
 
    <fieldset class=\"detail infos\">  
    <legend>$l_task_update</legend>
@@ -2786,7 +2786,7 @@ function html_project_reftask_selector($project,$projectreftask_q) {
   // ProjectTask select construction
 
   $block .= "
-    <form method=\"post\ name=\"f_add_task\" action=\"$url\"  
+    <form method=\"post\" name=\"f_add_task\" action=\"$url\"  
     onsubmit=\"of_select_fill_from_checkbox(this,'task');window.close();return false\">
     <fieldset>
     <table class=\"detail\" width=\"100%\">
