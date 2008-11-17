@@ -19,7 +19,7 @@ $l_no_found = "Aucun partage mail ne correspond à ces critères.";
 $l_can_delete = "Le partage mail peut être supprimé";
 $l_cant_delete = "Le partage mail ne peut être supprimé !";
 $l_can_delete = "Le partage mail peut être supprimé.";
-$l_name_error = "Le nom doit être correctement renseigné ! Il ne doit pas être vide ou contenir de caractères spéciaux";
+$l_name_error = "Le nom doit être correctement renseigné ! Il ne doit pas contenir d'espaces ni de caractères spéciaux";
 $l_name_in_use = "Le nom est déjà attribué à un autre répertoire partagé !";
 
 $l_err_mailshare_name_empty = "Le nom du partage mail doit être renseigné";

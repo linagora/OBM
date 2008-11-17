@@ -15,7 +15,7 @@ $l_no_found = "No mailshare found matching the query !";
 
 $l_can_delete = "Mailshare can be delete";
 $l_cant_delete = "Host can't be delete";
-$l_name_error = "Mailshare name must be fill ! It can't be empty or use special char";
+$l_name_error = "Mailshare name isn't valid ! It cannot contains spaces character nor special char";
 $l_name_in_use = "Mailshare name already used !";
 
 $l_err_mailshare_name_empty = "Mailshare name must be fill";
