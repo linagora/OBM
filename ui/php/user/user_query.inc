@@ -349,7 +349,7 @@ function run_query_user_insert($user) {
   if ($passwd != '') {
     // If a password type is given, get it else get the system parameter
     $passwd_type = $user['password_type'];
-    if (($passwd_type == 'PLAIN')
+    if (($passwd_type == 'MD5SUM')
 	|| ($passwd_type == 'CRYPT')
 	|| ($passwd_type == 'PLAIN')) {
       $passwd_type = $passwd_type;
