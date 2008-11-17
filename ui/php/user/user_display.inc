@@ -2286,7 +2286,7 @@ function dis_user_import_file_run($params) {
     } else {
       $user['password_type'] = 'PLAIN';
     }
-    $user['passwd'] = $user['password'];
+    //$user['passwd'] = $user['password'];
     if (in_array(trim($row[$c_mail]), $array_true)) {
       $user['mail_perms'] = 1;
       $user['mail_server_id'] = $obm['mailserver'];
