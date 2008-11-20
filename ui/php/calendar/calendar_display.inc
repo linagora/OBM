@@ -1092,8 +1092,13 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
             $br = '<br />';
           }
         }        
-        $date_begin = $date->getOutputDateTime();
-        $date_end = $end->getOutputDateTime(); 
+        if ($event->all_day == 1) {
+	  $date_begin = $date->getOutputDate();
+	  $date_end = $end->getOutputDate(); 
+	} else {
+	  $date_begin = $date->getOutputDateTime();
+	  $date_end = $end->getOutputDateTime(); 
+	}
         $j++;
 	$js .= "
 	div = $('evt-$date-$ev_id');
