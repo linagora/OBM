@@ -37,7 +37,7 @@ function run_query_calendar_detail($calendar_id) {
       event_repeatfrequence,
       event_location,
       event_category1_id,
-      calendarcategory1_label,
+      eventcategory1_label,
       event_privacy,
       event_priority,
       event_repeatkind,
@@ -49,7 +49,7 @@ function run_query_calendar_detail($calendar_id) {
       event_date
     FROM  
       Event
-      LEFT JOIN CalendarCategory1 ON event_category1_id = calendarcategory1_id
+      LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
       LEFT JOIN UserObm AS c ON event_usercreate = c.userobm_id
       LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
       LEFT JOIN UserObm AS o ON event_owner = o.userobm_id
@@ -394,7 +394,7 @@ function run_query_calendar_waiting_events() {
       event_id,
       event_title,
       event_location,
-      calendarcategory1_label,
+      eventcategory1_label,
       event_privacy,
       event_priority,
       event_repeatkind,
@@ -403,7 +403,7 @@ function run_query_calendar_waiting_events() {
       event_endrepeat,
       event_date
     FROM Event
-      LEFT JOIN CalendarCategory1 ON event_category1_id = calendarcategory1_id
+      LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
       LEFT JOIN EventEntity ON event_id  = evententity_event_id
       LEFT JOIN UserObm on evententity_entity='user' AND evententity_entity_id=userobm_id
       LEFT JOIN UserObm u ON event_owner = u.userobm_id
@@ -430,7 +430,7 @@ function run_query_calendar_waiting_events() {
       event_id,
       event_title,
       event_location,
-      calendarcategory1_label,
+      eventcategory1_label,
       event_privacy,
       event_priority,
       event_repeatkind,
@@ -439,7 +439,7 @@ function run_query_calendar_waiting_events() {
       event_endrepeat,
       event_date
     FROM Event
-      LEFT JOIN CalendarCategory1 ON event_category1_id = calendarcategory1_id
+      LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
       LEFT JOIN EventEntity ON event_id  = evententity_event_id
       LEFT JOIN Resource on evententity_entity='resource' AND evententity_entity_id=resource_id
       LEFT JOIN UserObm u ON event_owner = u.userobm_id
@@ -2349,12 +2349,12 @@ function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id
       evententity_entity_id,
       $select_user
       $select_resource
-      calendarcategory1_label,
+      eventcategory1_label,
       event_date,
       event_duration,
       event_allday
     FROM Event
-      LEFT JOIN CalendarCategory1 ON calendarcategory1_id = event_category1_id
+      LEFT JOIN EventCategory1 ON eventcategory1_id = event_category1_id
       LEFT JOIN EventEntity ON event_id = evententity_event_id
       $join_user
       $join_resource
@@ -2392,7 +2392,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
 
   $multidomain = sql_multidomain('event');
   if ($category_filter != '') {
-    $filter = " AND calendarcategory1_id = '$category_filter' ";
+    $filter = " AND eventcategory1_id = '$category_filter' ";
   }
   if (is_array($calendar_entity['user'])
       && (count($calendar_entity['user']) > 0) ) {
@@ -2474,14 +2474,14 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       evententity_entity_id,
       'resourcegroup' as evententity_entity,
       evententity_state,
-      calendarcategory1_label,
+      eventcategory1_label,
       event_date,
       event_duration,
       event_color,
       event_allday
     FROM Event
-      LEFT JOIN CalendarCategory1
-        ON event_category1_id = calendarcategory1_id
+      LEFT JOIN EventCategory1
+        ON event_category1_id = eventcategory1_id
       LEFT JOIN EventEntity ON event_id = evententity_event_id
     WHERE event_type='VEVENT'
       $where_status
@@ -2507,14 +2507,14 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       evententity_entity_id,
       evententity_entity,
       evententity_state,
-      calendarcategory1_label,
+      eventcategory1_label,
       event_date,
       event_duration,
       event_color,
       event_allday
     FROM Event
-      LEFT JOIN CalendarCategory1
-        ON event_category1_id = calendarcategory1_id
+      LEFT JOIN EventCategory1
+        ON event_category1_id = eventcategory1_id
       LEFT JOIN EventEntity ON event_id = evententity_event_id
     WHERE event_type='VEVENT'
       $where_status
@@ -2550,7 +2550,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
   $multidomain = sql_multidomain('event');
   if ($category_filter != '') {
     $category_filter = sql_parse_id( $category_filter);
-    $filter = " AND calendarcategory1_id = $category_filter ";
+    $filter = " AND eventcategory1_id = $category_filter ";
   }
   if (is_array($calendar_entity['user'])
       && (count($calendar_entity['user']) > 0) ) {
@@ -2627,7 +2627,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_description, 
       event_properties, 
       event_location, 
-      calendarcategory1_label,
+      eventcategory1_label,
       event_date,
       event_duration,
       event_repeatkind,
@@ -2642,8 +2642,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_color,
       event_allday
     FROM Event
-      LEFT JOIN CalendarCategory1
-        ON event_category1_id = calendarcategory1_id
+      LEFT JOIN EventCategory1
+        ON event_category1_id = eventcategory1_id
       LEFT JOIN EventEntity ON event_id = evententity_event_id
    WHERE event_type='VEVENT' 
       AND event_repeatkind != 'none'
@@ -2664,7 +2664,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_description, 
       event_properties, 
       event_location, 
-      calendarcategory1_label,
+      eventcategory1_label,
       event_date,
       event_duration,
       event_repeatkind,
@@ -2679,8 +2679,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_color,
       event_allday
     FROM Event
-      LEFT JOIN CalendarCategory1
-        ON event_category1_id = calendarcategory1_id
+      LEFT JOIN EventCategory1
+        ON event_category1_id = eventcategory1_id
       LEFT JOIN EventEntity ON event_id = evententity_event_id
     WHERE event_type='VEVENT'
       AND event_repeatkind != 'none'
@@ -2860,7 +2860,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $description = $nr_q->f('event_description'); 
     $properties = $nr_q->f('event_properties');
     $location = $nr_q->f('event_location'); 
-    $category1 = $nr_q->f('calendarcategory1_label');
+    $category1 = $nr_q->f('eventcategory1_label');
     $priority = $nr_q->f('event_priority');
     $date = new Of_Date($nr_q->f('event_date'),'GMT');
     $color = $nr_q->f('event_color');
@@ -2891,7 +2891,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $description = $r_q->f('event_description');
     $properties = $r_q->f('event_properties');
     $location = $r_q->f('event_location');
-    $category1 = $r_q->f('calendarcategory1_label');
+    $category1 = $r_q->f('eventcategory1_label');
     $date = new Of_Date($r_q->f('event_date'), 'GMT');
     $duration = $r_q->f('event_duration');
     $repeatkind = $r_q->f('event_repeatkind');

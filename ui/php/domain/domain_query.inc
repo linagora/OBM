@@ -696,7 +696,7 @@ function run_query_domain_init_data($id) {
   global $obm, $cdg_sql;
   $db = new DB_OBM;
   $tables = array ('CompanyNafCode', 'CompanyActivity', 'CompanyType', 'Kind', 'DealType',
-                   'DealStatus', 'CalendarCategory1', 'DocumentMimeType', 'TaskType', 'ContractStatus',
+                   'DealStatus', 'EventCategory1', 'DocumentMimeType', 'TaskType', 'ContractStatus',
                    'ContractPriority', 'IncidentStatus', 'IncidentPriority', 'PaymentKind');
   $query = "INSERT INTO %s (%s) SELECT %s FROM %s JOIN Domain ON %s = domain_id WHERE domain_global = true GROUP BY %s
     ";

@@ -106,17 +106,17 @@ class EventAlertCronJob extends CronJob{
     $obm_q = new DB_OBM;
     $obm2_q = new DB_OBM;
     $db_type = $obm_q->type;
-    $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat");
-    $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
+    $event_endrepeat = sql_date_format($db_type,"event_endrepeat");
+    $event_date = sql_date_format($db_type,"event_date");
 
     $this->logger->debug("Deleting alerts older than ".date("Y-m-d H:i:s",$date));
     $query = "
       SELECT eventalert_user_id, eventalert_event_id FROM EventAlert
-      LEFT JOIN CalendarEvent ON calendarevent_id = eventalert_event_id 
+      LEFT JOIN Event ON event_id = eventalert_event_id 
       WHERE 
-      calendarevent_id IS NULL 
-      OR ($calendarevent_date - eventalert_duration <= $date AND calendarevent_repeatkind = 'none')
-      OR ($calendarevent_endrepeat - eventalert_duration <= $date AND calendarevent_repeatkind != 'none')";
+      event_id IS NULL 
+      OR ($event_date - eventalert_duration <= $date AND event_repeatkind = 'none')
+      OR ($event_endrepeat - eventalert_duration <= $date AND event_repeatkind != 'none')";
     $obm_q = new DB_OBM;
     $this->logger->core($query);
     $obm_q->query($query);
@@ -160,21 +160,21 @@ class EventAlertCronJob extends CronJob{
     $nr_q = run_query_calendar_no_repeat_alerts($start_time,$end_time);
     $this->logger->debug($nr_q->nf()." potentials alerts founded on non-reccurent event");
     while ($nr_q->next_record()) {
-      $id = $nr_q->f("calendarevent_id");
-      $title = $nr_q->f("calendarevent_title");
-      $privacy = $nr_q->f("calendarevent_privacy");
-      $description = $nr_q->f("calendarevent_description"); 
+      $id = $nr_q->f("event_id");
+      $title = $nr_q->f("event_title");
+      $privacy = $nr_q->f("event_privacy");
+      $description = $nr_q->f("event_description"); 
       $entity_label = $nr_q->f("userobm_lastname") ." ".$nr_q->f("userobm_firstname");
-      $location = $nr_q->f("calendarevent_location"); 
-      $category1 = $nr_q->f("calendarcategory1_label");
-      $priority = $nr_q->f("calendarevent_priority");
-      $date = $nr_q->f("calendarevent_date");
-      $duration = $nr_q->f("calendarevent_duration");
+      $location = $nr_q->f("event_location"); 
+      $category1 = $nr_q->f("eventcategory1_label");
+      $priority = $nr_q->f("event_priority");
+      $date = $nr_q->f("event_date");
+      $duration = $nr_q->f("event_duration");
       $state = $nr_q->f("evententity_state");
-      $all_day = $nr_q->f("calendarevent_allday");
+      $all_day = $nr_q->f("event_allday");
       $entity = $nr_q->f("evententity_entity");
       $entity_id = $nr_q->f("evententity_entity_id");
-      $owner = $nr_q->f("calendarevent_owner");
+      $owner = $nr_q->f("event_owner");
       if (isset($of->events[$id])) {
         $event = &$of->events[$id];
       } else {
@@ -200,26 +200,26 @@ class EventAlertCronJob extends CronJob{
     $r_q = run_query_calendar_repeat_alerts($start_time,$end_time);
     $this->logger->debug($r_q->nf()." potentials alerts founded on reccurent events");
     while ($r_q->next_record()) {
-      $d = $r_q->f("calendarevent_date");
-      $id = $r_q->f("calendarevent_id");
-      $title = $r_q->f("calendarevent_title");
-      $privacy = $r_q->f("calendarevent_privacy");
-      $description = $r_q->f("calendarevent_description"); 
-      $location = $r_q->f("calendarevent_location"); 
-      $category1 = $r_q->f("calendarcategory1_label");
-      $date = $r_q->f("calendarevent_date");
-      $duration = $r_q->f("calendarevent_duration");
-      $repeatkind = $r_q->f("calendarevent_repeatkind");
-      $endrepeat = $r_q->f("calendarevent_endrepeat");
-      $all_day = $r_q->f("calendarevent_allday");     
-      $repeatfrequence = $r_q->f("calendarevent_repeatfrequence");
-      $repeatdays = $r_q->f("calendarevent_repeatdays");
+      $d = $r_q->f("event_date");
+      $id = $r_q->f("event_id");
+      $title = $r_q->f("event_title");
+      $privacy = $r_q->f("event_privacy");
+      $description = $r_q->f("event_description"); 
+      $location = $r_q->f("event_location"); 
+      $category1 = $r_q->f("eventcategory1_label");
+      $date = $r_q->f("event_date");
+      $duration = $r_q->f("event_duration");
+      $repeatkind = $r_q->f("event_repeatkind");
+      $endrepeat = $r_q->f("event_endrepeat");
+      $all_day = $r_q->f("event_allday");     
+      $repeatfrequence = $r_q->f("event_repeatfrequence");
+      $repeatdays = $r_q->f("event_repeatdays");
       $entity = $r_q->f("evententity_entity");
       $entity_id = $r_q->f("evententity_entity_id");    
       $entity_label = $r_q->f("userobm_lastname") ." ".$r_q->f("userobm_firstname");
       $state = $r_q->f("evententity_state");
-      $all_day = $r_q->f("calendarevent_allday");       
-      $owner = $r_q->f("calendarevent_owner");
+      $all_day = $r_q->f("event_allday");       
+      $owner = $r_q->f("event_owner");
       if (!$endrepeat) {
         $endrepeat = $end_time;
       }
@@ -295,37 +295,37 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
-  $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date");
+  $event_date = sql_date_format($db_type,"event_date");
+  $event_date_l = sql_date_format($db_type,"event_date");
 
 
   $query = "SELECT
-      calendarevent_id,
-      calendarevent_title,
-      calendarevent_privacy,
-      calendarevent_description,
-      calendarevent_location,
-      calendarevent_repeatfrequence,
-      calendarevent_owner,
+      event_id,
+      event_title,
+      event_privacy,
+      event_description,
+      event_location,
+      event_repeatfrequence,
+      event_owner,
       evententity_entity_id,
       evententity_entity,
       evententity_state,
-      $calendarevent_date_l - eventalert_duration as calendarevent_date,
+      $event_date_l - eventalert_duration as event_date,
       eventalert_duration,
-      calendarevent_duration,
-      calendarevent_allday,
+      event_duration,
+      event_allday,
       userobm_lastname,
       userobm_firstname
     FROM EventAlert
-      JOIN CalendarEvent ON calendarevent_id = eventalert_event_id  
-      JOIN EventEntity ON calendarevent_id = evententity_event_id AND eventalert_user_id = evententity_entity_id AND evententity_entity = 'user'
+      JOIN Event ON event_id = eventalert_event_id  
+      JOIN EventEntity ON event_id = evententity_event_id AND eventalert_user_id = evententity_entity_id AND evententity_entity = 'user'
       JOIN UserObm ON userobm_id = evententity_entity_id
     WHERE evententity_state = 'A'
-      AND calendarevent_repeatkind = 'none'
-      AND ($calendarevent_date - eventalert_duration) >= $start
-      AND ($calendarevent_date - eventalert_duration) <=  $end
+      AND event_repeatkind = 'none'
+      AND ($event_date - eventalert_duration) >= $start
+      AND ($event_date - eventalert_duration) <=  $end
       AND  eventalert_duration > 0
-      ORDER BY calendarevent_date
+      ORDER BY event_date
 ";
 
   Logger::log($query,L_CORE,"eventalertcronjob");
@@ -345,42 +345,42 @@ function run_query_calendar_repeat_alerts($start, $end) {
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat");
-  $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
-  $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date");
-  $calendarevent_endrepeat_l = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat");
+  $event_endrepeat = sql_date_format($db_type,"event_endrepeat");
+  $event_date = sql_date_format($db_type,"event_date");
+  $event_date_l = sql_date_format($db_type,"event_date");
+  $event_endrepeat_l = sql_date_format($db_type,"event_endrepeat","event_endrepeat");
 
   $query = "SELECT
-      calendarevent_id,
-      calendarevent_title,
-      calendarevent_privacy,
-      calendarevent_description, 
-      calendarevent_location, 
-      $calendarevent_date_l - eventalert_duration as calendarevent_date,
+      event_id,
+      event_title,
+      event_privacy,
+      event_description, 
+      event_location, 
+      $event_date_l - eventalert_duration as event_date,
       eventalert_duration,
-      calendarevent_duration,
-      calendarevent_repeatkind,
-      $calendarevent_endrepeat_l,
-      calendarevent_repeatfrequence,
-      calendarevent_owner,
+      event_duration,
+      event_repeatkind,
+      $event_endrepeat_l,
+      event_repeatfrequence,
+      event_owner,
       evententity_entity,
       evententity_entity_id,
       evententity_state,
-      calendarevent_repeatdays,
-      calendarevent_allday,
+      event_repeatdays,
+      event_allday,
       userobm_lastname,
       userobm_firstname
     FROM EventAlert
-      JOIN CalendarEvent ON calendarevent_id = eventalert_event_id
-      JOIN EventEntity ON calendarevent_id = evententity_event_id AND eventalert_user_id = evententity_entity_id AND evententity_entity = 'user'
+      JOIN Event ON event_id = eventalert_event_id
+      JOIN EventEntity ON event_id = evententity_event_id AND eventalert_user_id = evententity_entity_id AND evententity_entity = 'user'
       JOIN UserObm ON userobm_id = evententity_entity_id
-    WHERE calendarevent_repeatkind != 'none'
+    WHERE event_repeatkind != 'none'
       AND evententity_state = 'A'
-      AND ($calendarevent_date  - eventalert_duration) <= $end 
-      AND (($calendarevent_endrepeat  - eventalert_duration) >= $start
-      OR $calendarevent_endrepeat = '0')
+      AND ($event_date  - eventalert_duration) <= $end 
+      AND (($event_endrepeat  - eventalert_duration) >= $start
+      OR $event_endrepeat = '0')
       AND eventalert_duration > 0
-    ORDER BY calendarevent_date"; 
+    ORDER BY event_date"; 
 
   Logger::log($query,L_CORE,'eventalertcronjob');
   $obm_q->query($query);

@@ -717,6 +717,7 @@ CREATE TABLE Event (
   event_timecreate   	timestamp,
   event_userupdate   	integer,
   event_usercreate   	integer,
+  event_parent_id       integer default NULL,
   event_ext_id       	varchar(255) default '', 
   event_type            vcomponent default 'VEVENT',
   event_origin          varchar(255) NOT NULL default '',
@@ -793,19 +794,19 @@ CREATE INDEX idx_eventalert_user ON EventAlert (eventalert_user_id);
 
 
 --
--- Table structure for table 'CalendarCategory1'
+-- Table structure for table 'EventCategory1'
 --
-CREATE TABLE CalendarCategory1 (
-  calendarcategory1_id          serial,
-  calendarcategory1_domain_id   integer NOT NULL,
-  calendarcategory1_timeupdate  timestamp,
-  calendarcategory1_timecreate  timestamp,
-  calendarcategory1_userupdate  integer default NULL,
-  calendarcategory1_usercreate  integer default NULL,
-  calendarcategory1_code        varchar(10) default '',
-  calendarcategory1_label       varchar(128) default NULL,
-  calendarcategory1_color       char(6),
-  PRIMARY KEY (calendarcategory1_id)
+CREATE TABLE EventCategory1 (
+  eventcategory1_id          serial,
+  eventcategory1_domain_id   integer NOT NULL,
+  eventcategory1_timeupdate  timestamp,
+  eventcategory1_timecreate  timestamp,
+  eventcategory1_userupdate  integer default NULL,
+  eventcategory1_usercreate  integer default NULL,
+  eventcategory1_code        varchar(10) default '',
+  eventcategory1_label       varchar(128) default NULL,
+  eventcategory1_color       char(6),
+  PRIMARY KEY (eventcategory1_id)
 );
 
 
@@ -2312,14 +2313,14 @@ ALTER TABLE EventAlert ADD CONSTRAINT eventalert_userupdate_userobm_id_fkey FORE
 -- Foreign key from eventalert_usercreate to userobm_id
 ALTER TABLE EventAlert ADD CONSTRAINT eventalert_usercreate_userobm_id_fkey FOREIGN KEY (eventalert_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
--- Foreign key from calendarcategory1_domain_id to domain_id
-ALTER TABLE CalendarCategory1 ADD CONSTRAINT calendarcategory1_domain_id_domain_id_fkey FOREIGN KEY (calendarcategory1_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- Foreign key from eventcategory1_domain_id to domain_id
+ALTER TABLE EventCategory1 ADD CONSTRAINT eventcategory1_domain_id_domain_id_fkey FOREIGN KEY (eventcategory1_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
--- Foreign key from calendarcategory1_userupdate to userobm_id
-ALTER TABLE CalendarCategory1 ADD CONSTRAINT calendarcategory1_userupdate_userobm_id_fkey FOREIGN KEY (calendarcategory1_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+-- Foreign key from eventcategory1_userupdate to userobm_id
+ALTER TABLE EventCategory1 ADD CONSTRAINT eventcategory1_userupdate_userobm_id_fkey FOREIGN KEY (eventcategory1_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
--- Foreign key from calendarcategory1_usercreate to userobm_id
-ALTER TABLE CalendarCategory1 ADD CONSTRAINT calendarcategory1_usercreate_userobm_id_fkey FOREIGN KEY (calendarcategory1_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+-- Foreign key from eventcategory1_usercreate to userobm_id
+ALTER TABLE EventCategory1 ADD CONSTRAINT eventcategory1_usercreate_userobm_id_fkey FOREIGN KEY (eventcategory1_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from event_domain_id to domain_id
 ALTER TABLE Event ADD CONSTRAINT event_domain_id_domain_id_fkey FOREIGN KEY (event_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -2333,8 +2334,8 @@ ALTER TABLE Event ADD CONSTRAINT event_userupdate_userobm_id_fkey FOREIGN KEY (e
 -- Foreign key from event_usercreate to userobm_id
 ALTER TABLE Event ADD CONSTRAINT event_usercreate_userobm_id_fkey FOREIGN KEY (event_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
--- Foreign key from event_category1_id to calendarcategory1_id
-ALTER TABLE Event ADD CONSTRAINT event_category1_id_calendarcategory1_id_fkey FOREIGN KEY (event_category1_id) REFERENCES CalendarCategory1(calendarcategory1_id) ON UPDATE CASCADE ON DELETE SET NULL;
+-- Foreign key from event_category1_id to eventcategory1_id
+ALTER TABLE Event ADD CONSTRAINT event_category1_id_eventcategory1_id_fkey FOREIGN KEY (event_category1_id) REFERENCES EventCategory1(eventcategory1_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from eventexception_event_id to event_id
 ALTER TABLE EventException ADD CONSTRAINT eventexception_event_id_event_id_fkey FOREIGN KEY (eventexception_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;

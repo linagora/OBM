@@ -48,7 +48,7 @@ class Vcalendar_Reader_OBM {
     $this->setHeaders();
     foreach($this->eventSets as $set) {
       do {
-        $id = $set->f('calendarevent_id');      
+        $id = $set->f('event_id');      
         if(is_null($this->vevents[$id])) {
           $this->vevents[$id] = &$this->addVevent($set->Record);
         }
@@ -57,7 +57,7 @@ class Vcalendar_Reader_OBM {
 
     $attendees = run_query_get_events_attendee(array_keys($this->vevents));
     while($attendees->next_record()) {
-      $this->addAttendee($this->vevents[$attendees->f('calendarevent_id')] , $attendees->Record);
+      $this->addAttendee($this->vevents[$attendees->f('event_id')] , $attendees->Record);
     }
     if(count($this->vevents) > 0) {
       $exceptions = run_query_get_events_exception(array_keys($this->vevents));
@@ -78,21 +78,21 @@ class Vcalendar_Reader_OBM {
 
   function & addVevent(&$data) {
     $vevent = &$this->document->createElement('vevent');
-    $vevent->set('dtstart', $this->parseDate($data['calendarevent_date']));
-    $vevent->set('duration', $data['calendarevent_duration']);
-    if($data['calendarevent_allday'] != 0) {
+    $vevent->set('dtstart', $this->parseDate($data['event_date']));
+    $vevent->set('duration', $data['event_duration']);
+    if($data['event_allday'] != 0) {
       $vevent->set('x-obm-all-day', 1);
     }
-    $vevent->set('summary', $data['calendarevent_title']);
-    $vevent->set('description', $data['calendarevent_description']);
-    $vevent->set('class', $this->parsePrivacy($data['calendarevent_privacy']));
-    $vevent->set('priority', $this->parsePriority($data['calendarevent_priority']));
-    $vevent->set('organizer', $data['calendarevent_owner']);
-    $vevent->set('location', $data['calendarevent_location']);
-    $vevent->set('categories', array($data['calendarcategory1_label']));
-    $vevent->set('x-obm-color', $data['calendarevent_color']);
-    $vevent->set('uid', $this->parseUid($data['calendarevent_id']));
-    if(!is_null($data['calendarevent_repeatkind']) && $data['calendarevent_repeatkind'] != 'none') {
+    $vevent->set('summary', $data['event_title']);
+    $vevent->set('description', $data['event_description']);
+    $vevent->set('class', $this->parsePrivacy($data['event_privacy']));
+    $vevent->set('priority', $this->parsePriority($data['event_priority']));
+    $vevent->set('organizer', $data['event_owner']);
+    $vevent->set('location', $data['event_location']);
+    $vevent->set('categories', array($data['eventcategory1_label']));
+    $vevent->set('x-obm-color', $data['event_color']);
+    $vevent->set('uid', $this->parseUid($data['event_id']));
+    if(!is_null($data['event_repeatkind']) && $data['event_repeatkind'] != 'none') {
       $vevent->set('rrule',$this->parseRrule($data));
     }
     $this->document->vcalendar->appendChild($vevent);
@@ -138,33 +138,33 @@ class Vcalendar_Reader_OBM {
   
   function parseRrule($data) {
     $rrule = array();
-     switch ($data['calendarevent_repeatkind']) {
+     switch ($data['event_repeatkind']) {
        case 'daily' :
        case 'yearly' :
-         $rrule['kind'] = $data['calendarevent_repeatkind'];
+         $rrule['kind'] = $data['event_repeatkind'];
          break;
        case 'monthlybydate' :
          $rrule['kind'] = 'monthly';
          break;
        case 'monthlybyday' :
          $rrule['kind'] = 'monthly';
-         $day = $this->weekDays[strtolower(date('l',$data['calendarevent_date']))];
-         $num =  ceil(date('d',$data['calendarevent_date'])/7);
+         $day = $this->weekDays[strtolower(date('l',$data['event_date']))];
+         $num =  ceil(date('d',$data['event_date'])/7);
          $rrule['byday'] = array($num.$day);
          break;
        case 'weekly' :
          $rrule['kind'] = 'weekly';
          foreach($this->weekDays as $longDay => $shortDay) {
            $index = date('w', strtotime($longDay)) - date('w', strtotime($GLOBALS['ccalendar_weekstart']));
-           if($data['calendarevent_repeatdays'][$index] == '1') {
+           if($data['event_repeatdays'][$index] == '1') {
              $days[] = $shortDay;
            }           
          }
          $rrule['byday'] = $days;
          break;
      }
-     $rrule['until'] = $this->parseDate($data['calendarevent_endrepeat']);
-     $rrule['interval'] = $data['calendarevent_repeatfrequence'];
+     $rrule['until'] = $this->parseDate($data['event_endrepeat']);
+     $rrule['interval'] = $data['event_repeatfrequence'];
      return $rrule;
   }
 }

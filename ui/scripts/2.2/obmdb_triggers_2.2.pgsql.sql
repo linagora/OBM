@@ -510,23 +510,23 @@ END
 CREATE TRIGGER eventalert_created BEFORE INSERT ON eventalert FOR EACH ROW EXECUTE PROCEDURE on_eventalert_create();
 CREATE TRIGGER eventalert_changed BEFORE UPDATE ON eventalert FOR EACH ROW EXECUTE PROCEDURE on_eventalert_change();
 
-UPDATE calendarcategory1 SET calendarcategory1_timecreate=NOW() WHERE calendarcategory1_timecreate IS NULL;
-ALTER TABLE calendarcategory1 ALTER COLUMN calendarcategory1_timecreate SET DEFAULT NOW();
+UPDATE eventcategory1 SET eventcategory1_timecreate=NOW() WHERE eventcategory1_timecreate IS NULL;
+ALTER TABLE eventcategory1 ALTER COLUMN eventcategory1_timecreate SET DEFAULT NOW();
 
-CREATE OR REPLACE FUNCTION on_calendarcategory1_change() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_eventcategory1_change() RETURNS trigger AS '
 BEGIN
-new.calendarcategory1_timeupdate := current_timestamp;
+new.eventcategory1_timeupdate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE OR REPLACE FUNCTION on_calendarcategory1_create() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_eventcategory1_create() RETURNS trigger AS '
 BEGIN
-new.calendarcategory1_timecreate := current_timestamp;
+new.eventcategory1_timecreate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE TRIGGER calendarcategory1_created BEFORE INSERT ON calendarcategory1 FOR EACH ROW EXECUTE PROCEDURE on_calendarcategory1_create();
-CREATE TRIGGER calendarcategory1_changed BEFORE UPDATE ON calendarcategory1 FOR EACH ROW EXECUTE PROCEDURE on_calendarcategory1_change();
+CREATE TRIGGER eventcategory1_created BEFORE INSERT ON eventcategory1 FOR EACH ROW EXECUTE PROCEDURE on_eventcategory1_create();
+CREATE TRIGGER eventcategory1_changed BEFORE UPDATE ON eventcategory1 FOR EACH ROW EXECUTE PROCEDURE on_eventcategory1_change();
 
 UPDATE todo SET todo_timecreate=NOW() WHERE todo_timecreate IS NULL;
 ALTER TABLE todo ALTER COLUMN todo_timecreate SET DEFAULT NOW();

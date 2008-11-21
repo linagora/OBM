@@ -3014,7 +3014,7 @@ function html_calendar_waiting_events($obm_wait) {
      <td><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$obm_wait->f('event_id')."\">".$obm_wait->f('event_title')."</a></td>
      <td>$periodic</td> 
      <td>".$obm_wait->f('event_location')."</td>
-     <td>".$obm_wait->f('calendarcategory1_label')."</td>
+     <td>".$obm_wait->f('eventcategory1_label')."</td>
      <td>$priority</td>
      <td>$user_create</td>
      <td>".$begin->getOutputDateTime()."</td>

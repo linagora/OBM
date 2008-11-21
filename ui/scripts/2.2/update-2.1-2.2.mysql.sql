@@ -290,6 +290,7 @@ CREATE TABLE Event (
   event_timecreate      timestamp NOT NULL default '0000-00-00 00:00:00',
   event_userupdate      int(8) default NULL,
   event_usercreate      int(8) default NULL,
+  event_parent_id       int(8) default NULL,
   event_ext_id          varchar(255) default '',
   event_type            enum('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY') default 'VEVENT',
   event_origin          varchar(255) NOT NULL default '',
@@ -318,7 +319,7 @@ CREATE TABLE Event (
   KEY event_owner_userobm_id_fkey (event_owner),
   KEY event_userupdate_userobm_id_fkey (event_userupdate),
   KEY event_usercreate_userobm_id_fkey (event_usercreate),
-  KEY event_category1_id_calendarcategory1_id_fkey (event_category1_id)
+  KEY event_category1_id_eventcategory1_id_fkey (event_category1_id)
 );
 
 -- Clean CalendarEvent before migration to Event
@@ -571,6 +572,58 @@ SELECT
 FROM CalendarException;
 
 
+-- Table EventCategory1
+
+CREATE TABLE EventCategory1 (
+  eventcategory1_id int(8) NOT NULL auto_increment,
+  eventcategory1_domain_id int(8) NOT NULL,
+  eventcategory1_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  eventcategory1_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  eventcategory1_userupdate int(8) default NULL,
+  eventcategory1_usercreate int(8) default NULL,
+  eventcategory1_code varchar(10) default '',
+  eventcategory1_label varchar(128) default NULL,
+  eventcategory1_color char(6) default NULL,
+  PRIMARY KEY (eventcategory1_id),
+  KEY eventcategory1_domain_id_domain_id_fkey (eventcategory1_domain_id),
+  KEY eventcategory1_userupdate_userobm_id_fkey (eventcategory1_userupdate),
+  KEY eventcategory1_usercreate_userobm_id_fkey (eventcategory1_usercreate)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Clean CalendarCategory1 before migration to EventCategory1
+-- Foreign key from calendarcategory1_domain_id to domain_id
+DELETE FROM CalendarCategory1 WHERE calendarcategory1_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarcategory1_domain_id IS NOT NULL;
+
+-- Foreign key from calendarcategory1_userupdate to userobm_id
+UPDATE CalendarCategory1 SET calendarcategory1_userupdate = NULL WHERE calendarcategory1_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_userupdate IS NOT NULL;
+
+-- Foreign key from calendarcategory1_usercreate to userobm_id
+UPDATE CalendarCategory1 SET calendarcategory1_usercreate = NULL WHERE calendarcategory1_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_usercreate IS NOT NULL;
+
+
+INSERT INTO EventCategory1 (
+  eventcategory1_id,
+  eventcategory1_domain_id,
+  eventcategory1_timeupdate,
+  eventcategory1_timecreate,
+  eventcategory1_userupdate,
+  eventcategory1_usercreate,
+  eventcategory1_code,
+  eventcategory1_label,
+  eventcategory1_color)
+SELECT
+  calendarcategory1_id,
+  calendarcategory1_domain_id,
+  calendarcategory1_timeupdate,
+  calendarcategory1_timecreate,
+  calendarcategory1_userupdate,
+  calendarcategory1_usercreate,
+  calendarcategory1_code,
+  calendarcategory1_label,
+  calendarcategory1_color
+FROM CalendarCategory1;
+
+
 --
 -- Table `DeletedEvent`
 --
@@ -600,7 +653,18 @@ DROP Table DeletedCalendarEvent;
 DROP Table CalendarAlert;
 DROP Table CalendarException;
 DROP Table CalendarEvent;
+DROP Table CalendarCategory1;
 -- -----------------------------------------------------------------------------
+
+
+-- AliaSource specific database errors ?!
+DROP TABLE IF EXISTS CalendarSegment;
+DROP TABLE IF EXISTS Entry;
+DROP TABLE IF EXISTS EntryType;
+DROP TABLE IF EXISTS SubscriptionRenewal;
+ALTER TABLE Company DROP COLUMN company_nafcode;
+ALTER TABLE UserObm DROP COLUMN userobm_contact_id;
+ALTER TABLE P_UserObm DROP COLUMN userobm_contact_id;
 
 
 -- Preferences
@@ -618,7 +682,6 @@ ALTER TABLE Contact MODIFY COLUMN contact_origin VARCHAR(255) NOT NULL;
 -- Set Defaults 
 ALTER TABLE Account MODIFY COLUMN account_domain_id int(8) NOT NULL ;
 ALTER TABLE CV MODIFY COLUMN cv_domain_id int(8) NOT NULL ;
-ALTER TABLE CalendarCategory1 MODIFY COLUMN calendarcategory1_domain_id int(8) NOT NULL ;
 ALTER TABLE CategoryLink MODIFY COLUMN categorylink_category_id int(8) NOT NULL ;
 ALTER TABLE CategoryLink MODIFY COLUMN categorylink_entity_id int(8) NOT NULL ;
 ALTER TABLE Company MODIFY COLUMN company_domain_id int(8) NOT NULL ;
@@ -851,16 +914,6 @@ UPDATE CV SET cv_userupdate = NULL WHERE cv_userupdate NOT IN (SELECT userobm_id
 
 -- Foreign key from cv_usercreate to userobm_id
 UPDATE CV SET cv_usercreate = NULL WHERE cv_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND cv_usercreate IS NOT NULL;
-
--- Foreign key from calendarcategory1_domain_id to domain_id
-DELETE FROM CalendarCategory1 WHERE calendarcategory1_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarcategory1_domain_id IS NOT NULL;
-
--- Foreign key from calendarcategory1_userupdate to userobm_id
-UPDATE CalendarCategory1 SET calendarcategory1_userupdate = NULL WHERE calendarcategory1_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_userupdate IS NOT NULL;
-
--- Foreign key from calendarcategory1_usercreate to userobm_id
-UPDATE CalendarCategory1 SET calendarcategory1_usercreate = NULL WHERE calendarcategory1_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_usercreate IS NOT NULL;
-
 
 -- Foreign key from category_domain_id to domain_id
 DELETE FROM Category WHERE category_domain_id NOT IN (SELECT domain_id FROM Domain) AND category_domain_id IS NOT NULL;

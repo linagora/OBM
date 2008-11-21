@@ -298,27 +298,27 @@ CREATE TABLE EventAlert (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `CalendarCategory1`
+-- Table structure for table `EventCategory1`
 --
 
-DROP TABLE IF EXISTS CalendarCategory1;
-CREATE TABLE CalendarCategory1 (
-  calendarcategory1_id int(8) NOT NULL auto_increment,
-  calendarcategory1_domain_id int(8) NOT NULL,
-  calendarcategory1_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  calendarcategory1_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
-  calendarcategory1_userupdate int(8) default NULL,
-  calendarcategory1_usercreate int(8) default NULL,
-  calendarcategory1_code varchar(10) default '',
-  calendarcategory1_label varchar(128) default NULL,
-  calendarcategory1_color char(6) default NULL,
-  PRIMARY KEY  (calendarcategory1_id),
-  KEY calendarcategory1_domain_id_domain_id_fkey (calendarcategory1_domain_id),
-  KEY calendarcategory1_userupdate_userobm_id_fkey (calendarcategory1_userupdate),
-  KEY calendarcategory1_usercreate_userobm_id_fkey (calendarcategory1_usercreate),
-  CONSTRAINT calendarcategory1_usercreate_userobm_id_fkey FOREIGN KEY (calendarcategory1_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT calendarcategory1_domain_id_domain_id_fkey FOREIGN KEY (calendarcategory1_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT calendarcategory1_userupdate_userobm_id_fkey FOREIGN KEY (calendarcategory1_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
+DROP TABLE IF EXISTS EventCategory1;
+CREATE TABLE EventCategory1 (
+  eventcategory1_id int(8) NOT NULL auto_increment,
+  eventcategory1_domain_id int(8) NOT NULL,
+  eventcategory1_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  eventcategory1_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  eventcategory1_userupdate int(8) default NULL,
+  eventcategory1_usercreate int(8) default NULL,
+  eventcategory1_code varchar(10) default '',
+  eventcategory1_label varchar(128) default NULL,
+  eventcategory1_color char(6) default NULL,
+  PRIMARY KEY  (eventcategory1_id),
+  KEY eventcategory1_domain_id_domain_id_fkey (eventcategory1_domain_id),
+  KEY eventcategory1_userupdate_userobm_id_fkey (eventcategory1_userupdate),
+  KEY eventcategory1_usercreate_userobm_id_fkey (eventcategory1_usercreate),
+  CONSTRAINT eventcategory1_usercreate_userobm_id_fkey FOREIGN KEY (eventcategory1_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT eventcategory1_domain_id_domain_id_fkey FOREIGN KEY (eventcategory1_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT eventcategory1_userupdate_userobm_id_fkey FOREIGN KEY (eventcategory1_userupdate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -333,6 +333,7 @@ CREATE TABLE Event (
   event_timecreate      timestamp NOT NULL default '0000-00-00 00:00:00',
   event_userupdate      int(8) default NULL,
   event_usercreate      int(8) default NULL,
+  event_parent_id       int(8) default NULL,
   event_ext_id          varchar(255) default '',
   event_type            enum('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY') default 'VEVENT',
   event_origin          varchar(255) NOT NULL default '',
@@ -361,8 +362,8 @@ CREATE TABLE Event (
   KEY event_owner_userobm_id_fkey (event_owner),
   KEY event_userupdate_userobm_id_fkey (event_userupdate),
   KEY event_usercreate_userobm_id_fkey (event_usercreate),
-  KEY event_category1_id_calendarcategory1_id_fkey (event_category1_id),
-  CONSTRAINT event_category1_id_calendarcategory1_id_fkey FOREIGN KEY (event_category1_id) REFERENCES CalendarCategory1 (calendarcategory1_id) ON DELETE SET NULL ON UPDATE CASCADE,
+  KEY event_category1_id_eventcategory1_id_fkey (event_category1_id),
+  CONSTRAINT event_category1_id_eventcategory1_id_fkey FOREIGN KEY (event_category1_id) REFERENCES EventCategory1 (eventcategory1_id) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT event_domain_id_domain_id_fkey FOREIGN KEY (event_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT event_owner_userobm_id_fkey FOREIGN KEY (event_owner) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT event_usercreate_userobm_id_fkey FOREIGN KEY (event_usercreate) REFERENCES UserObm (userobm_id) ON DELETE SET NULL ON UPDATE CASCADE,

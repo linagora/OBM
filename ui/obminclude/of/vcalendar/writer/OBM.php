@@ -195,9 +195,9 @@ class Vcalendar_Writer_OBM {
       return NULL;
     }
     $name = addslashes(array_shift($categories));
-    $query = "SELECT calendarcategory1_id as id FROM CalendarCategory1 WHERE
-                     calendarcategory1_label = '$name' AND 
-                     calendarcategory1_domain_id ".sql_parse_id($GLOBALS['obm']['domain_id'], true);
+    $query = "SELECT eventcategory1_id as id FROM EventCategory1 WHERE
+                     eventcategory1_label = '$name' AND 
+                     eventcategory1_domain_id ".sql_parse_id($GLOBALS['obm']['domain_id'], true);
     $this->db->query($query);
     if($this->db->next_record()) {
       return $this->db->f('id');

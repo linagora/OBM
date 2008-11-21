@@ -58,16 +58,16 @@ INSERT INTO DealType (dealtype_domain_id, dealtype_timeupdate, dealtype_timecrea
 
 
 --
--- dump for table 'CalendarCategory1'
+-- dump for table 'EventCategory1'
 --
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'RDV');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Training');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Commercial');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Meeting');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Phone call');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Support');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Intervention');
-INSERT INTO CalendarCategory1 (calendarcategory1_domain_id, calendarcategory1_timeupdate, calendarcategory1_timecreate, calendarcategory1_userupdate, calendarcategory1_usercreate, calendarcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Personal');
+INSERT INTO EventCategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'RDV');
+INSERT INTO EventCategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Training');
+INSERT INTO EventCategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Commercial');
+INSERT INTO EventCategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Meeting');
+INSERT INTO EventCategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Phone call');
+INSERT INTO EventCategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Support');
+INSERT INTO EventCategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Intervention');
+INSERT INTO EventCategory1 (eventcategory1_domain_id, eventcategory1_timeupdate, eventcategory1_timecreate, eventcategory1_userupdate, eventcategory1_usercreate, eventcategory1_label) VALUES ((SELECT domain_id From Domain), NULL,NULL,NULL,NULL,'Personal');
 
 
 --

@@ -382,9 +382,9 @@ if ($action == 'index') {
 } elseif ($action == 'update_decision') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_event_participation($params)) {
-    $mail_data = run_query_prepare_event_mail($params, $action);
     $retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
     if ($retour) {
+      $mail_data = run_query_prepare_event_mail($params, $action);
       calendar_send_mail($mail_data);
       $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
     } else {
