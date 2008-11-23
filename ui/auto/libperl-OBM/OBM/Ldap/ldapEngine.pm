@@ -25,7 +25,7 @@ sub new {
     require OBM::Parameters::common;
     if( !$OBM::Parameters::common::obmModules->{'ldap'} ) {
         $self->_log( 'module OBM-LDAP désactivé, moteur non démarré', 3 );
-        return undef;
+        return '0 but true';
     }
 
     require OBM::Ldap::ldapServers;

@@ -6,7 +6,6 @@ $debug = 1;
 
 use 5.006_001;
 require Exporter;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 use strict;
 
 
@@ -28,7 +27,7 @@ sub new {
     require OBM::Parameters::common;
     if( !$OBM::Parameters::common::obmModules->{'mail'} ) {
         $self->_log( 'module OBM-MAIL désactivé, moteur non démarré', 3 );
-        return undef;
+        return '0 but true';
     }
 
     require OBM::Cyrus::cyrusServers;

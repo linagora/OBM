@@ -96,10 +96,24 @@ sub update {
     require OBM::Ldap::ldapEngine;
     $self->_log( 'initialisation du moteur LDAP', 2 );
     $self->{'ldapEngine'} = OBM::Ldap::ldapEngine->new();
+    if( !defined($self->{'ldapEngine'}) ) {
+        $self->_log( 'erreur à l\'initialisation du moteur LDAP', 1 );
+        return 1
+    }elsif( !ref($self->{'ldapEngine'}) ) {
+        $self->_log( 'moteur LDAP non démarré', 3 );
+        $self->{'ldapEngine'} = undef;
+    }
 
     require OBM::Cyrus::cyrusEngine;
     $self->_log( 'initialisation du moteur Cyrus', 2 );
     $self->{'cyrusEngine'} = OBM::Cyrus::cyrusEngine->new();
+    if( !defined($self->{'cyrusEngine'}) ) {
+        $self->_log( 'erreur à l\'initialisation du moteur Cyrus', 1 );
+        return 1
+    }elsif( !ref($self->{'cyrusEngine'}) ) {
+        $self->_log( 'moteur Cyrus non démarré', 3 );
+        $self->{'cyrusEngine'} = undef;
+    }
 
     while( my $entity = $self->{'entitiesFactory'}->next() ) {
         my $error = 0;
