@@ -34,7 +34,9 @@ unixhierarchysep: yes
 # not logged in, and can not login during he move.
 # Failure to do so may result in the user’s meta-data (seen state,
 # subscriptions, etc) being corrupted or out of date.
-allowusermoves: no
+#
+# Defautl to yes with OBM 2.2
+allowusermoves: yes
 
 # Rejecting illegal characters in headers
 # Headers of RFC2882 messages must not have characters with the 8th bit
