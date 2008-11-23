@@ -9,18 +9,16 @@ use strict;
 use vars qw( @EXPORT_OK $VERSION );
 use base qw(Exporter);
 
-
 use OBM::Parameters::common;
 
-
 $VERSION = "1.0";
-
-@EXPORT_OK = qw(    getUserSID
-                    getGroupSID
+@EXPORT_OK = qw(    _getUserSID
+                    _getGroupSID
                );
 
 
-sub getUserSID {
+sub _getUserSID {
+    my $self = shift;
     my( $domainSid, $userUID ) = @_;
 
     if( !$domainSid || !defined($userUID) ) {
@@ -61,7 +59,8 @@ sub getUserSID {
 }
 
 
-sub getGroupSID {
+sub _getGroupSID {
+    my $self = shift;
     my( $domainSid, $groupGID ) = @_;
 
     if( !$domainSid || !defined($groupGID) ) {

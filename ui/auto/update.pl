@@ -5,69 +5,107 @@
 #                   système de façon incrémentale                   #
 #####################################################################
 
+package update;
+
 use strict;
-require OBM::toolBox;
-require OBM::Tools::obmDbHandler;
-use Getopt::Long;
+use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
+
+use Getopt::Long;
+my %parameters;
+my $return = GetOptions( \%parameters, 'user=s', 'domain=s', 'delegation=s', 'global', 'incremental', 'help' );
+
+if( !$return ) {
+    %parameters = undef;
+}
+
+update->run(\%parameters);
+exit;
+
+$|=1;
+
+
+sub run {
+    my $self = shift;
+    my( $parameters ) = @_;
+
+    if( !defined($parameters) ) {
+        $parameters->{'help'} = 1;
+    }
+
+    # Traitement des paramètres
+    $self->_log( 'Analyse des parametres du script', 3 );
+    $self->getParameter( $parameters );
+    
+    
+    my $update;
+    if( $parameters->{'global'} ) {
+        require OBM::Update::updateGlobal;
+        $update = OBM::Update::updateGlobal->new( $parameters );
+    }else {
+        require OBM::Update::updateGlobal;
+        $update = OBM::Update::updateGlobal->new( $parameters );
+    }
+    
+    if( !defined($update) ) {
+        $self->_log( 'Probleme a l\'initialisation de l\'objet de mise a jour', 0 );
+    }else {
+        $update->update();
+    }
+
+    return 0;
+}
 
 
 # Fonction de verification des parametres du script
 sub getParameter {
+    my $self = shift;
     my( $parameters ) = @_;
 
-    # Analyse de la ligne de commande
-    my $return = GetOptions( $parameters, "user=s", "domain=s", "delegation=s", "global", "incremental", "help" );
-
-    if( !$return ) {
-        $parameters->{"help"} = 1;
-    }
-
-
-    if( !exists($parameters->{"domain"}) ) {
-        &OBM::toolBox::write_log( "Parametre '--domain' manquant", "W" );
-        $parameters->{"help"} = 1;
+    if( !exists($parameters->{'domain'}) ) {
+        $self->_log( 'Parametre \'--domain\' manquant', 0 );
+        $parameters->{'help'} = 1;
 
     }else {
-        &OBM::toolBox::write_log( "Mise a jour du domaine d'identifiant '".$parameters->{"domain"}."'", "W" );
+        $self->_log( 'Mise a jour du domaine d\'identifiant \''.$parameters->{'domain'}.'\'', 0 );
     }
     
-    if( exists($parameters->{"user"}) ) {
-        if( exists($parameters->{"delegation"}) ) {
-            &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
-            $parameters->{"help"} = 1;
+    if( exists($parameters->{'user'}) ) {
+        if( exists($parameters->{'delegation'}) ) {
+            $self->_log( 'Trop de parametres de mise a jour precise', 0 );
+            $parameters->{'help'} = 1;
         }else{
-            &OBM::toolBox::write_log( "Uniquement les mises a jour de l'utilisateur d'identifiant '".$parameters->{"user"}."'", "W" );
+            $self->_log( 'Uniquement les mises a jour de l\'utilisateur d\'identifiant \''.$parameters->{'user'}.'\'', 0 );
         }
 
-    }elsif( exists($parameters->{"delegation"}) ) {
-        if( exists($parameters->{"user"}) ) {
-            &OBM::toolBox::write_log( "Trop de parametres de mise a jour precise", "W" );
-            $parameters->{"help"} = 1;
+    }elsif( exists($parameters->{'delegation'}) ) {
+        if( exists($parameters->{'user'}) ) {
+            $self->_log( 'Trop de parametres de mise a jour precise', 0 );
+            $parameters->{'help'} = 1;
         }else {
-            &OBM::toolBox::write_log( "Uniquement les mises a jour de la delegation '".$parameters->{"delegation"}."'", "W" );
+            $self->_log( 'Uniquement les mises a jour de la delegation \''.$parameters->{'delegation'}.'\'', 0 );
         }
 
     }
 
-    if( exists($parameters->{"incremental"}) && exists($parameters->{"global"}) ) {
-        &OBM::toolBox::write_log( "parametres '--incremental' et '--global' incompatibles", "W" );
-        $parameters->{"help"} = 1;
+    if( exists($parameters->{'incremental'}) && exists($parameters->{'global'}) ) {
+        $self->_log( 'parametres \'--incremental\' et \'--global\' incompatibles', 0 );
+        $parameters->{'help'} = 1;
 
-    }elsif( exists($parameters->{"incremental"}) ) {
-        $parameters->{"incremental"} = 1;
-        &OBM::toolBox::write_log( "Mise a jour incrementale", "W" );
+    }elsif( exists($parameters->{'incremental'}) ) {
+        $parameters->{'incremental'} = 1;
+        $self->_log( 'Mise a jour incrementale', 0 );
 
-    }elsif( exists($parameters->{"global"}) || !(exists($parameters->{"incremental"}) || exists($parameters->{"global"})) ) {
-        $parameters->{"global"} = 1;
-        &OBM::toolBox::write_log( "Mise a jour globale", "W" );
+    }elsif( exists($parameters->{'global'}) || !(exists($parameters->{'incremental'}) || exists($parameters->{'global'})) ) {
+        $parameters->{'global'} = 1;
+        $self->_log( 'Mise a jour globale', 0 );
 
     }
 
 
-    if( exists( $parameters->{"help"} ) ) {
-        &OBM::toolBox::write_log( "Affichage de l'aide", "WC" );
+    if( exists( $parameters->{'help'} ) ) {
+        $self->_log( 'Affichage de l\'aide', 3 );
 
         print STDERR "Veuillez indiquer le critere de mise a jour :\n";
         print STDERR "\tSyntaxe: script --domain id [--user id | --delegation word] [--global | --incremental]\n";
@@ -81,49 +119,6 @@ sub getParameter {
     }
 }
 
-
-# On prepare le log
-my ($scriptname) = ($0=~'.*/([^/]+)');
-&OBM::toolBox::write_log( $scriptname.': ', 'O', 0 );
-
-# Traitement des paramètres
-&OBM::toolBox::write_log( 'Analyse des parametres du script', 'W', 3 );
-my %parameters;
-getParameter( \%parameters );
-
-# On se connecte a la base
-my $dbHandler = OBM::Tools::obmDbHandler->instance();
-if( !defined($dbHandler) ) {
-    &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
-    exit 1;
-}
-
-
-my $update;
-if( $parameters{"global"} ) {
-    require OBM::Update::updateGlobal;
-    $update = OBM::Update::updateGlobal->new( \%parameters );
-}else {
-    require OBM::Update::updateIncremental;
-    $update = OBM::Update::updateIncremental->new( \%parameters );
-}
-
-if( !defined($update) ) {
-    &OBM::toolBox::write_log( "Probleme a l'initialisation de l'objet de mise a jour", "W" );
-}else {
-    $update->update();
-    $update->destroy();
-}
-
-
-# On referme la connexion a la base
-$dbHandler->destroy();
-
-# On ferme le log
-&OBM::toolBox::write_log( "Fin du traitement", "W" );
-&OBM::toolBox::write_log( "", "C" );
-
-exit 0;
 
 # Perldoc
 

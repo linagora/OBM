@@ -10,34 +10,30 @@ use vars qw( @EXPORT_OK $VERSION );
 use base qw(Exporter);
 
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
-@EXPORT_OK = qw(    getType
-                    setDelete
+@EXPORT_OK = qw(    setDelete
                     getDelete
                     getArchive
-                    getLdapObjectclass
-                    isLinks
-                    getEntityId
-                    isMailActive
-                    makeEntityEmail
-                    getMailboxDefaultFolders
-                    getHostIpById
+                    setArchive
+                    getParent
+                    setUpdated
+                    getUpdated
+                    getDesc
+                    _makeEntityEmail
+                    setUpdateEntity
+                    getUpdateEntity
+                    setUpdateLinks
+                    getUpdateLinks
+                    isMailAvailable
                );
 
-
-
-sub getType {
-    my $self = shift;
-
-    return $self->{type};
-}
 
 
 sub setDelete {
     my $self = shift;
 
-    $self->{"toDelete"} = 1;
+    $self->{'toDelete'} = 1;
 
     return 1;
 }
@@ -46,46 +42,62 @@ sub setDelete {
 sub getDelete {
     my $self = shift;
 
-    return $self->{"toDelete"};
+    return $self->{'toDelete'};
+}
+
+
+sub setArchive {
+    my $self = shift;
+
+    $self->{'archive'} = 1;
+
+    return 0;
 }
 
 
 sub getArchive {
     my $self = shift;
 
-    return $self->{"archive"};
+    return $self->{'archive'};
 }
 
 
-sub getLdapObjectclass {
+sub getParent {
     my $self = shift;
 
-    return $self->{objectclass};
+    return $self->{'parent'};
 }
 
 
-sub isLinks {
+sub setUpdated {
     my $self = shift;
 
-    return $self->{links};
-}
-
-
-sub getEntityId {
-    my $self = shift;
-
-    return $self->{objectId};
-}
-
-
-sub isMailActive {
-    my $self = shift;
+    $self->{'updated'} = 1;
 
     return 0;
 }
 
 
-sub makeEntityEmail {
+sub getUpdated {
+    my $self = shift;
+
+    return $self->{'updated'};
+}
+
+
+sub getDesc {
+    my $self = shift;
+    my( $desc ) = @_;
+
+    if( $desc && !ref($desc) ) {
+        return $self->{'entityDesc'}->{$desc};
+    }
+
+    return undef;
+}
+
+
+sub _makeEntityEmail {
     require OBM::Parameters::regexp;
     my $self = shift;
     my( $mailAddress, $mainDomain, $domainAlias ) = @_;
@@ -93,8 +105,19 @@ sub makeEntityEmail {
     my %emails;
     my %emailsAlias;
 
-    if( !defined($mailAddress) || ($mailAddress eq "") ) {
+    if( !$mailAddress ) {
+        $self->_log( 'pas d\'adresses mails définis', 3 );
         return $totalEmails;
+    }
+
+    if( !$mainDomain ) {
+        $self->_log( 'pas de domaine principal défini', 3 );
+        return $totalEmails;
+    }
+
+    if( ref($domainAlias) ne 'ARRAY' ) {
+        $self->_log( 'pas d\'alias de domaine définis', 3 );
+        $domainAlias = undef;
     }
 
     my @email = split( /\r\n/, $mailAddress );
@@ -108,11 +131,11 @@ sub makeEntityEmail {
             }
 
             if( $email[$i] =~ /$OBM::Parameters::regexp::regexp_email_left/ ) {
-                $emails{$email[$i]."@".$mainDomain} = 1;
+                $emails{$email[$i].'@'.$mainDomain} = 1;
                 $totalEmails++;
 
                 for( my $j=0; $j<=$#{$domainAlias}; $j++ ) {
-                    $emailsAlias{$email[$i]."@".$domainAlias->[$j]} = 1;
+                    $emailsAlias{$email[$i].'@'.$domainAlias->[$j]} = 1;
                     $totalEmails++;
                 }
 
@@ -123,79 +146,52 @@ sub makeEntityEmail {
 
     my @emails = keys(%emails);
     if( $#emails >= 0 ) {
-        $self->{"properties"}->{"email"} = \@emails;
+        $self->{'email'} = \@emails;
     }
 
     my @emailsAlias = keys(%emailsAlias);
     if( $#emailsAlias >= 0 ) {
-        $self->{"properties"}->{"emailAlias"} = \@emailsAlias;
+        $self->{'emailAlias'} = \@emailsAlias;
     }
 
     return $totalEmails;
 }
 
 
-sub getMailboxDefaultFolders {
+# Update entity informations
+sub setUpdateEntity {
     my $self = shift;
-    my $entryProp = $self->{"properties"};
 
-    return $self->{"properties"}->{mailbox_folders};
+    $self->{'update'}->{'entity'} = 1;
 }
 
 
-sub getHostIpById {
+# Get update entity informations state
+sub getUpdateEntity {
     my $self = shift;
-    my( $hostId ) = @_;
 
-    if( !defined($hostId) ) {
-        $self->_log( 'identifiant de l\'hote non défini !', 3 );
-        return undef;
-    }elsif( $hostId !~ /^[0-9]+$/ ) {
-        $self->_log( 'identifiant de l\'hote \''.$hostId.'\' incorrect !', 3 );
-        return undef;
-    }
-    
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
-        $self->_log( 'connection a la base de donnee incorrect !', 3 );
-        return undef;
-    }
-
-    my $hostTable = "Host";
-    if( $self->getDelete() ) {
-        $hostTable = "P_".$hostTable;
-    }
-
-    my $query = "SELECT host_ip FROM ".$hostTable." WHERE host_id='".$hostId."'";
-    # On execute la requete
-    my $queryResult;
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return undef;
-    }
-
-    if( !(my( $hostIp ) = $queryResult->fetchrow_array) ) {
-        $self->_log( 'identifiant de l\'hote \''.$hostId.'\' inconnu !', 3 );
-
-        $queryResult->finish;
-        return undef;
-    }else{
-        $queryResult->finish;
-        return $hostIp;
-    }
-
-    return undef;
-
+    return $self->{'update'}->{'entity'};
 }
 
 
-sub getMailServerId {
+# Update entity links
+sub setUpdateLinks {
     my $self = shift;
 
-    return undef;
+    $self->{'update'}->{'links'} = 1;
 }
 
 
-sub updateLinkedEntity {
+# Get update entity links state
+sub getUpdateLinks {
+    my $self = shift;
+
+    return $self->{'update'}->{'links'};
+}
+
+
+# Get if the entity can have mail permission
+sub isMailAvailable {
     my $self = shift;
 
     return 0;

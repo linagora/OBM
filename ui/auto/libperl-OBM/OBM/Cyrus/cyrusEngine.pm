@@ -9,29 +9,37 @@ require Exporter;
 use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 use strict;
 
-use OBM::Parameters::common;
+
+use OBM::Tools::commonMethods qw(
+        _log
+        dump
+        );
+use OBM::Ldap::utils qw(
+        _modifyAttr
+        );
 use Cyrus::IMAP::Admin;
 
 
 sub new {
-    my $self = shift;
-    my( $domainList ) = @_;
+    my $class = shift;
 
-    # Definition des attributs de l'objet
-    my %cyrusEngineAttr = (
-        domainList => undef,
-        rightDefinition => undef
-    );
+    my $self = bless { }, $class;
 
-
-    if( !defined($domainList) ) {
-        croak( "Usage: PACKAGE->new(DOMAINLIST)" );
-    }else {
-        $cyrusEngineAttr{"domainList"} = $domainList;
+    require OBM::Parameters::common;
+    if( !$OBM::Parameters::common::obmModules->{'mail'} ) {
+        $self->_log( 'module OBM-MAIL désactivé, moteur non démarré', 3 );
+        return undef;
     }
 
+    require OBM::Cyrus::cyrusServers;
+    if( !($self->{'cyrusServers'} = OBM::Cyrus::cyrusServers->instance()) ) {
+        $self->_log( 'initialisation du gestionnaire de serveur Cyrus impossible', 3 );
+        return undef;
+    }
+
+
     # Definition des droits
-    $cyrusEngineAttr{"rightDefinition"} = {
+    $self->{'rightDefinition'} = {
         none => 'none',
         read => 'lrs',
         readAdmin => 'lrsc',
@@ -43,226 +51,64 @@ sub new {
         post => 'p'
     };
 
-    bless( \%cyrusEngineAttr, $self );
-}
-
-
-sub init {
-    my $self = shift;
-
-    if( !$OBM::Parameters::common::obmModules->{"mail"} ) {
-        return 0;
-    }
-
-    &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: initialisation du moteur", "W" );
-
-    # Etablissement des connexions
-    $self->_cyrusSrvsConn( 1 );
-
-    return 1;
+    return $self;
 }
 
 
 sub DESTROY {
     my $self = shift;
 
-    &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: arret du moteur", "W" );
+    $self->_log( 'suppression de l\'objet', 4 );
 
-    return $self->_cyrusSrvsConn( 0 );
-}
-
-
-sub dump {
-    my $self = shift;
-    my @desc;
-
-    push( @desc, $self );
-
-    require Data::Dumper;
-    print Data::Dumper->Dump( \@desc );
-
-    return 1;
-}
-
-
-sub _cyrusSrvsConn {
-    my $self = shift;
-    my( $connect ) = @_;
-    my $domainsDesc = $self->{"domainList"};
-
-    for( my $i=0; $i<=$#$domainsDesc; $i++ ) {
-        my $currentDomainDesc = $domainsDesc->[$i];
-
-        if( $currentDomainDesc->{"meta_domain"} ) {
-            next;
-        }
-
-        if( !defined($currentDomainDesc->{"imap_servers"}) ) {
-            next;
-        }
-
-        my $domainSrvList = $currentDomainDesc->{"imap_servers"};
-        if( $#$domainSrvList < 0 ) {
-            next;
-        }
-
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: gestion des serveurs IMAP du domaine '".$currentDomainDesc->{"domain_name"}."'", "W" );
-        for( my $j=0; $j<=$#$domainSrvList; $j++ ) {
-            if( $connect ) {
-                $self->_connectCyrusSrv( $domainSrvList->[$j] );
-            }else {
-                $self->_disconnectCyrusSrv( $domainSrvList->[$j] );
-            }
-        }
-    }
-
-    return 1;
-}
-
-
-sub _connectCyrusSrv {
-    my $self = shift;
-    my( $srvDesc ) = @_;
-
-    if( !defined($srvDesc->{"imap_server_login"}) ) {
-        return 0;
-    }elsif( !defined($srvDesc->{"imap_server_passwd"}) ) {
-        return 0;
-    }elsif( !defined($srvDesc->{"imap_server_ip"}) ) {
-        return 0;
-    }
-
-    &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: connexion au serveur IMAP '".$srvDesc->{"imap_server_name"}."' en tant que '".$srvDesc->{"imap_server_login"}."'", "W" );
-
-    $srvDesc->{"imap_server_conn"} = Cyrus::IMAP::Admin->new($srvDesc->{"imap_server_ip"});
-
-    if( !defined( $srvDesc->{"imap_server_conn"} ) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: probleme lors de la connexion au serveur IMAP", "W" );
-        $self->_disconnectCyrusSrv( $srvDesc );
-        return 0;
-
-    }else {
-        if( $srvDesc->{"imap_server_conn"}->authenticate( -user=>$srvDesc->{"imap_server_login"}, -password=>$srvDesc->{"imap_server_passwd"}, -mechanism=>"login" ) ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: connexion au serveur IMAP etablie", "W" );
-
-        }else {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec de connexion au serveur IMAP", "W" );
-            $self->_disconnectCyrusSrv( $srvDesc );
-            return 0;
-
-        }
-    }
-
-    return 1;
-}
-
-
-sub _disconnectCyrusSrv {
-    my $self = shift;
-    my( $srvDesc ) = @_;
-
-    if( defined($srvDesc->{"imap_server_conn"}) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: deconnexion du serveur '".$srvDesc->{"imap_server_name"}."'", "W" );
-        undef $srvDesc->{"imap_server_conn"};
-    }
-
-    return 1;
-}
-
-
-sub _findDomainbyId {
-    my $self = shift;
-    my( $domainId ) = @_;
-    my $domainDesc = undef;
-
-    if( !defined($domainId) || ($domainId !~ /^\d+$/) ) {
-        return undef;
-    }
-
-    for( my $i=0; $i<=$#{$self->{"domainList"}}; $i++ ) {
-        if( $self->{"domainList"}->[$i]->{"domain_id"} == $domainId ) {
-            $domainDesc = $self->{"domainList"}->[$i];
-            last;
-        }
-    }
-
-    return $domainDesc;
-}
-
-
-sub _findCyrusSrvbyId {
-    my $self = shift;
-    my( $domainId, $cyrusSrvId ) = @_;
-
-    if( !defined($domainId) || ($domainId !~ /^\d+$/) ) {
-        return undef;
-
-    }elsif(!defined($cyrusSrvId) || ($cyrusSrvId !~ /^\d+$/) ) {
-        return undef;
-
-    }
-
-    my $domainDesc = $self->_findDomainbyId( $domainId );
-    if( !defined($domainDesc) ) {
-        return undef;
-    }
-
-    if( !defined($domainDesc->{"imap_servers"}) || ($#{$domainDesc->{"imap_servers"}} < 0) ) {
-        return undef;
-    }
-
-    my $cyrusSrvList = $domainDesc->{"imap_servers"};
-    my $cyrusSrv = undef;
-    for( my $i=0; $i<=$#$cyrusSrvList; $i++ ) {
-        if( $cyrusSrvList->[$i]->{"imap_server_id"} == $cyrusSrvId ) {
-            $cyrusSrv = $cyrusSrvList->[$i];
-            last;
-        }
-    }
-
-    return $cyrusSrv;
+    $self->{'rightDefinition'} = undef;
+    $self->{'cyrusServers'} = undef;
 }
 
 
 sub _doWork {
     my $self = shift;
-    my( $cyrusSrv, $object ) = @_;
     my $returnCode = 1;
 
-    if( !defined($cyrusSrv) || !defined($object) ) {
-        return 0;
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
+    }
+
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrv) ) {
+        return 1;
     }
 
 
     # La bal existe ?
     my %srvBalDesc;
-    my $isExist = $self->isMailboxExist( $cyrusSrv, \%srvBalDesc, $object->getMailboxPrefix(), $object->getMailboxName( "new" ) );
+    my $isExist = $self->isMailboxExist( \%srvBalDesc, $entity->getMailboxPrefix(), $entity->getMailboxName( 'new' ) );
     if( !defined($isExist) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: probleme lors de l'obtention des informations de la boite sur le serveur Cyrus", "W" );
-        return 0;
+        $self->_log( 'probleme lors de l\'obtention des informations de la boite sur le serveur Cyrus', 2 );
+        return 1;
 
-    }elsif( $isExist && $object->getDelete() ) {
+    }elsif( $isExist && $entity->getDelete() ) {
         # On la supprime
-        $returnCode = $self->_deleteBox( $cyrusSrv, $object );
-        if( !$returnCode ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec lors de la suppression de la boite", "W" );
-            return 0;
+        $returnCode = $self->_deleteBox();
+        if( $returnCode ) {
+            $self->_log( 'echec lors de la suppression de la boite', 2 );
+            return 1;
         }
 
-    }elsif( $isExist && !$object->getDelete() ) {
+    }elsif( $isExist && !$entity->getDelete() ) {
         # On met à jour
-        $returnCode = $self->_updateMailbox( $cyrusSrv, $object );
-        if( !$returnCode ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec lors de la MAJ de la boite", "W" );
-            return 0;
+        $returnCode = $self->_updateMailbox();
+        if( $returnCode ) {
+            $self->_log( 'echec lors de la MAJ de la boite', 2 );
+            return 1;
         }
 
-    }elsif( !$isExist && !$object->getDelete() ) {
+    }elsif( !$isExist && !$entity->getDelete() ) {
         # On la crée
-        $returnCode = $self->_createMailbox( $cyrusSrv, $object );
-        if( !$returnCode ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: echec lors de la creation/renommage de la boite", "W" );
-            return 0;
+        $returnCode = $self->_createMailbox( $cyrusSrv, $entity );
+        if( $returnCode ) {
+            $self->_log( 'echec lors de la creation/renommage de la boite', 2 );
+            return 1;
         }
 
     }
@@ -273,49 +119,47 @@ sub _doWork {
 
 sub update {
     my $self = shift;
-    my( $object ) = @_;
+    my( $entity ) = @_;
 
-    if( !defined($object) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: mise a jour d'un objet non definit - Operation annulee !", "W" );
-        return 0;
-    }elsif( !defined($object->{"type"}) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: mise a jour d'un objet de type non définit - Operation annulee !", "W" );
-        return 0;
-    }elsif( !defined($object->{"domainId"}) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: mise a jour d'un objet de domaine non definit - Operation annulee !", "W" );
+
+    if( !defined($entity) ) {
+        $self->_log( 'entité non définie', 3 );
+        return 1;
+    }elsif( !ref($entity) ) {
+        $self->_log( 'entité incorrecte', 3 );
+        return 1;
+    }
+    $self->{'currentEntity'} = $entity;
+
+    if( !$entity->isMailAvailable() ) {
+        $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Cyrus', 3 );
         return 0;
     }
 
-    # Récupération du nom de la boîte à traiter
-    my $mailBoxName = $object->getMailboxName( "new" );
-    if( !defined($mailBoxName) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: pas de boite a lettres definies pour l'objet : ".$object->getEntityDescription(), "W" );
+
+    # Récupération de la description du serveur de la boîte à traiter
+    my $mailserverId = $entity->getMailServerId();
+    if( !defined($mailserverId) && $entity->isMailActive() && !$entity->getArchive() ) {
+        $self->_log( 'serveur de courrier IMAP non defini et droit mail actif - erreur', 2 );
+        return 1;
+    }elsif( !defined($mailserverId) && (!$entity->isMailActive() || $entity->getArchive()) ) {
+        $self->_log( 'serveur de courrier IMAP non defini et droit mail inactif - succés', 2 );
+        return 0;
+    }elsif( !defined($mailserverId) ) {
+        $self->_log( 'serveur de courrier IMAP non defini - erreur', 2 );
         return 1;
     }
 
-    # Récupération de la description du serveur de la boîte à traiter
-    my $mailserverId = $object->getMailServerId();
-    if( !defined($mailserverId) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: serveur de courrier IMAP non definit - Operation annulee", "W" );
-        return 0;
+    # Get Cyrus server connection
+    $self->{'currentCyrusSrv'} = $self->{'cyrusServers'}->getEntityCyrusServer( $entity );
+    if( !defined($self->{'currentCyrusSrv'}) ) {
+        $self->_log( 'serveur de courrier IMAP d\'identifiant \''.$entity->getMailServerId().'\' inconnu - Operation annulee !', 2 );
+        return 1;
     }
 
-    my $cyrusSrv = $self->_findCyrusSrvbyId( $object->{"domainId"}, $mailserverId );
-    if( !defined($cyrusSrv) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: serveur de courrier IMAP d'identifiant '".$mailserverId."' inconnu - Operation annulee !", "W" );
-        return 0;
-    }
-
-    # Est-on connecté à ce serveur
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: probleme de connexion avec le serveur de courrier IMAP d'identifiant '".$mailBoxName."' - Operation annulee !", "W" );
-        return 0;
-    }
-
-    my $returnCode = $self->_doWork( $cyrusSrv, $object );
-    if( !$returnCode ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: probleme de traitement de l'objet de type '".$object->{"type"}."' - Operation annulee !", "W" );
-        return 0;
+    my $returnCode = $self->_doWork();
+    if( $returnCode ) {
+        $self->_log( 'probleme de traitement de '.$entity->getDescription().' - Operation annulee !', 'W' );
     }
 
     return $returnCode;
@@ -324,49 +168,63 @@ sub update {
 
 sub updateAcl {
     my $self = shift;
-    my( $object ) = @_;
+    my( $entity ) = @_;
 
-    if( !defined($object) ) {
+    if( !defined($entity) ) {
+        $self->_log( 'entité non définie', 3 );
+        return 1;
+    }elsif( !ref($entity) ) {
+        $self->_log( 'entité incorrecte', 3 );
+        return 1;
+    }
+    $self->{'currentEntity'} = $entity;
+
+    if( !$entity->isMailAvailable() ) {
+        $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Cyrus', 3 );
         return 0;
     }
 
-    # Récupération du nom de la boîte à traiter
-    my $mailBoxName = $object->getMailboxName( "new" );
-    if( !defined($mailBoxName) ) {
-        return 0;
-    }
 
     # Récupération de la description du serveur de la boîte à traiter
-    my $cyrusSrv = $self->_findCyrusSrvbyId( $object->{"domainId"}, $object->getMailServerId() );
-    if( !defined($cyrusSrv) ) {
+    my $mailserverId = $entity->getMailServerId();
+    if( !defined($mailserverId) ) {
+        $self->_log( 'serveur de courrier IMAP non defini - Operation annulee', 2 );
         return 0;
     }
 
-    # Est-on connecté à ce serveur
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        return 0;
+    # Get Cyrus server connection
+    $self->{'currentCyrusSrv'} = $self->{'cyrusServers'}->getEntityCyrusServer( $entity );
+    if( !defined($self->{'currentCyrusSrv'}) ) {
+        $self->_log( 'problème avec le serveur de courrier IMAP d\'identifiant \''.$entity->getMailServerId().'\' - Operation annulee !', 2 );
+        return 1;
     }
 
-    return $self->_imapSetMailboxAcls( $cyrusSrv, $object );
+
+    return $self->_imapSetMailboxAcls();
 }
 
 
 sub isMailboxExist {
     my $self = shift;
-    my( $cyrusSrv, $srvBalDesc, $mailboxPrefix, $mailboxName ) = @_;
+    my( $srvBalDesc, $mailboxPrefix, $mailboxName ) = @_;
 
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
+    }
+
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrv) ) {
         return undef;
     }
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
 
     if( !defined($mailboxName) ) {
         return undef;
     }
 
-    my @mailBox = $cyrusSrvConn->listmailbox( $mailboxName, $mailboxPrefix );
-    if( $cyrusSrvConn->error ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus lors de la recherche de la BAL : ".$cyrusSrvConn->error(), "W" );
+    my @mailBox = $cyrusSrv->listmailbox( $mailboxName, $mailboxPrefix );
+    if( $cyrusSrv->error ) {
+        $self->_log( 'erreur Cyrus lors de la recherche de la BAL : '.$cyrusSrv->error(), 2 );
         return undef;
     }
 
@@ -379,10 +237,10 @@ sub isMailboxExist {
 
     # Si la boîte existe on charge ses caractéristiques
     if( defined($srvBalDesc) ) {
-        $srvBalDesc->{"box_name"} = $mailBox[0][0];
-        $srvBalDesc->{"box_login"} = $mailBox[0][0];
-        $srvBalDesc->{"box_login"} =~ s/^$mailboxPrefix//;
-        $srvBalDesc->{"box_quota"} = $self->getMailboxQuota( $cyrusSrv, $mailboxPrefix, $mailboxName );
+        $srvBalDesc->{'box_name'} = $mailBox[0][0];
+        $srvBalDesc->{'box_login'} = $mailBox[0][0];
+        $srvBalDesc->{'box_login'} =~ s/^$mailboxPrefix//;
+        $srvBalDesc->{'box_quota'} = $self->getMailboxQuota( $mailboxPrefix, $mailboxName );
     }
 
 
@@ -392,22 +250,27 @@ sub isMailboxExist {
 
 sub getMailboxQuota {
     my $self = shift;
-    my( $cyrusSrv, $mailboxPrefix, $mailboxName ) = @_;
+    my( $mailboxPrefix, $mailboxName ) = @_;
     my $mailBoxQuota = 0;
 
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        return 0;
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
     }
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
+
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrv) ) {
+        return undef;
+    }
 
     if( !defined($mailboxName) || !defined($mailboxPrefix) ) {
-        return 0;
+        return undef;
     }
 
 
-    my @quotaDesc = $cyrusSrvConn->listquotaroot( $mailboxPrefix.$mailboxName );
-    if( $cyrusSrvConn->error ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a l'obtention du quota maximum : ".$cyrusSrvConn->error(), "W" );
+    my @quotaDesc = $cyrusSrv->listquotaroot( $mailboxPrefix.$mailboxName );
+    if( $cyrusSrv->error ) {
+        $self->_log( 'erreur Cyrus a l\'obtention du quota maximum : '.$cyrusSrv->error(), 3 );
         return undef;
     }
 
@@ -466,67 +329,70 @@ sub getMailboxQuotaUse {
 
 sub _imapSetMailboxQuota {
     my $self = shift;
-    my( $cyrusSrv, $object ) = @_;
 
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        return 0;
-    }
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
-
-    if( !defined($object) ) {
-        return 0;
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
     }
 
-    my $boxName = $object->getMailboxName( "new" );
-    my $boxPrefix = $object->getMailboxPrefix();
-    my $boxQuota = $object->getMailboxQuota();
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrv) ) {
+        return 1;
+    }
+
+    $self->_log( 'mise à jour du quota de '.$entity->getDescription(), 3 );
+
+    my $boxName = $entity->getMailboxName( 'new' );
+    my $boxPrefix = $entity->getMailboxPrefix();
+    my $boxQuota = $entity->getMailboxQuota();
 
     if( !$boxQuota ) {
-        $cyrusSrvConn->setquota( $boxPrefix.$boxName );
+        $cyrusSrv->setquota( $boxPrefix.$boxName );
     }else {
-        $cyrusSrvConn->setquota( $boxPrefix.$boxName, "STORAGE", $boxQuota );
+        $cyrusSrv->setquota( $boxPrefix.$boxName, 'STORAGE', $boxQuota );
     }
 
-    if( $cyrusSrvConn->error ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus au positionnement du quota utilise : ".$cyrusSrvConn->error(), "W" );
-        return 0;
+    if( $cyrusSrv->error ) {
+        $self->_log( 'erreur Cyrus au positionnement du quota utilisé : '.$cyrusSrv->error(), 3 );
+        return 1;
     }
 
-    return 1;
+    return 0;
 }
 
 
 sub _imapGetMailboxAcls {
     my $self = shift;
-    my( $cyrusSrv, $object ) = @_;
 
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        return 0;
-    }
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
-
-    if( !defined($object) ) {
-        return 0;
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
     }
 
-    my $boxName = $object->getMailboxName( "new" );
-    my $boxPrefix = $object->getMailboxPrefix();
-    my $definedRight = $self->{"rightDefinition"};
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrv) || !defined($entity) ) {
+        return 1;
+    }
 
-    my %boxAclList = $cyrusSrvConn->listacl( $boxPrefix.$boxName );
+
+    my $boxName = $entity->getMailboxName( 'new' );
+    my $boxPrefix = $entity->getMailboxPrefix();
+    my $definedRight = $self->{'rightDefinition'};
+
+    my %boxAclList = $cyrusSrv->listacl( $boxPrefix.$boxName );
     my $boxRight;
-    if( $cyrusSrvConn->error ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a l'obtention des ACLs : ".$cyrusSrvConn->error(), "W" );
+    if( $cyrusSrv->error ) {
+        $self->_log( 'erreur Cyrus a l\'obtention des ACLs : '.$cyrusSrv->error(), 3 );
         return undef;
 
     }else {
         while( my( $user, $right ) = each( %boxAclList ) ) {
             # le droit POST est gere de façon transparente
-            $right =~ s/$definedRight->{"post"}//g;
+            $right =~ s/$definedRight->{'post'}//g;
 
             $right = $self->_checkAclRight( $right );
 
-            if( $user ne "anyone" ) {
+            if( $user ne 'anyone' ) {
                 $boxRight->{$right}->{$user} = 1;
             }
         }
@@ -560,41 +426,44 @@ sub _checkAclRight {
 
 sub _imapSetMailboxAcls {
     my $self = shift;
-    my( $cyrusSrv, $object ) = @_;
 
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        return 0;
-    }
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
-
-    if( !defined($object) ) {
-        return 0;
-    }
-
-    # Si l'objet n'est pas chargé avec les liens, on ne met pas à jour les ACLs
-    if( !$object->isLinks() ) {
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
         return 1;
     }
 
-    my $boxName = $object->getMailboxName( "new" );
-    my $boxPrefix = $object->getMailboxPrefix();
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrv) || !defined($entity) ) {
+        return 1;
+    }
+
+
+    # Si l'objet n'est pas chargé avec les liens, on ne met pas à jour les ACLs
+    if( !$entity->getUpdateLinks() ) {
+        return 0;
+    }
+
+    $self->_log( 'mise à jour des ACLs de '.$entity->getDescription(), 3 );
+
+    my $boxName = $entity->getMailboxName( 'new' );
+    my $boxPrefix = $entity->getMailboxPrefix();
 
     # Obtention des ACL depuis la BD (new) et depuis le serveur (old)
-    my $newAclList = $object->getMailboxAcl();
-    my $oldAclList = $self->_imapGetMailboxAcls( $cyrusSrv, $object );
+    my $newAclList = $entity->getMailboxAcl();
+    my $oldAclList = $self->_imapGetMailboxAcls();
 
     # Obtention de la liste des sous-répertoires de la boite
     my $boxPattern = $boxPrefix.$boxName;
-    my @boxStruct = $cyrusSrvConn->listmailbox( $boxPattern, '' );
-    if( $cyrusSrvConn->error ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a l'obtention des ACLs de la BAL : ".$cyrusSrvConn->error(), "W" );
+    my @boxStruct = $cyrusSrv->listmailbox( $boxPattern, '' );
+    if( $cyrusSrv->error ) {
+        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 3 );
         return 1;
     }
 
     $boxPattern =~ s/(@.*)$/\/*$1/;
-    push( @boxStruct, $cyrusSrvConn->listmailbox( $boxPattern, '' ) );
-    if( $cyrusSrvConn->error ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a l'obtention des ACLs de la BAL : ".$cyrusSrvConn->error(), "W" );
+    push( @boxStruct, $cyrusSrv->listmailbox( $boxPattern, '' ) );
+    if( $cyrusSrv->error ) {
+        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 3 );
         return 1;
     }
 
@@ -606,7 +475,7 @@ sub _imapSetMailboxAcls {
 
             while( my( $userName, $value ) = each( %$oldUserList ) ) {
                 if( !defined($newUserList) || !exists( $newUserList->{$userName} ) ) {
-                    if( !$self->_imapSetMailboxAcl( $cyrusSrv, $boxStruct[$i][0], $userName, "none" ) ) {
+                    if( !$self->_imapSetMailboxAcl( $boxStruct[$i][0], $userName, 'none' ) ) {
                         $errors++;
                     }
                 }
@@ -619,239 +488,260 @@ sub _imapSetMailboxAcls {
 
             while( my( $userName, $value ) = each( %$newUserList ) ) {
                 if( !defined($oldUserList) || !exists($oldUserList->{$userName} ) ) {
-                    if( !$self->_imapSetMailboxAcl( $cyrusSrv, $boxStruct[$i][0], $userName, $right ) ) {
+                    if( !$self->_imapSetMailboxAcl( $boxStruct[$i][0], $userName, $right ) ) {
                         $errors++;
                     }
                 }
 
-                if( $userName eq "anyone" ) {
+                if( $userName eq 'anyone' ) {
                     $anyoneRight = 1;
                 }
             }
         }
 
         if( !$anyoneRight ) {
-            if( !$self->_imapSetMailboxAcl( $cyrusSrv, $boxStruct[$i][0], "anyone", "post" ) ) {
+            if( !$self->_imapSetMailboxAcl( $boxStruct[$i][0], 'anyone', 'post' ) ) {
                 $errors++
             }
         }
     }
 
-    return 1;
+    return 0;
 }
 
 
 sub _deleteBox {
     my $self = shift;
-    my( $cyrusSrv, $object ) = @_;
 
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        return 0;
-    }
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
-
-    if( !defined($object) ) {
-        return 0;
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
     }
 
-    my $boxName = $object->getMailboxName( "current" );
-    my $boxPrefix = $object->getMailboxPrefix();
-
-    if( !$self->_imapSetMailboxAcl( $cyrusSrv, $boxPrefix.$boxName, $cyrusSrv->{"imap_server_login"}, "admin" ) ) {
-        return 0;
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrv) || !defined($entity) ) {
+        return 1;
     }
 
-    &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: suppression de la boite '".$boxName."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
-    $cyrusSrvConn->delete($boxPrefix.$boxName);
 
-    if( $cyrusSrvConn->error() ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a la suppression de la BAL : ".$cyrusSrvConn->error(), "W" );
-        return 0;
+    my $boxName = $entity->getMailboxName( 'current' );
+    my $boxPrefix = $entity->getMailboxPrefix();
+
+    require OBM::Parameters::common;
+    if( !$self->_imapSetMailboxAcl( $boxPrefix.$boxName, $OBM::Parameters::common::cyrusAdminLogin, 'admin' ) ) {
+        return 1;
     }
 
-    return 1;
+    $self->log( 'suppression de la boite de '.$entity->getDescription(), 2 );
+    $cyrusSrv->delete($boxPrefix.$boxName);
+
+    if( $cyrusSrv->error() ) {
+        $self->_log( 'erreur Cyrus a la suppression de la BAL : '.$cyrusSrv->error(), 2 );
+        return 1;
+    }
+
+    return 0;
 }
 
 
 sub _createMailbox {
     my $self = shift;
-    my( $cyrusSrv, $object ) = @_;
-    my $returnCode = 1;
+    my $returnCode = 0;
 
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        return 0;
-    }
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
-
-    if( !defined($object) ) {
-        return 0;
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
     }
 
-    my $currentBoxName = $object->getMailboxName( "current" );
-    my $newBoxName = $object->getMailboxName( "new" );
-    my $boxPrefix = $object->getMailboxPrefix();
-    my $boxPartition = $object->getMailboxPartition();
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrv) || !defined($entity) ) {
+        return 1;
+    }
+
+
+    my $currentBoxName = $entity->getMailboxName( 'current' );
+    my $newBoxName = $entity->getMailboxName( 'new' );
+    my $boxPrefix = $entity->getMailboxPrefix();
+    my $boxPartition = $entity->getMailboxPartition();
 
 
     # Si la BAL 'current' est définie, existe et est différente de la BAL 'new', on renomme
     # Si la BAL 'current' est définie et n'existe pas, on crée la 'new'
     # Si la BAL 'current' n'est pas définie, on crée la 'new'
     my $action;
-    if( defined($currentBoxName) && ($currentBoxName ne $newBoxName) && ($self->isMailboxExist( $cyrusSrv, undef, $boxPrefix, $currentBoxName) ) ) {
-        $action = "rename";
+    if( defined($currentBoxName) && ($currentBoxName ne $newBoxName) && ($self->isMailboxExist( undef, $boxPrefix, $currentBoxName) ) ) {
+        $action = 'rename';
 
         # On renomme la BAL
         if( !defined( $boxPartition ) ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: renommage de la boite '".$currentBoxName."' vers '".$newBoxName."' sur la partition Cyrus par defaut, du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+            $self->_log( 'renommage de la boite \''.$currentBoxName.'\' vers \''.$newBoxName.'\' sur la partition Cyrus par defaut, du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 2 );
         }else {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: renommage de la boite '".$currentBoxName."' vers '".$newBoxName."' sur la partition Cyrus '".$boxPartition."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+            $self->_log( 'renommage de la boite \''.$currentBoxName.'\' vers \''.$newBoxName.'\' sur la partition Cyrus \''.$boxPartition.'\', du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 2 );
         }
 
-        $cyrusSrvConn->rename( $boxPrefix.$currentBoxName, $boxPrefix.$newBoxName, $boxPartition );
-        $returnCode = 1;
+        $cyrusSrv->rename( $boxPrefix.$currentBoxName, $boxPrefix.$newBoxName, $boxPartition );
+        $returnCode = 0;
     }else {
-        $action = "create";
+        $action = 'create';
+
+        if( !$entity->isMailActive() ) {
+            $self->_log( 'l\'entité '.$entity->getDescription().' n\'a pas le droit mail, BAL non créée', 2 );
+            return 0;
+        }
+
+        if( $entity->getArchive() ) {
+            $self->_log( 'l\'entité '.$entity->getDescription().' est archivée, BAL non créée', 2 );
+            return 0;
+        }
 
         # Création de la boîte
         if( !defined( $boxPartition ) ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: creation de la boite '".$newBoxName."' sur la partition Cyrus par defaut, du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+            $self->_log( 'creation de la boite \''.$newBoxName.'\' sur la partition Cyrus par defaut, du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 2 );
         }else {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: creation de la boite '".$newBoxName."' sur la partition Cyrus '".$boxPartition."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
+            $self->_log( 'creation de la boite \''.$newBoxName.'\' sur la partition Cyrus \''.$boxPartition.'\', du serveur '.$self->{'currentCyrusSrv'}->getDescription(), 2 );
         }
 
-        $cyrusSrvConn->create( $boxPrefix.$newBoxName, $boxPartition );
-        $returnCode = 1;
+        $cyrusSrv->create( $boxPrefix.$newBoxName, $boxPartition );
+        $returnCode = 0;
     }
 
-    if( $cyrusSrvConn->error() ) {
-        if( $action eq "rename" ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus au renommage de la BAL : ".$cyrusSrvConn->error(), "W" );
-        }elsif( $action eq "create" ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a la creation de la BAL : ".$cyrusSrvConn->error(), "W" );
+    if( $cyrusSrv->error() ) {
+        if( $action eq 'rename' ) {
+            $self->_log( 'erreur Cyrus au renommage de la BAL : '.$cyrusSrv->error(), 2 );
+        }elsif( $action eq 'create' ) {
+            $self->_log( 'erreur Cyrus a la creation de la BAL : '.$cyrusSrv->error(), 2 );
         }else {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus : ".$cyrusSrvConn->error(), "W" );
+            $self->_log( 'erreur Cyrus : '.$cyrusSrv->error(), 2 );
         }
             
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: verifiez que la version de Cyrus (2.2 min) et que l'option 'allowusermoves' est active !", "W" );
-        return 0;
+        $self->_log( 'verifiez que la version de Cyrus (2.2 min) et que l\'option \'allowusermoves\' est active !', 0 );
+        return 1;
     }
 
     # On crée les répertoires par défaut si nécessaire
-    if( !$self->_createMailboxDefaultFolders( $cyrusSrv, $object ) ) {
-        return 0;
+    if( $self->_createMailboxDefaultFolders() ) {
+        return 1;
     }
 
     # On met à jour la boîte
-    if( !$self->_updateMailbox( $cyrusSrv, $object ) ) {
-        return 0;
+    if( $self->_updateMailbox() ) {
+        return 1;
     }
-
 
     return $returnCode;
 }
 
+
 sub _createMailboxDefaultFolders {
     my $self = shift;
-    my( $cyrusSrv, $object ) = @_;
 
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        return 0;
-    }
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
-    
-    if( !defined($object) ) {
-        return 0;
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
     }
 
-    my $boxName = $object->getMailboxName( "current" );
-    my $boxPrefix = $object->getMailboxPrefix();
-    my $boxPartition = $object->getMailboxPartition();
-    my $boxDefaultFolders = $object->getMailboxDefaultFolders();
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrv) || !defined($entity) ) {
+        return 1;
+    }
+
+
+    my $boxName = $entity->getMailboxName( 'current' );
+    my $boxPrefix = $entity->getMailboxPrefix();
+    my $boxPartition = $entity->getMailboxPartition();
+    my $boxDefaultFolders = $entity->getMailboxDefaultFolders();
 
     if( !defined($boxDefaultFolders) ) {
-        return 1;
+        return 0;
     }
 
     my $folderError = 0;
     foreach my $folder ( @{$boxDefaultFolders} ) {
-        $cyrusSrvConn->create( $boxPrefix.$folder, $boxPartition );
+        $cyrusSrv->create( $boxPrefix.$folder, $boxPartition );
 
-        if( $cyrusSrvConn->error() ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: Erreur lors de la creation du repertoire '".$folder."'", "W" );
+        if( $cyrusSrv->error() ) {
+            $self->_log( 'erreur lors de la creation du repertoire \''.$folder.'\'', 2 );
             $folderError++;
         }else {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: Creation du repertoire '".$folder."' reussie", "W" );
+            $self->_log( 'creation du repertoire \''.$folder.'\' reussie', 2 );
         }
     }
 
     if( $folderError ) {
-        return 0;
-    }else {
         return 1;
+    }else {
+        return 0;
     }
 }
 
 
 sub _updateMailbox {
     my $self = shift;
-    my( $cyrusSrv, $object ) = @_;
 
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        return 0;
-    }
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
-
-    if( !defined($object) ) {
-        return 0;
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
     }
 
-    &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: MAJ de la boite '".$object->getMailboxName( "new" )."', du serveur '".$cyrusSrv->{"imap_server_ip"}."'", "W" );
-    my $boxName = $object->getMailboxName( "new" );
-    my $boxPrefix = $object->getMailboxPrefix();
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrv) || !defined($entity) ) {
+        return 1;
+    }
 
-    # Positionnement du quota
-    if( !$self->_imapSetMailboxQuota( $cyrusSrv, $object ) ) {
-        return 0;
+
+    $self->_log( 'MAJ de la boite de '.$entity->getDescription(), 2 );
+
+    # Uniquement si l'entité doit être mise à jour
+    if( $entity->getUpdateEntity() ) {
+        # Positionnement du quota
+        if( $self->_imapSetMailboxQuota() ) {
+            return 1;
+        }
     }
 
     # Uniquement si les liens de l'entité sont à mettre à jour
-    if( $object->isLinks() ) {
+    if( $entity->getUpdateLinks() ) {
         # Positionnement des ACL
-        if( !$self->_imapSetMailboxAcls( $cyrusSrv, $object ) ) {
-            return 0;
+        if( $self->_imapSetMailboxAcls() ) {
+            return 1;
         }
     }
     
-    return 1;
+    return 0;
 }
 
 
 sub _imapSetMailboxAcl {
     my $self = shift;
-    my( $cyrusSrv, $boxName, $boxRightUser, $boxRight ) = @_;
+    my( $boxName, $boxRightUser, $boxRight ) = @_;
 
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
-        return 0;
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
+        return 1;
     }
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
+
+    my $cyrusSrvConn = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    if( !defined($cyrusSrvConn) ) {
+        return 1;
+    }
 
 
     # Préparation du droit à assigner
-    my $definedRight = $self->{"rightDefinition"};
+    my $definedRight = $self->{'rightDefinition'};
     if( !defined($definedRight->{$boxRight}) ) {
-        return 0;
+        return 1;
     }
 
     my $imapRight = $definedRight->{$boxRight};
-    if( ($boxRightUser eq "anyone") && ($boxRight ne "none") ) {
-        $imapRight .= $definedRight->{"post"};
+    if( ($boxRightUser eq 'anyone') && ($boxRight ne 'none') ) {
+        $imapRight .= $definedRight->{'post'};
     }
 
     $cyrusSrvConn->setaclmailbox( $boxName, $boxRightUser => $imapRight );
     if( $cyrusSrvConn->error() ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus au positionnement des ACLs de la BAL : ".$cyrusSrvConn->error(), "W" );
-        return 0;
+        $self->_log( 'erreur Cyrus au positionnement des ACLs de la BAL : '.$cyrusSrvConn->error(), 3 );
+        return 1;
     }
 
-    return 1;
+    return 0;
 }

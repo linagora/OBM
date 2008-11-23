@@ -277,7 +277,7 @@ my $domainHostsDesc = {
 };
 
 if( $obmModules->{"samba"} ) {
-    push( @{$domainHostsDesc->{"data_type"}}, $SAMBAGROUPS );
+    push( @{$domainHostsDesc->{"data_type"}}, $SAMBAHOSTS );
 }
 
 push( @{$currentNode->{"branch"}}, $domainHostsDesc );

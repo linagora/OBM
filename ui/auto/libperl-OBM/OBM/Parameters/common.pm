@@ -11,7 +11,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $renameUserMailbox $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db $dbType);
@@ -105,6 +105,9 @@ if( !defined($logLevel) || ($logLevel !~ /^[0-9]+$/) ) {
 }
 $facility_log = "local1";
 
+# La descrption de l'annuaire LDAP
+$ldapServerId = 0;
+$ldapDescription = 'Annuaire LDAP OBM';
 # Le login de l'administrateur LDAP
 $ldapAdminLogin = "ldapadmin";
 # Le serveur LDAP
@@ -193,14 +196,6 @@ if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
     $obmModules->{"contact"} = 1;
 }else {
     $obmModules->{"contact"} = 0;
-}
-
-# supporte-t-on le renommage de BAL utilisateur
-$renameUserMailbox = $cfgFile->val( 'global', 'renameUserMailbox' );
-if( defined( $renameUserMailbox ) && lc($renameUserMailbox) eq "true" ) {
-    $renameUserMailbox = 1;
-}else {
-    $renameUserMailbox = 0;
 }
 
 # Creation de repertoires a la creation de l'utilisateur

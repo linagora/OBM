@@ -1,6 +1,6 @@
 package OBM::Entities::obmGroup;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 $debug = 1;
 
@@ -8,453 +8,298 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use OBM::Tools::commonMethods qw(
+        _log
+        dump
+        );
 use OBM::Entities::commonEntities qw(
-            getType
-            setDelete
-            getDelete
-            getArchive
-            isLinks
-            getEntityId
-            isMailActive
-            makeEntityEmail
-            getMailServerId
-            updateLinkedEntity
-            );
-use OBM::Tools::commonMethods qw(_log dump);
+        setDelete
+        getDelete
+        getArchive
+        setArchive
+        getParent
+        setUpdated
+        getUpdated
+        getDesc
+        _makeEntityEmail
+        setUpdateEntity
+        getUpdateEntity
+        setUpdateLinks
+        getUpdateLinks
+        isMailAvailable
+        );
+use OBM::Ldap::utils qw(
+        _modifyAttr
+        _modifyAttrList
+        _diffObjectclassAttrs
+        );
+use OBM::Samba::utils qw(
+        _getUserSID
+        _getGroupSID
+        );
 use OBM::Parameters::common;
-require OBM::Parameters::ldapConf;
-require OBM::Ldap::utils;
-require OBM::Tools::obmDbHandler;
-require OBM::Samba::utils;
 
 
+# Needed
 sub new {
-    my $self = shift;
-    my( $links, $deleted, $groupId ) = @_;
+    my $class = shift;
+    my( $parent, $groupDesc ) = @_;
 
-    my %obmGroupAttr = (
-        type => undef,
-        links => undef,
-        toDelete => undef,
-        archive => undef,
-        sieve => undef,
-        objectId => undef,
-        domainId => undef,
-        groupDbDesc => undef,   # Pure description BD
-        properties => undef,    # Propriétés calculées
-        groupLinks => undef,    # Les relations avec d'autres entités
-        objectclass => undef,
-        dnPrefix => undef,
-        dnValue => undef
-    );
+    my $self = bless { }, $class;
 
-
-    if( !defined($links) || !defined($deleted) || !defined($groupId) ) {
-        $self->_log( 'Usage: PACKAGE->new(LINKS, DELETED, GROUPID)', 1 );
+    if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
+        $self->_log( 'domaine père incorrect', 3 );
         return undef;
-    }elsif( $groupId !~ /^\d+$/ ) {
-        $self->_log( 'identifiant de groupe incorrect', 2 );
+    }
+    $self->setParent( $parent );
+
+    if( $self->_init( $groupDesc ) ) {
+        $self->_log( 'problème lors de l\'initialisation du groupe', 1 );
         return undef;
+    }
+
+    $self->{'objectclass'} = [ 'posixGroup', 'obmGroup', 'sambaGroupMapping' ];
+
+    return $self;
+}
+
+
+# Needed
+sub DESTROY {
+    my $self = shift;
+
+    $self->_log( 'suppression de l\'objet', 4 );
+
+    $self->{'parent'} = undef;
+}
+
+
+# Needed
+sub _init {
+    my $self = shift;
+    my( $groupDesc ) = @_;
+
+    if( !defined($groupDesc) || (ref($groupDesc) ne 'HASH') ) {
+        $self->_log( 'description du groupe incorrect', 4 );
+        return 1;
+    }
+
+    # L'ID du groupe
+    if( !defined($groupDesc->{'group_id'}) ) {
+        $self->_log( 'ID du groupe non défini', 3 );
+        return 1;
+    }elsif( $groupDesc->{'group_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
+        $self->_log( 'ID \''.$groupDesc->{'group_id'}.'\' incorrect', 4 );
+        return 1;
+    }
+
+    # Le nom du groupe
+    if( !defined($groupDesc->{'group_name'}) ) {
+        $self->_log( 'Nom du groupe non défini', 3 );
+        return 1;
+    }elsif( $groupDesc->{'group_name'} !~ /$OBM::Parameters::regexp::regexp_groupname/ ) {
+        $self->_log( 'Nom du groupe \''.$groupDesc->{'group_name'}.'\' incorrect', 4 );
+        return 1;
+    }
+
+    # Le GID du groupe
+    if( !defined($groupDesc->{'group_gid'}) ) {
+        $self->_log( 'GID du groupe non défini', 3 );
+        return 1;
+    }elsif( $groupDesc->{'group_gid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
+        $self->_log( 'GID \''.$groupDesc->{'group_gid'}.'\' incorrect', 4 );
+        return 1;
+    }
+
+    # Le nom actuel du groupe, si définit
+    if( $groupDesc->{'group_name_current'} && $groupDesc->{'group_name_current'} !~ /$OBM::Parameters::regexp::regexp_groupname/ ) {
+        $self->_log( 'Nom actuel du groupe \''.$groupDesc->{'group_name_current'}.'\' incorrect', 4 );
+        return 1;
+    }
+
+    # Le droit de messagerie
+    if( !$self->_makeEntityEmail( $groupDesc->{'group_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') ) ) {
+        $groupDesc->{'group_mailperms'} = 0;
     }else {
-        $obmGroupAttr{objectId} = $groupId;
+        $groupDesc->{'group_mailperms'} = 1;
     }
 
-    $obmGroupAttr{links} = $links;
-    $obmGroupAttr{toDelete} = $deleted;
-
-    $obmGroupAttr{type} = $OBM::Parameters::ldapConf::POSIXGROUPS;
-    $obmGroupAttr{archive} = 0;
-    $obmGroupAttr{sieve} = 0;
-
-    # Définition de la représentation LDAP de ce type
-    $obmGroupAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmGroupAttr{"type"}}->{objectclass};
-    $obmGroupAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmGroupAttr{"type"}}->{dn_prefix};
-    $obmGroupAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmGroupAttr{"type"}}->{dn_value};
-
-    bless( \%obmGroupAttr, $self );
-}
-
-
-sub getEntity {
-    my $self = shift;
-    my( $domainDesc ) = @_;
-
-    my $groupId = $self->{objectId};
-    if( !defined($groupId) ) {
-        $self->_log( 'aucun identifiant de groupe defini', 3 );
-        return 0;
+    # Le SID du domaine
+    my $domainSid = $self->{'parent'}->getDesc('samba_sid');
+    if( !$domainSid ) {
+        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 3 );
+        $self->_log( 'droit samba annulé', 2 );
+        $groupDesc->{'group_samba'} = 0;
     }
 
-
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
-        $self->_log( 'connecteur a la base de donnee invalide', 3 );
-        return 0;
-    }
-
-    if( !defined($domainDesc->{domain_id}) || ($domainDesc->{domain_id} !~ /^\d+$/) ) {
-        $self->_log( 'description de domaine OBM incorrecte', 3 );
-        return 0;
-
+    # Les informations Samba
+    if( $OBM::Parameters::common::obmModules->{'samba'} && $groupDesc->{'group_samba'} ) {
+        $groupDesc->{'group_samba_sid'} = $self->_getGroupSID( $domainSid, $groupDesc->{'group_gid'} );
+        $groupDesc->{'group_samba_type'} = 2;
+        $groupDesc->{'group_samba_name'} = $groupDesc->{'group_name'};
     }else {
-        $self->{domainId} = $domainDesc->{domain_id};
+        $groupDesc->{'group_samba'} = 0;
     }
 
+    $self->{'entityDesc'} = $groupDesc;
 
-    my $uGroupTable = "UGroup";
-    if( $self->getDelete() ) {
-        $uGroupTable = "P_".$uGroupTable;
-    }
+    $self->_log( 'chargement : '.$self->getDescription(), 1 );
 
-    my $query = 'SELECT COUNT(*) FROM '.$uGroupTable.' WHERE group_id='.$groupId;
-
-    my $queryResult;
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-    my( $numRows ) = $queryResult->fetchrow_array();
-    $queryResult->finish();
-
-    if( $numRows == 0 ) {
-        $self->_log( 'pas de groupe d\'identifiant : '.$groupId, 3 );
-        return 0;
-
-    }elsif( $numRows > 1 ) {
-        $self->_log( 'plusieurs groupes d\'identifiant : '.$groupId.' ???', 3 );
-        return 0;
-    }
-
-
-    # La requete a executer - obtention des informations sur le groupe
-    $query = "SELECT * FROM ".$uGroupTable." WHERE group_id=".$groupId;
-
-    # On execute la requete
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-    # On range les resultats dans la structure de donnees des resultats
-    my $dbGroupDesc = $queryResult->fetchrow_hashref();
-    $queryResult->finish();
-
-    # On stocke la description BD utile pour la MAJ des tables
-    $self->{groupDbDesc} = $dbGroupDesc;
-
-    if( $self->getDelete() ) {
-        $self->_log( 'suppression du groupe : '.$self->getEntityDescription(), 1 );
-    }else {
-        $self->_log( 'gestion du groupe : '.$self->getEntityDescription(), 1 );
-    }
-
-    # On range les resultats calculés dans la structure de données dédiée
-    $self->{'properties'}->{'group_domain'} = $domainDesc->{'domain_label'};
-
-
-    SWITCH: {
-        # Les adresses du groupe
-        my $return = $self->makeEntityEmail( $dbGroupDesc->{'group_email'}, $domainDesc->{'domain_name'}, $domainDesc->{'domain_alias'} );
-        if( $return == 0 ) {
-            $self->{'properties'}->{'group_mailperms'} = 0;
-            last SWITCH;
-        }
-
-        $self->{'properties'}->{'group_mailperms'} = 1;
-    }
-
-
-    # Les données Samba
-    if( $OBM::Parameters::common::obmModules->{'samba'} && $dbGroupDesc->{'group_samba'} ) {
-        $self->{'properties'}->{'group_samba'} = 1;
-        $self->{'properties'}->{'group_samba_sid'} =
-        &OBM::Samba::utils::getGroupSID( $domainDesc->{'domain_samba_sid'}, $dbGroupDesc->{'group_gid'} );
-        if( !defined($self->{'properties'}->{'group_samba_sid'}) ) {
-            $self->_log( 'annulation du droit Samba du groupe : '.$self->getEntityDescription().' - SID non definit', 2 );
-            $self->{'properties'}->{'group_samba'} = 0;
-        }else {
-            $self->{'properties'}->{'group_samba_type'} = 2;
-            $self->{'properties'}->{'group_samba_name'} = $dbGroupDesc->{'group_name'};
-        }
-    }else {
-        $self->{'properties'}->{'group_samba'} = 0;
-    }
-
-
-    # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
-    # cette entité
-    if( $self->isLinks() ) {
-        $self->getEntityLinks( $domainDesc );
-    }
-
-    return 1;
+    return 0;
 }
 
 
-sub updateDbEntity {
+sub setLinks {
     my $self = shift;
+    my( $links ) = @_;
 
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
+    if( !defined($links) || ref($links) ne 'ARRAY' ) {
+        $self->_log( 'pas de liens définis', 3 );
         return 0;
     }
 
-    my $dbEntry = $self->{groupDbDesc};
-    if( !defined($dbEntry) ) {
-        return 0;
-    }
+    for( my $i=0; $i<=$#{$links}; $i++ ) {
+        my $current = $links->[$i];
 
-    $self->_log( 'MAJ du groupe '.$self->getEntityDescription().' dans les tables de production', 1 );
+        push( @{$self->{'entityDesc'}->{'group_users'}}, $current->{'userobm_login'} );
 
+        if( $self->{'entityDesc'}->{'group_mailperms'} && $self->{'entityDesc'}->{'userobm_samba_perms'} ) {
+            push( @{$self->{'entityDesc'}->{'group_contacts'}}, $current->{'userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name') );
+        }
 
-    # Champs de la BD qui ne sont pas mis à jour car champs références
-    my $exceptFields = '^(group_id)$';
-
-    # MAJ de l'entité dans la table de production
-    my @updateFields;
-    my @whereFields;
-    while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
-        if( $columnName =~ /$exceptFields/ ) {
-            push( @whereFields, $columnName."=".$dbHandler->quote($columnValue) );
-        }else {
-            push( @updateFields, $columnName."=".$dbHandler->quote($columnValue) );
+        if( $self->{'entityDesc'}->{'group_samba'} && $self->{'entityDesc'}->{'userobm_mail_perms'} ) {
+            push( @{$self->{'entityDesc'}->{'group_samba_users'}}, $self->_getUserSID( $self->{'parent'}->getDesc('samba_sid'), $current->{'userobm_uid'} ) );
         }
     }
 
-    my $query = 'UPDATE P_UGroup SET '.join( ', ', @updateFields ).' WHERE '.join( ' AND ', @whereFields );
-
-
-    my $queryResult;
-    my $result = $dbHandler->execQuery( $query, \$queryResult );
-
-    if( !defined($result) ) {
-        $self->_log( 'probleme a la mise a jour du groupe', 2 );
-        return 0;
-
-    }elsif( $result == 0 ) {
-        my @fields;
-        my @fieldsValues;
-        while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
-            push( @fields, $columnName );
-            push( @fieldsValues, $dbHandler->quote($columnValue) );
-        }
-
-        $query = 'INSERT INTO P_UGroup ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')'; 
-        
-        $result = $dbHandler->execQuery( $query, \$queryResult );
-        if( !defined($result) ) {
-            $self->_log( 'probleme a la mise a jour du groupe', 2 );
-            return 0;
-        }elsif( $result != 1 ) {
-            $self->_log( 'probleme a la mise a jour du groupe : groupe insere '.$result.' fois dans les tables de production !', 2 );
-            return 0;
-        }
-    }
-
-    $self->_log( 'MAJ des tables de production reussie', 2 );
-
-    return 1;
+    return 0;
 }
 
 
-sub updateDbEntityLinks {
+# Needed
+sub getDescription {
     my $self = shift;
-    my $queryResult;
+    my $groupDesc = $self->{'entityDesc'};
 
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
-        $self->_log( "[Entities::obmContact]: connecteur a la base de donnee invalide", 3 );
-        return 0;
-    }
-
-    $self->_log( 'MAJ des liens du groupe '.$self->getEntityDescription().' dans les tables de production', 1 );
-
-    # On supprime les liens actuels de la table de production des liens
-    # utilisateurs/groupes
-    my $query = 'DELETE FROM P_of_usergroup WHERE of_usergroup_group_id='.$self->{objectId};
-
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-
-    # On copie les nouveaux droits
-    $query = 'INSERT INTO P_of_usergroup SELECT * FROM of_usergroup WHERE of_usergroup_group_id='.$self->{objectId};
-
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-    $self->_log( 'MAJ des tables de production reussie', 2 );
-
-    return 1;
-}
-
-
-sub getEntityLinks {
-    my $self = shift;
-    my( $domainDesc ) = @_;
-
-    # Récupération des membres du groupe
-    $self->{groupLinks}->{group_users} = $self->_getGroupUsers( $domainDesc, undef, undef );
-
-    # Gestion des utilisateurs de la liste ayant droit au mail
-    if( $self->{"properties"}->{group_mailperms} ) {
-        $self->{groupLinks}->{group_contacts} = $self->_getGroupUsersMailEnable( $domainDesc );
-    }
-
-    # Gestion des utilisateurs de la liste ayant le droit Samba
-    if( $self->{"properties"}->{group_samba} ) {
-        $self->{groupLinks}->{group_samba_users} = $self->_getGroupUsersSid( $domainDesc );
-    }
-
-    # On précise que les liens de l'entité sont aussi à mettre à jour.
-    $self->{links} = 1;
-
-    return 1;
-}
-
-
-sub getEntityDescription {
-    my $self = shift;
-    my $dbEntry = $self->{groupDbDesc};
-    my $entryProp = $self->{"properties"};
-    my $description = "";
-
-
-    if( defined($dbEntry->{group_name}) ) {
-        $description .= "identifiant '".$dbEntry->{group_name}."'";
-    }
-
-    if( defined($entryProp->{group_domain}) ) {
-        $description .= ", domaine '".$entryProp->{group_domain}."'";
-    }
-
-    if( ($description ne "") && defined($self->{type}) ) {
-        $description .= ", type '".$self->{type}."'";
-    }
-
-    if( $description ne "" ) {
-        return $description;
-    }
-
-    if( defined($self->{objectId}) ) {
-        $description .= "ID BD '".$self->{objectId}."'";
-    }
-
-    if( defined($self->{type}) ) {
-        $description .= ",type '".$self->{type}."'";
-    }
+    my $description = 'groupe d\'ID \''.$groupDesc->{'group_id'}.'\', nom \''.$groupDesc->{'group_name'}.'\'';
 
     return $description;
 }
 
 
-sub _getGroupUsersMailEnable {
+# Needed
+sub getDomainId {
     my $self = shift;
-    my( $domainDesc ) = @_;
 
-    my $loginList = $self->_getGroupUsers( $domainDesc, undef, "AND i.userobm_mail_perms=1" );
-
-    for( my $i=0; $i<=$#$loginList; $i++ ) {
-        $loginList->[$i] .= "@".$domainDesc->{domain_name};
-    }
-
-    return $loginList;
+    return $self->{'entityDesc'}->{'group_domain_id'};
 }
 
 
-sub _getGroupUsersSid {
+# Needed
+sub getId {
     my $self = shift;
-    my( $domainDesc ) = @_;
 
-    my $uidList = $self->_getGroupUsers( $domainDesc, "userobm_uid", "AND i.userobm_samba_perms=1" );
-
-    for( my $i=0; $i<=$#$uidList; $i++ ) {
-        $uidList->[$i] = $domainDesc->{domain_samba_sid}."-".$uidList->[$i];
-    }
-
-    return $uidList;
+    return $self->{'entityDesc'}->{'group_id'};
 }
 
 
-sub _getGroupUsers {
+# Needed by : LdapEngine
+sub getLdapServerId {
     my $self = shift;
-    my( $domainDesc, $sqlResultColumn, $sqlRequest ) = @_;
-    my $groupId = $self->{objectId};
+
+    if( defined($self->{'parent'}) ) {
+        return $self->{'parent'}->getLdapServerId();
+    }
+
+    return undef;
+}
 
 
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
+# Needed by : LdapEngine
+sub setParent {
+    my $self = shift;
+    my( $parent ) = @_;
+
+    if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
+        $self->_log( 'description du domaine parent incorrecte', 3 );
+        return 1;
+    }
+
+    $self->{'parent'} = $parent;
+
+    return 0;
+}
+
+
+# Needed by : LdapEngine
+sub _getParentDn {
+    my $self = shift;
+    my $parentDn = undef;
+
+    if( defined($self->{'parent'}) ) {
+        $parentDn = $self->{'parent'}->getDnPrefix($self);
+    }
+
+    return $parentDn;
+}
+
+
+# Needed by : LdapEngine
+sub getDnPrefix {
+    my $self = shift;
+    my $rootDn;
+    my @dnPrefixes;
+
+    if( !($rootDn = $self->_getParentDn()) ) {
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
         return undef;
     }
 
-    if( !defined($domainDesc) ) {
-        return undef;
+    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
+        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'group_name'}.','.$rootDn->[$i] );
+        $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
-    if( !defined($sqlResultColumn) ) {
-        $sqlResultColumn = "userobm_login";
-    }
-
-    $self->_log( 'obtention des utilisateurs du groupe : '.$self->getEntityDescription(), 1 );
-
-    my $userObmTable = "UserObm";
-    my $userObmGroupTable = "of_usergroup";
-    if( $self->getDelete() ) {
-        $userObmTable = "P_".$userObmTable;
-        $userObmGroupTable = "P_".$userObmGroupTable;
-    }
-
-    # Récupération de la liste d'utilisateur de ce groupe id : $groupId.
-    my $query = 'SELECT i.'.$sqlResultColumn.' FROM '.$userObmTable.' i, '.$userObmGroupTable.' j WHERE j.of_usergroup_group_id='.$groupId.' AND j.of_usergroup_user_id=i.userobm_id AND i.userobm_archive=0';
-
-    if( defined( $sqlRequest ) && ($sqlRequest ne "") ) {
-        $query .= " ".$sqlRequest;
-    }
-
-    # On exécute la requête
-    my $queryResult;
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( 'probleme lors de l\'obtention des utilisateurs du groupe', 2 );
-        return undef;
-    }
-
-    # On stocke le resultat dans le tableau des resultats
-    my @tabResult;
-    while( my( $userLogin ) = $queryResult->fetchrow_array ) {
-        push( @tabResult, $userLogin );
-    }
-
-    $self->_log( eval{$#tabResult+1}.' utilisateurs font partis du groupe', 3 );
-
-    return \@tabResult;
+    return \@dnPrefixes;
 }
 
 
-sub getLdapDnPrefix {
+# Needed by : LdapEngine
+sub getCurrentDnPrefix {
     my $self = shift;
-    my $dnPrefix = undef;
+    my $rootDn;
+    my @dnPrefixes;
 
-    if( defined($self->{dnPrefix}) && defined($self->{groupDbDesc}->{$self->{dnValue}}) ) {
-        $dnPrefix = $self->{dnPrefix}."=".$self->{groupDbDesc}->{$self->{dnValue}};
+    if( !($rootDn = $self->_getParentDn()) ) {
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        return undef;
     }
 
-    return $dnPrefix;
+    my $currentGroupName = $self->{'entityDesc'}->{'group_name_current'};
+    if( !$currentGroupName ) {
+        $currentGroupName = $self->{'entityDesc'}->{'group_name'};
+    }
+
+    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
+        push( @dnPrefixes, 'cn='.$currentGroupName.','.$rootDn->[$i] );
+        $self->_log( 'DN de l\'entité : '.$dnPrefixes[$i], 4 );
+    }
+
+    return \@dnPrefixes;
 }
 
 
-sub getLdapObjectclass {
+sub _getLdapObjectclass {
     my $self = shift;
-    my($objectclass, $deletedObjectclass) = @_;
-    my $entryProp = $self->{"properties"};
+    my ($objectclass, $deletedObjectclass) = @_;
     my %realObjectClass;
 
     if( !defined($objectclass) || (ref($objectclass) ne "ARRAY") ) {
-        $objectclass = $self->{objectclass};
+        $objectclass = $self->{'objectclass'};
     }
 
     for( my $i=0; $i<=$#$objectclass; $i++ ) {
-        if( (lc($objectclass->[$i]) eq "sambagroupmapping") && !$entryProp->{group_samba} ) {
+        if( (lc($objectclass->[$i]) eq "sambagroupmapping") && !$self->{'entityDesc'}->{'group_samba'} ) {
             push( @{$deletedObjectclass}, $objectclass->[$i] );
             next;
         }
@@ -464,7 +309,7 @@ sub getLdapObjectclass {
 
     # Si le droit Samba est actif, on s'assure de la présence des classes
     # nécessaires - nécessaires pour les MAJ
-    if( $entryProp->{group_samba} ) {
+    if( $self->{'entityDesc'}->{'group_samba'} ) {
         $realObjectClass{sambaGroupMapping} = 1;
     }
 
@@ -475,244 +320,183 @@ sub getLdapObjectclass {
 
 sub createLdapEntry {
     my $self = shift;
-    my ( $ldapEntry ) = @_;
-    my $dbEntry = $self->{'groupDbDesc'};
-    my $entryProp = $self->{'properties'};
-    my $entryLinks = $self->{'groupLinks'};
+    my ( $entryDn, $entry ) = @_;
 
-    # Les paramètres nécessaires
-    if( $dbEntry->{'group_name'} && $dbEntry->{'group_gid'} ) {
-        $ldapEntry->add(
-            objectClass => $self->getLdapObjectclass(),
-            cn => $dbEntry->{'group_name'},
-            gidNumber => $dbEntry->{'group_gid'}
-        );
-
-    }else {
-        return 0;
+    if( !$entryDn ) {
+        $self->_log( 'DN non défini', 3 );
+        return 1;
     }
 
-    # Les membres
-    if( $self->isLinks() && $#{$entryLinks->{'group_users'}} != -1 ) {
-        $ldapEntry->add( memberUid => $entryLinks->{'group_users'} );
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        $self->_log( 'entrée LDAP incorrecte', 3 );
+        return 1;
     }
 
-    # Les contacts
-    if( $self->isLinks() && $#{$entryLinks->{'group_contacts'}} != -1 ) {
-        $ldapEntry->add( mailBox => $entryLinks->{'group_contacts'} );
-    }
+    $entry->add(
+        objectClass => $self->_getLdapObjectclass(),
+        cn => $self->{'entityDesc'}->{'group_name'},
+        gidNumber => $self->{'entityDesc'}->{'group_gid'}
+    );
 
     # La description
-    if( $dbEntry->{'group_desc'} ) {
-        $ldapEntry->add( description => $dbEntry->{'group_desc'} );       
+    if( $self->{'entityDesc'}->{'group_desc'} ) {
+        $entry->add( description => $self->{'entityDesc'}->{'group_desc'} );
     }
 
-    # L'acces mail
-    if( $entryProp->{'group_mailperms'} ) {
-        $ldapEntry->add( mailAccess => 'PERMIT' );
+    # L'accès mail
+    if( $self->{'entityDesc'}->{'group_mailperms'} ) {
+        $entry->add( mailAccess => 'PERMIT' );
     }else {
-        $ldapEntry->add( mailAccess => 'REJECT' );
+        $entry->add( mailAccess => 'REJECT' );
     }
 
     # Les adresses mails
-    if( $entryProp->{'email'} ) {
-        $ldapEntry->add( mail => $entryProp->{'email'} );
+    if( $self->{'properties'}->{'email'} ) {
+        $entry->add( mail => $self->{'properties'}->{'email'} );
     }
 
     # Les adresses mails secondaires
-    if( $entryProp->{'emailAlias'} ) {
-        $ldapEntry->add( mailAlias => $entryProp->{'emailAlias'} );
+    if( $self->{'properties'}->{'emailAlias'} ) {
+        $entry->add( mailAlias => $self->{'properties'}->{'emailAlias'} );
     }
-            
-    # Le domaine
-    if( $entryProp->{'group_domain'} ) {
-        $ldapEntry->add( obmDomain => $entryProp->{'group_domain'} );
+
+    # Le domaine OBM
+    if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
+        $entry->add( obmDomain => $domainName );
     }
 
     # Le SID du groupe
-    if( $entryProp->{'group_samba_sid'} ) {
-        $ldapEntry->add( sambaSID => $entryProp->{'group_samba_sid'} );
+    if( $self->{'entityDesc'}->{'group_samba_sid'} ) {
+        $entry->add( sambaSID => $self->{'entityDesc'}->{'group_samba_sid'} );
     }
 
     # Le type du groupe
-    if( $entryProp->{'group_samba_type'} ) {
-        $ldapEntry->add( sambaGroupType => $entryProp->{'group_samba_type'} );
+    if( $self->{'entityDesc'}->{'group_samba_type'} ) {
+        $entry->add( sambaGroupType => $self->{'entityDesc'}->{'group_samba_type'} );
     }
 
     # Le nom du groupe
-    if( $entryProp->{'group_samba_name'} ) {
-        $ldapEntry->add( displayName => $entryProp->{'group_samba_name'} );
+    if( $self->{'entityDesc'}->{'group_samba_name'} ) {
+        $entry->add( displayName => $self->{'entityDesc'}->{'group_samba_name'} );
+    }
+
+    # Les membres
+    if( $self->{'entityDesc'}->{'group_users'} ) {
+        $entry->add( memberUid => $self->{'entityDesc'}->{'group_users'} );
+    }
+
+    # Les contacts
+    if( $self->{'entityDesc'}->{'group_contacts'} ) {
+        $entry->add( mailBox => $self->{'entityDesc'}->{'group_contacts'} );
     }
 
     # La liste des utilisateurs Samba
-    if( $self->isLinks() && $#{$entryLinks->{'group_samba_users'}} != -1 ) {
-        $ldapEntry->add( sambaSIDList => $entryLinks->{'group_samba_users'} );
+    if( $self->{'entityDesc'}->{'group_samba_users'} ) {
+        $entry->add( sambaSIDList => $self->{'entityDesc'}->{'group_samba_users'} );
     }
 
-    return 1;
-}
-
-
-sub updateLdapEntryDn {
-    my $self = shift;
-    my( $ldapEntry ) = @_;
-    my $update = 0;
-
-
-    if( !defined($ldapEntry) ) {
-        return 0;
-    }
-
-
-    return $update;
+    return 0;
 }
 
 
 sub updateLdapEntry {
     my $self = shift;
-    my( $ldapEntry, $objectclassDesc ) = @_;
-    my $dbEntry = $self->{groupDbDesc};
-    my $entryProp = $self->{"properties"};
-    my $entryLinks = $self->{groupLinks};
+    my( $entry, $objectclassDesc ) = @_;
+    my $update = 0;
 
-    require OBM::Entities::entitiesUpdateState;
-    my $update = OBM::Entities::entitiesUpdateState->new();
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        return $update;
+    }
 
+
+    if( $self->getUpdateEntity() ) {
+        # Vérification des objectclass
+        my @deletedObjectclass;
+        my $currentObjectclass = $self->_getLdapObjectclass( $entry->get_value('objectClass', asref => 1), \@deletedObjectclass );
+        if( $self->_modifyAttrList( $currentObjectclass, $entry, 'objectClass' ) ) {
+            $update = 1;
+        }
     
-    if( !defined($ldapEntry) ) {
-        return undef;
-    }
-
-
-    # Vérification des objectclass
-    my @deletedObjectclass;
-    my $currentObjectclass = $self->getLdapObjectclass( $ldapEntry->get_value("objectClass", asref => 1), \@deletedObjectclass);
-    if( &OBM::Ldap::utils::modifyAttrList( $currentObjectclass, $ldapEntry, "objectClass" ) ) {
-        $update->setUpdate();
-    }
-
-    if( $#deletedObjectclass >= 0 ) {
-        # Pour les schémas LDAP supprimés, on détermine les attributs à
-        # supprimer.
-        # Uniquement ceux qui ne sont pas utilisés par d'autres objets.
-        my $deleteAttrs = &OBM::Ldap::utils::diffObjectclassAttrs(\@deletedObjectclass, $currentObjectclass, $objectclassDesc);
-
-        for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
-            if( &OBM::Ldap::utils::modifyAttrList( undef, $ldapEntry, $deleteAttrs->[$i] ) ) {
-                $update->setUpdate();
+        if( $#deletedObjectclass >= 0 ) {
+            # Pour les schémas LDAP supprimés, on détermine les attributs à
+            # supprimer.
+            # Uniquement ceux qui ne sont pas utilisés par d'autres objets.
+            my $deleteAttrs = $self->_diffObjectclassAttrs(\@deletedObjectclass, $currentObjectclass, $objectclassDesc);
+    
+            for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
+                if( $self->_modifyAttrList( undef, $entry, $deleteAttrs->[$i] ) ) {
+                    $update = 1;
+                }
             }
         }
-    }
-
-
-    # verification du GID
-    if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{group_gid}, $ldapEntry, "gidNumber" ) ) {
-        $update->setUpdate();
-    }
-
-    # La description
-    if( &OBM::Ldap::utils::modifyAttr( $dbEntry->{group_desc}, $ldapEntry, "description" ) ) {
-        $update->setUpdate();
-    }
-
-    # L'acces au mail
-    if( $entryProp->{group_mailperms} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
-        $update->setUpdate();
-
-    }elsif( !$entryProp->{group_mailperms} && (&OBM::Ldap::utils::modifyAttr( "REJECT", $ldapEntry, "mailAccess" )) ) {
-        $update->setUpdate();
-
-    }
-
-    # Le cas des alias mails
-    if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{"email"}, $ldapEntry, "mail" ) ) {
-        $update->setUpdate();
-    }
-
-    # Le cas des alias mails secondaires
-    if( &OBM::Ldap::utils::modifyAttrList( $entryProp->{"emailAlias"}, $ldapEntry, "mailAlias" ) ) {
-        $update->setUpdate();
-    }
-
-    # Le domaine
-    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{group_domain}, $ldapEntry, "obmDomain") ) {
-        $update->setUpdate();
-    }
-
-    # Le SID Samba
-    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{group_samba_sid}, $ldapEntry, "sambaSID" ) ) {
-        $update->setUpdate();
-    }
-
-    # Le type Samba du groupe
-    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{group_samba_type}, $ldapEntry, "sambaGroupType" ) ) {
-        $update->setUpdate();
-    }
-
-    # Le nom Samba affichable du groupe
-    if( &OBM::Ldap::utils::modifyAttr( $entryProp->{group_samba_name}, $ldapEntry, "displayName" ) ) {
-        $update->setUpdate();
-    }
-
-
-    if( $self->isLinks() ) {
-        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
-            $update->setUpdate();
+    
+    
+        # Le GID
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'group_gid'}, $entry, 'gidNumber' ) ) {
+            $update = 1;
+        }
+    
+        # La description
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'group_desc'}, $entry, 'description' ) ) {
+            $update = 1;
+        }
+    
+        # L'acces au mail
+        if( $self->{'entityDesc'}->{'group_mailperms'}  && $self->_modifyAttr( 'PERMIT', $entry, 'mailAccess' ) ) {
+            $update = 1;
+        }elsif( !$self->{'entityDesc'}->{'group_mailperms'} && $self->_modifyAttr( 'REJECT', $entry, 'mailAccess' ) ) {
+            $update = 1;
+        }
+    
+        # Les mails
+        if( $self->_modifyAttrList( $self->{'properties'}->{'email'}, $entry, 'mail' ) ) {
+            $update = 1;
+        }
+    
+        # Les alias mails
+        if( $self->_modifyAttrList( $self->{'properties'}->{'emailAlias'}, $entry, 'mailAlias' ) ) {
+            $update = 1;
+        }
+    
+        # Le domaine
+        if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
+            if( $self->_modifyAttr( $domainName, $entry, 'obmDomain' ) ) {
+                $update = 1;
+            }
+        }
+    
+        # Le SID du groupe
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'group_samba_sid'}, $entry, 'sambaSID' ) ) {
+            $update = 1;
+        }
+    
+        # Le type du groupe
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'group_samba_type'}, $entry, 'sambaGroupType' ) ) {
+            $update = 1;
+        }
+    
+        # Le nom du groupe
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'group_samba_name'}, $entry, 'displayName' ) ) {
+            $update = 1;
         }
     }
 
+    if( $self->getUpdateLinks() ) {
+        # Les membres du groupe
+        if( $self->_modifyAttrList( $self->{'entityDesc'}->{'group_users'}, $entry, 'memberUid' ) ) {
+            $update = 1;
+        }
 
-    return $update;
-}
+        # Le cas des contacts
+        if( $self->_modifyAttrList( $self->{'entityDesc'}->{'group_contacts'}, $entry, 'mailBox' ) ) {
+            $update = 1;
+        }
 
-
-sub updateLdapEntryLinks {
-    my $self = shift;
-    my( $ldapEntry ) = @_;
-    my $update = 0;
-    my $entryLinks = $self->{groupLinks};
-
-
-    if( !defined($ldapEntry) ) {
-        return 0;
-    }
-
-
-    # Les membres du groupe
-    if( &OBM::Ldap::utils::modifyAttrList( $entryLinks->{group_users}, $ldapEntry, "memberUid" ) ) {
-        $update = 1;
-    }
-
-    # Le cas des contacts
-    if( &OBM::Ldap::utils::modifyAttrList( $entryLinks->{group_contacts}, $ldapEntry, "mailBox" ) ) {
-        $update = 1;
-    }
-
-    # La liste des utilisateurs Samba
-    if( &OBM::Ldap::utils::modifyAttrList( $entryLinks->{group_samba_users}, $ldapEntry, "sambaSIDList" ) ) {
-        $update = 1;
+        # La liste des utilisateurs Samba
+        if( $self->_modifyAttrList( $self->{'entityDesc'}->{'group_samba_users'}, $entry, 'sambaSIDList' ) ) {
+            $update = 1;
+        }
     }
 
     return $update;
-}
-
-
-sub getMailboxName {
-    my $self = shift;
-
-    return undef;
-}
-
-
-sub getMailboxPartition {
-    my $self = shift;
-
-    return undef;
-}
-
-
-sub getMailboxSieve {
-    my $self = shift;
-
-    return $self->{sieve};
 }

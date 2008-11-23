@@ -8,385 +8,361 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use OBM::Tools::commonMethods qw(
+        _log
+        dump
+        );
 use OBM::Entities::commonEntities qw(
-            getType
-            setDelete
-            getDelete
-            getArchive
-            getLdapObjectclass
-            isLinks
-            getEntityId
-            isMailActive
-            getMailServerId
-            updateLinkedEntity
-            );
-use OBM::Tools::commonMethods qw(_log dump);
-use OBM::Parameters::common;
-require OBM::Parameters::ldapConf;
-require OBM::Ldap::utils;
-require OBM::Tools::obmDbHandler;
-require OBM::passwd;
-use URI::Escape;
+        setDelete
+        getDelete
+        getArchive
+        setArchive
+        getParent
+        setUpdated
+        getUpdated
+        isMailAvailable
+        );
+use OBM::Ldap::utils qw(
+        _modifyAttr
+        _modifyAttrList
+        _diffObjectclassAttrs
+        );
+use OBM::Tools::passwd qw(
+        _toMd5
+        _toSsha
+        _convertPasswd
+        );
+require OBM::Parameters::regexp;
 
 
+# Needed
 sub new {
-    my $self = shift;
-    my( $links, $deleted, $userId ) = @_;
+    my $class = shift;
+    my( $parent, $systemUserDesc ) = @_;
 
-    my %obmSystemUserAttr = (
-        type => undef,
-        links => undef,
-        toDelete => undef,
-        archive => undef,
-        sieve => undef,
-        objectId => undef,
-        domainId => undef,
-        userDesc => undef,
-        objectclass => undef,
-        dnPrefix => undef,
-        dnValue => undef
-    );
+    my $self = bless { }, $class;
 
-
-    if( !defined($links) || !defined($deleted) || !defined($userId) ) {
-        $self->_log( 'Usage: PACKAGE->new(LINKS, DELETED, USERID)', 1 );
+    if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
+        $self->_log( 'domaine père incorrect', 3 );
         return undef;
-    }elsif( $userId !~ /^\d+$/ ) {
-        $self->_log( 'identifiant d\'utilisateur incorrect', 2 );
+    }
+    $self->setParent( $parent );
+
+    if( $self->_init( $systemUserDesc ) ) {
+        $self->_log( 'problème lors de l\'initialisation de l\'utilisateur système', 1 );
         return undef;
-    }else {
-        $obmSystemUserAttr{"objectId"} = $userId;
     }
 
+    $self->{'objectclass'} = [ 'person', 'posixAccount', 'obmSystemUser' ];
 
-    $obmSystemUserAttr{"links"} = $links;
-    $obmSystemUserAttr{"toDelete"} = $deleted;
-
-    $obmSystemUserAttr{"type"} = $OBM::Parameters::ldapConf::SYSTEMUSERS;
-    $obmSystemUserAttr{"archive"} = 0;
-    $obmSystemUserAttr{"sieve"} = 0;
-
-    # Définition de la représentation LDAP de ce type
-    $obmSystemUserAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmSystemUserAttr{"type"}}->{objectclass};
-    $obmSystemUserAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmSystemUserAttr{"type"}}->{dn_prefix};
-    $obmSystemUserAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmSystemUserAttr{"type"}}->{dn_value};
-
-    bless( \%obmSystemUserAttr, $self );
+    return $self;
 }
 
 
-sub getEntity {
+# Needed
+sub DESTROY {
     my $self = shift;
-    my( $domainDesc ) = @_;
 
-    my $userId = $self->{"objectId"};
-    if( !defined($userId) ) {
-        $self->_log( 'aucun identifiant d\'utilisateur systeme definit', 3 );
-        return 0;
-    }
+    $self->_log( 'suppression de l\'objet', 4 );
 
-
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
-        $self->_log( 'connecteur a la base de donnee invalide', 3 );
-        return 0;
-    }
-
-    if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        $self->_log( 'description de domaine OBM incorrecte', 3 );
-        return 0;
-
-    }else {
-        # On positionne l'identifiant du domaine de l'entité
-        $self->{"domainId"} = $domainDesc->{"domain_id"};
-    }
-
-
-    my $yserSystemTable = "UserSystem";
-    if( $self->getDelete() ) {
-        $yserSystemTable = "P_".$yserSystemTable;
-    }
-
-    my $query = "SELECT COUNT(*) FROM ".$yserSystemTable." WHERE usersystem_id=".$userId;
-
-    my $queryResult;
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-    my( $numRows ) = $queryResult->fetchrow_array();
-    $queryResult->finish();
-
-    if( $numRows == 0 ) {
-        $self->_log( 'pas d\'utilisateur d\'identifiant : '.$userId, 3 );
-        return 0;
-    }elsif( $numRows > 1 ) {
-        $self->_log( 'plusieurs utilisateurs d\'identifiant : '.$userId.' ???', 3 );
-        return 0;
-    }
-
-
-    # La requete a executer - obtention des informations sur l'utilisateur
-    $query = "SELECT usersystem_id, usersystem_login, usersystem_password, usersystem_uid, usersystem_gid, usersystem_homedir, usersystem_lastname, usersystem_firstname, usersystem_shell FROM ".$yserSystemTable." WHERE usersystem_id=".$userId;
-
-    # On execute la requete
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-    # On range les resultats dans la structure de donnees des resultats
-    my( $user_id, $user_login, $user_password, $user_uid, $user_gid, $user_homedir, $user_lastname, $user_firstname, $user_shell ) = $queryResult->fetchrow_array();
-    $queryResult->finish();
-
-
-    $self->_log( 'gestion de l\'utilisateur \''.$user_login.'\', domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
-        
-    # On cree la structure correspondante a l'utilisateur
-    # Cette structure est composee des valeurs recuperees dans la base
-    $self->{"userDesc"} = {
-        "user_id"=>$user_id,
-        "user_login"=>$user_login,
-        "user_uid"=>$user_uid,
-        "user_gid"=>$user_gid,
-        "user_lastname"=>$user_lastname,
-        "user_firstname"=>$user_firstname,
-        "user_homedir"=>$user_homedir,
-        "user_passwd_type"=>"PLAIN",
-        "user_passwd"=>$user_password,
-        "user_shell"=>$user_shell,
-        "user_domain" => $domainDesc->{"domain_label"}
-    };
-
-
-    return 1;
+    $self->{'parent'} = undef;
 }
 
 
-sub updateDbEntity {
+# Needed
+sub _init {
     my $self = shift;
-    # Pas de table de production pour les entités de type utilisateur système
+    my( $systemUserDesc ) = @_;
 
-#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-#    if( !defined($dbHandler) ) {
-#        return 0;
-#    }
+    if( !defined($systemUserDesc) || (ref($systemUserDesc) ne 'HASH') ) {
+        $self->_log( 'description de l\'utilisateur système incorrecte', 4 );
+        return 1;
+    }
 
-    return 1;
+    # L'Id du l'utilisateur système
+    if( !defined($systemUserDesc->{'usersystem_id'}) ) {
+        $self->_log( 'ID de l\'utilisateur système non défini', 3 );
+        return 1;
+    }elsif( $systemUserDesc->{'usersystem_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
+        $self->_log( 'ID \''.$systemUserDesc->{'usersystem_id'}.'\' incorrect', 4 );
+        return 1;
+    }
+
+    # Le login de l'utilisateur système
+    if( !defined($systemUserDesc->{'usersystem_login'}) ) {
+        $self->_log( 'Login de l\'utilisateur système non défini', 3 );
+        return 1;
+    }elsif( $systemUserDesc->{'usersystem_login'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
+        $self->_log( 'Login \''.$systemUserDesc->{'usersystem_login'}.'\' incorrect', 4 );
+        return 1;
+    }
+
+    # L'UID de l'utilisateur système
+    if( !defined($systemUserDesc->{'usersystem_uid'}) ) {
+        $self->_log( 'UID de l\'utilisateur système non défini', 3 );
+        return 1;
+    }elsif( $systemUserDesc->{'usersystem_uid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
+        $self->_log( 'UID \''.$systemUserDesc->{'usersystem_uid'}.'\' incorrect', 4 );
+        return 1;
+    }
+
+    # Le GID de l'utilisateur système
+    if( !defined($systemUserDesc->{'usersystem_gid'}) ) {
+        $self->_log( 'GID de l\'utilisateur système non défini', 3 );
+        return 1;
+    }elsif( $systemUserDesc->{'usersystem_gid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
+        $self->_log( 'GID \''.$systemUserDesc->{'usersystem_gid'}.'\' incorrect', 4 );
+        return 1;
+    }
+
+    $self->{'userSystemDesc'} = $systemUserDesc;
+
+    $self->_log( 'chargement : '.$self->getDescription(), 1 );
+
+    return 0;
 }
 
 
-sub updateDbEntityLinks {
+# Needed
+sub getDescription {
     my $self = shift;
-    # Pas de table de production pour les entités de type utilisateur système
+    my $userSystemDesc = $self->{'userSystemDesc'};
 
-#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-#    if( !defined($dbHandler) ) {
-#        return 0;
-#    }
+    my $description = 'utilisateur système d\'ID \''.$userSystemDesc->{'usersystem_id'}.'\', login \''.$userSystemDesc->{'usersystem_login'}.'\'';
 
-    return 1;
-}
-
-
-sub getEntityLinks {
-    my $self = shift;
-    my( $domainDesc ) = @_;
-
-    return 1;
-}
-
-
-sub getEntityDescription {
-    my $self = shift;
-    my $entry = $self->{"userDesc"};
-    my $description = "";
-
-
-    if( defined($entry->{user_login}) ) {
-        $description .= "identifiant '".$entry->{user_login}."'";
+    if( defined($userSystemDesc->{'usersystem_lastname'}) ) {
+        $description .= ' '.$userSystemDesc->{'usersystem_lastname'};
     }
 
-    if( defined($entry->{user_domain}) ) {
-        $description .= ", domaine '".$entry->{user_domain}."'";
-    }
-
-    if( ($description ne "") && defined($self->{type}) ) {
-        $description .= ", type '".$self->{type}."'";
-    }
-
-    if( $description ne "" ) {
-        return $description;
-    }
-
-    if( defined($self->{objectId}) ) {
-        $description .= "ID BD '".$self->{objectId}."'";
-    }
-
-    if( defined($self->{type}) ) {
-        $description .= ",type '".$self->{type}."'";
+    if( defined($userSystemDesc->{'usersystem_firstname'}) ) {
+        $description .= ' '.$userSystemDesc->{'usersystem_firstname'};
     }
 
     return $description;
 }
 
 
-sub getLdapDnPrefix {
+# Needed
+sub getDesc {
     my $self = shift;
-    my $dnPrefix = undef;
+    my( $desc ) = @_;
 
-    if( defined($self->{"dnPrefix"}) && defined($self->{"userDesc"}->{$self->{"dnValue"}}) ) {
-        $dnPrefix = $self->{"dnPrefix"}."=".$self->{"userDesc"}->{$self->{"dnValue"}};
-    }
+    if( $desc && !ref($desc) ) {
+        return $self->{'userSystemDesc'}->{$desc};
+    };
 
-    return $dnPrefix;
+    return undef;
 }
 
 
-sub createLdapEntry {
+# Needed
+sub getDomainId {
     my $self = shift;
-    my ( $ldapEntry ) = @_;
-    my $entry = $self->{"userDesc"};
 
-    # Gestion du mot de passe
-    if( !defined( $entry->{"user_passwd_type"} ) || ($entry->{"user_passwd_type"} eq "") ) {
-        return 0;
-    }
+    my $parent = $self->getParent();
 
-    my $userPasswd = &OBM::passwd::convertPasswd( $entry->{"user_passwd_type"}, $entry->{"user_passwd"} );
-    if( !defined( $userPasswd ) ) {
-        return 0;
-    }
-
-
-    # On construit la nouvelle entree
-    #
-    # Les parametres nécessaires
-    if( $entry->{'user_login'} && $entry->{'user_firstname'} && $entry->{'user_lastname'} && $entry->{'user_uid'} && defined($entry->{'user_gid'})  && $entry->{'user_homedir'} ) {
-
-        my $longName;
-        if( $entry->{'user_firstname'} ) {
-            $longName = $entry->{'user_firstname'}.' '.$entry->{'user_lastname'};
-        }else {
-            $longName = $entry->{'user_lastname'};
-        }
-                
-        $ldapEntry->add(
-            objectClass => $self->{'objectclass'},
-            uid => $entry->{'user_login'},
-            cn => $longName,
-            sn => $entry->{'user_lastname'},
-            uidNumber => $entry->{'user_uid'},
-            gidNumber => $entry->{'user_gid'},
-            homeDirectory => $entry->{'user_homedir'},
-            loginShell => '/bin/bash',
-            userpassword => $userPasswd,
-            obmDomain => $entry->{'user_domain'}
-        );
-
-    }else {
-        return 0;
-    }
-
-    return 1;
+    return $parent->getId();
 }
 
 
-sub updateLdapEntryDn {
+# Needed
+sub getId {
     my $self = shift;
-    my( $ldapEntry ) = @_;
-    my $update = 0;
 
-
-    if( !defined($ldapEntry) ) {
-        return 0;
-    }
-
-
-    return $update;
+    return $self->{'userSystemDesc'}->{'usersystem_id'};
 }
 
 
-sub updateLdapEntry {
+# Needed by : LdapEngine
+sub getLdapServerId {
     my $self = shift;
-    my( $ldapEntry, $objectclassDesc ) = @_;
-    my $entry = $self->{"userDesc"};
 
-    require OBM::Entities::entitiesUpdateState;
-    my $update = OBM::Entities::entitiesUpdateState->new();
+    if( defined($self->{'parent'}) ) {
+        return $self->{'parent'}->getLdapServerId();
+    }
+
+    return undef;
+}
 
 
-    if( !defined($ldapEntry) ) {
+# Needed by : LdapEngine
+sub setParent {
+    my $self = shift;
+    my( $parent ) = @_;
+
+    if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
+        $self->_log( 'description du domaine parent incorrecte', 3 );
+        return 1;
+    }
+
+    $self->{'parent'} = $parent;
+
+    return 0;
+}
+
+
+# Needed by : LdapEngine
+sub _getParentDn {
+    my $self = shift;
+    my $parentDn = undef;
+
+    if( defined($self->{'parent'}) ) {
+        $parentDn = $self->{'parent'}->getDnPrefix($self);
+    }
+
+    return $parentDn;
+}
+
+
+# Needed by : LdapEngine
+sub getDnPrefix {
+    my $self = shift;
+    my $rootDn;
+    my @dnPrefixes;
+
+    if( !($rootDn = $self->_getParentDn()) ) {
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
         return undef;
     }
 
-
-    # Le champs nom, prenom de l'utilisateur
-    my $longName = $entry->{"user_firstname"}." ".$entry->{"user_lastname"};
-    if( &OBM::Ldap::utils::modifyAttr( $longName, $ldapEntry, "cn" ) ) {
-        # On synchronise le surname
-        &OBM::Ldap::utils::modifyAttr( $longName, $ldapEntry, "sn" );
-
-        $update->setUpdate();
+    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
+        push( @dnPrefixes, 'uid='.$self->{'userSystemDesc'}->{'usersystem_login'}.','.$rootDn->[$i] );
+        $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
-    # Le mot de passe
-    if( defined( $entry->{"user_passwd_type"} ) && ($entry->{"user_passwd_type"} ne"") ) {
-        my $userPasswd = &OBM::passwd::convertPasswd( $entry->{"user_passwd_type"}, $entry->{"user_passwd"} );
-        if( defined( $userPasswd ) ) {
-            if( &OBM::Ldap::utils::modifyAttr( $userPasswd, $ldapEntry, "userpassword" ) ) {
-                $update->setUpdate();
-            }
-        }
-    }
-
-    # Le domaine
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"user_domain"}, $ldapEntry, "obmDomain") ) {
-        $update->setUpdate();
-    }
-
-
-    if( $self->isLinks() ) {
-        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
-            $update->setUpdate();
-        }
-    }
-
-
-    return $update;
+    return \@dnPrefixes;
 }
 
 
-sub updateLdapEntryLinks {
+# Needed by : LdapEngine
+sub getCurrentDnPrefix {
     my $self = shift;
-    my( $ldapEntry ) = @_;
+
+    return $self->getDnPrefix();
+}
+
+
+# Needed by : LdapEngine
+sub createLdapEntry {
+    my $self = shift;
+    my( $entryDn, $entry ) = @_;
+
+    if( !$entryDn ) {
+        $self->_log( 'DN non défini', 3 );
+        return 1;
+    }
+
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        $self->_log( 'entrée LDAP incorrecte', 3 );
+        return 1;
+    }
+
+    my $userPasswd = $self->_convertPasswd( 'PLAIN', $self->{'userSystemDesc'}->{'usersystem_password'} );
+    if( !$userPasswd ) {
+        $self->_log( 'pas de mot de passe défini', 3 );
+        return 1;
+    }
+
+    my $cn = $self->{'userSystemDesc'}->{'usersystem_login'};
+    SWITCH: {
+        if( $self->{'userSystemDesc'}->{'usersystem_firstname'} && $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
+            $cn = $self->{'userSystemDesc'}->{'usersystem_firstname'}.' '.$self->{'userSystemDesc'}->{'usersystem_lastname'};
+            last SWITCH;
+        }
+
+        if( $self->{'userSystemDesc'}->{'usersystem_firstname'} ) {
+            $cn = $self->{'userSystemDesc'}->{'usersystem_firstname'};
+            last SWITCH;
+        }
+
+        if( $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
+            $cn = $self->{'userSystemDesc'}->{'usersystem_lastname'};
+            last SWITCH;
+        }
+    }
+
+    my $sn = $self->{'userSystemDesc'}->{'usersystem_login'};
+    if( $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
+        $sn = $self->{'userSystemDesc'}->{'usersystem_lastname'};
+    }
+
+    my $homeDirectory = $self->{'userSystemDesc'}->{'usersystem_homedir'};
+    if( !$homeDirectory ) {
+        $homeDirectory = '/home/'.$self->{'userSystemDesc'}->{'usersystem_login'};
+    }
+
+    $entry->add(
+        objectClass => $self->{'objectclass'},
+        uid => $self->{'userSystemDesc'}->{'usersystem_login'},
+        uidNumber => $self->{'userSystemDesc'}->{'usersystem_uid'},
+        gidNumber => $self->{'userSystemDesc'}->{'usersystem_gid'},
+        homeDirectory => $homeDirectory,
+        cn => $cn,
+        sn => $sn,
+        userpassword => $userPasswd,
+        loginShell => '/bin/bash'
+    );
+
+    if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
+        $entry->add( obmDomain => $domainName );
+    }
+
+    return 0;
+}
+
+
+# Needed by : LdapEngine
+sub updateLdapEntry {
+    my $self = shift;
+    my( $entry, $objectclassDesc ) = @_;
     my $update = 0;
 
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        return $update;
+    }
 
-    if( !defined($ldapEntry) ) {
-        return 0;
+    my $userPasswd = $self->_convertPasswd( 'PLAIN', $self->{'userSystemDesc'}->{'usersystem_password'} );
+    if( $userPasswd ) {
+        if( $self->_modifyAttr( $userPasswd, $entry, 'userpassword' ) ) {
+            $update = 1;
+        }
+    }
+
+    my $cn = $self->{'userSystemDesc'}->{'usersystem_login'};
+    SWITCH: {
+        if( $self->{'userSystemDesc'}->{'usersystem_firstname'} && $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
+            $cn = $self->{'userSystemDesc'}->{'usersystem_firstname'}.' '.$self->{'userSystemDesc'}->{'usersystem_lastname'};
+            last SWITCH;
+        }
+
+        if( $self->{'userSystemDesc'}->{'usersystem_firstname'} ) {
+            $cn = $self->{'userSystemDesc'}->{'usersystem_firstname'};
+            last SWITCH;
+        }
+
+        if( $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
+            $cn = $self->{'userSystemDesc'}->{'usersystem_lastname'};
+            last SWITCH;
+        }
+    }
+    if( $self->_modifyAttr( $cn, $entry, 'cn' ) ) {
+        $update = 1;
+    }
+
+    my $sn = $self->{'userSystemDesc'}->{'usersystem_login'};
+    if( $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
+        $sn = $self->{'userSystemDesc'}->{'usersystem_lastname'};
+    }
+    if( $self->_modifyAttr( $sn, $entry, 'sn' ) ) {
+        $update = 1;
+    }
+
+    if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
+        if( $self->_modifyAttr( $domainName, $entry, 'obmDomain' ) ) {
+            $update = 1;
+        }
     }
 
 
     return $update;
-}
-
-
-sub getMailboxName {
-    my $self = shift;
-
-    return undef;
-}
-
-
-sub getMailboxPartition {
-    my $self = shift;
-
-    return undef;
-}
-
-
-sub getMailboxSieve {
-    my $self = shift;
-
-    return $self->{"sieve"};
 }

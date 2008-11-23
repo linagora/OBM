@@ -38,6 +38,10 @@ sub _log {
     $self =~ /^OBM::(.+)=.+/;
     my $prefix = $1;
 
+    if( !defined($prefix) ) {
+        $prefix = $self;
+    }
+
     my $logObject = OBM::Tools::obmLog->instance();
     return $logObject->writeLog( '['.$prefix.']: '.$text, $level, undef );
 }

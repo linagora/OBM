@@ -18,10 +18,12 @@ require Exporter;
     $regexp_rootLdap
     $regexp_login
     $regexp_passwd
-    $regexp_login
     $regexp_ip
     $regexp_server_id
     $regexp_uid
+    $regexp_hostname
+    $regexp_groupname
+    $regexp_mailsharename
     );
 @EXPORT = (@EXPORT_regexp);
 
@@ -54,3 +56,12 @@ $regexp_server_id = "^[0-9]+\$";
 
 # User regexp
 $regexp_uid = '^[0-9]+$';
+
+# Host
+$regexp_hostname = '^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$';
+
+# Group
+$regexp_groupname = '^[\W\w0-9][\W\w0-9-._ ]{1,30}[\W\w0-9]$';
+
+# Mailshare
+$regexp_mailsharename = '^[A-Za-z0-9][A-Za-z0-9-._]{0,30}[A-Za-z0-9]$'

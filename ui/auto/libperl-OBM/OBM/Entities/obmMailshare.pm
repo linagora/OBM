@@ -1,6 +1,6 @@
 package OBM::Entities::obmMailshare;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 $debug = 1;
 
@@ -8,719 +8,532 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use OBM::Tools::commonMethods qw(
+        _log
+        dump
+        );
 use OBM::Entities::commonEntities qw(
-            getType
-            setDelete
-            getDelete
-            getArchive
-            getLdapObjectclass
-            isLinks
-            getEntityId
-            makeEntityEmail
-            getMailboxDefaultFolders
-            updateLinkedEntity
-            );
-use OBM::Tools::commonMethods qw(_log dump);
+        setDelete
+        getDelete
+        getArchive
+        setArchive
+        getParent
+        setUpdated
+        getUpdated
+        _makeEntityEmail
+        setUpdateEntity
+        getUpdateEntity
+        setUpdateLinks
+        getUpdateLinks
+        );
+use OBM::Ldap::utils qw(
+        _modifyAttr
+        _modifyAttrList
+        _diffObjectclassAttrs
+        );
+use OBM::Samba::utils qw(
+        _getUserSID
+        _getGroupSID
+        );
+use OBM::Tools::passwd qw(
+        _toMd5
+        _toSsha
+        _convertPasswd
+        );
 use OBM::Parameters::common;
-require OBM::Parameters::ldapConf;
-require OBM::Tools::obmDbHandler;
-require OBM::Ldap::utils;
-require OBM::toolBox;
+        
 
 
 sub new {
-    my $self = shift;
-    my( $links, $deleted, $mailShareId ) = @_;
+    my $class = shift;
+    my( $parent, $mailshareDesc ) = @_;
 
-    my %obmMailshareAttr = (
-        type => undef,
-        entityRightType => undef,
-        links => undef,
-        toDelete => undef,
-        archive => undef,
-        sieve => undef,
-        objectId => undef,
-        domainId => undef,
-        mailShareDbDesc => undef,   # Pure description BD
-        properties => undef,        # Propriétés calculées
-        mailShareLinks => undef,    # Les relations avec d'autres entités
-        objectclass => undef,
-        dnPrefix => undef,
-        dnValue => undef
-    );
+    my $self = bless { }, $class;
 
-
-    if( !defined( $links ) || !defined($deleted) || !defined($mailShareId) ) {
-        $self->_log( 'Usage: PACKAGE->new(LINKS, MAILSHAREID)', 1 );
+    if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
+        $self->_log( 'domaine père incorrect', 3 );
         return undef;
-    }elsif( $mailShareId !~ /^\d+$/ ) {
-        $self->_log( 'identifiant de BAL partagee incorrect', 2 );
-        return undef;
-    }else {
-        $obmMailshareAttr{"objectId"} = $mailShareId;
+    }
+    $self->setParent( $parent );
 
+    if( $self->_init( $mailshareDesc ) ) {
+        $self->_log( 'problème lors de l\'initialisation du mailshare', 1 );
+        return undef;
     }
 
+    $self->{'objectclass'} = [ "obmMailShare" ];
 
-    $obmMailshareAttr{'links'} = $links;
-    $obmMailshareAttr{'toDelete'} = $deleted;
-
-    $obmMailshareAttr{'type'} = $OBM::Parameters::ldapConf::MAILSHARE;
-    $obmMailshareAttr{'entityRightType'} = 'MailShare';
-    $obmMailshareAttr{'archive'} = 0;
-    $obmMailshareAttr{'sieve'} = 0;
-
-    # Définition de la représentation LDAP de ce type
-    $obmMailshareAttr{'objectclass'} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{objectclass};
-    $obmMailshareAttr{'dnPrefix'} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{dn_prefix};
-    $obmMailshareAttr{'dnValue'} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailshareAttr{"type"}}->{dn_value};
-
-    bless( \%obmMailshareAttr, $self );
+    return $self;
 }
 
 
-sub getEntity {
+# Needed
+sub DESTROY {
     my $self = shift;
-    my( $domainDesc ) = @_;
 
-    my $mailShareId = $self->{'objectId'};
-    if( !defined($mailShareId) ) {
-        $self->_log( 'aucun identifiant de partage de messagerie defini', 3 );
-        return 0;
+    $self->_log( 'suppression de l\'objet', 4 );
+
+    $self->{'parent'} = undef;
+}
+
+
+sub _init {
+    my $self = shift;
+    my( $mailshareDesc ) = @_;
+
+    if( !defined($mailshareDesc) || (ref($mailshareDesc) ne 'HASH') ) {
+        $self->_log( 'description du mailshare incorrect', 4 );
+        return 1;
     }
 
-
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
-        $self->_log( 'connecteur a la base de donnee invalide', 3 );
-        return 0;
+    # L'ID du mailshare
+    if( !defined($mailshareDesc->{'mailshare_id'}) ) {
+        $self->_log( 'ID du mailshare non défini', 3 );
+        return 1;
+    }elsif( $mailshareDesc->{'mailshare_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
+        $self->_log( 'ID \''.$mailshareDesc->{'mailshare_id'}.'\' incorrect', 4 );
+        return 1;
     }
 
-    if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        $self->_log( 'description de domaine OBM incorrecte', 3 );
-        return 0;
-    }else {
-        # On positionne l'identifiant du domaine de l'entité
-        $self->{"domainId"} = $domainDesc->{"domain_id"};
+    # Le nom du mailshare
+    if( !defined($mailshareDesc->{'mailshare_name'}) ) {
+        $self->_log( 'Nom du mailshare non défini', 3 );
+        return 1;
+    }elsif( $mailshareDesc->{'mailshare_name'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
+        $self->_log( 'Nom du mailshare \''.$mailshareDesc->{'mailshare_name'}.'\' incorrect', 4 );
+        return 1;
     }
 
-
-    my $mailShareTable = "MailShare";
-    my $mailServerTable = "MailServer";
-    if( $self->getDelete() ) {
-        $mailShareTable = "P_".$mailShareTable;
-        $mailServerTable = "P_".$mailServerTable;
+    # Le nom actuel du mailshare, si définit
+    if( $mailshareDesc->{'mailshare_name_current'} && $mailshareDesc->{'mailshare_name_current'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
+        $self->_log( 'Nom actuel du mailshare \''.$mailshareDesc->{'mailshare_name_current'}.'\' incorrect', 4 );
+        return 1;
     }
 
-    my $query = "SELECT COUNT(*) FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
-    my $queryResult;
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-    my( $numRows ) = $queryResult->fetchrow_array();
-    $queryResult->finish();
-
-    if( $numRows == 0 ) {
-        $self->_log( 'pas de BAL partagee d\'identifiant : '.$mailShareId, 3 );
-        return 0;
-    }elsif( $numRows > 1 ) {
-        $self->_log( 'plusieurs BAL partagees d\'identifiant : '.$mailShareId." ???", 3 );
-        return 0;
-    }
-
-
-    # Obtention de la description BD de l'utilisateur
-    $query = "SELECT * FROM ".$mailShareTable." WHERE mailshare_id=".$mailShareId;
-    # On execute la requete
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-    # On range les resultats dans la structure de donnees des resultats
-    my $dbMailShareDesc = $queryResult->fetchrow_hashref();
-    $queryResult->finish();
-
-    # Si pas de nom de BAL partagée, traitement impossible
-    if( !defined($dbMailShareDesc->{"mailshare_name"}) ) {
-        &OBM::toolBox::write_log( "[Entities::obmMailshare]: nom de la BAL partagee non definit, traitemant impossible !", "W" );
-        return 0;
-    }
-
-    # On stocke la description BD utile pour la MAJ des tables
-    $self->{"mailShareDbDesc"} = $dbMailShareDesc;
-
-
-    # La requete a exécuter - obtention des informations sur le répertoire
-    # partagé
-    $query = "SELECT * FROM ".$mailShareTable." LEFT JOIN ".$mailServerTable." ON mailshare_mail_server_id=mailserver_id WHERE mailshare_id=".$mailShareId;
-    # On exécute la requête
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-    # On range les résultats dans la structure de données des résultats
-    $dbMailShareDesc = $queryResult->fetchrow_hashref();
-    $queryResult->finish();
-
-    if( $self->getDelete() ) {
-        $self->_log( 'suppression de la BAL partagee : \''.$dbMailShareDesc->{'mailshare_name'}.'\', domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
-    
-    }else {
-        $self->_log( 'gestion de la BAL partagee : \''.$dbMailShareDesc->{'mailshare_name'}.'\', domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
-
-    }
-
-    # On range les resultats dans la structure de données des resultats
-    $self->{"properties"}->{"mailshare_name"} = $dbMailShareDesc->{"mailshare_name"};
-    $self->{"properties"}->{"mailshare_description"} = $dbMailShareDesc->{"mailshare_description"};
-    $self->{"properties"}->{"mailshare_domain"} = $domainDesc->{"domain_label"};
-
-
-    # Gestion du droit de messagerie
-    my $localServerIp;
     SWITCH: {
-        if( !$dbMailShareDesc->{"mailshare_email"} ) {
-            $self->{"properties"}->{"mailshare_mail_perms"} = 0;
+        require OBM::Cyrus::cyrusServers;
+        my $cyrusSrvList = OBM::Cyrus::cyrusServers->instance();
+        if( !(my $cyrusHostName = $cyrusSrvList->getCyrusServerIp( $mailshareDesc->{'mailshare_mail_server_id'}, $mailshareDesc->{'mailshare_domain_id'} ) ) ) {
+            $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.' annulé, serveur inconnu', 2 );
+            $mailshareDesc->{'mailshare_mail_perms'} = 0;
+            last SWITCH;
+        }else {
+            $mailshareDesc->{'mailshare_mail_server'} = 'lmtp:'.$cyrusHostName.':24';
+        }
+
+        if( !($self->_makeEntityEmail( $mailshareDesc->{'mailshare_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') )) ) {
+            $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.'annulé, pas d\'adresses mails valides', 2 );
+            $mailshareDesc->{'mailshare_mail_perms'} = 0;
             last SWITCH;
         }
 
-        $localServerIp = $self->getHostIpById( $dbMailShareDesc->{"mailserver_host_id"} );
-        if( !defined($localServerIp) ) {
-            $self->_log( 'droit mail du repertoire partage : \''.$dbMailShareDesc->{'mailshare_name'}.'\' - annule, serveur inconnu !', 2 );
-            $self->{"properties"}->{"mailshare_mail_perms"} = 0;
-            last SWITCH;
-        }
-
-        # Gestion des adresses de la boîte à lettres partagée
-        my $return = $self->makeEntityEmail( $dbMailShareDesc->{"mailshare_email"}, $domainDesc->{"domain_name"}, $domainDesc->{"domain_alias"} );
-        if( $return == 0 ) {
-            $self->_log( 'droit mail du repertoire partage : \''.$dbMailShareDesc->{'mailshare_name'}.'\' - annule, pas d\'adresses mails valides', 2 );
-            $self->{"properties"}->{"mailshare_mail_perms"} = 0;
-            last SWITCH;
-        }
-
-        $self->{"properties"}->{"mailshare_mail_perms"} = 1;
+        $mailshareDesc->{'mailshare_mail_perms'} = 1;
     }
 
-    # Gestion de la BAL destination
-    #   valeur dans LDAP
-    $self->{"properties"}->{"mailshare_mailbox"} = "+".$dbMailShareDesc->{"mailshare_name"}."@".$domainDesc->{"domain_name"};
-    #   nom de la BAL Cyrus
-    $self->{"properties"}->{"mailshare_mailbox_name"} = $dbMailShareDesc->{"mailshare_name"};
-    if( !$singleNameSpace ) {
-        $self->{"properties"}->{"mailshare_mailbox_name"} .= "@".$domainDesc->{"domain_name"};
+    # LDAP BAL destination
+    $mailshareDesc->{'mailshare_ldap_mailbox'} = '+'.$mailshareDesc->{'mailshare_name'}.'@'.$self->{'parent'}->getDesc('domain_name');
+    # Cyrus BAL destination
+    $mailshareDesc->{'mailshare_cyrus_mailbox'} = $mailshareDesc->{'mailshare_name'};
+    # Current Cyrus BAL destination
+    $mailshareDesc->{'current_mailshare_cyrus_mailbox'} = $mailshareDesc->{'mailshare_name_current'};
+    if( !$OBM::Parameters::common::singleNameSpace ) {
+        $mailshareDesc->{'mailshare_cyrus_mailbox'} .= '@'.$self->{'parent'}->getDesc('domain_name');
+        $mailshareDesc->{'current_mailshare_cyrus_mailbox'} .= '@'.$self->{'parent'}->getDesc('domain_name');
     }
 
-    # Partition Cyrus associée à cette BAL
+    # Cyrus partition
     if( $OBM::Parameters::common::cyrusDomainPartition ) {
-        $self->{"properties"}->{"mailShare_partition"} = $domainDesc->{"domain_dn"};
-        $self->{"properties"}->{"mailShare_partition"} =~ s/\./_/g;
-        $self->{"properties"}->{"mailShare_partition"} =~ s/-/_/g;
+        $mailshareDesc->{'mailshare_cyrus_partition'} = $self->{'parent'}->getDesc('domain_name');
+        $mailshareDesc->{'mailshare_cyrus_partition'} =~ s/\./_/g;
+        $mailshareDesc->{'mailshare_cyrus_partition'} =~ s/-/_/g;
     }
 
-    # Gestion du quota
-    $self->{"properties"}->{"mailshare_mailbox_quota"} = $dbMailShareDesc->{"mailshare_quota"}*1024;
+    # Cyrus quota
+    $mailshareDesc->{'mailshare_cyrus_quota'} = $mailshareDesc->{'mailshare_quota'}*1024;
 
-    # Gestion des sous-répertoires de la BAL a créer
-    if( defined($shareMailboxDefaultFolders) ) {
-        foreach my $folderTree ( split( ',', $shareMailboxDefaultFolders ) ) {
+    # BAL sub-folders
+    if( defined($OBM::Parameters::common::shareMailboxDefaultFolders) ) {
+        foreach my $folderTree ( split( ',', $OBM::Parameters::common::shareMailboxDefaultFolders ) ) {
             if( $folderTree !~ /(^[",]$)|(^$)/ ) {
-                my $folderName = $dbMailShareDesc->{"mailshare_name"};
+                my $folderName = $mailshareDesc->{'mailshare_name'};
                 foreach my $folder ( split( '/', $folderTree ) ) {
                     $folder =~ s/^\s+//;
 
                     $folderName .= '/'.$folder;
                     if( !$singleNameSpace ) {
-                        push( @{$self->{"properties"}->{mailbox_folders}}, $folderName.'@'.$domainDesc->{domain_name} );
+                        push( @{$mailshareDesc->{mailbox_folders}}, $folderName.'@'.$self->{'parent'}->getDesc('domain_name') );
                     }else {
-                        push( @{$self->{"properties"}->{mailbox_folders}}, $folderName );
+                        push( @{$mailshareDesc->{mailbox_folders}}, $folderName );
                     }
                 }
             }
         }
     }
 
-    # On ajoute le serveur de mail associé
-    if( defined($localServerIp) ) {
-        $self->{"properties"}->{"mailShare_mailLocalServer"} = "lmtp:".$localServerIp.":24";
-    }
+    $self->{'entityDesc'} = $mailshareDesc;
 
-    # Gestion du serveur de mail
-    $self->{"properties"}->{"mailShare_server"} = $dbMailShareDesc->{"mailserver_host_id"};
+    $self->_log( 'chargement : '.$self->getDescription(), 1 );
 
-
-    # On positionne l'identifiant du domaine de l'entité
-    $self->{"domainId"} = $domainDesc->{"domain_id"};
-
-    # Si nous ne sommes pas en mode incrémental, on charge aussi les liens de
-    # cette entité
-    if( $self->isLinks() ) {
-        $self->getEntityLinks( $domainDesc );
-    }
-
-
-    return 1;
+    return 0;
 }
 
 
-sub updateDbEntity {
+sub setLinks {
     my $self = shift;
+    my( $links ) = @_;
 
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
+    if( !defined($links) || ref($links) ne 'HASH' ) {
+        $self->_log( 'pas de liens définis', 3 );
         return 0;
     }
 
-    my $dbEntry = $self->{"mailShareDbDesc"};
-    if( !defined($dbEntry) ) {
-        return 0;
-    }
+    $self->{'entityDesc'}->{'mailshare_acl'} = $links;
 
-    $self->_log( 'MAJ de la boite a lettre partagee '.$self->getEntityDescription().' dans les tables de production', 1 );
-
-
-    # Champs de la BD qui ne sont pas mis à jour car champs références
-    my $exceptFields = '^(mailshare_id)$';
-
-    # MAJ de l'entité dans la table de production
-    my @updateFields;
-    my @whereFields;
-    while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
-        if( $columnName =~ /$exceptFields/ ) {
-            push( @whereFields, $columnName."=".$dbHandler->quote($columnValue) );
-        }else {
-            push( @updateFields, $columnName."=".$dbHandler->quote($columnValue) );
-        }
-    }
-
-    my $query = 'UPDATE P_MailShare SET '.join( ', ', @updateFields ).' WHERE '.join( ' AND ', @whereFields );
-    my $queryResult;
-    my $result = $dbHandler->execQuery( $query, \$queryResult );
-
-    if( !defined($result) ) {
-        $self->_log( 'probleme a la mise a jour de la boite a lettres partagee', 2 );
-        return 0;
-
-    }elsif( $result == 0 ) {
-        my @fields;
-        my @fieldsValues;
-        while( my( $columnName, $columnValue ) = each(%{$dbEntry}) ) {
-            push( @fields, $columnName );
-            push( @fieldsValues, $dbHandler->quote($columnValue) );
-        }
-
-        $query = 'INSERT INTO P_MailShare ('.join( ', ', @fields ).') VALUES ('.join( ', ', @fieldsValues ).')';
-        $result = $dbHandler->execQuery( $query, \$queryResult );
-        if( !defined($result) ) {
-            $self->_log( 'probleme a la mise a jour de la boite a lettre partagee', 2 );
-            return 0;
-
-        }elsif( $result != 1 ) {
-            $self->_log( 'probleme a la mise a jour de la boite a lettre partagee : boite a lettre partagee inseree '.$result.' fois dans les tables de production !', 2 );
-            return 0;
-        }
-    }
-
-    $self->_log( 'MAJ des tables de production reussie', 2 );
-
-    return 1;
+    return 0;
 }
 
 
-sub updateDbEntityLinks {
+# Needed
+sub getDescription {
     my $self = shift;
-    my $queryResult;
+    my $mailshareDesc = $self->{'entityDesc'};
 
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
-        return 0;
-    }
-
-    $self->_log( 'MAJ des liens de la boite a lettre partagee '.$self->getEntityDescription().' dans les tables de production', 1 );
-
-    # On supprime les liens actuels de la table de production
-    my $query = "DELETE FROM P_EntityRight WHERE entityright_entity_id=".$self->{"objectId"}." AND entityright_entity='".$self->{"entityRightType"}."'";
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-
-    # On copie les nouveaux droits
-    $query = "INSERT INTO P_EntityRight SELECT * FROM EntityRight WHERE entityright_entity='".$self->{"entityRightType"}."' AND entityright_entity_id=".$self->{"objectId"};
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-
-    return 1;
-}
-
-
-sub getEntityLinks {
-    my $self = shift;
-    my( $domainDesc ) = @_;
-
-    $self->_getEntityMailShareAcl( $domainDesc );
-
-    # On précise que les liens de l'entité sont aussi à mettre à jour.
-    $self->{"links"} = 1;
-
-    return 1;
-}
-
-
-sub getEntityDescription {
-    my $self = shift;
-    my $entry = $self->{"properties"};
-    my $description = "";
-
-
-    if( defined($entry->{mailshare_name}) ) {
-        $description .= "identifiant '".$entry->{mailshare_name}."'";
-    }
-
-    if( defined($entry->{mailshare_domain}) ) {
-        $description .= ", domaine '".$entry->{mailshare_domain}."'";
-    }
-
-    if( ($description ne "") && defined($self->{type}) ) {
-        $description .= ", type '".$self->{type}."'";
-    }
-
-    if( $description ne "" ) {
-        return $description;
-    }
-
-    if( defined($self->{objectId}) ) {
-        $description .= "ID BD '".$self->{objectId}."'";
-    }
-
-    if( defined($self->{type}) ) {
-        $description .= ",type '".$self->{type}."'";
-    }
+    my $description = 'mailshare d\'ID \''.$mailshareDesc->{'mailshare_id'}.'\', nom \''.$mailshareDesc->{'mailshare_name'}.'\'';
 
     return $description;
 }
 
 
-sub _getEntityMailShareAcl {
+# Needed
+sub getDesc {
     my $self = shift;
-    my( $domainDesc ) = @_;
-    my $mailShareId = $self->{'objectId'};
+    my( $desc ) = @_;
 
-    if( !$self->{'properties'}->{'mailshare_mail_perms'} ) {
-        $self->{'properties'}->{'user_mailshare_acl'} = undef;
-
-    }else {
-        my $entityType = $self->{'entityRightType'};
-        my %rightDef;
-
-
-        my $userObmTable = 'UserObm';
-        my $entityRightTable = 'EntityRight';
-        if( $self->getDelete() ) {
-            $userObmTable = 'P_'.$userObmTable;
-            $entityRightTable = 'P_'.$entityRightTable;
-        }
-
-        $rightDef{'read'}->{'compute'} = 1;
-        $rightDef{"read"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login
-                FROM ".$userObmTable." i, ".$entityRightTable." j
-                WHERE i.userobm_id=j.entityright_consumer_id
-                    AND i.userobm_archive=0
-                    AND i.userobm_mail_perms=1
-                    AND j.entityright_write=0
-                    AND j.entityright_read=1
-                    AND j.entityright_entity_id=".$mailShareId."
-                    AND j.entityright_entity='".$entityType."'";
-
-        $rightDef{'writeonly'}->{'compute'} = 1;
-        $rightDef{"writeonly"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login
-                FROM ".$userObmTable." i, ".$entityRightTable." j
-                WHERE i.userobm_id=j.entityright_consumer_id
-                    AND i.userobm_archive=0
-                    AND i.userobm_mail_perms=1
-                    AND j.entityright_write=1
-                    AND j.entityright_read=0
-                    AND j.entityright_entity_id=".$mailShareId."
-                    AND j.entityright_entity='".$entityType."'";
-
-        $rightDef{'write'}->{'compute'} = 1;
-        $rightDef{"write"}->{"sqlQuery"} = "SELECT i.userobm_id, i.userobm_login
-                FROM ".$userObmTable." i, ".$entityRightTable." j
-                WHERE i.userobm_id=j.entityright_consumer_id
-                    AND i.userobm_archive=0
-                    AND i.userobm_mail_perms=1
-                    AND j.entityright_write=1
-                    AND j.entityright_read=1
-                    AND j.entityright_entity_id=".$mailShareId."
-                    AND j.entityright_entity='".$entityType."'";
-
-        $rightDef{'admin'}->{'compute'} = 1;
-        $rightDef{'admin'}->{'sqlQuery'} = 'SELECT i.userobm_id, i.userobm_login
-                FROM '.$userObmTable.' i, '.$entityRightTable.' j
-                WHERE i.userobm_id=j.entityright_consumer_id
-                    AND i.userobm_archive=0
-                    AND i.userobm_mail_perms=1
-                    AND j.entityright_admin=1
-                    AND j.entityright_entity_id='.$mailShareId.'
-                    AND j.entityright_entity=\''.$entityType.'\'';
-
-        $rightDef{'public'}->{'compute'} = 0;
-        $rightDef{"public"}->{"sqlQuery"} = "SELECT entityright_read, entityright_write
-                FROM ".$entityRightTable."
-                WHERE entityright_entity_id=".$mailShareId."
-                    AND entityright_entity='".$entityType."'
-                    AND entityright_consumer_id=0";
-
-        # On recupere la definition des ACL
-        $self->{'properties'}->{'user_mailshare_acl'} = &OBM::toolBox::getEntityRight( $domainDesc, \%rightDef, $mailShareId );
+    if( $desc && !ref($desc) ) {
+        return $self->{'entityDesc'}->{$desc};
     }
 
-    return 1;
+    return undef;
 }
 
 
-sub getLdapDnPrefix {
+# Needed
+sub getDomainId {
     my $self = shift;
-    my $dnPrefix = undef;
 
-    if( defined($self->{"dnPrefix"}) && defined($self->{"properties"}->{$self->{"dnValue"}}) ) {
-        $dnPrefix = $self->{"dnPrefix"}."=".$self->{"properties"}->{$self->{"dnValue"}};
+    return $self->{'entityDesc'}->{'mailshare_domain_id'};
+}
+
+
+# Needed
+sub getId {
+    my $self = shift;
+
+    return $self->{'entityDesc'}->{'mailshare_id'};
+}
+
+
+# Needed by : LdapEngine
+sub getLdapServerId {
+    my $self = shift;
+
+    if( defined($self->{'parent'}) ) {
+        return $self->{'parent'}->getLdapServerId();
     }
 
-    return $dnPrefix;
+    return undef;
+}
+
+
+# Needed by : LdapEngine
+sub setParent {
+    my $self = shift;
+    my( $parent ) = @_;
+
+    if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
+        $self->_log( 'description du domaine parent incorrecte', 3 );
+        return 1;
+    }
+
+    $self->{'parent'} = $parent;
+
+    return 0;
+}
+
+
+# Needed by : LdapEngine
+sub _getParentDn {
+    my $self = shift;
+    my $parentDn = undef;
+
+    if( defined($self->{'parent'}) ) {
+        $parentDn = $self->{'parent'}->getDnPrefix($self);
+    }
+
+    return $parentDn;
+}
+
+
+
+# Needed by : LdapEngine
+sub getDnPrefix {
+    my $self = shift;
+    my $rootDn;
+    my @dnPrefixes;
+
+    if( !($rootDn = $self->_getParentDn()) ) {
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        return undef;
+    }
+
+    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
+        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'mailshare_name'}.','.$rootDn->[$i] );
+        $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
+    }
+
+    return \@dnPrefixes;
+}
+
+
+# Needed by : LdapEngine
+sub getCurrentDnPrefix {
+    my $self = shift;
+    my $rootDn;
+    my @dnPrefixes;
+
+    if( !($rootDn = $self->_getParentDn()) ) {
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        return undef;
+    }
+
+    my $currentMailshareName = $self->{'entityDesc'}->{'mailshare_name_current'};
+    if( !$currentMailshareName ) {
+        $currentMailshareName = $self->{'entityDesc'}->{'mailshare_name'};
+    }
+
+    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
+        push( @dnPrefixes, 'cn='.$currentMailshareName.','.$rootDn->[$i] );
+        $self->_log( 'DN de l\'entité : '.$dnPrefixes[$i], 4 );
+    }
+
+    return \@dnPrefixes;
+}
+
+
+sub _getLdapObjectclass {
+    my $self = shift;
+    my ($objectclass, $deletedObjectclass) = @_;
+
+    return $self->{'objectclass'};
 }
 
 
 sub createLdapEntry {
     my $self = shift;
-    my ( $ldapEntry ) = @_;
-    my $entry = $self->{'properties'};
+    my ( $entryDn, $entry ) = @_;
 
-    # Les parametres necessaires
-    if( $entry->{'mailshare_name'} ) {
-        $ldapEntry->add(
-            objectClass => $self->{'objectclass'},
-            cn => $entry->{'mailshare_name'}
-        );
+    if( !$entryDn ) {
+        $self->_log( 'DN non défini', 3 );
+        return 1;
+    }
 
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        $self->_log( 'entrée LDAP incorrecte', 3 );
+        return 1;
+    }
+
+    $entry->add(
+        objectClass => $self->_getLdapObjectclass(),
+        cn => $self->{'entityDesc'}->{'mailshare_name'}
+    );
+
+    if( $self->{'entityDesc'}->{'mailshare_ldap_mailbox'} ) {
+        $entry->add( mailBox => $self->{'entityDesc'}->{'mailshare_ldap_mailbox'} );
+    }
+
+    if( $self->{'entityDesc'}->{'mailshare_description'} ) {
+        $entry->add( description => $self->{'entityDesc'}->{'mailshare_description'} );
+    }
+
+    if( $self->{'entityDesc'}->{'mailshare_mail_server'} ) {
+        $entry->add( mailBoxServer => $self->{'entityDesc'}->{'mailshare_mail_server'} );
+    }
+
+    if( $self->{'email'} ) {
+        $entry->add( mail => $self->{'email'} );
+    }
+
+    if( $self->{'emailAlias'} ) {
+        $entry->add( mailAlias => $self->{'emailAlias'} );
+    }
+
+    if( $self->{'entityDesc'}->{'mailshare_mail_perms'} ) {
+        $entry->add( mailAccess => 'PERMIT' );
     }else {
-        return 0;
+        $entry->add( mailAccess => 'REJECT' );
     }
 
-    if( $entry->{'mailshare_mailbox'} ) {
-        $ldapEntry->add( mailBox => $entry->{'mailshare_mailbox'} );
+    # Le domaine OBM
+    if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
+        $entry->add( obmDomain => $domainName );
     }
 
-    if( $entry->{'mailshare_description'} ) {
-        $ldapEntry->add( description => $entry->{'mailshare_description'} );
-    }
-
-    # Le serveur de BAL local
-    if( $entry->{'mailShare_mailLocalServer'} ) {
-        $ldapEntry->add( mailBoxServer => $entry->{'mailShare_mailLocalServer'} );
-    }
-
-    # Les adresses mails
-    if( $entry->{'email'} ) {
-        $ldapEntry->add( mail => $entry->{'email'} );
-    }
-
-    # Les adresses mails secondaires
-    if( $entry->{'emailAlias'} ) {
-        $ldapEntry->add( mailAlias => $entry->{'emailAlias'} );
-    }
-
-    # L'acces mail
-    if( $entry->{'mailshare_mail_perms'} ) {
-        $ldapEntry->add( mailAccess => 'PERMIT' );
-    }else {
-        $ldapEntry->add( mailAccess => 'REJECT' );
-    }
-
-    # Le domaine
-    if( $entry->{'mailshare_domain'} ) {
-        $ldapEntry->add( obmDomain => $entry->{'mailshare_domain'} );
-    }
-
-
-    return 1;
-}
-
-
-sub updateLdapEntryDn {
-    my $self = shift;
-    my( $ldapEntry ) = @_;
-    my $update = 0;
-
-
-    if( !defined($ldapEntry) ) {
-        return 0;
-    }
-
-
-    return $update;
+    return 0;
 }
 
 
 sub updateLdapEntry {
     my $self = shift;
-    my( $ldapEntry, $objectclassDesc ) = @_;
-    my $entry = $self->{"properties"};
+    my( $entry, $objectclassDesc ) = @_;
+    my $update = 0;
 
-    require OBM::Entities::entitiesUpdateState;
-    my $update = OBM::Entities::entitiesUpdateState->new();
-
-
-    if( !defined($ldapEntry) ) {
-        return undef;
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        return $update;
     }
 
 
-    # Le nom de la BAL
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailshare_mailbox"}, $ldapEntry, "mailbox" ) ) {
-        $update->setUpdate();
-    }
+    if( $self->getUpdateEntity() ) {
+        # Vérification des objectclass
+        my @deletedObjectclass;
+        my $currentObjectclass = $self->_getLdapObjectclass( $entry->get_value('objectClass', asref => 1), \@deletedObjectclass );
+        if( $self->_modifyAttrList( $currentObjectclass, $entry, 'objectClass' ) ) {
+            $update = 1;
+        }
 
-    # La description
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailshare_description"}, $ldapEntry, "description" ) ) {
-        $update->setUpdate();
-    }
+        if( $#deletedObjectclass >= 0 ) {
+            # Pour les schémas LDAP supprimés, on détermine les attributs à
+            # supprimer.
+            # Uniquement ceux qui ne sont pas utilisés par d'autres objets.
+            my $deleteAttrs = $self->_diffObjectclassAttrs(\@deletedObjectclass, $currentObjectclass, $objectclassDesc);
 
-    # Le cas des alias mails
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"email"}, $ldapEntry, "mail" ) ) {
-        $update->setUpdate();
-    }
+            for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
+                if( $self->_modifyAttrList( undef, $entry, $deleteAttrs->[$i] ) ) {
+                    $update = 1;
+                }
+            }
+        }
 
-    # Le cas des alias mails secondaires
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"emailAlias"}, $ldapEntry, "mailAlias" ) ) {
-        $update->setUpdate();
-    }
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'mailshare_ldap_mailbox'}, $entry, 'mailbox' ) ) {
+            $update = 1;
+        }
 
-    # L'acces au mail
-    if( $entry->{"mailshare_mail_perms"} && (&OBM::Ldap::utils::modifyAttr( "PERMIT", $ldapEntry, "mailAccess" )) ) {
-        $update->setUpdate();
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'mailshare_description'}, $entry, 'description' ) ) {
+            $update = 1;
+        }
 
-    }elsif( !$entry->{"mailshare_mail_perms"} && (&OBM::Ldap::utils::modifyAttr( "REJECT", $ldapEntry, "mailAccess" )) ) {
-        $update->setUpdate();
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'mailshare_mail_server'}, $entry, 'mailBoxServer' ) ) {
+            $update = 1;
+        }
 
-    }
+        if( $self->_modifyAttr( $self->{'email'}, $entry, 'mail' ) ) {
+            $update = 1;
+        }
 
-    # Le serveur de BAL local
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailShare_mailLocalServer"}, $ldapEntry, "mailBoxServer" ) ) {
-        $update->setUpdate();
-    }
+        if( $self->_modifyAttr( $self->{'emailAlias'}, $entry, 'mailAlias' ) ) {
+            $update = 1;
+        }
 
-    # Le domaine
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"mailshare_domain"}, $ldapEntry, "obmDomain" ) ) {
-        $update->setUpdate();
-    }
+        if( $self->{'entityDesc'}->{'mailshare_mail_perms'} && $self->_modifyAttr( 'PERMIT', $entry, 'mailAccess' ) ) {
+            $update = 1;
+        }elsif( !$self->{'entityDesc'}->{'mailshare_mail_perms'} && $self->_modifyAttr( 'REJECT', $entry, 'mailAccess' ) ) {
+            $update = 1;
+        }
 
-
-    if( $self->isLinks() ) {
-        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
-            $update->setUpdate();
+        if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
+            if( $self->_modifyAttr( $domainName, $entry, 'obmDomain' ) ) {
+                $update = 1;
+            }
         }
     }
 
-
     return $update;
 }
 
 
-sub updateLdapEntryLinks {
+# Needed
+sub isMailAvailable {
     my $self = shift;
-    my( $ldapEntry ) = @_;
-    my $update = 0;
 
-    
-    if( !defined($ldapEntry) ) {
-        return 0;
+    if( defined($self->{'parent'}) && !$self->{'parent'}->isGlobal() ) {
+        return 1;
     }
 
-
-    return $update;
+    return 0;
 }
 
 
+# Needed : cyrusEngine
 sub isMailActive {
     my $self = shift;
-    my $entryProp =  $self->{"properties"};
 
-    return $entryProp->{mailshare_mail_perms};
+    return $self->{'entityDesc'}->{'mailshare_mail_perms'};
 }
 
 
-sub getMailServerId {
-    my $self = shift;
-    my $mailServerId = undef;
-
-    $mailServerId = $self->{"properties"}->{"mailShare_server"};
-
-    return $mailServerId;
-}
-
-
-sub getMailboxPrefix {
-    my $self = shift;
-
-    return "";
-}
-
-
+# Needed : cyrusEngine
 sub getMailboxName {
     my $self = shift;
+    my( $which ) = @_;
     my $mailShareName = undef;
 
-    # Pour l'instant le seul moyen de mettre en BD un mailshare sans l'activer
-    # est de l'insérer avec un serveur mail à NULL. Pour ne pas que ce soit une
-    # erreur pour l'automate, on conditionne le nom de la BAL au fait que le
-    # droit mail est actif car dans ce cas là, ce n'est qu'un warning pour
-    # l'automate
-    if( $self->isMailActive() ) {
-        $mailShareName = $self->{"properties"}->{"mailshare_mailbox_name"};
+    if( lc($which) =~ /^new$/ ) {
+        $mailShareName = $self->{'entityDesc'}->{'mailshare_cyrus_mailbox'};
+    }elsif( lc($which) =~ /^current$/ ) {
+        $mailShareName = $self->{'entityDesc'}->{'current_mailshare_cyrus_mailbox'};
     }
 
     return $mailShareName;
 }
 
 
-sub getMailboxPartition {
+# Needed : cyrusEngine
+sub getMailServerId {
     my $self = shift;
-    my $mailSharePartition = undef;
 
-    $mailSharePartition = $self->{"properties"}->{"mailShare_partition"};
-
-    return $mailSharePartition;
+    return $self->{'entityDesc'}->{'mailshare_mail_server_id'};
 }
 
 
-sub getMailboxSieve {
+# Needed : cyrusEngine
+sub getMailboxPrefix {
     my $self = shift;
 
-    return $self->{"sieve"};
+    return '';
 }
 
 
+# Needed : cyrusEngine
 sub getMailboxQuota {
     my $self = shift;
-    my $mailShareQuota = undef;
 
-    $mailShareQuota = $self->{"properties"}->{"mailshare_mailbox_quota"};
-
-    return $mailShareQuota;
+    return $self->{'entityDesc'}->{'mailshare_cyrus_quota'};
 }
 
 
+# Needed : cyrusEngine
 sub getMailboxAcl {
     my $self = shift;
-    my $mailShareAcl = undef;
+    my $mailBoxAcl = undef;
 
     if( !$self->getArchive() && $self->isMailActive() ) {
-        $mailShareAcl = $self->{"properties"}->{"user_mailshare_acl"};
+        $mailBoxAcl = $self->{'entityDesc'}->{'mailshare_acl'};
     }
 
-    return $mailShareAcl;
+    return $mailBoxAcl;
+}
+
+
+# Needed : cyrusEngine
+sub getMailboxPartition {
+    my $self = shift;
+
+    return $self->{'entityDesc'}->{'mailshare_cyrus_partition'};
+}
+
+
+# Needed : cyrusEngine
+sub getMailboxDefaultFolders {
+    my $self = shift;
+
+    return $self->{'entityDesc'}->{'mailbox_folders'};
 }

@@ -6,305 +6,241 @@ $debug = 1;
 
 use 5.006_001;
 require Exporter;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 use strict;
 
-use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
-require Net::LDAP;
-require Net::LDAP::Entry;
-require OBM::toolBox;
-require OBM::Tools::perlUtils;
-require OBM::Tools::commonMethods;
-require OBM::Entities::obmRoot;
-require OBM::Entities::obmDomainRoot;
-require OBM::Entities::obmNode;
+use OBM::Tools::commonMethods qw(
+        _log
+        dump
+        );
+use OBM::Ldap::utils qw(
+        _modifyAttr
+        );
 
 
 sub new {
-    my $self = shift;
-    my( $domainList ) = @_;
+    my $class = shift;
 
-    # Definition des attributs de l'objet
-    my %ldapEngineAttr = (
-        ldapStruct => undef,
-        domainList => undef,
-        typeDesc => undef,
-        ldapConn => {
-            ldapServer => undef,
-            ldapUser => undef,
-            ldapUserDn => undef,
-            ldapPasswd => undef,
-            conn => undef
-        },
-        objectclassDesc => undef
-    );
+    my $self = bless { }, $class;
 
-
-    if( !defined($domainList) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: liste des domaines OBM non definie", "W", 1 );
+    require OBM::Parameters::common;
+    if( !$OBM::Parameters::common::obmModules->{'ldap'} ) {
+        $self->_log( 'module OBM-LDAP désactivé, moteur non démarré', 3 );
         return undef;
-    }else {
-        $ldapEngineAttr{"domainList"} = $domainList;
     }
 
-    $ldapEngineAttr{"ldapStruct"} = &OBM::Tools::perlUtils::cloneStruct($OBM::Parameters::ldapConf::ldapStruct),
-    $ldapEngineAttr{"typeDesc"} = $OBM::Parameters::ldapConf::attributeDef;
-
-    bless( \%ldapEngineAttr, $self );
-}
-
-
-sub init {
-    my $self = shift;
-    my( $checkLdap ) = @_;
-
-    if( !defined($checkLdap) ) {
-        $checkLdap = 1;
+    require OBM::Ldap::ldapServers;
+    if( !($self->{'ldapservers'} = OBM::Ldap::ldapServers->instance()) ) {
+        $self->_log( 'initialisation du gestionnaire de serveur LDAP impossible', 3 );
+        return undef;
     }
 
-    if( !$OBM::Parameters::common::obmModules->{"ldap"} ) {
-        return 0;
-    }
+    $self->{'currentEntity'} = undef;
+    $self->{objectclassDesc} = undef;
 
-    &OBM::toolBox::write_log( "[Ldap::ldapEngine]: initialisation du moteur", "W" );
-
-    # Creation de l'arbre
-    $self->_initTree( $self->{"ldapStruct"}, undef, undef );
-
-    # Initialisation des paramètres de connexions LDAP
-    $self->{"ldapConn"}->{"ldapServer"} = $self->{"domainList"}->[0]->{"ldap_admin_server"};
-    $self->{"ldapConn"}->{"ldapUser"} = $self->{"domainList"}->[0]->{"ldap_admin_login"};
-
-    my $ldapUserRdn = $self->_makeRdn( { node_type => $OBM::Parameters::ldapConf::SYSTEMUSERS, name => $self->{"ldapConn"}->{"ldapUser"} } );
-    $self->{"ldapConn"}->{"ldapUserDn"} = $ldapUserRdn.",".$self->_findTypeParentDn( undef, $OBM::Parameters::ldapConf::SYSTEMUSERS, 0 );
-    $self->{"ldapConn"}->{"ldapPasswd"} = $self->{"domainList"}->[0]->{"ldap_admin_passwd"};
-
-    # Etabli la connexion à l'annuaire
-    if( !$self->_connectLdapSrv() ) {
-        return 0;
-    }
-
-    if( $checkLdap ) {
-        # On vérifie l'arboréscence
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: verification de l'arborescence de l'annuaire LDAP", "W" );
-        if( !$self->checkLdapTree( $self->{"ldapStruct"} ) ) {
-            $self->DESTROY();
-            return 0;
-        }
-    }
-
-    return 1;
+    return $self;
 }
 
 
 sub DESTROY {
     my $self = shift;
 
-    &OBM::toolBox::write_log( "[Ldap::ldapEngine]: arret du moteur", "W" );
+    $self->_log( 'suppression de l\'objet', 4 );
 
-    return $self->_disconnectLdapSrv();
+    $self->{'ldapservers'} = undef;
+    $self->{'currentEntity'} = undef;
+    $self->{objectclassDesc} = undef;
 }
 
 
-sub _connectLdapSrv {
+sub update {
     my $self = shift;
-    my( $ldapConn ) = @_;
-    my $ldapStruct = $self->{"ldapStruct"};
+    my( $entity ) = @_;
 
-    if( !defined($ldapConn) ) {
-        $ldapConn = $self->{"ldapConn"};
+
+    if( !defined($entity) ) {
+        $self->_log( 'entité non définie', 3 );
+        return 1;
+    }elsif( !ref($entity) ) {
+        $self->_log( 'entité incorrecte', 3 );
+        return 1;
+    }
+    $self->{'currentEntity'} = $entity;
+
+
+    # Obtention des DNs de l'entité mise à jour
+    my $updateEntityDNs = $entity->getDnPrefix();
+
+    # Obtention des DNs de l'entité avant mise à jour
+    my $currentEntityDNs = $entity->getCurrentDnPrefix();
+
+    if( $#{$updateEntityDNs} != $#{$currentEntityDNs} ) {
+        $self->_log( 'Problème avec les DN de l\'entité : '.$entity->getDescription(), 1 );
+        return 3;
     }
 
-    if( !defined($ldapConn->{"ldapServer"}) || !defined($ldapConn->{"ldapUserDn"}) || !defined($ldapConn->{"ldapPasswd"}) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: pas d'information de connexion a l'annuaire LDAP", "W" );
-        return 0;
-    }
-
-
-    &OBM::toolBox::write_log( "[Ldap::ldapEngine]: connexion a l'annuaire LDAP '".$ldapConn->{"ldapServer"}."'", "W" );
-
-    $ldapConn->{"conn"} = Net::LDAP->new(
-        $ldapConn->{"ldapServer"},
-        port => "389",
-        debug => "0",
-        timeout => "60",
-        version => "3"
-    ) or &OBM::toolBox::write_log( "[Ldap::ldapEngine]: echec de connexion a LDAP : $@", "W" ) && return 0;
-
-    if( !defined($ldapConn->{"conn"}) ) {
-        return 0;
-    }
-
-    &OBM::toolBox::write_log( "[Ldap::ldapEngine]: connexion a l'annuaire en tant que '".$ldapConn->{"ldapUserDn"}."'", "W" );
-
-    my $errorCode = $ldapConn->{"conn"}->bind(
-        $ldapConn->{"ldapUserDn"},
-        password => $ldapConn->{"ldapPasswd"}
-    );
-
-    if( $errorCode->code ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: echec de connexion : ".$errorCode->error, "W" );
-        return 0;
-    }else {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: connexion a l'annuaire LDAP etablie", "W" );
-    }
-
-    return 1;
-}
-
-
-sub _disconnectLdapSrv {
-    my $self = shift;
-    my( $ldapConn ) = @_;
-
-    if( !defined($ldapConn) ) {
-        $ldapConn = $self->{"ldapConn"};
-    }
-
-    if( defined($ldapConn->{"conn"}) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: deconnexion de l'annuaire LDAP '".$ldapConn->{"ldapServer"}."'", "W" );
-        $ldapConn->{"conn"}->unbind();
-    }
-
-    return 1;
-}
-
-
-sub _initTree {
-    my $self = shift;
-    my( $ldapStruct, $parentDn, $domainId ) = @_;
-
-    if( !defined($domainId) ) {
-        # Si le domaine du noeud n'est pas transmit
-        $domainId = 0;
-    }elsif( $ldapStruct->{"domain_id"} ) {
-        # Si le noeud est déjà asigné à un domaine
-        $domainId = $ldapStruct->{"domain_id"};
-    }
-
-
-    # On initialise le noeud courant
-    $ldapStruct->{"rdn"} = $self->_makeRdn( $ldapStruct );
-    $ldapStruct->{"dn"} = $ldapStruct->{"rdn"};
-    if( defined($parentDn) ) {
-        $ldapStruct->{"parentDn"} = $parentDn;
-        $ldapStruct->{"dn"} .= ",".$parentDn;
-    }
-    $ldapStruct->{"domain_id"} = $domainId;
-
-    &OBM::toolBox::write_log( "[Ldap::ldapEngine]: gestion du noeud de type '".$ldapStruct->{"node_type"}."' et de dn : ".$ldapStruct->{"dn"}, "W" );
-
-
-    # Création de l'objet adéquat
-    SWITCH: {
-        # Obtention de la description du domaine courrant
-        my $domainDesc = $self->_findDomainbyId($domainId);
-
-        if( $ldapStruct->{"node_type"} eq $ROOT ) {
-            my $object = OBM::Entities::obmRoot->new(1, 0);
-            $object->getEntity( $ldapStruct->{"name"}, $ldapStruct->{"description"}, $domainDesc );
-            $ldapStruct->{"object"} = $object;
-
-            last SWITCH;
+    for( my $i=0; $i<=$#{$updateEntityDNs}; $i++ ) {
+        my $updateLdapEntity = undef;
+        if( $updateEntityDNs->[$i] ne $currentEntityDNs->[$i] ) {
+            # Si le nouveau DN est différent de l'actuel, on cherche l'entité
+            # ayant le nouveau DN
+            $updateLdapEntity = $self->_searchLdapEntityByDN( $updateEntityDNs->[$i] );
+            if( defined($updateLdapEntity) && ($updateLdapEntity == 0) ) {
+                return 4;
+            }
         }
 
-        if( $ldapStruct->{"node_type"} eq $DOMAINROOT ) {
-            my $object = OBM::Entities::obmDomainRoot->new(1, 0);
-            $object->getEntity( $domainDesc );
-            $ldapStruct->{"object"} = $object;
-
-            last SWITCH;
+        # On cherche l'entité de DN courant
+        my $currentLdapEntity = $self->_searchLdapEntityByDN( $currentEntityDNs->[$i] );
+        if( defined($currentLdapEntity) && ($currentLdapEntity == 0) ) {
+            return 4;
         }
 
-        if( $ldapStruct->{"node_type"} eq $NODE ) {
-            my $object = OBM::Entities::obmNode->new(1, 0);
-            $object->getEntity( $ldapStruct->{"name"}, $ldapStruct->{"description"}, $domainDesc );
-            $ldapStruct->{"object"} = $object;
-
-            last SWITCH;
+        my $toDelete = 0;
+        if( $entity->getArchive() || $entity->getDelete() ) {
+            # Si l'entité est archivée ou à détruire, on la supprime de
+            # l'annuaire LDAP
+            $toDelete = 1;
         }
-    }
 
+        SWITCH: {
+            my $errorCode = 6;
 
-    # On cré les branches correspondants aux templates pour chacun des domaines
-    # sauf pour le domaine '0'
-    for( my $i=0; $i<=$#{$ldapStruct->{"template"}}; $i++ ) {
-        for( my $j=0; $j<=$#{$self->{"domainList"}}; $j++ ) {
-            if( $self->{"domainList"}->[$j]->{"meta_domain"} ) {
-                # On ne cré pas de structure pour les meta-domaines
-                next;
+            if( defined($currentLdapEntity) && defined($updateLdapEntity) && ($updateEntityDNs->[$i] ne $currentEntityDNs->[$i]) ) {
+                # Cas particulier, le DN actuel et le nouveau existent bien que
+                # différents...
+                # On ignore le DN actuel (qui peut correspondre en fait à un
+                # nouvel utilisateur dont le DN est le DN actuel de l'entité a
+                # renommer)
+                $self->_log( 'l\'ancien DN \''.$currentEntityDNs->[$i].'\' et le nouveau \''.$updateEntityDNs->[$i].'\' existent', 2 );
+                $self->_log( 'l\'ancien DN ne correspond plus à cette entité, on l\'ignore', 2 );
+                $currentLdapEntity = undef;
             }
 
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: creation de la structure pour le domaine '".$self->{"domainList"}->[$j]->{"domain_dn"}."'", "W" );
-            my $currentDomainBranch = &OBM::Tools::perlUtils::cloneStruct( $ldapStruct->{"template"}->[$i] );
+            if( defined($currentLdapEntity) && $toDelete ) {
+                # Suppression du DN actuel
+                if( $self->_deleteEntity( $currentLdapEntity ) ) {
+                    $self->( 'echec de suppression de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 3 );
+                    return $errorCode;
+                }
 
-            # On positionne le nom en fonction du domaine, afin de
-            # pouvoir créer le DN
-            $currentDomainBranch->{"name"} = $self->{"domainList"}->[$j]->{"domain_dn"};
-            $currentDomainBranch->{"domain_id"} = $self->{"domainList"}->[$j]->{"domain_id"};
+                last SWITCH;
+            }
 
-            push( @{$ldapStruct->{"branch"}}, $currentDomainBranch )
+            if( !defined($currentLdapEntity) && !defined($updateLdapEntity) && $toDelete ) {
+                # DN à supprimer et non existant dans l'annuaire
+                $self->_log( 'DN \''.$currentEntityDNs->[$i].'\' non présent dans l\'annuaire, suppression déjà effectuée', 2 );
+
+                last SWITCH;
+            }
+
+            if( !defined($currentLdapEntity) && !defined($updateLdapEntity) && !$toDelete ) {
+                # Création de l'entité de nouveau DN
+                if( $self->_createEntity( $updateEntityDNs->[$i] ) ) {
+                    $self->_log( 'echec de création du DN \''.$updateEntityDNs->[$i].'\'', 3 );
+                    return $errorCode;
+                }
+
+                last SWITCH;
+            }
+
+            if( defined($currentLdapEntity) && !$toDelete ) {
+                # Mise à jour de l'entité de DN actuel
+                if( $self->_updateEntity($currentLdapEntity) ) {
+                    $self->_log( 'echec de mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 3 );
+                    return $errorCode;
+                }
+
+                if( $self->_updateEntityDn($currentEntityDNs->[$i], $updateEntityDNs->[$i], $currentLdapEntity) ) {
+                    $self->_log( 'echec de mise à jour du DN de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 3 );
+                    return $errorCode;
+                }
+
+                last SWITCH;
+            }
+
+            if( defined($updateLdapEntity) && !$toDelete ) {
+                # Mise à jour de l'entité de nouveau DN
+                if( $self->_updateEntity($currentLdapEntity) ) {
+                    $self->_log( 'echec de mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$updateEntityDNs->[$i], 3 );
+                    return $errorCode;
+                }
+
+                last SWITCH;
+            }
+
+            $self->_log( 'problème de traitement de l\'entité '.$entity->getDescrption(), 1 );
+            return 5;
         }
     }
 
 
-    # On parcours les sous branches
-    for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
-        $self->_initTree( $ldapStruct->{"branch"}->[$i], $ldapStruct->{"dn"}, $ldapStruct->{"domain_id"} );
-    }
-
-    return 1;
+    return 0;
 }
 
 
-sub checkLdapTree {
+sub _searchLdapEntityByDN {
     my $self = shift;
-    my( $ldapStruct ) = @_;
-    my $type = $ldapStruct->{"node_type"};
+    my( $entityDn ) = @_;
 
-    if( !$self->{"typeDesc"}->{$type}->{"is_branch"} ) {
+    if( !$entityDn ) {
+        $self->_log( 'DN a chercher non défini ou incorrect', 3 );
+        return undef;
+    }
+
+    # Get LDAP server conn for this entity
+    my $ldapServerConn;
+    if( !($ldapServerConn = $self->{'ldapservers'}->getLdapServerConn($self->{'currentEntity'}->getLdapServerId())) ) {
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 2 );
+        return 2;
+    }
+
+    
+    $self->_log( 'Recherche du DN \''.$entityDn.'\'', 3 );
+
+    my $result = $ldapServerConn->search(
+        base => $entityDn,
+        scope => 'base',
+        filter => '(objectclass=*)'
+    );
+
+    if( $result->code == 32 ) {
+        # L'erreur 'No such object' n'est, dans ce cas, pas considérée comme
+        # une erreur
+        return undef;
+    }elsif( $result->is_error() ) {
+        $self->_log( 'problème lors de la recherche LDAP \''.$result->code.'\', '.$result->error, 3 );
         return 0;
     }
 
-    if( !defined($ldapStruct->{"object"}) ) {
-        return 0;
-    }
-
-    if( !defined($ldapStruct->{"dn"}) ) {
-        return 0;
-    }
-
-    $self->_doWork( $ldapStruct->{"parentDn"}, $ldapStruct->{"object"} );
-
-    # On parcours les sous branches
-    for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
-        if( !$self->checkLdapTree( $ldapStruct->{"branch"}->[$i] ) ) {
-            return 0;
-        }
-    }
-
-    return 1;
+    return $result->entry(0);
 }
 
 
-sub updateLdapEntity {
+sub _ldapUpdateEntity {
     my $self = shift;
-    my( $ldapEntry ) = @_;
+    my( $entry ) = @_;
 
-    if( !defined($self->{"ldapConn"}->{"conn"}) ) {
-        return 1;
-    }
-    my $ldapConn = $self->{"ldapConn"}->{"conn"};
-
-    if( !defined($ldapEntry) ) {
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
         return 1;
     }
 
-    my $result = $ldapEntry->update( $ldapConn );
+    # Get LDAP server conn for this entity
+    my $ldapServerConn;
+    if( !($ldapServerConn = $self->{'ldapservers'}->getLdapServerConn($self->{'currentEntity'}->getLdapServerId())) ) {
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 2 );
+        return 2;
+    }
+
+
+    my $result = $entry->update( $ldapServerConn );
 
     if( $result->is_error() ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: erreur LDAP : ".$result->code()." - ".$result->error(), "W" );
+        $self->_log( 'erreur LDAP à la mise à jour du DN '.$entry->dn().', '.$result->code().' - '.$result->error(), 3 );
+
+        if( $result->code() == 32 ) {
+            $self->_log( 'l\'objet père du DN '.$entry->dn().' n\'existe pas', 1 );
+        }
+
         return $result->code();
     }
 
@@ -312,350 +248,151 @@ sub updateLdapEntity {
 }
 
 
-sub deleteLdapEntity {
+sub _createEntity {
     my $self = shift;
-    my( $ldapEntry ) = @_;
+    my( $entityDn ) = @_;
 
-    if( !defined($self->{"ldapConn"}->{"conn"}) ) {
-        return 0;
-    }
-    my $ldapConn = $self->{"ldapConn"}->{"conn"};
-
-
-    if( !defined($ldapEntry) ) {
-        return 0;
+    if( !$entityDn ) {
+        $self->_log( 'DN de l\'entité a créer incorrect', 3 );
+        return 1;
     }
 
-    my $result = $ldapConn->delete( $ldapEntry->dn );
-
-    if( $result->is_error() ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: erreur : ".$result->code." - ".$result->error, "W" );
+    if( !ref($self->{'currentEntity'}) ) {
+        $self->_log( 'entité à mettre à jour incorrecte', 3 );
+        return 1;
     }
 
-    return 1;
+
+    $self->_log( 'création du DN \''.$entityDn.'\'', 2 );
+
+    require Net::LDAP::Entry;
+    my $entry = Net::LDAP::Entry->new();
+    if( $self->{'currentEntity'}->createLdapEntry($entityDn, $entry) ) {
+        $self->_log( 'problème à la création de l\'entrée LDAP de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+        return 1;
+    }
+
+    $entry->dn( $entityDn );
+
+    return $self->_ldapUpdateEntity( $entry );
 }
 
 
-sub findDn {
-    my $self = shift;
-    my( $dn ) = @_;
-
-    my $scope="base";
-    my $ldapFilter = "(objectclass=*)";
-    my $ldapConn = $self->{"ldapConn"}->{"conn"};
-
-    if( !defined($ldapConn) || !defined($dn) ) {
-        return undef;
-    }
-
-    my $result = $ldapConn->search(
-                    base => to_utf8( { -string => $dn, -charset => $defaultCharSet } ),   
-                    scope => $scope,
-                    filter => $ldapFilter
-                    );
-
-    if( !defined($result) ) {
-        return undef;
-
-    }elsif( ($result->code != 32) && $result->is_error() ) {
-        # L'erreur 'No such object' n'est, dans ce cas, pas considérée comme un
-        # erreur.
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: erreur: probleme lors d'une requête LDAP : ".$result->code." - ".$result->error, "W" );
-        return undef;
-
-    }elsif( $result->count != 1 ) {
-        return undef;
-
-    }
-
-    return $result->entry(0);
-}
-
-
-sub _findTypeParentDn {
-    my $self = shift;
-    my ( $ldapStruct, $type, $domainId ) = @_;
-
-    # Si aucune structure d'arbre LDAP n'est passée en paramètre, on part de la
-    # racine
-    if( !defined($ldapStruct) ) {
-        $ldapStruct = $self->{"ldapStruct"};
-    }
-
-    # Si le type demandé est de type 'branche' on stoppe le traitement
-    if( $self->{"typeDesc"}->{$type}->{"is_branch"} ) {
-        return 0;
-    }
-
-    if( defined($ldapStruct->{"data_type"}) && defined($ldapStruct->{"domain_id"}) && ($ldapStruct->{"domain_id"} == $domainId) ) {
-        for( my $i=0; $i<=$#{$ldapStruct->{"data_type"}}; $i++ ) {
-            if( $ldapStruct->{"data_type"}->[$i] eq $type ) {
-                return $ldapStruct->{"dn"};
-            }
-        }
-    }
-
-    if( exists($ldapStruct->{"branch"}) && defined($ldapStruct->{"branch"}) ) {
-        for( my $i=0; $i<=$#{$ldapStruct->{"branch"}}; $i++ ) {
-            my $parentDn = $self->_findTypeParentDn( $ldapStruct->{"branch"}->[$i], $type, $domainId );
-            if( defined($parentDn) ) {
-                return $parentDn;
-            }
-        }
-    }
-
-    return undef;
-}
-
-
-sub _makeRdn {
+sub _updateEntity {
     my $self = shift;
     my( $entry ) = @_;
 
-    return $self->{"typeDesc"}->{$entry->{"node_type"}}->{"dn_prefix"}."=".$entry->{"name"};
-}
-
-
-sub _findDomainbyId {
-    my $self = shift;
-    my( $domainId ) = @_;
-    my $domainDesc = undef;
-
-    if( !defined($domainId) || ($domainId !~ /^\d+$/) ) {
-        return undef;
-    }
-
-    for( my $i=0; $i<=$#{$self->{"domainList"}}; $i++ ) {
-        if( $self->{"domainList"}->[$i]->{"domain_id"} == $domainId ) {
-            $domainDesc = $self->{"domainList"}->[$i];
-            last;
-        }
-    }
-
-    return $domainDesc;
-}
-
-
-sub _doWork {
-    my $self = shift;
-    my( $parentDn, $object ) = @_;
-    my $returnCode = 1;
-    my( $newLdapEntry, $currentLdapEntry );
-
-    my $currentRdn = $object->getLdapDnPrefix( "current" );
-    my $currentDn = $currentRdn;
-    if( defined($currentDn) && defined($parentDn) ) {
-        $currentDn .= ",".$parentDn;
-    }
-    $currentLdapEntry = $self->findDn($currentDn);
-
-    my $newRdn = $object->getLdapDnPrefix( "new" );
-    my $newDn = $newRdn;
-    if( defined($newDn) && defined($parentDn) ) {
-        $newDn .= ",".$parentDn;
-    }
-    $newLdapEntry = $self->findDn($newDn);
-
-
-    SWITCH: {
-        if( defined($currentLdapEntry) && defined($newLdapEntry) && ($currentDn ne $newDn) ) {
-            # Cas particulier, le DN actuel et le nouveau existent bien que
-            # différents...
-            # On ignore le DN actuel (qui peut correspondre en fait à un nouvel
-            # utilisateur dont le DN est le DN actuel de l'entité a renommer)
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: les DN '".$currentDn."' et '".$newDn."' existent. Ignore le DN '".$currentDn."'", "W" );
-
-            $currentLdapEntry = undef;
-        }
-
-        if( defined($currentLdapEntry) && ($object->getDelete() || $object->getArchive()) ) {
-            # Suppression du DN actuel
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: suppression du noeud '".$currentDn."'", "W" );
-    
-            if( !$self->deleteLdapEntity($currentLdapEntry) ) {
-                return 0;
-            }
-        
-            last SWITCH;
-        }
-
-        if( !defined($currentLdapEntry) && !defined($newLdapEntry) && ($object->getDelete() || $object->getArchive()) ) {
-            # Noeud a supprimé non présent dans l'annuaire
-            &OBM::toolBox::write_log( "[Ldap::ldapEngine]: noeud '".$currentDn."' non présent dans l'annuaire. Suppression deja effectuee", "W" );
-
-            last SWITCH;
-        }
-
-        if( !defined($currentLdapEntry) && !defined($newLdapEntry) && !($object->getDelete() || $object->getArchive()) ) {
-            # Création de l'entité de DN nouveau
-            my $ldapEntry = Net::LDAP::Entry->new;
-            if( $object->createLdapEntry($ldapEntry) ) {
-                &OBM::toolBox::write_log( "[Ldap::ldapEngine]: creation du DN '".$newDn."'", "W" );
-
-                $ldapEntry->dn( to_utf8( { -string => $newDn, -charset => $defaultCharSet } ) );
-
-                if( $self->updateLdapEntity($ldapEntry) ) {
-                    return 0;
-                }
-            }else {
-                &OBM::toolBox::write_log( '[Ldap::ldapEngine]: probleme a la generation de la representation LDAP de l\'objet : '.$object->getEntityDescription(), 'W', 1 );
-                return 0;
-            }
-
-            last SWITCH;
-        }
-
-        if( defined($currentLdapEntry) && !($object->getDelete() || $object->getArchive()) ) {
-            # Mise à jour de l'entité de DN actuel
-
-            # Obtention de la description des classes d'objets
-            $self->_getObjectclassDesc( $currentLdapEntry );
-    
-            my $return = $object->updateLdapEntry($currentLdapEntry, $self->{objectclassDesc});
-            if( !defined($return) ) {
-                return 0;
-            }
-
-            if( $return->getUpdate() ) {
-                &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour du DN '".$currentDn."'", "W" );
-    
-                if( $self->updateLdapEntity($currentLdapEntry) ) {
-                    return 0;
-                }
-            }
-
-            if( $object->updateLdapEntryDn($currentLdapEntry) ) {
-                # Mise à jour du DN de l'entité vers le nouveau DN
-                &OBM::toolBox::write_log( "[Ldap::ldapEngine]: renommage du  DN '".$currentDn."', en '".$newDn."'", "W" );
-    
-                $currentLdapEntry->replace( deleteoldrdn => to_utf8( { -string => $currentDn, -charset => $defaultCharSet } ) );
-                $currentLdapEntry->changetype( "moddn" );
-                if( $self->updateLdapEntity($currentLdapEntry) ) {
-                    return 0;
-                }
-
-                $return->setUpdateLinks();
-            }
-
-            if( $return->getUpdateLinks() ) {
-                $returnCode = 2;
-            }
-
-            last SWITCH;
-        }
-
-        if( defined($newLdapEntry) && !($object->getDelete() || $object->getArchive()) ) {
-            # Mise à jour de l'entité de DN nouveau
-
-            # Obtention de la description des classes d'objets
-            $self->_getObjectclassDesc( $newLdapEntry );
-
-            my $return = $object->updateLdapEntry($newLdapEntry, $self->{objectclassDesc});
-            if( !defined($return) ) {
-                return 0;
-            }
-
-            if( $return->getUpdate() ) {
-                &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour du DN '".$newDn."'", "W" );
-                
-                if( $self->updateLdapEntity($newLdapEntry) ) {
-                    return 0;
-                }
-            }
-
-            if( $return->getUpdateLinks() ) {
-                $returnCode = 2;
-            }
-
-            last SWITCH;
-        }
-
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: description BD de : ".$object->getEntityDescription()." incorrecte.", "W" );
-        return 0;
-    }
-
-    return $returnCode;
-}
-
-
-sub update {
-    my $self = shift;
-    my( $object ) = @_;
-
-
-    if( !defined($object) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour d'un objet non definit - Operation annulee !", "W" );
-        return 0;
-    }elsif( !defined($object->{"type"}) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour d'un objet de type non définit - Operation annulee !", "W" );
-        return 0;
-    }elsif( !defined($object->{"domainId"}) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour d'un objet de domaine non definit - Operation annulee !", "W" );
-        return 0;
-    }
-
-    my $domainDesc = $self->_findDomainbyId($object->{"domainId"});
-    if( !defined($domainDesc) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: description du domaine '".$object->{"domainId"}."' non definit - Operation annulee !", "W" );
-        return 0;
-    }
-
-    my $objectRdn;
-    my $parentDn;
-    my $return = $self->getObjectParentDN( $object, \$parentDn );
-    if( $return == 1 ) {
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        $self->_log( 'entrée LDAP incorecte', 3 );
         return 1;
-    }elsif( $return ) {
-        return 0;
     }
 
-    my $returnCode = $self->_doWork( $parentDn, $object );
-    if( !$returnCode ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme de traitement de l'objet : ".$object->getEntityDescription()." - Operation annulee !", "W" );
-        return 0;
+    if( !ref($self->{'currentEntity'}) ) {
+        $self->_log( 'entité à mettre à jour incorrecte', 3 );
+        return 1;
     }
 
-    return $returnCode;
+    # Obtention de la description des classes d'objets LDAP
+    if( $self->_getObjectclassDesc( $entry ) ) {
+        $self->_log( 'problème à l\'obtention de la description des classes LDAP', 3 );
+        return 1;
+    }
+
+    if( $self->{'currentEntity'}->updateLdapEntry( $entry, $self->{objectclassDesc} ) ) {
+        $self->_log( 'mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$entry->dn(), 2 );
+        return $self->_ldapUpdateEntity( $entry );
+    }
+
+    # Pas de mises à jour en attente
+    return 0;
 }
 
 
-sub checkUserPasswd {
+sub _updateEntityDn {
     my $self = shift;
-    my( $object ) = @_;
+    my( $currentDn, $newDn, $entry ) = @_;
 
-    if( !defined($object) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour d'un objet non definit - Operation annulee !", "W" );
-        return 0;
-    }elsif( !defined($object->{"type"}) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour d'un objet de type non définit - Operation annulee !", "W" );
-        return 0;
-    }elsif( !defined($object->{"domainId"}) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: mise a jour d'un objet de domaine non definit - Operation annulee !", "W" );
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        $self->_log( 'entrée LDAP incorecte', 3 );
+        return 1;
+    }
+
+    if( ref($currentDn) || ref($newDn) || !$currentDn || !$newDn ) {
+        $self->_log( 'DN de '.$self->{'currentEntity'}->getDescription().' incorrects', 3 );
+        return 1;
+    }
+
+    if( $currentDn eq $newDn ) {
         return 0;
     }
 
-    my $domainDesc = $self->_findDomainbyId($object->{"domainId"});
-    if( !defined($domainDesc) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: description du domaine '".$object->{"domainId"}."' non definit - Operation annulee !", "W" );
-        return 0;
+    # Le DN de l'entité doit être mis à jour
+    my @newRdn = split( ',', $newDn );
+    my( $attr, $value ) = split( '=', $newRdn[0] );
+    
+    if( !$self->_modifyAttr( $value, $entry, $attr ) ) {
+        $self->_log( 'problème à la mise à jour du DN de '.$self->{'currentEntity'}->getDescription(), 3 );
+        return 1;
+    }
+    
+    $entry->add( newrdn => $newRdn[0] );
+    $entry->replace( deleteoldrdn => $currentDn );
+    $entry->changetype( 'moddn' );
+    if( $self->_ldapUpdateEntity( $entry ) ) {
+        $self->_log( 'problème à la mise à jour du DN de '.$self->{'currentEntity'}->getDescription().', DN '.$entry->dn(), 3 );
+        return 1;
     }
 
-    return 1;
+    $self->_log( 'mise à jour du DN de '.$self->{'currentEntity'}->getDescription().', nouveau DN '.$newDn, 2 );
+    return 0;
 }
 
 
+sub _deleteEntity {
+    my $self = shift;
+    my ( $entry ) = @_;
+
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        $self->_log( 'entrée LDAP incorecte', 3 );
+        return 1;
+    }
+
+    # Get LDAP server conn for this entity
+    my $ldapServerConn;
+    if( !($ldapServerConn = $self->{'ldapservers'}->getLdapServerConn($self->{'currentEntity'}->getLdapServerId())) ) {
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 2 );
+        return 1;
+    }
+
+    my $dn = $entry->dn();
+    my $result = $ldapServerConn->delete( $dn );
+
+    if( $result->is_error() ) {
+        $self->_log( 'erreur LDAP à la suppression de '.$self->{'currentEntity'}->getDescription().', DN '.$dn.' : '.$result->code().' - '.$result->error(), 3 );
+    }else {
+        $self->_log( 'suppression de l\'entité de '.$self->{'currentEntity'}->getDescription().', DN '.$dn, 2 );
+    }
+
+    return $result->code();
+}
+
+
+# Obtention de la description des classes d'objets de l'entité LDAP à traiter
+# si non référencées dans $self->{objectclassDesc}
 sub _getObjectclassDesc {
     my $self = shift;
     my( $ldapEntry ) = @_;
     my $objectclassDesc = $self->{objectclassDesc};
 
-    if( !defined($self->{ldapConn}->{conn}) ) {
-        return 0;
+    # Get LDAP server conn for this entity
+    my $ldapServerConn;
+    if( !($ldapServerConn = $self->{'ldapservers'}->getLdapServerConn($self->{'currentEntity'}->getLdapServerId())) ) {
+        $self->_log( 'problème avec le serveur LDAP de l\'entité : '.$self->{'currentEntity'}->getDescription(), 2 );
+        return 1;
     }
-    my $ldapConn = $self->{ldapConn}->{conn};
 
 
-    my $objectObjectclass = $ldapEntry->get_value( "objectClass", asref => 1);
+    my $objectObjectclass = $ldapEntry->get_value( 'objectClass', asref => 1);
 
 
     for( my $i=0; $i<=$#$objectObjectclass; $i++ ) {
@@ -667,7 +404,7 @@ sub _getObjectclassDesc {
             #   (equality, name, oid, desc, aliases, type, single-value,
             #   syntax)
     
-            my $ldapSchema = $ldapConn->schema;
+            my $ldapSchema = $ldapServerConn->schema;
             @{$objectclassDesc->{$objectObjectclass->[$i]}} = $ldapSchema->must($objectObjectclass->[$i]);
             push( @{$objectclassDesc->{$objectObjectclass->[$i]}}, $ldapSchema->may($objectObjectclass->[$i]) );
 
@@ -675,92 +412,7 @@ sub _getObjectclassDesc {
         }
     }
 
-    return 1;
-}
-
-
-sub getObjectParentDN {
-    my $self = shift;
-    my( $object, $parentDn ) = @_;
-
-    if( !defined( $object ) ) {
-        return undef;
-    }
-
-    $$parentDn = $self->_findTypeParentDn( undef, $object->{"type"}, $object->{"domainId"} );
-    if( !defined($$parentDn) ) {
-        # Le fait que l'entité n'ait pas de DN parent signifie simplement qu'elle n'a pas
-        # de représentation LDAP, ce n'est donc pas une erreur fatale.
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: type d'objet '".$object->{"type"}."' non definit dans l'arborescence du domaine '".$object->{"domainId"}."'", "W" );
-        return 1;
-    }
-
     return 0;
 }
 
 
-sub checkPasswd {
-    my $self = shift;
-    my( $object, $passwd ) = @_;
-
-    my $parentDn;
-    if( $self->getObjectParentDN( $object, \$parentDn ) ) {
-        return 0;
-    }
-
-    my $objectRdn = $object->getLdapDnPrefix( "current" );
-    if( !defined($objectRdn) ) {
-        return 0;
-    }
-    my $objectDn = $objectRdn.",".$parentDn;
-
-
-    my %ldapConn = (
-        ldapServer => $self->{ldapConn}->{ldapServer},
-        ldapUserDn => $objectDn,
-        ldapPasswd => $passwd
-    );
-
-    if( !$self->_connectLdapSrv( \%ldapConn ) ) {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: ancien mot de passe incorrect", "W" );
-        return 0;
-    }else {
-        &OBM::toolBox::write_log( "[Ldap::ldapEngine]: ancien mot de passe correct", "W" );
-        $self->_disconnectLdapSrv( \%ldapConn );
-    }
-
-    return 1;
-}
-
-
-sub updatePassword {
-    my $self = shift;
-    my( $object, $passwordDesc ) = @_;
-
-    my $parentDn;
-    if( $self->getObjectParentDN( $object, \$parentDn ) ) {
-        return 0;
-    }
-
-    my $objectRdn = $object->getLdapDnPrefix( "current" );
-    if( !defined($objectRdn) ) {
-        return 0;
-    }
-    my $objectDn = $objectRdn.",".$parentDn;
-
-    my $ldapEntry = $self->findDn($objectDn);
-    if( defined($ldapEntry) ) {
-        my $update = $object->updateLdapEntryPassword( $ldapEntry, $passwordDesc );
-        if( $update ) {
-            if( $self->updateLdapEntity( $ldapEntry ) ) {
-                &OBM::toolBox::write_log( "[Ldap::ldapEngine]: probleme de traitement de l'objet : ".$object->getEntityDescription()." - Operation annulee !", "W" );
-                return 0;
-            }
-        }
-    }else {
-        return 0;
-    }
-
-
-    return 1;
-}

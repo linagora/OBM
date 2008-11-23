@@ -1,6 +1,6 @@
 package OBM::Entities::obmMailServer;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 $debug = 1;
 
@@ -8,349 +8,338 @@ use 5.006_001;
 require Exporter;
 use strict;
 
+use OBM::Tools::commonMethods qw(
+        _log
+        dump
+        );
 use OBM::Entities::commonEntities qw(
-            getType
-            setDelete
-            getDelete
-            getArchive
-            getLdapObjectclass
-            isLinks
-            getEntityId
-            isMailActive
-            getMailServerId
-            updateLinkedEntity
-            );
-use OBM::Tools::commonMethods qw(_log dump);
+        setDelete
+        getDelete
+        getArchive
+        setArchive
+        getParent
+        setUpdated
+        getUpdated
+        getDesc
+        _makeEntityEmail
+        setUpdateEntity
+        getUpdateEntity
+        setUpdateLinks
+        getUpdateLinks
+        isMailAvailable
+        );
+use OBM::Ldap::utils qw(
+        _modifyAttr
+        _modifyAttrList
+        _diffObjectclassAttrs
+        );
 use OBM::Parameters::common;
-require OBM::Parameters::ldapConf;
-require OBM::Tools::obmDbHandler;
-require OBM::Ldap::utils;
-use URI::Escape;
 
 
+# Needed
 sub new {
-    my $self = shift;
-    my( $links, $deleted ) = @_;
+    my $class = shift;
+    my( $parent, $mailServerDesc ) = @_;
 
-    my %obmMailServerConfAttr = (
-        type => undef,
-        links => undef,
-        toDelete => undef,
-        archive => undef,
-        sieve => undef,
-        domainId => undef,
-        postfixConf => undef,
-        objectclass => undef,
-        dnPrefix => undef,
-        dnValue => undef
-    );
+    my $self = bless { }, $class;
 
+    if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
+        $self->_log( 'domaine père incorrect', 3 );
+        return undef;
+    }
+    $self->setParent( $parent );
 
-    if( !defined($links) || !defined($deleted) ) {
-        $self->_log( 'Usage: PACKAGE->new(LINKS)', 1 );
+    if( $self->_init( $mailServerDesc ) ) {
+        $self->_log( 'problème lors de l\'initialisation de la configuration des serveurs de courriers', 1 );
         return undef;
     }
 
-    $obmMailServerConfAttr{"links"} = $links;
-    $obmMailServerConfAttr{"toDelete"} = $deleted;
+    $self->{'objectclass'} = [ 'obmMailServer' ];
 
-    $obmMailServerConfAttr{"type"} = $OBM::Parameters::ldapConf::MAILSERVER;
-
-    # Définition de la représentation LDAP de ce type
-    $obmMailServerConfAttr{objectclass} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailServerConfAttr{"type"}}->{objectclass};
-    $obmMailServerConfAttr{dnPrefix} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailServerConfAttr{"type"}}->{dn_prefix};
-    $obmMailServerConfAttr{dnValue} = $OBM::Parameters::ldapConf::attributeDef->{$obmMailServerConfAttr{"type"}}->{dn_value};
-
-    bless( \%obmMailServerConfAttr, $self );
+    return $self;
 }
 
 
-sub getEntity {
+# Needed
+sub DESTROY {
     my $self = shift;
-    my( $domainDesc ) = @_;
+
+    $self->_log( 'suppression de l\'objet', 4 );
+
+    $self->{'parent'} = undef;
+}
 
 
-    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-    if( !defined($dbHandler) ) {
-        $self->_log( 'connecteur a la base de donnee invalide', 3 );
-        return 0;
+# Needed
+sub _init {
+    my $self = shift;
+    my( $mailServerDesc ) = @_;
+
+    if( !defined($mailServerDesc) || (ref($mailServerDesc) ne 'ARRAY') ) {
+        $self->_log( 'description des serveurs de courriers incorrect', 4 );
+        return 1;
     }
 
-    if( !defined($domainDesc->{"domain_id"}) || ($domainDesc->{"domain_id"} !~ /^\d+$/) ) {
-        $self->_log( 'description de domaine OBM incorrecte', 3 );
-        return 0;
-
-    }else {
-        # On positionne l'identifiant du domaine de l'entité
-        $self->{"domainId"} = $domainDesc->{"domain_id"};
+    push( @{$self->{'entityDesc'}->{'mailDomains'}}, $self->{'parent'}->getDesc('domain_name') );
+    my $domainAlias = $self->{'parent'}->getDesc('domain_alias');
+    for( my $i=0; $i<=$#$domainAlias; $i++ ) {
+        push( @{$self->{'entityDesc'}->{'mailDomains'}}, $domainAlias->[$i] );
     }
 
+    for( my $i=0; $i<=$#$mailServerDesc; $i++ ) {
+        my $currentSrv = $mailServerDesc->[$i];
 
-    $self->_log( 'gestion de la configuration de postfix, domaine \''.$domainDesc->{'domain_label'}.'\'', 1 );
-
-    $self->{"postfixConf"}->{"postfixconf_name"} = $domainDesc->{"domain_label"};
-    $self->{"postfixConf"}->{"postfixconf_domain"} = $domainDesc->{"domain_label"};
-
-    $self->{"postfixConf"}->{"postfixconf_mail_domains"} = [];
-    push( @{$self->{"postfixConf"}->{"postfixconf_mail_domains"}}, $domainDesc->{"domain_name"} );
-    for( my $i=0; $i<=$#{$domainDesc->{"domain_alias"}}; $i++ ) {
-        push( @{$self->{"postfixConf"}->{"postfixconf_mail_domains"}}, $domainDesc->{"domain_alias"}->[$i] );
-        
-    }
-
-
-    # Obtention des serveurs de mail du domaine
-    my $query = "SELECT i.host_name, k.domainmailserver_role FROM Host i, MailServer j, DomainMailServer k WHERE i.host_id=j.mailserver_host_id AND j.mailserver_id=k.domainmailserver_mailserver_id AND k.domainmailserver_domain_id=".$self->{"domainId"};
-
-    my $queryResult;
-    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        return 0;
-    }
-
-    while( my( $hostName, $srvRole ) = $queryResult->fetchrow_array() ) {
         SWITCH: {
-            if( $srvRole =~ /^imap$/i ) {
-                push( @{$self->{"postfixConf"}->{"postfixconf_imap_srv"}}, $hostName );
+            if( $currentSrv->{'server_role'} =~ /^imap$/i ) {
+                push( @{$self->{'entityDesc'}->{'imapServer'}}, $currentSrv->{'server_name'} );
                 last SWITCH;
             }
 
-            if( $srvRole =~ /^smtp_in$/i ) {
-                push( @{$self->{"postfixConf"}->{"postfixconf_smtpin_srv"}}, $hostName );
+            if( $currentSrv->{'server_role'} =~ /^smtp_in$/i ) {
+                push( @{$self->{'entityDesc'}->{'smtpInServer'}}, $currentSrv->{'server_name'} );
                 last SWITCH;
             }
 
-            if( $srvRole =~ /^smtp_out$/i ) {
-                push( @{$self->{"postfixConf"}->{"postfixconf_smtpout_srv"}}, $hostName );
+            if( $currentSrv->{'server_role'} =~ /^smtp_out$/i ) {
+                push( @{$self->{'entityDesc'}->{'smtpOutServer'}}, $currentSrv->{'server_name'} );
                 last SWITCH;
             }
         }
     }
 
-
-    return 1;
+    return 0;
 }
 
 
-sub updateDbEntity {
+sub setLinks {
     my $self = shift;
-    # Pas de tables de production pour le type obmMailServer. Ces informations
-    # font parties des informations de domaines
+    my( $links ) = @_;
 
-#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-#    if( !defined($dbHandler) ) {
-#        return 0;
-#    }
-
-    return 1;
+    return 0;
 }
 
 
-sub updateDbEntityLinks {
+# Needed
+sub getDescription {
     my $self = shift;
-    # Pas de tables de production pour le type obmMailServer. Ces informations
-    # font parties des informations de domaines
-    
-#    my $dbHandler = OBM::Tools::obmDbHandler->instance();
-#    if( !defined($dbHandler) ) {
-#        return 0;
-#    }
 
-    return 1;
-}
-
-
-sub getEntityLinks {
-    my $self = shift;
-    my( $domainDesc ) = @_;
-
-    return 1;
-}
-
-
-sub getEntityDescription {
-    my $self = shift;
-    my $entry = $self->{"postfixConf"};
-    my $description = "";
-
-
-    if( defined($entry->{postfixconf_domain}) ) {
-        $description .= "domaine '".$entry->{postfixconf_domain}."'";
-    }
-
-    if( ($description ne "") && defined($self->{type}) ) {
-        $description .= ", type '".$self->{type}."'";
-    }
-
-    if( $description ne "" ) {
-        return $description;
-    }
-
-    if( defined($self->{domainId}) ) {
-        $description .= "ID BD '".$self->{domainId}."'";
-    }
-
-    if( defined($self->{type}) ) {
-        $description .= ",type '".$self->{type}."'";
-    }
+    my $description = 'configuration des serveurs de courriers du domaine '.$self->{'parent'}->getDesc('domain_name');
 
     return $description;
 }
 
 
-sub getLdapDnPrefix {
+# Needed
+sub getDomainId {
     my $self = shift;
-    my $dnPrefix = undef;
 
-    if( defined($self->{"dnPrefix"}) && defined($self->{"postfixConf"}->{$self->{"dnValue"}}) ) {
-        $dnPrefix = $self->{"dnPrefix"}."=".$self->{"postfixConf"}->{$self->{"dnValue"}};
+    return 0;
+}
+
+
+# Needed
+sub getId {
+    my $self = shift;
+
+    return 0;
+}
+
+
+# Needed by : LdapEngine
+sub getLdapServerId {
+    my $self = shift;
+
+    if( defined($self->{'parent'}) ) {
+        return $self->{'parent'}->getLdapServerId();
     }
 
-    return $dnPrefix;
+    return undef;
+}
+
+
+# Needed by : LdapEngine
+sub setParent {
+    my $self = shift;
+    my( $parent ) = @_;
+
+    if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
+        $self->_log( 'description du domaine parent incorrecte', 3 );
+        return 1;
+    }
+
+    $self->{'parent'} = $parent;
+
+    return 0;
+}
+
+
+# Needed by : LdapEngine
+sub _getParentDn {
+    my $self = shift;
+    my $parentDn = undef;
+
+    if( defined($self->{'parent'}) ) {
+        $parentDn = $self->{'parent'}->getDnPrefix($self);
+    }
+
+    return $parentDn;
+}
+
+
+# Needed by : LdapEngine
+sub getDnPrefix {
+    my $self = shift;
+    my $rootDn;
+    my @dnPrefixes;
+
+    if( !($rootDn = $self->_getParentDn()) ) {
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        return undef;
+    }
+
+    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
+        push( @dnPrefixes, 'cn='.$self->{'parent'}->getDesc('domain_label').','.$rootDn->[$i] );
+        $self->_log( 'DN de l\'entité : '.$dnPrefixes[$i], 4 );
+    }
+
+    return \@dnPrefixes;
+}
+
+
+# Needed by : LdapEngine
+sub getCurrentDnPrefix {
+    my $self = shift;
+
+    return $self->getDnPrefix();
+}
+
+
+sub _getLdapObjectclass {
+    my $self = shift;
+    my ($objectclass, $deletedObjectclass) = @_;
+    my %realObjectClass;
+
+    if( !defined($objectclass) || (ref($objectclass) ne "ARRAY") ) {
+        $objectclass = $self->{'objectclass'};
+    }
+
+    for( my $i=0; $i<=$#$objectclass; $i++ ) {
+        $realObjectClass{$objectclass->[$i]} = 1;
+    }
+
+    my @realObjectClass = keys(%realObjectClass);
+
+    return \@realObjectClass;
 }
 
 
 sub createLdapEntry {
     my $self = shift;
-    my ( $ldapEntry ) = @_;
-    my $entry = $self->{'postfixConf'};
+    my ( $entryDn, $entry ) = @_;
 
-
-    if( !defined($entry->{'postfixconf_name'}) ) {
-        return 0;
+    if( !$entryDn ) {
+        $self->_log( 'DN non défini', 3 );
+        return 1;
     }
 
-    # On construit la nouvelle entree
-    #
-    # Les parametres nécessaires
-    $ldapEntry->add(
-        objectClass => $self->{'objectclass'},
-        cn => $entry->{'postfixconf_name'}
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        $self->_log( 'entrée LDAP incorrecte', 3 );
+        return 1;
+    }
+
+    $entry->add(
+        objectClass => $self->_getLdapObjectclass(),
+        cn => $self->{'parent'}->getDesc('domain_label')
     );
 
-    # Les domaines de messagerie
-    if( $entry->{'postfixconf_mail_domains'} ) {
-        $ldapEntry->add( myDestination => $entry->{'postfixconf_mail_domains'} );
+    # Mail domains
+    if( $self->{'entityDesc'}->{'mailDomains'} ) {
+        $entry->add( myDestination => $self->{'entityDesc'}->{'mailDomains'} );
     }
 
-    # Le domaine
-    if( $entry->{'postfixconf_domain'} ) {
-        $ldapEntry->add( obmDomain => $entry->{'postfixconf_domain'} );
+    # IMAP servers
+    if( $self->{'entityDesc'}->{'imapServer'} ) {
+        $entry->add( imapHost => $self->{'entityDesc'}->{'imapServer'} );
     }
 
-    # Les hôtes IMAP
-    if( $entry->{'postfixconf_imap_srv'} ) {
-        $ldapEntry->add( imapHost => $entry->{'postfixconf_imap_srv'} );
+    # SMTP-in servers
+    if( $self->{'entityDesc'}->{'smtpInServer'} ) {
+        $entry->add( smtpInHost => $self->{'entityDesc'}->{'smtpInServer'} );
     }
 
-    # Les hôtes SMTP-in
-    if( $entry->{'postfixconf_smtpin_srv'} ) {
-        $ldapEntry->add( smtpInHost => $entry->{'postfixconf_smtpin_srv'} );
+    # SMTP-out servers
+    if( $self->{'entityDesc'}->{'smtpOutServer'} ) {
+        $entry->add( smtpOutHost => $self->{'entityDesc'}->{'smtpOutServer'} );
     }
 
-    # Les hôtes SMTP-out
-    if( $entry->{'postfixconf_smtpout_srv'} ) {
-        $ldapEntry->add( smtpOutHost => $entry->{'postfixconf_smtpout_srv'} );
+    # OBM domain
+    if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
+        $entry->add( obmDomain => $domainName );
     }
 
-    return 1;
-}
-
-
-sub updateLdapEntryDn {
-    my $self = shift;
-    my( $ldapEntry ) = @_;
-    my $update = 0;
-
-    if( !defined($ldapEntry) ) {
-        return 0;
-    }
-
-    return $update;
+    return 0;
 }
 
 
 sub updateLdapEntry {
     my $self = shift;
-    my( $ldapEntry, $objectclassDesc ) = @_;
-    my $entry = $self->{"postfixConf"};
+    my( $entry, $objectclassDesc ) = @_;
+    my $update = 0;
 
-    require OBM::Entities::entitiesUpdateState;
-    my $update = OBM::Entities::entitiesUpdateState->new();
-
-
-    if( !defined($ldapEntry) ) {
-        return undef;
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        return $update;
     }
 
 
-    # Les domaines de messagerie
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_mail_domains"}, $ldapEntry, "myDestination" ) ) {
-        $update->setUpdate();
-    }
+    if( $self->getUpdateEntity() ) {
+        # Vérification des objectclass
+        my @deletedObjectclass;
+        my $currentObjectclass = $self->_getLdapObjectclass( $entry->get_value('objectClass', asref => 1), \@deletedObjectclass );
+        if( $self->_modifyAttrList( $currentObjectclass, $entry, 'objectClass' )) {
+            $update = 1;
+        }
 
-    # Le domaine
-    if( &OBM::Ldap::utils::modifyAttr( $entry->{"postfixconf_domain"}, $ldapEntry, "obmDomain") ) {
-        $update->setUpdate();
-    }
+        if( $#deletedObjectclass >= 0 ) {
+            # Pour les schémas LDAP supprimés, on détermine les attributs à
+            # supprimer.
+            # Uniquement ceux qui ne sont pas utilisés par d'autres objets.
+            my $deleteAttrs = $self->_diffObjectclassAttrs(\@deletedObjectclass, $currentObjectclass, $objectclassDesc);
 
-    # Les hôtes IMAP
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_imap_srv"}, $ldapEntry, "imapHost" ) ) {
-        $update->setUpdate();
-    }
+            for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
+                if( $self->_modifyAttrList( undef, $entry, $deleteAttrs->[$i] ) ) {
+                    $update = 1;
+                }
+            }
+        }
 
-    # Les hôtes SMTP-in
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_smtpin_srv"}, $ldapEntry, "smtpInHost" ) ) {
-        $update->setUpdate();
-    }
+        # Mail domains
+        if( $self->_modifyAttrList( $self->{'entityDesc'}->{'mailDomains'}, $entry, 'myDestination' ) ) {
+            $update = 1;
+        }
 
-    # Les hôtes SMTP-out
-    if( &OBM::Ldap::utils::modifyAttrList( $entry->{"postfixconf_smtpout_srv"}, $ldapEntry, "smtpOutHost" ) ) {
-        $update->setUpdate();
-    }
+        # IMAP servers
+        if( $self->_modifyAttrList( $self->{'entityDesc'}->{'imapServer'}, $entry, 'imapHost' ) ) {
+            $update = 1;
+        }
 
+        # SMTP-in servers
+        if( $self->_modifyAttrList( $self->{'entityDesc'}->{'smtpInServer'}, $entry, 'smtpInHost' ) ) {
+            $update = 1;
+        }
 
-    if( $self->isLinks() ) {
-        if( $self->updateLdapEntryLinks( $ldapEntry ) ) {
-            $update->setUpdate();
+        # SMTP-out servers
+        if( $self->_modifyAttrList( $self->{'entityDesc'}->{'smtpOutServer'}, $entry, 'smtpOutHost' ) ) {
+            $update = 1;
+        }
+
+        # OBM domain
+        if( defined($self->{'parent'}) && (my $domainName =
+        $self->{'parent'}->getDesc('domain_name')) ) {
+            if( $self->_modifyAttr( $domainName, $entry, 'obmDomain' ) ) {
+                $update = 1;
+            }
         }
     }
 
-
     return $update;
-}
-
-
-sub updateLdapEntryLinks {
-    my $self = shift;
-    my( $ldapEntry ) = @_;
-    my $update = 0;
-
-
-    if( !defined($ldapEntry) ) {
-        return 0;
-    }
-
-
-    return $update;
-}
-
-
-sub getMailboxName {
-    my $self = shift;
-
-    return undef;
-}
-
-
-sub getMailboxPartition {
-    my $self = shift;
-
-    return undef;
-}
-
-
-sub getMailboxSieve {
-    my $self = shift;
-
-    return $self->{"sieve"};
 }

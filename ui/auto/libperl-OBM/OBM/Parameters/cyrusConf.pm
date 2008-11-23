@@ -30,15 +30,6 @@ use constant definedRight => {
     post => 'p'
 };
 
-# Les clés des tables de hachage sont les identifiants utilisateurs, les valeurs
-# associés sont 1, si cet utilisateur a ce droit.
-use constant boxRight => {
-    read => {},
-    writeonly => {},
-    write => {}
-};
-
-
 use constant cyrusAdmin => {
     login => cyrusAdminLogin,
     passwd => undef,
