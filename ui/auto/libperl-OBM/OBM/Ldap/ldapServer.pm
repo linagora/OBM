@@ -112,7 +112,7 @@ sub _getAdminDn {
                         domain_name,
                         domain_alias
                  FROM Domain
-                 WHERE domain_global=1
+                 WHERE domain_global=true
                  LIMIT 1';
 
     my $sth;
