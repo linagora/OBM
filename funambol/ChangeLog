@@ -1,3 +1,48 @@
+2008-11-24  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Make funis sync sources build again
+	
+	* src/java/fr/aliasource/funambol/engine/source/CalendarSyncSource.
+	java: (CalendarSyncSource.getAllSyncItemKeys),
+	(CalendarSyncSource.getDeletedSyncItemKeys),
+	(CalendarSyncSource.getSyncItemKeysFromTwin),
+	(CalendarSyncSource.getUpdatedSyncItemKeys):
+	* src/java/fr/aliasource/funambol/engine/source/ContactSyncSource.j
+	ava: (ContactSyncSource.beginSync),
+	(ContactSyncSource.getAllSyncItemKeys),
+	(ContactSyncSource.getDeletedSyncItemKeys),
+	(ContactSyncSource.getSyncItemKeysFromTwin),
+	(ContactSyncSource.getUpdatedSyncItemKeys):
+	* src/java/fr/aliasource/funambol/engine/source/ObmSyncSource.java:
+	(ObmSyncSource), (ObmSyncSource.getSyncItemKeysFromKeys):
+	* src/java/fr/aliasource/funambol/utils/CalendarHelper.java:
+	(CalendarHelper..getRecurrenceFromFoundation),
+	(CalendarHelper..isUserRefused), (CalendarHelper..refuseEvent):
+	* src/java/fr/aliasource/funambol/utils/ContactHelper.java:
+	(ContactHelper), (ContactHelper.setFoundationPhone),
+	(ContactHelper.getPhone), (ContactHelper.setFoundationTitle),
+	(ContactHelper.getTitle), (ContactHelper.setFoundationEmail),
+	(ContactHelper.getEmail), (ContactHelper.setFoundationNote),
+	(ContactHelper.getNote), (ContactHelper.constructDisplayName):
+	* src/java/fr/aliasource/obm/items/manager/CalendarManager.java:
+	(CalendarManager), (CalendarManager.getAllItemKeys),
+	(CalendarManager.getDeletedItemKeys),
+	(CalendarManager.getUpdatedItemKeys),
+	(CalendarManager.getEventTwinKeys), (CalendarManager.getSync),
+	(CalendarManager.fillObmEventWithVEvent):
+	* src/java/fr/aliasource/obm/items/manager/ContactManager.java:
+	(ContactManager), (ContactManager.initRestriction),
+	(ContactManager.getAllItemKeys), (ContactManager.getBook),
+	(ContactManager.setBook), (ContactManager.getDeletedItemKeys),
+	(ContactManager.getUpdatedItemKeys),
+	(ContactManager.getItemFromId), (ContactManager.updateItem),
+	(ContactManager.addItem), (ContactManager.getContactTwinKeys),
+	(ContactManager.getSync), (ContactManager.obmContactTofoundation),
+	(ContactManager.updateAddress), (ContactManager.s),
+	(ContactManager.foundationContactToObm):
+	* src/java/fr/aliasource/obm/items/manager/ObmManager.java:
+	(ObmManager):
+
 2008-10-30  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	Fix dt start calculation

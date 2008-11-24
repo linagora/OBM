@@ -2,6 +2,7 @@ package fr.aliasource.funambol.engine.source;
 
 import java.io.ByteArrayInputStream;
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -100,7 +101,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 
 		logger.info("getAllSyncItemKeys(" + principal + ")");
 
-		String[] keys = null;
+		List<String> keys = null;
 		try {
 			keys = manager.getAllItemKeys();
 		} catch (OBMException e) {
@@ -120,7 +121,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 
 		logger.info("getDeletedSyncItemKeys(" + principal + " , " + since
 				+ " , " + until + ")");
-		String[] keys = null;
+		List<String> keys = null;
 
 		try {
 			keys = manager.getDeletedItemKeys(since);
@@ -154,7 +155,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 			throws SyncSourceException {
 
 		logger.info("getSyncItemKeysFromTwin(" + principal + ")");
-		String[] keys = null;
+		List<String> keys = null;
 		try {
 			syncItem.getKey().setKeyValue("");
 			Calendar event = getFoundationFromSyncItem(syncItem);
@@ -178,7 +179,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 
 		logger.info("getUpdatedSyncItemKeys(" + principal + " , " + since
 				+ " , " + until + ")");
-		String[] keys = null;
+		List<String> keys = null;
 
 		try {
 			keys = manager.getUpdatedItemKeys(since);

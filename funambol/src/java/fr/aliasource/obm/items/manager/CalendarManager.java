@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
@@ -32,6 +34,8 @@ public class CalendarManager extends ObmManager {
 	private String calendar;
 	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
 	private String userEmail;
+	protected Map<String, Event> updatedRest = null;
+	protected List<String> deletedRest = null;
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -84,46 +88,35 @@ public class CalendarManager extends ObmManager {
 		}
 	}
 
-	public String[] getAllItemKeys() throws OBMException {
+	public List<String> getAllItemKeys() throws OBMException {
 
 		if (!syncReceived) {
 			getSync(null);
 		}
 
-		return extractKeys(updatedRest);
-	}
-
-	public String[] getDeletedItemKeys(Timestamp since) throws OBMException {
-
-		if (!syncReceived) {
-			getSync(since);
-		}
-
-		return Helper.listToTab(deletedRest);
-	}
-
-	public String[] getRefusedItemKeys(Timestamp since) throws OBMException {
-
-		Date d = new Date(since.getTime());
-		String[] keys = null;
-
-		try {
-			keys = binding.getRefusedKeys(token, calendar, d).getKeys();
-		} catch (AuthFault e) {
-			throw new OBMException(e.getMessage());
-		} catch (ServerFault e) {
-			throw new OBMException(e.getMessage());
-		}
-
+		List<String> keys = new LinkedList<String>();
+		keys.addAll(updatedRest.keySet());
 		return keys;
 	}
 
-	public String[] getUpdatedItemKeys(Timestamp since) throws OBMException {
+	public List<String> getDeletedItemKeys(Timestamp since) throws OBMException {
+
 		if (!syncReceived) {
 			getSync(since);
 		}
+		
+		ArrayList<String> ret = new ArrayList<String>(deletedRest.size());
+		ret.addAll(deletedRest);
+		return ret;
+	}
 
-		return extractKeys(updatedRest);
+	public List<String> getUpdatedItemKeys(Timestamp since) throws OBMException {
+		if (!syncReceived) {
+			getSync(since);
+		}
+		List<String> keys = new LinkedList<String>();
+		keys.addAll(updatedRest.keySet());
+		return keys;
 	}
 
 	public com.funambol.common.pim.calendar.Calendar getItemFromId(String key,
@@ -220,28 +213,24 @@ public class CalendarManager extends ObmManager {
 		}
 	}
 
-	public String[] getEventTwinKeys(
+	public List<String> getEventTwinKeys(
 			com.funambol.common.pim.calendar.Calendar event, String type)
 			throws OBMException {
-
-		String[] keys = null;
 
 		Event evt = foundationCalendarToObmEvent(event, type);
 
 		if (evt == null) {
-			return new String[0];
+			return new LinkedList<String>();
 		}
 
 		try {
 			evt.setUid(null);
-			keys = binding.getEventTwinKeys(token, calendar, evt).getKeys();
+			return binding.getEventTwinKeys(token, calendar, evt).getKeys();
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
 			throw new OBMException(e.getMessage());
 		}
-
-		return keys;
 	}
 
 	// ---------------- Private methods ----------------------------------
@@ -272,8 +261,8 @@ public class CalendarManager extends ObmManager {
 		}
 
 		// remove refused events and private events
-		updatedRest = new HashMap();
-		deletedRest = new ArrayList();
+		updatedRest = new HashMap<String, Event>();
+		deletedRest = new ArrayList<String>();
 		String user = token.getUser();
 
 		for (Event e : updated) {
@@ -450,22 +439,14 @@ public class CalendarManager extends ObmManager {
 					+ foundation.getDuration().getPropertyValue());
 		}
 
-		List xtags = foundation.getXTags();
-		if (xtags != null) {
-			for (Object o : xtags) {
-				logger.info("     - xtag: '" + o + "'");
-			}
-		}
-
 		String prodId = "";
 		if (calendar.getProdId() != null) {
 			prodId = calendar.getProdId().getPropertyValueAsString();
+			logger.info("prodId: " + prodId);
 		}
-		logger.info("prodId: " + prodId);
 
 		Date dstart = parseStart(prodId, foundation, event);
 		Date dend = parseEnd(prodId, foundation, event);
-		Date dalarm = null;
 
 		if (dend.getTime() != dstart.getTime()) {
 			int fix = 0;

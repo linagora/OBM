@@ -4,9 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.sync.book.BookType;
 import org.xml.sax.SAXException;
 
 import com.funambol.common.pim.contact.Contact;
@@ -58,7 +60,7 @@ public final class ContactSyncSource extends ObmSyncSource implements
 		}
 
 		// manager.logIn("nicolasl","44669462809866fbfc6eab1f9fa93d4b");
-		manager.setBook("contacts");
+		manager.setBook(BookType.contacts);
 		manager.initRestriction(getRestrictions());
 	}
 
@@ -102,7 +104,7 @@ public final class ContactSyncSource extends ObmSyncSource implements
 	 */
 	public SyncItemKey[] getAllSyncItemKeys() throws SyncSourceException {
 		logger.info("getAllSyncItemKeys(" + principal + ")");
-		String[] keys = null;
+		List<String> keys = null;
 		try {
 			keys = manager.getAllItemKeys();
 		} catch (OBMException e) {
@@ -121,7 +123,7 @@ public final class ContactSyncSource extends ObmSyncSource implements
 			throws SyncSourceException {
 		logger.info("getDeletedSyncItemKeys(" + principal + " , " + since
 				+ " , " + until + ")");
-		String[] keys = null;
+		List<String> keys = null;
 		try {
 			keys = manager.getDeletedItemKeys(since);
 		} catch (OBMException e) {
@@ -151,7 +153,7 @@ public final class ContactSyncSource extends ObmSyncSource implements
 
 		Contact contact = null;
 
-		String[] keys = null;
+		List<String> keys = null;
 		try {
 			syncItem.getKey().setKeyValue("");
 			contact = getFoundationFromSyncItem(syncItem);
@@ -174,7 +176,7 @@ public final class ContactSyncSource extends ObmSyncSource implements
 		logger.info("getUpdatedSyncItemKeys(" + principal + " , " + since
 				+ " , " + until + ")");
 
-		String[] keys = null;
+		List<String> keys = null;
 		try {
 			keys = manager.getUpdatedItemKeys(since);
 		} catch (OBMException e) {

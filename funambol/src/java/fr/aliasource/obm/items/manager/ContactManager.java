@@ -1,36 +1,41 @@
 package fr.aliasource.obm.items.manager;
 
-import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
+import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.locators.AddressBookLocator;
 
+import com.funambol.common.pim.common.Property;
 import com.funambol.common.pim.contact.Address;
 import com.funambol.common.pim.contact.BusinessDetail;
-import com.funambol.framework.logging.FunambolLogger;
-import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.common.pim.contact.PersonalDetail;
 
 import fr.aliasource.funambol.OBMException;
-import fr.aliasource.funambol.engine.source.ObmSyncSource;
 import fr.aliasource.funambol.utils.ContactHelper;
-import fr.aliasource.funambol.utils.Helper;
 
 public class ContactManager extends ObmManager {
 
+	protected Map<String, Contact> updatedRest = null;
+	protected List<String> deletedRest = null;
+
 	private BookClient binding;
-	private String book;
-	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
+	private BookType book;
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -42,8 +47,8 @@ public class ContactManager extends ObmManager {
 
 	public void initRestriction(int restrictions) {
 		this.restrictions = restrictions;
-		if (log.isTraceEnabled()) {
-			log.trace(" init restrictions: " + restrictions);
+		if (logger.isDebugEnabled()) {
+			logger.debug(" init restrictions: " + restrictions);
 		}
 	}
 
@@ -54,24 +59,23 @@ public class ContactManager extends ObmManager {
 		}
 	}
 
-	public String[] getAllItemKeys() throws OBMException {
-
-		String[] keys = null;
+	public List<String> getAllItemKeys() throws OBMException {
 
 		if (!syncReceived) {
 			getSync(null);
 		}
 
-		keys = extractKeys(updatedRest);
+		List<String> keys = new LinkedList<String>();
+		keys.addAll(updatedRest.keySet());
 
 		return keys;
 	}
 
-	public String getBook() {
+	public BookType getBook() {
 		return book;
 	}
 
-	public void setBook(String book) {
+	public void setBook(BookType book) {
 		this.book = book;
 	}
 
@@ -88,34 +92,26 @@ public class ContactManager extends ObmManager {
 		return keys;
 	}
 
-	public String[] getDeletedItemKeys(Timestamp since) throws OBMException {
-
+	public List<String> getDeletedItemKeys(Timestamp since) throws OBMException {
 		Calendar d = Calendar.getInstance();
 		d.setTime(since);
-
-		String[] keys = null;
-
 		if (!syncReceived) {
 			getSync(since);
 		}
-
-		keys = Helper.listToTab(deletedRest);
-
-		return keys;
+		return deletedRest;
 	}
 
-	public String[] getUpdatedItemKeys(Timestamp since) throws OBMException {
+	public List<String> getUpdatedItemKeys(Timestamp since) throws OBMException {
 
 		Calendar d = Calendar.getInstance();
 		d.setTime(since);
-
-		String[] keys = null;
 
 		if (!syncReceived) {
 			getSync(since);
 		}
 
-		keys = extractKeys(updatedRest);
+		List<String> keys = new LinkedList<String>();
+		keys.addAll(updatedRest.keySet());
 
 		return keys;
 	}
@@ -128,9 +124,8 @@ public class ContactManager extends ObmManager {
 		contact = (Contact) updatedRest.get(key);
 
 		if (contact == null) {
-			log
-					.info(" item " + key
-							+ " not found in updated -> get from sever");
+			logger.info(" item " + key
+					+ " not found in updated -> get from sever");
 			try {
 				contact = binding.getContactFromId(token, book, key);
 			} catch (AuthFault e) {
@@ -141,7 +136,7 @@ public class ContactManager extends ObmManager {
 		}
 
 		com.funambol.common.pim.contact.Contact ret = obmContactTofoundation(
-				contact, type);
+				contact);
 
 		return ret;
 	}
@@ -171,7 +166,7 @@ public class ContactManager extends ObmManager {
 			throw new OBMException(e.getMessage());
 		}
 
-		return obmContactTofoundation(c, type);
+		return obmContactTofoundation(c);
 	}
 
 	public com.funambol.common.pim.contact.Contact addItem(
@@ -189,32 +184,28 @@ public class ContactManager extends ObmManager {
 			throw new OBMException(e.getMessage());
 		}
 
-		return obmContactTofoundation(c, type);
+		return obmContactTofoundation(c);
 	}
 
-	public String[] getContactTwinKeys(
+	public List<String> getContactTwinKeys(
 			com.funambol.common.pim.contact.Contact contact, String type)
 			throws OBMException {
 
-		String[] keys = null;
-
 		Contact c = foundationContactToObm(contact, type);
 
-		if (log.isDebugEnabled()) {
-			log.debug(" look twin of : " + c.getFirstname() + ","
+		if (logger.isDebugEnabled()) {
+			logger.debug(" look twin of : " + c.getFirstname() + ","
 					+ c.getLastname() + "," + c.getCompany());
 		}
 
 		try {
 			c.setUid(null);
-			keys = binding.getContactTwinKeys(token, book, c).getKeys();
+			return binding.getContactTwinKeys(token, book, c).getKeys();
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
 			throw new OBMException(e.getMessage());
 		}
-
-		return keys;
 	}
 
 	// ---------------- Private methods ----------------------------------
@@ -235,31 +226,32 @@ public class ContactManager extends ObmManager {
 			throw new OBMException(e.getMessage());
 		}
 
-		Contact[] updated = new Contact[0];
-		if (sync.getUpdated() != null)
+		List<Contact> updated = new LinkedList<Contact>();
+		if (sync.getUpdated() != null) {
 			updated = sync.getUpdated();
-		int[] deleted = new int[0];
-		if (sync.getRemoved() != null)
+		}
+		Set<Integer> deleted = new HashSet<Integer>();
+		if (sync.getRemoved() != null) {
 			deleted = sync.getRemoved();
-
+		}
 		// apply restriction(s)
-		updatedRest = new HashMap();
-		deletedRest = new ArrayList();
+		updatedRest = new HashMap<String, Contact>();
+		deletedRest = new ArrayList<String>();
 		// String owner = "";
 		// String user = token.getUser();
-		for (int i = 0; i < updated.length; i++) {
-			updatedRest.put("" + updated[i].getUid(), updated[i]);
+		for (Contact c : updated) {
+			updatedRest.put("" + c.getUid(), c);
 		}
 
-		for (int j = 0; j < deleted.length; j++) {
-			deletedRest.add((String) ("" + deleted[j]));
+		for (Integer i : deleted) {
+			deletedRest.add(i.toString());
 		}
 
 		syncReceived = true;
 	}
 
 	private com.funambol.common.pim.contact.Contact obmContactTofoundation(
-			Contact obmcontact, String type) {
+			Contact obmcontact) {
 		com.funambol.common.pim.contact.Contact contact = new com.funambol.common.pim.contact.Contact();
 
 		contact.setUid("" + obmcontact.getUid());
@@ -273,145 +265,59 @@ public class ContactManager extends ObmManager {
 						obmcontact.getLastname()));
 		contact.getName().getNickname().setPropertyValue(obmcontact.getAka());
 
-		BusinessDetail bus = contact.getBusinessDetail();
-		/*
-		 * bus.addEmail( ContactHelper.getFoundationEmail(
-		 * obmcontact.getEmail(),ContactHelper.WORK_EMAIL) );
-		 */
-		ContactHelper.setFoundationPhone(bus, obmcontact.getWorkPhone(),
-				ContactHelper.WORK_PHONE);
-		ContactHelper.setFoundationPhone(bus, obmcontact.getWorkFax(),
-				ContactHelper.WORK_FAX);
-		ContactHelper.setFoundationTitle(bus, obmcontact.getTitle(),
-				ContactHelper.WORK_TITLE);
-		bus.getCompany().setPropertyValue(obmcontact.getCompany());
-		bus.getDepartment().setPropertyValue(obmcontact.getService());
-
-		Address addr = bus.getAddress();
-		addr.getCity().setPropertyValue(obmcontact.getTown());
-		if (obmcontact.getCountry() != null) {
-			addr.getCountry().setPropertyValue(obmcontact.getCountry());
-		}
-		addr.getStreet().setPropertyValue(
-				ContactHelper.getStreetFromObm(obmcontact));
-		addr.getPostalCode().setPropertyValue(obmcontact.getZipCode());
-		addr.getPostOfficeAddress().setPropertyValue(
-				obmcontact.getExpressPostal());
-
-		// email 1
-		ContactHelper.setFoundationEmail(contact.getPersonalDetail(),
-				obmcontact.getEmail(), ContactHelper.WORK_EMAIL);
-		// email 2
-		ContactHelper.setFoundationEmail(contact.getPersonalDetail(),
-				obmcontact.getEmail2(), ContactHelper.HOME_EMAIL);
-
-		if (type.equals(ObmSyncSource.MSG_TYPE_VCARD)) {
-			ContactHelper.setFoundationPhone(contact.getPersonalDetail(),
-					obmcontact.getHomePhone(), ContactHelper.HOME_PHONE);// OTHER_PHONE
-			// );
-		} else {
-			ContactHelper.setFoundationPhone(contact.getPersonalDetail(),
-					obmcontact.getHomePhone(), ContactHelper.HOME_PHONE);
-		}
-		ContactHelper.setFoundationPhone(contact.getPersonalDetail(),
-				obmcontact.getMobilePhone(), ContactHelper.HOME_MOBILE);
-
+		BusinessDetail bd = contact.getBusinessDetail();
+		PersonalDetail pd = contact.getPersonalDetail();
+		// FIXME email, address, phones
+		
 		ContactHelper.setFoundationNote(contact, obmcontact.getComment(),
 				ContactHelper.COMMENT);
 
-		// Classification
-		if (obmcontact.getPrivacy() == 1) {
-			contact.setSensitivity(new Short((short) 2)); // olPrivate
-		} else {
-			contact.setSensitivity(new Short((short) 0)); // olNormal
-		}
+		contact.setSensitivity(new Short((short) 2)); // olPrivate
 
 		return contact;
 	}
 
+	private org.obm.sync.book.Address updateAddress(Address funis, String type) {
+		org.obm.sync.book.Address obm = new org.obm.sync.book.Address(s(funis
+				.getStreet()), s(funis.getPostalCode()), s(funis
+				.getPostOfficeAddress()), s(funis.getCity()), s(funis
+				.getCountry()));
+		return obm;
+	}
+
+	private String s(Property p) {
+		return p.getPropertyValueAsString();
+	}
+
 	private Contact foundationContactToObm(
-			com.funambol.common.pim.contact.Contact foundation, String type) {
+			com.funambol.common.pim.contact.Contact funis, String type) {
 
 		Contact contact = new Contact();
 
-		if (foundation.getUid() != null && foundation.getUid() != "") {
-			contact.setUid(new Integer(foundation.getUid()));
+		if (funis.getUid() != null && funis.getUid() != "") {
+			contact.setUid(new Integer(funis.getUid()));
 		}
 
-		contact.setFirstname(ContactHelper.nullToEmptyString(foundation
-				.getName().getFirstName().getPropertyValueAsString()));
-		contact.setLastname(ContactHelper.getLastName(foundation));
+		contact.setFirstname(ContactHelper.nullToEmptyString(funis.getName()
+				.getFirstName().getPropertyValueAsString()));
+		contact.setLastname(ContactHelper.getLastName(funis));
 
 		if (ContactHelper.nullToEmptyString(
-				foundation.getName().getNickname().getPropertyValueAsString())
+				funis.getName().getNickname().getPropertyValueAsString())
 				.equalsIgnoreCase("")) {
 			contact.setAka(null);
 		} else {
-			contact.setAka(ContactHelper.nullToEmptyString(foundation.getName()
+			contact.setAka(ContactHelper.nullToEmptyString(funis.getName()
 					.getNickname().getPropertyValueAsString()));
 		}
 
-		BusinessDetail bus = foundation.getBusinessDetail();
-		/*
-		 * contact.setEmail( ContactHelper.nullToEmptyString(
-		 * ContactHelper.getEmail(bus.getEmails(),ContactHelper.WORK_EMAIL)) );
-		 */
-		contact.setWorkPhone(ContactHelper.nullToEmptyString(ContactHelper
-				.getPhone(bus.getPhones(), ContactHelper.WORK_PHONE)));
-		contact.setTitle(ContactHelper.nullToEmptyString(ContactHelper
-				.getTitle(bus.getTitles(), ContactHelper.WORK_TITLE)));
-		contact.setCompany(ContactHelper.nullToEmptyString(bus.getCompany()
-				.getPropertyValueAsString()));
-		contact.setService(ContactHelper.nullToEmptyString(bus.getDepartment()
-				.getPropertyValueAsString()));
+		BusinessDetail bus = funis.getBusinessDetail();
 
-		Address addr = bus.getAddress();
-		contact.setTown(ContactHelper.nullToEmptyString(addr.getCity()
-				.getPropertyValueAsString()));
-		// country_iso_iso3166 char 2 in obm
-		contact.setCountry(ContactHelper.getCountry(addr));
-		ContactHelper
-				.constructObmStreet(contact, ContactHelper
-						.nullToEmptyString(addr.getStreet()
-								.getPropertyValueAsString()));
-		contact.setZipCode(ContactHelper.nullToEmptyString(addr.getPostalCode()
-				.getPropertyValueAsString()));
-		contact.setExpressPostal(ContactHelper.nullToEmptyString(addr
-				.getPostOfficeAddress().getPropertyValueAsString()));
-
-		// email 1
-		contact.setEmail(ContactHelper.nullToEmptyString(ContactHelper
-				.getEmail(foundation.getPersonalDetail().getEmails(),
-						ContactHelper.WORK_EMAIL)));
-		// email 2
-		contact.setEmail2(ContactHelper.nullToEmptyString(ContactHelper
-				.getEmail(foundation.getPersonalDetail().getEmails(),
-						ContactHelper.HOME_EMAIL)));
-
-		// different in vcard
-		if (type.equals(ObmSyncSource.MSG_TYPE_VCARD)) {
-			contact.setHomePhone(ContactHelper.nullToEmptyString(ContactHelper
-					.getPhone(foundation.getPersonalDetail().getPhones(),
-							ContactHelper.HOME_PHONE)));// OTHER_PHONE)) );
-		} else {
-			contact.setHomePhone(ContactHelper.nullToEmptyString(ContactHelper
-					.getPhone(foundation.getPersonalDetail().getPhones(),
-							ContactHelper.HOME_PHONE)));
-		}
-		contact.setMobilePhone(ContactHelper.nullToEmptyString(ContactHelper
-				.getPhone(foundation.getPersonalDetail().getPhones(),
-						ContactHelper.HOME_MOBILE)));
-
+		// TODO phones, email, contact
+		
 		// comment
 		contact.setComment(ContactHelper.nullToEmptyString(ContactHelper
-				.getNote(foundation.getNotes(), ContactHelper.COMMENT)));
-
-		// private
-		if (Helper.nullToZero(foundation.getSensitivity()).shortValue() == 0) { // olNormal
-			contact.setPrivacy(0); // public
-		} else {
-			contact.setPrivacy(1); // private
-		}
+				.getNote(funis.getNotes(), ContactHelper.COMMENT)));
 
 		return contact;
 	}

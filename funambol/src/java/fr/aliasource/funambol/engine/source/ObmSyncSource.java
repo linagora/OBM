@@ -5,6 +5,7 @@ package fr.aliasource.funambol.engine.source;
 
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
@@ -27,6 +28,11 @@ import com.funambol.server.config.Configuration;
  */
 public abstract class ObmSyncSource extends AbstractSyncSource implements
 		SyncSource, Serializable, LazyInitBean {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8641196924967132469L;
 
 	protected Principal principal = null;
 
@@ -156,14 +162,14 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 		logger.info(message.toString());
 	}
 
-	public SyncItemKey[] getSyncItemKeysFromKeys(String[] keys) {
+	public SyncItemKey[] getSyncItemKeysFromKeys(List<String> keys) {
 		int nb = 0;
 		if (keys != null) {
-			nb = keys.length;
+			nb = keys.size();
 		}
 		SyncItemKey[] syncKeys = new SyncItemKey[nb];
 		for (int i = 0; i < nb; i++) {
-			syncKeys[i] = new SyncItemKey(keys[i]);
+			syncKeys[i] = new SyncItemKey(keys.get(i));
 		}
 
 		return syncKeys;

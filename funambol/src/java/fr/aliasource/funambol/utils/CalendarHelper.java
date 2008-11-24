@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.calendar.ParticipationState;
 
 import com.funambol.common.pim.calendar.RecurrencePattern;
 import com.funambol.common.pim.calendar.RecurrencePatternException;
@@ -322,7 +323,7 @@ public class CalendarHelper extends Helper {
 		} else {
 			/* infinite */
 			cEndRec.add(Calendar.YEAR, 2049);
-			//cEndRec = null;
+			// cEndRec = null;
 		}
 		recurrence.setEnd(cEndRec.getTime());
 
@@ -369,7 +370,7 @@ public class CalendarHelper extends Helper {
 	public static boolean isUserRefused(String userEmail, List<Attendee> list) {
 		for (Attendee at : list) {
 			if (at.getEmail().equals(userEmail)
-					&& at.getStatus().equals("REFUSED")) {
+					&& at.getState() == ParticipationState.DECLINED) {
 				return true;
 			}
 		}
@@ -380,7 +381,7 @@ public class CalendarHelper extends Helper {
 		if (event.getAttendees() != null) {
 			for (Attendee at : event.getAttendees()) {
 				if (at.getEmail().equals(userEmail)) {
-					at.setStatus("REFUSED");
+					at.setState(ParticipationState.DECLINED);
 					break;
 				}
 			}
