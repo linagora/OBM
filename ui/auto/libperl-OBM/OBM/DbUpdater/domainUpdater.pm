@@ -56,14 +56,12 @@ sub update {
                     domain_label,
                     domain_description,
                     domain_name,
-                    domain_mail_server_id,
                     domain_alias
                 ) SELECT    domain_id,
                             domain_global,
                             domain_label,
                             domain_description,
                             domain_name,
-                            domain_mail_server_id,
                             domain_alias
                   FROM Domain
                   WHERE domain_id='.$entity->getId();
