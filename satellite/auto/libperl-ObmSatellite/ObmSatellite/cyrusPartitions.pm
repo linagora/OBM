@@ -60,33 +60,12 @@ sub new {
 
 
     for( my $i=0; $i<=$#{$domainList}; $i++ ) {
-        my $ldapFilter = "(&(objectclass=dcObject)(o=".$domainList->[$i]."))";
-        my $ldapAttributes = [ 'dc' ];
-
-        my @ldapEntries;
-        if( &ObmSatellite::utils::ldapSearch( $daemonRef->{ldap_server}, \@ldapEntries, $ldapFilter, $ldapAttributes ) ) {
-            $daemonRef->logMessage( "Echec: lors de l'obtention du domaine de messagerie principal du domaine OBM '".$domainList->[$i]."'" );
-            next;
-        }
-
-        if( $#ldapEntries != 0 ) {
-            $daemonRef->logMessage( "Echec: probleme dans la description LDAP du domaine OBM '".$domainList->[$i]."' !!!" );
-            next;
-        }
-
-        my $referenceList = $ldapEntries[0]->get_value( $ldapAttributes->[0], asref=>1 );
-        if( $#{$referenceList} < 0 ) {
-            $daemonRef->logMessage( "Echec: domaine de messagerie principal absent pour le domaine OBM '".$domainList->[$i]."' !!!" );
-            next;
-        }
+	# On mémorise l'association 'domain_name'=>'cyrus_domain_partition_name'
+	$cyrusPartitionAttr{"domainList"}->{$domainList->[$i]} = $domainList->[$i];
 
         # On remplace les caractères spéciaux par des '_'.
-        $referenceList->[0] =~ s/\./_/g;
-        $referenceList->[0] =~ s/-/_/g;
-
-        # On mémorise l'association 'domain_label'=>'cyrus_domain_partition_name'
-        $cyrusPartitionAttr{"domainList"}->{$domainList->[$i]} = $referenceList->[0];
-
+        $cyrusPartitionAttr{"domainList"}->{$domainList->[$i]} =~ s/\./_/g;
+        $cyrusPartitionAttr{"domainList"}->{$domainList->[$i]} =~ s/-/_/g;
     }
 
     if( !defined($cyrusPartitionAttr{"domainList"}) ) {
