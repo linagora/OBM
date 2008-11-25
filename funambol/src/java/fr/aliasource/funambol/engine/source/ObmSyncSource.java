@@ -220,12 +220,6 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 	}
 
 	@Override
-	public void endSync() throws SyncSourceException {
-		super.endSync();
-		logger.info("end sync");
-	}
-
-	@Override
 	public SyncSourceInfo getInfo() {
 		SyncSourceInfo info = super.getInfo();
 		return info;

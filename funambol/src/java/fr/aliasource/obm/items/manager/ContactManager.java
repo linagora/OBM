@@ -316,5 +316,10 @@ public class ContactManager extends ObmManager {
 
 		return contact;
 	}
+	
+	public void logout() {
+		binding.logout(token);
+	}
+
 
 }

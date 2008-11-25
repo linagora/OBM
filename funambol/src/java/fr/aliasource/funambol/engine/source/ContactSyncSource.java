@@ -1,7 +1,6 @@
 package fr.aliasource.funambol.engine.source;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
@@ -9,13 +8,10 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.book.BookType;
-import org.xml.sax.SAXException;
 
 import com.funambol.common.pim.contact.Contact;
-import com.funambol.common.pim.converter.ContactToSIFC;
 import com.funambol.common.pim.converter.ContactToVcard;
 import com.funambol.common.pim.converter.ConverterException;
-import com.funambol.common.pim.sif.SIFCParser;
 import com.funambol.common.pim.vcard.VcardParser;
 import com.funambol.framework.engine.SyncItem;
 import com.funambol.framework.engine.SyncItemImpl;
@@ -61,7 +57,6 @@ public final class ContactSyncSource extends ObmSyncSource implements
 
 		// manager.logIn("nicolasl","44669462809866fbfc6eab1f9fa93d4b");
 		manager.setBook(BookType.contacts);
-		manager.initRestriction(getRestrictions());
 	}
 
 	public void init() {
@@ -224,21 +219,18 @@ public final class ContactSyncSource extends ObmSyncSource implements
 	 */
 	public SyncItem getSyncItemFromId(SyncItemKey syncItemKey)
 			throws SyncSourceException {
-		logger
-				.info("getSyncItemFromId(" + principal + ", " + syncItemKey
-						+ ")");
+		logger.info("syncItemFromId(" + principal + ", " + syncItemKey + ")");
 
-		String key = syncItemKey.getKeyAsString();
-
-		com.funambol.common.pim.contact.Contact contact = null;
 		try {
+			com.funambol.common.pim.contact.Contact contact = null;
+			String key = syncItemKey.getKeyAsString();
 			contact = manager.getItemFromId(key, getSourceType());
+			SyncItem ret = getSyncItemFromFoundation(contact,
+					SyncItemState.UNKNOWN);
+			return ret;
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
-		SyncItem ret = getSyncItemFromFoundation(contact, SyncItemState.UNKNOWN);
-
-		return ret;
 	}
 
 	// -------------------- Private methods ----------------------
@@ -252,7 +244,7 @@ public final class ContactSyncSource extends ObmSyncSource implements
 		if (MSG_TYPE_VCARD.equals(getSourceType())) {
 			content = getVCardFromFoundationContact(contact);
 		} else {
-			content = getXMLFromFoundationContact(contact);
+			logger.error("Only vcard type is supported");
 		}
 
 		syncItem = new SyncItemImpl(this, contact.getUid(), state);
@@ -268,19 +260,6 @@ public final class ContactSyncSource extends ObmSyncSource implements
 		}
 
 		return syncItem;
-	}
-
-	private String getXMLFromFoundationContact(Contact contact)
-			throws SyncSourceException {
-		String xml = null;
-		ContactToSIFC c2xml = new ContactToSIFC(deviceTimezone, deviceCharset);
-		try {
-			xml = c2xml.convert(contact);
-		} catch (ConverterException e) {
-			throw new SyncSourceException("Error converting to XML", e);
-		}
-
-		return xml;
 	}
 
 	private String getVCardFromFoundationContact(Contact contact) {
@@ -307,34 +286,12 @@ public final class ContactSyncSource extends ObmSyncSource implements
 		if (MSG_TYPE_VCARD.equals(getSourceType())) {
 			contact = getFoundationContactFromVCard(content);
 		} else {
-			contact = getFoundationContactFromXML(content);
+			logger.error("Only vcard type is supported");
 		}
 
 		contact.setUid(item.getKey().getKeyAsString());
 
 		return contact;
-	}
-
-	private Contact getFoundationContactFromXML(String content)
-			throws OBMException {
-
-		Contact result = new Contact();
-
-		ByteArrayInputStream buffer = null;
-		SIFCParser parser = null;
-
-		buffer = new ByteArrayInputStream(content.getBytes());
-		if ((content.getBytes()).length > 0) {
-			try {
-				parser = new SIFCParser(buffer);
-				result = (Contact) parser.parse();
-			} catch (SAXException e) {
-				throw new OBMException("Error converting from XML", e);
-			} catch (IOException e) {
-				throw new OBMException("Error converting from XML", e);
-			}
-		}
-		return result;
 	}
 
 	private Contact getFoundationContactFromVCard(String content)
@@ -364,6 +321,12 @@ public final class ContactSyncSource extends ObmSyncSource implements
 		}
 
 		return contact;
+	}
+
+	@Override
+	public void endSync() throws SyncSourceException {
+		manager.logout();
+		super.endSync();
 	}
 
 }

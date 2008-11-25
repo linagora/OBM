@@ -9,15 +9,12 @@ import org.apache.commons.logging.LogFactory;
 
 import com.funambol.common.pim.calendar.Calendar;
 import com.funambol.common.pim.common.Property;
-import com.funambol.common.pim.converter.CalendarToSIFE;
 import com.funambol.common.pim.converter.ConverterException;
 import com.funambol.common.pim.converter.VCalendarConverter;
 import com.funambol.common.pim.converter.VComponentWriter;
 import com.funambol.common.pim.icalendar.ICalendarParser;
 import com.funambol.common.pim.model.VCalendar;
-import com.funambol.common.pim.sif.SIFCalendarParser;
 import com.funambol.common.pim.xvcalendar.XVCalendarParser;
-import com.funambol.foundation.exception.EntityException;
 import com.funambol.framework.engine.SyncItem;
 import com.funambol.framework.engine.SyncItemImpl;
 import com.funambol.framework.engine.SyncItemKey;
@@ -30,7 +27,6 @@ import com.funambol.framework.tools.Base64;
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.FunisHelper;
 import fr.aliasource.funambol.utils.Helper;
-import fr.aliasource.funambol.utils.MyCal2Sif;
 import fr.aliasource.funambol.utils.MyVCalConverter;
 import fr.aliasource.obm.items.manager.CalendarManager;
 
@@ -335,61 +331,6 @@ public class CalendarSyncSource extends ObmSyncSource {
 
 	}
 
-	/**
-	 * 
-	 * Get Data from sync4j.foundation.pdi.event.Calendar converting the
-	 * Calendar object into an xml item
-	 * 
-	 * @param calendar
-	 *            Calendar
-	 * @return String
-	 * @throws OBMException
-	 * @throws SyncSourceException
-	 * @throws EntityException
-	 */
-	private String getXMLFromFoundationCalendar(Calendar calendar)
-			throws SyncSourceException {
-
-		String xml = null;
-		try {
-			CalendarToSIFE c2xml = new MyCal2Sif(deviceTimezone, deviceCharset);
-			xml = c2xml.convert(calendar);
-		} catch (ConverterException ex) {
-			throw new SyncSourceException("Error converting calendar in xml",
-					ex);
-		}
-
-		return xml;
-	}
-
-	/**
-	 * Get Data from XML message converting the xml item into a Calendar object
-	 * 
-	 * the calendar object is a sync4j.foundation.pdi.event.Calendar
-	 * 
-	 * @param content
-	 *            String
-	 * @return Calendar
-	 * @throws OBMException
-	 */
-	private Calendar getFoundationCalendarFromXML(String content)
-			throws OBMException {
-
-		ByteArrayInputStream buffer = null;
-		Calendar calendar = null;
-		try {
-			calendar = new Calendar();
-			buffer = new ByteArrayInputStream(content.getBytes());
-			if ((content.getBytes()).length > 0) {
-				SIFCalendarParser parser = new SIFCalendarParser(buffer);
-				calendar = parser.parse();
-			}
-		} catch (Exception e) {
-			throw new OBMException("Error converting ", e);
-		}
-		return calendar;
-	}
-
 	private Calendar getFoundationFromSyncItem(SyncItem item)
 			throws OBMException, SyncSourceException {
 		Calendar foundationCalendar = null;
@@ -401,7 +342,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 		if (MSG_TYPE_ICAL.equals(getSourceType())) {
 			foundationCalendar = getFoundationCalendarFromICal(content);
 		} else {
-			foundationCalendar = getFoundationCalendarFromXML(content);
+			logger.error("Only Ical is supported");
 		}
 
 		logger.info("calContent.uid: "
@@ -422,7 +363,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 		if (MSG_TYPE_ICAL.equals(getSourceType())) {
 			content = getICalFromFoundationCalendar(calendar);
 		} else {
-			content = getXMLFromFoundationCalendar(calendar);
+			logger.error("Only Ical is supported");
 		}
 
 		syncItem = new SyncItemImpl(this, calendar.getCalendarContent()
@@ -439,5 +380,11 @@ public class CalendarSyncSource extends ObmSyncSource {
 		}
 
 		return syncItem;
+	}
+
+	@Override
+	public void endSync() throws SyncSourceException {
+		manager.logout();
+		super.endSync();
 	}
 }

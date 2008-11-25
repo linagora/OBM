@@ -39,23 +39,23 @@ public class ICalParsingTest extends TestCase {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testAsVcal() {
 		XVCalendarParser parser = new XVCalendarParser(bin);
 		try {
 			VCalendar cal = parser.XVCalendar();
 			assertNotNull(cal);
-			List p = cal.getAllProperties();
-			for (Object o : p) {
-				Property pr = (Property) o;
-				System.out.println("cal pr: "+pr);
+			List<Property> p = cal.getAllProperties();
+			for (Property pr : p) {
+				System.out.println("cal pr: " + pr);
 			}
 			VCalendarContent vcc = cal.getVCalendarContent();
 			p = vcc.getAllProperties();
 			for (Object o : p) {
 				Property pr = (Property) o;
-				System.out.println("vcc pr: "+pr);
+				System.out.println("vcc pr: " + pr);
 			}
-			
+
 		} catch (com.funambol.common.pim.xvcalendar.ParseException e) {
 			e.printStackTrace();
 			fail("not parseable as icalendar");

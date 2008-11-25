@@ -104,7 +104,7 @@ public class CalendarManager extends ObmManager {
 		if (!syncReceived) {
 			getSync(since);
 		}
-		
+
 		ArrayList<String> ret = new ArrayList<String>(deletedRest.size());
 		ret.addAll(deletedRest);
 		return ret;
@@ -250,7 +250,9 @@ public class CalendarManager extends ObmManager {
 		} catch (ServerFault e) {
 			throw new OBMException(e.getMessage());
 		}
-		logger.info("getSync("+calendar+", "+d+" (since == "+since+")) => upd: "+sync.getUpdated().length+" del: "+sync.getRemoved().length);
+		logger.info("getSync(" + calendar + ", " + d + " (since == " + since
+				+ ")) => upd: " + sync.getUpdated().length + " del: "
+				+ sync.getRemoved().length);
 		Event[] updated = new Event[0];
 		if (sync.getUpdated() != null) {
 			updated = sync.getUpdated();
@@ -266,8 +268,7 @@ public class CalendarManager extends ObmManager {
 		String user = token.getUser();
 
 		for (Event e : updated) {
-			logger.info("getSync: " + e.getTitle() + ", d: "
-					+ e.getDate());
+			logger.info("getSync: " + e.getTitle() + ", d: " + e.getDate());
 			if (e.getPrivacy() == 1
 					&& !calendar.equals(user)
 					|| (CalendarHelper.isUserRefused(userEmail, e
@@ -562,5 +563,9 @@ public class CalendarManager extends ObmManager {
 			// + " new dtend: " + cal.getTime());
 		}
 		return cal.getTime();
+	}
+
+	public void logout() {
+		binding.logout(token);
 	}
 }
