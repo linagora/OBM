@@ -102,7 +102,7 @@ sub getEntityCyrusServer {
 }
 
 
-sub getCyrusServerConn {
+sub getCyrusServerById {
     my $self = shift;
     my( $serverId, $domainId ) = @_;
 
@@ -110,8 +110,8 @@ sub getCyrusServerConn {
         return undef;
     }
 
-    $self->_log( 'obtention de la connexion au '.$self->{'servers'}->{$serverId}->getDescription(), 3 );
-    return $self->{'servers'}->{$serverId}->getCyrusConn( $domainId );
+    $self->_log( 'obtention de la description de '.$self->{'servers'}->{$serverId}->getDescription(), 3 );
+    return $self->{'servers'}->{$serverId};
 }
 
 

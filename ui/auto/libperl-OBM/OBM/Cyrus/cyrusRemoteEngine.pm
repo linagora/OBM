@@ -1,146 +1,182 @@
 package OBM::Cyrus::cyrusRemoteEngine;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
-use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
 use strict;
 
-use OBM::Parameters::common;
+use base qw( Class::Singleton );
+use OBM::Tools::commonMethods qw(
+        _log
+        dump
+        );
+require Sys::Syslog;
 use Net::Telnet;
 
 
-sub new {
-    my $self = shift;
-    my( $domainList ) = @_;
+sub _new_instance {
+    my $class = shift;
 
-    # Definition des attributs de l'objet
-    my %cyrusRemoteEngineAttr = (
-        domainList => undef,
-        cyrusMailServerList => undef
-    );
+    my $self = bless { }, $class;
 
-
-    if( !defined($domainList) ) {
-        croak( "Usage: PACKAGE->new(DOMAINLIST)" );
+    require OBM::Parameters::common;
+    if( !$OBM::Parameters::common::obmModules->{'mail'} ) {
+        $self->_log( 'module OBM-MAIL désactivé, gestionnaire Cyrus distant non démarré', 3 );
+        return undef;
     }
 
-    $cyrusRemoteEngineAttr{"domainList"} = $domainList;
+    # Setting obmSatellite TCP port
+    $self->{'obmSatellitePort'} = '30000';
 
-    bless( \%cyrusRemoteEngineAttr, $self );
+    return $self;
 }
 
 
 sub init {
-    my $self = shift;
-    my $domainsDesc = $self->{"domainList"};
-
-    if( !$OBM::Parameters::common::obmModules->{"mail"} ) {
-        # Pas de support de la messagerie
-        return 0;
-    }
-
-    &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: initialisation du moteur", "W" );
-
     if( !$OBM::Parameters::common::cyrusDomainPartition ) {
         # Pas de support des partitions Cyrus par domaine
         return 0;
     }
-
-    # Obtention de la liste des serveurs entrant à mettre à jour
-    for( my $i=0; $i<=$#$domainsDesc; $i++ ) {
-        my $currentDomainDesc = $domainsDesc->[$i];
-
-        if( $currentDomainDesc->{"meta_domain"} ) {
-            next;
-        }
-
-        if( !defined($currentDomainDesc->{"imap_servers"}) ) {
-            next;
-        }
-
-        my $domainSrvList = $currentDomainDesc->{"imap_servers"};
-        for( my $j=0; $j<=$#$domainSrvList; $j++ ) {
-            $self->{"cyrusMailServerList"}->{$domainSrvList->[$j]->{"imap_server_name"}} = $domainSrvList->[$j];
-        }
-    }
-
-    return 1;
 }
 
 
 sub DESTROY {
     my $self = shift;
 
-    &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: arret du moteur", "W" );
-
-    return 1;
+    $self->_log( 'suppression de l\'objet', 4 );
 }
 
 
-sub dump {
+sub addCyrusPartition {
     my $self = shift;
-    my @desc;
+    my( $cyrusSrv ) = @_;
 
-    push( @desc, $self );
-
-    require Data::Dumper;
-    print Data::Dumper->Dump( \@desc );
-
-    return 1;
-}
-
-
-sub update {
-    my $self = shift;
-    my( $action ) = @_;
-    my $srvList = $self->{"cyrusMailServerList"};
-    my $globalReturn = 1;
-
-    if( !defined($action) || ( $action !~ /^add|del$/ ) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: Erreur: vous devez indiquer une action [add|del]", "W" );
+    if( !$OBM::Parameters::common::cyrusDomainPartition ) {
+        # Cyrus partition support disable
         return 0;
     }
 
-    while( my( $serverName, $serverDesc ) = each(%{$srvList}) ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: connexion au serveur : '".$serverName."'", "W" );
-        my $srvCon = new Net::Telnet(
-            Host => $serverDesc->{"imap_server_ip"},
-            Port => 30000,
-            Timeout => 60,
-            errmode => "return"
-        );
-
-        if( !defined($srvCon) || !$srvCon->open() ) {
-            &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: echec de connexion au serveur : ".$serverName, "W" );
-            $globalReturn = 0;
-            next;
-        }
-
-        while( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 1)) ) {
-            chomp($line);
-            &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: reponse : '".$line."'", "W" );
-        }
-
-        my $cmd = "cyrusPartitions: ".$action.":".$serverName;
-        &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: envoie de la commande : '".$cmd."'", "W" );
-        $srvCon->print( $cmd );
-        if( (!$srvCon->eof()) && (my $line = $srvCon->getline()) ) {
-            chomp($line);
-            &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: reponse : '".$line."'", "W" );
-        }
-
-        &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: deconnexion du serveur : '".$serverName."'", "W" );
-        $srvCon->print( "quit" );
-        while( !$srvCon->eof() && (my $line = $srvCon->getline(Timeout => 1)) ) {
-            chomp($line);
-            &OBM::toolBox::write_log( "[Cyrus::cyrusRemoteEngine]: reponse : '".$line."'", "W" );
-        }
-
+    if( !defined($cyrusSrv) ) {
+        $self->_log( 'serveur Cyrus non défini, ajout de partition impossible', 3 );
+        return 1;
+    }elsif( ref($cyrusSrv) ne 'OBM::Cyrus::cyrusServer' ) {
+        $self->_log( 'description du serveur Cyrus incorrecte, ajout de partition impossible', 3 );
+        return 1;
     }
 
-    return $globalReturn;
+    my $cyrusSrvIp = $cyrusSrv->getCyrusServerIp();
+    if( !$cyrusSrvIp ) {
+        $self->_log( 'adresse IP du serveur Cyrus incorrecte, ajout de partition impossible', 3 );
+        return 1;
+    }
+
+    $self->_log( 'connexion à obmSatellite de '.$cyrusSrv->getDescription(), 2 );
+    my $srvCon = new Net::Telnet(
+        Host => $cyrusSrvIp,
+        Port => $self->{'obmSatellitePort'},
+        Timeout => 60,
+        errmode => 'return'
+    );
+
+    if( !defined($srvCon) ) {
+        $self->_log( 'problème à l\'initialisation de la connexion à obmSatellite de '.$cyrusSrv->getDescription(), 3 );
+        return 1;
+    }
+
+    if( !$srvCon->open() ) {
+        $self->_log( 'echec de connexion à obmSatellite de '.$cyrusSrv->getDescription().' : '.$srvCon->errmsg(), 2 );
+        return 1;
+    }
+
+    while( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 2)) ) {
+        chomp($line);
+        $self->_log( 'réponse : \''.$line.'\'', 4 );
+    }
+
+    my $cmd = 'cyrusPartitions: add:'.$cyrusSrv->getCyrusServerName();
+    $self->_log( 'envoi de la commande : '.$cmd, 2 );
+    $srvCon->print( $cmd );
+    if( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 60)) ) {
+        chomp($line);
+        $self->_log( 'réponse : \''.$line.'\'', 4 );
+    }
+
+    $self->_log( 'déconnexion d\'obmSatellite de '.$cyrusSrv->getDescription(), 2 );
+    $srvCon->print( 'quit' );
+    while( !$srvCon->eof() && (my $line = $srvCon->getline(Timeout => 5)) ) {
+        chomp($line);
+        $self->_log( 'réponse : \''.$line.'\'', 4 );
+    }
+
+
+    return 0;
+}
+
+
+sub delCyrusPartition {
+    my $self = shift;
+    my( $cyrusSrv ) = @_;
+
+    if( !$OBM::Parameters::common::cyrusDomainPartition ) {
+        # Cyrus partition support disable
+        return 0;
+    }
+
+    if( !defined($cyrusSrv) ) {
+        $self->_log( 'serveur Cyrus non défini, suppression de partition impossible', 3 );
+        return 1;
+    }elsif( ref($cyrusSrv) ne 'OBM::Cyrus::cyrusServer' ) {
+        $self->_log( 'description du serveur Cyrus incorrecte, suppression de partition impossible', 3 );
+        return 1;
+    }
+
+    my $cyrusSrvIp = $cyrusSrv->getCyrusServerIp();
+    if( !$cyrusSrvIp ) {
+        $self->_log( 'adresse IP du serveur Cyrus incorrecte, suppression de partition impossible', 3 );
+        return 1;
+    }
+
+    $self->_log( 'connexion à obmSatellite de '.$cyrusSrv->getDescription(), 2 );
+    my $srvCon = new Net::Telnet(
+        Host => $cyrusSrvIp,
+        Port => $self->{'obmSatellitePort'},
+        Timeout => 60,
+        errmode => 'return'
+    );
+
+    if( !defined($srvCon) ) {
+        $self->_log( 'problème à l\'initialisation de la connexion à obmSatellite de '.$cyrusSrv->getDescription(), 3 );
+        return 1;
+    }
+
+    if( !$srvCon->open() ) {
+        $self->_log( 'echec de connexion à obmSatellite de '.$cyrusSrv->getDescription().' : '.$srvCon->errmsg(), 2 );
+        return 1;
+    }
+
+    while( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 5)) ) {
+        chomp($line);
+        $self->_log( 'réponse : \''.$line.'\'', 4 );
+    }
+
+    my $cmd = 'cyrusPartitions: add:'.$cyrusSrv->getCyrusServerName();
+    $self->_log( 'envoi de la commande : '.$cmd, 2 );
+    $srvCon->print( $cmd );
+    if( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 60)) ) {
+        chomp($line);
+        $self->_log( 'réponse : \''.$line.'\'', 4 );
+    }
+
+    $self->_log( 'déconnexion d\'obmSatellite de '.$cyrusSrv->getDescription(), 2 );
+    $srvCon->print( 'quit' );
+    while( !$srvCon->eof() && (my $line = $srvCon->getline(Timeout => 5)) ) {
+        chomp($line);
+        $self->_log( 'réponse : \''.$line.'\'', 4 );
+    }
+
+
+    return 0;
 }

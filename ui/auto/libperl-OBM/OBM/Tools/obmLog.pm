@@ -1,6 +1,6 @@
 package OBM::Tools::obmLog;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 $debug = 1;
 

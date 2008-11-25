@@ -88,8 +88,13 @@ sub _getServerDesc {
         return 1;
     }
 
-    if( !defined($self->{'serverDesc'}->{'host_ip'}) ) {
+    if( !defined($self->{'serverDesc'}->{'host_name'}) ) {
         $self->_log( 'nom d\'hôte du serveur non défini', 3 );
+        return 1;
+    }
+
+    if( !defined($self->{'serverDesc'}->{'host_ip'}) ) {
+        $self->_log( 'ip d\'hôte du serveur non défini', 3 );
         return 1;
     }
 
@@ -217,6 +222,13 @@ sub _checkDomainId {
     }
 
     return $notFound;
+}
+
+
+sub getCyrusServerName {
+    my $self = shift;
+
+    return $self->{'serverDesc'}->{'host_name'};
 }
 
 
