@@ -111,7 +111,7 @@ public class MyCalContentConverter extends VCalendarConverter {
 			vcc = new VTodo();
 		}
 
-		ArrayList properties = new ArrayList(15);
+		ArrayList<Object> properties = new ArrayList<Object>(15);
 
 		properties.add(composeField("UID", cc.getUid()));
 		// Shouldn't be necessary: the UID is already known at Calendar level

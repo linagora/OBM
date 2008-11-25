@@ -1,10 +1,6 @@
 package fr.aliasource.obm.items.manager;
 
-import java.util.List;
-import java.util.Map;
-
 import org.obm.sync.auth.AccessToken;
-import org.obm.sync.calendar.Event;
 
 import fr.aliasource.funambol.utils.Helper;
 

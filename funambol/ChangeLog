@@ -1,3 +1,20 @@
+2008-11-25  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	Warning fixes
+	
+	* src/java/fr/aliasource/funambol/utils/FunisHelper.java:
+	(FunisHelper):
+	* src/java/fr/aliasource/funambol/utils/Helper.java:
+	(Helper.listToTab), (Helper.setToTab):
+	* src/java/fr/aliasource/funambol/utils/MyCal2Sif.java:
+	(MyCal2Sif), (MyCal2Sif.MyCal2Sif):
+	* src/java/fr/aliasource/funambol/utils/MyCalContentConverter.java:
+	(MyCalContentConverter..cc2vcc):
+	* src/java/fr/aliasource/obm/items/manager/ContactManager.java:
+	(ContactManager.obmContactTofoundation), (ContactManager),
+	(ContactManager.foundationContactToObm):
+	* src/java/fr/aliasource/obm/items/manager/ObmManager.java:
+
 2008-11-24  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	Make funis sync sources build again

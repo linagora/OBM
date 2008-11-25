@@ -80,13 +80,13 @@ public class Helper {
 		}
 	}
 
-	public static String[] listToTab(List list) {
+	public static String[] listToTab(List<String> list) {
 		String[] result = (String[]) list.toArray(new String[list.size()]);
 		return result;
 	}
 
 
-	public static String[] setToTab(Set set) {
+	public static String[] setToTab(Set<String> set) {
 		String[] result = (String[]) set.toArray(new String[set.size()]);
 		return result;
 	}

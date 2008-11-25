@@ -21,11 +21,6 @@ import org.obm.sync.client.book.BookClient;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.locators.AddressBookLocator;
 
-import com.funambol.common.pim.common.Property;
-import com.funambol.common.pim.contact.Address;
-import com.funambol.common.pim.contact.BusinessDetail;
-import com.funambol.common.pim.contact.PersonalDetail;
-
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.ContactHelper;
 
@@ -265,8 +260,8 @@ public class ContactManager extends ObmManager {
 						obmcontact.getLastname()));
 		contact.getName().getNickname().setPropertyValue(obmcontact.getAka());
 
-		BusinessDetail bd = contact.getBusinessDetail();
-		PersonalDetail pd = contact.getPersonalDetail();
+//		BusinessDetail bd = contact.getBusinessDetail();
+//		PersonalDetail pd = contact.getPersonalDetail();
 		// FIXME email, address, phones
 		
 		ContactHelper.setFoundationNote(contact, obmcontact.getComment(),
@@ -277,18 +272,18 @@ public class ContactManager extends ObmManager {
 		return contact;
 	}
 
-	private org.obm.sync.book.Address updateAddress(Address funis, String type) {
-		org.obm.sync.book.Address obm = new org.obm.sync.book.Address(s(funis
-				.getStreet()), s(funis.getPostalCode()), s(funis
-				.getPostOfficeAddress()), s(funis.getCity()), s(funis
-				.getCountry()));
-		return obm;
-	}
+//	private org.obm.sync.book.Address updateAddress(Address funis, String type) {
+//		org.obm.sync.book.Address obm = new org.obm.sync.book.Address(s(funis
+//				.getStreet()), s(funis.getPostalCode()), s(funis
+//				.getPostOfficeAddress()), s(funis.getCity()), s(funis
+//				.getCountry()));
+//		return obm;
+//	}
 
-	private String s(Property p) {
-		return p.getPropertyValueAsString();
-	}
-
+//	private String s(Property p) {
+//		return p.getPropertyValueAsString();
+//	}
+//
 	private Contact foundationContactToObm(
 			com.funambol.common.pim.contact.Contact funis, String type) {
 
@@ -311,13 +306,13 @@ public class ContactManager extends ObmManager {
 					.getNickname().getPropertyValueAsString()));
 		}
 
-		BusinessDetail bus = funis.getBusinessDetail();
+//		BusinessDetail bus = funis.getBusinessDetail();
 
 		// TODO phones, email, contact
 		
 		// comment
-		contact.setComment(ContactHelper.nullToEmptyString(ContactHelper
-				.getNote(funis.getNotes(), ContactHelper.COMMENT)));
+//		contact.setComment(ContactHelper.nullToEmptyString(ContactHelper
+//				.getNote(funis.getNotes(), ContactHelper.COMMENT)));
 
 		return contact;
 	}

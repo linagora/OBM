@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FunisHelper {
 	
+	@SuppressWarnings("unused")
 	private static final Log logger = LogFactory.getLog(FunisHelper.class);
 
 	public static String removeQuotedPrintableFromVCalString(String vcal) {

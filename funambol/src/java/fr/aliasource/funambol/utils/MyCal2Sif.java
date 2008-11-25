@@ -10,13 +10,13 @@ import com.funambol.common.pim.converter.CalendarToSIFE;
 
 public class MyCal2Sif extends CalendarToSIFE {
 
-	private TimeZone savedTz;
+//	private TimeZone savedTz;
 	private Log logger = LogFactory.getLog(getClass());
 	private String storedStart;
 
 	public MyCal2Sif(TimeZone timezone, String charset) {
 		super(timezone, charset);
-		this.savedTz = timezone;
+//		this.savedTz = timezone;
 	}
 
 	@Override
