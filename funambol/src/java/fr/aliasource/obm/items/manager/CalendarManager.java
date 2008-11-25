@@ -17,25 +17,31 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.client.ISyncClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.locators.CalendarLocator;
-
-import com.funambol.framework.logging.FunambolLogger;
-import com.funambol.framework.logging.FunambolLoggerFactory;
 
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.CalendarHelper;
 import fr.aliasource.funambol.utils.Helper;
 
+/**
+ * Maintains a connection to obm-sync through a {@link CalendarClient}.
+ * 
+ * Stores the result of the getSync call to provide updates and deletions
+ * informations "on demand".
+ * 
+ * @author tom
+ * 
+ */
 public class CalendarManager extends ObmManager {
 
 	private CalendarClient binding;
 	private String calendar;
-	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
 	private String userEmail;
-	protected Map<String, Event> updatedRest = null;
-	protected List<String> deletedRest = null;
+	private Map<String, Event> updatedRest = null;
+	private List<String> deletedRest = null;
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -43,10 +49,6 @@ public class CalendarManager extends ObmManager {
 
 		CalendarLocator calendarLocator = new CalendarLocator();
 		binding = calendarLocator.locate(obmAddress.replace("/Calendar", ""));
-	}
-
-	public void initRestriction(int restrictions) {
-		this.restrictions = restrictions;
 	}
 
 	public String getCalendar() {
@@ -65,14 +67,6 @@ public class CalendarManager extends ObmManager {
 		return token;
 	}
 
-	//
-
-	public void logIn(String user, String pass) throws OBMException {
-		token = binding.login(user, pass);
-		if (token == null) {
-			throw new OBMException("OBM Login refused for user : " + user);
-		}
-	}
 
 	public void initUserEmail() throws OBMException {
 		// userEmail = "nicolas.lascombes@aliasource.fr";
@@ -127,9 +121,8 @@ public class CalendarManager extends ObmManager {
 		event = (Event) updatedRest.get(key);
 
 		if (event == null) {
-			log
-					.info(" item " + key
-							+ " not found in updated -> get from sever");
+			logger.info(" item " + key
+					+ " not found in updated -> get from sever");
 			try {
 				event = binding.getEventFromId(token, calendar, key);
 			} catch (AuthFault e) {
@@ -565,7 +558,8 @@ public class CalendarManager extends ObmManager {
 		return cal.getTime();
 	}
 
-	public void logout() {
-		binding.logout(token);
+	@Override
+	public ISyncClient getSyncClient() {
+		return binding;
 	}
 }

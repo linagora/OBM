@@ -211,7 +211,7 @@ public class ObmOfficer implements Officer, java.io.Serializable{
 			manager.logIn(login,password);
 			if (manager.getToken() != null) check = true;
 		} catch (OBMException e) {
-			log.error("Error login Obm" + e);
+			log.error("Error login Obm " + e);
 		}
         return check;
     }

@@ -1,27 +1,26 @@
 package fr.aliasource.obm.items.manager;
 
 import org.obm.sync.auth.AccessToken;
+import org.obm.sync.client.ISyncClient;
 
-import fr.aliasource.funambol.utils.Helper;
+import fr.aliasource.funambol.OBMException;
 
 public abstract class ObmManager {
-	
+
 	protected AccessToken token;
-	
-	
 	protected boolean syncReceived = false;
-	
-	protected String restrictTest = "";
-	protected int restrictions = Helper.RESTRICTS_DEFAULT;
-	
-	public abstract void initRestriction(int restrictions);
 
-	public int getRestrictions() {
-		return restrictions;
+	public abstract ISyncClient getSyncClient();
+
+	public void logIn(String user, String pass) throws OBMException {
+		token = getSyncClient().login(user, pass);
+		if (token == null) {
+			throw new OBMException("OBM Login refused for user : " + user);
+		}
 	}
 
-	public void setRestrictions(int restrictions) {
-		this.restrictions = restrictions;
+	public void logout() {
+		getSyncClient().logout(token);
 	}
-	
+
 }

@@ -32,9 +32,6 @@ import fr.aliasource.obm.items.manager.CalendarManager;
 
 public class CalendarSyncSource extends ObmSyncSource {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8820543271150832304L;
 
 	private CalendarManager manager;
@@ -52,7 +49,6 @@ public class CalendarSyncSource extends ObmSyncSource {
 					.split("@")[0];
 			manager.setCalendar(calendar);
 			manager.initUserEmail();
-			manager.initRestriction(getRestrictions());
 
 			super.beginSync(context);
 		} catch (Throwable e) {

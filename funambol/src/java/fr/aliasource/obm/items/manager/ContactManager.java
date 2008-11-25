@@ -17,6 +17,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
+import org.obm.sync.client.ISyncClient;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.locators.AddressBookLocator;
@@ -38,20 +39,6 @@ public class ContactManager extends ObmManager {
 
 		AddressBookLocator addressbookLocator = new AddressBookLocator();
 		binding = addressbookLocator.locate(obmAddress);
-	}
-
-	public void initRestriction(int restrictions) {
-		this.restrictions = restrictions;
-		if (logger.isDebugEnabled()) {
-			logger.debug(" init restrictions: " + restrictions);
-		}
-	}
-
-	public void logIn(String user, String pass) throws OBMException {
-		token = binding.login(user, pass);
-		if (token == null) {
-			throw new OBMException("OBM Login refused for user : " + user);
-		}
 	}
 
 	public List<String> getAllItemKeys() throws OBMException {
@@ -130,8 +117,7 @@ public class ContactManager extends ObmManager {
 			}
 		}
 
-		com.funambol.common.pim.contact.Contact ret = obmContactTofoundation(
-				contact);
+		com.funambol.common.pim.contact.Contact ret = obmContactTofoundation(contact);
 
 		return ret;
 	}
@@ -260,10 +246,10 @@ public class ContactManager extends ObmManager {
 						obmcontact.getLastname()));
 		contact.getName().getNickname().setPropertyValue(obmcontact.getAka());
 
-//		BusinessDetail bd = contact.getBusinessDetail();
-//		PersonalDetail pd = contact.getPersonalDetail();
+		// BusinessDetail bd = contact.getBusinessDetail();
+		// PersonalDetail pd = contact.getPersonalDetail();
 		// FIXME email, address, phones
-		
+
 		ContactHelper.setFoundationNote(contact, obmcontact.getComment(),
 				ContactHelper.COMMENT);
 
@@ -272,18 +258,19 @@ public class ContactManager extends ObmManager {
 		return contact;
 	}
 
-//	private org.obm.sync.book.Address updateAddress(Address funis, String type) {
-//		org.obm.sync.book.Address obm = new org.obm.sync.book.Address(s(funis
-//				.getStreet()), s(funis.getPostalCode()), s(funis
-//				.getPostOfficeAddress()), s(funis.getCity()), s(funis
-//				.getCountry()));
-//		return obm;
-//	}
+	// private org.obm.sync.book.Address updateAddress(Address funis, String
+	// type) {
+	// org.obm.sync.book.Address obm = new org.obm.sync.book.Address(s(funis
+	// .getStreet()), s(funis.getPostalCode()), s(funis
+	// .getPostOfficeAddress()), s(funis.getCity()), s(funis
+	// .getCountry()));
+	// return obm;
+	// }
 
-//	private String s(Property p) {
-//		return p.getPropertyValueAsString();
-//	}
-//
+	// private String s(Property p) {
+	// return p.getPropertyValueAsString();
+	// }
+	//
 	private Contact foundationContactToObm(
 			com.funambol.common.pim.contact.Contact funis, String type) {
 
@@ -306,20 +293,20 @@ public class ContactManager extends ObmManager {
 					.getNickname().getPropertyValueAsString()));
 		}
 
-//		BusinessDetail bus = funis.getBusinessDetail();
+		// BusinessDetail bus = funis.getBusinessDetail();
 
 		// TODO phones, email, contact
-		
+
 		// comment
-//		contact.setComment(ContactHelper.nullToEmptyString(ContactHelper
-//				.getNote(funis.getNotes(), ContactHelper.COMMENT)));
+		// contact.setComment(ContactHelper.nullToEmptyString(ContactHelper
+		// .getNote(funis.getNotes(), ContactHelper.COMMENT)));
 
 		return contact;
 	}
-	
-	public void logout() {
-		binding.logout(token);
-	}
 
+	@Override
+	public ISyncClient getSyncClient() {
+		return binding;
+	}
 
 }
