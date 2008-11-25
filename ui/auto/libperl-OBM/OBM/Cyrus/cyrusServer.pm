@@ -139,7 +139,7 @@ sub getCyrusConn {
         return undef;
     }
 
-    $self->( 'Obtention de la connaxion IMAP à '.$self->getDescription(), 2 );
+    $self->_log( 'Obtention de la connexion IMAP à '.$self->getDescription(), 2 );
     return $self->{'cyrusServerConn'};
 }
 
@@ -147,7 +147,7 @@ sub getCyrusConn {
 sub _connect {
     my $self = shift;
 
-    if( ref( $self->{'cyrusServerConn'} ) eq 'Cyrus::IMAP::Admin' ) {
+    if( $self->_ping() ) {
         $self->_log( 'connexion déjà établie au '.$self->getDescription(), 4 );
         return 0;
     }
@@ -173,6 +173,22 @@ sub _connect {
     $self->_log( 'connexion au '.$self->getDescription().' établie', 2 );
 
     return 0;
+}
+
+
+sub _ping {
+    my $self = shift;
+
+    if( ref( $self->{'cyrusServerConn'} ) ne 'Cyrus::IMAP::Admin' ) {
+        return 0;
+    }
+
+    if( !defined($self->{'cyrusServerConn'}->listmailbox('')) ) {
+        $self->_log( 'la connexion à '.$self->getDescription().' a expirée', 4 );
+        return 0;
+    }
+
+    return 1;
 }
 
 
