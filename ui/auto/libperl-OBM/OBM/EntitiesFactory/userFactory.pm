@@ -197,7 +197,7 @@ sub _loadUsers {
     my $query = 'SELECT '.$userTable.'.*,
                         current.userobm_login as userobm_login_current
                  FROM '.$userTable.'
-                 LEFT JOIN P_UserObm current ON current.userobm_id='.$userTable.'.userobm_id
+                 LEFT JOIN P_'.$userTable.' current ON current.userobm_id='.$userTable.'.userobm_id
                  WHERE '.$userTable.'.userobm_domain_id='.$self->{'domainId'};
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'userDescList'} )) ) {

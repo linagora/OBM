@@ -21,6 +21,7 @@ use OBM::Entities::commonEntities qw(
         setUpdated
         getUpdated
         isMailAvailable
+        isSieveAvailable
         );
 use OBM::Ldap::utils qw(
         _modifyAttr

@@ -1,6 +1,6 @@
 package OBM::Cyrus::cyrusEngine;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 $debug = 1;
 
@@ -130,13 +130,14 @@ sub update {
     }
     $self->{'currentEntity'} = $entity;
 
+    # If entity don't have Cyrus dependancy, we do nothing and it's not an error
     if( !$entity->isMailAvailable() ) {
         $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Cyrus', 3 );
         return 0;
     }
 
 
-    # Récupération de la description du serveur de la boîte à traiter
+    # Get user BAL server object
     my $mailserverId = $entity->getMailServerId();
     if( !defined($mailserverId) && $entity->isMailActive() && !$entity->getArchive() ) {
         $self->_log( 'serveur de courrier IMAP non defini et droit mail actif - erreur', 2 );
@@ -156,9 +157,10 @@ sub update {
         return 1;
     }
 
+    # Do stuff...
     my $returnCode = $self->_doWork();
     if( $returnCode ) {
-        $self->_log( 'probleme de traitement de '.$entity->getDescription().' - Operation annulee !', 'W' );
+        $self->_log( 'probleme de traitement de '.$entity->getDescription().' - Operation annulee !', 2 );
     }
 
     return $returnCode;

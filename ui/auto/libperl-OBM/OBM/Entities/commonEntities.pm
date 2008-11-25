@@ -26,6 +26,7 @@ $VERSION = '1.0';
                     setUpdateLinks
                     getUpdateLinks
                     isMailAvailable
+                    isSieveAvailable
                );
 
 
@@ -192,6 +193,14 @@ sub getUpdateLinks {
 
 # Get if the entity can have mail permission
 sub isMailAvailable {
+    my $self = shift;
+
+    return 0;
+}
+
+
+# Get if the entity can have mail permission
+sub isSieveAvailable {
     my $self = shift;
 
     return 0;

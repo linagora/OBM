@@ -879,7 +879,7 @@ sub updateLdapEntry {
 }
 
 
-# Needed
+# Needed : cyrusEngine
 sub isMailAvailable {
     my $self = shift;
 
@@ -965,4 +965,103 @@ sub getMailboxDefaultFolders {
     my $self = shift;
 
     return $self->{'entityDesc'}->{'mailbox_folders'};
+}
+
+
+# Needed : sieveEngine
+sub isSieveAvailable {
+    my $self = shift;
+
+    if( defined($self->{'parent'}) && !$self->{'parent'}->isGlobal() ) {
+        return 1;
+    }
+
+    return 0;
+}
+
+
+# Needed : sieveEngine
+sub getSieveVacation {
+    my $self = shift;
+
+    # If vacation isn't enable, then no vacation message
+    if( !$self->{'entityDesc'}->{'userobm_vacation_enable'} ) {
+        $self->_log( $self->getDescription().' : message d\'absence désactivé', 4 );
+        return undef;
+    }
+
+    # If no vacation message, then no vacation message...
+    if( !$self->{'entityDesc'}->{'userobm_vacation_message'} ) {
+        $self->_log( $self->getDescription().' : message d\'absence vide !', 4 );
+        return undef;
+    }
+
+    my $boxEmails = $self->{'email'};
+    my $boxEmailsAlias = $self->{'emailAlias'};
+
+    # If no mail addess, then no vacation message
+    if( ($#{$boxEmails} < 0) && ($#{$boxEmailsAlias} < 0) ) {
+        $self->_log( $self->getDescription().' : pas d\'adresses mails défini', 4 );
+        return undef;
+    }
+
+    my $vacationMsg = 'vacation :addresses [ ';
+    my $firstAddress = 1;
+    for( my $i=0; $i<=$#{$boxEmails}; $i++ ) {
+        if( !$firstAddress ) {
+            $vacationMsg .= ', ';
+        }else {
+            $firstAddress = 0;
+        }
+
+        $vacationMsg .= '"'.$boxEmails->[$i].'"';
+    }
+
+    for( my $i=0; $i<=$#{$boxEmailsAlias}; $i++ ) {
+        if( !$firstAddress ) {
+            $vacationMsg .= ', ';
+        }else {
+            $firstAddress = 0;
+        }
+
+        $vacationMsg .= '"'.$boxEmailsAlias->[$i].'"';
+    }
+
+    $vacationMsg .= ' ] "'.$self->{'entityDesc'}->{'userobm_vacation_message'}.'";';
+
+    return $vacationMsg;
+}
+
+
+sub getSieveNomade {
+    my $self = shift;
+
+    # If nomade not available, then no redirection
+    if( !$self->{'entityDesc'}->{'userobm_nomade_perms'} ) {
+        $self->_log( $self->getDescription().' : redirection de messagerie non autorisée', 4 );
+        return undef;
+    }
+
+    # If nomade not enable, then no redirection
+    if( !$self->{'entityDesc'}->{'userobm_nomade_enable'} ) {
+        $self->_log( $self->getDescription().' : redirection de messagerie non activée', 4 );
+        return undef;
+    }
+
+    # If redirection email is non define, then no redirection
+    if( !$self->{'entityDesc'}->{'userobm_email_nomade'} ) {
+        $self->_log( $self->getDescription().' : adresse mail de redirection non définie', 4 );
+        return undef;
+    }
+
+    my $nomadeMsg = 'redirect "'.$self->{'entityDesc'}->{'userobm_email_nomade'}.'";';
+
+    if( !$self->{'entityDesc'}->{'userobm_nomade_local_copy'} ) {
+        $nomadeMsg .= 'discard;';
+        $nomadeMsg .= 'stop;';
+    }else {
+        $nomadeMsg .= 'keep;';
+    }
+
+    return $nomadeMsg;
 }

@@ -109,7 +109,7 @@ $facility_log = "local1";
 $ldapServerId = 0;
 $ldapDescription = 'Annuaire LDAP OBM';
 # Le login de l'administrateur LDAP
-$ldapAdminLogin = "ldapadmin";
+$ldapAdminLogin = 'ldapadmin';
 # Le serveur LDAP
 $ldapServer = $cfgFile->val( 'automate', 'ldapServer' );
 if( !defined($ldapServer) ) {

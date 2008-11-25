@@ -25,6 +25,7 @@ use OBM::Entities::commonEntities qw(
         getUpdateEntity
         setUpdateLinks
         getUpdateLinks
+        isSieveAvailable
         );
 use OBM::Ldap::utils qw(
         _modifyAttr

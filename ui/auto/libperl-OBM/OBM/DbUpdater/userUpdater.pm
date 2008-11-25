@@ -217,7 +217,7 @@ sub update {
                         entityright_read,
                         entityright_write,
                         entityright_admin,
-                        entityright_acces
+                        entityright_access
                     ) SELECT    entityright_entity,
                                 entityright_entity_id,
                                 entityright_consumer,
@@ -225,7 +225,7 @@ sub update {
                                 entityright_read,
                                 entityright_write,
                                 entityright_admin,
-                                entityright_acces
+                                entityright_access
                       FROM EntityRight
                       WHERE entityright_entity=\'MailShare\' AND entityright_entity_id='.$entity->getId();
 

@@ -115,7 +115,7 @@ sub getId {
 sub getDescription {
     my $self = shift;
     
-    my $description = 'serveur IMAP d\'ID \''.$self->{'serverId'}.'\'';
+    my $description = 'serveur Cyrus d\'ID \''.$self->{'serverId'}.'\'';
 
     if( $self->{'serverDesc'}->{'host_description'} ) {
         $description .= ', \''.$self->{'serverDesc'}->{'host_description'}.'\'';
@@ -139,6 +139,7 @@ sub getCyrusConn {
         return undef;
     }
 
+    $self->( 'Obtention de la connaxion IMAP à '.$self->getDescription(), 2 );
     return $self->{'cyrusServerConn'};
 }
 
@@ -207,4 +208,35 @@ sub getCyrusServerIp {
     my $self = shift;
 
     return $self->{'serverDesc'}->{'host_ip'};
+}
+
+
+sub getSieveServerConn {
+    my $self = shift;
+    my( $domainId, $login ) = @_;
+
+    if( $self->_checkDomainId($domainId) ) {
+        return undef;
+    }
+
+    if( !defined($login) ) {
+        $self->_log( 'pas d\'identifiant de connexion indiqué', 3 );
+        return undef;
+    }
+
+    # Replace '@' char by '%' for authentication domain separator
+    $login =~ s/@/%/;
+
+    $self->_log( 'connexion au '.$self->getDescription().' en tant que \''.$self->{'serverDesc'}->{'cyrus_login'}.'\' pour le compte de \''.$login.'\'', 2 );
+
+    use Cyrus::SIEVE::managesieve;
+    my $sieveSrvConn = sieve_get_handle( $self->{'serverDesc'}->{'host_ip'}, sub{return $login}, sub{return $self->{'serverDesc'}->{'cyrus_login'}}, sub{return $self->{'serverDesc'}->{'cyrus_password'}}, sub{return undef} );
+
+    if( !defined($sieveSrvConn) ) {
+        $self->_log( 'probleme lors de l\'établissement de la connexion Sieve à '.$self->getDescription(), 2 );
+        return undef;
+    }
+
+    $self->_log( 'Obtention de la connexion Sieve à '.$self->getDescription(), 2 );
+    return $sieveSrvConn;
 }

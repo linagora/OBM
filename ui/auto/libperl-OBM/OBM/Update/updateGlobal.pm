@@ -115,6 +115,17 @@ sub update {
         $self->{'cyrusEngine'} = undef;
     }
 
+    require OBM::Cyrus::sieveEngine;
+    $self->_log( 'initialisation du moteur Sieve', 2 );
+    $self->{'sieveEngine'} = OBM::Cyrus::sieveEngine->new();
+    if( !defined($self->{'sieveEngine'}) ) {
+        $self->_log( 'erreur à l\'initialisation du moteur Sieve', 1 );
+        return 1
+    }elsif( !ref($self->{'sieveEngine'}) ) {
+        $self->_log( 'moteur Sieve non démarré', 3 );
+        $self->{'sieveEngine'} = undef;
+    }
+
     while( my $entity = $self->{'entitiesFactory'}->next() ) {
         my $error = 0;
         $self->_log( 'traitement de '.$entity->getDescription(), 1 );
@@ -129,6 +140,13 @@ sub update {
         if( !$error && defined($self->{'cyrusEngine'}) ) {
             if($self->{'cyrusEngine'}->update($entity)) {
                 $self->_log( 'problème lors du traitement Cyrus de l\'entité '.$entity->getDescription(), 1 );
+                $error = 1;
+            }
+        }
+
+        if( !$error && defined($self->{'sieveEngine'}) ) {
+            if($self->{'sieveEngine'}->update($entity)) {
+                $self->_log( 'problème lors du traitement Sieve de l\'entité '.$entity->getDescription(), 1 );
                 $error = 1;
             }
         }
