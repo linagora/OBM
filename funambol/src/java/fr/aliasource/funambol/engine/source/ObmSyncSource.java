@@ -228,7 +228,6 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 	@Override
 	public SyncSourceInfo getInfo() {
 		SyncSourceInfo info = super.getInfo();
-		logger.info("getinfo: " + info);
 		return info;
 	}
 

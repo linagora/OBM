@@ -80,7 +80,7 @@ public class CalendarManager extends ObmManager {
 		try {
 			logger.info("getUserEmail(" + calendar + ", " + token.getUser()
 					+ ")");
-			userEmail = binding.getUserEmail(token, calendar, token.getUser());
+			userEmail = binding.getUserEmail(token);
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
@@ -250,7 +250,7 @@ public class CalendarManager extends ObmManager {
 		} catch (ServerFault e) {
 			throw new OBMException(e.getMessage());
 		}
-
+		logger.info("getSync("+calendar+", "+d+" (since == "+since+")) => upd: "+sync.getUpdated().length+" del: "+sync.getRemoved().length);
 		Event[] updated = new Event[0];
 		if (sync.getUpdated() != null) {
 			updated = sync.getUpdated();
@@ -267,7 +267,7 @@ public class CalendarManager extends ObmManager {
 
 		for (Event e : updated) {
 			logger.info("getSync: " + e.getTitle() + ", d: "
-					+ e.getDate().getTime());
+					+ e.getDate());
 			if (e.getPrivacy() == 1
 					&& !calendar.equals(user)
 					|| (CalendarHelper.isUserRefused(userEmail, e

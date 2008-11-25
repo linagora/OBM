@@ -9,7 +9,6 @@
 	<classpathentry kind="lib" path="lib/funambol-admin-dev.jar"/>
 	<classpathentry kind="lib" path="lib/funambol-server.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
-	<classpathentry kind="lib" path="lib/obm-sync-client.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/core-framework-6.5.1.jar"/>
@@ -19,5 +18,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/commons-httpclient-3.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/obm-sync-trunk"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

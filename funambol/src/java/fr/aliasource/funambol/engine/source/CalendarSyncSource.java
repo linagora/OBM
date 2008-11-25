@@ -47,13 +47,14 @@ public class CalendarSyncSource extends ObmSyncSource {
 	public void beginSync(SyncContext context) throws SyncSourceException {
 
 		logger.info("Begin an OBM-Funambol Calendar sync");
-
 		manager = new CalendarManager(getObmAddress());
 
 		try {
 			manager.logIn(context.getPrincipal().getUser().getUsername(),
 					context.getPrincipal().getUser().getPassword());
-			manager.setCalendar(manager.getToken().getUser());
+			String calendar = context.getPrincipal().getUser().getUsername()
+					.split("@")[0];
+			manager.setCalendar(calendar);
 			manager.initUserEmail();
 			manager.initRestriction(getRestrictions());
 
@@ -224,7 +225,7 @@ public class CalendarSyncSource extends ObmSyncSource {
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
-		
+
 		if (event == null) {
 			logger.warn("Sending faked syncitem to PDA, we skipped this event");
 			syncItem.setState(SyncItemState.SYNCHRONIZED);
@@ -301,9 +302,8 @@ public class CalendarSyncSource extends ObmSyncSource {
 	 */
 	private Calendar getFoundationCalendarFromICal(String content)
 			throws OBMException {
-		logger.info("pda sent:\n"+content);
-		
-		
+		logger.info("pda sent:\n" + content);
+
 		String toParse = content;
 		toParse = toParse.replace("encoding", "ENCODING");
 		toParse = toParse.replace("PRINTABLE:", "PRINTABLE;CHARSET=UTF-8:");
