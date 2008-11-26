@@ -237,6 +237,81 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
   return false;
 }
 
+/**
+ * exec_tools_cancel_update 
+ * 
+ * @param mixed $params 
+ * @access public
+ * @return void
+ */
+function exec_tools_cancel_update($params) {
+  global $obminclude;
+  
+  $entity = $params['entity'];
+  $state  = $params['state'];
+
+  switch ($state) {
+    case 'created':
+      require "$obminclude/of/of_category.inc";
+      require "../{$entity}/{$entity}_query.inc";
+      $function = "run_query_{$entity}_delete";
+      return $function($params['id']);
+    case 'updated':
+      return run_query_tools_cancel_update($entity, $params['id']);
+    case 'deleted':
+      return run_query_tools_cancel_delete($entity, $params['id']); 
+  }
+}
+
+/**
+ * run_query_tools_cancel_update 
+ * 
+ * @param string $entity
+ * @param string $id
+ * @access public
+ * @return void
+ */
+function run_query_tools_cancel_update($entity, $id) {
+  global $entities;
+
+  $obm_qm = new DB_OBM;
+  $metadata = $entities[$entity];
+  $query = "SELECT * FROM P_$metadata[table] WHERE $metadata[prefix]_id = '$id'";
+  $obm_qm->query($query);
+  $obm_qm->next_record();
+  $old_values = $obm_qm->Record;
+
+  $diffs = array();
+  $fields = $obm_qm->metadata($metadata['table'], false);
+  foreach ($fields as $field) {
+    if (strpos(strtolower($field['flags']),'primary') === false
+        && !isset($metadata['exclude'][str_replace($metadata['prefix'].'_','',$field['name'])])) {
+      $old_value = ($old_values[$field['name']] === null) ? 'NULL' : "'".$old_values[$field['name']]."'";
+      $diffs[] = "$field[name] = $old_value";
+    }
+  }
+  $query = "UPDATE $metadata[table] SET ".implode(',', $diffs)." WHERE $metadata[prefix]_id = '$id'";
+  return $obm_qm->query($query);
+}
+
+/**
+ * run_query_tools_cancel_delete 
+ * 
+ * @param string $entity
+ * @param string $id
+ * @access public
+ * @return void
+ */
+function run_query_tools_cancel_delete($entity, $id) {
+  global $entities;
+
+  $obm_qm = new DB_OBM;
+  $metadata = $entities[$entity];
+  $query = "INSERT INTO $metadata[table] SELECT * FROM P_$metadata[table] WHERE $metadata[prefix]_id = '$id'";
+  if (!$obm_qm->query($query)) return false;
+  $query = "DELETE FROM Deleted WHERE deleted_table = '$metadata[table]' AND deleted_entity_id = '$id'";
+  return $obm_qm->query($query);
+}
 
 /**
  * run_query_tools_perform_scope 
@@ -322,6 +397,15 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   
   $return = array('created' => 0, 'deleted' => 0, 'updated' => 0, 'links' => 0, 'diff' => 0);
   $ids = array('0');
+  
+  $current_columns = array("Current.$metadata[prefix]_id");
+  $prod_columns = array("Production.$metadata[prefix]_id");
+  foreach ($metadata['display'] as $column) {
+    $current_columns[] = "Current.$metadata[prefix]_$column";
+    $prod_columns[] = "Production.$metadata[prefix]_$column";
+  }
+  $current_columns = implode(', ', $current_columns);
+  $prod_columns = implode(', ', $prod_columns);
   /**
    * PERFORM UPDATED ENTITIES 
    */
@@ -344,16 +428,19 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   }
 
   $query = "
-      SELECT count(*) as updated
+      SELECT DISTINCT $current_columns
       FROM $metadata[table] as Current
       JOIN P_$metadata[table] as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['update']).")";
 
   display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(updated)');
   $obm_qm->query($query);
-  $obm_qm->next_record();
   
-  $return['updated'] = $obm_qm->f('updated');
+  $return['updated'] = 0;
+  while ($obm_qm->next_record()) {
+    $return['updated_entities'][] = get_record_representation($metadata, $obm_qm);
+    $return['updated']++;
+  }
   $return['diff'] += $return['updated'];
 
   /**
@@ -361,7 +448,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
    */
 
   $query = "
-      SELECT count(*) as created 
+      SELECT $current_columns
       FROM $metadata[table] as Current
       LEFT JOIN P_$metadata[table] as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['update']).") 
@@ -369,9 +456,12 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
 
   display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(created)');
   $obm_qm->query($query);
-  $obm_qm->next_record();
-
-  $return['created'] = $obm_qm->f('created');
+  
+  $return['created'] = 0;
+  while ($obm_qm->next_record()) {
+    $return['created_entities'][] = get_record_representation($metadata, $obm_qm);
+    $return['created']++;
+  }
   $return['diff'] += $return['created'];
 
   /**
@@ -379,14 +469,18 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
    */
 
   $query = "
-    SELECT count(*) as deleted FROM Deleted as Current
+    SELECT $prod_columns as deleted FROM Deleted as Current
     JOIN P_$metadata[table] as Production ON deleted_entity_id = $primaries[production] AND deleted_table = '$metadata[table]'
     AND (".implode(' AND ',$rules['delete']).")
     ";
   display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(deleted)');
   $obm_qm->query($query);
-  $obm_qm->next_record();
-  $return['deleted'] = $obm_qm->f('deleted');
+  
+  $return['deleted'] = 0;
+  while ($obm_qm->next_record()) {
+    $return['deleted_entities'][] = get_record_representation($metadata, $obm_qm);
+    $return['deleted']++;
+  }
   $return['diff'] += $return['deleted'];
   
   if(!isset($metadata['link'])) {
@@ -433,6 +527,31 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
   $return['diff'] += $return['links'];
 
   return $return;
+}
+
+/**
+ * get_record_representation 
+ * 
+ * @param mixed $metadata 
+ * @param mixed $obm_qm
+ * @access public
+ * @return void
+ */
+function get_record_representation(&$metadata, &$obm_qm) {
+  global $l_unspecified;
+  
+  $values = array();
+  foreach ($metadata['display'] as $column) {
+    $value = $obm_qm->f("$metadata[prefix]_$column");
+    if (empty($value)) {
+      $value = "[{$column} {$l_unspecified}]";
+    }
+    $values[] = $value;
+  }
+  return array(
+    'id' => $obm_qm->f("$metadata[prefix]_id"),
+    'repr' => vsprintf($metadata['display_format'], $values)
+  );
 }
 
 /**

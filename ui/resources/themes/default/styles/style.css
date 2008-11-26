@@ -1280,3 +1280,12 @@ input.colorPicker {
   color: #636466;
 }
 
+/* ------------------------------------------------------------------------- */ 
+/* Update tools specific styles */
+/* ------------------------------------------------------------------------- */
+form.button-to {
+  display: inline;
+}
+form.button-to input {
+  border: none;
+}

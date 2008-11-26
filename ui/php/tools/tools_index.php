@@ -44,7 +44,9 @@ $entities = array(
                        'local' => 1, 'timelastaccess' => 1, 'nb_login_failed' => 1, 'delegation_target' => 1, 
                        'calendar_version' => 1, 'nomade_datebegin' => 1, 'nomade_dateend' => 1, 'vacation_datebegin' => 1,
                        'vacation_dateend' => 1),
-    'rules'   => array()
+    'rules'   => array(),
+    'display' => array('firstname', 'lastname', 'email'),
+    'display_format' => '%s %s <%s>'
   ),
   'group' => array(
     'table'   => 'UGroup',
@@ -55,13 +57,17 @@ $entities = array(
     'prefix'  => 'group', 
     'exclude' => array('domain_id' => 1, 'timecreate' => 1, 'usercreate' => 1, 'timeupdate' => 1, 
                         'privacy' => 1,'usercreate' => 1),
-    'rules'   => array('privacy' => '0')
+    'rules'   => array('privacy' => '0'),
+    'display' => array('name', 'email'),
+    'display_format' => '%s <%s>'
   ),
   'host' => array(
     'table'   => 'Host',
     'prefix'  => 'host',
     'exclude' => array(),
-    'rules'   => array()
+    'rules'   => array(),
+    'display' => array('name', 'ip'),
+    'display_format' => '%s (%s)'
   ),
   'mailshare' => array(
     'table'   => 'MailShare',
@@ -72,11 +78,18 @@ $entities = array(
     ),    
     'prefix'  => 'mailshare',
     'exclude' => array(),
-    'rules'   => array()
+    'rules'   => array(),
+    'display' => array('name', 'email'),
+    'display_format' => '%s <%s>'
   )
 );
 
-if ($action == 'update_detail') {
+if ($action == 'cancel_update') {
+///////////////////////////////////////////////////////////////////////////////
+  exec_tools_cancel_update($params);
+  die();
+  
+} elseif ($action == 'update_detail') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_tools_update_detail();
 
@@ -160,6 +173,12 @@ function get_tools_action() {
 
 // Confirm Update
   $actions['tools']['update_update'] = array (
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('none') 
+                                    );
+  
+// Cancel Update
+  $actions['tools']['cancel_update'] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('none') 
                                     );

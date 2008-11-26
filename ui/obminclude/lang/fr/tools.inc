@@ -30,5 +30,8 @@ $l_updated = "Modifiés";
 $l_deleted = "Supprimés";
 $l_links = "Liaisons";
 
+$l_unspecified = "non saisi";
+$l_js_ask_confirm = "Etes-vous sûr(e) ?";
+
 $l_halt = "Arrêt du système";
 $l_halt_aliamin = "Arréter le système";
