@@ -29,9 +29,6 @@ import fr.aliasource.obm.items.manager.ContactManager;
 public final class ContactSyncSource extends ObmSyncSource implements
 		SyncSource, Serializable, LazyInitBean {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6493492575094388992L;
 	private ContactManager manager;
 	private Log logger = LogFactory.getLog(getClass());
@@ -54,22 +51,12 @@ public final class ContactSyncSource extends ObmSyncSource implements
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
-
-		// manager.logIn("nicolasl","44669462809866fbfc6eab1f9fa93d4b");
 		manager.setBook(BookType.contacts);
-	}
-
-	public void init() {
-		super.init();
 	}
 
 	public void setOperationStatus(String operation, int statusCode,
 			SyncItemKey[] keys) {
 		super.setOperationStatus(operation, statusCode, keys);
-	}
-
-	public String toString() {
-		return super.toString();
 	}
 
 	/**

@@ -1,3 +1,14 @@
+2008-11-26  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
+
+	add funis origin
+	
+	* src/java/fr/aliasource/funambol/engine/source/ContactSyncSource.j
+	ava: (ContactSyncSource), (ContactSyncSource.beginSync):
+	* src/java/fr/aliasource/funambol/engine/source/ObmSyncSource.java:
+	(ObmSyncSource), (ObmSyncSource.init):
+	* src/java/fr/aliasource/obm/items/manager/ObmManager.java:
+	(ObmManager.logIn):
+
 2008-11-25  Thomas Cataldo  <thomas.cataldo@aliasource.fr>
 
 	Call logout on endSync

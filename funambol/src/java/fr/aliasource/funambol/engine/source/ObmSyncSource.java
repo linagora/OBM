@@ -1,6 +1,3 @@
-/**
- * 
- */
 package fr.aliasource.funambol.engine.source;
 
 import java.io.Serializable;
@@ -21,6 +18,7 @@ import com.funambol.framework.security.Sync4jPrincipal;
 import com.funambol.framework.server.Sync4jDevice;
 import com.funambol.framework.server.store.PersistentStore;
 import com.funambol.framework.server.store.PersistentStoreException;
+import com.funambol.framework.tools.beans.BeanInitializationException;
 import com.funambol.framework.tools.beans.LazyInitBean;
 import com.funambol.server.config.Configuration;
 
@@ -49,20 +47,11 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 	private int restrictions = 1; // default private
 	private String obmAddress = null;
 
-	// protected FunambolLogger logger =
-	// FunambolLoggerFactory.getLogger("funambol");
 	private Log logger = LogFactory.getLog(getClass());
-
-	// ------------------------------------------------------------ Constructors
 
 	/** Creates a new instance of AbstractSyncSource */
 	public ObmSyncSource() {
 		logger.info("obmSyncSource ctor");
-	}
-
-	// ---------------------------------------------------------- Public methods
-	public void init() {
-		logger.info("init");
 	}
 
 	/**
@@ -244,6 +233,12 @@ public abstract class ObmSyncSource extends AbstractSyncSource implements
 		String ret = super.getSourceURI();
 		logger.info("getsourceuri: " + ret);
 		return ret;
+	}
+
+	@Override
+	public void init() throws BeanInitializationException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
