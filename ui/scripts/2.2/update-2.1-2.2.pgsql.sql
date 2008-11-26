@@ -430,18 +430,31 @@ UPDATE EventEntity set evententity_required = 'REQ';
 
 ALTER TABLE EventEntity ADD COLUMN evententity_percent float default 0;
 
+ALTER TABLE EventEntity RENAME TO EventLink;
+ALTER TABLE EventLink RENAME COLUMN evententity_timeupdate TO eventlink_timeupdate;
+ALTER TABLE EventLink RENAME COLUMN evententity_timecreate TO eventlink_timecreate;
+ALTER TABLE EventLink RENAME COLUMN evententity_userupdate TO eventlink_userupdate;
+ALTER TABLE EventLink RENAME COLUMN evententity_usercreate TO eventlink_usercreate;
+ALTER TABLE EventLink RENAME COLUMN evententity_event_id TO eventlink_event_id;
+ALTER TABLE EventLink RENAME COLUMN evententity_entity_id TO eventlink_entity_id;
+ALTER TABLE EventLink RENAME COLUMN evententity_entity TO eventlink_entity;
+ALTER TABLE EventLink RENAME COLUMN evententity_state TO eventlink_state;
+ALTER TABLE EventLink RENAME COLUMN evententity_required TO eventlink_required;
+ALTER TABLE EventLink RENAME COLUMN evententity_percent TO eventlink_percent;
 
 -- Foreign key from evententity_event_id to event_id
-DELETE FROM EventEntity WHERE evententity_event_id NOT IN (SELECT event_id FROM Event) AND evententity_event_id IS NOT NULL;
-ALTER TABLE EventEntity ADD CONSTRAINT evententity_event_id_event_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
+DELETE FROM EventLink WHERE eventlink_event_id NOT IN (SELECT event_id FROM Event) AND eventlink_event_id IS NOT NULL;
+ALTER TABLE EventLink ADD CONSTRAINT eventlink_event_id_event_id_fkey FOREIGN KEY (eventlink_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from evententity_userupdate to userobm_id
-UPDATE EventEntity SET evententity_userupdate = NULL WHERE evententity_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND evententity_userupdate IS NOT NULL;
-ALTER TABLE EventEntity ADD CONSTRAINT evententity_userupdate_userobm_id_fkey FOREIGN KEY (evententity_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+UPDATE EventLink SET eventlink_userupdate = NULL WHERE eventlink_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND eventlink_userupdate IS NOT NULL;
+ALTER TABLE EventLink ADD CONSTRAINT eventlink_userupdate_userobm_id_fkey FOREIGN KEY (eventlink_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from evententity_usercreate to userobm_id
-UPDATE EventEntity SET evententity_usercreate = NULL WHERE evententity_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND evententity_usercreate IS NOT NULL;
-ALTER TABLE EventEntity ADD CONSTRAINT evententity_usercreate_userobm_id_fkey FOREIGN KEY (evententity_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+UPDATE EventLink SET eventlink_usercreate = NULL WHERE eventlink_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND eventlink_usercreate IS NOT NULL;
+ALTER TABLE EventLink ADD CONSTRAINT eventlink_usercreate_userobm_id_fkey FOREIGN KEY (eventlink_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
 
 
 -- Table EventAlert
@@ -580,6 +593,23 @@ FROM CalendarCategory1;
 
 SELECT setval('eventcategory1_eventcategory1_id_seq', max(eventcategory1_id)) FROM EventCategory1;
 
+ALTER TABLE OGroupEntity RENAME TO OGroupLink;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_id TO ogrouplink_id;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_domain_id TO ogrouplink_domain_id;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_timeupdate TO ogrouplink_timeupdate;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_timecreat TO ogrouplink_timecreate;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_userupdate TO ogrouplink_userupdate;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_usercreate TO ogrouplink_usercreate;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_ogroup_id TO ogrouplink_ogroup_id;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_entity_id TO ogrouplink_entity_id;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_entity TO ogrouplink_entity;
+
+ALTER TABLE DocumentEntity RENAME TO DocumentLink;
+ALTER TABLE DocumentLink CHANGE COLUMN documententity_document_id TO documentlink_document_id;
+ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity_id TO documentlink_entity_id;
+ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity TO documentlink_entity;
+
+
 --
 -- Table `DeletedEvent`
 --
@@ -677,7 +707,7 @@ ALTER TABLE Account ALTER COLUMN account_domain_id SET NOT NULL;
 ALTER TABLE UGroup ALTER COLUMN group_domain_id SET NOT NULL;
 ALTER TABLE OrganizationalChart ALTER COLUMN organizationalchart_domain_id SET NOT NULL;
 ALTER TABLE OGroup ALTER COLUMN ogroup_domain_id SET NOT NULL;
-ALTER TABLE OGroupEntity ALTER COLUMN ogroupentity_domain_id SET NOT NULL;
+ALTER TABLE OGroupLink ALTER COLUMN ogrouplink_domain_id SET NOT NULL;
 ALTER TABLE Import ALTER COLUMN import_domain_id SET NOT NULL;
 ALTER TABLE Import ALTER COLUMN import_datasource_id SET default NULL;
 ALTER TABLE Resource ALTER COLUMN resource_domain_id SET NOT NULL;
@@ -797,6 +827,528 @@ CREATE TABLE ProfilePropertyValue (
 	profilepropertyvalue_property_value	text NOT NULL default '',
 	PRIMARY KEY (profilepropertyvalue_id)
 );
+
+CREATE TABLE AccountEntity (
+  accountentity_entity_id integer NOT NULL,
+  accountentity_account_id integer NOT NULL,
+  PRIMARY KEY (accountentity_entity_id, accountentity_account_id)
+);
+  
+CREATE TABLE CvEntity (
+  cventity_entity_id integer NOT NULL,
+  cventity_cv_id integer NOT NULL,
+  PRIMARY KEY (cventity_entity_id, cventity_cv_id)
+);
+  
+CREATE TABLE CalendarEntity (
+  calendarentity_entity_id integer NOT NULL,
+  calendarentity_calendar_id integer NOT NULL,
+  PRIMARY KEY (calendarentity_entity_id, calendarentity_calendar_id)
+);
+  
+CREATE TABLE CompanyEntity (
+  companyentity_entity_id integer NOT NULL,
+  companyentity_company_id integer NOT NULL,
+  PRIMARY KEY (companyentity_entity_id, companyentity_company_id)
+);
+  
+CREATE TABLE ContactEntity (
+  contactentity_entity_id integer NOT NULL,
+  contactentity_contact_id integer NOT NULL,
+  PRIMARY KEY (contactentity_entity_id, contactentity_contact_id)
+);
+  
+CREATE TABLE ContractEntity (
+  contractentity_entity_id integer NOT NULL,
+  contractentity_contract_id integer NOT NULL,
+  PRIMARY KEY (contractentity_entity_id, contractentity_contract_id)
+);
+  
+CREATE TABLE DealEntity (
+  dealentity_entity_id integer NOT NULL,
+  dealentity_deal_id integer NOT NULL,
+  PRIMARY KEY (dealentity_entity_id, dealentity_deal_id)
+);
+  
+CREATE TABLE DefaultodttemplateEntity (
+  defaultodttemplateentity_entity_id integer NOT NULL,
+  defaultodttemplateentity_defaultodttemplate_id integer NOT NULL,
+  PRIMARY KEY (defaultodttemplateentity_entity_id, defaultodttemplateentity_defaultodttemplate_id)
+);
+  
+CREATE TABLE DocumentEntity (
+  documententity_entity_id integer NOT NULL,
+  documententity_document_id integer NOT NULL,
+  PRIMARY KEY (documententity_entity_id, documententity_document_id)
+);
+  
+CREATE TABLE DomainEntity (
+  domainentity_entity_id integer NOT NULL,
+  domainentity_domain_id integer NOT NULL,
+  PRIMARY KEY (domainentity_entity_id, domainentity_domain_id)
+);
+  
+CREATE TABLE EventEntity (
+  evententity_entity_id integer NOT NULL,
+  evententity_event_id integer NOT NULL,
+  PRIMARY KEY (evententity_entity_id, evententity_event_id)
+);
+  
+CREATE TABLE HostEntity (
+  hostentity_entity_id integer NOT NULL,
+  hostentity_host_id integer NOT NULL,
+  PRIMARY KEY (hostentity_entity_id, hostentity_host_id)
+);
+  
+CREATE TABLE ImportEntity (
+  importentity_entity_id integer NOT NULL,
+  importentity_import_id integer NOT NULL,
+  PRIMARY KEY (importentity_entity_id, importentity_import_id)
+);
+  
+CREATE TABLE IncidentEntity (
+  incidententity_entity_id integer NOT NULL,
+  incidententity_incident_id integer NOT NULL,
+  PRIMARY KEY (incidententity_entity_id, incidententity_incident_id)
+);
+  
+CREATE TABLE InvoiceEntity (
+  invoiceentity_entity_id integer NOT NULL,
+  invoiceentity_invoice_id integer NOT NULL,
+  PRIMARY KEY (invoiceentity_entity_id, invoiceentity_invoice_id)
+);
+  
+CREATE TABLE LeadEntity (
+  leadentity_entity_id integer NOT NULL,
+  leadentity_lead_id integer NOT NULL,
+  PRIMARY KEY (leadentity_entity_id, leadentity_lead_id)
+);
+  
+CREATE TABLE ListEntity (
+  listentity_entity_id integer NOT NULL,
+  listentity_list_id integer NOT NULL,
+  PRIMARY KEY (listentity_entity_id, listentity_list_id)
+);
+  
+CREATE TABLE MailshareEntity (
+  mailshareentity_entity_id integer NOT NULL,
+  mailshareentity_mailshare_id integer NOT NULL,
+  PRIMARY KEY (mailshareentity_entity_id, mailshareentity_mailshare_id)
+);
+  
+CREATE TABLE MailboxEntity (
+  mailboxentity_entity_id integer NOT NULL,
+  mailboxentity_mailbox_id integer NOT NULL,
+  PRIMARY KEY (mailboxentity_entity_id, mailboxentity_mailbox_id)
+);
+  
+CREATE TABLE OgroupEntity (
+  ogroupentity_entity_id integer NOT NULL,
+  ogroupentity_ogroup_id integer NOT NULL,
+  PRIMARY KEY (ogroupentity_entity_id, ogroupentity_ogroup_id)
+);
+  
+CREATE TABLE ObmbookmarkEntity (
+  obmbookmarkentity_entity_id integer NOT NULL,
+  obmbookmarkentity_obmbookmark_id integer NOT NULL,
+  PRIMARY KEY (obmbookmarkentity_entity_id, obmbookmarkentity_obmbookmark_id)
+);
+  
+CREATE TABLE OrganizationalchartEntity (
+  organizationalchartentity_entity_id integer NOT NULL,
+  organizationalchartentity_organizationalchart_id integer NOT NULL,
+  PRIMARY KEY (organizationalchartentity_entity_id, organizationalchartentity_organizationalchart_id)
+);
+  
+CREATE TABLE ParentdealEntity (
+  parentdealentity_entity_id integer NOT NULL,
+  parentdealentity_parentdeal_id integer NOT NULL,
+  PRIMARY KEY (parentdealentity_entity_id, parentdealentity_parentdeal_id)
+);
+  
+CREATE TABLE PaymentEntity (
+  paymententity_entity_id integer NOT NULL,
+  paymententity_payment_id integer NOT NULL,
+  PRIMARY KEY (paymententity_entity_id, paymententity_payment_id)
+);
+  
+CREATE TABLE ProfileEntity (
+  profileentity_entity_id integer NOT NULL,
+  profileentity_profile_id integer NOT NULL,
+  PRIMARY KEY (profileentity_entity_id, profileentity_profile_id)
+);
+  
+CREATE TABLE ProjectEntity (
+  projectentity_entity_id integer NOT NULL,
+  projectentity_project_id integer NOT NULL,
+  PRIMARY KEY (projectentity_entity_id, projectentity_project_id)
+);
+  
+CREATE TABLE PublicationEntity (
+  publicationentity_entity_id integer NOT NULL,
+  publicationentity_publication_id integer NOT NULL,
+  PRIMARY KEY (publicationentity_entity_id, publicationentity_publication_id)
+);
+  
+CREATE TABLE ResourcegroupEntity (
+  resourcegroupentity_entity_id integer NOT NULL,
+  resourcegroupentity_resourcegroup_id integer NOT NULL,
+  PRIMARY KEY (resourcegroupentity_entity_id, resourcegroupentity_resourcegroup_id)
+);
+  
+CREATE TABLE ResourceEntity (
+  resourceentity_entity_id integer NOT NULL,
+  resourceentity_resource_id integer NOT NULL,
+  PRIMARY KEY (resourceentity_entity_id, resourceentity_resource_id)
+);
+  
+CREATE TABLE SubscriptionEntity (
+  subscriptionentity_entity_id integer NOT NULL,
+  subscriptionentity_subscription_id integer NOT NULL,
+  PRIMARY KEY (subscriptionentity_entity_id, subscriptionentity_subscription_id)
+);
+  
+CREATE TABLE GroupEntity (
+  groupentity_entity_id integer NOT NULL,
+  groupentity_group_id integer NOT NULL,
+  PRIMARY KEY (groupentity_entity_id, groupentity_group_id)
+);
+  
+CREATE TABLE UserEntity (
+  userentity_entity_id integer NOT NULL,
+  userentity_user_id integer NOT NULL,
+  PRIMARY KEY (userentity_entity_id, userentity_user_id)
+);
+  
+ALTER TABLE AccountEntity ADD CONSTRAINT accountentity_account_id_account_id_fkey FOREIGN KEY (accountentity_account_id) REFERENCES Account (account_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE AccountEntity ADD CONSTRAINT accountentity_entity_id_entity_id_fkey FOREIGN KEY (accountentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE CvEntity ADD CONSTRAINT cventity_cv_id_cv_id_fkey FOREIGN KEY (cventity_cv_id) REFERENCES CV (cv_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE CvEntity ADD CONSTRAINT cventity_entity_id_entity_id_fkey FOREIGN KEY (cventity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE CalendarEntity ADD CONSTRAINT calendarentity_calendar_id_calendar_id_fkey FOREIGN KEY (calendarentity_calendar_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE CalendarEntity ADD CONSTRAINT calendarentity_entity_id_entity_id_fkey FOREIGN KEY (calendarentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE CompanyEntity ADD CONSTRAINT companyentity_company_id_company_id_fkey FOREIGN KEY (companyentity_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE CompanyEntity ADD CONSTRAINT companyentity_entity_id_entity_id_fkey FOREIGN KEY (companyentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ContactEntity ADD CONSTRAINT contactentity_contact_id_contact_id_fkey FOREIGN KEY (contactentity_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ContactEntity ADD CONSTRAINT contactentity_entity_id_entity_id_fkey FOREIGN KEY (contactentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ContractEntity ADD CONSTRAINT contractentity_contract_id_contract_id_fkey FOREIGN KEY (contractentity_contract_id) REFERENCES Contract (contract_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ContractEntity ADD CONSTRAINT contractentity_entity_id_entity_id_fkey FOREIGN KEY (contractentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE DealEntity ADD CONSTRAINT dealentity_deal_id_deal_id_fkey FOREIGN KEY (dealentity_deal_id) REFERENCES Deal (deal_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE DealEntity ADD CONSTRAINT dealentity_entity_id_entity_id_fkey FOREIGN KEY (dealentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE DefaultodttemplateEntity ADD CONSTRAINT defaultodttemplateentity_defaultodttemplate_id_defaultodttemplate_id_fkey FOREIGN KEY (defaultodttemplateentity_defaultodttemplate_id) REFERENCES DefaultOdtTemplate (defaultodttemplate_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE DefaultodttemplateEntity ADD CONSTRAINT defaultodttemplateentity_entity_id_entity_id_fkey FOREIGN KEY (defaultodttemplateentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE DocumentEntity ADD CONSTRAINT documententity_document_id_document_id_fkey FOREIGN KEY (documententity_document_id) REFERENCES Document (document_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE DocumentEntity ADD CONSTRAINT documententity_entity_id_entity_id_fkey FOREIGN KEY (documententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE DomainEntity ADD CONSTRAINT domainentity_domain_id_domain_id_fkey FOREIGN KEY (domainentity_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE DomainEntity ADD CONSTRAINT domainentity_entity_id_entity_id_fkey FOREIGN KEY (domainentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE EventEntity ADD CONSTRAINT evententity_event_id_event_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES Event (event_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE EventEntity ADD CONSTRAINT evententity_entity_id_entity_id_fkey FOREIGN KEY (evententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE HostEntity ADD CONSTRAINT hostentity_host_id_host_id_fkey FOREIGN KEY (hostentity_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE HostEntity ADD CONSTRAINT hostentity_entity_id_entity_id_fkey FOREIGN KEY (hostentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ImportEntity ADD CONSTRAINT importentity_import_id_import_id_fkey FOREIGN KEY (importentity_import_id) REFERENCES Import (import_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ImportEntity ADD CONSTRAINT importentity_entity_id_entity_id_fkey FOREIGN KEY (importentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE IncidentEntity ADD CONSTRAINT incidententity_incident_id_incident_id_fkey FOREIGN KEY (incidententity_incident_id) REFERENCES Incident (incident_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IncidentEntity ADD CONSTRAINT incidententity_entity_id_entity_id_fkey FOREIGN KEY (incidententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE InvoiceEntity ADD CONSTRAINT invoiceentity_invoice_id_invoice_id_fkey FOREIGN KEY (invoiceentity_invoice_id) REFERENCES Invoice (invoice_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE InvoiceEntity ADD CONSTRAINT invoiceentity_entity_id_entity_id_fkey FOREIGN KEY (invoiceentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE LeadEntity ADD CONSTRAINT leadentity_lead_id_lead_id_fkey FOREIGN KEY (leadentity_lead_id) REFERENCES Lead (lead_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE LeadEntity ADD CONSTRAINT leadentity_entity_id_entity_id_fkey FOREIGN KEY (leadentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ListEntity ADD CONSTRAINT listentity_list_id_list_id_fkey FOREIGN KEY (listentity_list_id) REFERENCES List (list_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ListEntity ADD CONSTRAINT listentity_entity_id_entity_id_fkey FOREIGN KEY (listentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE MailshareEntity ADD CONSTRAINT mailshareentity_mailshare_id_mailshare_id_fkey FOREIGN KEY (mailshareentity_mailshare_id) REFERENCES MailShare (mailshare_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE MailshareEntity ADD CONSTRAINT mailshareentity_entity_id_entity_id_fkey FOREIGN KEY (mailshareentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE MailboxEntity ADD CONSTRAINT mailboxentity_mailbox_id_mailbox_id_fkey FOREIGN KEY (mailboxentity_mailbox_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE MailboxEntity ADD CONSTRAINT mailboxentity_entity_id_entity_id_fkey FOREIGN KEY (mailboxentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE OgroupEntity ADD CONSTRAINT ogroupentity_ogroup_id_ogroup_id_fkey FOREIGN KEY (ogroupentity_ogroup_id) REFERENCES OGroup (ogroup_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE OgroupEntity ADD CONSTRAINT ogroupentity_entity_id_entity_id_fkey FOREIGN KEY (ogroupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ObmbookmarkEntity ADD CONSTRAINT obmbookmarkentity_obmbookmark_id_obmbookmark_id_fkey FOREIGN KEY (obmbookmarkentity_obmbookmark_id) REFERENCES ObmBookmark (obmbookmark_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ObmbookmarkEntity ADD CONSTRAINT obmbookmarkentity_entity_id_entity_id_fkey FOREIGN KEY (obmbookmarkentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE OrganizationalchartEntity ADD CONSTRAINT organizationalchartentity_organizationalchart_id_organizationalchart_id_fkey FOREIGN KEY (organizationalchartentity_organizationalchart_id) REFERENCES OrganizationalChart (organizationalchart_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE OrganizationalchartEntity ADD CONSTRAINT organizationalchartentity_entity_id_entity_id_fkey FOREIGN KEY (organizationalchartentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ParentdealEntity ADD CONSTRAINT parentdealentity_parentdeal_id_parentdeal_id_fkey FOREIGN KEY (parentdealentity_parentdeal_id) REFERENCES ParentDeal (parentdeal_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ParentdealEntity ADD CONSTRAINT parentdealentity_entity_id_entity_id_fkey FOREIGN KEY (parentdealentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE PaymentEntity ADD CONSTRAINT paymententity_payment_id_payment_id_fkey FOREIGN KEY (paymententity_payment_id) REFERENCES Payment (payment_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE PaymentEntity ADD CONSTRAINT paymententity_entity_id_entity_id_fkey FOREIGN KEY (paymententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ProfileEntity ADD CONSTRAINT profileentity_profile_id_profile_id_fkey FOREIGN KEY (profileentity_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ProfileEntity ADD CONSTRAINT profileentity_entity_id_entity_id_fkey FOREIGN KEY (profileentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ProjectEntity ADD CONSTRAINT projectentity_project_id_project_id_fkey FOREIGN KEY (projectentity_project_id) REFERENCES Project (project_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ProjectEntity ADD CONSTRAINT projectentity_entity_id_entity_id_fkey FOREIGN KEY (projectentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE PublicationEntity ADD CONSTRAINT publicationentity_publication_id_publication_id_fkey FOREIGN KEY (publicationentity_publication_id) REFERENCES Publication (publication_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE PublicationEntity ADD CONSTRAINT publicationentity_entity_id_entity_id_fkey FOREIGN KEY (publicationentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ResourcegroupEntity ADD CONSTRAINT resourcegroupentity_resourcegroup_id_resourcegroup_id_fkey FOREIGN KEY (resourcegroupentity_resourcegroup_id) REFERENCES RGroup (rgroup_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ResourcegroupEntity ADD CONSTRAINT resourcegroupentity_entity_id_entity_id_fkey FOREIGN KEY (resourcegroupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ResourceEntity ADD CONSTRAINT resourceentity_resource_id_resource_id_fkey FOREIGN KEY (resourceentity_resource_id) REFERENCES Resource (resource_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ResourceEntity ADD CONSTRAINT resourceentity_entity_id_entity_id_fkey FOREIGN KEY (resourceentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE SubscriptionEntity ADD CONSTRAINT subscriptionentity_subscription_id_subscription_id_fkey FOREIGN KEY (subscriptionentity_subscription_id) REFERENCES Subscription (subscription_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE SubscriptionEntity ADD CONSTRAINT subscriptionentity_entity_id_entity_id_fkey FOREIGN KEY (subscriptionentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE GroupEntity ADD CONSTRAINT groupentity_group_id_group_id_fkey FOREIGN KEY (groupentity_group_id) REFERENCES UGroup (group_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE GroupEntity ADD CONSTRAINT groupentity_entity_id_entity_id_fkey FOREIGN KEY (groupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE UserEntity ADD CONSTRAINT userentity_user_id_user_id_fkey FOREIGN KEY (userentity_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE UserEntity ADD CONSTRAINT userentity_entity_id_entity_id_fkey FOREIGN KEY (userentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE TmpEntity (
+  entity_id     serial,
+  id_entity     integer,
+  PRIMARY KEY (entity_id)
+);
+
+INSERT INTO TmpEntity (id_entity) SELECT account_id FROM Account;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO AccountEntity (accountentity_entity_id, accountentity_account_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT cv_id FROM CV;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO CvEntity (cventity_entity_id, cventity_cv_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT userobm_id FROM UserObm;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO CalendarEntity (calendarentity_entity_id, calendarentity_calendar_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT company_id FROM Company;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO CompanyEntity (companyentity_entity_id, companyentity_company_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT contact_id FROM Contact;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO ContactEntity (contactentity_entity_id, contactentity_contact_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT contract_id FROM Contract;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO ContractEntity (contractentity_entity_id, contractentity_contract_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT deal_id FROM Deal;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO DealEntity (dealentity_entity_id, dealentity_deal_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT defaultodttemplate_id FROM DefaultOdtTemplate;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO DefaultodttemplateEntity (defaultodttemplateentity_entity_id, defaultodttemplateentity_defaultodttemplate_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT document_id FROM Document;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO DocumentEntity (documententity_entity_id, documententity_document_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT domain_id FROM Domain;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO DomainEntity (domainentity_entity_id, domainentity_domain_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT event_id FROM Event;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO EventEntity (evententity_entity_id, evententity_event_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT host_id FROM Host;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO HostEntity (hostentity_entity_id, hostentity_host_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT import_id FROM Import;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO ImportEntity (importentity_entity_id, importentity_import_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT incident_id FROM Incident;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO IncidentEntity (incidententity_entity_id, incidententity_incident_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT invoice_id FROM Invoice;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO InvoiceEntity (invoiceentity_entity_id, invoiceentity_invoice_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT lead_id FROM Lead;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO LeadEntity (leadentity_entity_id, leadentity_lead_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT list_id FROM List;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO ListEntity (listentity_entity_id, listentity_list_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT mailshare_id FROM MailShare;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO MailshareEntity (mailshareentity_entity_id, mailshareentity_mailshare_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT userobm_id FROM UserObm;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO MailboxEntity (mailboxentity_entity_id, mailboxentity_mailbox_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT ogroup_id FROM OGroup;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO OgroupEntity (ogroupentity_entity_id, ogroupentity_ogroup_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT obmbookmark_id FROM ObmBookmark;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO ObmbookmarkEntity (obmbookmarkentity_entity_id, obmbookmarkentity_obmbookmark_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT organizationalchart_id FROM OrganizationalChart;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO OrganizationalchartEntity (organizationalchartentity_entity_id, organizationalchartentity_organizationalchart_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT parentdeal_id FROM ParentDeal;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO ParentdealEntity (parentdealentity_entity_id, parentdealentity_parentdeal_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT payment_id FROM Payment;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO PaymentEntity (paymententity_entity_id, paymententity_payment_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT profile_id FROM Profile;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO ProfileEntity (profileentity_entity_id, profileentity_profile_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT project_id FROM Project;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO ProjectEntity (projectentity_entity_id, projectentity_project_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT publication_id FROM Publication;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO PublicationEntity (publicationentity_entity_id, publicationentity_publication_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT rgroup_id FROM RGroup;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO ResourcegroupEntity (resourcegroupentity_entity_id, resourcegroupentity_resourcegroup_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT resource_id FROM Resource;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO ResourceEntity (resourceentity_entity_id, resourceentity_resource_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT subscription_id FROM Subscription;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO SubscriptionEntity (subscriptionentity_entity_id, subscriptionentity_subscription_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT group_id FROM UGroup;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO GroupEntity (groupentity_entity_id, groupentity_group_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+  
+INSERT INTO TmpEntity (id_entity) SELECT userobm_id FROM UserObm;
+INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO UserEntity (userentity_entity_id, userentity_user_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+UPDATE TmpEntity SET id_entity = NULL;
+
+DROP TABLE TmpEntity;
+
+
+DELETE FROM EntityRight WHERE entityright_entity_id NOT IN (SELECT mailshare_id FROM MailShare) AND entityright_entity = 'mailshare';
+UPDATE EntityRight SET entityright_entity_id = (SELECT mailshareentity_entity_id FROM MailshareEntity INNER JOIN MailShare ON mailshareentity_mailshare_id = mailshare_id WHERE mailshare_id = entityright_entity_id), entityright_entity = 'entity' WHERE entityright_entity = 'mailshare'; 
+DELETE FROM EntityRight WHERE entityright_entity_id NOT IN (SELECT userobm_id FROM UserObm) AND entityright_entity = 'calendar';
+UPDATE EntityRight SET entityright_entity_id = (SELECT calendarentity_entity_id FROM CalendarEntity INNER JOIN UserObm ON calendarentity_calendar_id = userobm_id WHERE userobm_id = entityright_entity_id), entityright_entity = 'entity' WHERE entityright_entity = 'calendar'; 
+DELETE FROM EntityRight WHERE entityright_entity_id NOT IN (SELECT resource_id FROM Resource) AND entityright_entity = 'resource';
+UPDATE EntityRight SET entityright_entity_id = (SELECT resourceentity_entity_id FROM ResourceEntity INNER JOIN Resource ON resourceentity_resource_id = resource_id WHERE resource_id = entityright_entity_id), entityright_entity = 'entity' WHERE entityright_entity = 'resource'; 
+DELETE FROM EntityRight WHERE entityright_entity_id NOT IN (SELECT userobm_id FROM UserObm) AND entityright_entity = 'mailbox';
+UPDATE EntityRight SET entityright_entity_id = (SELECT mailboxentity_entity_id FROM MailboxEntity INNER JOIN UserObm ON mailboxentity_mailbox_id = userobm_id WHERE userobm_id = entityright_entity_id), entityright_entity = 'entity' WHERE entityright_entity = 'mailbox'; 
+UPDATE EntityRight SET entityright_consumer_id = NULL WHERE entityright_consumer_id = 0;
+DELETE FROM EntityRight WHERE entityright_consumer_id NOT IN (SELECT userobm_id FROM UserObm) AND entityright_consumer = 'user' AND entityright_consumer_id IS NOT NULL;
+UPDATE EntityRight SET entityright_consumer_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'user' AND entityright_consumer_id IS NOT NULL; 
+DELETE FROM EntityRight WHERE entityright_consumer_id NOT IN (SELECT group_id FROM UGroup) AND entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
+UPDATE EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
+DELETE FROM EntityRight WHERE entityright_entity != 'entity';
+ALTER TABLE EntityRight DROP COLUMN entityright_entity;
+ALTER TABLE EntityRight DROP COLUMN entityright_consumer;
+ALTER TABLE P_EntityRight DROP COLUMN entityright_entity;
+ALTER TABLE P_EntityRight DROP COLUMN entityright_consumer;
+
+DELETE FROM DocumentLink WHERE documentlink_entity_id NOT IN (SELECT contact_id FROM Contact) AND documentlink_entity = 'contact';
+UPDATE DocumentLink SET documentlink_entity_id = (SELECT contactentity_entity_id FROM ContactEntity INNER JOIN Contact ON contactentity_contact_id = contact_id WHERE contact_id = documentlink_entity_id), documentlink_entity = 'entity' WHERE documentlink_entity = 'contact';
+DELETE FROM DocumentLink WHERE documentlink_entity_id NOT IN (SELECT invoice_id FROM Invoice) AND documentlink_entity = 'invoice';
+UPDATE DocumentLink SET documentlink_entity_id = (SELECT invoiceentity_entity_id FROM InvoiceEntity INNER JOIN Invoice ON invoiceentity_invoice_id = invoice_id WHERE invoice_id = documentlink_entity_id), documentlink_entity = 'entity' WHERE documentlink_entity = 'invoice';
+DELETE FROM DocumentLink WHERE documentlink_entity_id NOT IN (SELECT deal_id FROM Deal) AND documentlink_entity = 'deal';
+UPDATE DocumentLink SET documentlink_entity_id = (SELECT dealentity_entity_id FROM DealEntity INNER JOIN Deal ON dealentity_deal_id = deal_id WHERE deal_id = documentlink_entity_id), documentlink_entity = 'entity' WHERE documentlink_entity = 'deal';
+DELETE FROM DocumentLink WHERE documentlink_entity_id NOT IN (SELECT project_id FROM Project) AND documentlink_entity = 'project';
+UPDATE DocumentLink SET documentlink_entity_id = (SELECT projectentity_entity_id FROM ProjectEntity INNER JOIN Project ON projectentity_project_id = project_id WHERE project_id = documentlink_entity_id), documentlink_entity = 'entity' WHERE documentlink_entity = 'project';
+DELETE FROM DocumentLink WHERE documentlink_entity_id NOT IN (SELECT company_id FROM Company) AND documentlink_entity = 'company';
+UPDATE DocumentLink SET documentlink_entity_id = (SELECT companyentity_entity_id FROM CompanyEntity INNER JOIN Company ON companyentity_company_id = company_id WHERE company_id = documentlink_entity_id), documentlink_entity = 'entity' WHERE documentlink_entity = 'company';
+DELETE FROM DocumentLink WHERE documentlink_entity_id NOT IN (SELECT contract_id FROM Contract) AND documentlink_entity = 'contract';
+UPDATE DocumentLink SET documentlink_entity_id = (SELECT contractentity_entity_id FROM ContractEntity INNER JOIN Contract ON contractentity_contract_id = contract_id WHERE contract_id = documentlink_entity_id), documentlink_entity = 'entity' WHERE documentlink_entity = 'contract';
+DELETE FROM DocumentLink WHERE documentlink_entity_id NOT IN (SELECT incident_id FROM Incident) AND documentlink_entity = 'incident';
+UPDATE DocumentLink SET documentlink_entity_id = (SELECT incidententity_entity_id FROM IncidentEntity INNER JOIN Incident ON incidententity_incident_id = incident_id WHERE incident_id = documentlink_entity_id), documentlink_entity = 'entity' WHERE documentlink_entity = 'incident';
+ALTER TABLE DocumentLink DROP COLUMN documentlink_entity;
+
+DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT contact_id FROM Contact) AND categorylink_entity = 'contact';
+UPDATE CategoryLink SET categorylink_entity_id = (SELECT contactentity_entity_id FROM ContactEntity INNER JOIN Contact ON contactentity_contact_id = contact_id WHERE contact_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'contact';
+DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT company_id FROM Company) AND categorylink_entity = 'company';
+UPDATE CategoryLink SET categorylink_entity_id = (SELECT companyentity_entity_id FROM CompanyEntity INNER JOIN Company ON companyentity_company_id = company_id WHERE company_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'company';
+DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT document_id FROM Document) AND categorylink_entity = 'document';
+UPDATE CategoryLink SET categorylink_entity_id = (SELECT documententity_entity_id FROM DocumentEntity INNER JOIN Document ON documententity_document_id = document_id WHERE document_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'document';
+DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT incident_id FROM Incident) AND categorylink_entity = 'incident';
+UPDATE CategoryLink SET categorylink_entity_id = (SELECT incidententity_entity_id FROM IncidentEntity INNER JOIN Incident ON incidententity_incident_id = incident_id WHERE incident_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'incident';
+DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT userobm_id FROM UserObm) AND categorylink_entity = 'user';
+UPDATE CategoryLink SET categorylink_entity_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'user';
+DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT group_id FROM UGroup) AND categorylink_entity = 'group';
+UPDATE CategoryLink SET categorylink_entity_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'group';
+DELETE FROM CategoryLink WHERE categorylink_entity_id NOT IN (SELECT deal_id FROM Deal) AND categorylink_entity = 'deal';
+UPDATE CategoryLink SET categorylink_entity_id = (SELECT dealentity_entity_id FROM DealEntity INNER JOIN Deal ON dealentity_deal_id = deal_id WHERE deal_id = categorylink_entity_id), categorylink_entity = 'entity' WHERE categorylink_entity = 'deal';
+ALTER TABLE CategoryLink DROP COLUMN categorylink_entity;
+
+DELETE FROM OGroupLink WHERE ogrouplink_entity_id NOT IN (SELECT group_id FROM UGroup) AND ogrouplink_entity = 'group';
+UPDATE OGroupLink SET ogrouplink_entity_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = ogrouplink_entity_id), ogrouplink_entity = 'entity' WHERE ogrouplink_entity = 'group';
+DELETE FROM OGroupLink WHERE ogrouplink_entity_id NOT IN (SELECT userobm_id FROM UserObm) AND ogrouplink_entity = 'user';
+UPDATE OGroupLink SET ogrouplink_entity_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = ogrouplink_entity_id), ogrouplink_entity = 'entity' WHERE ogrouplink_entity = 'user';
+ALTER TABLE OGroupLink DROP COLUMN ogrouplink_entity;
+
+DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT userobm_id FROM UserObm) AND eventlink_entity = 'user';
+UPDATE EventLink SET eventlink_entity_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = eventlink_entity_id), eventlink_entity = 'entity' WHERE eventlink_entity = 'user';
+DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT resource_id FROM Resource) AND eventlink_entity = 'resource';
+UPDATE EventLink SET eventlink_entity_id = (SELECT resourceentity_entity_id FROM ResourceEntity INNER JOIN Resource ON resourceentity_resource_id = resource_id WHERE resource_id = eventlink_entity_id), eventlink_entity = 'entity' WHERE eventlink_entity = 'resource';
+-- FIXME : Task not handle
+DELETE FROM EventLink where eventlink_entity != 'task';
+ALTER TABLE EventLink DROP COLUMN eventlink_entity;
 
 -------------------------------------------------------------------------------
 -- Default Profile properties
@@ -1229,9 +1781,9 @@ ALTER TABLE Document ADD CONSTRAINT document_usercreate_userobm_id_fkey FOREIGN 
 UPDATE Document SET document_mimetype_id = NULL WHERE document_mimetype_id NOT IN (SELECT documentmimetype_id FROM DocumentMimeType) AND document_mimetype_id IS NOT NULL;
 ALTER TABLE Document ADD CONSTRAINT document_mimetype_id_documentmimetype_id_fkey FOREIGN KEY (document_mimetype_id) REFERENCES DocumentMimeType(documentmimetype_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
--- Foreign key from documententity_document_id to document_id
-DELETE FROM DocumentEntity WHERE documententity_document_id NOT IN (SELECT document_id FROM Document) AND documententity_document_id IS NOT NULL;
-ALTER TABLE DocumentEntity ADD CONSTRAINT documententity_document_id_document_id_fkey FOREIGN KEY (documententity_document_id) REFERENCES Document(document_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- Foreign key from documentlink_document_id to document_id
+DELETE FROM DocumentLink WHERE documentlink_document_id NOT IN (SELECT document_id FROM Document) AND documentlink_document_id IS NOT NULL;
+ALTER TABLE DocumentLink ADD CONSTRAINT documentlink_document_id_document_id_fkey FOREIGN KEY (documentlink_document_id) REFERENCES Document(document_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from documentmimetype_domain_id to domain_id
 DELETE FROM DocumentMimeType WHERE documentmimetype_domain_id NOT IN (SELECT domain_id FROM Domain) AND documentmimetype_domain_id IS NOT NULL;
@@ -1533,21 +2085,21 @@ ALTER TABLE OGroup ADD CONSTRAINT ogroup_userupdate_userobm_id_fkey FOREIGN KEY 
 UPDATE OGroup SET ogroup_usercreate = NULL WHERE ogroup_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND ogroup_usercreate IS NOT NULL;
 ALTER TABLE OGroup ADD CONSTRAINT ogroup_usercreate_userobm_id_fkey FOREIGN KEY (ogroup_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
--- Foreign key from ogroupentity_ogroup_id to ogroup_id
-DELETE FROM OGroupEntity WHERE ogroupentity_ogroup_id NOT IN (SELECT ogroup_id FROM OGroup) AND ogroupentity_ogroup_id IS NOT NULL;
-ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_ogroup_id_ogroup_id_fkey FOREIGN KEY (ogroupentity_ogroup_id) REFERENCES OGroup(ogroup_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- Foreign key from ogrouplink_ogroup_id to ogroup_id
+DELETE FROM OGroupLink WHERE ogrouplink_ogroup_id NOT IN (SELECT ogroup_id FROM OGroup) AND ogrouplink_ogroup_id IS NOT NULL;
+ALTER TABLE OGroupLink ADD CONSTRAINT ogrouplink_ogroup_id_ogroup_id_fkey FOREIGN KEY (ogrouplink_ogroup_id) REFERENCES OGroup(ogroup_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
--- Foreign key from ogroupentity_domain_id to domain_id
-DELETE FROM OGroupEntity WHERE ogroupentity_domain_id NOT IN (SELECT domain_id FROM Domain) AND ogroupentity_domain_id IS NOT NULL;
-ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_domain_id_domain_id_fkey FOREIGN KEY (ogroupentity_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- Foreign key from ogrouplink_domain_id to domain_id
+DELETE FROM OGroupLink WHERE ogrouplink_domain_id NOT IN (SELECT domain_id FROM Domain) AND ogrouplink_domain_id IS NOT NULL;
+ALTER TABLE OGroupLink ADD CONSTRAINT ogrouplink_domain_id_domain_id_fkey FOREIGN KEY (ogrouplink_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
--- Foreign key from ogroupentity_userupdate to userobm_id
-UPDATE OGroupEntity SET ogroupentity_userupdate = NULL WHERE ogroupentity_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND ogroupentity_userupdate IS NOT NULL;
-ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_userupdate_userobm_id_fkey FOREIGN KEY (ogroupentity_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+-- Foreign key from ogrouplink_userupdate to userobm_id
+UPDATE OGroupLink SET ogrouplink_userupdate = NULL WHERE ogrouplink_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND ogrouplink_userupdate IS NOT NULL;
+ALTER TABLE OGroupLink ADD CONSTRAINT ogrouplink_userupdate_userobm_id_fkey FOREIGN KEY (ogrouplink_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
--- Foreign key from ogroupentity_usercreate to userobm_id
-UPDATE OGroupEntity SET ogroupentity_usercreate = NULL WHERE ogroupentity_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND ogroupentity_usercreate IS NOT NULL;
-ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_usercreate_userobm_id_fkey FOREIGN KEY (ogroupentity_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+-- Foreign key from ogrouplink_usercreate to userobm_id
+UPDATE OGroupLink SET ogrouplink_usercreate = NULL WHERE ogrouplink_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND ogrouplink_usercreate IS NOT NULL;
+ALTER TABLE OGroupLink ADD CONSTRAINT ogrouplink_usercreate_userobm_id_fkey FOREIGN KEY (ogrouplink_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from obmbookmark_user_id to userobm_id
 DELETE FROM ObmBookmark WHERE obmbookmark_user_id NOT IN (SELECT userobm_id FROM UserObm) AND obmbookmark_user_id IS NOT NULL;
@@ -1992,50 +2544,16 @@ ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profileprop
 ALTER TABLE Contact ADD CONSTRAINT contact_birthday_id_event_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
-ALTER TABLE ContactEntity ADD CONSTRAINT contactentity_contact_id_contact_id FOREIGN KEY (contactentity_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ContactEntity ADD  CONSTRAINT contactentity_entity_id_entity_id FOREIGN KEY (contactentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE UserEntity ADD CONSTRAINT userentity_user_id_user_id FOREIGN KEY (userentity_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE UserEntity ADD  CONSTRAINT userentity_entity_id_entity_id FOREIGN KEY (userentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE GroupEntity ADD CONSTRAINT groupentity_group_id_group_id FOREIGN KEY (groupentity_group_id) REFERENCES UGroup (group_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE GroupEntity ADD CONSTRAINT groupentity_entity_id_entity_id FOREIGN KEY (groupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ResourceEntity ADD CONSTRAINT resourceentity_resource_id_resource_id FOREIGN KEY (resourceentity_resource_id) REFERENCES Resource (resource_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ResourceEntity ADD CONSTRAINT resourceentity_entity_id_entity_id FOREIGN KEY (resourceentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE CompanyEntity ADD CONSTRAINT companyentity_company_id_company_id FOREIGN KEY (companyentity_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE CompanyEntity ADD CONSTRAINT companyentity_entity_id_entity_id FOREIGN KEY (companyentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE CalendarEntity ADD CONSTRAINT calendarentity_calendar_id_calendar_id FOREIGN KEY (calendarentity_calendar_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE CalendarEntity ADD CONSTRAINT calendarentity_entity_id_entity_id FOREIGN KEY (calendarentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE MailboxEntity ADD CONSTRAINT mailboxentity_mailbox_id_mailbox_id FOREIGN KEY (mailboxentity_mailbox_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE MailboxEntity ADD  CONSTRAINT mailboxentity_entity_id_entity_id FOREIGN KEY (mailboxentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE MailshareEntity ADD CONSTRAINT mailshareentity_mailshare_id_mailshare_id FOREIGN KEY (mailshareentity_mailshare_id) REFERENCES MailShare (mailshare_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE MailshareEntity ADD CONSTRAINT mailshareentity_entity_id_entity_id FOREIGN KEY (mailshareentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE HostEntity ADD CONSTRAINT hostentity_host_id_host_id FOREIGN KEY (hostentity_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE HostEntity ADD CONSTRAINT hostentity_entity_id_entity_id FOREIGN KEY (hostentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE DomainEntity ADD CONSTRAINT domainentity_domain_id_domain_id FOREIGN KEY (domainentity_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE DomainEntity ADD CONSTRAINT domainentity_entity_id_entity_id FOREIGN KEY (domainentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
 ALTER TABLE CategoryLink ADD CONSTRAINT categorylink_entity_id_entity_id_fkey FOREIGN KEY (categorylink_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE EventEntity CONSTRAINT evententity_entity_id_entity_id_fkey FOREIGN KEY (evententity_entity_id) REFERENCES Entity (entity_id) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE EventLink ADD CONSTRAINT eventlink_entity_id_entity_id_fkey FOREIGN KEY (eventlink_entity_id) REFERENCES Entity (entity_id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE EntityRight ADD CONSTRAINT entityright_entity_id_entity_id FOREIGN KEY (entityright_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE EntityRight ADD CONSTRAINT entityright_consumer_id_entity_id FOREIGN KEY (entityright_consumer_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE DocumentLink ADD CONSTRAINT documentlink_entity_id_entity_id_fkey FOREIGN KEY (documentlink_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE OGroupEntity ADD CONSTRAINT ogroupentity_entity_id_entity_id_fkey FOREIGN KEY (ogroupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE SET NULL ON UPDATE CASCADE,
+ALTER TABLE OGroupLink ADD CONSTRAINT ogrouplink_entity_id_entity_id_fkey FOREIGN KEY (ogrouplink_entity_id) REFERENCES Entity (entity_id) ON DELETE SET NULL ON UPDATE CASCADE,
 
 -- DATA
 

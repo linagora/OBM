@@ -1281,29 +1281,42 @@ CREATE TABLE `EventCategory1` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- Table structure for table `EventLink`
+--
+
+DROP TABLE IF EXISTS `EventLink`;
+CREATE TABLE `EventLink` (
+  `eventlink_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `eventlink_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `eventlink_userupdate` int(8) default NULL,
+  `eventlink_usercreate` int(8) default NULL,
+  `eventlink_event_id` int(8) NOT NULL,
+  `eventlink_entity_id` int(8) NOT NULL,
+  `eventlink_state` enum('NEEDS-ACTION','ACCEPTED','DECLINED','TENTATIVE','DELEGATED','COMPLETED','IN-PROGRESS') default 'NEEDS-ACTION',
+  `eventlink_required` enum('CHAIR','REQ','OPT','NON') default 'REQ',
+  `eventlink_percent` int(3) default '0',
+  PRIMARY KEY  (`eventlink_event_id`,`eventlink_entity_id`),
+  KEY `eventlink_userupdate_userobm_id_fkey` (`eventlink_userupdate`),
+  KEY `eventlink_usercreate_userobm_id_fkey` (`eventlink_usercreate`),
+  KEY `eventlink_entity_id_entity_id_fkey` (`eventlink_entity_id`),
+  CONSTRAINT `eventlink_entity_id_entity_id_fkey` FOREIGN KEY (`eventlink_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `eventlink_usercreate_userobm_id_fkey` FOREIGN KEY (`eventlink_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `eventlink_event_id_event_id_fkey` FOREIGN KEY (`eventlink_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `eventlink_userupdate_userobm_id_fkey` FOREIGN KEY (`eventlink_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
 -- Table structure for table `EventEntity`
 --
 
-DROP TABLE IF EXISTS `EventEntity`;
-CREATE TABLE `EventEntity` (
-  `evententity_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `evententity_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `evententity_userupdate` int(8) default NULL,
-  `evententity_usercreate` int(8) default NULL,
-  `evententity_event_id` int(8) NOT NULL,
-  `evententity_entity_id` int(8) NOT NULL,
-  `evententity_state` enum('NEEDS-ACTION','ACCEPTED','DECLINED','TENTATIVE','DELEGATED','COMPLETED','IN-PROGRESS') default 'NEEDS-ACTION',
-  `evententity_required` enum('CHAIR','REQ','OPT','NON') default 'REQ',
-  `evententity_percent` float default '0',
-  PRIMARY KEY  (`evententity_event_id`,`evententity_entity_id`),
-  KEY `evententity_userupdate_userobm_id_fkey` (`evententity_userupdate`),
-  KEY `evententity_usercreate_userobm_id_fkey` (`evententity_usercreate`),
-  KEY `evententity_entity_id_entity_id_fkey` (`evententity_entity_id`),
-  CONSTRAINT `evententity_entity_id_entity_id_fkey` FOREIGN KEY (`evententity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `evententity_usercreate_userobm_id_fkey` FOREIGN KEY (`evententity_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `evententity_event_id_event_id_fkey` FOREIGN KEY (`evententity_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `evententity_userupdate_userobm_id_fkey` FOREIGN KEY (`evententity_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+DROP TABLE IF EXISTS EventEntity;
+CREATE TABLE EventEntity (
+  evententity_entity_id int(8) NOT NULL,
+  evententity_event_id int(8) NOT NULL,
+  PRIMARY KEY (evententity_entity_id, evententity_event_id),
+  CONSTRAINT evententity_event_id_event_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES Event (event_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT evententity_entity_id_entity_id_fkey FOREIGN KEY (evententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Table structure for table `EventException`
@@ -3615,14 +3628,3 @@ CREATE TABLE `of_usergroup` (
   CONSTRAINT `of_usergroup_user_id_userobm_id_fkey` FOREIGN KEY (`of_usergroup_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `of_usergroup_group_id_group_id_fkey` FOREIGN KEY (`of_usergroup_group_id`) REFERENCES `UGroup` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2008-11-26  8:57:24
