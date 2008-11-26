@@ -31,6 +31,7 @@ createdb -O ${user} --encoding=UTF-8 ${db}
 
 psql ${db} <<EOF
 CREATE LANGUAGE plpgsql;
+ALTER DATABASE ${db} SET TIMEZONE='GMT';
 \q
 EOF
 
