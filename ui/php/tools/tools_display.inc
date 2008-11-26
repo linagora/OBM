@@ -23,7 +23,7 @@ function dis_tools_update_detail() {
 
   // Determine which domain to display, and which admin realm
   // For domain 0, only 'domain' realm and loop through all domains
-  if ($obm['domain_global'] === true) {
+  if ($obm['domain_global'] == true) {
     $admin_realm = array('domain');
     $domains = of_domain_get_list();
 
