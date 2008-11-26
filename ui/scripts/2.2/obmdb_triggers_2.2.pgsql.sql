@@ -456,23 +456,23 @@ END
 CREATE TRIGGER event_created BEFORE INSERT ON event FOR EACH ROW EXECUTE PROCEDURE on_event_create();
 CREATE TRIGGER event_changed BEFORE UPDATE ON event FOR EACH ROW EXECUTE PROCEDURE on_event_change();
 
-UPDATE evententity SET evententity_timecreate=NOW() WHERE evententity_timecreate IS NULL;
-ALTER TABLE evententity ALTER COLUMN evententity_timecreate SET DEFAULT NOW();
+UPDATE eventlink SET eventlink_timecreate=NOW() WHERE eventlink_timecreate IS NULL;
+ALTER TABLE eventlink ALTER COLUMN eventlink_timecreate SET DEFAULT NOW();
 
-CREATE OR REPLACE FUNCTION on_evententity_change() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_eventlink_change() RETURNS trigger AS '
 BEGIN
-new.evententity_timeupdate := current_timestamp;
+new.eventlink_timeupdate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE OR REPLACE FUNCTION on_evententity_create() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_eventlink_create() RETURNS trigger AS '
 BEGIN
-new.evententity_timecreate := current_timestamp;
+new.eventlink_timecreate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE TRIGGER evententity_created BEFORE INSERT ON evententity FOR EACH ROW EXECUTE PROCEDURE on_evententity_create();
-CREATE TRIGGER evententity_changed BEFORE UPDATE ON evententity FOR EACH ROW EXECUTE PROCEDURE on_evententity_change();
+CREATE TRIGGER eventlink_created BEFORE INSERT ON eventlink FOR EACH ROW EXECUTE PROCEDURE on_eventlink_create();
+CREATE TRIGGER eventlink_changed BEFORE UPDATE ON eventlink FOR EACH ROW EXECUTE PROCEDURE on_eventlink_change();
 
 UPDATE eventexception SET eventexception_timecreate=NOW() WHERE eventexception_timecreate IS NULL;
 ALTER TABLE eventexception ALTER COLUMN eventexception_timecreate SET DEFAULT NOW();
@@ -1068,23 +1068,23 @@ END
 CREATE TRIGGER ogroup_created BEFORE INSERT ON ogroup FOR EACH ROW EXECUTE PROCEDURE on_ogroup_create();
 CREATE TRIGGER ogroup_changed BEFORE UPDATE ON ogroup FOR EACH ROW EXECUTE PROCEDURE on_ogroup_change();
 
-UPDATE ogroupentity SET ogroupentity_timecreate=NOW() WHERE ogroupentity_timecreate IS NULL;
-ALTER TABLE ogroupentity ALTER COLUMN ogroupentity_timecreate SET DEFAULT NOW();
+UPDATE ogrouplink SET ogrouplink_timecreate=NOW() WHERE ogrouplink_timecreate IS NULL;
+ALTER TABLE ogrouplink ALTER COLUMN ogrouplink_timecreate SET DEFAULT NOW();
 
-CREATE OR REPLACE FUNCTION on_ogroupentity_change() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_ogrouplink_change() RETURNS trigger AS '
 BEGIN
-new.ogroupentity_timeupdate := current_timestamp;
+new.ogrouplink_timeupdate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE OR REPLACE FUNCTION on_ogroupentity_create() RETURNS trigger AS '
+CREATE OR REPLACE FUNCTION on_ogrouplink_create() RETURNS trigger AS '
 BEGIN
-new.ogroupentity_timecreate := current_timestamp;
+new.ogrouplink_timecreate := current_timestamp;
 RETURN new;
 END
 ' LANGUAGE plpgsql;
-CREATE TRIGGER ogroupentity_created BEFORE INSERT ON ogroupentity FOR EACH ROW EXECUTE PROCEDURE on_ogroupentity_create();
-CREATE TRIGGER ogroupentity_changed BEFORE UPDATE ON ogroupentity FOR EACH ROW EXECUTE PROCEDURE on_ogroupentity_change();
+CREATE TRIGGER ogrouplink_created BEFORE INSERT ON ogrouplink FOR EACH ROW EXECUTE PROCEDURE on_ogrouplink_create();
+CREATE TRIGGER ogrouplink_changed BEFORE UPDATE ON ogrouplink FOR EACH ROW EXECUTE PROCEDURE on_ogrouplink_change();
 
 UPDATE import SET import_timecreate=NOW() WHERE import_timecreate IS NULL;
 ALTER TABLE import ALTER COLUMN import_timecreate SET DEFAULT NOW();

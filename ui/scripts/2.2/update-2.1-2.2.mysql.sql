@@ -100,12 +100,312 @@ CREATE TABLE HostService (
   KEY hostservice_host_id_host_id_fkey (hostservice_host_id)
 );
 
+
+DROP TABLE IF EXISTS AccountEntity;
+CREATE TABLE AccountEntity (
+  accountentity_entity_id int(8) NOT NULL,
+  accountentity_account_id int(8) NOT NULL,
+  PRIMARY KEY (accountentity_entity_id, accountentity_account_id),
+  CONSTRAINT accountentity_account_id_account_id_fkey FOREIGN KEY (accountentity_account_id) REFERENCES Account (account_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT accountentity_entity_id_entity_id_fkey FOREIGN KEY (accountentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS CvEntity;
+CREATE TABLE CvEntity (
+  cventity_entity_id int(8) NOT NULL,
+  cventity_cv_id int(8) NOT NULL,
+  PRIMARY KEY (cventity_entity_id, cventity_cv_id),
+  CONSTRAINT cventity_cv_id_cv_id_fkey FOREIGN KEY (cventity_cv_id) REFERENCES CV (cv_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT cventity_entity_id_entity_id_fkey FOREIGN KEY (cventity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS CalendarEntity;
+CREATE TABLE CalendarEntity (
+  calendarentity_entity_id int(8) NOT NULL,
+  calendarentity_calendar_id int(8) NOT NULL,
+  PRIMARY KEY (calendarentity_entity_id, calendarentity_calendar_id),
+  CONSTRAINT calendarentity_calendar_id_calendar_id_fkey FOREIGN KEY (calendarentity_calendar_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT calendarentity_entity_id_entity_id_fkey FOREIGN KEY (calendarentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS CompanyEntity;
+CREATE TABLE CompanyEntity (
+  companyentity_entity_id int(8) NOT NULL,
+  companyentity_company_id int(8) NOT NULL,
+  PRIMARY KEY (companyentity_entity_id, companyentity_company_id),
+  CONSTRAINT companyentity_company_id_company_id_fkey FOREIGN KEY (companyentity_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT companyentity_entity_id_entity_id_fkey FOREIGN KEY (companyentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS ContactEntity;
+CREATE TABLE ContactEntity (
+  contactentity_entity_id int(8) NOT NULL,
+  contactentity_contact_id int(8) NOT NULL,
+  PRIMARY KEY (contactentity_entity_id, contactentity_contact_id),
+  CONSTRAINT contactentity_contact_id_contact_id_fkey FOREIGN KEY (contactentity_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contactentity_entity_id_entity_id_fkey FOREIGN KEY (contactentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS ContractEntity;
+CREATE TABLE ContractEntity (
+  contractentity_entity_id int(8) NOT NULL,
+  contractentity_contract_id int(8) NOT NULL,
+  PRIMARY KEY (contractentity_entity_id, contractentity_contract_id),
+  CONSTRAINT contractentity_contract_id_contract_id_fkey FOREIGN KEY (contractentity_contract_id) REFERENCES Contract (contract_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT contractentity_entity_id_entity_id_fkey FOREIGN KEY (contractentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS DealEntity;
+CREATE TABLE DealEntity (
+  dealentity_entity_id int(8) NOT NULL,
+  dealentity_deal_id int(8) NOT NULL,
+  PRIMARY KEY (dealentity_entity_id, dealentity_deal_id),
+  CONSTRAINT dealentity_deal_id_deal_id_fkey FOREIGN KEY (dealentity_deal_id) REFERENCES Deal (deal_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT dealentity_entity_id_entity_id_fkey FOREIGN KEY (dealentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS DefaultodttemplateEntity;
+CREATE TABLE DefaultodttemplateEntity (
+  defaultodttemplateentity_entity_id int(8) NOT NULL,
+  defaultodttemplateentity_defaultodttemplate_id int(8) NOT NULL,
+  PRIMARY KEY (defaultodttemplateentity_entity_id, defaultodttemplateentity_defaultodttemplate_id),
+  CONSTRAINT defaultodttemplate_id_defaultodttemplate_id_fkey FOREIGN KEY (defaultodttemplateentity_defaultodttemplate_id) REFERENCES DefaultOdtTemplate (defaultodttemplate_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT defaultodttemplateentity_entity_id_entity_id_fkey FOREIGN KEY (defaultodttemplateentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS DocumentEntity;
+CREATE TABLE DocumentEntity (
+  documententity_entity_id int(8) NOT NULL,
+  documententity_document_id int(8) NOT NULL,
+  PRIMARY KEY (documententity_entity_id, documententity_document_id),
+  CONSTRAINT documententity_document_id_document_id_fkey FOREIGN KEY (documententity_document_id) REFERENCES Document (document_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT documententity_entity_id_entity_id_fkey FOREIGN KEY (documententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS DomainEntity;
+CREATE TABLE DomainEntity (
+  domainentity_entity_id int(8) NOT NULL,
+  domainentity_domain_id int(8) NOT NULL,
+  PRIMARY KEY (domainentity_entity_id, domainentity_domain_id),
+  CONSTRAINT domainentity_domain_id_domain_id_fkey FOREIGN KEY (domainentity_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT domainentity_entity_id_entity_id_fkey FOREIGN KEY (domainentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS EventEntity;
+CREATE TABLE EventEntity (
+  evententity_entity_id int(8) NOT NULL,
+  evententity_event_id int(8) NOT NULL,
+  PRIMARY KEY (evententity_entity_id, evententity_event_id),
+  CONSTRAINT evententity_event_id_event_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES Event (event_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT evententity_entity_id_entity_id_fkey FOREIGN KEY (evententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS HostEntity;
+CREATE TABLE HostEntity (
+  hostentity_entity_id int(8) NOT NULL,
+  hostentity_host_id int(8) NOT NULL,
+  PRIMARY KEY (hostentity_entity_id, hostentity_host_id),
+  CONSTRAINT hostentity_host_id_host_id_fkey FOREIGN KEY (hostentity_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT hostentity_entity_id_entity_id_fkey FOREIGN KEY (hostentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS ImportEntity;
+CREATE TABLE ImportEntity (
+  importentity_entity_id int(8) NOT NULL,
+  importentity_import_id int(8) NOT NULL,
+  PRIMARY KEY (importentity_entity_id, importentity_import_id),
+  CONSTRAINT importentity_import_id_import_id_fkey FOREIGN KEY (importentity_import_id) REFERENCES Import (import_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT importentity_entity_id_entity_id_fkey FOREIGN KEY (importentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS IncidentEntity;
+CREATE TABLE IncidentEntity (
+  incidententity_entity_id int(8) NOT NULL,
+  incidententity_incident_id int(8) NOT NULL,
+  PRIMARY KEY (incidententity_entity_id, incidententity_incident_id),
+  CONSTRAINT incidententity_incident_id_incident_id_fkey FOREIGN KEY (incidententity_incident_id) REFERENCES Incident (incident_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT incidententity_entity_id_entity_id_fkey FOREIGN KEY (incidententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS InvoiceEntity;
+CREATE TABLE InvoiceEntity (
+  invoiceentity_entity_id int(8) NOT NULL,
+  invoiceentity_invoice_id int(8) NOT NULL,
+  PRIMARY KEY (invoiceentity_entity_id, invoiceentity_invoice_id),
+  CONSTRAINT invoiceentity_invoice_id_invoice_id_fkey FOREIGN KEY (invoiceentity_invoice_id) REFERENCES Invoice (invoice_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT invoiceentity_entity_id_entity_id_fkey FOREIGN KEY (invoiceentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS LeadEntity;
+CREATE TABLE LeadEntity (
+  leadentity_entity_id int(8) NOT NULL,
+  leadentity_lead_id int(8) NOT NULL,
+  PRIMARY KEY (leadentity_entity_id, leadentity_lead_id),
+  CONSTRAINT leadentity_lead_id_lead_id_fkey FOREIGN KEY (leadentity_lead_id) REFERENCES Lead (lead_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT leadentity_entity_id_entity_id_fkey FOREIGN KEY (leadentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS ListEntity;
+CREATE TABLE ListEntity (
+  listentity_entity_id int(8) NOT NULL,
+  listentity_list_id int(8) NOT NULL,
+  PRIMARY KEY (listentity_entity_id, listentity_list_id),
+  CONSTRAINT listentity_list_id_list_id_fkey FOREIGN KEY (listentity_list_id) REFERENCES List (list_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT listentity_entity_id_entity_id_fkey FOREIGN KEY (listentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS MailshareEntity;
+CREATE TABLE MailshareEntity (
+  mailshareentity_entity_id int(8) NOT NULL,
+  mailshareentity_mailshare_id int(8) NOT NULL,
+  PRIMARY KEY (mailshareentity_entity_id, mailshareentity_mailshare_id),
+  CONSTRAINT mailshareentity_mailshare_id_mailshare_id_fkey FOREIGN KEY (mailshareentity_mailshare_id) REFERENCES MailShare (mailshare_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT mailshareentity_entity_id_entity_id_fkey FOREIGN KEY (mailshareentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS MailboxEntity;
+CREATE TABLE MailboxEntity (
+  mailboxentity_entity_id int(8) NOT NULL,
+  mailboxentity_mailbox_id int(8) NOT NULL,
+  PRIMARY KEY (mailboxentity_entity_id, mailboxentity_mailbox_id),
+  CONSTRAINT mailboxentity_mailbox_id_mailbox_id_fkey FOREIGN KEY (mailboxentity_mailbox_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT mailboxentity_entity_id_entity_id_fkey FOREIGN KEY (mailboxentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS OgroupEntity;
+CREATE TABLE OgroupEntity (
+  ogroupentity_entity_id int(8) NOT NULL,
+  ogroupentity_ogroup_id int(8) NOT NULL,
+  PRIMARY KEY (ogroupentity_entity_id, ogroupentity_ogroup_id),
+  CONSTRAINT ogroupentity_ogroup_id_ogroup_id_fkey FOREIGN KEY (ogroupentity_ogroup_id) REFERENCES OGroup (ogroup_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT ogroupentity_entity_id_entity_id_fkey FOREIGN KEY (ogroupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS ObmbookmarkEntity;
+CREATE TABLE ObmbookmarkEntity (
+  obmbookmarkentity_entity_id int(8) NOT NULL,
+  obmbookmarkentity_obmbookmark_id int(8) NOT NULL,
+  PRIMARY KEY (obmbookmarkentity_entity_id, obmbookmarkentity_obmbookmark_id),
+  CONSTRAINT obmbookmarkentity_obmbookmark_id_obmbookmark_id_fkey FOREIGN KEY (obmbookmarkentity_obmbookmark_id) REFERENCES ObmBookmark (obmbookmark_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT obmbookmarkentity_entity_id_entity_id_fkey FOREIGN KEY (obmbookmarkentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS OrganizationalchartEntity;
+CREATE TABLE OrganizationalchartEntity (
+  organizationalchartentity_entity_id int(8) NOT NULL,
+  organizationalchartentity_organizationalchart_id int(8) NOT NULL,
+  PRIMARY KEY (organizationalchartentity_entity_id, organizationalchartentity_organizationalchart_id),
+  CONSTRAINT organizationalchart_id_organizationalchart_id_fkey FOREIGN KEY (organizationalchartentity_organizationalchart_id) REFERENCES OrganizationalChart (organizationalchart_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT organizationalchartentity_entity_id_entity_id_fkey FOREIGN KEY (organizationalchartentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS ParentdealEntity;
+CREATE TABLE ParentdealEntity (
+  parentdealentity_entity_id int(8) NOT NULL,
+  parentdealentity_parentdeal_id int(8) NOT NULL,
+  PRIMARY KEY (parentdealentity_entity_id, parentdealentity_parentdeal_id),
+  CONSTRAINT parentdealentity_parentdeal_id_parentdeal_id_fkey FOREIGN KEY (parentdealentity_parentdeal_id) REFERENCES ParentDeal (parentdeal_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT parentdealentity_entity_id_entity_id_fkey FOREIGN KEY (parentdealentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS PaymentEntity;
+CREATE TABLE PaymentEntity (
+  paymententity_entity_id int(8) NOT NULL,
+  paymententity_payment_id int(8) NOT NULL,
+  PRIMARY KEY (paymententity_entity_id, paymententity_payment_id),
+  CONSTRAINT paymententity_payment_id_payment_id_fkey FOREIGN KEY (paymententity_payment_id) REFERENCES Payment (payment_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT paymententity_entity_id_entity_id_fkey FOREIGN KEY (paymententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS ProfileEntity;
+CREATE TABLE ProfileEntity (
+  profileentity_entity_id int(8) NOT NULL,
+  profileentity_profile_id int(8) NOT NULL,
+  PRIMARY KEY (profileentity_entity_id, profileentity_profile_id),
+  CONSTRAINT profileentity_profile_id_profile_id_fkey FOREIGN KEY (profileentity_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT profileentity_entity_id_entity_id_fkey FOREIGN KEY (profileentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS ProjectEntity;
+CREATE TABLE ProjectEntity (
+  projectentity_entity_id int(8) NOT NULL,
+  projectentity_project_id int(8) NOT NULL,
+  PRIMARY KEY (projectentity_entity_id, projectentity_project_id),
+  CONSTRAINT projectentity_project_id_project_id_fkey FOREIGN KEY (projectentity_project_id) REFERENCES Project (project_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT projectentity_entity_id_entity_id_fkey FOREIGN KEY (projectentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS PublicationEntity;
+CREATE TABLE PublicationEntity (
+  publicationentity_entity_id int(8) NOT NULL,
+  publicationentity_publication_id int(8) NOT NULL,
+  PRIMARY KEY (publicationentity_entity_id, publicationentity_publication_id),
+  CONSTRAINT publicationentity_publication_id_publication_id_fkey FOREIGN KEY (publicationentity_publication_id) REFERENCES Publication (publication_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT publicationentity_entity_id_entity_id_fkey FOREIGN KEY (publicationentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS ResourcegroupEntity;
+CREATE TABLE ResourcegroupEntity (
+  resourcegroupentity_entity_id int(8) NOT NULL,
+  resourcegroupentity_resourcegroup_id int(8) NOT NULL,
+  PRIMARY KEY (resourcegroupentity_entity_id, resourcegroupentity_resourcegroup_id),
+  CONSTRAINT resourcegroupentity_resourcegroup_id_resourcegroup_id_fkey FOREIGN KEY (resourcegroupentity_resourcegroup_id) REFERENCES RGroup (rgroup_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT resourcegroupentity_entity_id_entity_id_fkey FOREIGN KEY (resourcegroupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS ResourceEntity;
+CREATE TABLE ResourceEntity (
+  resourceentity_entity_id int(8) NOT NULL,
+  resourceentity_resource_id int(8) NOT NULL,
+  PRIMARY KEY (resourceentity_entity_id, resourceentity_resource_id),
+  CONSTRAINT resourceentity_resource_id_resource_id_fkey FOREIGN KEY (resourceentity_resource_id) REFERENCES Resource (resource_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT resourceentity_entity_id_entity_id_fkey FOREIGN KEY (resourceentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS SubscriptionEntity;
+CREATE TABLE SubscriptionEntity (
+  subscriptionentity_entity_id int(8) NOT NULL,
+  subscriptionentity_subscription_id int(8) NOT NULL,
+  PRIMARY KEY (subscriptionentity_entity_id, subscriptionentity_subscription_id),
+  CONSTRAINT subscriptionentity_subscription_id_subscription_id_fkey FOREIGN KEY (subscriptionentity_subscription_id) REFERENCES Subscription (subscription_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT subscriptionentity_entity_id_entity_id_fkey FOREIGN KEY (subscriptionentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS GroupEntity;
+CREATE TABLE GroupEntity (
+  groupentity_entity_id int(8) NOT NULL,
+  groupentity_group_id int(8) NOT NULL,
+  PRIMARY KEY (groupentity_entity_id, groupentity_group_id),
+  CONSTRAINT groupentity_group_id_group_id_fkey FOREIGN KEY (groupentity_group_id) REFERENCES UGroup (group_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT groupentity_entity_id_entity_id_fkey FOREIGN KEY (groupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+DROP TABLE IF EXISTS UserEntity;
+CREATE TABLE UserEntity (
+  userentity_entity_id int(8) NOT NULL,
+  userentity_user_id int(8) NOT NULL,
+  PRIMARY KEY (userentity_entity_id, userentity_user_id),
+  CONSTRAINT userentity_user_id_user_id_fkey FOREIGN KEY (userentity_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT userentity_entity_id_entity_id_fkey FOREIGN KEY (userentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table 'Entity'
+--
+DROP TABLE IF EXISTS Entity;
+CREATE TABLE Entity (
+  entity_id int(8) NOT NULL auto_increment,
+  entity_mailing boolean,
+  PRIMARY KEY  (entity_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- Address
 --
 DROP TABLE IF EXISTS Address;
 CREATE TABLE Address (
   address_id                                    int(8) NOT NULL auto_increment,
+  address_entity_id                             int(8) NOT NULL,
   address_street1                               varchar(255),
   address_street2                               varchar(255),
   address_street3                               varchar(2555),
@@ -113,142 +413,65 @@ CREATE TABLE Address (
   address_town                                  varchar(128),
   address_expresspostal                         varchar(16),
   address_country                               char(2),
-  address_im                                    varchar(255),
   address_label                                 varchar(255),
-  PRIMARY KEY (address_id)
-);
+  PRIMARY KEY (address_id),
+  CONSTRAINT address_entity_id_entity_id_fkey FOREIGN KEY (address_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- Phone
 --
 DROP TABLE IF EXISTS Phone;
 CREATE TABLE Phone (
   phone_id                                      int(8) NOT NULL auto_increment,
+  phone_entity_id                               int(8) NOT NULL,
   phone_label                                   varchar(255) NOT NULL,
   phone_number                                  varchar(32),
-  PRIMARY KEY (phone_id)
-);
+  PRIMARY KEY (phone_id),
+  CONSTRAINT phone_entity_id_entity_id_fkey FOREIGN KEY (phone_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- Website
 --
 DROP TABLE IF EXISTS Website;
 CREATE TABLE Website (
   website_id                                    int(8) NOT NULL auto_increment,
+  website_entity_id                             int(8) NOT NULL,
   website_label                                 varchar(255) NOT NULL,
-  website_number                                varchar(32),
-  PRIMARY KEY (website_id)
-);
+  website_url                                   text,
+  PRIMARY KEY (website_id),
+  CONSTRAINT website_entity_id_entity_id_fkey FOREIGN KEY (website_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- Email
 --
 DROP TABLE IF EXISTS Email;
 CREATE TABLE Email (
   email_id                                      int(8) NOT NULL auto_increment,
+  email_entity_id                               int(8) NOT NULL,
   email_label                                   varchar(255) NOT NULL,
   email_address                                 varchar(255),
   PRIMARY KEY (email_id),
-  KEY email_address (email_address)
-);
+  KEY email_address (email_address),
+  CONSTRAINT email_entity_id_entity_id_fkey FOREIGN KEY (email_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 --
 -- Instant Messaging
 --
 DROP TABLE IF EXISTS IM;
 CREATE TABLE IM (
   im_id                                         int(8) NOT NULL auto_increment,
-  im_label                                      varchar(255) NOT NULL,
+  im_entity_id                                  int(8) NOT NULL,
+  im_label                                      varchar(255),
   im_address                                    varchar(255),
+  im_protocol                                   varchar(255),
   PRIMARY KEY (im_id),
-  KEY im_address (im_address)
-);--
--- ContactAddress
---
-DROP TABLE IF EXISTS ContactAddress;
-CREATE TABLE ContactAddress (
-  contactaddress_address_id                     int(8) NOT NULL,
-  contactaddress_contact_id                     int(8) NOT NULL,
-  PRIMARY KEY(contactaddress_contact_id,contactaddress_address_id),
-  KEY contactaddress_address_id_address_id_fkey (contactaddress_address_id),
-  KEY contactaddress_contact_id_contact_id_fkey (contactaddress_contact_id)
-);
---
--- ContactPhone
---
-DROP TABLE IF EXISTS ContactPhone;
-CREATE TABLE ContactPhone (
-  contactphone_phone_id                         int(8) NOT NULL,
-  contactphone_contact_id                       int(8) NOT NULL,
-  PRIMARY KEY(contactphone_contact_id,contactphone_phone_id)
-);
---
--- ContactWebsite
---
-DROP TABLE IF EXISTS ContactWebsite;
-CREATE TABLE ContactWebsite (
-  contactwebsite_website_id                     int(8) NOT NULL,
-  contactwebsite_contact_id                     int(8) NOT NULL,
-  PRIMARY KEY(contactwebsite_contact_id,contactwebsite_website_id)
-);
-
---
--- ContactEmail
---
-DROP TABLE IF EXISTS ContactEmail;
-CREATE TABLE ContactEmail (
-  contactemail_email_id                         int(8) NOT NULL,
-  contactemail_contact_id                       int(8) NOT NULL,
-  PRIMARY KEY(contactemail_contact_id,contactemail_email_id)
-);
-
---
--- ContactIM
---
-DROP TABLE IF EXISTS ContactIM;
-CREATE TABLE ContactIM (
-  contactim_im_id                               int(8) NOT NULL,
-  contactim_contact_id                          int(8) NOT NULL,
-  PRIMARY KEY(contactim_contact_id,contactim_im_id)
-);
-
---
--- CompanyAddress
---
-DROP TABLE IF EXISTS CompanyAddress;
-CREATE TABLE CompanyAddress (
-  companyaddress_address_id                     int(8) NOT NULL,
-  companyaddress_company_id                     int(8) NOT NULL,
-  PRIMARY KEY(companyaddress_company_id,companyaddress_address_id)
-);
-
---
--- CompanyPhone
---
-DROP TABLE IF EXISTS CompanyPhone;
-CREATE TABLE CompanyPhone (
-  companyphone_phone_id                         int(8) NOT NULL,
-  companyphone_company_id                       int(8) NOT NULL,
-  PRIMARY KEY(companyphone_company_id,companyphone_phone_id)
-);
-
---
--- CompanyWebsite
---
-DROP TABLE IF EXISTS CompanyWebsite;
-CREATE TABLE CompanyWebsite (
-  companywebsite_website_id                     int(8) NOT NULL,
-  companywebsite_company_id                     int(8) NOT NULL,
-  PRIMARY KEY(companywebsite_company_id,companywebsite_website_id)
-);
-
---
--- CompanyEmail
---
-DROP TABLE IF EXISTS CompanyEmail;
-CREATE TABLE CompanyEmail (
-  companyemail_email_id                         int(8) NOT NULL,
-  companyemail_company_id                       int(8) NOT NULL,
-  PRIMARY KEY(companyemail_company_id,companyemail_email_id),
-  KEY companyemail_email_id_email_id_fkey (companyemail_email_id),
-  KEY companyemail_company_id_company_id_fkey (companyemail_company_id)
-);
+  KEY im_address (im_address),
+  CONSTRAINT im_entity_id_entity_id_fkey FOREIGN KEY (im_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Set integer to boolean when necessary

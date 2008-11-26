@@ -27,9 +27,12 @@ DELETE FROM UserObm;
 
 -- Global Domain
 INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
+INSERT INTO Entity (entity_mailing) VALUES (TRUE);
+INSERT INTO DomainEntity (domainentity_entity_id, domainentity_domain_id) SELECT MAX(entity_id), MAX(domain_id) FROM Domain, Entity;
 -- Global ADMIN
 INSERT INTO UserObm (userobm_domain_id, userobm_login, userobm_password, userobm_password_type, userobm_perms, userobm_lastname, userobm_firstname, userobm_uid, userobm_gid) VALUES ((SELECT domain_id From Domain), 'admin0','admin','PLAIN','admin', 'Admin Lastname', 'Firstname', '1000', '512');
-
+INSERT INTO Entity (entity_mailing) VALUES (TRUE);
+INSERT INTO UserEntity (userentity_entity_id, userentity_user_id) SELECT MAX(entity_id), MAX(userobm_id) FROM UserObm, Entity;
 
 -- -----------------------------------------------------------------------------
 -- Default Domain properties
