@@ -35,14 +35,6 @@ sub _new_instance {
 }
 
 
-sub init {
-    if( !$OBM::Parameters::common::cyrusDomainPartition ) {
-        # Pas de support des partitions Cyrus par domaine
-        return 0;
-    }
-}
-
-
 sub DESTROY {
     my $self = shift;
 
@@ -82,12 +74,12 @@ sub addCyrusPartition {
     );
 
     if( !defined($srvCon) ) {
-        $self->_log( 'problème à l\'initialisation de la connexion à obmSatellite de '.$cyrusSrv->getDescription(), 3 );
+        $self->_log( 'problème à l\'initialisation de la connexion à obmSatellite de '.$cyrusSrv->getDescription(), 0 );
         return 1;
     }
 
     if( !$srvCon->open() ) {
-        $self->_log( 'echec de connexion à obmSatellite de '.$cyrusSrv->getDescription().' : '.$srvCon->errmsg(), 2 );
+        $self->_log( 'echec de connexion à obmSatellite de '.$cyrusSrv->getDescription().' : '.$srvCon->errmsg(), 0 );
         return 1;
     }
 
@@ -97,11 +89,16 @@ sub addCyrusPartition {
     }
 
     my $cmd = 'cyrusPartitions: add:'.$cyrusSrv->getCyrusServerName();
+    my $errorCode = 0;
     $self->_log( 'envoi de la commande : '.$cmd, 2 );
     $srvCon->print( $cmd );
     if( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 60)) ) {
         chomp($line);
         $self->_log( 'réponse : \''.$line.'\'', 4 );
+        if( $line !~ /^ok$/i ) {
+            $self->_log( 'problème lors de l\'exécution de la commande '.$cmd, 0 );
+            $errorCode = 1;
+        }
     }
 
     $self->_log( 'déconnexion d\'obmSatellite de '.$cyrusSrv->getDescription(), 2 );
@@ -112,7 +109,7 @@ sub addCyrusPartition {
     }
 
 
-    return 0;
+    return $errorCode;
 }
 
 
@@ -148,12 +145,12 @@ sub delCyrusPartition {
     );
 
     if( !defined($srvCon) ) {
-        $self->_log( 'problème à l\'initialisation de la connexion à obmSatellite de '.$cyrusSrv->getDescription(), 3 );
+        $self->_log( 'problème à l\'initialisation de la connexion à obmSatellite de '.$cyrusSrv->getDescription(), 0 );
         return 1;
     }
 
     if( !$srvCon->open() ) {
-        $self->_log( 'echec de connexion à obmSatellite de '.$cyrusSrv->getDescription().' : '.$srvCon->errmsg(), 2 );
+        $self->_log( 'echec de connexion à obmSatellite de '.$cyrusSrv->getDescription().' : '.$srvCon->errmsg(), 0 );
         return 1;
     }
 
@@ -163,11 +160,16 @@ sub delCyrusPartition {
     }
 
     my $cmd = 'cyrusPartitions: add:'.$cyrusSrv->getCyrusServerName();
+    my $errorCode = 0;
     $self->_log( 'envoi de la commande : '.$cmd, 2 );
     $srvCon->print( $cmd );
     if( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 60)) ) {
         chomp($line);
         $self->_log( 'réponse : \''.$line.'\'', 4 );
+        if( $line !~ /^ok$/i ) {
+            $self->_log( 'problème lors de l\'exécution de la commande '.$cmd, 0 );
+            $errorCode = 1;
+        }
     }
 
     $self->_log( 'déconnexion d\'obmSatellite de '.$cyrusSrv->getDescription(), 2 );
@@ -178,5 +180,5 @@ sub delCyrusPartition {
     }
 
 
-    return 0;
+    return $errorCode;
 }

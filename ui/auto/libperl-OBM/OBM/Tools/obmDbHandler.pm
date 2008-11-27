@@ -86,7 +86,7 @@ sub execQuery {
     }
 
     if( $self->_dbConnect() ) {
-        $self->_log( 'erreur lors de la connexion a la BD', 3 );
+        $self->_log( 'erreur lors de la connexion a la BD', 0 );
 
         $$sth = undef;
         return undef;
@@ -101,7 +101,7 @@ sub execQuery {
     if( !defined($rv) ) {
         $self->_log( 'erreur lors de l\'execution de la requete', 3 );
         if( defined($$sth) ) {
-            $self->_log( $$sth->err().' - '.$$sth->errstr(), 3 );
+            $self->_log( $$sth->err().' - '.$$sth->errstr(), 0 );
         }
         return undef;
     }
@@ -160,6 +160,7 @@ sub _dbConnect {
     $dbHandler = DBI->connect( 'dbi:'.$self->{'dbDriver'}.':database='.$self->{'dbName'}.';host='.$self->{'dbHost'}, $self->{'dbUser'}, $self->{'dbPassword'} );
 
     if( !$dbHandler ) {
+        $self->_log( 'problème de connexion a la BD \''.$self->{'dbName'}.'\', en tant que \''.$self->{'dbUser'}.'\'', 0 );
         return 1;
     }
 

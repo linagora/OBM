@@ -43,9 +43,7 @@ sub new {
 sub DESTROY {
     my $self = shift;
 
-    &OBM::toolBox::write_log( "[Cyrus::sieveEngine]: arret du moteur", "W" );
-
-    return 1;
+    $self->_log( 'suppression de l\'objet', 4 );
 }
 
 

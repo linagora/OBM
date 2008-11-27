@@ -21,7 +21,7 @@ sub new {
     $self->{'cyrusServerConn'} = undef;
 
     if( $self->_getServerDesc() ) {
-        $self->_log( 'problème lors de l\'initialisation du serveur LDAP', 1 );
+        $self->_log( 'problème lors de l\'initialisation du serveur Cyrus', 1 );
         return undef;
     }
 
@@ -70,7 +70,7 @@ sub _getServerDesc {
     }
 
     if( !($self->{'serverDesc'} = $sth->fetchrow_hashref()) ) {
-        $self->_log( 'le serveur d\'ID \''.$self->{'serverId'}.'\' n\'existe pas, ou n\'est pas un serveur IMAP', 2 );
+        $self->_log( 'le serveur d\'ID \''.$self->{'serverId'}.'\' n\'existe pas, ou n\'est pas un serveur IMAP', 0 );
         return 1;
     }else {
         push( @{$self->{'domainsId'}}, $self->{'serverDesc'}->{'mailserver_for_domain_id'} );
@@ -79,22 +79,22 @@ sub _getServerDesc {
 
     # Some checks
     if( !defined($self->{'serverDesc'}->{'cyrus_login'}) ) {
-        $self->_log( 'administrateur du serveur non défini', 3 );
+        $self->_log( 'administrateur du serveur non défini', 0 );
         return 1;
     }
 
     if( !defined($self->{'serverDesc'}->{'cyrus_password'}) ) {
-        $self->_log( 'mot de passe de l\'administrateur du serveur non défini', 3 );
+        $self->_log( 'mot de passe de l\'administrateur du serveur non défini', 0 );
         return 1;
     }
 
     if( !defined($self->{'serverDesc'}->{'host_name'}) ) {
-        $self->_log( 'nom d\'hôte du serveur non défini', 3 );
+        $self->_log( 'nom d\'hôte du serveur non défini', 0 );
         return 1;
     }
 
     if( !defined($self->{'serverDesc'}->{'host_ip'}) ) {
-        $self->_log( 'ip d\'hôte du serveur non défini', 3 );
+        $self->_log( 'ip d\'hôte du serveur non défini', 0 );
         return 1;
     }
 
@@ -171,7 +171,7 @@ sub _connect {
     $self->_log( 'authentification en tant que \''.$self->{'serverDesc'}->{'cyrus_login'}.'\' au '.$self->getDescription(), 2 );
 
     if( !$self->{'cyrusServerConn'}->authenticate( -user=>$self->{'serverDesc'}->{'cyrus_login'}, -password=>$self->{'serverDesc'}->{'cyrus_password'}, -mechanism=>'login') ) {
-        $self->_log( 'échec d\'authentification au '.$self->getDescription(), 2 );
+        $self->_log( 'échec d\'authentification au '.$self->getDescription(), 0 );
         return 1;
     }
 
@@ -207,6 +207,8 @@ sub _checkDomainId {
     }elsif( $domainId !~ /$OBM::Parameters::regexp::regexp_id/ ) {
         $self->_log( 'ID \''.$domainId.'\' incorrect', 4 );
         return 1;
+    }elsif( $self->_isDisable($domainId) ) {
+        return 1;
     }
 
     my $notFound = 1;
@@ -239,6 +241,76 @@ sub getCyrusServerIp {
 }
 
 
+sub updateCyrusPartitions {
+    my $self = shift;
+    my( $domainId ) = @_;
+
+    if( $self->_checkDomainId($domainId) ) {
+        return 1;
+    }
+
+    require OBM::Cyrus::cyrusRemoteEngine;
+    my $partitionUpdater = OBM::Cyrus::cyrusRemoteEngine->instance();
+
+    if( !defined($partitionUpdater) ) {
+        return 0;
+    }
+
+    if( $partitionUpdater->addCyrusPartition( $self ) ) {
+        $self->_log( 'Problème à la mise à jour des partitions de '.$self->getDescription(), 0 );
+        $self->_setDisable( $domainId );
+        return 1;
+    }
+
+    return 0;
+}
+
+
+sub _setDisable {
+    my $self = shift;
+    my( $domainId ) = @_;
+
+    if( !defined($domainId) ) {
+        $self->_log( 'ID du domaine non défini', 3 );
+        return 0;
+    }elsif( $domainId !~ /$OBM::Parameters::regexp::regexp_id/ ) {
+        $self->_log( 'ID \''.$domainId.'\' incorrect', 4 );
+        return 0;
+    }
+
+    push( @{$self->{'disabledDomains'}}, $domainId );
+
+    return 0;
+}
+
+
+sub _isDisable {
+    my $self = shift;
+    my( $domainId ) = @_;
+
+    if( !defined($domainId) ) {
+        $self->_log( 'ID du domaine non défini', 3 );
+        return 0;
+    }elsif( $domainId !~ /$OBM::Parameters::regexp::regexp_id/ ) {
+        $self->_log( 'ID \''.$domainId.'\' incorrect', 4 );
+        return 0;
+    }
+
+    if( !defined($self->{'disabledDomains'}) ) {
+        return 0;
+    }
+
+    for( my $i=0; $i<=$#{$self->{'disabledDomains'}}; $i++ ) {
+        if( $self->{'disabledDomains'}->[$i] == $domainId ) {
+            $self->_log( $self->getDescription().' est désactivé pour le domaine d\'ID \''.$domainId.'\'', 0 );
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+
 sub getSieveServerConn {
     my $self = shift;
     my( $domainId, $login ) = @_;
@@ -261,7 +333,7 @@ sub getSieveServerConn {
     my $sieveSrvConn = sieve_get_handle( $self->{'serverDesc'}->{'host_ip'}, sub{return $login}, sub{return $self->{'serverDesc'}->{'cyrus_login'}}, sub{return $self->{'serverDesc'}->{'cyrus_password'}}, sub{return undef} );
 
     if( !defined($sieveSrvConn) ) {
-        $self->_log( 'probleme lors de l\'établissement de la connexion Sieve à '.$self->getDescription(), 2 );
+        $self->_log( 'probleme lors de l\'établissement de la connexion Sieve à '.$self->getDescription(), 0 );
         return undef;
     }
 

@@ -104,7 +104,7 @@ sub _doWork {
 
     }elsif( !$isExist && !$entity->getDelete() ) {
         # On la crée
-        $returnCode = $self->_createMailbox( $cyrusSrv, $entity );
+        $returnCode = $self->_createMailbox();
         if( $returnCode ) {
             $self->_log( 'echec lors de la creation/renommage de la boite', 2 );
             return 1;
@@ -607,6 +607,12 @@ sub _createMailbox {
     }
 
     if( $cyrusSrv->error() ) {
+        if( ($cyrusSrv->error() =~ /invalid/i) && ($cyrusSrv->error() =~ /partition/i) ) {
+            if( !$self->{'currentCyrusSrv'}->updateCyrusPartitions($entity->getDomainId()) ) {
+                return $self->_createMailbox();
+            }
+        }
+
         if( $action eq 'rename' ) {
             $self->_log( 'erreur Cyrus au renommage de la BAL : '.$cyrusSrv->error(), 2 );
         }elsif( $action eq 'create' ) {
@@ -615,7 +621,6 @@ sub _createMailbox {
             $self->_log( 'erreur Cyrus : '.$cyrusSrv->error(), 2 );
         }
             
-        $self->_log( 'verifiez que la version de Cyrus (2.2 min) et que l\'option \'allowusermoves\' est active !', 0 );
         return 1;
     }
 

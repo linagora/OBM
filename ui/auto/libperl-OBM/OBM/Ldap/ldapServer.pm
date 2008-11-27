@@ -69,7 +69,7 @@ sub _getServerDesc {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
-    $self->_log( 'obtention du mot de passe de l\'utilisateur LDAP', 1 );
+    $self->_log( 'obtention du mot de passe de l\'utilisateur LDAP', 3 );
     my $query = 'SELECT usersystem.usersystem_password as ldap_admin_password
                     FROM UserSystem usersystem
                     WHERE usersystem.usersystem_login=\''.$self->{'ldap_admin_login'}.'\'
@@ -82,7 +82,7 @@ sub _getServerDesc {
     }
 
     if( !(( $self->{'ldap_admin_password'} ) = $sth->fetchrow_array()) ) {
-        $self->_log( 'pas de mot de passe pour l\'utilisateur LDAP defini en BD', 1 );
+        $self->_log( 'pas de mot de passe pour l\'utilisateur LDAP defini en BD', 0 );
         $self->{'ldap_admin_password'} = '';
     }
     $sth->finish();
@@ -151,10 +151,10 @@ sub _getAdminDn {
     }
 
     if( $#{$systemUser} > 0 ) {
-        $self->_log( 'obtention de plusieurs utilisateurs système \''.$self->{'ldap_admin_login'}.'\'', 4 );
+        $self->_log( 'obtention de plusieurs utilisateurs système \''.$self->{'ldap_admin_login'}.'\'', 1 );
         return undef;
     }elsif( $#{$systemUser} < 0 ) {
-        $self->_log( 'utilisateurs système \''.$self->{'ldap_admin_login'}.'\' non trouvé', 4 );
+        $self->_log( 'utilisateurs système \''.$self->{'ldap_admin_login'}.'\' non trouvé', 0 );
         return undef;
     }
 
@@ -216,7 +216,7 @@ sub _connect {
 
     if( !$self->{'ldapServerConn'} ) {
         $self->{'ldapServerConn'} = undef;
-        $self->_log( 'echec de connexion au '.$self->getDescription(), 2 );
+        $self->_log( 'echec de connexion au '.$self->getDescription(), 0 );
         return 1;
     }
 
@@ -224,7 +224,7 @@ sub _connect {
 
     my $error;
     for( my $i=0; $i<=$#{$self->{'ldap_admin_dn'}}; $i++ ) {
-        $self->_log( 'connexion avec le DN : '.$self->{'ldap_admin_dn'}->[$i], 4 );
+        $self->_log( 'connexion avec le DN : '.$self->{'ldap_admin_dn'}->[$i], 2 );
         $error = $self->{'ldapServerConn'}->bind(
            $self->{'ldap_admin_dn'}->[$i],
            password => $self->{'ldap_admin_password'}
@@ -239,7 +239,7 @@ sub _connect {
     }
 
     if( $error->code ) {
-        $self->_log( 'echec de l\'authentification : '.$error->error, 2 );
+        $self->_log( 'echec de l\'authentification : '.$error->error, 0 );
         $self->{'ldapServerConn'} = undef;
     }
 

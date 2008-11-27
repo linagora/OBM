@@ -426,11 +426,11 @@ sub updateLdapEntry {
             $update = 1;
         }
 
-        if( $self->_modifyAttr( $self->{'email'}, $entry, 'mail' ) ) {
+        if( $self->_modifyAttrList( $self->{'email'}, $entry, 'mail' ) ) {
             $update = 1;
         }
 
-        if( $self->_modifyAttr( $self->{'emailAlias'}, $entry, 'mailAlias' ) ) {
+        if( $self->_modifyAttrList( $self->{'emailAlias'}, $entry, 'mailAlias' ) ) {
             $update = 1;
         }
 
