@@ -2995,4 +2995,91 @@ function get_all_profiles() {
   }
   return $_SESSION['profiles'];
 }
+
+/**
+ * of_entity_insert 
+ * 
+ * @param mixed $entity 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function of_entity_insert($entity,$id) {
+  global $cdg_sql;
+  $entity = strtolower($entity);
+  $query = 'INSERT INTO Entity (entity_mailing) VALUES (TRUE)';
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $eid = $obm_q->lastid();
+  $query = 'INSERT INTO '.ucfirst($entity).'Entity 
+    ('.$entity.'entity_entity_id, '.$entity.'entity_'.$entity.'_id )
+    VALUES ('.$eid.', '.$id.')';
+  display_debug_msg($query, $cdg_sql, 'of_entity_insert()');
+  $obm_q->query($query);
+  return $eid;
+}
+
+/**
+ * of_entity_delete 
+ * 
+ * @access public
+ * @return void
+ */
+function of_entity_delete($entity,$id) {
+  global $cdg_sql;
+  $entity = strtolower($entity);
+  if(is_array($id)) {
+    $id = implode(',', $id);
+  } else {
+    $id = sql_parse_id($id);
+  }  
+  $query = 'DELETE FROM Entity WHERE entity_id IN (SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id IN ('.$id.'))';
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'of_entity_delete()');
+  $obm_q->query($query);
+}
+
+/**
+ * of_entity_get 
+ * 
+ * @param mixed $entity 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function of_entity_get($entity, $id) {
+  global $cdg_sql;
+  $entity = strtolower($entity);
+  $id = sql_parse_id($id, true, $not);
+  $query = 'SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id IN '.$id;
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'of_entity_get()');
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q->f($entity.'entity_entity_id');
+}
+
+/**
+ * of_entity_subquery 
+ * 
+ * @param mixed $entity 
+ * @param mixed $id 
+ * @param mixed $not 
+ * @access public
+ * @return void
+ */
+function of_entity_subquery($entity, $id = NULL, $not = false) {
+  $entity = strtolower($entity);
+  if(is_null($id)) {
+    $query = '(SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity)';
+  } elseif(is_array($id)) {
+    if($not) $NOT = 'NOT';
+    $id = implode(',', $id);
+    $query = '(SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id '.$NOT.' IN ('.$id.'))';
+  } else {
+    $id = sql_parse_id($id, true, $not);
+    $query = '(SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id '.$NOT.' '.$id.')';
+  }
+  return $query;
+}
 ?>
