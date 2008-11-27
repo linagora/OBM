@@ -35,9 +35,10 @@ sub DESTROY {
     $self->_log( 'suppression de l\'objet', 4 );
 
     if( ref( $self->{'ldapServerConn'} ) eq 'Net::LDAP' ) {
-        $self->{'ldapServerConn'}->unbind();
+        # Trying to unbind silently...
+        eval{ $self->{'ldapServerConn'}->unbind(); };
     }else {
-        $self->{'ldapServerConn'} = undef;
+        undef $self->{'ldapServerConn'};
     }
 }
 
