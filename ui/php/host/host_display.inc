@@ -462,15 +462,15 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['web_all'])) { $web_all = $host['web_all']; }
   if (isset($host['ftp_perms'])) { $ftp_perms = $host['ftp_perms']; }
   if (isset($host['firewall_perms'])) { $firewall_perms = $host['firewall_perms']; }
-  if (isset($host['domain'])) { $domain_id = $host['domain']; }
+  if (isset($host['domain_id'])) { $domain_id = $host['domain_id']; }
 
   // Domain (can't be updated, so only on insert)
   if (($action == 'new' || $action == 'insert')
       && $obm['domain_global']) {
-    $sel_domain = of_domain_dis_select($domain_id);
+    $sel_domain_id = of_domain_dis_select($domain_id);
     $dis_domain = "<tr>
       <th>$l_domain</th>
-      <td>$sel_domain</td>
+      <td>$sel_domain_id</td>
     </tr>";
   }
   // Samba host checkbox checked value

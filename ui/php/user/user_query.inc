@@ -27,7 +27,7 @@ function run_query_user_search($user) {
   $filter_pattern = $user['filter_pattern'];
   $login = sql_search_text_parse($user['login']);
   $profile = $user['profile'];
-  $domain_id = $user['domain'];
+  $domain_id = $user['domain_id'];
   $lname = sql_search_text_parse($user['lastname']);
   $fname = sql_search_text_parse($user['firstname']);
   $delegation = sql_search_text_parse($user['delegation']);
@@ -520,8 +520,8 @@ function run_query_user_insert($user) {
   }
 
 
-  if (isset($user['domain']) && $obm['domain_global']) {
-    $domain_id = sql_parse_id($user['domain']);
+  if (isset($user['domain_id']) && $obm['domain_global']) {
+    $domain_id = sql_parse_id($user['domain_id']);
   } else {
     $domain_id = sql_parse_id($obm['domain_id']);
   }
@@ -1381,21 +1381,28 @@ function get_user_group_public_hash() {
 // Returns:
 //   - true if found, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_user_login_in_use($login, $u_id='') {
-  global $cdg_sql;
+function check_user_login_in_use($domain_id, $login, $u_id='') {
+  global $cdg_sql, $obm;
+
+  if (! ($domain_id > 0)) {
+    $domain_id = $obm['domain_id'];
+  }
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   if ($u_id != '') {
-    $where_uid = "AND userobm_id != '$u_id'";
+    $u_id = sql_parse_id($u_id, true, true);
+    $where_uid = "AND userobm_id $u_id";
   }
+  $where_multidomain = "AND (domain_id = '$domain_id' OR domain_global = true)";
 
   $query = "SELECT
       userobm_id,
       userobm_login
     FROM UserObm
-    WHERE userobm_login $like '$login'
+      LEFT JOIN Domain on domain_id = userobm_domain_id
+    WHERE userobm_login='$login' $where_multidomain 
       $where_uid";
 
   display_debug_msg($query, $cdg_sql, 'check_user_login_in_use()');
@@ -1426,7 +1433,7 @@ function check_user_context($p_id, $user) {
   $fname = $user['firstname'];
   $phone = $user['phone'];
   $email = $user['email'];
-  $domain_id = $user['domain'];
+  $domain_id = $user['domain_id'];
 
   // if a user with same name exists, return false
   $co_q = run_query_user_check_user($p_id, $user);
@@ -1449,7 +1456,7 @@ function run_query_user_check_user($p_id, $user) {
   $like = sql_casei_like($db_type);
   $multidomain = sql_multidomain('userobm');
   $login = strtolower($user['login']);
-  $domain_id = $user['domain'];
+  $domain_id = $user['domain_id'];
   if ($domain_id == '') $domain_id = $obm['domain_id'];
   $domain_id = sql_parse_id($domain_id, true);
   $where_multidomain = " AND userobm_domain_id $domain_id ";
@@ -1523,7 +1530,7 @@ function check_user_data_form($p_id, &$user) {
   global $php_regexp_password;
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
   //global $obm, $profiles, $cgp_use, $c_imagetype;
-  global $obm, $cgp_use, $c_imagetype;
+  global $obm, $cgp_use, $c_imagetype, $c_renameUserMailbox;
   global $c_max_image_size;
   global $l_err_delegation_target_outside_domain, $l_err_delegation_target_outside_target;
   global $l_err_delegation_outside_domain, $l_err_delegation_outside_target;
@@ -1531,6 +1538,7 @@ function check_user_data_form($p_id, &$user) {
 
   $action = $user['action'];
   $id = $user['user_id'];
+  $domain_id = $user['domain_id'];
   $login = strtolower($user['login']);
   $passwd = $user['passwd'];
   $profile = $user['profile'];
@@ -1583,6 +1591,7 @@ function check_user_data_form($p_id, &$user) {
   
   if ($action == 'update') {
     $u = get_user_info($id);
+    $domain_id = $u['domain_id'];
     $usr_profile = $u['perms'];
     if (isset($profiles[$usr_profile]['level'])) {
       if (($profiles[$usr_profile]['level'] < $level)
@@ -1616,8 +1625,8 @@ function check_user_data_form($p_id, &$user) {
     }
   }
 
-  // login (can't be updated, so only on insert)
-  if (($action == 'new') || ($action == 'insert')) {
+  // login on insert or on update (if $c_renameUserMailbox)
+  if (($action == 'new') || ($action == 'insert') || $c_renameUserMailbox) {
     // MANDATORY: User login, not empty and unique
     if (trim($login) == '') {
       $err['msg'] = "$login : $l_login_error";
@@ -1629,8 +1638,9 @@ function check_user_data_form($p_id, &$user) {
 	$err['field'] = 'login';
 	return false;
       }
+      echo $domain_id;
       // Login not already in use
-      if (check_user_login_in_use($login, $id)) {
+      if (check_user_login_in_use($domain_id, $login, $id)) {
 	$err['msg'] = "$login : $l_login_in_use";
 	$err['field'] = 'login';
 	return false;
@@ -1842,31 +1852,6 @@ function check_user_data_form($p_id, &$user) {
       $err['field'] = 'file';
       return false;
     }
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // if a user with the same name already exists  return false
-  /////////////////////////////////////////////////////////////////////////////
-  if (($action == 'insert') && (isset($user['domain']))) {
-    $domain_id = $user['domain'];
-  } else if (($action == 'update') && (isset($u['domain_id']))) {
-    $domain_id = $u['domain_id'];
-  } else {
-    $domain_id = $obm['domain_id'];
-  }
-  $where_multidomain = "AND (domain_id = '$domain_id' OR domain_global = true)";
-  $query = "SELECT * FROM UserObm LEFT JOIN Domain on domain_id = userobm_domain_id WHERE userobm_login='$login' $where_multidomain ";
-  if ($p_id > 0) {
-    $p_id = sql_parse_id($p_id, true, true);
-    $query .= " AND userobm_id $p_id ";
-  }
-  display_debug_msg($query, $cdg_sql, 'check_user_data_form()');
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  if ($obm_q->num_rows() > 0) {
-    $err['msg'] = "$login : $l_exist_error";
-    $err['field'] = 'login';
-    return false;
   }
 
   // XXXXXXX verifier ici + fichiers de langue

@@ -194,7 +194,7 @@ function html_user_search_form($user) {
   
   $login = $user["login"];
   $profile = $user["profile"];
-  $domain_id = $user["domain"];
+  $domain_id = $user["domain_id"];
   $lname = stripslashes($user["lastname"]);
   $fname = stripslashes($user["firstname"]);
   $email = $user["email"];
@@ -255,7 +255,7 @@ function html_user_search_form($user) {
     $block_profile .= "<option value=\"$k_profile\">$profile</option>";
   }
 
-  if ($obm["domain_global"]) {
+  if ($obm['domain_global']) {
     $sel_domain = of_domain_dis_select($domain_id, "all");
     $dis_domain = "<label>$l_domain<br />
       $sel_domain
@@ -1026,6 +1026,7 @@ function html_user_form($usr_q, $user, $field='') {
   if ($action == "detailupdate") {
     // infos
     $id = $usr_q->f("userobm_id");
+    $domain_id = $usr_q->f('userobm_domain_id');
     $login = $usr_q->f("userobm_login");
     $old_login = $login;
     $passwd = "";
@@ -1102,7 +1103,7 @@ function html_user_form($usr_q, $user, $field='') {
     $smb_logon = $usr_q->f("userobm_samba_logon_script");
 
     $dis_title = "$fname $lname";
-  } elseif ($action == "new") {
+  } elseif ($action == 'new') {
     $dom_infos = of_domain_get_domain_infos($obm['domain_id'], true);
     $ad1 = $dom_infos['address1'];
     $ad2 = $dom_infos['address2'];
@@ -1117,7 +1118,7 @@ function html_user_form($usr_q, $user, $field='') {
   // If parameters have been given, they supercede the default action value
   // infos
   if (isset($user["user_id"])) { $id = $user["user_id"]; }
-  if (isset($user["domain"])) { $domain_id = $user["domain"]; }
+  if (isset($user["domain_id"])) { $domain_id = $user["domain_id"]; }
   if (isset($user["login"])) { $login = strtolower($user["login"]); }
   if (isset($user["old_login"])) { $old_login = $user["old_login"]; }
   if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
@@ -1195,15 +1196,15 @@ function html_user_form($usr_q, $user, $field='') {
     $class[$field] = "error";
   }
 
-	// Default exp is hidden
-	if (!isset($dateexp))	{
-		$showexp="display:none";
-	}
+  // Default exp is hidden
+  if (!isset($dateexp))	{
+    $showexp="display:none";
+  }
 
   // login (can't be updated, so only on insert)
   if (($action == "new") || ($action == "insert")) {
     $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />";
-  } elseif (!$c_renameUserMailbox) {
+  } elseif (! $c_renameUserMailbox) {
     $dis_login = "$login
                   <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />";
   } else {
@@ -1212,7 +1213,7 @@ function html_user_form($usr_q, $user, $field='') {
   }
 
   // Domain (can't be updated, so only on insert)
-  if (($action == "new" || $action == "insert")
+  if (($action == 'new' || $action == 'insert')
       && $obm["domain_global"]) {
     $sel_domain = of_domain_dis_select($domain_id);
     $dis_domain = "<tr>
@@ -1246,7 +1247,7 @@ function html_user_form($usr_q, $user, $field='') {
   }
 
   if ($cgp_use['service']['mail']) {
-    $dis_mail = dis_user_mail_field($email,$class);
+    $dis_mail = dis_user_mail_field($domain_id, $email, $class);
     
     // Mail perms checkbox checked values
     $mail_state  = ($mail_perms ? 'checked' : '');
@@ -1760,7 +1761,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $email = $user["email"];
   $desc = $user["desc"];
   $archive = $user["archive"];
-  $domain = $user["domain"];
+  $domain_id = $user["domain_id"];
   $delegation = $user["delegation"];
   $delegation_target = $user["delegation_target"];
 
@@ -1836,7 +1837,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
   <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
   <input type=\"hidden\" name=\"cba_hidden\" value=\"$hidden\" />
-  <input type=\"hidden\" name=\"sel_domain\" value=\"$domain\" />
+  <input type=\"hidden\" name=\"sel_domain_id\" value=\"$domain_id\" />
   <input type=\"hidden\" name=\"delegation\" value=\"$delegation\" />
   <input type=\"hidden\" name=\"delegation_target\" value=\"$delegation_target\" />
 
@@ -2436,17 +2437,27 @@ function json_search_users($user,$results) {
  * @access public
  * @return void
  */
-function dis_user_mail_field($values,$class) {
-  $d = of_domain_get_domain_infos($GLOBALS['obm']['domain_id'], true);
-  if(!empty($d['alias'])) {
-    $aliases = explode("\r\n",$d['alias']);
+function dis_user_mail_field($domain_id, $values, $class) {
+
+  if ($domain_id != '') {
+    $d = of_domain_get_domain_infos($domain_id, true);
+    if(!empty($d['alias'])) {
+      $aliases = explode("\r\n",$d['alias']);
+    } else {
+      $aliases = array();
+    }
+    array_unshift($aliases,$d['name']);
+
   } else {
+    // Creation from GLOBAL, do not propose aliases as we don't know the domain
+    $d = of_domain_get_domain_infos($GLOBALS['obm']['domain_id'], true);
     $aliases = array();
   }
-  array_unshift($aliases,$d['name']);
+
   if(!empty($values)) {
     $emails = explode("\r\n",$values);
   }
+
   $count = 0;
   if(is_array($emails)) {
     foreach($emails as $key => $email) {

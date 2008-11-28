@@ -176,6 +176,7 @@ function run_query_domain_insert($domain) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_replace_properties($domain_id,$domain) {
   global $cdg_sql;
+
   $d_id = sql_parse_id($domain_id, true);
   $query = "DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id $d_id ";
   display_debug_msg($query, $cdg_sql, 'run_query_domain_replace_properties()');

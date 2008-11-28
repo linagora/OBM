@@ -146,8 +146,8 @@ function run_query_host_insert($host) {
   $host_uid = get_first_user_free_uid();
   $host_gid = $cg_gid_host;
 
-  if (isset($host['domain']) && $obm['domain_global']) {
-    $domain_id = sql_parse_id($host['domain']);
+  if (isset($host['domain_id']) && $obm['domain_global']) {
+    $domain_id = sql_parse_id($host['domain_id']);
   } else {
     $domain_id = sql_parse_id($obm['domain_id']);
   }

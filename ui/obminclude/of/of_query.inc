@@ -290,7 +290,7 @@ function sql_multidomain($entity, $and=true) {
   $where = '';
 
   // If user is multidomain, no restrictions on domain
-  if ($obm['domain_global'] === true) {
+  if ($obm['domain_global'] == true) {
     return $where;
   } else {
     $domain_id = $obm['domain_id'];
@@ -543,7 +543,7 @@ function of_domain_html_select($domains, $domain_id='', $first_element='', $sel_
   }
 
   // Domain select
-  $sel_dom = "<select id=\"sel_domain\" name=\"sel_domain\" $sel_append>
+  $sel_dom = "<select id=\"sel_domain_id\" name=\"sel_domain_id\" $sel_append>
     $first_option";
   if (is_array($domains)) {
     foreach ($domains as $one_domain) {
