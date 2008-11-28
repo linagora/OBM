@@ -1,4 +1,6 @@
-
+--  _________________
+-- | Tables creation |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 --
 -- Table structure for table `Service`
 --
@@ -154,7 +156,6 @@ CREATE TABLE Phone (
 CREATE TABLE Website (
   website_id                                    serial,
   website_entity_id                             integer NOT NULL,
-  website_entity_id                             integer NOT NULL,
   website_label                                 varchar(255) NOT NULL,
   website_url                                   text,
   PRIMARY KEY (website_id),
@@ -186,582 +187,9 @@ CREATE TABLE IM (
   CONSTRAINT im_entity_id_entity_id_fkey FOREIGN KEY (im_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
---
--- Set integer to boolean when necessary
---
-
--- Domain
-ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
-ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
-ALTER TABLE Domain ADD COLUMN domain_mail_server_auto integer default NULL;
-
-SELECT setval('domain_domain_id_seq', max(domain_id)) FROM Domain;
-
--- Global Domain
-INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
-UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
-UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
-
--- P_Domain
-ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
-ALTER TABLE P_Domain DROP COLUMN domain_mail_server_id;
-ALTER TABLE P_Domain ADD COLUMN domain_mail_server_auto integer default NULL;
--- Global Domain
-INSERT INTO P_Domain (domain_id, domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (CURRVAL('domain_domain_id_seq'), NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
-UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
-UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
-
--- OGroup
-ALTER TABLE OGroup ALTER COLUMN ogroup_parent_id DROP NOT NULL;
-
--- Contact
-ALTER TABLE Contact ADD COLUMN contact_birthday_id INTEGER default NULL;
-ALTER TABLE Contact ADD COLUMN contact_collected BOOLEAN default FALSE;
-ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
-UPDATE Contact SET contact_origin='obm21';
-ALTER TABLE Contact ALTER COLUMN contact_origin SET DEFAULT NOT NULL;
-
-
--------------------------------------------------------------------------------
---
--- CalendarEvent + Todo to Event
---
-
-CREATE TYPE vcomponent AS ENUM ('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY');
-CREATE TYPE vopacity AS ENUM ('OPAQUE', 'TRANSPARENT');
--- Event Creation
-CREATE TABLE Event (
-  event_id           	serial,
-  event_domain_id    	integer NOT NULL,
-  event_timeupdate   	timestamp,
-  event_timecreate   	timestamp,
-  event_userupdate   	integer,
-  event_usercreate   	integer,
-  event_parent_id       integer default NULL,
-  event_ext_id       	varchar(255) default '', 
-  event_type            vcomponent default 'VEVENT',
-  event_origin          varchar(255) NOT NULL default '',
-  event_owner           integer default NULL,    
-  event_timezone        varchar(255) default 'GMT',    
-  event_opacity         vopacity default 'OPAQUE',
-  event_title           varchar(255) default NULL,
-  event_location        varchar(100) default NULL,
-  event_category1_id    integer default NULL,
-  event_priority        integer,
-  event_privacy         integer,
-  event_date            timestamp NULL,
-  event_duration        integer NOT NULL default 0,
-  event_allday          BOOLEAN default FALSE,
-  event_repeatkind      varchar(20) default NULL,
-  event_repeatfrequence integer default NULL,
-  event_repeatdays      varchar(7) default NULL,
-  event_endrepeat       timestamp default NULL,
-  event_color           varchar(7),
-  event_completed       timestamp,
-  event_url             text,
-  event_description     text,
-  event_properties      text,
-  PRIMARY KEY (event_id)
-);
--- Foreign key from event_domain_id to domain_id
-ALTER TABLE Event ADD CONSTRAINT event_domain_id_domain_id_fkey FOREIGN KEY (event_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
--- Foreign key from event_owner to userobm_id
-ALTER TABLE Event ADD CONSTRAINT event_owner_userobm_id_fkey FOREIGN KEY (event_owner) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
--- Foreign key from event_userupdate to userobm_id
-ALTER TABLE Event ADD CONSTRAINT event_userupdate_userobm_id_fkey FOREIGN KEY (event_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
--- Foreign key from event_usercreate to userobm_id
-ALTER TABLE Event ADD CONSTRAINT event_usercreate_userobm_id_fkey FOREIGN KEY (event_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
--- Foreign key from event_category1_id to calendarcategory1_id
-ALTER TABLE Event ADD CONSTRAINT event_category1_id_calendarcategory1_id_fkey FOREIGN KEY (event_category1_id) REFERENCES CalendarCategory1(calendarcategory1_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Clean CalendarEvent before migration to Event
--- Foreign key domain_id
-DELETE FROM CalendarEvent WHERE calendarevent_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarevent_domain_id IS NOT NULL;
--- Foreign key from calendarevent_userupdate to userobm_id
-UPDATE CalendarEvent SET calendarevent_userupdate = NULL WHERE calendarevent_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_userupdate IS NOT NULL;
--- Foreign key from calendarevent_usercreate to userobm_id
-UPDATE CalendarEvent SET calendarevent_usercreate = NULL WHERE calendarevent_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_usercreate IS NOT NULL;
--- Foreign key from calendarevent_owner to userobm_id
-DELETE FROM CalendarEvent WHERE calendarevent_owner NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_owner IS NOT NULL;
--- Foreign key from calendarevent_category1_id to calendarcategory1_id
-UPDATE CalendarEvent SET calendarevent_category1_id = NULL WHERE calendarevent_category1_id NOT IN (SELECT calendarcategory1_id FROM CalendarCategory1) AND calendarevent_category1_id IS NOT NULL;
-
-
-INSERT INTO Event (event_id,
-  event_domain_id, 
-  event_timeupdate,
-  event_timecreate,
-  event_userupdate,
-  event_usercreate,
-  event_ext_id,
-  event_type,
-  event_origin,
-  event_owner,
-  event_timezone,
-  event_opacity,
-  event_title,
-  event_location,
-  event_category1_id,
-  event_priority,
-  event_privacy,
-  event_date,
-  event_duration,
-  event_allday,
-  event_repeatkind,
-  event_repeatfrequence,
-  event_repeatdays,
-  event_endrepeat,
-  event_color,
-  event_completed,
-  event_url,
-  event_description,
-  event_properties)
-SELECT
-  calendarevent_id,
-  calendarevent_domain_id, 
-  calendarevent_timeupdate,
-  calendarevent_timecreate,
-  calendarevent_userupdate,
-  calendarevent_usercreate,
-  calendarevent_ext_id,
-  'VEVENT',
-  'migration',
-  calendarevent_owner,
-  'Europe/Paris',
-  'OPAQUE',
-  calendarevent_title,
-  calendarevent_location,
-  calendarevent_category1_id,
-  calendarevent_priority,
-  calendarevent_privacy,
-  calendarevent_date,
-  calendarevent_duration,
-  CAST(calendarevent_allday AS BOOLEAN),
-  calendarevent_repeatkind,
-  calendarevent_repeatfrequence,
-  calendarevent_repeatdays,
-  calendarevent_endrepeat,
-  calendarevent_color,
-  NULL,
-  NULL,
-  calendarevent_description,
-  calendarevent_properties
-FROM CalendarEvent;
-
-SELECT setval('event_event_id_seq', max(event_id)) FROM Event;
-
--- Clean Todo before migration to Event
--- Foreign key from todo_domain_id to domain_id
-DELETE FROM Todo WHERE todo_domain_id NOT IN (SELECT domain_id FROM Domain) AND todo_domain_id IS NOT NULL;
--- Foreign key from todo_user to userobm_id
-DELETE FROM Todo WHERE todo_user NOT IN (SELECT userobm_id FROM UserObm) AND todo_user IS NOT NULL;
--- Foreign key from todo_userupdate to userobm_id
-UPDATE Todo SET todo_userupdate = NULL WHERE todo_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND todo_userupdate IS NOT NULL;
--- Foreign key from todo_usercreate to userobm_id
-UPDATE Todo SET todo_usercreate = NULL WHERE todo_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND todo_usercreate IS NOT NULL;
-
-INSERT INTO Event (
-  event_domain_id, 
-  event_timeupdate,
-  event_timecreate,
-  event_userupdate,
-  event_usercreate,
-  event_type,
-  event_origin,
-  event_owner,
-  event_timezone,
-  event_opacity,
-  event_title,
-  event_priority,
-  event_privacy,
-  event_date,
-  event_duration,
-  event_allday,
-  event_repeatkind,
-  event_repeatfrequence,
-  event_repeatdays,
-  event_endrepeat,
-  event_color,
-  event_completed,
-  event_url,
-  event_description)
-SELECT
-  todo_domain_id,
-  todo_timeupdate,
-  todo_timecreate,
-  todo_userupdate,
-  todo_usercreate,
-  'VTODO',
-  'migration',
-  todo_user,
-  'Europe/Paris',
-  'OPAQUE',
-  todo_title,
-  todo_priority,
-  todo_privacy,
-  todo_deadline,
-  3600,
-  FALSE,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  todo_deadline,
-  NULL,
-  todo_content
-FROM Todo;
-
--- Table EventEntity
-CREATE TYPE vpartstat AS ENUM ('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS');
-ALTER TABLE EventEntity ADD COLUMN evententity_state2 vpartstat default 'NEEDS-ACTION';
-UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state!='A' AND evententity_state!='W' AND evententity_state!='R';
-UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state='A';
-UPDATE EventEntity set evententity_state2 = 'NEEDS-ACTION' where evententity_state='W';
-UPDATE EventEntity set evententity_state2 = 'DECLINED' where evententity_state='R';
-ALTER TABLE EventEntity DROP COLUMN evententity_state;
-ALTER TABLE EventEntity RENAME COLUMN evententity_state2 TO evententity_state;
-
-CREATE TYPE vrole AS ENUM ('CHAIR', 'REQ', 'OPT', 'NON');
-ALTER TABLE EventEntity ADD COLUMN evententity_required2 vrole default 'REQ';
-ALTER TABLE EventEntity DROP COLUMN evententity_required;
-ALTER TABLE EventEntity RENAME COLUMN evententity_required2 TO evententity_required;
-UPDATE EventEntity set evententity_required = 'REQ';
-
-ALTER TABLE EventEntity ADD COLUMN evententity_percent float default 0;
-
-ALTER TABLE EventEntity RENAME TO EventLink;
-ALTER TABLE EventLink RENAME COLUMN evententity_timeupdate TO eventlink_timeupdate;
-ALTER TABLE EventLink RENAME COLUMN evententity_timecreate TO eventlink_timecreate;
-ALTER TABLE EventLink RENAME COLUMN evententity_userupdate TO eventlink_userupdate;
-ALTER TABLE EventLink RENAME COLUMN evententity_usercreate TO eventlink_usercreate;
-ALTER TABLE EventLink RENAME COLUMN evententity_event_id TO eventlink_event_id;
-ALTER TABLE EventLink RENAME COLUMN evententity_entity_id TO eventlink_entity_id;
-ALTER TABLE EventLink RENAME COLUMN evententity_entity TO eventlink_entity;
-ALTER TABLE EventLink RENAME COLUMN evententity_state TO eventlink_state;
-ALTER TABLE EventLink RENAME COLUMN evententity_required TO eventlink_required;
-ALTER TABLE EventLink RENAME COLUMN evententity_percent TO eventlink_percent;
-
--- Foreign key from evententity_event_id to event_id
-DELETE FROM EventLink WHERE eventlink_event_id NOT IN (SELECT event_id FROM Event) AND eventlink_event_id IS NOT NULL;
-ALTER TABLE EventLink ADD CONSTRAINT eventlink_event_id_event_id_fkey FOREIGN KEY (eventlink_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from evententity_userupdate to userobm_id
-UPDATE EventLink SET eventlink_userupdate = NULL WHERE eventlink_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND eventlink_userupdate IS NOT NULL;
-ALTER TABLE EventLink ADD CONSTRAINT eventlink_userupdate_userobm_id_fkey FOREIGN KEY (eventlink_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from evententity_usercreate to userobm_id
-UPDATE EventLink SET eventlink_usercreate = NULL WHERE eventlink_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND eventlink_usercreate IS NOT NULL;
-ALTER TABLE EventLink ADD CONSTRAINT eventlink_usercreate_userobm_id_fkey FOREIGN KEY (eventlink_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
-
-
--- Table EventAlert
-
-CREATE TABLE EventAlert (
-  eventalert_timeupdate  timestamp,
-  eventalert_timecreate  timestamp,
-  eventalert_userupdate  integer default NULL,
-  eventalert_usercreate  integer default NULL,
-  eventalert_event_id    integer,
-  eventalert_user_id     integer,
-  eventalert_duration    integer NOT NULL default 0
-);
-CREATE INDEX idx_eventalert_user ON EventAlert (eventalert_user_id);
-ALTER TABLE EventAlert ADD CONSTRAINT eventalert_event_id_event_id_fkey FOREIGN KEY (eventalert_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE EventAlert ADD CONSTRAINT eventalert_user_id_userobm_id_fkey FOREIGN KEY (eventalert_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE EventAlert ADD CONSTRAINT eventalert_userupdate_userobm_id_fkey FOREIGN KEY (eventalert_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE EventAlert ADD CONSTRAINT eventalert_usercreate_userobm_id_fkey FOREIGN KEY (eventalert_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Clean CalendarAlert before migration to EventAlert
--- Foreign key from calendaralert_event_id to event_id
-DELETE FROM CalendarAlert WHERE calendaralert_event_id NOT IN (SELECT event_id FROM Event) AND calendaralert_event_id IS NOT NULL;
--- Foreign key from calendaralert_user_id to userobm_id
-DELETE FROM CalendarAlert WHERE calendaralert_user_id NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_user_id IS NOT NULL;
--- Foreign key from calendaralert_userupdate to userobm_id
-UPDATE CalendarAlert SET calendaralert_userupdate = NULL WHERE calendaralert_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_userupdate IS NOT NULL;
--- Foreign key from calendaralert_usercreate to userobm_id
-UPDATE CalendarAlert SET calendaralert_usercreate = NULL WHERE calendaralert_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_usercreate IS NOT NULL;
-
-
-INSERT INTO EventAlert (eventalert_timeupdate,
-  eventalert_timecreate,
-  eventalert_userupdate,
-  eventalert_usercreate,
-  eventalert_event_id,
-  eventalert_user_id,
-  eventalert_duration)
-SELECT
-  calendaralert_timeupdate,
-  calendaralert_timecreate,
-  calendaralert_userupdate,
-  calendaralert_usercreate,
-  calendaralert_event_id,
-  calendaralert_user_id,
-  calendaralert_duration
-FROM CalendarAlert;
-
-
--- Table EventException
-
-CREATE TABLE EventException (
-  eventexception_timeupdate   timestamp,
-  eventexception_timecreate   timestamp,
-  eventexception_userupdate   integer default NULL,
-  eventexception_usercreate   integer default NULL,
-  eventexception_event_id     integer,
-  eventexception_date         timestamp NOT NULL,
-  PRIMARY KEY (eventexception_event_id,eventexception_date)
-);
-ALTER TABLE EventException ADD CONSTRAINT eventexception_event_id_event_id_fkey FOREIGN KEY (eventexception_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE EventException ADD CONSTRAINT eventexception_userupdate_userobm_id_fkey FOREIGN KEY (eventexception_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE EventException ADD CONSTRAINT eventexception_usercreate_userobm_id_fkey FOREIGN KEY (eventexception_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Clean CalendarException before migration to EventException
--- Foreign key from calendarexception_event_id to calendarevent_id
-DELETE FROM CalendarException WHERE calendarexception_event_id NOT IN (SELECT calendarevent_id FROM CalendarEvent) AND calendarexception_event_id IS NOT NULL;
--- Foreign key from calendarexception_userupdate to userobm_id
-UPDATE CalendarException SET calendarexception_userupdate = NULL WHERE calendarexception_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_userupdate IS NOT NULL;
--- Foreign key from calendarexception_usercreate to userobm_id
-UPDATE CalendarException SET calendarexception_usercreate = NULL WHERE calendarexception_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_usercreate IS NOT NULL;
-
-
-INSERT INTO EventException (eventexception_timeupdate,
-  eventexception_timecreate,
-  eventexception_userupdate,
-  eventexception_usercreate,
-  eventexception_event_id,
-  eventexception_date)
-SELECT
-  calendarexception_timeupdate,
-  calendarexception_timecreate,
-  calendarexception_userupdate,
-  calendarexception_usercreate,
-  calendarexception_event_id,
-  calendarexception_date
-FROM CalendarException;
-
-
--- Table EventCategory1
-
-CREATE TABLE EventCategory1 (
-  eventcategory1_id          serial,
-  eventcategory1_domain_id   integer NOT NULL,
-  eventcategory1_timeupdate  timestamp,
-  eventcategory1_timecreate  timestamp,
-  eventcategory1_userupdate  integer default NULL,
-  eventcategory1_usercreate  integer default NULL,
-  eventcategory1_code        varchar(10) default '',
-  eventcategory1_label       varchar(128) default NULL,
-  eventcategory1_color       char(6),
-  PRIMARY KEY (eventcategory1_id)
-);
-ALTER TABLE EventCategory1 ADD CONSTRAINT eventcategory1_domain_id_domain_id_fkey FOREIGN KEY (eventcategory1_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE EventCategory1 ADD CONSTRAINT eventcategory1_userupdate_userobm_id_fkey FOREIGN KEY (eventcategory1_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-ALTER TABLE EventCategory1 ADD CONSTRAINT eventcategory1_usercreate_userobm_id_fkey FOREIGN KEY (eventcategory1_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Clean CalendarCategory1 before migration to EventCategory1
--- Foreign key from calendarcategory1_domain_id to domain_id
-DELETE FROM CalendarCategory1 WHERE calendarcategory1_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarcategory1_domain_id IS NOT NULL;
--- Foreign key from calendarcategory1_userupdate to userobm_id
-UPDATE CalendarCategory1 SET calendarcategory1_userupdate = NULL WHERE calendarcategory1_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_userupdate IS NOT NULL;
--- Foreign key from calendarcategory1_usercreate to userobm_id
-UPDATE CalendarCategory1 SET calendarcategory1_usercreate = NULL WHERE calendarcategory1_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_usercreate IS NOT NULL;
-
-INSERT INTO Eventcategory1 (
-  eventcategory1_id,
-  eventcategory1_domain_id,
-  eventcategory1_timeupdate,
-  eventcategory1_timecreate,
-  eventcategory1_userupdate,
-  eventcategory1_usercreate,
-  eventcategory1_code,
-  eventcategory1_label,
-  eventcategory1_color)
-SELECT
-  calendarcategory1_id,
-  calendarcategory1_domain_id,
-  calendarcategory1_timeupdate,
-  calendarcategory1_timecreate,
-  calendarcategory1_userupdate,
-  calendarcategory1_usercreate,
-  calendarcategory1_code,
-  calendarcategory1_label,
-  calendarcategory1_color
-FROM CalendarCategory1;
-
-SELECT setval('eventcategory1_eventcategory1_id_seq', max(eventcategory1_id)) FROM EventCategory1;
-
-ALTER TABLE OGroupEntity RENAME TO OGroupLink;
-ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_id TO ogrouplink_id;
-ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_domain_id TO ogrouplink_domain_id;
-ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_timeupdate TO ogrouplink_timeupdate;
-ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_timecreat TO ogrouplink_timecreate;
-ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_userupdate TO ogrouplink_userupdate;
-ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_usercreate TO ogrouplink_usercreate;
-ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_ogroup_id TO ogrouplink_ogroup_id;
-ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_entity_id TO ogrouplink_entity_id;
-ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_entity TO ogrouplink_entity;
-
-ALTER TABLE DocumentEntity RENAME TO DocumentLink;
-ALTER TABLE DocumentLink CHANGE COLUMN documententity_document_id TO documentlink_document_id;
-ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity_id TO documentlink_entity_id;
-ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity TO documentlink_entity;
-
-
---
--- Table `DeletedEvent`
---
-
-CREATE TABLE DeletedEvent (
-  deletedevent_id         serial,
-  deletedevent_event_id   integer,
-  deletedevent_user_id    integer,
-  deletedevent_timestamp  timestamp
-);
-create INDEX idx_dce_event_id ON DeletedEvent (deletedevent_event_id);
-create INDEX idx_dce_user_id ON DeletedEvent (deletedevent_user_id);
-
-INSERT INTO DeletedEvent (deletedevent_id,
-  deletedevent_event_id,
-  deletedevent_user_id,
-  deletedevent_timestamp)
-SELECT
-  deletedcalendarevent_id,
-  deletedcalendarevent_event_id,
-  deletedcalendarevent_user_id,
-  deletedcalendarevent_timestamp
-FROM DeletedCalendarEvent;
-
-SELECT setval('deletedevent_deletedevent_id_seq', max(deletedevent_id)) FROM DeletedEvent;
-
-
-DROP Table DeletedCalendarEvent;
-DROP Table CalendarAlert;
-DROP Table CalendarException;
-DROP Table CalendarEvent;
-DROP Table CalendarCategory1;
--------------------------------------------------------------------------------
-
-
--- Preferences
-ALTER TABLE DisplayPref DROP CONSTRAINT displaypref_pkey;
-ALTER TABLE DisplayPref ADD CONSTRAINT displaypref_key  UNIQUE (display_user_id, display_entity, display_fieldname);
-ALTER TABLE DisplayPref ADD COLUMN display_id serial PRIMARY KEY;
-
--- NOT NULL to NULL Convertion
-ALTER TABLE UserObm ALTER COLUMN userobm_domain_id SET NOT NULL;
-ALTER TABLE UserObmPref ALTER COLUMN userobmpref_user_id DROP NOT NULL;
-ALTER TABLE UserObmPref ALTER COLUMN userobmpref_user_id SET default NULL;
-ALTER TABLE UserObmPref ADD COLUMN userobmpref_id serial;
-ALTER TABLE UserObmPref ADD PRIMARY KEY (userobmpref_id);
-ALTER TABLE DataSource ALTER COLUMN datasource_domain_id SET NOT NULL;
-ALTER TABLE Country ALTER COLUMN country_domain_id SET NOT NULL;
-ALTER TABLE Region ALTER COLUMN region_domain_id SET NOT NULL;
-ALTER TABLE CompanyType ALTER COLUMN companytype_domain_id SET NOT NULL;
-ALTER TABLE CompanyActivity ALTER COLUMN companyactivity_domain_id SET NOT NULL;
-ALTER TABLE CompanyNafCode ALTER COLUMN companynafcode_domain_id SET NOT NULL;
-ALTER TABLE Company ALTER COLUMN company_domain_id SET NOT NULL;
-ALTER TABLE Company ALTER COLUMN company_datasource_id SET default NULL;
-ALTER TABLE Contact ALTER COLUMN contact_domain_id SET NOT NULL;
-ALTER TABLE Contact ALTER COLUMN contact_datasource_id SET default NULL;
-ALTER TABLE EntityRight ADD COLUMN entityright_access INTEGER not null DEFAULT 0;
-ALTER TABLE Kind ALTER COLUMN kind_domain_id SET NOT NULL;
-ALTER TABLE ContactFunction ALTER COLUMN contactfunction_domain_id SET NOT NULL;
-ALTER TABLE LeadSource ALTER COLUMN leadsource_domain_id SET NOT NULL;
-ALTER TABLE LeadStatus ALTER COLUMN leadstatus_domain_id SET NOT NULL;
-ALTER TABLE Lead ALTER COLUMN lead_domain_id SET NOT NULL;
-ALTER TABLE Lead ALTER COLUMN lead_source_id SET default NULL;
-ALTER TABLE Lead ALTER COLUMN lead_manager_id SET default NULL;
-ALTER TABLE ParentDeal ALTER COLUMN parentdeal_domain_id SET NOT NULL;
-ALTER TABLE Deal ALTER COLUMN deal_domain_id SET NOT NULL;
-ALTER TABLE DealStatus ALTER COLUMN dealstatus_domain_id SET NOT NULL;
-ALTER TABLE DealType ALTER COLUMN dealtype_domain_id SET NOT NULL;
-ALTER TABLE DealCompanyRole ALTER COLUMN dealcompanyrole_domain_id SET NOT NULL;
-ALTER TABLE List ALTER COLUMN list_domain_id SET NOT NULL;
-ALTER TABLE Publication ALTER COLUMN publication_domain_id SET NOT NULL;
-ALTER TABLE PublicationType ALTER COLUMN publicationtype_domain_id SET NOT NULL;
-ALTER TABLE Subscription ALTER COLUMN subscription_domain_id SET NOT NULL;
-ALTER TABLE Document ALTER COLUMN document_domain_id SET NOT NULL;
-ALTER TABLE DocumentMimeType ALTER COLUMN documentmimetype_domain_id SET NOT NULL;
-ALTER TABLE Project ALTER COLUMN project_domain_id SET NOT NULL;
-ALTER TABLE ProjectTask ALTER COLUMN projecttask_parenttask_id SET default NULL;
-ALTER TABLE CV ALTER COLUMN cv_domain_id SET NOT NULL;
-ALTER TABLE DefaultOdtTemplate ALTER COLUMN defaultodttemplate_domain_id SET NOT NULL;
-ALTER TABLE TaskType ALTER COLUMN tasktype_domain_id SET NOT NULL;
-ALTER TABLE Contract ALTER COLUMN contract_domain_id SET NOT NULL;
-ALTER TABLE ContractType ALTER COLUMN contracttype_domain_id SET NOT NULL;
-ALTER TABLE ContractPriority ALTER COLUMN contractpriority_domain_id SET NOT NULL;
-ALTER TABLE ContractStatus ALTER COLUMN contractstatus_domain_id SET NOT NULL;
-ALTER TABLE Incident ALTER COLUMN incident_domain_id SET NOT NULL;
-ALTER TABLE Incident ALTER COLUMN incident_priority_id SET default NULL;
-ALTER TABLE Incident ALTER COLUMN incident_status_id SET default NULL;
-ALTER TABLE Incident ALTER COLUMN incident_resolutiontype_id SET default NULL;
-ALTER TABLE IncidentPriority ALTER COLUMN incidentpriority_domain_id SET NOT NULL;
-ALTER TABLE IncidentStatus ALTER COLUMN incidentstatus_domain_id SET NOT NULL;
-ALTER TABLE IncidentResolutionType ALTER COLUMN incidentresolutiontype_domain_id SET NOT NULL;
-ALTER TABLE Payment ALTER COLUMN payment_domain_id SET NOT NULL;
-ALTER TABLE PaymentKind ALTER COLUMN paymentkind_domain_id SET NOT NULL;
-ALTER TABLE Account ALTER COLUMN account_domain_id SET NOT NULL;
-ALTER TABLE UGroup ALTER COLUMN group_domain_id SET NOT NULL;
-ALTER TABLE OrganizationalChart ALTER COLUMN organizationalchart_domain_id SET NOT NULL;
-ALTER TABLE OGroup ALTER COLUMN ogroup_domain_id SET NOT NULL;
-ALTER TABLE OGroupLink ALTER COLUMN ogrouplink_domain_id SET NOT NULL;
-ALTER TABLE Import ALTER COLUMN import_domain_id SET NOT NULL;
-ALTER TABLE Import ALTER COLUMN import_datasource_id SET default NULL;
-ALTER TABLE Resource ALTER COLUMN resource_domain_id SET NOT NULL;
-ALTER TABLE RGroup ALTER COLUMN rgroup_domain_id SET NOT NULL;
-ALTER TABLE Host ALTER COLUMN host_domain_id SET NOT NULL;
-ALTER TABLE Samba ALTER COLUMN samba_domain_id SET NOT NULL;
-ALTER TABLE MailShare ALTER COLUMN mailshare_domain_id SET NOT NULL;
-ALTER TABLE MailShare ALTER COLUMN mailshare_mail_server_id SET default NULL;
-ALTER TABLE deal ALTER COLUMN deal_region_id DROP DEFAULT;
-ALTER TABLE deal ALTER COLUMN deal_region_id DROP NOT NULL;
-ALTER TABLE deal ALTER COLUMN deal_region_id SET DEFAULT NULL;
-ALTER TABLE deal ALTER COLUMN deal_source_id DROP DEFAULT;
-ALTER TABLE deal ALTER COLUMN deal_source_id DROP NOT NULL;
-ALTER TABLE deal ALTER COLUMN deal_source_id SET DEFAULT NULL;
-ALTER TABLE dealcompany ALTER COLUMN dealcompany_role_id DROP DEFAULT;
-ALTER TABLE dealcompany ALTER COLUMN dealcompany_role_id DROP NOT NULL;
-ALTER TABLE dealcompany ALTER COLUMN dealcompany_role_id SET DEFAULT NULL;
-ALTER TABLE contract ALTER COLUMN contract_priority_id DROP DEFAULT;
-ALTER TABLE contract ALTER COLUMN contract_priority_id DROP NOT NULL;
-ALTER TABLE contract ALTER COLUMN contract_priority_id SET DEFAULT NULL;
-ALTER TABLE contract ALTER COLUMN contract_status_id DROP DEFAULT;
-ALTER TABLE contract ALTER COLUMN contract_status_id DROP NOT NULL;
-ALTER TABLE contract ALTER COLUMN contract_status_id SET DEFAULT NULL;
-ALTER TABLE document ALTER COLUMN document_mimetype_id DROP DEFAULT;
-ALTER TABLE document ALTER COLUMN document_mimetype_id DROP NOT NULL;
-ALTER TABLE document ALTER COLUMN document_mimetype_id SET DEFAULT NULL;
-ALTER TABLE lead ALTER COLUMN lead_contact_id DROP DEFAULT;
-ALTER TABLE lead ALTER COLUMN lead_contact_id DROP NOT NULL;
-ALTER TABLE lead ALTER COLUMN lead_contact_id SET DEFAULT NULL;
-ALTER TABLE payment ALTER COLUMN payment_company_id DROP DEFAULT;
-ALTER TABLE payment ALTER COLUMN payment_company_id DROP NOT NULL;
-ALTER TABLE payment ALTER COLUMN payment_company_id SET DEFAULT NULL;
-ALTER TABLE payment ALTER COLUMN payment_paymentkind_id DROP DEFAULT;
-ALTER TABLE payment ALTER COLUMN payment_paymentkind_id DROP NOT NULL;
-ALTER TABLE payment ALTER COLUMN payment_paymentkind_id SET DEFAULT NULL;
-ALTER TABLE projectclosing ALTER COLUMN projectclosing_usercreate DROP DEFAULT;
-ALTER TABLE projectclosing ALTER COLUMN projectclosing_usercreate DROP NOT NULL;
-ALTER TABLE projectclosing ALTER COLUMN projectclosing_usercreate SET DEFAULT NULL;
-ALTER TABLE subscription ALTER COLUMN subscription_reception_id DROP DEFAULT;
-ALTER TABLE subscription ALTER COLUMN subscription_reception_id DROP NOT NULL;
-ALTER TABLE subscription ALTER COLUMN subscription_reception_id SET DEFAULT NULL;
-ALTER TABLE userobm ALTER COLUMN userobm_host_id DROP DEFAULT;
-ALTER TABLE userobm ALTER COLUMN userobm_host_id SET DEFAULT NULL;
-ALTER TABLE displaypref ALTER COLUMN display_user_id DROP DEFAULT;
-ALTER TABLE displaypref ALTER COLUMN display_user_id DROP NOT NULL;
-ALTER TABLE displaypref ALTER COLUMN display_user_id SET DEFAULT NULL;
-ALTER TABLE UGroup ALTER COLUMN group_manager_id DROP DEFAULT;
-ALTER TABLE UGroup ALTER COLUMN group_manager_id SET DEFAULT NULL;
-ALTER TABLE P_EntityRight ADD COLUMN entityright_access INTEGER not null DEFAULT 0;
-
---
+-- -------------------------------------
 -- Add tables structures around Profiles
---
-
+-- -------------------------------------
 --
 -- Table structure for table 'Profile'
 --
@@ -827,6 +255,183 @@ CREATE TABLE ProfilePropertyValue (
 	profilepropertyvalue_property_value	text NOT NULL default '',
 	PRIMARY KEY (profilepropertyvalue_id)
 );
+
+--  _______________
+-- | CalendarEvent |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-- Table EventCategory1
+CREATE TABLE EventCategory1 (
+  eventcategory1_id          serial,
+  eventcategory1_domain_id   integer NOT NULL,
+  eventcategory1_timeupdate  timestamp,
+  eventcategory1_timecreate  timestamp,
+  eventcategory1_userupdate  integer default NULL,
+  eventcategory1_usercreate  integer default NULL,
+  eventcategory1_code        varchar(10) default '',
+  eventcategory1_label       varchar(128) default NULL,
+  eventcategory1_color       char(6),
+  PRIMARY KEY (eventcategory1_id)
+);
+ALTER TABLE EventCategory1 ADD CONSTRAINT eventcategory1_domain_id_domain_id_fkey FOREIGN KEY (eventcategory1_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE EventCategory1 ADD CONSTRAINT eventcategory1_userupdate_userobm_id_fkey FOREIGN KEY (eventcategory1_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE EventCategory1 ADD CONSTRAINT eventcategory1_usercreate_userobm_id_fkey FOREIGN KEY (eventcategory1_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+CREATE TYPE vcomponent AS ENUM ('VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY');
+CREATE TYPE vopacity AS ENUM ('OPAQUE', 'TRANSPARENT');
+-- Event Creation
+CREATE TABLE Event (
+  event_id           	serial,
+  event_domain_id    	integer NOT NULL,
+  event_timeupdate   	timestamp,
+  event_timecreate   	timestamp,
+  event_userupdate   	integer,
+  event_usercreate   	integer,
+  event_parent_id       integer default NULL,
+  event_ext_id       	varchar(255) default '', 
+  event_type            vcomponent default 'VEVENT',
+  event_origin          varchar(255) NOT NULL default '',
+  event_owner           integer default NULL,    
+  event_timezone        varchar(255) default 'GMT',    
+  event_opacity         vopacity default 'OPAQUE',
+  event_title           varchar(255) default NULL,
+  event_location        varchar(100) default NULL,
+  event_category1_id    integer default NULL,
+  event_priority        integer,
+  event_privacy         integer,
+  event_date            timestamp NULL,
+  event_duration        integer NOT NULL default 0,
+  event_allday          BOOLEAN default FALSE,
+  event_repeatkind      varchar(20) default NULL,
+  event_repeatfrequence integer default NULL,
+  event_repeatdays      varchar(7) default NULL,
+  event_endrepeat       timestamp default NULL,
+  event_color           varchar(7),
+  event_completed       timestamp,
+  event_url             text,
+  event_description     text,
+  event_properties      text,
+  PRIMARY KEY (event_id)
+);
+-- Foreign key from event_domain_id to domain_id
+ALTER TABLE Event ADD CONSTRAINT event_domain_id_domain_id_fkey FOREIGN KEY (event_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- Foreign key from event_owner to userobm_id
+ALTER TABLE Event ADD CONSTRAINT event_owner_userobm_id_fkey FOREIGN KEY (event_owner) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- Foreign key from event_userupdate to userobm_id
+ALTER TABLE Event ADD CONSTRAINT event_userupdate_userobm_id_fkey FOREIGN KEY (event_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+-- Foreign key from event_usercreate to userobm_id
+ALTER TABLE Event ADD CONSTRAINT event_usercreate_userobm_id_fkey FOREIGN KEY (event_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+-- Foreign key from event_category1_id to calendarcategory1_id
+ALTER TABLE Event ADD CONSTRAINT event_category1_id_eventcategory1_id_fkey FOREIGN KEY (event_category1_id) REFERENCES EventCategory1(eventcategory1_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Table EventAlert
+
+CREATE TABLE EventAlert (
+  eventalert_timeupdate  timestamp,
+  eventalert_timecreate  timestamp,
+  eventalert_userupdate  integer default NULL,
+  eventalert_usercreate  integer default NULL,
+  eventalert_event_id    integer,
+  eventalert_user_id     integer,
+  eventalert_duration    integer NOT NULL default 0
+);
+CREATE INDEX idx_eventalert_user ON EventAlert (eventalert_user_id);
+ALTER TABLE EventAlert ADD CONSTRAINT eventalert_event_id_event_id_fkey FOREIGN KEY (eventalert_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE EventAlert ADD CONSTRAINT eventalert_user_id_userobm_id_fkey FOREIGN KEY (eventalert_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE EventAlert ADD CONSTRAINT eventalert_userupdate_userobm_id_fkey FOREIGN KEY (eventalert_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE EventAlert ADD CONSTRAINT eventalert_usercreate_userobm_id_fkey FOREIGN KEY (eventalert_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Table EventException
+
+CREATE TABLE EventException (
+  eventexception_timeupdate   timestamp,
+  eventexception_timecreate   timestamp,
+  eventexception_userupdate   integer default NULL,
+  eventexception_usercreate   integer default NULL,
+  eventexception_event_id     integer,
+  eventexception_date         timestamp NOT NULL,
+  PRIMARY KEY (eventexception_event_id,eventexception_date)
+);
+ALTER TABLE EventException ADD CONSTRAINT eventexception_event_id_event_id_fkey FOREIGN KEY (eventexception_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE EventException ADD CONSTRAINT eventexception_userupdate_userobm_id_fkey FOREIGN KEY (eventexception_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE EventException ADD CONSTRAINT eventexception_usercreate_userobm_id_fkey FOREIGN KEY (eventexception_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--
+-- Table `DeletedEvent`
+--
+
+CREATE TABLE DeletedEvent (
+  deletedevent_id         serial,
+  deletedevent_event_id   integer,
+  deletedevent_user_id    integer,
+  deletedevent_timestamp  timestamp
+);
+create INDEX idx_dce_event_id ON DeletedEvent (deletedevent_event_id);
+create INDEX idx_dce_user_id ON DeletedEvent (deletedevent_user_id);
+
+--
+-- Modification of table EventEntity before rename it to EventLink
+--
+CREATE TYPE vpartstat AS ENUM ('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS');
+ALTER TABLE EventEntity ADD COLUMN evententity_state2 vpartstat default 'NEEDS-ACTION';
+UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state!='A' AND evententity_state!='W' AND evententity_state!='R';
+UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state='A';
+UPDATE EventEntity set evententity_state2 = 'NEEDS-ACTION' where evententity_state='W';
+UPDATE EventEntity set evententity_state2 = 'DECLINED' where evententity_state='R';
+ALTER TABLE EventEntity DROP COLUMN evententity_state;
+ALTER TABLE EventEntity RENAME COLUMN evententity_state2 TO evententity_state;
+
+CREATE TYPE vrole AS ENUM ('CHAIR', 'REQ', 'OPT', 'NON');
+ALTER TABLE EventEntity ADD COLUMN evententity_required2 vrole default 'REQ';
+ALTER TABLE EventEntity DROP COLUMN evententity_required;
+ALTER TABLE EventEntity RENAME COLUMN evententity_required2 TO evententity_required;
+UPDATE EventEntity set evententity_required = 'REQ';
+
+ALTER TABLE EventEntity ADD COLUMN evententity_percent float default 0;
+
+ALTER TABLE EventEntity RENAME TO EventLink;
+ALTER TABLE EventLink RENAME COLUMN evententity_timeupdate TO eventlink_timeupdate;
+ALTER TABLE EventLink RENAME COLUMN evententity_timecreate TO eventlink_timecreate;
+ALTER TABLE EventLink RENAME COLUMN evententity_userupdate TO eventlink_userupdate;
+ALTER TABLE EventLink RENAME COLUMN evententity_usercreate TO eventlink_usercreate;
+ALTER TABLE EventLink RENAME COLUMN evententity_event_id TO eventlink_event_id;
+ALTER TABLE EventLink RENAME COLUMN evententity_entity_id TO eventlink_entity_id;
+ALTER TABLE EventLink RENAME COLUMN evententity_entity TO eventlink_entity;
+ALTER TABLE EventLink RENAME COLUMN evententity_state TO eventlink_state;
+ALTER TABLE EventLink RENAME COLUMN evententity_required TO eventlink_required;
+ALTER TABLE EventLink RENAME COLUMN evententity_percent TO eventlink_percent;
+
+-- Foreign key from evententity_event_id to event_id
+DELETE FROM EventLink WHERE eventlink_event_id NOT IN (SELECT event_id FROM Event) AND eventlink_event_id IS NOT NULL;
+ALTER TABLE EventLink ADD CONSTRAINT eventlink_event_id_event_id_fkey FOREIGN KEY (eventlink_event_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from evententity_userupdate to userobm_id
+UPDATE EventLink SET eventlink_userupdate = NULL WHERE eventlink_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND eventlink_userupdate IS NOT NULL;
+ALTER TABLE EventLink ADD CONSTRAINT eventlink_userupdate_userobm_id_fkey FOREIGN KEY (eventlink_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+-- Foreign key from evententity_usercreate to userobm_id
+UPDATE EventLink SET eventlink_usercreate = NULL WHERE eventlink_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND eventlink_usercreate IS NOT NULL;
+ALTER TABLE EventLink ADD CONSTRAINT eventlink_usercreate_userobm_id_fkey FOREIGN KEY (eventlink_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+ALTER TABLE OGroupEntity RENAME TO OGroupLink;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_id TO ogrouplink_id;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_domain_id TO ogrouplink_domain_id;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_timeupdate TO ogrouplink_timeupdate;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_timecreate TO ogrouplink_timecreate;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_userupdate TO ogrouplink_userupdate;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_usercreate TO ogrouplink_usercreate;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_ogroup_id TO ogrouplink_ogroup_id;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_entity_id TO ogrouplink_entity_id;
+ALTER TABLE OGroupLink RENAME COLUMN ogroupentity_entity TO ogrouplink_entity;
+
+ALTER TABLE DocumentEntity RENAME TO DocumentLink;
+ALTER TABLE DocumentLink RENAME COLUMN documententity_document_id TO documentlink_document_id;
+ALTER TABLE DocumentLink RENAME COLUMN documententity_entity_id TO documentlink_entity_id;
+ALTER TABLE DocumentLink RENAME COLUMN documententity_entity TO documentlink_entity;
+
+--  _______________
+-- | Entity tables |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 
 CREATE TABLE AccountEntity (
   accountentity_entity_id integer NOT NULL,
@@ -1020,108 +625,438 @@ CREATE TABLE UserEntity (
   PRIMARY KEY (userentity_entity_id, userentity_user_id)
 );
   
-ALTER TABLE AccountEntity ADD CONSTRAINT accountentity_account_id_account_id_fkey FOREIGN KEY (accountentity_account_id) REFERENCES Account (account_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE AccountEntity ADD CONSTRAINT accountentity_entity_id_entity_id_fkey FOREIGN KEY (accountentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE CvEntity ADD CONSTRAINT cventity_cv_id_cv_id_fkey FOREIGN KEY (cventity_cv_id) REFERENCES CV (cv_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE CvEntity ADD CONSTRAINT cventity_entity_id_entity_id_fkey FOREIGN KEY (cventity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE CalendarEntity ADD CONSTRAINT calendarentity_calendar_id_calendar_id_fkey FOREIGN KEY (calendarentity_calendar_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE CalendarEntity ADD CONSTRAINT calendarentity_entity_id_entity_id_fkey FOREIGN KEY (calendarentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE CompanyEntity ADD CONSTRAINT companyentity_company_id_company_id_fkey FOREIGN KEY (companyentity_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE CompanyEntity ADD CONSTRAINT companyentity_entity_id_entity_id_fkey FOREIGN KEY (companyentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ContactEntity ADD CONSTRAINT contactentity_contact_id_contact_id_fkey FOREIGN KEY (contactentity_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ContactEntity ADD CONSTRAINT contactentity_entity_id_entity_id_fkey FOREIGN KEY (contactentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ContractEntity ADD CONSTRAINT contractentity_contract_id_contract_id_fkey FOREIGN KEY (contractentity_contract_id) REFERENCES Contract (contract_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ContractEntity ADD CONSTRAINT contractentity_entity_id_entity_id_fkey FOREIGN KEY (contractentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE DealEntity ADD CONSTRAINT dealentity_deal_id_deal_id_fkey FOREIGN KEY (dealentity_deal_id) REFERENCES Deal (deal_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE DealEntity ADD CONSTRAINT dealentity_entity_id_entity_id_fkey FOREIGN KEY (dealentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE DefaultodttemplateEntity ADD CONSTRAINT defaultodttemplateentity_defaultodttemplate_id_defaultodttemplate_id_fkey FOREIGN KEY (defaultodttemplateentity_defaultodttemplate_id) REFERENCES DefaultOdtTemplate (defaultodttemplate_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE DefaultodttemplateEntity ADD CONSTRAINT defaultodttemplateentity_entity_id_entity_id_fkey FOREIGN KEY (defaultodttemplateentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE DocumentEntity ADD CONSTRAINT documententity_document_id_document_id_fkey FOREIGN KEY (documententity_document_id) REFERENCES Document (document_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE DocumentEntity ADD CONSTRAINT documententity_entity_id_entity_id_fkey FOREIGN KEY (documententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE DomainEntity ADD CONSTRAINT domainentity_domain_id_domain_id_fkey FOREIGN KEY (domainentity_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE DomainEntity ADD CONSTRAINT domainentity_entity_id_entity_id_fkey FOREIGN KEY (domainentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE EventEntity ADD CONSTRAINT evententity_event_id_event_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES Event (event_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE EventEntity ADD CONSTRAINT evententity_entity_id_entity_id_fkey FOREIGN KEY (evententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE HostEntity ADD CONSTRAINT hostentity_host_id_host_id_fkey FOREIGN KEY (hostentity_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE HostEntity ADD CONSTRAINT hostentity_entity_id_entity_id_fkey FOREIGN KEY (hostentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ImportEntity ADD CONSTRAINT importentity_import_id_import_id_fkey FOREIGN KEY (importentity_import_id) REFERENCES Import (import_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ImportEntity ADD CONSTRAINT importentity_entity_id_entity_id_fkey FOREIGN KEY (importentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE IncidentEntity ADD CONSTRAINT incidententity_incident_id_incident_id_fkey FOREIGN KEY (incidententity_incident_id) REFERENCES Incident (incident_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE IncidentEntity ADD CONSTRAINT incidententity_entity_id_entity_id_fkey FOREIGN KEY (incidententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE InvoiceEntity ADD CONSTRAINT invoiceentity_invoice_id_invoice_id_fkey FOREIGN KEY (invoiceentity_invoice_id) REFERENCES Invoice (invoice_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE InvoiceEntity ADD CONSTRAINT invoiceentity_entity_id_entity_id_fkey FOREIGN KEY (invoiceentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE LeadEntity ADD CONSTRAINT leadentity_lead_id_lead_id_fkey FOREIGN KEY (leadentity_lead_id) REFERENCES Lead (lead_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE LeadEntity ADD CONSTRAINT leadentity_entity_id_entity_id_fkey FOREIGN KEY (leadentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ListEntity ADD CONSTRAINT listentity_list_id_list_id_fkey FOREIGN KEY (listentity_list_id) REFERENCES List (list_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ListEntity ADD CONSTRAINT listentity_entity_id_entity_id_fkey FOREIGN KEY (listentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE MailshareEntity ADD CONSTRAINT mailshareentity_mailshare_id_mailshare_id_fkey FOREIGN KEY (mailshareentity_mailshare_id) REFERENCES MailShare (mailshare_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE MailshareEntity ADD CONSTRAINT mailshareentity_entity_id_entity_id_fkey FOREIGN KEY (mailshareentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE MailboxEntity ADD CONSTRAINT mailboxentity_mailbox_id_mailbox_id_fkey FOREIGN KEY (mailboxentity_mailbox_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE MailboxEntity ADD CONSTRAINT mailboxentity_entity_id_entity_id_fkey FOREIGN KEY (mailboxentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE OgroupEntity ADD CONSTRAINT ogroupentity_ogroup_id_ogroup_id_fkey FOREIGN KEY (ogroupentity_ogroup_id) REFERENCES OGroup (ogroup_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE OgroupEntity ADD CONSTRAINT ogroupentity_entity_id_entity_id_fkey FOREIGN KEY (ogroupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ObmbookmarkEntity ADD CONSTRAINT obmbookmarkentity_obmbookmark_id_obmbookmark_id_fkey FOREIGN KEY (obmbookmarkentity_obmbookmark_id) REFERENCES ObmBookmark (obmbookmark_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ObmbookmarkEntity ADD CONSTRAINT obmbookmarkentity_entity_id_entity_id_fkey FOREIGN KEY (obmbookmarkentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE OrganizationalchartEntity ADD CONSTRAINT organizationalchartentity_organizationalchart_id_organizationalchart_id_fkey FOREIGN KEY (organizationalchartentity_organizationalchart_id) REFERENCES OrganizationalChart (organizationalchart_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE OrganizationalchartEntity ADD CONSTRAINT organizationalchartentity_entity_id_entity_id_fkey FOREIGN KEY (organizationalchartentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ParentdealEntity ADD CONSTRAINT parentdealentity_parentdeal_id_parentdeal_id_fkey FOREIGN KEY (parentdealentity_parentdeal_id) REFERENCES ParentDeal (parentdeal_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ParentdealEntity ADD CONSTRAINT parentdealentity_entity_id_entity_id_fkey FOREIGN KEY (parentdealentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE PaymentEntity ADD CONSTRAINT paymententity_payment_id_payment_id_fkey FOREIGN KEY (paymententity_payment_id) REFERENCES Payment (payment_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE PaymentEntity ADD CONSTRAINT paymententity_entity_id_entity_id_fkey FOREIGN KEY (paymententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ProfileEntity ADD CONSTRAINT profileentity_profile_id_profile_id_fkey FOREIGN KEY (profileentity_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ProfileEntity ADD CONSTRAINT profileentity_entity_id_entity_id_fkey FOREIGN KEY (profileentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ProjectEntity ADD CONSTRAINT projectentity_project_id_project_id_fkey FOREIGN KEY (projectentity_project_id) REFERENCES Project (project_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ProjectEntity ADD CONSTRAINT projectentity_entity_id_entity_id_fkey FOREIGN KEY (projectentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE PublicationEntity ADD CONSTRAINT publicationentity_publication_id_publication_id_fkey FOREIGN KEY (publicationentity_publication_id) REFERENCES Publication (publication_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE PublicationEntity ADD CONSTRAINT publicationentity_entity_id_entity_id_fkey FOREIGN KEY (publicationentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ResourcegroupEntity ADD CONSTRAINT resourcegroupentity_resourcegroup_id_resourcegroup_id_fkey FOREIGN KEY (resourcegroupentity_resourcegroup_id) REFERENCES RGroup (rgroup_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ResourcegroupEntity ADD CONSTRAINT resourcegroupentity_entity_id_entity_id_fkey FOREIGN KEY (resourcegroupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE ResourceEntity ADD CONSTRAINT resourceentity_resource_id_resource_id_fkey FOREIGN KEY (resourceentity_resource_id) REFERENCES Resource (resource_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE ResourceEntity ADD CONSTRAINT resourceentity_entity_id_entity_id_fkey FOREIGN KEY (resourceentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE SubscriptionEntity ADD CONSTRAINT subscriptionentity_subscription_id_subscription_id_fkey FOREIGN KEY (subscriptionentity_subscription_id) REFERENCES Subscription (subscription_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE SubscriptionEntity ADD CONSTRAINT subscriptionentity_entity_id_entity_id_fkey FOREIGN KEY (subscriptionentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE GroupEntity ADD CONSTRAINT groupentity_group_id_group_id_fkey FOREIGN KEY (groupentity_group_id) REFERENCES UGroup (group_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE GroupEntity ADD CONSTRAINT groupentity_entity_id_entity_id_fkey FOREIGN KEY (groupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE UserEntity ADD CONSTRAINT userentity_user_id_user_id_fkey FOREIGN KEY (userentity_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE UserEntity ADD CONSTRAINT userentity_entity_id_entity_id_fkey FOREIGN KEY (userentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
 CREATE TABLE TmpEntity (
   entity_id     serial,
   id_entity     integer,
   PRIMARY KEY (entity_id)
 );
 
+--  __________________
+-- | Cleanning tables |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-- Clean CalendarEvent before migration to Event
+-- Foreign key domain_id
+DELETE FROM CalendarEvent WHERE calendarevent_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarevent_domain_id IS NOT NULL;
+-- Foreign key from calendarevent_userupdate to userobm_id
+UPDATE CalendarEvent SET calendarevent_userupdate = NULL WHERE calendarevent_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_userupdate IS NOT NULL;
+-- Foreign key from calendarevent_usercreate to userobm_id
+UPDATE CalendarEvent SET calendarevent_usercreate = NULL WHERE calendarevent_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_usercreate IS NOT NULL;
+-- Foreign key from calendarevent_owner to userobm_id
+DELETE FROM CalendarEvent WHERE calendarevent_owner NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_owner IS NOT NULL;
+-- Foreign key from calendarevent_category1_id to calendarcategory1_id
+UPDATE CalendarEvent SET calendarevent_category1_id = NULL WHERE calendarevent_category1_id NOT IN (SELECT calendarcategory1_id FROM CalendarCategory1) AND calendarevent_category1_id IS NOT NULL;
+
+-- Clean Todo before migration to Event
+-- Foreign key from todo_domain_id to domain_id
+DELETE FROM Todo WHERE todo_domain_id NOT IN (SELECT domain_id FROM Domain) AND todo_domain_id IS NOT NULL;
+-- Foreign key from todo_user to userobm_id
+DELETE FROM Todo WHERE todo_user NOT IN (SELECT userobm_id FROM UserObm) AND todo_user IS NOT NULL;
+-- Foreign key from todo_userupdate to userobm_id
+UPDATE Todo SET todo_userupdate = NULL WHERE todo_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND todo_userupdate IS NOT NULL;
+-- Foreign key from todo_usercreate to userobm_id
+UPDATE Todo SET todo_usercreate = NULL WHERE todo_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND todo_usercreate IS NOT NULL;
+
+--
+-- Migration of ClandarEvent to Event
+--
+INSERT INTO Event (event_id,
+  event_domain_id, 
+  event_timeupdate,
+  event_timecreate,
+  event_userupdate,
+  event_usercreate,
+  event_ext_id,
+  event_type,
+  event_origin,
+  event_owner,
+  event_timezone,
+  event_opacity,
+  event_title,
+  event_location,
+  event_category1_id,
+  event_priority,
+  event_privacy,
+  event_date,
+  event_duration,
+  event_allday,
+  event_repeatkind,
+  event_repeatfrequence,
+  event_repeatdays,
+  event_endrepeat,
+  event_color,
+  event_completed,
+  event_url,
+  event_description,
+  event_properties)
+SELECT
+  calendarevent_id,
+  calendarevent_domain_id, 
+  calendarevent_timeupdate,
+  calendarevent_timecreate,
+  calendarevent_userupdate,
+  calendarevent_usercreate,
+  calendarevent_ext_id,
+  'VEVENT',
+  'migration',
+  calendarevent_owner,
+  'Europe/Paris',
+  'OPAQUE',
+  calendarevent_title,
+  calendarevent_location,
+  calendarevent_category1_id,
+  calendarevent_priority,
+  calendarevent_privacy,
+  calendarevent_date,
+  calendarevent_duration,
+  CAST(calendarevent_allday AS BOOLEAN),
+  calendarevent_repeatkind,
+  calendarevent_repeatfrequence,
+  calendarevent_repeatdays,
+  calendarevent_endrepeat,
+  calendarevent_color,
+  NULL,
+  NULL,
+  calendarevent_description,
+  calendarevent_properties
+FROM CalendarEvent;
+
+SELECT setval('event_event_id_seq', max(event_id)) FROM Event;
+
+--
+-- Migration of Todo to Event
+--
+INSERT INTO Event (
+  event_domain_id, 
+  event_timeupdate,
+  event_timecreate,
+  event_userupdate,
+  event_usercreate,
+  event_type,
+  event_origin,
+  event_owner,
+  event_timezone,
+  event_opacity,
+  event_title,
+  event_priority,
+  event_privacy,
+  event_date,
+  event_duration,
+  event_allday,
+  event_repeatkind,
+  event_repeatfrequence,
+  event_repeatdays,
+  event_endrepeat,
+  event_color,
+  event_completed,
+  event_url,
+  event_description)
+SELECT
+  todo_domain_id,
+  todo_timeupdate,
+  todo_timecreate,
+  todo_userupdate,
+  todo_usercreate,
+  'VTODO',
+  'migration',
+  todo_user,
+  'Europe/Paris',
+  'OPAQUE',
+  todo_title,
+  todo_priority,
+  todo_privacy,
+  todo_deadline,
+  3600,
+  FALSE,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  todo_deadline,
+  NULL,
+  todo_content
+FROM Todo;
+
+-- Clean CalendarAlert before migration to EventAlert
+-- Foreign key from calendaralert_event_id to event_id
+DELETE FROM CalendarAlert WHERE calendaralert_event_id NOT IN (SELECT event_id FROM Event) AND calendaralert_event_id IS NOT NULL;
+-- Foreign key from calendaralert_user_id to userobm_id
+DELETE FROM CalendarAlert WHERE calendaralert_user_id NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_user_id IS NOT NULL;
+-- Foreign key from calendaralert_userupdate to userobm_id
+UPDATE CalendarAlert SET calendaralert_userupdate = NULL WHERE calendaralert_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_userupdate IS NOT NULL;
+-- Foreign key from calendaralert_usercreate to userobm_id
+UPDATE CalendarAlert SET calendaralert_usercreate = NULL WHERE calendaralert_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_usercreate IS NOT NULL;
+
+-- Clean CalendarException before migration to EventException
+-- Foreign key from calendarexception_event_id to calendarevent_id
+DELETE FROM CalendarException WHERE calendarexception_event_id NOT IN (SELECT calendarevent_id FROM CalendarEvent) AND calendarexception_event_id IS NOT NULL;
+-- Foreign key from calendarexception_userupdate to userobm_id
+UPDATE CalendarException SET calendarexception_userupdate = NULL WHERE calendarexception_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_userupdate IS NOT NULL;
+-- Foreign key from calendarexception_usercreate to userobm_id
+UPDATE CalendarException SET calendarexception_usercreate = NULL WHERE calendarexception_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_usercreate IS NOT NULL;
+
+-- Clean CalendarCategory1 before migration to EventCategory1
+-- Foreign key from calendarcategory1_domain_id to domain_id
+DELETE FROM CalendarCategory1 WHERE calendarcategory1_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarcategory1_domain_id IS NOT NULL;
+-- Foreign key from calendarcategory1_userupdate to userobm_id
+UPDATE CalendarCategory1 SET calendarcategory1_userupdate = NULL WHERE calendarcategory1_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_userupdate IS NOT NULL;
+-- Foreign key from calendarcategory1_usercreate to userobm_id
+UPDATE CalendarCategory1 SET calendarcategory1_usercreate = NULL WHERE calendarcategory1_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_usercreate IS NOT NULL;
+
+--
+-- Migration of CalendarAlert to EventAlert
+--
+INSERT INTO EventAlert (eventalert_timeupdate,
+  eventalert_timecreate,
+  eventalert_userupdate,
+  eventalert_usercreate,
+  eventalert_event_id,
+  eventalert_user_id,
+  eventalert_duration)
+SELECT
+  calendaralert_timeupdate,
+  calendaralert_timecreate,
+  calendaralert_userupdate,
+  calendaralert_usercreate,
+  calendaralert_event_id,
+  calendaralert_user_id,
+  calendaralert_duration
+FROM CalendarAlert;
+
+--
+-- Migration of CalendarException to EventException
+--
+INSERT INTO EventException (eventexception_timeupdate,
+  eventexception_timecreate,
+  eventexception_userupdate,
+  eventexception_usercreate,
+  eventexception_event_id,
+  eventexception_date)
+SELECT
+  calendarexception_timeupdate,
+  calendarexception_timecreate,
+  calendarexception_userupdate,
+  calendarexception_usercreate,
+  calendarexception_event_id,
+  calendarexception_date
+FROM CalendarException;
+
+--
+-- Migration of CalendarCategory1 to EventCategory1
+--
+INSERT INTO EventCategory1 (
+  eventcategory1_id,
+  eventcategory1_domain_id,
+  eventcategory1_timeupdate,
+  eventcategory1_timecreate,
+  eventcategory1_userupdate,
+  eventcategory1_usercreate,
+  eventcategory1_code,
+  eventcategory1_label,
+  eventcategory1_color)
+SELECT
+  calendarcategory1_id,
+  calendarcategory1_domain_id,
+  calendarcategory1_timeupdate,
+  calendarcategory1_timecreate,
+  calendarcategory1_userupdate,
+  calendarcategory1_usercreate,
+  calendarcategory1_code,
+  calendarcategory1_label,
+  calendarcategory1_color
+FROM CalendarCategory1;
+
+SELECT setval('eventcategory1_eventcategory1_id_seq', max(eventcategory1_id)) FROM EventCategory1;
+
+--
+-- Migration of DeletedCalendarEvent to DeletedEvent
+--
+INSERT INTO DeletedEvent (deletedevent_id,
+  deletedevent_event_id,
+  deletedevent_user_id,
+  deletedevent_timestamp)
+SELECT
+  deletedcalendarevent_id,
+  deletedcalendarevent_event_id,
+  deletedcalendarevent_user_id,
+  deletedcalendarevent_timestamp
+FROM DeletedCalendarEvent;
+
+SELECT setval('deletedevent_deletedevent_id_seq', max(deletedevent_id)) FROM DeletedEvent;
+
+
+--  ______________________
+-- | Tables modifications |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-- NOTE : Set integer to boolean when necessary
+-- ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-- Domain
+ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
+ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
+ALTER TABLE Domain ADD COLUMN domain_mail_server_auto integer default NULL;
+
+SELECT setval('domain_domain_id_seq', max(domain_id)) FROM Domain;
+
+-- P_Domain
+ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
+ALTER TABLE P_Domain DROP COLUMN domain_mail_server_id;
+ALTER TABLE P_Domain ADD COLUMN domain_mail_server_auto integer default NULL;
+
+-- OGroup
+ALTER TABLE OGroup ALTER COLUMN ogroup_parent_id DROP NOT NULL;
+
+-- Preferences
+ALTER TABLE DisplayPref DROP CONSTRAINT displaypref_pkey;
+ALTER TABLE DisplayPref ADD CONSTRAINT displaypref_key  UNIQUE (display_user_id, display_entity, display_fieldname);
+ALTER TABLE DisplayPref ADD COLUMN display_id serial PRIMARY KEY;
+
+-- Contact
+ALTER TABLE Contact ADD COLUMN contact_birthday_id INTEGER default NULL;
+ALTER TABLE Contact ADD COLUMN contact_collected BOOLEAN default FALSE;
+ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
+UPDATE Contact SET contact_origin='obm21';
+ALTER TABLE Contact ALTER COLUMN contact_origin SET DEFAULT NOT NULL;
+
+-- NOT NULL to NULL Convertion
+ALTER TABLE UserObm ALTER COLUMN userobm_domain_id SET NOT NULL;
+ALTER TABLE UserObmPref ALTER COLUMN userobmpref_user_id DROP NOT NULL;
+ALTER TABLE UserObmPref ALTER COLUMN userobmpref_user_id SET default NULL;
+ALTER TABLE UserObmPref ADD COLUMN userobmpref_id serial;
+ALTER TABLE UserObmPref ADD PRIMARY KEY (userobmpref_id);
+ALTER TABLE DataSource ALTER COLUMN datasource_domain_id SET NOT NULL;
+ALTER TABLE Country ALTER COLUMN country_domain_id SET NOT NULL;
+ALTER TABLE Region ALTER COLUMN region_domain_id SET NOT NULL;
+ALTER TABLE CompanyType ALTER COLUMN companytype_domain_id SET NOT NULL;
+ALTER TABLE CompanyActivity ALTER COLUMN companyactivity_domain_id SET NOT NULL;
+ALTER TABLE CompanyNafCode ALTER COLUMN companynafcode_domain_id SET NOT NULL;
+ALTER TABLE Company ALTER COLUMN company_domain_id SET NOT NULL;
+ALTER TABLE Company ALTER COLUMN company_datasource_id SET default NULL;
+ALTER TABLE Contact ALTER COLUMN contact_domain_id SET NOT NULL;
+ALTER TABLE Contact ALTER COLUMN contact_datasource_id SET default NULL;
+ALTER TABLE EntityRight ADD COLUMN entityright_access INTEGER not null DEFAULT 0;
+ALTER TABLE Kind ALTER COLUMN kind_domain_id SET NOT NULL;
+ALTER TABLE ContactFunction ALTER COLUMN contactfunction_domain_id SET NOT NULL;
+ALTER TABLE LeadSource ALTER COLUMN leadsource_domain_id SET NOT NULL;
+ALTER TABLE LeadStatus ALTER COLUMN leadstatus_domain_id SET NOT NULL;
+ALTER TABLE Lead ALTER COLUMN lead_domain_id SET NOT NULL;
+ALTER TABLE Lead ALTER COLUMN lead_source_id SET default NULL;
+ALTER TABLE Lead ALTER COLUMN lead_manager_id SET default NULL;
+ALTER TABLE ParentDeal ALTER COLUMN parentdeal_domain_id SET NOT NULL;
+ALTER TABLE Deal ALTER COLUMN deal_domain_id SET NOT NULL;
+ALTER TABLE DealStatus ALTER COLUMN dealstatus_domain_id SET NOT NULL;
+ALTER TABLE DealType ALTER COLUMN dealtype_domain_id SET NOT NULL;
+ALTER TABLE DealCompanyRole ALTER COLUMN dealcompanyrole_domain_id SET NOT NULL;
+ALTER TABLE List ALTER COLUMN list_domain_id SET NOT NULL;
+ALTER TABLE Publication ALTER COLUMN publication_domain_id SET NOT NULL;
+ALTER TABLE PublicationType ALTER COLUMN publicationtype_domain_id SET NOT NULL;
+ALTER TABLE Subscription ALTER COLUMN subscription_domain_id SET NOT NULL;
+ALTER TABLE Document ALTER COLUMN document_domain_id SET NOT NULL;
+ALTER TABLE DocumentMimeType ALTER COLUMN documentmimetype_domain_id SET NOT NULL;
+ALTER TABLE Project ALTER COLUMN project_domain_id SET NOT NULL;
+ALTER TABLE ProjectTask ALTER COLUMN projecttask_parenttask_id SET default NULL;
+ALTER TABLE CV ALTER COLUMN cv_domain_id SET NOT NULL;
+ALTER TABLE DefaultOdtTemplate ALTER COLUMN defaultodttemplate_domain_id SET NOT NULL;
+ALTER TABLE TaskType ALTER COLUMN tasktype_domain_id SET NOT NULL;
+ALTER TABLE Contract ALTER COLUMN contract_domain_id SET NOT NULL;
+ALTER TABLE ContractType ALTER COLUMN contracttype_domain_id SET NOT NULL;
+ALTER TABLE ContractPriority ALTER COLUMN contractpriority_domain_id SET NOT NULL;
+ALTER TABLE ContractStatus ALTER COLUMN contractstatus_domain_id SET NOT NULL;
+ALTER TABLE Incident ALTER COLUMN incident_domain_id SET NOT NULL;
+ALTER TABLE Incident ALTER COLUMN incident_priority_id SET default NULL;
+ALTER TABLE Incident ALTER COLUMN incident_status_id SET default NULL;
+ALTER TABLE Incident ALTER COLUMN incident_resolutiontype_id SET default NULL;
+ALTER TABLE IncidentPriority ALTER COLUMN incidentpriority_domain_id SET NOT NULL;
+ALTER TABLE IncidentStatus ALTER COLUMN incidentstatus_domain_id SET NOT NULL;
+ALTER TABLE IncidentResolutionType ALTER COLUMN incidentresolutiontype_domain_id SET NOT NULL;
+ALTER TABLE Payment ALTER COLUMN payment_domain_id SET NOT NULL;
+ALTER TABLE PaymentKind ALTER COLUMN paymentkind_domain_id SET NOT NULL;
+ALTER TABLE Account ALTER COLUMN account_domain_id SET NOT NULL;
+ALTER TABLE UGroup ALTER COLUMN group_domain_id SET NOT NULL;
+ALTER TABLE OrganizationalChart ALTER COLUMN organizationalchart_domain_id SET NOT NULL;
+ALTER TABLE OGroup ALTER COLUMN ogroup_domain_id SET NOT NULL;
+ALTER TABLE OGroupLink ALTER COLUMN ogrouplink_domain_id SET NOT NULL;
+ALTER TABLE Import ALTER COLUMN import_domain_id SET NOT NULL;
+ALTER TABLE Import ALTER COLUMN import_datasource_id SET default NULL;
+ALTER TABLE Resource ALTER COLUMN resource_domain_id SET NOT NULL;
+ALTER TABLE RGroup ALTER COLUMN rgroup_domain_id SET NOT NULL;
+ALTER TABLE Host ALTER COLUMN host_domain_id SET NOT NULL;
+ALTER TABLE Samba ALTER COLUMN samba_domain_id SET NOT NULL;
+ALTER TABLE MailShare ALTER COLUMN mailshare_domain_id SET NOT NULL;
+ALTER TABLE MailShare ALTER COLUMN mailshare_mail_server_id SET default NULL;
+ALTER TABLE deal ALTER COLUMN deal_region_id DROP DEFAULT;
+ALTER TABLE deal ALTER COLUMN deal_region_id DROP NOT NULL;
+ALTER TABLE deal ALTER COLUMN deal_region_id SET DEFAULT NULL;
+ALTER TABLE deal ALTER COLUMN deal_source_id DROP DEFAULT;
+ALTER TABLE deal ALTER COLUMN deal_source_id DROP NOT NULL;
+ALTER TABLE deal ALTER COLUMN deal_source_id SET DEFAULT NULL;
+ALTER TABLE dealcompany ALTER COLUMN dealcompany_role_id DROP DEFAULT;
+ALTER TABLE dealcompany ALTER COLUMN dealcompany_role_id DROP NOT NULL;
+ALTER TABLE dealcompany ALTER COLUMN dealcompany_role_id SET DEFAULT NULL;
+ALTER TABLE contract ALTER COLUMN contract_priority_id DROP DEFAULT;
+ALTER TABLE contract ALTER COLUMN contract_priority_id DROP NOT NULL;
+ALTER TABLE contract ALTER COLUMN contract_priority_id SET DEFAULT NULL;
+ALTER TABLE contract ALTER COLUMN contract_status_id DROP DEFAULT;
+ALTER TABLE contract ALTER COLUMN contract_status_id DROP NOT NULL;
+ALTER TABLE contract ALTER COLUMN contract_status_id SET DEFAULT NULL;
+ALTER TABLE document ALTER COLUMN document_mimetype_id DROP DEFAULT;
+ALTER TABLE document ALTER COLUMN document_mimetype_id DROP NOT NULL;
+ALTER TABLE document ALTER COLUMN document_mimetype_id SET DEFAULT NULL;
+ALTER TABLE lead ALTER COLUMN lead_contact_id DROP DEFAULT;
+ALTER TABLE lead ALTER COLUMN lead_contact_id DROP NOT NULL;
+ALTER TABLE lead ALTER COLUMN lead_contact_id SET DEFAULT NULL;
+ALTER TABLE payment ALTER COLUMN payment_company_id DROP DEFAULT;
+ALTER TABLE payment ALTER COLUMN payment_company_id DROP NOT NULL;
+ALTER TABLE payment ALTER COLUMN payment_company_id SET DEFAULT NULL;
+ALTER TABLE payment ALTER COLUMN payment_paymentkind_id DROP DEFAULT;
+ALTER TABLE payment ALTER COLUMN payment_paymentkind_id DROP NOT NULL;
+ALTER TABLE payment ALTER COLUMN payment_paymentkind_id SET DEFAULT NULL;
+ALTER TABLE projectclosing ALTER COLUMN projectclosing_usercreate DROP DEFAULT;
+ALTER TABLE projectclosing ALTER COLUMN projectclosing_usercreate DROP NOT NULL;
+ALTER TABLE projectclosing ALTER COLUMN projectclosing_usercreate SET DEFAULT NULL;
+ALTER TABLE subscription ALTER COLUMN subscription_reception_id DROP DEFAULT;
+ALTER TABLE subscription ALTER COLUMN subscription_reception_id DROP NOT NULL;
+ALTER TABLE subscription ALTER COLUMN subscription_reception_id SET DEFAULT NULL;
+ALTER TABLE userobm ALTER COLUMN userobm_host_id DROP DEFAULT;
+ALTER TABLE userobm ALTER COLUMN userobm_host_id SET DEFAULT NULL;
+ALTER TABLE displaypref ALTER COLUMN display_user_id DROP DEFAULT;
+ALTER TABLE displaypref ALTER COLUMN display_user_id DROP NOT NULL;
+ALTER TABLE displaypref ALTER COLUMN display_user_id SET DEFAULT NULL;
+ALTER TABLE UGroup ALTER COLUMN group_manager_id DROP DEFAULT;
+ALTER TABLE UGroup ALTER COLUMN group_manager_id SET DEFAULT NULL;
+ALTER TABLE P_EntityRight ADD COLUMN entityright_access INTEGER not null DEFAULT 0;
+
+--  _________________
+-- | Updating values |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-- Global Domain
+INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
+UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
+UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
+
+
+-- Global Domain
+INSERT INTO P_Domain (domain_id, domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (CURRVAL('domain_domain_id_seq'), NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
+UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
+UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
+
+-- module 'profile'
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
+
+-- Timezone 
+INSERT INTO UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
+
+
+-- Default Profile properties
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('update_state', 'integer', 1, 1);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level', 'integer', 3);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level_managepeers', 'integer', 0);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('access_restriction', 'text', 'ALLOW_ALL');
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('admin_realm', 'text', '');
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('last_public_contact_export', 'timestamp', 0, 1);
+
+-- --------------------
+-- Entity tables update
+-- --------------------
 INSERT INTO TmpEntity (id_entity) SELECT account_id FROM Account;
 INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
 INSERT INTO AccountEntity (accountentity_entity_id, accountentity_account_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
@@ -1282,9 +1217,6 @@ INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity I
 INSERT INTO UserEntity (userentity_entity_id, userentity_user_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
 UPDATE TmpEntity SET id_entity = NULL;
 
-DROP TABLE TmpEntity;
-
-
 DELETE FROM EntityRight WHERE entityright_entity_id NOT IN (SELECT mailshare_id FROM MailShare) AND entityright_entity = 'mailshare';
 UPDATE EntityRight SET entityright_entity_id = (SELECT mailshareentity_entity_id FROM MailshareEntity INNER JOIN MailShare ON mailshareentity_mailshare_id = mailshare_id WHERE mailshare_id = entityright_entity_id), entityright_entity = 'entity' WHERE entityright_entity = 'mailshare'; 
 DELETE FROM EntityRight WHERE entityright_entity_id NOT IN (SELECT userobm_id FROM UserObm) AND entityright_entity = 'calendar';
@@ -1350,16 +1282,18 @@ UPDATE EventLink SET eventlink_entity_id = (SELECT resourceentity_entity_id FROM
 DELETE FROM EventLink where eventlink_entity != 'task';
 ALTER TABLE EventLink DROP COLUMN eventlink_entity;
 
--------------------------------------------------------------------------------
--- Default Profile properties
--------------------------------------------------------------------------------
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('update_state', 'integer', 1, 1);
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level', 'integer', 3);
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level_managepeers', 'integer', 0);
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('access_restriction', 'text', 'ALLOW_ALL');
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('admin_realm', 'text', '');
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('last_public_contact_export', 'timestamp', 0, 1);
+-- ------------------------------
+-- Prepare value for foreign keys
+-- ------------------------------
 
+-- Domain
+UPDATE UserObm SET userobm_domain_id = NULL WHERE userobm_domain_id = 0;
+UPDATE Host SET host_domain_id = NULL WHERE host_domain_id = 0;
+-- UserObm
+UPDATE UserObmPref SET userobmpref_user_id = NULL WHERE userobmpref_user_id = 0;
+UPDATE DisplayPref SET display_user_id = NULL WHERE display_user_id = 0;
+-- OGroup
+UPDATE OGroup SET ogroup_parent_id = NULL WHERE ogroup_parent_id = 0;
 
 -- Foreign key from account_domain_id to domain_id
 DELETE FROM Account WHERE account_domain_id NOT IN (SELECT domain_id FROM Domain) AND account_domain_id IS NOT NULL;
@@ -2553,17 +2487,103 @@ ALTER TABLE EntityRight ADD CONSTRAINT entityright_consumer_id_entity_id FOREIGN
 
 ALTER TABLE DocumentLink ADD CONSTRAINT documentlink_entity_id_entity_id_fkey FOREIGN KEY (documentlink_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
-ALTER TABLE OGroupLink ADD CONSTRAINT ogrouplink_entity_id_entity_id_fkey FOREIGN KEY (ogrouplink_entity_id) REFERENCES Entity (entity_id) ON DELETE SET NULL ON UPDATE CASCADE,
+ALTER TABLE OGroupLink ADD CONSTRAINT ogrouplink_entity_id_entity_id_fkey FOREIGN KEY (ogrouplink_entity_id) REFERENCES Entity (entity_id) ON DELETE SET NULL ON UPDATE CASCADE;
 
--- DATA
+ALTER TABLE AccountEntity ADD CONSTRAINT accountentity_account_id_account_id_fkey FOREIGN KEY (accountentity_account_id) REFERENCES Account (account_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE AccountEntity ADD CONSTRAINT accountentity_entity_id_entity_id_fkey FOREIGN KEY (accountentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- module 'profile'
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
+ALTER TABLE CvEntity ADD CONSTRAINT cventity_cv_id_cv_id_fkey FOREIGN KEY (cventity_cv_id) REFERENCES CV (cv_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE CvEntity ADD CONSTRAINT cventity_entity_id_entity_id_fkey FOREIGN KEY (cventity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- Timezone 
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
+ALTER TABLE CalendarEntity ADD CONSTRAINT calendarentity_calendar_id_calendar_id_fkey FOREIGN KEY (calendarentity_calendar_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE CalendarEntity ADD CONSTRAINT calendarentity_entity_id_entity_id_fkey FOREIGN KEY (calendarentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE CompanyEntity ADD CONSTRAINT companyentity_company_id_company_id_fkey FOREIGN KEY (companyentity_company_id) REFERENCES Company (company_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE CompanyEntity ADD CONSTRAINT companyentity_entity_id_entity_id_fkey FOREIGN KEY (companyentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
+ALTER TABLE ContactEntity ADD CONSTRAINT contactentity_contact_id_contact_id_fkey FOREIGN KEY (contactentity_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ContactEntity ADD CONSTRAINT contactentity_entity_id_entity_id_fkey FOREIGN KEY (contactentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ContractEntity ADD CONSTRAINT contractentity_contract_id_contract_id_fkey FOREIGN KEY (contractentity_contract_id) REFERENCES Contract (contract_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ContractEntity ADD CONSTRAINT contractentity_entity_id_entity_id_fkey FOREIGN KEY (contractentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE DealEntity ADD CONSTRAINT dealentity_deal_id_deal_id_fkey FOREIGN KEY (dealentity_deal_id) REFERENCES Deal (deal_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE DealEntity ADD CONSTRAINT dealentity_entity_id_entity_id_fkey FOREIGN KEY (dealentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE DefaultodttemplateEntity ADD CONSTRAINT defaultodttemplate_id_defaultodttemplate_id_fkey FOREIGN KEY (defaultodttemplateentity_defaultodttemplate_id) REFERENCES DefaultOdtTemplate (defaultodttemplate_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE DefaultodttemplateEntity ADD CONSTRAINT defaultodttemplateentity_entity_id_entity_id_fkey FOREIGN KEY (defaultodttemplateentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE DocumentEntity ADD CONSTRAINT documententity_document_id_document_id_fkey FOREIGN KEY (documententity_document_id) REFERENCES Document (document_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE DocumentEntity ADD CONSTRAINT documententity_entity_id_entity_id_fkey FOREIGN KEY (documententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE DomainEntity ADD CONSTRAINT domainentity_domain_id_domain_id_fkey FOREIGN KEY (domainentity_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE DomainEntity ADD CONSTRAINT domainentity_entity_id_entity_id_fkey FOREIGN KEY (domainentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE EventEntity ADD CONSTRAINT evententity_event_id_event_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES Event (event_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE EventEntity ADD CONSTRAINT evententity_entity_id_entity_id_fkey FOREIGN KEY (evententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE HostEntity ADD CONSTRAINT hostentity_host_id_host_id_fkey FOREIGN KEY (hostentity_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE HostEntity ADD CONSTRAINT hostentity_entity_id_entity_id_fkey FOREIGN KEY (hostentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ImportEntity ADD CONSTRAINT importentity_import_id_import_id_fkey FOREIGN KEY (importentity_import_id) REFERENCES Import (import_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ImportEntity ADD CONSTRAINT importentity_entity_id_entity_id_fkey FOREIGN KEY (importentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE IncidentEntity ADD CONSTRAINT incidententity_incident_id_incident_id_fkey FOREIGN KEY (incidententity_incident_id) REFERENCES Incident (incident_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE IncidentEntity ADD CONSTRAINT incidententity_entity_id_entity_id_fkey FOREIGN KEY (incidententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE InvoiceEntity ADD CONSTRAINT invoiceentity_invoice_id_invoice_id_fkey FOREIGN KEY (invoiceentity_invoice_id) REFERENCES Invoice (invoice_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE InvoiceEntity ADD CONSTRAINT invoiceentity_entity_id_entity_id_fkey FOREIGN KEY (invoiceentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE LeadEntity ADD CONSTRAINT leadentity_lead_id_lead_id_fkey FOREIGN KEY (leadentity_lead_id) REFERENCES Lead (lead_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE LeadEntity ADD CONSTRAINT leadentity_entity_id_entity_id_fkey FOREIGN KEY (leadentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ListEntity ADD CONSTRAINT listentity_list_id_list_id_fkey FOREIGN KEY (listentity_list_id) REFERENCES List (list_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ListEntity ADD CONSTRAINT listentity_entity_id_entity_id_fkey FOREIGN KEY (listentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE MailshareEntity ADD CONSTRAINT mailshareentity_mailshare_id_mailshare_id_fkey FOREIGN KEY (mailshareentity_mailshare_id) REFERENCES MailShare (mailshare_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE MailshareEntity ADD CONSTRAINT mailshareentity_entity_id_entity_id_fkey FOREIGN KEY (mailshareentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE MailboxEntity ADD CONSTRAINT mailboxentity_mailbox_id_mailbox_id_fkey FOREIGN KEY (mailboxentity_mailbox_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE MailboxEntity ADD CONSTRAINT mailboxentity_entity_id_entity_id_fkey FOREIGN KEY (mailboxentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE OgroupEntity ADD CONSTRAINT ogroupentity_ogroup_id_ogroup_id_fkey FOREIGN KEY (ogroupentity_ogroup_id) REFERENCES OGroup (ogroup_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE OgroupEntity ADD CONSTRAINT ogroupentity_entity_id_entity_id_fkey FOREIGN KEY (ogroupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ObmbookmarkEntity ADD CONSTRAINT obmbookmarkentity_obmbookmark_id_obmbookmark_id_fkey FOREIGN KEY (obmbookmarkentity_obmbookmark_id) REFERENCES ObmBookmark (obmbookmark_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ObmbookmarkEntity ADD CONSTRAINT obmbookmarkentity_entity_id_entity_id_fkey FOREIGN KEY (obmbookmarkentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE OrganizationalchartEntity ADD CONSTRAINT organizationalchart_id_organizationalchart_id_fkey FOREIGN KEY (organizationalchartentity_organizationalchart_id) REFERENCES OrganizationalChart (organizationalchart_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE OrganizationalchartEntity ADD CONSTRAINT organizationalchartentity_entity_id_entity_id_fkey FOREIGN KEY (organizationalchartentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ParentdealEntity ADD CONSTRAINT parentdealentity_parentdeal_id_parentdeal_id_fkey FOREIGN KEY (parentdealentity_parentdeal_id) REFERENCES ParentDeal (parentdeal_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ParentdealEntity ADD CONSTRAINT parentdealentity_entity_id_entity_id_fkey FOREIGN KEY (parentdealentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE PaymentEntity ADD CONSTRAINT paymententity_payment_id_payment_id_fkey FOREIGN KEY (paymententity_payment_id) REFERENCES Payment (payment_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE PaymentEntity ADD CONSTRAINT paymententity_entity_id_entity_id_fkey FOREIGN KEY (paymententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ProfileEntity ADD CONSTRAINT profileentity_profile_id_profile_id_fkey FOREIGN KEY (profileentity_profile_id) REFERENCES Profile (profile_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ProfileEntity ADD CONSTRAINT profileentity_entity_id_entity_id_fkey FOREIGN KEY (profileentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ProjectEntity ADD CONSTRAINT projectentity_project_id_project_id_fkey FOREIGN KEY (projectentity_project_id) REFERENCES Project (project_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ProjectEntity ADD CONSTRAINT projectentity_entity_id_entity_id_fkey FOREIGN KEY (projectentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE PublicationEntity ADD CONSTRAINT publicationentity_publication_id_publication_id_fkey FOREIGN KEY (publicationentity_publication_id) REFERENCES Publication (publication_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE PublicationEntity ADD CONSTRAINT publicationentity_entity_id_entity_id_fkey FOREIGN KEY (publicationentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ResourcegroupEntity ADD CONSTRAINT resourcegroupentity_resourcegroup_id_resourcegroup_id_fkey FOREIGN KEY (resourcegroupentity_resourcegroup_id) REFERENCES RGroup (rgroup_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ResourcegroupEntity ADD CONSTRAINT resourcegroupentity_entity_id_entity_id_fkey FOREIGN KEY (resourcegroupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE ResourceEntity ADD CONSTRAINT resourceentity_resource_id_resource_id_fkey FOREIGN KEY (resourceentity_resource_id) REFERENCES Resource (resource_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE ResourceEntity ADD CONSTRAINT resourceentity_entity_id_entity_id_fkey FOREIGN KEY (resourceentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE SubscriptionEntity ADD CONSTRAINT subscriptionentity_subscription_id_subscription_id_fkey FOREIGN KEY (subscriptionentity_subscription_id) REFERENCES Subscription (subscription_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE SubscriptionEntity ADD CONSTRAINT subscriptionentity_entity_id_entity_id_fkey FOREIGN KEY (subscriptionentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE GroupEntity ADD CONSTRAINT groupentity_group_id_group_id_fkey FOREIGN KEY (groupentity_group_id) REFERENCES UGroup (group_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE GroupEntity ADD CONSTRAINT groupentity_entity_id_entity_id_fkey FOREIGN KEY (groupentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE UserEntity ADD CONSTRAINT userentity_user_id_user_id_fkey FOREIGN KEY (userentity_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE UserEntity ADD CONSTRAINT userentity_entity_id_entity_id_fkey FOREIGN KEY (userentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Char to smallint
 ALTER TABLE userobm ALTER COLUMN userobm_archive DROP DEFAULT;
@@ -2614,4 +2634,12 @@ ALTER TABLE payment ALTER COLUMN payment_checked DROP DEFAULT;
 ALTER TABLE payment ALTER COLUMN payment_checked TYPE SMALLINT USING CASE payment_checked WHEN '1' THEN 1 ELSE 0 END;
 ALTER TABLE payment ALTER COLUMN payment_checked SET DEFAULT 0;
 
-
+--  _________________
+-- | Drop old tables |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+DROP TABLE DeletedCalendarEvent;
+DROP TABLE CalendarAlert;
+DROP TABLE CalendarException;
+DROP TABLE CalendarEvent;
+DROP TABLE CalendarCategory1;
+DROP TABLE TmpEntity;

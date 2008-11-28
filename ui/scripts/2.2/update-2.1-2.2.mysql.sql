@@ -1,9 +1,8 @@
+--  _________________
+-- | Tables creation |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 --
--- New table
---
-DROP TABLE IF EXISTS OBMTicket; 
---
--- Service
+-- Table structure for table `Service`
 --
 CREATE TABLE Service (
   service_id                                    int(8) NOT NULL auto_increment,
@@ -181,38 +180,69 @@ CREATE TABLE IM (
   KEY im_address (im_address)
 ) ;
 
+-- -------------------------------------
+-- Add tables structures around Profiles
+-- -------------------------------------
 --
--- Set integer to boolean when necessary
+-- Table structure for table `Profile`
 --
-
--- Domain
-ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
-ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
-ALTER TABLE Domain ADD COLUMN domain_mail_server_auto int(2) default NULL;
-
--- Global Domain
-INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
-UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
-UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
-
--- P_Domain
-ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
-ALTER TABLE P_Domain DROP COLUMN domain_mail_server_id;
-ALTER TABLE P_Domain ADD COLUMN domain_mail_server_auto int(2) default NULL;
--- Global Domain
-INSERT INTO P_Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
-UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
-UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
-
--- OGroup
-ALTER TABLE OGroup MODIFY COLUMN ogroup_parent_id int(8);
-
-
--- -----------------------------------------------------------------------------
+CREATE TABLE Profile (
+  profile_id int(8) NOT NULL auto_increment,
+  profile_domain_id int(8) NOT NULL,
+  profile_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  profile_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  profile_userupdate int(8) default NULL,
+  profile_usercreate int(8) default NULL,
+  profile_name varchar(64) default NULL,
+  PRIMARY KEY  (profile_id)
+);
 --
--- CalendarEvent + Todo to Event
+-- Table structure for table `ProfileModule`
 --
+CREATE TABLE ProfileModule (
+  profilemodule_id int(8) NOT NULL auto_increment,
+  profilemodule_domain_id int(8) NOT NULL,
+  profilemodule_profile_id int(8) default NULL,
+  profilemodule_module_name varchar(64) NOT NULL default '',
+  profilemodule_right int(2) default NULL,
+  PRIMARY KEY (profilemodule_id)
+);
+--
+-- Table structure for table `ProfileSection`
+--
+CREATE TABLE ProfileSection (
+  profilesection_id int(8) NOT NULL auto_increment,
+  profilesection_domain_id int(8) NOT NULL,
+  profilesection_profile_id int(8) default NULL,
+  profilesection_section_name varchar(64) NOT NULL default '',
+  profilesection_show tinyint(1) default NULL,
+  PRIMARY KEY (profilesection_id)
+);
+--
+-- Table structure for table `ProfileProperty`
+--
+CREATE TABLE ProfileProperty (
+  profileproperty_id int(8) NOT NULL auto_increment,
+  profileproperty_type varchar(32) default NULL,
+  profileproperty_default text default NULL,
+  profileproperty_readonly int(1) default '0',
+  profileproperty_name varchar(32) NOT NULL default '',
+  PRIMARY KEY (profileproperty_id)
+);
+--
+-- Table structure for table `ProfilePropertyValue`
+--
+CREATE TABLE ProfilePropertyValue (
+  profilepropertyvalue_id int(8) NOT NULL auto_increment,
+  profilepropertyvalue_profile_id int(8) default NULL,
+  profilepropertyvalue_property_id int(8) default NULL,
+  profilepropertyvalue_property_value text NOT NULL default '',
+  PRIMARY KEY (profilepropertyvalue_id)
+);
 
+--  _______________
+-- | CalendarEvent |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 -- Event Creation
 CREATE TABLE Event (
   event_id              int(8) NOT NULL auto_increment,
@@ -253,145 +283,67 @@ CREATE TABLE Event (
   KEY event_category1_id_eventcategory1_id_fkey (event_category1_id)
 );
 
--- Clean CalendarEvent before migration to Event
--- Foreign key domain_id
-DELETE FROM CalendarEvent WHERE calendarevent_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarevent_domain_id IS NOT NULL;
--- Foreign key from calendarevent_userupdate to userobm_id
-UPDATE CalendarEvent SET calendarevent_userupdate = NULL WHERE calendarevent_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_userupdate IS NOT NULL;
--- Foreign key from calendarevent_usercreate to userobm_id
-UPDATE CalendarEvent SET calendarevent_usercreate = NULL WHERE calendarevent_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_usercreate IS NOT NULL;
--- Foreign key from calendarevent_owner to userobm_id
-DELETE FROM CalendarEvent WHERE calendarevent_owner NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_owner IS NOT NULL;
--- Foreign key from calendarevent_category1_id to calendarcategory1_id
-UPDATE CalendarEvent SET calendarevent_category1_id = NULL WHERE calendarevent_category1_id NOT IN (SELECT calendarcategory1_id FROM CalendarCategory1) AND calendarevent_category1_id IS NOT NULL;
+-- Table EventAlert
+CREATE TABLE EventAlert (
+  eventalert_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  eventalert_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  eventalert_userupdate int(8) default NULL,
+  eventalert_usercreate int(8) default NULL,
+  eventalert_event_id   int(8) default NULL,
+  eventalert_user_id    int(8) default NULL,
+  eventalert_duration   int(8) NOT NULL default 0,
+  KEY idx_eventalert_user (eventalert_user_id),
+  KEY eventalert_event_id_event_id_fkey (eventalert_event_id),
+  KEY eventalert_userupdate_userobm_id_fkey (eventalert_userupdate),
+  KEY eventalert_usercreate_userobm_id_fkey (eventalert_usercreate)
+);
 
+-- Table EventException
+CREATE TABLE EventException (
+  eventexception_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  eventexception_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  eventexception_userupdate int(8) default NULL,
+  eventexception_usercreate int(8) default NULL,
+  eventexception_event_id   int(8) NOT NULL,
+  eventexception_date       datetime NOT NULL,
+  PRIMARY KEY (eventexception_event_id,eventexception_date),
+  KEY eventexception_userupdate_userobm_id_fkey (eventexception_userupdate),
+  KEY eventexception_usercreate_userobm_id_fkey (eventexception_usercreate)
+);
 
-INSERT INTO Event (event_id,
-  event_domain_id, 
-  event_timeupdate,
-  event_timecreate,
-  event_userupdate,
-  event_usercreate,
-  event_ext_id,
-  event_type,
-  event_origin,
-  event_owner,
-  event_timezone,
-  event_opacity,
-  event_title,
-  event_location,
-  event_category1_id,
-  event_priority,
-  event_privacy,
-  event_date,
-  event_duration,
-  event_allday,
-  event_repeatkind,
-  event_repeatfrequence,
-  event_repeatdays,
-  event_endrepeat,
-  event_color,
-  event_completed,
-  event_url,
-  event_description,
-  event_properties)
-SELECT
-  calendarevent_id,
-  calendarevent_domain_id, 
-  calendarevent_timeupdate,
-  calendarevent_timecreate,
-  calendarevent_userupdate,
-  calendarevent_usercreate,
-  calendarevent_ext_id,
-  'VEVENT',
-  'migration',
-  calendarevent_owner,
-  'Europe/Paris',
-  'OPAQUE',
-  calendarevent_title,
-  calendarevent_location,
-  calendarevent_category1_id,
-  calendarevent_priority,
-  calendarevent_privacy,
-  calendarevent_date,
-  calendarevent_duration,
-  calendarevent_allday,
-  calendarevent_repeatkind,
-  calendarevent_repeatfrequence,
-  calendarevent_repeatdays,
-  calendarevent_endrepeat,
-  calendarevent_color,
-  NULL,
-  NULL,
-  calendarevent_description,
-  calendarevent_properties
-FROM CalendarEvent;
+-- Table EventCategory1
+CREATE TABLE EventCategory1 (
+  eventcategory1_id int(8) NOT NULL auto_increment,
+  eventcategory1_domain_id int(8) NOT NULL,
+  eventcategory1_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  eventcategory1_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  eventcategory1_userupdate int(8) default NULL,
+  eventcategory1_usercreate int(8) default NULL,
+  eventcategory1_code varchar(10) default '',
+  eventcategory1_label varchar(128) default NULL,
+  eventcategory1_color char(6) default NULL,
+  PRIMARY KEY (eventcategory1_id),
+  KEY eventcategory1_domain_id_domain_id_fkey (eventcategory1_domain_id),
+  KEY eventcategory1_userupdate_userobm_id_fkey (eventcategory1_userupdate),
+  KEY eventcategory1_usercreate_userobm_id_fkey (eventcategory1_usercreate)
+) ;
 
--- Clean Todo before migration to Event
--- Foreign key from todo_domain_id to domain_id
-DELETE FROM Todo WHERE todo_domain_id NOT IN (SELECT domain_id FROM Domain) AND todo_domain_id IS NOT NULL;
--- Foreign key from todo_user to userobm_id
-DELETE FROM Todo WHERE todo_user NOT IN (SELECT userobm_id FROM UserObm) AND todo_user IS NOT NULL;
--- Foreign key from todo_userupdate to userobm_id
-UPDATE Todo SET todo_userupdate = NULL WHERE todo_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND todo_userupdate IS NOT NULL;
--- Foreign key from todo_usercreate to userobm_id
-UPDATE Todo SET todo_usercreate = NULL WHERE todo_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND todo_usercreate IS NOT NULL;
+-- Table `DeletedEvent`
+CREATE TABLE DeletedEvent (
+  deletedevent_id        int(8) NOT NULL auto_increment,
+  deletedevent_event_id  int(8) default NULL,
+  deletedevent_user_id   int(8) default NULL,
+  deletedevent_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY (deletedevent_id),
+  KEY idx_dce_event (deletedevent_event_id),
+  KEY idx_dce_user (deletedevent_user_id)
+);
 
-INSERT INTO Event (
-  event_domain_id, 
-  event_timeupdate,
-  event_timecreate,
-  event_userupdate,
-  event_usercreate,
-  event_type,
-  event_origin,
-  event_owner,
-  event_timezone,
-  event_opacity,
-  event_title,
-  event_priority,
-  event_privacy,
-  event_date,
-  event_duration,
-  event_allday,
-  event_repeatkind,
-  event_repeatfrequence,
-  event_repeatdays,
-  event_endrepeat,
-  event_color,
-  event_completed,
-  event_url,
-  event_description)
-SELECT
-  todo_domain_id,
-  todo_timeupdate,
-  todo_timecreate,
-  todo_userupdate,
-  todo_usercreate,
-  'VTODO',
-  'migration',
-  todo_user,
-  'Europe/Paris',
-  'OPAQUE',
-  todo_title,
-  todo_priority,
-  todo_privacy,
-  todo_deadline,
-  3600,
-  FALSE,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  todo_deadline,
-  NULL,
-  todo_content
-FROM Todo;
-
-
--- Table EventEntity
-
+--  _______________
+-- | Entity tables |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-- Modification of table EventEntity before rename it to EventLink
+--
 ALTER TABLE EventEntity ADD COLUMN evententity_state2 enum('NEEDS-ACTION', 'ACCEPTED', 'DECLINED', 'TENTATIVE', 'DELEGATED', 'COMPLETED', 'IN-PROGRESS') default 'NEEDS-ACTION';
 UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state!='A' AND evententity_state!='W' AND evententity_state!='R';
 UPDATE EventEntity set evententity_state2 = 'ACCEPTED' where evententity_state='A';
@@ -425,199 +377,11 @@ ALTER TABLE EventLink CHANGE COLUMN evententity_entity eventlink_entity varchar(
 ALTER TABLE EventLink CHANGE COLUMN evententity_state eventlink_state enum('NEEDS-ACTION','ACCEPTED','DECLINED','TENTATIVE','DELEGATED','COMPLETED','IN-PROGRESS') default 'NEEDS-ACTION';
 ALTER TABLE EventLink CHANGE COLUMN evententity_required eventlink_required enum('CHAIR','REQ','OPT','NON') default 'REQ';
 ALTER TABLE EventLink CHANGE COLUMN evententity_percent eventlink_percent int(3) default '0';
--- Table EventAlert
 
-CREATE TABLE EventAlert (
-  eventalert_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  eventalert_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
-  eventalert_userupdate int(8) default NULL,
-  eventalert_usercreate int(8) default NULL,
-  eventalert_event_id   int(8) default NULL,
-  eventalert_user_id    int(8) default NULL,
-  eventalert_duration   int(8) NOT NULL default 0,
-  KEY idx_eventalert_user (eventalert_user_id),
-  KEY eventalert_event_id_event_id_fkey (eventalert_event_id),
-  KEY eventalert_userupdate_userobm_id_fkey (eventalert_userupdate),
-  KEY eventalert_usercreate_userobm_id_fkey (eventalert_usercreate)
-);
-
--- Clean CalendarAlert before migration to EventAlert
--- Foreign key from calendaralert_event_id to event_id
-DELETE FROM CalendarAlert WHERE calendaralert_event_id NOT IN (SELECT event_id FROM Event) AND calendaralert_event_id IS NOT NULL;
-
--- Foreign key from calendaralert_user_id to userobm_id
-DELETE FROM CalendarAlert WHERE calendaralert_user_id NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_user_id IS NOT NULL;
-
--- Foreign key from calendaralert_userupdate to userobm_id
-UPDATE CalendarAlert SET calendaralert_userupdate = NULL WHERE calendaralert_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_userupdate IS NOT NULL;
-
--- Foreign key from calendaralert_usercreate to userobm_id
-UPDATE CalendarAlert SET calendaralert_usercreate = NULL WHERE calendaralert_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_usercreate IS NOT NULL;
-
-
-INSERT INTO EventAlert (eventalert_timeupdate,
-  eventalert_timecreate,
-  eventalert_userupdate,
-  eventalert_usercreate,
-  eventalert_event_id,
-  eventalert_user_id,
-  eventalert_duration)
-SELECT
-  calendaralert_timeupdate,
-  calendaralert_timecreate,
-  calendaralert_userupdate,
-  calendaralert_usercreate,
-  calendaralert_event_id,
-  calendaralert_user_id,
-  calendaralert_duration
-FROM CalendarAlert;
-
-
--- Table EventException
-
-CREATE TABLE EventException (
-  eventexception_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  eventexception_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
-  eventexception_userupdate int(8) default NULL,
-  eventexception_usercreate int(8) default NULL,
-  eventexception_event_id   int(8) NOT NULL,
-  eventexception_date       datetime NOT NULL,
-  PRIMARY KEY (eventexception_event_id,eventexception_date),
-  KEY eventexception_userupdate_userobm_id_fkey (eventexception_userupdate),
-  KEY eventexception_usercreate_userobm_id_fkey (eventexception_usercreate)
-);
--- Clean CalendarException before migration to EventException
--- Foreign key from calendarexception_event_id to event_id
-DELETE FROM CalendarException WHERE calendarexception_event_id NOT IN (SELECT event_id FROM Event) AND calendarexception_event_id IS NOT NULL;
-
--- Foreign key from calendarexception_userupdate to userobm_id
-UPDATE CalendarException SET calendarexception_userupdate = NULL WHERE calendarexception_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_userupdate IS NOT NULL;
-
--- Foreign key from calendarexception_usercreate to userobm_id
-UPDATE CalendarException SET calendarexception_usercreate = NULL WHERE calendarexception_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_usercreate IS NOT NULL;
-
-
-INSERT INTO EventException (eventexception_timeupdate,
-  eventexception_timecreate,
-  eventexception_userupdate,
-  eventexception_usercreate,
-  eventexception_event_id,
-  eventexception_date)
-SELECT
-  calendarexception_timeupdate,
-  calendarexception_timecreate,
-  calendarexception_userupdate,
-  calendarexception_usercreate,
-  calendarexception_event_id,
-  calendarexception_date
-FROM CalendarException;
-
-
--- Table EventCategory1
-
-CREATE TABLE EventCategory1 (
-  eventcategory1_id int(8) NOT NULL auto_increment,
-  eventcategory1_domain_id int(8) NOT NULL,
-  eventcategory1_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  eventcategory1_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
-  eventcategory1_userupdate int(8) default NULL,
-  eventcategory1_usercreate int(8) default NULL,
-  eventcategory1_code varchar(10) default '',
-  eventcategory1_label varchar(128) default NULL,
-  eventcategory1_color char(6) default NULL,
-  PRIMARY KEY (eventcategory1_id),
-  KEY eventcategory1_domain_id_domain_id_fkey (eventcategory1_domain_id),
-  KEY eventcategory1_userupdate_userobm_id_fkey (eventcategory1_userupdate),
-  KEY eventcategory1_usercreate_userobm_id_fkey (eventcategory1_usercreate)
-) ;
-
--- Clean CalendarCategory1 before migration to EventCategory1
--- Foreign key from calendarcategory1_domain_id to domain_id
-DELETE FROM CalendarCategory1 WHERE calendarcategory1_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarcategory1_domain_id IS NOT NULL;
-
--- Foreign key from calendarcategory1_userupdate to userobm_id
-UPDATE CalendarCategory1 SET calendarcategory1_userupdate = NULL WHERE calendarcategory1_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_userupdate IS NOT NULL;
-
--- Foreign key from calendarcategory1_usercreate to userobm_id
-UPDATE CalendarCategory1 SET calendarcategory1_usercreate = NULL WHERE calendarcategory1_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_usercreate IS NOT NULL;
-
-
-INSERT INTO EventCategory1 (
-  eventcategory1_id,
-  eventcategory1_domain_id,
-  eventcategory1_timeupdate,
-  eventcategory1_timecreate,
-  eventcategory1_userupdate,
-  eventcategory1_usercreate,
-  eventcategory1_code,
-  eventcategory1_label,
-  eventcategory1_color)
-SELECT
-  calendarcategory1_id,
-  calendarcategory1_domain_id,
-  calendarcategory1_timeupdate,
-  calendarcategory1_timecreate,
-  calendarcategory1_userupdate,
-  calendarcategory1_usercreate,
-  calendarcategory1_code,
-  calendarcategory1_label,
-  calendarcategory1_color
-FROM CalendarCategory1;
-
-
---
--- Table `DeletedEvent`
---
-
-CREATE TABLE DeletedEvent (
-  deletedevent_id        int(8) NOT NULL auto_increment,
-  deletedevent_event_id  int(8) default NULL,
-  deletedevent_user_id   int(8) default NULL,
-  deletedevent_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY (deletedevent_id),
-  KEY idx_dce_event (deletedevent_event_id),
-  KEY idx_dce_user (deletedevent_user_id)
-);
-INSERT INTO DeletedEvent (deletedevent_id,
-  deletedevent_event_id,
-  deletedevent_user_id,
-  deletedevent_timestamp)
-SELECT
-  deletedcalendarevent_id,
-  deletedcalendarevent_event_id,
-  deletedcalendarevent_user_id,
-  deletedcalendarevent_timestamp
-FROM DeletedCalendarEvent;
-
-
-DROP Table DeletedCalendarEvent;
-DROP Table CalendarAlert;
-DROP Table CalendarException;
-DROP Table CalendarEvent;
-DROP Table CalendarCategory1;
--- -----------------------------------------------------------------------------
-
-
--- AliaSource specific database errors ?!
--- DROP TABLE IF EXISTS CalendarSegment;
--- DROP TABLE IF EXISTS Entry;
--- DROP TABLE IF EXISTS EntryType;
--- DROP TABLE IF EXISTS SubscriptionRenewal;
--- ALTER TABLE Company DROP COLUMN company_nafcode;
--- ALTER TABLE UserObm DROP COLUMN userobm_contact_id;
--- ALTER TABLE P_UserObm DROP COLUMN userobm_contact_id;
-
-
--- Preferences
-ALTER TABLE DisplayPref DROP PRIMARY KEY;
-ALTER TABLE DisplayPref ADD COLUMN display_id int(8) auto_increment PRIMARY KEY FIRST;
-
--- Contact
-ALTER TABLE Contact ADD COLUMN contact_birthday_id int(8) default NULL;
-ALTER TABLE Contact ADD COLUMN contact_collected int(1) default false;
-ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
-UPDATE Contact SET contact_origin='obm21';
-ALTER TABLE Contact MODIFY COLUMN contact_origin VARCHAR(255) NOT NULL;
+ALTER TABLE DocumentEntity RENAME TO DocumentLink;
+ALTER TABLE DocumentLink CHANGE COLUMN documententity_document_id documentlink_document_id int(8) NOT NULL;
+ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity_id documentlink_entity_id int(8) NOT NULL;
+ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity documentlink_entity varchar(255) NOT NULL;
 
 ALTER TABLE OGroupEntity RENAME TO OGroupLink;
 ALTER TABLE OGroupLink CHANGE COLUMN ogroupentity_id ogrouplink_id int(8) NOT NULL auto_increment;
@@ -629,212 +393,6 @@ ALTER TABLE OGroupLink CHANGE COLUMN ogroupentity_usercreate ogrouplink_usercrea
 ALTER TABLE OGroupLink CHANGE COLUMN ogroupentity_ogroup_id ogrouplink_ogroup_id int(8) NOT NULL;
 ALTER TABLE OGroupLink CHANGE COLUMN ogroupentity_entity_id ogrouplink_entity_id int(8) NOT NULL;
 ALTER TABLE OGroupLink CHANGE COLUMN ogroupentity_entity ogrouplink_entity varchar(255) NOT NULL;
-
-ALTER TABLE DocumentEntity RENAME TO DocumentLink;
-ALTER TABLE DocumentLink CHANGE COLUMN documententity_document_id documentlink_document_id int(8) NOT NULL;
-ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity_id documentlink_entity_id int(8) NOT NULL;
-ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity documentlink_entity varchar(255) NOT NULL;
-
-
-
--- Set Defaults 
-ALTER TABLE Account MODIFY COLUMN account_domain_id int(8) NOT NULL ;
-ALTER TABLE CV MODIFY COLUMN cv_domain_id int(8) NOT NULL ;
-ALTER TABLE CategoryLink MODIFY COLUMN categorylink_category_id int(8) NOT NULL ;
-ALTER TABLE CategoryLink MODIFY COLUMN categorylink_entity_id int(8) NOT NULL ;
-ALTER TABLE Company MODIFY COLUMN company_domain_id int(8) NOT NULL ;
-ALTER TABLE Company MODIFY COLUMN company_datasource_id int(8)  default NULL;
-ALTER TABLE CompanyActivity MODIFY COLUMN companyactivity_domain_id int(8) NOT NULL ;
-ALTER TABLE CompanyNafCode MODIFY COLUMN companynafcode_domain_id int(8) NOT NULL ;
-ALTER TABLE CompanyType MODIFY COLUMN companytype_domain_id int(8) NOT NULL ;
-ALTER TABLE Contact MODIFY COLUMN contact_domain_id int(8) NOT NULL ;
-ALTER TABLE Contact MODIFY COLUMN contact_datasource_id int(8)  default NULL;
-ALTER TABLE ContactFunction MODIFY COLUMN contactfunction_domain_id int(8) NOT NULL ;
-ALTER TABLE ContactList MODIFY COLUMN contactlist_list_id int(8) NOT NULL ;
-ALTER TABLE ContactList MODIFY COLUMN contactlist_contact_id int(8) NOT NULL ;
-ALTER TABLE Contract MODIFY COLUMN contract_domain_id int(8) NOT NULL ;
-ALTER TABLE ContractPriority MODIFY COLUMN contractpriority_domain_id int(8) NOT NULL ;
-ALTER TABLE ContractStatus MODIFY COLUMN contractstatus_domain_id int(8) NOT NULL ;
-ALTER TABLE ContractType MODIFY COLUMN contracttype_domain_id int(8) NOT NULL ;
-ALTER TABLE Country MODIFY COLUMN country_domain_id int(8) NOT NULL ;
-ALTER TABLE DataSource MODIFY COLUMN datasource_domain_id int(8) NOT NULL ;
-ALTER TABLE Deal MODIFY COLUMN deal_domain_id int(8) NOT NULL ;
-ALTER TABLE Deal MODIFY COLUMN deal_company_id int(8) NOT NULL ;
-ALTER TABLE DealCompanyRole MODIFY COLUMN dealcompanyrole_domain_id int(8) NOT NULL ;
-ALTER TABLE DealStatus MODIFY COLUMN dealstatus_domain_id int(8) NOT NULL ;
-ALTER TABLE DealType MODIFY COLUMN dealtype_domain_id int(8) NOT NULL ;
-ALTER TABLE DefaultOdtTemplate MODIFY COLUMN defaultodttemplate_domain_id int(8) NOT NULL ;
-ALTER TABLE DeletedContact MODIFY COLUMN deletedcontact_contact_id int(8) NOT NULL ;
-ALTER TABLE DeletedTodo MODIFY COLUMN deletedtodo_todo_id int(8) NOT NULL;
-ALTER TABLE DeletedUser MODIFY COLUMN deleteduser_user_id int(8) NOT NULL ;
-ALTER TABLE Document MODIFY COLUMN document_domain_id int(8) NOT NULL ;
-ALTER TABLE DocumentMimeType MODIFY COLUMN documentmimetype_domain_id int(8) NOT NULL ;
-ALTER TABLE DomainMailServer MODIFY COLUMN domainmailserver_domain_id int(8) NOT NULL ;
-ALTER TABLE EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
-ALTER TABLE EntityRight ADD entityright_access int(1) NOT NULL default 0;
-ALTER TABLE EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
-ALTER TABLE EventLink MODIFY COLUMN eventlink_event_id int(8) NOT NULL ;
-ALTER TABLE EventLink MODIFY COLUMN eventlink_entity_id int(8) NOT NULL ;
-ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
-ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_child_id int(8) NOT NULL ;
-ALTER TABLE Host MODIFY COLUMN host_domain_id int(8) NOT NULL ;
-ALTER TABLE `Import` MODIFY COLUMN import_domain_id int(8) NOT NULL ;
-ALTER TABLE `Import` MODIFY COLUMN import_datasource_id int(8)  default NULL;
-ALTER TABLE Incident MODIFY COLUMN incident_domain_id int(8) NOT NULL ;
-ALTER TABLE Incident MODIFY COLUMN incident_priority_id int(8)  default NULL;
-ALTER TABLE Incident MODIFY COLUMN incident_status_id int(8)  default NULL;
-ALTER TABLE Incident MODIFY COLUMN incident_resolutiontype_id int(11)  default NULL;
-ALTER TABLE IncidentPriority MODIFY COLUMN incidentpriority_domain_id int(8) NOT NULL ;
-ALTER TABLE IncidentResolutionType MODIFY COLUMN incidentresolutiontype_domain_id int(8) NOT NULL ;
-ALTER TABLE IncidentStatus MODIFY COLUMN incidentstatus_domain_id int(8) NOT NULL ;
-ALTER TABLE Invoice MODIFY COLUMN invoice_domain_id int(8) NOT NULL ;
-ALTER TABLE Invoice MODIFY COLUMN invoice_status_id int(4) NOT NULL ;
-ALTER TABLE Kind MODIFY COLUMN kind_domain_id int(8) NOT NULL ;
-ALTER TABLE Lead MODIFY COLUMN lead_domain_id int(8) NOT NULL ;
-ALTER TABLE Lead MODIFY COLUMN lead_company_id int(8) NOT NULL ;
-ALTER TABLE LeadSource MODIFY COLUMN leadsource_domain_id int(8) NOT NULL ;
-ALTER TABLE LeadStatus MODIFY COLUMN leadstatus_domain_id int(8) NOT NULL ;
-ALTER TABLE List MODIFY COLUMN list_domain_id int(8) NOT NULL ;
-ALTER TABLE MailServer MODIFY COLUMN mailserver_host_id int(8) NOT NULL ;
-ALTER TABLE MailServerNetwork MODIFY COLUMN mailservernetwork_host_id int(8) NOT NULL ;
-ALTER TABLE MailShare MODIFY COLUMN mailshare_domain_id int(8) NOT NULL ;
-ALTER TABLE MailShare MODIFY COLUMN mailshare_mail_server_id int(8)  default NULL;
-ALTER TABLE OGroup MODIFY COLUMN ogroup_domain_id int(8) NOT NULL ;
-ALTER TABLE OGroupLink MODIFY COLUMN ogrouplink_domain_id int(8) NOT NULL ;
-ALTER TABLE OrganizationalChart MODIFY COLUMN organizationalchart_domain_id int(8) NOT NULL ;
-ALTER TABLE P_EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
-ALTER TABLE P_EntityRight ADD entityright_access int(1) NOT NULL default 0;
-ALTER TABLE P_EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
-ALTER TABLE P_GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
-ALTER TABLE P_GroupGroup MODIFY COLUMN groupgroup_child_id int(8) NOT NULL ;
-ALTER TABLE P_Host MODIFY COLUMN host_domain_id int(8) NOT NULL ;
-ALTER TABLE P_MailServer MODIFY COLUMN mailserver_host_id int(8) NOT NULL ;
-ALTER TABLE P_MailServerNetwork MODIFY COLUMN mailservernetwork_host_id int(8) NOT NULL ;
-ALTER TABLE P_MailShare MODIFY COLUMN mailshare_domain_id int(8) NOT NULL ;
-ALTER TABLE P_MailShare MODIFY COLUMN mailshare_mail_server_id int(8)  default NULL;
-ALTER TABLE P_Samba MODIFY COLUMN samba_domain_id int(8) NOT NULL ;
-ALTER TABLE P_UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
-ALTER TABLE P_UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
-ALTER TABLE P_UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
-ALTER TABLE P_of_usergroup MODIFY COLUMN of_usergroup_group_id int(8) NOT NULL ;
-ALTER TABLE P_of_usergroup MODIFY COLUMN of_usergroup_user_id int(8) NOT NULL ;
-ALTER TABLE ParentDeal MODIFY COLUMN parentdeal_domain_id int(8) NOT NULL ;
-ALTER TABLE Payment MODIFY COLUMN payment_domain_id int(8) NOT NULL ;
-ALTER TABLE PaymentKind MODIFY COLUMN paymentkind_domain_id int(8) NOT NULL ;
-ALTER TABLE Project MODIFY COLUMN project_domain_id int(8) NOT NULL ;
-ALTER TABLE ProjectTask MODIFY COLUMN projecttask_parenttask_id int(8)  default NULL;
-ALTER TABLE Publication MODIFY COLUMN publication_domain_id int(8) NOT NULL ;
-ALTER TABLE PublicationType MODIFY COLUMN publicationtype_domain_id int(8) NOT NULL ;
-ALTER TABLE RGroup MODIFY COLUMN rgroup_domain_id int(8) NOT NULL ;
-ALTER TABLE Region MODIFY COLUMN region_domain_id int(8) NOT NULL ;
-ALTER TABLE Resource MODIFY COLUMN resource_domain_id int(8) NOT NULL ;
-ALTER TABLE ResourceGroup MODIFY COLUMN resourcegroup_rgroup_id int(8) NOT NULL ;
-ALTER TABLE ResourceGroup MODIFY COLUMN resourcegroup_resource_id int(8) NOT NULL ;
-ALTER TABLE ResourceItem MODIFY COLUMN resourceitem_domain_id int(8) NOT NULL ;
-ALTER TABLE ResourceType MODIFY COLUMN resourcetype_domain_id int(8) NOT NULL ;
-ALTER TABLE Samba MODIFY COLUMN samba_domain_id int(8) NOT NULL ;
-ALTER TABLE Subscription MODIFY COLUMN subscription_domain_id int(8) NOT NULL ;
-ALTER TABLE SubscriptionReception MODIFY COLUMN subscriptionreception_domain_id int(8) NOT NULL ;
-ALTER TABLE TaskType MODIFY COLUMN tasktype_domain_id int(8) NOT NULL ;
-ALTER TABLE UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
-ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
-ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
-ALTER TABLE UserObmPref MODIFY COLUMN userobmpref_user_id int(8) NULL ;
-ALTER TABLE UserObmPref ADD COLUMN userobmpref_id int(8) NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (userobmpref_id);
-ALTER TABLE of_usergroup MODIFY COLUMN of_usergroup_group_id int(8) NOT NULL ;
-ALTER TABLE of_usergroup MODIFY COLUMN of_usergroup_user_id int(8) NOT NULL ;
-ALTER TABLE Category MODIFY COLUMN category_usercreate int(8) DEFAULT NULL;
-ALTER TABLE Category MODIFY COLUMN category_userupdate int(8) DEFAULT NULL;
-ALTER TABLE Deal MODIFY COLUMN deal_region_id int(8) DEFAULT NULL;
-ALTER TABLE Deal MODIFY COLUMN deal_source_id int(8) DEFAULT NULL;
-ALTER TABLE DealCompany MODIFY COLUMN dealcompany_role_id int(8) DEFAULT NULL;
-ALTER TABLE Contract MODIFY COLUMN contract_priority_id int(8) DEFAULT NULL;
-ALTER TABLE Contract MODIFY COLUMN contract_status_id int(8) DEFAULT NULL;
-ALTER TABLE Document MODIFY COLUMN document_mimetype_id int(8) DEFAULT NULL;
-ALTER TABLE Lead MODIFY COLUMN lead_contact_id int(8) DEFAULT NULL;
-ALTER TABLE Payment MODIFY COLUMN payment_company_id int(8) DEFAULT NULL;
-ALTER TABLE DisplayPref MODIFY COLUMN display_user_id int(8) DEFAULT NULL;
-ALTER TABLE Payment MODIFY COLUMN payment_paymentkind_id int(8) DEFAULT NULL;
-ALTER TABLE ProjectClosing MODIFY COLUMN projectclosing_usercreate int(8) DEFAULT NULL;
-ALTER TABLE Subscription MODIFY COLUMN subscription_reception_id int(8) DEFAULT NULL;
-ALTER TABLE UserObm MODIFY COLUMN userobm_host_id int(8) DEFAULT NULL;
-ALTER TABLE UGroup MODIFY COLUMN group_manager_id int(8) DEFAULT NULL;
-
---
--- Add tables structures around Profiles
---
-
---
--- Table structure for table `Profile`
---
-
-CREATE TABLE Profile (
-  profile_id int(8) NOT NULL auto_increment,
-  profile_domain_id int(8) NOT NULL,
-  profile_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  profile_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
-  profile_userupdate int(8) default NULL,
-  profile_usercreate int(8) default NULL,
-  profile_name varchar(64) default NULL,
-  PRIMARY KEY  (profile_id)
-);
---
--- Table structure for table `ProfileModule`
---
-
-CREATE TABLE ProfileModule (
-  profilemodule_id int(8) NOT NULL auto_increment,
-  profilemodule_domain_id int(8) NOT NULL,
-  profilemodule_profile_id int(8) default NULL,
-  profilemodule_module_name varchar(64) NOT NULL default '',
-  profilemodule_right int(2) default NULL,
-  PRIMARY KEY (profilemodule_id)
-);
---
--- Table structure for table `ProfileSection`
---
-
-CREATE TABLE ProfileSection (
-  profilesection_id int(8) NOT NULL auto_increment,
-  profilesection_domain_id int(8) NOT NULL,
-  profilesection_profile_id int(8) default NULL,
-  profilesection_section_name varchar(64) NOT NULL default '',
-  profilesection_show tinyint(1) default NULL,
-  PRIMARY KEY (profilesection_id)
-);
---
--- Table structure for table `ProfileProperty`
---
-
-CREATE TABLE ProfileProperty (
-  profileproperty_id int(8) NOT NULL auto_increment,
-  profileproperty_type varchar(32) default NULL,
-  profileproperty_default text default NULL,
-  profileproperty_readonly int(1) default '0',
-  profileproperty_name varchar(32) NOT NULL default '',
-  PRIMARY KEY (profileproperty_id)
-);
---
--- Table structure for table `ProfilePropertyValue`
---
-
-CREATE TABLE ProfilePropertyValue (
-  profilepropertyvalue_id int(8) NOT NULL auto_increment,
-  profilepropertyvalue_profile_id int(8) default NULL,
-  profilepropertyvalue_property_id int(8) default NULL,
-  profilepropertyvalue_property_value text NOT NULL default '',
-  PRIMARY KEY (profilepropertyvalue_id)
-);
--- -----------------------------------------------------------------------------
--- Default Profile properties
--- -----------------------------------------------------------------------------
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('update_state', 'integer', 1, 1);
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level', 'integer', 3);
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level_managepeers', 'integer', 0);
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('access_restriction', 'text', 'ALLOW_ALL');
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('admin_realm', 'text', '');
-INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('last_public_contact_export', 'timestamp', 0, 1);
-
 
 DROP TABLE IF EXISTS AccountEntity;
 CREATE TABLE AccountEntity (
@@ -1066,6 +624,455 @@ CREATE TABLE TmpEntity (
   PRIMARY KEY (entity_id)
 );
 
+--  __________________
+-- | Cleanning tables |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+--
+-- Clean CalendarEvent before migration to Event
+--
+-- Foreign key domain_id
+DELETE FROM CalendarEvent WHERE calendarevent_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarevent_domain_id IS NOT NULL;
+-- Foreign key from calendarevent_userupdate to userobm_id
+UPDATE CalendarEvent SET calendarevent_userupdate = NULL WHERE calendarevent_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_userupdate IS NOT NULL;
+-- Foreign key from calendarevent_usercreate to userobm_id
+UPDATE CalendarEvent SET calendarevent_usercreate = NULL WHERE calendarevent_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_usercreate IS NOT NULL;
+-- Foreign key from calendarevent_owner to userobm_id
+DELETE FROM CalendarEvent WHERE calendarevent_owner NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_owner IS NOT NULL;
+-- Foreign key from calendarevent_category1_id to calendarcategory1_id
+UPDATE CalendarEvent SET calendarevent_category1_id = NULL WHERE calendarevent_category1_id NOT IN (SELECT calendarcategory1_id FROM CalendarCategory1) AND calendarevent_category1_id IS NOT NULL;
+
+--
+-- Clean Todo before migration to Event
+--
+-- Foreign key from todo_domain_id to domain_id
+DELETE FROM Todo WHERE todo_domain_id NOT IN (SELECT domain_id FROM Domain) AND todo_domain_id IS NOT NULL;
+-- Foreign key from todo_user to userobm_id
+DELETE FROM Todo WHERE todo_user NOT IN (SELECT userobm_id FROM UserObm) AND todo_user IS NOT NULL;
+-- Foreign key from todo_userupdate to userobm_id
+UPDATE Todo SET todo_userupdate = NULL WHERE todo_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND todo_userupdate IS NOT NULL;
+-- Foreign key from todo_usercreate to userobm_id
+UPDATE Todo SET todo_usercreate = NULL WHERE todo_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND todo_usercreate IS NOT NULL;
+
+--
+-- Migration of ClandarEvent to Event
+--
+INSERT INTO Event (event_id,
+  event_domain_id, 
+  event_timeupdate,
+  event_timecreate,
+  event_userupdate,
+  event_usercreate,
+  event_ext_id,
+  event_type,
+  event_origin,
+  event_owner,
+  event_timezone,
+  event_opacity,
+  event_title,
+  event_location,
+  event_category1_id,
+  event_priority,
+  event_privacy,
+  event_date,
+  event_duration,
+  event_allday,
+  event_repeatkind,
+  event_repeatfrequence,
+  event_repeatdays,
+  event_endrepeat,
+  event_color,
+  event_completed,
+  event_url,
+  event_description,
+  event_properties)
+SELECT
+  calendarevent_id,
+  calendarevent_domain_id, 
+  calendarevent_timeupdate,
+  calendarevent_timecreate,
+  calendarevent_userupdate,
+  calendarevent_usercreate,
+  calendarevent_ext_id,
+  'VEVENT',
+  'migration',
+  calendarevent_owner,
+  'Europe/Paris',
+  'OPAQUE',
+  calendarevent_title,
+  calendarevent_location,
+  calendarevent_category1_id,
+  calendarevent_priority,
+  calendarevent_privacy,
+  calendarevent_date,
+  calendarevent_duration,
+  calendarevent_allday,
+  calendarevent_repeatkind,
+  calendarevent_repeatfrequence,
+  calendarevent_repeatdays,
+  calendarevent_endrepeat,
+  calendarevent_color,
+  NULL,
+  NULL,
+  calendarevent_description,
+  calendarevent_properties
+FROM CalendarEvent;
+
+--
+-- Migration of Todo to Event
+--
+INSERT INTO Event (
+  event_domain_id, 
+  event_timeupdate,
+  event_timecreate,
+  event_userupdate,
+  event_usercreate,
+  event_type,
+  event_origin,
+  event_owner,
+  event_timezone,
+  event_opacity,
+  event_title,
+  event_priority,
+  event_privacy,
+  event_date,
+  event_duration,
+  event_allday,
+  event_repeatkind,
+  event_repeatfrequence,
+  event_repeatdays,
+  event_endrepeat,
+  event_color,
+  event_completed,
+  event_url,
+  event_description)
+SELECT
+  todo_domain_id,
+  todo_timeupdate,
+  todo_timecreate,
+  todo_userupdate,
+  todo_usercreate,
+  'VTODO',
+  'migration',
+  todo_user,
+  'Europe/Paris',
+  'OPAQUE',
+  todo_title,
+  todo_priority,
+  todo_privacy,
+  todo_deadline,
+  3600,
+  FALSE,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  todo_deadline,
+  NULL,
+  todo_content
+FROM Todo;
+
+--
+-- Clean CalendarAlert before migration to EventAlert
+--
+-- Foreign key from calendaralert_event_id to event_id
+DELETE FROM CalendarAlert WHERE calendaralert_event_id NOT IN (SELECT event_id FROM Event) AND calendaralert_event_id IS NOT NULL;
+-- Foreign key from calendaralert_user_id to userobm_id
+DELETE FROM CalendarAlert WHERE calendaralert_user_id NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_user_id IS NOT NULL;
+-- Foreign key from calendaralert_userupdate to userobm_id
+UPDATE CalendarAlert SET calendaralert_userupdate = NULL WHERE calendaralert_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_userupdate IS NOT NULL;
+-- Foreign key from calendaralert_usercreate to userobm_id
+UPDATE CalendarAlert SET calendaralert_usercreate = NULL WHERE calendaralert_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendaralert_usercreate IS NOT NULL;
+
+--
+-- Clean CalendarException before migration to EventException
+--
+-- Foreign key from calendarexception_event_id to event_id
+DELETE FROM CalendarException WHERE calendarexception_event_id NOT IN (SELECT event_id FROM Event) AND calendarexception_event_id IS NOT NULL;
+-- Foreign key from calendarexception_userupdate to userobm_id
+UPDATE CalendarException SET calendarexception_userupdate = NULL WHERE calendarexception_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_userupdate IS NOT NULL;
+-- Foreign key from calendarexception_usercreate to userobm_id
+UPDATE CalendarException SET calendarexception_usercreate = NULL WHERE calendarexception_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarexception_usercreate IS NOT NULL;
+
+--
+-- Clean CalendarCategory1 before migration to EventCategory1
+--
+-- Foreign key from calendarcategory1_domain_id to domain_id
+DELETE FROM CalendarCategory1 WHERE calendarcategory1_domain_id NOT IN (SELECT domain_id FROM Domain) AND calendarcategory1_domain_id IS NOT NULL;
+-- Foreign key from calendarcategory1_userupdate to userobm_id
+UPDATE CalendarCategory1 SET calendarcategory1_userupdate = NULL WHERE calendarcategory1_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_userupdate IS NOT NULL;
+-- Foreign key from calendarcategory1_usercreate to userobm_id
+UPDATE CalendarCategory1 SET calendarcategory1_usercreate = NULL WHERE calendarcategory1_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND calendarcategory1_usercreate IS NOT NULL;
+
+--
+-- Migration of CalendarAlert to EventAlert
+--
+INSERT INTO EventAlert (eventalert_timeupdate,
+  eventalert_timecreate,
+  eventalert_userupdate,
+  eventalert_usercreate,
+  eventalert_event_id,
+  eventalert_user_id,
+  eventalert_duration)
+SELECT
+  calendaralert_timeupdate,
+  calendaralert_timecreate,
+  calendaralert_userupdate,
+  calendaralert_usercreate,
+  calendaralert_event_id,
+  calendaralert_user_id,
+  calendaralert_duration
+FROM CalendarAlert;
+
+--
+-- Migration of CalendarException to EventException
+--
+INSERT INTO EventException (eventexception_timeupdate,
+  eventexception_timecreate,
+  eventexception_userupdate,
+  eventexception_usercreate,
+  eventexception_event_id,
+  eventexception_date)
+SELECT
+  calendarexception_timeupdate,
+  calendarexception_timecreate,
+  calendarexception_userupdate,
+  calendarexception_usercreate,
+  calendarexception_event_id,
+  calendarexception_date
+FROM CalendarException;
+
+--
+-- Migration of CalendarCategory1 to EventCategory1
+--
+INSERT INTO EventCategory1 (
+  eventcategory1_id,
+  eventcategory1_domain_id,
+  eventcategory1_timeupdate,
+  eventcategory1_timecreate,
+  eventcategory1_userupdate,
+  eventcategory1_usercreate,
+  eventcategory1_code,
+  eventcategory1_label,
+  eventcategory1_color)
+SELECT
+  calendarcategory1_id,
+  calendarcategory1_domain_id,
+  calendarcategory1_timeupdate,
+  calendarcategory1_timecreate,
+  calendarcategory1_userupdate,
+  calendarcategory1_usercreate,
+  calendarcategory1_code,
+  calendarcategory1_label,
+  calendarcategory1_color
+FROM CalendarCategory1;
+
+--
+-- Migration of DeletedCalendarEvent to DeletedEvent
+--
+INSERT INTO DeletedEvent (deletedevent_id,
+  deletedevent_event_id,
+  deletedevent_user_id,
+  deletedevent_timestamp)
+SELECT
+  deletedcalendarevent_id,
+  deletedcalendarevent_event_id,
+  deletedcalendarevent_user_id,
+  deletedcalendarevent_timestamp
+FROM DeletedCalendarEvent;
+
+
+-- AliaSource specific database errors ?!
+-- DROP TABLE IF EXISTS CalendarSegment;
+-- DROP TABLE IF EXISTS Entry;
+-- DROP TABLE IF EXISTS EntryType;
+-- DROP TABLE IF EXISTS SubscriptionRenewal;
+-- ALTER TABLE Company DROP COLUMN company_nafcode;
+-- ALTER TABLE UserObm DROP COLUMN userobm_contact_id;
+-- ALTER TABLE P_UserObm DROP COLUMN userobm_contact_id;
+
+--  ______________________
+-- | Tables modifications |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-- NOTE : Set integer to boolean when necessary
+-- ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-- Domain
+ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
+ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
+ALTER TABLE Domain ADD COLUMN domain_mail_server_auto int(2) default NULL;
+
+-- P_Domain
+ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
+ALTER TABLE P_Domain DROP COLUMN domain_mail_server_id;
+ALTER TABLE P_Domain ADD COLUMN domain_mail_server_auto int(2) default NULL;
+
+-- OGroup
+ALTER TABLE OGroup MODIFY COLUMN ogroup_parent_id int(8);
+
+-- Preferences
+ALTER TABLE DisplayPref DROP PRIMARY KEY;
+ALTER TABLE DisplayPref ADD COLUMN display_id int(8) auto_increment PRIMARY KEY FIRST;
+
+-- Contact
+ALTER TABLE Contact ADD COLUMN contact_birthday_id int(8) default NULL;
+ALTER TABLE Contact ADD COLUMN contact_collected int(1) default false;
+ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
+UPDATE Contact SET contact_origin='obm21';
+ALTER TABLE Contact MODIFY COLUMN contact_origin VARCHAR(255) NOT NULL;
+
+-- Set Defaults 
+ALTER TABLE Account MODIFY COLUMN account_domain_id int(8) NOT NULL ;
+ALTER TABLE CV MODIFY COLUMN cv_domain_id int(8) NOT NULL ;
+ALTER TABLE CategoryLink MODIFY COLUMN categorylink_category_id int(8) NOT NULL ;
+ALTER TABLE CategoryLink MODIFY COLUMN categorylink_entity_id int(8) NOT NULL ;
+ALTER TABLE Company MODIFY COLUMN company_domain_id int(8) NOT NULL ;
+ALTER TABLE Company MODIFY COLUMN company_datasource_id int(8)  default NULL;
+ALTER TABLE CompanyActivity MODIFY COLUMN companyactivity_domain_id int(8) NOT NULL ;
+ALTER TABLE CompanyNafCode MODIFY COLUMN companynafcode_domain_id int(8) NOT NULL ;
+ALTER TABLE CompanyType MODIFY COLUMN companytype_domain_id int(8) NOT NULL ;
+ALTER TABLE Contact MODIFY COLUMN contact_domain_id int(8) NOT NULL ;
+ALTER TABLE Contact MODIFY COLUMN contact_datasource_id int(8)  default NULL;
+ALTER TABLE ContactFunction MODIFY COLUMN contactfunction_domain_id int(8) NOT NULL ;
+ALTER TABLE ContactList MODIFY COLUMN contactlist_list_id int(8) NOT NULL ;
+ALTER TABLE ContactList MODIFY COLUMN contactlist_contact_id int(8) NOT NULL ;
+ALTER TABLE Contract MODIFY COLUMN contract_domain_id int(8) NOT NULL ;
+ALTER TABLE ContractPriority MODIFY COLUMN contractpriority_domain_id int(8) NOT NULL ;
+ALTER TABLE ContractStatus MODIFY COLUMN contractstatus_domain_id int(8) NOT NULL ;
+ALTER TABLE ContractType MODIFY COLUMN contracttype_domain_id int(8) NOT NULL ;
+ALTER TABLE Country MODIFY COLUMN country_domain_id int(8) NOT NULL ;
+ALTER TABLE DataSource MODIFY COLUMN datasource_domain_id int(8) NOT NULL ;
+ALTER TABLE Deal MODIFY COLUMN deal_domain_id int(8) NOT NULL ;
+ALTER TABLE Deal MODIFY COLUMN deal_company_id int(8) NOT NULL ;
+ALTER TABLE DealCompanyRole MODIFY COLUMN dealcompanyrole_domain_id int(8) NOT NULL ;
+ALTER TABLE DealStatus MODIFY COLUMN dealstatus_domain_id int(8) NOT NULL ;
+ALTER TABLE DealType MODIFY COLUMN dealtype_domain_id int(8) NOT NULL ;
+ALTER TABLE DefaultOdtTemplate MODIFY COLUMN defaultodttemplate_domain_id int(8) NOT NULL ;
+ALTER TABLE DeletedContact MODIFY COLUMN deletedcontact_contact_id int(8) NOT NULL ;
+ALTER TABLE DeletedTodo MODIFY COLUMN deletedtodo_todo_id int(8) NOT NULL;
+ALTER TABLE DeletedUser MODIFY COLUMN deleteduser_user_id int(8) NOT NULL ;
+ALTER TABLE Document MODIFY COLUMN document_domain_id int(8) NOT NULL ;
+ALTER TABLE DocumentMimeType MODIFY COLUMN documentmimetype_domain_id int(8) NOT NULL ;
+ALTER TABLE DomainMailServer MODIFY COLUMN domainmailserver_domain_id int(8) NOT NULL ;
+ALTER TABLE EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
+ALTER TABLE EntityRight ADD entityright_access int(1) NOT NULL default 0;
+ALTER TABLE EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
+ALTER TABLE EventLink MODIFY COLUMN eventlink_event_id int(8) NOT NULL ;
+ALTER TABLE EventLink MODIFY COLUMN eventlink_entity_id int(8) NOT NULL ;
+ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
+ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_child_id int(8) NOT NULL ;
+ALTER TABLE Host MODIFY COLUMN host_domain_id int(8) NOT NULL ;
+ALTER TABLE `Import` MODIFY COLUMN import_domain_id int(8) NOT NULL ;
+ALTER TABLE `Import` MODIFY COLUMN import_datasource_id int(8)  default NULL;
+ALTER TABLE Incident MODIFY COLUMN incident_domain_id int(8) NOT NULL ;
+ALTER TABLE Incident MODIFY COLUMN incident_priority_id int(8)  default NULL;
+ALTER TABLE Incident MODIFY COLUMN incident_status_id int(8)  default NULL;
+ALTER TABLE Incident MODIFY COLUMN incident_resolutiontype_id int(11)  default NULL;
+ALTER TABLE IncidentPriority MODIFY COLUMN incidentpriority_domain_id int(8) NOT NULL ;
+ALTER TABLE IncidentResolutionType MODIFY COLUMN incidentresolutiontype_domain_id int(8) NOT NULL ;
+ALTER TABLE IncidentStatus MODIFY COLUMN incidentstatus_domain_id int(8) NOT NULL ;
+ALTER TABLE Invoice MODIFY COLUMN invoice_domain_id int(8) NOT NULL ;
+ALTER TABLE Invoice MODIFY COLUMN invoice_status_id int(4) NOT NULL ;
+ALTER TABLE Kind MODIFY COLUMN kind_domain_id int(8) NOT NULL ;
+ALTER TABLE Lead MODIFY COLUMN lead_domain_id int(8) NOT NULL ;
+ALTER TABLE Lead MODIFY COLUMN lead_company_id int(8) NOT NULL ;
+ALTER TABLE LeadSource MODIFY COLUMN leadsource_domain_id int(8) NOT NULL ;
+ALTER TABLE LeadStatus MODIFY COLUMN leadstatus_domain_id int(8) NOT NULL ;
+ALTER TABLE List MODIFY COLUMN list_domain_id int(8) NOT NULL ;
+ALTER TABLE MailServer MODIFY COLUMN mailserver_host_id int(8) NOT NULL ;
+ALTER TABLE MailServerNetwork MODIFY COLUMN mailservernetwork_host_id int(8) NOT NULL ;
+ALTER TABLE MailShare MODIFY COLUMN mailshare_domain_id int(8) NOT NULL ;
+ALTER TABLE MailShare MODIFY COLUMN mailshare_mail_server_id int(8)  default NULL;
+ALTER TABLE OGroup MODIFY COLUMN ogroup_domain_id int(8) NOT NULL ;
+ALTER TABLE OGroupLink MODIFY COLUMN ogrouplink_domain_id int(8) NOT NULL ;
+ALTER TABLE OrganizationalChart MODIFY COLUMN organizationalchart_domain_id int(8) NOT NULL ;
+ALTER TABLE P_EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
+ALTER TABLE P_EntityRight ADD entityright_access int(1) NOT NULL default 0;
+ALTER TABLE P_EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
+ALTER TABLE P_GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
+ALTER TABLE P_GroupGroup MODIFY COLUMN groupgroup_child_id int(8) NOT NULL ;
+ALTER TABLE P_Host MODIFY COLUMN host_domain_id int(8) NOT NULL ;
+ALTER TABLE P_MailServer MODIFY COLUMN mailserver_host_id int(8) NOT NULL ;
+ALTER TABLE P_MailServerNetwork MODIFY COLUMN mailservernetwork_host_id int(8) NOT NULL ;
+ALTER TABLE P_MailShare MODIFY COLUMN mailshare_domain_id int(8) NOT NULL ;
+ALTER TABLE P_MailShare MODIFY COLUMN mailshare_mail_server_id int(8)  default NULL;
+ALTER TABLE P_Samba MODIFY COLUMN samba_domain_id int(8) NOT NULL ;
+ALTER TABLE P_UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
+ALTER TABLE P_UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
+ALTER TABLE P_UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
+ALTER TABLE P_of_usergroup MODIFY COLUMN of_usergroup_group_id int(8) NOT NULL ;
+ALTER TABLE P_of_usergroup MODIFY COLUMN of_usergroup_user_id int(8) NOT NULL ;
+ALTER TABLE ParentDeal MODIFY COLUMN parentdeal_domain_id int(8) NOT NULL ;
+ALTER TABLE Payment MODIFY COLUMN payment_domain_id int(8) NOT NULL ;
+ALTER TABLE PaymentKind MODIFY COLUMN paymentkind_domain_id int(8) NOT NULL ;
+ALTER TABLE Project MODIFY COLUMN project_domain_id int(8) NOT NULL ;
+ALTER TABLE ProjectTask MODIFY COLUMN projecttask_parenttask_id int(8)  default NULL;
+ALTER TABLE Publication MODIFY COLUMN publication_domain_id int(8) NOT NULL ;
+ALTER TABLE PublicationType MODIFY COLUMN publicationtype_domain_id int(8) NOT NULL ;
+ALTER TABLE RGroup MODIFY COLUMN rgroup_domain_id int(8) NOT NULL ;
+ALTER TABLE Region MODIFY COLUMN region_domain_id int(8) NOT NULL ;
+ALTER TABLE Resource MODIFY COLUMN resource_domain_id int(8) NOT NULL ;
+ALTER TABLE ResourceGroup MODIFY COLUMN resourcegroup_rgroup_id int(8) NOT NULL ;
+ALTER TABLE ResourceGroup MODIFY COLUMN resourcegroup_resource_id int(8) NOT NULL ;
+ALTER TABLE ResourceItem MODIFY COLUMN resourceitem_domain_id int(8) NOT NULL ;
+ALTER TABLE ResourceType MODIFY COLUMN resourcetype_domain_id int(8) NOT NULL ;
+ALTER TABLE Samba MODIFY COLUMN samba_domain_id int(8) NOT NULL ;
+ALTER TABLE Subscription MODIFY COLUMN subscription_domain_id int(8) NOT NULL ;
+ALTER TABLE SubscriptionReception MODIFY COLUMN subscriptionreception_domain_id int(8) NOT NULL ;
+ALTER TABLE TaskType MODIFY COLUMN tasktype_domain_id int(8) NOT NULL ;
+ALTER TABLE UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
+ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
+ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
+ALTER TABLE UserObmPref MODIFY COLUMN userobmpref_user_id int(8) NULL ;
+ALTER TABLE UserObmPref ADD COLUMN userobmpref_id int(8) NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (userobmpref_id);
+ALTER TABLE of_usergroup MODIFY COLUMN of_usergroup_group_id int(8) NOT NULL ;
+ALTER TABLE of_usergroup MODIFY COLUMN of_usergroup_user_id int(8) NOT NULL ;
+ALTER TABLE Category MODIFY COLUMN category_usercreate int(8) DEFAULT NULL;
+ALTER TABLE Category MODIFY COLUMN category_userupdate int(8) DEFAULT NULL;
+ALTER TABLE Deal MODIFY COLUMN deal_region_id int(8) DEFAULT NULL;
+ALTER TABLE Deal MODIFY COLUMN deal_source_id int(8) DEFAULT NULL;
+ALTER TABLE DealCompany MODIFY COLUMN dealcompany_role_id int(8) DEFAULT NULL;
+ALTER TABLE Contract MODIFY COLUMN contract_priority_id int(8) DEFAULT NULL;
+ALTER TABLE Contract MODIFY COLUMN contract_status_id int(8) DEFAULT NULL;
+ALTER TABLE Document MODIFY COLUMN document_mimetype_id int(8) DEFAULT NULL;
+ALTER TABLE Lead MODIFY COLUMN lead_contact_id int(8) DEFAULT NULL;
+ALTER TABLE Payment MODIFY COLUMN payment_company_id int(8) DEFAULT NULL;
+ALTER TABLE DisplayPref MODIFY COLUMN display_user_id int(8) DEFAULT NULL;
+ALTER TABLE Payment MODIFY COLUMN payment_paymentkind_id int(8) DEFAULT NULL;
+ALTER TABLE ProjectClosing MODIFY COLUMN projectclosing_usercreate int(8) DEFAULT NULL;
+ALTER TABLE Subscription MODIFY COLUMN subscription_reception_id int(8) DEFAULT NULL;
+ALTER TABLE UserObm MODIFY COLUMN userobm_host_id int(8) DEFAULT NULL;
+ALTER TABLE UGroup MODIFY COLUMN group_manager_id int(8) DEFAULT NULL;
+
+--  _________________
+-- | Updating values |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-- Global Domain
+INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
+UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
+UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
+
+-- Global Domain
+INSERT INTO P_Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
+UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
+UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
+
+-- User prefs 
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
+
+-- Timezone 
+INSERT INTO UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
+
+-- Default Profile properties
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('update_state', 'integer', 1, 1);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level', 'integer', 3);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('level_managepeers', 'integer', 0);
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('access_restriction', 'text', 'ALLOW_ALL');
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('admin_realm', 'text', '');
+INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('last_public_contact_export', 'timestamp', 0, 1);
+
+-- --------------------
+-- Entity tables update
+-- --------------------
 INSERT INTO TmpEntity (id_entity) SELECT account_id FROM Account;
 INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
 INSERT INTO AccountEntity (accountentity_entity_id, accountentity_account_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
@@ -1118,7 +1125,7 @@ UPDATE TmpEntity SET id_entity = NULL;
   
 INSERT INTO TmpEntity (id_entity) SELECT event_id FROM Event;
 INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
-INSERT INTO EventEntity (evententity_entity_id, evententity_event_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO EventLink (eventlink_entity_id, eventlink_event_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
 UPDATE TmpEntity SET id_entity = NULL;
   
 INSERT INTO TmpEntity (id_entity) SELECT host_id FROM Host;
@@ -1226,8 +1233,6 @@ INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity I
 INSERT INTO UserEntity (userentity_entity_id, userentity_user_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
 UPDATE TmpEntity SET id_entity = NULL;
   
-DROP TABLE TmpEntity;
-
 DELETE FROM EntityRight WHERE entityright_entity_id NOT IN (SELECT mailshare_id FROM MailShare) AND entityright_entity = 'mailshare';
 UPDATE EntityRight SET entityright_entity_id = (SELECT mailshareentity_entity_id FROM MailshareEntity INNER JOIN MailShare ON mailshareentity_mailshare_id = mailshare_id WHERE mailshare_id = entityright_entity_id), entityright_entity = 'entity' WHERE entityright_entity = 'mailshare'; 
 DELETE FROM EntityRight WHERE entityright_entity_id NOT IN (SELECT userobm_id FROM UserObm) AND entityright_entity = 'calendar';
@@ -1293,9 +1298,9 @@ UPDATE EventLink SET eventlink_entity_id = (SELECT resourceentity_entity_id FROM
 DELETE FROM EventLink where eventlink_entity != 'task';
 ALTER TABLE EventLink DROP COLUMN eventlink_entity;
 
---
+-- ------------------------------
 -- Prepare value for foreign keys
---
+-- ------------------------------
 
 -- Domain
 UPDATE UserObm SET userobm_domain_id = NULL WHERE userobm_domain_id = 0;
@@ -2177,8 +2182,13 @@ DELETE FROM of_usergroup WHERE of_usergroup_user_id NOT IN (SELECT userobm_id FR
 -- Foreign key from contact_birthday_id to event_id
 -- UPDATE Contact SET contact_birthday_id = NULL WHERE contact_birthday_id NOT IN (SELECT event_id FROM Event) AND contact_birthday_id IS NOT NULL;
 
--- User prefs 
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
-
--- Timezone 
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
+--  _________________
+-- | Drop old tables |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+DROP TABLE IF EXISTS OBMTicket;
+DROP TABLE DeletedCalendarEvent;
+DROP TABLE CalendarAlert;
+DROP TABLE CalendarException;
+DROP TABLE CalendarEvent;
+DROP TABLE CalendarCategory1;
+DROP TABLE TmpEntity;
