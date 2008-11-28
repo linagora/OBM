@@ -530,7 +530,7 @@ sub _deleteBox {
     my @boxStruct = $cyrusSrvConn->listmailbox( $boxPrefix.$boxName, '' );
 
     my $boxSubfolders = undef;
-    if( !$boxPrefix ) {
+    if( ref($entity) eq 'OBM::Entities::obmMailshare' ) {
         if( $boxName =~ /^(.*)(@.*)$/ ) {
             $boxSubfolders = $1.'/*'.$2;
         }
