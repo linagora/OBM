@@ -527,18 +527,33 @@ sub _deleteBox {
 
     my $boxName = $entity->getMailboxName( 'current' );
     my $boxPrefix = $entity->getMailboxPrefix();
+    my @boxStruct = $cyrusSrvConn->listmailbox( $boxPrefix.$boxName, '' );
 
-    require OBM::Parameters::common;
-    if( !$self->_imapSetMailboxAcl( $boxPrefix.$boxName, $OBM::Parameters::common::cyrusAdminLogin, 'admin' ) ) {
-        return 1;
+    my $boxSubfolders = undef;
+    if( !$boxPrefix ) {
+        if( $boxName =~ /^(.*)(@.*)$/ ) {
+            $boxSubfolders = $1.'/*'.$2;
+        }
+    }
+
+    if( defined($boxSubfolders) ) {
+        push( @boxStruct, $cyrusSrvConn->listmailbox( $boxSubfolders, '' ) );
     }
 
     $self->log( 'suppression de la boite de '.$entity->getDescription(), 2 );
-    $cyrusSrv->delete($boxPrefix.$boxName);
-
-    if( $cyrusSrv->error() ) {
-        $self->_log( 'erreur Cyrus a la suppression de la BAL : '.$cyrusSrv->error(), 2 );
-        return 1;
+    for( my $i=0; $i<=$#boxStruct; $i++ ) {
+        require OBM::Parameters::common;
+        if( !$self->_imapSetMailboxAcl( $boxStruct[$i][0], $OBM::Parameters::common::cyrusAdminLogin, 'admin' ) ) {
+            return 1;
+        }
+    
+        $self->_log( 'Suppression de \''.$boxStruct[$i][0].'\'', 4 );
+        $cyrusSrv->delete($boxStruct[$i][0]);
+    
+        if( $cyrusSrv->error() ) {
+            $self->_log( 'erreur Cyrus a la suppression de '.$entity->getDescription().' : '.$cyrusSrv->error(), 2 );
+            return 1;
+        }
     }
 
     return 0;
