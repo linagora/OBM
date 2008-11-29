@@ -831,11 +831,12 @@ function global_session_load_user_todos($p_todo='todo_priority') {
 
   // create the todo list
   $query = "SELECT
-      todo_id,
-      todo_title
-    FROM Todo
-    WHERE todo_user $uid 
-    AND todo_percent < 100
+      event_id,
+      event_title
+    FROM Event
+    WHERE event_type='VTODO'
+      event_usercreate $uid 
+    AND eventtodo_percent < 100
     ORDER BY $order
     $limit";
 

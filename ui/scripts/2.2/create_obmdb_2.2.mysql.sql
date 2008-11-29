@@ -129,7 +129,7 @@ DROP TABLE IF EXISTS `CalendarEntity`;
 CREATE TABLE `CalendarEntity` (
   `calendarentity_entity_id` int(8) NOT NULL,
   `calendarentity_calendar_id` int(8) NOT NULL,
-  PRIMARY KEY  (`calendarentity_entity_id`,`calendarentity_calendar_id`),
+  PRIMARY KEY (`calendarentity_entity_id`,`calendarentity_calendar_id`),
   KEY `calendarentity_calendar_id_calendar_id_fkey` (`calendarentity_calendar_id`),
   CONSTRAINT `calendarentity_calendar_id_calendar_id_fkey` FOREIGN KEY (`calendarentity_calendar_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `calendarentity_entity_id_entity_id_fkey` FOREIGN KEY (`calendarentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -1163,7 +1163,7 @@ DROP TABLE IF EXISTS `Entity`;
 CREATE TABLE `Entity` (
   `entity_id` int(8) NOT NULL auto_increment,
   `entity_mailing` tinyint(1) default NULL,
-  PRIMARY KEY  (`entity_id`)
+  PRIMARY KEY (`entity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1178,7 +1178,7 @@ CREATE TABLE `EntityRight` (
   `entityright_read` int(1) NOT NULL default '0',
   `entityright_write` int(1) NOT NULL default '0',
   `entityright_admin` int(1) NOT NULL default '0',
-  PRIMARY KEY  (`entityright_entity_id`,`entityright_consumer_id`),
+  PRIMARY KEY (`entityright_entity_id`,`entityright_consumer_id`),
   KEY `entityright_consumer_id_entity_id` (`entityright_consumer_id`),
   CONSTRAINT `entityright_entity_id_entity_id` FOREIGN KEY (`entityright_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `entityright_consumer_id_entity_id` FOREIGN KEY (`entityright_consumer_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -3308,40 +3308,6 @@ CREATE TABLE `TimeTask` (
   CONSTRAINT `timetask_tasktype_id_tasktype_id_fkey` FOREIGN KEY (`timetask_tasktype_id`) REFERENCES `TaskType` (`tasktype_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `timetask_userupdate_userobm_id_fkey` FOREIGN KEY (`timetask_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `timetask_user_id_userobm_id_fkey` FOREIGN KEY (`timetask_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `Todo`
---
-
-DROP TABLE IF EXISTS `Todo`;
-CREATE TABLE `Todo` (
-  `todo_id` int(8) NOT NULL auto_increment,
-  `todo_domain_id` int(8) NOT NULL,
-  `todo_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `todo_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `todo_userupdate` int(8) default NULL,
-  `todo_usercreate` int(8) default NULL,
-  `todo_user` int(8) default NULL,
-  `todo_privacy` int(2) NOT NULL default '0',
-  `todo_date` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `todo_deadline` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `todo_dateend` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `todo_priority` int(8) default NULL,
-  `todo_percent` int(8) default NULL,
-  `todo_title` varchar(80) default NULL,
-  `todo_status` varchar(32) default NULL,
-  `todo_webpage` varchar(255) default NULL,
-  `todo_content` text,
-  PRIMARY KEY  (`todo_id`),
-  KEY `todo_domain_id_domain_id_fkey` (`todo_domain_id`),
-  KEY `todo_user_userobm_id_fkey` (`todo_user`),
-  KEY `todo_userupdate_userobm_id_fkey` (`todo_userupdate`),
-  KEY `todo_usercreate_userobm_id_fkey` (`todo_usercreate`),
-  CONSTRAINT `todo_usercreate_userobm_id_fkey` FOREIGN KEY (`todo_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `todo_domain_id_domain_id_fkey` FOREIGN KEY (`todo_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `todo_userupdate_userobm_id_fkey` FOREIGN KEY (`todo_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `todo_user_userobm_id_fkey` FOREIGN KEY (`todo_user`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

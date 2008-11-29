@@ -1230,6 +1230,7 @@ DELETE FROM EntityRight WHERE entityright_consumer_id NOT IN (SELECT userobm_id 
 UPDATE EntityRight SET entityright_consumer_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'user' AND entityright_consumer_id IS NOT NULL; 
 DELETE FROM EntityRight WHERE entityright_consumer_id NOT IN (SELECT group_id FROM UGroup) AND entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
 UPDATE EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
+UPDATE P_EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
 DELETE FROM EntityRight WHERE entityright_entity != 'entity';
 ALTER TABLE EntityRight DROP COLUMN entityright_entity;
 ALTER TABLE EntityRight DROP COLUMN entityright_consumer;
@@ -2642,4 +2643,5 @@ DROP TABLE CalendarAlert;
 DROP TABLE CalendarException;
 DROP TABLE CalendarEvent;
 DROP TABLE CalendarCategory1;
+DROP TABLE Todo;
 DROP TABLE TmpEntity;

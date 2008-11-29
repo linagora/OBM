@@ -654,7 +654,7 @@ UPDATE Todo SET todo_userupdate = NULL WHERE todo_userupdate NOT IN (SELECT user
 UPDATE Todo SET todo_usercreate = NULL WHERE todo_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND todo_usercreate IS NOT NULL;
 
 --
--- Migration of ClandarEvent to Event
+-- Migration of CalendarEvent to Event
 --
 INSERT INTO Event (event_id,
   event_domain_id, 
@@ -1070,6 +1070,7 @@ INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profile
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('admin_realm', 'text', '');
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('last_public_contact_export', 'timestamp', 0, 1);
 
+
 -- --------------------
 -- Entity tables update
 -- --------------------
@@ -1246,6 +1247,7 @@ DELETE FROM EntityRight WHERE entityright_consumer_id NOT IN (SELECT userobm_id 
 UPDATE EntityRight SET entityright_consumer_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'user' AND entityright_consumer_id IS NOT NULL; 
 DELETE FROM EntityRight WHERE entityright_consumer_id NOT IN (SELECT group_id FROM UGroup) AND entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
 UPDATE EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
+UPDATE P_EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
 DELETE FROM EntityRight WHERE entityright_entity != 'entity';
 ALTER TABLE EntityRight DROP COLUMN entityright_entity;
 ALTER TABLE EntityRight DROP COLUMN entityright_consumer;
@@ -2191,4 +2193,5 @@ DROP TABLE CalendarAlert;
 DROP TABLE CalendarException;
 DROP TABLE CalendarEvent;
 DROP TABLE CalendarCategory1;
+DROP TABLE Todo;
 DROP TABLE TmpEntity;

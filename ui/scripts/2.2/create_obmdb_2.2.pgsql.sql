@@ -2466,31 +2466,6 @@ CREATE TABLE timetask (
 
 
 --
--- Name: todo; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE todo (
-    todo_id integer NOT NULL,
-    todo_domain_id integer NOT NULL,
-    todo_timeupdate timestamp without time zone,
-    todo_timecreate timestamp without time zone DEFAULT now(),
-    todo_userupdate integer,
-    todo_usercreate integer,
-    todo_user integer,
-    todo_privacy integer DEFAULT 0 NOT NULL,
-    todo_date timestamp without time zone,
-    todo_deadline timestamp without time zone,
-    todo_dateend timestamp without time zone,
-    todo_priority integer,
-    todo_percent integer,
-    todo_title character varying(80) DEFAULT NULL::character varying,
-    todo_status character varying(32),
-    todo_webpage character varying(255),
-    todo_content text
-);
-
-
---
 -- Name: ugroup; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
