@@ -333,6 +333,7 @@ CREATE TABLE DeletedEvent (
   deletedevent_id        int(8) NOT NULL auto_increment,
   deletedevent_event_id  int(8) default NULL,
   deletedevent_user_id   int(8) default NULL,
+  deletedevent_origin    varchar(255) NOT NULL,
   deletedevent_timestamp timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY (deletedevent_id),
   KEY idx_dce_event (deletedevent_event_id),
@@ -873,12 +874,12 @@ FROM CalendarCategory1;
 INSERT INTO DeletedEvent (deletedevent_id,
   deletedevent_event_id,
   deletedevent_user_id,
-  deletedevent_timestamp)
+  deletedevent_timestamp, deletedevent_origin)
 SELECT
   deletedcalendarevent_id,
   deletedcalendarevent_event_id,
   deletedcalendarevent_user_id,
-  deletedcalendarevent_timestamp
+  deletedcalendarevent_timestamp, 'obm21'
 FROM DeletedCalendarEvent;
 
 
@@ -948,6 +949,7 @@ ALTER TABLE DealStatus MODIFY COLUMN dealstatus_domain_id int(8) NOT NULL ;
 ALTER TABLE DealType MODIFY COLUMN dealtype_domain_id int(8) NOT NULL ;
 ALTER TABLE DefaultOdtTemplate MODIFY COLUMN defaultodttemplate_domain_id int(8) NOT NULL ;
 ALTER TABLE DeletedContact MODIFY COLUMN deletedcontact_contact_id int(8) NOT NULL ;
+ALTER TABLE DeletedContact ADD COLUMN deletedcontact_user_id int(8) NOT NULL ;
 ALTER TABLE DeletedTodo MODIFY COLUMN deletedtodo_todo_id int(8) NOT NULL;
 ALTER TABLE DeletedUser MODIFY COLUMN deleteduser_user_id int(8) NOT NULL ;
 ALTER TABLE Document MODIFY COLUMN document_domain_id int(8) NOT NULL ;

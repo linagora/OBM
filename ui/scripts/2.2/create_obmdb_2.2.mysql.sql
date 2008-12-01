@@ -885,6 +885,7 @@ CREATE TABLE `Deleted` (
 DROP TABLE IF EXISTS `DeletedContact`;
 CREATE TABLE `DeletedContact` (
   `deletedcontact_contact_id` int(8) NOT NULL,
+  `deletedcontact_user_id` int(8) NOT NULL,
   `deletedcontact_timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`deletedcontact_contact_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -898,6 +899,7 @@ CREATE TABLE `DeletedEvent` (
   `deletedevent_id` int(8) NOT NULL auto_increment,
   `deletedevent_event_id` int(8) default NULL,
   `deletedevent_user_id` int(8) default NULL,
+  `deletedevent_origin` varchar(255) NOT NULL,
   `deletedevent_timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`deletedevent_id`),
   KEY `idx_dce_event` (`deletedevent_event_id`),

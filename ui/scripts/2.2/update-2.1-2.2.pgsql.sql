@@ -364,6 +364,7 @@ CREATE TABLE DeletedEvent (
   deletedevent_id         serial,
   deletedevent_event_id   integer,
   deletedevent_user_id    integer,
+  deletedevent_origin     varchar(255) NOT NULL,
   deletedevent_timestamp  timestamp
 );
 create INDEX idx_dce_event_id ON DeletedEvent (deletedevent_event_id);
@@ -874,12 +875,12 @@ SELECT setval('eventcategory1_eventcategory1_id_seq', max(eventcategory1_id)) FR
 INSERT INTO DeletedEvent (deletedevent_id,
   deletedevent_event_id,
   deletedevent_user_id,
-  deletedevent_timestamp)
+  deletedevent_timestamp, deletedevent_origin)
 SELECT
   deletedcalendarevent_id,
   deletedcalendarevent_event_id,
   deletedcalendarevent_user_id,
-  deletedcalendarevent_timestamp
+  deletedcalendarevent_timestamp, 'obm21'
 FROM DeletedCalendarEvent;
 
 SELECT setval('deletedevent_deletedevent_id_seq', max(deletedevent_id)) FROM DeletedEvent;
@@ -916,6 +917,9 @@ ALTER TABLE Contact ADD COLUMN contact_collected BOOLEAN default FALSE;
 ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
 UPDATE Contact SET contact_origin='obm21';
 ALTER TABLE Contact ALTER COLUMN contact_origin SET DEFAULT NOT NULL;
+
+ALTER TABLE DeletedContact ADD COLUMN deletedcontact_user_id integer;
+
 
 -- NOT NULL to NULL Convertion
 ALTER TABLE UserObm ALTER COLUMN userobm_domain_id SET NOT NULL;

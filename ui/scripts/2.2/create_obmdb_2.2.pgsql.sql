@@ -622,6 +622,7 @@ CREATE TABLE deleted (
 
 CREATE TABLE deletedcontact (
     deletedcontact_contact_id integer NOT NULL,
+    deletedcontact_user_id integer,
     deletedcontact_timestamp timestamp without time zone
 );
 
@@ -634,6 +635,7 @@ CREATE TABLE deletedevent (
     deletedevent_id integer NOT NULL,
     deletedevent_event_id integer,
     deletedevent_user_id integer,
+    deletedevent_origin varchar(255) NOT NULL,
     deletedevent_timestamp timestamp without time zone
 );
 
