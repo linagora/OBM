@@ -2174,6 +2174,9 @@ DELETE FROM of_usergroup WHERE of_usergroup_user_id NOT IN (SELECT userobm_id FR
 -- Foreign key from contact_birthday_id to event_id
 -- UPDATE Contact SET contact_birthday_id = NULL WHERE contact_birthday_id NOT IN (SELECT event_id FROM Event) AND contact_birthday_id IS NOT NULL;
 
+-- MailboxEntity production table
+CREATE TABLE P_MailboxEntity LIKE MailboxEntity;
+
 --  _________________
 -- | Drop old tables |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -2185,3 +2188,4 @@ DROP TABLE CalendarEvent;
 DROP TABLE CalendarCategory1;
 DROP TABLE Todo;
 DROP TABLE TmpEntity;
+

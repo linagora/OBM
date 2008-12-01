@@ -9508,3 +9508,8 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 -- PostgreSQL database dump complete
 --
 
+
+--
+-- MailboxEntity production table
+--
+CREATE TABLE P_MailboxEntity (LIKE MailboxEntity);

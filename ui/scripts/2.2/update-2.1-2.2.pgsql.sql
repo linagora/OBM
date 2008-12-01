@@ -2626,6 +2626,9 @@ ALTER TABLE payment ALTER COLUMN payment_checked DROP DEFAULT;
 ALTER TABLE payment ALTER COLUMN payment_checked TYPE SMALLINT USING CASE payment_checked WHEN '1' THEN 1 ELSE 0 END;
 ALTER TABLE payment ALTER COLUMN payment_checked SET DEFAULT 0;
 
+-- MailboxEntity production table
+CREATE TABLE P_MailboxEntity LIKE MailboxEntity;
+
 --  _________________
 -- | Drop old tables |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
