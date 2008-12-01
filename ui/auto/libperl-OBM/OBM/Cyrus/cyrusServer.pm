@@ -34,7 +34,7 @@ sub DESTROY {
 
     $self->_log( 'suppression de l\'objet', 4 );
 
-    undef $self->{'cyrusServerConn'};
+    $self->{'cyrusServerConn'} = undef;
 }
 
 

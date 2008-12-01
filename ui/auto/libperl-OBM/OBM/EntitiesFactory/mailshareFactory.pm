@@ -219,10 +219,16 @@ sub _loadMailshareLinks {
     my $entityType = 'MailShare';
 
     my $userObmTable = 'UserObm';
+    my $userEntityTable = 'UserEntity';
+    my $mailshareEntity = 'MailshareEntity';
+    my $groupEntityTable = 'GroupEntity';
     my $entityRightTable = 'EntityRight';
     my $ofUserGroupTable = 'of_usergroup';
     if( $self->{'source'} =~ /^SYSTEM$/ ) {
         $userObmTable = 'P_'.$userObmTable;
+        $userEntityTable = 'P_'.$userEntityTable;
+        $mailshareEntity = 'P_'.$mailshareEntity;
+        $groupEntityTable = 'P_'.$groupEntityTable;
         $entityRightTable = 'P_'.$entityRightTable;
         $ofUserGroupTable = 'P_'.$ofUserGroupTable;
     }
@@ -231,80 +237,93 @@ sub _loadMailshareLinks {
     $rightDef{'read'}->{'sqlQuery'} = 'SELECT
                   userobm_id,
                   userobm_login
-                FROM '.$userObmTable.'
-                LEFT JOIN '.$ofUserGroupTable.' ON userobm_id = of_usergroup_user_id
-                LEFT JOIN '.$entityRightTable.' ON (userobm_id = entityright_consumer_id AND entityright_consumer = \'user\')
-                WHERE entityright_entity_id IN ('.$entityId.') AND entityright_entity = \''.$entityType.'\' AND entityright_write=0 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                FROM '.$entityRightTable.'
+                INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
+                INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
+                INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=0 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
                   userobm_login
-                FROM '.$userObmTable.'
-                LEFT JOIN '.$ofUserGroupTable.' ON userobm_id = of_usergroup_user_id
-                LEFT JOIN '.$entityRightTable.' ON (of_usergroup_group_id = entityright_consumer_id AND entityright_consumer = \'group\')
-                WHERE entityright_entity_id IN ('.$entityId.') AND entityright_entity = \''.$entityType.'\' AND entityright_write=0 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                FROM '.$entityRightTable.'
+                INNER JOIN '.$groupEntityTable.' ON groupentity_entity_id = entityright_consumer_id
+                INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
+                INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
+                INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=0 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'writeonly'}->{'compute'} = 1;
     $rightDef{'writeonly'}->{'sqlQuery'} = 'SELECT
                   userobm_id,
                   userobm_login
-                FROM '.$userObmTable.'
-                LEFT JOIN '.$ofUserGroupTable.' ON userobm_id = of_usergroup_user_id
-                LEFT JOIN '.$entityRightTable.' ON (userobm_id = entityright_consumer_id AND entityright_consumer = \'user\')
-                WHERE entityright_entity_id IN ('.$entityId.') AND entityright_entity = \''.$entityType.'\' AND entityright_write=1 AND entityright_read=0 AND userobm_archive=0 AND userobm_mail_perms=1
+                FROM '.$entityRightTable.'
+                INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
+                INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
+                INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=0 AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
                   userobm_login
-                FROM '.$userObmTable.'
-                LEFT JOIN '.$ofUserGroupTable.' ON userobm_id = of_usergroup_user_id
-                LEFT JOIN '.$entityRightTable.' ON (of_usergroup_group_id = entityright_consumer_id AND entityright_consumer = \'group\')
-                WHERE entityright_entity_id IN ('.$entityId.') AND entityright_entity = \''.$entityType.'\' AND entityright_write=1 AND entityright_read=0 AND userobm_archive=0 AND userobm_mail_perms=1
+                FROM '.$entityRightTable.'
+                INNER JOIN '.$groupEntityTable.' ON groupentity_entity_id = entityright_consumer_id
+                INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
+                INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
+                INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=0 AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'write'}->{'compute'} = 1;
     $rightDef{'write'}->{'sqlQuery'} = 'SELECT
                   userobm_id,
                   userobm_login
-                FROM '.$userObmTable.'
-                LEFT JOIN '.$ofUserGroupTable.' ON userobm_id = of_usergroup_user_id
-                LEFT JOIN '.$entityRightTable.' ON (userobm_id = entityright_consumer_id AND entityright_consumer = \'user\')
-                WHERE entityright_entity_id IN ('.$entityId.') AND entityright_entity = \''.$entityType.'\' AND entityright_write=1 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                FROM '.$entityRightTable.'
+                INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
+                INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
+                INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
                   userobm_login
-                FROM '.$userObmTable.'
-                LEFT JOIN '.$ofUserGroupTable.' ON userobm_id = of_usergroup_user_id
-                LEFT JOIN '.$entityRightTable.' ON (of_usergroup_group_id = entityright_consumer_id AND entityright_consumer = \'group\')
-                WHERE entityright_entity_id IN ('.$entityId.') AND entityright_entity = \''.$entityType.'\' AND entityright_write=1 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                FROM '.$entityRightTable.'
+                INNER JOIN '.$groupEntityTable.' ON groupentity_entity_id = entityright_consumer_id
+                INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
+                INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
+                INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'admin'}->{'compute'} = 1;
     $rightDef{'admin'}->{'sqlQuery'} = 'SELECT
                   userobm_id,
                   userobm_login
-                FROM '.$userObmTable.'
-                LEFT JOIN '.$ofUserGroupTable.' ON userobm_id = of_usergroup_user_id
-                LEFT JOIN '.$entityRightTable.' ON (userobm_id = entityright_consumer_id AND entityright_consumer = \'user\')
-                WHERE entityright_entity_id IN ('.$entityId.') AND entityright_entity = \''.$entityType.'\' AND entityright_admin=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                FROM '.$entityRightTable.'
+                INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
+                INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
+                INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_admin=1 AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
                   userobm_login
-                FROM '.$userObmTable.'
-                LEFT JOIN '.$ofUserGroupTable.' ON userobm_id = of_usergroup_user_id
-                LEFT JOIN '.$entityRightTable.' ON (of_usergroup_group_id = entityright_consumer_id AND entityright_consumer = \'group\')
-                WHERE entityright_entity_id IN ('.$entityId.') AND entityright_entity = \''.$entityType.'\' AND entityright_admin=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                FROM '.$entityRightTable.'
+                INNER JOIN '.$groupEntityTable.' ON groupentity_entity_id = entityright_consumer_id
+                INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
+                INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
+                INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_admin=1 AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'public'}->{'compute'} = 0;
-    $rightDef{'public'}->{'sqlQuery'} = 'SELECT entityright_read, entityright_write
-            FROM '.$entityRightTable.'
-            WHERE entityright_entity_id='.$entityId.'
-                AND entityright_entity=\''.$entityType.'\'
-                AND entityright_consumer_id=0';
+    $rightDef{'public'}->{'sqlQuery'} = 'SELECT
+                  entityright_read,
+                  entityright_write
+                FROM '.$entityRightTable.'
+                INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_consumer_id IS NULL';
 
 
     $self->{'currentEntity'}->setLinks( $self->_getEntityRight( \%rightDef ) );

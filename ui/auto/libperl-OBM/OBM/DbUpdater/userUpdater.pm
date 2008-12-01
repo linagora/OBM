@@ -209,26 +209,36 @@ sub update {
     }
 
     if( !$entity->getDelete() && $entity->getUpdateLinks() ) {
+        $query = 'INSERT INTO P_MailboxEntity
+                    (   mailboxentity_entity_id,
+                        mailboxentity_mailbox_id
+                    ) SELECT    mailboxentity_entity_id,
+                                mailboxentity_mailbox_id
+                      FROM MailboxEntity
+                      WHERE mailboxentity_mailbox_id = '.$entity->getId();
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour des liens '.$entity->getDescription() );
+            return 1;
+        }
+
+
         $query = 'INSERT INTO P_EntityRight
-                    (   entityright_entity,
-                        entityright_entity_id,
-                        entityright_consumer,
+                    (   entityright_entity_id,
                         entityright_consumer_id,
                         entityright_read,
                         entityright_write,
                         entityright_admin,
                         entityright_access
-                    ) SELECT    entityright_entity,
-                                entityright_entity_id,
-                                entityright_consumer,
+                    ) SELECT    entityright_entity_id,
                                 entityright_consumer_id,
                                 entityright_read,
                                 entityright_write,
                                 entityright_admin,
                                 entityright_access
                       FROM EntityRight
-                      WHERE entityright_entity=\'MailShare\' AND entityright_entity_id='.$entity->getId();
-
+                      WHERE entityright_entity_id=(SELECT mailboxentity_entity_id
+                                                    FROM MailboxEntity
+                                                    WHERE mailboxentity_mailbox_id = '.$entity->getId().')';
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour des liens '.$entity->getDescription() );
             return 1;
@@ -281,7 +291,16 @@ sub _delete {
     }
 
     if( $entity->getUpdateLinks() ) {
-         $query = 'DELETE FROM P_EntityRight WHERE entityright_entity=\'MailShare\' AND entityright_entity_id='.$entity->getId();
+        $query = 'DELETE FROM P_EntityRight
+                    WHERE entityright_entity_id=(SELECT mailboxentity_entity_id
+                                                    FROM P_MailboxEntity
+                                                    WHERE mailboxentity_mailbox_id = '.$entity->getId().')';
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD de liens '.$entity->getDescription(), 2 );
+            return 1;
+        }
+
+        $query = 'DELETE FROM P_MailboxEntity WHERE mailboxentity_mailbox_id = '.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD de liens '.$entity->getDescription(), 2 );
             return 1;

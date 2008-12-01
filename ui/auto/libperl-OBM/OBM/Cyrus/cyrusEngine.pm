@@ -527,7 +527,7 @@ sub _deleteBox {
 
     my $boxName = $entity->getMailboxName( 'current' );
     my $boxPrefix = $entity->getMailboxPrefix();
-    my @boxStruct = $cyrusSrvConn->listmailbox( $boxPrefix.$boxName, '' );
+    my @boxStruct = $cyrusSrv->listmailbox( $boxPrefix.$boxName, '' );
 
     my $boxSubfolders = undef;
     if( ref($entity) eq 'OBM::Entities::obmMailshare' ) {
@@ -537,7 +537,7 @@ sub _deleteBox {
     }
 
     if( defined($boxSubfolders) ) {
-        push( @boxStruct, $cyrusSrvConn->listmailbox( $boxSubfolders, '' ) );
+        push( @boxStruct, $cyrusSrv->listmailbox( $boxSubfolders, '' ) );
     }
 
     $self->log( 'suppression de la boite de '.$entity->getDescription(), 2 );
