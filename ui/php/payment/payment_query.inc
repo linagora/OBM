@@ -235,19 +235,8 @@ function run_query_payment_insert($params) {
 
   $datep = ($params['date'] ? "='".of_isodate_convert($params['date'])."'" : 'is null');
 
-  // Get the payment id inserted
-  $query = "SELECT payment_id
-    FROM Payment
-    WHERE payment_company_id = '$company_id'
-      AND payment_paymentkind_id = '$kind'
-      AND payment_date $datep
-      AND payment_amount = '$amount'
-      AND payment_comment = '$comment'";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_payment_insert(2)');
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $id = $obm_q->f('payment_id');
+  $id = $obm_q->lastid();
+  $entity_id = of_entity_insert($GLOBALS['module'], $id);  
 
   // insert the payment-invoice link, if invoice_id set
   if ($id > 0 && isset($invoice_id)) {
@@ -809,6 +798,7 @@ function check_can_delete_payment($id) {
 function run_query_payment_delete($p_id) {
   global $cdg_sql;
 
+  of_entity_delete($GLOBALS['module'], $p_id);
   $obm_q = new DB_OBM;
 
   $query = "DELETE FROM PaymentInvoice

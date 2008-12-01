@@ -1,19 +1,9 @@
-var obm = Obm = {};
-obm.vars = new Object();
-obm.vars.labels = new Object();
-obm.vars.images = new Object();
-obm.vars.regexp = new Object();
-obm.vars.consts = new Object();
-obm.vars.conf = new Object();
-obm.initialize = new Chain();
-obm.resize = new Chain();
-
 Obm.Menu = new Class({
   
   initialize: function() {
     this.menuItems = new Object();
 
-    var sectionItems = $ES('.sectionItem');
+    var sectionItems = $$('.sectionItem');
     for(i=0;i<sectionItems.length;i++) {
       var item = sectionItems[i];
       item.addEvent('mouseover', function(e){
@@ -35,7 +25,6 @@ Obm.Menu = new Class({
 
     slide.hide();
     sectionItem.style.display = 'block';
-    var chain = new Chain();
     slide.boxFix = this.menuListBoxFix.bind(slide);
     slide.xHide = function () {
       this.hide();
@@ -47,12 +36,6 @@ Obm.Menu = new Class({
     sectionBlock.addEvent('click', function(e){
       obm.menu.toggle(this.id)
     });   
-    //sectionBlock.addEvent('mouseover', function(e){
-    //   this.addClass('hover');
-    //});  
-    //sectionBlock.addEvent('mouseout', function(e){
-    //    this.removeClass('hover');
-    //});      
   },
 
   toggle: function(item) {
@@ -93,7 +76,7 @@ Obm.Portlets = new Class({
   initialize: function() {
     if(!$('portlets') )
       return false;
-    elements = $ES('.portlet',this.panel);
+    elements = $$('.portlet');
     if (elements.length == 0) {
       $('portletsPanel').setStyle('display','none');
       $('mainPanel').setStyle('margin-left','0');
@@ -108,28 +91,28 @@ Obm.Portlets = new Class({
     // 
     this.portlets = new Object();
     
-    this.sidebar = new Fx.Style('portlets', 'width', {duration: 250});    
-    this.sidebar.element.setStyle('overflow', 'hidden');
-    this.main = new Fx.Style('mainPanel', 'margin-left',{duration: 250});
-    this.handle = new Fx.Style('portletsHandler', 'left',{duration: 250});
-    this.delta = this.main.element.getLeft() - this.sidebar.element.offsetWidth;
-    this.panel = $('portletsPanel');
-    this.width = this.panel.offsetWidth;
-    this.handler = $('portletsHandler');
-    this.handler.setStyle('height',(this.panel.offsetHeight - 4) + 'px');
-    this.handler.setStyle('left',(this.width - this.handler.offsetWidth)  + 'px');
-    this.handler.getFirst().getNext().setStyle('display','none'); ;
-    this.handler.addEvent('click', function(e){
+    $('portlets').set('slide', {duration: 'normal',mode: 'horizontal', wrapper: 'portletsPanel'});
+    $('mainPanel').set('tween',{property: 'margin-left'});
+
+    $('portletsHandler').set('tween',{property: 'left'});
+
+    this.delta = $('mainPanel').getLeft() - $('portlets').offsetWidth;
+    this.width = $('portletsPanel').offsetWidth;
+
+    $('portletsHandler').setStyle('height',($('portletsPanel').offsetHeight - 4) + 'px');
+    $('portletsHandler').setStyle('left',(this.width - $('portletsHandler').offsetWidth)  + 'px');
+    $('portletsHandler').getFirst().getNext().setStyle('display','none'); ;
+    $('portletsHandler').addEvent('click', function(e){
       obm.portlets.toggle();
     });
 
-    if(Cookie.get("portletHidden") == "true") {
-      this.handler.getFirst().setStyle('display','none')
+    if(Cookie.read("portletHidden") == "true") {
+      $('portletsHandler').getFirst().setStyle('display','none')
                   .getNext().setStyle('display','inline'); 
-      this.sidebar.set(0);
-      this.panel.setStyle('width',this.delta + 'px');
-      this.main.set(this.delta);
-      this.handle.set(0);
+      $('portlets').get('slide').hide();
+      $('portletsPanel').setStyle('width',this.delta + 'px');
+      $('mainPanel').tween(this.delta);
+      $('portletsHandler').tween(0);
     }
 
   
@@ -140,7 +123,7 @@ Obm.Portlets = new Class({
       this.portlets[el.id] = new Fx.Slide(content, {duration: 150,wait:false});
       
       img = new Element('img');
-      if(Cookie.get(el.id + "Hidden")  == "true") {
+      if(Cookie.read(el.id + "Hidden")  == "true") {
         this.portlets[el.id].hide();
         img.src = this.open;
       } else {
@@ -161,39 +144,39 @@ Obm.Portlets = new Class({
   },
 
   toggle: function() {
-    
-    if(this.handler.getFirst().getStyle('display') == 'none')
-       this.handler.getFirst().setStyle('display','inline')
+
+    if($('portletsHandler').getFirst().getStyle('display') == 'none')
+       $('portletsHandler').getFirst().setStyle('display','inline')
                    .getNext().setStyle('display','none');
     else
-       this.handler.getFirst().setStyle('display','none')
+       $('portletsHandler').getFirst().setStyle('display','none')
                    .getNext().setStyle('display','inline');      
 
-    if(this.main.element.getLeft() > this.width) {
-      this.main.custom(this.width + this.delta,this.delta );
-      this.sidebar.custom(this.width,0);
-      this.handle.custom(this.width - this.handler.offsetWidth,0);
-      this.panel.setStyle('width',this.delta + 'px');
+    if($('portlets').get('slide').open) {
+      $('mainPanel').tween(this.width + this.delta,this.delta);
+      $('portlets').slide('out');
+      $('portletsHandler').tween(this.width - $('portletsHandler').offsetWidth,0);
+      $('portletsPanel').setStyle('width',this.delta + 'px');
     } else {
-      this.main.custom(this.delta, this.width + this.delta);
-      this.sidebar.custom(0,this.width);
-      this.handle.custom(0,this.width - this.handler.offsetWidth);
-      this.panel.setStyle('width',this.width + 'px');
+      $('mainPanel').tween(this.delta,this.width + this.delta);
+      $('portlets').slide('in');
+      $('portletsHandler').tween(0,this.width - $('portletsHandler').offsetWidth);
+      $('portletsPanel').setStyle('width',this.width + 'px');
     }
 
-    if(Cookie.get("portletHidden")  != "true") {
-      Cookie.set("portletHidden", "true",{path: '/'});
+    if(Cookie.read("portletHidden")  != "true") {
+      Cookie.write("portletHidden", "true",{path: '/'});
     } else {
-      Cookie.set("portletHidden", "false",{path: '/'});
+      Cookie.write("portletHidden", "false",{path: '/'});
     }
   },
 
   toggleElement: function(item) {
     this.portlets[item].toggle();
-    if(Cookie.get(item + "Hidden")  != "true") {
-      Cookie.set(item + "Hidden", "true",{path: '/'});
+    if(Cookie.read(item + "Hidden")  != "true") {
+      Cookie.write(item + "Hidden", "true",{path: '/'});
     } else {
-      Cookie.set(item + "Hidden", "false",{path: '/'});
+      Cookie.write(item + "Hidden", "false",{path: '/'});
     }    
   }
 
@@ -278,6 +261,6 @@ function showWaitingPanel(el) {
 
 function discardWaitingPanel() {;
   if(obm.waitingPanel) {
-    obm.waitingPanel.remove();
+    obm.waitingPanel.dispose();
   }
 }

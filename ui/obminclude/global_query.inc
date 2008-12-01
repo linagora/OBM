@@ -509,11 +509,10 @@ function get_global_linked_payment_nb($id, $entity) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_global_document_nb($id,$entity) {
   global $cdg_sql;
-  $id = sql_parse_id($id, true);
+  $entity_id = of_entity_get($entity, $id);
   $query = "SELECT count(*) as nb
-    FROM DocumentEntity
-    WHERE documententity_entity = '$entity'
-      AND documententity_entity_id $id "; 
+    FROM DocumentLink
+    WHERE documentlink_entity_id = $entity_id"; 
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -539,19 +538,17 @@ function run_query_global_insert_documents_links($ids, $entity) {
   if($id == '') {
     $id = $ids['ext_id'];
   }
-  $sid = sql_parse_id($id, true);
-  $iid = sql_parse_id($id);
+
+  $entity_id = of_entity_get($entity, $id);
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $ids['doc_nb']) {
     $cpt++;
     $d_id = sql_parse_id($ids["doc$cpt"], true);
-    
     $query = "SELECT *
-      FROM DocumentEntity
-      WHERE documententity_entity='$entity'
-        AND documententity_entity_id $id 
-        AND documententity_document_id $d_id ";
+      FROM DocumentLink
+      WHERE documentlink_entity_id = $entity_id 
+        AND documentlink_document_id $d_id ";
     display_debug_msg($query, $cdg_sql, 'run_query_global_insert_documents_links(1)');
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
@@ -559,13 +556,11 @@ function run_query_global_insert_documents_links($ids, $entity) {
     // If the entry doesn't already exist, we insert it
     if ($test_q->num_rows() == 0) {
       $d_id = sql_parse_id($ids["doc$cpt"]);
-      $query = "INSERT INTO DocumentEntity (
-        	documententity_entity,
-	       documententity_entity_id,
-	       documententity_document_id
+      $query = "INSERT INTO DocumentLink (
+	       documentlink_entity_id,
+	       documentlink_document_id
        )VALUES (    
-	       '$entity',
-	       $iid,
+	       $entity_id,
 	       $d_id
       )";
       display_debug_msg($query, $cdg_sql, 'run_query_global_insert_documents_links(2)');
@@ -594,18 +589,15 @@ function run_query_global_delete_document_links($ent_id, $entity, $doc_id='') {
   }
   $where = '1=1';
   if ($ent_id != '') {
-    $ent_id = sql_parse_id($ent_id, true);
-    $where .= " AND documententity_entity_id $ent_id ";
-  }
-  if ($entity != '') {
-    $where .= " AND documententity_entity = '$entity'";
+    $entity_id = of_entity_get($entity_id, $id);
+    $where .= " AND documentlink_entity_id = $entity_id ";
   }
   if ($doc_id != '') {
     $doc_id = sql_parse_id($doc_id, true);
-    $where .= " AND documententity_document_id $doc_id ";
+    $where .= " AND documentlink_document_id $doc_id ";
   }
 
-  $query = "DELETE FROM DocumentEntity WHERE $where";
+  $query = "DELETE FROM DocumentLink WHERE $where";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql,'run_query_global_delete_document_links()');
@@ -727,18 +719,12 @@ function run_query_global_insert_document($params, $id, $entity) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $uid = sql_parse_id($obm['uid'], true);
-  // Get document id
-  $query = "SELECT MAX(document_id) as document_id
-    FROM Document
-    WHERE document_usercreate $uid"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_global_insert_document(2)');
-  $obm_q->query($query); 
  
-  if ($obm_q->num_rows() > 0) {
-    // Document is correctly inserted in db
-    $obm_q->next_record();
-    $id = $obm_q->f('document_id');
+  $id = $obm_q->lastid();
+  if ($id) {
+    of_entity_insert('document', $id);
     $params['document_id'] = $id;
 
     // Create the document on the disk
@@ -747,15 +733,12 @@ function run_query_global_insert_document($params, $id, $entity) {
       // If error, delete file
       run_query_global_delete_document($id); // todo
     } else {
-      $entity_id = sql_parse_id($params[$entity.'_id']);
-      $iid = sql_parse_id($iid);
+      $entity_id = of_entity_get($entity, $params[$entity.'_id']);
       // Insert links
-      $query = "INSERT INTO DocumentEntity (
-        documententity_entity,
-        documententity_entity_id,
-        documententity_document_id
+      $query = "INSERT INTO DocumentLink (
+        documentlink_entity_id,
+        documentlink_document_id
        )VALUES (    
-        '$entity',
         $entity_id,
         $id)";
       display_debug_msg($query, $cdg_sql, 'run_query_global_insert_document(3)');
@@ -826,7 +809,7 @@ function global_session_load_user_todos($pri='todo_priority') {
   $limit = sql_limit($db_type, $cgp_todo_nb, 0);
   $order = ($pri != '' ? $pri : 'todo_priority');
   if ($order == 'todo_priority') {
-    $order .= ' desc event_priority';
+    $order = ' desc event_priority';
   }
 
   // create the todo list

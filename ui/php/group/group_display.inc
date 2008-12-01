@@ -683,10 +683,12 @@ function html_group_form($action, $group_q, $group, $field='') {
       $dis_private = "
     <script type=\"text/javascript\">
       function privacyShowHide(input) {
-        if($(input).getValue()) {
+        if($(input).get('inputValue')) {
           if($('emailGroup')) {
             $('emailGroup').addClass('H');
-            input.form.tf_email.value = ''
+            $('groupMailHome').set('html','');
+            add_email_field(aliasSelectTemplate); 
+            show_hide_add_button();
           }
           if($('sambaGroup')) {
             $('sambaGroup').addClass('H');

@@ -170,10 +170,10 @@ class EventAlertCronJob extends CronJob{
       $priority = $nr_q->f("event_priority");
       $date = $nr_q->f("event_date");
       $duration = $nr_q->f("event_duration");
-      $state = $nr_q->f("evententity_state");
+      $state = $nr_q->f("eventlink_state");
       $all_day = $nr_q->f("event_allday");
-      $entity = $nr_q->f("evententity_entity");
-      $entity_id = $nr_q->f("evententity_entity_id");
+      $entity = $nr_q->f("eventlink_entity");
+      $entity_id = $nr_q->f("eventlink_entity_id");
       $owner = $nr_q->f("event_owner");
       if (isset($of->events[$id])) {
         $event = &$of->events[$id];
@@ -214,10 +214,10 @@ class EventAlertCronJob extends CronJob{
       $all_day = $r_q->f("event_allday");     
       $repeatfrequence = $r_q->f("event_repeatfrequence");
       $repeatdays = $r_q->f("event_repeatdays");
-      $entity = $r_q->f("evententity_entity");
-      $entity_id = $r_q->f("evententity_entity_id");    
+      $entity = $r_q->f("eventlink_entity");
+      $entity_id = $r_q->f("eventlink_entity_id");    
       $entity_label = $r_q->f("userobm_lastname") ." ".$r_q->f("userobm_firstname");
-      $state = $r_q->f("evententity_state");
+      $state = $r_q->f("eventlink_state");
       $all_day = $r_q->f("event_allday");       
       $owner = $r_q->f("event_owner");
       if (!$endrepeat) {
@@ -307,9 +307,9 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       event_location,
       event_repeatfrequence,
       event_owner,
-      evententity_entity_id,
-      evententity_entity,
-      evententity_state,
+      userentity_entity_id as eventlink_entity_id,
+      'user' as eventlink_entity,
+      eventlink_state,
       $event_date_l - eventalert_duration as event_date,
       eventalert_duration,
       event_duration,
@@ -317,10 +317,11 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       userobm_lastname,
       userobm_firstname
     FROM EventAlert
-      JOIN Event ON event_id = eventalert_event_id  
-      JOIN EventEntity ON event_id = evententity_event_id AND eventalert_user_id = evententity_entity_id AND evententity_entity = 'user'
-      JOIN UserObm ON userobm_id = evententity_entity_id
-    WHERE evententity_state = 'A'
+      INNER JOIN Event ON event_id = eventalert_event_id  
+      INNER JOIN UserEntity ON userentity_user_id = eventalert_user_id'
+      INNER JOIN EventLink ON event_id = eventlink_event_id AND eventlink_entity_id = userentity_entity_id 
+      INNER JOIN UserObm ON userobm_id = eventlink_entity_id
+    WHERE eventlink_state = 'A'
       AND event_repeatkind = 'none'
       AND ($event_date - eventalert_duration) >= $start
       AND ($event_date - eventalert_duration) <=  $end
@@ -363,19 +364,20 @@ function run_query_calendar_repeat_alerts($start, $end) {
       $event_endrepeat_l,
       event_repeatfrequence,
       event_owner,
-      evententity_entity,
-      evententity_entity_id,
-      evententity_state,
+      'user' as eventlink_entity,
+      userentity_user_id as eventlink_entity_id,
+      eventlink_state,
       event_repeatdays,
       event_allday,
       userobm_lastname,
       userobm_firstname
     FROM EventAlert
-      JOIN Event ON event_id = eventalert_event_id
-      JOIN EventEntity ON event_id = evententity_event_id AND eventalert_user_id = evententity_entity_id AND evententity_entity = 'user'
-      JOIN UserObm ON userobm_id = evententity_entity_id
+      INNER JOIN Event ON event_id = eventalert_event_id
+      INNER JOIN UserEntity ON userentity_user_id = eventalert_user_id'
+      INNER JOIN EventLink ON event_id = eventlink_event_id AND eventlink_entity_id = userentity_entity_id 
+      INNER JOIN UserObm ON userobm_id = eventlink_entity_id
     WHERE event_repeatkind != 'none'
-      AND evententity_state = 'A'
+      AND eventlink_state = 'A'
       AND ($event_date  - eventalert_duration) <= $end 
       AND (($event_endrepeat  - eventalert_duration) >= $start
       OR $event_endrepeat = '0')

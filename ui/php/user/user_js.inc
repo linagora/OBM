@@ -122,7 +122,7 @@ function check_phoneFax_number(form) {
 
 
 function delete_user_photo() {
-  $('block_photo_detail').remove();
+  $('block_photo_detail').dispose();
 
   return false;
 } 
@@ -149,7 +149,7 @@ function show_hide_add_button() {
   var childs = parent.getChildren();
   if($GLOBALS[c_max_user_alias] > 0) {
     if(childs.length >= $GLOBALS[c_max_user_alias] && button) {
-      button.remove();
+      button.dispose();
     } else if(childs.length < $GLOBALS[c_max_user_alias] && !button) {
       $('userMailLabel').adopt((new Element('a').addEvent('click', function () {
                 add_email_field(aliasSelectTemplate);
@@ -235,13 +235,16 @@ function set_toUpdate(name) {
 
 function switch_mail_mode() {
   if($('userMailActive').checked == true) {
-    external.remove();
+    external.dispose();
     external.addClass('H');
     internal.removeClass('H');
     internal.injectInside($('userMail'));
 
   } else {
-    internal.remove();
+    $('userMailHome').set('html','');
+    add_email_field(aliasSelectTemplate); 
+    show_hide_add_button();    
+    internal.dispose();
     internal.addClass('H');
     external.removeClass('H');
     external.injectInside($('userMail'));

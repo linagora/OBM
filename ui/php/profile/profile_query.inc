@@ -213,6 +213,7 @@ function run_query_profile_delete($profile_id) {
   if ($ret) $ret = run_query_profileproperties_delete($profile_id);
 
   // Delete Profile
+  of_entity_delete($GLOBALS['module'], $profile_id);
   if ($ret) {
     $query = "DELETE FROM Profile WHERE profile_id=$profile_id";
     display_debug_msg($query, $cdg_sql, "run_query_profile_delete($profile_id)");
@@ -255,22 +256,8 @@ function run_query_profile_insert ($params) {
   display_debug_msg($query, $cdg_sql, 'run_query_profile_insert(1)');
   $retour = $obm_q->query($query);
 
-  $query = "SELECT profile_id
-    FROM Profile
-    WHERE
-    profile_timeupdate = '$now'
-    AND profile_timecreate = '$now'
-    AND profile_userupdate = $uid
-    AND profile_usercreate = $uid
-    AND profile_domain_id = $domain_id
-    AND profile_name = '$params[name]'
-    ";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_profile_insert(2)');
-  $retour = $obm_q->query($query);
-  $obm_q->next_record();
-
-  $profile_id = $obm_q->f('profile_id');
+  $profile_id = $obm_q->lastid(); 
+  $entity_id = of_entity_insert($GLOBALS['module'], $profile_id);  
 
   run_query_profile_replace_properties($profile_id, $params);
 

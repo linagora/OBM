@@ -216,10 +216,10 @@ function run_query_list_insert($list) {
   display_debug_msg($query, $cdg_sql, "run_query_list_insert()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-
+  $id = $obm_q->lastid();
   // Handle list duplication
   if ($retour) {
-    $id = get_list_id($list);
+    $entity_id = of_entity_insert($GLOBALS['module'], $id);  
     $sql_id = sql_parse_id($id);
     $id_dup = $list["id_duplicated"];
     if ($id_dup > 0) {
@@ -373,6 +373,7 @@ function run_query_list_update_sql($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_list_delete($p_id) {
   global $cdg_sql;
+  of_entity_delete($GLOBALS['module'], $p_id);
   $p_id = sql_parse_id($p_id, true);
   // Delete all contacts registration to this list
   $query = "DELETE FROM ContactList WHERE contactlist_list_id $p_id ";
@@ -381,7 +382,7 @@ function run_query_list_delete($p_id) {
   $retour = $obm_q->query($query);
 
   // Delete the List
-	$multidomain = sql_multidomain("list");
+  $multidomain = sql_multidomain("list");
   $query = "DELETE FROM List WHERE list_id $p_id $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_list_delete(2)");
   $retour = $obm_q->query($query);
@@ -1482,8 +1483,7 @@ function make_list_query_from_criteria($list) {
 	$operateurs["$cat_name"] = str_replace('%t',"$cat_link",$usercategory_id_in); 
 	$operateurs["${cat_name}_code"] = str_replace('%t',"$cat",$usercategory_code_equal); 
 	$add_join["$cat_name"] = " LEFT JOIN CategoryLink $cat_link
-         ON ${entity}_id = $cat_link.categorylink_entity_id
-           AND $cat_link.categorylink_entity = '$entity'
+         ON ${entity}entity_entity_id = $cat_link.categorylink_entity_id
            AND $cat_link.categorylink_category = '$cat_name'
        LEFT JOIN Category $cat ON $cat_link.categorylink_category_id = $cat.category_id ";
 	
@@ -1540,6 +1540,8 @@ function make_list_query_from_criteria($list) {
         ctry2.country_name as company_country";
 
   $from = " Contact LEFT JOIN Company ON contact_company_id=company_id
+                    INNER JOIN ContactEntity ON contact_id = contactentity_contact_id
+                    INNER JOIN CompanyEntity ON company_id = companyentity_company_id
                     LEFT JOIN Country as ctry1 ON Contact.contact_country_iso3166=ctry1.country_iso3166 AND ctry1.country_lang='$lang'
                     LEFT JOIN Country as ctry2 ON Company.company_country_iso3166=ctry2.country_iso3166 AND ctry2.country_lang='$lang'
                     LEFT JOIN Kind ON contact_kind_id = kind_id

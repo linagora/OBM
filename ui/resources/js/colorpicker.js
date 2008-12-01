@@ -8,7 +8,7 @@ Obm.ColorPicker = new Class({
     element.setProperty('autocomplete','off');
     element.setProperty('maxlenght','7');
     var span = new Element('span').injectBefore(element).addClass('NW');
-    element.remove();
+    element.dispose();
     element.injectInside(span);
     if(element.value != '') {
       element.setStyles({

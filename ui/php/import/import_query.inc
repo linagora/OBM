@@ -712,21 +712,10 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  // Get the company Id
-  $query = "SELECT MAX(company_id) as id
-      FROM Company
-      WHERE company_name = '$name'
-        AND company_phone = '$phone'
-        AND company_address1 = '$ad1'
-        AND company_zipcode = '$zip'
-        AND company_town = '$town'";
-  
-  display_debug_msg($query, $cdg_sql, "run_query_import_company_insert(2)");
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $id = $obm_q->f("id");
+  $id = $obm_q->lastid();
 
   if ($id > 0) {
+    of_entity_insert('company', $id)
     // User data handling
     if (is_array($userdata["company"]["category"])) {
       foreach($userdata["company"]["category"] as $cat_name => $hash) {
@@ -1008,21 +997,10 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  // Get the contact Id
-  $query = "SELECT MAX(contact_id) as id
-      FROM Contact
-      WHERE contact_timecreate = '$now'
-        and contact_lastname = '$lname'
-        and contact_firstname = '$fname'
-        and contact_phone = '$phone'";
-  
-  display_debug_msg($query, $cdg_sql, "run_query_import_contact_insert(2)");
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $id = $obm_q->f("id");
+  $id = $obm_q->lastid();
 
   if ($id > 0) {
-
+    of_entity_insert('contact',$id);
     run_query_global_company_contact_number_update($comp_id);
 
     // User data handling

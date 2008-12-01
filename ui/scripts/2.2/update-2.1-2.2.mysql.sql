@@ -444,13 +444,6 @@ CREATE TABLE DealEntity (
   PRIMARY KEY (dealentity_entity_id, dealentity_deal_id)
 );
   
-DROP TABLE IF EXISTS DefaultodttemplateEntity;
-CREATE TABLE DefaultodttemplateEntity (
-  defaultodttemplateentity_entity_id int(8) NOT NULL,
-  defaultodttemplateentity_defaultodttemplate_id int(8) NOT NULL,
-  PRIMARY KEY (defaultodttemplateentity_entity_id, defaultodttemplateentity_defaultodttemplate_id)
-);
-  
 DROP TABLE IF EXISTS DocumentEntity;
 CREATE TABLE DocumentEntity (
   documententity_entity_id int(8) NOT NULL,
@@ -957,7 +950,7 @@ ALTER TABLE DocumentMimeType MODIFY COLUMN documentmimetype_domain_id int(8) NOT
 ALTER TABLE DomainMailServer MODIFY COLUMN domainmailserver_domain_id int(8) NOT NULL ;
 ALTER TABLE EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
 ALTER TABLE EntityRight ADD entityright_access int(1) NOT NULL default 0;
-ALTER TABLE EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
+ALTER TABLE EntityRight MODIFY COLUMN entityright_consumer_id int(8);
 ALTER TABLE EventLink MODIFY COLUMN eventlink_event_id int(8) NOT NULL ;
 ALTER TABLE EventLink MODIFY COLUMN eventlink_entity_id int(8) NOT NULL ;
 ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
@@ -1112,11 +1105,6 @@ INSERT INTO DealEntity (dealentity_entity_id, dealentity_deal_id) SELECT entity_
 UPDATE TmpEntity SET id_entity = NULL;
   
 INSERT INTO TmpEntity (id_entity) SELECT defaultodttemplate_id FROM DefaultOdtTemplate;
-INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
-INSERT INTO DefaultodttemplateEntity (defaultodttemplateentity_entity_id, defaultodttemplateentity_defaultodttemplate_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
-UPDATE TmpEntity SET id_entity = NULL;
-  
-INSERT INTO TmpEntity (id_entity) SELECT document_id FROM Document;
 INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
 INSERT INTO DocumentEntity (documententity_entity_id, documententity_document_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
 UPDATE TmpEntity SET id_entity = NULL;
@@ -1299,7 +1287,7 @@ UPDATE EventLink SET eventlink_entity_id = (SELECT userentity_entity_id FROM Use
 DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT resource_id FROM Resource) AND eventlink_entity = 'resource';
 UPDATE EventLink SET eventlink_entity_id = (SELECT resourceentity_entity_id FROM ResourceEntity INNER JOIN Resource ON resourceentity_resource_id = resource_id WHERE resource_id = eventlink_entity_id), eventlink_entity = 'entity' WHERE eventlink_entity = 'resource';
 -- FIXME : Task not handle
-DELETE FROM EventLink where eventlink_entity != 'task';
+DELETE FROM EventLink where eventlink_entity != 'task' AND eventlink_entity != 'entity';
 ALTER TABLE EventLink DROP COLUMN eventlink_entity;
 
 -- ------------------------------

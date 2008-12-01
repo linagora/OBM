@@ -348,9 +348,7 @@ function display_head_theme($p_module) {
   $dayMedium = phpArrayToJsArray($l_daysofweekshort);
   $dayLong =   phpArrayToJsArray($l_daysofweek);
 
-  $headers_e = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
-<html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
+  $headers_e = "";
 
   if (is_array($extra_css)) {
     foreach($extra_css as $css_file) {
@@ -365,20 +363,46 @@ function display_head_theme($p_module) {
       $js_include .= "<script type=\"text/javascript\" src=\"$resources_path/js/$js_file\" ></script>\n";
     }
   }
-
+  if(is_array($GLOBALS['js']['vars'])) {
+    foreach($GLOBALS['js']['vars'] as $kind => $values) {
+      foreach($values as $label => $value) {
+        if(is_numeric($value)) {
+          $obm_vars .= "obm.vars.$kind.$label = $value;\n";
+        } elseif(is_string($value)) {
+          $obm_vars .= "obm.vars.$kind.$label = '".phpStringToJsString($value)."';\n";
+        } elseif(is_array($value)) {
+          $obm_vars .= "obm.vars.$kind.$label = new Object();\n";
+          foreach($value as $key => $string) {
+            $obm_vars .= "obm.vars.$kind.$label.$key = '".phpStringToJsString($string)."';\n";
+          }
+        } else {
+          $obm_vars .= "obm.vars.$kind.$label = '$value';\n";
+        }
+      }
+    }
+  }
   return "$headers_e
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
+<html xmlns=\"http://www.w3.org/1999/xhtml\">     
 <head>
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
   <title>$l_obm_title - $p_module</title>
   <link rel=\"stylesheet\" type=\"text/css\" href=\"$css\" />
   $dis_extra_css
-  <script type=\"text/javascript\" src=\"$resources_path/js/mootools.js\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
-  <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/mootools-1.2-more.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/clientcide.js\" ></script>
   <script type=\"text/javascript\">
   //<![CDATA[
+  var obm = Obm = {};
+  obm.vars = new Object();
+  obm.vars.labels = new Object();
+  obm.vars.images = new Object();
+  obm.vars.regexp = new Object();
+  obm.vars.consts = new Object();
+  obm.vars.conf = new Object();
+  obm.initialize = new Chain();
+  obm.resize = new Chain();
   obm.vars.images.minus = '$ico_minus';
   obm.vars.images.plus = '$ico_plus';
   obm.vars.images.datePicker = '$ico_datepicker';
@@ -400,22 +424,27 @@ function display_head_theme($p_module) {
   obm.vars.labels.transparent = '".phpStringToJsString($l_transparent)."';
   obm.vars.labels.autocompleteField = '".phpStringToJsString($l_autocomplete_field)."'
   obm.vars.labels.fatalServerErr = '".phpStringToJsString($l_fatal_server_err)."';
+  $obm_vars
   // ]]>
   </script> 
-
+  <!-- <script type=\"text/javascript\" src=\"$resources_path/js/mootools.js\" ></script> -->
+  <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js\" ></script>
   $js_include
 
   <script type=\"text/javascript\">
   //<![CDATA[
   window.onresize= function() {
-    while(obm.resize.chains && obm.resize.chains.length > 0) {
+    while(obm.resize.\$chain && obm.resize.\$chain.length > 0) {
       obm.resize.callChain();
     }
   }
 
   obm.initialize.chain(datePickerGenerator);
-  window.onDomReady( function () {
-    while(obm.initialize.chains && obm.initialize.chains.length > 0) {
+  window.addEvent('domready', function () {
+    while(obm.initialize.\$chain && obm.initialize.\$chain.length > 0) {
       obm.initialize.callChain();
     }
   });

@@ -266,7 +266,8 @@ function run_query_resource_insert($resource) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $id = get_resource_id($name);
+    $id = $obm_q->lastid();
+    $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     $resource['entity_id'] = $id;
     of_right_default($resource, 'Resource', '',false) ;
   }
@@ -318,23 +319,8 @@ function run_query_resource_update($p_id, $resource) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_delete($p_id) {
   global $cdg_sql;
+  of_entity_delete($GLOBALS['module'], $p_id);
   $p_id = sql_parse_id($p_id, true);
-  // Delete Resource rights
-  $obm_q = new DB_OBM;
-  $query = "DELETE FROM EntityRight 
-    WHERE
-      entityright_entity_id $p_id 
-      AND entityright_entity = 'resource'";
-  display_debug_msg($query, $cdg_sql, 'run_query_resource_delete(entityright)');
-  $retour = $obm_q->query($query);
-
-  // Delete Resource events
-  $query = "DELETE FROM EventEntity 
-    WHERE
-      evententity_entity_id $p_id 
-      AND evententity_entity = 'resource'";
-  display_debug_msg($query, $cdg_sql, 'run_query_resource_delete(resource event)');
-  $retour = $obm_q->query($query);
 
   // Delete the resource
   $multidomain = sql_multidomain('resource');

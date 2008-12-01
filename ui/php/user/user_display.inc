@@ -1019,7 +1019,7 @@ function html_user_form($usr_q, $user, $field='') {
   global $l_mailserver_auto;
   //global $path, $display, $cgp_use, $action, $profiles;
   global $path, $display, $cgp_use, $action;
-  global $obm, $c_default_domain, $c_renameUserMailbox, $l_domain, $l_header_new, $l_hour;
+  global $obm, $c_default_domain, $l_domain, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
 	
   // if update mode and first time value are taken from database
@@ -1204,9 +1204,6 @@ function html_user_form($usr_q, $user, $field='') {
   // login (can't be updated, so only on insert)
   if (($action == "new") || ($action == "insert")) {
     $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />";
-  } elseif (! $c_renameUserMailbox) {
-    $dis_login = "$login
-                  <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />";
   } else {
     $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />
                   <input type=\"hidden\" name=\"tf_old_login\" value=\"$old_login\" />";
@@ -1310,9 +1307,9 @@ function html_user_form($usr_q, $user, $field='') {
     var internal = $('userInternalMail');
     var external = $('userExternalMail');
     if($('userMailActive').checked == true) {
-      external.remove();
+      external.dispose();
     } else {
-      internal.remove();  
+      internal.dispose();  
     }
   </script>
   </fieldset>";
@@ -1504,27 +1501,6 @@ function html_user_form($usr_q, $user, $field='') {
   }
 
   // Profiles
-  /* Old
-  foreach ($profiles as $k_profile => $one_profile) {
-    $admin_realm = $profiles[$k_profile]['properties']['admin_realm'];
-    if(is_array($admin_realm) && in_array('delegation', $admin_realm)) {
-      $onselect .= "profiles['$k_profile'] = true\n";
-      if(!isset($delegation_class) || $profile == $k_profile ) $delegation_class = ''; 
-    } else {
-      $onselect .= "profiles['$k_profile'] = false\n";
-      if(!isset($delegation_class) || $profile == $k_profile) $delegation_class = 'H'; 
-    }
-    if ($profile == $k_profile) {
-      $selected = " selected";
-    } else {
-      $selected = "";
-    }
-    $dis_profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;    
-    $block_profile .= "
-      <option value=\"$k_profile\"$selected>$dis_profile</option>";
-  }*/
-  
-  // Profiles
   foreach ($user['profiles'] as $k_profile => $one_profile) {
     $admin_realm = $one_profile['properties']['admin_realm'];
     if (is_array($admin_realm) && in_array('delegation', $admin_realm)) {
@@ -1577,15 +1553,15 @@ function html_user_form($usr_q, $user, $field='') {
         $('delegationTargetBlock').addClass('H');
         $('delegationTargetField').value = '';
       }
-		}
-		function showExpiration()	{
-			var Props = $('noexperie').getProperty('checked');			
-			if(Props==true){
-				$('exp').setProperty('style','');
-			}else{
-				$('exp').setProperty('style','display:none');
-			}	
-		}
+    }
+    function showExpiration()	{
+      var Props = $('noexperie').getProperty('checked');			
+      if(Props==true){
+        $('exp').setProperty('style','');
+      }else{
+        $('exp').setProperty('style','display:none');
+      }	
+    }
   </script>
   <table>
   <tr>

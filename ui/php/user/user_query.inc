@@ -44,7 +44,7 @@ function run_query_user_search($user) {
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
   $dateexp = sql_date_format($db_type, 'userobm_account_dateexp', 'dateexp');
-  $diff = "TIMESTAMPDIFF(DAY,now(),userobm_account_dateexp)";
+  $diff = "#DAYDIFF(now(),userobm_account_dateexp)";
   $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
   $multidomain = sql_multidomain('userobm');
 
@@ -166,6 +166,7 @@ function run_query_user_search($user) {
       $dateexp,
       $lastaccess
     FROM UserObm 
+    INNER JOIN UserEntity ON userentity_user_id = userobm_id
     LEFT JOIN Domain ON userobm_domain_id = domain_id
     $join_grp
     $join_userdata";
@@ -193,7 +194,7 @@ function run_query_user_search($user) {
 
   if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg($query, $cdg_sql, 'run_query_user_search()');
-    $obm_q->query($query);
+    $obm_q->xquery($query);
   }
 
   return $obm_q;
@@ -620,22 +621,14 @@ function run_query_user_insert($user) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    // Get the user id
-    $query = "SELECT userobm_id as id
-    FROM UserObm
-    WHERE userobm_login = '$login'
-      AND userobm_domain_id='$domain_id'";
-  
-    display_debug_msg($query, $cdg_sql, 'run_query_user_insert(2)');
-    $obm_q->query($query);
-    $obm_q->next_record();
-    $id = $obm_q->f('id');
+    $id = $obm_q->lastid();
   } else {
     $id = false;
   }
 
   if ($id > 0) {
     $user['entity_id'] = $id;
+    $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     of_right_default($user,'mailbox','userobm',false);
     of_right_default($user,'calendar','userobm',false);
     $ret = of_userdata_query_update('user', $id, $user);
@@ -722,7 +715,7 @@ function run_query_user_update($p_id, $user) {
   //global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
-  global $c_renameUserMailbox, $cmd_ldap_passwd;
+  global $cmd_ldap_passwd;
 
   // Connect to the BD
   $obm_q = new DB_OBM;
@@ -739,9 +732,7 @@ function run_query_user_update($p_id, $user) {
   $title = $user['title'];
   $email = $user['email'];
   $desc = $user['desc'];
-  if ($c_renameUserMailbox) {
-    $user_update_q = "userobm_login='".strtolower($user['login'])."',";
-  }
+  $user_update_q = "userobm_login='".strtolower($user['login'])."',";
   $multidomain = sql_multidomain('userobm');
   $photo_id = sql_parse_id($user['photo_id']);
   
@@ -1013,7 +1004,7 @@ function run_query_user_update($p_id, $user) {
           }
 
           if ($parameters) {
-            $cmd = $cmd_ldap_passwd.$parameters." --login ".$user['login']." --domain ".$user_domain." --type ".$password_encryption." --no-old --passwd '".$passwd."'";
+            $cmd = $cmd_ldap_passwd.$parameters." --login ".$user['login']." --domain ".$user_domain." --type PLAIN --no-old --passwd '".$passwd."'";
 
             display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
             exec($cmd);
@@ -1090,6 +1081,7 @@ function run_query_user_delete($p_id) {
   global $cdg_sql, $obm, $c_use_connectors;
 
   $multidomain = sql_multidomain('userobm');
+  of_entity_delete($GLOBALS['module'], $p_id);
   $ret = of_userdata_query_delete('user', $p_id);
   $obm_q = new DB_OBM;
   $id = sql_parse_id($p_id, true);
@@ -2088,10 +2080,10 @@ function run_query_user_delete_profile($user_id)  {
       event_timeupdate = '$now'
     WHERE event_owner $user_id 
       OR event_id IN (
-        SELECT evententity_event_id as event_id
-        FROM EventEntity
-        WHERE evententity_entity = 'user'
-          AND evententity_entity_id $user_id )";
+        SELECT eventlink_event_id as event_id
+        FROM EventLink
+        INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+        WHERE userentity_user_id $user_id )";
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
   $obm_q->query($query);
   
@@ -2099,46 +2091,12 @@ function run_query_user_delete_profile($user_id)  {
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
   $obm_q->query($query);
 
-  // Remove all User event participation
-  $query = "DELETE FROM EventEntity
-    WHERE evententity_entity = 'user'
-      AND evententity_entity_id $user_id "; 
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EventEntity)");
-  $obm_q->query($query);
-
   // Remove all Events that have non attendees !
   $query = "DELETE FROM Event
-     WHERE event_id NOT IN (
-       SELECT distinct evententity_event_id
-       FROM EventEntity
-       WHERE evententity_entity = 'user')"; 
+     WHERE event_id NOT IN (SELECT eventlink_event_id FROM EventLink)"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
 
-  // Remove all Event Alerts
-  $query = "DELETE FROM EventAlert
-     WHERE eventalert_user_id = '$user_id'";
-  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(EventAlerts)");
-  $obm_q->query($query);
-
-  // Remove all acl to the user and user's one
-  $query = "DELETE FROM EntityRight
-    WHERE entityright_entity = 'calendar'
-      AND entityright_entity_id $user_id "; 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(EntityRight)');
-  $obm_q->query($query);
-
-  $query = "DELETE FROM EntityRight
-    WHERE entityright_consumer = 'user'
-      AND entityright_consumer_id = '$user_id'"; 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(EntityRight)');
-  $obm_q->query($query);
-
-  // Remove all users in Organizational Chart
-  $query = "DELETE FROM OGroupEntity
-    WHERE ogroupentity_entity='user' AND ogroupentity_entity_id $user_id ";
-  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(OrganizationalChart)');
-  $obm_q->query($query);
 }
 
 /**

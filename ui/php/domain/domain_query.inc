@@ -148,16 +148,8 @@ function run_query_domain_insert($domain) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    // Get the domain id
-    $query = "SELECT domain_id as id
-      FROM Domain
-      WHERE domain_label = '$label'";
-
-    display_debug_msg($query, $cdg_sql, 'run_query_domain_detail(2)');
-
-    $obm_q->query($query);
-    $obm_q->next_record();
-    $id = $obm_q->f('id');
+    $id = $obm_q->lastid();
+    $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     run_query_domain_replace_properties($id,$domain);
   } else {
     $id = false;
@@ -250,6 +242,8 @@ function run_query_domain_update($d_id, $domain) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_delete($p_id) {
   global $cdg_sql, $c_use_connectors;
+  
+  of_entity_delete($GLOBALS['module'], $p_id);
 
   $obm_q = new DB_OBM;
   $p_id = sql_parse_id($p_id, true);

@@ -49,6 +49,7 @@ require('contact_display.inc');
 require('contact_query.inc');
 require_once('contact_js.inc');
 require_once("$obminclude/of/of_category.inc");
+$extra_js_include[] = 'contact.js';
 
 get_contact_action();
 $perm->check_permissions($module, $action);
@@ -133,7 +134,6 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_contact_data_form('', $params)) {
-
     // If the context (same contacts) was confirmed ok, we proceed
     if ($params['confirm'] == $c_yes) {
       $id = run_query_contact_insert($params);

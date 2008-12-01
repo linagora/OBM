@@ -384,22 +384,8 @@ function run_query_project_insert($params) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
-  // get the id of the inserted project. Date is to insure correct project
-  // is selected (and not similar from the same deal)
-  $query = "SELECT MAX(project_id) as project_id
-            FROM Project
-            WHERE project_usercreate = $uid";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_project_insert (get Id)');
-  $obm_q->query($query);
-
-  if ($obm_q->num_rows() > 0) {
-    $obm_q->next_record();
-    $pid = $obm_q->f('project_id');
-  } else {
-    $pid = 0;
-    return $pid;
-  }
+  $pid = $obm_q->lastid();
+  $entity_id = of_entity_insert($GLOBALS['module'], $pid);  
 
   $id = sql_parse_id($id);
   // If a task has been given, We create a task for this project
@@ -616,6 +602,7 @@ function run_query_project_delete($p_id) {
 
   // Delete all links to documents
   run_query_global_delete_document_links($p_id, 'project');
+  of_entity_delete($GLOBALS['module'], $p_id);
   $p_id = sql_parse_id($p_id, true);
   // Delete all users associations to the project
   $query = "DELETE FROM ProjectUser 

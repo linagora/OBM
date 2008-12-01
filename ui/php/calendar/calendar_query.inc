@@ -269,7 +269,7 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
     if ($entity == 'user') {
       $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
     } elseif ($entity == 'resource') {
-      $writable = of_right_entity_for_user('Resource', $obm['uid'], 'write');
+      $writable = of_right_entity_for_user('resource', $obm['uid'], 'write');
     }
     
     if (!in_array($entity_id, $writable['ids'])) {
@@ -279,12 +279,10 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   }
 
   $event_id = sql_parse_id($event_id, true);
-  $entity_id = sql_parse_id($entity_id, true);
-  $query = "UPDATE EventEntity 
-            SET evententity_state = '$state'
-            WHERE evententity_entity_id  $entity_id 
-              AND evententity_entity = '$entity'
-              AND evententity_event_id $event_id"; 
+  $query = "UPDATE EventLink 
+            SET eventlink_state = '$state'
+            WHERE eventlink_entity_id = ".of_entity_subquery($entity, $entity_id)." 
+              AND eventlink_event_id $entity_id"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
   $obm_q = new DB_OBM;
@@ -336,18 +334,17 @@ function check_calendar_event_participation($params) {
 function get_calendar_event_participation_state($event_id, $entity, $entity_id) {
   global $cdg_sql;
 
-  $query = "SELECT evententity_state
-    FROM EventEntity 
-    WHERE evententity_entity_id = $entity_id
-      AND evententity_entity = '$entity'
-      AND evententity_event_id = '$event_id'";
+  $query = "SELECT eventlink_state
+    FROM EventLink 
+    WHERE eventlink_entity_id = ".of_entity_subquery($entity, $entity_id)."
+      AND eventlink_event_id = '$event_id'";
 
   display_debug_msg($query, $cdg_sql, 'get_calendar_event_participation_state()');  
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   if ($obm_q->num_rows() == 1) {
     $obm_q->next_record();
-    $state = $obm_q->f('evententity_state');
+    $state = $obm_q->f('eventlink_state');
     return $state;
   } else {
     return false;
@@ -404,19 +401,20 @@ function run_query_calendar_waiting_events() {
       event_date
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-      LEFT JOIN EventEntity ON event_id  = evententity_event_id
-      LEFT JOIN UserObm on evententity_entity='user' AND evententity_entity_id=userobm_id
-      LEFT JOIN UserObm u ON event_owner = u.userobm_id
+      INNER JOIN EventLink ON event_id  = eventlink_event_id
+      INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+      INNER JOIN UserObm ON userentity_user_id = userobm_id
+      INNER JOIN UserObm u ON event_owner = u.userobm_id
     WHERE
       event_type='VEVENT'
-      AND evententity_state = 'NEEDS-ACTION'
+      AND eventlink_state = 'NEEDS-ACTION'
       AND ( 1=0
       $multidomain
 ";
   if (is_array($writable_cal) && (count($writable_cal['ids'])>0)) {
-    $query .= "OR ( evententity_entity_id IN ('".implode("','",$writable_cal['ids'])."') AND evententity_entity = 'user')";    
+    $query .= "OR userentity_entity_id IN ('".implode("','",$writable_cal['ids'])."')";    
   }
-  $query .= " OR (evententity_entity_id = '$uid' AND evententity_entity = 'user'))";
+  $query .= " OR userentity_entity_id = '$uid')";
 
   if (is_array($writable_res) && (count($writable_res['ids'])>0)) {
     $query .= "
@@ -440,16 +438,17 @@ function run_query_calendar_waiting_events() {
       event_date
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-      LEFT JOIN EventEntity ON event_id  = evententity_event_id
-      LEFT JOIN Resource on evententity_entity='resource' AND evententity_entity_id=resource_id
-      LEFT JOIN UserObm u ON event_owner = u.userobm_id
+      INNER JOIN EventLink ON event_id  = eventlink_event_id
+      INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
+      INNER JOIN Resource ON resourceentity_resource_id = resource_id
+      INNER JOIN UserObm u ON event_owner = u.userobm_id
     WHERE
       event_type='VEVENT'
-      AND evententity_state = 'NEEDS-ACTION'
+      AND eventlink_state = 'NEEDS-ACTION'
       AND ( 1=0
       $multidomain
 ";
-    $query .= "OR ( evententity_entity_id IN ('".implode("','",$writable_res['ids'])."') AND evententity_entity = 'resource'))";
+    $query .= "OR eventlink_entity_id IN ('".implode("','",$writable_res['ids'])."')";
   }
   $query .= " ORDER BY entity_entity, entity_label, event_date"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_waiting_events()');
@@ -468,13 +467,13 @@ function run_query_calendar_delete_event_entity($calendar, $users = null) {
   global $cdg_sql;
 
   $e_id = sql_parse_id( $calendar['calendar_id'], true);
-  $query = "DELETE FROM EventEntity WHERE evententity_event_id  $e_id"; 
+  $query = "DELETE FROM EventLink WHERE eventlink_event_id  $e_id"; 
   if (is_array($users)) {
     if (count($users) != 0) {
-      $query .= " AND (evententity_entity != 'user' OR evententity_entity_id IN (".implode(",",$users)."))";
+      $query .= " AND eventlink_entity_id NOT IN ".of_entity_subquery('user', $users, true);
     }
   } else {
-     $query .= " AND evententity_entity != 'user'";
+     $query .= " AND eventlink_entity_id NOT IN ".of_entity_subquery('user')."";
   }
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete_event_entity()');
@@ -497,8 +496,6 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, $event_id) {
 
   $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
   $groups = $sel_entity_id['group'];
-  if ($calendar['task_new_id']) $task_id = $calendar['task_new_id']; 
-  else $task_id = $calendar['task_id'];
   // Get the final user list (merge group)
   $users_array = $sel_entity_id['user'];
   if (is_array($groups)) {
@@ -526,11 +523,6 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, $event_id) {
     } else {
       run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'NEEDS-ACTION');
     }
-  }
-
-  // Insert The event task
-  if ($task_id > 0) {
-    run_query_calendar_insert_entity_event('task', $task_id, $event_id, 'ACCEPTED');
   }
 
   // Insert Event resources
@@ -710,20 +702,18 @@ function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $
   $event_id = $event_id;
   $entity_id = sql_parse_id( $entity_id);
   $uid = sql_parse_id( $obm['uid']);
-  $query = "INSERT INTO EventEntity (
-    evententity_timecreate,
-    evententity_usercreate,
-    evententity_event_id, 
-    evententity_entity_id,
-    evententity_entity,
-    evententity_required,
-    evententity_state) 
+  $query = "INSERT INTO EventLink (
+    eventlink_timecreate,
+    eventlink_usercreate,
+    eventlink_event_id, 
+    eventlink_entity_id,
+    eventlink_required,
+    eventlink_state) 
   VALUES (
     NOW(),
     $uid,
     $event_id,
-    $entity_id,
-    '$entity',
+    ".of_entity_subquery($entity, $entity_id).",
     'REQ',
     '$state')";
 
@@ -823,7 +813,6 @@ function search_user_by_name($lastname, $firstname) {
   }
 }
 
-//FIXME HERE
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurrence of each event,
 // Parameters:
@@ -843,7 +832,7 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   if(!$calendar['all_day']) {
     $occurrences = $of->getPeriodOccurrences($calendar['date_begin'], $calendar['date_end']);
   }
-  if(isset($calendar['calendar_id'])) {
+  if(isset($calendar['calendar_id']) && !is_null($occurrences)) {
     $event_id = $calendar["calendar_id"];
     foreach($occurrences as $occurrence) {
       if($occurrence->event->id != $event_id) {
@@ -891,7 +880,7 @@ function check_calendar_decision_conflict($calendar) {
 
   $cal_entities = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
-  if(isset($calendar['calendar_id'])) {
+  if(isset($calendar['calendar_id']) && !is_null($occurrences)) {
     $event_id = $calendar["calendar_id"];
     foreach($occurrences as $occurrence) {
       if($occurrence->event->id != $event_id) {
@@ -925,9 +914,6 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   $mail = $calendar['mail'];
   $mail_title = stripslashes($calendar['title']);
   $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
-
-  if($calendar['task_new_id']) $task_id =  $calendar['task_new_id']; 
-  else $task_id =  $calendar['task_id'];
 
   $user_group_array = array();
 
@@ -1004,10 +990,10 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   if(!$reset_state) {
     $entities = get_calendar_event_entity($event_id); 
     if(count($users_array) > 0) {
-      $qusers = "AND NOT (evententity_entity_id IN (".implode(',',$users_array).") AND evententity_entity = 'user')";
+      $qusers = "AND eventlink_entity_id NOT IN ".of_entity_subquery('entity',$users_array);
     }
     if(count($resources_array) > 0) {
-      $rresources = "AND NOT (evententity_entity_id IN (".implode(',',$resources_array).") AND evententity_entity = 'resource')";
+      $rresources = "AND eventlink_entity_id NOT IN ".of_entity_subquery('entity',$resources_array);
     }
     if(is_array($entities['user']['ids'])) {
       $users_array = array_diff($users_array,$entities['user']['ids']);
@@ -1017,7 +1003,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
     }
   }
   
-  $query = "DELETE FROM EventEntity WHERE 1=1 $qusers $rresources AND evententity_event_id = $event_id";
+  $query = "DELETE FROM EventLink WHERE 1=1 $qusers $rresources AND eventlink_event_id = $event_id";
   $db = new DB_OBM;
   $db->query($query);
 
@@ -1042,10 +1028,6 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
     }
   }
   
-  if ($task_id > 0) {
-    run_query_calendar_insert_entity_event('task', $task_id, $event_id, 'ACCEPTED');
-  }
-
   // Insert My alert if set
   if (($calendar['alert']) > 0) {
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
@@ -1574,13 +1556,13 @@ function run_query_calendar_delete($calendar) {
   // If connectors in use
   if ($c_use_connectors) {
     $now = date('Y-m-d H:i:s');
-    $query = "SELECT evententity_entity_id FROM EventEntity WHERE evententity_event_id = $event_id AND evententity_entity = 'user'";
+    $query = "SELECT userentity_user_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id WHERE eventlink_event_id = $event_id";
     $obm_q->query($query);
     $users = array();
     while ($obm_q->next_record()) {
       // We note the event deletion
       $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_timestamp)
-                VALUES ($event_id, ".$obm_q->f('evententity_entity_id').", '$now')";
+                VALUES ($event_id, ".$obm_q->f('userentity_user_id').", '$now')";
       display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
       $retour = $obm_q->query($query);
     }
@@ -1839,33 +1821,31 @@ function get_calendar_event_info($id,$attendees=true) {
   if ($id == '') {
     return false;
   }
-  $id = sql_parse_id( $id, true);
-  if($attendees) {
-    $a_sql = 'LEFT JOIN EventEntity ON evententity_event_id = event_id';
-  }
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $event_date_l = sql_date_format($db_type,'event_date','event_date');
   $multidomain = sql_multidomain('event');
   $query = "SELECT *, $event_date_l FROM Event 
             $a_sql
-            WHERE event_id $id 
+            WHERE event_id = $id 
             $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_calendar_event_info()');
   $obm_q->query($query);
   $e = array('attendees' => array('user' => array()));
-  while($obm_q->next_record()) {
-    $e['usercreate'] = $obm_q->f('event_usercreate');
-    $e['owner'] = $obm_q->f('event_owner');
-    $e['date'] = new  Of_Date($obm_q->f('event_date'), 'GMT');
-    $e['duration'] = $obm_q->f('event_duration');
-    $e['end'] = clone $e['date'];
-    $e['end']->addSecond($obm_q->f('event_duration'));
-    if($obm_q->f('evententity_entity_id') && $attendees) {
-      $e['attendees'][$obm_q->f('evententity_entity')][] = $obm_q->f('evententity_entity_id');
+  $obm_q->next_record();
+  $e['usercreate'] = $obm_q->f('event_usercreate');
+  $e['owner'] = $obm_q->f('event_owner');
+  $e['date'] = new  Of_Date($obm_q->f('event_date'), 'GMT');
+  $e['duration'] = $obm_q->f('event_duration');
+  $e['end'] = clone $e['date'];
+  $e['end']->addSecond($obm_q->f('event_duration'));
+  if ($attendees) {
+    $obm_q= run_query_get_events_attendee(array($id));
+    while($obm_q->next_record()) {
+      $e['attendees'][$obm_q->f('eventlink_entity')][] = $obm_q->f('eventlink_entity_id');
     }
-  }
+  } 
 
   return $e;
 }
@@ -1886,15 +1866,16 @@ function get_calendar_event_users_info($id) {
     return $users_array;
   }
 
-  $query = "SELECT evententity_entity_id
-    FROM EventEntity
-    WHERE evententity_event_id $id AND evententity_entity = 'user'";
+  $query = "SELECT userentity_user_id as eventlink_entity_id
+    FROM EventLink
+    INNER JOIN UserEntity ON eventlink_entity_id = userentity_entity_id
+    WHERE eventlink_event_id $id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   while ($obm_q->next_record()) {
-    $users_array[] = $obm_q->f('evententity_entity_id');
+    $users_array[] = $obm_q->f('eventlink_entity_id');
   }
 
   return $users_array;
@@ -1916,22 +1897,22 @@ function get_calendar_event_entity($calendar_id) {
     userobm_id,
     userobm_lastname,
     userobm_firstname,
-    evententity_entity,
-    evententity_entity_id,
-    evententity_state as state
-  FROM EventEntity
-    LEFT JOIN UserObm ON evententity_entity_id = userobm_id
+    'user' as eventlink_entity,
+    userentity_user_id as eventlink_entity_id,
+    eventlink_state as state
+  FROM EventLink
+    INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+    INNER JOIN UserObm ON userentity_user_id = userobm_id
   WHERE 
-    evententity_event_id $calendar_id AND 
-    evententity_entity = 'user'
+    eventlink_event_id $calendar_id 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_calendar_event_entity(1)');
   $u_q = new DB_OBM;
   $u_q->query($query);
   while ($u_q->next_record()) {
-    $entity = $u_q->f('evententity_entity');
-    $entity_id = $u_q->f('evententity_entity_id');
+    $entity = $u_q->f('eventlink_entity');
+    $entity_id = $u_q->f('eventlink_entity_id');
     $state = $u_q->f('state');
     $label = $u_q->f('userobm_lastname'). ' ' .$u_q->f('userobm_firstname');
     $entities[$entity]['ids'][] = $entity_id;
@@ -1943,57 +1924,29 @@ function get_calendar_event_entity($calendar_id) {
   $query = "SELECT DISTINCT
     resource_id,
     resource_name,
-    evententity_entity,
-    evententity_entity_id,
-    evententity_state as state
-  FROM EventEntity
-    LEFT JOIN Resource ON evententity_entity_id = resource_id
+    'resource' as eventlink_entity,
+    resourceentity_resource_id as eventlink_entity_id,
+    eventlink_state as state
+  FROM EventLink
+    INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
+    INNER JOIN Resource ON resourceentity_resource_id = resource_id
   WHERE 
-    evententity_event_id $calendar_id 
-    AND evententity_entity = 'resource'
+    eventlink_event_id $calendar_id 
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_calendar_event_entity(2)');
   $r_q = new DB_OBM;
   $r_q->query($query);
   while ($r_q->next_record()) {
-    $entity = $r_q->f('evententity_entity');
-    $entity_id = $r_q->f('evententity_entity_id');
+    $entity = $r_q->f('eventlink_entity');
+    $entity_id = $r_q->f('eventlink_entity_id');
     $state = $r_q->f('state');
     $label = $r_q->f('resource_name');
     $entities[$entity]['ids'][] = $entity_id;
     $entities[$entity]['entity'][$entity_id] = array('label'=> $label,
 						     'state' => $state);
   }
-  $multidomain = sql_multidomain('project');
 
-  $query = "SELECT DISTINCT
-    projecttask_id,
-    project_name,
-    projecttask_label,
-    evententity_entity,
-    evententity_entity_id,
-    evententity_state as state
-  FROM EventEntity
-    LEFT JOIN ProjectTask ON evententity_entity_id = projecttask_id
-    LEFT JOIN Project ON projecttask_project_id = project_id
-  WHERE 
-    evententity_event_id $calendar_id 
-    AND evententity_entity = 'task'
-    $multidomain";
-
-  display_debug_msg($query, $cdg_sql, 'get_calendar_event_entity(2)');
-  $r_q = new DB_OBM;
-  $r_q->query($query);
-  while ($r_q->next_record()) {
-    $entity = $r_q->f('evententity_entity');
-    $entity_id = $r_q->f('evententity_entity_id');
-    $state = $r_q->f('state');
-    $label = $r_q->f('project_name').'--'.$r_q->f('projecttask_label');
-    $entities[$entity]['ids'][] = $entity_id;
-    $entities[$entity]['entity'][$entity_id] = array('label'=> $label,
-						     'state' => $state);
-  }
   return $entities;
 }
 
@@ -2163,30 +2116,6 @@ function calendar_localizeDate($format, $date) {
  }
 }
 
-//FIXME NECESSARY?
-///////////////////////////////////////////////////////////////////////////////
-// Get the date of a day, from its day of week and a week date
-// Parameters:
-//   - $timestamp : timestamp date for the week 
-//   - $day       : day of week ('sun', 'mon',...) at least 3 letters
-// Returns:
-//   - $ts : timestamp of the day
-///////////////////////////////////////////////////////////////////////////////
-function get_calendar_date_day_of_week($timestamp, $day) {
-  global $ccalendar_weekstart;
-
-  if (!isset($ccalendar_weekstart)) $ccalendar_weekstart = 'Sunday';
-  $num = date('w', strtotime($ccalendar_weekstart));
-  $start_day_time = strtotime((date('w',$timestamp)==$num ? "$ccalendar_weekstart" : "last $ccalendar_weekstart"), $timestamp);
-  $ret_ts = strtotime($day,$start_day_time);
-  // we correct the value to eliminate DST pbs
-  $ret_ts = strtotime('+12 hours', $ret_ts);
-  $ret_ts = strtotime(of_isodate_format($ret_ts));
-
-  return $ret_ts;
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Slice the entities to display. Limit the entities selected to the entities
 // really readable by the user, and limit to a max (=6) for display
@@ -2253,128 +2182,7 @@ function slice_calendar_entities($sel_entity_id, $nb_max, $entity_readable='') {
     'resource' => $res_resource_id
   );
 }
-
-//FIXME NECESSARY?
-///////////////////////////////////////////////////////////////////////////////
-// return the number of the week of the argument.
-//------------------------------------------------------------------------
-// Argument:
-// ---------
-//     - $date
-///////////////////////////////////////////////////////////////////////////////
-function get_calendar_week_num($date) {
-  global $ccalendar_weekstart;
-
-  $num = date('w', strtotime($ccalendar_weekstart));
-  $delta_thursday = date('w',strtotime("-$num days",strtotime('thursday')))-date('w',strtotime("-$num days",$date));
-  $week_num = date('W',strtotime("$delta_thursday days",$date));
-  return $week_num;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return all not rejected events in a week of users or/and groups
-// Parameters:
-//   - $start        : event start datetime (timestamp)
-//   - $end          : event end datetime (timestamp)
-//   - $sel_entity_id : selected entities id
-//   - $calendar       : calendar params
-///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_conflict_events($start,$end,$sel_entity_id,$event_id) {
-  global $cdg_sql;
-  
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-
-  // get all users (from groups too)
-  $users = run_query_calendar_get_allusers($sel_entity_id['user'], $sel_entity_id['group']);
-
-  if ((is_array($users)) && (count($users) > 0)) {
-    $has_user = true;
-  }
-  if (is_array($sel_entity_id['resource'])
-      && (count($sel_entity_id['resource']) > 0) ) {
-    $has_resource = true;
-  }
-
-  if ($has_user) {
-    $where_user .= "( evententity_entity_id IN (";
-    foreach($users as $id) {
-      $where_user .= "$coma'$id'";
-      $coma = ',';
-    }
-    $where_user.= ')';
-    $where_user .= " AND evententity_entity = 'user' )"; 
-    $select_user = "
-      userobm_id,
-      userobm_lastname,
-      userobm_firstname,";
-    $join_user = "LEFT JOIN UserObm ON evententity_entity_id = userobm_id";
-  }   	     	    
-
-  if ($has_resource) {
-    $coma = '';
-    $where_res .= "( evententity_entity_id IN (";
-    foreach($sel_entity_id['resource'] as $id) {
-      $where_res .= "$coma'$id'";
-      $coma = ',';
-    }
-    $where_res.= ')';
-    $where_res .= " AND evententity_entity = 'resource' )"; 
-    $select_resource = 'resource_name,';
-    $join_resource = "LEFT JOIN Resource ON evententity_entity_id = resource_id";
-  }   	     	    
-
-  if ($has_user && $has_resource) {
-    $where_ent = "AND ( $where_user OR $where_res)";
-  } elseif ($has_user || $has_resource) {
-    $where_ent = "AND $where_user $where_res";
-  }
-
-  if ($event_id != '') {
-    $where_event .= " AND event_id != '$event_id' ";
-  }
-  $multidomain = sql_multidomain('event');
-
-  $query = "SELECT
-      event_id,
-      event_owner,
-      event_title,
-      event_privacy,
-      event_description,
-      event_properties,
-      event_location,
-      event_repeatfrequence,
-      evententity_entity,
-      evententity_entity_id,
-      $select_user
-      $select_resource
-      eventcategory1_label,
-      event_date,
-      event_duration,
-      event_allday
-    FROM Event
-      LEFT JOIN EventCategory1 ON eventcategory1_id = event_category1_id
-      LEFT JOIN EventEntity ON event_id = evententity_event_id
-      $join_user
-      $join_resource
-    WHERE event_type='VEVENT'
-      AND evententity_state = 'ACCEPTED'
-      AND event_repeatkind = 'none' AND
-      ((event_date > #SUBSECONDS('$start', event_duration) AND event_date < '$end') 
-        OR (event_allday = TRUE AND event_date >= #SUBSECONDS('$start', event_duration) AND event_date <= '$end'))
-      $where_ent
-      $where_event
-      $multidomain
-    ORDER BY event_date";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_conflict_events(()');
-  $obm_q->xquery($query);
-
-  return $obm_q;
-}
-
-
+//FIXME HERE I AM
 ///////////////////////////////////////////////////////////////////////////////
 // Return all not rejected events in a week of users or/and groups
 // Parameters:
@@ -2394,73 +2202,89 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
   if ($category_filter != '') {
     $filter = " AND eventcategory1_id = '$category_filter' ";
   }
-  if (is_array($calendar_entity['user'])
-      && (count($calendar_entity['user']) > 0) ) {
-    $has_user = true;
-  }
-  if (is_array($calendar_entity['resource'])
-      && (count($calendar_entity['resource']) > 0) ) {
-    $has_resource = true;
-  }
-  if (is_array($calendar_entity['resourcegroup'])
-      && (count($calendar_entity['resourcegroup']) > 0) ) {
-    $has_resourcegroup = true;
-  }
 
   $first = true;
   if (is_array($status)
       && (count($status) > 0) ) {
-    foreach ($status as $one_status) {
-      if ($first) {
-	$where_status = "AND (evententity_state = '$one_status'";
-	$first = false;
-      } else {
-	$where_status .= " OR evententity_state = '$one_status'";
-      }
-    }
-    $where_status .= ')';
+    $where_status = "AND eventlink_state IN ('".implode("','",$status)."')"    ;
   }
 
-  if ($has_user) {
-    $where_user .= "( evententity_entity_id IN (";
-    foreach($calendar_entity['user'] as $id => $prop) {
-      $where_user .= "$coma'$id'";
-      $coma = ',';
-    }
-    $where_user.= ')';
-    $where_user .= " AND evententity_entity = 'user' )"; 
+  if (is_array($calendar_entity['user'])
+      && (count($calendar_entity['user']) > 0) ) {
+    $select[] =  "SELECT
+        event_id,
+        event_title,
+        event_privacy,
+        event_priority,
+        event_description,
+        event_properties,
+        event_location,
+        event_repeatfrequence,
+        event_owner,
+        event_timezone,
+        userentity_user_id as eventlink_entity_id,
+        'user' as eventlink_entity,
+        eventlink_state,
+        eventcategory1_label,
+        event_date,
+        event_duration,
+        event_color,
+        event_allday
+      FROM Event
+        LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+        INNER JOIN EventLink ON event_id = eventlink_event_id
+        INNER JOIN UserEntity ON userentity_entity_id = eventlink_event_id
+      WHERE event_type='VEVENT'
+        $where_status
+        $filter
+        AND event_repeatkind = 'none'
+        AND event_date >= #SUBSECONDS('$start',event_duration)
+        AND event_date <= '$end'
+        AND userentity_user_id IN (".implode(',', array_keys($calendar_entity['user'])).")
+        $where
+        $multidomain";       
   }   	     	    
 
-  if ($has_resource) {
-    $coma = '';
-    $where_res .= "( evententity_entity_id IN (";
-    foreach($calendar_entity['resource'] as $id => $prop) {
-      $where_res .= "$coma'$id'";
-      $coma = ',';
-    }
-    $where_res.= ')';
-    $where_res .= " AND evententity_entity = 'resource' )"; 
+  if (is_array($calendar_entity['resource'])
+      && (count($calendar_entity['resource']) > 0) ) {
+    $select[] =  "SELECT
+        event_id,
+        event_title,
+        event_privacy,
+        event_priority,
+        event_description,
+        event_properties,
+        event_location,
+        event_repeatfrequence,
+        event_owner,
+        event_timezone,
+        resourceentity_resource_id as eventlink_entity_id,
+        'resource' as eventlink_entity,
+        eventlink_state,
+        eventcategory1_label,
+        event_date,
+        event_duration,
+        event_color,
+        event_allday
+      FROM Event
+        LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+        INNER JOIN EventLink ON event_id = eventlink_event_id
+        INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_event_id
+      WHERE event_type='VEVENT'
+        $where_status
+        $filter
+        AND event_repeatkind = 'none'
+        AND event_date >= #SUBSECONDS('$start',event_duration)
+        AND event_date <= '$end'
+        AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resource'])).")
+        $where
+        $multidomain";   
   }   	     	    
 
-  if ($has_user && $has_resource) {
-    $where_ent = "AND ( $where_user OR $where_res)";
-  } elseif ($has_user || $has_resource) {
-    $where_ent = "AND $where_user $where_res";
-  }
-  
-  if ($has_resourcegroup) {
-    $coma = '';
-    $where_grp .= "( evententity_entity_id IN (";
-    foreach($calendar_entity['resourcegroup'] as $id => $prop) {
-      $where_grp .= "$coma'$id'";
-      $coma = ',';
-    }
-    $where_grp.= ')';
-    $where_grp .= " AND evententity_entity = 'resource' )"; 
+  if (is_array($calendar_entity['resourcegroup'])
+      && (count($calendar_entity['resourcegroup']) > 0) ) {
     
-    $union = "
-      UNION
-    SELECT
+    $select[] = "SELECT
       event_id,
       event_title,
       event_privacy,
@@ -2471,65 +2295,31 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       event_repeatfrequence,
       event_owner,
       event_timezone,
-      evententity_entity_id,
-      'resourcegroup' as evententity_entity,
-      evententity_state,
+      resourceentity_resource_id as eventlink_entity_id,
+      'resourcegroup' as eventlink_entity,
+      eventlink_state,
       eventcategory1_label,
       event_date,
       event_duration,
       event_color,
       event_allday
     FROM Event
-      LEFT JOIN EventCategory1
-        ON event_category1_id = eventcategory1_id
-      LEFT JOIN EventEntity ON event_id = evententity_event_id
+      LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+      INNER JOIN EventLink ON event_id = eventlink_event_id
+      INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_event_id
     WHERE event_type='VEVENT'
       $where_status
       $filter
       AND event_repeatkind = 'none'
       AND event_date >= #SUBSECONDS('$start',event_duration)
       AND event_date <='$end'
+        AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resourcegroup'])).")
       AND $where_grp
       $multidomain";
   }
   
-  $query = "SELECT
-      event_id,
-      event_title,
-      event_privacy,
-      event_priority,
-      event_description,
-      event_properties,
-      event_location,
-      event_repeatfrequence,
-      event_owner,
-      event_timezone,
-      evententity_entity_id,
-      evententity_entity,
-      evententity_state,
-      eventcategory1_label,
-      event_date,
-      event_duration,
-      event_color,
-      event_allday
-    FROM Event
-      LEFT JOIN EventCategory1
-        ON event_category1_id = eventcategory1_id
-      LEFT JOIN EventEntity ON event_id = evententity_event_id
-    WHERE event_type='VEVENT'
-      $where_status
-      $filter
-      AND event_repeatkind = 'none'
-      AND event_date >= #SUBSECONDS('$start',event_duration)
-      AND event_date <= '$end'
-      $where_ent
-      $multidomain
-    $union
-      ORDER BY event_date, evententity_entity, evententity_entity_id
-";
-
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_no_repeat_events()');
-  $obm_q->xquery($query);
+  $obm_q->xquery(implode(' UNION ', $select)." ORDER BY event_date, eventlink_entity, eventlink_entity_id");
   return $obm_q;
 }
 
@@ -2544,82 +2334,24 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_repeat_events($start, $end, $calendar_entity, $status, $category_filter='') {
   global $cdg_sql;
-  
+
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+
   $multidomain = sql_multidomain('event');
   if ($category_filter != '') {
-    $category_filter = sql_parse_id( $category_filter);
-    $filter = " AND eventcategory1_id = $category_filter ";
-  }
-  if (is_array($calendar_entity['user'])
-      && (count($calendar_entity['user']) > 0) ) {
-    $has_user = true;
-  }
-  if (is_array($calendar_entity['resource'])
-      && (count($calendar_entity['resource']) > 0) ) {
-    $has_resource = true;
+    $filter = " AND eventcategory1_id = '$category_filter' ";
   }
 
   $first = true;
   if (is_array($status)
       && (count($status) > 0) ) {
-    foreach ($status as $one_status) {
-      if ($first) {
-	$where_status = "AND (evententity_state = '$one_status'";
-	$first = false;
-      } else {
-	$where_status .= " OR evententity_state = '$one_status'";
-      }
-    }
-    $where_status .= ')';
+    $where_status = "AND eventlink_state IN ('".implode("','",$status)."')";
   }
 
-  if ($has_user) {
-    $where_user .= "( evententity_entity_id IN (";
-    foreach($calendar_entity['user'] as $id => $prop) {
-      $where_user .= "$coma'$id'";
-      $coma = ",";
-    }
-    $where_user.= ")";
-    $where_user .= " AND evententity_entity = 'user' )"; 
-  }   	     	    
-
-  if ($has_resource) {
-    $coma = '';
-    $where_res .= "( evententity_entity_id IN (";
-    foreach($calendar_entity['resource'] as $id => $prop) {
-      $where_res .= "$coma'$id'";
-      $coma = ',';
-    }
-    $where_res.= ')';
-    $where_res .= " AND evententity_entity = 'resource' )"; 
-  }   
-
-  if (is_array($calendar_entity['resourcegroup'])
-      && (count($calendar_entity['resourcegroup']) > 0) ) {
-    $has_resourcegroup = true;
-  }
-
-  if ($has_user && $has_resource) {
-    $where_ent = "AND ( $where_user OR $where_res)";
-  } elseif ($has_user || $has_resource) {
-    $where_ent = "AND $where_user $where_res";
-  }
-  
-  if ($has_resourcegroup) {
-    $coma = '';
-    $where_grp .= "( evententity_entity_id IN (";
-    foreach($calendar_entity['resourcegroup'] as $id => $prop) {
-      $where_grp .= "$coma'$id'";
-      $coma = ',';
-    }
-    $where_grp.= ')';
-    $where_grp .= " AND evententity_entity = 'resource' )"; 
-    
-    $union = "
-      UNION
-      SELECT
+  if (is_array($calendar_entity['user'])
+      && (count($calendar_entity['user']) > 0) ) {
+    $select[] =  "SELECT
       event_id,
       event_title,
       event_privacy,
@@ -2635,53 +2367,16 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_repeatfrequence,
       event_owner,
       event_timezone,
-      'resourcegroup' as evententity_entity,
-      evententity_entity_id,
-      evententity_state,
+      'user' as eventlink_entity,
+      userentity_user_id as eventlink_entity_id,
+      eventlink_state,
       event_repeatdays,
       event_color,
       event_allday
     FROM Event
-      LEFT JOIN EventCategory1
-        ON event_category1_id = eventcategory1_id
-      LEFT JOIN EventEntity ON event_id = evententity_event_id
-   WHERE event_type='VEVENT' 
-      AND event_repeatkind != 'none'
-      $where_status
-      $filter
-      AND event_date <= '$end' 
-      AND (event_endrepeat >= #SUBSECONDS('$start',event_duration)
-      OR event_endrepeat IS NULL)
-      AND $where_grp
-      $multidomain";
-  }
-
-  $query = "SELECT
-      event_id,
-      event_title,
-      event_privacy,
-      event_priority,
-      event_description, 
-      event_properties, 
-      event_location, 
-      eventcategory1_label,
-      event_date,
-      event_duration,
-      event_repeatkind,
-      event_endrepeat,
-      event_repeatfrequence,
-      event_owner,
-      event_timezone,
-      evententity_entity,
-      evententity_entity_id,
-      evententity_state,
-      event_repeatdays,
-      event_color,
-      event_allday
-    FROM Event
-      LEFT JOIN EventCategory1
-        ON event_category1_id = eventcategory1_id
-      LEFT JOIN EventEntity ON event_id = evententity_event_id
+      LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+      INNER JOIN EventLink ON event_id = eventlink_event_id
+      INNER JOIN UserEntity ON userentity_entity_id = eventlink_event_id
     WHERE event_type='VEVENT'
       AND event_repeatkind != 'none'
       $where_status
@@ -2689,14 +2384,91 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       AND event_date <= '$end' 
       AND (event_endrepeat >= #SUBSECONDS('$start',event_duration)
       OR event_endrepeat IS NULL)
-      $where_ent
-      $multidomain
-      $union
+      AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resource'])).")
+      $multidomain";
+  }   	     	    
 
-    ORDER BY event_date, evententity_entity, evententity_entity_id"; 
+  if (is_array($calendar_entity['resource'])
+      && (count($calendar_entity['resource']) > 0) ) {
+    $select[] = "SELECT
+      event_id,
+      event_title,
+      event_privacy,
+      event_priority,
+      event_description, 
+      event_properties, 
+      event_location, 
+      eventcategory1_label,
+      event_date,
+      event_duration,
+      event_repeatkind,
+      event_endrepeat,
+      event_repeatfrequence,
+      event_owner,
+      event_timezone,
+      'resource' as eventlink_entity,
+      resourceentity_resource_id as eventlink_entity_id,
+      eventlink_state,
+      event_repeatdays,
+      event_color,
+      event_allday
+    FROM Event
+      LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+      INNER JOIN EventLink ON event_id = eventlink_event_id
+      INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_event_id
+    WHERE event_type='VEVENT'
+      AND event_repeatkind != 'none'
+      $where_status
+      $filter
+      AND event_date <= '$end' 
+      AND (event_endrepeat >= #SUBSECONDS('$start',event_duration)
+      OR event_endrepeat IS NULL)
+      AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resource'])).")
+      $multidomain";
+  }   	     	    
 
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_repeat_events()');
-  $obm_q->xquery($query);
+  if (is_array($calendar_entity['resourcegroup'])
+      && (count($calendar_entity['resourcegroup']) > 0) ) {
+    
+    $select[] = "SELECT
+      event_id,
+      event_title,
+      event_privacy,
+      event_priority,
+      event_description, 
+      event_properties, 
+      event_location, 
+      eventcategory1_label,
+      event_date,
+      event_duration,
+      event_repeatkind,
+      event_endrepeat,
+      event_repeatfrequence,
+      event_owner,
+      event_timezone,
+      'resourcegroup' as eventlink_entity,
+      resourceentity_resource_id as eventlink_entity_id,
+      eventlink_state,
+      event_repeatdays,
+      event_color,
+      event_allday
+    FROM Event
+      LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+      INNER JOIN EventLink ON event_id = eventlink_event_id
+      INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_event_id
+   WHERE event_type='VEVENT' 
+      AND event_repeatkind != 'none'
+      $where_status
+      $filter
+      AND event_date <= '$end' 
+      AND (event_endrepeat >= #SUBSECONDS('$start',event_duration)
+      OR event_endrepeat IS NULL)
+      AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resourcegroup'])).")
+      $multidomain";
+  }
+  
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_no_repeat_events()');
+  $obm_q->xquery(implode(' UNION ', $select)." ORDER BY event_date, eventlink_entity, eventlink_entity_id");
   return $obm_q;
 }
 
@@ -2716,28 +2488,45 @@ function run_query_get_events_attendee($events) {
     $event_list = '0';
   }
   $obm_q = new DB_OBM;
-
+  $concat = array (
+    array ('type' => 'field','value' => 'UserObm.userobm_lastname'),
+    array (
+      'type' => 'string',
+      'value' => ' '
+      ),
+    array (
+      'type' => 'field',
+      'value' => 'UserObm.userobm_firstname'
+      ) 
+    );
+  $entity_label = sql_string_concat($db_type,$concat);
   $multidomain = sql_multidomain('event');
   $query = "SELECT
    event_id,
-   evententity_state,
-   evententity_entity_id,
-   evententity_entity,
-   userobm_firstname,
-   userobm_lastname,
-   resource_name,
-   projecttask_label,
-   project_name
+   eventlink_state,
+   userentity_user_id as eventlink_entity_id,
+   'user' as eventlink_entity,
+   #CONCAT(userobm_lastname, ' ', userobm_firstname) as eventlink_label
    FROM Event
-   JOIN EventEntity ON evententity_event_id = event_id
-   LEFT JOIN UserObm ON evententity_entity = 'user' AND evententity_entity_id = userobm_id
-   LEFT JOIN Resource ON evententity_entity = 'resource' AND evententity_entity_id = resource_id
-   LEFT JOIN ProjectTask ON evententity_entity = 'task' AND  evententity_entity_id = projecttask_id
-   LEFT JOIN Project ON project_id = projecttask_project_id
+   INNER JOIN EventLink ON eventlink_event_id = event_id
+   INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+   INNER JOIN UserObm ON userentity_user_id = userobm_id
+   WHERE event_id IN ($event_list) $multidomain   
+   UNION
+   SELECT
+   event_id,
+   eventlink_state,
+   resourceentity_resource_id as eventlink_entity_id,
+   'resource' as eventlink_entity,
+   resource_name as eventlink_label
+   FROM Event
+   INNER JOIN EventLink ON eventlink_event_id = event_id
+   INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
+   INNER JOIN Resource ON resourceentity_resource_id = resource_id
    WHERE event_id IN ($event_list) $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_get_events_attendee()');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   return $obm_q;
 }
 
@@ -2836,7 +2625,6 @@ function get_one_event_user_alert($event_id, $user_id = null) {
   return $alerts;
 }
 
-//FIXME
 ///////////////////////////////////////////////////////////////////////////////
 // Return a table of Events between two dates
 // Parameters: 
@@ -2866,9 +2654,9 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $color = $nr_q->f('event_color');
     $duration = $nr_q->f('event_duration');
     $all_day = $nr_q->f('event_allday');
-    $entity = $nr_q->f('evententity_entity');
-    $entity_id = $nr_q->f('evententity_entity_id');
-    $entity_state = $nr_q->f('evententity_state');
+    $entity = $nr_q->f('eventlink_entity');
+    $entity_id = $nr_q->f('eventlink_entity_id');
+    $entity_state = $nr_q->f('eventlink_state');
     $owner = $nr_q->f('event_owner');
     $timezone = $nr_q->f('event_timezone');
     if (isset($of->events[$id])) {
@@ -2896,13 +2684,13 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $duration = $r_q->f('event_duration');
     $repeatkind = $r_q->f('event_repeatkind');
     $endrepeat = new Of_Date($r_q->f('event_endrepeat'), 'GMT');
-    $entity = $r_q->f('evententity_entity');
+    $entity = $r_q->f('eventlink_entity');
     $all_day = $r_q->f('event_allday');
     $color = $r_q->f('event_color');
     $repeatfrequence = $r_q->f('event_repeatfrequence');
     $repeatdays = $r_q->f('event_repeatdays');
-    $entity_id = $r_q->f('evententity_entity_id');
-    $entity_state = $r_q->f('evententity_state');
+    $entity_id = $r_q->f('eventlink_entity_id');
+    $entity_state = $r_q->f('eventlink_state');
     $all_day = $r_q->f('event_allday');    
     $owner = $r_q->f('event_owner');
     $timezone = $r_q->f('event_timezone');
@@ -2961,20 +2749,10 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $attendee_q = run_query_get_events_attendee(array_keys($of->events));
     while($attendee_q->next_record()) {
       $id = $attendee_q->f('event_id');
-      $entity = $attendee_q->f('evententity_entity');
-      $entity_id = $attendee_q->f('evententity_entity_id');
-      $entity_state = $attendee_q->f('evententity_state');
-      switch($entity) {
-        case 'user':
-          $entity_label = $attendee_q->f('userobm_lastname').' '.$attendee_q->f('userobm_firstname');
-          break;
-        case 'resource':
-          $entity_label = $attendee_q->f('resource_name');
-          break;
-        case 'task':
-          $entity_label = $attendee_q->f('project_name').'-'.$attendee_q->f('projecttask_label');
-          break;
-      }
+      $entity = $attendee_q->f('eventlink_entity');
+      $entity_id = $attendee_q->f('eventlink_entity_id');
+      $entity_state = $attendee_q->f('eventlink_state');
+      $entity_label = $attendee_q->f('enententity_label');
       $event = $of->events[$id];
       $event->addAttendee($entity,$entity_id,$entity_label,$entity_state);
     }
@@ -4040,18 +3818,20 @@ function run_query_calendar_reset($id) {
   global $cdg_sql, $obm;
   $obm_q = new DB_OBM;
   $calendar['mail'] = false;
-  $id =  $id; 
   $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
   $writable = $writable['ids'];
   # Delete all events where the user is the owner and an attendee and all events where the owner
   # is writable and the user is the only attendee
-  $sql_id = sql_parse_id($id, true);
-  $query = "SELECT event_id FROM Event LEFT JOIN EventEntity ON event_id = evententity_event_id
-            WHERE (event_type='VEVENT' AND event_owner $sql_id AND evententity_entity_id $sql_id AND evententity_entity = 'user')
+  $query = "SELECT event_id FROM Event
+            INNER JOIN EventLink ON event_id = eventlink_event_id
+            INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+            WHERE (event_type='VEVENT' AND event_owner $sql_id AND eventlink_entity_id = $id')
             UNION
-            SELECT event_id FROM Event LEFT JOIN EventEntity ON event_id = evententity_event_id
-            WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).") AND evententity_entity = 'user'
-            GROUP BY event_id HAVING MAX(evententity_entity_id) = MIN(evententity_entity_id)";
+            SELECT event_id FROM Event
+            INNER JOIN EventLink ON event_id = eventlink_event_id
+            INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
+            WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).")
+            GROUP BY event_id HAVING COUNT(*) = 1";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset()');
   $obm_q->query($query);
   
@@ -4061,16 +3841,15 @@ function run_query_calendar_reset($id) {
   }
 
   # Refuse all other events
-  $query = "SELECT evententity_event_id FROM EventEntity WHERE evententity_entity_id $id and evententity_entity = 'user'
-            AND evententity_state != 'DECLINED'";
+  $query = "SELECT eventlink_event_id FROM EventLink INNER JOIN UserEntity userentity_entity_id = eventlink_entity_id ON WHERE userentity_entity_id = $id 
+            AND eventlink_state != 'DECLINED'";
   $obm_q->query($query);
   while($obm_q->next_record()) {
-    run_query_calendar_update_occurrence_state($obm_q->f('evententity_event_id'), 'user', $id, 'DECLINED');
+    run_query_calendar_update_occurrence_state($obm_q->f('eventlink_event_id'), 'user', $id, 'DECLINED');
   }
   # Delete all alerts
 
-  $query = "DELETE FROM EventAlert WHERE eventalert_event_id NOT IN (SELECT evententity_event_id FROM EventEntity) 
-                  OR eventalert_user_id $id"; 
+  $query = "DELETE FROM EventAlert WHERE eventalert_user_id = $id"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset()');
   $obm_q->query($query);
 }

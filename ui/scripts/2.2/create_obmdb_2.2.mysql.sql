@@ -845,20 +845,6 @@ CREATE TABLE `DefaultOdtTemplate` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `DefaultodttemplateEntity`
---
-
-DROP TABLE IF EXISTS `DefaultodttemplateEntity`;
-CREATE TABLE `DefaultodttemplateEntity` (
-  `defaultodttemplateentity_entity_id` int(8) NOT NULL,
-  `defaultodttemplateentity_defaultodttemplate_id` int(8) NOT NULL,
-  PRIMARY KEY  (`defaultodttemplateentity_entity_id`,`defaultodttemplateentity_defaultodttemplate_id`),
-  KEY `defaultodttemplate_id_defaultodttemplate_id_fkey` (`defaultodttemplateentity_defaultodttemplate_id`),
-  CONSTRAINT `defaultodttemplate_id_defaultodttemplate_id_fkey` FOREIGN KEY (`defaultodttemplateentity_defaultodttemplate_id`) REFERENCES `DefaultOdtTemplate` (`defaultodttemplate_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `defaultodttemplateentity_entity_id_entity_id_fkey` FOREIGN KEY (`defaultodttemplateentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
 -- Table structure for table `Deleted`
 --
 
@@ -1175,7 +1161,7 @@ CREATE TABLE `Entity` (
 DROP TABLE IF EXISTS `EntityRight`;
 CREATE TABLE `EntityRight` (
   `entityright_entity_id` int(8) NOT NULL,
-  `entityright_consumer_id` int(8) NOT NULL,
+  `entityright_consumer_id` int(8),
   `entityright_access` int(1) NOT NULL default '0',
   `entityright_read` int(1) NOT NULL default '0',
   `entityright_write` int(1) NOT NULL default '0',

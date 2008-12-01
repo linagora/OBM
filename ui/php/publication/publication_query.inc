@@ -194,14 +194,8 @@ function run_query_publication_insert($publication) {
   display_debug_msg($query, $cdg_sql, 'run_query_publication_insert()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-  $uid = sql_parse_id($obm['uid'], true);
-  $query = "SELECT MAX(publication_id) as publication_id
-    FROM Publication
-      publication_usercreate $uid"; 
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-  $obm_q->next_record();
-  $p_id = $obm_q->f('publication_id');
+  $p_id = $obm_q->lastid(); 
+  $entity_id = of_entity_insert($GLOBALS['module'], $p_id);  
   $publication['publication_id'] = $p_id;
   
   if ( (is_array($cats1) && (count($cats1)>0) )
@@ -301,10 +295,9 @@ function run_query_publication_auto_subscription($publication) {
       $recept,
       1  
     FROM Contact
-      LEFT JOIN CategoryLink
-           ON categorylink_entity = 'contact'
-           AND categorylink_category $public_cat 
-           AND categorylink_entity_id = contact_id
+    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+      LEFT JOIN CategoryLink categorylink_category $public_cat 
+           AND categorylink_entity_id = contactentity_entity_id
       LEFT JOIN Kind ON kind_id = contact_kind_id
     WHERE categorylink_category_id IN (";
 
@@ -522,6 +515,7 @@ function run_query_publication_update($pid, $publication) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_publication_delete($p_id) {
   global $cdg_sql;
+  of_entity_delete($GLOBALS['module'], $p_id);
   $p_id = sql_parse_id($p_id, true);	
   $multidomain = sql_multidomain('publication');
   $query = "DELETE FROM Publication WHERE publication_id $p_id $multidomain";

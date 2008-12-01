@@ -49,10 +49,11 @@ function run_query_organizationalchart_search($organizationalchart) {
   if ($user != "") {
     $left_user = "
       LEFT JOIN OGroup ON ogroup_organizationalchart_id = organizationalchart_id
-      LEFT JOIN OGroupEntity ON ogroupentity_ogroup_id = ogroup_id
-      LEFT JOIN of_usergroup ON (of_usergroup_group_id=ogroupentity_entity_id AND ogroupentity_entity='group') 
-      LEFT JOIN UserObm as u ON (u.userobm_id=ogroupentity_entity_id AND ogroupentity_entity='user') 
-      OR (u.userobm_id=of_usergroup_user_id)";
+      LEFT JOIN OGroupLink ON ogrouplink_ogroup_id = ogroup_id
+      LEFT JOIN GroupEntity ON groupentity_entity_id=ogrouplink_entity_id
+      LEFT JOIN of_usergroup ON of_usergroup_group_id=groupentity_group_id 
+      LEFT JOIN UserEntity ON userentity_entity_id=ogrouplink_entity_id
+      LEFT JOIN UserObm as u ON (u.userobm_id=userentity_user_id OR u.userobm_id=of_usergroup_user_id)";
     $where .= " $and (userobm_lastname $like '$user%' OR userobm_firstname $like '$user%')";
   }
 
@@ -128,19 +129,11 @@ function run_query_organizationalchart_insert($organizationalchart) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   $uid = sql_parse_id($obm['uid'], true);
-  // Get the chart id
-  $query = "SELECT MAX(organizationalchart_id) as id
-    FROM OrganizationalChart
-    WHERE organizationalchart_name = '$name'
-    AND organizationalchart_usercreate $uid"; 
-
-  display_debug_msg($query, $cdg_sql, "run_query_organizationalchart_insert(2)");
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $id = $obm_q->f("id");
+  $id = $obm_q->lastid();
 
   if($id > 0) {
     // Insert OGroup
+    $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     run_query_organizational_chart_entity_insert($organizationalchart, $id);
   }
 
@@ -231,25 +224,26 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
           while (list($key, $value) = each($sel_ent) ) {
             if (strcmp(substr($value, 0, 5),"data-") == 0) {
               $data = explode("-", $value);
-              $id = sql_parse_id($data[2]);
+              $entit_id = of_entity_get($data[1], $data[2]);
               $entity = $data[1];
-              $query = "INSERT INTO OGroupEntity (
-                ogroupentity_domain_id,
-                ogroupentity_timeupdate,
-                ogroupentity_timecreate,
-                ogroupentity_userupdate,
-                ogroupentity_usercreate,
-                ogroupentity_ogroup_id,
-                ogroupentity_entity_id,
-                ogroupentity_entity) VALUES (
+              $query = "
+                INSERT INTO OGroupLink (
+                  ogrouplink_domain_id,
+                  ogrouplink_timeupdate,
+                  ogrouplink_timecreate,
+                  ogrouplink_userupdate,
+                  ogrouplink_usercreate,
+                  ogrouplink_ogroup_id,
+                  ogrouplink_entity_id
+                ) VALUES (
                   $ins_domain_id,
                   null,
                   '$now',
                   null,
                   $ins_uid,
                   $ogroup_id,
-                  $id,
-                  '$entity')";
+                  $entity_id
+                )";
               display_debug_msg($query, $cdg_sql, "run_query_organizational_chart_ogroup_insert()");
               $obm_q->query($query);
             }
@@ -321,9 +315,9 @@ function run_query_organizational_chart_entity_delete($id) {
   while($sel_obm_q->next_record()) {
     $ogroup_id = $sel_obm_q->f("ogroup_id");
     
-    $remove_ogroupentity_query = "DELETE FROM OGroupEntity WHERE ogroupentity_ogroup_id='$ogroup_id'";
-    display_debug_msg($remove_ogroupentity_query, $cdg_sql, "run_query_organizational_chart_entity_delete(2)");
-    $del_obm_q->query($remove_ogroupentity_query);
+    $remove_ogrouplink_query = "DELETE FROM OGroupLink WHERE ogrouplink_ogroup_id='$ogroup_id'";
+    display_debug_msg($remove_ogrouplink_query, $cdg_sql, "run_query_organizational_chart_entity_delete(2)");
+    $del_obm_q->query($remove_ogrouplink_query);
 
     $remove_ogroup_query = "DELETE FROM OGroup WHERE ogroup_id='$ogroup_id'";
     display_debug_msg($remove_ogroup_query, $cdg_sql, "run_query_organizational_chart_entity_delete(3)");
@@ -390,21 +384,69 @@ function run_query_organizationchart_ogroup_detail($id) {
 // Parameters :
 //   - $id  : organizational chart id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_organizationalchart_ogroupentity_detail($id) {
+function run_query_organizationalchart_ogrouplink_detail($id) {
   global $cdgl_sql, $obm;
   $id = sql_parse_id($id, true);
-  $query = "SELECT 
-    ogroupentity_id,
-    ogroupentity_entity,
-    ogroupentity_entity_id
-    FROM OGroupEntity
-    WHERE ogroupentity_ogroup_id $id ";
+  $query = "
+    SELECT 
+      ogrouplink_id,
+      userobm_lastname,
+      userobm_firstname,
+      userobm_login,
+      userobm_id,
+      userobm_title,
+      userobm_phone,
+      userobm_mobile,
+      userobm_description,
+      userobm_email,
+      domain_name,
+      NULL
+    FROM OGroupLink    
+      INNER JOIN UserEntity ON userentity_entity_id = entity_id
+      INNER JOIN UserObm ON userobm_id = userentity_user_id
+    WHERE ogrouplink_ogroup_id $id 
+    UNION 
+    SELECT 
+      ogrouplink_id,
+      userobm_lastname,
+      userobm_firstname,
+      userobm_login,
+      userobm_id,
+      userobm_title,
+      userobm_phone,
+      userobm_mobile,
+      userobm_description,
+      userobm_email,
+      domain_name,
+      group_manager_id
+    FROM OGroupLink    
+      INNER JOIN GroupEntity ON groupentity_entity_id = entity_id
+      INNER JOINT UGroup ON group_id = groupentity_group_id
+      INNER JOIN of_usergroup ON of_usergroup_group_id=groupentity_group_id 
+      INNER JOIN UserObm ON userobm_id = userentity_user_id
+      INNER JOIN Domain ON domain_id = userobm_domain_id
+    WHERE ogrouplink_ogroup_id $id";
 
   $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_organizationchart_ogroupentity_detail()");
+  display_debug_msg($query, $cdg_sql, "run_query_organizationchart_ogrouplink_detail()");
   $obm_q->query($query);
+  $users = array();
+  while($obm_q->next_record()) {
+    $users[$obm_q->f('userobm_id')] = array (
+      'lastname' => $obm_q->f('userobm_lastname'),
+      'firstname' => $obm_q->f('userobm_firstname'),
+      'manager' => ($obm_q->f('userobm_id') == $obm_q->f('group_manager_id')),
+      'title' => $obm_q->f('userobm_title'),
+      'id' => $obm_q->f('userobm_id'),
+      'login' => $obm_q->f('userobm_login'),
+      'description' => $obm_q->f('userobm_description')
+      'phone' => $obm_q->f('phone'),
+      'mobile' => $obm_q->f('mobile'),
+      'email' => get_entity_email($obm_q->f('userobm_email'), $obm_q->f('domain_name'))
+    );  
+  }
 
-  return $obm_q;
+  return $users;
 }
 
 
@@ -416,6 +458,7 @@ function run_query_organizationalchart_ogroupentity_detail($id) {
 function run_query_organizationalchart_delete($id) {
   global $cdg_sql;
 
+  of_entity_delete($GLOBALS['module'], $id);
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("organizationalchart");
   $sid = sql_parse_id($id, true);

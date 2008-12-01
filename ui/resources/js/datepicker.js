@@ -168,7 +168,7 @@ function refreshDatePicker(dateField, year, month, day)
   var table = new Element('table').adopt(new Element('thead').adopt(labels))
                                   .adopt(content);
 
-  $("datepicker").setHTML('');
+  $("datepicker").innerHTML = '';
   $("datepicker").adopt(title).adopt(table).adopt(today);
   overListBoxFix("datepicker");
   return false;
@@ -378,7 +378,7 @@ function datePickerGenerator() {
   elements.each(function(element){
     element.setProperty('autocomplete','off');
     var span = new Element('span').injectBefore(element).addClass('NW');
-    element.remove();
+    element.dispose();
     element.injectInside(span);
     var img = new Element('img');
     img.setAttribute("src", obm.vars.images.datePicker);

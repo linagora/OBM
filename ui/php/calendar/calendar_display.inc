@@ -42,7 +42,6 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
     if (function_exists($calendar_function_pdf)) {
       $display['print_url'] = "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=".$calendar['date']->getURL()."&amp;output_target=print";
     }
-
   } else {
     $block .= dis_calendar_month_planning($calendar, $calendar_entity,$writable_entity);
   }
@@ -338,6 +337,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
     $sel_group
     </select>
+    <div id=\"sel_group\">
+    </div>    
     </fieldset>
     <fieldset class=\"detail extra\">
     <legend>$l_public_group_members $group_add_button</legend>
@@ -2452,7 +2453,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   $$repeat_kind .= "selected=\"selected\" ";
   $dis_sel_kind .= "
-    <select onchange=\"repeat_form($(this).getValue())\" name=\"sel_repeat_kind\">
+    <select onchange=\"repeat_form($(this).get('inputValue'))\" name=\"sel_repeat_kind\">
       <option value=\"none\">$l_none</option>
       <option value=\"daily\" $daily>$l_daily</option>
       <option value=\"weekly\" $weekly>$l_weekly</option>
@@ -3713,8 +3714,8 @@ function json_event_data($id,$calendar) {
   $title = $calendar['title'];
 
   while($ent_q->next_record()) {
-    $entity = $ent_q->f('evententity_entity');
-    $entity_id = $ent_q->f('evententity_entity_id');
+    $entity = $ent_q->f('eventlink_entity');
+    $entity_id = $ent_q->f('eventlink_entity_id');
     switch($entity) {
       case 'user':
         $name = $ent_q->f('userobm_lastname').' '.$ent_q->f('userobm_firstname');

@@ -347,7 +347,8 @@ function run_query_contract_insert($contract) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  $c_id = run_query_contract_id($contract);
+  $c_id = $obm_q->lastid();
+  $entity_id = of_entity_insert($GLOBALS['module'], $id);  
 
   return $c_id;
 }
@@ -450,6 +451,7 @@ function run_query_contract_update($contract) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contract_delete($p_id) {
   global $cdg_sql;
+  of_entity_delete($GLOBALS['module'], $p_id);
   $p_id = sql_parse_id($p_id, true); 
   $multidomain = sql_multidomain("contract");
   $query = "DELETE FROM Contract WHERE contract_id $p_id $multidomain";

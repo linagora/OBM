@@ -213,7 +213,7 @@ function showRepeatBlockDisplay(label) {
   frequency = $('repeatFrequency').getFirst().getNext();
   frequencyField = frequency.getFirst();
   frequencyLabel = label.split('%s');
-  frequencyField.remove();
+  frequencyField.dispose();
   frequency.empty();
   frequency.appendText(frequencyLabel[0]);
   frequency.adopt(frequencyField);

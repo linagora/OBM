@@ -243,6 +243,7 @@ function html_host_consult($host_q) {
   global $l_user, $l_consult_web_list, $l_web_access, $l_mailserver;
   global $l_system, $l_help_system,$l_domain;
 
+
   $id = $host_q->f('host_id');
   $delegation = $host_q->f('host_delegation');
   $samba = $host_q->f('host_samba');
@@ -258,6 +259,7 @@ function html_host_consult($host_q) {
   $mail_server = $host_q->f('mailserver_id');
   $domain_name = ($host_q->f('domain_name') != '' ? $host_q->f('domain_name') : 'GLOBAL');
 
+  $service =  new Service_Details($GLOBALS['module'], $id);
   $dis_user =   
     "<tr>
       <th>$l_user</th>
@@ -282,6 +284,7 @@ function html_host_consult($host_q) {
   if ($mail_server) $mail_server = $l_yes; else $mail_server = $l_no;
 
   $block_delegation = of_delegation_dis_block_consult($delegation);
+    
 
   $display['detailInfo'] = display_record_info($host_q);
   $display['title'] = $name;

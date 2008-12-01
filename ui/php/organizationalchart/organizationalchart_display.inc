@@ -478,39 +478,7 @@ function dis_organizationalchart_consult_chart($node_q, $output) {
   }
 
   // Get node detail
-  $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
-  $users = array();
-  while($ogroupentity_q->next_record()) {
-    $entity = $ogroupentity_q->f("ogroupentity_entity");
-    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
-    switch($entity) {
-      case "group":
-	$users_q = of_usergroup_get_group_users($entity_id, true);
-        $g_manager = run_query_global_group_manager($entity_id);
-        foreach($users_q as $user) {
-          if ($user['id'] == $g_manager) { 
-            $users[$user['id']] = array('id' => $user['id'],
-              'lastname' => $user['lastname'],
-              'firstname' => $user['firstname'],
-              'manager' => true);
-          } else {
-            $users[$user['id']] = array('id' => $user['id'],
-              'lastname' => $user['lastname'],
-              'firstname' => $user['firstname']);
-          }
-        }
-        break;
-      case "user":
-	$user = get_user_info($entity_id);
-	$u_id = $user['id'];
-	$lname = $user['lastname'];
-	$fname = $user['firstname'];
-	$users[$u_id] = array ('id' => $u_id,
-	  'lastname' => $lname,
-	  'firstname' => $fname);
-       break;
-    }
-  }
+  $users = run_query_organizationalchart_ogrouplink_detail($node_id);
 
   if (is_array($users)) {
     uasort($users, "sort_node_detail");
@@ -625,34 +593,7 @@ function dis_organizationalchart_consult_outline($node_q) {
   $color = "color".($flour)%7;
 
   // Get node detail
-  $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
-  $users = array();
-  while($ogroupentity_q->next_record()) {
-    $entity = $ogroupentity_q->f("ogroupentity_entity");
-    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
-    switch($entity) {
-      case "group":
-	$users_q = of_usergroup_get_group_users($entity_id, true);
-        foreach($users_q as $user) {
-          $users[$user['id']] = array('id' => $user['id'],
-            'lastname' => $user['lastname'],
-            'firstname' => $user['firstname'],
-            'title' => $user['title']);
-        }
-        break;
-      case "user":
-	$user = get_user_info($entity_id);
-	$u_id = $user['id'];
-	$lname = $user['lastname'];
-	$fname = $user['firstname'];
-	$title = $user['title'];
-	$users[$u_id] = array ('id' => $u_id,
-	  'lastname' => $lname,
-	  'firstname' => $fname,
-          'title' => $title);
-       break;
-    }
-  }
+  $users = run_query_organizationalchart_ogrouplink_detail($node_id);
  
   // Users list
   if (is_array($users)) {
@@ -1070,95 +1011,80 @@ function export_ldif($node_q, $ou_arr=array()) {
   array_push($units, $unit);
 
   // Get node detail
-  $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
-  while($ogroupentity_q->next_record()) {
-    $users = array();
-    $entity = $ogroupentity_q->f("ogroupentity_entity");
-    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
-    switch($entity) {
-      case "group":
-	$users = of_usergroup_get_group_users($entity_id, true);
-        break;
-      case "user":
-	$user = get_user_info($entity_id);
-	$u_id = $user['id'];
-	$users[$u_id] = $user;
-       break;
-    }
-    foreach ($users as $user_id => $one_user) {
-      $uid = $one_user["login"];
-      $person = "$eol# $uid, ".implode($ou_arr, ", ").", $cn_arr[0], $cn_arr[1]$eol";
-      foreach($ldif_attributes as $k_ldif => $k_obm) {
-          switch($k_ldif) {
-            case "dn":
-              $dn = "uid=$one_user[$k_obm],$ou,$oc";
-              if (contains_ascii($dn)) {
-                $dn = base64_encode($dn);
-                $person .= "$k_ldif:: $dn$eol";                                
+  $users = run_query_organizationalchart_ogrouplink_detail($node_id);
+  foreach ($users as $user_id => $one_user) {
+    $uid = $one_user["login"];
+    $person = "$eol# $uid, ".implode($ou_arr, ", ").", $cn_arr[0], $cn_arr[1]$eol";
+    foreach($ldif_attributes as $k_ldif => $k_obm) {
+        switch($k_ldif) {
+          case "dn":
+            $dn = "uid=$one_user[$k_obm],$ou,$oc";
+            if (contains_ascii($dn)) {
+              $dn = base64_encode($dn);
+              $person .= "$k_ldif:: $dn$eol";                                
+            } else {
+              $person .= "$k_ldif: $dn$eol";              
+            }
+            break;
+          case "objectClass":
+            foreach($ldif_attributes[$k_ldif] as $key) {
+              $person .= "$k_ldif: $key$eol";
+            }              
+            break;
+          case "cn":
+            $cn = "";
+            foreach($ldif_attributes[$k_ldif] as $key) {
+              $cn .= $one_user[$key]." ";
+            }
+            if (!empty($cn)) {
+              if (contains_ascii($cn)) {
+                $cn = base64_encode($cn);
+                $person .= "$k_ldif:: $cn$eol";                                
               } else {
-                $person .= "$k_ldif: $dn$eol";              
+                $person .= "$k_ldif: $cn$eol";              
               }
-              break;
-            case "objectClass":
-              foreach($ldif_attributes[$k_ldif] as $key) {
-                $person .= "$k_ldif: $key$eol";
-              }              
-              break;
-            case "cn":
-              $cn = "";
-              foreach($ldif_attributes[$k_ldif] as $key) {
-                $cn .= $one_user[$key]." ";
+            }
+            break;
+          case "displayName":
+            $displayName = "";
+            foreach($ldif_attributes[$k_ldif] as $key) {
+              $displayName .= $one_user[$key]." ";
+            }
+            if (!empty($displayName)) {
+              if (contains_ascii($displayName)) {
+                $displayName = base64_encode($displayName);
+                $person .= "$k_ldif:: $displayName$eol";
+              } else {
+                $person .= "$k_ldif: $displayName$eol";
               }
-              if (!empty($cn)) {
-                if (contains_ascii($cn)) {
-                  $cn = base64_encode($cn);
-                  $person .= "$k_ldif:: $cn$eol";                                
-                } else {
-                  $person .= "$k_ldif: $cn$eol";              
-                }
+            }
+            break;
+          case "mail":
+            $emails = get_entity_email($one_user[$k_obm], $domain, false, null);
+            foreach($emails as $email) {
+              if (contains_ascii($email)) {
+                $email = base64_encode($email);
+                $person .= "$k_ldif:: $email$eol";                                
+              } else {
+                $person .= "$k_ldif: $email$eol";              
               }
-              break;
-            case "displayName":
-              $displayName = "";
-              foreach($ldif_attributes[$k_ldif] as $key) {
-                $displayName .= $one_user[$key]." ";
+            }
+            break;
+          default:
+            $val = $one_user[$k_obm];
+            if (!empty($val)) {
+              if (contains_ascii($val)) {
+                $val = base64_encode($val);
+                $person .= "$k_ldif:: $val$eol";                                
+              } else {
+                $person .= "$k_ldif: $val$eol";                
               }
-              if (!empty($displayName)) {
-                if (contains_ascii($displayName)) {
-                  $displayName = base64_encode($displayName);
-                  $person .= "$k_ldif:: $displayName$eol";
-                } else {
-                  $person .= "$k_ldif: $displayName$eol";
-                }
-              }
-              break;
-            case "mail":
-              $emails = get_entity_email($one_user[$k_obm], $domain, false, null);
-              foreach($emails as $email) {
-                if (contains_ascii($email)) {
-                  $email = base64_encode($email);
-                  $person .= "$k_ldif:: $email$eol";                                
-                } else {
-                  $person .= "$k_ldif: $email$eol";              
-                }
-              }
-              break;
-            default:
-              $val = $one_user[$k_obm];
-              if (!empty($val)) {
-                if (contains_ascii($val)) {
-                  $val = base64_encode($val);
-                  $person .= "$k_ldif:: $val$eol";                                
-                } else {
-                  $person .= "$k_ldif: $val$eol";                
-                }
-              }
-              break;
-          }
-      }
-      // Add Person
-      array_push($persons, "$person");
+            }
+            break;
+        }
     }
+    // Add Person
+    array_push($persons, "$person");
   }
  
   // Get node children 
@@ -1208,34 +1134,7 @@ function export_svg_outline($node_q, &$xml, &$svg) {
   if (!isset($y)) $y=$margin_top;
 
   // Get node detail
-  $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
-  $users = array();
-  while($ogroupentity_q->next_record()) {
-    $entity = $ogroupentity_q->f("ogroupentity_entity");
-    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
-    switch($entity) {
-      case "group":
-	$users_q = of_usergroup_get_group_users($entity_id, true);
-        foreach($users_q as $user) {
-          $users[$user['id']] = array('id' => $user['id'],
-            'lastname' => $user['lastname'],
-            'firstname' => $user['firstname'],
-            'title' => $user['title']);
-        }
-        break;
-      case "user":
-	$user = get_user_info($entity_id);
-	$u_id = $user['id'];
-	$lname = $user['lastname'];
-	$fname = $user['firstname'];
-	$title = $user['title'];
-	$users[$u_id] = array ('id' => $u_id,
-	  'lastname' => $lname,
-	  'firstname' => $fname,
-          'title' => $title);
-       break;
-    }
-  }
+  $users = run_query_organizationalchart_ogrouplink_detail($node_id);
 
   $text = $xml->createElement("text");
   $text->setAttribute("style", $style);
@@ -1331,39 +1230,7 @@ function export_svg_chart($node_q, &$xml, &$svg) {
   $nb_brother = sizeof($brother) - 1;
 
   // Get node detail
-  $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
-  $users = array();
-  while($ogroupentity_q->next_record()) {
-    $entity = $ogroupentity_q->f("ogroupentity_entity");
-    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
-    switch($entity) {
-      case "group":
-	$users_q = of_usergroup_get_group_users($entity_id, true);
-        $g_manager = run_query_global_group_manager($entity_id);
-        foreach($users_q as $user) {
-          if ($user['id'] == $g_manager) { 
-            $users[$user['id']] = array('id' => $user['id'],
-              'lastname' => $user['lastname'],
-              'firstname' => $user['firstname'],
-              'manager' => true);
-          } else {
-            $users[$user['id']] = array('id' => $user['id'],
-              'lastname' => $user['lastname'],
-              'firstname' => $user['firstname']);
-          }
-        }
-        break;
-      case "user":
-	$user = get_user_info($entity_id);
-	$u_id = $user['id'];
-	$lname = $user['lastname'];
-	$fname = $user['firstname'];
-	$users[$u_id] = array ('id' => $u_id,
-	  'lastname' => $lname,
-	  'firstname' => $fname);
-       break;
-    }
-  }
+  $users = run_query_organizationalchart_ogrouplink_detail($node_id);
 
   // node height
   $nb_users = sizeof($users);

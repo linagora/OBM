@@ -287,6 +287,18 @@ class DB_Sql {
     }
     return $nextid;
   }
+  
+  /**
+   * lastid 
+   * 
+   * @access public
+   * @return void
+   */
+  function lastid() {
+    $this->query('SELECT LAST_INSERT_ID() as id');
+    $this->next_record();
+    return $this->f('id');
+  }
 
   /* public: return table metadata */
   function metadata($table='',$full=false) {
@@ -504,5 +516,17 @@ class DB_Sql {
     
     return "TIMESTAMPDIFF(DAY,$start,$end)";
   }
+
+  /**
+   * CONCAT 
+   * 
+   * @param mixed $args 
+   * @static
+   * @access public
+   * @return void
+   */
+  static function CONCAT($args) {
+    return 'CONCAT('.implode(',',$args).')'; 
+  }  
 }
 ?>

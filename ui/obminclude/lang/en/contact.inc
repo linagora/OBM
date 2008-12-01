@@ -110,3 +110,10 @@ $l_recept = "Reception mode";
 $l_quantity = "Quantity";
 $l_no_found_subscription = "No subscription found for this contact !";
 
+$l_im = "Instant Messaging";
+$l_website = "Website";
+
+$l_phone_labels = array ('HOME' => 'Home phone', 'WORK' => 'Work phone', 'CELL' => 'Mobile phone', 'FAX' => 'Fax', 'PAGER' => 'Pager', 'OTHER' => 'Other phone');
+$l_email_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');
+$l_address_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');
+$l_website_labels = array ('HOMEPAGE' => 'Homepage', 'BLOG' => 'Blog', 'HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');

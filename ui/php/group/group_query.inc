@@ -305,6 +305,7 @@ function run_query_group_insert($group) {
   $g_id = run_query_group_id($group);
 
   if ($g_id > 0) {
+    $entity_id = of_entity_insert($GLOBALS['module'], $g_id);  
     $ret = of_userdata_query_update("group", $g_id, $group);
   }
 
@@ -418,7 +419,8 @@ function run_query_group_delete($p_id) {
   $obm_q = new DB_OBM;
   // Delete the Group
   $multidomain = sql_multidomain("group");
-  $query = "DELETE FROM UGroup WHERE group_id='$p_id' $multidomain";
+  of_entity_delete($GLOBALS['module'], $p_id);
+  $query = "DELETE FROM UGroup WHERE group_id=$p_id $multidomain";
   display_debug_msg($query, $cdg_sql, "run_query_group_delete(3)");
   $retour = $obm_q->query($query);
   $id = sql_parse_id($p_id, true);

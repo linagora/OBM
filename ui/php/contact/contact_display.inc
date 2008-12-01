@@ -1311,14 +1311,21 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   global $l_comment1, $l_add_comment1, $l_upd_comment1;
   global $l_comment2, $l_add_comment2, $l_upd_comment2,$l_yes;
   global $l_comment3, $l_add_comment3, $l_upd_comment3,$l_lang;
-  global $l_birthday;
+  global $l_birthday, $l_address_labels,$l_website_labels, $l_add;
   global $l_datasource, $l_archive, $l_private, $l_coord, $l_contact, $l_market;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
-  global $extra_js;
+  global $extra_js, $l_im, $l_website, $l_phone_labels, $l_email_labels;
 
   $uid = $obm['uid'];
 
+  $GLOBALS['js']['vars']['labels']['label'] = 'Label';
+  $GLOBALS['js']['vars']['labels']['value'] = 'Numéros';
+  $GLOBALS['js']['vars']['labels']['phoneLabel'] = $l_phone_labels;
+  $GLOBALS['js']['vars']['labels']['emailLabel'] = $l_email_labels;
+  $GLOBALS['js']['vars']['labels']['addressLabel'] = $l_address_labels;
+  $GLOBALS['js']['vars']['labels']['websiteLabel'] = $l_website_labels;
+  
   // if update mode and first time values are taken from database
   if ($action == 'detailupdate') {
     $id = $co_q->f('contact_id');
@@ -1444,6 +1451,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   if (isset($contact['ctry'])) { $ctry = $contact['country']; }
   if (isset($contact['function'])) { $func = $contact['function']; }
   if (isset($contact['title'])) { $title = stripslashes($contact['title']); }
+  if (isset($contact['phones'])) { $phones = $contact['phones'];}
+  if (isset($contact['addresses'])) { $addresses = $contact['addresses'];}
+  if (isset($contact['ims'])) { $ims = $contact['ims'];}
+  if (isset($contact['websites'])) { $websites = $contact['websites'];}
+  if (isset($contact['emails'])) { $emails = $contact['emails'];}
   if (isset($contact['phone'])) { $phone = stripslashes($contact['phone']); }
   if (isset($contact['hphone'])) { $hphone = stripslashes($contact['hphone']); }
   if (isset($contact['mphone'])) { $mphone = stripslashes($contact['mphone']); }
@@ -1761,6 +1773,73 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
+  
+  // PHONES
+  if(is_array($phones)) {
+    foreach($phones as $phone) {
+      if(trim($phone['number'])) {
+        $params = array();
+        foreach($phone as $field  => $value) {
+          $params[] = "$field: {value : '$value'}";
+        }
+        $js .=  "new Obm.PhoneWidget({".implode(',',$params)."});\n";
+      }
+    }
+  }
+  $js .= "new Obm.PhoneWidget();\n";
+  // ADDRESSES 
+  if(is_array($addresses)) {
+    foreach($addresses as $address) {
+      if(trim($address['street']) || trim($address['town']) || trim($address['country']) || trim($address['expresspostal']) || trim ($address['zipcode'])) {
+        $params = array();
+        foreach($address as $field  => $value) {
+          $params[] = "$field: {value : '$value'}";
+        }
+        $js .=  "new Obm.AddressWidget({".implode(',',$params)."});\n";
+      }
+    }
+  }
+  $js .= "new Obm.AddressWidget();\n";
+  // EMAILS 
+  if(is_array($emails)) {
+    foreach($emails as $email) {
+      if(trim($email['address'])) {
+        $params = array();
+        foreach($email as $field  => $value) {
+          $params[] = "$field: {value : '$value'}";
+        }
+        $js .=  "new Obm.EmailWidget({".implode(',',$params)."});\n";
+      }
+    }
+  }
+  $js .= "new Obm.EmailWidget();\n";
+  // WEBSITES 
+  if(is_array($websites)) {
+    foreach($websites as $website) {
+      if(trim($website['url'])) {
+        $params = array();
+        foreach($website as $field  => $value) {
+          $params[] = "$field: {value : '$value'}";
+        }
+        $js .=  "new Obm.WebsiteWidget({".implode(',',$params)."});\n";
+      }
+    }
+  }
+  $js .= "new Obm.WebsiteWidget();\n";
+  // IM 
+  if(is_array($ims)) {
+    foreach($ims as $im) {
+      if(trim($im['address'])) {
+        $params = array();
+        foreach($im as $field  => $value) {
+          $params[] = "$field: {value : '$value'}";
+        }
+        $js .=  "new Obm.IMWidget({".implode(',',$params)."});\n";
+      }
+    }
+  }
+  $js .= "new Obm.IMWidget();\n";
+
   $display['title'] = "$dis_title";
 
   // --- HTML Template --------------------------------------------------------
@@ -1821,15 +1900,29 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $block_birthday
     </table>
     </fieldset>
-   
+
+    <fieldset class=\"detail infos\" id='phoneHolder'>
+    <legend>$l_phone <a href='' onclick=\"new Obm.PhoneWidget();return false;\">$l_add</a></legend>
+    </fieldset>
+    <fieldset class=\"detail infos\" id='addressHolder'>
+    <legend>$l_address <a href='' onclick=\"new Obm.AddressWidget();return false;\">$l_add</a></legend>
+    </fieldset>
+    <fieldset class=\"detail infos\" id='emailHolder'>
+    <legend>$l_email <a href='' onclick=\"new Obm.EmailWidget();return false;\">$l_add</a></legend>
+    </fieldset>
+    <fieldset class=\"detail infos\" id='imHolder'>
+    <legend>$l_im <a href='' onclick=\"new Obm.IMWidget();return false;\">$l_add</a></legend>
+    </fieldset>
+    <fieldset class=\"detail infos\" id='websiteHolder'>
+    <legend>$l_website <a href='' onclick=\"new Obm.WebsiteWidget();return false;\">$l_add</a></legend>
+    </fieldset>
+    <script type='text/javascript'>
+      $js
+    </script>
     <fieldset class=\"detail infos\">
     <legend>$l_coord</legend>
-
     <table>
     <tr>
-    <th>$l_phone</th>
-    <td><input type=\"text\" name=\"tf_phone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$phone\" /> <br /> $c_phone</td>
-    </tr><tr>
     <th>$l_hphone</th>
     <td><input type=\"text\" name=\"tf_hphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$hphone\" /></td>
     </tr><tr>

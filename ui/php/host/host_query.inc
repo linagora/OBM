@@ -196,47 +196,23 @@ function run_query_host_insert($host) {
 
   // Mise a jour du lien user s'il a ete précisé
   $user_id = sql_parse_id($host['user_id'], true);
-  // Cas ou il n'y a pas de lien
+  $id = $obm_q->lastid();
+  $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     
   if ($retour && $user_id != 0) {
 
-    $multidomain = sql_multidomain('host');
-    // On recupere l'ID de l'hôte qu'on vient d'ajouter
-    $query = "SELECT host_id
-    FROM Host
+    $host_id = sql_parse_id($id);
+
+    $multidomain = sql_multidomain('userobm');
+    $query = "UPDATE UserObm 
+    SET userobm_timeupdate='$now',
+        userobm_userupdate=$obm[uid],
+        userobm_host_id=$host_id
     WHERE
-      host_timecreate='$now' and
-      host_usercreate $obm[uid] and
-      host_uid='$host_uid' and
-      host_gid='$host_gid' and
-      host_samba=$samba and
-      host_name='$name' and
-      host_ip='$ip' and
-      host_description='$desc' and
-      host_web_perms=$web_perms and
-      host_ftp_perms=$ftp_perms and
-      host_firewall_perms=$firewall_perms
-      $multidomain";
+        userobm_id $user_id $multidomain";
 
-    display_debug_msg($query, $cdg_sql, 'run_query_host_insert(2)');
+    display_debug_msg($query, $cdg_sql, 'run_query_host_insert(3)');
     $retour = $obm_q->query($query);
-
-    // Mise a jour du lien
-    if ($retour) {
-      $obm_q->next_record();
-      $host_id = sql_parse_id($obm_q->f('host_id'));
-
-      $multidomain = sql_multidomain('userobm');
-      $query = "UPDATE UserObm 
-      SET userobm_timeupdate='$now',
-          userobm_userupdate=$obm[uid],
-          userobm_host_id=$host_id
-      WHERE
-          userobm_id $user_id $multidomain";
-
-      display_debug_msg($query, $cdg_sql, 'run_query_host_insert(3)');
-      $retour = $obm_q->query($query);
-    }
   }
 
   return $retour;
@@ -329,6 +305,7 @@ function run_query_host_delete($p_id) {
 
   // Delete the Host
   $multidomain = sql_multidomain('host');
+  of_entity_delete($GLOBALS['module'], $p_id);
   $sel_id = sql_parse_id($p_id, true);
   $query = "DELETE FROM Host WHERE host_id $sel_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_host_delete()');

@@ -169,21 +169,8 @@ function run_query_mailshare_insert($mailshare) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-
-    // On recupere l'ID de l'hôte qu'on vient d'ajouter
-    $query = "SELECT MAX(mailshare_id) as id
-    FROM MailShare
-    WHERE
-      mailshare_usercreate $uid 
-      AND mailshare_name = '$name'
-      AND mailshare_quota = '$quota'
-      AND mailshare_email = '$email'
-      AND mailshare_description = '$desc'";
-
-    display_debug_msg($query, $cdg_sql, 'run_query_mailshare_insert(2)');
-    $obm_q->query($query);
-    $obm_q->next_record();
-    $id = $obm_q->f('id');
+    $id = $obm_q->lastid();
+    $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     $mailshare['entity_id'] = $id;
     of_right_default($mailshare, 'MailShare', '',false) ;
 
@@ -242,6 +229,7 @@ function run_query_mailshare_update($mailshare) {
 function run_query_mailshare_delete($p_id) {
   global $cdg_sql, $obm;
 
+  of_entity_delete($GLOBALS['module'], $p_id);
   $multidomain = sql_multidomain('mailshare');
   $id = sql_parse_id($p_id, true);
   // Delete ACL for this mailshare

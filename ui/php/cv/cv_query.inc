@@ -235,7 +235,8 @@ function run_query_cv_insert($cv) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  $cv_id = run_query_cv_id($cv, $timecreate, $uid);
+  $cv_id = $obm_q->lastid(); 
+  $entity_id = of_entity_insert($GLOBALS['module'], $id);  
   
   // ProjectCV insertion
   
@@ -342,6 +343,7 @@ function run_query_cv_delete($p_id) {
   global $cdg_sql;
   
   $obm_q = new DB_OBM;
+  of_entity_delete($GLOBALS['module'], $p_id);
   $p_id = sql_parse_id($p_id, true); 
   // delete the projectcv
   $query = "DELETE FROM ProjectCV WHERE projectcv_cv_id $p_id"; 

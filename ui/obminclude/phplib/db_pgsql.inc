@@ -181,6 +181,18 @@ class DB_Sql {
     return $nextid;
   }
 
+  
+  /**
+   * lastid 
+   * 
+   * @access public
+   * @return void
+   */
+  function lastid() {
+    $this->query('SELECT LASTVAL() as id');
+    $this->next_record();
+    return $this->f('id');
+  }
 
 
   function metadata($table) {
@@ -382,6 +394,18 @@ class DB_Sql {
     $end = next($args);
     
     return "FLOOR(EXTRACT(EPOCH from AGE($end,$start))/$seconds_in_a_day)";
+  }
+
+  /**
+   * CONCAT 
+   * 
+   * @param mixed $args 
+   * @static
+   * @access public
+   * @return void
+   */
+  static function CONCAT($args) {
+    return '('.implode('||',$args)')'; 
   }
 }
 ?>

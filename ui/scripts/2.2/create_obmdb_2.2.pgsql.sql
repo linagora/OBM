@@ -592,16 +592,6 @@ CREATE TABLE defaultodttemplate (
 
 
 --
--- Name: defaultodttemplateentity; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE defaultodttemplateentity (
-    defaultodttemplateentity_entity_id integer NOT NULL,
-    defaultodttemplateentity_defaultodttemplate_id integer NOT NULL
-);
-
-
---
 -- Name: deleted; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -846,7 +836,7 @@ CREATE TABLE entity (
 
 CREATE TABLE entityright (
     entityright_entity_id integer NOT NULL,
-    entityright_consumer_id integer NOT NULL,
+    entityright_consumer_id integer NULL,
     entityright_access integer DEFAULT 0 NOT NULL,
     entityright_read integer DEFAULT 0 NOT NULL,
     entityright_write integer DEFAULT 0 NOT NULL,
@@ -5143,14 +5133,6 @@ ALTER TABLE ONLY defaultodttemplate
 
 
 --
--- Name: defaultodttemplateentity_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY defaultodttemplateentity
-    ADD CONSTRAINT defaultodttemplateentity_pkey PRIMARY KEY (defaultodttemplateentity_entity_id, defaultodttemplateentity_defaultodttemplate_id);
-
-
---
 -- Name: deleted_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -7214,22 +7196,6 @@ ALTER TABLE ONLY defaultodttemplate
 
 ALTER TABLE ONLY defaultodttemplate
     ADD CONSTRAINT defaultodttemplate_domain_id_domain_id_fkey FOREIGN KEY (defaultodttemplate_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: defaultodttemplateentity_defaultodttemplate_id_defaultodttempla; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY defaultodttemplateentity
-    ADD CONSTRAINT defaultodttemplateentity_defaultodttemplate_id_defaultodttempla FOREIGN KEY (defaultodttemplateentity_defaultodttemplate_id) REFERENCES defaultodttemplate(defaultodttemplate_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: defaultodttemplateentity_entity_id_entity_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY defaultodttemplateentity
-    ADD CONSTRAINT defaultodttemplateentity_entity_id_entity_id_fkey FOREIGN KEY (defaultodttemplateentity_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

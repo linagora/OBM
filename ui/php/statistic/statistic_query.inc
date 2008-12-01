@@ -73,6 +73,9 @@ function run_query_statistic_entity_per_country_per_cat($entity, $category) {
 
   $lang = get_lang();
   $table = ucfirst($entity);
+  $entityTable = $table.'Entity';
+  $entityId = $entity.'entity_entity_id';
+  $entityEntityId = $entity.'entity_'.$entity.'_id';
   $multidomain = sql_multidomain($entity);
 
   $query = "SELECT
@@ -83,11 +86,11 @@ function run_query_statistic_entity_per_country_per_cat($entity, $category) {
       category_label,
       count(${entity}_id) as nb 
     FROM $table
+      INNER JOIN $entityTable ON $entityEntityId =  ${entity}_id
       LEFT JOIN Country ON ${entity}_country_iso3166 = country_iso3166
                            AND country_lang='$lang'
-      LEFT JOIN CategoryLink ON categorylink_entity='$entity'
-                                AND categorylink_category = '$category'
-                                AND categorylink_entity_id = ${entity}_id
+      LEFT JOIN CategoryLink ON categorylink_category = '$category'
+                               AND categorylink_entity_id = $entityId
       LEFT JOIN Category ON categorylink_category_id = category_id
     WHERE 1=1
       $multidomain
@@ -184,6 +187,9 @@ function run_query_statistic_selected_entity_per_country_per_cat($obm_q, $entity
 
   $lang = get_lang();
   $table = ucfirst($entity);
+  $entityTable = $table.'Entity';
+  $entityId = $entity.'entity_entity_id';
+  $entityEntityId = $entity.'entity_'.$entity.'_id';
   $multidomain = sql_multidomain("$entity");
   
   if ($obm_q->nf()!= 0) {
@@ -203,11 +209,11 @@ function run_query_statistic_selected_entity_per_country_per_cat($obm_q, $entity
       category_label,
       count(${entity}_id) as nb 
     FROM $table
+      INNER JOIN $entityTable ON $entityEntityId =  ${entity}_id
       LEFT JOIN Country ON ${entity}_country_iso3166 = country_iso3166
                            AND country_lang='$lang'
-      LEFT JOIN CategoryLink ON categorylink_entity='$entity'
-                                AND categorylink_category = '$category'
-                                AND categorylink_entity_id = ${entity}_id
+      LEFT JOIN CategoryLink ON categorylink_category = '$category'
+                               AND categorylink_entity_id = $entityId                           
       LEFT JOIN Category ON categorylink_category_id = category_id
     WHERE 1=1
       $where_entity

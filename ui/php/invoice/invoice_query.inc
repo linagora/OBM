@@ -299,6 +299,8 @@ function run_query_invoice_insert($invoice) {
   display_debug_msg($query, $cdg_sql, 'run_query_invoice_insert()');
   $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
+  $id = $obm_q->lastid();
+  $entity_id = of_entity_insert($GLOBALS['module'], $id);  
 
   return $ret;
 }
@@ -494,6 +496,7 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_delete($p_id) {
   global $cdg_sql;
+  of_entity_delete($GLOBALS['module'], $p_id);
   $id = sql_parse_id($p_id, true); 
   $multidomain = sql_multidomain('invoice');
   $query = "DELETE FROM Invoice 

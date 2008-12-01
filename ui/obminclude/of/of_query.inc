@@ -3050,8 +3050,7 @@ function of_entity_delete($entity,$id) {
 function of_entity_get($entity, $id) {
   global $cdg_sql;
   $entity = strtolower($entity);
-  $id = sql_parse_id($id, true, $not);
-  $query = 'SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id IN '.$id;
+  $query = 'SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id = '.$id;
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'of_entity_get()');
   $obm_q->query($query);

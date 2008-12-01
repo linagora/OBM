@@ -167,7 +167,9 @@ function run_query_company_search($company) {
       companynafcode_code as nafcode_code,
       companynafcode_label as nafcode_label,
       country_name
-    FROM Company";
+    FROM Company
+    INNER JOIN CompanyEntity ON companyentity_company_id = company_id
+      ";
 
   $left_join = "
          LEFT JOIN CompanyType ON company_type_id=companytype_id
@@ -381,16 +383,11 @@ function run_query_company_insert($company) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  // Get the company id
-  $query = "SELECT MAX(company_id) as id
-    FROM Company";
-  
   display_debug_msg($query, $cdg_sql, 'run_query_company_insert(2)');
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $id = $obm_q->f('id');
+  $id = $obm_q->lastid();
 
   if ($id > 0) {
+    $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     $ret = of_userdata_query_update('company', $id, $company);
   }
 
@@ -510,6 +507,7 @@ function run_query_company_delete($p_id) {
   $ret = of_userdata_query_delete('company', $p_id);
   $p_id = sql_parse_id( $p_id, true);
 
+  of_entity_delete($GLOBALS['module'], $p_id);
   $query = "DELETE FROM Company
     WHERE company_id $p_id 
       $multidomain";

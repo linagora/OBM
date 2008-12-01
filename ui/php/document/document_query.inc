@@ -39,10 +39,9 @@ function run_query_document_search($document) {
   $where .= " AND document_kind != $cdoc_kind_dir";
 
   if (($entity != "") && ($entity != "document")) {
-    $entity_id = sql_parse_id($entity_id, true);
-    $join_ent = "LEFT JOIN DocumentEntity on document_id = documententity_document_id";
-    $where .= " AND documententity_entity = '$entity'
-                AND documententity_entity_id $entity_id ";
+    $entity_id = of_entity_get($entity, $entity_id);
+    $join_ent = "LEFT JOIN DocumentLink on document_id = documentlink_document_id";
+    $where .= " AND documentlink_entity_id = $entity_id ";
   }
 
   if ($title != "") {
@@ -85,7 +84,9 @@ function run_query_document_search($document) {
       $timecreate,
       $timeupdate,
       documentmimetype_label
-    FROM Document";
+    FROM Document
+    INNER JOIN DocumentEntity ON documententity_document_id = document_id
+      ";
 
   $join = "
       $join_userdata
@@ -216,7 +217,8 @@ function run_query_document_insert(&$document) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  $doc_id = run_query_document_id($document);
+  $doc_id = $obm_q->lastid();
+  $entity_id = of_entity_insert($GLOBALS['module'], $doc_id);  
   $document["document_id"] = $doc_id;
 
   // If the document is correctly inserted in db
@@ -236,12 +238,10 @@ function run_query_document_insert(&$document) {
 
     // We insert links if entity given
     if ($entity != "") {
-      $query = "INSERT INTO DocumentEntity (
-        documententity_entity,
-        documententity_entity_id,
-        documententity_document_id
+      $query = "INSERT INTO DocumentLink (
+        documentlink_entity_id,
+        documentlink_document_id
       ) VALUES (
-        '$entity',
         $entity_id,
         $doc_id
       )";
@@ -393,6 +393,7 @@ function run_query_document_delete($p_id) {
 
   // Delete the file
   run_query_document_delete_file($p_id);
+  of_entity_delete($GLOBALS['module'], $p_id);
 
   // Delete User data
   $ret = of_userdata_query_delete("document", $p_id);
@@ -587,8 +588,8 @@ function get_document_link_nb($document_id) {
 
   $document_id = sql_parse_id($document_id, true);
   $query = "SELECT count(*) as nb
-    FROM DocumentEntity
-    WHERE documententity_document_id $document_id ";
+    FROM DocumentLink
+    WHERE documentlink_document_id $document_id ";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "get_document_link_nb()");
@@ -947,6 +948,8 @@ function run_query_document_insert_dir($document) {
   display_debug_msg($query, $cdg_sql, "run_query_document_insert_dir()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+  $id = $obm_q->lastid();
+  of_entity_insert('document', $id);
 
   return true;
 }

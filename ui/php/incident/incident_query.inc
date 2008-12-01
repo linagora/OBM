@@ -147,7 +147,8 @@ function run_query_incident_search($incident) {
     u1.userobm_lastname as incident_logger_lastname,
     u2.userobm_lastname as incident_owner_lastname,
     Company.company_name as incident_company_name
-    FROM Incident";
+    FROM Incident
+    INNER JOIN IncidentEntity ON incidententity_incident_id = incident_id";
 
   $left_join = "
     LEFT JOIN Contract ON incident_contract_id=contract_id
@@ -319,9 +320,10 @@ function run_query_incident_insert($incident) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
-  $i_id = run_query_incident_id($incident);
+  $i_id = $obm_q->lastid(); 
 
   if ($i_id > 0) {
+    $entity_id = of_entity_insert($GLOBALS['module'], $i_id);  
     $ret = of_userdata_query_update('incident', $i_id, $incident);
   }
 

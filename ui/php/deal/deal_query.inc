@@ -187,7 +187,9 @@ function run_query_deal_search($deal, $all='') {
       tasktype_label,
       dealstatus_label,
       userobm_lastname as deal_marketingmanager
-    FROM Deal";
+    FROM Deal
+    INNER JOIN DealEntity ON dealentity_deal_id = deal_id
+      ";
 
   $left_join = "
         LEFT JOIN Company as Company ON deal_company_id=Company.company_id
@@ -406,7 +408,8 @@ function run_query_deal_insert($deal) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);  
 
-  $d_id = run_query_deal_id($deal);
+  $d_id = $obm_q->lastid();
+  $entity_id = of_entity_insert($GLOBALS['module'], $d_id); 
   $deal['deal_id'] = $d_id;
 
   // if the deal inserted is not archived, we increment the company deal number
@@ -431,6 +434,7 @@ function run_query_deal_insert($deal) {
 
   // Delete associated Lead if exists
   if (($d_id > 0) && ($deal['lead_id'] > 0)) {
+    of_entity_delete('lead', $d_id);
     $deal_id = sql_parse_id($deal['lead_id'], true); 
     $query = "DELETE FROM Lead WHERE lead_id $deal_id"; 
     display_debug_msg($query, $cdg_sql, 'run_query_deal_insert(2)');
@@ -807,6 +811,7 @@ function run_query_deal_delete($id) {
   run_query_global_delete_document_links($id, 'deal');
 
   $ret = of_userdata_query_delete('deal', $id);
+  of_entity_delete($GLOBALS['module'], $id);
 
   $id = sql_parse_id($id, true);	
   $query = "DELETE FROM Deal WHERE deal_id $id $multidomain";
@@ -2340,6 +2345,7 @@ function run_query_deal_insert_parentdeal($deal) {
   display_debug_msg($query, $cdg_sql, 'run_query_deal_insert_parentdeal()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+  of_entity_insert('parentdeal', $obm_q->lastid());
 
   return $retour;
 }

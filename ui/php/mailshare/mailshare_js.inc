@@ -49,7 +49,7 @@ function show_hide_add_button() {
   var childs = parent.getChildren();
   if($GLOBALS[c_max_mailshare_alias] > 0) {
     if(childs.length >= $GLOBALS[c_max_mailshare_alias] && button) {
-      button.remove();
+      button.dispose();
     } else if(childs.length < $GLOBALS[c_max_mailshare_alias] && !button) {
       $('mailshareMailLabel').adopt((new Element('a').addEvent('click', function () {
                 add_email_field(aliasSelectTemplate);

@@ -41,9 +41,9 @@ function node_toggle(level) {
 ///////////////////////////////////////////////////////////////////////////////
 function zoom(z) {
 
-  var nodestart = \$ES('.nodeStart');
-  var nodeend = \$ES('.nodeEnd');
-  var nodewrap = \$ES('.nodeWrap');
+  var nodestart = $$('.nodeStart');
+  var nodeend = $$('.nodeEnd');
+  var nodewrap = $$('.nodeWrap');
 
   if (z == 'small') {
     newClass = 'nodeSmall';
@@ -85,7 +85,7 @@ function zoom(z) {
     }
   }
 
-  var nodes = \$ES('.'+oldClass);    
+  var nodes = $$('.'+oldClass);    
   for(i=0;i<nodes.length;i++) {
     var node = nodes[i];
     $(node).addClass(newClass);
@@ -108,7 +108,7 @@ function check_form(form) {
 
   // MANDATORY : Check that all ogroup name is not empty
   var reg = new RegExp(\"tf_ogroup\", \"g\");
-  var elems = \$ES('.mandatory', 'mainContent')
+  var elems = $$('.mandatory', 'mainContent')
   for(i=0;i<elems.length;i++) {
     node_name = elems[i].value;      
     if (node_name == \"\") {
@@ -241,7 +241,7 @@ function del_entity(level) {
 
     $('nb_child_'+parent_level).value--;
     if ( $('nb_child_'+parent_level).value == 0) {
-      $('img_'+parent_level).remove();
+      $('img_'+parent_level).dispose();
     }
 
   }

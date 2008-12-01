@@ -274,6 +274,7 @@ class OBM_Challenge_Auth extends Auth {
   }
 
 }
+
 class CAS_Auth extends Auth {
 
   var $lifetime       =  0;

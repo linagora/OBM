@@ -104,7 +104,7 @@ class Vcalendar_Reader_OBM {
   }
   
   function addAttendee(&$vevent, &$data) {
-   $vevent->set('attendee',$this->parseAttendee($data['evententity_entity_id'], $data['evententity_entity'], $data['evententity_state']));
+   $vevent->set('attendee',$this->parseAttendee($data['eventlink_entity_id'], $data['eventlink_entity'], $data['eventlink_state']));
   }
   
   function addExdate(&$vevent, &$date) {

@@ -1615,11 +1615,7 @@ function of_userdata_dis_admin_form($entity) {
 function of_userdata_query_search($entity, $params, $table='') {
   global $cgp_user, $c_all, $c_none;
 
-  if ($table != '') {
-    $entitytablefield = strtolower($table);
-  } else {
-    $entitytablefield = strtolower($entity);
-  }
+  $entitytablefield = strtolower($entity);
 
   // User defined categories
   if (is_array($cgp_user[$entity]["category"])) {
@@ -1632,8 +1628,7 @@ function of_userdata_query_search($entity, $params, $table='') {
       if (($cat != $c_all) && ($cat != $c_none) && ($cat != "")) {
 	$where_cat_user = "";
 	$join_cat_user .= "LEFT JOIN CategoryLink AS $tlink
-          ON ${entitytablefield}_id=$tlink.categorylink_entity_id
-          AND $tlink.categorylink_entity='$entity'
+          ON ${entitytablefield}_entity_id=$tlink.categorylink_entity_id
           AND $tlink.categorylink_category='$cat_name'";
 	if ($cat_tree) {
 	  $join_cat_user .= " LEFT JOIN Category AS $cat_name ON $tlink.categorylink_category_id=$cat_name.category_id";
@@ -1643,8 +1638,7 @@ function of_userdata_query_search($entity, $params, $table='') {
 	$and = "AND";
       } else if ($cat == $c_none) {
 	$join_cat_user .= " LEFT JOIN CategoryLink AS $tlink
-          ON ${entitytablefield}_id=$tlink.categorylink_entity_id
-          AND $tlink.categorylink_entity='$entity'
+          ON ${entitytablefield}__entity_id=$tlink.categorylink_entity_id
           AND $tlink.categorylink_category='$cat_name'";
 	$where .= " $and $tlink.categorylink_category_id IS NULL";
 	$and = "AND";
@@ -2217,15 +2211,17 @@ function of_category_user_get_ordered($cat, $entity="", $entity_id=0) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain("Category");
-
+  $entityTable = ucfirst($entity)."Entity";
+  $entityEntityId = strtolower($entity).'entity_'.strtolower($entity).'_id';
+  $entityId = strtolower($entity).'entity_entity_id';
   // If an entity id is given, restrict categories to those of this entry
   if ( $entity_id > 0) {
     $entity_id = sql_parse_id($entity_id, true);
     $query = "SELECT Category.*
       FROM CategoryLink
-        LEFT JOIN Category ON categorylink_category_id = category_id
-      WHERE categorylink_entity_id $entity_id 
-        AND categorylink_entity = '$entity'
+      INNER JOIN Category ON categorylink_category_id = category_id
+      INNER JOIN $entityTable ON $entityId=categorylink_entity_id
+      WHERE $entityEntityId $entity_id 
         AND categorylink_category = '$cat'
         $multidomain
       ORDER BY category_code, category_label";
@@ -2284,15 +2280,18 @@ function of_category_user_get_ordered($cat, $entity="", $entity_id=0) {
 function of_category_user_get_entitycategories($entity, $category, $entity_id) {
   global $cdg_sql;
 
+  $entityTable = ucfirst($entity)."Entity";
+  $entityEntityId = strtolower($entity).'entity_'.strtolower($entity).'_id';
+  $entityId = strtolower($entity).'entity_entity_id';
   $cats = array();
   $multidomain = sql_multidomain("Category");
   $entity_id = sql_parse_id($entity_id, true);
   $query = "SELECT category_id, category_code, category_label 
       FROM CategoryLink
         JOIN Category ON categorylink_category_id=category_id
-      WHERE categorylink_entity='$entity'
-        AND categorylink_category='$category'
-        AND categorylink_entity_id $entity_id 
+        INNER JOIN $entityTable ON categorylink_entity_id = $entityId
+      WHERE categorylink_category='$category'
+        AND $entityEntityId $entity_id 
         $multidomain
       ORDER BY category_id";
 
@@ -2447,15 +2446,14 @@ function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id, 
 
   if ( ($entity_id > 0) && ($cat_id > 0) ) {
     $obm_q = new DB_OBM;
-
+    $id_entity = of_entity_get($entity, $entity_id);
     if ($check) {
       $nb = 0;
       $query = "SELECT count(*) as nb
        FROM CategoryLink
        WHERE categorylink_category_id ".sql_parse_id($cat_id, true)." 
-         AND categorylink_entity_id ".sql_parse_id($entity_id, true)." 
-         AND categorylink_category='$cat'
-         AND categorylink_entity='$entity'";
+         AND categorylink_entity_id ".sql_parse_id($id_entity, true)." 
+         AND categorylink_category='$cat'";
 
       display_debug_msg($query, $cdg_sql, "of_category_user_query_insert_link(check)");
       $obm_q->query($query);
@@ -2466,17 +2464,16 @@ function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id, 
       }
     }
     $cat_id = sql_parse_id($cat_id);
-    $entity_id = sql_parse_id($entity_id);
+    $entity_id = sql_parse_id($id_entity);
     $query = "INSERT INTO CategoryLink (
        categorylink_category_id,
        categorylink_entity_id,
-       categorylink_category,
-       categorylink_entity
+       categorylink_category
      ) VALUES (
        $cat_id,
-       $entity_id,
-       '$cat',
-       '$entity')";
+       $id_entity,
+       '$cat'
+     )";
     display_debug_msg($query, $cdg_sql, "of_category_user_query_insert_link()");
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
@@ -2496,12 +2493,12 @@ function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id, 
 ///////////////////////////////////////////////////////////////////////////////
 function of_category_user_query_delete_link($entity, $entity_id) {
   global $cdg_sql;
+  $entity_id = of_entity_get($entity, $entity_id);
   $entity_id = sql_parse_id($entity_id, true);
   $query = "DELETE
     FROM CategoryLink
     WHERE
-      categorylink_entity='$entity'
-      AND categorylink_entity_id $entity_id ";
+      categorylink_entity_id $entity_id ";
 
   display_debug_msg($query, $cdg_sql, "of_category_user_query_delete_link()");
   $obm_q = new DB_OBM;

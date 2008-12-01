@@ -117,4 +117,10 @@ $l_quantity = "Quantité";
 $l_quantity = "Quantité";
 $l_no_found_subscription = "Aucun abonnement lié à ce contact !";
 
+$l_im = "Messagerie Instantanée";
+$l_website = "Site internet";
 
+$l_phone_labels = array ('HOME' => 'Téléphone (domicile)', 'WORK' => 'Téléphone (bureau)', 'CELL' => 'Téléphone portable', 'FAX' => 'Fax', 'PAGER' => 'Pager', 'OTHER' => 'Autre téléphone');
+$l_email_labels = array ('HOME' => 'Domicile', 'WORK' => 'Bureau', 'OTHER' => 'Autre');
+$l_address_labels = array ('HOME' => 'Domicile', 'WORK' => 'Bureau', 'OTHER' => 'Autre');
+$l_website_labels = array ('HOMEPAGE' => 'Site web', 'BLOG' => 'Log internet', 'HOME' => 'Domicile', 'WORK' => 'Bureau', 'OTHER' => 'Autre');

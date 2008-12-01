@@ -76,7 +76,7 @@ function show_hide_add_button() {
   var childs = parent.getChildren();
   if($GLOBALS[c_max_group_alias] > 0) {
     if(childs.length >= $GLOBALS[c_max_group_alias] && button) {
-      button.remove();
+      button.dispose();
    } else if(childs.length < $GLOBALS[c_max_group_alias] && !button) {
       $('groupMailLabel').adopt((new Element('a').addEvent('click', function () {
                 add_email_field(aliasSelectTemplate);

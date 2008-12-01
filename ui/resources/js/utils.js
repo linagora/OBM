@@ -1,20 +1,19 @@
-Element.extend({
+Element.implement({
   observe: function(options) {
-    return new Observer(this, options); 
+    return new Obm.Observer(this, options); 
   } 
 }); 
 
-var Observer = new Class({ 
+Obm.Observer = new Class({ 
 
-  setOptions: function(options) {
-    this.options = Object.extend({
-      property: 'width',
-      frequency: '500',
-      onStart: Class.empty,
-      onChange: Class.empty,
-      onStop: Class.empty
-    }, options || {});
+  Implements: Options,   
 
+  options: {
+    property: 'width',
+    frequency: '500',
+    onStart: $empty,
+    onChange: $empty,
+    onStop: $empty
   },
 
   initialize: function(el, options) {
@@ -46,7 +45,9 @@ var Observer = new Class({
       this.options.onStart(this.el, v);
       this.change = true;
     }
-    this.options.onChange(this.el, v);
+    if(this.change) {
+      this.options.onChange(this.el, v);
+    }
   }
 });
 
@@ -122,3 +123,9 @@ String.prototype.pad = function(l, s, t){
 Number.prototype.pad = function(l,s,t) { 
   return this.toString().pad(l,s,t);
 }
+/**
+ *  
+ */
+/**
+ *  
+ */

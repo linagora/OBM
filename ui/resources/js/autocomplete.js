@@ -110,28 +110,27 @@ obm.AutoComplete.View = new Class({
 
 obm.AutoComplete.Search = new Class({
 
-  setOptions: function(options){
-    this.options = Object.extend({
-      chars: 1,                        // min number of chars to type before requesting
-      results: 8,                      // number of results per page
-      delay: 400,                      // delay before the last key pressed and the request
-      mode: 'multiple',                // 'mono' or 'multiple'
-      locked: false,                   // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
-      resetable: false,                // only in 'mono' mode : reset field value
-      restriction: null,               // obm needs
-      filter_entity: null,            // obm needs
-      filter_pattern: 'read',            // obm needs
-      fieldText: obm.vars.labels.autocompleteField,          // default text displayed when empty field
-      extension: null,                  // obm needs
-      resultValue: Class.empty(),		// obm needs
-      name: null
-    }, options || {});
+  Implements: Options,   
+
+  options: {
+    chars: 1,                        // min number of chars to type before requesting
+    results: 8,                      // number of results per page
+    delay: 400,                      // delay before the last key pressed and the request
+    mode: 'multiple',                // 'mono' or 'multiple'
+    locked: false,                   // only in 'mono' mode : lock a choice, and restore it on blur if no other choice selected
+    resetable: false,                // only in 'mono' mode : reset field value
+    restriction: null,               // obm needs
+    filter_entity: null,            // obm needs
+    filter_pattern: 'read',            // obm needs
+    fieldText: obm.vars.labels.autocompleteField,          // default text displayed when empty field
+    extension: null,                  // obm needs
+    resultValue: null,		// obm needs
+    name: null
   },
 
 
   initialize: function(url, selectedBox, inputField, options) {
     this.setOptions(options);
-
     this.url = url;                    // url used for ajax requests
     this.inputField = $(inputField);   // field used for the input
     if(this.options.name == null) {
@@ -157,11 +156,11 @@ obm.AutoComplete.Search = new Class({
       	this.lockedLabel = this.inputField.value;
       	this.lockedKey = this.selectedBox.value;
       }
-      this.inputField.addEvent('focus', this.monoModeOnFocus.bindAsEventListener(this))
+      this.inputField.addEvent('focus', this.monoModeOnFocus.bindWithEvent(this))
                      .addEvent('keypress', this.monoModeOnKeyPress.bindWithEvent(this));
 
     } else {
-	    if (this.options.resultValue != Class.empty()) {
+	    if (this.options.resultValue != null) {
 	      this.validateResultValue = this.options.resultValue;
 	    } else {
 	      this.validateResultValue = this.addResultValue;
@@ -169,40 +168,38 @@ obm.AutoComplete.Search = new Class({
       this.resetFunc = this.reset;
       this.textChangedFunc = this.resetResultBox;
     }
-
-    this.inputField.addEvent('keyup', this.onTextChange.bindAsEventListener(this))
-                   .addEvent('input', this.onTextChange.bindAsEventListener(this))
-                   .addEvent('paste', this.onTextChange.bindAsEventListener(this))
+    this.inputField.addEvent('keyup', this.onTextChange.bindWithEvent(this))
+                   .addEvent('input', this.onTextChange.bindWithEvent(this))
+                   .addEvent('paste', this.onTextChange.bindWithEvent(this))
                    .addEvent('keydown', this.onKeyDown.bindWithEvent(this))
                    .addEvent('keypress', this.onKeyPress.bindWithEvent(this))
-                   .addEvent('focus', this.onFocus.bindAsEventListener(this))
-                   .addEvent('blur', this.onBlur.bindAsEventListener(this));
-
+                   .addEvent('focus', this.onFocus.bindWithEvent(this))
+                   .addEvent('blur', this.onBlur.bindWithEvent(this));
     var inputCoords = this.inputField.getCoordinates();
     this.resultBox = new Element('div').addClass('autoCompleteResultBox')
                                        .injectInside($(document.body))
-                                       .addEvent('mouseenter', function() {this.isMouseOver=true;}.bindAsEventListener(this))
-                                       .addEvent('mouseleave', function() {this.isMouseOver=false;}.bindAsEventListener(this))
+                                       .addEvent('mouseenter', function() {this.isMouseOver=true;}.bindWithEvent(this))
+                                       .addEvent('mouseleave', function() {this.isMouseOver=false;}.bindWithEvent(this))
                                        .setStyles({
                                          'top':(inputCoords.top + inputCoords.height + 2) + 'px',
                                          'left':inputCoords.left + 'px'
                                        });
     this.infos = new Element('h2').injectInside(this.resultBox)
-                                  .addEvent('mousedown', function() {this.inputField.focus();}.bindAsEventListener(this))
-                                  .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this));
+                                  .addEvent('mousedown', function() {this.inputField.focus();}.bindWithEvent(this))
+                                  .addEvent('mouseup', function() {this.inputField.focus();}.bindWithEvent(this));
 
     //FIXME Name of those 3 vars
-    this.previousResultsBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(-this.options.results);}.bindAsEventListener(this))
-                                          .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this))
-                                          .setHTML('&lt;&lt;&lt;')
+    this.previousResultsBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(-this.options.results);}.bindWithEvent(this))
+                                          .addEvent('mouseup', function() {this.inputField.focus();}.bindWithEvent(this))
                                           .setStyle('display', 'none')
-                                          .injectInside(this.infos);
+                                          .injectInside(this.infos)
+                                          .innerHTML = '&lt;&lt;&lt;';
     this.infoText = new Element('span').injectInside(this.infos);
-    this.nextResultsBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(this.options.results);}.bindAsEventListener(this))
-                                      .addEvent('mouseup', function() {this.inputField.focus();}.bindAsEventListener(this))
-                                      .setHTML('&gt;&gt;&gt;')
+    this.nextResultsBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(this.options.results);}.bindWithEvent(this))
+                                      .addEvent('mouseup', function() {this.inputField.focus();}.bindWithEvent(this))
                                       .setStyle('display', 'none')
-                                      .injectInside(this.infos);
+                                      .injectInside(this.infos)
+                                      .innerHTML = '&gt;&gt;&gt;';
 
     this.resetFunc();
   },
@@ -309,9 +306,9 @@ obm.AutoComplete.Search = new Class({
       this.requestId++;
       new Ajax(this.url, {
         method: 'post',
-        postBody: 'pattern='+this.currentValue+'&limit='+(this.options.results*3)+'&filter_pattern='+this.options.filter_pattern+'&filter_entity='+this.options.filter_entity+'&restriction='+this.options.restrictions+'&extension='+this.options.extension,
-        onFailure:this.onFailure.bindAsEventListener(this),
-        onComplete:this.onNewRequestSuccess.bindAsEventListener(this,[this.requestId])
+        postBody: 'pattern='+this.currentValue+'&limit='+(this.options.results*3)+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
+        onFailure:this.onFailure.bindWithEvent(this),
+        onComplete:this.onNewRequestSuccess.bindWithEvent(this,[this.requestId])
       }).request();
     }
   },
@@ -324,9 +321,9 @@ obm.AutoComplete.Search = new Class({
         var requestNbr = ((this.options.results*2)>unknownResultsNbr ? unknownResultsNbr : this.options.results*2);
         new Ajax(this.url, {
           method: 'post',
-          postBody: 'pattern='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+requestNbr+'&filter_pattern='+this.options.filter_pattern+'&filter_entity='+this.options.filter_entity+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
-          onFailure:this.onFailure.bindAsEventListener(this),
-          onComplete:this.onCacheRequestSuccess.bindAsEventListener(this)
+          postBody: 'pattern='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+requestNbr+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
+          onFailure:this.onFailure.bindWithEvent(this),
+          onComplete:this.onCacheRequestSuccess.bindWithEvent(this)
         }).request();
         this.cache.setSize(this.cache.getSize()+requestNbr);
       }
@@ -385,11 +382,11 @@ obm.AutoComplete.Search = new Class({
       if ($(div_id)) { res.addClass("selected"); }
       this.cache.addElement(res);
       if($type(data.extension)) {
-        res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-           .addEvent('mousedown', function() {this.validateResultValue(res,data.extension);}.bindAsEventListener(this));
+        res.addEvent('mouseover', function() {this.selectElement(res);}.bindWithEvent(this))
+           .addEvent('mousedown', function() {this.validateResultValue(res,data.extension);}.bindWithEvent(this));
       } else {
-        res.addEvent('mouseover', function() {this.selectElement(res);}.bindAsEventListener(this))
-           .addEvent('mousedown', function() {this.validateResultValue(res);}.bindAsEventListener(this));
+        res.addEvent('mouseover', function() {this.selectElement(res);}.bindWithEvent(this))
+           .addEvent('mousedown', function() {this.validateResultValue(res);}.bindWithEvent(this));
       }
     }.bind(this));
     this.totalNbr = results.length;
@@ -486,7 +483,7 @@ obm.AutoComplete.Search = new Class({
   // removes previously viewable results from the Result Box
   flushView: function() {
     this.hideSelection();
-    $ES('div', this.resultBox).each(function(elt){ elt.remove();});
+    this.resultBox.getElements('div').each(function(elt){ elt.dispose();});
   },
 
   ///////////////////////////////////////////////////////////////////////////
@@ -497,9 +494,9 @@ obm.AutoComplete.Search = new Class({
     this.previousResultsBtn.setStyle('display', 'none');
     this.nextResultsBtn.setStyle('display', 'none');
     if (this.totalNbr<=1) {
-      this.infoText.setHTML(this.totalNbr);
+      this.infoText.innerHTML = this.totalNbr;
     } else {
-      this.infoText.setHTML((this.view.getFirst()+1)+' - '+(this.view.getLast()+1)+' / '+this.totalNbr);
+      this.infoText.innerHTML = (this.view.getFirst()+1)+' - '+(this.view.getLast()+1)+' / '+this.totalNbr;
       this.updateNavBtns();
     }
   },
@@ -508,7 +505,7 @@ obm.AutoComplete.Search = new Class({
   setInfoText: function(str) {
     this.previousResultsBtn.setStyle('display', 'none');
     this.nextResultsBtn.setStyle('display', 'none');
-    this.infoText.setHTML(str);
+    this.infoText.innerHTML = str;
     this.updateNavBtns();
   },
 
@@ -565,7 +562,7 @@ obm.AutoComplete.Search = new Class({
   // removes an element from the selectedBox
   // not used (remove_element function used instead)
   removeFromSelectedBox: function(element) {
-    element.getParent().remove();
+    element.getParent().dispose();
     this.inputField.focus();
   },
 

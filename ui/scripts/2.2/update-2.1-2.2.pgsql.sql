@@ -476,12 +476,6 @@ CREATE TABLE DealEntity (
   PRIMARY KEY (dealentity_entity_id, dealentity_deal_id)
 );
   
-CREATE TABLE DefaultodttemplateEntity (
-  defaultodttemplateentity_entity_id integer NOT NULL,
-  defaultodttemplateentity_defaultodttemplate_id integer NOT NULL,
-  PRIMARY KEY (defaultodttemplateentity_entity_id, defaultodttemplateentity_defaultodttemplate_id)
-);
-  
 CREATE TABLE DocumentEntity (
   documententity_entity_id integer NOT NULL,
   documententity_document_id integer NOT NULL,
@@ -937,6 +931,7 @@ ALTER TABLE Company ALTER COLUMN company_domain_id SET NOT NULL;
 ALTER TABLE Company ALTER COLUMN company_datasource_id SET default NULL;
 ALTER TABLE Contact ALTER COLUMN contact_domain_id SET NOT NULL;
 ALTER TABLE Contact ALTER COLUMN contact_datasource_id SET default NULL;
+ALTER TABLE EntityRight ALTER COLUMN entityright_consumer_id SET default NULL;
 ALTER TABLE EntityRight ADD COLUMN entityright_access INTEGER not null DEFAULT 0;
 ALTER TABLE Kind ALTER COLUMN kind_domain_id SET NOT NULL;
 ALTER TABLE ContactFunction ALTER COLUMN contactfunction_domain_id SET NOT NULL;
@@ -1097,11 +1092,6 @@ INSERT INTO DealEntity (dealentity_entity_id, dealentity_deal_id) SELECT entity_
 UPDATE TmpEntity SET id_entity = NULL;
   
 INSERT INTO TmpEntity (id_entity) SELECT defaultodttemplate_id FROM DefaultOdtTemplate;
-INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
-INSERT INTO DefaultodttemplateEntity (defaultodttemplateentity_entity_id, defaultodttemplateentity_defaultodttemplate_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
-UPDATE TmpEntity SET id_entity = NULL;
-  
-INSERT INTO TmpEntity (id_entity) SELECT document_id FROM Document;
 INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
 INSERT INTO DocumentEntity (documententity_entity_id, documententity_document_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
 UPDATE TmpEntity SET id_entity = NULL;
@@ -2514,9 +2504,6 @@ ALTER TABLE ContractEntity ADD CONSTRAINT contractentity_entity_id_entity_id_fke
 
 ALTER TABLE DealEntity ADD CONSTRAINT dealentity_deal_id_deal_id_fkey FOREIGN KEY (dealentity_deal_id) REFERENCES Deal (deal_id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE DealEntity ADD CONSTRAINT dealentity_entity_id_entity_id_fkey FOREIGN KEY (dealentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE DefaultodttemplateEntity ADD CONSTRAINT defaultodttemplate_id_defaultodttemplate_id_fkey FOREIGN KEY (defaultodttemplateentity_defaultodttemplate_id) REFERENCES DefaultOdtTemplate (defaultodttemplate_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE DefaultodttemplateEntity ADD CONSTRAINT defaultodttemplateentity_entity_id_entity_id_fkey FOREIGN KEY (defaultodttemplateentity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE DocumentEntity ADD CONSTRAINT documententity_document_id_document_id_fkey FOREIGN KEY (documententity_document_id) REFERENCES Document (document_id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE DocumentEntity ADD CONSTRAINT documententity_entity_id_entity_id_fkey FOREIGN KEY (documententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;
