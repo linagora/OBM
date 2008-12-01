@@ -282,7 +282,13 @@ sub _loadUserLinks {
                 INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
                 INNER JOIN '.$mailboxEntity.' ON mailboxentity_entity_id = entityright_entity_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
-                WHERE (mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1) OR userobm_id='.$entityId.'
+                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                UNION
+                SELECT
+                  userobm_id,
+                  userobm_login
+                FROM '.$userObmTable.'
+                WHERE userobm_id = '.$entityId.'
                 UNION
                 SELECT
                   userobm_id,
@@ -303,7 +309,13 @@ sub _loadUserLinks {
                 INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
                 INNER JOIN '.$mailboxEntity.' ON mailboxentity_entity_id = entityright_entity_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
-                WHERE (mailboxentity_mailbox_id = '.$entityId.' AND entityright_admin=1 AND userobm_archive=0 AND userobm_mail_perms=1) OR userobm_id='.$entityId.'
+                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_admin=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                UNION
+                SELECT
+                  userobm_id,
+                  userobm_login
+                FROM '.$userObmTable.'
+                WHERE userobm_id = '.$entityId.'
                 UNION
                 SELECT
                   userobm_id,
