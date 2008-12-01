@@ -818,25 +818,27 @@ function run_query_global_update_document($params, $id) {
 // Get and register the user's todo into session
 // This must be called in an open session (between page_open and page_close )
 ///////////////////////////////////////////////////////////////////////////////
-function global_session_load_user_todos($p_todo='todo_priority') {
+function global_session_load_user_todos($pri='todo_priority') {
   global $cdg_sql, $cgp_todo_nb, $todos, $obm;
 
   $uid = sql_parse_id($obm['uid'], true);
 
   $limit = sql_limit($db_type, $cgp_todo_nb, 0);
-  $order = ($p_todo != '' ? $p_todo : 'todo_priority');
+  $order = ($pri != '' ? $pri : 'todo_priority');
   if ($order == 'todo_priority') {
-    $order .= ' desc';
+    $order .= ' desc event_priority';
   }
 
   // create the todo list
   $query = "SELECT
       event_id,
       event_title
-    FROM Event
+    FROM EventLink
+      INNER JOIN Event on eventlink_event_id=event_id
+      INNER JOIN UserEntity on eventlink_entity_id=userentity_entity_id
     WHERE event_type='VTODO'
-      event_usercreate $uid 
-    AND eventtodo_percent < 100
+      AND userentity_user_id $uid
+      AND eventlink_percent < 100
     ORDER BY $order
     $limit";
 
@@ -853,8 +855,8 @@ function global_session_load_user_todos($p_todo='todo_priority') {
     $todolist_q->next_record();
 
     $option = "todo_$rank";
-    $t_id = $todolist_q->f('todo_id');
-    $t_title = $todolist_q->f('todo_title');
+    $t_id = $todolist_q->f('event_id');
+    $t_title = $todolist_q->f('event_title');
 
     $todos[$rank]['id'] = $t_id; 
     $todos[$rank]['title'] = $t_title; 

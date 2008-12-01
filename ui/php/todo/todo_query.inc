@@ -31,60 +31,65 @@ function run_query_todo_search($params) {
   $datebefore = of_isodate_convert($params['date_before'],true);
 
   $uid = sql_parse_id($obm['uid'], true);
-  $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'todo_priority';
+  $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'event_priority';
   $sql_order_dir = (strcmp($sql_order_dir,'') != 0) ? $sql_order_dir : 'desc';
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $date = sql_date_format($db_type, 'todo_date', 'date_todo');
+  $date = sql_date_format($db_type, 'event_date', 'event_date');
   $deadline = sql_date_format($db_type, 'todo_deadline', 'date_deadline');
-  $multidomain = sql_multidomain('todo');
+  $multidomain = sql_multidomain('event');
 
   if ($text != '') {
-    $where .= " AND (todo_title $like '$text%' OR todo_content $like '$text%')";
+    $where .= " AND (event_title $like '$text%' OR event_description $like '$text%')";
   }
   if (($priority != '') && ($priority != $c_all)) {
-    $where .= " AND todo_priority = '$priority'";
+    $where .= " AND event_priority = '$priority'";
   }
   if ($percent != '') {
-    $where .= " AND todo_percent > '$percent'";
+    $where .= " AND event_percent > '$percent'";
   }
   if ($dateafter != '') {
-    $where .= " AND todo_$date_field > '$dateafter'";
+    $where .= " AND event_$date_field > '$dateafter'";
   }
   if ($datebefore != '') {
-    $where .= " AND todo_$date_field < '$datebefore'";
+    $where .= " AND event_$date_field < '$datebefore'";
   }
 
-  $whereq = "WHERE todo_user $uid 
+  $fromq = 'FROM EventLink
+    INNER JOIN Event on eventlink_event_id=event_id
+    INNER JOIN UserEntity on eventlink_entity_id=userentity_entity_id';
+
+  $whereq = "WHERE event_type = 'VTODO'
+    AND userentity_user_id $uid
     $where
     $multidomain";
 
   // Order exceptions (order on calculated rows)
   if (strcmp($sql_order_field, 'todo_update') == 0) {
-    $order = 'todo_priority';
+    $order = 'event_priority';
   } else if (strcmp($sql_order_field,'') == 0) {
-    $order = 'todo_priority';
+    $order = 'event_priority';
   }
   $orderq = " ORDER BY $order $sql_order_dir $order_next";
 
   $query = "SELECT
-    todo_id as id,
-    todo_id,
+    event_id as id,
+    event_id,
     $date,
     $deadline,
-    todo_priority,
-    todo_percent,
-    todo_title
-  FROM Todo
+    event_priority,
+    event_percent,
+    event_title
+  $fromq
   $whereq
   $orderq
   $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Todo $whereq");
+    $count = get_query_count("select count(*) $fromq $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
