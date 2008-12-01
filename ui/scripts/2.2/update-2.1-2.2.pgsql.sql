@@ -2629,6 +2629,9 @@ ALTER TABLE payment ALTER COLUMN payment_checked SET DEFAULT 0;
 -- MailboxEntity production table
 CREATE TABLE P_MailboxEntity (LIKE MailboxEntity);
 
+-- MailshareEntity production table
+CREATE TABLE P_MailshareEntity (LIKE MailshareEntity);
+
 --  _________________
 -- | Drop old tables |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯

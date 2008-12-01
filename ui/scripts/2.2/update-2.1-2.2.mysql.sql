@@ -2177,6 +2177,9 @@ DELETE FROM of_usergroup WHERE of_usergroup_user_id NOT IN (SELECT userobm_id FR
 -- MailboxEntity production table
 CREATE TABLE P_MailboxEntity LIKE MailboxEntity;
 
+-- MailshareEntity production table
+CREATE TABLE P_MailshareEntity LIKE MailshareEntity;
+
 --  _________________
 -- | Drop old tables |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯

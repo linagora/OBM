@@ -3587,3 +3587,8 @@ CREATE TABLE `of_usergroup` (
 -- MailboxEntity production table
 --
 CREATE TABLE P_MailboxEntity LIKE MailboxEntity;
+
+--
+-- MailshareEntity production table
+--
+CREATE TABLE P_MailshareEntity LIKE MailshareEntity;
