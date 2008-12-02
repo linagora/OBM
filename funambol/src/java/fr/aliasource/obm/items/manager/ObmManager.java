@@ -10,7 +10,7 @@ public abstract class ObmManager {
 	protected AccessToken token;
 	protected boolean syncReceived = false;
 
-	public abstract ISyncClient getSyncClient();
+	protected abstract ISyncClient getSyncClient();
 
 	public void logIn(String user, String pass) throws OBMException {
 		token = getSyncClient().login(user, pass, "funis");

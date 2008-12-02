@@ -355,7 +355,7 @@ public class ContactManager extends ObmManager {
 	}
 
 	@Override
-	public ISyncClient getSyncClient() {
+	protected ISyncClient getSyncClient() {
 		return binding;
 	}
 

@@ -559,7 +559,7 @@ public class CalendarManager extends ObmManager {
 	}
 
 	@Override
-	public ISyncClient getSyncClient() {
+	protected ISyncClient getSyncClient() {
 		return binding;
 	}
 }
