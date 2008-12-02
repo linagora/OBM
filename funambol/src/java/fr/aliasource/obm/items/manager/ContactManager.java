@@ -25,6 +25,7 @@ import org.obm.sync.client.book.BookClient;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.locators.AddressBookLocator;
 
+import com.funambol.common.pim.common.Property;
 import com.funambol.common.pim.contact.BusinessDetail;
 import com.funambol.common.pim.contact.PersonalDetail;
 import com.funambol.common.pim.contact.Phone;
@@ -308,19 +309,19 @@ public class ContactManager extends ObmManager {
 		}
 	}
 
-	// private String s(Property p) {
-	// return p.getPropertyValueAsString();
-	// }
-	//
-	// private org.obm.sync.book.Address updateAddress(Address funis, String
-	// type) {
-	// org.obm.sync.book.Address obm = new org.obm.sync.book.Address(s(funis
-	// .getStreet()), s(funis.getPostalCode()), s(funis
-	// .getPostOfficeAddress()), s(funis.getCity()), s(funis
-	// .getCountry()));
-	// return obm;
-	// }
+	private String s(Property p) {
+		return p.getPropertyValueAsString();
+	}
 
+	private Address funisToObm(com.funambol.common.pim.contact.Address funis) {
+		org.obm.sync.book.Address obm = new org.obm.sync.book.Address(s(funis
+				.getStreet()), s(funis.getPostalCode()), s(funis
+				.getPostOfficeAddress()), s(funis.getCity()), s(funis
+				.getCountry()));
+		return obm;
+	}
+
+	@SuppressWarnings("unchecked")
 	private Contact foundationContactToObm(
 			com.funambol.common.pim.contact.Contact funis, String type) {
 
@@ -343,13 +344,45 @@ public class ContactManager extends ObmManager {
 					.getNickname().getPropertyValueAsString()));
 		}
 
-		// BusinessDetail bus = funis.getBusinessDetail();
+		BusinessDetail bd = funis.getBusinessDetail();
+		PersonalDetail pd = funis.getPersonalDetail();
 
-		// TODO phones, email, contact
+		// addresses
+		List<com.funambol.common.pim.contact.Address> lad = new LinkedList<com.funambol.common.pim.contact.Address>();
+		lad.add(bd.getAddress());
+		lad.add(pd.getAddress());
+		lad.add(pd.getOtherAddress());
+		for (com.funambol.common.pim.contact.Address a : lad) {
+			contact.addAddress(s(a.getLabel()), funisToObm(a));
+		}
 
-		// comment
-		// contact.setComment(ContactHelper.nullToEmptyString(ContactHelper
-		// .getNote(funis.getNotes(), ContactHelper.COMMENT)));
+		// phones
+		List<Phone> lph = new LinkedList<Phone>();
+		lph.addAll(bd.getPhones());
+		lph.addAll(pd.getPhones());
+		for (Phone p : lph) {
+			contact.addPhone(p.getPhoneType(), new org.obm.sync.book.Phone(p
+					.getValue()));
+		}
+
+		// emails
+		List<com.funambol.common.pim.contact.Email> lem = new LinkedList<com.funambol.common.pim.contact.Email>();
+		lem.addAll(bd.getEmails());
+		lem.addAll(pd.getEmails());
+		for (com.funambol.common.pim.contact.Email em : lem) {
+			contact.addEmail(em.getEmailType(), new Email(em.getValue()));
+		}
+
+		// websites
+		List<WebPage> lwp = new LinkedList<WebPage>();
+		lwp.addAll(bd.getWebPages());
+		lwp.addAll(pd.getWebPages());
+		for (WebPage wp : lwp) {
+			contact.addWebsite(wp.getWebPageType(), new Website(wp.getValue()));
+		}
+
+		contact.setComment(ContactHelper.nullToEmptyString(ContactHelper
+				.getNote(funis.getNotes(), ContactHelper.COMMENT)));
 
 		return contact;
 	}
