@@ -1160,13 +1160,15 @@ CREATE TABLE `Entity` (
 
 DROP TABLE IF EXISTS `EntityRight`;
 CREATE TABLE `EntityRight` (
+  `entityright_id` int(8) auto_increment,
   `entityright_entity_id` int(8) NOT NULL,
   `entityright_consumer_id` int(8),
   `entityright_access` int(1) NOT NULL default '0',
   `entityright_read` int(1) NOT NULL default '0',
   `entityright_write` int(1) NOT NULL default '0',
   `entityright_admin` int(1) NOT NULL default '0',
-  PRIMARY KEY (`entityright_entity_id`,`entityright_consumer_id`),
+  PRIMARY KEY (`entityright_id`),
+  KEY `entityright_entity_id_entity_id` (`entityright_entity_id`),
   KEY `entityright_consumer_id_entity_id` (`entityright_consumer_id`),
   CONSTRAINT `entityright_entity_id_entity_id` FOREIGN KEY (`entityright_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `entityright_consumer_id_entity_id` FOREIGN KEY (`entityright_consumer_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE

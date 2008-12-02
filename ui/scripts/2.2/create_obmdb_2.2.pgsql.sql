@@ -835,6 +835,7 @@ CREATE TABLE entity (
 --
 
 CREATE TABLE entityright (
+    entityright_id integer NOT NULL,
     entityright_entity_id integer NOT NULL,
     entityright_consumer_id integer NULL,
     entityright_access integer DEFAULT 0 NOT NULL,
@@ -1601,6 +1602,7 @@ CREATE TABLE p_domain (
 --
 
 CREATE TABLE p_entityright (
+    entityright_entity_id integer NOT NULL,
     entityright_entity_id integer NOT NULL,
     entityright_consumer_id integer NOT NULL,
     entityright_access integer NOT NULL,
@@ -5281,7 +5283,7 @@ ALTER TABLE ONLY entity
 --
 
 ALTER TABLE ONLY entityright
-    ADD CONSTRAINT entityright_pkey PRIMARY KEY (entityright_entity_id, entityright_consumer_id);
+    ADD CONSTRAINT entityright_pkey PRIMARY KEY (entityright_id);
 
 
 --

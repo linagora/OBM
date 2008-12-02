@@ -933,6 +933,8 @@ ALTER TABLE Contact ALTER COLUMN contact_domain_id SET NOT NULL;
 ALTER TABLE Contact ALTER COLUMN contact_datasource_id SET default NULL;
 ALTER TABLE EntityRight ALTER COLUMN entityright_consumer_id SET default NULL;
 ALTER TABLE EntityRight ADD COLUMN entityright_access INTEGER not null DEFAULT 0;
+ALTER TABLE EntityRight DROP CONSTRAINT entityright_pkey;
+ALTER TABLE EntityRight ADD COLUMN entityright_id serial PRIMARY KEY;
 ALTER TABLE Kind ALTER COLUMN kind_domain_id SET NOT NULL;
 ALTER TABLE ContactFunction ALTER COLUMN contactfunction_domain_id SET NOT NULL;
 ALTER TABLE LeadSource ALTER COLUMN leadsource_domain_id SET NOT NULL;

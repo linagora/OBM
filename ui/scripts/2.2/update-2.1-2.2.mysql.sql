@@ -951,6 +951,8 @@ ALTER TABLE DomainMailServer MODIFY COLUMN domainmailserver_domain_id int(8) NOT
 ALTER TABLE EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
 ALTER TABLE EntityRight ADD entityright_access int(1) NOT NULL default 0;
 ALTER TABLE EntityRight MODIFY COLUMN entityright_consumer_id int(8);
+ALTER TABLE EntityRight DROP PRIMARY KEY;
+ALTER TABLE EntityRight ADD COLUMN entityright_id int(8) NOT NULL auto_increment PRIMARY KEY;
 ALTER TABLE EventLink MODIFY COLUMN eventlink_event_id int(8) NOT NULL ;
 ALTER TABLE EventLink MODIFY COLUMN eventlink_entity_id int(8) NOT NULL ;
 ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
