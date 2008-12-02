@@ -36,9 +36,8 @@ public class ContactManager extends ObmManager {
 	private Log logger = LogFactory.getLog(getClass());
 
 	public ContactManager(String obmAddress) {
-
 		AddressBookLocator addressbookLocator = new AddressBookLocator();
-		binding = addressbookLocator.locate(obmAddress);
+		binding = addressbookLocator.locate(obmAddress.replace("/AddressBook", ""));
 	}
 
 	public List<String> getAllItemKeys() throws OBMException {
