@@ -348,7 +348,7 @@ function run_query_contract_insert($contract) {
   $retour = $obm_q->query($query);
 
   $c_id = $obm_q->lastid();
-  $entity_id = of_entity_insert($GLOBALS['module'], $id);  
+  $entity_id = of_entity_insert($GLOBALS['module'], $c_id);  
 
   return $c_id;
 }

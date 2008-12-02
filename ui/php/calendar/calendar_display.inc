@@ -176,7 +176,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
   } elseif ( $p_view == 'planning' ) {
     $script_range = 'obm.vars.conf.displayRange = true;';
     $l_legend = $l_meeting_legend;
-    $cats1 = of_category_get_ordered('calendar', 'category1');
+    $cats1 = of_category_get_ordered('event', 'category1');
     $nb = count($cats1);
     $colors = random_color($nb);
     foreach($cats1 as $key => $cat_info) {
@@ -313,7 +313,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
 
     $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {filter_entity:'Resource', defaultText:'$resource_text'});";
   }
-  $cats1 = of_category_get_ordered('calendar', 'category1');
+  $cats1 = of_category_get_ordered('event', 'category1');
   $sel_cat1 = of_category_html_select('calendar', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
 
   $dis_back_myview = "<a href=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a>";
@@ -1349,7 +1349,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
   $of = &OccurrenceFactory::getInstance();
 
   $category_filter = $calendar['category_filter'];
-  $cats1 = of_category_get_ordered('calendar', 'category1');
+  $cats1 = of_category_get_ordered('event', 'category1');
   $nb = count($cats1);
   $colors = random_color($nb);
   foreach($cats1 as $key => $cat_info) {
@@ -1595,7 +1595,7 @@ function dis_calendar_planning_view($date, $end, $calendar_entity, $category_fil
   $of = &OccurrenceFactory::getInstance(); 
   $day_duration = 86400;
 
-  $cats1 = of_category_get_ordered('calendar', 'category1');
+  $cats1 = of_category_get_ordered('event', 'category1');
   $nb = count($cats1);
 
   $colors = random_color($nb);
@@ -2227,7 +2227,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
 
   $possible_owners = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
   $possible_owners = $possible_owners['entity'];
-  $cats1 = of_category_get_ordered('calendar', 'category1');
+  $cats1 = of_category_get_ordered('event', 'category1');
   $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $resources, $groups,$tasks, $cats1, $alerts);
 
   return $block;
@@ -3574,7 +3574,7 @@ function html_calendar_ressource_list($groupLabel,$resource_group,$free=false) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_admin_index() {
 
-  $cats1 = of_category_get_ordered('calendar', 'category1');
+  $cats1 = of_category_get_ordered('event', 'category1');
   $block = of_category_dis_admin_form('category1', $cats1);
 
   return $block;

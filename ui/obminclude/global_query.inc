@@ -589,7 +589,7 @@ function run_query_global_delete_document_links($ent_id, $entity, $doc_id='') {
   }
   $where = '1=1';
   if ($ent_id != '') {
-    $entity_id = of_entity_get($entity_id, $id);
+    $entity_id = of_entity_get($entity, $ent_id);
     $where .= " AND documentlink_entity_id = $entity_id ";
   }
   if ($doc_id != '') {
@@ -624,6 +624,7 @@ function run_query_global_delete_document($doc_id) {
 
   // Delete the file
   run_query_global_document_delete_file($doc_id);
+  of_entity_delete('document', $doc_id);
   $doc_id = sql_parse_id($doc_id, true);
   // Delete the database entry
   $query = "DELETE FROM Document 
@@ -809,7 +810,7 @@ function global_session_load_user_todos($pri='todo_priority') {
   $limit = sql_limit($db_type, $cgp_todo_nb, 0);
   $order = ($pri != '' ? $pri : 'todo_priority');
   if ($order == 'todo_priority') {
-    $order = ' desc event_priority';
+    $order = ' event_priority desc';
   }
 
   // create the todo list

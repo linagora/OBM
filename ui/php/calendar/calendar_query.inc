@@ -664,19 +664,9 @@ function run_query_calendar_insert_event_data($calendar) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
   $obm_q->query($query);
   
-  $query = "SELECT MAX(event_id) as event_id
-    FROM Event
-    WHERE event_date='$datebegin' 
-      AND event_title='$title'
-      AND event_duration='$event_duration'
-      AND event_domain_id=$obm[domain_id]
-      ORDER BY event_id";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $id = $obm_q->f('event_id');
+  $id = $obm_q->lastid();
   $calendar['calendar_id'] = $id;
-    
+  of_entity_insert('event',$id);
   if($repeat_kind != 'none' && is_array($date_exception)) {
     foreach($date_exception as $key => $value) {
       $calendar['old_date_begin'] = $value->setHour($datebegin)->setMinute($datebegin);        
@@ -1228,14 +1218,8 @@ function run_query_calendar_quick_event_insert($calendar) {
   )";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_insert_event_data()');
   $obm_q->query($query);
-  $query = "SELECT MAX(event_id) as max_id
-    FROM Event
-    WHERE event_title='$title'
-      AND event_date='$datebegin'";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data()');
-  $obm_q->query($query);
-  $obm_q->next_record(); 
-  $event_id = $obm_q->f('max_id'); 
+  $event_id = $obm_q->lastid();
+  of_entity_insert('event', $event_id) ;
   run_query_calendar_insert_entity_event('user', $obm['uid'], $event_id, 'ACCEPTED');
 
   return $event_id;
@@ -1567,10 +1551,10 @@ function run_query_calendar_delete($calendar) {
       $retour = $obm_q->query($query);
     }
   }
+  of_entity_delete('event', $event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
   $obm_q->query($query);
-
 
 }
 
@@ -2384,7 +2368,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       AND event_date <= '$end' 
       AND (event_endrepeat >= #SUBSECONDS('$start',event_duration)
       OR event_endrepeat IS NULL)
-      AND resourceentity_resource_id IN (".implode(',', array_keys($calendar_entity['resource'])).")
+      AND userentity_user_id IN (".implode(',', array_keys($calendar_entity['user'])).")
       $multidomain";
   }   	     	    
 
@@ -3035,16 +3019,8 @@ function run_query_calendar_insert_view($calendar) {
     'calendar')";
   $obm_q->query($query);
 
-  $user_id = sql_parse_id($obm['uid'], true);
-  // Select obmbookmark_id
-  $query = "SELECT obmbookmark_id FROM ObmBookmark
-    WHERE obmbookmark_user_id $user_id 
-    AND obmbookmark_label='$label'
-    AND obmbookmark_entity='calendar'";
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $obmbookmark_id = sql_parse_id( $obm_q->f('obmbookmark_id'));
-
+  $obmbookmark_id = $obm_q->lastid();
+  of_entity_insert('obmbookmark', $obmbookmark_id);
   // Insert ObmBookmark properties 
   if (is_array($calendar_bookmarkproperties)) {
     foreach($calendar_bookmarkproperties as $property) {
@@ -3077,6 +3053,7 @@ function run_query_calendar_delete_view($calendar) {
 
   $obm_q = new DB_OBM;
 
+  of_entity_delete('obmbookmark', $calendar['view_id']);
   $id = sql_parse_id( $calendar['view_id'], true);
 
   // Delete view

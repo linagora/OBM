@@ -575,9 +575,8 @@ function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set=''
       '$entity' as entityright_entity
     FROM EntityRight
       LEFT JOIN $table_entity as e ON entityright_entity_id = $e_id
-    WHERE entityright_entity = '$entity'
-      AND ( (entityright_consumer = 'user' AND (entityright_consumer_id $user_id OR entityright_consumer_id = 0))
-        OR (entityright_consumer = 'group'  AND (entityright_consumer_id IN (SELECT of_usergroup_group_id FROM of_usergroup WHERE of_usergroup_user_id $user_id )
+    WHERE ( ((entityright_consumer_id $user_id OR entityright_consumer_id = 0))
+        OR ((entityright_consumer_id IN (SELECT of_usergroup_group_id FROM of_usergroup WHERE of_usergroup_user_id $user_id )
             OR entityright_consumer_id = 0)))
         $where_right
     GROUP BY id, label, entityright_entity
@@ -696,18 +695,17 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
   $if_label = sql_if($db_type, "(entityright_consumer = 'user')", "$user_label", "group_name");
 
   $query = "SELECT
-      $if_id as id,
-      $if_label as label,
-      entityright_consumer,
+      userobm_id as id,
+      $user_label as label,
+      'user' as entityright_consumer,
       entityright_consumer_id,
       entityright_access,
       entityright_read,
       entityright_write,
       entityright_admin
     FROM EntityRight
-      LEFT JOIN UserObm ON entityright_consumer = 'user' AND entityright_consumer_id = userobm_id
-      LEFT JOIN UGroup ON entityright_consumer = 'group' AND entityright_consumer_id = group_id
-    WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity'
+      LEFT JOIN UserObm ON entityright_consumer_id = userobm_id
+    WHERE entityright_entity_id IN ($entity_id) 
       $where_right
     $union_admin
     ORDER BY entityright_consumer, label";
@@ -825,8 +823,7 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
   $obm_q = new DB_OBM;
   $query = "DELETE
     FROM EntityRight
-    WHERE entityright_entity_id ".sql_parse_id($eid, true)."
-      AND entityright_entity = '$entity'";
+    WHERE entityright_entity_id ".sql_parse_id($eid, true);
   display_debug_msg($query, $cdg_sql, 'of_right_update_right(1)');
   $obm_q->query($query);
   if ($public_read) {
@@ -843,17 +840,13 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
     $pw = sql_parse_int($public_write);
     $px = ($public_write ? sql_parse_int($public_write) : sql_parse_int($public_access));
     $query = "INSERT INTO EntityRight (
-      entityright_entity,
       entityright_entity_id,
-      entityright_consumer,
       entityright_consumer_id,
       entityright_read,
       entityright_write,
       entityright_access
     ) VALUES (
-      '$entity',
       ".sql_parse_id($eid).",
-      'user',
       0,
       $pr,
       $pw,
@@ -872,18 +865,14 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
         $w = (in_array($ref, $accept_write) ? 1 : 0);
         $a = (in_array($ref, $accept_admin) ? 1 : 0);
         $query = "INSERT INTO EntityRight (
-          entityright_entity,
           entityright_entity_id,
-          entityright_consumer,
           entityright_consumer_id,
           entityright_access,
           entityright_read,
           entityright_write,
           entityright_admin
         ) VALUES (
-          '$entity',
           ".sql_parse_id($eid).",
-          '$consumer',
           $id,
           1,
           $r,
@@ -906,17 +895,13 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
           $x = (in_array($ref, $accept_write) ? 1 : 0);
           $a = (in_array($ref, $accept_admin) ? 1 : 0);
           $query = "INSERT INTO EntityRight (
-            entityright_entity,
             entityright_entity_id,
-            entityright_consumer,
             entityright_consumer_id,
             entityright_read,
             entityright_write,
             entityright_admin
           ) VALUES (
-            '$entity',
             ".sql_parse_id($eid).",
-            '$consumer',
             $id,
             1,
             $w,
@@ -939,17 +924,13 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
           $x = 1;
           $a = (in_array($ref, $accept_admin) ? 1 : 0);
           $query = "INSERT INTO EntityRight (
-            entityright_entity,
             entityright_entity_id,
-            entityright_consumer,
             entityright_consumer_id,
             entityright_access,
             entityright_write,
             entityright_admin
           ) VALUES (
-            '$entity',
             ".sql_parse_id($eid).",
-            '$consumer',
             $id,
             $x,
             '1',
@@ -970,15 +951,11 @@ function of_right_update_right($param, $entity, $real_entity='',$check_perms=tru
         $consumer = $matches[1];
         $id = sql_parse_id($matches[2]);
         $query = "INSERT INTO EntityRight (
-          entityright_entity,
           entityright_entity_id,
-          entityright_consumer,
           entityright_consumer_id,
           entityright_admin
         ) VALUES (
-          '$entity',
           ".sql_parse_id($eid).",
-          '$consumer',
           $id,
           1)";
         display_debug_msg($query, $cdg_sql, 'of_right_update_right(5)');
@@ -1049,7 +1026,7 @@ function of_right_users_for_entity($entity, $entity_id, $right='all') {
     FROM UserObm
     LEFT JOIN of_usergroup ON userobm_id = of_usergroup_user_id
     LEFT JOIN EntityRight ON (userobm_id = entityright_consumer_id AND entityright_consumer = 'user')
-    WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity' $where_right
+    WHERE entityright_entity_id IN ($entity_id) $where_right
     UNION
     SELECT
       userobm_firstname,
@@ -1061,7 +1038,7 @@ function of_right_users_for_entity($entity, $entity_id, $right='all') {
     FROM UserObm
     LEFT JOIN of_usergroup ON userobm_id = of_usergroup_user_id 
     LEFT JOIN EntityRight ON (of_usergroup_group_id = entityright_consumer_id AND entityright_consumer = 'group') 
-    WHERE entityright_entity_id IN ($entity_id) AND entityright_entity = '$entity' $where_right
+    WHERE entityright_entity_id IN ($entity_id) $where_right
 
     $union_admin
 

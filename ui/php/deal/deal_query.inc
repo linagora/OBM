@@ -2457,6 +2457,7 @@ function run_query_deal_parentdeal_delete($p_id) {
   global $cdg_sql;
 	
   $multidomain = sql_multidomain('parentdeal');
+  of_entity_delete('parentdeal', $p_id);
   $p_id = sql_parse_id($p_id);	
   $query = "DELETE FROM ParentDeal WHERE parentdeal_id $p_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_deal_parentdeal_delete()');

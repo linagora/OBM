@@ -439,7 +439,7 @@ function run_query_time_update($task) {
 
   $id = $task['task_id'];
   $ttype = $task['tasktype'];
-  $projecttask = $task['projecttask'];
+  $projecttask = sql_parse_id($task['projecttask']);
   $time = $task['time'];
   $label = $task['label'];
   $day = $task['day'];
@@ -450,7 +450,7 @@ function run_query_time_update($task) {
     timetask_tasktype_id='$ttype',
     timetask_length='$time',
     timetask_label='$label',
-    timetask_projecttask_id='$projecttask'
+    timetask_projecttask_id = $projecttask
   WHERE timetask_id='$id'";
 
   display_debug_msg($query, $cdg_sql, 'run_query_time_update');

@@ -629,6 +629,8 @@ function run_query_user_insert($user) {
   if ($id > 0) {
     $user['entity_id'] = $id;
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
+    $entity_id = of_entity_insert('calendar', $id);    
+    $entity_id = of_entity_insert('mailbox', $id);    
     of_right_default($user,'mailbox','userobm',false);
     of_right_default($user,'calendar','userobm',false);
     $ret = of_userdata_query_update('user', $id, $user);
@@ -1082,6 +1084,8 @@ function run_query_user_delete($p_id) {
 
   $multidomain = sql_multidomain('userobm');
   of_entity_delete($GLOBALS['module'], $p_id);
+  of_entity_delete('mailbox', $p_id);
+  of_entity_delete('calendar', $p_id);
   $ret = of_userdata_query_delete('user', $p_id);
   $obm_q = new DB_OBM;
   $id = sql_parse_id($p_id, true);
@@ -2046,6 +2050,13 @@ function run_query_user_delete_profile($user_id)  {
   $retour = run_query_user_unsubscribe_all_groups($user_id);    
   $user_id = sql_parse_id($user_id, true);
 
+
+  $query = "DELETE FROM Entity 
+    WHERE entity_id IN (
+      SELECT contactentity_entity_id FROM ContactEntity INNER JOIN  Contact ON contactentity_contact_id = contact_id
+      WHERE contact_usercreate $user_id AND contact_privacy != 0)";
+  display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Contact)');
+  $obm_q->query($query);
   // Delete all the user private contact
   $query = "DELETE FROM Contact
     WHERE contact_usercreate $user_id 
@@ -2089,6 +2100,14 @@ function run_query_user_delete_profile($user_id)  {
   
   $query = "UPDATE Event SET event_owner = $obm[uid] WHERE event_owner $user_id";
   display_debug_msg($query, $cdg_sql, 'run_query_user_delete_profile(Event update)');
+  $obm_q->query($query);
+
+  $query = "DELETE FROM Entity 
+    WHERE entity_id IN (
+      SELECT evententity_entity_id FROM EventEntity 
+      LEFT JOIN EventLink ON evententity_event_id = enventlink_event_id
+      WHERE evententity_event_id IS NULL)";
+  display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
 
   // Remove all Events that have non attendees !

@@ -1788,6 +1788,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
       break;
 
     case $delete_event:
+      of_entity_delete('event',$event_id);
       $sql_id = sql_parse_id($event_id);
       $query = "DELETE FROM Event WHERE event_id = $sql_id
         $multidomain_event";

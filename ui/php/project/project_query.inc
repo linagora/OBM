@@ -551,7 +551,7 @@ function run_query_project_update($pid, $params) {
       project_reference_duration='$reference_duration',
       project_reference_desc='$reference_desc',
       project_reference_tech='$reference_tech',
-      project_archive=$archve,
+      project_archive=$archive,
       project_comment='$comment'
     WHERE project_id $pid $multidomain";
 
@@ -1608,22 +1608,7 @@ function run_query_project_closing_insert($params) {
   display_debug_msg($query, $cdg_sql, 'run_query_project_closing_insert');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  $uid = sql_parse_id($obm['uid'], true);
-  // get the id of the inserted project. Date is to insure correct project
-  // is selected (and not similar from the same deal)
-  $query = "SELECT MAX(projectclosing_id) as projectclosing_id
-            FROM ProjectClosing
-              projectclosing_usercreate $uid ";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_project_closing_insert (get Id)');
-  $obm_q->query($query);
-
-  if ($obm_q->num_rows() > 0) {
-    $obm_q->next_record();
-    $pid = $obm_q->f('projectclosing_id');
-  } else {
-    $pid = 0;
-  }
+  $pid = $obm_q->lastid();
   return $pid;
 }
 

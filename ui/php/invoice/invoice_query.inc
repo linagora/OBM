@@ -358,7 +358,7 @@ function run_query_invoice_update($invoice) {
       invoice_label='$label',
       invoice_amount_ht='$ht',
       invoice_amount_ttc='$ttc',
-      invoice_status_id=$status,
+      invoice_status_id $status,
       invoice_comment='$comment',
       invoice_date=$date,
       invoice_expiration_date=$expiration_date,
@@ -499,6 +499,9 @@ function run_query_invoice_delete($p_id) {
   of_entity_delete($GLOBALS['module'], $p_id);
   $id = sql_parse_id($p_id, true); 
   $multidomain = sql_multidomain('invoice');
+  if ($retour) {
+    run_query_global_delete_document_links($p_id, 'invoice');    
+  }
   $query = "DELETE FROM Invoice 
 		WHERE invoice_id $id $multidomain";
 
@@ -506,9 +509,6 @@ function run_query_invoice_delete($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  if ($retour) {
-    run_query_global_delete_document_links($p_id, 'invoice');    
-  }
 
   return $retour;
 }
