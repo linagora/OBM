@@ -12,7 +12,6 @@ import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
@@ -63,17 +62,8 @@ public class CalendarManager extends ObmManager {
 		return binding;
 	}
 
-	public AccessToken getToken() {
-		return token;
-	}
-
-
 	public void initUserEmail() throws OBMException {
-		// userEmail = "nicolas.lascombes@aliasource.fr";
-
 		try {
-			logger.info("getUserEmail(" + calendar + ", " + token.getUser()
-					+ ")");
 			userEmail = binding.getUserEmail(token);
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());

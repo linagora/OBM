@@ -7,8 +7,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.funambol.framework.core.Authentication;
 import com.funambol.framework.core.Cred;
-import com.funambol.framework.logging.FunambolLogger;
-import com.funambol.framework.logging.FunambolLoggerFactory;
 import com.funambol.framework.security.Officer;
 import com.funambol.framework.security.Sync4jPrincipal;
 import com.funambol.framework.server.Sync4jUser;
@@ -23,8 +21,7 @@ import fr.aliasource.obm.items.manager.CalendarManager;
 
 public class ObmOfficer implements Officer, java.io.Serializable {
 
-	private static final long serialVersionUID = 1L;
-	protected FunambolLogger log = FunambolLoggerFactory.getLogger("funambol");
+	private static final long serialVersionUID = 6689829013762588002L;
 
 	protected PersistentStore ps = null;
 	private String clientAuth = Cred.AUTH_TYPE_BASIC;
@@ -33,15 +30,13 @@ public class ObmOfficer implements Officer, java.io.Serializable {
 
 	private String obmAddress = null;
 
-	private Log logger = LogFactory.getLog(getClass());
+	private static final Log logger = LogFactory.getLog(ObmOfficer.class);
 
 	public String getClientAuth() {
-		logger.info("getClientAuth");
 		return this.clientAuth;
 	}
 
 	public String getServerAuth() {
-		logger.info("getServerAuth");
 		return this.serverAuth;
 	}
 
@@ -60,8 +55,8 @@ public class ObmOfficer implements Officer, java.io.Serializable {
 	public Sync4jUser authenticateUser(Cred credential) {
 		logger.info("authenticateUser");
 
-		if (log.isTraceEnabled()) {
-			log.trace(" ObmOfficer authenticate() Start");
+		if (logger.isTraceEnabled()) {
+			logger.trace(" ObmOfficer authenticate() Start");
 		}
 
 		Configuration config = Configuration.getConfiguration();
@@ -126,8 +121,8 @@ public class ObmOfficer implements Officer, java.io.Serializable {
 					.substring(p + 1);
 		}
 
-		if (log.isTraceEnabled()) {
-			log.trace("Username: " + username);
+		if (logger.isTraceEnabled()) {
+			logger.trace("Username: " + username);
 		}
 
 		user = new Sync4jUser();
@@ -135,14 +130,12 @@ public class ObmOfficer implements Officer, java.io.Serializable {
 		user.setFirstname("");
 		user.setLastname("");
 		user.setPassword(password);
-		String[] roles = new String[1];
-		roles[0] = "sync_user";
+		String[] roles = new String[] { "sync_user" };
 		user.setRoles(roles);
 		user.setUsername(username);
-		//
+
 		// Verify that exist the principal for the
 		// specify deviceId and username
-		//
 		boolean principalFound = false;
 		try {
 			principal = Sync4jPrincipal.createPrincipal(username, deviceId);
@@ -150,37 +143,28 @@ public class ObmOfficer implements Officer, java.io.Serializable {
 			credential.getAuthentication().setPrincipalId(principal.getId());
 			principalFound = true;
 		} catch (NotFoundException nfe) {
-			if (log.isTraceEnabled()) {
-				log.trace("Principal for " + username + ":" + deviceId
-						+ " not found");
+			if (logger.isTraceEnabled()) {
+				logger.trace("Principal for " + username + " devid: "
+						+ deviceId + " not found");
 			}
 		} catch (PersistentStoreException e) {
-			log.error("Error reading principal: " + e);
+			logger.error("Error reading principal: " + e);
 			return null;
 		}
 
-		//
-		// Verify these credentials on SugarCRM
-		//
 		String server = this.getObmAddress();
-		boolean isObmUser = checkObmCredentials(server, username, password);
+		boolean isLoggedIn = checkObmCredentials(server, username, password);
 
-		if (!isObmUser) {
-			//
-			// User not authenticate
-			//
+		if (!isLoggedIn) {
 			return null;
 		}
 
 		if (!principalFound) {
-			//
-			// We must create a new principal
-			//
 			principal = Sync4jPrincipal.createPrincipal(username, deviceId);
 			try {
 				ps.store(principal);
 			} catch (PersistentStoreException ex) {
-				log.error("Error creating new principal: " + ex);
+				logger.error("Error creating new principal: " + ex);
 				return null;
 			}
 
@@ -195,28 +179,31 @@ public class ObmOfficer implements Officer, java.io.Serializable {
 
 		if (serverUrl == null || serverUrl.equals("")) {
 
-			String message = "'Obm Address' is null or empty. You have to set "
-					+ "the OBM-Sync server url in the file: "
+			String message = "'ObmAddress' is null or empty. check the file: "
 					+ "config/com/funambol/server/security/ObmOfficer.xml";
 
-			if (log.isFatalEnabled()) {
-				log.fatal(message);
+			if (logger.isFatalEnabled()) {
+				logger.fatal(message);
 			}
 
 			throw new IllegalStateException(message);
 		}
 
-		boolean check = false;
+		// using cal manager is somewhat crappy as we cannot share token between
+		// book & cal
+		// with this architecture
 		CalendarManager manager = new CalendarManager(getObmAddress());
 
+		boolean ret = false;
 		try {
 			manager.logIn(login, password);
-			if (manager.getToken() != null)
-				check = true;
+			ret = true;
+			manager.logout();
 		} catch (OBMException e) {
-			log.error("Error login Obm " + e);
+			logger.error("Error on obm login: " + e);
+			ret = false;
 		}
-		return check;
+		return ret;
 	}
 
 	public void setObmAddress(String obmAddress) {
