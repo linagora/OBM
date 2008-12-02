@@ -15,12 +15,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
+import org.obm.sync.book.Address;
 import org.obm.sync.book.BookType;
 import org.obm.sync.book.Contact;
+import org.obm.sync.book.Email;
+import org.obm.sync.book.Website;
 import org.obm.sync.client.ISyncClient;
 import org.obm.sync.client.book.BookClient;
 import org.obm.sync.items.ContactChanges;
 import org.obm.sync.locators.AddressBookLocator;
+
+import com.funambol.common.pim.contact.BusinessDetail;
+import com.funambol.common.pim.contact.PersonalDetail;
+import com.funambol.common.pim.contact.Phone;
+import com.funambol.common.pim.contact.WebPage;
 
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.ContactHelper;
@@ -37,7 +45,8 @@ public class ContactManager extends ObmManager {
 
 	public ContactManager(String obmAddress) {
 		AddressBookLocator addressbookLocator = new AddressBookLocator();
-		binding = addressbookLocator.locate(obmAddress.replace("/AddressBook", ""));
+		binding = addressbookLocator.locate(obmAddress.replace("/AddressBook",
+				""));
 	}
 
 	public List<String> getAllItemKeys() throws OBMException {
@@ -245,9 +254,37 @@ public class ContactManager extends ObmManager {
 						obmcontact.getLastname()));
 		contact.getName().getNickname().setPropertyValue(obmcontact.getAka());
 
-		// BusinessDetail bd = contact.getBusinessDetail();
-		// PersonalDetail pd = contact.getPersonalDetail();
-		// FIXME email, address, phones
+		BusinessDetail bd = contact.getBusinessDetail();
+
+		for (String label : obmcontact.getEmails().keySet()) {
+			Email e = obmcontact.getEmails().get(label);
+			com.funambol.common.pim.contact.Email funisMail = new com.funambol.common.pim.contact.Email(
+					e.getEmail());
+			funisMail.setEmailType(label);
+			bd.addEmail(funisMail);
+		}
+
+		obmToFunis(bd.getAddress(), "work", obmcontact.getAddresses().get(
+				"work"));
+
+		for (String label : obmcontact.getPhones().keySet()) {
+			Phone p = new Phone(obmcontact.getPhones().get(label).getNumber());
+			p.setPhoneType(label);
+			bd.addPhone(p);
+		}
+
+		for (String label : obmcontact.getWebsites().keySet()) {
+			Website ws = obmcontact.getWebsites().get(label);
+			WebPage wp = new WebPage(ws.getUrl());
+			wp.setWebPageType(label);
+			bd.addWebPage(wp);
+		}
+
+		PersonalDetail pd = contact.getPersonalDetail();
+		obmToFunis(pd.getAddress(), "home", obmcontact.getAddresses().get(
+				"home"));
+		obmToFunis(pd.getOtherAddress(), "other", obmcontact.getAddresses()
+				.get("other"));
 
 		ContactHelper.setFoundationNote(contact, obmcontact.getComment(),
 				ContactHelper.COMMENT);
@@ -257,6 +294,24 @@ public class ContactManager extends ObmManager {
 		return contact;
 	}
 
+	private void obmToFunis(com.funambol.common.pim.contact.Address target,
+			String label, Address source) {
+		if (target == null) {
+			logger.warn("target addr is null");
+			return;
+		}
+		if (source != null) {
+			target.getStreet().setValue(source.getStreet());
+			target.getCity().setValue(source.getTown());
+			target.getCountry().setValue(source.getCountry());
+			target.getLabel().setValue(label);
+		}
+	}
+
+	// private String s(Property p) {
+	// return p.getPropertyValueAsString();
+	// }
+	//
 	// private org.obm.sync.book.Address updateAddress(Address funis, String
 	// type) {
 	// org.obm.sync.book.Address obm = new org.obm.sync.book.Address(s(funis
@@ -266,10 +321,6 @@ public class ContactManager extends ObmManager {
 	// return obm;
 	// }
 
-	// private String s(Property p) {
-	// return p.getPropertyValueAsString();
-	// }
-	//
 	private Contact foundationContactToObm(
 			com.funambol.common.pim.contact.Contact funis, String type) {
 
