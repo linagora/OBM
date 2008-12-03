@@ -1106,7 +1106,8 @@ INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity I
 INSERT INTO DealEntity (dealentity_entity_id, dealentity_deal_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
 UPDATE TmpEntity SET id_entity = NULL;
   
-INSERT INTO TmpEntity (id_entity) SELECT defaultodttemplate_id FROM DefaultOdtTemplate;
+-- INSERT INTO TmpEntity (id_entity) SELECT defaultodttemplate_id FROM DefaultOdtTemplate;
+INSERT INTO TmpEntity (id_entity) SELECT document_id FROM Document;
 INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
 INSERT INTO DocumentEntity (documententity_entity_id, documententity_document_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
 UPDATE TmpEntity SET id_entity = NULL;
