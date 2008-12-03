@@ -362,7 +362,7 @@ function run_query_calendar_waiting_events() {
   
   $multidomain = sql_multidomain('event');
   $writable_cal = of_right_entity_for_user('calendar', $uid, 'write', '', 'userobm');
-  $writable_res = of_right_entity_for_user('Resource', $uid, 'write');
+  $writable_res = of_right_entity_for_user('resource', $uid, 'write');
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
@@ -412,9 +412,9 @@ function run_query_calendar_waiting_events() {
       $multidomain
 ";
   if (is_array($writable_cal) && (count($writable_cal['ids'])>0)) {
-    $query .= "OR userentity_entity_id IN ('".implode("','",$writable_cal['ids'])."')";    
+    $query .= "OR userentity_user_id IN (".implode(",",$writable_cal['ids']).")";    
   }
-  $query .= " OR userentity_entity_id = '$uid')";
+  $query .= " OR userentity_user_id = '$uid')";
 
   if (is_array($writable_res) && (count($writable_res['ids'])>0)) {
     $query .= "
@@ -448,7 +448,7 @@ function run_query_calendar_waiting_events() {
       AND ( 1=0
       $multidomain
 ";
-    $query .= "OR eventlink_entity_id IN ('".implode("','",$writable_res['ids'])."')";
+    $query .= "OR eventlink_resource_id IN (".implode(",",$writable_res['ids']).")";
   }
   $query .= " ORDER BY entity_entity, entity_label, event_date"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_waiting_events()');
@@ -2217,7 +2217,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
         INNER JOIN EventLink ON event_id = eventlink_event_id
-        INNER JOIN UserEntity ON userentity_entity_id = eventlink_event_id
+        INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
       WHERE event_type='VEVENT'
         $where_status
         $filter
@@ -2253,7 +2253,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
         INNER JOIN EventLink ON event_id = eventlink_event_id
-        INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_event_id
+        INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
       WHERE event_type='VEVENT'
         $where_status
         $filter
@@ -2290,7 +2290,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
-      INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_event_id
+      INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT'
       $where_status
       $filter
@@ -2301,9 +2301,9 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       AND $where_grp
       $multidomain";
   }
-  
+  $query = implode(' UNION ', $select)." ORDER BY event_date, eventlink_entity, eventlink_entity_id"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_no_repeat_events()');
-  $obm_q->xquery(implode(' UNION ', $select)." ORDER BY event_date, eventlink_entity, eventlink_entity_id");
+  $obm_q->xquery($query);
   return $obm_q;
 }
 
@@ -2360,7 +2360,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
-      INNER JOIN UserEntity ON userentity_entity_id = eventlink_event_id
+      INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT'
       AND event_repeatkind != 'none'
       $where_status
@@ -2399,7 +2399,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
-      INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_event_id
+      INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT'
       AND event_repeatkind != 'none'
       $where_status
@@ -2439,7 +2439,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
-      INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_event_id
+      INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
    WHERE event_type='VEVENT' 
       AND event_repeatkind != 'none'
       $where_status
@@ -2451,8 +2451,9 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       $multidomain";
   }
   
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_no_repeat_events()');
-  $obm_q->xquery(implode(' UNION ', $select)." ORDER BY event_date, eventlink_entity, eventlink_entity_id");
+  $query = implode(' UNION ', $select)." ORDER BY event_date, eventlink_entity, eventlink_entity_id"; 
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_repeat_events()');
+  $obm_q->xquery($query);
   return $obm_q;
 }
 

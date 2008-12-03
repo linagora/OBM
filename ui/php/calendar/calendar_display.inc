@@ -193,7 +193,7 @@ function html_calendar_bar_legend($p_view, $calendar_entity,$calendar) {
           <input value=\"$data_id\" id=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
         if ($output_target != 'print') {
           $dis_legend .= "<img src=\"$ico_delete\"
-          onclick=\"\$('$data_id').remove(); $('calendarSelectForm').submit();\" onmouseover=\"this.style.cursor = 'pointer';\"/>";
+          onclick=\"\$('$data_id').dispose(); $('calendarSelectForm').submit();\" onmouseover=\"this.style.cursor = 'pointer';\"/>";
         }
         $dis_legend .= " &nbsp;".$data['name']."
           </li>";
@@ -592,6 +592,12 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension, $ico_private;
   global $l_private,$l_daysofweek, $l_previous, $l_next;
 
+  $GLOBALS['js']['vars']['images']['resize'] = $ico_resize;
+  $GLOBALS['js']['vars']['images']['periodic'] = $ico_periodic;
+  $GLOBALS['js']['vars']['images']['meeting'] = $ico_meeting;
+  $GLOBALS['js']['vars']['images']['private'] = $ico_private;
+  $GLOBALS['js']['vars']['images']['extension'] = $ico_extension;
+
   $date = clone $calendar['date'];
   $date->setDay(1)->addDay(1)->subWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
   $category_filter = $calendar['category_filter'];
@@ -668,11 +674,6 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
     </tbody>
   </table>
   <script type=\"text/javascript\">
-    obm.vars.images.resize = '$ico_resize';
-    obm.vars.images.periodic = '$ico_periodic';
-    obm.vars.images.meeting = '$ico_meeting';
-    obm.vars.images.private = '$ico_private';
-    obm.vars.images.extension = '$ico_extension';
     showWaitingPanel('calendarBody');
     obm.initialize.chain(function () {
       obm.calendarManager = new Obm.CalendarManager(".$date->setHour($ccalendar_first_hour)->getTimestamp().",'".$date->getOption('timezone')."');
@@ -701,6 +702,12 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension,$ico_private;
   global $ccalendar_first_hour, $ccalendar_last_hour;
  
+  $GLOBALS['js']['vars']['images']['resize'] = $ico_resize;
+  $GLOBALS['js']['vars']['images']['periodic'] = $ico_periodic;
+  $GLOBALS['js']['vars']['images']['meeting'] = $ico_meeting;
+  $GLOBALS['js']['vars']['images']['private'] = $ico_private;
+  $GLOBALS['js']['vars']['images']['extension'] = $ico_extension;
+  $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
 
   $display_days = $_SESSION['set_cal_display_days'];
   if (empty($display_days)) $display_days = '1111111';
@@ -786,12 +793,6 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
     </tbody>
   </table>
   <script type=\"text/javascript\">
-    obm.vars.images.resize = '$ico_resize';
-    obm.vars.images.periodic = '$ico_periodic';
-    obm.vars.images.meeting = '$ico_meeting';
-    obm.vars.images.private = '$ico_private';
-    obm.vars.images.extension = '$ico_extension';
-    obm.vars.consts.timeUnit = ".(3600/$_SESSION['set_cal_interval']).";
     obm.initialize.chain(function () {
       obm.calendarManager = new Obm.CalendarManager(".$date->setHour($ccalendar_first_hour)->getTimestamp().",'".$date->getOption('timezone')."');
       obm.calendarManager.lock();
@@ -814,6 +815,13 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
   global $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension,$ico_private;
   global $l_private, $l_all_day, $l_previous, $l_next;
+
+  $GLOBALS['js']['vars']['images']['resize'] = $ico_resize;
+  $GLOBALS['js']['vars']['images']['periodic'] = $ico_periodic;
+  $GLOBALS['js']['vars']['images']['meeting'] = $ico_meeting;
+  $GLOBALS['js']['vars']['images']['private'] = $ico_private;
+  $GLOBALS['js']['vars']['images']['extension'] = $ico_extension;
+  $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
 
   $category_filter = $calendar['category_filter'];
   $date = $calendar['date'];
@@ -863,12 +871,6 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
     </tbody>
   </table>
   <script type=\"text/javascript\">
-    obm.vars.images.resize = '$ico_resize';
-    obm.vars.images.periodic = '$ico_periodic';
-    obm.vars.images.meeting = '$ico_meeting';
-    obm.vars.images.private = '$ico_private';
-    obm.vars.images.extension = '$ico_extension';
-    obm.vars.consts.timeUnit = ".(3600/$_SESSION['set_cal_interval']).";    
     obm.initialize.chain(function () {
       obm.calendarManager = new Obm.CalendarManager(".$date->setHour($ccalendar_first_hour)->getTimestamp().",'".$date->getOption('timezone')."');
       obm.calendarManager.lock()

@@ -108,7 +108,7 @@ function check_form(form) {
 
   // MANDATORY : Check that all ogroup name is not empty
   var reg = new RegExp(\"tf_ogroup\", \"g\");
-  var elems = $$('.mandatory', 'mainContent')
+  var elems = $('mainContent').getElements('.mandatory');
   for(i=0;i<elems.length;i++) {
     node_name = elems[i].value;      
     if (node_name == \"\") {

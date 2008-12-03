@@ -1191,11 +1191,11 @@ function reset_preferences_to_default($user_id='') {
 function get_user_pref($u_id) {
   global $cdg_sql;
 
-  $u_id = sql_parse_id($u_id, true);
   $query = "SELECT *
     FROM UserObmPref
-    WHERE (userobmpref_user_id IS NULL OR userobmpref_user_id $u_id )
-    ORDER BY userobmpref_user_id DESC, userobmpref_option"; 
+    WHERE  userobmpref_user_id = $u_id OR (
+      userobmpref_user_id IS NULL AND 
+      userobmpref_option  NOT IN (SELECT userobmpref_option FROM UserObmPref WHERE userobmpref_user_id = $u_id))";
 
   display_debug_msg($query, $cdg_sql, 'get_user_pref()');
   $obm_q = new DB_OBM;

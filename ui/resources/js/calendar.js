@@ -112,21 +112,20 @@ Obm.CalendarDayEventExtension = new Class({
  * of it's duration (eg bar in month view or all day event)
  *****************************************************************************/
 Obm.CalendarDayEvent = new Class({
-  
-  setOptions: function(options){
-    this.options = Object.extend({
-      draggable: false,
-      type: 'day',
-      yUnit: 0,
-      xUnit: 24*3600,
-      unit : 24*3600,
-      context: obm.calendarManager.headContext
-    }, options || {});
+
+  Implements: Options,
+
+  options: {
+    draggable: false,
+    type: 'day',
+    yUnit: 0,
+    xUnit: 24*3600,
+    unit : 24*3600,
+    context: null 
   },
 
-
   initialize: function(eventData,options) {
-    this.setOptions(options);
+    this.setOptions($merge({context: obm.calendarManager.headContext},options));
     this.event = eventData;
     this.size = 1;
     this.length = 1;
@@ -453,21 +452,22 @@ Obm.CalendarDayEvent = new Class({
  * could be resize
  *****************************************************************************/
 
-Obm.CalendarEvent = Obm.CalendarDayEvent.extend({
+Obm.CalendarEvent = new Class({
 
-  setOptions: function(options){
-    this.options = Object.extend({
-      resizable: false,
-      type: 'time',
-      yUnit: obm.vars.consts.timeUnit,
-      xUnit: 3600*24,
-      unit : obm.vars.consts.timeUnit,
-      context: obm.calendarManager.bodyContext
-    }, options || {});
+  Extends: Obm.CalendarDayEvent,
+
+  options: {
+    draggable: false,
+    resizable: false,
+    type: 'time',
+    yUnit: obm.vars.consts.timeUnit,
+    xUnit: (3600*24),
+    unit : obm.vars.consts.timeUnit,
+    context: null
   },
 
   initialize: function(eventData,options) {
-    this.setOptions(options);
+    this.setOptions($merge({context: obm.calendarManager.bodyContext},options));
     this.event = eventData;
     this.extensions = new Array();
     this.size = 1;
@@ -701,9 +701,8 @@ Obm.CalendarManager = new Class({
 
     head = $('calendarHead');
     body = $('calendarBody');
-    zoneWidth = $$('table.calendar').offsetWidth - $('calendarHourCol').offsetWidth ;//$('calendarEventContext').offsetWidth;
-    
-    this.evidence = $$('td',body);
+    zoneWidth = $$('table.calendar')[0].offsetWidth - $('calendarHourCol').offsetWidth ;//$('calendarEventContext').offsetWidth;
+    this.evidence = body.getElement('td');
 
     this.headContext = new Object();
     if (head) {
@@ -718,7 +717,6 @@ Obm.CalendarManager = new Class({
     this.bodyContext.right = this.evidence.getLeft() + zoneWidth;
     this.bodyContext.left = this.evidence.getLeft();
     this.bodyContext.bottom = body.getTop() + body.offsetHeight;
-  
     this.evidence.observe({onStop:this.resizeWindow.bind(this), property:'offsetWidth'});
     this.evidence.observe({onStop:this.resizeWindow.bind(this), property:'offsetTop'});
 
@@ -756,7 +754,7 @@ Obm.CalendarManager = new Class({
 
       head = $('calendarHead');
       body = $('calendarBody');
-      zoneWidth = $$('table.calendar').offsetWidth - $('calendarHourCol').offsetWidth ;//$('calendarEventContext').offsetWidth;
+      zoneWidth = $$('table.calendar')[0].offsetWidth - $('calendarHourCol').offsetWidth ;//$('calendarEventContext').offsetWidth;
 
       if(head) {
         this.headContext.top = head.getTop();
@@ -873,9 +871,9 @@ Obm.CalendarManager = new Class({
     size = evt.length;
     for(var i=0;i < size;i++) {
       t = evt.origin + i*evt.options.unit;
-      this.times.get(t).remove(evt);
+      this.times.get(t).erase(evt);
       if(this.times.get(t).length == 0) {
-        this.times.remove(t);
+        this.times.erase(t);
       }
     }
   },
@@ -917,7 +915,7 @@ Obm.CalendarManager = new Class({
             end = size;
           }
         } else  {
-          free.remove(resize[id].position);
+          free.erase(resize[id].position);
         }
       }
       end --;
@@ -959,7 +957,7 @@ Obm.CalendarManager = new Class({
         var ivent = events[i].event;
         var id = str[0]+'_'+str[1] +'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
         var evt = obm.calendarManager.events.get(id);
-        if(ivent.state == 'A') {
+        if(ivent.state == 'ACCEPTED') {
           obm.calendarManager.unregister(id);
           evt.event.id = ivent.id;
           evt.setDuration(ivent.duration);
@@ -968,7 +966,7 @@ Obm.CalendarManager = new Class({
           evt.setTitle(ivent.title);
         } else if (evt) {
           obm.calendarManager.unregister(id);
-          obm.calendarManager.events.remove(id);
+          obm.calendarManager.events.erase(id);
           evt.destroy();
           delete evt;
         }
@@ -1048,7 +1046,7 @@ Obm.CalendarManager = new Class({
         var evt = obm.calendarManager.events.get(id);
         if (evt) {
           obm.calendarManager.unregister(id);
-          obm.calendarManager.events.remove(id);
+          obm.calendarManager.events.erase(id);
           evt.destroy();
           delete evt;
         }

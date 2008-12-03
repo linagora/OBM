@@ -518,6 +518,11 @@ function html_dis_right_admin(&$consumers, $entity_id, $entity) {
 function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set='', $real_entity='') {
   global $cdg_sql, $obm;
 
+  if($entityu != 'user') {
+    $ret_array = array();
+    $ret_array['ids'] = array();    
+    return $ret_array;
+  }
   // GLOBAL - superman has all rights on entities
   global $cright_write_admin;
   $obm_q = new DB_OBM;
