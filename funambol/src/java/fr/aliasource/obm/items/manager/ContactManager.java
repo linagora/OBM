@@ -335,14 +335,8 @@ public class ContactManager extends ObmManager {
 				.getFirstName().getPropertyValueAsString()));
 		contact.setLastname(ContactHelper.getLastName(funis));
 
-		if (ContactHelper.nullToEmptyString(
-				funis.getName().getNickname().getPropertyValueAsString())
-				.equalsIgnoreCase("")) {
-			contact.setAka(null);
-		} else {
-			contact.setAka(ContactHelper.nullToEmptyString(funis.getName()
-					.getNickname().getPropertyValueAsString()));
-		}
+		contact.setAka(ContactHelper.nullToEmptyString(s(funis.getName()
+				.getNickname())));
 
 		BusinessDetail bd = funis.getBusinessDetail();
 		PersonalDetail pd = funis.getPersonalDetail();
@@ -364,9 +358,9 @@ public class ContactManager extends ObmManager {
 		lph.addAll(bd.getPhones());
 		lph.addAll(pd.getPhones());
 		for (Phone p : lph) {
-			if (p != null && p.getValue() != null && p.getValue().length() > 0)
+			if (p != null && s(p) != null && s(p).length() > 0)
 				contact.addPhone(p.getPhoneType(), new org.obm.sync.book.Phone(
-						p.getValue()));
+						s(p)));
 		}
 
 		// emails
@@ -374,9 +368,8 @@ public class ContactManager extends ObmManager {
 		lem.addAll(bd.getEmails());
 		lem.addAll(pd.getEmails());
 		for (com.funambol.common.pim.contact.Email em : lem) {
-			if (em != null && em.getValue() != null
-					&& em.getValue().length() > 0) {
-				contact.addEmail(em.getEmailType(), new Email(em.getValue()));
+			if (em != null && s(em) != null && s(em).length() > 0) {
+				contact.addEmail(em.getEmailType(), new Email(s(em)));
 			}
 		}
 
@@ -385,9 +378,8 @@ public class ContactManager extends ObmManager {
 		lwp.addAll(bd.getWebPages());
 		lwp.addAll(pd.getWebPages());
 		for (WebPage wp : lwp) {
-			if (wp != null && wp.getValue() != null && wp.getValue().length() > 0) {
-				contact.addWebsite(wp.getWebPageType(), new Website(wp
-						.getValue()));
+			if (wp != null && s(wp) != null && s(wp).length() > 0) {
+				contact.addWebsite(wp.getWebPageType(), new Website(s(wp)));
 			}
 		}
 
