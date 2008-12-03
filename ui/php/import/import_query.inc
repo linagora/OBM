@@ -715,7 +715,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $id = $obm_q->lastid();
 
   if ($id > 0) {
-    of_entity_insert('company', $id)
+    of_entity_insert('company', $id);
     // User data handling
     if (is_array($userdata["company"]["category"])) {
       foreach($userdata["company"]["category"] as $cat_name => $hash) {

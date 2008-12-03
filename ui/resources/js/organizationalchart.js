@@ -19,8 +19,11 @@ Obm.UserDetail = new Class({
   },
 
   sendDetailEvent: function(user_id) {
-    ajax = new Ajax('organizationalchart_index.php',
-    {postBody:'ajax=1&action=userdetail&user_id='+user_id, onComplete: this.receiveDetailEvent, method: 'post'}).request();
+    new Request.JSON({
+      url : 'organizationalchart_index.php',
+      secure : false,
+      onComplete:this.receiveDetailEvent
+    }).post({ajax:1, action: 'userdetail', user_id: user_id});    
   },
   
   receiveDetailEvent: function(request) {
@@ -39,23 +42,23 @@ Obm.UserDetail = new Class({
   },
 
   setFormValues: function(userData) {
-    this.username.setHTML(userData.name);
+    this.username.set('html',userData.name);
     photo = userData.photo;
     if (photo != "") {
-      this.userphoto.setHTML("&nbsp;<img src=\""+obm.vars.path+"/document/document_index.php?action=accessfile&document_id="+userData.photo+"\" alt=\"[Photo]\" />");
+      this.userphoto.set('html',"&nbsp;<img src=\""+obm.vars.path+"/document/document_index.php?action=accessfile&document_id="+userData.photo+"\" alt=\"[Photo]\" />");
     } else {
-      this.userphoto.setHTML("&nbsp;<img src=\"/images/themes/default/images/ico_nophoto.png\" alt=\"[No Photo]\" />");
+      this.userphoto.set('html',"&nbsp;<img src=\"/images/themes/default/images/ico_nophoto.png\" alt=\"[No Photo]\" />");
       //this.userphoto.replaceWith(this.nophoto);
     }
-    this.usertitle.setHTML(userData.title);
-    this.userphone.setHTML(userData.phone);
-    this.usermphone.setHTML(userData.mphone);
-    this.useremail.setHTML(userData.email);
+    this.usertitle.set('html',userData.title);
+    this.userphone.set('html',userData.phone);
+    this.usermphone.set('html',userData.mphone);
+    this.useremail.set('html',userData.email);
   },
 
   compute: function (user_id, evt, item) {
     if(this.popup.getStyle('display') == 'none') {
-      this.userphoto.setHTML("&nbsp;<img src=\"/images/themes/default/images/ico_load.gif\" alt=\"[Photo]\" />&nbsp;");
+      this.userphoto.set('html',"&nbsp;<img src=\"/images/themes/default/images/ico_load.gif\" alt=\"[Photo]\" />&nbsp;");
       //this.userphoto.replaceWith(this.ico_load);
       this.sendDetailEvent(user_id);
       this.show();

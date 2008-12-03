@@ -359,7 +359,7 @@ UPDATE EventEntity set evententity_required = 'REQ';
 ALTER TABLE EventEntity ADD COLUMN evententity_percent float default 0;
 
 -- Foreign key from evententity_event_id to event_id
-DELETE FROM EventEntity WHERE evententity_event_id NOT IN (SELECT event_id FROM Event) AND evententity_event_id IS NOT NULL;
+DELETE FROM EventEntity WHERE evententity_event_id NOT IN (SELECT calendarevent_id FROM CalendarEvent);
 
 -- Foreign key from evententity_userupdate to userobm_id
 UPDATE EventEntity SET evententity_userupdate = NULL WHERE evententity_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND evententity_userupdate IS NOT NULL;
@@ -1119,7 +1119,7 @@ UPDATE TmpEntity SET id_entity = NULL;
   
 INSERT INTO TmpEntity (id_entity) SELECT event_id FROM Event;
 INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
-INSERT INTO EventLink (eventlink_entity_id, eventlink_event_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
+INSERT INTO EventEntity (evententity_entity_id, evententity_event_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
 UPDATE TmpEntity SET id_entity = NULL;
   
 INSERT INTO TmpEntity (id_entity) SELECT host_id FROM Host;
@@ -1290,7 +1290,7 @@ UPDATE EventLink SET eventlink_entity_id = (SELECT userentity_entity_id FROM Use
 DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT resource_id FROM Resource) AND eventlink_entity = 'resource';
 UPDATE EventLink SET eventlink_entity_id = (SELECT resourceentity_entity_id FROM ResourceEntity INNER JOIN Resource ON resourceentity_resource_id = resource_id WHERE resource_id = eventlink_entity_id), eventlink_entity = 'entity' WHERE eventlink_entity = 'resource';
 -- FIXME : Task not handle
-DELETE FROM EventLink where eventlink_entity != 'task' AND eventlink_entity != 'entity';
+DELETE FROM EventLink where eventlink_entity != 'entity';
 ALTER TABLE EventLink DROP COLUMN eventlink_entity;
 
 -- ------------------------------

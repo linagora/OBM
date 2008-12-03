@@ -205,9 +205,8 @@ function dis_admin_code_amp_directory($mode, $dir) {
   while($entry=$obm_dir->read()) {
 
     $long_entry = $obm_dir->path."/".$entry;
-
     if (! in_array ($entry, $exclude)) {
-      if (is_dir($long_entry)) {
+      if (is_dir($long_entry) && $entry != '.' && $entry != '..') {
 	dis_admin_code_amp_directory($mode, $long_entry);
       } else {
 	// We look only in .php and .inc files
@@ -424,9 +423,9 @@ function dis_admin_code_function_uses_content($mode, $function, $dir) {
     $long_entry = $obm_dir->path."/".$entry;
 
     if (! in_array ($entry, $exclude)) {
-      if (is_dir($long_entry)) {
+      if (is_dir($long_entry) && $entry != '.' && $entry != '..') {
 	dis_admin_code_function_uses_content($mode, $function, $long_entry);
-      } else {
+      } elseif ($entry != '.' && $entry != '..') {
 	// We look only in .php and .inc files
 	$temp = explode (".", $entry);
 	$ext = $temp[1];

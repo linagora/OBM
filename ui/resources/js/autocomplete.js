@@ -193,13 +193,13 @@ obm.AutoComplete.Search = new Class({
                                           .addEvent('mouseup', function() {this.inputField.focus();}.bindWithEvent(this))
                                           .setStyle('display', 'none')
                                           .injectInside(this.infos)
-                                          .innerHTML = '&lt;&lt;&lt;';
+                                          .set('html','&lt;&lt;&lt;');
     this.infoText = new Element('span').injectInside(this.infos);
     this.nextResultsBtn = new Element('span').addEvent('mousedown', function() {this.jumpTo(this.options.results);}.bindWithEvent(this))
                                       .addEvent('mouseup', function() {this.inputField.focus();}.bindWithEvent(this))
                                       .setStyle('display', 'none')
                                       .injectInside(this.infos)
-                                      .innerHTML = '&gt;&gt;&gt;';
+                                      .set('html','&gt;&gt;&gt;');
 
     this.resetFunc();
   },
@@ -304,12 +304,12 @@ obm.AutoComplete.Search = new Class({
       this.currentValue = this.inputField.value;
       this.textChangedFunc();
       this.requestId++;
-      new Ajax(this.url, {
-        method: 'post',
-        postBody: 'pattern='+this.currentValue+'&limit='+(this.options.results*3)+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
+      new Request.JSON({
+        url : this.url,
+        secure : false,
         onFailure:this.onFailure.bindWithEvent(this),
         onComplete:this.onNewRequestSuccess.bindWithEvent(this,[this.requestId])
-      }).request();
+      }).post({pattern:this.currentValue, limit:(this.options.results*3),restriction:this.options.restriction,extension:this.options.extension});      
     }
   },
 
@@ -319,12 +319,12 @@ obm.AutoComplete.Search = new Class({
       if (this.view.getFirst()+this.options.results*2>=this.cache.getSize() && this.cache.getSize()<this.totalNbr) {
         var unknownResultsNbr = this.totalNbr-this.cache.getSize();
         var requestNbr = ((this.options.results*2)>unknownResultsNbr ? unknownResultsNbr : this.options.results*2);
-        new Ajax(this.url, {
-          method: 'post',
-          postBody: 'pattern='+this.currentValue+'&first_row='+this.cache.getSize()+'&limit='+requestNbr+'&restriction='+this.options.restriction+'&extension='+this.options.extension,
+        new Request.JSON({
+          url : this.url,
+          secure : false,
           onFailure:this.onFailure.bindWithEvent(this),
           onComplete:this.onCacheRequestSuccess.bindWithEvent(this)
-        }).request();
+        }).post({pattern:this.currentValue, first_row: this.cache.getSize, limit:requestNbr,restriction:this.options.restriction,extension:this.options.extension});        
         this.cache.setSize(this.cache.getSize()+requestNbr);
       }
     }
@@ -337,8 +337,9 @@ obm.AutoComplete.Search = new Class({
 
   // when receiving a success response for a new request
   onNewRequestSuccess: function(response,responseId) {
+    console.log(response);
     this.resetResultBox();
-    if (response.trim() != '' && this.requestId == responseId) {
+    if (this.requestId == responseId) {
       this.parseResponse(response);
       this.drawView();
       this.updateInfo();
@@ -348,26 +349,19 @@ obm.AutoComplete.Search = new Class({
 
   // when receiving a success response for a cache update request
   onCacheRequestSuccess: function(response) {
-    if (response.trim() != '') {
-      var oldCacheLength = this.cache.getCacheSize();
-      this.parseResponse(response);
-      if (this.view.getLast()>=oldCacheLength) {
-        this.flushView();
-        this.drawView();
-        this.showSelection();
-      }
-      this.updateInfo();
+    var oldCacheLength = this.cache.getCacheSize();
+    this.parseResponse(response);
+    if (this.view.getLast()>=oldCacheLength) {
+      this.flushView();
+      this.drawView();
+      this.showSelection();
     }
+    this.updateInfo();
   },
 
   // parse a response of a request and add results to cache
   parseResponse: function(response) {
-    try {
-      var results = eval(response);
-    } catch (e) {
-      showErrorMessage('Fatal server error, please reload');
-    }  
-    results.datas.each(function(data) {
+    response.datas.each(function(data) {
       var res = new Element('div').setProperty('id','item_'+data.id)
                                   .adopt(
                                     new Element('span')
@@ -389,7 +383,7 @@ obm.AutoComplete.Search = new Class({
            .addEvent('mousedown', function() {this.validateResultValue(res);}.bindWithEvent(this));
       }
     }.bind(this));
-    this.totalNbr = results.length;
+    this.totalNbr = response.length;
     this.view.setElementNb(this.totalNbr);
   },
 
@@ -491,10 +485,11 @@ obm.AutoComplete.Search = new Class({
 
   // to automatically update the information text
   updateInfo: function() {
+  console.log(this.previousResultsBtn);
     this.previousResultsBtn.setStyle('display', 'none');
     this.nextResultsBtn.setStyle('display', 'none');
     if (this.totalNbr<=1) {
-      this.infoText.innerHTML = this.totalNbr;
+      this.infoText.set('html',this.totalNbr);
     } else {
       this.infoText.innerHTML = (this.view.getFirst()+1)+' - '+(this.view.getLast()+1)+' / '+this.totalNbr;
       this.updateNavBtns();
@@ -505,7 +500,7 @@ obm.AutoComplete.Search = new Class({
   setInfoText: function(str) {
     this.previousResultsBtn.setStyle('display', 'none');
     this.nextResultsBtn.setStyle('display', 'none');
-    this.infoText.innerHTML = str;
+    this.infoText.set('html',str);
     this.updateNavBtns();
   },
 

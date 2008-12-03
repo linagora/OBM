@@ -77,7 +77,7 @@ function run_query_password_update($password, $uid, $usr_q) {
 
   // Update 'P_UserObm' ands system ONLY if the user already exist in
   // 'P_UserObm'
-  $query = "SELECT count(*) AS nb_user FROM P_UserObm WHERE userobm_login='".$login."' AND userobm_domain_id $domain_id";
+  $query = "SELECT count(*) AS nb_user FROM P_UserObm WHERE userobm_login='".$login."' AND userobm_domain_id $did";
   $error = $usr_q->query($query);
   $usr_q->next_record();
 
@@ -101,7 +101,7 @@ function run_query_password_update($password, $uid, $usr_q) {
       }
 
       if ($parameters) {
-        $cmd = $cmd_ldap_passwd.$parameters.' --login '.$login.' --domain '.$domain_id.' --type PLAIN --passwd '".$new_pass."' --no-old";
+        $cmd = $cmd_ldap_passwd.$parameters.' --login '.$login.' --domain '.$domain_id." --type PLAIN --passwd '".$new_pass."' --no-old";
 
         display_debug_msg($cmd, $cdg_exe, 'run_query_password_update()');
         exec($cmd);

@@ -224,7 +224,7 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
           while (list($key, $value) = each($sel_ent) ) {
             if (strcmp(substr($value, 0, 5),"data-") == 0) {
               $data = explode("-", $value);
-              $entit_id = of_entity_get($data[1], $data[2]);
+              $entity_id = of_entity_get($data[1], $data[2]);
               $entity = $data[1];
               $query = "
                 INSERT INTO OGroupLink (
@@ -402,8 +402,9 @@ function run_query_organizationalchart_ogrouplink_detail($id) {
       domain_name,
       NULL
     FROM OGroupLink    
-      INNER JOIN UserEntity ON userentity_entity_id = entity_id
+      INNER JOIN UserEntity ON userentity_entity_id = ogrouplink_entity_id
       INNER JOIN UserObm ON userobm_id = userentity_user_id
+      INNER JOIN Domain ON domain_id = userobm_domain_id
     WHERE ogrouplink_ogroup_id $id 
     UNION 
     SELECT 
@@ -420,10 +421,10 @@ function run_query_organizationalchart_ogrouplink_detail($id) {
       domain_name,
       group_manager_id
     FROM OGroupLink    
-      INNER JOIN GroupEntity ON groupentity_entity_id = entity_id
-      INNER JOINT UGroup ON group_id = groupentity_group_id
+      INNER JOIN GroupEntity ON groupentity_entity_id = ogrouplink_entity_id
+      INNER JOIN UGroup ON group_id = groupentity_group_id
       INNER JOIN of_usergroup ON of_usergroup_group_id=groupentity_group_id 
-      INNER JOIN UserObm ON userobm_id = userentity_user_id
+      INNER JOIN UserObm ON userobm_id = of_usergroup_user_id
       INNER JOIN Domain ON domain_id = userobm_domain_id
     WHERE ogrouplink_ogroup_id $id";
 
@@ -439,7 +440,7 @@ function run_query_organizationalchart_ogrouplink_detail($id) {
       'title' => $obm_q->f('userobm_title'),
       'id' => $obm_q->f('userobm_id'),
       'login' => $obm_q->f('userobm_login'),
-      'description' => $obm_q->f('userobm_description')
+      'description' => $obm_q->f('userobm_description'),
       'phone' => $obm_q->f('phone'),
       'mobile' => $obm_q->f('mobile'),
       'email' => get_entity_email($obm_q->f('userobm_email'), $obm_q->f('domain_name'))

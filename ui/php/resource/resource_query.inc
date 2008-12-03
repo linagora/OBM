@@ -269,7 +269,7 @@ function run_query_resource_insert($resource) {
     $id = $obm_q->lastid();
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     $resource['entity_id'] = $id;
-    of_right_default($resource, 'Resource', '',false) ;
+    of_right_default($resource, 'resource', '',false) ;
   }
 
   return $id;
@@ -326,6 +326,7 @@ function run_query_resource_delete($p_id) {
   $multidomain = sql_multidomain('resource');
   $query = "DELETE FROM Resource WHERE resource_id $p_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_resource_delete(resource)');
+  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
   if (!$retour) return $retour;

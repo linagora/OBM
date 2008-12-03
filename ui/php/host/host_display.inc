@@ -259,7 +259,6 @@ function html_host_consult($host_q) {
   $mail_server = $host_q->f('mailserver_id');
   $domain_name = ($host_q->f('domain_name') != '' ? $host_q->f('domain_name') : 'GLOBAL');
 
-  $service =  new Service_Details($GLOBALS['module'], $id);
   $dis_user =   
     "<tr>
       <th>$l_user</th>
