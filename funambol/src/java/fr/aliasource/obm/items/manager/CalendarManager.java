@@ -16,6 +16,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.client.ISyncClient;
 import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.items.EventChanges;
@@ -500,7 +501,7 @@ public class CalendarManager extends ObmManager {
 					.getRecurrencePattern(), dend, foundation.isAllDay());
 		} else {
 			recurrence = new EventRecurrence();
-			recurrence.setKind("none");
+			recurrence.setKind(RecurrenceKind.none);
 			recurrence.setDays("");
 			recurrence.setFrequence(1);
 		}

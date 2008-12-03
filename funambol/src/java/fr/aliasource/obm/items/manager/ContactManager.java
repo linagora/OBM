@@ -342,15 +342,15 @@ public class ContactManager extends ObmManager {
 		PersonalDetail pd = funis.getPersonalDetail();
 
 		// addresses
-		List<com.funambol.common.pim.contact.Address> lad = new LinkedList<com.funambol.common.pim.contact.Address>();
-		lad.add(bd.getAddress());
-		lad.add(pd.getAddress());
-		lad.add(pd.getOtherAddress());
-		for (com.funambol.common.pim.contact.Address a : lad) {
-			if (a != null && a.getLabel() != null && s(a.getLabel()) != null
-					&& s(a.getLabel()).length() > 0) {
-				contact.addAddress(s(a.getLabel()), funisToObm(a));
-			}
+		if (bd.getAddress() != null) {
+			contact.addAddress("work", funisToObm(bd.getAddress()));
+		}
+
+		if (pd.getAddress() != null) {
+			contact.addAddress("home", funisToObm(pd.getAddress()));
+		}
+		if (pd.getOtherAddress() != null) {
+			contact.addAddress("other", funisToObm(pd.getOtherAddress()));
 		}
 
 		// phones

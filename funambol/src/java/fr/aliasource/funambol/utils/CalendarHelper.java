@@ -13,6 +13,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationState;
+import org.obm.sync.calendar.RecurrenceKind;
 
 import com.funambol.common.pim.calendar.RecurrencePattern;
 import com.funambol.common.pim.calendar.RecurrencePatternException;
@@ -329,25 +330,25 @@ public class CalendarHelper extends Helper {
 
 		switch (rec.getTypeId()) {
 		case RecurrencePattern.TYPE_DAYLY:
-			recurrence.setKind("daily");
+			recurrence.setKind(RecurrenceKind.daily);
 			break;
 		case RecurrencePattern.TYPE_WEEKLY:
-			recurrence.setKind("weekly");
+			recurrence.setKind(RecurrenceKind.weekly);
 			recurrence.setDays(getOBMDayOfWeekMask(rec.getDayOfWeekMask()));
 			break;
 		case RecurrencePattern.TYPE_MONTHLY:
-			recurrence.setKind("monthlybydate");
+			recurrence.setKind(RecurrenceKind.monthlybydate);
 			break;
 		case RecurrencePattern.TYPE_MONTH_NTH:
 			// only one nth day supported by OBM
-			recurrence.setKind("monthlybyday");
+			recurrence.setKind(RecurrenceKind.monthbyday);
 			break;
 		case RecurrencePattern.TYPE_YEARLY:
-			recurrence.setKind("yearly");
+			recurrence.setKind(RecurrenceKind.yearly);
 			break;
 		case RecurrencePattern.TYPE_YEAR_NTH:
 			// not supported by OBM
-			recurrence.setKind("yearly");
+			recurrence.setKind(RecurrenceKind.yearly);
 			break;
 		}
 
