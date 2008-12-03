@@ -327,9 +327,9 @@ public class ContactManager extends ObmManager {
 
 		Contact contact = new Contact();
 
-		if (funis.getUid() != null && funis.getUid() != "") {
-			contact.setUid(new Integer(funis.getUid()));
-		}
+		// if (funis.getUid() != null && funis.getUid() != "") {
+		// contact.setUid(new Integer(funis.getUid()));
+		// }
 
 		contact.setFirstname(ContactHelper.nullToEmptyString(funis.getName()
 				.getFirstName().getPropertyValueAsString()));
@@ -353,7 +353,10 @@ public class ContactManager extends ObmManager {
 		lad.add(pd.getAddress());
 		lad.add(pd.getOtherAddress());
 		for (com.funambol.common.pim.contact.Address a : lad) {
-			contact.addAddress(s(a.getLabel()), funisToObm(a));
+			if (a != null && a.getLabel() != null && s(a.getLabel()) != null
+					&& s(a.getLabel()).length() > 0) {
+				contact.addAddress(s(a.getLabel()), funisToObm(a));
+			}
 		}
 
 		// phones
@@ -361,8 +364,9 @@ public class ContactManager extends ObmManager {
 		lph.addAll(bd.getPhones());
 		lph.addAll(pd.getPhones());
 		for (Phone p : lph) {
-			contact.addPhone(p.getPhoneType(), new org.obm.sync.book.Phone(p
-					.getValue()));
+			if (p != null && p.getValue() != null && p.getValue().length() > 0)
+				contact.addPhone(p.getPhoneType(), new org.obm.sync.book.Phone(
+						p.getValue()));
 		}
 
 		// emails
@@ -370,7 +374,10 @@ public class ContactManager extends ObmManager {
 		lem.addAll(bd.getEmails());
 		lem.addAll(pd.getEmails());
 		for (com.funambol.common.pim.contact.Email em : lem) {
-			contact.addEmail(em.getEmailType(), new Email(em.getValue()));
+			if (em != null && em.getValue() != null
+					&& em.getValue().length() > 0) {
+				contact.addEmail(em.getEmailType(), new Email(em.getValue()));
+			}
 		}
 
 		// websites
@@ -378,7 +385,10 @@ public class ContactManager extends ObmManager {
 		lwp.addAll(bd.getWebPages());
 		lwp.addAll(pd.getWebPages());
 		for (WebPage wp : lwp) {
-			contact.addWebsite(wp.getWebPageType(), new Website(wp.getValue()));
+			if (wp != null && wp.getValue() != null && wp.getValue().length() > 0) {
+				contact.addWebsite(wp.getWebPageType(), new Website(wp
+						.getValue()));
+			}
 		}
 
 		contact.setComment(ContactHelper.nullToEmptyString(ContactHelper
