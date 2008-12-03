@@ -187,7 +187,7 @@ public final class ContactSyncSource extends ObmSyncSource implements
 	public SyncItem updateSyncItem(SyncItem syncItem)
 			throws SyncSourceException {
 		logger.info("updateSyncItem(" + principal + " , "
-				+ syncItem.getKey().getKeyAsString() + ")");
+				+ syncItem.getKey().getKeyAsString() + "("+syncItem.getKey()+"))");
 
 		Contact contact = null;
 		try {

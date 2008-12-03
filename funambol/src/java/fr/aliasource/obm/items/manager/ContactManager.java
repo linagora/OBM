@@ -327,9 +327,9 @@ public class ContactManager extends ObmManager {
 
 		Contact contact = new Contact();
 
-		// if (funis.getUid() != null && funis.getUid() != "") {
-		// contact.setUid(new Integer(funis.getUid()));
-		// }
+		if (funis.getUid() != null && funis.getUid() != "") {
+			contact.setUid(new Integer(funis.getUid()));
+		}
 
 		contact.setFirstname(ContactHelper.nullToEmptyString(funis.getName()
 				.getFirstName().getPropertyValueAsString()));
