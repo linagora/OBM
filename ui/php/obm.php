@@ -75,7 +75,7 @@ $l_obm_title version $obm_version - " . date('Y-m-d H:i:s') . "
 
 if ($cgp_show['module']['calendar'] && $perm->check_right('calendar', $cright_read)) { 
   require("$path/calendar/calendar_query.inc");
-  //  $block .= dis_calendar_portal();
+  $block .= dis_calendar_portal();
 }
 
 if ($cgp_show['module']['time'] && $perm->check_right('time', $cright_write)) { 

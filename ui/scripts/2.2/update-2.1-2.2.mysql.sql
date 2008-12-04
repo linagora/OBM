@@ -766,6 +766,7 @@ SELECT
   todo_content
 FROM Todo;
 
+
 --
 -- Clean CalendarAlert before migration to EventAlert
 --
@@ -2183,6 +2184,33 @@ CREATE TABLE P_MailboxEntity LIKE MailboxEntity;
 -- MailshareEntity production table
 CREATE TABLE P_MailshareEntity LIKE MailshareEntity;
 
+
+-- Create links from "todos" to users (need to be after userentity..)
+INSERT INTO EventLink (
+  eventlink_timeupdate,
+  eventlink_timecreate,
+  eventlink_userupdate,
+  eventlink_usercreate,
+  eventlink_event_id,
+  eventlink_entity_id,
+  eventlink_state,
+  eventlink_required,
+  eventlink_percent)
+SELECT
+  todo_timeupdate,
+  todo_timecreate,
+  todo_userupdate,
+  todo_usercreate,
+  event_id,
+  userentity_entity_id,
+  'ACCEPTED',
+  'REQ',
+  todo_percent
+FROM Todo
+LEFT JOIN Event on todo_usercreate=event_usercreate and todo_timecreate=event_timecreate and todo_timeupdate=event_timeupdate and todo_user=event_owner
+LEFT JOIN UserEntity on todo_user=userentity_user_id;
+
+
 --  _________________
 -- | Drop old tables |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -2194,4 +2222,3 @@ DROP TABLE CalendarEvent;
 DROP TABLE CalendarCategory1;
 DROP TABLE Todo;
 DROP TABLE TmpEntity;
-
