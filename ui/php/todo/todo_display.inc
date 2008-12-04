@@ -11,8 +11,8 @@
 //---------------------------------------------------------------------------//
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
-$fieldnames['date_todo'] = $l_date_create;
-$fieldnames['date_deadline'] = $l_deadline;
+$fieldnames['todo_date'] = $l_date;
+$fieldnames['date_create'] = $l_date_create;
 $fieldnames['todo_priority'] = $l_priority;
 $fieldnames['todo_percent'] = $l_percent;
 $fieldnames['todo_title'] = $l_title;
@@ -32,14 +32,20 @@ $fieldnames['todo_update'] = $l_update;
 function dis_data_todo(&$OD, $fieldname, $link_ok) {
   global $path, $ico_update;
 
-  if ($fieldname == 'date_deadline') {
-    $deadline = $OD->data_set->f('date_deadline');
-    $res['name'] = ($deadline) ? of_date_format($deadline) : ' ';
+  if ($fieldname == 'date_create') {
+    $datecreate = $OD->data_set->f('date_create');
+    $res['name'] = ($datecreate) ? of_date_format($datecreate) : ' ';
+    $res['align'] = 'center';
+  }
+
+  else if ($fieldname == 'todo_date') {
+    $date = $OD->data_set->f('todo_date');
+    $res['name'] = ($date) ? of_date_format($date) : ' ';
     $res['align'] = 'center';
   }
 
   else if ($fieldname == 'todo_title') {
-    $t_id = $OD->data_set->f('todo_id');
+    $t_id = $OD->data_set->f('event_id');
     $res['url'] = "todo_index.php?action=detailconsult&amp;todo_id=$t_id";
   }
 
@@ -55,10 +61,6 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if ($fieldname == 'date_todo') {
-    $res['align'] = 'center';
-  }
-
   else if ($fieldname == 'todo_update') {
     $t_id = $OD->data_set->f('todo_id');
     $res['popup'] = true;
@@ -67,6 +69,7 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
     $res['url'] = "todo_index.php?action=detailupdate&amp;todo_id=$t_id&amp;popup=1";
     $res['name'] = "<img src=\"$ico_update\" alt=\"\" />";
     $res['txt_name'] = ' ';
+    $res['align'] = 'center';
   }
 
   return $res;
@@ -94,13 +97,13 @@ function dis_todo_search_form($params='') {
  **/
 function html_todo_search_form($params) {
   global $action, $max_priority, $l_find, $popup, $display, $c_all, $l_all;
-  global $l_deadline, $l_date, $l_date_create;;
+  global $l_date, $l_date_create;;
   global $l_title, $l_percent, $l_priority, $l_text, $l_after, $l_before;
 
   $text = stripslashes($params['text']);
   $priority = $params['priority'];
   $percent = $params['percent'];
-  $date_field = ($params['date_field'] ? $params['date_field'] : 'deadline');
+  $date_field = ($params['date_field'] ? $params['date_field'] : 'date');
   $dateafter = of_date_upd_format(stripslashes($params['date_after']),true);
   $datebefore = of_date_upd_format(stripslashes($params['date_before']),true);
   $archive = ($params['archive'] == '1' ? "checked = \"checked\"" : '');
@@ -152,7 +155,7 @@ function html_todo_search_form($params) {
     </label>
     <label>$l_date<br />
       <select name=\"sel_date_field\">
-        <option value=\"deadline\" $s_date_field[deadline]>$l_deadline</option>
+        <option value=\"date\" $s_date_field[date]>$l_date</option>
         <option value=\"date_create\" $s_date_field[date_create]>$l_date_create</option>
       </select>
     </label>
@@ -278,18 +281,18 @@ function dis_todo_consult($params) {
 function html_todo_consult($todo_q) {
   global $display;
   global $l_todo, $l_todotitle, $l_user, $l_author, $l_priority, $l_date_create;
-  global $l_deadline, $l_content, $l_no_deadline, $l_percent;
+  global $l_date, $l_desc, $l_percent, $l_title;
 
-  $title = $todo_q->f('todo_title');
+  $title = $todo_q->f('event_title');
   $user = $todo_q->f('user_firstname') .' '. $todo_q->f('user_lastname');
   $author = $todo_q->f('author_firstname') .' '. $todo_q->f('author_lastname');
-  $priority = $todo_q->f('todo_priority');
-  $percent = $todo_q->f('todo_percent');
+  $priority = $todo_q->f('event_priority');
+  $percent = $todo_q->f('eventlink_percent');
 
-  $date = of_date_format($todo_q->f('date_todo'));
-  $deadline = $todo_q->f('date_deadline');
-  $deadline = ($deadline != 0) ? of_date_format($deadline) : $l_no_deadline;
-  $content = $todo_q->f('todo_content');
+  $date = of_date_format($todo_q->f('todo_date'));
+  $datecreate = of_date_format($todo_q->f('timecreate'));
+  $date = ($date != 0) ? of_date_format($date) : $l_no_date;
+  $description = $todo_q->f('event_description');
 
   $display['title'] = $title;
 
@@ -315,11 +318,11 @@ function html_todo_consult($todo_q) {
     </tr>
     <tr>
       <th>$l_date_create</th>
-      <td>$date</td>
+      <td>$datecreate</td>
     </tr>
     <tr>
-      <th>$l_deadline</th>
-      <td>$deadline</td>
+      <th>$l_date</th>
+      <td>$date</td>
     </tr>
     </table>
   </div>
@@ -335,8 +338,8 @@ function html_todo_consult($todo_q) {
    </div>
   
   <div class=\"detail extra\">
-    <h1>$l_content</h1> 
-      $content
+    <h1>$l_desc</h1> 
+      $description
   </div>
 ";
   
@@ -354,7 +357,7 @@ function dis_todo_form($todo, $todo_q = 0) {
   global $path, $obm, $max_priority;
   global $ico_mini_cal, $ico_add, $ico_delete;
   global $l_add, $l_update, $l_close,$display,$l_todo,$l_user;
-  global $l_deadline, $l_priority, $l_title, $l_percent, $l_content;
+  global $l_date, $l_priority, $l_title, $l_percent, $l_desc;
 
   $action = $todo['action'];
   $popup = $todo['popup'];
@@ -362,16 +365,16 @@ function dis_todo_form($todo, $todo_q = 0) {
   if ($action == 'detailupdate') {
     $t_id = $todo['todo_id'];
     $u_id = $todo_q->f('todo_user');
-    $title = htmlentities($todo_q->f('todo_title'));
-    $content = htmlentities($todo_q->f('todo_content'));
-    $priority = $todo_q->f('todo_priority');
-    $percent = $todo_q->f('todo_percent');
-    $deadline = $todo_q->f('date_deadline');
-    $deadline = ($deadline != 0) ? of_date_upd_format($deadline, true) : $l_no_deadline;
+    $title = htmlentities($todo_q->f('event_title'));
+    $description = htmlentities($todo_q->f('event_description'));
+    $priority = $todo_q->f('event_priority');
+    $percent = $todo_q->f('eventlink_percent');
+    $date = $todo_q->f('event_date');
+    $date = ($date != 0) ? of_date_upd_format($date, true) : $l_no_date;
   } else {
     $u_id = $obm['uid'];
     $priority = intval(($max_priority+1)/2);
-    $deadline = of_date_upd_format();
+    $date = of_date_upd_format();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -379,8 +382,8 @@ function dis_todo_form($todo, $todo_q = 0) {
   if (isset($todo['title'])) { $title = $todo['title']; }
   if (isset($todo['priority'])) { $priority = $todo['priority']; }
   if (isset($todo['percent'])) { $percent = $todo['percent']; }
-  if (isset($todo['deadline'])) { $deadline = of_date_upd_format($todo['deadline'],true); };
-  if (isset($todo['content'])) { $content = $todo['content']; }
+  if (isset($todo['date'])) { $date = of_date_upd_format($todo['date'],true); };
+  if (isset($todo['description'])) { $description = $todo['description']; }
   if (is_array($todo['userid'])) {
     $p_user_array = $todo['userid'];
   } else if ($u_id > 0) {
@@ -465,8 +468,8 @@ function dis_todo_form($todo, $todo_q = 0) {
     <th>$l_percent</th>
     <td><input type=\"text\" id=\"tf_percent\" name=\"tf_percent\" maxlength=\"3\" size=\"3\" value=\"$percent\" /></td>
   </tr><tr>
-    <th>$l_deadline</th>
-    <td><input type=\"text\" name=\"tf_deadline\" value=\"$deadline\" class=\"datePicker\"/></td>
+    <th>$l_date</th>
+    <td><input type=\"text\" name=\"tf_date\" value=\"$date\" class=\"datePicker\"/></td>
   </tr>
   </table>
   </fieldset>
@@ -481,8 +484,8 @@ function dis_todo_form($todo, $todo_q = 0) {
 
 
   <fieldset class=\"detail extra\">
-  <legend>$l_content</legend>
-    <textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\">$content</textarea>
+  <legend>$l_desc</legend>
+    <textarea id=\"ta_description\" name=\"ta_description\" rows=\"3\" cols=\"80\">$description</textarea>
   </fieldset>
   
   <fieldset class=\"buttons\">
