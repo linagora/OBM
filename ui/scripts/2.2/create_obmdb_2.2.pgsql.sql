@@ -613,8 +613,8 @@ CREATE TABLE deleted (
 CREATE TABLE deletedcontact (
   deletedcontact_contact_id integer NOT NULL,
   deletedcontact_user_id    integer,
-  deletedcontact_timestamp  timestamp without time zone
-  deletedcontact_origin     varchar(255) NOT NULL,
+  deletedcontact_timestamp  timestamp without time zone,
+  deletedcontact_origin     varchar(255) NOT NULL
 );
 
 
