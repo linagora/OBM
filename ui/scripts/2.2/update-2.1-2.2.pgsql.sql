@@ -913,6 +913,7 @@ UPDATE Contact SET contact_origin='obm21';
 ALTER TABLE Contact ALTER COLUMN contact_origin SET DEFAULT NOT NULL;
 
 ALTER TABLE DeletedContact ADD COLUMN deletedcontact_user_id integer;
+ALTER TABLE DeletedContact ADD COLUMN deletedcontact_origin varchar(255) NOT NULL;
 
 
 -- NOT NULL to NULL Convertion
@@ -976,9 +977,12 @@ ALTER TABLE UGroup ALTER COLUMN group_domain_id SET NOT NULL;
 ALTER TABLE OrganizationalChart ALTER COLUMN organizationalchart_domain_id SET NOT NULL;
 ALTER TABLE OGroup ALTER COLUMN ogroup_domain_id SET NOT NULL;
 ALTER TABLE OGroupLink ALTER COLUMN ogrouplink_domain_id SET NOT NULL;
+ALTER TABLE Host ADD COLUMN host_fqdn varchar(255);
+ALTER TABLE P_Host ADD COLUMN host_fqdn varchar(255);
 ALTER TABLE Import ALTER COLUMN import_domain_id SET NOT NULL;
 ALTER TABLE Import ALTER COLUMN import_datasource_id SET default NULL;
 ALTER TABLE Resource ALTER COLUMN resource_domain_id SET NOT NULL;
+ALTER TABLE Resource ADD COLUMN resource_delegation varchar(64) default '';
 ALTER TABLE RGroup ALTER COLUMN rgroup_domain_id SET NOT NULL;
 ALTER TABLE Host ALTER COLUMN host_domain_id SET NOT NULL;
 ALTER TABLE Samba ALTER COLUMN samba_domain_id SET NOT NULL;
@@ -1024,6 +1028,8 @@ ALTER TABLE displaypref ALTER COLUMN display_user_id DROP NOT NULL;
 ALTER TABLE displaypref ALTER COLUMN display_user_id SET DEFAULT NULL;
 ALTER TABLE UGroup ALTER COLUMN group_manager_id DROP DEFAULT;
 ALTER TABLE UGroup ALTER COLUMN group_manager_id SET DEFAULT NULL;
+ALTER TABLE UserObm ALTER COLUMN userobm_email_nomade TYPE text default '';
+ALTER TABLE P_UserObm MODIFY COLUMN userobm_email_nomade TYPE text default '';
 ALTER TABLE P_EntityRight ADD COLUMN entityright_access INTEGER not null DEFAULT 0;
 
 --  _________________
@@ -2585,6 +2591,10 @@ ALTER TABLE userobm ALTER COLUMN userobm_archive DROP DEFAULT;
 ALTER TABLE userobm ALTER COLUMN userobm_archive TYPE SMALLINT USING CASE userobm_archive WHEN '1' THEN 1 ELSE 0 END;
 ALTER TABLE userobm ALTER COLUMN userobm_archive SET DEFAULT 0;
 
+ALTER TABLE p_userobm ALTER COLUMN userobm_archive DROP DEFAULT;
+ALTER TABLE p_userobm ALTER COLUMN userobm_archive TYPE SMALLINT USING CASE userobm_archive WHEN '1' THEN 1 ELSE 0 END;
+ALTER TABLE p_userobm ALTER COLUMN userobm_archive SET DEFAULT 0;
+
 ALTER TABLE company ALTER COLUMN company_archive DROP DEFAULT;
 ALTER TABLE company ALTER COLUMN company_archive TYPE SMALLINT USING CASE company_archive WHEN '1' THEN 1 ELSE 0 END;
 ALTER TABLE company ALTER COLUMN company_archive SET DEFAULT 0;
@@ -2613,9 +2623,17 @@ ALTER TABLE deal ALTER COLUMN deal_archive DROP DEFAULT;
 ALTER TABLE deal ALTER COLUMN deal_archive TYPE SMALLINT USING CASE deal_archive WHEN '1' THEN 1 ELSE 0 END;
 ALTER TABLE deal ALTER COLUMN deal_archive SET DEFAULT 0;
 
+ALTER TABLE list ALTER COLUMN list_contact_archive DROP DEFAULT;
+ALTER TABLE list ALTER COLUMN list_contact_archive TYPE SMALLINT USING CASE list_contact_archive WHEN '1' THEN 1 ELSE 0 END;
+ALTER TABLE list ALTER COLUMN list_contact_archive SET DEFAULT 0;
+
 ALTER TABLE project ALTER COLUMN project_archive DROP DEFAULT;
 ALTER TABLE project ALTER COLUMN project_archive TYPE SMALLINT USING CASE project_archive WHEN '1' THEN 1 ELSE 0 END;
 ALTER TABLE project ALTER COLUMN project_archive SET DEFAULT 0;
+
+ALTER TABLE contract ALTER COLUMN contract_archive DROP DEFAULT;
+ALTER TABLE contract ALTER COLUMN contract_archive TYPE SMALLINT USING CASE contract_archive WHEN '1' THEN 1 ELSE 0 END;
+ALTER TABLE contract ALTER COLUMN contract_archive SET DEFAULT 0;
 
 ALTER TABLE incident ALTER COLUMN incident_archive DROP DEFAULT;
 ALTER TABLE incident ALTER COLUMN incident_archive TYPE SMALLINT USING CASE incident_archive WHEN '1' THEN 1 ELSE 0 END;
@@ -2628,6 +2646,24 @@ ALTER TABLE invoice ALTER COLUMN invoice_archive SET DEFAULT 0;
 ALTER TABLE payment ALTER COLUMN payment_checked DROP DEFAULT;
 ALTER TABLE payment ALTER COLUMN payment_checked TYPE SMALLINT USING CASE payment_checked WHEN '1' THEN 1 ELSE 0 END;
 ALTER TABLE payment ALTER COLUMN payment_checked SET DEFAULT 0;
+
+ALTER TABLE mailshare ALTER COLUMN mailshare_archive DROP DEFAULT;
+ALTER TABLE mailshare ALTER COLUMN mailshare_archive TYPE SMALLINT USING CASE mailshare_archive WHEN '1' THEN 1 ELSE 0 END;
+ALTER TABLE mailshare ALTER COLUMN mailshare_archive SET DEFAULT 0;
+
+ALTER TABLE p_mailshare ALTER COLUMN mailshare_archive DROP DEFAULT;
+ALTER TABLE p_mailshare ALTER COLUMN mailshare_archive TYPE SMALLINT USING CASE mailshare_archive WHEN '1' THEN 1 ELSE 0 END;
+ALTER TABLE p_mailshare ALTER COLUMN mailshare_archive SET DEFAULT 0;
+
+ALTER TABLE organizationalchart ALTER COLUMN organizationalchart_archive DROP DEFAULT;
+ALTER TABLE organizationalchart ALTER COLUMN organizationalchart_archive TYPE SMALLINT USING CASE organizationalchart_archive WHEN '1' THEN 1 ELSE 0 END;
+ALTER TABLE organizationalchart ALTER COLUMN organizationalchart_archive SET DEFAULT 0;
+
+ALTER TABLE host ADD COLUMN host_archive smallint DEFAULT 0 NOT NULL;
+ALTER TABLE p_host ADD COLUMN host_archive smallint DEFAULT 0 NOT NULL;
+
+ALTER TABLE ugroup ADD COLUMN group_archive smallint DEFAULT 0 NOT NULL;
+ALTER TABLE p_ugroup ADD COLUMN group_archive smallint DEFAULT 0 NOT NULL;
 
 -- MailboxEntity production table
 CREATE TABLE P_MailboxEntity (LIKE MailboxEntity);

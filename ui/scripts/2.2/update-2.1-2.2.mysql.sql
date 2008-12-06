@@ -943,7 +943,8 @@ ALTER TABLE DealStatus MODIFY COLUMN dealstatus_domain_id int(8) NOT NULL ;
 ALTER TABLE DealType MODIFY COLUMN dealtype_domain_id int(8) NOT NULL ;
 ALTER TABLE DefaultOdtTemplate MODIFY COLUMN defaultodttemplate_domain_id int(8) NOT NULL ;
 ALTER TABLE DeletedContact MODIFY COLUMN deletedcontact_contact_id int(8) NOT NULL ;
-ALTER TABLE DeletedContact ADD COLUMN deletedcontact_user_id int(8) NOT NULL ;
+ALTER TABLE DeletedContact ADD COLUMN deletedcontact_user_id int(8) NOT NULL;
+ALTER TABLE DeletedContact ADD COLUMN deletedcontact_origin varchar(255) NOT NULL;
 ALTER TABLE DeletedTodo MODIFY COLUMN deletedtodo_todo_id int(8) NOT NULL;
 ALTER TABLE DeletedUser MODIFY COLUMN deleteduser_user_id int(8) NOT NULL ;
 ALTER TABLE Document MODIFY COLUMN document_domain_id int(8) NOT NULL ;
@@ -959,8 +960,10 @@ ALTER TABLE EventLink MODIFY COLUMN eventlink_entity_id int(8) NOT NULL ;
 ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
 ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_child_id int(8) NOT NULL ;
 ALTER TABLE Host MODIFY COLUMN host_domain_id int(8) NOT NULL ;
-ALTER TABLE `Import` MODIFY COLUMN import_domain_id int(8) NOT NULL ;
-ALTER TABLE `Import` MODIFY COLUMN import_datasource_id int(8)  default NULL;
+ALTER TABLE Host ADD COLUMN host_fqdn varchar(255);
+ALTER TABLE P_Host ADD COLUMN host_fqdn varchar(255);
+ALTER TABLE Import MODIFY COLUMN import_domain_id int(8) NOT NULL ;
+ALTER TABLE Import MODIFY COLUMN import_datasource_id int(8)  default NULL;
 ALTER TABLE Incident MODIFY COLUMN incident_domain_id int(8) NOT NULL ;
 ALTER TABLE Incident MODIFY COLUMN incident_priority_id int(8)  default NULL;
 ALTER TABLE Incident MODIFY COLUMN incident_status_id int(8)  default NULL;
@@ -992,7 +995,7 @@ ALTER TABLE P_Host MODIFY COLUMN host_domain_id int(8) NOT NULL ;
 ALTER TABLE P_MailServer MODIFY COLUMN mailserver_host_id int(8) NOT NULL ;
 ALTER TABLE P_MailServerNetwork MODIFY COLUMN mailservernetwork_host_id int(8) NOT NULL ;
 ALTER TABLE P_MailShare MODIFY COLUMN mailshare_domain_id int(8) NOT NULL ;
-ALTER TABLE P_MailShare MODIFY COLUMN mailshare_mail_server_id int(8)  default NULL;
+ALTER TABLE P_MailShare MODIFY COLUMN mailshare_mail_server_id int(8) default NULL;
 ALTER TABLE P_Samba MODIFY COLUMN samba_domain_id int(8) NOT NULL ;
 ALTER TABLE P_UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
 ALTER TABLE P_UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
@@ -1008,7 +1011,8 @@ ALTER TABLE Publication MODIFY COLUMN publication_domain_id int(8) NOT NULL ;
 ALTER TABLE PublicationType MODIFY COLUMN publicationtype_domain_id int(8) NOT NULL ;
 ALTER TABLE RGroup MODIFY COLUMN rgroup_domain_id int(8) NOT NULL ;
 ALTER TABLE Region MODIFY COLUMN region_domain_id int(8) NOT NULL ;
-ALTER TABLE Resource MODIFY COLUMN resource_domain_id int(8) NOT NULL ;
+ALTER TABLE Resource MODIFY COLUMN resource_domain_id int(8) NOT NULL;
+ALTER TABLE Resource ADD COLUMN resource_delegation varchar(64) default '';
 ALTER TABLE ResourceGroup MODIFY COLUMN resourcegroup_rgroup_id int(8) NOT NULL ;
 ALTER TABLE ResourceGroup MODIFY COLUMN resourcegroup_resource_id int(8) NOT NULL ;
 ALTER TABLE ResourceItem MODIFY COLUMN resourceitem_domain_id int(8) NOT NULL ;
@@ -1019,6 +1023,8 @@ ALTER TABLE SubscriptionReception MODIFY COLUMN subscriptionreception_domain_id 
 ALTER TABLE TaskType MODIFY COLUMN tasktype_domain_id int(8) NOT NULL ;
 ALTER TABLE UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
 ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
+ALTER TABLE UserObm MODIFY COLUMN userobm_email_nomade text default '';
+ALTER TABLE P_UserObm MODIFY COLUMN userobm_email_nomade text default '';
 ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
 ALTER TABLE UserObmPref MODIFY COLUMN userobmpref_user_id int(8) NULL ;
 ALTER TABLE UserObmPref ADD COLUMN userobmpref_id int(8) NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (userobmpref_id);
@@ -1040,6 +1046,41 @@ ALTER TABLE ProjectClosing MODIFY COLUMN projectclosing_usercreate int(8) DEFAUL
 ALTER TABLE Subscription MODIFY COLUMN subscription_reception_id int(8) DEFAULT NULL;
 ALTER TABLE UserObm MODIFY COLUMN userobm_host_id int(8) DEFAULT NULL;
 ALTER TABLE UGroup MODIFY COLUMN group_manager_id int(8) DEFAULT NULL;
+
+-- Set archive to int(1) NOT NULL DEFAUL 0 everywhere
+
+UPDATE Company set company_archive='0' where company_archive != '1';
+ALTER TABLE Company MODIFY COLUMN company_archive int(1) DEFAULT 0 NOT NULL;
+
+UPDATE Contact set contact_archive='0' where contact_archive != '1';
+ALTER TABLE Contact MODIFY COLUMN contact_archive int(1) DEFAULT 0 NOT NULL;
+
+UPDATE Deal set deal_archive='0' where deal_archive != '1';
+ALTER TABLE Deal MODIFY COLUMN deal_archive int(1) DEFAULT 0 NOT NULL;
+
+UPDATE ParentDeal set parentdeal_archive='0' where parentdeal_archive != '1';
+ALTER TABLE ParentDeal MODIFY COLUMN parentdeal_archive int(1) DEFAULT 0 NOT NULL;
+
+UPDATE Lead set lead_archive='0' where lead_archive != '1';
+ALTER TABLE Lead MODIFY COLUMN lead_archive int(1) DEFAULT 0 NOT NULL;
+
+UPDATE Incident set incident_archive='0' where incident_archive != '1';
+ALTER TABLE Incident MODIFY COLUMN incident_archive int(1) DEFAULT 0 NOT NULL;
+
+UPDATE Invoice set invoice_archive='0' where invoice_archive != '1';
+ALTER TABLE Invoice MODIFY COLUMN invoice_archive int(1) DEFAULT 0 NOT NULL;
+
+UPDATE List set list_contact_archive='0' where list_contact_archive != '1';
+ALTER TABLE List MODIFY COLUMN list_contact_archive int(1) DEFAULT 0 NOT NULL;
+
+UPDATE Project set project_archive='0' where project_archive != '1';
+ALTER TABLE Project MODIFY COLUMN project_archive int(1) DEFAULT 0 NOT NULL;
+
+ALTER TABLE Host ADD COLUMN host_archive int(1) DEFAULT 0 NOT NULL;
+ALTER TABLE P_Host ADD COLUMN host_archive int(1) DEFAULT 0 NOT NULL;
+
+ALTER TABLE UGroup ADD COLUMN group_archive int(1) DEFAULT 0 NOT NULL;
+ALTER TABLE P_UGroup ADD COLUMN group_archive int(1) DEFAULT 0 NOT NULL;
 
 --  _________________
 -- | Updating values |

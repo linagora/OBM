@@ -255,7 +255,7 @@ CREATE TABLE contact (
     contact_email2 character varying(128),
     contact_mailing_ok smallint DEFAULT 0,
     contact_newsletter smallint DEFAULT 0,
-    contact_archive smallint DEFAULT 0,
+    contact_archive smallint DEFAULT 0 NOT NULL,
     contact_privacy integer DEFAULT 0,
     contact_date timestamp without time zone,
     contact_comment text,
@@ -336,7 +336,7 @@ CREATE TABLE contract (
     contract_techmanager_id integer,
     contract_marketmanager_id integer,
     contract_privacy integer DEFAULT 0,
-    contract_archive integer DEFAULT 0,
+    contract_archive smallint DEFAULT 0 NOT NULL,
     contract_clause text,
     contract_comment text
 );
@@ -495,7 +495,7 @@ CREATE TABLE deal (
     deal_commission numeric(4,2) DEFAULT 0,
     deal_hitrate integer DEFAULT 0,
     deal_status_id integer,
-    deal_archive smallint DEFAULT 0,
+    deal_archive smallint DEFAULT 0 NOT NULL,
     deal_todo character varying(128),
     deal_privacy integer DEFAULT 0,
     deal_comment text
@@ -611,9 +611,10 @@ CREATE TABLE deleted (
 --
 
 CREATE TABLE deletedcontact (
-    deletedcontact_contact_id integer NOT NULL,
-    deletedcontact_user_id integer,
-    deletedcontact_timestamp timestamp without time zone
+  deletedcontact_contact_id integer NOT NULL,
+  deletedcontact_user_id    integer,
+  deletedcontact_timestamp  timestamp without time zone
+  deletedcontact_origin     varchar(255) NOT NULL,
 );
 
 
@@ -1039,7 +1040,9 @@ CREATE TABLE host (
     host_uid integer,
     host_gid integer,
     host_samba integer DEFAULT 0,
+    host_archive smallint DEFAULT 0 NOT NULL,
     host_name character varying(32) NOT NULL,
+    host_fqdn character varying(255),
     host_ip character varying(16),
     host_delegation character varying(64) DEFAULT ''::character varying,
     host_description character varying(128),
@@ -1288,7 +1291,7 @@ CREATE TABLE lead (
     lead_date date,
     lead_datealarm date,
     lead_status_id integer,
-    lead_archive smallint DEFAULT 0,
+    lead_archive smallint DEFAULT 0 NOT NULL,
     lead_todo character varying(128),
     lead_comment text
 );
@@ -1353,7 +1356,7 @@ CREATE TABLE list (
     list_email character varying(128),
     list_mode integer DEFAULT 0,
     list_mailing_ok integer DEFAULT 0,
-    list_contact_archive integer DEFAULT 0,
+    list_contact_archive smallint DEFAULT 0 NOT NULL,
     list_info_publication integer DEFAULT 0,
     list_static_nb integer DEFAULT 0,
     list_query_nb integer DEFAULT 0,
@@ -1422,7 +1425,7 @@ CREATE TABLE mailshare (
     mailshare_userupdate integer,
     mailshare_usercreate integer,
     mailshare_name character varying(32),
-    mailshare_archive integer DEFAULT 0 NOT NULL,
+    mailshare_archive smallint DEFAULT 0 NOT NULL,
     mailshare_quota character varying(8) DEFAULT '0'::character varying NOT NULL,
     mailshare_mail_server_id integer,
     mailshare_delegation character varying(64) DEFAULT ''::character varying,
@@ -1564,7 +1567,7 @@ CREATE TABLE organizationalchart (
     organizationalchart_usercreate integer,
     organizationalchart_name character varying(32) NOT NULL,
     organizationalchart_description character varying(64),
-    organizationalchart_archive integer DEFAULT 0 NOT NULL
+    organizationalchart_archive smallint DEFAULT 0 NOT NULL
 );
 
 
@@ -1636,7 +1639,9 @@ CREATE TABLE p_host (
     host_uid integer,
     host_gid integer,
     host_samba integer,
+    host_archive smallint DEFAULT 0 NOT NULL,
     host_name character varying(32) NOT NULL,
+    host_fqdn character varying(255),
     host_ip character varying(16),
     host_delegation character varying(64),
     host_description character varying(128),
@@ -1688,7 +1693,7 @@ CREATE TABLE p_mailshare (
     mailshare_userupdate integer,
     mailshare_usercreate integer,
     mailshare_name character varying(32),
-    mailshare_archive integer NOT NULL,
+    mailshare_archive smallint DEFAULT 0 NOT NULL,
     mailshare_quota character varying(8) NOT NULL,
     mailshare_mail_server_id integer,
     mailshare_delegation character varying(64),
@@ -1730,6 +1735,7 @@ CREATE TABLE p_ugroup (
     group_userupdate integer,
     group_usercreate integer,
     group_system integer,
+    group_archive smallint DEFAULT 0 NOT NULL,
     group_privacy integer,
     group_local integer,
     group_ext_id integer,
@@ -1759,7 +1765,7 @@ CREATE TABLE p_userobm (
     userobm_local integer,
     userobm_ext_id character varying(16),
     userobm_system integer,
-    userobm_archive smallint NOT NULL,
+    userobm_archive smallint DEFAULT 0 NOT NULL,
     userobm_timelastaccess timestamp without time zone,
     userobm_login character varying(32) NOT NULL,
     userobm_nb_login_failed integer,
@@ -1810,7 +1816,7 @@ CREATE TABLE p_userobm (
     userobm_nomade_local_copy integer,
     userobm_nomade_datebegin timestamp without time zone,
     userobm_nomade_dateend timestamp without time zone,
-    userobm_email_nomade character varying(64),
+    userobm_email_nomade text default '',
     userobm_vacation_enable integer,
     userobm_vacation_datebegin timestamp without time zone,
     userobm_vacation_dateend timestamp without time zone,
@@ -1851,7 +1857,7 @@ CREATE TABLE parentdeal (
     parentdeal_label character varying(128) NOT NULL,
     parentdeal_marketingmanager_id integer,
     parentdeal_technicalmanager_id integer,
-    parentdeal_archive smallint DEFAULT 0,
+    parentdeal_archive smallint DEFAULT 0 NOT NULL,
     parentdeal_comment text
 );
 
@@ -2036,7 +2042,7 @@ CREATE TABLE project (
     project_estimatedtime integer,
     project_datebegin date,
     project_dateend date,
-    project_archive smallint DEFAULT 0,
+    project_archive smallint DEFAULT 0 NOT NULL,
     project_comment text,
     project_reference_date character varying(32),
     project_reference_duration character varying(16),
@@ -2215,6 +2221,7 @@ CREATE TABLE resource (
     resource_userupdate integer,
     resource_usercreate integer,
     resource_name character varying(32) DEFAULT ''::character varying NOT NULL,
+    resource_delegation varchar(64) default '',
     resource_description character varying(255),
     resource_qty integer DEFAULT 0
 );
@@ -2471,6 +2478,7 @@ CREATE TABLE ugroup (
     group_userupdate integer,
     group_usercreate integer,
     group_system integer DEFAULT 0,
+    group_archive smallint DEFAULT 0 NOT NULL,
     group_privacy integer DEFAULT 0,
     group_local integer DEFAULT 1,
     group_ext_id integer,
@@ -2591,7 +2599,7 @@ CREATE TABLE userobm (
     userobm_nomade_local_copy integer DEFAULT 0,
     userobm_nomade_datebegin timestamp without time zone,
     userobm_nomade_dateend timestamp without time zone,
-    userobm_email_nomade character varying(64) DEFAULT ''::character varying,
+    userobm_email_nomade text DEFAULT '',
     userobm_vacation_enable integer DEFAULT 0,
     userobm_vacation_datebegin timestamp without time zone,
     userobm_vacation_dateend timestamp without time zone,
