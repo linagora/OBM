@@ -528,24 +528,6 @@ END
 CREATE TRIGGER eventcategory1_created BEFORE INSERT ON eventcategory1 FOR EACH ROW EXECUTE PROCEDURE on_eventcategory1_create();
 CREATE TRIGGER eventcategory1_changed BEFORE UPDATE ON eventcategory1 FOR EACH ROW EXECUTE PROCEDURE on_eventcategory1_change();
 
-UPDATE todo SET todo_timecreate=NOW() WHERE todo_timecreate IS NULL;
-ALTER TABLE todo ALTER COLUMN todo_timecreate SET DEFAULT NOW();
-
-CREATE OR REPLACE FUNCTION on_todo_change() RETURNS trigger AS '
-BEGIN
-new.todo_timeupdate := current_timestamp;
-RETURN new;
-END
-' LANGUAGE plpgsql;
-CREATE OR REPLACE FUNCTION on_todo_create() RETURNS trigger AS '
-BEGIN
-new.todo_timecreate := current_timestamp;
-RETURN new;
-END
-' LANGUAGE plpgsql;
-CREATE TRIGGER todo_created BEFORE INSERT ON todo FOR EACH ROW EXECUTE PROCEDURE on_todo_create();
-CREATE TRIGGER todo_changed BEFORE UPDATE ON todo FOR EACH ROW EXECUTE PROCEDURE on_todo_change();
-
 UPDATE publication SET publication_timecreate=NOW() WHERE publication_timecreate IS NULL;
 ALTER TABLE publication ALTER COLUMN publication_timecreate SET DEFAULT NOW();
 
