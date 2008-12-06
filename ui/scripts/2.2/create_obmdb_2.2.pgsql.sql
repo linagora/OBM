@@ -1606,7 +1606,6 @@ CREATE TABLE p_domain (
 
 CREATE TABLE p_entityright (
     entityright_entity_id integer NOT NULL,
-    entityright_entity_id integer NOT NULL,
     entityright_consumer_id integer NOT NULL,
     entityright_access integer NOT NULL,
     entityright_read integer NOT NULL,
