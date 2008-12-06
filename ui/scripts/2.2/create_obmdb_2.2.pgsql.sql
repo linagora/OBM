@@ -4143,25 +4143,6 @@ ALTER SEQUENCE timetask_timetask_id_seq OWNED BY timetask.timetask_id;
 
 
 --
--- Name: todo_todo_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE todo_todo_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: todo_todo_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE todo_todo_id_seq OWNED BY todo.todo_id;
-
-
---
 -- Name: ugroup_group_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -4835,13 +4816,6 @@ ALTER TABLE tasktype ALTER COLUMN tasktype_id SET DEFAULT nextval('tasktype_task
 --
 
 ALTER TABLE timetask ALTER COLUMN timetask_id SET DEFAULT nextval('timetask_timetask_id_seq'::regclass);
-
-
---
--- Name: todo_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE todo ALTER COLUMN todo_id SET DEFAULT nextval('todo_todo_id_seq'::regclass);
 
 
 --
@@ -6027,14 +6001,6 @@ ALTER TABLE ONLY tasktype
 
 ALTER TABLE ONLY timetask
     ADD CONSTRAINT timetask_pkey PRIMARY KEY (timetask_id);
-
-
---
--- Name: todo_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY todo
-    ADD CONSTRAINT todo_pkey PRIMARY KEY (todo_id);
 
 
 --
@@ -9333,38 +9299,6 @@ ALTER TABLE ONLY timetask
 
 ALTER TABLE ONLY timetask
     ADD CONSTRAINT timetask_userupdate_userobm_id_fkey FOREIGN KEY (timetask_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: todo_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY todo
-    ADD CONSTRAINT todo_domain_id_domain_id_fkey FOREIGN KEY (todo_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: todo_user_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY todo
-    ADD CONSTRAINT todo_user_userobm_id_fkey FOREIGN KEY (todo_user) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: todo_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY todo
-    ADD CONSTRAINT todo_usercreate_userobm_id_fkey FOREIGN KEY (todo_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: todo_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY todo
-    ADD CONSTRAINT todo_userupdate_userobm_id_fkey FOREIGN KEY (todo_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
