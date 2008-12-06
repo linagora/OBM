@@ -221,7 +221,7 @@ sub _getParentDomain {
                        FROM '.$domainTable.'
                        LEFT JOIN '.$sambaTable.' sid ON sid.samba_name=\'samba_sid\' AND sid.samba_domain_id=domain_id
                        LEFT JOIN '.$sambaTable.' pdc ON pdc.samba_name=\'samba_pdc\' AND pdc.samba_domain_id=domain_id
-                       WHERE domain_global = 1';
+                       WHERE domain_global';
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $queryDomain, \$sth ) ) ) {
