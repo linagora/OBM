@@ -101,8 +101,10 @@ sub _init {
     }
 
     # Les alias du domaine
-    if( $domainDesc->{'domain_alias'} ) {
-        my @aliases = split( /\r\n/, $domainDesc->{'domain_alias'} );
+    my $domainAlias = $domainDesc->{'domain_alias'};
+    $domainDesc->{'domain_alias'} = [];
+    if( $domainAlias ) {
+        my @aliases = split( /\r\n/, $domainAlias );
         for( my $i; $i<=$#aliases; $i++ ) {
             if( $aliases[$i] !~ /$OBM::Parameters::regexp::regexp_domain/ ) {
                 $self->_log( 'alias de domaine \''.$aliases[$i].'\' incorrect', 4 );
