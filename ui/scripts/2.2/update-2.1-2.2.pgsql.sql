@@ -812,11 +812,13 @@ SELECT setval('eventcategory1_eventcategory1_id_seq', max(eventcategory1_id)) FR
 INSERT INTO DeletedEvent (deletedevent_id,
   deletedevent_event_id,
   deletedevent_user_id,
+  deletedevent_type,
   deletedevent_timestamp, deletedevent_origin)
 SELECT
   deletedcalendarevent_id,
   deletedcalendarevent_event_id,
   deletedcalendarevent_user_id,
+  'VEVENT',
   deletedcalendarevent_timestamp, 'obm21'
 FROM DeletedCalendarEvent;
 
