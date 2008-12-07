@@ -296,6 +296,7 @@ CREATE TABLE DeletedEvent (
   deletedevent_event_id   integer,
   deletedevent_user_id    integer,
   deletedevent_origin     varchar(255) NOT NULL,
+  deletedevent_type       vcomponent DEFAULT 'VEVENT'::vcomponent,
   deletedevent_timestamp  timestamp
 );
 create INDEX idx_dce_event_id ON DeletedEvent (deletedevent_event_id);

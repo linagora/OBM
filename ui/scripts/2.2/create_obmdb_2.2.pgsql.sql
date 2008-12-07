@@ -598,20 +598,11 @@ CREATE TABLE deletedcontact (
 
 CREATE TABLE deletedevent (
     deletedevent_id integer NOT NULL,
-    deletedevent_event_id integer,
-    deletedevent_user_id integer,
-    deletedevent_origin varchar(255) NOT NULL,
+    deletedevent_event_id  integer,
+    deletedevent_user_id   integer,
+    deletedevent_origin    varchar(255) NOT NULL,
+    deletedevent_type      vcomponent DEFAULT 'VEVENT'::vcomponent,
     deletedevent_timestamp timestamp without time zone
-);
-
-
---
--- Name: deletedtodo; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE deletedtodo (
-    deletedtodo_todo_id integer NOT NULL,
-    deletedtodo_timestamp timestamp without time zone
 );
 
 
@@ -5154,14 +5145,6 @@ ALTER TABLE ONLY deleted
 
 ALTER TABLE ONLY deletedcontact
     ADD CONSTRAINT deletedcontact_pkey PRIMARY KEY (deletedcontact_contact_id);
-
-
---
--- Name: deletedtodo_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY deletedtodo
-    ADD CONSTRAINT deletedtodo_pkey PRIMARY KEY (deletedtodo_todo_id);
 
 
 --

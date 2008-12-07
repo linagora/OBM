@@ -857,26 +857,17 @@ CREATE TABLE `DeletedContact` (
 
 DROP TABLE IF EXISTS `DeletedEvent`;
 CREATE TABLE `DeletedEvent` (
-  `deletedevent_id` int(8) NOT NULL auto_increment,
+  `deletedevent_id`       int(8) NOT NULL auto_increment,
   `deletedevent_event_id` int(8) default NULL,
-  `deletedevent_user_id` int(8) default NULL,
-  `deletedevent_origin` varchar(255) NOT NULL,
+  `deletedevent_user_id`  int(8) default NULL,
+  `deletedevent_origin`   varchar(255) NOT NULL,
+  `deletedevent_type`     enum('VEVENT','VTODO','VJOURNAL','VFREEBUSY') default 'VEVENT',
   `deletedevent_timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`deletedevent_id`),
   KEY `idx_dce_event` (`deletedevent_event_id`),
   KEY `idx_dce_user` (`deletedevent_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `DeletedTodo`
---
-
-DROP TABLE IF EXISTS `DeletedTodo`;
-CREATE TABLE `DeletedTodo` (
-  `deletedtodo_todo_id` int(8) NOT NULL,
-  `deletedtodo_timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`deletedtodo_todo_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Table structure for table `DeletedUser`
