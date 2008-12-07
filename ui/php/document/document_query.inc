@@ -62,10 +62,10 @@ function run_query_document_search($document) {
   }
 
   // User defined data
-  $userdata = of_userdata_query_search("document", $document);
-  if ($userdata["where"] != "") {
-    $where .= " AND ". $userdata["where"];
-    $join_userdata = $userdata["join"];
+  $userdata = of_userdata_query_search('Document', $document);
+  if ($userdata['where'] != '') {
+    $where .= " AND ". $userdata['where'];
+    $join_userdata = $userdata['join'];
   }
   
   $whereq = "WHERE $where $multidomain";

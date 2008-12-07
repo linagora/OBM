@@ -55,12 +55,19 @@ function run_query_group_search($group) {
     $where .= " AND group_privacy = 1";
   }
   // only the one which are allowed (ie. publics )
-  $where .=  " AND " .sql_obm_entity_privacy("group");
+  $where .=  ' AND ' .sql_obm_entity_privacy('group');
+
+  // User defined data
+  $userdata = of_userdata_query_search('Group', $group);
+  if ($userdata['where'] != '') {
+    $where .= ' AND '. $userdata['where'];
+    $join_userdata = $userdata['join'];
+  }
 
   $whereq = "WHERE $where $multidomain";
 
   // ORDER construction
-  $order = (strcmp($sql_order_field,"") != 0) ? $sql_order_field : "group_name";
+  $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'group_name';
   $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "SELECT
@@ -73,7 +80,6 @@ function run_query_group_search($group) {
   group_ext_id,
   group_samba,
   group_gid,
-  group_mailing,
   group_delegation,
   group_manager_id,
   group_name,
@@ -86,6 +92,7 @@ function run_query_group_search($group) {
   B.userobm_login as userupdate,
   count(usergroup.of_usergroup_user_id) as group_nb_user
   FROM UGroup
+  $join_userdata
   LEFT JOIN of_usergroup usergroup ON of_usergroup_group_id=group_id
   LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
   LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
@@ -99,7 +106,6 @@ function run_query_group_search($group) {
   group_ext_id,
   group_samba,
   group_gid,
-  group_mailing,
   group_delegation,
   group_manager_id,
   group_name,
@@ -114,7 +120,7 @@ function run_query_group_search($group) {
   $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM UGroup $join_user $whereq");
+    $count = get_query_count("SELECT count(*) FROM UGroup $join_userdata $join_user $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -217,7 +223,6 @@ function run_query_group_detail($id) {
 
   $query = "SELECT *,
   group_privacy as privacy,
-  group_mailing as mailing,
   $timecreate,
   $timeupdate,
   c.userobm_login as usercreate,
@@ -250,21 +255,19 @@ function run_query_group_insert($group) {
   $system = sql_parse_int($group["system"]);
   $samba = sql_parse_int($group["samba"]);
   $name = $group["name"];
-  $desc = $group["desc"];
-  $email = $group["email"];
-  $priv = sql_parse_int($group["privacy"]);
-  $mailing = sql_parse_int($group["mailing"]);
-  $now = date("Y-m-d H:i:s");
+  $desc = $group['desc'];
+  $email = $group['email'];
+  $priv = sql_parse_int($group['privacy']);
+  $now = date('Y-m-d H:i:s');
   $gid = get_first_group_free_gid();
-  $domain_id = sql_parse_id($obm["domain_id"]);
+  $domain_id = sql_parse_id($obm['domain_id']);
   if ($priv == 1) {
-    $mailing = 0;
     $samba = 0;
     $email = '';
   }
 
   // Delegation handling
-  $q_delegation = of_delegation_query_insert_clauses('group_delegation', stripslashes($group["delegation"]));
+  $q_delegation = of_delegation_query_insert_clauses('group_delegation', stripslashes($group['delegation']));
 
   $query = "INSERT INTO UGroup (
   group_timeupdate,
@@ -279,8 +282,7 @@ function run_query_group_insert($group) {
   group_name
   $q_delegation[field],
   group_desc,
-  group_email,
-  group_mailing
+  group_email
   ) VALUES (
   null,
   '$now',
@@ -294,8 +296,7 @@ function run_query_group_insert($group) {
   '$name'
   $q_delegation[value],
   '$desc',
-  '$email',
-  $mailing
+  '$email'
   )";
 
   display_debug_msg($query, $cdg_sql, "run_query_group_insert()");
@@ -369,11 +370,9 @@ function run_query_group_update($group) {
   $email = $group["email"];
   $manager = sql_parse_id($group["manager"]);
   $priv = sql_parse_int($group["privacy"]);
-  $mailing = sql_parse_int($group["mailing"]);
   $now = date("Y-m-d H:i:s");
   $multidomain = sql_multidomain("group");
   if ($priv == 1) {
-    $mailing = 0;
     $samba = 0;
     $email = "";
   }
@@ -389,7 +388,6 @@ function run_query_group_update($group) {
   group_name='$name',
   group_desc='$desc',
   group_email='$email',
-  group_mailing='$mailing',
   group_manager_id=$manager
   $q_delegation
   WHERE group_id $id

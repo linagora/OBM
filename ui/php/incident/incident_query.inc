@@ -111,7 +111,7 @@ function run_query_incident_search($incident) {
   }
 
   // User defined data
-  $userdata = of_userdata_query_search('incident', $incident);
+  $userdata = of_userdata_query_search('Incident', $incident);
   if ($userdata['where'] != '') {
     $where .= ' AND '. $userdata['where'];
     $join_userdata = $userdata['join'];

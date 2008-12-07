@@ -187,22 +187,22 @@ function run_query_contact_search($contact) {
     $where .= ' AND contact_mailing_ok=1';
   }
   if ($privacy == $c_public) {
-    $where .= " AND contact_privacy = 0";
+    $where .= ' AND contact_privacy = 0';
   } elseif ($privacy == $c_private) { 
-    $where .= " AND contact_privacy = 1";
+    $where .= ' AND contact_privacy = 1';
   }  
   if ($newsletter == '1') {
     $where .= ' AND contact_newsletter=1';
   }
   // Get only not archived by default
   if ($archive != '1') {
-    $where .= " AND contact_archive=0";
+    $where .= ' AND contact_archive=0';
   } elseif ($cgp_archive_only) {
-    $where .= " AND contact_archive=1";
+    $where .= ' AND contact_archive=1';
   }
 
   // User defined data
-  $userdata = of_userdata_query_search('contact', $contact);
+  $userdata = of_userdata_query_search('Contact', $contact);
   if ($userdata['where'] != '') {
     $where .= ' AND '. $userdata['where'];
     $join_userdata = $userdata['join'];
@@ -269,7 +269,7 @@ function run_query_contact_search($contact) {
     contactfunction_label as function_label
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-    ";
+";
 
   // XXX Really strange Postgres (8.1.5) behaviour here !
   // if $join_userdata after join_comp, query is really slow (30s) with only

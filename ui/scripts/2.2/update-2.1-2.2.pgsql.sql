@@ -1,3 +1,7 @@
+-- Write that the 2.1->2.2 has started
+UPDATE ObmInfo SET obminfo_value='2.1->2.2' WHERE obminfo_name='db_version';
+
+
 --  _________________
 -- | Tables creation |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -1061,6 +1065,7 @@ INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profile
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default) VALUES ('admin_realm', 'text', '');
 INSERT INTO ProfileProperty (profileproperty_name, profileproperty_type, profileproperty_default, profileproperty_readonly) VALUES ('last_public_contact_export', 'timestamp', 0, 1);
 
+
 -- --------------------
 -- Entity tables update
 -- --------------------
@@ -1285,6 +1290,69 @@ UPDATE EventLink SET eventlink_entity_id = (SELECT resourceentity_entity_id FROM
 -- FIXME : Task not handle
 DELETE FROM EventLink where eventlink_entity != 'task';
 ALTER TABLE EventLink DROP COLUMN eventlink_entity;
+
+
+-- -----------------------------------------
+-- Updates that need to be after Entity work
+-- -----------------------------------------
+
+-- Update entity sequence
+SELECT setval('entity_entity_id_seq', max(entity_id)) FROM Entity;
+
+-- Migration of group_mailing to a category
+INSERT INTO Category (
+  category_domain_id,
+  category_category,
+  category_code,
+  category_label)
+SELECT domain_id,
+  'groupcategory',
+  '1',
+  'external address'
+FROM Domain
+WHERE domain_global is not true;
+  
+INSERT INTO CategoryLink (
+  categorylink_category_id,
+  categorylink_entity_id,
+  categorylink_category)
+SELECT category_id,
+  groupentity_entity_id,
+  'groupcategory'
+FROM Category, GroupEntity
+LEFT JOIN UGroup ON groupentity_group_id=group_id
+WHERE category_category='groupcategory' AND category_label='external address'
+  AND group_mailing = 1;
+
+ALTER TABLE UGroup DROP COLUMN group_mailing;
+ALTER TABLE P_UGroup DROP COLUMN group_mailing;
+
+
+-- Create links from "todos" to users (need to be after userentity..)
+INSERT INTO EventLink (
+  eventlink_timeupdate,
+  eventlink_timecreate,
+  eventlink_userupdate,
+  eventlink_usercreate,
+  eventlink_event_id,
+  eventlink_entity_id,
+  eventlink_state,
+  eventlink_required,
+  eventlink_percent)
+SELECT
+  todo_timeupdate,
+  todo_timecreate,
+  todo_userupdate,
+  todo_usercreate,
+  event_id,
+  userentity_entity_id,
+  'ACCEPTED',
+  'REQ',
+  todo_percent
+FROM Todo
+LEFT JOIN Event on todo_usercreate=event_usercreate and todo_timecreate=event_timecreate and todo_timeupdate=event_timeupdate and todo_user=event_owner and todo_title=event_title
+LEFT JOIN UserEntity on todo_user=userentity_user_id;
+
 
 -- ------------------------------
 -- Prepare value for foreign keys
@@ -2672,32 +2740,6 @@ CREATE TABLE P_MailboxEntity (LIKE MailboxEntity);
 CREATE TABLE P_MailshareEntity (LIKE MailshareEntity);
 
 
--- Create links from "todos" to users (need to be after userentity..)
-INSERT INTO EventLink (
-  eventlink_timeupdate,
-  eventlink_timecreate,
-  eventlink_userupdate,
-  eventlink_usercreate,
-  eventlink_event_id,
-  eventlink_entity_id,
-  eventlink_state,
-  eventlink_required,
-  eventlink_percent)
-SELECT
-  todo_timeupdate,
-  todo_timecreate,
-  todo_userupdate,
-  todo_usercreate,
-  event_id,
-  userentity_entity_id,
-  'ACCEPTED',
-  'REQ',
-  todo_percent
-FROM Todo
-LEFT JOIN Event on todo_usercreate=event_usercreate and todo_timecreate=event_timecreate and todo_timeupdate=event_timeupdate and todo_user=event_owner
-LEFT JOIN UserEntity on todo_user=userentity_user_id;
-
-
 --  _________________
 -- | Drop old tables |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -2708,3 +2750,6 @@ DROP TABLE CalendarEvent;
 DROP TABLE CalendarCategory1;
 DROP TABLE Todo;
 DROP TABLE TmpEntity;
+
+-- Write that the 2.1->2.2 is completed
+UPDATE ObmInfo SET obminfo_value='2.2' WHERE obminfo_name='db_version';

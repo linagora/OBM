@@ -110,7 +110,7 @@ function run_query_company_search($company) {
   }
 
   // User defined data
-  $userdata = of_userdata_query_search('company', $company);
+  $userdata = of_userdata_query_search('Company', $company);
   if ($userdata['where'] != '') {
     $where .= " $and ". $userdata['where'];
     $join_userdata = $userdata['join'];

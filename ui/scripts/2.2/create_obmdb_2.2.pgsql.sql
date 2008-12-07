@@ -1740,7 +1740,6 @@ CREATE TABLE p_ugroup (
     group_ext_id integer,
     group_samba integer,
     group_gid integer,
-    group_mailing integer,
     group_delegation character varying(64),
     group_manager_id integer,
     group_name character varying(32) NOT NULL,

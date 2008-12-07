@@ -131,7 +131,7 @@ function run_query_deal_search($deal, $all='') {
   }
 
   // User defined data
-  $userdata = of_userdata_query_search('deal', $deal);
+  $userdata = of_userdata_query_search('Deal', $deal);
   if ($userdata['where'] != '') {
     $where .= ' AND '. $userdata['where'];
     $join_userdata = $userdata['join'];

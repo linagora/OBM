@@ -92,10 +92,12 @@ function html_import_search_form ($import, $dsrc_q, $users) {
   // Marketing manager select
   $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
     <option value=\"$c_all\">$l_all</option>";
-  foreach($users as $u_id => $one_user) {
-    $sel_market .= "\n<option value=\"$u_id\"";
-    if ($u_id == $market) { $sel_market .= " selected=\"selected\""; }
-    $sel_market .= '>'. $one_user['lastname'].' '.$one_user['firstname'] . "</option>\n";
+  if (is_array($users) && (count($users) > 0)) {
+    foreach($users as $u_id => $one_user) {
+      $sel_market .= "\n<option value=\"$u_id\"";
+      if ($u_id == $market) { $sel_market .= " selected=\"selected\""; }
+      $sel_market .= '>'. $one_user['lastname'].' '.$one_user['firstname'] . "</option>\n";
+    }
   }
   $sel_market .= '</select>';
 

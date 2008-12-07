@@ -1612,41 +1612,46 @@ function of_userdata_dis_admin_form($entity) {
 //   - $params : array with parameters
 //   - $table : tablename of entity if different
 ///////////////////////////////////////////////////////////////////////////////
-function of_userdata_query_search($entity, $params, $table='') {
+function of_userdata_query_search($uentity, $params, $table='') {
   global $cgp_user, $c_all, $c_none;
 
+  $entity = strtolower($uentity);
   $entitytablefield = strtolower($entity);
 
   // User defined categories
-  if (is_array($cgp_user[$entity]["category"])) {
-    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+  if (is_array($cgp_user[$entity]['category'])) {
+    foreach($cgp_user[$entity]['category'] as $cat_name => $one_cat) {
       $cat = $params[$cat_name];
       $cat_tree = $params["${cat_name}_tree"];
       $cat_code = $params["${cat_name}_code"];
       $tlink = "${cat_name}_link";
 
-      if (($cat != $c_all) && ($cat != $c_none) && ($cat != "")) {
-	$where_cat_user = "";
-	$join_cat_user .= "LEFT JOIN CategoryLink AS $tlink
-          ON ${entitytablefield}_entity_id=$tlink.categorylink_entity_id
+      if (($cat != $c_all) && ($cat != $c_none) && ($cat != '')) {
+	$where_cat_user = '';
+	$entent = "${entitytablefield}entity";
+	$join_cat_user .= " LEFT JOIN ${uentity}Entity ON ${entitytablefield}_id=${entent}_${entitytablefield}_id
+          LEFT JOIN CategoryLink AS $tlink
+          ON ${entent}_entity_id=$tlink.categorylink_entity_id
           AND $tlink.categorylink_category='$cat_name'";
 	if ($cat_tree) {
-	  $join_cat_user .= " LEFT JOIN Category AS $cat_name ON $tlink.categorylink_category_id=$cat_name.category_id";
-	  $where_cat_user = " OR $cat_name.category_code like '$cat_code%'";
+	  $join_cat_user .= " LEFT JOIN Category AS cat_$cat_name ON $tlink.categorylink_category_id=cat_$cat_name.category_id";
+	  $where_cat_user = " OR cat_$cat_name.category_code like '$cat_code%'";
 	}
 	$where .= " $and ($tlink.categorylink_category_id='$cat' $where_cat_user)";
-	$and = "AND";
+	$and = 'AND';
       } else if ($cat == $c_none) {
-	$join_cat_user .= " LEFT JOIN CategoryLink AS $tlink
-          ON ${entitytablefield}__entity_id=$tlink.categorylink_entity_id
+	$entent = "${entitytablefield}entity";
+	$join_cat_user .= " LEFT JOIN ${uentity}Entity ON ${entitytablefield}_id=${entent}_${entitytablefield}_id
+          LEFT JOIN CategoryLink AS $tlink
+          ON ${entent}_entity_id=$tlink.categorylink_entity_id
           AND $tlink.categorylink_category='$cat_name'";
 	$where .= " $and $tlink.categorylink_category_id IS NULL";
-	$and = "AND";
+	$and = 'AND';
       }
     }
   }
-  $ret["where"] = $where;
-  $ret["join"] = $join_cat_user;
+  $ret['where'] = $where;
+  $ret['join'] = $join_cat_user;
 
   return $ret;
 }

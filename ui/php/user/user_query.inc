@@ -145,7 +145,7 @@ function run_query_user_search($user) {
   }
 
   // User defined data
-  $userdata = of_userdata_query_search('user', $user, 'UserObm');
+  $userdata = of_userdata_query_search('User', $user, 'UserObm');
   if ($userdata['where'] != '') {
     if (trim($where) != '') $where .= ' AND ';
     $where .= $userdata['where'];

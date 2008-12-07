@@ -1,3 +1,7 @@
+-- Write that the 2.1->2.2 has started
+UPDATE ObmInfo SET obminfo_value='2.1->2.2' WHERE obminfo_name='db_version';
+
+
 --  _________________
 -- | Tables creation |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -1335,6 +1339,40 @@ UPDATE EventLink SET eventlink_entity_id = (SELECT resourceentity_entity_id FROM
 DELETE FROM EventLink where eventlink_entity != 'entity';
 ALTER TABLE EventLink DROP COLUMN eventlink_entity;
 
+
+-- -----------------------------------------
+-- Updates that need to be after Entity work
+-- -----------------------------------------
+
+-- Migration of group_mailing to a category
+INSERT INTO Category (
+  category_domain_id,
+  category_category,
+  category_code,
+  category_label)
+SELECT domain_id,
+  'groupcategory',
+  '1',
+  'external address'
+FROM Domain
+WHERE domain_global is not true;
+  
+INSERT INTO CategoryLink (
+  categorylink_category_id,
+  categorylink_entity_id,
+  categorylink_category)
+SELECT category_id,
+  groupentity_entity_id,
+  'groupcategory'
+FROM Category, GroupEntity
+LEFT JOIN UGroup ON groupentity_group_id=group_id
+WHERE category_category='groupcategory' AND category_label='external address'
+  AND group_mailing = 1;
+
+ALTER TABLE UGroup DROP COLUMN group_mailing;
+ALTER TABLE P_UGroup DROP COLUMN group_mailing;
+
+
 -- ------------------------------
 -- Prepare value for foreign keys
 -- ------------------------------
@@ -2248,7 +2286,7 @@ SELECT
   'REQ',
   todo_percent
 FROM Todo
-LEFT JOIN Event on todo_usercreate=event_usercreate and todo_timecreate=event_timecreate and todo_timeupdate=event_timeupdate and todo_user=event_owner
+LEFT JOIN Event on todo_usercreate=event_usercreate and todo_timecreate=event_timecreate and todo_timeupdate=event_timeupdate and todo_user=event_owner and todo_title=event_title
 LEFT JOIN UserEntity on todo_user=userentity_user_id;
 
 
@@ -2263,3 +2301,6 @@ DROP TABLE CalendarEvent;
 DROP TABLE CalendarCategory1;
 DROP TABLE Todo;
 DROP TABLE TmpEntity;
+
+-- Write that the 2.1->2.2 is completed
+UPDATE ObmInfo SET obminfo_value='2.2' WHERE obminfo_name='db_version';

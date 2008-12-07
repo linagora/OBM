@@ -2309,7 +2309,6 @@ CREATE TABLE `P_UGroup` (
   `group_ext_id` varchar(24) default NULL,
   `group_samba` int(1) default '0',
   `group_gid` int(8) default NULL,
-  `group_mailing` int(1) default '0',
   `group_delegation` varchar(64) default '',
   `group_manager_id` int(8) default NULL,
   `group_name` varchar(32) NOT NULL,

@@ -20,7 +20,6 @@ $fieldnames['group_ext_id'] = $l_ext_id;
 $fieldnames['group_samba'] = $l_smb;
 $fieldnames['group_desc'] = $l_desc;
 $fieldnames['group_email'] = $l_email;
-$fieldnames['group_mailing'] = $l_mailing;
 $fieldnames['usercreate'] = $l_creator;
 $fieldnames['userupdate'] = $l_updater;
 $fieldnames['timecreate'] = $l_date_creation;
@@ -137,16 +136,6 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if ($fieldname == 'group_mailing') {
-    $res['align'] = 'center';
-    if ($OD->data_set->f($fieldname)) {
-      $res['name'] = 'X';
-    } else {
-      $res['name'] = '&nbsp;';
-      $res['txt_name'] = ' ';
-    }
-  }
-
   return $res;
 }
 
@@ -159,7 +148,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_search_form ($group) {
   global $display, $l_name, $l_group_user, $l_email, $l_find, $l_add_groups;
-  global $l_visibility, $l_mailing;
+  global $l_visibility;
  
   $popup = $group['popup'];
 
@@ -207,7 +196,9 @@ function html_group_search_form ($group) {
   $email = stripslashes($group['email']);
   $user = stripslashes($group['user']);
   $privacy = $group['privacy'];
-  $mailing = $group['mailing'];
+
+  // User defined data
+  $block_userdata .= of_userdata_dis_search('group', $group);
 
   $sel_privacy = dis_privacy_search_select($privacy);
 
@@ -231,6 +222,7 @@ function html_group_search_form ($group) {
     <label>$l_visibility<br />
       $sel_privacy
     </label>
+    $block_userdata
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
@@ -412,7 +404,7 @@ function dis_group_consult($group, $uid) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $l_yes, $l_no, $ico_mail, $l_undef, $c_undef;
-  global $l_group, $l_name, $l_desc, $l_email, $l_mailing, $l_no_user, $l_no_group_group;
+  global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
   global $l_system, $l_local, $l_ext_id, $l_smb, $l_no,$l_yes;
   global $l_visibility, $l_private, $l_public, $l_manager;  
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
@@ -434,7 +426,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $delegation = $group_q->f('group_delegation');
   $desc = $group_q->f('group_desc');
   $email = $group_q->f('group_email');
-  $mailing = ($group_q->f('group_mailing') == 1 ? $l_yes : $l_no);
   $manager = $group_q->f('userobm_lastname').' '.$group_q->f('userobm_firstname');
 
   $dis_email = get_entity_email($email);
@@ -443,10 +434,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     $dis_email = "<tr>
       <th>$l_email</th>
       <td>$dis_email</td>
-      </tr>
-      <tr>
-        <th>$l_mailing</th>
-        <td>$mailing</td>
       </tr>";
 
     if ($cgp_use['service']['samba']) {
@@ -621,7 +608,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_form($action, $group_q, $group, $field='') {
   global $obm, $perm, $cgroup_private_default, $cgp_use, $cright_write_admin;
-  global $display, $l_group, $l_name, $l_desc, $l_smb, $l_email, $l_mailing;
+  global $display, $l_group, $l_name, $l_desc, $l_smb, $l_email;
   global $l_private, $l_public, $l_insert, $l_update, $l_back, $l_no,$l_yes;
   global $l_manager, $c_undef, $l_undef, $l_header_new;
 
@@ -637,7 +624,6 @@ function html_group_form($action, $group_q, $group, $field='') {
     $desc = $group_q->f('group_desc');
     $email = $group_q->f('group_email');
     $priv = $group_q->f('privacy');
-    $mailing = $group_q->f('group_mailing');
     $dis_title = $name;
   } elseif ($action == 'new') {
     if (!isset($group['privacy']) && $cgroup_private_default) {
@@ -653,16 +639,10 @@ function html_group_form($action, $group_q, $group, $field='') {
   if (isset($group['desc'])) { $desc = stripslashes($group['desc']); }
   if (isset($group['email'])) { $email = stripslashes($group['email']); }
   if (isset($group['privacy'])) { $priv = stripslashes($group['privacy']); }
-  if (isset($group['mailing'])) { $mailing = stripslashes($group['mailing']); }
 
   // Mark the error field
   if ($field != '') {
     $class[$field] = 'error';
-  }
-
-  // Mailing checkbox
-  if ($mailing == '1') {
-    $mailing_c = ' checked';
   }
 
   $block_userdata = of_userdata_dis_entity_form('group', $id, $group);
@@ -694,19 +674,12 @@ function html_group_form($action, $group_q, $group, $field='') {
             $('sambaGroup').addClass('H');
             input.form.cb_samba.checked = false;
           }
-          if($('mailingGroup')) {
-            $('mailingGroup').addClass('H');
-            input.form.cb_mailing.checked = false;
-          }
         } else {
           if($('emailGroup')) {
             $('emailGroup').removeClass('H')
           }
           if($('sambaGroup')) {
             $('sambaGroup').removeClass('H');
-          }
-          if($('mailingGroup')) {
-            $('mailingGroup').removeClass('H');
           }
         }
       }
@@ -740,13 +713,6 @@ function html_group_form($action, $group_q, $group, $field='') {
     $block_email = "
     <tr id=\"emailGroup\" class=\"$mail_class\">
       $dis_mail
-    </tr>
-    ";
-  
-    $block_mailing = "
-    <tr id=\"mailingGroup\" class=\"$mail_class\">
-      <th>$l_mailing</th>
-      <td><input name=\"cb_mailing\" type=\"checkbox\" value=\"1\" $mailing_c /></td>
     </tr>";
   }
 
@@ -797,7 +763,6 @@ function html_group_form($action, $group_q, $group, $field='') {
   </tr>
   $block_samba
   $block_email
-  $block_mailing
   </table>
   </fieldset>
 
@@ -886,7 +851,6 @@ function dis_group_warn_insert($id, $g_q, $group) {
   $desc = $group['desc'];
   $samba = $group['samba'];
   $email = $group['email'];
-  $mailing = $group['mailing'];
   $privacy = $group['privacy'];
 
   $display['msg'] .= display_warn_msg($l_check_samegroup);
@@ -906,7 +870,6 @@ function dis_group_warn_insert($id, $g_q, $group) {
     <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
     <input type=\"hidden\" name=\"cba_samba\" value=\"$samba\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-    <input type=\"hidden\" name=\"cba_mailing\" value=\"$mailing\" />
     <input type=\"hidden\" name=\"cba_privacy\" value=\"$privacy\" />
 ";
 
