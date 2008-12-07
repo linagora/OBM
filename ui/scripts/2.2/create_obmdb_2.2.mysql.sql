@@ -1673,6 +1673,7 @@ CREATE TABLE `Lead` (
   `lead_manager_id` int(8) default NULL,
   `lead_company_id` int(8) NOT NULL,
   `lead_contact_id` int(8) default NULL,
+  `lead_priority` int(2) default 0,
   `lead_privacy` int(2) NOT NULL default '0',
   `lead_name` varchar(64) default NULL,
   `lead_date` date default NULL,

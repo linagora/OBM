@@ -1261,6 +1261,7 @@ CREATE TABLE lead (
     lead_company_id integer NOT NULL,
     lead_contact_id integer,
     lead_privacy integer DEFAULT 0,
+    lead_priority integer DEFAULT 0,
     lead_name character varying(64),
     lead_date date,
     lead_datealarm date,

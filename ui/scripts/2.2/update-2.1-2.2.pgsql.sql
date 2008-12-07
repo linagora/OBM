@@ -884,6 +884,7 @@ ALTER TABLE LeadStatus ALTER COLUMN leadstatus_domain_id SET NOT NULL;
 ALTER TABLE Lead ALTER COLUMN lead_domain_id SET NOT NULL;
 ALTER TABLE Lead ALTER COLUMN lead_source_id SET default NULL;
 ALTER TABLE Lead ALTER COLUMN lead_manager_id SET default NULL;
+ALTER TABLE Lead ADD COLUMN lead_priority integer DEFAULT 0;
 ALTER TABLE ParentDeal ALTER COLUMN parentdeal_domain_id SET NOT NULL;
 ALTER TABLE Deal ALTER COLUMN deal_domain_id SET NOT NULL;
 ALTER TABLE DealStatus ALTER COLUMN dealstatus_domain_id SET NOT NULL;

@@ -929,6 +929,7 @@ ALTER TABLE Invoice MODIFY COLUMN invoice_status_id int(4) NOT NULL ;
 ALTER TABLE Kind MODIFY COLUMN kind_domain_id int(8) NOT NULL ;
 ALTER TABLE Lead MODIFY COLUMN lead_domain_id int(8) NOT NULL ;
 ALTER TABLE Lead MODIFY COLUMN lead_company_id int(8) NOT NULL ;
+ALTER TABLE Lead ADD COLUMN lead_priority int(2) DEFAULT 0;
 ALTER TABLE LeadSource MODIFY COLUMN leadsource_domain_id int(8) NOT NULL ;
 ALTER TABLE LeadStatus MODIFY COLUMN leadstatus_domain_id int(8) NOT NULL ;
 ALTER TABLE List MODIFY COLUMN list_domain_id int(8) NOT NULL ;
