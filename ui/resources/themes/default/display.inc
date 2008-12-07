@@ -334,7 +334,7 @@ function display_head_theme($p_module) {
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
   global $css_print_obm, $ico_delete, $ico_update, $output_target,$l_transparent;
-  global $l_autocomplete_field, $l_fatal_server_err;
+  global $l_autocomplete_field, $l_fatal_server_err, $gwt_js_include;
 
   $css = $css_obm;
 
@@ -443,7 +443,7 @@ function display_head_theme($p_module) {
   }
 
   obm.initialize.chain(datePickerGenerator);
-  window.addEvent('domready', function () {
+  window.addEvent('load', function () {
     while(obm.initialize.\$chain && obm.initialize.\$chain.length > 0) {
       obm.initialize.callChain();
     }

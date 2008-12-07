@@ -81,9 +81,7 @@ DROP TABLE IF EXISTS `Address`;
 CREATE TABLE `Address` (
   `address_id` int(8) NOT NULL auto_increment,
   `address_entity_id` int(8) NOT NULL,
-  `address_street1` varchar(255) default NULL,
-  `address_street2` varchar(255) default NULL,
-  `address_street3` varchar(2555) default NULL,
+  `address_street` text default NULL,
   `address_zipcode` varchar(14) default NULL,
   `address_town` varchar(128) default NULL,
   `address_expresspostal` varchar(16) default NULL,
@@ -200,17 +198,6 @@ CREATE TABLE `Company` (
   `company_activity_id` int(8) default NULL,
   `company_nafcode_id` int(8) default NULL,
   `company_marketingmanager_id` int(8) default NULL,
-  `company_address1` varchar(64) default NULL,
-  `company_address2` varchar(64) default NULL,
-  `company_address3` varchar(64) default NULL,
-  `company_zipcode` varchar(14) default NULL,
-  `company_town` varchar(64) default NULL,
-  `company_expresspostal` varchar(16) default NULL,
-  `company_country_iso3166` char(2) default '0',
-  `company_phone` varchar(32) default NULL,
-  `company_fax` varchar(32) default NULL,
-  `company_web` varchar(64) default NULL,
-  `company_email` varchar(64) default NULL,
   `company_contact_number` int(5) NOT NULL default '0',
   `company_deal_number` int(5) NOT NULL default '0',
   `company_deal_total` int(5) NOT NULL default '0',
@@ -340,21 +327,8 @@ CREATE TABLE `Contact` (
   `contact_aka` varchar(255) default NULL,
   `contact_sound` varchar(48) default NULL,
   `contact_service` varchar(64) default NULL,
-  `contact_address1` varchar(64) default NULL,
-  `contact_address2` varchar(64) default NULL,
-  `contact_address3` varchar(64) default NULL,
-  `contact_zipcode` varchar(14) default NULL,
-  `contact_town` varchar(64) default NULL,
-  `contact_expresspostal` varchar(16) default NULL,
-  `contact_country_iso3166` char(2) default '0',
   `contact_function_id` int(8) default NULL,
   `contact_title` varchar(64) default NULL,
-  `contact_phone` varchar(32) default NULL,
-  `contact_homephone` varchar(32) default NULL,
-  `contact_mobilephone` varchar(32) default NULL,
-  `contact_fax` varchar(32) default NULL,
-  `contact_email` varchar(128) default NULL,
-  `contact_email2` varchar(128) default NULL,
   `contact_mailing_ok` char(1) default '0',
   `contact_newsletter` char(1) default '0',
   `contact_archive` char(1) default '0',
@@ -1098,37 +1072,6 @@ CREATE TABLE `DomainPropertyValue` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `DomainService`
---
-
-DROP TABLE IF EXISTS `DomainService`;
-CREATE TABLE `DomainService` (
-  `domainservice_service_id` int(8) NOT NULL,
-  `domainservice_domain_id` int(8) NOT NULL,
-  PRIMARY KEY  (`domainservice_service_id`,`domainservice_domain_id`),
-  KEY `domainservice_service_id_domainservice_domain_id_fkey` (`domainservice_service_id`),
-  KEY `domainservice_domain_id_domain_id_fkey` (`domainservice_domain_id`),
-  CONSTRAINT `domainservice_service_id_domainservice_domain_id_fkey` FOREIGN KEY (`domainservice_service_id`) REFERENCES `ServiceDomain` (`servicedomain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `domainservice_domain_id_domain_id_fkey` FOREIGN KEY (`domainservice_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `DomainServiceValue`
---
-
-DROP TABLE IF EXISTS `DomainServiceValue`;
-CREATE TABLE `DomainServiceValue` (
-  `domainservicevalue_serviceproperty_id` int(8) NOT NULL,
-  `domainservicevalue_domain_id` int(8) NOT NULL,
-  `domainservicevalue_value` text,
-  PRIMARY KEY  (`domainservicevalue_serviceproperty_id`,`domainservicevalue_domain_id`),
-  KEY `domainservicevalue_serviceproperty_id_serviceproperty_id_fkey` (`domainservicevalue_serviceproperty_id`),
-  KEY `domainservicevalue_domain_id_domain_id_fkey` (`domainservicevalue_domain_id`),
-  CONSTRAINT `domainservicevalue_serviceproperty_id_serviceproperty_id_fkey` FOREIGN KEY (`domainservicevalue_serviceproperty_id`) REFERENCES `ServicePropertyDomain` (`servicepropertydomain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `domainservicevalue_domain_id_domain_id_fkey` FOREIGN KEY (`domainservicevalue_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
 -- Table structure for table `Email`
 --
 
@@ -1409,34 +1352,35 @@ CREATE TABLE `HostEntity` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `HostService`
+-- Table structure for table `ServiceProperty`
 --
 
-DROP TABLE IF EXISTS `HostService`;
-CREATE TABLE `HostService` (
-  `hostservice_service_id` int(8) NOT NULL,
-  `hostservice_host_id` int(8) NOT NULL,
-  PRIMARY KEY  (`hostservice_service_id`,`hostservice_host_id`),
-  KEY `hostservice_service_id_hostservice_host_id_fkey` (`hostservice_service_id`),
-  KEY `hostservice_host_id_host_id_fkey` (`hostservice_host_id`),
-  CONSTRAINT `hostservice_service_id_hostservice_host_id_fkey` FOREIGN KEY (`hostservice_service_id`) REFERENCES `ServiceHost` (`servicehost_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `hostservice_host_id_host_id_fkey` FOREIGN KEY (`hostservice_host_id`) REFERENCES `Host` (`host_id`) ON DELETE CASCADE ON UPDATE CASCADE
+DROP TABLE IF EXISTS `ServiceProperty`;
+CREATE TABLE `ServiceProperty` (
+  `serviceproperty_id` int(8) auto_increment,
+  `serviceproperty_service` varchar(255) NOT NULL,
+  `serviceproperty_property` varchar(255) NOT NULL,
+  `serviceproperty_entity_id` int(8) NOT NULL,
+  PRIMARY KEY  (`serviceproperty_id`),
+  KEY `serviceproperty_service_key` (`serviceproperty_service`),
+  KEY `serviceproperty_property_key` (`serviceproperty_property`),
+  KEY `serviceproperty_entity_id_entity_id_fkey` (`serviceproperty_entity_id`),
+  CONSTRAINT `serviceproperty_entity_id_entity_id_fkey` FOREIGN KEY (`serviceproperty_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `HostServiceValue`
+-- Table structure for table `Service`
 --
 
-DROP TABLE IF EXISTS `HostServiceValue`;
-CREATE TABLE `HostServiceValue` (
-  `hostservicevalue_serviceproperty_id` int(8) NOT NULL,
-  `hostservicevalue_host_id` int(8) NOT NULL,
-  `hostservicevalue_value` text,
-  PRIMARY KEY  (`hostservicevalue_serviceproperty_id`,`hostservicevalue_host_id`),
-  KEY `hostservicevalue_serviceproperty_id_serviceproperty_id_fkey` (`hostservicevalue_serviceproperty_id`),
-  KEY `hostservicevalue_host_id_host_id_fkey` (`hostservicevalue_host_id`),
-  CONSTRAINT `hostservicevalue_serviceproperty_id_serviceproperty_id_fkey` FOREIGN KEY (`hostservicevalue_serviceproperty_id`) REFERENCES `ServicePropertyHost` (`servicepropertyhost_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `hostservicevalue_host_id_host_id_fkey` FOREIGN KEY (`hostservicevalue_host_id`) REFERENCES `Host` (`host_id`) ON DELETE CASCADE ON UPDATE CASCADE
+DROP TABLE IF EXISTS `Service`;
+CREATE TABLE `Service` (
+  `service_id` int(8) auto_increment,
+  `service_service` varchar(255) NOT NULL,
+  `service_entity_id` int(8) NOT NULL,
+  PRIMARY KEY  (`service_id`),
+  KEY `service_service_key` (`service_service`),
+  KEY `service_entity_id_entity_id_fkey` (`service_entity_id`),
+  CONSTRAINT `service_entity_id_entity_id_fkey` FOREIGN KEY (`service_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -3091,85 +3035,6 @@ CREATE TABLE `Samba` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `Service`
---
-
-DROP TABLE IF EXISTS `Service`;
-CREATE TABLE `Service` (
-  `service_id` int(8) NOT NULL auto_increment,
-  `service_key` varchar(255) default NULL,
-  PRIMARY KEY  (`service_id`),
-  UNIQUE KEY `service_key` (`service_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `ServiceDomain`
---
-
-DROP TABLE IF EXISTS `ServiceDomain`;
-CREATE TABLE `ServiceDomain` (
-  `servicedomain_id` int(8) NOT NULL,
-  PRIMARY KEY  (`servicedomain_id`),
-  KEY `servicedomain_id_service_id_fkey` (`servicedomain_id`),
-  CONSTRAINT `servicedomain_id_service_id_fkey` FOREIGN KEY (`servicedomain_id`) REFERENCES `Service` (`service_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `ServiceHost`
---
-
-DROP TABLE IF EXISTS `ServiceHost`;
-CREATE TABLE `ServiceHost` (
-  `servicehost_id` int(8) NOT NULL,
-  PRIMARY KEY  (`servicehost_id`),
-  KEY `servicehost_id_service_id_fkey` (`servicehost_id`),
-  CONSTRAINT `servicehost_id_service_id_fkey` FOREIGN KEY (`servicehost_id`) REFERENCES `Service` (`service_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `ServiceProperty`
---
-
-DROP TABLE IF EXISTS `ServiceProperty`;
-CREATE TABLE `ServiceProperty` (
-  `serviceproperty_id` int(8) NOT NULL auto_increment,
-  `serviceproperty_service_id` int(8) NOT NULL,
-  `serviceproperty_key` varchar(255) default NULL,
-  `serviceproperty_default` text,
-  `serviceproperty_type` varchar(255) default NULL,
-  `serviceproperty_min` tinyint(4) default NULL,
-  `serviceproperty_max` tinyint(4) default NULL,
-  PRIMARY KEY  (`serviceproperty_id`),
-  UNIQUE KEY `serviceproperty_key` (`serviceproperty_key`),
-  KEY `serviceproperty_service_id_service_id_fkey` (`serviceproperty_service_id`),
-  CONSTRAINT `serviceproperty_service_id_service_id_fkey` FOREIGN KEY (`serviceproperty_service_id`) REFERENCES `Service` (`service_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `ServicePropertyDomain`
---
-
-DROP TABLE IF EXISTS `ServicePropertyDomain`;
-CREATE TABLE `ServicePropertyDomain` (
-  `servicepropertydomain_id` int(8) NOT NULL,
-  PRIMARY KEY  (`servicepropertydomain_id`),
-  KEY `servicepropertydomain_id_serviceproperty_id_fkey` (`servicepropertydomain_id`),
-  CONSTRAINT `servicepropertydomain_id_serviceproperty_id_fkey` FOREIGN KEY (`servicepropertydomain_id`) REFERENCES `ServiceProperty` (`serviceproperty_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `ServicePropertyHost`
---
-
-DROP TABLE IF EXISTS `ServicePropertyHost`;
-CREATE TABLE `ServicePropertyHost` (
-  `servicepropertyhost_id` int(8) NOT NULL,
-  PRIMARY KEY  (`servicepropertyhost_id`),
-  KEY `servicepropertyhost_id_serviceproperty_id_fkey` (`servicepropertyhost_id`),
-  CONSTRAINT `servicepropertyhost_id_serviceproperty_id_fkey` FOREIGN KEY (`servicepropertyhost_id`) REFERENCES `ServiceProperty` (`serviceproperty_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
 -- Table structure for table `Stats`
 --
 
@@ -3564,6 +3429,18 @@ CREATE TABLE `UserSystem` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- Table structure for table `SSOTicket`
+--
+DROP TABLE IF EXISTS `SSOTicket`;
+CREATE TABLE `SSOTicket` (
+  `ssoticket_ticket` varchar(255) NOT NULL,
+  `ssoticket_user_id` int(8),
+  `ssoticket_timestamp` timestamp NOT NULL,
+  PRIMARY KEY (`ssoticket_ticket`),
+  KEY `ssoticket_user_id_userobm_id_fkey` (`ssoticket_user_id`),  
+  CONSTRAINT `ssoticket_user_id_userobm_id_fkey` FOREIGN KEY (`ssoticket_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+--
 -- Table structure for table `Website`
 --
 
@@ -3591,6 +3468,20 @@ CREATE TABLE `of_usergroup` (
   CONSTRAINT `of_usergroup_user_id_userobm_id_fkey` FOREIGN KEY (`of_usergroup_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `of_usergroup_group_id_group_id_fkey` FOREIGN KEY (`of_usergroup_group_id`) REFERENCES `UGroup` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `TaskEvent`
+--
+
+DROP TABLE IF EXISTS `TaskEvent`;
+CREATE TABLE TaskEvent (
+  taskevent_task_id int(8) NOT NULL,
+  taskevent_event_id int(8) NOT NULL,
+  PRIMARY KEY (taskevent_event_id, taskevent_task_id),
+  CONSTRAINT `taskevent_task_id_projecttask_id_fkey` FOREIGN KEY (`taskevent_task_id`) REFERENCES `ProjectTask` (`projecttask_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `taskevent_event_id_event_id_fkey` FOREIGN KEY (`taskevent_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
 
 --
 -- MailboxEntity production table

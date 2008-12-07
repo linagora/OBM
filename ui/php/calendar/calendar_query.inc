@@ -2737,7 +2737,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
       $entity = $attendee_q->f('eventlink_entity');
       $entity_id = $attendee_q->f('eventlink_entity_id');
       $entity_state = $attendee_q->f('eventlink_state');
-      $entity_label = $attendee_q->f('enententity_label');
+      $entity_label = $attendee_q->f('eventlink_label');
       $event = $of->events[$id];
       $event->addAttendee($entity,$entity_id,$entity_label,$entity_state);
     }

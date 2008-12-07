@@ -112,6 +112,7 @@ $l_no_found_subscription = "No subscription found for this contact !";
 
 $l_im = "Instant Messaging";
 $l_website = "Website";
+$l_remove = 'Remove';
 
 $l_phone_labels = array ('HOME' => 'Home phone', 'WORK' => 'Work phone', 'CELL' => 'Mobile phone', 'FAX' => 'Fax', 'PAGER' => 'Pager', 'OTHER' => 'Other phone');
 $l_email_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');

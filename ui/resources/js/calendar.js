@@ -1093,7 +1093,7 @@ Obm.CalendarQuickForm = new Class({
   },
   
   compute: function(ivent, context) {
-    var target = ivent.target || ivent.srcElement;
+    var target = ivent.target;
     target = $(target);
     if(obm.calendarManager.redrawLock || target.get('tag') == 'a') {
       return false;
@@ -1244,13 +1244,11 @@ Obm.CalendarQuickForm = new Class({
 Obm.TabbedPane = new Class({
   initialize: function(el) {
     this.element = el;
-    this.tabs = new Array();
-    var tab = this.element.getFirst();
-    this.tabsContainer = new Element('p').injectBefore(tab).addClass('tabs');
+    this.tabs = this.element.getElements('div');
+    this.tabsContainer = new Element('p').injectTop(this.element).addClass('tabs');
 
-    do {
-      this.tabs.push(tab);
-    } while (tab = tab.getNext());
+    this.current = this.tabs[0].getFirst();
+    this.current.addClass('current');
 
     this.tabs.each(function (tabContent, index) {
       var title = tabContent.getFirst();
@@ -1261,13 +1259,11 @@ Obm.TabbedPane = new Class({
       title.tabIndex = index;
       if(index != 0) {
         tabContent.setStyle('display','none');
-      } else {
-        title.addClass('current');
-        this.current = title;
       }
 
       title.addEvent('click', function(ivent) {
-        var target = ivent.currentTarget || ivent.srcElement;
+        var target = ivent.target;
+
         this.tabs[this.current.tabIndex].setStyle('display','none');
         this.current.removeClass('current');
         this.current = target;

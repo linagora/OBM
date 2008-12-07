@@ -5,114 +5,6 @@ UPDATE ObmInfo SET obminfo_value='2.1->2.2' WHERE obminfo_name='db_version';
 --  _________________
 -- | Tables creation |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
---
--- Table structure for table `Service`
---
-
-CREATE TABLE Service (
-  service_id                                    serial,
-  service_key                                   varchar(255),
-  UNIQUE (service_key),
-  PRIMARY KEY (service_id)
-);
-
---
--- Table structure for table `ServiceProperty`
---
-CREATE TABLE ServiceProperty (
-  serviceproperty_id                            serial,
-  serviceproperty_service_id                    integer NOT NULL,
-  serviceproperty_key                           varchar(255),
-  serviceproperty_default                       text,
-  serviceproperty_type                          varchar(255),
-  serviceproperty_min                           smallint,
-  serviceproperty_max                           smallint,
-  UNIQUE (serviceproperty_key),
-  PRIMARY KEY (serviceproperty_id),
-  CONSTRAINT serviceproperty_service_id_service_id_fkey FOREIGN KEY (serviceproperty_service_id) REFERENCES Service (service_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
---
--- Table structure for table `ServicePropertyDomain`
---
-CREATE TABLE ServicePropertyDomain (
-  servicepropertydomain_id                      integer NOT NULL,
-  PRIMARY KEY (servicepropertydomain_id),
-  CONSTRAINT servicepropertydomain_id_serviceproperty_id_fkey FOREIGN KEY (servicepropertydomain_id) REFERENCES ServiceProperty (serviceproperty_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
---
--- Table structure for table `ServicePropertyHost`
---
-CREATE TABLE ServicePropertyHost (
-  servicepropertyhost_id                        integer NOT NULL,
-  PRIMARY KEY (servicepropertyhost_id),
-  CONSTRAINT servicepropertyhost_id_serviceproperty_id_fkey FOREIGN KEY (servicepropertyhost_id) REFERENCES ServiceProperty (serviceproperty_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
---
--- Table structure for table `DomainServicePropertyValue`
---
-CREATE TABLE DomainServiceValue (
-  domainservicevalue_serviceproperty_id integer NOT NULL,
-  domainservicevalue_domain_id          integer NOT NULL,
-  domainservicevalue_value              text,
-  PRIMARY KEY (domainservicevalue_serviceproperty_id,domainservicevalue_domain_id),
-  CONSTRAINT domainservicevalue_serviceproperty_id_serviceproperty_id_fkey FOREIGN KEY (domainservicevalue_serviceproperty_id) REFERENCES ServicePropertyDomain (servicepropertydomain_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT domainservicevalue_domain_id_domain_id_fkey FOREIGN KEY (domainservicevalue_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
---
--- Table structure for table `HostServicePropertyValue`
---
-CREATE TABLE HostServiceValue (
-  hostservicevalue_serviceproperty_id   integer,
-  hostservicevalue_host_id              integer,
-  hostservicevalue_value                text,
-  PRIMARY KEY (hostservicevalue_serviceproperty_id,hostservicevalue_host_id),
-  CONSTRAINT hostservicevalue_serviceproperty_id_serviceproperty_id_fkey FOREIGN KEY (hostservicevalue_serviceproperty_id) REFERENCES ServicePropertyHost (servicepropertyhost_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT hostservicevalue_host_id_host_id_fkey FOREIGN KEY (hostservicevalue_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
---
--- Table structure for table `ServiceDomain`
---
-CREATE TABLE ServiceDomain (
-  servicedomain_id                              integer,
-  PRIMARY KEY (servicedomain_id),
-  CONSTRAINT servicedomain_id_service_id_fkey FOREIGN KEY (servicedomain_id) REFERENCES Service (service_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
---
--- Table structure for table `ServiceHost`
---
-CREATE TABLE ServiceHost (
-  servicehost_id                                integer,
-  PRIMARY KEY (servicehost_id),
-  CONSTRAINT servicehost_id_service_id_fkey FOREIGN KEY (servicehost_id) REFERENCES Service (service_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
---
--- Table structure for table `DomainService`
---
-CREATE TABLE DomainService (
-  domainservice_service_id                      integer,
-  domainservice_domain_id                       integer,
-  PRIMARY KEY (domainservice_service_id,domainservice_domain_id),
-  CONSTRAINT domainservice_service_id_domainservice_domain_id_fkey FOREIGN KEY (domainservice_service_id) REFERENCES ServiceDomain (servicedomain_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT domainservice_domain_id_domain_id_fkey FOREIGN KEY (domainservice_domain_id) REFERENCES Domain (domain_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
---
--- Table structure for table `DomainService`
---
-CREATE TABLE HostService (
-  hostservice_service_id                        integer,
-  hostservice_host_id                           integer,
-  PRIMARY KEY (hostservice_service_id,hostservice_host_id),
-  CONSTRAINT hostservice_service_id_hostservice_host_id_fkey FOREIGN KEY (hostservice_service_id) REFERENCES ServiceHost (servicehost_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT hostservice_host_id_host_id_fkey FOREIGN KEY (hostservice_host_id) REFERENCES Host (host_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
 
 
 --
@@ -130,9 +22,7 @@ CREATE TABLE Entity (
 CREATE TABLE Address (
   address_id                                    serial,
   address_entity_id                             integer NOT NULL,
-  address_street1                               varchar(255),
-  address_street2                               varchar(255),
-  address_street3                               varchar(2555),
+  address_street                                text,
   address_zipcode                               varchar(14),
   address_town                                  varchar(128),
   address_expresspostal                         varchar(16),
@@ -260,6 +150,43 @@ CREATE TABLE ProfilePropertyValue (
 	PRIMARY KEY (profilepropertyvalue_id)
 );
 
+--
+-- Table structure for table ServiceProperty
+--
+
+CREATE TABLE ServiceProperty (
+  serviceproperty_id serial,
+  serviceproperty_service varchar(255) NOT NULL,
+  serviceproperty_property varchar(255) NOT NULL,
+  serviceproperty_entity_id integer NOT NULL,
+  PRIMARY KEY  (serviceproperty_id),
+  KEY serviceproperty_service_key (serviceproperty_service),
+  KEY serviceproperty_property_key (serviceproperty_property),
+  CONSTRAINT serviceproperty_entity_id_entity_id_fkey FOREIGN KEY (serviceproperty_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table Service
+--
+
+CREATE TABLE Service (
+  service_id serial,
+  service_service varchar(255) NOT NULL,
+  service_entity_id integer NOT NULL,
+  PRIMARY KEY  (service_id),
+  KEY service_service_key (service_service),
+  CONSTRAINT service_entity_id_entity_id_fkey FOREIGN KEY (service_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Table structure for table SSOTicket
+--
+CREATE TABLE SSOTicket (
+  ssoticket_ticket varchar(255) NOT NULL,
+  ssoticket_user_id integer,
+  ssoticket_timestamp timestamp NOT NULL,
+  PRIMARY KEY (ssoticket_ticket),
+  CONSTRAINT ssoticket_user_id_userobm_id_fkey FOREIGN KEY (ssoticket_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 --  _______________
 -- | CalendarEvent |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -373,6 +300,18 @@ CREATE TABLE DeletedEvent (
 );
 create INDEX idx_dce_event_id ON DeletedEvent (deletedevent_event_id);
 create INDEX idx_dce_user_id ON DeletedEvent (deletedevent_user_id);
+
+--
+-- Table structure for table `TaskEvent`
+--
+
+CREATE TABLE TaskEvent (
+  taskevent_task_id integer NOT NULL,
+  taskevent_event_id integer NOT NULL,
+  PRIMARY KEY (taskevent_event_id, taskevent_task_id),
+  CONSTRAINT `taskevent_task_id_projecttask_id_fkey` FOREIGN KEY (`taskevent_task_id`) REFERENCES `ProjectTask` (`projecttask_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `taskevent_event_id_event_id_fkey` FOREIGN KEY (`taskevent_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
 --
 -- Modification of table EventEntity before rename it to EventLink
@@ -629,7 +568,6 @@ CREATE TABLE TmpEntity (
   id_entity     integer,
   PRIMARY KEY (entity_id)
 );
-
 --  __________________
 -- | Cleanning tables |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -882,7 +820,6 @@ SELECT
 FROM DeletedCalendarEvent;
 
 SELECT setval('deletedevent_deletedevent_id_seq', max(deletedevent_id)) FROM DeletedEvent;
-
 
 --  ______________________
 -- | Tables modifications |
@@ -1287,7 +1224,9 @@ DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT userobm_id FROM U
 UPDATE EventLink SET eventlink_entity_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = eventlink_entity_id), eventlink_entity = 'entity' WHERE eventlink_entity = 'user';
 DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT resource_id FROM Resource) AND eventlink_entity = 'resource';
 UPDATE EventLink SET eventlink_entity_id = (SELECT resourceentity_entity_id FROM ResourceEntity INNER JOIN Resource ON resourceentity_resource_id = resource_id WHERE resource_id = eventlink_entity_id), eventlink_entity = 'entity' WHERE eventlink_entity = 'resource';
--- FIXME : Task not handle
+DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT projecttask_id FROM ProjectTask) AND eventlink_entity = 'task';
+INSERT INTO TaskEvent (taskevent_task_id, taskevent_event_id) SELECT eventlink_entity_id, eventlink_event_id FROM EventLink WHERE eventlink_entity = 'task';
+
 DELETE FROM EventLink where eventlink_entity != 'task';
 ALTER TABLE EventLink DROP COLUMN eventlink_entity;
 
@@ -1353,6 +1292,62 @@ FROM Todo
 LEFT JOIN Event on todo_usercreate=event_usercreate and todo_timecreate=event_timecreate and todo_timeupdate=event_timeupdate and todo_user=event_owner and todo_title=event_title
 LEFT JOIN UserEntity on todo_user=userentity_user_id;
 
+--  _______________________________________________________
+-- |Migrating Address  information from Contact and Company|
+--  --------------------------------------------------------
+INSERT INTO Address (address_entity_id, address_street, address_zipcode, address_town, address_expresspostal, address_country, address_label)
+SELECT contactentity_entity_id, (contact_address1 || '\n' || contact_address2 || '\n' || contact_address3), contact_zipcode, contact_town, contact_expresspostal, contact_country_iso3166, 'WORK' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE (contact_address1 != '' AND contact_address1 IS NOT NULL) OR (contact_address2 !='' AND contact_address2 IS NOT NULL) OR (contact_address3 !='' AND contact_address3 IS NOT NULL) OR (contact_zipcode !='' AND contact_zipcode IS NOT NULL) OR (contact_town !='' AND contact_town IS NOT NULL) OR (contact_expresspostal !='' AND contact_expresspostal IS NOT NULL) OR (contact_country_iso3166 !='' AND contact_country_iso3166 IS NOT NULL)
+UNION
+SELECT companyentity_entity_id, (company_address1 || '\n' || company_address2 || '\n' || company_address3), company_zipcode, company_town, company_expresspostal, company_country_iso3166, 'WORK' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE (company_address1 !='' AND company_address1 IS NOT NULL) OR (company_address2 !='' AND company_address2 IS NOT NULL) OR (company_address3 !='' AND company_address3 IS NOT NULL) OR (company_zipcode !='' AND company_zipcode IS NOT NULL) OR (company_town !='' AND company_town IS NOT NULL) OR (company_expresspostal !='' AND company_expresspostal IS NOT NULL) OR (company_country_iso3166 !='' AND company_country_iso3166 IS NOT NULL);
+
+INSERT INTO Phone (phone_entity_id, phone_number, phone_label)
+SELECT contactentity_entity_id, contact_phone, 'WORK' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_phone != '' AND contact_phone IS NOT NULL
+UNION
+SELECT contactentity_entity_id, contact_homephone, 'HOME' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_homephone != '' AND contact_homephone IS NOT NULL
+UNION
+SELECT contactentity_entity_id, contact_mobilephone, 'CELL' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_mobilephone != '' AND contact_mobilephone IS NOT NULL
+UNION
+SELECT contactentity_entity_id, contact_fax, 'FAX' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_fax != '' AND contact_fax IS NOT NULL
+UNION
+SELECT companyentity_entity_id, company_phone, 'WORK' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_phone != '' AND company_phone IS NOT NULL
+UNION
+SELECT companyentity_entity_id, company_fax, 'FAX' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_fax != '' AND company_fax IS NOT NULL;
+
+INSERT INTO Email (email_entity_id, email_address, email_label) 
+SELECT contactentity_entity_id, contact_email, 'WORK' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_email != '' AND contact_email IS NOT NULL
+UNION
+SELECT contactentity_entity_id, contact_email2, 'WORK' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_email2 != '' AND contact_email2 IS NOT NULL
+UNION
+SELECT companyentity_entity_id, company_email, 'WORK' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_email != '' AND company_email IS NOT NULL;
+
+INSERT INTO Website (website_entity_id, website_url, website_label) 
+SELECT companyentity_entity_id, company_web, 'WORK' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_web != '' AND company_web IS NOT NULL;
+
+ALTER TABLE Contact DROP COLUMN contact_address1;
+ALTER TABLE Contact DROP COLUMN contact_address2;
+ALTER TABLE Contact DROP COLUMN contact_address3;
+ALTER TABLE Contact DROP COLUMN contact_zipcode;
+ALTER TABLE Contact DROP COLUMN contact_town;
+ALTER TABLE Contact DROP COLUMN contact_expresspostal;
+ALTER TABLE Contact DROP COLUMN contact_country_iso3166;
+ALTER TABLE Contact DROP COLUMN contact_phone;
+ALTER TABLE Contact DROP COLUMN contact_homephone;
+ALTER TABLE Contact DROP COLUMN contact_mobilephone;
+ALTER TABLE Contact DROP COLUMN contact_fax;
+ALTER TABLE Contact DROP COLUMN contact_email;
+ALTER TABLE Contact DROP COLUMN contact_email2;
+
+ALTER TABLE Company DROP COLUMN company_address1;
+ALTER TABLE Company DROP COLUMN company_address2;
+ALTER TABLE Company DROP COLUMN company_address3;
+ALTER TABLE Company DROP COLUMN company_zipcode;
+ALTER TABLE Company DROP COLUMN company_town;
+ALTER TABLE Company DROP COLUMN company_expresspostal;
+ALTER TABLE Company DROP COLUMN company_country_iso3166;
+ALTER TABLE Company DROP COLUMN company_phone;
+ALTER TABLE Company DROP COLUMN company_fax;
+ALTER TABLE Company DROP COLUMN company_web;
+ALTER TABLE Company DROP COLUMN company_email;
 
 -- ------------------------------
 -- Prepare value for foreign keys

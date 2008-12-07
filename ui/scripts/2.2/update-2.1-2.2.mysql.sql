@@ -5,105 +5,6 @@ UPDATE ObmInfo SET obminfo_value='2.1->2.2' WHERE obminfo_name='db_version';
 --  _________________
 -- | Tables creation |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
---
--- Table structure for table `Service`
---
-CREATE TABLE Service (
-  service_id                                    int(8) NOT NULL auto_increment,
-  service_key                                   varchar(255),
-  PRIMARY KEY (service_id),
-  UNIQUE KEY service_key (service_key)
-);
-
---
--- Table structure for table `ServiceProperty`
---
-CREATE TABLE ServiceProperty (
-  serviceproperty_id                            int(8) NOT NULL auto_increment,
-  serviceproperty_service_id                    int(8) NOT NULL,
-  serviceproperty_key                           varchar(255),
-  serviceproperty_default                       text,
-  serviceproperty_type                          varchar(255),
-  serviceproperty_min                           tinyint,
-  serviceproperty_max                           tinyint,
-  PRIMARY KEY (serviceproperty_id),
-  UNIQUE KEY serviceproperty_key (serviceproperty_key)
-);
-
---
--- Table structure for table `ServicePropertyDomain`
---
-CREATE TABLE ServicePropertyDomain (
-  servicepropertydomain_id                      int(8) NOT NULL,
-  PRIMARY KEY (servicepropertydomain_id)
-);
-
---
--- Table structure for table `ServicePropertyHost`
---
-CREATE TABLE ServicePropertyHost (
-  servicepropertyhost_id                        int(8) NOT NULL,
-  PRIMARY KEY (servicepropertyhost_id),
-  KEY servicepropertyhost_id_serviceproperty_id_fkey (servicepropertyhost_id)
-);
-
---
--- Table structure for table `DomainServicePropertyValue`
---
-CREATE TABLE DomainServiceValue (
-  domainservicevalue_serviceproperty_id int(8) NOT NULL,
-  domainservicevalue_domain_id          int(8) NOT NULL,
-  domainservicevalue_value              text,
-  PRIMARY KEY (domainservicevalue_serviceproperty_id,domainservicevalue_domain_id)
-);
-
---
--- Table structure for table `HostServicePropertyValue`
---
-CREATE TABLE HostServiceValue (
-  hostservicevalue_serviceproperty_id   int(8) NOT NULL,
-  hostservicevalue_host_id              int(8) NOT NULL,
-  hostservicevalue_value                text,
-  PRIMARY KEY (hostservicevalue_serviceproperty_id,hostservicevalue_host_id)
-);
-
---
--- Table structure for table `ServiceDomain`
---
-CREATE TABLE ServiceDomain (
-  servicedomain_id                              int(8) NOT NULL,
-  PRIMARY KEY (servicedomain_id)
-);
-
---
--- Table structure for table `ServiceHost`
---
-CREATE TABLE ServiceHost (
-  servicehost_id                                int(8) NOT NULL,
-  PRIMARY KEY (servicehost_id)
-);
-
---
--- Table structure for table `DomainService`
---
-CREATE TABLE DomainService (
-  domainservice_service_id                      int(8) NOT NULL,
-  domainservice_domain_id                       int(8) NOT NULL,
-  PRIMARY KEY (domainservice_service_id,domainservice_domain_id)
-);
-
---
--- Table structure for table `DomainService`
---
-CREATE TABLE HostService (
-  hostservice_service_id                        int(8) NOT NULL,
-  hostservice_host_id                           int(8) NOT NULL,
-  PRIMARY KEY (hostservice_service_id,hostservice_host_id),
-  KEY hostservice_service_id_hostservice_host_id_fkey (hostservice_service_id),
-  KEY hostservice_host_id_host_id_fkey (hostservice_host_id)
-);
-
-
 
 --
 -- Table structure for table 'Entity'
@@ -122,9 +23,7 @@ DROP TABLE IF EXISTS Address;
 CREATE TABLE Address (
   address_id                                    int(8) NOT NULL auto_increment,
   address_entity_id                             int(8) NOT NULL,
-  address_street1                               varchar(255),
-  address_street2                               varchar(255),
-  address_street3                               varchar(2555),
+  address_street                                text,
   address_zipcode                               varchar(14),
   address_town                                  varchar(128),
   address_expresspostal                         varchar(16),
@@ -344,6 +243,55 @@ CREATE TABLE DeletedEvent (
   KEY idx_dce_user (deletedevent_user_id)
 );
 
+
+--
+-- Table structure for table `ServiceProperty`
+--
+
+CREATE TABLE `ServiceProperty` (
+  `serviceproperty_id` int(8) auto_increment,
+  `serviceproperty_service` varchar(255) NOT NULL,
+  `serviceproperty_property` varchar(255) NOT NULL,
+  `serviceproperty_entity_id` int(8) NOT NULL,
+  PRIMARY KEY  (`serviceproperty_id`),
+  KEY `serviceproperty_service_key` (`serviceproperty_service`),
+  KEY `serviceproperty_property_key` (`serviceproperty_property`),
+  KEY `serviceproperty_entity_id_entity_id_fkey` (`serviceproperty_entity_id`)
+);
+
+--
+-- Table structure for table `Service`
+--
+
+CREATE TABLE `Service` (
+  `service_id` int(8) auto_increment,
+  `service_service` varchar(255) NOT NULL,
+  `service_entity_id` int(8) NOT NULL,
+  PRIMARY KEY  (`service_id`),
+  KEY `service_service_key` (`service_service`),
+  KEY `service_entity_id_entity_id_fkey` (`service_entity_id`)
+);
+--
+-- Table structure for table `SSOTicket`
+--
+DROP TABLE IF EXISTS `SSOTicket`;
+CREATE TABLE `SSOTicket` (
+  `ssoticket_ticket` varchar(255) NOT NULL,
+  `ssoticket_user_id` int(8),
+  `ssoticket_timestamp` timestamp NOT NULL,
+  PRIMARY KEY (`ssoticket_ticket`)
+);
+
+--
+-- Table structure for table `TaskEvent`
+--
+
+DROP TABLE IF EXISTS `TaskEvent`;
+CREATE TABLE TaskEvent (
+  taskevent_task_id int(8) NOT NULL,
+  taskevent_event_id int(8) NOT NULL,
+  PRIMARY KEY (taskevent_event_id, taskevent_task_id)
+);
 --  _______________
 -- | Entity tables |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -881,6 +829,7 @@ SELECT
 FROM DeletedCalendarEvent;
 
 
+
 -- AliaSource specific database errors ?!
 -- DROP TABLE IF EXISTS CalendarSegment;
 -- DROP TABLE IF EXISTS Entry;
@@ -1335,11 +1284,68 @@ DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT userobm_id FROM U
 UPDATE EventLink SET eventlink_entity_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = eventlink_entity_id), eventlink_entity = 'entity' WHERE eventlink_entity = 'user';
 DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT resource_id FROM Resource) AND eventlink_entity = 'resource';
 UPDATE EventLink SET eventlink_entity_id = (SELECT resourceentity_entity_id FROM ResourceEntity INNER JOIN Resource ON resourceentity_resource_id = resource_id WHERE resource_id = eventlink_entity_id), eventlink_entity = 'entity' WHERE eventlink_entity = 'resource';
--- FIXME : Task not handle
+DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT projecttask_id FROM ProjectTask) AND eventlink_entity = 'task';
+INSERT INTO TaskEvent (taskevent_task_id, taskevent_event_id) SELECT eventlink_entity_id, eventlink_event_id FROM EventLink WHERE eventlink_entity = 'task';
+
 DELETE FROM EventLink where eventlink_entity != 'entity';
 ALTER TABLE EventLink DROP COLUMN eventlink_entity;
 
+--  _______________________________________________________
+-- |Migrating Address  information from Contact and Company|
+--  --------------------------------------------------------
+INSERT INTO Address (address_entity_id, address_street, address_zipcode, address_town, address_expresspostal, address_country, address_label)
+SELECT contactentity_entity_id, CONCAT(contact_address1,'\n',contact_address2,'\n',contact_address3), contact_zipcode, contact_town, contact_expresspostal, contact_country_iso3166, 'WORK' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE (contact_address1 != '' AND contact_address1 IS NOT NULL) OR (contact_address2 !='' AND contact_address2 IS NOT NULL) OR (contact_address3 !='' AND contact_address3 IS NOT NULL) OR (contact_zipcode !='' AND contact_zipcode IS NOT NULL) OR (contact_town !='' AND contact_town IS NOT NULL) OR (contact_expresspostal !='' AND contact_expresspostal IS NOT NULL) OR (contact_country_iso3166 !='0' AND contact_country_iso3166 !='' AND contact_country_iso3166 IS NOT NULL)
+UNION
+SELECT companyentity_entity_id, CONCAT(company_address1,'\n', company_address2,'\n', company_address3), company_zipcode, company_town, company_expresspostal, company_country_iso3166, 'WORK' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE (company_address1 !='' AND company_address1 IS NOT NULL) OR (company_address2 !='' AND company_address2 IS NOT NULL) OR (company_address3 !='' AND company_address3 IS NOT NULL) OR (company_zipcode !='' AND company_zipcode IS NOT NULL) OR (company_town !='' AND company_town IS NOT NULL) OR (company_expresspostal !='' AND company_expresspostal IS NOT NULL) OR (company_country_iso3166 !='0' AND company_country_iso3166 !='' AND company_country_iso3166 IS NOT NULL);
 
+INSERT INTO Phone (phone_entity_id, phone_number, phone_label)
+SELECT contactentity_entity_id, contact_phone, 'WORK' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_phone != '' AND contact_phone IS NOT NULL
+UNION
+SELECT contactentity_entity_id, contact_homephone, 'HOME' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_homephone != '' AND contact_homephone IS NOT NULL
+UNION
+SELECT contactentity_entity_id, contact_mobilephone, 'CELL' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_mobilephone != '' AND contact_mobilephone IS NOT NULL
+UNION
+SELECT contactentity_entity_id, contact_fax, 'FAX' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_fax != '' AND contact_fax IS NOT NULL
+UNION
+SELECT companyentity_entity_id, company_phone, 'WORK' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_phone != '' AND company_phone IS NOT NULL
+UNION
+SELECT companyentity_entity_id, company_fax, 'FAX' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_fax != '' AND company_fax IS NOT NULL;
+
+INSERT INTO Email (email_entity_id, email_address, email_label) 
+SELECT contactentity_entity_id, contact_email, 'WORK' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_email != '' AND contact_email IS NOT NULL
+UNION
+SELECT contactentity_entity_id, contact_email2, 'WORK' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_email2 != '' AND contact_email2 IS NOT NULL
+UNION
+SELECT companyentity_entity_id, company_email, 'WORK' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_email != '' AND company_email IS NOT NULL;
+
+INSERT INTO Website (website_entity_id, website_url, website_label) 
+SELECT companyentity_entity_id, company_web, 'WORK' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_web != '' AND company_web IS NOT NULL;
+
+ALTER TABLE Contact DROP COLUMN contact_address1;
+ALTER TABLE Contact DROP COLUMN contact_address2;
+ALTER TABLE Contact DROP COLUMN contact_address3;
+ALTER TABLE Contact DROP COLUMN contact_zipcode;
+ALTER TABLE Contact DROP COLUMN contact_town;
+ALTER TABLE Contact DROP COLUMN contact_expresspostal;
+ALTER TABLE Contact DROP COLUMN contact_country_iso3166;
+ALTER TABLE Contact DROP COLUMN contact_phone;
+ALTER TABLE Contact DROP COLUMN contact_homephone;
+ALTER TABLE Contact DROP COLUMN contact_mobilephone;
+ALTER TABLE Contact DROP COLUMN contact_fax;
+ALTER TABLE Contact DROP COLUMN contact_email;
+ALTER TABLE Contact DROP COLUMN contact_email2;
+
+ALTER TABLE Company DROP COLUMN company_address1;
+ALTER TABLE Company DROP COLUMN company_address2;
+ALTER TABLE Company DROP COLUMN company_address3;
+ALTER TABLE Company DROP COLUMN company_zipcode;
+ALTER TABLE Company DROP COLUMN company_town;
+ALTER TABLE Company DROP COLUMN company_expresspostal;
+ALTER TABLE Company DROP COLUMN company_country_iso3166;
+ALTER TABLE Company DROP COLUMN company_phone;
+ALTER TABLE Company DROP COLUMN company_fax;
+ALTER TABLE Company DROP COLUMN company_web;
+ALTER TABLE Company DROP COLUMN company_email;
 -- -----------------------------------------
 -- Updates that need to be after Entity work
 -- -----------------------------------------
@@ -2304,4 +2310,4 @@ DROP TABLE Todo;
 DROP TABLE TmpEntity;
 
 -- Write that the 2.1->2.2 is completed
-UPDATE ObmInfo SET obminfo_value='2.2' WHERE obminfo_name='db_version';
+UPDATE ObmInfo SET obminfo_value='2.2.0' WHERE obminfo_name='db_version';

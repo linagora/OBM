@@ -96,7 +96,7 @@ class Vcalendar_Writer_ICS {
         $partstat = 'ACCEPTED';
         break;
       case 'R' :
-        $partstat = 'REFUSED';
+        $partstat = 'DECLINED';
         break;
       case 'W' :
         $partstat = 'NEEDS-ACTION';

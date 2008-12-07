@@ -708,13 +708,14 @@ function dis_contact_consult($contact) {
   $display['link'] = html_contact_links($id);
   $funcs = of_category_get_entitycategories('contact', 'function', $id, 'mono');
   $block .= html_contact_header($con_q, $funcs);
-
+  
   if ($view != '') {
     include("$path/$view/".$view.'_display.inc');
     include("$path/$view/".$view.'_query.inc');
     $block .= dis_publication_subscription_external_list($contact);
   } else {
-    $block .= html_contact_view_main($con_q);
+    $coords = run_query_contact_coords($id);
+    $block .= html_contact_view_main($con_q, $coords);
   }
 
   return $block;
@@ -861,7 +862,7 @@ function html_contact_header($co_q, $funcs) {
 // Parameters:
 //   - $co_q : contact database result
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_view_main($co_q) {
+function html_contact_view_main($co_q, $coords) {
   global $l_phone, $l_hphone, $l_mphone, $l_fax, $l_address, $l_postcode;
   global $l_service, $l_coord, $l_town, $l_country;
   global $l_expresspostal, $l_comment1, $l_comment2, $l_comment3;
@@ -885,19 +886,7 @@ function html_contact_view_main($co_q) {
   $lname = $co_q->f('contact_lastname');
   $fname = $co_q->f('contact_firstname');
   $service = $co_q->f('contact_service');
-  $ad1 = $co_q->f('contact_address1');
-  $ad2 = $co_q->f('contact_address2');
-  $ad3 = $co_q->f('contact_address3');
-  $zip = $co_q->f('contact_zipcode');
-  $town = $co_q->f('contact_town');
-  $cdx = $co_q->f('contact_expresspostal');
   $ctry_name = $co_q->f('country_name');
-  $phone = trim($co_q->f('contact_phone'));
-  $hphone = $co_q->f('contact_homephone');
-  $mphone = $co_q->f('contact_mobilephone');
-  $fax = $co_q->f('contact_fax');
-  $email = $co_q->f('contact_email');
-  $email2 = $co_q->f('contact_email2');
   $mailok = ($co_q->f('contact_mailing_ok') == 1 ? $l_yes : $l_no);
   $newsletter = ($co_q->f('contact_newsletter') == 1 ? $l_yes : $l_no);
   $com  = beautify_comment(nl2br($co_q->f('contact_comment')));
@@ -1021,98 +1010,43 @@ function html_contact_view_main($co_q) {
       <td>$service</td>";
   }
 
-  // Address3 field
-  if ($show_ad3) {
-    $block_ad3 = "
-    </tr><tr>
-      <th>$l_address 3</th>
-      <td>$ad3</td>";
+  foreach($coords as $kind => $row) {
+    $coords = '';
+    foreach($row as $values) {
+      $coords .= '<tr>';
+      foreach($values as $label => $value) {
+        if($label == 'label') {
+          $coords .= '<th>'.$GLOBALS["l_${kind}_labels"][$value].'</th>';
+        } elseif($label == 'protocol') {
+          $coords .= "<th>$value</th>";
+        } else {
+          $coords .= "<td>$value</td>";
+        }
+      }
+      $coords .= '</tr>';
+    }
+    $block .= "
+    <div class=\"detail infos\">
+    <h1>".$GLOBALS["l_$kind"]."</h1>
+    <table>
+    $coords
+    </table>
+    </div>
+    ";
   }
-
-  // Cedex field
-  if ($show_cdx) {
-    $block_cdx = "
-    </tr><tr>
-      <th>$l_expresspostal</th>
-      <td>$cdx</td>";
-  }
-
-  if ($email != '') {
-    $link_email = "
-      <a href=\"mailto:$email\">
-      <img src=\"$ico_mail\" alt=\"C\" />
-      </a>";
-  }
-
-  if ($email2 != '') {
-    $link_email2 = "
-      <a href=\"mailto:$email2\">
-      <img src=\"$ico_mail\" alt=\"C\" />
-      </a>";
-  }
-  
-  if ($show_comment2) {
-    $block_comment2 = "
-    <div class=\"detail extra\"> 
-    <h1>$l_comment2</h1>
-    $com2
-    </div>";
-  }
-  if ($show_comment3) {
-    $block_comment3 = "
-    <div class=\"detail extra\">
-    <h1>$l_comment3</h1>
-    $com3
-    </div>";
-  }
-
-
   // --- HTML Template --------------------------------------------------------
 
-  $block = "
+  $block .= "
     <div class=\"detail infos\">
     <h1>$l_coord</h1>
 
     <table>
-    <tr>
-      <th>$l_phone</th>
-      <td>$phone</td>
-    </tr><tr>
-      <th>$l_hphone</th>
-      <td>$hphone</td>
-    </tr><tr>
-      <th>$l_fax</th>
-      <td>$fax</td>
-    </tr><tr>
-      <th>$l_mphone</th>
-      <td>$mphone</td>
     $block_service
     </tr><tr>
       <th>
       $l_address 1
       <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"$l_copy\" ><img alt=\"$l_copy\" src=\"$ico_clipboard\" /></a>
       </th>
-      <td>$ad1</td>
-    </tr><tr>
-      <th>$l_address 2</th>
-      <td>$ad2</td>
-    $block_ad3
-    </tr><tr>
-      <th>$l_postcode</th>
-      <td>$zip</td>
-    </tr><tr>
-      <th>$l_town</th>
-      <td>$town</td>
-    $block_cdx
-    </tr><tr>
-      <th>$l_country</th>
-      <td>$ctry_name</td>
-    </tr><tr>
-      <th>$l_email</th>
-      <td>$link_email $email</td>
-    </tr><tr>
-      <th>$l_email_other</th>
-      <td>$link_email2 $email2</td>
     </tr><tr>
       <th>$l_mailing_ok</th>
       <td>$mailok</td>
@@ -1283,7 +1217,8 @@ function dis_contact_form($action, $co_q, $contact) {
   }
   $users = of_usergroup_get_group_users($obm['group_com'], true, $uids, 'userobm_lastname');
   $ctry_q = run_query_global_country_for_lang();
-  $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact);
+  $coords = run_query_contact_coords($cid);
+  $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact, $coords);
 
   return $block;
 }
@@ -1301,7 +1236,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //   - $ctry_q    : country database result
 //   - $contact[] : default values
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact) {
+function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact, $coords) {
   global $ico_company, $l_company, $ico_add, $ico_crow, $l_header_new;
   global $cgp_mailing_default, $ccontact_private_default, $cright_write_admin;
   global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
@@ -1315,12 +1250,15 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   global $l_datasource, $l_archive, $l_private, $l_coord, $l_contact, $l_market;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
-  global $extra_js, $l_im, $l_website, $l_phone_labels, $l_email_labels;
+  global $extra_js, $l_im, $l_website, $l_phone_labels, $l_email_labels, $l_number;
+  global $l_remove;
+
 
   $uid = $obm['uid'];
 
-  $GLOBALS['js']['vars']['labels']['label'] = 'Label';
-  $GLOBALS['js']['vars']['labels']['value'] = 'Numéros';
+  $GLOBALS['js']['vars']['labels']['label'] = $l_label;
+  $GLOBALS['js']['vars']['labels']['value'] = $l_number;
+  $GLOBALS['js']['vars']['labels']['remove'] = $l_remove;
   $GLOBALS['js']['vars']['labels']['phoneLabel'] = $l_phone_labels;
   $GLOBALS['js']['vars']['labels']['emailLabel'] = $l_email_labels;
   $GLOBALS['js']['vars']['labels']['addressLabel'] = $l_address_labels;
@@ -1348,21 +1286,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $fname = $co_q->f('contact_firstname');
     $aka = $co_q->f('contact_aka');
     $service = $co_q->f('contact_service');
-    $ad1 = $co_q->f('contact_address1');
-    $ad2 = $co_q->f('contact_address2');
-    $ad3 = $co_q->f('contact_address3');
-    $zip = $co_q->f('contact_zipcode');
-    $town = $co_q->f('contact_town');
-    $cdx = $co_q->f('contact_expresspostal');
-    $ctry = $co_q->f('contact_country_iso3166');
     $func = $co_q->f('contact_function_id');
     $title = $co_q->f('contact_title');
-    $phone = $co_q->f('contact_phone');
-    $hphone = $co_q->f('contact_homephone');
-    $mphone = $co_q->f('contact_mobilephone');
-    $fax = $co_q->f('contact_fax');
-    $email = $co_q->f('contact_email');
-    $email2 = $co_q->f('contact_email2');
     $mailok = ($co_q->f('contact_mailing_ok') == 1 ? ' checked' : '');
     $newsletter = ($co_q->f('contact_newsletter') == 1 ? ' checked' : '');
     $archive = ($co_q->f('contact_archive') == 1 ? ' checked' : '');
@@ -1387,6 +1312,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $c_ctry = $co_q->f('company_country_iso3166');
     $c_ctry_name = $co_q->f('company_country_name');
     $dis_title = "$lname $fname";
+    $phones = $coords['phone'];
+    $addresses = $coords['address'];
+    $emails = $coords['email'];
+    $websites = $coords['website'];
+    $ims = $coords['im'];
 
   // New form and first time
   } elseif ($action == 'new') {
@@ -1442,13 +1372,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   if (isset($contact['fname'])) { $fname = stripslashes($contact['fname']); }
   if (isset($contact['aka'])) { $aka = stripslashes($contact['aka']); }
   if (isset($contact['service'])) { $service = stripslashes($contact['service']); }
-  if (isset($contact['ad1'])) { $ad1 = stripslashes($contact['ad1']); }
-  if (isset($contact['ad2'])) { $ad2 = stripslashes($contact['ad2']); }
-  if (isset($contact['ad3'])) { $ad3 = stripslashes($contact['ad3']); }
-  if (isset($contact['zip'])) { $zip = stripslashes($contact['zip']); }
-  if (isset($contact['town'])) { $town = stripslashes($contact['town']); }
-  if (isset($contact['cdx'])) { $cdx = stripslashes($contact['cdx']); }
-  if (isset($contact['ctry'])) { $ctry = $contact['country']; }
   if (isset($contact['function'])) { $func = $contact['function']; }
   if (isset($contact['title'])) { $title = stripslashes($contact['title']); }
   if (isset($contact['phones'])) { $phones = $contact['phones'];}
@@ -1456,12 +1379,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   if (isset($contact['ims'])) { $ims = $contact['ims'];}
   if (isset($contact['websites'])) { $websites = $contact['websites'];}
   if (isset($contact['emails'])) { $emails = $contact['emails'];}
-  if (isset($contact['phone'])) { $phone = stripslashes($contact['phone']); }
-  if (isset($contact['hphone'])) { $hphone = stripslashes($contact['hphone']); }
   if (isset($contact['mphone'])) { $mphone = stripslashes($contact['mphone']); }
   if (isset($contact['fax'])) { $fax = stripslashes($contact['fax']); }
-  if (isset($contact['email'])) { $email = stripslashes($contact['email']); }
-  if (isset($contact['email2'])) { $email2 = stripslashes($contact['email2']); }
   if (isset($contact['mailok'])) { $mailok = ($contact['mailok'] == 1 ? 'checked' : ''); }
   if (isset($contact['comment'])) { $comment = stripslashes($contact['comment']); }
   if (isset($contact['add_comment'])) { $add_comment = stripslashes($contact['add_comment']); }

@@ -325,21 +325,21 @@ Obm.DateTime = new Class({
 Obm.TimeZoneParser = new Class ({
   initialize: function (timeZone) {
     var request = new Request({
-        url:obm.vars.consts.resourcePath  + '/js/bin/timezone/'  + timeZone,
+        url:obm.vars.consts.resourcePath  + '/js/bin/timezone/' + timeZone,
         async: false,
-        charset: 'x-user-defined'}).send();
+        encoding: 'x-user-defined'}).send();
     var fileContent = request.response.text;
     var fileSize = fileContent.length;
     var bytes = [];
     for(var i=0; i < fileSize; i++) {
       bytes[i] = fileContent.charCodeAt(i) & 0xff;
     }
-    //window.parseTimeZoneData(bytes);
+    window.parseTimeZoneData(bytes);
   },
   
   getTimeZoneOffset: function(time) {
-  return 0;
-    //return window.getTimeZoneOffset(''+time+'');
+    console.log(window.getTimeZoneOffset('1262304061000'),window.getTimeZoneOffset(''+time+''), time, new Date(time));
+    return window.getTimeZoneOffset('1262304061000');
   }
 });
 

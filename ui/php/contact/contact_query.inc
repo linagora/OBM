@@ -343,21 +343,7 @@ function run_query_contact_detail($p_id) {
 
   if ($cgp_show['module']['company']) {
     $join_comp = 'LEFT JOIN Company ON contact_company_id=company_id';
-    $join_ctry2 = "LEFT JOIN Country as C2
-      ON company_country_iso3166=C2.country_iso3166
-      AND C2.country_lang='$lang'";
-    $company_fields = "company_id,
-      company_name,
-      company_phone,
-      company_fax,
-      company_address1,
-      company_address2,
-      company_address3,
-      company_zipcode,
-      company_town,
-      company_expresspostal,
-      company_country_iso3166,
-      C2.country_name as company_country_name";
+    $company_fields = "company_id,company_name";
   } else {
     $company_fields = 'contact_company as company_name';
   }
@@ -373,7 +359,6 @@ function run_query_contact_detail($p_id) {
     m.userobm_lastname as market_lname,
     m.userobm_firstname as market_fname,
     contactfunction_label,
-    C1.country_name,
     datasource_name,
     $date,
     $birthday,
@@ -386,9 +371,6 @@ function run_query_contact_detail($p_id) {
     LEFT JOIN Kind ON kind_id=contact_kind_id
     LEFT JOIN UserObm as m ON contact_marketingmanager_id=m.userobm_id
     LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
-    LEFT JOIN Country as C1 ON contact_country_iso3166=C1.country_iso3166
-    AND C1.country_lang='$lang'
-    $join_ctry2
     LEFT JOIN DataSource ON contact_datasource_id=datasource_id
     LEFT JOIN UserObm as c ON contact_usercreate=c.userobm_id
     LEFT JOIN UserObm as u ON contact_userupdate=u.userobm_id
@@ -418,20 +400,8 @@ function run_query_contact_company($c_id) {
   $multidomain = sql_multidomain('company');
 
   $query = "SELECT company_id,
-    company_name,
-    company_phone,
-    company_fax,
-    company_address1,
-    company_address2,
-    company_address3,
-    company_zipcode,
-    company_town,
-    company_expresspostal,
-    company_country_iso3166,
-    country_name as company_country_name
+    company_name
     FROM Company
-    LEFT JOIN Country ON company_country_iso3166 = country_iso3166
-    AND country_lang='$lang'
     WHERE company_id='$c_id'
     $multidomain";
 
@@ -509,21 +479,8 @@ function run_query_contact_insert($contact) {
   }
   $sound = phonetic_key($lname);
   $service = $contact['service'];
-  $ad1 = $contact['ad1'];
-  $ad2 = $contact['ad2'];
-  $ad3 = $contact['ad3'];
-  $zip = $contact['zip'];
-  $town = $contact['town'];
-  $cdx = $contact['cdx'];
-  $ctry = $contact['country'];
   $func = sql_parse_id( $contact['function']);
   $title = $contact['title'];
-  $phone = $contact['phone'];
-  $hphone = $contact['hphone'];
-  $mphone = $contact['mphone'];
-  $fax = $contact['fax'];
-  $email = $contact['email'];
-  $email2 = $contact['email2'];
   $mailok = ($contact['mailok'] == '1' ? '1' : '0');
   $newsletter = ($contact['newsletter'] == '1' ? '1' : '0');
   $date = ($contact['date'] ? "'".of_isodate_convert($contact['date'])."'" : 'null');
@@ -565,21 +522,8 @@ function run_query_contact_insert($contact) {
     contact_aka,
     contact_sound,
     contact_service,
-    contact_address1,
-    contact_address2,
-    contact_address3,
-    contact_zipcode,
-    contact_town,
-    contact_expresspostal,
-    contact_country_iso3166,
     contact_function_id,
     contact_title,
-    contact_phone,
-    contact_homephone,
-    contact_mobilephone,
-    contact_fax,
-    contact_email,
-    contact_email2,
     contact_mailing_ok,
     contact_newsletter,
     contact_archive,
@@ -604,21 +548,8 @@ function run_query_contact_insert($contact) {
     '$aka',
     '$sound',
     '$service',
-    '$ad1',
-    '$ad2',
-    '$ad3',
-    '$zip',
-    '$town',
-    '$cdx',
-    '$ctry',
     $func,
     '$title',
-    '$phone',
-    '$hphone',
-    '$mphone',
-    '$fax',
-    '$email',
-    '$email2',
     $mailok,
     $newsletter,
     $archive,
@@ -707,21 +638,8 @@ function run_query_contact_update($contact) {
   }
   $sound = phonetic_key($lname);
   $service = $contact['service'];
-  $ad1 = $contact['ad1'];
-  $ad2 = $contact['ad2'];
-  $ad3 = $contact['ad3'];
-  $zip = $contact['zip'];
-  $town = $contact['town'];
-  $cdx = $contact['cdx'];
-  $ctry = $contact['country'];
   $func = sql_parse_id( $contact['function']);
   $title = $contact['title'];
-  $phone = $contact['phone'];
-  $hphone = $contact['hphone'];
-  $mphone = $contact['mphone'];
-  $fax = $contact['fax'];
-  $email = $contact['email'];
-  $email2 = $contact['email2'];
   $mailok = ($contact['mailok'] == '1' ? '1' : '0');
   $newsletter = ($contact['newsletter'] == '1' ? '1' : '0');
   if ($contact['date'] != '') {
@@ -773,21 +691,8 @@ function run_query_contact_update($contact) {
       contact_aka='$aka',
       contact_sound='$sound',
       contact_service='$service',
-      contact_address1='$ad1',
-      contact_address2='$ad2',
-      contact_address3='$ad3',
-      contact_zipcode='$zip',
-      contact_town='$town',
-      contact_expresspostal='$cdx',
-      contact_country_iso3166='$ctry',
       contact_function_id=$func,
       contact_title='$title',
-      contact_phone='$phone',
-      contact_homephone='$hphone',
-      contact_mobilephone='$mphone',
-      contact_fax='$fax',
-      contact_email='$email',
-      contact_email2='$email2',
       contact_mailing_ok=$mailok,
       contact_newsletter=$newsletter,
       contact_archive=$archive,
@@ -834,6 +739,8 @@ function run_query_contact_update($contact) {
 
   if ($retour) {
     $ret = of_userdata_query_update('contact', $id, $contact);
+    $entityid = of_entity_get('contact', $id);
+    run_query_contact_coords_update($entityid, $contact);
 
     // Hook : Post
     if (function_exists('hook_post_run_query_contact_update')) {
@@ -880,7 +787,8 @@ function run_query_contact_coords_update($id, $contact) {
   $obm_q->query($query);  
   if(is_array($addresses)) {
     foreach($addresses as $address) {
-      if(trim($address['number']) != '' ) {
+      if(trim($address['street1']) != '' || trim($address['country']) != '' || trim($address['zipcode']) != ''
+         || trim($address['expresspostal']) != '') {
         $query = "INSERT INTO Address (
           address_entity_id,
           address_street1,
@@ -893,7 +801,6 @@ function run_query_contact_coords_update($id, $contact) {
           address_label
         ) VALUES (
           $id, 
-          '$address[number]',
           '$address[street1]',
           '$address[street2]',
           '$address[street3]',
@@ -901,8 +808,7 @@ function run_query_contact_coords_update($id, $contact) {
           '$address[town]',
           '$address[expresspostal]',
           '$address[country]',
-          '$address[label]',
-
+          '$address[label]'
         )";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(address)');
         $obm_q->query($query);
@@ -952,6 +858,48 @@ function run_query_contact_coords_update($id, $contact) {
   }      
 }
 
+/**
+ * run_query_contact_coords
+ * 
+ * @param mixed $id 
+ * @param mixed $contact 
+ * @access public
+ * @return void
+ */
+function run_query_contact_coords($id) {
+  global $cdg_sql;
+  $obm_q = new DB_OBM;
+  $coords = array();
+  $query = "SELECT * FROM Phone INNER JOIN ContactEntity ON phone_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $coords['phone'][] = array('label' => $obm_q->f('phone_label'), 'number' => $obm_q->f('phone_number'));
+  }
+  $query = "SELECT * FROM Email INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $coords['email'][] = array('label' => $obm_q->f('email_label'), 'address' => $obm_q->f('email_address'));
+  }
+  $query = "SELECT * FROM IM INNER JOIN ContactEntity ON im_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $coords['im'][] = array('protocol' => $obm_q->f('im_protocol'),'address' => $obm_q->f('im_address'));
+  }
+  $query = "SELECT * FROM Website INNER JOIN ContactEntity ON website_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $coords['website'][] = array('label' => $obm_q->f('website_label'), 'url' => $obm_q->f('website_url'));
+  }
+  $query = "SELECT * FROM Address INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $coords['address'][] = array(
+      'label' => $obm_q->f('address_label'), 'street' => $obm_q->f('address_street'), 'zipcode' => $obm_q->f('address_zipcode'),
+      'expresspostal' => $obm_q->f('address_expresspostal'), 'country' => $obm_q->f('address_country'));
+  }
+
+  return $coords;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Get the number of static lists where the contact is registered
 // Parameters:

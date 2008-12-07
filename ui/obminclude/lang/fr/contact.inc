@@ -116,6 +116,7 @@ $l_recept = "Mode de réception";
 $l_quantity = "Quantité";
 $l_quantity = "Quantité";
 $l_no_found_subscription = "Aucun abonnement lié à ce contact !";
+$l_remove = 'Supprimer';
 
 $l_im = "Messagerie Instantanée";
 $l_website = "Site internet";

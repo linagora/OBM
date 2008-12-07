@@ -1114,7 +1114,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
 	  slides[$j].toggle();
      	});
 ";
-        $dis_events .= "<div id=\"evt_$date_$ev_id\" >
+$dis_events .= "<div id=\"evt_${date}_$ev_id\" >
           <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_user $dis_res</span>
           $hour - <strong>$title</strong></a>
           <div id=\"eventDetail_$date_$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">

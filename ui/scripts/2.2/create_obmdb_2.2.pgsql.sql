@@ -68,9 +68,7 @@ CREATE TABLE activeuserobm (
 CREATE TABLE address (
     address_id integer NOT NULL,
     address_entity_id integer NOT NULL,
-    address_street1 character varying(255),
-    address_street2 character varying(255),
-    address_street3 character varying(2555),
+    address_street text,
     address_zipcode character varying(14),
     address_town character varying(128),
     address_expresspostal character varying(16),
@@ -140,17 +138,6 @@ CREATE TABLE company (
     company_activity_id integer,
     company_nafcode_id integer,
     company_marketingmanager_id integer,
-    company_address1 character varying(64),
-    company_address2 character varying(64),
-    company_address3 character varying(64),
-    company_zipcode character varying(14),
-    company_town character varying(64),
-    company_expresspostal character varying(16),
-    company_country_iso3166 character(2) DEFAULT '0'::bpchar,
-    company_phone character varying(32),
-    company_fax character varying(32),
-    company_web character varying(64),
-    company_email character varying(64),
     company_contact_number integer DEFAULT 0 NOT NULL,
     company_deal_number integer DEFAULT 0 NOT NULL,
     company_deal_total integer DEFAULT 0 NOT NULL,
@@ -238,21 +225,8 @@ CREATE TABLE contact (
     contact_aka character varying(255),
     contact_sound character varying(48),
     contact_service character varying(64),
-    contact_address1 character varying(64),
-    contact_address2 character varying(64),
-    contact_address3 character varying(64),
-    contact_zipcode character varying(14),
-    contact_town character varying(64),
-    contact_expresspostal character varying(16),
-    contact_country_iso3166 character(2) DEFAULT '0'::bpchar,
     contact_function_id integer,
     contact_title character varying(64),
-    contact_phone character varying(32),
-    contact_homephone character varying(32),
-    contact_mobilephone character varying(32),
-    contact_fax character varying(32),
-    contact_email character varying(128),
-    contact_email2 character varying(128),
     contact_mailing_ok smallint DEFAULT 0,
     contact_newsletter smallint DEFAULT 0,
     contact_archive smallint DEFAULT 0 NOT NULL,
@@ -2678,6 +2652,57 @@ CREATE TABLE website (
     website_entity_id integer NOT NULL,
     website_label character varying(255) NOT NULL,
     website_url text
+);
+
+
+--
+-- Table structure for table ServiceProperty
+--
+
+CREATE TABLE ServiceProperty (
+  serviceproperty_id serial,
+  serviceproperty_service varchar(255) NOT NULL,
+  serviceproperty_property varchar(255) NOT NULL,
+  serviceproperty_entity_id integer NOT NULL,
+  PRIMARY KEY  (serviceproperty_id),
+  KEY serviceproperty_service_key (serviceproperty_service),
+  KEY serviceproperty_property_key (serviceproperty_property),
+  CONSTRAINT serviceproperty_entity_id_entity_id_fkey FOREIGN KEY (serviceproperty_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table Service
+--
+
+CREATE TABLE Service (
+  service_id serial,
+  service_service varchar(255) NOT NULL,
+  service_entity_id integer NOT NULL,
+  PRIMARY KEY  (service_id),
+  KEY service_service_key (service_service),
+  CONSTRAINT service_entity_id_entity_id_fkey FOREIGN KEY (service_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Table structure for table SSOTicket
+--
+CREATE TABLE SSOTicket (
+  ssoticket_ticket varchar(255) NOT NULL,
+  ssoticket_user_id integer,
+  ssoticket_timestamp timestamp NOT NULL,
+  PRIMARY KEY (ssoticket_ticket),
+  CONSTRAINT ssoticket_user_id_userobm_id_fkey FOREIGN KEY (ssoticket_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table `TaskEvent`
+--
+
+CREATE TABLE TaskEvent (
+  taskevent_task_id integer NOT NULL,
+  taskevent_event_id integer NOT NULL,
+  PRIMARY KEY (taskevent_event_id, taskevent_task_id),
+  CONSTRAINT `taskevent_task_id_projecttask_id_fkey` FOREIGN KEY (`taskevent_task_id`) REFERENCES `ProjectTask` (`projecttask_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `taskevent_event_id_event_id_fkey` FOREIGN KEY (`taskevent_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
