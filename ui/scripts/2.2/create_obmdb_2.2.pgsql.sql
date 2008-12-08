@@ -593,6 +593,17 @@ CREATE TABLE deletedcontact (
 
 
 --
+-- Name: vcomponent; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE vcomponent AS ENUM (
+    'VEVENT',
+    'VTODO',
+    'VJOURNAL',
+    'VFREEBUSY'
+);
+
+--
 -- Name: deletedevent; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -720,17 +731,6 @@ CREATE TABLE domainentity (
 
 
 --
--- Name: domainmailserver; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE domainmailserver (
-    domainmailserver_domain_id integer NOT NULL,
-    domainmailserver_mailserver_id integer NOT NULL,
-    domainmailserver_role character varying(16) DEFAULT 'imap'::character varying NOT NULL
-);
-
-
---
 -- Name: domainproperty; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -750,27 +750,6 @@ CREATE TABLE domainpropertyvalue (
     domainpropertyvalue_domain_id integer NOT NULL,
     domainpropertyvalue_property_key character varying(255) NOT NULL,
     domainpropertyvalue_value character varying(255) NOT NULL
-);
-
-
---
--- Name: domainservice; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE domainservice (
-    domainservice_service_id integer NOT NULL,
-    domainservice_domain_id integer NOT NULL
-);
-
-
---
--- Name: domainservicevalue; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE domainservicevalue (
-    domainservicevalue_serviceproperty_id integer NOT NULL,
-    domainservicevalue_domain_id integer NOT NULL,
-    domainservicevalue_value text
 );
 
 
@@ -809,19 +788,6 @@ CREATE TABLE entityright (
     entityright_write integer DEFAULT 0 NOT NULL,
     entityright_admin integer DEFAULT 0 NOT NULL
 );
-
-
---
--- Name: vcomponent; Type: TYPE; Schema: public; Owner: -
---
-
-CREATE TYPE vcomponent AS ENUM (
-    'VEVENT',
-    'VTODO',
-    'VJOURNAL',
-    'VFREEBUSY'
-);
-
 
 --
 -- Name: vopacity; Type: TYPE; Schema: public; Owner: -
@@ -1004,18 +970,12 @@ CREATE TABLE host (
     host_usercreate integer,
     host_uid integer,
     host_gid integer,
-    host_samba integer DEFAULT 0,
     host_archive smallint DEFAULT 0 NOT NULL,
     host_name character varying(32) NOT NULL,
     host_fqdn character varying(255),
     host_ip character varying(16),
     host_delegation character varying(64) DEFAULT ''::character varying,
-    host_description character varying(128),
-    host_web_perms integer DEFAULT 0,
-    host_web_list text DEFAULT ''::text,
-    host_web_all integer DEFAULT 0,
-    host_ftp_perms integer DEFAULT 0,
-    host_firewall_perms character varying(128)
+    host_description character varying(128)
 );
 
 
@@ -1026,27 +986,6 @@ CREATE TABLE host (
 CREATE TABLE hostentity (
     hostentity_entity_id integer NOT NULL,
     hostentity_host_id integer NOT NULL
-);
-
-
---
--- Name: hostservice; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE hostservice (
-    hostservice_service_id integer NOT NULL,
-    hostservice_host_id integer NOT NULL
-);
-
-
---
--- Name: hostservicevalue; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE hostservicevalue (
-    hostservicevalue_serviceproperty_id integer NOT NULL,
-    hostservicevalue_host_id integer NOT NULL,
-    hostservicevalue_value text
 );
 
 
@@ -1352,34 +1291,6 @@ CREATE TABLE mailboxentity (
 
 
 --
--- Name: mailserver; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE mailserver (
-    mailserver_id integer NOT NULL,
-    mailserver_timeupdate timestamp without time zone,
-    mailserver_timecreate timestamp without time zone DEFAULT now(),
-    mailserver_userupdate integer,
-    mailserver_usercreate integer,
-    mailserver_host_id integer NOT NULL,
-    mailserver_relayhost_id integer,
-    mailserver_imap integer DEFAULT 0,
-    mailserver_smtp_in integer DEFAULT 0,
-    mailserver_smtp_out integer DEFAULT 0
-);
-
-
---
--- Name: mailservernetwork; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE mailservernetwork (
-    mailservernetwork_host_id integer NOT NULL,
-    mailservernetwork_ip character varying(16) DEFAULT ''::character varying NOT NULL
-);
-
-
---
 -- Name: mailshare; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1603,46 +1514,12 @@ CREATE TABLE p_host (
     host_usercreate integer,
     host_uid integer,
     host_gid integer,
-    host_samba integer,
     host_archive smallint DEFAULT 0 NOT NULL,
     host_name character varying(32) NOT NULL,
     host_fqdn character varying(255),
     host_ip character varying(16),
     host_delegation character varying(64),
-    host_description character varying(128),
-    host_web_perms integer,
-    host_web_list text,
-    host_web_all integer,
-    host_ftp_perms integer,
-    host_firewall_perms character varying(128)
-);
-
-
---
--- Name: p_mailserver; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_mailserver (
-    mailserver_id integer NOT NULL,
-    mailserver_timeupdate timestamp without time zone,
-    mailserver_timecreate timestamp without time zone,
-    mailserver_userupdate integer,
-    mailserver_usercreate integer,
-    mailserver_host_id integer NOT NULL,
-    mailserver_relayhost_id integer,
-    mailserver_imap integer,
-    mailserver_smtp_in integer,
-    mailserver_smtp_out integer
-);
-
-
---
--- Name: p_mailservernetwork; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_mailservernetwork (
-    mailservernetwork_host_id integer NOT NULL,
-    mailservernetwork_ip character varying(16) NOT NULL
+    host_description character varying(128)
 );
 
 
@@ -1674,17 +1551,6 @@ CREATE TABLE p_mailshare (
 CREATE TABLE p_of_usergroup (
     of_usergroup_group_id integer NOT NULL,
     of_usergroup_user_id integer NOT NULL
-);
-
-
---
--- Name: p_samba; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_samba (
-    samba_domain_id integer NOT NULL,
-    samba_name character varying(255) NOT NULL,
-    samba_value character varying(255) NOT NULL
 );
 
 
@@ -2265,78 +2131,6 @@ CREATE TABLE rgroup (
 
 
 --
--- Name: samba; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE samba (
-    samba_domain_id integer NOT NULL,
-    samba_name character varying(255) DEFAULT ''::character varying NOT NULL,
-    samba_value character varying(255) DEFAULT ''::character varying NOT NULL
-);
-
-
---
--- Name: service; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE service (
-    service_id integer NOT NULL,
-    service_key character varying(255)
-);
-
-
---
--- Name: servicedomain; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE servicedomain (
-    servicedomain_id integer NOT NULL
-);
-
-
---
--- Name: servicehost; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE servicehost (
-    servicehost_id integer NOT NULL
-);
-
-
---
--- Name: serviceproperty; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE serviceproperty (
-    serviceproperty_id integer NOT NULL,
-    serviceproperty_service_id integer NOT NULL,
-    serviceproperty_key character varying(255),
-    serviceproperty_default text,
-    serviceproperty_type character varying(255),
-    serviceproperty_min smallint,
-    serviceproperty_max smallint
-);
-
-
---
--- Name: servicepropertydomain; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE servicepropertydomain (
-    servicepropertydomain_id integer NOT NULL
-);
-
-
---
--- Name: servicepropertyhost; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE servicepropertyhost (
-    servicepropertyhost_id integer NOT NULL
-);
-
-
---
 -- Name: stats; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -2644,57 +2438,6 @@ CREATE TABLE website (
     website_entity_id integer NOT NULL,
     website_label character varying(255) NOT NULL,
     website_url text
-);
-
-
---
--- Table structure for table ServiceProperty
---
-
-CREATE TABLE ServiceProperty (
-  serviceproperty_id serial,
-  serviceproperty_service varchar(255) NOT NULL,
-  serviceproperty_property varchar(255) NOT NULL,
-  serviceproperty_entity_id integer NOT NULL,
-  PRIMARY KEY  (serviceproperty_id),
-  KEY serviceproperty_service_key (serviceproperty_service),
-  KEY serviceproperty_property_key (serviceproperty_property),
-  CONSTRAINT serviceproperty_entity_id_entity_id_fkey FOREIGN KEY (serviceproperty_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
---
--- Table structure for table Service
---
-
-CREATE TABLE Service (
-  service_id serial,
-  service_service varchar(255) NOT NULL,
-  service_entity_id integer NOT NULL,
-  PRIMARY KEY  (service_id),
-  KEY service_service_key (service_service),
-  CONSTRAINT service_entity_id_entity_id_fkey FOREIGN KEY (service_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
--- Table structure for table SSOTicket
---
-CREATE TABLE SSOTicket (
-  ssoticket_ticket varchar(255) NOT NULL,
-  ssoticket_user_id integer,
-  ssoticket_timestamp timestamp NOT NULL,
-  PRIMARY KEY (ssoticket_ticket),
-  CONSTRAINT ssoticket_user_id_userobm_id_fkey FOREIGN KEY (ssoticket_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
---
--- Table structure for table `TaskEvent`
---
-
-CREATE TABLE TaskEvent (
-  taskevent_task_id integer NOT NULL,
-  taskevent_event_id integer NOT NULL,
-  PRIMARY KEY (taskevent_event_id, taskevent_task_id),
-  CONSTRAINT `taskevent_task_id_projecttask_id_fkey` FOREIGN KEY (`taskevent_task_id`) REFERENCES `ProjectTask` (`projecttask_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `taskevent_event_id_event_id_fkey` FOREIGN KEY (`taskevent_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -3520,25 +3263,6 @@ ALTER SEQUENCE list_list_id_seq OWNED BY list.list_id;
 
 
 --
--- Name: mailserver_mailserver_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE mailserver_mailserver_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: mailserver_mailserver_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE mailserver_mailserver_id_seq OWNED BY mailserver.mailserver_id;
-
-
---
 -- Name: mailshare_mailshare_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -4043,44 +3767,6 @@ CREATE SEQUENCE rgroup_rgroup_id_seq
 --
 
 ALTER SEQUENCE rgroup_rgroup_id_seq OWNED BY rgroup.rgroup_id;
-
-
---
--- Name: service_service_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE service_service_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: service_service_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE service_service_id_seq OWNED BY service.service_id;
-
-
---
--- Name: serviceproperty_serviceproperty_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE serviceproperty_serviceproperty_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: serviceproperty_serviceproperty_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE serviceproperty_serviceproperty_id_seq OWNED BY serviceproperty.serviceproperty_id;
 
 
 --
@@ -4597,13 +4283,6 @@ ALTER TABLE list ALTER COLUMN list_id SET DEFAULT nextval('list_list_id_seq'::re
 
 
 --
--- Name: mailserver_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE mailserver ALTER COLUMN mailserver_id SET DEFAULT nextval('mailserver_mailserver_id_seq'::regclass);
-
-
---
 -- Name: mailshare_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4790,20 +4469,6 @@ ALTER TABLE resourcetype ALTER COLUMN resourcetype_id SET DEFAULT nextval('resou
 --
 
 ALTER TABLE rgroup ALTER COLUMN rgroup_id SET DEFAULT nextval('rgroup_rgroup_id_seq'::regclass);
-
-
---
--- Name: service_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE service ALTER COLUMN service_id SET DEFAULT nextval('service_service_id_seq'::regclass);
-
-
---
--- Name: serviceproperty_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE serviceproperty ALTER COLUMN serviceproperty_id SET DEFAULT nextval('serviceproperty_serviceproperty_id_seq'::regclass);
 
 
 --
@@ -5236,22 +4901,6 @@ ALTER TABLE ONLY domainpropertyvalue
 
 
 --
--- Name: domainservice_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY domainservice
-    ADD CONSTRAINT domainservice_pkey PRIMARY KEY (domainservice_service_id, domainservice_domain_id);
-
-
---
--- Name: domainservicevalue_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY domainservicevalue
-    ADD CONSTRAINT domainservicevalue_pkey PRIMARY KEY (domainservicevalue_serviceproperty_id, domainservicevalue_domain_id);
-
-
---
 -- Name: email_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -5361,23 +5010,6 @@ ALTER TABLE ONLY host
 
 ALTER TABLE ONLY hostentity
     ADD CONSTRAINT hostentity_pkey PRIMARY KEY (hostentity_entity_id, hostentity_host_id);
-
-
---
--- Name: hostservice_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY hostservice
-    ADD CONSTRAINT hostservice_pkey PRIMARY KEY (hostservice_service_id, hostservice_host_id);
-
-
---
--- Name: hostservicevalue_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY hostservicevalue
-    ADD CONSTRAINT hostservicevalue_pkey PRIMARY KEY (hostservicevalue_serviceproperty_id, hostservicevalue_host_id);
-
 
 --
 -- Name: im_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
@@ -5537,14 +5169,6 @@ ALTER TABLE ONLY listentity
 
 ALTER TABLE ONLY mailboxentity
     ADD CONSTRAINT mailboxentity_pkey PRIMARY KEY (mailboxentity_entity_id, mailboxentity_mailbox_id);
-
-
---
--- Name: mailserver_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY mailserver
-    ADD CONSTRAINT mailserver_pkey PRIMARY KEY (mailserver_id);
 
 
 --
@@ -5897,70 +5521,6 @@ ALTER TABLE ONLY resourcetype
 
 ALTER TABLE ONLY rgroup
     ADD CONSTRAINT rgroup_pkey PRIMARY KEY (rgroup_id);
-
-
---
--- Name: service_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY service
-    ADD CONSTRAINT service_pkey PRIMARY KEY (service_id);
-
-
---
--- Name: service_service_key_key; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY service
-    ADD CONSTRAINT service_service_key_key UNIQUE (service_key);
-
-
---
--- Name: servicedomain_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY servicedomain
-    ADD CONSTRAINT servicedomain_pkey PRIMARY KEY (servicedomain_id);
-
-
---
--- Name: servicehost_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY servicehost
-    ADD CONSTRAINT servicehost_pkey PRIMARY KEY (servicehost_id);
-
-
---
--- Name: serviceproperty_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY serviceproperty
-    ADD CONSTRAINT serviceproperty_pkey PRIMARY KEY (serviceproperty_id);
-
-
---
--- Name: serviceproperty_serviceproperty_key_key; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY serviceproperty
-    ADD CONSTRAINT serviceproperty_serviceproperty_key_key UNIQUE (serviceproperty_key);
-
-
---
--- Name: servicepropertydomain_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY servicepropertydomain
-    ADD CONSTRAINT servicepropertydomain_pkey PRIMARY KEY (servicepropertydomain_id);
-
-
---
--- Name: servicepropertyhost_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY servicepropertyhost
-    ADD CONSTRAINT servicepropertyhost_pkey PRIMARY KEY (servicepropertyhost_id);
 
 
 --
@@ -7326,59 +6886,11 @@ ALTER TABLE ONLY domainentity
 
 
 --
--- Name: domainmailserver_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY domainmailserver
-    ADD CONSTRAINT domainmailserver_domain_id_domain_id_fkey FOREIGN KEY (domainmailserver_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: domainmailserver_mailserver_id_mailserver_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY domainmailserver
-    ADD CONSTRAINT domainmailserver_mailserver_id_mailserver_id_fkey FOREIGN KEY (domainmailserver_mailserver_id) REFERENCES mailserver(mailserver_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: domainpropertyvalue_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY domainpropertyvalue
     ADD CONSTRAINT domainpropertyvalue_domain_id_domain_id_fkey FOREIGN KEY (domainpropertyvalue_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: domainservice_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY domainservice
-    ADD CONSTRAINT domainservice_domain_id_domain_id_fkey FOREIGN KEY (domainservice_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: domainservice_service_id_domainservice_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY domainservice
-    ADD CONSTRAINT domainservice_service_id_domainservice_domain_id_fkey FOREIGN KEY (domainservice_service_id) REFERENCES servicedomain(servicedomain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: domainservicevalue_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY domainservicevalue
-    ADD CONSTRAINT domainservicevalue_domain_id_domain_id_fkey FOREIGN KEY (domainservicevalue_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: domainservicevalue_serviceproperty_id_serviceproperty_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY domainservicevalue
-    ADD CONSTRAINT domainservicevalue_serviceproperty_id_serviceproperty_id_fkey FOREIGN KEY (domainservicevalue_serviceproperty_id) REFERENCES servicepropertydomain(servicepropertydomain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -7675,38 +7187,6 @@ ALTER TABLE ONLY hostentity
 
 ALTER TABLE ONLY hostentity
     ADD CONSTRAINT hostentity_host_id_host_id_fkey FOREIGN KEY (hostentity_host_id) REFERENCES host(host_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: hostservice_host_id_host_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY hostservice
-    ADD CONSTRAINT hostservice_host_id_host_id_fkey FOREIGN KEY (hostservice_host_id) REFERENCES host(host_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: hostservice_service_id_hostservice_host_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY hostservice
-    ADD CONSTRAINT hostservice_service_id_hostservice_host_id_fkey FOREIGN KEY (hostservice_service_id) REFERENCES servicehost(servicehost_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: hostservicevalue_host_id_host_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY hostservicevalue
-    ADD CONSTRAINT hostservicevalue_host_id_host_id_fkey FOREIGN KEY (hostservicevalue_host_id) REFERENCES host(host_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: hostservicevalue_serviceproperty_id_serviceproperty_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY hostservicevalue
-    ADD CONSTRAINT hostservicevalue_serviceproperty_id_serviceproperty_id_fkey FOREIGN KEY (hostservicevalue_serviceproperty_id) REFERENCES servicepropertyhost(servicepropertyhost_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -8206,38 +7686,6 @@ ALTER TABLE ONLY mailboxentity
 
 
 --
--- Name: mailserver_host_id_host_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY mailserver
-    ADD CONSTRAINT mailserver_host_id_host_id_fkey FOREIGN KEY (mailserver_host_id) REFERENCES host(host_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: mailserver_relayhost_id_host_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY mailserver
-    ADD CONSTRAINT mailserver_relayhost_id_host_id_fkey FOREIGN KEY (mailserver_relayhost_id) REFERENCES host(host_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: mailserver_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY mailserver
-    ADD CONSTRAINT mailserver_usercreate_userobm_id_fkey FOREIGN KEY (mailserver_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
--- Name: mailserver_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY mailserver
-    ADD CONSTRAINT mailserver_userupdate_userobm_id_fkey FOREIGN KEY (mailserver_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
-
---
 -- Name: mailshare_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -8250,7 +7698,7 @@ ALTER TABLE ONLY mailshare
 --
 
 ALTER TABLE ONLY mailshare
-    ADD CONSTRAINT mailshare_mail_server_id_mailserver_id_fkey FOREIGN KEY (mailshare_mail_server_id) REFERENCES mailserver(mailserver_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT mailshare_mail_server_id_mailserver_id_fkey FOREIGN KEY (mailshare_mail_server_id) REFERENCES host(host_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -9108,55 +8556,6 @@ ALTER TABLE ONLY rgroup
 ALTER TABLE ONLY rgroup
     ADD CONSTRAINT rgroup_userupdate_userobm_id_fkey FOREIGN KEY (rgroup_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
-
---
--- Name: samba_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY samba
-    ADD CONSTRAINT samba_domain_id_domain_id_fkey FOREIGN KEY (samba_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: servicedomain_id_service_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY servicedomain
-    ADD CONSTRAINT servicedomain_id_service_id_fkey FOREIGN KEY (servicedomain_id) REFERENCES service(service_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: servicehost_id_service_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY servicehost
-    ADD CONSTRAINT servicehost_id_service_id_fkey FOREIGN KEY (servicehost_id) REFERENCES service(service_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: serviceproperty_service_id_service_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY serviceproperty
-    ADD CONSTRAINT serviceproperty_service_id_service_id_fkey FOREIGN KEY (serviceproperty_service_id) REFERENCES service(service_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: servicepropertydomain_id_serviceproperty_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY servicepropertydomain
-    ADD CONSTRAINT servicepropertydomain_id_serviceproperty_id_fkey FOREIGN KEY (servicepropertydomain_id) REFERENCES serviceproperty(serviceproperty_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: servicepropertyhost_id_serviceproperty_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY servicepropertyhost
-    ADD CONSTRAINT servicepropertyhost_id_serviceproperty_id_fkey FOREIGN KEY (servicepropertyhost_id) REFERENCES serviceproperty(serviceproperty_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
 --
 -- Name: subscription_contact_id_contact_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
@@ -9378,7 +8777,7 @@ ALTER TABLE ONLY userobm
 --
 
 ALTER TABLE ONLY userobm
-    ADD CONSTRAINT userobm_mail_server_id_mailserver_id_fkey FOREIGN KEY (userobm_mail_server_id) REFERENCES mailserver(mailserver_id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT userobm_mail_server_id_mailserver_id_fkey FOREIGN KEY (userobm_mail_server_id) REFERENCES host(host_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
@@ -9443,6 +8842,61 @@ ALTER TABLE ONLY userobmpref
 
 ALTER TABLE ONLY website
     ADD CONSTRAINT website_entity_id_entity_id_fkey FOREIGN KEY (website_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+--
+-- Table structure for table ServiceProperty
+--
+
+CREATE TABLE ServiceProperty (
+  serviceproperty_id serial,
+  serviceproperty_service varchar(255) NOT NULL,
+  serviceproperty_property varchar(255) NOT NULL,
+  serviceproperty_entity_id integer NOT NULL,
+  serviceproperty_value text,
+  PRIMARY KEY  (serviceproperty_id),
+  CONSTRAINT serviceproperty_entity_id_entity_id_fkey FOREIGN KEY (serviceproperty_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+create INDEX serviceproperty_service_key ON ServiceProperty (serviceproperty_service);
+create INDEX serviceproperty_property_key ON ServiceProperty (serviceproperty_property);
+--
+-- Table structure for table Service
+--
+
+CREATE TABLE Service (
+  service_id serial,
+  service_service varchar(255) NOT NULL,
+  service_entity_id integer NOT NULL,
+  PRIMARY KEY  (service_id),
+  CONSTRAINT service_entity_id_entity_id_fkey FOREIGN KEY (service_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+create INDEX service_service_key ON Service (service_service);
+
+-- Table structure for table SSOTicket
+--
+CREATE TABLE SSOTicket (
+  ssoticket_ticket varchar(255) NOT NULL,
+  ssoticket_user_id integer,
+  ssoticket_timestamp timestamp NOT NULL,
+  PRIMARY KEY (ssoticket_ticket),
+  CONSTRAINT ssoticket_user_id_userobm_id_fkey FOREIGN KEY (ssoticket_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+--
+-- Table structure for table TaskEvent
+--
+
+CREATE TABLE TaskEvent (
+  taskevent_task_id integer NOT NULL,
+  taskevent_event_id integer NOT NULL,
+  PRIMARY KEY (taskevent_event_id, taskevent_task_id),
+  CONSTRAINT taskevent_task_id_projecttask_id_fkey FOREIGN KEY (taskevent_task_id) REFERENCES ProjectTask (projecttask_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT taskevent_event_id_event_id_fkey FOREIGN KEY (taskevent_event_id) REFERENCES Event (event_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 
 
 --
