@@ -1022,10 +1022,12 @@ Obm.CalendarManager = new Class({
     }
   }, 
 
-    sendDeleteEvent: function(eventData) {
-    ajax = new Ajax('calendar_index.php',
-    {postBody:'ajax=1&action=quick_delete&' + Object.toQueryString(eventData), onComplete: this.receiveDeleteEvent, method: 'post'});
-    ajax.request();
+  sendDeleteEvent: function(eventData) {
+    new Request.JSON({
+      url : 'calendar_index.php',
+      secure : false,
+      onComplete : this.receiveDeleteEvent,
+    }).post($merge({ajax : 1, action : 'quick_delete'}, eventData));    
   },
   
   receiveDeleteEvent: function(response) {
@@ -1286,10 +1288,6 @@ Obm.CalendarView = new Class({
   },
 
   insert: function(label) {
-    var qstring = Object.toQueryString({
-      view_label: label
-    });
-
     // Select input
     var sel = $('sel_view');
     var opt = sel.getChildren();
@@ -1305,36 +1303,36 @@ Obm.CalendarView = new Class({
     if (current_options.contains(label)) {
       alert(obm.vars.labels.conflict_view_label);
     } else {
-      var ajax = new Ajax('calendar_index.php',
-        {postBody: 'ajax=1&action=insert_view&'+qstring, onComplete: 
-          function(response){
-            try {
-              var resp = eval(response);
-            } catch (e) {
-              resp = new Object();
-              resp.error = 1;
-              resp.message = obm.vars.labels.fatalServerErr;
-            }
-            if(response.error == 0) {
-              showOkMessage(response.message);
-              var obmbookmark_id = response.obmbookmark_id;
-              var obmbookmark_label = response.obmbookmark_label;
-              var obmbookmark_properties = response.obmbookmarkproperties;
-
-              var option = new Element('option')
-                .setProperties({
-                  'id':'opt_'+obmbookmark_id,
-                  'value': 'calendar_index.php?'+obmbookmark_properties
-                 })
-                .set('html',obmbookmark_label);
-              sel.adopt(option);
-
-            } else {
-              showErrorMessage(response.message);
-            }
+      new Request.JSON({
+        url : 'calendar_index.php',
+        secure : false,
+        onComplete : function(response){
+          try {
+            var resp = eval(response);
+          } catch (e) {
+            resp = new Object();
+            resp.error = 1;
+            resp.message = obm.vars.labels.fatalServerErr;
           }
-        });
-      ajax.request();
+          if(response.error == 0) {
+            showOkMessage(response.message);
+            var obmbookmark_id = response.obmbookmark_id;
+            var obmbookmark_label = response.obmbookmark_label;
+            var obmbookmark_properties = response.obmbookmarkproperties;
+
+            var option = new Element('option')
+              .setProperties({
+                'id':'opt_'+obmbookmark_id,
+                'value': 'calendar_index.php?'+obmbookmark_properties
+               })
+              .set('html',obmbookmark_label);
+            sel.adopt(option);
+
+          } else {
+            showErrorMessage(response.message);
+          }
+        }
+      }).post({ajax : 1, action : 'insert_view', view_label : label});        
     }
   },
  
