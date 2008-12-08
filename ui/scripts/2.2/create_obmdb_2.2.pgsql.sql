@@ -72,6 +72,7 @@ CREATE TABLE address (
     address_zipcode character varying(14),
     address_town character varying(128),
     address_expresspostal character varying(16),
+    address_state varchar(128),
     address_country character(2),
     address_label character varying(255)
 );

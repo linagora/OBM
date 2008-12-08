@@ -309,3 +309,4 @@ INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NUL
 INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'FR', 'France ', 'EN', '+33');
 INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'MK', '« L''ex République Yougoslave de Macedoine »', 'EN', '');
 
+UPDATE Country SET country_name=trim(country_name);

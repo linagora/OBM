@@ -26,6 +26,7 @@ CREATE TABLE Address (
   address_street                                text,
   address_zipcode                               varchar(14),
   address_town                                  varchar(128),
+  address_state                         	varchar(128),
   address_expresspostal                         varchar(16),
   address_country                               char(2),
   address_label                                 varchar(255),

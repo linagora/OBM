@@ -84,6 +84,7 @@ CREATE TABLE `Address` (
   `address_street` text default NULL,
   `address_zipcode` varchar(14) default NULL,
   `address_town` varchar(128) default NULL,
+  address_state varchar(128),
   `address_expresspostal` varchar(16) default NULL,
   `address_country` char(2) default NULL,
   `address_label` varchar(255) default NULL,
