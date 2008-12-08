@@ -176,28 +176,29 @@ function run_query_todo_insert($todo) {
 
   $obm_q = new DB_OBM;
 
-  if (is_array($users)) {
-    foreach ($users as $user) {
-      $user = sql_parse_id($user);
-      $query = "INSERT INTO Event (
-        todo_timeupdate,
-        todo_timecreate,
-        todo_userupdate,
-        todo_usercreate,
-        todo_domain_id,
-        todo_user,
-        todo_date,
-        todo_deadline,
-        todo_priority,
-        todo_percent,
-        todo_title,
-        todo_description)
+  if (is_array($users) && (count($users)>0)) {
+    $query = "INSERT INTO Event (
+        event_domain_id,
+        event_timeupdate,
+        event_timecreate,
+        event_userupdate,
+        event_usercreate,
+        event_type,
+        event_origin,
+        event_date,
+        event_deadline,
+        event_priority,
+        event_percent,
+        event_title,
+        event_description)
       VALUES (
-        '$now',
-        '$now',
-        $uid,
-        $uid,
         $domain_id,
+        '$now',
+        '$now',
+        $uid,
+        $uid,
+        'VTODO',
+        'ui',
         $user,
         '$now',
         '$deadline',
@@ -206,34 +207,43 @@ function run_query_todo_insert($todo) {
         '$title',
         '$description'
       )";
-      display_debug_msg($query, $cdg_sql, 'run_query_todo_insert()');
-      $retour = $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql, 'run_query_todo_insert()');
+    $retour = $obm_q->query($query);
+
+    foreach ($users as $user) {
+      $user = sql_parse_id($user);
+      // insert user link
     }
 
-    if ($retour) {
-      if (in_array($obm['uid'], $users)) {
-	$where_user = "AND todo_user ='$uid'";
-      } else {
-	$where_user = "";
-      }
-      $uid = sql_parse_id($obm['uid'], true);
-      $query = "SELECT MAX(todo_id) as todo_id
+  }
+
+
+
+
+
+  if ($retour) {
+    if (in_array($obm['uid'], $users)) {
+      $where_user = "AND todo_user ='$uid'";
+    } else {
+      $where_user = "";
+    }
+    $uid = sql_parse_id($obm['uid'], true);
+    $query = "SELECT MAX(todo_id) as todo_id
         FROM Todo WHERE 
         1=1
         $where_user
         AND todo_usercreate $uid";
 
-      display_debug_msg($query, $cdg_sql, 'run_query_todo_insert(2)');
-      $obm_q->query($query);
-      $obm_q->next_record();
-      $id = $obm_q->f('todo_id');
-    }
+    display_debug_msg($query, $cdg_sql, 'run_query_todo_insert(2)');
+    $obm_q->query($query);
+    $obm_q->next_record();
+    $id = $obm_q->f('todo_id');
+  }
 
-    if (in_array($obm['uid'], $users)) {
-      $retour = $id;
-    } else {
-      $retour = 'other_user';
-    }
+  if (in_array($obm['uid'], $users)) {
+    $retour = $id;
+  } else {
+    $retour = 'other_user';
   }
 
   return $retour;

@@ -2310,6 +2310,7 @@ DROP TABLE CalendarException;
 DROP TABLE CalendarEvent;
 DROP TABLE CalendarCategory1;
 DROP TABLE Todo;
+DROP TABLE DeletedTodo;
 DROP TABLE TmpEntity;
 
 -- Write that the 2.1->2.2 is completed
