@@ -1176,24 +1176,6 @@ END
 CREATE TRIGGER mailshare_created BEFORE INSERT ON mailshare FOR EACH ROW EXECUTE PROCEDURE on_mailshare_create();
 CREATE TRIGGER mailshare_changed BEFORE UPDATE ON mailshare FOR EACH ROW EXECUTE PROCEDURE on_mailshare_change();
 
-UPDATE mailserver SET mailserver_timecreate=NOW() WHERE mailserver_timecreate IS NULL;
-ALTER TABLE mailserver ALTER COLUMN mailserver_timecreate SET DEFAULT NOW();
-
-CREATE OR REPLACE FUNCTION on_mailserver_change() RETURNS trigger AS '
-BEGIN
-new.mailserver_timeupdate := current_timestamp;
-RETURN new;
-END
-' LANGUAGE plpgsql;
-CREATE OR REPLACE FUNCTION on_mailserver_create() RETURNS trigger AS '
-BEGIN
-new.mailserver_timecreate := current_timestamp;
-RETURN new;
-END
-' LANGUAGE plpgsql;
-CREATE TRIGGER mailserver_created BEFORE INSERT ON mailserver FOR EACH ROW EXECUTE PROCEDURE on_mailserver_create();
-CREATE TRIGGER mailserver_changed BEFORE UPDATE ON mailserver FOR EACH ROW EXECUTE PROCEDURE on_mailserver_change();
-
 UPDATE profile SET profile_timecreate=NOW() WHERE profile_timecreate IS NULL;
 ALTER TABLE profile ALTER COLUMN profile_timecreate SET DEFAULT NOW();
 
