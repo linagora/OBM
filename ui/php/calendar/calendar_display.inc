@@ -65,6 +65,7 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   global $l_view_agenda_desc,  $l_view_planning_desc, $l_view_list_desc;
   global $l_view_week_desc, $l_view_day_desc, $l_view_month_desc;
   global $path;
+
   if ($p_kind) {
     ${'ico_'.$p_kind.'_view'} = ${'ico_'.$p_kind.'_view_current'};
   }
@@ -2954,7 +2955,7 @@ function html_calendar_waiting_events($obm_wait) {
   global $l_users, $l_title, $l_location, $l_priority, $l_category,$l_high;
   global $l_dateend,$l_change_state,$l_validate,$l_user, $l_resource, $l_owner;
   global $l_wait,$l_low,$l_medium,$l_datebegin,$l_daysofweekshort,$l_update;
-  global  $l_carac,$l_accept,$l_refuse,$l_periodic,$l_yes,$l_no,$path;
+  global $l_carac,$l_accept,$l_refuse,$l_periodic,$l_yes,$l_no,$path;
    
   while ($obm_wait->next_record()) {
     $old_entity = $current_entity;

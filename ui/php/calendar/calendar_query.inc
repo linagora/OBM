@@ -3288,6 +3288,7 @@ Class OccurrenceFactory {
     foreach($this->occurrences as $evtOccurrences) {
       $return = array_merge($return, $evtOccurrences);
     }
+    usort($return, 'occurrenceDateSort');
     return $return;
   }
 
@@ -3398,6 +3399,23 @@ Class OccurrenceFactory {
     unset($instance->events);
     $instance->occurrences = array();
     $instance->events = array();
+  }
+}
+
+
+/**
+ * Sort function to allow occurences sorting by date
+ * 
+ * @param mixed $occA first comparison element
+ * @param mixed $occB second comparison element
+ * @access public
+ * @return void
+ */
+function occurrenceDateSort($occA, $occB) {
+  if ($occA->date < $occB->date) {
+    return -1;
+  } else {
+    return 1;
   }
 }
 

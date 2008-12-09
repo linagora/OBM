@@ -475,7 +475,7 @@ function dis_domain_mailserver_select($role, $sel_id='', $domain_id='') {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_domain_can_delete($p_id) {
   global $l_can_delete, $l_back, $l_delete;
-  global $display, $l_domain;
+  global $path, $display, $l_domain;
 
   $url = url_prepare('domain_index.php');
 
