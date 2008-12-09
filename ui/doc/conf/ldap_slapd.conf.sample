@@ -55,7 +55,7 @@ sizelimit 500
 
 # The tool-threads parameter sets the actual amount of cpu's that is used
 # for indexing.
-tool-threads 1
+_COMMENT_tool-threads 1
 
 #
 # Default database
@@ -75,7 +75,7 @@ database        bdb
 
 # The base of your directory in database #1
 suffix          "dc=local"
-overlay         glue
+_COMMENT_overlay         glue
 
 # rootdn directive for specifying a superuser on the database. This is needed
 # for syncrepl.
