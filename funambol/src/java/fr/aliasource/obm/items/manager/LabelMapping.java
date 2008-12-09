@@ -20,7 +20,7 @@ public class LabelMapping {
 
 		addMapping("MobileTelephoneNumber", "CELL;VOICE;X-OBM-Ref1"); // mobiletel
 		addMapping("Mobile2TelephoneNumber", "CELL;VOICE;X-OBM-Ref2"); // radiotel
-		addMapping("Mobile3TelephoneNumber", "CELL;VOICE;X-OBM-Ref3"); // cartel
+		addMapping("Mobile3TelephoneNumber", "CELL;CAR;VOICE;X-OBM-Ref1"); // cartel
 		addMapping("PagerNumber", "PAGER;X-OBM-Ref1"); // pager
 		addMapping("BusinessTelephoneNumber", "WORK;VOICE;X-OBM-Ref1"); // worktel
 		addMapping("Business2TelephoneNumber", "WORK;VOICE;X-OBM-Ref2"); // work2tel

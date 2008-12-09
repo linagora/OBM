@@ -242,6 +242,7 @@ public class ContactManager extends ObmManager {
 
 	private com.funambol.common.pim.contact.Contact obmContactTofoundation(
 			Contact obmcontact) {
+		LabelMapping lm = new LabelMapping();
 		com.funambol.common.pim.contact.Contact contact = new com.funambol.common.pim.contact.Contact();
 
 		contact.setUid("" + obmcontact.getUid());
@@ -261,31 +262,31 @@ public class ContactManager extends ObmManager {
 			Email e = obmcontact.getEmails().get(label);
 			com.funambol.common.pim.contact.Email funisMail = new com.funambol.common.pim.contact.Email(
 					e.getEmail());
-			funisMail.setEmailType(label);
+			funisMail.setEmailType(lm.toFunis(label));
 			bd.addEmail(funisMail);
 		}
 
-		obmToFunis(bd.getAddress(), "work", obmcontact.getAddresses().get(
-				"work"));
+		obmToFunis(bd.getAddress(), obmcontact.getAddresses().get(
+				lm.toOBM("work")));
 
 		for (String label : obmcontact.getPhones().keySet()) {
 			Phone p = new Phone(obmcontact.getPhones().get(label).getNumber());
-			p.setPhoneType(label);
+			p.setPhoneType(lm.toFunis(label));
 			bd.addPhone(p);
 		}
 
 		for (String label : obmcontact.getWebsites().keySet()) {
 			Website ws = obmcontact.getWebsites().get(label);
 			WebPage wp = new WebPage(ws.getUrl());
-			wp.setWebPageType(label);
+			wp.setWebPageType(lm.toFunis(label));
 			bd.addWebPage(wp);
 		}
 
 		PersonalDetail pd = contact.getPersonalDetail();
-		obmToFunis(pd.getAddress(), "home", obmcontact.getAddresses().get(
+		obmToFunis(pd.getAddress(), obmcontact.getAddresses().get(
 				"home"));
-		obmToFunis(pd.getOtherAddress(), "other", obmcontact.getAddresses()
-				.get("other"));
+		obmToFunis(pd.getOtherAddress(), obmcontact.getAddresses()
+				.get(lm.toOBM("other")));
 
 		ContactHelper.setFoundationNote(contact, obmcontact.getComment(),
 				ContactHelper.COMMENT);
@@ -296,7 +297,7 @@ public class ContactManager extends ObmManager {
 	}
 
 	private void obmToFunis(com.funambol.common.pim.contact.Address target,
-			String label, Address source) {
+			Address source) {
 		if (target == null) {
 			logger.warn("target addr is null");
 			return;
@@ -305,7 +306,6 @@ public class ContactManager extends ObmManager {
 			target.getStreet().setValue(source.getStreet());
 			target.getCity().setValue(source.getTown());
 			target.getCountry().setValue(source.getCountry());
-			target.getLabel().setValue(label);
 		}
 	}
 
@@ -324,6 +324,7 @@ public class ContactManager extends ObmManager {
 	@SuppressWarnings("unchecked")
 	private Contact foundationContactToObm(
 			com.funambol.common.pim.contact.Contact funis, String type) {
+		LabelMapping lm = new LabelMapping();
 
 		Contact contact = new Contact();
 
@@ -343,14 +344,15 @@ public class ContactManager extends ObmManager {
 
 		// addresses
 		if (bd.getAddress() != null) {
-			contact.addAddress("work", funisToObm(bd.getAddress()));
+			contact.addAddress(lm.toOBM("work"), funisToObm(bd.getAddress()));
 		}
 
 		if (pd.getAddress() != null) {
-			contact.addAddress("home", funisToObm(pd.getAddress()));
+			contact.addAddress(lm.toOBM("home"), funisToObm(pd.getAddress()));
 		}
 		if (pd.getOtherAddress() != null) {
-			contact.addAddress("other", funisToObm(pd.getOtherAddress()));
+			contact.addAddress(lm.toOBM("other"), funisToObm(pd
+					.getOtherAddress()));
 		}
 
 		// phones
@@ -359,8 +361,8 @@ public class ContactManager extends ObmManager {
 		lph.addAll(pd.getPhones());
 		for (Phone p : lph) {
 			if (p != null && s(p) != null && s(p).length() > 0)
-				contact.addPhone(p.getPhoneType(), new org.obm.sync.book.Phone(
-						s(p)));
+				contact.addPhone(lm.toOBM(p.getPhoneType()),
+						new org.obm.sync.book.Phone(s(p)));
 		}
 
 		// emails
@@ -369,7 +371,7 @@ public class ContactManager extends ObmManager {
 		lem.addAll(pd.getEmails());
 		for (com.funambol.common.pim.contact.Email em : lem) {
 			if (em != null && s(em) != null && s(em).length() > 0) {
-				contact.addEmail(em.getEmailType(), new Email(s(em)));
+				contact.addEmail(lm.toOBM(em.getEmailType()), new Email(s(em)));
 			}
 		}
 
@@ -379,7 +381,8 @@ public class ContactManager extends ObmManager {
 		lwp.addAll(pd.getWebPages());
 		for (WebPage wp : lwp) {
 			if (wp != null && s(wp) != null && s(wp).length() > 0) {
-				contact.addWebsite(wp.getWebPageType(), new Website(s(wp)));
+				contact.addWebsite(lm.toOBM(wp.getWebPageType()), new Website(
+						s(wp)));
 			}
 		}
 
