@@ -1,0 +1,4 @@
+"cv_id";"cv_domain_id";"cv_timeupdate";"cv_timecreate";"cv_userupdate";"cv_usercreate";"cv_userobm_id";"cv_title";"cv_additionnalrefs";"cv_comment"
+"1";"2";"2008-11-28 10:16:40";"0000-00-00 00:00:00";NULL;NULL;"2";"CV Admin";NULL;NULL
+"2";"2";"2008-11-28 10:16:40";"0000-00-00 00:00:00";NULL;NULL;"3";"CV John Doe";NULL;NULL
+"3";"2";"2008-11-28 10:16:40";"0000-00-00 00:00:00";NULL;NULL;"4";"CV Jane Doe";NULL;NULL
