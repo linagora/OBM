@@ -283,10 +283,9 @@ public class ContactManager extends ObmManager {
 		}
 
 		PersonalDetail pd = contact.getPersonalDetail();
-		obmToFunis(pd.getAddress(), obmcontact.getAddresses().get(
-				"home"));
-		obmToFunis(pd.getOtherAddress(), obmcontact.getAddresses()
-				.get(lm.toOBM("other")));
+		obmToFunis(pd.getAddress(), obmcontact.getAddresses().get(lm.toOBM("home")));
+		obmToFunis(pd.getOtherAddress(), obmcontact.getAddresses().get(
+				lm.toOBM("other")));
 
 		ContactHelper.setFoundationNote(contact, obmcontact.getComment(),
 				ContactHelper.COMMENT);
@@ -303,12 +302,14 @@ public class ContactManager extends ObmManager {
 			return;
 		}
 		if (source != null) {
-			target.getStreet().setValue(source.getStreet());
-			target.getCity().setValue(source.getTown());
-			target.getCountry().setValue(source.getCountry());
-			target.getState().setValue(source.getState());
-			target.getPostalCode().setValue(source.getZipCode());
-			target.getPostOfficeAddress().setValue(source.getExpressPostal());
+			target.getStreet().setPropertyValue(source.getStreet());
+			target.getCity().setPropertyValue(source.getTown());
+			target.getCountry().setPropertyValue(source.getCountry());
+			target.getState().setPropertyValue(source.getState());
+			target.getPostalCode().setPropertyValue(source.getZipCode());
+			target.getPostOfficeAddress().setPropertyValue(
+					source.getExpressPostal());
+			logger.info("copied address with street: "+source.getStreet()+" to "+target);
 		}
 	}
 
