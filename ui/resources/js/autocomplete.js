@@ -236,7 +236,7 @@ obm.AutoComplete.Search = new Class({
   	switch (e.key) {
       case 'enter' : // Enter : choose the selection
         if (this.resultBox.getStyle('display')!='none') {
-          var currentSel = $E('.highlight', this.resultBox);
+          var currentSel = this.resultBox.getElement('.highlight');
           if (currentSel) {
             currentSel.fireEvent('mousedown');
           }
@@ -272,7 +272,7 @@ obm.AutoComplete.Search = new Class({
         e.stop(); // because pgdown works like End in IE
 
       } else if (e.code == obm.vars.consts.tab) {    // Tab key : select first result
-        var currentSel = $E('.highlight', this.resultBox);
+        var currentSel = this.resultBox.getElement('.highlight');
         if (currentSel) {
           currentSel.fireEvent('mousedown');
           this.resetFunc();
