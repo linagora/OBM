@@ -306,6 +306,9 @@ public class ContactManager extends ObmManager {
 			target.getStreet().setValue(source.getStreet());
 			target.getCity().setValue(source.getTown());
 			target.getCountry().setValue(source.getCountry());
+			target.getState().setValue(source.getState());
+			target.getPostalCode().setValue(source.getZipCode());
+			target.getPostOfficeAddress().setValue(source.getExpressPostal());
 		}
 	}
 
@@ -317,7 +320,7 @@ public class ContactManager extends ObmManager {
 		org.obm.sync.book.Address obm = new org.obm.sync.book.Address(s(funis
 				.getStreet()), s(funis.getPostalCode()), s(funis
 				.getPostOfficeAddress()), s(funis.getCity()), s(funis
-				.getCountry()));
+				.getCountry()), s(funis.getState()));
 		return obm;
 	}
 
