@@ -27,6 +27,7 @@ public class LabelMapping {
 		addMapping("Business3TelephoneNumber", "WORK;VOICE;X-OBM-Ref3"); // assistanttel
 		addMapping("BusinessFaxNumber", "WORK;FAX;X-OBM-Ref1"); // workfax
 		addMapping("HomeTelephoneNumber", "HOME;VOICE;X-OBM-Ref1"); // homephone
+		addMapping("OtherTelephoneNumber", "OTHER;VOICE;X-OBM-Ref1"); // telnokia
 		addMapping("HomeFaxNumber", "HOME;FAX;X-OBM-Ref1"); // homefax
 		addMapping("Email1Address", "INTERNET;X-OBM-Ref1"); // email
 		addMapping("OtherEmail2Address", "INTERNET;X-OBM-Ref2"); // email2
