@@ -316,7 +316,7 @@ sub getMailboxQuotaUse {
 
     my @quotaDesc = $cyrusSrvConn->listquotaroot( $boxPrefix.$mailBoxName );
     if( $cyrusSrvConn->error ) {
-        &OBM::toolBox::write_log( "[Cyrus::cyrusEngine]: erreur Cyrus a l'obtention du quota utilise : ".$cyrusSrvConn->error(), "W" );
+        $self->_log( 'erreur Cyrus a l\'obtention du quota utilise : '.$cyrusSrvConn->error(), 2 );
         return undef;
     }
 
