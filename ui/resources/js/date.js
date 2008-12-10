@@ -326,8 +326,10 @@ Obm.TimeZoneParser = new Class ({
   initialize: function (timeZone) {
     var request = new Request({
         url:obm.vars.consts.resourcePath  + '/js/bin/timezone/' + timeZone,
-        async: false,
-        encoding: 'x-user-defined'}).send();
+        async: false
+    });
+    request.xhr.overrideMimeType('text/plain; charset=x-user-defined');
+    request.send();
     var fileContent = request.response.text;
     var fileSize = fileContent.length;
     var bytes = [];
