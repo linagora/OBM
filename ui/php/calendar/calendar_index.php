@@ -238,7 +238,7 @@ if ($action == 'index') {
       $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
       $display['detail'] = dis_calendar_event_form($action, $params, '',$entities);
     } else {
-      run_query_calendar_add_event($params, $entities, $event_id);
+      $event_id = run_query_calendar_add_event($params, $entities);
       $params["calendar_id"] = $event_id;
       $mail_data = run_query_prepare_event_mail($params, $action);
       calendar_send_mail($mail_data);

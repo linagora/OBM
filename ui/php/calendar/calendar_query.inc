@@ -487,9 +487,8 @@ function run_query_calendar_delete_event_entity($calendar, $users = null) {
 // Parameters: 
 //   - $calendar        : Calendar params
 //   - $sel_entity_id : List entitis id ['user'] ['resource']
-//   - $event_id      : var to get the id to be returned
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_add_event($calendar, $sel_entity_id, $event_id) {
+function run_query_calendar_add_event($calendar, $sel_entity_id) {
   global $obm, $ccalendar_resource_admin, $ccalendar_send_ics;
   global $l_from, $l_to, $l_date, $l_resource_allocated;
   global $l_add_event_mail_head,$l_add_event_mail_subject;
@@ -546,7 +545,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id, $event_id) {
   if (($calendar['alert']) > 0) {
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
   }
-
+  return $event_id;
 }
 
 
@@ -728,7 +727,6 @@ function create_calendar_ics_meeting_file($calendar, $event_id, $attendees, $res
   include_once('obminclude/of/vcalendar/reader/OBM.php');
 
   $calendar_user['user'] = array ($obm['uid'] => 'dummy');
-  
   $reader = new Vcalendar_Reader_OBM($calendar_user,array($event_id));
   $document = $reader->getDocument();
   $writer = new Vcalendar_Writer_ICS();  
@@ -2525,7 +2523,6 @@ function run_query_get_events_attendee($events) {
  */
 function run_query_get_events_exception($events,$start_time = NULL,$end_time = NULL) {
   global $cdg_sql;
-
   $obm_q = new DB_OBM;
   $event_list = implode(',',$events);
   if(!is_null($start_time)) {
@@ -2723,7 +2720,6 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
 
   // Process the model : exceptions, attendees
   if (count($of->events) > 0) {
-
     // Handle exceptions : remove occurences from the model
     $exception_q = run_query_get_events_exception(array_keys($of->events),$start,$end);
     while($exception_q->next_record()) {
@@ -3672,10 +3668,11 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       'recipients' => $attendees
     );
   }
-  if($mail_datas['reset_resource_state']) {
-    $rattendees =  of_right_users_for_entity('resource', $resources, 'write');
-    if(!in_array($obm['uid'], $rattendees['ids'])) {
-      $rattendees = array_diff($rattendees['ids'], array($obm['uid']));
+  if ($mail_datas['reset_resource_state']) {
+    //$rattendees =  of_right_users_for_entity('resource', $resources, 'write');
+    $rattendees = array_keys(OBM_Acl::getEntityWriters('resource', $resources));
+    if (!in_array($obm['uid'], $rattendees)) {
+      //$rattendees = array_diff($rattendees['ids'], array($obm['uid'])); WTF ???
       $mail_datas['mails']['reset_resource_state'] = array (
         'subject' => sprintf($l_update_event_mail_subject,$old_title),
         'message' => sprintf($l_update_resource_mail_body, $old_title, $old_start->getOutputDateTime(), 
@@ -3708,16 +3705,15 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     );
   }
   if ($mail_datas['add_resource']) {
-    $rattendees =  of_right_users_for_entity('resource', $new_resources, 'write');
-    if(!in_array($obm['uid'], $rattendees['ids'])) {
-      $rattendees = array_diff($rattendees['ids'], array($obm['uid']));    
+    $rattendees =  of_right_users_for_entity('resource', $new_resources, 'write');echo $obm['uid'];print_r($rattendees);die();
+    if (!in_array($obm['uid'], $rattendees['ids'])) {
       $mail_datas['mails']['add_resource'] = array (
         'subject' => sprintf($l_add_event_mail_subject,$title),
         'message' => sprintf($l_add_resource_mail_body, $start->getOutputDateTime(), $end->getOutputDateTime() ,
                              $title, $location, $consult_link,
                              $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                              $userinfo['lastname'],$cgp_host),
-        'recipients' => $rattendees
+        'recipients' => $rattendees['ids']
       );
     }
   }
