@@ -56,5 +56,6 @@ $l_add_resources = "Add resources";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_j_check_number = "The quantity is not valid.";
+$l_j_create_type_first = "You must create a kind of resource before item creation !";
 
 $l_resource_display = "Display options for resources lists";

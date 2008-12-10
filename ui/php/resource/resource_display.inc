@@ -13,9 +13,9 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames['resource_name'] = $l_name;
-$fieldnames['resource_description'] = $l_desc; // description 
-$fieldnames['resource_qty'] = $l_qty; // quantity 
-$fieldnames['resourcetype_label'] = $l_rtype; 
+$fieldnames['resource_description'] = $l_desc; // description
+$fieldnames['resource_qty'] = $l_qty; // quantity
+$fieldnames['resourcetype_label'] = $l_rtype;
 $fieldnames['resource_id'] = $l_update;
 
 
@@ -133,13 +133,13 @@ function html_resource_search_form($resource) {
     <label>&nbsp;&nbsp;<br />
     </label>
     <label>&nbsp;<br />
-      <input type=\"text\" name=\"tf_qtyinf\" size=\"4\" maxlength=\"8\" value=\"$qtyinf\" /> 
+      <input type=\"text\" name=\"tf_qtyinf\" size=\"4\" maxlength=\"8\" value=\"$qtyinf\" />
     </label>
     <label><br />
-      &nbsp;&lt;=&nbsp;$l_qty&nbsp;&lt;=&nbsp; 
+      &nbsp;&lt;=&nbsp;$l_qty&nbsp;&lt;=&nbsp;
     </label>
     <label>&nbsp;<br />
-      <input type=\"text\" name=\"tf_qtysup\" size=\"4\" maxlength=\"8\" value=\"$qtysup\" /> 
+      <input type=\"text\" name=\"tf_qtysup\" size=\"4\" maxlength=\"8\" value=\"$qtysup\" />
     </label>
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
@@ -160,7 +160,7 @@ function html_resource_search_form($resource) {
 // Display the reseource search result
 // Parameters:
 //   - $resource[]   : resource search criteria
-//     keys used : name, desc 
+//     keys used : name, desc
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resource_search_list($resource) {
   global $l_found, $l_no_found;
@@ -189,7 +189,7 @@ function dis_resource_search_list($resource) {
 //   - $obm_q    : database result (resource list)
 //   - $prefs   : the fields which have to be displayed
 //   - $resource[]   : resource search criteria
-//     keys used : name, desc 
+//     keys used : name, desc
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
@@ -310,7 +310,7 @@ function html_resource_form($usr_q, $resource) {
       <legend>$l_admin_permission : <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" /></legend>
       <input type=\"hidden\" name=\"sel_accept_admin[]\" value=\"data-user-$obm[uid]\" />
       <input type=\"hidden\" name=\"sel_read_public\" value=\"1\" />
-      <div id=\"sel_accept_admin\">     
+      <div id=\"sel_accept_admin\">
       </div>
       </fieldset>";
     $js = "
@@ -333,7 +333,7 @@ function html_resource_form($usr_q, $resource) {
     <form method=\"post\" name=\"f_entity\"
       onsubmit=\"if (check_resource(this)) return true; else return false;\"
       action=\"" . url_prepare('resource_index.php') . "\">
-    
+
     <fieldset class=\"detail extra\">
     <legend>$l_resource</legend>
     <table>
@@ -354,11 +354,11 @@ function html_resource_form($usr_q, $resource) {
     <legend>$l_desc</legend>
       <textarea id=\"ta_desc\" name=\"ta_desc\" rows=\"3\" cols=\"80\">$desc</textarea>
     </fieldset>
-    
+
     <fieldset class=\"buttons\">
     $dis_button
     </fieldset>
-    
+
     </form>
     $js";
 
@@ -504,8 +504,8 @@ function dis_resource_display_pref($prefs) {
 
 
 /**
- * Build a JSON array with all search results 
- * 
+ * Build a JSON array with all search results
+ *
  * @param $results array of 'length' => DB query results nb, and 'datas' => DB Resources search query results
  * @access public
  * @return void
@@ -528,7 +528,7 @@ function json_search_resources($resource,$results) {
 
     if ($form == 'event' && $resourcetype_id != '') {
       // Display resource item
-      // TODO : Afficher le lien seulement si des accessoires sont dispo. 
+      // TODO : Afficher le lien seulement si des accessoires sont dispo.
       $url_item = "$path/resource/resource_index.php?action=ext_ritem&ext_element=list-item&popup=1&resource_id=$id";
       if($items > 0 || $property != '') {
         $extension = "new Element('div')";
@@ -567,7 +567,7 @@ function json_search_resources($resource,$results) {
                   {'type': 'text',
                   'name': 'property[$id]',
                   'value': '$l_property'}).
-                addClass('downlight').  
+                addClass('downlight').
                 addEvent('click', function(){ if(this.value=='$l_property') { this.value=\"\"; this.removeClass('downlight') }}).
                 addEvent('blur', function() { if(this.value == '') { this.addClass('downlight'); this.value = '$l_property';  } })
               )
@@ -597,7 +597,7 @@ function dis_resource_admin_index($params) {
 
   $ri_q = run_query_resourceitem();
   $block .= html_resource_resourceitem_form($ri_q);
-  
+
   return $block;
 }
 
@@ -611,7 +611,7 @@ function dis_resource_admin_index($params) {
 function html_resource_resourcetype_form($rt_q) {
   global $l_rtype_manage;
   global $l_label, $l_rtype_property, $l_rtype_kind;
-  global $l_c_new, $l_rtype_insert, $l_rtype_update, $l_rtype_checkdelete; 
+  global $l_c_new, $l_rtype_insert, $l_rtype_update, $l_rtype_checkdelete;
   global $ico_delete, $ico_ok;
 
   $key = 0;
@@ -619,7 +619,6 @@ function html_resource_resourcetype_form($rt_q) {
     $id = $rt_q->f('resourcetype_id');
     $label = $rt_q->f('resourcetype_label');
     $property = $rt_q->f('resourcetype_property');
-    $kind = $rt_q->f('resourcetype_kind');
     if ($key%2 == 0) {
       $class = "class=\"pair\"";
     } else {
@@ -636,7 +635,6 @@ function html_resource_resourcetype_form($rt_q) {
     </a></td>
     <td> <input type=\"text\" id=\"tf_rtype_label_$id\" value=\"$label\" size=\"16\"/></td>
     <td> <input type=\"text\" id=\"tf_rtype_property_$id\" value=\"$property\" size=\"16\"/></td>
-    <td> <input type=\"text\" id=\"tf_rtype_kind_$id\" value=\"$kind\" size=\"6\"/></td>
     <td>
     <a href=\"#\" onclick=\"return updateLine($id,'rtype');\">
     <img src=\"$ico_ok\"/>
@@ -652,8 +650,7 @@ function html_resource_resourcetype_form($rt_q) {
   <input type=\"hidden\" name=\"rtype\" value=\"\" />
   <input type=\"hidden\" name=\"tf_rtype_label\" value=\"\" />
   <input type=\"hidden\" name=\"tf_rtype_property\" value=\"\" />
-  <input type=\"hidden\" name=\"tf_rtype_kind\" value=\"\" />
-  </form>    
+  </form>
   <h1>$l_rtype_manage</h1>
   <div class=\"overflow\">
   <table>
@@ -662,15 +659,14 @@ function html_resource_resourcetype_form($rt_q) {
   <td>&nbsp;</td>
   <td>$l_label</td>
   <td>$l_rtype_property</td>
-  <td>$l_rtype_kind</td>
-  <td>&nbsp;</td>        
-  </tr>    
+  <td>&nbsp;</td>
+  </tr>
   </thead>
   <tbody>
   $rtype_list
   </tbody>
   </table>
-  </div>    
+  </div>
   <form id=\"form_rtype_new\" action=\"\" method=\"post\"
   onsubmit=\"return check_category(this.tf_rtype_label,'$jslabel')\">
   <table>
@@ -679,17 +675,15 @@ function html_resource_resourcetype_form($rt_q) {
   <td colspan=\"3\">$l_c_new</td>
   </tr>
   </thead>
-  <tbody>   
+  <tbody>
   <tr>
-  <td>$l_label</td>    
+  <td>$l_label</td>
   <td>$l_rtype_property</td>
-  <td>$l_rtype_kind</td>    
-  </tr>       
+  </tr>
   <tr>
   <td><input type=\"text\" name=\"tf_rtype_label\" value=\"\" size=\"16\"/></td>
   <td><input type=\"text\" name=\"tf_rtype_property\" value=\"\" size=\"16\"/></td>
-  <td><input type=\"text\" name=\"tf_rtype_kind\" value=\"\" size=\"6\"/></td>
-  </tr>  
+  </tr>
   </tbody>
   <tfoot>
   <tr>
@@ -715,12 +709,15 @@ function html_resource_resourceitem_form($ri_q) {
   global $l_ritem_manage, $l_label, $l_desc, $l_rtype;
   global $l_c_new, $l_ritem_insert;
   global $ico_ok, $ico_delete, $l_confirm_delete_item;
+  global $l_j_create_type_first;
+
+
 
   $key = 0;
   while($ri_q->next_record()) {
     $id = $ri_q->f('resourceitem_id');
     $label = $ri_q->f('resourceitem_label');
-    $desc = $ri_q->f('resourceitem_description'); 
+    $desc = $ri_q->f('resourceitem_description');
     $type_id = $ri_q->f('resourceitem_resourcetype_id');
 
     $rt_q = run_query_resourcetype();
@@ -734,8 +731,8 @@ function html_resource_resourceitem_form($ri_q) {
         $selected = '';
       }
       $sel_type .= "<option value=\"$rtype_id\" $selected>$rtype_label</option>";
-  
-    } 
+
+    }
     $sel_type .= '</select>';
 
     if ($key%2 == 0) {
@@ -763,7 +760,15 @@ function html_resource_resourceitem_form($ri_q) {
     </tr>";
   }
 
-  $rt_q = run_query_resourcetype();
+	$rt_q = run_query_resourcetype();
+
+  $disabled = "";
+  $onclick = "";
+  if ($rt_q->num_rows() == 0) {
+  	$disabled = "disabled=\"true\"";
+  	$onclick = "onclick=\"alert('$l_j_create_type_first')\"";
+	}
+
   $sel_type = "<select name=\"sel_rtype\" id=\"sel_rtype_$id\">";
   while($rt_q->next_record()) {
     $rtype_id = $rt_q->f('resourcetype_id');
@@ -774,8 +779,8 @@ function html_resource_resourceitem_form($ri_q) {
       $selected = '';
     }
     $sel_type .= "<option value=\"$rtype_id\">$rtype_label</option>";
-  
-  } 
+
+  }
   $sel_type .= '</select>';
 
   // --- HTML Template --------------------------------------------------------
@@ -786,7 +791,7 @@ function html_resource_resourceitem_form($ri_q) {
   <input type=\"hidden\" name=\"tf_ritem_label\" value=\"\" />
   <input type=\"hidden\" name=\"tf_ritem_desc\" value=\"\" />
   <input type=\"hidden\" name=\"sel_rtype\" value=\"\" />
-  </form>    
+  </form>
   <h1>$l_ritem_manage</h1>
   <div class=\"overflow\">
   <table>
@@ -796,37 +801,37 @@ function html_resource_resourceitem_form($ri_q) {
   <td>$l_label</td>
   <td>$l_desc</td>
   <td>$l_rtype</td>
-  <td>&nbsp;</td>        
-  </tr>    
+  <td>&nbsp;</td>
+  </tr>
   </thead>
   <tbody>
   $ritem_list
   </tbody>
   </table>
-  </div>    
+  </div>
   <form id=\"form_ritem_new\" action=\"\" method=\"post\"
-  onsubmit=\"return check_category(this.tf_ritem_label,'$jslabel')\">
+  onsubmit=\"return check_category(this.tf_ritem_label,'$jslabel')\" $onclick>
   <table>
   <thead>
   <tr>
   <td colspan=\"3\">$l_c_new</td>
   </tr>
   </thead>
-  <tbody>   
+  <tbody>
   <tr>
-  <td>$l_label</td>    
-  <td>$l_desc</td>    
-  <td>$l_rtype</td>    
-  </tr>       
+  <td>$l_label</td>
+  <td>$l_desc</td>
+  <td>$l_rtype</td>
+  </tr>
   <tr>
   <td><input type=\"text\" name=\"tf_ritem_label\" value=\"\" size=\"16\"/></td>
   <td><textarea name=\"tf_ritem_desc\" value=\"\" rows=\"2\"/></textarea></td>
   <td>$sel_type</td>
-  </tr>  
+  </tr>
   </tbody>
   <tfoot>
   <tr>
-  <td colspan=\"3\"><input type=\"submit\" value=\"$l_ritem_insert\" /></td>
+  <td colspan=\"3\"><input type=\"submit\" value=\"$l_ritem_insert\" $disabled/></td>
   </tr>
   </tfoot>
   </table>
@@ -849,20 +854,20 @@ function dis_resource_links($params, $kind) {
   global $display;
   global $l_c_cant_delete, $l_c_can_delete;
   global $l_back, $l_c_delete;
-  $l_kind = "l_${kind}"; 
+  $l_kind = "l_${kind}";
   global $$l_kind;
 
   $id = $params["${kind}"];
-  
+
   if ($kind == 'rtype') {
     $obm_q = run_query_resource_rtype_links($params);
   } else {
-    $obm_q = run_query_resource_ritem_links($params); 
-  } 
+    $obm_q = run_query_resource_ritem_links($params);
+  }
 
   $nb = $obm_q->num_rows();
   if ($nb > 0) {
-    $display['msg'] .= display_warn_msg("${$l_kind} : $l_c_cant_delete");    
+    $display['msg'] .= display_warn_msg("${$l_kind} : $l_c_cant_delete");
   } else {
     $display['msg'] .= display_ok_msg("${$l_kind} : $l_c_can_delete");
     $dis_buttons .= "<a href=\"?action=${kind}_delete&amp;${kind}=$id\">$l_c_delete</a>";
@@ -909,7 +914,7 @@ function html_resource_resourceitem_popup($ri_q, $params) {
   global $l_no_item_available;
 
   $res_id = $params['resource_id'];
-  
+
   while($ri_q->next_record()) {
     $id = $ri_q->f('resourceitem_id');
     $label = $ri_q->f('resourceitem_label');
@@ -944,14 +949,14 @@ function html_resource_resourceitem_popup($ri_q, $params) {
       <form onsubmit=\"select_ritem_fill_from_checkbox(this, '$res_id');return false;\">
       <table>
         $ritem_list
-      </table>  
+      </table>
       <fieldset class=\"buttons\">
         <input type=\"submit\" value=\"$l_ritem_add\" />
       </fieldset>
       </form>
       <p><a href=\"\" onclick='window.close();'>$l_close</a></p>
     </div>
-    <script> 
+    <script>
      item_id = window.opener.document.getElementById('list-item-id['+$res_id+']').value;
      item_arr = item_id.split(',');
      item_arr.each(function(item,index) {

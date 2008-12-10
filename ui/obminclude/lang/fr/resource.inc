@@ -57,5 +57,6 @@ $l_add_resources = "Ajouter des ressources";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_j_check_number = "La quantité renseignée n'est pas correct.";
+$l_j_create_type_first = "Vous devez créer un type de ressource avant de créer un accessoire !";
 
 $l_resource_display = "Options d'affichage des listes de ressources";
