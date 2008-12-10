@@ -174,6 +174,11 @@ public final class ContactSyncSource extends ObmSyncSource implements
 			boolean softDelete) throws SyncSourceException {
 		logger.info("removeSyncItem(" + principal + " , " + syncItemKey + " , "
 				+ time + ")");
+		String k = syncItemKey.getKeyAsString();
+		if (k == null || k.length() == 0 || "null".equalsIgnoreCase(k)) {
+			logger.warn("cannot remove null sync item key, skipping.");
+			return;
+		}
 		try {
 			manager.removeItem(syncItemKey.getKeyAsString());
 		} catch (OBMException e) {
