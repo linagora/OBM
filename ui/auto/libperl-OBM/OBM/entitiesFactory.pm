@@ -90,67 +90,45 @@ sub _initMode {
 }
 
 
+sub enqueueFactory {
+    my $self = shift;
+    my( $factory ) = @_;
+
+    if( !defined($factory) || ref($factory) !~ /^OBM::EntitiesFactory::/ ) {
+        $self->_log( 'factory incorrecte, ajout dans la file d\'attente impossible', 1 );
+        return 1;
+    }
+
+    push( @{$self->{'factoriesQueue'}}, $factory );
+
+    return 0;
+}
+
+
+sub enqueueEntity {
+    my $self = shift;
+    my( $entity ) = @_;
+
+    if( !defined($entity) || ref($entity) !~ /^OBM::Entities::/ ) {
+        $self->_log( 'entity incorrecte, ajout dans la file d\'attente impossible', 1 );
+        return 1;
+    }
+
+    push( @{$self->{'entitiesQueue'}}, $entity );
+
+    return 0;
+}
+
+
 sub _initGlobal {
     my $self = shift;
 
-    require OBM::EntitiesFactory::domainFactory;
-    my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'WORK', $self->{'domainId'} );
-
-    if( $self->_loadDomains( $entityFactory ) ) {
+    require OBM::EntitiesFactory::globalFactories;
+    my $globalFactories = OBM::EntitiesFactory::globalFactories->new( $self );
+    if( !defined($globalFactories) ) {
+        $self->_log( 'problème à l\'initialisation des factories nécessaire pour le mode global', 0 );
         return 1;
     }
-
-    if( $self->{'domain'}->isGlobal() ) {
-        require OBM::EntitiesFactory::userSystemFactory;
-        if( !($entityFactory = OBM::EntitiesFactory::userSystemFactory->new( $self->{'domain'} )) ) {
-            $self->_log( 'problème au chargement de la factory d\'utilisateurs système', 3 );
-            return 1;
-        }
-
-        push( @{$self->{'factoriesQueue'}}, $entityFactory );
-    }
-
-    if( !$self->{'domain'}->isGlobal() ) {
-        require OBM::EntitiesFactory::mailServerFactory;
-        if( !($entityFactory = OBM::EntitiesFactory::mailServerFactory->new( 'WORK', 'ALL', $self->{'domain'} )) ) {
-            $self->_log( 'problème au chargement de la factory de configuration des serveurs de courriers', 3 );
-            return 1;
-        }
-
-        push( @{$self->{'factoriesQueue'}}, $entityFactory );
-    }
-
-    require OBM::EntitiesFactory::hostFactory;
-    if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( 'WORK', 'ALL', $self->{'domain'} )) ) {
-        $self->_log( 'problème au chargement de la factory des hôtes', 3 );
-        return 1;
-    }
-
-    push( @{$self->{'factoriesQueue'}}, $entityFactory );
-
-    require OBM::EntitiesFactory::groupFactory;
-    if( !($entityFactory = OBM::EntitiesFactory::groupFactory->new( 'WORK', 'ALL', $self->{'domain'} )) ) {
-        $self->_log( 'problème au chargement de la factory des groupes', 3 );
-        return 1;
-    }
-
-    push( @{$self->{'factoriesQueue'}}, $entityFactory );
-
-    require OBM::EntitiesFactory::mailshareFactory;
-    if( !($entityFactory = OBM::EntitiesFactory::mailshareFactory->new( 'WORK', 'ALL', $self->{'domain'} )) ) {
-        $self->_log( 'problème au chargement de la factory des mailshare', 3 );
-        return 1;
-    }
-
-    push( @{$self->{'factoriesQueue'}}, $entityFactory );
-
-    require OBM::EntitiesFactory::userFactory;
-    if( !($entityFactory = OBM::EntitiesFactory::userFactory->new( 'WORK', 'ALL', $self->{'domain'} )) ) {
-        $self->_log( 'problème au chargement de la factory des utilisateurs', 3 );
-        return 1;
-    }
-
-    push( @{$self->{'factoriesQueue'}}, $entityFactory );
 
     return 0;
 }
@@ -233,7 +211,7 @@ sub _loadDomains {
                 $self->{'domain'} = $currentDomain;
             }
 
-            push( @{$self->{'entitiesQueue'}}, $currentDomain );
+            $self->enqueueEntity( $currentDomain );
         }
     }
 
