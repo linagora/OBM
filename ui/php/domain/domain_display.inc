@@ -173,8 +173,7 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
     if ($mail_server_id) {
       $dis_mailserver .= "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&mailserver_id=$mail_server_id\">$mail_server_host_name</a>";
     } else {
-      $no_mailserver = '-';
-      
+      $no_mailserver = '-' ;
       // BEGIN - automatic mail server chooser hooks
       if (isset($c_mailchooser_hooks) && $mail_server_auto) {
         foreach ($c_mailchooser_hooks as $hook) {
@@ -205,7 +204,6 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
         <td>$name</td>
         <td>$ip</td>
         <td>$role</td>
-        <td style=\"text-align: center;\"><a href=\"$path/domain/domain_index.php?action=mailserver_del&amp;domain_id=$id&amp;mail_server_id=$m_id&amp;role=$role\"><img src=\"$ico_delete\" alt=\"$l_header_delete\" /></a></td>
         </tr>";
 	}
       }
@@ -220,7 +218,6 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
         <th>$l_host</th>
         <th>$l_ip</th>
         <th>$l_role</th>
-        <th>$l_header_delete</th>
       </tr>
       </thead>
       $block_m
@@ -323,6 +320,7 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
     }
   }
 
+          echo "</pre>";
   // If parameters have been given, they supercede the default action value
   if (isset($domain['domain_id'])) { $id = $domain['domain_id']; }
   if (isset($domain['label'])) { $label = $domain['label']; }
@@ -446,7 +444,7 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
           <legend>$GLOBALS[l_imap] $l_mailserver</legend>
         <table>
         <tr>
-        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('imapMailServerHome').getFirst(), $('imapMailServerHome'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add imap mailserver]\" /></a></th>
+        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('imapMailServerHome').getLast(), $('imapMailServerHome'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add imap mailserver]\" /></a></th>
         <td id='imapMailServerHome'>
           $imap_servers
           <div class=\"multiple\">
@@ -472,7 +470,7 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
           <legend>$GLOBALS[l_smtp_in] $l_mailserver</legend>
         <table>
         <tr>
-        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('smtp_inMailServerHome').getFirst(), $('smtp_inMailServerHome'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add smtp_in mailserver]\" /></a></th>
+        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('smtp_inMailServerHome').getLast(), $('smtp_inMailServerHome'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add smtp_in mailserver]\" /></a></th>
         <td id='smtp_inMailServerHome'>
           $smtp_in_servers
           <div class=\"multiple\">
@@ -498,7 +496,7 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
           <legend>$GLOBALS[l_smtp_out] $l_mailserver</legend>
         <table>
         <tr>
-        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('smtp_outMailServerHome').getFirst(), $('smtp_outMailServerHome'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add smtp_out mailserver]\" /></a></th>
+        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('smtp_outMailServerHome').getLast(), $('smtp_outMailServerHome'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add smtp_out mailserver]\" /></a></th>
         <td id='smtp_outMailServerHome'>
           $smtp_out_servers
           <div class=\"multiple\">

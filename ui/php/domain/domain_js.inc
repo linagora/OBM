@@ -55,20 +55,6 @@ function confirm_del(form) {
 }
 
 
-function add_mailserver_field(role) {
-
-  var mailserverHome = $('mailserverDomainHome');
-  // Create the div
-  var div = new Element('div').addClass('multiple');
-  div.adopt(new Element('a').addEvent('click', function () {
-              remove_element(this.parentNode,'domainDomainHome');
-              show_hide_add_button();
-            }).adopt(new Element('img').setProperty('src','$ico_delete')));
-  mailserverHome.adopt(div);
-  div.appendText(' ').adopt(new Element('input').setProperty('name','tf_alias[]').setProperty('type','text'));
-  
-}
-
 function copyField(field, storage) {
   copy = field.clone();
   copy.injectInside(storage);

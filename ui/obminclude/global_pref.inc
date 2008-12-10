@@ -293,10 +293,6 @@ $modules["domain"] = array('Name'=> $l_module_domain,
 	       	   'Ico' => "$ico_ref",
                    'Url' => "$path/domain/domain_index.php",
                    'Right'=> $cright_read_admin);
-$modules["mailserver"] = array('Name'=> $l_module_mailserver,
-                  'Ico' => "$ico_mailserver",
-                  'Url' => "$path/mailserver/mailserver_index.php",
-                  'Right'=> $cright_read_admin);
 $modules["samba"] = array('Name'=> $l_module_samba,
                   'Ico' => "$ico_samba",
                   'Url' => "$path/samba/samba_index.php",

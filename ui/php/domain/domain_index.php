@@ -112,7 +112,7 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_user_defined_rules() && check_domain_data_form($params['domain_id'], $params)) {
+  if (check_user_defined_rules() && check_domain_data_form($params['domain_id'], $params) && check_domain_can_delete_mailserver($params)) {
     $retour = run_query_domain_update($params['domain_id'], $params);
     if ($retour) {
       set_update_state();
@@ -154,25 +154,9 @@ if ($action == 'index' || $action == '') {
     $display['detail'] = dis_domain_consult($params);
   }
 
-} elseif ($action == "mailserver_add") {
-///////////////////////////////////////////////////////////////////////////////
-  if (check_domain_can_add_mailserver($params)) {
-    if ($params['mailserver_nb'] > 0) {
-      $nb = run_query_domain_mailserver_insert($params);
-      //      set_update_state();
-      $display["msg"] .= display_ok_msg("$nb $l_mailserver_added");
-    } else {
-      $display['msg'] .= display_err_msg($l_no_mailserver_added);
-    }
-  } else {
-    $display['msg'] .= display_warn_msg($err['msg'], false);
-    $display['msg'] .= display_err_msg($l_no_mailserver_added);
-  }
-  $display['detail'] = dis_domain_consult($params);
-
 } elseif ($action == "mailserver_del") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_domain_can_delete_mailserver($params)) {
+  if (true) {
     $nb = run_query_domain_mailserver_delete($params);
     //      set_update_state();
     $display["msg"] .= display_ok_msg("$nb $l_mailserver_removed");
@@ -217,9 +201,41 @@ function get_domain_params() {
     }
   }
   $params['mailserver_nb'] = $nb_m;
+  if(is_array($params['imap'])) {
+    $params['imap'] = array_unique($params['imap']);
+    $array = array();
+    foreach($params['imap'] as $imap) {
+      $imap = trim($imap);
+      if(!empty($imap)) {
+        $array[] = $imap;
+      }
+    }
+    $params['imap'] = $array;
+  }
+  if(is_array($params['smtp_out'])) {
+    $params['smtp_out'] = array_unique($params['smtp_out']);
+    $array = array();
+    foreach($params['smtp_out'] as $smtp_out) {
+      $smtp_out = trim($smtp_out);
+      if(!empty($smtp_out)) {
+        $array[] = $smtp_out;
+      }
+    }
+    $params['smtp_out'] = $array;
+  }
+  if(is_array($params['smtp_in'])) {
+    $params['smtp_in'] = array_unique($params['smtp_in']);
+    $array = array();
+    foreach($params['smtp_in'] as $smtp_in) {
+      $smtp_in = trim($smtp_in);
+      if(!empty($smtp_in)) {
+        $array[] = $smtp_in;
+      }
+    }
+    $params['smtp_in'] = $array;
+  }
   if(is_array($params['alias'])) {
     $aliases = array();
-
     while(!empty($params['alias'])) {
       $alias= trim(array_shift($params['alias']));
       if(!empty($alias)) {
@@ -263,7 +279,7 @@ function get_domain_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/domain/domain_index.php?action=new",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('search','index','insert','update','delete','admin','detailconsult','display', 'mailserver_add', 'mailserver_del')
+    'Condition'=> array ('search','index','insert','update','delete','admin','detailconsult','display')
                                   );
 
 // Search
@@ -278,7 +294,7 @@ function get_domain_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/domain/domain_index.php?action=detailconsult&amp;domain_id=$id",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'mailserver_add', 'mailserver_del')
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                   );
 
 // Detail Update
@@ -286,33 +302,8 @@ function get_domain_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/domain/domain_index.php?action=detailupdate&amp;domain_id=$id",
      'Right'    => $cright_write_admin,
-     'Condition'=> array ('detailconsult', 'update', 'mailserver_add', 'mailserver_del')
+     'Condition'=> array ('detailconsult', 'update')
                                      	   );
-
-// Sel Mailserver add : Mail server selection
-  $actions['domain']['sel_mailserver_add'] = array (
-    'Name'     => $l_header_add_mailserver,
-    'Url'      => "$path/mailserver/mailserver_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=mailserver_add&amp;ext_url=".urlencode($path."/domain/domain_index.php")."&amp;ext_id=$id&amp;ext_target=$l_domain",
-    'Right'    => $cright_write_admin,
-    'Popup'    => 1,
-    'Target'   => $l_domain,
-    'Condition'=> array ('detailconsult','mailserver_add','mailserver_del','update')
-                                    	  );
-
-// Mailserver add
-  $actions['domain']['mailserver_add'] = array (
-    'Url'      => "$path/domain/domain_index.php?action=mailserver_add",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None')
-                                     );
-
-// Mailserver del
-  $actions['domain']['mailserver_del'] = array (
-    'Url'      => "$path/domain/domain_index.php?action=mailserver_del",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None')
-                                     );
-
 // Insert
   $actions['domain']['insert'] = array (
     'Url'      => "$path/domain/domain_index.php?action=insert",
@@ -332,7 +323,7 @@ function get_domain_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/domain/domain_index.php?action=check_delete&amp;domain_id=$id",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'mailserver_add', 'mailserver_del') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	   );
 
 // Delete
@@ -366,10 +357,6 @@ function update_domain_action() {
     // Check Delete
     $actions['domain']['check_delete']['Url'] = "$path/domain/domain_index.php?action=check_delete&amp;domain_id=$id";
     $actions['domain']['check_delete']['Condition'][] = 'insert';
-
-    // Sel Mailserver add : Mail server selection
-    $actions['domain']['sel_mailserver_add']['Url'] = "$path/mailserver/mailserver_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=mailserver_add&amp;ext_url=".urlencode($path."/domain/domain_index.php")."&amp;ext_id=$id&amp;ext_target=$l_domain";
-    $actions['domain']['sel_mailserver_add']['Condition'][] = 'insert';
  }
 }
 

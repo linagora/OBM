@@ -401,7 +401,6 @@ class Perm {
           'module' => array (
             'default' => 0,
             'user' => $perm_admin,
-            'mailserver' => $perm_admin,
             'host' => $perm_admin,
             'domain' => $perm_admin,
             'password' => $perm_admin,

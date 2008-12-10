@@ -86,13 +86,12 @@ function run_query_domain_detail($p_id) {
   $query = "SELECT Domain.*,
     $timeupdate,
     $timecreate,
-    -- host_name as mailserver_hostname,
-    domain_mail_server_auto,
     c.userobm_login as usercreate,
-    u.userobm_login as userupdate
+    u.userobm_login as userupdate,
+    serviceproperty_value as domain_mail_server_auto
     FROM Domain
-    -- LEFT JOIN MailServer ON mailserver_id = domain_mail_server_id
-    -- LEFT JOIN Host ON host_id = mailserver_host_id
+    INNER JOIN DomainEntity ON domain_id = domainentity_domain_id
+    LEFT JOIN ServiceProperty ON domainentity_entity_id = serviceproperty_entity_id AND serviceproperty_property = 'imap_autoselect'
     LEFT JOIN UserObm as c ON domain_usercreate=c.userobm_id
     LEFT JOIN UserObm as u ON domain_userupdate=u.userobm_id
     WHERE domain_id $p_id ";
@@ -150,10 +149,10 @@ function run_query_domain_insert($domain) {
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     if ($cgp_use['service']['mail']) {
       of_service_insert('mail', $entity_id);
-      of_service_property_insert('mail','imap_autoselect', $mail_server_auto);
-      of_service_property_insert('mail','imap', $domain['imap']);
-      of_service_property_insert('mail','smtp_in', $domain['smtp_in']);
-      of_service_property_insert('mail','smtp_out', $domain['smtp_out']);
+      of_service_property_insert('mail','imap_autoselect', $entity_id, $mail_server_auto);
+      of_service_property_insert('mail','imap', $entity_id, $domain['imap']);
+      of_service_property_insert('mail','smtp_in', $entity_id, $domain['smtp_in']);
+      of_service_property_insert('mail','smtp_out', $entity_id, $domain['smtp_out']);
     }
     if ($cgp_use['service']['samba']) {
       of_service_insert('samba', $entity_id);
@@ -230,7 +229,6 @@ function run_query_domain_update($d_id, $domain) {
     domain_userupdate=$uid,
     domain_label='$label',
     domain_description='$desc',
-    domain_mail_server_auto=$mail_server_auto,
     domain_alias='$alias'
     WHERE domain_id $did ";
 
@@ -492,66 +490,33 @@ function get_linked_host_domain($domain_id) {
 
 
 /**
- * Check if a mailserver can be added in a domain
- *
- * @param mixed $params : parameters : domain_id, mailserver_id
- * @return true if the mailserver can be removed from the domain
- **/
-function check_domain_can_add_mailserver($params) {
-  global $err;
-  global $l_mailserver_invalid_role;
-
-  $add_ok = true;
-  $role = $params['role']; 
-
-  // check mail servers have valid role
-  $cpt = 0;
-  $test_q = new DB_OBM;
-  while ($cpt < $params['mailserver_nb']) {
-    $cpt++;
-    $m_id = sql_parse_id($params["mailserver$cpt"], true);
-    $query = "SELECT count(*) as nb FROM MailServer
-      WHERE mailserver_id $m_id 
-      AND mailserver_$role=1";
-    display_debug_msg($query, $cdg_sql, 'check_domain_can_add_mailserver()');
-    $test_q->query($query);
-    $test_q->next_record();
-    $nb = $test_q->f('nb');
-    if ($nb == 0) {
-      $add_ok = false;
-      $err['msg'] .= $l_mailserver_invalid_role;
-      return $add_ok;
-    }
-  }
-
-  return $add_ok;
-}
-
-
-/**
  * Check if a mailserver can be removed from a domain
  *
  * @param mixed $params : parameters : domain_id, mailserver_id
  * @return true if the mailserver can be removed from the domain
  **/
-function check_domain_can_delete_mailserver($params) {
+function check_domain_can_delete_mailserver(&$params) {
   global $err, $ok_msg;
   global $l_link_user_mailserver, $l_link_user_mailserver_no;
 
   $delete_ok = true;
-  $domain_id = $params['domain_id'];
-  $mail_server_id = $params['mail_server_id'];
+  $mailservers = of_domain_get_domain_mailserver('', $params['domain_id']); 
+  foreach($mailservers as $domain_id => $domain_mailservers) {
+    foreach ($domain_mailservers as $mailserver_id => $mailserver) {
+      foreach($mailserver as $server) {
+        if(!is_array($params[$server['role']]) || !in_array($mailserver_id, $params[$server['role']])) {
+          $nb = get_domain_linked_user_mailserver($params['domain_id'], $mailserver_id);
+          if($nb > 0) {
+            $params[$server['role']][] = $mailserver_id;
+            $err['msg'] .= $server['name'].'('.$server['role'].')'.$l_link_user_mailserver;
+            return false;
+          }
+        }
+      }
+    }
+  }  
 
-  // Links from Users
-  $nb = get_domain_linked_user_mailserver($domain_id, $mail_server_id);
-  if ($nb > 0) {
-    $delete_ok = false;
-    $err['msg'] .= $l_link_user_mailserver;
-  } else {
-    $ok_msg .= $l_link_user_mailserver_no;
-  }
-
-  return $delete_ok;
+  return true;
 }
 
 
@@ -663,52 +628,6 @@ function run_query_domain_properties($domain_id = NULL) {
 
 
 /**
- * Query execution : DomainMailServer conditionnal insertion
- *
- * @param mixed $params[] : parameters
- * @result number of mailserver inserted
- **/
-function run_query_domain_mailserver_insert($params) {
-  global $obm, $cdg_sql;
-
-  $sel_id = sql_parse_id($params['domain_id'], true);
-  $ins_id = sql_parse_id($params['domain_id']);
-  $role = $params['role'];
-  $cpt = 0;
-  $cpt_ins = 0;
-  while ($cpt < $params['mailserver_nb']) {
-    $cpt++;
-    $m_id = sql_parse_id($params["mailserver$cpt"], true);
-
-    $query = "SELECT * FROM DomainMailServer
-      WHERE domainmailserver_domain_id $sel_id 
-      AND domainmailserver_mailserver_id $m_id 
-      AND domainmailserver_role='$role'";
-
-    display_debug_msg($query, $cdg_sql, 'run_query_domain_mailserver_insert(1)');
-    $test_q = new DB_OBM;
-    $retour = $test_q->query($query);
-
-    // If the entry doesn't already exist, we insert it
-    if ($test_q->num_rows() == 0) {
-      $m_id = sql_parse_id($params["mailserver$cpt"]);
-      $query = "INSERT INTO DomainMailServer (
-        domainmailserver_domain_id,
-        domainmailserver_mailserver_id,
-        domainmailserver_role)
-        VALUES ($ins_id, $m_id, '$role')";
-
-      display_debug_msg($query, $cdg_sql, 'run_query_domain_mailserver_insert(2)');
-      $obm_q = new DB_OBM;
-      $retour = $obm_q->query($query);
-      $cpt_ins++;
-    }
-  }
-
-  return $cpt_ins;
-}
-
-/**
  * Get default data from global domain and make a copy into the new domain
  * 
  * @param mixed $id 
@@ -752,29 +671,6 @@ function run_query_domain_init_data($id) {
     $db->query($squery);
   }
 
-}
-/**
- * Query execution : DomainMailServer deletion
- *
- * @param mixed $params[] : parameters 'domain_id', 'mailserver_id', 'role'
- * @result number of mailserver inserted
- **/
-function run_query_domain_mailserver_delete($params) {
-  global $obm, $cdg_sql;
-
-  $id = sql_parse_id($params['domain_id'], true);
-  $mailserver_id = sql_parse_id($params['mail_server_id'], true);
-  $role = $params['role'];
-  $query = "DELETE FROM DomainMailServer
-    WHERE domainmailserver_domain_id $id 
-    AND domainmailserver_mailserver_id $mailserver_id 
-    AND domainmailserver_role='$role'";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_domain_mailserver_delete()');
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
 }
 
 ?>

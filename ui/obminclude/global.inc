@@ -374,9 +374,6 @@ $cgp_show['module']['control'] = 'admin';
 $cgp_show['module']['admin'] = 'admin';
 $cgp_show['module']['import'] = 'admin';
 $cgp_show['module']['backup'] = 'admin';
-if ($cgp_use['service']['mail']) {
-  $cgp_show['module']['mailserver'] = 'admin';
-}
 if ($cgp_use['service']['samba']) {
   $cgp_show['module']['samba'] = 'admin';
 }
@@ -439,7 +436,6 @@ $c_week_first_day = date('w', strtotime($ccalendar_weekstart));
 if (! $cgp_use['service']['mail']) {
   $cgp_use['service']['mail_nomad'] = false;
   $cgp_use['service']['mail_vacation'] = false;
-  $cgp_show['module']['mailserver'] = false;
   $cgp_show['module']['mailforward'] = false;
   $cgp_show['module']['vacation'] = false;
   $cgp_show['module']['mailshare'] = false;

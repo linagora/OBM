@@ -337,7 +337,6 @@ $l_module_control = "Tableau de bord système";
 $l_module_admin = "Connexions";
 $l_module_import = "Import";
 $l_module_backup = "Sauvegarde";
-$l_module_mailserver = "Serveurs de mail";
 $l_module_samba = "Serveur Samba (Windows PDC)";
 $l_module_profile = "Profils utilisateurs";
 
@@ -366,7 +365,6 @@ $l_header_add_contact = "Ajouter contact";
 $l_header_add_user = "Ajouter utilisateur";
 $l_header_add_resource = "Ajouter ressource";
 $l_header_add_group = "Ajouter groupe";
-$l_header_add_mailserver = "Ajouter serveur de mail";
 $l_header_upd_group = "Modifier groupes";
 $l_header_convert_deal = "Convertir en Affaire";
 $l_header_add_deal = "Ajouter affaire";
