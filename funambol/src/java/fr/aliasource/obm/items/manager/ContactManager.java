@@ -29,6 +29,7 @@ import com.funambol.common.pim.common.Property;
 import com.funambol.common.pim.contact.BusinessDetail;
 import com.funambol.common.pim.contact.PersonalDetail;
 import com.funambol.common.pim.contact.Phone;
+import com.funambol.common.pim.contact.Title;
 import com.funambol.common.pim.contact.WebPage;
 
 import fr.aliasource.funambol.OBMException;
@@ -257,6 +258,14 @@ public class ContactManager extends ObmManager {
 		contact.getName().getNickname().setPropertyValue(obmcontact.getAka());
 
 		BusinessDetail bd = contact.getBusinessDetail();
+		PersonalDetail pd = contact.getPersonalDetail();
+
+		bd.setCompanies(obmcontact.getCompany());
+		if (obmcontact.getTitle() != null) {
+			List<Title> lt = new ArrayList<Title>();
+			lt.add(new Title(obmcontact.getTitle()));
+			bd.setTitles(lt);
+		}
 
 		for (String label : obmcontact.getEmails().keySet()) {
 			Email e = obmcontact.getEmails().get(label);
@@ -282,8 +291,8 @@ public class ContactManager extends ObmManager {
 			bd.addWebPage(wp);
 		}
 
-		PersonalDetail pd = contact.getPersonalDetail();
-		obmToFunis(pd.getAddress(), obmcontact.getAddresses().get(lm.toOBM("home")));
+		obmToFunis(pd.getAddress(), obmcontact.getAddresses().get(
+				lm.toOBM("home")));
 		obmToFunis(pd.getOtherAddress(), obmcontact.getAddresses().get(
 				lm.toOBM("other")));
 
@@ -309,7 +318,8 @@ public class ContactManager extends ObmManager {
 			target.getPostalCode().setPropertyValue(source.getZipCode());
 			target.getPostOfficeAddress().setPropertyValue(
 					source.getExpressPostal());
-			logger.info("copied address with street: "+source.getStreet()+" to "+target);
+			logger.info("copied address with street: " + source.getStreet()
+					+ " to " + target);
 		}
 	}
 
@@ -336,15 +346,21 @@ public class ContactManager extends ObmManager {
 			contact.setUid(new Integer(funis.getUid()));
 		}
 
+		BusinessDetail bd = funis.getBusinessDetail();
+		PersonalDetail pd = funis.getPersonalDetail();
+
 		contact.setFirstname(ContactHelper.nullToEmptyString(funis.getName()
 				.getFirstName().getPropertyValueAsString()));
 		contact.setLastname(ContactHelper.getLastName(funis));
 
 		contact.setAka(ContactHelper.nullToEmptyString(s(funis.getName()
 				.getNickname())));
+		contact.setCompany(bd.getCompanies());
 
-		BusinessDetail bd = funis.getBusinessDetail();
-		PersonalDetail pd = funis.getPersonalDetail();
+		if (bd.getTitles() != null && bd.getTitles().size() > 0) {
+			contact.setTitle(((Title) bd.getTitles().get(0))
+					.getPropertyValueAsString());
+		}
 
 		// addresses
 		if (bd.getAddress() != null) {

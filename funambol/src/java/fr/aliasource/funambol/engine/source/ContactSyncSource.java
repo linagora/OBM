@@ -235,6 +235,7 @@ public final class ContactSyncSource extends ObmSyncSource implements
 
 		if (MSG_TYPE_VCARD.equals(getSourceType())) {
 			content = getVCardFromFoundationContact(contact);
+			logger.info("vcardFromFoundation:\n"+content);
 		} else {
 			logger.error("Only vcard type is supported");
 		}
