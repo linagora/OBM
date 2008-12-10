@@ -1575,7 +1575,7 @@ CREATE TABLE p_ugroup (
     group_gid integer,
     group_delegation character varying(64),
     group_manager_id integer,
-    group_name character varying(32) NOT NULL,
+    group_name character varying(255) NOT NULL,
     group_desc character varying(128),
     group_email character varying(128),
     group_contacts text
@@ -2246,7 +2246,7 @@ CREATE TABLE ugroup (
     group_mailing integer DEFAULT 0,
     group_delegation character varying(64) DEFAULT ''::character varying,
     group_manager_id integer,
-    group_name character varying(32) NOT NULL,
+    group_name character varying(255) NOT NULL,
     group_desc character varying(128),
     group_email character varying(128),
     group_contacts text

@@ -920,6 +920,8 @@ ALTER TABLE Payment ALTER COLUMN payment_domain_id SET NOT NULL;
 ALTER TABLE PaymentKind ALTER COLUMN paymentkind_domain_id SET NOT NULL;
 ALTER TABLE Account ALTER COLUMN account_domain_id SET NOT NULL;
 ALTER TABLE UGroup ALTER COLUMN group_domain_id SET NOT NULL;
+ALTER TABLE UGroup ALTER COLUMN group_name varchar(255);
+ALTER TABLE P_UGroup ALTER COLUMN group_name varchar(255);
 ALTER TABLE OrganizationalChart ALTER COLUMN organizationalchart_domain_id SET NOT NULL;
 ALTER TABLE OGroup ALTER COLUMN ogroup_domain_id SET NOT NULL;
 ALTER TABLE OGroupLink ALTER COLUMN ogrouplink_domain_id SET NOT NULL;
