@@ -340,7 +340,6 @@ Obm.TimeZoneParser = new Class ({
   },
   
   getTimeZoneOffset: function(time) {
-    console.log(window.getTimeZoneOffset('1262304061000'),window.getTimeZoneOffset(''+time+''), time, new Date(time));
     return window.getTimeZoneOffset('1262304061000');
   }
 });
