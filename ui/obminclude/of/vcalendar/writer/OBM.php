@@ -132,7 +132,7 @@ class Vcalendar_Writer_OBM {
     if(!$this->haveAccess($data['event']['owner'])) {
       $data['event']['owner'] = $GLOBALS['obm']['uid'];
     }
-    run_query_calendar_add_event($data['event'], $data['entities'], $id);
+    $id = run_query_calendar_add_event($data['event'], $data['entities']);
     $this->updateStates($data['states'], $id);
   }
 
