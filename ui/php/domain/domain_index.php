@@ -153,18 +153,6 @@ if ($action == 'index' || $action == '') {
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
     $display['detail'] = dis_domain_consult($params);
   }
-
-} elseif ($action == "mailserver_del") {
-///////////////////////////////////////////////////////////////////////////////
-  if (true) {
-    $nb = run_query_domain_mailserver_delete($params);
-    //      set_update_state();
-    $display["msg"] .= display_ok_msg("$nb $l_mailserver_removed");
-  } else {
-    $display['msg'] .= display_warn_msg($err['msg'], false);
-    $display['msg'] .= display_err_msg($l_mailserver_cant_delete);
-  }
-  $display['detail'] = dis_domain_consult($params);
 }
 
 

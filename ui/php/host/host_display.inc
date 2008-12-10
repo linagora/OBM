@@ -290,7 +290,7 @@ function html_host_consult($host_q) {
   global $display, $perm, $menu, $action, $cright_write;
   global $l_perms;
   global $l_enable, $l_disable, $l_empty, $l_not_assigned;
-  global $l_user, $l_mailserver;
+  global $l_user;
   global $l_system, $l_help_system,$l_domain;
 
 
@@ -305,7 +305,6 @@ function html_host_consult($host_q) {
   $ip = $host_q->f('host_ip');
   $user_id = $host_q->f('userobm_id');
   $user_login = $host_q->f('userobm_login');
-  $mail_server = $host_q->f('mailserver_id');
   $domain_name = ($host_q->f('domain_name') != '' ? $host_q->f('domain_name') : 'GLOBAL');
 
   $dis_user =   
@@ -588,26 +587,19 @@ function dis_host_display_pref($prefs) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_host_warn_delete($id) {
   global $display, $l_warn_delete, $l_delete, $l_can_delete, $l_back;
-  global $l_cant_delete_mailserver;
 
   $lhost = get_host_info($id);
-  if ($lhost['mailserver'] != '') {
-    $display['msg'] .= display_warn_msg($l_cant_delete_mailserver);
-    $dis_delete = '';
+  $display['msg'] .= display_info_msg("$l_can_delete");
 
-  } else {
-    $display['msg'] .= display_info_msg("$l_can_delete");
-
-    $dis_delete = "
-    <p class=\"detailButtons\">
-      <form method=\"get\" name=\"form_delete\"
-      action=\"" .url_prepare("host_index.php") . "\">
-      <input type=\"hidden\" name=\"action\" value=\"delete\" />
-      <input type=\"hidden\" name=\"host_id\" value=\"$id\" />
-      <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
-      </form>
-    </p>";
-  }
+   $dis_delete = "
+   <p class=\"detailButtons\">
+    <form method=\"get\" name=\"form_delete\"
+    action=\"" .url_prepare("host_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"host_id\" value=\"$id\" />
+    <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
+    </form>
+   </p>";
 
   $dis_back = "
     <p class=\"detailButtons\">

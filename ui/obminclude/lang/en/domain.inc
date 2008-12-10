@@ -49,12 +49,7 @@ $l_link_user_no = "The domain has no users";
 $l_link_host = "The domain has hosts";
 $l_link_host_no = "The domain has no hosts";
 $l_link_user_mailserver = "Mailserver stores some users in the domain";
-$l_link_user_mailserver_no = "Mailserver has no users in the domain";
-$l_mailserver_added = "Mailserver added";
-$l_mailserver_removed = "Mailserver removed";
-$l_no_mailserver_added = "No mailserver to add";
 $l_mailserver_cant_delete = "Mailserver can be removed from the domain";
-$l_mailserver_invalid_role = "The mailserver role is incorrect";
 $l_name_in_use = "Those name or aliases are already in use";
 $l_alias_user_used = "Cannot change or remove aliases used in email adress";
 // JavaScript Messages

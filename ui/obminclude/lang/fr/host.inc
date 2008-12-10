@@ -23,7 +23,6 @@ $l_perms = "Permissions";
 $l_web_access = "Accès Internet";
 $l_restrict = "restrictions";
 $l_not_assigned = "Non assigné";
-$l_mailserver = "Serveur de mail";
 
 // Labels et textes
 $l_host_display = "Options d'affichage des listes d'hôtes";
@@ -44,7 +43,6 @@ $l_update_error = "La modification de l'hôte a échoué !";
 $l_delete_ok = "La suppression de l'hôte a été correctement effectuée.";
 $l_delete_error = "La suppression de l'hôte a échoué !";
 $l_can_delete = "L'hôte peut être supprimé";
-$l_cant_delete_mailserver = "L'hôte ne peut pas être supprimé car il est déclaré comme serveur de mail.";
 
 $l_err_host_name_empty = "Le nom de l'hôte doit être renseigné";
 $l_err_host_name_exist = "Le nom de l'hôte est déjà utilisé";

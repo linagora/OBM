@@ -655,7 +655,7 @@ function html_user_consult($obm_q) {
       <th>$l_mail_server</th>
       <td>";
       if ($mail_server_id) {
-        $mail_section .= "<a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=".$mail_server_id."\">".$mail_server_host_name."</a>";
+        $mail_section .= "<a href=\"$path/host/host_index.php?action=detailconsult&host_id=".$mail_server_id."\">".$mail_server_host_name."</a>";
       } else {
         $mail_section .= "-";
       }
@@ -1252,7 +1252,7 @@ function html_user_form($usr_q, $user, $field='') {
     
     } else {
       $dis_mailserver = "
-      <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server_id\">$mail_server_host_name</a>
+      <a href=\"$path/host/host_index.php?action=detailconsult&host_id=$mail_server_id\">$mail_server_host_name</a>
       <input type=\"hidden\" name=\"sel_mail_server_id\" value=\"$mail_server_id\" />
       <input type=\"hidden\" name=\"sel_mail_server_hostname\" value=\"$mail_server_host_name\" />";
     }
@@ -2254,7 +2254,6 @@ function dis_user_import_file_run($params) {
     //$user['passwd'] = $user['password'];
     if (in_array(trim($row[$c_mail]), $array_true)) {
       $user['mail_perms'] = 1;
-      $user['mail_server_id'] = $obm['mailserver'];
     }
     $user['email'] = addslashes(trim($row[$c_email]));
 

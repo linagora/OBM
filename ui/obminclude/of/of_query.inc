@@ -364,8 +364,11 @@ function of_domain_get_list() {
 function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
   global $cdg_sql, $obm;
   if (!is_null($domain_id)) {
-    $domain_id = sql_parse_id($domain_id, true);
-    $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
+    $d = of_domain_get_domain_infos($domain_id);
+    if($d['global'] === false) {
+      $domain_id = sql_parse_id($domain_id, true);
+      $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
+    }
   }
   if ($role != '') {
     $where_role = "AND serviceproperty_property = '$role'";
@@ -374,7 +377,6 @@ function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
   }
 
   $query = "SELECT 
-    domain_id,
     serviceproperty_property,
     host_id,
     host_name,
@@ -386,7 +388,9 @@ function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
     WHERE 
     serviceproperty_service = 'mail'
     $where_role
-    $where_domain";
+    $where_domain
+    GROUP BY serviceproperty_property, host_id, host_name, host_ip
+    ";
 
   display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_mailserver()');
   $obm_q = new DB_OBM;
@@ -394,12 +398,11 @@ function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
 
   $m = array();
   while ($obm_q->next_record()) {
-    $d_id = $obm_q->f('domain_id');
     $m_id = $obm_q->f('host_id');
     $role = $obm_q->f('serviceproperty_property');
     $name = $obm_q->f('host_name');
     $ip = $obm_q->f('host_ip');
-    $m[$d_id][$m_id][] = array ('name' => $name, 'ip' => $ip, 'role' => $role);
+    $m[$m_id][] = array ('name' => $name, 'ip' => $ip, 'role' => $role);
   }
 
   return $m;
@@ -434,7 +437,6 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
   $domain['label'] = $obm_q->f('domain_label');
   $domain['name'] = $obm_q->f('domain_name');
   $domain['alias'] = $obm_q->f('domain_alias');
-  $domain['mailserver'] = null;
   $domain['global'] = $obm_q->f('domain_global');
 
   if ($get_properties) {
@@ -573,20 +575,15 @@ function of_domain_dis_mailserver_select($role, $sel_id='', $domain_id='') {
   // select
   $sel = "<select id=\"sel_mail_server_id\" name=\"sel_mail_server_id\">";
   if (is_array($dms)) {
-    // domain mail servers
-    foreach ($dms as $ms) {
-      if (is_array($ms)) {
-        // one mail server
-        foreach ($ms as $id => $m) {
-          if (is_array($m)) {
-            // one mail server role
-            foreach ($m as $r) {
-              $name = htmlentities($r['name']);
-              $sel .= "<option value=\"$id\"";
-              if ($id == $sel_id) { $sel .= " selected=\"selected\""; }
-              $sel .= ">$name</option>";
-            }
-          }
+    // one mail server
+    foreach ($dms as $id => $m) {
+      if (is_array($m)) {
+        // one mail server role
+        foreach ($m as $r) {
+          $name = htmlentities($r['name']);
+          $sel .= "<option value=\"$id\"";
+          if ($id == $sel_id) { $sel .= " selected=\"selected\""; }
+          $sel .= ">$name</option>";
         }
       }
     }

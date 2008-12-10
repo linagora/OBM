@@ -2626,19 +2626,17 @@ function run_query_user_mailchooser_least_boxes () {
       host_id,
       COUNT(*) AS mailbox_count
     FROM ServiceProperty
-      LEFT JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
-      LEFT JOIN Host ON host_id = serviceproperty_property_value
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    INNER JOIN Host ON host_id = #CAST(serviceproperty_value, INTEGER)
     WHERE serviceproperty_property = 'imap' and serviceproperty_service = 'mail'
-    LEFT JOIN UserObm u ON domainmailserver_mailserver_id = userobm_mail_server_id
-    WHERE domainmailserver_domain_id $sel_id
-      AND domainmailserver_role = 'imap'
-    GROUP BY domainmailserver_mailserver_id
+    AND domainentity_domain_id $sel_id 
+    GROUP BY host_id
     ORDER BY mailbox_count ASC
     ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_user_mailchooser_least_boxes()');
   $obm_q = new DB_OBM;
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   $obm_q->next_record();
   
   return array('host_id' => $obm_q->f('host_id'));
@@ -2653,11 +2651,11 @@ function run_query_user_user_mailchooser_least_used_memory () {
   $query = "SELECT
       domainmailserver_mailserver_id as mailserver_id,
       SUM(userobm_mail_quota_use) AS used_memory
-    FROM DomainMailServer
-    LEFT JOIN UserObm u ON domainmailserver_mailserver_id = userobm_mail_server_id
-    WHERE domainmailserver_domain_id $sel_id
-      AND domainmailserver_role = 'imap'
-    GROUP BY domainmailserver_mailserver_id
+      FROM ServiceProperty
+        INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+        INNER JOIN Host ON host_id = #CAST(serviceproperty_value, INTEGER)
+      WHERE serviceproperty_property = 'imap' and serviceproperty_service = 'mail'
+    GROUP BY host_id
     ORDER BY used_memory ASC
     ";
 

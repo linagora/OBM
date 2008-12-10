@@ -272,7 +272,7 @@ function html_mailshare_consult($mailshare_q) {
   <tr>
     <th>$l_mail_server</th>
     <td>
-      <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server_id\">$mail_server_host_name</a>
+      <a href=\"$path/host/host_index.php?action=detailconsult&host_id=$mail_server_id\">$mail_server_host_name</a>
     </td>
   </tr>
   <tr>
@@ -334,13 +334,10 @@ function html_mailshare_form($action, $mailshare_q, $mailshare, $field='') {
 
   // Mail server can't be changed if set
   if (! $mail_server_host_name) {
-    if (! $mail_server_id) {
-      $mail_server_id = $obm['mailserver'];
-    }
     $dis_mailserver = of_domain_dis_mailserver_select('imap', $mail_server_id, $obm['domain_id']);
   } else {
     $dis_mailserver = "
-    <a href=\"$path/mailserver/mailserver_index.php?action=detailconsult&id=$mail_server_id\">$mail_server_host_name</a>
+    <a href=\"$path/host/host_index.php?action=detailconsult&host_id=$mail_server_id\">$mail_server_host_name</a>
     <input type=\"hidden\" name=\"sel_mail_server_id\" value=\"$mail_server_id\" />
     <input type=\"hidden\" name=\"sel_mail_server_hostname\" value=\"$mail_server_host_name\" />";
   }

@@ -190,10 +190,9 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
     
     // Domain mailservers
     // Get the domain mailservers
-    $ms = $mailservers[$id];
     $block_m = '';
-    if (is_array($ms)) {
-      foreach ($ms as $m_id => $mailserver_info) {
+    if (is_array($mailservers)) {
+      foreach ($mailservers as $m_id => $mailserver_info) {
 	// $mailserver_info is an array of info rows about this mail server
 	foreach ($mailserver_info as $server_info) {
 	  $name = $server_info['name'];
@@ -311,11 +310,9 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
       ${$properties_q->f('domainproperty_key')} = $properties_q->f('domainpropertyvalue_value');
     }
     $properties_q->seek(0);
-    foreach($mailservers as $domain_id => $domain_mailservers) {
-      foreach ($domain_mailservers as $mailserver_id => $mailserver) {
-        foreach($mailserver as $server) {
-          ${$server['role']}[] = $mailserver_id;
-        }
+    foreach ($mailservers as $mailserver_id => $mailserver) {
+      foreach($mailserver as $server) {
+        ${$server['role']}[] = $mailserver_id;
       }
     }
   }

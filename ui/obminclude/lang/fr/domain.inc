@@ -48,12 +48,6 @@ $l_link_user_no = "Le domaine n'a pas d'utilisateurs";
 $l_link_host = "Le domaine a des hôtes";
 $l_link_host_no = "Le domaine n'a pas d'hôtes";
 $l_link_user_mailserver = "Le serveur de messagerie contient des utilisateurs du domaine";
-$l_link_user_mailserver_no = "Le serveur de messagerie ne contient pas d'utilisateurs du domaine";
-$l_mailserver_added = "Serveurs de messagerie ajoutés";
-$l_mailserver_removed = "Serveur de messagerie enlevé";
-$l_no_mailserver_added = "Pas de serveur de messagerie à ajouter";
-$l_mailserver_cant_delete = "Le serveur de messagerie ne peut être supprimé du domaine";
-$l_mailserver_invalid_role = "Le rôle du serveur de messagerie est incorrect";
 $l_name_in_use = "Le nom de domaine ou l'un des alias est déjà utilisé";
 $l_alias_user_used = "Impossible de modifier ou supprimer des alias utilisés dans des adresses mails";
 
