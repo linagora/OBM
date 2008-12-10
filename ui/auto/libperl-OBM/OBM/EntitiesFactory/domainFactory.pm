@@ -127,10 +127,6 @@ sub next {
 
     $self->{'currentEntity'} = shift( @{$self->{'domains'}} );
 
-    if( !$self->{'currentEntity'} ) {
-        $self->_reset();
-    }
-
     return $self->{'currentEntity'};
 }
 
