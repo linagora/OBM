@@ -455,8 +455,8 @@ class OBM_Acl {
 
 class OBM_Acl_Utils {
   
-  private static $consumerRegex = "/^data-(user|group)-([0-9]+)$/";
-  
+  private static $consumerRegex = '/^data-(user|group)-([0-9]+)$/';
+ 
   public static function updateRights($entityType, $entityId, $currentUserId, $params) {
     
     $rights = OBM_Acl_Utils::parseRightsParams($params);
