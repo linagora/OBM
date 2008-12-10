@@ -369,7 +369,12 @@ class OBM_Acl {
   private static function getAclQueryWhere($entityType, $entityId = null, $userId = null, $action = null, $public = false) {
     $clauses = array();
     if ($entityId !== null) {
-      $clauses['entity'] = "{$entityType}entity_{$entityType}_id = '{$entityId}'";
+      if (is_array($entityId)) {
+        $entityIds = implode(',', $entityId);
+        $clauses['entity'] = "{$entityType}entity_{$entityType}_id IN ({$entityIds})";
+      } else {
+        $clauses['entity'] = "{$entityType}entity_{$entityType}_id = '{$entityId}'";
+      }
     }
     if ($userId !== null) {
       $clauses['user'] = "u1.userobm_id = '{$userId}'";

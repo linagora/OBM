@@ -45,8 +45,7 @@ get_resource_action();
 // if user does not have admin right on module, check for the resource right
 if (($params['resource_id'] > 0)
   && (! $perm->check_right('resource', $cright_write_admin))) {
-  $users = of_right_users_for_entity('resource', $params['resource_id'], 'admin');
-  if (in_array($obm['uid'], $users['ids'])) {
+  if (OBM_Acl::canAdmin($obm['uid'], 'resource', $params['resource_id'])) {
     $actions['resource']['rights_admin']['Right'] = $cright_read;
     $actions['resource']['rights_update']['Right'] = $cright_read;
   }

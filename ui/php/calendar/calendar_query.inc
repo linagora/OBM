@@ -3669,10 +3669,9 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     );
   }
   if ($mail_datas['reset_resource_state']) {
-    //$rattendees =  of_right_users_for_entity('resource', $resources, 'write');
-    $rattendees = array_keys(OBM_Acl::getEntityWriters('resource', $resources));
-    if (!in_array($obm['uid'], $rattendees)) {
-      //$rattendees = array_diff($rattendees['ids'], array($obm['uid'])); WTF ???
+    $rattendees = OBM_Acl::getEntityWriters('resource', $resources);
+    $rattendees_ids = array_keys($rattendees);
+    if (!in_array($obm['uid'], $rattendees_ids)) {
       $mail_datas['mails']['reset_resource_state'] = array (
         'subject' => sprintf($l_update_event_mail_subject,$old_title),
         'message' => sprintf($l_update_resource_mail_body, $old_title, $old_start->getOutputDateTime(), 
@@ -3680,7 +3679,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
                              $location,$consult_link,
                              $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                              $userinfo['lastname'],$cgp_host),
-        'recipients' => $rattendees
+        'recipients' => $rattendees_ids
       );
     }
   }   
@@ -3705,15 +3704,16 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     );
   }
   if ($mail_datas['add_resource']) {
-    $rattendees =  of_right_users_for_entity('resource', $new_resources, 'write');echo $obm['uid'];print_r($rattendees);die();
-    if (!in_array($obm['uid'], $rattendees['ids'])) {
+    $rattendees = OBM_Acl::getEntityWriters('resource', $new_resources);
+    $rattendees_ids = array_keys($rattendees);
+    if (!in_array($obm['uid'], $rattendees_ids)) {
       $mail_datas['mails']['add_resource'] = array (
         'subject' => sprintf($l_add_event_mail_subject,$title),
         'message' => sprintf($l_add_resource_mail_body, $start->getOutputDateTime(), $end->getOutputDateTime() ,
                              $title, $location, $consult_link,
                              $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
                              $userinfo['lastname'],$cgp_host),
-        'recipients' => $rattendees['ids']
+        'recipients' => $rattendees_ids
       );
     }
   }
@@ -3728,22 +3728,23 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     );
   }
   if ($mail_datas['remove_resource']) {
-    $rattendees =  of_right_users_for_entity('resource', $old_resources, 'write');
-    if(!in_array($obm['uid'], $rattendees['ids'])) {
-      $rattendees = array_diff($rattendees['ids'], array($obm['uid']));    
+    $rattendees = OBM_Acl::getEntityWriters('resource', $old_resources);
+    $rattendees_ids = array_keys($rattendees);
+    if (!in_array($obm['uid'], $rattendees_ids)) {    
       $mail_datas['mails']['remove_resource'] = array (
         'subject' => sprintf($l_delete_event_mail_subject,$old_title),
         'message' => sprintf($l_delete_resource_mail_body, $old_title, $old_start->getOutputDateTime(), 
                              $old_end->getOutputDateTime(), $old_location,$userinfo['email'], 
                              $userinfo['lastname'],$cgp_host),
-        'recipients' => $rattendees
+        'recipients' => $rattendees_ids
       );
     }
   }  
   if ($mail_datas['add_exception']) {
-    $rattendees =  of_right_users_for_entity('resource', $resources, 'write');
-    $rattendees = array_diff($rattendees['ids'], array($obm['uid']));    
-    $attendees = array_merge($attendees, $rattendees);    
+    $rattendees = OBM_Acl::getEntityWriters('resource', $resources);
+    $rattendees_ids = array_keys($rattendees);
+    $rattendees_ids = array_diff($rattendees_ids, array($obm['uid']));    
+    $attendees = array_merge($attendees, $rattendees_ids);    
     $mail_datas['mails']['add_exception'] = array (
       'subject' => sprintf($l_add_exception_mail_subject,$title),
       'message' => sprintf($l_add_exception_mail_body,$title,implode(', ', $new_exceptions),$consult_link, 
@@ -3753,9 +3754,10 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     );
   }
   if ($mail_datas['remove_exception']) {
-    $rattendees =  of_right_users_for_entity('resource', $resources, 'write');
-    $rattendees = array_diff($rattendees['ids'], array($obm['uid']));    
-    $attendees = array_merge($attendees, $rattendees);        
+    $rattendees = OBM_Acl::getEntityWriters('resource', $resources);
+    $rattendees_ids = array_keys($rattendees);
+    $rattendees_ids = array_diff($rattendees_ids, array($obm['uid']));    
+    $attendees = array_merge($attendees, $rattendees_ids);        
     $mail_datas['mails']['remove_exception'] = array (
       'subject' => sprintf($l_delete_exception_mail_subject,$title),
       'message' => sprintf($l_delete_exception_mail_body,$title,implode(', ', $old_exceptions),$consult_link, 
