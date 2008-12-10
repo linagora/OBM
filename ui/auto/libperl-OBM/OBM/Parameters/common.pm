@@ -21,6 +21,16 @@ use FindBin qw($Bin);
 # Necessaire pour le bon fonctionnement du package
 $debug=1;
 
+sub trim {
+    my( $string ) = @_;
+
+    $string =~ s/^\s+//;
+    $string =~ s/\s+$//;
+
+    return $string;
+}
+
+
 # Détainte la variable '$Bin'
 if( (-d $Bin) && ($Bin =~ /^([\p{Alphabetic}0-9\/_\-\s\.]+)$/) ) {
     $Bin = $1;
@@ -160,42 +170,42 @@ $obmModules = {
     contact => 0
 };
 
-$obmModule = $cfgFile->val( 'global', 'obm-ldap' );
-if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
-    $obmModules->{"ldap"} = 1;
+$obmModule = trim( $cfgFile->val( 'global', 'obm-ldap' ) );
+if( defined( $obmModule ) && lc($obmModule) eq 'true' ) {
+    $obmModules->{'ldap'} = 1;
 }else {
-    $obmModules->{"ldap"} = 0;
+    $obmModules->{'ldap'} = 0;
 }
 
-$obmModule = $cfgFile->val( 'global', 'obm-mail' );
-if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
-    $obmModules->{"ldap"} = 1;
-    $obmModules->{"mail"} = 1;
+$obmModule = trim( $cfgFile->val( 'global', 'obm-mail' ) );
+if( defined( $obmModule ) && lc($obmModule) eq 'true' ) {
+    $obmModules->{'ldap'} = 1;
+    $obmModules->{'mail'} = 1;
 }else {
-    $obmModules->{"mail"} = 0;
+    $obmModules->{'mail'} = 0;
 }
 
-$obmModule = $cfgFile->val( 'global', 'obm-samba' );
-if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
-    $obmModules->{"ldap"} = 1;
-    $obmModules->{"samba"} = 1;
+$obmModule = trim( $cfgFile->val( 'global', 'obm-samba' ) );
+if( defined( $obmModule ) && lc($obmModule) eq 'true' ) {
+    $obmModules->{'ldap'} = 1;
+    $obmModules->{'samba'} = 1;
 }else {
-    $obmModules->{"samba"} = 0;
+    $obmModules->{'samba'} = 0;
 }
 
-$obmModule = $cfgFile->val( 'global', 'obm-web' );
-if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
-    $obmModules->{"ldap"} = 1;
-    $obmModules->{"web"} = 1;
+$obmModule = trim( $cfgFile->val( 'global', 'obm-web' ) );
+if( defined( $obmModule ) && lc($obmModule) eq 'true' ) {
+    $obmModules->{'ldap'} = 1;
+    $obmModules->{'web'} = 1;
 }else {
-    $obmModules->{"web"} = 0;
+    $obmModules->{'web'} = 0;
 }
 
-$obmModule = $cfgFile->val( 'global', 'obm-contact' );
-if( defined( $obmModule ) && lc($obmModule) eq "true" ) {
-    $obmModules->{"contact"} = 1;
+$obmModule = trim( $cfgFile->val( 'global', 'obm-contact' ) );
+if( defined( $obmModule ) && lc($obmModule) eq 'true' ) {
+    $obmModules->{'contact'} = 1;
 }else {
-    $obmModules->{"contact"} = 0;
+    $obmModules->{'contact'} = 0;
 }
 
 # Creation de repertoires a la creation de l'utilisateur
