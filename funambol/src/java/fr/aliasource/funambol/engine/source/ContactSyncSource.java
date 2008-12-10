@@ -7,12 +7,11 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.funambol.vcardparser.VcardParser;
 import org.obm.sync.book.BookType;
 
 import com.funambol.common.pim.contact.Contact;
-import com.funambol.common.pim.converter.ContactToVcard;
 import com.funambol.common.pim.converter.ConverterException;
-import com.funambol.common.pim.vcard.VcardParser;
 import com.funambol.framework.engine.SyncItem;
 import com.funambol.framework.engine.SyncItemImpl;
 import com.funambol.framework.engine.SyncItemKey;
@@ -23,6 +22,7 @@ import com.funambol.framework.engine.source.SyncSourceException;
 import com.funambol.framework.tools.beans.LazyInitBean;
 
 import fr.aliasource.funambol.OBMException;
+import fr.aliasource.funambol.utils.ContactToVcard;
 import fr.aliasource.funambol.utils.Helper;
 import fr.aliasource.obm.items.manager.ContactManager;
 

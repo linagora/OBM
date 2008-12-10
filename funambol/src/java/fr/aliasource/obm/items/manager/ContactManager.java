@@ -260,10 +260,14 @@ public class ContactManager extends ObmManager {
 		BusinessDetail bd = contact.getBusinessDetail();
 		PersonalDetail pd = contact.getPersonalDetail();
 
-		bd.setCompanies(obmcontact.getCompany());
+		bd.getCompany().setPropertyValue(obmcontact.getCompany());
+		bd.getDepartment().setPropertyValue(obmcontact.getService());
 		if (obmcontact.getTitle() != null) {
 			List<Title> lt = new ArrayList<Title>();
-			lt.add(new Title(obmcontact.getTitle()));
+			Title t = new Title();
+			t.setTitleType("JobTitle");
+			t.setPropertyValue(obmcontact.getTitle());
+			lt.add(t);
 			bd.setTitles(lt);
 		}
 
@@ -355,7 +359,8 @@ public class ContactManager extends ObmManager {
 
 		contact.setAka(ContactHelper.nullToEmptyString(s(funis.getName()
 				.getNickname())));
-		contact.setCompany(bd.getCompanies());
+		contact.setCompany(s(bd.getCompany()));
+		contact.setService(s(bd.getDepartment()));
 
 		if (bd.getTitles() != null && bd.getTitles().size() > 0) {
 			contact.setTitle(((Title) bd.getTitles().get(0))
