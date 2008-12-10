@@ -160,7 +160,7 @@ public class CalendarManager extends ObmManager {
 		Event c = null;
 		try {
 			c = binding.modifyEvent(token, calendar,
-					foundationCalendarToObmEvent(event, type), false);
+					foundationCalendarToObmEvent(event, type, false), false);
 		} catch (AuthFault e) {
 			throw new OBMException(e.getMessage());
 		} catch (ServerFault e) {
@@ -181,7 +181,7 @@ public class CalendarManager extends ObmManager {
 		Event evt = null;
 
 		try {
-			Event forCreate = foundationCalendarToObmEvent(event, type);
+			Event forCreate = foundationCalendarToObmEvent(event, type, true);
 			String uid = binding.createEvent(token, calendar, forCreate);
 			evt = binding.getEventFromId(token, calendar, uid);
 		} catch (AuthFault e) {
@@ -201,7 +201,7 @@ public class CalendarManager extends ObmManager {
 			com.funambol.common.pim.calendar.Calendar event, String type)
 			throws OBMException {
 
-		Event evt = foundationCalendarToObmEvent(event, type);
+		Event evt = foundationCalendarToObmEvent(event, type, true);
 
 		if (evt == null) {
 			return new LinkedList<String>();
@@ -385,16 +385,19 @@ public class CalendarManager extends ObmManager {
 	 * 
 	 * @param calendar
 	 * @param type
+	 * @param ignoreUid
 	 * @param allDay
 	 * @return
 	 */
 	private Event foundationCalendarToObmEvent(
-			com.funambol.common.pim.calendar.Calendar calendar, String type) {
+			com.funambol.common.pim.calendar.Calendar calendar, String type,
+			boolean ignoreUid) {
 
 		com.funambol.common.pim.calendar.Event foundation = calendar.getEvent();
 
 		if (foundation != null) {
-			Event event = fillObmEventWithVEvent(calendar, foundation);
+			Event event = fillObmEventWithVEvent(calendar, foundation,
+					ignoreUid);
 			return event;
 		} else {
 			logger
@@ -406,9 +409,9 @@ public class CalendarManager extends ObmManager {
 
 	private Event fillObmEventWithVEvent(
 			com.funambol.common.pim.calendar.Calendar calendar,
-			com.funambol.common.pim.calendar.Event foundation) {
+			com.funambol.common.pim.calendar.Event foundation, boolean ignoreUid) {
 		Event event = new Event();
-		if (foundation.getUid() != null
+		if (!ignoreUid && foundation.getUid() != null
 				&& foundation.getUid().getPropertyValueAsString() != "") {
 			event.setUid(foundation.getUid().getPropertyValueAsString());
 		}
