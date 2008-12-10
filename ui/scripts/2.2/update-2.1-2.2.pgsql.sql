@@ -160,11 +160,12 @@ CREATE TABLE ServiceProperty (
   serviceproperty_service varchar(255) NOT NULL,
   serviceproperty_property varchar(255) NOT NULL,
   serviceproperty_entity_id integer NOT NULL,
+  serviceproperty_value text,
   PRIMARY KEY  (serviceproperty_id),
-  KEY serviceproperty_service_key (serviceproperty_service),
-  KEY serviceproperty_property_key (serviceproperty_property),
   CONSTRAINT serviceproperty_entity_id_entity_id_fkey FOREIGN KEY (serviceproperty_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+create INDEX serviceproperty_service_key ON ServiceProperty (serviceproperty_service);
+create INDEX serviceproperty_property_key ON ServiceProperty (serviceproperty_property);
 
 --
 -- Table structure for table Service
@@ -175,9 +176,9 @@ CREATE TABLE Service (
   service_service varchar(255) NOT NULL,
   service_entity_id integer NOT NULL,
   PRIMARY KEY  (service_id),
-  KEY service_service_key (service_service),
   CONSTRAINT service_entity_id_entity_id_fkey FOREIGN KEY (service_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+create INDEX service_service_key ON Service (service_service);
 
 -- Table structure for table SSOTicket
 --
@@ -1355,6 +1356,119 @@ ALTER TABLE Company DROP COLUMN company_phone;
 ALTER TABLE Company DROP COLUMN company_fax;
 ALTER TABLE Company DROP COLUMN company_web;
 ALTER TABLE Company DROP COLUMN company_email;
+
+-- -----------------------------------
+-- Migrating database for service model
+-- -----------------------------------
+INSERT INTO Service (service_service, service_entity_id) 
+SELECT 'samba', hostentity_entity_id FROM Host INNER JOIN HostEntity ON hostentity_host_id = host_id WHERE host_samba = 1;
+
+INSERT INTO Service (service_service, service_entity_id) 
+SELECT 'smtp_in', hostentity_entity_id FROM MailServer INNER JOIN HostEntity ON hostentity_host_id = mailserver_host_id WHERE mailserver_smtp_in = 1;
+
+INSERT INTO Service (service_service, service_entity_id) 
+SELECT 'smtp_out', hostentity_entity_id FROM MailServer INNER JOIN HostEntity ON hostentity_host_id = mailserver_host_id WHERE mailserver_smtp_out = 1;
+
+INSERT INTO Service (service_service, service_entity_id) 
+SELECT 'imap', hostentity_entity_id FROM MailServer INNER JOIN HostEntity ON hostentity_host_id = mailserver_host_id WHERE mailserver_imap = 1;
+
+INSERT INTO Service (service_service, service_entity_id)
+SELECT 'mail', domainentity_entity_id FROM Domain 
+INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
+INNER JOIN DomainMailServer ON domainmailserver_domain_id = domain_id
+GROUP BY domainentity_entity_id
+
+
+INSERT INTO Service (service_service, service_entity_id)
+SELECT 'samba', domainentity_entity_id FROM Domain 
+INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
+INNER JOIN Samba ON samba_domain_id = domain_id
+GROUP BY domainentity_entity_id
+
+UPDATE UserObm SET userobm_mail_server_id = (SELECT host_id FROM MailServer LEFT JOIN Host ON mailserver_host_id = host_id WHERE mailserver_id = userobm_mail_server_id);
+
+UPDATE MailShare SET mailshare_mailserver_id = (SELECT host_id FROM MailServer LEFT JOIN Host ON mailserver_host_id = host_id WHERE mailserver_id = mailshare_mailserver_id);
+
+INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
+SELECT 'imap', 'mail', domainentity_entity_id, mailserver_host_id
+FROM Domain 
+INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
+INNER JOIN DomainMailServer ON domainmailserver_domain_id = domain_id
+INNER JOIN MailServer ON domainmailserver_mailserver_id = mailserver_id
+WHERE domainmailserver_role = 'imap';
+
+INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
+SELECT 'smtp_in', 'mail', domainentity_entity_id, mailserver_host_id
+FROM Domain 
+INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
+INNER JOIN DomainMailServer ON domainmailserver_domain_id = domain_id
+INNER JOIN MailServer ON domainmailserver_mailserver_id = mailserver_id
+WHERE domainmailserver_role = 'smtp_in';
+
+INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
+SELECT 'smtp_out', 'mail', domainentity_entity_id, mailserver_host_id
+FROM Domain 
+INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
+INNER JOIN DomainMailServer ON domainmailserver_domain_id = domain_id
+INNER JOIN MailServer ON domainmailserver_mailserver_id = mailserver_id
+WHERE domainmailserver_role = 'smtp_out';
+
+INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
+SELECT 'smtp_out', 'mail', domainentity_entity_id, mailserver_host_id
+FROM Domain 
+INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
+INNER JOIN DomainMailServer ON domainmailserver_domain_id = domain_id
+INNER JOIN MailServer ON domainmailserver_mailserver_id = mailserver_id
+WHERE domainmailserver_role = 'smtp_out';
+
+
+INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
+SELECT 'sid', 'samba', domainentity_entity_id, samba_value 
+FROM Domain 
+INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
+INNER JOIN Samba ON samba_domain_id = domain_id
+WHERE samba_name = 'samba_sid';
+
+INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
+SELECT 'domain', 'samba', domainentity_entity_id, samba_value 
+FROM Domain 
+INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
+INNER JOIN Samba ON samba_domain_id = domain_id
+WHERE samba_name = 'samba_domain';
+
+INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
+SELECT 'profile', 'samba', domainentity_entity_id, samba_value 
+FROM Domain 
+INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
+INNER JOIN Samba ON samba_domain_id = domain_id
+WHERE samba_name = 'samba_profile';
+
+INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
+SELECT 'home', 'samba', domainentity_entity_id, samba_value 
+FROM Domain 
+INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
+INNER JOIN Samba ON samba_domain_id = domain_id
+WHERE samba_name = 'samba_home_def';
+
+INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
+SELECT 'drive', 'samba', domainentity_entity_id, samba_value 
+FROM Domain 
+INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
+INNER JOIN Samba ON samba_domain_id = domain_id
+WHERE samba_name = 'home_drive';
+
+ALTER TABLE Host DROP COLUMN host_web_perms;
+ALTER TABLE Host DROP COLUMN host_web_list;
+ALTER TABLE Host DROP COLUMN host_web_all;
+ALTER TABLE Host DROP COLUMN host_ftp_perms;
+ALTER TABLE Host DROP COLUMN host_firewall_perms;
+
+DROP TABLE Samba;
+DROP TABLE P_Samba
+DROP TABLE DomainMailServer;
+DROP TABLE P_DomainMailServer;
+DROP TABLE MailServer;
+DROP TABLE P_MailServer;
 
 -- ------------------------------
 -- Prepare value for foreign keys

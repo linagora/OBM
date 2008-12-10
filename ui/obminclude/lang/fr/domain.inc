@@ -60,3 +60,9 @@ $l_alias_user_used = "Impossible de modifier ou supprimer des alias utilisés da
 // JavaScript Messages
 $l_fill_title = "Vous devez renseigner le Label avant de valider.";
 $l_domain_confirm_delete = "ATTENTION : Vous allez supprimer un profil : Cette opération est irréversible.\\nVoulez-vous continuer ?";
+$l_mailserver = "Serveur de mail";
+
+$l_mailserver_warn = 'Vous devez créer un hôte de ce type';
+$l_imap = 'IMAP';
+$l_smtp_in = 'SMTP in';
+$l_smtp_out = 'SMTP out';

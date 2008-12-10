@@ -106,8 +106,7 @@ function run_query_mailshare_detail($id) {
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
     FROM MailShare
-         LEFT JOIN MailServer ON mailshare_mail_server_id = mailserver_id
-         LEFT JOIN Host ON mailserver_host_id = host_id
+         LEFT JOIN Host ON mailshare_mail_server_id = host_id
          LEFT JOIN UserObm as c ON mailshare_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON mailshare_userupdate=u.userobm_id
     WHERE mailshare_id $id 

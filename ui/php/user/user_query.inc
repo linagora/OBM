@@ -309,17 +309,14 @@ function run_query_user_detail($p_id) {
       domain_label,
       domain_name,
       ms.host_name as mailserver_hostname,
-      mailserver_id,
       ms.host_id as mailserver_host_id,
-      Host.host_name,
-      Host.host_web_perms
+      Host.host_name
     FROM UserObm
          LEFT JOIN UserObm as c ON UserObm.userobm_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON UserObm.userobm_userupdate=u.userobm_id
          LEFT JOIN Domain on UserObm.userobm_domain_id=domain_id
          LEFT JOIN Host on UserObm.userobm_host_id=Host.host_id
-         LEFT JOIN MailServer on UserObm.userobm_mail_server_id=mailserver_id
-         LEFT JOIN Host ms on mailserver_host_id=ms.host_id
+         LEFT JOIN Host ms on UserObm.userobm_mail_server_id=ms.host_id
     WHERE UserObm.userobm_id $p_id 
       $multidomain";
 
@@ -2599,18 +2596,17 @@ function get_user_params_mail_server_id ($params) {
     }
     
     if ($hook_result) {
-      if (isset($hook_result['mailserver_id'])) {
-        $params['mail_server_id'] = $hook_result['mailserver_id'];
+      if (isset($hook_result['host_id'])) {
+        $params['mail_server_id'] = $hook_result['host_id'];
       } else {
-        $query = "SELECT mailserver_id FROM MailServer
-          JOIN Host ON mailserver_host_id = host_id
+        $query = "SELECT host_id FROM Host 
           WHERE host_name = '$hook_result[hostname]'";
         display_debug_msg($query, $cdg_sql, 'get_user_params_mail_server_id(search)');
         $obm_q->query($query);
         
         if ($obm_q->num_rows() == 1) {
           $obm_q->next_record();
-          $params['mail_server_id'] = $obm_q->f('mailserver_id');
+          $params['mail_server_id'] = $obm_q->f('host_id');
         }
       }
     }
@@ -2627,9 +2623,12 @@ function run_query_user_mailchooser_least_boxes () {
   
   $query = "
     SELECT
-      domainmailserver_mailserver_id as mailserver_id,
+      host_id,
       COUNT(*) AS mailbox_count
-    FROM DomainMailServer
+    FROM ServiceProperty
+      LEFT JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+      LEFT JOIN Host ON host_id = serviceproperty_property_value
+    WHERE serviceproperty_property = 'imap' and serviceproperty_service = 'mail'
     LEFT JOIN UserObm u ON domainmailserver_mailserver_id = userobm_mail_server_id
     WHERE domainmailserver_domain_id $sel_id
       AND domainmailserver_role = 'imap'
@@ -2642,7 +2641,7 @@ function run_query_user_mailchooser_least_boxes () {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  return array('mailserver_id' => $obm_q->f('mailserver_id'));
+  return array('host_id' => $obm_q->f('host_id'));
 }
 
 // FUNCTION - automatic mail server chooser static hook
@@ -2667,7 +2666,7 @@ function run_query_user_user_mailchooser_least_used_memory () {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  return array('mailserver_id' => $obm_q->f('mailserver_id'));
+  return array('host_id' => $obm_q->f('host_id'));
 }
 
 ?>

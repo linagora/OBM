@@ -31,7 +31,6 @@ $fieldnames["userobm_fax2"] = $l_fax2;
 $fieldnames["datebegin"] = $l_datebegin;
 $fieldnames["userobm_account_dateexp"] = $l_dateexp;
 $fieldnames["timelastaccess"] = $l_lastaccess;
-$fieldnames["userobm_web_perms"] = $l_web;
 $fieldnames["userobm_email"] = $l_email;
 $fieldnames["userobm_mail_quota"] = $l_quota;
 $fieldnames["userobm_mail_login_date"] = $l_date;
@@ -97,15 +96,6 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
       $res["txt_name"] = " ";
     }
   }
-  else if ($fieldname == "userobm_web_perms") {
-    $res["align"] = "center";
-    $web_perms = $OD->data_set->f("userobm_web_perms");
-    if ($web_perms) {
-      $res["name"] = "X";
-    } else {
-      $res["name"] = "&nbsp;";
-    }
-  } 
   else if ($fieldname == "userobm_samba_perms") {
     $res["align"] = "center";
     $samba_perms = $OD->data_set->f("userobm_samba_perms");
@@ -549,7 +539,6 @@ function html_user_consult($obm_q) {
   $ctry_name = $obm_q->f("country_name");
 
   $web_perms = $obm_q->f("userobm_web_perms");
-  $host_web_perms = $obm_q->f("host_web_perms");
   $web_all = $obm_q->f("userobm_web_all");
   $mail_perms = $obm_q->f("userobm_mail_perms");
   $mail_ext_perms = $obm_q->f("userobm_mail_ext_perms");
@@ -592,7 +581,6 @@ function html_user_consult($obm_q) {
     $dis_host = "<a href=\"$path/host/host_index.php?action=detailconsult&amp;param_host=$host_id\">$host_name</a>";
   }
   if ($host_ip == '') $host_ip = $l_empty;
-  $web_state  = ($web_perms ? $l_enabled : ($host_web_perms ? $l_host_enable : $l_disabled));
   $web_access = ($web_all ? $l_web_all : $l_web_list_only);
   $mail_state  = ($mail_perms ? $l_enabled : $l_disabled);
   $mail_ext_state  = ($mail_ext_perms ? $l_enabled : $l_disabled);

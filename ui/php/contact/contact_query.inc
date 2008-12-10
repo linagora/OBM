@@ -57,51 +57,16 @@ function run_query_contact_search($contact) {
   // If company module used (external from Contact)
   if ($cgp_show['module']['company']) {
 
-    // To allow sorting on contact and company addresses infos
-    $if_condition = "(
-      (contact_address1 != '') OR
-      (contact_address2 != '') OR 
-      (contact_address3 != '') OR 
-      (contact_zipcode != '') OR 
-      (contact_town != '') OR 
-      (contact_expresspostal != ''))";
-
-    $if_ad1 = sql_if($db_type, $if_condition, 'contact_address1 ', 'company_address1') . ' as contact_address1,';
-    $if_ad2 = sql_if($db_type, $if_condition, 'contact_address2 ', 'company_address2') . ' as contact_address2,';
-    $if_ad3 = sql_if($db_type, $if_condition, 'contact_address3 ', 'company_address3') . ' as contact_address3,';
-    $if_zip = sql_if($db_type, $if_condition, 'contact_zipcode ', 'company_zipcode') . ' as contact_zipcode,';
-    $where_zip = "(contact_zipcode $like '$zip%' OR contact_zipcode='' AND company_zipcode $like '$zip%')";
-    $if_town = sql_if($db_type, $if_condition, 'contact_town ', 'company_town') . ' as contact_town,';
-    $where_town = "(contact_town $like '$town%' OR contact_town='' AND company_town $like '$town%')";
-    $if_express = sql_if($db_type, $if_condition, 'contact_expresspostal ', 'company_expresspostal') . ' as contact_expresspostal,';
-    $if_express = sql_if($db_type, $if_condition, 'ctry1.country_name ', 'ctry2.country_name') . ' as country_name,';
-    $join_comp = 'LEFT JOIN Company ON contact_company_id=company_id';
+    $join_comp = 'LEFT JOIN Company ON contact_company_id=company_id LEFT JOIN CompanyEntity ON companyentity_company_id = company_id';
+    $join_entity = 'OR entity_id = companyentity_entity_id';
     $join_ctry2 = "LEFT JOIN Country as ctry2 ON
       Company.company_country_iso3166 = ctry2.country_iso3166
       AND ctry2.country_lang='$lang'";
 
     $company_fields = "company_name,
-      company_aka,
-      company_phone,
-      company_fax,
-      company_address1,
-      company_address2,
-      company_address3,
-      company_zipcode,
-      company_town,
-      company_expresspostal,
-      ctry2.country_name as company_country,";
+      company_aka,";
 
   } else {
-    $if_ad1 = 'contact_address1,';
-    $if_ad2 = 'contact_address2,';
-    $if_ad3 = 'contact_address3,';
-    $if_zip = 'contact_zipcode,';
-    $where_zip = "(contact_zipcode $like '$zip%')";
-    $if_town = 'contact_town,';
-    $where_town = "(contact_town $like '$town%')";
-    $if_express = 'contact_expresspostal,';
-    $if_country = 'ctry1.country_name as country_name,';
     $company_fields = 'contact_company as company_name,';
   }
 
@@ -115,20 +80,16 @@ function run_query_contact_search($contact) {
   }
   // If a phone number has been specified, get it 
   if ($phone != '') {
-    $where .= " AND (contact_phone $like '$phone%' OR
-      contact_homephone $like '$phone%' OR
-      contact_mobilephone $like '$phone%')";
+    $where .= " AND phone_number $like '$phone%'";
   }
   // If an email indication has been specified, get it 
   if ($email != '') {
-    $where .= " AND (contact_email $like '$email%' OR
-      contact_email2 $like '$email%')";
+    $where .= " AND email_address $like '$email%'";
   }
   // If a company name indication has been specified (without id) get it 
   if (($company != '') && ($company_id == '')) {
     if ($cgp_show['module']['company']) {
       $where .= sql_global_company_name_advanced_search($company, $like);
-      $join_comp_count = 'LEFT JOIN Company ON contact_company_id=company_id';
     } else {
       $where .= " AND contact_company $like '$company%'";
     }
@@ -140,21 +101,15 @@ function run_query_contact_search($contact) {
   }
   // If a post code has been specified, get it
   if ($zip != '') {
-    $where .= " AND $where_zip";
+    $where .= " AND address_zipcode $like '$zip%'";
   }
   // If a town has been specified, get it 
   if ($town != '') {
-    $where .= " AND $where_town";
+    $where .= " AND address_town $like '$town%'";
   }
   // If a country has been set
   if (($ctry != $c_all) && ($ctry != '')) {
-    if ($cgp_show['module']['company']) {
-      $where .= " AND (contact_country_iso3166='$ctry' OR
-        contact_country_iso3166=0 AND company_country_iso3166='$ctry')";
-      $join_comp_count = 'LEFT JOIN Company ON contact_company_id=company_id';
-    } else {
-      $where .= " AND contact_country_iso3166='$ctry'";
-    }
+    $where .= " AND address_country='$ctry'";
   }
 
   // If a person in charge has been set
@@ -230,17 +185,19 @@ function run_query_contact_search($contact) {
     }
   }
   $orderq = " ORDER BY $order $sql_order_dir $order_next";
+  $selectFields = "
 
+  ";
   $select = "SELECT
     contact_id as id,
     contact_id,
-    $if_ad1
-    $if_ad2
-    $if_ad3
-    $if_zip
-    $if_town
-    $if_express
-    $if_country
+    address_street,
+    address_zipcode,
+    address_town,
+    address_expresspostal,
+    phone_number,
+    email_address,
+    country_name,
     contact_usercreate,
     contact_company_id,
     contact_kind_id,
@@ -254,12 +211,6 @@ function run_query_contact_search($contact) {
     contact_function_id,
     contact_title,
     contact_service,
-    contact_country_iso3166,
-    contact_phone,
-    contact_homephone,
-    contact_mobilephone,
-    contact_fax,
-    contact_email,
     contact_mailing_ok,
     contact_newsletter,
     contact_archive,
@@ -269,6 +220,12 @@ function run_query_contact_search($contact) {
     contactfunction_label as function_label
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+    $join_comp
+    INNER JOIN Entity ON entity_id = contactentity_entity_id $join_entity
+    LEFT JOIN Address ON address_entity_id = contactentity_entity_id
+    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='$lang'
+    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id
 ";
 
   // XXX Really strange Postgres (8.1.5) behaviour here !
@@ -276,13 +233,8 @@ function run_query_contact_search($contact) {
   // criteria : contactcategory1 selected
   $left_join = "
     $join_userdata
-    $join_comp
     LEFT JOIN Kind ON contact_kind_id = kind_id
-    LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
-    LEFT JOIN Country as ctry1 ON
-    contact_country_iso3166 = ctry1.country_iso3166
-    AND ctry1.country_lang='$lang'
-    $join_ctry2";
+    LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id";
 
 
   if ((! $fuzzy) || ($lname == '')) {

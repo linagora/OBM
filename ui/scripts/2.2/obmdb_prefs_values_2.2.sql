@@ -95,17 +95,14 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','activity_label',11,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','nafcode_code',12,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_address',13,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_address1',14,0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_address2',15,0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_address3',16,0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_zipcode',17,0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_town',18,0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_expresspostal',19,0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','country_name',20,0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_phone',21,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_fax',22,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_email',23,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','company_web',24,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','address_street',14,0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','address_zipcode',15,0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','address_town',16,0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','address_expresspostal',17,0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','country_name',18,0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','phone_number',19,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','email_address',20,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'company','website_url',21,1);
 
 -- module 'contact'
 
@@ -118,25 +115,20 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'kind_minilabel', 7, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'kind_header', 8, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'kind_lang', 9, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','company_name',10,2);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','company_aka',11,0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','contact_address',12,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'contact_service', 13, 0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'contact_address1', 14, 0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'contact_address2', 15, 0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'contact_address3', 16, 0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'contact_zipcode', 17, 0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'contact_town', 18, 0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'contact_expresspostal', 19, 0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'country_name', 20, 0);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','contact_phone',21,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','contact_homephone',22,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','contact_mobilephone',23,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','contact_fax',24,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','contact_email',25,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','contact_date',26,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','contact_mailing_ok',27,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact','contact_newsletter',28,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact', 'company_name',10,2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact', 'company_aka',11,0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact', 'contact_address',12,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact', 'address_street',13,0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'contact_service', 14, 0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'address_zipcode', 15, 0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'address_town', 16, 0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'address_expresspostal', 17, 0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'contact', 'country_name', 18, 0);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact', 'phone_number',19,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact', 'email_address',20,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact', 'contact_date',21,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact', 'contact_mailing_ok',22,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (NULL,'contact', 'contact_newsletter',23,1);
 
 -- module 'lead'
 

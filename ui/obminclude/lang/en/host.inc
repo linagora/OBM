@@ -58,3 +58,8 @@ $l_err_host_ip_not_in_lan="Host IP address isn't in the local network";
 $l_err_firewall_perms = "Invalid advanced perms syntax";
 
 $l_help_system = "System host is needed for the system.";
+
+
+$l_imap = 'IMAP';
+$l_smtp_in = 'SMTP in';
+$l_smtp_out = 'SMTP out';

@@ -528,5 +528,27 @@ class DB_Sql {
   static function CONCAT($args) {
     return 'CONCAT('.implode(',',$args).')'; 
   }  
+
+
+  /**
+   * CAST 
+   * 
+   * @param mixed $args 
+   * @static
+   * @access public
+   * @return void
+   */
+  static function CAST($args) {
+    $data = current($args);
+    $type = strtoupper(next($args));    
+    switch ($type) {
+    case 'INTEGER':
+      $type =  'UNSIGNED';
+      break;
+    default:
+      $type = $type;
+    }
+    return "CAST($data as $type)"; 
+  }  
 }
 ?>

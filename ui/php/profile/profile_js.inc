@@ -26,7 +26,7 @@ function select_right (module_name) {
 
 $extra_js .= "
 function setSectionState(state) {
-    var elements = \$ES('.activeSection');
+    var elements = $$('.activeSection');
     for (var i=0; i<elements.length; i++) {
       elem =elements[i];
       elem.empty();

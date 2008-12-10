@@ -113,7 +113,7 @@ function run_query_domain_detail($p_id) {
 //   $id : new domain id if ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_insert($domain) {
-  global $obm, $cdg_sql;
+  global $obm, $cdg_sql, $cgp_use;
 
   $uid = sql_parse_id($obm['uid']);
   $now = date('Y-m-d H:i:s');
@@ -121,7 +121,7 @@ function run_query_domain_insert($domain) {
   $desc = $domain['desc'];
   $domain_name = $domain['domain_name'];
   $alias = $domain['alias'];
-  $mail_server_auto = sql_parse_id($domain['mail_server_auto']);
+  $mail_server_auto = $domain['mail_server_auto'];
   
   $query = "INSERT INTO Domain (
     domain_timeupdate,
@@ -131,7 +131,6 @@ function run_query_domain_insert($domain) {
     domain_label,
     domain_description,
     domain_name,
-    domain_mail_server_auto,
     domain_alias)
     VALUES (
       null,
@@ -141,7 +140,6 @@ function run_query_domain_insert($domain) {
       '$label',
       '$desc',
       '$domain_name',
-      $mail_server_auto,
       '$alias')";
   display_debug_msg($query, $cdg_sql, 'run_query_domain_insert(1)');
   $obm_q = new DB_OBM;
@@ -150,6 +148,16 @@ function run_query_domain_insert($domain) {
   if ($retour) {
     $id = $obm_q->lastid();
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
+    if ($cgp_use['service']['mail']) {
+      of_service_insert('mail', $entity_id);
+      of_service_property_insert('mail','imap_autoselect', $mail_server_auto);
+      of_service_property_insert('mail','imap', $domain['imap']);
+      of_service_property_insert('mail','smtp_in', $domain['smtp_in']);
+      of_service_property_insert('mail','smtp_out', $domain['smtp_out']);
+    }
+    if ($cgp_use['service']['samba']) {
+      of_service_insert('samba', $entity_id);
+    } 
     run_query_domain_replace_properties($id,$domain);
   } else {
     $id = false;
@@ -208,7 +216,7 @@ function run_query_domain_replace_properties($domain_id,$domain) {
 //   - $domain[]   : entry values
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_domain_update($d_id, $domain) {
-  global $obm, $cdg_sql;
+  global $obm, $cdg_sql, $cgp_use;
 
   $uid = sql_parse_id($obm['uid']);
   $now = date('Y-m-d H:i:s');
@@ -229,6 +237,13 @@ function run_query_domain_update($d_id, $domain) {
   display_debug_msg($query, $cdg_sql, 'run_query_domain_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+  if ($cgp_use['service']['mail']) {
+    $entity_id =  of_entity_get($GLOBALS['module'], $d_id);
+    of_service_property_replace('mail','imap_autoselect', $entity_id, $mail_server_auto);
+    of_service_property_replace('mail','imap',$entity_id , $domain['imap']);
+    of_service_property_replace('mail','smtp_in', $entity_id, $domain['smtp_in']);
+    of_service_property_replace('mail','smtp_out', $entity_id, $domain['smtp_out']);
+  }  
   run_query_domain_replace_properties($d_id,$domain);
 
   return $retour;
@@ -567,7 +582,7 @@ function get_domain_linked_user_mailserver($domain_id, $mailserver_id) {
  *   if doma
  * @return array with mail servers
  **/
-function get_domain_mailservers($role, $domain_id='') {
+function get_domain_mailservers($role = NULL, $domain_id= NULL) {
   global $cdg_sql;
 
   if ($domain_id > 0) {
@@ -578,25 +593,38 @@ function get_domain_mailservers($role, $domain_id='') {
     // New domain (no id specified), host from domain 0
     $where_domain = "AND (domain_global = true)";
   }
+  if(!is_null($role)) {
+    $where_role = " AND $role.service_id IS NOT NULL";
+  } else {
+    $where_role = " AND (imap.service_id IS NOT NULL OR smtp_out.service_id IS NOT NULL OR smtp_in.service_id IS NOT NULL)";
+  }
 
   $obm_q = new DB_OBM;
-  $query = "SELECT *
-    FROM MailServer
-    LEFT JOIN Host on mailserver_host_id = host_id
+  $query = "SELECT 
+      Host.*,
+      imap.service_id as host_imap,
+      smtp_in.service_id as host_smtp_in,
+      smtp_out.service_id as host_smtp_out
+    FROM Host 
+    INNER JOIN HostEntity ON hostentity_host_id = host_id
     LEFT JOIN Domain ON domain_id = host_domain_id
-    WHERE mailserver_$role = 1
+    LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
+    LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
+    LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id    
+    WHERE 1 = 1
+    $where_role  
     $where_domain";
   display_debug_msg($query, $cdg_sql, 'get_domain_mailserver_list()');
   $obm_q->query($query);
 
   $m = array();
   while($obm_q->next_record()) {
-    $id = $obm_q->f('mailserver_id');
+    $id = $obm_q->f('host_id');
     $m[$id]['id'] = $id;
     $m[$id]['name'] = $obm_q->f('host_name');
-    $m[$id]['imap'] = $obm_q->f('mailserver_imap');
-    $m[$id]['smtp_in'] = $obm_q->f('mailserver_smtp_in');
-    $m[$id]['smtp_out'] = $obm_q->f('mailserver_smtp_out');
+    $m[$id]['imap'] = $obm_q->f('host_imap');
+    $m[$id]['smtp_in'] = $obm_q->f('host_smtp_in');
+    $m[$id]['smtp_out'] = $obm_q->f('host_smtp_out');
   }
 
   return $m;

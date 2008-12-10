@@ -15,6 +15,9 @@ $fieldnames['host_name'] = $l_name;
 $fieldnames['host_delegation'] = $l_delegation;
 $fieldnames['host_ip'] = $l_ip;
 $fieldnames['host_samba'] = $l_smb;
+$fieldnames['host_imap'] = $l_imap;
+$fieldnames['host_smtp_in'] = $l_smtp_in;
+$fieldnames['host_smtp_out'] = $l_smptout;
 $fieldnames['host_description'] = $l_desc;
 $fieldnames['usercreate'] = $l_creator;
 $fieldnames['userupdate'] = $l_updater;
@@ -39,6 +42,33 @@ function dis_data_host(&$OD, $fieldname, $link_ok) {
       $res['url'] = "javascript:check_get_id(".$OD->data_set->f('host_id').",'".addslashes($OD->data_set->f('host_name'))."');";
     } else {
      $res['url'] = "$path/host/host_index.php?action=detailconsult&amp;host_id=".$OD->data_set->f('host_id');
+    }
+  }
+
+  else if ($fieldname == 'host_smtp_in') {
+    $res['align'] = 'center';
+    if ($OD->data_set->f($fieldname) == '1') {
+      $res['name'] = 'X';
+    } else {
+      $res['name'] = ' ';
+    }
+  }
+
+  else if ($fieldname == 'host_smtp_out') {
+    $res['align'] = 'center';
+    if ($OD->data_set->f($fieldname) == '1') {
+      $res['name'] = 'X';
+    } else {
+      $res['name'] = ' ';
+    }
+  }
+
+  else if ($fieldname == 'host_imap') {
+    $res['align'] = 'center';
+    if ($OD->data_set->f($fieldname) == '1') {
+      $res['name'] = 'X';
+    } else {
+      $res['name'] = ' ';
     }
   }
 
@@ -94,6 +124,9 @@ function html_host_search_form($host) {
   $delegation = stripslashes($host['delegation']);
   $ip = stripslashes($host['ip']);
   $smb = ($host['samba'] == '1' ? "checked = \"checked\"" : '');
+  $smtp_in = ($host['smtp_in'] == '1' ? "checked = \"checked\"" : '');
+  $smtp_out = ($host['smtp_out'] == '1' ? "checked = \"checked\"" : '');
+  $imap = ($host['imap'] == '1' ? "checked = \"checked\"" : '');
 
   $dis_delegation = of_delegation_dis_search_form($delegation);
 
@@ -104,6 +137,19 @@ function html_host_search_form($host) {
     <label>$l_smb_only<br />
       <input type=\"checkbox\" name=\"cb_samba\" value=\"1\" $smb />
     </label>";
+  }
+  if ($cgp_use['service']['mail']) {
+    $block_mail = "
+    <label>$GLOBALS[l_imap]<br />
+      <input type=\"checkbox\" name=\"cb_imap\" value=\"1\" $imap />
+    </label>
+    <label>$GLOBALS[l_smtp_in]<br />
+      <input type=\"checkbox\" name=\"cb_smtp_in\" value=\"1\" $smtp_in />
+    </label>
+    <label>$GLOBALS[l_smtp_out]<br />
+      <input type=\"checkbox\" name=\"cb_smtp_out\" value=\"1\" $smtp_out />
+    </label>
+    ";
   }
 
   $block = "
@@ -117,6 +163,7 @@ function html_host_search_form($host) {
         <input name=\"tf_ip\" size=\"16\" maxlength=\"16\" value=\"$ip\" />
       </label>
       $block_samba
+      $block_mail
       <label>&nbsp;<br />
         <input name=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
@@ -183,8 +230,11 @@ function html_host_search_list($obm_q, $pref_q, $host) {
   $delegation = urlencode(stripslashes($host['delegation']));
   $ip = urlencode(stripslashes($host['ip']));
   $smb = $host['samba'];
+  $imap = $host['imap'];
+  $smtp_in = $host['smtp_in'];
+  $smtp_out = $host['smtp_out'];
 
-  $url = url_prepare("host_index.php?action=search&amp;tf_name=$namet&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_smb=$smb$url_ext");
+  $url = url_prepare("host_index.php?action=search&amp;tf_name=$namet&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_smb=$smb&amp;cb_imap=$imap&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out$url_ext");
 
   $dis_host = new OBM_DISPLAY('DATA', $pref_q, $module);
 
@@ -238,22 +288,21 @@ function html_host_consult($host_q) {
   global $cgp_use, $l_yes, $l_no;
   global $l_module_host, $l_name, $l_ip, $l_desc, $l_smb;
   global $display, $perm, $menu, $action, $cright_write;
-  global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_mode;
-  global $l_enable, $l_disable, $l_empty, $l_web_all, $l_web_list_only, $l_not_assigned;
-  global $l_user, $l_consult_web_list, $l_web_access, $l_mailserver;
+  global $l_perms;
+  global $l_enable, $l_disable, $l_empty, $l_not_assigned;
+  global $l_user, $l_mailserver;
   global $l_system, $l_help_system,$l_domain;
 
 
   $id = $host_q->f('host_id');
   $delegation = $host_q->f('host_delegation');
   $samba = $host_q->f('host_samba');
+  $imap = $host_q->f('host_imap');
+  $smtp_out = $host_q->f('host_smtp_out');
+  $smtp_in = $host_q->f('host_smtp_in');
   $name = $host_q->f('host_name');
   $desc = $host_q->f('host_description');
   $ip = $host_q->f('host_ip');
-  $web_perms = $host_q->f('host_web_perms');
-  $web_all = $host_q->f('host_web_all');
-  $ftp_perms = $host_q->f('host_ftp_perms');
-  $firewall_perms = $host_q->f('host_firewall_perms');
   $user_id = $host_q->f('userobm_id');
   $user_login = $host_q->f('userobm_login');
   $mail_server = $host_q->f('mailserver_id');
@@ -267,14 +316,9 @@ function html_host_consult($host_q) {
 
   // Formatage des informations de la BD
   if ($samba) $samba = $l_yes; else $samba = $l_no;
-  $web_state  = ($web_perms ? $l_enable : $l_disable);
-  $web_access = ($web_all ? $l_web_all : $l_web_list_only);
-  $ftp_state  = ($ftp_perms ? $l_enable : $l_disable);
-  if (trim($firewall_perms) != '') {
-    $firewall_str = nl2br($firewall_perms);
-  } else {
-    $firewall_str = $l_empty;
-  }
+  if ($imap) $imap = $l_yes; else $imap = $l_no;
+  if ($smtp_in) $smtp_in = $l_yes; else $smtp_in = $l_no;
+  if ($smtp_out) $smtp_out = $l_yes; else $smtp_out = $l_no;
   if ($user_login == '') {
     $dis_user = $l_not_assigned;
   } else {
@@ -288,31 +332,6 @@ function html_host_consult($host_q) {
   $display['detailInfo'] = display_record_info($host_q);
   $display['title'] = $name;
 
-  // Section Web, seulement si squid en local pour les machines car 
-  // acces geres dans les ACL donc dans squid.conf
-  if ($cgp_use['service']['web_local']) {
-    // Affichage uniquement si acces web ET mode web_local
-    // sinon il n'y a pas generation de squid.conf donc pas d'ACL
-    if ($web_perms == 1) {
-      $dis_access = "
-      <tr>
-        <th>$l_web_mode</th>
-	<td>$web_access (<a href=\"$path/host/host_index.php?action=showlist&amp;host_id=$id\" >$l_consult_web_list</a>)</td>
-      </tr>";
-    }
-    $web_section = "
-    <div class=\"detail infos\">
-      <h1>$l_web_access</h1>
-      <table>
-      <tr>
-        <th>$l_web</th>
-        <td>$web_state</td>
-      </tr>
-      $dis_access
-      </table>
-    </div>";
-  }
-  
   if ($cgp_use['service']['samba']) {
     $block_samba = "
     <tr>
@@ -324,9 +343,18 @@ function html_host_consult($host_q) {
   if ($cgp_use['service']['mail']) {
     $block_mail = "
     <tr>
-      <th>".$l_mailserver."</th>
-      <td>".$mail_server."</td>
-    </tr>";
+      <th>$GLOBALS[l_imap]</th>
+      <td>$imap</td>
+    </tr>
+    <tr>
+      <th>$GLOBALS[l_smtp_in]</th>
+      <td>$smtp_in</td>
+    </tr>
+    <tr>
+      <th>$GLOBALS[l_smtp_out]</th>
+      <td>$smtp_out</td>
+    </tr>
+      ";    
   }
 
   $block = "
@@ -355,67 +383,12 @@ function html_host_consult($host_q) {
 
     $block_mail
     </table>
-    </div>
-    $web_section";
+    </div>";
 
-  if ($cgp_use['service']['firewall']) {
-    $block .= "
-    <div class=\"detailHead\">$l_perms</div>
-
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_ftp</td>
-      <td class=\"detailText\">$ftp_state</td>
-    </tr>
-    <tr>
-      <td class=\"detailLabel\">$l_firewall</td>
-      <td class=\"detailText\">$firewall_str</td>
-    </tr>
-    </table>";
-  
-  }
 
   return $block;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display User Web restriction screen
-// Parameters:
-//   - $usr_q     : user database result
-///////////////////////////////////////////////////////////////////////////////
-function html_host_consult_web($host_q) {
-  global $l_lastname, $l_firstname, $l_restrict;
-  global $l_disable;
-  global $action, $c_yes, $c_no;
-  global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
-
-  $height_sep = '10';
-
-  $id = $host_q->f('host_id');
-  $name = $host_q->f('host_name');
-  $ip = $host_q->f('host_ip');
-  $web_all = $host_q->f('host_web_all');
-  $list = nl2br($host_q->f('host_web_list'));
-
-  $web_access = ($web_all ? $l_web_all : $l_web_list_only);
-
-  $block = "
-  <div>
-    <h1>$l_restrict $l_web : $name ($ip)</h1>
-  <table class=\"detail\">
-    <tr>
-      <th>$l_web_mode</th>
-      <td>$web_access</td>
-    </tr>
-    <tr>
-      <td colspan=\"2\">$list</td>
-    </tr>
-  </table>
-  </div>";
-
-  return $block;
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -428,11 +401,11 @@ function html_host_consult_web($host_q) {
 //   - $field    : field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_host_form($action, $host_q, $host, $field='') {
-  global $cgp_use, $l_domain, $l_insert, $l_update, $l_back,$l_web_list;
-  global $l_module_host, $l_name, $l_desc, $l_ip, $l_smb,$l_web_mode;
-  global $l_perms, $l_web, $l_ftp, $l_firewall,$l_web_access, $l_header_new;
-  global $l_host_select_user, $l_user, $l_clear,$l_web_all, $l_web_list_only;
-  global $ico_user, $display, $obm;
+  global $cgp_use, $l_domain, $l_insert, $l_update, $l_back;
+  global $l_module_host, $l_name, $l_desc, $l_ip, $l_smb;
+  global $l_perms, $l_header_new;
+  global $l_host_select_user, $l_user, $l_clear;
+  global $ico_user, $display, $obm, $c_services;
   
   // if update mode and first time, values are taken from db
   if ($action == 'detailupdate') {
@@ -441,12 +414,10 @@ function html_host_form($action, $host_q, $host, $field='') {
     $delegation = $host_q->f('host_delegation');
     $ip = $host_q->f('host_ip');
     $samba = $host_q->f('host_samba');
+    $imap = $host_q->f('host_imap');
+    $smtp_in = $host_q->f('host_smtp_in');
+    $smtp_out = $host_q->f('host_smtp_out');
     $desc = $host_q->f('host_description');
-    $web_perms = $host_q->f('host_web_perms');
-    $web_list = $host_q->f('host_web_list');
-    $web_all = $host_q->f('host_web_all');
-    $ftp_perms = $host_q->f('host_ftp_perms');
-    $firewall_perms = $host_q->f('host_firewall_perms');
     $u_login = $host_q->f('userobm_login');
     $u_id = $host_q->f('userobm_id');
     $dis_title = $name;
@@ -458,12 +429,10 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['delegation'])) { $delegation = stripslashes($host['delegation']); }
   if (isset($host['ip'])) { $ip = $host['ip']; }
   if (isset($host['samba'])) { $samba = $host['samba']; }
+  if (isset($host['imap'])) { $imap = $host['imap']; }
+  if (isset($host['smtp_in'])) { $smtp_in = $host['smtp_in']; }
+  if (isset($host['smtp_out'])) { $smtp_out = $host['smtp_out']; }
   if (isset($host['desc'])) { $desc = stripslashes($host['desc']); }
-  if (isset($host['web_perms'])) { $web_perms = $host['web_perms']; }
-  if (isset($host['web_list'])) { $web_list = $host['web_list']; }
-  if (isset($host['web_all'])) { $web_all = $host['web_all']; }
-  if (isset($host['ftp_perms'])) { $ftp_perms = $host['ftp_perms']; }
-  if (isset($host['firewall_perms'])) { $firewall_perms = $host['firewall_perms']; }
   if (isset($host['domain_id'])) { $domain_id = $host['domain_id']; }
 
   // Domain (can't be updated, so only on insert)
@@ -477,14 +446,10 @@ function html_host_form($action, $host_q, $host, $field='') {
   }
   // Samba host checkbox checked value
   $samba_state  = ($samba ? 'checked' : '');
+  $imap_state  = ($imap ? 'checked' : '');
+  $smtp_in_state  = ($smtp_in ? 'checked' : '');
+  $smtp_out_state  = ($smtp_out ? 'checked' : '');
 
-  // Web mode Radio checked value
-  if ($web_all == '0') $web_all_c0 = ' checked';
-  else $web_all_c1 = ' checked';
-
-  // Web/FTP checkbox checked value
-  $web_state  = ($web_perms ? 'checked' : '');
-  $ftp_state  = ($ftp_perms ? 'checked' : '');
 
   // Mark the error field
   if ($field != '') {
@@ -500,52 +465,35 @@ function html_host_form($action, $host_q, $host, $field='') {
   } else {
     $dis_name = "<input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />";
   }
-  // Section Web, seulement si squid en local pour les machines car 
-  // acces geres dans les ACL donc dans squid.conf
-  if ($cgp_use['service']['web_local']) {
-
-    $block_web_local = "
-    <tr>
-      <th class=\"$class[web_mode]\">$l_web_mode</th>
-      <td>
-        <input type=\"radio\" name=\"rd_web_all\" value=\"1\" $web_all_c1>
-        $l_web_all
-        <input type=\"radio\" name=\"rd_web_all\" value=\"0\" $web_all_c0>
-        $l_web_list_only
-      </td>
-    </tr>    
-    <tr>
-      <th class=\"$class[web_list]\">$l_web_list</th>
-      <td>
-        <textarea name=\"ta_web_list\" cols=\"40\" rows=\"6\">$web_list</textarea>
-      </td>
-    </tr>";
-
-    $dis_web = "
-    <fieldset class=\"detail info\">
-    <legend>$l_web_access</legend>
-    <table>
-    <tr>
-      <th class=\"$class[web_perms]\">$l_web</th>
-      <td>
-        <input name=\"cb_web_perms\" type=\"checkbox\" value=\"1\" $web_state>
-      </td>
-      </tr>
-    $block_web_local
-      </table>
-    </fieldset>";
-  }
 
   if ($cgp_use['service']['samba']) {
     $block_samba = "
-  <tr>
-    <th class=\"$class[samba]\">$l_smb</th>
-    <td>
-      <input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state>
-    </td>
-  </tr>";
+    <tr>
+      <th class=\"$class[samba]\">$l_smb</th>
+      <td>
+        <input name=\"cb_samba\" type=\"checkbox\" value=\"1\" $samba_state>
+      </td>
+    </tr>";
   }
-
+  if($cgp_use['service']['mail']) {
+    $block_mail = "
+    <tr>
+      <th class=\"$class[imap]\">$GLOBALS[l_imap]</th>
+      <td>
+        <input name=\"cb_imap\" type=\"checkbox\" value=\"1\" $imap_state>
+      </td>
+    </tr><tr>
+      <th class=\"$class[smtp_in]\">$GLOBALS[l_smtp_in]</th>
+      <td>
+        <input name=\"cb_smtp_in\" type=\"checkbox\" value=\"1\" $smtp_in_state>
+      </td>
+    </tr><tr>
+      <th class=\"$class[smtp_out]\">$GLOBALS[l_smtp_out]</th>
+      <td>
+        <input name=\"cb_smtp_out\" type=\"checkbox\" value=\"1\" $smtp_out_state>
+      </td>
+    </tr>";
+  }
   $dis_user = "
   <tr>
   <th class=\"$class[user]\">
@@ -582,6 +530,7 @@ function html_host_form($action, $host_q, $host, $field='') {
       <input name=\"tf_ip\" maxlength=\"16\" size=\"16\" value=\"$ip\" /></td>
   </tr>
   $block_samba
+  $block_mail  
   <tr>
     <th class=\"$class[desc]\">$l_desc</th>
     <td>
@@ -590,31 +539,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   </tr>
 
   </table>
-  </fieldset>
-  $dis_web";
-
-  if ($cgp_use['service']['firewall']) {
-    $block .= "
-  <fieldset class=\"detail infos\">
-  <h1>$l_perms</h1>
-
-  <table>
-  <tr>
-    <th class=\"$class[ftp_perms]\">$l_ftp</td>
-    <td>
-      <input name=\"cb_ftp_perms\" type=\"checkbox\" value=\"1\" $ftp_state>
-    </td>
-  </tr>
-  <tr>
-    <th class=\"$class[firewall_perms]\">$l_firewall</td>
-    <td>
-      <textarea name=\"ta_firewall_perms\" cols=\"32\" rows=\"3\">$firewall_perms</textarea>
-    </td>
-  </tr>
-  </table>
   </fieldset>";
-  }
-
 
   if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_but = "

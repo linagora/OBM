@@ -999,7 +999,6 @@ CREATE TABLE `Domain` (
   `domain_description` varchar(255) default NULL,
   `domain_name` varchar(128) default NULL,
   `domain_alias` text,
-  `domain_mail_server_auto` int(2) default NULL,
   `domain_global` tinyint(1) default '0',
   PRIMARY KEY  (`domain_id`),
   KEY `domain_userupdate_userobm_id_fkey` (`domain_userupdate`),
@@ -1020,21 +1019,6 @@ CREATE TABLE `DomainEntity` (
   KEY `domainentity_domain_id_domain_id_fkey` (`domainentity_domain_id`),
   CONSTRAINT `domainentity_domain_id_domain_id_fkey` FOREIGN KEY (`domainentity_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `domainentity_entity_id_entity_id_fkey` FOREIGN KEY (`domainentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `DomainMailServer`
---
-
-DROP TABLE IF EXISTS `DomainMailServer`;
-CREATE TABLE `DomainMailServer` (
-  `domainmailserver_domain_id` int(8) NOT NULL,
-  `domainmailserver_mailserver_id` int(8) NOT NULL,
-  `domainmailserver_role` varchar(16) NOT NULL default 'imap',
-  KEY `domainmailserver_domain_id_domain_id_fkey` (`domainmailserver_domain_id`),
-  KEY `domainmailserver_mailserver_id_mailserver_id_fkey` (`domainmailserver_mailserver_id`),
-  CONSTRAINT `domainmailserver_mailserver_id_mailserver_id_fkey` FOREIGN KEY (`domainmailserver_mailserver_id`) REFERENCES `MailServer` (`mailserver_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `domainmailserver_domain_id_domain_id_fkey` FOREIGN KEY (`domainmailserver_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1306,18 +1290,12 @@ CREATE TABLE `Host` (
   `host_usercreate` int(8) default NULL,
   `host_uid` int(8) default NULL,
   `host_gid` int(8) default NULL,
-  `host_samba` int(1) default '0',
   `host_archive` int(1) default '0' NOT NULL,
   `host_name` varchar(32) NOT NULL,
   `host_fqdn` varchar(255),
   `host_ip` varchar(16) default NULL,
   `host_delegation` varchar(64) default '',
   `host_description` varchar(128) default NULL,
-  `host_web_perms` int(1) default '0',
-  `host_web_list` text,
-  `host_web_all` int(1) default '0',
-  `host_ftp_perms` int(1) default '0',
-  `host_firewall_perms` varchar(128) default NULL,
   PRIMARY KEY  (`host_id`),
   UNIQUE KEY `host_name` (`host_name`),
   UNIQUE KEY `k_uid_host` (`host_uid`),
@@ -1353,6 +1331,7 @@ CREATE TABLE `ServiceProperty` (
   `serviceproperty_service` varchar(255) NOT NULL,
   `serviceproperty_property` varchar(255) NOT NULL,
   `serviceproperty_entity_id` int(8) NOT NULL,
+  `serviceproperty_value` text,
   PRIMARY KEY  (`serviceproperty_id`),
   KEY `serviceproperty_service_key` (`serviceproperty_service`),
   KEY `serviceproperty_property_key` (`serviceproperty_property`),
@@ -1802,43 +1781,6 @@ CREATE TABLE `ListEntity` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `MailServer`
---
-
-DROP TABLE IF EXISTS `MailServer`;
-CREATE TABLE `MailServer` (
-  `mailserver_id` int(8) NOT NULL auto_increment,
-  `mailserver_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `mailserver_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `mailserver_userupdate` int(8) default NULL,
-  `mailserver_usercreate` int(8) default NULL,
-  `mailserver_host_id` int(8) NOT NULL,
-  `mailserver_relayhost_id` int(8) default NULL,
-  `mailserver_imap` int(1) default '0',
-  `mailserver_smtp_in` int(1) default '0',
-  `mailserver_smtp_out` int(1) default '0',
-  PRIMARY KEY  (`mailserver_id`),
-  KEY `mailserver_host_id_host_id_fkey` (`mailserver_host_id`),
-  KEY `mailserver_userupdate_userobm_id_fkey` (`mailserver_userupdate`),
-  KEY `mailserver_usercreate_userobm_id_fkey` (`mailserver_usercreate`),
-  KEY `mailserver_relayhost_id_host_id_fkey` (`mailserver_relayhost_id`),
-  CONSTRAINT `mailserver_relayhost_id_host_id_fkey` FOREIGN KEY (`mailserver_relayhost_id`) REFERENCES `Host` (`host_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `mailserver_host_id_host_id_fkey` FOREIGN KEY (`mailserver_host_id`) REFERENCES `Host` (`host_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `mailserver_usercreate_userobm_id_fkey` FOREIGN KEY (`mailserver_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `mailserver_userupdate_userobm_id_fkey` FOREIGN KEY (`mailserver_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `MailServerNetwork`
---
-
-DROP TABLE IF EXISTS `MailServerNetwork`;
-CREATE TABLE `MailServerNetwork` (
-  `mailservernetwork_host_id` int(8) NOT NULL,
-  `mailservernetwork_ip` varchar(16) NOT NULL default ''
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
 -- Table structure for table `MailShare`
 --
 
@@ -1864,7 +1806,7 @@ CREATE TABLE `MailShare` (
   KEY `mailshare_usercreate_userobm_id_fkey` (`mailshare_usercreate`),
   CONSTRAINT `mailshare_usercreate_userobm_id_fkey` FOREIGN KEY (`mailshare_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `mailshare_domain_id_domain_id_fkey` FOREIGN KEY (`mailshare_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `mailshare_mail_server_id_mailserver_id_fkey` FOREIGN KEY (`mailshare_mail_server_id`) REFERENCES `MailServer` (`mailserver_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `mailshare_mail_server_id_mailserver_id_fkey` FOREIGN KEY (`mailshare_mail_server_id`) REFERENCES `Host` (`host_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `mailshare_userupdate_userobm_id_fkey` FOREIGN KEY (`mailshare_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -2136,57 +2078,18 @@ CREATE TABLE `P_Host` (
   `host_usercreate` int(8) default NULL,
   `host_uid` int(8) default NULL,
   `host_gid` int(8) default NULL,
-  `host_samba` int(1) default '0',
   `host_archive` int(1) default '0' NOT NULL,
   `host_name` varchar(32) NOT NULL,
   `host_fqdn` varchar(255),
   `host_ip` varchar(16) default NULL,
   `host_delegation` varchar(64) default '',
   `host_description` varchar(128) default NULL,
-  `host_web_perms` int(1) default '0',
-  `host_web_list` text,
-  `host_web_all` int(1) default '0',
-  `host_ftp_perms` int(1) default '0',
-  `host_firewall_perms` varchar(128) default NULL,
   PRIMARY KEY  (`host_id`),
   UNIQUE KEY `host_name` (`host_name`),
   UNIQUE KEY `k_uid_host` (`host_uid`),
   KEY `host_domain_id_domain_id_fkey` (`host_domain_id`),
   KEY `host_userupdate_userobm_id_fkey` (`host_userupdate`),
   KEY `host_usercreate_userobm_id_fkey` (`host_usercreate`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_MailServer`
---
-
-DROP TABLE IF EXISTS `P_MailServer`;
-CREATE TABLE `P_MailServer` (
-  `mailserver_id` int(8) NOT NULL auto_increment,
-  `mailserver_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `mailserver_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `mailserver_userupdate` int(8) default NULL,
-  `mailserver_usercreate` int(8) default NULL,
-  `mailserver_host_id` int(8) NOT NULL,
-  `mailserver_relayhost_id` int(8) default NULL,
-  `mailserver_imap` int(1) default '0',
-  `mailserver_smtp_in` int(1) default '0',
-  `mailserver_smtp_out` int(1) default '0',
-  PRIMARY KEY  (`mailserver_id`),
-  KEY `mailserver_host_id_host_id_fkey` (`mailserver_host_id`),
-  KEY `mailserver_userupdate_userobm_id_fkey` (`mailserver_userupdate`),
-  KEY `mailserver_usercreate_userobm_id_fkey` (`mailserver_usercreate`),
-  KEY `mailserver_relayhost_id_host_id_fkey` (`mailserver_relayhost_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_MailServerNetwork`
---
-
-DROP TABLE IF EXISTS `P_MailServerNetwork`;
-CREATE TABLE `P_MailServerNetwork` (
-  `mailservernetwork_host_id` int(8) NOT NULL,
-  `mailservernetwork_ip` varchar(16) NOT NULL default ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -2213,18 +2116,6 @@ CREATE TABLE `P_MailShare` (
   KEY `mailshare_mail_server_id_mailserver_id_fkey` (`mailshare_mail_server_id`),
   KEY `mailshare_userupdate_userobm_id_fkey` (`mailshare_userupdate`),
   KEY `mailshare_usercreate_userobm_id_fkey` (`mailshare_usercreate`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_Samba`
---
-
-DROP TABLE IF EXISTS `P_Samba`;
-CREATE TABLE `P_Samba` (
-  `samba_domain_id` int(8) NOT NULL,
-  `samba_name` varchar(255) NOT NULL default '',
-  `samba_value` varchar(255) NOT NULL default '',
-  KEY `samba_domain_id_domain_id_fkey` (`samba_domain_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -3015,19 +2906,6 @@ CREATE TABLE `ResourcegroupEntity` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `Samba`
---
-
-DROP TABLE IF EXISTS `Samba`;
-CREATE TABLE `Samba` (
-  `samba_domain_id` int(8) NOT NULL,
-  `samba_name` varchar(255) NOT NULL default '',
-  `samba_value` varchar(255) NOT NULL default '',
-  KEY `samba_domain_id_domain_id_fkey` (`samba_domain_id`),
-  CONSTRAINT `samba_domain_id_domain_id_fkey` FOREIGN KEY (`samba_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
 -- Table structure for table `Stats`
 --
 
@@ -3348,7 +3226,7 @@ CREATE TABLE `UserObm` (
   CONSTRAINT `userobm_photo_id_document_id_fkey` FOREIGN KEY (`userobm_photo_id`) REFERENCES `Document` (`document_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `userobm_domain_id_domain_id_fkey` FOREIGN KEY (`userobm_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `userobm_host_id_host_id_fkey` FOREIGN KEY (`userobm_host_id`) REFERENCES `Host` (`host_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `userobm_mail_server_id_mailserver_id_fkey` FOREIGN KEY (`userobm_mail_server_id`) REFERENCES `MailServer` (`mailserver_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `userobm_mail_server_id_mailserver_id_fkey` FOREIGN KEY (`userobm_mail_server_id`) REFERENCES `Host` (`host_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `userobm_usercreate_userobm_id_fkey` FOREIGN KEY (`userobm_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `userobm_userupdate_userobm_id_fkey` FOREIGN KEY (`userobm_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -407,5 +407,20 @@ class DB_Sql {
   static function CONCAT($args) {
     return '('.implode('||',$args).')'; 
   }
+
+  /**
+   * CAST 
+   * 
+   * @param mixed $args 
+   * @static
+   * @access public
+   * @return void
+   */
+  static function CAST($args) {
+    $data = current($args);
+    $type = strtoupper(next($args));    
+    return "CAST($data as $type)"; 
+  }
+
 }
 ?>

@@ -1127,6 +1127,9 @@ function dis_document_file($doc_q) {
     if($handle) {
       header("Content-Type: $mime");
       header("Content-Disposition: inline; filename=".addslashes(str_replace(" ", "_", $name)));
+      header("Cache-Control: maxage=3600");
+      header("Pragma: public");      
+      
       
       while ( !feof($handle) ) {
         echo fread($handle, 4096);

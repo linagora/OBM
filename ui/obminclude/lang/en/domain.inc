@@ -61,3 +61,8 @@ $l_alias_user_used = "Cannot change or remove aliases used in email adress";
 $l_fill_title = "You have to fill the Title before submitting.";
 $l_domain_confirm_delete = "CAUTION : You will delete a profile ! This operation is irreversible.\\nContinue anyway ?";
 
+$l_mailserver_warn = "You have to create an host of this kind first";
+$l_mailserver = "Mail server";
+$l_imap = 'IMAP';
+$l_smtp_in = 'SMTP in';
+$l_smtp_out = 'SMTP out';

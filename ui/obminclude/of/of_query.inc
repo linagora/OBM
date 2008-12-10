@@ -365,40 +365,38 @@ function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
   global $cdg_sql, $obm;
   if (!is_null($domain_id) &&  !$obm['domain_global']) {
     $domain_id = sql_parse_id($domain_id, true);
-    $where_domain = "(domain_id $domain_id OR domain_global = true)";
-    $and = 'AND';
+    $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
   }
   if ($role != '') {
-    $where_role = "$and domainmailserver_role='$role'";
-    $and = 'AND';
+    $where_role = "AND serviceproperty_property = '$role'";
+  } else {
+    $where_role = "AND serviceproperty_property IN ('imap', 'smtp_in', 'smtp_out')";
   }
 
-  if (($where_domain != '') || ($where_role != '')) {
-    $where = "WHERE $where_domain $where_role";
-  }
-
-  $query = "SELECT distinct
-    domainmailserver_domain_id,
-    domainmailserver_mailserver_id,
-    domainmailserver_role,
-    mailserver_host_id,
+  $query = "SELECT 
+    domain_id,
+    serviceproperty_property,
+    host_id,
     host_name,
     host_ip
-    FROM DomainMailServer
-    LEFT JOIN Domain ON domainmailserver_domain_id = domain_id
-    LEFT JOIN MailServer ON domainmailserver_mailserver_id=mailserver_id
-    LEFT JOIN Host ON mailserver_host_id=host_id
-    $where";
+    FROM Domain
+    INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
+    LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id
+    LEFT JOIN Host ON host_id = #CAST(serviceproperty_value,INTEGER)
+    WHERE 
+    serviceproperty_service = 'mail'
+    $where_role
+    $where_domain";
 
   display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_mailserver()');
   $obm_q = new DB_OBM;
-  $obm_q->query($query);
+  $obm_q->xquery($query);
 
   $m = array();
   while ($obm_q->next_record()) {
-    $d_id = $obm_q->f('domainmailserver_domain_id');
-    $m_id = $obm_q->f('domainmailserver_mailserver_id');
-    $role = $obm_q->f('domainmailserver_role');
+    $d_id = $obm_q->f('domain_id');
+    $m_id = $obm_q->f('host_id');
+    $role = $obm_q->f('serviceproperty_property');
     $name = $obm_q->f('host_name');
     $ip = $obm_q->f('host_ip');
     $m[$d_id][$m_id][] = array ('name' => $name, 'ip' => $ip, 'role' => $role);
@@ -3080,5 +3078,95 @@ function of_entity_subquery($entity, $id = NULL, $not = false) {
     $query = '(SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id '.$NOT.' '.$id.')';
   }
   return $query;
+}
+
+/**
+ * of_service_insert 
+ * 
+ * @param mixed $service 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function of_service_insert($service, $id) {
+  global $cdg_sql;
+  $query = "SELECT service_id FROM Service WHERE service_service = '$service' and service_entity_id = $id";
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'of_service_insert(select)');
+  $obm_q->query($query);
+  if(!$obm_q->next_record()) {
+    $query = "INSERT INTO Service (service_service, service_entity_id) VALUES ('$service', $id)";
+    display_debug_msg($query, $cdg_sql, 'of_service_insert(select)');
+    $obm_q->query($query);
+    $id = $obm_q->lastid();
+  } else {
+    $id = $obm_q->f('service_id');
+  }
+  return $id;
+}
+
+/**
+ * of_service_delete 
+ * 
+ * @param mixed $service 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function of_service_delete($service, $id) {
+  global $cdg_sql;
+  $query = "DELETE FROM Service WHERE service_service = '$service' and service_entity_id = $id";
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'of_service_delete()');
+  $obm_q->query($query);
+}
+
+/**
+ * of_service_property_insert 
+ * 
+ * @param mixed $service_property 
+ * @param mixed $service 
+ * @param mixed $id 
+ * @param mixed $value 
+ * @access public
+ * @return void
+ */
+function of_service_property_insert($service, $service_property, $id, $values) {
+  global $cdg_sql;
+  if(!is_array($values)) {
+    $values = array($values);
+  }
+  $values = array_unique($values);
+  $obm_q = new DB_OBM;  
+  foreach($values as $value) {
+    if($value != '') {
+      $query = "INSERT INTO ServiceProperty (serviceproperty_service, serviceproperty_property, serviceproperty_entity_id, serviceproperty_value)
+        VALUES ('$service', '$service_property', $id, '$value')";
+      display_debug_msg($query, $cdg_sql, 'of_service_property_insert()');
+      $obm_q->query($query);
+    }
+  }
+}
+/**
+ * of_service_property_replace 
+ * 
+ * @param mixed $service 
+ * @param mixed $service_property 
+ * @param mixed $id 
+ * @param mixed $values 
+ * @access public
+ * @return void
+ */
+function of_service_property_replace($service, $service_property, $id, $values) {
+  of_service_property_delete($service, $service_property, $id);
+  of_service_property_insert($service, $service_property, $id, $values);
+}
+
+function of_service_property_delete($service, $service_property, $id) {
+  global $cdg_sql;
+  $obm_q = new DB_OBM;  
+  $query = "DELETE FROM ServiceProperty WHERE serviceproperty_service = '$service' AND serviceproperty_property = '$service_property' AND serviceproperty_entity_id = $id";
+  display_debug_msg($query, $cdg_sql, 'of_service_property_delete()');
+  $obm_q->query($query);
 }
 ?>

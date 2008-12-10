@@ -297,9 +297,9 @@ $properties_block
 //   - $domain      : default values or updated values (if error)
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_form($dom_q,$properties_q, $domain) {
+function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
-  global $l_insert, $l_update,$l_mail_server;
+  global $l_insert, $l_update,$l_mail_server, $l_header_add_mailserver;
   global $display, $cgp_use,$l_properties;
   
   // if update mode and first time value are taken from database
@@ -314,6 +314,13 @@ function html_domain_form($dom_q,$properties_q, $domain) {
       ${$properties_q->f('domainproperty_key')} = $properties_q->f('domainpropertyvalue_value');
     }
     $properties_q->seek(0);
+    foreach($mailservers as $domain_id => $domain_mailservers) {
+      foreach ($domain_mailservers as $mailserver_id => $mailserver) {
+        foreach($mailserver as $server) {
+          ${$server['role']}[] = $mailserver_id;
+        }
+      }
+    }
   }
 
   // If parameters have been given, they supercede the default action value
@@ -323,6 +330,9 @@ function html_domain_form($dom_q,$properties_q, $domain) {
   if (isset($domain['domain_name'])) { $domain_name = $domain['domain_name']; }
   if (isset($domain['mail_server_auto'])) { $mail_server_auto = $domain['mail_server_auto']; }
   if (isset($domain['alias'])) { $alias = $domain['alias']; }
+  if (isset($domain['imap'])) { $imap = $domain['imap'];}
+  if (isset($domain['smtp_in'])) { $smtp_in = $domain['smtp_in'];}
+  if (isset($domain['smtp_out'])) { $smtp_out = $domain['smtp_out'];}
 
   while($properties_q->next_record()) {
     $readonly = $properties_q->f('domainproperty_readonly');
@@ -348,7 +358,6 @@ function html_domain_form($dom_q,$properties_q, $domain) {
      </table>
      </fieldset>";
   }
-
   // Buttons
   if (($domain['action'] == 'new') || ($domain['action'] == 'insert')) {
     $dis_domain_name = "<input name=\"tf_domain_name\" size=\"48\" maxlength=\"128\" value=\"$domain_name\" />";
@@ -373,15 +382,157 @@ function html_domain_form($dom_q,$properties_q, $domain) {
     // END - automatic mail server chooser hooks
     
     // Mail server selection
-    $dis_mailserver = "
+    $dis_mailserver_auto = "
     <tr>
       <th class=\"$class[mail_server]\">$l_mail_server</th>
       <td>
       ".dis_domain_mailserver_select('imap', "$mail_server_selected", ($id == '')?'0':$id)."
       </td>
     </tr>";
+    $serverlist = get_domain_mailservers(NULL, $id);
+    if(is_array($imap)) {
+      foreach($imap as $imapserver_id) {
+        $imap_servers .= "
+          <div class=\"multiple\">
+          <a onclick=\"remove_element(this.parentNode,'imapMailServerHome');show_hide_add_button();return false\" href=\"\">
+           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+          </a>        
+          ".$serverlist[$imapserver_id]['name']."<input type=\"hidden\" name=\"sel_imap[]\" value=\"$imapserver_id\" />  
+          </div>";
+      }
+    }
+    if(is_array($smtp_in)) {
+      foreach($smtp_in as $smtp_inserver_id) {
+        $smtp_in_servers .= "
+          <div class=\"multiple\">
+          <a onclick=\"remove_element(this.parentNode,'smtp_inMailServerHome');show_hide_add_button();return false\" href=\"\">
+           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+          </a>        
+          ".$serverlist[$smtp_inserver_id]['name']."<input type=\"hidden\" name=\"sel_smtp_in[]\" value=\"$smtp_inserver_id\" />  
+          </div>";
+      }
+    }
+    if(is_array($smtp_out)) {
+      foreach($smtp_out as $smtp_outserver_id) {
+        $smtp_out_servers .= "
+          <div class=\"multiple\">
+          <a onclick=\"remove_element(this.parentNode,'smtp_outMailServerHome');show_hide_add_button();return false\" href=\"\">
+           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+          </a>        
+          ".$serverlist[$smtp_outserver_id]['name']."<input type=\"hidden\" name=\"sel_smtp_out[]\" value=\"$smtp_outserver_id\" />  
+          </div>";
+      }
+    }
+    $imap_list = '<option value="">---</option>';
+    $smtp_in_list = '<option value="">---</option>';
+    $smtp_out_list = '<option value="">---</option>';
+    foreach($serverlist as $host_id => $serverinfos) {
+      if($serverinfos['imap'] > 0) {
+        $have_imap = true;
+        $imap_list .= "<option value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_imap])</option>";
+      }
+      if($serverinfos['smtp_in'] > 0) {
+        $have_smtp_in = true;
+        $smtp_in_list .= "<option value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_smtp_in])</option>";
+      }
+      if($serverinfos['smtp_out'] > 0) {
+        $have_smtp_out = true;
+        $smtp_out_list .= "<option value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_smtp_out])</option>";
+      }    
+    }
+    if($have_imap) {
+      $dis_imap = "
+        <fieldset class=\"detail infos\">
+          <legend>$GLOBALS[l_imap] $l_mailserver</legend>
+        <table>
+        <tr>
+        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('imapMailServerHome').getFirst(), $('imapMailServerHome'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add imap mailserver]\" /></a></th>
+        <td id='imapMailServerHome'>
+          $imap_servers
+          <div class=\"multiple\">
+          <a onclick=\"remove_element(this.parentNode,'imapMailServerHome');show_hide_add_button();return false\" href=\"\">
+           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+          </a>        
+          <select name='sel_imap[]'>$imap_list</select> 
+          </div>              
+        </td>
+        </tr>
+        </table>
+        </fieldset>
+      ";
+    } else {
+      $dis_imap = "
+        <fieldset class=\"detail infos\">
+          <legend class='warning'>$GLOBALS[l_imap] $l_mailserver : $GLOBALS[l_mailserver_warn]</legend>
+        </fieldset>";
+    }
+    if($have_smtp_in) {
+      $dis_smtp_in = "
+        <fieldset class=\"detail infos\">
+          <legend>$GLOBALS[l_smtp_in] $l_mailserver</legend>
+        <table>
+        <tr>
+        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('smtp_inMailServerHome').getFirst(), $('smtp_inMailServerHome'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add smtp_in mailserver]\" /></a></th>
+        <td id='smtp_inMailServerHome'>
+          $smtp_in_servers
+          <div class=\"multiple\">
+          <a onclick=\"remove_element(this.parentNode,'smtp_inMailServerHome');show_hide_add_button();return false\" href=\"\">
+           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+          </a>        
+          <select name='sel_smtp_in[]'>$smtp_in_list</select> 
+          </div>              
+        </td>
+        </tr>
+        </table>
+        </fieldset>
+      ";
+    } else {
+      $dis_smtp_in = "
+        <fieldset class=\"detail infos\">
+          <legend class='warning'>$GLOBALS[l_smtp_in] $l_mailserver : $GLOBALS[l_mailserver_warn]</legend>
+        </fieldset>";
+    }
+    if($have_smtp_out) {
+      $dis_smtp_out = "
+        <fieldset class=\"detail infos\">
+          <legend>$GLOBALS[l_smtp_out] $l_mailserver</legend>
+        <table>
+        <tr>
+        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('smtp_outMailServerHome').getFirst(), $('smtp_outMailServerHome'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add smtp_out mailserver]\" /></a></th>
+        <td id='smtp_outMailServerHome'>
+          $smtp_out_servers
+          <div class=\"multiple\">
+          <a onclick=\"remove_element(this.parentNode,'smtp_outMailServerHome');show_hide_add_button();return false\" href=\"\">
+           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+          </a>        
+          <select name='sel_smtp_out[]'>$smtp_out_list</select> 
+          </div>              
+        </td>
+        </tr>
+        </table>
+        </fieldset>
+      ";
+    } else {
+      $dis_smtp_out = "
+        <fieldset class=\"detail infos\">
+          <legend class='warning'>$GLOBALS[l_smtp_out] $l_mailserver : $GLOBALS[l_mailserver_warn]</legend>
+        </fieldset>";
+    }
+    
+    $dis_mailserver = "
+    $dis_imap
+    $dis_smtp_in
+    $dis_smtp_out
+    ";
+    $dis_alias = "
+     <fieldset class=\"detail infos\">
+    <legend>$l_alias</legend>
+    <table>
+    <tr>".dis_domain_mail_field($alias,$class)."</tr>
+    </table>
+    </fieldset>      
+    ";
   }
-  $dis_alias = dis_domain_mail_field($alias,$class);
   $display['title'] = $label;
 
   // --- HTML Template --------------------------------------------------------
@@ -405,20 +556,14 @@ function html_domain_form($dom_q,$properties_q, $domain) {
       <th>$l_domain_name</th>
       <td>$dis_domain_name</td>
     </tr>
+    $dis_mailserver_auto
+    </table>
+    </fieldset>
+
+    $dis_alias
+
     $dis_mailserver
-    </table>
-    </fieldset>
-
-     <fieldset class=\"detail infos\">
-    <legend>$l_alias</legend>
-    <table>
-    <tr>
-      $dis_alias
-    </tr>
-    </table>
-    </fieldset>
     $properties_block
-
     <fieldset class=\"buttons\">
     $dis_button
     </fieldset>
@@ -458,8 +603,6 @@ function dis_domain_mailserver_select($role, $sel_id='', $domain_id='') {
   
   // END - automatic mail server chooser hooks
   
-  $ms = get_domain_mailservers($role, $domain_id);
-
   // select
   $sel = "<select id=\"sel_mail_server_id\" name=\"sel_mail_server_id\">";
   $sel .= "$block_mailchooser</select>";
@@ -572,4 +715,5 @@ function dis_domain_mail_field($values,$class) {
 
   return $alias_block;
 }
+
 ?>

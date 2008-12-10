@@ -140,15 +140,6 @@ if ($action == 'ext_get_id') {
     $display['detail'] = html_host_form($action, $host_q, $params, $err['field']);
   }
 
-} elseif ($action == 'showlist') {
-///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_host_detail($params['host_id']);
-  if ($obm_q->num_rows() == 1) {
-    $display['detail'] = html_host_consult_web($obm_q);
-  } else {
-    $display['msg'] .= display_err_msg($l_query_error . ' - ' . $query . ' !');
-  }
-
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_host_warn_delete($params['host_id']);
@@ -201,13 +192,10 @@ display_page($display);
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_host_params() {
-  global $ta_firewall_perms;
-
   // Get global params
   $params = get_global_params('Host');
 
   // Group fields
-  if (isset ($params['firewall_perms'])) $params['firewall_perms'] = cleanup($params['firewall_perms']);
   if (isset ($params['id'])) $params['host_id'] = $params['id'];
   return $params;
 }

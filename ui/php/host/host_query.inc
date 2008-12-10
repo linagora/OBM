@@ -25,6 +25,9 @@ function run_query_host_search($host) {
   $delegation = sql_search_text_parse($host['delegation']);
   $ip = sql_search_text_parse($host['ip']);
   $samba = $host['samba'];
+  $smtp_in = $host['smtp_in'];
+  $smtp_out = $host['smtp_out'];
+  $imap = $host['imap'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -45,7 +48,16 @@ function run_query_host_search($host) {
     $where .= " AND host_ip $like '%$ip%'";
   }
   if ($samba != '') {
-    $where .= ' AND host_samba = 1';
+    $where .= ' AND samba.service_id IS NOT NULL';
+  }
+  if ($smtp_in != '') {
+    $where .= ' AND smtp_in.service_id IS NOT NULL';
+  }
+  if ($smtp_out != '') {
+    $where .= ' AND smtp_out.service_id IS NOT NULL';
+  }
+  if ($imap != '') {
+    $where .= ' AND imap.service_id IS NOT NULL';
   }
   $whereq = "WHERE $where $multidomain";
 
@@ -55,14 +67,23 @@ function run_query_host_search($host) {
 
   $multidomain = sql_multidomain('host');
   $query = "SELECT DISTINCT Host.*,
+      samba.service_id as host_samba,
+      imap.service_id as host_imap,
+      smtp_in.service_id as host_smtp_in,
+      smtp_out.service_id as host_smtp_out,
       host_id as id,
       $timecreate,
       $timeupdate,
       A.userobm_login as usercreate,
       B.userobm_login as userupdate
     FROM Host
+      INNER JOIN HostEntity ON hostentity_host_id = host_id
       LEFT JOIN UserObm as A ON host_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON host_userupdate=B.userobm_id
+      LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
     $whereq $multidomain 
     $orderq
     $limit";
@@ -98,19 +119,26 @@ function run_query_host_detail($id) {
   $multidomain = sql_multidomain('host');
   $id = sql_parse_id($id, true);
   $query = "SELECT *,
+      samba.service_id as host_samba,
+      imap.service_id as host_imap,
+      smtp_in.service_id as host_smtp_in,
+      smtp_out.service_id as host_smtp_out,
       $timecreate,
       $timeupdate,
       uo.userobm_id as userobm_id,
       uo.userobm_login as userobm_login,
       c.userobm_login as usercreate,
-      u.userobm_login as userupdate,
-      mailserver_id
+      u.userobm_login as userupdate
     FROM Host
-         LEFT JOIN UserObm as c ON host_usercreate=c.userobm_id
-         LEFT JOIN UserObm as u ON host_userupdate=u.userobm_id
-         LEFT JOIN UserObm as uo ON host_id=uo.userobm_host_id
-         LEFT JOIN MailServer ON host_id=mailserver_host_id
-         LEFT JOIN Domain ON host_domain_id = domain_id
+      INNER JOIN HostEntity ON hostentity_host_id = host_id
+      LEFT JOIN UserObm as c ON host_usercreate=c.userobm_id
+      LEFT JOIN UserObm as u ON host_userupdate=u.userobm_id
+      LEFT JOIN UserObm as uo ON host_id=uo.userobm_host_id
+      LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
+      LEFT JOIN Domain ON host_domain_id = domain_id
     WHERE host_id $id 
       $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_host_detail()');
@@ -134,10 +162,9 @@ function run_query_host_insert($host) {
   $name = $host['name'];
   $ip = $host['ip'];
   $samba = sql_parse_int($host['samba']);
-  $web_perms = sql_parse_int($host['web_perms']);
-  $ftp_perms = sql_parse_int($host['ftp_perms']);
-  $firewall_perms = sql_parse_int($host['firewall_perms']);
-  $web_all = sql_parse_int($host['web_all']);
+  $smtp_in = sql_parse_int($host['smtp_in']);
+  $smtp_out = sql_parse_int($host['smtp_out']);
+  $imap = sql_parse_int($host['imap']);
   $list = $host['web_list'];
   $desc = $host['desc'];
   $now = date('Y-m-d H:i:s');
@@ -162,16 +189,11 @@ function run_query_host_insert($host) {
     host_domain_id,
     host_uid,
     host_gid,
-    host_samba,
     host_name
     $q_delegation[field],
     host_ip,
-    host_description,
-    host_web_perms,
-    host_web_list,
-    host_web_all,    
-    host_ftp_perms,
-    host_firewall_perms)
+    host_description
+    )
   VALUES (null,
     '$now',
     null,
@@ -179,16 +201,11 @@ function run_query_host_insert($host) {
     $domain_id,
     '$host_uid',
     '$host_gid',
-    $samba,
     '$name'
     $q_delegation[value],
     '$ip',
-    '$desc',
-    $web_perms,
-    '$web_list',
-    $web_all,    
-    $ftp_perms,
-    $firewall_perms)";
+    '$desc'
+    )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_host_insert(1)');
   $obm_q = new DB_OBM;
@@ -198,7 +215,18 @@ function run_query_host_insert($host) {
   $user_id = sql_parse_id($host['user_id'], true);
   $id = $obm_q->lastid();
   $entity_id = of_entity_insert($GLOBALS['module'], $id);    
-    
+  if($samba > 0) {
+    of_service_insert('samba', $entity_id); 
+  }
+  if($smtp_in > 0) {
+    of_service_insert('smtp_in', $entity_id); 
+  }
+  if($smtp_out > 0) {
+    of_service_insert('smtp_out', $entity_id); 
+  }
+  if($imap > 0) {
+    of_service_insert('imap', $entity_id); 
+  }
   if ($retour && $user_id != 0) {
 
     $host_id = sql_parse_id($id);
@@ -232,11 +260,9 @@ function run_query_host_update($host) {
   $name = $host['name'];
   $ip = $host['ip'];
   $samba = sql_parse_int($host['samba']);
-  $web_perms = sql_parse_int($host['web_perms']);
-  $ftp_perms = sql_parse_int($host['ftp_perms']);
-  $web_all = sql_parse_int($host['web_all']);  
-  $web_list = $host['web_list'];
-  $firewall_perms = sql_parse_int($host['firewall_perms']);
+  $smtp_in = sql_parse_int($host['smtp_in']);
+  $smtp_out = sql_parse_int($host['smtp_out']);
+  $imap = sql_parse_int($host['imap']);
   $desc = $host['desc'];
   $now = date('Y-m-d H:i:s');
   $multidomain = sql_multidomain('host');
@@ -247,15 +273,9 @@ function run_query_host_update($host) {
   $query = "UPDATE Host SET
     host_timeupdate='$now',
     host_userupdate=$obm[uid],
-    host_samba=$samba,
     host_name='$name',
     host_ip='$ip',
-    host_description='$desc',
-    host_web_perms=$web_perms,
-    host_web_all=$web_all,
-    host_web_list='$web_list',    
-    host_ftp_perms=$ftp_perms,
-    host_firewall_perms=$firewall_perms
+    host_description='$desc'
     $q_delegation
   WHERE host_id $id $multidomain";
 
@@ -266,7 +286,27 @@ function run_query_host_update($host) {
   // Mise a jour du lien user s'il a ete précisé
   $user_id = sql_parse_id($host['user_id'], true);
   if ($retour) {
-
+    $entity_id = of_entity_get($GLOBALS['module'], $host['host_id']);
+    if($samba > 0) {
+      of_service_insert('samba', $entity_id); 
+    } else {
+      of_service_delete('samba', $entity_id); 
+    }
+    if($smtp_in > 0) {
+      of_service_insert('smtp_in', $entity_id); 
+    } else {
+      of_service_delete('smtp_in', $entity_id); 
+    }
+    if($smtp_out > 0) {
+      of_service_insert('smtp_out', $entity_id); 
+    } else {
+      of_service_delete('smtp_out', $entity_id); 
+    }
+    if($imap > 0) {
+      of_service_insert('imap', $entity_id); 
+    } else {
+      of_service_delete('imap', $entity_id); 
+    }
     // Suppression de l'ancien lien user=>host
     $query = "UPDATE UserObm 
     SET userobm_timeupdate='$now',
@@ -361,9 +401,17 @@ function get_host_info($id) {
   }
   $id = sql_parse_id($id, true);
   $multidomain = sql_multidomain('host');
-  $query = "SELECT *
+  $query = "SELECT *,
+    samba.service_id as host_samba,
+      imap.service_id as host_imap,
+      smtp_in.service_id as host_smtp_in,
+      smtp_out.service_id as host_smtp_out
     FROM Host
-      LEFT JOIN MailServer ON mailserver_host_id = host_id
+      INNER JOIN HostEntity ON hostentity_host_id = host_id
+      LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
     WHERE host_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_host_info()');
@@ -374,8 +422,10 @@ function get_host_info($id) {
   $h['delegation'] = $obm_q->f('host_delegation');
   $h['ip'] = $obm_q->f('host_ip');
   $h['samba'] = $obm_q->f('host_samba');
+  $h['smtp_in'] = $obm_q->f('host_smtp_in');
+  $h['smtp_out'] = $obm_q->f('host_smtp_out');
+  $h['imap'] = $obm_q->f('host_imap');
   $h['desc'] = $obm_q->f('host_description');
-  $h['mailserver'] = $obm_q->f('mail_name');
 
   return $h;
 }

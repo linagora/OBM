@@ -20,21 +20,15 @@ $fieldnames['contact_title'] = $l_title;
 $fieldnames['kind_minilabel'] = $l_kind;
 $fieldnames['kind_header'] = $l_header;
 $fieldnames['kind_lang'] = $l_lang;
+$fieldnames['address_street'] = $l_address;
 $fieldnames['contact_address'] = $l_address;
 $fieldnames['contact_service'] = $l_service;
-$fieldnames['contact_address1'] = "$l_address 1";
-$fieldnames['contact_address2'] = "$l_address 2";
-$fieldnames['contact_address3'] = "$l_address 3";
-$fieldnames['contact_zipcode'] = $l_postcode;
-$fieldnames['contact_town'] = $l_town;
-$fieldnames['contact_expresspostal'] = $l_expresspostal;
+$fieldnames['address_zipcode'] = $l_postcode;
+$fieldnames['address_town'] = $l_town;
+$fieldnames['address_expresspostal'] = $l_expresspostal;
 $fieldnames['country_name'] = $l_country;
-$fieldnames['contact_address'] = $l_address;
-$fieldnames['contact_phone'] = $l_phone;
-$fieldnames['contact_homephone'] = $l_hphone;
-$fieldnames['contact_mobilephone'] = $l_mphone;
-$fieldnames['contact_fax'] = $l_fax;
-$fieldnames['contact_email'] = $l_email;
+$fieldnames['phone_number'] = $l_phone;
+$fieldnames['email_address'] = $l_email;
 $fieldnames['contact_archive'] = $l_archive_first;
 $fieldnames['contact_date'] = $l_date;
 $fieldnames['contact_mailing_ok'] = $l_mailing_ok_first;
@@ -58,19 +52,6 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 
   $show_date = (! $cgp_hide['contact']['contact_date']);
   $ext_url = $params['ext_url'];
-
-  // We set an indicator to tell if the contact has an address
-  if ( ($OD->data_set->f('contact_address1') != '')
-         || ($OD->data_set->f('contact_address2') != '')
-         || ($OD->data_set->f('contact_address3') != '')
-         || ($OD->data_set->f('contact_zipcode') != '')
-         || ($OD->data_set->f('contact_town') != '')
-         || (trim($OD->data_set->f('contact_country_iso3166')) != '')
-         || ($OD->data_set->f('contact_expresspostal') != '') ) {
-    $contact_has_address = true;
-  } else {
-    $contact_has_address = false;
-  }
 
   //  if (($fieldname == 'contact_lastname') && $link_ok) {
   if ($fieldname == 'contact_lastname') {
@@ -127,28 +108,8 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
       $res['txt_name'] = ' ';
     }
   }
-  else if ($fieldname == 'contact_phone') {
-    $phone = trim($OD->data_set->f('contact_phone'));
-    $c_phone = trim($OD->data_set->f('company_phone'));
-    if ( (($phone == '') && ($c_phone != ''))
-         || ( ($phone != '') && ($phone == $c_phone)) ) {
-      $phone = "($c_phone)";
-    }
-    $res['name'] = $phone;
-  }
-
-  else if ($fieldname == 'contact_fax') {
-    $fax = trim($OD->data_set->f('contact_fax'));
-    $c_fax = trim($OD->data_set->f('company_fax'));
-    if ( (($fax == '') && ($c_fax != ''))
-         || ( ($fax != '') && ($fax == $c_fax)) ) {
-      $fax = "($c_fax)";
-    }
-    $res['name'] = $fax;
-  }
-
-  else if ($fieldname == 'contact_email') {
-    $email = $OD->data_set->f('contact_email');
+  else if ($fieldname == 'email_address') {
+    $email = $OD->data_set->f('email_address');
     if (strcmp($email,'') != 0) {
       $res['url'] = "mailto:$email";
       $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\" />";
@@ -157,70 +118,29 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == 'contact_address') {
-    // If a contact address is present we get it
-    if ( $contact_has_address ) {
-      if ($OD->data_set->f('contact_service') != '') {
-	$res['name'] .= $OD->data_set->f('contact_service')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('contact_service') . ' ';
-      }
-      if ($OD->data_set->f('contact_address1') != '') {
-	$res['name'] .= $OD->data_set->f('contact_address1')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('contact_address1') . ' ';
-      }
-      if ($OD->data_set->f('contact_address2') != '') {
-	$res['name'] .= $OD->data_set->f('contact_address2')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('contact_address2') . ' ';
-      }
-      if ($OD->data_set->f('contact_address3') != '') {
-	$res['name'] .= $OD->data_set->f('contact_address3')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('contact_address3');
-      }
-      if ($OD->data_set->f('contact_zipcode') != '') {
-	$res['name'] .= $OD->data_set->f('contact_zipcode')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('contact_zipcode');
-      }
-      if ($OD->data_set->f('contact_town') != '') {
-	$res['name'] .= $OD->data_set->f('contact_town')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('contact_town');
-      }
-      if ($OD->data_set->f('contact_expresspostal') != '') {
-	$res['name'] .= $OD->data_set->f('contact_expresspostal')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('contact_expresspostal');
-      }
-      if ($OD->data_set->f('country_name') != '') {
-	$res['name'] .= $OD->data_set->f('country_name')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('country_name');
-      }
-      // else we get the contact Company address
-    } else {
-      if ($OD->data_set->f('company_address1') != '') {
-	$res['name'] .= $OD->data_set->f('company_address1')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('company_address1') . ' ';
-      }
-      if ($OD->data_set->f('company_address2') != '') {
-	$res['name'] .= $OD->data_set->f('company_address2')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('company_address2') . ' ';
-      }
-      if ($OD->data_set->f('company_address3') != '') {
-	$res['name'] .= $OD->data_set->f('company_address3')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('company_address3');
-      }
-      if ($OD->data_set->f('company_zipcode') != '') {
-	$res['name'] .= $OD->data_set->f('company_zipcode')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('company_zipcode');
-      }
-      if ($OD->data_set->f('company_town') != '') {
-	$res['name'] .= $OD->data_set->f('company_town')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('company_town');
-      }
-      if ($OD->data_set->f('company_expresspostal') != '') {
-	$res['name'] .= $OD->data_set->f('company_expresspostal')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('company_expresspostal');
-      }
-      if ($OD->data_set->f('company_country') != '') {
-	$res['name'] .= $OD->data_set->f('company_country')."<br />\n";
-	$res['txt_name'] .= $OD->data_set->f('company_country');
-      }
+    if ($OD->data_set->f('contact_service') != '') {
+      $res['name'] .= $OD->data_set->f('contact_service')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('contact_service') . ' ';
+    }
+    if ($OD->data_set->f('address_street') != '') {
+      $res['name'] .= $OD->data_set->f('address_street')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('address_street') . ' ';
+    }
+    if ($OD->data_set->f('address_zipcode') != '') {
+      $res['name'] .= $OD->data_set->f('address_zipcode')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('address_zipcode');
+    }
+    if ($OD->data_set->f('address_town') != '') {
+      $res['name'] .= $OD->data_set->f('address_town')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('address_town');
+    }
+    if ($OD->data_set->f('address_expresspostal') != '') {
+      $res['name'] .= $OD->data_set->f('address_expresspostal')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('address_expresspostal');
+    }
+    if ($OD->data_set->f('country_name') != '') {
+      $res['name'] .= $OD->data_set->f('country_name')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('country_name');
     }
   }
 
@@ -228,102 +148,9 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     $res['name'].= $OD->data_set->f('contact_service');
   }
 
-  else if ($fieldname == 'contact_address1') {
-    // If a contact address is present we get it
-    if ( $contact_has_address ) {
-      if ($OD->data_set->f('contact_address1') != '') {
-	$res['name'] .= $OD->data_set->f('contact_address1');
-      }
-      // else we get the contact Company address
-    } else {
-      if ($OD->data_set->f('company_address1') != '') {
-	$res['name'] .= $OD->data_set->f('company_address1');
-      }
-    }
-  }
-
-  else if ($fieldname == 'contact_address2') {
-    // If a contact address is present we get it
-    if ( $contact_has_address ) {
-      if ($OD->data_set->f('contact_address2') != '') {
-	$res['name'] .= $OD->data_set->f('contact_address2');
-      }
-      // else we get the contact Company address
-    } else {
-      if ($OD->data_set->f('company_address2') != '') {
-	$res['name'] .= $OD->data_set->f('company_address2');
-      }
-    }
-  }
-
-  else if ($fieldname == 'contact_address3') {
-    // If a contact address is present we get it
-    if ( $contact_has_address ) {
-      if ($OD->data_set->f('contact_address3') != '') {
-	$res['name'] .= $OD->data_set->f('contact_address3');
-      }
-      // else we get the contact Company address
-    } else {
-      if ($OD->data_set->f('company_address3') != '') {
-	$res['name'] .= $OD->data_set->f('company_address3');
-      }
-    }
-  }
-
-  else if ($fieldname == 'contact_town') {
-    // If a contact address is present we get it
-    if ( $contact_has_address ) {
-      if ($OD->data_set->f('contact_town') != '') {
-	$res['name'] .= $OD->data_set->f('contact_town');
-      }
-      // else we get the contact Company address
-    } else {
-      if ($OD->data_set->f('company_town') != '') {
-	$res['name'] .= $OD->data_set->f('company_town');
-      }
-    }
-  }
-
-  else if ($fieldname == 'contact_zipcode') {
-    // If a contact address is present we get it
-    if ( $contact_has_address ) {
-      if ($OD->data_set->f('contact_zipcode') != '') {
-	$res['name'] .= $OD->data_set->f('contact_zipcode');
-      }
-      // else we get the contact Company address
-    } else {
-      if ($OD->data_set->f('company_zipcode') != '') {
-	$res['name'] .= $OD->data_set->f('company_zipcode');
-      }
-    }
-  }
-
-  else if ($fieldname == 'contact_expresspostal') {
-    // If a contact address is present we get it
-    if ( $contact_has_address ) {
-      if ($OD->data_set->f('contact_expresspostal') != '') {
-	$res['name'] .= $OD->data_set->f('contact_expresspostal');
-      }
-      // else we get the contact Company address
-    } else {
-      if ($OD->data_set->f('company_expresspostal') != '') {
-	$res['name'] .= $OD->data_set->f('company_expresspostal');
-      }
-    }
-  }
-
   else if ($fieldname == 'country_name') {
-    // If a contact address is present we get it
-    if ( $contact_has_address ) {
-      if ($OD->data_set->f('contact_country') != '') {
-	$res['name'] .= $OD->data_set->f('contact_country');
-      }
-      // else we get the contact Company address
-    } else {
-      if ($OD->data_set->f('company_country') != '') {
-	$res['name'] .= '('.$OD->data_set->f('company_country').')';
-	$res['txt_name'] .= $OD->data_set->f('company_country');
-      }
+    if ($OD->data_set->f('country_name') != '') {
+      $res['name'] .= $OD->data_set->f('country_name');
     }
   }
 
