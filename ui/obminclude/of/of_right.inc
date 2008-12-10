@@ -10,11 +10,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Display Rights admin panel
 // Parameters:
-//   - $entity    : entity to admminister the right for
+//   - $entity    : entity to administer the right for
 //   - $entity_id : entity id
-//   - $real_entity : [optionnal] if set, real data entity (eg mailbox->user)
 ///////////////////////////////////////////////////////////////////////////////
-function of_right_dis_admin($entity, $entity_id, $real_entity='') {
+require 'of_acl.php';
+OBM_Acl::initialize();
+
+function of_right_dis_admin($entity, $entity_id) {
   global $display, $obm, $l_of_right_err_empty;
 
   if (!isset($entity_id) || ($entity_id == '')) {
@@ -22,12 +24,15 @@ function of_right_dis_admin($entity, $entity_id, $real_entity='') {
     return;
   }
 
-  $admin_entity = of_right_entity_for_user($entity, $obm['uid'], 'admin','', $real_entity);
-  $display['features'] = html_entityadmin_bar($admin_entity ,$entity_id, $entity);
+  //$admin_entity = of_right_entity_for_user($entity, $obm['uid'], 'admin','', $real_entity);
+  $admin_entity = OBM_Acl::getEntityAdmins($entity, $entity_id); // ???
+  
+  $display['features'] = html_entityadmin_bar($admin_entity ,$entity_id, $entity); // ???
 
-  $consumers = of_right_consumer_for_entity($entity, $entity_id);
+  $consumers = OBM_Acl::getEntityConsumers($entity, $entity_id);
+  $public_rights = OBM_Acl::getPublicRights($entity, $entity_id);
 
-  return html_dis_right_admin($consumers, $entity_id, $entity);
+  return html_dis_right_admin($consumers, $public_rights, $entity_id, $entity);
 }
 
 
@@ -36,7 +41,7 @@ function of_right_dis_admin($entity, $entity_id, $real_entity='') {
 // Parameters:
 //   - $writable_user : Array of user on who you can manage the calandar
 ///////////////////////////////////////////////////////////////////////////////
-function html_entityadmin_bar($writable_entity,$entity_id, $entity) {
+function html_entityadmin_bar($writable_entity, $entity_id, $entity) {
   global $l_entity_right, $l_validate, $path, $module;
 
   if ($module != '') {
@@ -87,7 +92,7 @@ function html_entityadmin_bar($writable_entity,$entity_id, $entity) {
 //   - $consumers : array of all consumers for the entity
 //   - $entity_id : entity selected
 ///////////////////////////////////////////////////////////////////////////////
-function html_dis_right_admin(&$consumers, $entity_id, $entity) {
+function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) {
   global $l_authorize_list,$l_read_permission, $l_write_permission, $l_access_permission;
   global $l_right_validate ,$l_authorize,$l_deny, $ico_delete;
   global $l_public,$l_admin_permission, $module, $l_unselect_all, $l_select_all;
@@ -95,95 +100,81 @@ function html_dis_right_admin(&$consumers, $entity_id, $entity) {
   global $cgp_default_right;
 
   $l_userSearch = phpStringToJsString("$l_users...");
-  for ($i=0; $i<count($consumers['consumer']); $i++) {
-    $con_id = $consumers['consumer'][$i]['id'];
-    if ( ($con_id == 0 || $con_id == NULL) && $i != 0) {
-      $consumer = $consumers['consumer'][$i];
-      $consumers['consumer'][$i] = $consumers['consumer'][0];
-      $consumers['consumer'][0] = $consumer;
-      break;
-    }
+  
+  if ($public_rights['read'] == 1) {
+    $disabled_read = 'disabled="true"';
+    $public_read_checked = "checked=\"checked\"";
+    $style_read = 'visibility: hidden';
   }
-  foreach ($consumers['consumer'] as $one_consumer) {
+  if ($public_rights['write'] == 1) {
+    $disabled_write = 'disabled="true"';
+    $public_write_checked = "checked=\"checked\"";
+    $disabled_read = 'disabled="true"';
+    $public_read_checked = "checked=\"checked\"";
+    $style_write = 'visibility: hidden';
+    $style_read = 'visibility: hidden';
+  }
+  if ($public_rights['access'] == 1) {
+    $disabled_access = 'disabled="true"';
+    $public_access_checked = "checked=\"checked\"";
+    $style_access = 'visibility: hidden';
+  }
+  
+  foreach ($consumers as $one_consumer) {
     $id = $one_consumer['id'];
-    $consumer = $one_consumer['entity'];
+    $consumer = $one_consumer['consumer'];
     $label = $one_consumer['label'];
     $write = $one_consumer['write'];
     $read = $one_consumer['read'];
     $admin = $one_consumer['admin'];
     $access = $one_consumer['access'];
-    if ($id == 0 || $id == NULL) {
-      if ($read == 1) {
-        $disabled_read = 'disabled="true"';
-        $public_read_checked = "checked=\"checked\"";
-        $style_read = 'visibility: hidden';
-      }
-      if ($write == 1) {
-        $disabled_write = 'disabled="true"';
-        $public_write_checked = "checked=\"checked\"";
-        $disabled_read = 'disabled="true"';
-        $public_read_checked = "checked=\"checked\"";
-        $style_write = 'visibility: hidden';
-        $style_read = 'visibility: hidden';
-      }
-      if ($access == 1) {
-        $disabled_access = 'disabled="true"';
-        $public_access_checked = "checked=\"checked\"";
-        $style_access = 'visibility: hidden';
-      }
+    
+    if ($write == 1) {
+      $checked_write = 'checked="checked"';
     } else {
-      if ($write == 1) {
-        $checked_write = 'checked="checked"';
-        if ($read == 0) {
-          $checked_read = 'checked="checked"';
-        }
-      } else {
-        $checked_write = '';
-      }
-      if ($read == 1) {
-        $checked_read = 'checked="checked"';
-      } else {
-        if ($write == 0) {
-          $checked_read = '';
-        }
-      }
-      if ($admin == 1) {
-        $checked_admin = 'checked="checked"';
-      } else {
-        $checked_admin = '';
-      }
-      if ($access == 1) {
-        $checked_access = 'checked="checked"';
-      } else {
-        $checked_access = '';
-      }
-      
-      $sel_id = 'data-'.$consumer.'-'.$id;
-      $tr_id = 'sel_accept_'.$consumer.'-'.$sel_id;
-      ${'dis_'.$consumer} .= "
-      	<tr id=\"$tr_id\">
-      	  <td>
-      	    <a href=\"javascript: remove_element('$tr_id','perms');\"><img src=\"$ico_delete\"></a>
-      	    $label
-      	  </td>
-      	  <td>
-      	    <a href=\"#\" onclick=\"select_all_perms('$tr_id')\">$l_select_all</a>/<a href=\"#\" onclick=\"unselect_all_perms('$tr_id')\">$l_unselect_all</a>
-      	  </td>
-      	  <td class=\"cell_perms_access\">
-      	    <input style=\"$style_access\" type=\"checkbox\" name=\"cb_accept_access[]\" value=\"$sel_id\" $checked_access $disabled_access/>
-      	  </td>
-      	  <td class=\"cell_perms_read\">
-      	    <input style=\"$style_read\" type=\"checkbox\" name=\"cb_accept_read[]\" value=\"$sel_id\" $checked_read $disabled_read/>
-      	  </td>
-      	  <td class=\"cell_perms_write\">
-      	    <input style=\"$style_write\" type=\"checkbox\" name=\"cb_accept_write[]\" onclick=\"apply_checked_read(this, '$tr_id')\" onchange=\"apply_checked_read(this, '$tr_id')\" value=\"$sel_id\" $checked_write $disabled_write/>
-      	  </td>
-      	  <td>
-      	    <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin />
-      	  </td>
-      	</tr>
-      ";
+      $checked_write = '';
     }
+    if ($read == 1) {
+      $checked_read = 'checked="checked"';
+    } else {
+      $checked_read = '';
+    }
+    if ($admin == 1) {
+      $checked_admin = 'checked="checked"';
+    } else {
+      $checked_admin = '';
+    }
+    if ($access == 1) {
+      $checked_access = 'checked="checked"';
+    } else {
+      $checked_access = '';
+    }
+    
+    $sel_id = 'data-'.$consumer.'-'.$id;
+    $tr_id = 'sel_accept_'.$consumer.'-'.$sel_id;
+    ${'dis_'.$consumer} .= "
+      <tr id=\"$tr_id\">
+        <td>
+          <a href=\"javascript: remove_element('$tr_id','perms');\"><img src=\"$ico_delete\"></a>
+          $label
+        </td>
+        <td>
+          <a href=\"#\" onclick=\"select_all_perms('$tr_id')\">$l_select_all</a>/<a href=\"#\" onclick=\"unselect_all_perms('$tr_id')\">$l_unselect_all</a>
+        </td>
+        <td class=\"cell_perms_access\">
+          <input style=\"$style_access\" type=\"checkbox\" name=\"cb_accept_access[]\" value=\"$sel_id\" $checked_access $disabled_access/>
+        </td>
+        <td class=\"cell_perms_read\">
+          <input style=\"$style_read\" type=\"checkbox\" name=\"cb_accept_read[]\" value=\"$sel_id\" $checked_read $disabled_read/>
+        </td>
+        <td class=\"cell_perms_write\">
+          <input style=\"$style_write\" type=\"checkbox\" name=\"cb_accept_write[]\" onclick=\"apply_checked_read(this, '$tr_id')\" onchange=\"apply_checked_read(this, '$tr_id')\" value=\"$sel_id\" $checked_write $disabled_write/>
+        </td>
+        <td>
+          <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin />
+        </td>
+      </tr>
+    ";
   }
   if($cgp_default_right[$entity]['public']['read'] != -1 || ($read == 1 && $id == 0)){ 
     $block_consumer_read_public = "
@@ -272,7 +263,7 @@ function html_dis_right_admin(&$consumers, $entity_id, $entity) {
   $block = "
   <script type=\"text/javascript\">
     function togglePrivacy(formElement, dataElements) {
-      var elements = \$ES('td.'+dataElements);
+      var elements = \$$('td.'+dataElements);
       
       if(formElement.checked) {
         for (var i=0; i<elements.length; i++) {
@@ -415,7 +406,7 @@ function html_dis_right_admin(&$consumers, $entity_id, $entity) {
         var cb_read = $('cb_read_public');
         var accept_read_style = 'visible';
         var accept_read_disabled = false;
-        if (cb_read!==false && cb_read.getElement('input').checked) {
+        if (cb_read!==null && cb_read.getElement('input').checked) {
           accept_read_disabled = true;
           accept_read_style = 'hidden';
         }
@@ -423,7 +414,7 @@ function html_dis_right_admin(&$consumers, $entity_id, $entity) {
         var cb_write = $('cb_write_public');
         var accept_write_style = 'visible';
         var accept_write_disabled = false;
-        if (cb_write!==false && cb_write.getElement('input').checked) {
+        if (cb_write!==null && cb_write.getElement('input').checked) {
           accept_write_disabled = true;
           accept_write_style = 'hidden';
         }
@@ -431,7 +422,7 @@ function html_dis_right_admin(&$consumers, $entity_id, $entity) {
         var cb_access = $('cb_access_public');
         var accept_access_style = 'visible';
         var accept_access_disabled = false;
-        if (cb_access!==false && cb_access.getElement('input').checked) {
+        if (cb_access!==null && cb_access.getElement('input').checked) {
           accept_access_disabled = true;
           accept_access_style = 'hidden';
         }
@@ -759,218 +750,6 @@ function of_right_consumer_for_entity($entity, $entity_id, $consumer='all', $rig
   return $ret_array;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Read Default Rights given by conf.
-// Parameters:
-//   - $param  : hash entry with entity and right values
-//   - $entity : entity type to update
-//   - $real_entity : [optionnal] if set, real data entity (eg mailbox->user)
-///////////////////////////////////////////////////////////////////////////////
-function of_right_default($params, $entity, $real_entity='',$check_perms=true) {
-  global $cgp_default_right;
-  $params['write_public'] = ($cgp_default_right[$entity]['public']['write'] == -1)? 0:$cgp_default_right[$entity]['public']['write'];
-  $params['read_public'] = ($cgp_default_right[$entity]['public']['read'] == -1)? 0:$cgp_default_right[$entity]['public']['read'];;
-  $params['access_public'] = ($cgp_default_right[$entity]['public']['access'] == -1)? 0:$cgp_default_right[$entity]['public']['access'];
-  of_right_update_right($params, $entity, $real_entity,$check_perms);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Update Rights given to users.
-// Parameters:
-//   - $param  : hash entry with entity and right values
-//   - $entity : entity type to update
-//   - $real_entity : [optionnal] if set, real data entity (eg mailbox->user)
-///////////////////////////////////////////////////////////////////////////////
-function of_right_update_right($param, $entity, $real_entity='',$check_perms=true) {
-  global $cdg_sql, $obm, $err, $l_of_right_err_auth,$obm;
-
-  $consumer_ereg = "/^data-(user|group)-([0-9]+)$/";
-
-  $eid = $param['entity_id'];
-  $accept_write = $param['accept_write'];
-  $accept_read = $param['accept_read'];
-  $accept_access = $param['accept_access'];
-  $accept_admin = $param['accept_admin'];
-  $public_write = $param['write_public'];
-  $public_read = $param['read_public'];
-  $public_access = $param['access_public'];
-
-  if (! is_array($accept_read)) {
-    $accept_read = array();
-  }
-  if (! is_array($accept_write)) {
-    $accept_write = array();
-  }
-  if (! is_array($accept_access)) {
-    $accept_access = array();
-  }
-  if (! is_array($accept_admin)) {
-    $accept_admin = array();
-  }
-
-  $accept_admin = array_unique($accept_admin);
-  $accept_write = array_unique($accept_write);
-  $accept_read = array_unique($accept_read);
-  $accept_access = array_unique($accept_access);
-
-  // Rights on external objects : defined by module access
-  // Rights on userobm entity : user need write right on the entity
-  // If user manipulating NOT its own data, check if he has rights
-  if (($eid != $obm['uid'] || $real_entity != 'userobm') && $check_perms) {
-    $admin_entity = of_right_entity_for_user($entity, $obm['uid'], 'admin','', $real_entity);
-    if (!in_array($eid, $admin_entity['ids'])) {
-      $err['msg'] = $l_of_right_err_auth;
-      return false;
-    }
-  }
-
-  $obm_q = new DB_OBM;
-  $query = "DELETE
-    FROM EntityRight
-    WHERE entityright_entity_id ".sql_parse_id($eid, true);
-  display_debug_msg($query, $cdg_sql, 'of_right_update_right(1)');
-  $obm_q->query($query);
-  if ($public_read) {
-    $accept_read = array();
-  }
-  if( $public_write) {
-    $accept_write = array();
-  }
-  if( $public_access) {
-    $accept_access = array();
-  }
-  if ($public_read || $public_write || $public_access) {
-    $pr = sql_parse_int($public_read);
-    $pw = sql_parse_int($public_write);
-    $px = ($public_write ? sql_parse_int($public_write) : sql_parse_int($public_access));
-    $query = "INSERT INTO EntityRight (
-      entityright_entity_id,
-      entityright_consumer_id,
-      entityright_read,
-      entityright_write,
-      entityright_access
-    ) VALUES (
-      ".sql_parse_id($eid).",
-      0,
-      $pr,
-      $pw,
-      $px)";
-    display_debug_msg($query, $cdg_sql, 'of_right_update_right(2)');
-    $obm_q->query($query);
-  }
-
-  if (! $public_access) {
-    // Insert all read entries (with write right correctly set)
-    foreach ($accept_access as $key => $ref) {
-      if (preg_match($consumer_ereg,$ref,$matches)) {
-        $consumer = $matches[1];
-        $id = sql_parse_id($matches[2]);        
-        $r = (in_array($ref, $accept_read) ? 1 : 0);
-        $w = (in_array($ref, $accept_write) ? 1 : 0);
-        $a = (in_array($ref, $accept_admin) ? 1 : 0);
-        $query = "INSERT INTO EntityRight (
-          entityright_entity_id,
-          entityright_consumer_id,
-          entityright_access,
-          entityright_read,
-          entityright_write,
-          entityright_admin
-        ) VALUES (
-          ".sql_parse_id($eid).",
-          $id,
-          1,
-          $r,
-          $w,
-          $a)";
-        display_debug_msg($query, $cdg_sql, 'of_right_update_right(3)');
-        $obm_q->query($query);
-      }
-    }
-  }
-
-  if (! $public_read) {
-    // Insert all read entries not already done by the access loop
-    foreach ($accept_read as $key => $ref) {
-      if (preg_match($consumer_ereg,$ref,$matches)) {
-        if (! in_array($ref, $accept_access)) {
-          $consumer = $matches[1];
-          $id = sql_parse_id($matches[2]);          
-          $w = (in_array($ref, $accept_write) ? 1 : 0);
-          $x = (in_array($ref, $accept_write) ? 1 : 0);
-          $a = (in_array($ref, $accept_admin) ? 1 : 0);
-          $query = "INSERT INTO EntityRight (
-            entityright_entity_id,
-            entityright_consumer_id,
-            entityright_read,
-            entityright_write,
-            entityright_admin
-          ) VALUES (
-            ".sql_parse_id($eid).",
-            $id,
-            1,
-            $w,
-            $a)";
-          display_debug_msg($query, $cdg_sql, 'of_right_update_right(3)');
-          $obm_q->query($query);
-        }
-      }
-    }
-  }
-
-  if (! $public_write) {
-    // Insert all write entries not already done by the read loop
-    foreach ($accept_write as $key => $ref) {
-      if (preg_match($consumer_ereg,$ref,$matches)) {
-        if (! in_array($ref, $accept_access)
-          && (! in_array($ref, $accept_read))) {
-          $consumer = $matches[1];
-          $id = sql_parse_id($matches[2]);          
-          $x = 1;
-          $a = (in_array($ref, $accept_admin) ? 1 : 0);
-          $query = "INSERT INTO EntityRight (
-            entityright_entity_id,
-            entityright_consumer_id,
-            entityright_access,
-            entityright_write,
-            entityright_admin
-          ) VALUES (
-            ".sql_parse_id($eid).",
-            $id,
-            $x,
-            '1',
-            $a)";
-          display_debug_msg($query, $cdg_sql, 'of_right_update_right(4)');
-          $obm_q->query($query);
-        }
-      }
-    }
-  }
-
-  foreach ($accept_admin as $key => $ref) {
-    $ref_ent = substr($ref, 0, 10);
-    if (preg_match($consumer_ereg,$ref,$matches)) {
-      if ((! in_array($ref, $accept_access))
-        && (! in_array($ref, $accept_read)) 
-        && (! in_array($ref, $accept_write))) {
-        $consumer = $matches[1];
-        $id = sql_parse_id($matches[2]);
-        $query = "INSERT INTO EntityRight (
-          entityright_entity_id,
-          entityright_consumer_id,
-          entityright_admin
-        ) VALUES (
-          ".sql_parse_id($eid).",
-          $id,
-          1)";
-        display_debug_msg($query, $cdg_sql, 'of_right_update_right(5)');
-        $obm_q->query($query);
-      }
-    }
-  }
-
-  return true;
-}
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of users for the entity given with the corresponding right
 // Parameters:

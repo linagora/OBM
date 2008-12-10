@@ -181,11 +181,11 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (of_right_update_right($params, 'MailShare')) {
+  if (OBM_Acl_Utils::updateRights('mailshare', $params['entity_id'], $obm['uid'], $params)) {
     update_mailshare_acl( $obm['uid'], $obm['domain_id'] );
     $display['msg'] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
-    $display['msg'] .= display_warn_msg($err['msg']);
+    $display['msg'] .= display_warn_msg($l_of_right_err_auth);
   }
   $display['detail'] = dis_mailshare_right_dis_admin($params['entity_id']);
 

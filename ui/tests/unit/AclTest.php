@@ -44,6 +44,13 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $this->assertTrue(OBM_Acl::canRead(2, 'cv', 1));
     $this->assertTrue(OBM_Acl::canWrite(2, 'cv', 1));
     $this->assertFalse(OBM_Acl::canAdmin(2, 'cv', 1));
+    // special entities
+    $this->assertTrue(OBM_Acl::isAllowed(2, 'calendar', 2, 'read'));
+    $this->assertTrue(OBM_Acl::isAllowed(2, 'calendar', 2, 'write'));
+    $this->assertTrue(OBM_Acl::canRead(2, 'calendar', 2));
+    $this->assertTrue(OBM_Acl::canWrite(2, 'calendar', 2));
+    $this->assertTrue(OBM_Acl::canAdmin(2, 'calendar', 2));
+    
   }
   
   public function testGroupBasics() {
@@ -111,13 +118,13 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     ));
   }
   
-  public function testSetAsPublic() {
+  public function testPublicRights() {
     OBM_Acl::initialize();
     $this->assertFalse(OBM_Acl::canAccess(2, 'cv', 1));
     $this->assertFalse(OBM_Acl::canRead(2, 'cv', 1));
     $this->assertFalse(OBM_Acl::canWrite(2, 'cv', 1));
     $this->assertFalse(OBM_Acl::canAdmin(2, 'cv', 1));
-    OBM_Acl::setAsPublic('cv', 1, true, true, false);
+    OBM_Acl::setPublicRights('cv', 1, array('access' => 1, 'read' => 1, 'write' => 0));
     $this->assertTrue(OBM_Acl::canAccess(2, 'cv', 1));
     $this->assertTrue(OBM_Acl::canRead(2, 'cv', 1));
     $this->assertFalse(OBM_Acl::canWrite(2, 'cv', 1));
@@ -127,8 +134,15 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $this->assertTrue(OBM_Acl::canRead(2, 'cv', 1));
     $this->assertFalse(OBM_Acl::canWrite(2, 'cv', 1));
     $this->assertTrue(OBM_Acl::canAdmin(2, 'cv', 1));
-    $this->assertEquals(OBM_Acl::getAllowedEntities(2, 'cv', 'read', 'title'), 
-                        array(1 => 'CV Admin'));
+    $this->assertEquals(OBM_Acl::getAllowedEntities(2, 'cv', 'read', 'title'), array(1 => 'CV Admin'));
+    OBM_Acl::setPublicRights('cv', 1, array('access' => 1, 'read' => 1, 'write' => 0, 'admin' => 1));
+    $this->assertTrue(OBM_Acl::canAccess(3, 'cv', 1));
+    $this->assertTrue(OBM_Acl::canRead(3, 'cv', 1));
+    $this->assertFalse(OBM_Acl::canWrite(3, 'cv', 1));
+    $this->assertFalse(OBM_Acl::canAdmin(3, 'cv', 1));
+    $this->assertEquals(OBM_Acl::getPublicRights('cv', 1), array(
+      'access' => 1, 'read' => 1, 'write' => 0, 'admin' => 0
+    ));
   }
   
   public function testGetEntityRoles() {
@@ -156,6 +170,42 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $this->assertEquals($users[3], array('id' => 3, 'label' => 'Doe John', 
       'access' => 0, 'read' => 1, 'write' => 1, 'admin' => 0
     ));
+    $consumers = OBM_Acl::getEntityConsumers('cv', 1);
+    $this->assertEquals($consumers[0], array('id' => 4, 'label' => 'DÃ©veloppeur', 'consumer' => 'group',
+      'access' => 0, 'read' => 1, 'write' => 0, 'admin' => 0
+    ));
+    $this->assertEquals($consumers[1], array('id' => 2, 'label' => 'Admin domainezz.com', 'consumer' => 'user',
+      'access' => 0, 'read' => 1, 'write' => 0, 'admin' => 0
+    ));
+    $this->assertEquals($consumers[2], array('id' => 1, 'label' => 'Admin Lastname Firstname', 'consumer' => 'user',
+      'access' => 0, 'read' => 0, 'write' => 0, 'admin' => 1
+    ));
+    $this->assertEquals($consumers[3], array('id' => 3, 'label' => 'Doe John', 'consumer' => 'user',
+      'access' => 0, 'read' => 0, 'write' => 1, 'admin' => 0
+    ));
+  }
+  
+  public function testAclUtils() {
+    $params = array(
+      'access_public' => 1,
+      'read_public' => 1,
+      'accept_admin' => array(
+        0 => 'data-user-23',
+        1 => 'data-user-112'
+      ),
+      'accept_write' => array(
+        0 => 'data-user-23',
+        1 => 'data-user-112'
+      )
+    );
+    $this->assertEquals(OBM_Acl_Utils::parseRightsParams($params), array(
+      'user' => array(
+        23 => array('admin' => 1, 'write' => 1),
+        112 => array('admin' => 1, 'write' => 1)
+      ),
+      'group' => array(),
+      'public' => array('access' => 1, 'read' => 1)
+    ));
   }
   
   private function addCalendar($userId) {
@@ -164,6 +214,7 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $query = "INSERT INTO CalendarEntity (calendarentity_entity_id, calendarentity_calendar_id)
               VALUES ($entityId, $userId)";
     $this->pdo->exec($query);
+    return $entityId;
   }
 }
  

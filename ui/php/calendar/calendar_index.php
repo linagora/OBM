@@ -452,10 +452,10 @@ if ($action == 'index') {
 
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (of_right_update_right($params, 'calendar', 'userobm')) {
+  if (OBM_Acl_Utils::updateRights('calendar', $params['entity_id'], $obm['uid'], $params)) {
     $display['msg'] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
-    $display['msg'] .= display_warn_msg($err['msg']);
+    $display['msg'] .= display_warn_msg($l_of_right_err_auth);
   }
   $display['detail'] = dis_calendar_right_dis_admin($params['entity_id']);
 

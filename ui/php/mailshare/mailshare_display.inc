@@ -435,7 +435,7 @@ function dis_mailshare_right_dis_admin($id='') {
   $infos = get_mailshare_info($id);
   $name = $infos['name'];
   $display['title'] = $name;
-  $block = of_right_dis_admin('MailShare', $id);
+  $block = of_right_dis_admin('mailshare', $id);
 
   return $block;
 }

@@ -3536,7 +3536,7 @@ function dis_calendar_right_dis_admin($id='') {
   $infos = get_user_info($id);
   $name = $infos['firstname'] . ' ' . $infos['lastname'];
   $display['title'] = $name;
-  $block = of_right_dis_admin('calendar', $id, 'userobm');
+  $block = of_right_dis_admin('calendar', $id);
 
   return $block;
 }

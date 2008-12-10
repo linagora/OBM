@@ -122,6 +122,7 @@ if ($action == 'ext_get_ids') {
     // If the context (same resource) was confirmed ok, we proceed
     if (is_array($params['accept_admin'])) {
       $params['accept_write'] = $params['accept_admin'];
+      $params['accept_read'] = $params['accept_admin'];
     }
     $rid = run_query_resource_insert($params);
     if ($rid > 0) {
@@ -186,10 +187,10 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'rights_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (of_right_update_right($params, 'Resource')) {
+  if (OBM_Acl_Utils::updateRights('resource', $params['entity_id'], $obm['uid'], $params)) {
     $display['msg'] .= display_ok_msg($l_right_update_ok);
   } else {
-    $display['msg'] .= display_warn_msg($err['msg']);
+    $display['msg'] .= display_warn_msg($l_of_right_err_auth);
   }
   $display['detail'] = dis_resource_right_dis_admin($params['entity_id']);
 

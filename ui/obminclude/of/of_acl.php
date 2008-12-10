@@ -48,6 +48,10 @@ class OBM_Acl {
     self::$actions = array(self::ACCESS, self::READ, self::WRITE, self::ADMIN);
   }
   
+  public static function possibleActions() {
+    return self::$actions;
+  }
+  
   /**
    * Allows action for a user on a specific entity
    * 
@@ -78,6 +82,9 @@ class OBM_Acl {
    * @return bool
    */
   public static function isAllowed($userId, $entityType, $entityId, $action) {
+    if (self::isSpecialEntity($entityType) && $userId == $entityId) {
+      return true;
+    }
     $query = self::getAclQuery('1', $entityType, $entityId, $userId, $action);
     self::$db->query($query);
     if (!self::$db->next_record()) {
@@ -138,20 +145,42 @@ class OBM_Acl {
     self::setConsumerRights('user', $userId, $entityType, $entityId, $rights);
   }
   
-  public static function setAsPublic($entityType, $entityId, $access = true, $read = false, $write = false) {
-    $rights = array(self::ACCESS => $access, self::READ => $read, self::WRITE => $write);
+  public static function setGroupRights($groupId, $entityType, $entityId, $rights) {
+    self::setConsumerRights('group', $groupId, $entityType, $entityId, $rights);
+  }
+  
+  public static function setPublicRights($entityType, $entityId, $rights) {
+    if (in_array(self::ADMIN, $rights)) {
+      unset($rights[self::ADMIN]);
+    }
     self::setConsumerRights('user', null, $entityType, $entityId, $rights);
+  }
+  
+  public static function setDefaultPublicRights($entityType, $entityId) {
+    self::setConsumerRights('user', null, $entityType, $entityId, OBM_Acl_Utils::getDefaultPublicRights($entityType));
   }
   
   public static function getRights($userId, $entityType, $entityId) {
     $columns = self::getRightColumns();
     $rights = self::getDefaultRights();
-    $query = self::getAclQuery($columns, $entityType, $entityId, $userId, $action);
+    $query = self::getAclQuery($columns, $entityType, $entityId, $userId);
     self::$db->query($query);
     while (self::$db->next_record()) {
       foreach (self::$actions as $action) {
         $rights[$action] |= self::$db->f("entityright_{$action}");
       }
+    }
+    return $rights;
+  }
+  
+  public static function getPublicRights($entityType, $entityId) {
+    $columns = self::getRightColumns();
+    $rights = self::getDefaultRights();
+    $query = self::getPublicAclQuery($columns, $entityType, $entityId);
+    self::$db->query($query);
+    self::$db->next_record();
+    foreach (self::$actions as $action) {
+      $rights[$action] |= self::$db->f("entityright_{$action}");
     }
     return $rights;
   }
@@ -193,9 +222,45 @@ class OBM_Acl {
     return $users;
   }
   
-  public function getAllowedEntities($userId, $entityType, $action, $labelColumn = 'name') {
+  public static function getEntityConsumers($entityType, $entityId, $action = null) {
     $entityTable = ucfirst($entityType);
-    if (in_array($entityType, self::$specialEntityTypes)) {
+    $columns = array('userobm_id AS id', self::getUsernameColumns().' AS label', "'user' as consumer");
+    $unionColumns = array('group_id AS id', 'group_name AS label', "'group' AS consumer");
+    if ($action === null) {
+      $columns = array_merge($columns, self::getRightColumns());
+      $unionColumns = array_merge($unionColumns, self::getRightColumns());
+    }
+    
+    $union = "UNION SELECT ".implode(',', $unionColumns)." FROM UGroup 
+              LEFT JOIN GroupEntity ON group_id = groupentity_group_id 
+              LEFT JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id 
+              LEFT JOIN {$entityTable}Entity ON {$entityType}entity_entity_id = entityright_entity_id "
+              .self::getAclQueryWhere($entityType, $entityId, null, $action);
+              
+    $query = self::getAclQuery($columns, $entityType, $entityId, null, null, '', $union, false, false)
+             ." ORDER BY consumer, label";
+    self::$db->query($query);
+    
+    $consumers = array();
+    while (self::$db->next_record()) {
+      $consumer = array(
+        'id' => self::$db->f('id'),
+        'label' => self::$db->f('label'),
+        'consumer' => self::$db->f('consumer')
+      );
+      if ($action === null) {
+        foreach (self::$actions as $a) {
+          $consumer[$a] |= self::$db->f('entityright_'.$a);
+        }
+      }
+      $consumers[] = $consumer;
+    }
+    return $consumers;
+  }
+  
+  public static function getAllowedEntities($userId, $entityType, $action, $labelColumn = 'name') {
+    $entityTable = ucfirst($entityType);
+    if (self::isSpecialEntity($entityType)) {
       $columns = array('u2.userobm_id AS id', self::getUsernameColumns('u2').' AS label');
       $additionalJoins = "LEFT JOIN UserObm u2 ON {$entityType}entity_{$entityType}_id = u2.userobm_id";
       $unions = "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE userobm_id = {$userId}";
@@ -262,32 +327,43 @@ class OBM_Acl {
   }
   
   private static function getAclQuery($columns, $entityType, $entityId = null, $userId = null, $action = null, 
-                                      $additionalJoins = '', $unions = '', $includePublicEntities = true) {
+                                      $additionalJoins = '', $unions = '', $includePublicEntities = true, $includeGroups = true) {
     $entityTable = ucfirst($entityType);
     $where = self::getAclQueryWhere($entityType, $entityId, $userId, $action);
     if (is_array($columns)) {
       $columns = implode(',', $columns);
     }
-    
-    // Public entities UNION SELECT
     if ($includePublicEntities) {
-      $publicWhere = self::getAclQueryWhere($entityType, $entityId, null, $action, true);
-      $unions .= " UNION 
-                   SELECT {$columns}
-                   FROM EntityRight
-                   LEFT JOIN {$entityTable}Entity ON {$entityType}entity_entity_id = entityright_entity_id 
-                   {$additionalJoins} {$publicWhere}";
+      $unions .= " UNION ".self::getPublicAclQuery($columns, $entityType, $entityId, $action, $additionalJoins);
+    }
+    if ($includeGroups) {
+      $mainJoins = "LEFT JOIN UserObmGroup ON userobm_id = userobmgroup_userobm_id
+                    LEFT JOIN GroupEntity ON userobmgroup_group_id = groupentity_group_id 
+                    LEFT JOIN EntityRight ON (groupentity_entity_id = entityright_consumer_id 
+                                          OR userentity_entity_id = entityright_consumer_id)";
+    } else {
+      $mainJoins = "LEFT JOIN EntityRight ON userentity_entity_id = entityright_consumer_id";
     }
     
     $query = "SELECT {$columns} FROM UserObm u1 
               LEFT JOIN UserEntity ON u1.userobm_id = userentity_user_id 
-              LEFT JOIN UserObmGroup ON userobm_id = userobmgroup_userobm_id
-              LEFT JOIN GroupEntity ON userobmgroup_group_id = groupentity_group_id 
-              LEFT JOIN EntityRight ON (groupentity_entity_id = entityright_consumer_id OR userentity_entity_id = entityright_consumer_id)
+              {$mainJoins}
               LEFT JOIN {$entityTable}Entity ON {$entityType}entity_entity_id = entityright_entity_id 
               {$additionalJoins} {$where} {$unions}";
               
       return $query;
+  }
+  
+  private static function getPublicAclQuery($columns, $entityType, $entityId = null, $action = null, $additionalJoins = '') {
+    $entityTable = ucfirst($entityType);
+    $publicWhere = self::getAclQueryWhere($entityType, $entityId, null, $action, true);
+    if (is_array($columns)) {
+      $columns = implode(',', $columns);
+    }
+    return "SELECT {$columns}
+            FROM EntityRight
+            LEFT JOIN {$entityTable}Entity ON {$entityType}entity_entity_id = entityright_entity_id 
+            {$additionalJoins} {$publicWhere}";
   }
   
   private static function getAclQueryWhere($entityType, $entityId = null, $userId = null, $action = null, $public = false) {
@@ -302,15 +378,19 @@ class OBM_Acl {
       $clauses['public'] = "entityright_consumer_id IS NULL";
     }
     if ($action !== null) {
-      if (!in_array($action, self::$actions)) {
-        throw new Exception("Unknown action: $action");
-      }
-      $clauses['action'] = "entityright_{$action} = 1";
+      $clauses['action'] = self::getActionClause($action);
     }
     if (count($clauses) != 0) {
       return 'WHERE '.implode(' AND ', $clauses);
     }
     return '';
+  }
+  
+  private static function getActionClause($action) {
+    if (!in_array($action, self::$actions)) {
+      throw new Exception("Unknown action: $action");
+    }
+    return "entityright_{$action} = 1";
   }
   
   private static function getEntityId($entityType, $id) {
@@ -340,6 +420,10 @@ class OBM_Acl {
     return $rights;
   }
   
+  private static function isSpecialEntity($entityType) {
+    return in_array($entityType, self::$specialEntityTypes);
+  }
+  
   private static function getDefaultRights() {
     return array(self::ACCESS => 0, self::READ => 0, 
                  self::WRITE => 0, self::ADMIN => 0);
@@ -366,5 +450,63 @@ class OBM_Acl {
     $ctt[2]['type'] = 'field';
     $ctt[2]['value'] = "{$prefix}userobm_firstname";
     return sql_string_concat(self::$db->type, $ctt);
+  }
+}
+
+class OBM_Acl_Utils {
+  
+  private static $consumerRegex = "/^data-(user|group)-([0-9]+)$/";
+  
+  public static function updateRights($entityType, $entityId, $currentUserId, $params) {
+    
+    $rights = OBM_Acl_Utils::parseRightsParams($params);
+
+    if (!OBM_Acl::isAllowed($currentUserId, $entityType, $entityId, 'admin')) {
+      return false;
+    }
+    
+    OBM_Acl::setPublicRights($entityType, $entityId, $rights['public']);
+
+    foreach ($rights['user'] as $userId => $userRights) {
+      OBM_Acl::setRights($userId, $entityType, $entityId, $userRights);
+    }
+    foreach ($rights['group'] as $groupId => $groupRights) {
+      OBM_Acl::setGroupRights($groupId, $entityType, $entityId, $groupRights);
+    }
+    return true;
+  }
+  
+  public static function parseRightsParams($params) {
+    $rights = array('user' => array(), 'group' => array(), 'public' => array());
+    
+    foreach (OBM_Acl::possibleActions() as $a) {
+      if (isset($params[$a.'_public'])) {
+        $rights['public'][$a] = $params[$a.'_public'];
+      }
+      if (!isset($params['accept_'.$a])) {
+        continue;
+      }
+      foreach ($params['accept_'.$a] as $consumer) {
+        if (preg_match(self::$consumerRegex, $consumer, $matches)) {
+          if (!isset($rights[$matches[1]][$matches[2]])) {
+            $rights[$matches[1]][$matches[2]] = array();
+          }
+          $rights[$matches[1]][$matches[2]][$a] = 1;
+        }
+      }
+    }
+    return $rights;
+  }
+  
+  public static function getDefaultPublicRights($entityType) {
+    global $cgp_default_right;
+    
+    $confRights =& $cgp_default_right[$entityType]['public'];
+    
+    $rights = array();
+    $rights['write']  = ($confRights['write']  == -1) ? 0 : $confRights['write'];
+    $rights['read']   = ($confRights['read']   == -1) ? 0 : $confRights['read'];;
+    $rights['access'] = ($confRights['access'] == -1) ? 0 : $confRights['access'];
+    return $rights;
   }
 }

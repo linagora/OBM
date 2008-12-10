@@ -134,7 +134,7 @@ $cdefault_tax = array ('TVA 19,6' => 1.196, 'TVA 5,5' => 1.055, 'Pas de TVA' => 
 
 //  default Right values
 $cgp_default_right = array (
-  'Resource' => array (
+  'resource' => array (
       'public' => array(
         'access' => 1,
         'read' => -1,
@@ -142,7 +142,7 @@ $cgp_default_right = array (
         'admin' => 0
       )
     ),
-  'MailShare' => array (
+  'mailshare' => array (
       'public' => array(
         'access' => 1,
         'read' => 0,

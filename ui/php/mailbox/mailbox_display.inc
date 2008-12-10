@@ -23,7 +23,7 @@ function dis_mailbox_right_dis_admin($id="") {
   $infos = get_user_info($id);
   $name = $infos["firstname"] . " " . $infos["lastname"];
   $display["title"] = "$obm[login] ($name)";
-  $block = of_right_dis_admin("Mailbox", $id, "userobm");
+  $block = of_right_dis_admin("mailbox", $id);
 
   return $block;
 }

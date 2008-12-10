@@ -48,11 +48,11 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (of_right_update_right($params, "mailbox", "userobm")) {
+  if (OBM_Acl_Utils::updateRights('mailbox', $params['entity_id'], $obm['uid'], $params)) {
     update_mailbox_acl( $obm['login'], $obm['domain_id'] );
     $display["msg"] .= display_ok_msg("$l_rights : $l_update_ok");
   } else {
-    $display["msg"] .= display_warn_msg($err["msg"]);
+    $display["msg"] .= display_warn_msg($l_of_right_err_auth);
   }
   $display["detail"] = dis_mailbox_right_dis_admin($params["entity_id"]);
 }

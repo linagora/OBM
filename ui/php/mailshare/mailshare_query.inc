@@ -170,9 +170,7 @@ function run_query_mailshare_insert($mailshare) {
   if ($retour) {
     $id = $obm_q->lastid();
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
-    $mailshare['entity_id'] = $id;
-    of_right_default($mailshare, 'MailShare', '',false) ;
-
+    OBM_Acl::setDefaultPublicRights('mailshare', $id);
     return $id;
   } else {
     return false;

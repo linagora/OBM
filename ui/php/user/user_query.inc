@@ -628,11 +628,11 @@ function run_query_user_insert($user) {
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     $entity_id = of_entity_insert('calendar', $id);    
     $entity_id = of_entity_insert('mailbox', $id);    
-    of_right_default($user,'mailbox','userobm',false);
-    of_right_default($user,'calendar','userobm',false);
+    OBM_Acl::setDefaultPublicRights('mailbox', $id);
+    OBM_Acl::setDefaultPublicRights('calendar', $id);
     $ret = of_userdata_query_update('user', $id, $user);
     // Insert user's photo
-    if(isset($user['file_tmp']) && $user['file_tmp'] != '') {
+    if (isset($user['file_tmp']) && $user['file_tmp'] != '') {
       $user['title'] = $login;
       $user['user_id'] = $id;
       $doc_id = run_query_global_insert_document($user, $id, 'user');

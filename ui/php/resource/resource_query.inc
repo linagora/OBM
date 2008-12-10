@@ -269,7 +269,13 @@ function run_query_resource_insert($resource) {
     $id = $obm_q->lastid();
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     $resource['entity_id'] = $id;
-    of_right_default($resource, 'resource', '',false) ;
+    
+    $default_public_rights = OBM_Acl_Utils::getDefaultPublicRights('resource');
+    OBM_Acl::setPublicRights('resource', $id, $default_public_rights);
+    $default_rights = OBM_Acl_Utils::parseRightsParams($resource);
+    foreach ($default_rights['user'] as $user_id => $rights) {
+      OBM_Acl::setRights($user_id, 'resource', $id, $rights);
+    }
   }
 
   return $id;

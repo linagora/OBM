@@ -309,7 +309,6 @@ function html_resource_form($usr_q, $resource) {
       <fieldset class=\"detail extra\">
       <legend>$l_admin_permission : <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" /></legend>
       <input type=\"hidden\" name=\"sel_accept_admin[]\" value=\"data-user-$obm[uid]\" />
-      <input type=\"hidden\" name=\"sel_read_public\" value=\"1\" />
       <div id=\"sel_accept_admin\">
       </div>
       </fieldset>";
@@ -479,7 +478,7 @@ function dis_resource_right_dis_admin($id) {
   $infos = get_resource_infos($id);
   $name = $infos['name'];
   $display['title'] = $name;
-  $block = of_right_dis_admin('Resource', $id);
+  $block = of_right_dis_admin('resource', $id);
 
   return $block;
 }
