@@ -139,6 +139,11 @@ public class CalendarManager extends ObmManager {
 			event = binding.getEventFromId(token, calendar, key);
 			// log.info(" attendees size : "+event.getAttendees().length );
 			// log.info(" owner : "+event.getOwner()+" calendar : "+calendar);
+			if (event == null) {
+				logger.info("event removed on pda not in db: "+calendar+" / "+key);
+				return;
+			}
+			
 			if (event.getAttendees() == null
 					|| event.getAttendees().size() == 1) {
 				// no attendee (only the owner)
