@@ -21,7 +21,7 @@ use OBM::Parameters::regexp;
 
 sub new {
     my $class = shift;
-    my( $source, $updateType, $parentDomain ) = @_;
+    my( $source, $updateType, $parentDomain, $ids ) = @_;
 
     my $self = bless { }, $class;
 
@@ -50,6 +50,15 @@ sub new {
     if( ref($self->{'domainId'}) || ($self->{'domainId'} !~ /$regexp_id/) ) {
         $self->_log( 'identifiant de domaine \''.$self->{'domainId'}.'\' incorrect', 3 );
         return undef;
+    }
+
+    if( defined($ids) && (ref($ids) ne 'ARRAY') ) {
+        $self->_log( 'liste d\'ID à traiter incorrecte', 3 );
+        return undef;
+    }
+
+    if( $#$ids >= 0 ) {
+        $self->{'ids'} = $ids;
     }
 
     $self->{'running'} = undef;
@@ -130,7 +139,23 @@ sub next {
             next;
         }else {
             $self->{'currentEntity'} = $current;
-            $self->{'currentEntity'}->setUpdateEntity();
+
+            SWITCH: {
+                if( $self->{'updateType'} =~ /^(UPDATE_ALL|UPDATE_ENTITY|UPDATE_LINKS)$/ ) {
+                    $self->_log( 'mise à jour de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    $self->{'currentEntity'}->setUpdateEntity();
+                    last SWITCH;
+                }
+
+                if( $self->{'updateType'} eq 'DELETE' ) {
+                    $self->_log( 'suppression de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    $self->{'currentEntity'}->setDelete();
+                    last SWITCH;
+                }
+
+                $self->_log( 'type de mise à jour inconnu \''.$self->{'updateType'}.'\'', 0 );
+                return undef;
+            }
 
             return $self->{'currentEntity'};
         }
@@ -163,6 +188,10 @@ sub _loadHosts {
                  FROM '.$hostTable.'
                  LEFT JOIN P_Host current ON current.host_id='.$hostTable.'.host_id
                  WHERE '.$hostTable.'.host_domain_id='.$self->{'domainId'};
+
+    if( $self->{'ids'} ) {
+        $query .= ' AND '.$hostTable.'.host_id IN ('.join( ', ', @{$self->{'ids'}} ).')';
+    }
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'hostDescList'} )) ) {
         $self->_log( 'chargement des hôtes depuis la BD impossible', 3 );

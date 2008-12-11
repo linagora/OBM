@@ -41,9 +41,9 @@ sub _checkSource {
 
 
 # Allowed update type :
-#   ALL : entity+links
-#   ENTITY : entity only
-#   LINKS : links only
+#   UPDATE_ALL : entity+links
+#   UPDATE_ENTITY : entity only
+#   UPDATE_LINKS : links only
 sub _checkUpdateType {
     my $self = shift;
 
@@ -57,7 +57,7 @@ sub _checkUpdateType {
         return 0;
     }
 
-    if( $self->{'updateType'} !~ /^(ALL|ENTITY|LINKS)$/ ) {
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY|UPDATE_LINKS|DELETE)$/ ) {
         $self->_log( 'type de mise à jour \''.$self->{'updateType'}.'\' incorrecte', 3 );
         return 0;
     }

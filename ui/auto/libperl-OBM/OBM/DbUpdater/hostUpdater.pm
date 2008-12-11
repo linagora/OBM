@@ -112,6 +112,7 @@ sub delete {
     return $self->_delete( $entity );
 }
 
+
 sub _delete {
     my $self = shift;
     my( $entity ) = @_;
@@ -130,7 +131,7 @@ sub _delete {
     }
 
 
-    if( $entity->getUpdateEntity() ) {
+    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
         my $query = 'DELETE FROM P_Host WHERE host_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );

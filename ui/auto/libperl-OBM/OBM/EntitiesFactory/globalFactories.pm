@@ -25,11 +25,6 @@ sub new {
 
     $self->{'entitiesFactory'} = $entitiesFactory;
 
-    if( $self->_initDomainFactory() ) {
-        $self->_log( 'problème à l\'initialisation de la factory de domaine', 0 );
-        return undef;
-    }
-
     if( $self->_initDeleteFactory() ) {
         $self->_log( 'problème à l\'initialisation des factory des entités supprimées', 0 );
         return undef;
@@ -51,14 +46,12 @@ sub DESTROY {
 }
 
 
-sub _initDomainFactory {
+sub _initDeleteFactory {
     my $self = shift;
-    my $entitiesFactory = $self->{'entitiesFactory'};
 
-    require OBM::EntitiesFactory::domainFactory;
-    my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'WORK', $entitiesFactory->{'domainId'} );
-
-    if( $entitiesFactory->_loadDomains( $entityFactory ) ) {
+    # Deleted hosts
+    if( $self->_initDeleteHostFactory() ) {
+        $self->_log( 'problème au chargement des hôtes à supprimer', 1 );
         return 1;
     }
 
@@ -66,9 +59,47 @@ sub _initDomainFactory {
 }
 
 
-sub _initDeleteFactory {
+sub _initDeleteHostFactory {
     my $self = shift;
     my $entitiesFactory = $self->{'entitiesFactory'};
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return 1;
+    }
+
+    my $query = 'SELECT host_id
+                    FROM P_Host
+                    WHERE host_domain_id='.$entitiesFactory->{'domain'}->getId().' AND host_id NOT IN (SELECT host_id
+                        FROM Host
+                        WHERE host_domain_id='.$entitiesFactory->{'domain'}->getId().')';
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'chargement des utilisateurs depuis la BD impossible', 3 );
+        return 1;
+    }
+
+    my $deletedHosts = ();
+    while( my( $hostId ) = $queryResult->fetchrow_array() ) {
+        $self->_log( 'programmation de la suppression de l\'hôte d\'ID '.$hostId, 4 );
+        push( @{$deletedHosts}, $hostId );
+    }
+
+    if( $#$deletedHosts >= 0 ) {
+        my $entityFactory;
+
+        require OBM::EntitiesFactory::hostFactory;
+        if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( 'SYSTEM', 'DELETE', $entitiesFactory->{'domain'}, $deletedHosts )) ) {
+            $self->_log( 'problème au chargement de la factory des hôtes a supprimer', 3 );
+            return 1;
+        }
+
+        $entitiesFactory->enqueueFactory( $entityFactory );
+    }
 
     return 0;
 }
@@ -91,7 +122,7 @@ sub _initUpdateFactory {
 
     if( !$entitiesFactory->{'domain'}->isGlobal() ) {
         require OBM::EntitiesFactory::mailServerFactory;
-        if( !($entityFactory = OBM::EntitiesFactory::mailServerFactory->new( 'WORK', 'ALL', $entitiesFactory->{'domain'} )) ) {
+        if( !($entityFactory = OBM::EntitiesFactory::mailServerFactory->new( 'WORK', 'UPDATE_ALL', $entitiesFactory->{'domain'} )) ) {
             $self->_log( 'problème au chargement de la factory de configuration des serveurs de courriers', 3 );
             return 1;
         }
@@ -100,7 +131,7 @@ sub _initUpdateFactory {
     }
 
     require OBM::EntitiesFactory::hostFactory;
-    if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( 'WORK', 'ALL', $entitiesFactory->{'domain'} )) ) {
+    if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( 'WORK', 'UPDATE_ALL', $entitiesFactory->{'domain'} )) ) {
         $self->_log( 'problème au chargement de la factory des hôtes', 3 );
         return 1;
     }
@@ -108,7 +139,7 @@ sub _initUpdateFactory {
     $entitiesFactory->enqueueFactory( $entityFactory );
 
     require OBM::EntitiesFactory::groupFactory;
-    if( !($entityFactory = OBM::EntitiesFactory::groupFactory->new( 'WORK', 'ALL', $entitiesFactory->{'domain'} )) ) {
+    if( !($entityFactory = OBM::EntitiesFactory::groupFactory->new( 'WORK', 'UPDATE_ALL', $entitiesFactory->{'domain'} )) ) {
         $self->_log( 'problème au chargement de la factory des groupes', 3 );
         return 1;
     }
@@ -116,7 +147,7 @@ sub _initUpdateFactory {
     $entitiesFactory->enqueueFactory( $entityFactory );
 
     require OBM::EntitiesFactory::mailshareFactory;
-    if( !($entityFactory = OBM::EntitiesFactory::mailshareFactory->new( 'WORK', 'ALL', $entitiesFactory->{'domain'} )) ) {
+    if( !($entityFactory = OBM::EntitiesFactory::mailshareFactory->new( 'WORK', 'UPDATE_ALL', $entitiesFactory->{'domain'} )) ) {
         $self->_log( 'problème au chargement de la factory des mailshare', 3 );
         return 1;
     }
@@ -124,7 +155,7 @@ sub _initUpdateFactory {
     $entitiesFactory->enqueueFactory( $entityFactory );
 
     require OBM::EntitiesFactory::userFactory;
-    if( !($entityFactory = OBM::EntitiesFactory::userFactory->new( 'WORK', 'ALL', $entitiesFactory->{'domain'} )) ) {
+    if( !($entityFactory = OBM::EntitiesFactory::userFactory->new( 'WORK', 'UPDATE_ALL', $entitiesFactory->{'domain'} )) ) {
         $self->_log( 'problème au chargement de la factory des utilisateurs', 3 );
         return 1;
     }

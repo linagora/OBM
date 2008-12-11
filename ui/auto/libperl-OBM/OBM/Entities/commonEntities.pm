@@ -36,7 +36,7 @@ sub setDelete {
 
     $self->{'toDelete'} = 1;
 
-    return 1;
+    return 0;
 }
 
 

@@ -118,6 +118,8 @@ sub update {
 
             if( defined($currentLdapEntity) && $toDelete ) {
                 # Suppression du DN actuel
+                $self->_log( 'supression de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 2 );
+
                 if( $self->_deleteEntity( $currentLdapEntity ) ) {
                     $self->( 'echec de suppression de '.$self->{'currentEntity'}->getDescription().', DN '.$currentEntityDNs->[$i], 3 );
                     return $errorCode;

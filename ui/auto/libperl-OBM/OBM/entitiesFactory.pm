@@ -74,6 +74,15 @@ sub _initMode {
         return 1;
     }
 
+    # For any update mode, domains must be loaded
+    require OBM::EntitiesFactory::domainFactory;
+    my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'WORK', $self->{'domainId'} );
+
+    if( $self->_loadDomains( $entityFactory ) ) {
+        return 1;
+    }
+
+
     if( $self->{'mode'} =~ /^GLOBAL$/ ) {
         $self->_log( 'mode d\'exécution global', 3 );
         return $self->_initGlobal();

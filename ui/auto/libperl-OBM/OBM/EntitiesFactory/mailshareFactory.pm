@@ -134,7 +134,7 @@ sub next {
             $self->{'currentEntity'} = $current;
 
             SWITCH: {
-                if( $self->{'updateType'} eq 'ALL' ) {
+                if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
                     if( $self->_loadMailshareLinks() ) {
                         $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
                         next;
@@ -147,13 +147,13 @@ sub next {
                     last SWITCH;
                 }
 
-                if( $self->{'updateType'} eq 'ENTITY' ) {
+                if( $self->{'updateType'} eq 'UPDATE_ENTITY' ) {
                     $self->_log( 'mise à jour de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
                     $self->{'currentEntity'}->setUpdateEntity();
                     last SWITCH;
                 }
 
-                if( $self->{'updateType'} eq 'LINKS' ) {
+                if( $self->{'updateType'} eq 'UPDATE_LINKS' ) {
                     if( $self->_loadMailshareLinks() ) {
                         $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
                         next;
@@ -164,7 +164,7 @@ sub next {
                     last SWITCH;
                 }
 
-                $self->_log( 'type de mise à jour inconnu \''.$self->{'currentEntity'}.'\'', 0 );
+                $self->_log( 'type de mise à jour inconnu \''.$self->{'updateType'}.'\'', 0 );
                 return undef;
             }
 
