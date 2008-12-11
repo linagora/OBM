@@ -156,29 +156,29 @@ public class CalendarHelper extends Helper {
 		short dayOfWeekMask = getDayOfWeekMask(obmrec.getDays());
 
 		try {
-			if (obmrec.getKind().equals("daily")) {
+			if (obmrec.getKind() == RecurrenceKind.daily) {
 
 				result = RecurrencePattern.getDailyRecurrencePattern(interval,
 						sPatternStart, sPatternEnd, noEndDate);
 
-			} else if (obmrec.getKind().equals("weekly")) {
+			} else if (obmrec.getKind() == RecurrenceKind.weekly) {
 
 				result = RecurrencePattern.getWeeklyRecurrencePattern(interval,
 						dayOfWeekMask, sPatternStart, sPatternEnd, noEndDate);
 
-			} else if (obmrec.getKind().equals("monthlybydate")) {
+			} else if (obmrec.getKind() == RecurrenceKind.monthlybydate) {
 
 				result = RecurrencePattern.getMonthlyRecurrencePattern(
 						interval, getDayOfMonth(dstart), sPatternStart,
 						sPatternEnd, noEndDate);
 
-			} else if (obmrec.getKind().equals("monthlybyday")) {
+			} else if (obmrec.getKind() == RecurrenceKind.monthlybyday) {
 
 				result = RecurrencePattern.getMonthNthRecurrencePattern(
 						interval, getDayOfWeek(dstart), getNthDay(dstart),
 						sPatternStart, sPatternEnd);
 
-			} else if (obmrec.getKind().equals("yearly")) {
+			} else if (obmrec.getKind() == RecurrenceKind.yearly) {
 
 				result = RecurrencePattern.getYearlyRecurrencePattern(interval,
 						getDayOfMonth(dstart), getMonthOfYear(dstart),
