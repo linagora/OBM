@@ -1376,18 +1376,18 @@ INSERT INTO Service (service_service, service_entity_id)
 SELECT 'mail', domainentity_entity_id FROM Domain 
 INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
 INNER JOIN DomainMailServer ON domainmailserver_domain_id = domain_id
-GROUP BY domainentity_entity_id
+GROUP BY domainentity_entity_id;
 
 
 INSERT INTO Service (service_service, service_entity_id)
 SELECT 'samba', domainentity_entity_id FROM Domain 
 INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
 INNER JOIN Samba ON samba_domain_id = domain_id
-GROUP BY domainentity_entity_id
+GROUP BY domainentity_entity_id;
 
 UPDATE UserObm SET userobm_mail_server_id = (SELECT host_id FROM MailServer LEFT JOIN Host ON mailserver_host_id = host_id WHERE mailserver_id = userobm_mail_server_id);
 
-UPDATE MailShare SET mailshare_mailserver_id = (SELECT host_id FROM MailServer LEFT JOIN Host ON mailserver_host_id = host_id WHERE mailserver_id = mailshare_mailserver_id);
+UPDATE MailShare SET mailshare_mail_server_id = (SELECT host_id FROM MailServer LEFT JOIN Host ON mailserver_host_id = host_id WHERE mailserver_id = mailshare_mail_server_id);
 
 INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
 SELECT 'imap', 'mail', domainentity_entity_id, mailserver_host_id
@@ -1464,9 +1464,8 @@ ALTER TABLE Host DROP COLUMN host_ftp_perms;
 ALTER TABLE Host DROP COLUMN host_firewall_perms;
 
 DROP TABLE Samba;
-DROP TABLE P_Samba
+DROP TABLE P_Samba;
 DROP TABLE DomainMailServer;
-DROP TABLE P_DomainMailServer;
 DROP TABLE MailServer;
 DROP TABLE P_MailServer;
 
@@ -1927,14 +1926,6 @@ ALTER TABLE Domain ADD CONSTRAINT domain_userupdate_userobm_id_fkey FOREIGN KEY 
 UPDATE Domain SET domain_usercreate = NULL WHERE domain_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND domain_usercreate IS NOT NULL;
 ALTER TABLE Domain ADD CONSTRAINT domain_usercreate_userobm_id_fkey FOREIGN KEY (domain_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
--- Foreign key from domainmailserver_domain_id to domain_id
-DELETE FROM DomainMailServer WHERE domainmailserver_domain_id NOT IN (SELECT domain_id FROM Domain) AND domainmailserver_domain_id IS NOT NULL;
-ALTER TABLE DomainMailServer ADD CONSTRAINT domainmailserver_domain_id_domain_id_fkey FOREIGN KEY (domainmailserver_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from domainmailserver_mailserver_id to mailserver_id
-DELETE FROM DomainMailServer WHERE domainmailserver_mailserver_id NOT IN (SELECT mailserver_id FROM MailServer) AND domainmailserver_mailserver_id IS NOT NULL;
-ALTER TABLE DomainMailServer ADD CONSTRAINT domainmailserver_mailserver_id_mailserver_id_fkey FOREIGN KEY (domainmailserver_mailserver_id) REFERENCES MailServer(mailserver_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
 -- Foreign key from domainpropertyvalue_domain_id to domain_id
 DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id NOT IN (SELECT domain_id FROM Domain) AND domainpropertyvalue_domain_id IS NOT NULL;
 ALTER TABLE DomainPropertyValue ADD CONSTRAINT domainpropertyvalue_domain_id_domain_id_fkey FOREIGN KEY (domainpropertyvalue_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -2155,29 +2146,13 @@ ALTER TABLE List ADD CONSTRAINT list_userupdate_userobm_id_fkey FOREIGN KEY (lis
 UPDATE List SET list_usercreate = NULL WHERE list_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND list_usercreate IS NOT NULL;
 ALTER TABLE List ADD CONSTRAINT list_usercreate_userobm_id_fkey FOREIGN KEY (list_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
--- Foreign key from mailserver_host_id to host_id
-DELETE FROM MailServer WHERE mailserver_host_id NOT IN (SELECT host_id FROM Host) AND mailserver_host_id IS NOT NULL;
-ALTER TABLE MailServer ADD CONSTRAINT mailserver_host_id_host_id_fkey FOREIGN KEY (mailserver_host_id) REFERENCES Host(host_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from mailserver_userupdate to userobm_id
-UPDATE MailServer SET mailserver_userupdate = NULL WHERE mailserver_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND mailserver_userupdate IS NOT NULL;
-ALTER TABLE MailServer ADD CONSTRAINT mailserver_userupdate_userobm_id_fkey FOREIGN KEY (mailserver_userupdate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from mailserver_usercreate to userobm_id
-UPDATE MailServer SET mailserver_usercreate = NULL WHERE mailserver_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND mailserver_usercreate IS NOT NULL;
-ALTER TABLE MailServer ADD CONSTRAINT mailserver_usercreate_userobm_id_fkey FOREIGN KEY (mailserver_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from mailserver_relayhost_id to Host
-UPDATE MailServer SET mailserver_relayhost_id = NULL WHERE mailserver_relayhost_id NOT IN (SELECT host_id FROM Host) AND mailserver_relayhost_id IS NOT NULL;
-ALTER TABLE MailServer ADD CONSTRAINT mailserver_relayhost_id_host_id_fkey FOREIGN KEY (mailserver_relayhost_id) REFERENCES Host(host_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
 -- Foreign key from mailshare_domain_id to domain_id
 DELETE FROM MailShare WHERE mailshare_domain_id NOT IN (SELECT domain_id FROM Domain) AND mailshare_domain_id IS NOT NULL;
 ALTER TABLE MailShare ADD CONSTRAINT mailshare_domain_id_domain_id_fkey FOREIGN KEY (mailshare_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from mailshare_mail_server_id to mailserver_id
-DELETE FROM MailShare WHERE mailshare_mail_server_id NOT IN (SELECT mailserver_id FROM MailServer) AND mailshare_mail_server_id IS NOT NULL;
-ALTER TABLE MailShare ADD CONSTRAINT mailshare_mail_server_id_mailserver_id_fkey FOREIGN KEY (mailshare_mail_server_id) REFERENCES MailServer(mailserver_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- DELETE FROM MailShare WHERE mailshare_mail_server_id NOT IN (SELECT mailserver_id FROM MailServer) AND mailshare_mail_server_id IS NOT NULL;
+-- ALTER TABLE MailShare ADD CONSTRAINT mailshare_mail_server_id_mailserver_id_fkey FOREIGN KEY (mailshare_mail_server_id) REFERENCES MailServer(mailserver_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from mailshare_userupdate to userobm_id
 UPDATE MailShare SET mailshare_userupdate = NULL WHERE mailshare_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND mailshare_userupdate IS NOT NULL;
@@ -2489,10 +2464,6 @@ UPDATE ResourceType SET resourcetype_domain_id = NULL WHERE resourcetype_domain_
 DELETE FROM ResourceType WHERE resourcetype_domain_id NOT IN (SELECT domain_id FROM Domain) AND resourcetype_domain_id IS NOT NULL;
 ALTER TABLE ResourceType ADD CONSTRAINT resourcetype_domain_id_domain_id_fkey FOREIGN KEY (resourcetype_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
--- Foreign key from samba_domain_id to domain_id
-DELETE FROM Samba WHERE samba_domain_id NOT IN (SELECT domain_id FROM Domain) AND samba_domain_id IS NOT NULL;
-ALTER TABLE Samba ADD CONSTRAINT samba_domain_id_domain_id_fkey FOREIGN KEY (samba_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
 -- Foreign key from subscription_domain_id to domain_id
 DELETE FROM Subscription WHERE subscription_domain_id NOT IN (SELECT domain_id FROM Domain) AND subscription_domain_id IS NOT NULL;
 ALTER TABLE Subscription ADD CONSTRAINT subscription_domain_id_domain_id_fkey FOREIGN KEY (subscription_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -2604,10 +2575,6 @@ ALTER TABLE UserObm ADD CONSTRAINT userobm_userupdate_userobm_id_fkey FOREIGN KE
 -- Foreign key from userobm_usercreate to userobm_id
 UPDATE UserObm SET userobm_usercreate = NULL WHERE userobm_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND userobm_usercreate IS NOT NULL;
 ALTER TABLE UserObm ADD CONSTRAINT userobm_usercreate_userobm_id_fkey FOREIGN KEY (userobm_usercreate) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
-
--- Foreign key from userobm_mail_server_id to mailserver_id
-UPDATE UserObm SET userobm_mail_server_id = NULL WHERE userobm_mail_server_id NOT IN (SELECT mailserver_id FROM MailServer) AND userobm_mail_server_id IS NOT NULL;
-ALTER TABLE UserObm ADD CONSTRAINT userobm_mail_server_id_mailserver_id_fkey FOREIGN KEY (userobm_mail_server_id) REFERENCES MailServer(mailserver_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- Foreign key from userobm_host_id to host_id
 UPDATE UserObm SET userobm_host_id = NULL WHERE userobm_host_id NOT IN (SELECT host_id FROM Host) AND userobm_host_id IS NOT NULL;

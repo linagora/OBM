@@ -1371,18 +1371,18 @@ INSERT INTO Service (service_service, service_entity_id)
 SELECT 'mail', domainentity_entity_id FROM Domain 
 INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
 INNER JOIN DomainMailServer ON domainmailserver_domain_id = domain_id
-GROUP BY domainentity_entity_id
+GROUP BY domainentity_entity_id;
 
 
 INSERT INTO Service (service_service, service_entity_id)
 SELECT 'samba', domainentity_entity_id FROM Domain 
 INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
 INNER JOIN Samba ON samba_domain_id = domain_id
-GROUP BY domainentity_entity_id
+GROUP BY domainentity_entity_id;
 
 UPDATE UserObm SET userobm_mail_server_id = (SELECT host_id FROM MailServer LEFT JOIN Host ON mailserver_host_id = host_id WHERE mailserver_id = userobm_mail_server_id);
 
-UPDATE MailShare SET mailshare_mailserver_id = (SELECT host_id FROM MailServer LEFT JOIN Host ON mailserver_host_id = host_id WHERE mailserver_id = mailshare_mailserver_id);
+UPDATE MailShare SET mailshare_mail_server_id = (SELECT host_id FROM MailServer LEFT JOIN Host ON mailserver_host_id = host_id WHERE mailserver_id = mailshare_mail_server_id);
 
 INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
 SELECT 'imap', 'mail', domainentity_entity_id, mailserver_host_id
@@ -1450,11 +1450,11 @@ ALTER TABLE Host DROP COLUMN host_ftp_perms;
 ALTER TABLE Host DROP COLUMN host_firewall_perms;
 
 DROP TABLE Samba;
-DROP TABLE P_Samba
+DROP TABLE P_Samba;
 DROP TABLE DomainMailServer;
-DROP TABLE P_DomainMailServer;
 DROP TABLE MailServer;
 DROP TABLE P_MailServer;
+
 -- -----------------------------------------
 -- Updates that need to be after Entity work
 -- -----------------------------------------
@@ -1860,12 +1860,6 @@ UPDATE Domain SET domain_userupdate = NULL WHERE domain_userupdate NOT IN (SELEC
 -- Foreign key from domain_usercreate to userobm_id
 UPDATE Domain SET domain_usercreate = NULL WHERE domain_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND domain_usercreate IS NOT NULL;
 
--- Foreign key from domainmailserver_domain_id to domain_id
-DELETE FROM DomainMailServer WHERE domainmailserver_domain_id NOT IN (SELECT domain_id FROM Domain) AND domainmailserver_domain_id IS NOT NULL;
-
--- Foreign key from domainmailserver_mailserver_id to mailserver_id
-DELETE FROM DomainMailServer WHERE domainmailserver_mailserver_id NOT IN (SELECT mailserver_id FROM MailServer) AND domainmailserver_mailserver_id IS NOT NULL;
-
 -- Foreign key from domainpropertyvalue_domain_id to domain_id
 DELETE FROM DomainPropertyValue WHERE domainpropertyvalue_domain_id NOT IN (SELECT domain_id FROM Domain) AND domainpropertyvalue_domain_id IS NOT NULL;
 
@@ -2031,23 +2025,11 @@ UPDATE List SET list_userupdate = NULL WHERE list_userupdate NOT IN (SELECT user
 -- Foreign key from list_usercreate to userobm_id
 UPDATE List SET list_usercreate = NULL WHERE list_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND list_usercreate IS NOT NULL;
 
--- Foreign key from mailserver_host_id to host_id
-DELETE FROM MailServer WHERE mailserver_host_id NOT IN (SELECT host_id FROM Host) AND mailserver_host_id IS NOT NULL;
-
--- Foreign key from mailserver_userupdate to userobm_id
-UPDATE MailServer SET mailserver_userupdate = NULL WHERE mailserver_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND mailserver_userupdate IS NOT NULL;
-
--- Foreign key from mailserver_usercreate to userobm_id
-UPDATE MailServer SET mailserver_usercreate = NULL WHERE mailserver_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND mailserver_usercreate IS NOT NULL;
-
--- Foreign key from mailserver_relayhost_id to Host
-UPDATE MailServer SET mailserver_relayhost_id = NULL WHERE mailserver_relayhost_id NOT IN (SELECT host_id FROM Host) AND mailserver_relayhost_id IS NOT NULL;
-
 -- Foreign key from mailshare_domain_id to domain_id
 DELETE FROM MailShare WHERE mailshare_domain_id NOT IN (SELECT domain_id FROM Domain) AND mailshare_domain_id IS NOT NULL;
 
 -- Foreign key from mailshare_mail_server_id to mailserver_id
-DELETE FROM MailShare WHERE mailshare_mail_server_id NOT IN (SELECT mailserver_id FROM MailServer) AND mailshare_mail_server_id IS NOT NULL;
+-- DELETE FROM MailShare WHERE mailshare_mail_server_id NOT IN (SELECT mailserver_id FROM MailServer) AND mailshare_mail_server_id IS NOT NULL;
 
 -- Foreign key from mailshare_userupdate to userobm_id
 UPDATE MailShare SET mailshare_userupdate = NULL WHERE mailshare_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND mailshare_userupdate IS NOT NULL;
@@ -2281,9 +2263,6 @@ DELETE FROM ResourceItem WHERE resourceitem_resourcetype_id NOT IN (SELECT resou
 -- Foreign key from resourcetype_domain_id to domain_id
 UPDATE ResourceType SET resourcetype_domain_id = NULL WHERE resourcetype_domain_id NOT IN (SELECT domain_id FROM Domain) AND resourcetype_domain_id IS NOT NULL;
 
--- Foreign key from samba_domain_id to domain_id
-DELETE FROM Samba WHERE samba_domain_id NOT IN (SELECT domain_id FROM Domain) AND samba_domain_id IS NOT NULL;
-
 -- Foreign key from subscription_domain_id to domain_id
 DELETE FROM Subscription WHERE subscription_domain_id NOT IN (SELECT domain_id FROM Domain) AND subscription_domain_id IS NOT NULL;
 
@@ -2367,9 +2346,6 @@ UPDATE UserObm SET userobm_userupdate = NULL WHERE userobm_userupdate NOT IN (SE
 
 -- Foreign key from userobm_usercreate to userobm_id
 UPDATE UserObm SET userobm_usercreate = NULL WHERE userobm_usercreate NOT IN (SELECT userobm_id FROM (SELECT userobm_id FROM UserObm) AS Parent) AND userobm_usercreate IS NOT NULL;
-
--- Foreign key from userobm_mail_server_id to mailserver_id
-UPDATE UserObm SET userobm_mail_server_id = NULL WHERE userobm_mail_server_id NOT IN (SELECT mailserver_id FROM MailServer) AND userobm_mail_server_id IS NOT NULL;
 
 -- Foreign key from userobm_host_id to host_id
 UPDATE UserObm SET userobm_host_id = NULL WHERE userobm_host_id NOT IN (SELECT host_id FROM Host) AND userobm_host_id IS NOT NULL;
