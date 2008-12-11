@@ -2029,7 +2029,6 @@ CREATE TABLE `P_Domain` (
   `domain_description` varchar(255) default NULL,
   `domain_name` varchar(128) default NULL,
   `domain_alias` text,
-  `domain_mail_server_auto` int(2) default NULL,
   `domain_global` tinyint(1) default '0',
   PRIMARY KEY  (`domain_id`),
   KEY `domain_userupdate_userobm_id_fkey` (`domain_userupdate`),

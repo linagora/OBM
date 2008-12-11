@@ -834,14 +834,12 @@ SELECT setval('deletedevent_deletedevent_id_seq', max(deletedevent_id)) FROM Del
 -- Domain
 ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
 ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
-ALTER TABLE Domain ADD COLUMN domain_mail_server_auto integer default NULL;
 
 SELECT setval('domain_domain_id_seq', max(domain_id)) FROM Domain;
 
 -- P_Domain
 ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
 ALTER TABLE P_Domain DROP COLUMN domain_mail_server_id;
-ALTER TABLE P_Domain ADD COLUMN domain_mail_server_auto integer default NULL;
 
 -- OGroup
 ALTER TABLE OGroup ALTER COLUMN ogroup_parent_id DROP NOT NULL;
@@ -1462,12 +1460,22 @@ ALTER TABLE Host DROP COLUMN host_web_list;
 ALTER TABLE Host DROP COLUMN host_web_all;
 ALTER TABLE Host DROP COLUMN host_ftp_perms;
 ALTER TABLE Host DROP COLUMN host_firewall_perms;
+ALTER TABLE Host DROP COLUMN host_samba;
+
+ALTER TABLE P_Host DROP COLUMN host_web_perms;
+ALTER TABLE P_Host DROP COLUMN host_web_list;
+ALTER TABLE P_Host DROP COLUMN host_web_all;
+ALTER TABLE P_Host DROP COLUMN host_ftp_perms;
+ALTER TABLE P_Host DROP COLUMN host_firewall_perms;
+ALTER TABLE P_Host DROP COLUMN host_samba;
 
 DROP TABLE Samba;
 DROP TABLE P_Samba;
 DROP TABLE DomainMailServer;
 DROP TABLE MailServer;
 DROP TABLE P_MailServer;
+DROP TABLE MailServerNetwork;
+DROP TABLE P_MailServerNetwork;
 
 -- ------------------------------
 -- Prepare value for foreign keys

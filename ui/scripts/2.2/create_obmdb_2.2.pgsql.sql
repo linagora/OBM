@@ -716,7 +716,6 @@ CREATE TABLE domain (
     domain_description character varying(255),
     domain_name character varying(128),
     domain_alias text,
-    domain_mail_server_auto integer,
     domain_global boolean DEFAULT false
 );
 
@@ -1473,7 +1472,6 @@ CREATE TABLE p_domain (
     domain_description character varying(255),
     domain_name character varying(128),
     domain_alias text,
-    domain_mail_server_auto integer,
     domain_global boolean
 );
 

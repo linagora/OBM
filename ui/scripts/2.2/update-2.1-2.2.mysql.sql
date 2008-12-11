@@ -852,12 +852,10 @@ FROM DeletedCalendarEvent;
 -- Domain
 ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
 ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
-ALTER TABLE Domain ADD COLUMN domain_mail_server_auto int(2) default NULL;
 
 -- P_Domain
 ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
 ALTER TABLE P_Domain DROP COLUMN domain_mail_server_id;
-ALTER TABLE P_Domain ADD COLUMN domain_mail_server_auto int(2) default NULL;
 
 -- OGroup
 ALTER TABLE OGroup MODIFY COLUMN ogroup_parent_id int(8);
@@ -1448,12 +1446,22 @@ ALTER TABLE Host DROP COLUMN host_web_list;
 ALTER TABLE Host DROP COLUMN host_web_all;
 ALTER TABLE Host DROP COLUMN host_ftp_perms;
 ALTER TABLE Host DROP COLUMN host_firewall_perms;
+ALTER TABLE Host DROP COLUMN host_samba;
+
+ALTER TABLE P_Host DROP COLUMN host_web_perms;
+ALTER TABLE P_Host DROP COLUMN host_web_list;
+ALTER TABLE P_Host DROP COLUMN host_web_all;
+ALTER TABLE P_Host DROP COLUMN host_ftp_perms;
+ALTER TABLE P_Host DROP COLUMN host_firewall_perms;
+ALTER TABLE P_Host DROP COLUMN host_samba;
 
 DROP TABLE Samba;
 DROP TABLE P_Samba;
 DROP TABLE DomainMailServer;
 DROP TABLE MailServer;
 DROP TABLE P_MailServer;
+DROP TABLE MailServerNetwork;
+DROP TABLE P_MailServerNetwork;
 
 -- -----------------------------------------
 -- Updates that need to be after Entity work
