@@ -23,10 +23,8 @@ function of_right_dis_admin($entity, $entity_id) {
     $display['msg'] .= display_err_msg($l_of_right_err_empty);
     return;
   }
-
-  $admin_entity = OBM_Acl::getEntityAdmins($entity, $entity_id);
   
-  $display['features'] = html_entityadmin_bar($admin_entity, $entity_id, $entity);
+  $display['features'] = html_entityadmin_bar($entity_id, $entity);
   
   $consumers = OBM_Acl::getEntityConsumers($entity, $entity_id);
   $public_rights = OBM_Acl::getPublicRights($entity, $entity_id);
@@ -40,18 +38,18 @@ function of_right_dis_admin($entity, $entity_id) {
 // Parameters:
 //   - $writable_user : Array of user on who you can manage the calandar
 ///////////////////////////////////////////////////////////////////////////////
-function html_entityadmin_bar($writable_entity, $entity_id, $entity) {
+function html_entityadmin_bar($entity_id, $entity) {
   global $l_entity_right, $l_validate, $path, $module;
 
+  $writable_entity = OBM_Acl::getEntityAdmins($entity, $entity_id);
   if ($module != '') {
     $uri = $path.'/'.$module.'/'.$module.'_index.php';
   }
   // Entity Selection
-  if (count($writable_entity['ids']) > 0) {
+  if (count($writable_entity) > 0) {
     $dis_sel .= "<select name=\"entity_id\">";
-    foreach ($writable_entity['entity'] as $entity) {
-      $id = $entity['id'];
-      $label =  $entity['label'];
+    foreach ($writable_entity as $id => $data) {
+      $label = $data['label'];
       $dis_sel .= "\n<option value=\"$id\"";
       if ($id == $entity_id ) {
         $tag = " selected=\"selected\"";
