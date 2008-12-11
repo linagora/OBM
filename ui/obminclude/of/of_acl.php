@@ -82,10 +82,28 @@ class OBM_Acl {
    * @return bool
    */
   public static function isAllowed($userId, $entityType, $entityId, $action) {
-    if (self::isSpecialEntity($entityType) && ((is_array($entityId) && in_array($userId, $entityId)) || $userId == $entityId)) {
+    if (self::isSpecialEntity($entityType) && $userId == $entityId) {
       return true;
     }
     $query = self::getAclQuery('1', $entityType, $entityId, $userId, $action);
+    self::$db->query($query);
+    if (!self::$db->next_record()) {
+      return false;
+    }
+    return true;
+  }
+  
+  /**
+   * Checks if the user is authorized to perform a specific action on ONE
+   * OR MORE entity of a specific entity array
+   * 
+   * @return bool
+   */
+  public static function areSomeAllowed($userId, $entityType, $entityIds, $action) {
+    if (self::isSpecialEntity($entityType) && in_array($userId, $entityIds)) {
+      return true;
+    }
+    $query = self::getAclQuery('1', $entityType, $entityIds, $userId, $action);
     self::$db->query($query);
     if (!self::$db->next_record()) {
       return false;
@@ -258,6 +276,15 @@ class OBM_Acl {
     return $consumers;
   }
   
+  /**
+   * Return entities on which the user is authorized to perform a specific action
+   * 
+   * If an array of entity IDs is provided as $entityId parameter, this method
+   * will only return the allowed entities whose IDs where initially present
+   * in the $entityId array.
+   * 
+   * @return array
+   */
   public static function getAllowedEntities($userId, $entityType, $action, $entityId = null, $labelColumn = 'name') {
     if (self::isSpecialEntity($entityType)) {
       $columns = array('u2.userobm_id AS id', self::getUsernameColumns('u2').' AS label');

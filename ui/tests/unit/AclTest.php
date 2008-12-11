@@ -45,7 +45,7 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $this->assertTrue(OBM_Acl::canWrite(2, 'cv', 1));
     $this->assertFalse(OBM_Acl::canAdmin(2, 'cv', 1));
     
-    $this->assertTrue(OBM_Acl::canWrite(2, 'cv', array(1, 2)));
+    $this->assertTrue(OBM_Acl::areSomeAllowed(2, 'cv', array(1, 2), 'write'));
     
     // special entities
     $this->addCalendar(2);
@@ -56,7 +56,7 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $this->assertTrue(OBM_Acl::canWrite(2, 'calendar', 2));
     $this->assertTrue(OBM_Acl::canAdmin(2, 'calendar', 2));
     
-    $this->assertTrue(OBM_Acl::canWrite(2, 'calendar', array(2, 3)));
+    $this->assertTrue(OBM_Acl::areSomeAllowed(2, 'calendar', array(2, 3), 'write'));
   }
   
   public function testGroupBasics() {

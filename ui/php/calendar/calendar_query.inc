@@ -1487,9 +1487,9 @@ function check_calendar_access($id, $right = 'write') {
     if (in_array($obm['uid'], $e['attendees']['user'])) {
       return true;
     }
-    $access = OBM_Acl::isAllowed($obm['uid'], 'calendar', $e['attendees']['user'], $right);
+    $access = OBM_Acl::areSomeAllowed($obm['uid'], 'calendar', $e['attendees']['user'], $right);
     if (!$access && is_array($e['attendees']['resource'])) {
-      $access = OBM_Acl::isAllowed($obm['uid'], 'resource', $e['attendees']['resource'], $right);
+      $access = OBM_Acl::areSomeAllowed($obm['uid'], 'resource', $e['attendees']['resource'], $right);
     }
   }
   if (!$access) { 
