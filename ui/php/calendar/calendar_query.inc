@@ -836,16 +836,13 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check right user ,
-// Parameters:
-//   - sel_entity_id : selected entities id
+// Check if the user is authorized to access calendars and resources
 ///////////////////////////////////////////////////////////////////////////////
-function check_access_entity($consumers) {
+function check_access_entity($calendar_ids, $resource_ids) {
+  global $obm;
   
-  $access_entity = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access');
-  $no_access = array_diff($consumers, $access_entity);
-  
-  return $no_access;
+  return OBM_Acl::areAllowed($obm['uid'], 'calendar', $calendar_ids, 'access')
+      && OBM_Acl::areAllowed($obm['uid'], 'resources', $resource_ids, 'access');
 }
 
 ///////////////////////////////////////////////////////////////////////////////

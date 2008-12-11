@@ -94,6 +94,26 @@ class OBM_Acl {
   }
   
   /**
+   * Checks if the user is authorized to perform a specific action on a
+   * specific set of entities
+   * 
+   * @return bool
+   */
+  public static function areAllowed($userId, $entityType, $entityIds, $action) {
+    $query = self::getAclQuery('COUNT(1)', $entityType, $entityIds, $userId, $action);
+    self::$db->query($query);
+    if (self::isSpecialEntity($entityType) && in_array($userId, $entityIds)) {
+      $count = 1;
+    } else {
+      $count = 0;
+    }
+    while (self::$db->next_record()) {
+      $count+= self::$db->f('COUNT(1)');
+    }
+    return $count == count($entityIds);
+  }
+  
+  /**
    * Checks if the user is authorized to perform a specific action on ONE
    * OR MORE entity of a specific entity array
    * 
