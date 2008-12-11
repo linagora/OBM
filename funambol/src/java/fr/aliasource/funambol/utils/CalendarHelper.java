@@ -341,7 +341,7 @@ public class CalendarHelper extends Helper {
 			break;
 		case RecurrencePattern.TYPE_MONTH_NTH:
 			// only one nth day supported by OBM
-			recurrence.setKind(RecurrenceKind.monthbyday);
+			recurrence.setKind(RecurrenceKind.monthlybyday);
 			break;
 		case RecurrencePattern.TYPE_YEARLY:
 			recurrence.setKind(RecurrenceKind.yearly);
