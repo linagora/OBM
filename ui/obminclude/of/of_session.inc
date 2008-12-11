@@ -501,6 +501,17 @@ class Perm {
       return true;
     }
   }
+  
+  //-------------------------------------------------------------------------//
+  // Check if the current profile is superman                                //
+  // Parameters:
+  //   - $module : module to check
+  //-------------------------------------------------------------------------//
+  function is_superman($module) {
+    global $cright_write_admin;
+    
+    return (($this->get_module_rights($module) & $cright_write_admin) == $cright_write_admin);
+  }
 
 }
 

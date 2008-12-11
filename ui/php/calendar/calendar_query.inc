@@ -449,7 +449,7 @@ function run_query_calendar_waiting_events() {
       AND ( 1=0
       $multidomain
 ";
-    $query .= "OR eventlink_resource_id IN (".implode(",", $writable_res)."))";
+    $query .= "OR resourceentity_resource_id IN (".implode(",", $writable_res)."))";
   }
   $query .= " ORDER BY entity_entity, entity_label, event_date"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_waiting_events()');
@@ -1576,12 +1576,11 @@ function get_calendar_user_readable() {
   if ( (isset($calendar['entity']['group_view']))
        && ($calendar['entity']['group_view'] != $c_all) ) {
     $gusers = of_usergroup_get_group_users($calendar['entity']['group_view']);
+    $gusers[] = $obm['uid'];
+    $readable_calendars = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $gusers);
   } else {
-    $gusers = array();
+    $readable_calendars = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read');
   }
-  $gusers[] = $obm['uid'];
-  
-  $readable_calendars = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $gusers);
   
   return OBM_Acl_Utils::expandEntitiesArray($readable_calendars);
 }
@@ -2103,12 +2102,12 @@ function slice_calendar_entities($sel_entity_id, $nb_max, $entity_readable='') {
     if ($action != 'perform_meeting') {
       foreach ($sel_user_id as $u_id) {
         if (is_array($entity_readable)) {
-	    if (in_array($u_id, $entity_readable['user']['ids'])) {
-	      $res_user_id[] = $u_id;
-	    }
-	} else {
-	  $res_user_id[] = $u_id;
-	}
+	        if (in_array($u_id, $entity_readable['user']['ids'])) {
+	          $res_user_id[] = $u_id;
+	        }
+	      } else {
+	        $res_user_id[] = $u_id;
+  	    }
       }
     }
   }

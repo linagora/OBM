@@ -309,7 +309,13 @@ obm.AutoComplete.Search = new Class({
         secure : false,
         onFailure:this.onFailure.bindWithEvent(this),
         onComplete:this.onNewRequestSuccess.bindWithEvent(this,[this.requestId])
-      }).post({pattern:this.currentValue, limit:(this.options.results*3),restriction:this.options.restriction,extension:this.options.extension});      
+      }).post({
+        pattern:this.currentValue, 
+        limit:(this.options.results*3),
+        filter_pattern: this.options.filter_pattern,
+        filter_entity: this.options.filter_entity,
+        restriction:this.options.restriction,
+        extension:this.options.extension});      
     }
   },
 
@@ -324,7 +330,14 @@ obm.AutoComplete.Search = new Class({
           secure : false,
           onFailure:this.onFailure.bindWithEvent(this),
           onComplete:this.onCacheRequestSuccess.bindWithEvent(this)
-        }).post({pattern:this.currentValue, first_row: this.cache.getSize, limit:requestNbr,restriction:this.options.restriction,extension:this.options.extension});        
+        }).post({
+          pattern:this.currentValue,
+           first_row: this.cache.getSize,
+            limit:requestNbr,
+            filter_pattern: this.options.filter_pattern,
+            filter_entity: this.options.filter_entity,
+            restriction:this.options.restriction,
+            extension:this.options.extension});        
         this.cache.setSize(this.cache.getSize()+requestNbr);
       }
     }
