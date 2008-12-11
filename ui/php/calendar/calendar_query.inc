@@ -267,12 +267,12 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
 
   if (!$force && ($obm['uid'] != $entity_id || $entity != 'user')) {
     if ($entity == 'user') {
-      $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
+      $ok = OBM_Acl::canWrite($obm['uid'], 'calendar', $entity_id);
     } elseif ($entity == 'resource') {
-      $writable = of_right_entity_for_user('resource', $obm['uid'], 'write');
+      $ok = OBM_Acl::canWrite($obm['uid'], 'resource', $entity_id);
     }
     
-    if (!in_array($entity_id, $writable['ids'])) {
+    if (!$ok) {
       $err['msg'] = $l_of_right_err_auth;  
       return false;
     } 
@@ -282,7 +282,7 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   $query = "UPDATE EventLink 
             SET eventlink_state = '$state'
             WHERE eventlink_entity_id = ".of_entity_subquery($entity, $entity_id)." 
-              AND eventlink_event_id $entity_id"; 
+              AND eventlink_event_id = $entity_id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
   $obm_q = new DB_OBM;
@@ -361,8 +361,6 @@ function run_query_calendar_waiting_events() {
   $uid = $obm['uid'];
   
   $multidomain = sql_multidomain('event');
-  $writable_cal = of_right_entity_for_user('calendar', $uid, 'write', '', 'userobm');
-  $writable_res = of_right_entity_for_user('resource', $uid, 'write');
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
@@ -411,12 +409,15 @@ function run_query_calendar_waiting_events() {
       AND ( 1=0
       $multidomain
 ";
-  if (is_array($writable_cal) && (count($writable_cal['ids'])>0)) {
-    $query .= "OR userentity_user_id IN (".implode(",",$writable_cal['ids']).")";    
+  $writable_cal = array_keys(OBM_Acl::getAllowedEntities($uid, 'calendar', 'write'));
+  $writable_res = array_keys(OBM_Acl::getAllowedEntities($uid, 'resource', 'write'));
+  
+  if (count($writable_cal) > 0) {
+    $query .= "OR userentity_user_id IN (".implode(",", $writable_cal).")";    
   }
   $query .= " OR userentity_user_id = '$uid')";
 
-  if (is_array($writable_res) && (count($writable_res['ids'])>0)) {
+  if (count($writable_res) > 0) {
     $query .= "
     UNION
     SELECT
@@ -448,7 +449,7 @@ function run_query_calendar_waiting_events() {
       AND ( 1=0
       $multidomain
 ";
-    $query .= "OR eventlink_resource_id IN (".implode(",",$writable_res['ids']).")";
+    $query .= "OR eventlink_resource_id IN (".implode(",", $writable_res)."))";
   }
   $query .= " ORDER BY entity_entity, entity_label, event_date"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_waiting_events()');
@@ -493,7 +494,6 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
   global $l_from, $l_to, $l_date, $l_resource_allocated;
   global $l_add_event_mail_head,$l_add_event_mail_subject;
 
-  $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
   $groups = $sel_entity_id['group'];
   // Get the final user list (merge group)
   $users_array = $sel_entity_id['user'];
@@ -517,7 +517,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
 
   // Insert Event users
   foreach ($users_array as $user_id) {
-    if ($user_id == $obm['uid'] || in_array($user_id, $writable_cal['ids'])) {
+    if ($user_id == $obm['uid'] || OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
       run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'ACCEPTED');
     } else {
       run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'NEEDS-ACTION');
@@ -530,12 +530,11 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
   // Get the final resource list and insert resource links
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
-    $writable_res = of_right_entity_for_user('Resource', $obm['uid'], 'write');
     foreach ($resources_array as $res_id) {
-      if (in_array($res_id, $writable_res['ids'])) {
-	run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'ACCEPTED');
+      if (OBM_Acl::canWrite($obm['uid'], 'resource', $res_id)) {
+	      run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'ACCEPTED');
       } else {
-	run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'NEEDS-ACTION');
+	      run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'NEEDS-ACTION');
       }
       array_push($resources_writable, $res_id);
     }
@@ -843,9 +842,8 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_access_entity($consumers) {
   
-  $access_entity = of_right_entity_for_user('calendar', $obm['uid'], 'access','', 'userobm');
-
-  $no_access=array_diff($consumers,$access_entity);
+  $access_entity = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access');
+  $no_access = array_diff($consumers, $access_entity);
   
   return $no_access;
 }
@@ -901,7 +899,6 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   $groups = $sel_entity_id['group'];
   $mail = $calendar['mail'];
   $mail_title = stripslashes($calendar['title']);
-  $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
 
   $user_group_array = array();
 
@@ -920,7 +917,6 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   $resources_array = $sel_entity_id['resource'];
   if ( (is_array($resources_array)) && (count($resources_array) > 0) ) {
     $resources_array = array_unique($resources_array);
-    $writable_res = of_right_entity_for_user('Resource', $obm['uid'], 'write');
   } else {
     $resources_array = array();
   }
@@ -998,7 +994,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   // User insertion
   if(is_array($users_array)) {
     foreach($users_array as $user_id) {
-      if ($user_id == $obm['uid'] || in_array($user_id, $writable_cal['ids'])) {
+      if ($user_id == $obm['uid'] || OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
         run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'ACCEPTED');
       } else {
         run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'NEEDS-ACTION');
@@ -1008,10 +1004,10 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
 
   if (is_array($resources_array)) {
     foreach ($resources_array as $res_id) {
-      if (in_array($res_id, $writable_res['ids'])) {
-	run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'ACCEPTED');
+      if (OBM_Acl::canWrite($obm['uid'], 'resource', $res_id)) {
+	      run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'ACCEPTED');
       } else {
-	run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'NEEDS-ACTION');
+	      run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'NEEDS-ACTION');
       }
     }
   }
@@ -1160,7 +1156,6 @@ function run_query_calendar_quick_event_update($calendar) {
 function run_query_calendar_quick_event_insert($calendar) {
   global $cdg_sql, $obm;
 
-  $writable_cal = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
   $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
   $datebegin = $calendar['date_begin'];
@@ -1381,19 +1376,15 @@ function run_query_quick_attendee_update($params, $eve_q) {
   global $l_update_event_mail_body, $l_update_event_mail_subject ;
 
   $event_id = $eve_q->f('event_id');
-  $writable['user'] = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
-  array_push($writable['user']['ids'], $obm['uid']);
-  $writable['resource'] = of_right_entity_for_user('Resource', $obm['uid'], 'write');
   $entities = get_calendar_event_entity($event_id);
   run_query_calendar_delete_event_entity($params,array());
   foreach ($entities as $entity => $data) {
     foreach ($data['entity'] as $entity_id => $entity_data) { 
-      if(is_array( $writable[$entity]['ids'])) {
-        if (in_array($entity_id, $writable[$entity]['ids'])) {
-          run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 'ACCEPTED');
-        } else {
-          run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 'NEEDS-ACTION');
-        }     
+      $entity_type = ($entity == 'user') ? 'calendar' : 'resource';
+      if (OBM_Acl::canWrite($obm['uid'], $entity_type, $entity_id)) {
+        run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 'ACCEPTED');
+      } else {
+        run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 'NEEDS-ACTION');
       }
     }
   }
@@ -1491,17 +1482,17 @@ function check_calendar_access($id, $right = 'write') {
     return true;
   }
   if($right == 'write') {
-    $access = of_right_entity_for_user('calendar', $obm['uid'], 'write', array($e['owner']), 'userobm');
+    $access = OBM_Acl::canWrite($obm['uid'], 'calendar', $e['owner']);
   } else {
-    if(in_array($obm['uid'],$e['attendees']['user'])) {
+    if (in_array($obm['uid'], $e['attendees']['user'])) {
       return true;
     }
-    $access = of_right_entity_for_user('calendar', $obm['uid'], $right, $e['attendees']['user'], 'userobm');
-    if(count($access['ids']) == 0  && is_array($e['attendees']['resource'])) {
-      $access = of_right_entity_for_user('Resource', $obm['uid'], $right, $e['attendees']['resource']);
+    $access = OBM_Acl::isAllowed($obm['uid'], 'calendar', $e['attendees']['user'], $right);
+    if (!$access && is_array($e['attendees']['resource'])) {
+      $access = OBM_Acl::isAllowed($obm['uid'], 'resource', $e['attendees']['resource'], $right);
     }
   }
-  if(count($access['ids']) == 0) { 
+  if (!$access) { 
     $err['msg'] = $l_insufficient_permission;
     return false;
   }
@@ -1582,23 +1573,17 @@ function get_calendar_entity_readable() {
 function get_calendar_user_readable() {
   global $cdg_sql, $obm, $calendar, $c_all;
 
-  $uid = $obm['uid'];
-  $gusers = '';
   if ( (isset($calendar['entity']['group_view']))
        && ($calendar['entity']['group_view'] != $c_all) ) {
     $gusers = of_usergroup_get_group_users($calendar['entity']['group_view']);
+  } else {
+    $gusers = array();
   }
-  $entity = of_right_entity_for_user('calendar', $uid, 'read', $gusers, 'userobm');
-
-  // Add the user own calendar
-  $entity['ids'][] = $uid;
-  $obm_q = run_query_calendar_get_user_name(array($uid));
-  $obm_q->next_record();
-  $id = $obm_q->f('userobm_id');
-  $label = $obm_q->f('userobm_lastname') .' '. $obm_q->f('userobm_firstname');
-  $entity['entity'][] = array('id' => $id, 'label' => $label);
-
-  return $entity;
+  $gusers[] = $obm['uid'];
+  
+  $readable_calendars = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $gusers);
+  
+  return OBM_Acl_Utils::expandEntitiesArray($readable_calendars);
 }
 
 
@@ -1635,10 +1620,9 @@ function get_calendar_group_readable() {
 function get_calendar_resource_readable() {
   global $cdg_sql, $obm, $ccalendar_public_groups;
 
-  $uid = $obm['uid'];
-  $entity = of_right_entity_for_user('Resource', $uid, 'read');
-
-  return $entity;
+  $readable_resources = OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read');
+  
+  return OBM_Acl_Utils::expandEntitiesArray($readable_resources);
 }
 
 
@@ -3812,8 +3796,7 @@ function run_query_calendar_reset($id) {
   global $cdg_sql, $obm;
   $obm_q = new DB_OBM;
   $calendar['mail'] = false;
-  $writable = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
-  $writable = $writable['ids'];
+  $writable = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write'));
   # Delete all events where the user is the owner and an attendee and all events where the owner
   # is writable and the user is the only attendee
   $query = "SELECT event_id FROM Event

@@ -1173,10 +1173,11 @@ function run_query_group_ext_search($group) {
 
   if ($restriction == "user") {
     $uid = $obm["uid"];
-    $rs = of_right_entity_for_user("Group", $uid, "read");
-    if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
+    $r_groups = OBM_Acl::getAllowedEntities($uid, 'group', 'read');
+    $r_groups_ids = array_keys($r_groups);
+    if ((is_array($r_groups_ids)) && (count($r_groups_ids) > 0)) {
       $where_restriction = " AND (group_id IN (";
-      foreach($rs["ids"] as $r_id) {
+      foreach($r_groups_ids as $r_id) {
         $where_restriction .= "$coma'$r_id'";
         $coma = ",";
       }

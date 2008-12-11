@@ -39,13 +39,13 @@ function run_query_resource_search($resource) {
 	
   if ($filter_entity == 'Resource') {
     $where_filter_entity = 'AND (1=0';
-    $uid = $obm['uid'];
-    $rs = of_right_entity_for_user('Resource', $uid, $filter_pattern);
-    if ((is_array($rs['ids'])) && (count($rs['ids']) > 0)) {
+    $f_resources = OBM_Acl::getAllowedEntities($obm['uid'], 'resource', $filter_pattern);
+    $f_resources_ids = array_keys($f_resources);
+    if ((is_array($f_resources_ids)) && (count($f_resources_ids) > 0)) {
       $where_filter_entity .= " OR resource_id IN (";
-      foreach($rs['ids'] as $r_id) {
-	$where_filter_entity .= "$coma'$r_id'";
-	$coma = ',';
+      foreach($f_resources_ids as $r_id) {
+	    $where_filter_entity .= "$coma'$r_id'";
+	    $coma = ',';
       }
       $where_filter_entity .= ')';
     }
@@ -133,14 +133,14 @@ function run_query_resource_ext_search($resource) {
   else $first_row = 0;
 
   if ($filter_entity == 'Resource') {
-    $uid = $obm['uid'];
     $where_filter_entity = 'AND (1=0';
-    $rs = of_right_entity_for_user('Resource', $uid, $filter_pattern);
-    if ((is_array($rs['ids'])) && (count($rs['ids']) > 0)) {
+    $f_resources = OBM_Acl::getAllowedEntities($obm['uid'], 'resource', $filter_pattern);
+    $f_resources_ids = array_keys($f_resources);
+    if ((is_array($f_resources_ids)) && (count($f_resources_ids) > 0)) {
       $where_filter_entity .= " OR resource_id IN (";
-      foreach($rs['ids'] as $r_id) {
-	$where_filter_entity .= "$coma'$r_id'";
-	$coma = ',';
+      foreach($f_resources_ids as $r_id) {
+	    $where_filter_entity .= "$coma'$r_id'";
+	    $coma = ',';
       }
       $where_filter_entity .= ')';
     }

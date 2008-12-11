@@ -49,12 +49,13 @@ function run_query_user_search($user) {
   $multidomain = sql_multidomain('userobm');
 
   if ($filter_entity == 'calendar') {
-    $users = of_right_entity_for_user('calendar', $obm['uid'], $filter_pattern,'','userobm');
-    if ((is_array($users['ids'])) && (count($users['ids']) > 0)) {
+    $users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', $filter_pattern);
+    $users_ids = array_keys($users);
+    if ((is_array($users_ids)) && (count($users_ids) > 0)) {
       $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
-      foreach($users['ids'] as $u_id) {
-	$where_filter_entity .= "$coma'$u_id'";
-	$coma = ',';
+      foreach($users_ids as $u_id) {
+	    $where_filter_entity .= "$coma'$u_id'";
+	    $coma = ',';
       }
       $where_filter_entity .= '))';
     } else {
@@ -222,12 +223,13 @@ function run_query_user_ext_search($user) {
   else $first_row = 0;
 
   if ($filter_entity == 'calendar') {
-    $users = of_right_entity_for_user('calendar', $obm['uid'], $filter_pattern,'','userobm');
-    if ((is_array($users['ids'])) && (count($users['ids']) > 0)) {
+    $users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', $filter_pattern);
+    $users_ids = array_keys($users);
+    if ((is_array($users_ids)) && (count($users_ids) > 0)) {
       $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
-      foreach($users['ids'] as $u_id) {
-	$where_filter_entity .= "$coma'$u_id'";
-	$coma = ',';
+      foreach($users_ids as $u_id) {
+	    $where_filter_entity .= "$coma'$u_id'";
+	    $coma = ',';
       }
       $where_filter_entity .= '))';
     } else {

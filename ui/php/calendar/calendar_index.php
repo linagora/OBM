@@ -1011,8 +1011,7 @@ function update_calendar_action() {
   if($id) {
     $event_info = get_calendar_event_info($id);
     $owner = $event_info['owner'];
-    $writable_entity = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
-    if ($owner != $obm['uid'] && !in_array($owner,$writable_entity['ids'])) {
+    if ($owner != $obm['uid'] && !OBM_Acl::canWrite($obm['uid'], 'calendar', $owner)) {
       // Detail Update
       unset($actions['calendar']['detailupdate']);
 

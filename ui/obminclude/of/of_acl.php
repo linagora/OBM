@@ -82,7 +82,7 @@ class OBM_Acl {
    * @return bool
    */
   public static function isAllowed($userId, $entityType, $entityId, $action) {
-    if (self::isSpecialEntity($entityType) && $userId == $entityId) {
+    if (self::isSpecialEntity($entityType) && ((is_array($entityId) && in_array($userId, $entityId)) || $userId == $entityId)) {
       return true;
     }
     $query = self::getAclQuery('1', $entityType, $entityId, $userId, $action);
@@ -258,22 +258,26 @@ class OBM_Acl {
     return $consumers;
   }
   
-  public static function getAllowedEntities($userId, $entityType, $action, $labelColumn = 'name') {
-    $entityTable = ucfirst($entityType);
+  public static function getAllowedEntities($userId, $entityType, $action, $entityId = null, $labelColumn = 'name') {
     if (self::isSpecialEntity($entityType)) {
       $columns = array('u2.userobm_id AS id', self::getUsernameColumns('u2').' AS label');
       $additionalJoins = "LEFT JOIN UserObm u2 ON {$entityType}entity_{$entityType}_id = u2.userobm_id";
       $unions = "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE userobm_id = {$userId}";
     } else {
+      // dirty, but does I have the choice ? Please fix the damn DB schema !
+      $entityTable = ($entityType == 'group') ? 'UGroup' : ucfirst($entityType);
       $columns = array("{$entityType}_id AS id, {$entityType}_{$labelColumn} AS label");
       $additionalJoins = "LEFT JOIN {$entityTable} ON {$entityType}entity_{$entityType}_id = {$entityType}_id";
       $unions = '';
     }
-    $query = self::getAclQuery($columns, $entityType, null, $userId, $action, $additionalJoins, $unions);
+    $query = self::getAclQuery($columns, $entityType, $entityId, $userId, $action, $additionalJoins, $unions);
     $entities = array();
     self::$db->query($query);
     while (self::$db->next_record()) {
-      $entities[self::$db->f('id')] = self::$db->f('label');
+      $id = self::$db->f('id');
+      if (is_numeric($id)) {
+        $entities[$id] = self::$db->f('label');
+      }
     }
     return $entities;
   }
@@ -513,5 +517,16 @@ class OBM_Acl_Utils {
     $rights['read']   = ($confRights['read']   == -1) ? 0 : $confRights['read'];;
     $rights['access'] = ($confRights['access'] == -1) ? 0 : $confRights['access'];
     return $rights;
+  }
+  
+  public static function expandEntitiesArray($entities) {
+    $expandedArray = array(
+      'ids' => array_keys($entities),
+      'entity' => array()
+    );
+    foreach ($entities as $id => $label) {
+      $expandedArray['entity'][] = array('id' => $id, 'label' => $label);
+    }
+    return $expandedArray;
   }
 }

@@ -29,7 +29,9 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   $sel_entity_id['group_view'] = $group_view;
 
   $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
-  $writable_entity = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
+  $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
+    OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
+  );
   $my_views = run_query_calendar_get_my_views();
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view;
   
@@ -1720,8 +1722,9 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
   global $l_private, $obm;
   
-  $readable['user'] = of_right_entity_for_user('calendar', $obm['uid'], 'read', '', 'userobm');
-  $readable['resource'] = of_right_entity_for_user('Resource', $obm['uid'], 'read', '');
+  $readable['user'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read'));
+  $readable['resource'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read'));
+  
   foreach($conflicts as $conflict) {
     $private = true;
     $id = $conflict->event->id;
@@ -1865,9 +1868,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_A, $l_R, $l_W;
 
   $id = $event_q->f('event_id');
-  $writable_users = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
-  $administrable_users = 
-  $writable_resources = of_right_entity_for_user('Resource', $obm['uid'], 'write');
   
   if ($event_q->f('event_privacy') == 0 || 
       $event_q->f('event_owner') == $obm['uid'] ||
@@ -2011,7 +2011,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       $ACCEPTED = '';
       ${'NEEDS-ACTION'} = '';
       $DECLINED = '';
-      if ($obm['uid'] == $u_id || in_array($u_id,$writable_users['ids'])) {
+      if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id)) {
         $$state = "checked=\"checked\"";
         $urld = "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
         $urla = "$path/calendar/calendar_index.php?action=update_alert&calendar_id=$id&user_id=$u_id";
@@ -2084,7 +2084,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       foreach ($res['entity'] as $r_id => $entity) {
         $label = $entity['label'];
         $state = $entity['state'];
-        if (in_array($r_id,$writable_resources['ids'])) {
+        if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
           $$state = "checked=\"checked\"";
           $url= "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=resource&entity_id=$r_id";
           $dis_resource_list .= "
@@ -2227,8 +2227,9 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
       $groups = array();
     }
   }
-
-  $possible_owners = of_right_entity_for_user('calendar', $obm['uid'], 'write', '', 'userobm');
+  $possible_owners = OBM_Acl_Utils::expandEntitiesArray(
+    OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
+  );
   $possible_owners = $possible_owners['entity'];
   $cats1 = of_category_get_ordered('event', 'category1');
   $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $resources, $groups,$tasks, $cats1, $alerts);
@@ -3083,7 +3084,6 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   global $display, $path;
   global $ico_add, $ico_delete, $ico_mini_cal;
   global $ccalendar_resource;
-  // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
   global $l_groups,$l_resources,$l_module_resourcegroup, $l_module_calendar;
   global $l_resources_one_freebusy,$l_resources_all_freebusy,$l_resource_group_search;

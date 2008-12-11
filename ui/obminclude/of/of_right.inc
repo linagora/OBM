@@ -24,11 +24,10 @@ function of_right_dis_admin($entity, $entity_id) {
     return;
   }
 
-  //$admin_entity = of_right_entity_for_user($entity, $obm['uid'], 'admin','', $real_entity);
-  $admin_entity = OBM_Acl::getEntityAdmins($entity, $entity_id); // ???
+  $admin_entity = OBM_Acl::getEntityAdmins($entity, $entity_id);
   
-  $display['features'] = html_entityadmin_bar($admin_entity ,$entity_id, $entity); // ???
-
+  $display['features'] = html_entityadmin_bar($admin_entity, $entity_id, $entity);
+  
   $consumers = OBM_Acl::getEntityConsumers($entity, $entity_id);
   $public_rights = OBM_Acl::getPublicRights($entity, $entity_id);
 
@@ -487,124 +486,6 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
 ";
 
   return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-//////////////////////////           QUERY               //////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the list of entities for the consumer given with the corresponding right
-// Parameters:
-//   - $entityu     : target entity (table name with capital)
-//   - $user_id : user id
-//   - $right       : right to get and select from : "read", "write" or "admin"
-//   - $ids_set     : array of ids restricting the result
-//   - $real_entity : real data entity (eg: userobm for entity calendar)
-// Returns:
-//   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2)))
-///////////////////////////////////////////////////////////////////////////////
-function of_right_entity_for_user($entityu, $user_id, $right='read', $ids_set='', $real_entity='') {
-  global $cdg_sql, $obm;
-
-  if($entityu != 'user') {
-    $ret_array = array();
-    $ret_array['ids'] = array();    
-    return $ret_array;
-  }
-  // GLOBAL - superman has all rights on entities
-  global $cright_write_admin;
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-
-  $ent_array = array();
-  $id_array = array();
-
-  $entity = strtolower($entityu);
-  if ($real_entity != '') {
-    $r_entity = $real_entity;
-  } else {
-    $r_entity = $entity;
-  }
-
-  if ($r_entity == 'userobm') {
-    $table_entity = 'UserObm';
-    $e_id = 'e.userobm_id';
-    $ctt[0]['type'] = 'field';
-    $ctt[0]['value'] = 'userobm_lastname';
-    $ctt[1]['type'] = 'string';
-    $ctt[1]['value'] = ' ';
-    $ctt[2]['type'] = 'field';
-    $ctt[2]['value'] = 'userobm_firstname';
-    $e_label = sql_string_concat($db_type, $ctt);
-    $u = get_user_info($user_id);
-    $u_label = addslashes("$u[lastname] $u[firstname]");    
-    $union = "UNION SELECT '$u[id]' as id, '$u_label' as label, '$entity' as entityright_entity" ;
-  } else {
-    $table_entity = "$entityu";
-    $e_id = "e.${entity}_id";
-    $e_label = "e.${entity}_name";
-  }
-
-  // BEGIN - superman has all rights on entities
-
-  // IF asked right check AND admin && current user is admin
-  if ($right == 'admin' && (Perm::get_module_rights($entityu) & $cright_write_admin) == $cright_write_admin ) {
-    $multidomain = sql_multidomain($r_entity);
-    $union_admin = "UNION SELECT $e_id AS id, $e_label AS label,
-      '$entity' as entityright_entity
-      FROM $table_entity AS e
-      WHERE 1=1 $multidomain";
-  }
-
-  // END - superman has all rights on entities
-
-  if ($right != 'all') {
-    $where_right = "AND entityright_$right = 1";
-  }
-  $user_id = sql_parse_id($user_id, true);
-  $query = "SELECT
-      $e_id as id,
-      $e_label as label,
-      '$entity' as entityright_entity
-    FROM EntityRight
-      LEFT JOIN $table_entity as e ON entityright_entity_id = $e_id
-    WHERE ( ((entityright_consumer_id $user_id OR entityright_consumer_id = 0))
-        OR ((entityright_consumer_id IN (SELECT of_usergroup_group_id FROM of_usergroup WHERE of_usergroup_user_id $user_id )
-            OR entityright_consumer_id = 0)))
-        $where_right
-    GROUP BY id, label, entityright_entity
-    $union
-    $union_admin
-    ORDER BY entityright_entity, label";
-
-  display_debug_msg($query, $cdg_sql, 'of_right_entity_for_user()');
-  $obm_q->query($query);
-
-  while($obm_q->next_record()) {
-    $id = $obm_q->f('id');
-    if ( ($ids_set == '')
-         || ( (is_array($ids_set)) && (in_array($id, $ids_set)) ) ) {
-      $label = $obm_q->f('label');
-      $id_array[] = $id;
-      $ent_array[] = array(
-                           'id'    => $id,
-                           'label' => $label
-                           );
-    }
-  }
-  $ret_array = array();
-  $ret_array['ids'] = array();
-  if (is_array($id_array)) {
-    $ret_array['ids'] = $id_array;
-  }
-  $ret_array['entity'] = array();
-  if (is_array($ent_array)) {
-    $ret_array['entity'] = $ent_array;
-  }
-  return $ret_array;
 }
 
 ?>

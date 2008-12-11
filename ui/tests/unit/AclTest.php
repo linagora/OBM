@@ -44,13 +44,19 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $this->assertTrue(OBM_Acl::canRead(2, 'cv', 1));
     $this->assertTrue(OBM_Acl::canWrite(2, 'cv', 1));
     $this->assertFalse(OBM_Acl::canAdmin(2, 'cv', 1));
+    
+    $this->assertTrue(OBM_Acl::canWrite(2, 'cv', array(1, 2)));
+    
     // special entities
+    $this->addCalendar(2);
+    $this->addCalendar(3);
     $this->assertTrue(OBM_Acl::isAllowed(2, 'calendar', 2, 'read'));
     $this->assertTrue(OBM_Acl::isAllowed(2, 'calendar', 2, 'write'));
     $this->assertTrue(OBM_Acl::canRead(2, 'calendar', 2));
     $this->assertTrue(OBM_Acl::canWrite(2, 'calendar', 2));
     $this->assertTrue(OBM_Acl::canAdmin(2, 'calendar', 2));
     
+    $this->assertTrue(OBM_Acl::canWrite(2, 'calendar', array(2, 3)));
   }
   
   public function testGroupBasics() {
@@ -99,8 +105,15 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     OBM_Acl::allow(2, 'cv', 1, 'read');
     OBM_Acl::allow(2, 'cv', 2, 'read');
     OBM_Acl::allow(2, 'cv', 3, 'read');
-    $this->assertEquals(OBM_Acl::getAllowedEntities(2, 'cv', 'read', 'title'), array(
+    $this->assertEquals(OBM_Acl::getAllowedEntities(2, 'cv', 'read', null, 'title'), array(
         1 => 'CV Admin',
+        2 => 'CV John Doe',
+        3 => 'CV Jane Doe'
+    ));
+    $this->assertEquals(OBM_Acl::getAllowedEntities(2, 'cv', 'read', array(3,4), 'title'), array(
+        3 => 'CV Jane Doe'
+    ));
+    $this->assertEquals(OBM_Acl::getAllowedEntities(2, 'cv', 'read', array(2,3,4), 'title'), array(
         2 => 'CV John Doe',
         3 => 'CV Jane Doe'
     ));
@@ -134,7 +147,7 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $this->assertTrue(OBM_Acl::canRead(2, 'cv', 1));
     $this->assertFalse(OBM_Acl::canWrite(2, 'cv', 1));
     $this->assertTrue(OBM_Acl::canAdmin(2, 'cv', 1));
-    $this->assertEquals(OBM_Acl::getAllowedEntities(2, 'cv', 'read', 'title'), array(1 => 'CV Admin'));
+    $this->assertEquals(OBM_Acl::getAllowedEntities(2, 'cv', 'read', null, 'title'), array(1 => 'CV Admin'));
     OBM_Acl::setPublicRights('cv', 1, array('access' => 1, 'read' => 1, 'write' => 0, 'admin' => 1));
     $this->assertTrue(OBM_Acl::canAccess(3, 'cv', 1));
     $this->assertTrue(OBM_Acl::canRead(3, 'cv', 1));
@@ -206,6 +219,19 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
       'group' => array(),
       'public' => array('access' => 1, 'read' => 1)
     ));
+    
+    $entities = array(
+      1 => 'CV Admin',
+      2 => 'CV John Doe',
+      3 => 'CV Jane Doe'
+    );
+    $this->assertEquals(OBM_Acl_Utils::expandEntitiesArray($entities), array(
+      'ids' => array(1,2,3),
+      'entity' => array(
+        array('id' => 1, 'label' => 'CV Admin'),
+        array('id' => 2, 'label' => 'CV John Doe'),
+        array('id' => 3, 'label' => 'CV Jane Doe')
+    )));
   }
   
   private function addCalendar($userId) {

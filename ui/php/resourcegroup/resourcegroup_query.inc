@@ -113,19 +113,6 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
   $restriction = $resourcegroup["restriction"];
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain("RGroup");
-	
-  if ($restriction == "user") {
-    $uid = $obm["uid"];
-    $rs = of_right_entity_for_user("RGroup", $uid, "read");
-    if ((is_array($rs["ids"])) && (count($rs["ids"]) > 0)) {
-      $where_restriction = " AND (rgroup_id IN (";
-      foreach($rs["ids"] as $r_id) {
-	      $where_restriction .= "$coma'$r_id'";
-	      $coma = ",";
-      }
-      $where_restriction .= "))";
-    }
-  }
 
   $query = "SELECT 
       count(*) as resultsCount
@@ -134,7 +121,6 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
       rgroup_name LIKE '$pattern%'
       AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = $obm[uid]))
       $multidomain
-      $where_restriction
     ORDER BY rgroup_name ";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_ext_search()");
@@ -151,7 +137,6 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
       rgroup_name LIKE '$pattern%' 
       AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = $obm[uid]))
       $multidomain
-      $where_restriction
     ORDER BY rgroup_name";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_ext_search()");

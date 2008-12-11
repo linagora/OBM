@@ -22,8 +22,7 @@ class Vcalendar_Writer_OBM {
     $this->db = new DB_OBM;
     $this->lazyRead = true;
     if(!$force) {
-      $rights = of_right_entity_for_user('calendar', $GLOBALS['obm']['uid'], 'write', '', 'userobm');
-      $this->rights = $rights['ids'];
+      $this->rights = array_keys(OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'calendar', 'write');
     } else {
       $this->rights = true;
     }
