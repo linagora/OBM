@@ -14,8 +14,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
+import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.calendar.ParticipationRole;
+import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.client.ISyncClient;
 import org.obm.sync.client.calendar.CalendarClient;
@@ -510,8 +513,13 @@ public class CalendarManager extends ObmManager {
 		}
 		event.setRecurrence(recurrence);
 
-		if (foundation.getReminder() != null)
-			logger.info("alert Reminder:" + foundation.getReminder());
+		// add syncing user as attendee
+		Attendee syncingUser = new Attendee();
+		syncingUser.setRequired(ParticipationRole.CHAIR);
+		syncingUser.setState(ParticipationState.ACCEPTED);
+		syncingUser.setEmail(userEmail);
+
+		event.addAttendee(syncingUser);
 
 		return event;
 	}
