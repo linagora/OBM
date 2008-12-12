@@ -59,10 +59,7 @@ if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_todo_data_form($params)) {
     $id = run_query_todo_insert($params);
-    if ($id == 'other_user') {
-      $display['msg'] .= display_ok_msg("$l_todo : $l_insert_ok");
-      $display['result'] .= dis_todo_search_list($params);
-    } else if ($id > 0) {
+    if ($id > 0) {
       $params['todo_id'] = $id;
       $display['msg'] .= display_ok_msg("$l_todo : $l_insert_ok");
       $display['detail'] .= dis_todo_consult($params);
@@ -177,14 +174,14 @@ function get_todo_params() {
       if (strcmp(substr($value, 0, 10),'data-user-') == 0) {
         $data = explode('-', $value);
         $id = $data[2];
-        $params['userid'][] = $id;
+        $params['user_ids'][] = $id;
       } else {
         // direct id
-        $params['userid'][] = $value;
+        $params['user_ids'][] = $value;
       }
     }
   }
-  
+
   return $params;
 }
 

@@ -1,4 +1,4 @@
--- Write that the 2.1->2.2 has started
+-- Write that the 2.1->2.2 has started
 UPDATE ObmInfo SET obminfo_value='2.1->2.2' WHERE obminfo_name='db_version';
 
 
@@ -993,8 +993,14 @@ INSERT INTO P_Domain (domain_id, domain_timecreate,domain_label,domain_descripti
 UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
--- module 'profile'
+-- Preferences
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
+UPDATE UserObmPref SET userobmpref_value='event_priority' WHERE userobmpref_value='todo_priority';
+UPDATE DisplayPref SET display_fieldname='event_title' WHERE display_fieldname='todo_title';
+UPDATE DisplayPref SET display_fieldname='event_priority' WHERE display_fieldname='todo_priority';
+UPDATE DisplayPref SET display_fieldname='event_date' WHERE display_fieldname='todo_date';
+UPDATE DisplayPref SET display_fieldname='event_update' WHERE display_fieldname='todo_update';
+UPDATE DisplayPref SET display_fieldname='eventlink_percent' WHERE display_fieldname='todo_percent';
 
 -- Timezone 
 INSERT INTO UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');

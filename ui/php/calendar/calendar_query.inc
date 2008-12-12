@@ -688,15 +688,15 @@ function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $
   global $cdg_sql, $obm;
 
   $event_id = $event_id;
-  $entity_id = sql_parse_id( $entity_id);
-  $uid = sql_parse_id( $obm['uid']);
+  $entity_id = sql_parse_id($entity_id);
+  $uid = sql_parse_id($obm['uid']);
   $query = "INSERT INTO EventLink (
     eventlink_timecreate,
     eventlink_usercreate,
-    eventlink_event_id, 
+    eventlink_event_id,
     eventlink_entity_id,
     eventlink_required,
-    eventlink_state) 
+    eventlink_state)
   VALUES (
     NOW(),
     $uid,

@@ -852,6 +852,8 @@ function run_query_contact_coords($id) {
 
   return $coords;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the number of static lists where the contact is registered
 // Parameters:
@@ -859,6 +861,7 @@ function run_query_contact_coords($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_linked_contact_list_nb($p_id) {
   global $cdg_sql;
+
   $p_id = sql_parse_id( $p_id, true);
   $query = "SELECT count(DISTINCT contactlist_list_id) as nb
     FROM ContactList
@@ -881,6 +884,7 @@ function get_linked_contact_list_nb($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_linked_contact_publication_nb($p_id) {
   global $cdg_sql;
+
   $p_id = sql_parse_id( $p_id, true);
   $query = "SELECT DISTINCT subscription_publication_id as nb
     FROM Subscription 

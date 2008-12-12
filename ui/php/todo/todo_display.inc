@@ -11,13 +11,12 @@
 //---------------------------------------------------------------------------//
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
-$fieldnames['todo_date'] = $l_date;
+$fieldnames['event_date'] = $l_date;
 $fieldnames['date_create'] = $l_date_create;
-$fieldnames['todo_priority'] = $l_priority;
-$fieldnames['todo_percent'] = $l_percent;
-$fieldnames['todo_title'] = $l_title;
-$fieldnames['todo_percent'] = $l_percent;
-$fieldnames['todo_update'] = $l_update;
+$fieldnames['event_priority'] = $l_priority;
+$fieldnames['eventlink_percent'] = $l_percent;
+$fieldnames['event_title'] = $l_title;
+$fieldnames['event_update'] = $l_update;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,31 +37,31 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
     $res['align'] = 'center';
   }
 
-  else if ($fieldname == 'todo_date') {
-    $date = $OD->data_set->f('todo_date');
+  else if ($fieldname == 'event_date') {
+    $date = $OD->data_set->f('event_date');
     $res['name'] = ($date) ? of_date_format($date) : ' ';
     $res['align'] = 'center';
   }
 
-  else if ($fieldname == 'todo_title') {
+  else if ($fieldname == 'event_title') {
     $t_id = $OD->data_set->f('event_id');
     $res['url'] = "todo_index.php?action=detailconsult&amp;todo_id=$t_id";
   }
 
-  else if ($fieldname == 'todo_priority') {
+  else if ($fieldname == 'event_priority') {
     $res['align'] = 'center';
   }
 
-  else if ($fieldname == 'todo_percent') {
+  else if ($fieldname == 'eventlink_percent') {
     $res['align'] = 'center';
-    $percent = $OD->data_set->f('todo_percent');
+    $percent = $OD->data_set->f('eventlink_percent');
     if ($percent != '') {
       $res['name'] = "$percent %";
     }
   }
 
-  else if ($fieldname == 'todo_update') {
-    $t_id = $OD->data_set->f('todo_id');
+  else if ($fieldname == 'event_update') {
+    $t_id = $OD->data_set->f('event_id');
     $res['popup'] = true;
     $res['popup_width'] = 700;
     $res['popup_height'] = 260;
@@ -215,7 +214,7 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
 
   $uid = $obm['uid'];
   $text = stripslashes($todo['text']);
-  $users = $todo['userid'];
+  $users = $todo['user_id'];
   $user = $users[0];
   $priority = $todo['priority'];
   $percent = $todo['percent'];
@@ -225,11 +224,10 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
 
   $url = url_prepare("todo_index.php?action=search&amp;tf_text=$text&amp;tf_user=$user&amp;sel_priority=$priority&amp;tf_percent=$percent&amp;date_field=$date_field&amp;date_after=$date_after&amp;date_before=$date_before");
 
-
   $todo_d = new OBM_DISPLAY('DATA', $prefs, 'todo');
   $todo_d->data_set = $todo_q;
   $todo_d->data_url = $url;
-  $todo_d->data_idfield = 'todo_id';
+  $todo_d->data_idfield = 'event_id';
   $todo_d->data_cb_text = "$l_del";
   $todo_d->data_cb_side = 'left';
   $todo_d->data_cb_name = 'delete_';
@@ -255,7 +253,7 @@ function html_todo_search_list($todo, $todo_q, $prefs) {
 /**
  * Display Todo detail
  *
- * @param $contact[] : contact values (id)
+ * @param $params[] : todo values (id)
  **/
 function dis_todo_consult($params) {
   global $display, $l_no_found, $path, $l_err_reference;
@@ -264,35 +262,45 @@ function dis_todo_consult($params) {
   $todo_q = run_query_todo_detail($params);
   if ($todo_q->num_rows() != 1) {
     $display['msg'] .= display_err_msg($l_err_reference);
+  } else {
+    $users = get_todo_users($id);
+    $display['detailInfo'] = display_record_info($todo_q);
+    $block .= html_todo_consult($todo_q, $users);
   }
-  $display['detailInfo'] = display_record_info($todo_q);
-
-  $block .= html_todo_consult($todo_q);
-
   return $block;
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Todo Detail (all informations)
-// Parameters:
-//   - $todo_q    : todo list
-///////////////////////////////////////////////////////////////////////////////
-function html_todo_consult($todo_q) {
+/**
+ * HTML Display Todo detail
+ *
+ * @param $todo_q : todo database values
+ * @param $users : users array
+ **/
+function html_todo_consult($todo_q, $users) {
   global $display;
   global $l_todo, $l_todotitle, $l_user, $l_author, $l_priority, $l_date_create;
   global $l_date, $l_desc, $l_percent, $l_title;
 
   $title = $todo_q->f('event_title');
-  $user = $todo_q->f('user_firstname') .' '. $todo_q->f('user_lastname');
   $author = $todo_q->f('author_firstname') .' '. $todo_q->f('author_lastname');
   $priority = $todo_q->f('event_priority');
-  $percent = $todo_q->f('eventlink_percent');
 
-  $date = of_date_format($todo_q->f('todo_date'));
+  $date = of_date_format($todo_q->f('event_date'));
   $datecreate = of_date_format($todo_q->f('timecreate'));
-  $date = ($date != 0) ? of_date_format($date) : $l_no_date;
+  //  $date = ($date != 0) ? of_date_format($date) : $l_no_date;
   $description = $todo_q->f('event_description');
+
+  foreach ($users as $u_id => $one_user) {
+    $percent = '';
+    if ($one_user['percent'] > 0) {
+      $percent = "($one_user[percent] %)";
+    }
+    $dis_user .= "<tr>
+      <th>$l_user</th>
+      <td>$one_user[firstname] $one_user[lastname] $percent</td>
+    </tr>";
+  }
 
   $display['title'] = $title;
 
@@ -330,10 +338,7 @@ function html_todo_consult($todo_q) {
   <div class=\"detail infos\">
     <h1>$l_user</h1>
     <table>
-    <tr>
-      <th>$l_user</th>
-      <td>$user</td>
-    </tr>
+    $dis_user
     </table>
    </div>
   
@@ -352,6 +357,7 @@ function html_todo_consult($todo_q) {
 // Parameters:
 //   - $todo[] : default values
 //   - $todo_q : default values
+//   - $users : users array
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_form($todo, $todo_q = 0) {
   global $path, $obm, $max_priority;
@@ -364,7 +370,7 @@ function dis_todo_form($todo, $todo_q = 0) {
  
   if ($action == 'detailupdate') {
     $t_id = $todo['todo_id'];
-    $u_id = $todo_q->f('todo_user');
+    $users = get_todo_users($t_id);
     $title = htmlentities($todo_q->f('event_title'));
     $description = htmlentities($todo_q->f('event_description'));
     $priority = $todo_q->f('event_priority');
@@ -384,10 +390,10 @@ function dis_todo_form($todo, $todo_q = 0) {
   if (isset($todo['percent'])) { $percent = $todo['percent']; }
   if (isset($todo['date'])) { $date = of_date_upd_format($todo['date'],true); };
   if (isset($todo['description'])) { $description = $todo['description']; }
-  if (is_array($todo['userid'])) {
-    $p_user_array = $todo['userid'];
-  } else if ($u_id > 0) {
-    $p_user_array = array($u_id);
+  if (is_array($todo['user_ids'])) {
+    $p_user_array = $todo['user_ids'];
+  } else if (is_array($users) && (count($users)>0)) {
+    $p_user_array = array_keys($users);
   } else {
     $p_user_array = array($obm['uid']);
   }
@@ -485,7 +491,7 @@ function dis_todo_form($todo, $todo_q = 0) {
 
   <fieldset class=\"detail extra\">
   <legend>$l_desc</legend>
-    <textarea id=\"ta_description\" name=\"ta_description\" rows=\"3\" cols=\"80\">$description</textarea>
+    <textarea id=\"ta_description\" name=\"ta_description\" rows=\"10\" cols=\"80\">$description</textarea>
   </fieldset>
   
   <fieldset class=\"buttons\">
