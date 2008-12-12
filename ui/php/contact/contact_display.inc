@@ -1042,7 +1042,9 @@ function dis_contact_form($action, $co_q, $contact) {
   }
   $users = of_usergroup_get_group_users($obm['group_com'], true, $uids, 'userobm_lastname');
   $ctry_q = run_query_global_country_for_lang();
-  $coords = run_query_contact_coords($cid, true);
+  if($cid > 0) {
+    $coords = run_query_contact_coords($cid, true);
+  }
   $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact, $coords);
 
   return $block;
