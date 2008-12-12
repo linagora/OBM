@@ -2981,6 +2981,23 @@ ALTER SEQUENCE entity_entity_id_seq OWNED BY entity.entity_id;
 
 
 --
+-- Name: entity_entity_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE entityright_entityright_id_seq
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: entityright_entityright_id_seq Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE entityright_entityright_id_seq OWNED BY entityright.entityright_id_seq;
+
+--
 -- Name: event_event_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -4174,6 +4191,14 @@ ALTER TABLE email ALTER COLUMN email_id SET DEFAULT nextval('email_email_id_seq'
 --
 
 ALTER TABLE entity ALTER COLUMN entity_id SET DEFAULT nextval('entity_entity_id_seq'::regclass);
+
+
+--
+-- Name: entity_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE entityright ALTER COLUMN entityright_id SET DEFAULT nextval('entityright_entityright_id_seq'::regclass);
+
 
 
 --
