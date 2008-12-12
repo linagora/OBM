@@ -95,8 +95,11 @@ $l_expand_all = "Expand all";
 $l_edit = "Edit";
 
 $l_view = "View";
+$l_view_default = "Default view";
 $l_views = "Views";
 $l_select_view = "Select view";
+$l_insert_default_view = "Save default view";
+$l_delete_default_view = "Delete default view";
 $l_view_label = "View label";
 $l_view_save = "Save view";
 $l_view_delete = "Delete view";
@@ -161,7 +164,9 @@ $l_event_cant_delete = "You can only delete your own events!";
 
 $l_fill_view_label = "You have to fill the [$l_view_label] field";
 $l_confirm_delete_view = "Do you realy want to delete this view?";
+$l_confirm_default_view = "Do you realy want to delete the default view ?";
 $l_no_sel_view = "Can't delete: no selected view";
+$l_no_sel_default_view = "Default view : no selected view";
 $l_conflict_view_label = "$l_view_label: Conflict has been detected";
 
 $l_unknown = "Inconnu";

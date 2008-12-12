@@ -120,9 +120,12 @@ $l_W = "Attente";
 $l_R = "Refusé";
 
 $l_view = "Vue";
+$l_view_default =  "Vue Défaut";
 $l_views = "Vues";
 $l_view_type = "Type de vue";
 $l_select_view = "Choisir une vue";
+$l_insert_default_view = "Mettre en vue par défaut";
+$l_delete_default_view = "Suppression vue par défaut";
 $l_view_label = "Nom de la vue";
 $l_view_save = "Mémoriser la vue";
 $l_view_delete = "Supprimer la vue";
@@ -174,7 +177,9 @@ $l_event_cant_delete = "Vous ne pouvez supprimer que vos événements !";
 
 $l_fill_view_label = "Vous devez spécifier le nom de la vue avant de valider";
 $l_confirm_delete_view = "Etes-vous sûr de vouloir supprimer cette vue ?";
+$l_confirm_default_view = "Etes-vous sûr de vouloir mettre cette vue par défaut ?";
 $l_no_sel_view = "Suppression impossible : aucune vue sélectionnée";
+$l_no_sel_default_view = "Vue par défaut impossible : aucune vue sélectionnée";
 $l_conflict_view_label = "$l_view_label : Un conflit a été détecté";
 
 $l_header_planning = "Planning";
