@@ -27,7 +27,7 @@ Obm.CoordonateWidget = new Class({
     }
     line.adopt(new Element('td').adopt(
       new Element('a').appendText(obm.vars.labels.remove)
-        .addEvent('click', function() {this.element.dispose;}.bind(this))
+        .addEvent('click', function() {this.element.dispose();}.bind(this))
       )
     );
   },
