@@ -316,6 +316,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
     $dis_group->data_form_end = "
     <div class=\"buttons\">
       <input type=\"submit\" value=\"$l_add\" />
+      <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
       <input type=\"hidden\" name=\"group_id\" value=\"$ext_id\" />
       <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
       <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />

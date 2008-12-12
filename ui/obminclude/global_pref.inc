@@ -247,6 +247,12 @@ if ($cgp_show["module"]["document"]) {
                                'Url' => "$path/document/document_index.php",
                                'Right'=> $cright_read);
 }
+if ($cgp_show["module"]["campaign"]) {
+  $modules["campaign"] = array('Name'=> $l_module_campaign,
+                                  'Ico' => "$ico_cancel",
+                                  'Url' => "$path/campaign/campaign_index.php",
+                                  'Right'=> $cright_read);
+}
 
 $modules["admin_code"] = array('Name'=> $l_module_admin_code,
                   'Ico' => "$ico_code",

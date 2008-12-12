@@ -33,7 +33,9 @@ if ($obminclude == "") $obminclude = "obminclude";
 $acts = array('help', 'batch_processing');
 
 include("$obminclude/global.inc");
-require("$obminclude/../conf/hooks/user/mailchooser.inc"); // FIXME
+
+if (file_exists("$obminclude/../conf/hooks/user/mailchooser.inc"))
+require("$obminclude/../conf/hooks/user/mailchooser.inc");
 
 $params = get_user_params();
 $mode = $params["mode"];

@@ -299,6 +299,7 @@ $l_module_todo    = "Todo";
 $l_module_publication = "Publications";
 $l_module_statistic = "Statistics";
 $l_module_domain = "Domains";
+$l_module_campaign = "Campaign";
 
 $l_module_time = "Time management";
 $l_module_project = "Projects";

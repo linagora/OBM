@@ -1241,6 +1241,27 @@ function get_last_domain_text($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the campaign name from the campaign Id
+// Parameters:
+//   - $id : campaign id 
+///////////////////////////////////////////////////////////////////////////////
+function get_last_campaign_text($id) {
+  global $cdg_sql;
+
+  if ($id > 0) {
+    $query = "SELECT campaign_name FROM Campaign WHERE campaign_id='$id'";
+    $obm_q = new DB_OBM;
+    display_debug_msg($query, $cdg_sql, 'get_last_campaign_text()');
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f('campaign_name');
+  }
+
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return an array of all used emails (users, groups)
 // Parameters:
 //   - $id  : User id to exclude from the result

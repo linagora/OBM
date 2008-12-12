@@ -8870,7 +8870,7 @@ ALTER TABLE ONLY website
 
 
 --
--- Table structure for table ServiceProperty
+-- Name: ServiceProperty; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE ServiceProperty (
@@ -8886,7 +8886,7 @@ CREATE TABLE ServiceProperty (
 create INDEX serviceproperty_service_key ON ServiceProperty (serviceproperty_service);
 create INDEX serviceproperty_property_key ON ServiceProperty (serviceproperty_property);
 --
--- Table structure for table Service
+-- Name: Service; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE Service (
@@ -8899,7 +8899,9 @@ CREATE TABLE Service (
 
 create INDEX service_service_key ON Service (service_service);
 
--- Table structure for table SSOTicket
+
+--
+-- Name: SSOTicket; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 CREATE TABLE SSOTicket (
   ssoticket_ticket varchar(255) NOT NULL,
@@ -8909,8 +8911,9 @@ CREATE TABLE SSOTicket (
   CONSTRAINT ssoticket_user_id_userobm_id_fkey FOREIGN KEY (ssoticket_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+
 --
--- Table structure for table TaskEvent
+-- Name: TaskEvent; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE TaskEvent (
@@ -8922,6 +8925,128 @@ CREATE TABLE TaskEvent (
 );
 
 
+--
+-- Name: campaign; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE campaign (
+  campaign_id serial,
+  campaign_name character varying(50) default NULL,
+  campaign_timeupdate timestamp without time zone,
+  campaign_timecreate timestamp without time zone DEFAULT now(),
+  campaign_userupdate integer default NULL,
+  campaign_usercreate integer default NULL,
+  campaign_manager_id integer default NULL,
+  campaign_tracker_key integer default NULL,
+  campaign_refer_url character varying(255) default NULL,
+  campaign_nb_sent integer default NULL,
+  campaign_nb_error integer default NULL,
+  campaign_nb_inqueue integer default NULL,
+  campaign_progress integer default 0,
+  campaign_start_date date default NULL,
+  campaign_end_date date default NULL,
+  campaign_status integer default NULL,
+  campaign_type integer default NULL,
+  campaign_objective text default NULL,
+  campaign_comment text default NULL,
+  campaign_domain_id integer NOT NULL,
+  campaign_email integer default NULL,
+  campaign_parent integer default NULL,
+  campaign_child_order integer default NULL,
+  CONSTRAINT campaign_parent_fkey FOREIGN KEY (campaign_parent) REFERENCES campaign (campaign_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT campaign_email_fkey FOREIGN KEY (campaign_email) REFERENCES Document (document_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (campaign_id)
+);
+
+
+--
+-- Name: campaignentity; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE campaignentity (
+  campaignentity_entity_id integer NOT NULL,
+  campaignentity_campaign_id integer NOT NULL,
+  PRIMARY KEY  (campaignentity_entity_id,campaignentity_campaign_id),
+  CONSTRAINT campaignentity_campaign_id_campaign_id_fkey FOREIGN KEY (campaignentity_campaign_id) REFERENCES campaign (campaign_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT campaignentity_entity_id_entity_id_fkey FOREIGN KEY (campaignentity_entity_id) REFERENCES entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+--
+-- Name: campaigndisabledentity; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE campaigndisabledentity (
+  campaigndisabledentity_entity_id integer NOT NULL,
+  campaigndisabledentity_campaign_id integer NOT NULL,
+  PRIMARY KEY  (campaigndisabledentity_entity_id,campaigndisabledentity_campaign_id),
+  CONSTRAINT campaigndisabledentity_campaign_id_campaign_id_fkey FOREIGN KEY (campaigndisabledentity_campaign_id) REFERENCES campaign (campaign_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT campaigndisabledentity_entity_id_entity_id_fkey FOREIGN KEY (campaigndisabledentity_entity_id) REFERENCES entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+--
+-- Name: campaigntarget; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE campaigntarget (
+  campaigntarget_id serial,
+  campaigntarget_campaign_id integer NOT NULL,
+  campaigntarget_entity_id integer,
+  campaigntarget_status integer NULL,
+  PRIMARY KEY (campaigntarget_id),
+  CONSTRAINT campaigntarget_campaign_id_campaign_id_fkey FOREIGN KEY (campaigntarget_campaign_id) REFERENCES campaign (campaign_id) ON DELETE CASCADE ON UPDATE CASCADE,  
+  CONSTRAINT campaigntarget_entity_id_entity_id_fkey FOREIGN KEY (campaigntarget_entity_id) REFERENCES entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+--
+-- Name: campaignmailtarget; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE campaignmailtarget (
+  campaignmailtarget_id serial,
+  campaignmailtarget_campaign_id integer NOT NULL,
+  campaignmailtarget_entity_id integer,
+  campaignmailtarget_status integer NULL,
+  PRIMARY KEY (campaignmailtarget_id),
+  CONSTRAINT campaignmailtarget_campaign_id_campaign_id_fkey FOREIGN KEY (campaignmailtarget_campaign_id) REFERENCES campaign (campaign_id) ON DELETE CASCADE ON UPDATE CASCADE,  
+  CONSTRAINT campaignmailtarget_entity_id_entity_id_fkey FOREIGN KEY (campaignmailtarget_entity_id) REFERENCES entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+--
+-- Name: campaignmailcontent; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE campaignmailcontent (
+  campaignmailcontent_id         serial,
+  campaignmailcontent_refext_id  character varying(8),
+  campaignmailcontent_content    character varying,
+  PRIMARY KEY (campaignmailcontent_id)
+);
+
+--
+-- Name: campaignpushtarget; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE campaignpushtarget (
+  campaignpushtarget_id             serial,
+  campaignpushtarget_mailcontent_id integer NOT NULL,
+  campaignpushtarget_refext_id      character varying(8),
+
+  campaignpushtarget_status         smallint DEFAULT 1 NOT NULL,
+  -- 1 : not sent
+  -- 2 : sent
+  -- 3 : error occurred
+  
+  campaignpushtarget_email_address  character varying(512) NOT NULL,
+  campaignpushtarget_properties     text,
+  campaignpushtarget_start_time     timestamp,
+  campaignpushtarget_sent_time      timestamp,
+  campaignpushtarget_retries        smallint,
+  PRIMARY KEY (campaignpushtarget_id)
+);
 
 --
 -- Name: public; Type: ACL; Schema: -; Owner: -

@@ -3112,6 +3112,138 @@ CREATE TABLE P_MailboxEntity LIKE MailboxEntity;
 --
 CREATE TABLE P_MailshareEntity LIKE MailshareEntity;
 
+
+--
+-- Table structure for table `Campaign`
+--
+
+DROP TABLE IF EXISTS `Campaign`;
+CREATE TABLE `Campaign` (
+  `campaign_id` int(8) NOT NULL auto_increment,
+  `campaign_name` varchar(50) default NULL,
+  `campaign_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `campaign_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `campaign_userupdate` int(8) default NULL,
+  `campaign_usercreate` int(8) default NULL,
+  `campaign_manager_id` int(8) default NULL,
+  `campaign_tracker_key` int(11) default NULL,
+  `campaign_refer_url` varchar(255) default NULL,
+  `campaign_nb_sent` int(10) default NULL,
+  `campaign_nb_error` int(10) default NULL,
+  `campaign_nb_inqueue` int(10) default NULL,
+  `campaign_progress` int(3) default NULL,
+  `campaign_start_date` date default NULL,
+  `campaign_end_date` date default NULL,
+  `campaign_status` int(3) default NULL,
+  `campaign_type` int(2) default NULL,
+  `campaign_objective` text default NULL,
+  `campaign_comment` text default NULL,
+  `campaign_domain_id` int(8) NOT NULL,
+  `campaign_email` int(8) default NULL,
+  `campaign_parent` int(8) default NULL,
+  `campaign_child_order` int(2) default NULL,
+  KEY `campaign_parent_fkey` (`campaign_parent`),
+  CONSTRAINT `campaign_parent_fkey` FOREIGN KEY (`campaign_parent`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `campaign_email_fkey` FOREIGN KEY (`campaign_email`) REFERENCES `Document` (`document_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  PRIMARY KEY (`campaign_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignEntity`
+--
+
+DROP TABLE IF EXISTS `CampaignEntity`;
+CREATE TABLE `CampaignEntity` (
+  `campaignentity_entity_id` int(8) NOT NULL,
+  `campaignentity_campaign_id` int(8) NOT NULL,
+  PRIMARY KEY  (`campaignentity_entity_id`,`campaignentity_campaign_id`),
+  KEY `campaignentity_campaign_id_campaign_id_fkey` (`campaignentity_campaign_id`),
+  CONSTRAINT `campaignentity_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaignentity_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `campaignentity_entity_id_entity_id_fkey` FOREIGN KEY (`campaignentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignDisabledEntity`
+--
+
+DROP TABLE IF EXISTS `CampaignDisabledEntity`;
+CREATE TABLE `CampaignDisabledEntity` (
+  `campaigndisabledentity_entity_id` int(8) NOT NULL,
+  `campaigndisabledentity_campaign_id` int(8) NOT NULL,
+  PRIMARY KEY  (`campaigndisabledentity_entity_id`,`campaigndisabledentity_campaign_id`),
+  KEY `campaigndisabledentity_campaign_id_campaign_id_fkey` (`campaigndisabledentity_campaign_id`),
+  CONSTRAINT `campaigndisabledentity_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaigndisabledentity_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `campaigndisabledentity_entity_id_entity_id_fkey` FOREIGN KEY (`campaigndisabledentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignTarget`
+--
+
+DROP TABLE IF EXISTS `CampaignTarget`;
+CREATE TABLE `CampaignTarget` (
+  `campaigntarget_id` int(8) NOT NULL auto_increment,
+  `campaigntarget_campaign_id` int(8) NOT NULL,
+  `campaigntarget_entity_id` int(8),
+  `campaigntarget_status` int(8) NULL,
+  PRIMARY KEY (`campaigntarget_id`),
+  KEY `campaigntarget_campaign_id_campaign_id_fkey` (`campaigntarget_campaign_id`),
+  CONSTRAINT `campaigntarget_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaigntarget_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,  
+  CONSTRAINT `campaigntarget_entity_id_entity_id_fkey` FOREIGN KEY (`campaigntarget_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignMailTarget`
+--
+
+DROP TABLE IF EXISTS `CampaignMailTarget`;
+CREATE TABLE `CampaignMailTarget` (
+  `campaignmailtarget_id` int(8) NOT NULL auto_increment,
+  `campaignmailtarget_campaign_id` int(8) NOT NULL,
+  `campaignmailtarget_entity_id` int(8),
+  `campaignmailtarget_status` int(8) NULL,
+  PRIMARY KEY (`campaignmailtarget_id`),
+  KEY `campaignmailtarget_campaign_id_campaign_id_fkey` (`campaignmailtarget_campaign_id`),
+  CONSTRAINT `campaignmailtarget_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaignmailtarget_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,  
+  CONSTRAINT `campaignmailtarget_entity_id_entity_id_fkey` FOREIGN KEY (`campaignmailtarget_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignMailContent`
+--
+
+DROP TABLE IF EXISTS `CampaignMailContent`;
+CREATE TABLE `CampaignMailContent` (
+  `campaignmailcontent_id`         INT(8) NOT NULL AUTO_INCREMENT,
+  `campaignmailcontent_refext_id`  VARCHAR(8),
+  `campaignmailcontent_content`    BLOB,
+  PRIMARY KEY (`campaignmailcontent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignPushTarget`
+--
+
+DROP TABLE IF EXISTS `CampaignPushTarget`;
+CREATE TABLE `CampaignPushTarget` (
+  `campaignpushtarget_id`             INT(8) NOT NULL AUTO_INCREMENT,
+  `campaignpushtarget_mailcontent_id` INT(8) NOT NULL,
+  `campaignpushtarget_refext_id`      VARCHAR(8),
+
+  `campaignpushtarget_status`         INT(2) NOT NULL DEFAULT '1',
+  -- 1 : not sent
+  -- 2 : sent
+  -- 3 : error occurred
+  
+  `campaignpushtarget_email_address`  VARCHAR(512) NOT NULL,
+  `campaignpushtarget_properties`     TEXT,
+  `campaignpushtarget_start_time`     DATETIME,
+  `campaignpushtarget_sent_time`      DATETIME,
+  `campaignpushtarget_retries`        INT(3),
+  PRIMARY KEY (`campaignpushtarget_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 --
 -- Table structure for table `P_Domain`
 --
@@ -3166,3 +3298,4 @@ CREATE TABLE P_Service LIKE Service;
 -- Table structure for table `P_DomainEntity`
 --
 CREATE TABLE P_DomainEntity LIKE DomainEntity;
+

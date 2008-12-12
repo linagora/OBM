@@ -518,6 +518,12 @@ function get_list_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
+// External List Select 
+  $actions["list"]["ext_get_ids"]  = array (
+    'Url'      => "$path/list/list_index.php?action=ext_get_ids",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
 					    
 }
 
