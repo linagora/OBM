@@ -2995,7 +2995,7 @@ CREATE SEQUENCE entityright_entityright_id_seq
 -- Name: entityright_entityright_id_seq Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE entityright_entityright_id_seq OWNED BY entityright.entityright_id_seq;
+ALTER SEQUENCE entityright_entityright_id_seq OWNED BY entityright.entityright_id;
 
 --
 -- Name: event_event_id_seq; Type: SEQUENCE; Schema: public; Owner: -
