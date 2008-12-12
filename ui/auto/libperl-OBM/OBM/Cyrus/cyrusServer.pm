@@ -55,15 +55,16 @@ sub _getServerDesc {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
-    $self->_log( 'obtention du mot de passe de l\'utilisateur LDAP', 1 );
+    $self->_log( 'obtention du mot de passe de l\'utilisateur IMAP', 1 );
     my $query = 'SELECT     host.*,
                             usersystem.usersystem_login AS cyrus_login,
                             usersystem.usersystem_password AS cyrus_password,
-                            domainmailserver.domainmailserver_domain_id AS mailserver_for_domain_id
-                    FROM Host host, MailServer mailserver
-                    LEFT JOIN DomainMailServer domainmailserver ON domainmailserver.domainmailserver_mailserver_id=mailserver.mailserver_id
+                            domainentity_domain_id AS mailserver_for_domain_id
+                    FROM Host host
+                    INNER JOIN ServiceProperty ON serviceproperty_value='.$dbHandler->castAsInteger('host_id').' AND serviceproperty_service=\'mail\' AND serviceproperty_property=\'imap\'
+                    INNER JOIN DomainEntity ON domainentity_entity_id=serviceproperty_entity_id
                     LEFT JOIN UserSystem usersystem ON usersystem.usersystem_login=\''.$OBM::Parameters::common::cyrusAdminLogin.'\'
-                    WHERE domainmailserver.domainmailserver_role=\'imap\' AND host.host_id=mailserver.mailserver_host_id AND mailserver.mailserver_id='.$self->{'serverId'};
+                    WHERE host_id='.$self->{'serverId'};
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {

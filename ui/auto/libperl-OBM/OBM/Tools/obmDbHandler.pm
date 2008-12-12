@@ -53,7 +53,7 @@ sub _getDriver {
 }
 
 
-sub _driverHook {
+sub _driverConnectHook {
     my $self = shift;
     my $dbHandler = $self->{'dbHandler'};
 
@@ -166,7 +166,7 @@ sub _dbConnect {
 
     $self->{'dbHandler'} = $dbHandler;
 
-    $self->_driverHook();
+    $self->_driverConnectHook();
 
     return 0;
 }
@@ -198,6 +198,28 @@ sub DESTROY {
     $self->_dbDisconnect();
 
     return 0;
+}
+
+
+sub castAsInteger {
+    my $self = shift;
+    my( $value ) = @_;
+
+    if( defined($value) ) {
+        SWITCH:{
+            if( $self->{'dbType'} eq 'mysql' ) {
+                $value = 'CAST('.$value.' AS UNSIGNED)';
+                last SWITCH;
+            }
+    
+            if( $self->{'dbType'} eq 'pgsql' ) {
+                $value = 'CAST('.$value.' AS INTEGER)';
+                last SWITCH;
+            }
+        }
+    }
+
+    return $value;
 }
 
 # Perldoc

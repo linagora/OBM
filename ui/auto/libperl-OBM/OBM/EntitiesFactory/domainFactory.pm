@@ -145,10 +145,12 @@ sub _getDomain {
     }
 
     my $domainTable = 'Domain';
-    my $sambaTable = 'Samba';
+    my $domainEntityTable = 'DomainEntity';
+    my $servicePropertyTable = 'ServiceProperty';
     if( $self->{'source'} =~ /^SYSTEM$/ ) {
         $domainTable = 'P_'.$domainTable;
-        $sambaTable = 'P_'.$sambaTable;
+        $domainEntityTable = 'P_'.$domainEntityTable;
+        $servicePropertyTable = 'P_'.$servicePropertyTable;
     }
     my $queryDomain = 'SELECT   domain_id,
                                 domain_global,
@@ -156,16 +158,15 @@ sub _getDomain {
                                 domain_description,
                                 domain_name,
                                 domain_alias,
-                                name.samba_value as samba_domain_name,
-                                sid.samba_value as samba_sid,
-                                pdc.samba_value as samba_pdc,
-                                profile.samba_value as samba_user_profile
-                       FROM '.$domainTable.'
-                       LEFT JOIN '.$sambaTable.' name ON name.samba_name=\'samba_domain\' AND name.samba_domain_id=domain_id
-                       LEFT JOIN '.$sambaTable.' sid ON sid.samba_name=\'samba_sid\' AND sid.samba_domain_id=domain_id
-                       LEFT JOIN '.$sambaTable.' pdc ON pdc.samba_name=\'samba_pdc\' AND pdc.samba_domain_id=domain_id
-                       LEFT JOIN '.$sambaTable.' profile ON profile.samba_name=\'samba_profile\' AND profile.samba_domain_id=domain_id
-                       WHERE domain_id = '.$self->{'domainId'};
+                                domain.serviceproperty_value as samba_domain_name,
+                                sid.serviceproperty_value as samba_sid,
+                                profile.serviceproperty_value as samba_user_profile
+                        FROM '.$domainTable.'
+                        INNER JOIN '.$domainEntityTable.' ON domainentity_domain_id=domain_id
+                        LEFT JOIN '.$servicePropertyTable.' domain ON domain.serviceproperty_entity_id=domainentity_entity_id AND domain.serviceproperty_service=\'samba\' AND domain.serviceproperty_property=\'domain\'
+                        LEFT JOIN '.$servicePropertyTable.' sid ON sid.serviceproperty_entity_id=domainentity_entity_id AND sid.serviceproperty_service=\'samba\' AND sid.serviceproperty_property=\'sid\'
+                        LEFT JOIN '.$servicePropertyTable.' profile ON profile.serviceproperty_entity_id=domainentity_entity_id AND profile.serviceproperty_service=\'samba\' AND profile.serviceproperty_property=\'profile\'
+                        WHERE domain_id = '.$self->{'domainId'};
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $queryDomain, \$sth ) ) ) {
@@ -205,19 +206,20 @@ sub _getParentDomain {
     }
 
     my $domainTable = 'P_Domain';
-    my $sambaTable = 'P_Samba';
+    my $domainEntityTable = 'P_DomainEntity';
+    my $servicePropertyTable = 'P_ServiceProperty';
     my $queryDomain = 'SELECT   domain_id,
                                 domain_global,
                                 domain_label,
                                 domain_description,
                                 domain_name,
                                 domain_alias,
-                                sid.samba_value as samba_sid,
-                                pdc.samba_value as samba_pdc
-                       FROM '.$domainTable.'
-                       LEFT JOIN '.$sambaTable.' sid ON sid.samba_name=\'samba_sid\' AND sid.samba_domain_id=domain_id
-                       LEFT JOIN '.$sambaTable.' pdc ON pdc.samba_name=\'samba_pdc\' AND pdc.samba_domain_id=domain_id
-                       WHERE domain_global';
+                                sid.serviceproperty_value as samba_sid
+                        FROM '.$domainTable.'
+                        INNER JOIN '.$domainEntityTable.' ON domainentity_domain_id=domain_id
+                        LEFT JOIN '.$servicePropertyTable.' sid ON sid.serviceproperty_entity_id=domainentity_entity_id AND sid.serviceproperty_service=\'samba\' AND sid.serviceproperty_property=\'sid\'
+                        WHERE domain_global';
+
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $queryDomain, \$sth ) ) ) {

@@ -52,17 +52,17 @@ sub update {
 
     my $query = 'INSERT INTO P_Domain
                 (   domain_id,
-                    domain_global,
                     domain_label,
                     domain_description,
                     domain_name,
-                    domain_alias
+                    domain_alias,
+                    domain_global
                 ) SELECT    domain_id,
-                            domain_global,
                             domain_label,
                             domain_description,
                             domain_name,
-                            domain_alias
+                            domain_alias,
+                            domain_global
                   FROM Domain
                   WHERE domain_id='.$entity->getId();
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
@@ -71,15 +71,55 @@ sub update {
     }
 
 
-    $query = 'INSERT INTO P_Samba
-                (   samba_domain_id,
-                    samba_name,
-                    samba_value
-                ) SELECT    samba_domain_id,
-                            samba_name,
-                            samba_value
-                  FROM Samba
-                  WHERE samba_domain_id='.$entity->getId();
+    $query = 'INSERT INTO P_DomainEntity
+                (   domainentity_entity_id,
+                    domainentity_domain_id
+                ) SELECT    domainentity_entity_id,
+                            domainentity_domain_id
+                  FROM DomainEntity
+                  WHERE domainentity_domain_id='.$entity->getId();
+    if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        return 1;
+    }
+
+
+    $query = 'INSERT INTO P_Service
+                (   service_id,
+                    service_service,
+                    service_entity_id
+                ) SELECT    service_id,
+                            service_service,
+                            service_entity_id
+                  FROM Service
+                  WHERE service_entity_id IN
+                    ( SELECT domainentity_entity_id
+                      FROM DomainEntity
+                      WHERE domainentity_domain_id='.$entity->getId().'
+                    )';
+    if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        return 1;
+    }
+
+
+    $query = 'INSERT INTO P_ServiceProperty
+                (   serviceproperty_id,
+                    serviceproperty_service,
+                    serviceproperty_property,
+                    serviceproperty_entity_id,
+                    serviceproperty_value
+                ) SELECT    serviceproperty_id,
+                            serviceproperty_service,
+                            serviceproperty_property,
+                            serviceproperty_entity_id,
+                            serviceproperty_value
+                  FROM ServiceProperty
+                  WHERE serviceproperty_entity_id IN
+                    ( SELECT domainentity_entity_id
+                      FROM DomainEntity
+                      WHERE domainentity_domain_id='.$entity->getId().'
+                    )';
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
         $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
         return 1;
@@ -107,14 +147,25 @@ sub delete {
     }
 
 
-    my $query = 'DELETE FROM P_Domain WHERE domain_id='.$entity->getId();
+    my $query = 'DELETE FROM P_ServiceProperty WHERE serviceproperty_entity_id IN (SELECT domainentity_entity_id FROM P_DomainEntity WHERE domainentity_domain_id='.$entity->getId().')';
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
         $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
         return 1;
     }
 
+    $query = 'DELETE FROM P_Service WHERE service_entity_id IN (SELECT domainentity_entity_id FROM P_DomainEntity WHERE domainentity_domain_id='.$entity->getId().')'
+    if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        return 1;
+    }
 
-    $query = 'DELETE FROM P_Samba WHERE samba_domain_id='.$entity->getId();
+    $query = 'DELETE FROM P_DomainEntity WHERE domainentity_domain_id='.$entity->getId();
+    if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+        $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
+        return 1;
+    }
+
+    $query = 'DELETE FROM P_Domain WHERE domain_id='.$entity->getId();
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
         $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
         return 1;
