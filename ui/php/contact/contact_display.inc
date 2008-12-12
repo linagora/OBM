@@ -696,24 +696,15 @@ function html_contact_view_main($co_q, $coords) {
   global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter;
   global $ico_clipboard, $l_copy, $l_yes, $l_no,  $ico_mail;
   global $display, $cgp_show, $cgp_hide, $cclipboard_address;
+  global $l_company;
 
   $id = $co_q->f('contact_id');
   $title = $co_q->f('contact_title');
   $c_name = $co_q->f('company_name');
-  $c_phone = $co_q->f('company_phone');
-  $c_fax = $co_q->f('company_fax');
-  $c_ad1 = $co_q->f('company_address1');
-  $c_ad2 = $co_q->f('company_address2');
-  $c_ad3 = $co_q->f('company_address3');
-  $c_zip = $co_q->f('company_zipcode');
-  $c_town = $co_q->f('company_town');
-  $c_cdx = $co_q->f('company_expresspostal');
-  $c_ctry_name = $co_q->f('company_country_name');
   $kind_minilabel = $co_q->f('kind_minilabel');
   $lname = $co_q->f('contact_lastname');
   $fname = $co_q->f('contact_firstname');
   $service = $co_q->f('contact_service');
-  $ctry_name = $co_q->f('country_name');
   $mailok = ($co_q->f('contact_mailing_ok') == 1 ? $l_yes : $l_no);
   $newsletter = ($co_q->f('contact_newsletter') == 1 ? $l_yes : $l_no);
   $com  = beautify_comment(nl2br($co_q->f('contact_comment')));
@@ -723,13 +714,6 @@ function html_contact_view_main($co_q, $coords) {
   $newline = "\\r\\n";
   if (($ad1 == '') && ($ad2 == '') && ($ad3 == '') && ($zip == '')
       && ($town == '') && ($cdx == '') && ($ctry_name == '')) {
-    $ad1 = ("$c_ad1" != '' ? "( $c_ad1 )" : '');
-    $ad2 = ("$c_ad2" != '' ? "( $c_ad2 )" : '');
-    $ad3 = ("$c_ad3" != '' ? "( $c_ad3 )" : '');
-    $zip = ("$c_zip" != '' ? "( $c_zip )" : '');
-    $town = ("$c_town" != '' ? "( $c_town )" : '');
-    $cdx = ("$c_cdx" != '' ? "( $c_cdx )" : '');
-    $ctry_name = $c_ctry_name;
     if (($c_ad1 != '') && (in_array('address1', $cclipboard_address))) {
       $copy_addr_comp .= addslashes($c_ad1).$newline;
     }
@@ -768,7 +752,6 @@ function html_contact_view_main($co_q, $coords) {
 
   // Conditionnal fields
   $show_service = (! $cgp_hide['contact']['contact_service']);
-  $show_ad3 = (! $cgp_hide['contact']['contact_address3']);
   $show_cdx = (! $cgp_hide['contact']['contact_expresspostal']);
   $show_comment2 = (! $cgp_hide['contact']['contact_comment2']);
   $show_comment3 = (! $cgp_hide['contact']['contact_comment3']);
@@ -839,18 +822,38 @@ function html_contact_view_main($co_q, $coords) {
 
   foreach($coords as $kind => $row) {
     $coords = '';
+    $GLOBALS["l_${kind}_labels"]['COMPANY'] = $l_company;
     foreach($row as $values) {
-      $coords .= '<tr>';
+      $datas = array();
       foreach($values as $label => $value) {
-        if($label == 'label') {
-          $coords .= '<th>'.$GLOBALS["l_${kind}_labels"][$value].'</th>';
-        } elseif($label == 'protocol') {
-          $coords .= "<th>$value</th>";
-        } else {
-          $coords .= "<td>$value</td>";
+        if($label == 'label' || $label == 'protocol') {
+          if(isset($GLOBALS["l_${kind}_labels"][$value])) {
+            $header = $GLOBALS["l_${kind}_labels"][$value];
+          } else {
+            $header = $value;
+          }
+        } elseif(!empty($value)) {
+          $datas[] = $value;
         }
       }
-      $coords .= '</tr>';
+      //if($kind == 'address') {
+      //  $l_address 1
+      //  <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"$l_copy\" ><img alt=\"$l_copy\" src=\"$ico_clipboard\" /></a>
+      //}
+      switch ($kind) {
+      case 'website' :
+        $data = "<a href=\"$datas[0]\">$datas[0]</a>";
+        break;
+      case 'email' :
+        $data = "<a href=\"mailto:$datas[0]\">$datas[0]</a>";
+        break;
+      case 'address' :
+        $data = implode('<br />', $datas);
+        break;
+      default :
+        $data = implode('<br />', $datas);
+      }
+      $coords .= "<tr><th>$header</th><td>$data</td></tr>";
     }
     $block .= "
     <div class=\"detail infos\">
@@ -869,11 +872,6 @@ function html_contact_view_main($co_q, $coords) {
 
     <table>
     $block_service
-    </tr><tr>
-      <th>
-      $l_address 1
-      <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"$l_copy\" ><img alt=\"$l_copy\" src=\"$ico_clipboard\" /></a>
-      </th>
     </tr><tr>
       <th>$l_mailing_ok</th>
       <td>$mailok</td>
@@ -1044,7 +1042,7 @@ function dis_contact_form($action, $co_q, $contact) {
   }
   $users = of_usergroup_get_group_users($obm['group_com'], true, $uids, 'userobm_lastname');
   $ctry_q = run_query_global_country_for_lang();
-  $coords = run_query_contact_coords($cid);
+  $coords = run_query_contact_coords($cid, true);
   $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact, $coords);
 
   return $block;
@@ -1644,6 +1642,13 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $block_date
     $block_userdata
     $block_birthday
+    <tr>
+    <th>$l_mailing_ok</th>
+    <td><input type=\"checkbox\" name=\"cba_mailok\" value=\"1\" $mailok /></td>
+    </tr><tr>
+    <th>$l_newsletter</th>
+    <td><input type=\"checkbox\" name=\"cba_newsletter\" value=\"1\" $newsletter /></td>
+    </tr>    
     </table>
     </fieldset>
 
@@ -1665,51 +1670,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     <script type='text/javascript'>
       $js
     </script>
-    <fieldset class=\"detail infos\">
-    <legend>$l_coord</legend>
-    <table>
-    <tr>
-    <th>$l_hphone</th>
-    <td><input type=\"text\" name=\"tf_hphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$hphone\" /></td>
-    </tr><tr>
-    <th>$l_fax</th>
-    <td><input type=\"text\" name=\"tf_fax\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$fax\" /> <br /> $c_fax</td>
-    </tr><tr>
-    <th>$l_mphone</th>
-    <td><input type=\"text\" name=\"tf_mphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$mphone\" /></td>
-    $block_service
-    </tr><tr>
-    <th>$l_address 1</th>
-    <td><input type=\"text\" name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /> <br /> $c_ad1</td>
-    </tr><tr>
-    <th>$l_address 2</th>
-    <td><input type=\"text\" name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /> <br /> $c_ad2</td>
-    $block_ad3
-    </tr><tr>
-    <th>$l_postcode</th>
-    <td><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /> <br /> $c_zip</td>
-    </tr><tr>
-    <th>$l_town</th>
-    <td><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /> <br /> $c_town</td>
-    $block_cdx
-    </tr><tr>
-    <th>$l_country</th>
-    <td>$sel_ctry $c_ctry_name</td>
-    </tr><tr>
-    <th>$l_email</th>
-    <td><input type=\"text\" name=\"tf_email\" size=\"52\" maxlength=\"128\" value=\"$email\" /></td>
-    </tr><tr>
-    <th>$l_email_other</th>
-    <td><input type=\"text\" name=\"tf_email2\" size=\"52\" maxlength=\"128\" value=\"$email2\" /></td>
-    </tr><tr>
-    <th>$l_mailing_ok</th>
-    <td><input type=\"checkbox\" name=\"cba_mailok\" value=\"1\" $mailok /></td>
-    </tr><tr>
-    <th>$l_newsletter</th>
-    <td><input type=\"checkbox\" name=\"cba_newsletter\" value=\"1\" $newsletter /></td>
-    </tr>
-    </table>
-    </fieldset>
 
     <fieldset class=\"detail extra\">
     <legend>$l_comment1</legend>

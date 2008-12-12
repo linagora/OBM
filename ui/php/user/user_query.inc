@@ -2104,7 +2104,7 @@ function run_query_user_delete_profile($user_id)  {
   $query = "DELETE FROM Entity 
     WHERE entity_id IN (
       SELECT evententity_entity_id FROM EventEntity 
-      LEFT JOIN EventLink ON evententity_event_id = enventlink_event_id
+      LEFT JOIN EventLink ON evententity_event_id = eventlink_event_id
       WHERE evententity_event_id IS NULL)";
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);

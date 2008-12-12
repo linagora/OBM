@@ -75,12 +75,28 @@ function run_query_contact_search($contact) {
   }
   // If a phone number has been specified, get it 
   if ($phone != '') {
-    $where .= " AND phone_number $like '$phone%'";
+    $where .= " AND contact_id IN (SELECT contactentity_contact_id FROM ContactEntity INNER JOIN Phone ON contactentity_entity_id = phone_entity_id WHERE phone_number $like '$phone%')";
   }
   // If an email indication has been specified, get it 
   if ($email != '') {
-    $where .= " AND email_address $like '$email%'";
+    $where .= " AND contact_id IN (SELECT contactentity_contact_id FROM ContactEntity INNER JOIN Email ON contactentity_entity_id = email_entity_id WHERE email_address $like '$email%')";
   }
+  // If a post code has been specified, get it
+  if ($zip != '') {
+    $addr .= " AND address_zipcode $like '$zip%'";
+  }
+  // If a town has been specified, get it 
+  if ($town != '') {
+    $addr .= " AND address_town $like '$town%'";
+  }
+  // If a country has been set
+  if (($ctry != $c_all) && ($ctry != '')) {
+    $addr .= " AND address_country='$ctry'";
+  }
+  if($addr != '') {
+    $where .= " AND contact_id IN (SELECT contactentity_contact_id FROM ContactEntity INNER JOIN Address ON contactentity_entity_id = address_entity_id WHERE 1=1 ".$addr.")";
+  }
+
   // If a company name indication has been specified (without id) get it 
   if (($company != '') && ($company_id == '')) {
     if ($cgp_show['module']['company']) {
@@ -93,18 +109,6 @@ function run_query_contact_search($contact) {
   if ($company_id != '') {
     $company_id = sql_parse_id( $company_id, true);
     $where .= " AND contact_company_id $company_id"; 
-  }
-  // If a post code has been specified, get it
-  if ($zip != '') {
-    $where .= " AND address_zipcode $like '$zip%'";
-  }
-  // If a town has been specified, get it 
-  if ($town != '') {
-    $where .= " AND address_town $like '$town%'";
-  }
-  // If a country has been set
-  if (($ctry != $c_all) && ($ctry != '')) {
-    $where .= " AND address_country='$ctry'";
   }
 
   // If a person in charge has been set
@@ -186,13 +190,13 @@ function run_query_contact_search($contact) {
   $select = "SELECT
     contact_id as id,
     contact_id,
-    address_street,
-    address_zipcode,
-    address_town,
-    address_expresspostal,
-    phone_number,
-    email_address,
-    country_name,
+    'a' as address_street,
+    'a' as address_zipcode,
+    'a' as address_town,
+    'a' as address_expresspostal,
+    'a' as phone_number,
+    'a' as email_address,
+    'a' as country_name,
     contact_usercreate,
     contact_company_id,
     contact_kind_id,
@@ -216,10 +220,6 @@ function run_query_contact_search($contact) {
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
     $join_comp
-    LEFT JOIN Address ON address_entity_id = contactentity_entity_id
-    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='$lang'
-    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id
-    LEFT JOIN Email ON email_entity_id = contactentity_entity_id
 ";
 
   // XXX Really strange Postgres (8.1.5) behaviour here !
@@ -720,9 +720,11 @@ function run_query_contact_coords_update($id, $contact) {
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(phone)');
   $obm_q->query($query);
   if(is_array($phones)) {
+    $cpt = array();
     foreach($phones as $phone) {
       if(trim($phone['number']) != '' ) {
-        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label]')";
+        $cpt[$phone['label']]++;
+        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label]; X-OBM-REF".$cpt[$phone['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(phone)');
         $obm_q->query($query);
       }
@@ -732,9 +734,11 @@ function run_query_contact_coords_update($id, $contact) {
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(address)');
   $obm_q->query($query);  
   if(is_array($addresses)) {
+    $cpt = array();
     foreach($addresses as $address) {
       if(trim($address['street1']) != '' || trim($address['country']) != '' || trim($address['zipcode']) != ''
          || trim($address['expresspostal']) != '') {
+        $cpt[$address['label']]++;
         $query = "INSERT INTO Address (
           address_entity_id,
           address_street1,
@@ -754,7 +758,7 @@ function run_query_contact_coords_update($id, $contact) {
           '$address[town]',
           '$address[expresspostal]',
           '$address[country]',
-          '$address[label]'
+          '$address[label]; X-OBM-REF".$cpt[$address['label']]."'
         )";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(address)');
         $obm_q->query($query);
@@ -766,9 +770,11 @@ function run_query_contact_coords_update($id, $contact) {
   $obm_q->query($query);  
 
   if(is_array($websites)) {
+    $cpt = array();
     foreach($websites as $website) {
       if(trim($website['url']) != '' ) {
-        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label]')";
+        $cpt[$website['label']]++;
+        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label]; X-OBM-REF".$cpt[$website['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(website)');
         $obm_q->query($query);        
       }
@@ -780,6 +786,7 @@ function run_query_contact_coords_update($id, $contact) {
   $obm_q->query($query);  
 
   if(is_array($ims)) {
+    $cpt = array();
     foreach($ims as $im) {
       if(trim($im['address']) != '' ) {
         $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[label]')";
@@ -794,9 +801,11 @@ function run_query_contact_coords_update($id, $contact) {
   $obm_q->query($query);  
 
   if(is_array($emails)) {
+    $cpt = array();
     foreach($emails as $email) {
       if(trim($email['address']) != '' ) {
-        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '$email[address]', '$email[label]')";
+        $cpt[$email['label']]++;
+        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '$email[address]', '$email[label]; X-OBM-REF".$cpt[$email['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(Email)');
         $obm_q->query($query);        
       }
@@ -812,36 +821,77 @@ function run_query_contact_coords_update($id, $contact) {
  * @access public
  * @return void
  */
-function run_query_contact_coords($id) {
+function run_query_contact_coords($id, $update=false) {
   global $cdg_sql;
   $obm_q = new DB_OBM;
   $coords = array();
-  $query = "SELECT * FROM Phone INNER JOIN ContactEntity ON phone_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
-  $obm_q->query($query);        
-  while($obm_q->next_record()) {
-    $coords['phone'][] = array('label' => $obm_q->f('phone_label'), 'number' => $obm_q->f('phone_number'));
+  $query = "SELECT phone_label, phone_number FROM Phone INNER JOIN ContactEntity ON phone_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  if(!$update) {
+    $query .= " UNION 
+      SELECT 'COMPANY' as phone_label, phone_number FROM Phone 
+      INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id 
+      INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      WHERE contact_id = $id";
   }
-  $query = "SELECT * FROM Email INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  $query .= ' ORDER BY phone_label';
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Phone)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
-    $coords['email'][] = array('label' => $obm_q->f('email_label'), 'address' => $obm_q->f('email_address'));
+    $label = current(explode(';',$obm_q->f('phone_label')));
+    $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
+  }
+  $query = "SELECT email_label, email_address FROM Email INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  if(!$update) {
+    $query .= " UNION 
+      SELECT 'COMPANY' as email_label, email_address FROM Email 
+      INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id 
+      INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      WHERE contact_id = $id";
+  }  
+  $query .= ' ORDER BY email_label';
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Email)');
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $label = current(explode(';',$obm_q->f('email_label')));
+    $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
   }
   $query = "SELECT * FROM IM INNER JOIN ContactEntity ON im_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(IM)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
     $coords['im'][] = array('protocol' => $obm_q->f('im_protocol'),'address' => $obm_q->f('im_address'));
   }
-  $query = "SELECT * FROM Website INNER JOIN ContactEntity ON website_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  $query = "SELECT website_label, website_url FROM Website INNER JOIN ContactEntity ON website_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  if(!$update) {
+    $query .= " UNION 
+      SELECT 'COMPANY' as website_label, website_url FROM Website
+      INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id 
+      INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      WHERE contact_id = $id";
+  }  
+  $query .= ' ORDER BY website_label';
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Website)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
-    $coords['website'][] = array('label' => $obm_q->f('website_label'), 'url' => $obm_q->f('website_url'));
+    $label = current(explode(';',$obm_q->f('website_label')));
+    $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
-  $query = "SELECT * FROM Address INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  $query = "SELECT address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country FROM Address INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  if(!$update) {
+    $query .= " UNION 
+      SELECT 'COMPANY' as address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country FROM Address 
+      INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
+      INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      WHERE contact_id = $id";
+  }  
+  $query .= ' ORDER BY address_label';
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Address)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
+    $label = current(explode(';',$obm_q->f('address_label')));
     $coords['address'][] = array(
-      'label' => $obm_q->f('address_label'), 'street' => $obm_q->f('address_street'), 'zipcode' => $obm_q->f('address_zipcode'),
-      'expresspostal' => $obm_q->f('address_expresspostal'), 'country' => $obm_q->f('address_country'));
+      'label' => $label, 'street' => $obm_q->f('address_street'), 'zipcode' => $obm_q->f('address_zipcode'),
+      'expresspostal' => $obm_q->f('address_expresspostal'), 'town' => $obm_q->f('address_town'), 'country' => $obm_q->f('address_country'));
   }
 
   return $coords;
