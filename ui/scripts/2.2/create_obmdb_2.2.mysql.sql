@@ -2015,257 +2015,6 @@ CREATE TABLE `OrganizationalchartEntity` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `P_Domain`
---
-
-DROP TABLE IF EXISTS `P_Domain`;
-CREATE TABLE `P_Domain` (
-  `domain_id` int(8) NOT NULL auto_increment,
-  `domain_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `domain_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `domain_usercreate` int(8) default NULL,
-  `domain_userupdate` int(8) default NULL,
-  `domain_label` varchar(32) NOT NULL,
-  `domain_description` varchar(255) default NULL,
-  `domain_name` varchar(128) default NULL,
-  `domain_alias` text,
-  `domain_global` tinyint(1) default '0',
-  PRIMARY KEY  (`domain_id`),
-  KEY `domain_userupdate_userobm_id_fkey` (`domain_userupdate`),
-  KEY `domain_usercreate_userobm_id_fkey` (`domain_usercreate`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_EntityRight`
---
-
-DROP TABLE IF EXISTS `P_EntityRight`;
-CREATE TABLE `P_EntityRight` (
-  `entityright_entity_id` int(8) NOT NULL,
-  `entityright_consumer_id` int(8) NOT NULL,
-  `entityright_access` int(1) NOT NULL default '0',
-  `entityright_read` int(1) NOT NULL default '0',
-  `entityright_write` int(1) NOT NULL default '0',
-  `entityright_admin` int(1) NOT NULL default '0',
-  PRIMARY KEY  (`entityright_entity_id`,`entityright_consumer_id`),
-  KEY `entityright_consumer_id_entity_id` (`entityright_consumer_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_GroupGroup`
---
-
-DROP TABLE IF EXISTS `P_GroupGroup`;
-CREATE TABLE `P_GroupGroup` (
-  `groupgroup_parent_id` int(8) NOT NULL,
-  `groupgroup_child_id` int(8) NOT NULL,
-  PRIMARY KEY  (`groupgroup_parent_id`,`groupgroup_child_id`),
-  KEY `groupgroup_child_id_group_id_fkey` (`groupgroup_child_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_Host`
---
-
-DROP TABLE IF EXISTS `P_Host`;
-CREATE TABLE `P_Host` (
-  `host_id` int(8) NOT NULL auto_increment,
-  `host_domain_id` int(8) NOT NULL,
-  `host_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `host_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `host_userupdate` int(8) default NULL,
-  `host_usercreate` int(8) default NULL,
-  `host_uid` int(8) default NULL,
-  `host_gid` int(8) default NULL,
-  `host_archive` int(1) default '0' NOT NULL,
-  `host_name` varchar(32) NOT NULL,
-  `host_fqdn` varchar(255),
-  `host_ip` varchar(16) default NULL,
-  `host_delegation` varchar(64) default '',
-  `host_description` varchar(128) default NULL,
-  PRIMARY KEY  (`host_id`),
-  UNIQUE KEY `host_name` (`host_name`),
-  UNIQUE KEY `k_uid_host` (`host_uid`),
-  KEY `host_domain_id_domain_id_fkey` (`host_domain_id`),
-  KEY `host_userupdate_userobm_id_fkey` (`host_userupdate`),
-  KEY `host_usercreate_userobm_id_fkey` (`host_usercreate`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_MailShare`
---
-
-DROP TABLE IF EXISTS `P_MailShare`;
-CREATE TABLE `P_MailShare` (
-  `mailshare_id` int(8) NOT NULL auto_increment,
-  `mailshare_domain_id` int(8) NOT NULL,
-  `mailshare_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `mailshare_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `mailshare_userupdate` int(8) default NULL,
-  `mailshare_usercreate` int(8) default NULL,
-  `mailshare_name` varchar(32) default NULL,
-  `mailshare_archive` int(1) NOT NULL default '0',
-  `mailshare_quota` int(11) NOT NULL default '0',
-  `mailshare_mail_server_id` int(8) default NULL,
-  `mailshare_delegation` varchar(64) default '',
-  `mailshare_description` varchar(255) default NULL,
-  `mailshare_email` text,
-  PRIMARY KEY  (`mailshare_id`),
-  KEY `mailshare_domain_id_domain_id_fkey` (`mailshare_domain_id`),
-  KEY `mailshare_mail_server_id_mailserver_id_fkey` (`mailshare_mail_server_id`),
-  KEY `mailshare_userupdate_userobm_id_fkey` (`mailshare_userupdate`),
-  KEY `mailshare_usercreate_userobm_id_fkey` (`mailshare_usercreate`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_UGroup`
---
-
-DROP TABLE IF EXISTS `P_UGroup`;
-CREATE TABLE `P_UGroup` (
-  `group_id` int(8) NOT NULL auto_increment,
-  `group_domain_id` int(8) NOT NULL,
-  `group_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `group_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `group_userupdate` int(8) default NULL,
-  `group_usercreate` int(8) default NULL,
-  `group_system` int(1) default '0',
-  `group_archive` int(1) default '0' NOT NULL,
-  `group_privacy` int(2) default '0',
-  `group_local` int(1) default '1',
-  `group_ext_id` varchar(24) default NULL,
-  `group_samba` int(1) default '0',
-  `group_gid` int(8) default NULL,
-  `group_delegation` varchar(64) default '',
-  `group_manager_id` int(8) default NULL,
-  `group_name` varchar(255) NOT NULL,
-  `group_desc` varchar(128) default NULL,
-  `group_email` varchar(128) default NULL,
-  `group_contacts` text,
-  PRIMARY KEY  (`group_id`),
-  UNIQUE KEY `group_gid` (`group_gid`),
-  KEY `group_domain_id_domain_id_fkey` (`group_domain_id`),
-  KEY `group_userupdate_userobm_id_fkey` (`group_userupdate`),
-  KEY `group_usercreate_userobm_id_fkey` (`group_usercreate`),
-  KEY `group_manager_id_userobm_id_fkey` (`group_manager_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_UserObm`
---
-
-DROP TABLE IF EXISTS `P_UserObm`;
-CREATE TABLE `P_UserObm` (
-  `userobm_id` int(8) NOT NULL auto_increment,
-  `userobm_domain_id` int(8) default NULL,
-  `userobm_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `userobm_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `userobm_userupdate` int(8) default NULL,
-  `userobm_usercreate` int(8) default NULL,
-  `userobm_local` int(1) default '1',
-  `userobm_ext_id` varchar(16) default NULL,
-  `userobm_system` int(1) default '0',
-  `userobm_archive` int(1) NOT NULL default '0',
-  `userobm_timelastaccess` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `userobm_login` varchar(32) NOT NULL default '',
-  `userobm_nb_login_failed` int(2) default '0',
-  `userobm_password_type` char(6) NOT NULL default 'PLAIN',
-  `userobm_password` varchar(64) NOT NULL default '',
-  `userobm_password_dateexp` date default NULL,
-  `userobm_account_dateexp` date default NULL,
-  `userobm_perms` varchar(254) default NULL,
-  `userobm_delegation_target` varchar(64) default '',
-  `userobm_delegation` varchar(64) default '',
-  `userobm_calendar_version` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `userobm_uid` int(8) default NULL,
-  `userobm_gid` int(8) default NULL,
-  `userobm_datebegin` date default NULL,
-  `userobm_hidden` int(1) default '0',
-  `userobm_kind` varchar(12) default NULL,
-  `userobm_lastname` varchar(64) default '',
-  `userobm_firstname` varchar(64) default '',
-  `userobm_title` varchar(64) default '',
-  `userobm_sound` varchar(64) default NULL,
-  `userobm_company` varchar(64) default NULL,
-  `userobm_direction` varchar(64) default NULL,
-  `userobm_service` varchar(64) default NULL,
-  `userobm_address1` varchar(64) default NULL,
-  `userobm_address2` varchar(64) default NULL,
-  `userobm_address3` varchar(64) default NULL,
-  `userobm_zipcode` varchar(14) default NULL,
-  `userobm_town` varchar(64) default NULL,
-  `userobm_expresspostal` varchar(16) default NULL,
-  `userobm_country_iso3166` char(2) default '0',
-  `userobm_phone` varchar(32) default '',
-  `userobm_phone2` varchar(32) default '',
-  `userobm_mobile` varchar(32) default '',
-  `userobm_fax` varchar(32) default '',
-  `userobm_fax2` varchar(32) default '',
-  `userobm_web_perms` int(1) default '0',
-  `userobm_web_list` text,
-  `userobm_web_all` int(1) default '0',
-  `userobm_mail_perms` int(1) default '0',
-  `userobm_mail_ext_perms` int(1) default '0',
-  `userobm_email` text,
-  `userobm_mail_server_id` int(8) default NULL,
-  `userobm_mail_quota` int(8) default '0',
-  `userobm_mail_quota_use` int(8) default '0',
-  `userobm_mail_login_date` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `userobm_nomade_perms` int(1) default '0',
-  `userobm_nomade_enable` int(1) default '0',
-  `userobm_nomade_local_copy` int(1) default '0',
-  `userobm_nomade_datebegin` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `userobm_nomade_dateend` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `userobm_email_nomade` text default '',
-  `userobm_vacation_enable` int(1) default '0',
-  `userobm_vacation_datebegin` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `userobm_vacation_dateend` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `userobm_vacation_message` text,
-  `userobm_samba_perms` int(1) default '0',
-  `userobm_samba_home` varchar(255) default '',
-  `userobm_samba_home_drive` char(2) default '',
-  `userobm_samba_logon_script` varchar(128) default '',
-  `userobm_host_id` int(8) default NULL,
-  `userobm_description` varchar(255) default NULL,
-  `userobm_location` varchar(255) default NULL,
-  `userobm_education` varchar(255) default NULL,
-  `userobm_photo_id` int(8) default NULL,
-  PRIMARY KEY  (`userobm_id`),
-  KEY `k_login_user` (`userobm_login`),
-  KEY `k_uid_user` (`userobm_uid`),
-  KEY `userobm_domain_id_domain_id_fkey` (`userobm_domain_id`),
-  KEY `userobm_userupdate_userobm_id_fkey` (`userobm_userupdate`),
-  KEY `userobm_usercreate_userobm_id_fkey` (`userobm_usercreate`),
-  KEY `userobm_mail_server_id_mailserver_id_fkey` (`userobm_mail_server_id`),
-  KEY `userobm_host_id_host_id_fkey` (`userobm_host_id`),
-  KEY `userobm_photo_id_document_id_fkey` (`userobm_photo_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_UserObmGroup`
---
-
-DROP TABLE IF EXISTS `P_UserObmGroup`;
-CREATE TABLE `P_UserObmGroup` (
-  `userobmgroup_group_id` int(8) NOT NULL,
-  `userobmgroup_userobm_id` int(8) NOT NULL,
-  PRIMARY KEY  (`userobmgroup_group_id`,`userobmgroup_userobm_id`),
-  KEY `userobmgroup_userobm_id_userobm_id_fkey` (`userobmgroup_userobm_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `P_of_usergroup`
---
-
-DROP TABLE IF EXISTS `P_of_usergroup`;
-CREATE TABLE `P_of_usergroup` (
-  `of_usergroup_group_id` int(8) NOT NULL,
-  `of_usergroup_user_id` int(8) NOT NULL,
-  PRIMARY KEY  (`of_usergroup_group_id`,`of_usergroup_user_id`),
-  KEY `of_usergroup_user_id_userobm_id_fkey` (`of_usergroup_user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
 -- Table structure for table `ParentDeal`
 --
 
@@ -3362,3 +3111,58 @@ CREATE TABLE P_MailboxEntity LIKE MailboxEntity;
 -- MailshareEntity production table
 --
 CREATE TABLE P_MailshareEntity LIKE MailshareEntity;
+
+--
+-- Table structure for table `P_Domain`
+--
+CREATE TABLE P_Domain LIKE Domain;
+
+--
+-- Table structure for table `P_EntityRight`
+--
+CREATE TABLE P_EntityRight LIKE EntityRight;
+
+--
+-- Table structure for table `P_GroupGroup`
+--
+CREATE TABLE P_GroupGroup LIKE GroupGroup;
+
+--
+-- Table structure for table `P_Host`
+--
+CREATE TABLE P_Host LIKE Host;
+
+--
+-- Table structure for table `P_MailShare`
+--
+CREATE TABLE P_MailShare LIKE MailShare;
+
+--
+-- Table structure for table `P_UGroup`
+--
+CREATE TABLE P_UGroup LIKE UGroup;
+
+--
+-- Table structure for table `P_UserObm`
+--
+CREATE TABLE P_UserObm LIKE UserObm;
+
+--
+-- Table structure for table `P_UserObmGroup`
+--
+CREATE TABLE P_UserObmGroup LIKE UserObmGroup;
+
+--
+-- Table structure for table `P_of_usergroup`
+--
+CREATE TABLE P_of_usergroup LIKE of_usergroup;
+
+--
+-- Table structure for table `P_ServiceProperty`
+--
+CREATE TABLE P_Service LIKE Service;
+
+--
+-- Table structure for table `P_DomainEntity`
+--
+CREATE TABLE P_DomainEntity LIKE DomainEntity;
