@@ -334,7 +334,7 @@ public class CalendarManager extends ObmManager {
 		}
 		logger.info("computed dt end: " + dend);
 
-		if (obmevent.getAlert() != -1 && obmevent.getAlert() != 0) {
+		if (obmevent.getAlert() != null && obmevent.getAlert() > 0) {
 			com.funambol.common.pim.calendar.Reminder remind = new com.funambol.common.pim.calendar.Reminder();
 
 			remind.setMinutes(obmevent.getAlert() / 60);
