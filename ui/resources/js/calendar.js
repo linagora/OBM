@@ -1101,7 +1101,7 @@ Obm.CalendarQuickForm = new Class({
       return false;
     }
     while(target.id == '') {
-      if(target.getTag() == origin) {
+      if(target.get('tag') == origin) {
         return false;
       }
       target = $(target.parentNode);

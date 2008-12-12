@@ -1002,9 +1002,9 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   if (is_array($resources_array)) {
     foreach ($resources_array as $res_id) {
       if (OBM_Acl::canWrite($obm['uid'], 'resource', $res_id)) {
-	      run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'ACCEPTED');
+        run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'ACCEPTED');
       } else {
-	      run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'NEEDS-ACTION');
+        run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'NEEDS-ACTION');
       }
     }
   }
@@ -2757,7 +2757,7 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
   $current = clone $date;
   $current->setWeekday($ccalendar_weekstart);
   if ($current->compare($start) < 0) {
-    $diff = - ceil($start->diffTimestamp($current) / Of_Date::DAYDURATION); 
+    $diff = - ceil($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
     if ($diff > 0) {
       $diff = ($diff % ($repeatfrequence * 7));
     }	    
@@ -2765,6 +2765,7 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
   }
   $days = str_split($repeatdays);
   if($start->compare($date) < 0) $start = $date;
+  echo"<pre>";
   while ($current->compare($end) < 0) {
     foreach ($days as $num => $repeat) {	
       if ($repeat == 1) {
@@ -2777,6 +2778,7 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
     } 
     $current->addWeek($repeatfrequence);
   }	
+  echo"</pre>";
 }
 
 

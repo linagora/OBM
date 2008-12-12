@@ -23,7 +23,6 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   $group_view = $calendar['entity']['group_view'];
   $entity_readable = get_calendar_entity_readable();
   $visible_entities_id = slice_calendar_entities($sel_entity_id, $ccalendar_max_users, $entity_readable);
-
   $sel_entity_id = $visible_entities_id;
   // we restore the selected group for session storage
   $sel_entity_id['group_view'] = $group_view;
@@ -317,7 +316,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {filter_entity:'Resource', defaultText:'$resource_text'});";
   }
   $cats1 = of_category_get_ordered('event', 'category1');
-  $sel_cat1 = of_category_html_select('calendar', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
+  $sel_cat1 = of_category_html_select('event', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
 
   $dis_back_myview = "<a href=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a>";
   $dis_go_today = "<a href=\"$path/calendar/calendar_index.php?date=\" >$l_today</a>";
@@ -408,7 +407,7 @@ function html_calendar_bar_date_selector($calendar) {
   $current->subMonth(3)->setWeekday($ccalendar_weekstart);
   $end = clone $current;
   $end->addDay(6);
-   while ($current->compare($date_end) < 0) {
+  while ($current->compare($date_end) < 0) {
     $label = $current->localize(Of_Date::OBM_DATE_WEEK_JUMP).' - '.$end->localize(Of_Date::OBM_DATE_WEEK_JUMP);
     $iso = $current->getURL();
     if ($current->compareWeek($date) == 0) {
@@ -1194,7 +1193,7 @@ $dis_events .= "<div id=\"evt_${date}_$ev_id\" >
 function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entity, $options=array()) {
   global $obm, $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_private;
-  global $l_user, $l_resource, $l_task, $l_private;
+  global $l_user, $l_resource, $l_private;
   global $output_target;
 
   $event = $occurrence->event;
@@ -1676,7 +1675,7 @@ function dis_calendar_planning_view($date, $end, $calendar_entity, $category_fil
 function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $cats_color) {
   global $obm, $path;
   global $l_private, $l_location, $l_all_day;
-  global $l_task, $l_user, $l_resource, $l_private;
+  global $l_user, $l_resource, $l_private;
   global $ico_meeting, $ico_periodic, $ico_private;
 
   $location = '';
@@ -1862,7 +1861,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_alerts, $l_state, $l_user;
   global $l_change_state,$l_groups,$l_all_day,$l_every,$l_owner;
   global $l_repeatkind,$l_repeatdays,$l_date_repeatend, $l_none, $c_none; 
-  global $l_wait, $l_task, $l_exception, $l_yes, $l_no, $path;
+  global $l_wait, $l_exception, $l_yes, $l_no, $path;
   global $l_carac,$l_module_calendar, $l_items, $ccalendar_alerts;
   global $l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
   global $l_A, $l_R, $l_W;
@@ -1875,7 +1874,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
     $title = $event_q->f('event_title');
     $location = $event_q->f('event_location');
-    $cats1 = of_category_get_entitycategories('calendar', 'category1', $id, 'mono');
+    $cats1 = of_category_get_entitycategories('event', 'category1', $id, 'mono');
     $owner = $event_q->f('event_owner');
     $owner_lastname = $event_q->f('owner_lastname');
     $owner_firstname = $event_q->f('owner_firstname');
@@ -1889,7 +1888,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       $item = '';
     }
 
-    $block_category1 = of_category_dis_block_consult('calendar', 'category1', $cats1, 'mono');
+    $block_category1 = of_category_dis_block_consult('event', 'category1', $cats1, 'mono');
     switch ($priority ) {
       case 1 :
         $priority = $l_low;
@@ -1900,28 +1899,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       case 3 :
         $priority = $l_high;
         break;
-    }
-    if ($cgp_show['module']['project']) {
-      $tasks = $entities['task'];
-      if (is_array($tasks['entity'])) {
-	foreach ($tasks['entity'] as $u_id => $entity) {
-	  $label = $entity['label'];
-	  $state = $entity['state'];
-	  $dis_task_list .= "<tr><td>$label</td></tr>";
-	}
-	$dis_task_block = "
-        <div class=\"detail infos\">
-        <h1>$l_task</h1>
-        <table  class=\"spreadSheet\">
-        <thead>
-        <tr>
-        <td>$l_title</td>
-        </tr>
-        </thead>      
-        $dis_task_list
-        </table>
-        </div>"; 
-      }
     }
     $display['title'] = $title;
   } else {
@@ -2177,7 +2154,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   <p class=\"LC\" />
   $dis_resource_block
   $dis_item_list
-  $dis_task_block
 
    <div class=\"detail extra\">
    <h1>$l_desc</h1>
@@ -2204,7 +2180,6 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   if (($action == 'detailupdate') || ($action == 'duplicate')) {
     $users = $entities['user'];
     $resources = $entities['resource'];
-    $tasks = $entities['task'];
     $exception_q = run_query_get_one_event_exception($calendar['calendar_id']);
     $alerts = get_one_event_user_alert($calendar['calendar_id'], $obm['uid']);
   } else {
@@ -2232,7 +2207,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   );
   $possible_owners = $possible_owners['entity'];
   $cats1 = of_category_get_ordered('event', 'category1');
-  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $resources, $groups,$tasks, $cats1, $alerts);
+  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $resources, $groups, $cats1, $alerts);
 
   return $block;
 }
@@ -2324,7 +2299,7 @@ function dis_calendar_quick_form($calendar) {
 //   - $groups       : Array : selected groups [ids] [entity]
 //   - $cats1        : Array : Calendar categories1
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $res, $groups,$tasks, $cats1, $alerts) {
+function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $res, $groups, $cats1, $alerts) {
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ccalendar_hour_fraction;
   global $ico_mini_cal, $ico_add,$ico_delete, $ico_project, $l_header_new;
@@ -2335,7 +2310,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_owner;
   global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
-  global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups,$l_task;
+  global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time, $l_color ;
@@ -2370,8 +2345,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     if ($repeat_kind != 'none') {
       $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
     }
-    $t_id = $tasks['ids'][0];
-    $t_name = $tasks['entity'][$t_id]['label'];
     $id = $event_q->f('event_id');
 
     while($exception_q->next_record()) {
@@ -2423,10 +2396,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $repeatDisplay = 'none';
     $frequency_block = "<input type=\"text\" size=\"4\" style=\"width:3em;\" id=\"tf_repeatfrequency\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />";
   }
-  if (isset($calendar['task_id'])) { $t_id = $calendar['task_id']; }
-  if (isset($calendar['task_name'])) { $t_name = stripslashes($calendar['task_name']); }
-  if (isset($calendar['task_new_id'])) { $t_new_id = $calendar['task_new_id']; }
-  if (isset($calendar['task_new_name'])) { $t_new_name = stripslashes($calendar['task_new_name']); }
   if (isset($calendar['date_exception'])) { $date_exception = $calendar['date_exception']; }
   if (isset($calendar['list-item'])) { $t_list_item = $calendar['list-item']; }
   if (isset($calendar['list-item-id'])) { $t_list_item_id = $calendar['list-item-id']; }
@@ -2483,7 +2452,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </select>";
 
   // eventcategory select
-  $block_category1 = of_category_dis_entity_form('calendar', 'category1', $cats1, 'mono', $cat1);
+  $block_category1 = of_category_dis_entity_form('event', 'category1', $cats1, 'mono', $cat1);
 
  // Repetition days
   $week = new Of_Date($ccalendar_weekstart);
@@ -2704,41 +2673,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </fieldset>";
   }
 
-  if ($cgp_show['module']['project']) {
-    $block_task = "
-    <fieldset class=\"detail infos\">
-    <legend>$l_task</legend>    
-    <table>      
-    <th>$l_task     
-    <a href=\"\" onclick=\"url = get_selected_users_url();popup('$path/project/project_index.php?action=ext_get_task_id&amp;popup=1&amp;ext_widget=f_entity.task_new_id&amp;ext_widget_text=f_entity.task_new_name'+url,'Project'); return false;\">
-    <img src=\"$ico_project\" alt=\"[Add]\" /></a>
-    </th>
-    <td>
-    <script type=\"text/javascript\">
-    function get_selected_users_url() {
-      var uri = '';
-      users = document.getElementById('sel_user_id').childNodes;
-      for(i=0; i<users.length;i++) {
-        if(users[i].nodeName == \"DIV\") {
-          uri += '&user_ids[]=' + users[i].id.substr(22);
-        }
-      }
-      if(uri == '') 
-        uri = '&user_ids[]=".$obm['uid']."';
-      return uri;
-    }
-    </script>
-      $t_name
-      <input type=\"hidden\" name=\"task_id\" value=\"$t_id\" />
-      <input type=\"hidden\" name=\"task_name\" value=\"$t_name\" />
-      <input type=\"hidden\" name=\"task_new_id\" value=\"$t_new_id\" />
-      <input type=\"text\" size=\"32\" name=\"task_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
-      </td>
-      </tr>
-      </table>
-      </fieldset>";
-  }
-
   if ($force == 1) {
     $dis_force = "<input type=\"checkbox\" id=\"cba_force\" value=\"1\" checked=\"checked\" name=\"cba_force\" />";
   } else {
@@ -2820,7 +2754,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"post\" name=\"f_entity\"
-   onsubmit=\"if(this.tf_title.value == '')this.tf_title.value = this.task_new_name.value; if (check_calendar_calendar(this)) return true; else return false;\"
+   onsubmit=\"if (check_calendar_calendar(this)) return true; else return false;\"
    action=\"calendar_index.php\">
   <fieldset class=\"detail infos\">  
   <legend>$l_module_calendar</legend>
@@ -2919,7 +2853,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <p class=\"LC\" />
   $block_resource
   $block_group
-  $block_task
   <fieldset class=\"detail infos\">
   <legend>$l_alerts</legend>
   <table>    
@@ -3703,7 +3636,7 @@ function json_error_msg($msg) {
 function json_event_data($id,$calendar) {
   global $obm, $display,$ccalendar_first_hour,$ccalendar_last_hour;
   global $ccalendar_max_users, $cal_entity_id;
-  global $l_user, $l_resource, $l_task;
+  global $l_user, $l_resource;
 
   $context = $calendar['context'];
   $element_id = $calendar['element_id'];
@@ -4456,7 +4389,7 @@ Class CalendarPdf{
 
     // Category
     if (!empty($this->calendar["category_filter"])){
-      $category = of_category_get_label("calendar", "category1", $this->calendar["category_filter"]);
+      $category = of_category_get_label("event", "category1", $this->calendar["category_filter"]);
     } else {
       $category = $l_all_f; 
     }

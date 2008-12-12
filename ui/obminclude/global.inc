@@ -911,15 +911,18 @@ function of_date_upd_format($date='', $null_empty=false) {
   switch ($type) {
   case 'Y-m-d' :
     preg_match("/^(\d{4})[-\/](\d{2})[-\/](\d{2})/",$date, $d);
-    $date = date($_SESSION['set_date_upd'],mktime(0,0,0,$d[2],$d[3],$d[1]));
+    $date = new Of_Date("$d[1]-$d[2]-$d[3]");
+    $date = $date->getTimestamp();
     break;
   case 'd/m/Y' :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
-    $date = date($_SESSION['set_date_upd'],mktime(0,0,0,$d[2],$d[1],$d[3]));
+    $date = new Of_Date("$d[3]-$d[2]-$d[1]");
+    $date = $date->getTimestamp();
     break;
   case 'm/d/Y' :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
-    $date = date($_SESSION['set_date_upd'],mktime(0,0,0,$d[1],$d[2],$d[3]));        
+    $date = new Of_Date("$d[3]-$d[1]-$d[2]");
+    $date = $date->getTimestamp();
     break;
   case 't' :
     $date = date($_SESSION['set_date_upd'], $date);
@@ -987,15 +990,18 @@ function of_isodate_convert($date, $null_empty=false) {
   switch ($type) {
   case 'Y-m-d' :
     preg_match("/^(\d{4})[-\/](\d{2})[-\/](\d{2})/",$date, $d);
-    $date = date($c_php_isodate_format,mktime(0,0,0,$d[2],$d[3],$d[1]));    
+    $date = new Of_Date("$d[1]-$d[2]-$d[3]");
+    $date = $date->getTimestamp();
     break;    
   case 'd/m/Y' :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
-    $date = date($c_php_isodate_format,mktime(0,0,0,$d[2],$d[1],$d[3]));
+    $date = new Of_Date("$d[3]-$d[2]-$d[1]");
+    $date = $date->getTimestamp();
     break;
   case 'm/d/Y' :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
-    $date = date($c_php_isodate_format,mktime(0,0,0,$d[1],$d[2],$d[3]));        
+    $date = new Of_Date("$d[3]-$d[1]-$d[2]");
+    $date = $date->getTimestamp();
     break;
   case 't' :
     $date = date($c_php_isodate_format, $date);

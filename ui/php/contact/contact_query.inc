@@ -58,11 +58,6 @@ function run_query_contact_search($contact) {
   if ($cgp_show['module']['company']) {
 
     $join_comp = 'LEFT JOIN Company ON contact_company_id=company_id LEFT JOIN CompanyEntity ON companyentity_company_id = company_id';
-    $join_entity = 'OR entity_id = companyentity_entity_id';
-    $join_ctry2 = "LEFT JOIN Country as ctry2 ON
-      Company.company_country_iso3166 = ctry2.country_iso3166
-      AND ctry2.country_lang='$lang'";
-
     $company_fields = "company_name,
       company_aka,";
 
@@ -221,7 +216,6 @@ function run_query_contact_search($contact) {
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
     $join_comp
-    INNER JOIN Entity ON entity_id = contactentity_entity_id $join_entity
     LEFT JOIN Address ON address_entity_id = contactentity_entity_id
     LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='$lang'
     LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id

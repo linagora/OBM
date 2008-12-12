@@ -1302,7 +1302,9 @@ class Of_Date extends DateTime {
       $week = (isset($data['week']) && $data['week'] !== FALSE)?$data['week']:$this->format(self::WEEK);
       $weekday = (isset($data['weekday']) && $data['weekday'] !== FALSE)?$data['weekday']:$this->format(self::WEEKDAY_DIGIT);
       $weekday = ($weekday == 0)?7:$weekday;
-      $this->setISODate($this->format('Y'),$week, $weekday);
+      $year = $this->format('Y');
+      if($week == 1 && $this->format('m') == '12') $year ++;
+      $this->setISODate($year, $week, $weekday);
     }  
     return $this;
   }
