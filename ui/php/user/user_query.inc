@@ -2545,7 +2545,7 @@ function has_mail_server_auto () {
   
   {
     $obm_q = new DB_OBM();
-    $query = "SELECT domain_mail_server_auto FROM Domain WHERE domain_id = $obm[domain_id]";
+    $query = "SELECT serviceproperty_value as domain_mail_server_auto FROM ServiceProperty INNER JOIN DomainEntity ON serviceproperty_entity_id = domainentity_entity_id WHERE domainentity_domain_id = $obm[domain_id]";
     display_debug_msg($query, $cdg_sql, 'has_mail_server_auto()');
     $obm_q->query($query);
     
@@ -2575,7 +2575,7 @@ function get_user_params_mail_server_id ($params) {
     unset($params['mail_server_id']);
     
     $obm_q = new DB_OBM();
-    $query = "SELECT domain_mail_server_auto FROM Domain WHERE domain_id = $domain_id";
+    $query = "SELECT serviceproperty_value as domain_mail_server_auto FROM ServiceProperty INNER JOIN DomainEntity ON  serviceproperty_entity_id = domainentity_entity_id WHERE domainentity_domain_id = $domain_id";
     display_debug_msg($query, $cdg_sql, 'get_user_params_mail_server_id()');
     $obm_q->query($query);
     
