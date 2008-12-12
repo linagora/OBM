@@ -12,7 +12,7 @@
 #####################################################################
 
 use strict;
-require OBM::toolBox;
+#require OBM::toolBox;
 require OBM::Tools::obmDbHandler;
 require OBM::Update::updatePassword;
 use OBM::Parameters::common;

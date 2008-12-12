@@ -6,7 +6,7 @@
 #####################################################################
 
 use strict;
-require OBM::toolBox;
+#require OBM::toolBox;
 require OBM::Tools::obmDbHandler;
 require OBM::Update::updateCyrusAcl;
 use OBM::Parameters::common;
