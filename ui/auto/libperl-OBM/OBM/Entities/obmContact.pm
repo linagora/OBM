@@ -10,7 +10,7 @@ use strict;
 
 use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
+#use OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::Tools::obmDbHandler;
 use URI::Escape;

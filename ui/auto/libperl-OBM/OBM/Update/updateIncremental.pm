@@ -9,15 +9,15 @@ require Exporter;
 use strict;
 
 
-require OBM::toolBox;
-require OBM::imapd;
+#require OBM::toolBox;
+#require OBM::imapd;
 require OBM::Ldap::ldapEngine;
 require OBM::Cyrus::cyrusEngine;
 require OBM::Cyrus::sieveEngine;
 require OBM::Cyrus::cyrusRemoteEngine;
-require OBM::Entities::obmRoot;
-require OBM::Entities::obmDomainRoot;
-require OBM::Entities::obmNode;
+#require OBM::Entities::obmRoot;
+#require OBM::Entities::obmDomainRoot;
+#require OBM::Entities::obmNode;
 require OBM::Entities::obmSystemUser;
 require OBM::Entities::obmUser;
 require OBM::Entities::obmHost;
@@ -29,7 +29,7 @@ require OBM::Update::utils;
 require OBM::Tools::obmDbHandler;
 use OBM::Update::commonGlobalIncremental qw(_updateState _doRemoteConf _runEngines _doUser _doGroup _doMailShare _doHost _deleteDbEntity _tableNamePrefix);
 use OBM::Parameters::common;
-use OBM::Parameters::ldapConf;
+#use OBM::Parameters::ldapConf;
 
 
 sub new {

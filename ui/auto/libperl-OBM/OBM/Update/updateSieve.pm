@@ -9,8 +9,8 @@ require Exporter;
 use strict;
 
 
-require OBM::toolBox;
-require OBM::imapd;
+#require OBM::toolBox;
+#require OBM::imapd;
 require OBM::Update::utils;
 require OBM::Cyrus::sieveEngine;
 require OBM::Entities::obmUser;

@@ -8,8 +8,8 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-require OBM::toolBox;
-require OBM::imapd;
+#require OBM::toolBox;
+#require OBM::imapd;
 require OBM::Update::utils;
 require OBM::Cyrus::cyrusEngine;
 

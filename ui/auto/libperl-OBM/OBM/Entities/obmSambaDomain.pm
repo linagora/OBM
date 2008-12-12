@@ -22,7 +22,7 @@ use OBM::Entities::commonEntities qw(
             );
 use OBM::Tools::commonMethods qw(_log dump);
 use OBM::Parameters::common;
-require OBM::Parameters::ldapConf;
+#require OBM::Parameters::ldapConf;
 require OBM::Ldap::utils;
 require OBM::Tools::obmDbHandler;
 use URI::Escape;
