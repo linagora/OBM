@@ -94,6 +94,12 @@ option[disabled="disabled"] {
   color: #fff;
 }
 
+/*use for default_view in calendar*/
+option[default="default"] {
+  background-color: #E0E1E3;
+  color: #368397;
+}
+
 h1 {
   text-align: center;
   font-size: 130%;
