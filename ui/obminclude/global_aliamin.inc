@@ -113,7 +113,7 @@ function get_hostname_by_id($id) {
 function get_samba_info() {
   global $cdg_sql;
 
-  $query = "SELECT * FROM ServiceProperty where servicepropery_service = 'samba'";
+  $query = "SELECT * FROM ServiceProperty where serviceproperty_service = 'samba'";
 
   display_debug_msg($query, $cdg_sql, 'get_samba_info()');
   $obm_q = new DB_OBM;
