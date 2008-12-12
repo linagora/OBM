@@ -1285,6 +1285,7 @@ Obm.TabbedPane = new Class({
 Obm.CalendarView = new Class({
   initialize: function(el) {
     this.view_id = $('view_id');
+    this.default_view_id = $('default_view_id');
   },
 
   insert: function(label) {
@@ -1369,6 +1370,83 @@ Obm.CalendarView = new Class({
       }
     } else {
       alert(obm.vars.labels.no_sel_view);
+    }
+  },
+
+  default_view: function() {
+    var action = "";
+    var confirm_message = "";
+    var id = this.view_id.value;
+    var default_id = this.default_view_id.value;
+
+    if (id != "") {
+      if(id != default_id) {
+        action = 'insert_default_view';
+        confirm_message = obm.vars.labels.insert_default_view;
+      } else {
+        action = 'delete_default_view';
+        confirm_message = obm.vars.labels.delete_default_view;
+      }
+    } else {
+      var message_error = obm.vars.labels.no_sel_default_view;
+      if(default_id != ""){
+        action = 'delete_default_view';
+        confirm_message = obm.vars.labels.delete_default_view;
+      } else {
+        message_error = obm.vars.labels.no_default_view;
+      }
+    }
+
+    if(action != ""){
+      if (confirm(confirm_message)) {
+        new Request.JSON({
+          url :'calendar_index.php',
+          secure : false,
+          onComplete : 
+            function(response){
+              try {
+                var resp = eval(response);
+              } catch (e) {
+                resp = new Object();
+                resp.error = 1;
+                resp.message = obm.vars.labels.fatalServerErr;
+              }
+              if(response.error == 0) {
+                showOkMessage(response.message);
+                
+                if (action == 'insert_default_view') {
+                  $('default').set('html', obm.vars.labels.delete_default_view);
+                  $('default_view_id').value = id;
+                  
+                  //change visual for default view
+                  $('opt_'+id).set('default','default');
+                  $('my_view').set('href','calendar_index.php?views_id='+id);
+                  if(default_id != "") {
+                    $('opt_'+default_id).erase("default");
+                  }
+
+                } else { //delete default view
+                  
+                  $('default').set('html', obm.vars.labels.insert_default_view);
+                  $('default_view_id').value = "";
+                  $('my_view').set('href','calendar_index.php?views_id=');
+                  $('opt_'+default_id).erase("default");
+                  
+                  //hidde option for default view
+                  if($('view_id').value == "") {
+                    $('default').set('styles',{'display':'none'});
+                  }
+
+                }
+              } else {
+                showErrorMessage(response.message);
+              }
+            }
+          }
+        ).post({ajax: 1,action: action, view_id: this.view_id.value});
+      }
+    } else {
+      alert(message_error);
     }
   },
 
