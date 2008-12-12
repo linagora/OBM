@@ -736,14 +736,12 @@ function run_query_contact_coords_update($id, $contact) {
   if(is_array($addresses)) {
     $cpt = array();
     foreach($addresses as $address) {
-      if(trim($address['street1']) != '' || trim($address['country']) != '' || trim($address['zipcode']) != ''
+      if(trim($address['street']) != '' || trim($address['country']) != '' || trim($address['zipcode']) != ''
          || trim($address['expresspostal']) != '') {
         $cpt[$address['label']]++;
         $query = "INSERT INTO Address (
           address_entity_id,
-          address_street1,
-          address_street2,
-          address_street3,
+          address_street,
           address_zipcode,
           address_town,
           address_expresspostal,
@@ -751,9 +749,7 @@ function run_query_contact_coords_update($id, $contact) {
           address_label
         ) VALUES (
           $id, 
-          '$address[street1]',
-          '$address[street2]',
-          '$address[street3]',
+          '$address[street]',
           '$address[zipcode]',
           '$address[town]',
           '$address[expresspostal]',
@@ -876,22 +872,32 @@ function run_query_contact_coords($id, $update=false) {
     $label = current(explode(';',$obm_q->f('website_label')));
     $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
-  $query = "SELECT address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country FROM Address INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+  $lang = get_lang();
+  $query = "SELECT 
+    address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name
+    FROM Address INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id 
+    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' WHERE contactentity_contact_id = $id";
   if(!$update) {
     $query .= " UNION 
-      SELECT 'COMPANY' as address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country FROM Address 
+      SELECT 'COMPANY' as address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name 
+      FROM Address 
       INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
       INNER JOIN Contact ON contact_company_id = companyentity_company_id
-      WHERE contact_id = $id";
+      LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' WHERE contact_id = $id";
   }  
   $query .= ' ORDER BY address_label';
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Address)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
     $label = current(explode(';',$obm_q->f('address_label')));
+    if($update) {
+      $country =  $obm_q->f('address_country');
+    } else {
+      $country = $obm_q->f('country_name');
+    }
     $coords['address'][] = array(
       'label' => $label, 'street' => $obm_q->f('address_street'), 'zipcode' => $obm_q->f('address_zipcode'),
-      'expresspostal' => $obm_q->f('address_expresspostal'), 'town' => $obm_q->f('address_town'), 'country' => $obm_q->f('address_country'));
+      'expresspostal' => $obm_q->f('address_expresspostal'), 'town' => $obm_q->f('address_town'), 'country' => $country);
   }
 
   return $coords;

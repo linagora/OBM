@@ -1524,6 +1524,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       if(trim($phone['number'])) {
         $params = array();
         foreach($phone as $field  => $value) {
+          $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
         $js .=  "new Obm.PhoneWidget({".implode(',',$params)."});\n";
@@ -1537,6 +1538,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       if(trim($address['street']) || trim($address['town']) || trim($address['country']) || trim($address['expresspostal']) || trim ($address['zipcode'])) {
         $params = array();
         foreach($address as $field  => $value) {
+          $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
         $js .=  "new Obm.AddressWidget({".implode(',',$params)."});\n";
@@ -1550,6 +1552,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       if(trim($email['address'])) {
         $params = array();
         foreach($email as $field  => $value) {
+          $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
         $js .=  "new Obm.EmailWidget({".implode(',',$params)."});\n";
@@ -1563,6 +1566,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       if(trim($website['url'])) {
         $params = array();
         foreach($website as $field  => $value) {
+          $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
         $js .=  "new Obm.WebsiteWidget({".implode(',',$params)."});\n";
@@ -1576,6 +1580,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       if(trim($im['address'])) {
         $params = array();
         foreach($im as $field  => $value) {
+          $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
         $js .=  "new Obm.IMWidget({".implode(',',$params)."});\n";
