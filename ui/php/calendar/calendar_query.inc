@@ -2860,6 +2860,105 @@ function calendar_yearly_repeatition($date,$start,$end,$repeatfrequence,$event,$
   }  
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Insert default views
+// Parameters:
+//      - $id : current view
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_insert_default_view($id){
+  global $cdg_sql, $obm;
+
+  $id_view = $id;
+  $user_id = sql_parse_id($obm['uid']);
+  $obm_q = new DB_OBM;
+
+  $query = "INSERT INTO UserObmPref (
+      userobmpref_user_id, 
+      userobmpref_option, 
+      userobmpref_value 
+    ) VALUES (
+      $user_id,
+      'set_cal_default_view',
+      $id_view
+    )";
+
+  $obm_q->query($query);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Update default views
+// Parameters:
+//      - $id : current view
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_update_default_view($id){
+  global $cdg_sql, $obm;
+
+  $id_view = $id;
+  $user_id = sql_parse_id($obm['uid']);
+  $obm_q = new DB_OBM;
+
+  $query = "UPDATE UserObmPref 
+    SET userobmpref_value=$id_view
+    WHERE userobmpref_user_id=$user_id
+    AND userobmpref_option='set_cal_default_view' 
+    ";
+
+  $obm_q->query($query);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Delete default views
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_delete_default_view(){
+  global $cdg_sql, $obm;
+
+  $user_id = sql_parse_id($obm['uid']);
+  $obm_q = new DB_OBM;
+
+  $query = "DELETE FROM UserObmPref
+    WHERE userobmpref_user_id=$user_id
+    AND userobmpref_option='set_cal_default_view' 
+    ";
+
+  $obm_q->query($query);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Return Tab Bookmark parameters
+// Parameters:
+//      - $id : OBM bookmark_id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_get_BookmarkProperty_view($id){
+  global $cdg_sql, $obm;
+
+  $id_view = $id;
+  $default_view_property=array();
+  $obm_q = new DB_OBM;
+
+  $query = "SELECT * FROM ObmBookmarkProperty
+    WHERE obmbookmarkproperty_bookmark_id='$id_view'";
+
+  display_debug_msg($query, $cdg_sql, "run_query_calendar_get_BookmarkProperty_view())");
+  $obm_q->query($query);
+
+  while($obm_q->next_record()) {
+    $property = $obm_q->f("obmbookmarkproperty_property");
+    $value = $obm_q->f("obmbookmarkproperty_value");
+    switch($property) {
+      case "users":
+      case "resources":
+        $return[$property] = explode(',', $value);
+        break;
+      default:
+        $return[$property]=$value;
+        break; 
+    }
+  }
+
+  $return['view_id']=$id;
+
+  return $return;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return my views

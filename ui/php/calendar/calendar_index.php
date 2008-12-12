@@ -30,6 +30,7 @@ $params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 require_once("$obminclude/lib/Zend/Pdf.php");
+require('calendar_query.inc');
 
 $params = get_calendar_params();
 // Get user preferences if set for hour display range 
@@ -48,17 +49,27 @@ if (isset($_SESSION['cal_category_filter'])){
 if (isset($params['cal_view'])) {
   $cal_view = $params['cal_view'];
 } elseif (isset($_SESSION['cal_view'])){
-  $cal_view = $_SESSION['cal_view'];
+    $cal_view = $_SESSION['cal_view'];
 } else {
-  $cal_view = 'agenda';
+    $cal_view = 'agenda';
 }
 if (isset($params['cal_range'])) {
-  $cal_range = $params['cal_range'];
+    $cal_range = $params['cal_range'];
 } elseif (isset($_SESSION['cal_range'])){
-  $cal_range = $_SESSION['cal_range'];
+    $cal_range = $_SESSION['cal_range'];
+} else if(isset($_SESSION['set_cal_default_view'])) {
+    $view_properties = run_query_calendar_get_BookmarkProperty_view($_SESSION['set_cal_default_view']);
+    $cal_view = $view_properties['cal_view'];
+    $cal_range = $view_properties['cal_range'];
+    $params['new_group'] = 1;
+    $params['group_view'] = $view_properties['group'];
+    $cal_entity_id['user'] = $view_properties['users'];
+    $cal_entity_id['resource'] = $view_properties['resources'];
+    $cal_category_filter = $view_properties['category'];
 } else {
   $cal_range = 'week';
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
 $extra_css[] = $css_calendar;
@@ -67,7 +78,6 @@ $extra_js_include[] = 'date.js';
 $extra_js_include[] = 'calendar.js';
 $extra_js_include[] = 'colorpicker.js';
 
-require('calendar_query.inc');
 require('calendar_display.inc');
 require_once('calendar_js.inc');
 require("$obminclude/of/of_right.inc");
@@ -527,6 +537,11 @@ if ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_calendar_pdf_options($params, $cal_range, $cal_view);
 
+} elseif ($action == 'pdf_export_form') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_calendar_pdf_options($params, $cal_range, $cal_view);
+
+
 } elseif ($action == 'pdf_export') {
 ///////////////////////////////////////////////////////////////////////////////
   $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
@@ -562,7 +577,31 @@ if (!$params['ajax']) {
   echo "({".$display['json'].",$msg})";
   exit();
 
-} 
+} elseif ($action == 'insert_default_view') {
+///////////////////////////////////////////////////////////////////////////////
+  if ($_SESSION['set_cal_default_view']) {
+    $obm_default_view = run_query_calendar_update_default_view($params['view_id']);
+  } else {
+    $obm_default_view = run_query_calendar_insert_default_view($params['view_id']);
+  }
+  $_SESSION['set_cal_default_view'] = $params['view_id'];
+  json_ok_msg("$l_view_default : $l_insert_ok");
+  echo "({".$display['json'].",$msg})";
+  exit();
+
+} elseif ($action == 'delete_default_view') {
+///////////////////////////////////////////////////////////////////////////////
+  if ($_SESSION['set_cal_default_view']) {
+    run_query_calendar_delete_default_view();
+    $_SESSION['set_cal_default_view'] = NULL;
+    json_ok_msg("$l_view_default : $l_delete_ok");
+  } else {
+    json_error_msg("$l_view_default : $l_delete_error");
+  }
+  echo "({".$display['json'].",$msg})";
+  exit();
+
+}
 display_page($display);
 
 
@@ -979,7 +1018,18 @@ $actions['calendar']['delete_view'] = array (
   'Right'    => $cright_read,
   'Condition'=> array ('None')
                                   	  );
-
+// Insert default view
+$actions['calendar']['insert_default_view'] = array (
+  'Url'      => "$path/calendar/calendar_index.php?action=insert_default_view",
+  'Right'    => $cright_read,
+  'Condition'=> array ('None')
+                                  	  );
+// Delete default view
+$actions['calendar']['delete_default_view'] = array (
+  'Url'      => "$path/calendar/calendar_index.php?action=delete_default_view",
+  'Right'    => $cright_read,
+  'Condition'=> array ('None')
+                                  	  );
 // PDF export options form
 $actions['calendar']['pdf_export_form'] = array (
   'Url'      => "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=$date&output_target=print",

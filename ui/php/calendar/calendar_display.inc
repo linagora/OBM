@@ -317,8 +317,12 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   }
   $cats1 = of_category_get_ordered('event', 'category1');
   $sel_cat1 = of_category_html_select('event', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
-
-  $dis_back_myview = "<a href=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a>";
+  if(isset($_SESSION['set_cal_default_view'])) {
+    $default_view_url_params = run_query_calendar_get_bookmark_property($_SESSION['set_cal_default_view']);
+    $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?$default_view_url_params\">$l_back_mono</a>";
+  } else {
+    $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a>";
+  }
   $dis_go_today = "<a href=\"$path/calendar/calendar_index.php?date=\" >$l_today</a>";
   
   $block = "
@@ -519,31 +523,49 @@ function html_calendar_bar_date_selector($calendar) {
 */
 function html_calendar_view_selector($calendar, $my_views) {
   global $obm;
-  global $l_views, $l_view_label, $l_select, $l_select_view; 
+  global $l_views, $l_view_label, $l_select, $l_select_view, $l_label_default, $l_delete_default_view, $l_insert_default_view; 
   global $l_view_save, $l_view_delete, $l_validate, $l_fill_view_label;
-  global $l_confirm_delete_view, $l_no_sel_view, $l_conflict_view_label;
+  global $l_confirm_delete_view, $l_no_sel_view, $l_conflict_view_label, $l_confirm_default_view, $l_no_sel_default_view;
   global $ico_delete, $ico_add, $ico_popup_close;
 
   $view_id = $calendar['view_id'];
   $iso = $calendar['date']->getURL();
-
+  $default_view_id=$_SESSION['set_cal_default_view'];
+  $display = 'none';
+  if(isset($default_view_id)){
+    $default_view=$l_delete_default_view;
+    $display='inline';
+  } 
   while($my_views->next_record()) {
     $id =  $my_views->f('obmbookmark_id');
     $label =  $my_views->f('obmbookmark_label');
     if ($id == $view_id) {
       $selected = "selected=\"selected\"";
+      if($id != $default_view_id) {
+        $default_view=$l_insert_default_view;
+        $display='inline';
+      }
     } else {
       $selected = '';
     }
+    if ($id == $default_view_id) {
+      $style_default="default=\"default\"";
+    } else {
+      $style_default="";
+    }
     $obmbookmarkproperty = run_query_calendar_get_bookmark_property($id);
-    $sel_view .= "<option id=\"opt_$id\" value=\"calendar_index.php?$obmbookmarkproperty\" $selected>$label</option>";
+    $sel_view .= "<option id=\"opt_$id\" value=\"calendar_index.php?$obmbookmarkproperty\" $style_default $selected>$label</option>";
   }
 
   // Javascript Strings
   $l_js_confirm_delete_view = phpStringToJsString($l_confirm_delete_view);
+  $l_js_delete_default_view = phpStringToJsString($l_delete_default_view);
+  $l_js_insert_default_view = phpStringToJsString($l_insert_default_view);
   $l_js_no_sel_view = phpStringToJsString($l_no_sel_view);
+  $l_js_no_sel_default_view = phpStringToJsString($l_no_sel_default_view);
   $l_js_conflict_view_label = phpStringToJsString($l_conflict_view_label);
   $l_js_view_save = phpStringToJsString($l_view_save);
+  $l_js_confirm_default_view = phpStringToJsString($l_confirm_default_view);
 
   $block = "
   <div class=\"portlet\" id=\"calendarSelView\">
@@ -558,22 +580,27 @@ function html_calendar_view_selector($calendar, $my_views) {
         $sel_view
       </select>
       <input type=\"hidden\" id=\"view_id\" name=\"view_id\" value=\"$view_id\" />
+      <input type=\"hidden\" id=\"default_view_id\" name=\"default_view_id\" value=\"$default_view_id\" />
       <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.remove();return false;\">
         <img src=\"$ico_delete\" alt=\"[$l_view_delete]\"/>
       </a>
       <a href=\"javascript:void(0);\" onclick=\"obm.calendarView.show();return false;\">
         <img src=\"$ico_add\" alt=\"[$l_view_save]\"/>
       </a>
+      <a href=\"javascript:void(0);\" id=\"default\" name=\"default\" onclick=\"obm.calendarView.default_view();return false;\" style=\"display: $display;\">$default_view</a>
     </form>
 
     </div>
   </div>
   <script type=\"text/javascript\">
     obm.vars.labels.delete_view = '$l_js_confirm_delete_view';
+    obm.vars.labels.delete_default_view = '$l_js_delete_default_view';
+    obm.vars.labels.insert_default_view = '$l_js_insert_default_view';
     obm.vars.labels.no_sel_view = '$l_js_no_sel_view';
+    obm.vars.labels.no_sel_default_view = '$l_js_no_sel_default_view';
     obm.vars.labels.conflict_view_label = '$l_js_conflict_view_label';
     obm.vars.labels.save_view = '$l_js_view_save';
-
+    obm.vars.labels.default_view = '$l_js_confirm_default_view';
     obm.calendarView = new Obm.CalendarView();
 
   </script>";
