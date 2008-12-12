@@ -868,7 +868,8 @@ function get_one_display_pref($u_id, $entity, $fieldname) {
     $user_id = $obm_q->f('display_user_id');
     $fieldorder = $obm_q->f('display_fieldorder');
     $fieldstatus = $obm_q->f('display_display');
-
+    if (!$user_id > 0)
+      $user_id = 0;
     $prefs[$user_id]['order'] = $fieldorder;
     $prefs[$user_id]['status'] = $fieldstatus;
   }
