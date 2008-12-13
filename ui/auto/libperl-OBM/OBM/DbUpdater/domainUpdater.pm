@@ -153,7 +153,7 @@ sub delete {
         return 1;
     }
 
-    $query = 'DELETE FROM P_Service WHERE service_entity_id IN (SELECT domainentity_entity_id FROM P_DomainEntity WHERE domainentity_domain_id='.$entity->getId().')'
+    $query = 'DELETE FROM P_Service WHERE service_entity_id IN (SELECT domainentity_entity_id FROM P_DomainEntity WHERE domainentity_domain_id='.$entity->getId().')';
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
         $self->_log( 'problème à la mise à jour BD du domaine d\'identifiant '.$entity->getId(), 2 );
         return 1;
