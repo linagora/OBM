@@ -187,20 +187,20 @@ sub _loadMailServer {
     }
 
     my $hostTable = 'Host';
-    my $mailServerTable = 'MailServer';
-    my $domainMailServerTable = 'DomainMailServer';
+    my $domainEntity = 'DomainEntity';
+    my $serviceProperty = 'ServiceProperty';
     if( $self->{'source'} =~ /^SYSTEM$/ ) {
-        my $hostTable = 'P_Host';
-        my $mailServerTable = 'P_MailServer';
-        my $domainMailServerTable = 'P_DomainMailServer';
+        $hostTable = 'P_'.$hostTable;
+        $domainEntity = 'P_'.$domainEntity;
+        $serviceProperty = 'P_'.$serviceProperty;
     }
 
-    my $query = 'SELECT     hosts.host_name as server_name,
-                            domainmailserver.domainmailserver_role as server_role
-                 FROM   '.$hostTable.' hosts,
-                        '.$mailServerTable.' mailserver,
-                        '.$domainMailServerTable.' domainmailserver 
-                 WHERE hosts.host_id=mailserver.mailserver_host_id AND mailserver.mailserver_id=domainmailserver.domainmailserver_mailserver_id AND domainmailserver.domainmailserver_domain_id='.$self->{'domainId'};
+    my $query = 'SELECT host_name as server_name,
+                        serviceproperty_property as server_role
+                 FROM '.$hostTable.'
+                 INNER JOIN DomainEntity ON domainentity_domain_id='.$self->{'domainId'}.'
+                 INNER JOIN ServiceProperty ON serviceproperty_entity_id=domainentity_entity_id
+                 WHERE host_id='.$dbHandler->castAsInteger('serviceproperty_value').' AND serviceproperty_service=\'mail\'';
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'mailServerDescList'} )) ) {
         $self->_log( 'chargement de la configuration des serveurs de courriers depuis la BD impossible', 3 );

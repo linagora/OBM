@@ -184,8 +184,11 @@ sub _loadHosts {
     }
 
     my $query = 'SELECT '.$hostTable.'.*,
+                        service_id AS host_samba,
                         current.host_name as host_name_current
                  FROM '.$hostTable.'
+                 INNER JOIN HostEntity ON hostentity_host_id=host_id
+                 LEFT JOIN Service ON service_entity_id=hostentity_entity_id AND service_service=\'samba\'
                  LEFT JOIN P_Host current ON current.host_id='.$hostTable.'.host_id
                  WHERE '.$hostTable.'.host_domain_id='.$self->{'domainId'};
 

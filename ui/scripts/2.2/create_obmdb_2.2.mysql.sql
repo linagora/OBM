@@ -3290,12 +3290,21 @@ CREATE TABLE P_UserObmGroup LIKE UserObmGroup;
 CREATE TABLE P_of_usergroup LIKE of_usergroup;
 
 --
--- Table structure for table `P_ServiceProperty`
+-- Table structure for table `P_Service`
 --
 CREATE TABLE P_Service LIKE Service;
+
+--
+-- Table structure for table `P_ServiceProperty`
+--
+CREATE TABLE P_ServiceProperty LIKE ServiceProperty;
 
 --
 -- Table structure for table `P_DomainEntity`
 --
 CREATE TABLE P_DomainEntity LIKE DomainEntity;
 
+--
+-- Table structure for table `P_HostEntity`
+--
+CREATE TABLE P_HostEntity LIKE HostEntity;

@@ -59,16 +59,12 @@ sub update {
                         host_usercreate,
                         host_uid,
                         host_gid,
-                        host_samba,
+                        host_archive,
                         host_name,
+                        host_fqdn,
                         host_ip,
                         host_delegation,
-                        host_description,
-                        host_web_perms,
-                        host_web_list,
-                        host_web_all,
-                        host_ftp_perms,
-                        host_firewall_perms
+                        host_description
                     ) SELECT    host_id,
                                 host_domain_id,
                                 host_timecreate,
@@ -76,19 +72,44 @@ sub update {
                                 host_usercreate,
                                 host_uid,
                                 host_gid,
-                                host_samba,
+                                host_archive,
                                 host_name,
+                                host_fqdn,
                                 host_ip,
                                 host_delegation,
-                                host_description,
-                                host_web_perms,
-                                host_web_list,
-                                host_web_all,
-                                host_ftp_perms,
-                                host_firewall_perms
+                                host_description
                       FROM Host
                       WHERE host_id='.$entity->getId();
-    
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
+            return 1;
+        }
+
+        $query = 'INSERT INTO P_HostEntity
+                 (  hostentity_entity_id,
+                    hostentity_host_id
+                 ) SELECT   hostentity_entity_id,
+                            hostentity_host_id
+                   FROM HostEntity
+                   WHERE hostentity_host_id='.$entity->getId();
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
+            return 1;
+        }
+
+        $query = 'INSERT INTO P_Service
+                 (  service_id,
+                    service_service,
+                    service_entity_id
+                 ) SELECT   service_id,
+                            service_service,
+                            service_entity_id
+                   FROM Service
+                   WHERE service_entity_id IN
+                    ( SELECT hostentity_entity_id
+                      FROM HostEntity
+                      WHERE hostentity_host_id='.$entity->getId().'
+                    )';
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
             return 1;
@@ -132,7 +153,23 @@ sub _delete {
 
 
     if( $entity->getDelete() || $entity->getUpdateEntity() ) {
-        my $query = 'DELETE FROM P_Host WHERE host_id='.$entity->getId();
+        my $query = 'DELETE FROM P_Service
+                        WHERE service_entity_id IN (
+                                    SELECT  hostentity_entity_id
+                                    FROM P_HostEntity
+                                    WHERE hostentity_host_id='.$entity->getId().')';
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
+            return 1;
+        }
+
+        $query = 'DELETE FROM P_HostEntity WHERE hostentity_host_id='.$entity->getId();
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
+            return 1;
+        }
+
+        $query = 'DELETE FROM P_Host WHERE host_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
             return 1;

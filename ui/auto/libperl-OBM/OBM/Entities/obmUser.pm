@@ -344,7 +344,7 @@ sub getDescription {
     my $self = shift;
     my $userDesc = $self->{'entityDesc'};
 
-    my $description = 'utilisateur d\'ID \''.$userDesc->{'userobm_login'}.'\', nom \''.$userDesc->{'userobm_fullname'}.'\'';
+    my $description = 'utilisateur \''.$userDesc->{'userobm_login'}.'\' (ID:'.$userDesc->{'userobm_id'}.'), nom \''.$userDesc->{'userobm_fullname'}.'\'';
 
     return $description;
 }

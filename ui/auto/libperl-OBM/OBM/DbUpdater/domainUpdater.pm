@@ -52,12 +52,18 @@ sub update {
 
     my $query = 'INSERT INTO P_Domain
                 (   domain_id,
+                    domain_timecreate,
+                    domain_usercreate,
+                    domain_userupdate,
                     domain_label,
                     domain_description,
                     domain_name,
                     domain_alias,
                     domain_global
                 ) SELECT    domain_id,
+                            domain_timecreate,
+                            domain_usercreate,
+                            domain_userupdate,
                             domain_label,
                             domain_description,
                             domain_name,

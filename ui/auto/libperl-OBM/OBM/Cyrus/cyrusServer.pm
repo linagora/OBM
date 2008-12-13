@@ -34,7 +34,7 @@ sub DESTROY {
 
     $self->_log( 'suppression de l\'objet', 4 );
 
-    $self->{'cyrusServerConn'} = undef;
+    eval{ $self->{'cyrusServerConn'} = undef; };
 }
 
 
@@ -61,7 +61,7 @@ sub _getServerDesc {
                             usersystem.usersystem_password AS cyrus_password,
                             domainentity_domain_id AS mailserver_for_domain_id
                     FROM Host host
-                    INNER JOIN ServiceProperty ON serviceproperty_value='.$dbHandler->castAsInteger('host_id').' AND serviceproperty_service=\'mail\' AND serviceproperty_property=\'imap\'
+                    INNER JOIN ServiceProperty ON '.$dbHandler->castAsInteger('serviceproperty_value').'=host_id AND serviceproperty_service=\'mail\' AND serviceproperty_property=\'imap\'
                     INNER JOIN DomainEntity ON domainentity_entity_id=serviceproperty_entity_id
                     LEFT JOIN UserSystem usersystem ON usersystem.usersystem_login=\''.$OBM::Parameters::common::cyrusAdminLogin.'\'
                     WHERE host_id='.$self->{'serverId'};
