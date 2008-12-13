@@ -1,6 +1,8 @@
 package fr.aliasource.obm.items.manager;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -305,6 +307,12 @@ public class ContactManager extends ObmManager {
 
 		contact.setSensitivity(new Short((short) 2)); // olPrivate
 
+		Date bday = obmcontact.getBirthday();
+		if (bday != null) {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			pd.setBirthday(sdf.format(bday));
+		}
+
 		return contact;
 	}
 
@@ -413,6 +421,18 @@ public class ContactManager extends ObmManager {
 
 		contact.setComment(ContactHelper.nullToEmptyString(ContactHelper
 				.getNote(funis.getNotes(), ContactHelper.COMMENT)));
+
+		String bday = pd.getBirthday();
+		if (bday != null && bday.length() > 0) {
+			logger.info("contact bday: " + bday);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			try {
+				Date d = sdf.parse(bday);
+				contact.setBirthday(d);
+			} catch (ParseException e) {
+				logger.error("cannot parse bday: " + bday, e);
+			}
+		}
 
 		return contact;
 	}
