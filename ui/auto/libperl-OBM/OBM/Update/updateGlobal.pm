@@ -153,13 +153,18 @@ sub update {
 
         if( !$error ) {
             $entity->setUpdated();
-            if( $self->{'dbUpdater'}->update($entity) ) {
-                $self->_log( 'problème à la mise à jour BD de l\'entité '.$entity->getDescription(), 1 );
-            }else {
-                $self->_log( 'entité '.$entity->getDescription().' mise à jour en BD', 1 );
-            }
         }else {
-            $self->_log( 'entité '.$entity->getDescription().' en erreur de mise à jour, mise à jour BD annulée', 1 );
+            if( ref($entity) eq 'OBM::Entities::obmDomain' ) {
+                $self->_log( 'problème à la mise à jour de '.$entity->getDescription(), 0 );
+                $self->_log( 'erreur fatale', 1 );
+                return 1;
+            }
+        }
+
+        if( $self->{'dbUpdater'}->update($entity) ) {
+            $self->_log( 'problème à la mise à jour BD de l\'entité '.$entity->getDescription(), 1 );
+        }else {
+            $self->_log( 'entité '.$entity->getDescription().' mise à jour en BD', 1 );
         }
     }
 
