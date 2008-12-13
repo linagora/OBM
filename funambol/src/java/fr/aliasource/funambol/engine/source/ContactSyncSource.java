@@ -43,6 +43,7 @@ public final class ContactSyncSource extends ObmSyncSource implements
 		logger.info("- Begin an OBM Contact sync -");
 
 		manager = new ContactManager(getObmAddress());
+		
 
 		try {
 			manager.logIn(context.getPrincipal().getUser().getUsername(),
@@ -52,6 +53,7 @@ public final class ContactSyncSource extends ObmSyncSource implements
 			throw new SyncSourceException(e);
 		}
 		manager.setBook(BookType.contacts);
+		manager.setDeviceTimeZone(deviceTimezone);
 	}
 
 	public void setOperationStatus(String operation, int statusCode,

@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +47,7 @@ public class ContactManager extends ObmManager {
 	private BookType book;
 
 	private Log logger = LogFactory.getLog(getClass());
+	private TimeZone deviceTimeZone;
 
 	public ContactManager(String obmAddress) {
 		AddressBookLocator addressbookLocator = new AddressBookLocator();
@@ -310,6 +312,7 @@ public class ContactManager extends ObmManager {
 		Date bday = obmcontact.getBirthday();
 		if (bday != null) {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			sdf.setTimeZone(deviceTimeZone);
 			pd.setBirthday(sdf.format(bday));
 		}
 
@@ -426,6 +429,7 @@ public class ContactManager extends ObmManager {
 		if (bday != null && bday.length() > 0) {
 			logger.info("contact bday: " + bday);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			sdf.setTimeZone(deviceTimeZone);
 			try {
 				Date d = sdf.parse(bday);
 				contact.setBirthday(d);
@@ -440,6 +444,14 @@ public class ContactManager extends ObmManager {
 	@Override
 	protected ISyncClient getSyncClient() {
 		return binding;
+	}
+
+	public void setDeviceTimeZone(TimeZone deviceTimeZone) {
+		this.deviceTimeZone = deviceTimeZone;
+		if (deviceTimeZone == null) {
+			this.deviceTimeZone = TimeZone.getTimeZone("Europe/Paris");
+		}
+		logger.info("device timezone set to: "+this.deviceTimeZone);
 	}
 
 }
