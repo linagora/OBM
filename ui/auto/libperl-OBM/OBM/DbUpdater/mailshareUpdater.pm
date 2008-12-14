@@ -160,7 +160,7 @@ sub _delete {
 
 
     my $query;
-    if( $entity->getUpdateEntity() ) {
+    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
         $query = 'DELETE FROM P_MailShare WHERE mailshare_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );

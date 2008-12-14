@@ -540,10 +540,11 @@ sub _deleteBox {
         push( @boxStruct, $cyrusSrv->listmailbox( $boxSubfolders, '' ) );
     }
 
-    $self->log( 'suppression de la boite de '.$entity->getDescription(), 2 );
+    $self->_log( 'suppression de la boite de '.$entity->getDescription(), 2 );
     for( my $i=0; $i<=$#boxStruct; $i++ ) {
         require OBM::Parameters::common;
-        if( !$self->_imapSetMailboxAcl( $boxStruct[$i][0], $OBM::Parameters::common::cyrusAdminLogin, 'admin' ) ) {
+        if( $self->_imapSetMailboxAcl( $boxStruct[$i][0], $OBM::Parameters::common::cyrusAdminLogin, 'admin' ) ) {
+            $self->_log( 'erreur au positionnement des ACLs nécessaires à la suppression de '.$entity->getDescription(), 0 );
             return 1;
         }
     
@@ -551,7 +552,7 @@ sub _deleteBox {
         $cyrusSrv->delete($boxStruct[$i][0]);
     
         if( $cyrusSrv->error() ) {
-            $self->_log( 'erreur Cyrus a la suppression de '.$entity->getDescription().' : '.$cyrusSrv->error(), 2 );
+            $self->_log( 'erreur Cyrus a la suppression de '.$entity->getDescription().' : '.$cyrusSrv->error(), 0 );
             return 1;
         }
     }

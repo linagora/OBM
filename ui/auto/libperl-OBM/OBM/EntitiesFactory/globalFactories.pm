@@ -61,6 +61,12 @@ sub _initDeleteFactory {
         return 1;
     }
 
+    # Deleted mailshares
+    if( $self->_initDeleteMailshareFactory() ) {
+        $self->_log( 'problème au chargement des partages de messagerie à supprimer', 1 );
+        return 1;
+    }
+
     return 0;
 }
 
@@ -129,8 +135,7 @@ sub _initDeleteGroupFactory {
                     WHERE group_domain_id='.$entitiesFactory->{'domain'}->getId().' AND group_id NOT IN
                         (SELECT group_id
                             FROM UGroup
-                            WHERE
-                            group_domain_id='.$entitiesFactory->{'domain'}->getId().')';
+                            WHERE group_domain_id='.$entitiesFactory->{'domain'}->getId().')';
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
@@ -150,6 +155,53 @@ sub _initDeleteGroupFactory {
         require OBM::EntitiesFactory::groupFactory;
         if( !($entityFactory = OBM::EntitiesFactory::groupFactory->new( 'SYSTEM', 'DELETE', $entitiesFactory->{'domain'}, $deletedGroups )) ) {
             $self->_log( 'problème au chargement de la factory des groupes à supprimer', 3 );
+            return 1;
+        }
+
+        $entitiesFactory->enqueueFactory( $entityFactory );
+    }
+
+    return 0;
+}
+
+
+sub _initDeleteMailshareFactory {
+    my $self = shift;
+    my $entitiesFactory = $self->{'entitiesFactory'};
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return 1;
+    }
+
+    my $query = 'SELECT mailshare_id
+                    FROM P_MailShare
+                    WHERE mailshare_domain_id='.$entitiesFactory->{'domain'}->getId().' AND mailshare_id NOT IN
+                        (SELECT mailshare_id
+                            FROM MailShare
+                            WHERE mailshare_domain_id='.$entitiesFactory->{'domain'}->getId().')';
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'chargement des partages de messagerie à supprimer depuis la BD impossible', 3 );
+        return 1;
+    }
+
+    my $deletedMailshare = ();
+    while( my( $mailshareId ) = $queryResult->fetchrow_array() ) {
+        $self->_log( 'programmation de la suppression du partage de messagerie d\'ID '.$mailshareId, 4 );
+        push( @{$deletedMailshare}, $mailshareId );
+    }
+
+    if( $#{$deletedMailshare} >= 0 ) {
+        my $entityFactory;
+
+        require OBM::EntitiesFactory::mailshareFactory;
+        if( !($entityFactory = OBM::EntitiesFactory::mailshareFactory->new( 'SYSTEM', 'DELETE', $entitiesFactory->{'domain'}, $deletedMailshare )) ) {
+            $self->_log( 'problème au chargement de la factory des partages de messagerie à supprimer', 3 );
             return 1;
         }
 

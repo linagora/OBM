@@ -23,7 +23,7 @@ use OBM::Parameters::regexp;
 
 sub new {
     my $class = shift;
-    my( $source, $updateType, $parentDomain ) = @_;
+    my( $source, $updateType, $parentDomain, $ids ) = @_;
 
     my $self = bless { }, $class;
 
@@ -52,6 +52,15 @@ sub new {
     if( ref($self->{'domainId'}) || ($self->{'domainId'} !~ /$regexp_id/) ) {
         $self->_log( 'identifiant de domaine \''.$self->{'domainId'}.'\' incorrect', 3 );
         return undef;
+    }
+
+    if( defined($ids) && (ref($ids) ne 'ARRAY') ) {
+        $self->_log( 'liste d\'ID à traiter incorrecte', 3 );
+        return undef;
+    }
+
+    if( $#{$ids} >= 0 ) {
+        $self->{'ids'} = $ids;
     }
 
     $self->{'running'} = undef;
@@ -164,6 +173,12 @@ sub next {
                     last SWITCH;
                 }
 
+                if( $self->{'updateType'} eq 'DELETE' ) {
+                    $self->_log( 'suppression de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    $self->{'currentEntity'}->setDelete();
+                    last SWITCH;
+                }
+
                 $self->_log( 'type de mise à jour inconnu \''.$self->{'updateType'}.'\'', 0 );
                 return undef;
             }
@@ -199,6 +214,10 @@ sub _loadMailshare {
                  FROM '.$mailshareTable.'
                  LEFT JOIN P_MailShare current ON current.mailshare_id='.$mailshareTable.'.mailshare_id
                  WHERE '.$mailshareTable.'.mailshare_domain_id='.$self->{'domainId'};
+
+    if( $self->{'ids'} ) {
+        $query .= ' AND '.$mailshareTable.'.mailshare_id IN ('.join( ', ', @{$self->{'ids'}}).')';
+    }
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'mailshareDescList'} )) ) {
         $self->_log( 'chargement des mailshare depuis la BD impossible', 3 );
