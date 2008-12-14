@@ -55,6 +55,12 @@ sub _initDeleteFactory {
         return 1;
     }
 
+    # Deleted groups
+    if( $self->_initDeleteGroupFactory() ) {
+        $self->_log( 'problème au chargement des groupes à supprimer', 1 );
+        return 1;
+    }
+
     return 0;
 }
 
@@ -73,13 +79,14 @@ sub _initDeleteHostFactory {
 
     my $query = 'SELECT host_id
                     FROM P_Host
-                    WHERE host_domain_id='.$entitiesFactory->{'domain'}->getId().' AND host_id NOT IN (SELECT host_id
-                        FROM Host
-                        WHERE host_domain_id='.$entitiesFactory->{'domain'}->getId().')';
+                    WHERE host_domain_id='.$entitiesFactory->{'domain'}->getId().' AND host_id NOT IN
+                        (SELECT host_id
+                            FROM Host
+                            WHERE host_domain_id='.$entitiesFactory->{'domain'}->getId().')';
 
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( 'chargement des utilisateurs depuis la BD impossible', 3 );
+        $self->_log( 'chargement des hôtes à supprimer depuis la BD impossible', 3 );
         return 1;
     }
 
@@ -89,12 +96,60 @@ sub _initDeleteHostFactory {
         push( @{$deletedHosts}, $hostId );
     }
 
-    if( $#$deletedHosts >= 0 ) {
+    if( $#{$deletedHosts} >= 0 ) {
         my $entityFactory;
 
         require OBM::EntitiesFactory::hostFactory;
         if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( 'SYSTEM', 'DELETE', $entitiesFactory->{'domain'}, $deletedHosts )) ) {
-            $self->_log( 'problème au chargement de la factory des hôtes a supprimer', 3 );
+            $self->_log( 'problème au chargement de la factory des hôtes à supprimer', 3 );
+            return 1;
+        }
+
+        $entitiesFactory->enqueueFactory( $entityFactory );
+    }
+
+    return 0;
+}
+
+
+sub _initDeleteGroupFactory {
+    my $self = shift;
+    my $entitiesFactory = $self->{'entitiesFactory'};
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return 1;
+    }
+
+    my $query = 'SELECT group_id
+                    FROM P_UGroup
+                    WHERE group_domain_id='.$entitiesFactory->{'domain'}->getId().' AND group_id NOT IN
+                        (SELECT group_id
+                            FROM UGroup
+                            WHERE
+                            group_domain_id='.$entitiesFactory->{'domain'}->getId().')';
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'chargement des groupes à supprimer depuis la BD impossible', 3 );
+        return 1;
+    }
+
+    my $deletedGroups = ();
+    while( my( $groupId ) = $queryResult->fetchrow_array() ) {
+        $self->_log( 'programmation de la suppression du groupe d\'ID '.$groupId, 4 );
+        push( @{$deletedGroups}, $groupId );
+    }
+
+    if( $#{$deletedGroups} >= 0 ) {
+        my $entityFactory;
+
+        require OBM::EntitiesFactory::groupFactory;
+        if( !($entityFactory = OBM::EntitiesFactory::groupFactory->new( 'SYSTEM', 'DELETE', $entitiesFactory->{'domain'}, $deletedGroups )) ) {
+            $self->_log( 'problème au chargement de la factory des groupes à supprimer', 3 );
             return 1;
         }
 

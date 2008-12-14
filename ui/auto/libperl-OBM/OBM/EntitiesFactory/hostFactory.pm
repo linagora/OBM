@@ -57,7 +57,7 @@ sub new {
         return undef;
     }
 
-    if( $#$ids >= 0 ) {
+    if( $#{$ids} >= 0 ) {
         $self->{'ids'} = $ids;
     }
 
