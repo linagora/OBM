@@ -181,6 +181,7 @@ sub _init {
     }
 
     # User e-mails
+    $userDesc->{'userobm_mail_perms'} = 1;
     if( !($self->_makeEntityEmail( $userDesc->{'userobm_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') ) ) ) {
         $self->_log( 'droit mail de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' annulé, pas d\'adresses mails valides', 2 );
         $userDesc->{'userobm_mail_perms'} = 0;
@@ -295,7 +296,7 @@ sub _init {
             $userDesc->{'userobm_samba_group_sid'} = $self->_getGroupSID( $domainSid, $userDesc->{'userobm_gid'} );
 
             # User Samba flags
-            $userDesc->{'userobm_samba_flags'} = '[U]';
+            $userDesc->{'userobm_samba_flags'} = '[UX]';
 
             # User home share
             if( !$userDesc->{'userobm_samba_home_drive'} || !$userDesc->{'userobm_samba_home'} ) {
