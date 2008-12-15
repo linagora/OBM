@@ -1675,7 +1675,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
         ('$now',
         '$now',
         '$contact_usercreate',
-        '$GLOBALS[c_origin]',
+        '$GLOBALS[c_origin_web]',
         '$contact_usercreate',
         '".Of_Date::getOption('timezone')."',
         '$title',
@@ -1732,7 +1732,8 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
 
     case $update_event:
       $sql_id = sql_parse_id($event_id);
-      $query = "UPDATE Event SET event_date = '$new_value'
+      $query = "UPDATE Event SET event_date = '$new_value',
+        event_origin = '$GLOBALS[c_origin_web]'
         WHERE
         event_id = $sql_id
         $multidomain_event";

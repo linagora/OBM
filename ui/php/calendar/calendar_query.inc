@@ -639,7 +639,7 @@ function run_query_calendar_insert_event_data($calendar) {
     '$now',
     '$obm[uid]',
     'VEVENT',
-    'ui',
+    '$GLOBALS[c_origin_web]',
     '$owner',
     '".Of_Date::getOption('timezone')."', 
     '$title',
@@ -1090,6 +1090,7 @@ function run_query_calendar_update_event_data($calendar) {
     event_duration = '$event_duration',
     event_allday = $all_day, 
     event_color = '$color',
+    event_origin = '$GLOBALS[c_origin_web]',
     event_repeatkind = '$repeat_kind',
     event_repeatfrequence = '$frequency',
     event_repeatdays = '$repeat_days',
@@ -1135,6 +1136,7 @@ function run_query_calendar_quick_event_update($calendar) {
     event_userupdate = $obm[uid], 
     event_title = '$title', 
     event_date = '$datebegin',     
+    event_origin = '$GLOBALS[c_origin_ajax]',
     event_duration = '$event_duration'
   WHERE
   event_id $event_id $multidomain";
@@ -1187,7 +1189,7 @@ function run_query_calendar_quick_event_insert($calendar) {
     '$now',
     $obm[uid],
     'VEVENT',
-    'ui_ajax',
+    '$GLOBAL[c_origin_ajax]',
      $obm[uid],
     '".Of_Date::getOption('timezone')."', 
     '$title', 
@@ -1318,7 +1320,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       '$now',
       $obm[uid],
       'VEVENT',
-      'ui',
+      '$GLOBALS[c_origin_web]',
       $obm[uid],
       '".Of_Date::getOption('timezone')."', 
       '$title',
