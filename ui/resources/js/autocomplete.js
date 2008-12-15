@@ -350,7 +350,6 @@ obm.AutoComplete.Search = new Class({
 
   // when receiving a success response for a new request
   onNewRequestSuccess: function(response,responseId) {
-    console.log(response);
     this.resetResultBox();
     if (this.requestId == responseId) {
       this.parseResponse(response);
@@ -498,7 +497,6 @@ obm.AutoComplete.Search = new Class({
 
   // to automatically update the information text
   updateInfo: function() {
-  console.log(this.previousResultsBtn);
     this.previousResultsBtn.setStyle('display', 'none');
     this.nextResultsBtn.setStyle('display', 'none');
     if (this.totalNbr<=1) {
