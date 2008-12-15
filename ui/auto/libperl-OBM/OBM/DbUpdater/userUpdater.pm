@@ -282,7 +282,7 @@ sub _delete {
 
 
     my $query;
-    if( $entity->getUpdateEntity() ) {
+    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
         $query = 'DELETE FROM P_UserObm WHERE userobm_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
@@ -290,7 +290,7 @@ sub _delete {
         }
     }
 
-    if( $entity->getUpdateLinks() ) {
+    if( $entity->getDelete() || $entity->getUpdateLinks() ) {
         $query = 'DELETE FROM P_EntityRight
                     WHERE entityright_entity_id=(SELECT mailboxentity_entity_id
                                                     FROM P_MailboxEntity

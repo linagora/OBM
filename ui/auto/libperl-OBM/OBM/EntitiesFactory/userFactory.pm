@@ -23,7 +23,7 @@ use OBM::Parameters::regexp;
 
 sub new {
     my $class = shift;
-    my( $source, $updateType, $parentDomain ) = @_;
+    my( $source, $updateType, $parentDomain, $ids ) = @_;
 
     my $self = bless { }, $class;
 
@@ -52,6 +52,15 @@ sub new {
     if( ref($self->{'domainId'}) || ($self->{'domainId'} !~ /$regexp_id/) ) {
         $self->_log( 'identifiant de domaine \''.$self->{'domainId'}.'\' incorrect', 3 );
         return undef;
+    }
+
+    if( defined($ids) && (ref($ids) ne 'ARRAY') ) {
+        $self->_log( 'liste d\'ID à traiter incorrecte', 3 );
+        return undef;
+    }
+
+    if( $#{$ids} >= 0 ) {
+        $self->{'ids'} = $ids;
     }
 
     $self->{'running'} = undef;
@@ -164,6 +173,12 @@ sub next {
                     last SWITCH;
                 }
 
+                if( $self->{'updateType'} eq 'DELETE' ) {
+                    $self->_log( 'suppression de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    $self->{'currentEntity'}->setDelete();
+                    last SWITCH;
+                }
+
                 $self->_log( 'type de mise à jour inconnu \''.$self->{'updateType'}.'\'', 0 );
                 return undef;
             }
@@ -197,8 +212,12 @@ sub _loadUsers {
     my $query = 'SELECT '.$userTable.'.*,
                         current.userobm_login as userobm_login_current
                  FROM '.$userTable.'
-                 LEFT JOIN P_'.$userTable.' current ON current.userobm_id='.$userTable.'.userobm_id
+                 LEFT JOIN '.$userTable.' current ON current.userobm_id='.$userTable.'.userobm_id
                  WHERE '.$userTable.'.userobm_domain_id='.$self->{'domainId'};
+
+    if( $self->{'ids'} ) {
+        $query .= ' AND '.$userTable.'.userobm_id IN ('.join( ', ', @{$self->{'ids'}}).')';
+    }
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'userDescList'} )) ) {
         $self->_log( 'chargement des utilisateurs depuis la BD impossible', 3 );

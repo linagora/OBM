@@ -160,7 +160,7 @@ sub _delete {
         }
     }
 
-    if( $entity->getUpdateLinks() ) {
+    if( $entity->getDelete() || $entity->getUpdateLinks() ) {
         $query = 'DELETE FROM P_of_usergroup WHERE of_usergroup_group_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD de liens '.$entity->getDescription(), 2 );

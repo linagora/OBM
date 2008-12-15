@@ -168,7 +168,7 @@ sub _delete {
         }
     }
 
-    if( $entity->getUpdateLinks() ) {
+    if( $entity->getDelete() || $entity->getUpdateLinks() ) {
         $query = 'DELETE FROM P_EntityRight
                     WHERE entityright_entity_id=(SELECT mailshareentity_entity_id
                                                         FROM P_MailshareEntity

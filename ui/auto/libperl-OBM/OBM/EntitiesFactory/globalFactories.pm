@@ -67,6 +67,12 @@ sub _initDeleteFactory {
         return 1;
     }
 
+    # Deleted users
+    if( $self->_initDeleteUserFactory() ) {
+        $self->_log( 'problème au chargement des utilisateurs à supprimer', 1 );
+        return 1;
+    }
+
     return 0;
 }
 
@@ -202,6 +208,53 @@ sub _initDeleteMailshareFactory {
         require OBM::EntitiesFactory::mailshareFactory;
         if( !($entityFactory = OBM::EntitiesFactory::mailshareFactory->new( 'SYSTEM', 'DELETE', $entitiesFactory->{'domain'}, $deletedMailshare )) ) {
             $self->_log( 'problème au chargement de la factory des partages de messagerie à supprimer', 3 );
+            return 1;
+        }
+
+        $entitiesFactory->enqueueFactory( $entityFactory );
+    }
+
+    return 0;
+}
+
+
+sub _initDeleteUserFactory {
+    my $self = shift;
+    my $entitiesFactory = $self->{'entitiesFactory'};
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return 1;
+    }
+
+    my $query = 'SELECT userobm_id
+                    FROM P_UserObm
+                    WHERE userobm_domain_id='.$entitiesFactory->{'domain'}->getId().' AND userobm_id NOT IN
+                        (SELECT userobm_id
+                            FROM UserObm
+                            WHERE userobm_domain_id='.$entitiesFactory->{'domain'}->getId().')';
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'chargement des utilisateurs à supprimer depuis la BD impossible', 3 );
+        return 1;
+    }
+
+    my $deletedUser = ();
+    while( my( $userId ) = $queryResult->fetchrow_array() ) {
+        $self->_log( 'programmation de la suppression de l\'utilisateur d\'ID '.$userId, 4 );
+        push( @{$deletedUser}, $userId );
+    }
+
+    if( $#{$deletedUser} >= 0 ) {
+        my $entityFactory;
+
+        require OBM::EntitiesFactory::userFactory;
+        if( !($entityFactory = OBM::EntitiesFactory::userFactory->new( 'SYSTEM', 'DELETE', $entitiesFactory->{'domain'}, $deletedUser )) ) {
+            $self->_log( 'problème au chargement de la factory des utilisateurs à supprimer', 3 );
             return 1;
         }
 
