@@ -1188,6 +1188,14 @@ UPDATE EntityRight SET entityright_consumer_id = (SELECT userentity_entity_id FR
 DELETE FROM EntityRight WHERE entityright_consumer_id NOT IN (SELECT group_id FROM UGroup) AND entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
 UPDATE EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
 UPDATE P_EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
+
+
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT calendarentity_entity_id, NULL FROM CalendarEntity WHERE calendarentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT mailshareentity_entity_id, NULL FROM MailshareEntity WHERE mailshareentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT resourceentity_entity_id, NULL FROM ResourceEntity WHERE resourceentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT mailboxentity_entity_id, NULL FROM MailboxEntity WHERE mailboxentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
+UPDATE EntityRight SET entityright_access = 1 WHERE entityright_consumer_id IS NULL;
+
 DELETE FROM EntityRight WHERE entityright_entity != 'entity';
 ALTER TABLE EntityRight DROP COLUMN entityright_entity;
 ALTER TABLE EntityRight DROP COLUMN entityright_consumer;

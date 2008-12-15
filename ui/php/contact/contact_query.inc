@@ -1624,7 +1624,6 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
     global $l_birthday_event_title;
 
     list($nope_event, $insert_event, $update_event, $delete_event) = array(0,1,2,3);
-
     if ($event_id == null) {
       if ($new_value != null) {
         $do = $insert_event;
@@ -1632,7 +1631,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
     } else {
       if ($new_value == null) {
         $do = $delete_event;
-      } else if ($new_value != $old_value) {
+      } else if ($new_value->compare($old_value) != 0) {
         $do = $update_event;
       }
     }
@@ -1653,7 +1652,9 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
         (event_timeupdate,
         event_timecreate,
         event_usercreate,
+        event_origin,
         event_owner,
+        event_timezone,
         event_title,
         event_date,
         event_description,
@@ -1675,6 +1676,8 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
         '$now',
         '$contact_usercreate',
         '$contact_usercreate',
+        'web',
+        '".Of_Date::getOption('timezone')."',
         '$title',
         '$new_value',
         '',
@@ -1696,7 +1699,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
       display_debug_msg($query, $cdg_sql, 'run_query_contact_birthday_update(insert event)');
 
       $insert_event_id = $obm_q->lastid();
-      if ($event_id) {
+      if ($insert_event_id) {
         of_entity_insert('event', $insert_event_id);
         $sql_id = sql_parse_id($contact_id);
         $query = "UPDATE Contact
@@ -1713,15 +1716,13 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
           eventlink_usercreate,
           eventlink_event_id, 
           eventlink_entity_id,
-          eventlink_required,
           eventlink_state) 
           VALUES (
             '$now',
             $contact_usercreate,
             $insert_event_id,
             $entity_id,
-            '0',
-            'A')";
+            'ACCEPTED')";
 
         $obm_q->query($query);
         display_debug_msg($query, $cdg_sql, "run_query_contact_birthday_update(insert entity)");

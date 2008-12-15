@@ -221,16 +221,11 @@ class Vcalendar_Reader_ICS {
     list($all, $year, $month, $day, $time, $hour, $minute, $second) = $match;
 
     if($options['TZID'] || !preg_match('/^[^Z]*Z$/',$value)) {
-      //FIXME : Only php 5 handle timezone...
-      $date = mktime($hour, $minute, $second, $month, $day, $year);
+      $date = new Of_Date($value, $options['TZID']);
     } else {
-      $date = gmmktime($hour, $minute, $second, $month, $day, $year);
+      $date = new Of_Date($value, 'GMT');
     }
-    if($match[4]) {
-      return date('Y-m-d H:i:s',$date);
-    }else {
-      return date('Y-m-d',$date);
-    }
+    return $date;
   }
 
   /**
@@ -370,16 +365,16 @@ class Vcalendar_Reader_ICS {
     }
     switch(strtolower($options['partstat'])) {
       case 'accepted' :
-        $state = 'A';
+        $state = 'ACCEPTED';
         break;
       case 'declined' :
-        $state = 'R';
+        $state = 'DECLINED';
         break;
       case null :
         $state = null;
         break;
       default :
-        $state = 'W';
+        $state = 'NEEDS-ACCTION';
     }
 
     $attendee = $this->getAttendeeId($value, $options, $entity);

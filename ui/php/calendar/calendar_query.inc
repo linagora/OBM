@@ -842,7 +842,7 @@ function check_access_entity($calendar_ids, $resource_ids) {
   global $obm;
   
   return OBM_Acl::areAllowed($obm['uid'], 'calendar', $calendar_ids, 'access')
-      && OBM_Acl::areAllowed($obm['uid'], 'resources', $resource_ids, 'access');
+      && OBM_Acl::areAllowed($obm['uid'], 'resource', $resource_ids, 'access');
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -98,7 +98,7 @@ class Vcalendar_Reader_OBM {
   }
 
   function parseDate($timestamp) {
-    return date('Y-m-d H:i:s', $timestamp);
+    return new Of_Date($timestamp);
   }
   
   function addAttendee(&$vevent, &$data) {
@@ -146,14 +146,15 @@ class Vcalendar_Reader_OBM {
          break;
        case 'monthlybyday' :
          $rrule['kind'] = 'monthly';
-         $day = $this->weekDays[strtolower(date('l',$data['event_date']))];
-         $num =  ceil(date('d',$data['event_date'])/7);
+         $day = $data['event_date']->get(Of_Date::WEEKDAY_ICS);
+         
+         $num =  ceil($data['event_date']->getDay()/7);
          $rrule['byday'] = array($num.$day);
          break;
        case 'weekly' :
          $rrule['kind'] = 'weekly';
          foreach($this->weekDays as $longDay => $shortDay) {
-           $index = date('w', strtotime($longDay)) - date('w', strtotime($GLOBALS['ccalendar_weekstart']));
+           $index = date('w', strtotime($longDay));
            if($data['event_repeatdays'][$index] == '1') {
              $days[] = $shortDay;
            }           

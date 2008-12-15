@@ -1246,6 +1246,14 @@ UPDATE EntityRight SET entityright_consumer_id = (SELECT userentity_entity_id FR
 DELETE FROM EntityRight WHERE entityright_consumer_id NOT IN (SELECT group_id FROM UGroup) AND entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
 UPDATE EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
 UPDATE P_EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
+
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT calendarentity_entity_id, NULL FROM CalendarEntity WHERE calendarentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT mailshareentity_entity_id, NULL FROM MailshareEntity WHERE mailshareentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT resourceentity_entity_id, NULL FROM ResourceEntity WHERE resourceentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
+INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT mailboxentity_entity_id, NULL FROM MailboxEntity WHERE mailboxentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
+UPDATE EntityRight SET entityright_access = 1 WHERE entityright_consumer_id IS NULL;
+
+
 DELETE FROM EntityRight WHERE entityright_entity != 'entity';
 ALTER TABLE EntityRight DROP COLUMN entityright_entity;
 ALTER TABLE EntityRight DROP COLUMN entityright_consumer;
@@ -2442,10 +2450,8 @@ CREATE TABLE `Campaign` (
   `campaign_parent` int(8) default NULL,
   `campaign_child_order` int(2) default NULL,
   KEY `campaign_parent_fkey` (`campaign_parent`),
-  CONSTRAINT `campaign_parent_fkey` FOREIGN KEY (`campaign_parent`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `campaign_email_fkey` FOREIGN KEY (`campaign_email`) REFERENCES `Document` (`document_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY (`campaign_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 
 --
 -- Table structure for table `CampaignEntity`
@@ -2457,9 +2463,7 @@ CREATE TABLE `CampaignEntity` (
   `campaignentity_campaign_id` int(8) NOT NULL,
   PRIMARY KEY  (`campaignentity_entity_id`,`campaignentity_campaign_id`),
   KEY `campaignentity_campaign_id_campaign_id_fkey` (`campaignentity_campaign_id`),
-  CONSTRAINT `campaignentity_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaignentity_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `campaignentity_entity_id_entity_id_fkey` FOREIGN KEY (`campaignentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 
 --
 -- Table structure for table `CampaignDisabledEntity`
@@ -2471,9 +2475,7 @@ CREATE TABLE `CampaignDisabledEntity` (
   `campaigndisabledentity_campaign_id` int(8) NOT NULL,
   PRIMARY KEY  (`campaigndisabledentity_entity_id`,`campaigndisabledentity_campaign_id`),
   KEY `campaigndisabledentity_campaign_id_campaign_id_fkey` (`campaigndisabledentity_campaign_id`),
-  CONSTRAINT `campaigndisabledentity_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaigndisabledentity_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `campaigndisabledentity_entity_id_entity_id_fkey` FOREIGN KEY (`campaigndisabledentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 
 --
 -- Table structure for table `CampaignTarget`
@@ -2487,9 +2489,7 @@ CREATE TABLE `CampaignTarget` (
   `campaigntarget_status` int(8) NULL,
   PRIMARY KEY (`campaigntarget_id`),
   KEY `campaigntarget_campaign_id_campaign_id_fkey` (`campaigntarget_campaign_id`),
-  CONSTRAINT `campaigntarget_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaigntarget_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,  
-  CONSTRAINT `campaigntarget_entity_id_entity_id_fkey` FOREIGN KEY (`campaigntarget_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 
 --
 -- Table structure for table `CampaignMailTarget`
@@ -2503,9 +2503,7 @@ CREATE TABLE `CampaignMailTarget` (
   `campaignmailtarget_status` int(8) NULL,
   PRIMARY KEY (`campaignmailtarget_id`),
   KEY `campaignmailtarget_campaign_id_campaign_id_fkey` (`campaignmailtarget_campaign_id`),
-  CONSTRAINT `campaignmailtarget_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaignmailtarget_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,  
-  CONSTRAINT `campaignmailtarget_entity_id_entity_id_fkey` FOREIGN KEY (`campaignmailtarget_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 
 --
 -- Table structure for table `CampaignMailContent`
@@ -2517,7 +2515,7 @@ CREATE TABLE `CampaignMailContent` (
   `campaignmailcontent_refext_id`  VARCHAR(8),
   `campaignmailcontent_content`    BLOB,
   PRIMARY KEY (`campaignmailcontent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 
 --
 -- Table structure for table `CampaignPushTarget`
@@ -2540,7 +2538,7 @@ CREATE TABLE `CampaignPushTarget` (
   `campaignpushtarget_sent_time`      DATETIME,
   `campaignpushtarget_retries`        INT(3),
   PRIMARY KEY (`campaignpushtarget_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+);
 
 
 

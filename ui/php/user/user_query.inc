@@ -311,7 +311,7 @@ function run_query_user_detail($p_id) {
       domain_label,
       domain_name,
       ms.host_name as mailserver_hostname,
-      ms.host_id as mailserver_host_id,
+      ms.host_id as mailserver_id,
       Host.host_name
     FROM UserObm
          LEFT JOIN UserObm as c ON UserObm.userobm_usercreate=c.userobm_id
@@ -1633,7 +1633,6 @@ function check_user_data_form($p_id, &$user) {
 	$err['field'] = 'login';
 	return false;
       }
-      echo $domain_id;
       // Login not already in use
       if (check_user_login_in_use($domain_id, $login, $id)) {
 	$err['msg'] = "$login : $l_login_in_use";
@@ -2545,7 +2544,9 @@ function has_mail_server_auto () {
   
   {
     $obm_q = new DB_OBM();
-    $query = "SELECT serviceproperty_value as domain_mail_server_auto FROM ServiceProperty INNER JOIN DomainEntity ON serviceproperty_entity_id = domainentity_entity_id WHERE domainentity_domain_id = $obm[domain_id]";
+    $query = "SELECT serviceproperty_value as domain_mail_server_auto FROM ServiceProperty 
+      INNER JOIN DomainEntity ON serviceproperty_entity_id = domainentity_entity_id 
+      WHERE domainentity_domain_id = $obm[domain_id] AND serviceproperty_property = 'imap_autoselect'";
     display_debug_msg($query, $cdg_sql, 'has_mail_server_auto()');
     $obm_q->query($query);
     
@@ -2575,7 +2576,9 @@ function get_user_params_mail_server_id ($params) {
     unset($params['mail_server_id']);
     
     $obm_q = new DB_OBM();
-    $query = "SELECT serviceproperty_value as domain_mail_server_auto FROM ServiceProperty INNER JOIN DomainEntity ON  serviceproperty_entity_id = domainentity_entity_id WHERE domainentity_domain_id = $domain_id";
+    $query = "SELECT serviceproperty_value as domain_mail_server_auto FROM ServiceProperty 
+      INNER JOIN DomainEntity ON  serviceproperty_entity_id = domainentity_entity_id 
+      WHERE domainentity_domain_id = $domain_id AND serviceproperty_property = 'imap_autoselect'";
     display_debug_msg($query, $cdg_sql, 'get_user_params_mail_server_id()');
     $obm_q->query($query);
     

@@ -11,7 +11,8 @@ class Of_Date extends DateTime {
 
   const WEEKDAY        = 'l';              // l - full day name - locale aware, Monday - Sunday
   const WEEKDAY_SHORT  = 'D';              // --- 3 letter day of week - locale aware, Mon-Sun
-  const WEEKDAY_NARROW = 'X';                 // --- 1 letter day name - locale aware, M-S
+  const WEEKDAY_ICS    = 'WEEKDAY_ICS';    // --- 2 letters day name - locale aware, MO-SU
+  const WEEKDAY_NARROW = 'X';              // --- 1 letter day name - locale aware, M-S
   const WEEKDAY_NAME   = 'D';              // D - abbreviated day name, 1-3 letters - locale aware, Mon-Sun
 
   const WEEKDAY_8601   = 'N';              // N - digit weekday ISO 8601, 1-7 1 = monday, 7=sunday
@@ -249,6 +250,9 @@ class Of_Date extends DateTime {
       case self:: WEEKDAY_NARROW :
         return substr($this->format(self::WEEKDAY_SHORT), 0, 1);
         break;
+      case self:: WEEKDAY_ICS :
+        return strtoupper(substr($this->format(self::WEEKDAY_SHORT), 0, 2));
+        break;        
       default :
         return $this->format($part);
     }

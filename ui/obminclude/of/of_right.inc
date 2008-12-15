@@ -39,17 +39,16 @@ function of_right_dis_admin($entity, $entity_id) {
 //   - $writable_user : Array of user on who you can manage the calandar
 ///////////////////////////////////////////////////////////////////////////////
 function html_entityadmin_bar($entity_id, $entity) {
-  global $l_entity_right, $l_validate, $path, $module;
+  global $l_entity_right, $l_validate, $path, $module, $obm;
 
-  $writable_entity = OBM_Acl::getEntityAdmins($entity, $entity_id);
+  $writable_entity = OBM_Acl::getAllowedEntities($obm['uid'], $entity, 'admin');
   if ($module != '') {
     $uri = $path.'/'.$module.'/'.$module.'_index.php';
   }
   // Entity Selection
   if (count($writable_entity) > 0) {
     $dis_sel .= "<select name=\"entity_id\">";
-    foreach ($writable_entity as $id => $data) {
-      $label = $data['label'];
+    foreach ($writable_entity as $id => $label) {
       $dis_sel .= "\n<option value=\"$id\"";
       if ($id == $entity_id ) {
         $tag = " selected=\"selected\"";
