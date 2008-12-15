@@ -62,7 +62,7 @@ class OBM_Acl {
    * @return void
    */
   public static function allow($userId, $entityType, $entityId, $action) {
-    self::allowConsumer('user', $userId, $entityType, $entityId, $action);
+    self::setRight('user', $userId, $entityType, $entityId, $action, 1);
   }
   
   /**
@@ -72,7 +72,41 @@ class OBM_Acl {
    * @return void
    */
   public static function allowGroup($groupId, $entityType, $entityId, $action) {
-    self::allowConsumer('group', $groupId, $entityType, $entityId, $action);
+    self::setRight('group', $groupId, $entityType, $entityId, $action, 1);
+  }
+  
+  /**
+   * Denies action for a user on a specific entity
+   * 
+   * @param mixed $userId the user ID (UserObm table primary key)
+   * @param mixed $entityType lowercased entity type (ex: mailshare, resource, ...)
+   * @param mixed $entityId the entity original id  (ex: MailShare table primary key)
+   * @param mixed $action possible values : access, read, write, admin
+   * @return void
+   */
+  public static function deny($userId, $entityType, $entityId, $action) {
+    self::setRight('user', $userId, $entityType, $entityId, $action, 0);
+  }
+  
+  /**
+   * Denies action for a group of users on a specific entity
+   * 
+   * @param mixed $groupId the group ID (UGroup table primary key)
+   * @return void
+   */
+  public static function denyGroup($groupId, $entityType, $entityId, $action) {
+    self::setRight('group', $groupId, $entityType, $entityId, $action, 0);
+  }
+  
+  /**
+   * Denies all actions for all users
+   * 
+   * @return void
+   */
+  public static function denyAll($entityType, $entityId) {
+    $realEntityId = self::getEntityId($entityType, $entityId);
+    $delete = "DELETE FROM EntityRight WHERE entityright_entity_id = '{$realEntityId}'";
+    self::$db->query($delete);
   }
   
   /**
@@ -329,7 +363,7 @@ class OBM_Acl {
     return $entities;
   }
   
-  private static function allowConsumer($consumerType, $consumerId, $entityType, $entityId, $action) {
+  private static function setRight($consumerType, $consumerId, $entityType, $entityId, $action, $right = 1) {
     if (!in_array($action, self::$actions)) {
       throw new Exception("Unknown action: $action");
     }
@@ -344,11 +378,11 @@ class OBM_Acl {
     if (!self::$db->next_record()) {
       $insert = "INSERT INTO EntityRight (
                  entityright_entity_id, entityright_consumer_id, entityright_{$action}
-                 ) VALUES ('{$realEntityId}', '{$consumerEntityId}', 1)";
+                 ) VALUES ('{$realEntityId}', '{$consumerEntityId}', '{$right}')";
       self::$db->query($insert);
     } else {
       $update = "UPDATE EntityRight 
-                 SET entityright_{$action} = 1 
+                 SET entityright_{$action} = '{$right}'  
                  WHERE entityright_consumer_id = '{$consumerEntityId}' 
                  AND entityright_entity_id = '{$realEntityId}'";
       self::$db->query($update);
@@ -520,6 +554,8 @@ class OBM_Acl_Utils {
     if (!OBM_Acl::isAllowed($currentUserId, $entityType, $entityId, 'admin')) {
       return false;
     }
+    
+    OBM_Acl::denyAll($entityType, $entityId);
     
     OBM_Acl::setPublicRights($entityType, $entityId, $rights['public']);
 

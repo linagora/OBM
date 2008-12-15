@@ -44,11 +44,21 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $this->assertTrue(OBM_Acl::canRead(2, 'cv', 1));
     $this->assertTrue(OBM_Acl::canWrite(2, 'cv', 1));
     $this->assertFalse(OBM_Acl::canAdmin(2, 'cv', 1));
+    OBM_Acl::deny(2, 'cv', 1, 'write');
+    $this->assertTrue(OBM_Acl::canRead(2, 'cv', 1));
+    $this->assertFalse(OBM_Acl::canWrite(2, 'cv', 1));
     
+    OBM_Acl::allow(2, 'cv', 1, 'write');
     $this->assertTrue(OBM_Acl::areSomeAllowed(2, 'cv', array(1, 2), 'write'));
-    //$this->assertFalse(OBM_Acl::areAllowed(2, 'cv', array(1, 2), 'write'));
+    $this->assertFalse(OBM_Acl::areAllowed(2, 'cv', array(1, 2), 'write'));
     OBM_Acl::allow(2, 'cv', 2, 'write');
+    $this->assertTrue(OBM_Acl::areSomeAllowed(2, 'cv', array(1, 2), 'write'));
     $this->assertTrue(OBM_Acl::areAllowed(2, 'cv', array(1, 2), 'write'));
+    
+    OBM_Acl::denyAll('cv', 1);
+    $this->assertFalse(OBM_Acl::canRead(2, 'cv', 1));
+    $this->assertFalse(OBM_Acl::canWrite(2, 'cv', 1));
+    $this->assertFalse(OBM_Acl::canAdmin(2, 'cv', 1));
     
     // special entities
     $this->addCalendar(2);
@@ -62,6 +72,7 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $this->assertTrue(OBM_Acl::areSomeAllowed(2, 'calendar', array(2, 3), 'write'));
     $this->assertFalse(OBM_Acl::areAllowed(2, 'calendar', array(2, 3), 'write'));
     OBM_Acl::allow(2, 'calendar', 3, 'write');
+    $this->assertTrue(OBM_Acl::areSomeAllowed(2, 'calendar', array(2, 3), 'write'));
     $this->assertTrue(OBM_Acl::areAllowed(2, 'calendar', array(2, 3), 'write'));
   }
   
