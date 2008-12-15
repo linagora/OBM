@@ -32,7 +32,7 @@ require Exporter;
 $regexp_id = '^[0-9]+$';
 
 # Domain regexp
-$regexp_domain = '^([a-z0-9-]{1,16}\.)+[a-z]{2,6}$';
+$regexp_domain = '^([a-z0-9-]+\.)+[a-z]{2,6}$';
 
 # Email
 $regexp_email = '^[a-zA-Z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@([a-z0-9-]{1,16}\.)+[a-z]{2,6}$';
