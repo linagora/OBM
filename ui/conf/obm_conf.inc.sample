@@ -228,6 +228,8 @@ $profiles['admin'] = array (
 //$cgp_show['section']['webmail']['url'] = $path."/horde3";
 //$cgp_show['section']['webmail']['target'] = '_blanck';
 
+//$cgp_show['module']['campaign'] = 'com';
+
 // modules -- false to hide, otherwise section
 //$cgp_show['module'] = ''; // Needed if module order to change
 //$cgp_show['module']['company'] = 'com';
