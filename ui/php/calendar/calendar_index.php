@@ -239,7 +239,8 @@ if ($action == 'index') {
     $entities['user']  = array($obm['uid']);
     $params['sel_user_id'] = array($obm['uid']);
   }
-  if (!check_calendar_data_form($params) || !check_access_entity($entities['user'], $entities['resource'])) {
+  
+  if (check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource'])) {
     if ( (!$params['force'])
         && ($conflicts = check_calendar_conflict($params, $entities)) ) {
       $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;

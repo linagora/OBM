@@ -144,7 +144,8 @@ class OBM_Acl {
     while (self::$db->next_record()) {
       $count+= self::$db->f('COUNT(1)');
     }
-    return $count == count($entityIds);
+    
+    return $count >= count($entityIds);
   }
   
   /**
