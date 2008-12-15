@@ -259,6 +259,7 @@ $profiles['admin'] = array (
 ); 
 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Load global parameters from .ini file
 ///////////////////////////////////////////////////////////////////////////////
@@ -328,6 +329,19 @@ $cg_gid_smb_guest = 514;
 $cg_gid_smb_host = 515;
 $cg_gid_host = 515;
 
+// Mail chooser constant hooks
+$c_mailchooser_global_hooks = array(
+  array(
+    'id'            => 98,
+    'hook_function' => 'least_used_memory',
+    'name'          => 'l_mailboxchoice_least_used_memory',
+  ),
+  array(
+    'id'            => 99,
+    'hook_function' => 'least_boxes',
+    'name'          => 'l_mailboxchoice_least_boxes',
+  ),
+);
 
 //-------------------------//
 // Default Displayed Infos //

@@ -30,7 +30,6 @@ include("$obminclude/global_pref.inc");
 require('domain_display.inc');
 require('domain_query.inc');
 require('domain_js.inc');
-require("$obminclude/../conf/hooks/user/mailchooser.inc"); // FIXME
 
 if ($action == '') $action = 'index';
 get_domain_action();

@@ -2562,9 +2562,19 @@ function has_mail_server_auto () {
 
 // FUNCTION - automatic mail server chooser hooks
 function get_user_params_mail_server_id ($params) {
-  global $cdg_sql, $obm, $c_mailchooser_hooks;
-
-  if (!isset($c_mailchooser_hooks)) return $params;
+  global $cdg_sql, $obm, $path;
+  global $c_mailchooser_global_hooks;
+  
+  if ($params['mail_server_id'] != 'auto') return $params;
+  
+  $hooks = $c_mailchooser_global_hooks;
+  
+  if (file_exists("$path/../conf/hooks/user/mailchooser.inc")) {
+    require_once("$path/../conf/hooks/user/mailchooser.inc");
+    $hooks = array_merge($hooks, $c_mailchooser_hooks);
+  }
+  
+  unset($params['mail_server_id']);
   
   if (isset($params['domain']) && $params['domain_global']) {
     $domain_id = sql_parse_id($params['domain']);
@@ -2572,47 +2582,38 @@ function get_user_params_mail_server_id ($params) {
     $domain_id = sql_parse_id($obm['domain_id']);
   }
   
-  if ($params['mail_server_id'] == 'auto') {
-    unset($params['mail_server_id']);
+  $obm_q = new DB_OBM();
+  $query = "SELECT serviceproperty_value as domain_mail_server_auto FROM ServiceProperty
+    INNER JOIN DomainEntity ON  serviceproperty_entity_id = domainentity_entity_id
+    WHERE domainentity_domain_id = $domain_id AND serviceproperty_property = 'imap_autoselect'";
+  display_debug_msg($query, $cdg_sql, 'get_user_params_mail_server_id()');
+  $obm_q->query($query);
+  
+  if ($obm_q->num_rows() == 1) {
+    $obm_q->next_record();
     
-    $obm_q = new DB_OBM();
-    $query = "SELECT serviceproperty_value as domain_mail_server_auto FROM ServiceProperty 
-      INNER JOIN DomainEntity ON  serviceproperty_entity_id = domainentity_entity_id 
-      WHERE domainentity_domain_id = $domain_id AND serviceproperty_property = 'imap_autoselect'";
-    display_debug_msg($query, $cdg_sql, 'get_user_params_mail_server_id()');
-    $obm_q->query($query);
-    
-    if ($obm_q->num_rows() == 1) {
-      $obm_q->next_record();
-      
-      if ($obm_q->f('domain_mail_server_auto')) {
-        foreach ($c_mailchooser_hooks as $hook) {
-          if ($hook['id'] == $obm_q->f('domain_mail_server_auto')) {
-            $hook_function = 'hook_user_mailchooser_'. $hook['hook_function'];
-            $hook_result = $hook_function($params);
-          }
-        }
-        if ($obm_q->f('domain_mail_server_auto') == '98') {
-          $hook_result = run_query_user_mailchooser_least_boxes();
-        } else if ($obm_q->f('domain_mail_server_auto') == '99') {
-          $hook_result = run_query_user_user_mailchooser_least_used_memory();
+    if ($obm_q->f('domain_mail_server_auto')) {
+      foreach ($hooks as $hook) {
+        if ($hook['id'] == $obm_q->f('domain_mail_server_auto')) {
+          $hook_function = 'hook_user_mailchooser_'. $hook['hook_function'];
+          $hook_result = $hook_function($params);
         }
       }
     }
-    
-    if ($hook_result) {
-      if (isset($hook_result['host_id'])) {
-        $params['mail_server_id'] = $hook_result['host_id'];
-      } else {
-        $query = "SELECT host_id FROM Host 
-          WHERE host_name = '$hook_result[hostname]'";
-        display_debug_msg($query, $cdg_sql, 'get_user_params_mail_server_id(search)');
-        $obm_q->query($query);
-        
-        if ($obm_q->num_rows() == 1) {
-          $obm_q->next_record();
-          $params['mail_server_id'] = $obm_q->f('host_id');
-        }
+  }
+  
+  if ($hook_result) {
+    if (isset($hook_result['host_id'])) {
+      $params['mail_server_id'] = $hook_result['host_id'];
+    } else {
+      $query = "SELECT host_id FROM Host 
+        WHERE host_name = '$hook_result[hostname]'";
+      display_debug_msg($query, $cdg_sql, 'get_user_params_mail_server_id(search)');
+      $obm_q->query($query);
+      
+      if ($obm_q->num_rows() == 1) {
+        $obm_q->next_record();
+        $params['mail_server_id'] = $obm_q->f('host_id');
       }
     }
   }
@@ -2621,7 +2622,7 @@ function get_user_params_mail_server_id ($params) {
 }
 
 // FUNCTION - automatic mail server chooser static hook
-function run_query_user_mailchooser_least_boxes () {
+function hook_user_mailchooser_least_boxes () {
   global $cdg_sql, $obm;
   
   $sel_id = sql_parse_id($obm['domain_id'], true);
@@ -2648,7 +2649,7 @@ function run_query_user_mailchooser_least_boxes () {
 }
 
 // FUNCTION - automatic mail server chooser static hook
-function run_query_user_user_mailchooser_least_used_memory () {
+function hook_user_user_mailchooser_least_used_memory () {
   global $cdg_sql, $obm;
   
   $sel_id = sql_parse_id($obm['domain_id'], true);

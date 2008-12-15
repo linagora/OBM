@@ -156,7 +156,7 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
   global $l_host, $l_ip, $l_role, $l_mail_servers, $l_header_delete;
 
   // GLOBAL - automatic mail server chooser hooks
-  global $c_mailchooser_hooks;
+  global $c_mailchooser_global_hooks;
   
   $id = $obm_q->f('domain_id');
   $label = $obm_q->f('domain_label');
@@ -175,10 +175,21 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
     } else {
       $no_mailserver = '-' ;
       // BEGIN - automatic mail server chooser hooks
-      if (isset($c_mailchooser_hooks) && $mail_server_auto) {
-        foreach ($c_mailchooser_hooks as $hook) {
+        
+      $hooks = $c_mailchooser_global_hooks;
+      
+      if (file_exists("$path/../conf/hooks/user/mailchooser.inc")) {
+        require_once("$path/../conf/hooks/user/mailchooser.inc");
+        $hooks = array_merge($hooks, $c_mailchooser_hooks);
+      }
+      
+      if ($mail_server_auto) {
+        foreach ($hooks as $hook) {
+          $hook_name = $hook['name'];
+          if (isset($GLOBALS[$hook_name])) $hook_name = $GLOBALS[$hook_name];
+          
           if ($hook['id'] == $mail_server_auto)
-            $no_mailserver = $hook['name'];
+            $no_mailserver = $hook_name;
         }
       }
       // END - automatic mail server chooser hooks
@@ -567,7 +578,6 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
   return $block;
 }
 
-
 /**
  * Display : domain applicable mailserver select (host from domain or global)
  * @param $role : restrict list to mail server role
@@ -576,25 +586,29 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
  **/
 function dis_domain_mailserver_select($role, $sel_id='', $domain_id='') {
   // GLOBAL - automatic mail server chooser hooks
-  global $c_mailchooser_hooks;
-  global $l_mailboxchoice_least_boxes, $l_mailboxchoice_least_used_memory;
+  global $c_mailchooser_global_hooks;
   
   // BEGIN - automatic mail server chooser hooks
   
+  $hooks = $c_mailchooser_global_hooks;
+  
+  if (file_exists("$path/../conf/hooks/user/mailchooser.inc")) {
+    require_once("$path/../conf/hooks/user/mailchooser.inc");
+    $hooks = array_merge($hooks, $c_mailchooser_hooks);
+  }
+  
   $selected = " selected=\"selected\"";
   
-  if (isset($c_mailchooser_hooks)) {
-    $block_mailchooser = '';
-    foreach ($c_mailchooser_hooks as $hook) {
-      $block_mailchooser .= "<option value=\"a$hook[id]\"";
-      if ("a$hook[id]" == $sel_id)
-        { $block_mailchooser .= $selected; }
-      $block_mailchooser .= ">$hook[name]</option>";
-    }
+  $block_mailchooser = '';
+  foreach ($hooks as $hook) {
+    $hook_name = $hook['name'];
+    if (isset($GLOBALS[$hook_name])) $hook_name = $GLOBALS[$hook_name];
+    
+    $block_mailchooser .= "<option value=\"a$hook[id]\"";
+    if ("a$hook[id]" == $sel_id)
+      { $block_mailchooser .= $selected; }
+    $block_mailchooser .= ">$hook_name</option>";
   }
-  $block_mailchooser .= "
-  <option value=\"a98\"". ($sel_id == 'a98' ? $selected : ''). ">$l_mailboxchoice_least_boxes</option>
-  <option value=\"a99\"". ($sel_id == 'a99' ? $selected : ''). ">$l_mailboxchoice_least_used_memory</option>";
   
   // END - automatic mail server chooser hooks
   
