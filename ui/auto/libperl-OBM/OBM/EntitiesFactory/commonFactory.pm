@@ -128,7 +128,7 @@ sub _getEntityRight {
 
 
     # Traitement du droit '$right', cles du hachage '%rightDef'
-    my $domainName = $self->{'currentEntity'}->getDesc('domain_name');
+    my $domainName = $self->{'parentDomain'}->getDesc('domain_name');
     while( my( $right, $rightDesc ) = each( %{$rightDef} ) ) {
         if( !$rightDesc->{'compute'} ) {
             next;
