@@ -140,10 +140,11 @@ public class CalendarManager extends ObmManager {
 			// log.info(" attendees size : "+event.getAttendees().length );
 			// log.info(" owner : "+event.getOwner()+" calendar : "+calendar);
 			if (event == null) {
-				logger.info("event removed on pda not in db: "+calendar+" / "+key);
+				logger.info("event removed on pda not in db: " + calendar
+						+ " / " + key);
 				return;
 			}
-			
+
 			if (event.getAttendees() == null
 					|| event.getAttendees().size() == 1) {
 				// no attendee (only the owner)
@@ -445,17 +446,8 @@ public class CalendarManager extends ObmManager {
 		Date dend = parseEnd(prodId, foundation, event);
 
 		if (dend.getTime() != dstart.getTime()) {
-			int fix = 0;
-			// le rdv s'affiche sur 1 jour de plus dans obm si la duration
-			// fait
-			// tomber la date de fin sur minuit
-			if (foundation.isAllDay()
-					&& ((dend.getTime() - dstart.getTime()) % 86400) == 0) {
-				fix = 1;
-			}
 			event
-					.setDuration((int) ((dend.getTime() - dstart.getTime()) / 1000)
-							- fix);
+					.setDuration((int) ((dend.getTime() - dstart.getTime()) / 1000));
 		} else {
 			event.setDuration(3600);
 		}
