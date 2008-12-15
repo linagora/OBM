@@ -2424,7 +2424,6 @@ DROP TABLE TmpEntity;
 -- Table structure for table `Campaign`
 --
 
-DROP TABLE IF EXISTS `Campaign`;
 CREATE TABLE `Campaign` (
   `campaign_id` int(8) NOT NULL auto_increment,
   `campaign_name` varchar(50) default NULL,
@@ -2457,7 +2456,6 @@ CREATE TABLE `Campaign` (
 -- Table structure for table `CampaignEntity`
 --
 
-DROP TABLE IF EXISTS `CampaignEntity`;
 CREATE TABLE `CampaignEntity` (
   `campaignentity_entity_id` int(8) NOT NULL,
   `campaignentity_campaign_id` int(8) NOT NULL,
@@ -2469,7 +2467,6 @@ CREATE TABLE `CampaignEntity` (
 -- Table structure for table `CampaignDisabledEntity`
 --
 
-DROP TABLE IF EXISTS `CampaignDisabledEntity`;
 CREATE TABLE `CampaignDisabledEntity` (
   `campaigndisabledentity_entity_id` int(8) NOT NULL,
   `campaigndisabledentity_campaign_id` int(8) NOT NULL,
@@ -2481,7 +2478,6 @@ CREATE TABLE `CampaignDisabledEntity` (
 -- Table structure for table `CampaignTarget`
 --
 
-DROP TABLE IF EXISTS `CampaignTarget`;
 CREATE TABLE `CampaignTarget` (
   `campaigntarget_id` int(8) NOT NULL auto_increment,
   `campaigntarget_campaign_id` int(8) NOT NULL,
@@ -2495,7 +2491,6 @@ CREATE TABLE `CampaignTarget` (
 -- Table structure for table `CampaignMailTarget`
 --
 
-DROP TABLE IF EXISTS `CampaignMailTarget`;
 CREATE TABLE `CampaignMailTarget` (
   `campaignmailtarget_id` int(8) NOT NULL auto_increment,
   `campaignmailtarget_campaign_id` int(8) NOT NULL,
@@ -2509,7 +2504,6 @@ CREATE TABLE `CampaignMailTarget` (
 -- Table structure for table `CampaignMailContent`
 --
 
-DROP TABLE IF EXISTS `CampaignMailContent`;
 CREATE TABLE `CampaignMailContent` (
   `campaignmailcontent_id`         INT(8) NOT NULL AUTO_INCREMENT,
   `campaignmailcontent_refext_id`  VARCHAR(8),
@@ -2521,7 +2515,6 @@ CREATE TABLE `CampaignMailContent` (
 -- Table structure for table `CampaignPushTarget`
 --
 
-DROP TABLE IF EXISTS `CampaignPushTarget`;
 CREATE TABLE `CampaignPushTarget` (
   `campaignpushtarget_id`             INT(8) NOT NULL AUTO_INCREMENT,
   `campaignpushtarget_mailcontent_id` INT(8) NOT NULL,
