@@ -19,10 +19,17 @@ P=$VALUE
 get_val db
 DB=$VALUE
 
-echo "database backup stored in ${HOME}/migration.sql"
+echo "database backup stored in ${HOME}/migration-backup.sql"
 mysqldump -u $U -p$P  --default-character-set='UTF8' ${DB} > ${HOME}/migration-backup.sql 
+
 echo "Running 2.1 -> 2.2 schema upgrade script..."
 mysql -u $U -p$P  --default-character-set='UTF8' ${DB} <  ./update-2.1-2.2.mysql.sql >/dev/null
+status=$?
+test $status -eq 0 || {
+    echo "error on data migration, aborting."
+    exit 1
+}
+
 echo "Updated data dump stored in ${HOME}/migration.sql"
 mysqldump -u $U -p$P -tcn  --default-character-set='UTF8' ${DB} > ${HOME}/migration.sql 
 success=$?
