@@ -307,7 +307,7 @@ function run_query_contact_detail($p_id) {
     contactfunction_label,
     datasource_name,
     $date,
-    $birthday,
+    bd.event_date as contact_birthday,
     contact_birthday_id,
     c.userobm_login as usercreate,
     u.userobm_login as userupdate

@@ -406,8 +406,8 @@ function run_query_calendar_waiting_events() {
     WHERE
       event_type='VEVENT'
       AND eventlink_state = 'NEEDS-ACTION'
-      AND ( 1=0
       $multidomain
+      AND ( 1=0
 ";
   $writable_cal = array_keys(OBM_Acl::getAllowedEntities($uid, 'calendar', 'write'));
   $writable_res = array_keys(OBM_Acl::getAllowedEntities($uid, 'resource', 'write'));
@@ -446,10 +446,8 @@ function run_query_calendar_waiting_events() {
     WHERE
       event_type='VEVENT'
       AND eventlink_state = 'NEEDS-ACTION'
-      AND ( 1=0
       $multidomain
-";
-    $query .= "OR resourceentity_resource_id IN (".implode(",", $writable_res)."))";
+      AND (resourceentity_resource_id IN (".implode(",", $writable_res)."))";
   }
   $query .= " ORDER BY entity_entity, entity_label, event_date"; 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_waiting_events()');
@@ -971,10 +969,10 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   if(!$reset_state) {
     $entities = get_calendar_event_entity($event_id); 
     if(count($users_array) > 0) {
-      $qusers = "AND eventlink_entity_id NOT IN ".of_entity_subquery('entity',$users_array);
+      $qusers = "AND eventlink_entity_id NOT IN ".of_entity_subquery('user',$users_array);
     }
     if(count($resources_array) > 0) {
-      $rresources = "AND eventlink_entity_id NOT IN ".of_entity_subquery('entity',$resources_array);
+      $rresources = "AND eventlink_entity_id NOT IN ".of_entity_subquery('resource',$resources_array);
     }
     if(is_array($entities['user']['ids'])) {
       $users_array = array_diff($users_array,$entities['user']['ids']);

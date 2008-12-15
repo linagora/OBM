@@ -1653,9 +1653,11 @@ function dis_calendar_planning_view($date, $end, $calendar_entity, $category_fil
     foreach($entities as $id => $data) {
       $dis_planning_view .= '<tr><th>'.$data['name'].'</th>';
       $current = clone $date;
+      $current->setHour(0)->setMinute(0)->setSecond(0);
       while($current->compare($end) < 0) {
         $view = array();
         $occurrences = $of->getPeriodOccurrences($current,null,array($entity => array($id)));
+        var_dump($current->getIso(), $occurrences);
         if(is_array($occurrences)) {
           $dis_planning_view .= "<td style=\"width:$td_width%\"><ul>";
           foreach($occurrences as $occurrence) {

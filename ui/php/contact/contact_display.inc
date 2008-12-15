@@ -579,7 +579,7 @@ function html_contact_header($co_q, $funcs) {
   $date = ($date != 0) ? of_date_format($date) : $l_no_date;
   
   if ($co_q->f('contact_birthday')) {
-    $birthday = new Of_Date($co_q->f('contact_birthday'));
+    $birthday = new Of_Date($co_q->f('contact_birthday'), 'GMT');
     $birthday = $birthday->getOutputDate();
   } else {
     $birthday = $l_no_date;
@@ -1730,6 +1730,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $cdx = stripslashes($contact['cdx']);
   $ctry = $contact['country'];
   $phone = stripslashes($contact['phone']);
+  $birthday = $contact['birthday'];
   $hphone = stripslashes($contact['hphone']);
   $mphone = stripslashes($contact['mphone']);
   $fax = stripslashes($contact['fax']);
@@ -1771,6 +1772,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
+    <input type=\"hidden\" name=\"tf_birthday\" value=\"$birthday\" />
     <input type=\"hidden\" name=\"sel_country\" value=\"$ctry\" />
     <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_hphone\" value=\"$hphone\" />
