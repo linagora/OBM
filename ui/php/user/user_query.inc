@@ -2634,13 +2634,14 @@ function hook_user_mailchooser_least_boxes () {
     FROM ServiceProperty
     INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
     INNER JOIN Host ON host_id = #CAST(serviceproperty_value, INTEGER)
+    LEFT JOIN UserObm ON userobm_mail_server_id = host_id
     WHERE serviceproperty_property = 'imap' and serviceproperty_service = 'mail'
     AND domainentity_domain_id $sel_id 
     GROUP BY host_id
     ORDER BY mailbox_count ASC
     ";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_mailchooser_least_boxes()');
+  display_debug_msg($query, $cdg_sql, 'hook_user_mailchooser_least_boxes()');
   $obm_q = new DB_OBM;
   $obm_q->xquery($query);
   $obm_q->next_record();
@@ -2649,25 +2650,27 @@ function hook_user_mailchooser_least_boxes () {
 }
 
 // FUNCTION - automatic mail server chooser static hook
-function hook_user_user_mailchooser_least_used_memory () {
+function hook_user_mailchooser_least_used_memory () {
   global $cdg_sql, $obm;
   
   $sel_id = sql_parse_id($obm['domain_id'], true);
   
   $query = "SELECT
-      domainmailserver_mailserver_id as mailserver_id,
+      host_id,
       SUM(userobm_mail_quota_use) AS used_memory
-      FROM ServiceProperty
-        INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
-        INNER JOIN Host ON host_id = #CAST(serviceproperty_value, INTEGER)
-      WHERE serviceproperty_property = 'imap' and serviceproperty_service = 'mail'
+    FROM ServiceProperty
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    INNER JOIN Host ON host_id = #CAST(serviceproperty_value, INTEGER)
+    LEFT JOIN UserObm ON userobm_mail_server_id = host_id
+    WHERE serviceproperty_property = 'imap' and serviceproperty_service = 'mail'
+      AND domainentity_domain_id $sel_id
     GROUP BY host_id
     ORDER BY used_memory ASC
     ";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_user_user_mailchooser_least_used_memory()');
+  
+  display_debug_msg($query, $cdg_sql, 'hook_user_mailchooser_least_used_memory()');
   $obm_q = new DB_OBM;
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   $obm_q->next_record();
   
   return array('host_id' => $obm_q->f('host_id'));
