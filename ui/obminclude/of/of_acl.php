@@ -296,7 +296,7 @@ class OBM_Acl {
   }
   
   public static function getEntityConsumers($entityType, $entityId, $action = null) {
-    $entityTable = ucfirst($entityType);
+    $entityJoinTable = self::getEntityJoinTable($entityType);
     $columns = array('userobm_id AS id', self::getUsernameColumns().' AS label', "'user' as consumer");
     $unionColumns = array('group_id AS id', 'group_name AS label', "'group' AS consumer");
     if ($action === null) {
@@ -307,7 +307,7 @@ class OBM_Acl {
     $union = "UNION SELECT ".implode(',', $unionColumns)." FROM UGroup 
               LEFT JOIN GroupEntity ON group_id = groupentity_group_id 
               LEFT JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id 
-              LEFT JOIN {$entityTable}Entity ON {$entityType}entity_entity_id = entityright_entity_id "
+              LEFT JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id "
               .self::getAclQueryWhere($entityType, $entityId, null, $action);
               
     $query = self::getAclQuery($columns, $entityType, $entityId, null, null, '', $union, false, false)
@@ -346,8 +346,7 @@ class OBM_Acl {
       $additionalJoins = "LEFT JOIN UserObm u2 ON {$entityType}entity_{$entityType}_id = u2.userobm_id";
       $unions = "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE userobm_id = {$userId}";
     } else {
-      // dirty, but does I have the choice ? Please fix the damn DB schema !
-      $entityTable = ($entityType == 'group') ? 'UGroup' : ucfirst($entityType);
+      $entityTable = self::getEntityTable($entityType);
       $columns = array("{$entityType}_id AS id, {$entityType}_{$labelColumn} AS label");
       $additionalJoins = "LEFT JOIN {$entityTable} ON {$entityType}entity_{$entityType}_id = {$entityType}_id";
       $unions = '';
@@ -414,7 +413,8 @@ class OBM_Acl {
   
   private static function getAclQuery($columns, $entityType, $entityId = null, $userId = null, $action = null, 
                                       $additionalJoins = '', $unions = '', $includePublicEntities = true, $includeGroups = true) {
-    $entityTable = ucfirst($entityType);
+    $entityTable = self::getEntityTable($entityType);
+    $entityJoinTable = self::getEntityJoinTable($entityType);
     $where = self::getAclQueryWhere($entityType, $entityId, $userId, $action);
     if (is_array($columns)) {
       $columns = implode(',', $columns);
@@ -434,21 +434,21 @@ class OBM_Acl {
     $query = "SELECT {$columns} FROM UserObm u1 
               LEFT JOIN UserEntity ON u1.userobm_id = userentity_user_id 
               {$mainJoins}
-              LEFT JOIN {$entityTable}Entity ON {$entityType}entity_entity_id = entityright_entity_id 
+              LEFT JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id 
               {$additionalJoins} {$where} {$unions}";
               
       return $query;
   }
   
   private static function getPublicAclQuery($columns, $entityType, $entityId = null, $action = null, $additionalJoins = '') {
-    $entityTable = ucfirst($entityType);
+    $entityJoinTable = self::getEntityJoinTable($entityType);
     $publicWhere = self::getAclQueryWhere($entityType, $entityId, null, $action, true);
     if (is_array($columns)) {
       $columns = implode(',', $columns);
     }
     return "SELECT {$columns}
             FROM EntityRight
-            LEFT JOIN {$entityTable}Entity ON {$entityType}entity_entity_id = entityright_entity_id 
+            LEFT JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id 
             {$additionalJoins} {$publicWhere}";
   }
   
@@ -484,9 +484,24 @@ class OBM_Acl {
     return "entityright_{$action} = 1";
   }
   
+  private static function getEntityTable($entityType) {
+    switch ($entityType) {
+      case 'group':
+        return 'UGroup';
+      case 'mailshare':
+        return 'MailShare';
+      default:
+        return ucfirst($entityType);
+    }
+  }
+  
+  private static function getEntityJoinTable($entityType) {
+    return ucfirst($entityType).'Entity';
+  }
+  
   private static function getEntityId($entityType, $id) {
-    $entityTable = ucfirst($entityType);
-    $query = "SELECT {$entityType}entity_entity_id FROM {$entityTable}Entity WHERE {$entityType}entity_{$entityType}_id = '{$id}'";
+    $entityJoinTable = self::getEntityJoinTable($entityType);
+    $query = "SELECT {$entityType}entity_entity_id FROM {$entityJoinTable} WHERE {$entityType}entity_{$entityType}_id = '{$id}'";
     self::$db->query($query);
     if (!self::$db->next_record()) {
       throw new Exception("Unknown $entityType entity #$id");
