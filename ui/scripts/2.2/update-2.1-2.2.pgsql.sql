@@ -3064,8 +3064,6 @@ INSERT INTO P_UserObm SELECT * FROM UserObm;
 --
 
 DROP TABLE P_UserObmGroup;
-CREATE TABLE P_UserObmGroup (LIKE UserObmGroup);
-INSERT INTO P_UserObmGroup SELECT * FROM UserObmGroup;
 
 
 --

@@ -8869,14 +8869,6 @@ INSERT INTO P_GroupEntity SELECT * FROM GroupEntity;
 
 
 --
--- Table structure for table P_GroupGroup
---
-
-CREATE TABLE P_GroupGroup (LIKE GroupGroup);
-INSERT INTO P_GroupGroup SELECT * FROM GroupGroup;
-
-
---
 -- Table structure for table P_Host
 --
 
@@ -8953,14 +8945,6 @@ INSERT INTO P_UserEntity SELECT * FROM UserEntity;
 
 CREATE TABLE P_UserObm (LIKE UserObm);
 INSERT INTO P_UserObm SELECT * FROM UserObm;
-
-
---
--- Table structure for table P_UserObmGroup
---
-
-CREATE TABLE P_UserObmGroup (LIKE UserObmGroup);
-INSERT INTO P_UserObmGroup SELECT * FROM UserObmGroup;
 
 
 --

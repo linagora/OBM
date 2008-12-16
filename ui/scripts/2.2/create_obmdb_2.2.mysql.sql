@@ -3251,13 +3251,6 @@ DROP TABLE IF EXISTS `P_GroupEntity`;
 CREATE TABLE `P_GroupEntity` (LIKE `GroupEntity`);
 
 --
--- Table structure for table `P_GroupGroup`
---
-
-DROP TABLE IF EXISTS `P_GroupGroup`;
-CREATE TABLE `P_GroupGroup` (LIKE `GroupGroup`);
-
---
 -- Table structure for table `P_Host`
 --
 
@@ -3325,13 +3318,6 @@ CREATE TABLE `P_UserEntity` (LIKE `UserEntity`);
 
 DROP TABLE IF EXISTS `P_UserObm`;
 CREATE TABLE `P_UserObm` (LIKE `UserObm`);
-
---
--- Table structure for table `P_UserObmGroup`
---
-
-DROP TABLE IF EXISTS `P_UserObmGroup`;
-CREATE TABLE `P_UserObmGroup` (LIKE `UserObmGroup`);
 
 --
 -- Table structure for table `P_of_usergroup`
