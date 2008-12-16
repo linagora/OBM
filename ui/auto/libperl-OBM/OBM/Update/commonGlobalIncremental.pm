@@ -11,7 +11,6 @@ use base qw(Exporter);
 
 
 #require OBM::toolBox;
-require OBM::Postfix::smtpInRemoteEngine;
 require OBM::Postfix::smtpOutRemoteEngine;
 require OBM::Update::utils;
 
