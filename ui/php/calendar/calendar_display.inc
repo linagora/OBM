@@ -1756,9 +1756,6 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
     $private = true;
     $id = $conflict->event->id;
     $name  = $conflict->event->attendee[$conflict->entity][$conflict->id];
-    echo "<pre>";
-    var_dump($conflict);
-    echo "</pre>";
     if (((in_array($conflict->id, $readable[$conflict->entity]['ids']) || in_array($conflict->event->owner,$readable['user']['ids']))
       && $conflict->event->privacy != '1') || $conflict->event->owner == $obm['uid'] || ($conflict->id == $obm['uid'] && $conflict->entity == 'user')) {
         $private = false;   

@@ -605,7 +605,7 @@ function run_query_calendar_insert_event_data($calendar) {
     }
   }
   $properties = "<extended_desc>$properties</extended_desc>";
-  if($all_day) {
+  if($all_day == 'TRUE') {
     $dateend = clone $datebegin;
     $dateend->addSecond($event_duration - 1);
     $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
@@ -1078,7 +1078,7 @@ function run_query_calendar_update_event_data($calendar) {
   }
   $properties = "<extended_desc>$properties</extended_desc>";
 
-  if($all_day) {
+  if($all_day == 'TRUE') {
     $dateend = clone $datebegin;
     $dateend->addSecond($event_duration - 1);
     $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
@@ -1171,7 +1171,7 @@ function run_query_calendar_quick_event_insert($calendar) {
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
-  if($all_day) {
+  if($all_day == 'TRUE') {
     $dateend = clone $datebegin;
     $dateend->addSecond($event_duration - 1);
     $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);

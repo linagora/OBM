@@ -189,17 +189,19 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
   // Samba table check
   if (!is_null($domain_id) && !$domain_global) {
     $did = sql_parse_id($domain_id, true);
-    $where = "AND Samba.samba_domain_id $did ";
+    $where = "AND domainentity_domain_id $did ";
   }
   
   // Get infos from Update table;
   $query = " SELECT
     count(*) as diff
-    FROM Samba LEFT JOIN P_Samba ON Samba.samba_domain_id = P_Samba.samba_domain_id
-    AND Samba.samba_name = P_Samba.samba_name
-    WHERE (Samba.samba_value != P_Samba.samba_value 
-    OR (Samba.samba_value IS NULL AND P_Samba.samba_value IS NOT NULL)
-    OR (Samba.samba_value IS NOT NULL AND P_Samba.samba_value IS NULL))
+    FROM ServiceProperty 
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    LEFT JOIN P_ServiceProperty ON ServiceProperty.serviceproperty_id = P_ServiceProperty.serviceproperty_id
+    WHERE ServiceProperty.serviceproperty_service = 'samba' AND 
+    ((ServiceProperty.serviceproperty_value != P_ServiceProperty.serviceproperty_value 
+    OR (ServiceProperty.serviceproperty_value IS NULL AND P_ServiceProperty.serviceproperty_value IS NOT NULL)
+    OR (P_ServiceProperty.serviceproperty_value IS NOT NULL AND ServiceProperty.serviceproperty_value IS NULL)))
     $where
   ";
   display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
@@ -213,17 +215,19 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
     // Samba table check
   if (!is_null($domain_id) && !$domain_global) {
     $did = sql_parse_id($domain_id, true);
-    $where = "AND P_Samba.samba_domain_id $did ";
+    $where = "AND domainentity_domain_id $did ";
   }
 
   // Get infos from Update table;
   $query = " SELECT
     count(*) as diff
-    FROM P_Samba LEFT JOIN Samba ON Samba.samba_domain_id = P_Samba.samba_domain_id
-    AND Samba.samba_name = P_Samba.samba_name
-    WHERE (Samba.samba_value != P_Samba.samba_value 
-    OR (Samba.samba_value IS NULL AND P_Samba.samba_value IS NOT NULL)
-    OR (Samba.samba_value IS NOT NULL AND P_Samba.samba_value IS NULL))
+    FROM P_ServiceProperty 
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    LEFT JOIN ServiceProperty ON ServiceProperty.serviceproperty_id = P_ServiceProperty.serviceproperty_id
+    WHERE ServiceProperty.serviceproperty_service = 'samba' AND 
+    ((ServiceProperty.serviceproperty_value != P_ServiceProperty.serviceproperty_value 
+    OR (ServiceProperty.serviceproperty_value IS NULL AND P_ServiceProperty.serviceproperty_value IS NOT NULL)
+    OR (P_ServiceProperty.serviceproperty_value IS NOT NULL AND ServiceProperty.serviceproperty_value IS NULL)))
     $where
   ";
   display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
