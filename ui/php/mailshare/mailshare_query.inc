@@ -171,6 +171,10 @@ function run_query_mailshare_insert($mailshare) {
     $id = $obm_q->lastid();
     $entity_id = of_entity_insert($GLOBALS['module'], $id);    
     OBM_Acl::setDefaultPublicRights('mailshare', $id);
+    $default_rights = OBM_Acl_Utils::parseRightsParams($mailshare);
+    foreach ($default_rights['user'] as $user_id => $rights) {
+      OBM_Acl::setRights($user_id, 'mailshare', $id, $rights);
+    }
     return $id;
   } else {
     return false;
