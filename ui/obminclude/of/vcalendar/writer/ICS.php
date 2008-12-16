@@ -10,6 +10,9 @@ class Vcalendar_Writer_ICS {
     $this->buffer = '';
   }
 
+  /**
+   * @param Vcalendar $document
+   */
   function writeDocument(&$document) {
     $vcalendar = &$document->vcalendar;
     $this->buffer .= 'BEGIN:'.$this->parseName($vcalendar->name)."\n";
@@ -43,7 +46,10 @@ class Vcalendar_Writer_ICS {
     foreach ($properties as $name => $value) {
       $this->writeProperty($name, $value);
     }
-    $this->writeProperty('dtstamp', $this->parseDate(gmdate('Y-m-d H:i:s')));
+    //$this->writeProperty('dtstamp', $this->parseDate(gmdate('Y-m-d H:i:s')));
+    
+    // FIXME ??? maybe a good substitute
+    $this->writeProperty('dtstamp', $this->parseDate(new Of_Date()));
     $this->buffer .= 'END:'.$this->parseName($vevent->name)."\n";
   }
 
@@ -70,8 +76,17 @@ class Vcalendar_Writer_ICS {
     return trim(chunk_split($property,74,"\n "));
   }
 
-  function writeDtstart($name,$value) {
-    $this->buffer .= $this->parseProperty($this->parseName($name).':'.$this->parseDate($value));
+  function writeDtstart($name, $value) {
+    $this->buffer .= $this->parseProperty($this->parseName($name));
+    
+    if ($value->getOriginalTimeZone()) {
+      $value->setTimezone(new DateTimeZone($value->getOriginalTimeZone()));
+      $this->buffer .= ';TZID='. $value->getOriginalTimeZone().':'. $value->get(Of_Date::ICS_DATETIME);
+      $value->setDefaultTimezone();
+    } else {
+      $this->buffer .= ':'. $value->get(Of_Date::ICS_DATETIME).'Z';
+    }
+    
     $this->buffer .= "\n";
   }
 
@@ -140,7 +155,8 @@ class Vcalendar_Writer_ICS {
   function writeRrule($name, $value) {
     $params[] = 'INTERVAL='.strtoupper($value['interval']);
     $params[] = 'FREQ='.strtoupper($value['kind']);
-    $params[] = 'UNTIL='.$this->parseDate($value['until']);
+    if ($value['until'])
+      $params[] = 'UNTIL='.$this->parseDate($value['until']);
     if(!is_null($value['byday'])) {
       $params[] = 'BYDAY='.strtoupper(implode(',',$value['byday']));
     }
@@ -166,10 +182,12 @@ class Vcalendar_Writer_ICS {
     }
     $this->buffer .= $this->parseProperty($this->parseName($name).':'.implode(',',$property))."\n";
   }
-
+  
+  /**
+   * @param Of_Date $date
+   */
   function parseDate($date) {
-    $timestamp = strtotime($date);
-    return gmdate('Ymd\THis\Z',$timestamp);
+    return $date->get(Of_Date::ICS_DATETIME).'Z';
   }
 }
 ?>

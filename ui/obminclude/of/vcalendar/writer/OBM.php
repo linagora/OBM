@@ -22,7 +22,7 @@ class Vcalendar_Writer_OBM {
     $this->db = new DB_OBM;
     $this->lazyRead = true;
     if(!$force) {
-      $this->rights = array_keys(OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'calendar', 'write');
+      $this->rights = array_keys(OBM_Acl::getAllowedEntities($GLOBALS['obm']['uid'], 'calendar', 'write'));
     } else {
       $this->rights = true;
     }
@@ -106,7 +106,12 @@ class Vcalendar_Writer_OBM {
     $event['date_exception'] = $vevent->get('exdate');
     $event['owner'] = $this->parseOrganizer($vevent->get('organizer'));
     $event['title'] = addslashes($vevent->get('summary'));
-    $event['date_begin'] = $vevent->get('dtstart');
+    $dtstart = $vevent->get('dtstart');
+    $event['date_begin'] = $dtstart;
+    
+    if ($dtstart->getOriginalTimeZone())
+      $event['timezone'] = $dtstart->getOriginalTimeZone();
+      
     $event['date_end'] = $vevent->get('dtend');
     $event['event_duration'] = $vevent->get('duration');
     $event['duration'] = $vevent->get('duration');
@@ -253,7 +258,7 @@ class Vcalendar_Writer_OBM {
         if(!is_null($rrule['byday'])) {
           $countFactor = $countFactor / count($rrule['byday']);
           foreach($rrule['byday'] as $day) {
-            $index = date('w', strtotime($day)) - date('w', strtotime($GLOBALS['ccalendar_weekstart']));
+            $index = date('w', strtotime($day)); // - date('w', strtotime($GLOBALS['ccalendar_weekstart']));
             $days[$index] = '1';
           }
         } else {

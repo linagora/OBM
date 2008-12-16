@@ -65,7 +65,7 @@ class Of_Date extends DateTime {
   const ISO_8601       = 'c';              // DATE_ISO8601 c - ISO 8601 date string
   const RFC_2822       = 'r';              // DATE_RFC2822 r - RFC 2822 date string
   const TIMESTAMP      = 'U';              // U - unix timestamp
-
+  const ICS_DATETIME   = 'Ymd\THis';       // ICS date time format
   // additional formats
   const DATABASE_DATE  = 'Y-m-d H:i:s';
   const ERA            = 'ERA';            // --- short name of era, locale aware,
@@ -150,7 +150,9 @@ class Of_Date extends DateTime {
   private static $_loaded = false;
 
   private $_error;
-
+  
+  private $originalTimeZone;
+  
   public function __construct($time=null, $timezone=null) {
     self::loadOptions();
     if(is_numeric($time)) {
@@ -161,6 +163,7 @@ class Of_Date extends DateTime {
     }
     try {
       if(!is_null($timezone)) {
+        $this->originalTimeZone = $timezone;
         $timezone = new DateTimeZone($timezone);
         parent::__construct($time, $timezone);
       } else {
@@ -1657,5 +1660,13 @@ class Of_Date extends DateTime {
 
   public static function cmpDate($d1, $d2) {
     return $d1->compareDateIso($d2);
+  }
+  
+  public function setOriginalTimeZone ($timezone) {
+    $this->originalTimeZone = $timezone;
+  }
+  
+  public function getOriginalTimeZone () {
+    return $this->originalTimeZone;
   }
 }

@@ -225,6 +225,7 @@ class Vcalendar_Reader_ICS {
     } else {
       $date = new Of_Date($value, 'GMT');
     }
+    
     return $date;
   }
 

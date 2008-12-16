@@ -30,21 +30,22 @@ class Vcalendar_Element_Vevent extends Vcalendar_Element {
   function setDtstart($value) {
     $this->dtstart = $value;
     if(isset($this->dtend) && !isset($this->duration)) {
-      $this->set('duration', strtotime($this->dtend) - strtotime($this->dtstart));
+      $this->set('duration', $this->dtend->diffTimestamp($this->dtstart));
     }
   }
 
   function setDtend($value) {
     $this->dtend = $value;
     if(isset($this->dtstart) && !isset($this->duration)) {
-      $this->set('duration', strtotime($this->dtend) - strtotime($this->dtstart));
+      $this->set('duration', $this->dtend->diffTimestamp($this->dtstart));
     }
   }
 
   function setDuration($value) {
     $this->duration = $value;
-    if(isset($this->duration) && isset($this->dtend)) {
-      $this->set('dtend', gmdate('Y-m-d H:i:s',strtotime($this->dtstart) + $this->duration));
+    if(isset($this->dtstart) && !isset($this->dtend)) {
+      $dtend = clone $this->dtstart;
+      $this->set('dtend', $dtend->addSecond($this->duration));
     }
   }
     
@@ -52,7 +53,15 @@ class Vcalendar_Element_Vevent extends Vcalendar_Element {
     if($this->get('x-obm-all-day') == 1) {
       return true;
     }
-    if(date('His', strtotime($this->dtstart)) == '000000' && date('His', strtotime($this->dtstart + $this->duration)) == '000000') {
+    
+    // if(date('His', strtotime($this->dtstart)) == '000000' && date('His', strtotime($this->dtstart + $this->duration)) == '000000') {
+    $start = $this->dtstart;
+    $end = clone $start;
+    $end = $end->addSecond($this->duration);
+    
+    if ($start->getHour() == 0 && $start->getMinute() == 0 && $start->getSecond() == 0 &&
+        $end->getHour() == 0 && $end->getMinute() == 0 && $end->getSecond() == 0
+      ) { 
       return true;
     }
     if($this->duration == '0') {

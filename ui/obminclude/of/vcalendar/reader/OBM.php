@@ -29,27 +29,31 @@ class Vcalendar_Reader_OBM {
   function readPeriod($startTime, $endTime) {
     $noRepeatEvent = run_query_calendar_no_repeat_events($startTime,$endTime,$this->entities,NULL);
     $repeatEvent = run_query_calendar_repeat_events($startTime,$endTime,$this->entities,NULL);
-    if($noRepeatEvent->next_record()) {
-      $this->eventSets[] = &$noRepeatEvent;
+    while($noRepeatEvent->next_record()) {
+      $this->eventSets[] = $noRepeatEvent->Record;
     }
-    if($repeatEvent->next_record()) {
-      $this->eventSets[] = &$repeatEvent;
+    while($repeatEvent->next_record()) {
+      $this->eventSets[] = $repeatEvent->Record;
     }
   }
-
+   
   function readSet($events) {
     foreach($events as $eventId) {
-      $this->eventSets[] = &run_query_calendar_detail($eventId);
+      $set = run_query_calendar_detail($eventId);
+      $this->eventSets[] = $set->Record;
     }
   }
-
+  
+  /**
+   * @return Vcalendar
+   */
   function & getDocument() {
     $this->document = new Vcalendar();
     $this->setHeaders();
     foreach($this->eventSets as $set) {
-      $id = $set->f('event_id');      
+      $id = $set['event_id'];      
       if(is_null($this->vevents[$id])) {
-        $this->vevents[$id] = &$this->addVevent($set->Record);
+        $this->vevents[$id] = &$this->addVevent($set);
       }
     }
 
@@ -76,7 +80,9 @@ class Vcalendar_Reader_OBM {
 
   function & addVevent(&$data) {
     $vevent = &$this->document->createElement('vevent');
-    $vevent->set('dtstart', $this->parseDate($data['event_date']));
+    $dtstart = $this->parseDate($data['event_date']);
+    $dtstart->setOriginalTimeZone($data['event_timezone']);
+    $vevent->set('dtstart', $dtstart);
     $vevent->set('duration', $data['event_duration']);
     if($data['event_allday'] != 0) {
       $vevent->set('x-obm-all-day', 1);
@@ -97,8 +103,11 @@ class Vcalendar_Reader_OBM {
     return $vevent;
   }
 
+  /**
+   * @return Of_Date
+   */
   function parseDate($timestamp) {
-    return new Of_Date($timestamp);
+    return new Of_Date($timestamp, 'GMT');
   }
   
   function addAttendee(&$vevent, &$data) {
@@ -146,9 +155,10 @@ class Vcalendar_Reader_OBM {
          break;
        case 'monthlybyday' :
          $rrule['kind'] = 'monthly';
-         $day = $data['event_date']->get(Of_Date::WEEKDAY_ICS);
+         $date = new Of_Date($data['event_date']);
+         $day = $date->get(Of_Date::WEEKDAY_ICS);
          
-         $num =  ceil($data['event_date']->getDay()/7);
+         $num =  ceil($date->getDay()/7);
          $rrule['byday'] = array($num.$day);
          break;
        case 'weekly' :
@@ -162,7 +172,8 @@ class Vcalendar_Reader_OBM {
          $rrule['byday'] = $days;
          break;
      }
-     $rrule['until'] = $this->parseDate($data['event_endrepeat']);
+     if ($data['event_endrepeat'])
+       $rrule['until'] = $this->parseDate($data['event_endrepeat']);
      $rrule['interval'] = $data['event_repeatfrequence'];
      return $rrule;
   }

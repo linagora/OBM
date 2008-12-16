@@ -2778,13 +2778,12 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
   if ($current->compare($start) < 0) {
     $diff = - ceil($current->diffTimestamp($start) / Of_Date::DAYDURATION); 
     if ($diff > 0) {
-      $diff = ($diff % ($repeatfrequence * 7));
+      $diff = ($diff % (($repeatfrequence) * 7));
     }	    
     $current->setDateIso($start)->subDay($diff);
   }
   $days = str_split($repeatdays);
   if($start->compare($date) < 0) $start = $date;
-  echo"<pre>";
   while ($current->compare($end) < 0) {
     foreach ($days as $num => $repeat) {	
       if ($repeat == 1) {
@@ -2792,12 +2791,12 @@ function calendar_weekly_repeatition($date,$start,$end,$repeatdays,$repeatfreque
         if($current->compare($start) >= 0 && $current->compare($end) < 0) {
           $of = &OccurrenceFactory::getInstance();
           $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
-	}
+	    }
       }
     } 
+    $current->setWeekday($ccalendar_weekstart);
     $current->addWeek($repeatfrequence);
   }	
-  echo"</pre>";
 }
 
 
@@ -3687,7 +3686,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $event_q = run_query_calendar_detail($calendar['calendar_id']);
     $old_title = $event_q->f('event_title');
     $old_start = new Of_Date($event_q->f('event_date'), 'GMT');
-    $old_end = clone $start;
+    $old_end = clone $old_start;
     $old_end->addSecond($event_q->f('event_duration'));
     $old_location = $event_q->f('event_location');
     $entities = get_calendar_event_entity($calendar['calendar_id']); 
