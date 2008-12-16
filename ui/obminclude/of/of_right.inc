@@ -205,13 +205,12 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   return false;\">
     <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
-  if($module != 'mailbox' && $module != 'mailshare') {
-    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group&amp;ext_container=table";
-    $popup_group_add_button = "
-      <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
-      <img src=\"$ico_add\" alt=\"[Add]\" />
-      </a>";
-  }
+    
+  $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group&amp;ext_container=table";
+  $popup_group_add_button = "
+    <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
+    <img src=\"$ico_add\" alt=\"[Add]\" />
+    </a>";
     
   $block_public_perms = "
   <tbody>
@@ -469,13 +468,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
     var sel_perms = new Array('cb_accept_read', 'cb_accept_write', 'cb_accept_access', 'cb_accept_admin');
     obm.initialize.chain(function () {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user', 'userSearch', {name: sel_perms, resultValue: resultValue});
-      ";
-      if($module != 'mailbox' && $module != 'mailshare') {
-        $block .= "      
       new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group', 'groupSearch', {name: sel_perms, resultValue: resultValue});
-      ";
-      }
-      $block .="
     });
   </script>
 ";
