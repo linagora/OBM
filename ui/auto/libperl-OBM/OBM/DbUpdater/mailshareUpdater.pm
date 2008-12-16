@@ -84,9 +84,8 @@ sub update {
             $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
             return 1;
         }
-    }
 
-    if( !$entity->getDelete() && $entity->getUpdateLinks() ) {
+
         $query = 'INSERT INTO P_MailshareEntity
                     (   mailshareentity_entity_id,
                         mailshareentity_mailshare_id
@@ -98,8 +97,9 @@ sub update {
             $self->_log( 'problème à la mise à jour des liens '.$entity->getDescription() );
             return 1;
         }
+    }
 
-
+    if( !$entity->getDelete() && $entity->getUpdateLinks() ) {
         $query = 'INSERT INTO P_EntityRight
                     (   entityright_entity_id,
                         entityright_consumer_id,
@@ -160,14 +160,6 @@ sub _delete {
 
 
     my $query;
-    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
-        $query = 'DELETE FROM P_MailShare WHERE mailshare_id='.$entity->getId();
-        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
-            return 1;
-        }
-    }
-
     if( $entity->getDelete() || $entity->getUpdateLinks() ) {
         $query = 'DELETE FROM P_EntityRight
                     WHERE entityright_entity_id=(SELECT mailshareentity_entity_id
@@ -177,14 +169,22 @@ sub _delete {
             $self->_log( 'problème à la mise à jour BD de liens '.$entity->getDescription(), 2 );
             return 1;
         }
+    }
 
-        $query = 'DELETE FROM P_MailshareEntity WHERE mailshareentity_mailshare_id = '.$entity->getId();
+
+    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
+        $query = 'DELETE FROM P_MailshareEntity WHERE mailshareentity_mailshare_id='$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-            $self->_log( 'problème à la mise à jour BD de liens '.$entity->getDescription(), 2 );
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
+            return 1;
+        }
+
+        $query = 'DELETE FROM P_MailShare WHERE mailshare_id='.$entity->getId();
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
             return 1;
         }
     }
-
 
     return 0;
 }

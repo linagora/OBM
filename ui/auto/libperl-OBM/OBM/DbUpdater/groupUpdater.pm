@@ -93,7 +93,18 @@ sub update {
                                 group_contacts
                       FROM UGroup
                       WHERE group_id='.$entity->getId();
-    
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
+            return 1;
+        }
+
+        $query = 'INSERT INTO P_GroupEntity
+                    (   groupentity_entity_id,
+                        groupentity_group_id
+                    ) SELECT    groupentity_entity_id,
+                                groupentity_group_id
+                      FROM GroupEntity
+                      WHERE groupentity_group_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
             return 1;
@@ -152,18 +163,24 @@ sub _delete {
 
 
     my $query;
-    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
-        $query = 'DELETE FROM P_UGroup WHERE group_id='.$entity->getId();
-        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
-            return 1;
-        }
-    }
-
     if( $entity->getDelete() || $entity->getUpdateLinks() ) {
         $query = 'DELETE FROM P_of_usergroup WHERE of_usergroup_group_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD de liens '.$entity->getDescription(), 2 );
+            return 1;
+        }
+    }
+
+    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
+        $query = 'DELETE FROM P_GroupEntity WHERE groupentity_group_id='.$entity->getId();
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
+            return 1;
+        }
+
+        $query = 'DELETE FROM P_UGroup WHERE group_id='.$entity->getId();
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
             return 1;
         }
     }

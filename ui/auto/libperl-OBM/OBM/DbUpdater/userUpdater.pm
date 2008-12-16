@@ -201,7 +201,20 @@ sub update {
                                 userobm_photo_id
                       FROM UserObm
                       WHERE userobm_id='.$entity->getId();
-    
+
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
+            return 1;
+        }
+
+        $query = 'INSERT INTO P_UserEntity
+                    (   userentity_entity_id,
+                        userentity_user_id
+                    ) SELECT    userentity_entity_id,
+                                userentity_user_id
+                      FROM UserEntity
+                      WHERE userentity_user_id='.$entity->getId();
+
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
             return 1;
@@ -282,14 +295,6 @@ sub _delete {
 
 
     my $query;
-    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
-        $query = 'DELETE FROM P_UserObm WHERE userobm_id='.$entity->getId();
-        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
-            return 1;
-        }
-    }
-
     if( $entity->getDelete() || $entity->getUpdateLinks() ) {
         $query = 'DELETE FROM P_EntityRight
                     WHERE entityright_entity_id=(SELECT mailboxentity_entity_id
@@ -303,6 +308,20 @@ sub _delete {
         $query = 'DELETE FROM P_MailboxEntity WHERE mailboxentity_mailbox_id = '.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD de liens '.$entity->getDescription(), 2 );
+            return 1;
+        }
+    }
+
+    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
+        $query = 'DELETE FROM P_UserEntity WHERE userentity_user_id='..$entity->getId();
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
+            return 1;
+        }
+
+        $query = 'DELETE FROM P_UserObm WHERE userobm_id='.$entity->getId();
+        if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+            $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
             return 1;
         }
     }
