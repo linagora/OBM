@@ -1257,8 +1257,8 @@ UPDATE EntityRight SET entityright_access = 1 WHERE entityright_consumer_id IS N
 DELETE FROM EntityRight WHERE entityright_entity != 'entity';
 ALTER TABLE EntityRight DROP COLUMN entityright_entity;
 ALTER TABLE EntityRight DROP COLUMN entityright_consumer;
-ALTER TABLE P_EntityRight DROP COLUMN entityright_entity;
-ALTER TABLE P_EntityRight DROP COLUMN entityright_consumer;
+DROP TABLE P_EntityRight;
+
 
 DELETE FROM DocumentLink WHERE documentlink_entity_id NOT IN (SELECT contact_id FROM Contact) AND documentlink_entity = 'contact';
 UPDATE DocumentLink SET documentlink_entity_id = (SELECT contactentity_entity_id FROM ContactEntity INNER JOIN Contact ON contactentity_contact_id = contact_id WHERE contact_id = documentlink_entity_id), documentlink_entity = 'entity' WHERE documentlink_entity = 'contact';
@@ -2400,6 +2400,8 @@ DELETE FROM of_usergroup WHERE of_usergroup_user_id NOT IN (SELECT userobm_id FR
 -- MailboxEntity production table
 CREATE TABLE P_MailboxEntity LIKE MailboxEntity;
 
+CREATE TABLE P_EntityRight LIKE EntityRight;
+
 -- MailshareEntity production table
 CREATE TABLE P_MailshareEntity LIKE MailshareEntity;
 
@@ -2460,7 +2462,7 @@ CREATE TABLE `CampaignEntity` (
   `campaignentity_entity_id` int(8) NOT NULL,
   `campaignentity_campaign_id` int(8) NOT NULL,
   PRIMARY KEY  (`campaignentity_entity_id`,`campaignentity_campaign_id`),
-  KEY `campaignentity_campaign_id_campaign_id_fkey` (`campaignentity_campaign_id`),
+  KEY `campaignentity_campaign_id_campaign_id_fkey` (`campaignentity_campaign_id`)
 );
 
 --
@@ -2471,7 +2473,7 @@ CREATE TABLE `CampaignDisabledEntity` (
   `campaigndisabledentity_entity_id` int(8) NOT NULL,
   `campaigndisabledentity_campaign_id` int(8) NOT NULL,
   PRIMARY KEY  (`campaigndisabledentity_entity_id`,`campaigndisabledentity_campaign_id`),
-  KEY `campaigndisabledentity_campaign_id_campaign_id_fkey` (`campaigndisabledentity_campaign_id`),
+  KEY `campaigndisabledentity_campaign_id_campaign_id_fkey` (`campaigndisabledentity_campaign_id`)
 );
 
 --
@@ -2484,7 +2486,7 @@ CREATE TABLE `CampaignTarget` (
   `campaigntarget_entity_id` int(8),
   `campaigntarget_status` int(8) NULL,
   PRIMARY KEY (`campaigntarget_id`),
-  KEY `campaigntarget_campaign_id_campaign_id_fkey` (`campaigntarget_campaign_id`),
+  KEY `campaigntarget_campaign_id_campaign_id_fkey` (`campaigntarget_campaign_id`)
 );
 
 --
@@ -2497,7 +2499,7 @@ CREATE TABLE `CampaignMailTarget` (
   `campaignmailtarget_entity_id` int(8),
   `campaignmailtarget_status` int(8) NULL,
   PRIMARY KEY (`campaignmailtarget_id`),
-  KEY `campaignmailtarget_campaign_id_campaign_id_fkey` (`campaignmailtarget_campaign_id`),
+  KEY `campaignmailtarget_campaign_id_campaign_id_fkey` (`campaignmailtarget_campaign_id`)
 );
 
 --
