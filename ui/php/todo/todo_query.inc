@@ -129,15 +129,18 @@ function run_query_todo_detail($todo) {
     $timecreate,
     $date,
     Author.userobm_lastname as author_firstname,
-    Author.userobm_firstname as author_lastname
+    Author.userobm_firstname as author_lastname,
+    eventlink_percent
   FROM Event
     LEFT JOIN UserObm as uc ON event_usercreate = uc.userobm_id
-    LEFT JOIN UserObm as uu ON event_userupdate = uu.userobm_id,
+    LEFT JOIN UserObm as uu ON event_userupdate = uu.userobm_id
+    LEFT JOIN EventLink ON eventlink_event_id = event_id,
     UserObm as Author
   WHERE event_id $t_id
     AND event_type='VTODO'
     $multidomain
-    AND Author.userobm_id = event_usercreate";
+    AND Author.userobm_id = event_usercreate
+    ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_todo_detail()');
   $obm_q->query($query);
@@ -242,7 +245,7 @@ function run_query_todo_insert($todo) {
       $entity_id = of_entity_insert('event', $id);
 
       foreach ($users as $user_id) {
-	$user = sql_parse_id($user);
+        $user = str_replace('data-user-','',$user_id) ;
 	// insert user link
 	$query = "INSERT INTO EventLink (
           eventlink_timeupdate,
@@ -260,7 +263,7 @@ function run_query_todo_insert($todo) {
           '$uid',
           '$uid',
           '$id',
-          ".of_entity_subquery('user', $user_id).",
+          ".of_entity_subquery('user', $user).",
           'ACCEPTED',
           'REQ',
           '$percent')";
@@ -290,6 +293,9 @@ function run_query_todo_update($todo) {
   $title = $todo['title'];
   $priority = $todo['priority'];
   $date = of_isodate_convert($todo['date'],true);
+  if($date) {
+    $date = new Of_Date($date);
+  }
   $description = $todo['description'];
   $percent = $todo['percent'];
   if ($percent == '') {
@@ -353,9 +359,13 @@ function run_query_todo_update($todo) {
       $retour = $obm_q->query($query);
     }
   }
-
+  
   // XXXXX Update the existing users (if percent has changed)
-
+  if($percent != 0) {
+    $query = 'UPDATE EventLink SET eventlink_percent = '.$percent.' WHERE eventlink_event_id = '.$todo_id;
+    display_debug_msg($query, $cdg_sql, 'run_query_todo_update_percent_update()');
+    $retour = $obm_q->query($query);  
+  }
   return $retour;
 }
 
