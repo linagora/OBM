@@ -25,7 +25,7 @@ sub new {
     $self->{'entitiesUpdateErrorDesc'} = ();
 
     # Which domains SMTP-in to update
-    $self->{'smtpInDomainId'} = ();
+    $self->{'smtpInDomainId'} = {};
 
     return $self;
 }
@@ -82,7 +82,7 @@ sub update {
     }
 
     $self->{'entitiesUpdate'}++;
-    push( @{$self->{'smtpInDomainId'}}, $entity->getDomainId() );
+    $self->{'smtpInDomainId'}->{$entity->getDomainId()} = '';
 
     return 0;
 }
@@ -119,7 +119,8 @@ sub updateMaps {
 sub _updateSmtpInMaps {
     my $self = shift;
 
-    if( $#{$self->{'smtpInDomainId'}} < 0 ) {
+    my @smtpInDomainId = keys(%{$self->{'smtpInDomainId'}});
+    if( $#smtpInDomainId < 0 ) {
         $self->_log( 'pas d\'ID de domaine à mettre à jour. Pas de régénération des maps SMTP-in', 3 );
         return 0;
     }
@@ -135,7 +136,7 @@ sub _updateSmtpInMaps {
                  FROM ServiceProperty
                  INNER JOIN DomainEntity ON serviceproperty_entity_id=domainentity_entity_id AND serviceproperty_property=\'smtp_in\'
                  INNER JOIN Host ON host_id='.$dbHandler->castAsInteger('serviceproperty_value').' 
-                 WHERE domainentity_domain_id IN ('.join( ', ', @{$self->{'smtpInDomainId'}} ).')';
+                 WHERE domainentity_domain_id IN ('.join( ', ', @smtpInDomainId ).')';
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {

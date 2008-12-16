@@ -313,7 +313,7 @@ sub _delete {
     }
 
     if( $entity->getDelete() || $entity->getUpdateEntity() ) {
-        $query = 'DELETE FROM P_UserEntity WHERE userentity_user_id='..$entity->getId();
+        $query = 'DELETE FROM P_UserEntity WHERE userentity_user_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
             return 1;
