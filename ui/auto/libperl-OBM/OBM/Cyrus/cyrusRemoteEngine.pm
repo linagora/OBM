@@ -99,6 +99,10 @@ sub addCyrusPartition {
             $self->_log( 'problème lors de l\'exécution de la commande '.$cmd, 0 );
             $errorCode = 1;
         }
+
+    }elsif( $srvCon->eof() ) {
+        $self->_log( 'problème lors de l\'exécution de la commande '.$cmd, 0 );
+        return 1;
     }
 
     $self->_log( 'déconnexion d\'obmSatellite de '.$cyrusSrv->getDescription(), 2 );
