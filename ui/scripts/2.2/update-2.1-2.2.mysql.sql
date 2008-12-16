@@ -2525,8 +2525,6 @@ INSERT INTO P_GroupEntity SELECT * FROM GroupEntity;
 --
 
 DROP TABLE IF EXISTS `P_GroupGroup`;
-CREATE TABLE `P_GroupGroup` (LIKE `GroupGroup`);
-INSERT INTO P_GroupGroup SELECT * FROM GroupGroup;
 
 
 --

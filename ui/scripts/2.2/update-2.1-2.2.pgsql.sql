@@ -2972,8 +2972,6 @@ INSERT INTO P_GroupEntity SELECT * FROM GroupEntity;
 --
 
 DROP TABLE P_GroupGroup;
-CREATE TABLE P_GroupGroup (LIKE GroupGroup);
-INSERT INTO P_GroupGroup SELECT * FROM GroupGroup;
 
 
 --
