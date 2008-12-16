@@ -240,7 +240,7 @@ sub _sieveGetHeaders {
 
     while( ( $#{$oldSieveScript}>=0 ) && ( $oldSieveScript->[0] =~ /^(require|#|\s+|$)/ ) ) {
         if( $oldSieveScript->[0] !~ /OBM2/ ) {
-            push( @{$headers}, $oldSieveScript->[0]."\n" );
+            push( @{$headers}, $oldSieveScript->[0] );
         }else {
             last;
         }

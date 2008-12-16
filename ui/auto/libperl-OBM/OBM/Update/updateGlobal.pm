@@ -86,6 +86,13 @@ sub update {
         return 1;
     }
 
+    require OBM::Postfix::smtpInEngine;
+    $self->_log( 'initialisation du SMTP-in maps updater', 2 );
+    if( !($self->{'smtpInEngine'} = OBM::Postfix::smtpInEngine->new()) ) {
+        $self->_log( 'echec de l\'initialisation du SMTP-in maps updater', 0 );
+        return 1;
+    }
+
     require OBM::entitiesFactory;
     $self->_log( 'initialisation de l\'entity factory', 2 );
     if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'GLOBAL', $self->{'domain'} )) ) {
@@ -163,9 +170,26 @@ sub update {
 
         if( $self->{'dbUpdater'}->update($entity) ) {
             $self->_log( 'problème à la mise à jour BD de l\'entité '.$entity->getDescription(), 1 );
+            $entity->unsetUpdated();
         }else {
             $self->_log( 'entité '.$entity->getDescription().' mise à jour en BD', 1 );
         }
+
+        if( $self->{'smtpInEngine'}->update($entity) ) {
+            $self->_log( 'erreur fatale', 1 );
+            return 1;
+        }
+    }
+
+    my $returnCode = $self->{'smtpInEngine'}->updateMaps();
+    if( $returnCode == 1 ) {
+        $self->_log( 'annulation de la génération des maps SMTP-in', 3 );
+        return 1;
+
+    }elsif( $returnCode == 2 ) {
+        $self->_log( 'erreur lors de la mise à jour des maps SMTP-in', 0 );
+        $self->_log( 'Il peut y avoir des incohérences dans le contenu des différents serveur SMTP-in', 0 );
+        return 1;
     }
 
     return 0;

@@ -19,6 +19,7 @@ use OBM::Entities::commonEntities qw(
         setArchive
         getParent
         setUpdated
+        unsetUpdated
         getUpdated
         getDesc
         _makeEntityEmail

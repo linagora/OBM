@@ -18,6 +18,7 @@ $VERSION = '1.0';
                     setArchive
                     getParent
                     setUpdated
+                    unsetUpdated
                     getUpdated
                     getDesc
                     _makeEntityEmail
@@ -74,6 +75,15 @@ sub setUpdated {
     my $self = shift;
 
     $self->{'updated'} = 1;
+
+    return 0;
+}
+
+
+sub unsetUpdated {
+    my $self = shift;
+
+    $self->{'updated'} = 0;
 
     return 0;
 }
