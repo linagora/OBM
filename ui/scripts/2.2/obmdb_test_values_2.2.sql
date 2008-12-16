@@ -218,16 +218,6 @@ INSERT INTO UserObmGroup (userobmgroup_group_id, userobmgroup_userobm_id) VALUES
 
 
 -- -----------------------------------------------------------------------------
--- Remplissage de la table 'MailServerNetwork' : déclaration des serveurs
--- réseaux locaux des serveurs de BALs
--- -----------------------------------------------------------------------------
-DELETE FROM MailServerNetwork;
-
-INSERT INTO MailServerNetwork (mailservernetwork_host_id, mailservernetwork_ip) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail'), '127.0.0.1' );
-INSERT INTO MailServerNetwork (mailservernetwork_host_id, mailservernetwork_ip) VALUES ( (SELECT host_id FROM Host WHERE host_name='srv-mail'), '10.0.0.0/24' );
-
-
--- -----------------------------------------------------------------------------
 -- Remplissage de la table 'MailShare' : Création d'un répertoire partagé
 -- -----------------------------------------------------------------------------
 DELETE FROM MailShare;

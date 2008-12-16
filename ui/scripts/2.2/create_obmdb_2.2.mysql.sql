@@ -1,17 +1,6 @@
--- /////////////////////////////////////////////////////////////////////////////
--- // OBM - File : create_obmdb_2.2.mysql.sql                                 //
--- //     - Desc : MySQL Database 2.2 creation script                         //
--- // 2007-04-22 AliaSource                                                   //
--- /////////////////////////////////////////////////////////////////////////////
--- $Id$
--- /////////////////////////////////////////////////////////////////////////////
--- -----------------------------------------------------------------------------
--- Global Information table
--- -----------------------------------------------------------------------------
 SET NAMES 'UTF8';
 
 SET FOREIGN_KEY_CHECKS=0;
-
 
 --
 -- Table structure for table `Account`
@@ -81,10 +70,10 @@ DROP TABLE IF EXISTS `Address`;
 CREATE TABLE `Address` (
   `address_id` int(8) NOT NULL auto_increment,
   `address_entity_id` int(8) NOT NULL,
-  `address_street` text default NULL,
+  `address_street` text,
   `address_zipcode` varchar(14) default NULL,
   `address_town` varchar(128) default NULL,
-  address_state varchar(128),
+  `address_state` varchar(128) default NULL,
   `address_expresspostal` varchar(16) default NULL,
   `address_country` char(2) default NULL,
   `address_label` varchar(255) default NULL,
@@ -128,10 +117,138 @@ DROP TABLE IF EXISTS `CalendarEntity`;
 CREATE TABLE `CalendarEntity` (
   `calendarentity_entity_id` int(8) NOT NULL,
   `calendarentity_calendar_id` int(8) NOT NULL,
-  PRIMARY KEY (`calendarentity_entity_id`,`calendarentity_calendar_id`),
+  PRIMARY KEY  (`calendarentity_entity_id`,`calendarentity_calendar_id`),
   KEY `calendarentity_calendar_id_calendar_id_fkey` (`calendarentity_calendar_id`),
   CONSTRAINT `calendarentity_calendar_id_calendar_id_fkey` FOREIGN KEY (`calendarentity_calendar_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `calendarentity_entity_id_entity_id_fkey` FOREIGN KEY (`calendarentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Campaign`
+--
+
+DROP TABLE IF EXISTS `Campaign`;
+CREATE TABLE `Campaign` (
+  `campaign_id` int(8) NOT NULL auto_increment,
+  `campaign_name` varchar(50) default NULL,
+  `campaign_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `campaign_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `campaign_userupdate` int(8) default NULL,
+  `campaign_usercreate` int(8) default NULL,
+  `campaign_manager_id` int(8) default NULL,
+  `campaign_tracker_key` int(11) default NULL,
+  `campaign_refer_url` varchar(255) default NULL,
+  `campaign_nb_sent` int(10) default NULL,
+  `campaign_nb_error` int(10) default NULL,
+  `campaign_nb_inqueue` int(10) default NULL,
+  `campaign_progress` int(3) default NULL,
+  `campaign_start_date` date default NULL,
+  `campaign_end_date` date default NULL,
+  `campaign_status` int(3) default NULL,
+  `campaign_type` int(2) default NULL,
+  `campaign_objective` text,
+  `campaign_comment` text,
+  `campaign_domain_id` int(8) NOT NULL,
+  `campaign_email` int(8) default NULL,
+  `campaign_parent` int(8) default NULL,
+  `campaign_child_order` int(2) default NULL,
+  PRIMARY KEY  (`campaign_id`),
+  KEY `campaign_parent_fkey` (`campaign_parent`),
+  KEY `campaign_email_fkey` (`campaign_email`),
+  CONSTRAINT `campaign_parent_fkey` FOREIGN KEY (`campaign_parent`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `campaign_email_fkey` FOREIGN KEY (`campaign_email`) REFERENCES `Document` (`document_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignDisabledEntity`
+--
+
+DROP TABLE IF EXISTS `CampaignDisabledEntity`;
+CREATE TABLE `CampaignDisabledEntity` (
+  `campaigndisabledentity_entity_id` int(8) NOT NULL,
+  `campaigndisabledentity_campaign_id` int(8) NOT NULL,
+  PRIMARY KEY  (`campaigndisabledentity_entity_id`,`campaigndisabledentity_campaign_id`),
+  KEY `campaigndisabledentity_campaign_id_campaign_id_fkey` (`campaigndisabledentity_campaign_id`),
+  CONSTRAINT `campaigndisabledentity_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaigndisabledentity_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `campaigndisabledentity_entity_id_entity_id_fkey` FOREIGN KEY (`campaigndisabledentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignEntity`
+--
+
+DROP TABLE IF EXISTS `CampaignEntity`;
+CREATE TABLE `CampaignEntity` (
+  `campaignentity_entity_id` int(8) NOT NULL,
+  `campaignentity_campaign_id` int(8) NOT NULL,
+  PRIMARY KEY  (`campaignentity_entity_id`,`campaignentity_campaign_id`),
+  KEY `campaignentity_campaign_id_campaign_id_fkey` (`campaignentity_campaign_id`),
+  CONSTRAINT `campaignentity_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaignentity_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `campaignentity_entity_id_entity_id_fkey` FOREIGN KEY (`campaignentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignMailContent`
+--
+
+DROP TABLE IF EXISTS `CampaignMailContent`;
+CREATE TABLE `CampaignMailContent` (
+  `campaignmailcontent_id` int(8) NOT NULL auto_increment,
+  `campaignmailcontent_refext_id` varchar(8) default NULL,
+  `campaignmailcontent_content` blob,
+  PRIMARY KEY  (`campaignmailcontent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignMailTarget`
+--
+
+DROP TABLE IF EXISTS `CampaignMailTarget`;
+CREATE TABLE `CampaignMailTarget` (
+  `campaignmailtarget_id` int(8) NOT NULL auto_increment,
+  `campaignmailtarget_campaign_id` int(8) NOT NULL,
+  `campaignmailtarget_entity_id` int(8) default NULL,
+  `campaignmailtarget_status` int(8) default NULL,
+  PRIMARY KEY  (`campaignmailtarget_id`),
+  KEY `campaignmailtarget_campaign_id_campaign_id_fkey` (`campaignmailtarget_campaign_id`),
+  KEY `campaignmailtarget_entity_id_entity_id_fkey` (`campaignmailtarget_entity_id`),
+  CONSTRAINT `campaignmailtarget_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaignmailtarget_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `campaignmailtarget_entity_id_entity_id_fkey` FOREIGN KEY (`campaignmailtarget_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignPushTarget`
+--
+
+DROP TABLE IF EXISTS `CampaignPushTarget`;
+CREATE TABLE `CampaignPushTarget` (
+  `campaignpushtarget_id` int(8) NOT NULL auto_increment,
+  `campaignpushtarget_mailcontent_id` int(8) NOT NULL,
+  `campaignpushtarget_refext_id` varchar(8) default NULL,
+  `campaignpushtarget_status` int(2) NOT NULL default '1',
+  `campaignpushtarget_email_address` varchar(512) NOT NULL,
+  `campaignpushtarget_properties` text,
+  `campaignpushtarget_start_time` datetime default NULL,
+  `campaignpushtarget_sent_time` datetime default NULL,
+  `campaignpushtarget_retries` int(3) default NULL,
+  PRIMARY KEY  (`campaignpushtarget_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `CampaignTarget`
+--
+
+DROP TABLE IF EXISTS `CampaignTarget`;
+CREATE TABLE `CampaignTarget` (
+  `campaigntarget_id` int(8) NOT NULL auto_increment,
+  `campaigntarget_campaign_id` int(8) NOT NULL,
+  `campaigntarget_entity_id` int(8) default NULL,
+  `campaigntarget_status` int(8) default NULL,
+  PRIMARY KEY  (`campaigntarget_id`),
+  KEY `campaigntarget_campaign_id_campaign_id_fkey` (`campaigntarget_campaign_id`),
+  KEY `campaigntarget_entity_id_entity_id_fkey` (`campaigntarget_entity_id`),
+  CONSTRAINT `campaigntarget_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaigntarget_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `campaigntarget_entity_id_entity_id_fkey` FOREIGN KEY (`campaigntarget_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -858,17 +975,16 @@ CREATE TABLE `DeletedContact` (
 
 DROP TABLE IF EXISTS `DeletedEvent`;
 CREATE TABLE `DeletedEvent` (
-  `deletedevent_id`       int(8) NOT NULL auto_increment,
+  `deletedevent_id` int(8) NOT NULL auto_increment,
   `deletedevent_event_id` int(8) default NULL,
-  `deletedevent_user_id`  int(8) default NULL,
-  `deletedevent_origin`   varchar(255) NOT NULL,
-  `deletedevent_type`     enum('VEVENT','VTODO','VJOURNAL','VFREEBUSY') default 'VEVENT',
+  `deletedevent_user_id` int(8) default NULL,
+  `deletedevent_origin` varchar(255) NOT NULL,
+  `deletedevent_type` enum('VEVENT','VTODO','VJOURNAL','VFREEBUSY') default 'VEVENT',
   `deletedevent_timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`deletedevent_id`),
   KEY `idx_dce_event` (`deletedevent_event_id`),
   KEY `idx_dce_user` (`deletedevent_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 --
 -- Table structure for table `DeletedUser`
@@ -1071,7 +1187,7 @@ DROP TABLE IF EXISTS `Entity`;
 CREATE TABLE `Entity` (
   `entity_id` int(8) NOT NULL auto_increment,
   `entity_mailing` tinyint(1) default NULL,
-  PRIMARY KEY (`entity_id`)
+  PRIMARY KEY  (`entity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1080,14 +1196,14 @@ CREATE TABLE `Entity` (
 
 DROP TABLE IF EXISTS `EntityRight`;
 CREATE TABLE `EntityRight` (
-  `entityright_id` int(8) auto_increment,
+  `entityright_id` int(8) NOT NULL auto_increment,
   `entityright_entity_id` int(8) NOT NULL,
-  `entityright_consumer_id` int(8),
+  `entityright_consumer_id` int(8) default NULL,
   `entityright_access` int(1) NOT NULL default '0',
   `entityright_read` int(1) NOT NULL default '0',
   `entityright_write` int(1) NOT NULL default '0',
   `entityright_admin` int(1) NOT NULL default '0',
-  PRIMARY KEY (`entityright_id`),
+  PRIMARY KEY  (`entityright_id`),
   KEY `entityright_entity_id_entity_id` (`entityright_entity_id`),
   KEY `entityright_consumer_id_entity_id` (`entityright_consumer_id`),
   CONSTRAINT `entityright_entity_id_entity_id` FOREIGN KEY (`entityright_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -1191,6 +1307,40 @@ CREATE TABLE `EventCategory1` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- Table structure for table `EventEntity`
+--
+
+DROP TABLE IF EXISTS `EventEntity`;
+CREATE TABLE `EventEntity` (
+  `evententity_entity_id` int(8) NOT NULL,
+  `evententity_event_id` int(8) NOT NULL,
+  PRIMARY KEY  (`evententity_entity_id`,`evententity_event_id`),
+  KEY `evententity_event_id_event_id_fkey` (`evententity_event_id`),
+  CONSTRAINT `evententity_event_id_event_id_fkey` FOREIGN KEY (`evententity_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `evententity_entity_id_entity_id_fkey` FOREIGN KEY (`evententity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `EventException`
+--
+
+DROP TABLE IF EXISTS `EventException`;
+CREATE TABLE `EventException` (
+  `eventexception_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `eventexception_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `eventexception_userupdate` int(8) default NULL,
+  `eventexception_usercreate` int(8) default NULL,
+  `eventexception_event_id` int(8) NOT NULL,
+  `eventexception_date` datetime NOT NULL,
+  PRIMARY KEY  (`eventexception_event_id`,`eventexception_date`),
+  KEY `eventexception_userupdate_userobm_id_fkey` (`eventexception_userupdate`),
+  KEY `eventexception_usercreate_userobm_id_fkey` (`eventexception_usercreate`),
+  CONSTRAINT `eventexception_usercreate_userobm_id_fkey` FOREIGN KEY (`eventexception_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `eventexception_event_id_eventevent_id_fkey` FOREIGN KEY (`eventexception_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `eventexception_userupdate_userobm_id_fkey` FOREIGN KEY (`eventexception_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
 -- Table structure for table `EventLink`
 --
 
@@ -1213,39 +1363,6 @@ CREATE TABLE `EventLink` (
   CONSTRAINT `eventlink_usercreate_userobm_id_fkey` FOREIGN KEY (`eventlink_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `eventlink_event_id_event_id_fkey` FOREIGN KEY (`eventlink_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `eventlink_userupdate_userobm_id_fkey` FOREIGN KEY (`eventlink_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `EventEntity`
---
-
-DROP TABLE IF EXISTS EventEntity;
-CREATE TABLE EventEntity (
-  evententity_entity_id int(8) NOT NULL,
-  evententity_event_id int(8) NOT NULL,
-  PRIMARY KEY (evententity_entity_id, evententity_event_id),
-  CONSTRAINT evententity_event_id_event_id_fkey FOREIGN KEY (evententity_event_id) REFERENCES Event (event_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT evententity_entity_id_entity_id_fkey FOREIGN KEY (evententity_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `EventException`
---
-
-DROP TABLE IF EXISTS `EventException`;
-CREATE TABLE `EventException` (
-  `eventexception_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `eventexception_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `eventexception_userupdate` int(8) default NULL,
-  `eventexception_usercreate` int(8) default NULL,
-  `eventexception_event_id` int(8) NOT NULL,
-  `eventexception_date` datetime NOT NULL,
-  PRIMARY KEY  (`eventexception_event_id`,`eventexception_date`),
-  KEY `eventexception_userupdate_userobm_id_fkey` (`eventexception_userupdate`),
-  KEY `eventexception_usercreate_userobm_id_fkey` (`eventexception_usercreate`),
-  CONSTRAINT `eventexception_usercreate_userobm_id_fkey` FOREIGN KEY (`eventexception_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `eventexception_event_id_eventevent_id_fkey` FOREIGN KEY (`eventexception_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `eventexception_userupdate_userobm_id_fkey` FOREIGN KEY (`eventexception_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1290,9 +1407,9 @@ CREATE TABLE `Host` (
   `host_usercreate` int(8) default NULL,
   `host_uid` int(8) default NULL,
   `host_gid` int(8) default NULL,
-  `host_archive` int(1) default '0' NOT NULL,
+  `host_archive` int(1) NOT NULL default '0',
   `host_name` varchar(32) NOT NULL,
-  `host_fqdn` varchar(255),
+  `host_fqdn` varchar(255) default NULL,
   `host_ip` varchar(16) default NULL,
   `host_delegation` varchar(64) default '',
   `host_description` varchar(128) default NULL,
@@ -1319,39 +1436,6 @@ CREATE TABLE `HostEntity` (
   KEY `hostentity_host_id_host_id_fkey` (`hostentity_host_id`),
   CONSTRAINT `hostentity_host_id_host_id_fkey` FOREIGN KEY (`hostentity_host_id`) REFERENCES `Host` (`host_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `hostentity_entity_id_entity_id_fkey` FOREIGN KEY (`hostentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `ServiceProperty`
---
-
-DROP TABLE IF EXISTS `ServiceProperty`;
-CREATE TABLE `ServiceProperty` (
-  `serviceproperty_id` int(8) auto_increment,
-  `serviceproperty_service` varchar(255) NOT NULL,
-  `serviceproperty_property` varchar(255) NOT NULL,
-  `serviceproperty_entity_id` int(8) NOT NULL,
-  `serviceproperty_value` text,
-  PRIMARY KEY  (`serviceproperty_id`),
-  KEY `serviceproperty_service_key` (`serviceproperty_service`),
-  KEY `serviceproperty_property_key` (`serviceproperty_property`),
-  KEY `serviceproperty_entity_id_entity_id_fkey` (`serviceproperty_entity_id`),
-  CONSTRAINT `serviceproperty_entity_id_entity_id_fkey` FOREIGN KEY (`serviceproperty_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `Service`
---
-
-DROP TABLE IF EXISTS `Service`;
-CREATE TABLE `Service` (
-  `service_id` int(8) auto_increment,
-  `service_service` varchar(255) NOT NULL,
-  `service_entity_id` int(8) NOT NULL,
-  PRIMARY KEY  (`service_id`),
-  KEY `service_service_key` (`service_service`),
-  KEY `service_entity_id_entity_id_fkey` (`service_entity_id`),
-  CONSTRAINT `service_entity_id_entity_id_fkey` FOREIGN KEY (`service_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1644,7 +1728,7 @@ CREATE TABLE `Lead` (
   `lead_manager_id` int(8) default NULL,
   `lead_company_id` int(8) NOT NULL,
   `lead_contact_id` int(8) default NULL,
-  `lead_priority` int(2) default 0,
+  `lead_priority` int(2) default '0',
   `lead_privacy` int(2) NOT NULL default '0',
   `lead_name` varchar(64) default NULL,
   `lead_date` date default NULL,
@@ -2654,6 +2738,53 @@ CREATE TABLE `ResourcegroupEntity` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- Table structure for table `SSOTicket`
+--
+
+DROP TABLE IF EXISTS `SSOTicket`;
+CREATE TABLE `SSOTicket` (
+  `ssoticket_ticket` varchar(255) NOT NULL,
+  `ssoticket_user_id` int(8) default NULL,
+  `ssoticket_timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`ssoticket_ticket`),
+  KEY `ssoticket_user_id_userobm_id_fkey` (`ssoticket_user_id`),
+  CONSTRAINT `ssoticket_user_id_userobm_id_fkey` FOREIGN KEY (`ssoticket_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `Service`
+--
+
+DROP TABLE IF EXISTS `Service`;
+CREATE TABLE `Service` (
+  `service_id` int(8) NOT NULL auto_increment,
+  `service_service` varchar(255) NOT NULL,
+  `service_entity_id` int(8) NOT NULL,
+  PRIMARY KEY  (`service_id`),
+  KEY `service_service_key` (`service_service`),
+  KEY `service_entity_id_entity_id_fkey` (`service_entity_id`),
+  CONSTRAINT `service_entity_id_entity_id_fkey` FOREIGN KEY (`service_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `ServiceProperty`
+--
+
+DROP TABLE IF EXISTS `ServiceProperty`;
+CREATE TABLE `ServiceProperty` (
+  `serviceproperty_id` int(8) NOT NULL auto_increment,
+  `serviceproperty_service` varchar(255) NOT NULL,
+  `serviceproperty_property` varchar(255) NOT NULL,
+  `serviceproperty_entity_id` int(8) NOT NULL,
+  `serviceproperty_value` text,
+  PRIMARY KEY  (`serviceproperty_id`),
+  KEY `serviceproperty_service_key` (`serviceproperty_service`),
+  KEY `serviceproperty_property_key` (`serviceproperty_property`),
+  KEY `serviceproperty_entity_id_entity_id_fkey` (`serviceproperty_entity_id`),
+  CONSTRAINT `serviceproperty_entity_id_entity_id_fkey` FOREIGN KEY (`serviceproperty_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
 -- Table structure for table `Stats`
 --
 
@@ -2736,6 +2867,20 @@ CREATE TABLE `SubscriptionReception` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- Table structure for table `TaskEvent`
+--
+
+DROP TABLE IF EXISTS `TaskEvent`;
+CREATE TABLE `TaskEvent` (
+  `taskevent_task_id` int(8) NOT NULL,
+  `taskevent_event_id` int(8) NOT NULL,
+  PRIMARY KEY  (`taskevent_event_id`,`taskevent_task_id`),
+  KEY `taskevent_task_id_projecttask_id_fkey` (`taskevent_task_id`),
+  CONSTRAINT `taskevent_task_id_projecttask_id_fkey` FOREIGN KEY (`taskevent_task_id`) REFERENCES `ProjectTask` (`projecttask_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `taskevent_event_id_event_id_fkey` FOREIGN KEY (`taskevent_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
 -- Table structure for table `TaskType`
 --
 
@@ -2803,7 +2948,7 @@ CREATE TABLE `UGroup` (
   `group_userupdate` int(8) default NULL,
   `group_usercreate` int(8) default NULL,
   `group_system` int(1) default '0',
-  `group_archive` int(1) default '0' NOT NULL,
+  `group_archive` int(1) NOT NULL default '0',
   `group_privacy` int(2) default '0',
   `group_local` int(1) default '1',
   `group_ext_id` varchar(24) default NULL,
@@ -2948,7 +3093,7 @@ CREATE TABLE `UserObm` (
   `userobm_nomade_local_copy` int(1) default '0',
   `userobm_nomade_datebegin` timestamp NOT NULL default '0000-00-00 00:00:00',
   `userobm_nomade_dateend` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `userobm_email_nomade` text default '',
+  `userobm_email_nomade` text,
   `userobm_vacation_enable` int(1) default '0',
   `userobm_vacation_datebegin` timestamp NOT NULL default '0000-00-00 00:00:00',
   `userobm_vacation_dateend` timestamp NOT NULL default '0000-00-00 00:00:00',
@@ -3048,18 +3193,6 @@ CREATE TABLE `UserSystem` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Table structure for table `SSOTicket`
---
-DROP TABLE IF EXISTS `SSOTicket`;
-CREATE TABLE `SSOTicket` (
-  `ssoticket_ticket` varchar(255) NOT NULL,
-  `ssoticket_user_id` int(8),
-  `ssoticket_timestamp` timestamp NOT NULL,
-  PRIMARY KEY (`ssoticket_ticket`),
-  KEY `ssoticket_user_id_userobm_id_fkey` (`ssoticket_user_id`),  
-  CONSTRAINT `ssoticket_user_id_userobm_id_fkey` FOREIGN KEY (`ssoticket_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
---
 -- Table structure for table `Website`
 --
 
@@ -3088,223 +3221,122 @@ CREATE TABLE `of_usergroup` (
   CONSTRAINT `of_usergroup_group_id_group_id_fkey` FOREIGN KEY (`of_usergroup_group_id`) REFERENCES `UGroup` (`group_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Table structure for table `TaskEvent`
---
-
-DROP TABLE IF EXISTS `TaskEvent`;
-CREATE TABLE TaskEvent (
-  taskevent_task_id int(8) NOT NULL,
-  taskevent_event_id int(8) NOT NULL,
-  PRIMARY KEY (taskevent_event_id, taskevent_task_id),
-  CONSTRAINT `taskevent_task_id_projecttask_id_fkey` FOREIGN KEY (`taskevent_task_id`) REFERENCES `ProjectTask` (`projecttask_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `taskevent_event_id_event_id_fkey` FOREIGN KEY (`taskevent_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-  
-
---
--- MailboxEntity production table
---
-CREATE TABLE P_MailboxEntity LIKE MailboxEntity;
-
---
--- MailshareEntity production table
---
-CREATE TABLE P_MailshareEntity LIKE MailshareEntity;
-
-
---
--- Table structure for table `Campaign`
---
-
-DROP TABLE IF EXISTS `Campaign`;
-CREATE TABLE `Campaign` (
-  `campaign_id` int(8) NOT NULL auto_increment,
-  `campaign_name` varchar(50) default NULL,
-  `campaign_timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `campaign_timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
-  `campaign_userupdate` int(8) default NULL,
-  `campaign_usercreate` int(8) default NULL,
-  `campaign_manager_id` int(8) default NULL,
-  `campaign_tracker_key` int(11) default NULL,
-  `campaign_refer_url` varchar(255) default NULL,
-  `campaign_nb_sent` int(10) default NULL,
-  `campaign_nb_error` int(10) default NULL,
-  `campaign_nb_inqueue` int(10) default NULL,
-  `campaign_progress` int(3) default NULL,
-  `campaign_start_date` date default NULL,
-  `campaign_end_date` date default NULL,
-  `campaign_status` int(3) default NULL,
-  `campaign_type` int(2) default NULL,
-  `campaign_objective` text default NULL,
-  `campaign_comment` text default NULL,
-  `campaign_domain_id` int(8) NOT NULL,
-  `campaign_email` int(8) default NULL,
-  `campaign_parent` int(8) default NULL,
-  `campaign_child_order` int(2) default NULL,
-  KEY `campaign_parent_fkey` (`campaign_parent`),
-  CONSTRAINT `campaign_parent_fkey` FOREIGN KEY (`campaign_parent`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `campaign_email_fkey` FOREIGN KEY (`campaign_email`) REFERENCES `Document` (`document_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  PRIMARY KEY (`campaign_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `CampaignEntity`
---
-
-DROP TABLE IF EXISTS `CampaignEntity`;
-CREATE TABLE `CampaignEntity` (
-  `campaignentity_entity_id` int(8) NOT NULL,
-  `campaignentity_campaign_id` int(8) NOT NULL,
-  PRIMARY KEY  (`campaignentity_entity_id`,`campaignentity_campaign_id`),
-  KEY `campaignentity_campaign_id_campaign_id_fkey` (`campaignentity_campaign_id`),
-  CONSTRAINT `campaignentity_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaignentity_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `campaignentity_entity_id_entity_id_fkey` FOREIGN KEY (`campaignentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `CampaignDisabledEntity`
---
-
-DROP TABLE IF EXISTS `CampaignDisabledEntity`;
-CREATE TABLE `CampaignDisabledEntity` (
-  `campaigndisabledentity_entity_id` int(8) NOT NULL,
-  `campaigndisabledentity_campaign_id` int(8) NOT NULL,
-  PRIMARY KEY  (`campaigndisabledentity_entity_id`,`campaigndisabledentity_campaign_id`),
-  KEY `campaigndisabledentity_campaign_id_campaign_id_fkey` (`campaigndisabledentity_campaign_id`),
-  CONSTRAINT `campaigndisabledentity_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaigndisabledentity_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `campaigndisabledentity_entity_id_entity_id_fkey` FOREIGN KEY (`campaigndisabledentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `CampaignTarget`
---
-
-DROP TABLE IF EXISTS `CampaignTarget`;
-CREATE TABLE `CampaignTarget` (
-  `campaigntarget_id` int(8) NOT NULL auto_increment,
-  `campaigntarget_campaign_id` int(8) NOT NULL,
-  `campaigntarget_entity_id` int(8),
-  `campaigntarget_status` int(8) NULL,
-  PRIMARY KEY (`campaigntarget_id`),
-  KEY `campaigntarget_campaign_id_campaign_id_fkey` (`campaigntarget_campaign_id`),
-  CONSTRAINT `campaigntarget_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaigntarget_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,  
-  CONSTRAINT `campaigntarget_entity_id_entity_id_fkey` FOREIGN KEY (`campaigntarget_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `CampaignMailTarget`
---
-
-DROP TABLE IF EXISTS `CampaignMailTarget`;
-CREATE TABLE `CampaignMailTarget` (
-  `campaignmailtarget_id` int(8) NOT NULL auto_increment,
-  `campaignmailtarget_campaign_id` int(8) NOT NULL,
-  `campaignmailtarget_entity_id` int(8),
-  `campaignmailtarget_status` int(8) NULL,
-  PRIMARY KEY (`campaignmailtarget_id`),
-  KEY `campaignmailtarget_campaign_id_campaign_id_fkey` (`campaignmailtarget_campaign_id`),
-  CONSTRAINT `campaignmailtarget_campaign_id_campaign_id_fkey` FOREIGN KEY (`campaignmailtarget_campaign_id`) REFERENCES `Campaign` (`campaign_id`) ON DELETE CASCADE ON UPDATE CASCADE,  
-  CONSTRAINT `campaignmailtarget_entity_id_entity_id_fkey` FOREIGN KEY (`campaignmailtarget_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `CampaignMailContent`
---
-
-DROP TABLE IF EXISTS `CampaignMailContent`;
-CREATE TABLE `CampaignMailContent` (
-  `campaignmailcontent_id`         INT(8) NOT NULL AUTO_INCREMENT,
-  `campaignmailcontent_refext_id`  VARCHAR(8),
-  `campaignmailcontent_content`    BLOB,
-  PRIMARY KEY (`campaignmailcontent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `CampaignPushTarget`
---
-
-DROP TABLE IF EXISTS `CampaignPushTarget`;
-CREATE TABLE `CampaignPushTarget` (
-  `campaignpushtarget_id`             INT(8) NOT NULL AUTO_INCREMENT,
-  `campaignpushtarget_mailcontent_id` INT(8) NOT NULL,
-  `campaignpushtarget_refext_id`      VARCHAR(8),
-
-  `campaignpushtarget_status`         INT(2) NOT NULL DEFAULT '1',
-  -- 1 : not sent
-  -- 2 : sent
-  -- 3 : error occurred
-  
-  `campaignpushtarget_email_address`  VARCHAR(512) NOT NULL,
-  `campaignpushtarget_properties`     TEXT,
-  `campaignpushtarget_start_time`     DATETIME,
-  `campaignpushtarget_sent_time`      DATETIME,
-  `campaignpushtarget_retries`        INT(3),
-  PRIMARY KEY (`campaignpushtarget_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 --
 -- Table structure for table `P_Domain`
 --
-CREATE TABLE P_Domain LIKE Domain;
 
---
--- Table structure for table `P_EntityRight`
---
-CREATE TABLE P_EntityRight LIKE EntityRight;
-
---
--- Table structure for table `P_GroupGroup`
---
-CREATE TABLE P_GroupGroup LIKE GroupGroup;
-
---
--- Table structure for table `P_Host`
---
-CREATE TABLE P_Host LIKE Host;
-
---
--- Table structure for table `P_MailShare`
---
-CREATE TABLE P_MailShare LIKE MailShare;
-
---
--- Table structure for table `P_UGroup`
---
-CREATE TABLE P_UGroup LIKE UGroup;
-
---
--- Table structure for table `P_UserObm`
---
-CREATE TABLE P_UserObm LIKE UserObm;
-
---
--- Table structure for table `P_UserObmGroup`
---
-CREATE TABLE P_UserObmGroup LIKE UserObmGroup;
-
---
--- Table structure for table `P_of_usergroup`
---
-CREATE TABLE P_of_usergroup LIKE of_usergroup;
-
---
--- Table structure for table `P_Service`
---
-CREATE TABLE P_Service LIKE Service;
-
---
--- Table structure for table `P_ServiceProperty`
---
-CREATE TABLE P_ServiceProperty LIKE ServiceProperty;
+DROP TABLE IF EXISTS `P_Domain`;
+CREATE TABLE `P_Domain` (LIKE `Domain`);
 
 --
 -- Table structure for table `P_DomainEntity`
 --
-CREATE TABLE P_DomainEntity LIKE DomainEntity;
 
+DROP TABLE IF EXISTS `P_DomainEntity`;
+CREATE TABLE `P_DomainEntity` (LIKE `DomainEntity`);
+
+--
+-- Table structure for table `P_EntityRight`
+--
+
+DROP TABLE IF EXISTS `P_EntityRight`;
+CREATE TABLE `P_EntityRight` (LIKE `EntityRight`); 
+
+--
+-- Table structure for table `P_GroupEntity`
+--
+
+DROP TABLE IF EXISTS `P_GroupEntity`;
+CREATE TABLE `P_GroupEntity` (LIKE `GroupEntity`);
+
+--
+-- Table structure for table `P_GroupGroup`
+--
+
+DROP TABLE IF EXISTS `P_GroupGroup`;
+CREATE TABLE `P_GroupGroup` (LIKE `GroupGroup`);
+
+--
+-- Table structure for table `P_Host`
+--
+
+DROP TABLE IF EXISTS `P_Host`;
+CREATE TABLE `P_Host` (LIKE `Host`);
 --
 -- Table structure for table `P_HostEntity`
 --
-CREATE TABLE P_HostEntity LIKE HostEntity;
+
+DROP TABLE IF EXISTS `P_HostEntity`;
+CREATE TABLE `P_HostEntity` (LIKE `HostEntity`);
+
+--
+-- Table structure for table `P_MailShare`
+--
+
+DROP TABLE IF EXISTS `P_MailShare`;
+CREATE TABLE `P_MailShare` (LIKE `MailShare`);
+
+--
+-- Table structure for table `P_MailshareEntity`
+--
+
+DROP TABLE IF EXISTS `P_MailshareEntity`;
+CREATE TABLE `P_MailshareEntity` (LIKE `MailshareEntity`);
+
+--
+-- Table structure for table `P_MailboxEntity`
+--
+
+DROP TABLE IF EXISTS `P_MailboxEntity`;
+CREATE TABLE `P_MailboxEntity` (LIKE `MailboxEntity`);
+
+--
+-- Table structure for table `P_Service`
+--
+
+DROP TABLE IF EXISTS `P_Service`;
+CREATE TABLE `P_Service` (LIKE `Service`);
+
+--
+-- Table structure for table `P_ServiceProperty`
+--
+
+DROP TABLE IF EXISTS `P_ServiceProperty`;
+CREATE TABLE `P_ServiceProperty` (LIKE `ServiceProperty`);
+
+--
+-- Table structure for table `P_UGroup`
+--
+
+DROP TABLE IF EXISTS `P_UGroup`;
+CREATE TABLE `P_UGroup` (LIKE `UGroup`);
+
+--
+-- Table structure for table `P_UserObm`
+--
+
+DROP TABLE IF EXISTS `P_UserEntity`;
+CREATE TABLE `P_UserEntity` (LIKE `UserEntity`);
+
+--
+-- Table structure for table `P_UserObm`
+--
+
+DROP TABLE IF EXISTS `P_UserObm`;
+CREATE TABLE `P_UserObm` (LIKE `UserObm`);
+
+--
+-- Table structure for table `P_UserObmGroup`
+--
+
+DROP TABLE IF EXISTS `P_UserObmGroup`;
+CREATE TABLE `P_UserObmGroup` (LIKE `UserObmGroup`);
+
+--
+-- Table structure for table `P_of_usergroup`
+--
+
+DROP TABLE IF EXISTS `P_of_usergroup`;
+CREATE TABLE `P_of_usergroup` (LIKE `of_usergroup`);
+

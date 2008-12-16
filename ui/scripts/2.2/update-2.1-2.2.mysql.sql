@@ -835,14 +835,6 @@ FROM DeletedCalendarEvent;
 
 
 
--- AliaSource specific database errors ?!
--- DROP TABLE IF EXISTS CalendarSegment;
--- DROP TABLE IF EXISTS Entry;
--- DROP TABLE IF EXISTS EntryType;
--- DROP TABLE IF EXISTS SubscriptionRenewal;
--- ALTER TABLE Company DROP COLUMN company_nafcode;
--- ALTER TABLE UserObm DROP COLUMN userobm_contact_id;
--- ALTER TABLE P_UserObm DROP COLUMN userobm_contact_id;
 
 --  ______________________
 -- | Tables modifications |
@@ -852,10 +844,6 @@ FROM DeletedCalendarEvent;
 -- Domain
 ALTER TABLE Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
 ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
-
--- P_Domain
-ALTER TABLE P_Domain ADD COLUMN domain_global BOOLEAN DEFAULT FALSE;
-ALTER TABLE P_Domain DROP COLUMN domain_mail_server_id;
 
 -- OGroup
 ALTER TABLE OGroup MODIFY COLUMN ogroup_parent_id int(8);
@@ -916,7 +904,6 @@ ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
 ALTER TABLE GroupGroup MODIFY COLUMN groupgroup_child_id int(8) NOT NULL ;
 ALTER TABLE Host MODIFY COLUMN host_domain_id int(8) NOT NULL ;
 ALTER TABLE Host ADD COLUMN host_fqdn varchar(255);
-ALTER TABLE P_Host ADD COLUMN host_fqdn varchar(255);
 ALTER TABLE Import MODIFY COLUMN import_domain_id int(8) NOT NULL ;
 ALTER TABLE Import MODIFY COLUMN import_datasource_id int(8)  default NULL;
 ALTER TABLE Incident MODIFY COLUMN incident_domain_id int(8) NOT NULL ;
@@ -942,22 +929,6 @@ ALTER TABLE MailShare MODIFY COLUMN mailshare_mail_server_id int(8)  default NUL
 ALTER TABLE OGroup MODIFY COLUMN ogroup_domain_id int(8) NOT NULL ;
 ALTER TABLE OGroupLink MODIFY COLUMN ogrouplink_domain_id int(8) NOT NULL ;
 ALTER TABLE OrganizationalChart MODIFY COLUMN organizationalchart_domain_id int(8) NOT NULL ;
-ALTER TABLE P_EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
-ALTER TABLE P_EntityRight ADD entityright_access int(1) NOT NULL default 0;
-ALTER TABLE P_EntityRight MODIFY COLUMN entityright_consumer_id int(8) NOT NULL ;
-ALTER TABLE P_GroupGroup MODIFY COLUMN groupgroup_parent_id int(8) NOT NULL ;
-ALTER TABLE P_GroupGroup MODIFY COLUMN groupgroup_child_id int(8) NOT NULL ;
-ALTER TABLE P_Host MODIFY COLUMN host_domain_id int(8) NOT NULL ;
-ALTER TABLE P_MailServer MODIFY COLUMN mailserver_host_id int(8) NOT NULL ;
-ALTER TABLE P_MailServerNetwork MODIFY COLUMN mailservernetwork_host_id int(8) NOT NULL ;
-ALTER TABLE P_MailShare MODIFY COLUMN mailshare_domain_id int(8) NOT NULL ;
-ALTER TABLE P_MailShare MODIFY COLUMN mailshare_mail_server_id int(8) default NULL;
-ALTER TABLE P_Samba MODIFY COLUMN samba_domain_id int(8) NOT NULL ;
-ALTER TABLE P_UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
-ALTER TABLE P_UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
-ALTER TABLE P_UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
-ALTER TABLE P_of_usergroup MODIFY COLUMN of_usergroup_group_id int(8) NOT NULL ;
-ALTER TABLE P_of_usergroup MODIFY COLUMN of_usergroup_user_id int(8) NOT NULL ;
 ALTER TABLE ParentDeal MODIFY COLUMN parentdeal_domain_id int(8) NOT NULL ;
 ALTER TABLE Payment MODIFY COLUMN payment_domain_id int(8) NOT NULL ;
 ALTER TABLE PaymentKind MODIFY COLUMN paymentkind_domain_id int(8) NOT NULL ;
@@ -980,7 +951,6 @@ ALTER TABLE TaskType MODIFY COLUMN tasktype_domain_id int(8) NOT NULL ;
 ALTER TABLE UGroup MODIFY COLUMN group_domain_id int(8) NOT NULL ;
 ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_group_id int(8) NOT NULL ;
 ALTER TABLE UserObm MODIFY COLUMN userobm_email_nomade text default '';
-ALTER TABLE P_UserObm MODIFY COLUMN userobm_email_nomade text default '';
 ALTER TABLE UserObmGroup MODIFY COLUMN userobmgroup_userobm_id int(8) NOT NULL ;
 ALTER TABLE UserObmPref MODIFY COLUMN userobmpref_user_id int(8) NULL ;
 ALTER TABLE UserObmPref ADD COLUMN userobmpref_id int(8) NOT NULL AUTO_INCREMENT, ADD PRIMARY KEY (userobmpref_id);
@@ -1033,10 +1003,8 @@ UPDATE Project set project_archive='0' where project_archive != '1';
 ALTER TABLE Project MODIFY COLUMN project_archive int(1) DEFAULT 0 NOT NULL;
 
 ALTER TABLE Host ADD COLUMN host_archive int(1) DEFAULT 0 NOT NULL;
-ALTER TABLE P_Host ADD COLUMN host_archive int(1) DEFAULT 0 NOT NULL;
 
 ALTER TABLE UGroup ADD COLUMN group_archive int(1) DEFAULT 0 NOT NULL;
-ALTER TABLE P_UGroup ADD COLUMN group_archive int(1) DEFAULT 0 NOT NULL;
 
 --  _________________
 -- | Updating values |
@@ -1045,11 +1013,6 @@ ALTER TABLE P_UGroup ADD COLUMN group_archive int(1) DEFAULT 0 NOT NULL;
 INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
 UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
-
--- Global Domain
-INSERT INTO P_Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
-UPDATE P_UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
-UPDATE P_Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 
 -- Preferences
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
@@ -1245,7 +1208,6 @@ DELETE FROM EntityRight WHERE entityright_consumer_id NOT IN (SELECT userobm_id 
 UPDATE EntityRight SET entityright_consumer_id = (SELECT userentity_entity_id FROM UserEntity INNER JOIN UserObm ON userentity_user_id = userobm_id WHERE userobm_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'user' AND entityright_consumer_id IS NOT NULL; 
 DELETE FROM EntityRight WHERE entityright_consumer_id NOT IN (SELECT group_id FROM UGroup) AND entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
 UPDATE EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
-UPDATE P_EntityRight SET entityright_consumer_id = (SELECT groupentity_entity_id FROM GroupEntity INNER JOIN UGroup ON groupentity_group_id = group_id WHERE group_id = entityright_consumer_id), entityright_consumer = 'entity' WHERE entityright_consumer = 'group' AND entityright_consumer_id IS NOT NULL;
 
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT calendarentity_entity_id, NULL FROM CalendarEntity WHERE calendarentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT mailshareentity_entity_id, NULL FROM MailshareEntity WHERE mailshareentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
@@ -1257,7 +1219,6 @@ UPDATE EntityRight SET entityright_access = 1 WHERE entityright_consumer_id IS N
 DELETE FROM EntityRight WHERE entityright_entity != 'entity';
 ALTER TABLE EntityRight DROP COLUMN entityright_entity;
 ALTER TABLE EntityRight DROP COLUMN entityright_consumer;
-DROP TABLE P_EntityRight;
 
 
 DELETE FROM DocumentLink WHERE documentlink_entity_id NOT IN (SELECT contact_id FROM Contact) AND documentlink_entity = 'contact';
@@ -1463,20 +1424,10 @@ ALTER TABLE Host DROP COLUMN host_ftp_perms;
 ALTER TABLE Host DROP COLUMN host_firewall_perms;
 ALTER TABLE Host DROP COLUMN host_samba;
 
-ALTER TABLE P_Host DROP COLUMN host_web_perms;
-ALTER TABLE P_Host DROP COLUMN host_web_list;
-ALTER TABLE P_Host DROP COLUMN host_web_all;
-ALTER TABLE P_Host DROP COLUMN host_ftp_perms;
-ALTER TABLE P_Host DROP COLUMN host_firewall_perms;
-ALTER TABLE P_Host DROP COLUMN host_samba;
-
 DROP TABLE Samba;
-DROP TABLE P_Samba;
 DROP TABLE DomainMailServer;
 DROP TABLE MailServer;
-DROP TABLE P_MailServer;
 DROP TABLE MailServerNetwork;
-DROP TABLE P_MailServerNetwork;
 
 -- -----------------------------------------
 -- Updates that need to be after Entity work
@@ -1508,7 +1459,6 @@ WHERE category_category='groupcategory' AND category_label='external address'
   AND group_mailing = 1;
 
 ALTER TABLE UGroup DROP COLUMN group_mailing;
-ALTER TABLE P_UGroup DROP COLUMN group_mailing;
 
 
 -- Create links from "todos" to users (need to be after userentity..)
@@ -2397,14 +2347,6 @@ DELETE FROM of_usergroup WHERE of_usergroup_user_id NOT IN (SELECT userobm_id FR
 -- Foreign key from contact_birthday_id to event_id
 -- UPDATE Contact SET contact_birthday_id = NULL WHERE contact_birthday_id NOT IN (SELECT event_id FROM Event) AND contact_birthday_id IS NOT NULL;
 
--- MailboxEntity production table
-CREATE TABLE P_MailboxEntity LIKE MailboxEntity;
-
-CREATE TABLE P_EntityRight LIKE EntityRight;
-
--- MailshareEntity production table
-CREATE TABLE P_MailshareEntity LIKE MailshareEntity;
-
 --  _________________
 -- | Drop old tables |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -2534,6 +2476,164 @@ CREATE TABLE `CampaignPushTarget` (
   `campaignpushtarget_retries`        INT(3),
   PRIMARY KEY (`campaignpushtarget_id`)
 );
+
+--
+--
+--
+DROP TABLE P_Samba;
+DROP TABLE P_MailServer;
+DROP TABLE P_MailServerNetwork;
+
+--
+-- Table structure for table `P_Domain`
+--
+
+DROP TABLE IF EXISTS `P_Domain`;
+CREATE TABLE `P_Domain` (LIKE `Domain`);
+INSERT INTO P_Domain SELECT * FROM Domain;
+
+
+--
+-- Table structure for table `P_DomainEntity`
+--
+
+DROP TABLE IF EXISTS `P_DomainEntity`;
+CREATE TABLE `P_DomainEntity` (LIKE `DomainEntity`);
+INSERT INTO P_DomainEntity SELECT * FROM DomainEntity;
+
+
+--
+-- Table structure for table `P_EntityRight`
+--
+
+DROP TABLE IF EXISTS `P_EntityRight`;
+CREATE TABLE `P_EntityRight` (LIKE `EntityRight`);
+INSERT INTO P_EntityRight SELECT * FROM EntityRight;
+ 
+
+--
+-- Table structure for table `P_GroupEntity`
+--
+
+DROP TABLE IF EXISTS `P_GroupEntity`;
+CREATE TABLE `P_GroupEntity` (LIKE `GroupEntity`);
+INSERT INTO P_GroupEntity SELECT * FROM GroupEntity;
+
+
+--
+-- Table structure for table `P_GroupGroup`
+--
+
+DROP TABLE IF EXISTS `P_GroupGroup`;
+CREATE TABLE `P_GroupGroup` (LIKE `GroupGroup`);
+INSERT INTO P_GroupGroup SELECT * FROM GroupGroup;
+
+
+--
+-- Table structure for table `P_Host`
+--
+
+DROP TABLE IF EXISTS `P_Host`;
+CREATE TABLE `P_Host` (LIKE `Host`);
+INSERT INTO P_Host SELECT * FROM Host;
+
+--
+-- Table structure for table `P_HostEntity`
+--
+
+DROP TABLE IF EXISTS `P_HostEntity`;
+CREATE TABLE `P_HostEntity` (LIKE `HostEntity`);
+INSERT INTO P_HostEntity SELECT * FROM HostEntity;
+
+
+--
+-- Table structure for table `P_MailShare`
+--
+
+DROP TABLE IF EXISTS `P_MailShare`;
+CREATE TABLE `P_MailShare` (LIKE `MailShare`);
+INSERT INTO P_MailShare SELECT * FROM MailShare;
+
+
+--
+-- Table structure for table `P_MailshareEntity`
+--
+
+DROP TABLE IF EXISTS `P_MailshareEntity`;
+CREATE TABLE `P_MailshareEntity` (LIKE `MailshareEntity`);
+INSERT INTO P_MailshareEntity SELECT * FROM MailshareEntity;
+
+
+--
+-- Table structure for table `P_MailboxEntity`
+--
+
+DROP TABLE IF EXISTS `P_MailboxEntity`;
+CREATE TABLE `P_MailboxEntity` (LIKE `MailboxEntity`);
+INSERT INTO P_MailboxEntity SELECT * FROM MailboxEntity;
+
+
+--
+-- Table structure for table `P_Service`
+--
+
+DROP TABLE IF EXISTS `P_Service`;
+CREATE TABLE `P_Service` (LIKE `Service`);
+INSERT INTO P_Service SELECT * FROM Service;
+
+
+--
+-- Table structure for table `P_ServiceProperty`
+--
+
+DROP TABLE IF EXISTS `P_ServiceProperty`;
+CREATE TABLE `P_ServiceProperty` (LIKE `ServiceProperty`);
+INSERT INTO P_ServiceProperty SELECT * FROM ServiceProperty;
+
+
+--
+-- Table structure for table `P_UGroup`
+--
+
+DROP TABLE IF EXISTS `P_UGroup`;
+CREATE TABLE `P_UGroup` (LIKE `UGroup`);
+INSERT INTO P_UGroup SELECT * FROM UGroup;
+
+
+--
+-- Table structure for table `P_UserObm`
+--
+
+DROP TABLE IF EXISTS `P_UserEntity`;
+CREATE TABLE `P_UserEntity` (LIKE `UserEntity`);
+INSERT INTO P_UserEntity SELECT * FROM UserEntity;
+
+
+--
+-- Table structure for table `P_UserObm`
+--
+
+DROP TABLE IF EXISTS `P_UserObm`;
+CREATE TABLE `P_UserObm` (LIKE `UserObm`);
+INSERT INTO P_UserObm SELECT * FROM UserObm;
+
+
+--
+-- Table structure for table `P_UserObmGroup`
+--
+
+DROP TABLE IF EXISTS `P_UserObmGroup`;
+CREATE TABLE `P_UserObmGroup` (LIKE `UserObmGroup`);
+INSERT INTO P_UserObmGroup SELECT * FROM UserObmGroup;
+
+
+--
+-- Table structure for table `P_of_usergroup`
+--
+
+DROP TABLE IF EXISTS `P_of_usergroup`;
+CREATE TABLE `P_of_usergroup` (LIKE `of_usergroup`);
+INSERT INTO P_of_usergroup SELECT * FROM of_usergroup;
 
 
 

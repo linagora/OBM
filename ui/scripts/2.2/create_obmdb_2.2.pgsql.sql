@@ -1459,220 +1459,6 @@ CREATE TABLE organizationalchartentity (
 
 
 --
--- Name: p_domain; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_domain (
-    domain_id integer NOT NULL,
-    domain_timeupdate timestamp without time zone,
-    domain_timecreate timestamp without time zone,
-    domain_usercreate integer,
-    domain_userupdate integer,
-    domain_label character varying(32) NOT NULL,
-    domain_description character varying(255),
-    domain_name character varying(128),
-    domain_alias text,
-    domain_global boolean
-);
-
-
---
--- Name: p_entityright; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_entityright (
-    entityright_entity_id integer NOT NULL,
-    entityright_consumer_id integer NOT NULL,
-    entityright_access integer NOT NULL,
-    entityright_read integer NOT NULL,
-    entityright_write integer NOT NULL,
-    entityright_admin integer NOT NULL
-);
-
-
---
--- Name: p_groupgroup; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_groupgroup (
-    groupgroup_parent_id integer NOT NULL,
-    groupgroup_child_id integer NOT NULL
-);
-
-
---
--- Name: p_host; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_host (
-    host_id integer NOT NULL,
-    host_domain_id integer NOT NULL,
-    host_timeupdate timestamp without time zone,
-    host_timecreate timestamp without time zone,
-    host_userupdate integer,
-    host_usercreate integer,
-    host_uid integer,
-    host_gid integer,
-    host_archive smallint DEFAULT 0 NOT NULL,
-    host_name character varying(32) NOT NULL,
-    host_fqdn character varying(255),
-    host_ip character varying(16),
-    host_delegation character varying(64),
-    host_description character varying(128)
-);
-
-
---
--- Name: p_mailshare; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_mailshare (
-    mailshare_id integer NOT NULL,
-    mailshare_domain_id integer NOT NULL,
-    mailshare_timeupdate timestamp without time zone,
-    mailshare_timecreate timestamp without time zone,
-    mailshare_userupdate integer,
-    mailshare_usercreate integer,
-    mailshare_name character varying(32),
-    mailshare_archive smallint DEFAULT 0 NOT NULL,
-    mailshare_quota character varying(8) NOT NULL,
-    mailshare_mail_server_id integer,
-    mailshare_delegation character varying(64),
-    mailshare_description character varying(255),
-    mailshare_email text
-);
-
-
---
--- Name: p_of_usergroup; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_of_usergroup (
-    of_usergroup_group_id integer NOT NULL,
-    of_usergroup_user_id integer NOT NULL
-);
-
-
---
--- Name: p_ugroup; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_ugroup (
-    group_id integer NOT NULL,
-    group_domain_id integer NOT NULL,
-    group_timeupdate timestamp without time zone,
-    group_timecreate timestamp without time zone,
-    group_userupdate integer,
-    group_usercreate integer,
-    group_system integer,
-    group_archive smallint DEFAULT 0 NOT NULL,
-    group_privacy integer,
-    group_local integer,
-    group_ext_id integer,
-    group_samba integer,
-    group_gid integer,
-    group_delegation character varying(64),
-    group_manager_id integer,
-    group_name character varying(255) NOT NULL,
-    group_desc character varying(128),
-    group_email character varying(128),
-    group_contacts text
-);
-
-
---
--- Name: p_userobm; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_userobm (
-    userobm_id integer NOT NULL,
-    userobm_domain_id integer NOT NULL,
-    userobm_timeupdate timestamp without time zone,
-    userobm_timecreate timestamp without time zone,
-    userobm_userupdate integer,
-    userobm_usercreate integer,
-    userobm_local integer,
-    userobm_ext_id character varying(16),
-    userobm_system integer,
-    userobm_archive smallint DEFAULT 0 NOT NULL,
-    userobm_timelastaccess timestamp without time zone,
-    userobm_login character varying(32) NOT NULL,
-    userobm_nb_login_failed integer,
-    userobm_password_type character varying(6) NOT NULL,
-    userobm_password character varying(64) NOT NULL,
-    userobm_password_dateexp date,
-    userobm_account_dateexp date,
-    userobm_perms character varying(254),
-    userobm_delegation_target character varying(64),
-    userobm_delegation character varying(64),
-    userobm_calendar_version timestamp without time zone,
-    userobm_uid integer,
-    userobm_gid integer,
-    userobm_datebegin date,
-    userobm_hidden integer,
-    userobm_kind character varying(12),
-    userobm_lastname character varying(64),
-    userobm_firstname character varying(64),
-    userobm_title character varying(64),
-    userobm_sound character varying(64),
-    userobm_company character varying(64),
-    userobm_direction character varying(64),
-    userobm_service character varying(64),
-    userobm_address1 character varying(64),
-    userobm_address2 character varying(64),
-    userobm_address3 character varying(64),
-    userobm_zipcode character varying(14),
-    userobm_town character varying(64),
-    userobm_expresspostal character varying(16),
-    userobm_country_iso3166 character(2),
-    userobm_phone character varying(32),
-    userobm_phone2 character varying(32),
-    userobm_mobile character varying(32),
-    userobm_fax character varying(32),
-    userobm_fax2 character varying(32),
-    userobm_web_perms integer,
-    userobm_web_list text,
-    userobm_web_all integer,
-    userobm_mail_perms integer,
-    userobm_mail_ext_perms integer,
-    userobm_email text,
-    userobm_mail_server_id integer,
-    userobm_mail_quota integer,
-    userobm_mail_quota_use integer,
-    userobm_mail_login_date timestamp without time zone,
-    userobm_nomade_perms integer,
-    userobm_nomade_enable integer,
-    userobm_nomade_local_copy integer,
-    userobm_nomade_datebegin timestamp without time zone,
-    userobm_nomade_dateend timestamp without time zone,
-    userobm_email_nomade text default '',
-    userobm_vacation_enable integer,
-    userobm_vacation_datebegin timestamp without time zone,
-    userobm_vacation_dateend timestamp without time zone,
-    userobm_vacation_message text,
-    userobm_samba_perms integer,
-    userobm_samba_home character varying(255),
-    userobm_samba_home_drive character(2),
-    userobm_samba_logon_script character varying(128),
-    userobm_host_id integer,
-    userobm_description character varying(255),
-    userobm_location character varying(255),
-    userobm_education character varying(255),
-    userobm_photo_id integer
-);
-
-
---
--- Name: p_userobmgroup; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE p_userobmgroup (
-    userobmgroup_group_id integer NOT NULL,
-    userobmgroup_userobm_id integer NOT NULL
-);
-
-
---
 -- Name: parentdeal; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -9048,6 +8834,144 @@ CREATE TABLE campaignpushtarget (
   PRIMARY KEY (campaignpushtarget_id)
 );
 
+
+
+--
+-- Table structure for table P_Domain
+--
+
+CREATE TABLE P_Domain (LIKE Domain);
+INSERT INTO P_Domain SELECT * FROM Domain;
+
+
+--
+-- Table structure for table P_DomainEntity
+--
+
+CREATE TABLE P_DomainEntity (LIKE DomainEntity);
+INSERT INTO P_DomainEntity SELECT * FROM DomainEntity;
+
+
+--
+-- Table structure for table P_EntityRight
+--
+
+CREATE TABLE P_EntityRight (LIKE EntityRight);
+INSERT INTO P_EntityRight SELECT * FROM EntityRight;
+ 
+
+--
+-- Table structure for table P_GroupEntity
+--
+
+CREATE TABLE P_GroupEntity (LIKE GroupEntity);
+INSERT INTO P_GroupEntity SELECT * FROM GroupEntity;
+
+
+--
+-- Table structure for table P_GroupGroup
+--
+
+CREATE TABLE P_GroupGroup (LIKE GroupGroup);
+INSERT INTO P_GroupGroup SELECT * FROM GroupGroup;
+
+
+--
+-- Table structure for table P_Host
+--
+
+CREATE TABLE P_Host (LIKE Host);
+INSERT INTO P_Host SELECT * FROM Host;
+
+--
+-- Table structure for table P_HostEntity
+--
+
+CREATE TABLE P_HostEntity (LIKE HostEntity);
+INSERT INTO P_HostEntity SELECT * FROM HostEntity;
+
+
+--
+-- Table structure for table P_MailShare
+--
+
+CREATE TABLE P_MailShare (LIKE MailShare);
+INSERT INTO P_MailShare SELECT * FROM MailShare;
+
+
+--
+-- Table structure for table P_MailshareEntity
+--
+
+CREATE TABLE P_MailshareEntity (LIKE MailshareEntity);
+INSERT INTO P_MailshareEntity SELECT * FROM MailshareEntity;
+
+
+--
+-- Table structure for table P_MailboxEntity
+--
+
+CREATE TABLE P_MailboxEntity (LIKE MailboxEntity);
+INSERT INTO P_MailboxEntity SELECT * FROM MailboxEntity;
+
+
+--
+-- Table structure for table P_Service
+--
+
+CREATE TABLE P_Service (LIKE Service);
+INSERT INTO P_Service SELECT * FROM Service;
+
+
+--
+-- Table structure for table P_ServiceProperty
+--
+
+CREATE TABLE P_ServiceProperty (LIKE ServiceProperty);
+INSERT INTO P_ServiceProperty SELECT * FROM ServiceProperty;
+
+
+--
+-- Table structure for table P_UGroup
+--
+
+CREATE TABLE P_UGroup (LIKE UGroup);
+INSERT INTO P_UGroup SELECT * FROM UGroup;
+
+
+--
+-- Table structure for table P_UserObm
+--
+
+CREATE TABLE P_UserEntity (LIKE UserEntity);
+INSERT INTO P_UserEntity SELECT * FROM UserEntity;
+
+
+--
+-- Table structure for table P_UserObm
+--
+
+CREATE TABLE P_UserObm (LIKE UserObm);
+INSERT INTO P_UserObm SELECT * FROM UserObm;
+
+
+--
+-- Table structure for table P_UserObmGroup
+--
+
+CREATE TABLE P_UserObmGroup (LIKE UserObmGroup);
+INSERT INTO P_UserObmGroup SELECT * FROM UserObmGroup;
+
+
+--
+-- Table structure for table P_of_usergroup
+--
+
+CREATE TABLE P_of_usergroup (LIKE of_usergroup);
+INSERT INTO P_of_usergroup SELECT * FROM of_usergroup;
+
+
+
 --
 -- Name: public; Type: ACL; Schema: -; Owner: -
 --
@@ -9061,14 +8985,3 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 -- PostgreSQL database dump complete
 --
-
-
---
--- MailboxEntity production table
---
-CREATE TABLE P_MailboxEntity (LIKE MailboxEntity);
-
---
--- MailshareEntity production table
---
-CREATE TABLE P_MailshareEntity (LIKE MailshareEntity);
