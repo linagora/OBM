@@ -239,22 +239,20 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   </tbody>
   ";
   
-  if($module != 'mailbox' && $module != 'mailshare') {
-    $block_groups = "
-    <tbody id='sel_group'>
-      <tr>
-        <th>$l_groups</th>
-        <th colspan=\"5\">
-          <input type=\"text\" id=\"groupSearch\" autocomplete=\"off\" />
-          $popup_group_add_button
-        </th>
-      </tr>
-    </tbody>
-    <tbody id='sel_accept_group'>
-      $dis_group
-    </tbody>
-    ";
-  }
+  $block_groups = "
+  <tbody id='sel_group'>
+    <tr>
+      <th>$l_groups</th>
+      <th colspan=\"5\">
+        <input type=\"text\" id=\"groupSearch\" autocomplete=\"off\" />
+        $popup_group_add_button
+      </th>
+    </tr>
+  </tbody>
+  <tbody id='sel_accept_group'>
+    $dis_group
+  </tbody>
+  ";
     
   $block = "
   <script type=\"text/javascript\">
