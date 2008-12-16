@@ -332,7 +332,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
       
       for (var i=0; i < tbody_blocks.length; i++) {
         var tbody = tbody_blocks[i];
-        var tr_elements = (tbody !== false ? tbody.getChildren() : new Array());
+        var tr_elements = (tbody ? tbody.getChildren() : new Array());
         for (var j=0; j < tr_elements.length; j++) {
           if ( (j % 2) == 0) {
             tr_elements[j].addClass('pair');

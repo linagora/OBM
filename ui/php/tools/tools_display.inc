@@ -184,7 +184,7 @@ function html_tools_delete_button($entity, $state, $id) {
              onclick=\"if (confirm('{$l_js_ask_confirm}')) { postUpdateToDelete('$entity', '$state', '$id'); }; return false;\"/>
     </form>";
 
-  return $block;
+//  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

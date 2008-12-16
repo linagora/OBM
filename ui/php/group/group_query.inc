@@ -467,6 +467,7 @@ function run_query_group_delete($p_id) {
 function run_query_group_usergroup_insert($group) {
   global $obm, $cdg_sql;
 
+  $id = $group['group_id'];
   $sel_id = sql_parse_id($group['group_id'], true);
   $ins_id = sql_parse_id($group['group_id']);
   $cpt = 0;

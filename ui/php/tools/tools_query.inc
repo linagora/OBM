@@ -355,14 +355,22 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=fals
 
   if(is_array($metadata['rules'])) {
     foreach($metadata['rules'] as $field => $value) {
-      $rules['update'][] ="Current.$metadata[prefix]_$field = '$value'";
+      if(is_array($value)) {
+        $rules['update'][] ="Current.$metadata[prefix]_$field IN ('".implode("','", $value)."')";
+      } else {
+        $rules['update'][] ="Current.$metadata[prefix]_$field = '$value'";
+      }
     }   
   }
   $rules['link'] = $rules['update'];
 
   if(is_array($metadata['link']['rules'])) {
     foreach($metadata['link']['rules'] as $field => $value) {
-      $rules['link'][] ="Link.$field = '$value'";
+      if(is_array($value)) {
+        $rules['link'][] ="Link.$field IN ('".implode("','", $value)."')";
+      } else {
+        $rules['link'][] ="Link.$field = '$value'";
+      }
     }   
   }
   if($update) {
@@ -503,18 +511,31 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
       $join[] = "Link.$field[name] = Production.$field[name]";
     }
   }
+  if($metadata['link']['join']) {
+    $linkTable = '(
+      SELECT '.$metadata['link']['table'].'.*, '.$metadata['link']['id'].' 
+      FROM '.$metadata['link']['table'].' 
+      INNER JOIN '.$metadata['link']['join']['table'].' ON '.$metadata['link']['join']['id'] .' = '.$metadata['link']['join']['joinId'].')';
+    $productionTable = '(
+      SELECT P_'.$metadata['link']['table'].'.*, '.$metadata['link']['id'].' 
+      FROM P_'.$metadata['link']['table'].' 
+      INNER JOIN P_'.$metadata['link']['join']['table'].' ON '.$metadata['link']['join']['id'] .' = '.$metadata['link']['join']['joinId'].')'; 
+  } else {
+    $linkTable = $metadata['link']['table'];
+    $productionTable = "P_".$metadata['link']['table'];
+  }
   // Union to get all changes ! (eg: links that have been deleted)
   $query = "
     SELECT count(distinct Link.".$metadata['link']['id'].") as links 
-      FROM ".$metadata['link']['table']." as Link 
+      FROM $linkTable as Link 
       JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
-      LEFT JOIN P_".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
+      LEFT JOIN $productionTable as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")
   UNION
       SELECT count(distinct Link.".$metadata['link']['id'].") as links 
-      FROM P_".$metadata['link']['table']." as Link 
+      FROM $productionTable as Link 
       JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
-      LEFT JOIN ".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
+      LEFT JOIN $linkTable as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")";
 
   display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links, '.$metadata['link']['table'].')');
@@ -676,6 +697,20 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
       $join[] = "Link.$field[name] = Production.$field[name]";
     }
   }
+
+  if($metadata['link']['join']) {
+    $linkTable = '(
+      SELECT '.$metadata['link']['table'].'.*, '.$metadata['link']['id'].' 
+      FROM '.$metadata['link']['table'].' 
+      INNER JOIN '.$metadata['link']['join']['table'].' ON '.$metadata['link']['join']['id'] .' = '.$metadata['link']['join']['joinId'].')';
+    $productionTable = '(
+      SELECT P_'.$metadata['link']['table'].'.*, '.$metadata['link']['id'].' 
+      FROM P_'.$metadata['link']['table'].' 
+      INNER JOIN P_'.$metadata['link']['join']['table'].' ON '.$metadata['link']['join']['id'] .' = '.$metadata['link']['join']['joinId'].')'; 
+  } else {
+    $linkTable = $metadata['link']['table'];
+    $productionTable = "P_".$metadata['link']['table'];
+  }  
   $query = "
     INSERT INTO Updatedlinks (
         updatedlinks_domain_id,
@@ -692,9 +727,9 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
       '$metadata[table]',
       '$metadata[prefix]',
       Link.".$metadata['link']['id']." 
-    FROM ".$metadata['link']['table']." as Link 
+    FROM $linkTable as Link 
       JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
-      LEFT JOIN P_".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
+      LEFT JOIN $productionTable as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")
       GROUP BY Link.".$metadata['link']['id']."
   UNION
@@ -705,9 +740,9 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
       '$metadata[table]',
       '$metadata[prefix]',
       Link.".$metadata['link']['id']." 
-    FROM P_".$metadata['link']['table']." as Link 
+    FROM $productionTable as Link 
       JOIN $metadata[table] as Current ON $primaries[current] = Link.".$metadata['link']['id']."
-      LEFT JOIN ".$metadata['link']['table']." as Production ON ".implode(' AND ', $join)."
+      LEFT JOIN $linkTable as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")
       GROUP BY $primaries[current], Link.".$metadata['link']['id'];
 

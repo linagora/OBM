@@ -2254,7 +2254,6 @@ function of_usergroup_update_group_hierarchy($g_id) {
 
   $groups = get_all_parent_group_of_group($g_id);
   $ret = false;
-
   foreach ($groups as $group_id) {
     $ret = of_usergroup_update_group_node($group_id);
   }

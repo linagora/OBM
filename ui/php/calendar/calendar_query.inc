@@ -605,7 +605,13 @@ function run_query_calendar_insert_event_data($calendar) {
     }
   }
   $properties = "<extended_desc>$properties</extended_desc>";
-
+  if($all_day) {
+    $dateend = clone $datebegin;
+    $dateend->addSecond($event_duration - 1);
+    $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
+    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
+    $event_duration = $dateend->diffTimestamp($datebegin);
+  }
   $obm_q = new DB_OBM;
   
   $query = "INSERT INTO Event (
@@ -1072,6 +1078,13 @@ function run_query_calendar_update_event_data($calendar) {
   }
   $properties = "<extended_desc>$properties</extended_desc>";
 
+  if($all_day) {
+    $dateend = clone $datebegin;
+    $dateend->addSecond($event_duration - 1);
+    $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
+    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
+    $event_duration = $dateend->diffTimestamp($datebegin);
+  }
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = '$now',
@@ -1158,7 +1171,13 @@ function run_query_calendar_quick_event_insert($calendar) {
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
-
+  if($all_day) {
+    $dateend = clone $datebegin;
+    $dateend->addSecond($event_duration - 1);
+    $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
+    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
+    $event_duration = $dateend->diffTimestamp($datebegin);
+  }
   $obm_q = new DB_OBM;
   $query = "INSERT INTO Event
     (event_timecreate,
@@ -3272,9 +3291,16 @@ Class Occurrence {
    */
   function Occurrence($event, $date, $entity, $id, $state) {
     $this->event = $event;
-    $this->date = $date;
-    $this->end = clone $this->date;
-    $this->end->addSecond($event->duration);
+    if($event->all_day == 1) {
+      $this->end = clone $date;
+      $this->date = $date->setHour(0)->setMinute(0)->setSecond(0);
+      $this->end->addSecond($event->duration - 1);
+      $this->end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
+    } else {
+      $this->date = $date;
+      $this->end = clone $this->date;
+      $this->end->addSecond($event->duration);
+    }
     $this->entity = $entity;
     $this->id = $id;
     $this->entity_state = $state;
@@ -3411,13 +3437,13 @@ Class OccurrenceFactory {
              count($entityFilter[$occurrence->entity]) == 0 || 
              in_array($occurrence->id,$entityFilter[$occurrence->entity])))) {
           $eventDuration = $occurrence->event->duration;
-          $eventDate = $occurrence->date;
-          $eventEnd = $occurrence->end;
+          $eventBegin = clone $occurrence->date;
+          $eventEnd = clone $occurrence->end;          
           $eventAllDay = $occurrence->event->all_day;
-          if($eventAllDay && $eventEnd->compareDateIso($begin) > 0 && $eventDate->compareDateIso($end) < 0) {
+          if($eventAllDay && $eventFilter != 1 && $begin->compare($eventEnd) < 0 && $end->compare($eventBegin) > 0) {
             return true;
           } 
-          if(!$eventAllDay && $eventEnd->compare($begin) > 0 && $eventDate->compare($end) < 0) {
+          if(!$eventAllDay && $eventEnd->compare($begin) > 0 && $eventBegin->compare($end) < 0) {
             return true;
           }
         }
@@ -3451,13 +3477,13 @@ Class OccurrenceFactory {
              count($entityFilter[$occurrence->entity]) == 0 || 
              in_array($occurrence->id,$entityFilter[$occurrence->entity])))) {
           $eventDuration = $occurrence->event->duration;
-          $eventBegin = $occurrence->date;
-          $eventEnd = $occurrence->end;
+          $eventBegin = clone $occurrence->date;
+          $eventEnd = clone $occurrence->end;
           $eventAllDay = $occurrence->event->all_day;
-          if($eventAllDay && $eventFilter != 1 && $begin->compareDateIso($eventEnd) <= 0 && $end->compareDateIso($eventBegin) >= 0) {
+          if($eventAllDay && $eventFilter != 1 && $begin->compare($eventEnd) < 0 && $end->compare($eventBegin) > 0) {
             array_unshift($occurrences,$occurrence);
           } 
-          if(!$eventAllDay && $eventFilter != 2 && $begin->compare($eventEnd) < 0 && $end->compareDateIso($eventBegin) > 0) {
+          if(!$eventAllDay && $eventFilter != 2 && $begin->compare($eventEnd) < 0 && $end->compare($eventBegin) > 0) {
             array_push($occurrences,$occurrence);
           }
         }

@@ -1657,7 +1657,6 @@ function dis_calendar_planning_view($date, $end, $calendar_entity, $category_fil
       while($current->compare($end) < 0) {
         $view = array();
         $occurrences = $of->getPeriodOccurrences($current,null,array($entity => array($id)));
-        var_dump($current->getIso(), $occurrences);
         if(is_array($occurrences)) {
           $dis_planning_view .= "<td style=\"width:$td_width%\"><ul>";
           foreach($occurrences as $occurrence) {
@@ -1757,6 +1756,9 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
     $private = true;
     $id = $conflict->event->id;
     $name  = $conflict->event->attendee[$conflict->entity][$conflict->id];
+    echo "<pre>";
+    var_dump($conflict);
+    echo "</pre>";
     if (((in_array($conflict->id, $readable[$conflict->entity]['ids']) || in_array($conflict->event->owner,$readable['user']['ids']))
       && $conflict->event->privacy != '1') || $conflict->event->owner == $obm['uid'] || ($conflict->id == $obm['uid'] && $conflict->entity == 'user')) {
         $private = false;   
@@ -1945,6 +1947,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   $end->addSecond($event_q->f('event_duration'));
   if ($all_day) {
     $dis_all_day = "<tr><th>$l_all_day</th><td></td></tr>";
+    $end->subSecond(1);
     $begin = $begin->getOutputDate();
     $end = $end->getOutputDate();
   } else {
@@ -2366,6 +2369,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $end = clone $begin;
     $end = $end->addSecond($event_q->f('event_duration'));
     $all_day = $event_q->f('event_allday');
+    if($all_day) {
+      $end->subMinute(1);
+    }
     $color = $event_q->f('event_color');
     $privacy = $event_q->f('event_privacy');
     $repeat_kind = $event_q->f('event_repeatkind');
@@ -3410,7 +3416,7 @@ function dis_calendar_free_interval($calendar, $entity_store) {
           </div>";              
         }
       } 
-      $goto = "calendar_index.php?action=new&amp;tf_date_begin=$begin_date&amp;tf_date_end=$end_date".$resource_url;
+      $goto = "calendar_index.php?action=new&amp;tf_date_begin=".$current->getURL()."&amp;tf_duration=$duration".$resource_url;
       if ($have_event) {
         $week_cal .= "<td class=\"busy\">&nbsp;</td>\n";
       } elseif ($will_have_event) {

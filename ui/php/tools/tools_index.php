@@ -36,8 +36,12 @@ $entities = array(
     'table'   => 'UserObm', 
     'link'    => array(
       'table' => 'EntityRight', 
-      'id' => 'entityright_entity_id', 
-      'rules' => array('entityright_entity' => 'mailbox')
+      'join' => array (
+        'table' => 'MailboxEntity',
+        'id' => 'mailboxentity_entity_id',
+        'joinId' => 'entityright_entity_id'
+      ),      
+      'id' => 'mailboxentity_mailbox_id'
     ),
     'prefix'  => 'userobm',
     'exclude' => array('domain_id' => 1, 'timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1, 
@@ -63,6 +67,16 @@ $entities = array(
   ),
   'host' => array(
     'table'   => 'Host',
+    'link'    => array(
+      'table' => 'Service',
+      'join' => array (
+        'table' => 'HostEntity',
+        'id' => 'hostentity_entity_id',
+        'joinId' => 'service_entity_id'
+      ),
+      'id' => 'hostentity_host_id',
+      'rules' => array('service_service' => array('smtp_in', 'smtp_out', 'imap'))
+    ),
     'prefix'  => 'host',
     'exclude' => array(),
     'rules'   => array(),
@@ -73,8 +87,12 @@ $entities = array(
     'table'   => 'MailShare',
     'link'    => array(
       'table' => 'EntityRight', 
-      'id' => 'entityright_entity_id', 
-      'rules' => array('entityright_entity' => 'MailShare')
+      'join' => array (
+        'table' => 'MailshareEntity',
+        'id' => 'mailshareentity_entity_id',
+        'joinId' => 'entityright_entity_id'
+      ),      
+      'id' => 'mailshareentity_mailshare_id'      
     ),    
     'prefix'  => 'mailshare',
     'exclude' => array(),
