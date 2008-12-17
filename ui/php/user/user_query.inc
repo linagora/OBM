@@ -342,7 +342,6 @@ function run_query_user_insert($user) {
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
   $login = strtolower($user['login']);
   $passwd = stripslashes($user['passwd']);
@@ -571,8 +570,8 @@ function run_query_user_insert($user) {
     $query_insert_samba
   ) VALUES (
     $domain_id,
-    '$now',
-    '$now',
+    NOW(),
+    NOW(),
     $uid,
     $uid,
     '$login',
@@ -1119,7 +1118,6 @@ function run_query_user_delete($p_id) {
   if ($obm_q->num_rows() > 0) {
     $uid = sql_parse_id($obm['uid']);
     $domain_id = sql_parse_id($obm['domain_id']);
-    $now = date('Y-m-d H:i:s');
 
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
@@ -1134,17 +1132,16 @@ function run_query_user_delete($p_id) {
       '$delegation',
       'UserObm',
       $p_id,
-      '$now')";
+      NOW())";
     display_debug_msg($query, $cdg_sql, 'run_query_user_delete(auto)');
     $retour = $obm_q->query($query);
   }
 
   // If connectors in use
   if ($c_use_connectors) {
-    $now = date('Y-m-d H:i:s');
     $query = "INSERT INTO
       DeletedUser (deleteduser_user_id, deleteduser_timestamp)
-      VALUES ($p_id, '$now')";
+      VALUES ($p_id, NOW())";
     display_debug_msg($query, $cdg_sql, 'run_query_user_delete(connector)');
     $retour = $obm_q->query($query);
   }
@@ -2038,7 +2035,6 @@ function check_user_can_delete($params) {
 function run_query_user_delete_profile($user_id)  {
   global $cdg_sql, $l_attendee, $obm;
 
-  $now = date('Y-m-d H:i:s');
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
@@ -2086,7 +2082,7 @@ function run_query_user_delete_profile($user_id)  {
   $concat = sql_string_concat($db_type, $cdesc);
   $query = "UPDATE Event
     SET event_description = $concat,
-      event_timeupdate = '$now'
+      event_timeupdate = NOW() 
     WHERE event_owner $user_id 
       OR event_id IN (
         SELECT eventlink_event_id as event_id

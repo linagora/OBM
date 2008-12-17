@@ -196,7 +196,6 @@ function get_todo_users($id) {
 function run_query_todo_insert($todo) {
   global $cdg_sql, $obm;
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
   $title = $todo['title'];
   $users = $todo['user_id'];
@@ -226,13 +225,13 @@ function run_query_todo_insert($todo) {
         event_description)
       VALUES (
         $domain_id,
-        '$now',
-        '$now',
+        NOW(),
+        NOW(),
         $uid,
         $uid,
         'VTODO',
         'ui',
-        '$now',
+        NOW(),
         '$priority',
         '$title',
         '$description'
@@ -258,8 +257,8 @@ function run_query_todo_insert($todo) {
           eventlink_required,
           eventlink_percent)
         VALUES (
-          '$now',
-          '$now',
+          NOW(),
+          NOW(),
           '$uid',
           '$uid',
           '$id',
@@ -286,7 +285,6 @@ function run_query_todo_insert($todo) {
 function run_query_todo_update($todo) {
   global $obm, $cdg_sql;
 
-  $now = date('Y-m-d H:i:s');
   $todo_id = $todo['todo_id'];
   $t_id = sql_parse_id($todo['todo_id'], true);
   $uid = sql_parse_id($obm['uid']);
@@ -305,7 +303,7 @@ function run_query_todo_update($todo) {
   $multidomain = sql_multidomain('event');
 		
   $query = "UPDATE Event SET
-    event_timeupdate = '$now',
+    event_timeupdate = NOW(),
     event_userupdate = $uid,
     event_date = '$date',
     event_priority = '$priority',
@@ -346,8 +344,8 @@ function run_query_todo_update($todo) {
           eventlink_required,
           eventlink_percent)
         VALUES (
-          '$now',
-          '$now',
+          NOW(),
+          NOW(),
           '$uid',
           '$uid',
           '$todo_id',
@@ -396,7 +394,6 @@ function run_query_todo_delete($parms) {
 	// If connectors in use
 	if ($c_use_connectors) {
           $ins_id = sql_parse_id($id_todo);
-	  $now = date('Y-m-d H:i:s');
 	  $query = "INSERT INTO DeletedEvent (
                       deletedevent_event_id,
                       deletedevent_user_id,
@@ -408,7 +405,7 @@ function run_query_todo_delete($parms) {
                       $uid,
                       'ui',
                       'VTODO',
-                      '$now')";
+                      NOW())";
 	  display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(2)');
 	  $retour = $obm_q->query($query);
 	}
@@ -438,7 +435,6 @@ function run_query_todo_delete_unique($t_id) {
   // If connectors in use
   if ($c_use_connectors) {
     $id = sql_parse_id($t_id);
-    $now = date('Y-m-d H:i:s');
     $query = "INSERT INTO DeletedEvent (
                       deletedevent_event_id,
                       deletedevent_user_id,
@@ -450,7 +446,7 @@ function run_query_todo_delete_unique($t_id) {
                       $uid,
                       'ui',
                       'VTODO',
-                      '$now')";
+                      NOW())";
     display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(2)');
     $retour = $obm_q->query($query);
   }

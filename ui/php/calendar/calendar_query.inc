@@ -289,9 +289,8 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $now = date('Y-m-d H:i:s');
     $query = "UPDATE Event
-      SET event_timeupdate = '$now'
+      SET event_timeupdate = NOW()
       WHERE event_id $event_id";
 
     display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');
@@ -555,7 +554,6 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
 function run_query_calendar_insert_event_data($calendar) {
   global $cdg_sql, $obm;
 
-  $now = Of_Date::today();
   if(!is_numeric($calendar['owner']) || $calendar['owner'] <= 0) {
     $owner = $obm['uid'];
   } else {
@@ -639,8 +637,8 @@ function run_query_calendar_insert_event_data($calendar) {
     event_endrepeat,
     event_domain_id)
   VALUES (
-    '$now',
-    '$now',
+    NOW(),
+    NOW(),
     '$obm[uid]',
     'VEVENT',
     '$GLOBALS[c_origin_web]',
@@ -929,7 +927,6 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   // Handle Connectors data
   if ($c_use_connectors) {
     $obm_q = new DB_OBM;
-    $now = date('Y-m-d H:i:s');
     $old_users = get_calendar_event_users_info($event_id);
     if (is_array($old_users)) {
       $removed_users = array_diff($old_users, $users_array);
@@ -949,7 +946,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
       VALUES (
         $event_id,
         $u_id,
-        '$now')";
+        NOW())";
 	display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_update(1)');
 	$retour = $obm_q->query($query);
       }
@@ -1029,7 +1026,6 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
 function run_query_calendar_update_event_data($calendar) {
   global $cdg_sql, $obm;
 
-  $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
   if(is_numeric($calendar['owner']) && $calendar['owner'] >= 0) {
     $owner = "event_owner = $calendar[owner],";
@@ -1087,7 +1083,7 @@ function run_query_calendar_update_event_data($calendar) {
   }
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
-    event_timeupdate = '$now',
+    event_timeupdate = NOW(),
     $owner
     event_userupdate = $obm[uid], 
     event_title = '$title', 
@@ -1136,14 +1132,13 @@ function run_query_calendar_quick_event_update($calendar) {
   global $cdg_sql, $obm;
 
   $multidomain = sql_multidomain('event');
-  $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $event_id = sql_parse_id($calendar['calendar_id'], true); 
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
-    event_timeupdate = '$now',
+    event_timeupdate = NOW(),
     event_userupdate = $obm[uid], 
     event_title = '$title', 
     event_date = '$datebegin',     
@@ -1166,7 +1161,6 @@ function run_query_calendar_quick_event_update($calendar) {
 function run_query_calendar_quick_event_insert($calendar) {
   global $cdg_sql, $obm;
 
-  $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
@@ -1203,7 +1197,7 @@ function run_query_calendar_quick_event_insert($calendar) {
      event_domain_id
    )
   VALUES (
-    '$now',
+    NOW(),
     $obm[uid],
     'VEVENT',
     '$GLOBAL[c_origin_ajax]',
@@ -1246,7 +1240,6 @@ function run_query_calendar_quick_event_insert($calendar) {
 function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
   global $cdg_sql, $obm;
 
-  $now = date('Y-m-d H:i:s');
   $title = $calendar['title'];
   $id =  $calendar['calendar_id'];
   $olddatebegin = $calendar['old_date_begin'];
@@ -1268,9 +1261,9 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       eventexception_date)
       VALUES (
         $obm[uid],
-        '$now',
+        NOW(),
         $obm[uid],
-        '$now',
+        NOW(),
         $id,
         '$olddatebegin'
       )";
@@ -1333,8 +1326,8 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       event_domain_id
     )
     VALUES (
-      '$now',
-      '$now',
+      NOW(),
+      NOW(),
       $obm[uid],
       'VEVENT',
       '$GLOBALS[c_origin_web]',
@@ -1419,7 +1412,6 @@ function run_query_quick_attendee_update($params, $eve_q) {
 function run_query_calendar_event_alert_insert($event_id, $user_id, $alerts) {
   global $cdg_sql, $obm;
 
-  $now = date('Y-m-d H:i:s');
   run_query_calendar_event_alert_delete($event_id, $user_id);
 
   if (! is_array($alerts) && $alerts > 0) {
@@ -1438,7 +1430,7 @@ function run_query_calendar_event_alert_insert($event_id, $user_id, $alerts) {
         eventalert_user_id,
         eventalert_duration)
       VALUES (
-        '$now',
+        NOW(),
         $obm[uid],
         $event_id,
         $user_id,
@@ -1544,14 +1536,13 @@ function run_query_calendar_delete($calendar) {
 
   // If connectors in use
   if ($c_use_connectors) {
-    $now = date('Y-m-d H:i:s');
     $query = "SELECT userentity_user_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id WHERE eventlink_event_id = $event_id";
     $obm_q->query($query);
     $users = array();
     while ($obm_q->next_record()) {
       // We note the event deletion
       $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_timestamp)
-                VALUES ($event_id, ".$obm_q->f('userentity_user_id').", '$now')";
+                VALUES ($event_id, ".$obm_q->f('userentity_user_id').", NOW())";
       display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
       $retour = $obm_q->query($query);
     }

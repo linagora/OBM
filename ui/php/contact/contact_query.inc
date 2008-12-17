@@ -402,7 +402,6 @@ function run_query_contact_kind() {
 function run_query_contact_insert($contact) {
   global $cgp_show, $cdg_sql, $obm;
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id( $obm['uid']);
 
   $comp_id = $contact['company_new_id'];
@@ -483,8 +482,9 @@ function run_query_contact_insert($contact) {
     contact_comment2,
     contact_comment3,
     contact_origin
-  ) VALUES ('$now',
-    '$now',
+  ) VALUES (
+    NOW(),
+    NOW(),
     $uid,
     $uid,
     $domain_id,
@@ -1003,10 +1003,9 @@ function run_query_contact_delete($p_id) {
   // If connectors in use
 
   if ($c_use_connectors) {
-    $now = date('Y-m-d H:i:s');
     $query = "INSERT INTO
       DeletedContact (deletedcontact_contact_id, deletedcontact_timestamp)
-      VALUES ($p_id, '$now')";
+      VALUES ($p_id, NOW())";
     display_debug_msg($query, $cdg_sql, 'run_query_contact_delete(2)');
     $retour = $obm_q->query($query);
   }
@@ -1645,7 +1644,6 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
     $multidomain_contact = sql_multidomain('contact');
     $multidomain_event = sql_multidomain('event');
 
-    $now = Of_Date::today();
 
     switch ($do) {
     case $insert_event:
@@ -1676,8 +1674,9 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
         event_endrepeat,
         event_domain_id)
         VALUES
-        ('$now',
-        '$now',
+        (
+         NOW(),
+         NOW(),
         '$contact_usercreate',
         '$GLOBALS[c_origin_web]',
         '$contact_usercreate',
@@ -1722,7 +1721,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
           eventlink_entity_id,
           eventlink_state) 
           VALUES (
-            '$now',
+            NOW(),
             $contact_usercreate,
             $insert_event_id,
             $entity_id,
