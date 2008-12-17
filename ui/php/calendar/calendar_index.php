@@ -234,7 +234,7 @@ if ($action == 'index') {
   $entities['group'] = $params['sel_group_id'];
   $entities['resource'] = $params['sel_resource_id'];
   $entities['user'] = $params['sel_user_id'];
-  if (count($entities,COUNT_RECURSIVE) <= 4) {
+  if (count($entities,COUNT_RECURSIVE) <= 3) {
     $entities['user']  = array($obm['uid']);
     $params['sel_user_id'] = array($obm['uid']);
   }
