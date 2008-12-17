@@ -55,7 +55,7 @@ INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainprope
 INSERT INTO DomainProperty (domainproperty_key, domainproperty_type, domainproperty_default, domainproperty_readonly) VALUES ('last_public_contact_export','timestamp', 0, 1);
 
 -- Fill the initial update_state for each Domain
-INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) VALUES ((SELECT domain_id From Domain), 'update_state', 1);
+INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) SELECT domain_id , 'update_state', 1 From Domain;
 
 -- -----------------------------------------------------------------------------
 -- Remplissage de la table 'UserSystem' : Utilisateurs systeme

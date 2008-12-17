@@ -976,6 +976,7 @@ ALTER TABLE UserObm ALTER COLUMN userobm_email_nomade TYPE text default '';
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 -- Global Domain
 INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_name,domain_global) VALUES  (NOW(), 'Global Domain', 'Virtual domain for managing domains', 'global.virt', TRUE);
+INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) SELECT domain_id , 'update_state', 0 From Domain WHERE domain_global = TRUE;
 UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
 

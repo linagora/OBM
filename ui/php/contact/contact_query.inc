@@ -219,6 +219,10 @@ function run_query_contact_search($contact) {
     contactfunction_label as function_label
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+    LEFT JOIN Address ON address_entity_id = contactentity_entity_id
+    LEFT JOIN Country ON country_iso3166 = address_country
+    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id
     $join_comp
 ";
 

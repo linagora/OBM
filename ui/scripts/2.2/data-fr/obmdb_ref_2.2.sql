@@ -168,17 +168,6 @@ INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentk
 INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'CB', 'Carte de crédit');
 
 
--- Add system Groups
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_name, group_desc, group_email)
-VALUES
-((SELECT domain_id From Domain), 1, 0, 'Admin', 'groupe système Administration', 'admin');
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_name, group_desc, group_email)
-VALUES
-((SELECT domain_id From Domain), 1, 0, 'Commercial', 'groupe système Commercial', '');
-INSERT INTO UGroup (group_domain_id, group_system, group_privacy, group_name, group_desc, group_email)
-VALUES
-((SELECT domain_id From Domain), 1, 0, 'Production', 'groupe système Production', '');
-
 -- Add Country
 INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AE', 'Emirats Arabes Unis', 'FR', '');
 INSERT INTO Country VALUES ((SELECT domain_id From Domain), NULL, NULL,NULL, NULL, 'AL', 'Albanie', 'FR', '');
