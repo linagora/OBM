@@ -167,7 +167,7 @@ class Vcalendar_Reader_OBM {
          break;
        case 'monthlybyday' :
          $rrule['kind'] = 'monthly';
-         $date = new Of_Date($data['event_date']);
+         $date = new Of_Date($data['event_date'], 'GMT');
          $day = $date->get(Of_Date::WEEKDAY_ICS);
          
          $num =  ceil($date->getDay()/7);

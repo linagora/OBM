@@ -174,7 +174,10 @@ class Vcalendar_Writer_ICS {
    * @param Of_Date $date
    */
   function parseDate($date) {
-    return $date->get(Of_Date::ICS_DATETIME).'Z';
+    $date->setTimezone(new DateTimeZone('GMT'));
+    $return = $date->get(Of_Date::ICS_DATETIME).'Z';
+    $date->setDefaultTimezone();
+    return $return;
   }
   
   /**
@@ -186,7 +189,7 @@ class Vcalendar_Writer_ICS {
       $res = ';TZID='. $date->getOriginalTimeZone().':'. $date->get(Of_Date::ICS_DATETIME);
       $date->setDefaultTimezone();
     } else {
-      $res = ':'. parseDate($date);
+      $res = ':'. $this->parseDate($date);
     }
     
     return $res;
