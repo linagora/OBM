@@ -723,6 +723,7 @@ function run_query_contact_coords_update($id, $contact) {
     $cpt = array();
     foreach($phones as $phone) {
       if(trim($phone['number']) != '' ) {
+        $phone['label'] = str_replace('_', ';', $phone['label']);
         $cpt[$phone['label']]++;
         $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(phone)');
@@ -736,8 +737,10 @@ function run_query_contact_coords_update($id, $contact) {
   if(is_array($addresses)) {
     $cpt = array();
     foreach($addresses as $address) {
-      if(trim($address['street']) != '' || trim($address['country']) != '' || trim($address['zipcode']) != ''
+      if(trim($address['street']) != '' || (trim($address['country']) != '' && trim($address['country']) != 'none') || trim($address['zipcode']) != ''
          || trim($address['expresspostal']) != '') {
+        if(trim($address['country']) == 'none') $address['country'] = '';
+        $address['label'] = str_replace('_', ';', $address['label']);
         $cpt[$address['label']]++;
         $query = "INSERT INTO Address (
           address_entity_id,
@@ -769,6 +772,7 @@ function run_query_contact_coords_update($id, $contact) {
     $cpt = array();
     foreach($websites as $website) {
       if(trim($website['url']) != '' ) {
+        $website['label'] = str_replace('_', ';', $website['label']);
         $cpt[$website['label']]++;
         $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(website)');
@@ -800,6 +804,7 @@ function run_query_contact_coords_update($id, $contact) {
     $cpt = array();
     foreach($emails as $email) {
       if(trim($email['address']) != '' ) {
+        $email['label'] = str_replace('_', ';', $email['label']);
         $cpt[$email['label']]++;
         $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '$email[address]', '$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(Email)');
@@ -833,7 +838,9 @@ function run_query_contact_coords($id, $update=false) {
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Phone)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
-    $label = current(explode(';',$obm_q->f('phone_label')));
+    $label = explode(';',$obm_q->f('phone_label'));
+    array_pop($label);
+    $label = implode(';',$label);
     $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
   }
   $query = "SELECT email_label, email_address FROM Email INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
@@ -848,7 +855,9 @@ function run_query_contact_coords($id, $update=false) {
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Email)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
-    $label = current(explode(';',$obm_q->f('email_label')));
+    $label = explode(';',$obm_q->f('email_label'));
+    array_pop($label);
+    $label = implode(';',$label);
     $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
   }
   $query = "SELECT * FROM IM INNER JOIN ContactEntity ON im_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
@@ -869,7 +878,9 @@ function run_query_contact_coords($id, $update=false) {
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Website)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
-    $label = current(explode(';',$obm_q->f('website_label')));
+    $label = explode(';',$obm_q->f('website_label'));
+    array_pop($label);
+    $label = implode(';',$label);
     $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
   $lang = get_lang();
@@ -889,7 +900,9 @@ function run_query_contact_coords($id, $update=false) {
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Address)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
-    $label = current(explode(';',$obm_q->f('address_label')));
+    $label = explode(';',$obm_q->f('address_label'));
+    array_pop($label);
+    $label = implode(';',$label);
     if($update) {
       $country =  $obm_q->f('address_country');
     } else {

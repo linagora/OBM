@@ -831,13 +831,13 @@ function html_contact_view_main($co_q, $coords) {
       $datas = array();
       foreach($values as $label => $value) {
         if($label == 'label' || $label == 'protocol') {
-          if(isset($GLOBALS["l_${kind}_labels"][$value])) {
-            $header = $GLOBALS["l_${kind}_labels"][$value];
+          if(isset($GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)])) {
+            $header = $GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)];
           } else {
             $header = $value;
           }
         } elseif(!empty($value)) {
-          $datas[] = $value;
+          $datas[] = nl2br($value);
         }
       }
       //if($kind == 'address') {
@@ -1082,19 +1082,33 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
   global $extra_js, $l_im, $l_website, $l_phone_labels, $l_email_labels, $l_number;
-  global $l_remove;
+  global $l_remove, $l_street;
 
 
   $uid = $obm['uid'];
 
   $GLOBALS['js']['vars']['labels']['label'] = $l_label;
-  $GLOBALS['js']['vars']['labels']['value'] = $l_number;
   $GLOBALS['js']['vars']['labels']['remove'] = $l_remove;
   $GLOBALS['js']['vars']['labels']['phoneLabel'] = $l_phone_labels;
   $GLOBALS['js']['vars']['labels']['emailLabel'] = $l_email_labels;
   $GLOBALS['js']['vars']['labels']['addressLabel'] = $l_address_labels;
   $GLOBALS['js']['vars']['labels']['websiteLabel'] = $l_website_labels;
-  
+  $GLOBALS['js']['vars']['labels']['phoneNumber'] = $l_number;
+  $GLOBALS['js']['vars']['labels']['emailAddress'] = $l_email;
+  $GLOBALS['js']['vars']['labels']['websiteUrl'] = $l_website;
+  $GLOBALS['js']['vars']['labels']['imAddress'] = $l_im;
+  $GLOBALS['js']['vars']['labels']['addressStreet'] = $l_street;
+  $GLOBALS['js']['vars']['labels']['addressTown'] = $l_town;
+  $GLOBALS['js']['vars']['labels']['addressZipcode'] = $l_postcode;
+  $GLOBALS['js']['vars']['labels']['addressExpressPostal'] = $l_expresspostal; 
+  $GLOBALS['js']['vars']['labels']['addressCountry'] = $l_country;
+
+
+  $GLOBALS['js']['vars']['labels']['countries']['none'] = '---';
+  while($ctry_q->next_record()) {
+    $GLOBALS['js']['vars']['labels']['countries'][$ctry_q->f('country_iso3166')] = $ctry_q->f('country_name');
+  } 
+
   // if update mode and first time values are taken from database
   if ($action == 'detailupdate') {
     $id = $co_q->f('contact_id');
