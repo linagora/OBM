@@ -548,8 +548,8 @@ function of_domain_html_select($domains, $domain_id='', $first_element='', $sel_
   if (is_array($domains)) {
     foreach ($domains as $one_domain) {
       $d_id = $one_domain['id'];
-      $d_label = htmlentities($one_domain['label']);
-      $d_name = htmlentities($one_domain['name']);
+      $d_label = ($one_domain['label']);
+      $d_name = ($one_domain['name']);
       $dis_name = ($d_name != '') ? " ($d_name)" : '';
       $sel_dom .= "\n<option value=\"$d_id\"";
       if ($d_id == $domain_id) { $sel_dom .= " selected=\"selected\""; }
