@@ -762,7 +762,7 @@ sub updateLdapEntry {
         # User web permission
         if( $self->{'entityDesc'}->{'userobm_web_perms'} && $self->_modifyAttr( 'PERMIT', $entry, 'webAccess' ) ) {
             $update = 1;
-        }elsif( $self->_modifyAttr( 'REJECT', $entry, 'webAccess' ) ) {
+        }elsif( !$self->{'entityDesc'}->{'userobm_web_perms'} && $self->_modifyAttr( 'REJECT', $entry, 'webAccess' ) ) {
             $update = 1;
         }
 
@@ -779,7 +779,7 @@ sub updateLdapEntry {
         # User mail permission
         if( $self->{'entityDesc'}->{'userobm_mail_perms'} && $self->_modifyAttr( 'PERMIT', $entry, 'mailAccess' ) ) {
             $update = 1;
-        }elsif( $self->_modifyAttr( 'REJECT', $entry, 'mailAccess' ) ) {
+        }elsif( !$self->{'entityDesc'}->{'userobm_mail_perms'} && $self->_modifyAttr( 'REJECT', $entry, 'mailAccess' ) ) {
             $update = 1;
         }
 
