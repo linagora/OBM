@@ -34,13 +34,13 @@ public class CalendarHelper extends Helper {
 	private static Log logger = LogFactory.getLog(CalendarHelper.class);
 
 	private static final byte[] foundationWeekDays = {
+			RecurrencePattern.DAY_OF_WEEK_SUNDAY,
 			RecurrencePattern.DAY_OF_WEEK_MONDAY,
 			RecurrencePattern.DAY_OF_WEEK_TUESDAY,
 			RecurrencePattern.DAY_OF_WEEK_WEDNESDAY,
 			RecurrencePattern.DAY_OF_WEEK_THURSDAY,
 			RecurrencePattern.DAY_OF_WEEK_FRIDAY,
-			RecurrencePattern.DAY_OF_WEEK_SATURDAY,
-			RecurrencePattern.DAY_OF_WEEK_SUNDAY };
+			RecurrencePattern.DAY_OF_WEEK_SATURDAY, };
 
 	static {
 		dateFormat = new SimpleDateFormat(DATE_FORMAT);
@@ -67,7 +67,7 @@ public class CalendarHelper extends Helper {
 		if (date != null) {
 			utc = dateFormatUTC.format(date);
 		}
-		logger.info("date: "+date+" converted to "+utc);
+		logger.info("date: " + date + " converted to " + utc);
 		return utc;
 	}
 
@@ -380,14 +380,16 @@ public class CalendarHelper extends Helper {
 	}
 
 	public static void refuseEvent(Event event, String userEmail) {
-		if (event.getAttendees() != null) {
-			for (Attendee at : event.getAttendees()) {
-				if (at.getEmail().equals(userEmail)) {
-					at.setState(ParticipationState.DECLINED);
-					break;
-				}
+		for (Attendee at : event.getAttendees()) {
+			if (at.getEmail().equals(userEmail)) {
+				at.setState(ParticipationState.DECLINED);
+				logger.info("DECLINED for email " + userEmail);
+				return;
 			}
 		}
+		logger
+				.error("Did not find attendee to refuse with email: "
+						+ userEmail);
 	}
 
 	public static String formatWithTiret(String propValue) {

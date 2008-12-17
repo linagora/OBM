@@ -148,8 +148,10 @@ public class CalendarManager extends ObmManager {
 			if (event.getAttendees() == null
 					|| event.getAttendees().size() == 1) {
 				// no attendee (only the owner)
+				logger.info("not a meeting, removing event");
 				binding.removeEvent(token, calendar, key);
 			} else {
+				logger.info("meeting removed, refusing for "+userEmail);
 				CalendarHelper.refuseEvent(event, userEmail);
 				// event = binding.refuseEvent(token, calendar, event);
 				binding.modifyEvent(token, calendar, event, true);
