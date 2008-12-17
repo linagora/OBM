@@ -1084,6 +1084,9 @@ Obm.CalendarQuickForm = new Class({
     this.deleteButton = $('calendarQuickFormDelete');
     this.detailButton = $('calendarQuickFormDetail');
     this.editButton = $('calendarQuickFormEdit');
+    this.entityView = $('calendarViewEntity');
+    this.entityKind = $('calendarKindEntity');
+    this.entityList = $('calendarListEntity');
 
     this.popup.setStyle('position','absolute');
 
@@ -1152,6 +1155,7 @@ Obm.CalendarQuickForm = new Class({
       this.deleteButton.setStyle('display','');
       this.editButton.setStyle('display','');
       this.detailButton.setStyle('display','');
+      this.entityList.setStyle('display','none');
       this.editButton.value = obm.vars.labels.edit;
     } else {
       this.form.setStyle('display','none');
@@ -1204,6 +1208,7 @@ Obm.CalendarQuickForm = new Class({
     this.deleteButton.setStyle('display','none');
     this.editButton.setStyle('display','');
     this.detailButton.setStyle('display','none');    
+    this.entityList.setStyle('display','block');
     if(!this.eventData.all_day) {
       this.date.set('html',date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
     } else {
@@ -1223,6 +1228,8 @@ Obm.CalendarQuickForm = new Class({
 
   submit: function(action) {
     this.eventData.title = this.form.tf_title.value;
+    this.eventData.entity_id = this.entityView.get('inputValue');
+    this.eventData.entity_kind = this.entityKind.value;
     this.eventData.action = action || this.eventData.action;
     if(this.eventData.action == 'quick_insert') {
       obm.calendarManager.sendCreateEvent(this.eventData);
@@ -1420,7 +1427,7 @@ Obm.CalendarView = new Class({
                   
                   //change visual for default view
                   $('opt_'+id).set('default','default');
-                  $('my_view').set('href','calendar_index.php?views_id='+id);
+                  $('my_view').set('href',$('opt_'+id).value);
                   if(default_id != "") {
                     $('opt_'+default_id).erase("default");
                   }
@@ -1429,7 +1436,7 @@ Obm.CalendarView = new Class({
                   
                   $('default').set('html', obm.vars.labels.insert_default_view);
                   $('default_view_id').value = "";
-                  $('my_view').set('href','calendar_index.php?views_id=');
+                  $('my_view').set('href',$('opt_choix').value);
                   $('opt_'+default_id).erase("default");
                   
                   //hidde option for default view
