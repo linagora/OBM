@@ -1980,9 +1980,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     }
 
     // Exception
+    $block_exception_detail = '';
     while($exception_q->next_record()) {
       $date = new Of_Date($exception_q->f('eventexception_date'), 'GMT');
-      $block_exception_detail = $date->getOutputDate()."<br />";
+      $block_exception_detail .= $date->getOutputDate()."<br />";
     }
     $repeat_block = "
     <div class=\"detail infos\">
@@ -2762,7 +2763,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   // Exception
   if(is_array($date_exception)) {
     foreach($date_exception as $key => $exception) {
-      $block_exception_detail .= "<div class=\"elementRow\" id=\"date_exception-$key\">
+      $block_exception_detail .= "<div id=\"date_exception-$key\">
          <a href=\"javascript: remove_element('date_exception-$key','exceptionHome');\">
          <img src=\"$ico_delete\" alt=\"[Delete]\">
          </a>
@@ -2872,7 +2873,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <th>$l_repeatdays2</th>
     <td>$dis_repeat_day</td>
   </tr>
-  <tr id=\"repeatException\" style=\"display:$repeatDisplay\">
+  <tr id=\"repeatException\" style=\"display:$repeatDisplay; white-space:nowrap;\">
     <th> $l_exception $add_date</th>
     <td id=\"exceptionHome\">$block_exception_detail</td>
     </tr>

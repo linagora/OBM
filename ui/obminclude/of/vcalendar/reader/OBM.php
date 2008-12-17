@@ -64,7 +64,19 @@ class Vcalendar_Reader_OBM {
     if(count($this->vevents) > 0) {
       $exceptions = run_query_get_events_exception(array_keys($this->vevents));
       while($exceptions->next_record()) {
-        $this->addExdate($this->vevents[$exceptions->f('eventexception_event_id')] , $exceptions->f('eventexception_date'));
+        $date = new Of_Date($exceptions->f('eventexception_date'));
+        $timezone = $exceptions->f('event_timezone');
+        if ($timezone) $date->setOriginalTimeZone($timezone);
+        $this->addExdate($this->vevents[$exceptions->f('eventexception_event_id')] , $date);
+        
+        // BEGIN to get an ICS file that Google understand
+        // (disabled after Mehdi's choice)
+        
+//        $enddate = clone $date;
+//        $enddate->addSecond(3600);
+//        $this->addExdate($this->vevents[$exceptions->f('eventexception_event_id')] , $enddate);
+
+        // END to get an ICS file that Google understand
       }    
     }
     return $this->document;
@@ -115,7 +127,7 @@ class Vcalendar_Reader_OBM {
   }
   
   function addExdate(&$vevent, &$date) {
-   $vevent->set('exdate',$this->parseDate($date));
+   $vevent->set('exdate', $date);
   }
     
   function parsePrivacy($privacy) {

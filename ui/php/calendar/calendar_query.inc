@@ -2531,9 +2531,12 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
     $end = "AND eventexception_date < '$end_time'";
   }
   $query = "SELECT
+    event_duration,
+    event_timezone,
     eventexception_event_id,
     eventexception_date
    FROM EventException
+   JOIN Event ON eventexception_event_id = event_id
    WHERE eventexception_event_id IN ($event_list) 
    $start $end";
   display_debug_msg($query, $cdg_sql, 'run_query_get_events_exception()');
@@ -3847,30 +3850,36 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     }
   }  
   if ($mail_datas['add_exception']) {
-    $rattendees = OBM_Acl::getEntityWriters('resource', $resources);
-    $rattendees_ids = array_keys($rattendees);
-    $rattendees_ids = array_diff($rattendees_ids, array($obm['uid']));    
-    $attendees = array_merge($attendees, $rattendees_ids);    
-    $mail_datas['mails']['add_exception'] = array (
-      'subject' => sprintf($l_add_exception_mail_subject,$title),
-      'message' => sprintf($l_add_exception_mail_body,$title,implode(', ', $new_exceptions),$consult_link, 
-                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
-                           $userinfo['lastname'],$cgp_host),
-      'recipients' => $attendees
-    );
+    // because when $resources is empty, OBM_Acl::getEntityWriters fails
+    if (!empty($resources)) {
+      $rattendees = OBM_Acl::getEntityWriters('resource', $resources);
+      $rattendees_ids = array_keys($rattendees);
+      $rattendees_ids = array_diff($rattendees_ids, array($obm['uid']));    
+      $attendees = array_merge($attendees, $rattendees_ids);    
+      $mail_datas['mails']['add_exception'] = array (
+        'subject' => sprintf($l_add_exception_mail_subject,$title),
+        'message' => sprintf($l_add_exception_mail_body,$title,implode(', ', $new_exceptions),$consult_link, 
+                             $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
+                             $userinfo['lastname'],$cgp_host),
+        'recipients' => $attendees
+      );
+    }
   }
   if ($mail_datas['remove_exception']) {
-    $rattendees = OBM_Acl::getEntityWriters('resource', $resources);
-    $rattendees_ids = array_keys($rattendees);
-    $rattendees_ids = array_diff($rattendees_ids, array($obm['uid']));    
-    $attendees = array_merge($attendees, $rattendees_ids);        
-    $mail_datas['mails']['remove_exception'] = array (
-      'subject' => sprintf($l_delete_exception_mail_subject,$title),
-      'message' => sprintf($l_delete_exception_mail_body,$title,implode(', ', $old_exceptions),$consult_link, 
-                           $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
-                           $userinfo['lastname'],$cgp_host),
-      'recipients' => $attendees
-    );
+    // because when $resources is empty, OBM_Acl::getEntityWriters fails
+    if (!empty($resources)) {
+      $rattendees = OBM_Acl::getEntityWriters('resource', $resources);
+      $rattendees_ids = array_keys($rattendees);
+      $rattendees_ids = array_diff($rattendees_ids, array($obm['uid']));    
+      $attendees = array_merge($attendees, $rattendees_ids);        
+      $mail_datas['mails']['remove_exception'] = array (
+        'subject' => sprintf($l_delete_exception_mail_subject,$title),
+        'message' => sprintf($l_delete_exception_mail_body,$title,implode(', ', $old_exceptions),$consult_link, 
+                             $date->getOutputDate(), $date->get(Of_Date::TIME_SHORT), $userinfo['firstname'],
+                             $userinfo['lastname'],$cgp_host),
+        'recipients' => $attendees
+      );
+    }
   }
   if ($mail_datas['update_decision']) {
     switch ($decision) {

@@ -86,6 +86,9 @@ class Vcalendar_Writer_OBM {
     return $eventData;    
   }
 
+  /**
+   * @param Vcalendar_Element $vevent
+   */
   function parseEventData(&$vevent) {
     $entities = array();
     $states = array();
@@ -103,7 +106,6 @@ class Vcalendar_Writer_OBM {
     }
     $entities['user'][] = $GLOBALS['obm']['uid'];
     $entities['user'] = array_unique($entities['user']);
-    $event['date_exception'] = $vevent->get('exdate');
     $event['owner'] = $this->parseOrganizer($vevent->get('organizer'));
     $event['title'] = addslashes($vevent->get('summary'));
     $dtstart = $vevent->get('dtstart');
@@ -115,6 +117,42 @@ class Vcalendar_Writer_OBM {
     $event['date_end'] = $vevent->get('dtend');
     $event['event_duration'] = $vevent->get('duration');
     $event['duration'] = $vevent->get('duration');
+    
+    $event['date_exception'] = array();
+    $exdates = $vevent->get('exdate');
+    
+    $dates_exception = array();
+    
+    if (is_array($exdates))
+    foreach($exdates as $exdate) {
+      if (is_array($exdate)) {
+        foreach($exdate as $exdate2) {
+          $dates_exception[] = $exdate2;
+        }
+      } else {
+        $dates_exception[] = $exdate;
+      }
+    }
+    
+    $event['date_exception'] = $dates_exception;
+    
+    // BEGIN one exception for each day
+    
+    foreach ($dates_exception as $k => $v) {
+      $dates_exception[$k] = $v->get(Of_Date::DATE_ISO);
+    }
+    
+    $dates_exception = array_unique($dates_exception);
+    
+    foreach ($dates_exception as $k => $v) {
+      $date = new Of_Date($v);
+      $dates_exception[$k] = $date->setHour($dtstart->getHour())->setMinute($dtstart->getMinute())->setSecond($dtstart->getSecond());
+    }
+    
+    $event['date_exception'] = $dates_exception;
+    
+    // END one exception for each day
+    
     $event['description'] = addslashes($vevent->get('description'));
     $event['location'] = addslashes($vevent->get('location'));
     $event['category1'] = $this->parseCategories($vevent->get('categories'));

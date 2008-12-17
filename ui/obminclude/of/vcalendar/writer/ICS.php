@@ -77,17 +77,7 @@ class Vcalendar_Writer_ICS {
   }
 
   function writeDtstart($name, $value) {
-    $this->buffer .= $this->parseProperty($this->parseName($name));
-    
-    if ($value->getOriginalTimeZone()) {
-      $value->setTimezone(new DateTimeZone($value->getOriginalTimeZone()));
-      $this->buffer .= ';TZID='. $value->getOriginalTimeZone().':'. $value->get(Of_Date::ICS_DATETIME);
-      $value->setDefaultTimezone();
-    } else {
-      $this->buffer .= ':'. $value->get(Of_Date::ICS_DATETIME).'Z';
-    }
-    
-    $this->buffer .= "\n";
+    $this->buffer .= $this->parseProperty($this->parseName($name). $this->parseTZIDedDate($value))."\n";
   }
 
   function writeOrganizer($name, $value) {
@@ -175,12 +165,9 @@ class Vcalendar_Writer_ICS {
   function writeExdate($name, $value) {
     if(is_array($value)) {
       foreach($value as $exdate) {
-        $property[] = $this->parseDate($exdate);
+        $this->buffer .= $this->parseProperty($this->parseName($name). $this->parseTZIDedDate($exdate))."\n";
       } 
-    } else {
-      $property[] = $this->parseDate($value);
     }
-    $this->buffer .= $this->parseProperty($this->parseName($name).':'.implode(',',$property))."\n";
   }
   
   /**
@@ -188,6 +175,21 @@ class Vcalendar_Writer_ICS {
    */
   function parseDate($date) {
     return $date->get(Of_Date::ICS_DATETIME).'Z';
+  }
+  
+  /**
+   * @param Of_Date $date
+   */
+  function parseTZIDedDate($date) {
+    if ($date->getOriginalTimeZone()) {
+      $date->setTimezone(new DateTimeZone($date->getOriginalTimeZone()));
+      $res = ';TZID='. $date->getOriginalTimeZone().':'. $date->get(Of_Date::ICS_DATETIME);
+      $date->setDefaultTimezone();
+    } else {
+      $res = ':'. parseDate($date);
+    }
+    
+    return $res;
   }
 }
 ?>
