@@ -2490,10 +2490,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $week = new Of_Date($ccalendar_weekstart);
   for ($i=0; $i<7; $i++) {
     $day = $week->localize(Of_Date::WEEKDAY_NARROW) ;
-    if (strcmp(substr($repeat_days,$i,1),'1') ==0) {
-      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" name=\"cba_repeatday_".$i."\" value=\"1\" checked = \"checked\"/>$day</span> ";
+    $j = $week->getWeekday();
+    if (strcmp(substr($repeat_days,$j,1),'1') ==0) {
+      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" name=\"cba_repeatday_".$j."\" value=\"1\" checked = \"checked\"/>$day</span> ";
     } else {
-      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" name=\"cba_repeatday_".$i."\" value=\"1\" />$day</span> ";
+      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" name=\"cba_repeatday_".$j."\" value=\"1\" />$day</span> ";
     }
     $week->addDay(1);
   }
