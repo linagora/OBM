@@ -840,7 +840,7 @@ function run_query_contact_coords($id, $update=false) {
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('phone_label'));
     array_pop($label);
-    $label = implode(';',$label);
+    $label = implode('_',$label);
     $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
   }
   $query = "SELECT email_label, email_address FROM Email INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
@@ -857,7 +857,7 @@ function run_query_contact_coords($id, $update=false) {
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('email_label'));
     array_pop($label);
-    $label = implode(';',$label);
+    $label = implode('_',$label);
     $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
   }
   $query = "SELECT * FROM IM INNER JOIN ContactEntity ON im_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
@@ -880,7 +880,7 @@ function run_query_contact_coords($id, $update=false) {
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('website_label'));
     array_pop($label);
-    $label = implode(';',$label);
+    $label = implode('_',$label);
     $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
   $lang = get_lang();
@@ -902,7 +902,7 @@ function run_query_contact_coords($id, $update=false) {
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('address_label'));
     array_pop($label);
-    $label = implode(';',$label);
+    $label = implode('_',$label);
     if($update) {
       $country =  $obm_q->f('address_country');
     } else {
