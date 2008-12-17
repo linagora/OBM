@@ -2261,14 +2261,21 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
 
   $u = get_user_info(); 
   $entity_view.="<select id=\"calendarViewEntity\">";
-  $entity_view.="<option value=\"$obm[uid]\" />$u[firstname] $u[lastname]</option>";
   if(is_array($calendar_entity['user'])){
     foreach($calendar_entity['user'] as $user){
-      if($obm["uid"]!=$user["id"] && OBM_Acl::areAllowed($obm['uid'], 'calendar',array($user['id']), 'access')) {
+      if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($user['id']), 'access')) {
         $entity_view.="<option value=\"$user[id]\" />$user[name]</option>";
+        if($obm['uid'] == $user["id"]) {
+          $uid = true;
+        }
       }
     }
   }
+
+  if(!isset($uid)) {
+    $entity_view.="<option value=\"$obm[uid]\" />$u[firstname] $u[lastname]</option>";
+  }
+
   $entity_view.="</select>";
   $entity_view.="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
   
