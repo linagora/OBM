@@ -19,7 +19,6 @@ $module = 'tools';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
 include("$obminclude/global.inc");
-$params = get_tools_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 $params = get_tools_params();
 include("$obminclude/global_pref.inc");
@@ -161,8 +160,7 @@ function get_tools_params() {
 
   // Get global params
   $params = get_global_params('Tools');
-
-  if ($obm['domain_global'] === true) {
+  if ($obm['domain_global'] == true) {
     $params['domain_id'] = (isset($params['domain_id']) ? $params['domain_id'] : $obm['domain_id']);
   } else {
     $params['domain_id'] = $obm['domain_id'];
