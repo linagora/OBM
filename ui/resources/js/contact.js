@@ -24,6 +24,7 @@ Obm.CoordonateWidget = new Class({
       if(data.newCell == true || data.newLine == true) {cell = new Element('td');line.adopt(cell);}
       if(!data.newCell && !data.newLine) cell.adopt(new Element('br'));
       cell.adopt(this.makeField(field, data));
+      new OverText(cell.getElement('input', 'textarea'));
     }
     line.adopt(new Element('td').adopt(
       new Element('a').appendText(obm.vars.labels.remove)
@@ -37,12 +38,16 @@ Obm.CoordonateWidget = new Class({
       case 'text' :
         var element = new Element('input').setProperties({
           'type' : 'text',
-          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']'
+          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']',
+          'alt' : field.label,
+          'title' : field.label
         }).set('inputValue',field.value);
         break;
       case 'select' :
         var element = new Element('select').setProperties({
-          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']'
+          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']',
+          'alt' : field.label,
+          'title' : field.label
         });
         for (var option in field.token) {
           element.adopt(new Element('option').appendText(field.token[option]).setProperty('value', option));
@@ -61,7 +66,9 @@ Obm.CoordonateWidget = new Class({
       case 'textarea' :
         var element = new Element('textarea').setProperties({
           'rows' : field.rows,
-          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']'
+          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']',
+          'alt' : field.label,
+          'title' : field.label
         }).set('inputValue',field.value);
         break;        
     }
@@ -73,8 +80,8 @@ Obm.CoordonateWidget = new Class({
 Obm.PhoneWidget = new Class ({
   kind : 'phones',
   structure : {
-    number: { kind: 'text', value: '', newLine : true},
-    label: { kind: 'select', value: 'WORK',token: obm.vars.labels.phoneLabel, newCell : true}      
+    number: { kind: 'text', value: '', newLine : true, label : obm.vars.labels.phoneNumber},
+    label: { kind: 'select', value: 'WORK',token: obm.vars.labels.phoneLabel, newCell : true, label : ''}      
   },
 
   options: {container: 'phoneHolder'},
@@ -87,8 +94,8 @@ Obm.PhoneWidget = new Class ({
 Obm.EmailWidget = new Class ({
   kind : 'emails',
   structure : {
-    address: { kind: 'text', value: '', newLine : true },
-    label: { kind: 'select', value: 'WORK',token: obm.vars.labels.emailLabel, newCell : true}      
+    address: { kind: 'text', value: '', newLine : true, label : obm.vars.labels.emailAddress},
+    label: { kind: 'select', value: 'WORK',token: obm.vars.labels.emailLabel, newCell : true, label : ''}      
   },
 
   options: {container: 'emailHolder'},
@@ -101,12 +108,12 @@ Obm.EmailWidget = new Class ({
 Obm.AddressWidget = new Class ({
   kind : 'addresses',
   structure : {
-    street: { kind: 'textarea', value: '', rows: 3, newLine : true},
-    label: { kind: 'select', value: 'WORK',token: obm.vars.labels.emailLabel}, 
-    zipcode: { kind: 'text', value: '' , newCell : true},
-    town: { kind: 'text', value: '' },
-    expresspostal: { kind: 'text', value: '' },
-    country: { kind: 'text', value: '' }
+    street: { kind: 'textarea', value: '', rows: 3, newLine : true, label : obm.vars.labels.addressStreet},
+    label: { kind: 'select', value: 'WORK',token: obm.vars.labels.addressLabel, label : ''}, 
+    zipcode: { kind: 'text', value: '' , newCell : true, label : obm.vars.labels.addressZipcode},
+    town: { kind: 'text', value: '', label : obm.vars.labels.addressTown },
+    expresspostal: { kind: 'text', value: '', label : obm.vars.labels.addressExpressPostal },
+    country: { kind: 'select', value: '', token: obm.vars.labels.countries, label : obm.vars.labels.addressCountry }
   },
 
   options: {container: 'addressHolder'},
@@ -119,8 +126,8 @@ Obm.AddressWidget = new Class ({
 Obm.WebsiteWidget = new Class ({
   kind : 'websites',
   structure : {
-    url: { kind: 'text', value: '', newLine : true},
-    label: { kind: 'select', value: 'HOMEPAGE',token: obm.vars.labels.websiteLabel, newCell : true}      
+    url: { kind: 'text', value: '', newLine : true, label: obm.vars.labels.websiteUrl},
+    label: { kind: 'select', value: 'HOMEPAGE',token: obm.vars.labels.websiteLabel, newCell : true, label: ''}      
   },
 
   options: {container: 'websiteHolder'},
@@ -133,8 +140,8 @@ Obm.WebsiteWidget = new Class ({
 Obm.IMWidget = new Class ({
   kind : 'ims',
   structure : {
-    address: { kind: 'text', value: '', newLine : true},
-    protocol: { kind: 'select', value: 'JABBER', token : {'XMPP' : 'Jabber', 'X-GTALK' : 'Google Talk', 'AIM' : 'AIM', 'YMSGR' : 'Yahoo', 'MSN' : 'MSN', 'X-ICQ' : 'ICQ'}, newCell : true}      
+    address: { kind: 'text', value: '', newLine : true, label: obm.vars.labels.imAddress},
+    protocol: { kind: 'select', value: 'JABBER', token : {'XMPP' : 'Jabber', 'X-GTALK' : 'Google Talk', 'AIM' : 'AIM', 'YMSGR' : 'Yahoo', 'MSN' : 'MSN', 'X-ICQ' : 'ICQ'}, newCell : true, label: ''}      
   },
 
   options: {container: 'imHolder'},
