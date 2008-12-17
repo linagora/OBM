@@ -78,7 +78,7 @@ $entities = array(
       'rules' => array('service_service' => array('smtp_in', 'smtp_out', 'imap'))
     ),
     'prefix'  => 'host',
-    'exclude' => array(),
+    'exclude' => array('timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1),
     'rules'   => array(),
     'display' => array('name', 'ip'),
     'display_format' => '%s (%s)'
@@ -95,7 +95,7 @@ $entities = array(
       'id' => 'mailshareentity_mailshare_id'      
     ),    
     'prefix'  => 'mailshare',
-    'exclude' => array(),
+    'exclude' => array('timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1),
     'rules'   => array(),
     'display' => array('name', 'email'),
     'display_format' => '%s <%s>'
@@ -117,7 +117,6 @@ if ($action == 'cancel_update') {
     set_update_lock();
     set_update_state($params['domain_id']);
     store_update_data($params);
-     
     $res = exec_tools_update_update($params);
     if ($res == '0') {
       $display['msg'] .= display_ok_msg($l_upd_running);

@@ -599,7 +599,7 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
   $join = array();
 
   $return = 0;
-
+  $rules['purgelinks'][] = '1=1';
   /**
   * PURGE 
   */
