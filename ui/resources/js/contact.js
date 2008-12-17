@@ -15,6 +15,7 @@ Obm.CoordonateWidget = new Class({
     this.container = $(this.options.container);
     this.displayForm(); 
     this.container.adopt(this.element);
+    OverText.update();
   },    
 
   displayForm: function() {
@@ -24,7 +25,7 @@ Obm.CoordonateWidget = new Class({
       if(data.newCell == true || data.newLine == true) {cell = new Element('td');line.adopt(cell);}
       if(!data.newCell && !data.newLine) cell.adopt(new Element('br'));
       cell.adopt(this.makeField(field, data));
-      new OverText(cell.getElement('input', 'textarea'));
+      new OverText(cell.getElements('input, textarea'));
     }
     line.adopt(new Element('td').adopt(
       new Element('a').appendText(obm.vars.labels.remove)
