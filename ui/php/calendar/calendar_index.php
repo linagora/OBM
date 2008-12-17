@@ -351,7 +351,7 @@ if ($action == 'index') {
 } elseif ($action == 'quick_insert') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_data_quick_form($params) && OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'access' )) {
-    if( $obm['uid'] == $params['entity_id']) {
+    if( OBM_Acl::areAllowed($obm['uid'], 'calendar',array($params['entity_id']), 'write' )) {
       $state = 'ACCEPTED';
     } else {
       $state = 'NEEDS-ACTION';
