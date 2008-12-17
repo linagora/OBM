@@ -319,9 +319,6 @@ public class CalendarManager extends ObmManager {
 		} else {
 			java.util.Calendar temp = java.util.Calendar.getInstance();
 			temp.setTime(dstart);
-			temp.set(Calendar.HOUR_OF_DAY, 0);
-			temp.set(Calendar.MINUTE, 0);
-			temp.set(Calendar.SECOND, 0);
 
 			event.getDtStart().setPropertyValue(
 					CalendarHelper.getUTCFormat(temp.getTime()));

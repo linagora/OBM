@@ -47,7 +47,7 @@ public class CalendarHelper extends Helper {
 		dateFormatTiret = new SimpleDateFormat(DATE_FORMAT_T);
 
 		dateFormatUTC = new SimpleDateFormat(DATE_UTC_PATTERN);
-		dateFormatUTC.setTimeZone(TimeZone.getTimeZone("UTC"));
+		dateFormatUTC.setTimeZone(TimeZone.getTimeZone("GMT"));
 
 		dateFormatEurope = new SimpleDateFormat(DATE_FORMAT_EU);
 		dateFormatEurope.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
@@ -67,6 +67,7 @@ public class CalendarHelper extends Helper {
 		if (date != null) {
 			utc = dateFormatUTC.format(date);
 		}
+		logger.info("date: "+date+" converted to "+utc);
 		return utc;
 	}
 
