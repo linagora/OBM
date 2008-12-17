@@ -282,7 +282,7 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   $query = "UPDATE EventLink 
             SET eventlink_state = '$state'
             WHERE eventlink_entity_id = ".of_entity_subquery($entity, $entity_id)." 
-              AND eventlink_event_id = $entity_id";
+              AND eventlink_event_id $event_id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
   $obm_q = new DB_OBM;
@@ -841,10 +841,19 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 // Check if the user is authorized to access calendars and resources
 ///////////////////////////////////////////////////////////////////////////////
 function check_access_entity($calendar_ids, $resource_ids) {
-  global $obm;
+  global $obm, $err;
+  global $l_of_right_err_user, $l_of_right_err_resource;
+
+  if(isset($calendar_ids)) {
+    $err['msg'] = $l_of_right_err_user;
+    $ok = OBM_Acl::areAllowed($obm['uid'], 'calendar', $calendar_ids, 'access');
+  }
+  if(isset($resource_ids)) {
+    $err['msg'] = $l_of_right_err_resource;
+    $ok = OBM_Acl::areAllowed($obm['uid'], 'resource', $resource_ids, 'access');
+  }
   
-  return OBM_Acl::areAllowed($obm['uid'], 'calendar', $calendar_ids, 'access')
-      && OBM_Acl::areAllowed($obm['uid'], 'resource', $resource_ids, 'access');
+  return $ok;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1158,7 +1167,7 @@ function run_query_calendar_quick_event_update($calendar) {
  * @access public
  * @return void
  */
-function run_query_calendar_quick_event_insert($calendar) {
+function run_query_calendar_quick_event_insert($calendar,$state) {
   global $cdg_sql, $obm;
 
   $title = $calendar['title'];
@@ -1223,7 +1232,7 @@ function run_query_calendar_quick_event_insert($calendar) {
   $obm_q->query($query);
   $event_id = $obm_q->lastid();
   of_entity_insert('event', $event_id) ;
-  run_query_calendar_insert_entity_event('user', $obm['uid'], $event_id, 'ACCEPTED');
+  run_query_calendar_insert_entity_event('user', $calendar['entity_id'], $event_id, $state);
 
   return $event_id;
 }
@@ -3255,7 +3264,7 @@ Class Event {
    * @return void
    */
   function addAttendee($entity,$entity_id,$entity_label, $entity_state) {
-    $this->attendee[$entity][$entity_id] = $entity_label.'('.$GLOBALS["l_$entity_state"].')';
+    $this->attendee[$entity][$entity_id] = $entity_label.'('.$GLOBALS["l_".strtolower($entity_state)].')';
   }
 
 }

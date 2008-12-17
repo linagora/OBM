@@ -38,7 +38,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   $display['title'] = "<div class=\"title\">$l_module_calendar : ".$GLOBALS["l_view_$p_view"].' '.$GLOBALS["l_range_$p_range"].' </div>';
   if (function_exists($calendar_function)) {
     $block = $calendar_function($calendar, $calendar_entity,$writable_entity,$date);
-    $block .= dis_calendar_quick_form($calendar);
+    $block .= dis_calendar_quick_form($calendar,$calendar_entity);
     $calendar_function_pdf = $calendar_function."_pdf";
     if (function_exists($calendar_function_pdf)) {
       $display['print_url'] = "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=".$calendar['date']->getURL()."&amp;output_target=print";
@@ -544,15 +544,18 @@ function html_calendar_view_selector($calendar, $my_views) {
       if($id != $default_view_id) {
         $default_view=$l_insert_default_view;
         $display='inline';
+        $style_default="";
+      } else {
+        $style_default="default=\"default\"";
       }
+    } elseif ($id == $default_view_id){
+      $style_default="default=\"default\"";
+      $selected = '';
     } else {
       $selected = '';
-    }
-    if ($id == $default_view_id) {
-      $style_default="default=\"default\"";
-    } else {
       $style_default="";
     }
+    
     $obmbookmarkproperty = run_query_calendar_get_bookmark_property($id);
     $sel_view .= "<option id=\"opt_$id\" value=\"calendar_index.php?$obmbookmarkproperty\" $style_default $selected>$label</option>";
   }
@@ -574,7 +577,7 @@ function html_calendar_view_selector($calendar, $my_views) {
     <form action=\"calendar_index.php\" method=\"get\">
       <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\"
         onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-        <option value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\" >
+        <option id=\"opt_choix\" value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\" >
           $l_select_view
         </option>
         $sel_view
@@ -2206,7 +2209,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   global $obm;
-
   if (($action == 'detailupdate') || ($action == 'duplicate')) {
     $users = $entities['user'];
     $resources = $entities['resource'];
@@ -2252,10 +2254,23 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
  * @access public
  * @return HTML
  */
-function dis_calendar_quick_form($calendar) {
-  global $ico_popup_close,$l_validate,$popup_queue,$l_title;
+function dis_calendar_quick_form($calendar,$calendar_entity) {
+  global $ico_popup_close,$l_validate,$popup_queue,$l_title,$obm;
   global $l_desc,$l_confirm_delete,$l_c_delete,$l_category1, $l_edit, $l_edit_full;
-  global $l_location,$l_members,$l_carac, $l_items,$l_details;
+  global $l_location,$l_members,$l_carac, $l_items,$l_details,$l_users;
+
+  $u = get_user_info(); 
+  $entity_view.="<select id=\"calendarViewEntity\">";
+  $entity_view.="<option value=\"$obm[uid]\" />$u[firstname] $u[lastname]</option>";
+  if(is_array($calendar_entity['user'])){
+    foreach($calendar_entity['user'] as $user){
+      if($obm["uid"]!=$user["id"] && OBM_Acl::areAllowed($obm['uid'], 'calendar',array($user['id']), 'access')) {
+        $entity_view.="<option value=\"$user[id]\" />$user[name]</option>";
+      }
+    }
+  }
+  $entity_view.="</select>";
+  $entity_view.="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
   
   $block = "
     <div id=\"calendarQuickForm\">
@@ -2272,7 +2287,10 @@ function dis_calendar_quick_form($calendar) {
       <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
       <fieldset>
         $l_title : <input type=\"text\" name=\"tf_title\" /> 
-      </fieldset> 
+      </fieldset>
+      <fieldset id=\"calendarListEntity\">
+        $l_users : $entity_view
+      </fieldset>
       <fieldset class=\"buttons\"> 
         <input class=\"button\" type=\"submit\" value=\"$l_validate\" />
         <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" />
@@ -2997,9 +3015,9 @@ function html_calendar_waiting_events($obm_wait) {
        <input type=\"hidden\" name=\"calendar_id\" value=\"".$obm_wait->f('event_id')."\" />
        <input type=\"hidden\" name=\"entity_kind\" value=\"$current_entity_entity\" />
        <input type=\"hidden\" name=\"entity_id\" value=\"$current_entity\" />
-       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onclick=\"this.form.submit()\" />$l_accept</span><br />
-       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onclick=\"this.form.submit()\" />$l_wait</span><br />
-       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"R\" onclick=\"this.form.submit()\" />$l_refuse</span>
+       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"ACCEPTED\"  onclick=\"this.form.submit()\" />$l_accept</span><br />
+       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"NEEDS-ACTION\" checked=\"checked\" onclick=\"this.form.submit()\" />$l_wait</span><br />
+       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"DECLINED\" onclick=\"this.form.submit()\" />$l_refuse</span>
       </form>
      </td>
     </tr>";
@@ -3682,20 +3700,11 @@ function json_event_data($id,$calendar) {
   $end = clone $date;
   $end->addSecond($duration);
   $title = $calendar['title'];
-
   while($ent_q->next_record()) {
     $entity = $ent_q->f('eventlink_entity');
     $entity_id = $ent_q->f('eventlink_entity_id');
-    switch($entity) {
-      case 'user':
-        $name = $ent_q->f('userobm_lastname').' '.$ent_q->f('userobm_firstname');
-      break;
-      case 'resource':
-        $name = $ent_q->f('resource_name');
-      break;
-      default: break;
-    }
-    $attendee[$entity][$entity_id] .= $name;
+    $name = $ent_q->f('eventlink_label');
+    $attendee[$entity][$entity_id] .= $name.'('.$GLOBALS['l_'.strtolower($ent_q->f('eventlink_state'))].')';
   }
   if(is_array($attendee)) { 
     foreach ($attendee as $att_entity => $att_entities) {
