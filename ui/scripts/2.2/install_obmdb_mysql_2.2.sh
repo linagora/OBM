@@ -20,22 +20,41 @@ mysql -u $user -p$pw -e "CREATE DATABASE $db"
 
 echo "  Create new $db database model"
 mysql -u $user -p$pw $db < create_obmdb_2.2.mysql.sql
-
+test $? -eq 0 || {
+    echo "error running mysql script"
+    exit 1
+}
 echo "*** Database filling"
 
 # Default data insertion
 mysql --default-character-set='UTF8' -u $user -p$pw $db < obmdb_default_values_2.2.sql
+test $? -eq 0 || {
+    echo "error running mysql script"
+    exit 1
+}
 
 # Dictionnary data insertion
 echo "  Dictionnary data insertion"
 mysql --default-character-set='UTF8' -u $user -p$pw $db < data-$obm_lang/obmdb_ref_2.2.sql
+test $? -eq 0 || {
+    echo "error running mysql script"
+    exit 1
+}
 
 # Company Naf Code data insertion
 echo "  Company Naf Code data insertion"
 mysql --default-character-set='UTF8' -u $user -p$pw $db < data-$obm_lang/obmdb_nafcode_2.2.sql
+test $? -eq 0 || {
+    echo "error running mysql script"
+    exit 1
+}
 
 # Preferences data insertion & Update default lang to .ini value
 echo "  Default preferences data insertion"
 mysql --default-character-set='UTF8' -u $user -p$pw $db < obmdb_prefs_values_2.2.sql
+test $? -eq 0 || {
+    echo "error running mysql script"
+    exit 1
+}
 
 echo "UPDATE UserObmPref set userobmpref_value='$obm_lang' where userobmpref_option='set_lang'" | mysql -u $user -p$pw $db 

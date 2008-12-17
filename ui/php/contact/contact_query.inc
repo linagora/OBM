@@ -728,7 +728,7 @@ function run_query_contact_coords_update($id, $contact) {
     foreach($phones as $phone) {
       if(trim($phone['number']) != '' ) {
         $cpt[$phone['label']]++;
-        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label]; X-OBM-REF".$cpt[$phone['label']]."')";
+        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(phone)');
         $obm_q->query($query);
       }
@@ -758,7 +758,7 @@ function run_query_contact_coords_update($id, $contact) {
           '$address[town]',
           '$address[expresspostal]',
           '$address[country]',
-          '$address[label]; X-OBM-REF".$cpt[$address['label']]."'
+          '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
         )";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(address)');
         $obm_q->query($query);
@@ -774,7 +774,7 @@ function run_query_contact_coords_update($id, $contact) {
     foreach($websites as $website) {
       if(trim($website['url']) != '' ) {
         $cpt[$website['label']]++;
-        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label]; X-OBM-REF".$cpt[$website['label']]."')";
+        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(website)');
         $obm_q->query($query);        
       }
@@ -805,7 +805,7 @@ function run_query_contact_coords_update($id, $contact) {
     foreach($emails as $email) {
       if(trim($email['address']) != '' ) {
         $cpt[$email['label']]++;
-        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '$email[address]', '$email[label]; X-OBM-REF".$cpt[$email['label']]."')";
+        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '$email[address]', '$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(Email)');
         $obm_q->query($query);        
       }
