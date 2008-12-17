@@ -68,7 +68,7 @@ Obm.ColorPicker = new Class({
           'textDecoration' : 'none',
           'width' : '90%'
         }).setProperty('href','#')
-          .addEvent('click',this.setElementColor.bindAsEventListener(this))
+          .addEvent('click',this.setElementColor.bind(this))
           .appendText(obm.vars.labels.transparent)
       )    
     );
@@ -89,7 +89,7 @@ Obm.ColorPicker = new Class({
             'width' : '13px',
             'color' : 'rgb('+color+')',
             'backgroundColor' : 'rgb('+color+')'
-          }).addEvent('click',this.setElementColor.bindAsEventListener(this))
+          }).addEvent('click',this.setElementColor.bind(this))
         )
       )
     }.bind(this));

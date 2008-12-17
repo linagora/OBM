@@ -142,7 +142,7 @@ Obm.CalendarDayEvent = new Class({
   makeDraggable: function() {
     var dragOptions = {
       handle: this.dragHandler,
-      grid: {'y' : obm.calendarManager.defaultHeight + 1, 'x' : obm.calendarManager.defaultWidth - 1},
+      //grid: {'y' : obm.calendarManager.defaultHeight + 1, 'x' : obm.calendarManager.defaultWidth - 1},
       limit: {
         'x': [this.options.context.left,this.options.context.right - obm.calendarManager.defaultWidth],
         'y': [this.options.context.top,this.options.context.bottom]
