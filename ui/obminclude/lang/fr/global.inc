@@ -470,6 +470,8 @@ $l_c_j_delete = "Une entrée doit être sélectionnée.";
 //---------------------------------------------------------------------------//
 $l_of_right_err_auth = "Droits insuffisants pour exécuter la modification des droits !";
 $l_of_right_err_empty = "La référence de l'objet à afficher est manquante !";
+$l_of_right_err_user = "Droits insuffisants sur des utilisateurs !";
+$l_of_right_err_resource = "Droits insuffisants sur des ressources !";
 
 //---------------------------------------------------------------------------//
 // Home page portlets
