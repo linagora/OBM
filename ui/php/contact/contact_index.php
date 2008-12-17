@@ -45,6 +45,7 @@ include("$obminclude/global.inc");
 $params = get_contact_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
+require("$obminclude/of/of_contact.php");
 require('contact_display.inc');
 require('contact_query.inc');
 require_once('contact_js.inc');
@@ -107,6 +108,20 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $comp_q = run_query_contact_company($params['company_id']);
   }
   $display['detail'] = dis_contact_form($action, $comp_q, $params);
+  
+} elseif ($action == 'import') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_vcard_import_form();
+  
+} elseif ($action == 'export') {
+///////////////////////////////////////////////////////////////////////////////
+  $contacts = OBM_Contact::fetchPrivate($obm['uid']);
+  if (count($contacts) == 0) {
+    $display['msg'] .= display_warn_msg($l_no_export);
+  } else {
+    dis_contact_vcard_export_all($contacts);
+    exit();
+  }
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,6 +232,22 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
     $display['detail'] = dis_contact_consult($params);
+  }
+  
+} elseif ($action == 'vcard_insert') {
+///////////////////////////////////////////////////////////////////////////////
+  $ids = run_query_vcard_insert($params);
+  if ($ids !== false) {
+    $display['msg'] .= display_ok_msg("$l_contact : $l_insert_ok");
+    if (count($ids) == 1) {
+      $params['contact_id'] = $ids[0];
+      $display['detail'] = dis_contact_consult($params);
+    } else {
+      $display['detail'] = dis_vcard_import_form();
+    }
+  } else {
+    $display['msg'] .= display_err_msg("$l_contact : $l_insert_error");
+    $display['detail'] .= dis_vcard_import_form();
   }
 
 } elseif ($action == 'statistics') {
@@ -363,6 +394,14 @@ function get_contact_params() {
   if (isset ($params['town'])) $params['town'] = get_format_town($params['town']);
 
   get_global_params_document($params);
+  
+  // imported file
+  if (isset ($_FILES['vcard_file'])) {
+    $params['vcard_tmp']  = $_FILES['vcard_file']['tmp_name'];
+    $params['vcard_name'] = $_FILES['vcard_file']['name'];
+    $params['vcard_size'] = $_FILES['vcard_file']['size'];
+    $params['vcard_type'] = $_FILES['vcard_file']['type'];
+  }
 
   return $params;
 }
@@ -375,6 +414,7 @@ function get_contact_action() {
   global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_stats;
   global $l_header_consult,$l_header_vcard, $l_header_display, $l_header_admin;
+  global $l_header_import,$l_header_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   of_category_user_module_action('contact');
@@ -413,6 +453,24 @@ function get_contact_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('','index','search','insert','new','detailconsult','update','statistics','check_delete','delete','admin','display') 
                                      );
+                                     
+// Import VCard
+  $actions['contact']['import'] = array (
+    'Name'     => $l_header_import,
+    'Url'      => "$path/contact/contact_index.php?action=import",
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('','index','search','insert','new','detailconsult','update','statistics','check_delete','delete','admin','display')
+                                     		 );
+                                     		 
+// Export all contacts as VCards
+  $actions['contact']['export'] = array (
+    'Name'     => $l_header_export,
+    'Url'      => "$path/contact/contact_index.php?action=export",
+    'Right'    => $cright_read,
+    'Privacy'  => true,
+    'Condition'=> array ('','index','search','insert','new','detailconsult','update','statistics','check_delete','delete','admin','display')
+                                     		 );
 
 // Detail Consult
  $actions['contact']['detailconsult']   = array (
@@ -462,6 +520,13 @@ function get_contact_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('all')
                                         );
+                                        
+// VCard insert
+  $actions['contact']['vcard_insert'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=vcard_insert",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                     	);
 					
 // Document Add
   $actions['contact']['document_add'] = array (

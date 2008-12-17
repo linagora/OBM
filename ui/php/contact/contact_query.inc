@@ -1078,6 +1078,46 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Insert a contact imported from a VCard
+// Parameters:
+//   - $params : form values
+///////////////////////////////////////////////////////////////////////////////
+function run_query_vcard_insert($params) {
+  $file_content = file_get_contents($params['vcard_tmp']);
+  try {
+    $vcards = Vpdi::decode($file_content, 'VCARD');
+  } catch (Exception $e) {
+    return false;
+  }
+  $ids = array();
+  foreach ($vcards as $vcard) {
+    $contact = OBM_Contact::import($vcard);
+    if (isset($contact['contact_id']) && run_query_check_contact_existence($contact['contact_id'])) {
+      if (run_query_contact_update($contact)) {
+        $ids[] = $contact['contact_id'];
+      }
+    } else {
+      $id = run_query_contact_insert($contact);
+      if ($id > 0) {
+        $ids[] = $id;
+      }
+    }
+  }
+  if (count($ids) != count($vcards)) {
+    return false;
+  }
+  return $ids;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Check contact existence
+///////////////////////////////////////////////////////////////////////////////
+function run_query_check_contact_existence($contact_id) {
+  $obm_q = new DB_OBM;
+  $obm_q->query("SELECT 1 FROM Contact WHERE contact_id='{$contact_id}'");
+  return $obm_q->next_record() !== false;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Contact environment checking (same contacts exists ?)

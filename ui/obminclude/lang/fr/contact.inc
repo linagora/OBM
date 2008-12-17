@@ -79,6 +79,7 @@ $l_can_delete = "Le contact peut être supprimé.";
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des contacts correspondants.";
 $l_found = "contacts trouvés.";
 $l_no_found = "Aucun contact ne correspond à ces critères !";
+$l_no_export = "Aucun contact privé à exporter !";
 // Kind messages
 $l_kind_link_contact = "Ces contacts sont du genre";
 $l_kind_link_contact_no = "Pas de contacts du genre";
@@ -117,6 +118,8 @@ $l_quantity = "Quantité";
 $l_quantity = "Quantité";
 $l_no_found_subscription = "Aucun abonnement lié à ce contact !";
 $l_remove = 'Supprimer';
+
+$l_vcf_file = "Fichier VCF à importer" ;
 
 $l_im = "Messagerie Instantanée";
 $l_website = "Site internet";

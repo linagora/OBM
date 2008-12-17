@@ -76,6 +76,7 @@ $l_can_delete = "The contact can be deleted.";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the contacts";
 $l_found = "contacts found.";
 $l_no_found = "No contact found matching the query !";
+$l_no_export = "No contact to export !";
 // Kind Messages
 $l_kind_link_company = "These companies are referenced as";
 $l_kind_link_company_no = "No company referenced as";
@@ -113,6 +114,8 @@ $l_no_found_subscription = "No subscription found for this contact !";
 $l_im = "Instant Messaging";
 $l_website = "Website";
 $l_remove = 'Remove';
+
+$l_vcf_file = 'VCF file to import';
 
 $l_phone_labels = array ('HOME' => 'Home phone', 'WORK' => 'Work phone', 'CELL' => 'Mobile phone', 'FAX' => 'Fax', 'PAGER' => 'Pager', 'OTHER' => 'Other phone');
 $l_email_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');
