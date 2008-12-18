@@ -318,10 +318,10 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       userobm_firstname
     FROM EventAlert
       INNER JOIN Event ON event_id = eventalert_event_id  
-      INNER JOIN UserEntity ON userentity_user_id = eventalert_user_id'
+      INNER JOIN UserEntity ON userentity_user_id = eventalert_user_id
       INNER JOIN EventLink ON event_id = eventlink_event_id AND eventlink_entity_id = userentity_entity_id 
       INNER JOIN UserObm ON userobm_id = eventlink_entity_id
-    WHERE eventlink_state = 'A'
+    WHERE eventlink_state = 'ACCEPTED'
       AND event_repeatkind = 'none'
       AND ($event_date - eventalert_duration) >= $start
       AND ($event_date - eventalert_duration) <=  $end
@@ -373,11 +373,11 @@ function run_query_calendar_repeat_alerts($start, $end) {
       userobm_firstname
     FROM EventAlert
       INNER JOIN Event ON event_id = eventalert_event_id
-      INNER JOIN UserEntity ON userentity_user_id = eventalert_user_id'
+      INNER JOIN UserEntity ON userentity_user_id = eventalert_user_id
       INNER JOIN EventLink ON event_id = eventlink_event_id AND eventlink_entity_id = userentity_entity_id 
       INNER JOIN UserObm ON userobm_id = eventlink_entity_id
     WHERE event_repeatkind != 'none'
-      AND eventlink_state = 'A'
+      AND eventlink_state = 'ACCEPTED'
       AND ($event_date  - eventalert_duration) <= $end 
       AND (($event_endrepeat  - eventalert_duration) >= $start
       OR $event_endrepeat = '0')
