@@ -165,11 +165,11 @@ sub setLinks {
 
         push( @{$self->{'entityDesc'}->{'group_users'}}, $current->{'userobm_login'} );
 
-        if( $self->{'entityDesc'}->{'group_mailperms'} && $self->{'entityDesc'}->{'userobm_samba_perms'} ) {
-            push( @{$self->{'entityDesc'}->{'group_contacts'}}, $current->{'userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name') );
+        if( $self->{'entityDesc'}->{'group_mailperms'} ) {
+            push( @{$self->{'entityDesc'}->{'group_mailboxes'}}, $current->{'userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name') );
         }
 
-        if( $self->{'entityDesc'}->{'group_samba'} && $self->{'entityDesc'}->{'userobm_mail_perms'} ) {
+        if( $self->{'entityDesc'}->{'group_samba'} ) {
             push( @{$self->{'entityDesc'}->{'group_samba_users'}}, $self->_getUserSID( $self->{'parent'}->getDesc('samba_sid'), $current->{'userobm_uid'} ) );
         }
     }
@@ -353,13 +353,13 @@ sub createLdapEntry {
     }
 
     # Les adresses mails
-    if( $self->{'properties'}->{'email'} ) {
-        $entry->add( mail => $self->{'properties'}->{'email'} );
+    if( $self->{'email'} ) {
+        $entry->add( mail => $self->{'email'} );
     }
 
     # Les adresses mails secondaires
-    if( $self->{'properties'}->{'emailAlias'} ) {
-        $entry->add( mailAlias => $self->{'properties'}->{'emailAlias'} );
+    if( $self->{'emailAlias'} ) {
+        $entry->add( mailAlias => $self->{'emailAlias'} );
     }
 
     # Le domaine OBM
@@ -388,8 +388,8 @@ sub createLdapEntry {
     }
 
     # Les contacts
-    if( $self->{'entityDesc'}->{'group_contacts'} ) {
-        $entry->add( mailBox => $self->{'entityDesc'}->{'group_contacts'} );
+    if( $self->{'entityDesc'}->{'group_mailboxes'} ) {
+        $entry->add( mailBox => $self->{'entityDesc'}->{'group_mailboxes'} );
     }
 
     # La liste des utilisateurs Samba
@@ -451,12 +451,12 @@ sub updateLdapEntry {
         }
     
         # Les mails
-        if( $self->_modifyAttrList( $self->{'properties'}->{'email'}, $entry, 'mail' ) ) {
+        if( $self->_modifyAttrList( $self->{'email'}, $entry, 'mail' ) ) {
             $update = 1;
         }
     
         # Les alias mails
-        if( $self->_modifyAttrList( $self->{'properties'}->{'emailAlias'}, $entry, 'mailAlias' ) ) {
+        if( $self->_modifyAttrList( $self->{'emailAlias'}, $entry, 'mailAlias' ) ) {
             $update = 1;
         }
     
@@ -490,7 +490,7 @@ sub updateLdapEntry {
         }
 
         # Le cas des contacts
-        if( $self->_modifyAttrList( $self->{'entityDesc'}->{'group_contacts'}, $entry, 'mailBox' ) ) {
+        if( $self->_modifyAttrList( $self->{'entityDesc'}->{'group_mailboxes'}, $entry, 'mailBox' ) ) {
             $update = 1;
         }
 
