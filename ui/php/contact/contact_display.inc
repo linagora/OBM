@@ -236,6 +236,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   $show_title = (! $cgp_hide['contact']['contact_title']);
   $show_resp = (! $cgp_hide['contact']['responsible']);
   $show_date = (! $cgp_hide['contact']['contact_date']);
+  $show_mailing = (! $cgp_hide['contact']['contact_mailing']);
 
   // User defined data
   $block_userdata .= of_userdata_dis_search('contact', $contact);
@@ -250,16 +251,22 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   // Function select
   $block_function = of_category_dis_search_select('contact', 'function', $funcs, $func);
 
-  // Data source select
-  $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
-    <option value=\"$c_all\">$l_all</option>";
-  while ($dsrc_q->next_record()) {
-    $d_id = $dsrc_q->f('datasource_id');
-    $sel_dsrc .= "\n<option value=\"$d_id\"";
-    if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
-    $sel_dsrc .= '>'. $dsrc_q->f('datasource_name') . "</option>\n";
+  if($dsrc_q->nf() != 0) {
+    // Data source select
+    $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
+      <option value=\"$c_all\">$l_all</option>";
+    while ($dsrc_q->next_record()) {
+      $d_id = $dsrc_q->f('datasource_id');
+      $sel_dsrc .= "\n<option value=\"$d_id\"";
+      if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
+      $sel_dsrc .= '>'. $dsrc_q->f('datasource_name') . "</option>\n";
+    }
+    $sel_dsrc .= '</select>';
+    $block_datasource = "
+      <label>$l_datasource<br />
+        $sel_dsrc
+      </label>";
   }
-  $sel_dsrc .= '</select>';
 
   // Title Block
   if ($show_title) {
@@ -300,6 +307,14 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   }
   $sel_ctry .= '</select>';
 
+  if($show_mailing) {
+    $block_mailing = "<label>$l_mailing_ok_only<br />
+        <input type=\"checkbox\" name=\"cba_mailing_ok_only\" value=\"1\" $mailing_ok_only />
+      </label>
+      <label>$l_newsletter<br />
+        <input type=\"checkbox\" name=\"cba_newsletter\" value=\"1\" $newsletter />
+      </label>";
+  }
   if ($popup) {
     $ext_action = $contact['ext_action'];
     $ext_type = $contact['ext_type'];
@@ -353,9 +368,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>$l_country<br />
       $sel_ctry
     </label>
-    <label>$l_datasource<br />
-      $sel_dsrc
-    </label>
+    $block_datasource
     $block_function
     $block_title
     $block_resp
@@ -371,12 +384,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>$l_before<br />
       <input type=\"text\" name=\"tf_date_before\" class=\"datePicker\" value=\"$datebefore\" />
     </label>
-    <label>$l_mailing_ok_only<br />
-      <input type=\"checkbox\" name=\"cba_mailing_ok_only\" value=\"1\" $mailing_ok_only />
-    </label>
-    <label>$l_newsletter<br />
-      <input type=\"checkbox\" name=\"cba_newsletter\" value=\"1\" $newsletter />
-    </label>
+    $block_mailing
     $block_userdata
     <label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
@@ -755,8 +763,9 @@ function html_contact_view_main($co_q, $coords) {
   }
 
   // Conditionnal fields
+
+  $show_mailing = (! $cgp_hide['contact']['contact_mailing']);
   $show_service = (! $cgp_hide['contact']['contact_service']);
-  $show_cdx = (! $cgp_hide['contact']['contact_expresspostal']);
   $show_comment2 = (! $cgp_hide['contact']['contact_comment2']);
   $show_comment3 = (! $cgp_hide['contact']['contact_comment3']);
 
@@ -819,11 +828,22 @@ function html_contact_view_main($co_q, $coords) {
   // Service field
   if ($show_service) {
     $block_service = "
-    </tr><tr>
+     <tr>
       <th>$l_service</th>
-      <td>$service</td>";
+      <td>$service</td>
+     </tr>";
   }
-
+  if($show_mailing) {
+    $block_mailing = "
+    <tr>
+      <th>$l_mailing_ok</th>
+      <td>$mailok</td>
+    </tr><tr>
+      <th>$l_newsletter</th>
+      <td>$newsletter</td>
+    </tr>      
+    ";
+  }
   foreach($coords as $kind => $row) {
     $coords = '';
     $GLOBALS["l_${kind}_labels"]['COMPANY'] = $l_company;
@@ -876,13 +896,7 @@ function html_contact_view_main($co_q, $coords) {
 
     <table>
     $block_service
-    </tr><tr>
-      <th>$l_mailing_ok</th>
-      <td>$mailok</td>
-    </tr><tr>
-      <th>$l_newsletter</th>
-      <td>$newsletter</td>
-    </tr>
+    $block_mailing
     </table>
     </div>
 
@@ -1252,7 +1266,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   $show_comment2 = (! $cgp_hide['contact']['contact_comment2']);
   $show_comment3 = (! $cgp_hide['contact']['contact_comment3']);
   $show_birthday = (! $cgp_hide['contact']['birthday']);
-
+  $show_mailing = (! $cgp_hide['contact']['contact_mailing']);
   // User defined data
   $block_userdata = of_userdata_dis_entity_form('contact', $id, $contact);
 
@@ -1314,16 +1328,25 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     </tr>";
   }
 
-  // data source select
-  $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
-    <option value=\"$c_undef\">$l_undef</option>";
-  while ($dsrc_q->next_record()) {
-    $d_id = $dsrc_q->f('datasource_id');
-    $sel_dsrc .= "\n<option value=\"$d_id\"";
-    if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
-    $sel_dsrc .= '>'. $dsrc_q->f('datasource_name') . "</option>\n";
+  if($dsrc_q->nf() > 0 ) {
+    // data source select
+    $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
+      <option value=\"$c_undef\">$l_undef</option>";
+    while ($dsrc_q->next_record()) {
+      $d_id = $dsrc_q->f('datasource_id');
+      $sel_dsrc .= "\n<option value=\"$d_id\"";
+      if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
+      $sel_dsrc .= '>'. $dsrc_q->f('datasource_name') . "</option>\n";
+    }
+    $sel_dsrc .= '</select>';
+    $block_dsrc = "
+      <tr>
+        <th>$l_datasource</th> 
+        <td>$sel_dsrc</td>
+      </tr>";
   }
-  $sel_dsrc .= '</select>';
+
+
   if ($kind_q->nf()>0) {
     $i=0;
     $j=0;
@@ -1508,6 +1531,15 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $dis_company = "<input type=\"text\" name=\"tf_company\" size=\"30\" maxlength=\"64\" value=\"$c_name\" />";
   }
 
+  if($show_mailing) {
+    $block_mailing = "<tr>
+    <th>$l_mailing_ok</th>
+    <td><input type=\"checkbox\" name=\"cba_mailok\" value=\"1\" $mailok /></td>
+    </tr><tr>
+    <th>$l_newsletter</th>
+    <td><input type=\"checkbox\" name=\"cba_newsletter\" value=\"1\" $newsletter /></td>
+    </tr>";  
+  }
   // Check
   if (! $perm->check_right('contact', $cright_write_admin)) {
     $display_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_yes";
@@ -1645,10 +1677,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       <th>$l_letter</th>
       <td>$sel_kind_header </td>
     </tr>
-    <tr>
-      <th>$l_datasource</th> 
-      <td>$sel_dsrc</td>
-    </tr>
+    $block_dsrc
     <tr>
       <th>$l_private</th>
       <td>$display_private</td>
@@ -1667,13 +1696,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $block_date
     $block_userdata
     $block_birthday
-    <tr>
-    <th>$l_mailing_ok</th>
-    <td><input type=\"checkbox\" name=\"cba_mailok\" value=\"1\" $mailok /></td>
-    </tr><tr>
-    <th>$l_newsletter</th>
-    <td><input type=\"checkbox\" name=\"cba_newsletter\" value=\"1\" $newsletter /></td>
-    </tr>    
+    $block_mailing
     </table>
     </fieldset>
 
