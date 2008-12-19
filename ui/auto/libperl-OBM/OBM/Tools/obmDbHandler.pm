@@ -59,7 +59,9 @@ sub _driverConnectHook {
 
     SWITCH: {
         if( $self->{'dbType'} eq 'mysql' ) {
-            $dbHandler->{'mysql_enable_utf8'} = 1;
+            # Perldoc said that $dbHandler->{'mysql_enable_utf8'} is needed,
+            # but in fact, it seems that it has no effect, or can break accute
+            # letter
             $dbHandler->do('SET NAMES utf8');
             last SWITCH;
         }
