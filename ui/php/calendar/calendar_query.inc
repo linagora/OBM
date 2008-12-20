@@ -70,7 +70,7 @@ function run_query_calendar_detail($calendar_id) {
 // Parameters: 
 //   - $users : users id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_get_user_name($users='') {
+function get_calendar_user_name($users='') {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('userobm');
@@ -82,12 +82,24 @@ function run_query_calendar_get_user_name($users='') {
   $query = "SELECT userobm_lastname, userobm_firstname, userobm_id
             FROM UserObm
 	    WHERE userobm_id IN ($in) $multidomain";
-
-  $query.= " ORDER BY userobm_id"; 
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_user_name()');
+  display_debug_msg($query, $cdg_sql, 'get_calendar_user_name()');
   $obm_q->query($query);
 
-  return $obm_q;
+  $u = array();
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f('userobm_id');
+    $firstname = $obm_q->f('userobm_firstname');
+    $lastname = $obm_q->f('userobm_lastname');
+    $u[$id] = "$firstname $lastname";
+  }
+
+  // Preserve the users order
+  $names = array();
+  foreach ($users as $id) {
+    $names[$id] = $u[$id];
+  } 
+
+  return $names;
 }
 
 
@@ -96,7 +108,7 @@ function run_query_calendar_get_user_name($users='') {
 // Parameters:
 //   - $resources : resource id array, the event is assigned to
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_get_resource_label($resources) {
+function get_calendar_resource_label($resources) {
   global $cdg_sql;
   
   if (count($resources) > 0) {
@@ -110,12 +122,23 @@ function run_query_calendar_get_resource_label($resources) {
   $query = "SELECT resource_name, resource_id
             FROM Resource 
             WHERE $where $multidomain";
-
-  $query.= " ORDER BY resource_id";
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_get_resource_label()');
+  display_debug_msg($query, $cdg_sql, 'get_calendar_resource_label()');
   $obm_q->query($query);
 
-  return $obm_q;
+  $r = array();
+  while ($obm_q->next_record()) {
+    $id = $obm_q->f('resource_id');
+    $name = $obm_q->f('resource_name');
+    $r[$id] = "$name";
+  }
+
+  $names = array();
+  // Preserve the users order
+  foreach ($resources as $id) {
+    $names[$id] = $r[$id];
+  } 
+
+  return $names;
 }
 
 
@@ -148,15 +171,15 @@ function run_query_calendar_get_resource_property($r_id) {
 // Parameters:
 //   - $entities : entity id array, the event is assigned to
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_get_entity_label($entities) {
+function get_calendar_entity_label($entities) {
 
   if ((is_array($entities['user']))
       && (count($entities['user']) > 0)) {
-    $ret['user'] = run_query_calendar_get_user_name($entities['user']);
+    $ret['user'] = get_calendar_user_name($entities['user']);
   }
   if ((is_array($entities['resource']))
       && (count($entities['resource']) > 0)) {
-    $ret['resource'] = run_query_calendar_get_resource_label($entities['resource']);
+    $ret['resource'] = get_calendar_resource_label($entities['resource']);
   }
 
   return $ret;
@@ -815,7 +838,7 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
   $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
 
-  $cal_entities = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
+  $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
   $of = &OccurrenceFactory::getInstance(); 
   if(!$calendar['all_day']) {
@@ -872,7 +895,7 @@ function check_calendar_decision_conflict($calendar) {
     $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
   }
 
-  $cal_entities = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
+  $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
   if(isset($calendar['calendar_id']) && !is_null($occurrences)) {
     $event_id = $calendar["calendar_id"];
@@ -1732,34 +1755,31 @@ function store_calendar_entities($entities_q) {
 
   $i = 0;
   $entity_tab = array();
-  $user_q = $entities_q['user'];
-  if (is_object($user_q)) {
-    while ($user_q->next_record()) {
-      $id = $user_q->f('userobm_id');
-      $name = $user_q->f('userobm_firstname').' '.$user_q->f('userobm_lastname');
+  $users = $entities_q['user'];
+  if (is_array($users)) {
+    foreach ($users as $id => $name) {
       if ($obm['uid'] == $id) {
       $entity_tab['user'][$id] = array(
         'name'  => $name,
         'class' => 'eventOwner',
         'type'  => 'user',
-        'id'    => $user_q->f('userobm_id'));
+        'id'    => $id);
       } else {
         $entity_tab['user'][$id] = array(
           'name'  => $name,
           'class' => "eventOwner$i",
           'type'  => 'user',
-          'id'    => $user_q->f('userobm_id'));
+          'id'    => $id);
         $i++;
         $i = $i%20;
       }
     }
   }
-  $resource_q = $entities_q['resource'];
-  if (is_object($resource_q)) {
-    while($resource_q->next_record()) {
-      $id = $resource_q->f('resource_id');
+  $resources = $entities_q['resource'];
+  if (is_array($resources)) {
+    foreach ($resources as $id => $name) {
       $entity_tab['resource'][$id] = array(
-        'name'  => $resource_q->f('resource_name'),
+        'name'  => $name,
         'class' => "eventOwner$i",
         'image' => ${'ico_calendar_user'.$i},
         'type'  => 'resource',

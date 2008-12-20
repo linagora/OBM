@@ -859,6 +859,9 @@ ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
 UPDATE Contact SET contact_origin='obm21';
 ALTER TABLE Contact MODIFY COLUMN contact_origin VARCHAR(255) NOT NULL;
 
+-- PublicationType (correct an error in MySQL 2.1 creation script)
+ALTER TABLE PublicationType CHANGE COLUMN publication_code publicationtype_code varchar(10) default '';
+
 -- Set Defaults 
 ALTER TABLE Account MODIFY COLUMN account_domain_id int(8) NOT NULL ;
 ALTER TABLE CV MODIFY COLUMN cv_domain_id int(8) NOT NULL ;

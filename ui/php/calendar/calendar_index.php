@@ -20,6 +20,7 @@
 // - rights_admin    -- access rights screen
 // - rights_update   -- Update calendar access rights
 ///////////////////////////////////////////////////////////////////////////////
+
 $path = '..';
 $module = 'calendar';
 $obminclude = getenv('OBM_INCLUDE_VAR');
@@ -479,7 +480,7 @@ if ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
   $cal_entity_id['user'] = run_query_calendar_get_allusers($cal_entity_id['user'], $params['sel_group_id']);
   $entity_readable = get_calendar_entity_readable();
-  $ret = run_query_calendar_get_entity_label($cal_entity_id);
+  $ret = get_calendar_entity_label($cal_entity_id);
   $ret['resourcegroup'] = run_query_resource_resourcegroup($cal_entity_id['resource_group']);
   $entity_store = store_calendar_entities($ret);
   $display['features'] = html_calendar_planning_bar($params, $cal_entity_id, $entity_store, $entity_readable,$cal_view);

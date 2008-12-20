@@ -27,7 +27,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   // we restore the selected group for session storage
   $sel_entity_id['group_view'] = $group_view;
 
-  $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
+  $calendar_entity = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   $writable_entity = OBM_Acl_Utils::expandEntitiesArray(
     OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write')
   );
@@ -369,10 +369,10 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <fieldset class=\"detail extra\">
     <legend>$l_add</legend>
     </fieldset>
+    $sel_ent
     <div id=\"sel_ent\">
     </div>
     <fieldset class=\"buttons\">
-    $sel_ent
     <input type=\"submit\" value=\"$l_validate\" />
     </fieldset>
     $dis_back_myview - $dis_go_today
@@ -3738,7 +3738,7 @@ function json_event_data($id,$calendar) {
   
   $entity_readable = get_calendar_entity_readable();
   $sel_entity_id = slice_calendar_entities($cal_entity_id, $ccalendar_max_users, $entity_readable);
-  $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($cal_entity_id));
+  $calendar_entity = store_calendar_entities(get_calendar_entity_label($cal_entity_id));
   
   switch($context)  {
     case 'day' :
@@ -3993,7 +3993,7 @@ function dis_calendar_pdf_view($calendar, &$sel_entity_id, $p_range, $p_view) {
   // we restore the selected group for session storage
   $sel_entity_id['group_view'] = $group_view;
 
-  $calendar_entity = store_calendar_entities(run_query_calendar_get_entity_label($sel_entity_id));
+  $calendar_entity = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   $calendar_function = 'dis_calendar_'.$p_range.'_'.$p_view.'_pdf';
 
   $calendar_function($calendar, $calendar_entity);
