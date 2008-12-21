@@ -156,6 +156,7 @@ $l_version = "Version";
 $l_aka = "Also known as";
 $l_cat_tree = "Category tree";
 $l_category = "Category";
+$l_category1 = "Category";
 $l_aduplicate = "Duplicate";
 $l_hide = "Hide";
 $l_show = "Show";

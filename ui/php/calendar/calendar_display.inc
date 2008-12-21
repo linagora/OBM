@@ -983,6 +983,7 @@ function dis_calendar_month_list($calendar, $calendar_entity, $writable_entity) 
   return $block;
 }
 
+
 /**
  * Display Event List
  * 
@@ -995,9 +996,10 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   global $l_daysofweek, $l_monthsofyear, $l_attendees, $l_title, $l_location;
   global $l_desc, $l_category,$l_datebegin, $l_dateend, $l_private, $l_repeat;
   global $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
-  global $l_date, $l_resources, $l_items, $l_event, $ico_search,$ccalendar_first_hour;
+  global $l_date, $l_resources, $l_items, $l_event, $l_owner;
   global $l_expand_all, $l_collapse_all,$ccalendar_last_hour,$ccalendar_weekstart;
-  global $ico_periodic_alt, $ico_meeting_alt, $ico_private_alt;
+  global $ico_periodic_alt, $ico_meeting_alt, $ico_private_alt, $ico_search;
+  global $ccalendar_first_hour;
 
   $sel_user = $calendar_entity['user'];
   $sel_user_id = array();
@@ -1101,6 +1103,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
             $title = "<img src=\"$ico_periodic_alt\" alt=\"[Periodic]\" /> $title";
           }                  
         }
+        $dis_owner = $event->owner_name;
         $dis_attendees = '';
         $br = '';
         $dis_user = '';
@@ -1170,6 +1173,9 @@ $dis_events .= "<div id=\"evt_${date}_$ev_id\" >
                 <th>$l_desc</th><td>$description</td>
               </tr>
               <tr>
+                <th>$l_owner</th><td>$dis_owner</td>
+              </tr>
+              <tr>
                 <th>$l_attendees</th><td>$dis_attendees</td>
               </tr>
               <tr>
@@ -1228,6 +1234,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
 
   $event = $occurrence->event;
   $owner = $event->owner;
+  $owner_name = $event->owner_name;
 
   if ($owner == $obm['uid'] || in_array($owner,$writable_entity['ids'])) {
     $updatable =  true;
@@ -1291,6 +1298,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "all_day:".$all_day;
   $ed[] = "klass:'$entityClass'"; 
   $ed[] = "description:'$description'";
+  $ed[] = "owner_name:'$owner_name'";
   $ed[] = "location:'$location'";
   $ed[] = "category:'$category'";
   $ed[] = "colors: {event:'$eventColor'}";
@@ -2255,9 +2263,9 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
  * @return HTML
  */
 function dis_calendar_quick_form($calendar,$calendar_entity) {
-  global $ico_popup_close,$l_validate,$popup_queue,$l_title,$obm;
-  global $l_desc,$l_confirm_delete,$l_c_delete,$l_category1, $l_edit, $l_edit_full;
-  global $l_location,$l_members,$l_carac, $l_items,$l_details,$l_users;
+  global $obm,$ico_popup_close,$popup_queue,$l_validate, $l_edit, $l_edit_full;
+  global $l_confirm_delete,$l_c_delete, $l_title, $l_category1, $l_desc;
+  global $l_location, $l_owner, $l_members, $l_users, $l_carac, $l_items, $l_details;
 
   $u = get_user_info(); 
   $entity_view.="<select id=\"calendarViewEntity\">";
@@ -2314,6 +2322,10 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
       <div>
         <h3>$l_carac</h3>
         <table>
+        <tr>
+        <th>$l_owner</th>
+        <td id=\"calendarQuickFormOwner\"></td>
+        </tr>
         <tr>
         <th>$l_location</th>
         <td id=\"calendarQuickFormLocation\"></td>

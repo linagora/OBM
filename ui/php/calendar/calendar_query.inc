@@ -47,7 +47,7 @@ function run_query_calendar_detail($calendar_id) {
       event_color,
       event_endrepeat,
       event_date
-    FROM  
+    FROM
       Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
       LEFT JOIN UserObm AS c ON event_usercreate = c.userobm_id
@@ -825,6 +825,7 @@ function search_user_by_name($lastname, $firstname) {
   }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurrence of each event,
 // Parameters:
@@ -860,6 +861,7 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
   return $occurrences;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the user is authorized to access calendars and resources
 ///////////////////////////////////////////////////////////////////////////////
@@ -878,6 +880,7 @@ function check_access_entity($calendar_ids, $resource_ids) {
   
   return $ok;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurrence of each event
@@ -912,6 +915,7 @@ function check_calendar_decision_conflict($calendar) {
   }
   return $occurrences;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Event Update Execution
@@ -2183,6 +2187,8 @@ function slice_calendar_entities($sel_entity_id, $nb_max, $entity_readable='') {
     'resource' => $res_resource_id
   );
 }
+
+
 //FIXME HERE I AM
 ///////////////////////////////////////////////////////////////////////////////
 // Return all not rejected events in a week of users or/and groups
@@ -2222,6 +2228,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         event_location,
         event_repeatfrequence,
         event_owner,
+        userobm_lastname,
+        userobm_firstname,
         event_timezone,
         userentity_user_id as eventlink_entity_id,
         'user' as eventlink_entity,
@@ -2233,6 +2241,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         event_allday
       FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+        LEFT JOIN UserObm ON event_owner = userobm_id
         INNER JOIN EventLink ON event_id = eventlink_event_id
         INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
       WHERE event_type='VEVENT'
@@ -2258,6 +2267,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         event_location,
         event_repeatfrequence,
         event_owner,
+        userobm_lastname,
+        userobm_firstname,
         event_timezone,
         resourceentity_resource_id as eventlink_entity_id,
         'resource' as eventlink_entity,
@@ -2269,6 +2280,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         event_allday
       FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+        LEFT JOIN UserObm ON event_owner = userobm_id
         INNER JOIN EventLink ON event_id = eventlink_event_id
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
       WHERE event_type='VEVENT'
@@ -2295,6 +2307,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       event_location,
       event_repeatfrequence,
       event_owner,
+      userobm_lastname,
+      userobm_firstname,
       event_timezone,
       resourceentity_resource_id as eventlink_entity_id,
       'resourcegroup' as eventlink_entity,
@@ -2306,6 +2320,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       event_allday
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+      LEFT JOIN UserObm ON event_owner = userobm_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
       INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT'
@@ -2367,6 +2382,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_endrepeat,
       event_repeatfrequence,
       event_owner,
+      userobm_lastname,
+      userobm_firstname,
       event_timezone,
       'user' as eventlink_entity,
       userentity_user_id as eventlink_entity_id,
@@ -2376,6 +2393,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_allday
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+      LEFT JOIN UserObm ON event_owner = userobm_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
       INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT'
@@ -2406,6 +2424,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_endrepeat,
       event_repeatfrequence,
       event_owner,
+      userobm_lastname,
+      userobm_firstname,
       event_timezone,
       'resource' as eventlink_entity,
       resourceentity_resource_id as eventlink_entity_id,
@@ -2415,6 +2435,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_allday
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+      LEFT JOIN UserObm ON event_owner = userobm_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
       INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT'
@@ -2446,6 +2467,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_endrepeat,
       event_repeatfrequence,
       event_owner,
+      userobm_lastname,
+      userobm_firstname,
       event_timezone,
       'resourcegroup' as eventlink_entity,
       resourceentity_resource_id as eventlink_entity_id,
@@ -2455,6 +2478,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_allday
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
+      LEFT JOIN UserObm ON event_owner = userobm_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
       INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
    WHERE event_type='VEVENT' 
@@ -2629,6 +2653,7 @@ function get_one_event_user_alert($event_id, $user_id = null) {
   return $alerts;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return a table of Events between two dates
 // Parameters: 
@@ -2662,6 +2687,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $entity_id = $nr_q->f('eventlink_entity_id');
     $entity_state = $nr_q->f('eventlink_state');
     $owner = $nr_q->f('event_owner');
+    $owner_name = $nr_q->f('userobm_lastname').' '.$nr_q->f('userobm_firstname');
     $timezone = $nr_q->f('event_timezone');
     if (isset($of->events[$id])) {
       $event = $of->events[$id];
@@ -2669,7 +2695,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
 	$of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
       }
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$color);
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color);
       $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
     }
   }
@@ -2697,6 +2723,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $entity_state = $r_q->f('eventlink_state');
     $all_day = $r_q->f('event_allday');    
     $owner = $r_q->f('event_owner');
+    $owner_name = $r_q->f('userobm_lastname').' '.$r_q->f('userobm_firstname');
     $timezone = $r_q->f('event_timezone');
     if ($endrepeat->error() == Of_Date::WARN_EMPTY_DATE) {
       $endrepeat = $end;
@@ -2708,7 +2735,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
         $addOcc = false;
       }
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$color);
+      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color);
       $event->setTimezone($timezone);
     }
     $tz = new DateTimeZone($timezone);
@@ -3203,6 +3230,7 @@ Class Event {
   var $repeat;
   var $all_day;
   var $owner;
+  var $owner_name;
   var $color;
   var $timezone;
 
@@ -3220,10 +3248,11 @@ Class Event {
    * @param mixed $all_day 
    * @param mixed $repeat 
    * @param mixed $owner 
+   * @param mixed $owner_name 
    * @access public
    * @return void
    */
-  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$color) {
+  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color) {
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;
@@ -3236,6 +3265,7 @@ Class Event {
     $this->all_day = $all_day;
     $this->attendee = array();
     $this->owner = $owner;
+    $this->owner_name = $owner_name;
     $this->color = $color;
   }
 
@@ -3511,7 +3541,10 @@ Class OccurrenceFactory {
         }
       }
     }
-    if (count($occurrence) > 0) {
+    // FIXME here occurrenceS ??
+    if (count($occurrences) > 0) {
+      // SORT repeat And non repeat event
+      usort($occurrences, 'occurrenceDateSort');
       return $occurrences;
     } else {
       return NULL;
