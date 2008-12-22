@@ -3541,7 +3541,6 @@ Class OccurrenceFactory {
         }
       }
     }
-    // FIXME here occurrenceS ??
     if (count($occurrences) > 0) {
       // SORT repeat And non repeat event
       usort($occurrences, 'occurrenceDateSort');
