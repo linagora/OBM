@@ -16,7 +16,7 @@ require Exporter;
 @EXPORT = ();
 @EXPORT_OK = qw();
 
-#
+
 # Nécessaire pour le bon fonctionnement du package
 $debug=1;
 
