@@ -1,5 +1,0 @@
-#!/bin/sh
-
-
-APPDIR=`dirname $0`;
-/usr/lib/jvm/ia32-java-6-sun/bin/java  -Xmx256M -cp "$APPDIR/src:$APPDIR/bin:/home/tom/java/gwt-linux-1.5.2/gwt-user.jar:/home/tom/java/gwt-linux-1.5.2/gwt-dev-linux.jar" com.google.gwt.dev.GWTShell -out "$APPDIR/www" "$@" org.obm.tz.TZParser/TZParser.html;
