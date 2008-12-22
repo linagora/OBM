@@ -16,7 +16,7 @@ echo "  Delete old database if exists"
 mysql -u $user -p$pw -e "DROP DATABASE IF EXISTS $db"
 
 echo "  Create new $db database"
-mysql -u $user -p$pw -e "CREATE DATABASE $db"
+mysql -u $user -p$pw -e "CREATE DATABASE $db CHARACTER SET utf8 COLLATE utf8_general_ci"
 
 echo "  Create new $db database model"
 mysql -u $user -p$pw $db < create_obmdb_2.2.mysql.sql

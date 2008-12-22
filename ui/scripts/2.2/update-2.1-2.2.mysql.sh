@@ -39,10 +39,11 @@ test ${success} -eq 0 || {
     exit 1
 }
 
-echo "Drop/Create database"
-mysqladmin -u $U -p$P -f drop ${DB}
+echo "  Delete old database if exists"
+mysql -u $U -p$P -e "DROP DATABASE IF EXISTS $DB"
 
-mysqladmin -u $U -p$P --default-character-set='UTF8' create ${DB}
+echo "  Create new $db database"
+mysql -u $U -p$P -e "CREATE DATABASE $DB CHARACTER SET utf8 COLLATE utf8_general_ci"
 
 echo "Running 2.2 creation schema script..."
 mysql -u $U -p$P  --default-character-set='UTF8' ${DB} < ./create_obmdb_2.2.mysql.sql 
