@@ -46,13 +46,13 @@ $regexp_rootLdap = "^dc=(.+),dc=.+\$";
 $regexp_login = "^([A-Za-z0-9][A-Za-z0-9-._]{1,31})\$";
 
 # Passwd regexp
-$regexp_passwd = "^[-\\\$&\\\\~#\{\(\[\|_`\^@\);\\\]+=\}%!:\\\/\\\.,?<>\\\"\\p{Alphabetic}0-9]{4,12}\$";
+$regexp_passwd = '^[-\$\\\&~#\{\(\[\|_`\^@\);\]+=\}%!:\/\.,?<>"\w0-9]{4,12}$';
 
 # Les adresses IP
 $regexp_ip = "^([1-2]?[0-9]{1,2}\\\.){3}[1-2]?[0-9]{1,2}\$";
 
 # Server regexp
-$regexp_server_id = "^[0-9]+\$";
+$regexp_server_id = '^[0-9]+$';
 
 # User regexp
 $regexp_uid = '^[0-9]+$';
