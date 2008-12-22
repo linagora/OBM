@@ -13,7 +13,7 @@ ldap_password
 # Options communément modifiées
 #
 # de 0 a 4 - 0 par défaut
-log_level           1
+log_level           2
 # Le fichier de log - /var/log/obm/obmSatellite.log par défaut
 log_file            /var/log/obm/obmSatellite.log
 # Le PID - /var/run/obm/obmSatellite.pid par défaut
