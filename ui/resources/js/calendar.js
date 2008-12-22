@@ -937,7 +937,7 @@ Obm.CalendarManager = new Class({
     new Request.JSON({
       url : 'calendar_index.php',
       secure : false,
-      onComplete : this.receiveUpdateEvent,
+      onComplete : this.receiveUpdateEvent
     }).post($merge({ajax : 1, action : 'quick_update'}, eventData));
   },
   
@@ -1026,7 +1026,7 @@ Obm.CalendarManager = new Class({
     new Request.JSON({
       url : 'calendar_index.php',
       secure : false,
-      onComplete : this.receiveDeleteEvent,
+      onComplete : this.receiveDeleteEvent
     }).post($merge({ajax : 1, action : 'quick_delete'}, eventData));    
   },
   

@@ -74,7 +74,6 @@ if (isset($params['cal_range'])) {
 ///////////////////////////////////////////////////////////////////////////////
 
 $extra_css[] = $css_calendar;
-$extra_js_include[] = 'bin/org.obm.tz.TZParser.nocache.js';
 $extra_js_include[] = 'date.js';
 $extra_js_include[] = 'calendar.js';
 $extra_js_include[] = 'colorpicker.js';

@@ -324,23 +324,35 @@ Obm.DateTime = new Class({
 
 Obm.TimeZoneParser = new Class ({
   initialize: function (timeZone) {
-    var request = new Request({
+    this.lastIndex = 0;
+    var request = new Request.JSON({
         url:obm.vars.consts.resourcePath  + '/js/bin/timezone/' + timeZone,
-        async: false
+        async: false,
+        secure: false,
+        onSuccess: function (response) {
+          this.offsets = response;
+        }.bind(this)
     });
-    request.xhr.overrideMimeType('text/plain; charset=x-user-defined');
     request.send();
-    var fileContent = request.response.text;
-    var fileSize = fileContent.length;
-    var bytes = [];
-    for(var i=0; i < fileSize; i++) {
-      bytes[i] = fileContent.charCodeAt(i) & 0xff;
-    }
-    window.parseTimeZoneData(bytes);
   },
   
   getTimeZoneOffset: function(time) {
-    return window.getTimeZoneOffset('' + time + '');
+    var ok = false;
+    var i = this.lastIndex;
+    time = time/1000;
+    while(!ok) {
+      if(! this.offsets[i]['from'] || this.offsets[i]['from'] <= time) {
+        if(!this.offsets[i]['to'] || this.offsets[i]['to'] > time) {
+          ok = true
+        } else {
+          i++;
+        }
+      } else {
+        i--;
+      }
+    }
+    this.lastIndex = i;
+    return this.offsets[i]['offset']*1000;
   }
 });
 
