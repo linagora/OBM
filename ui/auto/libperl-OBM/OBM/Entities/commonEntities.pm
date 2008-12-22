@@ -11,7 +11,6 @@ use base qw(Exporter);
 
 
 $VERSION = '1.0';
-
 @EXPORT_OK = qw(    setDelete
                     getDelete
                     getArchive
