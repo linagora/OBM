@@ -10,8 +10,7 @@ use vars qw( @EXPORT_OK $VERSION );
 use base qw(Exporter);
 
 
-$VERSION = "1.0";
-
+$VERSION = '1.0';
 @EXPORT_OK = qw(    dump
                     _log
                );
