@@ -10,13 +10,11 @@ use vars qw( @EXPORT_OK $VERSION );
 use base qw(Exporter);
 
 
-#require OBM::toolBox;
 require OBM::Postfix::smtpOutRemoteEngine;
 require OBM::Update::utils;
 
 
 $VERSION = "1.0";
-
 @EXPORT_OK = qw(    _updateState
                     _doRemoteConf
                     _runEngines
