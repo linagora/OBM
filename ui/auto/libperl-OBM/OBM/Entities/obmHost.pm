@@ -152,6 +152,14 @@ sub _init {
 }
 
 
+sub setLinks {
+    my $self = shift;
+    my( $links ) = @_;
+
+    return 0;
+}
+
+
 # Needed
 sub getDescription {
     my $self = shift;

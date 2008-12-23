@@ -21,6 +21,7 @@ use OBM::Entities::commonEntities qw(
         setUpdated
         unsetUpdated
         getUpdated
+        getDesc
         isMailAvailable
         isSieveAvailable
         );
@@ -117,9 +118,17 @@ sub _init {
         return 1;
     }
 
-    $self->{'userSystemDesc'} = $systemUserDesc;
+    $self->{'entityDesc'} = $systemUserDesc;
 
     $self->_log( 'chargement : '.$self->getDescription(), 1 );
+
+    return 0;
+}
+
+
+sub setLinks {
+    my $self = shift;
+    my( $links ) = @_;
 
     return 0;
 }
@@ -128,7 +137,7 @@ sub _init {
 # Needed
 sub getDescription {
     my $self = shift;
-    my $userSystemDesc = $self->{'userSystemDesc'};
+    my $userSystemDesc = $self->{'entityDesc'};
 
     my $description = 'utilisateur système d\'ID \''.$userSystemDesc->{'usersystem_id'}.'\', login \''.$userSystemDesc->{'usersystem_login'}.'\'';
 
@@ -141,19 +150,6 @@ sub getDescription {
     }
 
     return $description;
-}
-
-
-# Needed
-sub getDesc {
-    my $self = shift;
-    my( $desc ) = @_;
-
-    if( $desc && !ref($desc) ) {
-        return $self->{'userSystemDesc'}->{$desc};
-    };
-
-    return undef;
 }
 
 
@@ -171,7 +167,7 @@ sub getDomainId {
 sub getId {
     my $self = shift;
 
-    return $self->{'userSystemDesc'}->{'usersystem_id'};
+    return $self->{'entityDesc'}->{'usersystem_id'};
 }
 
 
@@ -228,7 +224,7 @@ sub getDnPrefix {
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'uid='.$self->{'userSystemDesc'}->{'usersystem_login'}.','.$rootDn->[$i] );
+        push( @dnPrefixes, 'uid='.$self->{'entityDesc'}->{'usersystem_login'}.','.$rootDn->[$i] );
         $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
@@ -259,45 +255,45 @@ sub createLdapEntry {
         return 1;
     }
 
-    my $userPasswd = $self->_convertPasswd( 'PLAIN', $self->{'userSystemDesc'}->{'usersystem_password'} );
+    my $userPasswd = $self->_convertPasswd( 'PLAIN', $self->{'entityDesc'}->{'usersystem_password'} );
     if( !$userPasswd ) {
         $self->_log( 'pas de mot de passe défini', 3 );
         return 1;
     }
 
-    my $cn = $self->{'userSystemDesc'}->{'usersystem_login'};
+    my $cn = $self->{'entityDesc'}->{'usersystem_login'};
     SWITCH: {
-        if( $self->{'userSystemDesc'}->{'usersystem_firstname'} && $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
-            $cn = $self->{'userSystemDesc'}->{'usersystem_firstname'}.' '.$self->{'userSystemDesc'}->{'usersystem_lastname'};
+        if( $self->{'entityDesc'}->{'usersystem_firstname'} && $self->{'entityDesc'}->{'usersystem_lastname'} ) {
+            $cn = $self->{'entityDesc'}->{'usersystem_firstname'}.' '.$self->{'entityDesc'}->{'usersystem_lastname'};
             last SWITCH;
         }
 
-        if( $self->{'userSystemDesc'}->{'usersystem_firstname'} ) {
-            $cn = $self->{'userSystemDesc'}->{'usersystem_firstname'};
+        if( $self->{'entityDesc'}->{'usersystem_firstname'} ) {
+            $cn = $self->{'entityDesc'}->{'usersystem_firstname'};
             last SWITCH;
         }
 
-        if( $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
-            $cn = $self->{'userSystemDesc'}->{'usersystem_lastname'};
+        if( $self->{'entityDesc'}->{'usersystem_lastname'} ) {
+            $cn = $self->{'entityDesc'}->{'usersystem_lastname'};
             last SWITCH;
         }
     }
 
-    my $sn = $self->{'userSystemDesc'}->{'usersystem_login'};
-    if( $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
-        $sn = $self->{'userSystemDesc'}->{'usersystem_lastname'};
+    my $sn = $self->{'entityDesc'}->{'usersystem_login'};
+    if( $self->{'entityDesc'}->{'usersystem_lastname'} ) {
+        $sn = $self->{'entityDesc'}->{'usersystem_lastname'};
     }
 
-    my $homeDirectory = $self->{'userSystemDesc'}->{'usersystem_homedir'};
+    my $homeDirectory = $self->{'entityDesc'}->{'usersystem_homedir'};
     if( !$homeDirectory ) {
-        $homeDirectory = '/home/'.$self->{'userSystemDesc'}->{'usersystem_login'};
+        $homeDirectory = '/home/'.$self->{'entityDesc'}->{'usersystem_login'};
     }
 
     $entry->add(
         objectClass => $self->{'objectclass'},
-        uid => $self->{'userSystemDesc'}->{'usersystem_login'},
-        uidNumber => $self->{'userSystemDesc'}->{'usersystem_uid'},
-        gidNumber => $self->{'userSystemDesc'}->{'usersystem_gid'},
+        uid => $self->{'entityDesc'}->{'usersystem_login'},
+        uidNumber => $self->{'entityDesc'}->{'usersystem_uid'},
+        gidNumber => $self->{'entityDesc'}->{'usersystem_gid'},
         homeDirectory => $homeDirectory,
         cn => $cn,
         sn => $sn,
@@ -323,27 +319,27 @@ sub updateLdapEntry {
         return $update;
     }
 
-    my $userPasswd = $self->_convertPasswd( 'PLAIN', $self->{'userSystemDesc'}->{'usersystem_password'} );
+    my $userPasswd = $self->_convertPasswd( 'PLAIN', $self->{'entityDesc'}->{'usersystem_password'} );
     if( $userPasswd ) {
         if( $self->_modifyAttr( $userPasswd, $entry, 'userpassword' ) ) {
             $update = 1;
         }
     }
 
-    my $cn = $self->{'userSystemDesc'}->{'usersystem_login'};
+    my $cn = $self->{'entityDesc'}->{'usersystem_login'};
     SWITCH: {
-        if( $self->{'userSystemDesc'}->{'usersystem_firstname'} && $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
-            $cn = $self->{'userSystemDesc'}->{'usersystem_firstname'}.' '.$self->{'userSystemDesc'}->{'usersystem_lastname'};
+        if( $self->{'entityDesc'}->{'usersystem_firstname'} && $self->{'entityDesc'}->{'usersystem_lastname'} ) {
+            $cn = $self->{'entityDesc'}->{'usersystem_firstname'}.' '.$self->{'entityDesc'}->{'usersystem_lastname'};
             last SWITCH;
         }
 
-        if( $self->{'userSystemDesc'}->{'usersystem_firstname'} ) {
-            $cn = $self->{'userSystemDesc'}->{'usersystem_firstname'};
+        if( $self->{'entityDesc'}->{'usersystem_firstname'} ) {
+            $cn = $self->{'entityDesc'}->{'usersystem_firstname'};
             last SWITCH;
         }
 
-        if( $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
-            $cn = $self->{'userSystemDesc'}->{'usersystem_lastname'};
+        if( $self->{'entityDesc'}->{'usersystem_lastname'} ) {
+            $cn = $self->{'entityDesc'}->{'usersystem_lastname'};
             last SWITCH;
         }
     }
@@ -351,9 +347,9 @@ sub updateLdapEntry {
         $update = 1;
     }
 
-    my $sn = $self->{'userSystemDesc'}->{'usersystem_login'};
-    if( $self->{'userSystemDesc'}->{'usersystem_lastname'} ) {
-        $sn = $self->{'userSystemDesc'}->{'usersystem_lastname'};
+    my $sn = $self->{'entityDesc'}->{'usersystem_login'};
+    if( $self->{'entityDesc'}->{'usersystem_lastname'} ) {
+        $sn = $self->{'entityDesc'}->{'usersystem_lastname'};
     }
     if( $self->_modifyAttr( $sn, $entry, 'sn' ) ) {
         $update = 1;
