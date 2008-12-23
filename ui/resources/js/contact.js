@@ -24,7 +24,7 @@ Obm.CoordonateWidget = new Class({
     for (var field in this.structure){
       var data = this.structure[field]
       if(data.newLine == true) {line =  new Element('tr'); this.element.adopt(line);}
-      if(data.newCell == true || data.newLine == true) {cell = new Element('td');line.adopt(cell);}
+      if(data.newCell == true || data.newLine == true) {cell = new Element('th');line.adopt(cell);}
       if(!data.newCell && !data.newLine) cell.adopt(new Element('br'));
       cell.adopt(this.makeField(field, data));
       new OverText(cell.getElements('input, textarea'));

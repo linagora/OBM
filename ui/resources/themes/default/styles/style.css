@@ -1353,5 +1353,6 @@ div.overTxtDiv {
   font-family: arial, helvetica, verdana;
   font-size: 12px;
   color: #999;
+  overflow:hidden;
 }
 

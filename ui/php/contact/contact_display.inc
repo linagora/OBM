@@ -1261,8 +1261,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   $show_resp = (! $cgp_hide['contact']['responsible']);
   $show_date = (! $cgp_hide['contact']['contact_date']);
   $show_service = (! $cgp_hide['contact']['contact_service']);
-  $show_ad3 = (! $cgp_hide['contact']['contact_address3']);
-  $show_cdx = (! $cgp_hide['contact']['contact_expresspostal']);
   $show_comment2 = (! $cgp_hide['contact']['contact_comment2']);
   $show_comment3 = (! $cgp_hide['contact']['contact_comment3']);
   $show_birthday = (! $cgp_hide['contact']['birthday']);
@@ -1419,17 +1417,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       $k_kind_js
     </script>\n";
 
-  // Country select
-  $sel_ctry = "<select name=\"sel_country\" id=\"sel_country\">
-    <option value=\"$c_undef\">$l_undef</option>";
-  while ($ctry_q->next_record()) {
-    $ctry_iso3166 = $ctry_q->f('country_iso3166');
-    $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";
-    if ($ctry_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
-    $sel_ctry .= '>'. $ctry_q->f('country_name') . "</option>\n";
-  }
-  $sel_ctry .= '</select>';
-
   // Service field
   if ($show_service) {
     $block_service = "
@@ -1438,24 +1425,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       <td>
       <input type=\"text\" id=\"tf_service\" name=\"tf_service\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$service\" />
       </td>";
-  }
-
-  // Address 3 field
-  if ($show_ad3) {
-    $block_ad3 = "
-    </tr><tr>
-      <th>$l_address 3</th>
-      <td>
-      <input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" /> $c_ad3
-      </td>";
-  }
-
-  // Cedex field
-  if ($show_cdx) {
-    $block_cdx = "
-    </tr><tr>
-      <th>$l_expresspostal</th>
-      <td><input type=\"text\" name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /> $c_cdx</td>";
   }
 
   // User comment select construction
