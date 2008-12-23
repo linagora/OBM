@@ -69,14 +69,11 @@ class Vcalendar_Reader_OBM {
         if ($timezone) $date->setOriginalTimeZone($timezone);
         $this->addExdate($this->vevents[$exceptions->f('eventexception_event_id')] , $date);
         
-        // BEGIN to get an ICS file that Google understand
-        // (disabled after Mehdi's choice)
         
-//        $enddate = clone $date;
-//        $enddate->addSecond(3600);
-//        $this->addExdate($this->vevents[$exceptions->f('eventexception_event_id')] , $enddate);
+        $enddate = clone $date;
+        $enddate->addSecond(3600);
+        $this->addExdate($this->vevents[$exceptions->f('eventexception_event_id')] , $enddate);
 
-        // END to get an ICS file that Google understand
       }    
     }
     return $this->document;

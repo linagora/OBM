@@ -224,7 +224,7 @@ $profiles['user'] = array (
     'user' => 1,
     'my' => 1),
   'module' => array (
-		     'default' => 0, //$perm_user,
+     'default' => 0, //$perm_user,
     'calendar' => $perm_editor,
     ),
   'level' => 3,
