@@ -11,10 +11,12 @@ Obm.CoordonateWidget = new Class({
     this.id = this.newId();
     this.setOptions(options);
     this.setValues(fields);
-    this.element = new Element('table');
+    this.table = new Element('table');
+    this.element = new Element('tbody');
+    this.table.adopt(this.element);
     this.container = $(this.options.container);
     this.displayForm(); 
-    this.container.adopt(this.element);
+    this.container.adopt(this.table);
     OverText.update();
   },    
 
