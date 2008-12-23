@@ -1548,11 +1548,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
           $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
-        $js .=  "new Obm.PhoneWidget({".implode(',',$params)."});\n";
+        $js .=  "new Obm.Contact.PhoneWidget({".implode(',',$params)."});\n";
       }
     }
   }
-  $js .= "new Obm.PhoneWidget();\n";
+  $js .= "new Obm.Contact.PhoneWidget();\n";
   // ADDRESSES 
   if(is_array($addresses)) {
     foreach($addresses as $address) {
@@ -1562,11 +1562,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
           $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
-        $js .=  "new Obm.AddressWidget({".implode(',',$params)."});\n";
+        $js .=  "new Obm.Contact.AddressWidget({".implode(',',$params)."});\n";
       }
     }
   }
-  $js .= "new Obm.AddressWidget();\n";
+  $js .= "new Obm.Contact.AddressWidget();\n";
   // EMAILS 
   if(is_array($emails)) {
     foreach($emails as $email) {
@@ -1576,11 +1576,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
           $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
-        $js .=  "new Obm.EmailWidget({".implode(',',$params)."});\n";
+        $js .=  "new Obm.Contact.EmailWidget({".implode(',',$params)."});\n";
       }
     }
   }
-  $js .= "new Obm.EmailWidget();\n";
+  $js .= "new Obm.Contact.EmailWidget();\n";
   // WEBSITES 
   if(is_array($websites)) {
     foreach($websites as $website) {
@@ -1590,11 +1590,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
           $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
-        $js .=  "new Obm.WebsiteWidget({".implode(',',$params)."});\n";
+        $js .=  "new Obm.Contact.WebsiteWidget({".implode(',',$params)."});\n";
       }
     }
   }
-  $js .= "new Obm.WebsiteWidget();\n";
+  $js .= "new Obm.Contact.WebsiteWidget();\n";
   // IM 
   if(is_array($ims)) {
     foreach($ims as $im) {
@@ -1604,11 +1604,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
           $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
-        $js .=  "new Obm.IMWidget({".implode(',',$params)."});\n";
+        $js .=  "new Obm.Contact.IMWidget({".implode(',',$params)."});\n";
       }
     }
   }
-  $js .= "new Obm.IMWidget();\n";
+  $js .= "new Obm.Contact.IMWidget();\n";
 
   $display['title'] = "$dis_title";
 
@@ -1670,19 +1670,19 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     </fieldset>
 
     <fieldset class=\"detail infos\" id='phoneHolder'>
-    <legend>$l_phone <a href='' onclick=\"new Obm.PhoneWidget();return false;\">$l_add</a></legend>
+    <legend>$l_phone <a href='' onclick=\"new Obm.Contact.PhoneWidget();return false;\">$l_add</a></legend>
     </fieldset>
     <fieldset class=\"detail infos\" id='addressHolder'>
-    <legend>$l_address <a href='' onclick=\"new Obm.AddressWidget();return false;\">$l_add</a></legend>
+    <legend>$l_address <a href='' onclick=\"new Obm.Contact.AddressWidget();return false;\">$l_add</a></legend>
     </fieldset>
     <fieldset class=\"detail infos\" id='emailHolder'>
-    <legend>$l_email <a href='' onclick=\"new Obm.EmailWidget();return false;\">$l_add</a></legend>
+    <legend>$l_email <a href='' onclick=\"new Obm.Contact.EmailWidget();return false;\">$l_add</a></legend>
     </fieldset>
     <fieldset class=\"detail infos\" id='imHolder'>
-    <legend>$l_im <a href='' onclick=\"new Obm.IMWidget();return false;\">$l_add</a></legend>
+    <legend>$l_im <a href='' onclick=\"new Obm.Contact.IMWidget();return false;\">$l_add</a></legend>
     </fieldset>
     <fieldset class=\"detail infos\" id='websiteHolder'>
-    <legend>$l_website <a href='' onclick=\"new Obm.WebsiteWidget();return false;\">$l_add</a></legend>
+    <legend>$l_website <a href='' onclick=\"new Obm.Contact.WebsiteWidget();return false;\">$l_add</a></legend>
     </fieldset>
     <script type='text/javascript'>
       $js

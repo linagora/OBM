@@ -1,87 +1,6 @@
-Obm.CoordonateWidget = new Class({
-  Implements: Options,
+Obm.Contact = {}
 
-  newId: function() { return 0;},
-
-  setValues: function() {
-    this.structure = $merge.run([this.structure].extend(arguments));
-  },
-
-  initialize: function(fields, options) {
-    this.id = this.newId();
-    this.setOptions(options);
-    this.setValues(fields);
-    this.table = new Element('table');
-    this.element = new Element('tbody');
-    this.table.adopt(this.element);
-    this.container = $(this.options.container);
-    this.displayForm(); 
-    this.container.adopt(this.table);
-    OverText.update();
-  },    
-
-  displayForm: function() {
-    for (var field in this.structure){
-      var data = this.structure[field]
-      if(data.newLine == true) {line =  new Element('tr'); this.element.adopt(line);}
-      if(data.newCell == true || data.newLine == true) {cell = new Element('th');line.adopt(cell);}
-      if(!data.newCell && !data.newLine) cell.adopt(new Element('br'));
-      cell.adopt(this.makeField(field, data));
-      new OverText(cell.getElements('input, textarea'));
-    }
-    line.adopt(new Element('td').adopt(
-      new Element('a').appendText(obm.vars.labels.remove)
-        .addEvent('click', function() {this.element.dispose();OverText.update();}.bind(this))
-        .setStyle('cursor','pointer')
-      )
-    );
-  },
-
-  makeField: function(fieldName, field) {
-    switch (field.kind) {
-      case 'text' :
-        var element = new Element('input').setProperties({
-          'type' : 'text',
-          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']',
-          'alt' : field.label,
-          'title' : field.label
-        }).set('inputValue',field.value);
-        break;
-      case 'select' :
-        var element = new Element('select').setProperties({
-          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']',
-          'alt' : field.label,
-          'title' : field.label
-        });
-        for (var option in field.token) {
-          element.adopt(new Element('option').appendText(field.token[option]).setProperty('value', option));
-        }
-        element.set('inputValue', field.value);
-        break;
-      case 'autocomplete.local' :
-        var element = new Element('input').setProperties({'type' : 'text','value' : field.value});
-        new Autocompleter.Local(element, field.token, {
-          'minLength': 0, 
-          'overflow': true,
-          'selectMode': 'type-ahead',
-          'multiple': field.multiple      
-          });
-        break;        
-      case 'textarea' :
-        var element = new Element('textarea').setProperties({
-          'rows' : field.rows,
-          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']',
-          'alt' : field.label,
-          'title' : field.label
-        }).set('inputValue',field.value);
-        break;        
-    }
-
-    return element;
-  }
-});
-
-Obm.PhoneWidget = new Class ({
+Obm.Contact.PhoneWidget = new Class ({
   kind : 'phones',
   structure : {
     number: { kind: 'text', value: '', newLine : true, label : obm.vars.labels.phoneNumber},
@@ -90,12 +9,12 @@ Obm.PhoneWidget = new Class ({
 
   options: {container: 'phoneHolder'},
   
-  newId: function() {if(!Obm.PhoneWidget.phoneId) Obm.PhoneWidget.phoneId = 0; return Obm.PhoneWidget.phoneId++;},
+  newId: function() {if(!Obm.Contact.PhoneWidget.phoneId) Obm.Contact.PhoneWidget.phoneId = 0; return Obm.Contact.PhoneWidget.phoneId++;},
 
   Extends: Obm.CoordonateWidget
 });
 
-Obm.EmailWidget = new Class ({
+Obm.Contact.EmailWidget = new Class ({
   kind : 'emails',
   structure : {
     address: { kind: 'text', value: '', newLine : true, label : obm.vars.labels.emailAddress},
@@ -104,12 +23,12 @@ Obm.EmailWidget = new Class ({
 
   options: {container: 'emailHolder'},
 
-  newId: function() {if(!Obm.EmailWidget.phoneId) Obm.EmailWidget.phoneId = 0; return Obm.EmailWidget.phoneId++;},
+  newId: function() {if(!Obm.Contact.EmailWidget.emailId) Obm.Contact.EmailWidget.emailId = 0; return Obm.Contact.EmailWidget.emailId++;},
 
   Extends: Obm.CoordonateWidget
 });
 
-Obm.AddressWidget = new Class ({
+Obm.Contact.AddressWidget = new Class ({
   kind : 'addresses',
   structure : {
     street: { kind: 'textarea', value: '', rows: 3, newLine : true, label : obm.vars.labels.addressStreet},
@@ -122,12 +41,12 @@ Obm.AddressWidget = new Class ({
 
   options: {container: 'addressHolder'},
 
-  newId: function() {if(!Obm.AddressWidget.phoneId) Obm.AddressWidget.phoneId = 0; return Obm.AddressWidget.phoneId++;},
+  newId: function() {if(!Obm.Contact.AddressWidget.addressId) Obm.Contact.AddressWidget.addressId = 0; return Obm.Contact.AddressWidget.addressId++;},
 
   Extends: Obm.CoordonateWidget
 });
 
-Obm.WebsiteWidget = new Class ({
+Obm.Contact.WebsiteWidget = new Class ({
   kind : 'websites',
   structure : {
     url: { kind: 'text', value: '', newLine : true, label: obm.vars.labels.websiteUrl},
@@ -136,12 +55,12 @@ Obm.WebsiteWidget = new Class ({
 
   options: {container: 'websiteHolder'},
 
-  newId: function() {if(!Obm.WebsiteWidget.phoneId) Obm.WebsiteWidget.phoneId = 0; return Obm.WebsiteWidget.phoneId++;},
+  newId: function() {if(!Obm.Contact.WebsiteWidget.websiteId) Obm.Contact.WebsiteWidget.websiteId = 0; return Obm.Contact.WebsiteWidget.websiteId++;},
 
   Extends: Obm.CoordonateWidget
 });
 
-Obm.IMWidget = new Class ({
+Obm.Contact.IMWidget = new Class ({
   kind : 'ims',
   structure : {
     address: { kind: 'text', value: '', newLine : true, label: obm.vars.labels.imAddress},
@@ -150,7 +69,7 @@ Obm.IMWidget = new Class ({
 
   options: {container: 'imHolder'},
   
-  newId: function() {if(!Obm.IMWidget.phoneId) Obm.IMWidget.phoneId = 0; return Obm.IMWidget.phoneId++;},
+  newId: function() {if(!Obm.Contact.IMWidget.imId) Obm.Contact.IMWidget.imId = 0; return Obm.Contact.IMWidget.imId++;},
 
   Extends: Obm.CoordonateWidget
 });

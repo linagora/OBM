@@ -120,6 +120,89 @@ String.prototype.pad = function(l, s, t){
 Number.prototype.pad = function(l,s,t) { 
   return this.toString().pad(l,s,t);
 }
+
+Obm.CoordonateWidget = new Class({
+  Implements: Options,
+
+  newId: function() { return 0;},
+
+  setValues: function() {
+    this.structure = $merge.run([this.structure].extend(arguments));
+  },
+
+  initialize: function(fields, options) {
+    this.id = this.newId();
+    this.setOptions(options);
+    this.setValues(fields);
+    this.table = new Element('table');
+    this.element = new Element('tbody');
+    this.table.adopt(this.element);
+    this.container = $(this.options.container);
+    this.displayForm(); 
+    this.container.adopt(this.table);
+    OverText.update();
+  },    
+
+  displayForm: function() {
+    for (var field in this.structure){
+      var data = this.structure[field]
+      if(data.newLine == true) {line =  new Element('tr'); this.element.adopt(line);}
+      if(data.newCell == true || data.newLine == true) {cell = new Element('th');line.adopt(cell);}
+      if(!data.newCell && !data.newLine) cell.adopt(new Element('br'));
+      cell.adopt(this.makeField(field, data));
+      new OverText(cell.getElements('input, textarea'));
+    }
+    line.adopt(new Element('td').adopt(
+      new Element('a').appendText(obm.vars.labels.remove)
+        .addEvent('click', function() {this.element.dispose();OverText.update();}.bind(this))
+        .setStyle('cursor','pointer')
+      )
+    );
+  },
+
+  makeField: function(fieldName, field) {
+    switch (field.kind) {
+      case 'text' :
+        var element = new Element('input').setProperties({
+          'type' : 'text',
+          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']',
+          'alt' : field.label,
+          'title' : field.label
+        }).set('inputValue',field.value);
+        break;
+      case 'select' :
+        var element = new Element('select').setProperties({
+          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']',
+          'alt' : field.label,
+          'title' : field.label
+        });
+        for (var option in field.token) {
+          element.adopt(new Element('option').appendText(field.token[option]).setProperty('value', option));
+        }
+        element.set('inputValue', field.value);
+        break;
+      case 'autocomplete.local' :
+        var element = new Element('input').setProperties({'type' : 'text','value' : field.value});
+        new Autocompleter.Local(element, field.token, {
+          'minLength': 0, 
+          'overflow': true,
+          'selectMode': 'type-ahead',
+          'multiple': field.multiple      
+          });
+        break;        
+      case 'textarea' :
+        var element = new Element('textarea').setProperties({
+          'rows' : field.rows,
+          'name' : this.kind + '[' + this.id + ']' + '[' + fieldName + ']',
+          'alt' : field.label,
+          'title' : field.label
+        }).set('inputValue',field.value);
+        break;        
+    }
+
+    return element;
+  }
+});
 /**
  *  
  */
