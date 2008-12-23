@@ -120,8 +120,10 @@ sub _init {
     my $domainSid = $self->{'parent'}->getDesc('samba_sid');
     if( !$domainSid ) {
         $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 3 );
-        $self->_log( 'droit samba annulé', 2 );
-        $hostDesc->{'host_samba'} = 0;
+        if( $hostDesc->{'host_samba'} ) {
+            $self->_log( 'droit samba annulé', 2 );
+            $hostDesc->{'host_samba'} = 0;
+        }
     }
 
     # Les informations Samba
@@ -133,8 +135,10 @@ sub _init {
 
         if( $self->getNTLMPasswd( $hostDesc->{'host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
             $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 3 );
-            $self->_log( 'droit samba annulé', 2 );
-            $hostDesc->{'host_samba'} = 0;
+            if( $hostDesc->{'host_samba'} ) {
+                $self->_log( 'droit samba annulé', 2 );
+                $hostDesc->{'host_samba'} = 0;
+            }
         }
     }else {
         $hostDesc->{'host_samba'} = 0;
