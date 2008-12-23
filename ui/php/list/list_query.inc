@@ -497,23 +497,12 @@ function run_query_list_contacts_list($list, $entity="") {
   // Addresses are taken from contact or from company (if empty for contact)
 
   if ( (strcmp($sql_order_field,"address")==0) ) {
-    $order = "contact_address1";
-    $order_next = ", contact_address2, contact_address3, contact_zipcode, contact_town, company_address1, company_address2, company_address3, company_zipcode, company_town";
-  } else if (strcmp($sql_order_field,"address1")==0) {
-    $order = "contact_address1";
-    $order_next = ", company_address1";
-  } else if (strcmp($sql_order_field,"address2")==0) {
-    $order = "contact_address2";
-    $order_next = ", company_address2";
-  } else if (strcmp($sql_order_field,"address3")==0) {
-    $order = "contact_address3";
-    $order_next = ", company_address3";
+    $order = "address_street";
+    $order_next = ", address_zipcode, address_town";
   } else if (strcmp($sql_order_field,"zipcode")==0) {
-    $order = "contact_zipcode";
-    $order_next = ", company_zipcode";
+    $order = "address_zipcode";
   } else if (strcmp($sql_order_field,"town")==0) {
-    $order = "contact_town";
-    $order_next = ", company_town";
+    $order = "address_town";
   } else if (trim($sql_order_field) == "") {
     $order = "contact_lastname";
   } else {
@@ -540,36 +529,21 @@ function run_query_list_contacts_list($list, $entity="") {
          contact_lastname,
          contact_firstname,
          contact_service,
-         contact_address1,
-         contact_address2,
-         contact_address3,
-         contact_zipcode,
-         contact_town,
-         contact_expresspostal,
-         contact_country_iso3166,
-         ctry1.country_name as contact_country,
+         address_street,
+         address_zipcode,
+         address_town,
+         address_expresspostal,
+         address_country_iso3166,
+         country_name,
          contact_function_id,
          contactfunction_label,
          contact_title,
-         contact_phone,
-         contact_homephone,
-         contact_mobilephone,
-         contact_fax,
-         contact_email,
+         phone_number,
+         email_address,
          contact_comment,
          contact_privacy,
          company_id,
-         company_name,
-         company_phone,
-         company_fax,
-         company_address1,
-         company_address2,
-         company_address3,
-         company_zipcode,
-         company_town,
-         company_expresspostal,
-         ctry2.country_name as company_country,
-         $if_country as country_name
+         company_name
       FROM ContactList
          LEFT JOIN Contact ON contactlist_contact_id=contact_id
          LEFT JOIN Company ON Contact.contact_company_id = Company.company_id

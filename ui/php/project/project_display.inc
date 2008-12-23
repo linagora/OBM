@@ -1520,7 +1520,6 @@ function html_project_task_form($ptask_q, $project) {
 	  $selected = '';
 	}
 	$sel_ptask .= "<option value=\"$ptask_id\" $selected>$ptask_label</option>\n";
-	$js_task .= "parent_pos[$ptask_id] = $cpt_root;\n";
       }
     }
     $sel_ptask .= '</select>';
@@ -1545,20 +1544,11 @@ function html_project_task_form($ptask_q, $project) {
 	$selected = '';
       }
       $sel_task .= "<option value=\"$task_id\" $selected>$prefix$task_label</option>\n";
-      $js_task .= "parent_task[$task_id] = $parent;\n";
     }
 
     $sel_task .= '</select>';
     $ptask_q->seek(0);
   }
-
-  $js_script = "
-    <script type=\"text/javascript\">
-      parent_pos = new Object();
-      parent_task = new Object();
-      parent_pos[0] = 0;
-      $js_task
-    </script>\n";
 
   $display['title'] = $pname;
 

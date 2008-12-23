@@ -175,13 +175,10 @@ function run_query_contact_search($contact) {
 
   // Order exceptions (order on calculated rows)
   if (strcmp($sql_order_field,'contact_address') == 0) {
-    $order = 'contact_address1';
-    $order_next = ', contact_address2, contact_address3, contact_zipcode, contact_town';
+    $order = 'address_street';
+    $order_next = ', street_zipcode, street_town';
   } else if (strcmp($sql_order_field,'country_name') == 0) {
     $order = 'country_name';
-    if ($cgp_show['module']['company']) {
-      $order_next = ', company_country';
-    }
   }
   $orderq = " ORDER BY $order $sql_order_dir $order_next";
   $selectFields = "
