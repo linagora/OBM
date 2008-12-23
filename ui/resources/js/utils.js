@@ -53,14 +53,16 @@ Obm.Observer = new Class({
 
 
 HideTimer = new Class({
+  Implements: Options,   
 
-  setOptions: function(options) {
-    this.options = Object.extend({
-      duration: 1000,
-      fn: this.hideElement.bind(this),
-      elems: new Array()
-    }, options || {});
-
+  options : {
+    duration: 1000,
+    fn: function() {
+      this.el.setStyle('display','none');
+      this.el.setStyle('visibility','hidden');
+      overListBoxFix(this.el,'none');
+    },
+    elems: new Array()
   },
 
   initialize: function(el,options) {
@@ -69,12 +71,12 @@ HideTimer = new Class({
     this.timer = null;
     if(this.options.elems.length > 0) {
       this.options.elems.each(function (element) {
-        element.addEvent('mouseover',this.clearTimer.bind(this));
-        element.addEvent('mouseout',this.initTimer.bind(this));
+        element.addEvent('mouseenter',this.clearTimer.bind(this));
+        element.addEvent('mouseleave',this.initTimer.bind(this));
       }.bind(this));
     }
-    this.el.addEvent('mouseover',this.clearTimer.bind(this));
-    this.el.addEvent('mouseout',this.initTimer.bind(this));
+    this.el.addEvent('mouseenter',this.clearTimer.bind(this));
+    this.el.addEvent('mouseleave',this.initTimer.bind(this));
   },
   
   initTimer: function() {
@@ -101,11 +103,6 @@ HideTimer = new Class({
     }
   },
 
-  hideElement: function() {
-    this.el.setStyle('display','none');
-    this.el.setStyle('visibility','hidden');
-    overListBoxFix(this.el,'none');
-  },
   
   exec: function() {
     this.options.fn.delay(1);

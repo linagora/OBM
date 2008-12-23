@@ -414,3 +414,5 @@ $mj_date_incompatibility = "La date de fin ne peut être antérieure a la date d
 $mj_repeat_date_incompatibility = "La date de fin de répétition ne peut être antérieure a la date de début."; 
 $mj_event_delete_confirm = "Confirmer la suppression de l'événement ?"; 
 $mj_event_delete_all_confirm = "Confirmer la suppression de l'événement et de toutes ses répétitions ?"; 
+$l_confirm_reset = 'Cette opération videra complétement votre calendrier et annulera votre participation à toutes les réunions où vous avez été convié.Êtes-vous sûr de vouloir poursuivre ?';
+$l_js_confirm_reset = 'Cette opération ne pourras être annulée, voulez-vous poursuivre ?';

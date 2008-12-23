@@ -1099,6 +1099,7 @@ Obm.CalendarQuickForm = new Class({
   },
   
   compute: function(ivent, context) {
+    ivent = new Event(ivent)
     var target = ivent.target;
     target = $(target);
     if(obm.calendarManager.redrawLock || target.get('tag') == 'a') {

@@ -1775,6 +1775,7 @@ var OverText = new Class({
 			if (!txt || !el.getParent()) return;
 			this.testOverTxt(el);
 			txt.setPosition($merge(this.options.positionOptions, {relativeTo: el}));
+                        txt.setStyle('width', el.getStyle('width'));
 			if (el.offsetHeight) this.testOverTxt(el);
 			else this.hideTxt(el);
 		} catch(e){

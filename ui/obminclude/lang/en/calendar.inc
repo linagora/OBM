@@ -401,3 +401,5 @@ This message was sent on %s at %s by OBM
 %s";
 
 
+$l_confirm_reset = 'This will completly reset your calendar, and will cancell all your scheduled meetings. Are you sure you want to continue?';
+$l_js_confirm_reset = 'This cannot be canceled, do you want to continue ?';

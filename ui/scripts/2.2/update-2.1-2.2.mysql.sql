@@ -1217,10 +1217,10 @@ INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT 
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT mailshareentity_entity_id, NULL FROM MailshareEntity WHERE mailshareentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT resourceentity_entity_id, NULL FROM ResourceEntity WHERE resourceentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT mailboxentity_entity_id, NULL FROM MailboxEntity WHERE mailboxentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
-UPDATE EntityRight SET entityright_access = 1 WHERE entityright_consumer_id IS NULL;
+UPDATE EntityRight SET entityright_access = 1;
 
 
-DELETE FROM EntityRight WHERE entityright_entity != 'entity';
+DELETE FROM EntityRight WHERE entityright_entity != 'entity' AND entityright_consumer_id IS NOT NULL;
 ALTER TABLE EntityRight DROP COLUMN entityright_entity;
 ALTER TABLE EntityRight DROP COLUMN entityright_consumer;
 
