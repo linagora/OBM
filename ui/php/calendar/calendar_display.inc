@@ -3620,7 +3620,25 @@ function dis_calendar_export_handle($calendar) {
   echo $writer->buffer;
 }
 
+/**
+ * dis_calendar_reset 
+ * 
+ * @access public
+ * @return void
+ */
+function dis_calendar_reset() {
+  global $path, $l_confirm_reset, $l_cancel, $l_confirm,$l_js_confirm_reset;
+  $block = "
+    
+    <div class=\"buttons\">
+      <h1>$l_confirm_reset</h1>
+      <a href='$path/calendar/calendar_index.php'>$l_cancel</a>
+      <a href='$path/calendar/calendar_index.php?action=reset&amp;force=1' onclick=\"return confirm('$l_js_confirm_reset');\">$l_confirm</a>
+    </div>
+    <p class=\"LC\" />" ;
 
+  return $block ;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Import iCalendar file
 ///////////////////////////////////////////////////////////////////////////////

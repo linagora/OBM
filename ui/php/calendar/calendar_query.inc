@@ -3985,7 +3985,7 @@ function run_query_calendar_reset($id) {
   $query = "SELECT event_id FROM Event
             INNER JOIN EventLink ON event_id = eventlink_event_id
             INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
-            WHERE (event_type='VEVENT' AND event_owner $sql_id AND eventlink_entity_id = $id')
+            WHERE (event_type='VEVENT' AND event_owner = $id AND userentity_user_id = $id)
             UNION
             SELECT event_id FROM Event
             INNER JOIN EventLink ON event_id = eventlink_event_id
@@ -4001,7 +4001,7 @@ function run_query_calendar_reset($id) {
   }
 
   # Refuse all other events
-  $query = "SELECT eventlink_event_id FROM EventLink INNER JOIN UserEntity userentity_entity_id = eventlink_entity_id ON WHERE userentity_entity_id = $id 
+  $query = "SELECT eventlink_event_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id WHERE userentity_user_id = $id 
             AND eventlink_state != 'DECLINED'";
   $obm_q->query($query);
   while($obm_q->next_record()) {

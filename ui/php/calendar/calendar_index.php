@@ -523,6 +523,14 @@ if ($action == 'index') {
   }
   $display['detail'] .= dis_calendar_admin_index();
 
+} elseif ($action == 'reset')  {
+///////////////////////////////////////////////////////////////////////////////
+  if(!$params['force']) {
+    $display['detail'] .= dis_calendar_reset($params);
+  } else {
+    run_query_calendar_reset($obm['uid']);
+    $display['detail'] .= dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
+  }
 } elseif ($action == 'import')  {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] .= dis_icalendar_import($params);
@@ -1004,6 +1012,13 @@ function get_calendar_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('all') 
                                        );
+// Reset Calendar
+  $actions['calendar']['reset'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=reset",
+    'Right'    => $cright_write,
+    'Condition'=> array ('none') 
+  );
+
 // Insert ICalendar (insert the events)
   $actions['calendar']['ics_insert'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=ics_insert",
