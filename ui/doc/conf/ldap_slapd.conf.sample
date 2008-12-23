@@ -51,7 +51,7 @@ _COMMENT_moduleload      back_bdb
 
 # The maximum number of entries that is returned for a search operation
 # You can put no limit for authenticated user - see below
-sizelimit unlimited
+sizelimit 500
 
 # The tool-threads parameter sets the actual amount of cpu's that is used
 # for indexing.
@@ -158,8 +158,8 @@ lastmod         on
 
 
 ## BEGIN Common ACLs
-## Allow obmSatellite athenticated requests without response limits
-#limits dn.exact="uid=obmsatellite,ou=sysusers,dc=local" size=unlimited
+## Allows obmSatellite authentificated requests without response limits
+limits dn.exact="uid=obmsatellite,ou=sysusers,dc=local" size=unlimited
 
 ## ACL sample to limit access on entries in relation to 'hiddenUser'
 ## attribute
