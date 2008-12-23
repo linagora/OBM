@@ -21,6 +21,7 @@ use OBM::Entities::commonEntities qw(
         setUpdated
         unsetUpdated
         getUpdated
+        getDesc
         setUpdateEntity
         getUpdateEntity
         isMailAvailable
@@ -139,7 +140,7 @@ sub _init {
         $hostDesc->{'host_samba'} = 0;
     }
 
-    $self->{'hostDesc'} = $hostDesc;
+    $self->{'entityDesc'} = $hostDesc;
 
     $self->_log( 'chargement : '.$self->getDescription(), 1 );
 
@@ -150,7 +151,7 @@ sub _init {
 # Needed
 sub getDescription {
     my $self = shift;
-    my $hostDesc = $self->{'hostDesc'};
+    my $hostDesc = $self->{'entityDesc'};
 
     my $description = 'hôte d\'ID \''.$hostDesc->{'host_id'}.'\', nom \''.$hostDesc->{'host_name'}.'\'';
 
@@ -159,23 +160,10 @@ sub getDescription {
 
 
 # Needed
-sub getDesc {
-    my $self = shift;
-    my( $desc ) = @_;
-
-    if( $desc && !ref($desc) ) {
-        return $self->{'hostDesc'}->{$desc};
-    }
-
-    return undef;
-}
-
-
-# Needed
 sub getDomainId {
     my $self = shift;
 
-    return $self->{'hostDesc'}->{'host_domain_id'};
+    return $self->{'entityDesc'}->{'host_domain_id'};
 }
 
 
@@ -183,7 +171,7 @@ sub getDomainId {
 sub getId {
     my $self = shift;
 
-    return $self->{'hostDesc'}->{'host_id'};
+    return $self->{'entityDesc'}->{'host_id'};
 }
 
 
@@ -240,7 +228,7 @@ sub getDnPrefix {
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'cn='.$self->{'hostDesc'}->{'host_name'}.','.$rootDn->[$i] );
+        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'host_name'}.','.$rootDn->[$i] );
         $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
@@ -259,9 +247,9 @@ sub getCurrentDnPrefix {
         return undef;
     }
 
-    my $currentHostName = $self->{'hostDesc'}->{'host_name_current'};
+    my $currentHostName = $self->{'entityDesc'}->{'host_name_current'};
     if( !$currentHostName ) {
-        $currentHostName = $self->{'hostDesc'}->{'host_name'};
+        $currentHostName = $self->{'entityDesc'}->{'host_name'};
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
@@ -283,7 +271,7 @@ sub _getLdapObjectclass {
     }
 
     for( my $i=0; $i<=$#$objectclass; $i++ ) {
-        if( (lc($objectclass->[$i]) eq 'sambasamaccount') && !$self->{'hostDesc'}->{'host_samba'} ) {
+        if( (lc($objectclass->[$i]) eq 'sambasamaccount') && !$self->{'entityDesc'}->{'host_samba'} ) {
             push( @{$deletedObjectclass}, $objectclass->[$i] );
             next;
         }
@@ -293,7 +281,7 @@ sub _getLdapObjectclass {
 
     # Si le droit Samba est actif, on s'assure de la présence des classes
     # nécessaires - nécessaires pour les MAJ
-    if( $self->{'hostDesc'}->{'host_samba'} ) {
+    if( $self->{'entityDesc'}->{'host_samba'} ) {
         $realObjectClass{'sambaSamAccount'} = 1;
     }
 
@@ -318,13 +306,13 @@ sub createLdapEntry {
 
     $entry->add(
         objectClass => $self->_getLdapObjectclass(),
-        cn => $self->{'hostDesc'}->{'host_name'},
-        ipHostNumber => $self->{'hostDesc'}->{'host_ip'}
+        cn => $self->{'entityDesc'}->{'host_name'},
+        ipHostNumber => $self->{'entityDesc'}->{'host_ip'}
     );
 
     # La description
-    if( $self->{'hostDesc'}->{'host_description'} ) {
-        $entry->add( description => $self->{'hostDesc'}->{'host_description'} );
+    if( $self->{'entityDesc'}->{'host_description'} ) {
+        $entry->add( description => $self->{'entityDesc'}->{'host_description'} );
     }
     
     # Le domaine OBM
@@ -333,31 +321,31 @@ sub createLdapEntry {
     }
 
     # Le nom windows
-    if( $self->{'hostDesc'}->{'host_login'} ) {
-        $entry->add( uid => $self->{'hostDesc'}->{'host_login'} );
+    if( $self->{'entityDesc'}->{'host_login'} ) {
+        $entry->add( uid => $self->{'entityDesc'}->{'host_login'} );
     }
 
     # Le SID de l'hôte
-    if( $self->{'hostDesc'}->{'host_samba_sid'} ) {
-        $entry->add( sambaSID => $self->{'hostDesc'}->{'host_samba_sid'} );
+    if( $self->{'entityDesc'}->{'host_samba_sid'} ) {
+        $entry->add( sambaSID => $self->{'entityDesc'}->{'host_samba_sid'} );
     }
 
     # Le groupe de l'hôte
-    if( $self->{'hostDesc'}->{'host_samba_group_sid'} ) {
-        $entry->add( sambaPrimaryGroupSID => $self->{'hostDesc'}->{'host_samba_group_sid'} );
+    if( $self->{'entityDesc'}->{'host_samba_group_sid'} ) {
+        $entry->add( sambaPrimaryGroupSID => $self->{'entityDesc'}->{'host_samba_group_sid'} );
     }
 
     # Les flags de l'hôte Samba
-    if( $self->{'hostDesc'}->{'host_samba_flags'} ) {
-        $entry->add( sambaAcctFlags => $self->{'hostDesc'}->{'host_samba_flags'} );
+    if( $self->{'entityDesc'}->{'host_samba_flags'} ) {
+        $entry->add( sambaAcctFlags => $self->{'entityDesc'}->{'host_samba_flags'} );
     }
 
     # Les mots de passes windows
-    if( $self->{'hostDesc'}->{'host_lm_passwd'} ) {
-        $entry->add( sambaLMPassword => $self->{'hostDesc'}->{'host_lm_passwd'} );
+    if( $self->{'entityDesc'}->{'host_lm_passwd'} ) {
+        $entry->add( sambaLMPassword => $self->{'entityDesc'}->{'host_lm_passwd'} );
     }
-    if( $self->{'hostDesc'}->{'host_nt_passwd'} ) {
-        $entry->add( sambaNTPassword => $self->{'hostDesc'}->{'host_nt_passwd'} );
+    if( $self->{'entityDesc'}->{'host_nt_passwd'} ) {
+        $entry->add( sambaNTPassword => $self->{'entityDesc'}->{'host_nt_passwd'} );
     }
 
     return 0;
@@ -397,12 +385,12 @@ sub updateLdapEntry {
     
     
         # La description
-        if( $self->_modifyAttr( $self->{'hostDesc'}->{'host_description'}, $entry, 'description' ) ) {
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_description'}, $entry, 'description' ) ) {
             $update = 1;
         }
     
         # L'adresse IP
-        if( $self->_modifyAttr( $self->{'hostDesc'}->{'host_ip'}, $entry, 'ipHostNumber' ) ) {
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_ip'}, $entry, 'ipHostNumber' ) ) {
             $update = 1;
         }
     
@@ -414,36 +402,36 @@ sub updateLdapEntry {
         }
     
         # Le nom windows
-        if( $self->_modifyAttr( $self->{'hostDesc'}->{'host_login'}, $entry, 'uid' ) ) {
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_login'}, $entry, 'uid' ) ) {
             $update = 1;
         }
     
-        if( $self->{'hostDesc'}->{'host_samba_sid'} ) {
+        if( $self->{'entityDesc'}->{'host_samba_sid'} ) {
             my @currentLdapHostSambaSid = $entry->get_value( 'sambaSID', asref => 1 );
             if( $#currentLdapHostSambaSid < 0 ) {
                 # Si le SID de l'hôte n'est pas actuellement dans LDAP mais est
                 # dans la description de l'hôte, c'est qu'on vient de ré-activer
                 # le droit samba de l'hôte. Il faut donc placer les mots dexi
                 # passes.
-                if( $self->_modifyAttr( $self->{'hostDesc'}->{'host_lm_passwd'}, $entry, 'sambaLMPassword' ) ) {
-                    $self->_modifyAttr( $self->{'hostDesc'}->{'host_nt_passwd'}, $entry, 'sambaNTPassword' );
+                if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_lm_passwd'}, $entry, 'sambaLMPassword' ) ) {
+                    $self->_modifyAttr( $self->{'entityDesc'}->{'host_nt_passwd'}, $entry, 'sambaNTPassword' );
                     $update = 1;
                 }
             }
         }
     
         # Le SID de l'hôte
-        if( $self->_modifyAttr( $self->{'hostDesc'}->{'host_samba_sid'}, $entry, 'sambaSID' ) ) {
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_samba_sid'}, $entry, 'sambaSID' ) ) {
             $update = 1;
         }
     
         # Le groupe de l'hôte
-        if( $self->_modifyAttr( $self->{'hostDesc'}->{'host_samba_group_sid'}, $entry, 'sambaPrimaryGroupSID' ) ) {
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_samba_group_sid'}, $entry, 'sambaPrimaryGroupSID' ) ) {
             $update = 1;
         }
     
         # Les flags de l'hôte Samba
-        if( $self->_modifyAttr( $self->{'hostDesc'}->{'host_samba_flags'}, $entry, 'sambaAcctFlags' ) ) {
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_samba_flags'}, $entry, 'sambaAcctFlags' ) ) {
             $update = 1;
         }
     }
