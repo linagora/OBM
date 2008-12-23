@@ -13,8 +13,8 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames['resource_name'] = $l_name;
-$fieldnames['resource_description'] = $l_desc; // description
-$fieldnames['resource_qty'] = $l_qty; // quantity
+$fieldnames['resource_description'] = $l_desc;
+$fieldnames['resource_qty'] = $l_qty;
 $fieldnames['resourcetype_label'] = $l_rtype;
 $fieldnames['resource_id'] = $l_update;
 
@@ -608,8 +608,7 @@ function dis_resource_admin_index($params) {
  * @return Resource Type HTML code
  */
 function html_resource_resourcetype_form($rt_q) {
-  global $l_rtype_manage;
-  global $l_label, $l_rtype_property, $l_rtype_kind;
+  global $l_rtype_manage, $l_label, $l_rtype_property;
   global $l_c_new, $l_rtype_insert, $l_rtype_update, $l_rtype_checkdelete;
   global $ico_delete, $ico_ok;
 
@@ -710,8 +709,6 @@ function html_resource_resourceitem_form($ri_q) {
   global $ico_ok, $ico_delete, $l_confirm_delete_item;
   global $l_j_create_type_first;
 
-
-
   $key = 0;
   while($ri_q->next_record()) {
     $id = $ri_q->f('resourceitem_id');
@@ -759,14 +756,14 @@ function html_resource_resourceitem_form($ri_q) {
     </tr>";
   }
 
-	$rt_q = run_query_resourcetype();
+  $rt_q = run_query_resourcetype();
 
-  $disabled = "";
-  $onclick = "";
+  $disabled = '';
+  $onclick = '';
   if ($rt_q->num_rows() == 0) {
-  	$disabled = "disabled=\"true\"";
-  	$onclick = "onclick=\"alert('$l_j_create_type_first')\"";
-	}
+    $disabled = "disabled=\"true\"";
+    $onclick = "onclick=\"alert('$l_j_create_type_first')\"";
+  }
 
   $sel_type = "<select name=\"sel_rtype\" id=\"sel_rtype_$id\">";
   while($rt_q->next_record()) {
@@ -778,7 +775,6 @@ function html_resource_resourceitem_form($ri_q) {
       $selected = '';
     }
     $sel_type .= "<option value=\"$rtype_id\">$rtype_label</option>";
-
   }
   $sel_type .= '</select>';
 

@@ -253,7 +253,7 @@ function run_query_resource_insert($resource) {
     null,
     '".date('Y-m-d H:i:s')."',
     null,
-     $obm[uid],
+    $obm[uid],
     $domain_id,
     $rtype,
     '$name',
