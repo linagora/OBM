@@ -87,3 +87,8 @@ $l_j_select_company = "Vous devez sélectionner une société !";
 
 // For the display preferences modification screen 
 $l_company_display = "Options d'affichage des listes de sociétés";
+
+$l_phone_labels = array ('WORK_VOICE' => 'Téléphone', 'CELL_VOICE' => 'Téléphone portable', 'WORK_FAX' => 'Fax', 'OTHER' => 'Autre téléphone');
+$l_email_labels = array ('INTERNET' => 'Internet', 'OTHER' => 'Autre');
+$l_address_labels = array ('HOME' => 'Domicile', 'WORK' => 'Bureau', 'OTHER' => 'Autre');
+$l_website_labels = array ('URL' => 'Site web', 'BLOG' => 'Log internet', 'OTHER' => 'Autre');

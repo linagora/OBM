@@ -118,7 +118,7 @@ $l_remove = 'Remove';
 $l_vcf_file = 'VCF file to import';
 $l_street = 'Street';
 
-$l_phone_labels = array ('HOME;VOICE' => 'Home phone', 'WORK;VOICE' => 'Work phone', 'CELL;VOICE' => 'Mobile phone', 'HOME;FAX' => 'Home fax', 'WORK;FAX' => 'Work fax', 'PAGER' => 'Pager', 'OTHER' => 'Other phone');
+$l_phone_labels = array ('HOME_VOICE' => 'Home phone', 'WORK_VOICE' => 'Work phone', 'CELL_VOICE' => 'Mobile phone', 'HOME_FAX' => 'Home fax', 'WORK_FAX' => 'Work fax', 'PAGER' => 'Pager', 'OTHER' => 'Other phone');
 $l_email_labels = array ('INTERNET' => 'Home', 'OTHER' => 'Other');
 $l_address_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');
 $l_website_labels = array ('URL' => 'Homepage', 'BLOG' => 'Blog', 'OTHER' => 'Other');

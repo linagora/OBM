@@ -77,18 +77,22 @@ function run_query_company_search($company) {
     $where .= " $and company_phone $like '$phone%'";
     $and = 'AND';
   }
+  
+  // Address criteria
+  $addr = '';
   if ($town != '') {
-    $where .= " $and company_town $like '$town%'";
-    $and = 'AND';
+    $addr .= " AND address_town $like '$town%'";
   }
   if (($ctry != $c_all) && ($ctry != '')) { 
-    $where .= " $and company_country_iso3166='$ctry'";
-    $and = 'AND';
+    $addr .= " AND address_country='$ctry'";
   }
   if ($zip != '') {
-    $where .= " $and company_zipcode $like '$zip%'";
-    $and = 'AND';
+    $addr .= " AND address_zipcode $like '$zip%'";
   }
+  if($addr != '') {
+    $where .= " AND company_id IN (SELECT companyentity_company_id FROM CompanyEntity INNER JOIN Address ON companyentity_entity_id = address_entity_id WHERE 1=1 ".$addr.")";
+  }
+  
   if ($dateafter != '') {
     $where .= " $and (company_timeupdate > '$dateafter'
                      OR company_timecreate > '$dateafter')";
@@ -175,9 +179,7 @@ function run_query_company_search($company) {
          LEFT JOIN CompanyType ON company_type_id=companytype_id
          $join_userdata
          LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id
-         LEFT JOIN CompanyNafCode ON company_nafcode_id=companynafcode_id
-         LEFT JOIN Country ON company_country_iso3166=country_iso3166
-                   AND country_lang='$lang'";
+         LEFT JOIN CompanyNafCode ON company_nafcode_id=companynafcode_id";
 
   if ((! $fuzzy) || ($name == '')) {
     // If result limited, we get the global rows number

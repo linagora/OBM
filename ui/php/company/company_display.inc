@@ -1002,6 +1002,28 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
 
   $uid = $obm['uid'];
   $lang = get_lang();
+  
+  $GLOBALS['js']['vars']['labels']['label'] = $l_label;
+  $GLOBALS['js']['vars']['labels']['remove'] = $l_remove;
+  $GLOBALS['js']['vars']['labels']['phoneLabel'] = $l_phone_labels;
+  $GLOBALS['js']['vars']['labels']['emailLabel'] = $l_email_labels;
+  $GLOBALS['js']['vars']['labels']['addressLabel'] = $l_address_labels;
+  $GLOBALS['js']['vars']['labels']['websiteLabel'] = $l_website_labels;
+  $GLOBALS['js']['vars']['labels']['phoneNumber'] = $l_number;
+  $GLOBALS['js']['vars']['labels']['emailAddress'] = $l_email;
+  $GLOBALS['js']['vars']['labels']['websiteUrl'] = $l_website;
+  $GLOBALS['js']['vars']['labels']['imAddress'] = $l_im;
+  $GLOBALS['js']['vars']['labels']['addressStreet'] = $l_street;
+  $GLOBALS['js']['vars']['labels']['addressTown'] = $l_town;
+  $GLOBALS['js']['vars']['labels']['addressZipcode'] = $l_postcode;
+  $GLOBALS['js']['vars']['labels']['addressExpressPostal'] = $l_expresspostal; 
+  $GLOBALS['js']['vars']['labels']['addressCountry'] = $l_country;
+
+
+  $GLOBALS['js']['vars']['labels']['countries']['none'] = '---';
+  while($ctry_q->next_record()) {
+    $GLOBALS['js']['vars']['labels']['countries'][$ctry_q->f('country_iso3166')] = $ctry_q->f('country_name');
+  }
 
   // if update mode and first display values are taken from database
   if ($action == 'detailupdate') {
@@ -1075,8 +1097,6 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
   $show_vat = (! $cgp_hide['company']['company_vat']);
   $show_siret = (! $cgp_hide['company']['company_siret']);
   $show_naf = (! $cgp_hide['company']['nafcode']);
-  $show_ad3 = (! $cgp_hide['company']['company_address3']);
-  $show_cdx = (! $cgp_hide['company']['company_expresspostal']);
 
   // User defined data
   $block_userdata = of_userdata_dis_entity_form('company', $id, $company);
@@ -1145,64 +1165,7 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
     }
   }
   $sel_market .= "</select>";
-  
-  // Address 3 field
-  if ($show_ad3) {
-    $block_ad3 = "
-  </tr><tr>
-    <th>$l_address 3</th>
-    <td><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" /></td>";
-  }
-  
-  // Cedex field
-  if ($show_cdx) {
-    $block_cdx = "
-  </tr><tr>
-    <th>$l_expresspostal</th>
-    <td><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"16\" size=\"16\" value=\"$cdx\" /></td>";
-  }
 
-  // Country select
-  $sel_ctry = "<select name=\"sel_country\" id=\"sel_country\" onChange=\"
-    if (trim(this.form.tf_phone.value) == '') {
-      this.form.tf_phone.value = country_phone[this.options[this.selectedIndex].value];
-    }
-  \">
-  <option value=\"$c_undef\">$l_undef</option>";
-
-  $js_ctry = "<script type=\"text/javascript\">
-    var country_phone = new Array ();
-    country_phone[0] = '';
-    ";
-  while ($ctry_q->next_record()) {
-    $c_iso3166 = $ctry_q->f('country_iso3166');
-    $c_name = $ctry_q->f('country_name');
-    $c_phone = $ctry_q->f('country_phone');
-    $sel_ctry .= "\n<option value=\"$c_iso3166\"";
-    if ($c_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
-    $sel_ctry .= ">$c_name</option>";
-    $js_ctry .= "country_phone['$c_iso3166'] = '$c_phone';\n";
-  }
-  $sel_ctry .= '</select>';
-  $js_ctry .= '
-  </script>';
-
-  // Email link
-  if (($action=='detailupdate') || ($action=='update')) { 
-    if ($email != '') {
-      $link_email = "<a href=\"mailto:$email\">
-      <img src=\"$ico_mail\" alt=\"$email\" /></a>";
-    } else { $link_email = '&nbsp;'; }
-  } else { $link_email = '&nbsp;'; }
-
-  // Web link
-  if (($action=='detailupdate') || ($action=='update')) {
-    if ($web != '') {
-      $link_web = "<a target=\"_blank\" href=\"$web\">
-      <img src=\"$ico_web\" alt=\"$web\" /></a>";
-    } else { $link_web = '&nbsp;'; }
-  } else { $link_web = '&nbsp;'; }
-  
   // User comment select construction
   $sel_usercomment = "<select name=\"sel_usercomment\">";
   if (is_array($users)) {
@@ -1237,6 +1200,63 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
     <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
     <input type=\"submit\" value=\"$l_insert\" />";
   }
+  
+  // PHONES
+  if(is_array($phones)) {
+    foreach($phones as $phone) {
+      if(trim($phone['number'])) {
+        $params = array();
+        foreach($phone as $field  => $value) {
+          $value = phpStringToJsString($value);
+          $params[] = "$field: {value : '$value'}";
+        }
+        $js .=  "new Obm.Contact.PhoneWidget({".implode(',',$params)."});\n";
+      }
+    }
+  }
+  $js .= "new Obm.Contact.PhoneWidget();\n";
+  // ADDRESSES 
+  if(is_array($addresses)) {
+    foreach($addresses as $address) {
+      if(trim($address['street']) || trim($address['town']) || trim($address['country']) || trim($address['expresspostal']) || trim ($address['zipcode'])) {
+        $params = array();
+        foreach($address as $field  => $value) {
+          $value = phpStringToJsString($value);
+          $params[] = "$field: {value : '$value'}";
+        }
+        $js .=  "new Obm.Contact.AddressWidget({".implode(',',$params)."});\n";
+      }
+    }
+  }
+  $js .= "new Obm.Contact.AddressWidget();\n";
+  // EMAILS 
+  if(is_array($emails)) {
+    foreach($emails as $email) {
+      if(trim($email['address'])) {
+        $params = array();
+        foreach($email as $field  => $value) {
+          $value = phpStringToJsString($value);
+          $params[] = "$field: {value : '$value'}";
+        }
+        $js .=  "new Obm.Contact.EmailWidget({".implode(',',$params)."});\n";
+      }
+    }
+  }
+  $js .= "new Obm.Contact.EmailWidget();\n";
+  // WEBSITES 
+  if(is_array($websites)) {
+    foreach($websites as $website) {
+      if(trim($website['url'])) {
+        $params = array();
+        foreach($website as $field  => $value) {
+          $value = phpStringToJsString($value);
+          $params[] = "$field: {value : '$value'}";
+        }
+        $js .=  "new Obm.Contact.WebsiteWidget({".implode(',',$params)."});\n";
+      }
+    }
+  }
+  $js .= "new Obm.Contact.WebsiteWidget();\n";
 
   $display['title'] = $dis_title;
 
@@ -1277,42 +1297,26 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
   </tr>
   </table>
   </fieldset>
-  <fieldset class=\"detail infos\">  
-  <legend>$l_coord</legend>    
-
-  <table>
-  <tr>
-    <th>$l_address 1 :</th>
-    <td><input type=\"text\" id=\"tf_ad1\" name=\"tf_ad1\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad1\" /></td>
-  </tr><tr>
-    <th>$l_address 2 :</th>
-    <td><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad2\" /></td>
-  $block_ad3
-  </tr><tr>
-    <th>$l_postcode :</th>
-    <td><input type=\"text\" id=\"tf_zip\" name=\"tf_zip\" maxlength=\"14\" size=\"6\" value=\"$zip\" /></td>
-  </tr><tr>
-    <th>$l_town :</th>
-    <td><input type=\"text\" id=\"tf_town\" name=\"tf_town\" maxlength=\"24\" size=\"24\" value=\"$town\" /></td>
-  $block_cdx
-  </tr><tr>
-    <th>$l_country :</th>
-    <td>$sel_ctry</td>
-  </tr><tr>
-    <th>$l_phone :</th>
-    <td><input type=\"text\" id=\"tf_phone\" name=\"tf_phone\" maxlength=\"$csize_phone\" size=\"$csize_phone\" value=\"$phone\" /></td>
-  </tr><tr>
-    <th>$l_fax :</th>
-    <td><input type=\"text\" id=\"tf_fax\" name=\"tf_fax\" maxlength=\"24\" size=\"$csize_phone\" value=\"$fax\" /></td>
-  </tr><tr>
-    <th>$l_email :</th>
-    <td><input type=\"text\" id=\"tf_email\" name=\"tf_email\" maxlength=\"64\" size=\"45\" value=\"$email\" /></td>
-  </tr><tr>
-    <th>$l_web :</th>
-    <td><input type=\"text\" id=\"tf_web\" name=\"tf_web\" maxlength=\"52\" size=\"45\" value=\"$web\" /></td>
-  </tr>
-  </table>
-  </fieldset>
+  
+  <fieldset class=\"detail infos\" id='phoneHolder'>
+    <legend>$l_phone <a href='' onclick=\"new Obm.Contact.PhoneWidget();return false;\">$l_add</a></legend>
+    </fieldset>
+    <fieldset class=\"detail infos\" id='addressHolder'>
+    <legend>$l_address <a href='' onclick=\"new Obm.Contact.AddressWidget();return false;\">$l_add</a></legend>
+    </fieldset>
+    <fieldset class=\"detail infos\" id='emailHolder'>
+    <legend>$l_email <a href='' onclick=\"new Obm.Contact.EmailWidget();return false;\">$l_add</a></legend>
+    </fieldset>
+    <fieldset class=\"detail infos\" id='imHolder'>
+    <legend>$l_im <a href='' onclick=\"new Obm.Contact.IMWidget();return false;\">$l_add</a></legend>
+    </fieldset>
+    <fieldset class=\"detail infos\" id='websiteHolder'>
+    <legend>$l_website <a href='' onclick=\"new Obm.Contact.WebsiteWidget();return false;\">$l_add</a></legend>
+    </fieldset>
+    <script type='text/javascript'>
+      $js
+    </script>
+    
   <fieldset class=\"detail extra\">    
   <legend>$l_comment</legend>
     $l_add_comment
