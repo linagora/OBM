@@ -40,9 +40,14 @@ sub update {
 
     my $returnCode = 0;
     SWITCH: {
+        if( !$entity->getBdUpdate() ) {
+            $self->_log( 'l\'entité '.$entity->getDescription().' n\'est pas à mettre à jour en BD', 2 );
+            last SWITCH;
+        }
+
         if( !$entity->getUpdated() ) {
-            $self->_log( 'l\'entité de type \''.ref($entity).'\' est en erreur de traitement', 3 );
-            $self->_log( 'pas de traitement BD de l\'entité de type \''.ref($entity).'\'', 2 );
+            $self->_log( 'l\'entité '.$entity->getDescription().' est en erreur de traitement', 3 );
+            $self->_log( 'pas de traitement BD de l\'entité de '.$entity->getDescription(), 2 );
             last SWITCH;
         }
 
