@@ -162,8 +162,7 @@ sub _connect {
 
     $self->_log( 'connexion au '.$self->getDescription(), 2 );
 
-    require Cyrus::IMAP::Admin;
-    $self->{'cyrusServerConn'} = Cyrus::IMAP::Admin->new( $self->{'serverDesc'}->{'host_ip'} );
+    $self->{'cyrusServerConn'} = OBM::Cyrus::cyrusAdmin->new( $self->{'serverDesc'}->{'host_ip'} );
 
     if( !$self->{'cyrusServerConn'} ) {
         $self->{'cyrusServerConn'} = undef;
@@ -187,7 +186,7 @@ sub _connect {
 sub _ping {
     my $self = shift;
 
-    if( ref( $self->{'cyrusServerConn'} ) ne 'Cyrus::IMAP::Admin' ) {
+    if( ref( $self->{'cyrusServerConn'} ) ne 'OBM::Cyrus::cyrusAdmin' ) {
         return 0;
     }
 
@@ -342,4 +341,24 @@ sub getSieveServerConn {
 
     $self->_log( 'Obtention de la connexion Sieve à '.$self->getDescription(), 2 );
     return $sieveSrvConn;
+}
+
+
+
+# This is done to prevent a non fatal uninitialized value on 'Cyrus::IMAP::Admin' global
+# destruction
+package OBM::Cyrus::cyrusAdmin;
+
+use strict;
+
+use Cyrus::IMAP::Admin;
+our @ISA = qw(Cyrus::IMAP::Admin);
+
+use OBM::Tools::commonMethods qw(_log dump);
+
+
+sub DESTROY {
+    my $self = shift;
+
+    $self->_log( 'suppression de l\'objet', 4 );
 }
