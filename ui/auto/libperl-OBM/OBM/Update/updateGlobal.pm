@@ -24,7 +24,7 @@ sub new {
         $self->_log( 'Usage: PACKAGE->new(PARAMLIST)', 4 );
         return undef;
     }elsif( !exists($parameters->{'user'}) && !exists($parameters->{'domain'}) && !exists($parameters->{'delegation' }) ) {
-        $self->_log( 'Usage: PARAMLIST: table de hachage avec les cles \'user\', \'domain\' et \'delegation\'', 4 );
+        $self->_log( 'Usage: PARAMLIST: table de hachage avec la clé \'domain\' et optionnellement les cles \'user\' ou \'delegation\'', 4 );
         return undef;
     }
 
@@ -35,10 +35,17 @@ sub new {
         return undef;
     }
 
-    # Initialisation de l'objet
+    # Updater initialization
     $self->{'global'} = $parameters->{'global'};
 
-    # Identifiant utilisateur
+    # Domain identifier
+    if( defined($parameters->{'domain'}) ) {
+        $self->{'domain'} = $parameters->{'domain'};
+    }else {
+        $self->_log( 'Le parametre domaine doit etre precise', 0 );
+    }
+
+    # User identifier
     if( defined($parameters->{'user'}) ) {
         $self->{'user'} = $parameters->{'user'};
 
@@ -49,20 +56,13 @@ sub new {
             return undef;
         }
 
-	    ( $self->{'user_name'} ) = $queryResult->fetchrow_array();
-	    $queryResult->finish();
+        ( $self->{'user_login'} ) = $queryResult->fetchrow_array();
+        $queryResult->finish();
     }
 
-    # Identifiant de délégation
+    # Delegation
     if( defined($parameters->{'delegation'}) ) {
         $self->{'delegation'} = $parameters->{'delegation'};
-    }
-
-    # Identifiant de domaine
-    if( defined($parameters->{'domain'}) ) {
-        $self->{'domain'} = $parameters->{'domain'};
-    }else {
-        $self->_log( 'Le parametre domaine doit etre precise', 0 );
     }
 
 
@@ -72,12 +72,13 @@ sub new {
 
 sub DESTROY {
     my $self = shift;
+
+    $self->_log( 'suppression de l\'objet', 4 );
 }
 
 
 sub update {
     my $self = shift;
-    my $return = 0;
 
     require OBM::dbUpdater;
     $self->_log( 'initialisation du BD updater', 2 );
@@ -86,17 +87,17 @@ sub update {
         return 1;
     }
 
-    require OBM::Postfix::smtpInEngine;
-    $self->_log( 'initialisation du SMTP-in maps updater', 2 );
-    if( !($self->{'smtpInEngine'} = OBM::Postfix::smtpInEngine->new()) ) {
-        $self->_log( 'echec de l\'initialisation du SMTP-in maps updater', 0 );
-        return 1;
-    }
-
     require OBM::entitiesFactory;
     $self->_log( 'initialisation de l\'entity factory', 2 );
     if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'GLOBAL', $self->{'domain'} )) ) {
         $self->_log( 'echec de l\'initialisation de l\'entity factory', 0 );
+        return 1;
+    }
+
+    require OBM::Postfix::smtpInEngine;
+    $self->_log( 'initialisation du SMTP-in maps updater', 2 );
+    if( !($self->{'smtpInEngine'} = OBM::Postfix::smtpInEngine->new()) ) {
+        $self->_log( 'echec de l\'initialisation du SMTP-in maps updater', 0 );
         return 1;
     }
 
@@ -132,6 +133,7 @@ sub update {
         $self->_log( 'moteur Sieve non démarré', 3 );
         $self->{'sieveEngine'} = undef;
     }
+
 
     while( my $entity = $self->{'entitiesFactory'}->next() ) {
         my $error = 0;
