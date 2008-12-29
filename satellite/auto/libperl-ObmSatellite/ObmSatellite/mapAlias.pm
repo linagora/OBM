@@ -32,6 +32,11 @@ sub makeAliasMap {
 
         for( my $j=0; $j<=$#ldapEntries; $j++ ) {
             my $entryMailbox = $ldapEntries[$j]->get_value( $ldapAttributes->[0], asref => 1 );
+            my $externalContacts = $ldapEntries[$j]->get_value( $ldapAttributes->[1], asref => 1 );
+            if( defined($externalContacts) ) {
+                push( @{$entryMailbox}, @{$externalContacts} );
+            }
+
             if( $#{$entryMailbox} == -1 ) {
                 next;
             }
@@ -45,8 +50,8 @@ sub makeAliasMap {
                 $mailBoxes .= $entryMailbox->[$k];
             }
 
-            my $entryAlias = $ldapEntries[$j]->get_value( $ldapAttributes->[1], asref => 1 );
-            my $entryAliasSec = $ldapEntries[$j]->get_value( $ldapAttributes->[2], asref => 1 );
+            my $entryAlias = $ldapEntries[$j]->get_value( $ldapAttributes->[2], asref => 1 );
+            my $entryAliasSec = $ldapEntries[$j]->get_value( $ldapAttributes->[3], asref => 1 );
             if( defined($entryAliasSec) ) {
                 push( @{$entryAlias}, @{$entryAliasSec} );
             }
