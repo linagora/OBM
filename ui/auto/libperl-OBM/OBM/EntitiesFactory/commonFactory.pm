@@ -11,6 +11,7 @@ use base qw(Exporter);
 
 $VERSION = '1.0';
 @EXPORT_OK = qw(    _checkSource
+                    _getSourceByUpdateType
                     _checkUpdateType
                     _getEntityRight
                     _computeRight
@@ -40,10 +41,41 @@ sub _checkSource {
 }
 
 
+sub _getSourceByUpdateType {
+    my $self = shift;
+
+    if( !$self->_checkUpdateType() ) {
+        $self->_log( 'type de mise à jour incorrect', 3 );
+        return undef;
+    }
+
+    SWITCH: {
+        if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
+            return 'WORK';
+        }
+
+        if( $self->{'updateType'} eq 'UPDATE_ENTITY' ) {
+            return 'WORK';
+        }
+
+        if( $self->{'updateType'} eq 'UPDATE_LINKS' ) {
+            return 'WORK';
+        }
+
+        if( $self->{'updateType'} eq 'DELETE' ) {
+            return 'SYSTEM';
+        }
+    }
+
+    return undef;
+}
+
+
 # Allowed update type :
 #   UPDATE_ALL : entity+links
 #   UPDATE_ENTITY : entity only
 #   UPDATE_LINKS : links only
+#   DELETE : delete entity
 sub _checkUpdateType {
     my $self = shift;
 

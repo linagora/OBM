@@ -141,6 +141,15 @@ sub next {
             $self->{'currentEntity'} = $current;
 
             SWITCH: {
+                if( $self->{'source'} =~ /^SYSTEM$/ ) {
+                    $self->{'currentEntity'}->unsetBdUpdate();
+                    last SWITCH;
+                }
+
+                $self->{'currentEntity'}->setBdUpdate();
+            }
+
+            SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
                     if( $self->_loadGroupLinks() ) {
                         $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );

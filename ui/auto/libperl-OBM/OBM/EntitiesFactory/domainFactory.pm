@@ -176,7 +176,15 @@ sub _getDomain {
 
     while( my $domaindesc = $sth->fetchrow_hashref() ) {
         require OBM::Entities::obmDomain;
-        unshift( @{$self->{'domains'}}, OBM::Entities::obmDomain->new( $domaindesc ) );
+        my $domainEntity = OBM::Entities::obmDomain->new( $domaindesc );
+
+        if( $self->{'source'} =~ /^SYSTEM$/ ) {
+            $domainEntity->unsetBdUpdate();
+        }else {
+            $domainEntity->setBdUpdate();
+        }
+
+        unshift( @{$self->{'domains'}}, $domainEntity );
     }
 
     if( $#{$self->{'domains'}} > 0 ) {

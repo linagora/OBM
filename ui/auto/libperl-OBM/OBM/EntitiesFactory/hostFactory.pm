@@ -141,6 +141,15 @@ sub next {
             $self->{'currentEntity'} = $current;
 
             SWITCH: {
+                if( $self->{'source'} =~ /^SYSTEM$/ ) {
+                    $self->{'currentEntity'}->unsetBdUpdate();
+                    last SWITCH;
+                }
+
+                $self->{'currentEntity'}->setBdUpdate();
+            }
+
+            SWITCH: {
                 if( $self->{'updateType'} =~ /^(UPDATE_ALL|UPDATE_ENTITY|UPDATE_LINKS)$/ ) {
                     $self->_log( 'mise à jour de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
                     $self->{'currentEntity'}->setUpdateEntity();
