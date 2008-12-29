@@ -18,6 +18,9 @@ use OBM::Entities::commonEntities qw(
         getArchive
         setArchive
         getParent
+        setBdUpdate
+        unsetBdUpdate
+        getBdUpdate
         setUpdated
         unsetUpdated
         getUpdated

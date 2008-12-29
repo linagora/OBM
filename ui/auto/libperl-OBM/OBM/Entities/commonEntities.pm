@@ -16,6 +16,9 @@ $VERSION = '1.0';
                     getArchive
                     setArchive
                     getParent
+                    setBdUpdate
+                    unsetBdUpdate
+                    getBdUpdate
                     setUpdated
                     unsetUpdated
                     getUpdated
@@ -70,6 +73,35 @@ sub getParent {
 }
 
 
+# Set entity to be updated in BD if it's system update is ok
+sub setBdUpdate {
+    my $self = shift;
+
+    $self->{'allowBdUpdate'} = 1;
+
+    return 0;
+}
+
+
+# Set entity to be updated in BD whatever it's system update is ok or not
+sub unsetBdUpdate {
+    my $self = shift;
+
+    $self->{'allowBdUpdate'} = 0;
+
+    return 0;
+}
+
+
+# Is entity can be updated in BD ?
+sub getBdUpdate {
+    my $self = shift;
+
+    return $self->{'allowBdUpdate'};
+}
+
+
+# Set that entity system update is ok
 sub setUpdated {
     my $self = shift;
 
@@ -79,6 +111,7 @@ sub setUpdated {
 }
 
 
+# Set that entity system update isn't ok
 sub unsetUpdated {
     my $self = shift;
 
@@ -88,6 +121,7 @@ sub unsetUpdated {
 }
 
 
+# Is entity system update ok or not ?
 sub getUpdated {
     my $self = shift;
 
