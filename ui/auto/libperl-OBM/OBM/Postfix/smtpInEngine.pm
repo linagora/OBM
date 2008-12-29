@@ -13,7 +13,6 @@ use OBM::Tools::commonMethods qw(_log dump);
 
 sub new {
     my $class = shift;
-    my( $serverDesc ) = @_;
 
     my $self = bless { }, $class;
 
@@ -50,7 +49,7 @@ sub update {
         return 1;
     }
 
-    # Is entity need need postfix maps regeneration ?
+    # Is entity need postfix maps regeneration ?
     SWITCH: {
         if( ref($entity) eq 'OBM::Entities::obmUser' ) {
             last SWITCH;
@@ -64,7 +63,7 @@ sub update {
             last SWITCH;
         }
 
-        $self->_log( 'l\'entité '.$entity->getDescription().' n\' pas d\'impact sur le contenu des maps postfix', 3 );
+        $self->_log( 'l\'entité '.$entity->getDescription().' n\'a pas d\'impact sur le contenu des maps postfix', 3 );
         return 0;
     }
  
@@ -128,7 +127,7 @@ sub _updateSmtpInMaps {
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
 
-    $self->_log( 'obtention des serveurs SMTP-in à mettre à jour', 1 );
+    $self->_log( 'obtention des serveurs SMTP-in à mettre à jour', 3 );
     my $query = 'SELECT host_id,
                         host_name,
                         host_ip,
@@ -144,7 +143,10 @@ sub _updateSmtpInMaps {
         return 1;
     }
 
+    my $smtpInDesc = 0;
     while( my $srvDesc = $sth->fetchrow_hashref() ) {
+        $smtpInDesc++;
+
         require OBM::Postfix::smtpInServer;
         my $srv = OBM::Postfix::smtpInServer->new( $srvDesc );
 
@@ -159,6 +161,10 @@ sub _updateSmtpInMaps {
             $sth->finish();
             return 1;
         }
+    }
+
+    if( $smtpInDesc == 0 ) {
+        $self->_log( 'pas de serveur SMTP-in à mettre à jour', 3 );
     }
 
     return 0;
