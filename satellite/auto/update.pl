@@ -20,8 +20,7 @@ if( !$return ) {
     %parameters = undef;
 }
 
-update->run(\%parameters);
-exit;
+exit update->run(\%parameters);
 
 $|=1;
 
@@ -40,18 +39,29 @@ sub run {
     
     
     my $update;
-    if( $parameters->{'global'} ) {
-        require OBM::Update::updateGlobal;
-        $update = OBM::Update::updateGlobal->new( $parameters );
-    }else {
-        require OBM::Update::updateGlobal;
-        $update = OBM::Update::updateGlobal->new( $parameters );
+    SWITCH: {
+        if( $parameters->{'incremental'} ) {
+            require OBM::Update::updateIncremental;
+            $update = OBM::Update::updateIncremental->new( $parameters );
+            last SWITCH;
+        }
+
+        if( $parameters->{'global'} ) {
+            require OBM::Update::updateIncremental;
+            $update = OBM::Update::updateGlobal->new( $parameters );
+            last SWITCH;
+        }
     }
     
     if( !defined($update) ) {
         $self->_log( 'Probleme a l\'initialisation de l\'objet de mise a jour', 0 );
     }else {
-        $update->update();
+        if( my $code = $update->update() ) {
+            $self->_log( 'La mise à jour ne s\'est pas correctement déroulée', 0 );
+            return $code;
+        }else {
+            $self->_log( 'Mise à jour terminée avec succés', 0 );
+        }
     }
 
     return 0;
@@ -64,13 +74,13 @@ sub getParameter {
     my( $parameters ) = @_;
 
     if( !exists($parameters->{'domain'}) ) {
-        $self->_log( 'Parametre \'--domain\' manquant', 0 );
+        $self->_log( 'Paramétre \'--domain\' manquant', 0 );
         $parameters->{'help'} = 1;
 
     }else {
         $self->_log( 'Mise a jour du domaine d\'identifiant \''.$parameters->{'domain'}.'\'', 0 );
     }
-    
+
     if( exists($parameters->{'user'}) ) {
         if( exists($parameters->{'delegation'}) ) {
             $self->_log( 'Trop de parametres de mise a jour precise', 0 );
@@ -89,18 +99,29 @@ sub getParameter {
 
     }
 
-    if( exists($parameters->{'incremental'}) && exists($parameters->{'global'}) ) {
-        $self->_log( 'parametres \'--incremental\' et \'--global\' incompatibles', 0 );
-        $parameters->{'help'} = 1;
-
-    }elsif( exists($parameters->{'incremental'}) ) {
+    my $mode = 0;
+    if( $parameters->{'incremental'} ) {
         $parameters->{'incremental'} = 1;
-        $self->_log( 'Mise a jour incrementale', 0 );
+        $mode++;
+    }
 
-    }elsif( exists($parameters->{'global'}) || !(exists($parameters->{'incremental'}) || exists($parameters->{'global'})) ) {
+    if( $parameters->{'global'} ) {
         $parameters->{'global'} = 1;
-        $self->_log( 'Mise a jour globale', 0 );
+        $mode++;
+    }
 
+    SWITCH: {
+        if( $mode == 0 ) {
+            $self->_log( 'un paramètre de mode d\'exécution doit être indiqué [global|incremental]', 0 );
+            $parameters->{'help'} = 1;
+            last SWITCH;
+        }
+
+        if( $mode > 1 ) {
+            $self->_log( 'un et un seul mode d\'exécution doit être indiqué [global|incremental]', 0 );
+            $parameters->{'help'} = 1;
+            last SWITCH;
+        }
     }
 
 
@@ -112,7 +133,7 @@ sub getParameter {
         print STDERR "\tuser <id> : utilisateur d'identifiant <id> ;\n";
         print STDERR "\tdomain <id> : domaine d'identifiant <id> ;\n";
         print STDERR "\tdelegation <word> : delegation de mot cle <word> ;\n";
-        print STDERR "\tglobal : fait une mise a jour globale du domaine - action par defaut ;\n";
+        print STDERR "\tglobal : fait une mise a jour globale du domaine ;\n";
         print STDERR "\tincremental : fait une mise a jour incrementale du domaine.\n";
 
         exit 0;
@@ -124,7 +145,7 @@ sub getParameter {
 
 =head1 NAME
 
-update.pl - OBM administration tool , alter ego of Cyrus::IMAP::Shell
+update.pl - OBM administration tool, alter ego of Cyrus::IMAP::Shell
 
 =head1 SYNOPSIS
 
