@@ -931,7 +931,7 @@ function html_publication_type_form($type_q) {
     } else {
       $class = '';
     }
-    $c_label = htmlentities($one_cat['label']);
+    $c_label = htmlentities($one_cat['label'], ENT_COMPAT, 'UTF-8');
     $type_list .= "
     <tr $class>
     <td>
@@ -1100,7 +1100,7 @@ function html_publication_subscription_reception_form($recept_q) {
     } else {
       $class = '';
     }
-    $c_label = htmlentities($one_cat['label']);
+    $c_label = htmlentities($one_cat['label'], ENT_COMPAT, 'UTF-8');
     $recept_list .= "
     <tr $class>
     <td>

@@ -360,7 +360,7 @@ function html_incident_consult($inc_q) {
 
   $id = $inc_q->f("incident_id");
   $com = beautify_comment(nl2br($inc_q->f("incident_comment")));
-  $label = htmlentities($inc_q->f("incident_label"));
+  $label = htmlentities($inc_q->f("incident_label"), ENT_COMPAT, 'UTF-8');
   $reference = $inc_q->f("incident_reference");
   $priority = $inc_q->f("incidentpriority_label");
   $status_id = $inc_q->f("incident_status_id");
@@ -370,7 +370,7 @@ function html_incident_consult($inc_q) {
   $inc_id = $inc_q->f("incident_id");
   $inc_dur = nl2br($inc_q->f("incident_duration"));
   $resolution = $inc_q->f("incident_resolution");
-  $inc_reso = nl2br(htmlentities($resolution));
+  $inc_reso = nl2br(htmlentities($resolution, ENT_COMPAT, 'UTF-8'));
   $con_id = $inc_q->f("contract_id");
   $comp_id = $inc_q->f("contract_company_id");
   $comp_name = $inc_q->f("company_name");

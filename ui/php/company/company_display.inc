@@ -247,7 +247,7 @@ function html_company_search_form($types, $acts, $naf_q, $usr_q, $ctry_q, $dsrc_
     $ctry_iso3166 = $ctry_q->f('country_iso3166');
     $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";
     if ($ctry_iso3166 == $ctry) { $sel_ctry .= " selected=\"selected\""; }
-    $sel_ctry .= '>'. htmlentities($ctry_q->f('country_name')) . "</option>\n";
+    $sel_ctry .= '>'. htmlentities($ctry_q->f('country_name'), ENT_COMPAT, 'UTF-8') . "</option>\n";
   }
   $sel_ctry .= '</select>';
 
@@ -1513,7 +1513,7 @@ function html_company_nafcode_form($naf_q) {
       $class = '';
     }
     $key ++;
-    $c_label = htmlentities($one_cat['label']);
+    $c_label = htmlentities($one_cat['label'], ENT_COMPAT, 'UTF-8');
     $nafcode_list .= "
     <tr $class>
     <td>

@@ -44,7 +44,7 @@ function html_admin_ref_country_form($ctry_q) {
     } else {
       $class = '';
     }
-    $c_label = htmlentities($one_cat['label']);
+    $c_label = htmlentities($one_cat['label'], ENT_COMPAT, 'UTF-8');
     $ctry_list .= "
     <tr $class>
     <td>

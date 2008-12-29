@@ -718,7 +718,7 @@ function html_document_mime_form($mime_q) {
     } else {
       $class = "";
     }
-    $c_label = htmlentities($one_cat["label"]);
+    $c_label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
     $mime_list .= "
     <tr $class>
     <td>

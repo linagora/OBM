@@ -371,8 +371,8 @@ function dis_todo_form($todo, $todo_q = 0) {
   if ($action == 'detailupdate') {
     $t_id = $todo['todo_id'];
     $users = get_todo_users($t_id);
-    $title = htmlentities($todo_q->f('event_title'));
-    $description = htmlentities($todo_q->f('event_description'));
+    $title = htmlentities($todo_q->f('event_title'), ENT_COMPAT, 'UTF-8');
+    $description = htmlentities($todo_q->f('event_description'), ENT_COMPAT, 'UTF-8');
     $priority = $todo_q->f('event_priority');
     $percent = $todo_q->f('eventlink_percent');
     $date = $todo_q->f('event_date');

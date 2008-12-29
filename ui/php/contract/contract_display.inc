@@ -1582,7 +1582,7 @@ function html_contract_priority_form($pri_q) {
     } else {
       $class = "";
     }
-    $c_label = htmlentities($one_cat["label"]);
+    $c_label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
     $priority_list .= "
     <tr $class>
     <td>
@@ -1751,7 +1751,7 @@ while ($sta_q->next_record()) {
   } else {
     $class = "";
   }
-  $c_label = htmlentities($one_cat["label"]);
+  $c_label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
   $sta_list .= "
     <tr $class>
     <td>
@@ -1926,7 +1926,7 @@ while ($type_q->next_record()) {
   } else {
     $class = "";
   }
-  $c_label = htmlentities($one_cat["label"]);
+  $c_label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
   $type_list .= "
     <tr $class>
     <td>

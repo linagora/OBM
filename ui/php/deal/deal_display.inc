@@ -2831,7 +2831,7 @@ function html_deal_admin_form($types, $status_q) {
     } else {
       $class = '';
     }
-    $c_label = htmlentities($one_cat['label']);
+    $c_label = htmlentities($one_cat['label'], ENT_COMPAT, 'UTF-8');
     $type_list .= "
     <tr $class>
     <td>
@@ -2870,7 +2870,7 @@ function html_deal_admin_form($types, $status_q) {
     } else {
       $class = '';
     }
-    $c_label = htmlentities($one_cat['label']);
+    $c_label = htmlentities($one_cat['label'], ENT_COMPAT, 'UTF-8');
     $sta_list .= "
     <tr $class>
     <td>

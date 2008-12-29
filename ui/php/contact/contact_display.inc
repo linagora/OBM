@@ -1902,7 +1902,7 @@ function html_contact_kind_form($kind_q) {
       $class = '';
     }
     $key ++;
-    $c_label = htmlentities($one_cat['label']);
+    $c_label = htmlentities($one_cat['label'], ENT_COMPAT, 'UTF-8');
     $kind_list .= "
     <tr $class>
     <td>
