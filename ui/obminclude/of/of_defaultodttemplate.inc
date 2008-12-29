@@ -56,7 +56,7 @@ function of_defaultodttemplates_dis_admin_form($entity, $defaults_q) {
     } else {
       $class = "";
     }
-    $c_label = htmlentities($one_cat["label"]);
+    $c_label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
     $defaultodttemplate_list .= "
     <tr $class>
     <td>

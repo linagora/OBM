@@ -194,7 +194,7 @@ function of_category_dis_entity_form($entity, $cat, $cats, $mode="multi", $cat_i
         foreach ($cats as $one_cat) {
 	  $c_id = $one_cat["id"];
           $c_code = $one_cat["code"];
-	  $c_label = htmlentities($one_cat["label"]);
+	  $c_label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
 	  $sel_name = "sel_${cat}";
 	  $div_id = "$sel_name-data-$c_id";
 	  $sel_cat .= "<div class=\"elementRow\" id=\"$div_id\">
@@ -288,7 +288,7 @@ function of_category_html_select($entity, $cat, $cats, $cat_id, $first_element, 
 	if ($has_code) {
 	  $c_code = str_pad($one_cat["code"] . " ", 10, ".");
 	}
-        $c_label = htmlentities($one_cat["label"]);
+        $c_label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
         $sel_cat .= "\n<option value=\"$c_id\"";
         if ($c_id == $cat_id) { $sel_cat .= " selected=\"selected\""; }
         $sel_cat .= ">$c_code $c_label</option>";
@@ -321,7 +321,7 @@ function of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
     // Mode mono
     if ($mode == "mono") {
       // Mono Link
-      $label = htmlentities($cats[0]["label"]); 
+      $label = htmlentities($cats[0]["label"], ENT_COMPAT, 'UTF-8'); 
       $block_cat = "
       <tr><th>".ucfirst(${$l_cat})." </th><td>$label</td></tr>
       ";
@@ -336,7 +336,7 @@ function of_category_dis_block_consult($entity, $cat, $cats, $mode="multi") {
           if ($i==0) {
             $dis_cat .= "<tr>";
           }
-          $label = htmlentities($one_cat["label"]);
+          $label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
           $code = $one_cat["code"];
           $i++;
           $dis_cat .= "<td>$code $label </td>";
@@ -494,7 +494,7 @@ function of_category_dis_admin_form($catu, $cats, $user=false) {
       } else {
         $class = "";
       }
-      $c_label = htmlentities($one_cat["label"]);
+      $c_label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
       $cat_list .= "
         <tr $class>
         <td>
@@ -1951,7 +1951,7 @@ function of_category_user_html_select($cat, $cats, $cat_id, $first_element, $sel
       if ($has_code) {
 	$c_code = str_pad($one_cat["code"] . " ", 10, ".");
       }
-      $c_label = htmlentities($one_cat["label"]);
+      $c_label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
       $sel_cat .= "\n<option value=\"$c_id\"";
       if ($c_id == $cat_id) { $sel_cat .= " selected=\"selected\""; }
       $sel_cat .= ">$c_code $c_label</option>";
@@ -1986,7 +1986,7 @@ function of_category_user_dis_entity_form($entity, $cat, $cats, $mode="multi", $
       foreach ($cats as $one_cat) {
 	$c_id = $one_cat["id"];
 	$c_code = $one_cat["code"];
-	$c_label = htmlentities($one_cat["label"]);
+	$c_label = htmlentities($one_cat["label"], ENT_COMPAT, 'UTF-8');
 	$sel_name = "sel_${cat}";
 	$div_id = "$sel_name-data-$c_id";
 	$sel_cat .= "<div class=\"elementRow\" id=\"$div_id\">

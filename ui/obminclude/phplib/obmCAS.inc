@@ -86,7 +86,7 @@ class obmCASClient extends CASClient {
 	} 
 	// ill-formed ticket, halt
 	else if ( !empty($ticket) ) {
-	  phpCAS::error('ill-formed ticket found in the URL (ticket=`'.htmlentities($ticket).'\')');
+	  phpCAS::error('ill-formed ticket found in the URL (ticket=`'.htmlentities($ticket, ENT_COMPAT, 'UTF-8').'\')');
 	}
 	// ticket has been taken into account, unset it to hide it to applications
 	unset($_GET['ticket']);

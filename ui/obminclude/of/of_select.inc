@@ -346,7 +346,7 @@ function _of_select_select($data_array, $data_name) {
 
   if (is_array($data_array)) {
     foreach ($data_array as $id => $one_data) {
-      $data_label = htmlentities($one_data["label"]);
+      $data_label = htmlentities($one_data["label"], ENT_COMPAT, 'UTF-8');
       $data_id = "data-$data_name-$id";
       $div_id = "sel_$data_name-$data_id";
       $sel_data .= "<div class=\"elementRow\" id=\"$div_id\">

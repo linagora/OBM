@@ -580,7 +580,7 @@ function of_domain_dis_mailserver_select($role, $sel_id='', $domain_id='') {
       if (is_array($m)) {
         // one mail server role
         foreach ($m as $r) {
-          $name = htmlentities($r['name']);
+          $name = htmlentities($r['name'], ENT_COMPAT, 'UTF-8');
           $sel .= "<option value=\"$id\"";
           if ($id == $sel_id) { $sel .= " selected=\"selected\""; }
           $sel .= ">$name</option>";
@@ -2447,6 +2447,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
   }
   if ($reci_list != '') {
     // as we don't have a mean to encode the subject, we drop its accentsr
+    mb_internal_encoding('UTF-8');
     $subject = mb_encode_mimeheader($subject, "UTF-8", "Q","\n");
     mail ($reci_list, $subject, $msg, $headers);         
   }

@@ -1607,7 +1607,7 @@ function format_name($name, $up, $accent, $dot=false) {
   $res = $name;
 
   if ($accent) {
-    $res = htmlentities($res);
+    $res = htmlentities($res, ENT_COMPAT, 'UTF-8');
     $res = preg_replace('/&([a-zA-Z])(uml|acute|grave|circ|tilde|cedil|ring);/','$1',$res);
     $res = html_entity_decode($res);
   }
