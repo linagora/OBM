@@ -51,7 +51,8 @@ _COMMENT_moduleload      back_bdb
 
 # The maximum number of entries that is returned for a search operation
 # You can put no limit for authenticated user - see below
-sizelimit 500
+# Default 500
+#sizelimit unlimited
 
 # The tool-threads parameter sets the actual amount of cpu's that is used
 # for indexing.
@@ -157,20 +158,20 @@ lastmod         on
 #replogfile     /var/lib/ldap/replog
 
 
-## BEGIN Common ACLs
-## Allows obmSatellite authentificated requests without response limits
+# BEGIN Common ACLs
+# Allow obmSatellite athenticated requests without response limits
 limits dn.exact="uid=obmsatellite,ou=sysusers,dc=local" size=unlimited
 
-## ACL sample to limit access on entries in relation to 'hiddenUser'
-## attribute
-## This ACL can be tuned to get more flexibility (see 'man slapd.access')
-#access to filter=(hiddenUser=TRUE)
-#    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
-#    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
-#    by anonymous auth
-#    by self write
-#    by * none
-## END Common ACLs
+# ACL sample to limit access on entries in relation to 'hiddenUser'
+# attribute
+# This ACL can be tuned to get more flexibility (see 'man slapd.access')
+access to filter=(hiddenUser=TRUE)
+    by dn="uid=ldapadmin,ou=sysusers,dc=local" write
+    by dn="uid=obmsatellite,ou=sysusers,dc=local" read
+    by anonymous auth
+    by self write
+    by * none
+# END Common ACLs
 
 
 # BEGIN without SAMBA ACLs
