@@ -34,7 +34,7 @@ $postfixMapsDesc = {
         postfix_map_process => 1,
         postfix_map_postmap => 1,
         ldap_filter => "(&(mailAccess=PERMIT)(obmdomain=<obmDomain>))",
-        ldap_attibute => [ "mailbox", "mail", "mailAlias" ],
+        ldap_attibute => [ "mailbox", "externalContactEmail", "mail", "mailAlias" ],
         make_map => sub {
             my( $daemonRef, $aliasMapFile, $obmDomains ) = @_;
             require ObmSatellite::mapAlias;
