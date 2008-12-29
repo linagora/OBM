@@ -14,16 +14,19 @@ use OBM::Parameters::regexp;
 
 sub new {
     my $class = shift;
-    my( $mode, $domainId ) = @_;
+    my( $mode, $domainId, $userId, $delegation ) = @_;
 
     my $self = bless { }, $class;
 
-    if( !defined($domainId) || ref($domainId) ) {
+    if( !defined($domainId) || ref($domainId) || ($domainId !~ /$regexp_id/) ) {
         $self->_log( 'un et un seul identifiant de domaine doit être indiqué', 3 );
         return undef;
     }
 
     $self->{'domainId'} = $domainId;
+    $self->{'userId'} = $userId;
+    $self->{'delegation'} = $delegation;
+
     $self->{'domain'} = undef;
     $self->{'entitiesQueue'} = undef;
     $self->{'factoriesQueue'} = undef;
@@ -71,14 +74,6 @@ sub _initMode {
 
     if( ref($self->{'mode'}) ) {
         $self->_log( 'mode d\'exécution incorrect', 3 );
-        return 1;
-    }
-
-    # For any update mode, domains must be loaded
-    require OBM::EntitiesFactory::domainFactory;
-    my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'WORK', $self->{'domainId'} );
-
-    if( $self->_loadDomains( $entityFactory ) ) {
         return 1;
     }
 
@@ -132,6 +127,15 @@ sub enqueueEntity {
 sub _initGlobal {
     my $self = shift;
 
+    # For any update mode, domains must be loaded
+    require OBM::EntitiesFactory::domainFactory;
+    my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'WORK', $self->{'domainId'} );
+
+    if( $self->_loadDomains( $entityFactory ) ) {
+        return 1;
+    }
+
+
     require OBM::EntitiesFactory::globalFactories;
     my $globalFactories = OBM::EntitiesFactory::globalFactories->new( $self );
     if( !defined($globalFactories) ) {
@@ -147,9 +151,16 @@ sub _initIncremental {
     my $self = shift;
 
     require OBM::EntitiesFactory::domainFactory;
-    my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'SYSTEM', $self->{'domainId'});
+    my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'SYSTEM', $self->{'domainId'} );
 
     if( $self->_loadDomains( $entityFactory ) ) {
+        return 1;
+    }
+
+    require OBM::EntitiesFactory::incrementalFactories;
+    my $globalFactories = OBM::EntitiesFactory::incrementalFactories->new( $self );
+    if( !defined($globalFactories) ) {
+        $self->_log( 'problème à l\'initialisation des factories nécessaire pour le mode incrémental', 0 );
         return 1;
     }
 
