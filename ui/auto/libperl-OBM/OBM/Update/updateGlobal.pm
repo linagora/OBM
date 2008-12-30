@@ -194,5 +194,14 @@ sub update {
         return 1;
     }
 
+    require OBM::incrementalTableUpdater;
+    $self->_log( 'purge des tables du mode incrémental', 2 );
+    my $incrementalTableUpdater;
+    if( !($incrementalTableUpdater = OBM::incrementalTableUpdater->new( $self->{'domain'}, undef, undef )) || $incrementalTableUpdater->purgeBd() ) {
+        $self->_log( 'echec du purge des tables incrémentales non effectuée', 0 );
+        return 1;
+    }
+
+
     return 0;
 }

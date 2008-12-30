@@ -67,6 +67,30 @@ sub updateBd {
         $error = 1;
     }
 
+    # Only delete really deleted entities references
+    if( $self->_deleteDeleted() ) {
+        $self->_log( 'problème lors du nettoyage de la table Deleted', 1 );
+        $error = 1;
+    }
+
+    return $error;
+}
+
+
+sub purgeBd {
+    my $self = shift;
+    my $error = 0;
+
+    if( $self->_purgeUpdated() ) {
+        $self->_log( 'problème lors du nettoyage de la table Updated', 1 );
+        $error = 1;
+    }
+
+    if( $self->_purgeUpdatedlinks() ) {
+        $self->_log( 'problème lors du nettoyage de la table Updatedlinks', 1 );
+        $error = 1;
+    }
+
     if( $self->_purgeDeleted() ) {
         $self->_log( 'problème lors du nettoyage de la table Deleted', 1 );
         $error = 1;
@@ -141,6 +165,30 @@ sub _purgeUpdatedlinks {
 
 
 sub _purgeDeleted {
+    my $self = shift;
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler;
+    if( !($dbHandler = OBM::Tools::obmDbHandler->instance()) ) {
+        $self->_log( 'connexion à la base de données impossible', 3 );
+        return 1;
+    }
+
+    my $query = 'DELETE FROM Deleted
+                    WHERE deleted_domain_id='.$self->{'domainId'};
+
+    $self->_log( 'nettoyage de la table Deleted', 3 );
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'problème lors du nettoyage de la table Deleted', 0 );
+        return 1;
+    }
+
+    return 0;
+}
+
+
+sub _deleteDeleted {
     my $self = shift;
 
     if( $#{$self->{'deletedId'}} < 0 ) {
