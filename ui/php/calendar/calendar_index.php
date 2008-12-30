@@ -599,7 +599,7 @@ if (!$params['ajax']) {
   }
   $_SESSION['set_cal_default_view'] = $params['view_id'];
   json_ok_msg("$l_view_default : $l_insert_ok");
-  echo "({".$display['json'].",$msg})";
+  echo "({".$display['json']."})";
   exit();
 
 } elseif ($action == 'delete_default_view') {
@@ -611,7 +611,7 @@ if (!$params['ajax']) {
   } else {
     json_error_msg("$l_view_default : $l_delete_error");
   }
-  echo "({".$display['json'].",$msg})";
+  echo "({".$display['json']."})";
   exit();
 
 }
