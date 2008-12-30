@@ -491,7 +491,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'category1_insert')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_insert('calendar', 'category1', $params);
+  $retour = of_category_query_insert('event', 'category1', $params);
   if ($retour) {
     $display['msg'] .= display_ok_msg("$l_category1 : $l_insert_ok");
   } else {
@@ -501,7 +501,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'category1_update')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_update('calendar', 'category1', $params);
+  $retour = of_category_query_update('event', 'category1', $params);
   if ($retour) {
     $display['msg'] .= display_ok_msg("$l_category1 : $l_update_ok");
   } else {
@@ -511,11 +511,11 @@ if ($action == 'index') {
 
 } elseif ($action == 'category1_checklink')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] .= of_category_dis_links('calendar', 'category1', $params, 'mono');
+  $display['detail'] .= of_category_dis_links('event', 'category1', $params, 'mono');
 
 } elseif ($action == 'category1_delete')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = of_category_query_delete('calendar', 'category1', $params);
+  $retour = of_category_query_delete('event', 'category1', $params);
   if ($retour) {
     $display['msg'] .= display_ok_msg("$l_category1 : $l_delete_ok");
   } else {
