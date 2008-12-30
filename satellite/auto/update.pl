@@ -47,7 +47,7 @@ sub run {
         }
 
         if( $parameters->{'global'} ) {
-            require OBM::Update::updateIncremental;
+            require OBM::Update::updateGlobal;
             $update = OBM::Update::updateGlobal->new( $parameters );
             last SWITCH;
         }
