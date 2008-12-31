@@ -140,16 +140,11 @@ function sql_casei_sort($db_type, $field) {
 ///////////////////////////////////////////////////////////////////////////////
 function sql_string_concat($db_type, $ctt) {
   global $db_type_mysql, $db_type_pgsql;
-  global $cmy_character_set, $cmy_charset_collation;
 
   if ($db_type == $db_type_mysql) {
     $start = 'concat(';
     $end = ')';
     $sep = ',';
-    $intro = $cmy_character_set;
-    if ($cmy_charset_collation) {
-      $collation = " COLLATE $cmy_charset_collation";
-    }
   } elseif ($db_type == $db_type_pgsql) {
     $start = '(';
     $end = ')';
@@ -172,7 +167,7 @@ function sql_string_concat($db_type, $ctt) {
     if ($ctt[$i]['type'] == 'field') {
       $ret .= $ctt[$i]['value'];
     } else {
-      $ret .= "$intro'" . $ctt[$i]['value'] . "'$collation";
+      $ret .= "'" . $ctt[$i]['value'] . "'";
     }
     $i++;
   }

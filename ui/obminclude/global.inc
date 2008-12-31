@@ -55,12 +55,6 @@ $cgp_sql_star = true;
 // Tuning constants
 $ctu_sql_limit = false;
 
-// MySQL (only 4.1+) charset used (for database and files !)
-//$cmy_character_set = '_latin1';
-
-// MySQL (only 4.1+) charset collation used (for database and files !)
-//$cmy_charset_collation = 'latin1_general_ci';
-
 // is Mail enabled (is a mail server configured for OBM)
 $cgp_mail_enabled = false;
 
@@ -211,54 +205,6 @@ $perm_reader = '01';
 $perm_user = '03';
 $perm_editor = '05';
 $perm_admin = '1D';
-
-//------------------------------//
-// Default Profiles definitions //
-//------------------------------//
-
-$profiles['user'] = array (
-  'section' => array (
-    'default' => 0,
-    'com' => 1,
-    'prod' => 1,
-    'user' => 1,
-    'my' => 1),
-  'module' => array (
-     'default' => 0, //$perm_user,
-    'calendar' => $perm_editor,
-    ),
-  'level' => 3,
-  'access_restriction' => 'ALLOW_ALL',
-  'access_exeptions' => array()
-);
-
-$profiles['editor'] = array (
-  'section' => array (
-    'default' => 0,
-    'com' => 1,
-    'prod' => 1,
-    'user' => 1,
-    'my' => 1),
-  'module' => array (
-    'default' => $perm_editor),
-  'level' => 2,
-  'access_restriction' => 'ALLOW_ALL',
-  'access_exeptions' => array()
-);
-
-$profiles['admin'] = array (
-  'section' => array (
-    'default' => 1),
-  'module' => array (
-    'default' => $perm_admin,
-    'domain' => 0),
-  'level' => 1,
-  'level_managepeers' => 1,
-  'access_restriction' => 'ALLOW_ALL',
-  'access_exeptions' => array()
-); 
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load global parameters from .ini file

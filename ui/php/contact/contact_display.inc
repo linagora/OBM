@@ -567,18 +567,18 @@ function html_contact_header($co_q, $funcs) {
   global $l_company, $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title;
   global $l_contact, $l_market, $l_archive, $l_date, $l_no_date, $l_birthday;
   global $cgp_show, $cgp_hide, $l_yes, $l_no;
-  global $display, $path, $action;
+  global $display, $path, $action, $ccontact_simple_kind;
 
   $c_id = $co_q->f('contact_company_id');
   $c_name = $co_q->f('company_name');
   $id = $co_q->f('contact_id');
   $kind_minilabel = $co_q->f('kind_minilabel');
-  if (!empty($kind_minilabel)) {
+  if (!$ccontact_simple_kind && !empty($kind_minilabel)) {
     $kind = "[" . $co_q->f('kind_lang') . "] $kind_minilabel";
     $kind_header = $co_q->f('kind_header');
     if ($kind_header != $kind) $kind .= " ($kind_header)";
   } else {
-    $kind = '';
+    $kind = $kind_minilabel;
   }
   $function = $co_q->f('function_label');
   $title = $co_q->f('contact_title');
@@ -1096,7 +1096,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
   global $extra_js, $l_im, $l_website, $l_phone_labels, $l_email_labels, $l_number;
-  global $l_remove, $l_street;
+  global $l_remove, $l_street, $ccontact_simple_kind;
 
 
   $uid = $obm['uid'];
@@ -1344,78 +1344,108 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       </tr>";
   }
 
-
-  if ($kind_q->nf()>0) {
-    $i=0;
-    $j=0;
-    $k=0;
-    $k_kind_js .= "lang_array = new Object();\n";
-    while ($kind_q->next_record()) {
-      $k_id = $kind_q->f('kind_id');
-      $k_lang = $kind_q->f('kind_lang');
-      $k_label = $kind_q->f('kind_minilabel');
-      $k_header = $kind_q->f('kind_header');
-      if ($k_lang != $k_old_lang) {
-	$k_kind_js .= "lang_array[\"$k_lang\"] = new Object();\n";
-	$k_old_lang = $k_lang;
-      }     
-      if ($k_label !== $k_old_label) {
-	$k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"] = new Object();\n";
-	$k_old_label = $k_label;
-      }
-      $k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"][\"$k_header\"] = '$k_id';\n";
-      $k_kind[$k_lang][$k_label][$k_header] = $k_id;
-      if ($k_id == $kind) {
-	$kind_lang = $k_lang;
-	$kind_label = $k_label;
-	$kind_header = $k_header;
-      }
-    }
-  }
-  // kind select
-  $sel_kind_header = "<select name=\"sel_header\">";
-  $sel_kind_lang = "<select name=\"sel_lang\">";
-  $sel_kind_label = "<select name=\"sel_label\">";
-
-  $i=0;
-  $sel_kind_lang = "<select name=\"sel_kind_lang\"
-  onchange=\"fill_contact_select_label(this)\">
-  <option value=\"$c_undef\">$l_undef</option>";
-  $sel_kind_label = "<select name=\"sel_kind_label\" 
-  onchange=\"fill_contact_select_header(this)\">
-  <option value=\"$c_undef\">$l_undef</option>";
-  $sel_kind_header = "<select name=\"sel_kind\">
-  <option value=\"$c_undef\">$l_undef</option>";
-  if(is_array($k_kind)) {
-    foreach ($k_kind as $k_lang => $k_kind_label) {
-      $sel_kind_lang .= "\n<option value=\"$k_lang\"";
-      if ($k_lang == $kind_lang) {
-        foreach ($k_kind_label as $k_label => $k_kind_header) {
-	  $sel_kind_label .= "\n<option value=\"$k_label\"";
-	  if ($k_label == $kind_label) {
-	    foreach ($k_kind_header as $k_header => $k_id) {
-	      $sel_kind_header .= "\n<option value=\"$k_id\"";
-	      if ($k_id == $kind) {
-	        $sel_kind_lang .= "selected = \"selected\"";
-	        $sel_kind_label .= "selected = \"selected\"";
-	        $sel_kind_header .= "selected = \"selected\"";
-	      }
-	      $sel_kind_header .= ">$k_header</option>";
-	    }
-	  }
-	  $sel_kind_label .= ">$k_label</option>";
+  if(!$ccontact_simple_kind) {
+    if ($kind_q->nf()>0) {
+      $i=0;
+      $j=0;
+      $k=0;
+      $k_kind_js .= "lang_array = new Object();\n";
+      while ($kind_q->next_record()) {
+        $k_id = $kind_q->f('kind_id');
+        $k_lang = $kind_q->f('kind_lang');
+        $k_label = $kind_q->f('kind_minilabel');
+        $k_header = $kind_q->f('kind_header');
+        if ($k_lang != $k_old_lang) {
+          $k_kind_js .= "lang_array[\"$k_lang\"] = new Object();\n";
+          $k_old_lang = $k_lang;
+        }     
+        if ($k_label !== $k_old_label) {
+          $k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"] = new Object();\n";
+          $k_old_label = $k_label;
+        }
+        $k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"][\"$k_header\"] = '$k_id';\n";
+        $k_kind[$k_lang][$k_label][$k_header] = $k_id;
+        if ($k_id == $kind) {
+          $kind_lang = $k_lang;
+          $kind_label = $k_label;
+          $kind_header = $k_header;
         }
       }
-      $sel_kind_lang .= ">$k_lang</option>";
     }
+    // kind select
+    $sel_kind_header = "<select name=\"sel_header\">";
+    $sel_kind_lang = "<select name=\"sel_lang\">";
+    $sel_kind_label = "<select name=\"sel_label\">";
+
+    $i=0;
+    $sel_kind_lang = "<select name=\"sel_kind_lang\"
+    onchange=\"fill_contact_select_label(this)\">
+    <option value=\"$c_undef\">$l_undef</option>";
+    $sel_kind_label = "<select name=\"sel_kind_label\" 
+    onchange=\"fill_contact_select_header(this)\">
+    <option value=\"$c_undef\">$l_undef</option>";
+    $sel_kind_header = "<select name=\"sel_kind\">
+    <option value=\"$c_undef\">$l_undef</option>";
+    if(is_array($k_kind)) {
+      foreach ($k_kind as $k_lang => $k_kind_label) {
+        $sel_kind_lang .= "\n<option value=\"$k_lang\"";
+        if ($k_lang == $kind_lang) {
+          foreach ($k_kind_label as $k_label => $k_kind_header) {
+            $sel_kind_label .= "\n<option value=\"$k_label\"";
+            if ($k_label == $kind_label) {
+              foreach ($k_kind_header as $k_header => $k_id) {
+                $sel_kind_header .= "\n<option value=\"$k_id\"";
+                if ($k_id == $kind) {
+                  $sel_kind_lang .= "selected = \"selected\"";
+                  $sel_kind_label .= "selected = \"selected\"";
+                  $sel_kind_header .= "selected = \"selected\"";
+                }
+                $sel_kind_header .= ">$k_header</option>";
+              }
+            }
+            $sel_kind_label .= ">$k_label</option>";
+          }
+        }
+        $sel_kind_lang .= ">$k_lang</option>";
+      }
+    }
+    $sel_kind_label .= '</select>';
+    $sel_kind_lang .= '</select>';
+    $sel_kind_header .= '</select>';
+    $script = "
+      <script type=\"text/javascript\">
+        $k_kind_js
+      </script>\n";
+    $block_kind = "<tr>
+      <th>$l_lang</th>
+      <td> $sel_kind_lang</td>
+    </tr>
+    <tr>
+      <th>$l_kind</th>
+      <td>$sel_kind_label</td>
+    </tr>
+    <tr>
+      <th>$l_letter</th>
+      <td>$sel_kind_header </td>
+    </tr>";
+  } else {
+    $sel_kind_label = "<select name=\"sel_kind\"><option value=\"$c_undef\">$l_undef</option>";
+    while($kind_q->next_record()) {
+      $k_id = $kind_q->f("kind_id");
+      $k_lang = $kind_q->f("kind_lang");
+      $k_label = $kind_q->f("kind_minilabel");
+      $k_header = $kind_q->f("kind_header");      
+      if ($k_id == $kind) {
+        $selected = "selected=\"selected\"";
+      }
+      $sel_kind_label .= "<option value=\"$k_id\" $selected>$k_label</option>";
+    }
+    $sel_kind_label .= "</select";
+    $block_kind = "<tr>
+      <th>$l_kind</th>
+      <td>$sel_kind_label</td>
+    </tr>";    
   }
-  $sel_kind_label .= '</select>';
-  $sel_kind_lang .= '</select>';
-  $sel_kind_header .= '</select>';
-  $script = "
-    <script type=\"text/javascript\">
-      $k_kind_js
-    </script>\n";
 
   // Service field
   if ($show_service) {
@@ -1440,9 +1470,29 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       $opt_usercomment .= ">$cname</option>\n";
     }
   }
+  // Check
+  if (! $perm->check_right('contact', $cright_write_admin)) {
+    $display_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_yes";
+    $priv = 1;
 
+  // If new contact or contact update and user is owner, display visibility
+  } else if ( ($action == 'new') || ($action == 'insert') ||
+       ( (($action == 'detailupdate') || ($action == 'update')) &&
+         ($usercreate == $obm['uid']) ) ) {
+    if ($priv == '1') {
+      $private_c = ' checked';
+    }
+    $display_private = "<input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />";
+  }
 
-  $sel_usercomment = "<select name=\"sel_usercomment\">$opt_usercomment</select>";
+  if(!$priv) {
+    $sel_usercomment = "<select name=\"sel_usercomment\">$opt_usercomment</select>";
+    $sel_usercomment2 = "<select name=\"sel_usercomment2\">$opt_usercomment</select>";
+    $sel_usercomment3 = "<select name=\"sel_usercomment3\">$opt_usercomment</select>";
+    $date_comment = "<input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>";
+    $date_comment2 = "<input type=\"text\" name=\"tf_datecomment2\" value=\"$datecomment2\" class=\"datePicker\"/>";
+    $date_comment3 = "<input type=\"text\" name=\"tf_datecomment3\" value=\"$datecomment3\" class=\"datePicker\"/>";
+  }
 
   if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_comment = "
@@ -1461,12 +1511,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   }
 
   if ($show_comment2) {
-    $sel_usercomment2 = "<select name=\"sel_usercomment2\">$opt_usercomment</select>";
     $block_comment2 = "
     <fieldset class=\"detail extra\">
     <legend>$l_comment2</legend>
       $l_add_comment2
-      <input type=\"text\" name=\"tf_datecomment2\" value=\"$datecomment2\" class=\"datePicker\"/>
+      $date_comment2
       $sel_usercomment2
       <textarea name=\"ta_add_comment2\" rows=\"6\" cols=\"78\">$add_comment2</textarea>
       $dis_comment2
@@ -1474,12 +1523,11 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   }
 
   if ($show_comment3) {
-    $sel_usercomment3 = "<select name=\"sel_usercomment3\">$opt_usercomment</select>";
     $block_comment3 = "
     <fieldset class=\"detail extra\">
     <legend>$l_comment3</legend>
       $l_add_comment3
-      <input type=\"text\" name=\"tf_datecomment3\" value=\"$datecomment3\" class=\"datePicker\"/>
+      $date_comment3
       $sel_usercomment3
       <textarea name=\"ta_add_comment3\" rows=\"6\" cols=\"78\">$add_comment3</textarea>
       $dis_comment3
@@ -1509,19 +1557,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     <td><input type=\"checkbox\" name=\"cba_newsletter\" value=\"1\" $newsletter /></td>
     </tr>";  
   }
-  // Check
-  if (! $perm->check_right('contact', $cright_write_admin)) {
-    $display_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_yes";
 
-  // If new contact or contact update and user is owner, display visibility
-  } else if ( ($action == 'new') || ($action == 'insert') ||
-       ( (($action == 'detailupdate') || ($action == 'update')) &&
-         ($usercreate == $obm['uid']) ) ) {
-    if ($priv == '1') {
-      $private_c = ' checked';
-    }
-    $display_private = "<input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />";
-  }
 
   // UPDATE 
   if (($action == 'detailupdate') || ($action == 'update')) {
@@ -1634,18 +1670,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       <th>$l_aka</th>
       <td><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
     </tr>
-    <tr>
-      <th>$l_lang</th>
-      <td> $sel_kind_lang</td>
-    </tr>
-    <tr>
-      <th>$l_kind</th>
-      <td>$sel_kind_label</td>
-    </tr>
-    <tr>
-      <th>$l_letter</th>
-      <td>$sel_kind_header </td>
-    </tr>
+    $block_kind
     $block_dsrc
     <tr>
       <th>$l_private</th>
@@ -1691,8 +1716,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     <fieldset class=\"detail extra\">
     <legend>$l_comment1</legend>
       $l_add_comment1
-
-      <input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>$sel_usercomment
+      $date_comment
+      $sel_usercomment
       <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
       $dis_comment
     </fieldset>
