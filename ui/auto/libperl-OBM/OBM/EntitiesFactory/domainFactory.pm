@@ -158,12 +158,12 @@ sub _getDomain {
                                 domain_description,
                                 domain_name,
                                 domain_alias,
-                                domain.serviceproperty_value as samba_domain_name,
+                                sambadomain.serviceproperty_value as samba_domain_name,
                                 sid.serviceproperty_value as samba_sid,
                                 profile.serviceproperty_value as samba_user_profile
                         FROM '.$domainTable.'
                         INNER JOIN '.$domainEntityTable.' ON domainentity_domain_id=domain_id
-                        LEFT JOIN '.$servicePropertyTable.' domain ON domain.serviceproperty_entity_id=domainentity_entity_id AND domain.serviceproperty_service=\'samba\' AND domain.serviceproperty_property=\'domain\'
+                        LEFT JOIN '.$servicePropertyTable.' sambadomain ON sambadomain.serviceproperty_entity_id=domainentity_entity_id AND sambadomain.serviceproperty_service=\'samba\' AND sambadomain.serviceproperty_property=\'domain\'
                         LEFT JOIN '.$servicePropertyTable.' sid ON sid.serviceproperty_entity_id=domainentity_entity_id AND sid.serviceproperty_service=\'samba\' AND sid.serviceproperty_property=\'sid\'
                         LEFT JOIN '.$servicePropertyTable.' profile ON profile.serviceproperty_entity_id=domainentity_entity_id AND profile.serviceproperty_service=\'samba\' AND profile.serviceproperty_property=\'profile\'
                         WHERE domain_id = '.$self->{'domainId'};
