@@ -29,6 +29,7 @@ function run_query_payment_search($payment) {
   $company = sql_search_text_parse($payment['company']);
   $company_id = $payment['company_id'];
   $checked = $payment['checked'];
+  $invoice_id = $payment['invoice_id'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -75,11 +76,16 @@ function run_query_payment_search($payment) {
   }
   if ($company != '') {
     $where .= " $and company_name $like '$company%'";
-    $join_comp = "LEFT JOIN Company ON payment_company_id=company_id";
+    $join .= " LEFT JOIN Company ON payment_company_id=company_id";
     $and = 'AND';
   }
   if ($company_id != '') {
     $where .= " $and payment_company_id = '$company_id'";
+    $and = 'AND';
+  }
+  if ($invoice_id != '') {
+    $where .= " $and paymentinvoice_invoice_id = '$invoice_id'";
+    $join .= " LEFT JOIN PaymentInvoice ON payment_id=paymentinvoice_payment_id";
     $and = 'AND';
   }
   if ($checked != 'y') {
@@ -109,13 +115,14 @@ function run_query_payment_search($payment) {
     LEFT JOIN Company ON payment_company_id=company_id
     LEFT JOIN PaymentKind ON payment_paymentkind_id=paymentkind_id
     LEFT JOIN Account ON payment_account_id=account_id
+    $join
   $whereq
   $orderq
   $limit
 ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Payment $join_comp $whereq");
+    $count = get_query_count("SELECT count(*) FROM Payment $join $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0) || (! $ctu_sql_limit)) {

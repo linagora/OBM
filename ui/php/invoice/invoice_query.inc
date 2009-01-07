@@ -119,6 +119,9 @@ function run_query_invoice_search ($invoice) {
   }
   $whereq = "WHERE $where";
 
+  if ($sql_order_field == 'invoice_status') {
+    $sql_order_field = 'invoice_status_id';
+  }
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'invoice_date';
   $orderq .= "ORDER BY $order $sql_order_dir";
 
