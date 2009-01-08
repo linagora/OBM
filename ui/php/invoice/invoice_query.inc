@@ -383,7 +383,7 @@ function run_query_invoice_update($invoice) {
 // Get invoice status list with conditions
 // Parameters:
 //   - $target : 'payment' : get status where invoice should have a payment
-//             : 'tocreate' : get status where invoice has not been cretated
+//             : 'tocreate' : get status where invoice has not been creatted
 //             : 'dashboard' : valid invoices (remove cancelled,...)
 //             : a number  : get status where status id = this number
 // Returns:
@@ -396,6 +396,7 @@ function get_invoice_status($target='') {
 
   if ($target == 'payment') {
     $status_target['sent'] = $cinv_status['sent'];
+    $status_target['factor'] = $cinv_status['factor'];
     $status_target['ppaid'] = $cinv_status['ppaid'];
     $status_target['paid'] = $cinv_status['paid'];
     $status_target['conflict'] = $cinv_status['conflict'];
@@ -404,6 +405,7 @@ function get_invoice_status($target='') {
   } else if ($target == 'dashboard') {
     $status_target['tocreate'] = $cinv_status['tocreate'];
     $status_target['sent'] = $cinv_status['sent'];
+    $status_target['factor'] = $cinv_status['factor'];
     $status_target['ppaid'] = $cinv_status['ppaid'];
     $status_target['paid'] = $cinv_status['paid'];
     $status_target['conflict'] = $cinv_status['conflict'];
@@ -711,7 +713,7 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
         // Handle partially paid distribution for payment chart
         // Part paid set to 'paid'
         // Part not paid paid set to 'ppaid'
-        if (($status == $cinv_status['ppaid']) || ($status == $cinv_status['dailly'])) {
+        if (($status == $cinv_status['ppaid']) || ($status == $cinv_status['factor'])) {
           $pays = get_invoice_payment($id);
           $one_pay = $pays['total'];
           if ($credit != '1') {
@@ -871,11 +873,11 @@ function check_invoice_data_form($id, $invoice) {
     $err['field'] = 'status';
     return false;
   }
-  // If invoice partially paid, status must be 'ppaid', 'conflict' or 'dailly'
+  // If invoice partially paid, status must be 'ppaid', 'conflict' or 'factor'
   if (($total_pay_amount != $ttc) && ($total_pay_amount > 0)
       && ! (($status == $cinv_status['ppaid'])
 	    || ($status == $cinv_status['conflict'])
-	    || ($status == $cinv_status['dailly']))) {
+	    || ($status == $cinv_status['factor']))) {
     $err['msg'] = $l_err_ppaid_status;
     $err['field'] = 'status';
     return false;

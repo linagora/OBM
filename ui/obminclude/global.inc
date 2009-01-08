@@ -594,6 +594,7 @@ $cinv_status['paid'] = 4;
 $cinv_status['conflict'] = 5;
 $cinv_status['cancelled'] = 6;
 $cinv_status['loss'] = 7;
+$cinv_status['factor'] = 8;
 
 // Incident status
 $cincident_status['new'] = 0;

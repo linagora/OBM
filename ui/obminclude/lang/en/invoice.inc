@@ -37,6 +37,7 @@ $l_invoicestatus_paid = 'Paid';
 $l_invoicestatus_conflict = 'Conflict';
 $l_invoicestatus_cancelled = 'Cancelled';
 $l_invoicestatus_loss = 'Lost';
+$l_invoicestatus_factor = 'Factor';
 
 // payment
 $l_no_payment = "no payments related to this invoice";

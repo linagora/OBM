@@ -36,7 +36,7 @@ $l_invoicestatus_paid = 'Payée';
 $l_invoicestatus_conflict = 'En conflit';
 $l_invoicestatus_cancelled = 'Annulée';
 $l_invoicestatus_loss = 'Perdue';
-
+$l_invoicestatus_factor = 'Dailly';
 
 // payment
 $l_no_payment = "Aucun paiement connecté à cette facture";
