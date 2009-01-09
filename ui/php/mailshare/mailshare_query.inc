@@ -51,7 +51,7 @@ function run_query_mailshare_search($mailshare) {
   if ($desc != '') {
     $where .= " AND mailshare_description $like '%$desc%'";
   }
-  $whereq = "WHERE $where $multidomain";
+  $whereq = "WHERE $where";
 
   // ORDER construction
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'mailshare_name';
@@ -66,7 +66,7 @@ function run_query_mailshare_search($mailshare) {
     FROM MailShare
       LEFT JOIN UserObm as A ON mailshare_usercreate=A.userobm_id
       LEFT JOIN UserObm as B ON mailshare_userupdate=B.userobm_id
-    $whereq
+    $whereq $multidomain
     $orderq
     $limit";
 

@@ -855,6 +855,8 @@ ALTER TABLE Contact ALTER COLUMN contact_origin SET DEFAULT NOT NULL;
 ALTER TABLE DeletedContact ADD COLUMN deletedcontact_user_id integer;
 ALTER TABLE DeletedContact ADD COLUMN deletedcontact_origin varchar(255) NOT NULL;
 
+CREATE TYPE userstatus AS ENUM ('INIT', 'VALID');
+ALTER TABLE UserObm ADD COLUMN userobm_status userstatus DEFAULT 'VALID';
 
 -- NOT NULL to NULL Convertion
 ALTER TABLE UserObm ALTER COLUMN userobm_domain_id SET NOT NULL;
