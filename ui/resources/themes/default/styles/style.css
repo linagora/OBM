@@ -1355,5 +1355,6 @@ div.overTxtDiv {
   color: #999;
   overflow: hidden;
   white-space: nowrap;
+  text-align:left;
 }
 
