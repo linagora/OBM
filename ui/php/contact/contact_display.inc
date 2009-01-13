@@ -538,6 +538,7 @@ function dis_contact_consult($contact) {
   $con_q = run_query_contact_detail($id);
   if ($con_q->num_rows() != 1) {
     $display['msg'] .= display_err_msg($l_err_reference);
+    return '';
   }
   $display['detailInfo'] = display_record_info($con_q);
   $display['link'] = html_contact_links($id);
@@ -700,6 +701,7 @@ function html_contact_header($co_q, $funcs) {
 // HTML Display Contact Consultation : main info tab
 // Parameters:
 //   - $co_q : contact database result
+//   - $coords : contact secondary info (addresses, phone numbers, ...)
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_view_main($co_q, $coords) {
   global $l_phone, $l_hphone, $l_mphone, $l_fax, $l_address, $l_postcode;
@@ -724,43 +726,6 @@ function html_contact_view_main($co_q, $coords) {
   $com3 = beautify_comment(nl2br($co_q->f('contact_comment3')));
   
   $newline = "\\r\\n";
-  if (($ad1 == '') && ($ad2 == '') && ($ad3 == '') && ($zip == '')
-      && ($town == '') && ($cdx == '') && ($ctry_name == '')) {
-    if (($c_ad1 != '') && (in_array('address1', $cclipboard_address))) {
-      $copy_addr_comp .= addslashes($c_ad1).$newline;
-    }
-    if (($c_ad2 != '') && (in_array('address2', $cclipboard_address))) {
-      $copy_addr_comp .= addslashes($c_ad2).$newline;
-    }
-    if (($c_ad3 != '') && (in_array('address3', $cclipboard_address))) {
-      $copy_addr_comp .= addslashes($c_ad3).$newline;
-    }
-    if (($c_zip != '') && (in_array('zipcode', $cclipboard_address))) {
-      $copy_addr_comp .= addslashes($c_zip);
-      $copy_zip = true;
-    }
-    if (($c_town != '') && (in_array('town', $cclipboard_address))) {
-      $copy_addr_comp .= ($copy_zip ? ' ' : '') . addslashes($c_town);
-      $copy_town = true;
-    }
-    if ($copy_zip || $copy_town) {
-      $copy_addr_comp .= $newline;
-    }
-    if (($c_cdx != '') && (in_array('expresspostal', $cclipboard_address))) {
-      $copy_addr_comp .= addslashes($c_cdx).$newline;
-    }
-    if (($c_ctry_name != '') && (in_array('country', $cclipboard_address))) {
-      $copy_addr_comp .= addslashes($c_ctry_name).$newline;
-    }
-  }
-  if ( (($phone == '') && ($c_phone != '')) ||
-       (($phone != '') && ($phone == $c_phone)) ) {
-    $phone = "( $c_phone )";
-  }
-  if ( (($fax == '') && ($c_fax != '')) ||
-       (($fax != '') && ($fax == $c_fax)) ) {
-    $fax = "( $c_fax )";
-  }
 
   // Conditionnal fields
 
@@ -781,48 +746,6 @@ function html_contact_view_main($co_q, $coords) {
   }
   if ($service != '') {
     $copy .= addslashes($service) . $newline;
-  }
-  // If contact address is empty, get the company one
-  if ($copy_addr_comp != '') {
-    $copy .= $copy_addr_comp;
-  } else {
-    if (($ad1 != '') && (in_array('address1', $cclipboard_address))) {
-      $copy .= addslashes($ad1).$newline;
-    }
-    if (($ad2 != '') && (in_array('address2', $cclipboard_address))) {
-      $copy .= addslashes($ad2).$newline;
-    }
-    if (($ad3 != '') && (in_array('address3', $cclipboard_address))) {
-      $copy .= addslashes($ad3).$newline;
-    }
-    $copy_zip = false;
-    $copy_town = false;
-    if (($zip != '') && (in_array('zipcode', $cclipboard_address))) {
-      $copy .= addslashes($zip);
-      $copy_zip = true;
-    }
-    if (($town != '') && (in_array('town', $cclipboard_address))) {
-      $copy .= ($copy_zip ? ' ' : '') . addslashes($town);
-      $copy_town = true;
-    }
-    if ($copy_zip || $copy_town) {
-      $copy .= $newline;
-    }
-    if (($ctry_name != '') && (in_array('country', $cclipboard_address))) {
-      $copy .= addslashes($ctry_name).$newline;
-    }
-  }
-  if (($phone != '') && (in_array('phone', $cclipboard_address))) {
-    $copy .= "$l_phone : " . addslashes($phone).$newline;
-  }
-  if (($fax != '') && (in_array('fax', $cclipboard_address))) {
-    $copy .= "$l_fax : " . addslashes($fax).$newline;
-  }
-  if (($mphone != '') && (in_array('mobile', $cclipboard_address))) {
-    $copy .= "$l_mphone : " . addslashes($mphone).$newline;
-  }
-  if (($email != '') && (in_array('email', $cclipboard_address))) {
-    $copy .= "$l_email : " . addslashes($email).$newline;
   }
   
   // Service field
@@ -865,17 +788,17 @@ function html_contact_view_main($co_q, $coords) {
       //  <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"$l_copy\" ><img alt=\"$l_copy\" src=\"$ico_clipboard\" /></a>
       //}
       switch ($kind) {
-      case 'website' :
-        $data = "<a href=\"$datas[0]\">$datas[0]</a>";
-        break;
-      case 'email' :
-        $data = "<a href=\"mailto:$datas[0]\">$datas[0]</a>";
-        break;
-      case 'address' :
-        $data = implode('<br />', $datas);
-        break;
-      default :
-        $data = implode('<br />', $datas);
+        case 'website' :
+          $data = "<a href=\"$datas[0]\">$datas[0]</a>";
+          break;
+        case 'email' :
+          $data = "<a href=\"mailto:$datas[0]\">$datas[0]</a>";
+          break;
+        case 'address' :
+          $data = implode('<br />', $datas);
+          break;
+        default :
+          $data = implode('<br />', $datas);
       }
       $coords .= "<tr><th>$header</th><td>$data</td></tr>";
     }
@@ -1238,8 +1161,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   if (isset($contact['ims'])) { $ims = $contact['ims'];}
   if (isset($contact['websites'])) { $websites = $contact['websites'];}
   if (isset($contact['emails'])) { $emails = $contact['emails'];}
-  if (isset($contact['mphone'])) { $mphone = stripslashes($contact['mphone']); }
-  if (isset($contact['fax'])) { $fax = stripslashes($contact['fax']); }
   if (isset($contact['mailok'])) { $mailok = ($contact['mailok'] == 1 ? 'checked' : ''); }
   if (isset($contact['comment'])) { $comment = stripslashes($contact['comment']); }
   if (isset($contact['add_comment'])) { $add_comment = stripslashes($contact['add_comment']); }

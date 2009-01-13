@@ -74,9 +74,6 @@ $password_encryption = 'PLAIN';
 
 // Modules specific parameters ----------------------------------------------//
 
-// Company and Contact : Copy address to clipboard
-$cclipboard_address = array ('title', 'address1' , 'address2', 'address3', 'zipcode', 'town', 'expresspostal', 'country', 'phone', 'fax', 'mobile', 'email', 'web');
-
 // Company : Auto format fields
 $caf_company_name = true;
 $caf_town = true;
@@ -244,8 +241,6 @@ $profiles['admin'] = array (
 //$cgp_hide['company']['type'] = true;
 //$cgp_hide['company']['activity'] = true;
 //$cgp_hide['company']['nafcode'] = true;
-//$cgp_hide['company']['company_address3'] = true;
-//$cgp_hide['company']['company_expresspostal'] = true;
 
 // Contact module
 //$cgp_hide['contact']['function'] = true;

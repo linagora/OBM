@@ -117,12 +117,8 @@ $l_recept = "Mode de réception";
 $l_quantity = "Quantité";
 $l_quantity = "Quantité";
 $l_no_found_subscription = "Aucun abonnement lié à ce contact !";
-$l_remove = 'Supprimer';
-$l_street = 'Rue';
-$l_vcf_file = "Fichier VCF à importer" ;
 
-$l_im = "Messagerie Instantanée";
-$l_website = "Site internet";
+$l_vcf_file = "Fichier VCF à importer" ;
 
 $l_phone_labels = array ('HOME_VOICE' => 'Téléphone (domicile)', 'WORK_VOICE' => 'Téléphone (bureau)', 'CELL_VOICE' => 'Téléphone portable', 'HOME_FAX' => 'Fax (domicile)','WORK_FAX' => 'Fax (bureau)', 'PAGER' => 'Pager', 'OTHER' => 'Autre téléphone');
 $l_email_labels = array ('INTERNET' => 'Internet', 'OTHER' => 'Autre');

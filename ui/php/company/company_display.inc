@@ -645,43 +645,40 @@ function dis_company_consult($params) {
   global $path, $display, $obminclude, $l_err_reference;
 
   $cid = $params['company_id'];
-
-  if ($cid > 0) {
-    $comp_q = run_query_company_detail($cid);
-    if ($comp_q->num_rows() == 1) {
-      $display['detailInfo'] = display_record_info($comp_q);
-      $display['link'] = html_company_links($comp_q);
-      $block .= html_company_consult($comp_q);
-      $view = $params['view'];
-      
-      if ($view != '') {
-	global $fieldnames;
-	include("$obminclude/lang/".$_SESSION['set_lang'].'/global.inc');
-	include("$obminclude/lang/".$_SESSION['set_lang']."/$view.inc");
-	include("$path/$view/".$view.'_display.inc');
-	include("$path/$view/".$view.'_query.inc');
-	$ext_func = "ext_dis_${view}_list";
-	$block .= $ext_func($params, 'company', $cid);
-      } else {
-	$block .= html_company_consult_address($comp_q);
-      }
-    } else {
-      $display['msg'] .= display_err_msg($l_err_reference);
-    }
-  } else {
+  $comp_q = run_query_company_detail($cid);
+  if ($comp_q->num_rows() != 1) {
     $display['msg'] .= display_err_msg($l_err_reference);
+    return '';
   }
-
+  $display['detailInfo'] = display_record_info($comp_q);
+  $display['link'] = html_company_links($comp_q);
+  
+  $block .= html_company_header($comp_q);
+  
+  $view = $params['view'];
+  if ($view != '') {
+    global $fieldnames;
+    include("$obminclude/lang/".$_SESSION['set_lang'].'/global.inc');
+    include("$obminclude/lang/".$_SESSION['set_lang']."/$view.inc");
+    include("$path/$view/".$view.'_display.inc');
+    include("$path/$view/".$view.'_query.inc');
+    $ext_func = "ext_dis_${view}_list";
+    $block .= $ext_func($params, 'company', $cid);
+  } else {
+	  $coords = run_query_company_coords($cid);
+	  $block .= html_company_view_main($comp_q, $coords);
+  }
+  
   return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// XHTML Display Company Consultation
+// HTML Display Company Consultation
 // Parameters:
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_consult($co_q) {
+function html_company_header($co_q) {
   global $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   global $l_name, $l_aka, $l_number, $l_nafcode, $l_vat, $l_siret, $l_market;
   global $l_company, $l_archive;
@@ -802,131 +799,79 @@ function html_company_consult($co_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// XHTML Display Company Consultation : Address sub view
+// XHTML Display Company Consultation : main info tab
 // Parameters:
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_consult_address($co_q) {
+function html_company_view_main($co_q, $coords) {
   global $ico_contact, $ico_contact_new, $ico_google;
   global $l_name, $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment;
   global $l_company, $l_coord,$ico_mail,$ico_web;
-  global $display, $l_yes, $l_no, $cgp_hide,$ico_clipboard,$cclipboard_address;
+  global $display, $l_yes, $l_no, $l_copy, $ico_clipboard;
   
   $id = $co_q->f('company_id');
   $archive = ($co_q->f('company_archive') == 1 ? $l_yes : $l_no);
   $name = $co_q->f('company_name');
-  $ad1 = $co_q->f('company_address1');
-  $ad2 = $co_q->f('company_address2');
-  $ad3 = $co_q->f('company_address3');
-  $zip = $co_q->f('company_zipcode');
-  $town = $co_q->f('company_town');
-  $cdx = $co_q->f('company_expresspostal');
-  $ctry_name = $co_q->f('country_name');
-  $phone = $co_q->f('company_phone');
-  $fax = $co_q->f('company_fax');
-  $web = $co_q->f('company_web');
-  $email = $co_q->f('company_email');
   $com = beautify_comment(nl2br($co_q->f('company_comment')));
 
   // User defined data
   $block_userdata .= of_userdata_dis_entity_consult('company', $id);
-
-  // Conditionnal fields
-  $show_ad3 = (! $cgp_hide['company']['company_address3']);
-  $show_cdx = (! $cgp_hide['company']['company_expresspostal']);
-
-  $newline = "\r\n";
-  $copy = $name.$newline;
-  if (($ad1 != '') && (in_array('address1', $cclipboard_address))) {
-    $copy .= $ad1.$newline;
-  }
-  if (($ad2 != '') && (in_array('address2', $cclipboard_address))) {
-    $copy .= $ad2.$newline;
-  }
-  if (($ad3 != '') && (in_array('address3', $cclipboard_address))) {
-    $copy .= $ad3.$newline;
-  }
-  if (($zip != '') && (in_array('zipcode', $cclipboard_address))) {
-    $copy .= $zip;
-    $copy_zip = true;
-  }
-  if (($town != '') && (in_array('town', $cclipboard_address))) {
-    $copy .= ($copy_zip ? ' ' : '') . $town;
-    $copy_town = true;
-  }
-  if ($copy_zip || $copy_town) {
-    $copy .= $newline;
-  }
-  if (($cdx != '') && (in_array('expresspostal', $cclipboard_address))) {
-    $copy .= $cdx.$newline;
-  }
-  if (($ctry_name != '') && (in_array('country', $cclipboard_address))) {
-    $copy .= $ctry_name.$newline;
-  }
-  if (($phone != '') && (in_array('phone', $cclipboard_address))) {
-    $copy .= "$l_phone : " . $phone.$newline;
-  }
-  if (($fax != '') && (in_array('fax', $cclipboard_address))) {
-    $copy .= "$l_fax : " . $fax.$newline;
-  }
-  if (($email != '') && (in_array('email', $cclipboard_address))) {
-    $copy .= "$l_email : " . $email.$newline;
-  }
-  if (($web != '') && (in_array('web', $cclipboard_address))) {
-    $copy .= "$l_web : " . $web.$newline;
-  }
-  $copy = "'".phpStringToJsString($copy)."'"; 
-  // Address3 field
-  if ($show_ad3) {
-    $block_ad3 = "
-  <tr>
-    <th>$l_address 3 :</th>
-    <td>$ad3</td>
-  </tr>";
-  }
-
-  // Cedex field
-  if ($show_cdx) {
-    $block_cdx = "
-  <tr>
-    <th>$l_expresspostal</th>
-    <td>$cdx</td>
-  </tr>";
-  }
-
-  // Email link
-  if ($email != '') {
-    $link_email = "<a href=\"mailto:$email\">
-    <img border=\"0\" src=\"$ico_mail\"
-    alt=\"$email\" /></a>";
-  } else {
-    $link_email = '&nbsp;';
-  }
-
-  // Web link
-  if ($web != '') {
-    $link_web = "<a target=\"_blank\" href=\"";
-    if ( (strcmp(substr($web,0,7), 'http://') == 0)
-	 || (strcmp(substr($web,0,8), 'https://') == 0) ){
-      $link_web .= '';
-    } else {
-      $link_web .= 'http://';
-    }
-    $link_web .= "$web\">
-    <img border=\"0\" src=\"$ico_web\"
-    alt=\"$web\" /></a>";
-  } else {
-    $link_web = '&nbsp;';
-  }
-
-  $map_address = urlencode("$ad1 $zip $town $ctry_name");
   
-  // --- HTML Template --------------------------------------------------------
-
-  $template = get_template('company_consult.tpl');
-  eval ("\$template = \"$template\";");
-  $block = $template;
+  foreach($coords as $kind => $row) {
+    $coords = '';
+    $GLOBALS["l_${kind}_labels"]['COMPANY'] = $l_company;
+    foreach($row as $values) {
+      $datas = array();
+      foreach($values as $label => $value) {
+        if($label == 'label' || $label == 'protocol') {
+          if(isset($GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)])) {
+            $header = $GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)];
+          } else {
+            $header = $value;
+          }
+        } elseif(!empty($value)) {
+          $datas[] = nl2br($value);
+        }
+      }
+      switch ($kind) {
+        case 'website' :
+          $data = "<a href=\"$datas[0]\">$datas[0]</a>";
+          break;
+        case 'email' :
+          $data = "<a href=\"mailto:$datas[0]\">$datas[0]</a>";
+          break;
+        case 'address' :
+          $data = implode('<br />', $datas);
+          $map_address = urlencode(implode(' ', $datas));
+          foreach ($datas as $k => $v) {
+            $datas[$k] = addslashes($v);
+          }
+          $clipboard = implode('\r\n', $datas);
+          $header.= "&nbsp;<a href=\"javascript: return false;\" onclick=\"company_copy_clip('$clipboard'); return false;\" title=\"$l_copy\" ><img alt=\"$l_copy\" src=\"$ico_clipboard\" /></a>";
+          $header.= "&nbsp;<a target=\"_blank\" href=\"http://maps.google.fr/maps?f=q&amp;hl=fr&amp;q=$map_address&amp;t=h&amp;z=14&amp;source=embed\"><img alt=\"Map\" src=\"$ico_google\"></a>";
+          break;
+        default :
+          $data = implode('<br />', $datas);
+      }
+      $coords .= "<tr><th>$header</th><td>$data</td></tr>";
+    }
+    $block .= "
+    <div class=\"detail infos\">
+    <h1>".$GLOBALS["l_$kind"]."</h1>
+    <table>
+    $coords
+    </table>
+    </div>
+    ";
+  }
+  
+  $block.= "
+    $block_userdata
+    <div class=\"detail extra\">
+      <h1>$l_comment</h1>
+      $com
+    </div>";
   
   return $block;
 }
@@ -970,8 +915,10 @@ function dis_company_form($action, $company) {
   }
   $users = of_usergroup_get_group_users($obm['group_com'], true, $uids, 'userobm_lastname');
   $ctry_q = run_query_global_country_for_lang();
-  
-  $block = html_company_form($action, $comp_q, $dsrc_q, $types, $acts, $naf_q, $users, $ctry_q, $company);
+  if($c_id > 0) {
+    $coords = run_query_company_coords($c_id, true);
+  }
+  $block = html_company_form($action, $comp_q, $dsrc_q, $types, $acts, $naf_q, $users, $ctry_q, $company, $coords);
 
   return $block;
 }
@@ -989,16 +936,18 @@ function dis_company_form($action, $company) {
  * @param mixed $users     : array : userobm 
  * @param mixed $ctry_q    : country database result 
  * @param mixed $company[] : default values
+ * @param mixed $coords    : company secondary info
  * @return string XHTML company form
  */
-function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $users, $ctry_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $users, $ctry_q, $company, $coords) {
   global $display, $obm, $cgp_hide, $c_undef, $l_undef;
   global $ico_web,$ico_mail,$ico_add, $l_header_new_f;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_add_comment,$l_upd_comment;
-  global $l_number, $l_vat, $l_siret, $l_market, $l_coord;
-  global $l_insert, $l_update, $l_internal, $l_company, $l_archive;
+  global $l_number, $l_vat, $l_siret, $l_market, $l_coord, $l_website;
+  global $l_add, $l_insert, $l_update, $l_remove, $l_internal, $l_company, $l_archive;
+  global $l_phone_labels, $l_email_labels, $l_address_labels,$l_website_labels;
 
   $uid = $obm['uid'];
   $lang = get_lang();
@@ -1012,7 +961,6 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
   $GLOBALS['js']['vars']['labels']['phoneNumber'] = $l_number;
   $GLOBALS['js']['vars']['labels']['emailAddress'] = $l_email;
   $GLOBALS['js']['vars']['labels']['websiteUrl'] = $l_website;
-  $GLOBALS['js']['vars']['labels']['imAddress'] = $l_im;
   $GLOBALS['js']['vars']['labels']['addressStreet'] = $l_street;
   $GLOBALS['js']['vars']['labels']['addressTown'] = $l_town;
   $GLOBALS['js']['vars']['labels']['addressZipcode'] = $l_postcode;
@@ -1039,23 +987,16 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
     $act = $co_q->f('company_activity_id');
     $naf = $co_q->f('company_nafcode_id');
     $mark = $co_q->f('company_marketingmanager_id');
-    $ad1 = $co_q->f('company_address1');
-    $ad2 = $co_q->f('company_address2');
-    $ad3 = $co_q->f('company_address3');
-    $zip = $co_q->f('company_zipcode');
-    $town = $co_q->f('company_town');
-    $cdx = $co_q->f('company_expresspostal');
-    $ctry = $co_q->f('company_country_iso3166');
-    $phone = $co_q->f('company_phone');
-    $fax = $co_q->f('company_fax');
-    $web = $co_q->f('company_web');
-    $email = $co_q->f('company_email');
     $con_num = $co_q->f('company_contact_number');
     $deal_num = $co_q->f('company_deal_number');
     $comment = $co_q->f('company_comment');
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
     $dis_title = $name;
+    $phones = $coords['phone'];
+    $addresses = $coords['address'];
+    $emails = $coords['email'];
+    $websites = $coords['website'];
   } else if ($action == 'new') {
     $mark = $obm['uid'];
     $dsrc = $_SESSION['set_dsrc'];
@@ -1076,17 +1017,10 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
   if (isset($company['activity'])) { $act = $company['activity']; }
   if (isset($company['naf'])) { $naf = $company['naf']; }
   if (isset($company['market'])) { $mark = $company['market']; }
-  if (isset($company['ad1'])) { $ad1 = stripslashes($company['ad1']); }
-  if (isset($company['ad2'])) { $ad2 = stripslashes($company['ad2']); }
-  if (isset($company['ad3'])) { $ad3 = stripslashes($company['ad3']); }
-  if (isset($company['zip'])) { $zip = stripslashes($company['zip']); }
-  if (isset($company['town'])) { $town = stripslashes($company['town']); }
-  if (isset($company['cdx'])) { $cdx = stripslashes($company['cdx']); }
-  if (isset($company['country'])) { $ctry = $company['country']; }
-  if (isset($company['phone'])) { $phone = stripslashes($company['phone']); }
-  if (isset($company['fax'])) { $fax = stripslashes($company['fax']); }
-  if (isset($company['web'])) { $web = stripslashes($company['web']); }
-  if (isset($company['email'])) { $email = stripslashes($company['email']); }
+  if (isset($company['phones'])) { $phones = $company['phones'];}
+  if (isset($company['addresses'])) { $addresses = $company['addresses'];}
+  if (isset($company['websites'])) { $websites = $company['websites'];}
+  if (isset($company['emails'])) { $emails = $company['emails'];}
   if (isset($company['comment'])) { $comment = stripslashes($company['comment']); }
   if (isset($company['add_comment'])) { $add_comment = stripslashes($company['add_comment']); }
   if (isset($company['usercomment'])) { $usercomment = $company['usercomment']; }
@@ -1210,11 +1144,11 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
           $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
-        $js .=  "new Obm.Contact.PhoneWidget({".implode(',',$params)."});\n";
+        $js .=  "new Obm.Company.PhoneWidget({".implode(',',$params)."});\n";
       }
     }
   }
-  $js .= "new Obm.Contact.PhoneWidget();\n";
+  $js .= "new Obm.Company.PhoneWidget();\n";
   // ADDRESSES 
   if(is_array($addresses)) {
     foreach($addresses as $address) {
@@ -1224,11 +1158,11 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
           $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
-        $js .=  "new Obm.Contact.AddressWidget({".implode(',',$params)."});\n";
+        $js .=  "new Obm.Company.AddressWidget({".implode(',',$params)."});\n";
       }
     }
   }
-  $js .= "new Obm.Contact.AddressWidget();\n";
+  $js .= "new Obm.Company.AddressWidget();\n";
   // EMAILS 
   if(is_array($emails)) {
     foreach($emails as $email) {
@@ -1238,11 +1172,11 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
           $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
-        $js .=  "new Obm.Contact.EmailWidget({".implode(',',$params)."});\n";
+        $js .=  "new Obm.Company.EmailWidget({".implode(',',$params)."});\n";
       }
     }
   }
-  $js .= "new Obm.Contact.EmailWidget();\n";
+  $js .= "new Obm.Company.EmailWidget();\n";
   // WEBSITES 
   if(is_array($websites)) {
     foreach($websites as $website) {
@@ -1252,11 +1186,11 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
           $value = phpStringToJsString($value);
           $params[] = "$field: {value : '$value'}";
         }
-        $js .=  "new Obm.Contact.WebsiteWidget({".implode(',',$params)."});\n";
+        $js .=  "new Obm.Company.WebsiteWidget({".implode(',',$params)."});\n";
       }
     }
   }
-  $js .= "new Obm.Contact.WebsiteWidget();\n";
+  $js .= "new Obm.Company.WebsiteWidget();\n";
 
   $display['title'] = $dis_title;
 
@@ -1306,9 +1240,6 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
     </fieldset>
     <fieldset class=\"detail infos\" id='emailHolder'>
     <legend>$l_email <a href='' onclick=\"new Obm.Contact.EmailWidget();return false;\">$l_add</a></legend>
-    </fieldset>
-    <fieldset class=\"detail infos\" id='imHolder'>
-    <legend>$l_im <a href='' onclick=\"new Obm.Contact.IMWidget();return false;\">$l_add</a></legend>
     </fieldset>
     <fieldset class=\"detail infos\" id='websiteHolder'>
     <legend>$l_website <a href='' onclick=\"new Obm.Contact.WebsiteWidget();return false;\">$l_add</a></legend>

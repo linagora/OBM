@@ -89,5 +89,5 @@ $l_company_display = "Display options for companies lists";
 
 $l_phone_labels = array ('WORK_VOICE' => 'Phone', 'CELL_VOICE' => 'Mobile phone', 'WORK_FAX' => 'Fax', 'OTHER' => 'Other phone');
 $l_email_labels = array ('INTERNET' => 'Home', 'OTHER' => 'Other');
-$l_address_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');
-$l_website_labels = array ('URL' => 'Homepage', 'BLOG' => 'Blog', 'OTHER' => 'Other');
+$l_address_labels = array ('HQ' => 'Headquarters', 'OTHER' => 'Other');
+$l_website_labels = array ('URL' => 'Website', 'OTHER' => 'Other');

@@ -1229,12 +1229,6 @@ function check_contact_data_form($cid, &$contact) {
 
   $lname = $contact['lname'];
   $fname = $contact['fname'];
-  $phone = $contact['phone'];
-  $hphone = $contact['hphone'];
-  $mphone = $contact['mphone'];
-  $fax = $contact['fax'];
-  $email = stripslashes($contact['email']);
-  $email2 = stripslashes($contact['email2']);
   $priv = $contact['privacy'];
   $c_id = $contact['company_id'];
   $c_new_id = $contact['company_new_id'];
@@ -1277,28 +1271,6 @@ function check_contact_data_form($cid, &$contact) {
         return false;
       }  
     }
-  }
-
-  // Contact mobile or personal phone
-  if (($hphone != '') && (preg_match($php_regexp_phone, $hphone) == 0)) {
-    $err['msg'] = $l_j_check_hphone . " : $hphone";
-    return false;
-  }
-  if (($mphone != '') && (preg_match($php_regexp_phone, $mphone) == 0)) {
-    $err['msg'] = $l_j_check_mphone . " : $mphone";
-    return false;
-  }
-  // Contact fax
-  if (($fax != '') && (preg_match($php_regexp_fax, $fax) == 0)) {
-    $err['msg'] = $l_j_check_fax . " : $fax";
-    return false;
-  }
-
-
-  // Contact email
-  if (($email2 != '') && (preg_match($php_regexp_email, $email2) == 0)) {
-    $err['msg'] = $l_j_check_email . " : $email2";
-    return false;
   }
 
   // Allow public contact handling only if write_admin right

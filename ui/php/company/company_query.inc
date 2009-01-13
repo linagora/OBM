@@ -152,25 +152,13 @@ function run_query_company_search($company) {
       company_activity_id,
       company_nafcode_id,
       company_marketingmanager_id,
-      company_address1,
-      company_address2,
-      company_address3,
-      company_zipcode,
-      company_town,
-      company_expresspostal,
-      company_country_iso3166,
-      company_phone,
-      company_fax,
-      company_web,
-      company_email,
       company_contact_number,
       company_deal_number,
       company_deal_total,
       companytype_label as type_label,
       companyactivity_label as activity_label,
       companynafcode_code as nafcode_code,
-      companynafcode_label as nafcode_label,
-      country_name
+      companynafcode_label as nafcode_label
     FROM Company
     INNER JOIN CompanyEntity ON companyentity_company_id = company_id
       ";
@@ -249,8 +237,6 @@ function run_query_company_detail($p_id) {
          LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id
          LEFT JOIN CompanyNafCode ON company_nafcode_id=companynafcode_id
          LEFT JOIN UserObm as m ON company_marketingmanager_id=m.userobm_id
-         LEFT JOIN Country ON company_country_iso3166=country_iso3166
-                   AND country_lang='$lang'
          LEFT JOIN DataSource ON company_datasource_id=datasource_id
          LEFT JOIN UserObm as c ON company_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON company_userupdate=u.userobm_id
@@ -261,6 +247,69 @@ function run_query_company_detail($p_id) {
   $obm_q->next_record();
 
   return $obm_q;
+}
+
+/**
+ * run_query_company_coords
+ * 
+ * @param mixed $id
+ * @access public
+ * @return void
+ */
+function run_query_company_coords($id, $update=false) {
+  global $cdg_sql;
+  $obm_q = new DB_OBM;
+  $coords = array();
+  $query = "SELECT phone_label, phone_number FROM Phone INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id WHERE companyentity_company_id = $id ORDER BY phone_label";
+  display_debug_msg($query, $cdg_sql, 'run_query_company_coords(Phone)');
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $label = explode(';',$obm_q->f('phone_label'));
+    array_pop($label);
+    $label = implode('_',$label);
+    $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
+  }
+  $query = "SELECT email_label, email_address FROM Email INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id WHERE companyentity_company_id = $id ORDER BY email_label";
+  display_debug_msg($query, $cdg_sql, 'run_query_company_coords(Email)');
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $label = explode(';',$obm_q->f('email_label'));
+    array_pop($label);
+    $label = implode('_',$label);
+    $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
+  }
+  
+  $query = "SELECT website_label, website_url FROM Website INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id WHERE companyentity_company_id = $id ORDER BY website_label";
+  display_debug_msg($query, $cdg_sql, 'run_query_company_coords(Website)');
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $label = explode(';',$obm_q->f('website_label'));
+    array_pop($label);
+    $label = implode('_',$label);
+    $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
+  }
+  $lang = get_lang();
+  $query = "SELECT 
+    address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name
+    FROM Address INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
+    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' WHERE companyentity_company_id = $id ORDER BY address_label";
+  display_debug_msg($query, $cdg_sql, 'run_query_company_coords(Address)');
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $label = explode(';',$obm_q->f('address_label'));
+    array_pop($label);
+    $label = implode('_',$label);
+    if($update) {
+      $country =  $obm_q->f('address_country');
+    } else {
+      $country = $obm_q->f('country_name');
+    }
+    $coords['address'][] = array(
+      'label' => $label, 'street' => $obm_q->f('address_street'), 'zipcode' => $obm_q->f('address_zipcode'),
+      'expresspostal' => $obm_q->f('address_expresspostal'), 'town' => $obm_q->f('address_town'), 'country' => $country);
+  }
+
+  return $coords;
 }
 
 
@@ -297,17 +346,6 @@ function run_query_company_insert($company) {
   $act = sql_parse_id( $company['activity']); 
   $naf = sql_parse_id( $company['naf']); 
   $market = sql_parse_id( $company['market']);
-  $ad1 = $company['ad1'];
-  $ad2 = $company['ad2'];
-  $ad3 = $company['ad3'];
-  $zip = $company['zip'];
-  $town = $company['town'];
-  $cdx = $company['cdx'];
-  $ctry = $company['country'];
-  $phone = $company['phone'];
-  $fax = $company['fax'];
-  $web = trim($company['web']);
-  $email = trim($company['email']);
   $comment = $company['comment'];
   $add_comment = $company['add_comment'];
   if ($add_comment != '') {
@@ -338,17 +376,6 @@ function run_query_company_insert($company) {
     company_activity_id,
     company_nafcode_id,
     company_marketingmanager_id,
-    company_address1,
-    company_address2,
-    company_address3,
-    company_zipcode,
-    company_town,
-    company_expresspostal,
-    company_country_iso3166,
-    company_phone,
-    company_fax,
-    company_web,
-    company_email,
     company_comment)
   VALUES (
     $domain_id,
@@ -368,17 +395,6 @@ function run_query_company_insert($company) {
     $act,
     $naf,
     $market,
-    '$ad1',
-    '$ad2',
-    '$ad3',
-    '$zip',
-    '$town',
-    '$cdx',
-    '$ctry',
-    '$phone',
-    '$fax',
-    '$web',
-    '$email',
     '$comment')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_company_insert(1)');
@@ -389,7 +405,8 @@ function run_query_company_insert($company) {
   $id = $obm_q->lastid();
 
   if ($id > 0) {
-    $entity_id = of_entity_insert($GLOBALS['module'], $id);    
+    $entity_id = of_entity_insert($GLOBALS['module'], $id);
+    run_query_contact_coords_update($entity_id, $company);
     $ret = of_userdata_query_update('company', $id, $company);
   }
 
@@ -430,17 +447,6 @@ function run_query_company_update($cid, $company) {
   $naf = sql_parse_id( $company['naf']);
   $upd_naf = "company_nafcode_id=$naf,";
   $market = sql_parse_id( $company['market']);
-  $ad1 = $company['ad1'];
-  $ad2 = $company['ad2'];
-  $ad3 = $company['ad3'];
-  $zip = $company['zip'];
-  $town = $company['town'];
-  $cdx = $company['cdx'];
-  $ctry = $company['country'];
-  $phone = $company['phone'];
-  $fax = $company['fax'];
-  $web = trim($company['web']);
-  $email = trim($company['email']);
   $comment = $company['comment'];
   $add_comment = $company['add_comment'];
   if ($add_comment != '') {
@@ -465,17 +471,6 @@ function run_query_company_update($cid, $company) {
     $upd_act
     $upd_naf
     company_marketingmanager_id=$market,
-    company_address1='$ad1',
-    company_address2='$ad2',
-    company_address3='$ad3',
-    company_zipcode='$zip',
-    company_town='$town',
-    company_expresspostal='$cdx',
-    company_country_iso3166='$ctry',
-    company_phone='$phone',
-    company_fax='$fax',
-    company_web='$web',
-    company_email='$email',
     company_comment='$comment'
   WHERE company_id $cid_sql
     $multidomain";
@@ -486,6 +481,8 @@ function run_query_company_update($cid, $company) {
 
   if ($retour) {
     $ret = of_userdata_query_update('company', $cid, $company);
+    $entityid = of_entity_get('company', $cid);
+    run_query_contact_coords_update($entityid, $company);
   }
 
   return $retour;
@@ -507,9 +504,10 @@ function run_query_company_delete($p_id) {
   run_query_global_delete_document_links($p_id, 'company');
 
   $ret = of_userdata_query_delete('company', $p_id);
-  $p_id = sql_parse_id( $p_id, true);
 
   of_entity_delete($GLOBALS['module'], $p_id);
+  
+  $p_id = sql_parse_id( $p_id, true);  
   $query = "DELETE FROM Company
     WHERE company_id $p_id 
       $multidomain";
@@ -525,9 +523,8 @@ function run_query_company_delete($p_id) {
 // Parameters:
 //   - $p_id : company Id not to return
 //   - $name : name
-//   - $zip  : zip
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_company($p_id, $name, $zip) {
+function run_query_check_company($p_id, $name) {
   global $cdg_sql;
 
   $where_id = '';
@@ -540,7 +537,7 @@ function run_query_check_company($p_id, $name, $zip) {
   $like = sql_casei_like($db_type);
   $multidomain = sql_multidomain('company');
 	
-  $query = "SELECT DISTINCT company_id, company_name, company_zipcode 
+  $query = "SELECT DISTINCT company_id, company_name 
     FROM Company
     WHERE company_name $like '$name%'
       $where_id
@@ -728,10 +725,9 @@ function get_company_nafcode_label($id) {
 function check_company_context($cid, $company) {
 
   $name = $company['name'];
-  $zip = $company['zip'];
 
-  // if a company with same name and zip exists, return false
-  $co_q = run_query_check_company($cid, $name, $zip);
+  // if a company with same name exists, return false
+  $co_q = run_query_check_company($cid, $name);
   return $co_q;
 }
 
@@ -754,11 +750,9 @@ function check_company_data_form($cid, $company) {
   $number = $company['number'];
   $name = $company['name'];
   $act = $company['activity'];
-  $zip = $company['zip'];
-  $phone = $company['phone'];
-  $fax = $company['fax'];
-  $web = trim($company['web']);
-  $email = trim($company['email']);
+  $phones = $company['phones'];
+  $emails = $company['emails'];
+  $addresses = $company['addresses'];
 
   // MANDATORY: Company name
   if (trim($name) == '') {
@@ -773,33 +767,33 @@ function check_company_data_form($cid, $company) {
   //  }
 
   // Company Zip code
-  if (($zip != '') && (preg_match($php_regexp_zip, $zip) == 0)) {
-    $err['msg'] = $l_j_check_zip . " : $zip";
-    return false;
+  if(is_array($addresses)) {
+    foreach($addresses as $address) {
+      if (($address['zipcode'] != '') && (preg_match($php_regexp_zip, $address['zipcode']) == 0)) {
+        $err['msg'] = $l_j_check_zip . " : $address[zipcode]";
+        return false;
+      }
+    }
   }
-
+  
   // Company phone
-  if (($phone != '') && (preg_match($php_regexp_phone, $phone) == 0)) {
-    $err['msg'] = $l_j_check_phone . " : $phone";
-    return false;
-  }
-
-  // Company fax
-  if (($fax != '') && (preg_match($php_regexp_fax, $fax) == 0)) {
-    $err['msg'] = $l_j_check_fax . " : $fax";
-    return false;
+  if(is_array($phones)) {
+    foreach($phones as $phone) {
+      if (($phone['number'] != '') && (preg_match($php_regexp_phone, $phone['number']) == 0)) {
+        $err['msg'] = $l_j_check_phone . " : $phone[number]";
+        return false;
+      }
+    }
   }
 
   // Company email
-  if (($email != '') && (preg_match($php_regexp_email, $email) == 0)) {
-    $err['msg'] = $l_j_check_email . " : $email";
-    return false;
-  }
-
-  // Company web
-  if (($web != '') && (preg_match($php_regexp_web, $web) == 0)) {
-    $err['msg'] = $l_j_check_web . " : $web";
-    return false;
+  if(is_array($emails)) {
+    foreach($emails as $email) {
+      if (($email['address'] != '') && (preg_match($php_regexp_email, $email['address']) == 0)) {
+        $err['msg'] = $l_j_check_email . " : $email[address]";
+        return false;
+      }  
+    }
   }
 
   return true; 

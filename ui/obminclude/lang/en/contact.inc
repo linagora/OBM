@@ -111,12 +111,7 @@ $l_recept = "Reception mode";
 $l_quantity = "Quantity";
 $l_no_found_subscription = "No subscription found for this contact !";
 
-$l_im = "Instant Messaging";
-$l_website = "Website";
-$l_remove = 'Remove';
-
-$l_vcf_file = 'VCF file to import';
-$l_street = 'Street';
+$l_vcf_file = "VCF file to import";
 
 $l_phone_labels = array ('HOME_VOICE' => 'Home phone', 'WORK_VOICE' => 'Work phone', 'CELL_VOICE' => 'Mobile phone', 'HOME_FAX' => 'Home fax', 'WORK_FAX' => 'Work fax', 'PAGER' => 'Pager', 'OTHER' => 'Other phone');
 $l_email_labels = array ('INTERNET' => 'Home', 'OTHER' => 'Other');

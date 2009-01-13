@@ -47,9 +47,10 @@ page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => '
 include("$obminclude/global_pref.inc");
 require('company_display.inc');
 require('company_query.inc');
+require('../contact/contact_query.inc');
 include("$obminclude/of/of_category.inc");
-
 require('company_js.inc');
+$extra_js_include[] = 'company.js';
 
 get_company_action();
 $perm->check_permissions($module, $action);
