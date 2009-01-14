@@ -228,8 +228,8 @@ function run_query_user_ext_search($user) {
     if ((is_array($users_ids)) && (count($users_ids) > 0)) {
       $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
       foreach($users_ids as $u_id) {
-	    $where_filter_entity .= "$coma'$u_id'";
-	    $coma = ',';
+	$where_filter_entity .= "$coma'$u_id'";
+	$coma = ',';
       }
       $where_filter_entity .= '))';
     } else {

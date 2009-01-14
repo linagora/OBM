@@ -38,6 +38,7 @@ function sql_date_format($db_type, $field, $as='') {
   return $ret;
 }
 
+
 /**
  * Return an int if id is numeric elser return NULL 
  * 
@@ -56,6 +57,8 @@ function sql_parse_id($id, $select=false, $not=false) {
     return (is_numeric($id) && $id > 0)?(int)$id:'NULL';
   }
 }
+
+
 /**
  * Return an int if $int is numeric elser return 0
  * 
@@ -66,6 +69,8 @@ function sql_parse_id($id, $select=false, $not=false) {
 function sql_parse_int($int) {
   return (is_numeric($int))?(int)$int:0;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return the sql word corresponding to case incensitive like
 // Parameters:

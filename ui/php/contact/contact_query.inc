@@ -1,5 +1,4 @@
 <?php
-
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contact_query.inc                                            //
 //     - Desc : contact query File                                           //
@@ -107,18 +106,18 @@ function run_query_contact_search($contact) {
   }
   // If a company was sent as parameter, get it
   if ($company_id != '') {
-    $company_id = sql_parse_id( $company_id, true);
+    $company_id = sql_parse_id($company_id, true);
     $where .= " AND contact_company_id $company_id"; 
   }
 
   // If a person in charge has been set
   if (($market != $c_all) && ($market != '')) { 
-    $market = sql_parse_id( $market, true);
+    $market = sql_parse_id($market, true);
     $where .= " AND contact_marketingmanager_id $market"; 
   }
   // If a function has been set
   if (($func != $c_all) && ($func != '')) { 
-    $func = sql_parse_id( $func, true);
+    $func = sql_parse_id($func, true);
     $where .= " AND contact_function_id $func"; 
   }
   // If a title has been specified, get it 
@@ -127,7 +126,7 @@ function run_query_contact_search($contact) {
   }
   // If a datasource has been specified, get it 
   if (($dsrc != $c_all) && ($dsrc != '')) { 
-    $dsrc = sql_parse_id( $dsrc, true);
+    $dsrc = sql_parse_id($dsrc, true);
     $where .= " AND contact_datasource_id $dsrc"; 
   }
   if ($dateafter != '') {
@@ -276,7 +275,7 @@ function run_query_contact_detail($p_id) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $p_id = sql_parse_id( $p_id, true);
+  $p_id = sql_parse_id($p_id, true);
   $timeupdate = sql_date_format($db_type, 'contact_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'contact_timecreate', 'timecreate');
   $lang = get_lang();
@@ -395,7 +394,7 @@ function run_query_contact_kind() {
 function run_query_contact_insert($contact) {
   global $cgp_show, $cdg_sql, $obm;
 
-  $uid = sql_parse_id( $obm['uid']);
+  $uid = sql_parse_id($obm['uid']);
 
   $comp_id = $contact['company_new_id'];
   if ($comp_id < 1) {
@@ -404,11 +403,11 @@ function run_query_contact_insert($contact) {
   // In case company module not used, to avoid postgres error
   $comp_id = sql_parse_id($comp_id);
 
-  $domain_id = sql_parse_id( $obm['domain_id']);
-  $dsrc = sql_parse_id( $contact['datasource'] );
+  $domain_id = sql_parse_id($obm['domain_id']);
+  $dsrc = sql_parse_id($contact['datasource'] );
   $company = $contact['company'];
-  $kind = sql_parse_id( $contact['kind']);
-  $market = sql_parse_id( $contact['market']);
+  $kind = sql_parse_id($contact['kind']);
+  $market = sql_parse_id($contact['market']);
   $lname = $contact['lname'];
   $fname = $contact['fname'];
   $aka = trim($contact['aka']);
@@ -421,7 +420,7 @@ function run_query_contact_insert($contact) {
   }
   $sound = phonetic_key($lname);
   $service = $contact['service'];
-  $func = sql_parse_id( $contact['function']);
+  $func = sql_parse_id($contact['function']);
   $title = $contact['title'];
   $mailok = ($contact['mailok'] == '1' ? '1' : '0');
   $newsletter = ($contact['newsletter'] == '1' ? '1' : '0');
@@ -501,17 +500,14 @@ function run_query_contact_insert($contact) {
     '$comment',
     '$comment2',
     '$comment3',
-    'WEB'
+    '$GLOBALS[c_origin_web]'
   )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_contact_insert(1)');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-
   $id = $obm_q->lastid();
-
-
 
   // BEGIN birthday support
 
@@ -564,11 +560,11 @@ function run_query_contact_update($contact) {
     $comp_id = $contact['company_id'];
   }
   // In case company module not used, to avoid postgres error
-  $comp_id = sql_parse_id( $comp_id);
-  $dsrc = sql_parse_id( $contact['datasource']);
+  $comp_id = sql_parse_id($comp_id);
+  $dsrc = sql_parse_id($contact['datasource']);
   $company = $contact['company'];
-  $kind = sql_parse_id( $contact['kind']);
-  $market = sql_parse_id( $contact['market']);
+  $kind = sql_parse_id($contact['kind']);
+  $market = sql_parse_id($contact['market']);
   $lname = $contact['lname'];
   $fname = $contact['fname'];
   $aka = trim($contact['aka']);
@@ -581,7 +577,7 @@ function run_query_contact_update($contact) {
   }
   $sound = phonetic_key($lname);
   $service = $contact['service'];
-  $func = sql_parse_id( $contact['function']);
+  $func = sql_parse_id($contact['function']);
   $title = $contact['title'];
   $mailok = ($contact['mailok'] == '1' ? '1' : '0');
   $newsletter = ($contact['newsletter'] == '1' ? '1' : '0');
@@ -922,7 +918,7 @@ function run_query_contact_coords($id, $update=false) {
 function get_linked_contact_list_nb($p_id) {
   global $cdg_sql;
 
-  $p_id = sql_parse_id( $p_id, true);
+  $p_id = sql_parse_id($p_id, true);
   $query = "SELECT count(DISTINCT contactlist_list_id) as nb
     FROM ContactList
     WHERE contactlist_contact_id $p_id"; 
@@ -945,7 +941,7 @@ function get_linked_contact_list_nb($p_id) {
 function get_linked_contact_publication_nb($p_id) {
   global $cdg_sql;
 
-  $p_id = sql_parse_id( $p_id, true);
+  $p_id = sql_parse_id($p_id, true);
   $query = "SELECT DISTINCT subscription_publication_id as nb
     FROM Subscription 
     WHERE subscription_contact_id $p_id"; 
@@ -966,7 +962,7 @@ function get_linked_contact_publication_nb($p_id) {
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_delete($p_id) {
-  global $cdg_sql, $c_use_connectors;
+  global $obm, $cdg_sql, $c_use_connectors;
 
   // Hook : Pre
   if (function_exists('hook_pre_run_query_contact_delete')) {
@@ -1009,16 +1005,23 @@ function run_query_contact_delete($p_id) {
   // If connectors in use
 
   if ($c_use_connectors) {
-    $query = "INSERT INTO
-      DeletedContact (deletedcontact_contact_id, deletedcontact_timestamp)
-      VALUES ($p_id, NOW())";
+    $uid = sql_parse_id($obm['uid']);
+    $query = "INSERT INTO DeletedContact (
+        deletedcontact_contact_id,
+        deletedcontact_user_id,
+        deletedcontact_timestamp,
+        deletedcontact_origin)
+      VALUES (
+        $p_id,
+        $uid,
+        NOW(),
+        '$GLOBALS[c_origin_web]')";
     display_debug_msg($query, $cdg_sql, 'run_query_contact_delete(2)');
     $retour = $obm_q->query($query);
   }
 
   // After contact deletion to get correct number
   run_query_global_company_contact_number_update($comp_id);
-
 
   return $retour;
 }
@@ -1054,16 +1057,17 @@ function run_query_contact_delete_subscription($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_check($cid, $comp_id, $lname, $fname) {
   global $cdg_sql, $cgp_show, $obm;
+
   $uid = sql_parse_id($obm['uid'], true);
   $multidomain = sql_multidomain('contact');	
   $where_id = '';
   if ($cid != '') {
-    $cid = sql_parse_id( $cid, true, true);
+    $cid = sql_parse_id($cid, true, true);
     $where_id = "contact_id $cid AND";
   }
 
   if ($cgp_show['module']['company']) {
-    $comp_id = sql_parse_id( $comp_id, true);
+    $comp_id = sql_parse_id($comp_id, true);
     $join_comp = 'LEFT JOIN Company ON contact_company_id=company_id';
     $where_comp = "OR (contact_company_id $comp_id AND contact_lastname='$lname')";
     $select_comp = ', company_name';
@@ -1370,7 +1374,7 @@ function get_contact_info($con_id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('contact');
-  $con_id = sql_parse_id( $con_id, true);
+  $con_id = sql_parse_id($con_id, true);
   $query = "SELECT
     contact_company_id,
     contact_privacy
@@ -1419,13 +1423,13 @@ function run_query_contact_kind_insert($contact) {
   global $cdg_sql, $obm;
 
   $timecreate = date('Y-m-d H:i:s');
-  $usercreate = sql_parse_id( $obm['uid']);
+  $usercreate = sql_parse_id($obm['uid']);
   $label = $contact['kind_label'];
   $lang = $contact['kind_lang'];
   $header = $contact['kind_header'];
   //$default = ($contact['kind_default'] == 1 ? 1 : 0);
-  $default = sql_parse_int( $contact['kind_default']);
-  $domain_id = sql_parse_id( $obm['domain_id']);
+  $default = sql_parse_int($contact['kind_default']);
+  $domain_id = sql_parse_id($obm['domain_id']);
 
   // If kind is new default for this lang, we cancel other defaults
   if ($default == 1) {
@@ -1489,12 +1493,12 @@ function run_query_contact_kind_update($contact) {
   global $obm, $cdg_sql;
 
   $timeupdate = date('Y-m-d H:i:s');
-  $userupdate = sql_parse_id( $obm['uid']);
-  $id = sql_parse_id( $contact['kind'], true);
+  $userupdate = sql_parse_id($obm['uid']);
+  $id = sql_parse_id($contact['kind'], true);
   $label = $contact['kind_label'];
   $lang = $contact['kind_lang'];
   $header = $contact['kind_header'];
-  $default = sql_parse_int( $contact['kind_default'] );
+  $default = sql_parse_int($contact['kind_default'] );
   $multidomain = sql_multidomain('kind');
 
   // If kind is new default for this lang, we cancel other defaults
@@ -1529,7 +1533,7 @@ function run_query_contact_kind_delete($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('kind');
-  $id = sql_parse_id( $id, true);
+  $id = sql_parse_id($id, true);
   $query = "DELETE FROM Kind WHERE kind_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_contact_kind_delete()');
@@ -1549,7 +1553,7 @@ function run_query_contact_kind_links($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('contact');
-  $id = sql_parse_id( $id, true);
+  $id = sql_parse_id($id, true);
   $query = "SELECT contact_lastname,
     contact_firstname,
     contact_id,
@@ -1574,7 +1578,7 @@ function get_contact_kind_label($id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('kind');	
-  $id = sql_parse_id( $id, true);
+  $id = sql_parse_id($id, true);
   $query = "SELECT kind_lang, kind_minilabel, kind_header
     FROM Kind
     WHERE kind_id $id $multidomain";
@@ -1597,8 +1601,9 @@ function get_contact_kind_label($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_subscription_nb($id) {
   global $cdg_sql;
+
   if ($id != '') {
-    $id = sql_parse_id( $id, true);
+    $id = sql_parse_id($id, true);
     $query = "SELECT count(*) as nb
       FROM Subscription
       WHERE subscription_contact_id $id"; 
@@ -1640,7 +1645,6 @@ function run_query_contact_subscription_nb($id) {
  */
 function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
   $event_id, $contact_fullname, $old_value, $new_value) {
-
     global $cdg_sql, $obm;
     global $l_birthday_event_title;
 
@@ -1753,9 +1757,10 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
 
     case $update_event:
       $sql_id = sql_parse_id($event_id);
-      $query = "UPDATE Event SET event_date = '$new_value',
+      $query = "UPDATE Event SET
+        event_date = '$new_value',
         event_origin = '$GLOBALS[c_origin_web]'
-        WHERE
+      WHERE
         event_id = $sql_id
         $multidomain_event";
 
