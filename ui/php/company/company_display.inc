@@ -17,18 +17,16 @@ $fieldnames['company_number'] = $l_number;
 $fieldnames['company_vat'] = $l_vat;
 $fieldnames['company_siret'] = $l_siret;
 $fieldnames['company_archive'] = $l_archive_first;
+$fieldnames['address_street'] = $l_address;
 $fieldnames['company_address'] = $l_address;
-$fieldnames['company_address1'] = "$l_address 1";
-$fieldnames['company_address2'] = "$l_address 2";
-$fieldnames['company_address3'] = "$l_address 3";
-$fieldnames['company_zipcode'] = $l_postcode;
-$fieldnames['company_town'] = $l_town;
-$fieldnames['company_expresspostal'] = $l_expresspostal;
+$fieldnames['address_zipcode'] = $l_postcode;
+$fieldnames['address_town'] = $l_town;
+$fieldnames['address_expresspostal'] = $l_expresspostal;
 $fieldnames['country_name'] = $l_country;
-$fieldnames['company_phone'] = $l_phone;
-$fieldnames['company_fax'] = $l_fax;
-$fieldnames['company_email'] = $l_email;
-$fieldnames['company_web'] = $l_web;
+$fieldnames['phone_number'] = $l_phone;
+$fieldnames['email_address'] = $l_email;
+$fieldnames['country_name'] = $l_country;
+$fieldnames['website_url'] = $l_web;
 // Calculated or indirect fields
 $fieldnames['type_label'] = $l_type;
 $fieldnames['activity_label'] = $l_activity;
@@ -72,8 +70,8 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if (($fieldname == 'company_email') && $link_ok) {
-    $email = $OD->data_set->f('company_email');
+  else if (($fieldname == 'email_address') && $link_ok) {
+    $email = $OD->data_set->f('email_address');
     if (strcmp($email,'') != 0) {
       $res['url'] = "mailto:$email";
       $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\" />";
@@ -81,8 +79,8 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if (($fieldname == 'company_web') && $link_ok) {
-    $web = $OD->data_set->f('company_web');
+  else if (($fieldname == 'website_url') && $link_ok) {
+    $web = $OD->data_set->f('website_url');
     if (strcmp($web,'') != 0) {
       if ( (strcmp(substr($web,0,7), 'http://') == 0)
            || (strcmp(substr($web,0,8), 'https://') == 0) ) {
@@ -130,32 +128,30 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
   }
   
   else if ($fieldname == 'company_address') {
-    if ($OD->data_set->f('company_address1') != '') {
-      $res['name'] .= $OD->data_set->f('company_address1')."<br />\n";
+    if ($OD->data_set->f('contact_service') != '') {
+      $res['name'] .= $OD->data_set->f('contact_service')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('contact_service') . ' ';
     }
-    if ($OD->data_set->f('company_address2') != '') {
-      $res['name'] .= $OD->data_set->f('company_address2')."<br />\n";
+    if ($OD->data_set->f('address_street') != '') {
+      $res['name'] .= $OD->data_set->f('address_street')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('address_street') . ' ';
     }
-    if ($OD->data_set->f('company_address3') != '') {
-      $res['name'] .= $OD->data_set->f('company_address3')."<br />\n";
+    if ($OD->data_set->f('address_zipcode') != '') {
+      $res['name'] .= $OD->data_set->f('address_zipcode')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('address_zipcode');
     }
-    if ($OD->data_set->f('company_zipcode') != '') {
-      $res['name'] .= $OD->data_set->f('company_zipcode') . ' ';
-    } else {
-      $res['name'] .= ' ';
+    if ($OD->data_set->f('address_town') != '') {
+      $res['name'] .= $OD->data_set->f('address_town')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('address_town');
     }
-    if ($OD->data_set->f('company_town') != '') {
-      $res['name'] .= $OD->data_set->f('company_town');
+    if ($OD->data_set->f('address_expresspostal') != '') {
+      $res['name'] .= $OD->data_set->f('address_expresspostal')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('address_expresspostal');
     }
     if ($OD->data_set->f('country_name') != '') {
-      $res['name'] .= ' ' . $OD->data_set->f('country_name');
-    }
-    $res['txt_name'] = trim($OD->data_set->f('company_address1') . ' ' .
-                       $OD->data_set->f('company_address2') . ' ' .
-                       $OD->data_set->f('company_address3') . ' ' .
-                       $OD->data_set->f('company_zipcode') . ' ' .
-                       $OD->data_set->f('company_town') . ' ' .
-		       $OD->data_set->f('country_name'));
+      $res['name'] .= $OD->data_set->f('country_name')."<br />\n";
+      $res['txt_name'] .= $OD->data_set->f('country_name');
+    }    
   }
 
   return $res;

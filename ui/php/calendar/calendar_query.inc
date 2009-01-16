@@ -2577,7 +2577,7 @@ function run_query_get_events_exception($events,$start_time = NULL,$end_time = N
   $obm_q = new DB_OBM;
   $event_list = implode(',',$events);
   if(!is_null($start_time)) {
-    $start = "AND eventexception_date > '$start_time'";
+    $start = "AND eventexception_date >= '$start_time'";
   }
   if(!is_null($end_time)) {
     $end = "AND eventexception_date < '$end_time'";

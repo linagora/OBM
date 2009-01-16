@@ -1518,8 +1518,8 @@ DROP TABLE MailServerNetwork;
 -- --------------------------------------------
  UPDATE Event SET 
  event_date = CONVERT_TZ(event_date, 'SYSTEM', '+00:00'), 
- event_endrepeat = CONVERT_TZ(event_date, 'SYSTEM', '+00:00'),
- event_completed = CONVERT_TZ(event_date, 'SYSTEM', '+00:00');
+ event_endrepeat = CONVERT_TZ(event_endrepeat, 'SYSTEM', '+00:00'),
+ event_completed = CONVERT_TZ(event_completed, 'SYSTEM', '+00:00');
  
  UPDATE EventException SET
  eventexception_date = CONVERT_TZ(eventexception_date, 'SYSTEM', '+00:00');

@@ -1469,20 +1469,20 @@ DROP TABLE MailServerNetwork;
 -- -----------------------------------------------
 -- Migrating event all day date to a ~correct time
 -- -----------------------------------------------
- UPDATE Event SET
- event_date = DATE_FORMAT(event_date,'%Y-%m-%d 00:00:00'),
- event_duration = UNIX_TIMESTAMP(DATE_FORMAT(DATE_ADD(DATE_ADD(event_date, INTERVAL (event_duration - 1) SECOND), INTERVAL 1 DAY),'%Y-%m-%d 00:00:00')) - UNIX_TIMESTAMP(DATE_FORMAT(event_date,'%Y-%m-%d 00:00:00'))
- WHERE event_allday = TRUE;
+-- UPDATE Event SET
+-- event_date = DATE_FORMAT(event_date,'%Y-%m-%d 00:00:00'),
+-- event_duration = UNIX_TIMESTAMP(DATE_FORMAT(DATE_ADD(DATE_ADD(event_date, INTERVAL (event_duration - 1) SECOND), INTERVAL 1 DAY),'%Y-%m-%d 00:00:00')) - UNIX_TIMESTAMP(DATE_FORMAT(event_date,'%Y-%m-%d 00:00:00'))
+-- WHERE event_allday = TRUE;
 -- --------------------------------------------
 -- Migrating date from system timezone to gmt
 -- --------------------------------------------
- UPDATE Event SET 
- event_date = CONVERT_TZ(event_date, 'SYSTEM', '+00:00'), 
- event_endrepeat = CONVERT_TZ(event_date, 'SYSTEM', '+00:00'),
- event_completed = CONVERT_TZ(event_date, 'SYSTEM', '+00:00');
- 
- UPDATE EventException SET
- eventexception_date = CONVERT_TZ(eventexception_date, 'SYSTEM', '+00:00');
+-- UPDATE Event SET 
+-- event_date = CONVERT_TZ(event_date, 'SYSTEM', '+00:00'), 
+-- event_endrepeat = CONVERT_TZ(event_date, 'SYSTEM', '+00:00'),
+-- event_completed = CONVERT_TZ(event_date, 'SYSTEM', '+00:00');
+-- 
+-- UPDATE EventException SET
+-- eventexception_date = CONVERT_TZ(eventexception_date, 'SYSTEM', '+00:00');
 -- ------------------------------
 -- Prepare value for foreign keys
 -- ------------------------------

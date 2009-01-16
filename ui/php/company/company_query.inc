@@ -73,11 +73,21 @@ function run_query_company_search($company) {
     $where .= " $and company_datasource_id=$dsrc";
     $and = 'AND';
   }
+  // If a phone number has been specified, get it 
+  $where .= " $and (phone_id IN (SELECT MIN(phone_id) FROM Phone WHERE phone_entity_id = companyentity_entity_id)";
+  $and = 'AND';
   if ($phone != '') {
-    $where .= " $and company_phone $like '$phone%'";
-    $and = 'AND';
+    $where .= "AND companyentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE companyentity_entity_id = phone_entity_id AND phone_number $like '$phone%'))";
+  } else {
+    $where .= " OR phone_id IS NULL)";
   }
-  
+  // If an email indication has been specified, get it 
+  $where .= 'AND (email_id IN (SELECT MIN(email_id) FROM Email WHERE email_entity_id = companyentity_entity_id)';
+  if ($email != '') {
+    $where .= " AND companyentity_entity_id IN (SELECT email_entity_id FROM Email WHERE companyentity_entity_id = email_entity_id AND email_address $like '$email%'))";
+  } else {
+    $where .= " OR email_id IS NULL)";
+  }  
   // Address criteria
   $addr = '';
   if ($town != '') {
@@ -89,9 +99,14 @@ function run_query_company_search($company) {
   if ($zip != '') {
     $addr .= " AND address_zipcode $like '$zip%'";
   }
+
+  $where .= 'AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = companyentity_entity_id)';
   if($addr != '') {
-    $where .= " AND company_id IN (SELECT companyentity_company_id FROM CompanyEntity INNER JOIN Address ON companyentity_entity_id = address_entity_id WHERE 1=1 ".$addr.")";
-  }
+    $where .= " AND companyentity_entity_id IN (SELECT address_entity_id FROM Address WHERE companyentity_entity_id = address_entity_id ".$addr."))";
+  } else {
+    $where .= " OR address_id IS NULL)";
+  }  
+  $where .= 'AND (website_id IN (SELECT MIN(website_id) FROM Website WHERE website_entity_id = companyentity_entity_id) OR website_id IS NULL)';
   
   if ($dateafter != '') {
     $where .= " $and (company_timeupdate > '$dateafter'
@@ -135,8 +150,8 @@ function run_query_company_search($company) {
       || (strcmp($sql_order_field,'company_new_contact') == 0) ) {
     $order = 'company_name';
   } else if (strcmp($sql_order_field,'company_address')==0) {
-    $order = 'company_address1';
-    $order_next = ', company_address2, company_address3, company_zipcode, company_town';
+    $order = 'address_street';
+    $order_next = ', address_zipcode, address_town';    
   }
   $orderq = " ORDER BY $order $sql_order_dir $order_next";
 
@@ -145,6 +160,14 @@ function run_query_company_search($company) {
       company_id,
       company_name,
       company_number,
+      address_street,
+      address_zipcode,
+      address_town,
+      address_expresspostal,
+      phone_number,
+      email_address,
+      website_url,
+      country_name,      
       company_vat,
       company_siret,
       company_archive,
@@ -161,6 +184,11 @@ function run_query_company_search($company) {
       companynafcode_label as nafcode_label
     FROM Company
     INNER JOIN CompanyEntity ON companyentity_company_id = company_id
+    LEFT JOIN Address ON address_entity_id = companyentity_entity_id
+    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
+    LEFT JOIN Phone ON phone_entity_id = companyentity_entity_id
+    LEFT JOIN Email ON email_entity_id = companyentity_entity_id        
+    LEFT JOIN Website ON website_entity_id = companyentity_entity_id        
       ";
 
   $left_join = "
