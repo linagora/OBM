@@ -1168,10 +1168,18 @@ function run_query_calendar_quick_event_update($calendar) {
   global $cdg_sql, $obm;
 
   $multidomain = sql_multidomain('event');
+  $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
   $title = $calendar['title'];
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $event_id = sql_parse_id($calendar['calendar_id'], true); 
+  if($all_day == 'TRUE') {
+    $dateend = clone $datebegin;
+    $dateend->addSecond($event_duration - 1);
+    $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
+    $datebegin->setHour(0)->setMinute(0)->setSecond(0);
+    $event_duration = $dateend->diffTimestamp($datebegin);
+  }  
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),

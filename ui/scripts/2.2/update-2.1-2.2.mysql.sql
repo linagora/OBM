@@ -6,6 +6,7 @@ UPDATE ObmInfo SET obminfo_value='2.1->2.2' WHERE obminfo_name='db_version';
 -- | Tables creation |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 
+
 --
 -- Table structure for table 'Entity'
 --
@@ -14,7 +15,7 @@ CREATE TABLE Entity (
   entity_id int(8) NOT NULL auto_increment,
   entity_mailing boolean,
   PRIMARY KEY  (entity_id)
-) ;
+);
 
 --
 -- Address
@@ -144,9 +145,66 @@ CREATE TABLE ProfilePropertyValue (
   PRIMARY KEY (profilepropertyvalue_id)
 );
 
+--
+-- Table structure for table `ServiceProperty`
+--
+
+CREATE TABLE `ServiceProperty` (
+  `serviceproperty_id` int(8) auto_increment,
+  `serviceproperty_service` varchar(255) NOT NULL,
+  `serviceproperty_property` varchar(255) NOT NULL,
+  `serviceproperty_entity_id` int(8) NOT NULL,
+  `serviceproperty_value` text,
+  PRIMARY KEY  (`serviceproperty_id`),
+  KEY `serviceproperty_service_key` (`serviceproperty_service`),
+  KEY `serviceproperty_property_key` (`serviceproperty_property`),
+  KEY `serviceproperty_entity_id_entity_id_fkey` (`serviceproperty_entity_id`)
+);
+
+--
+-- Table structure for table `Service`
+--
+
+CREATE TABLE `Service` (
+  `service_id` int(8) auto_increment,
+  `service_service` varchar(255) NOT NULL,
+  `service_entity_id` int(8) NOT NULL,
+  PRIMARY KEY  (`service_id`),
+  KEY `service_service_key` (`service_service`),
+  KEY `service_entity_id_entity_id_fkey` (`service_entity_id`)
+);
+--
+-- Table structure for table `SSOTicket`
+--
+DROP TABLE IF EXISTS `SSOTicket`;
+CREATE TABLE `SSOTicket` (
+  `ssoticket_ticket` varchar(255) NOT NULL,
+  `ssoticket_user_id` int(8),
+  `ssoticket_timestamp` timestamp NOT NULL,
+  PRIMARY KEY (`ssoticket_ticket`)
+);
+
+
 --  _______________
 -- | CalendarEvent |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+
+-- Table EventCategory1
+CREATE TABLE EventCategory1 (
+  eventcategory1_id int(8) NOT NULL auto_increment,
+  eventcategory1_domain_id int(8) NOT NULL,
+  eventcategory1_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  eventcategory1_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
+  eventcategory1_userupdate int(8) default NULL,
+  eventcategory1_usercreate int(8) default NULL,
+  eventcategory1_code varchar(10) default '',
+  eventcategory1_label varchar(128) default NULL,
+  eventcategory1_color char(6) default NULL,
+  PRIMARY KEY (eventcategory1_id),
+  KEY eventcategory1_domain_id_domain_id_fkey (eventcategory1_domain_id),
+  KEY eventcategory1_userupdate_userobm_id_fkey (eventcategory1_userupdate),
+  KEY eventcategory1_usercreate_userobm_id_fkey (eventcategory1_usercreate)
+) ;
 -- Event Creation
 CREATE TABLE Event (
   event_id              int(8) NOT NULL auto_increment,
@@ -215,22 +273,6 @@ CREATE TABLE EventException (
   KEY eventexception_usercreate_userobm_id_fkey (eventexception_usercreate)
 );
 
--- Table EventCategory1
-CREATE TABLE EventCategory1 (
-  eventcategory1_id int(8) NOT NULL auto_increment,
-  eventcategory1_domain_id int(8) NOT NULL,
-  eventcategory1_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  eventcategory1_timecreate timestamp NOT NULL default '0000-00-00 00:00:00',
-  eventcategory1_userupdate int(8) default NULL,
-  eventcategory1_usercreate int(8) default NULL,
-  eventcategory1_code varchar(10) default '',
-  eventcategory1_label varchar(128) default NULL,
-  eventcategory1_color char(6) default NULL,
-  PRIMARY KEY (eventcategory1_id),
-  KEY eventcategory1_domain_id_domain_id_fkey (eventcategory1_domain_id),
-  KEY eventcategory1_userupdate_userobm_id_fkey (eventcategory1_userupdate),
-  KEY eventcategory1_usercreate_userobm_id_fkey (eventcategory1_usercreate)
-) ;
 
 -- Table `DeletedEvent`
 CREATE TABLE DeletedEvent (
@@ -243,46 +285,6 @@ CREATE TABLE DeletedEvent (
   PRIMARY KEY (deletedevent_id),
   KEY idx_dce_event (deletedevent_event_id),
   KEY idx_dce_user (deletedevent_user_id)
-);
-
-
---
--- Table structure for table `ServiceProperty`
---
-
-CREATE TABLE `ServiceProperty` (
-  `serviceproperty_id` int(8) auto_increment,
-  `serviceproperty_service` varchar(255) NOT NULL,
-  `serviceproperty_property` varchar(255) NOT NULL,
-  `serviceproperty_entity_id` int(8) NOT NULL,
-  `serviceproperty_value` text,
-  PRIMARY KEY  (`serviceproperty_id`),
-  KEY `serviceproperty_service_key` (`serviceproperty_service`),
-  KEY `serviceproperty_property_key` (`serviceproperty_property`),
-  KEY `serviceproperty_entity_id_entity_id_fkey` (`serviceproperty_entity_id`)
-);
-
---
--- Table structure for table `Service`
---
-
-CREATE TABLE `Service` (
-  `service_id` int(8) auto_increment,
-  `service_service` varchar(255) NOT NULL,
-  `service_entity_id` int(8) NOT NULL,
-  PRIMARY KEY  (`service_id`),
-  KEY `service_service_key` (`service_service`),
-  KEY `service_entity_id_entity_id_fkey` (`service_entity_id`)
-);
---
--- Table structure for table `SSOTicket`
---
-DROP TABLE IF EXISTS `SSOTicket`;
-CREATE TABLE `SSOTicket` (
-  `ssoticket_ticket` varchar(255) NOT NULL,
-  `ssoticket_user_id` int(8),
-  `ssoticket_timestamp` timestamp NOT NULL,
-  PRIMARY KEY (`ssoticket_ticket`)
 );
 
 --
@@ -313,15 +315,6 @@ UPDATE EventEntity set evententity_required = 'REQ';
 
 ALTER TABLE EventEntity ADD COLUMN evententity_percent float default 0;
 
--- Foreign key from evententity_event_id to event_id
-DELETE FROM EventEntity WHERE evententity_event_id NOT IN (SELECT calendarevent_id FROM CalendarEvent);
-
--- Foreign key from evententity_userupdate to userobm_id
-UPDATE EventEntity SET evententity_userupdate = NULL WHERE evententity_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND evententity_userupdate IS NOT NULL;
-
--- Foreign key from evententity_usercreate to userobm_id
-UPDATE EventEntity SET evententity_usercreate = NULL WHERE evententity_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND evententity_usercreate IS NOT NULL;
-
 ALTER TABLE EventEntity RENAME TO EventLink;
 ALTER TABLE EventLink CHANGE COLUMN evententity_timeupdate eventlink_timeupdate timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP;
 ALTER TABLE EventLink CHANGE COLUMN evententity_timecreate eventlink_timecreate timestamp NOT NULL default '0000-00-00 00:00:00';
@@ -333,11 +326,14 @@ ALTER TABLE EventLink CHANGE COLUMN evententity_entity eventlink_entity varchar(
 ALTER TABLE EventLink CHANGE COLUMN evententity_state eventlink_state enum('NEEDS-ACTION','ACCEPTED','DECLINED','TENTATIVE','DELEGATED','COMPLETED','IN-PROGRESS') default 'NEEDS-ACTION';
 ALTER TABLE EventLink CHANGE COLUMN evententity_required eventlink_required enum('CHAIR','REQ','OPT','NON') default 'REQ';
 ALTER TABLE EventLink CHANGE COLUMN evententity_percent eventlink_percent int(3) default '0';
+-- Foreign key from eventlink_event_id to event_id
+DELETE FROM EventLink WHERE eventlink_event_id NOT IN (SELECT calendarevent_id FROM CalendarEvent);
 
-ALTER TABLE DocumentEntity RENAME TO DocumentLink;
-ALTER TABLE DocumentLink CHANGE COLUMN documententity_document_id documentlink_document_id int(8) NOT NULL;
-ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity_id documentlink_entity_id int(8) NOT NULL;
-ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity documentlink_entity varchar(255) NOT NULL;
+-- Foreign key from eventlink_userupdate to userobm_id
+UPDATE EventLink SET eventlink_userupdate = NULL WHERE eventlink_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND eventlink_userupdate IS NOT NULL;
+
+-- Foreign key from eventlink_usercreate to userobm_id
+UPDATE EventLink SET eventlink_usercreate = NULL WHERE eventlink_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND eventlink_usercreate IS NOT NULL;
 
 ALTER TABLE OGroupEntity RENAME TO OGroupLink;
 ALTER TABLE OGroupLink CHANGE COLUMN ogroupentity_id ogrouplink_id int(8) NOT NULL auto_increment;
@@ -350,6 +346,15 @@ ALTER TABLE OGroupLink CHANGE COLUMN ogroupentity_ogroup_id ogrouplink_ogroup_id
 ALTER TABLE OGroupLink CHANGE COLUMN ogroupentity_entity_id ogrouplink_entity_id int(8) NOT NULL;
 ALTER TABLE OGroupLink CHANGE COLUMN ogroupentity_entity ogrouplink_entity varchar(255) NOT NULL;
 
+
+ALTER TABLE DocumentEntity RENAME TO DocumentLink;
+ALTER TABLE DocumentLink CHANGE COLUMN documententity_document_id documentlink_document_id int(8) NOT NULL;
+ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity_id documentlink_entity_id int(8) NOT NULL;
+ALTER TABLE DocumentLink CHANGE COLUMN documententity_entity documentlink_entity varchar(255) NOT NULL;
+
+--  _______________
+-- | Entity tables |
+--  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 DROP TABLE IF EXISTS AccountEntity;
 CREATE TABLE AccountEntity (
   accountentity_entity_id int(8) NOT NULL,
@@ -900,8 +905,8 @@ ALTER TABLE DocumentMimeType MODIFY COLUMN documentmimetype_domain_id int(8) NOT
 ALTER TABLE DomainMailServer MODIFY COLUMN domainmailserver_domain_id int(8) NOT NULL ;
 ALTER TABLE EntityRight MODIFY COLUMN entityright_entity_id int(8) NOT NULL ;
 ALTER TABLE EntityRight ADD entityright_access int(1) NOT NULL default 0;
-ALTER TABLE EntityRight MODIFY COLUMN entityright_consumer_id int(8);
 ALTER TABLE EntityRight DROP PRIMARY KEY;
+ALTER TABLE EntityRight MODIFY COLUMN entityright_consumer_id int(8) NULL;
 ALTER TABLE EntityRight ADD COLUMN entityright_id int(8) NOT NULL auto_increment PRIMARY KEY;
 ALTER TABLE EventLink MODIFY COLUMN eventlink_event_id int(8) NOT NULL ;
 ALTER TABLE EventLink MODIFY COLUMN eventlink_entity_id int(8) NOT NULL ;
@@ -1200,7 +1205,7 @@ INSERT INTO TmpEntity (id_entity) SELECT userobm_id FROM UserObm;
 INSERT INTO Entity (entity_id) SELECT entity_id FROM TmpEntity WHERE id_entity IS NOT NULL;
 INSERT INTO UserEntity (userentity_entity_id, userentity_user_id) SELECT entity_id, id_entity FROM TmpEntity WHERE id_entity IS NOT NULL;
 UPDATE TmpEntity SET id_entity = NULL;
-  
+
 DELETE FROM EntityRight WHERE entityright_entity_id NOT IN (SELECT mailshare_id FROM MailShare) AND entityright_entity = 'mailshare';
 UPDATE EntityRight SET entityright_entity_id = (SELECT mailshareentity_entity_id FROM MailshareEntity INNER JOIN MailShare ON mailshareentity_mailshare_id = mailshare_id WHERE mailshare_id = entityright_entity_id), entityright_entity = 'entity' WHERE entityright_entity = 'mailshare'; 
 DELETE FROM EntityRight WHERE entityright_entity_id NOT IN (SELECT userobm_id FROM UserObm) AND entityright_entity = 'calendar';
@@ -1220,8 +1225,6 @@ INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT 
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT resourceentity_entity_id, NULL FROM ResourceEntity WHERE resourceentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT mailboxentity_entity_id, NULL FROM MailboxEntity WHERE mailboxentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
 UPDATE EntityRight SET entityright_access = 1;
-
-
 DELETE FROM EntityRight WHERE entityright_entity != 'entity' AND entityright_consumer_id IS NOT NULL;
 ALTER TABLE EntityRight DROP COLUMN entityright_entity;
 ALTER TABLE EntityRight DROP COLUMN entityright_consumer;
@@ -1274,6 +1277,65 @@ INSERT INTO TaskEvent (taskevent_task_id, taskevent_event_id) SELECT eventlink_e
 
 DELETE FROM EventLink where eventlink_entity != 'entity';
 ALTER TABLE EventLink DROP COLUMN eventlink_entity;
+
+-- -----------------------------------------
+-- Updates that need to be after Entity work
+-- -----------------------------------------
+
+-- Migration of group_mailing to a category
+INSERT INTO Category (
+  category_domain_id,
+  category_category,
+  category_code,
+  category_label)
+SELECT domain_id,
+  'groupcategory',
+  '1',
+  'external address'
+FROM Domain
+WHERE domain_global is not true;
+  
+INSERT INTO CategoryLink (
+  categorylink_category_id,
+  categorylink_entity_id,
+  categorylink_category)
+SELECT category_id,
+  groupentity_entity_id,
+  'groupcategory'
+FROM Category, GroupEntity
+LEFT JOIN UGroup ON groupentity_group_id=group_id
+WHERE category_category='groupcategory' AND category_label='external address'
+  AND group_mailing = 1;
+
+ALTER TABLE UGroup DROP COLUMN group_mailing;
+
+
+-- Create links from "todos" to users (need to be after userentity..)
+INSERT INTO EventLink (
+  eventlink_timeupdate,
+  eventlink_timecreate,
+  eventlink_userupdate,
+  eventlink_usercreate,
+  eventlink_event_id,
+  eventlink_entity_id,
+  eventlink_state,
+  eventlink_required,
+  eventlink_percent)
+SELECT
+  todo_timeupdate,
+  todo_timecreate,
+  todo_userupdate,
+  todo_usercreate,
+  event_id,
+  userentity_entity_id,
+  'ACCEPTED',
+  'REQ',
+  todo_percent
+FROM Todo
+LEFT JOIN Event on todo_usercreate=event_usercreate and todo_timecreate=event_timecreate and todo_timeupdate=event_timeupdate and todo_user=event_owner and todo_title=event_title
+LEFT JOIN UserEntity on todo_user=userentity_user_id;
+
+
 
 --  _______________________________________________________
 -- |Migrating Address  information from Contact and Company|
@@ -1389,6 +1451,15 @@ INNER JOIN MailServer ON domainmailserver_mailserver_id = mailserver_id
 WHERE domainmailserver_role = 'smtp_out';
 
 INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
+SELECT 'smtp_out', 'mail', domainentity_entity_id, mailserver_host_id
+FROM Domain 
+INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
+INNER JOIN DomainMailServer ON domainmailserver_domain_id = domain_id
+INNER JOIN MailServer ON domainmailserver_mailserver_id = mailserver_id
+WHERE domainmailserver_role = 'smtp_out';
+
+
+INSERT INTO ServiceProperty (serviceproperty_property, serviceproperty_service, serviceproperty_entity_id, serviceproperty_value) 
 SELECT 'sid', 'samba', domainentity_entity_id, samba_value 
 FROM Domain 
 INNER JOIN DomainEntity ON domain_id = domainentity_domain_id 
@@ -1435,64 +1506,23 @@ DROP TABLE DomainMailServer;
 DROP TABLE MailServer;
 DROP TABLE MailServerNetwork;
 
--- -----------------------------------------
--- Updates that need to be after Entity work
--- -----------------------------------------
-
--- Migration of group_mailing to a category
-INSERT INTO Category (
-  category_domain_id,
-  category_category,
-  category_code,
-  category_label)
-SELECT domain_id,
-  'groupcategory',
-  '1',
-  'external address'
-FROM Domain
-WHERE domain_global is not true;
-  
-INSERT INTO CategoryLink (
-  categorylink_category_id,
-  categorylink_entity_id,
-  categorylink_category)
-SELECT category_id,
-  groupentity_entity_id,
-  'groupcategory'
-FROM Category, GroupEntity
-LEFT JOIN UGroup ON groupentity_group_id=group_id
-WHERE category_category='groupcategory' AND category_label='external address'
-  AND group_mailing = 1;
-
-ALTER TABLE UGroup DROP COLUMN group_mailing;
-
-
--- Create links from "todos" to users (need to be after userentity..)
-INSERT INTO EventLink (
-  eventlink_timeupdate,
-  eventlink_timecreate,
-  eventlink_userupdate,
-  eventlink_usercreate,
-  eventlink_event_id,
-  eventlink_entity_id,
-  eventlink_state,
-  eventlink_required,
-  eventlink_percent)
-SELECT
-  todo_timeupdate,
-  todo_timecreate,
-  todo_userupdate,
-  todo_usercreate,
-  event_id,
-  userentity_entity_id,
-  'ACCEPTED',
-  'REQ',
-  todo_percent
-FROM Todo
-LEFT JOIN Event on todo_usercreate=event_usercreate and todo_timecreate=event_timecreate and todo_timeupdate=event_timeupdate and todo_user=event_owner and todo_title=event_title
-LEFT JOIN UserEntity on todo_user=userentity_user_id;
-
-
+-- -----------------------------------------------
+-- Migrating event all day date to a ~correct time
+-- -----------------------------------------------
+ UPDATE Event SET
+ event_date = DATE_FORMAT(event_date,'%Y-%m-%d 00:00:00'),
+ event_duration = UNIX_TIMESTAMP(DATE_FORMAT(DATE_ADD(DATE_ADD(event_date, INTERVAL (event_duration - 1) SECOND), INTERVAL 1 DAY),'%Y-%m-%d 00:00:00')) - UNIX_TIMESTAMP(DATE_FORMAT(event_date,'%Y-%m-%d 00:00:00'))
+ WHERE event_allday = TRUE;
+-- --------------------------------------------
+-- Migrating date from system timezone to gmt
+-- --------------------------------------------
+ UPDATE Event SET 
+ event_date = CONVERT_TZ(event_date, 'SYSTEM', '+00:00'), 
+ event_endrepeat = CONVERT_TZ(event_date, 'SYSTEM', '+00:00'),
+ event_completed = CONVERT_TZ(event_date, 'SYSTEM', '+00:00');
+ 
+ UPDATE EventException SET
+ eventexception_date = CONVERT_TZ(eventexception_date, 'SYSTEM', '+00:00');
 -- ------------------------------
 -- Prepare value for foreign keys
 -- ------------------------------
@@ -2257,7 +2287,7 @@ UPDATE Subscription SET subscription_userupdate = NULL WHERE subscription_userup
 -- Foreign key from subscription_usercreate to userobm_id
 UPDATE Subscription SET subscription_usercreate = NULL WHERE subscription_usercreate NOT IN (SELECT userobm_id FROM UserObm) AND subscription_usercreate IS NOT NULL;
 
--- Foreign key from subscription_reception_id to subscription_reception_id
+-- Foreign key from subscription_reception_id to subscriptionreception_id
 UPDATE Subscription SET subscription_reception_id = NULL WHERE subscription_reception_id NOT IN (SELECT subscriptionreception_id FROM SubscriptionReception) AND subscription_reception_id IS NOT NULL;
 
 -- Foreign key from subscriptionreception_domain_id to domain_id

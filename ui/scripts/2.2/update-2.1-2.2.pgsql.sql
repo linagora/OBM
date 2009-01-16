@@ -874,10 +874,10 @@ ALTER TABLE Company ALTER COLUMN company_domain_id SET NOT NULL;
 ALTER TABLE Company ALTER COLUMN company_datasource_id SET default NULL;
 ALTER TABLE Contact ALTER COLUMN contact_domain_id SET NOT NULL;
 ALTER TABLE Contact ALTER COLUMN contact_datasource_id SET default NULL;
-ALTER TABLE EntityRight ALTER COLUMN entityright_consumer_id SET default NULL;
 ALTER TABLE EntityRight ADD COLUMN entityright_access INTEGER not null DEFAULT 0;
 ALTER TABLE EntityRight DROP CONSTRAINT entityright_pkey;
 ALTER TABLE EntityRight ADD COLUMN entityright_id serial PRIMARY KEY;
+ALTER TABLE EntityRight ALTER COLUMN entityright_consumer_id SET default NULL;
 ALTER TABLE Kind ALTER COLUMN kind_domain_id SET NOT NULL;
 ALTER TABLE ContactFunction ALTER COLUMN contactfunction_domain_id SET NOT NULL;
 ALTER TABLE LeadSource ALTER COLUMN leadsource_domain_id SET NOT NULL;
@@ -981,7 +981,7 @@ INSERT INTO Domain (domain_timecreate,domain_label,domain_description,domain_nam
 INSERT INTO DomainPropertyValue (domainpropertyvalue_domain_id, domainpropertyvalue_property_key, domainpropertyvalue_value) SELECT domain_id , 'update_state', 0 From Domain WHERE domain_global = TRUE;
 UPDATE UserObm SET userobm_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE userobm_domain_id = 0;
 UPDATE Host SET host_domain_id = (SELECT domain_id FROM Domain WHERE domain_global = TRUE) WHERE host_domain_id = 0;
-
+INSERT INTO UserSystem VALUES (4,'obmsatellite','mG4_Zdnh','200','65534','/','OBM Satellite','LDAP Reader','/bin/false');
 
 -- Preferences
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'profile', 'profile_name', 1, 2);
@@ -1183,9 +1183,8 @@ INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT 
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT mailshareentity_entity_id, NULL FROM MailshareEntity WHERE mailshareentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT resourceentity_entity_id, NULL FROM ResourceEntity WHERE resourceentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
 INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id) SELECT mailboxentity_entity_id, NULL FROM MailboxEntity WHERE mailboxentity_entity_id NOT IN (SELECT entityright_entity_id FROM EntityRight WHERE entityright_consumer_id IS NULL);
-UPDATE EntityRight SET entityright_access = 1 WHERE entityright_consumer_id IS NULL;
-
-DELETE FROM EntityRight WHERE entityright_entity != 'entity';
+UPDATE EntityRight SET entityright_access = 1;
+DELETE FROM EntityRight WHERE entityright_entity != 'entity' AND entityright_consumer_id IS NOT NULL;
 ALTER TABLE EntityRight DROP COLUMN entityright_entity;
 ALTER TABLE EntityRight DROP COLUMN entityright_consumer;
 
@@ -1234,7 +1233,7 @@ UPDATE EventLink SET eventlink_entity_id = (SELECT resourceentity_entity_id FROM
 DELETE FROM EventLink WHERE eventlink_entity_id NOT IN (SELECT projecttask_id FROM ProjectTask) AND eventlink_entity = 'task';
 INSERT INTO TaskEvent (taskevent_task_id, taskevent_event_id) SELECT eventlink_entity_id, eventlink_event_id FROM EventLink WHERE eventlink_entity = 'task';
 
-DELETE FROM EventLink where eventlink_entity != 'task';
+DELETE FROM EventLink where eventlink_entity != 'entity';
 ALTER TABLE EventLink DROP COLUMN eventlink_entity;
 
 
@@ -1467,6 +1466,23 @@ DROP TABLE DomainMailServer;
 DROP TABLE MailServer;
 DROP TABLE MailServerNetwork;
 
+-- -----------------------------------------------
+-- Migrating event all day date to a ~correct time
+-- -----------------------------------------------
+ UPDATE Event SET
+ event_date = DATE_FORMAT(event_date,'%Y-%m-%d 00:00:00'),
+ event_duration = UNIX_TIMESTAMP(DATE_FORMAT(DATE_ADD(DATE_ADD(event_date, INTERVAL (event_duration - 1) SECOND), INTERVAL 1 DAY),'%Y-%m-%d 00:00:00')) - UNIX_TIMESTAMP(DATE_FORMAT(event_date,'%Y-%m-%d 00:00:00'))
+ WHERE event_allday = TRUE;
+-- --------------------------------------------
+-- Migrating date from system timezone to gmt
+-- --------------------------------------------
+ UPDATE Event SET 
+ event_date = CONVERT_TZ(event_date, 'SYSTEM', '+00:00'), 
+ event_endrepeat = CONVERT_TZ(event_date, 'SYSTEM', '+00:00'),
+ event_completed = CONVERT_TZ(event_date, 'SYSTEM', '+00:00');
+ 
+ UPDATE EventException SET
+ eventexception_date = CONVERT_TZ(eventexception_date, 'SYSTEM', '+00:00');
 -- ------------------------------
 -- Prepare value for foreign keys
 -- ------------------------------
