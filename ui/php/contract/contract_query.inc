@@ -184,8 +184,10 @@ function run_query_contract_detail($id) {
   $datesignature = sql_date_format($db_type, "contract_datesignature", "datesignature");
   $timeupdate = sql_date_format($db_type, "contract_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "contract_timecreate", "timecreate");
-	$multidomain = sql_multidomain("contract");
-	
+  $multidomain = sql_multidomain("contract");
+  $db_type = $obm_q->type;
+  $limit = sql_limit($db_type,1,0);	
+
   $query = "SELECT Contract.*,
       contract_privacy as privacy,
       deal_id,
@@ -193,17 +195,18 @@ function run_query_contract_detail($id) {
       contracttype_label,
       company_name,
       company_id,
-      company_phone,
-      company_fax,
-      company_address1,
-      company_zipcode,
-      company_town,
-      company_expresspostal,
+      cpp.phone_number as company_phone,
+      cpf.phone_number as company_fax,
+      address_street as company_address1,
+      address_zipcode as company_zipcode,
+      address_town as company_town,
+      address_expresspostal as company_expresspostal,
       u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
       u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
       c1.contact_lastname as clname1, c1.contact_firstname as cfname1,
       c2.contact_lastname as clname2, c2.contact_firstname as cfname2,
-      c1.contact_phone as cphone1, c2.contact_phone as cphone2,
+      c1p.phone_number as cphone1, 
+      c2p.phone_number as cphone2,
       p.contractpriority_label,
       s.contractstatus_label,
       $datesignature, 
@@ -219,15 +222,26 @@ function run_query_contract_detail($id) {
          LEFT JOIN UserObm u1 on contract_marketmanager_id=u1.userobm_id
          LEFT JOIN UserObm u2 on contract_techmanager_id=u2.userobm_id
          LEFT JOIN Contact c1 on contract_contact1_id=c1.contact_id
+         LEFT JOIN ContactEntity ce1 ON c1.contact_id = ce1.contactentity_contact_id
          LEFT JOIN Contact c2 on contract_contact2_id=c2.contact_id
+         LEFT JOIN ContactEntity ce2 ON c2.contact_id = ce2.contactentity_contact_id
          LEFT JOIN Company on contract_company_id=company_id
+         LEFT JOIN CompanyEntity ON company_id = companyentity_company_id
+         LEFT JOIN Address ON address_entity_id = companyentity_entity_id
+         LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
+         LEFT JOIN Phone as cpp ON cpp.phone_entity_id = companyentity_entity_id AND cpp.phone_label like 'WORK;VOICE%'
+         LEFT JOIN Phone as cpf ON cpf.phone_entity_id = companyentity_entity_id AND cpf.phone_label like 'WORK;FAX%'
+         LEFT JOIN Phone as c1p ON c1p.phone_entity_id = ce1.contactentity_entity_id AND c1p.phone_label like 'WORK;VOICE%'
+         LEFT JOIN Phone as c2p ON c2p.phone_entity_id = ce2.contactentity_entity_id AND c2p.phone_label like 'WORK;VOICE%'
          LEFT JOIN ContractPriority p on contract_priority_id=p.contractpriority_id
          LEFT JOIN ContractStatus s on contract_status_id=s.contractstatus_id
          LEFT JOIN ContractType on contract_type_id=contracttype_id
          LEFT JOIN Deal on contract_deal_id=deal_id
          LEFT JOIN UserObm as c on contract_usercreate=c.userobm_id
          LEFT JOIN UserObm as u on contract_userupdate=u.userobm_id
-    WHERE contract_id $id $multidomain";
+    WHERE contract_id $id 
+    $multidomain
+    $limit";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -879,11 +893,13 @@ function run_query_company_info($id) {
   $id = sql_parse_id($id, true);
   $query = "SELECT
       company_name, 
-      company_marketingmanager_id, 
-      company_address1,
-      company_zipcode,
-      company_town 
-    FROM Company 
+      company_marketingmanager_id,
+      address_street as company_address1,
+      address_zipcode as company_zipcode,
+      address_town as company_town
+    FROM Company
+    INNER JOIN CompanyEntity ON companyentity_company_id = company_id
+    LEFT JOIN Address ON address_entity_id = companyentity_entity_id       
     WHERE company_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, "run_query_company_info()");
@@ -907,9 +923,11 @@ function run_query_contact_contract($p_company_id) {
       contact_id,
       contact_lastname,
       contact_firstname,
-      contact_phone 
+      phone_number as contact_phone 
     FROM Contact 
-    WHERE contact_company_id $p_company_id $multidomain";
+    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id
+    WHERE contact_company_id $p_company_id $multidomain AND (phone_id IN (SELECT MIN(phone_id) FROM Phone WHERE phone_entity_id = contactentity_entity_id) OR phone_id IS NULL) ";
   
   display_debug_msg($query, $cdg_sql, "run_query_contact_contract()");
   $obm_q = new DB_OBM;

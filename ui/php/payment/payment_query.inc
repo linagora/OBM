@@ -156,13 +156,19 @@ function run_query_payment_detail($p_id) {
       $date,
       paymentkind_label,
       account_label,
-      company_name, company_address1, company_zipcode, company_town,
-      company_phone,
+      company_name,
+      address_street as company_address1,
+      address_zipcode as company_zipcode,
+      address_town as company_town,
+      phone_number as company_phone,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
     FROM Payment
          LEFT JOIN PaymentKind ON payment_paymentkind_id=paymentkind_id
          LEFT JOIN Company ON payment_company_id=company_id
+         LEFT JOIN CompanyEntity ON companyentity_company_id = company_id
+         LEFT JOIN Address ON address_entity_id = companyentity_entity_id         
+         LEFT JOIN Phone ON phone_entity_id = companyentity_entity_id AND phone_label like 'WORK;VOICE%'
          LEFT JOIN Account ON payment_account_id=account_id
          LEFT JOIN UserObm as c ON payment_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON payment_userupdate=u.userobm_id

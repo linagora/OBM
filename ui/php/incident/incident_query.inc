@@ -212,9 +212,12 @@ function run_query_incident_detail($id) {
     $dateexp,
     contractstatus_label,
     c1.contact_lastname as lname_c1, c1.contact_firstname as fname_c1,
-    c1.contact_phone as phone_c1, c1.contact_email as email_c1,
-    c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2,
-    c2.contact_phone as phone_c2, c2.contact_email as email_c2
+    c1p.phone_number as phone_c1,
+    c1e.email_address as email_c1,
+    c2.contact_lastname as lname_c2,
+    c2.contact_firstname as fname_c2,
+    c2p.phone_number as phone_c2,
+    c2e.email_address as email_c2
     FROM Incident
     LEFT JOIN Contract on incident_contract_id=contract_id
     LEFT JOIN ContractStatus on contract_status_id=contractstatus_id
@@ -226,7 +229,13 @@ function run_query_incident_detail($id) {
     LEFT JOIN UserObm as c on incident_usercreate=c.userobm_id
     LEFT JOIN UserObm as u on incident_userupdate=u.userobm_id
     LEFT JOIN Contact c1 on contract_contact1_id=c1.contact_id
+    LEFT JOIN ContactEntity ce1 ON c1.contact_id = ce1.contactentity_contact_id
+    LEFT JOIN Email as c1e ON c1e.email_entity_id = ce1.contactentity_entity_id
+    LEFT JOIN Phone as c1p ON c1p.phone_entity_id = ce1.contactentity_entity_id AND c1p.phone_label like 'WORK;VOICE%'
     LEFT JOIN Contact c2 on contract_contact2_id=c2.contact_id
+    LEFT JOIN ContactEntity ce2 ON c2.contact_id = ce2.contactentity_contact_id
+    LEFT JOIN Phone as c2p ON c2p.phone_entity_id = ce2.contactentity_entity_id AND c2p.phone_label like 'WORK;VOICE%'    
+    LEFT JOIN Email as c2e ON c2e.email_entity_id = ce2.contactentity_entity_id
     WHERE incident_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_incident_detail()');

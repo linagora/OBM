@@ -119,8 +119,8 @@ function run_query_lead_search($params) {
     $datealarm,
     lead_todo,
     company_name,
-    company_zipcode,
-    company_phone,
+    address_zipcode as company_zipcode,
+    phone_number as company_phone,
     leadsource_label,
     leadstatus_label,
     contact_id,
@@ -128,11 +128,16 @@ function run_query_lead_search($params) {
     $concat_manager as manager
   FROM Lead
     LEFT JOIN Company ON lead_company_id=company_id
+    LEFT JOIN CompanyEntity ON company_id = companyentity_company_id
+    LEFT JOIN Address ON address_entity_id = companyentity_entity_id
+    LEFT JOIN Phone as cpp ON cpp.phone_entity_id = companyentity_entity_id AND cpp.phone_label like 'WORK;VOICE%'
     LEFT JOIN Contact ON lead_contact_id=contact_id
     LEFT JOIN LeadSource ON lead_source_id=leadsource_id
     LEFT JOIN LeadStatus ON lead_status_id=leadstatus_id
     LEFT JOIN UserObm ON lead_manager_id=userobm_id
-  $whereq
+    $whereq
+  AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = companyentity_entity_id) OR address_id IS NULL)
+  AND (phone_id IN (SELECT MIN(phone_id) FROM Phone WHERE phone_entity_id = companyentity_entity_id) OR phone_id IS NULL)
   $orderq
   $limit
 ";
@@ -171,6 +176,8 @@ function run_query_lead_detail($p_id) {
   $concat_manager = sql_string_concat($db_type, $manager_name);
   $multidomain = sql_multidomain('lead');
   $p_id = sql_parse_id($p_id, true);	
+  $db_type = $obm_q->type;
+  $limit = sql_limit($db_type,1,0);	  
   $query = "SELECT Lead.*,
       $timeupdate,
       $timecreate,
@@ -178,9 +185,14 @@ function run_query_lead_detail($p_id) {
       $datealarm,
       leadsource_label,
       leadstatus_label,
-      company_name, company_address1, company_zipcode, company_town,
-      company_phone,
-      contact_lastname, contact_firstname, contact_phone,
+      company_name, 
+      cpp.phone_number as company_phone,
+      address_street as company_address1,
+      address_zipcode as company_zipcode,
+      address_town as company_town,
+      contact_lastname, 
+      contact_firstname, 
+      c1p.phone_number as contact_phone,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
       $concat_manager as manager
@@ -188,12 +200,18 @@ function run_query_lead_detail($p_id) {
          LEFT JOIN LeadSource ON lead_source_id=leadsource_id
          LEFT JOIN LeadStatus ON lead_status_id=leadstatus_id
          LEFT JOIN Company ON lead_company_id=company_id
+         LEFT JOIN CompanyEntity ON company_id = companyentity_company_id
+         LEFT JOIN Address ON address_entity_id = companyentity_entity_id
+         LEFT JOIN Phone as cpp ON cpp.phone_entity_id = companyentity_entity_id AND cpp.phone_label like 'WORK;VOICE%'         
          LEFT JOIN Contact ON lead_contact_id=contact_id
+         LEFT JOIN ContactEntity  ON contact_id = contactentity_contact_id         
+         LEFT JOIN Phone as c1p ON c1p.phone_entity_id = contactentity_entity_id  AND c1p.phone_label like 'WORK;VOICE%'
          LEFT JOIN UserObm as c ON lead_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON lead_userupdate=u.userobm_id
          LEFT JOIN UserObm as m ON lead_manager_id=m.userobm_id
     WHERE lead_id $p_id 
-      $multidomain";
+    $multidomain
+    $limit";
 
   display_debug_msg($query, $cdg_sql, 'run_query_lead_detail()');
   $obm_q->query($query);

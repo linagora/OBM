@@ -560,10 +560,12 @@ function get_import_similar_company($fields, $map, &$countries) {
   $zip = addslashes($fields["comp_zip"]);
   $town = addslashes($fields["comp_town"]);
   if( $ctry == "") {
-    $zip_query = "OR (company_zipcode $like '$zip' OR company_town $like '$town')";
+    $zip_query = "OR (address_zipcode $like '$zip' OR address_town $like '$town')";
   }
-  $query = "SELECT distinct company_id, company_name, company_zipcode 
+  $query = "SELECT distinct company_id, company_name, address_zipcode 
     FROM Company 
+    INNER JOIN CompanyEntity on companyentity_company_id = company_id
+    LEFT JOIN Address ON address_entity_id = companyentity_entity_id
     WHERE (company_name $like '$short_name%' OR company_aka $like '%$name%')
       AND (company_country_iso3166 $like '$ctry' $zip_query)
       $multidomain";
@@ -576,7 +578,7 @@ function get_import_similar_company($fields, $map, &$countries) {
   while ($obm_q->next_record()) {
     $db_id = $obm_q->f("company_id");
     $db_name = $obm_q->f("company_name");
-    $db_zip = $obm_q->f("company_zipcode");
+    $db_zip = $obm_q->f("address_zipcode");
     if (($name == $db_name) && ($zip == $db_zip)) {
       $comps["same"][$cpt_same]["comp_id"] = $db_id;
       $comps["same"][$cpt_same]["comp_name"] = $db_name;
@@ -655,6 +657,19 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $fax = $fields["comp_fax"];
   $web = $fields["comp_web"];
   $email = $fields["comp_mail"];
+
+  $coords['phones'][] = array('label' => 'WORK_VOICE', 'number' => $phone);
+  $coords['phones'][] = array('label' => 'WORK_FAX', 'number' => $fax);
+  $coords['emails'][] = array('label' => 'INTERNET', 'address' => $email);
+  $coords['websites'][] = array('label' => 'URL', 'url' => $web);
+  $coords['addresses'][] = array(
+    'label' => 'HQ', 
+    'street' => "$ad1\n$ad2\n$ad3", 
+    'zipcode' => $zip, 
+    'town' => $town, 
+    'expresspostal' => $cdx,
+    'country' => $ctry);
+
   $com = addslashes($fields["comp_com"]);
 
   $query = "INSERT INTO Company (
@@ -670,17 +685,6 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     company_aka,
     company_sound,
     company_marketingmanager_id,
-    company_address1,
-    company_address2,
-    company_address3,
-    company_zipcode,
-    company_town,
-    company_expresspostal,
-    company_country_iso3166,
-    company_phone,
-    company_fax,
-    company_web,
-    company_email,
     company_comment)
   VALUES (
     '$domain_id',
@@ -695,17 +699,6 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     '$aka',
     '$sound',
     $market,
-    '$ad1',
-    '$ad2',
-    '$ad3',
-    '$zip',
-    '$town',
-    '$cdx',
-    '$ctry',
-    '$phone',
-    '$fax',
-    '$web',
-    '$email',
     '$com')";
 
   display_debug_msg($query, $cdg_sql, "run_query_import_company_insert(1)");
@@ -715,7 +708,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $id = $obm_q->lastid();
 
   if ($id > 0) {
-    of_entity_insert('company', $id);
+    $entity_id = of_entity_insert('company', $id);
     // User data handling
     if (is_array($userdata["company"]["category"])) {
       foreach($userdata["company"]["category"] as $cat_name => $hash) {
@@ -723,11 +716,127 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
       }
       $ret = of_userdata_query_update("company", $id, $param_values);
     }
+    run_query_entity_coords_update($entity_id, $coords);
   }
 
   return $id;
 }
 
+
+/**
+ * run_query_entity_coords_update 
+ * 
+ * @param mixed $id 
+ * @param mixed $params 
+ * @access public
+ * @return void
+ */
+function run_query_entity_coords_update($id, $params) {
+  global $cdg_sql;
+  $phones = $params['phones'];
+  $addresses = $params['addresses'];
+  $ims = $params['ims'];
+  $websites = $params['websites'];
+  $emails = $params['emails'];
+  $obm_q = new DB_OBM;
+
+  $query = "DELETE FROM Phone WHERE phone_entity_id = $id"; 
+  display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(phone)');
+  $obm_q->query($query);
+  if(is_array($phones)) {
+    $cpt = array();
+    foreach($phones as $phone) {
+      if(trim($phone['number']) != '' ) {
+        $phone['label'] = str_replace('_', ';', $phone['label']);
+        $cpt[$phone['label']]++;
+        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
+        display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(phone)');
+        $obm_q->query($query);
+      }
+    }
+  }
+  $query = "DELETE FROM Address WHERE address_entity_id = $id"; 
+  display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(address)');
+  $obm_q->query($query);  
+  if(is_array($addresses)) {
+    $cpt = array();
+    foreach($addresses as $address) {
+      if(trim($address['street']) != '' || (trim($address['country']) != '' && trim($address['country']) != 'none') || trim($address['zipcode']) != ''
+         || trim($address['expresspostal']) != '') {
+        if(trim($address['country']) == 'none') $address['country'] = '';
+        $address['label'] = str_replace('_', ';', $address['label']);
+        $cpt[$address['label']]++;
+        $query = "INSERT INTO Address (
+          address_entity_id,
+          address_street,
+          address_zipcode,
+          address_town,
+          address_expresspostal,
+          address_country,
+          address_label
+        ) VALUES (
+          $id, 
+          '$address[street]',
+          '$address[zipcode]',
+          '$address[town]',
+          '$address[expresspostal]',
+          '$address[country]',
+          '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
+        )";
+        display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(address)');
+        $obm_q->query($query);
+      }
+    }
+  }  
+  $query = "DELETE FROM Website WHERE website_entity_id = $id"; 
+  display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(website)');
+  $obm_q->query($query);  
+
+  if(is_array($websites)) {
+    $cpt = array();
+    foreach($websites as $website) {
+      if(trim($website['url']) != '' ) {
+        $website['label'] = str_replace('_', ';', $website['label']);
+        $cpt[$website['label']]++;
+        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
+        display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(website)');
+        $obm_q->query($query);        
+      }
+    }
+  }  
+
+  $query = "DELETE FROM IM WHERE im_entity_id = $id"; 
+  display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(IM)');
+  $obm_q->query($query);  
+
+  if(is_array($ims)) {
+    $cpt = array();
+    foreach($ims as $im) {
+      if(trim($im['address']) != '' ) {
+        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[label]')";
+        display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(IM)');
+        $obm_q->query($query);        
+      }
+    }
+  }    
+
+  $query = "DELETE FROM Email WHERE email_entity_id = $id"; 
+  display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(Email)');
+  $obm_q->query($query);  
+
+  if(is_array($emails)) {
+    $cpt = array();
+    foreach($emails as $email) {
+      if(trim($email['address']) != '' ) {
+        $email['label'] = str_replace('_', ';', $email['label']);
+        $cpt[$email['label']]++;
+        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '$email[address]', '$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
+        display_debug_msg($query, $cdg_sql, 'run_query_entity_coords_update(Email)');
+        $obm_q->query($query);        
+      }
+    }
+  }      
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Company Update query execution
@@ -781,6 +890,20 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
   $fax = $fields["comp_fax"];
   $web = $fields["comp_web"];
   $email = $fields["comp_mail"];
+
+
+  $coords['phones'][] = array('label' => 'WORK_VOICE', 'number' => $phone);
+  $coords['phones'][] = array('label' => 'WORK_FAX', 'number' => $fax);
+  $coords['emails'][] = array('label' => 'INTERNET', 'address' => $email);
+  $coords['websites'][] = array('label' => 'URL', 'url' => $web);
+  $coords['addresses'][] = array(
+    'label' => 'HQ', 
+    'street' => "$ad1\n$ad2\n$ad3", 
+    'zipcode' => $zip, 
+    'town' => $town, 
+    'expresspostal' => $cdx,
+    'country' => $ctry);
+
   $com = addslashes($fields["comp_com"]);
   $comp_id = sql_parse_id($company_id, true);
   $query = "UPDATE Company SET
@@ -790,23 +913,14 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     company_marketingmanager_id=$market,
     company_number='$num',
     company_name='$name',
-    company_address1='$ad1',
-    company_address2='$ad2',
-    company_address3='$ad3',
-    company_zipcode='$zip',
-    company_town='$town',
-    company_expresspostal='$cdx',
-    company_country_iso3166='$ctry',
-    company_phone='$phone',
-    company_fax='$fax',
-    company_web='$web',
-    company_email='$email',
     company_comment='$com'
-  WHERE company_id $company_id ";
+  WHERE company_id $comp_id ";
 
   display_debug_msg($query, $cdg_sql, "run_query_import_company_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+  $entity_id = of_entity_get('company', $company_id);
+  run_query_entity_coords_update($entity_id, $coords);
 
   // User data handling
   if (is_array($userdata["company"]["category"])) {
@@ -929,6 +1043,20 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $mphone = $fields["con_mpho"];
   $fax = $fields["con_fax"];
   $email = $fields["con_mail"];
+
+  $coords['phones'][] = array('label' => 'WORK_VOICE', 'number' => $phone);
+  $coords['phones'][] = array('label' => 'HOME_VOICE', 'number' => $hphone);
+  $coords['phones'][] = array('label' => 'CELL_VOICE', 'number' => $mphone);
+  $coords['phones'][] = array('label' => 'WORK_FAX', 'number' => $fax);
+  $coords['emails'][] = array('label' => 'INTERNET', 'address' => $email);
+  $coords['addresses'][] = array(
+    'label' => 'HQ', 
+    'street' => "$ad1\n$ad2\n$ad3", 
+    'zipcode' => $zip, 
+    'town' => $town, 
+    'expresspostal' => $cdx,
+    'country' => $ctry);
+
   $mailok = (in_array($fields["con_mailok"], $mailoks) ? '1' : '0');
   $com = addslashes($fields["con_com"]);
   $arch = '0';
@@ -945,20 +1073,8 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_marketingmanager_id,
     contact_lastname,
     contact_firstname,
-    contact_address1,
-    contact_address2,
-    contact_address3,
-    contact_zipcode,
-    contact_town,
-    contact_expresspostal,
-    contact_country_iso3166,
     contact_function_id,
     contact_title,
-    contact_phone,
-    contact_homephone,
-    contact_mobilephone,
-    contact_fax,
-    contact_email,
     contact_mailing_ok,
     contact_archive,
     contact_privacy,
@@ -974,20 +1090,8 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     $market,
     '$lname',
     '$fname',
-    '$ad1',
-    '$ad2',
-    '$ad3',
-    '$zip',
-    '$town',
-    '$cdx',
-    '$ctry',
     $function_id,
     '$title',
-    '$phone',
-    '$hphone',
-    '$mphone',
-    '$fax',
-    '$email',
     '$mailok',
     $arch,
     $priv,
@@ -1000,7 +1104,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $id = $obm_q->lastid();
 
   if ($id > 0) {
-    of_entity_insert('contact',$id);
+    $entity_id  = of_entity_insert('contact',$id);
     run_query_global_company_contact_number_update($comp_id);
 
     // User data handling
@@ -1010,6 +1114,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
       }
       $ret = of_userdata_query_update("contact", $id, $param_values);
     }
+    run_query_entity_coords_update($entity_id, $coords);
   }
 
   return $id;
@@ -1083,6 +1188,19 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $mphone = $fields["con_mpho"];
   $fax = $fields["con_fax"];
   $email = $fields["con_mail"];
+
+  $coords['phones'][] = array('label' => 'WORK_VOICE', 'number' => $phone);
+  $coords['phones'][] = array('label' => 'HOME_VOICE', 'number' => $hphone);
+  $coords['phones'][] = array('label' => 'CELL_VOICE', 'number' => $mphone);
+  $coords['phones'][] = array('label' => 'WORK_FAX', 'number' => $fax);
+  $coords['emails'][] = array('label' => 'INTERNET', 'address' => $email);
+  $coords['addresses'][] = array(
+    'label' => 'HQ', 
+    'street' => "$ad1\n$ad2\n$ad3", 
+    'zipcode' => $zip, 
+    'town' => $town, 
+    'expresspostal' => $cdx,
+    'country' => $ctry);  
   $mailok = (in_array($fields["con_mailok"], $mailoks) ? '1' : '0');
   $com = addslashes($fields["con_com"]);
   $arch = '0';
@@ -1097,19 +1215,8 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_marketingmanager_id $market ,
     contact_lastname='$lname',
     contact_firstname='$fname',
-    contact_address1='$ad1',
-    contact_address2='$ad2',
-    contact_address3='$ad3',
-    contact_zipcode='$zip',
-    contact_town='$town',
-    contact_expresspostal='$cdx',
     contact_country_iso3166='$ctry',
     contact_title='$title',
-    contact_phone='$phone',
-    contact_homephone='$hphone',
-    contact_mobilephone='$mphone',
-    contact_fax='$fax',
-    contact_email='$email',
     contact_mailing_ok='$mailok',
     contact_archive='$arch',
     contact_privacy='$priv',
@@ -1119,7 +1226,8 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   display_debug_msg($query, $cdg_sql, "run_query_import_contact_update()");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-
+  $entity_id = of_entity_get('contact', $contact_id);
+  run_query_entity_coords_update($entity_id, $coords);
   // User data handling
   if (is_array($userdata["contact"]["category"])) {
     foreach($userdata["contact"]["category"] as $cat_name => $hash) {

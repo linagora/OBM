@@ -550,7 +550,7 @@ function dis_contact_consult($contact) {
     include("$path/$view/".$view.'_query.inc');
     $block .= dis_publication_subscription_external_list($contact);
   } else {
-    $coords = run_query_contact_coords($id);
+    $coords = run_query_contact_coords($id, true);
     $block .= html_contact_view_main($con_q, $coords);
   }
 
@@ -774,6 +774,7 @@ function html_contact_view_main($co_q, $coords) {
       $datas = array();
       foreach($values as $label => $value) {
         if($label == 'label' || $label == 'protocol') {
+          var_dump($kind, $value, str_replace(';', '_', $value));
           if(isset($GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)])) {
             $header = $GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)];
           } else {
@@ -984,7 +985,7 @@ function dis_contact_form($action, $co_q, $contact) {
   $users = of_usergroup_get_group_users($obm['group_com'], true, $uids, 'userobm_lastname');
   $ctry_q = run_query_global_country_for_lang();
   if($cid > 0) {
-    $coords = run_query_contact_coords($cid, true);
+    $coords = run_query_contact_coords($cid, false, true);
   }
   $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact, $coords);
 
@@ -1083,16 +1084,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $comment3 = $co_q->f('contact_comment3');
     $usercomment3 = $uid;
     $datecomment3 = of_date_upd_format();
-    $c_phone = $co_q->f('company_phone');
-    $c_fax = $co_q->f('company_fax');
-    $c_ad1 = $co_q->f('company_address1');
-    $c_ad2 = $co_q->f('company_address2');
-    $c_ad3 = $co_q->f('company_address3');
-    $c_zip = $co_q->f('company_zipcode');
-    $c_town = $co_q->f('company_town');
-    $c_cdx = $co_q->f('company_expresspostal');
-    $c_ctry = $co_q->f('company_country_iso3166');
-    $c_ctry_name = $co_q->f('company_country_name');
     $dis_title = "$lname $fname";
     $phones = $coords['phone'];
     $addresses = $coords['address'];
@@ -1122,15 +1113,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     // if company given
     if (is_object($co_q)) {
       // fill the phone with company one
-      $c_phone = $co_q->f('company_phone');
-      $c_fax = $co_q->f('company_fax');
-      $c_ad1 = $co_q->f('company_address1');
-      $c_ad2 = $co_q->f('company_address2');
-      $c_ad3 = $co_q->f('company_address3');
-      $c_zip = $co_q->f('company_zipcode');
-      $c_town = $co_q->f('company_town');
-      $c_cdx = $co_q->f('company_expresspostal');
-      $c_ctry_name = $co_q->f('company_country_name');
       $c_id = $co_q->f('company_id');
       $c_name = $co_q->f('company_name');
       $c_new_id = $c_id;

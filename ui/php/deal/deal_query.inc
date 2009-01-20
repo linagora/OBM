@@ -95,10 +95,14 @@ function run_query_deal_search($deal, $all='') {
     $where .= " AND (deal_contact1_id $contact_id 
                     OR deal_contact2_id $contact_id)"; 
   }
-  if ($zip != '') {
-    $join_comp = "LEFT JOIN Company ON deal_company_id=company_id";
-    $where .= " AND company_zipcode $like '$zip%'";
-  }
+
+  $where .= 'AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = companyentity_entity_id)';
+  if($zip != '') {
+    $where .= " AND companyentity_entity_id IN (SELECT address_entity_id FROM Address WHERE companyentity_entity_id = address_entity_id  AND address_zipcode $like '$zip%'))";
+  } else {
+    $where .= " OR address_id IS NULL)";
+  }  
+
   if (($status != $c_all) && ($status != '')) {
     $status = sql_parse_id($status, true);
     $where .= " AND deal_status_id $status"; 
@@ -183,7 +187,7 @@ function run_query_deal_search($deal, $all='') {
       region_label,
       leadsource_label,
       Company.company_name as deal_company_name,
-      Company.company_zipcode as deal_company_zipcode,
+      address_zipcode as deal_company_zipcode,
       tasktype_label,
       dealstatus_label,
       userobm_lastname as deal_marketingmanager
@@ -193,6 +197,8 @@ function run_query_deal_search($deal, $all='') {
 
   $left_join = "
         LEFT JOIN Company as Company ON deal_company_id=Company.company_id
+        LEFT JOIN CompanyEntity ON companyentity_company_id = company_id
+        LEFT JOIN Address ON address_entity_id = companyentity_entity_id
         LEFT JOIN DealType ON deal_type_id=dealtype_id
         LEFT JOIN Region ON deal_region_id=region_id
         LEFT JOIN TaskType ON deal_tasktype_id=tasktype_id
@@ -228,6 +234,7 @@ function run_query_deal_detail($id) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
+  $limit = sql_limit($db_type,1,0);	
   $datebegin = sql_date_format($db_type, 'deal_datebegin', 'datebegin');
   $dateprop = sql_date_format($db_type, 'deal_dateproposal', 'dateproposal');
   $datealarm = sql_date_format($db_type, 'deal_datealarm', 'datealarm');
@@ -244,12 +251,16 @@ function run_query_deal_detail($id) {
       region_label,
       tasktype_label,
       dealstatus_label,
-      company_name, company_address1, company_zipcode, company_town,
-      company_phone,
+      company_name, 
+      cpp.phone_number as company_phone,
+      address_street as company_address1,
+      address_zipcode as company_zipcode,
+      address_town as company_town,
+      c1p.phone_number as phonec1, 
+      c2p.phone_number as phonec2,
       u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
       u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
       c1.contact_lastname as lnamec1, c1.contact_firstname as fnamec1,
-      c1.contact_phone as phonec1, c2.contact_phone as phonec2,
       c2.contact_lastname as lnamec2, c2.contact_firstname as fnamec2,
       $datebegin,
       $dateprop,
@@ -266,7 +277,16 @@ function run_query_deal_detail($id) {
         LEFT JOIN UserObm u2 ON deal_technicalmanager_id=u2.userobm_id
         LEFT JOIN Company ON deal_company_id=company_id
         LEFT JOIN Contact c1 ON deal_contact1_id=c1.contact_id
+        LEFT JOIN ContactEntity ce1 ON c1.contact_id = ce1.contactentity_contact_id
         LEFT JOIN Contact c2 ON deal_contact2_id=c2.contact_id
+        LEFT JOIN ContactEntity ce2 ON c2.contact_id = ce2.contactentity_contact_id
+        LEFT JOIN CompanyEntity ON company_id = companyentity_company_id
+        LEFT JOIN Address ON address_entity_id = companyentity_entity_id
+        LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
+        LEFT JOIN Phone as cpp ON cpp.phone_entity_id = companyentity_entity_id AND cpp.phone_label like 'WORK;VOICE%'
+        LEFT JOIN Phone as cpf ON cpf.phone_entity_id = companyentity_entity_id AND cpf.phone_label like 'WORK;FAX%'
+        LEFT JOIN Phone as c1p ON c1p.phone_entity_id = ce1.contactentity_entity_id  AND c1p.phone_label like 'WORK;VOICE%'
+        LEFT JOIN Phone as c2p ON c2p.phone_entity_id = ce2.contactentity_entity_id  AND c2p.phone_label like 'WORK;VOICE%'       
         LEFT JOIN UserObm c ON deal_usercreate=c.userobm_id
         LEFT JOIN UserObm u ON deal_userupdate=u.userobm_id
         LEFT JOIN DealType ON deal_type_id=dealtype_id
@@ -275,7 +295,7 @@ function run_query_deal_detail($id) {
         LEFT JOIN Region ON deal_region_id=region_id,
       TaskType
     WHERE deal_id $id 
-      AND tasktype_id=deal_tasktype_id $multidomain";
+      AND tasktype_id=deal_tasktype_id $multidomain $limit";
 
   display_debug_msg($query, $cdg_sql, 'run_query_deal_detail()');
   $obm_q->query($query);
@@ -831,16 +851,21 @@ function run_query_deal_delete($id) {
 function run_query_deal_company_info($id) {
   global $cdg_sql;
   $id = sql_parse_id($id, true);
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $limit = sql_limit($db_type, 1, 0);
+
   $query = "SELECT company_name,
       company_marketingmanager_id,
-      company_address1,
-      company_zipcode,
-      company_town
+      address_street as company_address1,
+      address_zipcode as company_zipcode,
+      address_town as company_town
     FROM Company
-    WHERE company_id $id"; 
+    INNER JOIN CompanyEntity ON companyentity_company_id = company_id
+    LEFT JOIN Address ON address_entity_id = companyentity_entity_id    
+    WHERE company_id $id $limit"; 
 
   display_debug_msg($query, $cdg_sql, 'run_query_deal_company_info()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -1325,12 +1350,14 @@ function run_query_deal_dashboard_list($deal, $users_id='') {
       region_label,
       leadsource_label,
       company_name as deal_company_name,
-      company_zipcode as deal_company_zipcode,
+      address_zipcode as deal_company_zipcode,
       tasktype_label,
       dealstatus_label,
       userobm_lastname as deal_marketingmanager
     FROM Deal
       LEFT JOIN Company ON deal_company_id = company_id
+      LEFT JOIN CompanyEntity ON companyentity_company_id = company_id
+      LEFT JOIN Address ON address_entity_id = companyentity_entity_id
       LEFT JOIN DealType ON deal_type_id = dealtype_id
       LEFT JOIN Region ON deal_region_id = region_id
       LEFT JOIN TaskType ON deal_tasktype_id=tasktype_id 
@@ -1341,6 +1368,7 @@ function run_query_deal_dashboard_list($deal, $users_id='') {
       AND deal_hitrate > 0
       AND deal_hitrate < 100
       AND deal_archive = '0'
+      AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = companyentity_entity_id) OR address_id IS NULL)
       $where_uid
       $where_date
       $multidomain
@@ -1431,17 +1459,21 @@ function run_query_deal_contact($p_id) {
   global $cdg_sql;
   $multidomain = sql_multidomain('contact');
   $p_id = sql_parse_id($p_id, true);
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $limit = sql_limit($db_type, 0, 1);
   $query = "SELECT contact_id,
       contact_lastname,
       contact_firstname,
-      contact_phone
+      phone_number as contact_phone
     FROM Contact
+    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id    
     WHERE contact_company_id $p_id 
       $multidomain
-    ORDER BY contact_archive, contact_lastname";
+    ORDER BY contact_archive, contact_lastname $limit";
 
   display_debug_msg($query, $cdg_sql, 'run_query_deal_contact()');
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;

@@ -840,14 +840,14 @@ function run_query_contact_coords_update($id, $contact) {
  * @access public
  * @return void
  */
-function run_query_contact_coords($id, $update=false) {
+function run_query_contact_coords($id, $inherit=false, $update=false) {
   global $cdg_sql;
   $obm_q = new DB_OBM;
   $coords = array();
   $query = "SELECT phone_label, phone_number FROM Phone INNER JOIN ContactEntity ON phone_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
-  if(!$update) {
+  if($inherit) {
     $query .= " UNION 
-      SELECT 'COMPANY' as phone_label, phone_number FROM Phone 
+      SELECT 'COMPANY;X-OBM-REF1' as phone_label, phone_number FROM Phone 
       INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id 
       INNER JOIN Contact ON contact_company_id = companyentity_company_id
       WHERE contact_id = $id";
@@ -862,9 +862,9 @@ function run_query_contact_coords($id, $update=false) {
     $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
   }
   $query = "SELECT email_label, email_address FROM Email INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
-  if(!$update) {
+  if($inherit) {
     $query .= " UNION 
-      SELECT 'COMPANY' as email_label, email_address FROM Email 
+      SELECT 'COMPANY;X-OBM-REF1' as email_label, email_address FROM Email 
       INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id 
       INNER JOIN Contact ON contact_company_id = companyentity_company_id
       WHERE contact_id = $id";
@@ -885,9 +885,9 @@ function run_query_contact_coords($id, $update=false) {
     $coords['im'][] = array('protocol' => $obm_q->f('im_protocol'),'address' => $obm_q->f('im_address'));
   }
   $query = "SELECT website_label, website_url FROM Website INNER JOIN ContactEntity ON website_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
-  if(!$update) {
+  if($inherit) {
     $query .= " UNION 
-      SELECT 'COMPANY' as website_label, website_url FROM Website
+      SELECT 'COMPANY;X-OBM-REF1' as website_label, website_url FROM Website
       INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id 
       INNER JOIN Contact ON contact_company_id = companyentity_company_id
       WHERE contact_id = $id";
@@ -906,9 +906,9 @@ function run_query_contact_coords($id, $update=false) {
     address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name
     FROM Address INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id 
     LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' WHERE contactentity_contact_id = $id";
-  if(!$update) {
+  if($inherit) {
     $query .= " UNION 
-      SELECT 'COMPANY' as address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name 
+      SELECT 'COMPANY;X-OBM-REF1' as address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name 
       FROM Address 
       INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
       INNER JOIN Contact ON contact_company_id = companyentity_company_id

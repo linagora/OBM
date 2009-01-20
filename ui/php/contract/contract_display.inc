@@ -604,7 +604,7 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
 
   // --- HTML Template --------------------------------------------------------
 
-  $display["link"] = html_contract_links($id, $label, $tech_id, $deal_id, $inc_nb, $last_inc);
+  //$display["link"] = html_contract_links($id, $label, $tech_id, $deal_id, $inc_nb, $last_inc);
   $display["title"] = $label;
 
 
