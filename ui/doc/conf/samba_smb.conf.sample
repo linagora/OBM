@@ -104,7 +104,9 @@
 # 'encrypt passwords' in the smb.conf(5) manpage before enabling.
    encrypt passwords = true
    null passwords = No
-   ldap passwd sync = Yes
+# Don't synchronize 'userPassword' ldap attribute, use unix password sync
+# instead.
+   ldap passwd sync = No
 
 # If you are using encrypted passwords, Samba will need to know what
 # password database type you are using.  
