@@ -1275,6 +1275,54 @@ table.planning thead th {
   color: black;
 }
 
+table.planningRessource {
+  background-color: white;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin: auto;
+}
+table.planningRessource th{
+  white-space: nowrap;
+  font-size: 100%;
+  text-align: center;
+  padding-right: 2px;
+}
+
+table.planningRessource colgroup.main {
+  background-color: #f1f3f2;
+}
+
+table.planningRessource colgroup.total {
+  background-color: #f1f3f2;
+}
+
+table.planningRessource td {
+  border: 1px solid #AEAEAE;
+  height: 2em;
+  font-size: 90%;
+  text-align: left;
+}
+
+table.planningRessource thead {
+  background-color: #fffcf7;
+  empty-cells: hide;
+  text-align: center;
+  font-weight: bold;
+  color: #aca0d2;
+}
+
+table.planningRessource thead td{
+  font-size: 90%;
+}
+  
+table.planningRessource thead th {
+  color: black;
+}
+
+table.planningRessource tbody a  {
+  color: white;
+  font-style: italic;
+}
 /* ------------------------------------------------------------------------- */ 
 /* Color Picker */
 /* ------------------------------------------------------------------------- */

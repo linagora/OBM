@@ -1600,7 +1600,7 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
   $end = clone $date;
   $end->addDay(1);
 
-  $dis_planning = dis_calendar_planning_view ($date, $end, $calendar_entity, $category_filter);
+  $dis_planning = dis_calendar_planning_day_view ($date, $end, $calendar_entity, $category_filter);
 
   $label = $date->localize(Of_Date::OBM_DATE_DAY);
   $current = new Of_Date();
@@ -1617,7 +1617,115 @@ function dis_calendar_day_planning($calendar, $calendar_entity,$writable_entity)
 
   return $block;
 }
+/**
+ * ViewRessource (ligne:time column:resource)
+ *
+ * @param mixed $calendar_entity
+ * @param reference $en_tete
+ * @return array() $entity_occ
+ */
+function ViewRessource($calendar_entity,&$en_tete){
+  $en_tete.="<tr><th></th>";
+  foreach($calendar_entity as $entity => $entities){
+    foreach($entities as $id => $data){
+      $entity_occ[]=array($entity => array($id),'class'=>$data['class']);
+      $en_tete.="<th title='$data[name]' ><div class='NW'>$data[name]</div></th>";
+    }
+  }
+  $en_tete.="</tr>";
+  return $entity_occ;
+}
 
+/**
+ * dis_calendar_planning_view (day and week views)
+ * 
+ * @param mixed $date 
+ * @param mixed $end 
+ * @param mixed $calendar_entity 
+ * @param mixed $category_filter 
+ * @access public
+ * @return void
+ */
+function dis_calendar_planning_day_view($date, $end, $calendar_entity, $category_filter) {
+  global $ccalendar_first_hour, $ccalendar_last_hour;
+
+  $status = array('ACCEPTED');
+  calendar_events_model($date,$end, $calendar_entity, $status, $category_filter);
+  $of = &OccurrenceFactory::getInstance();
+  
+  $cats1 = of_category_get_ordered('event', 'category1');
+  $nb = count($cats1);
+
+  $colors = random_color($nb);
+  foreach($cats1 as $key => $cat_info) {
+    $cats_color[$cat_info['label']] = $colors[$key];
+  }
+
+  $en_tete="";
+
+  $entity_occ=ViewRessource($calendar_entity,$en_tete);
+  
+  $nb_ressources=count($entity_occ);
+  $td_width = ceil(90/$nb_ressources);
+
+  $current_time = clone $date;
+  $current_time->addHour($ccalendar_first_hour);
+
+  $event_unit=60/$_SESSION['set_cal_interval'];
+
+  //Permet de savoir si un evenement à déjà etait affiché
+  $event=array(); 
+
+  //Display Calendar
+  for ($i = $ccalendar_first_hour; $i < $ccalendar_last_hour; $i++) {
+    for ($k=0; $k<$_SESSION['set_cal_interval']; $k++) {
+      if ($k==0) {
+	      $ressource_occ .= "\n<tr><th>$i:00</th>"; 
+      } else {
+	      $ressource_occ .= "\n<tr><th></th>"; 
+      }
+
+      $end_event=clone $current_time;
+      $end_event->addMinute($event_unit);
+
+      foreach($entity_occ as $ress){
+        $occurrences = $of->getPeriodOccurrences($current_time,$end_event,$ress);
+        if(is_array($occurrences)) {
+          $ressource_occ .= "<td style=\"width:$td_width%;\" class='$ress[class]' ><ul>";
+          foreach($occurrences as $occurrence) {
+            $event_id=$occurrence->event->id;
+            $entity_type=$occurrence->entity;
+            $ress_id=$ress[$entity_type]['0'];
+            if(!isset($event[$event_id][$ress_id][$entity_type])){
+              $ressource_occ .= dis_calendar_planning_day_event($occurrence, $calendar_entity, $current_time,$cats_color);
+              $event[$event_id][$ress_id][$entity_type]=true;
+            }
+          }
+          $ressource_occ .= '</ul></td>';
+        } else {
+          $ressource_occ .= "<td style=\"width:$td_width%;\">&nbsp;</td>";
+        }
+      }
+      $ressource_occ.="</tr>";
+      $current_time->addMinute($event_unit);
+    }
+  }
+
+  unset($event);
+
+  $block .= "
+    <table class='spreadSheet planningRessource' style=\"width:100%;height:100%;\">
+    <thead>
+    $en_tete
+    </thead>
+    <tbody>
+    $ressource_occ
+    </tbody>
+    </table>
+  ";
+
+  return $block;
+}
 
 /**
  * dis_calendar_planning_view 
@@ -1748,6 +1856,64 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
   return $event_data;  
 }
 
+/**
+ * Generate the html code for an event in the planning day view 
+ * 
+ * @param mixed $occurrence 
+ * @access public
+ * @return void
+ */
+function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date, $cats_color) {
+  global $obm, $path;
+  global $l_private, $l_location, $l_all_day;
+  global $l_user, $l_resource, $l_private;
+  global $ico_meeting, $ico_periodic, $ico_private;
+
+  $location = '';
+  if ($occurrence->event->privacy == 1 && !(array_key_exists($obm['uid'],$occurrence->event->attendee['user']))) {
+    $title = $l_private;
+  } else {
+    $title = $occurrence->event->title;
+    if($occurrence->event->location != '') {
+      $location = "<br />$l_location : ".$occurrence->event->location;
+    }            
+  }
+  $entity_id = $occurrence->id;
+  $entity = $occurrence->entity;
+
+  $end=clone($occurrence->date);
+  $end->addSecond($occurrence->event->duration);
+
+  $style = "color:rgb(".$cats_color[$occurrence->event->category1].")";  
+  if($occurrence->event->all_day) {
+    $schedule = "<h1 class='RF hoursTitle'>$l_all_day</h1>"; 
+  } else {
+    if($occurrence->date->compareDateIso($date) != 0) {
+      $schedule_start = $occurrence->date->get(Of_Date::DAY).'/'.$occurrence->date->get(Of_Date::MONTH);
+    } else {
+      $schedule_start = $occurrence->date->get(Of_Date::TIME_SHORT);
+    }
+    if($end->compareDateIso($date) != 0) {
+      $schedule_end = $end->get(Of_Date::DAY).'/'.$end->get(Of_Date::MONTH);
+    } else {
+      $schedule_end = $end->get(Of_Date::TIME_SHORT);
+    }
+    $schedule="
+      <h1 class='RF hoursTitle'>$schedule_start<br/>$schedule_end</h1>  
+    ";
+  }
+
+
+  $event_data = "
+    <li style='$style' class='LF'>
+    $schedule
+    <div>
+      <a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$title</a>
+    </div>
+    </li>";
+
+  return $event_data;  
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // display conflicts
@@ -2271,7 +2437,7 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
   $entity_view.="<select id=\"calendarViewEntity\">";
   if(is_array($calendar_entity['user'])){
     foreach($calendar_entity['user'] as $user){
-      if(OBM_Acl::areAllowed($obm['uid'], 'calendar',array($user['id']), 'access')) {
+      if(OBM_Acl::canAccess($obm['uid'], 'calendar',array($user['id']))) {
         $entity_view.="<option value=\"$user[id]\" />$user[name]</option>";
         if($obm['uid'] == $user["id"]) {
           $uid = true;

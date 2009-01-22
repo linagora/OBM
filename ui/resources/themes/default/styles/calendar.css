@@ -860,3 +860,43 @@ table.planning li {
   padding: 0;
   margin: 0;
 }
+
+table.planningRessource a {
+  color:#FFFFFF;
+}
+
+table.planningRessource td {
+  vertical-align: top;
+  padding: 0;
+  font-size: 90%;
+}
+
+table.planningRessource ul {
+  padding: 0;
+  padding-left: 15px;
+  margin: 0;
+  list-style: disc;
+}
+
+table.planningRessource li {
+  padding: 0;
+  margin: 0;
+}
+
+table.planningRessource thead div {
+  clip: rect(auto,auto,auto,auto);
+  overflow: hidden;
+}
+
+h1.hoursTitle{
+  margin:0;
+  border-left: 1px solid black;
+  border-bottom: 1px solid black;
+  font-size: 90%;
+  font-weight: bold;
+  padding: 2px;
+  color:white;
+  width:40%;
+}
+
+
