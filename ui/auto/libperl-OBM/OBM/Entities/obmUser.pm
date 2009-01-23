@@ -188,7 +188,7 @@ sub _init {
     if( $userDesc->{'userobm_photo_id'} ) {
       my $jpeg;
       my $pathJpeg = substr $userDesc->{'userobm_photo_id'}, -1 ,1;
-      $pathJpeg = "/var/lib/obm/documents/".$pathJpeg."/".$userDesc->{'userobm_photo_id'};
+      $pathJpeg = $OBM::Parameters::common::documentRoot.$OBM::Parameters::common::documentDefaultPath.$pathJpeg."/".$userDesc->{'userobm_photo_id'};
       open (JPEG, $pathJpeg) or
         $self->_log( 'path jpeg '.$pathJpeg.' du user '.$userDesc->{'userobm_login'}.' introuvable', 2 );
       while(<JPEG>) {

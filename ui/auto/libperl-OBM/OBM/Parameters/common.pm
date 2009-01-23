@@ -11,7 +11,7 @@ use FindBin qw($Bin);
 
 
 @ISA = qw(Exporter);
-@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
+@EXPORT_const = qw($Bin $logLevel $facility_log $sieveSrv $singleNameSpace $backupRoot $documentRoot $documentDefaultPath $ldapServerId $ldapDescription $ldapAdminLogin $ldapServer $ldapRoot $sambaOldSidMapping $cyrusAdminLogin $cyrusDomainPartition $ldapAllMainMailAddress $obmModules $userMailboxDefaultFolders $shareMailboxDefaultFolders $baseHomeDir $defaultCharSet $sambaRidBase $minUID $minGID $MAILBOXENTITY $MAILSHAREENTITY $USERCONSUMER);
 @EXPORT_dir = qw($automateOBM $templateOBM $tmpOBM);
 @EXPORT_command = qw($recode $sambaNTPass $sambaLMPass);
 @EXPORT_db = qw($userDb $userPasswd $dbName $db $dbType);
@@ -102,6 +102,24 @@ if( !defined( $backupRoot ) ) {
 }else {
     $backupRoot =~ s/^"//;
     $backupRoot =~ s/"$//;
+}
+
+# La racine du repertoire document
+$documentRoot = $cfgFile->val( 'global', 'documentRoot' );
+if( !defined( $documentRoot ) ) {
+    $documentRoot = "/var/lib/obm/documents";
+}else {
+    $documentRoot =~ s/^"//;
+    $documentRoot =~ s/"$//;
+}
+
+# Path des documents
+$documentDefaultPath = $cfgFile->val( 'global', 'documentDefaultPath' );
+if( !defined( $backupRoot ) ) {
+    $documentDefaultPath = "/";
+}else {
+    $documentDefaultPath =~ s/^"//;
+    $documentDefaultPath =~ s/"$//;
 }
 
 # definition du niveau de log

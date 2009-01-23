@@ -46,6 +46,10 @@ singleNameSpace = false
 ; backupRoot is the directory used to store backup data
 backupRoot = "/var/lib/obm/backup"
 ;
+; documentRoot is root of document repository
+documentRoot="/var/lib/obm/documents"
+documentDefaultPath="/"
+;
 ;
 [automate]
 ; Automate specific parameters

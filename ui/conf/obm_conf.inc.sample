@@ -119,9 +119,8 @@ $c_working_days = array(0,1,1,1,1,1,0);
 // Time : activity report logo
 $cimage_logo = 'linagora.jpg';
 
-// Document : Root of the document repository
-$cdocument_root = '/var/www/obmdocuments';
-$default_path = '/Default';                  // Default directory
+// Document : $cdocument_root and $default_path are deprecated
+// see obm_conf.ini
 
 // Group : is a new group private by default
 $cgroup_private_default = true;

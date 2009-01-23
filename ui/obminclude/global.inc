@@ -231,6 +231,21 @@ if (is_null($ini_array['backupRoot'])) {
 }
 
 $cgp_host = $ini_array['external-protocol'].'://'.$ini_array['external-url'].$ini_array['obm-prefix'];
+
+// Document root
+if (is_null($ini_array['documentRoot'])) {
+    $cdocument_root = "/var/lib/obm/documents";
+}else {
+    $cdocument_root = $ini_array['documentRoot'];
+}
+
+// Document default directory
+if (is_null($ini_array['documentDefaultPath'])) {
+    $default_path = "/";
+}else {
+    $default_path = $ini_array['documentDefaultPath'];
+}
+
 //------------------//
 // Services enabled //
 //------------------//
