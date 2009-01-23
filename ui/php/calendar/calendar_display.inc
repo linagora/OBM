@@ -1905,7 +1905,7 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
 
 
   $event_data = "
-    <li style='$style' class='LF'>
+    <li style='$style' class='RC'>
     $schedule
     <div>
       <a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$occurrence->event->id."\">$title</a>
