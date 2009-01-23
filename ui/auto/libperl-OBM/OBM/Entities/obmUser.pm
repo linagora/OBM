@@ -184,6 +184,20 @@ sub _init {
         push( @{$userDesc->{'userobm_fax_list'}}, $userDesc->{'userobm_fax2'} );
     }
 
+    # User jpeg
+    if( $userDesc->{'userobm_photo_id'} ) {
+      my $jpeg;
+      my $pathJpeg = substr $userDesc->{'userobm_photo_id'}, -1 ,1;
+      $pathJpeg = "/var/lib/obm/documents/".$pathJpeg."/".$userDesc->{'userobm_photo_id'};
+      open (JPEG, $pathJpeg) or
+        $self->_log( 'path jpeg '.$pathJpeg.' du user '.$userDesc->{'userobm_login'}.' introuvable', 2 );
+      while(<JPEG>) {
+        $jpeg .= $_;
+      }
+      close JPEG;
+      $userDesc->{'userobm_photo'} = $jpeg;
+    }
+
     # User e-mails
     $userDesc->{'userobm_mail_perms'} = 1;
     if( !($self->_makeEntityEmail( $userDesc->{'userobm_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') ) ) ) {
@@ -560,6 +574,11 @@ sub createLdapEntry {
         $entry->add( description => $self->{'entityDesc'}->{'userobm_description'} );
     }
 
+    # User jpeg
+    if( $self->{'entityDesc'}->{'userobm_photo'} ) {
+        $entry->add( jpegPhoto => $self->{'entityDesc'}->{'userobm_photo'} );
+    }
+
     # User web permission
     if( $self->{'entityDesc'}->{'userobm_web_perms'} ) {
         $entry->add( webAccess => 'PERMIT' );
@@ -759,6 +778,11 @@ sub updateLdapEntry {
 
         # User description
         if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_description'}, $entry, 'description' ) ) {
+            $update = 1;
+        }
+
+        # User jpeg
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_photo'}, $entry, 'jpegPhoto' ) ) {
             $update = 1;
         }
 
