@@ -2872,7 +2872,7 @@ function run_of_query_profileproperty_list ($profile_id = NULL) {
   
   if (!is_null($profile_id)) {
     $val = 'profilepropertyvalue_property_value,';
-    $join = " LEFT JOIN ProfilePropertyValue
+    $join = " LEFT JOIN ProfileProperty
     	ON profileproperty_id = profilepropertyvalue_property_id
     	AND profilepropertyvalue_profile_id = '$profile_id'";
   }
@@ -2938,19 +2938,19 @@ function get_profile_data ($profile_id, $domain_id, $global_domain_id) {
     $res['section'][$sections_q->f('profilesection_section_name')] = ( $sections_q->f('profilesection_show') == '1' ? true : false) ;
   }
   // Load profile properties
-  $properties_q = run_of_query_profileproperty_list($profile_id);
-  
-  while ($properties_q->next_record()) {
-    if ($properties_q->f('profileproperty_readonly') != 1 && $properties_q->f('profileproperty_name') == 'admin_realm') {
-      $res['properties'][$properties_q->f('profileproperty_name')] = $properties_q->f('profilepropertyvalue_property_value');
-    } else if ($properties_q->f('profileproperty_readonly') != 1) {
-      if ($properties_q->f('profileproperty_name') == 'access_restriction') {
-        $res[$properties_q->f('profileproperty_name')] = $properties_q->f('profilepropertyvalue_property_value');
-      } else {
-        $res[$properties_q->f('profileproperty_name')] = intval($properties_q->f('profilepropertyvalue_property_value'));
-      }
-    }
-  }
+  //$properties_q = run_of_query_profileproperty_list($profile_id);
+  //
+  //while ($properties_q->next_record()) {
+  //  if ($properties_q->f('profileproperty_readonly') != 1 && $properties_q->f('profileproperty_name') == 'admin_realm') {
+  //    $res['properties'][$properties_q->f('profileproperty_name')] = $properties_q->f('profilepropertyvalue_property_value');
+  //  } else if ($properties_q->f('profileproperty_readonly') != 1) {
+  //    if ($properties_q->f('profileproperty_name') == 'access_restriction') {
+  //      $res[$properties_q->f('profileproperty_name')] = $properties_q->f('profilepropertyvalue_property_value');
+  //    } else {
+  //      $res[$properties_q->f('profileproperty_name')] = intval($properties_q->f('profilepropertyvalue_property_value'));
+  //    }
+  //  }
+  //}
   return $res;
 }
 

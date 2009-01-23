@@ -968,18 +968,18 @@ function of_isodate_convert($date, $null_empty=false) {
   switch ($type) {
   case 'Y-m-d' :
     preg_match("/^(\d{4})[-\/](\d{2})[-\/](\d{2})/",$date, $d);
-    $date = new Of_Date("$d[1]-$d[2]-$d[3]");
-    $date = $date->getTimestamp();
+    $do = new Of_Date("$d[1]-$d[2]-$d[3]");
+    $date = $do->getDateIso();
     break;    
   case 'd/m/Y' :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
-    $date = new Of_Date("$d[3]-$d[2]-$d[1]");
-    $date = $date->getTimestamp();
+    $do = new Of_Date("$d[3]-$d[2]-$d[1]");
+    $date = $do->getDateIso();
     break;
   case 'm/d/Y' :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
-    $date = new Of_Date("$d[3]-$d[1]-$d[2]");
-    $date = $date->getTimestamp();
+    $do = new Of_Date("$d[3]-$d[1]-$d[2]");
+    $date = $do->getDateIso();
     break;
   case 't' :
     $date = date($c_php_isodate_format, $date);

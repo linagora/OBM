@@ -51,3 +51,18 @@ $l_section_all = "Toutes";
 $l_section_none = "Aucune";
 $l_found = "profiles trouvés.";
 $l_no_found = "Aucun profile ne correspond à ces critères !";
+
+$l_user = "Lecture";
+$l_editor = "Écriture";
+$l_admin = "Administration";
+
+$l_modules_right = "Droits sur les modules";
+$l_sections_right = "Affichage des sections";
+$l_default_settings = "Réglages par défauts";
+$l_specific_settings = "Réglages spécifiques";
+$l_section_enabled = "Etat de la section";
+
+$l_informations = "Informations";
+
+$l_add_module_rights = "Ajouter des droits spécifiques à un module";
+$l_add_section_enabled = "Ajouter un réglage pour une section";

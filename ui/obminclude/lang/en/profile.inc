@@ -51,3 +51,18 @@ $l_section_all = "All";
 $l_section_none = "None";
 $l_found = "profiles found.";
 $l_no_found = "No profile found matching the query !";
+
+
+$l_user = "Read";
+$l_editor = "Write";
+$l_admin = "Administration";
+
+$l_modules_right = "Modules rights";
+$l_sections_right = "Section display";
+$l_default_settings = "Defaults settings";
+$l_specific_settings = "Specific settings";
+
+$l_informations = "Informations";
+
+$l_add_module_rights = "Add specifics right for a module";
+$l_add_section_enabled = "Add specifics settings for a section";
