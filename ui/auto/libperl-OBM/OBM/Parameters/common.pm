@@ -85,7 +85,7 @@ SWITCH: {
 }
 
 # Construction de la chaîne DBI de connexion à la BD
-$db = "dbi:".$dbDriver.":database=$dbName;host=".$dbHost;
+$db = 'dbi:'.$dbDriver.':database=$dbName;host='.$dbHost;
 
 # Mode d'espace de nom OBM
 $singleNameSpace = $cfgFile->val( 'global', 'singleNameSpace' );
@@ -98,7 +98,7 @@ if( defined( $singleNameSpace ) && lc($singleNameSpace) eq "true" ) {
 # La racine du backup
 $backupRoot = $cfgFile->val( 'global', 'backupRoot' );
 if( !defined( $backupRoot ) ) {
-    $backupRoot = "/var/lib/obm/backup";
+    $backupRoot = '/var/lib/obm/backup';
 }else {
     $backupRoot =~ s/^"//;
     $backupRoot =~ s/"$//;
@@ -107,7 +107,7 @@ if( !defined( $backupRoot ) ) {
 # La racine du repertoire document
 $documentRoot = $cfgFile->val( 'global', 'documentRoot' );
 if( !defined( $documentRoot ) ) {
-    $documentRoot = "/var/lib/obm/documents";
+    $documentRoot = '/var/lib/obm/documents';
 }else {
     $documentRoot =~ s/^"//;
     $documentRoot =~ s/"$//;
@@ -115,8 +115,8 @@ if( !defined( $documentRoot ) ) {
 
 # Path des documents
 $documentDefaultPath = $cfgFile->val( 'global', 'documentDefaultPath' );
-if( !defined( $backupRoot ) ) {
-    $documentDefaultPath = "/";
+if( !defined( $documentDefaultPath ) ) {
+    $documentDefaultPath = '/';
 }else {
     $documentDefaultPath =~ s/^"//;
     $documentDefaultPath =~ s/"$//;

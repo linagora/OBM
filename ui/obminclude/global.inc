@@ -142,7 +142,6 @@ $c_working_days = array(0,1,1,1,1,1,0);
 $cmail_incident = '';
 
 // Document : constants
-$cdocument_root = '/var/www/docs';           // Root of the document repository
 $default_path = '/Default';                  // Default directory
 $default_mime = 'application/octet-stream';  // Default Mime Type
 
@@ -231,20 +230,6 @@ if (is_null($ini_array['backupRoot'])) {
 }
 
 $cgp_host = $ini_array['external-protocol'].'://'.$ini_array['external-url'].$ini_array['obm-prefix'];
-
-// Document root
-if (is_null($ini_array['documentRoot'])) {
-    $cdocument_root = "/var/lib/obm/documents";
-}else {
-    $cdocument_root = $ini_array['documentRoot'];
-}
-
-// Document default directory
-if (is_null($ini_array['documentDefaultPath'])) {
-    $default_path = "/";
-}else {
-    $default_path = $ini_array['documentDefaultPath'];
-}
 
 //------------------//
 // Services enabled //
@@ -388,6 +373,19 @@ require_once('conf/obm_conf.inc');
 require_once("$obminclude/phplib/obmlib.inc");
 require_once("$obminclude/of/of_date.inc");
 
+// Document root
+if (is_null($ini_array['documentRoot'])) {
+    $cdocument_root = "/var/lib/obm/documents";
+}else {
+    $cdocument_root = $ini_array['documentRoot'];
+}
+
+// Document default directory
+if (is_null($ini_array['documentDefaultPath'])) {
+    $default_path = "/";
+}else {
+    $default_path = $ini_array['documentDefaultPath'];
+}
 
 define('C_IMAGE_PATH',$cgp_host.'images');
 

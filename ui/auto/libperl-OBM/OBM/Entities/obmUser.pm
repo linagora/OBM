@@ -167,35 +167,47 @@ sub _init {
     }
 
     # User phone
+    my %phoneList;
     if( $userDesc->{'userobm_phone'} ) {
-        push( @{$userDesc->{'userobm_phone_list'}}, $userDesc->{'userobm_phone'} );
+        $phoneList{$userDesc->{'userobm_phone'}} = 1;
     }
 
     if( $userDesc->{'userobm_phone2'} ) {
-        push( @{$userDesc->{'userobm_phone_list'}}, $userDesc->{'userobm_phone2'} );
+        $phoneList{$userDesc->{'userobm_phone2'}} = 1;
+    }
+
+    my @phoneList = keys(%phoneList);
+    if( $#phoneList >= 0 ) {
+        $userDesc->{'userobm_phone_list'} = \@phoneList;
     }
 
     # User fax
+    my %faxList;
     if( $userDesc->{'userobm_fax'} ) {
-        push( @{$userDesc->{'userobm_fax_list'}}, $userDesc->{'userobm_fax'} );
+        $faxList{$userDesc->{'userobm_fax'}} = 1;
     }
 
     if( $userDesc->{'userobm_fax2'} ) {
-        push( @{$userDesc->{'userobm_fax_list'}}, $userDesc->{'userobm_fax2'} );
+        $faxList{$userDesc->{'userobm_fax2'}} = 1;
+    }
+
+    my @faxList = keys(%faxList);
+    if( $#faxList >= 0 ) {
+        $userDesc->{'userobm_fax_list'} = \@faxList;
     }
 
     # User jpeg
     if( $userDesc->{'userobm_photo_id'} ) {
-      my $jpeg;
-      my $pathJpeg = substr $userDesc->{'userobm_photo_id'}, -1 ,1;
-      $pathJpeg = $OBM::Parameters::common::documentRoot.$OBM::Parameters::common::documentDefaultPath.$pathJpeg."/".$userDesc->{'userobm_photo_id'};
-      open (JPEG, $pathJpeg) or
-        $self->_log( 'path jpeg '.$pathJpeg.' du user '.$userDesc->{'userobm_login'}.' introuvable', 2 );
-      while(<JPEG>) {
-        $jpeg .= $_;
-      }
-      close JPEG;
-      $userDesc->{'userobm_photo'} = $jpeg;
+        my @jpeg;
+        my $pathJpeg = substr $userDesc->{'userobm_photo_id'}, -1 ,1;
+
+        $pathJpeg = $OBM::Parameters::common::documentRoot.$OBM::Parameters::common::documentDefaultPath.$pathJpeg.'/'.$userDesc->{'userobm_photo_id'};
+        open (JPEG, $pathJpeg) or
+            $self->_log( 'fichier jpeg '.$pathJpeg.' de '.$self->getDescription().' introuvable', 2 );
+        @jpeg = <JPEG>;
+        close JPEG;
+
+        $userDesc->{'userobm_photo'} = join( '', @jpeg );
     }
 
     # User e-mails
