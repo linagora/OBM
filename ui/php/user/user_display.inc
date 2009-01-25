@@ -2223,7 +2223,7 @@ function dis_user_import_file_run($params) {
 
   $groups = get_user_group_public_hash();
   foreach($groups as $name => $id) {
-    $groups[strtoupper($name)] = $id;
+    $groups[strtolower($name)] = $id;
   }
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('userobm');
@@ -2307,7 +2307,7 @@ function dis_user_import_file_run($params) {
 	$user['user_id'] = run_query_user_insert($user);
 	$res = '+';
 	// handle groups membership
-	$group = trim(strtok($row[$c_group],','));
+	$group = trim(strtok(strtolower($row[$c_group]),','));
 	$cpt_g = 0;
 	while ($group) {
 	  if (array_key_exists($group, $groups)) {
