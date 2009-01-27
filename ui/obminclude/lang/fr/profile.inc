@@ -7,30 +7,13 @@
 // $Id: profile.inc 2972 2008-07-02 09:42:54Z mehdi $ //
 ///////////////////////////////////////////////////////////////////////////////
 
-// Labels des propriétés
-$l_level = "Niveau";
-$l_level_managepeers = "Gestion d'utilisateurs de même niveau";
-$l_access_restriction = "Restriction d'accès";
-$l_access_exeptions = "Exceptions de restriction d'accès";
-$l_admin_realm = "Étendue de l'administration";
+
 
 // Messages d'erreurs
 $l_profile_name_error = "Le nom du profil est invalide, veuillez saisir de 1 à 64 caractères alphanumériques ou '_' '.' '-' !";
 $l_profile_name_empty = "Vous devez saisir un nom de profil : 1 à 64 caractères alphanumériques ou '_' '.' '-' !";
 
 $l_level_empty = "Le champ Niveau est vide. Veuillez le remplir avec un entier positif !";
-$l_level_managepeers_empty = "Le champ Gestion d'utilisateurs de même niveau est vide. Veuillez le remplir avec 0 ou 1 !";
-$l_access_restriction_empty = "Le champ Restriction d'accès est vide. Veuillez le remplir avec ALLOW_ALL ou DENY_ALL !";
-
-$l_profile_level_error = "Erreur sur le champ Niveau. Veuillez le remplir avec un entier positif !";
-$l_profile_level_managepeers_error = "Erreur sur le champ Niveau de gestion pairs. Les valeurs acceptés sont 0 ou 1 !";
-$l_profile_access_restriction_error = "Erreur sur le champ Restriction d'accès. Les valeurs acceptés sont ALLOW_ALL ou DENY_ALL !";
-$l_profile_admin_realm_error = "Erreur sur le champ Étendue de l'administration, veuillez saisir de 1 à 64 caractères alphanumériques ou '_' '.' '-' séparés par un espace!";
-
-$l_profile_default_permission_empty = "Erreur sur les permissions par défaut. Veuillez cocher au moins une permission !";
-
-// Infos
-$l_admin_realm_info = "* Les valeurs acceptés pour Étendue de l'administration sont :<blockquote><i>user</i>, <i>delegation</i>, <i>domain</i></blockquote>ou bien une combinaison de ces valeurs séparés par un espace.";
 
 $l_profile_delete_warning = "Suppression du profil non permise ! Au moins un utilisateur est affecté au profil.";
 
@@ -66,3 +49,23 @@ $l_informations = "Informations";
 
 $l_add_module_rights = "Ajouter des droits spécifiques à un module";
 $l_add_section_enabled = "Ajouter un réglage pour une section";
+
+// Labels des propriétés
+$l_level = "Niveau de gestion";
+$l_help_level = "Un utilisateur avec ce profil ne pourra modifier que les utilisateurs ayant un profil de niveau supérieur à celui de son profil";
+$l_level_managepeers = "Gestion d'utilisateurs de même niveau";
+$l_help_level_managepeers = "Un utilisateur avec ce profil pourra modifier les utilisateurs ayant un profil de même niveau que le sien si cette option est activée";
+$l_access_restriction = "Politique de sécurité des connexions";
+$l_help_access_restriction = "Définit la politique de sécurité par défaut de connexion des utilisateurs de ce profil.";
+$l_access_exceptions = "Exceptions à la politique de sécurité";
+$l_help_access_exceptions = "Définit les ip ou plages ip faisant exceptions à la politique de sécurité.";
+$l_admin_realm = "Étendue de l'application de l'outil de mise à jour";
+$l_help_admin_realm = "Lorsque un utilisateur de ce profil exécutera la mise à jour système, ne seront pris en compte que les modifications répondant à ces critères.";
+$l_deny_connect = 'Refuser la connexion par défaut';
+$l_allow_connect = 'Authoriser la connexion par défaut';
+$l_none_f = 'Aucune';
+$l_lower = 'Le plus bas';
+$l_higher = 'Le plus haut';
+$l_realm_user = 'Ses propres modifications';
+$l_realm_delegation = 'Les modifications sur sa délégation';
+$l_realm_domain = 'Toutes les modifications du domaine';

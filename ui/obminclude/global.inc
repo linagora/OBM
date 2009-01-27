@@ -1828,8 +1828,8 @@ function global_convert_network_address($address) {
 function global_allow_access($perm) {
   global $profiles;
 
-  $access_restriction = $profiles[$perm][access_restriction];
-  $access_exceptions = $profiles[$perm][access_exceptions];
+  $access_restriction = $profiles[$perm]['properties']['access_restriction'];
+  $access_exceptions = $profiles[$perm]['properties']['access_exceptions'];
 
   if (empty($access_restriction)) {
     $access_restriction = "ALLOW_ALL";

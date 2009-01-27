@@ -120,7 +120,7 @@ function run_query_user_search($user) {
 	// if a time of expiration has been specified, get it  
   if (trim($exp) != '') {
      if (trim($where) != '') $where .= ' AND';
-     $where .= " $diff<$exp";
+     $where .= " $diff < $exp";
   }
 
   // If a description indication has been specified, get it
@@ -380,7 +380,7 @@ function run_query_user_insert($user) {
   $desc = $user['desc'];
 
   // Target Delegation handling (if updated user as delegation admin realm)
-  $profiles = get_profile_list();
+  $profiles = $user['profiles'];
   $admin_realm = $profiles[$profile]['properties']['admin_realm'];
   if (is_array($admin_realm)) {
     if (in_array('delegation', $admin_realm)) {
@@ -724,7 +724,7 @@ function run_query_user_update($p_id, $user) {
   $profile = $user['profile'];
   $archive = sql_parse_int($user['archive']);
   $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
-  $dateexp = (($user['dateexp'] && $user['noexperie']) ? "'".of_isodate_convert($user['dateexp'])."'" : 'null');
+  $dateexp = (($user['dateexp'] && !$user['noexperie']) ? "'".of_isodate_convert($user['dateexp'])."'" : 'null');
   $hidden = sql_parse_int($user['hidden']);
   $kind = $user['kind'];
   $lname = $user['lastname'];
@@ -739,7 +739,7 @@ function run_query_user_update($p_id, $user) {
   $u = get_user_info($p_id);
 
   // Target Delegation handling (if updated user as delegation admin realm)
-  $profiles = get_profile_list();
+  $profiles = $user['profiles'];
   $admin_realm = $profiles[$profile]['properties']['admin_realm'];
   if (is_array($admin_realm)) {
     if (in_array('delegation', $admin_realm)) {
@@ -1565,16 +1565,16 @@ function check_user_data_form($p_id, &$user) {
   $smb_logon = $user['smb_logon'];
   $file = $user['file_tmp'];
   
-  $profiles = get_profile_list();
+  $profiles = $user['profiles'];
   
   // We can't handle a user with a more privileged profile
   // Or same privilege with 'impair' profile
   // If user profile level is not set, OK
-  $level = $profiles[$obm['profile']]['level'];
-  $managepeers = $profiles[$obm['profile']]['level_managepeers'];
-  if (isset($profiles[$profile]['level'])) {
-    if (($profiles[$profile]['level'] < $level)
-	|| (($profiles[$profile]['level'] == $level) && (! $managepeers))) {
+  $level = $profiles[$obm['profile']]['properties']['level'];
+  $managepeers = $profiles[$obm['profile']]['properties']['level_managepeers'];
+  if (isset($profiles[$profile]['properties']['level'])) {
+    if (($profiles[$profile]['properties']['level'] < $level)
+	|| (($profiles[$profile]['properties']['level'] == $level) && (! $managepeers))) {
       $err['msg'] = "$l_profile_privilege_error";
       $err['field'] = 'profile';
       return false;
@@ -1585,9 +1585,9 @@ function check_user_data_form($p_id, &$user) {
     $u = get_user_info($id);
     $domain_id = $u['domain_id'];
     $usr_profile = $u['perms'];
-    if (isset($profiles[$usr_profile]['level'])) {
-      if (($profiles[$usr_profile]['level'] < $level)
-	  || (($profiles[$usr_profile]['level'] == $level) && (! $managepeers))) {
+    if (isset($profiles[$usr_profile]['properties']['level'])) {
+      if (($profiles[$usr_profile]['properties']['level'] < $level)
+	  || (($profiles[$usr_profile]['properties']['level'] == $level) && (! $managepeers))) {
 	$err['msg'] = "$l_profile_privilege_error";
 	$err['field'] = 'profile';
 	return false;
@@ -1980,7 +1980,7 @@ function check_user_can_delete($params) {
   global $l_profile_privilege_error, $l_link_timetask, $l_link_timetask_no;
   global $l_user_delete_himself_error;
 
-  $profiles = get_profile_list();
+  $profiles = $params['profiles'];
   
   $delete_ok = true;
   
@@ -2011,11 +2011,11 @@ function check_user_can_delete($params) {
 
   // We can't delete a user with a more privileged profile
   // Or same privilege with 'impair' profile
-  $level = $profiles[$obm['profile']]['level'];
-  $managepeers = $profiles[$obm['profile']]['level_managepeers'];
-  if (isset($profiles[$usr_profile]['level'])) {
-    if (($profiles[$usr_profile]['level'] < $level)
-	|| (($profiles[$usr_profile]['level'] == $level) && (! $managepeers))) {
+  $level = $profiles[$obm['profile']]['properties']['level'];
+  $managepeers = $profiles[$obm['profile']]['properties']['level_managepeers'];
+  if (isset($profiles[$usr_profile]['properties']['level'])) {
+    if (($profiles[$usr_profile]['properties']['level'] < $level)
+	|| (($profiles[$usr_profile]['properties']['level'] == $level) && (! $managepeers))) {
       $err['msg'] = "$l_profile_privilege_error";
       $delete_ok = false;
     }
@@ -2110,65 +2110,6 @@ function run_query_user_delete_profile($user_id)  {
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
 
-}
-
-/**
- * Return profile list [$name][id] => id
- * 					   [$name][properties][admin_realm] => array
- * 					   [$name][level] => level
- * 					   [$name][level_managepeers] => level_managepeers
- * 					   [$name][access_restriction] => access_restriction
- * 					   [$name][module][default | $module_name] => false|section_name
- * 					   [$name][section][default | $section_name] => ...
- * 
- **/
-function get_profile_list() {
-  global $cdg_sql;
-  
-  $profiles = array();
-  $query = "SELECT profile_id, profile_name
-    FROM Profile";
-
-  display_debug_msg($query, $cdg_sql, 'get_profile_list()');
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  while ($obm_q->next_record()) {
-    $id = $obm_q->f('profile_id');
-    $name = trim($obm_q->f('profile_name'));
-    $profiles[$name]['id'] = $id;
-/*    
-    // Get admin_realm properties
-    $query = "SELECT profilepropertyvalue_property_value
-    	FROM ProfilePropertyValue
-    	LEFT JOIN ProfileProperty ON profilepropertyvalue_property_id = profileproperty_id
-    	WHERE profilepropertyvalue_profile_id = $id AND profileproperty_name = 'admin_realm'";
-    display_debug_msg($query, $cdg_sql, 'get_admin_realm(profile_id = '.$id.')');
-    $admin_realm_q = new DB_OBM;
-    $admin_realm_q->query($query);
-    $admin_realm_rough_value = $admin_realm_q->f('profilepropertyvalue_property_value');
-    $profiles[$name]['properties']['admin_realm'] = explode(" ", $admin_realm_rough_value);
-    
-    // Get other properties (level, level_managepeers, access_restriction)
-    $query = "SELECT profilepropertyvalue_property_value, profileproperty_name
-    	FROM ProfilePropertyValue
-    	LEFT JOIN ProfileProperty ON profilepropertyvalue_property_id = profileproperty_id
-    	WHERE profilepropertyvalue_profile_id = $id AND profileproperty_name <> 'admin_realm'";
-    display_debug_msg($query, $cdg_sql, 'get_profile_properties(profile_id = '.$id.')');
-    $properties_q = new DB_OBM;
-    $properties_q->query($query);
-    while ($properties_q->next_record()) {
-      $profiles[$name][$properties_q->f('profileproperty_name')][$properties_q->f('profilepropertyvalue_property_value')];
-    }
-  }
-  
-  return $profiles;
-*/
- 
-    $profiles[$name] = get_profile_full_data($id);
-    $profiles[$name]['properties']['admin_realm'] = explode(" ", $profiles[$name]['properties']['admin_realm']);
-  }
-  return $profiles;
 }
 
 /**

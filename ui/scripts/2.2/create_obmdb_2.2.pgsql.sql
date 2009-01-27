@@ -1604,22 +1604,9 @@ CREATE TABLE profilemodule (
 
 CREATE TABLE profileproperty (
     profileproperty_id integer NOT NULL,
-    profileproperty_type character varying(32) DEFAULT NULL::character varying,
-    profileproperty_default text,
-    profileproperty_readonly smallint DEFAULT 0,
+    profileproperty_profile_id integer,
     profileproperty_name character varying(32) DEFAULT ''::character varying NOT NULL
-);
-
-
---
--- Name: profilepropertyvalue; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE profilepropertyvalue (
-    profilepropertyvalue_id integer NOT NULL,
-    profilepropertyvalue_profile_id integer,
-    profilepropertyvalue_property_id integer,
-    profilepropertyvalue_property_value text DEFAULT ''::text NOT NULL
+    profileproperty_value text DEFAULT ''::text NOT NULL
 );
 
 
@@ -3319,24 +3306,6 @@ ALTER SEQUENCE profileproperty_profileproperty_id_seq OWNED BY profileproperty.p
 
 
 --
--- Name: profilepropertyvalue_profilepropertyvalue_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE profilepropertyvalue_profilepropertyvalue_id_seq
-    INCREMENT BY 1
-    NO MAXVALUE
-    NO MINVALUE
-    CACHE 1;
-
-
---
--- Name: profilepropertyvalue_profilepropertyvalue_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE profilepropertyvalue_profilepropertyvalue_id_seq OWNED BY profilepropertyvalue.profilepropertyvalue_id;
-
-
---
 -- Name: profilesection_profilesection_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -4192,13 +4161,6 @@ ALTER TABLE profilemodule ALTER COLUMN profilemodule_id SET DEFAULT nextval('pro
 --
 
 ALTER TABLE profileproperty ALTER COLUMN profileproperty_id SET DEFAULT nextval('profileproperty_profileproperty_id_seq'::regclass);
-
-
---
--- Name: profilepropertyvalue_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE profilepropertyvalue ALTER COLUMN profilepropertyvalue_id SET DEFAULT nextval('profilepropertyvalue_profilepropertyvalue_id_seq'::regclass);
 
 
 --
@@ -5182,14 +5144,6 @@ ALTER TABLE ONLY profilemodule
 
 ALTER TABLE ONLY profileproperty
     ADD CONSTRAINT profileproperty_pkey PRIMARY KEY (profileproperty_id);
-
-
---
--- Name: profilepropertyvalue_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY profilepropertyvalue
-    ADD CONSTRAINT profilepropertyvalue_pkey PRIMARY KEY (profilepropertyvalue_id);
 
 
 --
@@ -7931,19 +7885,11 @@ ALTER TABLE ONLY profilemodule
 
 
 --
--- Name: profilepropertyvalue_profile_id_profile_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: profileproperty_profile_id_profile_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY profilepropertyvalue
-    ADD CONSTRAINT profilepropertyvalue_profile_id_profile_id_fkey FOREIGN KEY (profilepropertyvalue_profile_id) REFERENCES profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: profilepropertyvalue_profileproperty_id_profileproperty_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY profilepropertyvalue
-    ADD CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES profileproperty(profileproperty_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY profileproperty
+    ADD CONSTRAINT profileproperty_profile_id_profile_id_fkey FOREIGN KEY (profileproperty_profile_id) REFERENCES profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

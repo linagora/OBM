@@ -1406,3 +1406,6 @@ div.overTxtDiv {
   text-align:left;
 }
 
+.helpTooltip:hover {
+  cursor: help;
+}

@@ -165,55 +165,6 @@ $cgp_default_right = array (
   );
 
 
-//----------------------//
-// Profiles definitions //
-//----------------------//
-
-$profiles['user']['level'] = 4;
-$profiles['user']['module']['mailbox'] = $perm_editor;
-$profiles['editor'] = array (
-  'section' => array (
-    'default' => 0,
-    'com' => 1,
-    'prod' => 1,
-    'user' => 1,
-    'my' => 1),
-  'module' => array (
-    'default' => $perm_editor),
-  'level' => 3,
-  'access_restriction' => 'ALLOW_ALL',
-  'access_exeptions' => array()
-);
-$profiles['admin_delegue'] = array (
-  'section' => array (
-    'default' => 1),
-  'module' => array (
-    'default' => $perm_admin,
-    'domain' => 0),
-  'properties' => array (
-    'admin_realm' => array ('user', 'delegation')
-    ),
-  'level' => 2,
-  'level_managepeers' => 1,
-  'access_restriction' => 'ALLOW_ALL',
-  'access_exeptions' => array()
-);
-
-$profiles['admin'] = array (
-  'section' => array (
-    'default' => 1),
-  'module' => array (
-    'default' => $perm_admin,
-    'domain' => 0),
-  'properties' => array (
-    'admin_realm' => array ('user', 'delegation', 'domain')
-    ),
-  'level' => 1,
-  'level_managepeers' => 1,
-  'access_restriction' => 'ALLOW_ALL',
-  'access_exeptions' => array()
-);
-
 //-----------------//
 // Displayed Infos //
 //-----------------//

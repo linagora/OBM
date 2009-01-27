@@ -59,5 +59,69 @@ function check_profile (form) {
 	return true;
 }
 
+function addModule(storage, value) {
+  var previous = storage.getLast();
+  if($('module_' + value) || !modules.get(value)) {
+    return false;
+  }  
+  if(previous) {
+    klass = previous.get('class');
+    if(klass == 'pair') {
+      klass = '';
+    } else {
+      klass = 'pair';
+    }
+  } else {
+    klass = 'impair';
+  }
+  var line = $('module_default').clone();
+  line.set('id', 'module_'+value)
+  line.set('class',klass);
+  var label = line.getElement('td');
+  var input = line.getElement('td').getElement('input');
+  label.set('html','<a onclick=\"$(\'module_' + value + '\').dispose();return false\" href=\"\"><img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\"></a> ' + modules.get(value));
+  line.getElements('td').each(function (element) {
+    if(element.getElement('input')) {
+      element.getElement('input').set('name','cb_rights[' + value +'][]');
+    }
+  })
+  storage.adopt(line);
+}
+
+function addSection(storage, value) {
+  var previous = storage.getLast();
+  if($('section_' + value) || !sections.get(value)) {
+    return false;
+  }
+  if(previous) {
+    klass = previous.get('class');
+    if(klass == 'pair') {
+      klass = '';
+    } else {
+      klass = 'pair';
+    }
+  } else {
+    klass = 'impair';
+  }
+  var line = $('section_default').clone();
+  line.set('id', 'section_'+value)
+  line.set('class',klass);
+  var label = line.getElement('td');
+  var input = line.getElement('td').getElement('input');
+  label.set('html','<a onclick=\"$(\'section_' + value + '\').dispose();return false\" href=\"\"><img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\"></a> ' + sections.get(value));
+  input.inject(label, 'bottom');
+  line.getElements('td').each(function (element) {
+    if(element.getElement('input')) {
+      element.getElement('input').set('name','cb_enabled[' + value +']');
+    }
+  })
+  storage.adopt(line);
+}
+
+function copyLine(field, storage) {
+  copy = field.clone();
+  copy.injectInside(storage);
+}
+
 ";
 ?>

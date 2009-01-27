@@ -648,21 +648,12 @@ function dis_organizationalchart_draw_form($node_q) {
   $level = $node_q->f("ogroup_level");
 
   // Get node detail
-  $ogroupentity_q = run_query_organizationalchart_ogroupentity_detail($node_id);
+  $ogroupentity_q = run_query_organizationalchart_ogrouplink_entities($node_id);
   $block_detail_entities = "";
   while($ogroupentity_q->next_record()) {
-    $entity = $ogroupentity_q->f("ogroupentity_entity");
-    $entity_id = $ogroupentity_q->f("ogroupentity_entity_id");
-    switch($entity) {
-      case "group":
-        $name = get_last_group_text($entity_id);
-      break;
-      case "user":
-        $name_q = run_query_userobm($entity_id);
-        $name_q->next_record();
-        $name = $name_q->f("userobm_lastname")." ".$name_q->f("userobm_firstname");
-      break;
-    }
+    $entity = $ogroupentity_q->f("entity");
+    $entity_id = $ogroupentity_q->f("entity_id");
+    $name = $ogroupentity_q->f("entity_name");
     $block_detail_entities .= "
       <div class=\"elementRow\" id=\"sel_ent${level}-data-${entity}-${entity_id}\">
         <a href=\"javascript: remove_element('sel_ent${level}-data-${entity}-${entity_id}','sel_ent${level}');\">

@@ -7,12 +7,6 @@
 // $Id: profile.inc 2917 2008-05-31 15:08:08Z pierre $ //
 ///////////////////////////////////////////////////////////////////////////////
 
-// Properties label
-$l_level = "Level";
-$l_level_managepeers = "Manage same level users";
-$l_access_restriction = "Access restriction";
-$l_access_exeptions = "Access restriction exceptions";
-$l_admin_realm = "Administration realm";
 
 // Errors message
 $l_profile_name_error = "Profile name is invalid, please enter from 1 to 64 alphanumerical characters or '_' '.' '-' !";
@@ -66,3 +60,11 @@ $l_informations = "Informations";
 
 $l_add_module_rights = "Add specifics right for a module";
 $l_add_section_enabled = "Add specifics settings for a section";
+
+// Properties label
+$l_level = "Level";
+$l_level_managepeers = "Manage same level users";
+$l_access_restriction = "Access restriction";
+$l_access_exeptions = "Access restriction exceptions";
+$l_admin_realm = "Administration realm";
+

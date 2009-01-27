@@ -2299,28 +2299,12 @@ CREATE TABLE `ProfileModule` (
 DROP TABLE IF EXISTS `ProfileProperty`;
 CREATE TABLE `ProfileProperty` (
   `profileproperty_id` int(8) NOT NULL auto_increment,
-  `profileproperty_type` varchar(32) default NULL,
-  `profileproperty_default` text,
-  `profileproperty_readonly` int(1) default '0',
+  `profileproperty_profile_id` int(8) default NULL,
   `profileproperty_name` varchar(32) NOT NULL default '',
-  PRIMARY KEY  (`profileproperty_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Table structure for table `ProfilePropertyValue`
---
-
-DROP TABLE IF EXISTS `ProfilePropertyValue`;
-CREATE TABLE `ProfilePropertyValue` (
-  `profilepropertyvalue_id` int(8) NOT NULL auto_increment,
-  `profilepropertyvalue_profile_id` int(8) default NULL,
-  `profilepropertyvalue_property_id` int(8) default NULL,
-  `profilepropertyvalue_property_value` text NOT NULL,
-  PRIMARY KEY  (`profilepropertyvalue_id`),
-  KEY `profilepropertyvalue_profile_id_profile_id_fkey` (`profilepropertyvalue_profile_id`),
-  KEY `profilepropertyvalue_profileproperty_id_profileproperty_id_fkey` (`profilepropertyvalue_property_id`),
-  CONSTRAINT `profilepropertyvalue_profile_id_profile_id_fkey` FOREIGN KEY (`profilepropertyvalue_profile_id`) REFERENCES `Profile` (`profile_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `profilepropertyvalue_profileproperty_id_profileproperty_id_fkey` FOREIGN KEY (`profilepropertyvalue_property_id`) REFERENCES `ProfileProperty` (`profileproperty_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  `profileproperty_value` text NOT NULL,
+  PRIMARY KEY  (`profileproperty_id`),
+  KEY `profileproperty_profile_id_profile_id_fkey` (`profileproperty_profile_id`),
+  CONSTRAINT `profileproperty_profile_id_profile_id_fkey` FOREIGN KEY (`profileproperty_profile_id`) REFERENCES `Profile` (`profile_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --

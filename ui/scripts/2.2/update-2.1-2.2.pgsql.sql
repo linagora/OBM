@@ -132,24 +132,12 @@ CREATE TABLE ProfileSection (
 
 CREATE TABLE ProfileProperty (
 	profileproperty_id 			serial,
-	profileproperty_type		varchar(32) default NULL,
-	profileproperty_default		text default NULL,
-	profileproperty_readonly	smallint default 0,
+	profileproperty_profile_id		integer default NULL,
 	profileproperty_name		varchar(32) NOT NULL default '',
+	profileproperty_property_value	text NOT NULL default '',
 	PRIMARY KEY (profileproperty_id)
 );
 
---
--- Table structure for table ProfilePropertyValue
---
-
-CREATE TABLE ProfilePropertyValue (
-	profilepropertyvalue_id				serial,
-	profilepropertyvalue_profile_id		integer default NULL,
-	profilepropertyvalue_property_id	integer default NULL,
-	profilepropertyvalue_property_value	text NOT NULL default '',
-	PRIMARY KEY (profilepropertyvalue_id)
-);
 
 --
 -- Table structure for table ServiceProperty
@@ -2637,11 +2625,8 @@ ALTER TABLE ProfileModule ADD CONSTRAINT profilemodule_profile_id_profile_id_fke
 -- Foreign key from profilesection_profile_id to profile_id
 ALTER TABLE ProfileSection ADD CONSTRAINT profilesection_profile_id_profile_id_fkey FOREIGN KEY (profilesection_profile_id) REFERENCES Profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
--- Foreign key from profilepropertyvalue_profile_id to profile_id
-ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profile_id_profile_id_fkey FOREIGN KEY (profilepropertyvalue_profile_id) REFERENCES Profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
--- Foreign key from profilepropertyvalue_property_id to profileproperty_id
-ALTER TABLE ProfilePropertyValue ADD CONSTRAINT profilepropertyvalue_profileproperty_id_profileproperty_id_fkey FOREIGN KEY (profilepropertyvalue_property_id) REFERENCES ProfileProperty(profileproperty_id) ON UPDATE CASCADE ON DELETE CASCADE;
+-- Foreign key from profileproperty_profile_id to profile_id
+ALTER TABLE ProfileProperty ADD CONSTRAINT profileproperty_profile_id_profile_id_fkey FOREIGN KEY (profileproperty_profile_id) REFERENCES Profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from contact_birthday_id to event_id
 ALTER TABLE Contact ADD CONSTRAINT contact_birthday_id_event_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;

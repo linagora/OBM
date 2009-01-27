@@ -130,344 +130,437 @@ function html_profile_search_list($obm_q, $prefs, $profile, $popup) {
 
 
 /**
- * Produce HTML Profile List content
- *
- * @param DB_OBM $profile_q
- * @return string xHTML
+ * html_profile_consult 
+ * 
+ * @param mixed $params 
+ * @param mixed $profile 
+ * @access public
+ * @return void
  */
-function html_profile_list ($profile_q) {
-  $block = "<div class=\"result\"><table>
-    <thead><tr><td>Nom</td></tr></thead><tbody>";
+function html_profile_consult($profile) {
+  global $l_user, $l_editor, $l_admin, $l_default;
+  global $l_default_settings, $l_specific_settings, $l_rights;
+  global $l_modules_right, $l_sections_right, $l_section_enabled;
+  global $l_name, $l_properties, $l_informations;
+  $i = 0;
+  foreach($profile['module'] as $name => $rights) {
+    $i++;
+    $class = ($i%2 == 0)? 'class="pair"':'';
+    if($name == 'default') {
+      $dis_modules_default .= "
+        <tr $class>
+        <td>$l_default</td>
+        <td>".dis_module_status('user', $rights, $name)."</td>
+        <td>".dis_module_status('editor', $rights, $name)."</td>
+        <td>".dis_module_status('admin', $rights, $name)."</td>
+        </tr>";
+    } else {
+      $dis_modules .= "
+        <tr $class>
+        <td>".$GLOBALS["l_module_$name"]."</td>
+        <td>".dis_module_status('user', $rights, $name)."</td>
+        <td>".dis_module_status('editor', $rights, $name)."</td>
+        <td>".dis_module_status('admin', $rights, $name)."</td>
+        </tr>";
+    }
+  }
 
-  while ($profile_q->next_record()) {
-    $profile_name = $profile_q->f('profile_name');
-    if ($profile_name == '')
-      $profile_name = '-';
-
-    $url_consult = url_prepare("profile_index.php?action=detailconsult&amp;profile_id=". $profile_q->f('profile_id'));
-    $block .= "<tr>
-      <td><a href=\"$url_consult\">$profile_name</a></td>
+  $i = 0;
+  foreach($profile['section'] as $name => $show) {
+    $i++;
+    $class = ($i%2 == 0)? 'class="pair"':'';    
+    if($name == 'default') {
+      $dis_section_default .= "
+        <tr $class>
+        <td>$l_default</td>
+        <td>".dis_section_status($show, $name)."</td>
+        </tr>";
+    } else {
+      $dis_section .= "
+        <tr $class>
+        <td>".$GLOBALS["l_section_$name"]."</td>
+        <td>".dis_section_status($show, $name)."</td>
+        </tr>";
+    }
+  }
+  foreach($profile['property'] as $name => $value) {
+    $dis_properties .= "
+      <tr $class>
+      <th><dfn title='".$GLOBALS["l_help_$name"]."' class='helpTooltip'>".$GLOBALS["l_$name"]."</dfn></th>
+      <td>".dis_property_value($name, $value)."</td>
       </tr>";
-  }
-
-  $block .= "</tbody></table></div>";
-
-  return $block;
-}
-
-/**
- * Produce a HTML Profile consult detail display
- *
- * @param array $params
- * @param array $profile
- * @return string xHTML
- */
-function html_profile_consult($params, $profile) {
-  return html_profile_superform($params, 'consult', $profile);
-}
-
-function html_profile_form($action, $params, $profile = array()) {
-  if ($action == 'new') { $action = 'insert'; }
-
-  if ($action == 'detailupdate' && ($profile['profile_id'] > 0 || $params['profile_id'])) {
-    $action = 'update';
-  } else if ($action == 'detailupdate') {
-    $action = 'insert';
-  }
-
-  return html_profile_superform($params, $action, $profile);
-}
-
-
-
-
-/**
- * Produce a HTML Profile edit form/consult detail display  
- *
- * @param array $params
- * @param array $action consult/insert/update
- * @param array $profile full data profile array
- * @return string xHTML
- */
-function html_profile_superform($params, $action, $profile = array()) {
-
-  /////////// Init /////////////////////////////////////////////// BEGIN
-
-  global $cright_list;
-
-  // labels
-  global $l_right_default, $l_name, $l_module_name, $l_properties;
-  global $l_section_disable;
-
-  // titles
-  global $l_default_permissions, $l_general_properties;
-
-  // table column names
-  foreach ($cright_list as $right_name) { global ${'l_right_'. $right_name}; }
-
-  $obm_modules = get_obm_modules();
-
-  // init $value with database parameters
-  if ($action == 'consult' || $action == 'update') {
-    $value['name']          = $profile['name'];
-    $value['modules_right'] = $profile['modules_right'];
-    $value['default_section_show'] = $profile['sections_show']['default'];
-    $value['sections_show'] = $profile['sections_show'];
-    $value['properties']    = $profile['properties'];
-  }
-
-  // init $value with passed parameters  
-  if ( ($action == 'insert' || $action == 'update') &&
-    ($params['action'] == 'insert' || $params['action'] == 'update')
-  ) {
-    $value['name']          = $params['name'];
-    $value['modules_right'] = $params['modules_right'];
-    $value['default_section_show'] = $params['sections_show']['default'];
-    $value['sections_show'] = $params['sections_show'];
-    $value['properties']    = $params['properties'];
-  } else if ($action == 'insert') {
-    $value['properties']    = $params['properties'];
-  }
-  /////////// Init /////////////////////////////////////////////// END
-
-  /////////// Prepare fields ///////////////////////////////////// BEGIN
-
-  if ($action == 'insert' || $action == 'update') {
-
-    // Profile name
-    $field['name'] = "<input type=\"text\" name=\"tf_name\" maxlength=\"64\" size=\"32\" value=\"$value[name]\" />";
-
-    // Profile properties
-    foreach ($value['properties'] as $pp_name => $pp_value) {
-      $field[$pp_name] = "<input type=\"text\" name=\"tf_$pp_name\" value=\"$pp_value[value]\" />";
-    }
-
-  } else if ($action == 'consult') {
-
-    // Profile name
-    $field['name'] = $value['name'];
-
-    // Profile properties
-    foreach ($value['properties'] as $pp_name => $pp_value) {
-      $field[$pp_name] = $pp_value['value'];
-    }
-  }
-
-  // Default Sections show
-  $checked_rd1 = "";
-  $checked_rd2 = "";
-  if (!isset($value['default_section_show']) || $value['default_section_show']) {
-    $checked_rd1 .= "checked=\"checked\"";
-  } else {
-    $checked_rd2 .= "checked=\"checked\"";
-  }
-
-  if ($action != 'consult') {
-    $field['default_section_show_true'] = "<input type=\"radio\" name=\"rd_default_section_show\" value=\"1\" $checked_rd1 onchange=\"setSectionState('active')\" />";
-    $field['default_section_show_false'] = "<input type=\"radio\" name=\"rd_default_section_show\" value=\"0\" $checked_rd2 onchange=\"setSectionState('deactive')\" />";
-  } else {
-    $field['default_section_show_true'] = ($checked_rd1 == "checked=\"checked\"" ? "X" : ""); 
-    $field['default_section_show_false'] = ($checked_rd2 == "checked=\"checked\"" ? "X" : "");
-  }
-
-  // make $function_make_checkbox_field
-  $checked_condition = 'if ($checked)';
-  $parameters_make_checkbox_field = '$name, $checked, $ext';
-
-  if ($action == 'consult') {
-    $function_make_checkbox_field = create_function($parameters_make_checkbox_field,
-      $checked_condition. ' return \'X\';
-    return \'&nbsp;\';');
-  } else {
-    $function_make_checkbox_field = create_function($parameters_make_checkbox_field,
-      $checked_condition. ' $checked = "checked=\"checked\""; 
-    return "<input type=\"checkbox\" name=\"cba_$name\" id=\"cbx_$name\" value=\"1\" $checked $ext/>";');
-  }
-  /////////// Prepare fields ///////////////////////////////////// END
-
-  /////////// Make HTML blocks /////////////////////////////////// BEGIN
-
-  // Custom JavaScript
-  $block_js = "<script type=\"text/javascript\" language=\"JavaScript\">";
-  if (!isset($value['default_section_show']) || $value['default_section_show']) {
-    $sectionAction = "active";
-  } else {
-    $sectionAction = "deactive";
-  }
-  $block_js .= "setSectionState('$sectionAction');
-        </script>";
-
-  // Custom CSS styles
-  $block_style = "
-  <style>
-    table.perms label {
-      display:block;
-      border:1px solid #D2D2D2;
-    }
-    .default_perm label {
-      text-align:right;
-      border:0px;
-    }
-    .blockRight {
-        text-align: left;
-        float: right;
-    }
-    table.allSections {
-        text-align: center;
-        width: auto;
-        }
-        table.allSections tr td {
-                vertical-align: top;
-        }
-  </style>";
-
-  // Profile name
-  $block_name = "
-  <div class=\"detail infos\">
-    <h1>$l_general_properties</h1>
+  }  
+  $block = "
+    <div class=\"detail infos\">
+    <h1>$l_informations</h1>
     <table>
-      <tbody>
-        <tr><th>$l_name</th><td>$field[name]</td></tr>
-      </tbody>
+    <tr><th>$l_name</th><td>$profile[name]</td>
     </table>
-  </div>";
-
-  // Profile properties
-  $block_properties = "
-  <div class=\"detail infos\">
+    </div>
+    <div class=\"detail infos\">
     <h1>$l_properties</h1>
     <table>
-      <tbody>";
-      foreach ($value['properties'] as $pp_name => $pp_value) {
-          global ${'l_'.$pp_name};
-          $block_properties .= "<tr><th>".${'l_'.$pp_name}."</th><td>".$field[$pp_name]."</td></tr>";
-          /*if ($action != "consult" && $pp_name == "admin_realm") {
-            global ${'l_'.$pp_name."_info"};
-            $block_properties .= "<tr><td colspan=\"2\"><div class=\"blockRight\">".${'l_'.$pp_name."_info"}."</div></td></tr>";
-          }*/
-      }
-  $block_properties .= "
-          </tbody>
-        </table>
-  </div>";
-
-  // Profile default permissions
-  $block_defaultPerm = "
-  <div class=\"detail infos\">
-    <h1>$l_default_permissions</h1>
-    <table class=\"default_perm\">
-      <tbody>";
-      foreach ($cright_list as $right_name) {
-            $ename = 'default_right_'. $right_name;
-            $right_value = $value['modules_right']['default'][$right_name];
-            $block_defaultPerm .= '<tr><td class=\"C\">'. $function_make_checkbox_field($ename, $right_value, '')
-              . "</td><td><label for=\"cbx_$ename\">". ${'l_right_'. $right_name}. "</a></td></tr>";
-      }
-  $block_defaultPerm .= "
-      </tbody>
+    $dis_properties
     </table>
-  </div>";
-
-  // Profile section/modules
-  global $l_active_section, $l_section_all, $l_section_none;
-  $block_allSections = "<div class=\"detail\" style=\"clear: left\">";
-  $block_allSections .= "<h1>$l_active_section</h1>
-    <table class=\"allSections\"><tbody>
-      <tr><td><label>$l_section_all<br />$field[default_section_show_true]</label></td>
-          <td><label>$l_section_none<br />$field[default_section_show_false]</label></td>
-      </tr>
-    </tbody></table>
-  </div>";
-
-  $block_sectionsModules = "<div class=\"result\">";
-
-  $block_rights_header = '';
-  foreach ($cright_list as $right_name) {
-    $block_rights_header .= "<td>". ${'l_right_'. $right_name}. "</td>";
-  }
-
-  foreach ($obm_modules as $section_name => $modules) {
-    $block_table = '';
-
-          $block_table .= "<table class=\"perms\"><thead>
-              <tr><td>$l_module_name</td>
-          <td>$l_right_default</td>
-                $block_rights_header
-              </tr>
-            </thead><tbody>";
-
-          $i = 0;
-        foreach ($modules as $module_name) {
-      $block_table .= "<tr". ($i%2 == 1 ? ' class="pair"':''). "><td>". $GLOBALS['l_module_'. $module_name]. "</td>";
-
-      $checked = !isset($value['modules_right']) || $value['modules_right'][$module_name]['default'];
-      $block_table .= "<td class=\"C\">". $function_make_checkbox_field($module_name. '_default',
-        $checked, "onclick=\"select_default('$module_name')\""). "</td>";
-
-      foreach ($cright_list as $right_name) {
-        $checked = $value['modules_right'][$module_name][$right_name];
-        $block_table .= "<td class=\"C\">". $function_make_checkbox_field($module_name. '_right_'. $right_name,
-          $checked, "onclick=\"select_right('$module_name')\""). "</td>";
-      }
-
-      $block_table .= "</tr>";
-      $i += 1;
-        }
-
-    $block_table .= "</tbody></table>";
-
-    if ($value['sections_show']['default']) {
-      $checked = ($value['sections_show'][$section_name] ? false : true);
-    } else {
-      $checked = ($value['sections_show'][$section_name] ? true : false);
-    }
-    $block_sectionsModules .= "<div class=\"detail extra\"\">
-      <h1>". $GLOBALS['l_section_'. $section_name]. "</h1>";
-
-
-     if ($action != 'consult' || ($action == 'consult' && ($value['sections_show']['default'] && $checked))
-                              || ($action == 'consult' && (!$value['sections_show']['default'] && $checked))) {
-
-       $block_sectionsModules .= "<div><label for=\"cbx_$section_name\" class=\"activeSection\"></label>"
-                                 .$function_make_checkbox_field($section_name. '_show', $checked, '')
-                                 ."</div>";
-     }
-
-     if ($action != 'consult' || ($action == 'consult' && ($value['sections_show']['default'] && !$checked))
-                              || ($action == 'consult' && (!$value['sections_show']['default'] && $checked))) {
-       $block_sectionsModules .= $block_table;
-     }
-
-    $block_sectionsModules .= "</div>";
-  }
-
-  $block_sectionsModules .= "</div>";
-
-  // Concatenate blocks
-  $block =  $block_style
-           .$block_name
-           .$block_properties
-           .$block_defaultPerm
-           .$block_allSections
-           .$block_sectionsModules
-           .$block_js;
-
-  // Build profile form
-  if ($action != 'consult') {
-    $form_block = '';  
-        $form_block .= "<form action=\"\" method=\"post\" onsubmit=\"if (check_profile(this)) return true; else return false;\">";
-        $form_block .= $block;
-    $form_block .= "<input type=\"hidden\" name=\"action\" value=\"$action\"/>";
-    $form_block .= "<input type=\"hidden\" name=\"profile_id\" value=\"$params[profile_id]\"/>";
-    $form_block .= "<div class=\"buttons\">";
-    $form_block .= "<input type=\"submit\" />"; // FIXME label bouton
-    $form_block .= "</div>";
-        $form_block .= "</form>";
-
-    $block = $form_block;
-  }
-  /////////// Make HTML blocks /////////////////////////////////// END
+    </div>    
+    <div class=\"detail extra\">
+    <h1>$l_modules_right</h1>
+    <table class='spreadSheet'>
+    <tr><th>$l_default_settings</th><th>$l_user</th><th>$l_editor</th><th>$l_admin</th></tr>
+    $dis_modules_default
+    <tr><th>$l_specific_settings</th><th>$l_user</th><th>$l_editor</th><th>$l_admin</th></tr>
+    $dis_modules
+    </table>
+    </div>    
+    <div class=\"detail extra\">
+    <h1>$l_sections_right</h1>
+    <table class='spreadSheet'>
+    <tr><th>$l_default_settings</th><th>$l_section_enabled</th></tr>
+    $dis_section_default
+    <tr><th>$l_specific_settings</th><th>$l_section_enabled</th></tr>
+    $dis_section
+    </table>
+    </div>        
+    ";
   return $block;
+}
+
+
+/**
+ * html_profile_form 
+ * 
+ * @param mixed $params 
+ * @param array $profile 
+ * @access public
+ * @return void
+ */
+function html_profile_form($profile) {
+  global $l_user, $l_editor, $l_admin, $l_default;
+  global $l_default_settings, $l_specific_settings, $l_rights;
+  global $l_modules_right, $l_sections_right, $l_section_enabled;
+  global $l_name, $l_properties, $l_informations, $action;
+  global $l_add_module_rights, $l_add,$l_add_section_enabled ;
+  global $l_insert, $l_update;
+  if($action == 'new' || $action == 'insert') {
+    $dis_buttons = '
+      <input type="hidden" name="action" value="insert" />
+      <input type="submit" value="'.$l_insert.'" />
+      ';
+  } else {
+    $dis_buttons = '
+      <input type="hidden" name="action" value="update" />
+      <input type="submit" value="'.$l_update.'" />
+      <input type="hidden" name="profile_id" value="'.$profile['profile_id'].'"
+      ';
+  }
+
+  $i = 0;
+  if(is_array($profile['module']))
+  foreach($profile['module'] as $name => $rights) {
+    $i++;
+    $class = ($i%2 == 0)? 'class="pair"':'';
+    if($name != 'default') {
+      $dis_modules .= "
+        <tr $class id='module_$name'>
+        <td>
+        <a onclick=\"$('module_$name').dispose();return false\" href=\"\">
+         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+        </a>                        
+        <input type='hidden' name='cb_rights[$name][]' value='0' />
+        ".$GLOBALS["l_module_$name"]."
+        </td>
+        <td>".dis_module_status('user',$rights, $name, true)."</td>
+        <td>".dis_module_status('editor',$rights, $name, true)."</td>
+        <td>".dis_module_status('admin',$rights, $name, true)."</td>
+        </tr>";
+    }
+  }
+
+  $i = 0;
+  if(is_array($profile['section']))
+  foreach($profile['section'] as $name => $show) {
+    $i++;
+    $class = ($i%2 == 0)? 'class="pair"':'';    
+    if($name != 'default') {
+      $dis_section .= "
+        <tr $class id='section_$name'>
+        <td>
+        <a onclick=\"$('section_$name').dispose();return false\" href=\"\">
+         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+        </a>                
+        ".$GLOBALS["l_section_$name"]."
+        <input type='hidden' name='cb_enabled[$name]' value='0' />
+        </td>
+        <td>".dis_section_status($show, $name, true)."</td>
+        </tr>";
+    }
+  }
+  foreach($profile['property'] as $name => $value) {
+    $dis_properties .= "
+      <tr >
+      <th><dfn title='".$GLOBALS["l_help_$name"]."' class='helpTooltip'>".$GLOBALS["l_$name"]."</dfn></th>
+      <td>".dis_property_value($name, $value, true)."</td>
+      </tr>";
+  }  
+
+  $js_modules = "var modules = new Hash();\n";
+  foreach($GLOBALS['cgp_show']['module'] as $module => $section) {
+    $label = phpStringToJsString($GLOBALS["l_module_$module"]);
+    $js_modules .= "modules.set('$module', '$label');\n";
+  }
+  $js_sections = "var sections = new Hash();\n";
+  foreach($GLOBALS['cgp_show']['section'] as $section => $enabled) {
+    $label = phpStringToJsString($GLOBALS["l_section_$section"]);
+    $js_sections .= "sections.set('$section','$label');\n";
+  }  
+  $block = "
+    <script type='text/javascript'>
+    $js_modules
+    $js_sections
+    </script>
+    <form method='POST' action='profile_index.php'>
+    <fieldset class=\"detail infos\">
+    <legend>$l_informations</legend>
+    <table>
+    <tr><th>$l_name</th><td><input type='text' name='tf_name' value='$profile[name]' /></td>
+    </table>
+    </fieldset>
+    <fieldset class=\"detail infos\">
+    <legend>$l_properties</legend>
+    <table>
+    $dis_properties
+    </table>
+    </fieldset>    
+    <fieldset class=\"detail extra\">
+    <legend>$l_modules_right</legend>
+    $l_add_module_rights : <input name='' type='text' id='addModuleInput' value=''/>
+    <a style='display:none;' id='addModuleButton' href=\"\" onclick=\"addModule($('moduleSheet').getElement('tbody'), $('addModuleInput').value);return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[$l_add_module_rights]\" /></a>
+    <script type='text/javascript'>
+      new Obm.Profile.Autocompleter('addModuleInput', modules, {
+      }).addEvent('change', function () {
+        if(this.isSelected) {
+          $('addModuleButton').setStyle('display','inline');
+        } else {
+          $('addModuleButton').setStyle('display','none');
+        }
+      });
+    </script>      
+    <table class='spreadSheet' id='moduleSheet'>
+    <tr><th>$l_default_settings</th><th>$l_user</th><th>$l_editor</th><th>$l_admin</th></tr>
+    <tr $class id='module_default'>
+    <td>$l_default <input type='hidden' name='cb_rights[default][]' value='0' /></td>
+    <td>".dis_module_status('user',$profile['module']['default'], 'default', true)."</td>
+    <td>".dis_module_status('editor',$profile['module']['default'], 'default', true)."</td>
+    <td>".dis_module_status('admin',$profile['module']['default'], 'default', true)."</td></tr>
+    <tr><th>$l_specific_settings</th><th>$l_user</th><th>$l_editor</th><th>$l_admin</th></tr>
+    $dis_modules
+    </table>
+    </fieldset>    
+    <fieldset class=\"detail extra\">
+    <legend>$l_sections_right</legend>
+    $l_add_section_enabled : <input type='text' id='addSectionInput' value=''/>
+    <a style='display:none;' id='addSectionButton' onclick=\"addSection($('sectionSheet').getElement('tbody'), $('addSectionInput').value);return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[$l_add_section_rights]\" /></a>
+    <script type='text/javascript'>
+      new Obm.Profile.Autocompleter('addSectionInput', sections, {
+      }).addEvent('change', function () {
+        if(this.isSelected) {
+          $('addSectionButton').setStyle('display','');
+        } else {
+          $('addSectionButton').setStyle('display','none');
+        }
+      });
+    </script>    
+    <table class='spreadSheet' id='sectionSheet'>
+    <tr><th>$l_default_settings</th><th>$l_section_enabled</th></tr>
+    <tr $class id='section_default'>
+    <td>$l_default <input type='hidden' name='cb_enabled[default]' value='0' /></td><td>".dis_section_status($profile['section']['default'], 'default', true)."</td></tr>
+    <tr><th>$l_specific_settings</th><th>$l_section_enabled</th></tr>
+    $dis_section
+    </table>
+    </fieldset> 
+    <fieldset class='buttons'>
+    $dis_buttons
+    </fieldset>    
+    ";
+  return $block;
+
+}
+
+
+
+/**
+ * dis_property_value 
+ * 
+ * @param mixed $property 
+ * @param mixed $value 
+ * @param mixed $update 
+ * @access public
+ * @return void
+ */
+function dis_property_value($property, $value, $update=false) {
+  if(function_exists('dis_property_'.$property.'_value')) {
+    return call_user_func('dis_property_'.$property.'_value', $value, $update);
+  }
+}
+
+/**
+ * dis_property_level_value 
+ * 
+ * @param mixed $value 
+ * @param mixed $update 
+ * @access public
+ * @return void
+ */
+function dis_property_level_value($value, $update=false) {
+  if($update) {
+    if(is_numeric($value)) {
+      ${'_'.$value} = 'selected=\"selected\"';
+    }
+    $return = "<select name='property[level]'><option value='0' $_0 >$GLOBALS[l_higher]</option>";
+    for($i=1; $i<10; $i++) {
+      $return .= '<option value="'.$i.'" '.${'_'.$i}.'>'.$i.'</option>';
+    }
+    $return .= "<option value='0' $_0 >$GLOBALS[l_lower]</option></select>";
+    return $return;
+  } else {
+    return ($value)?$value:0;
+  }
+}
+
+/**
+ * dis_property_level_managepeers_value 
+ * 
+ * @param mixed $value 
+ * @param mixed $update 
+ * @access public
+ * @return void
+ */
+function dis_property_level_managepeers_value($value, $update=false) {
+  if($update) {
+    $checked = ($value == 1)?'checked=\"checked\"':'';
+    return '<input type="hidden" name="property[level_managepeers]" value="0"/><input type="checkbox" name="property[level_managepeers]" value="1" '.$checked.'/>';
+  } else {
+    return ($value == 1)?$GLOBALS['l_yes']:$GLOBALS['l_no'];
+  }
+}
+
+/**
+ * dis_property_access_restriction_value 
+ * 
+ * @param mixed $value 
+ * @param mixed $update 
+ * @access public
+ * @return void
+ */
+function dis_property_access_restriction_value($value, $update=false) {
+  if($update) {
+    if($value == 'ALLOW_ALL' || $value == 'DENY_ALL') {
+      $$value = 'selected="selected"';
+    }
+    return "<select name='property[access_restriction]'>
+      <option value='ALLOW_ALL' $ALLOW_ALL>$GLOBALS[l_allow_connect]</option>
+      <option value='DENY_ALL' $DENY_ALL>$GLOBALS[l_deny_connect]</option>
+      </select>";    
+  } else {
+    return ($value == 'DENY_ALL')?$GLOBALS['l_deny_connect']:$GLOBALS['l_allow_connect'];
+  }
+}
+
+/**
+ * dis_property_access_exceptions_value 
+ * 
+ * @param mixed $value 
+ * @param mixed $update 
+ * @access public
+ * @return void
+ */
+function dis_property_access_exceptions_value($value, $update=false) {
+  if($update) {
+    if(is_array($value)) $value = implode(',',$value);
+    return "<div><input name='property[access_exceptions]' id='accessExceptionsInput' value='$value' />
+      <script type='text/javascript'>
+      new Autocompleter.Local('accessExceptionsInput', ['127.0.0.1', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'], {
+        multiple: true,
+        selectMode :'type-ahead',
+        minLength : 1,
+        relative: false,
+        overflow: true
+      });      
+      </script></div>
+    ";
+  } else {
+    if(is_array($value) && count($value) > 1) {
+      return implode(',', $value);
+    }
+    return ($value)?$value:$GLOBALS['l_none_f'];
+  }
+}
+
+/**
+ * dis_property_admin_realm_value 
+ * 
+ * @param mixed $value 
+ * @param mixed $update 
+ * @access public
+ * @return void
+ */
+function dis_property_admin_realm_value($value, $update=false) {
+  if($update) {
+    if(is_array($value))
+      foreach($value as $realm) 
+        $$realm = 'selected="selected"';
+
+    return "<select multiple='multiple' name='property[admin_realm][]'>
+      <option value='user' $user>$GLOBALS[l_realm_user]</option>
+      <option value='delegation' $delegation>$GLOBALS[l_realm_delegation]</option>
+      <option value='domain' $domain>$GLOBALS[l_realm_domain]</option>
+      </select>";
+  } else {
+    if(is_array($value) && count($value) > 1) {
+      foreach($value as $realm) {
+        $realms[] = $GLOBALS["l_realm_$realm"];
+      }
+      return implode(', ', $realms);
+    }
+    return ($GLOBALS["l_realm_$value"])?$GLOBALS["l_realm_$value"]:$GLOBALS['l_all'];
+  }
+}
+
+/**
+ * dis_module_status 
+ * 
+ * @param mixed $type 
+ * @param mixed $right 
+ * @param mixed $update 
+ * @access public
+ * @return void
+ */
+function dis_module_status($type, $right, $module, $update=false) {
+  if($update) {
+    $checked = ((hexdec($GLOBALS["perm_$type"]) & $right) == hexdec($GLOBALS["perm_$type"]))?'checked="checked"':'';
+    return "<input type='checkbox' name='cb_rights[$module][]' value='".$GLOBALS["perm_$type"]."' $checked />";
+  } else {
+    return ((hexdec($GLOBALS["perm_$type"]) & $right) == hexdec($GLOBALS["perm_$type"]))? 'X' : '';
+  }
+}
+
+/**
+ * dis_section_status 
+ * 
+ * @param mixed $show 
+ * @param mixed $section 
+ * @param mixed $update 
+ * @access public
+ * @return void
+ */
+function dis_section_status($show, $section, $update=false) {
+  global $l_enabled, $l_disabled;
+  if($update) {
+    $checked = ($show == 1)?'checked="checked"':'';
+    return "<input type='checkbox' name='cb_enabled[$section]' value='1' $checked />";
+  } else {
+    return ($show == 1)? $l_enabled : $l_disabled;
+  }
 }
 
 /**

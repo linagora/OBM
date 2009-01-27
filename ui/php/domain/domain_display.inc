@@ -328,7 +328,6 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
     }
   }
 
-          echo "</pre>";
   // If parameters have been given, they supercede the default action value
   if (isset($domain['domain_id'])) { $id = $domain['domain_id']; }
   if (isset($domain['label'])) { $label = $domain['label']; }

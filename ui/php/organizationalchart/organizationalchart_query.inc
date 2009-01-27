@@ -452,6 +452,43 @@ function run_query_organizationalchart_ogrouplink_detail($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Detail Form OGroup query execution
+// Parameters :
+//   - $id  : organizational chart id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_organizationalchart_ogrouplink_entities($id) {
+  global $cdgl_sql, $obm;
+  $id = sql_parse_id($id, true);
+  $query = "
+    SELECT 
+      ogrouplink_id,
+      #CONCAT(userobm_lastname, ' ', userobm_firstname) as entity_name ,
+      userobm_id as entity_id,
+      'user' as entity
+    FROM OGroupLink    
+      INNER JOIN UserEntity ON userentity_entity_id = ogrouplink_entity_id
+      INNER JOIN UserObm ON userobm_id = userentity_user_id
+      INNER JOIN Domain ON domain_id = userobm_domain_id
+    WHERE ogrouplink_ogroup_id $id 
+    UNION 
+    SELECT 
+      ogrouplink_id,
+      group_name as entity_name,
+      group_id as entity_id,
+      'group' as entity
+    FROM OGroupLink    
+      INNER JOIN GroupEntity ON groupentity_entity_id = ogrouplink_entity_id
+      INNER JOIN UGroup ON group_id = groupentity_group_id
+      INNER JOIN Domain ON domain_id = group_domain_id
+    WHERE ogrouplink_ogroup_id $id";
+
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "run_query_organizationchart_ogrouplink_detail()");
+  $obm_q->xquery($query);
+
+  return $obm_q;
+}
+///////////////////////////////////////////////////////////////////////////////
 // Deletion query execution
 // Parameters:
 //   - $id : organizational chart id

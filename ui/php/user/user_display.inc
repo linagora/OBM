@@ -498,7 +498,7 @@ function html_user_consult($obm_q) {
   //global $obm, $cgp_use, $profiles, $path, $display, $l_yes, $l_no;
   global $obm, $cgp_use, $path, $display, $l_yes, $l_no;
   
-  $profiles = get_all_profiles();
+  $profiles = get_all_profiles(false);
 
   $id = $obm_q->f("userobm_id");
   $domain_label = ($obm_q->f("domain_label") != "" ? $obm_q->f("domain_label") : "GLOBAL");
@@ -1009,7 +1009,7 @@ function html_user_form($usr_q, $user, $field='') {
   global $path, $display, $cgp_use, $action;
   global $obm, $c_default_domain, $l_domain, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
-	
+  $noexperie = " checked=\"checked\" ";	
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
     // infos
@@ -1027,9 +1027,9 @@ function html_user_form($usr_q, $user, $field='') {
     $delegation_target = $usr_q->f("userobm_delegation_target");
     $delegation = $usr_q->f("userobm_delegation");
     $desc = $usr_q->f("userobm_description");
-    $datebegin = of_date_upd_format($usr_q->f("userobm_datebegin"),true);
-    $dateexp = of_date_upd_format($usr_q->f("userobm_account_dateexp"),true);
-		if(isset($dateexp)){$noexperie = " checked=\"checked\" ";};
+    $datebegin = of_date_upd_format($usr_q->f("datebegin"),true);
+    $dateexp = of_date_upd_format($usr_q->f("dateexp"),true);
+    if(isset($dateexp)){$noexperie = "";};
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
     $hidden = ($usr_q->f("userobm_hidden") == "1" ? " checked" : "");
     $photo_id = $usr_q->f("userobm_photo_id");
@@ -1117,7 +1117,7 @@ function html_user_form($usr_q, $user, $field='') {
   if (isset($user["title"])) { $title = stripslashes($user["title"]); }
   if (isset($user["email"])) { $email = stripslashes($user["email"]); }
   if (isset($user["datebegin"])) { $datebegin = of_date_upd_format($user["datebegin"],true); }
-  if (isset($user["dateexp"])) { $dateexp = of_date_upd_format($user["dateexp"],true); $noexperie = " checked=\"checked\"";}
+  if (isset($user["dateexp"])) { $dateexp = of_date_upd_format($user["dateexp"],true); $noexperie = "";}
   if (isset($user["delegation_target"])) { $delegation_target = stripslashes($user["delegation_target"]); }
   if (isset($user["delegation"])) { $delegation = stripslashes($user["delegation"]); }
   if (isset($user["desc"])) { $desc = stripslashes($user["desc"]); }
@@ -1544,7 +1544,7 @@ function html_user_form($usr_q, $user, $field='') {
     }
     function showExpiration()	{
       var Props = $('noexperie').getProperty('checked');			
-      if(Props==true){
+      if(Props==false){
         $('exp').setProperty('style','');
       }else{
         $('exp').setProperty('style','display:none');
@@ -2504,7 +2504,7 @@ function html_user_batch_form($params) {
   $l_address2 = $l_address." 2";
   $l_address3 = $l_address." 3";
   
-  $profiles = get_profile_list();
+  $profiles = $params['profiles'];
   
   $sel_default = array('label' => '-----', 'value' => '');
   $selected = "selected=\"selected\"";
@@ -2728,23 +2728,5 @@ function disp_tf_coord($name, $size, $params) {
   return $block;
 }
 
-function dis_user_help($mode) {
-  if ($mode == 'html')
-    echo "<table>
-      <tr>
-        <td><pre>";
-
-  include ('user_help.inc');
-
-  if ($mode == 'html')
-    echo "</pre></td>
-      </tr>
-      </table>";
-}
-
-function dis_user_command_use($disp) {
-  echo "\n$disp\n";
-  echo "Try -h for help\n\n";
-}
 
 ?>

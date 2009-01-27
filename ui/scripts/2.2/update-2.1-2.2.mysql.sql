@@ -128,21 +128,10 @@ CREATE TABLE ProfileSection (
 --
 CREATE TABLE ProfileProperty (
   profileproperty_id int(8) NOT NULL auto_increment,
-  profileproperty_type varchar(32) default NULL,
-  profileproperty_default text default NULL,
-  profileproperty_readonly int(1) default '0',
+  profileproperty_profile_id int(8) default NULL,
   profileproperty_name varchar(32) NOT NULL default '',
+  profileproperty_property_value text NOT NULL default '',
   PRIMARY KEY (profileproperty_id)
-);
---
--- Table structure for table `ProfilePropertyValue`
---
-CREATE TABLE ProfilePropertyValue (
-  profilepropertyvalue_id int(8) NOT NULL auto_increment,
-  profilepropertyvalue_profile_id int(8) default NULL,
-  profilepropertyvalue_property_id int(8) default NULL,
-  profilepropertyvalue_property_value text NOT NULL default '',
-  PRIMARY KEY (profilepropertyvalue_id)
 );
 
 --

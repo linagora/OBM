@@ -17,6 +17,8 @@ $params = get_profile_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 
+$extra_js_include[] = 'profile.js';
+
 require('profile_display.inc');
 require('profile_query.inc');
 require('profile_js.inc');
@@ -50,7 +52,10 @@ if ($action == 'index' || $action == '') {
   
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = html_profile_form($action, $params);
+  foreach($c_profile_properties as $property) {
+    $profile['property'][$property] = false;
+  }
+  $display['detail'] = html_profile_form($profile);
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -58,54 +63,40 @@ if ($action == 'index' || $action == '') {
     $params['profile_id'] = run_query_profile_insert($params);
     if($params['profile_id'] > 0) {
       $display['msg'] .= display_ok_msg("$l_profile : $l_insert_ok");
-      $profile = get_profile_full_data($params['profile_id']);
-      $display['detail'] = html_profile_consult($params, $profile);
+      $profile = run_query_profile_details($params['profile_id']);
+      $display['detail'] = html_profile_consult($profile);         
     } else {
       $display['msg'] .= display_err_msg("$l_profile : $l_insert_error");
-      $display['detail'] = html_profile_form($action, $params, null);
+      $display['detail'] = html_profile_form($params);
     }
   } else {
     $display['msg'] = display_warn_msg($l_invalid_data . " : " . $err['msg']);
-    $display['detail'] = html_profile_form($action, $params, null);
+    $display['detail'] = html_profile_form($params);
   }
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $profile = get_profile_full_data($params['profile_id']);
-  $display['detail'] = html_profile_consult($params, $profile);
+  $profile = run_query_profile_details($params['profile_id']);
+  $display['detail'] = html_profile_consult($profile);
 
-} else if ($action == 'userdetail') {
-///////////////////////////////////////////////////////////////////////////////
-  $user_id = $params['user_id'];
-  $usr_q = run_query_userobm($user_id);
-  if ($usr_q->next_record()) {
-    profile_json_event($usr_q);
-    echo "({".$display['json']."})";
-    exit();
-  } else {
-    exit();
-  }
-  
 } elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
-  $profile = get_profile_full_data($params['profile_id']);
-  $display['detail'] = html_profile_form($action, $params, $profile);
+  $profile = run_query_profile_details($params['profile_id']);
+  $display['detail'] = html_profile_form($profile);
 
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  $initial_profile = get_profile_full_data($params['profile_id']);
-
   if(check_user_defined_rules() && check_profile_data_form($params)) {
-    if (run_query_profile_update($params, $initial_profile)) {
+    if (run_query_profile_update($params)) {
       $display['msg'] .= display_ok_msg("$l_profile : $l_update_ok");
-      $profile = get_profile_full_data($params['profile_id']);
-      $display['detail'] = html_profile_consult($params, $profile);
+      $profile = run_query_profile_details($params['profile_id']);
+      $display['detail'] = html_profile_consult($profile);      
     } else {
       $display['msg'] .= display_err_msg("$l_profile : $l_update_error");
-      $display['detail'] = html_profile_form($action, $params, $profile);
+      $display['detail'] = html_profile_form($params);
     }
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . " : " . $err['msg']);
-    $display['detail'] = html_profile_form($action, $params, $profile);
+    $display['detail'] = html_profile_form($params);
   }
   
 } elseif ($action == 'check_delete') {
@@ -114,13 +105,15 @@ if ($action == 'index' || $action == '') {
     $retour = run_query_profile_delete($params['profile_id']);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_profile : $l_delete_ok");
+      $display['search'] = dis_profile_search_form($params);
     } else {
       $display['msg'] .= display_err_msg("$l_profile : $l_delete_error");
+      $display['search'] = dis_profile_search_form($params);
     }    
   } else {
     $display['msg'] .= display_warn_msg($l_profile_delete_warning);
-    $profile = get_profile_full_data($params['profile_id']);
-    $display['detail'] = html_profile_consult($params, $profile);
+    $profile = run_query_profile_details($params['profile_id']);
+    $display['detail'] = html_profile_consult($profile);      
   }
 
 } elseif ($action == 'display') {
@@ -144,14 +137,12 @@ if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-if (!$params['ajax']) {
-  $display['head'] = display_head($l_profile);
-  if (! $params['popup']) {
-    update_profile_action();
-    $display['header'] = display_menu($module);
-  }
-  $display['end'] = display_end();
+$display['head'] = display_head($l_profile);
+if (! $params['popup']) {
+  update_profile_action();
+  $display['header'] = display_menu($module);
 }
+$display['end'] = display_end();
 display_page($display);
 
 
@@ -164,86 +155,26 @@ function get_profile_params() {
   $params = get_global_params('profile');
   
   $action = $params['action'];
-  
-  if (function_exists('get_obm_modules')) {
-    global $cright_list; // right constants
-    foreach ($cright_list as $right_name) { global ${'cright_'. $right_name}; }
-    
-	  $obm_modules = get_obm_modules();
-	  $params['modules_right'] = array();
-    $params['sections_show'] = array();
-	  
-	  if ($action == 'insert' || $action == 'update') {
-	    
-	    if (isset($params['default_section_show']) && $params['default_section_show'] == 1) {
-          $params['default_section_show'] = true;
-          $params['sections_show']['default'] = true;
-        }
-        if (isset($params['default_section_show']) && $params['default_section_show'] == 0) {
-          $params['default_section_show'] = false;
-          $params['sections_show']['default'] = false;
-        }
-        
-        foreach ($obm_modules as $section_name => $modules) {
-          foreach ($modules as $module_name) {
-            $params['modules_right'][$module_name]['default'] = isset($params["${module_name}_default"]);
-            $params['modules_right'][$module_name]['right'] = 0;
-          }
-        
-        if (isset($params["${section_name}_show"]))
-          $params['sections_show'][$section_name] = ($params['default_section_show'] ? false : true);
-        else
-          $params['sections_show'][$section_name] = ($params['default_section_show'] ? true : false); 
+  if(is_array($params['rights'])) {
+    foreach($params['rights'] as $module => $rights) {
+      $params['module'][$module] = 0;
+      foreach($rights as $right) {
+        $params['module'][$module] = $params['module'][$module] | hexdec($right);
       }
-      
-		  foreach ($params as $k => $v) {
-		    $matches = array();
-		    if (preg_match('/(.+)_right_(.+)/', $k, $matches)) {
-		      $module_name = $matches[1];
-		      $right_name = $matches[2];
-		      
-		      if (!isset($params['modules_right'][$module_name])) {
-		        $params['modules_right'][$module_name]['right'] = 0;
-		      }
-		        
-		      $params['modules_right'][$module_name]['right'] += ${'cright_'. $right_name};
-		      $params['modules_right'][$module_name][$right_name] = $params[$module_name.'_right_'.$right_name];
-		    }
-		  }
-	  }
-	}
-	
-	// Get profile properties params
-	if (function_exists('run_query_profileproperty_list')) {
-	  
-	  $profile_id = NULL;
-	  if (isset($params['profile_id'])) { $profile_id = $params['profile_id']; }
-	  
-	  $profile_properties_q = run_query_profileproperty_list($profile_id);
-	  $params['properties'] = array();
-	  
-	  $i = 0; // <--- Array index for properties which contains multiple value
-	  while ($profile_properties_q->next_record()) {
-	    if ($profile_properties_q->f('profileproperty_readonly') != 1) {
-    	  $property_name = $profile_properties_q->f('profileproperty_name');
-    	  $default_value = $profile_properties_q->f('profileproperty_default');
-    	  $readonly      = $profile_properties_q->f('profileproperty_readonly');
-    	  $value         = $profile_properties_q->f('profilepropertyvalue_property_value');
-    	  
-    	  if (empty($value)) { $value = $default_value; }
-    	  
-    	  // get properties value from form when updating or inserting
-    	  if ($action == 'update' || $action == 'insert') {
-    	    $value = $params[$property_name];
-    	  }
-
-    	  $params['properties'][$property_name]['default']  = $default_value;
-    	  $params['properties'][$property_name]['readonly'] = $readonly;
-    	  $params['properties'][$property_name]['value'] = $value;
-	    }
-	  }
-	}
-
+    } 
+  }
+  if(is_array($params['enabled'])) {
+    foreach($params['enabled'] as $section => $show) {
+      $params['section'][$section] = $show;
+    } 
+  }  
+  if(is_array($params['property'])) {
+    foreach($params['property'] as $property => $value) {
+      if(!is_array($value) && count(explode(',', $value)) > 1) {
+        $params['property'][$property] = explode(',', $value);
+      }
+    }
+  }
   return $params;
 }
 
@@ -294,13 +225,6 @@ function get_profile_action() {
       'Condition'=> array ('detailupdate'),
     );
     
-  // User Detail
-    $actions['profile']['userdetail']  = array (
-      'Url'      => "$path/profile/profile_index.php?action=userdetail",
-      'Right'    => $cright_read,
-      'Condition'=> array ('None') );
-
-
   // Detail Update
   $actions['profile']['detailupdate'] = array (
     'Name'     => $l_header_update,
@@ -327,7 +251,7 @@ function get_profile_action() {
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') );
 
-  //FIXME
+//FIXME
 //  // Display
 //    $actions['profile']['display'] = array (
 //      'Name'     => $l_header_display,

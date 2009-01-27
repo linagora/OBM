@@ -24,7 +24,13 @@ make_profiles();
 function make_profiles() {
   global $profiles, $cdg_sql;
   global $obm;
-
+  $c_profile_properties = array(
+      'level' => 5,
+      'level_managepeers' => 1,
+      'access_restriction' => 'ALLOW_ALL',
+      'access_exceptions' => '',
+      'admin_realm' => ''
+  );
   $query = "SELECT domain_id from Domain where domain_global=TRUE";
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -40,11 +46,6 @@ function make_profiles() {
   }
   
   echo "Parsing configuration files : ".count($profiles)." profiles found\n";
-  $query = "SELECT *  FROM ProfileProperty";
-  $obm_q->query($query);
-  while($obm_q->next_record()) {
-    $properties[$obm_q->f('profileproperty_name')] = array('default' => $obm_q->f('profileproperty_default'), 'id' => $obm_q->f('profileproperty_id'));
-  }
   foreach ($profiles as $name => $data) {
     $name = addslashes($name);
     echo "** Inserting profile : $name \n"; 
@@ -96,23 +97,23 @@ function make_profiles() {
       $obm_q->query($query);
     }
 
-    foreach ($properties as $property_name => $property_data) {
+    foreach ($c_profile_properties as $property_name => $default) {
       if(isset($data['properties'][$property_name])) {
         $property = $data['properties'][$property_name];
-        if($property_name == 'admin_realm')  {
-          $property = implode(' ', $property);
+        if(is_array($property))  {
+          $property = implode(',', $property);
         }
       } else {
-        $property = $property_data['default'];
+        $property = $default;
       }
       echo "**** Setting property $property_name : $property\n";
       $query = "INSERT INTO ProfilePropertyValue (
-              	profilepropertyvalue_profile_id,
-              	profilepropertyvalue_property_id,
-                profilepropertyvalue_property_value
+              	profileproperty_profile_id,
+              	profileproperty_name,
+                profileproperty_value
               ) VALUES (
                 $profile_id,
-                $property_data[id],
+                $property_name,
                 '$property'
               )";
       $obm_q->query($query);

@@ -1139,20 +1139,20 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
 	}
         $j++;
 	$js .= "
-	div = $('evt-$date-$ev_id');
+	div = $('evt_${date}_$ev_id');
 	a = div.getFirst();
-	info = $('eventDetail-$date-$ev_id');
+        info = $('eventDetail_${date}_$ev_id');
 	slides[$j] = new Fx.Slide(info, {duration: 150,wait:false});	
 	slides[$j].hide();
 	info.setStyle('display','block');	
 	a.addEvent('click', function(e){
 	  slides[$j].toggle();
      	});
-";
-$dis_events .= "<div id=\"evt_${date}_$ev_id\" >
+      ";
+      $dis_events .= "<div id=\"evt_${date}_$ev_id\" >
           <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_user $dis_res</span>
           $hour - <strong>$title</strong></a>
-          <div id=\"eventDetail_$date_$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
+          <div id=\"eventDetail_${date}_$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
             <table>
               <tr>
                 <th>$l_datebegin</th><td>$date_begin</td>
