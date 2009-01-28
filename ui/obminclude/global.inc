@@ -277,6 +277,7 @@ $cg_gid_host = 515;
 
 $c_origin_web = 'obm-ui-web-'.$obm_version;
 $c_orgini_ajax = 'obm-ui-ajax-'.$obm_version;
+$c_origin_cron = 'obm-ui-cron-'.$obm_version;
 // Mail chooser constant hooks
 $c_mailchooser_global_hooks = array(
   array(
@@ -476,13 +477,17 @@ if ($cgp_hide['contact']['function']) {
 
 // Determine if delegation is used
 $cgp_use['property']['delegation'] = false;
-foreach ($profiles as $one_pro) {
-  if (is_array($one_pro['properties']['admin_realm'])) {
-    if (in_array('delegation', $one_pro['properties']['admin_realm'])) {
-      $cgp_use['property']['delegation'] = true;
-      break;
+if(is_array($profiles)) {
+  foreach ($profiles as $one_pro) {
+    if (is_array($one_pro['properties']['admin_realm'])) {
+      if (in_array('delegation', $one_pro['properties']['admin_realm'])) {
+        $cgp_use['property']['delegation'] = true;
+        break;
+      }
     }
   }
+} else {
+  $profiles = array();
 }
 // If delegation not used, disable delegation fields
 if (! $cgp_use['property']['delegation']) {
