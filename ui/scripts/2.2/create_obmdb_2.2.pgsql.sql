@@ -1605,7 +1605,7 @@ CREATE TABLE profilemodule (
 CREATE TABLE profileproperty (
     profileproperty_id integer NOT NULL,
     profileproperty_profile_id integer,
-    profileproperty_name character varying(32) DEFAULT ''::character varying NOT NULL
+    profileproperty_name character varying(32) DEFAULT ''::character varying NOT NULL,
     profileproperty_value text DEFAULT ''::text NOT NULL
 );
 
