@@ -101,13 +101,15 @@ sub update {
 
     if( !$entity->getDelete() && $entity->getUpdateLinks() ) {
         $query = 'INSERT INTO P_EntityRight
-                    (   entityright_entity_id,
+                    (   entityright_id,
+                        entityright_entity_id,
                         entityright_consumer_id,
                         entityright_read,
                         entityright_write,
                         entityright_admin,
                         entityright_access
-                    ) SELECT    entityright_entity_id,
+                    ) SELECT    entityright_id,
+                                entityright_entity_id,
                                 entityright_consumer_id,
                                 entityright_read,
                                 entityright_write,
