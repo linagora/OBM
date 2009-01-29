@@ -774,7 +774,6 @@ function html_contact_view_main($co_q, $coords) {
       $datas = array();
       foreach($values as $label => $value) {
         if($label == 'label' || $label == 'protocol') {
-          var_dump($kind, $value, str_replace(';', '_', $value));
           if(isset($GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)])) {
             $header = $GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)];
           } else {
