@@ -22,8 +22,8 @@ make_profiles();
  * Insert profiles into DB From static $profiles
  */
 function make_profiles() {
-  global $profiles, $cdg_sql;
-  global $obm;
+  global $profiles, $cdg_sql, $cgp_show;
+  global $obm, $perm_user, $perm_editor, $perm_admin;
   $c_profile_properties = array(
       'level' => 5,
       'level_managepeers' => 1,
@@ -63,23 +63,11 @@ function make_profiles() {
     $obm_q->query($query);
     $obm_q->next_record();
     $profile_id = $obm_q->f('profile_id');
-    foreach ($data['section'] as $section_name => $section) {
-      echo "**** Right on section $section_name : $section \n";
-      $query = "INSERT INTO ProfileSection (
-            profilesection_section_name,
-            profilesection_domain_id,
-            profilesection_profile_id,
-            profilesection_show
-          ) VALUES (
-            '$section_name',
-            $global_domain_id,
-            $profile_id,
-            $section
-          )";
-      $obm_q->query($query);
-    }
-        
     // Insert Modules
+    if(!is_array($data['module'])) {
+      echo "No module founded, default value used";
+      $data['module'] = array('default' => $perm_user, 'calendar' => $perm_editor);
+    }
     foreach ($data['module'] as $module_name => $module) {
       $module_value = hexdec($module_value);
       echo "**** Right on module $module_name : $module \n";
@@ -96,6 +84,26 @@ function make_profiles() {
           )";    
       $obm_q->query($query);
     }
+    
+    if(!is_array($data['section'])) {
+      echo "No section founded, default value used";
+      $data['section'] = array('default' => 0, 'com' => 1, 'prod' => 1, 'user' => 1, 'my' => 1);
+    }
+    foreach ($data['section'] as $section_name => $section) {
+      echo "**** Right on section $section_name : $section \n";
+      $query = "INSERT INTO ProfileSection (
+            profilesection_section_name,
+            profilesection_domain_id,
+            profilesection_profile_id,
+            profilesection_show
+          ) VALUES (
+            '$section_name',
+            $global_domain_id,
+            $profile_id,
+            $section
+          )";
+      $obm_q->query($query);
+    }
 
     foreach ($c_profile_properties as $property_name => $default) {
       if(isset($data['properties'][$property_name])) {
@@ -107,13 +115,13 @@ function make_profiles() {
         $property = $default;
       }
       echo "**** Setting property $property_name : $property\n";
-      $query = "INSERT INTO ProfilePropertyValue (
+      $query = "INSERT INTO ProfileProperty (
               	profileproperty_profile_id,
               	profileproperty_name,
                 profileproperty_value
               ) VALUES (
                 $profile_id,
-                $property_name,
+                '$property_name',
                 '$property'
               )";
       $obm_q->query($query);
