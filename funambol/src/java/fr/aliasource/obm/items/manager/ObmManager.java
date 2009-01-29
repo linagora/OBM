@@ -5,6 +5,12 @@ import org.obm.sync.client.ISyncClient;
 
 import fr.aliasource.funambol.OBMException;
 
+/**
+ * The obm manager
+ * 
+ * @author tom
+ *
+ */
 public abstract class ObmManager {
 
 	protected AccessToken token;
