@@ -81,7 +81,7 @@ sub _doWork {
 
     # La bal existe ?
     my %srvBalDesc;
-    my $isExist = $self->isMailboxExist( \%srvBalDesc, $entity->getMailboxPrefix(), $entity->getMailboxName( 'new' ) );
+    my $isExist = $self->isMailboxExist( \%srvBalDesc, $entity->getMailboxPrefix(), $entity->getMailboxName('new') );
     if( !defined($isExist) ) {
         $self->_log( 'probleme lors de l\'obtention des informations de la boite sur le serveur Cyrus', 2 );
         return 1;
