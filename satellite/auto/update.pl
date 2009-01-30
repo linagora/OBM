@@ -60,6 +60,13 @@ sub run {
             $self->_log( 'La mise à jour ne s\'est pas correctement déroulée', 0 );
             return $code;
         }else {
+            require OBM::updateStateUpdater;
+            my $updateState;
+            if( !($updateState = OBM::updateStateUpdater->new( $parameters->{'domain'} )) || $updateState->update() ) {
+                $self->_log( 'échec de la mise à jour du flag de mise à jour en attente', 0 );
+                return 1;
+            }
+
             $self->_log( 'Mise à jour terminée avec succés', 0 );
         }
     }
@@ -197,8 +204,6 @@ updates for only a particular user or for a delegation.
 =item C<delegation> : apply update done by only this delegation
 
 =back
-
-Global update by default.
 
 Parameters 'user' and 'delegation' are exclusive.
 
