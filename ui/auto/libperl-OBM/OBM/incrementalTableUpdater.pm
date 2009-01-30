@@ -67,7 +67,6 @@ sub updateBd {
         $error = 1;
     }
 
-    # Only delete really deleted entities references
     if( $self->_deleteDeleted() ) {
         $self->_log( 'problème lors du nettoyage de la table Deleted', 1 );
         $error = 1;
@@ -204,7 +203,7 @@ sub _deleteDeleted {
     }
 
     my $query = 'DELETE FROM Deleted
-                    WHERE deleted_domain_id='.$self->{'domainId'}. 'AND
+                    WHERE deleted_domain_id='.$self->{'domainId'}.' AND
                     deleted_entity_id IN ('.join( ', ', @{$self->{'deletedId'}} ).')';
 
     if( defined($self->{'userId'}) ) {

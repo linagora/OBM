@@ -198,7 +198,7 @@ sub update {
 
     }elsif( $smtpInReturnCode == 2 ) {
         $self->_log( 'erreur lors de la mise à jour des maps SMTP-in', 0 );
-        $self->_log( 'Il peut y avoir des incohérences dans le contenu des différents serveur SMTP-in', 0 );
+        $self->_log( 'Il peut y avoir des incohérences dans le contenu des différents serveurs SMTP-in', 0 );
     }
 
     my $incrTableUpdReturnCode = $self->{'incrementalTableUpdater'}->updateBd();
