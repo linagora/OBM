@@ -3312,6 +3312,10 @@ Class Event {
     return ($this->privacy == 1);
   }
 
+  function isAllDay() {
+    return ($this->all_day == 1);
+  }
+
   /**
    * Add an attendee to the event 
    * 

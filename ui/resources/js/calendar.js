@@ -44,6 +44,14 @@ Obm.CalendarDayEventExtension = new Class({
       this.meeting = new Element('img').setProperty('src',obm.vars.images.meeting)
                                        .injectInside(this.dragHandler);
     }
+    if (this.event.private) {
+      this.private = new Element('img').setProperty('src',obm.vars.images.private)
+                                       .injectInside(this.dragHandler);
+    }
+    if (this.event.all_day) {
+      this.all_day = new Element('img').setProperty('src',obm.vars.images.all_day)
+                                       .injectInside(this.dragHandler);
+    }
     this.setPeriodicity();
     this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
                                           .injectInside(this.dragHandler);
@@ -184,6 +192,14 @@ Obm.CalendarDayEvent = new Class({
     if (this.event.meeting) {
       this.meeting = new Element('img').setProperty('src',obm.vars.images.meeting)
                         .injectInside(this.dragHandler);
+    }
+    if (this.event.private) {
+      this.private = new Element('img').setProperty('src',obm.vars.images.private)
+                                       .injectInside(this.dragHandler);
+    }
+    if (this.event.all_day) {
+      this.all_day = new Element('img').setProperty('src',obm.vars.images.all_day)
+                                       .injectInside(this.dragHandler);
     }
     this.setPeriodicity();
     this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)

@@ -620,7 +620,7 @@ function html_calendar_view_selector($calendar, $my_views) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity) { 
   global $ico_previous, $ico_next, $ico_far_next, $ico_far_previous;
-  global $ccalendar_weekstart, $ccalendar_first_hour;
+  global $ccalendar_weekstart, $ccalendar_first_hour, $ico_allday;
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension, $ico_private;
   global $l_private,$l_daysofweek, $l_previous, $l_next;
 
@@ -628,6 +628,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
   $GLOBALS['js']['vars']['images']['periodic'] = $ico_periodic;
   $GLOBALS['js']['vars']['images']['meeting'] = $ico_meeting;
   $GLOBALS['js']['vars']['images']['private'] = $ico_private;
+  $GLOBALS['js']['vars']['images']['all_day'] = $ico_allday;
   $GLOBALS['js']['vars']['images']['extension'] = $ico_extension;
 
   $date = clone $calendar['date'];
@@ -730,7 +731,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
  */
 function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) {
   global $path, $ico_next, $ico_previous, $l_previous, $l_next;
-  global $ccalendar_weekstart, $ico_far_next, $ico_far_previous;
+  global $ccalendar_weekstart, $ico_far_next, $ico_far_previous, $ico_allday;
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension,$ico_private;
   global $ccalendar_first_hour, $ccalendar_last_hour;
  
@@ -738,6 +739,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
   $GLOBALS['js']['vars']['images']['periodic'] = $ico_periodic;
   $GLOBALS['js']['vars']['images']['meeting'] = $ico_meeting;
   $GLOBALS['js']['vars']['images']['private'] = $ico_private;
+  $GLOBALS['js']['vars']['images']['all_day'] = $ico_allday;
   $GLOBALS['js']['vars']['images']['extension'] = $ico_extension;
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
 
@@ -844,7 +846,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
   global $ico_previous, $ico_next, $ico_far_next, $ico_far_previous;
-  global $ccalendar_first_hour, $ccalendar_last_hour;
+  global $ccalendar_first_hour, $ccalendar_last_hour, $ico_allday;
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_extension,$ico_private;
   global $l_private, $l_all_day, $l_previous, $l_next;
 
@@ -852,6 +854,7 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
   $GLOBALS['js']['vars']['images']['periodic'] = $ico_periodic;
   $GLOBALS['js']['vars']['images']['meeting'] = $ico_meeting;
   $GLOBALS['js']['vars']['images']['private'] = $ico_private;
+  $GLOBALS['js']['vars']['images']['all_day'] = $ico_allday;
   $GLOBALS['js']['vars']['images']['extension'] = $ico_extension;
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
 
@@ -999,7 +1002,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   global $l_date, $l_resources, $l_items, $l_event, $l_owner;
   global $l_expand_all, $l_collapse_all,$ccalendar_last_hour,$ccalendar_weekstart;
   global $ico_periodic_alt, $ico_meeting_alt, $ico_private_alt, $ico_search;
-  global $ccalendar_first_hour;
+  global $ccalendar_first_hour, $ico_allday_alt;
 
   $sel_user = $calendar_entity['user'];
   $sel_user_id = array();
@@ -1068,7 +1071,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
 	  $dis_repeat = ${"l_$repeat"};
         }
 
-        if ($event->privacy == 1 && !(in_array($obm['uid'],$attendee['user']))) {
+        if ($event->privacy == 1 && !(array_key_exists($obm['uid'],$attendee['user']))) {
 	  $title = $l_private;
 	  $description = $title;
         } else {
@@ -1083,9 +1086,9 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
               foreach($xml->resource as $key => $value) {
                 if (!empty($value->item)) {
                   if (!empty($value->property_value)) {
-                     $block_property = "($value->property_name:$value->property_value)";
+		    $block_property = "($value->property_name:$value->property_value)";
                   } else {
-                     $block_property = '';
+		    $block_property = '';
                   }
                   $item_list .= "<strong>$value->res_name</strong> $block_property<br>".
                     nl2br($value->item);
@@ -1101,6 +1104,9 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
           }
           if ($event->isPeriodic()) {
             $title = "<img src=\"$ico_periodic_alt\" alt=\"[Periodic]\" /> $title";
+          }                  
+          if ($event->isAllDay()) {
+            $title = "<img src=\"$ico_allday_alt\" alt=\"[All Day]\" /> $title";
           }                  
         }
         $dis_owner = $event->owner_name;
