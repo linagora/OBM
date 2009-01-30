@@ -188,16 +188,20 @@ sub _loadHosts {
     }
 
     my $hostTable = 'Host';
+    my $hostEntityTable = 'HostEntity';
+    my $serviceTable = 'Service';
     if( $self->{'source'} =~ /^SYSTEM$/ ) {
         $hostTable = 'P_'.$hostTable;
+        $hostEntityTable = 'P_'.$hostEntityTable;
+        $serviceTable = 'P_'.$serviceTable;
     }
 
     my $query = 'SELECT '.$hostTable.'.*,
                         service_id AS host_samba,
                         current.host_name as host_name_current
                  FROM '.$hostTable.'
-                 INNER JOIN HostEntity ON hostentity_host_id=host_id
-                 LEFT JOIN Service ON service_entity_id=hostentity_entity_id AND service_service=\'samba\'
+                 INNER JOIN '.$hostEntityTable.' ON hostentity_host_id=host_id
+                 LEFT JOIN '.$serviceTable.' ON service_entity_id=hostentity_entity_id AND service_service=\'samba\'
                  LEFT JOIN P_Host current ON current.host_id='.$hostTable.'.host_id
                  WHERE '.$hostTable.'.host_domain_id='.$self->{'domainId'};
 

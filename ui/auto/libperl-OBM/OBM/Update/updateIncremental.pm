@@ -181,7 +181,7 @@ sub update {
             $self->_log( 'problème à la mise à jour BD de l\'entité '.$entity->getDescription(), 1 );
             $entity->unsetUpdated();
         }else {
-            $self->_log( 'entité '.$entity->getDescription().' mise à jour en BD', 1 );
+            $self->_log( 'mise à jour BD de l\'entité '.$entity->getDescription().' correcte', 3 );
         }
 
         $self->{'incrementalTableUpdater'}->update($entity);

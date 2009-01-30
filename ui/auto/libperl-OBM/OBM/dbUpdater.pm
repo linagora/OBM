@@ -40,7 +40,7 @@ sub update {
 
     my $returnCode = 0;
     SWITCH: {
-        if( !$entity->getBdUpdate() ) {
+        if( !$entity->getDelete() && !$entity->getBdUpdate() ) {
             $self->_log( 'l\'entité '.$entity->getDescription().' n\'est pas à mettre à jour en BD', 2 );
             last SWITCH;
         }
