@@ -36,8 +36,8 @@ sub run {
     # Traitement des paramètres
     $self->_log( 'Analyse des parametres du script', 3 );
     $self->getParameter( $parameters );
-    
-    
+
+
     my $update;
     SWITCH: {
         if( $parameters->{'incremental'} ) {
@@ -52,7 +52,7 @@ sub run {
             last SWITCH;
         }
     }
-    
+
     if( !defined($update) ) {
         $self->_log( 'Probleme a l\'initialisation de l\'objet de mise a jour', 0 );
     }else {
