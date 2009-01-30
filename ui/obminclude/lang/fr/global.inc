@@ -378,7 +378,6 @@ $l_header_closing = "Clôtures";
 $l_header_closing_new = "Nouvelle clôture";
 $l_header_search = "Chercher";
 $l_header_tools_upd = "Mise à jour";
-$l_header_tools_halt = "Arrêt";
 $l_header_tools_remote = "Contrôle à distance";
 
 $l_header_new_child = "Nouvelle Affaire liée";

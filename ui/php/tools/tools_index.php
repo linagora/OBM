@@ -10,7 +10,6 @@
 // - update_index  --         -- show the Update screen
 // - update_update --         -- run the config update
 // - update_detail --         -- display the updates
-// - halt_index    --         -- show the shutdown tool
 // - halt_halt     --         -- Halt the system
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -130,10 +129,6 @@ if ($action == 'cancel_update') {
     $display['detail'] = dis_tools_update_detail();
   }
 
-} elseif ($action == 'halt_index') {
-///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = html_tools_halt_index();
-
 } elseif ($action == 'halt_halt') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['msg'] .= display_debug_msg($cmd_halt, $cdg_exe);
@@ -174,7 +169,7 @@ function get_tools_params() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_tools_action() {
   global $params, $actions, $path;
-  global $l_header_tools_upd, $l_header_tools_halt,$l_header_tools_remote;
+  global $l_header_tools_upd, $l_header_tools_remote;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 
@@ -202,13 +197,6 @@ function get_tools_action() {
   $actions['tools']['remote_update'] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('none') 
-                                    );
-// Tool Halt
-  $actions['tools']['halt_index'] = array (
-    'Name'     => $l_header_tools_halt,
-    'Url'      => "$path/tools/tools_index.php?action=halt_index",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('all') 
                                     );
 
 // Tool Halt

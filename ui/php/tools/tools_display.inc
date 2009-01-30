@@ -221,27 +221,4 @@ function html_tools_javascript($domain_id) {
     </script>";
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display Halt tool
-///////////////////////////////////////////////////////////////////////////////
-function html_tools_halt_index() {
-  global $l_halt, $l_halt_aliamin, $l_validate;
-
-  $block = "
-    <form method=\"post\" action=\"tools_index.php\">
-      <input type=\"hidden\" name=\"action\" value=\"halt_halt\">
-
-    <div class=\"detailHead\">$l_halt</div>
-
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailLabel\">$l_halt_aliamin</td>
-      <td class=\"detailForm\"><input type=\"submit\" value=\"$l_validate\"></td>
-    </tr>
-    </table>
-    </form>";
-
-  return $block;
-}
-
 </script>
