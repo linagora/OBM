@@ -152,7 +152,9 @@ class Of_Date extends DateTime {
   private $_error;
   
   private $originalTimeZone;
-  
+
+  private $cache = array();
+
   public function __construct($time=null, $timezone=null) {
     self::loadOptions();
     if(is_numeric($time)) {
@@ -1501,7 +1503,7 @@ class Of_Date extends DateTime {
           $time = new of_Date("@$date");
           $data = $time->toArray();
       }
-    } elseif($date instanceof DateTime) {
+    } elseif($date instanceof Of_Date) {
       $data = $date->toArray();
     } else {
       $data = self::_parseDate($date, $format);
@@ -1529,10 +1531,14 @@ class Of_Date extends DateTime {
 
   private static function _parseDate($date, $format) {
     if(is_null($format) || empty($format))  {
-      if(in_array($date, self::$DAY_LIST) || in_array($date, self::$SHORT_DAY_LIST)) {
-        $format=self::WEEKDAY_DIGIT;
-      } elseif(isset($date, self::$MONTH_LIST) || in_array($date, self::$SHORT_MONTH_LIST)) {
-        $format=self::MONTH;
+      if(in_array($date, self::$DAY_LIST)) {
+        return array('weekday' => array_search($date, self::$DAY_LIST));
+      } elseif (in_array($date, self::$SHORT_DAY_LIST)) {
+        return array('weekday' => array_search($date, self::$SHORT_DAY_LIST));
+      } elseif(isset($date, self::$MONTH_LIST)) {
+        return array('month' => array_search($date, self::$MONTH_LIST));
+      } elseif (in_array($date, self::$SHORT_MONTH_LIST)) {
+        return array('month' => array_search($date, self::$SHORT_MONTH_LIST));
       } else {
         $format = self::ISO_8601;
       }
@@ -1669,4 +1675,45 @@ class Of_Date extends DateTime {
   public function getOriginalTimeZone () {
     return $this->originalTimeZone;
   }
+
+  public function fireUpdate() {
+    $this->updateCache();
+  }
+
+  public function updateCache() {
+    $this->cache = array(); 
+  }
+  
+  public function modify($modify) {
+    parent::modify($modify);
+    $this->fireUpdate();
+  }
+
+  public function format($format) {
+    if(!$this->cache[$format]) {
+      $this->cache[$format] = parent::format($format);
+    }
+    return $this->cache[$format];
+  }
+
+  public function setDate($year, $month, $day) {
+    parent::setDate($year, $month, $day);
+    $this->fireUpdate();
+  }
+
+  public function setISODate($year, $week, $day = null) {
+    parent::setISODate($year, $week, $day);
+    $this->fireUpdate();
+  }
+
+  public function setTime($hour, $minute, $second = null) {
+    parent::setTime($hour, $minute, $second);
+    $this->fireUpdate();
+  }
+
+
+  public function setTimezone($timezone) {
+    parent::setTimezone($timezone);
+    $this->fireUpdate();
+  }    
 }
