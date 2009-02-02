@@ -152,7 +152,7 @@ class Of_Date extends DateTime {
   private $_error;
   
   private $originalTimeZone;
-
+  
   public function __construct($time=null, $timezone=null) {
     self::loadOptions();
     if(is_numeric($time)) {
@@ -1501,7 +1501,7 @@ class Of_Date extends DateTime {
           $time = new of_Date("@$date");
           $data = $time->toArray();
       }
-    } elseif($date instanceof Of_Date) {
+    } elseif($date instanceof DateTime) {
       $data = $date->toArray();
     } else {
       $data = self::_parseDate($date, $format);
@@ -1529,14 +1529,10 @@ class Of_Date extends DateTime {
 
   private static function _parseDate($date, $format) {
     if(is_null($format) || empty($format))  {
-      if(in_array($date, self::$DAY_LIST)) {
-        return array('weekday' => array_search($date, self::$DAY_LIST));
-      } elseif (in_array($date, self::$SHORT_DAY_LIST)) {
-        return array('weekday' => array_search($date, self::$SHORT_DAY_LIST));
-      } elseif(isset($date, self::$MONTH_LIST)) {
-        return array('month' => array_search($date, self::$MONTH_LIST));
-      } elseif (in_array($date, self::$SHORT_MONTH_LIST)) {
-        return array('month' => array_search($date, self::$SHORT_MONTH_LIST));
+      if(in_array($date, self::$DAY_LIST) || in_array($date, self::$SHORT_DAY_LIST)) {
+        $format=self::WEEKDAY_DIGIT;
+      } elseif(isset($date, self::$MONTH_LIST) || in_array($date, self::$SHORT_MONTH_LIST)) {
+        $format=self::MONTH;
       } else {
         $format = self::ISO_8601;
       }
