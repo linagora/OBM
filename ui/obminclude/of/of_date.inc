@@ -149,6 +149,8 @@ class Of_Date extends DateTime {
 
   private static $_loaded = false;
 
+  private static $_today;
+
   private $_error;
   
   private $originalTimeZone;
@@ -1329,6 +1331,7 @@ class Of_Date extends DateTime {
    */   
   function _add($parts,$date, $format) { 
     $data = self::_parse($parts, $date, $format);
+    $str = '';
     foreach($data as $part => $value) {
       if($part == 'weekday') {
         $part = self::$DAY_LIST[$value];
@@ -1353,6 +1356,7 @@ class Of_Date extends DateTime {
    */   
   function _sub($parts,$date, $format) { 
     $data = self::_parse($parts, $date, $format);
+    $str = '';
     foreach($data as $part => $value) {
       if($part == 'weekday') {
         $part = self::$DAY_LIST[$value];
@@ -1529,13 +1533,17 @@ class Of_Date extends DateTime {
 
   private static function _parseDate($date, $format) {
     if(is_null($format) || empty($format))  {
-      if(in_array($date, self::$DAY_LIST) || in_array($date, self::$SHORT_DAY_LIST)) {
-        $format=self::WEEKDAY_DIGIT;
-      } elseif(isset($date, self::$MONTH_LIST) || in_array($date, self::$SHORT_MONTH_LIST)) {
-        $format=self::MONTH;
+      if(in_array($date, self::$DAY_LIST)) {
+        return array('weekday' => array_search($date, self::$DAY_LIST));
+      } elseif (in_array($date, self::$SHORT_DAY_LIST)) {
+        return array('weekday' => array_search($date, self::$SHORT_DAY_LIST));
+      } elseif(isset($date, self::$MONTH_LIST)) {
+        return array('month' => array_search($date, self::$MONTH_LIST));
+      } elseif (in_array($date, self::$SHORT_MONTH_LIST)) {
+        return array('month' => array_search($date, self::$SHORT_MONTH_LIST));
       } else {
         $format = self::ISO_8601;
-      }
+      }      
     }
     $format = str_split(strtr($format, self::$PHP_TO_ISO));
     if(in_array('e',$format)) {
@@ -1639,7 +1647,10 @@ class Of_Date extends DateTime {
    * @return Of_Date
    */
   public static function today() {
-    return new Of_Date();
+    if(!self::$_today) {
+      self::$_today = new Of_Date();
+    }
+    return clone self::$_today;
   }
 
   /**
@@ -1649,9 +1660,7 @@ class Of_Date extends DateTime {
    * @return boolean
    */
   public function isToday() {
-    $day = $this->format('Y-m-d');
-    $today = self::today()->format('Y-m-d');
-    return ($day == $today);
+    return ($this->format('Y-m-d') == self::today()->format('Y-m-d'));
   }
 
   public static function cmp($d1, $d2) {

@@ -30,7 +30,6 @@ include("$obminclude/global.inc");
 $params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
-require_once("$obminclude/lib/Zend/Pdf.php");
 require('calendar_query.inc');
 $params = get_calendar_params();
 // Get user preferences if set for hour display range 
@@ -557,6 +556,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'pdf_export') {
 ///////////////////////////////////////////////////////////////////////////////
+  require_once("$obminclude/lib/Zend/Pdf.php");
   $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
   if (count($entities,COUNT_RECURSIVE) <= 4) {
     $entities['user']  = array($obm['uid']);
