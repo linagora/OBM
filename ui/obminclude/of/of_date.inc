@@ -153,8 +153,6 @@ class Of_Date extends DateTime {
   
   private $originalTimeZone;
 
-  private $cache = array();
-
   public function __construct($time=null, $timezone=null) {
     self::loadOptions();
     if(is_numeric($time)) {
@@ -1675,45 +1673,4 @@ class Of_Date extends DateTime {
   public function getOriginalTimeZone () {
     return $this->originalTimeZone;
   }
-
-  public function fireUpdate() {
-    $this->updateCache();
-  }
-
-  public function updateCache() {
-    $this->cache = array(); 
-  }
-  
-  public function modify($modify) {
-    parent::modify($modify);
-    $this->fireUpdate();
-  }
-
-  public function format($format) {
-    if(!$this->cache[$format]) {
-      $this->cache[$format] = parent::format($format);
-    }
-    return $this->cache[$format];
-  }
-
-  public function setDate($year, $month, $day) {
-    parent::setDate($year, $month, $day);
-    $this->fireUpdate();
-  }
-
-  public function setISODate($year, $week, $day = null) {
-    parent::setISODate($year, $week, $day);
-    $this->fireUpdate();
-  }
-
-  public function setTime($hour, $minute, $second = null) {
-    parent::setTime($hour, $minute, $second);
-    $this->fireUpdate();
-  }
-
-
-  public function setTimezone($timezone) {
-    parent::setTimezone($timezone);
-    $this->fireUpdate();
-  }    
 }
