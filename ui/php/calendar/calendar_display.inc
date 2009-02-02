@@ -1709,7 +1709,9 @@ function dis_calendar_planning_day_view($date, $end, $calendar_entity, $category
           }
           $ressource_occ .= '</ul></td>';
         } else {
-          $ressource_occ .= "<td style=\"width:$td_width%;\">&nbsp;</td>";
+          $goto = "calendar_index.php?action=new&amp;tf_date_begin=".$current_time->getURL();
+          $ressource_occ .= "<td onclick=\"window.location='$goto'\" onmouseover=\"this.className='hover';this.style.cursor = 'pointer';\"
+             onmouseout=\"this.className ='';\" style=\"width:$td_width%;\">&nbsp;</td>";        
         }
       }
       $ressource_occ.="</tr>";

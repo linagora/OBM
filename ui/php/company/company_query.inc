@@ -183,15 +183,16 @@ function run_query_company_search($company) {
       companynafcode_code as nafcode_code,
       companynafcode_label as nafcode_label
     FROM Company
-    INNER JOIN CompanyEntity ON companyentity_company_id = company_id
-    LEFT JOIN Address ON address_entity_id = companyentity_entity_id
-    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
-    LEFT JOIN Phone ON phone_entity_id = companyentity_entity_id
-    LEFT JOIN Email ON email_entity_id = companyentity_entity_id        
-    LEFT JOIN Website ON website_entity_id = companyentity_entity_id        
+       
       ";
 
   $left_join = "
+         INNER JOIN CompanyEntity ON companyentity_company_id = company_id
+         LEFT JOIN Address ON address_entity_id = companyentity_entity_id
+         LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
+         LEFT JOIN Phone ON phone_entity_id = companyentity_entity_id
+         LEFT JOIN Email ON email_entity_id = companyentity_entity_id        
+         LEFT JOIN Website ON website_entity_id = companyentity_entity_id
          LEFT JOIN CompanyType ON company_type_id=companytype_id
          $join_userdata
          LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id

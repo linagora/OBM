@@ -2876,7 +2876,7 @@ function calendar_monthlybyday_repeatition($date,$start,$end,$repeatfrequence,$e
     $current->setMonth($start)->subMonth($diff);
   }
   $position = ceil($date->getDay() / 7);
-  $pattern = ($position == 5)? "-1 ".$date->format(Of_Date::WEEKDAY): "+$position ".$date->format(Of_Date::WEEKDAY);
+  $pattern = ($position == 5)? "-1 ".$date->get(Of_Date::WEEKDAY): "+$position ".$date->get(Of_Date::WEEKDAY);
   while ($current->compareDateIso($end) < 0) {
     $current->setDay(1);
     if($position == 5) $current->addMonth(1); else $current->subDay(1);
