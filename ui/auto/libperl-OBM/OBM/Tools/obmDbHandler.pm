@@ -36,11 +36,23 @@ sub _getDriver {
 
     SWITCH:{
         if( $self->{'dbType'} eq 'mysql' ) {
+            my $moduleInstalled = eval { require DBD::mysql; };
+            if( !defined($moduleInstalled) ) {
+                $self->_log( 'module DBD::mysql non installé, connexion à la BD impossible', 0 );
+                return 1;
+            }
+
             $self->{'dbDriver'} = 'mysql';
             last SWITCH;
         }
 
         if( $self->{'dbType'} eq 'pgsql' ) {
+            my $moduleInstalled = eval { require DBD::Pg; };
+            if( !defined($moduleInstalled) ) {
+                $self->_log( 'module DBD::Pg non installé, connexion à la BD impossible', 0 );
+                return 1;
+            }
+
             $self->{'dbDriver'} = 'Pg';
             last SWITCH;
         }
@@ -154,7 +166,7 @@ sub _dbConnect {
     }
 
     if( !defined($self->{'dbDriver'}) && $self->_getDriver() ) {
-        $self->_log( 'driver inconnu pour les SGBD de type \''.$self->{'dbType'}.'\', connexion impossible', 0 );
+        $self->_log( 'problème de driver SGBD, connexion BD impossible', 3 );
         return 0;
     }
 
