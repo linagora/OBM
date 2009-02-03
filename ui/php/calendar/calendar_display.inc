@@ -1532,8 +1532,8 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
           } else {
             resource.setStyle('left',container.getLeft() - resource.getStyle('width').toInt() +'px')   
           }
-          resource.setstyle('top',(container.gettop()+container.offsetheight)+'px')   
-          resource.setstyle('display','block');
+          resource.setStyle('top',(container.getTop()+container.offsetheight)+'px')   
+          resource.setStyle('display','block');
         }
       } 
     }

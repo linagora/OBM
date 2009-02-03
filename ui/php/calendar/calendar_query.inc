@@ -2703,7 +2703,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
 	$of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
       }
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color);
+      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color);
       $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
     }
   }
@@ -2743,7 +2743,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
         $addOcc = false;
       }
     } else {
-      $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color);
+      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color);
       $event->setTimezone($timezone);
     }
     $tz = new DateTimeZone($timezone);
@@ -3423,7 +3423,7 @@ Class OccurrenceFactory {
   function addOccurrence($event, $date, $entity, $id, $state='ACCEPTED') {
     $date->setDefaultTimeZone();
     if ($date->compare($this->end) < 0 && ($date->getTimestamp() + $event->duration) > $this->begin->getTimestamp()) {
-      $this->occurrences[$event->id][] = &new Occurrence($event, $date, $entity, $id, $state);
+      $this->occurrences[$event->id][] = new Occurrence($event, $date, $entity, $id, $state);
       $this->events[$event->id] = $event;
     }
   }
