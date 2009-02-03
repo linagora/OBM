@@ -1,7 +1,7 @@
 <?php
 include_once('CronJob.class.php');
 
-global $obminclude; // FIXME
+global $obminclude; 
 require_once("$obminclude/of/of_category.inc");
 
 class ContactExpiration extends CronJob {
@@ -10,13 +10,13 @@ class ContactExpiration extends CronJob {
    */
   var $logger;
   
-  const EXPIRATION_TIME = 6;
+  const EXPIRATION_TIME = 0;
   
   function mustExecute($date) {
     if (self::EXPIRATION_TIME == 0) return false;
     
     $hours = date('G');
-    return ($hours == 6);
+    return ($hours == 6) || 1 == 1;
   }
 
   function execute($date) {
@@ -44,7 +44,7 @@ class ContactExpiration extends CronJob {
       $obj->$method_callback($obm_q->f('contact_id'));
     }
     
-    $this->logger->info($obm_q->affected_rows()." contacts deleted.");
+    $this->logger->info($obm_q->nf()." contacts deleted.");
   }
   
   /**
@@ -61,13 +61,15 @@ class ContactExpiration extends CronJob {
     
     $obm_q = new DB_OBM;
     
-    $query = "SELECT contact_company_id, contact_birthday_id FROM Contact
+    $query = "SELECT contact_company_id, contact_birthday_id, contact_usercreate, contact_privacy FROM Contact
       WHERE contact_id $sql_id";
     $this->logger->core($query);
     $obm_q->query($query);
     $obm_q->next_record();
     $comp_id = $obm_q->f('contact_company_id');
     $birthday_id = $obm_q->f('contact_birthday_id');
+    $privacy = $obm_q->f('contact_privacy');
+    $uid = $obm_q->f('contact_usercreate');
     
     // Hook : Pre
     if (function_exists('hook_pre_run_query_contact_delete')) {
@@ -82,24 +84,24 @@ class ContactExpiration extends CronJob {
     
     // BEGIN birthday support
     
-    $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = '$birthday_id'";
+    $query = "DELETE FROM Event WHERE event_id = '$birthday_id'";
     $this->logger->core($query);
     $obm_q->query($query);
     
     // END birthday support
     
     
+    of_entity_delete('contact', $c_id); 
     $query = "DELETE FROM Contact WHERE contact_id $sql_id";
     $this->logger->core($query);
     $obm_q->query($query);
     
     // If connectors in use
     
-    if ($c_use_connectors) {
-      $now = date('Y-m-d H:i:s');
+    if ($c_use_connectors && $privacy == 1) {
       $query = "INSERT INTO
-        DeletedContact (deletedcontact_contact_id, deletedcontact_timestamp)
-        VALUES ($c_id, '$now')";
+        DeletedContact (deletedcontact_contact_id, deletedcontact_user_id, deletedcontact_timestamp, deletedcontact_origin)
+        VALUES ($c_id, $uid, NOW(), '$GLOBALS[c_origin_cron]')";
       $this->logger->core($query);
       $obm_q->query($query);
     }

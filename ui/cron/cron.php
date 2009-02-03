@@ -13,10 +13,11 @@ include_once("$obminclude/global.inc");
 include_once("Logger.class.php");
 include_once("Cron.class.php");
 
-define("L_LEVEL",L_DEBUG);
+define("L_LEVEL", L_DEBUG);
 
 set_error_handler('errorHandler');
 
+date_default_timezone_set('GMT');
 
 $cron = new Cron($jobsPath);
 $cron->process();

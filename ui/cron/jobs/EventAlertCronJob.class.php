@@ -178,7 +178,7 @@ class EventAlertCronJob extends CronJob{
       if (isset($of->events[$id])) {
         $event = &$of->events[$id];
       } else {
-        $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$color);
+        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$color);
       }
       $this->logger->debug("$entity $entity_id ($entity_label) added on event ".$event->id);
       $event->addAttendee($entity,$entity_id,$entity_label,$state);
@@ -226,7 +226,7 @@ class EventAlertCronJob extends CronJob{
       if (isset($of->events[$id])) {
         $event = &$of->events[$id];
       } else {
-        $event = &new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$color);
+        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$color);
       }
       $this->logger->debug("$entity $entity_id ($entity_label) added on event ".$event->id);
       $event->addAttendee($entity,$entity_id,$entity_label,$state);      

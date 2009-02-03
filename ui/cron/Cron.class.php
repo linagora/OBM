@@ -72,7 +72,7 @@ class Cron {
     while (false !== ($jobFile = $jobsFile->read())) {
       if(is_file($jobsPath.$jobFile) && Cron::isCronJob($jobFile)) {
         $klass = Cron::getCronJobClass($jobFile);
-        $this->logger->debug("$klass scheduled for execution");
+        $this->logger->debug("$klass registred");
         include_once($jobsPath.$jobFile);
         $this->jobs[] = new $klass;
       }
@@ -119,6 +119,8 @@ class Cron {
             include_once($file);
           }
           $job->execute($this->date); 
+        } else {
+          $this->logger->info(get_class($job)." will not be executed");
         }
       }
       $this->unlock();

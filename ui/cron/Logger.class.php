@@ -46,13 +46,13 @@ class Logger {
   }
 
   // TODO set log handler
-  function log($message,$level, $caller) {
-    //if($level <= L_LEVEL) {
-    //  echo date("Y-m-d H:i:s")." [".Logger::getLevelLabel($level)."] [$caller] : $message \n";
-    //}
+  static function log($message,$level, $caller) {
+    if($level <= L_LEVEL) {
+      echo date("Y-m-d H:i:s")." [".Logger::getLevelLabel($level)."] [$caller] : $message \n";
+    }
   }
 
-  function getLevelLabel($level) {
+  static function getLevelLabel($level) {
     switch($level) {
     case L_CORE :
       return "Core";
