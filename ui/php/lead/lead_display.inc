@@ -583,7 +583,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
         <th>$l_upd_comment</th>
         <td>&nbsp;</td>
       </tr><tr>
-        <td colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td colspan=\"2\"><textarea name=\"ta_comment\" rows=\"16\" cols=\"78\">$comment</textarea></td>
       </tr>";
     $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
@@ -665,7 +665,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
       
-   <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
+   <textarea name=\"ta_add_comment\" rows=\"16\" cols=\"78\">$add_comment</textarea>
     $dis_comment
     </fieldset>
 

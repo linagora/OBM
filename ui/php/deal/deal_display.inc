@@ -1417,7 +1417,7 @@ $js_status_loop
   if ($comment != '') {
     $dis_comment = "
     $l_upd_comment
-    <textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea>";
+    <textarea name=\"ta_comment\" rows=\"20\" cols=\"78\">$comment</textarea>";
   }
 
   if ( ($action == 'new') || ($action == 'insert') ||
@@ -1606,7 +1606,7 @@ $js_status_loop
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
         <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
-     <textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea>
+     <textarea name=\"ta_add_comment\" rows=\"12\" cols=\"78\">$add_comment</textarea>
       $dis_comment
   </fieldset>
  
@@ -1792,9 +1792,9 @@ $js_status_loop
      <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_no\" $rd_mail_no_c />$l_no
      <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_members\" $rd_mail_members_c />$l_members
      <input name=\"rd_mail_comment\" type=\"radio\" value=\"$l_group\" $rd_mail_group_c />$l_group
-     <textarea name=\"ta_add_comment\" rows=\"8\" cols=\"78\">$add_comment</textarea>
+     <textarea name=\"ta_add_comment\" rows=\"12\" cols=\"78\">$add_comment</textarea>
      $l_upd_comment
-     <textarea name=\"ta_comment\" rows=\"8\" cols=\"78\">$comment</textarea>
+     <textarea name=\"ta_comment\" rows=\"20\" cols=\"78\">$comment</textarea>
   </fieldset>
 
     <fieldset class=\"buttons\">
@@ -3520,13 +3520,13 @@ function html_deal_parentdeal_form($action, $deal_q, $users_c, $users_p, $deal) 
 
   <fieldset class=\"detail extra\">
   <legend>$l_comment</legend>
-  <textarea name=\"ta_pcom\" rows=\"8\" cols=\"72\">$pcomment</textarea>
+  <textarea name=\"ta_pcom\" rows=\"20\" cols=\"72\">$pcomment</textarea>
   </fieldset>  
 
-    <fieldset class=\"buttons\">
-      $dis_button
-    </fieldset>
-    </form>
+  <fieldset class=\"buttons\">
+    $dis_button
+  </fieldset>
+  </form>
 ";
 
   return $block;

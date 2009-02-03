@@ -382,7 +382,11 @@ function dis_time_user_planning($obm_q, $time) {
     if ($shortname == '') {
       $shortname = $dis_label;
     }
-    $projects[$type.$project_id] = "<abbr title=\"$label\">$shortname</abbr>";
+    if ($type == 'project') {
+      $projects[$type.$project_id] = "<a href=\"$path/project/project_index.php?action=detailconsult&project_id=$project_id\" title=\"$label\">$shortname</a>";
+    } else {
+      $projects[$type.$project_id] = "<abbr title=\"$label\">$shortname</abbr>";
+    }
     $users[$u_id] = $obm_q->f('userobm_lastname').' '. $obm_q->f('userobm_firstname');
     $planning[$u_id][$type.$project_id]["$day"] = $obm_q->f('timetask_length')/$c_day_fraction;
     $planning[$u_id][$type.$project_id]['length'] += $obm_q->f('timetask_length')/$c_day_fraction;
@@ -746,6 +750,7 @@ function dis_time_form_addtask($time, $validate_days) {
   } else {
     $obm_action = 'insert';
     $time_label = '';
+    $is_time = $c_day_fraction;
 
     // Day checkboxes construction
     // Precheck current day
