@@ -136,7 +136,7 @@ sub _init {
         $hostDesc->{'host_samba_group_sid'} = $self->_getGroupSID( $domainSid, $hostDesc->{'host_gid'} );
         $hostDesc->{'host_samba_flags'} = '[W]';
 
-        if( $self->getNTLMPasswd( $hostDesc->{'host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
+        if( $self->_getNTLMPasswd( $hostDesc->{'host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
             $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 3 );
             if( $hostDesc->{'host_samba'} ) {
                 $self->_log( 'droit samba annulé', 2 );
