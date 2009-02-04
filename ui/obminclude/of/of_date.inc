@@ -124,8 +124,13 @@ class Of_Date extends DateTime {
       'r' => 'date', 'U' => 'timestamp');     
 
   private static $STRING_TO_PHP = array(
-      'day' => 'd', 'weekday' => 'N', 'week' => 'W', 'month' => 'm',
-      'year' => 'Y', 'hour' => 'H', 'minute' => 'i', 'second' => 's', 'timestamp' => 'U');
+      'day' => 'd', 'weekday' => 'N', 'week' => 'W', 'month' => 'm', 'weekday' => 'w',
+      'year' => 'Y', 'hour' => 'H', 'minute' => 'i', 'second' => 's', 'timestamp' => 'U'
+    );
+
+  private static $PHP_TO_STRING = array(
+      'd' => 'day', 'N' => 'weekday', 'W' => 'week', 'm' => 'month', 'w' => 'weekday',
+      'Y' => 'year', 'H' => 'hour', 'i' => 'minute', 's' => 'second', 'U' => 'timestamp');
 
   private static $DAY_LIST = array('sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');
 
@@ -149,12 +154,14 @@ class Of_Date extends DateTime {
 
   private static $_loaded = false;
 
+  private static $_cache = array();
+
   private static $_today;
 
   private $_error;
   
   private $originalTimeZone;
-  
+
   public function __construct($time=null, $timezone=null) {
     self::loadOptions();
     if(is_numeric($time)) {
@@ -1489,6 +1496,7 @@ class Of_Date extends DateTime {
    */
   private function _parse($parts,$date, $format) {
     if(is_numeric($date)) {
+      if($parts == null) $parts = self::TIMESTAMP;
       switch($parts) {
         case self::DAY : 
         case self::WEEK : 
@@ -1499,22 +1507,48 @@ class Of_Date extends DateTime {
         case self::HOUR : 
         case self::MINUTE : 
         case self::SECOND : 
-          $data[self::$ISO_TO_STRING[self::$PHP_TO_ISO[$parts][0]]] = $date;
+        case self::TIMESTAMP :
+          return array(self::$PHP_TO_STRING[$parts] => $date);
           break;
         default :
           $time = new of_Date("@$date");
+          if(isset(self::$PHP_TO_STRING[$parts])) {
+            return array(self::$PHP_TO_STRING[$parts] => $time->format($parts));
+          // FIXME : Optimization purpose, should not be done this way!
+          } elseif($parts == 'Y-m-d') {
+            return array('year' => $time->format(self::YEAR),'month' => $time->format(self::MONTH), 'day' => $time->format(self::DAY));            
+          }
           $data = $time->toArray();
       }
-    } elseif($date instanceof DateTime) {
-      $data = $date->toArray();
+    } elseif(is_object($date)) {
+      if(isset(self::$PHP_TO_STRING[$parts])) {
+        return array(self::$PHP_TO_STRING[$parts] => $date->format($parts));
+      // FIXME : Optimization purpose, should not be done this way!
+      } elseif($parts == 'Y-m-d') {
+        return array('year' => $date->format(self::YEAR),'month' => $date->format(self::MONTH), 'day' => $date->format(self::DAY));
+      } elseif($parts == null) {
+        return array('timestamp' => $date->format(self::TIMESTAMP));
+      } else {
+        $data = $date->toArray();
+      }      
     } else {
       $data = self::_parseDate($date, $format);
     } 
+
     if(!is_null($parts)) {
-      $parts =  str_split(strtr($parts, self::$PHP_TO_ISO));
-      foreach($parts as $part) {
-        if(isset(self::$ISO_TO_STRING[$part]) && isset($data[self::$ISO_TO_STRING[$part]]))
-          $result[self::$ISO_TO_STRING[$part]] = $data[self::$ISO_TO_STRING[$part]]; 
+      if(isset(self::$PHP_TO_STRING[$parts])) {
+        $result = array(self::$PHP_TO_STRING[$parts] => $data[self::$PHP_TO_STRING[$parts]]);
+      // FIXME : Optimization purpose, should not be done this way!
+      } elseif($parts == 'Y-m-d') {
+        $result = array('year' => $data['year'], 'month' => $data['month'], 'day' => $data['day']);
+      } else {
+        $parts_array =  str_split(strtr($parts, self::$PHP_TO_ISO));
+        $filter = array();
+        foreach($parts_array as $part) {
+          if(isset(self::$ISO_TO_STRING[$part]) && isset($data[self::$ISO_TO_STRING[$part]]))
+            $filter[self::$ISO_TO_STRING[$part]] = '';
+        }         
+        $result = array_intersect_key($data, $filter);
       }
     } else {
       $result = $data;
@@ -1590,7 +1624,8 @@ class Of_Date extends DateTime {
    */
   function custom($string) {
     $this->modify($string);
-    $this->modify('');
+    //Seems to clear an internal cache... magical power inside
+    // $this->modify('');
     return $this;
   }
 
@@ -1601,19 +1636,11 @@ class Of_Date extends DateTime {
    * @return void
    */
   public function toArray() {
-        return array('day'       => $this->format(self::DAY),
-                     'month'     => $this->format(self::MONTH),
-                     'year'      => $this->format(self::YEAR),
-                     'hour'      => $this->format(self::HOUR),
-                     'minute'    => $this->format(self::MINUTE),
-                     'second'    => $this->format(self::SECOND),
-                     'timezone'  => $this->format(self::TIMEZONE),
-                     'timestamp' => $this->format(self::TIMESTAMP),
-                     'weekday'   => $this->format(self::WEEKDAY_DIGIT),
-                     'dayofyear' => $this->format(self::DAYOFYEAR),
-                     'week'      => $this->format(self::WEEK),
-                     'gmtsecs'   => $this->format(self::TIMEZONE_SECS));
-
+    $array = date_parse($this->getIso());
+    $array['timestamp'] = $this->format(self::TIMESTAMP);
+    $array['weekday'] = $this->format(self::WEEKDAY_DIGIT);
+    $array['week'] = $this->format(self::WEEK);
+    return $array;
   }
 
   /**
