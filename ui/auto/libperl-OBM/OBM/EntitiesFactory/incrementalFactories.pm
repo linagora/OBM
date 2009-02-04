@@ -296,8 +296,7 @@ sub _initUpdateFactory {
         if( defined($updateDesc->{'updatedlinks_entity_id'}) ) {
             push( @{$idByUpdateType->{'UPDATE_ALL'}->{$updateDesc->{'updated_table'}}}, $updateDesc->{'updated_entity_id'} );
         }else {
-            push(
-            @{$idByUpdateType->{'UPDATE_ENTITY'}->{$updateDesc->{'updated_table'}}}, $updateDesc->{'updated_entity_id'} );
+            push( @{$idByUpdateType->{'UPDATE_ENTITY'}->{$updateDesc->{'updated_table'}}}, $updateDesc->{'updated_entity_id'} );
         }
     }
 
