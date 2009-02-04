@@ -1625,7 +1625,7 @@ class Of_Date extends DateTime {
   function custom($string) {
     $this->modify($string);
     //Seems to clear an internal cache... magical power inside
-    // $this->modify('');
+    $this->modify('');
     return $this;
   }
 
