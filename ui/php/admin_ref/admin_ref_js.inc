@@ -134,7 +134,7 @@ function check_admin_ref_tt_checkdel(sel)
 function check_admin_ref_tt_upd(form, sel_del_tt)
 {
   tt_pos = sel_del_tt.selectedIndex;
-  if ((tt_pos >= 0) && (form.tf_label.value != \"\")) {
+  if ((tt_pos >= 0) && (form.tf_tt_label.value != \"\")) {
     form.sel_tasktype_id.value=sel_del_tt.options[tt_pos].value;
     return true;
    } else {

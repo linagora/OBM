@@ -1229,16 +1229,16 @@ function html_company_form($action, $co_q, $dsrc_q, $types, $acts, $naf_q, $user
   </fieldset>
   
   <fieldset class=\"detail infos\" id='phoneHolder'>
-    <legend>$l_phone <a href='' onclick=\"new Obm.Contact.PhoneWidget();return false;\">$l_add</a></legend>
+    <legend>$l_phone <a href='' onclick=\"new Obm.Company.PhoneWidget();return false;\">$l_add</a></legend>
     </fieldset>
     <fieldset class=\"detail infos\" id='addressHolder'>
-    <legend>$l_address <a href='' onclick=\"new Obm.Contact.AddressWidget();return false;\">$l_add</a></legend>
+    <legend>$l_address <a href='' onclick=\"new Obm.Company.AddressWidget();return false;\">$l_add</a></legend>
     </fieldset>
     <fieldset class=\"detail infos\" id='emailHolder'>
-    <legend>$l_email <a href='' onclick=\"new Obm.Contact.EmailWidget();return false;\">$l_add</a></legend>
+    <legend>$l_email <a href='' onclick=\"new Obm.Company.EmailWidget();return false;\">$l_add</a></legend>
     </fieldset>
     <fieldset class=\"detail infos\" id='websiteHolder'>
-    <legend>$l_website <a href='' onclick=\"new Obm.Contact.WebsiteWidget();return false;\">$l_add</a></legend>
+    <legend>$l_website <a href='' onclick=\"new Obm.Company.WebsiteWidget();return false;\">$l_add</a></legend>
     </fieldset>
     <script type='text/javascript'>
       $js

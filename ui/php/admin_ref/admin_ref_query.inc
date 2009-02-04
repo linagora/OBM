@@ -124,9 +124,11 @@ function run_query_admin_ref_country_company_links($iso) {
   $multidomain = sql_multidomain('company');
   $query = "SELECT company_id,
       company_name,
-      company_country_iso3166
+      address_country as company_country_iso3166
     FROM Company
-    WHERE company_country_iso3166='$iso'
+    INNER JOIN CompanyEntity ON company_id = companyentity_company_id
+    INNER JOIN Address ON address_entity_id = companyentity_entity_id
+    WHERE address_country='$iso'
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_admin_ref_country_company_links()');
@@ -149,9 +151,11 @@ function run_query_admin_ref_country_contact_links($iso) {
   $query = "SELECT contact_id,
       contact_lastname,
       contact_firstname,
-      contact_country_iso3166
+      address_country as contact_country_iso3166
     FROM Contact
-    WHERE contact_country_iso3166='$iso'
+    INNER JOIN ContactEntity ON contact_id = contactentity_contact_id
+    INNER JOIN Address ON address_entity_id = contactentity_entity_id
+    WHERE address_country='$iso'    
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_admin_ref_country_contact_links()');

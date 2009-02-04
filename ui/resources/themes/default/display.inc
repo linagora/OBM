@@ -455,9 +455,9 @@ function display_head_theme($p_module) {
 
 </head>
 
-<body onload=\"if (document.f_search) {
+<body onload=\"if (document.f_search && document.f_search.elements[0]) {
     document.f_search.elements[0].focus();
-  } else if (document.f_entity) {
+  } else if (document.f_entity && document.f_entity.elements[0]) {
     document.f_entity.elements[0].focus();
   } \">
 "
