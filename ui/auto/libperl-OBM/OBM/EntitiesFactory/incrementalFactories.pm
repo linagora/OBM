@@ -269,7 +269,7 @@ sub _initUpdateFactory {
                         updated_entity_id,
                         updatedlinks_entity_id
                  FROM Updated
-                 LEFT JOIN Updatedlinks ON updated_domain_id=updatedlinks_domain_id AND updated_user_id=updatedlinks_user_id AND updated_delegation=updatedlinks_delegation AND updated_entity_id=updatedlinks_entity_id
+                 LEFT JOIN Updatedlinks ON updated_user_id=updatedlinks_user_id AND updated_delegation=updatedlinks_delegation AND updated_entity_id=updatedlinks_entity_id
                  WHERE updated_domain_id='.$entitiesFactory->{'domain'}->getId();
 
     if( defined($entitiesFactory->{'userId'}) ) {
