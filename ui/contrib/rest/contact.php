@@ -103,7 +103,7 @@ function get_contact_detail() {
  */
 function get_contact_detail_by_id($id) {
   $field_list = array('contact_id' => 'contact_id', 
-  		 'contactfunction_label' => 'contact_function',
+  	 'contactfunction_label' => 'contact_function',
 		 'contact_firstname' => 'contact_firstname',
 		 'contact_lastname' => 'contact_lastname',
 		 'kind_minilabel' => 'contact_genre',
@@ -137,29 +137,105 @@ function get_contact_detail_by_id($id) {
  * @return string XML representation of the search results (list of contact ids that match the query)
  */
 function get_contact_search() {
-  $obm_q = run_query_contact_search($_GET) ;
+  // the obm var nams and the search parameters names may be different
+  $replacement = array('fname' => 'firstname',
+    'lname' => 'lastname',
+    'privacy' => 'privacy',
+    'number'=>'number',
+    'phone'=>'phone',
+    'email'=>'email',
+    'company'=>'company',
+    'zip'=>'zip',
+    'town'=>'town',
+    'country'=>'country',
+    'datasource'=>'datasource',
+    'function'=>'function',
+    'title'=>'title',
+    'market'=>'market',
+    'date_field'=>'date_type',
+    'date_after'=>'date_after',
+    'date_before'=>'date_before',
+  );
 
+   $field_list = array('contact_id' => 'contact_id', 
+  	 'contactfunction_label' => 'contact_function',
+		 'contact_firstname' => 'contact_firstname',
+		 'contact_lastname' => 'contact_lastname',
+		 'kind_minilabel' => 'contact_genre',
+		 'contact_title' => 'contact_title',
+		 'contact_service' => 'contact_office',
+		 'contact_address1' => 'contact_address1',
+		 'contact_address2' => 'contact_address2',
+		 'contact_address3' => 'contact_address3',
+		 'company_town' => 'company_town',
+		 'company_zipcode' => 'company_zipcode',
+		 'company_country_name' => 'company_country',
+		 'company_phone' => 'company_phone',
+		 'company_fax' => 'company_fax',
+     'contact_email' => 'contact_email'
+   );
+
+  $get=array();
+  $root_node='listing';
+  
+  $multi_search = false;
+  $require_fields = array();
+
+  $field_list = prepare_field_list($_GET,$field_list);
+  
+  foreach($replacement as $key => $value){
+    if(isset($_GET[$value])){
+      $get[$key]=$_GET[$value];
+    }
+  }
+
+  $multi_search = search_multicritere($get,&$multicritere,&$champ);
+
+
+  $datas = array();
+  if($multi_search){
+    $root_node='multisearch';
+    foreach($multicritere as $val){
+      $get[$champ]=$val;
+      $data = get_contact_mono_search($get,$field_list);
+      if(!empty($data)){
+        $datas=array_merge($datas,$data);
+      }
+    }
+  } else {
+    $field_list=array('contact_id' => 'contact_id');
+    $datas=get_contact_mono_search($get,$field_list);
+  }
+  
+  // if no datas, return
+  if (count($datas) == 0) {
+    return ;
+  }
+  return create_xml($datas,$root_node,'contact',$multi_search);
+}
+
+/**
+ * get_contact_search
+ *
+ * @return array list of entity fields
+ */
+function get_contact_mono_search($get,$field_list) {
+  
+  $obm_q = run_query_contact_search($get) ;
   // if no result
   if ($obm_q->num_rows_total() < 1) {
     return ;
   }
-
-  // else
-  // create xml doc
-  $xml_doc = new DOMDocument('1.0', 'UTF-8') ;
-
-  // create listing node
-  $listing_node = $xml_doc->createElement('listing') ;
-  $xml_doc->appendChild($listing_node) ;
-
+  
+  $row = array();
   // foreach id, create xml node and add it to doc
   while($row = $obm_q->next_record()) {
-    $id_node = create_listing_node(&$xml_doc, $listing_node, 'contact', $obm_q->f('id')) ;
+    foreach($field_list as $sql_field => $name) {
+      $data[$name]=$obm_q->f($sql_field);
+    }
+    $datas[" ".$obm_q->f('id')." "] = $data ;
   }
-
-  // return xml doc
-  $xml_string = $xml_doc->saveXML() ;
-  return $xml_string ;
+  return $datas ;
 }
 
 ?>

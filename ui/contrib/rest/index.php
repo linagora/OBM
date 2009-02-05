@@ -30,6 +30,33 @@ function no_result() {
   exit() ;
 }
 
+function create_xml($entity,$root_node,$name_entity,$multisearch=false){
+  $xml_doc = new DOMDocument('1.0', 'UTF-8') ;
+  
+  $head_node = $xml_doc->createElement($root_node) ;
+  $xml_doc->appendChild($head_node) ;
+  
+  foreach($entity as $key => $data){
+    if($multisearch){
+      // create entity node
+      $entity_node = $xml_doc->createElement($name_entity) ;
+      $head_node->appendChild($entity_node) ;
+      // foreach data, create xml node, add it to contact node
+      foreach ($data as $name => $value) {
+        $new_node = $xml_doc->createElement($name, utf8_encode(htmlspecialchars($value, ENT_COMPAT, "UTF-8"))) ;
+        $entity_node->appendChild($new_node) ;
+      }
+    } else {
+      foreach ($data as $name => $value) {
+        create_listing_node(&$xml_doc, $head_node, $name_entity, $value) ;
+      }
+    }
+  }
+  // return xml doc
+  $xml_string = $xml_doc->saveXML() ;
+  return $xml_string ;
+}
+
 /**
  * create_listing_node
  *
@@ -56,6 +83,73 @@ function create_listing_node($xml_doc, $listing_node, $entity, $entity_id) {
  */
 function sanitize_param($key) {
   return filter_var($key, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) ;
+}
+
+/**
+* search_multicritere
+ *
+ * Analyse multivalued criteria in search string
+ *
+ * @param array $get array of all search fields (fields must be pre-filtered for obm run_query_search use)
+ * @param array $multicritere array, passed by reference, that will store all criteria
+ * @param string $champ passed by reference, will store the name of the multivalued criteria
+ *
+ */
+
+function search_multicritere($get,&$multicritere,&$champ){
+  global $multi_value_separator;
+  // boolean : is there a multivalued criteria ?
+  $multi=false;
+  // get all multivalued criterii
+  $pattern = "/^.*[$multi_value_separator].*$/";
+  $multivalue = preg_grep($pattern,$get);
+  // is there one and only one multivalued field
+  // if more than one multivalued field, send an error 500
+  $nb_multi = count($multivalue);
+  if($nb_multi > 1){
+    internal_error('only one multivalued search criteria');
+  } elseif ($nb_multi == 1) {
+    // else get all values from the multivalued criteria
+    // just say that we have one multivalued criteria    
+    $multi = true;
+    $champ = key($multivalue);
+    $multicritere = explode($multi_value_separator,$multivalue[$champ]);
+  }
+
+  // returns if there's a multivalued criteria or not
+  return $multi;
+}
+
+/* prepare_field_list
+ * 
+ * analyse if required_fields are asked
+ *
+ * @param array $get array all fields of search string
+ * @param array $source_fields array of allowed fields
+ * @return array array of exported fields
+ */
+function prepare_field_list($get,$source_field){
+  global $multi_value_separator;
+  
+  $field_list = array();
+
+  $require_fields = $get['require_fields']; 
+
+  // Is there a required_field parameter ?
+  // If there's a required_field, get all required fields
+  if(isset($require_fields) && !empty($require_fields)){
+    $require_fields = explode($multi_value_separator,$require_fields);
+    $field_list = array_intersect($source_field,$require_fields);
+    // Are the required fields allowed ?
+    $valid = array_diff($require_fields,$field_list);
+    // If not allowed, send an error 500
+    if(!empty($valid)){
+      internal_error('invalid required field');
+    }
+  } else {
+    $field_list=$source_field;
+  }
+  return $field_list;
 }
 
 /**

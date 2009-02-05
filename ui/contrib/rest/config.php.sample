@@ -18,5 +18,6 @@ $set_rows = 'ALL' ; // same as "no LIMIT"
 
 $obm['uid'] = 1 ; // admin uid
 $ctu_sql_limit = false ;
+$multi_value_separator = '|';
 
 ?>

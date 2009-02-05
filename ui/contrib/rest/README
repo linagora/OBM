@@ -57,9 +57,95 @@ The URL are :
 
  - for a search
    http://www.domain.tld/obm/rest/<entity>/search/<query> 
-   ex. : http://www.mydomain.com/obm/rest/contact/search/fname=Roger&town=Paris
+   ex. : http://www.mydomain.com/obm/rest/contact/search/firstname=Roger&town=Paris
 
+ - for a multi-search
+   http://www.domain.tld/obm/rest/<entity>/search/<query> 
+   ex. : http://www.mydomain.com/obm/rest/contact/search/firstname=Roger|Robert&town=Paris
 
+ - for a multi-search with only some field 
+   http://www.domain.tld/obm/rest/<entity>/search/<query> 
+   ex. : http://www.mydomain.com/obm/rest/contact/search/firstname=Roger|Paul&town=Paris&require_fields=contact_firstname|contact_lastname
+  
+  
+
+========================================================
+Allowed parameters for multi-parameters search 
+========================================================
+company search parameters
+
+	name
+	number
+	phone
+	zip
+	town
+	country
+	type
+	activity
+	datasource
+	market
+	date_after
+	date_before
+	naf
+
+contact search parameters 
+
+	firstname
+	lastname
+	archive
+	number
+	phone
+	email
+	company
+	zip
+	town
+	country
+	datasource
+	function
+	title
+	market
+	date_type
+	date_after
+	date_before
+
+========================================================
+Allowed field for multi-parameters search 
+========================================================
+
+contact view field 
+
+  contact_id
+  contact_function
+  contact_firstname
+  contact_lastname
+  contact_genre
+  contact_title
+  contact_office
+  contact_address1
+  contact_address2
+  contact_address3
+  company_town
+  company_zipcode
+  company_country
+  company_phone
+  company_fax
+  contact_email
+
+company view field 
+
+  company_id
+  company_name
+  company_number
+  company_isin
+  company_address1
+  company_address2
+  company_address3
+  company_town
+  company_zipcode
+  company_country
+  company_phone
+  company_fax
+  company_web
 
 =============================
 Tech notes
@@ -74,6 +160,7 @@ contact.php and company.php are similar
 	get_contact_list constructs the xml list of all contacts
 	get_contact_detail_by_id queries the database and manage a translation between db field and wml field names
 	get_contact_detail constructs the xml detail listing for one contact
-	get_contact_search contructs the xml listing of all contacts matching the <query>, using the search function of OBM framework
+	get_contact_search replacement of fields in obm fields
+	get_contact_mono_search use the search function of OBM framework
 
 
