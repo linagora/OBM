@@ -141,17 +141,12 @@ sub _initHostFactory {
         return 1;
     }
 
-    my $source = $self->_getSourceByUpdateType();
-    if( !defined($source) ) {
-        return 1;
-    }
-
     if( $#{$entitiesIds} >= 0 ) {
         my $entityFactory;
 
         require OBM::EntitiesFactory::hostFactory;
-        if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( $source, $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des hôtes à supprimer', 3 );
+        if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
+            $self->_log( 'problème au chargement de la factory des hôtes', 3 );
             return 1;
         }
 
@@ -171,17 +166,12 @@ sub _initGroupFactory {
         return 1;
     }
 
-    my $source = $self->_getSourceByUpdateType();
-    if( !defined($source) ) {
-        return 1;
-    }
-
     if( $#{$entitiesIds} >= 0 ) {
         my $entityFactory;
 
         require OBM::EntitiesFactory::groupFactory;
-        if( !($entityFactory = OBM::EntitiesFactory::groupFactory->new( $source, $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des groupes à supprimer', 3 );
+        if( !($entityFactory = OBM::EntitiesFactory::groupFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
+            $self->_log( 'problème au chargement de la factory des groupes', 3 );
             return 1;
         }
 
@@ -201,17 +191,12 @@ sub _initMailshareFactory {
         return 1;
     }
 
-    my $source = $self->_getSourceByUpdateType();
-    if( !defined($source) ) {
-        return 1;
-    }
-
     if( $#{$entitiesIds} >= 0 ) {
         my $entityFactory;
 
         require OBM::EntitiesFactory::mailshareFactory;
-        if( !($entityFactory = OBM::EntitiesFactory::mailshareFactory->new( $source, $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des partages de messagerie à supprimer', 3 );
+        if( !($entityFactory = OBM::EntitiesFactory::mailshareFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
+            $self->_log( 'problème au chargement de la factory des partages de messagerie', 3 );
             return 1;
         }
 
@@ -231,17 +216,12 @@ sub _initUserFactory {
         return 1;
     }
 
-    my $source = $self->_getSourceByUpdateType();
-    if( !defined($source) ) {
-        return 1;
-    }
-
     if( $#{$entitiesIds} >= 0 ) {
         my $entityFactory;
 
         require OBM::EntitiesFactory::userFactory;
-        if( !($entityFactory = OBM::EntitiesFactory::userFactory->new( $source, $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
-            $self->_log( 'problème au chargement de la factory des utilisateurs à supprimer', 3 );
+        if( !($entityFactory = OBM::EntitiesFactory::userFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
+            $self->_log( 'problème au chargement de la factory des utilisateurs', 3 );
             return 1;
         }
 

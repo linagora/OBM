@@ -14,6 +14,7 @@ use OBM::Tools::commonMethods qw(
         );
 use OBM::EntitiesFactory::commonFactory qw(
         _checkSource
+        _getSourceByUpdateType
         _checkUpdateType
         _getEntityRight
         _computeRight
@@ -23,17 +24,17 @@ use OBM::Parameters::regexp;
 
 sub new {
     my $class = shift;
-    my( $source, $updateType, $parentDomain, $ids ) = @_;
+    my( $updateType, $parentDomain, $ids ) = @_;
 
     my $self = bless { }, $class;
 
-    $self->{'source'} = $source;
-    if( !$self->_checkSource() ) {
+    $self->{'updateType'} = $updateType;
+    if( !$self->_checkUpdateType() ) {
         return undef;
     }
 
-    $self->{'updateType'} = $updateType;
-    if( !$self->_checkUpdateType() ) {
+    $self->{'source'} = $self->_getSourceByUpdateType();
+    if( !$self->_checkSource() ) {
         return undef;
     }
 
