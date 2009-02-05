@@ -164,6 +164,22 @@ $cgp_default_right = array (
     )
   );
 
+$profiles['admin'] = array (
+  'section' => array (
+    'default' => 1
+  ),
+  'module' => array (
+    'default' => $perm_admin,
+    'toto' =>  0,
+    'domain' => 0),
+  'properties' => array (
+    'admin_realm' => array ('user', 'delegation', 'domain')
+    ),
+  'level' => 1,
+  'level_managepeers' => 1,
+  'access_restriction' => 'ALLOW_ALL'
+
+);
 
 //-----------------//
 // Displayed Infos //

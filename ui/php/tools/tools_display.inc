@@ -97,7 +97,8 @@ function dis_tools_update_detail() {
         }
 
         $dis_realm_board = html_tools_javascript($domain_id)
-            ."<a id=\"link_domain_$domain_id\">Voir le détail</a>
+            ."<a href='' onclick='return false;' id=\"link_domain_$domain_id\">$GLOBALS[l_show_details]<img src='$GLOBALS[ico_add]' alt='$GLOBALS[l_show_details]' /></a>
+            <br /><br />
             <table id=\"table_domain_$domain_id\" class=\"spreadSheet\">
               $dis_row_update
             </table>";
@@ -141,34 +142,44 @@ function html_tools_update_entity_table($entity, $nb) {
     <thead><tr>
       <th colspan=\"4\">$dis_entity</th>
     </tr></thead>
+    <tbody>
     <tr>
       <td$class_cre>$l_created : <span id=\"count_{$entity}_created\">$nb[created]</span></td>
       <td$class_upd>$l_updated : <span id=\"count_{$entity}_updated\">$nb[updated]</td>
       <td$class_del>$l_deleted : <span id=\"count_{$entity}_deleted\">$nb[deleted]</td>
       <td$class_lnk>$l_links : $nb[links]</td>
-    </tr>";
-  $block .= '<tr>'
-    .html_tools_update_detail_list($entity, 'created', $nb['created_entities'])
-    .html_tools_update_detail_list($entity, 'updated', $nb['updated_entities'])
-    .html_tools_update_detail_list($entity, 'deleted', $nb['deleted_entities'])
-    .'<td></td>'
-    .'</tr>';
+    </tr>
+    </tbody>
+      ";
+  $block .= html_tools_update_detail_list($entity, $nb);
   return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Updates unordered list
 ///////////////////////////////////////////////////////////////////////////////
-function html_tools_update_detail_list($entity, $state, $entities) {
+function html_tools_update_detail_list($entity, $entities) {
   $block = '';
-  if (!empty($entities)) {
-    $block .= '<ul style="display:none;">';
-    foreach ($entities as $en) {
-      $block .= "<li id=\"item_{$entity}_$en[id]\">$en[repr]&nbsp;".html_tools_delete_button($entity, $state, $en['id'])."</li>";
+  $cpt = count($entities['created_entities']) | count($entities['updated_entities']) | count($entities['deleted_entities']) ;
+  if($cpt > 0) {
+    for($i=0; $i < $cpt; $i++) {
+      if($i%2 == 0) {
+        $klass = 'pair';
+      } else {
+        $klass = '';
+      }
+      $created = (isset($entities['created_entities'][$i]))?$entities['created_entities'][$i]['repr'].' '.html_tools_delete_button($entity, 'created', $entities['created_entities'][$i]['id']):'';
+      $updated = (isset($entities['updated_entities'][$i]))?$entities['updated_entities'][$i]['repr'].' '.html_tools_delete_button($entity, 'updated', $entities['updated_entities'][$i]['id']):'';
+      $deleted = (isset($entities['deleted_entities'][$i]))?$entities['deleted_entities'][$i]['repr'].' '.html_tools_delete_button($entity, 'deleted', $entities['deleted_entities'][$i]['id']):'';
+      $block .= "<tr class='$klass'><td>$created</td><td>$updated</td><td>$deleted</td><td></td><tr>";
     }
-    $block .= '</ul>';
+    $block = '
+      <tbody style="display:none;" class="detail">
+      <tr><th colspan="4">'.$GLOBALS['l_details'].'Details</th></tr>
+      '.$block.'
+      </tbody>';
   }
-  return "<td>$block</td>";
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -179,12 +190,11 @@ function html_tools_delete_button($entity, $state, $id) {
 
   $block = "
     <img id=\"spinner_{$entity}_{$id}\" src=\"$resources_path/themes/default/images/spinner.gif\" style=\"display: none;\" />
-    <form method=\"post\" action=\"\" id=\"form_{$entity}_{$id}\" class=\"button-to\">
-      <input type=\"image\" value=\"Delete\" src=\"$resources_path/themes/default/images/ico_trash.gif\"
+      <img src=\"$resources_path/themes/default/images/ico_trash.gif\"
              onclick=\"if (confirm('{$l_js_ask_confirm}')) { postUpdateToDelete('$entity', '$state', '$id'); }; return false;\"/>
-    </form>";
+    ";
 
-//  return $block;
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -193,11 +203,11 @@ function html_tools_delete_button($entity, $state, $id) {
 function html_tools_javascript($domain_id) {
   return "
     <script type=\"text/javascript\">
-      window.addEvent('domready', function(){
+      obm.initialize.chain(function () {
         $('link_domain_$domain_id').addEvent('click', function(e){
-          $('table_domain_$domain_id').getElements('ul').each(function(item, index){
+          $('table_domain_$domain_id').getElements('tbody.detail').each(function(item, index){
             if (item.getStyle('display') == 'none') {
-              item.setStyle('display', 'block');
+              item.setStyle('display', '');
             } else {
               item.setStyle('display', 'none');
             }
@@ -206,14 +216,15 @@ function html_tools_javascript($domain_id) {
       });
       
       function postUpdateToDelete(entity, state, id) {
-        var req = new Ajax('$path/tools/tools_index.php?action=cancel_update', {
-          method: 'post',
-          data: {entity: entity, state: state, id: id},
-          onSuccess: function(){
-            $('item_'+entity+'_'+id).remove();
+        new Request({
+          url : 'tools_index.php',
+          data : {entity: entity, state: state, id: id, action: 'cancel_update'},
+          onSuccess : function(){
+            $('item_'+entity+'_'+id).dispose();
             $('count_'+entity+'_'+state).firstChild.nodeValue--;
           }
-        });
+        }).send();        
+
         $('form_'+entity+'_'+id).setStyle('display', 'none');
         $('spinner_'+entity+'_'+id).setStyle('display', 'inline');
         req.request();

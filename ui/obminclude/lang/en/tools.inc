@@ -35,3 +35,4 @@ $l_js_ask_confirm = "Are you sure ?";
 
 $l_halt = "System stop";
 $l_halt_aliamin = "Stopping system";
+$l_show_details = 'Show details';

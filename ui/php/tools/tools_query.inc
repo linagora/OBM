@@ -290,6 +290,7 @@ function run_query_tools_cancel_update($entity, $id) {
   foreach ($fields as $field) {
     if (strpos(strtolower($field['flags']),'primary') === false
         && !isset($metadata['exclude'][str_replace($metadata['prefix'].'_','',$field['name'])])) {
+
       $old_value = ($old_values[$field['name']] === null) ? 'NULL' : "'".$old_values[$field['name']]."'";
       $diffs[] = "$field[name] = $old_value";
     }
@@ -445,7 +446,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
       JOIN P_$metadata[table] as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['update']).")";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(updated)');
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(updated,'.$metadata['table'].')');
   $obm_qm->query($query);
   
   $return['updated'] = 0;
@@ -466,7 +467,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['update']).") 
       AND $primaries[production] IS NULL";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(created)');
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(created,'.$metadata['table'].')');
   $obm_qm->query($query);
   
   $return['created'] = 0;
@@ -485,7 +486,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
     JOIN P_$metadata[table] as Production ON deleted_entity_id = $primaries[production] AND deleted_table = '$metadata[table]'
     AND (".implode(' AND ',$rules['delete']).")
     ";
-  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(deleted)');
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(deleted,'.$metadata['table'].')');
   $obm_qm->query($query);
   
   $return['deleted'] = 0;
@@ -542,7 +543,7 @@ function run_query_tools_get_scope(&$metadata, &$rules) {
       LEFT JOIN $linkTable as Production ON ".implode(' AND ', $join)."
       WHERE (".implode(' OR ',$diff).") AND (".implode(' AND ', $rules['link']).")";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links, '.$metadata['link']['table'].')');
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_get_scope(links,'.$metadata['link']['table'].','.$metadata['table'].')');
   $obm_qm->query($query);
   $obm_qm->next_record();
   $return['links'] = $obm_qm->f('links');
