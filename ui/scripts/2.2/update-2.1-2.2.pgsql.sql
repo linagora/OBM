@@ -2921,6 +2921,22 @@ CREATE TABLE campaignpushtarget (
   PRIMARY KEY (campaignpushtarget_id)
 );
 
+
+--
+-- Name: synchedcontact; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+CREATE TABLE synchedcontact (
+  synchedcontact_user_id integer NOT NULL,
+  synchedcontact_contact_id integer NOT NULL,
+  synchedcontact_timestamp timestamp timestamp  without time zone NOT NULL DEFAULT now(),
+  PRIMARY KEY  (synchedcontact_user_id, synchedcontact_contact_id),
+  CONSTRAINT synchedcontact_user_id_userobm_id_fkey FOREIGN KEY (synchedcontact_user_id) REFERENCES UserObm (userobm_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT synchedcontact_contact_id_contact_id_fkey FOREIGN KEY (synchedcontact_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO SyncedContact (synchedcontact_user_id, synchedcontact_contact_id, synchedcontact_timestamp) 
+SELECT contact_usercreate, contact_id, contact_timecreate FROM Contact WHERE contact_privacy = 1 AND contact_usercreate IS NOT NULL;
+
 --
 --
 --

@@ -2494,6 +2494,18 @@ CREATE TABLE `CampaignPushTarget` (
 );
 
 --
+-- Table structure for table `SyncedContact`
+--
+CREATE TABLE `SynchedContact` (
+  `synchedcontact_user_id` int(8) NOT NULL,
+  `synchedcontact_contact_id` int(8) NOT NULL,
+  `synchedcontact_timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`synchedcontact_user_id`, `synchedcontact_contact_id`)
+);
+
+INSERT INTO SyncedContact (synchedcontact_user_id, synchedcontact_contact_id, synchedcontact_timestamp) 
+SELECT contact_usercreate, contact_id, contact_timecreate FROM Contact WHERE contact_privacy = 1 AND contact_usercreate IS NOT NULL;
+--
 --
 --
 DROP TABLE P_Samba;

@@ -2850,6 +2850,22 @@ CREATE TABLE `SubscriptionReception` (
   CONSTRAINT `subscriptionreception_userupdate_userobm_id_fkey` FOREIGN KEY (`subscriptionreception_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+--
+-- Table structure for table `SyncedContact`
+--
+DROP TABLE IF EXISTS `SynchedContact`;
+CREATE TABLE `SynchedContact` (
+  `synchedcontact_user_id` int(8) NOT NULL,
+  `synchedcontact_contact_id` int(8) NOT NULL,
+  `synchedcontact_timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`synchedcontact_user_id`, `synchedcontact_contact_id`),
+  KEY `synchedcontact_user_id_user_id_fkey` (`synchedcontact_user_id`),
+  KEY `synchedcontact_contact_id_contact_id_fkey` (`synchedcontact_contact_id`),
+  CONSTRAINT `synchedcontact_user_id_userobm_id_fkey` FOREIGN KEY (`synchedcontact_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `synchedcontact_contact_id_contact_id_fkey` FOREIGN KEY (`synchedcontact_contact_id`) REFERENCES `Contact` (`contact_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 --
 -- Table structure for table `TaskEvent`
 --

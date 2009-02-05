@@ -1958,6 +1958,15 @@ CREATE TABLE subscriptionreception (
     subscriptionreception_label character(12)
 );
 
+--
+-- Name: synchedcontact; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE synchedcontact(
+  synchedcontact_user_id integer NOT NULL,
+  synchedcontact_contact_id integer NOT NULL,
+  synchedcontact_timestamp timestamp  without time zone NOT NULL DEFAULT now()
+);
 
 --
 -- Name: tasktype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
@@ -5329,6 +5338,12 @@ ALTER TABLE ONLY subscriptionentity
 ALTER TABLE ONLY subscriptionreception
     ADD CONSTRAINT subscriptionreception_pkey PRIMARY KEY (subscriptionreception_id);
 
+--
+-- Name: synchedcontact_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY synchedcontact
+    ADD CONSTRAINT synchedcontact_pkey PRIMARY KEY (synchedcontact_user_id, synchedcontact_contact_id);
 
 --
 -- Name: tasktype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
@@ -8386,6 +8401,20 @@ ALTER TABLE ONLY subscriptionentity
 ALTER TABLE ONLY subscriptionentity
     ADD CONSTRAINT subscriptionentity_subscription_id_subscription_id_fkey FOREIGN KEY (subscriptionentity_subscription_id) REFERENCES subscription(subscription_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+--
+-- Name: synchedcontact_entity_id_entity_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY synchedcontact
+    ADD CONSTRAINT synchedcontact_contact_id_contact_id_fkey FOREIGN KEY (synchedcontact_contact_id) REFERENCES contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: synchedcontact_subscription_id_subscription_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY synchedcontact
+    ADD CONSTRAINT synchedcontact_user_id_userobm_id_fkey FOREIGN KEY (synchedcontact_user_id) REFERENCES user(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
 -- Name: subscriptionreception_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
