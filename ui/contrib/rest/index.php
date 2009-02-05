@@ -43,7 +43,7 @@ function create_xml($entity,$root_node,$name_entity,$multisearch=false){
       $head_node->appendChild($entity_node) ;
       // foreach data, create xml node, add it to contact node
       foreach ($data as $name => $value) {
-        $new_node = $xml_doc->createElement($name, utf8_encode(htmlspecialchars($value, ENT_COMPAT, "UTF-8"))) ;
+        $new_node = $xml_doc->createElement($name, utf8_encode(htmlspecialchars($value, ENT_COMPAT))) ;
         $entity_node->appendChild($new_node) ;
       }
     } else {
@@ -68,7 +68,7 @@ function create_xml($entity,$root_node,$name_entity,$multisearch=false){
  * @param string $entity_id obm id of the entity to add
  */
 function create_listing_node($xml_doc, $listing_node, $entity, $entity_id) {
-    $new_node = $xml_doc->createElement($entity, $entity_id)  ;
+    $new_node = $xml_doc->createElement($entity, utf8_encode(htmlspecialchars($entity_id, ENT_COMPAT)))  ;
     $new_node->setAttributeNode(new DOMAttr('url', URL_REST.'/'.$entity.'/'.$entity_id));
     $listing_node->appendChild($new_node) ;
 }
