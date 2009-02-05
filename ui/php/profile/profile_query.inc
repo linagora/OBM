@@ -90,8 +90,7 @@ function run_query_profile_update ($params) {
 
   $query = "UPDATE Profile SET
     profile_timeupdate = NOW(),
-    profile_userupdate = $uid,
-    profile_name = '$name'
+    profile_userupdate = $uid
     WHERE profile_id = $id
     $profile_multidomain
   ";
@@ -550,6 +549,28 @@ function run_query_profileproperty_list ($profile_id = NULL) {
   return $obm_q;
 }
 
+/**
+ * run_query_profile_exist 
+ * 
+ * @param mixed $name 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function run_query_profile_exist($name, $id) {
+  global $obm;
+  if($id) {
+    $update = "AND profile_id != $id";
+  }
+  $query = "
+    SELECT * FROM Profile INNER JOIN Domain ON  domain_id = profile_domain_id
+    WHERE profile_name = '$name' and (domain_global = TRUE OR domain_id = $obm[domain_id])
+    $update";
+  display_debug_msg($query, $cdg_sql, 'run_query_profileproperty_list()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q->next_record();  
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Checking functions
@@ -558,10 +579,16 @@ function check_profile_data_form($params) {
   global $err;
   global $php_regexp_profile_name;
   global $l_profile_name_empty;
-  global $l_profile_name_error;
+  global $l_profile_name_error,$l_profile_exists;
+  
 
   $return = true;
-
+  $exists = run_query_profile_exist($params['name'], $params['profile_id']);
+  if($exists === TRUE) {
+    $err['msg'] = $l_profile_exists;
+    $err['field'] = 'name';
+    $return = false;
+  }
   // Check profile name
   if (strlen($params['name']) == 0) {
     $err['msg'] = $l_profile_name_empty;

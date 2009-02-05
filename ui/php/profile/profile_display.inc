@@ -246,7 +246,9 @@ function html_profile_form($profile) {
       <input type="hidden" name="action" value="insert" />
       <input type="submit" value="'.$l_insert.'" />
       ';
+    $dis_name = "<input type='text' name='tf_name' value='$profile[name]' />";
   } else {
+    $dis_name = $profile['name']."<input type='hidden' name='tf_name' value='$profile[name]' />";;
     $dis_buttons = '
       <input type="hidden" name="action" value="update" />
       <input type="submit" value="'.$l_update.'" />
@@ -322,7 +324,7 @@ function html_profile_form($profile) {
     <fieldset class=\"detail infos\">
     <legend>$l_informations</legend>
     <table>
-    <tr><th>$l_name</th><td><input type='text' name='tf_name' value='$profile[name]' /></td>
+    <tr><th>$l_name</th><td>$dis_name</td>
     </table>
     </fieldset>
     <fieldset class=\"detail infos\">
@@ -505,14 +507,18 @@ function dis_property_access_exceptions_value($value, $update=false) {
  * @return void
  */
 function dis_property_admin_realm_value($value, $update=false) {
+  global $cgp_use;
   if($update) {
-    if(is_array($value))
+    if(is_array($value)) {
       foreach($value as $realm) 
         $$realm = 'selected="selected"';
-
+    } else {
+      $domain = 'selected="selected"';
+    }
+    if($cgp_use['property']['delegation']) $delegation = "<option value='delegation' $delegation>$GLOBALS[l_realm_delegation]</option>";
     return "<select multiple='multiple' name='property[admin_realm][]'>
       <option value='user' $user>$GLOBALS[l_realm_user]</option>
-      <option value='delegation' $delegation>$GLOBALS[l_realm_delegation]</option>
+      $delegation
       <option value='domain' $domain>$GLOBALS[l_realm_domain]</option>
       </select>";
   } else {
