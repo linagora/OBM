@@ -670,6 +670,27 @@ function run_query_time_short_month($time) {
     $order = 'userobm_lastname, userobm_firstname';
   }
 
+  // Get users that have tasks filled in the period
+  $query = "
+    SELECT DISTINCT
+      timetask_user_id as user_id
+    FROM TimeTask
+    WHERE timetask_date >= '$month_begin' 
+      AND timetask_date <= '$month_end'
+";
+  display_debug_msg($query, $cdg_sql, 'run_query_time_short_month(1)');
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+  $coma = '';
+  $not_in = '0';
+  while ($obm_db->next_record()) {
+    $id = $obm_db->f('user_id');
+    $not_in .= ",$id";
+    $coma = ',';
+  }
+
+  // Get tasks filled with associated users
+  // and active users that have no tasks filled in the period
   $query = "
     SELECT
       userobm_lastname,
@@ -684,10 +705,21 @@ function run_query_time_short_month($time) {
     GROUP BY userobm_lastname,
              userobm_firstname,
              timetask_user_id
+  UNION
+    SELECT
+      userobm_lastname,
+      userobm_firstname,
+      0 as total_length,
+      userobm_id as userid,
+      0 as status
+    FROM UserObm
+    WHERE userobm_archive='0'
+      AND userobm_id NOT IN ($not_in)
+      AND userobm_datebegin <= '$month_end'
     ORDER BY $order
 ";
   
-  display_debug_msg($query, $cdg_sql, 'run_query_time_short_month');
+  display_debug_msg($query, $cdg_sql, 'run_query_time_short_month(2)');
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 
