@@ -58,7 +58,6 @@ page_close();
 $params['profiles'] = get_all_profiles(false);
 
 $params = get_user_params_mail_server_id($params);
-
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,6 +117,7 @@ if ($action == "ext_get_ids") {
     }
   } else {
     $display["msg"] .= display_warn_msg($err['msg']);
+    $display["detail"] = dis_user_consult($params);
   }
 
 } elseif ($action == "insert") {
@@ -582,21 +582,29 @@ function update_user_action() {
 
   $id = $params['user_id'];
   if ($id > 0) {
-    // Detail Consult
-    $actions['user']['detailconsult']['Url'] = "$path/user/user_index.php?action=detailconsult&amp;user_id=$id";
-    $actions['user']['detailconsult']['Condition'][] = 'insert';
+    $u = get_user_info($id);
+    if (check_user_update_rights($params, $u)) {
+      // Detail Consult
+      $actions['user']['detailconsult']['Url'] = "$path/user/user_index.php?action=detailconsult&amp;user_id=$id";
+      $actions['user']['detailconsult']['Condition'][] = 'insert';
 
-    // Detail Update
-    $actions['user']['detailupdate']['Url'] = "$path/user/user_index.php?action=detailupdate&amp;user_id=$id";
-    $actions['user']['detailupdate']['Condition'][] = 'insert';
+      // Detail Update
+      $actions['user']['detailupdate']['Url'] = "$path/user/user_index.php?action=detailupdate&amp;user_id=$id";
+      $actions['user']['detailupdate']['Condition'][] = 'insert';
 
-    // Check Delete
-    $actions['user']['check_delete']['Url'] = "$path/user/user_index.php?action=check_delete&amp;user_id=$id";
-    $actions['user']['check_delete']['Condition'][] = 'insert';
+      // Check Delete
+      $actions['user']['check_delete']['Url'] = "$path/user/user_index.php?action=check_delete&amp;user_id=$id";
+      $actions['user']['check_delete']['Condition'][] = 'insert';
 
-    // Group Consult
-    $actions['user']['group_consult']['Url'] = "$path/user/user_index.php?action=group_consult&amp;user_id=$id";
-    $actions['user']['group_consult']['Condition'][] = 'insert';
+      // Group Consult
+      $actions['user']['group_consult']['Url'] = "$path/user/user_index.php?action=group_consult&amp;user_id=$id";
+      $actions['user']['group_consult']['Condition'][] = 'insert';
+    } else {
+      $actions['user']['group_consult']['Condition'] = array('None');
+      $actions['user']['check_delete']['Condition'] = array('None');
+      $actions['user']['detailupdate']['Condition'] = array('None');
+      $actions['user']['detailconsult']['Condition'] = array('None');
+    }
   }
 }
 

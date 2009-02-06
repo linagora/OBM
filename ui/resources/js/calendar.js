@@ -512,6 +512,10 @@ Obm.CalendarEvent = new Class({
       new Element('img').setProperty('src',obm.vars.images.meeting)
                         .injectInside(this.dragHandler);
     }
+    if (this.event.private) {
+      this.private = new Element('img').setProperty('src',obm.vars.images.private)
+                                       .injectInside(this.dragHandler);
+    }
     this.setPeriodicity();
     if(this.options.resizable) {
 	/*	this.resizeHandler = new Element('img')

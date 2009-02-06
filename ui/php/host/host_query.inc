@@ -518,7 +518,27 @@ function run_query_check_host($id, $name, $desc) {
   return $obm_q;
 }
 
-
+///////////////////////////////////////////////////////////////////////////////
+// Host context checking (same hosts exists ?)
+// Parameters:
+//   - $id     : host id
+//   - $host[] : host values
+//     keys used : name, desc
+// Returns:
+//   - Host Database object with host of similar hosts
+///////////////////////////////////////////////////////////////////////////////
+function check_host_can_delete($id) {
+  global $cdg_sql;
+  $query = "
+    SELECT count(*) FROM ServiceProperty 
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    WHERE serviceproperty_service = 'mail' AND serviceproperty_property IN ('imap', 'smtp_in', 'smtp_out')
+    AND serviceproperty_value = '$id'";
+  $obm_q = new DB_OBM;  
+  display_debug_msg($query, $cdg_sql, 'check_host_can_delete');
+  $obm_q->query($query);
+  
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Host context checking (same hosts exists ?)
 // Parameters:

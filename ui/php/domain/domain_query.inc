@@ -501,16 +501,14 @@ function check_domain_can_delete_mailserver(&$params) {
 
   $delete_ok = true;
   $mailservers = of_domain_get_domain_mailserver('', $params['domain_id']); 
-  foreach($mailservers as $domain_id => $domain_mailservers) {
-    foreach ($domain_mailservers as $mailserver_id => $mailserver) {
-      foreach($mailserver as $server) {
-        if(!is_array($params[$server['role']]) || !in_array($mailserver_id, $params[$server['role']])) {
-          $nb = get_domain_linked_user_mailserver($params['domain_id'], $mailserver_id);
-          if($nb > 0) {
-            $params[$server['role']][] = $mailserver_id;
-            $err['msg'] .= $server['name'].'('.$server['role'].')'.$l_link_user_mailserver;
-            return false;
-          }
+  foreach ($mailservers as $mailserver_id => $mailserver) {
+    foreach($mailserver as $server) {
+      if($server['role'] == 'imap' && (!is_array($params[$server['role']]) || !in_array($mailserver_id, $params[$server['role']]))) {
+        $nb = get_domain_linked_user_mailserver($params['domain_id'], $mailserver_id);
+        if($nb > 0) {
+          $params[$server['role']][] = $mailserver_id;
+          $err['msg'] .= $server['name'].'('.$server['role'].')'.$l_link_user_mailserver;
+          return false;
         }
       }
     }

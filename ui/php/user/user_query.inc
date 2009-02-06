@@ -1849,7 +1849,7 @@ function check_user_data_form($p_id, &$user) {
   $d = of_domain_get_domain_infos($domain_id, true);
 
   // Les contraintes sur la delegation ne sont pas valables pour le domaine 0
-  if ((int)($domain_id) > 0) {
+  if (!$d['global']) {
 
     // Verifier que pour un profil ayant delegation
     if (is_array($profiles[$profile]['properties']['admin_realm'])

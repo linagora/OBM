@@ -142,8 +142,12 @@ if ($action == 'ext_get_id') {
 
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_host_warn_delete($params['host_id']);
-
+  if(check_host_can_delete($params['host_id'])) {
+    $display['detail'] = dis_host_warn_delete($params['host_id']);
+  } else {
+    $display['msg'] .= display_err_msg($l_cant_delete);
+    $display['detail'] = dis_host_consult($params);
+  }
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_host_delete($params['host_id']);

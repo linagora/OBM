@@ -246,33 +246,76 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   $category_filter = $calendar['category_filter'];
   $group_privacy = $calendar['group_privacy'];
 
-  //-- Private Group selection
-  if ($this_group == $c_all) {
-    $sel_group = "<option selected=\"selected\">$l_select_group</option>";
-  } else {
-    $sel_group = "<option value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_select_group</option>";
-  }
 
-  while ($entity_readable['group']->next_record()) {
-    $g_id = $entity_readable['group']->f('group_id');
-    $g_priv = $entity_readable['group']->f('group_privacy');
-    $g_name = $entity_readable['group']->f('group_name');
-    if ($g_priv) {
-      if ($g_id == $this_group) {
-        $selected_s = "selected=\"selected\"";
-      } else {
-        $selected_s = '';
-      }
-      $sel_group .= "<option value=\"calendar_index.php?date=$iso&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
+  if (count($entity_readable['user']['ids']) > 1) {
+    //-- Private Group selection
+    if ($this_group == $c_all) {
+      $sel_group = "<option selected=\"selected\">$l_select_group</option>";
+    } else {
+      $sel_group = "<option value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_select_group</option>";
     }
+
+    while ($entity_readable['group']->next_record()) {
+      $g_id = $entity_readable['group']->f('group_id');
+      $g_priv = $entity_readable['group']->f('group_privacy');
+      $g_name = $entity_readable['group']->f('group_name');
+      if ($g_priv) {
+        if ($g_id == $this_group) {
+          $selected_s = "selected=\"selected\"";
+        } else {
+          $selected_s = '';
+        }
+        $sel_group .= "<option value=\"calendar_index.php?date=$iso&amp;group_id=$g_id&amp;new_group=1\" $selected_s>$g_name</option>\n";
+      }
+    }
+    $sel_group .= '</select>';
+
+    if ($this_group != $c_all && empty($selected_s)) {
+      $g_public_name = get_last_group_text($this_group);
+    } 
+
+    $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;filter_entity=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path.'/calendar/calendar_index.php')."&amp;ext_target=$l_calendar&amp;iso_date=$iso";
+    $group_add_button = "
+      <a href=\"javascript: return false;\" 
+      onclick=\"popup('$url_group', '');
+    return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>";
+
+    $block_group = "
+    <form name=\"f_entity_group\" action=\"\" onsubmit=\"return false;\">
+    <fieldset class=\"detail extra\">
+    <legend>$l_private_group_members</legend>
+    <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+    $sel_group
+    </select>
+    <div id=\"sel_group\">
+    </div>    
+    </fieldset>
+    <fieldset class=\"detail extra\">
+    <legend>$l_public_group_members $group_add_button</legend>
+    <input type=\"text\" name=\"group_name\" value=\"$g_public_name\" id=\"group_name\" autocomplete=\"off\" />
+    <input type=\"hidden\" name=\"ext_group_id\" id=\"ext_group_id\" />
+    </fieldset>
+    </form>";
+
+    $user_text = phpStringToJsString($l_search_users);
+    $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;filter_entity=calendar";
+    $user_add_button = "
+      <a href=\"javascript: return false;\" 
+      onclick=\"popup('$url_user','$user_text');
+    return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>";
+
+    $block_user = "<fieldset class=\"detail extra\">
+      <legend>
+      $l_users
+      $user_add_button
+      </legend>
+      <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"user\" autocomplete=\"off\" />
+      <input type=\"hidden\" name=\"date\" value=\"".$calendar['date']->getIso()."\" />
+      <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
+      <input type=\"hidden\" name=\"new_group\" value=\"1\" />
+      <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
+    </fieldset>";
   }
-  $sel_group .= '</select>';
-
-  if ($this_group != $c_all && empty($selected_s)) {
-    $g_public_name = get_last_group_text($this_group);
-  } 
-  //-- End private Group selection
-
   // loop through ['user'], ['resource']
   foreach ($calendar_entity as $type => $entity) {
     foreach ($entity as $id => $data) {
@@ -281,22 +324,13 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       $div_id = "sel_ent-$data_id";
       $sel_ent .= "<input value=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
     }
+
+
   }
 
-  $user_text = phpStringToJsString($l_search_users);
-  $url_user = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;filter_entity=calendar";
-  $user_add_button = "
-    <a href=\"javascript: return false;\" 
-    onclick=\"popup('$url_user','$user_text');
-  return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>";
 
-  $url_group = "$path/group/group_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget_text=f_entity_group.group_name&amp;ext_widget=f_entity_group.ext_group_id&amp;filter_entity=calendar&amp;ext_action=index&amp;ext_url=".urlencode($path.'/calendar/calendar_index.php')."&amp;ext_target=$l_calendar&amp;iso_date=$iso";
-  $group_add_button = "
-    <a href=\"javascript: return false;\" 
-    onclick=\"popup('$url_group', '');
-  return false;\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>";
 
-  if ($ccalendar_resource) {
+  if ($ccalendar_resource && count($entity_readable['resource']['ids']) > 0) {
     $resource_text = phpStringToJsString($l_search_resources);
     $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_ent&amp;filter_entity=Resource";
     $resource_add_button = "    
@@ -317,14 +351,33 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   }
   $cats1 = of_category_get_ordered('event', 'category1');
   $sel_cat1 = of_category_html_select('event', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
-  if(isset($_SESSION['set_cal_default_view'])) {
-    $default_view_url_params = run_query_calendar_get_bookmark_property($_SESSION['set_cal_default_view']);
-    $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?$default_view_url_params\">$l_back_mono</a>";
-  } else {
-    $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a>";
-  }
+ 
   $dis_go_today = "<a href=\"$path/calendar/calendar_index.php?date=\" >$l_today</a>";
-  
+
+  if($block_user || $block_group || $dis_block_resource) {
+    $block_entity = "
+    <form action=\"calendar_index.php\" method=\"get\">
+    $block_group
+    $block_user
+    $dis_block_resource
+    <fieldset class=\"detail extra\">
+    <legend>$l_add</legend>
+    </fieldset>
+    $sel_ent
+    <div id=\"sel_ent\">
+    </div>
+    <fieldset class=\"buttons\">
+    <input type=\"submit\" value=\"$l_validate\" />
+    </fieldset>
+    </form>
+    ";
+   if(isset($_SESSION['set_cal_default_view'])) {
+      $default_view_url_params = run_query_calendar_get_bookmark_property($_SESSION['set_cal_default_view']);
+      $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?$default_view_url_params\">$l_back_mono</a> -";
+    } else {
+      $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a> -";
+    }    
+  } 
   $block = "
     <div class=\"portlet\" id=\"calendarSelection\">
     <h1>$l_selection</h1>
@@ -336,47 +389,11 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       <input type=\"hidden\" name=\"date\" value=\"".$calendar['date']->getIso()."\" />
     </fieldset>
     </form>
-
-    <form name=\"f_entity_group\" action=\"\" onsubmit=\"return false;\">
-    <fieldset class=\"detail extra\">
-    <legend>$l_private_group_members</legend>
-    <select name=\"action\" class=\"calendarQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
-    $sel_group
-    </select>
-    <div id=\"sel_group\">
-    </div>    
-    </fieldset>
-    <fieldset class=\"detail extra\">
-    <legend>$l_public_group_members $group_add_button</legend>
-    <input type=\"text\" name=\"group_name\" value=\"$g_public_name\" id=\"group_name\" autocomplete=\"off\" />
-    <input type=\"hidden\" name=\"ext_group_id\" id=\"ext_group_id\" />
-    </fieldset>
-    </form>
-
-    <form action=\"calendar_index.php\" method=\"get\">
-    <fieldset class=\"detail extra\">
-    <legend>
-    $l_users
-    $user_add_button
-    </legend>
-    <input type=\"text\" name=\"\" value=\"\" onfocus=\"\" onblur=\"\" id=\"user\" autocomplete=\"off\" />
-    <input type=\"hidden\" name=\"date\" value=\"".$calendar['date']->getIso()."\" />
-    <input type=\"hidden\" name=\"group_view\" value=\"$c_all\" />
-    <input type=\"hidden\" name=\"new_group\" value=\"1\" />
-    <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
-    </fieldset>
-    $dis_block_resource
-    <fieldset class=\"detail extra\">
-    <legend>$l_add</legend>
-    </fieldset>
-    $sel_ent
-    <div id=\"sel_ent\">
+    $block_entity
+    <div class='C'>
+    $dis_back_myview
+    $dis_go_today
     </div>
-    <fieldset class=\"buttons\">
-    <input type=\"submit\" value=\"$l_validate\" />
-    </fieldset>
-    $dis_back_myview - $dis_go_today
-    </form>
    </div>
   </div>
   <script type=\"text/javascript\">
@@ -914,6 +931,40 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
       obm.calendarManager.resizeWindow();
     });
   </script>";
+
+  return $block;
+}
+
+/**
+ * Display Event List over one week
+ * 
+ * @param mixed $calendar 
+ * @param mixed $calendar_entity 
+ * @param mixed $writable_entity 
+ * @access public
+ * @return void
+ */
+function dis_calendar_day_list($calendar, $calendar_entity, $writable_entity) {
+  global $ico_previous, $ico_next, $l_previous, $l_next, $ico_far_next, $ico_far_previous;
+  global $ccalendar_weekstart, $ccalendar_first_hour, $ccalendar_last_hour;
+
+  $category_filter = $calendar['category_filter'];
+  $date = clone $calendar['date'];
+  $date->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(1);
+
+  $label = $date->localize(Of_Date::OBM_DATE_WEEK);
+  $current = new Of_Date();
+  $block = "
+  <h1>
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getURL()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getURL()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    $label
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getURL()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getURL()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+  </h1>";
+  $block .= dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end);
 
   return $block;
 }

@@ -389,7 +389,7 @@ function run_query_calendar_waiting_events() {
   $concat = array (
     array (
       'type' => 'field',
-      'value' => 'UserObm.userobm_lastname'
+      'value' => 'attendee.userobm_lastname'
       ),
     array (
       'type' => 'string',
@@ -397,7 +397,7 @@ function run_query_calendar_waiting_events() {
       ),
     array (
       'type' => 'field',
-      'value' => 'UserObm.userobm_firstname'
+      'value' => 'attendee.userobm_firstname'
       ) 
     );
   $entity_label = sql_string_concat($db_type,$concat);
@@ -406,7 +406,7 @@ function run_query_calendar_waiting_events() {
       u.userobm_lastname as usercreate_lastname,
       u.userobm_firstname as usercreate_firstname,
       $entity_label AS entity_label,
-      UserObm.userobm_id AS entity_id,
+      attendee.userobm_id AS entity_id,
       'user' AS entity_entity,
       event_id,
       event_title,
@@ -423,7 +423,7 @@ function run_query_calendar_waiting_events() {
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
       INNER JOIN EventLink ON event_id  = eventlink_event_id
       INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
-      INNER JOIN UserObm ON userentity_user_id = userobm_id
+      INNER JOIN UserObm attendee ON userentity_user_id = attendee.userobm_id
       INNER JOIN UserObm u ON event_owner = u.userobm_id
     WHERE
       event_type='VEVENT'
@@ -978,10 +978,14 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
 	$query = "INSERT INTO DeletedEvent (
         deletedevent_event_id,
         deletedevent_user_id,
+        deletedevent_origin,
+        deletedevent_type,
         deletedevent_timestamp)
       VALUES (
         $event_id,
         $u_id,
+        '$GLOBALS[c_origin_web]',
+        'VEVENT',
         NOW())";
 	display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_update(1)');
 	$retour = $obm_q->query($query);
@@ -1585,8 +1589,8 @@ function run_query_calendar_delete($calendar) {
     $users = array();
     while ($obm_q->next_record()) {
       // We note the event deletion
-      $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_timestamp)
-                VALUES ($event_id, ".$obm_q->f('userentity_user_id').", NOW())";
+      $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_origin, deletedevent_type, deletedevent_timestamp)
+                VALUES ($event_id, ".$obm_q->f('userentity_user_id').",'$GLOBALS[c_origin_web]', 'VEVENT', NOW())";
       display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
       $retour = $obm_q->query($query);
     }
@@ -1624,14 +1628,7 @@ function get_calendar_entity_readable() {
 function get_calendar_user_readable() {
   global $cdg_sql, $obm, $calendar, $c_all;
 
-  if ( (isset($calendar['entity']['group_view']))
-       && ($calendar['entity']['group_view'] != $c_all) ) {
-    $gusers = of_usergroup_get_group_users($calendar['entity']['group_view']);
-    $gusers[] = $obm['uid'];
-    $readable_calendars = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read', $gusers);
-  } else {
     $readable_calendars = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read');
-  }
   
   return OBM_Acl_Utils::expandEntitiesArray($readable_calendars);
 }

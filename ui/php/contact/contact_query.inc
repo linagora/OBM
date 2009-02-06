@@ -664,7 +664,8 @@ function run_query_contact_update($contact) {
       $query_date
       contact_comment='$comment',
       contact_comment2='$comment2',
-      contact_comment3='$comment3'
+      contact_comment3='$comment3',
+      contact_origin='$GLOBALS[c_origin_web]'
       WHERE contact_id $sql_id 
       $multidomain";
 
