@@ -41,7 +41,12 @@ function of_right_dis_admin($entity, $entity_id) {
 function html_entityadmin_bar($entity_id, $entity) {
   global $l_entity_right, $l_validate, $path, $module, $obm;
 
-  $writable_entity = OBM_Acl::getAllowedEntities($obm['uid'], $entity, 'admin');
+  if(!(Perm::get_module_rights($entity) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin']) {
+    $writable_entity = OBM_Acl::getAllowedEntities($obm['uid'], $entity, 'admin');
+  } else {
+    $writable_entity = getAllEntities($entity, $obm['uid']);
+  }
+
   if ($module != '') {
     $uri = $path.'/'.$module.'/'.$module.'_index.php';
   }
@@ -474,6 +479,70 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
 ";
 
   return $block;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the list of entities for the consumer given with the corresponding right
+// Parameters:
+//   - $entityu     : target entity (table name with capital)
+//   - $user_id : user id
+//   - $right       : right to get and select from : "read", "write" or "admin"
+//   - $ids_set     : array of ids restricting the result
+//   - $real_entity : real data entity (eg: userobm for entity calendar)
+// Returns:
+//   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2)))
+///////////////////////////////////////////////////////////////////////////////
+function getAllEntities($entityu, $user_id) {
+  global $cdg_sql, $obm;
+
+  // GLOBAL - superman has all rights on entities
+  
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $ent_array = array();
+  $id_array = array();
+
+  $entity = strtolower($entityu);
+
+  if (OBM_Acl::isSpecialEntity($entityu)) {
+    $table_entity = 'UserObm';
+    $e_id = 'e.userobm_id';
+    $ctt[0]['type'] = 'field';
+    $ctt[0]['value'] = 'userobm_lastname';
+    $ctt[1]['type'] = 'string';
+    $ctt[1]['value'] = ' ';
+    $ctt[2]['type'] = 'field';
+    $ctt[2]['value'] = 'userobm_firstname';
+    $e_label = sql_string_concat($db_type, $ctt);
+    $u = get_user_info($user_id);
+  } else {
+    $table_entity = "$entityu";
+    $e_id = "e.${entity}_id";
+    $e_label = "e.${entity}_name";
+  }
+  
+  $multidomain = sql_multidomain($table_entity);
+  $query = "SELECT $e_id AS id, $e_label AS label, '$entity' as entityright_entity FROM $table_entity AS e WHERE 1=1 $multidomain";
+  
+  // END - superman has all rights on entities
+
+  display_debug_msg($query, $cdg_sql, 'of_right_entity_for_user()');
+  $obm_q->query($query);
+  $ret_array = array();
+
+  while($obm_q->next_record()) {
+    $id = $obm_q->f('id');
+    if ( ($ids_set == '') || ( (is_array($ids_set)) && (in_array($id, $ids_set)) ) ) {
+      $label = $obm_q->f('label');
+      $id_array[] = $id;
+      $ret_array[$id] = $label;
+    }
+  }
+  
+  return $ret_array;
 }
 
 ?>

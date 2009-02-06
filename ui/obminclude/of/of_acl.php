@@ -526,7 +526,7 @@ class OBM_Acl {
     return $rights;
   }
   
-  private static function isSpecialEntity($entityType) {
+  public static function isSpecialEntity($entityType) {
     return in_array($entityType, self::$specialEntityTypes);
   }
   
@@ -567,7 +567,7 @@ class OBM_Acl_Utils {
     
     $rights = OBM_Acl_Utils::parseRightsParams($params);
 
-    if (!OBM_Acl::isAllowed($currentUserId, $entityType, $entityId, 'admin')) {
+    if (!(Perm::get_module_rights($entityType) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin'] && !OBM_Acl::isAllowed($currentUserId, $entityType, $entityId, 'admin')) {
       return false;
     }
     

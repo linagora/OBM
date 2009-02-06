@@ -545,8 +545,6 @@ class DB_Sql {
     case 'INTEGER':
       $type =  'UNSIGNED';
       break;
-    default:
-      $type = $type;
     }
     return "CAST($data as $type)"; 
   }  
