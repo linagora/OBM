@@ -69,3 +69,4 @@ $l_higher = 'Le plus haut';
 $l_realm_user = 'Ses propres modifications';
 $l_realm_delegation = 'Les modifications sur sa délégation';
 $l_realm_domain = 'Toutes les modifications du domaine';
+$l_profile_exists= "Ce nom de profile est déjà utilisé";

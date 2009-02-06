@@ -201,16 +201,12 @@ class DB_Sql {
     $res   = array();
     
     $this->connect();
-    $id = $this->query("SELECT c.column_name, data_type, tc.constraint_type, character_maximum_length
-                 FROM information_schema.columns c 
-                   LEFT JOIN information_schema.constraint_column_usage ccu ON ccu.column_name = c.column_name
-                   LEFT JOIN information_schema.table_constraints tc ON ccu.constraint_name = tc.constraint_name
-                 WHERE c.table_name ilike '$table'");    
-    if ($id < 0) {
+    $columns = $this->query("SELECT column_name, data_type, character_maximum_length FROM information_schema.columns c WHERE c.table_name ilike '$table'");
+    if ($columns < 0) {
       $this->Error = pg_ErrorMessage($id);
       $this->Errno = 1;
       $this->halt("Metadata query failed.");
-    }
+    }    
     
     while($this->next_record()) {
       $res[$this->f('column_name')]["table"] = $table;
@@ -221,8 +217,27 @@ class DB_Sql {
         $res[$this->f('column_name')]["flags"] .= " ".$this->f('constraint_type');
       }
     }
+
+    pg_FreeResult($columns);
+
+    $constraints = $this->query("SELECT kcu.column_name, tc.constraint_type 
+      FROM information_schema.key_column_usage kcu
+      LEFT JOIN information_schema.table_constraints tc ON kcu.constraint_name = tc.constraint_name
+      WHERE kcu.table_name ilike '$table'"); 
+
+    if ($constraints < 0) {
+      $this->Error = pg_ErrorMessage($id);
+      $this->Errno = 1;
+      $this->halt("Metadata query failed.");
+    }
     
-    pg_FreeResult($id);
+    while($this->next_record()) {
+      if($this->f('constraint_type')) {
+        $res[$this->f('column_name')]["flags"] .= " ".$this->f('constraint_type');
+      }
+    }
+    
+    pg_FreeResult($constraints);
     return $res;
   }
 

@@ -68,3 +68,5 @@ $l_access_restriction = "Access restriction";
 $l_access_exeptions = "Access restriction exceptions";
 $l_admin_realm = "Administration realm";
 
+$l_profile_exists= "This profile name is already used";
+

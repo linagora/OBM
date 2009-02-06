@@ -475,20 +475,8 @@ if ($cgp_hide['contact']['function']) {
   $cgp_hide['list_contact_2']['function'] = true;
 }
 
-// Determine if delegation is used
-$cgp_use['property']['delegation'] = false;
-if(is_array($profiles)) {
-  foreach ($profiles as $one_pro) {
-    if (is_array($one_pro['properties']['admin_realm'])) {
-      if (in_array('delegation', $one_pro['properties']['admin_realm'])) {
-        $cgp_use['property']['delegation'] = true;
-        break;
-      }
-    }
-  }
-} else {
-  $profiles = array();
-}
+$cgp_use['property']['delegation'] = true;
+
 // If delegation not used, disable delegation fields
 if (! $cgp_use['property']['delegation']) {
   $cgp_hide['user']['userobm_delegation'] = true;

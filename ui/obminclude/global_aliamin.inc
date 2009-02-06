@@ -318,7 +318,6 @@ function get_ip_used($id='') {
  */
 function get_update_state($domain_id='no') {
   global $obm, $cdg_sql;
-
   if ($domain_id == 'no') {
     $domain_id = $obm['domain_id'];
   }

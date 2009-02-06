@@ -2799,7 +2799,7 @@ function get_all_profiles($cached = true) {
     $obm_q->query($query);
     while($obm_q->next_record()) {
       $value = $obm_q->f('profileproperty_value');
-      if(count(explode(',', $value)) > 1) {
+      if($obm_q->f('profileproperty_name') == 'admin_realm' || $obm_q->f('profileproperty_name') == 'access_exceptions') {
         $profiles[$obm_q->f('profile_name')]['properties'][$obm_q->f('profileproperty_name')] = explode(',', $value);
       } else {
         $profiles[$obm_q->f('profile_name')]['properties'][$obm_q->f('profileproperty_name')] = $value;
