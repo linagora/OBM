@@ -2,7 +2,9 @@ package fr.aliasource.obm.autoconf;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -61,24 +63,28 @@ public class AutoconfService extends HttpServlet {
 				.getAttribute("uid").getStringValue(), attributeSet
 				.getAttribute("obmDomain").getStringValue());
 		DBQueryTool dbqt = new DBQueryTool(dbc);
-		String hostIp = dbqt.getDBInformation();
 		
-		if (hostIp == null) {
+		HashMap<String, String> hostIps = dbqt.getDBInformation();
+		
+		if (hostIps == null) {
 			logger.warn("NULL information obtained from DBQueryTool for "
 					+ login);
 			return;
 		}
-
-		// map host ip with imap host and smtp host
-		String hosts = ConstantService.getInstance().getStringValue(hostIp);
-
-		if (hosts == null || hosts.length() == 0 || !(hosts.split(",").length == 3)) {
+		
+		if (hostIps.get("imap") == null || hostIps.get("smtp") == null) {
 			logger.warn("No hosts found for  " + login);
 			return;
 		}
-		String imapMailHost = hosts.split(",")[0];
-		String smtpMailHost = hosts.split(",")[1];
-		String ldapHost = hosts.split(",")[2];
+
+		// map host ip with imap host and smtp host
+		
+		String imapMailHost = ConstantService.getInstance().getStringValue(
+				"imap." + hostIps.get("imap"));
+		String smtpMailHost = ConstantService.getInstance().getStringValue(
+				"smtp." + hostIps.get("smtp"));
+		String ldapHost = ConstantService.getInstance().getStringValue(
+				"ldapHostname");
 
 		SimpleDateFormat formatter = new SimpleDateFormat(
 				"EEE, dd MMM yyyy HH:mm:ss z");
