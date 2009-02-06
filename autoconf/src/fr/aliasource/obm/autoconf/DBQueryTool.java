@@ -48,7 +48,7 @@ public class DBQueryTool {
 				" INNER JOIN DomainEntity ON domainentity_domain_id = domain_id" +
 				" INNER JOIN UserObm ON userobm_domain_id = domain_id AND userobm_login = ?" +
 				" LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id" +
-				" LEFT JOIN Host ON host_id = CAST(serviceproperty_value as INTEGER)" +
+				" LEFT JOIN Host ON CAST(host_id as CHAR) = serviceproperty_value" +
 				" WHERE serviceproperty_service = 'mail'" +
 				"   AND serviceproperty_property IN ('imap')" +
 				"   AND (domain_name = ? OR domain_global = true)" +
@@ -76,12 +76,15 @@ public class DBQueryTool {
 				" FROM Domain" +
 				" INNER JOIN DomainEntity ON domainentity_domain_id = domain_id" +
 				" LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id" +
-				" LEFT JOIN Host ON host_id = CAST(serviceproperty_value as INTEGER)" +
+				" LEFT JOIN Host ON CAST(host_id as CHAR) = serviceproperty_value" +
 				" WHERE serviceproperty_service = 'mail'" +
 				"   AND serviceproperty_property IN ('smtp_out')" +
 				"   AND (domain_name = ? OR domain_global = true)" +
 				" GROUP BY serviceproperty_property, host_id, host_name, host_ip" +
+				
 				" LIMIT 2";
+		
+		logger.info(query);
 		
 		try {
 			con = ObmHelper.getConnection();
@@ -92,10 +95,9 @@ public class DBQueryTool {
 			ps.setString(3, dc.getDomainName());
 			rs = ps.executeQuery();
 
-			rs.next();
-			ret.put((String) rs.getString(1), (String) rs.getString(2));
-			rs.next();
-			ret.put((String) rs.getString(1), (String) rs.getString(2));
+			while (rs.next()) {
+				ret.put((String) rs.getString(1), (String) rs.getString(2));
+			}
 			
 			return ret;
 		} catch (SQLException e) {
