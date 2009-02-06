@@ -84,8 +84,6 @@ public class DBQueryTool {
 				
 				" LIMIT 2";
 		
-		logger.info(query);
-		
 		try {
 			con = ObmHelper.getConnection();
 			ps = con.prepareStatement(query);
