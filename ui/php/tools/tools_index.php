@@ -18,8 +18,9 @@ $module = 'tools';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
 include("$obminclude/global.inc");
-$params = get_tools_params();
+$params = get_global_params('Tools');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
+$params = get_tools_params();
 include("$obminclude/global_pref.inc");
 require('tools_display.inc');
 require('tools_query.inc');
@@ -102,7 +103,11 @@ $entities = array(
 
 if ($action == 'cancel_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  exec_tools_cancel_update($params);
+  if(!exec_tools_cancel_update($params)) {
+    echo "({error:1,message:'".phpStringToJsString($GLOBALS['l_cant_undo_'.$params['state'].'_'.$params['entity']])."'})";
+  } else {
+    echo "({error:0,message:'".phpStringToJsString($GLOBALS['l_undo_success'])."'})";
+  }
   die();
   
 } elseif ($action == 'update_detail') {
@@ -116,13 +121,16 @@ if ($action == 'cancel_update') {
     set_update_state($params['domain_id']);
     store_update_data($params);
     $res = exec_tools_update_update($params);
-    if ($res == '0') {
+    var_dump($res);
+    if ($res === 0) {
       $display['msg'] .= display_ok_msg($l_upd_running);
+      $display['detail'] = dis_tools_update_detail();
+      remove_update_lock();
     } else {
       $display['msg'] .= display_err_msg("$l_upd_error ($res)");
+      remove_update_lock();
+      $display['detail'] = dis_tools_update_detail();
     }
-    $display['detail'] = dis_tools_update_detail();
-    remove_update_lock();
   } else {
     // Si le contexte ne permet pas une modification de configuration
     $display['msg'] .= display_warn_msg($err['msg']);

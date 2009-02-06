@@ -186,12 +186,12 @@ function html_tools_update_detail_list($entity, $entities) {
 // HTML Delete button
 ///////////////////////////////////////////////////////////////////////////////
 function html_tools_delete_button($entity, $state, $id) {
-  global $resources_path, $l_js_ask_confirm;
+  global $resources_path, $l_js_ask_confirm, $ico_undo, $ico_spinner;
 
   $block = "
-    <img id=\"spinner_{$entity}_{$id}\" src=\"$resources_path/themes/default/images/spinner.gif\" style=\"display: none;\" />
-      <img src=\"$resources_path/themes/default/images/ico_trash.gif\"
-             onclick=\"if (confirm('{$l_js_ask_confirm}')) { postUpdateToDelete('$entity', '$state', '$id'); }; return false;\"/>
+    <img id=\"spinner_{$entity}_{$id}\" src=\"$ico_spinner\" style=\"display: none;\" />
+      <img src=\"$ico_undo\"
+      onclick=\"if (confirm('".phpStringToJsString($GLOBALS['l_js_'.$state.'_'.$entity.'_confirm'])."')) { postUpdateToDelete('$entity', '$state', '$id'); }; return false;\"/>
     ";
 
   return $block;
@@ -216,14 +216,19 @@ function html_tools_javascript($domain_id) {
       });
       
       function postUpdateToDelete(entity, state, id) {
-        new Request({
+        new Request.JSON({
           url : 'tools_index.php',
-          data : {entity: entity, state: state, id: id, action: 'cancel_update'},
-          onSuccess : function(){
-            $('item_'+entity+'_'+id).dispose();
-            $('count_'+entity+'_'+state).firstChild.nodeValue--;
+          secure : false,
+          onComplete : function(response) {
+            if(response.error != 0) {
+              showErrorMessage(response.message);
+            } else {
+              showOkMessage(response.message);
+              $('item_'+entity+'_'+id).dispose();
+              $('count_'+entity+'_'+state).firstChild.nodeValue--;
+            }
           }
-        }).send();        
+        }).post({entity: entity, state: state, id: id, action: 'cancel_update'});        
 
         $('form_'+entity+'_'+id).setStyle('display', 'none');
         $('spinner_'+entity+'_'+id).setStyle('display', 'inline');

@@ -259,11 +259,19 @@ function exec_tools_cancel_update($params) {
       require "$obminclude/of/of_category.inc";
       require "../{$entity}/{$entity}_query.inc";
       $function = "run_query_{$entity}_delete";
-      return $function($params['id']);
+      $check = "check_{$entity}_can_delete";
+      if($check($params['id'])) {
+        return $function($params['id']);
+      } else  {
+        return false;
+      }
+      break;
     case 'updated':
       return run_query_tools_cancel_update($entity, $params['id']);
+      break;
     case 'deleted':
       return run_query_tools_cancel_delete($entity, $params['id']); 
+      break;
   }
 }
 
