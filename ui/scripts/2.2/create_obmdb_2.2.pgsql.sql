@@ -8414,7 +8414,7 @@ ALTER TABLE ONLY synchedcontact
 --
 
 ALTER TABLE ONLY synchedcontact
-    ADD CONSTRAINT synchedcontact_user_id_userobm_id_fkey FOREIGN KEY (synchedcontact_user_id) REFERENCES user(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT synchedcontact_user_id_userobm_id_fkey FOREIGN KEY (synchedcontact_user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 --
 -- Name: subscriptionreception_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
