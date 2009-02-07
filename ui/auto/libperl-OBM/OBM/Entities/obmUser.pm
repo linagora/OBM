@@ -40,7 +40,7 @@ use OBM::Samba::utils qw(
         _getUserSID
         _getGroupSID
         );
-use OBM::Tools::passwd qw(
+use OBM::Password::passwd qw(
         _toMd5
         _toSsha
         _convertPasswd

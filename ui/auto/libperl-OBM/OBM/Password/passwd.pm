@@ -1,4 +1,4 @@
-package OBM::Tools::passwd;
+package OBM::Password::passwd;
 
 
 $debug = 1;

@@ -35,7 +35,7 @@ use OBM::Ldap::utils qw(
         _modifyAttrList
         _diffObjectclassAttrs
         );
-use OBM::Tools::passwd qw(
+use OBM::Password::passwd qw(
         _getNTLMPasswd
         );
 use OBM::Samba::utils qw(

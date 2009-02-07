@@ -33,7 +33,7 @@ use OBM::Ldap::utils qw(
         _modifyAttrList
         _diffObjectclassAttrs
         );
-use OBM::Tools::passwd qw(
+use OBM::Password::passwd qw(
         _toMd5
         _toSsha
         _convertPasswd
