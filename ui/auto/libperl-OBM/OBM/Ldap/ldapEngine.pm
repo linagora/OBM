@@ -35,7 +35,7 @@ sub new {
     }
 
     $self->{'currentEntity'} = undef;
-    $self->{objectclassDesc} = undef;
+    $self->{'objectclassDesc'} = undef;
 
     return $self;
 }
@@ -48,7 +48,7 @@ sub DESTROY {
 
     $self->{'ldapservers'} = undef;
     $self->{'currentEntity'} = undef;
-    $self->{objectclassDesc} = undef;
+    $self->{'objectclassDesc'} = undef;
 }
 
 
@@ -300,7 +300,7 @@ sub _updateEntity {
         return 1;
     }
 
-    if( $self->{'currentEntity'}->updateLdapEntry( $entry, $self->{objectclassDesc} ) ) {
+    if( $self->{'currentEntity'}->updateLdapEntry( $entry, $self->{'objectclassDesc'} ) ) {
         $self->_log( 'mise à jour de '.$self->{'currentEntity'}->getDescription().', DN '.$entry->dn(), 2 );
         return $self->_ldapUpdateEntity( $entry );
     }
@@ -384,7 +384,7 @@ sub _deleteEntity {
 sub _getObjectclassDesc {
     my $self = shift;
     my( $ldapEntry ) = @_;
-    my $objectclassDesc = $self->{objectclassDesc};
+    my $objectclassDesc = $self->{'objectclassDesc'};
 
     # Get LDAP server conn for this entity
     my $ldapServerConn;
@@ -410,7 +410,7 @@ sub _getObjectclassDesc {
             @{$objectclassDesc->{$objectObjectclass->[$i]}} = $ldapSchema->must($objectObjectclass->[$i]);
             push( @{$objectclassDesc->{$objectObjectclass->[$i]}}, $ldapSchema->may($objectObjectclass->[$i]) );
 
-            $self->{objectclassDesc} = $objectclassDesc;
+            $self->{'objectclassDesc'} = $objectclassDesc;
         }
     }
 
