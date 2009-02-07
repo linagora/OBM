@@ -84,14 +84,14 @@ sub update {
             # Si le nouveau DN est différent de l'actuel, on cherche l'entité
             # ayant le nouveau DN
             $updateLdapEntity = $self->_searchLdapEntityByDN( $updateEntityDNs->[$i] );
-            if( defined($updateLdapEntity) && ($updateLdapEntity == 0) ) {
+            if( defined($updateLdapEntity) && !ref($updateLdapEntity) ) {
                 return 4;
             }
         }
 
         # On cherche l'entité de DN courant
         my $currentLdapEntity = $self->_searchLdapEntityByDN( $currentEntityDNs->[$i] );
-        if( defined($currentLdapEntity) && ($currentLdapEntity == 0) ) {
+        if( defined($currentLdapEntity) && !ref($currentLdapEntity) ) {
             return 4;
         }
 
