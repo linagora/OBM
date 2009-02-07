@@ -2934,7 +2934,7 @@ CREATE TABLE synchedcontact (
   CONSTRAINT synchedcontact_contact_id_contact_id_fkey FOREIGN KEY (synchedcontact_contact_id) REFERENCES Contact (contact_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO SyncedContact (synchedcontact_user_id, synchedcontact_contact_id, synchedcontact_timestamp) 
+INSERT INTO SynchedContact (synchedcontact_user_id, synchedcontact_contact_id, synchedcontact_timestamp) 
 SELECT contact_usercreate, contact_id, contact_timecreate FROM Contact WHERE contact_privacy = 1 AND contact_usercreate IS NOT NULL;
 
 --
