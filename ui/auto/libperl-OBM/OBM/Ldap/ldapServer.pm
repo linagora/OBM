@@ -221,14 +221,23 @@ sub _connect {
         return 1;
     }
 
-    $self->_log( 'authentification en tant que \''.$self->{'ldap_admin_login'}.'\' au '.$self->getDescription(), 2 );
+    my $ldapLogin = $self->{'ldap_admin_login'};
+    my $ldapDnLogin = $self->{'ldap_admin_dn'};
+    my $ldapPassword = $self->{'ldap_admin_password'};
+    if( defined($self->{'ldap_user_dnlogin'}) && defined($self->{'ldap_user_password'}) ) {
+        $ldapLogin = $self->{'ldap_user_dnlogin'};
+        $ldapDnLogin = [ $self->{'ldap_user_dnlogin'} ];
+        $ldapPassword = $self->{'ldap_user_password'};
+    }
+
+    $self->_log( 'authentification en tant que \''.$ldapLogin.'\' au '.$self->getDescription(), 2 );
 
     my $error;
-    for( my $i=0; $i<=$#{$self->{'ldap_admin_dn'}}; $i++ ) {
-        $self->_log( 'connexion avec le DN : '.$self->{'ldap_admin_dn'}->[$i], 2 );
+    for( my $i=0; $i<=$#{$ldapDnLogin}; $i++ ) {
+        $self->_log( 'connexion avec le DN : '.$ldapDnLogin->[$i], 2 );
         $error = $self->{'ldapServerConn'}->bind(
-           $self->{'ldap_admin_dn'}->[$i],
-           password => $self->{'ldap_admin_password'}
+           $ldapDnLogin->[$i],
+           password => $ldapPassword
         );
 
         if( !$error->code ) {
@@ -243,6 +252,45 @@ sub _connect {
         $self->_log( 'echec de l\'authentification : '.$error->error, 0 );
         $self->{'ldapServerConn'} = undef;
     }
+
+    return 0;
+}
+
+
+sub setDnLogin {
+    my $self = shift;
+    my( $login ) = @_;
+
+    $self->{'ldap_user_dnlogin'} = $login;
+
+    return 0;
+}
+
+
+sub setPasswd {
+    my $self = shift;
+    my( $password ) = @_;
+
+    $self->{'ldap_user_password'} = $password;
+
+    return 0;
+}
+
+
+# Reset LDAP connection and user/password
+# On next connect, LDAP will be bind as Admin if no call to setDnLogin and
+# setPasswd methods
+sub resetConn {
+    my $self = shift;
+
+    if( ref( $self->{'ldapServerConn'} ) eq 'Net::LDAP' ) {
+        # Trying to unbind silently...
+        eval{ $self->{'ldapServerConn'}->unbind(); };
+        $self->{'ldapServerConn'} = undef;
+    }
+
+    delete($self->{'ldap_user_dnlogin'});
+    delete($self->{'ldap_user_password'});
 
     return 0;
 }
