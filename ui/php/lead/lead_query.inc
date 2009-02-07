@@ -13,7 +13,7 @@
 //   - $lead[]       : lead search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_lead_search($params) {
-  global $cdg_sql, $c_all, $c_null, $ctu_sql_limit, $cgp_archive_only;
+  global $cdg_sql, $c_all, $c_null, $c_undef, $ctu_sql_limit, $cgp_archive_only;
 
   $sql_order_dir = $params['sql_order_dir'];
   $sql_order_field = $params['sql_order_field'];
@@ -24,6 +24,7 @@ function run_query_lead_search($params) {
   $date_after = of_isodate_convert($params['date_after'],true);
   $date_before = of_isodate_convert($params['date_before'],true);
   $date_field = $params['date_field'] ? $params['date_field'] : 'date';
+  $priority = $params['priority'];
   $source = $params['source'];
   $status = $params['status'];
   $manager = $params['manager'];
@@ -78,6 +79,12 @@ function run_query_lead_search($params) {
       $and = 'AND';
     }
   }
+echo "undef=$c_undef";
+  if (($priority != '') && ($priority != "$c_undef")) {
+    $priority = sql_parse_int($priority, true);
+    $where .= " $and lead_priority = $priority ";
+    $and = 'AND';
+  }
   if (($source != '') && ($source != "$c_all")) {
     $source = sql_parse_id($source, true);
     $where .= " $and lead_source_id $source ";
@@ -114,6 +121,7 @@ function run_query_lead_search($params) {
     lead_manager_id,
     lead_company_id,
     lead_name,
+    lead_priority,
     lead_archive,
     $date,
     $datealarm,
@@ -251,6 +259,7 @@ function run_query_lead_insert($params) {
   $todo = $params['todo'];
   $archive = sql_parse_int($params['archive']);
   $privacy = sql_parse_int($params['privacy']);
+  $priority = sql_parse_int($params['priority']);
 
   $add_comment = $params['add_comment'];
   if ($add_comment != '') {
@@ -280,7 +289,8 @@ function run_query_lead_insert($params) {
     lead_manager_id,
     lead_company_id,
     lead_contact_id,
-    lead_privacy,    
+    lead_priority,
+    lead_privacy,
     lead_name,
     lead_date,
     lead_datealarm,
@@ -299,6 +309,7 @@ function run_query_lead_insert($params) {
     $company_id,
     $contact_id,
     '$privacy',
+    '$priority',
     '$name',
     $date,
     $datealarm,
@@ -346,6 +357,7 @@ function run_query_lead_update($pid, $params) {
   $date = ($params['date'] ? "'".of_isodate_convert($params['date'])."'" : 'null');
   $datealarm = ($params['datealarm'] ? "'".of_isodate_convert($params['datealarm'])."'" : 'null');
   $todo = $params['todo'];
+  $priority = sql_parse_int($params['priority']);
   $archive = ($params['archive'] == '1' ? '1' : '0');
   $privacy = ($params['privacy'] == '1' ? '1' : '0');
   $comment = $params['comment'];
@@ -368,9 +380,10 @@ function run_query_lead_update($pid, $params) {
     lead_userupdate=$uid,
     lead_source_id=$source_id,
     lead_status_id=$status_id,
+    lead_manager_id=$manager_id,
     lead_company_id=$company_id,
     lead_contact_id=$contact_id,
-    lead_manager_id=$manager_id,
+    lead_priority='$priority',
     lead_name='$name',
     lead_date=$date,
     lead_datealarm=$datealarm,
@@ -500,7 +513,7 @@ function check_lead_data_form($id, $params) {
   }
   
   // Company check
-  if (trim($company) == '') {
+  if ((! ($c_id > 0)) && (! ($c_new_id > 0))) {
     $err['msg'] = $l_fill_company;
     return false;
   }

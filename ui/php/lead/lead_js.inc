@@ -22,7 +22,7 @@ function check_lead (f_lead) {
 	errorMsg += \"$l_fill_datealarm\\n\";
 	retour = false;  
   }
-  if (f_lead.company_new_name.value == \"\") {
+  if ((f_lead.company_new_name.value == \"\") && (f_lead.company_name.value == \"\")) {
     errorMsg += \"$l_fill_company\\n\";
     retour = false;
   }

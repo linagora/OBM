@@ -22,6 +22,7 @@ $fieldnames['company_name'] = $l_company;
 $fieldnames['company_zipcode'] = $l_postcode;
 $fieldnames['company_phone'] = $l_phone;
 $fieldnames['lead_contact'] = $l_contact;
+$fieldnames['lead_priority'] = $l_priority;
 $fieldnames['lead_todo'] = $l_todo;
 $fieldnames['manager'] = $l_manager;
 
@@ -66,6 +67,17 @@ function dis_data_lead(&$OD, $fieldname, $link_ok) {
     }
   }
 
+  else if ($fieldname == 'lead_priority') {
+    $res['align'] = 'center';
+    $value = $OD->data_set->f($fieldname);
+    if ($value > 0 && $value < 4) {
+      $res['name'] = str_pad('', $value, '*');
+    } else {
+      $res['name'] = '&nbsp;';
+      $res['txt_name'] = ' ';
+    }
+  }
+
   return $res;
 }
 
@@ -96,15 +108,16 @@ function dis_lead_search_form($params='') {
 //   - $managers : managers infos
 ///////////////////////////////////////////////////////////////////////////////
 function html_lead_search_form($params, $sources, $status, $managers) {
-  global $l_find, $l_all, $c_all;
+  global $l_find, $l_all, $c_all, $l_undef, $c_undef;
   global $l_text, $l_manager, $l_source, $l_status, $l_company, $l_show_archive;
-  global $l_date, $l_after, $l_before;
+  global $l_date, $l_after, $l_before, $l_priority;
   global $l_both, $l_received, $l_emitted;
 
   $source_id = $params['source'];
   $status_id = $params['status'];
   $manager_id = $params['manager'];
   $company = $params['company'];
+  $priority = $params['priority'];
   $archive = ($params['archive'] == '1' ? "checked = \"checked\"" : '');
   $text = stripslashes($params['text']);
   $date_after = of_date_upd_format($params['date_after'],true);
@@ -149,6 +162,19 @@ function html_lead_search_form($params, $sources, $status, $managers) {
   }
   $sel_manager .= '</select>';
 
+  // Priority select
+  $sel_priority = "
+    <select name=\"sel_priority\">
+     <option value=\"$c_undef\">$l_undef</option>\n";
+  for ($pri=1; $pri<4; $pri++) {
+    $pri_label = str_pad('', $pri, '*');
+    $sel_priority .= "\n<option value=\"$pri\"";
+    if ($pri == $priority) $sel_priority .= "selected =\"selected\"";
+    $sel_priority .= ">$pri_label</option>\n";
+  }
+  $sel_priority .= '</select>';
+
+
   $block = "
   <form method=\"post\" name=\"f_search\" action=\"lead_index.php?action=search\" class=\"search\">
 
@@ -158,6 +184,10 @@ function html_lead_search_form($params, $sources, $status, $managers) {
 
     <label>$l_company<br />
      <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
+    </label>
+
+    <label>$l_priority<br />
+     $sel_priority
     </label>
 
     <label>$l_date $l_after<br />
@@ -232,6 +262,7 @@ function html_lead_search_list($obm_q, $prefs, $params) {
 
   $text = urlencode($params['text']);
   $company = $params['company'];
+  $priority = $params['priority'];
   $date_after = $params['date_after'];
   $date_before = $params['date_before'];
   $source = $params['source'];
@@ -250,6 +281,7 @@ function html_lead_search_list($obm_q, $prefs, $params) {
   $url = url_prepare("lead_index.php?action=search".
 		    "&amp;tf_text=$text".
 		    "&amp;tf_company=$company".
+		    "&amp;sel_priority=$priority".
 		    "&amp;tf_date_before=$date_before".
 		    "&amp;tf_date_after=$date_after".
 		    "&amp;sel_source=$source".
@@ -309,7 +341,7 @@ function dis_lead_consult($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_lead_consult($l_q) {
   global $path, $display, $ico_company, $ico_contact, $l_yes, $l_no;
-  global $l_company, $l_contact, $l_comment, $l_phone, $l_status, $l_archive;
+  global $l_company, $l_contact, $l_comment, $l_priority, $l_status, $l_archive;
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
 
   $id = $l_q->f('lead_id');
@@ -324,6 +356,8 @@ function html_lead_consult($l_q) {
   $date = of_date_format($l_q->f('date'));
   $datealarm = of_date_format($l_q->f('datealarm'));
   $name = $l_q->f('lead_name');
+  $priority = $l_q->f('lead_priority');
+  if ($priority > 0 && $priority < 4) $priority = str_pad('', $priority, '*');
   $archive = ($l_q->f('lead_archive') == 1 ? $l_yes : $l_no);
   $todo = $l_q->f('lead_todo');
   $comment = beautify_comment(nl2br($l_q->f('lead_comment')));
@@ -394,6 +428,10 @@ function html_lead_consult($l_q) {
     <th>$l_alarm</th>
     <td>$datealarm</td>
   </tr>
+  <tr>
+    <th>$l_priority</th>
+    <td>$priority</td>
+  </tr>
   </table>
 </div>
 
@@ -450,7 +488,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
   global $l_lead, $l_source, $l_manager, $l_name, $l_date, $l_alarm, $l_todo;
   global $l_update, $l_checkdelete, $l_insert, $l_company, $l_contact;
   global $l_comment,$l_add_comment,$l_upd_comment, $l_mail_comment, $l_archive;
-  global $l_no, $l_members, $l_group, $l_status;
+  global $l_no, $l_members, $l_group, $l_status, $l_priority;
   global $l_header_new, $ico_mini_cal;
 
   $uid = $obm['uid'];
@@ -468,6 +506,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
     $contact_fname = $l_q->f('contact_firstname');
     $contact_name = "$contact_lname $contact_fname";
     $name = $l_q->f('lead_name');
+    $priority = $l_q->f('lead_priority');
     $date = $l_q->f('date');
     $dis_date = of_date_format($date);
     $date = ($date != 0) ? of_date_upd_format($date) : '';
@@ -503,6 +542,7 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
   if (isset($params['status'])) { $status_id = $params['status']; }
   if (isset($params['manager'])) { $manager_id = $params['manager']; }
   if (isset($params['name'])) { $name = $params['name']; }
+  if (isset($params['priority'])) { $priority = $params['priority']; }
   if (isset($params['date'])) { $date = of_date_upd_format($params['date']); }
   if (isset($params['datealarm'])) { $datealarm = of_date_upd_format($params['datealarm']); }
   if (isset($params['archive'])) { $archive = ($params['archive'] == 1 ? 'checked="checked"' : ''); }
@@ -532,6 +572,18 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
     }
   }
   $sel_manager .= '</select>';
+
+  // Priority select
+  $sel_priority = "
+    <select name=\"sel_priority\">
+     <option value=\"$c_undef\">$l_undef</option>\n";
+  for ($pri=1; $pri<4; $pri++) {
+    $pri_label = str_pad('', $pri, '*');
+    $sel_priority .= "\n<option value=\"$pri\"";
+    if ($pri == $priority) $sel_priority .= "selected =\"selected\"";
+    $sel_priority .= ">$pri_label</option>\n";
+  }
+  $sel_priority .= '</select>';
 
   // Company Display
   $dis_company = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;company_id=$c_id") . "\">
@@ -650,6 +702,10 @@ function html_lead_form($action, $l_q, $sources, $status, $managers, $params) {
       <td>
        <input type=\"text\" name=\"tf_datealarm\" value=\"$datealarm\" class=\"datePicker\"/>
       </td>
+    </tr>
+    <tr>
+      <th>$l_priority</th>
+      <td>$sel_priority</td>
     </tr>
     </table>
 </fieldset>
