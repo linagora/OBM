@@ -183,6 +183,18 @@ sub next {
                     last SWITCH;
                 }
 
+                if( ($self->{'updateType'} eq 'SYSTEM_ALL') || ($self->{'updateType'} eq 'SYSTEM_LINKS') ) {
+                    if( $self->_loadUserLinks() ) {
+                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                        next;
+                    }
+                }
+
+                if( $self->{'updateType'} eq 'SYSTEM_ENTITY' ) {
+                    $self->_log( 'chargement de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    last SWITCH;
+                }
+
                 if( $self->{'updateType'} eq 'DELETE' ) {
                     $self->_log( 'suppression de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
                     $self->{'currentEntity'}->setDelete();

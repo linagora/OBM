@@ -62,6 +62,18 @@ sub _getSourceByUpdateType {
             return 'WORK';
         }
 
+        if( $self->{'updateType'} eq 'SYSTEM_ALL' ) {
+            return 'SYSTEM';
+        }
+
+        if( $self->{'updateType'} eq 'SYSTEM_ENTITY' ) {
+            return 'SYSTEM';
+        }
+
+        if( $self->{'updateType'} eq 'SYSTEM_LINKS' ) {
+            return 'SYSTEM';
+        }
+
         if( $self->{'updateType'} eq 'DELETE' ) {
             return 'SYSTEM';
         }
@@ -72,9 +84,12 @@ sub _getSourceByUpdateType {
 
 
 # Allowed update type :
-#   UPDATE_ALL : entity+links
-#   UPDATE_ENTITY : entity only
-#   UPDATE_LINKS : links only
+#   UPDATE_ALL : entity+links from work tables
+#   UPDATE_ENTITY : entity only from work tables
+#   UPDATE_LINKS : links only from work tables
+#   SYSTEM_ALL : entity+links from system tables
+#   SYSTEM_ENTITY : entity only from system tables
+#   SYSTEM_LINKS : links only from system tables
 #   DELETE : delete entity
 sub _checkUpdateType {
     my $self = shift;
@@ -89,7 +104,7 @@ sub _checkUpdateType {
         return 0;
     }
 
-    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY|UPDATE_LINKS|DELETE)$/ ) {
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY|UPDATE_LINKS|SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS|DELETE)$/ ) {
         $self->_log( 'type de mise à jour \''.$self->{'updateType'}.'\' incorrecte', 3 );
         return 0;
     }

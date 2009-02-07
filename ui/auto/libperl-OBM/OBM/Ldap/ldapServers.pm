@@ -32,7 +32,7 @@ sub DESTROY {
 }
 
 
-sub getLdapServerConn {
+sub getLdapServer {
     my $self = shift;
     my( $serverId ) = @_;
 
@@ -53,6 +53,18 @@ sub getLdapServerConn {
             return undef;
         }
     }elsif( !$self->_loadServer( $serverId ) ) {
+        return undef;
+    }
+
+    return $self->{'servers'}->{$serverId};
+}
+
+
+sub getLdapServerConn {
+    my $self = shift;
+    my( $serverId ) = @_;
+
+    if( !$self->getLdapServer($serverId ) ) {
         return undef;
     }
 

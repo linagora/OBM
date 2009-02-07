@@ -88,6 +88,11 @@ sub _initMode {
         return $self->_initIncremental();
     }
 
+    if( $self->{'mode'} =~ /^PROGRAMMABLE$/ ) {
+        $self->_log( 'mode d\'exécution programmable', 3 );
+        return $self->_initProgrammable();
+    }
+
     $self->_log( 'mode d\'exécution \''.$self->{'mode'}.'\' incorrect', 3 );
 
     return 1;
@@ -131,7 +136,7 @@ sub _initGlobal {
     require OBM::EntitiesFactory::domainFactory;
     my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'WORK', $self->{'domainId'} );
 
-    if( $self->_loadDomains( $entityFactory ) ) {
+    if( $self->_loadDomains( $entityFactory, 1 ) ) {
         return 1;
     }
 
@@ -153,14 +158,52 @@ sub _initIncremental {
     require OBM::EntitiesFactory::domainFactory;
     my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'SYSTEM', $self->{'domainId'} );
 
-    if( $self->_loadDomains( $entityFactory ) ) {
+    if( $self->_loadDomains( $entityFactory, 1 ) ) {
         return 1;
     }
 
     require OBM::EntitiesFactory::incrementalFactories;
-    my $globalFactories = OBM::EntitiesFactory::incrementalFactories->new( $self );
-    if( !defined($globalFactories) ) {
+    my $incrementalFactories = OBM::EntitiesFactory::incrementalFactories->new( $self );
+    if( !defined($incrementalFactories) ) {
         $self->_log( 'problème à l\'initialisation des factories nécessaire pour le mode incrémental', 0 );
+        return 1;
+    }
+
+    return 0;
+}
+
+
+sub _initProgrammable {
+    my $self = shift;
+
+    require OBM::EntitiesFactory::domainFactory;
+    my $entityFactory = OBM::EntitiesFactory::domainFactory->new( 'SYSTEM', $self->{'domainId'} );
+
+    if( $self->_loadDomains( $entityFactory, 0 ) ) {
+        return 1;
+    }
+
+    return 0;
+}
+
+
+sub loadEntities {
+    my $self = shift;
+    my( $programmingObj ) = @_;
+
+    if( ref($programmingObj) ne 'OBM::EntitiesFactory::factoryProgramming' ) {
+        $self->_log( 'liste d\'entités à charger incorrecte', 3 );
+        return 1;
+    }
+
+    require OBM::EntitiesFactory::programmableFactories;
+    my $programmableFactories = OBM::EntitiesFactory::programmableFactories->new( $self );
+    if( !defined($programmableFactories) ) {
+        return 1;
+    }
+
+    if( $programmableFactories->addEntities($programmingObj) ) {
+        $self->_log( 'problème lors de la programmation de la factory', 2 );
         return 1;
     }
 
@@ -218,7 +261,7 @@ sub next {
 
 sub _loadDomains {
     my $self = shift;
-    my( $domainFactory ) = @_;
+    my( $domainFactory, $enqueueDomain ) = @_;
 
     if( !defined($domainFactory) || ref($domainFactory) ne 'OBM::EntitiesFactory::domainFactory' ) {
         $self->_log( 'problème au chargement de la factory de domaine', 3 );
@@ -231,7 +274,9 @@ sub _loadDomains {
                 $self->{'domain'} = $currentDomain;
             }
 
-            $self->enqueueEntity( $currentDomain );
+            if( $enqueueDomain ) {
+                $self->enqueueEntity( $currentDomain );
+            }
         }
     }
 
