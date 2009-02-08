@@ -286,32 +286,26 @@ sub _initUpdateFactory {
             SWITCH: {
                 if( lc($entityType) eq 'host' ) {
                     if( $self->_initHostFactory( $entitiesIds ) ) {
-                        if( $self->_initHostFactory( $entitiesIds ) ) {
-                            $self->_log( 'problème au chargement des hôtes à mettre à jour', 0 );
-                            return 1;
-                        }
+                        $self->_log( 'problème au chargement des hôtes à mettre à jour', 0 );
+                        return 1;
                     }
 
                     last SWITCH;
                 }
 
                 if( lc($entityType) eq 'ugroup' ) {
-                    if( $self->_initHostFactory( $entitiesIds ) ) {
-                        if( $self->_initGroupFactory( $entitiesIds ) ) {
-                            $self->_log( 'problème au chargement des groupes à mettre à jour', 0 );
-                            return 1;
-                        }
+                    if( $self->_initGroupFactory( $entitiesIds ) ) {
+                        $self->_log( 'problème au chargement des groupes à mettre à jour', 0 );
+                        return 1;
                     }
 
                     last SWITCH;
                 }
 
                 if( lc($entityType) eq 'mailshare' ) {
-                    if( $self->_initHostFactory( $entitiesIds ) ) {
-                        if( $self->_initMailshareFactory( $entitiesIds ) ) {
-                            $self->_log( 'problème au chargement des partages de messagerie à mettre à jour', 0 );
-                            return 1;
-                        }
+                    if( $self->_initMailshareFactory( $entitiesIds ) ) {
+                        $self->_log( 'problème au chargement des partages de messagerie à mettre à jour', 0 );
+                        return 1;
                     }
 
                     last SWITCH;
@@ -319,10 +313,8 @@ sub _initUpdateFactory {
 
                 if( lc($entityType) eq 'userobm' ) {
                     if( $self->_initUserFactory( $entitiesIds ) ) {
-                        if( $self->_initMailshareFactory( $entitiesIds ) ) {
-                            $self->_log( 'problème au chargement des utilisateurs à mettre à jour', 0 );
-                            return 1;
-                        }
+                        $self->_log( 'problème au chargement des utilisateurs à mettre à jour', 0 );
+                        return 1;
                     }
 
                     last SWITCH;
