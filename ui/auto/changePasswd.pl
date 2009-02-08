@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w -T -C7
+#!/usr/bin/perl -w -T
 #####################################################################
 # OBM               - File : changePasswd.pl                        #
 #                   - Desc : Script permettant de modifier le mot   #

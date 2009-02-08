@@ -171,11 +171,21 @@ sub _updatePassword {
             $self->_log( 'probleme lors de la mise à jour du mot de passe Unix', 3 );
             return 1;
         }else {
-            $self->_log( 'mise à jour du mot de passe Unix', 2 );
+            $self->_log( 'succès de la mise à jour du mot de passe Unix', 2 );
+        }
+    }
+
+    if( $self->{'newPasswordDesc'}->{'sql'} ) {
+        $self->_log( 'mise à jour du mot de passe SQL', 4 );
+
+        if( $self->_updateSqlPasswd() ) {
+            $self->_log( 'probleme lors de la mise à jour du mot de passe SQL', 3 );
+            return 1;
+        }else {
+            $self->_log( 'succès de la mise à jour du mot de passe SQL', 2 );
         }
     }
 #    $self->{'newPasswordDesc'}->{'samba'} = $parameters->{'samba'};
-#    $self->{'newPasswordDesc'}->{'sql'} = $parameters->{'sql'};
 
 
     return 0;
@@ -189,6 +199,20 @@ sub _updateUnixPasswd {
     my $passwordUpdater = OBM::Password::unixPasswdUpdater->new();
     if( $passwordUpdater->update( $self->{'userEntity'}, $self->{'newPasswordDesc'}->{'newPassword'} ) ) {
         $self->_log( 'problème a la mise à jour du mot de passe Unix', 0 );
+        return 1;
+    }
+
+    return 0;
+}
+
+
+sub _updateSqlPasswd {
+    my $self = shift;
+
+    require OBM::Password::sqlPasswdUpdater;
+    my $passwordUpdater = OBM::Password::sqlPasswdUpdater->new();
+    if( $passwordUpdater->update( $self->{'userEntity'}, $self->{'newPasswordDesc'}->{'newPassword'} ) ) {
+        $self->_log( 'problème a la mise à jour du mot de passe SQL', 0 );
         return 1;
     }
 
