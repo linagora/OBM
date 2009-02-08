@@ -1004,7 +1004,7 @@ function run_query_user_update($p_id, $user) {
           }
 
           if ($parameters) {
-            $cmd = $cmd_ldap_passwd.$parameters." --login ".$user['login']." --domain ".$user_domain." --type PLAIN --no-old --passwd '".$passwd."'";
+            $cmd = $cmd_ldap_passwd.$parameters." --login ".$user['login']." --domain ".$user_domain." --no-old --passwd '".$passwd."'";
 
             display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
             exec($cmd);
