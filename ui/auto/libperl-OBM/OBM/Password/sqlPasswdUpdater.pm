@@ -73,6 +73,7 @@ sub update {
         return 1;
     }
 
+    $self->_log( 'mot de passe Sql mis à jour', 2 );
 
     return 0;
 }

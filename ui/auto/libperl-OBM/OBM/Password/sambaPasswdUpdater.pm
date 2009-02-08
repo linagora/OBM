@@ -1,4 +1,4 @@
-package OBM::Password::unixPasswdUpdater;
+package OBM::Password::sambaPasswdUpdater;
 
 $VERSION = '1.0';
 
@@ -12,6 +12,11 @@ $debug = 1;
 use 5.006_001;
 require Exporter;
 use strict;
+
+use OBM::Tools::commonMethods qw(
+        _log
+        dump
+        );
 
 
 sub update {
@@ -32,7 +37,12 @@ sub update {
     $self->{'currentEntity'} = $entity;
 
     if( $entity->getDesc('userobm_archive') ) {
-        $self->_log( 'utilisateur archivé, pas de mise à jour du mot de passe Unix nécessaire', 0 );
+        $self->_log( 'utilisateur archivé, pas de mise à jour du mot de passe Samba nécessaire', 0 );
+        return 0;
+    }
+
+    if( !$entity->getDesc('userobm_samba_perms') ) {
+        $self->_log( 'utilisateur non Samba, pas de mise à jour du mot de passe Samba nécessaire', 0 );
         return 0;
     }
 
@@ -42,8 +52,10 @@ sub update {
         return 0;
     }
 
-    if( !($passwd = $self->_convertPasswd( 'PLAIN', $passwd)) ) {
-        $self->_log( 'echec de conversion du mot de passe Unix', 3 );
+    my $lmPasswd;
+    my $ntPasswd;
+    if( $self->_getNTLMPasswd( $passwd, \$lmPasswd, \$ntPasswd ) ) {
+        $self->_log( 'echec de conversion du mot de passe Samba', 3 );
         return 1;
     }
 
@@ -58,7 +70,7 @@ sub update {
             return 1;
         }
 
-        if( $self->_modifyAttr( $passwd , $updateLdapEntity, 'userPassword' ) ) {
+        if( $self->_modifyAttr( $ntPasswd , $updateLdapEntity, 'sambaNTPassword' ) && $self->_modifyAttr( $lmPasswd, $updateLdapEntity, 'sambaLMPassword' ) ) {
             if( $self->_ldapUpdateEntity($updateLdapEntity) ) {
                 $self->_log( 'échec de mise à jour de l\'entrée LDAP', 3 );
                 return 1;
@@ -69,7 +81,7 @@ sub update {
         }
     }
 
-    $self->_log( 'mot de passe Unix mis à jour', 2 );
+    $self->_log( 'mot de passe Samba mis à jour', 2 );
 
     return 0;
 }

@@ -2,6 +2,9 @@ package OBM::Update::updatePassword;
 
 $VERSION = '1.0';
 
+use OBM::Update::commonUpdate;
+@ISA = ('OBM::Update::commonUpdate');
+
 $debug = 1;
 
 use 5.006_001;
@@ -9,9 +12,6 @@ require Exporter;
 use strict;
 
 use OBM::Tools::commonMethods qw(_log dump);
-use OBM::Update::commonUpdate qw(   
-            _getUserIdFromUserLoginDomain
-            );
 
 
 sub new {
@@ -175,6 +175,17 @@ sub _updatePassword {
         }
     }
 
+    if( $self->{'newPasswordDesc'}->{'samba'} ) {
+        $self->_log( 'mise à jour du mot de passe Samba', 3 );
+
+        if( $self->_updateSambaPasswd() ) {
+            $self->_log( 'probleme lors de la mise à jour du mot de passe Samba', 3 );
+            return 1;
+        }else {
+            $self->_log( 'succès de la mise à jour du mot de passe Samba', 2 );
+        }
+    }
+
     if( $self->{'newPasswordDesc'}->{'sql'} ) {
         $self->_log( 'mise à jour du mot de passe SQL', 4 );
 
@@ -185,7 +196,6 @@ sub _updatePassword {
             $self->_log( 'succès de la mise à jour du mot de passe SQL', 2 );
         }
     }
-#    $self->{'newPasswordDesc'}->{'samba'} = $parameters->{'samba'};
 
 
     return 0;
@@ -213,6 +223,20 @@ sub _updateSqlPasswd {
     my $passwordUpdater = OBM::Password::sqlPasswdUpdater->new();
     if( $passwordUpdater->update( $self->{'userEntity'}, $self->{'newPasswordDesc'}->{'newPassword'} ) ) {
         $self->_log( 'problème a la mise à jour du mot de passe SQL', 0 );
+        return 1;
+    }
+
+    return 0;
+}
+
+
+sub _updateSambaPasswd {
+    my $self = shift;
+
+    require OBM::Password::sambaPasswdUpdater;
+    my $passwordUpdater = OBM::Password::sambaPasswdUpdater->new();
+    if( $passwordUpdater->update( $self->{'userEntity'}, $self->{'newPasswordDesc'}->{'newPassword'} ) ) {
+        $self->_log( 'problème a la mise à jour du mot de passe Samba', 0 );
         return 1;
     }
 
