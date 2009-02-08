@@ -13,8 +13,6 @@ use OBM::Tools::commonMethods qw(
         dump
         );
 use OBM::EntitiesFactory::commonFactory qw(
-        _checkSource
-        _getSourceByUpdateType
         _checkUpdateType
         );
 use OBM::Parameters::regexp;
@@ -28,11 +26,6 @@ sub new {
 
     $self->{'updateType'} = $updateType;
     if( !$self->_checkUpdateType() ) {
-        return undef;
-    }
-
-    $self->{'source'} = $self->_getSourceByUpdateType();
-    if( !$self->_checkSource() ) {
         return undef;
     }
 
@@ -142,15 +135,6 @@ sub next {
             $self->{'currentEntity'} = $current;
 
             SWITCH: {
-                if( $self->{'source'} =~ /^SYSTEM$/ ) {
-                    $self->{'currentEntity'}->unsetBdUpdate();
-                    last SWITCH;
-                }
-
-                $self->{'currentEntity'}->setBdUpdate();
-            }
-
-            SWITCH: {
                 if( $self->{'updateType'} =~ /^(UPDATE_ALL|UPDATE_ENTITY|UPDATE_LINKS)$/ ) {
                     $self->_log( 'mise à jour de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
                     $self->{'currentEntity'}->setUpdateEntity();
@@ -191,7 +175,7 @@ sub _loadHosts {
     my $hostTable = 'Host';
     my $hostEntityTable = 'HostEntity';
     my $serviceTable = 'Service';
-    if( $self->{'source'} =~ /^SYSTEM$/ ) {
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
         $hostTable = 'P_'.$hostTable;
         $hostEntityTable = 'P_'.$hostEntityTable;
         $serviceTable = 'P_'.$serviceTable;

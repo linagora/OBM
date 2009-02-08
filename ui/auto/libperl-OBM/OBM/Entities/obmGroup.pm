@@ -18,9 +18,6 @@ use OBM::Entities::commonEntities qw(
         getArchive
         setArchive
         getParent
-        setBdUpdate
-        unsetBdUpdate
-        getBdUpdate
         setUpdated
         unsetUpdated
         getUpdated
@@ -504,4 +501,15 @@ sub updateLdapEntry {
     }
 
     return $update;
+}
+
+
+sub getBdUpdate {
+    my $self = shift;
+
+    if( $self->getUpdateEntity() || $self->getUpdateLinks() ) {
+        return 1;
+    }
+
+    return 0;
 }

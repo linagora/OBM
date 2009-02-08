@@ -13,8 +13,6 @@ use OBM::Tools::commonMethods qw(
         dump
         );
 use OBM::EntitiesFactory::commonFactory qw(
-        _checkSource
-        _getSourceByUpdateType
         _checkUpdateType
         _getEntityRight
         _computeRight
@@ -30,11 +28,6 @@ sub new {
 
     $self->{'updateType'} = $updateType;
     if( !$self->_checkUpdateType() ) {
-        return undef;
-    }
-
-    $self->{'source'} = $self->_getSourceByUpdateType();
-    if( !$self->_checkSource() ) {
         return undef;
     }
 
@@ -144,15 +137,6 @@ sub next {
             $self->{'currentEntity'} = $current;
 
             SWITCH: {
-                if( $self->{'source'} =~ /^SYSTEM$/ ) {
-                    $self->{'currentEntity'}->unsetBdUpdate();
-                    last SWITCH;
-                }
-
-                $self->{'currentEntity'}->setBdUpdate();
-            }
-
-            SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
                     if( $self->_loadMailshareLinks() ) {
                         $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
@@ -215,7 +199,7 @@ sub _loadMailshare {
     }
 
     my $mailshareTable = 'MailShare';
-    if( $self->{'source'} =~ /^SYSTEM$/ ) {
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
         $mailshareTable = 'P_'.$mailshareTable;
     }
 
@@ -245,7 +229,6 @@ sub _loadMailshareLinks {
     $self->_log( 'chargement des liens de '.$self->{'currentEntity'}->getDescription(), 2 );
 
     my $entityId = $self->{'currentEntity'}->getId();
-    my $entityType = 'MailShare';
 
     my $userObmTable = 'UserObm';
     my $userEntityTable = 'UserEntity';
@@ -253,7 +236,7 @@ sub _loadMailshareLinks {
     my $groupEntityTable = 'GroupEntity';
     my $entityRightTable = 'EntityRight';
     my $ofUserGroupTable = 'of_usergroup';
-    if( $self->{'source'} =~ /^SYSTEM$/ ) {
+    if( $self->{'updateType'} =~ /^(SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS)$/ ) {
         $userObmTable = 'P_'.$userObmTable;
         $userEntityTable = 'P_'.$userEntityTable;
         $mailshareEntity = 'P_'.$mailshareEntity;

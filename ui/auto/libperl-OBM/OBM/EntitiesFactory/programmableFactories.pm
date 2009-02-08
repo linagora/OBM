@@ -10,7 +10,6 @@ use strict;
 
 use OBM::Tools::commonMethods qw(_log dump);
 use OBM::EntitiesFactory::commonFactory qw(
-            _getSourceByUpdateType
             _checkUpdateType
             );
 

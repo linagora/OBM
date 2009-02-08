@@ -13,8 +13,6 @@ use OBM::Tools::commonMethods qw(
         dump
         );
 use OBM::EntitiesFactory::commonFactory qw(
-        _checkSource
-        _getSourceByUpdateType
         _checkUpdateType
         );
 use OBM::Parameters::regexp;
@@ -28,11 +26,6 @@ sub new {
 
     $self->{'updateType'} = $updateType;
     if( !$self->_checkUpdateType() ) {
-        return undef;
-    }
-
-    $self->{'source'} = $self->_getSourceByUpdateType();
-    if( !$self->_checkSource() ) {
         return undef;
     }
 
@@ -142,15 +135,6 @@ sub next {
             $self->{'currentEntity'} = $current;
 
             SWITCH: {
-                if( $self->{'source'} =~ /^SYSTEM$/ ) {
-                    $self->{'currentEntity'}->unsetBdUpdate();
-                    last SWITCH;
-                }
-
-                $self->{'currentEntity'}->setBdUpdate();
-            }
-
-            SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
                     if( $self->_loadGroupLinks() ) {
                         $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
@@ -213,7 +197,7 @@ sub _loadGroups {
     }
 
     my $groupTable = 'UGroup';
-    if( $self->{'source'} =~ /^SYSTEM$/ ) {
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
         $groupTable = 'P_'.$groupTable;
     }
 
@@ -251,7 +235,7 @@ sub _loadGroupLinks {
 
     my $groupLinksTable = 'of_usergroup';
     my $userTable = 'UserObm';
-    if( $self->{'source'} =~ /^SYSTEM$/ ) {
+    if( $self->{'updateType'} =~ /^(SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS)$/ ) {
         $groupLinksTable = 'P_'.$groupLinksTable;
         $userTable = 'P_'.$userTable;
     }

@@ -13,8 +13,6 @@ use OBM::Tools::commonMethods qw(
         dump
         );
 use OBM::EntitiesFactory::commonFactory qw(
-        _checkSource
-        _getSourceByUpdateType
         _checkUpdateType
         _getEntityRight
         _computeRight
@@ -30,11 +28,6 @@ sub new {
 
     $self->{'updateType'} = $updateType;
     if( !$self->_checkUpdateType() ) {
-        return undef;
-    }
-
-    $self->{'source'} = $self->_getSourceByUpdateType();
-    if( !$self->_checkSource() ) {
         return undef;
     }
 
@@ -144,15 +137,6 @@ sub next {
             $self->{'currentEntity'} = $current;
 
             SWITCH: {
-                if( $self->{'source'} =~ /^SYSTEM$/ ) {
-                    $self->{'currentEntity'}->unsetBdUpdate();
-                    last SWITCH;
-                }
-    
-                $self->{'currentEntity'}->setBdUpdate();
-            }
-
-            SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
                     if( $self->_loadUserLinks() ) {
                         $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
@@ -227,7 +211,7 @@ sub _loadUsers {
     }
 
     my $userTable = 'UserObm';
-    if( $self->{'source'} =~ /^SYSTEM$/ ) {
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
         $userTable = 'P_'.$userTable;
     }
 
@@ -259,13 +243,16 @@ sub _loadUserLinks {
     my $entityId = $self->{'currentEntity'}->getId();
 
     my $userObmTable = 'UserObm';
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
+        $userObmTable = 'P_'.$userObmTable;
+    }
+
     my $userEntityTable = 'UserEntity';
     my $mailboxEntity = 'MailboxEntity';
     my $groupEntityTable = 'GroupEntity';
     my $entityRightTable = 'EntityRight';
     my $ofUserGroupTable = 'of_usergroup';
-    if( $self->{'source'} =~ /^SYSTEM$/ ) {
-        $userObmTable = 'P_'.$userObmTable;
+    if( $self->{'updateType'} =~ /^(SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS)$/ ) {
         $userEntityTable = 'P_'.$userEntityTable;
         $mailboxEntity = 'P_'.$mailboxEntity;
         $groupEntityTable = 'P_'.$groupEntityTable;

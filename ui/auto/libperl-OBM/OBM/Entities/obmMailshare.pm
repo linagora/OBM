@@ -18,9 +18,6 @@ use OBM::Entities::commonEntities qw(
         getArchive
         setArchive
         getParent
-        setBdUpdate
-        unsetBdUpdate
-        getBdUpdate
         setUpdated
         unsetUpdated
         getUpdated
@@ -541,4 +538,15 @@ sub getMailboxDefaultFolders {
     my $self = shift;
 
     return $self->{'entityDesc'}->{'mailbox_folders'};
+}
+
+
+sub getBdUpdate {
+    my $self = shift;
+
+    if( $self->getUpdateEntity() || $self->getUpdateLinks() ) {
+        return 1;
+    }
+
+    return 0;
 }
