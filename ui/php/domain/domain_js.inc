@@ -59,6 +59,17 @@ function copyField(field, storage) {
   copy = field.clone();
   copy.injectInside(storage);
 }
+
+function autoGenSid() {
+  var sid = 'S-1-5-21';
+  for(var i=0; i<3; i++) {
+    sid = sid + '-'
+    for(var j=0; j<10;j++) {
+      sid = sid + Math.floor(Math.random() * 10);
+    }
+  }
+  $('sambaSID').value = sid;
+}
 ";
   
 ?>

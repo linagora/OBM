@@ -1191,9 +1191,9 @@ function html_user_form($usr_q, $user, $field='') {
 
   // login (can't be updated, so only on insert)
   if (($action == "new") || ($action == "insert")) {
-    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />";
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' maxlength=\"32\" value=\"$login\" />";
   } else {
-    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" />
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' maxlength=\"32\" value=\"$login\" />
                   <input type=\"hidden\" name=\"tf_old_login\" value=\"$old_login\" />";
   }
 
@@ -1431,32 +1431,63 @@ function html_user_form($usr_q, $user, $field='') {
   }
 
   if ($cgp_use["service"]["samba"]) {
-    // Samba perms checkbox checked value
+    $samba = run_query_user_samba_properties();
+    $smb_home_drive = (isset($smb_home_drive))?$smb_home_drive:$samba['drive'];
+    if(isset($smb_home_drive) && $smb_home_drive != '') $drive[$samba['drive']] = 'selected="selected"';
+    for($i='A';$i<='Z';$i++) {
+      $dis_drive_sel .= "<option ".$drive["$i"]." value='$i'>$i:</option>";
+    }
+    $dis_drive_sel = "<select style='width:4em;' name='samba[drive]'>$dis_drive_sel</select>";
+    $smb_home = (isset($smb_home))?$smb_home:$samba['home'];
+    if($login != '') {
+      $smb_hidden_home = str_replace($login,'%u', $smb_home);
+      $smb_home = str_replace('%u', $login, $smb_home);
+    } else {
+      $smb_hidden_home = $smb_home;
+    }
     $smb_state  = ($smb_perms ? "checked" : "");
-
+    if(!$smb_state) {
+      $sambaKlass = 'H';
+    }
     $samba_section = "
-  <fieldset class=\"detail infos\">
-  <legend>$l_smb</legend>
+      <fieldset class=\"detail infos\" id='userSamba'>
+      <legend>$l_smb</legend>
 
-  <table>
-  <tr>
-    <th class=\"$class[smb_perms]\">$l_smb_perms</th>
-    <td><input name=\"cb_smb_perms\" type=\"checkbox\" value=\"1\" $smb_state /></td>
-  </tr>
-  <tr>
-    <th class=\"$class[smb_home]\">$l_smb_home</th>
-    <td><input name=\"tf_smb_home\" maxlength=\"255\" size=\"64\" value=\"$smb_home\" /></td>
-  </tr>
-  <tr>
-    <th class=\"$class[smb_home_drive]\">$l_smb_home_drive</th>
-    <td><input name=\"tf_smb_home_drive\" maxlength=\"1\" size=\"1\" value=\"$smb_home_drive\" />:</td>
-  </tr>
-  <tr>
-    <th class=\"$class[smb_logon]\">$l_smb_logon</th>
-    <td><input name=\"tf_smb_logon\" maxlength=\"128\" size=\"64\" value=\"$smb_logon\" /></td>
-  </tr>
-  </table>
-  </fieldset>";
+      <table>
+      <tr>
+        <th class=\"$class[smb_perms]\">$l_smb_perms</th>
+        <td><input name=\"cb_smb_perms\" type=\"checkbox\" id=\"userSambaActive\" onclick=\"switch_samba_mode();\"  value=\"1\" $smb_state /></td>
+      </tr>
+      </table>
+      <table  id=\"userSambaProperties\" class='$sambaKlass'>
+      <tr>
+        <th class=\"$class[smb_home]\">$l_smb_home</th>
+        <td>
+        <input name=\"tf_smb_home\" maxlength=\"255\" size=\"64\" id='userSambaHome'value=\"$smb_home\" />
+        <input type=\"hidden\" id='userSambaHiddenHome'value=\"$smb_hidden_home\" />
+        </td>
+      </tr>
+      <tr>
+        <th class=\"$class[smb_home_drive]\">$l_smb_home_drive</th>
+        <td>$dis_drive_sel</td>
+      </tr>
+      <tr>
+        <th class=\"$class[smb_logon]\">$l_smb_logon</th>
+        <td><input name=\"tf_smb_logon\" maxlength=\"128\" size=\"64\" value=\"$smb_logon\" /></td>
+      </tr>
+      </table>
+      <script type='text/javascript'>
+        var samba = $('userSambaProperties');
+        $('userSambaHome').addEvent('focus', function () { $('userSambaHome').value = $('userSambaHiddenHome').value});
+        $('userSambaHome').addEvent('blur', function () { $('userSambaHiddenHome').value = $('userSambaHome').value; sambaHomeCompute()});
+        $('userSambaHome').addEvent((Browser.Engine.trident || Browser.Engine.webkit) ? 'keydown' : 'keypress', function (e) {
+          if(e.key == 'enter') {
+            sambaHomeCompute();
+          }
+        });
+        $('userLogin').addEvent('keyup' , sambaHomeCompute);
+      </script>      
+      </fieldset>";
   }
 
   // Input file (photo)

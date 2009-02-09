@@ -44,6 +44,7 @@ $l_group_admin = "Admin group id";
 $l_group_com = "Commercial group id";
 $l_group_prod = "Production group id";
 
+$l_name_error = "Invalid name!";
 $l_link_user = "The domain has users";
 $l_link_user_no = "The domain has no users";
 $l_link_host = "The domain has hosts";
@@ -61,3 +62,19 @@ $l_mailserver = "Mail server";
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
+
+$l_samba = 'Windows server properties';
+$l_samba_sid = 'domain SID';
+$l_samba_domain = 'Windows domain name';
+$l_samba_profile = 'Profil default path';
+$l_samba_home = 'User home default path (%u will be replaced by user login)';
+$l_samba_drive = 'User home default drive';
+$l_autogen_sid = 'Autogen SID';
+
+$l_samba_sid_error = 'Invalid SID, the sid must have the followinf form : S-1-5-21-XXXXXXXXXX-XXXXXXXXX-XXXXXXXXXX';
+$l_samba_sid_used = 'This SID is already in use';
+$l_samba_domain_error = 'Invalid workgroup name';
+$l_samba_domain_used = 'This workgroup name is already in use';
+$l_samba_profile_error = 'Invalid profil default path, it should look like \\\\computeur\\path\\to\\profile';
+$l_samba_home_error = 'Invalid users home default path'; 
+$l_samba_drive_error = 'Invalid users home default drive';

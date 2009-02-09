@@ -121,6 +121,7 @@ function run_query_domain_insert($domain) {
   $domain_name = $domain['domain_name'];
   $alias = $domain['alias'];
   $mail_server_auto = $domain['mail_server_auto'];
+  $samba = $domain['samba'];
   
   $query = "INSERT INTO Domain (
     domain_timeupdate,
@@ -156,6 +157,9 @@ function run_query_domain_insert($domain) {
     }
     if ($cgp_use['service']['samba']) {
       of_service_insert('samba', $entity_id);
+      foreach($samba as $property => $value) {
+        of_service_property_insert('samba', $property, $entity_id, addslashes($value));
+      }
     } 
     run_query_domain_replace_properties($id,$domain);
   } else {
@@ -224,6 +228,7 @@ function run_query_domain_update($d_id, $domain) {
   $alias = $domain['alias'];
   $mail_server_auto = sql_parse_id($domain['mail_server_auto']);
   $did = sql_parse_id($d_id, true);
+  $samba = $domain['samba'];
   $query = "UPDATE Domain SET
     domain_timeupdate='$now',
     domain_userupdate=$uid,
@@ -242,6 +247,11 @@ function run_query_domain_update($d_id, $domain) {
     of_service_property_replace('mail','smtp_in', $entity_id, $domain['smtp_in']);
     of_service_property_replace('mail','smtp_out', $entity_id, $domain['smtp_out']);
   }  
+  if ($cgp_use['service']['samba']) {
+    foreach($samba as $property => $value) {
+      of_service_property_replace('samba', $property, $entity_id, addslashes($value));
+    }
+  }
   run_query_domain_replace_properties($d_id,$domain);
 
   return $retour;
@@ -277,16 +287,23 @@ function run_query_domain_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_domain_data_form($d_id, $domain) {
   global $err, $l_label_error,$l_alias_user_used,$l_name_in_use;
+  global $l_name_error, $cgp_use;
 
   $label = $domain['label'];
   $alias = trim($domain['alias']);
   $name = trim($domain['domain_name']);
+  $samba = $domain['samba'];
+  $id = $domain['domain_id'];
+
   // MANDATORY: Label
   if (trim($label) == '') {
     $err['msg'] = $l_label_error.' : '. $label;
     return false;
   }
-
+  if (trim($name) == '') {
+    $err['msg'] = $l_name_error.' : '. $name;
+    return false;
+  }
   $used_name = run_query_domain_get_used_name($alias, $name, $d_id);
   if(count($used_name) > 0) {
     $err['msg'] = "$l_name_in_use : ".implode(', ',$used_name);
@@ -299,6 +316,36 @@ function check_domain_data_form($d_id, $domain) {
       return false;
     }
   } 
+  if ($cgp_use['service']['samba']) {
+    if(!preg_match($GLOBALS['php_regexp_samba_sid'],$samba['sid'])) {
+      $err['msg'] = "$GLOBALS[l_samba_sid_error] : $samba[sid]";
+      return false;
+    }
+    if(!of_service_property_unique('samba', 'sid', $samba['sid'], $id)) {
+      $err['msg'] = "$GLOBALS[l_samba_sid_used] : $samba[sid]";
+      return false;
+    }
+    if(!preg_match($GLOBALS['php_regexp_samba_domain'],$samba['domain'])) {
+      $err['msg'] = "$GLOBALS[l_samba_domain_error] : $samba[domain]";
+      return false;
+    }
+    if(!of_service_property_unique('samba', 'domain', $samba['domain'], $id)) {
+      $err['msg'] = "$GLOBALS[l_samba_domain_used] : $samba[domain]";
+      return false;
+    }    
+    if(!preg_match($GLOBALS['php_regexp_samba_profile'],$samba['profile'])) {
+      $err['msg'] = "$GLOBALS[l_samba_profile_error] : $samba[profile]";
+      return false;
+    }
+    if(!preg_match($GLOBALS['php_regexp_samba_home'],$samba['home'])) {
+      $err['msg'] = "$GLOBALS[l_samba_home_error] : $samba[home]";
+      return false;
+    }
+    if(!preg_match($GLOBALS['php_regexp_samba_drive'],$samba['drive'])) {
+      $err['msg'] = "$GLOBALS[l_samba_drive_error] : $samba[drive]";
+      return false;
+    }
+  }
   return true;
 }
 /**
@@ -666,9 +713,31 @@ function run_query_domain_init_data($id) {
     $squery = sprintf($query, $table, implode(', ',array_merge($dynamicfields,array_keys($staticfields))), 
                                       implode(', ', array_merge($dynamicfields, array_values($staticfields))),
                                       $table, $domain_field, implode(', ', $dynamicfields));
+    display_debug_msg($squery, $cdg_sql, 'run_query_domain_init_data()');
     $db->query($squery);
   }
 
 }
 
+/**
+ * Get domain samba properties 
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function run_query_domain_samba_properties($id) {
+  global $obm, $cdg_sql;
+  $db = new DB_OBM;
+  $query = "SELECT * FROM ServiceProperty 
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    WHERE serviceproperty_service = 'samba' and domainentity_domain_id = '$id'";
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_samba_properties()');
+  $db->query($query);
+  $samba = array();
+  while($db->next_record()) {
+    $samba[$db->f('serviceproperty_property')] = $db->f('serviceproperty_value');
+  }
+  return $samba;
+}
 ?>

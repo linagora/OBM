@@ -134,8 +134,9 @@ function dis_domain_consult($domain) {
   $obm_q = run_query_domain_detail($id);
   $properties_q = run_query_domain_properties($id);
   $mailservers = of_domain_get_domain_mailserver('', $id);
+  $samba = run_query_domain_samba_properties($id);
   if ($obm_q->num_rows() == 1) {
-    $block = html_domain_consult($obm_q, $mailservers, $properties_q);
+    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q);
   } else {
     $display['msg'] .= display_err_msg($l_query_error);
   }
@@ -150,7 +151,7 @@ function dis_domain_consult($domain) {
 //   - $obm_q       : domain database result
 //   - $mailservers : domain mailservers array
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_consult($obm_q, $mailservers, $properties_q) {
+function html_domain_consult($obm_q, $mailservers, $samba, $properties_q) {
   global $display, $ico_delete, $l_mail_server, $cgp_use, $l_properties;
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
   global $l_host, $l_ip, $l_role, $l_mail_servers, $l_header_delete;
@@ -237,6 +238,30 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
     }
   }
 
+  if ($cgp_use['service']['samba']) {
+    $dis_samba = "
+      <div class=\"detail infos\">
+      <h1>$GLOBALS[l_samba]</h1>
+      <table>
+       <tr>
+         <th>$GLOBALS[l_samba_sid]</th><td>$samba[sid]</td>
+       </tr>
+       <tr>
+         <th>$GLOBALS[l_samba_domain]</th><td>$samba[domain]</td>
+       </tr>
+       <tr>
+         <th>$GLOBALS[l_samba_profile]</th><td>$samba[profile]</td>
+       </tr>        
+       <tr>
+         <th>$GLOBALS[l_samba_home]</th><td>$samba[home]</td>
+       </tr>
+       <tr>
+         <th>$GLOBALS[l_samba_drive]</th><td>$samba[drive]</td>
+       </tr>
+      </table>
+      </div>
+      ";
+  }
   // Domain properties
   while ($properties_q->next_record()) {
     $plabel = $GLOBALS['l_'.$properties_q->f('domainproperty_key')];
@@ -290,6 +315,7 @@ function html_domain_consult($obm_q, $mailservers, $properties_q) {
   </table>
   </div>
 $block_ms
+$dis_samba
 $properties_block    
 ";
 
@@ -304,7 +330,7 @@ $properties_block
 //   - $domain      : default values or updated values (if error)
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
+function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
   global $l_insert, $l_update,$l_mail_server, $l_header_add_mailserver;
   global $display, $cgp_use,$l_properties;
@@ -338,6 +364,7 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
   if (isset($domain['imap'])) { $imap = $domain['imap'];}
   if (isset($domain['smtp_in'])) { $smtp_in = $domain['smtp_in'];}
   if (isset($domain['smtp_out'])) { $smtp_out = $domain['smtp_out'];}
+  if (isset($domain['samba'])) { $samba = $domain['samba'];}
 
   while($properties_q->next_record()) {
     $readonly = $properties_q->f('domainproperty_readonly');
@@ -372,6 +399,7 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
   } elseif (($domain['action'] == 'detailupdate') || ($domain['action'] == 'update')) {
     $dis_domain_name = $domain_name;
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\">
+      <input type=\"hidden\"  name=\"tf_domain_name\"  value=\"$domain_name\">
           <input type=\"hidden\" name=\"domain_id\" value=\"$id\">
           <input type=\"submit\" value=\"$l_update\">";
   }
@@ -538,6 +566,38 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
     </fieldset>      
     ";
   }
+
+  if ($cgp_use['service']['samba']) {
+    if(isset($samba['drive']) && $samba['drive'] != '') $drive[$samba['drive']] = 'selected="selected"';
+    for($i='A';$i<='Z';$i++) {
+      $dis_drive_sel .= "<option ".$drive["$i"]." value='$i'>$i:</option>";
+    }
+    $dis_drive_sel = "<select style='width:4em;' name='samba[drive]'>$dis_drive_sel</select>";
+
+    $dis_samba = "
+      <fieldset class=\"detail infos\">
+      <legend>$GLOBALS[l_samba]</legend>
+      <table>
+       <tr>
+         <th>$GLOBALS[l_samba_sid]</th><td class='multiple'><input type='text' name='samba[sid]' id='sambaSID' value='$samba[sid]'/>&nbsp;<input type='button' onclick='autoGenSid()' value='$GLOBALS[l_autogen_sid]' /></td>
+       </tr>
+       <tr>
+         <th>$GLOBALS[l_samba_domain]</th><td><input type='text' name='samba[domain]' value='$samba[domain]'/></td>
+       </tr>
+       <tr>
+         <th>$GLOBALS[l_samba_profile]</th><td><input type='text' name='samba[profile]' value='$samba[profile]'/></td>
+       </tr>        
+       <tr>
+         <th>$GLOBALS[l_samba_home]</th><td><input type='text' name='samba[home]' value='$samba[home]'/></td>
+       </tr>
+       <tr>
+         <th>$GLOBALS[l_samba_drive]</th><td>$dis_drive_sel</td>
+       </tr>
+      </table>
+      </fieldset>
+      ";
+  }
+
   $display['title'] = $label;
 
   // --- HTML Template --------------------------------------------------------
@@ -568,6 +628,7 @@ function html_domain_form($dom_q, $mailservers, $properties_q, $domain) {
     $dis_alias
 
     $dis_mailserver
+    $dis_samba
     $properties_block
     <fieldset class=\"buttons\">
     $dis_button

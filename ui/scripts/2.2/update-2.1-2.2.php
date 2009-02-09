@@ -10,6 +10,52 @@
 $path = "../../php";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
+
+//------------------------------//
+// Default Profiles definitions //
+// Copy of global.inc from 2.1  //
+//------------------------------//
+$profiles['user'] = array (
+  'section' => array (
+    'default' => 0,
+    'com' => 1,
+    'prod' => 1,
+    'user' => 1,
+    'my' => 1),
+  'module' => array (
+    'default' => $perm_user,
+    'calendar' => $perm_editor),
+  'level' => 3,
+  'access_restriction' => 'ALLOW_ALL',
+  'access_exeptions' => array()
+);
+
+$profiles['editor'] = array (
+  'section' => array (
+    'default' => 0,
+    'com' => 1,
+    'prod' => 1,
+    'user' => 1,
+    'my' => 1),
+  'module' => array (
+    'default' => $perm_editor),
+  'level' => 2,
+  'access_restriction' => 'ALLOW_ALL',
+  'access_exeptions' => array()
+);
+
+$profiles['admin'] = array (
+  'section' => array (
+    'default' => 1),
+  'module' => array (
+    'default' => $perm_admin,
+    'domain' => 0),
+  'level' => 1,
+  'level_managepeers' => 1,
+  'access_restriction' => 'ALLOW_ALL',
+  'access_exeptions' => array()
+);
+
 include("../../obminclude/global.inc");
 include("$path/admin_data/admin_data_display.inc");
 include("$path/admin_data/admin_data_query.inc");

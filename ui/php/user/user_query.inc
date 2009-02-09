@@ -2613,4 +2613,29 @@ function hook_user_mailchooser_least_used_memory () {
   return array('host_id' => $obm_q->f('host_id'));
 }
 
+
+/**
+ * Get domain samba properties 
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function run_query_user_samba_properties() {
+  global $obm, $cdg_sql;
+  if($obm['domain_global'] == true) {
+    return array();
+  }
+  $db = new DB_OBM;
+  $query = "SELECT * FROM ServiceProperty 
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    WHERE serviceproperty_service = 'samba' and domainentity_domain_id = '$obm[domain_id]'";
+  display_debug_msg($query, $cdg_sql, 'run_query_domain_samba_properties()');
+  $db->query($query);
+  $samba = array();
+  while($db->next_record()) {
+    $samba[$db->f('serviceproperty_property')] = $db->f('serviceproperty_value');
+  }
+  return $samba;
+}
 ?>

@@ -2991,6 +2991,16 @@ function of_service_property_replace($service, $service_property, $id, $values) 
   of_service_property_insert($service, $service_property, $id, $values);
 }
 
+
+/**
+ * of_service_property_delete 
+ * 
+ * @param mixed $service 
+ * @param mixed $service_property 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
 function of_service_property_delete($service, $service_property, $id) {
   global $cdg_sql;
   $obm_q = new DB_OBM;  
@@ -2998,4 +3008,32 @@ function of_service_property_delete($service, $service_property, $id) {
   display_debug_msg($query, $cdg_sql, 'of_service_property_delete()');
   $obm_q->query($query);
 }
+
+/**
+ * of_service_property_unique
+ * 
+ * @param mixed $service 
+ * @param mixed $service_property 
+ * @param mixed $value 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function of_service_property_unique($service, $service_property, $value, $id='') {
+  $value = trim($value);
+  if($id) {
+    $qid = 'AND domainentity_domain_id != '.$id;
+  }
+  $obm_q = new DB_OBM;  
+  $query = "SELECT * FROM ServiceProperty 
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    WHERE serviceproperty_service = '$service' AND serviceproperty_property = '$service_property' 
+    AND serviceproperty_value = '$value'
+    $qid";
+  display_debug_msg($query, $cdg_sql, 'of_service_property_unique()');
+  $obm_q->query($query);
+  return (!$obm_q->next_record()); 
+}
+
+
 ?>

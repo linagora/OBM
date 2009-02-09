@@ -250,6 +250,23 @@ function switch_mail_mode() {
     external.injectInside($('userMail'));
   }
 }
+
+
+function switch_samba_mode() {
+  if($('userSambaActive').checked == true) {
+    samba.removeClass('H');
+    samba.injectInside($('userSamba'));
+
+  } else {
+    samba.addClass('H');
+  }
+}
+
+function sambaHomeCompute() {
+  var login = $('userLogin').value;
+  var hidden = $('userSambaHiddenHome').value;
+  $('userSambaHome').value = hidden.replace(/%u/g, login);
+}
 ";
 
 ?>
