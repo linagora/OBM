@@ -1231,12 +1231,13 @@ function get_user_pref($u_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_one_user_pref($u_id, $option) {
   global $cdg_sql;
+
   $u_id = sql_parse_id($u_id, true);
   $query = "SELECT *
     FROM UserObmPref
     WHERE (userobmpref_user_id IS NULL OR userobmpref_user_id $u_id )
     AND userobmpref_option='$option'
-    ORDER BY userobmpref_user_id DESC"; 
+    ORDER BY userobmpref_user_id"; 
 
   display_debug_msg($query, $cdg_sql, 'get_one_user_pref()');
   $obm_q = new DB_OBM;
@@ -1246,7 +1247,8 @@ function get_one_user_pref($u_id, $option) {
   while ($obm_q->next_record()) {
     $user_id = $obm_q->f('userobmpref_user_id');
     $value = $obm_q->f('userobmpref_value');
-
+    // To store default preferences (as NULL can not be a key)
+    if ($user_id == '') $user_id = 0;
     $prefs[$user_id]['value'] = $value;
   }
 
@@ -2333,10 +2335,11 @@ function of_usergroup_update_user_hierarchy($u_id, $is_array=false) {
 //  - $message    : mail content
 //  - $recipients : Id Recipients array
 //  - $r_addr     : adresses array to add to recipients
+//  - $setting    : recipient setting to check (set_mail, set_mail_participant)
 //  - $force      : Mail should be forced (all user even with no set_mail)
 //  - $h_file     : Attachments (array of ('name'=> '', 'type=''))
 ///////////////////////////////////////////////////////////////////////////////
-function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file='') {
+function send_mail($subject, $message, $recipients, $r_addr, $setting='set_mail', $force='', $h_file='') {
   global $cgp_mail_enabled;
   global $obm_version, $cgp_use; 
 
@@ -2350,7 +2353,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
   }
 
   $send_q = run_query_get_sender();
-  $reci_q = run_query_get_recipients($recipients, $force);
+  $reci_q = run_query_get_recipients($recipients, $setting, $force);
 
   // If AliaSuite, get local main mail domain.
 
@@ -2421,7 +2424,7 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
   $sep = chr(13) . chr(10);
 
   // message
-  $msg='';
+  $msg = '';
   if ($h_file !='') {
     $msg .= "\n--$boundary\n";
     $msg .= "Content-Type: text/plain; charset=UTF-8\n";
@@ -2453,25 +2456,33 @@ function send_mail($subject, $message, $recipients, $r_addr, $force='', $h_file=
   }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get recipients mail addresses
 // If no recipient given, no list returned
 // Parameters:
 //  - $recipients : Id Recipients array
+//  - $setting    : recipient setting to check (set_mail, set_mail_participant)
 //  - $force      : Mail should be forced (all user even with no set_mail)
 // Returns: DB with email recipients, or false if no valid recipients
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_recipients($recipients, $force) {
+function run_query_get_recipients($recipients, $setting='set_mail', $force) {
   global $cdg_sql;
+
+  if (($setting == 'set_mail') || ($setting == 'set_mail_participant')) {
+    $set_mail = $setting;
+  } else {
+    $set_mail = 'set_mail';
+  }
 
   if ($force != 1) {
     $mail_filter = "
       AND (up1.userobmpref_value = 'yes' OR
       (up2.userobmpref_value = 'yes' AND up1.userobmpref_value IS NULL))";
     $join = "LEFT JOIN UserObmPref as up1 ON up1.userobmpref_user_id=userobm_id
-      AND up1.userobmpref_option = 'set_mail'
+      AND up1.userobmpref_option = '$set_mail'
       LEFT JOIN UserObmPref as up2 on up2.userobmpref_user_id IS NULL
-      AND up2.userobmpref_option = 'set_mail'";
+      AND up2.userobmpref_option = '$set_mail'";
   }
   $coma = '';
   foreach($recipients as $recipient) {

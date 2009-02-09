@@ -58,6 +58,12 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Mail enabled
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_mail','yes');
 
+-- Mail event participation enabled
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_mail_participation','yes');
+
+-- Calendar display days
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_cal_display_days','1111111');
+
 -- Day the week start 
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_day_weekstart','monday');
 

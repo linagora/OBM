@@ -2580,6 +2580,8 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
 
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
 // Parameters:
@@ -3070,7 +3072,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <tr>
     <th>$l_sendamail</th>
     <td><input type=\"checkbox\" id=\"cba_mail\" value=\"1\" name=\"cba_mail\" /></td>
-  </tr>       
+  </tr>
   <tr>
     <th>$l_force</th>
     <td>$dis_force</td>

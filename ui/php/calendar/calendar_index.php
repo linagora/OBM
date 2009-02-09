@@ -213,7 +213,7 @@ if ($action == 'index') {
   } else {
     $mail_data = run_query_prepare_event_mail($params, $action);
     $conflict = run_query_calendar_insert_decision($params);
-    calendar_send_mail($mail_data);    
+    calendar_send_mail($mail_data, 'set_mail_participation');    
     $obm_wait = run_query_calendar_waiting_events();
     if ($obm_wait->nf() != 0) {
       $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
@@ -248,7 +248,7 @@ if ($action == 'index') {
       $event_id = run_query_calendar_add_event($params, $entities);
       $params["calendar_id"] = $event_id;
       $mail_data = run_query_prepare_event_mail($params, $action);
-      calendar_send_mail($mail_data);
+      calendar_send_mail($mail_data, 'set_mail');
       if ($params['date_begin'] < date('Y-m-d H:')) {
 	$display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
       }
@@ -313,7 +313,7 @@ if ($action == 'index') {
     } else {
       $mail_data = run_query_prepare_event_mail($params, $action);
       run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
-      calendar_send_mail($mail_data);
+      calendar_send_mail($mail_data, 'set_mail');
       $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
       $params["date"] = $params["date_begin"];
       $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
@@ -336,7 +336,7 @@ if ($action == 'index') {
     } else {
       $id = run_query_calendar_event_exception_insert($params,$eve_q);
     }
-    calendar_send_mail($mail_data);
+    calendar_send_mail($mail_data, 'set_mail');
     json_event_data($id,$params);
     json_ok_msg("$l_event : $l_update_ok");
     echo "({".$display['json']."})";
@@ -379,7 +379,7 @@ if ($action == 'index') {
     } else {
       run_query_calendar_event_exception_insert($params);
     }
-    calendar_send_mail($mail_data);
+    calendar_send_mail($mail_data, 'set_mail');
     json_ok_msg("$l_event : $l_delete_ok");
     echo "({".$display['json']."})";
     exit();            
@@ -395,7 +395,7 @@ if ($action == 'index') {
     $retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
     if ($retour) {
       $mail_data = run_query_prepare_event_mail($params, $action);
-      calendar_send_mail($mail_data);
+      calendar_send_mail($mail_data, 'set_mail_participation');
       $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
     } else {
       $display['msg'] .= display_err_msg("$l_event  : $err[msg]");
@@ -445,7 +445,7 @@ if ($action == 'index') {
   if (check_calendar_access($params["calendar_id"])) {
     $mail_data = run_query_prepare_event_mail($params, $action);
     run_query_calendar_delete($params);
-    calendar_send_mail($mail_data);
+    calendar_send_mail($mail_data, 'set_mail');
     $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);

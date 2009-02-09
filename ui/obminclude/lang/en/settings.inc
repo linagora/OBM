@@ -27,7 +27,8 @@ $l_set_cal_first_hour = "Calendar start hour";
 $l_set_cal_last_hour = "Calendar end hour";
 $l_set_csv_sep = "CSV Export separator";
 $l_set_debug = "Debugging level";
-$l_send_mail = "Accept e-mails";
+$l_send_mail = "Accept emails";
+$l_send_mail_participation = "Meeting participation emails";
 
 $l_update_ok = "Settings updated successfully";
 

@@ -2254,6 +2254,6 @@ $cgp_host/project/project_index.php?action=detailconsult&project_id=$p_id
   $l_dateend : $dateend
 
   $comment";
-  send_mail($subject, $message, array($member), array(), 1);
+  send_mail($subject, $message, array($member), array(), '', 1);
 }
 ?>

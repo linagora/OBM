@@ -99,6 +99,13 @@ if ($params['form_user_pref']) {
   }
   update_user_pref($obm['uid'], 'set_mail', $_SESSION['set_mail']);
 
+  if ($params['mail_participation'] == 'yes') {
+    $_SESSION['set_mail_participation'] = 'yes';
+  } else {
+    $_SESSION['set_mail_participation'] = 'no';
+  }
+  update_user_pref($obm['uid'], 'set_mail_participation', $_SESSION['set_mail_participation']);
+
   // days to display in the week view
   if ($params['display_days']=='0000000') {
     $params['display_days'] = '1111111';
@@ -327,6 +334,15 @@ $display['detail'] .= " /></td>
   </tr>";
 
 if ($cgp_show['module']['calendar']) {
+
+$display['detail'] .= "
+  <tr>
+    <th>$l_send_mail_participation</th>
+    <td class=\"adminText\">
+      <input type=\"checkbox\" name=\"mail_participation\" value=\"yes\" ";
+if ($_SESSION['set_mail_participation'] == 'yes') $display['detail'] .= 'checked';
+$display['detail'] .= " /></td>
+  </tr>";
 
   // days to display in the week view
   $display_days = $_SESSION['set_cal_display_days'];

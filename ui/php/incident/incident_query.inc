@@ -348,7 +348,7 @@ function run_query_incident_insert($incident) {
       $l_status: $status
       $l_contract: $contract
       $comment";
-    send_mail($subject, $message, array($logger, $owner), array("$cmail_incident"), 1);
+    send_mail($subject, $message, array($logger, $owner), array("$cmail_incident"), '', 1);
   }
 
   return $i_id;
@@ -512,14 +512,14 @@ function run_query_incident_update($incident) {
       $label_mail = stripslashes($lincident);
       $subject = "$l_mail_incident_affected_subject : $label_mail";
       $message = "$l_mail_incident_affected_content : $cgp_host/incident/incident_index.php?action=detailconsult&incident_id=$incident[incident_id]";
-      send_mail($subject, $message,  array($incident['owner']), array(), 1);
+      send_mail($subject, $message,  array($incident['owner']), array(), '', 1);
     }
     if($closed) {
       $label_mail = stripslashes($lincident);
       $subject = "$l_mail_incident_closed_subject : $label_mail";
       $message = "$cgp_host/incident/incident_index.php?action=detailconsult&incident_id=$incident[incident_id] $l_mail_incident_closed_content";
 
-      send_mail($subject, $message, array($incident['owner']), array("$cmail_incident"), 1);
+      send_mail($subject, $message, array($incident['owner']), array("$cmail_incident"), '', 1);
     }
     $ret = of_userdata_query_update('incident', $incident['incident_id'], $incident);
   }

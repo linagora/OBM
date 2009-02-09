@@ -334,7 +334,7 @@ function check_calendar_event_participation($params) {
 
   $event_id = $params['calendar_id'];
   $entity = 'user';
-  $entity_id = $obm['uid'];
+  $entity_id = $params['entity_id'];
   $state = $params['decision_event'];
 
   $current_state = get_calendar_event_participation_state($event_id, $entity, $entity_id);
@@ -506,13 +506,11 @@ function run_query_calendar_delete_event_entity($calendar, $users = null) {
 ///////////////////////////////////////////////////////////////////////////////
 // Insert one event
 // Parameters: 
-//   - $calendar        : Calendar params
+//   - $calendar      : Calendar params
 //   - $sel_entity_id : List entitis id ['user'] ['resource']
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_add_event($calendar, $sel_entity_id) {
   global $obm, $ccalendar_resource_admin, $ccalendar_send_ics;
-  global $l_from, $l_to, $l_date, $l_resource_allocated;
-  global $l_add_event_mail_head,$l_add_event_mail_subject;
 
   $groups = $sel_entity_id['group'];
   // Get the final user list (merge group)
@@ -525,15 +523,15 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
     $users_array = array_merge($users_array, $user_group_array);
     $users_array = array_unique($users_array);
   }
-  
+
   $resources_array = $sel_entity_id['resource'];
-  
+
   if (!is_array($resources_array) && !is_array($users_array)) {
-    $users_array = array($obm["uid"]);
+    $users_array = array($obm['uid']);
   }
 
   // Insert the Event
-  $event_id = run_query_calendar_insert_event_data($calendar);   
+  $event_id = run_query_calendar_insert_event_data($calendar);
 
   // Insert Event users
   foreach ($users_array as $user_id) {
@@ -558,7 +556,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
       }
       array_push($resources_writable, $res_id);
     }
-  }    
+  }
 
   // Insert My alert if set
   if (($calendar['alert']) > 0) {
@@ -770,11 +768,11 @@ function create_calendar_ics_meeting_file($calendar, $event_id, $attendees, $res
 // Analyse the imported ics file
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_icalendar_insert($params, $force = false) {
-  global $obm ;
-  global $all_emails ;
+  global $obm;
+  global $all_emails;
 
   // --- get the unfolding ics
-  $ics = $params['ics_tmp'] ;
+  $ics = $params['ics_tmp'];
   include_once('obminclude/of/vcalendar/Utils.php');
   include_once('obminclude/of/vcalendar/writer/OBM.php');
   $format = VCalendar_Utils::getFileType($ics);
@@ -924,9 +922,7 @@ function check_calendar_decision_conflict($calendar) {
 //   - $sel_entity_id : List entitis id ['user'] ['resource']
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $reset_state) {
-  global $c_use_connectors, $obm, $l_date;
-  global $l_update_event_mail_head,$l_update_event_mail_subject,$l_update_event_mail_body,$l_to,$l_from;
-  global $ccalendar_resource_admin, $l_resource_allocated;
+  global $c_use_connectors, $obm, $ccalendar_resource_admin;
 
   $datebegin = $calendar['date_begin'];
   $dateend = $calendar['date_end'];
@@ -957,7 +953,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   }
 
   if (!is_array($resources_array) && !is_array($users_array)) {
-    $users_array = array($obm["uid"]);
+    $users_array = array($obm['uid']);
   }
 
   // Handle Connectors data
@@ -1049,7 +1045,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
       }
     }
   }
-  
+
   // Insert My alert if set
   if (($calendar['alert']) > 0) {
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
@@ -1430,7 +1426,6 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
  */
 function run_query_quick_attendee_update($params, $eve_q) {
   global $obm, $cgp_host;
-  global $l_update_event_mail_body, $l_update_event_mail_subject ;
 
   $event_id = $eve_q->f('event_id');
   $entities = get_calendar_event_entity($event_id);
@@ -1563,16 +1558,14 @@ function check_calendar_access($id, $right = 'write') {
 //   - $calendar : calendar infos hash
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_delete($calendar) {
-  global $cdg_sql, $c_use_connectors, $l_to, $l_from;
-  global $l_delete_event_mail_head,$l_delete_event_mail_subject,$l_delete_event_mail_body;
-  global $ccalendar_resource_admin, $l_resource_allocated;
+  global $cdg_sql, $c_use_connectors, $ccalendar_resource_admin;
 
   $obm_q = new DB_OBM;
   $event_id =  $calendar['calendar_id'];
-  $mail = $calendar['mail']; 
-  
+  $mail = $calendar['mail'];
+
   $users_array = get_calendar_event_users_info($event_id);
-  
+
   $multidomain = sql_multidomain('event');
   $query = "SELECT event_title
     FROM Event
@@ -1599,7 +1592,6 @@ function run_query_calendar_delete($calendar) {
   $query = "DELETE FROM Event WHERE event_id = $event_id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
   $obm_q->query($query);
-
 }
 
 
@@ -1959,6 +1951,7 @@ function get_calendar_event_entity($calendar_id) {
 
   return $entities;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Calendar Quick Form Data checking and formatting
@@ -3624,12 +3617,12 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $calendar['sel_user_id'] = array_unique($calendar['sel_user_id']);
   }
 
-  if($action == 'update') {
-    if(!$event_q) {
+  if ($action == 'update') {
+    if (!$event_q) {
       $event_q = run_query_calendar_detail($calendar['calendar_id']);
     }
 
-    
+
 
 
     $oldtitle = $event_q->f('event_title');
@@ -3971,9 +3964,9 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
 }
 
 
-function calendar_send_mail($mails) {
+function calendar_send_mail($mails, $setting='set_mail') {
   foreach($mails['mails'] as $mail) {
-    send_mail(stripslashes($mail['subject']), $mail['message'], $mail['recipients'], array(), $mail, $mail['h_file']);
+    send_mail(stripslashes($mail['subject']), $mail['message'], $mail['recipients'], array(), $setting, $mail, $mail['h_file']);
   }
 }
 
@@ -3986,6 +3979,7 @@ function calendar_send_mail($mails) {
  */
 function run_query_calendar_reset($id) {
   global $cdg_sql, $obm;
+
   $obm_q = new DB_OBM;
   $calendar['mail'] = false;
   $writable = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write'));

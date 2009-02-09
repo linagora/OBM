@@ -683,7 +683,7 @@ $datecomment:$usercomment:$add_comment";
     $users_array = array();
   }
   $recipient_array = $users_array;
-  send_mail($subject, $message, $recipient_array,'');
+  send_mail($subject, $message, $recipient_array,'', 'set_mail');
 
   return true;
 }
