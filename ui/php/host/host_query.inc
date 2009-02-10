@@ -530,13 +530,15 @@ function run_query_check_host($id, $name, $desc) {
 function check_host_can_delete($id) {
   global $cdg_sql;
   $query = "
-    SELECT count(*) FROM ServiceProperty 
+    SELECT count(*) as count FROM ServiceProperty 
     INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
     WHERE serviceproperty_service = 'mail' AND serviceproperty_property IN ('imap', 'smtp_in', 'smtp_out')
     AND serviceproperty_value = '$id'";
   $obm_q = new DB_OBM;  
   display_debug_msg($query, $cdg_sql, 'check_host_can_delete');
   $obm_q->query($query);
+  $obm_q->next_record();
+  return ($obm_q->f('count') == 0);
   
 }
 ///////////////////////////////////////////////////////////////////////////////

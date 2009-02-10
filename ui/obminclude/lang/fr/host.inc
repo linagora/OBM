@@ -56,6 +56,8 @@ $l_err_firewall_perms = "La syntaxe des permissions avancées n'est pas correcte
 
 $l_help_system = "Un hôte système est un hôte nécessaire au fonctionnement de votre plate-forme.";
 
+$l_cant_delete = 'Cet hôte est lié à un ou plusieurs domaines et ne peux donc être supprimé';
+
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';

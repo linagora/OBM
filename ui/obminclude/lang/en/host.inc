@@ -57,6 +57,7 @@ $l_err_firewall_perms = "Invalid advanced perms syntax";
 
 $l_help_system = "System host is needed for the system.";
 
+$l_cant_delete = 'This host is linked to one or more domains so it can\'t be deleted';
 
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
