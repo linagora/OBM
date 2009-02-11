@@ -221,7 +221,6 @@ function run_query_invoice_detail($p_invoice_id) {
 function run_query_invoice_insert($invoice) {
   global $cdg_sql, $obm;
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
   $domain_id = sql_parse_id($obm['domain_id']);
 	
@@ -279,7 +278,7 @@ function run_query_invoice_insert($invoice) {
     VALUES (
      $domain_id,
       null,
-     '$now',
+     NOW(),
      null,
      $uid,
      $comp_id,
@@ -314,7 +313,6 @@ function run_query_invoice_insert($invoice) {
 function run_query_invoice_update($invoice) {
   global $obm, $cdg_sql;
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
 
   $id = sql_parse_id($invoice['invoice_id'], true);
@@ -351,7 +349,7 @@ function run_query_invoice_update($invoice) {
   $multidomain = sql_multidomain('invoice');
 
   $query = "UPDATE Invoice SET
-      invoice_timeupdate='$now',
+      invoice_timeupdate=NOW(),
       invoice_userupdate=$uid,
       invoice_company_id=$comp_id,
       invoice_deal_id=$deal_id,

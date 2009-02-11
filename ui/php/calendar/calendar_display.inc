@@ -315,6 +315,10 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       <input type=\"hidden\" name=\"new_group\" value=\"1\" />
       <input type=\"hidden\" name=\"new_sel\" value=\"1\" />
     </fieldset>";
+
+    $user_complete = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {filter_entity:'calendar', filter_pattern:'read', defaultText:'$user_text'});";
+    $group_complete = "new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {filter_entity:'calendar', filter_pattern:'read', mode: 'mono',
+        locked: 'true', resetable: 'true', selectfunction:'sel_public_group(\"$iso\", element, this.inputField.value)'});";
   }
   // loop through ['user'], ['resource']
   foreach ($calendar_entity as $type => $entity) {
@@ -347,7 +351,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     </legend>
     <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />";
 
-    $resource_js = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {filter_entity:'Resource', defaultText:'$resource_text'});";
+    $resource_complete = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {filter_entity:'Resource', defaultText:'$resource_text'});";
   }
   $cats1 = of_category_get_ordered('event', 'category1');
   $sel_cat1 = of_category_html_select('event', 'category1', $cats1, $category_filter,'all_f',"onchange=\"this.form.submit()\"",'category_filter');
@@ -356,8 +360,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
 
   if($block_user || $block_group || $dis_block_resource) {
     $block_entity = "
-    <form action=\"calendar_index.php\" method=\"get\">
     $block_group
+    <form action=\"calendar_index.php\" method=\"get\">
     $block_user
     $dis_block_resource
     <fieldset class=\"detail extra\">
@@ -399,10 +403,9 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
   <script type=\"text/javascript\">
     obm.vars.images.update = '$ico_group';
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent', 'user', {filter_entity:'calendar', filter_pattern:'read', defaultText:'$user_text'})
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group', 'group_name', {filter_entity:'calendar', filter_pattern:'read', mode: 'mono',
-        locked: 'true', resetable: 'true', selectfunction:'sel_public_group(\"$iso\", element, this.inputField.value)'});
-      $resource_js
+      $user_complete
+      $group_complete
+      $resource_complete
     });
     </script>    
 ";
@@ -1099,7 +1102,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
       if ($i%2 == 0) $klass = "pair"; else $klass = '';
       $i ++;
       $label = $current->localize(Of_Date::OBM_DATE_WEEK_LONG);
-      if ($current->isToday())$klass="class=\"highlight\"";
+      if ($current->isToday())$klass="highlight";
       $dis_events .= "
         <tr class=\"$klass\">
           <td><a href=\"calendar_index.php?cal_range=day&amp;date=".$current->getURL()."\">$label</a></td>
@@ -1109,7 +1112,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         $event = $v->event;
         $date = $v->date;
         $hour = $v->date->get(Of_Date::TIME_SHORT);
-        $end = $v->end;
+        $end = clone $v->end;
         $ev_id = $event->id;
         $title = $event->title;
         $location = $event->location;
@@ -1189,7 +1192,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         }        
         if ($event->all_day == 1) {
 	  $date_begin = $date->getOutputDate();
-	  $date_end = $end->getOutputDate(); 
+	  $date_end = $end->subSecond(1)->getOutputDate(); 
 	} else {
 	  $date_begin = $date->getOutputDateTime();
 	  $date_end = $end->getOutputDateTime(); 
@@ -1212,10 +1215,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
           <div id=\"eventDetail_${date}_$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
             <table>
               <tr>
-                <th>$l_datebegin</th><td>$date_begin</td>
-              </tr>
-              <tr>
-                <th>$l_dateend</th><td>$date_end</td>
+                <th colspan='2'>$date_begin - $date_end</th>
               </tr>
               <tr>
                 <th>$l_repeat</th><td>$dis_repeat</td>
@@ -2611,6 +2611,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   $repeatfrequency = 1;
 
+  $calendar_readable = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access');
+  $resources_readable = OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'access');
+
   if (($action == 'detailupdate') || ($action == 'duplicate')) {
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
@@ -2807,26 +2810,32 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </select>
     </td>";
 
-
-  $block_user = "
-    <fieldset class=\"detail infos\">
-    <legend>$l_users</legend>    
-    <table>
-    <tr>
-    <th>
-    $l_users
-    $user_add_button
-    </th>
-    <td>
-      <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
-    </td>
-    </tr>
-    <tr>
-    <th>&nbsp;</th>    
-    <td id=\"sel_user_id\">$dis_sel_user</td>
-    </tr>
-    </table>
-    </fieldset>";
+  if(count($calendar_readable) > 1) {
+    $block_user = "
+      <fieldset class=\"detail infos\">
+      <legend>$l_users</legend>    
+      <table>
+      <tr>
+      <th>
+      $l_users
+      $user_add_button
+      </th>
+      <td>
+        <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
+      </td>
+      </tr>
+      <tr>
+      <th>&nbsp;</th>    
+      <td id=\"sel_user_id\">$dis_sel_user</td>
+      </tr>
+      </table>
+      </fieldset>
+      <p class=\"LC\" />
+      ";
+      $user_complete = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
+  } else {
+    $block_user = "<fieldset class=\"detail infos H\"><input type='hidden' name='sel_user_id[]' value='data-user-$obm[uid]' /></fieldset>";
+  }
 
   // group select
   if (is_array($groups['entity'])) {
@@ -2853,28 +2862,30 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
 
+  if(count($calendar_readable) > 1) {
     $block_group = "
-    <fieldset class=\"detail infos\">
-    <legend>$l_groups</legend>    
-    <table>
-    <tr>
-    <th>
-    $l_groups
-    $group_add_button
-    </th>
-    <td>
-      <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />
-    </td>
-    </tr>
+      <fieldset class=\"detail infos\">
+      <legend>$l_groups</legend>    
+      <table>
+      <tr>
+      <th>
+      $l_groups
+      $group_add_button
+      </th>
+      <td>
+        <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />
+      </td>
+      </tr>
 
-    <tr>
-    <th>&nbsp;</th>
-    <td id=\"sel_group_id\">$dis_sel_group</td>
-    </tr>
-    </table>
-    </fieldset>";
-
-  if ($ccalendar_resource) {
+      <tr>
+      <th>&nbsp;</th>
+      <td id=\"sel_group_id\">$dis_sel_group</td>
+      </tr>
+      </table>
+      </fieldset>";
+    $group_complete = "new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
+  }
+  if ($ccalendar_resource && count($resources_readable) > 0) {
     // resource select
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $r_ent) {
@@ -2969,6 +2980,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </tr>
     </table>
     </fieldset>";
+    $resource_complete = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&form=event', 'sel_resource_id', 'resourceSearch',{filter_entity:'Resource', filter_pattern:'access'});";
   }
 
   if ($force == 1) {
@@ -3148,7 +3160,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   </table>
   </fieldset>
   $block_user
-  <p class=\"LC\" />
   $block_resource
   $block_group
   <fieldset class=\"detail infos\">
@@ -3169,9 +3180,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   </form>
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});
-      new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&form=event', 'sel_resource_id', 'resourceSearch',{filter_entity:'Resource', filter_pattern:'access'});
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');
+      $user_complete
+      $resource_complete
+      $group_complete
     });
   </script>"; 
 
@@ -4414,7 +4425,6 @@ function dis_calendar_month_list_pdf($calendar, $calendar_entity) {
   $status = array('ACCEPTED');
 
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
-
   $pdf = new CalendarPdfList('month', $calendar, $calendar_entity, $occurrences);
   $pdf->drawCalendar();
   $pdf->download();
@@ -4441,7 +4451,6 @@ function dis_calendar_week_list_pdf($calendar, $calendar_entity) {
   $status = array('ACCEPTED');
 
   $occurrences = calendar_events_model($date, $end, $calendar_entity, $status, $category_filter, true);
-
   $pdf = new CalendarPdfList('week', $calendar, $calendar_entity, $occurrences);
   $pdf->drawCalendar();
   $pdf->download();
@@ -4485,11 +4494,10 @@ function dis_calendar_day_list_pdf($calendar, $calendar_entity) {
  * @return void
  */
 function check_conflict($column){ // FIXME
-
   //Evénement à mettre à jour
   $updated = array();
   foreach($column as $date => $cell) {
-    //Position utilisé dans le groupe d'événement en cours de traitement
+    //Positions utilisées dans le groupe d'événement en cours de traitement
     $usedPositions = array();
     //Position de l'événement en cours de traitement
     $position = 0;
@@ -4499,7 +4507,7 @@ function check_conflict($column){ // FIXME
         // Coordonnée de l'événement en cours de traitement
         unset($coordinate);
         // Si cette événement n'est pas déjà taité
-        if(!($coordinate = &$updated[$event->id])) {
+        if(!($coordinate = &$updated[$event->id .'-'.$occurrence->entity . '-' . $occurrence->id])) {
           // Si il n'y a aucune position utilisé, on définit l'unité de fractionnement à 100 % de la cellule
           if(empty($usedPositions))  {
             unset($unit);
@@ -4523,7 +4531,7 @@ function check_conflict($column){ // FIXME
           // On définis les coordonnées de l'événement
           unset($coordinate);
           $coordinate = array('position' => $position, 'unit' => &$unit, 'end' => &$end, 'occurrence' => $occurrence);
-          $updated[$event->id] = &$coordinate;
+          $updated[$event->id .'-'.$occurrence->entity . '-' . $occurrence->id] = &$coordinate;
         }
         $usedPositions[$coordinate['position']] = true;        
         // On peuple Updated
@@ -4601,7 +4609,8 @@ Class CalendarPdf{
 
     // Style
     $this->font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_BOLD);
-    $this->font_size = 8;
+    $this->font_size = 6;
+    $this->font_height = 1.25 * 6;
     $this->class = array(
       "eventOwner" => array("title" => "#2952A3", "background" => "#668CD9"),
       "eventOwner0" => array("title" => "#A32929", "background" => "#D86666"),
@@ -4682,7 +4691,7 @@ Class CalendarPdf{
     $this->page->drawText(
       $this->editor,
       $this->content_x0+90,
-      $this->content_y1-$this->font_size,
+      $this->content_y1-$this->font_height,
       'UTF 8');
 
     // Date creation
@@ -4691,7 +4700,7 @@ Class CalendarPdf{
     $this->page->drawText(
       $today,
       $this->content_x0+90,
-      $this->content_y1-2*$this->font_size,
+      $this->content_y1-2*$this->font_height,
       'UTF-8');
 
     // Category
@@ -4704,7 +4713,7 @@ Class CalendarPdf{
     $this->page->drawText(
       $display_category,
       $this->content_x0+90,
-      $this->content_y1-3*$this->font_size,
+      $this->content_y1-3*$this->font_height,
       'UTF-8');
   }
 
@@ -4722,7 +4731,7 @@ Class CalendarPdf{
         $x0 = $this->content_x0 +$i;
         $y0 = $this->content_y0;
         $x1 = $x0 + 90;
-        $y1 = $y0 + $this->font_size;
+        $y1 = $y0 + $this->font_height;
         $this->page->drawRectangle($x0+2 , $y0-1, $x1, $y1+1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
         $this->page->drawText($username, $x0+4, $y0, 'UTF-8');
@@ -4777,7 +4786,7 @@ Class CalendarPdf{
 
     $this->pdf->save($this->tmp_filename);
     $file = fopen($this->tmp_filename, "r");
-    header("Content-Type: application/octet-stream") ;
+    header("Content-Type: application/pdf") ;
     header("Content-Disposition: attachment; filename=\"$filename\";");
     header("Cache-Control: maxage=3600");
     header('Pragma: public');
@@ -4862,9 +4871,9 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $this->page->setFillColor(new Zend_Pdf_Color_Html('#EEEEEE'));
     $this->page->drawRectangle(
       $this->calendar_x0,
-      $this->calendar_y1+$this->font_size,
+      $this->calendar_y1+$this->font_height,
       $this->calendar_x1,
-      $this->calendar_y1+2*$this->font_size+2,
+      $this->calendar_y1+2*$this->font_height+2,
       Zend_Pdf_Page::SHAPE_DRAW_FILL);
 
     $date = clone $this->calendar['date'];
@@ -4881,7 +4890,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
         $this->page->drawText(
           $day,
           $this->calendar_x0+$i*$this->col_width+$this->col_width/2-($this->getStringWidth($day)/2),
-          $this->calendar_y1+$this->font_size+2,
+          $this->calendar_y1+$this->font_height+2,
           'UTF-8');
       $i++;
       $current->addDay(1);
@@ -4925,14 +4934,14 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
           $nb_events = max($nb_events, sizeof($this->updated[$s])); // max events per day
         }
 
-        $this->col_height = $this->font_size*($nb_events+2);
+        $this->col_height = $this->font_height*($nb_events+2);
         if ($this->col_height< $this->min_col_height){
           $this->col_height = $this->min_col_height;
         }
         $this->current_y += $this->col_height;
 
         $endofday = $this->calendar_y1-$this->current_y;
-        if ($endofday < ($this->content_y0+$this->font_size)) {
+        if ($endofday < ($this->content_y0+$this->font_height)) {
           $this->addPage();
           $this->drawDays();
           $this->current_y = $this->col_height;
@@ -4965,7 +4974,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
       $this->page->setFillColor(new Zend_Pdf_Color_Html('#CCCCCC'));
       $this->page->drawRectangle(
         $this->calendar_x0+$i*$this->col_width,
-        $this->calendar_y1-$this->current_y+$this->col_height+$this->font_size,
+        $this->calendar_y1-$this->current_y+$this->col_height+$this->font_height,
         $this->calendar_x0+$i*$this->col_width+$this->col_width,
         $this->calendar_y1-$this->current_y+$this->col_height-2,
         Zend_Pdf_Page::SHAPE_DRAW_FILL);
@@ -5011,14 +5020,14 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
           $nb_events = max($nb_events, sizeof($this->updated[$s])); // max events per day
         }
 
-        $this->col_height = $this->font_size*($nb_events+2);
+        $this->col_height = $this->font_height*($nb_events+2);
         if ($this->col_height< $this->min_col_height){
           $this->col_height = $this->min_col_height;
         }
         $this->current_y += $this->col_height;
 
         $endofday = $this->calendar_y1-$this->current_y;
-        if ($endofday < ($this->content_y0+$this->font_size)) {
+        if ($endofday < ($this->content_y0+$this->font_height)) {
           $page++;
           $this->page = $this->pdf->pages[$page];
           $this->current_y = $this->col_height;
@@ -5091,7 +5100,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
 
       $this->page->setFillColor(new Zend_Pdf_Color_Html($title_color));
       $x0 = $this->calendar_x0+$day*$this->col_width;
-      $y0 = $this->calendar_y1-$this->current_y+$this->col_height-$this->font_size*$cur-2;
+      $y0 = $this->calendar_y1-$this->current_y+$this->col_height-$this->font_height*$cur-2;
       $x1 = $x0+$this->col_width;
 
       if ($this->is_multi_days_event($occurrence)) {
@@ -5119,11 +5128,11 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
       }
       if ($x1 > $this->calendar_x1) $x1 = $this->calendar_x1;
 
-      $this->page->drawRectangle($x0,$y0,$x1,$y0-$this->font_size,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+      $this->page->drawRectangle($x0,$y0,$x1,$y0-$this->font_height,Zend_Pdf_Page::SHAPE_DRAW_FILL);
       $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
       $this->page->drawText($title,
         $this->calendar_x0+$day*$this->col_width+2, 
-        $y0-$this->font_size+1, 'UTF-8');
+        $y0-$this->font_height+1, 'UTF-8');
       $cur++;
     }
   }
@@ -5170,7 +5179,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
 
     // Page Coord.
     $this->calendar_x0 = $this->content_x0 + $this->margin;
-    $this->calendar_y0 = $this->content_y0 + 2*$this->font_size;
+    $this->calendar_y0 = $this->content_y0 + 2*$this->font_height;
     $this->calendar_x1 = $this->content_x1;
 
     // Calendar
@@ -5199,7 +5208,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
     $this->week_num = $date->get(Of_Date::WEEK); 
 
     $this->getNbOutEvents();
-    $this->allday_height = (1+$this->nb_out_events) * $this->font_size;
+    $this->allday_height = (1+$this->nb_out_events) * $this->font_height;
     $this->onedayperpage = $calendar['onedayperpage'];
 
     if ($this->range == "week") {
@@ -5279,11 +5288,11 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
     $this->page->setFillColor(new Zend_Pdf_Color_Html('#F5F5F5'));
     $this->page->drawRectangle(
       $this->content_x0, $this->calendar_y0,
-      $this->calendar_x0, $this->calendar_y1+$this->font_size*2,
+      $this->calendar_x0, $this->calendar_y1+$this->font_height*2,
       Zend_Pdf_Page::SHAPE_DRAW_FILL);
     $this->page->drawRectangle(
       $this->content_x0, $this->calendar_y1,
-      $this->content_x1, $this->calendar_y1+$this->font_size*2,
+      $this->content_x1, $this->calendar_y1+$this->font_height*2,
       Zend_Pdf_Page::SHAPE_DRAW_FILL);
 
     // day label y separator
@@ -5308,9 +5317,9 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $this->page->drawLine($this->calendar_x0-10, $y+$this->col_height/2, $this->calendar_x1, $y+$this->col_height/2);
       }
       // label
-      if ($this->calendar_y0+$i*$this->col_height-$this->font_size > $this->calendar_y0){
+      if ($this->calendar_y0+$i*$this->col_height-$this->font_height > $this->calendar_y0){
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#3D3D3D'));
-        $this->page->drawText($this->calendar_last_hour-$i.":00", $this->content_x0, $y-$this->font_size, 'UTF-8');
+        $this->page->drawText($this->calendar_last_hour-$i.":00", $this->content_x0, $y-$this->font_height, 'UTF-8');
       }
     }
 
@@ -5377,8 +5386,8 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         }
 
         $x1 = $x0 + $this->col_width;
-        $y0 = $this->calendar_y1-($this->current_out_event)*$this->font_size;
-        $y1 = $y0 - $this->font_size;
+        $y0 = $this->calendar_y1-($this->current_out_event)*$this->font_height;
+        $y1 = $y0 - $this->font_height;
 
         if ($this->isOutOfTimeInterval($event)) $title = $event->date->get(Of_Date::TIME_SHORT)." $title";
 
@@ -5446,16 +5455,16 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $this->page->setFillColor(new Zend_Pdf_Color_Html($bg_color));
         $this->page->drawRectangle($x0,$y0,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
-        $this->page->drawText($dis_title, $x0+2, $y1-2*$this->font_size, 'UTF-8');
+        $this->page->drawText($dis_title, $x0+2, $y1-2*$this->font_height, 'UTF-8');
 
         // event header
         while($this->getStringWidth($dis_header) > $event->size*$this->col_width) {
           $dis_header = substr($dis_header, 0, -1); 
         }
         $this->page->setFillColor(new Zend_Pdf_Color_Html($title_color));
-        $this->page->drawRectangle($x0,$y1-$this->font_size-2,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $this->page->drawRectangle($x0,$y1-$this->font_height-2,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
-        $this->page->drawText($dis_header, $x0+2, $y1-$this->font_size, 'UTF-8');
+        $this->page->drawText($dis_header, $x0+2, $y1-$this->font_height, 'UTF-8');
       }
 
     }
@@ -5529,7 +5538,6 @@ Class CalendarPdfList Extends CalendarPdf{
     $this->calendar_x1 = $this->content_x1;
     $this->occurrences = $occurrences;
     $this->calendar_entity = $calendar_entity;
-
     $date = $calendar['date'];
     $end = clone $date;
 
@@ -5577,27 +5585,27 @@ Class CalendarPdfList Extends CalendarPdf{
           }
         } 
 
-        $day_text_evt = $d->get(Of_Date::OBM_DATE_MONTH_LIST);
+        $day_text_evt = $d->localize(Of_Date::OBM_DATE_MONTH_LIST);
 
-        $col_height = sizeof($occurrence)*$this->font_size;
+        $col_height = sizeof($occurrence)*$this->font_height;
 
-        if ($this->showdetails) {
-          $col_height += 9*$this->font_size*sizeof($occurrence);
+        if ($this->showdetails) {           
+          $col_height += 8*$this->font_height*sizeof($occurrence);     
         }
 
 	$endofday = $this->current_y-$col_height;
-        if ($endofday<$this->content_y0+$this->font_size || $this->onedayperpage) {
+        if ($endofday<$this->content_y0+$this->font_height || $this->onedayperpage) {
           $this->addPage(true, false);
           $this->drawHeader();
-          $this->current_y = $this->calendar_y1-$this->font_size-1 ;
-          $endofday = $this->content_y0+$this->font_size;
+          $this->current_y = $this->calendar_y1-$this->font_height-1 ;
+          $endofday = $this->content_y0+$this->font_height;
         }
 
         // one day
         $this->page->setFillColor(new Zend_Pdf_Color_Html($color));
         $this->page->drawRectangle(
           $this->content_x0,
-          $this->current_y+$this->font_size,
+          $this->current_y+$this->font_height,
           $this->content_x1,
           $endofday,
           Zend_Pdf_Page::SHAPE_DRAW_FILL);
@@ -5612,7 +5620,7 @@ Class CalendarPdfList Extends CalendarPdf{
         $this->addEvents($occurrence);
 
         // new y
-        $this->current_y -= $col_height +$this->font_size;
+        $this->current_y -= $col_height +$this->font_height;
 
       }
     }
@@ -5626,7 +5634,8 @@ Class CalendarPdfList Extends CalendarPdf{
 
     if (is_array($this->occurrences)) {
       foreach($this->occurrences as $occurrence) {
-        $id = $occurrence->date->setHour(0)->setMinute(0)->setSecond(0);
+        $id = clone $occurrence->date;
+        $id->setHour(0)->setMinute(0)->setSecond(0);
         if(!is_array($ocs[$id->getTimestamp()])) { $ocs[$id->getTimestamp()] = array();}
         array_push($ocs[$id->getTimestamp()],$occurrence);
       }
@@ -5648,14 +5657,14 @@ Class CalendarPdfList Extends CalendarPdf{
       $this->content_x0,
       $this->calendar_y1-1,
       $this->content_x1,
-      $this->calendar_y1+$this->font_size+1,
+      $this->calendar_y1+$this->font_height+1,
       Zend_Pdf_Page::SHAPE_DRAW_FILL);
 
     $this->page->setFillColor(new Zend_Pdf_Color_Html("#3D3D3D"));
     $this->page->drawText($l_date, $this->content_x0+2, $this->calendar_y1+1, 'UTF-8');
     $this->page->drawText($l_event, $this->content_x0+150, $this->calendar_y1+1, 'UTF-8');
 
-    $this->current_y = $this->calendar_y1-$this->font_size-1;
+    $this->current_y = $this->calendar_y1-$this->font_height-1;
 
   }
   
@@ -5689,9 +5698,15 @@ Class CalendarPdfList Extends CalendarPdf{
     foreach($occurrences as $key => $occurrence){
       $event = $occurrence->event;
       $date = $occurrence->date;
-      $hour = $occurrence->date->get(Of_Date::TIME_SHORT);
-      $end = $occurrence->end;
       $title = $event->title;
+      if($event->all_day) {
+        $head = $GLOBALS['l_all_day'].' - '.$title;
+        $margin_left = $this->getStringWidth($GLOBALS['l_all_day']);
+      } else {
+        $head = $occurrence->date->get(Of_Date::TIME_SHORT). ' - '. $title;
+        $margin_left = $this->getStringWidth($occurrence->date->get(Of_Date::TIME_SHORT));
+      }
+      $end = clone $occurrence->end;
       $attendee = $event->attendee;
       $properties = $event->properties;
       $dis_attendees = array();
@@ -5751,30 +5766,35 @@ Class CalendarPdfList Extends CalendarPdf{
         }
       }
 
-      if ($evt_y-$key*$this->font_size < $this->content_y0+$this->font_size) {
+      if ($evt_y-$key*$this->font_height < $this->content_y0+$this->font_height) {
         $this->addPage(true, false);
         $this->drawHeader();
-        $evt_y = $this->current_y+$key*$this->font_size;
+        $evt_y = $this->current_y+$key*$this->font_height;
       }
 
       // Event title
       $this->page->setFillColor(new Zend_Pdf_Color_Html("#368397"));
       $this->page->drawText(
-        "$hour - $title",
-         $this->content_x0+150,
-         $evt_y-$key*$this->font_size,
+         $head,
+         $this->content_x0 + 169 - $margin_left,
+         $evt_y-$key*$this->font_height,
          'UTF-8');
 
       // Event attendees + resources
       $this->page->drawText(
         $dis_user.$dis_res,
-        $this->calendar_x1-strlen($dis_user.$dis_res)*5,
-        $evt_y-$key*$this->font_size,
+        $this->calendar_x1-$this->getStringWidth($dis_user.$dis_res),
+        $evt_y-$key*$this->font_height,
         'UTF-8');        
 
       if ($this->showdetails) {
-        $date_begin = $date->getOutputDateTime();
-        $date_end = $end->getOutputDateTime(); 
+        if($event->all_day) {
+          $date_begin = $date->getOutputDate();
+          $date_end = $end->subSecond(1)->getOutputDate(); 
+        } else {
+          $date_begin = $date->getOutputDateTime();
+          $date_end = $end->getOutputDateTime(); 
+        }
         $repeat = $event->repeat;
         if ($repeat == 'none') {
 	  $dis_repeat = '';
@@ -5784,10 +5804,9 @@ Class CalendarPdfList Extends CalendarPdf{
         $location = $event->location;
         $category = $event->category1;
         $description = $event->description;
-
+        
         $details = array(
-          "$l_datebegin" => "$date_begin", 
-          "$l_dateend" => "$date_end", 
+          "$date_begin" => "$date_end", 
           "$l_repeat" => "$dis_repeat", 
           "$l_category" => "$category",
           "$l_location" => "$location", 
@@ -5795,14 +5814,13 @@ Class CalendarPdfList Extends CalendarPdf{
           "$l_attendees" => $dis_attendees, 
           "$l_resources" => $dis_resources,
           "$l_items" => "$item_list"); 
-
-        $details_height = (sizeof($details)+sizeof($dis_attendees)+sizeof($dis_resources)-2)*$this->font_size;
+        $details_height = (sizeof($details,COUNT_RECURSIVE) - 2)*$this->font_height;
 
         // left bar
         $x0 = $this->content_x0+170;
-        $y0 = $evt_y-$key*$this->font_size;
+        $y0 = $evt_y-$key*$this->font_height;
         $x1 = $x0+3;
-        $y1 = $y0-$this->font_size-$details_height;
+        $y1 = $y0-$this->font_height-$details_height;
 
         $this->page->setFillColor(new Zend_Pdf_Color_Html("#B3B3B3"));
         $this->page->drawRectangle($x0, $y0, $x1, $y1, Zend_Pdf_Page::SHAPE_DRAW_FILL);
@@ -5814,7 +5832,7 @@ Class CalendarPdfList Extends CalendarPdf{
           $this->page->drawText(
             $label,
             $x0+5,
-            $y0-$this->font_size-$i*$this->font_size,
+            $y0-$this->font_height - $i*$this->font_height,
             'UTF-8');
           if (is_array($value)){
             if (sizeof($value)==0) $i++;
@@ -5822,7 +5840,7 @@ Class CalendarPdfList Extends CalendarPdf{
               $this->page->drawText(
                 $array_value,
                 $x0+80,
-                $y0-$this->font_size-$i*$this->font_size,
+                $y0-$this->font_height-$i*$this->font_height,
                 'UTF-8');
               $i++;
             }
@@ -5830,12 +5848,12 @@ Class CalendarPdfList Extends CalendarPdf{
             $this->page->drawText(
               $value,
               $x0+80,
-              $y0-$this->font_size-$i*$this->font_size,
+              $y0-$this->font_height-$i*$this->font_height,
               'UTF-8');
              $i++;
           }
         }
-        $evt_y -= $i*$this->font_size;
+        $evt_y -= $i*$this->font_height;
       }
     }
   }

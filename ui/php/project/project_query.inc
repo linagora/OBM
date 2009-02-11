@@ -387,7 +387,7 @@ function run_query_project_insert($params) {
   $pid = $obm_q->lastid();
   $entity_id = of_entity_insert($GLOBALS['module'], $pid);  
 
-  $id = sql_parse_id($id);
+  $id = sql_parse_id($pid);
   // If a task has been given, We create a task for this project
   if ($task != '') {
     $query = "
@@ -403,7 +403,7 @@ function run_query_project_insert($params) {
       '$date_now',
       $uid,
       '$task',
-      0,
+      NULL,
       1)";
 
     display_debug_msg($query, $cdg_sql, 'run_query_project_insert (create task)');

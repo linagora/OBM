@@ -313,7 +313,6 @@ function run_query_deal_detail($id) {
 function run_query_deal_insert($deal) {
   global $cdg_sql, $l_no, $obm;
 
-  $now = date('Y-m-d H:i:s');
   $pid = sql_parse_id($deal['parentdeal_id']);
   $number = $deal['number'];
   $label = $deal['label'];
@@ -351,7 +350,7 @@ function run_query_deal_insert($deal) {
     $datecomment = of_isodate_convert($deal['datecomment']);
     $today = date('Y-m-d');
     if ($today == $datecomment) {
-      $datecomment = $now;
+      $datecomment = date('Y-m-d H:i:s');
     }
     $usercomment = $deal['usercomment'];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
@@ -392,7 +391,7 @@ function run_query_deal_insert($deal) {
     deal_parentdeal_id,
     deal_todo)
   VALUES (null,
-    '$now',
+    NOW(),
     null,
     " . $obm[uid] . ",
     $domain_id,
@@ -479,7 +478,6 @@ function run_query_deal_insert($deal) {
 function run_query_deal_update($deal) {
   global $obm, $cdg_sql, $l_no;
 
-  $now = date('Y-m-d H:i:s');
   $id = $deal['deal_id'];
   $sql_id = sql_parse_id($deal['deal_id'], true);
   $pid = sql_parse_id($deal['parentdeal_id']);
@@ -519,7 +517,7 @@ function run_query_deal_update($deal) {
     $datecomment = of_isodate_convert($deal['datecomment']);
     $today = date('Y-m-d');
     if ($today == $datecomment) {
-      $datecomment = $now;
+      $datecomment = date('Y-m-d H:i:s');
     }
     $usercomment = $deal['usercomment'];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
@@ -528,8 +526,8 @@ function run_query_deal_update($deal) {
   $multidomain = sql_multidomain('deal');
   
   $query = "UPDATE Deal SET
-    deal_timeupdate='$now',
-    deal_userupdate=".$obm[uid].",
+    deal_timeupdate=NOW(),
+    deal_userupdate=".$obm['uid'].",
     deal_number='$number',
     deal_label='$label',
     deal_datebegin=$datebegin,

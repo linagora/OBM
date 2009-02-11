@@ -113,9 +113,14 @@ function run_query_account_detail($id) {
 function run_query_account_insert($account) {
   global $cdg_sql, $obm;
 
+<<<<<<< .mine
+  $uid = sql_parse_id( $obm["uid"]);
+  $domain_id = sql_parse_id($obm["domain_id"]);
+=======
   $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
   $domain_id = sql_parse_id($obm['domain_id']);
+>>>>>>> .r3717
 
   $label = $account['label'];
   $bank = $account['bank'];
@@ -137,7 +142,7 @@ function run_query_account_insert($account) {
     account_comment
   ) values (
     null,
-    '$now',
+    NOW(),
     null,
     $uid,
     $domain_id,
@@ -162,7 +167,6 @@ function run_query_account_insert($account) {
 function run_query_account_update($account) {
   global $obm, $cdg_sql;
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id( $obm['uid']);
   $id =$id;
   $label = $account['label'];
@@ -180,7 +184,7 @@ function run_query_account_update($account) {
     account_balance=$balance,
     account_comment='$comment',
     account_userupdate=$uid,
-    account_timeupdate='$now'
+    account_timeupdate=NOW()
     WHERE account_id $account_id $multidomain";  
 
   display_debug_msg ($query, $cdg_sql, 'run_query_account_update()');

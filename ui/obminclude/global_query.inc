@@ -667,7 +667,6 @@ function run_query_global_insert_document($params, $id, $entity) {
   global $cdg_sql, $obm, $l_create_file_error;
 
   $uid = sql_parse_id($obm['uid']);
-  $now = date('Y-m-d H:i:s');
 
   $title = $params['title'];
   $usr_q = get_user_info($uid);
@@ -702,7 +701,7 @@ function run_query_global_insert_document($params, $id, $entity) {
       document_privacy
     ) VALUES (
       null,
-      '$now',
+      NOW(),
       null,
       $uid,
       $domain_id,
@@ -766,7 +765,6 @@ function run_query_global_update_document($params, $id) {
   global  $l_delete_file_error, $l_create_file_error;
 
   $uid = sql_parse_id($obm['uid']);
-  $now = date('Y-m-d H:i:s');
   
   $mime = $params['type'];
   $name = $params['file_name'];
@@ -775,7 +773,7 @@ function run_query_global_update_document($params, $id) {
   $title = $params['title'];
   $iid = sql_parse_id($id, true);
   $query = "UPDATE Document SET
-     document_timeupdate='$now',
+     document_timeupdate=NOW(),
      document_userupdate=$uid,
      document_size=$size,
      document_name='$name',

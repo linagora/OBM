@@ -237,7 +237,6 @@ function run_query_lead_detail($p_id) {
 function run_query_lead_insert($params) {
   global $obm, $cdg_sql;
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
 	
   $company_id = $params['company_new_id'];
@@ -266,7 +265,7 @@ function run_query_lead_insert($params) {
     $datecomment = of_isodate_convert($params['datecomment'],true);
     $today = date('Y-m-d');
     if ($today == $datecomment) {
-      $datecomment = $now;
+      $datecomment = date('Y-m-d H:i:s');
     }
     $usercomment = $params['usercomment'];
     $comment = "$datecomment:$usercomment:$add_comment";
@@ -300,7 +299,7 @@ function run_query_lead_insert($params) {
    VALUES (
     $domain_id,
     null,
-    '$now',
+    NOW(),
     null,
     $uid,
     $source_id,
@@ -337,7 +336,6 @@ function run_query_lead_insert($params) {
 function run_query_lead_update($pid, $params) {
   global $obm, $cdg_sql;
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
   $pid = sql_parse_id($pid, true);
   $company_id = $params['company_new_id'];
@@ -367,7 +365,7 @@ function run_query_lead_update($pid, $params) {
     $datecomment = of_isodate_convert($params['datecomment'],true);
     $today = date('Y-m-d');
     if ($today == $datecomment) {
-      $datecomment = $now;
+      $datecomment = date('Y-m-d H:i:s');
     }
     $usercomment = $params['usercomment'];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
@@ -376,7 +374,7 @@ function run_query_lead_update($pid, $params) {
   $multidomain = sql_multidomain('lead');
 	
   $query = "UPDATE Lead SET
-    lead_timeupdate='$now',
+    lead_timeupdate=NOW(),
     lead_userupdate=$uid,
     lead_source_id=$source_id,
     lead_status_id=$status_id,

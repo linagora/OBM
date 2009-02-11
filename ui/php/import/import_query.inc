@@ -986,7 +986,6 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
 
   $uid = sql_parse_id($obm["uid"]);
   $domain_id = sql_parse_id($obm["domain_id"]);
-  $now = date("Y-m-d H:i:s");
   $mailoks = array("X",'x','1',"1","Y","y");
 
   // Set default values when needed
@@ -1081,7 +1080,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_comment)
   VALUES (
     $domain_id,
-    '$now',
+    NOW(),
     null,
     $uid,
     $dsrc,

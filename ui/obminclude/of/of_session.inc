@@ -591,7 +591,6 @@ if ($cgp_sess_db) {
     function sess_db_write ($id, $sess_data) {
       global $sess_save_path, $sess_session_name;
     
-      $now = date("Y-m-d H:i:s");
       $s_q = new DB_OBM;
       $query = "REPLACE ObmSession ( 
       obmsession_sid,
@@ -600,7 +599,7 @@ if ($cgp_sess_db) {
       obmsession_data)
     VALUES (
       '$id',
-      '$now',
+      NOW(),
       '$sess_session_name',
       '".addslashes($sess_data)."')";
       
@@ -618,10 +617,9 @@ if ($cgp_sess_db) {
     function sess_db_write ($id, $sess_data) {
       global $sess_save_path, $sess_session_name;
     
-      $now = date("Y-m-d H:i");
       $s_q = new DB_OBM;
       $query = "UPDATE ObmSession set
-        obmsession_timeupdate='$now',
+        obmsession_timeupdate=NOW(),
         obmsession_name='$sess_session_name',
         obmsession_data='".addslashes($sess_data)."'
       WHERE
@@ -637,7 +635,7 @@ if ($cgp_sess_db) {
           obmsession_data)
         VALUES (
           '$id',
-          '$now',
+          NOW(),
           '$sess_session_name',
           '".addslashes($sess_data)."')";
       $ret = $s_q->query($query);

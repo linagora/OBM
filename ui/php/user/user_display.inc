@@ -1520,7 +1520,7 @@ function html_user_form($usr_q, $user, $field='') {
   // Profiles
   $delegation_modules = array(
     'user' => $GLOBALS['cright_write_admin'],
-    'resource' => $GLOBALS['cright_write'], 
+    //'resource' => $GLOBALS['cright_write'], 
     'host' => $GLOBALS['cright_write'],
     'group' => $GLOBALS['cright_write_admin'],
     'mailshare' => $GLOBALS['cright_write']);

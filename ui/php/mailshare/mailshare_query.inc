@@ -132,7 +132,6 @@ function run_query_mailshare_insert($mailshare) {
   $email = $mailshare['email'];
   $desc = $mailshare['desc'];
   $mail_server_id = sql_parse_id($mailshare['mail_server_id']);
-  $now = date('Y-m-d H:i:s');
   $domain_id = sql_parse_id($obm['domain_id']);
   $uid = sql_parse_id($obm['uid'], true);
   // Delegation handling
@@ -153,7 +152,7 @@ function run_query_mailshare_insert($mailshare) {
   VALUES (
     $domain_id,
     null,
-    '$now',
+    NOW(),
     null,
     $obm[uid],
     '$name'
@@ -196,14 +195,13 @@ function run_query_mailshare_update($mailshare) {
   $email = $mailshare['email'];
   $desc = $mailshare['desc'];
   $mail_server_id = sql_parse_id($mailshare['mail_server_id']);
-  $now = date('Y-m-d H:i:s');
   $multidomain = sql_multidomain('mailshare');
 
   // Delegation handling
   $q_delegation = of_delegation_query_update_clause('mailshare_delegation', stripslashes($mailshare['delegation']));
   
   $query = "UPDATE MailShare set
-    mailshare_timeupdate = '$now',
+    mailshare_timeupdate = NOW(),
     mailshare_userupdate = $obm[uid],
     mailshare_name = '$name',
     mailshare_quota = '$quota',
@@ -252,7 +250,6 @@ function run_query_mailshare_delete($p_id) {
   if ($obm_q->num_rows() > 0) {
     $uid = sql_parse_id($obm['uid']);
     $domain_id = sql_parse_id($obm['domain_id']);
-    $now = date('Y-m-d H:i:s');
     $p_id = sql_parse_id($p_id); 
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
@@ -267,7 +264,7 @@ function run_query_mailshare_delete($p_id) {
       '$delegation',
       'MailShare',
       $p_id,
-      '$now')";
+      NOW())";
     display_debug_msg($query, $cdg_sql, 'run_query_mailshare_delete(auto)');
     $retour = $obm_q->query($query);
   }

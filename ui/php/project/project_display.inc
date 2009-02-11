@@ -2188,7 +2188,7 @@ function html_project_closing_form($action, $clo, $params) {
   if (isset($params['used'])) { $used = $params['used']; }
   if (isset($params['remaining'])) { $remaining = $params['remaining']; }
   if (isset($params['comment'])) { $comment = stripslashes($params['comment']); }
-  if (isset($params['date'])) { $date = of_date_upd_format($params['date'],true); }
+  if (isset($params['date'])) { $date = $params['date']; }
 
   // UPDATE 
   if (($action == 'closing_detailupdate') || ($action == 'closing_update')) {

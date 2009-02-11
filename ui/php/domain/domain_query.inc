@@ -115,7 +115,6 @@ function run_query_domain_insert($domain) {
   global $obm, $cdg_sql, $cgp_use;
 
   $uid = sql_parse_id($obm['uid']);
-  $now = date('Y-m-d H:i:s');
   $label = $domain['label'];
   $desc = $domain['desc'];
   $domain_name = $domain['domain_name'];
@@ -134,7 +133,7 @@ function run_query_domain_insert($domain) {
     domain_alias)
     VALUES (
       null,
-      '$now',
+      NOW(),
       null,
       $uid,
       '$label',
@@ -222,7 +221,6 @@ function run_query_domain_update($d_id, $domain) {
   global $obm, $cdg_sql, $cgp_use;
 
   $uid = sql_parse_id($obm['uid']);
-  $now = date('Y-m-d H:i:s');
   $label = $domain['label'];
   $desc = $domain['desc'];
   $alias = $domain['alias'];
@@ -230,7 +228,7 @@ function run_query_domain_update($d_id, $domain) {
   $did = sql_parse_id($d_id, true);
   $samba = $domain['samba'];
   $query = "UPDATE Domain SET
-    domain_timeupdate='$now',
+    domain_timeupdate=NOW(),
     domain_userupdate=$uid,
     domain_label='$label',
     domain_description='$desc',

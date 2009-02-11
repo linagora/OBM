@@ -134,7 +134,7 @@ class OBM_Acl {
    * @return bool
    */
   public static function areAllowed($userId, $entityType, $entityIds, $action) {
-    $query = self::getAclQuery('COUNT(1)', $entityType, $entityIds, $userId, $action);
+    $query = self::getAclQuery('COUNT(1) as count', $entityType, $entityIds, $userId, $action);
     self::$db->query($query);
     if (self::isSpecialEntity($entityType) && in_array($userId, $entityIds)) {
       $count = 1;
@@ -142,9 +142,8 @@ class OBM_Acl {
       $count = 0;
     }
     while (self::$db->next_record()) {
-      $count+= self::$db->f('COUNT(1)');
+      $count+= self::$db->f('count');
     }
-    
     return $count >= count($entityIds);
   }
   

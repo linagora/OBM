@@ -100,7 +100,6 @@ function run_query_organizationalchart_insert($organizationalchart) {
   global $obm, $cdg_sql;
 
   $uid = sql_parse_id($obm["uid"]);
-  $now = date("Y-m-d H:i:s");
   $domain_id = sql_parse_id($obm["domain_id"]);
 
   $name = $organizationalchart["oc_name"];
@@ -118,7 +117,7 @@ function run_query_organizationalchart_insert($organizationalchart) {
     organizationalchart_description) VALUES (
       $domain_id,
       null,
-      '$now',
+      NOW(),
       null,
       $uid,
       '$name',
@@ -157,7 +156,6 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
   $ins_domain_id = sql_parse_id($obm["domain_id"]);
   $sel_organizationalchart_id = sql_parse_id($organizationalchart_id, true);
   $ins_organizationalchart_id = sql_parse_id($organizationalchart_id);
-  $now = date("Y-m-d H:i:s");
 
   $ogroup = $organizationalchart["ogroup"];
 
@@ -172,7 +170,6 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
         // Select parent id
         $query = "SELECT ogroup_id FROM OGroup
           WHERE ogroup_domain_id $sel_domain_id 
-          AND ogroup_timecreate='$now'
           AND ogroup_usercreate $sel_uid 
           AND ogroup_organizationalchart_id $sel_organizationalchart_id 
           AND ogroup_level='$parent_level'";
@@ -194,7 +191,7 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
           ogroup_level) VALUES (
             $ins_domain_id,
             null,
-            '$now',
+            NOW(),
             null,
             $ins_uid,
             $ins_organizationalchart_id,
@@ -204,18 +201,10 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
 
         display_debug_msg($query, $cdg_sql, "run_query_organizational_chart_ogroup_insert($name)");
         $obm_q->query($query);
+        
 
-        $query = "SELECT ogroup_id FROM OGroup
-          WHERE ogroup_domain_id $sel_domain_id 
-          AND ogroup_timecreate='$now'
-          AND ogroup_usercreate $sel_uid 
-          AND ogroup_organizationalchart_id $sel_organizationalchart_id 
-          AND ogroup_name='$name'
-          AND ogroup_level='$level'";
-        display_debug_msg($query, $cdg_sql, "run_query_organizational_chart_ogroup_insert(ogroup_id)");
-        $obm_q->query($query);
-        $obm_q->next_record();
-        $ogroup_id = sql_parse_id($obm_q->f("ogroup_id"));
+        
+        $ogroup_id = sql_parse_id($obm_q->lastid());
 
         $sel_ent_id = str_replace(".", "_", $level);
         $sel_entities = $organizationalchart["ent${sel_ent_id}"];
@@ -238,7 +227,7 @@ function run_query_organizational_chart_entity_insert($organizationalchart, $org
                 ) VALUES (
                   $ins_domain_id,
                   null,
-                  '$now',
+                  NOW(),
                   null,
                   $ins_uid,
                   $ogroup_id,
@@ -265,7 +254,6 @@ function run_query_organizationalchart_update($id, $organizationalchart) {
   global $obm, $cdg_sql;
 
   $uid = sql_parse_id($obm["uid"]);
-  $now = date("Y-m-d H:i:s");
   $domain_id = sql_parse_id($obm["domain_id"]);
 
   $name = $organizationalchart["oc_name"];
@@ -274,7 +262,7 @@ function run_query_organizationalchart_update($id, $organizationalchart) {
   $multidomain = sql_multidomain("organizationalchart");
   $sid = sql_parse_id($id, true);
   $query = "UPDATE OrganizationalChart SET
-    organizationalchart_timeupdate='$now',
+    organizationalchart_timeupdate=NOW(),
     organizationalchart_userupdate=$uid,
     organizationalchart_name='$name',
     organizationalchart_description='$desc',

@@ -3355,6 +3355,7 @@ Class Occurrence {
       $this->end = clone $this->date;
       $this->end->addSecond($event->duration);
     }
+
     $this->entity = $entity;
     $this->id = $id;
     $this->entity_state = $state;

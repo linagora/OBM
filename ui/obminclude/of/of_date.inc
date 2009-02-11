@@ -317,7 +317,7 @@ class Of_Date extends DateTime {
    * @return void
    */
   public function getOutputDateTime() {
-    return $this->get(self::$_options['outputdate'].' '.self::TIME_MEDIUM);
+    return $this->get(self::$_options['outputdate'].' '.self::TIME_SHORT);
   }
 
   /**

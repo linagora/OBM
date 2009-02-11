@@ -154,7 +154,6 @@ function run_query_document_insert(&$document) {
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   $uid = sql_parse_id($obm["uid"]);
-  $now = date("Y-m-d H:i:s");
   $domain_id = sql_parse_id($obm["domain_id"]);
 	
   $title = $document["title"];
@@ -199,7 +198,7 @@ function run_query_document_insert(&$document) {
     document_privacy
   ) VALUES (
     null,
-    '$now',
+    NOW(),
     null,
     $uid,
     $domain_id,
@@ -307,7 +306,6 @@ function run_query_document_update(&$document) {
   global $cdoc_kind_dir, $cdoc_kind_file, $cdoc_kind_link;
 
   $uid = $obm["uid"];
-  $now = date("Y-m-d H:i:s");
 
   $id = sql_parse_id($document["document_id"], true);
   $title = $document["title"];
@@ -344,7 +342,7 @@ function run_query_document_update(&$document) {
   }
   
   $query = "UPDATE Document SET
-    document_timeupdate='$now',
+    document_timeupdate=NOW(),
     document_userupdate=$uid,
     document_title='$title',
     document_kind=$kind,
@@ -911,7 +909,6 @@ function run_query_document_insert_dir($document) {
   global $cdg_sql, $cdoc_kind_dir, $obm;
 
   $uid = sql_parse_id($obm["uid"]);
-  $now = date("Y-m-d H:i:s");
   $domain_id = sql_parse_id($obm["domain_id"]);
 	
   $path = $document["path"];
@@ -932,7 +929,7 @@ function run_query_document_insert_dir($document) {
     document_mimetype_id,
     document_privacy
   ) VALUES (null,
-    '$now',
+    NOW(),
     null,
     $uid,
     $domain_id,
@@ -964,7 +961,6 @@ function run_query_document_update_dir($document) {
   global $cdg_sql, $obm, $cdoc_kind_dir;
 
   $uid = sql_parse_id($obm["uid"]);
-  $now = date("Y-m-d H:i:s");
   $path = $document["path"].$document["name"];
   $old_path = $document["path"].$document["old_name"];
   $name = $document["name"];

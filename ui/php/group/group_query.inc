@@ -258,7 +258,6 @@ function run_query_group_insert($group) {
   $desc = $group['desc'];
   $email = $group['email'];
   $priv = sql_parse_int($group['privacy']);
-  $now = date('Y-m-d H:i:s');
   $gid = get_first_group_free_gid();
   $domain_id = sql_parse_id($obm['domain_id']);
   if ($priv == 1) {
@@ -285,7 +284,7 @@ function run_query_group_insert($group) {
   group_email
   ) VALUES (
   null,
-  '$now',
+  NOW(),
   null,
   $obm[uid],
   $domain_id,
@@ -370,7 +369,6 @@ function run_query_group_update($group) {
   $email = $group["email"];
   $manager = sql_parse_id($group["manager"]);
   $priv = sql_parse_int($group["privacy"]);
-  $now = date("Y-m-d H:i:s");
   $multidomain = sql_multidomain("group");
   if ($priv == 1) {
     $samba = 0;
@@ -381,7 +379,7 @@ function run_query_group_update($group) {
   $q_delegation = of_delegation_query_update_clause('group_delegation', stripslashes($group["delegation"]));
 
   $query = "UPDATE UGroup SET
-  group_timeupdate='$now',
+  group_timeupdate=NOW(),
   group_userupdate=$obm[uid],
   group_samba=$samba,
   group_privacy=$priv,
@@ -434,7 +432,6 @@ function run_query_group_delete($p_id) {
     $uid = sql_parse_id($obm["uid"]);
     $domain_id = sql_parse_id($obm["domain_id"]);
     $id = sql_parse_id($p_id);
-    $now = date("Y-m-d H:i:s");
 
     $query = "INSERT INTO Deleted (
     deleted_domain_id,
@@ -449,7 +446,7 @@ function run_query_group_delete($p_id) {
     '$delegation',
     'UGroup',
     $p_id,
-    '$now')";
+    NOW())";
     display_debug_msg($query, $cdg_sql, "run_query_group_delete(auto)");
     $retour = $obm_q->query($query);
   }

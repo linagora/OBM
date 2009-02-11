@@ -258,7 +258,6 @@ function run_query_incident_insert($incident) {
   global $cmail_incident, $l_mail_incident_new_subject, $l_status, $l_contract;
 
   $uid = sql_parse_id($obm['uid']);
-  $now = date('Y-m-d H:i:s');
   $domain_id = sql_parse_id($obm['domain_id']);
 
   $contract_id = $incident['contract_new_id'];
@@ -308,7 +307,7 @@ function run_query_incident_insert($incident) {
     VALUES (
       $domain_id,
       null,
-      '$now',
+      NOW(),
       null,
       $uid,
       '$lincident',

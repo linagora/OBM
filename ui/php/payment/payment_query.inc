@@ -191,7 +191,6 @@ function run_query_payment_detail($p_id) {
 function run_query_payment_insert($params) {
   global $obm, $cdg_sql;
 
-  $now = date('Y-m-d H:i:s');
   $uid = $obm['uid'];
   $domain_id = sql_parse_id($obm['domain_id']);
 
@@ -229,7 +228,7 @@ function run_query_payment_insert($params) {
    VALUES (
     $domain_id,
     null,
-    '$now',
+    NOW(),
     null,
     '$uid',
     $company_id,
@@ -263,7 +262,7 @@ function run_query_payment_insert($params) {
       '$invoice_id',
       '$id',
       '$amount_invoice',
-      '$now',
+      NOW(),
       '$uid')";
 
     display_debug_msg($query, $cdg_sql, 'run_query_payment_insert(3)');
@@ -283,7 +282,6 @@ function run_query_payment_insert($params) {
 function run_query_payment_update($pid, $params) {
   global $obm, $cdg_sql;
 
-  $now = date('Y-m-d H:i:s');
   $uid = $obm['uid'];
 
   $company_id = $params['company_new_id'];
@@ -302,7 +300,7 @@ function run_query_payment_update($pid, $params) {
   $multidomain = sql_multidomain('payment');
 	
   $query = "UPDATE Payment SET
-    payment_timeupdate='$now',
+    payment_timeupdate=NOW(),
     payment_userupdate='$uid',
     payment_company_id='$company_id',
     payment_account_id='$account_id',
@@ -497,7 +495,6 @@ function get_payment_amount_info($id) {
 function run_query_payment_invoice_insert($params) {
   global $cdg_sql, $obm;
 
-  $now = date('Y-m-d H:i:s');
   $uid = $obm['uid'];
   $id = $params['payment_id'];
   $amount ='0';
@@ -540,7 +537,7 @@ function run_query_payment_invoice_insert($params) {
       '$inv_id',
       '$id',
       null,
-      '$now',
+      NOW(),
       null,
       '$uid',
       '$amount')";
@@ -567,7 +564,6 @@ function run_query_payment_invoice_update($pid, $params) {
   global $obm, $cdg_sql;
 
   $invs = $params['invoices'];
-  $now = date('Y-m-d H:i:s');
   $uid = $obm['uid'];
 
   $obm_q = new DB_OBM;
@@ -595,7 +591,7 @@ function run_query_payment_invoice_update($pid, $params) {
   foreach($invs as $i_id=>$amount) {
     if (! in_array($i_id, $invoices_del)) {
       $query = "UPDATE PaymentInvoice SET
-      paymentinvoice_timeupdate = '$now',
+      paymentinvoice_timeupdate = NOW(),
       paymentinvoice_userupdate = '$uid',
       paymentinvoice_amount = '$amount'
     WHERE

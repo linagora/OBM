@@ -172,7 +172,6 @@ function run_query_host_insert($host) {
   $imap = sql_parse_int($host['imap']);
   $list = $host['web_list'];
   $desc = $host['desc'];
-  $now = date('Y-m-d H:i:s');
 
   // Postitionnement du l'UID et le GID
   $host_uid = get_first_user_free_uid();
@@ -200,7 +199,7 @@ function run_query_host_insert($host) {
     host_description
     )
   VALUES (null,
-    '$now',
+    NOW(),
     null,
     $obm[uid],
     $domain_id,
@@ -238,7 +237,7 @@ function run_query_host_insert($host) {
 
     $multidomain = sql_multidomain('userobm');
     $query = "UPDATE UserObm 
-    SET userobm_timeupdate='$now',
+    SET userobm_timeupdate=NOW(),
         userobm_userupdate=$obm[uid],
         userobm_host_id=$host_id
     WHERE
@@ -269,14 +268,13 @@ function run_query_host_update($host) {
   $smtp_out = sql_parse_int($host['smtp_out']);
   $imap = sql_parse_int($host['imap']);
   $desc = $host['desc'];
-  $now = date('Y-m-d H:i:s');
   $multidomain = sql_multidomain('host');
 
   // Delegation handling
   $q_delegation = of_delegation_query_update_clause('host_delegation', stripslashes($host['delegation']));
 
   $query = "UPDATE Host SET
-    host_timeupdate='$now',
+    host_timeupdate=NOW(),
     host_userupdate=$obm[uid],
     host_name='$name',
     host_ip='$ip',
@@ -314,7 +312,7 @@ function run_query_host_update($host) {
     }
     // Suppression de l'ancien lien user=>host
     $query = "UPDATE UserObm 
-    SET userobm_timeupdate='$now',
+    SET userobm_timeupdate=NOW(),
         userobm_userupdate='$obm[uid]',
         userobm_host_id='0'
     WHERE
@@ -325,7 +323,7 @@ function run_query_host_update($host) {
       $id = sql_parse_id($id);
       // Creation du nouveau lien user=>host
       $query = "UPDATE UserObm 
-      SET userobm_timeupdate='$now',
+      SET userobm_timeupdate=NOW(),
           userobm_userupdate=$obm[uid],
           userobm_host_id=$id
       WHERE
@@ -357,7 +355,6 @@ function run_query_host_delete($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-    $now = date('Y-m-d H:i:s');
   // Mise a jour du lien vers user
   // If this host exists in Prod table, Insert it in Deleted table
   $query = "SELECT host_id, host_delegation FROM P_Host WHERE host_id $sel_id ";
@@ -384,7 +381,7 @@ function run_query_host_delete($p_id) {
       '$delegation',
       'Host',
       $ins_id,
-      '$now')";
+      NOW())";
     display_debug_msg($query, $cdg_sql, 'run_query_host_delete(auto)');
     $retour = $obm_q->query($query);
   }

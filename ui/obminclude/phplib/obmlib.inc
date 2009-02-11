@@ -82,14 +82,13 @@ class OBM_User_Sql extends CT_Sql {
 
     $ret = true;
     $name = addslashes($name);
-    $now = date("Y-m-d H:i:s", time());
     $table = $this->database_table;
     $lastpage = "$module:$action";
     // update duration of visit
     $uid = sql_parse_id($u_id);
     $uquery = "UPDATE $table SET
         activeuserobm_userobm_id = $uid,
-        activeuserobm_timeupdate = '$now',
+        activeuserobm_timeupdate = NOW(),
         activeuserobm_nb_connexions = activeuserobm_nb_connexions + 1,
         activeuserobm_lastpage = '$lastpage'
       WHERE activeuserobm_sid = '$id'
@@ -99,7 +98,7 @@ class OBM_User_Sql extends CT_Sql {
     $squery = "SELECT count(*)
       FROM $table
       WHERE activeuserobm_userobm_id $uid 
-        and activeuserobm_timeupdate = '$now'
+        and activeuserobm_timeupdate = NOW() 
         and activeuserobm_sid = '$id'
         and activeuserobm_session_name = '$name'";
 
@@ -113,7 +112,7 @@ class OBM_User_Sql extends CT_Sql {
         activeuserobm_nb_connexions,
         activeuserobm_lastpage,
         activeuserobm_ip
-      ) VALUES ('$id', '$name', $uid, '$now', '$now', 1, '$lastpage', '$REMOTE_ADDR')";
+      ) VALUES ('$id', '$name', $uid, NOW(), NOW(), 1, '$lastpage', '$REMOTE_ADDR')";
 
     $this->db->query($uquery);
 

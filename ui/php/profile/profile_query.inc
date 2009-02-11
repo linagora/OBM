@@ -82,7 +82,6 @@ function run_query_profile_update ($params) {
   $domain_id = sql_parse_id($obm['domain_id']);
   $profile_multidomain = sql_multidomain('profile'); 
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
 
   $name = $params['name'];
@@ -114,7 +113,6 @@ function run_query_profile_replace_dataset($params) {
   $domain_id = sql_parse_id($obm['domain_id']);
   $profile_multidomain = sql_multidomain('profile'); 
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
   
   $id = $params['profile_id'];
@@ -179,7 +177,6 @@ function run_query_profile_insert ($params) {
 
   $obm_q = new DB_OBM;
 
-  $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
   $domain_id = sql_parse_id( $obm['domain_id']);
 
@@ -190,8 +187,9 @@ function run_query_profile_insert ($params) {
     profile_usercreate,
     profile_domain_id,
     profile_name
-  ) VALUES ('$now',
-    '$now',
+  ) VALUES (
+    NOW(),
+    NOW(),
     $uid,
     $uid,
     $domain_id,

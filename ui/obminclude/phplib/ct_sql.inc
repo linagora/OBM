@@ -50,25 +50,21 @@ class CT_Sql {
     ## update duration of visit
     global $HTTP_REFERER, $HTTP_USER_AGENT, $REMOTE_ADDR;
 
-    $now = date("YmdHis", time());
-    $uquery = sprintf("update %s set val='%s', changed='%s' where sid='%s' and name='%s'",
+    $uquery = sprintf("update %s set val='%s', changed=NOW() where sid='%s' and name='%s'",
       $this->database_table,
       $str,
-      $now,
       $id,
       $name);
-    $squery = sprintf("select count(*) from %s where val='%s' and changed='%s' and sid='%s' and name='%s'",
+    $squery = sprintf("select count(*) from %s where val='%s' and changed=NOW() and sid='%s' and name='%s'",
       $this->database_table,
       $str,
-      $now,
       $id,
       $name);
-    $iquery = sprintf("insert into %s ( sid, name, val, changed ) values ('%s', '%s', '%s', '%s')",
+    $iquery = sprintf("insert into %s ( sid, name, val, changed ) values ('%s', '%s', '%s', NOW())",
       $this->database_table,
       $id,
       $name,
-      $str,
-      $now);
+      $str);
 
     $this->db->query($uquery);
 

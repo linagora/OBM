@@ -254,7 +254,6 @@ function run_query_resourcegroup_insert($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $priv = sql_parse_int($group["privacy"]);
-  $now = date("Y-m-d H:i:s");
   $domain_id = sql_parse_id($obm["domain_id"]);
 	
   $query = "INSERT INTO RGroup (
@@ -268,7 +267,7 @@ function run_query_resourcegroup_insert($group) {
     rgroup_desc
   ) values (
     null,
-    '$now',
+    NOW(),
     null,
     $obm[uid],
     $domain_id,
@@ -335,11 +334,10 @@ function run_query_resourcegroup_update($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $priv = sql_parse_int($group["privacy"]);
-  $now = date("Y-m-d H:i:s");
   $multidomain = sql_multidomain("rgroup");
   
   $query = "UPDATE RGroup set
-    rgroup_timeupdate='$now',
+    rgroup_timeupdate=NOW(),
     rgroup_userupdate=$obm[uid],
     rgroup_privacy=$priv,
     rgroup_name='$name',

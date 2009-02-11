@@ -353,7 +353,6 @@ function run_query_company_insert($company) {
   global $obm, $cdg_sql;
 
   $uid = sql_parse_id( $obm['uid']);
-  $now = date('Y-m-d H:i:s');
   $domain_id = sql_parse_id( $obm['domain_id']);
 	
   $number = $company['number'];
@@ -381,7 +380,7 @@ function run_query_company_insert($company) {
     $datecomment = of_isodate_convert($company['datecomment']);
     $today = date('Y-m-d');
     if ($today == $datecomment) {
-      $datecomment = $now;
+      $datecomment = date('Y-m-d H:i:s');
     }
     $usercomment = $company['usercomment'];
     $comment .= "\n$datecomment:$usercomment:$add_comment";
@@ -409,7 +408,7 @@ function run_query_company_insert($company) {
   VALUES (
     $domain_id,
     null,
-    '$now',
+    NOW(),
     null,
     $uid,
     $dsrc,
