@@ -2,8 +2,8 @@ package OBM::Update::updatePassword;
 
 $VERSION = '1.0';
 
-use OBM::Update::commonUpdate;
-@ISA = ('OBM::Update::commonUpdate');
+use OBM::Entities::entityIdsGetter;
+@ISA = ('OBM::Entities::entityIdsGetter');
 
 $debug = 1;
 
