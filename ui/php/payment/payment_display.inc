@@ -682,6 +682,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
   //  if (isset($params['company_new_name'])) { $c_new_name = $params['company_new_name']; }
   if (isset($params['payment_id'])) { $id = $params['payment_id']; }
   if (isset($params['invoice_id'])) { $invoice_id = $params['invoice_id']; }
+  if (isset($params['invoice_name'])) { $invoice_name = $params['invoice_name']; }
   if (isset($params['account'])) { $account = $params['account']; }
   if (isset($params['kind'])) { $kind = $params['kind']; }
   if (isset($params['date'])) { $date = $params['date']; }
@@ -699,7 +700,7 @@ function html_payment_form($action, $p_q, $kinds, $accs, $params) {
     $dis_invoice = "
     <tr>
       <th>$l_invoice</th>
-      <td>".$params['invoice_name']."</td>
+      <td>$invoice_name<input type=\"hidden\" id=\"invoice_name\" name=\"invoice_name\" value=\"$invoice_name\" /></td>
     </tr>
     <tr>
       <th>$l_invoice / $l_amount</th>

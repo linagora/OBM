@@ -193,16 +193,16 @@ function run_query_payment_insert($params) {
 
   $now = date('Y-m-d H:i:s');
   $uid = $obm['uid'];
-  $domain_id = $obm['domain_id'];
+  $domain_id = sql_parse_id($obm['domain_id']);
 
   $company_id = $params['company_new_id'];
   if ($company_id < 1) {
-    $company_id = $params['company_id'];
+    $company_id = sql_parse_id($params['company_id']);
   }
 
-  $account_id = $params['account'];
-  $invoice_id = $params['invoice_id'];
-  $kind = $params['kind'];
+  $account_id = sql_parse_id($params['account']);
+  $invoice_id = sql_parse_id($params['invoice_id']);
+  $kind = sql_parse_int($params['kind']);
   $number = $params['number'];
   $date = ($params['date'] ? "'".of_isodate_convert($params['date'])."'" : 'null');
   $amount = $params['amount'];
@@ -227,13 +227,13 @@ function run_query_payment_insert($params) {
     payment_checked,
     payment_comment)
    VALUES (
-    '$domain_id',
+    $domain_id,
     null,
     '$now',
     null,
     '$uid',
-    '$company_id',
-    '$account_id',
+    $company_id,
+    $account_id,
     '$kind',
     '$amount',
     $date,
@@ -252,7 +252,7 @@ function run_query_payment_insert($params) {
   $entity_id = of_entity_insert($GLOBALS['module'], $id);  
 
   // insert the payment-invoice link, if invoice_id set
-  if ($id > 0 && isset($invoice_id)) {
+  if ($id > 0 && is_numeric($invoice_id)) {
     $query = "INSERT INTO PaymentInvoice (
       paymentinvoice_invoice_id,
       paymentinvoice_payment_id,
@@ -288,11 +288,11 @@ function run_query_payment_update($pid, $params) {
 
   $company_id = $params['company_new_id'];
   if ($company_id < 1) {
-    $company_id = $params['company_id'];
+    $company_id = sql_parse_id($params['company_id']);
   }
 
-  $account_id = $params['account'];
-  $kind = $params['kind'];
+  $account_id = sql_parse_id($params['account']);
+  $kind = sql_parse_int($params['kind']);
   $number = $params['number'];
   $date = ($params['date'] ? "'".of_isodate_convert($params['date'])."'" : 'null');
   $amount = $params['amount'];
@@ -715,7 +715,7 @@ function check_payment_data_form($id, $params) {
   }
 
   // MANDATORY: Invoice number, if state not "to be created"
-  if ($status_created) {
+  /*  if ($status_created) {
     if (trim($number) == '') {
       $err['msg'] = $l_fill_number;
       return false;
@@ -726,7 +726,7 @@ function check_payment_data_form($id, $params) {
 	return false;
       }
     }
-  }
+    }*/
 
   return true;
 }
@@ -851,6 +851,7 @@ function check_payment_kind($params) {
   return true;
 }
 
+
 /**
  * Update Payment kind
  *
@@ -871,6 +872,7 @@ function run_query_payment_kind_update($params) {
   return $obm_q->query($query);
 }
 
+
 /**
  * Insert Payment kind
  *
@@ -890,7 +892,9 @@ function run_query_payment_kind_insert($params) {
   return $obm_q->query($query);
 }
 
+
 function run_query_payment_kind_delete($params) {
+
   $id = $params['kind'];
   $k_id = sql_parse_id($id, true);
   $query = "DELETE FROM Paymentkind WHERE paymentkind_id $k_id";

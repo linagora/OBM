@@ -61,14 +61,14 @@ function run_query_invoice_search ($invoice) {
     $where .= ' AND (';
     $or = '';
     foreach ($status as $s_id) {
-      $s_id = sql_parse_id($s_id, true);
-      $where .= "$or invoice_status_id $s_id ";
+      $s_id = sql_parse_int($s_id, true);
+      $where .= "$or invoice_status_id = $s_id ";
       $or = ' OR';
     }
     $where .= ')';
   } else if (($status != '') && ($status != "$c_all")) {
-    $status = sql_parse_id($status, true);
-    $where .= " AND invoice_status_id $status ";
+    $status = sql_parse_int($status, true);
+    $where .= " AND invoice_status_id = $status ";
   }
   if ($date_after != '') {
     $where .= " AND invoice_$date_field >= '$date_after'";
@@ -229,7 +229,7 @@ function run_query_invoice_insert($invoice) {
   $number = $invoice['number'];
   $ht = $invoice['amount_ht'];
   $ttc = $invoice['amount_ttc'];
-  $status = sql_parse_id($invoice['status']);
+  $status = sql_parse_int($invoice['status']);
   $date = ($invoice['date'] ? "'".of_isodate_convert($invoice['date'])."'" : 'null');
   $expiration_date = ($invoice['expiration_date'] ? "'".of_isodate_convert($invoice['expiration_date'])."'" : 'null');
   $payment_date = ($invoice['payment_date'] ? "'".of_isodate_convert($invoice['payment_date'])."'" : 'null');
@@ -253,7 +253,6 @@ function run_query_invoice_insert($invoice) {
   if ($project_new_id < 1) { $project_new_id = $invoice['project_id']; }
   if ($project_new_id == '') { $project_new_id = '0'; }
   $project_new_id = sql_parse_id($project_new_id);
-  $status = sql_parse_id($status);
   $arch = sql_parse_int($invoice['archive']);
 
   $query = "INSERT INTO Invoice (
@@ -458,7 +457,7 @@ function get_invoice_payment($p_invoice, $not_paid=0) {
     FROM PaymentInvoice
       LEFT JOIN Payment ON paymentinvoice_payment_id=payment_id
       LEFT JOIN Company ON payment_company_id=company_id
-    WHERE paymentinvoice_invoice_id = '$p_invoice'
+    WHERE paymentinvoice_invoice_id $p_invoice
       $multidomain";
 
   if ($not_paid == 1) {

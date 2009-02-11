@@ -78,7 +78,7 @@ function check_invoice(f_inv) {
   }
   // inout de la facture doit être renseigné :
   if ((f_inv.rd_inout[0].checked == \"0\") && (f_inv.rd_inout[1].checked == \"0\")){
-    alert (\"$l_check_inout\");
+    alert (\"$l_fill_inout\");
     return false;
   }
 

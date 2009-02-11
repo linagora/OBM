@@ -60,7 +60,7 @@ $l_invoice_added = "The connection with the invoice has been created";
 $l_no_invoice_added = "The connection with the invoice has failed !";
 $l_err_kind = "Payment kind has not been added !";
 $l_err_del_kind = "Payment kind has not been deleted !";
-$l_fill_kind_label = "The payment kind label have to be filled !";
+$l_fill_kind = "The payment kind have to be selected !";
 $l_fill_kind_short_label = "The payment kind short label have to be filled !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

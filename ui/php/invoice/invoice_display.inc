@@ -908,6 +908,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat, $usr_q, $field='') 
     }
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
+    $inout = '+';
+    $credit_memo = 0;
   }
 
   // if we duplicate we have to modify some fields :
