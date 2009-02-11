@@ -1,20 +1,14 @@
-package OBM::Update::commonUpdate;
+package OBM::Entities::entityIdsGetter;
 
+$VERSION = '1.0';
 
 $debug = 1;
 
-
 use 5.006_001;
 use strict;
-use vars qw( @EXPORT_OK $VERSION );
-use base qw(Exporter);
-
-use OBM::Parameters::regexp; 
 
 
-$VERSION = '1.0';
-@EXPORT_OK = qw(    _getUserIdFromUserLoginDomain
-               );
+my $userObmTable = 'UserObm';
 
 
 sub _getUserIdFromUserLoginDomain {
@@ -29,7 +23,7 @@ sub _getUserIdFromUserLoginDomain {
     }
 
 
-    require OBM::Parameters::regexp;
+    use OBM::Parameters::regexp;
     if( $userLogin !~ /$regexp_login/ ) {
         $self->_log( 'nom d\'utilisateur non specifié ou incorrect', 0 );
         return undef;
@@ -41,10 +35,11 @@ sub _getUserIdFromUserLoginDomain {
     }
 
     my $query = 'SELECT userobm_id
-                 FROM UserObm
+                 FROM '.$userObmTable.'
                  WHERE userobm_login='.$dbHandler->quote($userLogin).' AND userobm_domain_id='.$domainId;
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'utilisateur \''.$userLogin.'\' du domaine d\'ID \''.$domainId.'\' non existant', 3 );
         return undef;
     }
 
@@ -57,6 +52,3 @@ sub _getUserIdFromUserLoginDomain {
 
     return $userId;
 }
-
-
-
