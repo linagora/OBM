@@ -1,7 +1,7 @@
 <?php
 include_once('obminclude/of/vcalendar/Element.php');
 include_once('obminclude/of/vcalendar/element/Vevent.php');
-
+include_once('obminclude/of/vcalendar/Utils.php');
 //TODO : VAlerts
 //TODO : Timezone support
 //TODO : ICS Writer

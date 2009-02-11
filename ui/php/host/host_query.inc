@@ -528,7 +528,8 @@ function run_query_check_host($id, $name, $desc) {
 //   - Host Database object with host of similar hosts
 ///////////////////////////////////////////////////////////////////////////////
 function check_host_can_delete($id) {
-  global $cdg_sql;
+  global $cdg_sql, $err;
+  $delete_ok = true;
   $query = "
     SELECT count(*) as count FROM ServiceProperty 
     INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
@@ -538,7 +539,16 @@ function check_host_can_delete($id) {
   display_debug_msg($query, $cdg_sql, 'check_host_can_delete');
   $obm_q->query($query);
   $obm_q->next_record();
-  return ($obm_q->f('count') == 0);
+  if($obm_q->f('count') != 0) {
+    $delete_ok = false;
+    $err['msg'] .= $GLOBALS['l_cant_delete'];
+  }
+
+  // Check that user has delegation rights for this host
+  if (! check_host_update_rights(array('host_id' => $id))) {
+    $delete_ok = false;
+  }  
+  return $delete_ok;
   
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -656,7 +666,17 @@ function check_host_data_form($host) {
       }
     }
   }
- 
+  // XXXXXXX verifier ici + fichiers de langue
+  $d = of_domain_get_domain_infos($domain_id, true);
+
+  // Les contraintes sur la delegation ne sont pas valables pour le domaine global
+  if (!$d['global'] && $cgp_use['property']['delegation']) {
+    if(!of_delegation_check_data($host['delegation'], $d['delegation'])) {
+      $err['field'] = 'delegation';
+      return false;
+    }
+  } 
+
   if ($cgp_use['service']['firewall']) {
     $firewall_perms = $host['firewall_perms'];
     

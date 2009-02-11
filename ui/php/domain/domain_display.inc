@@ -569,9 +569,10 @@ function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) 
 
   if ($cgp_use['service']['samba']) {
     if(isset($samba['drive']) && $samba['drive'] != '') $drive[$samba['drive']] = 'selected="selected"';
-    for($i='A';$i<='Z';$i++) {
+    for($i='D'; $i< 'Z';$i++) {
       $dis_drive_sel .= "<option ".$drive["$i"]." value='$i'>$i:</option>";
     }
+    $dis_drive_sel .= "<option ".$drive["Z"]." value='Z'>Z:</option>";
     $dis_drive_sel = "<select style='width:4em;' name='samba[drive]'>$dis_drive_sel</select>";
 
     $dis_samba = "
@@ -579,7 +580,7 @@ function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) 
       <legend>$GLOBALS[l_samba]</legend>
       <table>
        <tr>
-         <th>$GLOBALS[l_samba_sid]</th><td class='multiple'><input type='text' name='samba[sid]' id='sambaSID' value='$samba[sid]'/>&nbsp;<input type='button' onclick='autoGenSid()' value='$GLOBALS[l_autogen_sid]' /></td>
+         <th>$GLOBALS[l_samba_sid]</th><td><input type='text' name='samba[sid]' id='sambaSID' value='$samba[sid]'/>&nbsp;<input type='button' onclick='autoGenSid()' value='$GLOBALS[l_autogen_sid]' /></td>
        </tr>
        <tr>
          <th>$GLOBALS[l_samba_domain]</th><td><input type='text' name='samba[domain]' value='$samba[domain]'/></td>

@@ -14,25 +14,17 @@
 //   - $samba[] : samba hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_samba_update($samba) {
-  global $cdg_sql;
+  global $cdg_sql, $obm;
 
   $obm_q = new DB_OBM;
 
-  $home_def = $samba["home"];
-  $home_drive_def = $samba["home_drive"];
+  $home = $samba["home"];
+  $drive = $samba["drive"];
 
-  $query = "UPDATE Samba SET
-      samba_value='$home_def'
-    WHERE samba_name='samba_home_def'";
-  display_debug_msg($query, $cdg_sql, "run_query_samba_update(1)");
-  $retour = $obm_q->query($query);
+  $entity_id = of_entity_get('domain', $obm['domain_id']);
 
-  $query = "UPDATE Samba SET
-      samba_value='$home_drive_def'
-    WHERE samba_name='samba_home_drive_def'";
-  display_debug_msg($query, $cdg_sql, "run_query_samba_update(2)");
-  $retour = $obm_q->query($query);
-
+  $retour = of_service_property_replace('samba', 'drive', $entity_id, $drive);
+  $retour = $retour && of_service_property_replace('samba', 'home', $entity_id, $home);
   return $retour;
 }
 

@@ -1047,6 +1047,15 @@ function check_group_data_form(&$group) {
   }
 
 
+  // Les contraintes sur la delegation ne sont pas valables pour le domaine global
+  if ($cgp_use['property']['delegation']) {
+    if(!of_delegation_check_data($group['delegation'])) {
+      $err['field'] = 'delegation';
+      return false;
+    }
+  } 
+
+
   // Allow public group handling only if write_admin right
   if (($priv != 1) && (! $perm->check_right('group', $cright_write_admin))) {
     $err['msg'] = "$l_err_public_rights";
@@ -1100,7 +1109,10 @@ function check_group_can_delete($p_id) {
   global $l_warn_delete, $l_cant_delete_system, $l_err_public_rights;
 
   $delete_ok = true;
-
+  // Check that user has delegation rights for this group 
+  if (! check_group_update_rights(array('group_id' =>$p_id))) {
+    $delete_ok = false;
+  }
   $lgroup = get_group_info($p_id);
   if ($lgroup["system"] != "0") {
     $err["msg"] .= "$l_cant_delete_system";

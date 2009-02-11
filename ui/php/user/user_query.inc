@@ -382,14 +382,12 @@ function run_query_user_insert($user) {
   // Target Delegation handling (if updated user as delegation admin realm)
   $profiles = $user['profiles'];
   $admin_realm = $profiles[$profile]['properties']['admin_realm'];
-  if (is_array($admin_realm)) {
-    if (in_array('delegation', $admin_realm)) {
-      $delegation_target = $user['delegation_target'];
-      $q_insert_delegation_target = ',
-    userobm_delegation_target';
-      $q_value_delegation_target = ",
-    '$delegation_target'";
-    }
+  if ($GLOBALS['cgp_use']['property']['delegation']) {
+    $delegation_target = $user['delegation_target'];
+    $q_insert_delegation_target = ',
+      userobm_delegation_target';
+    $q_value_delegation_target = ",
+      '$delegation_target'";
   }
 
   // Delegation handling
@@ -741,12 +739,10 @@ function run_query_user_update($p_id, $user) {
   // Target Delegation handling (if updated user as delegation admin realm)
   $profiles = $user['profiles'];
   $admin_realm = $profiles[$profile]['properties']['admin_realm'];
-  if (is_array($admin_realm)) {
-    if (in_array('delegation', $admin_realm)) {
-      $delegation_target = $user['delegation_target'];
-      $q_delegation_target = ",
-    userobm_delegation_target='$delegation_target'";
-    }
+  if ($GLOBALS['cgp_use']['property']['delegation']) {
+    $delegation_target = $user['delegation_target'];
+    $q_delegation_target = ",
+  userobm_delegation_target='$delegation_target'";
   }
 
   // Delegation handling
@@ -1848,53 +1844,14 @@ function check_user_data_form($p_id, &$user) {
   // XXXXXXX verifier ici + fichiers de langue
   $d = of_domain_get_domain_infos($domain_id, true);
 
-  // Les contraintes sur la delegation ne sont pas valables pour le domaine 0
-  if (!$d['global']) {
-
-    // Verifier que pour un profil ayant delegation
-    if (is_array($profiles[$profile]['properties']['admin_realm'])
-        && (in_array('delegation', $profiles[$profile]['properties']['admin_realm']))) {
-      // la cible de delegation est bien dans l'arbo. de l'entite
-      if (isset($d['delegation']) && ($d['delegation'] != '')) {
-	if (strpos($delegation_target, $d['delegation']) !== 0) {
-	  $err['msg'] = "$l_err_delegation_target_outside_domain ($d[delegation])";
-	  $err['field'] = 'delegation_target';
-	  return false;
-	}
-      }
-      // la cible de delegation est dans la cible de delegation de l'admin
-      if (isset($obm['delegation']) && ($obm['delegation'] != '')) {
-	if (($delegation_target != '') &&
-	    (strpos($delegation_target, $obm['delegation']) !== 0)) {
-	  $err['msg'] = "$l_err_delegation_target_outside_target ($obm[delegation])";
-	  $err['field'] = 'delegation_target';
-	  return false;
-	}
-      }
-    } else {
-      // Sinon la cible de delegation ne doit pas etre remplie !
-      if ($delegation_target != '') {
-        $err['msg'] = "$l_err_delegation_target_profile ($delegation_target)";
-        $err['field'] = 'delegation_target';
-        return false;
-      }
-    }
-
-    // Verifier delegation est dans la delegation du domaine
-    if (isset($d['delegation']) && ($d['delegation'] != '')) {
-      if (strpos($delegation, $d['delegation']) !== 0) {
-	$err['msg'] = "$l_err_delegation_outside_domain ($d[delegation])";
-	$err['field'] = 'delegation';
-	return false;
-      }
-    }
-
-    // Verifier delegation est dans la cible de delegation de l'admin
-    if (isset($obm['delegation'])
-        && ($obm['delegation'] != '')
-        && (strpos($delegation, $obm['delegation']) !== 0)) {
-      $err['msg'] = "$l_err_delegation_outside_target ($obm[delegation])";
+  // Les contraintes sur la delegation ne sont pas valables pour le domaine global
+  if (!$d['global'] && $cgp_use['property']['delegation']) {
+    if(!of_delegation_check_data($delegation, $d['delegation'])) { 
       $err['field'] = 'delegation';
+      return false;
+    }
+    if(!of_delegation_check_data($delegation_target, $d['delegation'])) {
+      $err['field'] = 'delegation_target';
       return false;
     }
   }         

@@ -650,27 +650,17 @@ function of_delegation_dis_block_update($value, $class) {
 
   $block = '';
   if ($cgp_use['property']['delegation']) {
-    $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
     $delegation = $value;
-
-    if (is_array($admin_realm)) {
-      if (in_array('delegation', $admin_realm)) {
-        // Default to admin target if empty
-        if ($delegation == '') {
-          $delegation = $obm['delegation'];
-        }
-      }
-      if (in_array('delegation', $admin_realm) || in_array('domain', $admin_realm)) {
-        $input_delegation = "<input name=\"tf_delegation\" size=\"32\" maxlength=\"64\" value=\"$delegation\" />";
-      } else {
-        $input_delegation .= "<input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />";
-      }
-      $block = "
-        <tr>
-        <th class=\"$class\">$l_delegation</th>
-        <td>$input_delegation</td>
-        </tr>";
+    // Default to admin target if empty
+    if ($delegation == '') {
+      $delegation = $obm['delegation'];
     }
+    $input_delegation = "<input name=\"tf_delegation\" id='delegationField' size=\"32\" maxlength=\"64\" value=\"$delegation\" />";
+    $block = "
+      <tr>
+      <th class=\"$class\">$l_delegation</th>
+      <td>$input_delegation</td>
+      </tr>";
   }
 
   return $block;
@@ -723,38 +713,53 @@ function of_delegation_query_update_clause($field, $value) {
 //   - $current_delegation : object current delegation to check right
 // Returns : XHTML consult display block
 ///////////////////////////////////////////////////////////////////////////////
-function of_delegation_check_update_rights($params, $current_delegation) {
-  global $obm, $cgp_use, $profiles;
+function of_delegation_check_update_rights($params, $current_delegation, $delegation=false) {
+  global $obm, $cgp_use;
   
   if ($cgp_use['property']['delegation']) {
     $id = $params['id'];
     $action = $params['action'];
-    $delegation = $params['delegation'];
-    $admin_realm = $profiles[$obm['profile']]['properties']['admin_realm'];
-
-    // If admin is restricted to his delegation target, check it
-    if (is_array($admin_realm)) {
-      if ((in_array('delegation', $admin_realm))
-        && (! in_array('domain', $admin_realm))) {
-
-          // Object (User,..) delegation must be in target delegation
-          if (($obm['delegation'] != '')
-            && (strpos($current_delegation, $obm['delegation']) !== 0)) {
-              return false;
-            }
-
-          // Can not update to other delegation
-          if ( (($action == 'insert') || ($action == 'update'))
-            && ($delegation != $obm['delegation'])) {
-              return false;
-            }
-        }
+    if(!$delegation) $delegation = $params['delegation'];
+    // Object (User,..) delegation must be in target delegation
+    if ($obm['delegation'] != '') {
+      if(strpos($current_delegation, $obm['delegation']) !== 0) {
+        return false;
+      }
+      // Can not update to other delegation
+      if ( (($action == 'insert') || ($action == 'update'))
+        && (strpos($delegation, $obm['delegation']) !== 0)) {
+        //&& ($delegation != $obm['delegation'])) {
+          return false;
+      }
     }
   }
-
   return true;
 }
 
+/**
+ * of_delegation_check_data 
+ * 
+ * @param mixed $delegation 
+ * @param mixed $domain_id 
+ * @access public
+ * @return void
+ */
+function of_delegation_check_data($delegation, $domain=false) {
+  global $obm, $cgp_use, $err;
+  if ($cgp_use['property']['delegation']) {
+    // Verifier delegation est dans  delegation du domaine
+    if (isset($domain) && ($domain != '') && strpos($delegation, $domain) !== 0) {
+      $err['msg'] = "$GLOBALS[l_err_delegation_outside_domain] ($domain)";
+      return false;
+    }
+    // Verifier delegation est dans la cible de delegation de l'admin
+    if (isset($obm['delegation']) && ($obm['delegation'] != '') && strpos($delegation, $obm['delegation']) !== 0) {
+      $err['msg'] = "$GLOBALS[l_err_delegation_outside_target] ($obm[delegation])";
+      return false;
+    }
+  }
+  return true;
+}
 
 //--- User and Display preferences handling----------------------------------//
 
@@ -2967,14 +2972,16 @@ function of_service_property_insert($service, $service_property, $id, $values) {
   }
   $values = array_unique($values);
   $obm_q = new DB_OBM;  
+  $return = true;
   foreach($values as $value) {
     if($value != '') {
       $query = "INSERT INTO ServiceProperty (serviceproperty_service, serviceproperty_property, serviceproperty_entity_id, serviceproperty_value)
         VALUES ('$service', '$service_property', $id, '$value')";
       display_debug_msg($query, $cdg_sql, 'of_service_property_insert()');
-      $obm_q->query($query);
+      $return = $return && $obm_q->query($query);
     }
   }
+  return $return;
 }
 /**
  * of_service_property_replace 
@@ -2987,8 +2994,9 @@ function of_service_property_insert($service, $service_property, $id, $values) {
  * @return void
  */
 function of_service_property_replace($service, $service_property, $id, $values) {
-  of_service_property_delete($service, $service_property, $id);
-  of_service_property_insert($service, $service_property, $id, $values);
+  $return = of_service_property_delete($service, $service_property, $id);
+  $return = $return && of_service_property_insert($service, $service_property, $id, $values);
+  return $return;
 }
 
 
@@ -3006,7 +3014,7 @@ function of_service_property_delete($service, $service_property, $id) {
   $obm_q = new DB_OBM;  
   $query = "DELETE FROM ServiceProperty WHERE serviceproperty_service = '$service' AND serviceproperty_property = '$service_property' AND serviceproperty_entity_id = $id";
   display_debug_msg($query, $cdg_sql, 'of_service_property_delete()');
-  $obm_q->query($query);
+  return $obm_q->query($query);
 }
 
 /**

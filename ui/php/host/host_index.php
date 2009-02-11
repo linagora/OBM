@@ -145,7 +145,7 @@ if ($action == 'ext_get_id') {
   if(check_host_can_delete($params['host_id'])) {
     $display['detail'] = dis_host_warn_delete($params['host_id']);
   } else {
-    $display['msg'] .= display_err_msg($l_cant_delete);
+    $display['msg'] .= display_err_msg($err["msg"], false);
     $display['detail'] = dis_host_consult($params);
   }
 } elseif ($action == 'delete') {
@@ -181,6 +181,7 @@ if ($action == 'ext_get_id') {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
+update_host_action();
 $display['head'] = display_head($l_host);
 $display['end'] = display_end();
 // Update actions url in case some values have been updated (id after insert) 
@@ -346,4 +347,33 @@ function get_host_action() {
                                       	 );
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// MailShare Actions updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_host_action() {
+  global $params, $actions, $path;
+
+  $id = $params['host_id'];
+  if ($id > 0) {
+    $h = get_host_info($id);
+    // Detail Consult
+    $actions['host']['detailconsult']['Url'] = "$path/host/host_index.php?action=detailconsult&amp;host_id=$id";
+    if (check_host_update_rights($params, $h)) { 
+      // Detail Update
+      $actions['host']['detailupdate']['Url'] = "$path/host/host_index.php?action=detailupdate&amp;host_id=$id";
+      $actions['host']['detailupdate']['Condition'][] = 'insert';
+      
+      // Check Delete
+      $actions['host']['check_delete']['Url'] = "$path/host/host_index.php?action=check_delete&amp;host_id=$id";
+      $actions['host']['check_delete']['Condition'][] = 'insert';
+    } else {
+      // Detail Update
+      $actions['host']['detailupdate']['Condition'] = array('None');
+      // Check Delete
+      $actions['host']['check_delete']['Condition'] = array('None');
+      // Rights admin
+      $actions['host']['rights_admin']['Condition'] = array('None');
+    }
+  }
+}
 </script>

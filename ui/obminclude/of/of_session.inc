@@ -424,10 +424,9 @@ class Perm {
   // Parameters:
   //   - $section : section to return the right
   //-------------------------------------------------------------------------//
-  function get_section_rights($section) {
+  function get_section_rights($section, $profile = false) {
     global $profiles, $obm;
-	
-	$profile = $obm["profile"];
+    if(!$profile) $profile = $obm["profile"];
     if (isset($profiles[$profile]['section'][$section])) {
       return $profiles[$profile]['section'][$section];
     } else {
@@ -442,10 +441,11 @@ class Perm {
   // Parameters:
   //   - $module : module to return the right
   //-------------------------------------------------------------------------//
-  function get_module_rights($module) {
+  function get_module_rights($module, $profile = false) {
     global $profiles, $obm;
 	
-	$profile = $obm["profile"];
+    if(!$profile) $profile = $obm["profile"];
+    $profile = $obm["profile"];
 
     if (isset($profiles[$profile]['module'][$module])) {
       return hexdec($profiles[$profile]['module'][$module]);
@@ -488,10 +488,12 @@ class Perm {
   //   - $module : module to check
   //   - $right  : right to check in the module
   //-------------------------------------------------------------------------//
-  function check_right($module, $right) {
-    global $actions;
+  function check_right($module, $right, $profile = false) {
+    return self::check_module_right($module, $right, $profile);
+  }
 
-    $module_right = $this->get_module_rights($module);
+  function check_module_right($module, $right, $profile = false) {
+    $module_right = self::get_module_rights($module, $profile);
 
     // If action right not defined or user has not access rights
     if ( ( ($module_right & $right) != $right)
@@ -501,7 +503,16 @@ class Perm {
       return true;
     }
   }
-  
+
+  function check_section_right($section, $profile = false) {
+    $section_right = self::get_section_rights($module, $profile);
+
+    if ($section_right) {
+      return true;
+    } else {
+      return false;
+    }
+  }  
   //-------------------------------------------------------------------------//
   // Check if the current profile is superman                                //
   // Parameters:

@@ -363,6 +363,8 @@ if (!$cgp_use['service']['ldap']) {
   $cgp_show['module']['tools'] = false;
 }
 
+$cgp_use['property']['delegation'] = true;
+
 // Specific user data
 $cgp_user = array();
 
@@ -475,7 +477,6 @@ if ($cgp_hide['contact']['function']) {
   $cgp_hide['list_contact_2']['function'] = true;
 }
 
-$cgp_use['property']['delegation'] = true;
 
 // If delegation not used, disable delegation fields
 if (! $cgp_use['property']['delegation']) {
@@ -665,9 +666,9 @@ $php_regexp_network_port_list = '/^([1-2]?[0-9]{1,2}.){3}[1-2]?[0-9]{1,2}:[0-9]+
 
 $php_regexp_samba_sid = '/^S-1-5-21-[0-9]{10}-[0-9]{10}-[0-9]{10}$/';
 $php_regexp_samba_domain ='/^[aA-zZ0-9!@#$%^&()-_{}.~]{1,15}$/';
-$php_regexp_samba_profile = '/^\\\\\\\[aA-zZ!@#$%^&()-_{}.~]{1,15}\\\.+$/';
-$php_regexp_samba_home = '/^.+$/';
-$php_regexp_samba_drive = '/^[A-Z]$/';
+$php_regexp_samba_profile = "/^\\\\\\\\[a-zA-Z0-9-]{1,15}\\\\[a-zA-Z0-9_\\\\.-]{1,48}$/";
+$php_regexp_samba_home = "/^\\\\\\\\[a-zA-Z0-9-]{1,15}\\\\([a-zA-Z0-9_\\\\.-]{1,48}|%u)$/";
+$php_regexp_samba_drive = '/^[D-Z]?$/';
 
 
 
@@ -685,8 +686,8 @@ $php_regexp_quota = "/^[0-9]{1,6}$/";
 
 // Samba
 // Backslashes \ needs 2 backslash passes (PHP + regexp) so for "\" -> "\\\\"
-$php_regexp_home = "/^\\\\\\\\[a-zA-Z0-9-]{1,32}\\\\[a-zA-Z0-9_\\\\.-]{1,48}$/";
-$php_regexp_dflt_home = "/^\\\\\\\\[a-zA-Z0-9-]{1,32}\\\\([a-zA-Z0-9_\\\\.]{1,48}|%u)$/";
+$php_regexp_home = "/^\\\\\\\\[a-zA-Z0-9-]{1,15}\\\\[a-zA-Z0-9_\\\\.-]{1,48}$/";
+$php_regexp_dflt_home = "/^\\\\\\\\[a-zA-Z0-9-]{1,15}\\\\([a-zA-Z0-9_\\\\.]|%u){1,48}$/";
 $php_regexp_drive = "/^[D-Z]?$/";
 // Virus log
 $php_regexp_main_virus_db = "/^main\.cvd.*$/";

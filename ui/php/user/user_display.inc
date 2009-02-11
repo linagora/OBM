@@ -611,18 +611,15 @@ function html_user_consult($obm_q) {
   }
 
   // Target Delegation handling (if user as delegation admin realm)
-  $admin_realm = $profiles[$profile]['properties']['admin_realm'];
-  if (is_array($admin_realm)) {
-    if (in_array('delegation', $admin_realm)) {
-      $dis_delegation_target = "
-  <tr>
-    <th>$l_delegation_target</th>
-    <td>$delegation_target</td>
-  </tr>";
-    }
-  }
+  if($cgp_use['property']['delegation']) {
+    $dis_delegation_target = "
+    <tr>
+      <th>$l_delegation_target</th>
+      <td>$delegation_target</td>
+    </tr>";
 
-  $dis_delegation = of_delegation_dis_block_consult($delegation);
+    $dis_delegation = of_delegation_dis_block_consult($delegation);
+  }
 
   // Section Web
   if ($cgp_use["service"]["web"]) {
@@ -814,8 +811,8 @@ function html_user_consult($obm_q) {
     <th>$l_profile</th>
     <td>$dis_profile</td>
   </tr>
-  $dis_delegation_target
   $dis_delegation
+  $dis_delegation_target
   <tr>
     <th>$l_title</th>
     <td>$title</td>
@@ -1434,9 +1431,10 @@ function html_user_form($usr_q, $user, $field='') {
     $samba = run_query_user_samba_properties();
     $smb_home_drive = (isset($smb_home_drive))?$smb_home_drive:$samba['drive'];
     if(isset($smb_home_drive) && $smb_home_drive != '') $drive[$samba['drive']] = 'selected="selected"';
-    for($i='A';$i<='Z';$i++) {
+    for($i='D'; $i < 'Z';$i++) {
       $dis_drive_sel .= "<option ".$drive["$i"]." value='$i'>$i:</option>";
     }
+    $dis_drive_sel .= "<option ".$drive["Z"]." value='Z'>Z:</option>";
     $dis_drive_sel = "<select style='width:4em;' name='samba[drive]'>$dis_drive_sel</select>";
     $smb_home = (isset($smb_home))?$smb_home:$samba['home'];
     if($login != '') {
@@ -1520,31 +1518,54 @@ function html_user_form($usr_q, $user, $field='') {
   }
 
   // Profiles
+  $delegation_modules = array(
+    'user' => $GLOBALS['cright_write_admin'],
+    'resource' => $GLOBALS['cright_write'], 
+    'host' => $GLOBALS['cright_write'],
+    'group' => $GLOBALS['cright_write_admin'],
+    'mailshare' => $GLOBALS['cright_write']);
   foreach ($user['profiles'] as $k_profile => $one_profile) {
-    $admin_realm = $one_profile['properties']['admin_realm'];
-    if (is_array($admin_realm) && in_array('delegation', $admin_realm)) {
-      $onselect .= "profiles['$k_profile'] = true\n";
-      if (!isset($delegation_class) || $profile == $k_profile) $delegation_class = '';
-    } else {
-      $onselect .= "profiles['$k_profile'] = false\n";
-      if (!isset($delegation_class) || $profile == $k_profile) $delegation_class = 'H';
-    }
-    if ($profile == $k_profile) {
+    $selected = "";
+    foreach($delegation_modules as $mdl => $rgt) {
+      $section = $GLOBALS['cgp_show']['modules'][$mdl];
+      if(Perm::check_section_right($section, $k_profile) && Perm::check_module_right($mdl, $rgt, $k_profile)) {
+        $onselect .= "profiles['$k_profile'] = true\n";
+        if (!isset($delegation_class) && $profile == $k_profile){
+          $delegation_class = '';
+          $selected = " selected";
+        } 
+        break;
+      }
+    } 
+    if (!isset($delegation_class) && $profile == $k_profile){
+      $delegation_class = 'H';
       $selected = " selected";
-    } else {
-      $selected = "";
-    }
+    } 
+
     $dis_profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
     $block_profile .= "<option value=\"$k_profile\"$selected>$dis_profile</option>";
+
   }
+  if($cgp_use['property']['delegation']) {
+    if(!isset($delegation_target)) $delegation_target = $obm['delegation'];
+    $dis_delegation_target = "
+    <tr class='$delegation_class' id='delegationTargetBlock'>
+      <th class=\"$class[delegation_target]\">$l_delegation_target</th>
+      <td>
+      <input id='delegationTargetField' name=\"tf_delegation_target\" size=\"32\" maxlength=\"64\" value=\"$delegation_target\" />
+      <script type='text/javascript'>
+        $('delegationField').addEvent('keyup' , function () {
+          $('delegationTargetField').value = $('delegationField').value;
+        })
+        $('delegationField').addEvent('change' , function () {
+          $('delegationTargetField').value = $('delegationField').value;
+        })          
+      </script>
+      </td>
+    </tr>";
 
-  $dis_delegation_target = "
-  <tr class='$delegation_class' id='delegationTargetBlock'>
-    <th class=\"$class[delegation_target]\">$l_delegation_target</th>
-    <td><input id='delegationTargetField' name=\"tf_delegation_target\" size=\"32\" maxlength=\"64\" value=\"$delegation_target\" /></td>
-  </tr>";
-
-  $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
+    $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
+  }
 
   // some constants
   $csize_add = "48";
@@ -1619,8 +1640,8 @@ function html_user_form($usr_q, $user, $field='') {
       </select>
     </td>
   </tr>
-  $dis_delegation_target
   $block_delegation
+  $dis_delegation_target
   <tr>
     <th class=\"$class[title]\">$l_title</th>
     <td><input name=\"tf_title\" size=\"32\" maxlength=\"32\" value=\"$title\" /></td>

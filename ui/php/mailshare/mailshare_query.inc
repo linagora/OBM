@@ -432,7 +432,10 @@ function check_can_delete_mailshare($p_id) {
   global $ok_msg;
 
   $delete_ok = true;
-
+  // Check that user has delegation rights for this user
+  if (! check_mailshare_update_rights(array('mailshare_id' => $p_id))) {
+    $delete_ok = false;
+  }
   return $delete_ok;
 }
 
@@ -475,7 +478,7 @@ function check_mailshare_data_form($mailshare) {
   global $err, $l_err_mailshare_name_empty, $l_err_mailshare_name_exist;
   global $php_regexp_login, $l_name_error, $l_name_in_use;
   global $php_regexp_email_name, $php_regexp_quota, $l_err_mailshare_email;
-  global $l_err_mailshare_email_empty, $l_err_mailshare_email_exist;
+  global $l_err_mailshare_email_empty, $l_err_mailshare_email_exist,$cgp_use;
   global $l_err_mailshare_uemail_exist, $l_err_mailshare_quota,$php_regexp_email;
 
   $id = $mailshare['mailshare_id'];
@@ -509,6 +512,14 @@ function check_mailshare_data_form($mailshare) {
     $err['field'] = 'name';
     return false;
   }
+
+  // Les contraintes sur la delegation ne sont pas valables pour le domaine global
+  if ($cgp_use['property']['delegation']) {
+    if(!of_delegation_check_data($mailshare['delegation'])) {
+      $err['field'] = 'delegation';
+      return false;
+    }
+  } 
 
   // If quota set, must be numerical
   if ($quota != '') {

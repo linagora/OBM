@@ -12,7 +12,7 @@
  */
 class Vcalendar_Utils {
 
-  function getFileType($file) {
+  static function getFileType($file) {
     $handle = fopen($file, 'r');
     while($line = fgets($handle)) {
       if(preg_match('/^\s*VERSION\s*:\s*(.*)$/i',$line,$match)) {
@@ -26,6 +26,13 @@ class Vcalendar_Utils {
     }
     fclose($handle);
     return null;
+  }
+
+  static function userExist($id) {
+    $db = new DB_OBM;
+    $query = 'SELECT userobm_id From UserObm WHERE userobm_id = '.$id;
+    $db->query($query);
+    return $db->next_record();
   }
 }
 

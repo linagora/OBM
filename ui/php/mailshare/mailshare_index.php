@@ -385,20 +385,29 @@ function update_mailshare_action() {
 
   $id = $params['mailshare_id'];
   if ($id > 0) {
+    $m = get_mailshare_info($id);
     // Detail Consult
     $actions['mailshare']['detailconsult']['Url'] = "$path/mailshare/mailshare_index.php?action=detailconsult&amp;mailshare_id=$id";
-    
-    // Detail Update
-    $actions['mailshare']['detailupdate']['Url'] = "$path/mailshare/mailshare_index.php?action=detailupdate&amp;mailshare_id=$id";
-    $actions['mailshare']['detailupdate']['Condition'][] = 'insert';
-    
-    // Check Delete
-    $actions['mailshare']['check_delete']['Url'] = "$path/mailshare/mailshare_index.php?action=check_delete&amp;mailshare_id=$id";
-    $actions['mailshare']['check_delete']['Condition'][] = 'insert';
+    if (check_mailshare_update_rights($params, $m)) { 
+      // Detail Update
+      $actions['mailshare']['detailupdate']['Url'] = "$path/mailshare/mailshare_index.php?action=detailupdate&amp;mailshare_id=$id";
+      $actions['mailshare']['detailupdate']['Condition'][] = 'insert';
+      
+      // Check Delete
+      $actions['mailshare']['check_delete']['Url'] = "$path/mailshare/mailshare_index.php?action=check_delete&amp;mailshare_id=$id";
+      $actions['mailshare']['check_delete']['Condition'][] = 'insert';
 
-    // Rights admin
-    $actions['mailshare']['rights_admin']['Url'] = "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=$id";
-    $actions['mailshare']['rights_admin']['Condition'][] = 'insert';
+      // Rights admin
+      $actions['mailshare']['rights_admin']['Url'] = "$path/mailshare/mailshare_index.php?action=rights_admin&amp;entity_id=$id";
+      $actions['mailshare']['rights_admin']['Condition'][] = 'insert';
+    } else {
+      // Detail Update
+      $actions['mailshare']['detailupdate']['Condition'] = array('None');
+      // Check Delete
+      $actions['mailshare']['check_delete']['Condition'] = array('None');
+      // Rights admin
+      $actions['mailshare']['rights_admin']['Condition'] = array('None');
+    }
   }
 }
 

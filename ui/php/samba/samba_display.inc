@@ -27,13 +27,12 @@ function html_samba_consult(&$smb) {
   global $l_samba, $l_smb_domain, $l_smb_sid, $l_smb_pdc_name, $l_smb_profile;
   global $l_default, $l_smb_home_def, $l_smb_home_drive_def;
 
-  $domain = $smb["samba_domain"];
-  $sid = $smb["samba_sid"];
-  $pdc_name = $smb["samba_pdc"];
-  $profile = $smb["samba_profile"];
+  $domain = $smb["domain"];
+  $sid = $smb["sid"];
+  $profile = $smb["profile"];
 
-  $home_def = $smb["samba_home_def"];
-  $home_drive_def = $smb["samba_home_drive_def"];
+  $home_def = $smb["home"];
+  $home_drive_def = $smb["drive"];
   if ($home_drive_def != "") {
     $home_drive_def .= ":";
   }
@@ -50,10 +49,6 @@ function html_samba_consult(&$smb) {
   <tr>
     <th>$l_smb_sid</th>
     <td>$sid</td>
-  </tr>
-  <tr>
-    <th>$l_smb_pdc_name</th>
-    <td>$pdc_name</td>
   </tr>
   <tr>
     <th>$l_smb_profile</td>
@@ -107,12 +102,19 @@ function html_samba_form($samba, $smb, $field="") {
 
   // if detailupdate mode values are taken from database
   if ($action == "detailupdate") {
-    $home_def = $smb["samba_home_def"];
-    $home_drive_def = $smb["samba_home_drive_def"];
+    $home = $smb["home"];
+    $drive = $smb["drive"];
   } else {
-    $home_def = stripslashes($samba["home"]);
-    $home_drive_def = $samba["home_drive"];
+    $home = stripslashes($samba["home"]);
+    $drive = $samba["drive"];
   }
+
+  if(isset($drive) && $drive != '') $val[$drive] = 'selected="selected"';
+  for($i='D'; $i< 'Z';$i++) {
+    $dis_drive_sel .= "<option ".$val["$i"]." value='$i'>$i:</option>";
+  }
+  $dis_drive_sel .= "<option ".$val["Z"]." value='Z'>Z:</option>";
+  $dis_drive_sel = "<select style='width:4em;' name='drive'>$dis_drive_sel</select>";
 
   // Mark the error field
   if ($field != "") {
@@ -130,11 +132,11 @@ function html_samba_form($samba, $smb, $field="") {
     <table>
     <tr>
       <th class=\"$class[home]\">$l_smb_home_def</th>
-      <td><input type=\"text\" name=\"tf_home\" size=\"64\" maxlength=\"255\" value=\"$home_def\" /></td>
+      <td><input type=\"text\" name=\"tf_home\" size=\"64\" maxlength=\"255\" value=\"$home\" /></td>
     </tr>
     <tr>
-      <th class=\"$class[home_drive]\">$l_smb_home_drive_def</th>
-      <td><input type=\"text\" name=\"tf_home_drive\" size=\"1\" maxlength=\"1\" value=\"$home_drive_def\" />:</td>
+      <th class=\"$class[drive]\">$l_smb_home_drive_def</th>
+      <td>$dis_drive_sel</td>
     </tr>
     </table>
     </fieldset>";

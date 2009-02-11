@@ -111,20 +111,23 @@ function get_hostname_by_id($id) {
 // Get Samba informations
 ///////////////////////////////////////////////////////////////////////////////
 function get_samba_info() {
-  global $cdg_sql;
+  global $cdg_sql, $obm;
 
-  $query = "SELECT * FROM ServiceProperty where serviceproperty_service = 'samba'";
+  $query = "
+    SELECT * FROM ServiceProperty 
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    WHERE serviceproperty_service = 'samba'
+    AND domainentity_domain_id = $obm[domain_id]";
 
   display_debug_msg($query, $cdg_sql, 'get_samba_info()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $cpt = 0;
   while ($obm_q->next_record()) {
-    $name = $obm_q->f('servicepropery_property');
+    $name = $obm_q->f('serviceproperty_property');
     $value = $obm_q->f('serviceproperty_value');
     $smb["$name"] = $value;
   }
-
   return $smb;
 }
 

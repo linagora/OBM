@@ -388,7 +388,7 @@ class Vcalendar_Reader_ICS {
 
   function getAttendeeId($attendee, $options, $entity='user') {
     if(!is_null($options['x-obm-id'])) {
-      return $options['x-obm-id'];
+      if(Vcalendar_Utils::userExist($options['x-obm-id'])) return $options['x-obm-id'];
     }
     if(preg_match('/^\s*mailto\s*:\s*(([^@]*)@([^\s]*))\s*$/i',$attendee, $match)) {
       $attendee = $this->getStandardMailto($match);
