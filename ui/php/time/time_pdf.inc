@@ -1,8 +1,8 @@
 <?php
 
-require_once 'fpdf.php';
+require('obminclude/lib/Fpdf/fpdf.php');
 
-class PDF extends FPDF
+class TimeSheetPDF extends FPDF
 {
   var $filename;
   var $data;

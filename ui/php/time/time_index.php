@@ -39,8 +39,8 @@ include("$obminclude/global_pref.inc");
 require('time_display.inc');
 require('time_query.inc');
 require('time_js.inc');
+require('time_pdf.inc');
 
-require('obminclude/lib/Fpdf/pdf.php');
 
 get_time_actions();
 $perm->check_permissions($module, $action);

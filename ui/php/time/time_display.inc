@@ -1310,7 +1310,7 @@ function dis_time_form_ra($time)
   global $c_dst_err;
 
   if (!isset($display['msg']) && isset($time['pdf_form'])) {
-    $pdf = new PDF();
+    $pdf = new TimeSheetPDF();
     $pdf->AliasNbPages();
     $pdf->AddPage();
     $pdf->Init($time);
