@@ -519,12 +519,21 @@ function getAllEntities($entityu, $user_id) {
     $e_label = sql_string_concat($db_type, $ctt);
     $u = get_user_info($user_id);
   } else {
-    $table_entity = "$entityu";
+    switch($entityu) {
+    case 'resource':
+      $table_entity = 'Resource';
+      break;
+    case 'maishare':
+      $table_entity = 'MailShare';
+      break;
+    default :
+      $table_entity = ucfirst($entityu);
+    }
     $e_id = "e.${entity}_id";
     $e_label = "e.${entity}_name";
   }
   
-  $multidomain = sql_multidomain($table_entity);
+  $multidomain = sql_multidomain(strtolower($table_entity));
   $query = "SELECT $e_id AS id, $e_label AS label, '$entity' as entityright_entity FROM $table_entity AS e WHERE 1=1 $multidomain";
   
   // END - superman has all rights on entities
