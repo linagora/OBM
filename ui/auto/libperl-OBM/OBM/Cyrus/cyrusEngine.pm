@@ -73,11 +73,6 @@ sub _doWork {
         return 1;
     }
 
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
-    if( !defined($cyrusSrv) ) {
-        return 1;
-    }
-
 
     # La bal existe ?
     my %srvBalDesc;
@@ -702,11 +697,6 @@ sub _updateMailbox {
 
     my $entity = $self->{'currentEntity'};
     if( !defined($entity) ) {
-        return 1;
-    }
-
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
-    if( !defined($cyrusSrv) || !defined($entity) ) {
         return 1;
     }
 
