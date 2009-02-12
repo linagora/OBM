@@ -1,9 +1,4 @@
 #!/usr/bin/perl -w -T
-#####################################################################
-# OBM               - File : update.pl                              #
-#                   - Desc : Script permettant de mettre à jour le  #
-#                   système de façon incrémentale                   #
-#####################################################################
 
 package update;
 
