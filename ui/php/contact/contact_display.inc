@@ -568,6 +568,7 @@ function html_contact_header($co_q, $funcs) {
   global $l_company, $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title;
   global $l_contact, $l_market, $l_archive, $l_date, $l_no_date, $l_birthday;
   global $cgp_show, $cgp_hide, $l_yes, $l_no;
+  global $l_service, $l_mailing_ok, $l_newsletter;
   global $display, $path, $action, $ccontact_simple_kind;
 
   $c_id = $co_q->f('contact_company_id');
@@ -590,6 +591,9 @@ function html_contact_header($co_q, $funcs) {
   $archive = ($co_q->f('contact_archive') == 1 ? $l_yes : $l_no);
   $date = $co_q->f('contact_date');
   $date = ($date != 0) ? of_date_format($date) : $l_no_date;
+  $service = $co_q->f('contact_service');
+  $mailok = ($co_q->f('contact_mailing_ok') == 1 ? $l_yes : $l_no);
+  $newsletter = ($co_q->f('contact_newsletter') == 1 ? $l_yes : $l_no);
   
   if ($co_q->f('contact_birthday')) {
     $birthday = new Of_Date($co_q->f('contact_birthday'), 'GMT');
@@ -614,6 +618,9 @@ function html_contact_header($co_q, $funcs) {
   $show_resp = (! $cgp_hide['contact']['responsible']);
   $show_date = (! $cgp_hide['contact']['contact_date']);
   $show_birthday = (! $cgp_hide['contact']['contact_birthday']);
+
+  $show_mailing = (! $cgp_hide['contact']['contact_mailing']);
+  $show_service = (! $cgp_hide['contact']['contact_service']);
 
   $display['title'] = "$lname $fname";
 
@@ -659,7 +666,25 @@ function html_contact_header($co_q, $funcs) {
       <td>$birthday</td>
     ";
   }
-  
+  // Service field
+  if ($show_service) {
+    $block_service = "
+     <tr>
+      <th>$l_service</th>
+      <td>$service</td>
+     </tr>";
+  }
+  if($show_mailing) {
+    $block_mailing = "
+    <tr>
+      <th>$l_mailing_ok</th>
+      <td>$mailok</td>
+    </tr><tr>
+      <th>$l_newsletter</th>
+      <td>$newsletter</td>
+    </tr>      
+    ";
+  }  
   // --- HTML Template --------------------------------------------------------
 
   $block = "
@@ -689,6 +714,8 @@ function html_contact_header($co_q, $funcs) {
     $block_resp
     $block_date
     $block_birthday
+    $block_service
+    $block_mailing
     </tr>
     </table>
     </div>"; 
@@ -718,9 +745,6 @@ function html_contact_view_main($co_q, $coords) {
   $kind_minilabel = $co_q->f('kind_minilabel');
   $lname = $co_q->f('contact_lastname');
   $fname = $co_q->f('contact_firstname');
-  $service = $co_q->f('contact_service');
-  $mailok = ($co_q->f('contact_mailing_ok') == 1 ? $l_yes : $l_no);
-  $newsletter = ($co_q->f('contact_newsletter') == 1 ? $l_yes : $l_no);
   $com  = beautify_comment(nl2br($co_q->f('contact_comment')));
   $com2 = beautify_comment(nl2br($co_q->f('contact_comment2')));
   $com3 = beautify_comment(nl2br($co_q->f('contact_comment3')));
@@ -728,9 +752,6 @@ function html_contact_view_main($co_q, $coords) {
   $newline = "\\r\\n";
 
   // Conditionnal fields
-
-  $show_mailing = (! $cgp_hide['contact']['contact_mailing']);
-  $show_service = (! $cgp_hide['contact']['contact_service']);
   $show_comment2 = (! $cgp_hide['contact']['contact_comment2']);
   $show_comment3 = (! $cgp_hide['contact']['contact_comment3']);
 
@@ -748,25 +769,6 @@ function html_contact_view_main($co_q, $coords) {
     $copy .= addslashes($service) . $newline;
   }
   
-  // Service field
-  if ($show_service) {
-    $block_service = "
-     <tr>
-      <th>$l_service</th>
-      <td>$service</td>
-     </tr>";
-  }
-  if($show_mailing) {
-    $block_mailing = "
-    <tr>
-      <th>$l_mailing_ok</th>
-      <td>$mailok</td>
-    </tr><tr>
-      <th>$l_newsletter</th>
-      <td>$newsletter</td>
-    </tr>      
-    ";
-  }
   foreach($coords as $kind => $row) {
     $coords = '';
     $GLOBALS["l_${kind}_labels"]['COMPANY'] = $l_company;
@@ -814,15 +816,6 @@ function html_contact_view_main($co_q, $coords) {
   // --- HTML Template --------------------------------------------------------
 
   $block .= "
-    <div class=\"detail infos\">
-    <h1>$l_coord</h1>
-
-    <table>
-    $block_service
-    $block_mailing
-    </table>
-    </div>
-
     $block_userdata
     <div class=\"detail extra\">
     <h1>$l_comment1</h1>
@@ -1060,7 +1053,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     
     if ($co_q->f('contact_birthday')) {
       $birthday = $co_q->f('contact_birthday');
-      $birthday = new Of_Date($birthday);
+      $birthday = new Of_Date($birthday, 'GMT');
       $birthday = $birthday->getOutputDate();
     }
     
@@ -1337,6 +1330,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       $k_lang = $kind_q->f("kind_lang");
       $k_label = $kind_q->f("kind_minilabel");
       $k_header = $kind_q->f("kind_header");      
+      $selected = '';
       if ($k_id == $kind) {
         $selected = "selected=\"selected\"";
       }
@@ -1560,6 +1554,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     <legend>$l_contact</legend>
 
     <table>
+    $block_kind
     <tr>
       <th>$l_lastname</th>
       <td><input type=\"text\" name=\"tf_lname\" size=\"30\" maxlength=\"64\" value=\"$lname\" /></td>
@@ -1572,7 +1567,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       <th>$l_aka</th>
       <td><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
     </tr>
-    $block_kind
     $block_dsrc
     <tr>
       <th>$l_private</th>
@@ -1592,6 +1586,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $block_date
     $block_userdata
     $block_birthday
+    $block_service
     $block_mailing
     </table>
     </fieldset>

@@ -1385,7 +1385,6 @@ Obm.CalendarView = new Class({
               if(response.error == 0) {
                 showOkMessage(response.message);
                 var obmbookmark_id = response.obmbookmark_id;
-
                 // Delete option
                 $('opt_'+obmbookmark_id).dispose(); 
 
@@ -1396,7 +1395,7 @@ Obm.CalendarView = new Class({
               }
             }
           }
-        ).post({view_id: this.view_id.value});
+        ).post({ajax : 1, action : 'delete_view',view_id: this.view_id.value});
       }
     } else {
       alert(obm.vars.labels.no_sel_view);

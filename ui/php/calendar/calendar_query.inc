@@ -3204,7 +3204,7 @@ function run_query_calendar_delete_view($calendar) {
   $query = "DELETE FROM ObmBookmark WHERE obmbookmark_id $id"; 
   $obm_q->query($query);
 
-  $message = "\"obmbookmark_id\": \"$id\"";
+  $message = "\"obmbookmark_id\": \"$calendar[view_id]\"";
   
   return $message;
 }

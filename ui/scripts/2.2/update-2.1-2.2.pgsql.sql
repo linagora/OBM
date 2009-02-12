@@ -1250,6 +1250,10 @@ WHERE category_category='groupcategory' AND category_label='external address'
 
 ALTER TABLE UGroup DROP COLUMN group_mailing;
 
+-- utilisateur 'obmsatellite', mot de passe 'mG4_Zdnh' - doit avoir le droit de
+-- lecture sur l'arborescence d'OBM
+DELETE FROM UserSystem WHERE usersystem_login = 'obmsatellite';
+INSERT INTO UserSystem VALUES (4,'obmsatellite','mG4_Zdnh','200','65534','/','OBM Satellite','LDAP Reader','/bin/false');
 
 -- Create links from "todos" to users (need to be after userentity..)
 INSERT INTO EventLink (
