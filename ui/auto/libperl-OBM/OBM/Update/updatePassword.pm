@@ -2,8 +2,8 @@ package OBM::Update::updatePassword;
 
 $VERSION = '1.0';
 
-use OBM::Entities::entityIdsGetter;
-@ISA = ('OBM::Entities::entityIdsGetter');
+use OBM::Entities::systemEntityIdGetter;
+@ISA = ('OBM::Entities::systemEntityIdGetter');
 
 $debug = 1;
 
@@ -70,9 +70,10 @@ sub _getEntity {
         $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
         return 1;
     }
-    $programmingObj->setEntitiesType( 'USER' );
-    $programmingObj->setUpdateType( 'SYSTEM_ENTITY' );
-    $programmingObj->setEntitiesIds( [$userId] );
+    if( $programmingObj->setEntitiesType( 'USER' ) || $programmingObj->setUpdateType( 'SYSTEM_ENTITY' ) || $programmingObj->setEntitiesIds( [$userId] ) ) {
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+        return 1;
+    }
 
     require OBM::entitiesFactory;
     my $entitiesFactory = OBM::entitiesFactory->new( 'PROGRAMMABLE', 1 );
@@ -116,14 +117,6 @@ sub update {
         $self->_log( 'erreur lors de la mise a jour du mot de passe de '.$self->{'userEntity'}->getDescription(), 0 );
         return 1;
     }
-#    if( !$ldapEngine->updatePassword( $userObject, $self->{newPasswordDesc} ) ) {
-#        return 0;
-#    }
-#
-#
-#    if( !$userObject->updateDbEntityPassword( $self->{newPasswordDesc} ) ) {
-#        return 0;
-#    }
 
     return 0;
 }
