@@ -1,6 +1,9 @@
 package OBM::Update::updateCyrusAcl;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
+
+use OBM::Entities::systemEntityIdGetter;
+@ISA = ('OBM::Entities::systemEntityIdGetter');
 
 $debug = 1;
 
@@ -8,108 +11,150 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-#require OBM::toolBox;
-#require OBM::imapd;
-require OBM::Update::utils;
-require OBM::Cyrus::cyrusEngine;
+use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
-    my $self = shift;
+    my $class = shift;
     my( $parameters ) = @_;
 
-    my %updateAclAttr = (
-        name => undef,
-        type => undef,
-        id => undef,
-        object => undef,
-        domainId => undef,
-        domainList => undef,
-        engine => undef
-    );
+    my $self = bless { }, $class;
+
 
     if( !defined($parameters) ) {
-        croak( "[Update::updateCyrusAcl]: Usage: PACKAGE->new(DBHANDLER, PARAMLIST)" );
-    }
-
-    $updateAclAttr{domainId} = $parameters->{domain};
-    $updateAclAttr{name} = $parameters->{name};
-    $updateAclAttr{type} = $parameters->{type};
-
-    if( $updateAclAttr{type} =~ /^mailbox$/ ) {
-        $updateAclAttr{id} = &OBM::Update::utils::getUserIdFromUserLoginDomain( $updateAclAttr{name}, $updateAclAttr{domainId} );
-    }elsif( $updateAclAttr{type} =~ /^mailshare$/ ) {
-        $updateAclAttr{id} = &OBM::Update::utils::getMailshareIdFromMailshareNameDomain( $updateAclAttr{name}, $updateAclAttr{domainId} );
-    }
-
-    if( !defined($updateAclAttr{id}) ) {
-        &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: entite '".$updateAclAttr{name}."' de type '".$updateAclAttr{type}."' inconnu", "W" );
-        return undef;
-    }
-
-    # Obtention des informations sur les domaines nécessaires
-    $updateAclAttr{domainList} = &OBM::Update::utils::getDomains( $updateAclAttr{domainId} );
-
-    # Paramétrage des serveurs IMAP par domaine
-    &OBM::Update::utils::getCyrusServers( $updateAclAttr{"domainList"} );
-    if( !&OBM::imapd::getAdminImapPasswd( $updateAclAttr{"domainList"} ) ) {
-        return undef;
-    }
-
-    # Initialisation du moteur Cyrus
-    $updateAclAttr{"engine"}->{"cyrusEngine"} = OBM::Cyrus::cyrusEngine->new( $updateAclAttr{"domainList"} );
-    if( !$updateAclAttr{"engine"}->{"cyrusEngine"}->init() ) {
-        return undef;
-    }
-
-    # Création de l'objet de l'utilisateur avec ses liens
-    if( $updateAclAttr{type} =~ /^mailbox$/ ) {
-        require OBM::Entities::obmUser;
-        $updateAclAttr{object} = OBM::Entities::obmUser->new( 1, 0, $updateAclAttr{id} );
-    }elsif( $updateAclAttr{type} =~ /^mailshare$/ ) {
-        require OBM::Entities::obmMailshare;
-        $updateAclAttr{object} = OBM::Entities::obmMailshare->new( 1, 0, $updateAclAttr{id} );
-    }
-
-    if( !defined($updateAclAttr{object}) ) {
-        &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: erreur a l'initialisation de l'utilisateur.", "W" );
-        return undef;
-    }
-
-    if( !$updateAclAttr{object}->getEntity( &OBM::Update::utils::findDomainbyId( $updateAclAttr{domainList}, $updateAclAttr{domainId} ) ) ) {
-        &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: erreur a l'initialisation de l'utilisateur.", "W" );
+        $self->_log( 'paramètres d\'initialisation non définis', 0 );
         return undef;
     }
 
 
-    bless( \%updateAclAttr, $self );
+    $self->{'entityType'} = $parameters->{'type'};
+    $self->{'entityName'} = $parameters->{'name'};
+    $self->{'domainId'} = $parameters->{'domain-id'};
+
+    require OBM::Cyrus::cyrusServers;
+    if( !($self->{'cyrusServers'} = OBM::Cyrus::cyrusServers->instance()) ) {
+        $self->_log( 'initialisation du gestionnaire de serveur Cyrus impossible', 3 );
+        return undef;
+    }
+
+    if( $self->_getEntity() ) {
+        return undef;
+    }
+
+    return $self;
+}
+
+
+sub _getEntity {
+    my $self = shift;
+
+    if( $self->{'entityType'} =~ /^mailbox$/  ) {
+        return $self->_getUserEntity();
+    }elsif( $self->{'entityType'} =~ /^mailshare$/ ) {
+        return $self->_getMaishareEntity();
+    }else {
+       $self->_log( 'type d\'entité inconnu', 3 );
+       return 1;
+    }
+
+    return 0;
+}
+
+
+sub _getUserEntity {
+    my $self = shift;
+
+    # Getting BD user ID
+    my $userId = $self->_getUserIdFromUserLoginDomain( $self->{'entityName'}, $self->{'domainId'});
+    if( !defined($userId) ) {
+        $self->_log( 'utilisateur \''.$self->{'entityName'}.'\', domaine d\'ID '.$self->{'domainId'}.' inconnu', 1 );
+        return 1;
+    }
+
+    # Getting user entity
+    require OBM::EntitiesFactory::factoryProgramming;
+    my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
+    if( !defined($programmingObj) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return 1;
+    }
+    if( $programmingObj->setEntitiesType( 'USER' ) || $programmingObj->setUpdateType( 'UPDATE_LINKS' ) || $programmingObj->setEntitiesIds( [$userId] ) ) {
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+        return 1;
+    }
+
+    require OBM::entitiesFactory;
+    my $entitiesFactory = OBM::entitiesFactory->new( 'PROGRAMMABLE', 1 );
+    if( !defined($entitiesFactory) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return 1;
+    }
+    if( $entitiesFactory->loadEntities($programmingObj) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return 1;
+    }
+
+    while( my $userEntity = $entitiesFactory->next() ) {
+        $self->{'entity'} = $userEntity;
+    }
+
+    if( !defined($self->{'entity'}) ) {
+        $self->_log( 'problème lors de la récupération de la description de l\'utilisateur', 0 );
+        return 1;
+    }
+
+    return 0;
+}
+
+
+sub _getMaishareEntity {
+    my $self = shift;
+
+    # Getting BD mailshare ID
+    my $mailshareId = $self->_getMailShareIdFromUserLoginDomain( $self->{'entityName'}, $self->{'domainId'});
+    if( !defined($mailshareId) ) {
+        $self->_log( 'patage messagerie \''.$self->{'entityName'}.'\', domaine d\'ID '.$self->{'domainId'}.' inconnu', 1 );
+        return 1;
+    }
+
+    # Getting mailshare entity
+    require OBM::EntitiesFactory::factoryProgramming;
+    my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
+    if( !defined($programmingObj) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return 1;
+    }
+    if( $programmingObj->setEntitiesType( 'MAILSHARE' ) || $programmingObj->setUpdateType( 'UPDATE_LINKS' ) || $programmingObj->setEntitiesIds( [$mailshareId] ) ) {
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+        return 1;
+    }
+
+    require OBM::entitiesFactory;
+    my $entitiesFactory = OBM::entitiesFactory->new( 'PROGRAMMABLE', 1 );
+    if( !defined($entitiesFactory) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return 1;
+    }
+    if( $entitiesFactory->loadEntities($programmingObj) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return 1;
+    }
+
+    while( my $mailshareEntity = $entitiesFactory->next() ) {
+        $self->{'entity'} = $mailshareEntity;
+    }
+
+    if( !defined($self->{'entity'}) ) {
+        $self->_log( 'problème lors de la récupération de la description du partage de messagerie', 0 );
+        return 1;
+    }
+
+    return 0;
 }
 
 
 sub update {
     my $self = shift;
-    my $object = $self->{object};
-    my $cyrusEngine = $self->{"engine"}->{"cyrusEngine"};
 
-    &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: mise a jour des ACL de l'entite ".$object->getEntityDescription(), "W" );
-    if( !$cyrusEngine->updateAcl($object) ) {
-        &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: erreur lors de la mise a jour des ACLs", "W" );
-        return 0;
-    }
-
-    &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: mise a jour en BD des ACLs de l'entite ".$object->getEntityDescription(), "W" );
-    if( !$object->updateDbEntityLinks() ) {
-        &OBM::toolBox::write_log( "[Update::updateCyrusAcl]: erreur lors de la mise a jour de la BD", "W" );
-        return 0;
-    }
-
-    return 1;
-}
-
-
-sub DESTROY {
-    my $self = shift;
-    my $cyrusEngine = $self->{"engine"}->{"cyrusEngine"};
-
-    $cyrusEngine->DESTROY();
+    return 0;
 }

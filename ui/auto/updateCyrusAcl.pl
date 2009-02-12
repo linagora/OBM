@@ -1,72 +1,100 @@
 #!/usr/bin/perl -w -T
-#####################################################################
-# OBM               - File : updateCyrusAcl.pl                      #
-#                   - Desc : script permettant une mise à jour en   #
-#                            temps réel des ACLs sur une BAL/share  #
-#####################################################################
+
+package updateCyrusAcl;
 
 use strict;
-#require OBM::toolBox;
-require OBM::Tools::obmDbHandler;
-require OBM::Update::updateCyrusAcl;
-use OBM::Parameters::common;
 use OBM::Parameters::regexp;
-use Getopt::Long;
-
+use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
+use Getopt::Long;
+my %parameters;
+my $return = GetOptions( \%parameters, 'type=s', 'name=s', 'domain-id=s', 'help' );
 
-# Fonction de vérification des paramètres du script
-sub getParameter {
+if( !$return ) {
+    updateCyrusAcl->_displayHelp();
+    exit 1;
+}
+
+exit updateCyrusAcl->run(\%parameters);
+
+$| = 1;
+
+
+sub run {
+    my $self = shift;
     my( $parameters ) = @_;
 
-    # Analyse de la ligne de commande
-    &GetOptions( $parameters, "type=s", "name=s", "domain=s" );
+    if( !defined($parameters) ) {
+        $parameters->{'help'} = 1;
+    }
+
+    $self->_log( 'Analyse des paramètres du script', 3 );
+    if( $self->_getParameter( $parameters ) ) {
+        $self->_log( 'Erreur à l\'analyse des parametres du scripts', 0 );
+        return 1;
+    }
+
+    require OBM::Update::updateCyrusAcl;
+    my $updateCyrusAcl = OBM::Update::updateCyrusAcl->new( $parameters );
+    my $errorCode = 0;
+    if( defined($updateCyrusAcl) ) {
+        $errorCode = $updateCyrusAcl->update();
+    }else {
+        $self->_log( 'problème à l\'initialisation de l\'ACL updater', 0 );
+        return 1;
+    }
+
+    if( $errorCode ) {
+        $self->_log( 'échec de mise à jour des ACLs Cyrus', 0 );
+    }else {
+        $self->_log( 'mise à jour des ACLs Cyrus avec succés', 0 );
+    }
+
+    return $errorCode;
+}
+
+
+# Check script parameters
+sub _getParameter {
+    my $self = shift;
+    my( $parameters ) = @_;
+
+    if( $$parameters{'help'} ) {
+        $self->_displayHelp();
+        return 1;
+    }
 
     # Vérification du type d'entité à mettre à jour
-    if( !exists($$parameters{"type"}) ) {
-        &OBM::toolBox::write_log( "Parametre --type manquant", "W" );
-        print STDERR "Paramètre '--type' manquant.\nCe paramètre vaut :\n";
-        print STDERR "\t'mailbox' pour mettre à jour les ACL d'une boîte à lettres utilisateur\n";
-        print STDERR "\t'mailshare' pour mettre à jour les ACL d'un répertoire partagé\n";
+    if( !exists($$parameters{'type'}) ) {
+        $self->_log( 'Parametre --type manquant', 0 );
         return 1;
     }else {
-        if( $$parameters{"type"} !~ /^(mailbox|mailshare)$/ ) {
-            &OBM::toolBox::write_log( "Parametre --type invalide", "W" );
-            print STDERR "Paramètre '--type' invalide.\nCe paramètre vaut :\n";
-            print STDERR "\t'mailbox' pour mettre à jour les ACL d'une boîte à lettres utilisateur\n";
-            print STDERR "\t'mailshare' pour mettre à jour les ACL d'un répertoire partagé\n";
+        if( $$parameters{'type'} !~ /^(mailbox|mailshare)$/ ) {
+            $self->_log( 'Parametre --type invalide', 0 );
             return 1;
         }
     }
 
     # Vérification de l'identifiant utilisateur
-    if( !exists($$parameters{"name"}) ) {
-        &OBM::toolBox::write_log( "Parametre --name manquant", "W" );
-        print STDERR "Paramètre '--name' manquant.\nCe paramètre est :\n";
-        print STDERR "\tle login d'un utilisateur si le paramètre '--type' vaut 'mailbox'\n";
-        print STDERR "\tle nom d'un répertoire partagé si le paramètre '--type' vaut 'mailshare'\n";
+    if( !exists($$parameters{'name'}) ) {
+        $self->_log( 'Parametre --name manquant', 0 );
         return 1;
     }else {
-        if( $$parameters{"name"} !~ /$regexp_login/ ) {
-            &OBM::toolBox::write_log( "Parametre --name invalide", "W" );
-            print STDERR "Paramètre '--name' invalide.\nCe paramètre est :\n";
-            print STDERR "\tle login d'un utilisateur si le paramètre '--type' vaut 'mailbox'\n";
-            print STDERR "\tle nom d'un répertoire partagé si le paramètre '--type' vaut 'mailshare'\n";
+        if( $$parameters{'name'} !~ /$regexp_login/ ) {
+            $self->_log( 'Parametre --name invalide', 0 );
             return 1;
         }
     }
 
-    # Verification du domaine
-    if( !exists($$parameters{"domain"}) ) {
-        &OBM::toolBox::write_log( "Parametre --domain manquant", "W" );
-        print STDERR "Paramètre '--domain' manquant.\nCe paramètre indique l'ID BD du domaine de l'entité à mettre à jour.\n";
+    # Vérification du domaine
+    if( !exists($$parameters{'domain-id'}) ) {
+        $self->_log( 'Parametre --domain-id manquant', 0 );
         return 1;
     }else {
-        if( $$parameters{"domain"} !~ /$regexp_domain_id/ ) {
-            &OBM::toolBox::write_log( "Parametre --domain invalide", "W" );
-            print STDERR "Paramètre '--domain' invalide.\nCe paramètre indique l'ID BD du domaine de l'entité à mettre à jour.\n";
+        if( $$parameters{'domain-id'} !~ /$regexp_id/ ) {
+            $self->_log( 'Parametre --domain-id invalide', 0 );
             return 1;
         }
     }
@@ -75,44 +103,19 @@ sub getParameter {
 }
 
 
-# On prepare le log
-my ($scriptname) = ($0=~'.*/([^/]+)');
-&OBM::toolBox::write_log( $scriptname.': ', 'O', 0 );
+sub _displayHelp {
+    my $self = shift;
 
-# Traitement des paramètrs
-&OBM::toolBox::write_log( 'Analyse des parametres du script', 'W', 3 );
-my %parameters;
-if( getParameter( \%parameters ) ) {
-    &OBM::toolBox::write_log( "", "C" );
-    exit 1;
+    $self->_log( 'Affichage de l\'aide', 3 );
+
+    print STDERR 'Script permettant de mettre à jour les ACLs Cyrus'."\n";
+    print STDERR 'Pour plus d\'information : perldoc path_to/updateCyrusAcl.pl'."\n";
+    print STDERR 'Syntaxe :'."\n";
+    print STDERR "\t".'updateCyrusAcl.pl --type [mailbox|mailshare] --name NAME --domain-id DOMAIN_ID '."\n";
+
+    return 0;
 }
 
-
-# On se connecte àla base
-my $dbHandler = OBM::Tools::obmDbHandler->instance();
-if( !defined($dbHandler) ) {
-    &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
-    exit 1;
-}
-
-
-my $updateCyrusAcl = OBM::Update::updateCyrusAcl->new( \%parameters );
-my $errorCode = 0;
-if( defined($updateCyrusAcl) ) {
-     $errorCode = $updateCyrusAcl->update();
-     $updateCyrusAcl->destroy();
-}
-
-
-
-# On referme la connexion àla base
-$dbHandler->destroy();
-
-
-# On ferme le log
-&OBM::toolBox::write_log( "Execution du script terminee", "WC" );
-
-exit !$errorCode;
 
 # Perldoc
 
