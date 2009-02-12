@@ -264,3 +264,19 @@ function discardWaitingPanel() {;
     obm.waitingPanel.dispose();
   }
 }
+
+function selectAllCb(container) {
+  var container = $(container);
+  var chks = container.getElements('input[type=checkbox]');
+  chks.each(function (chk) {
+    chk.checked = true;
+  })
+}
+function unSelectAllCb(container) {
+  container = $(container);
+  var chks = container.getElements('input[type=checkbox]');
+  chks.each(function (chk) {
+    chk.checked = false;
+  })          
+}
+

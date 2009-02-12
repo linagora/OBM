@@ -531,26 +531,10 @@ class OBM_DISPLAY {
       $export_rows = $_SESSION['set_rows'];
     }
     if($have_cb) {
-      $cb_script = "
-        function selectAllCb(container) {
-          var container = $(container);
-          var chks = container.getElements('input[type=checkbox]');
-          chks.each(function (chk) {
-            chk.checked = true;
-          })
-        }
-        function unSelectAllCb(container) {
-          container = $(container);
-          var chks = container.getElements('input[type=checkbox]');
-          chks.each(function (chk) {
-            chk.checked = false;
-          })          
-        }
-      ";
       $cb_links = "
         <span>
         <a href=\"\" onclick=\"selectAllCb(this.parentNode.parentNode.parentNode);return false;\">$l_select_all</a>
-        <a href=\"\" onclick=\"unSelectAllCb();return false;\">$l_unselect_all</a>
+        <a href=\"\" onclick=\"unSelectAllCb(this.parentNode.parentNode.parentNode);return false;\">$l_unselect_all</a>
         </span>
       ";
     }
@@ -558,7 +542,7 @@ class OBM_DISPLAY {
     $content = "<div>
       $cb_links
       <script type=\"text/javascript\">
-        function exportResultSet(firstRow,nbRows) {
+        function exportResultSet_$this_entity(firstRow,nbRows) {
           form = new Element('form');
           form.setProperties({action:'$export_url', method:'POST'});
           form.adopt(new Element('input').setProperties({type:'hidden', name:'action', value:'export_page'}));
@@ -573,10 +557,9 @@ class OBM_DISPLAY {
           form.submit();
           return false;
         }
-        $cb_script
       </script>
-    <a href=\"#\" onclick=\"return exportResultSet('$first_row','$export_rows');\" >$l_export</a>      
-    <a href=\"#\" onclick=\"return exportResultSet('0','$nb_rows');\" >$l_export_all</a>   
+    <a href=\"#\" onclick=\"return exportResultSet_$this_entity('$first_row','$export_rows');\" >$l_export</a>      
+    <a href=\"#\" onclick=\"return exportResultSet_$this_entity('0','$nb_rows');\" >$l_export_all</a>   
             
       $l_entries $nb_rows | $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
 
