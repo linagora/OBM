@@ -215,7 +215,7 @@ sub _updateSqlPasswd {
     require OBM::Password::sqlPasswdUpdater;
     my $passwordUpdater = OBM::Password::sqlPasswdUpdater->new();
     if( $passwordUpdater->update( $self->{'userEntity'}, $self->{'newPasswordDesc'}->{'newPassword'} ) ) {
-        $self->_log( 'problème a la mise à jour du mot de passe SQL', 0 );
+        $self->_log( 'problème à la mise à jour du mot de passe SQL', 0 );
         return 1;
     }
 

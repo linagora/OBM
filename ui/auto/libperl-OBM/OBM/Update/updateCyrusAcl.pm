@@ -31,12 +31,6 @@ sub new {
     $self->{'entityName'} = $parameters->{'name'};
     $self->{'domainId'} = $parameters->{'domain-id'};
 
-    require OBM::Cyrus::cyrusServers;
-    if( !($self->{'cyrusServers'} = OBM::Cyrus::cyrusServers->instance()) ) {
-        $self->_log( 'initialisation du gestionnaire de serveur Cyrus impossible', 3 );
-        return undef;
-    }
-
     if( $self->_getEntity() ) {
         return undef;
     }
@@ -156,5 +150,27 @@ sub _getMaishareEntity {
 sub update {
     my $self = shift;
 
+    require OBM::Cyrus::cyrusUpdateAclEngine;
+    my $cyrusUpdateAclEngine = OBM::Cyrus::cyrusUpdateAclEngine->new();
+    if( $cyrusUpdateAclEngine->update( $self->{'entity'} ) ) {
+        $self->_log( 'problème à la mise à jour des ACLs de '.$self->{'entity'}->getDescription(), 0 );
+        return 1;
+    }
+
+    require OBM::dbUpdater;
+    $self->_log( 'initialisation du BD updater', 2 );
+    if( !($self->{'dbUpdater'} = OBM::dbUpdater->new()) ) {
+        $self->_log( 'echec de l\'initialisation du BD updater', 0 );
+        return 1;
+    }
+
+    $self->{'entity'}->setUpdated();
+
+    if( $self->{'dbUpdater'}->update($self->{'entity'}) ) {
+        $self->_log( 'problème à la mise à jour BD de l\'entité '.$$self->{'entity'}->getDescription(), 1 );
+        return 1;
+    }
+
+ 
     return 0;
 }
