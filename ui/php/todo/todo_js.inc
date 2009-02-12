@@ -24,8 +24,8 @@ function check_addtodoform(form) {
     return false;
   } 
 
-  if (form.tf_deadline.value == \"\") {
-    alert(\"$l_deadline\" + \" : $l_fill_date\");
+  if (form.tf_date.value == \"\") {
+    alert(\"$l_date\" + \" : $l_fill_date\");
     return false;
   } else
     return true;

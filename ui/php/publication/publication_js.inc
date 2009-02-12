@@ -44,7 +44,7 @@ function check_publication(form) {
 
   // MANDATORY : Check that the publication name is not empty
   if (trim(form.tf_title.value) == \"\") {
-    alert (\"$l_fill_name\");
+    alert (\"$l_fill_title\");
     return false;
   }
 

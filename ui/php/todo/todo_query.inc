@@ -24,10 +24,7 @@ function run_query_todo_search($params) {
   $text = sql_search_text_parse($params['text']);
   $priority = $params['priority'];
   $percent = $params['percent'];
-  $date_field = ($params['date_field'] ? $params['date_field'] : 'deadline');
-  if ($date_field == 'date') {
-    $date_field = 'date';
-  }
+  $date_field = ($params['date_field'] ? $params['date_field'] : 'date');
   $dateafter = of_isodate_convert($params['date_after'],true);
   $datebefore = of_isodate_convert($params['date_before'],true);
 
@@ -191,7 +188,7 @@ function get_todo_users($id) {
 // Todo insert query execution
 // Parametes:
 //   - $todo[]       : company search criteria
-//     keys used       uid, title, sel_user, priority, deadline, description
+//     keys used       uid, title, sel_user, priority, date, description
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_insert($todo) {
   global $cdg_sql, $obm;
@@ -280,7 +277,7 @@ function run_query_todo_insert($todo) {
 // Todo update query execution
 // Parametes:
 //   - $todo[]   : company search criteria
-//     keys used  id, uid, title, sel_user, priority, deadline, content
+//     keys used  id, uid, title, sel_user, priority, date, content
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_todo_update($todo) {
   global $obm, $cdg_sql;
@@ -470,7 +467,7 @@ function check_todo_data_form($todo) {
   $users = $todo['user_id'];
   $user = $users[0];
   $priority = $todo['priority'];
-  $deadline = $todo['deadline'];
+  $date = $todo['date'];
   $description = $todo['description'];
   $percent = $todo['percent'];
 

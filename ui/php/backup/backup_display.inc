@@ -124,7 +124,9 @@ function html_backup_search_list($files, $nb_files) {
   $display['msg'] .= display_info_msg("$nb_files $l_found");
 
   $block = "
-    <table class=\"resultTable\">
+  <div class=\"result\">
+    <table>
+    <thead>
     <tr>
       <td class=\"resultHead\">$l_file</td>
       <td class=\"resultHead\">$l_date</td>
@@ -133,8 +135,10 @@ function html_backup_search_list($files, $nb_files) {
       <td class=\"resultHead\">$l_restore</td>
       <td class=\"resultHead\">$l_delete</td>
     </tr>
+    </thead>
     $dis_files
-    </table>";
+    </table>
+  </div>";
 
   return $block;
 }

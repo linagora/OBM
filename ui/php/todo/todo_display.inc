@@ -467,7 +467,7 @@ function dis_todo_form($todo, $todo_q = 0) {
   <tr>
     <th>$l_title</th>
     <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"100\" size=\"100\" value=\"$title\" /></td>
-    </tr><tr>
+  </tr><tr>
     <th>$l_priority</th>
     <td>$sel_priority</td>
   </tr><tr>
@@ -480,14 +480,12 @@ function dis_todo_form($todo, $todo_q = 0) {
   </table>
   </fieldset>
 
-  
- <fieldset class=\"detail infos\">
- <legend>$l_user</legend>
+  <fieldset class=\"detail infos\">
+  <legend>$l_user</legend>
   <table>
   $block_user
   </table>
- </fieldset>
-
+  </fieldset>
 
   <fieldset class=\"detail extra\">
   <legend>$l_desc</legend>

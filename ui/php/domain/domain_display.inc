@@ -54,7 +54,7 @@ function html_domain_search_form($domain) {
 
     <label>$l_text<br />
       <input type=\"text\" name=\"tf_text\" size=\"16\" maxlength=\"32\"
-      value=\"$label\" />
+      value=\"$text\" />
     </label>
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />

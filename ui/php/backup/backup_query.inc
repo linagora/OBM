@@ -16,16 +16,10 @@
 // Array( [$fullname] => array([0]=>$path [1]=>$name), ..)
 ///////////////////////////////////////////////////////////////////////////////
 function get_backup_list($backup) {
-  global $cbackup_root;
+  global $backup_path;
 
   $version = $backup['version'];
   $date = of_isodate_convert($backup['date']);
-
-  if ( substr($cbackup_root, strlen($cbackup_root)-1 ) != '/' ) {
-    $backup_path = $cbackup_root . '/';
-  } else {
-    $backup_path = $cbackup_root;
-  }
 
   $root_handler = opendir($backup_path);
   while (($file = readdir($root_handler)) !== false) {
@@ -190,7 +184,7 @@ function run_query_backup_delete($filename) {
 function run_query_backup_delete_backup_file($filename) {
 
   $disk_path = get_backup_disk_path();
-  $disk_fullname = $disk_path . $filename; 
+  $disk_fullname = $disk_path . $filename;
 
   $ret = unlink($disk_fullname);
 
@@ -207,8 +201,8 @@ function get_backup_disk_path() {
   global $cbackup_root;
 
   $disk_path = format_path($cbackup_root);
-  
-  return $disk_path; 
+
+  return $disk_path;
 }
 
 

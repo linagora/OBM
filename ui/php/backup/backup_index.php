@@ -36,7 +36,18 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == 'index') {
+// Check that the Backup directory is ok
+if (substr($cbackup_root, strlen($cbackup_root)-1 ) != '/') {
+  $backup_path = $cbackup_root . '/';
+} else {
+  $backup_path = $cbackup_root;
+}
+if (! file_exists($backup_path)) {
+  $display['msg'] = display_err_msg($l_err_backup_dir_not_exist);
+} else if (! is_writable($backup_path)) {
+  $display['msg'] = display_err_msg($l_err_backup_dir_not_writable);
+
+} else if ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['search'] = dis_backup_search_form($params);
   if ($_SESSION['set_display'] == 'yes') {
