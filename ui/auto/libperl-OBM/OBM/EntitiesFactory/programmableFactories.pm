@@ -55,8 +55,18 @@ sub addEntities {
     }
 
     SWITCH: {
+        if( !defined($programmingObj->getEntitiesType()) ) {
+            $self->_log( 'type d\'entité à programmer incorrect', 4 );
+            return 1;
+        }
+
         if( $programmingObj->getEntitiesType() eq 'USER' ) {
             $self->_initUserFactory();
+            last SWITCH;
+        }
+
+        if( $programmingObj->getEntitiesType() eq 'MAILSHARE' ) {
+            $self->_initMailshareFactory();
             last SWITCH;
         }
     }
