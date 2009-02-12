@@ -1,10 +1,4 @@
 #!/usr/bin/perl -w -T
-#####################################################################
-# OBM               - File : changePasswd.pl                        #
-#                   - Desc : Script permettant de modifier le mot   #
-#                   de passe de l'utilisateur dont le login et le   #
-#                   domaine sont passes en paramètre                #
-#####################################################################
 
 package changePasswd;
 
@@ -19,7 +13,8 @@ my %parameters;
 my $return = GetOptions( \%parameters, 'login=s', 'domain=s', 'passwd=s', 'old-passwd=s', 'unix', 'samba', 'sql', 'interactiv', 'no-old', 'help' );
 
 if( !$return ) {
-    %parameters = undef;
+    updateCyrusAcl->_displayHelp();
+    exit 1;
 }
 
 exit changePasswd->run(\%parameters);
@@ -35,8 +30,7 @@ sub run {
         $parameters->{'help'} = 1;
     }
 
-    # Traitement des paramètres
-    $self->_log( 'Analyse des parametres du script', 3 ); 
+    $self->_log( 'Analyse des paramètres du script', 3 ); 
     if( $self->_getParameter( $parameters ) ) {
         $self->_log( 'Erreur à l\'analyse des parametres du scripts', 0 );
         return 1;
@@ -48,7 +42,7 @@ sub run {
     if( defined($updatePasswd) ) {
         $errorCode = $updatePasswd->update();
     }else {
-        $self->_log( 'problème à l\'initialisation du password updater', 0);
+        $self->_log( 'problème à l\'initialisation du password updater', 0 );
         return 1;
     }
 
@@ -259,138 +253,3 @@ sub _displayHelp {
 
     return 0;
 }
-
-
-## On prépare le log
-#my ($scriptname) = ($0=~'.*/([^/]+)');
-#$self->_log( $scriptname.': ', "O", 0 );
-#
-## Traitement des paramètres
-#$self->_log( "Analyse des parametres du script", "W", 3 );
-#my %parameters;
-#my $getParamRet = getParameter( \%parameters );
-#if( ($getParamRet == 2) || ($parameters{'interactiv'} && $getParamRet) ) {
-#    $self->_log( 'Affichage de l\'aide', 'WC', 2 );
-#    exit 0;
-#
-#}elsif( $getParamRet ) {
-#    $self->_log( "", "C" );
-#    exit 1;
-#}
-#
-## On se connecte a la base
-#my $dbHandler = OBM::Tools::obmDbHandler->instance();
-#if( !defined($dbHandler) ) {
-#    $self->_log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
-#    exit 2;
-#}
-#
-#
-#my $updatePasswd = OBM::Update::updatePassword->new( \%parameters );
-#my $errorCode = 0;
-#if( defined($updatePasswd) ) {
-#    $errorCode = $updatePasswd->update();
-#}
-#
-#
-## On referme la connexion à la base
-#$dbHandler->destroy();
-#
-#
-## On ferme le log
-#$self->_log( "Execution du script terminee", "WC", 0 );
-#
-#exit !$errorCode;
-
-# Perldoc
-=head1 NAME
-
-changePasswd.pl - OBM administration tool to manipulate user password
-
-=head1 SYNOPSIS
-
-  # Prompt for old and new password, update only LDAP 'userPassword' attribute
-  $ changePasswd.pl --login <LOGIN> --domain <DOMAIN_ID> --interactiv
-
-  # Prompt for new password, don't check old, update only LDAP 'userPassword'
-  # attribute
-  $ changePasswd.pl --login <LOGIN> --domain <DOMAIN_ID> --interactiv --no-old
-
-  # Prompt for old and new password, update :
-  #     - LDAP 'userPassword' attribute
-  #     - LDAP 'sambaNTPassword' and 'sambaLMPassword' attributes
-  #     - SQL 'userobm_password' column for
-  #     'UserObm' and 'P_UserObm' tables
-  $ changePasswd.pl --login <LOGIN> --domain <DOMAIN_ID> --interactiv --unix --samba --sql
-
-  # Pass new and old password on command line, update only LDAP 'userPassword'
-  # attribute
-  $ changePasswd.pl --login <LOGIN> --domain <DOMAIN_ID> --passwd <NEW_PASSWD> --old-passwd <OLD_PASSWD>
-
-  # Pass only new password on command line, update only LDAP 'userPassword'
-  # attribute
-  $ changePasswd.pl --login <LOGIN> --domain <DOMAIN_ID> --passwd <NEW_PASSWD> --no-old
-
-  # Typical Samba usage for 'smb.conf' 'passwd program' option
-  $ changePasswd.pl --login %u --domain <DOMAIN_ID> --interactiv --unix --sql --no-old
-  # 'smb.conf' 'passwd chat' sample :
-  passwd chat = *New*password:* %n*Re-type*new*password:* %n*
-
-=head1 DESCRIPTION
-
-This script allow modify OBM password in all of his forms (LDAP, SQL).
-
-=head1 COMMANDS
-
-=over 4
-
-=item C<login> : B<needed>
-
-=over 4
-
-=item only left part of login (before '@' for multi-domains)
-
-=item modify password for this user
-
-=back
-
-=item C<domain> : B<needed>
-
-=over 4
-
-=item domain BD ID
-
-=back
-
-=item C<sql> : change user BD password
-
-=item C<unix> : change user 'userPassword' LDAP attribute
-
-=item C<samba> : change 'sambaNTPassword' and 'sambaLMPassword' LDAP attributes
-
-=item C<no-old> : change password without verifying old
-
-=item C<interactiv> : prompt for passwords
-
-=over 4
-
-=item B<PLAIN> : plain password
-
-=back
-
-=item C<passwd> : new password
-
-=item C<old-passwd> : old password
-
-=back
-
-If none of 'passwd' and 'interactiv' options are specified, then script run in
-interactive mode.
-
-Options 'passwd' and 'old-passwd' are exclusive with 'interactiv'.
-
-Mode non interactive have priority on 'interactiv' option.
-
-Options 'sql', 'unix' and 'samba' can be used at the same time.
-
-This script generate log via syslog.
