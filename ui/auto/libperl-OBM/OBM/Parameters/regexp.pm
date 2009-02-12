@@ -43,7 +43,7 @@ $regexp_email_right = $regexp_domain;
 $regexp_rootLdap = "^dc=(.+),dc=.+\$";
 
 # Login regexp
-$regexp_login = "^([A-Za-z0-9][A-Za-z0-9-._]{1,31})\$";
+$regexp_login = "^([a-z0-9][a-z0-9-._]{1,31})\$";
 
 # Passwd regexp
 $regexp_passwd = '^[-\$\\\&~#\{\(\[\|_`\^@\);\]+=\}%!:\/\.,?<>"\w0-9]{4,12}$';
