@@ -48,24 +48,24 @@ if (isset($_SESSION['cal_category_filter'])){
 if (isset($params['cal_view'])) {
   $cal_view = $params['cal_view'];
 } elseif (isset($_SESSION['cal_view'])){
-    $cal_view = $_SESSION['cal_view'];
+  $cal_view = $_SESSION['cal_view'];
 } else {
-    $cal_view = 'agenda';
+  $cal_view = 'agenda';
 }
 if (isset($params['cal_range'])) {
-    $cal_range = $params['cal_range'];
+  $cal_range = $params['cal_range'];
 } elseif (isset($_SESSION['cal_range'])){
-    $cal_range = $_SESSION['cal_range'];
+  $cal_range = $_SESSION['cal_range'];
 } elseif(isset($_SESSION['set_cal_default_view'])) {
-    $params['view_id'] = $_SESSION['set_cal_default_view'];
-    $view_properties = run_query_calendar_get_BookmarkProperty_view($_SESSION['set_cal_default_view']);
-    $cal_view = $view_properties['cal_view'];
-    $cal_range = $view_properties['cal_range'];
-    $params['new_group'] = 1;
-    $params['group_view'] = $view_properties['group'];
-    $params['sel_user_id'] = $view_properties['users'];
-    $params['sel_resource_id'] = $view_properties['resources'];
-    $params['category_filter'] = $view_properties['category'];
+  $params['view_id'] = $_SESSION['set_cal_default_view'];
+  $view_properties = run_query_calendar_get_BookmarkProperty_view($_SESSION['set_cal_default_view']);
+  $cal_view = $view_properties['cal_view'];
+  $cal_range = $view_properties['cal_range'];
+  $params['new_group'] = 1;
+  $params['group_view'] = $view_properties['group'];
+  $params['sel_user_id'] = $view_properties['users'];
+  $params['sel_resource_id'] = $view_properties['resources'];
+  $params['category_filter'] = $view_properties['category'];
 } else {
   $cal_range = 'week';
 }

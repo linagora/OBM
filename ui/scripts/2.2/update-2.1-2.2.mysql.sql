@@ -286,6 +286,7 @@ CREATE TABLE TaskEvent (
   taskevent_event_id int(8) NOT NULL,
   PRIMARY KEY (taskevent_event_id, taskevent_task_id)
 );
+
 --  _______________
 -- | Entity tables |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -828,8 +829,6 @@ SELECT
 FROM DeletedCalendarEvent;
 
 
-
-
 --  ______________________
 -- | Tables modifications |
 --  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
@@ -841,6 +840,9 @@ ALTER TABLE Domain DROP COLUMN domain_mail_server_id;
 
 -- OGroup
 ALTER TABLE OGroup MODIFY COLUMN ogroup_parent_id int(8);
+
+-- ObmBookmarkProperty
+ALTER TABLE ObmBookmarkProperty MODIFY COLUMN obmbookmarkproperty_value varchar(255) NOT NULL DEFAULT '';
 
 -- Preferences
 ALTER TABLE DisplayPref DROP PRIMARY KEY;
@@ -1026,6 +1028,9 @@ UPDATE DisplayPref SET display_fieldname='eventlink_percent' WHERE display_field
 
 -- Timezone 
 INSERT INTO UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
+
+-- Clean group gid (private group must have gid = NULL)
+UPDATE UGroup set group_gid=NULL WHERE group_privacy=1;
 
 -- --------------------
 -- Entity tables update

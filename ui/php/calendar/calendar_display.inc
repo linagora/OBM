@@ -329,9 +329,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       $sel_ent .= "<input value=\"$data_id\" name=\"sel_ent[]\" type=\"hidden\" />";
     }
 
-
   }
-
 
 
   if ($ccalendar_resource && count($entity_readable['resource']['ids']) > 0) {
@@ -373,8 +371,8 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
     <fieldset class=\"buttons\">
     <input type=\"submit\" value=\"$l_validate\" />
     </fieldset>
-    </form>
-    ";
+    </form>";
+
    if(isset($_SESSION['set_cal_default_view'])) {
       $default_view_url_params = run_query_calendar_get_bookmark_property($_SESSION['set_cal_default_view']);
       $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?$default_view_url_params\">$l_back_mono</a> -";
@@ -533,6 +531,7 @@ function html_calendar_bar_date_selector($calendar) {
   return $block;
 }
 
+
 /**
  * HTML for the view selector portlet
  *
@@ -550,34 +549,35 @@ function html_calendar_view_selector($calendar, $my_views) {
 
   $view_id = $calendar['view_id'];
   $iso = $calendar['date']->getURL();
-  $default_view_id=$_SESSION['set_cal_default_view'];
+  $default_view_id = $_SESSION['set_cal_default_view'];
   $display = 'none';
-  if(isset($default_view_id)){
-    $default_view=$l_delete_default_view;
-    $display='inline';
+  if (isset($default_view_id)) {
+    $default_view = $l_delete_default_view;
+    $display = 'inline';
   } 
   while($my_views->next_record()) {
-    $id =  $my_views->f('obmbookmark_id');
-    $label =  $my_views->f('obmbookmark_label');
+    $id = $my_views->f('obmbookmark_id');
+    $label = $my_views->f('obmbookmark_label');
     if ($id == $view_id) {
-      $selected = "selected=\"selected\"";
-      if($id != $default_view_id) {
-        $default_view=$l_insert_default_view;
-        $display='inline';
-        $style_default="";
+      $selected = " selected=\"selected\"";
+      if ($id != $default_view_id) {
+        $default_view = $l_insert_default_view;
+        $display = 'inline';
+        $style_default = '';
       } else {
-        $style_default="default=\"default\"";
+        $style_default = " default=\"default\"";
       }
-    } elseif ($id == $default_view_id){
-      $style_default="default=\"default\"";
+    } elseif ($id == $default_view_id) {
+      $style_default = " default=\"default\"";
       $selected = '';
     } else {
       $selected = '';
-      $style_default="";
+      $style_default = '';
     }
     
     $obmbookmarkproperty = run_query_calendar_get_bookmark_property($id);
-    $sel_view .= "<option id=\"opt_$id\" value=\"calendar_index.php?$obmbookmarkproperty\" $style_default $selected>$label</option>";
+    $sel_view .= "
+    <option id=\"opt_$id\" value=\"calendar_index.php?new_sel=1&amp;$obmbookmarkproperty\"$style_default$selected>$label</option>";
   }
 
   // Javascript Strings

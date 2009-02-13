@@ -828,6 +828,11 @@ SELECT setval('domain_domain_id_seq', max(domain_id)) FROM Domain;
 -- OGroup
 ALTER TABLE OGroup ALTER COLUMN ogroup_parent_id DROP NOT NULL;
 
+-- ObmBookmarkProperty
+ALTER TABLE ObmBookmarkProperty ALTER COLUMN obmbookmarkproperty_value TYPE varchar(255);
+ALTER TABLE ObmBookmarkProperty ALTER COLUMN obmbookmarkproperty_value SET NOT NULL;
+ALTER TABLE ObmBookmarkProperty ALTER COLUMN obmbookmarkproperty_value SET DEFAULT '';
+
 -- Preferences
 ALTER TABLE DisplayPref DROP CONSTRAINT displaypref_pkey;
 ALTER TABLE DisplayPref ADD CONSTRAINT displaypref_key  UNIQUE (display_user_id, display_entity, display_fieldname);
@@ -983,6 +988,8 @@ UPDATE DisplayPref SET display_fieldname='eventlink_percent' WHERE display_field
 -- Timezone 
 INSERT INTO UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
 
+-- Clean group gid (private group must have gid = NULL)
+UPDATE UGroup set group_gid=NULL WHERE group_privacy=1;
 
 -- --------------------
 -- Entity tables update

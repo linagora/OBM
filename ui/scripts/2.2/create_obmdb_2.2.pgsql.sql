@@ -1350,7 +1350,7 @@ CREATE TABLE obmbookmarkentity (
 CREATE TABLE obmbookmarkproperty (
     obmbookmarkproperty_id integer NOT NULL,
     obmbookmarkproperty_bookmark_id integer NOT NULL,
-    obmbookmarkproperty_property character varying(64) DEFAULT ''::character varying NOT NULL,
+    obmbookmarkproperty_property character varying(255) DEFAULT ''::character varying NOT NULL,
     obmbookmarkproperty_value character varying(64) DEFAULT ''::character varying NOT NULL
 );
 

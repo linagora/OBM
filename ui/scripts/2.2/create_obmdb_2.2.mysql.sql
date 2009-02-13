@@ -2002,7 +2002,7 @@ CREATE TABLE `ObmBookmarkProperty` (
   `obmbookmarkproperty_id` int(8) NOT NULL auto_increment,
   `obmbookmarkproperty_bookmark_id` int(8) NOT NULL,
   `obmbookmarkproperty_property` varchar(64) NOT NULL default '',
-  `obmbookmarkproperty_value` varchar(64) NOT NULL default '',
+  `obmbookmarkproperty_value` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`obmbookmarkproperty_id`),
   KEY `bkmprop_idx_bkm` (`obmbookmarkproperty_bookmark_id`),
   CONSTRAINT `obmbookmarkproperty_bookmark_id_obmbookmark_id_fkey` FOREIGN KEY (`obmbookmarkproperty_bookmark_id`) REFERENCES `ObmBookmark` (`obmbookmark_id`) ON DELETE CASCADE ON UPDATE CASCADE
