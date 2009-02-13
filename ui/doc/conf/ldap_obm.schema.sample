@@ -94,6 +94,26 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.15
     SUBSTR caseIgnoreIA5SubstringsMatch
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
 
+# Attribut : delegation
+# Attribut permettant de renseigner la délégation de l'utilisateur
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.19
+    NAME 'delegation'
+    DESC 'User Delegation'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+    SINGLE-VALUE )
+
+# Attribut : direction
+# Attribut permettant de renseigner la direction de l'utilisateur
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.20
+    NAME 'direction'
+    DESC 'User Direction'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
+    SINGLE-VALUE )
+
 # Classe d'objet: obmUser
 # complète la description d'un utilisateur avec les paramètres OBM
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.1
@@ -101,7 +121,7 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.1
 	DESC 'OBM user description'
 	SUP top AUXILIARY
     MUST uid
-	MAY ( webAccess $ mailAccess $ mailAlias $ mailLocalOnly $ mailBox $ mailBoxServer $ obmDomain $ personalTitle $ organizationName $ hiddenUser ) )
+	MAY ( webAccess $ mailAccess $ mailAlias $ mailLocalOnly $ mailBox $ mailBoxServer $ obmDomain $ personalTitle $ organizationName $ hiddenUser $direction $ delegation ) )
 
 # Objet : obmSystemUser
 # Definition de l'objet specifique a l'application OBM.

@@ -207,6 +207,14 @@ sub _init {
         $userDesc->{'userobm_photo'} = join( '', @jpeg );
     }
 
+    # User accout expiration date
+    if( $userDesc->{'userobm_account_dateexp'} ) {
+        require POSIX;
+        my @date_exp = split(/-/,$userDesc->{'userobm_account_dateexp'});
+        my $date_exp_timestamp = POSIX::mktime(0,0,0,$date_exp[2],$date_exp[1]-1,$date_exp[0]-1900,0,0,0);
+        $userDesc->{'userobm_account_dateexp_timestamp'} = $date_exp_timestamp;
+    }
+
     # User e-mails
     $userDesc->{'userobm_mail_perms'} = 1;
     if( !($self->_makeEntityEmail( $userDesc->{'userobm_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') ) ) ) {
@@ -573,9 +581,19 @@ sub createLdapEntry {
         $entry->add( title => $self->{'entityDesc'}->{'userobm_title'} );
     }
 
+    # User personnal title
+    if( $self->{'entityDesc'}->{'userobm_kind'} ) {
+        $entry->add( personalTitle => $self->{'entityDesc'}->{'userobm_kind'} );
+    }
+
     # User service
     if( $self->{'entityDesc'}->{'userobm_service'} ) {
         $entry->add( ou => $self->{'entityDesc'}->{'userobm_service'} );
+    }
+
+    # User company
+    if( $self->{'entityDesc'}->{'userobm_company'} ) {
+        $entry->add( o => $self->{'entityDesc'}->{'userobm_company'} );
     }
 
     # User description
@@ -583,9 +601,24 @@ sub createLdapEntry {
         $entry->add( description => $self->{'entityDesc'}->{'userobm_description'} );
     }
 
+    # User direction
+    if( $self->{'entityDesc'}->{'userobm_direction'} ) {
+        $entry->add( direction => $self->{'entityDesc'}->{'userobm_direction'} );
+    }
+
+    # User delegation
+    if( $self->{'entityDesc'}->{'userobm_delegation'} ) {
+        $entry->add( delegation => $self->{'entityDesc'}->{'userobm_delegation'} );
+    }
+
     # User jpeg
     if( $self->{'entityDesc'}->{'userobm_photo'} ) {
         $entry->add( jpegPhoto => $self->{'entityDesc'}->{'userobm_photo'} );
+    }
+
+    # User account expiration date
+    if( $self->{'entityDesc'}->{'userobm_account_dateexp_timestamp'} ) {
+        $entry->add( shadowExpire => $self->{'userobm_account_dateexp_timestamp'} );
     }
 
     # User web permission
@@ -780,8 +813,18 @@ sub updateLdapEntry {
             $update = 1;
         }
 
+        # User personal title
+        if ($self->_modifyAttr( $self->{'entityDesc'}->{'userobm_kind'}, $entry, 'personalTitle' ) ) {
+            $update = 1;
+        }
+
         # User service
         if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_service'}, $entry, 'ou' ) ) {
+            $update = 1;
+        }
+
+        # User company
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_company'}, $entry, 'o' ) ) {
             $update = 1;
         }
 
@@ -790,8 +833,23 @@ sub updateLdapEntry {
             $update = 1;
         }
 
+        # User direction
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_direction'}, $entry, 'direction' ) ) {
+            $update = 1;
+        }
+
+        # User delegation
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_delegation'}, $entry, 'delegation' ) ) {
+            $update = 1;
+        }
+
         # User jpeg
         if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_photo'}, $entry, 'jpegPhoto' ) ) {
+            $update = 1;
+        }
+
+        # User account expire date
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_account_dateexp_timestamp'}, $entry, 'shadowExpire' ) ) {
             $update = 1;
         }
 
