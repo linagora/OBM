@@ -839,7 +839,15 @@ ALTER TABLE DisplayPref ADD CONSTRAINT displaypref_key  UNIQUE (display_user_id,
 ALTER TABLE DisplayPref ADD COLUMN display_id serial PRIMARY KEY;
 
 -- Contact
+ALTER TABLE Contact ADD COLUMN contact_middlename varchar(16);
+ALTER TABLE Contact ADD COLUMN contact_suffix varchar(16);
+ALTER TABLE Contact ADD COLUMN contact_manager varchar(64);
+ALTER TABLE Contact ADD COLUMN contact_assistant varchar(64);
+ALTER TABLE Contact ADD COLUMN contact_spouse varchar(64);
+ALTER TABLE Contact ADD COLUMN contact_category varchar(255);
 ALTER TABLE Contact ADD COLUMN contact_birthday_id INTEGER default NULL;
+ALTER TABLE Contact ADD COLUMN contact_anniversary_id INTEGER default NULL;
+ALTER TABLE Contact ADD COLUMN contact_photo_id INTEGER default NULL;
 ALTER TABLE Contact ADD COLUMN contact_collected BOOLEAN default FALSE;
 ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
 UPDATE Contact SET contact_origin='obm21';
@@ -2632,6 +2640,12 @@ ALTER TABLE ProfileProperty ADD CONSTRAINT profileproperty_profile_id_profile_id
 
 -- Foreign key from contact_birthday_id to event_id
 ALTER TABLE Contact ADD CONSTRAINT contact_birthday_id_event_id_fkey FOREIGN KEY (contact_birthday_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contact_anniversary_id to event_id
+ALTER TABLE Contact ADD CONSTRAINT contact_anniversary_id_event_id_fkey FOREIGN KEY (contact_anniversary_id) REFERENCES Event(event_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Foreign key from contact_photo_id to document_id
+ALTER TABLE Contact ADD CONSTRAINT contact_photo_id_document_id_fkey FOREIGN KEY (contact_photo_id) REFERENCES Document(document_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 ALTER TABLE CategoryLink ADD CONSTRAINT categorylink_entity_id_entity_id_fkey FOREIGN KEY (categorylink_entity_id) REFERENCES Entity (entity_id) ON DELETE CASCADE ON UPDATE CASCADE;

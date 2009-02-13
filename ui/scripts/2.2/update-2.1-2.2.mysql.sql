@@ -849,7 +849,15 @@ ALTER TABLE DisplayPref DROP PRIMARY KEY;
 ALTER TABLE DisplayPref ADD COLUMN display_id int(8) auto_increment PRIMARY KEY FIRST;
 
 -- Contact
-ALTER TABLE Contact ADD COLUMN contact_birthday_id int(8) default NULL;
+ALTER TABLE Contact ADD COLUMN contact_middlename varchar(16) AFTER contact_firstname;
+ALTER TABLE Contact ADD COLUMN contact_suffix varchar(16) AFTER contact_middlename;
+ALTER TABLE Contact ADD COLUMN contact_manager varchar(64) AFTER contact_sound;
+ALTER TABLE Contact ADD COLUMN contact_assistant varchar(64) AFTER contact_manager;
+ALTER TABLE Contact ADD COLUMN contact_spouse varchar(64) AFTER contact_assistant;
+ALTER TABLE Contact ADD COLUMN contact_category varchar(255) AFTER contact_spouse;
+ALTER TABLE Contact ADD COLUMN contact_birthday_id int(8) default NULL AFTER contact_date;
+ALTER TABLE Contact ADD COLUMN contact_anniversary_id int(8) default NULL AFTER contact_birthday_id;
+ALTER TABLE Contact ADD COLUMN contact_photo_id int(8) default NULL AFTER contact_anniversary_id;
 ALTER TABLE Contact ADD COLUMN contact_collected int(1) default false;
 ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
 UPDATE Contact SET contact_origin='obm21';
