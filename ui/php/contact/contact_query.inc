@@ -202,8 +202,8 @@ function run_query_contact_search($contact) {
   }
   $orderq = " ORDER BY $order $sql_order_dir $order_next";
   $selectFields = "
+";
 
-  ";
   $select = "SELECT
     contact_id as id,
     contact_id,
@@ -254,7 +254,7 @@ function run_query_contact_search($contact) {
 
   if ((! $fuzzy) || ($lname == '')) {
     if ($ctu_sql_limit) {
-      $count = get_query_count("SELECT count(distinct contact_id) FROM Contact $left_join $whereq");
+      $count = get_query_count("SELECT count(distinct contact_id) FROM Contact $join_comp $left_join $whereq");
       $obm_q->set_num_rows_total($count);
     }
     // If any results (from limited) or result not limited, we get the data
@@ -276,7 +276,7 @@ function run_query_contact_search($contact) {
       OR contact_sound = '$sound')";
     $whereq = " WHERE $where $where_name";
     if ($ctu_sql_limit) {
-      $count = get_query_count("SELECT count(distinct contact_id) FROM Contact $left_join $whereq");
+      $count = get_query_count("SELECT count(distinct contact_id) FROM Contact $join_comp $left_join $whereq");
       $obm_q->set_num_rows_total($count);
     }
     if (($count > 0) || (! $ctu_sql_limit)) {
@@ -832,6 +832,7 @@ function run_query_contact_coords_update($id, $contact) {
   }      
 }
 
+
 /**
  * run_query_contact_coords
  * 
@@ -842,17 +843,24 @@ function run_query_contact_coords_update($id, $contact) {
  */
 function run_query_contact_coords($id, $inherit=false, $update=false) {
   global $cdg_sql;
+
   $obm_q = new DB_OBM;
   $coords = array();
-  $query = "SELECT phone_label, phone_number FROM Phone INNER JOIN ContactEntity ON phone_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
-  if($inherit) {
+
+  // Phone
+  $query = "SELECT phone_id, phone_label, phone_number
+    FROM Phone
+      INNER JOIN ContactEntity ON phone_entity_id = contactentity_entity_id
+    WHERE contactentity_contact_id = $id";
+  if ($inherit) {
     $query .= " UNION 
-      SELECT 'COMPANY;X-OBM-REF1' as phone_label, phone_number FROM Phone 
-      INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id 
-      INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      SELECT phone_id, 'COMPANY;X-OBM-REF1' as phone_label, phone_number
+      FROM Phone 
+        INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id 
+        INNER JOIN Contact ON contact_company_id = companyentity_company_id
       WHERE contact_id = $id";
   }
-  $query .= ' ORDER BY phone_label';
+  $query .= ' ORDER BY phone_id';
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Phone)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
@@ -861,15 +869,21 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
     $label = implode('_',$label);
     $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
   }
-  $query = "SELECT email_label, email_address FROM Email INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
-  if($inherit) {
+
+  // Email
+  $query = "SELECT email_id, email_label, email_address
+    FROM Email
+      INNER JOIN ContactEntity ON email_entity_id = contactentity_entity_id
+    WHERE contactentity_contact_id = $id";
+  if ($inherit) {
     $query .= " UNION 
-      SELECT 'COMPANY;X-OBM-REF1' as email_label, email_address FROM Email 
-      INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id 
-      INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      SELECT email_id, 'COMPANY;X-OBM-REF1' as email_label, email_address
+      FROM Email 
+        INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id 
+        INNER JOIN Contact ON contact_company_id = companyentity_company_id
       WHERE contact_id = $id";
   }  
-  $query .= ' ORDER BY email_label';
+  $query .= ' ORDER BY email_id';
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Email)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
@@ -878,21 +892,33 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
     $label = implode('_',$label);
     $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
   }
-  $query = "SELECT * FROM IM INNER JOIN ContactEntity ON im_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+
+  // IM
+  $query = "SELECT *
+    FROM IM
+      INNER JOIN ContactEntity ON im_entity_id = contactentity_entity_id
+    WHERE contactentity_contact_id = $id
+    ORDER BY im_id";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(IM)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
     $coords['im'][] = array('protocol' => $obm_q->f('im_protocol'),'address' => $obm_q->f('im_address'));
   }
-  $query = "SELECT website_label, website_url FROM Website INNER JOIN ContactEntity ON website_entity_id = contactentity_entity_id WHERE  contactentity_contact_id = $id";
+
+  // Website
+  $query = "SELECT website_id, website_label, website_url
+    FROM Website
+      INNER JOIN ContactEntity ON website_entity_id = contactentity_entity_id
+    WHERE contactentity_contact_id = $id";
   if($inherit) {
     $query .= " UNION 
-      SELECT 'COMPANY;X-OBM-REF1' as website_label, website_url FROM Website
-      INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id 
-      INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      SELECT website_id, 'COMPANY;X-OBM-REF1' as website_label, website_url
+      FROM Website
+        INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id 
+        INNER JOIN Contact ON contact_company_id = companyentity_company_id
       WHERE contact_id = $id";
   }  
-  $query .= ' ORDER BY website_label';
+  $query .= ' ORDER BY website_id';
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Website)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {
@@ -901,20 +927,29 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
     $label = implode('_',$label);
     $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
+
+  // Address
   $lang = get_lang();
-  $query = "SELECT 
-    address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name
-    FROM Address INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id 
-    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' WHERE contactentity_contact_id = $id";
-  if($inherit) {
-    $query .= " UNION 
-      SELECT 'COMPANY;X-OBM-REF1' as address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name 
-      FROM Address 
-      INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
-      INNER JOIN Contact ON contact_company_id = companyentity_company_id
-      LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' WHERE contact_id = $id";
+  $query = "SELECT address_id,
+      address_label, address_street, address_zipcode, address_expresspostal,
+      address_town, address_country, country_name
+    FROM Address
+      INNER JOIN ContactEntity ON address_entity_id = contactentity_entity_id 
+      LEFT JOIN Country ON country_iso3166 = address_country
+        AND country_lang = '$lang' WHERE contactentity_contact_id = $id";
+  if ($inherit) {
+    $query .= " UNION
+      SELECT address_id, 'COMPANY;X-OBM-REF1' as address_label, address_street,
+        address_zipcode, address_expresspostal, address_town, address_country,
+        country_name 
+      FROM Address
+        INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
+        INNER JOIN Contact ON contact_company_id = companyentity_company_id
+        LEFT JOIN Country ON country_iso3166 = address_country
+          AND country_lang = '$lang'
+      WHERE contact_id = $id";
   }  
-  $query .= ' ORDER BY address_label';
+  $query .= ' ORDER BY address_id';
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Address)');
   $obm_q->query($query);        
   while($obm_q->next_record()) {

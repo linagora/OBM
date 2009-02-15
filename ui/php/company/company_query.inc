@@ -278,6 +278,7 @@ function run_query_company_detail($p_id) {
   return $obm_q;
 }
 
+
 /**
  * run_query_company_coords
  * 
@@ -287,48 +288,72 @@ function run_query_company_detail($p_id) {
  */
 function run_query_company_coords($id, $update=false) {
   global $cdg_sql;
+
   $obm_q = new DB_OBM;
   $coords = array();
-  $query = "SELECT phone_label, phone_number FROM Phone INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id WHERE companyentity_company_id = $id ORDER BY phone_label";
+
+  // Phone
+  $query = "SELECT phone_id, phone_label, phone_number
+    FROM Phone
+      INNER JOIN CompanyEntity ON phone_entity_id = companyentity_entity_id
+    WHERE companyentity_company_id = $id
+    ORDER BY phone_id";
   display_debug_msg($query, $cdg_sql, 'run_query_company_coords(Phone)');
-  $obm_q->query($query);        
+  $obm_q->query($query);
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('phone_label'));
     array_pop($label);
     $label = implode('_',$label);
     $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
   }
-  $query = "SELECT email_label, email_address FROM Email INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id WHERE companyentity_company_id = $id ORDER BY email_label";
+
+  // Email
+  $query = "SELECT email_id, email_label, email_address
+    FROM Email
+      INNER JOIN CompanyEntity ON email_entity_id = companyentity_entity_id
+    WHERE companyentity_company_id = $id
+    ORDER BY email_id";
   display_debug_msg($query, $cdg_sql, 'run_query_company_coords(Email)');
-  $obm_q->query($query);        
+  $obm_q->query($query);
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('email_label'));
     array_pop($label);
     $label = implode('_',$label);
     $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
   }
-  
-  $query = "SELECT website_label, website_url FROM Website INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id WHERE companyentity_company_id = $id ORDER BY website_label";
+
+  // Website
+  $query = "SELECT website_id, website_label, website_url
+    FROM Website
+      INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id
+    WHERE companyentity_company_id = $id
+    ORDER BY website_id";
   display_debug_msg($query, $cdg_sql, 'run_query_company_coords(Website)');
-  $obm_q->query($query);        
+  $obm_q->query($query);
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('website_label'));
     array_pop($label);
     $label = implode('_',$label);
     $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
+
+  // Address
   $lang = get_lang();
-  $query = "SELECT 
-    address_label, address_street, address_zipcode, address_expresspostal, address_town, address_country, country_name
-    FROM Address INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
-    LEFT JOIN Country ON country_iso3166 = address_country AND country_lang = '$lang' WHERE companyentity_company_id = $id ORDER BY address_label";
+  $query = "SELECT address_id,
+      address_label, address_street, address_zipcode, address_expresspostal,
+      address_town, address_country, country_name
+    FROM Address
+      INNER JOIN CompanyEntity ON address_entity_id = companyentity_entity_id 
+      LEFT JOIN Country ON country_iso3166 = address_country
+        AND country_lang = '$lang' WHERE companyentity_company_id = $id
+    ORDER BY address_id";
   display_debug_msg($query, $cdg_sql, 'run_query_company_coords(Address)');
-  $obm_q->query($query);        
+  $obm_q->query($query);
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('address_label'));
     array_pop($label);
     $label = implode('_',$label);
-    if($update) {
+    if ($update) {
       $country =  $obm_q->f('address_country');
     } else {
       $country = $obm_q->f('country_name');

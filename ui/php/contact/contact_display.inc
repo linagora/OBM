@@ -639,23 +639,26 @@ function html_contact_header($co_q, $funcs) {
     $block_title = "
     <tr>
       <th>$l_title</th>
-      <td>$title</td>";
+      <td>$title</td>
+    </tr>";
   }
 
   // Responsible field
   if ($show_resp) {
     $block_resp = "
-    </tr><tr>
+    <tr>
       <th>$l_market</th>
-      <td>$market</td>";
+      <td>$market</td>
+    </tr>";
   }
 
   // Date field
   if ($show_date) {
     $block_date = "
-    </tr><tr>
+    <tr>
       <th>$l_date</th>
-      <td>$date</td>";
+      <td>$date</td>
+    </tr>";
   }
   
   // Birthday consult field
@@ -664,26 +667,26 @@ function html_contact_header($co_q, $funcs) {
     <tr>
       <th>$l_birthday</th>
       <td>$birthday</td>
-    ";
+    </tr>";
   }
   // Service field
   if ($show_service) {
     $block_service = "
-     <tr>
+    <tr>
       <th>$l_service</th>
       <td>$service</td>
-     </tr>";
+    </tr>";
   }
-  if($show_mailing) {
+  if ($show_mailing) {
     $block_mailing = "
     <tr>
       <th>$l_mailing_ok</th>
       <td>$mailok</td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_newsletter</th>
       <td>$newsletter</td>
-    </tr>      
-    ";
+    </tr>";
   }  
   // --- HTML Template --------------------------------------------------------
 
@@ -695,7 +698,8 @@ function html_contact_header($co_q, $funcs) {
     <tr>
       <th>$l_lastname</th>
       <td>$lname</td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_firstname</th>
       <td>$fname</td>
     </tr>
@@ -703,12 +707,15 @@ function html_contact_header($co_q, $funcs) {
     <tr>
       <th>$l_kind</th>
       <td>$kind</td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_archive</th>
       <td>$archive</td>
-    </tr><tr>
+    </tr>
+    <tr>
       <th>$l_company</th>
       <td>$dis_company</td>
+    </tr>
     $block_function
     $block_title
     $block_resp
@@ -716,7 +723,6 @@ function html_contact_header($co_q, $funcs) {
     $block_birthday
     $block_service
     $block_mailing
-    </tr>
     </table>
     </div>"; 
 
@@ -775,8 +781,8 @@ function html_contact_view_main($co_q, $coords) {
     foreach($row as $values) {
       $datas = array();
       foreach($values as $label => $value) {
-        if($label == 'label' || $label == 'protocol') {
-          if(isset($GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)])) {
+        if ($label == 'label' || $label == 'protocol') {
+          if (isset($GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)])) {
             $header = $GLOBALS["l_${kind}_labels"][str_replace(';', '_', $value)];
           } else {
             $header = $value;
@@ -810,8 +816,7 @@ function html_contact_view_main($co_q, $coords) {
     <table>
     $coords
     </table>
-    </div>
-    ";
+    </div>";
   }
   // --- HTML Template --------------------------------------------------------
 

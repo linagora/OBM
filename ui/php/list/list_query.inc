@@ -516,48 +516,59 @@ function run_query_list_contacts_list($list, $entity='') {
   $orderq = "ORDER BY $order $sql_order_dir $order_next";
 
   $query = "SELECT contactlist_contact_id as contact_id,
-         contactlist_contact_id as id,
-         contact_timeupdate,
-         contact_timecreate,
-         contact_userupdate,
-         contact_usercreate,
-         contact_company_id,
-         contact_kind_id,
-         kind_minilabel,
-         kind_header,
-         kind_lang,
-         contact_lastname,
-         contact_firstname,
-         contact_service,
-         address_street,
-         address_zipcode,
-         address_town,
-         address_expresspostal,
-         address_country_iso3166,
-         country_name,
-         contact_function_id,
-         contactfunction_label,
-         contact_title,
-         phone_number,
-         email_address,
-         contact_comment,
-         contact_privacy,
-         company_id,
-         company_name
-      FROM ContactList
-         LEFT JOIN Contact ON contactlist_contact_id=contact_id
-         LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
-         LEFT JOIN Country as ctry1
-           ON Contact.contact_country_iso3166 = ctry1.country_iso3166
-              AND ctry1.country_lang='$lang'
-         LEFT JOIN Country as ctry2
-            ON Company.company_country_iso3166 = ctry2.country_iso3166
-               AND ctry2.country_lang='$lang'
-         LEFT JOIN ContactFunction ON Contact.contact_function_id = contactfunction_id
-         LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
-      WHERE contactlist_list_id $id 
-      $orderq
-      $limit";
+      contactlist_contact_id as id,
+      contact_timeupdate,
+      contact_timecreate,
+      contact_userupdate,
+      contact_usercreate,
+      contact_company_id,
+      contact_kind_id,
+      kind_minilabel,
+      kind_header,
+      kind_lang,
+      contact_lastname,
+      contact_firstname,
+      contact_service,
+      ad1.address_street AS contact_street,
+      ad1.address_zipcode AS contact_zipcode,
+      ad1.address_town AS contact_town,
+      ad1.address_expresspostal AS contact_expresspostal,
+      ctry1.country_name AS contact_country,
+      ctry1.country_iso3166 AS contact_country_iso3166,
+      contact_function_id,
+      contactfunction_label,
+      contact_title,
+      ph1.phone_number as contact_phone,
+      email_address,
+      contact_comment,
+      contact_privacy,
+      company_id,
+      company_name,
+      ad2.address_street AS company_street,
+      ad2.address_zipcode AS company_zipcode,
+      ad2.address_town AS company_town,
+      ad2.address_expresspostal AS company_expresspostal,
+      ctry2.country_name AS company_country,
+      $if_country AS country_name
+    FROM ContactList
+      LEFT JOIN Contact ON contactlist_contact_id=contact_id
+      INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+      LEFT JOIN Address as ad1 ON contactentity_entity_id=ad1.address_entity_id
+      LEFT JOIN Country as ctry1 ON ad1.address_country=ctry1.country_iso3166
+           AND ctry1.country_lang='$lang'
+      LEFT JOIN Phone AS ph1 ON contactentity_entity_id=ph1.phone_entity_id
+      LEFT JOIN Email ON contactentity_entity_id=email_entity_id
+      LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
+      INNER JOIN CompanyEntity ON companyentity_company_id = company_id
+      LEFT JOIN Address as ad2 ON companyentity_entity_id=ad2.address_entity_id
+      LEFT JOIN Country as ctry2 ON ad2.address_country=ctry2.country_iso3166
+           AND ctry2.country_lang='$lang'
+      LEFT JOIN ContactFunction ON Contact.contact_function_id = contactfunction_id
+      LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
+    WHERE contactlist_list_id $id
+      AND (ph1.phone_id IN (SELECT MIN(phone_id) FROM Phone WHERE phone_entity_id = contactentity_entity_id) OR phone_id IS NULL)
+    $orderq
+    $limit";
 
   if ($ctu_sql_limit) {
     display_debug_msg($query, $cdg_sql, 'run_query_list_contacts_list()');
