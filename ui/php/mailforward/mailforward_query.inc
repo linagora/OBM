@@ -123,7 +123,7 @@ function exec_change_alias($usr_q, $forward) {
     $dst = $usr_q->f("userobm_login");
   }
 
-  $cmd = "$cmd_mailforward --login $login --domain $domain";
+  $cmd = $cmd_mailforward.' --login '.$login.' --domain-id '.$domain;
   display_debug_msg($cmd, $cdg_exe);
   exec($cmd);
 

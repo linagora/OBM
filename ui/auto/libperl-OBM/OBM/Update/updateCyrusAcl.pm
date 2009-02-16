@@ -88,14 +88,7 @@ sub _getUserEntity {
         return 1;
     }
 
-    while( my $userEntity = $entitiesFactory->next() ) {
-        $self->{'entity'} = $userEntity;
-    }
-
-    if( !defined($self->{'entity'}) ) {
-        $self->_log( 'problème lors de la récupération de la description de l\'utilisateur', 0 );
-        return 1;
-    }
+    $self->{'entityFactory'} = $entitiesFactory;
 
     return 0;
 }
@@ -134,14 +127,7 @@ sub _getMaishareEntity {
         return 1;
     }
 
-    while( my $mailshareEntity = $entitiesFactory->next() ) {
-        $self->{'entity'} = $mailshareEntity;
-    }
-
-    if( !defined($self->{'entity'}) ) {
-        $self->_log( 'problème lors de la récupération de la description du partage de messagerie', 0 );
-        return 1;
-    }
+    $self->{'entityFactory'} = $entitiesFactory;
 
     return 0;
 }
@@ -152,8 +138,9 @@ sub update {
 
     require OBM::Cyrus::cyrusUpdateAclEngine;
     $self->_log( 'initialisation du moteur ide mise à jour des ACLs et mise à jour des ACLs', 2 );
-    if( !(my $cyrusUpdateAclEngine = OBM::Cyrus::cyrusUpdateAclEngine->new()) || ($cyrusUpdateAclEngine->update( $self->{'entity'} )) ) {
-        $self->_log( 'problème à la mise à jour des ACLs de '.$self->{'entity'}->getDescription(), 0 );
+    my $cyrusUpdateAclEngine;
+    if( !($cyrusUpdateAclEngine = OBM::Cyrus::cyrusUpdateAclEngine->new()) ) {
+        $self->_log( 'problème à l\'initialisation du moteur de mise à jour des ACLs Cyrus', 0 );
         return 1;
     }
 
@@ -164,13 +151,27 @@ sub update {
         return 1;
     }
 
-    $self->{'entity'}->setUpdated();
+    my $errorCode = 0;
+    while( my $entity = $self->{'entityFactory'}->next() ) {
+        if( !defined($entity) ) {
+            $self->_log( 'problème lors de la récupération de la description de l\'entité', 0 );
+            $errorCode = 1;
+            next;
+        }
 
-    if( $self->{'dbUpdater'}->update($self->{'entity'}) ) {
-        $self->_log( 'problème à la mise à jour BD de l\'entité '.$$self->{'entity'}->getDescription(), 1 );
-        return 1;
+        # Update Cyrus ACLs
+        if( $cyrusUpdateAclEngine->update( $entity ) || $entity->setUpdated() ) {
+            $self->_log( 'problème à la mise à jour des ACLs Cyrus de '.$entity->getDescription(), 0 );
+            $errorCode = 1;
+            next;
+        }
+
+        if( $self->{'dbUpdater'}->update($entity) ) {
+            $self->_log( 'problème à la mise à jour BD de l\'entité '.$entity->getDescription(), 1 );
+            $errorCode = 1;
+        }
     }
 
  
-    return 0;
+    return $errorCode;
 }

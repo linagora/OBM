@@ -10,7 +10,9 @@ delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
 use Getopt::Long;
 my %parameters;
-my $return = GetOptions( \%parameters, 'login=s', 'domain-id=s', 'help' );
+my $return = GetOptions( \%parameters, 'login=s', 'domain-id=i', 'help' );
+
+print keys(%parameters);
 
 if( !$return ) {
     updateSieve->_displayHelp();
@@ -60,6 +62,8 @@ sub run {
 sub _getParameter {
     my $self = shift;
     my( $parameters ) = @_;
+
+    print keys(%{$parameters});
 
     if( $$parameters{'help'} ) {
         $self->_displayHelp();

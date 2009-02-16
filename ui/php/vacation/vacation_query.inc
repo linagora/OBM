@@ -112,7 +112,7 @@ function run_query_vacation_update($params, $u_id) {
 function update_sieve($vacation, $u_uid, $u_domain_id) {  
   global $err, $l_sieve_login_failed, $cmd_vacation;
 
-  $cmd = $cmd_vacation.' --login '.$u_uid.' --domain '.$u_domain_id;
+  $cmd = $cmd_vacation.' --login '.$u_uid.' --domain-id '.$u_domain_id;
   
   display_debug_msg($cmd, $cdg_exe, "update_sieve()");
   exec($cmd);
