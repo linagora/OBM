@@ -288,7 +288,7 @@ sub update {
 
     # If entity don't have Sieve dependancy, we do nothing and it's not an error
     if( !$entity->isSieveAvailable() ) {
-        $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Sieve', 3 );
+        $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Sieve', 0 );
         return 0;
     }
 
@@ -300,13 +300,13 @@ sub update {
 
     # If entity is archiving, we do nothing and it's not an error
     if( $entity->getArchive() ) {
-        $self->_log( 'pas de gestion de SIEVE pour l\'entité archive '.$entity->getDescription(), 3 );
+        $self->_log( 'pas de gestion de SIEVE pour l\'entité archivée '.$entity->getDescription(), 0 );
         return 0;
     }
 
     # If entity don't have mail right, we do nothing and it's not an error
     if( !$entity->isMailActive() ) {
-        $self->_log( 'droit mail désactivé pour l\'objet : '.$entity->getDescription(), 3 );
+        $self->_log( 'droit mail désactivé pour l\'objet : '.$entity->getDescription().', pas de gestion Sieve', 0 );
         return 0;
     }
 
@@ -314,27 +314,27 @@ sub update {
     # Get user BAL server object
     my $mailServerId = $entity->getMailServerId();
     if( !defined($mailServerId) && $entity->isMailActive() && !$entity->getArchive() ) {
-        $self->_log( 'serveur de courrier IMAP non defini et droit mail actif - erreur', 2 );
+        $self->_log( 'serveur de courrier IMAP non defini et droit mail actif - erreur', 0 );
         return 1;
     }elsif( !defined($mailServerId) && (!$entity->isMailActive() || $entity->getArchive()) ) {
-        $self->_log( 'serveur de courrier IMAP non defini et droit mail inactif - succés', 2 );
+        $self->_log( 'serveur de courrier IMAP non defini et droit mail inactif - succés', 0 );
         return 0;
     }elsif( !defined($mailServerId) ) {
-        $self->_log( 'serveur de courrier IMAP non defini - erreur', 1 );
+        $self->_log( 'serveur de courrier IMAP non defini - erreur', 0 );
         return 1;
     }
 
     # Get Sieve server connection
     $self->{'currentSieveSrv'} = $self->{'sieveServers'}->getEntityCyrusServer( $entity );
     if( !defined($self->{'currentSieveSrv'}) ) {
-        $self->_log( 'serveur de courrier Sieve d\'identifiant \''.$entity->getMailServerId().'\' inconnu - Operation annulée !', 2 );
+        $self->_log( 'serveur de courrier Sieve d\'identifiant \''.$entity->getMailServerId().'\' inconnu - Operation annulée !', 0 );
         return 1;
     }
 
 
     # Do stuff...
     if( $self->_doWork() ) {
-        $self->_log( 'probleme de traitement de '.$entity->getDescription().' - Operation annulee !', 2 );
+        $self->_log( 'problème de traitement de '.$entity->getDescription().' - Operation annulee !', 0 );
         return 1;
     }
 

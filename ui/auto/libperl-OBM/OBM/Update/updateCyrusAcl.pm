@@ -151,8 +151,8 @@ sub update {
     my $self = shift;
 
     require OBM::Cyrus::cyrusUpdateAclEngine;
-    my $cyrusUpdateAclEngine = OBM::Cyrus::cyrusUpdateAclEngine->new();
-    if( $cyrusUpdateAclEngine->update( $self->{'entity'} ) ) {
+    $self->_log( 'initialisation du moteur ide mise à jour des ACLs et mise à jour des ACLs', 2 );
+    if( !(my $cyrusUpdateAclEngine = OBM::Cyrus::cyrusUpdateAclEngine->new()) || ($cyrusUpdateAclEngine->update( $self->{'entity'} )) ) {
         $self->_log( 'problème à la mise à jour des ACLs de '.$self->{'entity'}->getDescription(), 0 );
         return 1;
     }

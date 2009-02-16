@@ -1,73 +1,89 @@
 #!/usr/bin/perl -w -T
 
-#+-------------------------------------------------------------------------+
-#|   Copyright (c) 1997-2009 OBM.org project members team                  |
-#|                                                                         |
-#|  This program is free software; you can redistribute it and/or          |
-#|  modify it under the terms of the GNU General Public License            |
-#|  as published by the Free Software Foundation; version 2                |
-#|  of the License.                                                        |
-#|                                                                         |
-#|  This program is distributed in the hope that it will be useful,        |
-#|  but WITHOUT ANY WARRANTY; without even the implied warranty of         |
-#|  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          |
-#|  GNU General Public License for more details.                           | 
-#+-------------------------------------------------------------------------+
-#|  http://www.obm.org                                                     |
-#+-------------------------------------------------------------------------+
-
-#####################################################################
-# OBM               - File : updateSieve.pl                         #
-#                   - Desc : Script permettant de gérer le filtre   #
-#                   sieve d'un utilisateur                          #
-#                   - Paramètres :                                  #
-#                       uid : login de l'utilisateur à traiter      #
-#                       deomain : domain ID de l'utilisateur        #
-#####################################################################
-# Retour :                                                          #
-#    - 0 : tout c'est bien passé                                    #
-#    - 1 : erreur à l'analyse des paramètres du script              #
-#    - 2 : erruer à l'ouverture de la BD                            #
-#####################################################################
+package updateSieve;
 
 use strict;
-#require OBM::toolBox;
-require OBM::Tools::obmDbHandler;
-require OBM::Update::updateSieve;
-use OBM::Parameters::common;
 use OBM::Parameters::regexp;
-use Getopt::Long;
+use OBM::Tools::commonMethods qw(_log dump);
 
-$ENV{PATH}=$automateOBM;
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
+use Getopt::Long;
+my %parameters;
+my $return = GetOptions( \%parameters, 'login=s', 'domain-id=s', 'help' );
 
-# Fonction de vérification des paramètres du script
-sub getParameter {
+if( !$return ) {
+    updateSieve->_displayHelp();
+    exit 1;
+}
+
+exit updateSieve->run(\%parameters);
+
+$| = 1;
+
+
+sub run {
+    my $self = shift;
     my( $parameters ) = @_;
 
-    # Analyse de la ligne de commande
-    &GetOptions( $parameters, "login=s", "domain=s" );
+    if( !defined($parameters) ) {
+        $parameters->{'help'} = 1;
+    }
 
-    # Verification de l'identifiant utilisateur
-    if( !exists($$parameters{"login"}) ) {
-        &OBM::toolBox::write_log( "Parametre --login manquant", "W" );
+    $self->_log( 'Analyse des paramètres du script', 3 );
+    if( $self->_getParameter( $parameters ) ) {
+        $self->_log( 'Erreur à l\'analyse des parametres du scripts', 0 );
         return 1;
+    }
 
+    require OBM::Update::updateSieve;
+    my $updateSieve = OBM::Update::updateSieve->new( $parameters );
+    my $errorCode = 0;
+    if( defined($updateSieve) ) {
+        $errorCode = $updateSieve->update();
     }else {
-        if( $$parameters{"login"} !~ /$regexp_login/ ) {
-            &OBM::toolBox::write_log( "Parametre --login invalide", "W" );
+        $self->_log( 'problème à l\'initialisation di Sieve updater', 0 );
+        $errorCode = 1;
+    }
+
+    if( $errorCode ) {
+        $self->_log( 'échec de mise à jour du filtre Sieve', 0 );
+    }else {
+        $self->_log( 'mise à jour du filtre Sieve avec succés', 0 );
+    }
+
+    return $errorCode;
+}
+
+
+# Check script parameters
+sub _getParameter {
+    my $self = shift;
+    my( $parameters ) = @_;
+
+    if( $$parameters{'help'} ) {
+        $self->_displayHelp();
+        return 1;
+    }
+
+    # Check user name
+    if( !exists($$parameters{'login'}) ) {
+        $self->_log( 'Parametre --login manquant', 0 );
+        return 1;
+    }else {
+        if( $$parameters{'login'} !~ /$regexp_login/ ) {
+            $self->_log( 'Parametre --login invalide', 0 );
             return 1;
         }
     }
 
-    # Verification du domaine
-    if( !exists($$parameters{"domain"}) ) {
-        &OBM::toolBox::write_log( "Parametre --domain manquant", "W" );
+    # Check domain ID
+    if( !exists($$parameters{'domain-id'}) ) {
+        $self->_log( 'Parametre --domain-id manquant', 0 );
         return 1;
     }else {
-        if( $$parameters{"domain"} !~ /$regexp_domain_id/ ) {
-            &OBM::toolBox::write_log( "Parametre --domain invalide", "W" );
+        if( $$parameters{'domain-id'} !~ /$regexp_id/ ) {
+            $self->_log( 'Parametre --domain-id invalide', 0 );
             return 1;
         }
     }
@@ -76,41 +92,19 @@ sub getParameter {
 }
 
 
-# On prepare le log
-my ($scriptname) = ($0=~'.*/([^/]+)');
-&OBM::toolBox::write_log( $scriptname.': ', 'O', 0 );
+# Display help
+sub _displayHelp {
+    my $self = shift;
 
-# Traitement des parametres
-&OBM::toolBox::write_log( 'Analyse des parametres du script', 'W', 3 );
-my %parameters;
-if( getParameter( \%parameters ) ) {
-    &OBM::toolBox::write_log( '', 'C' );
-    exit 1;
+    $self->_log( 'Affichage de l\'aide', 3 );
+
+    print STDERR 'Script permettant de mettre à jour le filtre Sieve d\'une BAL'."\n";
+    print STDERR 'Syntaxe :'."\n";
+    print STDERR "\t".'updateSieve.pl --login LOGIN --domain-id DOMAIN_ID'."\n";
+
+    return 0;
 }
 
-# On se connecte a la base
-my $dbHandler = OBM::Tools::obmDbHandler->instance();
-if( !defined($dbHandler) ) {
-    &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
-    exit 2;
-}
-
-
-my $errorCode = 0;
-my $updateSieve = OBM::Update::updateSieve->new( \%parameters );
-if( defined($updateSieve) ) {
-    $errorCode = $updateSieve->update();
-}
-
-
-# On referme la connexion à la base
-$dbHandler->destroy();
-
-
-# On ferme le log
-&OBM::toolBox::write_log( "Execution du script terminee", "WC", 0 );
-
-exit !$errorCode;
 
 # Perldoc
 

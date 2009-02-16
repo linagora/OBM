@@ -1153,8 +1153,8 @@ sub getSieveNomade {
     my $nomadeMsg = 'redirect "'.$self->{'entityDesc'}->{'userobm_email_nomade'}.'";';
 
     if( !$self->{'entityDesc'}->{'userobm_nomade_local_copy'} ) {
-        $nomadeMsg .= 'discard;';
-        $nomadeMsg .= 'stop;';
+        $nomadeMsg .= "\n".'discard;';
+        $nomadeMsg .= "\n".'stop;';
     }else {
         $nomadeMsg .= 'keep;';
     }

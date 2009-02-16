@@ -64,4 +64,4 @@ $regexp_hostname = '^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$';
 $regexp_groupname = '^[\W\w0-9][\W\w0-9-._ ]{1,30}[\W\w0-9]$';
 
 # Mailshare
-$regexp_mailsharename = '^[A-Za-z0-9][A-Za-z0-9-._]{0,30}[A-Za-z0-9]$'
+$regexp_mailsharename = '^[a-z0-9][a-z0-9-._]{0,30}[a-z0-9]$'
