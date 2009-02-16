@@ -39,29 +39,40 @@ db = obm
 user = obm
 ; Password must be enclosed with "
 password = "aliasource"
-;
+
 ; Default language
 lang = fr
-;
+
 ; Enabled OBM module
 obm-ldap = true
 obm-mail = true
 obm-samba = false
 obm-web = false
 obm-contact = false
-;
+
 ; singleNameSpace mode allow only one domain
 ; login are 'login' and not 'login@domain'
 ; Going multi-domain from mono domain needs system work (ldap, cyrus,...)
 ; Multi-domain disabled by default
 singleNameSpace = false
-;
+
 ; backupRoot is the directory used to store backup data
 backupRoot = "/var/lib/obm/backup"
-;
+
 ; documentRoot is root of document repository
 documentRoot="/var/lib/obm/documents"
 documentDefaultPath="/"
+
+; LDAP Authentification for obm-sync & ui
+; ldap authentication server (specify :port if different than default)
+;auth-ldap-server = ldap://localhost
+; base dn for search (search are performed with scope sub, of not specified, use the server default)
+;auth-ldap-basedn = dc=local
+; filter used for the search part of the authentication
+; See http://www.faqs.org/rfcs/rfc2254.html for filter syntax
+; auth-ldap-filter = "(&(uid=%u)(obmDomain=%d))"
+;auth-ldap-filter = (&(uid=%u)(obmDomain=%d))
+
 ;
 ;
 [automate]
@@ -76,11 +87,6 @@ ldapServer = ldap://localhost
 ; LDAP Root
 ; Exemple : 'aliasource,local' means that the root DN is: 'dc=aliasource,dc=local' 
 ldapRoot = local
-
-; LDAP Authentification for obm-sync & ui
-;auth-ldap-server = ldap://localhost
-;auth-ldap-basedn = dc=local
-;auth-ldap-filter = (&(uid=%u)(obmDomain=%d))
 
 ; Enable Cyrus partition support
 ; if cyrusPartition is enable, a dedicated Cyrus partition is created for each OBM domain
