@@ -12,8 +12,6 @@ use Getopt::Long;
 my %parameters;
 my $return = GetOptions( \%parameters, 'login=s', 'domain-id=i', 'help' );
 
-print keys(%parameters);
-
 if( !$return ) {
     updateSieve->_displayHelp();
     exit 1;
@@ -62,8 +60,6 @@ sub run {
 sub _getParameter {
     my $self = shift;
     my( $parameters ) = @_;
-
-    print keys(%{$parameters});
 
     if( $$parameters{'help'} ) {
         $self->_displayHelp();
