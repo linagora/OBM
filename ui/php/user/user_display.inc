@@ -744,18 +744,23 @@ function html_user_consult($obm_q) {
       <th>$l_smb_perms</th>
       <td>$smb_state</td>
     </tr>
-    <tr>
-      <th>$l_smb_home</th>
-      <td>$smb_home</td>
-    </tr>
-    <tr>
-      <th>$l_smb_home_drive</th>
-      <td>$smb_home_drive</td>
-    </tr>
-    <tr>
-      <th>$l_smb_logon</th>
-      <td>$smb_logon</td>
-    </tr>
+    ";
+    if($samba_perms == '1') {
+      $samba_section .= "      
+      <tr>
+        <th>$l_smb_home</th>
+        <td>$smb_home</td>
+      </tr>
+      <tr>
+        <th>$l_smb_home_drive</th>
+        <td>$smb_home_drive</td>
+      </tr>
+      <tr>
+        <th>$l_smb_logon</th>
+        <td>$smb_logon</td>
+      </tr>";
+    }
+    $samba_section .= "      
     </table>
     </div>";
   }

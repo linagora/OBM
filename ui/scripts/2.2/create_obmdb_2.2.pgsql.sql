@@ -5892,6 +5892,13 @@ ALTER TABLE ONLY contact
 
 
 --
+-- Name: contact_anniversary_id_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY contact
+    ADD CONSTRAINT contact_anniversary_id_event_id_fkey FOREIGN KEY (contact_anniversary_id) REFERENCES event(event_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+--
 -- Name: contact_company_id_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 

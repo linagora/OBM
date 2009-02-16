@@ -482,9 +482,9 @@ function run_query_user_insert($user) {
   // Section Samba
   if ($cgp_use['service']['samba']) {
     $smb_perms = sql_parse_id($user['smb_perms']);
-    $smb_home = $user['smb_home'];
-    $smb_home_drive = $user['smb_home_drive'];
-    $smb_logon = $user['smb_logon'];
+    $smb_home = ($smb_perms == 1)?$user['smb_home']:'';
+    $smb_home_drive = ($smb_perms == 1)?$user['smb_home_drive'] : '';
+    $smb_logon = ($smb_perms == 1)?$user['smb_logon']: '';
     $query_insert_samba = ',
     userobm_samba_perms,
     userobm_samba_home,
@@ -822,9 +822,9 @@ function run_query_user_update($p_id, $user) {
   // Section Samba
   if ($cgp_use['service']['samba']) {
     $smb_perms = sql_parse_int($user['smb_perms']);
-    $smb_home = $user['smb_home'];
-    $smb_home_drive = $user['smb_home_drive'];
-    $smb_logon = $user['smb_logon'];
+    $smb_home = ($samba_perms == 1)?$user['smb_home']:'';
+    $smb_home_drive = ($samba_perms == 1)?$user['smb_home_drive']:'';
+    $smb_logon = ($samba_perms == 1)?$user['smb_logon']:'';
     $query_samba = ",
     userobm_samba_perms=$smb_perms,
     userobm_samba_home='$smb_home',
@@ -1556,9 +1556,9 @@ function check_user_data_form($p_id, &$user) {
   $vacation_message = stripslashes($user['vacation_message']);
   $email_nomade = $user['email_nomade'];
   $smb_perms = $user['smb_perms'];
-  $smb_home = stripslashes($user['smb_home']);
+  $smb_home = trim(stripslashes($user['smb_home']));
   $smb_home_drive = $user['smb_home_drive'];
-  $smb_logon = $user['smb_logon'];
+  $smb_logon = trim($user['smb_logon']);
   $file = $user['file_tmp'];
   
   $profiles = $user['profiles'];
@@ -1781,14 +1781,14 @@ function check_user_data_form($p_id, &$user) {
   // Samba checks
   if ($cgp_use['service']['samba']) {
     // Samba home correct
-    if (($smb_home != '') && (! preg_match($php_regexp_home, $smb_home))) {
+    if ($smb_perms == 1 && ($smb_home == '' || !preg_match($php_regexp_home, $smb_home))) {
       $err['msg'] = " $smb_home : $l_err_home";
       $err['field'] = 'smb_home';
       return false;
     }
 
     // Samba home drive correct
-    if (($smb_home_drive != '') && (! preg_match($php_regexp_drive, $smb_home_drive))) {
+    if ($smb_perms == 1 && ($smb_home_drive == '' || !preg_match($php_regexp_drive, $smb_home_drive))) {
       $err['msg'] = " $smb_home_drive : $l_err_drive";
       $err['field'] = 'smb_home_drive';
       return false;
