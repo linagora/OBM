@@ -60,7 +60,7 @@ sub run {
         $errorCode = $updateCyrusAcl->update();
     }else {
         $self->_log( 'problème à l\'initialisation de l\'ACL updater', 0 );
-        return 1;
+        $errorCode = 1;
     }
 
     if( $errorCode ) {
@@ -83,7 +83,7 @@ sub _getParameter {
         return 1;
     }
 
-    # Vérification du type d'entité à mettre à jour
+    # Check updated entity type
     if( !exists($$parameters{'type'}) ) {
         $self->_log( 'Parametre --type manquant', 0 );
         return 1;
@@ -94,18 +94,20 @@ sub _getParameter {
         }
     }
 
-    # Vérification de l'identifiant utilisateur
+    # Check entity name
     if( !exists($$parameters{'name'}) ) {
         $self->_log( 'Parametre --name manquant', 0 );
         return 1;
     }else {
-        if( $$parameters{'name'} !~ /$regexp_login/ ) {
+        if( ($$parameters{'type'} eq 'mailbox') && ($$parameters{'name'} !~ /$regexp_login/) ) {
             $self->_log( 'Parametre --name invalide', 0 );
             return 1;
+        }elsif( ($$parameters{'type'} eq 'mailshare') && ($$parameters{'name'} !~ /$regexp_mailsharename/) ) {
+            $self->_log( 'Parametre --name invalide', 0 );
         }
     }
 
-    # Vérification du domaine
+    # Check domain ID
     if( !exists($$parameters{'domain-id'}) ) {
         $self->_log( 'Parametre --domain-id manquant', 0 );
         return 1;
@@ -120,15 +122,15 @@ sub _getParameter {
 }
 
 
+# Display help
 sub _displayHelp {
     my $self = shift;
 
     $self->_log( 'Affichage de l\'aide', 3 );
 
     print STDERR 'Script permettant de mettre à jour les ACLs Cyrus'."\n";
-    print STDERR 'Pour plus d\'information : perldoc path_to/updateCyrusAcl.pl'."\n";
     print STDERR 'Syntaxe :'."\n";
-    print STDERR "\t".'updateCyrusAcl.pl --type [mailbox|mailshare] --name NAME --domain-id DOMAIN_ID '."\n";
+    print STDERR "\t".'updateCyrusAcl.pl --type [mailbox|mailshare] --name NAME --domain-id DOMAIN_ID'."\n";
 
     return 0;
 }
