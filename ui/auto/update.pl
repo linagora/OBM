@@ -26,7 +26,7 @@ delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
 use Getopt::Long;
 my %parameters;
-my $return = GetOptions( \%parameters, 'user=s', 'domain=s', 'delegation=s', 'global', 'incremental', 'help' );
+my $return = GetOptions( \%parameters, 'user=s', 'domain-id=s', 'delegation=s', 'global', 'incremental', 'help' );
 
 if( !$return ) {
     %parameters = undef;
@@ -74,7 +74,7 @@ sub run {
         }else {
             require OBM::updateStateUpdater;
             my $updateState;
-            if( !($updateState = OBM::updateStateUpdater->new( $parameters->{'domain'} )) || $updateState->update() ) {
+            if( !($updateState = OBM::updateStateUpdater->new( $parameters->{'domain-id'} )) || $updateState->update() ) {
                 $self->_log( 'échec de la mise à jour du flag de mise à jour en attente', 0 );
                 return 1;
             }
@@ -92,12 +92,12 @@ sub getParameter {
     my $self = shift;
     my( $parameters ) = @_;
 
-    if( !exists($parameters->{'domain'}) ) {
-        $self->_log( 'Paramétre \'--domain\' manquant', 0 );
+    if( !exists($parameters->{'domain-id'}) ) {
+        $self->_log( 'Paramétre \'--domain-id\' manquant', 0 );
         $parameters->{'help'} = 1;
 
     }else {
-        $self->_log( 'Mise a jour du domaine d\'identifiant \''.$parameters->{'domain'}.'\'', 0 );
+        $self->_log( 'Mise a jour du domaine d\'identifiant \''.$parameters->{'domain-id'}.'\'', 0 );
     }
 
     if( exists($parameters->{'user'}) ) {
@@ -148,9 +148,9 @@ sub getParameter {
         $self->_log( 'Affichage de l\'aide', 3 );
 
         print STDERR "Veuillez indiquer le critere de mise a jour :\n";
-        print STDERR "\tSyntaxe: script --domain id [--user id | --delegation word] [--global | --incremental]\n";
+        print STDERR "\tSyntaxe: script --domain-id id [--user id | --delegation word] [--global | --incremental]\n";
         print STDERR "\tuser <id> : utilisateur d'identifiant <id> ;\n";
-        print STDERR "\tdomain <id> : domaine d'identifiant <id> ;\n";
+        print STDERR "\tdomain-id <id> : domaine d'identifiant <id> ;\n";
         print STDERR "\tdelegation <word> : delegation de mot cle <word> ;\n";
         print STDERR "\tglobal : fait une mise a jour globale du domaine ;\n";
         print STDERR "\tincremental : fait une mise a jour incrementale du domaine.\n";
@@ -169,16 +169,16 @@ update.pl - OBM administration tool, alter ego of Cyrus::IMAP::Shell
 =head1 SYNOPSIS
 
   # Domain global update
-  $ update.pl --domain <DOMAIN_ID> --global
+  $ update.pl --domain-id <DOMAIN_ID> --global
 
   # Domain incremental update
-  $ update.pl --domain <DOMAIN_ID> --incremental
+  $ update.pl --domain-id <DOMAIN_ID> --incremental
 
   # Domain incremental update - only updates done by an admin
-  $ update.pl --domain <DOMAIN_ID> --user <USER_ID> --incremental
+  $ update.pl --domain-id <DOMAIN_ID> --user <USER_ID> --incremental
 
   # Domain incremental update - only updates done for a delegation
-  $ update.pl --domain <DOMAIN_ID> --delegation <DELEGATION> --incremental
+  $ update.pl --domain-id <DOMAIN_ID> --delegation <DELEGATION> --incremental
 
   # Display help
   $ update.pl --help
@@ -199,7 +199,7 @@ updates for only a particular user or for a delegation.
 
 =item C<help> : display help
 
-=item C<domain> : B<needed>
+=item C<domain-id> : B<needed>
 
 =over 4
 

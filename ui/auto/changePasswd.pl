@@ -27,7 +27,7 @@ delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
 use Getopt::Long;
 my %parameters;
-my $return = GetOptions( \%parameters, 'login=s', 'domain=s', 'passwd=s', 'old-passwd=s', 'unix', 'samba', 'sql', 'interactiv', 'no-old', 'help' );
+my $return = GetOptions( \%parameters, 'login=s', 'domain-id=s', 'passwd=s', 'old-passwd=s', 'unix', 'samba', 'sql', 'interactiv', 'no-old', 'help' );
 
 if( !$return ) {
     updateCyrusAcl->_displayHelp();
@@ -105,14 +105,14 @@ sub _getParameter {
     }
 
 
-    # Check 'domain' parameter
-    if( !$$parameters{'domain'} ) {
-        $self->_log( 'Parametre --domain manquant', 0 );
+    # Check 'domain-id' parameter
+    if( !$$parameters{'domain-id'} ) {
+        $self->_log( 'Parametre --domain-id manquant', 0 );
         return 1;
 
     }else {
-        if( $$parameters{'domain'} !~ /$regexp_id/ ) {
-            $self->_log( 'Parametre --domain incorrect', 0 );
+        if( $$parameters{'domain-id'} !~ /$regexp_id/ ) {
+            $self->_log( 'Parametre --domain-id incorrect', 0 );
             return 1;
         }
     }
@@ -264,8 +264,8 @@ sub _displayHelp {
     print STDERR 'Script permettant de mettre à jour les mots de passes SQL et/ou LDAP'."\n";
     print STDERR 'Pour plus d\'informations : perldoc path_to/changePasswd.pl'."\n";
     print STDERR 'Syntaxe :'."\n";
-    print STDERR "\t".'changePasswd.pl --login LOGIN --domain DOMAIN_ID --interactiv [--no-old] [--unix|--samba|--sql]'."\n";
-    print STDERR "\t".'changePasswd.pl --login LOGIN --domain DOMAIN_ID --passwd NEW_PASSWD [--no-old|--old-passwd OLD_PASSWD] [--unix|--samba|--sql]'."\n";
+    print STDERR "\t".'changePasswd.pl --login LOGIN --domain-id DOMAIN_ID --interactiv [--no-old] [--unix|--samba|--sql]'."\n";
+    print STDERR "\t".'changePasswd.pl --login LOGIN --domain-id DOMAIN_ID --passwd NEW_PASSWD [--no-old|--old-passwd OLD_PASSWD] [--unix|--samba|--sql]'."\n";
     print STDERR "Par défaut, seul le mot de passe Unix est mis à jour\n";
 
     return 0;

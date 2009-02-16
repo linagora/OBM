@@ -79,7 +79,7 @@ function exec_tools_update_update($tools) {
   }
 
   // Update command creation
-  $cmd = $cmd_update." --$update_type --domain $domain_id";
+  $cmd = $cmd_update." --$update_type --domain-id $domain_id";
   
   if ($realm == 'user') {
     $cmd .= " --user $uid";

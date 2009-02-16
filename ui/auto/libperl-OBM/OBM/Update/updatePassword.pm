@@ -37,7 +37,7 @@ sub new {
     $self->{'newPasswordDesc'}->{'sql'} = $parameters->{'sql'};
 
     $self->{'userLogin'} = $parameters->{'login'};
-    $self->{'domainId'} = $parameters->{'domain'};
+    $self->{'domainId'} = $parameters->{'domain-id'};
 
     require OBM::Ldap::ldapServers;
     if( !($self->{'ldapservers'} = OBM::Ldap::ldapServers->instance()) ) {
