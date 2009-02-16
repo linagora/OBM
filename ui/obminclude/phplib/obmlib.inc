@@ -396,4 +396,154 @@ class CAS_Auth extends Auth {
 }
 
 
+class LDAP_Auth extends Auth {
+
+  var $lifetime       = 86400;
+  var $magic          = 'Simsalabim';  // Challenge seed
+  var $database_class = 'DB_OBM';
+  var $database_table = 'UserObm';
+
+  function of_session_dis_login_page() {
+    global $obminclude, $l_obm_title, $obm_version, $module, $path;
+    global $login_action;
+    global $params, $c_singleNameSpace, $c_default_domain;
+
+    $login_page = $path.'/../'.$obminclude.'/login.inc';
+    include($login_page);
+  }
+
+  function auth_validatelogin() {
+    global $obm, $params;
+    global $c_default_domain, $c_singleNameSpace, $l_error;
+
+    if(isset($params['auth_ticket'])) {
+      $udata = $this->check_ticket_auth($params['auth_ticket']);
+      if(!$udata) {
+        return false;
+      }
+      $params = array_merge($params,$udata);
+    }
+
+    $login = $params["login"];
+    $domain = $params["domain"];
+    $password = stripslashes($params['password']);
+    if(!$c_singleNameSpace) {
+      if(strpos($login,"@") !== false) {
+        list($login, $domain) = split("@",$login);
+        $domain_query = "domain_name";
+      } else {
+        $domain_query = "userobm_domain_id";
+      }
+
+      // if no domain set, set the default domain
+      if ((! isset($domain)) || ($domain == "")) {
+        $domain = "$c_default_domain";
+      }
+      $where_domain = "AND $domain_query = '$domain'";
+    }
+
+    if (isset($login)) {
+      $obm["login"] = $login; // provides access for loginform.ihtml
+    }
+
+    // authenticate user against ldap server, return uid or false
+    $user_table = $this->database_table;
+    $user_login = addslashes($login);
+
+    $query_login = "SELECT
+                      userobm_id,
+                      userobm_login,
+                      domain_name,
+                      userobm_perms,
+                      userobm_domain_id,
+                      userobm_delegation_target
+                    FROM $user_table
+                    LEFT JOIN Domain ON userobm_domain_id = domain_id
+                    WHERE userobm_login = '$user_login'
+                      AND userobm_archive = '0'
+                      $where_domain";
+
+    $class = $this->database_class;
+    $this->db = new $class;
+
+    $this->db->query($query_login);
+    while ($this->db->next_record()) {
+      $uid  = $this->db->f("userobm_id");
+      $perm = $this->db->f("userobm_perms");
+      $pass = $this->db->f("userobm_password");
+      $domain_id = $this->db->f("userobm_domain_id");
+      $delegation = $this->db->f("userobm_delegation_target");
+      $dbLogin = $this->db->f("userobm_login");
+      $domain_name = $this->db->f("domain_name");
+    }
+
+    if (global_allow_access($perm)) {
+      $unfreeze = global_unfreeze_user($uid);
+      if ($user_login = $this->auth_ldap_validatelogin($dbLogin, $password, $domain_name)) {
+        if ($unfreeze) {
+          $obm["profile"] = $perm;
+          $obm["domain_id"] = $domain_id;
+          $obm["delegation"] = $delegation;
+          return $uid;
+        } else {
+          return false;
+        }
+      } else {
+        global_freeze_user($params);
+        return false;
+      }
+    } else {
+      return false;
+    }
+    
+  }
+
+
+  function auth_ldap_validatelogin($login, $password, $domain){
+    global $auth_ldap_server, $auth_ldap_basedn, $auth_ldap_binddn;
+    global $auth_ldap_bindpw, $auth_ldap_filter;
+    global $auth_ldap_attribute, $auth_ldap_sizelimit;
+
+    if(!$login) return false;
+    $auth_ldap_attribute = array("dn", "uid");
+    $auth_ldap_sizelimit = 1;
+    $auth_ldap_filter = str_replace('%u', $login, $auth_ldap_filter);
+    $auth_ldap_filter = str_replace('%d', $domain, $auth_ldap_filter);
+    
+    $ldapconn=ldap_connect($auth_ldap_server);
+    if (! ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3)) {
+      ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 2) or
+        die("Echec de négociation de protocole avec le serveur LDAP");
+    }
+    	
+    if (isset($auth_ldap_binddn) and strlen($auth_ldap_binddn) > 0) {
+      $ldapbindconn=ldap_bind($ldapconn,$auth_ldap_binddn,$auth_ldap_bindpw);
+    } else {
+      $ldapbindconn=ldap_bind($ldapconn);
+    }
+    	
+    if ($ldapbindconn) {
+      $result=ldap_search($ldapconn, $auth_ldap_basedn,$auth_ldap_filter,
+      $auth_ldap_attribute, 0, $auth_ldap_sizelimit);
+      if ($result and ldap_count_entries($ldapconn, $result) > 0) {
+        $ldap_data = ldap_get_entries($ldapconn, $result);
+        $ldap_userdn = $ldap_data[0]["dn"];
+        $ldap_useruid = $ldap_data[0]["uid"][0];
+      } else {
+        return false;
+      }
+  
+      if (@ldap_bind($ldapconn, $ldap_userdn, $password)) {
+        return $ldap_useruid;
+      } else {
+        return false;
+      }
+    } else {
+      echo("Echec lors de l'ouverture de la connexion au serveur d'authentification");
+      return false;
+    }
+  }
+}
+
+
 </script>

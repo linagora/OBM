@@ -231,6 +231,13 @@ if (is_null($ini_array['backupRoot'])) {
 
 $cgp_host = $ini_array['external-protocol'].'://'.$ini_array['external-url'].$ini_array['obm-prefix'];
 
+// ldapauth ini variables
+$auth_ldap_server = $ini_array['auth-ldap-server'];
+$auth_ldap_basedn = $ini_array['auth-ldap-basedn'];
+$auth_ldap_binddn = $ini_array['auth-ldap-binddn'];
+$auth_ldap_bindpw = $ini_array['auth-ldap-bindpw'];
+$auth_ldap_filter = $ini_array['auth-ldap-filter'];
+
 //------------------//
 // Services enabled //
 //------------------//
@@ -495,6 +502,8 @@ if ($auth_kind == 'CAS') {
   $auth_class_name = 'CAS_Auth';
 } elseif ($auth_kind == 'standalone') {
   $auth_class_name = 'OBM_Challenge_Auth';
+} elseif ($auth_kind == 'ldap') {
+  $auth_class_name = 'LDAP_Auth';
 } else {
   echo 'unknown Authentication kind !<br/>';
   echo 'please edit $auth_kind in conf/obm_conf.inc';

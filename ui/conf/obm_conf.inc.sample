@@ -63,11 +63,12 @@ $cgp_sess_db = false;
 $cgp_cookie_name = 'OBM_Session';
 $cgp_cookie_domain = 'aliacom.local';
 
-// authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
+// authentification : 'CAS' (SSO AliaSuite), 'ldap' (LDAP authentication) or 'standalone' (default)
 //$auth_kind = 'CAS';
 //$cas_server = 'sso.aliacom.local';
 //$cas_server_port = 8443;
 //$cas_server_uri = '';
+//$auth_kind='ldap';
 
 // encyption used to store password : 'PLAIN', 'MD5SUM' or 'CRYPT'
 $password_encryption = 'PLAIN';
