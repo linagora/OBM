@@ -67,7 +67,7 @@ ldapRoot = local
 ; LDAP Authentification for obm-sync & ui
 ;auth-ldap-server = ldap://localhost
 ;auth-ldap-basedn = dc=local
-;auth-ldap-filter = uid=%u
+;auth-ldap-filter = (&(uid=%u)(obmDomain=%d))
 
 ; Enable Cyrus partition support
 ; if cyrusPartition is enable, a dedicated Cyrus partition is created for each OBM domain
