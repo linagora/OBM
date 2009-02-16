@@ -60,7 +60,7 @@ sub run {
         $errorCode = $updatePasswd->update();
     }else {
         $self->_log( 'problème à l\'initialisation du password updater', 0 );
-        return 1;
+        $errorCode = 1;
     }
 
     if( $errorCode ) {
