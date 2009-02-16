@@ -18,6 +18,19 @@ external-url = obm
 external-protocol = http
 obm-prefix = /
 ;
+;
+; parameters for LDAP authentication
+;
+; Authentication LDAP server
+; auth-ldap-server = ldap://ldap.auth.server/
+; Authentication LDAP base DN
+; auth-ldap-basedn = dc=sample,dc=dn
+; Authentication LDAP search filter to find user DN :
+;   - %u will be replace with user login
+;   - %d will be replace with user OBM domain name
+; ie: toto@domain.foo : %u=toto, %d=domain.foo
+; auth-ldap-filter = (&(uid=%u)(obmDomain=%d))
+;
 ; Database infos
 host = localhost
 ; dbtype = PGSQL
