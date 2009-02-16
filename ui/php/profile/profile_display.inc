@@ -150,16 +150,16 @@ function html_profile_consult($profile) {
       $dis_modules_default .= "
         <tr $class>
         <td>$l_default</td>
-        <td>".dis_module_status('user', $rights, $name)."</td>
-        <td>".dis_module_status('editor', $rights, $name)."</td>
+        <td>".dis_module_status('read', $rights, $name)."</td>
+        <td>".dis_module_status('write', $rights, $name)."</td>
         <td>".dis_module_status('admin', $rights, $name)."</td>
         </tr>";
     } else {
       $dis_modules .= "
         <tr $class>
         <td>".$GLOBALS["l_module_$name"]."</td>
-        <td>".dis_module_status('user', $rights, $name)."</td>
-        <td>".dis_module_status('editor', $rights, $name)."</td>
+        <td>".dis_module_status('read', $rights, $name)."</td>
+        <td>".dis_module_status('write', $rights, $name)."</td>
         <td>".dis_module_status('admin', $rights, $name)."</td>
         </tr>";
     }
@@ -271,8 +271,8 @@ function html_profile_form($profile) {
         <input type='hidden' name='cb_rights[$name][]' value='0' />
         ".$GLOBALS["l_module_$name"]."
         </td>
-        <td>".dis_module_status('user',$rights, $name, true)."</td>
-        <td>".dis_module_status('editor',$rights, $name, true)."</td>
+        <td>".dis_module_status('read',$rights, $name, true)."</td>
+        <td>".dis_module_status('write',$rights, $name, true)."</td>
         <td>".dis_module_status('admin',$rights, $name, true)."</td>
         </tr>";
     }
@@ -351,8 +351,8 @@ function html_profile_form($profile) {
     <tr><th>$l_default_settings</th><th>$l_user</th><th>$l_editor</th><th>$l_admin</th></tr>
     <tr $class id='module_default'>
     <td>$l_default <input type='hidden' name='cb_rights[default][]' value='0' /></td>
-    <td>".dis_module_status('user',$profile['module']['default'], 'default', true)."</td>
-    <td>".dis_module_status('editor',$profile['module']['default'], 'default', true)."</td>
+    <td>".dis_module_status('read',$profile['module']['default'], 'default', true)."</td>
+    <td>".dis_module_status('write',$profile['module']['default'], 'default', true)."</td>
     <td>".dis_module_status('admin',$profile['module']['default'], 'default', true)."</td></tr>
     <tr><th>$l_specific_settings</th><th>$l_user</th><th>$l_editor</th><th>$l_admin</th></tr>
     $dis_modules
@@ -543,10 +543,10 @@ function dis_property_admin_realm_value($value, $update=false) {
  */
 function dis_module_status($type, $right, $module, $update=false) {
   if($update) {
-    $checked = ((hexdec($GLOBALS["perm_$type"]) & $right) == hexdec($GLOBALS["perm_$type"]))?'checked="checked"':'';
-    return "<input type='checkbox' name='cb_rights[$module][]' value='".$GLOBALS["perm_$type"]."' $checked />";
+    $checked = ((($GLOBALS["c_perms_$type"]) & $right) == ($GLOBALS["c_perms_$type"]))?'checked="checked"':'';
+    return "<input type='checkbox' name='cb_rights[$module][]' value='".$GLOBALS["c_perms_$type"]."' $checked />";
   } else {
-    return ((hexdec($GLOBALS["perm_$type"]) & $right) == hexdec($GLOBALS["perm_$type"]))? 'X' : '';
+    return ((($GLOBALS["c_perms_$type"]) & $right) == ($GLOBALS["c_perms_$type"]))? 'X' : '';
   }
 }
 

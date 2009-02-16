@@ -63,10 +63,22 @@ $l_add_section_enabled = "Add specifics settings for a section";
 
 // Properties label
 $l_level = "Level";
+$l_help_level = "An user with this profil will not be allowed to modify user with a profile having a lesser level than this one";
 $l_level_managepeers = "Manage same level users";
+$l_help_level_managepeers = "If this option is enabled, a user with this profile will be allowed to modify user with a profile having the same level as his";
 $l_access_restriction = "Access restriction";
+$l_help_access_restriction = "Define the default security policy for network connection for this profile";
 $l_access_exeptions = "Access restriction exceptions";
+$l_help_access_exceptions = "Exeption for the network default security policy (IP or IP range)";
 $l_admin_realm = "Administration realm";
-
+$l_help_admin_realm = "When a user with this profil will execute a system update, the realm of the update will be defined by this option.";
+$l_deny_connect = 'Deny connection by default';
+$l_allow_connect = 'Allow connection by default';
+$l_none_f = 'None';
+$l_lower = 'The lower';
+$l_higher = 'The Higher';
+$l_realm_user = 'His own modifications';
+$l_realm_delegation = 'All modifications in his delegation';
+$l_realm_domain = 'All domain modification';
 $l_profile_exists= "This profile name is already used";
 

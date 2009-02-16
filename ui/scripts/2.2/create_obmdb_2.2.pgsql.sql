@@ -8320,7 +8320,7 @@ ALTER TABLE ONLY resourceitem
 --
 
 ALTER TABLE ONLY resourcetype
-    ADD CONSTRAINT resourcetype_domain_id_domain_id_fkey FOREIGN KEY (resourcetype_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE SET NULL;
+    ADD CONSTRAINT resourcetype_domain_id_domain_id_fkey FOREIGN KEY (resourcetype_domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

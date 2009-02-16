@@ -1195,8 +1195,8 @@ function html_project_form($action, $project_q, $project) {
   if (isset($project['deal_label'])) { $deal_label = $project['deal_label']; }
   if (isset($project['tasklabel'])) { $task = $project['tasklabel']; }
   if (isset($project['member'])) { $member = $project['member']; }
-  if (isset($project['datebegin'])) { $datebegin = $project['datebegin']; }
-  if (isset($project['dateend'])) { $dateend = $project['dateend']; }
+  if (isset($project['datebegin'])) { $datebegin = of_date_upd_format($project['datebegin']); }
+  if (isset($project['dateend'])) { $dateend = of_date_upd_format($project['dateend']); }
   if (isset($project['archive'])) { $arc_val = ($project['archive'] == 1 ? 'checked' : ''); }
   if (isset($project['reference_date'])) { $reference_date = stripslashes($project['reference_date']); }
   if (isset($project['reference_duration'])) { $reference_duration = stripslashes($project['reference_duration']); }

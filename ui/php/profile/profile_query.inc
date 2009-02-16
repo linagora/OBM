@@ -16,6 +16,9 @@ $c_profile_properties = array(
     'admin_realm' 
 );
 
+$c_perms_admin = 24;
+$c_perms_write = 4;
+$c_perms_read = 3;
 
 /**
  * run_query_profile_details 

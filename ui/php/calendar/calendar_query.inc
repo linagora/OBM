@@ -333,7 +333,7 @@ function check_calendar_event_participation($params) {
   global $obm;
 
   $event_id = $params['calendar_id'];
-  $entity = 'user';
+  $entity = $params['entity_kind'];
   $entity_id = $params['entity_id'];
   $state = $params['decision_event'];
 
@@ -884,9 +884,11 @@ function check_access_entity($calendar_ids, $resource_ids) {
 // Check for conflict : Only with the first occurrence of each event
 ///////////////////////////////////////////////////////////////////////////////
 function check_calendar_decision_conflict($calendar) {
-  
+  if($calendar['decision_event'] != 'ACCEPTED') {
+    return false;
+  }   
   $event_id = $calendar['calendar_id'];
-  $sel_entity_id["user"][] = $calendar["user_id"];
+  $sel_entity_id[$calendar['entity_kind']][] = $calendar["entity_id"];
   $e_q = run_query_calendar_detail($event_id);
   $begin = new Of_Date($e_q->f('event_date'),'GMT');
   $end = clone $begin;

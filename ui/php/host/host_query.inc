@@ -166,6 +166,7 @@ function run_query_host_insert($host) {
   $domain_id = $obm['domain_id'];
   $name = $host['name'];
   $ip = $host['ip'];
+  $fqdn = $host['fqdn'];
   $samba = sql_parse_int($host['samba']);
   $smtp_in = sql_parse_int($host['smtp_in']);
   $smtp_out = sql_parse_int($host['smtp_out']);
@@ -196,6 +197,7 @@ function run_query_host_insert($host) {
     host_name
     $q_delegation[field],
     host_ip,
+    host_fqdn,
     host_description
     )
   VALUES (null,
@@ -208,6 +210,7 @@ function run_query_host_insert($host) {
     '$name'
     $q_delegation[value],
     '$ip',
+    '$fqdn',
     '$desc'
     )";
 
@@ -263,6 +266,7 @@ function run_query_host_update($host) {
   $id = sql_parse_id($host['host_id'], true);
   $name = $host['name'];
   $ip = $host['ip'];
+  $fqdn = $host['fqdn'];
   $samba = sql_parse_int($host['samba']);
   $smtp_in = sql_parse_int($host['smtp_in']);
   $smtp_out = sql_parse_int($host['smtp_out']);
@@ -278,6 +282,7 @@ function run_query_host_update($host) {
     host_userupdate=$obm[uid],
     host_name='$name',
     host_ip='$ip',
+    host_fqdn='$fqdn',
     host_description='$desc'
     $q_delegation
   WHERE host_id $id $multidomain";
@@ -403,7 +408,7 @@ function get_host_info($id) {
   }
   $id = sql_parse_id($id, true);
   $multidomain = sql_multidomain('host');
-  $query = "SELECT *,
+  $query = "SELECT Host.*,
     samba.service_id as host_samba,
       imap.service_id as host_imap,
       smtp_in.service_id as host_smtp_in,
@@ -423,6 +428,7 @@ function get_host_info($id) {
   $h['name'] = $obm_q->f('host_name');
   $h['delegation'] = $obm_q->f('host_delegation');
   $h['ip'] = $obm_q->f('host_ip');
+  $h['fqdn'] = $obm_q->f('host_fqdn');
   $h['samba'] = $obm_q->f('host_samba');
   $h['smtp_in'] = $obm_q->f('host_smtp_in');
   $h['smtp_out'] = $obm_q->f('host_smtp_out');
@@ -608,12 +614,14 @@ function check_host_update_rights($params) {
 function check_host_data_form($host) {
   global $php_regexp_hostname, $l_err_host_name_empty, $l_err_host_name_exist;
   global $cgp_use, $err, $l_err_host_name;
-  global $php_regexp_ip, $l_err_host_ip, $l_err_host_ip_exist;
+  global $php_regexp_ip, $l_err_host_ip, $l_err_host_ip_exist,$php_regexp_fqdn;
   global $l_err_host_ip_not_in_lan, $l_err_firewall_perms, $l_err_web_all;
+  global $l_err_host_fqdn;
 
   $id = $host['host_id'];
   $name = $host['name'];
   $ip = $host['ip'];
+  $fqdn = $host['fqdn'];
   $web_list = $host['web_list'];
   $web_all = $host['web_all'];     
 
@@ -663,6 +671,12 @@ function check_host_data_form($host) {
       }
     }
   }
+    // Host FQDN correct
+    if (! preg_match($php_regexp_fqdn, $fqdn)) {
+      $err['msg'] = " $fqdn : $l_err_host_fqdn";
+      $err['field'] = 'fqdn';
+      return false;
+    }  
   // XXXXXXX verifier ici + fichiers de langue
   $d = of_domain_get_domain_infos($domain_id, true);
 

@@ -92,7 +92,7 @@ INSERT INTO Profile (profile_timeupdate, profile_timecreate, profile_userupdate,
 
 INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('default', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='admin'), 1);
 
-INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='admin'), 29);
+INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='admin'), 31);
 INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('domain', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='admin'), 0);
 
 INSERT into ProfileProperty (profileproperty_profile_id, profileproperty_name, profileproperty_value) values ((select profile_id from Profile where profile_name='admin'), 'level', '0');
@@ -145,6 +145,6 @@ INSERT into ProfileSection (profilesection_section_name, profilesection_domain_i
 INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('user', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='user'), 1);
 INSERT into ProfileSection (profilesection_section_name, profilesection_domain_id, profilesection_profile_id, profilesection_show) values ('my', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='user'), 1);
 
-INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='user'), 0);
+INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('default', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='user'), 3);
 INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('calendar', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='user'), 5);
 INSERT into ProfileModule (profilemodule_module_name, profilemodule_domain_id, profilemodule_profile_id, profilemodule_right) values ('mailbox', (select domain_id from Domain where domain_name='global.virt'), (select profile_id from Profile where profile_name='user'), 5);

@@ -411,6 +411,9 @@ if ($action == 'index') {
 } elseif ($action == 'update_decision') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_event_participation($params)) {
+    if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
+      $display['msg'] .= display_warn_msg("$l_event : $l_conflicts");
+    }        
     $retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
     if ($retour) {
       $mail_data = run_query_prepare_event_mail($params, $action);
@@ -846,7 +849,7 @@ function get_calendar_action() {
   // New   
   $actions['calendar']['new'] = array (
     'Name'     => $l_header_new_event,
-    'Url'      => "$path/calendar/calendar_index.php?action=new",
+    'Url'      => "$path/calendar/calendar_index.php?action=new&amp;date_begin=".$date->getURL(),
     'Right'    => $cright_write,
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
        'update_decision','update_alert','decision','update','delete', 'new_meeting',
@@ -1103,6 +1106,7 @@ function update_calendar_action() {
 
       // Duplicate
       unset($actions['calendar']['duplicate']);
+          $data = "<a href=\"$datas[0]\">$datas[0]</a>";
 
       // Update
       unset($actions['calendar']['update']);

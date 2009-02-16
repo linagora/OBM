@@ -133,8 +133,8 @@ CREATE TABLE ProfileSection (
 CREATE TABLE ProfileProperty (
 	profileproperty_id 			serial,
 	profileproperty_profile_id		integer default NULL,
-	profileproperty_name		varchar(32) NOT NULL default '',
-	profileproperty_property_value	text NOT NULL default '',
+	profileproperty_name		        varchar(32) NOT NULL default '',
+	profileproperty_value	                text NOT NULL default '',
 	PRIMARY KEY (profileproperty_id)
 );
 

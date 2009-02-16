@@ -830,15 +830,17 @@ function html_company_view_main($co_q, $coords) {
           $datas[] = nl2br($value);
         }
       }
+      $template='<tr><th>%s</th><td>%s</td></tr>';
       switch ($kind) {
         case 'website' :
-          $data = "<a href=\"$datas[0]\">$datas[0]</a>";
+          $data = "<a href=\"$datas[0]\">".((strpos($datas[0],'://') === false)?'http://'.$datas[0]:$datas[0])."</a>";
           break;
         case 'email' :
           $data = "<a href=\"mailto:$datas[0]\">$datas[0]</a>";
           break;
         case 'address' :
           $data = implode('<br />', $datas);
+          $template = '<tr><th>%s</th><td>%s</td></tr><tr><td colspan="2">&nbsp;</td></tr>';
           $map_address = urlencode(implode(' ', $datas));
           foreach ($datas as $k => $v) {
             $datas[$k] = addslashes($v);
@@ -850,7 +852,7 @@ function html_company_view_main($co_q, $coords) {
         default :
           $data = implode('<br />', $datas);
       }
-      $coords .= "<tr><th>$header</th><td>$data</td></tr>";
+      $coords .= sprintf($template, $header, $data);
     }
     $block .= "
     <div class=\"detail infos\">

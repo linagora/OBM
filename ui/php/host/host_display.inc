@@ -290,7 +290,7 @@ function html_host_consult($host_q) {
   global $display, $perm, $menu, $action, $cright_write;
   global $l_perms;
   global $l_enable, $l_disable, $l_empty, $l_not_assigned;
-  global $l_user;
+  global $l_user, $l_fqdn;
   global $l_system, $l_help_system,$l_domain;
 
 
@@ -303,6 +303,7 @@ function html_host_consult($host_q) {
   $name = $host_q->f('host_name');
   $desc = $host_q->f('host_description');
   $ip = $host_q->f('host_ip');
+  $fqdn = $host_q->f('host_fqdn');
   $user_id = $host_q->f('userobm_id');
   $user_login = $host_q->f('userobm_login');
   $domain_name = ($host_q->f('domain_name') != '' ? $host_q->f('domain_name') : 'GLOBAL');
@@ -371,6 +372,10 @@ function html_host_consult($host_q) {
     </tr>
     $block_delegation
     <tr>
+      <th>$l_fqdn</th>
+      <td>$fqdn</td>
+    </tr>    
+    <tr>
       <th>$l_ip</th>
       <td>$ip</td>
     </tr>
@@ -402,7 +407,7 @@ function html_host_consult($host_q) {
 function html_host_form($action, $host_q, $host, $field='') {
   global $cgp_use, $l_domain, $l_insert, $l_update, $l_back;
   global $l_module_host, $l_name, $l_desc, $l_ip, $l_smb;
-  global $l_perms, $l_header_new;
+  global $l_perms, $l_header_new, $l_fqdn;
   global $l_host_select_user, $l_user, $l_clear;
   global $ico_user, $display, $obm, $c_services;
   
@@ -412,6 +417,7 @@ function html_host_form($action, $host_q, $host, $field='') {
     $name = $host_q->f('host_name');
     $delegation = $host_q->f('host_delegation');
     $ip = $host_q->f('host_ip');
+    $fqdn = $host_q->f('host_fqdn');
     $samba = $host_q->f('host_samba');
     $imap = $host_q->f('host_imap');
     $smtp_in = $host_q->f('host_smtp_in');
@@ -427,6 +433,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['name'])) { $name = stripslashes($host['name']); }
   if (isset($host['delegation'])) { $delegation = stripslashes($host['delegation']); }
   if (isset($host['ip'])) { $ip = $host['ip']; }
+  if (isset($host['fqdn'])) { $fqdn = $host['fqdn']; }
   if (isset($host['samba'])) { $samba = $host['samba']; }
   if (isset($host['imap'])) { $imap = $host['imap']; }
   if (isset($host['smtp_in'])) { $smtp_in = $host['smtp_in']; }
@@ -528,6 +535,11 @@ function html_host_form($action, $host_q, $host, $field='') {
     <td>
       <input name=\"tf_ip\" maxlength=\"16\" size=\"16\" value=\"$ip\" /></td>
   </tr>
+  <tr>
+    <th class=\"$class[fqdn]\">$l_fqdn</th>
+    <td>
+      <input name=\"tf_fqdn\" value=\"$fqdn\" /></td>
+  </tr>  
   $block_samba
   $block_mail  
   <tr>
@@ -638,6 +650,7 @@ function dis_host_warn_insert($id, $h_q, $host) {
   $delegation = $host['delegation'];
   $ip = $host['ip'];
   $desc = $host['desc'];
+  $fqdn = $host['fqdn'];
 
   $display['msg'] .= display_warn_msg($l_check_samehost);
   while ($h_q->next_record()) {
@@ -656,6 +669,7 @@ function dis_host_warn_insert($id, $h_q, $host) {
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />
     <input type=\"hidden\" name=\"tf_ip\" value=\"$ip\" />
+    <input type=\"hidden\" name=\"tf_fqdn\" value=\"$fqdn\" />
     <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
 ";
 

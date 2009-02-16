@@ -789,7 +789,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
 
   $current->setHour($ccalendar_first_hour);
   // Week Calendar content
-  while ($current->compareHour($ccalendar_last_hour) < 0) {
+  while ($current->compareHour($ccalendar_last_hour) < 0 && $current->compareDateIso($end) <= 0) {
     $current->setDateIso($date);
     if($current->compareMinute(0) == 0) $label = $current->get(Of_Date::TIME_SHORT);
     else $label = '';
@@ -886,7 +886,7 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
   $current = clone $date;  
   $current->setHour($ccalendar_first_hour);
   // Display Calendar
-  while($current->compareHour($ccalendar_last_hour) < 0) {
+  while($current->compareHour($ccalendar_last_hour) < 0 && $current->compareDateIso($date) == 0) {
     if($current->compareMinute(0) == 0) $label = $current->get(Of_Date::TIME_SHORT);
     else $label = '';    
     $day_cal .= "\n<tr><th>$label</th><td id=\"time_".$current->getTimestamp()."\"></td></tr>";
@@ -3636,7 +3636,7 @@ function dis_calendar_free_interval($calendar, $entity_store) {
     $current->addDay(1);
   }  
   /* Events of the week */
-  while ($current->compareHour($ccalendar_last_hour) < 0) {  
+  while ($current->compareHour($ccalendar_last_hour) < 0 && $current->compareDateIso($end) <= 0) {  
     $current->setDateIso($date);
     if($current->compareMinute(0) == 0) $label = $current->get(Of_Date::TIME_SHORT);
     else $label = '';
@@ -5075,7 +5075,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
         $title = "ii ";
       }
       if (!$occurrence->event->all_day){
-        $title .= $occurrence->date->get(Of_Date::TIME_SHORT);
+        $title .= $occurrence->date->get(Of_Date::TIME_SHORT).' - ';
       }
 
       if ($occurrence->event->privacy && !(in_array($obm['uid'],$attendee['user']))) {

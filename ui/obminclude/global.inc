@@ -202,8 +202,8 @@ $cright_write_admin = 16;
 // admin  : 1D (bits 0+2+3+4) : can do everything
 $perm_reader = '01';
 $perm_user = '03';
-$perm_editor = '05';
-$perm_admin = '1D';
+$perm_editor = '06';
+$perm_admin = '1F';
 
 ///////////////////////////////////////////////////////////////////////////////
 // Load global parameters from .ini file
@@ -883,7 +883,6 @@ function of_date_upd_format($date='', $null_empty=false) {
   } else {
     return null;
   }
-
   if ($type == 'user') {
     $type = $_SESSION['set_date_upd'];
   }
@@ -891,17 +890,17 @@ function of_date_upd_format($date='', $null_empty=false) {
   case 'Y-m-d' :
     preg_match("/^(\d{4})[-\/](\d{2})[-\/](\d{2})/",$date, $d);
     $date = new Of_Date("$d[1]-$d[2]-$d[3]");
-    $date = $date->getTimestamp();
+    $date = $date->getInputDate();
     break;
   case 'd/m/Y' :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
     $date = new Of_Date("$d[3]-$d[2]-$d[1]");
-    $date = $date->getTimestamp();
+    $date = $date->getInputDate();
     break;
   case 'm/d/Y' :
     preg_match("/^(\d{2})[-\/]?(\d{2})[-\/]?(\d{4})/",$date, $d);
     $date = new Of_Date("$d[3]-$d[1]-$d[2]");
-    $date = $date->getTimestamp();
+    $date = $date->getInputDate();
     break;
   case 't' :
     $date = date($_SESSION['set_date_upd'], $date);

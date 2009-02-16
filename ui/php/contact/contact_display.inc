@@ -795,20 +795,22 @@ function html_contact_view_main($co_q, $coords) {
       //  $l_address 1
       //  <a href=\"javascript: return false;\" onclick=\"contact_copy_clip('$copy'); return false;\" title=\"$l_copy\" ><img alt=\"$l_copy\" src=\"$ico_clipboard\" /></a>
       //}
+      $template='<tr><th>%s</th><td>%s</td></tr>';
       switch ($kind) {
         case 'website' :
-          $data = "<a href=\"$datas[0]\">$datas[0]</a>";
+          $data = "<a href=\"$datas[0]\">".((strpos($datas[0],'://') === false)?'http://'.$datas[0]:$datas[0])."</a>";
           break;
         case 'email' :
           $data = "<a href=\"mailto:$datas[0]\">$datas[0]</a>";
           break;
         case 'address' :
           $data = implode('<br />', $datas);
+          $template = '<tr><th>%s</th><td>%s</td></tr><tr><td colspan="2">&nbsp;</td></tr>';
           break;
         default :
           $data = implode('<br />', $datas);
       }
-      $coords .= "<tr><th>$header</th><td>$data</td></tr>";
+      $coords .= sprintf($template, $header, $data);
     }
     $block .= "
     <div class=\"detail infos\">

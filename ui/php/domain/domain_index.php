@@ -337,7 +337,6 @@ function get_domain_action() {
 
 // Delete
   $actions['domain']['delete'] = array (
-    'Name'     => "aaa",
     'Url'      => "$path/domain/domain_index.php?action=delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 

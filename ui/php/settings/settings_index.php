@@ -231,7 +231,7 @@ $sel_dsrc .= '</select>';
 if ($perm->check_right($module, $cright_write_admin)) {
 
   $dis_debug = "
-  <tr>
+  <tr id='debug'>
     <th>$l_set_debug ($_SESSION[set_debug])</th>
     <td>
       <input type=\"checkbox\" name=\"debug_id\" value=\"$cdg_id\" $dg_id />$l_dg_id
@@ -290,24 +290,24 @@ $display['detail'] .= "
 <!--User preferences current config -->
 
   <form action=\"settings_index.php\" method=\"get\">
-  <fieldset class=\"detail infos\">
+  <fieldset id='currentSettigns1' class=\"detail infos\">
   <legend>$l_cur_settings</legend>
   <table>
-  <tr>
+  <tr id='menu'>
     <th>$l_set_menu</th>
     <td>
       <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_txt\" $me_txt />$l_me_txt</span>
       <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_ico\" $me_ico />$l_me_ico</span>
       <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both</span>
     </td>
-  </tr><tr>
+  </tr><tr id='autoDispay'>
     <th>$l_auto_display</th>
     <td>
       <input type=\"checkbox\" name=\"display\" value=\"yes\" ";
 if ($_SESSION['set_display'] == 'yes') $display['detail'] .= "checked = \"checked\"";
 $display['detail'] .= " /></td>
   </tr>
-  <tr>
+  <tr id='rows'>
     <th>$l_set_rows</th>
     <td>
       <input size=\"3\" name=\"rows\" value=\"".$_SESSION['set_rows']."\" /></td>
@@ -318,7 +318,7 @@ if ($cgp_show['module']['todo']) {
   $display['detail'] .= "
 
 <!-- Todo Order config -->
-  <tr>
+  <tr id='todo'>
     <th>$l_set_todo</th>
     <td>$sel_todo</td>
   </tr>";
@@ -327,23 +327,23 @@ if ($cgp_show['module']['todo']) {
 $display['detail'] .= "
 
 <!-- Data Source config -->
-  <tr>
+  <tr id='datasource'>
     <th>$l_datasource</th>
     <td>$sel_dsrc</td>
   </tr>
   </table>
   </fieldset>
-  <fieldset class=\"detail infos\">
+  <fieldset id='currentSettings2' class=\"detail infos\">
   <legend>$l_cur_settings</legend>
   <table>
 <!-- Date Format config -->
-  <tr>
+  <tr id='commentOrder'>
     <th>$l_set_commentorder</th>
     <td>
       <span class=\"NW\"><input type=\"radio\" name=\"commentorder\" value=\"$cco_chro\" $co_chro />$l_co_chro</span>
       <span class=\"NW\"><input type=\"radio\" name=\"commentorder\" value=\"$cco_rev\" $co_rev />$l_co_rev</span>
     </td>
-  </tr><tr>
+  </tr><tr id='mail'>
     <th>$l_send_mail</th>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"mail\" value=\"yes\" ";
@@ -355,7 +355,7 @@ $display['detail'] .= " /></td>
 if ($cgp_show['module']['calendar']) {
 
 $display['detail'] .= "
-  <tr>
+  <tr id='mailParticipation'>
     <th>$l_send_mail_participation</th>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"mail_participation\" value=\"yes\" ";
@@ -392,7 +392,7 @@ $display['detail'] .= " /></td>
   }
   $dis_hour_e .= "</select>";    
   $display['detail'] .= "
-  <tr>
+  <tr id='displayDays'>
     <th>$l_set_display_days</th>
     <td>
     <select name='sel_display_days'>
@@ -401,7 +401,7 @@ $display['detail'] .= " /></td>
     </select>
     </td>
   </tr>
-  <tr>
+  <tr id='calendarInterval'>
     <th>$l_set_cal_interval</th>
     <td>
       <span class=\"NW\"><input type=\"radio\" name=\"cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4</span>
@@ -409,12 +409,12 @@ $display['detail'] .= " /></td>
       <span class=\"NW\"><input type=\"radio\" name=\"cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1</span>
     </td>
   </tr>
-  <tr>
+  <tr id='calendarFirstHour'>
     <th>$l_set_cal_first_hour</th>
     <td>$dis_hour_b</td>
 
   </tr>
-  <tr>
+  <tr id='calendarLastHour'>
     <th>$l_set_cal_last_hour</th>
     <td>$dis_hour_e</td>
   </tr>
@@ -430,7 +430,7 @@ foreach($timezone_identifiers as $tz) {
   }
 }
 $display['detail'] .= "
-  <tr>
+  <tr id='csvSeparator'>
   <th>$l_set_csv_sep</th>
   <td>
     <span class=\"NW\"><input type=\"radio\" name=\"csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc</span>
@@ -440,9 +440,9 @@ $display['detail'] .= "
   $dis_debug
   </table>
   </fieldset>
-  <fieldset class=\"detail extra\">
+  <fieldset id='dateSettings' class=\"detail extra\">
   <legend>$l_date</legend>
-  <table>
+  <table id='dateUpdate'>
   <tr>
   <td>$l_set_date_upd</td>
   <td>
@@ -458,7 +458,7 @@ $display['detail'] .= "
     <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_txt\" $da_txt />$l_da_txt</span>
   </td>
   </tr>
-  <table>
+  <table id='dateTimezone'>
   <tr>
   <td>$l_timezone</td>
   <td>
@@ -478,13 +478,13 @@ $display['detail'] .= "
   </form>
   <hr />
 <!-- Lang and theme current config -->
-  <div class=\"detail infos\">
+  <div class=\"detail infos\" id='langSettings'>
   <h1>$l_cur_lang</h1>
   <img src=\"".${'flag_'.$_SESSION['set_lang']}."\" alt=\"[language]\" />
   <h1>$l_set_lang</h1>
   $dis_lang
   </div>
-  <div class=\"detail infos\">
+  <div class=\"detail infos\" id='themeSettings'>
   <h1>$l_cur_theme</h1>
   <img src=\"".${"preview_".$_SESSION['set_theme']}."\" alt=\"[Theme]\"  />
   <h1>$l_set_theme</h1>

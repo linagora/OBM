@@ -178,7 +178,7 @@ function get_profile_params() {
     foreach($params['rights'] as $module => $rights) {
       $params['module'][$module] = 0;
       foreach($rights as $right) {
-        $params['module'][$module] = $params['module'][$module] | hexdec($right);
+        $params['module'][$module] = $params['module'][$module] | ($right);
       }
     } 
   }

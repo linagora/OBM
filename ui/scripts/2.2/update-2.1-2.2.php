@@ -29,7 +29,10 @@
 $path = "../../php";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-
+$perm_reader = '01';
+$perm_user = '03';
+$perm_editor = '05';
+$perm_admin = '1F';
 //------------------------------//
 // Default Profiles definitions //
 // Copy of global.inc from 2.1  //
@@ -134,7 +137,10 @@ function make_profiles() {
       $data['module'] = array('default' => $perm_user, 'calendar' => $perm_editor);
     }
     foreach ($data['module'] as $module_name => $module) {
-      $module_value = hexdec($module_value);
+      $module = hexdec($module);
+      if(($module & 1 == 1) && ($module & 2 != 2)) {
+        $module += 2;
+      }
       echo "**** Right on module $module_name : $module \n";
       $query = "INSERT INTO ProfileModule (
             profilemodule_module_name,
@@ -145,7 +151,7 @@ function make_profiles() {
             '$module_name',
             $global_domain_id,
             $profile_id,
-           ".hexdec($module)." 
+            $module 
           )";    
       $obm_q->query($query);
     }
