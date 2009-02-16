@@ -387,7 +387,7 @@ function get_resourcegroup_action() {
 
 // Ext get Ids : external Group selection
   $actions["resourcegroup"]["ext_get_ids"] = array (
-    'Right'    => $cright_write,
+    'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	  );
 
