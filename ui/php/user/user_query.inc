@@ -2313,21 +2313,20 @@ function run_query_batch_processing_update($params, $users_id) {
   $nomade_local_copy = $params['nomade_local_copy'];
   
   // Coords
-  $is_phone_up = bool($params['to_update_phone']);
-  $is_phone2_up = bool($params['to_update_phone2']);
-  $is_mobile_up = bool($params['to_update_mobile']);
-  $is_fax_up = bool($params['to_update_fax']);
-  $is_fax2_up = bool($params['to_update_fax2']);
-  $is_company_up = bool($params['to_update_company']);
-  $is_direction_up = bool($params['to_update_direction']);
-  $is_service_up = bool($params['to_update_service']);
-  $is_address1_up = bool($params['to_update_address1']);
-  $is_address2_up = bool($params['to_update_address2']);
-  $is_address3_up = bool($params['to_update_address3']);
-  $is_zipcode_up = bool($params['to_update_zipcode']);
-  $is_town_up = bool($params['to_update_town']);
-  $is_expresspostal_up = bool($params['to_update_expresspostal']);
-  
+  $is_phone_up = (strtolower($params['to_update_phone']) == 'true');
+  $is_phone2_up = (strtolower($params['to_update_phone2']) == 'true');
+  $is_mobile_up = (strtolower($params['to_update_mobile']) == 'true');
+  $is_fax_up = (strtolower($params['to_update_fax']) == 'true');
+  $is_fax2_up = (strtolower($params['to_update_fax2']) == 'true');
+  $is_company_up = (strtolower($params['to_update_company']) == 'true');
+  $is_direction_up = (strtolower($params['to_update_direction']) == 'true');
+  $is_service_up = (strtolower($params['to_update_service']) == 'true');
+  $is_address1_up = (strtolower($params['to_update_address1']) == 'true');
+  $is_address2_up = (strtolower($params['to_update_address2']) == 'true');
+  $is_address3_up = (strtolower($params['to_update_address3']) == 'true');
+  $is_zipcode_up = (strtolower($params['to_update_zipcode']) == 'true');
+  $is_town_up = (strtolower($params['to_update_town']) == 'true');
+  $is_expresspostal_up = (strtolower($params['to_update_expresspostal']) == 'true');
   $phone = "".$params['phone'];
   $phone2 = "".$params['phone2'];
   $mobile = "".$params['mobile'];
@@ -2414,22 +2413,6 @@ function run_query_batch_processing_update($params, $users_id) {
   }
   
   return $retour;
-}
-
-/**
- * Function which transform a mixed boolean to real boolean
- *
- * @param mixed $var
- * @return boolean
- */
-function bool($var) {
-    switch (strtolower($var)) {
-        case ("true"):
-        case (true): return true;
-        case ("false"):
-        case (false): return false;
-        default: return false;
-    }
 }
 
 // FUNCTION - automatic mail server chooser hooks
