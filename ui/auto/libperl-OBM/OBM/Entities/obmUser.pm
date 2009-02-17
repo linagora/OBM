@@ -706,9 +706,7 @@ sub createLdapEntry {
     $self->setLdapSambaPasswd( $entry );
 
     # Samba password must change
-    if( $self->{'entityDesc'}->{'userobm_samba_passwd_change'} ) {
-        $entry->add( sambaPwdMustChange => $self->{'entityDesc'}->{'userobm_samba_passwd_change'} );
-    }
+    $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_samba_passwd_change'}, $entry, 'sambaPwdMustChange' );
 
     # Samba session script
     if( $self->{'entityDesc'}->{'userobm_samba_logon_script'} ) {
