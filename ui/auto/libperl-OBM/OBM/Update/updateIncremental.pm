@@ -23,8 +23,8 @@ sub new {
     if( !defined($parameters) ) {
         $self->_log( 'Usage: PACKAGE->new(PARAMLIST)', 4 );
         return undef;
-    }elsif( !exists($parameters->{'user'}) && !exists($parameters->{'domain'}) && !exists($parameters->{'delegation' }) ) {
-        $self->_log( 'Usage: PARAMLIST: table de hachage avec la clé \'domain\' et optionnellement les cles \'user\' ou \'delegation\'', 4 );
+    }elsif( !exists($parameters->{'user'}) && !exists($parameters->{'domain-id'}) && !exists($parameters->{'delegation' }) ) {
+        $self->_log( 'Usage: PARAMLIST: table de hachage avec la clé \'domain-id\' et optionnellement les cles \'user\' ou \'delegation\'', 4 );
         return undef;
     }
 
@@ -39,10 +39,10 @@ sub new {
     $self->{'incremental'} = $parameters->{'incremental'};
 
     # Domain identifier
-    if( defined($parameters->{'domain'}) ) {
-        $self->{'domain'} = $parameters->{'domain'};
+    if( defined($parameters->{'domain-id'}) ) {
+        $self->{'domainId'} = $parameters->{'domain-id'};
     }else {
-        $self->_log( 'Le parametre domaine doit etre precise', 0 );
+        $self->_log( 'Le parametre domain-id doit etre precise', 0 );
     }
 
     # User identifier
@@ -89,14 +89,14 @@ sub update {
 
     require OBM::incrementalTableUpdater;
     $self->_log( 'initialisation de l\'incrémental table updater', 2 );
-    if( !($self->{'incrementalTableUpdater'} = OBM::incrementalTableUpdater->new( $self->{'domain'}, $self->{'user'}, $self->{'delegation'} )) ) {
+    if( !($self->{'incrementalTableUpdater'} = OBM::incrementalTableUpdater->new( $self->{'domainId'}, $self->{'user'}, $self->{'delegation'} )) ) {
         $self->_log( 'echec de l\'initialisation de l\'incrémental table updater', 2 );
         return 1;
     }
 
     require OBM::entitiesFactory;
     $self->_log( 'initialisation de l\'entity factory', 2 );
-    if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'INCREMENTAL', $self->{'domain'}, $self->{'user'}, $self->{'delegation'} )) ) {
+    if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'INCREMENTAL', $self->{'domainId'}, $self->{'user'}, $self->{'delegation'} )) ) {
         $self->_log( 'echec de l\'initialisation de l\'entity factory', 0 );
         return 1;
     }

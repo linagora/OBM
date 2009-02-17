@@ -23,7 +23,7 @@ sub new {
     if( !defined($parameters) ) {
         $self->_log( 'Usage: PACKAGE->new(PARAMLIST)', 4 );
         return undef;
-    }elsif( !exists($parameters->{'user'}) && !exists($parameters->{'domain'}) && !exists($parameters->{'delegation' }) ) {
+    }elsif( !exists($parameters->{'user'}) && !exists($parameters->{'domain-id'}) && !exists($parameters->{'delegation' }) ) {
         $self->_log( 'Usage: PARAMLIST: table de hachage avec la clé \'domain\' et optionnellement les cles \'user\' ou \'delegation\'', 4 );
         return undef;
     }
@@ -39,10 +39,10 @@ sub new {
     $self->{'global'} = $parameters->{'global'};
 
     # Domain identifier
-    if( defined($parameters->{'domain'}) ) {
-        $self->{'domain'} = $parameters->{'domain'};
+    if( defined($parameters->{'domain-id'}) ) {
+        $self->{'domainId'} = $parameters->{'domain-id'};
     }else {
-        $self->_log( 'Le parametre domaine doit etre precise', 0 );
+        $self->_log( 'Le parametre domain-id doit etre precise', 0 );
     }
 
     # User identifier
@@ -89,7 +89,7 @@ sub update {
 
     require OBM::entitiesFactory;
     $self->_log( 'initialisation de l\'entity factory', 2 );
-    if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'GLOBAL', $self->{'domain'} )) ) {
+    if( !($self->{'entitiesFactory'} = OBM::entitiesFactory->new( 'GLOBAL', $self->{'domainId'} )) ) {
         $self->_log( 'echec de l\'initialisation de l\'entity factory', 0 );
         return 1;
     }
@@ -197,7 +197,7 @@ sub update {
     require OBM::incrementalTableUpdater;
     $self->_log( 'purge des tables du mode incrémental', 2 );
     my $incrementalTableUpdater;
-    if( !($incrementalTableUpdater = OBM::incrementalTableUpdater->new( $self->{'domain'}, undef, undef )) || $incrementalTableUpdater->purgeBd() ) {
+    if( !($incrementalTableUpdater = OBM::incrementalTableUpdater->new( $self->{'domainId'}, undef, undef )) || $incrementalTableUpdater->purgeBd() ) {
         $self->_log( 'echec du purge des tables incrémentales non effectuée', 0 );
         return 1;
     }
