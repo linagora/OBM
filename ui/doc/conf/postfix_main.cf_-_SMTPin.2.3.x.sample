@@ -1,4 +1,6 @@
 # See /usr/share/postfix/main.cf.dist for a commented, more complete version
+#mailbox_command = procmail -a "$EXTENSION"
+#mailbox_size_limit = 0
 
 smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
 biff = no
@@ -64,8 +66,6 @@ transport_maps = hash:/etc/postfix/transport
 #lmtp_sasl_password_maps = hash:/etc/postfix/lmtp_sasl_passwd
 #lmtp_sasl_security_options = noanonymous
 
-mailbox_command = procmail -a "$EXTENSION"
-mailbox_size_limit = 0
 recipient_delimiter = +
 
 # Ecoute uniquement sur l'interface locale

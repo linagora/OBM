@@ -1,4 +1,5 @@
 # See /usr/share/postfix/main.cf.dist for a commented, more complete version
+#mailbox_command = procmail -a "$EXTENSION"
 
 smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
 biff = no
@@ -15,7 +16,6 @@ alias_database = hash:/etc/aliases
 myorigin = /etc/mailname
 mydestination = smtp-out.aliacom.local, localhost.aliacom.local, localhost
 mynetworks = 127.0.0.0/8
-mailbox_command = procmail -a "$EXTENSION"
 mailbox_size_limit = 0
 recipient_delimiter = +
 inet_interfaces = loopback-only
