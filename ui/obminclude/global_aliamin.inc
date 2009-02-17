@@ -23,6 +23,8 @@ function get_email_used($emails, $id='', $gid='', $mid='') {
 
   foreach($emails as $email) {
     list($mail,$domain) = explode('@', $email);
+    $mail = addslashes($mail);
+    $domain = addslashes($domain);
     $user_query[] = "userobm_email LIKE '%$mail%'";
     $mailshare_query[] = "mailshare_email LIKE '%$mail%'";
     $group_query[] = "group_email LIKE '$mail%'";
