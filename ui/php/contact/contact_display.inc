@@ -11,6 +11,7 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
+$fieldnames['contact_displayname'] = $l_displayname;
 $fieldnames['contact_lastname'] = $l_lastname;
 $fieldnames['contact_firstname'] = $l_firstname;
 $fieldnames['contact_aka'] = $l_aka;
@@ -52,6 +53,22 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 
   $show_date = (! $cgp_hide['contact']['contact_date']);
   $ext_url = $params['ext_url'];
+
+    //  if (($fieldname == 'contact_lastname') && $link_ok) {
+  if ($fieldname == 'contact_displayname') {
+     $displayname = $OD->data_set->f('contact_firstname').' '.$OD->data_set->f('contact_lastname');
+    if(trim($displayname) == '') {
+      $displayname = $GLOBALS['l_data_unfilled'];
+    }
+    if ($OD->display_ext == 'get_id') {
+      $res['url'] = "javascript:check_contact_get_id(".$OD->data_set->f('contact_id').",'".phpStringToJsString($displayname)."');";
+    } else if ($OD->display_ext == 'get_id_url') {
+      $res['url'] = "javascript:check_contact_get_id_url('$ext_url',".$OD->data_set->f('contact_id').");";
+    } else {
+      $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('contact_id');
+    }
+    $res['name'] = $displayname;
+  }
 
   //  if (($fieldname == 'contact_lastname') && $link_ok) {
   if ($fieldname == 'contact_lastname') {
@@ -345,29 +362,30 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>$l_firstname<br />
       <input type=\"text\" name=\"tf_fname\" size=\"12\" value=\"$fname\" />
     </label>
-    <label>$l_visibility<br />
-      $sel_privacy
-    </label>      
-    <label>$l_phone<br />
-      <input type=\"text\" name=\"tf_phone\" size=\"12\" maxlength=\"24\" value=\"$phone\" />
-    </label>
-    <label>$l_email<br />
-      <input type=\"text\" name=\"tf_email\" size=\"32\" value=\"$email\" />
-    </label>
     <label>$l_from_company<br />
       <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
+    </label>
+    <label>$l_email<br />
+      <input type=\"text\" name=\"tf_email\" size=\"16\" value=\"$email\" />
+    </label>      
+    <div id='searchMore' style=\"display:none\">
+    <label>$l_phone<br />
+      <input type=\"text\" name=\"tf_phone\" size=\"12\" maxlength=\"24\" value=\"$phone\" />
+    </label>      
+    <label>$l_town<br />
+      <input type=\"text\" name=\"tf_town\" id=\"tf_town\" size=\"24\"
+      value=\"$town\" />
     </label>
     <label>$l_postcode<br />
       <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
       value=\"$zip\" />
     </label>
-    <label>$l_town<br />
-      <input type=\"text\" name=\"tf_town\" id=\"tf_town\" size=\"24\"
-      value=\"$town\" />
-    </label>
     <label>$l_country<br />
       $sel_ctry
-    </label>
+      </label>
+    <label>$l_visibility<br />
+      $sel_privacy
+    </label>            
     $block_datasource
     $block_function
     $block_title
@@ -392,12 +410,19 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>$l_fuzzy<br />
       <input type=\"checkbox\" name=\"cba_fuzzy\" value=\"1\" $fuzzy />
     </label>
+    </div>
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"hd_company_id\" type=\"hidden\" value=\"$company_id\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext &nbsp;
+    </label>
+    <label>
+    <br />
+    <a href='#' onclick=\"if($('searchMore').getStyle('display') == 'none') { $('searchMore').setStyle('display',''); this.innerHTML = '".phpStringToJsString($GLOBALS['l_less_fields'])."'} else { $('searchMore').setStyle('display','none'); this.innerHTML = '".phpStringToJsString($GLOBALS['l_more_fields'])."'} return false;\">
+    $GLOBALS[l_more_fields] 
+    </a>
     </label>
     <p class=\"CL\" />
   </form>";

@@ -79,6 +79,7 @@ $l_next = "Suivant";
 $l_text = "Texte";
 $l_name = "Nom";
 $l_kind = "Genre";
+$l_displayname = 'Nom complet';
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_title = "Titre";
@@ -246,7 +247,7 @@ $l_unselect_all = "Tout désélectionner";
 $l_pagelayout = "Orientation";
 $l_pagelayout_portrait = "Portrait";
 $l_pagelayout_landscape = "Paysage";
-
+$l_data_unfilled = 'Non renseigné';
 // Global display
 $l_last_visit = "Dernières visites";
 
@@ -257,7 +258,8 @@ $l_help_display_no = "Le champ n'est pas affiché. Cliquer pour l'afficher";
 $l_help_mandatory = "Le champ est obligatoire";
 $l_help_down  = "Descendre le champ d'un cran";
 $l_help_up = "Monter le champ d'un cran";
-
+$l_more_fields = "Plus d'options";
+$l_less_fields = "Moins d'options";
 // Javascript common messages
 $l_fill_label = "Vous devez renseigner le Label.";
 $l_fill_status = "Vous devez renseigner l'état.";

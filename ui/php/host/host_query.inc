@@ -671,12 +671,12 @@ function check_host_data_form($host) {
       }
     }
   }
-    // Host FQDN correct
-    if (! preg_match($php_regexp_fqdn, $fqdn)) {
-      $err['msg'] = " $fqdn : $l_err_host_fqdn";
-      $err['field'] = 'fqdn';
-      return false;
-    }  
+  // Host FQDN correct
+  if (trim($fqdn) != '' && !preg_match($php_regexp_fqdn, $fqdn)) {
+    $err['msg'] = " $fqdn : $l_err_host_fqdn";
+    $err['field'] = 'fqdn';
+    return false;
+  }  
   // XXXXXXX verifier ici + fichiers de langue
   $d = of_domain_get_domain_infos($domain_id, true);
 

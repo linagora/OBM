@@ -231,7 +231,7 @@ $sel_dsrc .= '</select>';
 if ($perm->check_right($module, $cright_write_admin)) {
 
   $dis_debug = "
-  <tr id='debug'>
+  <tr id='settings_debug'>
     <th>$l_set_debug ($_SESSION[set_debug])</th>
     <td>
       <input type=\"checkbox\" name=\"debug_id\" value=\"$cdg_id\" $dg_id />$l_dg_id
@@ -293,21 +293,21 @@ $display['detail'] .= "
   <fieldset id='currentSettigns1' class=\"detail infos\">
   <legend>$l_cur_settings</legend>
   <table>
-  <tr id='menu'>
+  <tr id='settings_menu'>
     <th>$l_set_menu</th>
     <td>
       <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_txt\" $me_txt />$l_me_txt</span>
       <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_ico\" $me_ico />$l_me_ico</span>
       <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both</span>
     </td>
-  </tr><tr id='autoDispay'>
+  </tr><tr id='settings_autoDispay'>
     <th>$l_auto_display</th>
     <td>
       <input type=\"checkbox\" name=\"display\" value=\"yes\" ";
 if ($_SESSION['set_display'] == 'yes') $display['detail'] .= "checked = \"checked\"";
 $display['detail'] .= " /></td>
   </tr>
-  <tr id='rows'>
+  <tr id='settings_rows'>
     <th>$l_set_rows</th>
     <td>
       <input size=\"3\" name=\"rows\" value=\"".$_SESSION['set_rows']."\" /></td>
@@ -318,7 +318,7 @@ if ($cgp_show['module']['todo']) {
   $display['detail'] .= "
 
 <!-- Todo Order config -->
-  <tr id='todo'>
+  <tr id='settings_todo'>
     <th>$l_set_todo</th>
     <td>$sel_todo</td>
   </tr>";
@@ -327,7 +327,7 @@ if ($cgp_show['module']['todo']) {
 $display['detail'] .= "
 
 <!-- Data Source config -->
-  <tr id='datasource'>
+  <tr id='settings_datasource'>
     <th>$l_datasource</th>
     <td>$sel_dsrc</td>
   </tr>
@@ -337,13 +337,13 @@ $display['detail'] .= "
   <legend>$l_cur_settings</legend>
   <table>
 <!-- Date Format config -->
-  <tr id='commentOrder'>
+  <tr id='settings_commentOrder'>
     <th>$l_set_commentorder</th>
     <td>
       <span class=\"NW\"><input type=\"radio\" name=\"commentorder\" value=\"$cco_chro\" $co_chro />$l_co_chro</span>
       <span class=\"NW\"><input type=\"radio\" name=\"commentorder\" value=\"$cco_rev\" $co_rev />$l_co_rev</span>
     </td>
-  </tr><tr id='mail'>
+  </tr><tr id='settings_mail'>
     <th>$l_send_mail</th>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"mail\" value=\"yes\" ";
@@ -355,7 +355,7 @@ $display['detail'] .= " /></td>
 if ($cgp_show['module']['calendar']) {
 
 $display['detail'] .= "
-  <tr id='mailParticipation'>
+  <tr id='settings_mailParticipation'>
     <th>$l_send_mail_participation</th>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"mail_participation\" value=\"yes\" ";
@@ -392,7 +392,7 @@ $display['detail'] .= " /></td>
   }
   $dis_hour_e .= "</select>";    
   $display['detail'] .= "
-  <tr id='displayDays'>
+  <tr id='settings_displayDays'>
     <th>$l_set_display_days</th>
     <td>
     <select name='sel_display_days'>
@@ -401,7 +401,7 @@ $display['detail'] .= " /></td>
     </select>
     </td>
   </tr>
-  <tr id='calendarInterval'>
+  <tr id='settings_calendarInterval'>
     <th>$l_set_cal_interval</th>
     <td>
       <span class=\"NW\"><input type=\"radio\" name=\"cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4</span>
@@ -409,12 +409,12 @@ $display['detail'] .= " /></td>
       <span class=\"NW\"><input type=\"radio\" name=\"cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1</span>
     </td>
   </tr>
-  <tr id='calendarFirstHour'>
+  <tr id='settings_calendarFirstHour'>
     <th>$l_set_cal_first_hour</th>
     <td>$dis_hour_b</td>
 
   </tr>
-  <tr id='calendarLastHour'>
+  <tr id='settings_calendarLastHour'>
     <th>$l_set_cal_last_hour</th>
     <td>$dis_hour_e</td>
   </tr>
@@ -430,7 +430,7 @@ foreach($timezone_identifiers as $tz) {
   }
 }
 $display['detail'] .= "
-  <tr id='csvSeparator'>
+  <tr id='settings_csvSeparator'>
   <th>$l_set_csv_sep</th>
   <td>
     <span class=\"NW\"><input type=\"radio\" name=\"csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc</span>
@@ -442,7 +442,7 @@ $display['detail'] .= "
   </fieldset>
   <fieldset id='dateSettings' class=\"detail extra\">
   <legend>$l_date</legend>
-  <table id='dateUpdate'>
+  <table id='settings_dateUpdate'>
   <tr>
   <td>$l_set_date_upd</td>
   <td>
@@ -458,7 +458,7 @@ $display['detail'] .= "
     <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_txt\" $da_txt />$l_da_txt</span>
   </td>
   </tr>
-  <table id='dateTimezone'>
+  <table id='settings_dateTimezone'>
   <tr>
   <td>$l_timezone</td>
   <td>

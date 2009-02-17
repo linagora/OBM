@@ -41,6 +41,9 @@ $l_select_all = "Select all";
 $l_fast_search = "Fast search";
 $l_or = "or";
 $l_generate = "Generate";
+$l_data_unfilled = 'Unfilled';
+$l_more_fields = "More fields";
+$l_less_fields = "Less fields";
 
 // Common messages
 $l_users = "Users";
@@ -79,6 +82,7 @@ $l_next = "Next";
 $l_text = "Text";
 $l_name = "Name";
 $l_kind = "Kind";
+$l_displayname = 'Display name';
 $l_lastname = "Last name";
 $l_firstname = "First name";
 $l_title = "Title";

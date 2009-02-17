@@ -407,7 +407,7 @@ class Perm {
             'settings' => $perm_admin,
             'tools' => $perm_admin,
             'group' => $perm_user,
-			'profile' => $perm_admin
+            'profile' => $perm_admin
           ),
           'properties' => array (
             'admin_realm' => array ('domain')

@@ -2604,7 +2604,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_owner;
   global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
-  global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups;
+  global $l_none,$l_force,$l_repeat_update,$l_groups;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time, $l_color ;
@@ -3082,10 +3082,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   </tr> 
     $block_category1
   <tr>
-    <th>$l_sendamail</th>
-    <td><input type=\"checkbox\" id=\"cba_mail\" value=\"1\" name=\"cba_mail\" /></td>
-  </tr>
-  <tr>
     <th>$l_force</th>
     <td>$dis_force</td>
   </tr>   
@@ -3303,8 +3299,6 @@ function html_calendar_dis_delete($calendar) {
   $block = "
    <h1>$l_confirm_delete_all</h1>
    <div class=\"C\">
-    <a href=\"calendar_index.php?action=delete&calendar_id=$event_id&cba_mail=1\"><img src=\"$ico_validate\" alt=\"[ValidateMail]\"/></a>
-     $l_confirm_mail
     <a href=\"calendar_index.php?action=delete&calendar_id=$event_id\"><img src=\"$ico_validate\" alt=\"[Validate]\"/></a>
      $l_confirm
     <a href=\"calendar_index.php?action=detailconsult&calendar_id=$event_id&date=$iso\"><img src=\"$ico_cancel\" alt=\"[Cancel]\" /></a>
@@ -3325,10 +3319,13 @@ function html_calendar_dis_delete($calendar) {
 function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   global $display, $path;
   global $ico_add, $ico_delete, $ico_mini_cal;
-  global $ccalendar_resource;
+  global $ccalendar_resource, $obm;
   global $l_users,$l_datebegin,$l_dateend,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
   global $l_groups,$l_resources,$l_module_resourcegroup, $l_module_calendar;
   global $l_resources_one_freebusy,$l_resources_all_freebusy,$l_resource_group_search;
+
+  $calendar_readable = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access');
+  $resources_readable = OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'access');
 
   $date = $calendar['date'];
   $hourbegin = $calendar['time_duration'];
@@ -3392,8 +3389,11 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
       <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
       $dis_sel_user
     </td>";
+    $user_js = "
+    new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch');
+    new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
 
-  if ($ccalendar_resource) {
+  if ($ccalendar_resource && count($resources_readable) > 0) {
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $r_ent) {
 	$r_name = $r_ent['label'];
@@ -3519,8 +3519,20 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     <td id=\"sel_group_id\">
       <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />
       $dis_sel_group
-    </td>";
-
+  </td>";
+  if(count($calendar_readable) > 1) {
+    $dis_block_user = "<fieldset class=\"detail infos\">  
+      <legend>$l_users</legend>
+      <table>
+      <tr>
+        $block_user
+      </tr>
+      <tr>
+        $block_group
+        </tr>
+      </table>
+      </fieldset> ";
+  }
 
   $dis_hour_d = "<select style='width:4em;' name=\"sel_time_duration\">";
   for ($i=0;$i<24;$i++) {
@@ -3566,17 +3578,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   </tr>
   </table>
   </fieldset>   
-  <fieldset class=\"detail infos\">  
-  <legend>$l_users</legend>
-  <table>
-  <tr>
-    $block_user
-  </tr>
-  <tr>
-    $block_group
-    </tr>
-  </table>
-  </fieldset>   
+    $dis_block_user 
     $dis_block_resource
   <fieldset class=\"buttons\">
     $dis_button
@@ -3584,8 +3586,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   </form>
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch');
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');
+      $user_js
       $resource_js
     });
   </script>";
