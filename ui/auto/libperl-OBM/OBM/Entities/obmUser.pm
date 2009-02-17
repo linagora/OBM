@@ -209,9 +209,9 @@ sub _init {
 
     # User accout expiration date
     if( $userDesc->{'userobm_account_dateexp'} ) {
-        require POSIX;
+        require Time::Local;
         my @date_exp = split(/-/,$userDesc->{'userobm_account_dateexp'});
-        my $date_exp_timestamp = POSIX::mktime(0,0,0,$date_exp[2],$date_exp[1]-1,$date_exp[0]-1900,0,0,0);
+        my $date_exp_timestamp = Time::Local::timelocal(0,0,0,$date_exp[2],$date_exp[1]-1,$date_exp[0]-1900);
         $userDesc->{'userobm_account_dateexp_timestamp'} = $date_exp_timestamp;
     }
 
@@ -319,6 +319,9 @@ sub _init {
                 $userDesc->{'userobm_samba_perms'} = 0;
                 last SWITCH;
             }
+
+            # Samba password must not change
+            $userDesc->{'userobm_samba_passwd_change'} = 0;
 
             # Specific user UID
             if( lc($userDesc->{'userobm_perms'}) eq 'admin' ) {
@@ -701,9 +704,11 @@ sub createLdapEntry {
     }
 
     # Samba user passwords
-    if( $self->{'entityDesc'}->{'userobm_samba_nt_password'} ) {
-        $entry->add( sambaLMPassword => $self->{'entityDesc'}->{'userobm_samba_lm_password'} );
-        $entry->add( sambaNTPassword => $self->{'entityDesc'}->{'userobm_samba_nt_password'} );
+    $self->setLdapSambaPasswd( $entry );
+
+    # Samba password must change
+    if( $self->{'entityDesc'}->{'userobm_samba_passwd_change'} ) {
+        $entry->add( sambaPwdMustChange => $self->{'entityDesc'}->{'userobm_samba_passwd_change'} );
     }
 
     # Samba session script
@@ -924,13 +929,17 @@ sub updateLdapEntry {
                 # is defined in current user description, samba perms is
                 # re-enable, we must put 'sambaLMPassword' and
                 # 'sambaNTPassword'...
-                if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_samba_nt_password'}, $entry, 'sambaNTPassword' ) ) {
-                    $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_samba_lm_password'}, $entry, 'sambaLMPassword' );
+                if( $self->setLdapSambaPasswd( $entry ) ) {
                     $update = 1;
                 }
 
-                # ...and 'sambaAcctFlags' too.
+                # ...and 'sambaAcctFlags'...
                 if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_samba_flags'}, $entry, 'sambaAcctFlags' ) ) {
+                    $update = 1;
+                }
+
+                # ...and 'sambaPwdMustChange'.
+                if( $self->_modifyAttr( 0, $entry, 'sambaPwdMustChange' ) ) {
                     $update = 1;
                 }
             }
@@ -1171,4 +1180,48 @@ sub getBdUpdate {
     }
 
     return 0;
+}
+
+
+sub setLdapSambaPasswd {
+    my $self = shift;
+    my( $entry, $plainPasswd ) = @_; 
+    my $update = 0;
+
+    if( ref($entry) ne 'Net::LDAP::Entry' ) {
+        $self->_log( 'entrée LDAP incorrecte', 3 );
+        return undef;
+    }
+
+    if( !$OBM::Parameters::common::obmModules->{samba} ) {
+        $self->_log( 'module Samba désactivé', 0 );
+        return 0;
+    }
+
+    if( !$self->{'entityDesc'}->{'userobm_samba_perms'} ) {
+        $self->_log( $self->getDescription().' n\'a pas le droit mail', 2 );
+        return 0;
+    }
+
+    my $lmPasswd;
+    my $ntPasswd;
+    if( defined($plainPasswd) ) {
+        if( $self->_getNTLMPasswd( $plainPasswd, \$lmPasswd, \$ntPasswd ) ) {
+            $self->_log( 'probleme lors de la generation du mot de passe windows de \''.$self->getDescription().'\', droit samba annulé', 2 );
+            return undef;
+        }
+    }else {
+        $lmPasswd = $self->{'entityDesc'}->{'userobm_samba_lm_password'};
+        $ntPasswd = $self->{'entityDesc'}->{'userobm_samba_nt_password'};
+    }
+
+    if( $self->_modifyAttr( $ntPasswd, $entry, 'sambaNTPassword' ) ) {
+        $self->_modifyAttr( $lmPasswd, $entry, 'sambaLMPassword' );
+
+        # Update sambaPwdLastSet
+        $self->_modifyAttr( time(), $entry, 'sambaPwdLastSet' );
+        $update = 1;
+    }
+
+    return $update;
 }

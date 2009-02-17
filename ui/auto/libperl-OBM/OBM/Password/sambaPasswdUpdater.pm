@@ -3,9 +3,8 @@ package OBM::Password::sambaPasswdUpdater;
 $VERSION = '1.0';
 
 use OBM::Ldap::ldapEngine;
-use OBM::Password::passwd;
 use OBM::Ldap::utils;
-@ISA = ('OBM::Ldap::ldapEngine', 'OBM::Password::passwd', 'OBM::Ldap::utils');
+@ISA = ('OBM::Ldap::ldapEngine', 'OBM::Ldap::utils');
 
 $debug = 1;
 
@@ -52,13 +51,6 @@ sub update {
         return 0;
     }
 
-    my $lmPasswd;
-    my $ntPasswd;
-    if( $self->_getNTLMPasswd( $passwd, \$lmPasswd, \$ntPasswd ) ) {
-        $self->_log( 'echec de conversion du mot de passe Samba', 3 );
-        return 1;
-    }
-
 
     # Obtention des DNs de l'entité mise à jour
     my $currentEntityDNs = $entity->getCurrentDnPrefix();
@@ -70,14 +62,19 @@ sub update {
             return 1;
         }
 
-        if( $self->_modifyAttr( $ntPasswd , $updateLdapEntity, 'sambaNTPassword' ) && $self->_modifyAttr( $lmPasswd, $updateLdapEntity, 'sambaLMPassword' ) ) {
+        my $update = $entity->setLdapSambaPasswd( $updateLdapEntity, $passwd );
+        if( $update ) {
             if( $self->_ldapUpdateEntity($updateLdapEntity) ) {
                 $self->_log( 'échec de mise à jour de l\'entrée LDAP', 3 );
                 return 1;
             }
-        }else {
-            $self->_log( 'échec de mise à jour du mot de passe Unix', 3 );
+
+        }elsif( !defined($update) ) {
+            $self->_log( 'échec de mise à jour du mot de passe Samba', 3 );
             return 1;
+        }elsif( !$update ) {
+            $self->_log( 'pas de mise à jour du mot de passe Samba nécessaire', 3 );
+            return 0
         }
     }
 
