@@ -42,7 +42,7 @@ sub run {
     if( defined($updateSieve) ) {
         $errorCode = $updateSieve->update();
     }else {
-        $self->_log( 'problème à l\'initialisation di Sieve updater', 0 );
+        $self->_log( 'problème à l\'initialisation du Sieve updater', 0 );
         $errorCode = 1;
     }
 

@@ -1,5 +1,4 @@
 #!/usr/bin/perl -w -T
-
 #+-------------------------------------------------------------------------+
 #|   Copyright (c) 1997-2009 OBM.org project members team                  |
 #|                                                                         |
@@ -49,7 +48,7 @@ sub run {
 
     $self->_log( 'Analyse des paramètres du script', 3 ); 
     if( $self->_getParameter( $parameters ) ) {
-        $self->_log( 'Erreur à l\'analyse des parametres du scripts', 0 );
+        $self->_log( 'erreur à l\'analyse des parametres du scripts', 0 );
         return 1;
     }
 
