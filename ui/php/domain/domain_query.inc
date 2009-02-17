@@ -331,15 +331,15 @@ function check_domain_data_form($d_id, $domain) {
       $err['msg'] = "$GLOBALS[l_samba_domain_used] : $samba[domain]";
       return false;
     }    
-    if(!preg_match($GLOBALS['php_regexp_samba_profile'],$samba['profile'])) {
+    if($samba['profile'] != '' && !preg_match($GLOBALS['php_regexp_samba_profile'],$samba['profile'])) {
       $err['msg'] = "$GLOBALS[l_samba_profile_error] : $samba[profile]";
       return false;
     }
-    if(!preg_match($GLOBALS['php_regexp_samba_home'],$samba['home'])) {
+    if($samba['home'] != '' && !preg_match($GLOBALS['php_regexp_samba_home'],$samba['home'])) {
       $err['msg'] = "$GLOBALS[l_samba_home_error] : $samba[home]";
       return false;
     }
-    if(!preg_match($GLOBALS['php_regexp_samba_drive'],$samba['drive'])) {
+    if($samba['drive'] != '' && !preg_match($GLOBALS['php_regexp_samba_drive'],$samba['drive'])) {
       $err['msg'] = "$GLOBALS[l_samba_drive_error] : $samba[drive]";
       return false;
     }

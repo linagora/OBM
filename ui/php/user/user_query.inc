@@ -1781,14 +1781,14 @@ function check_user_data_form($p_id, &$user) {
   // Samba checks
   if ($cgp_use['service']['samba']) {
     // Samba home correct
-    if ($smb_perms == 1 && ($smb_home == '' || !preg_match($php_regexp_home, $smb_home))) {
+    if ($smb_perms == 1 && ($smb_home != '' && !preg_match($php_regexp_home, $smb_home))) {
       $err['msg'] = " $smb_home : $l_err_home";
       $err['field'] = 'smb_home';
       return false;
     }
 
     // Samba home drive correct
-    if ($smb_perms == 1 && ($smb_home_drive == '' || !preg_match($php_regexp_drive, $smb_home_drive))) {
+    if ($smb_perms == 1 && ($smb_home_drive != '' && !preg_match($php_regexp_drive, $smb_home_drive))) {
       $err['msg'] = " $smb_home_drive : $l_err_drive";
       $err['field'] = 'smb_home_drive';
       return false;
