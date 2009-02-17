@@ -8,6 +8,7 @@ use 5.006_001;
 use strict;
 
 
+my $domain = 'Domain';
 my $userObmTable = 'UserObm';
 my $mailShareTable = 'MailShare';
 
@@ -40,7 +41,6 @@ sub _getUserIdFromUserLoginDomain {
                  WHERE userobm_login='.$dbHandler->quote(lc($userLogin)).' AND userobm_domain_id='.$domainId;
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( 'utilisateur \''.$userLogin.'\' du domaine d\'ID \''.$domainId.'\' non existant', 3 );
         return undef;
     }
 
@@ -52,6 +52,44 @@ sub _getUserIdFromUserLoginDomain {
     }
 
     return $userId;
+}
+
+
+sub getUserIdByDomainId {
+    my $self = shift;
+    my( $domainList ) = @_;
+
+    if( defined($domainList) && ref($domainList) ne 'ARRAY' ) {
+        $self->_log( 'paramètre \'domainList\' incorrect', 3 );
+        return undef;
+    }
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connection à la base de données incorrecte !', 0 );
+        return undef;
+    }
+
+    my $query = 'SELECT userobm_id,
+                        userobm_domain_id
+                 FROM '.$userObmTable;
+
+    if( $domainList ) {
+        $query .= ' WHERE userobm_domain_id IN ('.join(', ', @{$domainList}).')';
+    }
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        return undef;
+    }
+
+    my %usersByDomainId;
+    while( my( $userId, $domainUserId ) = $queryResult->fetchrow_array() ) {
+        push( @{$usersByDomainId{$domainUserId}}, $userId );
+    }
+
+    return \%usersByDomainId;
 }
 
 
@@ -83,7 +121,6 @@ sub _getMailShareIdFromUserLoginDomain {
                  WHERE mailshare_name='.$dbHandler->quote(lc($mailShareName)).' AND mailshare_domain_id='.$domainId;
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-        $self->_log( 'partage de messagerie \''.$mailShareName.'\' du domaine d\'ID \''.$domainId.'\' non existant', 3 );
         return undef;
     }
 
@@ -95,4 +132,58 @@ sub _getMailShareIdFromUserLoginDomain {
     }
 
     return $mailShareId;
+}
+
+
+sub getDomainId {
+    my $self = shift;
+    my( $withGlobal, $domainName ) = @_;
+
+    if( !defined($withGlobal) ) {
+        $withGlobal = 1;
+    }
+
+    if( defined($domainName) && ref($domainName) !~ /$regexp_domain/ ) {
+        $self->_log( 'paramètre \'domainName\' incorrect', 3 );
+        return undef;
+    }
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+    if( !defined($dbHandler) ) {
+        $self->_log( 'connection à la base de données incorrecte !', 0 );
+        return undef;
+    }
+
+    my $query = 'SELECT domain_id
+                 FROM '.$domain;
+
+    my $whereClause = '';
+    if( !$withGlobal ) {
+        if( !$whereClause ) {
+            $whereClause .= ' WHERE';
+        }
+        $whereClause .= ' NOT domain_global';
+    }
+
+    if( $domainName ) {
+        if( !$whereClause ) {
+            $whereClause .= ' WHERE';
+        }else {
+            $whereClause .= ' AND';
+        }
+        $whereClause .= ' domain_name=\''.$dbHandler->quote($domainName).'\'';
+    }
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query.$whereClause, \$queryResult )) ) {
+        return undef;
+    }
+
+    my @domainIds;
+    while( my( $domainId ) = $queryResult->fetchrow_array() ) {
+        push( @domainIds, $domainId );
+    }
+
+    return \@domainIds;
 }
