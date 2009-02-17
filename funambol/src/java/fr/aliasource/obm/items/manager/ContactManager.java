@@ -261,9 +261,16 @@ public class ContactManager extends ObmManager {
 						obmcontact.getLastname()));
 		contact.getName().getNickname().setPropertyValue(obmcontact.getAka());
 
+		contact.getName().getMiddleName().setPropertyValue(obmcontact.getMiddlename());
+		contact.getName().getSuffix().setPropertyValue(obmcontact.getSuffix());
+
 		BusinessDetail bd = contact.getBusinessDetail();
 		PersonalDetail pd = contact.getPersonalDetail();
 
+		pd.setSpouse(obmcontact.getSpouse());
+		
+		bd.setAssistant(obmcontact.getAssistant());
+		bd.setManager(obmcontact.getManager());
 		bd.getCompany().setPropertyValue(obmcontact.getCompany());
 		bd.getDepartment().setPropertyValue(obmcontact.getService());
 		if (obmcontact.getTitle() != null) {
@@ -309,11 +316,16 @@ public class ContactManager extends ObmManager {
 
 		contact.setSensitivity(new Short((short) 2)); // olPrivate
 
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date bday = obmcontact.getBirthday();
 		if (bday != null) {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			sdf.setTimeZone(deviceTimeZone);
 			pd.setBirthday(sdf.format(bday));
+		}
+		Date anniv = obmcontact.getAnniversary();
+		if (anniv != null) {
+			sdf.setTimeZone(deviceTimeZone);
+			pd.setAnniversary(sdf.format(anniv));
 		}
 
 		return contact;
