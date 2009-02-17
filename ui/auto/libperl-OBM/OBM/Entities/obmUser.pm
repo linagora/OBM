@@ -211,8 +211,7 @@ sub _init {
     if( $userDesc->{'userobm_account_dateexp'} ) {
         require Time::Local;
         my @date_exp = split(/-/,$userDesc->{'userobm_account_dateexp'});
-        my $date_exp_timestamp = Time::Local::timelocal(0,0,0,$date_exp[2],$date_exp[1]-1,$date_exp[0]-1900);
-        $userDesc->{'userobm_account_dateexp_timestamp'} = $date_exp_timestamp;
+        $userDesc->{'userobm_account_dateexp_timestamp'} = Time::Local::timelocal(0,0,0,$date_exp[2],$date_exp[1]-1,$date_exp[0]-1900);
     }
 
     # User e-mails
@@ -621,7 +620,7 @@ sub createLdapEntry {
 
     # User account expiration date
     if( $self->{'entityDesc'}->{'userobm_account_dateexp_timestamp'} ) {
-        $entry->add( shadowExpire => $self->{'userobm_account_dateexp_timestamp'} );
+        $entry->add( shadowExpire => $self->{'entityDesc'}->{'userobm_account_dateexp_timestamp'} );
     }
 
     # User web permission
