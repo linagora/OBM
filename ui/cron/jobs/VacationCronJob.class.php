@@ -168,16 +168,16 @@ class VacationCronJob extends CronJob{
       $obm_q = new DB_OBM;
       $query = "UPDATE UserObm set 
         userobm_vacation_enable = 0, 
-        userobm_vacation_datebegin = '0',
-        userobm_vacation_dateend = '0'
+        userobm_vacation_datebegin = NULL,
+        userobm_vacation_dateend = NULL 
         WHERE userobm_id IN (".implode(',',array_keys($users)).")";
       $this->logger->core($query);
       $obm_q->query($query);      
       $this->logger->debug("Disabling ".count($users)."vacations in P table");
       $obm_q = new DB_OBM;
       $query = "UPDATE P_UserObm set userobm_vacation_enable = 0, 
-        userobm_vacation_datebegin = '0',
-        userobm_vacation_dateend = '0'
+        userobm_vacation_datebegin = NULL,
+        userobm_vacation_dateend = NULL
         WHERE userobm_id IN (".implode(',',array_keys($users)).")";
       $this->logger->core($query);
       $obm_q->query($query);      

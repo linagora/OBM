@@ -4234,7 +4234,7 @@ function dis_calendar_pdf_options($calendar, $p_range, $p_view) {
     </div>
     <div class=\"buttons\">
       <input type=\"hidden\" name=\"action\" value=\"pdf_export\">
-      <input type=\"hidden\" name=\"date\" value=\"$date\">
+      <input type=\"hidden\" name=\"date\" value=\"".$date->getIso()."\">
       <input type=\"submit\" value=\"$l_print\"/>
     </div>
   </form>";
@@ -5588,10 +5588,21 @@ Class CalendarPdfList Extends CalendarPdf{
 
         $day_text_evt = $d->localize(Of_Date::OBM_DATE_MONTH_LIST);
 
-        $col_height = sizeof($occurrence)*$this->font_height;
+        $col_height = (sizeof($occurrence) + 1)*$this->font_height;
 
         if ($this->showdetails) {           
-          $col_height += 8*$this->font_height*sizeof($occurrence);     
+          foreach($occurrence as $blocks) {
+            $datas = array(
+              ($blocks->event->repeat == 'none')?'':$blocks->event->repeat, 
+              $blocks->event->category1,
+              $blocks->event->location, 
+              $blocks->event->description,
+              (is_array($blocks->event->attendee['resource']))?implode(',',$blocks->event->attendee['resource']):'', 
+              (is_array($blocks->event->attendee['user']))?implode(',',$blocks->event->attendee['user']):'',
+              'dummy'); 
+            $datas = array_filter($datas);
+            $col_height += (sizeof($datas,COUNT_RECURSIVE) - 1  ) * $this->font_height;
+          }
         }
 
 	$endofday = $this->current_y-$col_height;
@@ -5701,11 +5712,23 @@ Class CalendarPdfList Extends CalendarPdf{
       $date = $occurrence->date;
       $title = $event->title;
       if($event->all_day) {
-        $head = $GLOBALS['l_all_day'].' - '.$title;
-        $margin_left = $this->getStringWidth($GLOBALS['l_all_day']);
+        $end = clone $occurrence->end;
+        if($end->subSecond(1)->compareDateIso($date) != 0) {
+          $diff = ceil($occurrence->end->diff($occurrence->date)/86400);
+          $head =  $GLOBALS['l_all_day']. " ($diff $GLOBALS[l_days])";
+        } else {
+          $head = $GLOBALS['l_all_day'];
+        } 
+        $margin_left = $this->getStringWidth($head);
+        $head .= ' - '.$title;
       } else {
-        $head = $occurrence->date->get(Of_Date::TIME_SHORT). ' - '. $title;
-        $margin_left = $this->getStringWidth($occurrence->date->get(Of_Date::TIME_SHORT));
+        if($occurrence->end->compareDateIso($date) != 0) {
+          $head = $occurrence->date->getOutputDateTime(). ' - '.$occurrence->end->getOutputDateTime();
+        } else {
+          $head = $occurrence->date->get(Of_Date::TIME_SHORT). ' - '.$occurrence->end->get(Of_Date::TIME_SHORT);
+        }        
+        $margin_left = $this->getStringWidth($head);
+        $head .= ' - '. $title;
       }
       $end = clone $occurrence->end;
       $attendee = $event->attendee;
@@ -5789,13 +5812,6 @@ Class CalendarPdfList Extends CalendarPdf{
         'UTF-8');        
 
       if ($this->showdetails) {
-        if($event->all_day) {
-          $date_begin = $date->getOutputDate();
-          $date_end = $end->subSecond(1)->getOutputDate(); 
-        } else {
-          $date_begin = $date->getOutputDateTime();
-          $date_end = $end->getOutputDateTime(); 
-        }
         $repeat = $event->repeat;
         if ($repeat == 'none') {
 	  $dis_repeat = '';
@@ -5807,7 +5823,6 @@ Class CalendarPdfList Extends CalendarPdf{
         $description = $event->description;
         
         $details = array(
-          "$date_begin" => "$date_end", 
           "$l_repeat" => "$dis_repeat", 
           "$l_category" => "$category",
           "$l_location" => "$location", 
@@ -5815,7 +5830,8 @@ Class CalendarPdfList Extends CalendarPdf{
           "$l_attendees" => $dis_attendees, 
           "$l_resources" => $dis_resources,
           "$l_items" => "$item_list"); 
-        $details_height = (sizeof($details,COUNT_RECURSIVE) - 2)*$this->font_height;
+        $details = array_filter($details);
+        $details_height = (sizeof($details,COUNT_RECURSIVE) - 2 )*$this->font_height;
 
         // left bar
         $x0 = $this->content_x0+170;

@@ -73,7 +73,7 @@ $l_category_filter = "Filtrer par catégorie";
 $l_from = "du";
 $l_to = "au";
 $l_periodic = "Périodique";
-
+$l_days = 'jours';
 // PDF Options
 $l_display_details = "Afficher les détails";
 $l_one_day_per_page = "Un jour par page";
@@ -150,6 +150,7 @@ $l_view_list_desc = "Liste des événements, cette vue n'est pas éditable";
 $l_view_week_desc = "Voir les événements sur une semaine";
 $l_view_day_desc = "Voir les événements sur un jour";
 $l_view_month_desc = "Voir les événements sur un mois";
+
 
 // Messages
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";

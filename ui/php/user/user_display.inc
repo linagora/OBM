@@ -745,7 +745,7 @@ function html_user_consult($obm_q) {
       <td>$smb_state</td>
     </tr>
     ";
-    if($samba_perms == '1') {
+    if($smb_perms == '1') {
       $samba_section .= "      
       <tr>
         <th>$l_smb_home</th>
@@ -1440,7 +1440,7 @@ function html_user_form($usr_q, $user, $field='') {
       $dis_drive_sel .= "<option ".$drive["$i"]." value='$i'>$i:</option>";
     }
     $dis_drive_sel .= "<option ".$drive["Z"]." value='Z'>Z:</option>";
-    $dis_drive_sel = "<select style='width:4em;' name='samba[drive]'>$dis_drive_sel</select>";
+    $dis_drive_sel = "<select style='width:4em;' name='sel_smb_home_drive'>$dis_drive_sel</select>";
     $smb_home = (isset($smb_home))?$smb_home:$samba['home'];
     if($login != '') {
       $smb_hidden_home = str_replace($login,'%u', $smb_home);
