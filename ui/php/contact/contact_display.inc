@@ -1623,20 +1623,35 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     </table>
     </fieldset>
 
-    <fieldset class=\"detail infos\" id='phoneHolder'>
-    <legend>$l_phone <a href='' onclick=\"new Obm.Contact.PhoneWidget();return false;\">$l_add</a></legend>
+    <fieldset class=\"detail infos\" >
+    <legend>$l_phone </legend>
+    <div id='phoneHolder'>
+    </div>
+    <p><a class='B' href='' onclick=\"new Obm.Contact.PhoneWidget();return false;\">$l_add</a></p>
     </fieldset>
-    <fieldset class=\"detail infos\" id='addressHolder'>
-    <legend>$l_address <a href='' onclick=\"new Obm.Contact.AddressWidget();return false;\">$l_add</a></legend>
+    <fieldset class=\"detail infos\">
+    <legend>$l_address</legend>
+    <div id='addressHolder'>
+    </div>
+    <p><a class='B' href='' onclick=\"new Obm.Contact.AddressWidget();return false;\">$l_add</a></p>
     </fieldset>
-    <fieldset class=\"detail infos\" id='emailHolder'>
-    <legend>$l_email <a href='' onclick=\"new Obm.Contact.EmailWidget();return false;\">$l_add</a></legend>
+    <fieldset class=\"detail infos\">
+    <legend>$l_email</legend>
+    <div id='emailHolder'>
+    </div>
+    <p><a class='B' href='' onclick=\"new Obm.Contact.EmailWidget();return false;\">$l_add</a></p>
     </fieldset>
-    <fieldset class=\"detail infos\" id='imHolder'>
-    <legend>$l_im <a href='' onclick=\"new Obm.Contact.IMWidget();return false;\">$l_add</a></legend>
+    <fieldset class=\"detail infos\">
+    <legend>$l_im</legend>
+    <div id='imHolder'>
+    </div>
+    <p><a class='B' href='' onclick=\"new Obm.Contact.IMWidget();return false;\">$l_add</a></p>
     </fieldset>
-    <fieldset class=\"detail infos\" id='websiteHolder'>
-    <legend>$l_website <a href='' onclick=\"new Obm.Contact.WebsiteWidget();return false;\">$l_add</a></legend>
+    <fieldset class=\"detail infos\">
+    <legend>$l_website</legend>
+    <div id='websiteHolder'>
+    </div>
+    <p><a class='B' href='' onclick=\"new Obm.Contact.WebsiteWidget();return false;\">$l_add</a></p>
     </fieldset>
     <script type='text/javascript'>
       $js
