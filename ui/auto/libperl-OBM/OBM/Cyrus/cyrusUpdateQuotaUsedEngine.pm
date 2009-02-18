@@ -1,4 +1,4 @@
-package OBM::Cyrus::cyrusUpdateAclEngine;
+package OBM::Cyrus::cyrusUpdateQuotaUsedEngine;
 
 $VERSION = '1.0';
 
@@ -33,8 +33,8 @@ sub _doWork {
         return 1;
     }
 
-
-    if( $entity->getUpdateLinks() && $self->_imapSetMailboxAcls() ) {
+    if( $entity->setCyrusQuotaUsed( $srvBalDesc{'box_quota_used'} ) ) {
+        $self->_log( 'probleme lors du positionnement du quota utilisé de '.$entity->getDescription(), 0 );
         return 1;
     }
 

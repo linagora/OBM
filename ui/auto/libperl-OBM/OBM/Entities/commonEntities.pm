@@ -248,3 +248,32 @@ sub isSieveAvailable {
 
     return 0;
 }
+
+
+# Set mailbox quota used
+sub setCyrusQuotaUsed {
+    my $self = shift;
+    my( $quotaUsed ) = @_;
+
+    if( $quotaUsed !~ /^\d+$/ ) {
+        $self->_log( 'quota utilisé incorrect : '.$quotaUsed, 0 );
+        return 1;
+    }
+
+    $self->{'mail_quota_used'} = $quotaUsed;
+
+    return 0;
+}
+
+
+# Get mailbox quota used
+sub getCyrusQuotaUsed {
+    my $self = shift;
+    my $quotaUsed = 0;
+
+    if( defined($self->{'mail_quota_used'}) ) {
+        $quotaUsed = $self->{'mail_quota_used'};
+    }
+
+    return $quotaUsed;
+}

@@ -1,4 +1,4 @@
-package OBM::Cyrus::sqlSieveUpdater;
+package OBM::DbUpdater::sqlSieveUpdater;
 
 $VERSION = '1.0';
 
@@ -44,7 +44,6 @@ sub update {
         $self->_log( 'type d\'entité \''.ref($entity).' non supporté', 0 );
         return 1;
     }
-    $self->{'currentEntity'} = $entity;
 
 
     my $query = 'UPDATE P_UserObm

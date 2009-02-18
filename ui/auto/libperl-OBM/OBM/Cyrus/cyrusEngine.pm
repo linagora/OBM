@@ -126,21 +126,15 @@ sub update {
     $self->{'currentEntity'} = $entity;
 
     # If entity don't have Cyrus dependancy, we do nothing and it's not an error
-    if( !$entity->isMailAvailable() ) {
+    if( !$entity->isMailAvailable() || !$entity->isMailActive() || $entity->getArchive() ) {
         $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Cyrus', 3 );
         return 0;
     }
 
 
-    # Get user BAL server object
+    # Get user BAL server Id
     my $mailserverId = $entity->getMailServerId();
-    if( !defined($mailserverId) && $entity->isMailActive() && !$entity->getArchive() ) {
-        $self->_log( 'serveur de courrier IMAP non defini et droit mail actif - erreur', 2 );
-        return 1;
-    }elsif( !defined($mailserverId) && (!$entity->isMailActive() || $entity->getArchive()) ) {
-        $self->_log( 'serveur de courrier IMAP non defini et droit mail inactif - succés', 2 );
-        return 0;
-    }elsif( !defined($mailserverId) ) {
+    if( !defined($mailserverId) ) {
         $self->_log( 'serveur de courrier IMAP non defini - erreur', 2 );
         return 1;
     }
@@ -237,6 +231,7 @@ sub isMailboxExist {
         $srvBalDesc->{'box_login'} = $mailBox[0][0];
         $srvBalDesc->{'box_login'} =~ s/^$mailboxPrefix//;
         $srvBalDesc->{'box_quota'} = $self->getMailboxQuota( $mailboxPrefix, $mailboxName );
+        $srvBalDesc->{'box_quota_used'} = $self->getMailboxQuotaUse( $mailboxPrefix, $mailboxName );
     }
 
 
@@ -251,7 +246,7 @@ sub getMailboxQuota {
 
     my $entity = $self->{'currentEntity'};
     if( !defined($entity) ) {
-        return 1;
+        return undef;
     }
 
     my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
@@ -280,43 +275,31 @@ sub getMailboxQuota {
 
 sub getMailboxQuotaUse {
     my $self = shift;
-    my( $object ) = @_;
+    my( $mailboxPrefix, $mailboxName ) = @_;
+    my $mailBoxQuotaUse = 0;
 
-    if( !defined($object) ) {
+    my $entity = $self->{'currentEntity'};
+    if( !defined($entity) ) {
         return undef;
     }
 
-    # Récupération du nom de la boîte à traiter
-    my $mailBoxName = $object->getMailboxName( "new" );
-    if( !defined($mailBoxName) ) {
-        return undef;
-    }
-
-    # Récupération de la description du serveur de la boîte à traiter
-    my $cyrusSrv = $self->_findCyrusSrvbyId( $object->{"domainId"}, $object->getMailServerId() );
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
     if( !defined($cyrusSrv) ) {
         return undef;
     }
 
-    # Est-on connecté à ce serveur
-    if( !defined($cyrusSrv->{"imap_server_conn"}) ) {
+    if( !defined($mailboxName) || !defined($mailboxPrefix) ) {
         return undef;
     }
 
-    # Obtention du quota utilisé
-    my $cyrusSrvConn = $cyrusSrv->{"imap_server_conn"};
-    my $mailBoxQuotaUse = 0;
-    my $boxPrefix = $object->getMailboxPrefix();
-
-
-    my @quotaDesc = $cyrusSrvConn->listquotaroot( $boxPrefix.$mailBoxName );
-    if( $cyrusSrvConn->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention du quota utilise : '.$cyrusSrvConn->error(), 2 );
+    my @quotaDesc = $cyrusSrv->listquotaroot( $mailboxPrefix.$mailboxName );
+    if( $cyrusSrv->error ) {
+        $self->_log( 'erreur Cyrus a l\'obtention du quota utilise : '.$cyrusSrv->error(), 3 );
         return undef;
     }
 
     if( defined( $quotaDesc[2][1] ) ) {
-        $mailBoxQuotaUse = $quotaDesc[2][0];
+        $mailBoxQuotaUse = int($quotaDesc[2][0]/1024);
     }
 
     return $mailBoxQuotaUse;

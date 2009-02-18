@@ -93,10 +93,10 @@ sub update {
         return 1;
     }
 
-    require OBM::Cyrus::sqlSieveUpdater;
+    require OBM::DbUpdater::sqlSieveUpdater;
     $self->_log( 'initialisation du moteur de mise à jour BD', 2 );
     my $dbUpdater;
-    if( !($dbUpdater = OBM::Cyrus::sqlSieveUpdater->new()) ) {
+    if( !($dbUpdater = OBM::DbUpdater::sqlSieveUpdater->new()) ) {
         $self->_log( 'problème à l\'initialisation du moteur de mise à jour BD', 0 );
         return 1;
     }
