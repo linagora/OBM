@@ -195,3 +195,7 @@ DESTROY ()
 _openLog ()
 
     try to establish a syslog connection
+
+_convertLevel ()
+
+    convert integer level into word
