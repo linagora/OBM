@@ -28,11 +28,11 @@ function get_email_used($emails, $id='', $gid='', $mid='') {
     $user_query[] = "userobm_email LIKE '%$mail%'";
     $mailshare_query[] = "mailshare_email LIKE '%$mail%'";
     $group_query[] = "group_email LIKE '$mail%'";
-    $regexp[] = $mail;
+    $regexp[] = str_replace('/','\/',preg_quote($mail));
     if(empty($domain)) {
-      $regexp[] = $mail."@.*";
+      $regexp[] = str_replace('/','\/',preg_quote($mail))."@.*";
     } else {
-      $regexp[] = $email;
+      $regexp[] = str_replace('/','\/',preg_quote($email));
     }
   }
   if ($id != '') {
