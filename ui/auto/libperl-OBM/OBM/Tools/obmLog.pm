@@ -67,9 +67,11 @@ sub writeLog {
             $self->_openLog();
         }
 
+        $level = $self->_convertLevel( $level );
+
         $text =~ s/\s+/ /g;
         $text =~ s/\t+/ /g;
-        Sys::Syslog::syslog( $priority, $text );
+        Sys::Syslog::syslog( $priority, $level.$text );
     }
 
 
@@ -87,6 +89,29 @@ sub DESTROY {
 
     return 0;
 }
+
+
+sub _convertLevel {
+    my $self = shift;
+    my( $level ) = @_;
+
+    SWITCH: {
+        if( $level == 0 ) {
+            return 'CRITICAL: ';
+        }
+
+        if( $level == 1 ) {
+            return 'BASIC: ';
+        }
+
+        if( $level == 2 ) {
+            return 'ADVANCED: ';
+        }
+    }
+
+    return 'DEBUG: '
+}
+
 
 # Perldoc
 

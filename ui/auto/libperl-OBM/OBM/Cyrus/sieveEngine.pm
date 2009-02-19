@@ -288,7 +288,7 @@ sub update {
 
     # If entity don't have Sieve dependancy, we do nothing and it's not an error
     if( !$entity->isSieveAvailable() ) {
-        $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Sieve', 0 );
+        $self->_log( 'entité '.$entity->getDescription().' n\'a aucune représentation Sieve', 3 );
         return 0;
     }
 
@@ -300,13 +300,13 @@ sub update {
 
     # If entity is archiving, we do nothing and it's not an error
     if( $entity->getArchive() ) {
-        $self->_log( 'pas de gestion de SIEVE pour l\'entité archivée '.$entity->getDescription(), 0 );
+        $self->_log( 'pas de gestion de SIEVE pour l\'entité archivée '.$entity->getDescription(), 2 );
         return 0;
     }
 
     # If entity don't have mail right, we do nothing and it's not an error
     if( !$entity->isMailActive() ) {
-        $self->_log( 'droit mail désactivé pour l\'objet : '.$entity->getDescription().', pas de gestion Sieve', 0 );
+        $self->_log( 'droit mail désactivé pour l\'objet : '.$entity->getDescription().', pas de gestion Sieve', 2 );
         return 0;
     }
 
