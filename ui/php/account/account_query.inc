@@ -113,14 +113,9 @@ function run_query_account_detail($id) {
 function run_query_account_insert($account) {
   global $cdg_sql, $obm;
 
-<<<<<<< .mine
-  $uid = sql_parse_id( $obm["uid"]);
-  $domain_id = sql_parse_id($obm["domain_id"]);
-=======
   $now = date('Y-m-d H:i:s');
   $uid = sql_parse_id($obm['uid']);
   $domain_id = sql_parse_id($obm['domain_id']);
->>>>>>> .r3717
 
   $label = $account['label'];
   $bank = $account['bank'];
