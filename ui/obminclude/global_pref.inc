@@ -329,6 +329,12 @@ if ($cgp_show["module"]["user"]) {
                                    'Url' => "$path/user/user_index.php",
                                    'Right'=> $cright_read);
 }
+if ($cgp_show["module"]["people"]) {
+  $modules["people"] = array('Name'=> $l_module_people,
+                                   'Ico' => "$ico_user",
+                                   'Url' => "$path/people/people_index.php",
+                                   'Right'=> $cright_read);
+}
 if ($cgp_show["module"]["resource"]) {
   $modules["resource"] = array('Name'=> $l_module_resource,
                                    'Ico' => "$ico_resource",

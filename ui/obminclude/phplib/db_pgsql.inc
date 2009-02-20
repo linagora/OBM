@@ -327,7 +327,7 @@ class DB_Sql {
         if(!is_null($args)) {
           $pcode = self::$match[2][$key]($args);
         } else {
-          $pcode = self::$match[2][$key];
+          $pcode = self::${$match[2][$key]};
         } 
       }else  {
         if(!is_null($args)) {

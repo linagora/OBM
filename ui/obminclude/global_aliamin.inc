@@ -25,9 +25,9 @@ function get_email_used($emails, $id='', $gid='', $mid='') {
     list($mail,$domain) = explode('@', $email);
     $mail = addslashes($mail);
     $domain = addslashes($domain);
-    $user_query[] = "userobm_email LIKE '%$mail%'";
-    $mailshare_query[] = "mailshare_email LIKE '%$mail%'";
-    $group_query[] = "group_email LIKE '$mail%'";
+    $user_query[] = "userobm_email #LIKE '%$mail%'";
+    $mailshare_query[] = "mailshare_email #LIKE '%$mail%'";
+    $group_query[] = "group_email #LIKE '$mail%'";
     $regexp[] = str_replace('/','\/',preg_quote($mail));
     if(empty($domain)) {
       $regexp[] = str_replace('/','\/',preg_quote($mail))."@.*";
@@ -67,11 +67,11 @@ function get_email_used($emails, $id='', $gid='', $mid='') {
             SELECT group_email as mail, group_name as label FROM UGroup WHERE (".implode(' OR ', $group_query).") $where_group"; 
 
   display_debug_msg($query, $cdg_sql, 'get_email_used(1)');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   $regexp = implode('|',$regexp);
   $return = array();
   while($obm_q->next_record()) {
-    preg_match_all('/^('.$regexp.')\r?$/m',$obm_q->f('mail'),$results);
+    preg_match_all('/^('.$regexp.')\r?$/mi',$obm_q->f('mail'),$results);
     $return = array_merge($return, $results[1]);
   }
   return implode(', ',$return);

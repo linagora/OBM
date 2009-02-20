@@ -207,6 +207,7 @@ $l_account = "Compte";
 $l_invoice = "Facture";
 $l_payment = "Paiement";
 $l_user = "Utilisateur";
+$l_people = "Personnes";
 $l_resource = "Ressource";
 $l_group = "Groupe";
 $l_resourcegroup = "Groupe de ressources";
@@ -326,6 +327,7 @@ $l_module_invoice = "Factures";
 $l_module_payment = "Paiements";
 
 $l_module_user = "Utilisateurs";
+$l_module_people = "Personnes";
 $l_module_resource = "Ressources";
 $l_module_group = "Groupes";
 $l_module_resourcegroup = "Groupes de ressources";

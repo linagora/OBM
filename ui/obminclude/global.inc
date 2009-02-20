@@ -331,6 +331,7 @@ $cgp_show['module']['invoice'] = 'compta';
 $cgp_show['module']['payment'] = 'compta';
 $cgp_show['module']['account'] = 'compta';
 $cgp_show['module']['user'] = 'user';
+$cgp_show['module']['people'] = 'user';
 $cgp_show['module']['group'] = 'user';
 $cgp_show['module']['resource'] = 'user';
 $cgp_show['module']['resourcegroup'] = 'user';

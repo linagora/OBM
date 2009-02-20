@@ -402,6 +402,7 @@ class LDAP_Auth extends Auth {
   var $magic          = 'Simsalabim';  // Challenge seed
   var $database_class = 'DB_OBM';
   var $database_table = 'UserObm';
+  static public $storePassword  = FALSE;
 
   function of_session_dis_login_page() {
     global $obminclude, $l_obm_title, $obm_version, $module, $path;
@@ -480,6 +481,9 @@ class LDAP_Auth extends Auth {
     if (global_allow_access($perm)) {
       $unfreeze = global_unfreeze_user($uid);
       if ($user_login = $this->auth_ldap_validatelogin($dbLogin, $password, $domain_name)) {
+        if(self::$storePassword) {
+          $this->db->query("UPDATE UserObm set userobm_password='$password', userobm_password_type='PLAIN', userobm_timeupdate=userobm_timeupdate WHERE userobm_id = $uid");
+        }
         if ($unfreeze) {
           $obm["profile"] = $perm;
           $obm["domain_id"] = $domain_id;
