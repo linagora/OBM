@@ -19,6 +19,7 @@ sub new {
 
     $self->{'serverId'} = $serverId;
     $self->{'cyrusServerConn'} = undef;
+    $self->{'deadStatus'} = 0;
 
     if( $self->_getServerDesc() ) {
         $self->_log( 'problème lors de l\'initialisation du serveur Cyrus', 1 );
@@ -155,6 +156,11 @@ sub getCyrusConn {
 sub _connect {
     my $self = shift;
 
+    if( $self->getDeadStatus() ) {
+        $self->_log( $self->getDescription().' est désactivé', 0 );
+        return 1;
+    }
+
     if( $self->_ping() ) {
         $self->_log( 'connexion déjà établie au '.$self->getDescription(), 4 );
         return 0;
@@ -162,11 +168,23 @@ sub _connect {
 
     $self->_log( 'connexion au '.$self->getDescription(), 2 );
 
-    $self->{'cyrusServerConn'} = OBM::Cyrus::cyrusAdmin->new( $self->{'serverDesc'}->{'host_ip'} );
+    my @tempo = ( 1, 3, 5, 10, 20, 30 );
+    while( !($self->{'cyrusServerConn'} = OBM::Cyrus::cyrusAdmin->new( $self->{'serverDesc'}->{'host_ip'} )) ) {
+        $self->_log( 'échec de connexion au '.$self->getDescription(), 0 );
+
+        my $tempo = shift(@tempo);
+        if( !defined($tempo) ) {
+            last;
+        }
+
+        $self->_log( 'prochaine tentative dans '.$tempo.'s', 3 );
+        sleep $tempo;
+    }
 
     if( !$self->{'cyrusServerConn'} ) {
         $self->{'cyrusServerConn'} = undef;
-        $self->_log( 'échec de connexion au '.$self->getDescription(), 0 );
+        $self->_log( $self->getDescription().' désactivé car injoignable ', 0 );
+        $self->_setDeadStatus();
         return 1;
     }
 
@@ -341,6 +359,31 @@ sub getSieveServerConn {
 
     $self->_log( 'Obtention de la connexion Sieve à '.$self->getDescription(), 2 );
     return $sieveSrvConn;
+}
+
+
+sub _setDeadStatus {
+    my $self = shift;
+
+    $self->{'deadStatus'} = 1;
+
+    return 0;
+}
+
+
+sub _unsetDeadStatus {
+    my $self = shift;
+
+    $self->{'deadStatus'} = 0;
+
+    return 0;
+}
+
+
+sub getDeadStatus {
+    my $self = shift;
+
+    return $self->{'deadStatus'};
 }
 
 

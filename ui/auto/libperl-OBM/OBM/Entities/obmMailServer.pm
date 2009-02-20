@@ -2,6 +2,9 @@ package OBM::Entities::obmMailServer;
 
 $VERSION = '1.0';
 
+use OBM::Entities::commonEntities;
+@ISA = ('OBM::Entities::commonEntities');
+
 $debug = 1;
 
 use 5.006_001;
@@ -11,24 +14,6 @@ use strict;
 use OBM::Tools::commonMethods qw(
         _log
         dump
-        );
-use OBM::Entities::commonEntities qw(
-        setDelete
-        getDelete
-        getArchive
-        setArchive
-        getParent
-        setUpdated
-        unsetUpdated
-        getUpdated
-        getDesc
-        _makeEntityEmail
-        setUpdateEntity
-        getUpdateEntity
-        setUpdateLinks
-        getUpdateLinks
-        isMailAvailable
-        isSieveAvailable
         );
 use OBM::Ldap::utils qw(
         _modifyAttr
@@ -93,16 +78,19 @@ sub _init {
 
         SWITCH: {
             if( $currentSrv->{'server_role'} =~ /^imap$/i ) {
+                push( @{$self->{'entityDesc'}->{'imapServerId'}}, $currentSrv->{'server_id'} );
                 push( @{$self->{'entityDesc'}->{'imapServer'}}, $currentSrv->{'server_name'} );
                 last SWITCH;
             }
 
             if( $currentSrv->{'server_role'} =~ /^smtp_in$/i ) {
+                push( @{$self->{'entityDesc'}->{'smtpInServerId'}}, $currentSrv->{'server_id'} );
                 push( @{$self->{'entityDesc'}->{'smtpInServer'}}, $currentSrv->{'server_name'} );
                 last SWITCH;
             }
 
             if( $currentSrv->{'server_role'} =~ /^smtp_out$/i ) {
+                push( @{$self->{'entityDesc'}->{'smtpOutServerId'}}, $currentSrv->{'server_id'} );
                 push( @{$self->{'entityDesc'}->{'smtpOutServer'}}, $currentSrv->{'server_name'} );
                 last SWITCH;
             }
@@ -335,8 +323,7 @@ sub updateLdapEntry {
         }
 
         # OBM domain
-        if( defined($self->{'parent'}) && (my $domainName =
-        $self->{'parent'}->getDesc('domain_name')) ) {
+        if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
             if( $self->_modifyAttr( $domainName, $entry, 'obmDomain' ) ) {
                 $update = 1;
             }
@@ -355,4 +342,25 @@ sub getBdUpdate {
     }
 
     return 0;
+}
+
+
+sub getImapServersIds {
+    my $self = shift;
+
+    return $self->{'entityDesc'}->{'imapServerId'};
+}
+
+
+sub getSmtpInServersIds {
+    my $self = shift;
+
+    return $self->{'entityDesc'}->{'smtpInServerId'};
+}
+
+
+sub getSmtpOutServersIds {
+    my $self = shift;
+
+    return $self->{'entityDesc'}->{'smtpOutServerId'};
 }

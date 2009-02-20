@@ -76,7 +76,6 @@ sub configure_hook {
         transport_smtp_map => [],
         cyrus_service => [],
         cyrus_imap_conf => [],
-        cyrus_restart => [],
         cyrus_partition_root => []
     };
     $self->configure( $daemonOptions );
@@ -202,13 +201,6 @@ sub configure_hook {
         $self->{cyrus}->{cyrus_imap_conf} = $daemonOptions->{cyrus_imap_conf}->[0];
     }else {
         $self->{cyrus}->{cyrus_imap_conf} = "/etc/imapd.conf";
-    }
-
-    # Le temps attendu avant de considérer le service Cyrus comme redémarré
-    if( defined($daemonOptions->{cyrus_restart}->[0]) ) {
-        $self->{cyrus}->{cyrus_restart} = $daemonOptions->{cyrus_restart}->[0];
-    }else {
-        $self->{cyrus}->{cyrus_restart} = "5";
     }
 
     # Le chemin d'accès aux partitions Cyrus
@@ -713,8 +705,6 @@ sub processCyrusPartitions {
     if( $errors == 0 ) {
         # On attend un temps pour s'assurer que le service est correctement
         # accessible
-        $self->logMessage( "Temporisation de '".$self->{cyrus}->{cyrus_restart}."s' pour laisser le service Cyrus redemarrer correctement" );
-        sleep $self->{cyrus}->{cyrus_restart};
         $self->sendMessage( "OK", undef );
     }elsif( $errors == 1 ) {
         $self->sendMessage( "ERROR", "mise a jour des partitions Cyrus impossible !" );

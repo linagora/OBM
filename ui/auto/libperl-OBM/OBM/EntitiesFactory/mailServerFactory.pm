@@ -189,7 +189,8 @@ sub _loadMailServer {
         $serviceProperty = 'P_'.$serviceProperty;
     }
 
-    my $query = 'SELECT host_name as server_name,
+    my $query = 'SELECT host_id as server_id,
+                        host_name as server_name,
                         serviceproperty_property as server_role
                  FROM '.$hostTable.'
                  INNER JOIN DomainEntity ON domainentity_domain_id='.$self->{'domainId'}.'
