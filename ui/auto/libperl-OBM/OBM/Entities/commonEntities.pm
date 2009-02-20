@@ -167,6 +167,8 @@ sub _makeEntityEmail {
     my @email = split( /\r\n/, $mailAddress );
     
     for( my $i=0; $i<=$#email; $i++ ) {
+        $email[$i] = lc($email[$i]);
+
         SWITCH: {
             if( $email[$i] =~ /$OBM::Parameters::regexp::regexp_email/ ) {
                 $emails{$email[$i]} = 1;
