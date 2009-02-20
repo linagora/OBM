@@ -17,8 +17,8 @@
 function run_query_mailshare_search($mailshare) {
   global $cdg_sql, $ctu_sql_limit;
 
-  $sql_order_dir = $user['sql_order_dir'];
-  $sql_order_field = $user['sql_order_field'];
+  $sql_order_dir = $mailshare['sql_order_dir'];
+  $sql_order_field = $mailshare['sql_order_field'];
 
   $name = sql_search_text_parse($mailshare['name']);
   $delegation = sql_search_text_parse($mailshare['delegation']);

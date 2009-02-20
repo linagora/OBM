@@ -133,8 +133,8 @@ function run_query_user_search($user) {
   if (trim($group) != '') {
      if (trim($where) != '') $where .= ' AND';
      $where .= " group_name like '$group%'";
-     $join_grp = 'LEFT JOIN of_usergroup ON userobm_id=of_usergroup_user_id
-                  LEFT JOIN UGroup ON of_usergroup_group_id=group_id';
+     $join_grp = 'INNER JOIN of_usergroup ON userobm_id=of_usergroup_user_id
+                  INNER JOIN UGroup ON of_usergroup_group_id=group_id';
   }
 
   if ($archive != '1') {
@@ -168,7 +168,7 @@ function run_query_user_search($user) {
       $lastaccess
     FROM UserObm 
     INNER JOIN UserEntity ON userentity_user_id = userobm_id
-    LEFT JOIN Domain ON userobm_domain_id = domain_id
+    INNER JOIN Domain ON userobm_domain_id = domain_id
     $join_grp
     $join_userdata";
 
