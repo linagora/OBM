@@ -104,8 +104,9 @@ sub _init {
     }
 
     # L'adresse IP
-    if( !$hostDesc->{'host_ip'} || $hostDesc->{'host_ip'} !~ /$regexp_ip/ ) {
-        $hostDesc->{'host_ip'} = '0.0.0.0';
+    if( $hostDesc->{'host_ip'} && $hostDesc->{'host_ip'} !~ /$regexp_ip/ ) {
+        $self->_log( 'ip de l\'hôte incorrecte. IP non prise en compte', 1 );
+        delete( $hostDesc->{'host_ip'} );
     }
 
     # Le SID du domaine
@@ -310,9 +311,13 @@ sub createLdapEntry {
 
     $entry->add(
         objectClass => $self->_getLdapObjectclass(),
-        cn => $self->{'entityDesc'}->{'system_host_name'},
-        ipHostNumber => $self->{'entityDesc'}->{'host_ip'}
+        cn => $self->{'entityDesc'}->{'system_host_name'}
     );
+
+    # L'IP
+    if( $self->{'entityDesc'}->{'host_ip'} ) {
+        $entry->add( ipHostNumber => $self->{'entityDesc'}->{'host_ip'} );
+    }
 
     # La description
     if( $self->{'entityDesc'}->{'host_description'} ) {
