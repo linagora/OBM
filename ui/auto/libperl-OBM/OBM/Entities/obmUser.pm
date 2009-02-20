@@ -89,16 +89,16 @@ sub _init {
 
     # User name
     if( !defined($userDesc->{'userobm_login'}) ) {
-        $self->_log( 'Nom de l\'utilisateur non défini', 3 );
+        $self->_log( 'login de l\'utilisateur non défini', 3 );
         return 1;
     }elsif( $userDesc->{'userobm_login'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
-        $self->_log( 'Nom de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 4 );
+        $self->_log( 'login de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 4 );
         return 1;
     }
 
     # Current user name, if define
     if( $userDesc->{'userobm_login_current'} && $userDesc->{'userobm_login_current'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
-        $self->_log( 'Nom actuel de l\'utilisateur \''.$userDesc->{'userobm_login_current'}.'\' incorrect', 4 );
+        $self->_log( 'login actuel de l\'utilisateur \''.$userDesc->{'userobm_login_current'}.'\' incorrect', 4 );
         return 1;
     }
 
@@ -112,7 +112,7 @@ sub _init {
         $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' non défini', 3 );
         return 1;
     }elsif( $userDesc->{'userobm_uid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
-        $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 4 );
+        $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 3 );
         return 1;
     }
 
@@ -121,7 +121,13 @@ sub _init {
         $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' non défini', 3 );
         return 1;
     }elsif( $userDesc->{'userobm_gid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
-        $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 4 );
+        $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 3 );
+        return 1;
+    }
+
+    # User lastname
+    if( $OBM::Parameters::common::obmModules->{'ldap'} && !$userDesc->{'userobm_lastname'} ) {
+        $self->_log( 'le nom de l\'utilisateur doit être défini avec le module LDAP', 3 );
         return 1;
     }
 
