@@ -602,6 +602,7 @@ sub _createMailbox {
 
     if( $cyrusSrv->error() ) {
         if( ($cyrusSrv->error() =~ /invalid/i) && ($cyrusSrv->error() =~ /partition/i) ) {
+            $self->_log( $cyrusSrv->error().': tentative de création de la partition', 3 );
             if( !$self->{'currentCyrusSrv'}->updateCyrusPartitions($entity->getDomainId()) ) {
                 return $self->_createMailbox();
             }
