@@ -48,7 +48,7 @@ sub new {
     $self->setParent( $parent );
 
     if( $self->_init( $userDesc ) ) {
-        $self->_log( 'problème lors de l\'initialisation di l\'utilisateur', 1 );
+        $self->_log( 'problème lors de l\'initialisation de l\'utilisateur', 1 );
         return undef;
     }
 

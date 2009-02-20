@@ -237,7 +237,7 @@ sub _ldapUpdateEntity {
     my $result = $entry->update( $ldapServerConn );
 
     if( $result->is_error() ) {
-        $self->_log( 'erreur LDAP à la mise à jour du DN '.$entry->dn().', '.$result->code().' - '.$result->error(), 3 );
+        $self->_log( 'erreur LDAP à la mise à jour du DN '.$entry->dn().', '.$result->code().' - '.$result->error(), 0 );
 
         if( $result->code() == 32 ) {
             $self->_log( 'l\'objet père du DN '.$entry->dn().' n\'existe pas', 1 );
@@ -370,7 +370,7 @@ sub _deleteEntity {
     my $result = $ldapServerConn->delete( $dn );
 
     if( $result->is_error() ) {
-        $self->_log( 'erreur LDAP à la suppression de '.$self->{'currentEntity'}->getDescription().', DN '.$dn.' : '.$result->code().' - '.$result->error(), 3 );
+        $self->_log( 'erreur LDAP à la suppression de '.$self->{'currentEntity'}->getDescription().', DN '.$dn.' : '.$result->code().' - '.$result->error(), 0 );
     }else {
         $self->_log( 'suppression de l\'entité de '.$self->{'currentEntity'}->getDescription().', DN '.$dn, 2 );
     }
