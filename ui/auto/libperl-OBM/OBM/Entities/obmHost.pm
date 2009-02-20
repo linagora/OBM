@@ -49,7 +49,7 @@ sub new {
         return undef;
     }
 
-    $self->{'objectclass'} = [ 'device', 'ipHost', 'obmHost', 'sambaSamAccount' ];
+    $self->{'objectclass'} = [ 'device', 'obmHost', 'sambaSamAccount' ];
 
     return $self;
 }
