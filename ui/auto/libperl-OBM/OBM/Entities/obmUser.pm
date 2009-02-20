@@ -80,25 +80,29 @@ sub _init {
 
     # User ID
     if( !defined($userDesc->{'userobm_id'}) ) {
-        $self->_log( 'ID de l\'utilisateur non défini', 3 );
+        $self->_log( 'ID de l\'utilisateur non défini', 0 );
         return 1;
     }elsif( $userDesc->{'userobm_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$userDesc->{'userobm_id'}.'\' incorrect', 4 );
+        $self->_log( 'ID \''.$userDesc->{'userobm_id'}.'\' incorrect', 0 );
         return 1;
     }
 
-    # User name
+    # User login
     if( !defined($userDesc->{'userobm_login'}) ) {
-        $self->_log( 'login de l\'utilisateur non défini', 3 );
+        $self->_log( 'login de l\'utilisateur non défini', 0 );
         return 1;
-    }elsif( $userDesc->{'userobm_login'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
-        $self->_log( 'login de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 4 );
+    }
+    
+    $userDesc->{'system_userobm_login'} = lc($userDesc->{'userobm_login'});
+    if( $userDesc->{'system_userobm_login'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
+        $self->_log( 'login de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 0 );
         return 1;
     }
 
     # Current user name, if define
+    $userDesc->{'userobm_login_current'} = lc($userDesc->{'userobm_login_current'});
     if( $userDesc->{'userobm_login_current'} && $userDesc->{'userobm_login_current'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
-        $self->_log( 'login actuel de l\'utilisateur \''.$userDesc->{'userobm_login_current'}.'\' incorrect', 4 );
+        $self->_log( 'login actuel de l\'utilisateur \''.$userDesc->{'userobm_login_current'}.'\' incorrect', 0 );
         return 1;
     }
 
@@ -109,25 +113,19 @@ sub _init {
 
     # User UID
     if( !defined($userDesc->{'userobm_uid'}) ) {
-        $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' non défini', 3 );
+        $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' non défini', 0 );
         return 1;
     }elsif( $userDesc->{'userobm_uid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
-        $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 3 );
+        $self->_log( 'UID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 0 );
         return 1;
     }
 
     # User GID
     if( !defined($userDesc->{'userobm_gid'}) ) {
-        $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' non défini', 3 );
+        $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' non défini', 0 );
         return 1;
     }elsif( $userDesc->{'userobm_gid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
-        $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 3 );
-        return 1;
-    }
-
-    # User lastname
-    if( $OBM::Parameters::common::obmModules->{'ldap'} && !$userDesc->{'userobm_lastname'} ) {
-        $self->_log( 'le nom de l\'utilisateur doit être défini avec le module LDAP', 3 );
+        $self->_log( 'GID de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 0 );
         return 1;
     }
 
@@ -139,6 +137,7 @@ sub _init {
         $userDesc->{'userobm_fullname'} = $userDesc->{'userobm_lastname'};
     }else {
         $userDesc->{'userobm_fullname'} = $userDesc->{'userobm_login'};
+        $userDesc->{'userobm_lastname'} = $userDesc->{'userobm_login'};
     }
 
     # User Address
@@ -240,9 +239,9 @@ sub _init {
     }
 
     # LDAP BAL destination
-    $userDesc->{'userobm_ldap_mailbox'} = $userDesc->{'userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name');
+    $userDesc->{'userobm_ldap_mailbox'} = $userDesc->{'system_userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name');
     # Cyrus BAL destination
-    $userDesc->{'userobm_cyrus_mailbox'} = $userDesc->{'userobm_login'};
+    $userDesc->{'userobm_cyrus_mailbox'} = $userDesc->{'system_userobm_login'};
     # Current Cyrus BAL destination
     $userDesc->{'current_userobm_cyrus_mailbox'} = $userDesc->{'userobm_login_current'};
     if( !$OBM::Parameters::common::singleNameSpace ) {
@@ -264,7 +263,7 @@ sub _init {
     if( defined($userMailboxDefaultFolders) ) {
         foreach my $folderTree ( split( ',', $userMailboxDefaultFolders ) ) {
             if( $folderTree !~ /(^[",]$)|(^$)/ ) {
-                my $folderName = $userDesc->{'userobm_login'};
+                my $folderName = $userDesc->{'system_userobm_login'};
                 foreach my $folder ( split( '/', $folderTree ) ) {
                     $folder =~ s/^\s+//;
 
@@ -339,7 +338,7 @@ sub _init {
             # W2k+ profil share (for older version, see smb.conf)
             if( $self->{'parent'}->getDesc('samba_user_profile') ) {
                 $userDesc->{'userobm_samba_profile'} = $self->{'parent'}->getDesc('samba_user_profile');
-                $userDesc->{'userobm_samba_profile'} =~ s/\%u/$userDesc->{'userobm_login'}/g;
+                $userDesc->{'userobm_samba_profile'} =~ s/\%u/$userDesc->{'system_userobm_login'}/g;
             }
         }
     }else {
@@ -450,7 +449,7 @@ sub getDnPrefix {
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'uid='.$self->{'entityDesc'}->{'userobm_login'}.','.$rootDn->[$i] );
+        push( @dnPrefixes, 'uid='.$self->{'entityDesc'}->{'system_userobm_login'}.','.$rootDn->[$i] );
         $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
@@ -471,7 +470,7 @@ sub getCurrentDnPrefix {
 
     my $currentUserLogin = $self->{'entityDesc'}->{'userobm_login_current'};
     if( !$currentUserLogin ) {
-        $currentUserLogin = $self->{'entityDesc'}->{'userobm_login'};
+        $currentUserLogin = $self->{'entityDesc'}->{'system_userobm_login'};
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
@@ -528,7 +527,7 @@ sub createLdapEntry {
 
     $entry->add(
         objectClass => $self->_getLdapObjectclass(),
-        uid => $self->{'entityDesc'}->{'userobm_login'},
+        uid => $self->{'entityDesc'}->{'system_userobm_login'},
         uidNumber => $self->{'entityDesc'}->{'userobm_uid'},
         gidNumber => $self->{'entityDesc'}->{'userobm_gid'},
         loginShell => '/bin/bash'
@@ -549,7 +548,7 @@ sub createLdapEntry {
     }
 
     # Home directory
-    $entry->add( homeDirectory => '/home/'.$self->{'entityDesc'}->{'userobm_login'} );
+    $entry->add( homeDirectory => '/home/'.$self->{'entityDesc'}->{'system_userobm_login'} );
 
     # User password
     if( my $userPasswd = $self->_convertPasswd( $self->{'entityDesc'}->{'userobm_password_type'}, $self->{'entityDesc'}->{'userobm_password'} ) ) {
@@ -784,7 +783,7 @@ sub updateLdapEntry {
         }
 
         # User home directory
-        if( $self->_modifyAttr( '/home/'.$self->{'entityDesc'}->{'userobm_login'}, $entry, 'homeDirectory' ) ) {
+        if( $self->_modifyAttr( '/home/'.$self->{'entityDesc'}->{'system_userobm_login'}, $entry, 'homeDirectory' ) ) {
             $update = 1;
         }
 

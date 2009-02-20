@@ -2,6 +2,9 @@ package OBM::Entities::obmMailshare;
 
 $VERSION = '1.0';
 
+use OBM::Entities::commonEntities;
+@ISA = ('OBM::Entities::commonEntities');
+
 $debug = 1;
 
 use 5.006_001;
@@ -11,22 +14,6 @@ use strict;
 use OBM::Tools::commonMethods qw(
         _log
         dump
-        );
-use OBM::Entities::commonEntities qw(
-        setDelete
-        getDelete
-        getArchive
-        setArchive
-        getParent
-        setUpdated
-        unsetUpdated
-        getUpdated
-        _makeEntityEmail
-        setUpdateEntity
-        getUpdateEntity
-        setUpdateLinks
-        getUpdateLinks
-        isSieveAvailable
         );
 use OBM::Ldap::utils qw(
         _modifyAttr
@@ -63,7 +50,7 @@ sub new {
         return undef;
     }
 
-    $self->{'objectclass'} = [ "obmMailShare" ];
+    $self->{'objectclass'} = [ 'obmMailShare' ];
 
     return $self;
 }
@@ -90,25 +77,29 @@ sub _init {
 
     # L'ID du mailshare
     if( !defined($mailshareDesc->{'mailshare_id'}) ) {
-        $self->_log( 'ID du mailshare non défini', 3 );
+        $self->_log( 'ID du mailshare non défini', 0 );
         return 1;
     }elsif( $mailshareDesc->{'mailshare_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$mailshareDesc->{'mailshare_id'}.'\' incorrect', 4 );
+        $self->_log( 'ID \''.$mailshareDesc->{'mailshare_id'}.'\' incorrect', 0 );
         return 1;
     }
 
     # Le nom du mailshare
     if( !defined($mailshareDesc->{'mailshare_name'}) ) {
-        $self->_log( 'Nom du mailshare non défini', 3 );
+        $self->_log( 'Nom du mailshare non défini', 0 );
         return 1;
-    }elsif( $mailshareDesc->{'mailshare_name'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
-        $self->_log( 'Nom du mailshare \''.$mailshareDesc->{'mailshare_name'}.'\' incorrect', 4 );
+    }
+    
+    $mailshareDesc->{'system_mailshare_name'} = lc($mailshareDesc->{'mailshare_name'});
+    if( $mailshareDesc->{'system_mailshare_name'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
+        $self->_log( 'Nom du mailshare \''.$mailshareDesc->{'mailshare_name'}.'\' incorrect', 0 );
         return 1;
     }
 
     # Le nom actuel du mailshare, si définit
+    $mailshareDesc->{'mailshare_name_current'} = lc($mailshareDesc->{'mailshare_name_current'});
     if( $mailshareDesc->{'mailshare_name_current'} && $mailshareDesc->{'mailshare_name_current'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
-        $self->_log( 'Nom actuel du mailshare \''.$mailshareDesc->{'mailshare_name_current'}.'\' incorrect', 4 );
+        $self->_log( 'Nom actuel du mailshare \''.$mailshareDesc->{'mailshare_name_current'}.'\' incorrect', 0 );
         return 1;
     }
 
@@ -133,9 +124,9 @@ sub _init {
     }
 
     # LDAP BAL destination
-    $mailshareDesc->{'mailshare_ldap_mailbox'} = '+'.$mailshareDesc->{'mailshare_name'}.'@'.$self->{'parent'}->getDesc('domain_name');
+    $mailshareDesc->{'mailshare_ldap_mailbox'} = '+'.$mailshareDesc->{'system_mailshare_name'}.'@'.$self->{'parent'}->getDesc('domain_name');
     # Cyrus BAL destination
-    $mailshareDesc->{'mailshare_cyrus_mailbox'} = $mailshareDesc->{'mailshare_name'};
+    $mailshareDesc->{'mailshare_cyrus_mailbox'} = $mailshareDesc->{'system_mailshare_name'};
     # Current Cyrus BAL destination
     $mailshareDesc->{'current_mailshare_cyrus_mailbox'} = $mailshareDesc->{'mailshare_name_current'};
     if( !$OBM::Parameters::common::singleNameSpace ) {
@@ -157,7 +148,7 @@ sub _init {
     if( defined($OBM::Parameters::common::shareMailboxDefaultFolders) ) {
         foreach my $folderTree ( split( ',', $OBM::Parameters::common::shareMailboxDefaultFolders ) ) {
             if( $folderTree !~ /(^[",]$)|(^$)/ ) {
-                my $folderName = $mailshareDesc->{'mailshare_name'};
+                my $folderName = $mailshareDesc->{'system_mailshare_name'};
                 foreach my $folder ( split( '/', $folderTree ) ) {
                     $folder =~ s/^\s+//;
 
@@ -289,7 +280,7 @@ sub getDnPrefix {
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'mailshare_name'}.','.$rootDn->[$i] );
+        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'system_mailshare_name'}.','.$rootDn->[$i] );
         $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
@@ -310,7 +301,7 @@ sub getCurrentDnPrefix {
 
     my $currentMailshareName = $self->{'entityDesc'}->{'mailshare_name_current'};
     if( !$currentMailshareName ) {
-        $currentMailshareName = $self->{'entityDesc'}->{'mailshare_name'};
+        $currentMailshareName = $self->{'entityDesc'}->{'system_mailshare_name'};
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
@@ -346,7 +337,7 @@ sub createLdapEntry {
 
     $entry->add(
         objectClass => $self->_getLdapObjectclass(),
-        cn => $self->{'entityDesc'}->{'mailshare_name'}
+        cn => $self->{'entityDesc'}->{'system_mailshare_name'}
     );
 
     if( $self->{'entityDesc'}->{'mailshare_ldap_mailbox'} ) {

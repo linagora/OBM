@@ -2,6 +2,9 @@ package OBM::Entities::obmHost;
 
 $VERSION = '1.0';
 
+use OBM::Entities::commonEntities;
+@ISA = ('OBM::Entities::commonEntities');
+
 $debug = 1;
 
 use 5.006_001;
@@ -11,21 +14,6 @@ use strict;
 use OBM::Tools::commonMethods qw(
         _log
         dump
-        );
-use OBM::Entities::commonEntities qw(
-        setDelete
-        getDelete
-        getArchive
-        setArchive
-        getParent
-        setUpdated
-        unsetUpdated
-        getUpdated
-        getDesc
-        setUpdateEntity
-        getUpdateEntity
-        isMailAvailable
-        isSieveAvailable
         );
 use OBM::Ldap::utils qw(
         _modifyAttr
@@ -89,25 +77,29 @@ sub _init {
 
     # L'ID de l'hôte
     if( !defined($hostDesc->{'host_id'}) ) {
-        $self->_log( 'ID de l\'hôte non défini', 3 );
+        $self->_log( 'ID de l\'hôte non défini', 0 );
         return 1;
     }elsif( $hostDesc->{'host_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$hostDesc->{'host_id'}.'\' incorrect', 4 );
+        $self->_log( 'ID \''.$hostDesc->{'host_id'}.'\' incorrect', 0 );
         return 1;
     }
 
     # Le nom de l'hôte
     if( !defined($hostDesc->{'host_name'}) ) {
-        $self->_log( 'Nom de l\'hôte non défini', 3 );
+        $self->_log( 'nom de l\'hôte non défini', 0 );
         return 1;
-    }elsif( $hostDesc->{'host_name'} !~ /$OBM::Parameters::regexp::regexp_hostname/ ) {
-        $self->_log( 'Nom de l\'hôte \''.$hostDesc->{'host_name'}.'\' incorrect', 4 );
+    }
+    
+    $hostDesc->{'system_host_name'} = lc($hostDesc->{'host_name'});
+    if( $hostDesc->{'system_host_name'} !~ /$OBM::Parameters::regexp::regexp_hostname/ ) {
+        $self->_log( 'nom de l\'hôte \''.$hostDesc->{'host_name'}.'\' incorrect', 0 );
         return 1;
     }
 
     # Le nom actuel de l'hôte, si définit
+    $hostDesc->{'host_name_current'} = lc($hostDesc->{'host_name_current'});
     if( $hostDesc->{'host_name_current'} && $hostDesc->{'host_name_current'} !~ /$OBM::Parameters::regexp::regexp_hostname/ ) {
-        $self->_log( 'Nom actuel de l\'hôte \''.$hostDesc->{'host_name_current'}.'\' incorrect', 4 );
+        $self->_log( 'nom actuel de l\'hôte \''.$hostDesc->{'host_name_current'}.'\' incorrect', 0 );
         return 1;
     }
 
@@ -128,12 +120,12 @@ sub _init {
 
     # Les informations Samba
     if( $OBM::Parameters::common::obmModules->{'samba'} && $hostDesc->{'host_samba'} ) {
-        $hostDesc->{'host_login'} = $hostDesc->{'host_name'}.'$';
+        $hostDesc->{'host_login'} = $hostDesc->{'system_host_name'}.'$';
         $hostDesc->{'host_samba_sid'} = $self->_getUserSID( $domainSid, $hostDesc->{'host_uid'} );
         $hostDesc->{'host_samba_group_sid'} = $self->_getGroupSID( $domainSid, $hostDesc->{'host_gid'} );
         $hostDesc->{'host_samba_flags'} = '[W]';
 
-        if( $self->_getNTLMPasswd( $hostDesc->{'host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
+        if( $self->_getNTLMPasswd( $hostDesc->{'system_host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
             $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 3 );
             if( $hostDesc->{'host_samba'} ) {
                 $self->_log( 'droit samba annulé', 2 );
@@ -240,7 +232,7 @@ sub getDnPrefix {
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'host_name'}.','.$rootDn->[$i] );
+        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'system_host_name'}.','.$rootDn->[$i] );
         $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
@@ -261,7 +253,7 @@ sub getCurrentDnPrefix {
 
     my $currentHostName = $self->{'entityDesc'}->{'host_name_current'};
     if( !$currentHostName ) {
-        $currentHostName = $self->{'entityDesc'}->{'host_name'};
+        $currentHostName = $self->{'entityDesc'}->{'system_host_name'};
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
@@ -318,7 +310,7 @@ sub createLdapEntry {
 
     $entry->add(
         objectClass => $self->_getLdapObjectclass(),
-        cn => $self->{'entityDesc'}->{'host_name'},
+        cn => $self->{'entityDesc'}->{'system_host_name'},
         ipHostNumber => $self->{'entityDesc'}->{'host_ip'}
     );
 
