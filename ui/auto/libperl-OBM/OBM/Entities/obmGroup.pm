@@ -2,6 +2,9 @@ package OBM::Entities::obmGroup;
 
 $VERSION = '1.0';
 
+use OBM::Entities::commonEntities;
+@ISA = ('OBM::Entities::commonEntities');
+
 $debug = 1;
 
 use 5.006_001;
@@ -11,24 +14,6 @@ use strict;
 use OBM::Tools::commonMethods qw(
         _log
         dump
-        );
-use OBM::Entities::commonEntities qw(
-        setDelete
-        getDelete
-        getArchive
-        setArchive
-        getParent
-        setUpdated
-        unsetUpdated
-        getUpdated
-        getDesc
-        _makeEntityEmail
-        setUpdateEntity
-        getUpdateEntity
-        setUpdateLinks
-        getUpdateLinks
-        isMailAvailable
-        isSieveAvailable
         );
 use OBM::Ldap::utils qw(
         _modifyAttr
@@ -88,32 +73,36 @@ sub _init {
 
     # L'ID du groupe
     if( !defined($groupDesc->{'group_id'}) ) {
-        $self->_log( 'ID du groupe non défini', 3 );
+        $self->_log( 'ID du groupe non défini', 0 );
         return 1;
     }elsif( $groupDesc->{'group_id'} !~ /$OBM::Parameters::regexp::regexp_id/ ) {
-        $self->_log( 'ID \''.$groupDesc->{'group_id'}.'\' incorrect', 4 );
+        $self->_log( 'ID \''.$groupDesc->{'group_id'}.'\' incorrect', 0 );
         return 1;
     }
 
     # Le nom du groupe
     if( !defined($groupDesc->{'group_name'}) ) {
-        $self->_log( 'Nom du groupe non défini', 3 );
+        $self->_log( 'Nom du groupe non défini', 0 );
         return 1;
-    }elsif( $groupDesc->{'group_name'} !~ /$OBM::Parameters::regexp::regexp_groupname/ ) {
-        $self->_log( 'Nom du groupe \''.$groupDesc->{'group_name'}.'\' incorrect', 4 );
+    }
+    
+    $groupDesc->{'system_group_name'} = lc($groupDesc->{'group_name'});
+    if( $groupDesc->{'system_group_name'} !~ /$OBM::Parameters::regexp::regexp_groupname/ ) {
+        $self->_log( 'Nom du groupe \''.$groupDesc->{'group_name'}.'\' incorrect', 0 );
         return 1;
     }
 
     # Le GID du groupe
     if( !defined($groupDesc->{'group_gid'}) ) {
-        $self->_log( 'GID du groupe non défini', 3 );
+        $self->_log( 'GID du groupe non défini', 0 );
         return 1;
     }elsif( $groupDesc->{'group_gid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
-        $self->_log( 'GID \''.$groupDesc->{'group_gid'}.'\' incorrect', 4 );
+        $self->_log( 'GID \''.$groupDesc->{'group_gid'}.'\' incorrect', 0 );
         return 1;
     }
 
     # Le nom actuel du groupe, si définit
+    $groupDesc->{'group_name_current'} = lc($groupDesc->{'group_name_current'});
     if( $groupDesc->{'group_name_current'} && $groupDesc->{'group_name_current'} !~ /$OBM::Parameters::regexp::regexp_groupname/ ) {
         $self->_log( 'Nom actuel du groupe \''.$groupDesc->{'group_name_current'}.'\' incorrect', 4 );
         return 1;
@@ -138,7 +127,7 @@ sub _init {
     if( $OBM::Parameters::common::obmModules->{'samba'} && $groupDesc->{'group_samba'} ) {
         $groupDesc->{'group_samba_sid'} = $self->_getGroupSID( $domainSid, $groupDesc->{'group_gid'} );
         $groupDesc->{'group_samba_type'} = 2;
-        $groupDesc->{'group_samba_name'} = $groupDesc->{'group_name'};
+        $groupDesc->{'group_samba_name'} = $groupDesc->{'system_group_name'};
     }else {
         $groupDesc->{'group_samba'} = 0;
     }
@@ -258,7 +247,7 @@ sub getDnPrefix {
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'group_name'}.','.$rootDn->[$i] );
+        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'system_group_name'}.','.$rootDn->[$i] );
         $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
@@ -279,7 +268,7 @@ sub getCurrentDnPrefix {
 
     my $currentGroupName = $self->{'entityDesc'}->{'group_name_current'};
     if( !$currentGroupName ) {
-        $currentGroupName = $self->{'entityDesc'}->{'group_name'};
+        $currentGroupName = $self->{'entityDesc'}->{'system_group_name'};
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
@@ -336,7 +325,7 @@ sub createLdapEntry {
 
     $entry->add(
         objectClass => $self->_getLdapObjectclass(),
-        cn => $self->{'entityDesc'}->{'group_name'},
+        cn => $self->{'entityDesc'}->{'system_group_name'},
         gidNumber => $self->{'entityDesc'}->{'group_gid'}
     );
 
