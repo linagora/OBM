@@ -63,8 +63,5 @@ transport_smtp_map  /etc/postfix/transport_smtp
 cyrus_imap_conf     /etc/imapd.conf
 # /etc/init.d/cyrus par défaut
 cyrus_service       /etc/init.d/cyrus2.2
-# 5 par defaut - temps attendu avant de considérer le service Cyrus comme
-# redémarre
-cyrus_restart       10
 # /var/spool/cyrus par défaut
 cyrus_partition_root    /var/spool/cyrus
