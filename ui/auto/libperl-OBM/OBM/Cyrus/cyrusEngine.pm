@@ -261,7 +261,7 @@ sub getMailboxQuota {
 
     my @quotaDesc = $cyrusSrv->listquotaroot( $mailboxPrefix.$mailboxName );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention du quota maximum : '.$cyrusSrv->error(), 3 );
+        $self->_log( 'erreur Cyrus a l\'obtention du quota maximum : '.$cyrusSrv->error(), 0 );
         return undef;
     }
 
@@ -294,7 +294,7 @@ sub getMailboxQuotaUse {
 
     my @quotaDesc = $cyrusSrv->listquotaroot( $mailboxPrefix.$mailboxName );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention du quota utilise : '.$cyrusSrv->error(), 3 );
+        $self->_log( 'erreur Cyrus a l\'obtention du quota utilise : '.$cyrusSrv->error(), 0 );
         return undef;
     }
 
@@ -332,7 +332,7 @@ sub _imapSetMailboxQuota {
     }
 
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus au positionnement du quota utilisé : '.$cyrusSrv->error(), 3 );
+        $self->_log( 'erreur Cyrus au positionnement du quota utilisé : '.$cyrusSrv->error(), 0 );
         return 1;
     }
 
@@ -361,7 +361,7 @@ sub _imapGetMailboxAcls {
     my %boxAclList = $cyrusSrv->listacl( $boxPrefix.$boxName );
     my $boxRight;
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention des ACLs : '.$cyrusSrv->error(), 3 );
+        $self->_log( 'erreur Cyrus a l\'obtention des ACLs : '.$cyrusSrv->error(), 2 );
         return undef;
 
     }else {
@@ -435,14 +435,14 @@ sub _imapSetMailboxAcls {
     my $boxPattern = $boxPrefix.$boxName;
     my @boxStruct = $cyrusSrv->listmailbox( $boxPattern, '' );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 3 );
+        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 2 );
         return 1;
     }
 
     $boxPattern =~ s/(@.*)$/\/*$1/;
     push( @boxStruct, $cyrusSrv->listmailbox( $boxPattern, '' ) );
     if( $cyrusSrv->error ) {
-        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 3 );
+        $self->_log( 'erreur Cyrus a l\'obtention des ACLs de la BAL : '.$cyrusSrv->error(), 2 );
         return 1;
     }
 

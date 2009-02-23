@@ -265,6 +265,11 @@ sub updateCyrusPartitions {
     my $self = shift;
     my( $domainId ) = @_;
 
+    if( $self->getDeadStatus() ) {
+        $self->_log( $self->getDescription().' est désactivé', 0 );
+        return 1;
+    }
+
     if( $self->_checkDomainId($domainId) ) {
         return 1;
     }
