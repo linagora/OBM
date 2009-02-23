@@ -157,7 +157,7 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.7
     DESC 'OBM special hosts description'
     SUP top AUXILIARY
     MUST cn
-    MAY ( obmDomain ) )
+    MAY ( obmDomain $ ipHostNumber ) )
 
 # Attribut : myDestination
 # Permet de stocker la liste des domaines locaux. plusieurs attributs
