@@ -18,11 +18,11 @@
 
 
 require 5.003;
-#require OBM::toolBox;
 require OBM::Tools::obmDbHandler;
 use Net::Telnet;
 use Getopt::Long;
 use strict;
+use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
@@ -39,31 +39,31 @@ sub getParameter {
     while( my( $paramName, $paramValue ) = each(%{$parameters}) ) {
         SWITCH: {
             if( $paramName eq "smtpInConf" ) {
-                &OBM::toolBox::write_log( "Mise a jour des tables Postfix des serveurs SMTP-in", "W" );
+                _log( "Mise a jour des tables Postfix des serveurs SMTP-in", "W" );
                 $goodParams++;
                 last SWITCH;
             }
 
             if( $paramName eq "smtpOutConf" ) {
-                &OBM::toolBox::write_log( "Mise a jour des tables Postfix des serveurs SMTP-out", "W" );
+                _log( "Mise a jour des tables Postfix des serveurs SMTP-out", "W" );
                 $goodParams++;
                 last SWITCH;
             }
 
             if( $paramName eq "cyrusPartitionsAdd" ) {
-                &OBM::toolBox::write_log( "Mise a jour (ajout) des partitions Cyrus", "W" );
+                _log( "Mise a jour (ajout) des partitions Cyrus", "W" );
                 $goodParams++;
                 last SWITCH;
             }
 
             if( $paramName eq "cyrusPartitionsDel" ) {
-                &OBM::toolBox::write_log( "Mise a jour (suppression) des partitions Cyrus", "W" );
+                _log( "Mise a jour (suppression) des partitions Cyrus", "W" );
                 $goodParams++;
                 last SWITCH;
             }
 
             if( $paramName eq "help" ) {
-                &OBM::toolBox::write_log( "Affichage de l'aide", "W" );
+                _log( "Affichage de l'aide", "W" );
                 $helpParam = 1;
                 last SWITCH;
             }
@@ -91,7 +91,7 @@ sub updateServer {
         return 1;
     }
 
-    &OBM::toolBox::write_log( "Connexion au serveur : '".$srv."'", "W" );
+    _log( "Connexion au serveur : '".$srv."'", "W" );
     my $srvCon = new Net::Telnet(
         Host => $srv,
         Port => 30000,
@@ -100,27 +100,27 @@ sub updateServer {
     );
     
     if( !defined($srvCon) || !$srvCon->open() ) {
-        &OBM::toolBox::write_log( "Echec : lors de la connexion au serveur : ".$srv, "W" );
+        _log( "Echec : lors de la connexion au serveur : ".$srv, "W" );
         return 1;
     }
     while( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 1)) ) {
         chomp($line);
-        &OBM::toolBox::write_log( "Reponse : '".$line."'", "W" );
+        _log( "Reponse : '".$line."'", "W" );
     }
 
 
-    &OBM::toolBox::write_log( "Envoi de la commande : '".$cmd."'", "W" );
+    _log( "Envoi de la commande : '".$cmd."'", "W" );
     $srvCon->print( $cmd );
     if( (!$srvCon->eof()) && (my $line = $srvCon->getline()) ) {
         chomp($line);
-        &OBM::toolBox::write_log( "Reponse : '".$line."'", "W" );
+        _log( "Reponse : '".$line."'", "W" );
     }
 
-    &OBM::toolBox::write_log( "Deconnexion du serveur : '".$srv."'", "W" );
+    _log( "Deconnexion du serveur : '".$srv."'", "W" );
     $srvCon->print( "quit" );
     while( !$srvCon->eof() && (my $line = $srvCon->getline(Timeout => 1)) ) {
         chomp($line);
-        &OBM::toolBox::write_log( "Reponse : '".$line."'", "W" );
+        _log( "Reponse : '".$line."'", "W" );
     }
 
     return 0;
@@ -129,20 +129,19 @@ sub updateServer {
 
 # On prepare le log
 my ($scriptname) = ($0=~'.*/([^/]+)');
-&OBM::toolBox::write_log( $scriptname.': ', 'O', 0 );
 
 # Vérification des paramètres du script
-&OBM::toolBox::write_log( "Analyse des parametres du script", "W", 3 );
+_log( "Analyse des parametres du script", "W", 3 );
 my %parameters;
 if( !getParameter( \%parameters ) ) {
-    &OBM::toolBox::write_log( "Affichage de l'aide ou mauvais parametres...", "WC", 0 );
+    _log( "Affichage de l'aide ou mauvais parametres...", "WC", 0 );
     exit 1;
 }
 
 # On se connecte a la base
 my $dbHandler = OBM::Tools::obmDbHandler->instance();
 if( !defined($dbHandler) ) {
-    &OBM::toolBox::write_log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
+    _log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
     exit 1;
 }
 
@@ -165,25 +164,25 @@ while( my( $serverName, $serverIp, $imapSrv, $smtpInSrv, $smtpOutSrv ) = $queryR
 
         SWITCH: {
             if( $smtpInSrv && ($paramName eq "smtpInConf") ) {
-                &OBM::toolBox::write_log( "Mise a jour des tables Postfix des serveurs SMTP-in", "W" );
+                _log( "Mise a jour des tables Postfix des serveurs SMTP-in", "W" );
                 $cmd = "smtpInConf: ".$serverName;
                 last SWITCH;
             }
 
             if( $smtpOutSrv && ($paramName eq "smtpOutConf") ) {
-                &OBM::toolBox::write_log( "Mise a jour des tables Postfix des serveurs SMTP-out", "W" );
+                _log( "Mise a jour des tables Postfix des serveurs SMTP-out", "W" );
                 $cmd = "smtpOutConf: ".$serverName;
                 last SWITCH;
             }
 
             if( $imapSrv && ($paramName eq "cyrusPartitionsAdd") ) {
-                &OBM::toolBox::write_log( "Mise a jour des partitions Cyrus - Ajout", "W" );
+                _log( "Mise a jour des partitions Cyrus - Ajout", "W" );
                 $cmd = "cyrusPartitions: add:".$serverName;
                 last SWITCH;
             }
 
             if( $imapSrv && ($paramName eq "cyrusPartitionsDel") ) {
-                &OBM::toolBox::write_log( "Mise a jour des partitions Cyrus - Suppression", "W" );
+                _log( "Mise a jour des partitions Cyrus - Suppression", "W" );
                 $cmd = "cyrusPartitions: del:".$serverName;
                 last SWITCH;
             }
@@ -199,9 +198,6 @@ while( my( $serverName, $serverIp, $imapSrv, $smtpInSrv, $smtpOutSrv ) = $queryR
 $dbHandler->destroy();
 
 # Fin de MAJ des MTA
-&OBM::toolBox::write_log( "Fin de mise a jour des MTA", "W" );
-
-# On ferme la connection avec Syslog
-&OBM::toolBox::write_log( "", "C" );
+_log( "Fin de mise a jour d'ObmSatellite", "W" );
 
 exit 0;
