@@ -19,6 +19,7 @@ sub new {
 
     $self->{'serverid'} = $serverId;
     $self->{'ldapServerConn'} = undef;
+    $self->{'deadStatus'} = 0;
 
     if( $self->_getServerDesc() ) {
         $self->_log( 'problème lors de l\'initialisation du serveur LDAP', 1 );
@@ -200,6 +201,11 @@ sub getLdapConn {
 sub _connect {
     my $self = shift;
 
+    if( $self->getDeadStatus() ) {
+        $self->_log( $self->getDescription().' est désactivé', 0 );
+        return 1;
+    }
+
     if( ref( $self->{'ldapServerConn'} ) eq 'Net::LDAP' ) {
         $self->_log( 'connexion déjà établie à '.$self->getDescription(), 3 );
         return 0;
@@ -207,17 +213,24 @@ sub _connect {
 
     $self->_log( 'connexion au '.$self->getDescription(), 2 );
 
+    my @tempo = ( 1, 3, 5, 10, 20, 30 );
     require Net::LDAP;
-    $self->{'ldapServerConn'} = Net::LDAP->new(
-        $self->{'ldap_server'},
-        debug => '0',
-        timeout => '60',
-        version => '3'
-    );
+    while( !($self->{'ldapServerConn'} = Net::LDAP->new( $self->{'ldap_server'}, debug => '0', timeout => '60', version => '3' )) ) {
+        $self->_log( 'échec de connexion au '.$self->getDescription(), 0 );
+
+        my $tempo = shift(@tempo);
+        if( !defined($tempo) ) {
+            last;
+        }
+
+        $self->_log( 'prochaine tentative dans '.$tempo.'s', 3 );
+        sleep $tempo;
+    }
 
     if( !$self->{'ldapServerConn'} ) {
         $self->{'ldapServerConn'} = undef;
-        $self->_log( 'echec de connexion au '.$self->getDescription(), 0 );
+        $self->_log( $self->getDescription().' désactivé car injoignable ', 0 );
+        $self->_setDeadStatus();
         return 1;
     }
 
@@ -291,6 +304,32 @@ sub resetConn {
 
     delete($self->{'ldap_user_dnlogin'});
     delete($self->{'ldap_user_password'});
+    $self->{'deadStatus'} = 0;
 
     return 0;
+}
+
+
+sub _setDeadStatus {
+    my $self = shift;
+
+    $self->{'deadStatus'} = 1;
+
+    return 0;
+}
+
+
+sub _unsetDeadStatus {
+    my $self = shift;
+
+    $self->{'deadStatus'} = 0;
+
+    return 0;
+}
+
+
+sub getDeadStatus {
+    my $self = shift;
+
+    return $self->{'deadStatus'};
 }
