@@ -112,7 +112,7 @@ function run_query_contact_search($contact) {
     if ($cgp_show['module']['company']) {
       $where .= " OR companyentity_entity_id IN (SELECT address_entity_id FROM Address WHERE companyentity_entity_id = address_entity_id ".$addr.")";
     }
-    $where .= '))';
+    $where .= ') OR address_id IS NULL)';
   } else {
     $where .= " OR address_id IS NULL)";
   }

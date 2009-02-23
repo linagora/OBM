@@ -31,7 +31,7 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 $perm_reader = '01';
 $perm_user = '03';
-$perm_editor = '05';
+$perm_editor = '06';
 $perm_admin = '1F';
 //------------------------------//
 // Default Profiles definitions //
