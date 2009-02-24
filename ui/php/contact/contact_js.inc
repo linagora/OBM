@@ -42,40 +42,6 @@ function check_contact(form) {
     return false;
   }
 
-  // MANDATORY : Check the phone number
-  lphone = form.tf_phone.value;
-
-  if ((lphone != \"\") && (check_phone(lphone) == null)) {
-    alert (\"$l_j_check_phone\");
-    return false;
-  }
-
-  // Check the Mobile or personnal phone
-  hphone = form.tf_hphone.value;
-  if ((hphone != \"\") && (check_phone(hphone) == null)) {
-    alert (\"$l_j_check_hphone\");
-    return false;
-  }
-  mphone = form.tf_mphone.value;
-  if ((mphone != \"\") && (check_phone(mphone) == null)) {
-    alert (\"$l_j_check_mphone\");
-    return false;
-  }
-
-  // Check the fax
-  lfax = form.tf_fax.value;
-  if ((lfax != \"\") && (check_fax(lfax) == null)) {
-    alert (\"$l_j_check_fax\");
-    return false;
-  }
-
-  // Check the email
-  lemail = form.tf_email.value;
-  if ((lemail != \"\") && (check_email(lemail) == null)) {
-    alert (\"$l_j_check_email\");
-    return false;
-  }
-
   return true;
 }
 

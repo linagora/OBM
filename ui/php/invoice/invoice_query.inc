@@ -126,8 +126,18 @@ function run_query_invoice_search ($invoice) {
   $orderq .= "ORDER BY $order $sql_order_dir";
 
   // XXXXXX ???? Display archive
-  $query = "SELECT Invoice.*,
+  $query = "SELECT 
+      invoice_id,
       invoice_id as id,
+      invoice_domain_id,
+      invoice_number,
+      invoice_label,
+      invoice_amount_ttc,
+      invoice_amount_ht,
+      invoice_archive,
+      invoice_inout,
+      invoice_credit_memo,
+      invoice_status_id,
       $date,
       $dateexp,
       $datepay,
@@ -199,7 +209,7 @@ function run_query_invoice_detail($p_invoice_id) {
       LEFT JOIN UserObm as c ON invoice_usercreate=c.userobm_id
       LEFT JOIN UserObm as u ON invoice_userupdate=u.userobm_id
     WHERE invoice_id $p_invoice_id $multidomain
-    GROUP BY Invoice.invoice_id, invoice_timeupdate, invoice_timecreate,
+    GROUP BY Invoice.invoice_domain_id, invoice_id, invoice_timeupdate, invoice_timecreate,
       invoice_userupdate, invoice_usercreate, invoice_company_id,
       invoice_deal_id, invoice_project_id, invoice_number, invoice_label,
       invoice_amount_ht, invoice_amount_ttc, invoice_status_id, invoice_date,
@@ -321,7 +331,7 @@ function run_query_invoice_update($invoice) {
   $arch = sql_parse_int($invoice['archive']);
   $ht = $invoice['amount_ht'];
   $ttc = $invoice['amount_ttc'];
-  $status = sql_parse_id($invoice['status'], true);
+  $status = sql_parse_int($invoice['status']);
   $date = ($invoice['date'] ? "'".of_isodate_convert($invoice['date'])."'" : 'null');
   $expiration_date = ($invoice['expiration_date'] ? "'".of_isodate_convert($invoice['expiration_date'])."'" : 'null');
   $payment_date = ($invoice['payment_date'] ? "'".of_isodate_convert($invoice['payment_date'])."'" : 'null');
@@ -358,7 +368,7 @@ function run_query_invoice_update($invoice) {
       invoice_label='$label',
       invoice_amount_ht='$ht',
       invoice_amount_ttc='$ttc',
-      invoice_status_id $status,
+      invoice_status_id=$status,
       invoice_comment='$comment',
       invoice_date=$date,
       invoice_expiration_date=$expiration_date,

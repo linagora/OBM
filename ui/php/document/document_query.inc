@@ -768,9 +768,9 @@ function run_query_document_mime_insert($document) {
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = sql_parse_id($obm["uid"]);
-  $mime = sql_parse_id($document["mime_label"]);
+  $mime = $document["mime_label"];
   $extension = $document["extension"];
-  $mimetype = sql_parse_id($document["mimetype"]);
+  $mimetype = $document["mimetype"];
   $domain_id = sql_parse_id($obm["domain_id"]);
 	
   if($mime == "" || $extension == "" || $mimetype == "") {
@@ -787,9 +787,9 @@ function run_query_document_mime_insert($document) {
     $domain_id,
     '$timecreate',
     $usercreate,
-    $mime,
+    '$mime',
     '$extension',
-    $mimetype)";
+    '$mimetype')";
 
   display_debug_msg($query, $cdg_sql, "run_query_document_mime_insert()");
   $obm_q = new DB_OBM;

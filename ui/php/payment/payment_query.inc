@@ -302,9 +302,9 @@ function run_query_payment_update($pid, $params) {
   $query = "UPDATE Payment SET
     payment_timeupdate=NOW(),
     payment_userupdate='$uid',
-    payment_company_id='$company_id',
-    payment_account_id='$account_id',
-    payment_paymentkind_id='$kind',
+    payment_company_id=$company_id,
+    payment_account_id=$account_id,
+    payment_paymentkind_id=$kind,
     payment_amount='$amount',
     payment_date=$date,
     payment_inout='$inout',
@@ -395,7 +395,7 @@ function get_payment_invoices($id) {
     $multidomain
   GROUP BY
     invoice_id,
-    paymentinvoice_amount,
+    PI1.paymentinvoice_amount,
     invoice_company_id,
     invoice_amount_ttc,
     invoice_number,

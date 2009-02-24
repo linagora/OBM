@@ -120,7 +120,7 @@ function run_query_account_insert($account) {
   $label = $account['label'];
   $bank = $account['bank'];
   $number = $account['number'];
-  $balance = $account['balance'];
+  $balance = sql_parse_int($account['balance']);
   $comment = $account['comment'];
 
   $query = "INSERT INTO Account (
@@ -145,7 +145,7 @@ function run_query_account_insert($account) {
     '$label',
     '$number',
     '$balance',
-    '$balance',
+    $balance,
     '$comment')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_account_insert()');

@@ -424,7 +424,7 @@ function run_query_project_insert($params) {
       '$date_now',
       $uid,
       projectreftask_label,
-      0,
+      NULL,
       1
     FROM ProjectRefTask
     WHERE
@@ -700,7 +700,7 @@ function run_query_project_task_insert($params) {
   $pid = sql_parse_id($params['project_id']);
   $ptask = sql_parse_id($params['ptask'], true);
   $tasklabel = trim($params['tasklabel']);
-  $ref_task = sql_parse_id($params['reftask_id']);
+  $ref_task = $params['reftask_id'];
   $search_q = new DB_OBM;
 
   // If a parent task has been given, check that there are no links from
@@ -753,7 +753,7 @@ function run_query_project_task_insert($params) {
         SELECT 
         $pid,
         '". date('Y-m-d H:i:s') ."',
-        $uid,
+        $obm[uid],
         projectreftask_label,
         $ptask,
         1 FROM ProjectRefTask WHERE
@@ -1350,7 +1350,7 @@ function run_query_project_tasks($pid) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $if_parentgroup = sql_if($db_type, "(Task.projecttask_parenttask_id > 0)", 'PTask.projecttask_label', 'Task.projecttask_label');
+  $if_parentgroup = sql_if($db_type, "(Task.projecttask_parenttask_id IS NOT NULL)", 'PTask.projecttask_label', 'Task.projecttask_label');
   $multidomain = sql_multidomain('project');
   $pid = sql_parse_id($pid, true);
 
@@ -1365,7 +1365,7 @@ function run_query_project_tasks($pid) {
       JOIN Project ON project_id = Task.projecttask_project_id
       LEFT JOIN ProjectTask as PTask on Task.projecttask_parenttask_id=PTask.projecttask_id
     WHERE project_id $pid $multidomain
-    ORDER BY parent_group, parent_id, Task.projecttask_label";
+    ORDER BY parent_group, parent_id DESC, Task.projecttask_label";
 
   display_debug_msg($query, $cdg_sql, 'run_query_project_tasks');
   $obm_q->query($query);
@@ -2139,8 +2139,8 @@ function run_query_project_reftask_insert($params) {
     projectreftask_usercreate,
     projectreftask_tasktype_id,
     projectreftask_label)
-    VALUE (
-    '0',
+    VALUES (
+    NULL,
     NOW(),
     $uid,
     $tasktype,
