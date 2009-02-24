@@ -107,7 +107,7 @@ function run_query_contact_search($contact) {
     $addr .= " AND address_country='$ctry'";
   }
   $where .= 'AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = contactentity_entity_id)';
-  if($addr != '') {
+  if ($addr != '') {
     $where .= " AND (contactentity_entity_id IN (SELECT address_entity_id FROM Address WHERE contactentity_entity_id = address_entity_id ".$addr.")";
     if ($cgp_show['module']['company']) {
       $where .= " OR companyentity_entity_id IN (SELECT address_entity_id FROM Address WHERE companyentity_entity_id = address_entity_id ".$addr.")";
@@ -249,7 +249,7 @@ function run_query_contact_search($contact) {
     LEFT JOIN Address ON address_entity_id = contactentity_entity_id
     LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
     LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id
-    LEFT JOIN Email ON email_entity_id = contactentity_entity_id    ";
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id";
 
 
   if ((! $fuzzy) || ($lname == '')) {
