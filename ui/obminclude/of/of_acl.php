@@ -484,7 +484,7 @@ class OBM_Acl {
   }
   
   private static function getEntityTable($entityType) {
-    switch ($entityType) {
+    switch (strtolower($entityType)) {
       case 'group':
         return 'UGroup';
       case 'mailshare':

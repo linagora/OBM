@@ -519,11 +519,11 @@ function getAllEntities($entityu, $user_id) {
     $e_label = sql_string_concat($db_type, $ctt);
     $u = get_user_info($user_id);
   } else {
-    switch($entityu) {
+    switch($entity) {
     case 'resource':
       $table_entity = 'Resource';
       break;
-    case 'maishare':
+    case 'mailshare':
       $table_entity = 'MailShare';
       break;
     default :
