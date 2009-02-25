@@ -19,7 +19,7 @@
 const PREF_LOGIN = "config.obm.login";
 const PREF_AUTOCONF = "config.obm.autoconfigStatus";
 
-const CONFIG_XML_URL = "https://melamel-sync.sga.defense.gouv.fr/obm-autoconf/autoconfiguration/%s";
+const CONFIG_XML_URL = "http://obm-sync.int.culture.fr/obm-autoconf/autoconfiguration/%s";
 
 const promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                                 .getService(Components.interfaces.nsIPromptService);
@@ -61,11 +61,16 @@ function runAutoconfiguration() {
       
       var configurationXML = _getDataHTTP(CONFIG_XML_URL.replace("%s", login));
       
-      if ( configurationXML == null) {
+      if ( configurationXML == "error") {
       	_displayMessage("Autoconfiguration","Impossible de contacter le service d'autoconfiguration.");
       	return;
       }
-      
+    	
+    	if ( configurationXML == "failed" ) {
+    		_displayMessage("Autoconfiguration","Erreur lors de l'autoconfiguration.");
+    		return;
+    	}
+    	
       if ( configurationXML == "" ) {
         _displayError("Autoconfiguration", "Erreur lors de l'autoconfiguration :" + "\n\n"
                                          + "pas d'adresse correspondante dans l'annuaire.");
@@ -134,11 +139,16 @@ function _getDataHTTP(aURL) {
                             .getService(Components.interfaces.nsIIOService);
 
   var channel = ioService.newChannel(aURL, null, null);
-
+  
   var inputStream = channel.open();
   httpChannel = channel.QueryInterface(Components.interfaces.nsIHttpChannel);
+
 	try {
-			responseStatus = httpChannel.responseStatus;
+			
+			if (! httpChannel.requestSucceeded ) {
+				return "failed";
+			}
+			
 			var charset = "iso8859-1";
 			const replacementChar = Components.interfaces.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER;
 			var converterInputStream = Components.classes["@mozilla.org/intl/converter-input-stream;1"]
@@ -152,7 +162,7 @@ function _getDataHTTP(aURL) {
 
 			return str;
 	} catch (e) {
-		return null;
+		return "error";
 	}
 }
 
@@ -162,24 +172,30 @@ function _setupPreferences(aConfigurationData) {
   var preferences = aConfigurationData.*::preferences;
 
   for each ( var preference in preferences.*::preference ) {
-    var typedValue;
-
-    // créé une variable JavaScript typée
-    switch ( preference.@type.toString() ) {
-      case "string":
-        typedValue = preference.@value.toString();
-        break;
-      case "integer":
-        typedValue = Number(preference.@value).valueOf(); // NaN ??
-        break;
-      case "boolean":
-        typedValue = (preference.@value == "true");
-        break;
-      default:
-        break;
+    if ("@remove" in preference) {
+    	if (preference.@remove == "true") {
+    		_deletePrefBranch(preference.@name);
+    	}
+    } else {
+	    var typedValue;
+	
+	    // créé une variable JavaScript typée
+	    switch ( preference.@type.toString() ) {
+	      case "string":
+	        typedValue = preference.@value.toString();
+	        break;
+	      case "integer":
+	        typedValue = Number(preference.@value).valueOf(); // NaN ??
+	        break;
+	      case "boolean":
+	        typedValue = (preference.@value == "true");
+	        break;
+	      default:
+	        break;
+	    }
+	
+	    _setPreference(preference.@name, typedValue, preference.@set);
     }
-
-    _setPreference(preference.@name, typedValue, preference.@set);
   }
 }
 
@@ -239,9 +255,13 @@ function _getPreference(aName, aDefaultValue) {
 }
 
 function _deletePrefBranch(aName) {
-  var prefBranch = Components.classes["@mozilla.org/preferences-service;1"]
-                             .getService(Components.interfaces.nsIPrefBranch);
-  prefBranch.deleteBranch(aName);
+  try {
+	  var prefBranch = Components.classes["@mozilla.org/preferences-service;1"]
+	                             .getService(Components.interfaces.nsIPrefBranch);
+	  prefBranch.deleteBranch(aName);
+  } catch (e) {
+  	//nothing
+  }
 }
 
 function _prefBranchExists(aBranchName) {
@@ -286,12 +306,18 @@ function _installExtensions(aConfigurationData) {
 
   var extensions = aConfigurationData.*::extensions;
 
+  var extensionManager = Components.classes["@mozilla.org/extensions/manager;1"]
+                                   .getService(Components.interfaces.nsIExtensionManager);
+
   for each ( var extension in extensions.*::extension ) {
-    if ( _extensionMustBeInstalled(extension) ) {
-      extensionsToInstall.push(extension.@src.toString());
+    if ( _extensionMustBeUnInstalled(extension) ) {
+			if (_extensionIsAlreadyInstalled(extension.@id))
+				extensionManager.uninstallItem(extension.@id);
+    } else {
+    	if ( _extensionMustBeInstalled(extension) )
+      	extensionsToInstall.push(extension.@src.toString());
     }
   }
-
   var installManager = Components.classes["@mozilla.org/xpinstall/install-manager;1"]
                                  .getService(Components.interfaces.nsIXPInstallManager);
 
@@ -320,6 +346,14 @@ function _extensionMustBeInstalled(aExtension) {
          || _extensionCanBeUpdated(aExtension.@id, aExtension.@version))
          && _extensionIsCompatible(aExtension));
 }
+
+// vérifie si l'extension est spécifié dans le xml comme à désinstaller
+// et qu'elle est installé
+function _extensionMustBeUnInstalled(aExtension) {
+	return ( aExtension.@uninstall && aExtension.@uninstall == "true"
+					 && _extensionIsAlreadyInstalled(aExtension.@id) );
+}
+
 
 // vérifie qu'une extension n'est pas déjà installée,
 // d'après son identifiant
@@ -581,6 +615,33 @@ function _setupAccounts(aConfigurationData) {
     	}
       _setPreference("mail.identity." + identity.@id + ".stationery_folder", value);
     }
+    
+    if ( "@composeHtml" in identity) {
+    	_setPreference("mail.identity." + identity.@id + ".compose_html",
+                     identity.@composeHtml == "true" ? true : false);
+    }
+    
+    if ( "@replyOnTop" in identity) {
+    	var value;
+    	switch ( identity.@replyOnTop.toString() ) {
+    		case "1":
+    			value = 1;
+    			break;
+    		case "2":
+    			value = 2;
+    			break;
+    		case "3":
+    			value = 3;
+    			break;
+    	}
+    	_setPreference("mail.identity." + identity.@id + ".reply_on_top",
+                     value);
+    }
+    
+    if ( "@sigBottom" in identity) {
+    	_setPreference("mail.identity." + identity.@id + ".sig_bottom",
+                     identity.@sigBottom == "true" ? true : false);
+    }
   }
 
   // SERVEURS
@@ -652,7 +713,12 @@ function _setupAccounts(aConfigurationData) {
       
       if ( "@useSubscription" in server ) {
       	_setPreference("mail.server." + server.@id + ".using_subscription",
-      								server.@offlineDownload == "true" ? true : false);
+      								server.@useSubscription == "true" ? true : false);
+      }
+      
+      if ( "@useIdle" in server ) {
+      	_setPreference("mail.server." + server.@id + ".use_idle",
+      								server.@useIdle == "true" ? true : false);
       }
   }
 
