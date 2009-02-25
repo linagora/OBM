@@ -198,11 +198,11 @@ $cright_write_admin = 16;
 
 // reader : 01 (bit 0) : can see data
 // user   : 03 (bits 0+1) : can see data + insert or update his own data
-// editor : 05 (bits 0+2) : can see data + write data
-// admin  : 1D (bits 0+2+3+4) : can do everything
+// editor : 07 (bits 0+1+2) : can see data + write data
+// admin  : 1F (bits 0+1+2+3+4) : can do everything
 $perm_reader = '01';
 $perm_user = '03';
-$perm_editor = '06';
+$perm_editor = '07';
 $perm_admin = '1F';
 
 ///////////////////////////////////////////////////////////////////////////////
