@@ -74,19 +74,14 @@ function run_query_company_search($company) {
     $and = 'AND';
   }
   // If a phone number has been specified, get it 
-  $where .= " $and (phone_id IN (SELECT MIN(phone_id) FROM Phone WHERE phone_entity_id = companyentity_entity_id)";
-  $and = 'AND';
   if ($phone != '') {
-    $where .= "AND companyentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE companyentity_entity_id = phone_entity_id AND phone_number $like '$phone%'))";
-  } else {
-    $where .= " OR phone_id IS NULL)";
+    $where .= "$and companyentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%')";
+    $and = 'AND';
   }
   // If an email indication has been specified, get it 
-  $where .= 'AND (email_id IN (SELECT MIN(email_id) FROM Email WHERE email_entity_id = companyentity_entity_id)';
   if ($email != '') {
-    $where .= " AND companyentity_entity_id IN (SELECT email_entity_id FROM Email WHERE companyentity_entity_id = email_entity_id AND email_address $like '$email%'))";
-  } else {
-    $where .= " OR email_id IS NULL)";
+    $where .= " $and companyentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$email%')";
+    $and = 'AND';
   }  
   // Address criteria
   $addr = '';
@@ -100,13 +95,10 @@ function run_query_company_search($company) {
     $addr .= " AND address_zipcode $like '$zip%'";
   }
 
-  $where .= 'AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = companyentity_entity_id)';
   if($addr != '') {
-    $where .= " AND companyentity_entity_id IN (SELECT address_entity_id FROM Address WHERE companyentity_entity_id = address_entity_id ".$addr."))";
-  } else {
-    $where .= " OR address_id IS NULL)";
+    $where .= " $and companyentity_entity_id IN (SELECT address_entity_id FROM Address WHERE 1=1 ".$addr.")";
+    $and = 'AND';
   }  
-  $where .= 'AND (website_id IN (SELECT MIN(website_id) FROM Website WHERE website_entity_id = companyentity_entity_id) OR website_id IS NULL)';
   
   if ($dateafter != '') {
     $where .= " $and (company_timeupdate > '$dateafter'
@@ -188,11 +180,11 @@ function run_query_company_search($company) {
 
   $left_join = "
          INNER JOIN CompanyEntity ON companyentity_company_id = company_id
-         LEFT JOIN Address ON address_entity_id = companyentity_entity_id
-         LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
-         LEFT JOIN Phone ON phone_entity_id = companyentity_entity_id
-         LEFT JOIN Email ON email_entity_id = companyentity_entity_id        
-         LEFT JOIN Website ON website_entity_id = companyentity_entity_id
+         LEFT JOIN Address ON address_entity_id = companyentity_entity_id AND address_label like '%X-OBM-Ref1%'
+         LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR'  
+         LEFT JOIN Phone ON phone_entity_id = companyentity_entity_id AND phone_label like '%X-OBM-Ref1%'
+         LEFT JOIN Email ON email_entity_id = companyentity_entity_id AND email_label like '%X-OBM-Ref1%'        
+         LEFT JOIN Website ON website_entity_id = companyentity_entity_id AND website_label like '%X-OBM-Ref1%'
          LEFT JOIN CompanyType ON company_type_id=companytype_id
          $join_userdata
          LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id

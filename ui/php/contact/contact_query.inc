@@ -73,26 +73,20 @@ function run_query_contact_search($contact) {
     $where .= " AND contact_firstname $like '$fname%'";
   }
   // If a phone number has been specified, get it 
-  $where .= 'AND (phone_id IN (SELECT MIN(phone_id) FROM Phone WHERE phone_entity_id = contactentity_entity_id)';
   if ($phone != '') {
-    $where .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE contactentity_entity_id = phone_entity_id AND phone_number $like '$phone%')";
+    $where .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%')";
     if ($cgp_show['module']['company']) {
-      $where .= "OR companyentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE companyentity_entity_id = phone_entity_id AND phone_number $like '$phone%')";
+      $where .= "OR companyentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%')";
     }
-    $where .= '))';
-  } else {
-    $where .= " OR phone_id IS NULL)";
+    $where .= ')';
   }
   // If an email indication has been specified, get it 
-  $where .= 'AND (email_id IN (SELECT MIN(email_id) FROM Email WHERE email_entity_id = contactentity_entity_id)';
   if ($email != '') {
-    $where .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE contactentity_entity_id = email_entity_id AND email_address $like '$email%')";
+    $where .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$email%')";
     if ($cgp_show['module']['company']) {
-      $where .= " OR companyentity_entity_id IN (SELECT email_entity_id FROM Email WHERE companyentity_entity_id = email_entity_id AND email_address $like '$email%')";
+      $where .= " OR companyentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$email%')";
     }
-    $where .= '))';
-  } else {
-    $where .= " OR email_id IS NULL)";
+    $where .= ')';
   }
   // If a post code has been specified, get it
   if ($zip != '') {
@@ -106,15 +100,12 @@ function run_query_contact_search($contact) {
   if (($ctry != $c_all) && ($ctry != '')) {
     $addr .= " AND address_country='$ctry'";
   }
-  $where .= 'AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = contactentity_entity_id)';
   if ($addr != '') {
-    $where .= " AND (contactentity_entity_id IN (SELECT address_entity_id FROM Address WHERE contactentity_entity_id = address_entity_id ".$addr.")";
+    $where .= " AND (contactentity_entity_id IN (SELECT address_entity_id FROM Address WHERE 1=1 ".$addr.")";
     if ($cgp_show['module']['company']) {
-      $where .= " OR companyentity_entity_id IN (SELECT address_entity_id FROM Address WHERE companyentity_entity_id = address_entity_id ".$addr.")";
+      $where .= " OR companyentity_entity_id IN (SELECT address_entity_id FROM Address WHERE 1=1 ".$addr.")";
     }
-    $where .= ') OR address_id IS NULL)';
-  } else {
-    $where .= " OR address_id IS NULL)";
+    $where .= ')';
   }
 
   // If a company name indication has been specified (without id) get it 
@@ -245,11 +236,11 @@ function run_query_contact_search($contact) {
     $join_userdata
     LEFT JOIN Kind ON contact_kind_id = kind_id
     LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
-    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-    LEFT JOIN Address ON address_entity_id = contactentity_entity_id
+    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id 
+    LEFT JOIN Address ON address_entity_id = contactentity_entity_id  AND address_label like '%X-OBM-Ref1%'
     LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
-    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id
-    LEFT JOIN Email ON email_entity_id = contactentity_entity_id";
+    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label like '%X-OBM-Ref1%'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like '%X-OBM-Ref1%'";
 
 
   if ((! $fuzzy) || ($lname == '')) {
