@@ -212,7 +212,7 @@ Obm.CalendarDayEvent = new Class({
   setExtension: function(time) {
     var eventTime = time * 1000;
     var calendarStartTime = obm.calendarManager.startTime * 1000;
-    if (eventTime < calendarStartTime) {
+    if (new Obm.DateTime(eventTime).format('Ymd') < new Obm.DateTime(calendarStartTime).format('Ymd')) {
       this.extension = new Element('img').setProperty('src',obm.vars.images.extension).injectTop(this.titleContainer);
     }
   },
