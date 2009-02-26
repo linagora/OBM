@@ -188,11 +188,11 @@ function html_tools_update_detail_list($entity, $entities) {
 function html_tools_delete_button($entity, $state, $id) {
   global $resources_path, $l_js_ask_confirm, $ico_undo, $ico_spinner;
 
-  $block = "
-    <img id=\"spinner_{$entity}_{$id}\" src=\"$ico_spinner\" style=\"display: none;\" />
-      <img src=\"$ico_undo\"
-      onclick=\"if (confirm('".phpStringToJsString($GLOBALS['l_js_'.$state.'_'.$entity.'_confirm'])."')) { postUpdateToDelete('$entity', '$state', '$id'); }; return false;\"/>
-    ";
+  //$block = "
+  //  <img id=\"spinner_{$entity}_{$id}\" src=\"$ico_spinner\" style=\"display: none;\" />
+  //    <img src=\"$ico_undo\"
+  //    onclick=\"if (confirm('".phpStringToJsString($GLOBALS['l_js_'.$state.'_'.$entity.'_confirm'])."')) { postUpdateToDelete('$entity', '$state', '$id'); }; return false;\"/>
+  //  ";
 
   return $block;
 }
