@@ -19,14 +19,16 @@
 const PREF_LOGIN = "config.obm.login";
 const PREF_AUTOCONF = "config.obm.autoconfigStatus";
 
-const CONFIG_XML_URL = "http://obm-sync.int.culture.fr/obm-autoconf/autoconfiguration/%s";
-
 const promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                                 .getService(Components.interfaces.nsIPromptService);
                                 
 const appStartup = Components.interfaces.nsIAppStartup;
 const appStartupService = Components.classes["@mozilla.org/toolkit/app-startup;1"]
             										.getService(appStartup);
+
+var global_config_url = _getPreference("autoadmin.global_config_url");
+global_config_url = global_config_url.replace(/autoconfig.js$/, "");
+const CONFIG_XML_URL = global_config_url + "autoconfiguration/%s";
 
 runAutoconfiguration();
 

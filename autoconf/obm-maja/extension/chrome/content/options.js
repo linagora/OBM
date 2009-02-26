@@ -56,13 +56,23 @@ var obmmaja = {
     }
   },
   resetPrefs: function() {
-  	//unset all user prefs
-  	var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-  	var prefs = prefService.getChildList("",{});
+    //unset all user prefs
+    var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+    var prefs = prefService.getChildList("",{});
+    var no_resets = new Array(/mail\.server\.server1\.directory/);
+    var do_clear;
   	for ( var i=0; i < prefs.length; i++) {
-  		if (prefService.prefHasUserValue(prefs[i])) {
-    		prefService.clearUserPref(prefs[i]);
-    	}
+  	  if (prefService.prefHasUserValue(prefs[i])) {
+        do_clear = true;
+        for ( var j=0; j < no_resets.length; j++) {
+          if (prefs[i].match(no_resets[j])) {
+            do_clear = false;
+          }
+        }
+        if (do_clear) {
+          prefService.clearUserPref(prefs[i]);
+        }
+      }
    	}
   },
   visibleValid: function() {

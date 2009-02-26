@@ -38,8 +38,60 @@ var scriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"]
                              .createInstance(Components.interfaces.mozIJSSubScriptLoader);
 
 scriptLoader.loadSubScript("chrome://obmmaja/content/utils.js");
+scriptLoader.loadSubScript("chrome://obmmaja/content/logger.js");
+scriptLoader.loadSubScript("chrome://obmmaja/content/toolbar.js");
+
 
 doMaj();
+doInitToolbar();
+
+function doInitToolbar () {
+  prefService = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+  prefs = prefService.getBranch(null);
+  
+  if (prefs.prefHasUserValue("config.obm.autoconf.toolbar.debug")
+      && prefs.getIntPref("config.obm.autoconf.toolbar.debug") == 1) {
+    window.addEventListener("load", function () {
+      Logger.logToConsole("Toolbar debug main window load event");
+      Logger.logToConsole("DOM main: " + MainToolbar.getCurrentSet());
+      Logger.logToConsole("DOM addressbook: " + AddressBookToolbar.getCurrentSet());
+      Logger.logToConsole("DOM compose: " + ComposeToolbar.getCurrentSet());
+      Logger.logToConsole("RDF main: " + MainToolbar.getRDFData());
+      Logger.logToConsole("RDF addressbook: " + AddressBookToolbar.getRDFData());
+      Logger.logToConsole("RDT compose: " + ComposeToolbar.getRDFData());
+    }, false);
+    
+    window.addEventListener("close", function () {
+      Logger.logToConsole("Toolbar debug main window close event");
+      Logger.logToConsole("DOM main: " + MainToolbar.getCurrentSet());
+      Logger.logToConsole("DOM addressbook: " + AddressBookToolbar.getCurrentSet());
+      Logger.logToConsole("DOM compose: " + ComposeToolbar.getCurrentSet());
+      Logger.logToConsole("RDF main: " + MainToolbar.getRDFData());
+      Logger.logToConsole("RDF addressbook: " + AddressBookToolbar.getRDFData());
+      Logger.logToConsole("RDT compose: " + ComposeToolbar.getRDFData());
+    }, false);
+  }
+
+  if (!prefs.prefHasUserValue("config.obm.autoconf.toolbar")) {
+    prefs.setIntPref("config.obm.autoconf.toolbar", "1");
+    
+    if (prefs.prefHasUserValue("config.obm.autoconf.toolbar.main")) {
+    	/*
+      MainToolbar.flush();
+      MainToolbar.addButtons(prefs.getCharPref("config.obm.autoconf.toolbar.main"));
+      * */
+      MainToolbar.save(prefs.getCharPref("config.obm.autoconf.toolbar.main"));
+    }
+    
+    if (prefs.prefHasUserValue("config.obm.autoconf.toolbar.addressbook")) {
+      AddressBookToolbar.save(prefs.getCharPref("config.obm.autoconf.toolbar.addressbook"));
+    }
+    
+    if (prefs.prefHasUserValue("config.obm.autoconf.toolbar.compose")) {
+      ComposeToolbar.save(prefs.getCharPref("config.obm.autoconf.toolbar.compose"));
+    }
+  }
+}
 
 function doMaj() {
   var oldVersion = utils._getPreference("extensions.obmmaja.versionOnLastMaj", "0");
@@ -54,7 +106,6 @@ function doMaj() {
 /* fin de la section de forçage des préférences */
   
   if ( utils._isExtensionUpdated(oldVersion, currentVersion) ) {
-    
     setPreferences(oldVersion);
     
     utils._setPreference("extensions.obmmaja.versionOnLastMaj", currentVersion, "user" );

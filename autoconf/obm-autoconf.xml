@@ -6,12 +6,13 @@
                 type="javax.transaction.UserTransaction"/>
 
   <Resource name="jdbc/AutoConfDS" auth="Container"
-	    type="javax.sql.DataSource"
-	    factory="fr.aliacom.jndi.DataSourceFactory"
-	    login="obm"
-	    password="obm"
-	    className="com.mysql.jdbc.Driver"
-	    url="jdbc:mysql://localhost/obm?relaxAutocommit=true&amp;zeroDateTimeBehavior=convertToNull&amp;jdbcCompliantTruncation=false"
-	    max="4"
-	    pingQuery="SELECT 1"/>
+            type="javax.sql.DataSource"
+            factory="fr.aliacom.jndi.DataSourceFactory"
+            login="obm"
+            password="obm"
+            className="org.postgresql.Driver"
+            url="jdbc:postgresql://127.0.0.1/obm"
+            max="4"
+            pingQuery="SELECT 1"/>
 </Context>
+
