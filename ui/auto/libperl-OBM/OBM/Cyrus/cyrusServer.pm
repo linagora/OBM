@@ -104,7 +104,7 @@ sub _getServerDesc {
 
 
     while( my $srvDesc = $sth->fetchrow_hashref() ) {
-        push( @{$self->{'domainsId'}}, $self->{'serverDesc'}->{'mailserver_for_domain_id'} );
+        push( @{$self->{'domainsId'}}, $srvDesc->{'mailserver_for_domain_id'} );
     }
 
     $self->_log( 'chargement : '.$self->getDescription(), 1 );
