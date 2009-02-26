@@ -27,6 +27,11 @@ class Vcalendar_Utils {
     fclose($handle);
     return null;
   }
+  
+  static function entityExist($id, $entity) {
+    $fn = $entity.'Exist';
+    return self::$fn($id);
+  }
 
   static function userExist($id) {
     $db = new DB_OBM;
@@ -34,5 +39,12 @@ class Vcalendar_Utils {
     $db->query($query);
     return $db->next_record();
   }
+
+  static function resourceExist($id) {
+    $db = new DB_OBM;
+    $query = 'SELECT resource_id From Resource WHERE resource_id = '.$id;
+    $db->query($query);
+    return $db->next_record();
+  }  
 }
 

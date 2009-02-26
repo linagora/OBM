@@ -305,6 +305,9 @@ class DB_Sql {
   }
 
   static function xParser($query) {
+    // Search for any pseuso code substring (begining by #).
+    // This is buggy for exemple field='#toto', this should not be interpretted
+    // as pseudo  code, but it will.
     preg_match_all('/#[\w_]+(\((?:(?>[^()]+)|(?1))*\))?/', $query, $pcodes);
     $translate = array();
     foreach($pcodes[0] as $pcode) {
@@ -314,21 +317,42 @@ class DB_Sql {
     return $query;
   }        
   
+  /**
+   * Interpret the sql pseudo code 
+   * 
+   * @param mixed $code 
+   * @static
+   * @access public
+   * @return void
+   */
   static function interpret($code) {
+    // Search for #X, #X(), #X(Y), #X(Y()) and any subcombinaison of this
+    // (#A(#B(Z, #C, #D(E)), F)) 
+    // This is buggy for exemple #X('#toto').
+    // #toto should not be interpreted as a pseudo code, but it will.
+
     preg_match_all("/(#)?([^ (,][^(,]*)(\(((?:(?>[^()]+)|(?3))*)\))?/",$code, $match);
     $return = array();
     foreach($match[0] as $key => $pattern) {
       if(!empty($match[3][$key])) {
+        //Recursive call for embeb pseudo code (#X(#Y))
         $args = self::interpret($match[4][$key]);
       } else {
         $args = NULL;
       }
+      //If the match is pseudo code (#X) it will be parsed =>
+      // #X => self::X
+      // #X(Y) => self:X(Y)
       if(!empty($match[1][$key])) {
-        if(!is_null($args)) {
+        if(!is_null($args) && method_exists(__CLASS__, $match[2][$key])) {
           $pcode = self::$match[2][$key]($args);
-        } else {
+        } elseif(property_exists(__CLASS__, $match[2][$key])) {
           $pcode = self::${$match[2][$key]};
-        } 
+        }  else {
+          $pcode = $pattern;
+        }            
+      // Else only arguments will be replaced :
+      // X(#Y) => X(self::Y) 
       }else  {
         if(!is_null($args)) {
           $pcode = $match[2][$key].'('.implode(',', $args).')';

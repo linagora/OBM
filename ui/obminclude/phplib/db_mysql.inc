@@ -432,11 +432,13 @@ class DB_Sql {
         $args = NULL;
       }
       if(!empty($match[1][$key])) {
-        if(!is_null($args)) {
+        if(!is_null($args) && method_exists(__CLASS__, $match[2][$key])) {
           $pcode = self::$match[2][$key]($args);
-        } else {
+        } elseif(property_exists(__CLASS__, $match[2][$key])) {
           $pcode = self::${$match[2][$key]};
-        } 
+        }  else {
+          $pcode = $pattern;
+        }        
       }else  {
         if(!is_null($args)) {
           $pcode = $match[2][$key].'('.implode(',', $args).')';
