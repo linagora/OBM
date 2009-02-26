@@ -823,7 +823,8 @@ function html_contact_view_main($co_q, $coords) {
       $template='<tr><th>%s</th><td>%s</td></tr>';
       switch ($kind) {
         case 'website' :
-          $data = "<a href=\"$datas[0]\">".((strpos($datas[0],'://') === false)?'http://'.$datas[0]:$datas[0])."</a>";
+          $data = ((strpos($datas[0],'://') === false)?'http://'.$datas[0]:$datas[0]);
+          $data = "<a target='_blank' href=\"$data\">$data</a>";
           break;
         case 'email' :
           $data = "<a href=\"mailto:$datas[0]\">$datas[0]</a>";

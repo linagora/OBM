@@ -51,7 +51,7 @@ function run_query_payment_search($payment) {
     $and = 'AND';
   }
   if ($amount) {
-    $where .= " $and payment_amount $like '$amount%'";
+    $where .= " $and payment_amount = $amount";
     $and = 'AND';
   }
   if ($date_after) {
