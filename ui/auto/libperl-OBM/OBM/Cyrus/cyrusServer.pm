@@ -240,7 +240,7 @@ sub _checkDomainId {
     }
 
     if( $notFound ) {
-        $self->_log( $self->getDescription().' n\'est pas un serveur du domaine \''.$domainId.'\'', 2 );
+        $self->_log( $self->getDescription().' n\'est pas un serveur du domaine \''.$domainId.'\'', 0 );
     }
 
     return $notFound;
