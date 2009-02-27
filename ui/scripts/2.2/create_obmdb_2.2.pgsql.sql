@@ -223,7 +223,7 @@ CREATE TABLE contact (
     contact_marketingmanager_id integer,
     contact_lastname            character varying(64) DEFAULT ''::character varying NOT NULL,
     contact_firstname           character varying(64),
-    contact_middlename          varchar(16) DEFAULT NULL,
+    contact_middlename          varchar(32) DEFAULT NULL,
     contact_suffix              varchar(16) DEFAULT NULL,
     contact_aka                 character varying(255),
     contact_sound               character varying(48),

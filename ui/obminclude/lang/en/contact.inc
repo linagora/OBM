@@ -8,6 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
+$l_middlename = 'Middle Name';
+$l_suffix = 'Suffix';
 $l_market = "Person in charge";
 $l_function = "Function";
 $l_title = "Job Title";
@@ -28,7 +30,11 @@ $l_comment3 = "Comment 3";
 $l_date_after = "Inscription date after";
 $l_date_before = "Inscription date before";
 $l_mailing_ok_first = "Mail.";
+$l_other_infos = 'Other Informations';
 $l_birthday = "Birth day";
+$l_anniversary = 'Anniversary';
+$l_assistant = 'Assistant';
+$l_spouse = 'Spouse';
 
 // Labels and texts
 $l_contact_name = "Contact Name";

@@ -849,7 +849,7 @@ ALTER TABLE DisplayPref DROP PRIMARY KEY;
 ALTER TABLE DisplayPref ADD COLUMN display_id int(8) auto_increment PRIMARY KEY FIRST;
 
 -- Contact
-ALTER TABLE Contact ADD COLUMN contact_middlename varchar(16) AFTER contact_firstname;
+ALTER TABLE Contact ADD COLUMN contact_middlename varchar(32) AFTER contact_firstname;
 ALTER TABLE Contact ADD COLUMN contact_suffix varchar(16) AFTER contact_middlename;
 ALTER TABLE Contact ADD COLUMN contact_manager varchar(64) AFTER contact_sound;
 ALTER TABLE Contact ADD COLUMN contact_assistant varchar(64) AFTER contact_manager;
@@ -2100,7 +2100,7 @@ UPDATE ParentDeal SET parentdeal_technicalmanager_id = NULL WHERE parentdeal_tec
 DELETE FROM Payment WHERE payment_domain_id NOT IN (SELECT domain_id FROM Domain) AND payment_domain_id IS NOT NULL;
 
 -- Foreign key from payment_account_id to account_id
-DELETE FROM Payment WHERE payment_account_id NOT IN (SELECT account_id FROM Account) AND payment_account_id IS NOT NULL;
+-- DELETE FROM Payment WHERE payment_account_id NOT IN (SELECT account_id FROM Account) AND payment_account_id IS NOT NULL;
 
 -- Foreign key from payment_userupdate to userobm_id
 UPDATE Payment SET payment_userupdate = NULL WHERE payment_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND payment_userupdate IS NOT NULL;

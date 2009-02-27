@@ -1,4 +1,4 @@
--- Write that the 2.1->2.2 has started
+-- Write that the 2.1->2.2 has started
 UPDATE ObmInfo SET obminfo_value='2.1->2.2' WHERE obminfo_name='db_version';
 
 
@@ -851,7 +851,7 @@ ALTER TABLE DisplayPref ADD CONSTRAINT displaypref_key  UNIQUE (display_user_id,
 ALTER TABLE DisplayPref ADD COLUMN display_id serial PRIMARY KEY;
 
 -- Contact
-ALTER TABLE Contact ADD COLUMN contact_middlename varchar(16);
+ALTER TABLE Contact ADD COLUMN contact_middlename varchar(32);
 ALTER TABLE Contact ADD COLUMN contact_suffix varchar(16);
 ALTER TABLE Contact ADD COLUMN contact_manager varchar(64);
 ALTER TABLE Contact ADD COLUMN contact_assistant varchar(64);
@@ -2347,7 +2347,7 @@ DELETE FROM Payment WHERE payment_domain_id NOT IN (SELECT domain_id FROM Domain
 ALTER TABLE Payment ADD CONSTRAINT payment_domain_id_domain_id_fkey FOREIGN KEY (payment_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from payment_account_id to account_id
-DELETE FROM Payment WHERE payment_account_id NOT IN (SELECT account_id FROM Account) AND payment_account_id IS NOT NULL;
+-- DELETE FROM Payment WHERE payment_account_id NOT IN (SELECT account_id FROM Account) AND payment_account_id IS NOT NULL;
 ALTER TABLE Payment ADD CONSTRAINT payment_account_id_account_id_fkey FOREIGN KEY (payment_account_id) REFERENCES Account(account_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from payment_userupdate to userobm_id

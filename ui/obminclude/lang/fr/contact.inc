@@ -8,6 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
+$l_middlename = 'Deuxième prénom';
+$l_suffix = 'Suffixe';
 $l_market = "Responsable";
 $l_function = "Fonction";
 $l_minihphone = "(Perso)";
@@ -41,7 +43,11 @@ $l_category5 = "catégorie 5";
 $l_date_after = "Date Après";
 $l_date_before = "Date Avant";
 $l_mailing_ok_first = "Mail.";
+$l_other_infos = 'Informations supplémentaires';
 $l_birthday = "Date de naissance";
+$l_anniversary = 'Anniversaire';
+$l_assistant = 'Assistant';
+$l_spouse = 'Conjoint';
 
 // Actions
 $l_j_check_date = "Remplissez la date avec une date valide";

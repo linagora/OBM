@@ -442,7 +442,7 @@ CREATE TABLE `Contact` (
   `contact_marketingmanager_id` int(8) default NULL,
   `contact_lastname`            varchar(64) NOT NULL default '',
   `contact_firstname`           varchar(64) default NULL,
-  `contact_middlename`          varchar(16) default NULL,
+  `contact_middlename`          varchar(32) default NULL,
   `contact_suffix`              varchar(16) default NULL,
   `contact_aka`                 varchar(255) default NULL,
   `contact_sound`               varchar(48) default NULL,

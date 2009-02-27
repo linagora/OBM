@@ -590,11 +590,13 @@ function dis_contact_consult($contact) {
 //   - $funcs     : array with contact function list
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_header($co_q, $funcs) {
-  global $l_company, $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title;
-  global $l_contact, $l_market, $l_archive, $l_date, $l_no_date, $l_birthday;
   global $cgp_show, $cgp_hide, $l_yes, $l_no;
-  global $l_service, $l_mailing_ok, $l_newsletter;
   global $display, $path, $action, $ccontact_simple_kind;
+  global $l_lastname, $l_firstname, $l_middlename, $l_suffix, $l_aka, $l_kind;
+  global $l_contact, $l_company, $l_title, $l_market, $l_archive;
+  global $l_date, $l_no_date, $l_birthday, $l_anniversary;
+  global $l_other_infos, $l_manager, $l_assistant, $l_spouse, $l_category;
+  global $l_service, $l_mailing_ok, $l_newsletter;
 
   $c_id = $co_q->f('contact_company_id');
   $c_name = $co_q->f('company_name');
@@ -612,11 +614,17 @@ function html_contact_header($co_q, $funcs) {
   $market = $co_q->f('market_lname') . ' ' . $co_q->f('market_fname');
   $lname = $co_q->f('contact_lastname');
   $fname = $co_q->f('contact_firstname');
+  $mname = $co_q->f('contact_middlename');
+  $suffix = $co_q->f('contact_suffix');
   $aka = $co_q->f('contact_aka');
+  $service = $co_q->f('contact_service');
   $archive = ($co_q->f('contact_archive') == 1 ? $l_yes : $l_no);
   $date = $co_q->f('contact_date');
   $date = ($date != 0) ? of_date_format($date) : $l_no_date;
-  $service = $co_q->f('contact_service');
+  $manager = $co_q->f('contact_manager');
+  $assistant = $co_q->f('contact_assistant');
+  $spouse = $co_q->f('contact_spouse');
+  $category = $co_q->f('contact_category');
   $mailok = ($co_q->f('contact_mailing_ok') == 1 ? $l_yes : $l_no);
   $newsletter = ($co_q->f('contact_newsletter') == 1 ? $l_yes : $l_no);
   
@@ -643,6 +651,7 @@ function html_contact_header($co_q, $funcs) {
   $show_resp = (! $cgp_hide['contact']['responsible']);
   $show_date = (! $cgp_hide['contact']['contact_date']);
   $show_birthday = (! $cgp_hide['contact']['contact_birthday']);
+  $show_anniversary = (! $cgp_hide['contact']['contact_anniversary']);
 
   $show_mailing = (! $cgp_hide['contact']['contact_mailing']);
   $show_service = (! $cgp_hide['contact']['contact_service']);
@@ -694,6 +703,14 @@ function html_contact_header($co_q, $funcs) {
       <td>$birthday</td>
     </tr>";
   }
+  // Birthday consult field
+  if ($show_anniversary) {
+    $block_anniversary = "
+    <tr>
+      <th>$l_anniversary</th>
+      <td>$anniversary</td>
+    </tr>";
+  }
   // Service field
   if ($show_service) {
     $block_service = "
@@ -728,14 +745,18 @@ function html_contact_header($co_q, $funcs) {
       <th>$l_firstname</th>
       <td>$fname</td>
     </tr>
+    <tr>
+      <th>$l_middlename</th>
+      <td>$mname</td>
+    </tr>
+    <tr>
+      <th>$l_suffix</th>
+      <td>$suffix</td>
+    </tr>
     $dis_aka
     <tr>
       <th>$l_kind</th>
       <td>$kind</td>
-    </tr>
-    <tr>
-      <th>$l_archive</th>
-      <td>$archive</td>
     </tr>
     <tr>
       <th>$l_company</th>
@@ -743,13 +764,39 @@ function html_contact_header($co_q, $funcs) {
     </tr>
     $block_function
     $block_title
+    $block_service
     $block_resp
+    </table>
+    &nbsp;
+    <h1>$l_other_infos</h1>
+    <table>
+    <tr>
+      <th>$l_archive</th>
+      <td>$archive</td>
+    </tr>
+    <tr>
+      <th>$l_manager</th>
+      <td>$manager</td>
+    </tr>
+    <tr>
+      <th>$l_assistant</th>
+      <td>$assistant</td>
+    </tr>
+    <tr>
+      <th>$l_spouse</th>
+      <td>$spouse</td>
+    </tr>
+    <tr>
+      <th>$l_category</th>
+      <td>$category</td>
+    </tr>
     $block_date
     $block_birthday
-    $block_service
+    $block_anniversary
     $block_mailing
     </table>
-    </div>"; 
+    </div>
+";
 
   return $block;
 }
@@ -762,7 +809,7 @@ function html_contact_header($co_q, $funcs) {
 //   - $coords : contact secondary info (addresses, phone numbers, ...)
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_view_main($co_q, $coords) {
-  global $l_phone, $l_hphone, $l_mphone, $l_fax, $l_address, $l_postcode;
+  global $l_phone, $l_address, $l_postcode;
   global $l_service, $l_coord, $l_town, $l_country;
   global $l_expresspostal, $l_comment1, $l_comment2, $l_comment3;
   global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter;
@@ -1031,18 +1078,20 @@ function dis_contact_form($action, $co_q, $contact) {
 //   - $contact[] : default values
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact, $coords) {
-  global $ico_company, $l_company, $ico_add, $ico_crow, $l_header_new;
+  global $ico_company, $l_company, $ico_add, $ico_crow, $l_header_new, $l_add;
   global $cgp_mailing_default, $ccontact_private_default, $cright_write_admin;
-  global $l_lastname, $l_firstname, $l_aka, $l_kind, $l_title, $l_letter;
-  global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
+  global $l_lastname, $l_firstname, $l_middlename, $l_suffix, $l_aka;
+  global $l_kind, $l_title, $l_letter;
+  global $l_phone, $l_postcode,$l_expresspostal;
   global $l_address, $l_town, $l_country, $l_service,$l_date, $l_no_date;
   global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter;
   global $l_comment1, $l_add_comment1, $l_upd_comment1;
   global $l_comment2, $l_add_comment2, $l_upd_comment2,$l_yes;
   global $l_comment3, $l_add_comment3, $l_upd_comment3,$l_lang;
-  global $l_birthday, $l_address_labels,$l_website_labels, $l_add;
+  global $l_birthday, $l_anniversary, $l_address_labels,$l_website_labels;
   global $l_datasource, $l_archive, $l_private, $l_coord, $l_contact, $l_market;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
+  global $l_other_infos, $l_manager, $l_assistant, $l_spouse, $l_category;
   global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
   global $extra_js, $l_im, $l_website, $l_phone_labels, $l_email_labels, $l_number;
   global $l_remove, $l_street, $ccontact_simple_kind;
@@ -1089,9 +1138,16 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       $birthday = new Of_Date($birthday, 'GMT');
       $birthday = $birthday->getOutputDate();
     }
+    if ($co_q->f('contact_anniversary')) {
+      $anniversary = $co_q->f('contact_anniversary');
+      $anniversary = new Of_Date($anniversary, 'GMT');
+      $anniversary = $anniversary->getOutputDate();
+    }
     
     $lname = $co_q->f('contact_lastname');
     $fname = $co_q->f('contact_firstname');
+    $mname = $co_q->f('contact_middlename');
+    $suffix = $co_q->f('contact_suffix');
     $aka = $co_q->f('contact_aka');
     $service = $co_q->f('contact_service');
     $func = $co_q->f('contact_function_id');
@@ -1100,6 +1156,10 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $newsletter = ($co_q->f('contact_newsletter') == 1 ? ' checked' : '');
     $archive = ($co_q->f('contact_archive') == 1 ? ' checked' : '');
     $priv = $co_q->f('privacy');
+    $manager = $co_q->f('contact_manager');
+    $assistant = $co_q->f('contact_assistant');
+    $spouse = $co_q->f('contact_spouse');
+    $category = $co_q->f('contact_category');
     $comment = $co_q->f('contact_comment');
     $usercomment = $uid;
     $datecomment = of_date_upd_format();
@@ -1157,12 +1217,19 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   if (isset($contact['market'])) { $mark = $contact['market']; }
   if (isset($contact['date'])) { $date = of_date_upd_format($contact['date'],true); }
   if (isset($contact['birthday'])) { $birthday = of_date_upd_format($contact['birthday'],true); }
+  if (isset($contact['anniversary'])) { $anniversary = of_date_upd_format($contact['anniversary'],true); }
   if (isset($contact['lname'])) { $lname = stripslashes($contact['lname']); }
   if (isset($contact['fname'])) { $fname = stripslashes($contact['fname']); }
+  if (isset($contact['mname'])) { $mname = stripslashes($contact['mname']); }
+  if (isset($contact['suffix'])) { $suffix = stripslashes($contact['suffix']); }
   if (isset($contact['aka'])) { $aka = stripslashes($contact['aka']); }
   if (isset($contact['service'])) { $service = stripslashes($contact['service']); }
   if (isset($contact['function'])) { $func = $contact['function']; }
   if (isset($contact['title'])) { $title = stripslashes($contact['title']); }
+  if (isset($contact['manager'])) { $manager = stripslashes($contact['manager']); }
+  if (isset($contact['assistant'])) { $assistant = stripslashes($contact['assistant']); }
+  if (isset($contact['spouse'])) { $spouse = stripslashes($contact['spouse']); }
+  if (isset($contact['category'])) { $category = stripslashes($contact['category']); }
   if (isset($contact['phones'])) { $phones = $contact['phones'];}
   if (isset($contact['addresses'])) { $addresses = $contact['addresses'];}
   if (isset($contact['ims'])) { $ims = $contact['ims'];}
@@ -1192,6 +1259,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   $show_comment2 = (! $cgp_hide['contact']['contact_comment2']);
   $show_comment3 = (! $cgp_hide['contact']['contact_comment3']);
   $show_birthday = (! $cgp_hide['contact']['birthday']);
+  $show_anniversary = (! $cgp_hide['contact']['anniversary']);
   $show_mailing = (! $cgp_hide['contact']['contact_mailing']);
   // User defined data
   $block_userdata = of_userdata_dis_entity_form('contact', $id, $contact);
@@ -1254,7 +1322,16 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     </tr>";
   }
 
-  if($dsrc_q->nf() > 0 ) {
+  // Anniversary form field
+  if ($show_anniversary) {
+    $block_anniversary = "
+    <tr>
+      <th>$l_anniversary</th>
+      <td><input type=\"text\" name=\"tf_anniversary\" value=\"$anniversary\" class=\"datePicker\"/></td>
+    </tr>";
+  }
+
+  if ($dsrc_q->nf() > 0 ) {
     // data source select
     $sel_dsrc = "<select name=\"sel_datasource\" id=\"sel_datasource\">
       <option value=\"$c_undef\">$l_undef</option>";
@@ -1272,7 +1349,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       </tr>";
   }
 
-  if(!$ccontact_simple_kind) {
+  if (!$ccontact_simple_kind) {
     if ($kind_q->nf()>0) {
       $i=0;
       $j=0;
@@ -1379,11 +1456,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   // Service field
   if ($show_service) {
     $block_service = "
-    </tr><tr>
+    <tr>
       <th>$l_service</th>
       <td>
       <input type=\"text\" id=\"tf_service\" name=\"tf_service\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$service\" />
-      </td>";
+      </td>
+    </tr>";
   }
 
   // User comment select construction
@@ -1597,30 +1675,61 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       <td><input type=\"text\" name=\"tf_fname\" size=\"30\" maxlength=\"64\" value=\"$fname\" /></td>
     </tr>
     <tr>
+      <th>$l_middlename</th>
+      <td><input type=\"text\" name=\"tf_mname\" size=\"30\" maxlength=\"32\" value=\"$mname\" /></td>
+    </tr>
+    <tr>
+      <th>$l_suffix</th>
+      <td><input type=\"text\" name=\"tf_suffix\" size=\"30\" maxlength=\"16\" value=\"$suffix\" /></td>
+    </tr>
+    <tr>
       <th>$l_aka</th>
       <td><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
     </tr>
     $block_dsrc
-    <tr>
-      <th>$l_private</th>
-      <td>$display_private</td>
-    </tr>
-    <tr>
-      <th>$l_archive</th>
-      <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
-    </tr>
     <tr>
       <th>$l_company</th>
       <td>$dis_company</td>
     </tr>
     $block_function
     $block_title
-    $block_resp
-    $block_date
-    $block_userdata
-    $block_birthday
     $block_service
+    $block_resp
+    </table>
+    <br />
+    <legend>$l_other_infos</legend>
+
+    <table>
+    <tr>
+      <th>$l_archive</th>
+      <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
+    </tr>
+    <tr>
+      <th>$l_private</th>
+      <td>$display_private</td>
+    </tr>
+    <tr>
+      <th>$l_manager</th>
+      <td><input type=\"text\" id=\"tf_manager\" name=\"tf_manager\" maxlength=\"64\" size=\"30\" value=\"$manager\" /></td>
+    </tr>
+    <tr>
+      <th>$l_assistant</th>
+      <td><input type=\"text\" id=\"tf_assistant\" name=\"tf_assistant\" maxlength=\"64\" size=\"30\" value=\"$assistant\" /></td>
+    </tr>
+    <tr>
+      <th>$l_spouse</th>
+      <td><input type=\"text\" id=\"tf_spouse\" name=\"tf_spouse\" maxlength=\"64\" size=\"30\" value=\"$spouse\" /></td>
+    </tr>
+    <tr>
+      <th>$l_category</th>
+      <td><input type=\"text\" id=\"tf_category\" name=\"tf_category\" maxlength=\"255\" size=\"30\" value=\"$category\" /></td>
+    </tr>
+    $block_date
+    $block_birthday
+    $block_anniversary
     $block_mailing
+
+    $block_userdata
     </table>
     </fieldset>
 
@@ -1631,18 +1740,21 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     <p><a class='B' href='' onclick=\"new Obm.Contact.PhoneWidget();return false;\">$l_add</a></p>
     </fieldset>
     <fieldset class=\"detail infos\">
-    <legend>$l_address</legend>
-    <div id='addressHolder'>
-    </div>
-    <p><a class='B' href='' onclick=\"new Obm.Contact.AddressWidget();return false;\">$l_add</a></p>
-    </fieldset>
-    <fieldset class=\"detail infos\">
+
     <legend>$l_email</legend>
     <div id='emailHolder'>
     </div>
     <p><a class='B' href='' onclick=\"new Obm.Contact.EmailWidget();return false;\">$l_add</a></p>
     </fieldset>
     <fieldset class=\"detail infos\">
+
+    <legend>$l_address</legend>
+    <div id='addressHolder'>
+    </div>
+    <p><a class='B' href='' onclick=\"new Obm.Contact.AddressWidget();return false;\">$l_add</a></p>
+    </fieldset>
+    <fieldset class=\"detail infos\">
+
     <legend>$l_im</legend>
     <div id='imHolder'>
     </div>
@@ -1686,7 +1798,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
 //   - $co_q      : contact database result (at least 1 row)
 //   - $contact[] : values for insertion/update (if confirmation)
 //     keys used  : company_id, kind, lname, fname ad1, ad2, ad3, zip, town,cdx
-//                : ctry, func, phone, hphone, mphone, fax, email, com, priv
+//                : ctry, func, phone, email, com, priv
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $l_check_samecontact, $l_confirm, $l_back;
@@ -1695,6 +1807,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $comp_id = ($contact['company_new_id'] ? $contact['company_new_id'] : $contact['company_id']);
   $lname = stripslashes($contact['lname']);
   $fname = stripslashes($contact['fname']);
+  $mname = stripslashes($contact['mname']);
+  $suffix = stripslashes($contact['suffix']);
   $kind = $contact['kind'];
   $dsrc = $contact['datasource'];
   $privacy = $contact['privacy'];
@@ -1702,6 +1816,20 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $title = stripslashes($contact['title']);
   $mark = $contact['market'];
   $service = stripslashes($contact['service']);
+  $manager = stripslashes($contact['manager']);
+  $assistant = stripslashes($contact['assistant']);
+  $spouse = stripslashes($contact['spouse']);
+  $category = stripslashes($contact['category']);
+  $date = $contact['date'];
+  $birthday = $contact['birthday'];
+  $anniversary = $contact['anniversary'];
+  $mailok = $contact['mailok'];
+  $com = stripslashes($contact['comment']);
+  $com2 = stripslashes($contact['comment2']);
+  $com3 = stripslashes($contact['comment3']);
+  $archive = $contact['archive'];
+
+  // XXXX still used ?
   $ad1 = stripslashes($contact['ad1']);
   $ad2 = stripslashes($contact['ad2']);
   $ad3 = stripslashes($contact['ad3']);
@@ -1710,17 +1838,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $cdx = stripslashes($contact['cdx']);
   $ctry = $contact['country'];
   $phone = stripslashes($contact['phone']);
-  $birthday = $contact['birthday'];
-  $hphone = stripslashes($contact['hphone']);
-  $mphone = stripslashes($contact['mphone']);
-  $fax = stripslashes($contact['fax']);
   $email = stripslashes($contact['email']);
   $email2 = stripslashes($contact['email2']);
-  $mailok = $contact['mailok'];
-  $com = stripslashes($contact['comment']);
-  $com2 = stripslashes($contact['comment2']);
-  $com3 = stripslashes($contact['comment3']);
-  $archive = $contact['archive'];
 
   $disp_same_cont_head = "<h1>$l_check_samecontact</h1>";
   while ($co_q->next_record()) {
@@ -1739,6 +1858,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
     <input type=\"hidden\" name=\"tf_lname\" value=\"$lname\" />
     <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
+    <input type=\"hidden\" name=\"tf_mname\" value=\"$mname\" />
+    <input type=\"hidden\" name=\"tf_suffix\" value=\"$suffix\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"sel_datasource\" value=\"$dsrc\" />
     <input type=\"hidden\" name=\"cba_privacy\" value=\"$privacy\" />
@@ -1746,21 +1867,25 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
     <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
     <input type=\"hidden\" name=\"tf_service\" value=\"$service\" />
+    <input type=\"hidden\" name=\"tf_manager\" value=\"$manager\" />
+    <input type=\"hidden\" name=\"tf_assistant\" value=\"$assistant\" />
+    <input type=\"hidden\" name=\"tf_spouse\" value=\"$spouse\" />
+    <input type=\"hidden\" name=\"tf_category\" value=\"$category\" />
+    <input type=\"hidden\" name=\"tf_date\" value=\"$date\" />
+    <input type=\"hidden\" name=\"tf_birthday\" value=\"$birthday\" />
+    <input type=\"hidden\" name=\"tf_anniversary\" value=\"$anniversary\" />
+    <input type=\"hidden\" name=\"cba_mailok\" value=\"1\" $mailok />
+
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
     <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"tf_birthday\" value=\"$birthday\" />
     <input type=\"hidden\" name=\"sel_country\" value=\"$ctry\" />
     <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
-    <input type=\"hidden\" name=\"tf_hphone\" value=\"$hphone\" />
-    <input type=\"hidden\" name=\"tf_mphone\" value=\"$mphone\" />
-    <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"tf_email2\" value=\"$email2\" />
-    <input type=\"hidden\" name=\"cba_mailok\" value=\"1\" $mailok />
     <input type=\"hidden\" name=\"ta_comment\" value=\"$com\" />
     <input type=\"hidden\" name=\"ta_comment2\" value=\"$com2\" />
     <input type=\"hidden\" name=\"ta_comment3\" value=\"$com3\" />

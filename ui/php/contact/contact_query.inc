@@ -425,6 +425,8 @@ function run_query_contact_insert($contact) {
   $market = sql_parse_id($contact['market']);
   $lname = $contact['lname'];
   $fname = $contact['fname'];
+  $mname = $contact['mname'];
+  $suffix = $contact['suffix'];
   $aka = trim($contact['aka']);
   // If aka is empty we auto fill it
   if ($aka == '') {
@@ -437,9 +439,13 @@ function run_query_contact_insert($contact) {
   $service = $contact['service'];
   $func = sql_parse_id($contact['function']);
   $title = $contact['title'];
+  $manager = $contact['manager'];
+  $assistant = $contact['assistant'];
+  $spouse = $contact['spouse'];
+  $category = $contact['category'];
+  $date = ($contact['date'] ? "'".of_isodate_convert($contact['date'])."'" : 'null');
   $mailok = ($contact['mailok'] == '1' ? '1' : '0');
   $newsletter = ($contact['newsletter'] == '1' ? '1' : '0');
-  $date = ($contact['date'] ? "'".of_isodate_convert($contact['date'])."'" : 'null');
 
   $add_comment = $contact['add_comment'];
   if ($add_comment != '') {
@@ -475,8 +481,14 @@ function run_query_contact_insert($contact) {
     contact_marketingmanager_id,
     contact_lastname,
     contact_firstname,
+    contact_middlename,
+    contact_suffix,
     contact_aka,
     contact_sound,
+    contact_manager,
+    contact_assistant,
+    contact_spouse,
+    contact_category,
     contact_service,
     contact_function_id,
     contact_title,
@@ -502,8 +514,14 @@ function run_query_contact_insert($contact) {
     $market,
     '$lname',
     '$fname',
+    '$mname',
+    '$suffix',
     '$aka',
     '$sound',
+    '$manager',
+    '$assistant',
+    '$spouse',
+    '$category',
     '$service',
     $func,
     '$title',
@@ -582,6 +600,8 @@ function run_query_contact_update($contact) {
   $market = sql_parse_id($contact['market']);
   $lname = $contact['lname'];
   $fname = $contact['fname'];
+  $mname = $contact['mname'];
+  $suffix = $contact['suffix'];
   $aka = trim($contact['aka']);
   // If aka is empty we auto fill it
   if ($aka == '') {
@@ -594,6 +614,10 @@ function run_query_contact_update($contact) {
   $service = $contact['service'];
   $func = sql_parse_id($contact['function']);
   $title = $contact['title'];
+  $manager = $contact['manager'];
+  $assistant = $contact['assistant'];
+  $spouse = $contact['spouse'];
+  $category = $contact['category'];
   $mailok = ($contact['mailok'] == '1' ? '1' : '0');
   $newsletter = ($contact['newsletter'] == '1' ? '1' : '0');
   if ($contact['date'] != '') {
@@ -634,30 +658,36 @@ function run_query_contact_update($contact) {
   $sql_id = sql_parse_id($id, true);
   $query = "UPDATE Contact SET
     contact_timeupdate='".date('Y-m-d H:i:s')."',
-      contact_userupdate='".$obm['uid']."',
-      contact_datasource_id=$dsrc,
-      contact_company_id=$comp_id,
-      contact_company='$company',
-      contact_kind_id=$kind,
-      contact_marketingmanager_id=$market,
-      contact_lastname='$lname',
-      contact_firstname='$fname',
-      contact_aka='$aka',
-      contact_sound='$sound',
-      contact_service='$service',
-      contact_function_id=$func,
-      contact_title='$title',
-      contact_mailing_ok=$mailok,
-      contact_newsletter=$newsletter,
-      contact_archive=$archive,
-      contact_privacy=$priv,
-      $query_date
-      contact_comment='$comment',
-      contact_comment2='$comment2',
-      contact_comment3='$comment3',
-      contact_origin='$GLOBALS[c_origin_web]'
-      WHERE contact_id $sql_id 
-      $multidomain";
+    contact_userupdate='".$obm['uid']."',
+    contact_datasource_id=$dsrc,
+    contact_company_id=$comp_id,
+    contact_company='$company',
+    contact_kind_id=$kind,
+    contact_marketingmanager_id=$market,
+    contact_lastname='$lname',
+    contact_firstname='$fname',
+    contact_middlename='$mname',
+    contact_suffix='$suffix',
+    contact_aka='$aka',
+    contact_sound='$sound',
+    contact_manager='$manager',
+    contact_assistant='$assistant',
+    contact_spouse='$spouse',
+    contact_category='$category',
+    contact_service='$service',
+    contact_function_id=$func,
+    contact_title='$title',
+    contact_mailing_ok=$mailok,
+    contact_newsletter=$newsletter,
+    contact_archive=$archive,
+    contact_privacy=$priv,
+    $query_date
+    contact_comment='$comment',
+    contact_comment2='$comment2',
+    contact_comment3='$comment3',
+    contact_origin='$GLOBALS[c_origin_web]'
+  WHERE contact_id $sql_id 
+    $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_contact_update()');
   $obm_q = new DB_OBM;
@@ -718,6 +748,7 @@ function run_query_contact_update($contact) {
  */
 function run_query_contact_coords_update($id, $contact) {
   global $cdg_sql;
+
   $phones = $contact['phones'];
   $addresses = $contact['addresses'];
   $ims = $contact['ims'];
@@ -884,41 +915,6 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
     $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
   }
 
-  // IM
-  $query = "SELECT *
-    FROM IM
-      INNER JOIN ContactEntity ON im_entity_id = contactentity_entity_id
-    WHERE contactentity_contact_id = $id
-    ORDER BY im_id";
-  display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(IM)');
-  $obm_q->query($query);        
-  while($obm_q->next_record()) {
-    $coords['im'][] = array('protocol' => $obm_q->f('im_protocol'),'address' => $obm_q->f('im_address'));
-  }
-
-  // Website
-  $query = "SELECT website_id, website_label, website_url
-    FROM Website
-      INNER JOIN ContactEntity ON website_entity_id = contactentity_entity_id
-    WHERE contactentity_contact_id = $id";
-  if($inherit) {
-    $query .= " UNION 
-      SELECT website_id, 'COMPANY;X-OBM-REF1' as website_label, website_url
-      FROM Website
-        INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id 
-        INNER JOIN Contact ON contact_company_id = companyentity_company_id
-      WHERE contact_id = $id";
-  }  
-  $query .= ' ORDER BY website_id';
-  display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Website)');
-  $obm_q->query($query);        
-  while($obm_q->next_record()) {
-    $label = explode(';',$obm_q->f('website_label'));
-    array_pop($label);
-    $label = implode('_',$label);
-    $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
-  }
-
   // Address
   $lang = get_lang();
   $query = "SELECT address_id,
@@ -955,6 +951,41 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
     $coords['address'][] = array(
       'label' => $label, 'street' => $obm_q->f('address_street'), 'zipcode' => $obm_q->f('address_zipcode'),
       'expresspostal' => $obm_q->f('address_expresspostal'), 'town' => $obm_q->f('address_town'), 'country' => $country);
+  }
+
+  // IM
+  $query = "SELECT *
+    FROM IM
+      INNER JOIN ContactEntity ON im_entity_id = contactentity_entity_id
+    WHERE contactentity_contact_id = $id
+    ORDER BY im_id";
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(IM)');
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $coords['im'][] = array('protocol' => $obm_q->f('im_protocol'),'address' => $obm_q->f('im_address'));
+  }
+
+  // Website
+  $query = "SELECT website_id, website_label, website_url
+    FROM Website
+      INNER JOIN ContactEntity ON website_entity_id = contactentity_entity_id
+    WHERE contactentity_contact_id = $id";
+  if($inherit) {
+    $query .= " UNION 
+      SELECT website_id, 'COMPANY;X-OBM-REF1' as website_label, website_url
+      FROM Website
+        INNER JOIN CompanyEntity ON website_entity_id = companyentity_entity_id 
+        INNER JOIN Contact ON contact_company_id = companyentity_company_id
+      WHERE contact_id = $id";
+  }  
+  $query .= ' ORDER BY website_id';
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_coords(Website)');
+  $obm_q->query($query);        
+  while($obm_q->next_record()) {
+    $label = explode(';',$obm_q->f('website_label'));
+    array_pop($label);
+    $label = implode('_',$label);
+    $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
 
   return $coords;
@@ -1143,6 +1174,7 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Insert a contact imported from a VCard
 // Parameters:
@@ -1175,6 +1207,7 @@ function run_query_vcard_insert($params) {
   return $ids;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check contact existence
 ///////////////////////////////////////////////////////////////////////////////
@@ -1183,6 +1216,7 @@ function run_query_check_contact_existence($contact_id) {
   $obm_q->query("SELECT 1 FROM Contact WHERE contact_id='{$contact_id}'");
   return $obm_q->next_record() !== false;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Contact environment checking (same contacts exists ?)
