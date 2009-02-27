@@ -2973,7 +2973,7 @@ CREATE TABLE `UGroup` (
   `group_email` varchar(128) default NULL,
   `group_contacts` text,
   PRIMARY KEY  (`group_id`),
-  UNIQUE KEY `group_gid` (`group_gid`, `userobm_domain_id`),
+  UNIQUE KEY `group_gid` (`group_gid`, `group_domain_id`),
   KEY `group_domain_id_domain_id_fkey` (`group_domain_id`),
   KEY `group_userupdate_userobm_id_fkey` (`group_userupdate`),
   KEY `group_usercreate_userobm_id_fkey` (`group_usercreate`),
