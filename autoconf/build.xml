@@ -85,16 +85,6 @@
 			<fileset dir="${main.classes}" includes="*.jar" />
 		</copy>
 
-		<!-- Move ressources to WEB-INF/classes -->
-		<copy todir="${dist}/WEB-INF/classes">
-			<fileset dir="resources" includes="*.xml" />
-		</copy>
-
-		<!-- Move ressources to WEB-INF/classes -->
-		<copy todir="${dist}/WEB-INF/classes">
-			<fileset dir="resources" includes="*.properties" />
-		</copy>
-
 		<!-- Configuration -->
 		<copy todir="${dist}/WEB-INF">
 			<fileset dir="descriptors" includes="*.xml" />
