@@ -4789,14 +4789,6 @@ ALTER TABLE ONLY host
 
 
 --
--- Name: host_host_uid_key; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY host
-    ADD CONSTRAINT host_host_uid_key UNIQUE (host_uid);
-
-
---
 -- Name: host_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -5374,7 +5366,7 @@ ALTER TABLE ONLY timetask
 --
 
 ALTER TABLE ONLY ugroup
-    ADD CONSTRAINT ugroup_group_gid_key UNIQUE (group_gid);
+    ADD CONSTRAINT ugroup_group_gid_key UNIQUE (group_gid, group_domain_id);
 
 
 --
@@ -5558,17 +5550,17 @@ CREATE INDEX k_login_user_userobm_index ON userobm USING btree (userobm_login);
 
 
 --
+-- Name: k_uid_user_userobm_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX k_uid_user_userobm_index ON userobm USING btree (userobm_uid);
+
+
+--
 -- Name: k_name_resource_resource_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX k_name_resource_resource_index ON resource USING btree (resource_name);
-
-
---
--- Name: k_uid_user_userobm_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX k_uid_user_userobm_index ON userobm USING btree (userobm_uid);
 
 
 --

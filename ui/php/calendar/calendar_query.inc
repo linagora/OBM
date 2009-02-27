@@ -2047,11 +2047,11 @@ function check_calendar_data_form($calendar) {
       $err['msg'] = "$l_date_repeatend : $l_invalid_date"; 
       return false;
     }
-  }
 
-  if (!is_numeric($repeatfrequency) || $repeatfrequency < 1) {
-    $err['msg'] = $l_err_repeatfrequency;
-    return false;
+    if (!is_numeric($repeatfrequency) || $repeatfrequency < 1) {
+      $err['msg'] = $l_err_repeatfrequency;
+      return false;
+    }
   }
 
   if ($end->compare($begin) < 0 || $event_duration < 0 || ( $all_day && $end->compare($begin) == 0)) {

@@ -1008,8 +1008,13 @@ UPDATE DisplayPref SET display_fieldname='eventlink_percent' WHERE display_field
 -- Timezone 
 INSERT INTO UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values (NULL,'set_timezone','Europe/Paris');
 
--- Clean group gid (private group must have gid = NULL)
+-- Clean group gid and user uid(private group must have gid = NULL)
+ALTER TABLE ONLY ugroup DROP CONSTRAINT ugroup_group_gid_key;
+ALTER TABLE ONLY ugroup ADD CONSTRAINT ugroup_group_gid_key UNIQUE (group_gid, group_domain_id);
 UPDATE UGroup set group_gid=NULL WHERE group_privacy=1;
+DROP INDEX k_uid_user_userobm_index;
+CREATE INDEX k_uid_user_userobm_index ON userobm USING btree (userobm_uid);
+ALTER TABLE ONLY host DROP CONSTRAINT host_host_uid_key;
 
 -- --------------------
 -- Entity tables update
