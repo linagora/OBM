@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-<!--
   Fonction : fichier de configuration XML
 
   Remarque: partout où noté "LDAP", des données provenant du serveur LDAP central
@@ -24,6 +23,7 @@
               fccFolder_pickerMode="1"
               autocompleteDirectory="serveur-ldap-obm"/>
   </identities>
+
 
   <!-- SERVEURS -->
   <servers>
@@ -56,30 +56,10 @@
 
   <!-- ANNUAIRES -->
   <directories>
-	
-	<directory id="ldap-annuaire-dsn"
-		label="Annuaire de la DSN"
-		uri="ldap://ldap.obm.defense.gouv.fr:389/dc=dsn,dc=defense,dc=gouv,dc=fr??sub?(objectclass=*)"/>
-
-	<directory id="ldap-annuaire-annudef"
-		label="Annuaire de la Défense"
-		uri="ldap://annudef.obm.defense.gouv.fr:389/dc=defense,dc=gouv,dc=fr??sub?(objectclass=*)"/>
-
 	<directory id="ldap-contacts-publics"
-		label="OBM - Contacts publics"
-		uri="ldap://|ldapHost|:389/ou=contacts,dc=defense.gouv.fr,dc=local??sub?(&amp;(objectClass=*)(mail=*))"
+		label="Contacts OBM"
+		uri="ldap://|ldapHost|:389/ou=contacts,dc=zz.com,dc=local??sub?(&amp;(objectClass=*)(mail=*))"
 		autocomplete="true"/>
-
-	<directory id="ldap-annuaire-mel"
-		label="Annuaire OBM"
-		uri="ldap://|ldapHost|:389/dc=defense.gouv.fr,dc=local??sub?(&amp;(|(objectclass=obmMailShare)(objectClass=obmUser)(objectClass=obmGroup))(mail=*))"
-		autocomplete="true"/>
-
-<!--
-	<directory id="ldap-maia"
-		label="MAIA"
-		uri="ldap://annuaire.ader.gouv.fr:389/??sub?(objectclass=*)"/>
--->		
   </directories>
 
   <!-- PREFERENCES -->
@@ -94,7 +74,8 @@
 		            set="lock"/>
 
 		<!-- page d'accueil de thunderbird -->
-	<!--	<preference type="string"
+<!--
+		<preference type="string"
 		            name="mailnews.start_page.override_url"
 		            value="http://server/thunderbird.html"
 		            set="user"/>              
@@ -106,7 +87,8 @@
 		            name="mailnews.start_page.welcome_url"
 		            value="http://server/thunderbird.html"
 		            set="user"/>       
-	-->
+-->
+
 		<!-- Toujours afficher l'état du quota-->
 		<preference type="integer"
 		            name="mail.quota.mainwindow_threshold.show"
@@ -119,13 +101,13 @@
 					value="moz-abmdbdirectory://history.mab"
 					set="user"/>
 		
-		<!--Donwload messages for ofline use -->
+		<!--Download messages for offline use -->
 		<preference type="string"
 				          name="spellchecker.dictionary"
 				          value="fr-FR"
 				          set="user"/>
 
-    <!-- Installed extensions preferences -->
+         <!-- Installed extensions preferences -->
 			<!-- Extension spellchecker -->
 			<preference type="string"
 				          name="spellchecker.dictionary"
@@ -150,7 +132,7 @@
 				          value="true"
 				          set="user"/>
 
-			<!-- URL de connection au service Web d'melamel-sync -->
+			<!-- URL de connection au service Web d'OBM-sync -->
 			<preference type="string"
 				          name="extensions.obm.server"
 				          value="http://10.75.0.2/obm/services"
@@ -177,13 +159,94 @@
 				          name="calendar.autorefresh.timeout"
 				          value="10"
 				          set="user"/>
-		
+			
+			<!-- Toolbar initialize -->
+<!--
+
+Configuration de l'initialisateur de Barre d'outils
+
+- nécessite OBM-maja
+- pour connaître les codes qui servent à construire une barre d'outils
+    - configurer la préférence "config.obm.autoconf.toolbar.debug" à 1
+    - démarrer Thunderbird
+    - ouvrir la console d'erreurs
+    - le message "Toolbar debug main window load event" doit apparaître
+         ainsi que 6 autres messages qui le suivent.
+      Le groupe RDF correspond aux valeurs récupérées dans le fichier de configuration localstore.rdf
+      Le groupe DOM correspond aux valeurs récupérées dans l'arbre DOM.
+      
+      Normalement seule la valeur DOM du main toolbar est récupérable,
+      car le DOM n'est récupérable que si l'on ouvre la fenêtre qui correspond au DOM.
+      Donc pour les autres fenêtre qui ne sont pas ouvertes
+      soit le "carnet d'adresse" et "écrire un message".
+      On ouvre donc ces 2 fenêtres,
+      puis on ferme la fenêtre principale pour provoquer un event close qui déclenche
+      la deuxième partie du debug.
+      
+      Après cela un autre message "Toolbar debug main window close event" doit apparaît
+      dans la console d'erreurs. Les 3 messages DOM doivent donner les valeurs des barre d'outils.
+
+value="button-getmsg,button-newmsg,button-address,calendar-show-todaypane-button,separator,button-reply,button-replyall,button-forward,separator,button-tag,button-delete,button-junk,button-print,separator,button-goback,button-goforward,spring,separator,calendar-week-view-button,calendar-month-view-button,search-container"
+
+// main TB default			          
+value="button-getmsg,button-newmsg,button-address,separator,button-reply,button-replyall,button-forward,separator,button-tag,button-delete,button-junk,button-print,separator,button-goback,button-goforward,spring,search-container"
+
+// compose TB default
+value="button-send,separator,button-address,spellingButton,button-attach,button-security,button-save"
+
+// addressbook TB default
+value="button-newcard,button-newlist,separator,button-editcard,button-newmessage,separator,button-abdelete,spring,search-container"
+
+// empty default
+value="__empty"
+
+			<preference type="integer"
+				          name="config.obm.autoconf.toolbar.debug"
+				          value="1"
+				          set="user"/>
+			<preference type="string"
+				          name="config.obm.autoconf.toolbar.main"
+				          value="button-getmsg,button-newmsg,button-address,calendar-show-todaypane-button,separator,button-reply,button-replyall,button-forward,separator,button-tag,button-delete,button-junk,button-print,separator,button-goback,button-goforward,spring,separator,calendar-week-view-button,calendar-month-view-button,search-container"
+                          set="user"/>
+			<preference type="string"
+				          name="config.obm.autoconf.toolbar.compose"
+				          value="button-send,separator,button-address,spellingButton,button-attach,button-security,button-save"
+				          set="user"/>
+			<preference type="string"
+				          name="config.obm.autoconf.toolbar.addressbook"
+				          value="button-newcard,button-newlist,separator,button-editcard,button-newmessage,separator,button-abdelete,spring,search-container"
+				          set="user"/>
+-->
+			<preference type="string"
+				          name="config.obm.autoconf.toolbar.main"
+				          value="button-getmsg,button-newmsg,button-address,calendar-show-todaypane-button,separator,button-reply,button-replyall,button-forward,separator,button-tag,button-delete,button-junk,button-print,separator,button-goback,button-goforward,spring,separator,calendar-week-view-button,calendar-month-view-button,search-container"
+                          set="user"/>
   </preferences>
 
   <!-- EXTENSIONS -->
   <extensions>
 
+    <!-- OBM-MAJA -->
+    <extension id="{912dfb00-4684-11dd-ae16-0800200c9a66}"
+               src="http://10.75.0.2/obm-autoconf/xpi/obm-maja_1.1.0.xpi"
+               version="1.1.0">
+               <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+               minVersion="1.5"
+               maxVersion="2.0.*"/>
+    </extension>
+
+    <!-- bouton-extension -->
+	   <extension id="bouton-extension@aliasource.fr"
+		       src="http://obm.eole.dgi/obm-autoconf/xpi/bouton-extension-1.5.xpi"
+			   version="1.5">
+	      <targetApplication id="{3550f703-e582-4d05-9a08-453d09bdfdc6}"
+				 minVersion="1.5"
+				 maxVersion="2.0.*"/>
+	    </extension>
+
+
     <!-- Minimize To Tray -->
+<!--
     <extension id="{31513E58-F253-47ad-86DB-D5F21E905429}"
                src="http://10.75.0.2/obm-autoconf/xpi/minimizetotray-0.0.1.2006102615+-fx+zm+sb+tb.xpi"
                version="0.0.1">
@@ -191,8 +254,9 @@
                minVersion="1.5"
                maxVersion="2.0.*"/>
     </extension>
- 
+-->
 	<!-- Minimize To Tray Enhancer -->
+<!--
     <extension id="{de1b245c-de57-11da-ba2d-0050c2490048}"
                src="http://10.75.0.2/obm-autoconf/xpi/minimize_to_tray_enhancer-0.7.5.3-fx+tb+sb.xpi"
                version="0.7.5.3">
@@ -200,6 +264,7 @@
                minVersion="1.5"
                maxVersion="2.0.*"/>
     </extension>
+ -->
  
 	<!-- Multi LDAP-->
     <extension id="multildap@milimail.org"
@@ -246,18 +311,18 @@
   <!-- CERTIFICATS -->
 <!--
   <certificates>
-    <certificate src="http://10.75.0.2/obm-autoconf/certificates/IGCG_ACD_METROPOLE_MINDEF.crt"
+    <certificate src="http://10.75.0.2/obm-autoconf/certificates/mycertificate.crt"
                  sha1Fingerprint="23:04:5A:97:EB:C8:EF:D7:75:ED:10:D2:3E:E0:33:3D:C4:01:CA:6B"/>
-    <certificate src="http://10.75.0.2/obm-autoconf/certificates/IGCG_ACR_MINDEF.crt"
+    <certificate src="http://10.75.0.2/obm-autoconf/certificates/mycertificate.crt"
                  sha1Fingerprint="C8:27:B7:2F:7B:F3:19:3E:58:22:6B:32:85:C2:E1:F5:81:66:60:09"/>
   </certificates>
 -->
-  <!-- PROXYS -->
-<!--  <proxies>
 
+  <!-- PROXYS -->
+<!--
+  <proxies>
     <proxy type="auto"
            value="autoconfHost/proxy.pac"/>
-
   </proxies>
 -->
 </configuration>
