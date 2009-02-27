@@ -429,7 +429,7 @@ function dis_can_delete_organizationalchart($id) {
   $block .= "
   <form action=\"$path/organizationalchart/organizationalchart_index.php\" method=\"post\" onsubmit=\"return confirm_del()\">
   <input type=\"hidden\" name=\"action\" value=\"delete\" />
-  <imput type=\"hidden\" name=\"organizationalchart_id\" value=\"$id\" />
+  <input type=\"hidden\" name=\"organizationalchart_id\" value=\"$id\" />
   <div class=\"buttons\">
   <input type=\"submit\" value=\"$l_delete\" />
   <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$id\">$l_back</a>

@@ -74,7 +74,7 @@ function run_query_organizationalchart_search($organizationalchart) {
     FROM OrganizationalChart $left_user";
 
   if ($ctu_sql_limit) {
-    $cq = "SELECT count(*) FROM OrganizationalChart $join $whereq";
+    $cq = "SELECT count(*) FROM OrganizationalChart $left_user $whereq";
     $count = get_query_count($cq);
     $obm_q->set_num_rows_total($count);
   }

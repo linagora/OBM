@@ -57,7 +57,7 @@ function check_company(form) {
     alert (\"$l_fill_name\");
     return false;
   }
-
+  return true;
 } 
 
 

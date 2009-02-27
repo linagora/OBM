@@ -76,7 +76,6 @@ function run_query_payment_search($payment) {
   }
   if ($company != '') {
     $where .= " $and company_name $like '$company%'";
-    $join .= " LEFT JOIN Company ON payment_company_id=company_id";
     $and = 'AND';
   }
   if ($company_id != '') {
