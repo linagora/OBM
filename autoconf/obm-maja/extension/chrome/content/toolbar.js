@@ -34,6 +34,22 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+/**
+ *  Useful documentation :
+ *    - https://developer.mozilla.org/en/XUL/toolbar
+ *    - https://developer.mozilla.org/en/XUL/Attribute/currentset
+ *    - https://developer.mozilla.org/en/XUL/toolbar#p-currentSet
+ *    - profile/localstore.rdf
+ *    - firefox_source_3.xxx/mozilla/browser/components/bookmarks/content/addBookmark2.js
+ *    - https://developer.mozilla.org/en/DOM/element.removeChild
+ *    - https://developer.mozilla.org/en/DOM/element.firstChild
+ *    - https://developer.mozilla.org/en/Working_with_windows_in_chrome_code#Example_3.3a_Using_nsIWindowMediator_when_opener_is_not_enough
+ *    - https://developer.mozilla.org/en/XUL/Attribute/persist
+ *
+ *  Useful tools :
+ *    - DOM Inspector : https://addons.mozilla.org/fr/firefox/addon/1806
+ */
+
 var Toolbar = function() {};
 
 // Toolbar DOM Tree Notes
@@ -116,7 +132,7 @@ Toolbar.save = function Toolbar_save (newToolbar) {
   // RDF Resource File
   //
   // solution found by crawling into mozilla source code :
-  //        mozilla/browser/components/bookmarks/content/addBookmark2.js
+  //        firefox/mozilla/browser/components/bookmarks/content/addBookmark2.js
   
   var RDF = Components.classes["@mozilla.org/rdf/rdf-service;1"]
                              .getService(Components.interfaces.nsIRDFService);
