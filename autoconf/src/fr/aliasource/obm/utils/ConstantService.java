@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -91,6 +92,10 @@ public class ConstantService {
 		} catch (IOException e) {
 			logger.error("Problem while trying to read obm_conf.ini", e);
 		}
+	}
+	
+	public Properties getProperties() {
+		return props;
 	}
 
 	public String getStringValue(String prop) {

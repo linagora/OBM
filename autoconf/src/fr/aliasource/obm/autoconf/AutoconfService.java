@@ -91,7 +91,8 @@ public class AutoconfService extends HttpServlet {
 		resp.setHeader("Expires", formatter.format(new Date()));
 		resp.setContentType("application/xml");
 
-		TemplateLoader tl = new TemplateLoader(dc);
+		TemplateLoader tl = new TemplateLoader(dc, ConstantService
+				.getInstance());
 		tl.applyTemplate(attributeSet, imapMailHost, smtpMailHost, ldapHost, resp.getOutputStream());
 	}
 
