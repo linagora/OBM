@@ -54,8 +54,9 @@ public class ConstantService {
 			String section_name = "";
 			String line;
 			Pattern section_pattern = Pattern.compile("^ *\\[(.*)\\] *$");
-			Pattern assert_pattern = Pattern.compile("(.+)=(.+)");
+			Pattern assert_pattern = Pattern.compile("(.+?)=(.+)");
 			Pattern comment_pattern = Pattern.compile("^[#;].*");
+			Pattern quoted_pattern = Pattern.compile("^\"(.*)\"$");
 			Matcher matches;
 			
 			while ((line = input.readLine()) != null) {
@@ -68,15 +69,21 @@ public class ConstantService {
 //						logger.info("section="+section_name);
 					}
 
-					logger.info("section_name==autoconf : "+section_name.equals("autoconf"));
+//					logger.info("section_name==autoconf : "+section_name.equals("autoconf"));
+					
 					if (section_name.equals("autoconf")) {
 						matches = assert_pattern.matcher(line);
 						if (matches.matches()) {
-							props.setProperty(matches.group(1).trim(), matches
-									.group(2).trim());
-//							logger.info(matches
-//									.group(1).trim() +"="+matches
-//									.group(2).trim());
+							String key = matches.group(1).trim();
+							String value = matches.group(2).trim();
+
+							matches = quoted_pattern.matcher(value);
+							if (matches.matches()) {
+								value = matches.group(1).trim();
+							}
+							
+							props.setProperty(key, value);
+//							logger.info("["+key +"]=["+value+"]");
 						}
 					}
 				}
