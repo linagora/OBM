@@ -35,7 +35,7 @@ $fieldnames["userobm_description"] = $l_desc;
 function dis_user_data(&$OD, $fieldname, $link_ok) {
   global $path,  $ico_mail, $params,$obm,$cgp_use;
   global $l_enabled, $l_disabled, $l_forbidden, $l_perms;
-  global $perm, $cright_write_admin, $module, $cright_read_admin;
+  global $perm, $cright_write_admin, $module, $cright_read_admin, $cright_read;
 
   $ext_url = $params["ext_url"];
   $ext_element = $params["ext_element"];
@@ -46,7 +46,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
     } else if ($OD->display_ext == "get_id_url") {
       $res["url"] = "javascript:check_user_get_id_url('$ext_url',".$OD->data_set->f("userobm_id").");";
     } else {
-      if ($link_ok && $perm->check_right($module, $cright_read_admin))
+      if ($link_ok && $perm->check_right($module, $cright_read))
         $res["url"] = "$path/people/people_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
     }
   }

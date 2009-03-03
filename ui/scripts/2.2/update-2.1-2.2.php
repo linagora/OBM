@@ -46,6 +46,7 @@ $profiles['user'] = array (
     'my' => 1),
   'module' => array (
     'default' => $perm_user,
+    'user' => 0,
     'calendar' => $perm_editor),
   'level' => 3,
   'access_restriction' => 'ALLOW_ALL',
@@ -60,6 +61,7 @@ $profiles['editor'] = array (
     'user' => 1,
     'my' => 1),
   'module' => array (
+    'user' => 0,
     'default' => $perm_editor),
   'level' => 2,
   'access_restriction' => 'ALLOW_ALL',
@@ -92,6 +94,7 @@ make_profiles();
 function make_profiles() {
   global $profiles, $cdg_sql, $cgp_show;
   global $obm, $perm_user, $perm_editor, $perm_admin;
+
   $c_profile_properties = array(
       'level' => 5,
       'level_managepeers' => 1,
@@ -155,7 +158,7 @@ function make_profiles() {
           )";    
       $obm_q->query($query);
     }
-    
+
     if(!is_array($data['section'])) {
       echo "No section founded, default value used";
       $data['section'] = array('default' => 0, 'com' => 1, 'prod' => 1, 'user' => 1, 'my' => 1);

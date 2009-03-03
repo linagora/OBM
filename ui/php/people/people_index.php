@@ -231,7 +231,7 @@ function get_user_action() {
   $actions['people']['detailconsult'] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/people/people_index.php?action=detailconsult&amp;user_id=".$params['user_id'],
-    'Right'    => $cright_read_admin,
+    'Right'    => $cright_read,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'group_consult', 'group_update')
                                   );
 
@@ -239,14 +239,14 @@ function get_user_action() {
   $actions['people']['detailupdate'] = array (
      'Name'     => $l_header_update,
      'Url'      => "$path/people/people_index.php?action=detailupdate&amp;user_id=".$params['user_id'],
-     'Right'    => $cright_write_admin,
+     'Right'    => $cright_write,
      'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update')
                                      	   );
 
 // Update
   $actions['people']['update'] = array (
     'Url'      => "$path/people/people_index.php?action=update",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      );
 

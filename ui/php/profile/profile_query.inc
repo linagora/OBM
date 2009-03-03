@@ -29,6 +29,7 @@ $c_perms_read = 3;
  */
 function run_query_profile_details($id) {
   global $cdg_sql, $obm, $c_profile_properties;
+
   $multidomain = sql_multidomain('profile');
   $obm_q = new DB_OBM;
   $query = "SELECT * FROM Profile WHERE profile_id = $id $multidomain";
@@ -72,6 +73,7 @@ function run_query_profile_details($id) {
   
 }
 
+
 /**
  * Update a profile in SQL database
  *
@@ -101,6 +103,7 @@ function run_query_profile_update ($params) {
   run_query_profile_replace_dataset($params);
   return true;
 }
+
 
 /**
  * Update a profile in SQL database
