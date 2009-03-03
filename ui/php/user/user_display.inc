@@ -2212,7 +2212,7 @@ function html_user_import_file() {
 function dis_user_import_file_run($params) {
   global $obm, $display, $err, $ccscd_tab, $l_user, $l_header_import, $l_group;
   global $l_delegation, $l_login, $l_lastname, $l_firstname, $l_email;
-  global $l_login_in_use, $l_file_error;
+  global $l_login_in_use, $l_file_error, $l_user_import_row_cols_error;
 
   $file = $params['file_saved'];
   if ($file == '') {
@@ -2261,6 +2261,8 @@ function dis_user_import_file_run($params) {
   $c_cdx = $cpt++;
   $c_description = $cpt++;
   $c_group = $cpt++;
+
+  $nb_col = $cpt;
 
   $domain_id = $obm['domain_id'];
   $d = of_domain_get_domain_infos($domain_id, true);
@@ -2356,7 +2358,11 @@ function dis_user_import_file_run($params) {
     if (in_array(trim($row[$c_nomade_local_copy]), $array_true)) {
       $user['nomade_local_copy'] = 1;
     }
-    if (check_user_login_in_use($user['login'])) {
+    if (count($row) != $nb_col) {
+      // Row not OK
+      $user['user_id'] = false;
+      $res = $l_user_import_row_cols_error;
+    } else if (check_user_login_in_use($domain_id, $user['login'])) {
       $res = "$user[login] : $l_login_in_use";
     } else {
       // Insert the user

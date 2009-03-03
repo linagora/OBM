@@ -1,13 +1,11 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
-//     - File     : people.inc                                                 //
-// 2008-10-06 Vincent Bernard                                               //
+//     - File     : people.inc                                               //
+// 2008-10-06 Vincent Bernard                                                //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: people.inc 3097 2008-09-22 14:22:46Z benoitc $ //
 ///////////////////////////////////////////////////////////////////////////////
-
-
 
 $l_login = "Identifiant";
 $l_password = "Mot de passe";
@@ -116,8 +114,6 @@ $l_image_size_error = "La photo ne doit pas dépasser 96px x 96px et avoir un po
 $l_err_delegation_target_outside_domain = "La délégation d'administration doit être dans la délégation de l'entité !";
 $l_err_delegation_target_outside_target = "La délégation d'administration doit être dans votre cible de délégation !";
 $l_err_delegation_target_profile = "Ce profil d'utilisateur ne peut avoir de délégation d'administration !";
-$l_fill_vacation_datebegin = "Vous devez renseigner la date de début du message d'absence avant de valider";
-$l_fill_vacation_dateend = "Vous devez renseigner la date de fin du message d'absence avant de valider";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";

@@ -1613,8 +1613,8 @@ function check_user_data_form($p_id, &$user) {
     }
   }
 
-  // login on insert or on update (if $c_renameUserMailbox)
-  if (($action == 'new') || ($action == 'insert') || $c_renameUserMailbox) {
+  // login check (except on update if !$c_renameUserMailbox)
+  if (($action != 'update') || $c_renameUserMailbox) {
     // MANDATORY: User login, not empty and unique
     if (trim($login) == '') {
       $err['msg'] = "$login : $l_login_error";
