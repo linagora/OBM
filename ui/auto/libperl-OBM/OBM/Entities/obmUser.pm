@@ -207,7 +207,6 @@ sub _init {
     }
 
     # User e-mails
-    $userDesc->{'userobm_mail_perms'} = 1;
     if( !($self->_makeEntityEmail( $userDesc->{'userobm_email'}, $self->{'parent'}->getDesc('domain_name'), $self->{'parent'}->getDesc('domain_alias') ) ) ) {
         $self->_log( 'droit mail de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' annulé, pas d\'adresses mails valides', 2 );
         $userDesc->{'userobm_mail_perms'} = 0;
