@@ -390,6 +390,7 @@ class OBM_Acl {
   
   private static function setConsumerRights($consumerType, $consumerId, $entityType, $entityId, $rights) {
     $rights = self::normalizeRightsArray($rights);
+    print_r($rights);
     $realEntityId = self::getEntityId($entityType, $entityId);
     if ($consumerType == 'user' && $consumerId === null) {
       $consumerEntityId = 'NULL';
@@ -515,10 +516,13 @@ class OBM_Acl {
         unset($rights[$action]);
         continue;
       }
+      // Added to prevent Postgres errors
+      if ($value == '') $value = 0;
+
       if (is_bool($value)) {
         $value = ($value) ? 1 : 0;
       } elseif ($value != 1 && $value != 0) {
-        throw new Exception("Forbidden value for $action action: $value");
+	throw new Exception("Forbidden value for $action action: $value");
       }
       $rights[$action] = $value;
     }

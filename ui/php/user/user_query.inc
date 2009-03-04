@@ -663,7 +663,6 @@ function run_query_user_insert($user) {
 function run_query_user_init_group($u_id, $gid, $oldGid) {
   global $cdg_sql;
 
-
   $sel_user = sql_parse_id($u_id, true);
   $ins_user = sql_parse_id($u_id);
   if ($oldGid != NULL) {
@@ -822,9 +821,9 @@ function run_query_user_update($p_id, $user) {
   // Section Samba
   if ($cgp_use['service']['samba']) {
     $smb_perms = sql_parse_int($user['smb_perms']);
-    $smb_home = ($samba_perms == 1)?$user['smb_home']:'';
-    $smb_home_drive = ($samba_perms == 1)?$user['smb_home_drive']:'';
-    $smb_logon = ($samba_perms == 1)?$user['smb_logon']:'';
+    $smb_home = ($smb_perms == 1)?$user['smb_home']:'';
+    $smb_home_drive = ($smb_perms == 1)?$user['smb_home_drive']:'';
+    $smb_logon = ($smb_perms == 1)?$user['smb_logon']:'';
     $query_samba = ",
     userobm_samba_perms=$smb_perms,
     userobm_samba_home='$smb_home',

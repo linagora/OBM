@@ -1011,6 +1011,7 @@ function html_user_form($usr_q, $user, $field='') {
   global $path, $display, $cgp_use, $action;
   global $obm, $c_default_domain, $l_domain, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
+
   $noexperie = " checked=\"checked\" ";	
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
@@ -1089,7 +1090,7 @@ function html_user_form($usr_q, $user, $field='') {
     // samba
     $smb_perms = $usr_q->f("userobm_samba_perms");
     $smb_home = $usr_q->f("userobm_samba_home");
-    $smb_home_drive = $usr_q->f("userobm_samba_home_drive");
+    $smb_home_drive = trim($usr_q->f("userobm_samba_home_drive"));
     $smb_logon = $usr_q->f("userobm_samba_logon_script");
 
     $dis_title = "$fname $lname";
@@ -1176,7 +1177,7 @@ function html_user_form($usr_q, $user, $field='') {
   // samba
   if (isset($user["smb_perms"])) { $smb_perms = $user["smb_perms"]; }
   if (isset($user["smb_home"])) { $smb_home = stripslashes($user["smb_home"]); }
-  if (isset($user["smb_home_drive"])) { $smb_home_drive = $user["smb_home_drive"]; }
+  if (isset($user["smb_home_drive"])) { $smb_home_drive = $user['smb_home_drive']; }
   if (isset($user["smb_logon"])) { $smb_logon = $user["smb_logon"]; }
 
   $block_userdata = of_userdata_dis_entity_form("user", $id, $user);
@@ -1435,11 +1436,11 @@ function html_user_form($usr_q, $user, $field='') {
   if ($cgp_use["service"]["samba"]) {
     $samba = run_query_user_samba_properties();
     $smb_home_drive = (isset($smb_home_drive))?$smb_home_drive:$samba['drive'];
-    if(isset($smb_home_drive) && $smb_home_drive != '') $drive[$samba['drive']] = 'selected="selected"';
+    if (isset($smb_home_drive) && $smb_home_drive != '') $drive[$smb_home_drive] = 'selected="selected"';
     for($i='D'; $i < 'Z';$i++) {
       $dis_drive_sel .= "<option ".$drive["$i"]." value='$i'>$i:</option>";
     }
-    $dis_drive_sel .= "<option ".$drive["Z"]." value='Z'>Z:</option>";
+    $dis_drive_sel .= "<option ".$drive['Z']." value='Z'>Z:</option>";
     $dis_drive_sel = "<select style='width:4em;' name='sel_smb_home_drive'>$dis_drive_sel</select>";
     $smb_home = (isset($smb_home))?$smb_home:$samba['home'];
     if($login != '') {
