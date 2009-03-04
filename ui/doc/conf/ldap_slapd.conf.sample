@@ -58,6 +58,12 @@ _COMMENT_moduleload      back_bdb
 # for indexing.
 _COMMENT_tool-threads 1
 
+## BEGIN TLS
+#TLSCACertificateFile /var/lib/obm-ca/cacert.pem
+#TLSCertificateFile /etc/obm/certs/obm_cert.pem
+#TLSCertificateKeyFile  /etc/obm/certs/obm_cert.pem
+## End TLS
+
 #
 # Default database
 defaultsearchbase "dc=local"
