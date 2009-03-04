@@ -79,7 +79,6 @@ function run_query_lead_search($params) {
       $and = 'AND';
     }
   }
-echo "undef=$c_undef";
   if (($priority != '') && ($priority != "$c_undef")) {
     $priority = sql_parse_int($priority, true);
     $where .= " $and lead_priority = $priority ";

@@ -1,8 +1,8 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : people_query.inc                                               //
-//     - Desc : People query & db File                                         //
-// 2008-10-08 : Vincent Bernard                                     //
+// OBM - File : people_query.inc                                             //
+//     - Desc : People query & db File                                       //
+// 2008-10-08 : Vincent Bernard                                              //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: people_query.inc 3114 2008-09-30 16:10:15Z benoitc $
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ function run_query_user_search($user) {
   }
 
   // User defined data
-  $userdata = of_userdata_query_search('people', $user, 'UserObm');
+  $userdata = of_userdata_query_search('user', $user, 'UserObm');
   if ($userdata['where'] != '') {
     if (trim($where) != '') $where .= ' AND ';
     $where .= $userdata['where'];
@@ -247,7 +247,6 @@ function run_query_user_detail($p_id) {
 function run_query_user_update($p_id, $user) {
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
-  global $c_renameUserMailbox, $cmd_ldap_passwd;
 
   // Connect to the BD
   $obm_q = new DB_OBM;
@@ -310,11 +309,12 @@ function run_query_user_update($p_id, $user) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $ret = of_userdata_query_update('people', $p_id, $user);
+    $ret = of_userdata_query_update('user', $p_id, $user);
   }
-  
+
   return $retour;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return the number of admin user

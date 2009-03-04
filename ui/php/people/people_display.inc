@@ -100,7 +100,7 @@ function html_user_search_form($user) {
   }
 
   // User defined data
-  $block_userdata .= of_userdata_dis_search('people', $user);
+  $block_userdata .= of_userdata_dis_search('user', $user);
 
   $block = "
   <form method=\"get\" name=\"f_search\"
@@ -182,7 +182,7 @@ function html_user_search_list($obm_q, $prefs, $user) {
   $desc = urlencode($user["desc"]);
 
   // User defined data
-  $url_userdata = of_userdata_get_url_search_params('people', $user);
+  $url_userdata = of_userdata_get_url_search_params('user', $user);
 
   $url = url_prepare("people_index.php?action=search&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;tf_email=$email&amp;tf_desc=$desc$url_userdata$url_ext");
 
@@ -267,7 +267,7 @@ function html_user_consult($obm_q) {
 
   $email = $obm_q->f("userobm_email");
   
-  $block_userdata .= of_userdata_dis_entity_consult("people", $id);
+  $block_userdata .= of_userdata_dis_entity_consult('user', $id);
 
  
     $mail_section = "
@@ -468,7 +468,7 @@ function html_user_form($usr_q, $user, $field='') {
   if (isset($user["cdx"])) { $cdx = $user["cdx"]; }
   if (isset($user["ctry"])) { $ctry = $user["country"]; }
 
-  $block_userdata = of_userdata_dis_entity_form("people", $id, $user);
+  $block_userdata = of_userdata_dis_entity_form('user', $id, $user);
 
   // Mark the error field
   if ($field != "") {

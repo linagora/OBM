@@ -1675,8 +1675,8 @@ function of_userdata_query_update($entity, $ent_id, $params, $clear=true) {
     $ret = of_category_user_query_delete_link($entity, $ent_id);
   }
 
-  if (is_array($cgp_user[$entity]["category"])) {
-    foreach($cgp_user[$entity]["category"] as $cat_name => $one_cat) {
+  if (is_array($cgp_user[$entity]['category'])) {
+    foreach($cgp_user[$entity]['category'] as $cat_name => $one_cat) {
       $cats = $params["$cat_name"];
       if (is_array($cats)) {
 	foreach($cats as $cat_id) {
@@ -2414,9 +2414,9 @@ function of_category_user_query_update($params) {
 function of_category_user_query_delete($params) {
   global $cdg_sql;
 
-  $category_id = sql_parse_id($params["category_id"], true);
-  $category = $params["category"];
-  $multidomain = sql_multidomain("Category");
+  $category_id = sql_parse_id($params['category_id'], true);
+  $category = $params['category'];
+  $multidomain = sql_multidomain('Category');
 
   if ($category_id > 0) {
     $query = "DELETE FROM Category
@@ -2424,7 +2424,7 @@ function of_category_user_query_delete($params) {
       AND category_category = '$category'
       $multidomain";
 
-    display_debug_msg($query, $cdg_sql, "of_category_user_query_delete()");
+    display_debug_msg($query, $cdg_sql, 'of_category_user_query_delete()');
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
   } else {
@@ -2460,10 +2460,10 @@ function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id, 
          AND categorylink_entity_id ".sql_parse_id($id_entity, true)." 
          AND categorylink_category='$cat'";
 
-      display_debug_msg($query, $cdg_sql, "of_category_user_query_insert_link(check)");
+      display_debug_msg($query, $cdg_sql, 'of_category_user_query_insert_link(check)');
       $obm_q->query($query);
       $obm_q->next_record();
-      $nb = $obm_q->f("nb");
+      $nb = $obm_q->f('nb');
       if ($nb > 0) {
 	return $nb;
       }
@@ -2479,7 +2479,7 @@ function of_category_user_query_insert_link($entity, $cat, $entity_id, $cat_id, 
        $id_entity,
        '$cat'
      )";
-    display_debug_msg($query, $cdg_sql, "of_category_user_query_insert_link()");
+    display_debug_msg($query, $cdg_sql, 'of_category_user_query_insert_link()');
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
   }
@@ -2505,7 +2505,7 @@ function of_category_user_query_delete_link($entity, $entity_id) {
     WHERE
       categorylink_entity_id $entity_id ";
 
-  display_debug_msg($query, $cdg_sql, "of_category_user_query_delete_link()");
+  display_debug_msg($query, $cdg_sql, 'of_category_user_query_delete_link()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -2531,14 +2531,14 @@ function of_category_user_get_links($category, $p_id) {
         AND categorylink_category = '$category'
       ORDER by categorylink_entity";
 
-  display_debug_msg($query, $cdg_sql, "of_category_user_get_links()");
+  display_debug_msg($query, $cdg_sql, 'of_category_user_get_links()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   $cats = array();
   while ($obm_q->next_record()) {
-    $ent = $obm_q->f("categorylink_entity");
-    $ent_id = $obm_q->f("categorylink_entity_id");
+    $ent = $obm_q->f('categorylink_entity');
+    $ent_id = $obm_q->f('categorylink_entity_id');
     $cats[$ent][] = $ent_id;
   }
 
@@ -2560,11 +2560,11 @@ function of_category_user_get_infos($cat_id) {
 
   if (is_array($cat_id)) {
     if (count($cat_id) > 0) {
-      $or = "";
+      $or = '';
       foreach ($cat_id as $one_id) {
         $one_id = sql_parse_id($one_id, true);
 	$where_cat .= " $or category_id $one_id ";
-	$or = "OR";
+	$or = 'OR';
       }
     } else {
       return $cat;
@@ -2582,16 +2582,16 @@ function of_category_user_get_infos($cat_id) {
     FROM Category
     WHERE $where_cat";
 
-  display_debug_msg($query, $cdg_sql, "of_category_user_get_infos()");
+  display_debug_msg($query, $cdg_sql, 'of_category_user_get_infos()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   while($obm_q->next_record() ) {
-    $id = $obm_q->f("category_id");
+    $id = $obm_q->f('category_id');
     $cat[$id] = array (
-		    "category" => $obm_q->f("category_category"),
-		    "id" => $id,
-		    "code" => $obm_q->f("category_code"),
-		    "label" => $obm_q->f("category_label"));
+		    'category' => $obm_q->f('category_category'),
+		    'id' => $id,
+		    'code' => $obm_q->f('category_code'),
+		    'label' => $obm_q->f('category_label'));
   }
 
   return $cat;
@@ -2608,20 +2608,20 @@ function of_category_user_get_infos($cat_id) {
 function of_category_user_get_code_hash($category) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("Category");
+  $multidomain = sql_multidomain('Category');
 
   $query = "SELECT category_id, category_code
       FROM Category
       WHERE category_category = '$category'
         $multidomain";
 
-  display_debug_msg($query, $cdg_sql, "of_category_user_get_code_hash()");
+  display_debug_msg($query, $cdg_sql, 'of_category_user_get_code_hash()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $cat = array();
   while ($obm_q->next_record()) {
-    $id = $obm_q->f("category_id");
-    $code = $obm_q->f("category_code");
+    $id = $obm_q->f('category_id');
+    $code = $obm_q->f('category_code');
     $cats[$id] = $code;
   }
 
@@ -2638,7 +2638,7 @@ function of_category_user_get_code_hash($category) {
 function of_category_user_get_category_distribution($entity, $category) {
   global $cdg_sql;
 
-  $multidomain = sql_multidomain("Category");
+  $multidomain = sql_multidomain('Category');
 	
   $query = "SELECT
       category_id,
@@ -2653,16 +2653,16 @@ function of_category_user_get_category_distribution($entity, $category) {
     GROUP BY category_id, category_code, category_label
     ORDER BY category_code, category_label";
 
-  display_debug_msg($query, $cdg_sql, "of_category_user_category_per_entity()");
+  display_debug_msg($query, $cdg_sql, 'of_category_user_category_per_entity()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $cats = array();
   while ($obm_q->next_record()) {
-    $id = $obm_q->f("category_id");
-    $code = $obm_q->f("category_code");
-    $label = $obm_q->f("category_label");
-    $nb = $obm_q->f("nb_category");
-    $cats[$id] = array("code" => $code, "label" => $label, "nb" => $nb);
+    $id = $obm_q->f('category_id');
+    $code = $obm_q->f('category_code');
+    $label = $obm_q->f('category_label');
+    $nb = $obm_q->f('nb_category');
+    $cats[$id] = array('code' => $code, 'label' => $label, 'nb' => $nb);
   }
 
   return $cats;

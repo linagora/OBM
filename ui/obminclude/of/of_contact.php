@@ -166,15 +166,23 @@ class OBM_Contact {
   }
   
   private static function fetchDetails($db, $where) {
+
+    $db_type = $db->type;
+    $birthday = sql_date_format($db_type, 'bd.event_date', 'contact_birthday');
     $contacts = array();
-    $query = "SELECT contact_id, contact_lastname, contact_firstname, contact_title, 
-              UNIX_TIMESTAMP(bd.event_date) as contact_birthday, 
-              kind_minilabel as contact_kind, contactfunction_label as contact_function 
-              FROM Contact 
-              LEFT JOIN Kind ON kind_id = contact_kind_id
-              LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id 
-              LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
-              WHERE {$where}";
+
+    $query = "SELECT contact_id, contact_lastname,
+      contact_firstname,
+      contact_title,
+      $birthday,
+      kind_minilabel as contact_kind,
+      contactfunction_label as contact_function 
+    FROM Contact 
+         LEFT JOIN Kind ON kind_id = contact_kind_id
+         LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id 
+         LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
+    WHERE {$where}";
+
     $db->query($query);
     while ($db->next_record()) {
       $contact = new OBM_Contact;

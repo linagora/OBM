@@ -37,56 +37,56 @@ $perm->check_permissions($module, $action);
 
 page_close();
 
-if ($action == "index" || $action == "") {
+if ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_user_search_form($params);
-  if ($_SESSION['set_display'] == "yes") {
-    $display["result"] = dis_user_search_list($params);
+  $display['search'] = html_user_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_user_search_list($params);
   } else {
-    $display["msg"] .= display_info_msg($l_no_display);
+    $display['msg'] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "search") {
+} elseif ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_user_search_form($params);
-  $display["result"] = dis_user_search_list($params);
+  $display['search'] = html_user_search_form($params);
+  $display['result'] = dis_user_search_list($params);
 
-} elseif ($action == "ext_search") {
+} elseif ($action == 'ext_search') {
 ///////////////////////////////////////////////////////////////////////////////
   $user_q = run_query_user_ext_search($params);
   json_search_users($params, $user_q);
-  echo "(".$display['json'].")";
+  echo '('.$display['json'].')';
   exit();
 
-} elseif ($action == "detailconsult") {
+} elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_user_consult($params);
+  $display['detail'] = dis_user_consult($params);
 
-} elseif ($action == "detailupdate") {
+} elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_user_detail($params["user_id"]);
+  $obm_q = run_query_user_detail($params['user_id']);
   if ($obm_q->num_rows() == 1) {
-    $display["detailInfo"] = display_record_info($obm_q);
-    $display["detail"] = html_user_form($obm_q, $params);
+    $display['detailInfo'] = display_record_info($obm_q);
+    $display['detail'] = html_user_form($obm_q, $params);
   } else {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_err_msg($l_err_reference);
   }
 
-} elseif ($action == "update") {
+} elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_user_defined_rules() && check_user_data_form($params["user_id"], $params)) {
-    $retour = run_query_user_update($params["user_id"], $params);
+  if (check_user_defined_rules() && check_user_data_form($params['user_id'], $params)) {
+    $retour = run_query_user_update($params['user_id'], $params);
     if ($retour) {
       set_update_state();
-      $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
-      $display["detail"] = dis_user_consult($params);
+      $display['msg'] .= display_ok_msg("$l_user : $l_update_ok");
+      $display['detail'] = dis_user_consult($params);
     } else {
-      $display["msg"] .= display_err_msg("$l_user : $l_update_error");
-      $display["detail"] = html_user_form("", $params, $err["field"]);
+      $display['msg'] .= display_err_msg("$l_user : $l_update_error");
+      $display['detail'] = html_user_form('', $params, $err['field']);
     }
   } else {
-    $display["msg"] .= display_err_msg($err["msg"]);
-    $display["detail"] = html_user_form("", $params, $err["field"]);
+    $display['msg'] .= display_err_msg($err['msg']);
+    $display['detail'] = html_user_form('', $params, $err['field']);
   }
 
 } elseif ($action == 'display') {
