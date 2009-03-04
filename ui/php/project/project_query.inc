@@ -82,7 +82,7 @@ function run_query_project_search($params) {
   }
 
   if (($member != '') && ($member != $c_all)) {
-    $member = $member;
+    $member = sql_parse_id($member, true);
     $join_member = "LEFT JOIN ProjectUser as Member ON project_id=Member.projectuser_project_id";
     $where .= " AND Member.projectuser_user_id $member 
                 AND Member.projectuser_projecttask_id is null";
