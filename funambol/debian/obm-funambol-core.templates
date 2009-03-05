@@ -1,6 +1,0 @@
-Template: obm-funambol-core/already_configured
-Type: boolean
-Default: false
-Description: for internal use.
- Internal use for preconfigure and configure install via apt.
-
