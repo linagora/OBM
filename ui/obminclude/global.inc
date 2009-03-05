@@ -674,7 +674,7 @@ $php_regexp_network = '/^([1-2]?[0-9]{1,2}.){3}[1-2]?[0-9]{1,2}(\/[1-2]?[0-9])?$
 $php_regexp_port_list ='/^[0-9]+(-[0-9]*){0,1}$/'; // Une liste de ports TCP/IP num[-num]
 $php_regexp_network_port_list = '/^([1-2]?[0-9]{1,2}.){3}[1-2]?[0-9]{1,2}:[0-9]+(-[0-9]*){0,1}$/'; // IP[:num[-num]]
 
-$php_regexp_samba_sid = '/^S-1-5-21-[0-9]{10}-[0-9]{10}-[0-9]{10}$/';
+$php_regexp_samba_sid = '/^S-1-5-21-[0-9]{1,10}-[0-9]{1,10}-[0-9]{1,10}$/';
 $php_regexp_samba_domain ='/^[aA-zZ0-9!@#$%^&()-_{}.~]{1,15}$/';
 $php_regexp_samba_profile = "/^\\\\\\\\[a-zA-Z0-9-]{1,15}\\\\([a-zA-Z0-9_\\\\.-]{1,48})*$/";
 $php_regexp_samba_home = "/^\\\\\\\\[a-zA-Z0-9-]{1,15}\\\\([a-zA-Z0-9_\\\\.-]{1,48}|%u)*$/";
