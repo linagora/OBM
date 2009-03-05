@@ -313,15 +313,15 @@ sub _init {
             # Samba password must not change
             $userDesc->{'userobm_samba_passwd_change'} = 0;
 
-            # Specific user UID
-            if( lc($userDesc->{'userobm_perms'}) eq 'admin' ) {
-                $userDesc->{'userobm_uid'} = 0;
-            }
-
             # User SID
             $userDesc->{'userobm_samba_sid'} = $self->_getUserSID( $domainSid, $userDesc->{'userobm_uid'} );
             # Group SID
             $userDesc->{'userobm_samba_group_sid'} = $self->_getGroupSID( $domainSid, $userDesc->{'userobm_gid'} );
+
+            # Specific user UID
+            if( lc($userDesc->{'userobm_perms'}) eq 'admin' ) {
+                $userDesc->{'userobm_uid'} = 0;
+            }
 
             # User Samba flags
             $userDesc->{'userobm_samba_flags'} = '[UX]';

@@ -28,21 +28,9 @@ sub _getUserSID {
     my $userSID;
 
     SWITCH: {
-        # Si nouvelle génération du SID et UID=0
-        if( !$OBM::Parameters::common::sambaOldSidMapping && ($userUID == 0) ) {
-            $userSID = $domainSid."-500";
-            last SWITCH;
-        }
-
         # Si nouvelle génération du SID
         if( !$OBM::Parameters::common::sambaOldSidMapping ) {
             $userSID = $domainSid."-".$userUID;
-            last SWITCH;
-        }
-
-        # Si ancienne génération du SID et UID=0
-        if( $OBM::Parameters::common::sambaOldSidMapping && ($userUID == 0) ) {
-            $userSID = $domainSid."-2996";
             last SWITCH;
         }
 
