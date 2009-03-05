@@ -30,13 +30,13 @@ sub _getUserSID {
     SWITCH: {
         # Si nouvelle génération du SID
         if( !$OBM::Parameters::common::sambaOldSidMapping ) {
-            $userSID = $domainSid."-".$userUID;
+            $userSID = $domainSid.'-'.$userUID;
             last SWITCH;
         }
 
         # Si ancienne génération du SID
         if( $OBM::Parameters::common::sambaOldSidMapping ) {
-            $userSID = $domainSid."-".(2*$userUID+1000);
+            $userSID = $domainSid.'-'.(2*$userUID+1000);
             last SWITCH;
         }
 
@@ -55,42 +55,42 @@ sub _getGroupSID {
         return undef;
     }
 
-    my $groupSID = "";
+    my $groupSID = '';
 
     SWITCH: {
         # Groupe des administrateurs
         if( $groupGID == 512 ) {
-            $groupSID = $domainSid."-512";
+            $groupSID = $domainSid.'-512';
             last SWITCH;
         }
 
         # Groupe des utilisateurs
         if( $groupGID == 513 ) {
-            $groupSID = $domainSid."-513";
+            $groupSID = $domainSid.'-513';
             last SWITCH;
         }
 
         # Groupe des invites
         if( $groupGID == 514 ) {
-            $groupSID = $domainSid."-514";
+            $groupSID = $domainSid.'-514';
             last SWITCH;
         }
 
         # Groupe des hôtes
         if( $groupGID == 515 ) {
-            $groupSID = $domainSid."-515";
+            $groupSID = $domainSid.'-515';
             last SWITCH;
         }
 
         # Si nouvelle génération du SID
         if( !$OBM::Parameters::common::sambaOldSidMapping ) {
-            $groupSID = $domainSid."-".$groupGID;
+            $groupSID = $domainSid.'-'.$groupGID;
             last SWITCH;
         }
 
         # Si ancienne génération du SID
         if( $OBM::Parameters::common::sambaOldSidMapping ) {
-            $groupSID = $domainSid."-".(2*$groupGID+1001);
+            $groupSID = $domainSid.'-'.(2*$groupGID+1001);
             last SWITCH;
         }
 
