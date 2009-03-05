@@ -147,13 +147,13 @@ if ($action == "ext_get_ids") {
     if ($params["confirm"] == $c_yes) {
       $cid = run_query_user_insert($params);
       if ($cid > 0) {
-	$params["user_id"] = $cid;
-	set_update_state();
+        $params["user_id"] = $cid;
+        set_update_state();
         $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
-	$display["detail"] = dis_user_consult($params);
+        $display["detail"] = dis_user_consult($params);
       } else {
-	$display["msg"] .= display_err_msg("$l_user : $l_insert_error");
-	$display["detail"] = html_user_form("", $params);
+        $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
+        $display["detail"] = html_user_form("", $params);
       }
 
     // If it is the first try, we warn the user if some user seem similar
@@ -164,13 +164,13 @@ if ($action == "ext_get_ids") {
       } else {
         $cid = run_query_user_insert($params);
         if ($cid > 0) {
-	  set_update_state();
-	  $params["user_id"] = $cid;
+          set_update_state();
+          $params["user_id"] = $cid;
           $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
-	  $display["detail"] = dis_user_consult($params);
+          $display["detail"] = dis_user_consult($params);
         } else {
           $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
-	  $display["detail"] = html_user_form("",$params);
+          $display["detail"] = html_user_form("",$params);
         }
       }
     }
