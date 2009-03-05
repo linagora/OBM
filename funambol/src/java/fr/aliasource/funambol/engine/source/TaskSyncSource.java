@@ -28,19 +28,19 @@ import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.FunisHelper;
 import fr.aliasource.funambol.utils.Helper;
 import fr.aliasource.funambol.utils.MyVCalConverter;
-import fr.aliasource.obm.items.manager.CalendarManager;
+import fr.aliasource.obm.items.manager.TaskManager;
 
 public class TaskSyncSource extends ObmSyncSource {
 
 	private static final long serialVersionUID = 8820543271150832304L;
 
-	private CalendarManager manager;
+	private TaskManager manager;
 	private Log logger = LogFactory.getLog(getClass());
 
 	public void beginSync(SyncContext context) throws SyncSourceException {
 
 		logger.info("Begin an OBM-Funambol Calendar sync");
-		manager = new CalendarManager(getObmAddress());
+		manager = new TaskManager(getObmAddress());
 
 		try {
 			manager.logIn(context.getPrincipal().getUser().getUsername(),
