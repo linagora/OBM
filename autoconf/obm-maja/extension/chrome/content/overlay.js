@@ -46,11 +46,11 @@ doMaj();
 doInitToolbar();
 
 function doInitToolbar () {
-  prefService = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
-  prefs = prefService.getBranch(null);
+  var prefService = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService);
+  var prefs = prefService.getBranch(null);
+  var prefPrefix = "config.obm.autoconf.toolbar.";
   
-  if (prefs.prefHasUserValue("config.obm.autoconf.toolbar.debug")
-      && prefs.getIntPref("config.obm.autoconf.toolbar.debug") == 1) {
+  if (prefs.prefHasUserValue(prefPrefix + "debug") && prefs.getIntPref(prefPrefix + "debug") == 1) {
     window.addEventListener("load", function () {
       Logger.logToConsole("Toolbar debug main window load event");
       Logger.logToConsole("DOM main: " + MainToolbar.getCurrentSet());
@@ -71,24 +71,43 @@ function doInitToolbar () {
       Logger.logToConsole("RDT compose: " + ComposeToolbar.getRDFData());
     }, false);
   }
-
-  if (!prefs.prefHasUserValue("config.obm.autoconf.toolbar")) {
-    prefs.setIntPref("config.obm.autoconf.toolbar", "1");
     
-    if (prefs.prefHasUserValue("config.obm.autoconf.toolbar.main")) {
-    	/*
-      MainToolbar.flush();
-      MainToolbar.addButtons(prefs.getCharPref("config.obm.autoconf.toolbar.main"));
-      * */
-      MainToolbar.save(prefs.getCharPref("config.obm.autoconf.toolbar.main"));
+  var toolbar_names = new Array("main", "addressbook", "compose");
+  var toolbar_class = new Array(MainToolbar, AddressBookToolbar, ComposeToolbar);
+  
+  if (!prefs.prefHasUserValue(prefPrefix + "init_done")) {
+    prefs.setIntPref(prefPrefix + "init_done", "1");
+    
+    for(var i = 0; i < toolbar_names.length; i++) {
+      var options = {};
+      
+      if (prefs.prefHasUserValue(prefPrefix + toolbar_names[i])) {
+      	if (prefs.prefHasUserValue(prefPrefix + toolbar_names[i] + ".smallicons")
+      	 && prefs.getBoolPref(prefPrefix + toolbar_names[i] + ".smallicons")) {
+      	  options.iconsize = "small";
+      	}
+      	
+        toolbar_class[i].save(prefs.getCharPref(prefPrefix + toolbar_names[i]), options);
+      }
     }
-    
-    if (prefs.prefHasUserValue("config.obm.autoconf.toolbar.addressbook")) {
-      AddressBookToolbar.save(prefs.getCharPref("config.obm.autoconf.toolbar.addressbook"));
-    }
-    
-    if (prefs.prefHasUserValue("config.obm.autoconf.toolbar.compose")) {
-      ComposeToolbar.save(prefs.getCharPref("config.obm.autoconf.toolbar.compose"));
+  
+    if (prefs.prefHasUserValue(prefPrefix + ".force_after_load")) {
+      window.addEventListener("load", function () {
+        for(var i = 0; i < toolbar_names.length; i++) {
+          var options = {};
+          
+          if (prefs.prefHasUserValue(prefPrefix + toolbar_names[i])) {
+          	if (prefs.prefHasUserValue(prefPrefix + toolbar_names[i] + ".smallicons")
+      	     && prefs.getBoolPref(prefPrefix + toolbar_names[i] + ".smallicons")) {
+      	      options.iconsize = "small";
+      	    }
+            
+            toolbar_class[i].flush();
+            toolbar_class[i].addButtons(prefs.getCharPref(prefPrefix + toolbar_names[i]), null, options);
+            toolbar_class[i].save(prefs.getCharPref(prefPrefix + toolbar_names[i]), options);
+          }
+        }
+      }, false);
     }
   }
 }

@@ -216,6 +216,18 @@ value="__empty"
 				          name="config.obm.autoconf.toolbar.addressbook"
 				          value="button-newcard,button-newlist,separator,button-editcard,button-newmessage,separator,button-abdelete,spring,search-container"
 				          set="user"/>
+				          
+			<!-- to set small icons on toolbar -->
+			<preference type="boolean"
+				          name="config.obm.autoconf.toolbar.main.smallicons"
+				          value="true"
+                          set="user"/>
+                          
+			<!-- to force toolbar init after loading window -->
+			<preference type="boolean"
+				          name="config.obm.autoconf.toolbar.main.force_after_load"
+				          value="true"
+                          set="user"/>
 -->
 			<preference type="string"
 				          name="config.obm.autoconf.toolbar.main"

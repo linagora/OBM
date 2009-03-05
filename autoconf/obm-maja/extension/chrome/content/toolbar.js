@@ -61,8 +61,9 @@ var Toolbar = function() {};
 /**
  * @param String aToolbarButtonNames : button IDS to add separated by commas
  * @param String aButtonBeforeDomId : button ID before which insert
+ * @param Struct aOptions
  */
-Toolbar.addButtons = function Toolbar_addButtons(aToolbarButtonNames, aButtonBeforeDomId) {
+Toolbar.addButtons = function Toolbar_addButtons(aToolbarButtonNames, aButtonBeforeDomId, aOptions) {
   var constParameters = this.getConstParameters();
 
   this.eachWindows (function (w) {
@@ -88,6 +89,8 @@ Toolbar.addButtons = function Toolbar_addButtons(aToolbarButtonNames, aButtonBef
       // currentSet != currentset (see : https://developer.mozilla.org/en/XUL/toolbar)
       toolbar.setAttribute("currentset", toolbar.currentSet);
       
+      if (aOptions && aOptions.iconsize)
+          toolbar.setAttribute("iconsize", aOptions.iconsize);
     }
     
     return null;
@@ -97,8 +100,9 @@ Toolbar.addButtons = function Toolbar_addButtons(aToolbarButtonNames, aButtonBef
 /**
  * @argument String newToolbar : (optional) save given toolbar settings string
  *                                          or use current toolbar setting
+ * @param Struct aOptions
  */
-Toolbar.save = function Toolbar_save (newToolbar) {
+Toolbar.save = function Toolbar_save (newToolbar, aOptions) {
   var constParameters = this.getConstParameters();
   
   if (!newToolbar) {
@@ -142,14 +146,26 @@ Toolbar.save = function Toolbar_save (newToolbar) {
   var rDialog    = RDF.GetResource(constParameters.XUL);
   var rPersist   = RDF.GetResource("http://home.netscape.com/NC-rdf#persist");
   var rOldValue = localStore.GetTarget(rElement, rAttribute, true);
-  
+/*  
+      if (aOptions && aOptions.iconsize)
+          toolbar.setAttribute("iconsize", aOptions.iconsize);*/
   if (rOldValue) {
     localStore.Change(rElement, rAttribute, rOldValue, RDF.GetLiteral(newToolbar));
   } else {
     localStore.Assert(rDialog, rPersist, rElement, true);
     localStore.Assert(rElement, rAttribute, RDF.GetLiteral(newToolbar), true);
   }
+  
+  rAttribute = RDF.GetResource("iconsize");
+  rOldValue = localStore.GetTarget(rElement, rAttribute, true);
+  
+  if (rOldValue) {
+    localStore.Unassert(rElement, rAttribute, rOldValue, true);
+  }
 
+  if (aOptions && aOptions.iconsize) {
+    localStore.Assert(rElement, rAttribute, RDF.GetLiteral(aOptions.iconsize), true);
+  }
 }
 
 Toolbar.getRDFData = function Toolbar_getRDFData () {
@@ -280,5 +296,4 @@ ComposeToolbar.getXULToolbarParameters = function () {
     XUL: "chrome://messenger/content/messengercompose/messengercompose.xul" // the toolbar rdf resource ID
   };
 }
-
 
