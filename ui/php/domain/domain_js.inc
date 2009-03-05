@@ -61,12 +61,12 @@ function copyField(field, storage) {
 }
 
 function autoGenSid() {
+// the max SID is in hexa FF FF FF FF
+// in dec 4294967295
   var sid = 'S-1-5-21';
   for(var i=0; i<3; i++) {
     sid = sid + '-'
-    for(var j=0; j<10;j++) {
-      sid = sid + Math.floor(Math.random() * 10);
-    }
+    sid = sid + Math.floor(Math.random() * (4294967295 - 0 + 1));
   }
   $('sambaSID').value = sid;
 }
