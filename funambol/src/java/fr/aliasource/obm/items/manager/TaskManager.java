@@ -17,6 +17,7 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
@@ -296,8 +297,8 @@ public class TaskManager extends ObmManager {
 			Event obmevent, String type) {
 
 		com.funambol.common.pim.calendar.Calendar calendar = new com.funambol.common.pim.calendar.Calendar();
-		com.funambol.common.pim.calendar.CalendarContent event = new com.funambol.common.pim.calendar.Event();
-		calendar.setEvent((com.funambol.common.pim.calendar.Event) event);
+		com.funambol.common.pim.calendar.CalendarContent event = new com.funambol.common.pim.calendar.Task();
+		calendar.setTask((com.funambol.common.pim.calendar.Task) event);
 
 		event.getUid().setPropertyValue(obmevent.getUid());
 
@@ -402,7 +403,7 @@ public class TaskManager extends ObmManager {
 			com.funambol.common.pim.calendar.Calendar calendar, String type,
 			boolean ignoreUid) {
 
-		com.funambol.common.pim.calendar.Event foundation = calendar.getEvent();
+		com.funambol.common.pim.calendar.Task foundation = calendar.getTask();
 
 		if (foundation != null) {
 			Event event = fillObmEventWithVEvent(calendar, foundation,
@@ -418,11 +419,14 @@ public class TaskManager extends ObmManager {
 
 	private Event fillObmEventWithVEvent(
 			com.funambol.common.pim.calendar.Calendar calendar,
-			com.funambol.common.pim.calendar.Event foundation, boolean ignoreUid) {
+			com.funambol.common.pim.calendar.Task foundation, boolean ignoreUid) {
 		Event event = new Event();
 		if (!ignoreUid && foundation.getUid() != null
 				&& foundation.getUid().getPropertyValueAsString() != "") {
+			try {
 			event.setUid(foundation.getUid().getPropertyValueAsString());
+			} catch (NumberFormatException nfe) {
+			}
 		}
 
 		event.setAllday(foundation.getAllDay().booleanValue());
@@ -517,7 +521,7 @@ public class TaskManager extends ObmManager {
 		syncingUser.setEmail(userEmail);
 
 		event.addAttendee(syncingUser);
-
+		event.setType(EventType.VTODO);
 		return event;
 	}
 
@@ -531,7 +535,7 @@ public class TaskManager extends ObmManager {
 	 * @return
 	 */
 	private Date parseStart(String prodId,
-			com.funambol.common.pim.calendar.Event foundation, Event event) {
+			com.funambol.common.pim.calendar.Task foundation, Event event) {
 		String dtStart = foundation.getDtStart().getPropertyValueAsString();
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		Date utcDate = CalendarHelper.getDateFromUTCString(dtStart);
@@ -541,7 +545,7 @@ public class TaskManager extends ObmManager {
 	}
 
 	private Date parseEnd(String prodId,
-			com.funambol.common.pim.calendar.Event foundation, Event event) {
+			com.funambol.common.pim.calendar.Task foundation, Event event) {
 		String dtEnd = foundation.getDtEnd().getPropertyValueAsString();
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		Date utcDate = CalendarHelper.getDateFromUTCString(dtEnd);
