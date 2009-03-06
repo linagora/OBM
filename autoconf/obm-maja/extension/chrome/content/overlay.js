@@ -70,6 +70,11 @@ function doInitToolbar () {
       Logger.logToConsole("RDF addressbook: " + AddressBookToolbar.getRDFData());
       Logger.logToConsole("RDT compose: " + ComposeToolbar.getRDFData());
     }, false);
+    
+    var ww = Components.classes["@mozilla.org/embedcomp/window-watcher;1"]
+      .getService(Components.interfaces.nsIWindowWatcher);
+    var win = ww.openWindow(null, "chrome://obmmaja/content/toolbarDebug.xul",
+      "Errors Console", "chrome,centerscreen", null);
   }
     
   var toolbar_names = new Array("main", "addressbook", "compose");
