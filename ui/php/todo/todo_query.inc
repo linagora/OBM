@@ -219,7 +219,8 @@ function run_query_todo_insert($todo) {
         event_date,
         event_priority,
         event_title,
-        event_description)
+        event_description, 
+	event_repeatkind)
       VALUES (
         $domain_id,
         NOW(),
@@ -231,7 +232,8 @@ function run_query_todo_insert($todo) {
         NOW(),
         '$priority',
         '$title',
-        '$description'
+        '$description',
+	'none'
       )";
     display_debug_msg($query, $cdg_sql, 'run_query_todo_insert()');
     $retour = $obm_q->query($query);
