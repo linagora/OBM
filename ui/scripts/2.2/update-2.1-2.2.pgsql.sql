@@ -701,7 +701,7 @@ SELECT
   todo_deadline,
   3600,
   FALSE,
-  NULL,
+  'none',
   NULL,
   NULL,
   NULL,
