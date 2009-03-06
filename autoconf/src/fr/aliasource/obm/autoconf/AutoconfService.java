@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.novell.ldap.LDAPAttributeSet;
+import com.novell.ldap.LDAPException;
 
 import fr.aliasource.obm.utils.ConstantService;
 
@@ -51,11 +52,16 @@ public class AutoconfService extends HttpServlet {
 		DirectoryConfig dc = new DirectoryConfig(login, ConstantService
 				.getInstance());
 		LDAPQueryTool lqt = new LDAPQueryTool(dc);
-		LDAPAttributeSet attributeSet = lqt.getLDAPInformations();
-
-		if (attributeSet == null) {
-			logger.warn("NULL informations obtained from LDAPQueryTool for "
-					+ login);
+		LDAPAttributeSet attributeSet;
+		try {
+			attributeSet = lqt.getLDAPInformations();
+		} catch (LDAPException e) {
+			if (e.getResultCode() == LDAPException.LOCAL_ERROR) {
+				logger.warn("NULL informations obtained from LDAPQueryTool for "
+						+ login);
+			} else {
+				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
 			return;
 		}
 		
@@ -64,7 +70,14 @@ public class AutoconfService extends HttpServlet {
 				.getAttribute("obmDomain").getStringValue());
 		DBQueryTool dbqt = new DBQueryTool(dbc);
 		
-		HashMap<String, String> hostIps = dbqt.getDBInformation();
+		HashMap<String, String> hostIps = null;
+		try {
+			hostIps = dbqt.getDBInformation();
+		} catch (Exception e) {
+			logger.error("Cannot contact DB:"+e);
+			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
 		
 		if (hostIps == null) {
 			logger.warn("NULL information obtained from DBQueryTool for "

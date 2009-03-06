@@ -19,7 +19,7 @@ public class LDAPQueryTool {
 		this.dc = dc;
 	}
 
-	LDAPAttributeSet getLDAPInformations() {
+	LDAPAttributeSet getLDAPInformations() throws LDAPException {
 		LDAPConnection ld = new LDAPConnection();
 		LDAPSearchResults searchResults;
 		LDAPAttributeSet attributeSet;
@@ -33,7 +33,7 @@ public class LDAPQueryTool {
 			return attributeSet;
 		} catch (LDAPException e) {
 			logger.error("Error finding user info", e);
-			return null;
+			throw e;
 		} finally {
 			try {
 				ld.disconnect();
