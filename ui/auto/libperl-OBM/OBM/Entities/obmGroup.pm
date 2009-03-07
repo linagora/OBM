@@ -155,11 +155,15 @@ sub setLinks {
         push( @{$self->{'entityDesc'}->{'group_users'}}, $current->{'userobm_login'} );
 
         if( $self->{'entityDesc'}->{'group_mailperms'} ) {
-            push( @{$self->{'entityDesc'}->{'group_mailboxes'}}, $current->{'userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name') );
+            if( $current->{'userobm_mail_perms'} ) {
+                push( @{$self->{'entityDesc'}->{'group_mailboxes'}}, $current->{'userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name') );
+            }
         }
 
         if( $self->{'entityDesc'}->{'group_samba'} ) {
-            push( @{$self->{'entityDesc'}->{'group_samba_users'}}, $self->_getUserSID( $self->{'parent'}->getDesc('samba_sid'), $current->{'userobm_uid'} ) );
+            if( $current->{'userobm_samba_perms'} ) {
+                push( @{$self->{'entityDesc'}->{'group_samba_users'}}, $self->_getUserSID( $self->{'parent'}->getDesc('samba_sid'), $current->{'userobm_uid'} ) );
+            }
         }
     }
 
@@ -266,9 +270,9 @@ sub getCurrentDnPrefix {
         return undef;
     }
 
-    my $currentGroupName = $self->{'entityDesc'}->{'group_name_current'};
-    if( !$currentGroupName ) {
-        $currentGroupName = $self->{'entityDesc'}->{'system_group_name'};
+    my $currentGroupName = $self->{'entityDesc'}->{'system_group_name'};
+    if( $self->{'entityDesc'}->{'group_name_current'} && ($currentGroupName ne $self->{'entityDesc'}->{'group_name_current'}) ) {
+        $currentGroupName = $self->{'entityDesc'}->{'group_name_current'};
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {

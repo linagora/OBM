@@ -210,19 +210,19 @@ sub _loadUsers {
         return 1;
     }
 
-    my $userTable = 'UserObm';
+    my $userTablePrefix = '';
     if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
-        $userTable = 'P_'.$userTable;
+        $userTablePrefix = 'P_';
     }
 
-    my $query = 'SELECT '.$userTable.'.*,
+    my $query = 'SELECT '.$userTablePrefix.'UserObm.*,
                         current.userobm_login as userobm_login_current
-                 FROM '.$userTable.'
-                 LEFT JOIN '.$userTable.' current ON current.userobm_id='.$userTable.'.userobm_id
-                 WHERE '.$userTable.'.userobm_domain_id='.$self->{'domainId'};
+                 FROM '.$userTablePrefix.'UserObm
+                 LEFT JOIN P_UserObm current ON current.userobm_id='.$userTablePrefix.'UserObm.userobm_id
+                 WHERE '.$userTablePrefix.'UserObm.userobm_domain_id='.$self->{'domainId'};
 
     if( $self->{'ids'} ) {
-        $query .= ' AND '.$userTable.'.userobm_id IN ('.join( ', ', @{$self->{'ids'}}).')';
+        $query .= ' AND '.$userTablePrefix.'UserObm.userobm_id IN ('.join( ', ', @{$self->{'ids'}}).')';
     }
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'userDescList'} )) ) {

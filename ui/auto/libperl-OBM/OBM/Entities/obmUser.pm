@@ -467,9 +467,9 @@ sub getCurrentDnPrefix {
         return undef;
     }
 
-    my $currentUserLogin = $self->{'entityDesc'}->{'userobm_login_current'};
-    if( !$currentUserLogin ) {
-        $currentUserLogin = $self->{'entityDesc'}->{'system_userobm_login'};
+    my $currentUserLogin = $self->{'entityDesc'}->{'system_userobm_login'};
+    if( $self->{'entityDesc'}->{'userobm_login_current'} && ($currentUserLogin ne $self->{'entityDesc'}->{'userobm_login_current'}) ) {
+        $currentUserLogin = $self->{'entityDesc'}->{'userobm_login_current'};
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {

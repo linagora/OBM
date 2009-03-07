@@ -196,19 +196,19 @@ sub _loadGroups {
         return 1;
     }
 
-    my $groupTable = 'UGroup';
+    my $groupTablePrefix = '';
     if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
-        $groupTable = 'P_'.$groupTable;
+        $groupTablePrefix = 'P_';
     }
 
-    my $query = 'SELECT '.$groupTable.'.*,
+    my $query = 'SELECT '.$groupTablePrefix.'UGroup.*,
                         current.group_name as group_name_current
-                 FROM '.$groupTable.'
-                 LEFT JOIN P_UGroup current ON current.group_id='.$groupTable.'.group_id
-                 WHERE '.$groupTable.'.group_domain_id='.$self->{'domainId'};
+                 FROM '.$groupTablePrefix.'UGroup
+                 LEFT JOIN P_UGroup current ON current.group_id='.$groupTablePrefix.'UGroup.group_id
+                 WHERE '.$groupTablePrefix.'UGroup.group_domain_id='.$self->{'domainId'};
 
     if( $self->{'ids'} ) {
-        $query .= ' AND '.$groupTable.'.group_id IN ('.join( ', ', @{$self->{'ids'}}).')';
+        $query .= ' AND '.$groupTablePrefix.'UGroup.group_id IN ('.join( ', ', @{$self->{'ids'}}).')';
     }
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'groupDescList'} )) ) {
