@@ -172,26 +172,22 @@ sub _loadHosts {
         return 1;
     }
 
-    my $hostTable = 'Host';
-    my $hostEntityTable = 'HostEntity';
-    my $serviceTable = 'Service';
+    my $hostTablePrefix = '';
     if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
-        $hostTable = 'P_'.$hostTable;
-        $hostEntityTable = 'P_'.$hostEntityTable;
-        $serviceTable = 'P_'.$serviceTable;
+        $hostTablePrefix = 'P_';
     }
 
-    my $query = 'SELECT '.$hostTable.'.*,
+    my $query = 'SELECT '.$hostTablePrefix.'Host.*,
                         service_id AS host_samba,
                         current.host_name as host_name_current
-                 FROM '.$hostTable.'
-                 INNER JOIN '.$hostEntityTable.' ON hostentity_host_id=host_id
-                 LEFT JOIN '.$serviceTable.' ON service_entity_id=hostentity_entity_id AND service_service=\'samba\'
-                 LEFT JOIN P_Host current ON current.host_id='.$hostTable.'.host_id
-                 WHERE '.$hostTable.'.host_domain_id='.$self->{'domainId'};
+                 FROM '.$hostTablePrefix.'Host
+                 INNER JOIN '.$hostTablePrefix.'HostEntity ON hostentity_host_id=host_id
+                 LEFT JOIN '.$hostTablePrefix.'Service ON service_entity_id=hostentity_entity_id AND service_service=\'samba\'
+                 LEFT JOIN P_Host current ON current.host_id='.$hostTablePrefix.'Host.host_id
+                 WHERE '.$hostTablePrefix.'Host.host_domain_id='.$self->{'domainId'};
 
     if( $self->{'ids'} ) {
-        $query .= ' AND '.$hostTable.'.host_id IN ('.join( ', ', @{$self->{'ids'}} ).')';
+        $query .= ' AND '.$hostTablePrefix.'Host.host_id IN ('.join( ', ', @{$self->{'ids'}} ).')';
     }
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'hostDescList'} )) ) {

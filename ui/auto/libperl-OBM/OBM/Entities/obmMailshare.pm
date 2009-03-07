@@ -299,9 +299,9 @@ sub getCurrentDnPrefix {
         return undef;
     }
 
-    my $currentMailshareName = $self->{'entityDesc'}->{'mailshare_name_current'};
-    if( !$currentMailshareName ) {
-        $currentMailshareName = $self->{'entityDesc'}->{'system_mailshare_name'};
+    my $currentMailshareName = $self->{'entityDesc'}->{'system_mailshare_name'};
+    if( $self->{'entityDesc'}->{'mailshare_name_current'} && ($currentMailshareName ne $self->{'entityDesc'}->{'mailshare_name_current'}) ) {
+        $currentMailshareName = $self->{'entityDesc'}->{'mailshare_name_current'};
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {

@@ -252,9 +252,9 @@ sub getCurrentDnPrefix {
         return undef;
     }
 
-    my $currentHostName = $self->{'entityDesc'}->{'host_name_current'};
-    if( !$currentHostName ) {
-        $currentHostName = $self->{'entityDesc'}->{'system_host_name'};
+    my $currentHostName = $self->{'entityDesc'}->{'system_host_name'};
+    if( $self->{'entityDesc'}->{'host_name_current'} && ($currentHostName ne $self->{'entityDesc'}->{'host_name_current'}) ) {
+        $currentHostName = $self->{'entityDesc'}->{'host_name_current'};
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {

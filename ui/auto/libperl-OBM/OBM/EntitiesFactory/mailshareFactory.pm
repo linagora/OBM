@@ -198,19 +198,19 @@ sub _loadMailshare {
         return 1;
     }
 
-    my $mailshareTable = 'MailShare';
+    my $mailshareTablePrefix = '';
     if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
-        $mailshareTable = 'P_'.$mailshareTable;
+        $mailshareTablePrefix = 'P_';
     }
 
-    my $query = 'SELECT '.$mailshareTable.'.*,
+    my $query = 'SELECT '.$mailshareTablePrefix.'MailShare.*,
                         current.mailshare_name as mailshare_name_current
-                 FROM '.$mailshareTable.'
-                 LEFT JOIN P_MailShare current ON current.mailshare_id='.$mailshareTable.'.mailshare_id
-                 WHERE '.$mailshareTable.'.mailshare_domain_id='.$self->{'domainId'};
+                 FROM '.$mailshareTablePrefix.'MailShare
+                 LEFT JOIN P_MailShare current ON current.mailshare_id='.$mailshareTablePrefix.'MailShare.mailshare_id
+                 WHERE '.$mailshareTablePrefix.'MailShare.mailshare_domain_id='.$self->{'domainId'};
 
     if( $self->{'ids'} ) {
-        $query .= ' AND '.$mailshareTable.'.mailshare_id IN ('.join( ', ', @{$self->{'ids'}}).')';
+        $query .= ' AND '.$mailshareTablePrefix.'MailShare.mailshare_id IN ('.join( ', ', @{$self->{'ids'}}).')';
     }
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'mailshareDescList'} )) ) {
