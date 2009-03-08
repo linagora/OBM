@@ -223,7 +223,7 @@ CREATE TABLE Event (
   event_date            timestamp NULL,
   event_duration        integer NOT NULL default 0,
   event_allday          BOOLEAN default FALSE,
-  event_repeatkind      varchar(20) default NULL,
+  event_repeatkind      varchar(20) default 'none' NOT NULL,
   event_repeatfrequence integer default NULL,
   event_repeatdays      varchar(7) default NULL,
   event_endrepeat       timestamp default NULL,
@@ -577,6 +577,8 @@ ALTER TABLE CalendarEvent ALTER COLUMN calendarevent_usercreate SET DEFAULT NULL
 DELETE FROM CalendarEvent WHERE calendarevent_owner NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_owner IS NOT NULL;
 -- Foreign key from calendarevent_category1_id to calendarcategory1_id
 UPDATE CalendarEvent SET calendarevent_category1_id = NULL WHERE calendarevent_category1_id NOT IN (SELECT calendarcategory1_id FROM CalendarCategory1) AND calendarevent_category1_id IS NOT NULL;
+-- event_repeatkind will be NOT NULL default 'none'
+UPDATE CalendarEvent SET calendarevent_repeatkind='none' WHERE calendarevent_repeatkind IS NULL;
 
 -- Clean Todo before migration to Event
 -- Foreign key from todo_domain_id to domain_id
@@ -815,14 +817,35 @@ INSERT INTO DeletedEvent (deletedevent_id,
   deletedevent_event_id,
   deletedevent_user_id,
   deletedevent_type,
-  deletedevent_timestamp, deletedevent_origin)
+  deletedevent_timestamp,
+  deletedevent_origin)
 SELECT
   deletedcalendarevent_id,
   deletedcalendarevent_event_id,
   deletedcalendarevent_user_id,
   'VEVENT',
-  deletedcalendarevent_timestamp, 'obm21'
+  deletedcalendarevent_timestamp,
+  'obm21'
 FROM DeletedCalendarEvent;
+
+SELECT setval('deletedevent_deletedevent_id_seq', max(deletedevent_id)) FROM DeletedEvent;
+
+--
+-- Migration of DeletedTodo to DeletedEvent
+--
+INSERT INTO DeletedEvent (
+  deletedevent_event_id,
+  deletedevent_user_id,
+  deletedevent_type,
+  deletedevent_timestamp,
+  deletedevent_origin)
+SELECT
+  deletedtodo_todo_id,
+  null,
+  'VTODO',
+  deletedtodo_timestamp,
+  'obm21'
+FROM DeletedTodo;
 
 SELECT setval('deletedevent_deletedevent_id_seq', max(deletedevent_id)) FROM DeletedEvent;
 
@@ -1703,7 +1726,7 @@ DELETE FROM Contract WHERE contract_domain_id NOT IN (SELECT domain_id FROM Doma
 ALTER TABLE Contract ADD CONSTRAINT contract_domain_id_domain_id_fkey FOREIGN KEY (contract_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from contract_deal_id to deal_id
-DELETE FROM Contract WHERE contract_deal_id NOT IN (SELECT deal_id FROM Deal) AND contract_deal_id IS NOT NULL;
+UPDATE Contract SET contract_deal_id=NULL WHERE contract_deal_id NOT IN (SELECT deal_id FROM Deal) AND contract_deal_id IS NOT NULL;
 ALTER TABLE Contract ADD CONSTRAINT contract_deal_id_deal_id_fkey FOREIGN KEY (contract_deal_id) REFERENCES Deal(deal_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from contract_company_id to company_id
@@ -1823,7 +1846,7 @@ DELETE FROM Deal WHERE deal_domain_id NOT IN (SELECT domain_id FROM Domain) AND 
 ALTER TABLE Deal ADD CONSTRAINT deal_domain_id_domain_id_fkey FOREIGN KEY (deal_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from deal_parentdeal_id to parentdeal_id
-DELETE FROM Deal WHERE deal_parentdeal_id NOT IN (SELECT parentdeal_id FROM ParentDeal) AND deal_parentdeal_id IS NOT NULL;
+UPDATE Deal SET deal_parentdeal_id=NULL WHERE deal_parentdeal_id NOT IN (SELECT parentdeal_id FROM ParentDeal) AND deal_parentdeal_id IS NOT NULL;
 ALTER TABLE Deal ADD CONSTRAINT deal_parentdeal_id_parentdeal_id_fkey FOREIGN KEY (deal_parentdeal_id) REFERENCES ParentDeal(parentdeal_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from deal_company_id to company_id
@@ -2139,11 +2162,11 @@ DELETE FROM Invoice WHERE invoice_company_id NOT IN (SELECT company_id FROM Comp
 ALTER TABLE Invoice ADD CONSTRAINT invoice_company_id_company_id_fkey FOREIGN KEY (invoice_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from invoice_project_id to project_id
-DELETE FROM Invoice WHERE invoice_project_id NOT IN (SELECT project_id FROM Project) AND invoice_project_id IS NOT NULL;
+UPDATE Invoice SET invoice_project_id=NULL WHERE invoice_project_id NOT IN (SELECT project_id FROM Project) AND invoice_project_id IS NOT NULL;
 ALTER TABLE Invoice ADD CONSTRAINT invoice_project_id_project_id_fkey FOREIGN KEY (invoice_project_id) REFERENCES Project(project_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from invoice_deal_id to deal_id
-DELETE FROM Invoice WHERE invoice_deal_id NOT IN (SELECT deal_id FROM Deal) AND invoice_deal_id IS NOT NULL;
+UPDATE Invoice SET invoice_deal_id=NULL WHERE invoice_deal_id NOT IN (SELECT deal_id FROM Deal) AND invoice_deal_id IS NOT NULL;
 ALTER TABLE Invoice ADD CONSTRAINT invoice_deal_id_deal_id_fkey FOREIGN KEY (invoice_deal_id) REFERENCES Deal(deal_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from invoice_userupdate to userobm_id
@@ -2657,7 +2680,7 @@ DELETE FROM TimeTask WHERE timetask_user_id NOT IN (SELECT userobm_id FROM UserO
 ALTER TABLE TimeTask ADD CONSTRAINT timetask_user_id_userobm_id_fkey FOREIGN KEY (timetask_user_id) REFERENCES UserObm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from timetask_projecttask_id to projecttask_id
-DELETE FROM TimeTask WHERE timetask_projecttask_id NOT IN (SELECT projecttask_id FROM ProjectTask) AND timetask_projecttask_id IS NOT NULL;
+UPDATE TimeTask SET timetask_projecttask_id=NULL WHERE timetask_projecttask_id NOT IN (SELECT projecttask_id FROM ProjectTask) AND timetask_projecttask_id IS NOT NULL;
 ALTER TABLE TimeTask ADD CONSTRAINT timetask_projecttask_id_projecttask_id_fkey FOREIGN KEY (timetask_projecttask_id) REFERENCES ProjectTask(projecttask_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from timetask_tasktype_id to tasktype_id
@@ -3207,7 +3230,7 @@ INSERT INTO P_ServiceProperty SELECT * FROM ServiceProperty;
 
 DROP TABLE P_UGroup;
 CREATE TABLE P_UGroup (LIKE UGroup);
-INSERT INTO P_UGroup SELECT * FROM UGroup;
+INSERT INTO P_UGroup SELECT * FROM UGroup WHERE group_privacy=0;
 
 
 --

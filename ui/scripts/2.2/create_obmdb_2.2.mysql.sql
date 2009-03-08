@@ -1249,7 +1249,7 @@ CREATE TABLE `Event` (
   `event_date` datetime default NULL,
   `event_duration` int(8) NOT NULL default '0',
   `event_allday` tinyint(1) default '0',
-  `event_repeatkind` varchar(20) default NULL,
+  `event_repeatkind` varchar(20) NOT NULL default 'none',
   `event_repeatfrequence` int(3) default NULL,
   `event_repeatdays` varchar(7) default NULL,
   `event_endrepeat` datetime default NULL,

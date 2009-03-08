@@ -217,7 +217,7 @@ CREATE TABLE Event (
   event_date            datetime NOT NULL,
   event_duration        int(8) NOT NULL default '0',
   event_allday          boolean default false,
-  event_repeatkind      varchar(20) default NULL,
+  event_repeatkind      varchar(20) NOT NULL default 'none',
   event_repeatfrequence int(3) default NULL,
   event_repeatdays      varchar(7) default NULL,
   event_endrepeat       datetime default NULL,
@@ -584,6 +584,8 @@ UPDATE CalendarEvent SET calendarevent_usercreate = NULL WHERE calendarevent_use
 DELETE FROM CalendarEvent WHERE calendarevent_owner NOT IN (SELECT userobm_id FROM UserObm) AND calendarevent_owner IS NOT NULL;
 -- Foreign key from calendarevent_category1_id to calendarcategory1_id
 UPDATE CalendarEvent SET calendarevent_category1_id = NULL WHERE calendarevent_category1_id NOT IN (SELECT calendarcategory1_id FROM CalendarCategory1) AND calendarevent_category1_id IS NOT NULL;
+-- event_repeatkind will be NOT NULL default 'none'
+UPDATE CalendarEvent SET calendarevent_repeatkind='none' WHERE calendarevent_repeatkind IS NULL;
 
 --
 -- Clean Todo before migration to Event
@@ -819,14 +821,34 @@ INSERT INTO DeletedEvent (deletedevent_id,
   deletedevent_event_id,
   deletedevent_user_id,
   deletedevent_type,
-  deletedevent_timestamp, deletedevent_origin)
+  deletedevent_timestamp,
+  deletedevent_origin)
 SELECT
   deletedcalendarevent_id,
   deletedcalendarevent_event_id,
   deletedcalendarevent_user_id,
   'VEVENT',
-  deletedcalendarevent_timestamp, 'obm21'
+  deletedcalendarevent_timestamp,
+  'obm21'
 FROM DeletedCalendarEvent;
+
+
+--
+-- Migration of DeletedTodo to DeletedEvent
+--
+INSERT INTO DeletedEvent (
+  deletedevent_event_id,
+  deletedevent_user_id,
+  deletedevent_type,
+  deletedevent_timestamp,
+  deletedevent_origin)
+SELECT
+  deletedtodo_todo_id,
+  null,
+  'VTODO',
+  deletedtodo_timestamp,
+  'obm21'
+FROM DeletedTodo;
 
 
 --  ______________________
@@ -1659,7 +1681,7 @@ DELETE FROM ContactList WHERE contactlist_contact_id NOT IN (SELECT contact_id F
 DELETE FROM Contract WHERE contract_domain_id NOT IN (SELECT domain_id FROM Domain) AND contract_domain_id IS NOT NULL;
 
 -- Foreign key from contract_deal_id to deal_id
-DELETE FROM Contract WHERE contract_deal_id NOT IN (SELECT deal_id FROM Deal) AND contract_deal_id IS NOT NULL;
+UPDATE Contract SET contract_deal_id=NULL WHERE contract_deal_id NOT IN (SELECT deal_id FROM Deal) AND contract_deal_id IS NOT NULL;
 
 -- Foreign key from contract_company_id to company_id
 DELETE FROM Contract WHERE contract_company_id NOT IN (SELECT company_id FROM Company) AND contract_company_id IS NOT NULL;
@@ -1740,7 +1762,7 @@ UPDATE DataSource SET datasource_usercreate = NULL WHERE datasource_usercreate N
 DELETE FROM Deal WHERE deal_domain_id NOT IN (SELECT domain_id FROM Domain) AND deal_domain_id IS NOT NULL;
 
 -- Foreign key from deal_parentdeal_id to parentdeal_id
-DELETE FROM Deal WHERE deal_parentdeal_id NOT IN (SELECT parentdeal_id FROM ParentDeal) AND deal_parentdeal_id IS NOT NULL;
+UPDATE Deal SET deal_parentdeal_id=NULL WHERE deal_parentdeal_id NOT IN (SELECT parentdeal_id FROM ParentDeal) AND deal_parentdeal_id IS NOT NULL;
 
 -- Foreign key from deal_company_id to company_id
 DELETE FROM Deal WHERE deal_company_id NOT IN (SELECT company_id FROM Company) AND deal_company_id IS NOT NULL;
@@ -1956,10 +1978,10 @@ DELETE FROM Invoice WHERE invoice_domain_id NOT IN (SELECT domain_id FROM Domain
 DELETE FROM Invoice WHERE invoice_company_id NOT IN (SELECT company_id FROM Company) AND invoice_company_id IS NOT NULL;
 
 -- Foreign key from invoice_project_id to project_id
-DELETE FROM Invoice WHERE invoice_project_id NOT IN (SELECT project_id FROM Project) AND invoice_project_id IS NOT NULL;
+UPDATE Invoice SET invoice_project_id=NULL WHERE invoice_project_id NOT IN (SELECT project_id FROM Project) AND invoice_project_id IS NOT NULL;
 
 -- Foreign key from invoice_deal_id to deal_id
-DELETE FROM Invoice WHERE invoice_deal_id NOT IN (SELECT deal_id FROM Deal) AND invoice_deal_id IS NOT NULL;
+UPDATE Invoice SET invoice_deal_id=NULL WHERE invoice_deal_id NOT IN (SELECT deal_id FROM Deal) AND invoice_deal_id IS NOT NULL;
 
 -- Foreign key from invoice_userupdate to userobm_id
 UPDATE Invoice SET invoice_userupdate = NULL WHERE invoice_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND invoice_userupdate IS NOT NULL;
@@ -2305,6 +2327,7 @@ UPDATE TaskType SET tasktype_usercreate = NULL WHERE tasktype_usercreate NOT IN 
 DELETE FROM TimeTask WHERE timetask_user_id NOT IN (SELECT userobm_id FROM UserObm) AND timetask_user_id IS NOT NULL;
 
 -- Foreign key from timetask_projecttask_id to projecttask_id
+UPDATE TimeTask SET timetask_projecttask_id=NULL WHERE timetask_projecttask_id NOT IN (SELECT projecttask_id FROM ProjectTask) AND timetask_projecttask_id IS NOT NULL;
 DELETE FROM TimeTask WHERE timetask_projecttask_id NOT IN (SELECT projecttask_id FROM ProjectTask) AND timetask_projecttask_id IS NOT NULL;
 
 -- Foreign key from timetask_tasktype_id to tasktype_id
@@ -2636,7 +2659,7 @@ INSERT INTO P_ServiceProperty SELECT * FROM ServiceProperty;
 
 DROP TABLE IF EXISTS `P_UGroup`;
 CREATE TABLE `P_UGroup` (LIKE `UGroup`);
-INSERT INTO P_UGroup SELECT * FROM UGroup;
+INSERT INTO P_UGroup SELECT * FROM UGroup WHERE group_privacy=0;
 
 
 --
@@ -2670,7 +2693,7 @@ DROP TABLE IF EXISTS `P_UserObmGroup`;
 
 DROP TABLE IF EXISTS `P_of_usergroup`;
 CREATE TABLE `P_of_usergroup` (LIKE `of_usergroup`);
-INSERT INTO P_of_usergroup SELECT * FROM of_usergroup;
+INSERT INTO P_of_usergroup SELECT of_usergroup_group_id, of_usergroup_user_id FROM of_usergroup INNER JOIN UGroup ON of_usergroup_group_id=group_id WHERE group_privacy=0;
 
 
 
