@@ -2155,10 +2155,10 @@ DELETE FROM PaymentKind WHERE paymentkind_domain_id NOT IN (SELECT domain_id FRO
 DELETE FROM Project WHERE project_domain_id NOT IN (SELECT domain_id FROM Domain) AND project_domain_id IS NOT NULL;
 
 -- Foreign key from project_deal_id to deal_id
-DELETE FROM Project WHERE project_deal_id NOT IN (SELECT deal_id FROM Deal) AND project_deal_id IS NOT NULL;
+UPDATE Project SET project_deal_id=NULL WHERE project_deal_id NOT IN (SELECT deal_id FROM Deal) AND project_deal_id IS NOT NULL;
 
 -- Foreign key from project_company_id to company_id
-DELETE FROM Project WHERE project_company_id NOT IN (SELECT company_id FROM Company) AND project_company_id IS NOT NULL;
+UPDATE Project SET project_company_id=NULL WHERE project_company_id NOT IN (SELECT company_id FROM Company) AND project_company_id IS NOT NULL;
 
 -- Foreign key from project_userupdate to userobm_id
 UPDATE Project SET project_userupdate = NULL WHERE project_userupdate NOT IN (SELECT userobm_id FROM UserObm) AND project_userupdate IS NOT NULL;

@@ -2424,11 +2424,11 @@ DELETE FROM Project WHERE project_domain_id NOT IN (SELECT domain_id FROM Domain
 ALTER TABLE Project ADD CONSTRAINT project_domain_id_domain_id_fkey FOREIGN KEY (project_domain_id) REFERENCES Domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from project_deal_id to deal_id
-DELETE FROM Project WHERE project_deal_id NOT IN (SELECT deal_id FROM Deal) AND project_deal_id IS NOT NULL;
+UPDATE Project SET project_deal_id=NULL WHERE project_deal_id NOT IN (SELECT deal_id FROM Deal) AND project_deal_id IS NOT NULL;
 ALTER TABLE Project ADD CONSTRAINT project_deal_id_deal_id_fkey FOREIGN KEY (project_deal_id) REFERENCES Deal(deal_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from project_company_id to company_id
-DELETE FROM Project WHERE project_company_id NOT IN (SELECT company_id FROM Company) AND project_company_id IS NOT NULL;
+UPDATE Project SET project_company_id=NULL WHERE project_company_id NOT IN (SELECT company_id FROM Company) AND project_company_id IS NOT NULL;
 ALTER TABLE Project ADD CONSTRAINT project_company_id_company_id_fkey FOREIGN KEY (project_company_id) REFERENCES Company(company_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- Foreign key from project_userupdate to userobm_id
