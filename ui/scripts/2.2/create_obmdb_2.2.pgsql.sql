@@ -5890,6 +5890,14 @@ ALTER TABLE ONLY contact
 ALTER TABLE ONLY contact
     ADD CONSTRAINT contact_anniversary_id_event_id_fkey FOREIGN KEY (contact_anniversary_id) REFERENCES event(event_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
+
+--
+-- Name: userobm_photo_id_document_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY contact
+    ADD CONSTRAINT contact_photo_id_document_id_fkey FOREIGN KEY (contact_photo_id) REFERENCES document(document_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
 --
 -- Name: contact_company_id_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --

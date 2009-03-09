@@ -283,7 +283,7 @@ $cg_gid_smb_host = 515;
 $cg_gid_host = 515;
 
 $c_origin_web = 'obm-ui-web-'.$obm_version;
-$c_orgini_ajax = 'obm-ui-ajax-'.$obm_version;
+$c_origin_ajax = 'obm-ui-ajax-'.$obm_version;
 $c_origin_cron = 'obm-ui-cron-'.$obm_version;
 // Mail chooser constant hooks
 $c_mailchooser_global_hooks = array(

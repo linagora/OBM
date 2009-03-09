@@ -1246,7 +1246,7 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     NOW(),
     $obm[uid],
     'VEVENT',
-    '$GLOBAL[c_origin_ajax]',
+    '$GLOBALS[c_origin_ajax]',
      $obm[uid],
     '".Of_Date::getOption('timezone')."', 
     '$title', 
