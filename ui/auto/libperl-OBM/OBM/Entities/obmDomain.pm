@@ -109,7 +109,7 @@ sub _init {
     $domainDesc->{'domain_alias'} = [];
     if( $domainAlias ) {
         my @aliases = split( /\r\n/, $domainAlias );
-        for( my $i; $i<=$#aliases; $i++ ) {
+        for( my $i=0; $i<=$#aliases; $i++ ) {
             if( $aliases[$i] !~ /$OBM::Parameters::regexp::regexp_domain/ ) {
                 $self->_log( 'alias de domaine \''.$aliases[$i].'\' incorrect', 4 );
             }else {
