@@ -4,6 +4,7 @@ Obm.CalendarDayEventExtension = new Class({
   initialize: function(parentEvent,size,origin) {
     this.event = parentEvent.event;
     this.options = parentEvent.options;
+    this.context = this.options.context;
     this.parentEvent = parentEvent;
     this.buildExtension();
     this.size = size;
@@ -79,8 +80,8 @@ Obm.CalendarDayEventExtension = new Class({
   },
 
   setWidth: function(width) {
-    if( (this.element.offsetLeft + width) > this.options.context.right ) {
-      width = this.options.context.right - this.element.offsetLeft;
+    if( (this.element.offsetLeft + width) > this.context.right ) {
+      width = this.context.right - this.element.offsetLeft;
     }
     this.element.setStyle('width',width + 'px');
   },
@@ -134,6 +135,7 @@ Obm.CalendarDayEvent = new Class({
 
   initialize: function(eventData,options) {
     this.setOptions($merge({context: obm.calendarManager.headContext},options));
+    this.context = obm.calendarManager.headContext;
     this.event = eventData;
     this.size = 1;
     this.length = 1;
@@ -152,8 +154,8 @@ Obm.CalendarDayEvent = new Class({
       handle: this.dragHandler,
       //grid: {'y' : obm.calendarManager.defaultHeight + 1, 'x' : obm.calendarManager.defaultWidth - 1},
       limit: {
-        'x': [this.options.context.left,this.options.context.right - obm.calendarManager.defaultWidth],
-        'y': [this.options.context.top,this.options.context.bottom]
+        'x': [this.context.left,this.context.right - obm.calendarManager.defaultWidth],
+        'y': [this.context.top,this.context.bottom]
       },
 
       onSnap:function() {
@@ -341,7 +343,7 @@ Obm.CalendarDayEvent = new Class({
     if (obm.calendarManager.lock()) {
       this.setWidth(this.size * (hr.clientWidth+1) - 1);
       if (this.drag) {
-        this.drag.options.xMax = this.options.context.right - obm.calendarManager.defaultWidth;
+        this.drag.options.xMax = this.context.right - obm.calendarManager.defaultWidth;
       }
       obm.calendarManager.unlock();
     }
@@ -356,8 +358,8 @@ Obm.CalendarDayEvent = new Class({
     this.setWidth(this.size * (hr.clientWidth+1) - 1);
     if (this.options.draggable) {
       this.drag.options.limit = {
-        'x': [this.options.context.left,this.options.context.right - obm.calendarManager.defaultWidth],
-        'y': [this.options.context.top,this.options.context.bottom - this.element.offsetHeight]};      
+        'x': [this.context.left,this.context.right - obm.calendarManager.defaultWidth],
+        'y': [this.context.top,this.context.bottom - this.element.offsetHeight]};      
     }   
     this.extensions.each( function (extension) {
       extension.redraw();
@@ -365,8 +367,8 @@ Obm.CalendarDayEvent = new Class({
   },
 
   setWidth: function(width) {
-    if( (this.element.offsetLeft + width) > this.options.context.right ) {
-      width = this.options.context.right - this.element.offsetLeft;
+    if( (this.element.offsetLeft + width) > this.context.right ) {
+      width = this.context.right - this.element.offsetLeft;
     }
     // Waiting events add a border
     status = this.event.status;
@@ -484,6 +486,7 @@ Obm.CalendarEvent = new Class({
 
   initialize: function(eventData,options) {
     this.setOptions($merge({context: obm.calendarManager.bodyContext},options));
+    this.context = obm.calendarManager.bodyContext;
     this.event = eventData;
     this.extensions = new Array();
     this.size = 1;
@@ -571,18 +574,18 @@ Obm.CalendarEvent = new Class({
       height = size * obm.calendarManager.defaultHeight;
       this.setHeight(height);
       if (this.resize) {
-        this.resize.options.yMax = this.options.context.bottom - this.element.getTop();
+        this.resize.options.yMax = this.context.bottom - this.element.getTop();
       }
       if (this.drag) {
-        this.drag.options.yMax = this.options.context.bottom - this.element.offsetHeight;
+        this.drag.options.yMax = this.context.bottom - this.element.offsetHeight;
       }
       obm.calendarManager.unlock();
     }
   },
 
   setHeight: function(height) {
-    if((this.element.getTop() + height) > this.options.context.bottom) {
-      height = this.options.context.bottom - this.element.getTop();
+    if((this.element.getTop() + height) > this.context.bottom) {
+      height = this.context.bottom - this.element.getTop();
     }
     // Waiting events add a border
     status = this.event.status;
@@ -601,7 +604,7 @@ Obm.CalendarEvent = new Class({
       grid: {'y' : obm.calendarManager.defaultHeight + 1},
       limit: {
         'x': [obm.calendarManager.defaultWidth,obm.calendarManager.defaultWidth],
-        'y': [obm.calendarManager.defaultHeight,this.options.context.bottom]
+        'y': [obm.calendarManager.defaultHeight,this.context.bottom]
       },
 
       onStart:function() {
@@ -671,13 +674,13 @@ Obm.CalendarEvent = new Class({
     this.setHeight(this.size * obm.calendarManager.defaultHeight);
     if (this.options.draggable) {
       this.drag.options.limit = {
-        'x': [this.options.context.left,this.options.context.right - obm.calendarManager.defaultWidth],
-        'y': [this.options.context.top,this.options.context.bottom - this.element.offsetHeight]};         
+        'x': [this.context.left,this.context.right - obm.calendarManager.defaultWidth],
+        'y': [this.context.top,this.context.bottom - this.element.offsetHeight]};         
     }    
     if (this.options.resizable) {
       this.resize.options.limit = {
         'x': [obm.calendarManager.defaultWidth,obm.calendarManager.defaultWidth],
-        'y': [obm.calendarManager.defaultHeight,this.options.context.bottom - this.element.getTop()]};      
+        'y': [obm.calendarManager.defaultHeight,this.context.bottom - this.element.getTop()]};      
     }
   },
 
@@ -822,8 +825,8 @@ Obm.CalendarManager = new Class({
 
   moveEventTo: function(id,left,top) {
     var evt = this.events.get(id);
-    var xDelta = Math.round((left-evt.options.context.left)/this.defaultWidth);
-    var yDelta = Math.round((top-evt.options.context.top)/this.defaultHeight);
+    var xDelta = Math.round((left-evt.context.left)/this.defaultWidth);
+    var yDelta = Math.round((top-evt.context.top)/this.defaultHeight);
     var secDelta = xDelta*evt.options.xUnit + yDelta*evt.options.yUnit;
     var dayDelta = Math.floor(secDelta / 86400);
     secDelta = secDelta - (dayDelta * 86400);
