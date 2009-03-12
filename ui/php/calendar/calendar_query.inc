@@ -595,7 +595,7 @@ function run_query_calendar_insert_event_data($calendar) {
     $repeat_end = "'$calendar[repeat_end]'";
   } else {
     $repeat_end = 'NULL';
-  }  
+  } 
   $repeatfrequency = $calendar['repeatfrequency'];  
   $date_exception = $calendar['date_exception'];
   $item = $calendar['list-item'];
@@ -630,6 +630,20 @@ function run_query_calendar_insert_event_data($calendar) {
     $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $event_duration = $dateend->diffTimestamp($datebegin);
+  }
+  if($repeat_kind == 'weekly') {
+    $days = str_split($repeat_days);
+    $event_day = $datebegin->getWeekday();
+    if($days[$event_day] != 1) {
+      for($i = ($event_day +1)%7; $i != $event_day; $i = ($i+1)%7) {
+        if($days[$i] == 1) {
+          $datebegin->setWeekday($i);
+          break;
+        } 
+      }      
+    } 
+  } else {
+    $repeat_days = '0000000';
   }
   $obm_q = new DB_OBM;
   
@@ -1119,6 +1133,20 @@ function run_query_calendar_update_event_data($calendar) {
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $event_duration = $dateend->diffTimestamp($datebegin);
   }
+  if($repeat_kind == 'weekly') {
+    $days = str_split($repeat_days);
+    $event_day = $datebegin->getWeekday();
+    if($days[$event_day] != 1) {
+      for($i = ($event_day +1)%7; $i != $event_day; $i = ($i+1)%7) {
+        if($days[$i] == 1) {
+          $datebegin->setWeekday($i);
+          break;
+        } 
+      }      
+    } 
+  } else {
+    $repeat_days = '0000000';
+  }  
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
@@ -2067,12 +2095,6 @@ function check_calendar_data_form($calendar) {
   // If repeat kind is weekly, repeat days must be set
   if ($kind == 'weekly' && $repeat_days == '0000000') {
     $err['msg'] = $l_err_days_repeat;
-    return false;
-  }
-
-  // If repeat days are set, repeat kind must be weekly
-  if ($kind != 'weekly' && $repeat_days != '0000000') {
-    $err['msg'] = $l_err_days_repeat_not_weekly;
     return false;
   }
 

@@ -304,9 +304,9 @@ class OBM_Acl {
     }
     
     $union = "UNION SELECT ".implode(',', $unionColumns)." FROM UGroup 
-              LEFT JOIN GroupEntity ON group_id = groupentity_group_id 
-              LEFT JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id 
-              LEFT JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id "
+              INNER JOIN GroupEntity ON group_id = groupentity_group_id 
+              INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id 
+              INNER JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id "
               .self::getAclQueryWhere($entityType, $entityId, null, $action);
               
     $query = self::getAclQuery($columns, $entityType, $entityId, null, null, '', $union, false, false)
@@ -342,12 +342,12 @@ class OBM_Acl {
   public static function getAllowedEntities($userId, $entityType, $action, $entityId = null, $labelColumn = 'name') {
     if (self::isSpecialEntity($entityType)) {
       $columns = array('u2.userobm_id AS id', self::getUsernameColumns('u2').' AS label');
-      $additionalJoins = "LEFT JOIN UserObm u2 ON {$entityType}entity_{$entityType}_id = u2.userobm_id";
+      $additionalJoins = "INNER JOIN UserObm u2 ON {$entityType}entity_{$entityType}_id = u2.userobm_id";
       $unions = "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE userobm_id = {$userId}";
     } else {
       $entityTable = self::getEntityTable($entityType);
       $columns = array("{$entityType}_id AS id, {$entityType}_{$labelColumn} AS label");
-      $additionalJoins = "LEFT JOIN {$entityTable} ON {$entityType}entity_{$entityType}_id = {$entityType}_id";
+      $additionalJoins = "INNER JOIN {$entityTable} ON {$entityType}entity_{$entityType}_id = {$entityType}_id";
       $unions = '';
     }
     $query = self::getAclQuery($columns, $entityType, $entityId, $userId, $action, $additionalJoins, $unions);
@@ -422,21 +422,38 @@ class OBM_Acl {
       $unions .= " UNION ".self::getPublicAclQuery($columns, $entityType, $entityId, $action, $additionalJoins);
     }
     if ($includeGroups) {
-      $mainJoins = "LEFT JOIN UserObmGroup ON userobm_id = userobmgroup_userobm_id
-                    LEFT JOIN GroupEntity ON userobmgroup_group_id = groupentity_group_id 
-                    LEFT JOIN EntityRight ON (groupentity_entity_id = entityright_consumer_id 
-                                          OR userentity_entity_id = entityright_consumer_id)";
-    } else {
-      $mainJoins = "LEFT JOIN EntityRight ON userentity_entity_id = entityright_consumer_id";
+      $unions .= " UNION ".self::getGroupAclQuery($columns, $entityType, $entityId, $userId, $action, $additionalJoins);
     }
     
     $query = "SELECT {$columns} FROM UserObm u1 
-              LEFT JOIN UserEntity ON u1.userobm_id = userentity_user_id 
-              {$mainJoins}
-              LEFT JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id 
+              INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id 
+              INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
+              INNER JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id 
               {$additionalJoins} {$where} {$unions}";
               
       return $query;
+    /*
+     *
+     *   MIGHT BE A SOLUTION
+ * SELECT userobm_id, concat(userobm_lastname , ' ' , userobm_firstname) AS label FROM UserObm
+INNER JOIN (
+SELECT calendarentity_calendar_id AS id FROM UserEntity  
+INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
+INNER JOIN CalendarEntity ON calendarentity_entity_id = entityright_entity_id 
+WHERE userentity_user_id = '1' AND entityright_access = 1 
+UNION ALL
+SELECT calendarentity_calendar_id AS id FROM EntityRight
+INNER JOIN CalendarEntity ON calendarentity_entity_id = entityright_entity_id 
+WHERE entityright_consumer_id IS NULL AND entityright_access = 1 
+UNION ALL
+SELECT calendarentity_calendar_id FROM UserEntity 
+INNER JOIN of_usergroup ON userentity_user_id = of_usergroup_user_id
+INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id 
+INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id              
+INNER JOIN CalendarEntity ON calendarentity_entity_id = entityright_entity_id 
+WHERE userentity_user_id = '1' AND entityright_access = 1
+) as W ON id = userobm_id;
+ */
   }
   
   private static function getPublicAclQuery($columns, $entityType, $entityId = null, $action = null, $additionalJoins = '') {
@@ -447,10 +464,29 @@ class OBM_Acl {
     }
     return "SELECT {$columns}
             FROM EntityRight
-            LEFT JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id 
+            INNER JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id 
             {$additionalJoins} {$publicWhere}";
   }
   
+  private static function getGroupAclQuery($columns, $entityType, $entityId = null, $userId = null, $action = null, $additionalJoins = '') {
+    $entityTable = self::getEntityTable($entityType);
+    $entityJoinTable = self::getEntityJoinTable($entityType);
+    $where = self::getAclQueryWhere($entityType, $entityId, $userId, $action);    
+    if (is_array($columns)) {
+      $columns = implode(',', $columns);
+    }
+    
+    $query = "SELECT {$columns} FROM UserObm u1 
+              INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id 
+              INNER JOIN of_usergroup ON userobm_id = of_usergroup_user_id
+              INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id 
+              INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id              
+              INNER JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id 
+              {$additionalJoins} {$where}";
+              
+      return $query;    
+  }
+
   private static function getAclQueryWhere($entityType, $entityId = null, $userId = null, $action = null, $public = false) {
     $clauses = array();
     if ($entityId !== null) {

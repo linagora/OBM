@@ -327,6 +327,7 @@ Obm.TimeZoneParser = new Class ({
     this.lastIndex = 0;
     var request = new Request.JSON({
         url:obm.vars.consts.resourcePath  + '/js/bin/timezone/' + timeZone,
+        method: 'get',
         async: false,
         secure: false,
         onSuccess: function (response) {

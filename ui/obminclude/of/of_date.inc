@@ -194,9 +194,9 @@ class Of_Date extends DateTime {
    */
   static private function loadOptions() {
     if(!self::$_loaded) {
-      self::setOption('outputdate',$_SESSION['set_date']);
-      self::setOption('inputdate',$_SESSION['set_date_upd']);
-      self::setOption('timezone',$_SESSION['set_timezone']);
+      if(isset($_SESSION['set_date'])) self::setOption('outputdate',$_SESSION['set_date']);
+      if(isset($_SESSION['set_date_upd'])) self::setOption('inputdate',$_SESSION['set_date_upd']);
+      if(isset($_SESSION['set_timezone'])) self::setOption('timezone',$_SESSION['set_timezone']);
       self::$_loaded = true;
     }
   }
