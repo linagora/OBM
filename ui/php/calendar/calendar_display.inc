@@ -698,7 +698,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
   if (is_array($occurrences)) {
     $week_duration = 86400*7;
     $options = array('xUnit:86400',"yUnit:$week_duration",
-                     'context:obm.calendarManager.bodyContext');
+                     "context: 'body'");
     foreach($occurrences as $occurrence) {
       $dis_event .= dis_calendar_event($occurrence, 'day',$calendar_entity,$writable_entity,$options);
     }
@@ -4028,7 +4028,7 @@ function json_event_data($id,$calendar) {
       $day = true;
       $week_duration = 86400*7;
       $options = array('xUnit:86400',"yUnit:$week_duration",
-                       'context:obm.calendarManager.bodyContext');      
+                       "context: 'body'");      
       break;     
     default :
       $options = array();

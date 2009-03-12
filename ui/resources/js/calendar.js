@@ -4,7 +4,7 @@ Obm.CalendarDayEventExtension = new Class({
   initialize: function(parentEvent,size,origin) {
     this.event = parentEvent.event;
     this.options = parentEvent.options;
-    this.context = this.options.context;
+    this.context = parentEvent.context;
     this.parentEvent = parentEvent;
     this.buildExtension();
     this.size = size;
@@ -130,12 +130,12 @@ Obm.CalendarDayEvent = new Class({
     yUnit: 0,
     xUnit: 24*3600,
     unit : 24*3600,
-    context: null 
+		context : 'head'
   },
 
   initialize: function(eventData,options) {
-    this.setOptions($merge({context: obm.calendarManager.headContext},options));
-    this.context = obm.calendarManager.headContext;
+    this.setOptions(options);
+		this.initContext();
     this.event = eventData;
     this.size = 1;
     this.length = 1;
@@ -148,6 +148,14 @@ Obm.CalendarDayEvent = new Class({
     this.setDuration(this.event.duration);
     this.switchColor(obm.vars.conf.calendarColor);
   },
+
+	initContext: function() {
+		if(this.options.context == 'body') {
+			this.context = obm.calendarManager.bodyContext;
+		} else if(this.options.context == 'head') {
+			this.context = obm.calendarManager.headContext;
+		}
+	},
 
   makeDraggable: function() {
     var dragOptions = {
@@ -481,12 +489,12 @@ Obm.CalendarEvent = new Class({
     yUnit: obm.vars.consts.timeUnit,
     xUnit: (3600*24),
     unit : obm.vars.consts.timeUnit,
-    context: null
+    context: 'body'
   },
 
   initialize: function(eventData,options) {
-    this.setOptions($merge({context: obm.calendarManager.bodyContext},options));
-    this.context = obm.calendarManager.bodyContext;
+    this.setOptions(options);
+		this.initContext();	
     this.event = eventData;
     this.extensions = new Array();
     this.size = 1;
