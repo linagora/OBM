@@ -52,8 +52,9 @@ public class LabelMapping {
 	}
 
 	public String toFunis(String obmLabel) {
-		if (obmToClient.containsKey(obmLabel)) {
-			return obmToClient.get(obmLabel);
+		String lbl = obmLabel.replace("PREF;", "");
+		if (obmToClient.containsKey(lbl)) {
+			return obmToClient.get(lbl);
 		} else {
 			return obmLabel;
 		}
