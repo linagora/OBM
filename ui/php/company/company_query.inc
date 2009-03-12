@@ -175,16 +175,15 @@ function run_query_company_search($company) {
       companynafcode_code as nafcode_code,
       companynafcode_label as nafcode_label
     FROM Company
-       
-      ";
+";
 
   $left_join = "
          INNER JOIN CompanyEntity ON companyentity_company_id = company_id
-         LEFT JOIN Address ON address_entity_id = companyentity_entity_id AND address_label like '%X-OBM-Ref1%'
+         LEFT JOIN Address ON address_entity_id = companyentity_entity_id AND address_label like 'PREF;%'
          LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR'  
-         LEFT JOIN Phone ON phone_entity_id = companyentity_entity_id AND phone_label like '%X-OBM-Ref1%'
-         LEFT JOIN Email ON email_entity_id = companyentity_entity_id AND email_label like '%X-OBM-Ref1%'        
-         LEFT JOIN Website ON website_entity_id = companyentity_entity_id AND website_label like '%X-OBM-Ref1%'
+         LEFT JOIN Phone ON phone_entity_id = companyentity_entity_id AND phone_label like 'PREF;%'
+         LEFT JOIN Email ON email_entity_id = companyentity_entity_id AND email_label like 'PREF;%'        
+         LEFT JOIN Website ON website_entity_id = companyentity_entity_id AND website_label like 'PREF;%'
          LEFT JOIN CompanyType ON company_type_id=companytype_id
          $join_userdata
          LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id
@@ -294,7 +293,12 @@ function run_query_company_coords($id, $update=false) {
   $obm_q->query($query);
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('phone_label'));
+    // Remove the X-OBM mark
     array_pop($label);
+    // Remove the PREF mark
+    if ($label[0] == 'PREF') {
+      unset($label[0]);
+    }
     $label = implode('_',$label);
     $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
   }
@@ -309,7 +313,12 @@ function run_query_company_coords($id, $update=false) {
   $obm_q->query($query);
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('email_label'));
+    // Remove the X-OBM mark
     array_pop($label);
+    // Remove the PREF mark
+    if ($label[0] == 'PREF') {
+      unset($label[0]);
+    }
     $label = implode('_',$label);
     $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
   }
@@ -324,7 +333,12 @@ function run_query_company_coords($id, $update=false) {
   $obm_q->query($query);
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('website_label'));
+    // Remove the X-OBM mark
     array_pop($label);
+    // Remove the PREF mark
+    if ($label[0] == 'PREF') {
+      unset($label[0]);
+    }
     $label = implode('_',$label);
     $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
@@ -343,7 +357,12 @@ function run_query_company_coords($id, $update=false) {
   $obm_q->query($query);
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('address_label'));
+    // Remove the X-OBM mark
     array_pop($label);
+    // Remove the PREF mark
+    if ($label[0] == 'PREF') {
+      unset($label[0]);
+    }
     $label = implode('_',$label);
     if ($update) {
       $country =  $obm_q->f('address_country');

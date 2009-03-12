@@ -1357,6 +1357,8 @@ SELECT companyentity_entity_id, company_phone, 'WORK;VOICE;X-OBM-Ref1' FROM Comp
 UNION
 SELECT companyentity_entity_id, company_fax, 'WORK;FAX;X-OBM-Ref1' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_fax != '' AND company_fax IS NOT NULL;
 
+UPDATE Phone SET phone_label=('PREF;' || phone_label) WHERE phone_id IN (SELECT min(phone_id) FROM Phone GROUP BY phone_entity_id);
+
 INSERT INTO Email (email_entity_id, email_address, email_label) 
 SELECT contactentity_entity_id, contact_email, 'INTERNET;X-OBM-Ref1' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_email != '' AND contact_email IS NOT NULL
 UNION

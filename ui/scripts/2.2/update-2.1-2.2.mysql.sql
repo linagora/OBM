@@ -1352,11 +1352,11 @@ LEFT JOIN UserEntity on todo_user=userentity_user_id;
 
 
 
---  _______________________________________________________
--- |Migrating Address  information from Contact and Company|
---  --------------------------------------------------------
+--  ______________________________________________________
+--  Migrating Address information from Contact and Company
+--  ------------------------------------------------------
 INSERT INTO Address (address_entity_id, address_street, address_zipcode, address_town, address_expresspostal, address_country, address_label)
-SELECT contactentity_entity_id, CONCAT(contact_address1,'\n',contact_address2,'\n',contact_address3), contact_zipcode, contact_town, contact_expresspostal, contact_country_iso3166, 'WORK;X-OBM-Ref1' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE (contact_address1 != '' AND contact_address1 IS NOT NULL) OR (contact_address2 !='' AND contact_address2 IS NOT NULL) OR (contact_address3 !='' AND contact_address3 IS NOT NULL) OR (contact_zipcode !='' AND contact_zipcode IS NOT NULL) OR (contact_town !='' AND contact_town IS NOT NULL) OR (contact_expresspostal !='' AND contact_expresspostal IS NOT NULL) OR (contact_country_iso3166 !='0' AND contact_country_iso3166 !='' AND contact_country_iso3166 IS NOT NULL)
+SELECT contactentity_entity_id, CONCAT(contact_address1,'\n',contact_address2,'\n',contact_address3), contact_zipcode, contact_town, contact_expresspostal, contact_country_iso3166, 'PREF;WORK;X-OBM-Ref1' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE (contact_address1 != '' AND contact_address1 IS NOT NULL) OR (contact_address2 !='' AND contact_address2 IS NOT NULL) OR (contact_address3 !='' AND contact_address3 IS NOT NULL) OR (contact_zipcode !='' AND contact_zipcode IS NOT NULL) OR (contact_town !='' AND contact_town IS NOT NULL) OR (contact_expresspostal !='' AND contact_expresspostal IS NOT NULL) OR (contact_country_iso3166 !='0' AND contact_country_iso3166 !='' AND contact_country_iso3166 IS NOT NULL)
 UNION
 SELECT companyentity_entity_id, CONCAT(company_address1,'\n', company_address2,'\n', company_address3), company_zipcode, company_town, company_expresspostal, company_country_iso3166, 'HQ;X-OBM-Ref1' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE (company_address1 !='' AND company_address1 IS NOT NULL) OR (company_address2 !='' AND company_address2 IS NOT NULL) OR (company_address3 !='' AND company_address3 IS NOT NULL) OR (company_zipcode !='' AND company_zipcode IS NOT NULL) OR (company_town !='' AND company_town IS NOT NULL) OR (company_expresspostal !='' AND company_expresspostal IS NOT NULL) OR (company_country_iso3166 !='0' AND company_country_iso3166 !='' AND company_country_iso3166 IS NOT NULL);
 
@@ -1372,6 +1372,12 @@ UNION
 SELECT companyentity_entity_id, company_phone, 'WORK;VOICE;X-OBM-Ref1' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_phone != '' AND company_phone IS NOT NULL
 UNION
 SELECT companyentity_entity_id, company_fax, 'WORK;FAX;X-OBM-Ref1' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_fax != '' AND company_fax IS NOT NULL;
+
+CREATE TEMPORARY TABLE P1
+SELECT min(phone_id) as id FROM Phone
+GROUP BY phone_entity_id;
+UPDATE Phone SET phone_label=concat('PREF;',phone_label) WHERE phone_id IN (SELECT id FROM P1);
+DROP TABLE P1;
 
 INSERT INTO Email (email_entity_id, email_address, email_label) 
 SELECT contactentity_entity_id, contact_email, 'INTERNET;X-OBM-Ref1' FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id WHERE contact_email != '' AND contact_email IS NOT NULL

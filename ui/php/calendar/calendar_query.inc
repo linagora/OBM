@@ -790,8 +790,8 @@ function run_query_icalendar_insert($params, $force = false) {
   $writer = new Vcalendar_Writer_OBM($force);  
   $writer->writeDocument($document);
   $nb_processed_event = count($document->getVevents());
-  return array($nb_processed_event);
 
+  return array($nb_processed_event);
 }
 
 

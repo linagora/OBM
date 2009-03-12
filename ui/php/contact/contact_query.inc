@@ -237,10 +237,10 @@ function run_query_contact_search($contact) {
     LEFT JOIN Kind ON contact_kind_id = kind_id
     LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id 
-    LEFT JOIN Address ON address_entity_id = contactentity_entity_id  AND address_label like '%X-OBM-Ref1%'
+    LEFT JOIN Address ON address_entity_id = contactentity_entity_id  AND address_label like 'PREF;%'
     LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
-    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label like '%X-OBM-Ref1%'
-    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like '%X-OBM-Ref1%'";
+    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label like 'PREF;%'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like 'PREF;%'";
 
 
   if ((! $fuzzy) || ($lname == '')) {
@@ -738,6 +738,7 @@ function run_query_contact_update($contact) {
   return $retour;
 }
 
+
 /**
  * run_query_contact_coords_update 
  * 
@@ -756,26 +757,30 @@ function run_query_contact_coords_update($id, $contact) {
   $emails = $contact['emails'];
   $obm_q = new DB_OBM;
 
-  $query = "DELETE FROM Phone WHERE phone_entity_id = $id"; 
+  $query = "DELETE FROM Phone WHERE phone_entity_id = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(phone)');
   $obm_q->query($query);
   if(is_array($phones)) {
     $cpt = array();
+    $pref = 'PREF;';
     foreach($phones as $phone) {
       if(trim($phone['number']) != '' ) {
         $phone['label'] = str_replace('_', ';', $phone['label']);
         $cpt[$phone['label']]++;
-        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
+        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$pref$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(phone)');
         $obm_q->query($query);
+	$pref = '';
       }
     }
   }
-  $query = "DELETE FROM Address WHERE address_entity_id = $id"; 
+
+  $query = "DELETE FROM Address WHERE address_entity_id = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(address)');
-  $obm_q->query($query);  
+  $obm_q->query($query);
   if(is_array($addresses)) {
     $cpt = array();
+    $pref = 'PREF;';
     foreach($addresses as $address) {
       if(trim($address['street']) != '' || (trim($address['country']) != '' && trim($address['country']) != 'none') || trim($address['zipcode']) != ''
          || trim($address['expresspostal']) != '') {
@@ -797,69 +802,78 @@ function run_query_contact_coords_update($id, $contact) {
           '$address[town]',
           '$address[expresspostal]',
           '$address[country]',
-          '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
+          '$pref$address[label];X-OBM-Ref".$cpt[$address['label']]."'
         )";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(address)');
         $obm_q->query($query);
+	$pref = '';
       }
     }
-  }  
-  $query = "DELETE FROM Website WHERE website_entity_id = $id"; 
+  }
+
+  $query = "DELETE FROM Website WHERE website_entity_id = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(website)');
-  $obm_q->query($query);  
+  $obm_q->query($query);
 
   if(is_array($websites)) {
     $cpt = array();
+    $pref = 'PREF;';
     foreach($websites as $website) {
       if(trim($website['url']) != '' ) {
         $website['label'] = str_replace('_', ';', $website['label']);
         $cpt[$website['label']]++;
-        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
+        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$pref$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(website)');
-        $obm_q->query($query);        
+        $obm_q->query($query);
+	$pref = '';
       }
     }
-  }  
+  }
 
-  $query = "DELETE FROM IM WHERE im_entity_id = $id"; 
+  $query = "DELETE FROM IM WHERE im_entity_id = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(IM)');
-  $obm_q->query($query);  
+  $obm_q->query($query);
 
   if(is_array($ims)) {
     $cpt = array();
+    $pref = 'PREF;';
     foreach($ims as $im) {
       if(trim($im['address']) != '' ) {
-        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[label]')";
+        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$pref$im[label]')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(IM)');
-        $obm_q->query($query);        
+        $obm_q->query($query);
+	$pref = '';
       }
     }
-  }    
+  }
 
-  $query = "DELETE FROM Email WHERE email_entity_id = $id"; 
+  $query = "DELETE FROM Email WHERE email_entity_id = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(Email)');
-  $obm_q->query($query);  
+  $obm_q->query($query);
 
   if(is_array($emails)) {
     $cpt = array();
+    $pref = 'PREF;';
     foreach($emails as $email) {
       if(trim($email['address']) != '' ) {
         $email['label'] = str_replace('_', ';', $email['label']);
         $cpt[$email['label']]++;
-        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '$email[address]', '$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
+        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '$email[address]', '$pref$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(Email)');
-        $obm_q->query($query);        
+        $obm_q->query($query);
+	$pref = '';
       }
     }
-  }      
+  }
 }
 
 
 /**
  * run_query_contact_coords
  * 
- * @param mixed $id 
- * @param mixed $contact 
+ * @param mixed $id
+ * @param mixed $inherit
+ * @param mixed $update
  * @access public
  * @return void
  */
@@ -887,7 +901,12 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
   $obm_q->query($query);        
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('phone_label'));
+    // Remove the X-OBM mark
     array_pop($label);
+    // Remove the PREF mark
+    if ($label[0] == 'PREF') {
+      unset($label[0]);
+    }
     $label = implode('_',$label);
     $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
   }
@@ -911,6 +930,10 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('email_label'));
     array_pop($label);
+    // Remove the PREF mark
+    if ($label[0] == 'PREF') {
+      unset($label[0]);
+    }
     $label = implode('_',$label);
     $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
   }
@@ -942,6 +965,10 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('address_label'));
     array_pop($label);
+    // Remove the PREF mark
+    if ($label[0] == 'PREF') {
+      unset($label[0]);
+    }
     $label = implode('_',$label);
     if($update) {
       $country =  $obm_q->f('address_country');
@@ -984,6 +1011,10 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('website_label'));
     array_pop($label);
+    // Remove the PREF mark
+    if ($label[0] == 'PREF') {
+      unset($label[0]);
+    }
     $label = implode('_',$label);
     $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
