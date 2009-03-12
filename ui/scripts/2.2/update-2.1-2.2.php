@@ -83,11 +83,12 @@ $profiles['admin'] = array (
 include("../../obminclude/global.inc");
 include("$path/admin_data/admin_data_display.inc");
 include("$path/admin_data/admin_data_query.inc");
+include("../../obminclude/lang/fr/global.inc");
 
 echo "**** OBM : data migration 2.1 -> 2.2 : DB $obmdb_db ($obmdb_host)\n";
 
 make_profiles();
-
+update_weekly_events();
 /**
  * Insert profiles into DB From static $profiles
  */
@@ -203,5 +204,42 @@ function make_profiles() {
   }
 }
 
-
+function update_weekly_events() {
+  
+  $currentTime = strtotime($GLOBALS['ccalendar_weekstart']);
+  $events = array();
+  $query = "SELECT event_id, event_repeatdays, event_date FROM Event WHERE event_repeatkind = 'weekly'";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  while($obm_q->next_record()) {
+    $events[$obm_q->f('event_id')] = array('days' => str_split($obm_q->f('event_repeatdays')), 'date' => new Of_Date($obm_q->f('event_date'), 'GMT'));
+  }
+  foreach($events as $id => $data) {
+    $days = array();
+    $eventDay = $data['date']->getWeekday();
+    $haveday = false;
+    for ($i=0; $i<7; $i++) {
+      $dayNum = (int) date('w', $currentTime);
+      $days[$dayNum] = $data['days'][$i];
+      $currentTime = strtotime('+1 day', $currentTime); 
+      if($days[$dayNum] == 1) $haveday = true;
+    }
+    if(!$haveday) $days[$eventDay] = 1;
+    if($days[$eventDay] != 1) {
+      for($i = ($eventDay +1)%7; $i != $eventDay; $i = ($i+1)%7) {
+        if($days[$i] == 1) {
+          $data['date']->setWeekday($i);
+          break;
+        } 
+      }
+    }
+    ksort($days);
+    try {
+      $query = "UPDATE Event SET event_repeatdays='".implode('',$days)."', event_date = '".$data['date']."' WHERE event_id = $id";
+    } catch(Exception $e) {
+      var_dump($e); exit();
+    }
+    $obm_q->query($query);
+  }
+}
 </script>

@@ -718,7 +718,6 @@ SELECT
   todo_content
 FROM Todo;
 
-
 --
 -- Clean CalendarAlert before migration to EventAlert
 --
