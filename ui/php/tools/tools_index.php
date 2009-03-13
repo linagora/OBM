@@ -93,7 +93,7 @@ $entities = array(
         'joinId' => 'service_entity_id'
       ),
       'id' => 'hostentity_host_id',
-      'rules' => array('service_service' => array('smtp_in', 'smtp_out', 'imap'))
+      'rules' => array('service_service' => array('smtp_in', 'smtp_out', 'imap', 'samba'))
     ),
     'prefix'  => 'host',
     'exclude' => array('timeupdate' => 1, 'timecreate' => 1, 'usercreate' => 1, 'userupdate' => 1),

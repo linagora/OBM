@@ -2343,6 +2343,7 @@ function run_query_batch_processing_update($params, $users_id) {
   
   $set = array();
   
+  if(sizeof($users_id) == 0) return true;
   // User
   if (isset($archive)) { $set[] = "userobm_archive=$archive"; }
   if (isset($profile)) { $set[] = "userobm_perms='$profile'"; }

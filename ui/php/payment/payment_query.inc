@@ -121,7 +121,11 @@ function run_query_payment_search($payment) {
 ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Payment $join $whereq");
+    $count = get_query_count("
+      SELECT count(*) FROM Payment LEFT JOIN Company ON payment_company_id=company_id 
+      LEFT JOIN PaymentKind ON payment_paymentkind_id=paymentkind_id
+      LEFT JOIN Account ON payment_account_id=account_id
+      $join $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0) || (! $ctu_sql_limit)) {

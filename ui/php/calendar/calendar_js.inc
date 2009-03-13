@@ -101,7 +101,7 @@ function calendar_check_meeting(form) {
     alert (\"$l_interval_null\");
     return false;
   }
-  else if (form.tf_date_begin.value == \"\") {
+  else if (form.tf_date.value == \"\") {
     alert(\"$l_datebegin\" + \" : $l_fill_date\");
     return false;
   }
