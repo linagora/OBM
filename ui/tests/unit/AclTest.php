@@ -16,8 +16,6 @@
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
 */
-?>
-<?php
 
 require_once dirname(__FILE__).'/TestsHelper.php';
 
@@ -39,7 +37,7 @@ require_once 'of_acl.php';
  * @author Raphaël Rougeron <raphael.rougeron@aliasource.fr> 
  * @license GPL 2.0
  */
-class OBM_Acl_TestCase extends OBM_Database_TestCase {
+class AclTest extends OBM_Database_TestCase {
   
   protected function getDataSet() {
     $csvDataSet = new OBM_Database_CsvDataSet(';');
@@ -47,15 +45,17 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     $csvDataSet->addEntityTable('UserObm', 'user', dirname(__FILE__).'/db_data/UserObm.csv');
     $csvDataSet->addEntityTable('UGroup', 'group', dirname(__FILE__).'/db_data/UGroup.csv');
     $csvDataSet->addEntityTable('Cv', 'cv', dirname(__FILE__).'/db_data/Cv.csv');
-    $csvDataSet->addTable('UserObmGroup', dirname(__FILE__).'/db_data/UserObmGroup.csv');
+    $csvDataSet->addTable('of_usergroup', dirname(__FILE__).'/db_data/of_usergroup.csv');
     return $csvDataSet;
   }
   
   public function testBasics() {
     OBM_Acl::initialize();
     $this->assertFalse(OBM_Acl::isAllowed(2, 'cv', 1, 'read'));
+    $this->assertFalse(OBM_Acl::hasAllowedEntities(2, 'cv', 'read'));
     OBM_Acl::allow(2, 'cv', 1, 'read');
     $this->assertTrue(OBM_Acl::isAllowed(2, 'cv', 1, 'read'));
+    $this->assertTrue(OBM_Acl::hasAllowedEntities(2, 'cv', 'read'));
     $this->assertFalse(OBM_Acl::isAllowed(2, 'cv', 1, 'write'));
     OBM_Acl::allow(2, 'cv', 1, 'write');
     $this->assertTrue(OBM_Acl::isAllowed(2, 'cv', 1, 'read'));
@@ -69,10 +69,12 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     
     OBM_Acl::allow(2, 'cv', 1, 'write');
     $this->assertTrue(OBM_Acl::areSomeAllowed(2, 'cv', array(1, 2), 'write'));
+    $this->assertTrue(OBM_Acl::hasAllowedEntities(2, 'cv', 'write'));
     $this->assertFalse(OBM_Acl::areAllowed(2, 'cv', array(1, 2), 'write'));
     OBM_Acl::allow(2, 'cv', 2, 'write');
     $this->assertTrue(OBM_Acl::areSomeAllowed(2, 'cv', array(1, 2), 'write'));
     $this->assertTrue(OBM_Acl::areAllowed(2, 'cv', array(1, 2), 'write'));
+    $this->assertTrue(OBM_Acl::hasAllowedEntities(2, 'cv', 'write'));
     
     OBM_Acl::denyAll('cv', 1);
     $this->assertFalse(OBM_Acl::canRead(2, 'cv', 1));
@@ -90,9 +92,11 @@ class OBM_Acl_TestCase extends OBM_Database_TestCase {
     
     $this->assertTrue(OBM_Acl::areSomeAllowed(2, 'calendar', array(2, 3), 'write'));
     $this->assertFalse(OBM_Acl::areAllowed(2, 'calendar', array(2, 3), 'write'));
+    $this->assertFalse(OBM_Acl::hasAllowedEntities(2, 'calendar', 'write'));
     OBM_Acl::allow(2, 'calendar', 3, 'write');
     $this->assertTrue(OBM_Acl::areSomeAllowed(2, 'calendar', array(2, 3), 'write'));
     $this->assertTrue(OBM_Acl::areAllowed(2, 'calendar', array(2, 3), 'write'));
+    $this->assertTrue(OBM_Acl::hasAllowedEntities(2, 'calendar', 'write'));
   }
   
   public function testGroupBasics() {

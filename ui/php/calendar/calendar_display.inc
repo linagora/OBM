@@ -2613,9 +2613,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   $repeatfrequency = 1;
 
-  $calendar_readable = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access');
-  $resources_readable = OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'access');
-
   if (($action == 'detailupdate') || ($action == 'duplicate')) {
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
@@ -2812,7 +2809,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </select>
     </td>";
 
-  if(count($calendar_readable) > 1) {
+  if ($has_access_to_other_calendars = OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access')) {
     $block_user = "
       <fieldset class=\"detail infos\">
       <legend>$l_users</legend>    
@@ -2864,7 +2861,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
 
-  if(count($calendar_readable) > 1) {
+  if ($has_access_to_other_calendars) {
     $block_group = "
       <fieldset class=\"detail infos\">
       <legend>$l_groups</legend>    
@@ -2887,7 +2884,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </fieldset>";
     $group_complete = "new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
   }
-  if ($ccalendar_resource && count($resources_readable) > 0) {
+  if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
     // resource select
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $r_ent) {
@@ -3326,9 +3323,6 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   global $l_groups,$l_resources,$l_module_resourcegroup, $l_module_calendar;
   global $l_resources_one_freebusy,$l_resources_all_freebusy,$l_resource_group_search;
 
-  $calendar_readable = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'access');
-  $resources_readable = OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'access');
-
   $date = $calendar['date'];
   $hourbegin = $calendar['time_duration'];
   $minbegin = $calendar['min_duration'];
@@ -3395,7 +3389,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch');
     new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
 
-  if ($ccalendar_resource && count($resources_readable) > 0) {
+  if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $r_ent) {
 	$r_name = $r_ent['label'];
@@ -3522,7 +3516,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
       <input type=\"text\" name=\"\" value=\"\" id=\"groupSearch\" autocomplete=\"off\" />
       $dis_sel_group
   </td>";
-  if(count($calendar_readable) > 1) {
+  if (OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access')) {
     $dis_block_user = "<fieldset class=\"detail infos\">  
       <legend>$l_users</legend>
       <table>

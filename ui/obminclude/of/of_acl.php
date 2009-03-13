@@ -1,4 +1,21 @@
 <?php
+/*
+ +-------------------------------------------------------------------------+
+ |  Copyright (c) 1997-2009 OBM.org project members team                   |
+ |                                                                         |
+ | This program is free software; you can redistribute it and/or           |
+ | modify it under the terms of the GNU General Public License             |
+ | as published by the Free Software Foundation; version 2                 |
+ | of the License.                                                         |
+ |                                                                         |
+ | This program is distributed in the hope that it will be useful,         |
+ | but WITHOUT ANY WARRANTY; without even the implied warranty of          |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           |
+ | GNU General Public License for more details.                            |
+ +-------------------------------------------------------------------------+
+ | http://www.obm.org                                                      |
+ +-------------------------------------------------------------------------+
+*/
 
 /**
  * OBM ACL Class
@@ -24,6 +41,8 @@ class OBM_Acl {
   const ADMIN  = 'admin';
   
   private static $db;
+  
+  private static $log;
   
   private static $cache;
   
@@ -121,6 +140,7 @@ class OBM_Acl {
     }
     $query = self::getAclQuery('1', $entityType, $entityId, $userId, $action);
     self::$db->query($query);
+    self::log($query, 'isAllowed');
     if (!self::$db->next_record()) {
       return false;
     }
@@ -136,6 +156,7 @@ class OBM_Acl {
   public static function areAllowed($userId, $entityType, $entityIds, $action) {
     $query = self::getAclQuery('COUNT(1) as count', $entityType, $entityIds, $userId, $action);
     self::$db->query($query);
+    self::log($query, 'areAllowed');
     if (self::isSpecialEntity($entityType) && in_array($userId, $entityIds)) {
       $count = 1;
     } else {
@@ -145,6 +166,19 @@ class OBM_Acl {
       $count+= self::$db->f('count');
     }
     return $count >= count($entityIds);
+  }
+  
+  /**
+   * Checks if the user is authorized to perform a specific action on ONE
+   * OR MORE entity (not including his own entities like his calendar)
+   * 
+   * @return bool
+   */
+  public static function hasAllowedEntities($userId, $entityType, $action) {
+    $query = self::getAclQuery('1', $entityType, null, $userId, $action);
+    self::$db->query($query);
+    self::log($query, 'hasAllowedEntities');
+    return self::$db->nf() > 0;
   }
   
   /**
@@ -159,6 +193,7 @@ class OBM_Acl {
     }
     $query = self::getAclQuery('1', $entityType, $entityIds, $userId, $action);
     self::$db->query($query);
+    self::log($query, 'areSomeAllowed');
     if (!self::$db->next_record()) {
       return false;
     }
@@ -237,6 +272,7 @@ class OBM_Acl {
     $rights = self::getDefaultRights();
     $query = self::getAclQuery($columns, $entityType, $entityId, $userId);
     self::$db->query($query);
+    self::log($query, 'getRights');
     while (self::$db->next_record()) {
       foreach (self::$actions as $action) {
         $rights[$action] |= self::$db->f("entityright_{$action}");
@@ -250,6 +286,7 @@ class OBM_Acl {
     $rights = self::getDefaultRights();
     $query = self::getPublicAclQuery($columns, $entityType, $entityId);
     self::$db->query($query);
+    self::log($query, 'getPublicRights');
     self::$db->next_record();
     foreach (self::$actions as $action) {
       $rights[$action] |= self::$db->f("entityright_{$action}");
@@ -276,6 +313,7 @@ class OBM_Acl {
     }
     $query = self::getAclQuery($columns, $entityType, $entityId, null, null, '', '', false);
     self::$db->query($query);
+    self::log($query, 'getEntityUsers');
     $users = array();
     while (self::$db->next_record()) {
       $id = self::$db->f('userobm_id');
@@ -312,6 +350,7 @@ class OBM_Acl {
     $query = self::getAclQuery($columns, $entityType, $entityId, null, null, '', $union, false, false)
              ." ORDER BY consumer, label";
     self::$db->query($query);
+    self::log($query, 'getEntityConsumers');
     
     $consumers = array();
     while (self::$db->next_record()) {
@@ -353,6 +392,7 @@ class OBM_Acl {
     $query = self::getAclQuery($columns, $entityType, $entityId, $userId, $action, $additionalJoins, $unions);
     $entities = array();
     self::$db->query($query);
+    self::log($query, 'getAllowedEntities');
     while (self::$db->next_record()) {
       $id = self::$db->f('id');
       if (is_numeric($id)) {
@@ -360,6 +400,10 @@ class OBM_Acl {
       }
     }
     return $entities;
+  }
+  
+  public static function getAclSubselect($columns, $entityType, $entityId = null, $userId = null, $action = null) {
+    return self::getAclQuery($columns, $entityType, $entityId, $userId, $action);
   }
   
   private static function setRight($consumerType, $consumerId, $entityType, $entityId, $action, $right = 1) {
@@ -410,8 +454,8 @@ class OBM_Acl {
     self::$db->query($insert);
   }
   
-  private static function getAclQuery($columns, $entityType, $entityId = null, $userId = null, $action = null, 
-                                      $additionalJoins = '', $unions = '', $includePublicEntities = true, $includeGroups = true) {
+  public static function getAclQuery($columns, $entityType, $entityId = null, $userId = null, $action = null, 
+                                     $additionalJoins = '', $unions = '', $includePublicEntities = true, $includeGroups = true) {
     $entityTable = self::getEntityTable($entityType);
     $entityJoinTable = self::getEntityJoinTable($entityType);
     $where = self::getAclQueryWhere($entityType, $entityId, $userId, $action);
@@ -419,10 +463,10 @@ class OBM_Acl {
       $columns = implode(',', $columns);
     }
     if ($includePublicEntities) {
-      $unions .= " UNION ".self::getPublicAclQuery($columns, $entityType, $entityId, $action, $additionalJoins);
+      $unions .= " UNION ALL ".self::getPublicAclQuery($columns, $entityType, $entityId, $action, $additionalJoins);
     }
     if ($includeGroups) {
-      $unions .= " UNION ".self::getGroupAclQuery($columns, $entityType, $entityId, $userId, $action, $additionalJoins);
+      $unions .= " UNION ALL ".self::getGroupAclQuery($columns, $entityType, $entityId, $userId, $action, $additionalJoins);
     }
     
     $query = "SELECT {$columns} FROM UserObm u1 
@@ -430,30 +474,7 @@ class OBM_Acl {
               INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
               INNER JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id 
               {$additionalJoins} {$where} {$unions}";
-              
-      return $query;
-    /*
-     *
-     *   MIGHT BE A SOLUTION
- * SELECT userobm_id, concat(userobm_lastname , ' ' , userobm_firstname) AS label FROM UserObm
-INNER JOIN (
-SELECT calendarentity_calendar_id AS id FROM UserEntity  
-INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
-INNER JOIN CalendarEntity ON calendarentity_entity_id = entityright_entity_id 
-WHERE userentity_user_id = '1' AND entityright_access = 1 
-UNION ALL
-SELECT calendarentity_calendar_id AS id FROM EntityRight
-INNER JOIN CalendarEntity ON calendarentity_entity_id = entityright_entity_id 
-WHERE entityright_consumer_id IS NULL AND entityright_access = 1 
-UNION ALL
-SELECT calendarentity_calendar_id FROM UserEntity 
-INNER JOIN of_usergroup ON userentity_user_id = of_usergroup_user_id
-INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id 
-INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id              
-INNER JOIN CalendarEntity ON calendarentity_entity_id = entityright_entity_id 
-WHERE userentity_user_id = '1' AND entityright_access = 1
-) as W ON id = userobm_id;
- */
+    return $query;
   }
   
   private static function getPublicAclQuery($columns, $entityType, $entityId = null, $action = null, $additionalJoins = '') {
@@ -484,7 +505,7 @@ WHERE userentity_user_id = '1' AND entityright_access = 1
               INNER JOIN {$entityJoinTable} ON {$entityType}entity_entity_id = entityright_entity_id 
               {$additionalJoins} {$where}";
               
-      return $query;    
+    return $query;    
   }
 
   private static function getAclQueryWhere($entityType, $entityId = null, $userId = null, $action = null, $public = false) {
@@ -538,6 +559,7 @@ WHERE userentity_user_id = '1' AND entityright_access = 1
     $entityJoinTable = self::getEntityJoinTable($entityType);
     $query = "SELECT {$entityType}entity_entity_id FROM {$entityJoinTable} WHERE {$entityType}entity_{$entityType}_id = '{$id}'";
     self::$db->query($query);
+    self::log($query, 'getEntityId');
     if (!self::$db->next_record()) {
       throw new Exception("Unknown $entityType entity #$id");
     }
@@ -594,6 +616,11 @@ WHERE userentity_user_id = '1' AND entityright_access = 1
     $ctt[2]['type'] = 'field';
     $ctt[2]['value'] = "{$prefix}userobm_firstname";
     return sql_string_concat(self::$db->type, $ctt);
+  }
+  
+  private static function log($sql, $methodCall) {
+    global $cdg_sql;
+    display_debug_msg($sql, $cdg_sql, "OBM_Acl::$methodCall()");
   }
 }
 

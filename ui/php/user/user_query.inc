@@ -49,19 +49,7 @@ function run_query_user_search($user) {
   $multidomain = sql_multidomain('userobm');
 
   if ($filter_entity == 'calendar') {
-    $users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', $filter_pattern);
-    $users_ids = array_keys($users);
-    if ((is_array($users_ids)) && (count($users_ids) > 0)) {
-      $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
-      foreach($users_ids as $u_id) {
-	    $where_filter_entity .= "$coma'$u_id'";
-	    $coma = ',';
-      }
-      $where_filter_entity .= '))';
-    } else {
-      // If no users have given $uid with read right, return empty set
-      $where_filter_entity = ' AND userobm_id < 0';
-    }
+    $where_filter_entity = ' AND userobm_id IN ('.OBM_Acl::getAclSubselect('userobm_id', 'calendar', null, $obm['uid'], $filter_pattern).')';
   }
 
   $where = '1=1';
@@ -223,38 +211,10 @@ function run_query_user_ext_search($user) {
   else $first_row = 0;
 
   if ($filter_entity == 'calendar') {
-    $users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', $filter_pattern);
-    $users_ids = array_keys($users);
-    if ((is_array($users_ids)) && (count($users_ids) > 0)) {
-      $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
-      foreach($users_ids as $u_id) {
-	$where_filter_entity .= "$coma'$u_id'";
-	$coma = ',';
-      }
-      $where_filter_entity .= '))';
-    } else {
-      // If no users have given $uid with read right, return empty set
-      $where_filter_entity = ' AND userobm_id < 0';
-    }
+    $where_filter_entity = ' AND userobm_id IN ('.OBM_Acl::getAclSubselect('userobm_id', 'calendar', null, $obm['uid'], $filter_pattern).')';
   }
 
-  $query = "SELECT 
-      count(*) as resultscount
-    FROM UserObm
-    WHERE (
-      userobm_lastname LIKE '$pattern%'
-      OR userobm_login LIKE '$pattern%' 
-      OR userobm_firstname LIKE '$pattern%' 
-      OR userobm_email LIKE '$pattern%' )
-      AND userobm_archive = 0
-      $multidomain
-      $where_filter_entity";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $resultsCount = $obm_q->f('resultscount');
-  $query = "SELECT 
+   $query = "SELECT 
       userobm_id,
       userobm_lastname,
       userobm_firstname,
@@ -274,7 +234,7 @@ function run_query_user_ext_search($user) {
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->query($query);
 
-  return array('length' => $resultsCount, 'datas' => $obm_q);
+  return array('length' => $obm_q->nf(), 'datas' => $obm_q);
 }
 
 

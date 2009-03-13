@@ -28,7 +28,7 @@ require_once 'vpdi/vcard.php';
 
 date_default_timezone_set('Europe/Paris');
  
-class Vpdi_TestCase extends PHPUnit_Framework_TestCase {
+class VpdiTest extends PHPUnit_Framework_TestCase {
   public function testRFC2425ParserBasicMethods() {
     $this->assertEquals(Vpdi::decodeTextList('aaa,bbb,ccc'), array('aaa', 'bbb', 'ccc'));
     $this->assertEquals(Vpdi::decodeTextList('a\,aa,bbb,ccc'), array('a,aa', 'bbb', 'ccc'));
