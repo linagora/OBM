@@ -1375,7 +1375,7 @@ SELECT companyentity_entity_id, company_fax, 'WORK;FAX;X-OBM-Ref1' FROM Company 
 CREATE TEMPORARY TABLE P1
 SELECT min(phone_id) as id FROM Phone
 GROUP BY phone_entity_id;
-UPDATE Phone SET phone_label=concat('PREF;',phone_label) WHERE phone_id IN (SELECT id FROM P1);
+UPDATE Phone INNER JOIN P1 ON phone_id =id SET phone_label=concat('PREF;',phone_label);
 DROP TABLE P1;
 
 INSERT INTO Email (email_entity_id, email_address, email_label) 
@@ -1388,7 +1388,7 @@ SELECT companyentity_entity_id, company_email, 'INTERNET;X-OBM-Ref1' FROM Compan
 CREATE TEMPORARY TABLE E1
 SELECT min(email_id) as id FROM Email
 GROUP BY email_entity_id;
-UPDATE Email SET email_label=concat('PREF;',email_label) WHERE email_id IN (SELECT id FROM E1);
+UPDATE Email INNER JOIN E1 ON email_id = id SET email_label=concat('PREF;',email_label);
 DROP TABLE E1;
 
 INSERT INTO Website (website_entity_id, website_url, website_label) 
