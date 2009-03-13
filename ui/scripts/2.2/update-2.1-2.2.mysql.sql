@@ -1385,8 +1385,14 @@ SELECT contactentity_entity_id, contact_email2, 'INTERNET;X-OBM-Ref2' FROM Conta
 UNION
 SELECT companyentity_entity_id, company_email, 'INTERNET;X-OBM-Ref1' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_email != '' AND company_email IS NOT NULL;
 
+CREATE TEMPORARY TABLE E1
+SELECT min(email_id) as id FROM Email
+GROUP BY email_entity_id;
+UPDATE Email SET email_label=concat('PREF;',email_label) WHERE email_id IN (SELECT id FROM E1);
+DROP TABLE E1;
+
 INSERT INTO Website (website_entity_id, website_url, website_label) 
-SELECT companyentity_entity_id, company_web, 'URL;X-OBM-Ref1' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_web != '' AND company_web IS NOT NULL;
+SELECT companyentity_entity_id, company_web, 'PREF;URL;X-OBM-Ref1' FROM Company INNER JOIN CompanyEntity ON companyentity_company_id = company_id WHERE company_web != '' AND company_web IS NOT NULL;
 
 ALTER TABLE Contact DROP COLUMN contact_address1;
 ALTER TABLE Contact DROP COLUMN contact_address2;
