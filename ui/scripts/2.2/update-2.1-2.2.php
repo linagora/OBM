@@ -225,6 +225,7 @@ function update_weekly_events() {
       if($days[$dayNum] == 1) $haveday = true;
     }
     if(!$haveday) $days[$eventDay] = 1;
+    ksort($days);
     if($days[$eventDay] != 1) {
       for($i = ($eventDay +1)%7; $i != $eventDay; $i = ($i+1)%7) {
         if($days[$i] == 1) {
@@ -233,7 +234,6 @@ function update_weekly_events() {
         } 
       }
     }
-    ksort($days);
     try {
       $query = "UPDATE Event SET event_repeatdays='".implode('',$days)."', event_date = '".$data['date']."' WHERE event_id = $id";
     } catch(Exception $e) {
