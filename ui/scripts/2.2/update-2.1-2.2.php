@@ -206,7 +206,6 @@ function make_profiles() {
 
 function update_weekly_events() {
   
-  $currentTime = strtotime($GLOBALS['ccalendar_weekstart']);
   $events = array();
   $query = "SELECT event_id, event_repeatdays, event_date FROM Event WHERE event_repeatkind = 'weekly'";
   $obm_q = new DB_OBM;
@@ -215,6 +214,7 @@ function update_weekly_events() {
     $events[$obm_q->f('event_id')] = array('days' => str_split($obm_q->f('event_repeatdays')), 'date' => new Of_Date($obm_q->f('event_date'), 'GMT'));
   }
   foreach($events as $id => $data) {
+    $currentTime = strtotime($GLOBALS['ccalendar_weekstart']);
     $days = array();
     $eventDay = $data['date']->getWeekday();
     $haveday = false;
