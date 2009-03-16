@@ -7,15 +7,15 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
+require 'of_acl.php';
+OBM_Acl::initialize();
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Rights admin panel
 // Parameters:
 //   - $entity    : entity to administer the right for
 //   - $entity_id : entity id
 ///////////////////////////////////////////////////////////////////////////////
-require 'of_acl.php';
-OBM_Acl::initialize();
-
 function of_right_dis_admin($entity, $entity_id) {
   global $display, $obm, $l_of_right_err_empty;
 
@@ -63,8 +63,7 @@ function html_entityadmin_bar($entity_id, $entity) {
     }
     $dis_sel .= "</select>
       <br />
-      $dis_duration
-      ";
+      $dis_duration";
 
     $block = "
       <div class=\"portlet\" id=\"rightManagerPortlet\">
@@ -175,7 +174,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin />
         </td>
       </tr>
-    ";
+";
   }
   if($cgp_default_right[$entity]['public']['read'] != -1 || ($read == 1 && $id == 0)){ 
     $block_consumer_read_public = "
@@ -226,7 +225,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   	<td>$block_consumer_read_public</td>
   	<td>$block_consumer_write_public</td>
   	<td>&nbsp;</td>
-  ";
+";
   	
   $block_users = "
   <tbody id='sel_user'>
@@ -241,7 +240,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   <tbody id='sel_accept_user'>
     $dis_user
   </tbody>
-  ";
+";
   
   $block_groups = "
   <tbody id='sel_group'>
@@ -256,7 +255,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   <tbody id='sel_accept_group'>
     $dis_group
   </tbody>
-  ";
+";
     
   $block = "
   <script type=\"text/javascript\">
@@ -285,23 +284,23 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
       for (var i=0; i<td_elements.length; i++) {
           var td_element = td_elements[i];
           var cb_element = td_element.getElement('input');
-          if (cb_element !== false && cb_element.getProperty('type') == 'checkbox') {
+          if (cb_element !== null && cb_element.getProperty('type') == 'checkbox') {
             cb_element.setProperty('checked', true);
           }
       }
     }
     
     function unselect_all_perms(tr_id) {
-        var tr_element = $(tr_id);
+      var tr_element = $(tr_id);
         
-        var td_elements = tr_element.getChildren();
-        for (var i=0; i<td_elements.length; i++) {
-          var td_element = td_elements[i];
-          var cb_element = td_element.getElement('input');
-          if (cb_element !== false && cb_element.getProperty('type') == 'checkbox') {
-            cb_element.setProperty('checked', false);
-          }
+      var td_elements = tr_element.getChildren();
+      for (var i=0; i<td_elements.length; i++) {
+        var td_element = td_elements[i];
+        var cb_element = td_element.getElement('input');
+        if (cb_element !== null && cb_element.getProperty('type') == 'checkbox') {
+          cb_element.setProperty('checked', false);
         }
+      }
     }
     
     function apply_checked_read(formElement, tr_id) {
@@ -343,7 +342,8 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
       }
     }
   </script>
-  
+
+  <br />
   <form method=\"post\" name=\"f_mod_right\" action=\"$path/$module/${module}_index.php\">
     <table class=\"spreadSheet\">
       <colgroup class=\"highlight\"/>

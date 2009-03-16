@@ -162,11 +162,11 @@ VALUES ((SELECT domain_id From Domain), 'CSV File','csv','text/c-xsv');
 --
 INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain),'Ch', 'Cheque');
 INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'C.T', 'credit transfert');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'TIP', 'Titre Interbancaire de Paiement');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'PA', 'Prélèvement Automatique');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'FrB', 'Frais bancaires');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'BAO', 'Billet à ordre');
-INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'LC', 'Lettre de change');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'TIP', 'Interbank title of Payment');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'PA', 'Standing order(Direct debit)');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'FrB', 'Banking charges');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'BAO', 'Promissory note');
+INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'LC', 'Bill of exchange');
 INSERT INTO PaymentKind (paymentkind_domain_id, paymentkind_shortlabel, paymentkind_label) VALUES ((SELECT domain_id From Domain), 'CC', 'Credit Card');
 
 

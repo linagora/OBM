@@ -390,7 +390,7 @@ function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
     $where_role
     $where_domain
     GROUP BY serviceproperty_property, host_id, host_name, host_ip
-    ";
+";
 
   display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_mailserver()');
   $obm_q = new DB_OBM;
