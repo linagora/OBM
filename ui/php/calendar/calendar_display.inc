@@ -5118,7 +5118,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
 
 
 
-      if ($occurrence->entity_state == "W") {
+      if ($occurrence->entity_state == "NEEDS-ACTION") {
         $this->page->setAlpha($this->waiting_alpha);
       } else {
         $this->page->setAlpha(1);
@@ -5370,7 +5370,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $title = $event->event->title;
       }
 
-      if ($event->entity_state == "W") {
+      if ($event->entity_state == "NEEDS-ACTION") {
         $this->page->setAlpha($this->waiting_alpha);
       } else {
         $this->page->setAlpha(1);
