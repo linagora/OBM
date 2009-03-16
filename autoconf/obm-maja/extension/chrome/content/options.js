@@ -59,7 +59,14 @@ var obmmaja = {
     //unset all user prefs
     var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
     var prefs = prefService.getChildList("",{});
-    var no_resets = new Array(/mail\.server\.server1\.directory/);
+    var no_resets = new Array();
+    //do not remove ref to local mail file
+    no_resets.push( /mail\.server\..+\.directory/ );
+    //do not remove addressbooks
+    no_resets.push( /ldap_2\.servers\..+\.dirType/ );
+    no_resets.push( /ldap_2\.servers\..+\.filename/ );
+    no_resets.push( /ldap_2\.servers\..+\.description/ );
+    
     var do_clear;
   	for ( var i=0; i < prefs.length; i++) {
   	  if (prefService.prefHasUserValue(prefs[i])) {
@@ -74,6 +81,7 @@ var obmmaja = {
         }
       }
    	}
+   	utils._setPreference("config.obm.autoconfigStatus", 0, "user" );
   },
   visibleValid: function() {
     var checkAutoconf = document.getElementById("resetAutoconf").getAttribute("checked");
