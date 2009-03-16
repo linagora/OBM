@@ -2196,8 +2196,12 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $kind = $GLOBALS['l_'.$event_q->f('event_repeatkind')];
     $kind_unit = $GLOBALS['l_'.$event_q->f('event_repeatkind').'_unit'];
     $repeat_days = $event_q->f('event_repeatdays'); 
-    $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
-    $repeat_end = $repeat_end->getOutputDate();
+    if ($event_q->f('event_endrepeat') != '') {
+      $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
+      $repeat_end = $repeat_end->getOutputDate();
+    } else {
+      $repeat_end = '';
+    }
     if( $event_q->f('event_repeatfrequence') == 1 ) {
       $repeatfrequency = sprintf($kind_unit,'');
     } else {

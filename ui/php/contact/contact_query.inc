@@ -1736,6 +1736,7 @@ function run_query_contact_subscription_nb($id) {
   return $retour;
 }
 
+
 /**
  * Update contact birthday
  *
@@ -1759,8 +1760,7 @@ function run_query_contact_subscription_nb($id) {
  * @param Of_Date $old_value
  * @param Of_Date $new_value
  */
-function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
-  $event_id, $contact_fullname, $old_value, $new_value) {
+function run_query_contact_birthday_update ($contact_id, $contact_usercreate, $event_id, $contact_fullname, $old_value, $new_value) {
     global $cdg_sql, $obm;
     global $l_birthday_event_title;
 
@@ -1781,7 +1781,6 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
 
     $multidomain_contact = sql_multidomain('contact');
     $multidomain_event = sql_multidomain('event');
-
 
     switch ($do) {
     case $insert_event:
@@ -1858,12 +1857,12 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate,
           eventlink_event_id, 
           eventlink_entity_id,
           eventlink_state) 
-          VALUES (
-            NOW(),
-            $contact_usercreate,
-            $insert_event_id,
-            $entity_id,
-            'ACCEPTED')";
+        VALUES (
+          NOW(),
+          $contact_usercreate,
+          $insert_event_id,
+          $entity_id,
+          'ACCEPTED')";
 
         $obm_q->query($query);
         display_debug_msg($query, $cdg_sql, "run_query_contact_birthday_update(insert entity)");
