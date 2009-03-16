@@ -298,7 +298,7 @@ function check_domain_data_form($d_id, $domain) {
     $err['msg'] = $l_label_error.' : '. $label;
     return false;
   }
-  if (trim($name) == '' || (!preg_match($GLOBALS['php_regexp_domain'], $name) && !preg_match($GLOBALS['php_regexp_localdomain'], $name))) {
+  if (trim($name) == '' || !preg_match($GLOBALS['php_regexp_domain'], $name)) {
     $err['msg'] = $l_name_error.' : '. $name;
     return false;
   }

@@ -1045,13 +1045,15 @@ function run_query_user_delete($p_id) {
   $p_id = sql_parse_id($p_id);
   // Get some user infos
   $query = "SELECT userobm_photo_id,
-      userobm_delegation
+      userobm_delegation,
+      userobm_domain_id
     FROM UserObm
     WHERE userobm_id $id $multidomain";
   $obm_q->query($query);
   $obm_q->next_record();
   $photo_id = $obm_q->f('userobm_photo_id');
   $delegation = $obm_q->f('userobm_delegation');
+  $domain_id = $obm_q->f('userobm_domain_id');
 
   // Remove user's photo (document & documententity)
   if ($photo_id > 0) {
@@ -1072,7 +1074,7 @@ function run_query_user_delete($p_id) {
 
   if ($obm_q->num_rows() > 0) {
     $uid = sql_parse_id($obm['uid']);
-    $domain_id = sql_parse_id($obm['domain_id']);
+    $domain_id = sql_parse_id($domain_id);
 
     $query = "INSERT INTO Deleted (
       deleted_domain_id,

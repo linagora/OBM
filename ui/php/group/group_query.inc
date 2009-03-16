@@ -90,8 +90,10 @@ function run_query_group_search($group) {
   $timeupdate,
   A.userobm_login as usercreate,
   B.userobm_login as userupdate,
+  domain_name,
   count(usergroup.of_usergroup_user_id) as group_nb_user
   FROM UGroup
+  INNER JOIN Domain ON domain_id = group_domain_id
   $join_userdata
   LEFT JOIN of_usergroup usergroup ON of_usergroup_group_id=group_id
   LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
@@ -115,6 +117,7 @@ function run_query_group_search($group) {
   timecreate,
   timeupdate,
   usercreate,
+  domain_name,
   userupdate
   $orderq
   $limit";
@@ -423,16 +426,17 @@ function run_query_group_delete($p_id) {
   $retour = $obm_q->query($query);
   $id = sql_parse_id($p_id, true);
   // If the Group exists in Prod table AND is public, Insert it in Deleted table
-  $query = "SELECT group_id, group_delegation FROM P_UGroup
+  $query = "SELECT group_id, group_delegation, group_domain_id FROM P_UGroup
   WHERE group_id $id AND group_privacy=0";
   display_debug_msg($query, $cdg_sql, 'run_query_group_delete(auto)');
   $obm_q->query($query);
   $obm_q->next_record();
   $delegation = $obm_q->f('group_delegation');
+  $domain_id = $obm_q->f('group_domain_id');
 
   if ($obm_q->num_rows() > 0) {
     $uid = sql_parse_id($obm['uid']);
-    $domain_id = sql_parse_id($obm['domain_id']);
+    $domain_id = sql_parse_id($domain_id);
     $id = sql_parse_id($p_id);
 
     $query = "INSERT INTO Deleted (
@@ -699,7 +703,7 @@ function run_query_group_group($group) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $limit = sql_limit($db_type);
+  $limit = sql_limit($db_type,'', '','group_group');
 
   $id = sql_parse_id($group['group_id'], true);
   $entity = $group['entity'];

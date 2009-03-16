@@ -362,16 +362,18 @@ function run_query_host_delete($p_id) {
 
   // Mise a jour du lien vers user
   // If this host exists in Prod table, Insert it in Deleted table
-  $query = "SELECT host_id, host_delegation FROM P_Host WHERE host_id $sel_id ";
+  $query = "SELECT host_id, host_delegation, host_domain_id FROM P_Host WHERE host_id $sel_id AND host_id NOT IN (SELECT deleted_entity_id FROM Deleted WHERE deleted_table = 'Host')";
   display_debug_msg($query, $cdg_sql, 'run_query_host_delete(auto)');
   $obm_q->query($query);
   $obm_q->next_record();
   $delegation = $obm_q->f('host_delegation');
+  $domain_id = $obm_q->f('host_domain_id');
+
 
   if ($obm_q->num_rows() > 0) {
     $uid = sql_parse_id($obm['uid']);
     $ins_id = sql_parse_id($p_id);
-    $domain_id = sql_parse_id($obm['domain_id']);
+    $domain_id = sql_parse_id($domain_id);
 
     $query = "INSERT INTO Deleted (
       deleted_domain_id,
