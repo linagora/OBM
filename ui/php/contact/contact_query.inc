@@ -319,7 +319,9 @@ function run_query_contact_detail($p_id) {
     datasource_name,
     $date,
     bd.event_date as contact_birthday,
+    an.event_date as contact_anniversary,
     contact_birthday_id,
+    contact_anniversary_id,
     c.userobm_login as usercreate,
     u.userobm_login as userupdate
     FROM
@@ -332,8 +334,9 @@ function run_query_contact_detail($p_id) {
     LEFT JOIN UserObm as c ON contact_usercreate=c.userobm_id
     LEFT JOIN UserObm as u ON contact_userupdate=u.userobm_id
     LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id
+    LEFT JOIN Event as an ON contact_anniversary_id = an.event_id
     WHERE
-    contact_id $p_id 
+    contact_id $p_id
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_contact_detail()');
@@ -402,9 +405,6 @@ function run_query_contact_kind() {
 // Contact Insertion query execution
 // Parameters:
 //   - $contact[]: Entry's values
-//     keys used : company_id, kind, lname, fname ad1, ad2, ad3, zip, town, cdx
-//               : ctry, func, phone, hphone, mphone, fax, email, priv
-//               : com, com2, com3, birthday
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_insert($contact) {
   global $cgp_show, $cdg_sql, $obm;
@@ -542,20 +542,28 @@ function run_query_contact_insert($contact) {
 
   $id = $obm_q->lastid();
 
-  // BEGIN birthday support
-
   if ($id > 0) {
     if (($cgp_show['module']['company']) && ($retour)) {
       run_query_global_company_contact_number_update($comp_id);
     }    
     $entityid = of_entity_insert($GLOBALS['module'],$id);
     $contact['contact_id'] = $id;
+
+    // Birthday support
     $birthday = of_isodate_convert($contact['birthday'], true);
     if (!empty($birthday))
       $birthday = new Of_Date($birthday);
     else
       $birthday = null;
-    run_query_contact_birthday_update($id, $uid, null, "$fname $lname", null, $birthday);
+    run_query_contact_birthday_update('birthday', $id, $uid, null, "$fname $lname", null, $birthday);
+
+    // Anniversary support
+    $anniversary = of_isodate_convert($contact['anniversary'], true);
+    if (!empty($anniversary))
+      $anniversary = new Of_Date($anniversary);
+    else
+      $anniversary = null;
+    run_query_contact_birthday_update('anniversary', $id, $uid, null, "$fname $lname", null, $anniversary);
 
     run_query_contact_coords_update($entityid, $contact);
     $ret = of_userdata_query_update('contact', $id, $contact);
@@ -706,9 +714,9 @@ function run_query_contact_update($contact) {
   $birthday = of_isodate_convert($contact['birthday'], true);
   if (!empty($birthday)) {
     $birthday = new Of_Date($birthday);
-  } else
+  } else {
     $birthday = null;
-
+  }
   $old_contact = run_query_contact_detail($id);
   $old_birthday = $old_contact->f('contact_birthday');
   if ($old_birthday) {
@@ -716,11 +724,25 @@ function run_query_contact_update($contact) {
   } else {
     $old_birthday = null;
   }
-
-  run_query_contact_birthday_update($id, $old_contact->f('contact_usercreate'),
+  run_query_contact_birthday_update('birthday', $id, $old_contact->f('contact_usercreate'),
     $old_contact->f('contact_birthday_id'), "$fname $lname", $old_birthday, $birthday);
 
-  // END birthday support
+  // BEGIN anniversary support
+
+  $anniversary = of_isodate_convert($contact['anniversary'], true);
+  if (!empty($anniversary)) {
+    $anniversary = new Of_Date($anniversary);
+  } else {
+    $anniversary = null;
+  }
+  $old_anniversary = $old_contact->f('contact_anniversary');
+  if ($old_anniversary) {
+    $old_anniversary = new Of_Date($old_anniversary);
+  } else {
+    $old_anniversary = null;
+  }
+  run_query_contact_birthday_update('anniversary', $id, $old_contact->f('contact_usercreate'),
+    $old_contact->f('contact_anniversary_id'), "$fname $lname", $old_anniversary, $anniversary);
 
   if ($retour) {
     $ret = of_userdata_query_update('contact', $id, $contact);
@@ -1089,7 +1111,9 @@ function run_query_contact_delete($p_id) {
   $sql_id = sql_parse_id($p_id, true);
   $multidomain = sql_multidomain('contact');
 
-  $query = "SELECT contact_company_id, contact_birthday_id
+  $query = "SELECT contact_company_id,
+      contact_birthday_id,
+      contact_anniversary_id
     FROM Contact
     WHERE contact_id $sql_id $multidomain";
 
@@ -1099,17 +1123,17 @@ function run_query_contact_delete($p_id) {
 
   $comp_id =  $obm_q->f('contact_company_id');
   $birthday_id =  $obm_q->f('contact_birthday_id');
+  $anniversary_id =  $obm_q->f('contact_anniversary_id');
 
   run_query_global_delete_document_links($p_id, 'contact');    
   $ret = of_userdata_query_delete('contact', $p_id);
 
-  // BEGIN birthday support
+  // BEGIN birthday and anniversary support
+  run_query_contact_birthday_update('birthday', null, null, $birthday_id, null, null, null);
+  run_query_contact_birthday_update('anniversary', null, null, $anniversary_id, null, null, null);
+  // END birthday and anniversary support
 
-  run_query_contact_birthday_update(null, null, $birthday_id, null, null, null);
-
-  // END birthday support
-
-  of_entity_delete($GLOBALS['module'], $p_id); 
+  of_entity_delete($GLOBALS['module'], $p_id);
 
   $query = "DELETE FROM Contact WHERE contact_id $sql_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_delete(1)');
@@ -1738,7 +1762,7 @@ function run_query_contact_subscription_nb($id) {
 
 
 /**
- * Update contact birthday
+ * Update contact birthday or anniversary
  *
  * When new need : - $contact_id
  *                 - $contact_usercreate
@@ -1753,6 +1777,7 @@ function run_query_contact_subscription_nb($id) {
  * When delete : - need $event_id
  *               - set $new_value to null
  * 
+ * @param Integer $date ('birthday' || 'anniversary')
  * @param Integer $contact_id
  * @param Integer $contact_usercreate
  * @param Integer $event_id
@@ -1760,9 +1785,9 @@ function run_query_contact_subscription_nb($id) {
  * @param Of_Date $old_value
  * @param Of_Date $new_value
  */
-function run_query_contact_birthday_update ($contact_id, $contact_usercreate, $event_id, $contact_fullname, $old_value, $new_value) {
+function run_query_contact_birthday_update ($date='birthday', $contact_id, $contact_usercreate, $event_id, $contact_fullname, $old_value, $new_value) {
     global $cdg_sql, $obm;
-    global $l_birthday_event_title;
+    global $l_birthday_event_title, $l_anniversary_event_title;
 
     list($nope_event, $insert_event, $update_event, $delete_event) = array(0,1,2,3);
     if ($event_id == null) {
@@ -1785,7 +1810,8 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate, $e
     switch ($do) {
     case $insert_event:
       $duration = 3600*24;
-      $title = str_replace('\'', '\\\'', sprintf($l_birthday_event_title, $contact_fullname));
+      $label = ${"l_${date}_event_title"};
+      $title = str_replace('\'', '\\\'', sprintf($label, $contact_fullname));
 
       $query = "INSERT INTO Event
         (event_timeupdate,
@@ -1843,7 +1869,7 @@ function run_query_contact_birthday_update ($contact_id, $contact_usercreate, $e
         of_entity_insert('event', $insert_event_id);
         $sql_id = sql_parse_id($contact_id);
         $query = "UPDATE Contact
-          SET contact_birthday_id = $insert_event_id
+          SET contact_${date}_id = $insert_event_id
           WHERE
           contact_id = $sql_id
           $multidomain_contact";

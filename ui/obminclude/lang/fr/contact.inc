@@ -92,7 +92,8 @@ $l_kind_link_contact_no = "Pas de contacts du genre";
 $l_kind_cant_delete = "Le genre ne peut être supprimé !";
 $l_kind_can_delete = "Le genre peut être supprimé.";
 
-$l_birthday_event_title = "Anniversaire de %s";
+$l_birthday_event_title = "Date de naissance de %s";
+$l_anniversary_event_title = "Anniversaire de %s";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_lastname = "Vous devez renseigner le Nom avant de valider.";

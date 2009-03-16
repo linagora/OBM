@@ -370,27 +370,27 @@ display_page($display);
 function get_group_params() {
   
   // Get global params
-  $params = get_global_params("Group");
+  $params = get_global_params('Group');
 
   // Get group specific params
   // Group fields
-  if (isset ($params["ext_id"])) $params["group_id"] = trim($params["ext_id"]);
+  if (isset ($params['ext_id'])) $params['group_id'] = trim($params['ext_id']);
     
   $nb_u = 0;
   $nb_group = 0;
   foreach ($params as $key => $value) {
-    if (strcmp(substr($key, 0, 7),"data-u-") == 0) {
+    if (strcmp(substr($key, 0, 7),'data-u-') == 0) {
       $nb_u++;
       $u_num = substr($key, 7);
       $params["user$nb_u"] = $u_num;
-    } elseif (strcmp(substr($key, 0, 7),"data-g-") == 0) {
+    } elseif (strcmp(substr($key, 0, 7),'data-g-') == 0) {
       $nb_group++;
       $params_num = substr($key, 7);
       $params["group_$nb_group"] = $params_num;
     }
   }
-  $params["user_nb"] = $nb_u;
-  $params["group_nb"] = $nb_group;
+  $params['user_nb'] = $nb_u;
+  $params['group_nb'] = $nb_group;
 
   if(is_array($params['email'])) {
     $email_aliases = array();
@@ -421,10 +421,10 @@ function get_group_action() {
   global $l_header_add_user, $l_add_user, $l_header_add_group, $l_add_group;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
-  of_category_user_module_action("group");
+  of_category_user_module_action('group');
 
 // Index
-  $actions["group"]["index"] = array (
+  $actions['group']['index'] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/group/group_index.php?action=index",
     'Right'    => $cright_read,
@@ -432,19 +432,19 @@ function get_group_action() {
                                     );
 
 // Search
-  $actions["group"]["search"] = array (
+  $actions['group']['search'] = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                   );
 
-  $actions["group"]["ext_search"] = array (
+  $actions['group']['ext_search'] = array (
     'Url'      => "$path/group/group_index.php?action=ext_search",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
   );  
 
 // New
-  $actions["group"]["new"] = array (
+  $actions['group']['new'] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/group/group_index.php?action=new",
     'Right'    => $cright_write,
@@ -452,25 +452,25 @@ function get_group_action() {
                                   );
 
 // Detail Consult
-  $actions["group"]["detailconsult"] = array (
+  $actions['group']['detailconsult'] = array (
     'Name'     => $l_header_consult,
-    'Url'      => "$path/group/group_index.php?action=detailconsult&amp;group_id=".$params["group_id"]."",
+    'Url'      => "$path/group/group_index.php?action=detailconsult&amp;group_id=".$params['group_id'],
     'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update')
                                   );
 
 // Detail Update
-  $actions["group"]["detailupdate"] = array (
+  $actions['group']['detailupdate'] = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/group/group_index.php?action=detailupdate&amp;group_id=".$params["group_id"]."",
+    'Url'      => "$path/group/group_index.php?action=detailupdate&amp;group_id=".$params['group_id'],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
                                      	   );
 
 // Insert
-  $actions["group"]["insert"] = array (
+  $actions['group']['insert'] = array (
     'Url'      => "$path/group/group_index.php?action=insert",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -478,7 +478,7 @@ function get_group_action() {
                                      );
 
 // Update
-  $actions["group"]["update"] = array (
+  $actions['group']['update'] = array (
     'Url'      => "$path/group/group_index.php?action=update",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -486,16 +486,16 @@ function get_group_action() {
                                      );
 
 // Check Delete
-  $actions["group"]["check_delete"] = array (
+  $actions['group']['check_delete'] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/group/group_index.php?action=check_delete&amp;group_id=".$params["group_id"]."",
+    'Url'      => "$path/group/group_index.php?action=check_delete&amp;group_id=".$params['group_id'],
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('detailconsult', 'detailupdate', 'user_add', 'user_del', 'group_add', 'group_del', 'update')
                                      	   );
 
 // Delete
-  $actions["group"]["delete"] = array (
+  $actions['group']['delete'] = array (
     'Url'      => "$path/group/group_index.php?action=delete",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -503,7 +503,7 @@ function get_group_action() {
                                      );
 
 // Ext get Ids : external Group selection
-  $actions["group"]["ext_get_ids"] = array (
+  $actions['group']['ext_get_ids'] = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                   	  );
@@ -517,9 +517,9 @@ function get_group_action() {
                                     );
 
 // sel group add : Groups selection
-  $actions["group"]["sel_group_add"] = array (
+  $actions['group']['sel_group_add'] = array (
     'Name'     => $l_header_add_group,
-    'Url'      => "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$params["group_id"]."&amp;ext_target=$l_group&amp;child_res=1",
+    'Url'      => "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path.'/group/group_index.php')."&amp;ext_id=".$params['group_id']."&amp;ext_target=$l_group&amp;child_res=1",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_group,
@@ -528,9 +528,9 @@ function get_group_action() {
                                     	  );
 
 // Sel user add : Users selection
-  $actions["group"]["sel_user_add"] = array (
+  $actions['group']['sel_user_add'] = array (
     'Name'     => $l_header_add_user,
-    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$params["group_id"]."&amp;ext_target=$l_group",
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path.'/group/group_index.php')."&amp;ext_id=".$params['group_id']."&amp;ext_target=$l_group",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_group,
@@ -539,7 +539,7 @@ function get_group_action() {
                                     	  );
 
 // User add
-  $actions["group"]["user_add"] = array (
+  $actions['group']['user_add'] = array (
     'Url'      => "$path/group/group_index.php?action=user_add",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -547,7 +547,7 @@ function get_group_action() {
                                      );
 
 // User del
-  $actions["group"]["user_del"] = array (
+  $actions['group']['user_del'] = array (
     'Url'      => "$path/group/group_index.php?action=user_del",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -555,7 +555,7 @@ function get_group_action() {
                                      );
 
 // Group add
-  $actions["group"]["group_add"] = array (
+  $actions['group']['group_add'] = array (
     'Url'      => "$path/group/group_index.php?action=group_add",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -563,14 +563,14 @@ function get_group_action() {
                                      );
 
 // Group del
-  $actions["group"]["group_del"] = array (
+  $actions['group']['group_del'] = array (
     'Url'      => "$path/group/group_index.php?action=group_del",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None')
                                      );
 // Display
-  $actions["group"]["display"] = array (
+  $actions['group']['display'] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/group/group_index.php?action=display",
     'Right'    => $cright_read,
@@ -578,33 +578,33 @@ function get_group_action() {
                                       	 );
 
 // Display
-  $actions["group"]["dispref_display"] = array (
+  $actions['group']['dispref_display'] = array (
     'Url'      => "$path/group/group_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                       	 );
 // Display
-  $actions["group"]["dispref_level"] = array (
+  $actions['group']['dispref_level'] = array (
     'Url'      => "$path/group/group_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                       	 );
 // Import
-  $actions["group"]["import"] = array (
+  $actions['group']['import'] = array (
     'Name'     => $l_header_import,
     'Url'      => "$path/group/group_index.php?action=import",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('all')
                                                  );
 // Import file
-  $actions["group"]["import_file"] = array (
+  $actions['group']['import_file'] = array (
     'Url'      => "$path/group/group_index.php?action=import_file",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None')
                                                  );
 
 // Admin
-  $actions["group"]["admin"] = array (
+  $actions['group']['admin'] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/group/group_index.php?action=admin",
     'Right'    => $cright_read_admin,
@@ -657,11 +657,11 @@ function update_group_action() {
       $actions['group']['check_delete']['Condition'][] = 'insert';
 
       // Sel User add
-      $actions['group']['sel_user_add']['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group";
+      $actions['group']['sel_user_add']['Url'] = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path.'/group/group_index.php')."&amp;ext_id=$id&amp;ext_target=$l_group";
       $actions['group']['sel_user_add']['Condition'][] = 'insert';
 
       // Sel group add : Groups selection
-      $actions['group']['sel_group_add']['Url'] = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=$id&amp;ext_target=$l_group&amp;child_res=1";
+      $actions['group']['sel_group_add']['Url'] = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path.'/group/group_index.php')."&amp;ext_id=$id&amp;ext_target=$l_group&amp;child_res=1";
       $actions['group']['sel_group_add']['Condition'][] = 'insert';
 
     } else {

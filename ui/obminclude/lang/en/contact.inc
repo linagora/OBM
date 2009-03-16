@@ -90,6 +90,7 @@ $l_kind_cant_delete = "The Kind can't be deleted !";
 $l_kind_can_delete = "The Kind can be deleted.";
 
 $l_birthday_event_title = "%s's birthday";
+$l_anniversary_event_title = "%s's anniversary";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
 $l_fill_lastname = "You have to fill the Lastname before submitting.";

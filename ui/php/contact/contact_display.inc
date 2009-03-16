@@ -634,6 +634,13 @@ function html_contact_header($co_q, $funcs) {
   } else {
     $birthday = $l_no_date;
   }
+
+  if ($co_q->f('contact_anniversary')) {
+    $anniversary = new Of_Date($co_q->f('contact_anniversary'), 'GMT');
+    $anniversary = $anniversary->getOutputDate();
+  } else {
+    $anniversary = $l_no_date;
+  }
   
   // Display Aka only if non empty
   if ($aka != '') {
@@ -695,7 +702,7 @@ function html_contact_header($co_q, $funcs) {
     </tr>";
   }
   
-  // Birthday consult field
+  // Birthday field
   if ($show_birthday) {
     $block_birthday = "
     <tr>
@@ -703,7 +710,7 @@ function html_contact_header($co_q, $funcs) {
       <td>$birthday</td>
     </tr>";
   }
-  // Birthday consult field
+  // Anniversary field
   if ($show_anniversary) {
     $block_anniversary = "
     <tr>
@@ -1313,7 +1320,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     </tr>";
   }
   
-  // Birthday form field
+  // Birthday field
   if ($show_birthday) {
     $block_birthday = "
     <tr>
@@ -1322,7 +1329,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     </tr>";
   }
 
-  // Anniversary form field
+  // Anniversary field
   if ($show_anniversary) {
     $block_anniversary = "
     <tr>
@@ -1829,17 +1836,60 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $com3 = stripslashes($contact['comment3']);
   $archive = $contact['archive'];
 
-  // XXXX still used ?
-  $ad1 = stripslashes($contact['ad1']);
-  $ad2 = stripslashes($contact['ad2']);
-  $ad3 = stripslashes($contact['ad3']);
-  $zip = stripslashes($contact['zip']);
-  $town = stripslashes($contact['town']);
-  $cdx = stripslashes($contact['cdx']);
-  $ctry = $contact['country'];
-  $phone = stripslashes($contact['phone']);
-  $email = stripslashes($contact['email']);
-  $email2 = stripslashes($contact['email2']);
+  $phones = '';
+  $param_phones = $contact['phones'];
+  foreach ($param_phones as $nb => $one_phone) {
+    $number = $one_phone['number'];
+    $label = $one_phone['label'];
+    $phones .= "
+    <input type=\"hidden\" name=\"phones[$nb][number]\" value=\"$number\" />
+    <input type=\"hidden\" name=\"phones[$nb][label]\" value=\"$label\" />";
+  }
+  $emails = '';
+  $param_emails = $contact['emails'];
+  foreach ($param_emails as $nb => $one_email) {
+    $address = $one_email['address'];
+    $label = $one_email['label'];
+    $emails .= "
+    <input type=\"hidden\" name=\"emails[$nb][address]\" value=\"$address\" />
+    <input type=\"hidden\" name=\"emails[$nb][label]\" value=\"$label\" />";
+  }
+  $addresses = '';
+  $param_ad = $contact['addresses'];
+  foreach ($param_ad as $nb => $one_ad) {
+    $street = $one_ad['street'];
+    $label = $one_ad['label'];
+    $zipcode = $one_ad['zipcode'];
+    $town = $one_ad['town'];
+    $expresspostal = $one_ad['expresspostal'];
+    $country = $one_ad['country'];
+    $addresses .= "
+    <input type=\"hidden\" name=\"addresses[$nb][street]\" value=\"$street\" />
+    <input type=\"hidden\" name=\"addresses[$nb][label]\" value=\"$label\" />
+    <input type=\"hidden\" name=\"addresses[$nb][zipcode]\" value=\"$zipcode\" />
+    <input type=\"hidden\" name=\"addresses[$nb][town]\" value=\"$town\" />
+    <input type=\"hidden\" name=\"addresses[$nb][expresspostal]\" value=\"$expresspostal\" />
+    <input type=\"hidden\" name=\"addresses[$nb][country]\" value=\"$country\" />
+";
+  }
+  $ims = '';
+  $param_ims = $contact['ims'];
+  foreach ($param_ims as $nb => $one_im) {
+    $address = $one_im['address'];
+    $protocol = $one_email['protocol'];
+    $ims .= "
+    <input type=\"hidden\" name=\"ims[$nb][address]\" value=\"$address\" />
+    <input type=\"hidden\" name=\"ims[$nb][protocol]\" value=\"$protocol\" />";
+  }
+  $websites = '';
+  $param_web = $contact['websites'];
+  foreach ($param_web as $nb => $one_web) {
+    $url = $one_web['url'];
+    $label = $one_web['label'];
+    $websites .= "
+    <input type=\"hidden\" name=\"websites[$nb][url]\" value=\"$url\" />
+    <input type=\"hidden\" name=\"websites[$nb][label]\" value=\"$label\" />";
+  }
 
   $disp_same_cont_head = "<h1>$l_check_samecontact</h1>";
   while ($co_q->next_record()) {
@@ -1875,26 +1925,20 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_birthday\" value=\"$birthday\" />
     <input type=\"hidden\" name=\"tf_anniversary\" value=\"$anniversary\" />
     <input type=\"hidden\" name=\"cba_mailok\" value=\"1\" $mailok />
-
-    <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
-    <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
-    <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
-    <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
-    <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
-    <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"sel_country\" value=\"$ctry\" />
-    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
-    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-    <input type=\"hidden\" name=\"tf_email2\" value=\"$email2\" />
     <input type=\"hidden\" name=\"ta_comment\" value=\"$com\" />
     <input type=\"hidden\" name=\"ta_comment2\" value=\"$com2\" />
     <input type=\"hidden\" name=\"ta_comment3\" value=\"$com3\" />
     <input type=\"hidden\" name=\"cba_archive\" value=\"$archive\" />
+    $phones
+    $emails
+    $addresses
+    $ims
+    $websites
 ";
 
   $block = "
     <div class=\"detail\">
-    $disp_same_cont_head 
+    $disp_same_cont_head
     <ul>
     $disp_same_cont
     </ul>

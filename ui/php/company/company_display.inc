@@ -1321,18 +1321,54 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $act = $company['activity'];
   $naf = $company['naf'];
   $mark = $company['market'];
-  $ad1 = $company['ad1'];
-  $ad2 = $company['ad2'];
-  $ad3 = $company['ad3'];
-  $zip = $company['zip'];
-  $town = $company['town'];
-  $cdx = $company['cdx'];
-  $ctry = $company['country'];
-  $phone = $company['phone'];
-  $fax = $company['fax'];
-  $web = $company['web'];
-  $email = $company['email'];
   $com = $company['comment'];
+
+  $phones = '';
+  $param_phones = $company['phones'];
+  foreach ($param_phones as $nb => $one_phone) {
+    $number = $one_phone['number'];
+    $label = $one_phone['label'];
+    $phones .= "
+    <input type=\"hidden\" name=\"phones[$nb][number]\" value=\"$number\" />
+    <input type=\"hidden\" name=\"phones[$nb][label]\" value=\"$label\" />";
+  }
+  $emails = '';
+  $param_emails = $company['emails'];
+  foreach ($param_emails as $nb => $one_email) {
+    $address = $one_email['address'];
+    $label = $one_email['label'];
+    $emails .= "
+    <input type=\"hidden\" name=\"emails[$nb][address]\" value=\"$address\" />
+    <input type=\"hidden\" name=\"emails[$nb][label]\" value=\"$label\" />";
+  }
+  $addresses = '';
+  $param_ad = $company['addresses'];
+  foreach ($param_ad as $nb => $one_ad) {
+    $street = $one_ad['street'];
+    $label = $one_ad['label'];
+    $zipcode = $one_ad['zipcode'];
+    $town = $one_ad['town'];
+    $expresspostal = $one_ad['expresspostal'];
+    $country = $one_ad['country'];
+    $addresses .= "
+    <input type=\"hidden\" name=\"addresses[$nb][street]\" value=\"$street\" />
+    <input type=\"hidden\" name=\"addresses[$nb][label]\" value=\"$label\" />
+    <input type=\"hidden\" name=\"addresses[$nb][zipcode]\" value=\"$zipcode\" />
+    <input type=\"hidden\" name=\"addresses[$nb][town]\" value=\"$town\" />
+    <input type=\"hidden\" name=\"addresses[$nb][expresspostal]\" value=\"$expresspostal\" />
+    <input type=\"hidden\" name=\"addresses[$nb][country]\" value=\"$country\" />
+";
+  }
+  $websites = '';
+  $param_web = $company['websites'];
+  foreach ($param_web as $nb => $one_web) {
+    $url = $one_web['url'];
+    $label = $one_web['label'];
+    $websites .= "
+    <input type=\"hidden\" name=\"websites[$nb][url]\" value=\"$url\" />
+    <input type=\"hidden\" name=\"websites[$nb][label]\" value=\"$label\" />";
+  }
+
   $display['msg'] .= display_warn_msg($l_check_samecompany);
 
   while ($co_q->next_record()) {
@@ -1360,18 +1396,11 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
   <input type=\"hidden\" name=\"sel_naf\" value=\"$naf\" />
   <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
-  <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
-  <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
-  <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
-  <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
-  <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
-  <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-  <input type=\"hidden\" name=\"sel_country\" value=\"$ctry\" />
-  <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
-  <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
-  <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
-  <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
   <input type=\"hidden\" name=\"ta_comment\" value=\"$com\" />
+    $phones
+    $emails
+    $addresses
+    $websites
 ";
 
   $block = "
