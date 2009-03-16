@@ -868,7 +868,7 @@ function dis_group_warn_insert($id, $g_q, $group) {
   $hidden_fields = "
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />
-    <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+    <input type=\"hidden\" name=\"tf_desc\" value=\"".stripslashes($desc)."\" />
     <input type=\"hidden\" name=\"cba_samba\" value=\"$samba\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"cba_privacy\" value=\"$privacy\" />
