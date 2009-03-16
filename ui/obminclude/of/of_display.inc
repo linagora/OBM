@@ -1056,7 +1056,7 @@ function display_actions($section, $module) {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_last_visited() {
-  global $path, $cgp_show, $last_v, $l_last_visit, $path;
+  global $path, $cgp_show, $last_v, $l_last_visit, $path, $modules;
 
   // If a theme specif function is provided
   if (function_exists("display_last_visited_theme")) {
@@ -1068,11 +1068,20 @@ function display_last_visited() {
     if (($cgp_show["module"][$module]) && ($_SESSION['last_v'][$module]["text"] != "")) {
       $id = $_SESSION['last_v'][$module]["id"];
       $text = substr($_SESSION['last_v'][$module]["text"], 0, 30);
-      $l_ico = "ico_$module";
-      global ${$l_ico};
-      $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;${module}_id=$id");
-      $dis_last .= "
-        <li><a href=\"$mod_url\"><img src=\"${$l_ico}\" alt=\"$module\" /> $text</a></li>";
+      if(isset($GLOBALS['modules'][$module]['Ico'])) {
+        $l_ico = $GLOBALS['modules'][$module]['Ico'];
+      } else {
+        $l_ico = $GLOBALS["ico_$module"];
+      }
+      if($l_ico != '') {
+        $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;${module}_id=$id");
+        $dis_last .= "
+          <li><a href=\"$mod_url\"><img src=\"$l_ico\" alt=\"$module\" /> $text</a></li>";
+      } else {
+        $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;${module}_id=$id");
+        $dis_last .= "
+          <li><a href=\"$mod_url\"> $text</li>";
+      }
     }
   }
 
