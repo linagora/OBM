@@ -124,7 +124,7 @@ function check_tools_update_context_ok($params) {
   // Check update type is allowed (global need domain 0 or 'domain' realm)
   if ($update_type == 'global' && isset($domain_id)) {
     $domain = of_domain_get_domain_infos($domain_id);
-    if (($domain['global'] === false) && (! in_array('domain', $admin_realm))) {
+    if (($domain['global'] == false) && (! in_array('domain', $admin_realm))) {
       $err['msg'] = $l_error_permission;
       return false;
     }

@@ -1842,7 +1842,7 @@ function get_entity_email($mail=null, $domain=null, $first_only=true, $separator
     $domain = $e['domain_name'];
   }
 
-  if(is_null($domain) && $obm['domain_global'] === false) {
+  if(is_null($domain) && !$obm['domain_global']) {
     $domain = $obm['domain_name'];
   }    
   $mail = explode("\r\n",$mail);
