@@ -935,6 +935,13 @@ function check_group_update_rights($params, $g='') {
   global $cg_gid_smb_user, $cg_gid_smb_admin, $l_cant_update_smb_group;
   global $l_err_public_rights, $l_error_permission, $l_error_delegation;
 
+  // Hook : Pre
+  if (function_exists('hook_pre_check_group_update_rights')) {
+    if (! hook_pre_check_group_update_rights($params, $g)) {
+      return false;
+    }
+  }
+
   $id = $params['group_id'];
   if ($id > 0) {
     // Get current group info if not given
@@ -985,6 +992,13 @@ function check_group_data_form(&$group) {
   global $obm, $perm, $err, $action, $cright_write_admin,$cgp_use;
   global $l_j_check_email, $l_system_no_priv, $l_err_system_samba;
   global $l_only_owner_priv, $l_err_public_rights, $l_err_private_email;
+
+  // Hook : Pre
+  if (function_exists('hook_pre_check_group_data_form')) {
+    if (! hook_pre_check_group_data_form($group)) {
+      return false;
+    }
+  }
 
   $id = $group['group_id'];
   $name = $group['name'];
@@ -1112,6 +1126,14 @@ function check_group_can_delete($p_id) {
   global $l_warn_delete, $l_cant_delete_system, $l_err_public_rights;
 
   $delete_ok = true;
+
+  // Hook : Pre
+  if (function_exists('hook_pre_check_group_can_delete')) {
+    if (! hook_pre_check_group_can_delete($p_id)) {
+      return false;
+    }
+  }
+
   // Check that user has delegation rights for this group 
   if (! check_group_update_rights(array('group_id' =>$p_id))) {
     $delete_ok = false;

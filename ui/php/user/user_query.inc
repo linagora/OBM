@@ -1186,6 +1186,13 @@ function run_query_user_public_owner_group($uid) {
 function run_query_user_update_user_group($user) {
   global $obm, $cdg_sql, $perms_admin, $cg_gid_smb_admin, $cg_gid_smb_user;
 
+  // Hook : Pre
+  if (function_exists('hook_pre_run_query_user_update_user_group')) {
+    if (! hook_pre_run_query_user_update_user_group($user)) {
+      return false;
+    }
+  }
+
   $u_id = $user['user_id'];
 
   // $groups tracks the user membership, to optimize internal mapping update
@@ -1484,6 +1491,13 @@ function check_user_data_form($p_id, &$user) {
   global $l_err_delegation_target_outside_domain, $l_err_delegation_target_outside_target;
   global $l_err_delegation_outside_domain, $l_err_delegation_outside_target;
   global $l_err_delegation_target_profile;
+
+  // Hook : Pre
+  if (function_exists('hook_pre_check_user_data_form')) {
+    if (! hook_pre_check_user_data_form($p_id, $user)) {
+      return false;
+    }
+  }
 
   $action = $user['action'];
   $id = $user['user_id'];
@@ -1901,7 +1915,14 @@ function check_user_can_delete($params) {
   $profiles = $params['profiles'];
   
   $delete_ok = true;
-  
+
+  // Hook : Pre
+  if (function_exists('hook_pre_check_user_can_delete')) {
+    if (! hook_pre_check_user_can_delete($params)) {
+      return false;
+    }
+  }
+
   // Check if this user is'nt to try to delete himself
   $current_uid = $obm['uid'];
   $uid = $params['user_id'];
