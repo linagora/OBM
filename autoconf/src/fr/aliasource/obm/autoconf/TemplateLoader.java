@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import com.novell.ldap.LDAPAttribute;
