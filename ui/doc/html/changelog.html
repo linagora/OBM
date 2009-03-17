@@ -37,47 +37,38 @@ To do
 <li> usergroup : agir lorsqu'archivage d'un user ?
 </ul>
 
-2009-02-16 : version 2.2.0<br>
+2009-03-17 : version 2.2.0<br>
 
 <ul>
-<li> Calendar now display events invitations in working views
-<li> Todo : portlet updated when a displayed todo is updated
-<li> 2 debug messages removed from Time and Payment
-<li> Todo : reworked to have standard module handling (find, new,..)
-<li> Calendar : display location in events + display event extensions
+<li> All changes up to 2.1.15
 <li> UTF-8 : default charset is now UTF-8, database and files migration
-<li> PostgreSQL full support (obm-ui and obm-ldap) so for messaging directory
-<li> Deal : fix a deal sorting bug
-<li> Lead : link from one company do not retrieve company with same name
-<li> Lead : lead without company can now be retrieved !
-<li> Right management action URL OK through proxies
-<li> Time : dates and range (month, week, specific) can be select for stats
-<li> Time : fixed a bug when an empty user group was selected for stats
-<li> Time : User select now displays users having activity in the time frame
-<li> User : import now handles delegation and fixes password
-<li> Calendar : performance improvement in waiting events queries
-<li> Project : Company link from search result set
-<li> Calendar : remove a warning on event deletion with only resources
-<li> Mailshare : administrator validation not needed to apply ACLs in Cyrus
-<li> Mailbox : administrator validation not needed to apply ACLs in Cyrus
-<li> Calendar : performance improvement in getting resources infos
-<li> Rights : performance improvement in calculating consumers for an entity
-<li> Lead : added contact in lead list
-
-<li> Calendar model and tables reworked the icalendar way
-<li> Todo are now stored in Event table with VTODO type
+<li> PostgreSQL full support (obm-ui and obm-ldap) so for messaging & directory
 <li> Full Database integrity constraints !
 <li> New handling of "Entity" links (n-n) where 1 n is on more than 1 table
+<li> Profile now in database, with profile administration screen
+<li> SSO integration for OBM components
 <li> Multi Address (phones, addresses,..) handling on contact, company
 <li> Better data preservation in Smartphones, TBird, Outlook Synchronisation
 <li> Synchronisation webservices moved from SOAP to REST for efficiency
+<li> Calendar timezones handling
+<li> Calendar model and tables reworked the icalendar way
+<li> Calendar quick popup event allows to select the calendar of the event
 <li> Calendar printing center that allows options and PDF quality printing
 <li> Better Calendar views consistency
 <li> Calendar : ability to store the user default view
-<li> Email notification for event participation user preference added 
+<li> Email notification for event participation user preference added
+<li> Todo are now stored in Event table with VTODO type
+<li> New right 'access right' determine who can request my participation
+<li> Rights admin screen rewritten
+<li> Resources have now a delegation
+<li> Data update tool now allows to see the details of changes to be applied 
+<li> Domain / mailserver improvement and simplification
 <li> Added Lead priority
 <li> module List disabled in 2.2.0 (will be back in 2.2.1)
 <li> New module Person, subset of user with only public infos
+<li> New contacts fields : birthday, anniversary, assistant, spouse, category,..
+<li> User expiration date
+<li> Mailserver allocation policies to determine a new user mailserver
 </ul>
 
 <p/>
