@@ -1,5 +1,8 @@
 package fr.aliasource.obm.autoconf;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import fr.aliasource.obm.utils.ConstantService;
 
 /**
@@ -17,12 +20,15 @@ public class DirectoryConfig {
 	private String ldapHost;
 	private String configXml;
 
+	private static final Log logger = LogFactory.getLog(DirectoryConfig.class);
+	
 	public DirectoryConfig(String login, ConstantService cs) {
 		ldapHost = cs.getStringValue("ldapHost");
 		ldapPort = cs.getIntValue("ldapPort");
 		ldapSearchBase = cs.getStringValue("ldapSearchBase");
 		ldapAtts = cs.getStringValue("ldapAtts").split(",");
 		ldapFilter = "(" + cs.getStringValue("ldapFilter") + "=" + login + ")";
+		logger.info("ldap filter: "+ldapFilter);
 		configXml = cs.getStringValue("configXml");
 	}
 

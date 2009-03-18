@@ -35,15 +35,15 @@ public class ConstantService {
 			logger.error("Problem while trying to read obm_conf.ini", e);
 		}
 	}
-	
+
 	public Set<Object> getKeySet() {
 		return props.keySet();
 	}
-	
+
 	public String getStringValue(String prop) {
 		String val = props.getProperty(prop);
 		if (val.startsWith("\"") && val.endsWith("\"")) {
-			val = val.replace('"', '"');
+			val = val.replace("\"", "");
 		}
 		return val;
 	}
