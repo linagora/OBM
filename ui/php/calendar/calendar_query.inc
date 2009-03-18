@@ -111,7 +111,7 @@ function get_calendar_resource_label($resources) {
   global $cdg_sql;
   
   if (count($resources) > 0) {
-    $in = "'".implode (",", $resources)."'";
+    $in = implode (",", $resources);
     $where = " resource_id IN ($in)";
     $and = true;
   }
