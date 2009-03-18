@@ -22,7 +22,7 @@ function run_query_calendar_detail($calendar_id) {
   $timeupdate = sql_date_format($db_type, 'event_timeupdate', 'timeupdate');
   $timecreate = sql_date_format($db_type, 'event_timecreate', 'timecreate');
   $multidomain = sql_multidomain('event');
-  $query = "SELECT DISTINCT
+  $query = "SELECT 
       event_id,
       c.userobm_login AS usercreate,
       u.userobm_login AS userupdate,
@@ -52,7 +52,7 @@ function run_query_calendar_detail($calendar_id) {
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
       LEFT JOIN UserObm AS c ON event_usercreate = c.userobm_id
       LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
-      LEFT JOIN UserObm AS o ON event_owner = o.userobm_id
+      INNER JOIN UserObm AS o ON event_owner = o.userobm_id
     WHERE event_type='VEVENT'
       AND event_id $calendar_id
       $multidomain";
