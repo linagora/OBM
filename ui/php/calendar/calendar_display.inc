@@ -2587,58 +2587,53 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
       <span id=\"calendarQuickFormDate\"></span>
       </h1>
       <h2>
-      <a id=\"calendarQuickFormTitle\" href=\"\" onclick=\"obm.calendarQuickForm.goTo('detailconsult'); return false\">
-      </a>
+      <a id=\"calendarQuickFormTitle\" href=\"\" onclick=\"obm.calendarQuickForm.goTo('detailconsult'); return false\"></a>
       </h2> 
 		 <div class=\"content\">
-       <div class=\"logo\"> <img src=\"$GLOBALS[ico_very_big_time]\" /> </div>
-       <div class=\"data\">
-
-      <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
-      <fieldset>
-        $l_title : <input type=\"text\" name=\"tf_title\" /> 
-      </fieldset>
-      <fieldset id=\"calendarListEntity\">
-        $l_users : $entity_view
-      </fieldset>
-      <fieldset class=\"buttons\"> 
-        <input class=\"button closeSticky\" type=\"submit\" value=\"$l_validate\" />
-        <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" />
-        <input type=\"button\" id=\"calendarQuickFormDetail\" onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value=\"$l_details\" />
-        <input type=\"button\" class=\"closeSticky\" id=\"calendarQuickFormDelete\" 
-          onclick=\"if(confirm('".phpStringToJsString($l_confirm_delete)."')) obm.calendarQuickForm.submit('quick_delete');\"
-      value=\"$l_c_delete\" />
-      </fieldset>
-      </form>
-      <div id=\"calendarQuickFormData\">
-        <div id=\"calendarQuickFormAttendees\">
-          <h3>$l_members</h3>
-        </div>
-        <div>
-          <h3>$l_carac</h3>
-          <table>
-          <tr>
-          <th>$l_owner</th>
-          <td id=\"calendarQuickFormOwner\"></td>
-          </tr>
-          <tr>
-          <th>$l_location</th>
-          <td id=\"calendarQuickFormLocation\"></td>
-          </tr>
-          <tr>
-          <th>$l_category1</th>
-          <td id=\"calendarQuickFormCategory\"></td>
-          </tr>
-          </table>
-        </div>
-        <div>
-          <h3>$l_desc</h3>
-          <p id=\"calendarQuickFormDescription\"></p>
-        </div>
-        <div id=\"calendarQuickFormItem\">
-          <h3>$l_items</h3>
-        </div>
-      </div>
+      	<form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
+      		<fieldset>
+      		  $l_title : <input type=\"text\" name=\"tf_title\" /> 
+      		</fieldset>
+      		<fieldset id=\"calendarListEntity\">
+      		  $l_users : $entity_view
+      		</fieldset>
+      		<fieldset class=\"buttons\"> 
+      		  <input class=\"button closeSticky\" type=\"submit\" value=\"$l_validate\" />
+      		  <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" />
+      		  <input type=\"button\" id=\"calendarQuickFormDetail\" onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value=\"$l_details\" />
+      		  <input type=\"button\" class=\"closeSticky\" id=\"calendarQuickFormDelete\" 
+      		    onclick=\"if(confirm('".phpStringToJsString($l_confirm_delete)."')) obm.calendarQuickForm.submit('quick_delete');\"
+      		value=\"$l_c_delete\" />
+      		</fieldset>
+      	</form>
+      	<div id=\"calendarQuickFormData\">
+      	  <div id=\"calendarQuickFormAttendees\">
+      	    <h3>$l_members</h3>
+      	  </div>
+      	  <div>
+      	    <h3>$l_carac</h3>
+      	    <table>
+      	    <tr>
+      	    <th>$l_owner</th>
+      	    <td id=\"calendarQuickFormOwner\"></td>
+      	    </tr>
+      	    <tr>
+      	    <th>$l_location</th>
+      	    <td id=\"calendarQuickFormLocation\"></td>
+      	    </tr>
+      	    <tr>
+      	    <th>$l_category1</th>
+      	    <td id=\"calendarQuickFormCategory\"></td>
+      	    </tr>
+      	    </table>
+      	  </div>
+      	  <div>
+      	    <h3>$l_desc</h3>
+      	    <p id=\"calendarQuickFormDescription\"></p>
+      	  </div>
+      	  <div id=\"calendarQuickFormItem\">
+      	    <h3>$l_items</h3>
+      	  </div>
 			</div>
     </div>
     <script type=\"text/javascript\">
@@ -2668,15 +2663,12 @@ function dis_calendar_conflict_popup() {
         <span>$GLOBALS[l_conflicts]</span>
       </h1>
       <div class=\"content\">
-        <div class=\"logo\"> <img src=\"$GLOBALS[ico_very_big_time]\" /> </div>
-        <div class=\"data\">
-					<h2>$GLOBALS[l_conflict_message]</h2>
+				<h2>$GLOBALS[l_conflict_message]</h2>
          <fieldset class=\"buttons\"> 
 		    	<input type=\"button\" id=\"popup_manage\" class=\"closeSticky\" value=\"$GLOBALS[l_conflict_manage]\" /><br/>
 		    	<input type=\"button\" id=\"popup_force\" value=\"$GLOBALS[l_conflict_force]\" /><br/>
 		    	<input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
 				 </fieldset>
-        </div>
       </div>
    </div>
 
@@ -2688,16 +2680,12 @@ function dis_calendar_conflict_popup() {
        <span>$GLOBALS[l_confirm]</span>
      </h1>
 		 <div class=\"content\">
-       <div class=\"logo\"> <img src=\"$GLOBALS[ico_very_big_time]\" /> </div>
-       <div class=\"data\">
 				<h2>$GLOBALS[l_conflict_sendmail]</h2>
          <fieldset class=\"buttons\"> 
 		    	<input type=\"button\" id=\"popup_sendmail_yes\" class=\"closeSticky\" value=\"$GLOBALS[l_yes]\" />
 		    	<input type=\"button\" id=\"popup_sendmail_no\" class=\"closeSticky\" value=\"$GLOBALS[l_no]\" />
 		    </fieldset>
-       </div>
      </div>
-
 	 </div>	";
 
   return $block;

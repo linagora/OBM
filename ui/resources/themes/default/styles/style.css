@@ -1416,6 +1416,7 @@ div.overTxtDiv {
 	border: 2px solid #3F7C8E;
   background: #FFF;
 	display: none;
+	width: auto;
 }
 
 .obmPopup h1 {
@@ -1433,9 +1434,9 @@ div.overTxtDiv {
 }
 
 .obmPopup h1 img{
-  vertical-align: middle;
-  float: right;
   margin: 1px 3px 0 0;
+  position: absolute;
+	right: 1px;
 }
 
 .obmPopup h2 {
@@ -1446,21 +1447,16 @@ div.overTxtDiv {
 }
 
 .obmPopup .content {
-	padding: 10px;
+  background-image: url(../images/ico_very_big_time.png);
+  background-repeat: no-repeat;
+  background-position: 10px 10px;  
+	padding-left: 116px;
+	padding-right: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
 	min-height: 100px;
 }
 
-.obmPopup .content .logo {
-	clear: left;
-	position: absolute;
-}
-
-.obmPopup .content .data {
-	margin-left: 96px;
-}
-
-.obmPopup .content .data input {
-	width: 14em;
-  margin: 0;
-  padding: 0;
+.obmPopup .content .buttons input{
+	width: 15em;
 }

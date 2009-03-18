@@ -936,9 +936,9 @@ Obm.CalendarManager = new Class({
   },
 
 	getEventNewPosition: function(elem) {
-		id = elem.id;
-		left = elem.getLeft();
-		top = elem.getTop();
+		var id = elem.id;
+		var left = elem.getLeft();
+		var top = elem.getTop();
     var evt = this.events.get(id);
     var xDelta = Math.round((left-evt.context.left)/this.defaultWidth);
     var yDelta = Math.round((top-evt.context.top)/this.defaultHeight);
@@ -1369,7 +1369,7 @@ Obm.CalendarQuickForm = new Class({
   },
   
   show: function() {
-    this.popup.setStyle('display','block');
+    this.popup.setStyle('display','');
     obm.popup.show('calendarQuickForm');
   },
 

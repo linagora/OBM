@@ -675,12 +675,6 @@
   margin-top: -2px;
 }
 
-#calendarQuickForm h1 img{
-  vertical-align: middle;
-  float: right;
-  margin: 1px 3px 0 0;
-}
-
 #calendarQuickForm fieldset {
   border: 0;
   text-align: center;
