@@ -225,14 +225,19 @@ if ($action == 'index') {
 
 } elseif ($action == 'decision') {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
+  if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
     $display['search'] .= html_calendar_dis_conflict($params, $conflicts) ;
     $display['detail'] = html_calendar_conflict_form($params);
     $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
   } else {
-    $mail_data = run_query_prepare_event_mail($params, $action);
-    $conflict = run_query_calendar_insert_decision($params);
-    calendar_send_mail($mail_data, 'set_mail_participation');    
+    $params['conflicts'] = $conflicts;
+    if (check_calendar_participation_decision($params)) {
+      $mail_data = run_query_prepare_event_mail($params, $action);
+      $conflict = run_query_calendar_insert_decision($params);
+      calendar_send_mail($mail_data, 'set_mail_participation');    
+    } else {
+      $display['msg'] .= display_err_msg($err['msg']);
+    }
     $obm_wait = run_query_calendar_waiting_events();
     if ($obm_wait->nf() != 0) {
       $display['msg'] .= display_info_msg($l_waiting_events.' : '.$obm_wait->nf());
@@ -242,6 +247,7 @@ if ($action == 'index') {
       $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
     }
   }
+
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_calendar_event_form($action, $params, '', $cal_entity_id);
@@ -320,7 +326,7 @@ if ($action == 'index') {
   $entities['group'] = $params['sel_group_id'];
   $entities['user'] = $params['sel_user_id'];
   $entities['resource'] = $params['sel_resource_id'];
-  if (check_calendar_access($params["calendar_id"]) && 
+  if (check_calendar_access($params['calendar_id']) && 
       check_calendar_data_form($params)) {
     $c = get_calendar_event_info($params['calendar_id'],false); 
     if ( (!$params['force']) 
@@ -344,7 +350,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'quick_update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_access($params["calendar_id"]) && 
+  if (check_calendar_access($params['calendar_id']) && 
       check_calendar_data_quick_form($params)) {
     $id = $params['calendar_id'];
     $eve_q = run_query_calendar_detail($id);
@@ -361,7 +367,7 @@ if ($action == 'index') {
     echo "({".$display['json']."})";
     exit();
   } else {
-    json_error_msg($l_invalid_data . " : " . $err["msg"]);
+    json_error_msg($l_invalid_data . " : " . $err['msg']);
     echo "({".$display['json']."})";
     exit();
   }
@@ -413,14 +419,19 @@ if ($action == 'index') {
   if (check_calendar_event_participation($params)) {
     if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
       $display['msg'] .= display_warn_msg("$l_event : $l_conflicts");
-    }        
-    $retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
-    if ($retour) {
-      $mail_data = run_query_prepare_event_mail($params, $action);
-      calendar_send_mail($mail_data, 'set_mail_participation');
-      $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
+    }
+    $params['conflicts'] = $conflicts;
+    if (check_calendar_participation_decision($params)) {
+      $retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
+      if ($retour) {
+	$mail_data = run_query_prepare_event_mail($params, $action);
+	calendar_send_mail($mail_data, 'set_mail_participation');
+	$display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
+      } else {
+	$display['msg'] .= display_err_msg("$l_event  : $err[msg]");
+      }
     } else {
-      $display['msg'] .= display_err_msg("$l_event  : $err[msg]");
+      $display['msg'] .= display_err_msg($err['msg']);
     }
     if (check_calendar_access($params['calendar_id'], 'read')) {
       $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
@@ -443,11 +454,12 @@ if ($action == 'index') {
   } else {
     $display['msg'] .= display_err_msg("$l_event  : $err[msg]");
   }
-  if (check_calendar_access($params["calendar_id"], "read")) {
+  if (check_calendar_access($params['calendar_id'], 'read')) {
     $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
   } else {
     $display['msg'] .= display_err_msg($err['msg']);
-  }   
+  }
+
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_access($params['calendar_id'])) {
@@ -455,7 +467,7 @@ if ($action == 'index') {
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    if (check_calendar_access($params["calendar_id"], "read")) {
+    if (check_calendar_access($params['calendar_id'], 'read')) {
       $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);
@@ -464,7 +476,7 @@ if ($action == 'index') {
 
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_calendar_access($params["calendar_id"])) {
+  if (check_calendar_access($params['calendar_id'])) {
     $mail_data = run_query_prepare_event_mail($params, $action);
     run_query_calendar_delete($params);
     calendar_send_mail($mail_data, 'set_mail');
@@ -472,7 +484,7 @@ if ($action == 'index') {
   } else {
     $display['msg'] .= display_warn_msg($err['msg'], false);
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    if (check_calendar_access($params["calendar_id"], "read")) {
+    if (check_calendar_access($params['calendar_id'], 'read')) {
       $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);

@@ -328,7 +328,8 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
  * Check if the user participation to en event differs from the one given
  *
  * @param
- **/
+ * return true if new participation differs from current 
+**/
 function check_calendar_event_participation($params) {
   global $obm;
 
@@ -841,7 +842,7 @@ function search_user_by_name($lastname, $firstname) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurrence of each event,
 // Parameters:
-//   - $calendar       : calendar parameters
+//   - $calendar     : calendar parameters
 //   - sel_entity_id : selected entities id
 ///////////////////////////////////////////////////////////////////////////////
 function check_calendar_conflict($calendar, $sel_entity_id) {
@@ -894,31 +895,50 @@ function check_access_entity($calendar_ids, $resource_ids) {
 }
 
 
+/**
+ * Check for participation decision
+ * Essentially a hook container to allow specific rules
+ * @param $calendar parameters
+ * @return  
+**/
+function check_calendar_participation_decision($calendar) {
+
+  if (function_exists('hook_pre_check_calendar_participation_decision')) {
+    if (! hook_pre_check_calendar_participation_decision($calendar)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check for conflict : Only with the first occurrence of each event
 ///////////////////////////////////////////////////////////////////////////////
 function check_calendar_decision_conflict($calendar) {
-  if($calendar['decision_event'] != 'ACCEPTED') {
+
+  if ($calendar['decision_event'] != 'ACCEPTED') {
     return false;
-  }   
+  }
   $event_id = $calendar['calendar_id'];
-  $sel_entity_id[$calendar['entity_kind']][] = $calendar["entity_id"];
+  $sel_entity_id[$calendar['entity_kind']][] = $calendar['entity_id'];
   $e_q = run_query_calendar_detail($event_id);
   $begin = new Of_Date($e_q->f('event_date'),'GMT');
   $end = clone $begin;
   $end->addSecond($e_q->f('event_duration'));
-  if($e_q->f('all_day')) {
-    $begin->setHour(0)->setMinute(0)->setSecond(0); 
+  if ($e_q->f('all_day')) {
+    $begin->setHour(0)->setMinute(0)->setSecond(0);
     $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
   }
 
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
-  if(isset($calendar['calendar_id']) && !is_null($occurrences)) {
-    $event_id = $calendar["calendar_id"];
+  if (isset($calendar['calendar_id']) && !is_null($occurrences)) {
+    $event_id = $calendar['calendar_id'];
     foreach($occurrences as $occurrence) {
-      if($occurrence->event->id != $event_id) {
-        $oc = $occurrence;
+      if ($occurrence->event->id != $event_id) {
+        $oc[] = $occurrence;
       }
     }
     $occurrences = $oc;
@@ -2753,7 +2773,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $addOcc = true;
     if (isset($of->events[$id])) {
       $event = $of->events[$id];
-      if ($unique) { 
+      if ($unique) {
         $addOcc = false;
       }
     } else {

@@ -1959,9 +1959,9 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
     } else {
       $schedule_end = $end->get(Of_Date::TIME_SHORT);
     }
-    $schedule="
+    $schedule = "
       <h1 class='RF hoursTitle'>$schedule_start<br/>$schedule_end</h1>  
-    ";
+";
   }
 
 
@@ -1976,6 +1976,7 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
   return $event_data;  
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // display conflicts
 // parameters:
@@ -1986,19 +1987,19 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   global $l_title, $l_location, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
   global $l_private, $obm;
-  
+
   $readable['user'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read'));
   $readable['resource'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read'));
-  
+
   foreach($conflicts as $conflict) {
     $private = true;
     $id = $conflict->event->id;
     $name  = $conflict->event->attendee[$conflict->entity][$conflict->id];
     if (((in_array($conflict->id, $readable[$conflict->entity]) || in_array($conflict->event->owner,$readable['user']))
       && $conflict->event->privacy != '1') || $conflict->event->owner == $obm['uid'] || ($conflict->id == $obm['uid'] && $conflict->entity == 'user')) {
-        $private = false;   
-      }    
-    if(!$private) {
+        $private = false;
+      }
+    if (!$private) {
       $title = $conflict->event->title;
       $location = $conflict->event->location;
     } else {
