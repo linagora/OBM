@@ -258,12 +258,23 @@ if ($action == 'index') {
   $entities['group'] = $params['sel_group_id'];
   $entities['resource'] = $params['sel_resource_id'];
   $entities['user'] = $params['sel_user_id'];
+  $entities['contact'] = $params['sel_contact_id'];
+  if ($entities['contact'] == null) {
+		$entities['contact'] = array();
+  }
   if (count($entities,COUNT_RECURSIVE) <= 3) {
     $entities['user']  = array($obm['uid']);
     $params['sel_user_id'] = array($obm['uid']);
   }
   
   if (check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource'])) {
+
+		// Insert "others attendees" as private contacts
+    if ($params['others_attendees'] != "") {
+		  $others_attendees = run_query_insert_others_attendees($params);
+      $entities['contact'] = array_merge($entities['contact'], $others_attendees);
+    }
+
     if ( (!$params['force'])
         && ($conflicts = check_calendar_conflict($params, $entities)) ) {
       $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
@@ -275,10 +286,13 @@ if ($action == 'index') {
       $mail_data = run_query_prepare_event_mail($params, $action);
       calendar_send_mail($mail_data, 'set_mail');
       if ($params['date_begin'] < date('Y-m-d H:')) {
-	$display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
+				$display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
       }
       $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
       $params["date"] = $params["date_begin"];
+
+  		$cal_entity_id['user'] = $params['sel_user_id'];
+
       $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
     }
   } else {
@@ -326,7 +340,12 @@ if ($action == 'index') {
   $entities['group'] = $params['sel_group_id'];
   $entities['user'] = $params['sel_user_id'];
   $entities['resource'] = $params['sel_resource_id'];
-  if (check_calendar_access($params['calendar_id']) && 
+  $entities['contact'] = $params['sel_contact_id'];
+  if ($entities['contact'] == null) {
+		$entities['contact'] = array();
+  }
+
+  if (check_calendar_access($params["calendar_id"]) && 
       check_calendar_data_form($params)) {
     $c = get_calendar_event_info($params['calendar_id'],false); 
     if ( (!$params['force']) 
@@ -336,6 +355,13 @@ if ($action == 'index') {
       $display['msg'] .= display_err_msg("$l_event : $l_update_error");
       $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
     } else {
+
+		  // Insert "others attendees" as private contacts
+      if ($params['others_attendees'] != "") {
+		    $others_attendees = run_query_insert_others_attendees($params);
+        $entities['contact'] = array_merge($entities['contact'], $others_attendees);
+      }
+
       $mail_data = run_query_prepare_event_mail($params, $action);
       run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
       calendar_send_mail($mail_data, 'set_mail');
@@ -354,14 +380,16 @@ if ($action == 'index') {
       check_calendar_data_quick_form($params)) {
     $id = $params['calendar_id'];
     $eve_q = run_query_calendar_detail($id);
-    $mail_data = run_query_prepare_event_mail($params, $action, $eve_q);
     run_query_quick_attendee_update($params,$eve_q);    
     if($eve_q->f('event_repeatkind') == 'none') {
       run_query_calendar_quick_event_update($params);
     } else {
       $id = run_query_calendar_event_exception_insert($params,$eve_q);
     }
-    calendar_send_mail($mail_data, 'set_mail');
+		if ($params['send_mail']) {
+      $mail_data = run_query_prepare_event_mail($params, $action, $eve_q);
+      calendar_send_mail($mail_data, 'set_mail');
+		}
     json_event_data($id,$params);
     json_ok_msg("$l_event : $l_update_ok");
     echo "({".$display['json']."})";
@@ -414,6 +442,17 @@ if ($action == 'index') {
     exit();
   }
 
+} elseif ($action == 'check_conflict') {
+///////////////////////////////////////////////////////////////////////////////
+  $entities['user'] = $params['entity']['user'];
+	$conflicts = quick_check_calendar_conflict($params, $entities);
+	if (!$conflicts) {
+  	echo "({conflict:false})";    
+  } else {
+  	echo "({conflict:true})";    
+  }
+	exit();
+
 } elseif ($action == 'update_decision') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_calendar_event_participation($params)) {
@@ -445,6 +484,24 @@ if ($action == 'index') {
       $display['msg'] .= display_err_msg($err['msg']);
     }
   }
+
+} elseif ($action == 'update_ext_decision') {
+///////////////////////////////////////////////////////////////////////////////
+	$retour = run_query_calendar_update_occurrence_state($params['calendar_id'], $params['entity_kind'], $params['entity_id'],$params['decision_event']);
+
+    if ($retour) {
+      $mail_data = run_query_prepare_event_mail($params, $action);
+      calendar_send_mail($mail_data, 'set_mail_participation');
+      $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
+    } else {
+      $display['msg'] .= display_err_msg("$l_event  : $err[msg]");
+    }
+    if (check_calendar_access($params['calendar_id'], 'read')) {
+      $display['detail'] = dis_calendar_event_consult($params['calendar_id']);
+    } else {
+      $display['msg'] .= display_err_msg($err['msg']);
+    }
+
 
 } elseif ($action == 'update_alert') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -598,6 +655,25 @@ if ($action == 'index') {
   }
   dis_calendar_pdf_view($params, $cal_entity_id, $cal_range, $cal_view);
   exit();
+
+} elseif ($action == 'conflict_manager') {
+///////////////////////////////////////////////////////////////////////////////
+  if ($params['calendar_id'] > 0) {  
+    if (check_calendar_access($params['calendar_id'], 'read')) {
+      $eve_q = run_query_calendar_detail($params['calendar_id']);
+      $entities = get_calendar_event_entity($params['calendar_id']);
+			$conflicts_entities['user'] = $params['entity']['user'];
+			$conflicts_entities['group'] = $params['entity']['group'];
+			$conflicts_entities['resource'] = $params['entity']['resource'];
+			$conflicts = check_calendar_conflict($params, $conflicts_entities);
+			$display['search'] .= html_calendar_dis_conflict($params, $conflicts) ;
+      $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities);
+    } else {
+      $display['msg'] .= display_err_msg($err['msg']);
+    }
+  } else {
+    $display['msg'] .= display_err_msg($l_err_reference);
+  }
 }
 
 $_SESSION['cal_entity_id'] = $cal_entity_id;
@@ -761,10 +837,11 @@ function get_calendar_params() {
         $data = explode('-', $value);
         $id = $data[2];
         $params['sel_user_id'][] = $id;
-      } else {
-        // direct id
-        $params['sel_user_id'][] = $value;
-      }
+      } else if (strcmp(substr($value, 0, 13),'data-contact-') == 0) {
+        $data = explode('-', $value);
+        $id = $data[2];
+        $params['sel_contact_id'][] = $id;
+			}
     }
   }
 
@@ -844,6 +921,20 @@ function get_calendar_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );
+
+  // Looking for Conflicts
+  $actions['calendar']['check_conflict'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=check_conflict",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                         );
+
+  // Conflict Manager
+  $actions['calendar']['conflict_manager'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=conflict_manager",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                         );
   
   // Decision
   $actions['calendar']['decision'] = array (
@@ -864,7 +955,7 @@ function get_calendar_action() {
     'Url'      => "$path/calendar/calendar_index.php?action=new&amp;date_begin=".$date->getURL(),
     'Right'    => $cright_write,
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
-       'update_decision','update_alert','decision','update','delete', 'new_meeting',
+       'update_decision','update_ext_decision', 'update_alert','decision','update','delete', 'new_meeting',
        'rights_admin','rights_update', 'waiting_events','planning')
 		);
 
@@ -881,7 +972,7 @@ function get_calendar_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/calendar/calendar_index.php?action=detailupdate&amp;calendar_id=$id&amp;date=".$date->getURL(),
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult','update_alert','update_decision') 
+    'Condition'=> array ('detailconsult','update_alert','update_decision', 'update_ext_decision') 
   );
 
   // Duplicate
@@ -946,6 +1037,13 @@ function get_calendar_action() {
   // Update
   $actions['calendar']['update_decision'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=update_decision",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                         );
+
+  // Update external decision
+  $actions['calendar']['update_ext_decision'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=update_ext_decision",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                          );

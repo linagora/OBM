@@ -91,6 +91,7 @@ function display_page(&$display) {
     </div>
     <script type=\"text/javascript\">
       obm.portlets = new Obm.Portlets();
+      obm.popup = new Obm.Popup();
     </script>  
     <!-- center zone end -->  
     ".$display["end"];
@@ -415,6 +416,8 @@ function display_head_theme($p_module) {
   obm.vars.consts.weekStart = $c_week_first_day;
   obm.vars.consts.resourcePath = '$resources_path';
   obm.vars.consts.timeZone = '".Of_Date::getOption('timezone')."';
+  obm.vars.consts.calendarUrl = '$path/calendar/calendar_index.php';
+  obm.vars.consts.calendarDetailconsultURL = '$path/calendar/calendar_index.php?action=detailconsult&calendar_id=';
   obm.vars.labels.monthsShort = $monthShort;
   obm.vars.labels.months = $monthLong;
   obm.vars.labels.dayShort = $daysShort;

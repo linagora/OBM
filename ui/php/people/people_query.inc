@@ -10,44 +10,42 @@
 ///////////////////////////////////////////////////////////////////////////////
 // User query search query execution
 // Parameters:
-//   - $user[] : user search criteria
+//   - $people[] : people search criteria
 //     keys used  : name, perms
 //   - $sql_order_field : infos for order clause
 //   - $sql_order_dir : direction for order clause (asc, desc)
 //   - $filter_entity : if and which filter_entity to set (eg calendar readable)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_search($user) {
+function run_query_people_search($people) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
   global $cgp_archive_only;
 
-  $sql_order_dir = $user['sql_order_dir'];
-  $sql_order_field = $user['sql_order_field'];
+  $sql_order_dir = $people['sql_order_dir'];
+  $sql_order_field = $people['sql_order_field'];
 
-  $filter_entity = $user['filter_entity'];
-  $filter_pattern = $user['filter_pattern'];
-  $lname = sql_search_text_parse($user['lastname']);
-  $fname = sql_search_text_parse($user['firstname']);
-  $email = sql_search_text_parse($user['email']);
-  $desc = sql_search_text_parse($user['desc']);
-  $phone = $user['phone'];
+  $filter_entity = $people['filter_entity'];
+  $filter_pattern = $people['filter_pattern'];
+  $lname = sql_search_text_parse($people['lastname']);
+  $fname = sql_search_text_parse($people['firstname']);
+  $email = sql_search_text_parse($people['email']);
+  $desc = sql_search_text_parse($people['desc']);
+  $phone = $people['phone'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
-  $dateexp = sql_date_format($db_type, 'userobm_account_dateexp', 'dateexp');
-  $diff = "TIMESTAMPDIFF(DAY,now(),userobm_account_dateexp)";
-  $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
-  $multidomain = sql_multidomain('userobm');
+  $multidomain_userobm = sql_multidomain('userobm');
+  $multidomain_contact = sql_multidomain('contact');
 
   if ($filter_entity == 'calendar') {
-    $users = of_right_entity_for_user('calendar', $obm['uid'], $filter_pattern,'','userobm');
-    if ((is_array($users['ids'])) && (count($users['ids']) > 0)) {
+    $users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', $filter_pattern);
+    $users_ids = array_keys($users);
+    if ((is_array($users_ids)) && (count($users_ids) > 0)) {
       $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
-      foreach($users['ids'] as $u_id) {
-	$where_filter_entity .= "$coma'$u_id'";
-	$coma = ',';
+      foreach($users_ids as $u_id) {
+	    $where_filter_entity .= "$coma'$u_id'";
+	    $coma = ',';
       }
       $where_filter_entity .= '))';
     } else {
@@ -56,79 +54,133 @@ function run_query_user_search($user) {
     }
   }
 
-  $where = '1=1';
+  $where_userobm = '1=1';
+  $where_contact = '1=1';
 
   // If a lastname indication has been specified, get it
   if (trim($lname) != '') {
-     if (trim($where) != '') $where .= ' AND';
-     $where .= " userobm_lastname $like '$lname%'";
+     // UserObm
+     $where_userobm .= " AND userobm_lastname $like '$lname%'";
+     // Contact
+     $where_contact .= " AND (contact_lastname $like '$lname%' or contact_aka like '$lname%')";
   }
 
   // If a firstname indication has been specified, get it
   if (trim($fname) != '') {
-     if (trim($where) != '') $where .= ' AND';
-     $where .= " userobm_firstname $like '$fname%'";
+     // UserObm
+     $where_userobm .= " AND userobm_firstname $like '$fname%'";
+     // Contact
+     $where_contact .= " AND contact_lastname $like '$fname%'";
   }
 
   // If an email indication has been specified, get it
   if (trim($email) != '') {
-     if (trim($where) != '') $where .= ' AND';
-     $where .= " userobm_email like '%$email%'";
+    // UserObm
+    $where_userobm .= " AND userobm_email like '%$email%'";
+    // Contact
+		$where_contact .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$email%'))";
   }
 
   // If a phone number indication has been specified, get it
   if (trim($phone) != '') {
-     if (trim($where) != '') $where .= ' AND';
-     $where .= " (userobm_phone like '%$phone%'
-       OR userobm_phone2 like '%$phone%'
-       OR userobm_mobile like '%$phone%')";
+    // UserObm
+    $where_userobm .= " AND (userobm_phone like '%$phone%'
+      OR userobm_phone2 like '%$phone%'
+      OR userobm_mobile like '%$phone%')";
+		// Contact
+    $where_contact .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%'))";
   }
 
   // If a description indication has been specified, get it
   if (trim($desc) != '') {
-     if (trim($where) != '') $where .= ' AND';
-     $where .= " userobm_description like '%$desc%'";
+     $where_userobm .= " AND userobm_description like '%$desc%'";
   }
 
   // User defined data
-  $userdata = of_userdata_query_search('user', $user, 'UserObm');
+	// UserObm
+  $userdata_userobm = of_userdata_query_search('people', $people, 'UserObm');
+  if ($userdata_userobm['where'] != '') {
+    if (trim($where_userobm) != '') $where_userobm .= ' AND ';
+    $where_userobm .= $userdata_userobm['where'];
+    $join_userdata_userobm = $userdata_userobm['join'];
+  }
+	// Contact
+  $userdata_contact = of_userdata_query_search('Contact', $people);
   if ($userdata['where'] != '') {
-    if (trim($where) != '') $where .= ' AND ';
-    $where .= $userdata['where'];
-    $join_userdata = $userdata['join'];
+    $where_contact .= ' AND '. $userdata_contact['where'];
+    $join_userdata_contact = $userdata_contact['join'];
   }
 
-  if ((trim($where) != '') || (trim($where_filter_entity) != '')) {
-    $whereq = " WHERE $where $where_filter_entity $multidomain";
+	// Where
+  // UserObm
+  if ((trim($where_userobm) != '') || (trim($where_filter_entity) != '')) {
+    $whereq_userobm = " WHERE $where_userobm $where_filter_entity $multidomain_userobm";
   } else {
-    $whereq = " WHERE 1=1 $multidomain";
+    $whereq_userobm = " WHERE 1=1 $multidomain_userobm";
   }
+	// Contact
+  $whereq_contact = " WHERE $where_contact $multidomain_contact";
 
-  $select = "SELECT distinct UserObm.*,
-      userobm_id as id,
-      $lastaccess
+
+  $select_userobm = "SELECT distinct userobm_lastname,
+    userobm_firstname,
+		userobm_title,
+		userobm_phone,
+		userobm_phone2,
+		userobm_mobile,
+		userobm_fax,
+		userobm_fax2,
+		userobm_description,
+    userobm_email,
+    userobm_id,
+    'user' as type
     FROM UserObm 
     LEFT JOIN Domain ON userobm_domain_id = domain_id
-    $join_userdata";
+    $join_userdata_userobm";
 
+	$select_contact = "select distinct contact_lastname as userobm_lastname,
+    contact_firstname as userobm_firstname,
+    contact_title as userobm_title,
+    p1.phone_number as userobm_phone, 
+    p2.phone_number as userobm_phone2,
+    p3.phone_number as userobm_mobile, 
+    p4.phone_number as userobm_fax, 
+    p5.phone_number as userobm_fax2, 
+    contact_comment,
+    email_address as userobm_email,
+    contact_id as userobm_id,
+    'contact' as type
+    FROM Contact";
+	$join_contact = "
+    LEFT JOIN Domain ON contact_domain_id = domain_id
+    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id 
+    LEFT JOIN Phone p1 ON p1.phone_entity_id = contactentity_entity_id AND p1.phone_label='HOME;VOICE;X-OBM-Ref1'
+    LEFT JOIN Phone p2 ON p2.phone_entity_id = contactentity_entity_id AND p2.phone_label='WORK;VOICE;X-OBM-Ref1'
+    LEFT JOIN Phone p3 ON p3.phone_entity_id = contactentity_entity_id AND p3.phone_label='CELL;VOICE;X-OBM-Ref1'
+    LEFT JOIN Phone p4 ON p4.phone_entity_id = contactentity_entity_id AND p4.phone_label='HOME;FAX;X-OBM-Ref1'
+    LEFT JOIN Phone p5 ON p5.phone_entity_id = contactentity_entity_id AND p5.phone_label='WORK;FAX;X-OBM-Ref1'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like 'PREF;INTERNET;X-OBM-Ref1%'
+		$join_userdata_contact";
 
   // ORDER construction
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'userobm_lastname';
-
   $orderq .= " ORDER BY $order $sql_order_dir";
 
-  $query = "$select
-    $whereq
-    $orderq
-    $limit";
+  $query_userobm = "$select_userobm $whereq_userobm";
+  $query_contact = "$select_contact $join_contact $whereq_contact";
+
+  // Union
+	$query = "$query_userobm UNION $query_contact $orderq $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_userdata $whereq");
+    $count_userobm = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_userdata_userobm $whereq_userobm");
+    $count_contact = get_query_count("SELECT count(distinct contact_id) FROM Contact $join_userdata_contact $join_contact $whereq_contact");
+    $count = $count_userobm+$count_contact;
     $obm_q->set_num_rows_total($count);
   }
 
   if (($count > 0) || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, 'run_query_user_search()');
+    display_debug_msg($query, $cdg_sql, 'run_query_people_search()');
     $obm_q->query($query);
   }
 
@@ -139,30 +191,35 @@ function run_query_user_search($user) {
 /**
  * Search users from a single field 
  * 
- * @param mixed $user 
+ * @param mixed $people 
  * @access public
- * @return array of 'length' => DB user results nb, and 'datas' => DB User search query results
+ * @return array of 'length' => DB people results nb, and 'datas' => DB User search query results
  */
-function run_query_user_ext_search($user) {
+function run_query_people_ext_search($people) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $pattern = $user['pattern'];
-  $filter_entity = $user['filter_entity'];
-  $filter_pattern = $user['filter_pattern'];
+  $pattern = $people['pattern'];
+  $filter_entity = $people['filter_entity'];
+  $filter_pattern = $people['filter_pattern'];
   $obm_q = new DB_OBM;
-  $multidomain = sql_multidomain('UserObm.userobm');
+  $db_type = $obm_q->type;
 
-  $limit = $user['limit'];
-  if(isset($user['first_row'])) $first_row = $user['first_row'] - 1;
+  $multidomain = sql_multidomain('UserObm.userobm');
+  $multidomain_contact = sql_multidomain('Contact');
+  $like = sql_casei_like($db_type);
+
+  $limit = $people['limit'];
+  if(isset($people['first_row'])) $first_row = $people['first_row'] - 1;
   else $first_row = 0;
 
   if ($filter_entity == 'calendar') {
-    $users = of_right_entity_for_user('calendar', $obm['uid'], $filter_pattern,'','userobm');
-    if ((is_array($users['ids'])) && (count($users['ids']) > 0)) {
+    $users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', $filter_pattern);
+    $users_ids = array_keys($users);
+    if ((is_array($users_ids)) && (count($users_ids) > 0)) {
       $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
-      foreach($users['ids'] as $u_id) {
-	$where_filter_entity .= "$coma'$u_id'";
-	$coma = ',';
+      foreach($users_ids as $u_id) {
+	      $where_filter_entity .= "$coma'$u_id'";
+	      $coma = ',';
       }
       $where_filter_entity .= '))';
     } else {
@@ -171,38 +228,44 @@ function run_query_user_ext_search($user) {
     }
   }
 
-  $query = "SELECT 
-      count(*) as resultscount
+  $query_userobm = "SELECT 
+      userobm_id as id,
+      userobm_lastname as lastname,
+      userobm_firstname as firstname,
+      userobm_email as email,
+      'user' as type
     FROM UserObm
     WHERE (
-      userobm_lastname LIKE '$pattern%'
-      OR userobm_firstname LIKE '$pattern%' 
-      OR userobm_email LIKE '$pattern%' )
+      userobm_lastname $like '$pattern%' 
+      OR userobm_firstname $like '$pattern%' 
+      OR userobm_email $like  '$pattern%' )
       AND userobm_archive = 0
       $multidomain
       $where_filter_entity";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
-  $obm_q->query($query);
-  $obm_q->next_record();
-  $resultsCount = $obm_q->f('resultscount');
-  $query = "SELECT 
-      userobm_id,
-      userobm_lastname,
-      userobm_firstname,
-      userobm_email
-    FROM UserObm
-    WHERE (
-      userobm_lastname LIKE '$pattern%' 
-      OR userobm_firstname LIKE '$pattern%' 
-      OR userobm_email LIKE  '$pattern%' )
-      AND userobm_archive = 0
-      $multidomain
-      $where_filter_entity
-    ORDER BY  userobm_lastname, userobm_firstname
+	$query_contact = "SELECT
+    	contact_id as id,
+      contact_lastname as lastname,
+      contact_firstname as firstname,
+      email_address as email,
+      'contact' as type
+		FROM Contact
+		INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+		LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like 'INTERNET;X-OBM-Ref1%'
+		WHERE (
+		  contact_lastname $like '$pattern%'
+      OR contact_firstname $like '$pattern%'
+      OR email_address $like '$pattern%')
+		  AND contact_archive = 0
+      $multidomain_contact";
+
+
+	$query = "$query_userobm UNION $query_contact ORDER BY lastname, firstname
     LIMIT $limit OFFSET $first_row";
-  display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
+
+  display_debug_msg($query, $cdg_sql, 'run_query_people_ext_search()');
   $obm_q->query($query);
+  $resultsCount = $obm_q->num_rows();
 
   return array('length' => $resultsCount, 'datas' => $obm_q);
 }
@@ -211,9 +274,9 @@ function run_query_user_ext_search($user) {
 ///////////////////////////////////////////////////////////////////////////////
 // User detail query execution
 // Parameters:
-//   - $p_id : user id
+//   - $p_id : people id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_detail($p_id) {
+function run_query_people_detail($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -229,7 +292,7 @@ function run_query_user_detail($p_id) {
          WHERE UserObm.userobm_id $p_id 
       $multidomain";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_detail()');
+  display_debug_msg($query, $cdg_sql, 'run_query_people_detail()');
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -240,11 +303,11 @@ function run_query_user_detail($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // User update query execution
 // Parameters:
-//   - $p_id     : user id
-//   - $user[]   : entry values
+//   - $p_id     : people id
+//   - $people[]   : entry values
 //     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_update($p_id, $user) {
+function run_query_people_update($p_id, $people) {
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
@@ -252,29 +315,29 @@ function run_query_user_update($p_id, $user) {
   $obm_q = new DB_OBM;
 
   // infos
-  $kind = $user['kind'];
-  $lname = $user['lastname'];
-  $fname = $user['firstname'];
-  $title = $user['title'];
-  $desc = $user['desc'];
+  $kind = $people['kind'];
+  $lname = $people['lastname'];
+  $fname = $people['firstname'];
+  $title = $people['title'];
+  $desc = $people['desc'];
   $multidomain = sql_multidomain('userobm');
   
   // Coord
-  $phone = $user['phone'];
-  $phone2 = $user['phone2'];
-  $mobile = $user['mobile'];
-  $fax = $user['fax'];
-  $fax2 = $user['fax2'];
-  $company = $user['company'];
-  $direction = $user['direction'];
-  $service = $user['service'];
-  $ad1 = $user['ad1'];
-  $ad2 = $user['ad2'];
-  $ad3 = $user['ad3'];
-  $zip = $user['zip'];
-  $town = $user['town'];
-  $cdx = $user['cdx'];
-  $ctry = $user['country'];
+  $phone = $people['phone'];
+  $phone2 = $people['phone2'];
+  $mobile = $people['mobile'];
+  $fax = $people['fax'];
+  $fax2 = $people['fax2'];
+  $company = $people['company'];
+  $direction = $people['direction'];
+  $service = $people['service'];
+  $ad1 = $people['ad1'];
+  $ad2 = $people['ad2'];
+  $ad3 = $people['ad3'];
+  $zip = $people['zip'];
+  $town = $people['town'];
+  $cdx = $people['cdx'];
+  $ctry = $people['country'];
 
   // User UID/GID
   $userDesc = get_user_info($p_id);
@@ -305,11 +368,11 @@ function run_query_user_update($p_id, $user) {
     userobm_description='$desc'
     WHERE userobm_id $id $multidomain";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_user_update()');
+  display_debug_msg($query, $cdg_sql, 'run_query_people_update()');
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $ret = of_userdata_query_update('user', $p_id, $user);
+    $ret = of_userdata_query_update('people', $p_id, $people);
   }
 
   return $retour;
@@ -317,9 +380,9 @@ function run_query_user_update($p_id, $user) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the number of admin user
+// Return the number of admin people
 // Returns:
-//   - number of admin user
+//   - number of admin people
 ///////////////////////////////////////////////////////////////////////////////
 function get_nb_user_admin() {
   global $cdg_sql, $perms_admin;
@@ -340,25 +403,24 @@ function get_nb_user_admin() {
 ///////////////////////////////////////////////////////////////////////////////
 // Data checking and formatting
 // Parameters:
-//   - $p_id     : user id
-//   - $user[]   : values checked
+//   - $p_id     : people id
+//   - $people[]   : values checked
 //     keys used : name, passwd, email
 ///////////////////////////////////////////////////////////////////////////////
-function check_user_data_form($p_id, &$user) {
+function check_user_data_form($p_id, &$people) {
   global $l_lname_error;
   global $err, $action;
 
-
-  $action = $user['action'];
-  $id = $user['user_id'];
-  $lname = $user['lastname'];
-  $fname = $user['firstname'];
-  $title = $user['title'];
-  $phone = $user['phone'];
-  $phone2 = $user['phone2'];
-  $mobile = $user['mobile'];
-  $fax = $user['fax'];
-  $fax2 = $user['fax2'];
+  $action = $people['action'];
+  $id = $people['user_id'];
+  $lname = $people['lastname'];
+  $fname = $people['firstname'];
+  $title = $people['title'];
+  $phone = $people['phone'];
+  $phone2 = $people['phone2'];
+  $mobile = $people['mobile'];
+  $fax = $people['fax'];
+  $fax2 = $people['fax2'];
   
   // MANDATORY: Lastname
   if (trim($lname) == '') {

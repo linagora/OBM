@@ -648,36 +648,13 @@
 /* Calendar Quick Form */
 /* ------------------------------------------------------------------------- */
 
-#calendarQuickForm {
-  display: none;
-  width: 34em;
-  text-align: center;
-  z-index: 1000;
-}
-
 #calendarQuickForm form  {
-  background-color: #ebebeb;
-  border: 1px solid #b3b3b3;
   text-align: left;
   margin-bottom: 0;
 }
 
-#calendarQuickForm h1 {
-  margin: 0;
-  background-color: #4692A9;
-  font-weight: bold;
-  font-size: 100%;
-  background-image: url(../images/tab_border.png);
-  background-repeat: repeat-x;
-  background-position: 0 0.5em;  
-  color: #FFF;
-}
-
 #calendarQuickForm h2 {
-  background-color: #ebebeb;
   font-weight: bold;
-  border-left: 1px solid #b3b3b3;
-  border-right: 1px solid #b3b3b3;
   font-size: 100%;  
   margin: 0;
 }
@@ -685,7 +662,6 @@
 #calendarQuickForm h4 {
   font-weight: bold;
   font-size: 100%; 
-  background-color: #ebebeb;
   margin: 3px;
 }
 
@@ -727,8 +703,6 @@
   margin:0;
   padding: 0 0 5px 0;
   height: 6em;
-  background-color: #ebebeb;
-  border: 1px solid #b3b3b3;
 }
 
 #calendarQuickFormData div {

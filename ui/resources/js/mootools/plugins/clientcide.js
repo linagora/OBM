@@ -1,9 +1,101 @@
 /*
+Script: Clientcide.js
+	The Clientcide namespace.
+
+License:
+	http://www.clientcide.com/wiki/cnet-libraries#license
+*/
+var Clientcide = {
+	version: '805',
+	setAssetLocation: function(baseHref) {
+		if (window.StickyWin && StickyWin.ui) {
+			StickyWin.UI.refactor({
+				options: {
+					baseHref: baseHref + '/stickyWinHTML/'
+				}
+			});
+			if (StickyWin.alert) {
+				var CGFsimpleErrorPopup = StickyWin.alert.bind(window);
+				StickyWin.alert = function(msghdr, msg, base) {
+				    return CGFsimpleErrorPopup(msghdr, msg, base||baseHref + "/simple.error.popup");
+				};
+			}
+		}
+		if (window.TagMaker) {
+			TagMaker = TagMaker.refactor({
+			    options: {
+			        baseHref: baseHref + '/tips/'
+			    }
+			});
+		}
+		if (window.ProductPicker) {
+			ProductPicker.refactor({
+			    options:{
+			        baseHref: baseHref + '/Picker'
+			    }
+			});
+		}
+
+		if (window.Autocompleter) {
+			var AcClientcide = {
+					options: {
+						baseHref: baseHref + '/autocompleter/'
+					}
+			};
+			Autocompleter.Base.refactor(AcClientcide);
+			if (Autocompleter.Ajax) {
+				["Base", "Xhtml", "Json"].each(function(c){
+					if(Autocompleter.Ajax[c]) Autocompleter.Ajax[c].refactor(AcClientcide);
+				});
+			}
+			if (Autocompleter.Local) Autocompleter.Local.refactor(AcClientcide);
+			if (Autocompleter.JsonP) Autocompleter.JsonP.refactor(AcClientcide);
+		}
+
+		if (window.Lightbox) {
+			Lightbox.refactor({
+			    options: {
+			        assetBaseUrl: baseHref + '/slimbox/'
+			    }
+			});
+		}
+
+		if (window.Waiter) {
+			Waiter.refactor({
+				options: {
+					baseHref: baseHref + '/waiter/'
+				}
+			});
+		}
+	},
+	preLoadCss: function(){
+		if (window.DatePicker) new DatePicker();
+		if (window.ProductPicker) new ProductPicker();
+		if (window.TagMaker) new TagMaker();
+		if (window.StickyWin && StickyWin.ui) StickyWin.ui();
+		if (window.StickyWin && StickyWin.pointy) StickyWin.pointy();
+		Clientcide.preloaded = true;
+		return true;
+	},
+	preloaded: false
+};
+(function(){
+	if (!window.addEvent) return;
+	var preload = function(){
+		if (window.dbug) dbug.log('preloading clientcide css');
+		if (!Clientcide.preloaded) Clientcide.preLoadCss();
+	};
+	window.addEvent('domready', preload);
+	window.addEvent('load', preload);
+})();
+setCNETAssetBaseHref = Clientcide.setAssetLocation;
+
+/*
 Script: dbug.js
 	A wrapper for Firebug console.* statements.
 
 License:
-	http://clientside.cnet.com/wiki/cnet-libraries#license
+	http://www.clientcide.com/wiki/cnet-libraries#license
 */
 var dbug = {
 	logged: [],	
@@ -27,20 +119,22 @@ var dbug = {
 		} else dbug.log('no such timer: %s', name);
 	},
 	enable: function(silent) { 
-		if(dbug.firebug) {
+		var con = window.firebug ? firebug.d.console.cmd : window.console;
+
+		if((!!window.console && !!window.console.warn) || window.firebug) {
 			try {
 				dbug.enabled = true;
 				dbug.log = function(){
-						(console.debug || console.log).apply(console, arguments);
+						(con.debug || con.log).apply(con, arguments);
 				};
 				dbug.time = function(){
-					console.time.apply(console, arguments);
+					con.time.apply(con, arguments);
 				};
 				dbug.timeEnd = function(){
-					console.timeEnd.apply(console, arguments);
+					con.timeEnd.apply(con, arguments);
 				};
 				if(!silent) dbug.log('enabling dbug');
-				for(var i=0;i<dbug.logged.length;i++){ dbug.log.apply(console, dbug.logged[i]); }
+				for(var i=0;i<dbug.logged.length;i++){ dbug.log.apply(con, dbug.logged[i]); }
 				dbug.logged=[];
 			} catch(e) {
 				dbug.enable.delay(400);
@@ -71,18 +165,19 @@ var dbug = {
 };
 
 (function(){
-	var fb = typeof console != "undefined";
+	var fb = !!window.console || !!window.firebug;
+	var con = window.firebug ? window.firebug.d.console.cmd : window.console;
 	var debugMethods = ['debug','info','warn','error','assert','dir','dirxml'];
 	var otherMethods = ['trace','group','groupEnd','profile','profileEnd','count'];
 	function set(methodList, defaultFunction) {
 		for(var i = 0; i < methodList.length; i++){
-			dbug[methodList[i]] = (fb && console[methodList[i]])?console[methodList[i]]:defaultFunction;
+			dbug[methodList[i]] = (fb && con[methodList[i]])?con[methodList[i]]:defaultFunction;
 		}
 	};
 	set(debugMethods, dbug.log);
 	set(otherMethods, function(){});
 })();
-if (typeof console != "undefined" && console.warn){
+if ((!!window.console && !!window.console.warn) || window.firebug){
 	dbug.firebug = true;
 	var value = document.cookie.match('(?:^|;)\\s*jsdebug=([^;]*)');
 	var debugCookie = value ? unescape(value[1]) : false;
@@ -97,16 +192,50 @@ if (typeof console != "undefined" && console.warn){
 
 
 /*
+Script: Occlude.js
+	Prevents a class from being applied to a DOM element twice.
+
+License:
+	http://www.clientcide.com/wiki/cnet-libraries#license
+*/
+var Occlude = new Class({
+	// usage: if(this.occlude()) return this.occluded;
+	occlude: function(property, element) {
+		element = $(element || this.element);
+		var instance = element.retrieve(property || this.property);
+		if (instance && (this.occluded === null || this.occluded)) {
+			this.occluded = instance; 
+		} else {
+			this.occluded = false;
+			element.store(property || this.property, this);
+		}
+		return this.occluded||false;
+	}
+});
+
+/*
+Script: ToElement.js
+	Defines the toElement method for a class.
+
+License:
+	http://www.clientcide.com/wiki/cnet-libraries#license
+*/
+var ToElement = new Class({
+	toElement: function(){
+		return this.element;
+	}
+});
+
+/*
 Script: IframeShim.js
 	Defines IframeShim, a class for obscuring select lists and flash objects in IE.
 
 License:
-	http://clientside.cnet.com/wiki/cnet-libraries#license
+	http://www.clientcide.com/wiki/cnet-libraries#license
 */	
 var IframeShim = new Class({
-	Implements: [Options, Events],
+	Implements: [Options, Events, Occlude, ToElement],
 	options: {
-		name: '',
 		className:'iframeShim',
 		display:false,
 		zindex: null,
@@ -117,18 +246,19 @@ var IframeShim = new Class({
 		},
 		browsers: (Browser.Engine.trident4 || (Browser.Engine.gecko && !Browser.Engine.gecko19 && Browser.Platform.mac))
 	},
+	property: 'IframeShim',
 	initialize: function (element, options){
-		this.setOptions(options);
-		//legacy
-		if(this.options.offset && this.options.offset.top) this.options.offset.y = this.options.offset.top;
-		if(this.options.offset && this.options.offset.left) this.options.offset.x = this.options.offset.left;
 		this.element = $(element);
+		if (this.occlude()) return this.occluded;
+		this.setOptions(options);
 		this.makeShim();
 		return;
 	},
 	makeShim: function(){
-		this.shim = new Element('iframe');
-		this.id = this.options.name || new Date().getTime() + "_shim";
+		this.shim = new Element('iframe').store('IframeShim', this);
+		if(!this.options.browsers) return;
+		var pos = this.element.getStyle('position');
+		if (pos == "static" || !pos) this.element.setStyle('position', 'relative');
 		if(this.element.getStyle('z-Index').toInt()<1 || isNaN(this.element.getStyle('z-Index').toInt()))
 			this.element.setStyle('z-Index',5);
 		var z = this.element.getStyle('z-Index')-1;
@@ -137,19 +267,18 @@ var IframeShim = new Class({
 			 this.element.getStyle('z-Index').toInt() > this.options.zindex)
 			 z = this.options.zindex;
 			
- 		this.shim.setStyles({
-			'position': 'absolute',
-			'zIndex': z,
-			'border': 'none',
-			'filter': 'progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)'
-		}).setProperties({
-			'src':'javascript:void(0);',
-			'frameborder':'0',
-			'scrolling':'no',
-			'id':this.id
-		}).addClass(this.options.className);
-		
-		this.element.store('shim', this);
+ 		this.shim.set({
+			src: (window.location.protocol == 'https') ? '://0' : 'javascript:void(0)',
+			frameborder:'0',
+			scrolling:'no',
+			styles: {
+				position: 'absolute',
+				zIndex: z,
+				border: 'none',
+				filter: 'progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)'
+			},
+			'class':this.options.className
+		});
 
 		var inject = function(){
 			this.shim.inject(this.element, 'after');
@@ -157,31 +286,19 @@ var IframeShim = new Class({
 			else this.hide();
 			this.fireEvent('onInject');
 		};
-		if(this.options.browsers){
-			if(Browser.Engine.trident && !IframeShim.ready) {
-				window.addEvent('load', inject.bind(this));
-			} else {
-				inject.run(null, this);
-			}
-		}
+		if(Browser.Engine.trident && !IframeShim.ready) window.addEvent('load', inject.bind(this));
+		else inject.run(null, this);
 	},
 	position: function(shim){
 		if(!this.options.browsers || !IframeShim.ready) return this;
-		var before = this.element.getStyles('display', 'visibility', 'position');
-		this.element.setStyles({
-			display: 'block',
-			position: 'absolute',
-			visibility: 'hidden'
-		});
-		var size = this.element.getSize();
-		this.element.setStyles(before);
+		var size = this.element.measure(function(){ return this.getSize(); });
 		if($type(this.options.margin)){
 			size.x = size.x-(this.options.margin*2);
 			size.y = size.y-(this.options.margin*2);
 			this.options.offset.x += this.options.margin; 
 			this.options.offset.y += this.options.margin;
 		}
- 		this.shim.setStyles({
+ 		this.shim.set({
 			'width': size.x,
 			'height': size.y
 		}).setPosition({
@@ -191,12 +308,12 @@ var IframeShim = new Class({
 		return this;
 	},
 	hide: function(){
-		if(this.options.browsers) this.shim.setStyle('display','none');
+		if(this.options.browsers) this.shim.hide();
 		return this;
 	},
 	show: function(){
 		if(!this.options.browsers) return this;
-		this.shim.setStyle('display','block');
+		this.shim.show();
 		return this.position();
 	},
 	dispose: function(){
@@ -210,390 +327,15 @@ window.addEvent('load', function(){
 
 
 /*
-Script: Date.js
-	Extends the Date native object to include methods useful in managing dates.
-
-License:
-	http://clientside.cnet.com/wiki/cnet-libraries#license
-*/
-
-new Native({name: 'Date', initialize: Date, protect: true});
-['now','parse','UTC'].each(function(method){
-	Native.genericize(Date, method, true);
-});
-Date.$Methods = new Hash();
-["Date", "Day", "FullYear", "Hours", "Milliseconds", "Minutes", "Month", "Seconds", "Time", "TimezoneOffset", 
-	"Week", "Timezone", "GMTOffset", "DayOfYear", "LastMonth", "UTCDate", "UTCDay", "UTCFullYear",
-	"AMPM", "UTCHours", "UTCMilliseconds", "UTCMinutes", "UTCMonth", "UTCSeconds"].each(function(method) {
-	Date.$Methods.set(method.toLowerCase(), method);
-});
-$each({
-	ms: "Milliseconds",
-	year: "FullYear",
-	min: "Minutes",
-	mo: "Month",
-	sec: "Seconds",
-	hr: "Hours"
-}, function(value, key){
-	Date.$Methods.set(key, value);
-});
-
-
-Date.implement({
-	set: function(key, value) {
-		key = key.toLowerCase();
-		var m = Date.$Methods;
-		if (m.has(key)) this['set'+m.get(key)](value);
-		return this;
-	},
-	get: function(key) {
-		key = key.toLowerCase();
-		var m = Date.$Methods;
-		if (m.has(key)) return this['get'+m.get(key)]();
-		return null;
-	},
-	clone: function() {
-		return new Date(this.get('time'));
-	},
-	increment: function(interval, times) {
-		return this.multiply(interval, times);
-	},
-	decrement: function(interval, times) {
-		return this.multiply(interval, times, false);
-	},
-	multiply: function(interval, times, increment){
-		interval = interval || 'day';
-		times = $pick(times, 1);
-		increment = $pick(increment, true);
-		var multiplier = increment?1:-1;
-		var month = this.format("%m").toInt()-1;
-		var year = this.format("%Y").toInt();
-		var time = this.get('time');
-		var offset = 0;
-		switch (interval) {
-				case 'year':
-					times.times(function(val) {
-						if (Date.isLeapYear(year+val) && month > 1 && multiplier > 0) val++;
-						if (Date.isLeapYear(year+val) && month <= 1 && multiplier < 0) val--;
-						offset += Date.$units.year(year+val);
-					});
-					break;
-				case 'month':
-					times.times(function(val){
-						if (multiplier < 0) val++;
-						var mo = month+(val*multiplier);
-						var year = year;
-						if (mo < 0) {
-							year--;
-							mo = 12+mo;
-						}
-						if (mo > 11 || mo < 0) {
-							year += (mo/12).toInt()*multiplier;
-							mo = mo%12;
-						}
-						offset += Date.$units.month(mo, year);
-					});
-					break;
-				case 'day':
-					return this.set('date', this.get('date')+(multiplier*times));
-				default:
-					offset = Date.$units[interval]()*times;
-					break;
-		}
-		this.set('time', time+(offset*multiplier));
-		return this;
-	},
-	isLeapYear: function() {
-		return Date.isLeapYear(this.get('year'));
-	},
-	clearTime: function() {
-		['hr', 'min', 'sec', 'ms'].each(function(t){
-			this.set(t, 0);
-		}, this);
-		return this;
-	},
-	diff: function(d, resolution) {
-		resolution = resolution || 'day';
-		if($type(d) == 'string') d = Date.parse(d);
-		switch (resolution) {
-			case 'year':
-				return d.format("%Y").toInt() - this.format("%Y").toInt();
-				break;
-			case 'month':
-				var months = (d.format("%Y").toInt() - this.format("%Y").toInt())*12;
-				return months + d.format("%m").toInt() - this.format("%m").toInt();
-				break;
-			default:
-				var diff = d.get('time') - this.get('time');
-				if (diff < 0 && Date.$units[resolution]() > (-1*(diff))) return 0;
-				else if (diff >= 0 && diff < Date.$units[resolution]()) return 0;
-				return ((d.get('time') - this.get('time')) / Date.$units[resolution]()).round();
-		}
-	},
-	getWeek: function() {
-		var day = (new Date(this.get('year'), 0, 1)).get('date');
-		return Math.round((this.get('dayofyear') + (day > 3 ? day - 4 : day + 3)) / 7);
-	},
-	getTimezone: function() {
-		return this.toString()
-			.replace(/^.*? ([A-Z]{3}).[0-9]{4}.*$/, '$1')
-			.replace(/^.*?\(([A-Z])[a-z]+ ([A-Z])[a-z]+ ([A-Z])[a-z]+\)$/, '$1$2$3');
-	},
-	getGMTOffset: function() {
-		var off = this.get('timezoneOffset');
-		return ((off > 0) ? '-' : '+')
-			+ Math.floor(Math.abs(off) / 60).zeroise(2)
-			+ (off % 60).zeroise(2);
-	},
-	parse: function(str) {
-		this.set('time', Date.parse(str));
-		return this;
-	},
-	format: function(f) {
-		f = f || "%x %X";
-		if (!this.valueOf()) return 'invalid date';
-		//replace short-hand with actual format
-		if (Date.$formats[f.toLowerCase()]) f = Date.$formats[f.toLowerCase()];
-		var d = this;
-		return f.replace(/\%([aAbBcdHIjmMpSUWwxXyYTZ])/g,
-			function($1, $2) {
-				switch ($2) {
-					case 'a': return Date.$days[d.get('day')].substr(0, 3);
-					case 'A': return Date.$days[d.get('day')];
-					case 'b': return Date.$months[d.get('month')].substr(0, 3);
-					case 'B': return Date.$months[d.get('month')];
-					case 'c': return d.toString();
-					case 'd': return d.get('date').zeroise(2);
-					case 'H': return d.get('hr').zeroise(2);
-					case 'I': return ((d.get('hr') % 12) || 12);
-					case 'j': return d.get('dayofyear').zeroise(3);
-					case 'm': return (d.get('mo') + 1).zeroise(2);
-					case 'M': return d.get('min').zeroise(2);
-					case 'p': return d.get('hr') < 12 ? 'AM' : 'PM';
-					case 'S': return d.get('seconds').zeroise(2);
-					case 'U': return d.get('week').zeroise(2);
-					case 'W': throw new Error('%W is not supported yet');
-					case 'w': return d.get('day');
-					case 'x': 
-						var c = Date.$cultures[Date.$culture];
-						//return d.format("%{0}{3}%{1}{3}%{2}".substitute(c.map(function(s){return s.substr(0,1)}))); //grr!
-						return d.format('%' + c[0].substr(0,1) +
-							c[3] + '%' + c[1].substr(0,1) +
-							c[3] + '%' + c[2].substr(0,1).toUpperCase());
-					case 'X': return d.format('%I:%M%p');
-					case 'y': return d.get('year').toString().substr(2);
-					case 'Y': return d.get('year');
-					case 'T': return d.get('GMTOffset');
-					case 'Z': return d.get('Timezone');
-					case '%': return '%';
-				}
-				return $2;
-			}
-		);
-	},
-	setAMPM: function(ampm){
-		ampm = ampm.toUpperCase();
-		if (this.format("%H").toInt() > 11 && ampm == "AM") 
-			return this.decrement('hour', 12);
-		else if (this.format("%H").toInt() < 12 && ampm == "PM")
-			return this.increment('hour', 12);
-		return this;
-	}
-});
-
-Date.prototype.compare = Date.prototype.diff;
-Date.prototype.strftime = Date.prototype.format;
-
-Date.$nativeParse = Date.parse;
-
-$extend(Date, {
-	$months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-	$days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-	$daysInMonth: function(monthIndex, year) {
-		if (Date.isLeapYear(year.toInt()) && monthIndex === 1) return 29;
-		return [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][monthIndex];
-	},
-	$epoch: -1,
-	$era: -2,
-	$units: {
-		ms: function(){return 1},
-		second: function(){return 1000},
-		minute: function(){return 60000},
-		hour: function(){return 3600000},
-		day: function(){return 86400000},
-		week: function(){return 608400000},
-		month: function(monthIndex, year) {
-			var d = new Date();
-			return Date.$daysInMonth($pick(monthIndex,d.format("%m").toInt()), $pick(year,d.format("%Y").toInt())) * 86400000;
-		},
-		year: function(year){
-			year = year || new Date().format("%Y").toInt();
-			return Date.isLeapYear(year.toInt())?31622400000:31536000000;
-		}
-	},
-	$formats: {
-		db: '%Y-%m-%d %H:%M:%S',
-		compact: '%Y%m%dT%H%M%S',
-		iso8601: '%Y-%m-%dT%H:%M:%S%T',
-		rfc822: '%a, %d %b %Y %H:%M:%S %Z',
-		'short': '%d %b %H:%M',
-		'long': '%B %d, %Y %H:%M'
-	},
-	
-	isLeapYear: function(yr) {
-		return new Date(yr,1,29).getDate()==29;
-	},
-
-	parseUTC: function(value){
-		var localDate = new Date(value);
-		var utcSeconds = Date.UTC(localDate.get('year'), localDate.get('mo'),
-		localDate.get('date'), localDate.get('hr'), localDate.get('min'), localDate.get('sec'));
-		return new Date(utcSeconds);
-	},
-	
-	parse: function(from) {
-		var type = $type(from);
-		if (type == 'number') return new Date(from);
-		if (type != 'string') return from;
-		if (!from.length) return null;
-		for (var i = 0, j = Date.$parsePatterns.length; i < j; i++) {
-			var r = Date.$parsePatterns[i].re.exec(from);
-			if (r) {
-				try {
-					return Date.$parsePatterns[i].handler(r);
-				} catch(e) {
-					dbug.log('date parse error: ', e);
-					return null;
-				}
-			}
-		}
-		return new Date(Date.$nativeParse(from));
-	},
-
-	parseMonth: function(month, num) {
-		var ret = -1;
-		switch ($type(month)) {
-			case 'object':
-				ret = Date.$months[month.get('mo')];
-				break;
-			case 'number':
-				ret = Date.$months[month - 1] || false;
-				if (!ret) throw new Error('Invalid month index value must be between 1 and 12:' + index);
-				break;
-			case 'string':
-				var match = Date.$months.filter(function(name) {
-					return this.test(name);
-				}, new RegExp('^' + month, 'i'));
-				if (!match.length) throw new Error('Invalid month string');
-				if (match.length > 1) throw new Error('Ambiguous month');
-				ret = match[0];
-		}
-		return (num) ? Date.$months.indexOf(ret) : ret;
-	},
-
-	parseDay: function(day, num) {
-		var ret = -1;
-		switch ($type(day)) {
-			case 'number':
-				ret = Date.$days[day - 1] || false;
-				if (!ret) throw new Error('Invalid day index value must be between 1 and 7');
-				break;
-			case 'string':
-				var match = Date.$days.filter(function(name) {
-					return this.test(name);
-				}, new RegExp('^' + day, 'i'));
-				if (!match.length) throw new Error('Invalid day string');
-				if (match.length > 1) throw new Error('Ambiguous day');
-				ret = match[0];
-		}
-		return (num) ? Date.$days.indexOf(ret) : ret;
-	},
-	
-	fixY2K: function(d){
-		if (!isNaN(d)) {
-			var newDate = new Date(d);
-			if (newDate.get('year') < 2000 && d.toString().indexOf(newDate.get('year')) < 0) {
-				newDate.increment('year', 100);
-			}
-			return newDate;
-		} else return d;
-	},
-
-	$cultures: {
-		'US': ['month', 'date', 'year', '/'],
-		'GB': ['date', 'month', 'year', '/']
-	},
-
-	$culture: 'US',
-	
-	$language: 'enUS',
-	
-	$cIndex: function(unit){
-		return Date.$cultures[Date.$culture].indexOf(unit)+1;
-	},
-
-	$parsePatterns: [
-		{
-			//"12.31.08", "12-31-08", "12/31/08", "12.31.2008", "12-31-2008", "12/31/2008"
-			re: /^(\d{1,2})[\.\-\/](\d{1,2})[\.\-\/](\d{2,4})$/,
-			handler: function(bits){
-				var d = new Date();
-				var culture = Date.$cultures[Date.$culture];
-				d.set('year', bits[Date.$cIndex('year')]);
-				d.set('month', bits[Date.$cIndex('month')] - 1);
-				d.set('date', bits[Date.$cIndex('date')]);
-				return Date.fixY2K(d);
-			}
-		},
-		//"12.31.08", "12-31-08", "12/31/08", "12.31.2008", "12-31-2008", "12/31/2008"
-		//above plus "10:45pm" ex: 12.31.08 10:45pm
-		{
-			re: /^(\d{1,2})[\.\-\/](\d{1,2})[\.\-\/](\d{2,4})\s(\d{1,2}):(\d{1,2})(\w{2})$/,
-			handler: function(bits){
-				var d = new Date();
-				d.set('year', bits[Date.$cIndex('year')]);
-				d.set('month', bits[Date.$cIndex('month')] - 1);
-				d.set('date', bits[Date.$cIndex('date')]);
-				d.set('hr', bits[4]);
-				d.set('min', bits[5]);
-				d.set('ampm', bits[6]);
-				return Date.fixY2K(d);
-			}
-		}
-	]
-});
-
-Number.implement({
-	zeroise: function(length) {
-		return String(this).zeroise(length);
-	}
-});
-
-String.implement({
-	repeat: function(times) {
-		var ret = [];
-		for (var i = 0; i < times; i++) ret.push(this);
-		return ret.join('');
-	},
-	zeroise: function(length) {
-		return '0'.repeat(length - this.length) + this;
-	}
-
-});
-
-
-/*
 Script: Element.Forms.js
 	Extends the Element native object to include methods useful in managing inputs.
 
 License:
-	http://clientside.cnet.com/wiki/cnet-libraries#license
+	http://www.clientcide.com/wiki/cnet-libraries#license
 */
 Element.implement({
 	tidy: function(){
-		try {	
-			this.set('value', this.get('value').tidy());
-		}catch(e){dbug.log('element.tidy error: %o', e);}
+		this.set('value', this.get('value').tidy());
 	},
 	getTextInRange: function(start, end) {
 		return this.get('value').substring(start, end);
@@ -602,23 +344,21 @@ Element.implement({
 		if(Browser.Engine.trident) return document.selection.createRange().text;
 		return this.get('value').substring(this.getSelectionStart(), this.getSelectionEnd());
 	},
+	getIERanges: function(){
+		this.focus();
+		var range = document.selection.createRange();
+		var re = this.createTextRange();
+		var dupe = re.duplicate();
+		re.moveToBookmark(range.getBookmark());
+		dupe.setEndPoint('EndToStart', re);
+		return { start: dupe.text.length, end: dupe.text.length + range.text.length, length: range.text.length, text: range.text };
+	},
 	getSelectionStart: function() {
-		if(Browser.Engine.trident) {
-			var offset = (Browser.Engine.trident4)?3:2;
-			this.focus();
-			var range = document.selection.createRange();
-			if (range.compareEndPoints("StartToEnd", range) != 0) range.collapse(true);
-			return range.getBookmark().charCodeAt(2) - offset;
-		}
+		if(Browser.Engine.trident) return this.getIERanges().start;
 		return this.selectionStart;
 	},
 	getSelectionEnd: function() {
-		if(Browser.Engine.trident) {
-			var offset = (Browser.Engine.trident4)?3:2;
-			var range = document.selection.createRange();
-			if (range.compareEndPoints("StartToEnd", range) != 0) range.collapse(false);
-			return range.getBookmark().charCodeAt(2) - offset;
-		}
+		if(Browser.Engine.trident) return this.getIERanges().end;
 		return this.selectionEnd;
 	},
 	getSelectedRange: function() {
@@ -763,10 +503,18 @@ Script: Element.Measure.js
 	Extends the Element native object to include methods useful in measuring dimensions.
 
 License:
-	http://clientside.cnet.com/wiki/cnet-libraries#license
+	http://www.clientcide.com/wiki/cnet-libraries#license
 */
 
 Element.implement({
+
+	// Daniel Steigerwald - MIT licence
+	measure: function(fn) {
+		var restore = this.expose();
+		var result = fn.apply(this);
+		restore();
+		return result;
+	},
 
 	expose: function(){
 		if (this.getStyle('display') != 'none') return $empty;
@@ -865,12 +613,115 @@ Element.implement({
 
 
 /*
+Script: Element.Pin.js
+	Extends the Element native object to include the pin method useful for fixed positioning for elements.
+
+License:
+	http://www.clientcide.com/wiki/cnet-libraries#license
+*/
+
+window.addEvent('domready', function(){
+	var test = new Element('div').setStyles({
+		position: 'fixed',
+		top: 0,
+		right: 0
+	}).inject(document.body);
+	var supported = (test.offsetTop === 0);
+	test.dispose();
+	Browser.supportsPositionFixed = supported;
+});
+
+Element.implement({
+	pin: function(enable){
+		if(!Browser.loaded) dbug.log('cannot pin ' + this + ' natively because the dom is not ready');
+		if (this.getStyle('display') == 'none') {
+			dbug.log('cannot pin ' + this + ' because it is hidden');
+			return;
+		}
+		if(enable!==false) {
+			var p = this.getPosition();
+			if(!this.retrieve('pinned')) {
+				var pos = {
+					top: (p.y - window.getScroll().y),
+					left: (p.x - window.getScroll().x)
+				};
+				if(Browser.supportsPositionFixed) {
+					this.setStyle('position','fixed').setStyles(pos);
+				} else {
+					this.store('pinnedByJS', true);
+					this.setStyles({
+						position: 'absolute',
+						top: p.y,
+						left: p.x
+					});
+					this.store('scrollFixer', function(){
+						if(this.retrieve('pinned')) {
+							var to = {
+								top: (pos.top.toInt() + window.getScroll().y),
+								left: (pos.left.toInt() + window.getScroll().x)
+							};
+							this.setStyles(to);
+						}
+					}.bind(this));
+					window.addEvent('scroll', this.retrieve('scrollFixer'));
+				}
+				this.store('pinned', true);
+			}
+		} else {
+			var op;
+			if (!Browser.Engine.trident) {
+				if (this.getParent().getComputedStyle('position') != 'static') op = this.getParent();
+				else op = this.getParent().getOffsetParent();
+			}
+			var p = this.getPosition(op);
+			this.store('pinned', false);
+			var reposition;
+			if (Browser.supportsPositionFixed && !this.retrieve('pinnedByJS')) {
+				reposition = {
+					top: (p.y + window.getScroll().y),
+					left: (p.x + window.getScroll().x)
+				};
+			} else {
+				this.store('pinnedByJS', false);
+				window.removeEvent('scroll', this.retrieve('scrollFixer'));
+				reposition = {
+					top: (p.y),
+					left: (p.x)
+				};
+			}
+			this.setStyles($merge(reposition, {position: 'absolute'}));
+		}
+		return this.addClass('isPinned');
+	},
+	unpin: function(){
+		return this.pin(false).removeClass('isPinned');
+	},
+	togglepin: function(){
+		this.pin(!this.retrieve('pinned'));
+	}
+});
+
+
+/*
 Script: Element.Position.js
 	Extends the Element native object to include methods useful positioning elements relative to others.
 
 License:
-	http://clientside.cnet.com/wiki/cnet-libraries#license
+	http://www.clientcide.com/wiki/cnet-libraries#license
 */
+
+Element.Properties.position = {
+
+	set: function(options){
+		this.setPosition(options);
+	},
+
+	get: function(options){
+		if (options) this.setPosition(options);
+		return this.getPosition();
+	}
+
+};
 
 Element.implement({
 
@@ -883,66 +734,72 @@ Element.implement({
 				y: 'center' //top, center, bottom
 			},
 			edge: false,
-			offset: {x:0,y:0},
+			offset: {x: 0, y: 0},
 			returnPos: false,
 			relFixedPosition: false,
-			ignoreMargins: false
+			ignoreMargins: false,
+			allowNegative: false
 		}, options);
 		//compute the offset of the parent positioned element if this element is in one
 		var parentOffset = {x: 0, y: 0};
 		var parentPositioned = false;
-		var putItBack = this.expose();
-    /* dollar around getOffsetParent should not be necessary, but as it does not return 
-     * a mootools extended element in IE, an error occurs on the call to expose. See:
+		/* dollar around getOffsetParent should not be necessary, but as it does not return
+		 * a mootools extended element in IE, an error occurs on the call to expose. See:
 		 * http://mootools.lighthouseapp.com/projects/2706/tickets/333-element-getoffsetparent-inconsistency-between-ie-and-other-browsers */
-		var offsetParent = $(this.getOffsetParent());
-		putItBack();
-		if(offsetParent && offsetParent != this.getDocument().body) {
-			var putItBack = offsetParent.expose();
-			parentOffset = offsetParent.getPosition();
-			putItBack();
+		var offsetParent = this.measure(function(){
+			return $(this.getOffsetParent());
+		});
+		if (offsetParent && offsetParent != this.getDocument().body){
+			parentOffset = offsetParent.measure(function(){
+				return this.getPosition();
+			});
 			parentPositioned = true;
 			options.offset.x = options.offset.x - parentOffset.x;
 			options.offset.y = options.offset.y - parentOffset.y;
 		}
 		//upperRight, bottomRight, centerRight, upperLeft, bottomLeft, centerLeft
 		//topRight, topLeft, centerTop, centerBottom, center
-		function fixValue(option) {
-			if($type(option) != "string") return option;
+		var fixValue = function(option){
+			if ($type(option) != "string") return option;
 			option = option.toLowerCase();
 			var val = {};
-			if(option.test('left')) val.x = 'left';
-			else if(option.test('right')) val.x = 'right';
+			if (option.test('left')) val.x = 'left';
+			else if (option.test('right')) val.x = 'right';
 			else val.x = 'center';
-
-			if(option.test('upper')||option.test('top')) val.y = 'top';
+			if (option.test('upper') || option.test('top')) val.y = 'top';
 			else if (option.test('bottom')) val.y = 'bottom';
 			else val.y = 'center';
 			return val;
 		};
 		options.edge = fixValue(options.edge);
 		options.position = fixValue(options.position);
-		if(!options.edge) {
-			if(options.position.x == 'center' && options.position.y == 'center') options.edge = {x:'center',y:'center'};
-			else options.edge = {x:'left',y:'top'};
+		if (!options.edge){
+			if (options.position.x == 'center' && options.position.y == 'center') options.edge = {x:'center', y:'center'};
+			else options.edge = {x:'left', y:'top'};
 		}
-		
+
 		this.setStyle('position', 'absolute');
 		var rel = $(options.relativeTo) || document.body;
-		var top = (rel == document.body)?window.getScroll().y:rel.getPosition().y;
-		var left = (rel == document.body)?window.getScroll().x:rel.getPosition().x;
-		
-		if (top < 0) top = 0;
-		if (left < 0) left = 0;
+		var calc = rel == document.body ? window.getScroll() : rel.getPosition();
+		var top = calc.y;
+		var left = calc.x;
+
+		if (Browser.Engine.trident){
+			var scrolls = rel.getScrolls();
+			top += scrolls.y;
+			left += scrolls.x;
+		}
+
 		var dim = this.getDimensions({computeSize: true, styles:['padding', 'border','margin']});
-		if (options.ignoreMargins) {
+		if (options.ignoreMargins){
 			options.offset.x = options.offset.x - dim['margin-left'];
 			options.offset.y = options.offset.y - dim['margin-top'];
 		}
 		var pos = {};
-		var prefY = options.offset.y.toInt();
-		var prefX = options.offset.x.toInt();
-		switch(options.position.x) {
+		var prefY = options.offset.y;
+		var prefX = options.offset.x;
+		var winSize = window.getSize();
+		switch(options.position.x){
 			case 'left':
 				pos.x = left + prefX;
 				break;
@@ -950,10 +807,10 @@ Element.implement({
 				pos.x = left + prefX + rel.offsetWidth;
 				break;
 			default: //center
-				pos.x = left + (((rel == document.body)?window.getSize().x:rel.offsetWidth)/2) + prefX;
+				pos.x = left + ((rel == document.body ? winSize.x : rel.offsetWidth)/2) + prefX;
 				break;
 		};
-		switch(options.position.y) {
+		switch(options.position.y){
 			case 'top':
 				pos.y = top + prefY;
 				break;
@@ -961,14 +818,14 @@ Element.implement({
 				pos.y = top + prefY + rel.offsetHeight;
 				break;
 			default: //center
-				pos.y = top + (((rel == document.body)?window.getSize().y:rel.offsetHeight)/2) + prefY;
+				pos.y = top + ((rel == document.body ? winSize.y : rel.offsetHeight)/2) + prefY;
 				break;
 		};
-		
-		if(options.edge){
+
+		if (options.edge){
 			var edgeOffset = {};
-			
-			switch(options.edge.x) {
+
+			switch(options.edge.x){
 				case 'left':
 					edgeOffset.x = 0;
 					break;
@@ -979,7 +836,7 @@ Element.implement({
 					edgeOffset.x = -(dim.x/2);
 					break;
 			};
-			switch(options.edge.y) {
+			switch(options.edge.y){
 				case 'top':
 					edgeOffset.y = 0;
 					break;
@@ -990,22 +847,24 @@ Element.implement({
 					edgeOffset.y = -(dim.y/2);
 					break;
 			};
-			pos.x = pos.x+edgeOffset.x;
-			pos.y = pos.y+edgeOffset.y;
+			pos.x = pos.x + edgeOffset.x;
+			pos.y = pos.y + edgeOffset.y;
 		}
 		pos = {
-			left: ((pos.x >= 0 || parentPositioned)?pos.x:0).toInt(),
-			top: ((pos.y >= 0 || parentPositioned)?pos.y:0).toInt()
+			left: ((pos.x >= 0 || parentPositioned || options.allowNegative) ? pos.x : 0).toInt(),
+			top: ((pos.y >= 0 || parentPositioned || options.allowNegative) ? pos.y : 0).toInt()
 		};
-		if(rel.getStyle('position') == "fixed"||options.relFixedPosition) {
-			pos.top = pos.top.toInt() + window.getScroll().y;
-			pos.left = pos.left.toInt() + window.getScroll().x;
+		if (rel.getStyle('position') == "fixed" || options.relFixedPosition){
+			var winScroll = window.getScroll();
+			pos.top = pos.top.toInt() + winScroll.y;
+			pos.left = pos.left.toInt() + winScroll.x;
 		}
 
-		if(options.returnPos) return pos;
+		if (options.returnPos) return pos;
 		else this.setStyles(pos);
 		return this;
 	}
+
 });
 
 
@@ -1014,7 +873,7 @@ Script: Element.Shortcuts.js
 	Extends the Element native object to include some shortcut methods.
 
 License:
-	http://clientside.cnet.com/wiki/cnet-libraries#license
+	http://www.clientcide.com/wiki/cnet-libraries#license
 */
 
 Element.implement({
@@ -1047,625 +906,346 @@ Element.implement({
 	//it is temporary, as Mootools 1.1 will negate its requirement
 	fxOpacityOk: function(){
 		return !Browser.Engine.trident4;
+	} 
+});
+
+
+//returns a collection given an id or a selector
+$G = function(elements) {
+	return $splat($(elements)||$$(elements));
+};
+
+/*
+Script: modalizer.js
+	Defines Modalizer: functionality to overlay the window contents with a semi-transparent layer that prevents interaction with page content until it is removed
+
+License:
+	http://www.clientcide.com/wiki/cnet-libraries#license
+*/
+var Modalizer = new Class({
+	defaultModalStyle: {
+		display:'block',
+		position:'fixed',
+		top:0,
+		left:0,	
+		'z-index':5000,
+		'background-color':'#333',
+		opacity:0.8
+	},
+	setModalOptions: function(options){
+		this.modalOptions = $merge({
+			width:(window.getScrollSize().x),
+			height:(window.getScrollSize().y),
+			elementsToHide: 'select, embed, object',
+			hideOnClick: true,
+			modalStyle: {},
+			updateOnResize: true,
+			layerId: 'modalOverlay',
+			onModalHide: $empty,
+			onModalShow: $empty
+		}, this.modalOptions, options);
+		return this;
+	},
+	layer: function(){
+		if (!this.modalOptions.layerId) this.setModalOptions();
+		return $(this.modalOptions.layerId) || new Element('div', {id: this.modalOptions.layerId}).inject(document.body);
+	},
+	resize: function(){
+		if (this.layer()) {
+			this.layer().setStyles({
+				width:(window.getScrollSize().x),
+				height:(window.getScrollSize().y)
+			});
+		}
+	},
+	setModalStyle: function (styleObject){
+		this.modalOptions.modalStyle = styleObject;
+		this.modalStyle = $merge(this.defaultModalStyle, {
+			width:this.modalOptions.width,
+			height:this.modalOptions.height
+		}, styleObject);
+		if (this.layer()) this.layer().setStyles(this.modalStyle);
+		return(this.modalStyle);
+	},
+	modalShow: function(options){
+		this.setModalOptions(options);
+		this.layer().setStyles(this.setModalStyle(this.modalOptions.modalStyle));
+		if (Browser.Engine.trident4) this.layer().setStyle('position','absolute');
+		this.layer().removeEvents('click').addEvent('click', function(){
+			this.modalHide(this.modalOptions.hideOnClick);
+		}.bind(this));
+		this.bound = this.bound||{};
+		if (!this.bound.resize && this.modalOptions.updateOnResize) {
+			this.bound.resize = this.resize.bind(this);
+			window.addEvent('resize', this.bound.resize);
+		}
+		if ($type(this.modalOptions.onModalShow)  == "function") this.modalOptions.onModalShow();
+		this.togglePopThroughElements(0);
+		this.layer().setStyle('display','block');
+		return this;
+	},
+	modalHide: function(override, force){
+		if (override === false) return false; //this is internal, you don't need to pass in an argument
+		this.togglePopThroughElements(1);
+		if ($type(this.modalOptions.onModalHide) == "function") this.modalOptions.onModalHide();
+		this.layer().setStyle('display','none');
+		if (this.modalOptions.updateOnResize) {
+			this.bound = this.bound||{};
+			if (!this.bound.resize) this.bound.resize = this.resize.bind(this);
+			window.removeEvent('resize', this.bound.resize);
+		}
+		return this;
+	},
+	togglePopThroughElements: function(opacity){
+		if (Browser.Engine.trident4 || (Browser.Engine.gecko && Browser.Platform.mac)) {
+			$$(this.modalOptions.elementsToHide).each(function(sel){
+				sel.setStyle('opacity', opacity);
+			});
+		}
 	}
 });
 
 /*
-Script: FormValidator.js
-	A css-class based form validation system.
+Script: StyleWriter.js
+
+Provides a simple method for injecting a css style element into the DOM if it's not already present.
 
 License:
-	http://clientside.cnet.com/wiki/cnet-libraries#license
+	http://www.clientcide.com/wiki/cnet-libraries#license
 */
-var InputValidator = new Class({
-	Implements: [Options],
-	initialize: function(className, options){
-		this.setOptions({
-			errorMsg: 'Validation failed.',
-			test: function(field){return true}
-		}, options);
-		this.className = className;
-	},
-	test: function(field){
-		if($(field)) return this.options.test($(field), this.getProps(field));
-		else return false;
-	},
-	getError: function(field){
-		var err = this.options.errorMsg;
-		if($type(err) == "function") err = err($(field), this.getProps(field));
-		return err;
-	},
-	getProps: function(field){
-		if($(field) && $(field).get('validatorProps')){
+
+var StyleWriter = new Class({
+	createStyle: function(css, id) {
+		window.addEvent('domready', function(){
 			try {
-				return JSON.decode($(field).get('validatorProps'));
-			}catch(e){ return {}}
-		} else {
-			return {}
-		}
+				if($(id) && id) return;
+				var style = new Element('style', {id: id||''}).inject($$('head')[0]);
+				if (Browser.Engine.trident) style.styleSheet.cssText = css;
+				else style.set('text', css);
+			}catch(e){dbug.log('error: %s',e);}
+		}.bind(this));
 	}
 });
 
-var FormValidator = new Class({
-	Implements:[Options, Events],
+/*
+Script: StickyWin.js
+
+Creates a div within the page with the specified contents at the location relative to the element you specify; basically an in-page popup maker.
+
+License:
+	http://www.clientcide.com/wiki/cnet-libraries#license
+*/
+
+var StickyWin = new Class({
+	Implements: [Options, Events, StyleWriter, ToElement],
 	options: {
-		fieldSelectors:"input, select, textarea",
-		ignoreHidden: true,
-		useTitles:false,
-		evaluateOnSubmit:true,
-		evaluateFieldsOnBlur: true,
-		evaluateFieldsOnChange: true,
-		serial: true,
-		warningPrefix: function(){
-			return FormValidator.resources[FormValidator.language].warningPrefix || 'Warning: ';
-		},
-		errorPrefix: function(){
-			return FormValidator.resources[FormValidator.language].errorPrefix || 'Error: ';
+//		onDisplay: $empty,
+//		onClose: $empty,
+		closeClassName: 'closeSticky',
+		pinClassName: 'pinSticky',
+		content: '',
+		zIndex: 10000,
+		className: '',
+//		id: ... set above in initialize function
+/*  	these are the defaults for setPosition anyway
+		************************************************
+		edge: false, //see Element.setPosition
+		position: 'center', //center, corner == upperLeft, upperRight, bottomLeft, bottomRight
+		offset: {x:0,y:0},
+		relativeTo: document.body, */
+		width: false,
+		height: false,
+		timeout: -1,
+		allowMultipleByClass: false,
+		allowMultiple: true,
+		showNow: true,
+		useIframeShim: true,
+		iframeShimSelector: '',
+		inject: {
+			where: 'bottom' 
 		}
-//	onFormValidate: function(isValid, form){},
-//	onElementValidate: function(isValid, field){}
 	},
-	initialize: function(form, options){
+	css: '.SWclearfix:after {content: "."; display: block; height: 0; clear: both; visibility: hidden;}'+
+			 '.SWclearfix {display: inline-table;}'+
+			 '* html .SWclearfix {height: 1%;}'+
+			 '.SWclearfix {display: block;}',
+	initialize: function(options){
 		this.setOptions(options);
-		this.form = $(form);
-		this.form.store('validator', this);
-		this.warningPrefix = $lambda(this.options.warningPrefix)();
-		this.errorPrefix = $lambda(this.options.errorPrefix)();
+		this.options.inject.target = this.options.inject.target || document.body;
+		this.id = this.options.id || 'StickyWin_'+new Date().getTime();
+		this.makeWindow();
 
-		if(this.options.evaluateOnSubmit) this.form.addEvent('submit', this.onSubmit.bind(this));
-		if(this.options.evaluateFieldsOnBlur) this.watchFields();
+		if(this.options.content) this.setContent(this.options.content);
+		if(this.options.timeout > 0) {
+			this.addEvent('onDisplay', function(){
+				this.hide.delay(this.options.timeout, this)
+			}.bind(this));
+		}
+		if(this.options.showNow) this.show();
+		//add css for clearfix
+		this.createStyle(this.css, 'StickyWinClearFix');
 	},
-	toElement: function(){
-		return this.form;
+	makeWindow: function(){
+		this.destroyOthers();
+		if(!$(this.id)) {
+			this.win = new Element('div', {
+				id:		this.id
+			}).addClass(this.options.className).addClass('StickyWinInstance').addClass('SWclearfix').setStyles({
+			 	display:'none',
+				position:'absolute',
+				zIndex:this.options.zIndex
+			}).inject(this.options.inject.target, this.options.inject.where).store('StickyWin', this);			
+		} else this.win = $(this.id);
+		this.element = this.win;
+		if(this.options.width && $type(this.options.width.toInt())=="number") this.win.setStyle('width', this.options.width.toInt());
+		if(this.options.height && $type(this.options.height.toInt())=="number") this.win.setStyle('height', this.options.height.toInt());
+		return this;
 	},
-	getFields: function(){
-		return this.fields = this.form.getElements(this.options.fieldSelectors);
+	show: function(suppressEvent){
+		this.showWin();
+		if (!suppressEvent) this.fireEvent('onDisplay');
+		if(this.options.useIframeShim) this.showIframeShim();
+		this.visible = true;
+		return this;
 	},
-	watchFields: function(){
-		this.getFields().each(function(el){
-				el.addEvent('blur', this.validateField.pass([el, false], this));
-			if(this.options.evaluateFieldsOnChange)
-				el.addEvent('change', this.validateField.pass([el, true], this));
+	showWin: function(){
+		if(!this.positioned) this.position();
+		this.win.show();
+	},
+	hide: function(suppressEvent){
+		if(!suppressEvent) this.fireEvent('onClose');
+		this.hideWin();
+		if(this.options.useIframeShim) this.hideIframeShim();
+		this.visible = false;
+		return this;
+	},
+	hideWin: function(){
+		this.win.setStyle('display','none');
+	},
+	destroyOthers: function() {
+		if(!this.options.allowMultipleByClass || !this.options.allowMultiple) {
+			$$('div.StickyWinInstance').each(function(sw) {
+				if(!this.options.allowMultiple || (!this.options.allowMultipleByClass && sw.hasClass(this.options.className))) 
+					sw.retrieve('StickyWin').destroy();
+			}, this);
+		}
+	},
+	setContent: function(html) {
+		if(this.win.getChildren().length>0) this.win.empty();
+		if($type(html) == "string") this.win.set('html', html);
+		else if ($(html)) this.win.adopt(html);
+		this.win.getElements('.'+this.options.closeClassName).each(function(el){
+			el.addEvent('click', this.hide.bind(this));
 		}, this);
-	},
-	onSubmit: function(event){
-		if(!this.validate(event) && event) event.preventDefault();
-		else this.reset();
-	},
-	reset: function() {
-		this.getFields().each(this.resetField, this);
-		return this;
-	}, 
-	validate: function(event) {
-		var result = this.getFields().map(function(field) { 
-			return this.validateField(field, true);
-		}, this).every(function(v){ return v;});
-		this.fireEvent('onFormValidate', [result, this.form, event]);
-		return result;
-	},
-	validateField: function(field, force){
-		if(this.paused) return true;
-		field = $(field);
-		var passed = !field.hasClass('validation-failed');
-		var failed, warned;
-		if (this.options.serial && !force) {
-			failed = this.form.getElement('.validation-failed');
-			warned = this.form.getElement('.warning');
-		}
-		if(field && (!failed || force || field.hasClass('validation-failed') || (failed && !this.options.serial))){
-			var validators = field.className.split(" ").some(function(cn){
-				return this.getValidator(cn);
-			}, this);
-			var validatorsFailed = [];
-			field.className.split(" ").each(function(className){
-				if (!this.test(className,field)) validatorsFailed.include(className);
-			}, this);
-			passed = validatorsFailed.length === 0;
-			if (validators && !field.hasClass('warnOnly')){
-				if(passed) {
-					field.addClass('validation-passed').removeClass('validation-failed');
-					this.fireEvent('onElementPass', field);
-				} else {
-					field.addClass('validation-failed').removeClass('validation-passed');
-					this.fireEvent('onElementFail', [field, failed]);
-				}
-			}
-			if(!warned) {
-				var warnings = field.className.split(" ").some(function(cn){
-					if(cn.test('^warn-') || field.hasClass('warnOnly')) 
-						return this.getValidator(cn.replace(/^warn-/,""));
-					else return null;
-				}, this);
-				field.removeClass('warning');
-				var warnResult = field.className.split(" ").map(function(cn){
-					if(cn.test('^warn-') || field.hasClass('warnOnly')) 
-						return this.test(cn.replace(/^warn-/,""), field, true);
-					else return null;
-				}, this);
-			}
-		}
-		return passed;
-	},
-	getPropName: function(className){
-		return '__advice'+className;
-	},
-	test: function(className, field, warn){
-		field = $(field);
-		if(field.hasClass('ignoreValidation')) return true;
-		warn = $pick(warn, false);
-		if(field.hasClass('warnOnly')) warn = true;
-		var isValid = true;
-		if(field) {
-			var validator = this.getValidator(className);
-			if(validator && this.isVisible(field)) {
-				isValid = validator.test(field);
-				if(!isValid && validator.getError(field)){
-					if(warn) field.addClass('warning');
-					var advice = this.makeAdvice(className, field, validator.getError(field), warn);
-					this.insertAdvice(advice, field);
-					this.showAdvice(className, field);
-				} else this.hideAdvice(className, field);
-				this.fireEvent('onElementValidate', [isValid, field, className]);
-			}
-		}
-		if(warn) return true;
-		return isValid;
-	},
-	showAdvice: function(className, field){
-		var advice = this.getAdvice(className, field);
-		if(advice && !field[this.getPropName(className)] 
-			 && (advice.getStyle('display') == "none" 
-			 || advice.getStyle('visiblity') == "hidden" 
-			 || advice.getStyle('opacity')==0)){
-			field[this.getPropName(className)] = true;
-			if(advice.reveal) advice.reveal();
-			else advice.setStyle('display','block');
-		}
-	},
-	hideAdvice: function(className, field){
-		var advice = this.getAdvice(className, field);
-		if(advice && field[this.getPropName(className)]) {
-			field[this.getPropName(className)] = false;
-			//if element.cnet.js is present, transition the advice out
-			if(advice.dissolve) advice.dissolve();
-			else advice.setStyle('display','none');
-		}
-	},
-	isVisible : function(field) {
-		if (!this.options.ignoreHidden) return true;
-		while(field != document.body) {
-			if($(field).getStyle('display') == "none") return false;
-			field = field.getParent();
-		}
-		return true;
-	},
-	getAdvice: function(className, field) {
-		return field.retrieve('advice-'+className);
-	},
-	makeAdvice: function(className, field, error, warn){
-		var errorMsg = (warn)?this.warningPrefix:this.errorPrefix;
-				errorMsg += (this.options.useTitles) ? field.title || error:error;
-		var advice = this.getAdvice(className, field);
-		if(!advice){
-			var cssClass = (warn)?'warning-advice':'validation-advice';
-			advice = new Element('div', {
-				text: errorMsg,
-				styles: { display: 'none' },
-				id: 'advice-'+className+'-'+this.getFieldId(field)
-			}).addClass(cssClass);
-		} else{
-			advice.set('html', errorMsg);
-		}
-		field.store('advice-'+className, advice);
-		return advice;
-	},
-	insertAdvice: function(advice, field){
-		//Check for error position prop
-		var vProp = field.get('validatorProps');
-		if (vProp) {
-			var vp = JSON.decode(vProp);
-			var msgPos = vp.msgPos;
-		}
-		//Build advice
-		if (!msgPos) {
-			switch (field.type.toLowerCase()) {
-				case 'radio':
-					var p = field.getParent().adopt(advice);
-					break;
-				default: 
-					advice.inject($(field), 'after');
-			};
-		} else {
-			$(msgPos).grab(advice);
-		}
-	},
-	getFieldId : function(field) {
-		return field.id ? field.id : field.id = "input_"+field.name;
-	},
-	resetField: function(field) {
-		field = $(field);
-		if(field) {
-			var cn = field.className.split(" ");
-			cn.each(function(className) {
-				if(className.test('^warn-')) className = className.replace(/^warn-/,"");
-				var prop = this.getPropName(className);
-				if(field[prop]) this.hideAdvice(className, field);
-				field.removeClass('validation-failed');
-				field.removeClass('warning');
-				field.removeClass('validation-passed');
-			}, this);
-		}
-		return this;
-	},
-	stop: function(){
-		this.paused = true;
-		return this;
-	},
-	start: function(){
-		this.paused = false;
-		return this;
-	},
-	ignoreField: function(field, warn){
-		field = $(field);
-		if(field){
-			this.enforceField(field);
-			if(warn) field.addClass('warnOnly');
-			else field.addClass('ignoreValidation');
-		}
-		return this;
-	},
-	enforceField: function(field){
-		field = $(field);
-		if(field) field.removeClass('warnOnly').removeClass('ignoreValidation');
-		return this;
-	}
-});
-
-FormValidator.resources = {
-	enUS: {
-		required:'This field is required.',
-		minLength:'Please enter at least {minLength} characters (you entered {length} characters).',
-		maxLength:'Please enter no more than {maxLength} characters (you entered {length} characters).',
-		integer:'Please enter an integer in this field. Numbers with decimals (e.g. 1.25) are not permitted.',
-		numeric:'Please enter only numeric values in this field (i.e. "1" or "1.1" or "-1" or "-1.1").',
-		digits:'Please use numbers and punctuation only in this field (for example, a phone number with dashes or dots is permitted).',
-		alpha:'Please use letters only (a-z) with in this field. No spaces or other characters are allowed.',
-		alphanum:'Please use only letters (a-z) or numbers (0-9) only in this field. No spaces or other characters are allowed.',
-		dateSuchAs:'Please enter a valid date such as {date}',
-		dateInFormatMDY:'Please enter a valid date such as MM/DD/YYYY (i.e. "12/31/1999")',
-		email:'Please enter a valid email address. For example "fred@domain.com".',
-		url:'Please enter a valid URL such as http://www.google.com.',
-		currencyDollar:'Please enter a valid $ amount. For example $100.00 .',
-		oneRequired:'Please enter something for at least one of these inputs.',
-		errorPrefix: 'Error: ',
-		warningPrefix: 'Warning: '
-	}
-};
-FormValidator.language = "enUS";
-FormValidator.getMsg = function(key, language){
-	return FormValidator.resources[language||FormValidator.language][key];
-};
-
-FormValidator.adders = {
-	validators:{},
-	add : function(className, options) {
-		this.validators[className] = new InputValidator(className, options);
-		//if this is a class
-		//extend these validators into it
-		if(!this.initialize){
-			this.implement({
-				validators: this.validators
-			});
-		}
-	},
-	addAllThese : function(validators) {
-		$A(validators).each(function(validator) {
-			this.add(validator[0], validator[1]);
+		this.win.getElements('.'+this.options.pinClassName).each(function(el){
+			el.addEvent('click', this.togglepin.bind(this));
 		}, this);
+		return this;
+	},	
+	position: function(options){
+		this.positioned = true;
+		this.setOptions(options);
+		this.win.setPosition({
+			allowNegative: true,
+			relativeTo: this.options.relativeTo,
+			position: this.options.position,
+			offset: this.options.offset,
+			edge: this.options.edge
+		});
+		if(this.shim) this.shim.position();
+		return this;
 	},
-	getValidator: function(className){
-		return this.validators[className];
+	pin: function(pin) {
+		if(!this.win.pin) {
+			dbug.log('you must include element.pin.js!');
+			return this;
+		}
+		this.pinned = $pick(pin, true);
+		this.win.pin(pin);
+		return this;
+	},
+	unpin: function(){
+		return this.pin(false);
+	},
+	togglepin: function(){
+		return this.pin(!this.pinned);
+	},
+	makeIframeShim: function(){
+		if(!this.shim){
+			var el = (this.options.iframeShimSelector)?this.win.getElement(this.options.iframeShimSelector):this.win;
+			this.shim = new IframeShim(el, {
+				display: false,
+				name: 'StickyWinShim'
+			});
+		}
+	},
+	showIframeShim: function(){
+		if(this.options.useIframeShim) {
+			this.makeIframeShim();
+			this.shim.show();
+		}
+	},
+	hideIframeShim: function(){
+		if(this.shim) this.shim.hide();
+	},
+	destroy: function(){
+		if (this.win) this.win.dispose();
+		if(this.options.useIframeShim && this.shim) this.shim.dispose();
+		if($('modalOverlay'))$('modalOverlay').dispose();
+	}
+});
+
+
+/*
+Script: StickyWin.Modal.js
+
+This script extends StickyWin and StickyWin.Fx classes to add Modalizer functionality.
+
+License:
+	http://www.clientcide.com/wiki/cnet-libraries#license
+*/
+(function(){
+var modalWinBase = function(extend){
+	return {
+		Extends: extend,
+		initialize: function(options){
+			options = options||{};
+			this.setModalOptions($merge(options.modalOptions||{}, {
+				onModalHide: function(){
+						this.hide(false);
+					}.bind(this)
+				}));
+			this.parent(options);
+		},
+		show: function(showModal){
+			if($pick(showModal, true)) {
+				this.modalShow();
+				if (this.modalOptions.elementsToHide) this.win.getElements(this.modalOptions.elementsToHide).setStyle('opacity', 1);
+			}
+			this.parent();
+		},
+		hide: function(hideModal){
+			if($pick(hideModal, true)) this.modalHide();
+			else this.parent();
+		}
 	}
 };
-$extend(FormValidator, FormValidator.adders);
-FormValidator.implement(FormValidator.adders);
 
-FormValidator.add('IsEmpty', {
-	errorMsg: false,
-	test: function(element) { 
-		if(element.type == "select-one"||element.type == "select")
-			return !(element.selectedIndex >= 0 && element.options[element.selectedIndex].value != "");
-		else
-			return ((element.get('value') == null) || (element.get('value').length == 0));
-	}
-});
-
-FormValidator.addAllThese([
-	['required', {
-		errorMsg: function(){
-			return FormValidator.getMsg('required');
-		},
-		test: function(element) { 
-			return !FormValidator.getValidator('IsEmpty').test(element); 
-		}
-	}],
-	['minLength', {
-		errorMsg: function(element, props){
-			if($type(props.minLength))
-				return FormValidator.getMsg('minLength').substitute({minLength:props.minLength,length:element.get('value').length });
-			else return '';
-		}, 
-		test: function(element, props) {
-			if($type(props.minLength)) return (element.get('value').length >= $pick(props.minLength, 0));
-			else return true;
-		}
-	}],
-	['maxLength', {
-		errorMsg: function(element, props){
-			//props is {maxLength:10}
-			if($type(props.maxLength))
-				return FormValidator.getMsg('maxLength').substitute({maxLength:props.maxLength,length:element.get('value').length });
-			else return '';
-		}, 
-		test: function(element, props) {
-			//if the value is <= than the maxLength value, element passes test
-			return (element.get('value').length <= $pick(props.maxLength, 10000));
-		}
-	}],
-	['validate-integer', {
-		errorMsg: FormValidator.getMsg.pass('integer'),
-		test: function(element) {
-			return FormValidator.getValidator('IsEmpty').test(element) || /^-?[1-9]\d*$/.test(element.get('value'));
-		}
-	}],
-	['validate-numeric', {
-		errorMsg: FormValidator.getMsg.pass('numeric'), 
-		test: function(element) {
-			return FormValidator.getValidator('IsEmpty').test(element) || 
-				/^-?(?:0$0(?=\d*\.)|[1-9]|0)\d*(\.\d+)?$/.test(element.get('value'));
-		}
-	}],
-	['validate-digits', {
-		errorMsg: FormValidator.getMsg.pass('digits'), 
-		test: function(element) {
-			return FormValidator.getValidator('IsEmpty').test(element) || (/^[\d() .:\-\+#]+$/.test(element.get('value')));
-		}
-	}],
-	['validate-alpha', {
-		errorMsg: FormValidator.getMsg.pass('alpha'), 
-		test: function (element) {
-			return FormValidator.getValidator('IsEmpty').test(element) ||  /^[a-zA-Z]+$/.test(element.get('value'))
-		}
-	}],
-	['validate-alphanum', {
-		errorMsg: FormValidator.getMsg.pass('alphanum'), 
-		test: function(element) {
-			return FormValidator.getValidator('IsEmpty').test(element) || !/\W/.test(element.get('value'))
-		}
-	}],
-	['validate-date', {
-		errorMsg: function(element, props) {
-			if (Date.parse) {
-				var format = props.dateFormat || "%x";
-				return FormValidator.getMsg('dateSuchAs').substitute({date:new Date().format(format)});
-			} else {
-				return FormValidator.getMsg('dateInFormatMDY');
-			}
-		},
-		test: function(element, props) {
-			if(FormValidator.getValidator('IsEmpty').test(element)) return true;
-			if (Date.parse) {
-				var format = props.dateFormat || "%x";
-				var d = Date.parse(element.get('value'));
-				var formatted = d.format(format);
-				if (formatted != "invalid date") element.set('value', formatted);
-				return !isNaN(d);
-			} else {
-			var regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-			if(!regex.test(element.get('value'))) return false;
-			var d = new Date(element.get('value').replace(regex, '$1/$2/$3'));
-			return (parseInt(RegExp.$1, 10) == (1+d.getMonth())) && 
-			(parseInt(RegExp.$2, 10) == d.getDate()) && 
-			(parseInt(RegExp.$3, 10) == d.getFullYear() );
-			}
-		}
-	}],
-	['validate-email', {
-		errorMsg: FormValidator.getMsg.pass('email'), 
-		test: function (element) {
-			return FormValidator.getValidator('IsEmpty').test(element) || /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(element.get('value'));
-		}
-	}],
-	['validate-url', {
-		errorMsg: FormValidator.getMsg.pass('url'), 
-		test: function (element) {
-			return FormValidator.getValidator('IsEmpty').test(element) || /^(https?|ftp|rmtp|mms):\/\/(([A-Z0-9][A-Z0-9_-]*)(\.[A-Z0-9][A-Z0-9_-]*)+)(:(\d+))?\/?/i.test(element.get('value'));
-		}
-	}],
-	['validate-currency-dollar', {
-		errorMsg: FormValidator.getMsg.pass('currencyDollar'), 
-		test: function(element) {
-			// [$]1[##][,###]+[.##]
-			// [$]1###+[.##]
-			// [$]0.##
-			// [$].##
-			return FormValidator.getValidator('IsEmpty').test(element) ||  /^\$?\-?([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}\d*(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$/.test(element.get('value'));
-		}
-	}],
-	['validate-one-required', {
-		errorMsg: FormValidator.getMsg.pass('oneRequired'), 
-		test: function (element) {
-			var p = element.parentNode;
-			return p.getElements('input').some(function(el) {
-				if (['checkbox', 'radio'].contains(el.get('type'))) return el.get('checked');
-				return el.get('value');
-			});
-		}
-	}]
-]);
-
-$extend(FormValidator.resources.enUS, {
-	noSpace: 'There can be no spaces in this input.',
-	reqChkByNode: 'No items are selected.',
-	requiredChk: 'This field is required.',
-	reqChkByName: 'Please select a {label}.',
-	match: 'This field needs to match the {matchName} field',
-	startDate: 'the start date',
-	endDate: 'the end date',
-	currendDate: 'the current date',
-	afterDate: 'The date should be the same or after {label}.',
-	beforeDate: 'The date should be the same or before {label}.',
-	startMonth: 'Please select a start month',
-	sameMonth: 'These two dates must be in the same month - you must change one or the other.'
-});
-
-FormValidator.addAllThese([
-    ['validate-enforce-oncheck', {
-        test: function(element, props) {
-            if (element.checked) {
-                (props.toEnforce || $(props.enforceChildrenOf).getElements('input, select, textarea')).map(function(item) {
-                    FV.enforceField(item);
-                });
-            }
-            return true;
-        }
-    }],
-    ['validate-ignore-oncheck', {
-        test: function(element, props) {
-            if (element.checked) {
-                (props.toIgnore || $(props.ignoreChildrenOf).getElements('input, select, textarea')).each(function(item) {
-                    FV.ignoreField(item);
-                    FV.resetField(item);
-                });
-            }
-            return true;
-        }
-    }],
-    ['validate-nospace', {
-        errorMsg: function(){
-			return FormValidator.getMsg('noSpace');
-		},
-        test: function(element, props) {
-            return !element.get('value').test(/\s/);
-        }
-    }],
-    ['validate-toggle-oncheck', {
-        test: function(element, props) {
-            var parentForm = element.getParent('form').retrieve('validator');
-            var eleArr = props.toToggle || $(props.toToggleChildrenOf).getElements('input, select, textarea');
-            if (!element.checked) {
-                eleArr.each(function(item) {
-                    parentForm.ignoreField(item);
-                    parentForm.resetField(item);
-                });
-            } else {
-				eleArr.each(function(item) {
-					parentForm.enforceField(item);
-				});
-			}
-            return true;
-        }
-    }],
-    ['validate-reqchk-bynode', {
-        errorMsg: function(){
-			return FormValidator.getMsg('reqChkByNode');
-		},
-        test: function(element, props) {
-            return ($(props.nodeId).getElements(props.selector || 'input[type=checkbox], input[type=radio]')).some(function(item){
-                return item.checked;
-            });
-        }
-    }],
-    ['validate-required-check', {
-        errorMsg: function(element, props) {
-            return props.useTitle ? element.get('title') : FormValidator.getMsg('requiredChk');
-        },
-        test: function(element, props) {
-            return !!element.checked;
-        }
-    }],
-    ['validate-reqchk-byname', {
-        errorMsg: function(element, props) {
-            return FormValidator.getMsg('reqChkByName').substitute({label: props.label || element.get('type')});
-        },
-        test: function(element, props) {
-            var grpName = props.groupName || element.get('name');
-            var oneCheckedItem = $$(document.getElementsByName(grpName)).some(function(item, index){
-                return item.checked;
-            });
-            var fv = element.getParent('form').retrieve('validator');
-            if (oneCheckedItem && fv) fv.resetField(element);
-            return oneCheckedItem;
-        }
-    }],
-    ['validate-validate-match', {
-        errorMsg: function(element, props) {
-			return FormValidator.getMsg('match').substitute({matchName: props.matchName || $(props.matchInput).get('name')});
-        }, 
-        test: function(element, props){
-            var eleVal = element.get('value');
-            var matchVal = $(props.matchInput) && $(props.matchInput).get('value');
-            return eleVal && matchVal ? eleVal == matchVal : true;
-        }
-    }],
-    ['validate-after-date', {
-        errorMsg: function(element, props) {
-			return FormValidator.getMsg('afterDate').substitute({
-				label: props.afterLabel || (props.afterElement ? FormValidator.getMsg('startDate') : FormValidator.getMsg('currentDate'))
-			});
-		},
-        test: function(element, props) {
-            var start = $(props.afterElement) ? Date.parse($(props.afterElement).get('value')) : new Date();
-            var end = Date.parse(element.get('value'));
-			return end && start ? end >= start : true;
-        }
-    }],
-    ['validate-before-date', {
-        errorMsg: function(element, props) {
-			return FormValidator.getMsg('beforeDate').substitute({
-				label: props.beforeLabel || (props.beforeElement ? FormValidator.getMsg('endDate') : FormValidator.getMsg('currentDate'))
-			});
-		},
-        test: function(element, props) {
-            var start = Date.parse(element.get('value'));
-            var end = $(props.beforeElement) ? Date.parse($(props.beforeElement).get('value')) : new Date();
-			return end && start ? end >= start : true;
-        }
-    }],
-    ['validate-custom-required', {
-        errorMsg: function(){
-			return FormValidator.getMsg('required');
-		},
-        test: function(element, props) {
-            return element.get('value') != props.emptyValue;
-        }
-    }],
-    ['validate-same-month', {
-        errorMsg: function(element, props) {
-            var startMo = $(props.sameMonthAs) && $(props.sameMonthAs).get('value');
-            var eleVal = element.get('value');
-            if (eleVal != '') {
-                if (!startMo) { return FormValidator.getMsg('startMonth');}
-                else {
-                    return FormValidator.getMsg('sameMonth');
-                }
-            }
-        },
-        test: function(element, props) {
-            var d1 = Date.parse(element.get('value'));
-            var d2 = Date.parse($(props.sameMonthAs) && $(props.sameMonthAs).get('value'));
-            return d1 && d2 ? d1.format("%B") == d2.format("%B") : true;
-        }
-    }]
-]);
-
+StickyWin.Modal = new Class(modalWinBase(StickyWin));
+StickyWin.Modal.implement(new Modalizer());
+if (StickyWin.Fx) StickyWin.Fx.Modal = new Class(modalWinBase(StickyWin.Fx));
+try { StickyWin.Fx.Modal.implement(new Modalizer()); }catch(e){}
+})();
+//legacy
+var StickyWinModal = StickyWin.Modal;
+if (StickyWin.Fx) var StickyWinFxModal = StickyWin.Fx.Modal;
 
 /*
 Script: OverText.js
 	Shows text over an input that disappears when the user clicks into it. The text remains hidden if the user adds a value.
 
 License:
-	http://clientside.cnet.com/wiki/cnet-libraries#license
+	http://www.clientcide.com/wiki/cnet-libraries#license
 */
 var OverText = new Class({
 	Implements: [Options, Events],
@@ -1687,19 +1267,20 @@ var OverText = new Class({
 	overTxtEls: [],
 	initialize: function(inputs, options) {
 		this.setOptions(options);
-		$$(inputs).each(this.addElement, this);
+		$G(inputs).each(this.addElement, this);
 		OverText.instances.push(this);
 		if (this.options.poll) this.poll();
 	},
 	addElement: function(el){
-		if (this.overTxtEls.contains(el) || el.retrieve('overtext')) return;
+		if (el.retrieve('OverText')) return;
 		var val = this.options.textOverride || el.get('alt') || el.get('title');
 		if (!val) return;
 		this.overTxtEls.push(el);
 		var txt = new Element('div', {
 		  'class': 'overTxtDiv',
 			styles: {
-				lineHeight: 'normal'
+				lineHeight: 'normal',
+				position: 'absolute'
 			},
 		  html: val,
 		  events: {
@@ -1710,7 +1291,7 @@ var OverText = new Class({
 			focus: this.hideTxt.pass([el, true], this),
 			blur: this.testOverTxt.pass(el, this),
 			change: this.testOverTxt.pass(el, this)
-		}).store('overtext', txt);
+		}).store('OverTextDiv', txt).store('OverText', this);
 		window.addEvent('resize', this.repositionAll.bind(this));
 		this.testOverTxt(el);
 		this.repositionOverTxt(el);
@@ -1740,7 +1321,7 @@ var OverText = new Class({
 		return this.poll(true);
 	},
 	hideTxt: function(el, focus){
-		var txt = el.retrieve('overtext');
+		var txt = el.retrieve('OverTextDiv');
 		if (txt && txt.isVisible() && !el.get('disabled')) {
 			txt.hide(); 
 			try {
@@ -1752,7 +1333,7 @@ var OverText = new Class({
 		return this;
 	},
 	showTxt: function(el){
-		var txt = el.retrieve('overtext');
+		var txt = el.retrieve('OverTextDiv');
 		if (txt && !txt.isVisible()) {
 			txt.show();
 			this.fireEvent('onTextShow', [txt, el]);
@@ -1771,11 +1352,10 @@ var OverText = new Class({
 	repositionOverTxt: function (el){
 		if (!el) return;
 		try {
-			var txt = el.retrieve('overtext');
+			var txt = el.retrieve('OverTextDiv');
 			if (!txt || !el.getParent()) return;
 			this.testOverTxt(el);
 			txt.setPosition($merge(this.options.positionOptions, {relativeTo: el}));
-                        txt.setStyle('width', el.getStyle('width'));
 			if (el.offsetHeight) this.testOverTxt(el);
 			else this.hideTxt(el);
 		} catch(e){
@@ -1882,7 +1462,7 @@ Autocompleter.Base = new Class({
 				}
 			}).inject(document.body);
 			this.relative = false;
-			if (this.options.relative && this.element.getOffsetParent() != document.body) {
+			if (this.options.relative || this.element.getOffsetParent() != document.body) {
 				this.choices.inject(this.element, 'after');
 				this.relative = this.element.getOffsetParent();
 			}
@@ -2299,7 +1879,7 @@ var Observer = new Class({
 		this.setOptions(options);
 		this.addEvent('onFired', onFired);
 		this.element = $(el) || $$(el);
-		/* CNET change */
+		/* Clientcide change */
 		this.boundChange = this.changed.bind(this);
 		this.resume();
 	},
@@ -2326,7 +1906,7 @@ var Observer = new Class({
 		$clear(this.timeout || null);
 		return this;
 	},
-	/* CNET change */
+	/* Clientcide change */
 	pause: function(){
 		$clear(this.timeout);
 		$clear(this.timer);

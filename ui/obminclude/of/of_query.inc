@@ -1741,6 +1741,43 @@ function get_userobm_from_ids($users) {
   return $res;
 }
 
+/**
+ * Get users infos from the uid array given
+ * Used by: agenda
+ * @param contacts : array of contacts id
+ * @return array [ids], [entity] (label=>)
+ **/
+function get_contact_from_ids($contacts) {
+  global $cdg_sql;
+
+  if (is_array($contacts)) {
+    $where = '(0';
+    foreach($contacts as $contact) {
+      $where .= ", $contact";
+    }
+    $where .= ')';
+    $query = "SELECT *
+      FROM Contact
+      WHERE contact_archive = 0
+      AND contact_id IN $where
+      ORDER by contact_lastname";
+    display_debug_msg($query, $cdg_sql, 'get_contact_from_ids()');
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    while ($obm_q->next_record()) {
+      $id = $obm_q->f('contact_id');
+      $lname = $obm_q->f('contact_lastname');
+      $fname = $obm_q->f('contact_firstname');
+      $res['ids'][] = $id;
+      $res['entity'][$id] = array('label' => "$lname $fname");
+    }
+  } else {
+    $res = '';
+  }
+
+  return $res;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution : get the Id of one User from its login

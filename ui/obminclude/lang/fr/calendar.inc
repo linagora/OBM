@@ -9,6 +9,8 @@
 
 $l_calendar = "Calendrier";
 $l_attendees = "Participants";
+$l_others_attendees = "Autres participants";
+$l_add_displayed_users = "Ajouter les utilisateurs dont les agendas sont affichés";
 $l_users = "Utilisateurs";
 $l_owner = "Organisateur";
 $l_resources = "Ressources";
@@ -417,3 +419,8 @@ $mj_event_delete_confirm = "Confirmer la suppression de l'événement ?";
 $mj_event_delete_all_confirm = "Confirmer la suppression de l'événement et de toutes ses répétitions ?"; 
 $l_confirm_reset = 'Cette opération videra complétement votre calendrier et annulera votre participation à toutes les réunions où vous avez été convié.Êtes-vous sûr de vouloir poursuivre ?';
 $l_js_confirm_reset = 'Cette opération ne pourras être annulée, voulez-vous poursuivre ?';
+
+$l_conflict_message = 'Certains participants ne sont pas disponibles sur ce créneau';
+$l_conflict_manage = 'Gérer le conflit';
+$l_conflict_force = 'Forcer le déplacement';
+$l_conflict_sendmail = 'Souhaitez-vous notifier les participants?';

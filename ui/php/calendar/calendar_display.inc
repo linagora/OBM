@@ -39,6 +39,7 @@ function dis_calendar_calendar_view($calendar, &$sel_entity_id, $p_view, $p_rang
   if (function_exists($calendar_function)) {
     $block = $calendar_function($calendar, $calendar_entity,$writable_entity,$date);
     $block .= dis_calendar_quick_form($calendar,$calendar_entity);
+    $block .= dis_calendar_conflict_popup();
     $calendar_function_pdf = $calendar_function."_pdf";
     if (function_exists($calendar_function_pdf)) {
       $display['print_url'] = "$path/calendar/calendar_index.php?action=pdf_export_form&amp;date=".$calendar['date']->getURL()."&amp;output_target=print";
@@ -596,7 +597,7 @@ function html_calendar_view_selector($calendar, $my_views) {
     <div style=\"margin: 2px;\">
     <form action=\"calendar_index.php\" method=\"get\">
       <select id=\"sel_view\" name=\"sel_view\" style=\"width:12em;\"
-        onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+        onchange=\"change_view(this.options[this.selectedIndex].value);\">
         <option id=\"opt_choix\" value=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\" >
           $l_select_view
         </option>
@@ -1166,17 +1167,30 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         $dis_owner = $event->owner_name;
         $dis_attendees = '';
         $br = '';
-        $dis_user = '';
+        $dis_people = '';
         $separator = '';
-        if (is_array($attendee['user']))
-        foreach($attendee['user'] as $at_id => $at_name) {
-          if (array_key_exists($at_id, $sel_user_id)) {
-            $dis_user .= "$separator$at_name";
-            $separator = ', ';
-          }
-	  $dis_attendees .= "$br$at_name";
-	  $br = '<br />';
+        if (is_array($attendee['user'])) {
+          foreach($attendee['user'] as $at_id => $at_name) {
+            if (array_key_exists($at_id, $sel_user_id)) {
+              $dis_people .= "$separator$at_name";
+              $separator = ', ';
+            }
+	          $dis_attendees .= "$br$at_name";
+	          $br = '<br />';
+          } 
         }
+
+        if (is_array($attendee['contact'])) {
+          foreach($attendee['contact'] as $at_id => $at_name) {
+            if (array_key_exists($at_id, $sel_user_id)) {
+              $dis_people .= "$separator$at_name";
+              $separator = ', ';
+            }
+	          $dis_attendees .= "$br$at_name";
+	          $br = '<br />';
+          } 
+        }
+
         $dis_resources = '';
         $dis_res = '';
         $br = '';
@@ -1210,7 +1224,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
      	});
       ";
       $dis_events .= "<div id=\"evt_${date}_$ev_id\" >
-          <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_user $dis_res</span>
+          <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_people $dis_res</span>
           $hour - <strong>$title</strong></a>
           <div id=\"eventDetail_${date}_$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
             <table>
@@ -1286,7 +1300,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
 function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entity, $options=array()) {
   global $obm, $ccalendar_first_hour, $ccalendar_last_hour;
   global $ico_resize, $ico_periodic, $ico_meeting, $ico_private;
-  global $l_user, $l_resource, $l_private;
+  global $l_user, $l_contact, $l_resource, $l_private;
   global $output_target;
 
   $event = $occurrence->event;
@@ -2150,7 +2164,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $description = $event_q->f('event_description');
     if ($properties != '') {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'?>".$properties;
+      $item = "<?xml version='1.0' encoding='$charset'?/>".$properties;
     } else {
       $item = '';
     }
@@ -2299,6 +2313,42 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     }
   }
 
+  $attendee = $entities['contact'];
+  if (is_array($attendee['entity'])) {
+    foreach ($attendee['entity'] as $c_id => $entity) {
+      $label = $entity['label'];
+      $state = $entity['state'];
+      $ACCEPTED = '';
+      ${'NEEDS-ACTION'} = '';
+      $DECLINED = '';
+        $$state = "checked=\"checked\"";
+        $urld = "$path/calendar/calendar_index.php?action=update_ext_decision&calendar_id=$id&entity_kind=contact&entity_id=$c_id";
+
+        $dis_contact_list .= "
+        <tr>
+        <td>$label</td>
+        <td class=\"C\">
+        <input $ACCEPTED type=\"radio\" name=\"rd_user_decision_$c_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_A</span>
+	<input ${'NEEDS-ACTION'} type=\"radio\" name=\"rd_user_decision_$c_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_W</span>
+        <input $DECLINED type=\"radio\" name=\"rd_user_decision_$c_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_R</span>
+        </td>
+        </tr>";
+        $$state = '';
+    }
+  }
+  if ($dis_contact_list != "") {
+   $dis_contacts_block ="  <div class=\"detail infos\">
+    <h1>$GLOBALS[l_contacts]</h1>
+    <table  class=\"spreadSheet\">
+    <thead>
+    <tr>
+    <td>$GLOBALS[l_contacts]</td><td>$GLOBALS[l_state]</td>
+    </tr>
+    </thead>
+    $dis_contact_list
+    </table>
+    </div>";
+  }
 
   if ($ccalendar_resource) {
 
@@ -2424,7 +2474,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   $dis_user_list
   </table>
   </div>
+
   <p class=\"LC\" />
+	$dis_contacts_block
   $dis_resource_block
   $dis_item_list
 
@@ -2449,9 +2501,10 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   global $obm;
-  if (($action == 'detailupdate') || ($action == 'duplicate')) {
+  if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') ) {
     $users = $entities['user'];
     $resources = $entities['resource'];
+    $contacts = $entities['contact'];
     $exception_q = run_query_get_one_event_exception($calendar['calendar_id']);
     $alerts = get_one_event_user_alert($calendar['calendar_id'], $obm['uid']);
   } else {
@@ -2460,6 +2513,12 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
       $users = get_userobm_from_ids($users_id);
     } else {
       $users = array();
+    }
+    $contacts_id = $entities['contact'];
+    if (count($contacts_id > 0)) {
+      $contacts = get_contact_from_ids($contacts_id);
+    } else {
+      $contacts = array();
     }
     $res_id = $entities['resource'];
     if (count($res_id > 0)) {
@@ -2479,7 +2538,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   );
   $possible_owners = $possible_owners['entity'];
   $cats1 = of_category_get_ordered('event', 'category1');
-  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $resources, $groups, $cats1, $alerts);
+  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts);
 
   return $block;
 }
@@ -2520,9 +2579,9 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
   $entity_view.="<input id=\"calendarKindEntity\" type=\"hidden\" value=\"user\" />";
   
   $block = "
-    <div id=\"calendarQuickForm\">
+    <div id=\"calendarQuickForm\" class=\"obmPopup\">
       <h1>
-      <a href=\"\" onclick=\"obm.calendarQuickForm.hide();return false;\">
+      <a href=\"\" class=\"closeSticky\" onclick=\"return false;\">
       <img src=\"$ico_popup_close\" alt=\"close\" />
       </a>
       <span id=\"calendarQuickFormDate\"></span>
@@ -2531,6 +2590,10 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
       <a id=\"calendarQuickFormTitle\" href=\"\" onclick=\"obm.calendarQuickForm.goTo('detailconsult'); return false\">
       </a>
       </h2> 
+		 <div class=\"content\">
+       <div class=\"logo\"> <img src=\"$GLOBALS[ico_very_big_time]\" /> </div>
+       <div class=\"data\">
+
       <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
       <fieldset>
         $l_title : <input type=\"text\" name=\"tf_title\" /> 
@@ -2539,44 +2602,44 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
         $l_users : $entity_view
       </fieldset>
       <fieldset class=\"buttons\"> 
-        <input class=\"button\" type=\"submit\" value=\"$l_validate\" />
+        <input class=\"button closeSticky\" type=\"submit\" value=\"$l_validate\" />
         <input type=\"button\" id=\"calendarQuickFormEdit\" onclick=\"obm.calendarQuickForm.goTo();\" />
         <input type=\"button\" id=\"calendarQuickFormDetail\" onclick=\"obm.calendarQuickForm.goTo('detailconsult');\" value=\"$l_details\" />
-        <input type=\"button\" id=\"calendarQuickFormDelete\" 
+        <input type=\"button\" class=\"closeSticky\" id=\"calendarQuickFormDelete\" 
           onclick=\"if(confirm('".phpStringToJsString($l_confirm_delete)."')) obm.calendarQuickForm.submit('quick_delete');\"
       value=\"$l_c_delete\" />
       </fieldset>
       </form>
       <div id=\"calendarQuickFormData\">
-      <div id=\"calendarQuickFormAttendees\">
-      <h3>$l_members</h3>
+        <div id=\"calendarQuickFormAttendees\">
+          <h3>$l_members</h3>
+        </div>
+        <div>
+          <h3>$l_carac</h3>
+          <table>
+          <tr>
+          <th>$l_owner</th>
+          <td id=\"calendarQuickFormOwner\"></td>
+          </tr>
+          <tr>
+          <th>$l_location</th>
+          <td id=\"calendarQuickFormLocation\"></td>
+          </tr>
+          <tr>
+          <th>$l_category1</th>
+          <td id=\"calendarQuickFormCategory\"></td>
+          </tr>
+          </table>
+        </div>
+        <div>
+          <h3>$l_desc</h3>
+          <p id=\"calendarQuickFormDescription\"></p>
+        </div>
+        <div id=\"calendarQuickFormItem\">
+          <h3>$l_items</h3>
+        </div>
       </div>
-      <div>
-        <h3>$l_carac</h3>
-        <table>
-        <tr>
-        <th>$l_owner</th>
-        <td id=\"calendarQuickFormOwner\"></td>
-        </tr>
-        <tr>
-        <th>$l_location</th>
-        <td id=\"calendarQuickFormLocation\"></td>
-        </tr>
-        <tr>
-        <th>$l_category1</th>
-        <td id=\"calendarQuickFormCategory\"></td>
-        </tr>
-        </table>
-      </div>
-      <div>
-        <h3>$l_desc</h3>
-        <p id=\"calendarQuickFormDescription\"></p>
-      </div>
-      <div id=\"calendarQuickFormItem\">
-        <h3>$l_items</h3>
-      </div>
-      </div>
-      <img src=\"$popup_queue\" alt=\"\"/>
+			</div>
     </div>
     <script type=\"text/javascript\">
       obm.calendarQuickForm = new Obm.CalendarQuickForm();
@@ -2587,6 +2650,60 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
 
   return $block;
 }
+
+
+/**
+ * HTML for the conflict manager popup in the calendar view.
+ *  
+ * @access public
+ * @return HTML
+ */
+function dis_calendar_conflict_popup() {
+  $block = "
+    <div id=\"calendarConflictPopup\" class=\"obmPopup\">
+      <h1>
+        <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
+          <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+        </a>
+        <span>$GLOBALS[l_conflicts]</span>
+      </h1>
+      <div class=\"content\">
+        <div class=\"logo\"> <img src=\"$GLOBALS[ico_very_big_time]\" /> </div>
+        <div class=\"data\">
+					<h2>$GLOBALS[l_conflict_message]</h2>
+         <fieldset class=\"buttons\"> 
+		    	<input type=\"button\" id=\"popup_manage\" class=\"closeSticky\" value=\"$GLOBALS[l_conflict_manage]\" /><br/>
+		    	<input type=\"button\" id=\"popup_force\" value=\"$GLOBALS[l_conflict_force]\" /><br/>
+		    	<input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
+				 </fieldset>
+        </div>
+      </div>
+   </div>
+
+	<div id=\"calendarSendMail\" class=\"obmPopup\">
+     <h1>
+       <a href=\"#\" id=\"popup_sendmail_close\" class=\"closeSticky\">
+         <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+       </a>
+       <span>$GLOBALS[l_confirm]</span>
+     </h1>
+		 <div class=\"content\">
+       <div class=\"logo\"> <img src=\"$GLOBALS[ico_very_big_time]\" /> </div>
+       <div class=\"data\">
+				<h2>$GLOBALS[l_conflict_sendmail]</h2>
+         <fieldset class=\"buttons\"> 
+		    	<input type=\"button\" id=\"popup_sendmail_yes\" class=\"closeSticky\" value=\"$GLOBALS[l_yes]\" />
+		    	<input type=\"button\" id=\"popup_sendmail_no\" class=\"closeSticky\" value=\"$GLOBALS[l_no]\" />
+		    </fieldset>
+       </div>
+     </div>
+
+	 </div>	";
+
+  return $block;
+}
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2600,13 +2717,13 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
 //   - $groups       : Array : selected groups [ids] [entity]
 //   - $cats1        : Array : Calendar categories1
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $res, $groups, $cats1, $alerts) {
+function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts) {
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ccalendar_hour_fraction;
   global $ico_mini_cal, $ico_add,$ico_delete, $ico_project, $l_header_new;
   global $ccalendar_first_hour, $ccalendar_last_hour;
   // -- Labels
-  global $l_users, $l_title, $l_location, $l_priority, $l_private, $l_desc;
+  global $l_users, $l_attendees, $l_title, $l_location, $l_priority, $l_private, $l_desc;
   global $l_items, $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_owner;
   global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_daily, $l_weekly;
@@ -2617,8 +2734,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_alerts, $l_alerts_time, $l_color ;
 
   $repeatfrequency = 1;
+  $uid = $obm['uid']; 
 
-  if (($action == 'detailupdate') || ($action == 'duplicate')) {
+  if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') ) {
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
     $cat1 = $event_q->f('event_category1_id');
@@ -2634,9 +2752,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     } else {
       $item = '';
     }
-    $begin = new Of_Date($event_q->f('event_date'), 'GMT');
-    $end = clone $begin;
-    $end = $end->addSecond($event_q->f('event_duration'));
+		if ($action == 'conflict_manager') {
+			$begin = $calendar['date_begin'];
+    	$end = clone $begin;
+    	$end = $end->addSecond($calendar['duration']);
+		} else {
+    	$begin = new Of_Date($event_q->f('event_date'), 'GMT');
+    	$end = clone $begin;
+    	$end = $end->addSecond($event_q->f('event_duration'));
+		}
     $all_day = $event_q->f('event_allday');
     if($all_day) {
       $end->subMinute(1);
@@ -2670,7 +2794,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['title'])) { $title = stripslashes($calendar['title']); }
   if (isset($calendar['location'])) { $location = stripslashes($calendar['location']); }
   if (isset($calendar['category1'])) { $cat1 = $calendar['category1']; }
-  if (isset($calendar['owner'])) {$owner = $calendar['owner'];} elseif(!$owner) {$owner = $obm['uid'];}
+  if (isset($calendar['owner'])) {$owner = $calendar['owner'];} elseif(!$owner) {$owner = $uid;}
   if (isset($calendar['priority'])) { $priority = $calendar['priority']; }
   if (isset($calendar['description'])) { $desc = stripslashes($calendar['description']); }
   if (isset($calendar['all_day'])) { $all_day = $calendar['all_day']; }
@@ -2705,6 +2829,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['list-item-id'])) { $t_list_item_id = $calendar['list-item-id']; }
   if (isset($calendar['property-name'])) { $t_property_name = $calendar['property-name']; }
   if (isset($calendar['property'])) { $t_property_value = $calendar['property']; }
+  if (isset($calendar['others_attendees'])) { $others_attendees = $calendar['others_attendees']; }
+  if (isset($calendar['add_displayed_users'])) { $add_displayed_users = $calendar['add_displayed_users']; }
   if (isset($calendar['alert'])) {
     // handle only one entry for now
     if (is_array($sel_alert)) {
@@ -2715,7 +2841,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
   
 
-  if (($action == 'detailupdate') || ($action == 'update')) {
+  if (($action == 'detailupdate') || ($action == 'update') || ($action == 'conflict_manager')) {
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
@@ -2775,12 +2901,63 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $style = 'display:none;';
     $all_day_checked = "checked=\"checked\"";
   }
-  
-  // userobm select
-  if (is_array($users['entity'])) {
-    foreach ($users['entity'] as $u_id => $u_ent) {
+
+	if ($action == "new") {
+    // userobm select
+	  $u_name = ($users['entity'][$uid]['label']);
+    $sel_id = "data-user-$uid";
+    $div_id = "sel_user_id-$sel_id";
+    $dis_sel_user = "<div class=\"elementRow\" id=\"$div_id\">
+      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+      <img src=\"$ico_delete\" alt=\"[Delete]\" />
+      </a>
+      $u_name
+      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+      </div>";
+	} else {
+    // user select
+    if (is_array($users['entity'])) {
+      foreach ($users['entity'] as $u_id => $u_ent) {
+        $u_name = $u_ent['label'];
+        $sel_id = "data-user-$u_id";
+        $div_id = "sel_user_id-$sel_id";
+        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+        <img src=\"$ico_delete\" alt=\"[Delete]\" />
+        </a>
+        $u_name
+        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+        </div>";
+      }
+    }
+  }
+
+	if (sizeof($users["entity"]) > 1) {
+    $u = array();
+		foreach($users["entity"] as $id => $user) {
+        $name = phpStringToJsString($user["label"]);
+				array_push($u, "'$id' : '$name'");
+    }
+		$users_js = "{".implode(",", $u)."}";
+
+    if ( $add_displayed_users ) {
+      $add_displayed_users_checked = "checked=\"checked\"";
+    }
+		$block_add_displayed_users = "<tr>
+      <th>
+      $GLOBALS[l_add_displayed_users]
+      </th>
+      <td>
+				<input type=\"checkbox\" id=\"cba_add_displayed_users\" value=\"1\" 
+					$add_displayed_users_checked name=\"cba_add_displayed_users\" onclick=\"add_displayed_users(this.checked, $users_js, $uid)\"/>
+      </td>
+      </tr>";
+  }
+
+  if (is_array($contacts['entity'])) {
+    foreach ($contacts['entity'] as $u_id => $u_ent) {
       $u_name = $u_ent['label'];
-      $sel_id = "data-user-$u_id";
+      $sel_id = "data-contact-$u_id";
       $div_id = "sel_user_id-$sel_id";
       $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
       <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
@@ -2792,7 +2969,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
   }
 
-  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id&amp;filter_entity=calendar&amp;filter_pattern=access";
+  $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id&amp;filter_entity=calendar&amp;filter_pattern=access";
   $user_add_button = "
     <a href=\"javascript: return false;\" 
       onclick=\"popup('$url','');
@@ -2817,11 +2994,14 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if ($has_access_to_other_calendars = OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access')) {
     $block_user = "
       <fieldset class=\"detail infos\">
-      <legend>$l_users</legend>    
+      <legend>$l_attendees</legend>    
       <table>
+
+			$block_add_displayed_users
+
       <tr>
       <th>
-      $l_users
+      $l_users / $GLOBALS[l_contacts]
       $user_add_button
       </th>
       <td>
@@ -2832,11 +3012,21 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <th>&nbsp;</th>    
       <td id=\"sel_user_id\">$dis_sel_user</td>
       </tr>
+
+      <tr>
+      <th>
+      $GLOBALS[l_others_attendees]
+      </th>
+      <td>
+				<textarea id=\"ta_others_attendees\" name=\"ta_others_attendees\">$others_attendees</textarea>
+      </td>
+      </tr>
+
       </table>
       </fieldset>
       <p class=\"LC\" />
       ";
-      $user_complete = "new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
+      $user_complete = "new obm.AutoComplete.Search('$path/people/people_index.php?action=ext_search', 'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
   } else {
     $block_user = "<fieldset class=\"detail infos H\"><input type='hidden' name='sel_user_id[]' value='data-user-$obm[uid]' /></fieldset>";
   }
@@ -4495,7 +4685,7 @@ function dis_calendar_day_list_pdf($calendar, $calendar_entity) {
  * @access public
  * @return void
  */
-function check_conflict($column){ // FIXME
+function check_conflict($column){
   //Evénement à mettre à jour
   $updated = array();
   foreach($column as $date => $cell) {
@@ -5735,7 +5925,7 @@ Class CalendarPdfList Extends CalendarPdf{
       $attendee = $event->attendee;
       $properties = $event->properties;
       $dis_attendees = array();
-      $dis_user = "";
+      $dis_people = "";
       $dis_res = "";
       $dis_resources = array();
       $separator = "";
@@ -5755,7 +5945,15 @@ Class CalendarPdfList Extends CalendarPdf{
       if (is_array($attendee['user']))
       foreach($attendee['user'] as $at_id => $at_name) {
         if (array_key_exists($at_id, $sel_user_id)) {
-          $dis_user .= "$separator$at_name";
+          $dis_people .= "$separator$at_name";
+          $separator = ', ';
+        }
+        array_push($dis_attendees, $at_name);
+      }
+      if (is_array($attendee['contact']))
+      foreach($attendee['contact'] as $at_id => $at_name) {
+        if (array_key_exists($at_id, $sel_user_id)) {
+          $dis_people .= "$separator$at_name";
           $separator = ', ';
         }
         array_push($dis_attendees, $at_name);
@@ -5807,8 +6005,8 @@ Class CalendarPdfList Extends CalendarPdf{
 
       // Event attendees + resources
       $this->page->drawText(
-        $dis_user.$dis_res,
-        $this->calendar_x1-$this->getStringWidth($dis_user.$dis_res),
+        $dis_people.$dis_res,
+        $this->calendar_x1-$this->getStringWidth($dis_people.$dis_res),
         $evt_y-$key*$this->font_height,
         'UTF-8');        
 

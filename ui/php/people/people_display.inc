@@ -32,7 +32,7 @@ $fieldnames["userobm_description"] = $l_desc;
 // Returns:
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_user_data(&$OD, $fieldname, $link_ok) {
+function dis_people_data(&$OD, $fieldname, $link_ok) {
   global $path,  $ico_mail, $params,$obm,$cgp_use;
   global $l_enabled, $l_disabled, $l_forbidden, $l_perms;
   global $perm, $cright_write_admin, $module, $cright_read_admin, $cright_read;
@@ -42,24 +42,29 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 
   if (($fieldname == "userobm_lastname")) {
     if ($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_user_get_id(".$OD->data_set->f("userobm_id").",'".addslashes($OD->data_set->f("userobm_lastname"))."');";
+      $res["url"] = "javascript:check_user_get_id(".$OD->data_set->f("id").",'".addslashes($OD->data_set->f("userobm_lastname"))."');";
     } else if ($OD->display_ext == "get_id_url") {
       $res["url"] = "javascript:check_user_get_id_url('$ext_url',".$OD->data_set->f("userobm_id").");";
     } else {
-      if ($link_ok && $perm->check_right($module, $cright_read))
-        $res["url"] = "$path/people/people_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
+      if ($link_ok && $perm->check_right($module, $cright_read)) {
+        if ($OD->data_set->f("type") == "user") {
+          $res["url"] = "$path/people/people_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
+        } else {
+          $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f("userobm_id");
+        }
+      }
     }
+    $res["name"] = addslashes($OD->data_set->f("userobm_lastname"));
   }
 
   if (($fieldname == "data_element") && $ext_element != "") {
-    $res["name"] = "<span id=\"data-user-".$OD->data_set->f("userobm_id")."\" style=\"display:none;\">".
-    $OD->data_set->f("userobm_lastname")." ".$OD->data_set->f("userobm_firstname").
-    "</span>";
+    $res["name"] = "<span id=\"data-".$OD->data_set->f("type")."-".$OD->data_set->f("userobm_id")."\" style=\"display:none;\">".
+    $OD->data_set->f("userobm_lastname")." ".$OD->data_set->f("userobm_firstname")."</span>";
   }
 
   else if ($fieldname == "userobm_email") {
     $email = $OD->data_set->f("userobm_email");
-    if($OD->data_set->f("userobm_hidden") == 1 && !$perm->check_right($module, $cright_write_admin)) {
+    if($OD->data_set->f("hidden") == 1 && !$perm->check_right($module, $cright_write_admin)) {
       $res["align"] = "center";
       $res['name'] = '-';
     } elseif (strcmp($email ,"") != 0) {
@@ -79,16 +84,15 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 // Parameters:
 //   - $user[]   : default form values
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_search_form($user) {
-  global $l_lastname;
-  global $l_email, $l_phone, $l_desc, $l_find, $l_all, $l_firstname;
-  global $display, $c_all, $obm;
+function html_people_search_form($user) {
+  global $display,$obm;
   
   $lname = stripslashes($user["lastname"]);
   $fname = stripslashes($user["firstname"]);
   $email = $user["email"];
   $phone = $user["phone"];
   $desc = $user["desc"];
+  $popup = $user["popup"];
   
   if ($user["filter_entity"]) {
     $dis_filter_entity = "<input name=\"filter_entity\" type=\"hidden\" value=\"$user[filter_entity]\" />";
@@ -102,34 +106,59 @@ function html_user_search_form($user) {
   // User defined data
   $block_userdata .= of_userdata_dis_search('user', $user);
 
+  if ($popup) {
+    $ext_action = $user["ext_action"];
+    $ext_title = stripslashes($user["ext_title"]);
+    $ext_url = $user["ext_url"];
+    $ext_id = $user["ext_id"];
+    $ext_target = $user["ext_target"];
+    $ext_widget = $user["ext_widget"];
+    $ext_element = $user["ext_element"];
+    $ext_container = $user["ext_container"];
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\" />
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\" />
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\" />
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
+            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\" />
+	          <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\" />
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\" />
+            <input name=\"ext_container\" type=\"hidden\" value=\"$ext_container\" />";
+
+    if ($ext_title == "") {
+      $ext_title = $GLOBALS['l_add_users'];
+    }
+    $display["title"] = $ext_title;
+  }
+
   $block = "
   <form method=\"get\" name=\"f_search\"
     action=\"". url_prepare("people_index.php")."\" class=\"search\"> 
 
-    <label>$l_lastname<br />
+    <label>$GLOBALS[l_lastname]<br />
       <input type=\"text\" name=\"tf_lastname\" size=\"16\" maxlength=\"32\"
       value=\"$lname\" />
     </label>
-    <label>$l_firstname<br />
+    <label>$GLOBALS[l_firstname]<br />
       <input type=\"text\" name=\"tf_firstname\" size=\"16\" maxlength=\"32\"
       value=\"$fname\" />
     </label>
-    <label>$l_email<br />
+    <label>$GLOBALS[l_email]<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" maxlength=\"32\"
       value=\"$email\" />
     </label>
-    <label>$l_phone<br />
+    <label>$GLOBALS[l_phone]<br />
       <input type=\"text\" name=\"tf_phone\" size=\"16\" maxlength=\"16\"
       value=\"$phone\" />
     </label>
-    <label>$l_desc<br />
+    <label>$GLOBALS[l_desc]<br />
       <input type=\"text\" name=\"tf_desc\" size=\"16\" maxlength=\"32\"
       value=\"$desc\" />
     </label>
     $block_userdata
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
-      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+      <input name=\"submit\" type=\"submit\" value=\"$GLOBALS[l_find]\" />
+			<input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $dis_filter_entity
       $ext
     </label>
@@ -145,20 +174,21 @@ function html_user_search_form($user) {
 // Parameters:
 //   - $user[]   : user search criteria
 ///////////////////////////////////////////////////////////////////////////////
-function dis_user_search_list($user) {
-  global $l_found, $l_no_found;
+function dis_people_search_list($user) {
   global $display, $obm;
 
   $filter_entity = $user["filter_entity"];
-  $obm_q = run_query_user_search($user);
+  $popup = $user["popup"];
+
+  $obm_q = run_query_people_search($user);
 
   $prefs = get_display_pref($obm["uid"], "people");
   $nb_user = $obm_q->num_rows_total();
   if ($nb_user == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found);
+    $display["msg"] .= display_warn_msg($GLOBALS['l_no_found']);
   } else {
-    $display["msg"] .= display_info_msg("$nb_user $l_found");
-    $block = html_user_search_list($obm_q, $prefs, $user);
+    $display["msg"] .= display_info_msg("$nb_user $GLOBALS[l_found]");
+    $block = html_people_search_list($obm_q, $prefs, $user, $popup);
   }
 
   return $block;
@@ -173,7 +203,7 @@ function dis_user_search_list($user) {
 //   - $user[]   : user search criteria
 //     keys used : login, lastname, pemrs
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_search_list($obm_q, $prefs, $user) {
+function html_people_search_list($obm_q, $prefs, $user, $popup) {
   global $l_close, $l_add;
 
   $lname = urlencode($user["lastname"]);
@@ -184,17 +214,59 @@ function html_user_search_list($obm_q, $prefs, $user) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('user', $user);
 
+  if ($popup) {
+    $ext_action = $user["ext_action"];
+    $ext_url = $user["ext_url"];
+    $ext_id = $user["ext_id"];
+    $ext_target = $user["ext_target"];
+    $ext_widget = $user["ext_widget"];
+    $ext_widget_text = $user["ext_widget_text"];
+    $ext_element = $user["ext_element"];
+    $ext_container = $user["ext_container"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;ext_container=$ext_container";
+  }
+
   $url = url_prepare("people_index.php?action=search&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;tf_email=$email&amp;tf_desc=$desc$url_userdata$url_ext");
 
   $user_d = new OBM_DISPLAY("DATA", $prefs, "people");
-  
-  $user_d->data_export = false;
+
+  if ($popup) {
+    $user_d->display_link = false;
+    $user_d->data_cb_text = "X";
+    $user_d->data_idfield = "id";
+    $user_d->data_cb_name = "data-u-";
+    if ($ext_element != "") {
+      $user_d->data_cb_name = "";
+      $user_d->data_form_head = "
+      <form onsubmit=\"select_fill_from_checkbox(this); return false;\">";
+    } elseif ($ext_widget != "") {
+      $user_d->data_form_head = "
+      <form onsubmit=\"fill_ext_form(this); return false;\">";
+    } else {
+      $user_d->data_form_head = "
+      <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    }
+    $user_d->data_form_end = "
+      <div class=\"buttons\">
+        <input type=\"submit\" value=\"$l_add\" />
+        <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+      </div>
+      </form>";
+
+  $display_popup_end = "
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+      
+  }
   $user_d->data_set = $obm_q;
   $user_d->data_header = "both";
   $user_d->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  $block .= $user_d->display("dis_user_data");
+  $block .= $user_d->display("dis_people_data");
+  $block .= $display_popup_end;
 
   return $block;
 }
@@ -205,15 +277,15 @@ function html_user_search_list($obm_q, $prefs, $user) {
 // Parameters:
 //   - $user : user database result
 ///////////////////////////////////////////////////////////////////////////////
-function dis_user_consult($user) {
+function dis_people_consult($user) {
   global $display, $l_err_reference;
 
   $id = $user["user_id"];
 
   if ($id > 0) {
-    $obm_q = run_query_user_detail($id);
+    $obm_q = run_query_people_detail($id);
     if ($obm_q->num_rows() == 1) {
-      $block = html_user_consult($obm_q);
+      $block = html_people_consult($obm_q);
     } else {
       $display["msg"] .= display_err_msg($l_err_reference);
     }
@@ -229,7 +301,7 @@ function dis_user_consult($user) {
 // Parameters:
 //   - $obm_q : user database result
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_consult($obm_q) {
+function html_people_consult($obm_q) {
   global $l_kind, $l_lastname, $l_firstname;
   global $l_people, $l_desc;
   global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal, $l_title;
@@ -241,7 +313,6 @@ function html_user_consult($obm_q) {
   global $l_enabled, $l_disabled, $module;
   global $obm, $cgp_use, $path, $display, $l_yes, $l_no;
   
-
   $id = $obm_q->f("userobm_id");
   $kind = $obm_q->f("userobm_kind");
   $lname = $obm_q->f("userobm_lastname");
@@ -399,7 +470,7 @@ $mail_section
 //   - $user  : default values or updated values (if error)
 //   - $field : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_form($usr_q, $user, $field='') {
+function html_people_form($usr_q, $user, $field='') {
   global $l_kind, $l_lastname, $l_firstname;
   global $l_people, $l_title, $l_update; 
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
@@ -600,7 +671,7 @@ function html_user_form($usr_q, $user, $field='') {
 // Parameters:
 //   - $prefs : Display preferences
 ///////////////////////////////////////////////////////////////////////////////
-function dis_user_display_pref($prefs) {
+function dis_people_display_pref($prefs) {
   global $l_people_display;
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $prefs, "people");
@@ -623,18 +694,18 @@ function dis_user_display_pref($prefs) {
 function json_search_users($user,$results) {
   global $display, $module, $cright_write_admin, $perm;
 
-  $user_q = $results['datas'];
+  $people_q = $results['datas'];
 
   $users = array();
-  while($user_q->next_record()) {
-    $id = $user_q->f("userobm_id");
-    $label = phpStringToJsString($user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname"));
-    if($user_q->f('userobm_hidden') != 1 || $perm->check_right($module, $cright_write_admin)) {
-      $extra = phpStringToJsString($user_q->f("userobm_email"));
+  while($people_q->next_record()) {
+    $id = $people_q->f("id");
+    $label = phpStringToJsString($people_q->f("lastname")." ".$people_q->f("firstname"));
+    if($people_q->f('userobm_hidden') != 1 || $perm->check_right($module, $cright_write_admin)) {
+      $extra = phpStringToJsString($people_q->f("email"));
     } else {
       $extra = '';
     }
-    $users[] = "{id:'data-user-$id', label:'$label', extra:'$extra'}";
+    $users[] = "{id:'data-".$people_q->f('type')."-$id', label:'$label', extra:'$extra'}";
   }
   $display["json"] = "{length:".$results['length'].", datas:[".implode(",",$users)."]}";
 }

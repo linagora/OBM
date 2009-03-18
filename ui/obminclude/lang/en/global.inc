@@ -48,6 +48,7 @@ $l_less_fields = "Less fields";
 // Common messages
 $l_users = "Users";
 $l_groups = "Groups";
+$l_contacts = "Contacts";
 $l_yes = "Yes";
 $l_no = "No";
 $l_all = "All";
@@ -96,6 +97,7 @@ $l_size = "Size";
 $l_email = "Email";
 $l_quota = "Quota";
 $l_invalid_data = "Invalid Data";
+$l_invalid_email = "Invalid Email";
 $l_insert_ok = "Insertion successful";
 $l_insert_error = "Insertion Error";
 $l_update_ok = "Update successful";

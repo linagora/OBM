@@ -182,6 +182,25 @@ Obm.Portlets = new Class({
 
 });
 
+
+/*
+ *
+ * OBM Popup
+ *
+ */
+Obm.Popup = new Class ({
+
+  show: function(id) {
+    $(id).setStyle('display', 'block');
+		new StickyWinModal({
+			content: $(id),
+			modalOptions :{hideOnClick:false}
+		});
+  }
+
+});
+
+
 function popup(url,name,height,width) {
   if(!width)
     width = obm.vars.consts.popupWidth;
@@ -280,3 +299,15 @@ function unSelectAllCb(container) {
   })          
 }
 
+function change_view(url) {
+	Cookie.write('calendar_view', url,{path: '/'});
+	window.location=url;
+}
+
+function last_visit_calendar_view() {
+  url = obm.vars.consts.calendarUrl;
+  if (Cookie.read('calendar_view') != null) {
+    url = '/calendar/'+Cookie.read('calendar_view');
+  }
+	window.location=url;
+}

@@ -11,6 +11,26 @@ require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
 
+function add_displayed_users(check, users, uid) {
+	if (check) {
+		for(var id in users) {
+      var sel_id = 'sel_user_id-data-user-'+id;
+      if ($(sel_id) == null) {
+				of_select_add_element(window.document, 'sel_user_id', 'data-user-'+id, users[id]);
+      }
+		}
+  } else {
+		for(var id in users) {
+			if (id != uid) {
+      	var sel_id = 'sel_user_id-data-user-'+id;
+        if (sel_id != null) {
+					$(sel_id).destroy();
+        }
+      }
+    }
+  }
+}
+
 
 function check_calendar_pdf_options() {
   var hour_begin = parseInt($('cal_first_hour').value);

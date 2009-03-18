@@ -14,22 +14,23 @@ require("$obminclude/javascript/check_js.inc");
 if ($params["ext_widget"] != "") {
   $extra_js .= "
 
-function fill_ext_form(int_form) {
-   size = int_form.length;
-   ext_field = window.opener.document.$params[ext_widget];
-   for(i=0; i <size ; i++) {
-     if(int_form.elements[i].type == 'checkbox'){
-       if(int_form.elements[i].checked == true) {
-	 ext_size = ext_field.length;
-	 for(j=0; j< ext_size; j++) {
-	   if('data-u-' + ext_field.options[j].value == int_form.elements[i].name) {
-	     window.opener.document.$params[ext_widget].options[j].selected =true;
-	   }
-	 }
+  function fill_ext_form(int_form) {
+     size = int_form.length;
+     ext_field = window.opener.document.$params[ext_widget];
+     for(i=0; i <size ; i++) {
+       if(int_form.elements[i].type == 'checkbox'){
+         if(int_form.elements[i].checked == true) {
+  	 ext_size = ext_field.length;
+  	 for(j=0; j< ext_size; j++) {
+  	   if('data-u-' + ext_field.options[j].value == int_form.elements[i].name) {
+  	     window.opener.document.$params[ext_widget].options[j].selected =true;
+  	   }
+  	 }
+         }
        }
      }
-   }
-}";
+  }";
+
 }
 
 if ($params["ext_widget"] != "" && $params["ext_widget_text"] != ""){
@@ -49,6 +50,36 @@ if ($params["ext_widget"] != "" && $params["ext_widget_text"] != ""){
 }
 
 $extra_js .="
+
+
+  function select_fill_from_checkbox(int_form) {
+  
+    var container = '$params[ext_container]';
+    size = int_form.length;
+    for (i=0; i <size; i++) {
+      // For each checkbox of the form, if filled we send the value
+      if (int_form.elements[i].type == 'checkbox') {
+        if (int_form.elements[i].checked == true) {
+          id = $(int_form.elements[i]).getNext().id;
+          div_id = '$params[ext_element]-'+id;
+          // If the element not already present in the caller window
+          if (! get_elem(window.opener.document, div_id )) {
+   	        sel_id = 'data-'+id;
+            // Get the label associated to the id from the int_form row
+            // hidden in an hidden span
+  	        span = get_elem(window.document, id);
+  	        if (container == '' || container == 'div') {
+  	          of_select_add_element(window.opener.document, '$params[ext_element]', id, span.innerHTML);
+            }
+            if (container == 'table') {
+              of_select_add_element_table(window.opener.document, '$params[ext_element]', id, span.innerHTML);
+            }
+          }
+        }
+      }
+    }
+  }
+
   function check_user_get_id_url(p_url, valeur) {
     if ((valeur < 1) || (valeur == null)) {
       alert (\"$l_j_select_user\");

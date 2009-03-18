@@ -1410,3 +1410,57 @@ div.overTxtDiv {
 .helpTooltip:hover {
   cursor: help;
 }
+
+/* Popup */
+.obmPopup {
+	border: 2px solid #3F7C8E;
+  background: #FFF;
+	display: none;
+}
+
+.obmPopup h1 {
+  margin: 0;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	text-align: center;
+  background-color: #4692A9;
+  font-weight: bold;
+  font-size: 130%;
+  background-image: url(../images/tab_border.png);
+  background-repeat: repeat-x;
+  background-position: 0 0.5em;  
+  color: #FFF;
+}
+
+.obmPopup h1 img{
+  vertical-align: middle;
+  float: right;
+  margin: 1px 3px 0 0;
+}
+
+.obmPopup h2 {
+  font-size: 100%;  
+  font-weight: normal;
+	text-align:center;
+  margin: 0;
+}
+
+.obmPopup .content {
+	padding: 10px;
+	min-height: 100px;
+}
+
+.obmPopup .content .logo {
+	clear: left;
+	position: absolute;
+}
+
+.obmPopup .content .data {
+	margin-left: 96px;
+}
+
+.obmPopup .content .data input {
+	width: 14em;
+  margin: 0;
+  padding: 0;
+}

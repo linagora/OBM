@@ -9,6 +9,8 @@
 
 $l_calendar = "Calendar";
 $l_attendees = "Attendees";
+$l_others_attendees = "Others attendees";
+$l_add_displayed_users = "Add displayed users";
 $l_users = "Users";
 $l_owner = "Organizer";
 $l_resources = "Resources";
@@ -404,3 +406,10 @@ This message was sent on %s at %s by OBM
 
 $l_confirm_reset = 'This will completly reset your calendar, and will cancell all your scheduled meetings. Are you sure you want to continue?';
 $l_js_confirm_reset = 'This cannot be canceled, do you want to continue ?';
+
+
+$l_conflict_message = 'Some attendees are not available for this time slot';
+$l_conflict_manage = 'Manage conflict';
+$l_conflict_force = 'Force move';
+$l_conflict_sendmail = 'Notification by email?';
+
