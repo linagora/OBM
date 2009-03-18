@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.Map.Entry;
 
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPAttributeSet;
@@ -28,15 +27,18 @@ public class TemplateLoader {
 		this.constants = constants;
 	}
 
-	public void applyTemplate(LDAPAttributeSet attributeSet, String imapMailHost, String smtpMailHost, String ldapHost, OutputStream out)
-			throws IOException {
+	public void applyTemplate(LDAPAttributeSet attributeSet,
+			String imapMailHost, String smtpMailHost, String ldapHost,
+			OutputStream out) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(configXml));
-		generateXMLConfig(reader, out, attributeSet, imapMailHost, smtpMailHost, ldapHost);
+		generateXMLConfig(reader, out, attributeSet, imapMailHost,
+				smtpMailHost, ldapHost);
 	}
 
 	@SuppressWarnings("unchecked")
 	private void generateXMLConfig(BufferedReader reader, OutputStream out,
-			LDAPAttributeSet attributeSet, String imapMailHost, String smtpMailHost, String ldapHost) throws IOException {
+			LDAPAttributeSet attributeSet, String imapMailHost,
+			String smtpMailHost, String ldapHost) throws IOException {
 		String line = null;
 		while ((line = reader.readLine()) != null) {
 			Iterator iterator = attributeSet.iterator();
@@ -45,14 +47,15 @@ public class TemplateLoader {
 				line = line.replace("|" + att.getName() + "|", att
 						.getStringValue());
 			}
-			line = line.replace ("|imapMailHost|", imapMailHost);
-			line = line.replace ("|smtpMailHost|", smtpMailHost);
-			line = line.replace ("|ldapHost|", ldapHost); 
-			
-			for (Entry<Object, Object> entry : constants.getProperties().entrySet()) {
-				line = line.replace("|" + (String) entry.getKey() + "|", (String) entry.getValue());
+			line = line.replace("|imapMailHost|", imapMailHost);
+			line = line.replace("|smtpMailHost|", smtpMailHost);
+			line = line.replace("|ldapHost|", ldapHost);
+
+			for (Object key : constants.getKeySet()) {
+				String k = (String) key;
+				line = line.replace("|" + k + "|", constants.getStringValue(k));
 			}
-			
+
 			out.write(line.getBytes());
 		}
 

@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * @author tom
- *  
+ * 
  */
 public class ObmHelper {
 
@@ -31,18 +31,17 @@ public class ObmHelper {
 	private static DataSource ds;
 	private static UserTransaction ut;
 
-
 	static {
 		logger = LogFactory.getLog(ObmHelper.class);
 		logger.info("ObmHelper static init.");
 		InitialContext context;
 		try {
 			context = new InitialContext();
-			logger.info("ctx: "+context);
+			logger.info("ctx: " + context);
 			ut = (UserTransaction) context.lookup(USER_TRANSACTION);
 			ds = (DataSource) context.lookup(DATA_SOURCE);
-			logger.info("ut: "+ut);
-			logger.info("ds: "+ds);
+			logger.info("ut: " + ut);
+			logger.info("ds: " + ds);
 		} catch (NamingException e) {
 			logger.error("Cannot locate datasource at " + "jdbc/AutoConfDS", e);
 		}
@@ -62,8 +61,7 @@ public class ObmHelper {
 	}
 
 	/**
-	 * Permet d'accéder à la transaction liée au thread
-	 * courant.
+	 * Permet d'accéder à la transaction liée au thread courant.
 	 * 
 	 * @return la transaction courante
 	 */
@@ -80,16 +78,24 @@ public class ObmHelper {
 	 * @param rs
 	 * @throws SQLException
 	 */
-	public static void cleanup(Connection con, Statement st, ResultSet rs)
-		throws SQLException {
+	public static void cleanup(Connection con, Statement st, ResultSet rs) {
 		if (rs != null) {
-			rs.close();
+			try {
+				rs.close();
+			} catch (SQLException e) {
+			}
 		}
 		if (st != null) {
-			st.close();
+			try {
+				st.close();
+			} catch (SQLException e) {
+			}
 		}
 		if (con != null) {
-			con.close();
+			try {
+				con.close();
+			} catch (SQLException e) {
+			}
 		}
 	}
 
@@ -102,7 +108,7 @@ public class ObmHelper {
 	 * @throws SQLException
 	 */
 	public static void cleanup(Connection con, Statement st)
-		throws SQLException {
+			throws SQLException {
 		if (con != null) {
 			if (st != null) {
 				st.close();
@@ -112,11 +118,11 @@ public class ObmHelper {
 	}
 
 	/**
-	 * Retourne la valeur de la dernière clef auto-générée 
-	 * par une séquence donnée
+	 * Retourne la valeur de la dernière clef auto-générée par une séquence
+	 * donnée
 	 * 
 	 * @param con
-	 * @return le dernier id inséré 
+	 * @return le dernier id inséré
 	 * @throws SQLException
 	 */
 	public static int getLastInsertId(Connection con) throws SQLException {
@@ -139,5 +145,5 @@ public class ObmHelper {
 			logger.error("Error while rolling-back", e);
 		}
 	}
-	
+
 }

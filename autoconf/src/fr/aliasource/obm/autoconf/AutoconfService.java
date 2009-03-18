@@ -46,7 +46,7 @@ public class AutoconfService extends HttpServlet {
 
 		// get user from reqString : format ".../autoconfiguration/login"
 		String login = reqString.substring(reqString.lastIndexOf("/") + 1);
-		logger.info("login : '" + login);
+		logger.info("login : '" + login+"'");
 
 		DirectoryConfig dc = new DirectoryConfig(login, ConstantService
 				.getInstance());
@@ -91,10 +91,8 @@ public class AutoconfService extends HttpServlet {
 
 		// map host ip with imap host and smtp host
 		
-		String imapMailHost = ConstantService.getInstance().getStringValue(
-				"imap." + hostIps.get("imap"));
-		String smtpMailHost = ConstantService.getInstance().getStringValue(
-				"smtp." + hostIps.get("smtp"));
+		String imapMailHost = hostIps.get("imap");
+		String smtpMailHost = hostIps.get("smtp");
 		String ldapHost = ConstantService.getInstance().getStringValue(
 				"ldapHostname");
 
