@@ -75,7 +75,6 @@ function get_calendar_user_name($users='') {
 
   $multidomain = sql_multidomain('userobm');
 
-  $in = "'".implode (",", $users)."'";
   $in = implode (",", $users);
   
   $obm_q = new DB_OBM;
