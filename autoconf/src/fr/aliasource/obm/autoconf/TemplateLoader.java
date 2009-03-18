@@ -22,8 +22,8 @@ public class TemplateLoader {
 	private String configXml;
 	private ConstantService constants;
 
-	public TemplateLoader(DirectoryConfig dc, ConstantService constants) {
-		this.configXml = dc.getConfigXml();
+	public TemplateLoader(String configXml, ConstantService constants) {
+		this.configXml = configXml;
 		this.constants = constants;
 	}
 

@@ -20,12 +20,10 @@ import fr.aliasource.obm.utils.ObmHelper;
  */
 public class DBQueryTool {
 
-	private DBConfig dc;
 	private Log logger;
 
-	public DBQueryTool(DBConfig dc) {
+	public DBQueryTool() {
 		logger = LogFactory.getLog(getClass());
-		this.dc = dc;
 	}
 
 	/**
@@ -33,7 +31,7 @@ public class DBQueryTool {
 	 * 
 	 * @return a Map<service_name, fqdn> with service in ('imap', 'smtp')
 	 */
-	HashMap<String, String> getDBInformation() {
+	HashMap<String, String> getDBInformation(String login, String domainName) {
 		HashMap<String, String> ret = new HashMap<String, String>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -66,9 +64,9 @@ public class DBQueryTool {
 			con = ObmHelper.getConnection();
 			ps = con.prepareStatement(query);
 
-			ps.setString(1, dc.getLogin());
-			ps.setString(2, dc.getDomainName());
-			ps.setString(3, dc.getDomainName());
+			ps.setString(1, login);
+			ps.setString(2, domainName);
+			ps.setString(3, domainName);
 			rs = ps.executeQuery();
 
 			while (rs.next()) {
@@ -82,5 +80,34 @@ public class DBQueryTool {
 		} finally {
 			ObmHelper.cleanup(con, ps, rs);
 		}
+	}
+
+	public String getDomain(String login) {
+		String domain = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection con = null;
+
+		String query = " SELECT domain_name from Domain INNER JOIN UserObm ON userobm_domain_id=domain_id WHERE userobm_login=?";
+
+		try {
+			con = ObmHelper.getConnection();
+			ps = con.prepareStatement(query);
+
+			ps.setString(1, login);
+			rs = ps.executeQuery();
+
+			if (rs.next()) {
+				domain = rs.getString(1);
+			} else {
+				logger.error("Can't find domain name for login '"+login+"'");
+			}
+
+		} catch (SQLException e) {
+			logger.error("Could not find user in OBM", e);
+		} finally {
+			ObmHelper.cleanup(con, ps, rs);
+		}
+		return domain;
 	}
 }

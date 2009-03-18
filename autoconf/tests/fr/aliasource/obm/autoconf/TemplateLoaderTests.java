@@ -11,7 +11,7 @@ import fr.aliasource.obm.utils.ConstantService;
 public class TemplateLoaderTests extends AutoconfTestCase {
 
 	public void testApplyTemplates() throws LDAPException {
-		TemplateLoader tl = new TemplateLoader(dc, ConstantService.getInstance());
+		TemplateLoader tl = new TemplateLoader(dc.getConfigXml(), ConstantService.getInstance());
 
 		LDAPQueryTool lqt = new LDAPQueryTool(dc);
 		LDAPAttributeSet las = lqt.getLDAPInformations();

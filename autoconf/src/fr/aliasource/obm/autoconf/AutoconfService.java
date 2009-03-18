@@ -46,51 +46,39 @@ public class AutoconfService extends HttpServlet {
 
 		// get user from reqString : format ".../autoconfiguration/login"
 		String login = reqString.substring(reqString.lastIndexOf("/") + 1);
-		logger.info("login : '" + login+"'");
-
-		DirectoryConfig dc = new DirectoryConfig(login, ConstantService
-				.getInstance());
-		LDAPQueryTool lqt = new LDAPQueryTool(dc);
-		LDAPAttributeSet attributeSet;
-		try {
-			attributeSet = lqt.getLDAPInformations();
-		} catch (LDAPException e) {
-			if (e.getResultCode() == LDAPException.LOCAL_ERROR) {
-				logger.warn("NULL informations obtained from LDAPQueryTool for "
-						+ login);
-			} else {
-				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			}
-			return;
+		String domain = null;
+		logger.info("login : '" + login + "'");
+		if (login.indexOf("@") > 0) {
+			String[] splitted = login.split("@");
+			login = splitted[0];
+			domain = splitted[1];
 		}
-		
-		DBConfig dbc = new DBConfig(ConstantService.getInstance(), attributeSet
-				.getAttribute("uid").getStringValue(), attributeSet
-				.getAttribute("obmDomain").getStringValue());
-		DBQueryTool dbqt = new DBQueryTool(dbc);
-		
+
+		DBQueryTool dbqt = new DBQueryTool();
+
 		HashMap<String, String> hostIps = null;
 		try {
-			hostIps = dbqt.getDBInformation();
+			hostIps = dbqt.getDBInformation(login, loadDomain(dbqt, login,
+					domain));
 		} catch (Exception e) {
-			logger.error("Cannot contact DB:"+e);
+			logger.error("Cannot contact DB:" + e);
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return;
 		}
-		
+
 		if (hostIps == null) {
 			logger.warn("NULL information obtained from DBQueryTool for "
 					+ login);
 			return;
 		}
-		
+
 		if (hostIps.get("imap") == null || hostIps.get("smtp") == null) {
 			logger.warn("No hosts found for  " + login);
 			return;
 		}
 
 		// map host ip with imap host and smtp host
-		
+
 		String imapMailHost = hostIps.get("imap");
 		String smtpMailHost = hostIps.get("smtp");
 		String ldapHost = ConstantService.getInstance().getStringValue(
@@ -101,9 +89,35 @@ public class AutoconfService extends HttpServlet {
 		resp.setHeader("Expires", formatter.format(new Date()));
 		resp.setContentType("application/xml");
 
-		TemplateLoader tl = new TemplateLoader(dc, ConstantService
+		DirectoryConfig dc = new DirectoryConfig(login, ConstantService
 				.getInstance());
-		tl.applyTemplate(attributeSet, imapMailHost, smtpMailHost, ldapHost, resp.getOutputStream());
+		LDAPQueryTool lqt = new LDAPQueryTool(dc);
+		LDAPAttributeSet attributeSet;
+		try {
+			attributeSet = lqt.getLDAPInformations();
+		} catch (LDAPException e) {
+			if (e.getResultCode() == LDAPException.LOCAL_ERROR) {
+				logger
+						.warn("NULL informations obtained from LDAPQueryTool for "
+								+ login);
+			} else {
+				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
+			return;
+		}
+
+		TemplateLoader tl = new TemplateLoader(dc.getConfigXml(),
+				ConstantService.getInstance());
+		tl.applyTemplate(attributeSet, imapMailHost, smtpMailHost, ldapHost,
+				resp.getOutputStream());
+	}
+
+	private String loadDomain(DBQueryTool dbqt, String login, String domain) {
+		if (domain != null) {
+			return domain;
+		} else {
+			return dbqt.getDomain(login);
+		}
 	}
 
 }

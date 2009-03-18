@@ -7,8 +7,8 @@ import fr.aliasource.obm.autoconf.impl.AutoconfTestCase;
 public class DBQueryToolTests extends AutoconfTestCase {
 
 	public void testQuery() {
-		DBQueryTool dqt = new DBQueryTool(dbc);
-		HashMap<String, String> mailHost = dqt.getDBInformation();
+		DBQueryTool dqt = new DBQueryTool();
+		HashMap<String, String> mailHost = dqt.getDBInformation("thomas", "zz.com");
 		assertNotNull(mailHost);
 		System.out.println("mailHost: "+mailHost);
 	}
