@@ -185,7 +185,11 @@ Obm.CalendarDayEvent = new Class({
       	eventData = new Object();
       	eventData.calendar_id = this.event.id;
       	eventData.element_id = this.event.id;
-      	eventData.date_begin = new Obm.DateTime(guessedTime * 1000).format('c');
+      	eventData.date_begin = new Obm.DateTime(guessedTime * 1000);
+				if (this.event.all_day) {
+					eventData.date_begin.setHours(0);
+        }
+				eventData.date_begin = eventData.date_begin.format('c');
 				eventData.duration = this.event.duration;
     		new Request.JSON({
     		  url : 'calendar_index.php',
@@ -772,7 +776,11 @@ Obm.CalendarConflictManager = new Class({
 			startDate = obm.calendarManager.getEventNewPosition(this.evt.element);
       time = Math.floor(startDate.getTime() / 1000);
       guessedTime = evt.guessEventTime(time);
-      date_begin = new Obm.DateTime(guessedTime * 1000).format('c');
+      date_begin = new Obm.DateTime(guessedTime * 1000);
+			if (this.evt.event.all_day) {
+				date_begin.setHours(0);
+      }
+			date_begin = date_begin.format('c');
 			duration = this.evt.event.duration;
 			id = this.evt.event.id;
 			window.location=obm.vars.consts.calendarUrl+'?action=conflict_manager&calendar_id='+id+'&date_begin='+encodeURIComponent(date_begin)+'&duration='+duration;	
