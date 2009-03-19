@@ -6,9 +6,11 @@ Prérequis :
 Création :
 
 - éditer config.jsc pour mettre l'addresse du serveur d'autoconf
-- lancer le script add_autoconf.bat avec en paramètre
+- lancer au choix :
+  - sous Windows : le script add_autoconf.bat avec en paramètre
  le path complet vers l'installeur standard de thunderbird à packager
- (sans espaces dans le nom).
+ (sans espaces dans le nom)
+ - sous Linux : add_autoconf.sh avec en paramètre le chemin vers le setup standard de thunderbird
 
 Le script :
  * extrait l'installeur
