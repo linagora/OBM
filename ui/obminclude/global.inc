@@ -376,6 +376,20 @@ $cgp_use['property']['delegation'] = true;
 // Specific user data
 $cgp_user = array();
 
+// Default preferences data
+$set_lang_default = 'en';
+$set_theme_default = 'default';
+$set_menu_default = $cme_both;
+$set_display_default = 'no';
+$set_rows_default = 10;
+$set_todo_default = 'todo_priority';
+$set_date_upd_default = $cda_dmy;
+$set_date_default = $cda_iso;
+$set_commentorder_default = $cco_chro;
+$set_debug_default = 0;
+$set_cal_interval_default = 2;
+$set_timezone_default = 'Europe/Paris';
+
 //---------------------------------------------------------------------------//
 // END : OBM Default configurable Constants : Default values
 //---------------------------------------------------------------------------//
@@ -628,20 +642,6 @@ $perms_admin = 'admin';
 
 // DST (Daily Saving Time) correction to avoid dates problems (2h)
 $c_dst_err = 7200;
-
-// Default preferences data
-$set_lang_default = 'en';
-$set_theme_default = 'default';
-$set_menu_default = $cme_both;
-$set_display_default = 'no';
-$set_rows_default = 10;
-$set_todo_default = 'todo_priority';
-$set_date_upd_default = $cda_dmy;
-$set_date_default = $cda_iso;
-$set_commentorder_default = $cco_chro;
-$set_debug_default = 0;
-$set_cal_interval_default = 2;
-$set_timezone_default = 'Europe/Paris';
 
 // JavaScript and PHP Fields masks (PCRE regexp)
 $js_regexp_phone="/^[0-9+x \(\)-\.]+$/"; // digits + SPACE ( ) - phone number
