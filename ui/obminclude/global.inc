@@ -377,7 +377,7 @@ $cgp_use['property']['delegation'] = true;
 $cgp_user = array();
 
 // Default preferences data
-$set_lang_default = 'en';
+$set_lang_default = $ini_array['lang'];
 $set_theme_default = 'default';
 $set_menu_default = $cme_both;
 $set_display_default = 'no';
