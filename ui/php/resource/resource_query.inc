@@ -230,6 +230,13 @@ function run_query_resource_detail($p_id) {
 function run_query_resource_insert($resource) {
   global $cdg_sql, $obm;
 
+  // Hook : Pre
+  if (function_exists('hook_pre_run_query_resource_insert')) {
+    if (! hook_pre_run_query_resource_insert($resource)) {
+      return false;
+    }
+  }
+
   $name = $resource['name'];
   $desc = $resource['desc'];
   $qty = $resource['qty'];
@@ -276,6 +283,14 @@ function run_query_resource_insert($resource) {
     foreach ($default_rights['user'] as $user_id => $rights) {
       OBM_Acl::setRights($user_id, 'resource', $id, $rights);
     }
+
+    // Hook : Post
+    if (function_exists('hook_post_run_query_resource_insert')) {
+      if (! hook_post_run_query_resource_insert($resource)) {
+        return false;
+      }
+    }
+
   }
 
   return $id;
@@ -291,6 +306,13 @@ function run_query_resource_insert($resource) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_update($p_id, $resource) {
   global $obm, $cdg_sql;
+
+  // Hook : Pre
+  if (function_exists('hook_pre_run_query_resource_update')) {
+    if (! hook_pre_run_query_resource_update($resource)) {
+      return false;
+    }
+  }
 
   $name = $resource['name'];
   $desc = $resource['desc'];
@@ -314,6 +336,15 @@ function run_query_resource_update($p_id, $resource) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+	if ($retour) {
+    // Hook : Post
+    if (function_exists('hook_post_run_query_resource_update')) {
+      if (! hook_post_run_query_resource_update($resource)) {
+        return false;
+      }
+    }
+ 	}
+
   return $retour;
 }
 
@@ -325,6 +356,14 @@ function run_query_resource_update($p_id, $resource) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_resource_delete($p_id) {
   global $cdg_sql;
+
+  // Hook : Pre
+  if (function_exists('hook_pre_run_query_resource_delete')) {
+    if (! hook_pre_run_query_resource_delete($p_id)) {
+      return false;
+    }
+  }
+
   of_entity_delete($GLOBALS['module'], $p_id);
   $p_id = sql_parse_id($p_id, true);
 
@@ -372,6 +411,13 @@ function check_resource_data_form($p_id, &$resource) {
   global $l_lname_error;
   global $err, $action, $cdg_sql;
 
+  // Hook : Validation
+  if (function_exists('hook_pre_check_resource_data_form')) {
+    if (! hook_pre_check_resource_data_form($resource)) {
+      return false;
+    }
+  }
+
   $id = $resource['resource_id'];
   $name = $resource['name'];
   $desc = $resource['desc'];
@@ -410,12 +456,17 @@ function check_resource_data_form($p_id, &$resource) {
 // Returns:
 //   true if the resource can be deleted, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_resource_can_delete($id) {
+function check_resource_can_delete($params) {
   global $ok_msg;
 
-  $delete_ok = true;
+  // Hook : Pre
+  if (function_exists('hook_pre_check_resource_can_delete')) {
+    if (! hook_pre_check_resource_can_delete($params)) {
+      return false;
+    }
+  }
 
-  return $delete_ok;
+  return true;
 }
 
 

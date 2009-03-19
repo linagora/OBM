@@ -174,7 +174,7 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resource_can_delete($params['resource_id'])) {
+  if (check_resource_can_delete($params)) {
     $display['msg'] .= display_info_msg($ok_msg, false);
     $display['detail'] = dis_resource_can_delete($params['resource_id']);
   } else {
@@ -185,7 +185,7 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resource_can_delete($params['resource_id'])) {
+  if (check_resource_can_delete($params)) {
     $retour = run_query_resource_delete($params['resource_id']);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_resource : $l_delete_ok");
