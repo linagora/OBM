@@ -987,7 +987,8 @@ function check_group_update_rights($params, $g='') {
 //     keys used : name, desc, email
 ///////////////////////////////////////////////////////////////////////////////
 function check_group_data_form(&$group) {
-  global $php_regexp_email_name, $php_regexp_email, $l_fill_name;
+  global $php_regexp_email_name, $php_regexp_email, $l_fill_name, $l_j_check_email;
+  global $l_groupname_error, $php_regexp_groupname;
   global $l_group_exists, $l_email_exist;
   global $obm, $perm, $err, $action, $cright_write_admin,$cgp_use;
   global $l_j_check_email, $l_system_no_priv, $l_err_system_samba;
@@ -1019,6 +1020,12 @@ function check_group_data_form(&$group) {
     return false;
   }
 
+  if (! preg_match($php_regexp_groupname, $name)) {
+    $err['msg'] = $l_groupname_error;
+    $err['field'] = 'name';
+    return false;
+  }
+
   // MANDATORY: Group name unique
   if (get_group_name_exists($name, $id)) {
     $err['msg'] = "$l_group_exists ($name)";
@@ -1032,7 +1039,7 @@ function check_group_data_form(&$group) {
       $em = strtok($email, "\r\n");
       while ($em) {
         if (! preg_match($php_regexp_email_name, $em) && !preg_match($php_regexp_email, $em)) {
-          $err['msg'] .= "$em : $l_email_error";
+          $err['msg'] .= "$em : $l_j_check_email";
           $err['field'] = 'email';
           return false;
         }

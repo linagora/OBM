@@ -61,7 +61,7 @@ $regexp_uid = '^[0-9]+$';
 $regexp_hostname = '^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$';
 
 # Group
-$regexp_groupname = '^[\W\w0-9][\W\w0-9-._ ]{1,30}[\W\w0-9]$';
+$regexp_groupname = '^[\W\w0-9]([\W\w0-9-._ ]{0,252}[\W\w0-9]){0,1}$';
 
 # Mailshare
 $regexp_mailsharename = '^[a-z0-9][a-z0-9-._]{0,30}[a-z0-9]$'

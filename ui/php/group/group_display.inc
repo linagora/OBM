@@ -210,7 +210,7 @@ function html_group_search_form ($group) {
   <form method=\"get\" name=\"f_search\" action=\"".url_prepare("group_index.php")."\" class=\"search\">
 
     <label>$l_name<br />
-      <input name=\"tf_name\" size=\"16\" maxlength=\"16\" value=\"$name\" />
+      <input name=\"tf_name\" size=\"16\" maxlength=\"256\" value=\"$name\" />
     </label>
     $dis_delegation
     <label>$l_group_user<br />
@@ -753,8 +753,8 @@ function html_group_form($action, $group_q, $group, $field='') {
 
   <table>
   <tr>
-    <th>$l_name</th>
-    <td><input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
+    <th class=\"$class[name]\">$l_name</th>
+    <td><input name=\"tf_name\" maxlength=\"256\" size=\"32\" value=\"$name\" /></td>
   </tr>
   $block_manager
   $block_delegation

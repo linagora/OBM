@@ -39,6 +39,7 @@ $l_system_no_priv = "A system group can't be private !";
 $l_only_owner_priv = "Only the group owner can set a group privacy !";
 $l_err_private_email = "Private group can't have an email !";
 $l_warn_group_diff_privacy = "Some groups haven't be added. You are trying to add private groups in a public group !";
+$l_groupname_error = "group name is not valid !";
 
 $l_no_display = "Fill the search fields and press < Find > to retrieve the groups";
 $l_no_user = "There are no users registered.";
