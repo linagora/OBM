@@ -3,7 +3,7 @@ Extension OBM-MAJA
 
 * Fonctionnement
 
-L'extension positionne des préférences au premier redémarage de Thunderbird soit après qu'elle ai été installée soit après qu'elle ai été mise à jour.
+L'extension positionne des préférences au premier redémarage de Thunderbird, soit après avoir été installée, soit après avoir été mise à jour.
 
 La détection de l'install ou mise à jour se fait par le test de la pref extensions.pablomaja.versionOnLastMaj.
 Le code appelé à chaque démarrage de Thunderbird est dans overlay.js
