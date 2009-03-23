@@ -72,4 +72,22 @@
       </property>            
     </service>
   </entity>  
+
+  
+  <entity type="user">
+    <service key="funis">
+      <!-- Synchronisation range -->
+      <property key="sync_days_min">
+	<type>int</type>
+	<min>0</min>
+	<max>1</max>
+      </property>
+      <property key="sync_days_max">
+	<type>int</type>
+	<min>0</min>
+	<max>1</max>
+      </property>
+    </service>
+  </entity>
+
 </services>
