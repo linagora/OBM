@@ -58,7 +58,7 @@ class OBM_Mailer extends Stato_Mailer
     $query = "SELECT 
     userobm_email, userobm_lastname, userobm_firstname, domain_name
     FROM UserObm
-    LEFT JOIN Domain ON userobm_domain_id = domain_id
+    INNER JOIN Domain ON userobm_domain_id = domain_id
     WHERE userobm_id $uid ";
 
     display_debug_msg($query, $cdg_sql, 'run_query_get_sender()');
@@ -113,7 +113,7 @@ class OBM_Mailer extends Stato_Mailer
     $query = "SELECT 
       userobm_email, userobm_lastname, userobm_firstname, domain_name
       FROM UserObm 
-      LEFT JOIN Domain on userobm_domain_id = domain_id
+      INNER JOIN Domain on userobm_domain_id = domain_id
       $join
       WHERE $user_in
       userobm_email != ''
