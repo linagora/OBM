@@ -283,8 +283,8 @@ if ($action == 'index') {
     } else {
       $event_id = run_query_calendar_add_event($params, $entities);
       $params["calendar_id"] = $event_id;
-      $mail_data = run_query_prepare_event_mail($params, $action);
-      calendar_send_mail($mail_data, 'set_mail');
+      /*$mail_data = run_query_prepare_event_mail($params, $action);
+      calendar_send_mail($mail_data, 'set_mail');*/
       if ($params['date_begin'] < date('Y-m-d H:')) {
 				$display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
       }
@@ -355,16 +355,16 @@ if ($action == 'index') {
       $display['msg'] .= display_err_msg("$l_event : $l_update_error");
       $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
     } else {
-
-		  // Insert "others attendees" as private contacts
+      // Insert "others attendees" as private contacts
       if ($params['others_attendees'] != "") {
 		    $others_attendees = run_query_insert_others_attendees($params);
         $entities['contact'] = array_merge($entities['contact'], $others_attendees);
       }
 
-      $mail_data = run_query_prepare_event_mail($params, $action);
+      //$mail_data = run_query_prepare_event_mail($params, $action);
+
       run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
-      calendar_send_mail($mail_data, 'set_mail');
+      //calendar_send_mail($mail_data, 'set_mail');
       $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
       $params["date"] = $params["date_begin"];
       $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);

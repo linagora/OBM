@@ -6,7 +6,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-
+require("$obminclude/of/of_mailer.php");
+require('calendar_mailer.php');
+require('event_observer.php');
+$event_observer = new EventObserver();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return events details
@@ -512,7 +515,7 @@ function run_query_calendar_delete_event_entity($calendar, $users = null) {
 //   - $sel_entity_id : List entitis id ['user'] ['resource']
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_add_event($calendar, $sel_entity_id) {
-  global $obm, $ccalendar_resource_admin, $ccalendar_send_ics;
+  global $obm, $ccalendar_resource_admin, $ccalendar_send_ics, $event_observer;
 
   $groups = $sel_entity_id['group'];
   // Get the final user list (merge group)
@@ -574,6 +577,10 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
   if (($calendar['alert']) > 0) {
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
   }
+  
+  $calendar['calendar_id'] = $event_id;
+  $event_observer->afterInsert($calendar);
+  
   return $event_id;
 }
 
@@ -1001,7 +1008,7 @@ function check_calendar_decision_conflict($calendar) {
 //   - $sel_entity_id : List entitis id ['user'] ['resource']
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $reset_state) {
-  global $c_use_connectors, $obm, $ccalendar_resource_admin;
+  global $c_use_connectors, $obm, $ccalendar_resource_admin, $event_observer;
 
   $datebegin = $calendar['date_begin'];
   $dateend = $calendar['date_end'];
@@ -1139,6 +1146,8 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   if (($calendar['alert']) > 0) {
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
   }
+  
+  $event_observer->afterUpdate($calendar);
 
 }
 
@@ -3847,7 +3856,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
   }
 
   if ($action == 'update') {
-    if (!$event_q) {
+    /*if (!$event_q) {
       $event_q = run_query_calendar_detail($calendar['calendar_id']);
     }
 
@@ -3967,7 +3976,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     $title = $calendar['title'];
     $start =  $calendar['date_begin'];
     $end = $calendar['date_end'];
-    $location = $calendar['location'];
+    $location = $calendar['location'];*/
   } elseif ($action == 'delete') {
     $event_q = run_query_calendar_detail($calendar['calendar_id']);
     $old_title = $event_q->f('event_title');
@@ -4049,7 +4058,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
     }
   }
   $date = new Of_Date();
-  if($mail_datas['reset_state']) {
+  /*if($mail_datas['reset_state']) {
     $mail_datas['mails']['reset_state'] = array (
       'subject' => sprintf($l_update_event_mail_subject,$old_title),
       'message' => sprintf($l_update_event_mail_body, $old_title, $old_start->getOutputDateTime(), 
@@ -4059,7 +4068,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
                            $userinfo['lastname'],$cgp_host),
       'recipients' => $attendees
     );
-  }
+  }*/
   if ($mail_datas['reset_resource_state']) {
     $rattendees = OBM_Acl::getEntityWriters('resource', $resources);
     $rattendees_ids = array_keys($rattendees);
@@ -4075,7 +4084,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       );
     }
   }   
-  if ($mail_datas['add_attendee']) {
+  /*if ($mail_datas['add_attendee']) {
     if ($ccalendar_send_ics) {
       $tmp_filename = secure_tmpname('.ics','ics_');
       create_calendar_ics_meeting_file($calendar, $calendar['calendar_id'], $calendar['sel_user_id'], array(), $tmp_filename);
@@ -4094,7 +4103,7 @@ function run_query_prepare_event_mail($calendar, $action, $event_q = null) {
       'recipients' => $new_attendees,
       'h_file' => $h_file
     );
-  }
+  }*/
   if ($mail_datas['add_resource']) {
     $rattendees = OBM_Acl::getEntityWriters('resource', $new_resources);
     $rattendees_ids = array_keys($rattendees);
