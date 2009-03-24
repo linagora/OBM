@@ -640,11 +640,6 @@ if ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_calendar_pdf_options($params, $cal_range, $cal_view);
 
-} elseif ($action == 'pdf_export_form') {
-///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_calendar_pdf_options($params, $cal_range, $cal_view);
-
-
 } elseif ($action == 'pdf_export') {
 ///////////////////////////////////////////////////////////////////////////////
   require_once("$obminclude/lib/Zend/Pdf.php");
