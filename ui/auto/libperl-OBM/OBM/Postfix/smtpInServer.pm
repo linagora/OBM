@@ -18,7 +18,7 @@ sub new {
     my $self = bless { }, $class;
 
     if( $self->_init( $serverDesc ) ) {
-        $self->_log( 'problème lors de l\'initialisation du serveur de type SMTP-in', 1 );
+        $self->_log( 'problème lors de l\'initialisation du serveur de type SMTP-in', 0 );
         return undef;
     }
 
@@ -40,7 +40,7 @@ sub _init {
     my( $serverDesc ) = @_;
 
     if( !defined($serverDesc) || (ref($serverDesc) ne 'HASH') ) {
-        $self->_log( 'description du serveur de type SMTP-in', 4 );
+        $self->_log( 'description du serveur de type SMTP-in invalide', 2 );
         return 1;
     }
 
@@ -94,7 +94,7 @@ sub _connect {
     my $self = shift;
 
     if( ref($self->{'serverConn'}) eq 'Net::Telnet' ) {
-        $self->_log( 'connexion déjà établie à '.$self->getDescription(), 3 );
+        $self->_log( 'connexion déjà établie à l\'ObmSatellite de '.$self->getDescription(), 3 );
         return 0;
     }
 
@@ -109,7 +109,7 @@ sub _connect {
     );
 
     if( !defined($self->{'serverConn'}) || !$self->{'serverConn'}->open() ) {
-        $self->_log( 'échec de connexion à '.$self->getDescription(), 0 );
+        $self->_log( 'échec de connexion à l\'ObmSatellite de '.$self->getDescription(), 0 );
         return 1;
     }
 
@@ -126,7 +126,7 @@ sub _disConnect {
     my $self = shift;
 
     if( ref($self->{'serverConn'}) eq 'Net::Telnet' ) {
-        $self->_log( 'connexion non établie à '.$self->getDescription(), 3 );
+        $self->_log( 'connexion non établie à l\'ObmSatellite de '.$self->getDescription(), 3 );
         return 0;
     }
 
