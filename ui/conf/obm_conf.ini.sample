@@ -118,11 +118,4 @@ ldapAtts = cn,mail,mailAlias,mailBox,obmDomain,uid
 ldapFilter = "mail"
 configXml = /usr/lib/obm-autoconf/config.xml
 ;
-; Mappings IP <=> Hostname
-;
-;smtp.127.0.0.1 = mysmtp.aliacom.local
-;imap.127.0.0.1 = myimap.aliacom.local
-;smtp.192.168.0.1 = mysmtp2.aliacom.local
-;imap.192.168.0.1 = myimap2.aliacom.local
-;
 ; EOF
