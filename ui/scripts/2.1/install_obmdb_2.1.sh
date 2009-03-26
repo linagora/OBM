@@ -122,15 +122,6 @@ elif [ $DBTYPE == "PGSQL" ]; then
   echo "UPDATE UserObmPref set userobmpref_value='$OBM_LANG' where userobmpref_option='set_lang'" | psql -U $U $DB 
 fi
 
-# Test data insertion
-echo "  Test data insertion"
-if [ $DBTYPE == "MYSQL" ]; then
-  mysql -h $H -u $U -p$P $DB < obmdb_test_values_2.1.sql
-elif [ $DBTYPE == "PGSQL" ]; then
-  cat postgres-pre.sql obmdb_test_values_2.1.sql | psql -U $U $DB 
-fi
-
-
 echo "*** Data checking and validation"
 
 # Set the current dir to php/admin_data (to resolve includes then)

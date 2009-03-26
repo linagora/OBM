@@ -1486,7 +1486,7 @@ function check_user_data_form($p_id, &$user) {
   global $php_regexp_password;
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
   //global $obm, $profiles, $cgp_use, $c_imagetype;
-  global $obm, $cgp_use, $c_imagetype, $c_renameUserMailbox;
+  global $obm, $cgp_use, $c_imagetype;
   global $c_max_image_size;
   global $l_err_delegation_target_outside_domain, $l_err_delegation_target_outside_target;
   global $l_err_delegation_outside_domain, $l_err_delegation_outside_target;
@@ -1588,25 +1588,22 @@ function check_user_data_form($p_id, &$user) {
     }
   }
 
-  // login check (except on update if !$c_renameUserMailbox)
-  if (($action != 'update') || $c_renameUserMailbox) {
-    // MANDATORY: User login, not empty and unique
-    if (trim($login) == '') {
-      $err['msg'] = "$login : $l_login_error";
+  // MANDATORY: User login, not empty and unique
+  if (trim($login) == '') {
+    $err['msg'] = "$login : $l_login_error";
+    $err['field'] = 'login';
+    return false;
+  } else {
+    if (! preg_match($php_regexp_login, $login)) {
+      $err['msg'] .= "$login : $l_login_error";
       $err['field'] = 'login';
       return false;
-    } else {
-      if (! preg_match($php_regexp_login, $login)) {
-	$err['msg'] .= "$login : $l_login_error";
-	$err['field'] = 'login';
-	return false;
-      }
-      // Login not already in use
-      if (check_user_login_in_use($domain_id, $login, $id)) {
-	$err['msg'] = "$login : $l_login_in_use";
-	$err['field'] = 'login';
-	return false;
-      }
+    }
+    // Login not already in use
+    if (check_user_login_in_use($domain_id, $login, $id)) {
+      $err['msg'] = "$login : $l_login_in_use";
+      $err['field'] = 'login';
+      return false;
     }
   }
 

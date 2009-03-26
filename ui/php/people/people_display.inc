@@ -479,7 +479,7 @@ function html_people_form($usr_q, $user, $field='') {
   global $l_perms, $l_access, $l_empty;
   global $l_enabled, $l_disabled, $path;
   global $path, $display, $cgp_use, $action;
-  global $obm, $c_default_domain, $c_renameUserMailbox, $l_header_new, $l_hour;
+  global $obm, $c_default_domain, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour;
 	
   // if update mode and first time value are taken from database
