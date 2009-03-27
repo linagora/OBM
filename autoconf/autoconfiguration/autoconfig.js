@@ -1,8 +1,8 @@
 //
 //  Nom du fichier : autoconfig.js
 //  Fonction : script d'autoconfiguration
-//  	téléchargé par thunderbird il récupère
-//		un fichier xml de prefs/comptes/extensions 
+//    téléchargé par thunderbird il récupère
+//    un fichier xml de prefs/comptes/extensions 
 //      puis l'applique.
 //             
 //
@@ -11,7 +11,7 @@
 //      1. positionne la préférence 'config.obm.autoconfigStatus=0'
 //      2. si 'config.obm.autoconfigStatus=0', on traite les préférences, les
 //         extensions et les comptes et on positionne 'config.obm.autoconfigStatus=1'
-//	Aux démarrages suivants si la pref est à 1 on ne traite que les extensions
+//  Aux démarrages suivants si la pref est à 1 on ne traite que les extensions
 //
 //  Pour réappliquer toutes les modifs il faut repasser la pref à 0.
 
@@ -24,7 +24,7 @@ const promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;
                                 
 const appStartup = Components.interfaces.nsIAppStartup;
 const appStartupService = Components.classes["@mozilla.org/toolkit/app-startup;1"]
-            										.getService(appStartup);
+                                .getService(appStartup);
 
 var global_config_url = _getPreference("autoadmin.global_config_url");
 global_config_url = global_config_url.replace(/autoconfig.js$/, "");
@@ -42,8 +42,8 @@ function runAutoconfiguration() {
                                "Autoconfiguration de Thunderbird." + "\n\n"
                              + "Veuillez entrer votre adresse email." );
       if (login == null) {
-      	//user canceled
-      	appStartupService.quit(appStartup.eForceQuit);
+        //user canceled
+        appStartupService.quit(appStartup.eForceQuit);
         return;
       }
       _displayMessage("Autoconfiguration", "Quand Thunderbird s'ouvrira patientez un peu, fermez et relancez.");
@@ -64,31 +64,31 @@ function runAutoconfiguration() {
       var configurationXML = _getDataHTTP(CONFIG_XML_URL.replace("%s", login));
       
       if ( configurationXML == "error") {
-      	_displayMessage("Autoconfiguration","Impossible de contacter le service d'autoconfiguration.");
-      	return;
+        _displayMessage("Autoconfiguration","Impossible de contacter le service d'autoconfiguration.");
+        return;
       }
-    	
-    	if ( configurationXML == "failed" ) {
-    		_displayMessage("Autoconfiguration","Erreur lors de l'autoconfiguration.");
-    		return;
-    	}
-    	
+      
+      if ( configurationXML == "failed" ) {
+        _displayMessage("Autoconfiguration","Erreur lors de l'autoconfiguration.");
+        return;
+      }
+      
       if ( configurationXML == "" ) {
         _displayError("Autoconfiguration", "Erreur lors de l'autoconfiguration :" + "\n\n"
                                          + "pas d'adresse correspondante dans l'annuaire.");
-				_setPreference(PREF_LOGIN, "");
-				appStartupService.quit(appStartup.eForceQuit);
-				return;
+        _setPreference(PREF_LOGIN, "");
+        appStartupService.quit(appStartup.eForceQuit);
+        return;
       }
 
       var configurationData = configurationXML;
       try {
-         configurationData = new XML(configurationData.replace(/<\?xml .*\?>/, ""));
+        configurationData = new XML(configurationData.replace(/<\?xml .*\?>/, ""));
       } catch (e) {
-         _displayError("Autoconfiguration", "Fichier XML de configuration non valide.");
-         _setPreference(PREF_LOGIN, "");
-         appStartupService.quit(appStartup.eForceQuit);
-         return;
+        _displayError("Autoconfiguration", "Fichier XML de configuration non valide.");
+        _setPreference(PREF_LOGIN, "");
+        appStartupService.quit(appStartup.eForceQuit);
+        return;
       }
       
       if (autoconfStatus == 0) {
@@ -128,10 +128,10 @@ function _displayMessage(title, text) {
 function _displayPrompt(title, text) {
   var input = { value: "" };
   if (promptService.prompt(null, title, text, input, null, {}) ) {
-  	return input.value;
+    return input.value;
   } else {
-  	//cancel pressed
-  	return null;
+    //cancel pressed
+    return null;
   }
 }
 
@@ -145,27 +145,27 @@ function _getDataHTTP(aURL) {
   var inputStream = channel.open();
   httpChannel = channel.QueryInterface(Components.interfaces.nsIHttpChannel);
 
-	try {
-			
-			if (! httpChannel.requestSucceeded ) {
-				return "failed";
-			}
-			
-			var charset = "iso8859-1";
-			const replacementChar = Components.interfaces.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER;
-			var converterInputStream = Components.classes["@mozilla.org/intl/converter-input-stream;1"]
-				                                   .createInstance(Components.interfaces.nsIConverterInputStream);
-			converterInputStream.init(inputStream, charset, 32768, replacementChar);
-			var str = "";
-			var buffer = {};
-			while ( converterInputStream.readString(32768, buffer) != 0 ) {
-				str += buffer.value;
-			}
+  try {
+      
+      if (! httpChannel.requestSucceeded ) {
+        return "failed";
+      }
+      
+      var charset = "iso8859-1";
+      const replacementChar = Components.interfaces.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER;
+      var converterInputStream = Components.classes["@mozilla.org/intl/converter-input-stream;1"]
+                                           .createInstance(Components.interfaces.nsIConverterInputStream);
+      converterInputStream.init(inputStream, charset, 32768, replacementChar);
+      var str = "";
+      var buffer = {};
+      while ( converterInputStream.readString(32768, buffer) != 0 ) {
+        str += buffer.value;
+      }
 
-			return str;
-	} catch (e) {
-		return "error";
-	}
+      return str;
+  } catch (e) {
+    return "error";
+  }
 }
 
 // positionne les préférences utilisateur, qui seront stockées dans le
@@ -175,28 +175,28 @@ function _setupPreferences(aConfigurationData) {
 
   for each ( var preference in preferences.*::preference ) {
     if ("@remove" in preference) {
-    	if (preference.@remove == "true") {
-    		_deletePrefBranch(preference.@name);
-    	}
+      if (preference.@remove == "true") {
+        _deletePrefBranch(preference.@name);
+      }
     } else {
-	    var typedValue;
-	
-	    // créé une variable JavaScript typée
-	    switch ( preference.@type.toString() ) {
-	      case "string":
-	        typedValue = preference.@value.toString();
-	        break;
-	      case "integer":
-	        typedValue = Number(preference.@value).valueOf(); // NaN ??
-	        break;
-	      case "boolean":
-	        typedValue = (preference.@value == "true");
-	        break;
-	      default:
-	        break;
-	    }
-	
-	    _setPreference(preference.@name, typedValue, preference.@set);
+      var typedValue;
+  
+      // créé une variable JavaScript typée
+      switch ( preference.@type.toString() ) {
+        case "string":
+          typedValue = preference.@value.toString();
+          break;
+        case "integer":
+          typedValue = Number(preference.@value).valueOf(); // NaN ??
+          break;
+        case "boolean":
+          typedValue = (preference.@value == "true");
+          break;
+        default:
+          break;
+      }
+  
+      _setPreference(preference.@name, typedValue, preference.@set);
     }
   }
 }
@@ -258,11 +258,11 @@ function _getPreference(aName, aDefaultValue) {
 
 function _deletePrefBranch(aName) {
   try {
-	  var prefBranch = Components.classes["@mozilla.org/preferences-service;1"]
-	                             .getService(Components.interfaces.nsIPrefBranch);
-	  prefBranch.deleteBranch(aName);
+    var prefBranch = Components.classes["@mozilla.org/preferences-service;1"]
+                               .getService(Components.interfaces.nsIPrefBranch);
+    prefBranch.deleteBranch(aName);
   } catch (e) {
-  	//nothing
+    //nothing
   }
 }
 
@@ -313,11 +313,13 @@ function _installExtensions(aConfigurationData) {
 
   for each ( var extension in extensions.*::extension ) {
     if ( _extensionMustBeUnInstalled(extension) ) {
-			if (_extensionIsAlreadyInstalled(extension.@id))
-				extensionManager.uninstallItem(extension.@id);
+      if (_extensionIsAlreadyInstalled(extension.@id)) {
+        extensionManager.uninstallItem(extension.@id);
+      }
     } else {
-    	if ( _extensionMustBeInstalled(extension) )
-      	extensionsToInstall.push(extension.@src.toString());
+      if ( _extensionMustBeInstalled(extension) ) {
+        extensionsToInstall.push(extension.@src.toString());
+      }
     }
   }
   var installManager = Components.classes["@mozilla.org/xpinstall/install-manager;1"]
@@ -352,8 +354,8 @@ function _extensionMustBeInstalled(aExtension) {
 // vérifie si l'extension est spécifié dans le xml comme à désinstaller
 // et qu'elle est installé
 function _extensionMustBeUnInstalled(aExtension) {
-	return ( aExtension.@uninstall && aExtension.@uninstall == "true"
-					 && _extensionIsAlreadyInstalled(aExtension.@id) );
+  return ( aExtension.@uninstall && aExtension.@uninstall == "true"
+           && _extensionIsAlreadyInstalled(aExtension.@id) );
 }
 
 
@@ -593,55 +595,55 @@ function _setupAccounts(aConfigurationData) {
     
     
     if ( "@draftFolder" in identity ) {
- 			var value = identity.@draftFolder.toString();
-    	if ( value.match(/.*@.*@/) ) {
-    		//multi-domain : replace 'login@domain@server' by 'login%40domain@server'
-    		value = value.replace("@","%40");
-    	}
+       var value = identity.@draftFolder.toString();
+      if ( value.match(/.*@.*@/) ) {
+        //multi-domain : replace 'login@domain@server' by 'login%40domain@server'
+        value = value.replace("@","%40");
+      }
       _setPreference("mail.identity." + identity.@id + ".draft_folder", value);
                      
     }
     if ( "@fccFolder" in identity ) {
-    	var value = identity.@fccFolder.toString();
-    	if ( value.match(/.*@.*@/) ) {
-    		//multi-domain : replace 'login@domain@server' by 'login%40domain@server'
-    		value = value.replace("@","%40");
-    	}
+      var value = identity.@fccFolder.toString();
+      if ( value.match(/.*@.*@/) ) {
+        //multi-domain : replace 'login@domain@server' by 'login%40domain@server'
+        value = value.replace("@","%40");
+      }
       _setPreference("mail.identity." + identity.@id + ".fcc_folder", value);
     }
     if ( "@stationeryFolder" in identity ) {
-    	var value = identity.@stationeryFolder.toString();
-    	if ( value.match(/.*@.*@/) ) {
-    		//multi-domain : replace 'login@domain@server' by 'login%40domain@server'
-    		value = value.replace("@","%40");
-    	}
+      var value = identity.@stationeryFolder.toString();
+      if ( value.match(/.*@.*@/) ) {
+        //multi-domain : replace 'login@domain@server' by 'login%40domain@server'
+        value = value.replace("@","%40");
+      }
       _setPreference("mail.identity." + identity.@id + ".stationery_folder", value);
     }
     
     if ( "@composeHtml" in identity) {
-    	_setPreference("mail.identity." + identity.@id + ".compose_html",
+      _setPreference("mail.identity." + identity.@id + ".compose_html",
                      identity.@composeHtml == "true" ? true : false);
     }
     
     if ( "@replyOnTop" in identity) {
-    	var value;
-    	switch ( identity.@replyOnTop.toString() ) {
-    		case "1":
-    			value = 1;
-    			break;
-    		case "2":
-    			value = 2;
-    			break;
-    		case "3":
-    			value = 3;
-    			break;
-    	}
-    	_setPreference("mail.identity." + identity.@id + ".reply_on_top",
+      var value;
+      switch ( identity.@replyOnTop.toString() ) {
+        case "1":
+          value = 1;
+          break;
+        case "2":
+          value = 2;
+          break;
+        case "3":
+          value = 3;
+          break;
+      }
+      _setPreference("mail.identity." + identity.@id + ".reply_on_top",
                      value);
     }
     
     if ( "@sigBottom" in identity) {
-    	_setPreference("mail.identity." + identity.@id + ".sig_bottom",
+      _setPreference("mail.identity." + identity.@id + ".sig_bottom",
                      identity.@sigBottom == "true" ? true : false);
     }
   }
@@ -695,32 +697,32 @@ function _setupAccounts(aConfigurationData) {
       }
 
       if ( "@trashFolder" in server ) {
-      	var value = server.@trashFolder.toString();
-      	if ( value.match(/.*@.*@/) ) {
-      		//multi-domain : replace 'login@domain@server' by 'login%40domain@server'
-      		value = value.replace("@","%40");
-      	}
+        var value = server.@trashFolder.toString();
+        if ( value.match(/.*@.*@/) ) {
+          //multi-domain : replace 'login@domain@server' by 'login%40domain@server'
+          value = value.replace("@","%40");
+        }
         _setPreference("mail.server." + server.@id + ".trash_folder_name", value);
       }
       
       if ( "@downloadBodies" in server ) {
-      	_setPreference("mail.server." + server.@id + ".download_bodies_on_get_new_mail",
-      								server.@downloadBodies == "true" ? true : false);
+        _setPreference("mail.server." + server.@id + ".download_bodies_on_get_new_mail",
+                      server.@downloadBodies == "true" ? true : false);
       }
       
       if ( "@offlineDownload" in server ) {
-      	_setPreference("mail.server." + server.@id + ".offline_download",
-      								server.@offlineDownload == "true" ? true : false);
+        _setPreference("mail.server." + server.@id + ".offline_download",
+                      server.@offlineDownload == "true" ? true : false);
       }
       
       if ( "@useSubscription" in server ) {
-      	_setPreference("mail.server." + server.@id + ".using_subscription",
-      								server.@useSubscription == "true" ? true : false);
+        _setPreference("mail.server." + server.@id + ".using_subscription",
+                      server.@useSubscription == "true" ? true : false);
       }
       
       if ( "@useIdle" in server ) {
-      	_setPreference("mail.server." + server.@id + ".use_idle",
-      								server.@useIdle == "true" ? true : false);
+        _setPreference("mail.server." + server.@id + ".use_idle",
+                      server.@useIdle == "true" ? true : false);
       }
   }
 
@@ -746,7 +748,7 @@ function _setupAccounts(aConfigurationData) {
         _setPreference("mail.smtpserver." + server.@id + ".auth_method", 0);
       }
 
-	  if ( "@port" in server ) {
+    if ( "@port" in server ) {
         _setPreference("mail.smtpserver." + server.@id + ".port",
                        server.@port.toString());
       }
@@ -817,15 +819,15 @@ function _setupDirectories(aConfigurationData) {
     _setPreference("ldap_2.servers." + directory.@id + ".replication.lastChangeNumber"
                     , 0);                
     
-	if ( "@autocomplete" in directory ) {
-		//extension multi-ldap : activer l'annuaire pour l'auto-complétion
-		if ( !autoCompleteDirectories.match("ldap_2.servers." + directory.@id) ) {
-		  if (autoCompleteDirectories != "") {
-		    autoCompleteDirectories += ",";
-		  }
-		  autoCompleteDirectories += "ldap_2.servers." + directory.@id;
-		}
-	}
+  if ( "@autocomplete" in directory ) {
+    //extension multi-ldap : activer l'annuaire pour l'auto-complétion
+    if ( !autoCompleteDirectories.match("ldap_2.servers." + directory.@id) ) {
+      if (autoCompleteDirectories != "") {
+        autoCompleteDirectories += ",";
+      }
+      autoCompleteDirectories += "ldap_2.servers." + directory.@id;
+    }
+  }
     
   }
   //extension multi-ldap : activer tous les annuaires pour l'auto-complétion
