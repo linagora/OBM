@@ -542,10 +542,9 @@ function _certificateIsAlreadyInstalled(aCertificateFingerprint) {
 function _setupAccounts(aConfigurationData) {
   // COMPTES
   var accounts = aConfigurationData.*::accounts;
-  var addedAccounts = [];
 
   var currentAccounts = _getPreference("mail.accountmanager.accounts", "");
-  currentAccounts = (currentAccounts != "" ? currentAccounts.split(",") : []);
+  var allAccounts = (currentAccounts != "" ? currentAccounts.split(",") : []);
 
   for each ( var account in accounts.*::account ) {
     if ( currentAccounts.indexOf(account.@id.toString()) != -1 ) {
@@ -557,11 +556,11 @@ function _setupAccounts(aConfigurationData) {
                    account.@identities.toString().replace(" ", ","));
     _setPreference("mail.account." + account.@id + ".server",
                    account.@server.toString());
-    addedAccounts.push(account.@id.toString());
+    allAccounts.push(account.@id.toString());
   }
 
   _setPreference("mail.accountmanager.accounts",
-                 currentAccounts + "," + addedAccounts.join(","));
+                 allAccounts.join(","));
 
   if ( "@defaultAccount" in accounts ) {
     _setPreference("mail.accountmanager.defaultaccount",
