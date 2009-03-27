@@ -211,7 +211,7 @@ function run_query_user_ext_search($user) {
   else $first_row = 0;
 
   if ($filter_entity == 'calendar') {
-    $where_filter_entity = ' AND userobm_id IN ('.OBM_Acl::getAclSubselect('userobm_id', 'calendar', null, $obm['uid'], $filter_pattern).')';
+    $where_filter_entity = ' AND userobm_id IN ('.OBM_Acl::getAclSubselect('calendarentity_calendar_id', 'calendar', null, $obm['uid'], $filter_pattern).')';
   }
 
    $query = "SELECT 

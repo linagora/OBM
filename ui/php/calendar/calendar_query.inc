@@ -2390,7 +2390,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         event_allday
       FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-        LEFT JOIN UserObm ON event_owner = userobm_id
+        INNER JOIN UserObm ON event_owner = userobm_id
         INNER JOIN EventLink ON event_id = eventlink_event_id
         INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
       WHERE event_type='VEVENT'
@@ -2429,7 +2429,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         event_allday
       FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-        LEFT JOIN UserObm ON event_owner = userobm_id
+        INNER JOIN UserObm ON event_owner = userobm_id
         INNER JOIN EventLink ON event_id = eventlink_event_id
         INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
       WHERE event_type='VEVENT'
@@ -2469,7 +2469,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
       event_allday
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-      LEFT JOIN UserObm ON event_owner = userobm_id
+      INNER JOIN UserObm ON event_owner = userobm_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
       INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT'
@@ -2542,7 +2542,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_allday
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-      LEFT JOIN UserObm ON event_owner = userobm_id
+      INNER JOIN UserObm ON event_owner = userobm_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
       INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT'
@@ -2584,7 +2584,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_allday
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-      LEFT JOIN UserObm ON event_owner = userobm_id
+      INNER JOIN UserObm ON event_owner = userobm_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
       INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
     WHERE event_type='VEVENT'
@@ -2627,7 +2627,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
       event_allday
     FROM Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-      LEFT JOIN UserObm ON event_owner = userobm_id
+      INNER JOIN UserObm ON event_owner = userobm_id
       INNER JOIN EventLink ON event_id = eventlink_event_id
       INNER JOIN ResourceEntity ON resourceentity_entity_id = eventlink_entity_id
    WHERE event_type='VEVENT' 

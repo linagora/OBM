@@ -928,6 +928,7 @@ function run_query_project_memberlist_insert($params) {
       display_debug_msg($query, $cdg_sql, 'run_query_project_memberlist_insert(3)');
       $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
+      project_send_mail(array("member"=>$params["mem$cpt"]),$params['project_id']);
       $cpt_ins++;
     }
   }
@@ -1010,7 +1011,7 @@ function run_query_project_memberstatus_change($params) {
   display_debug_msg($query, $cdg_sql, 'run_query_project_memberstatus_change');
   $obm_q->query($query);
   if ($m_val == 1) {
-    project_send_mail($params,$pid);
+    project_send_mail($params,$params['project_id']);
   }
   return $obm_q;
 }

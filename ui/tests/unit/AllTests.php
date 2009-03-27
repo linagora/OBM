@@ -21,10 +21,12 @@ require_once dirname(__FILE__).'/TestsHelper.php';
 
 require_once 'AclTest.php';
 require_once 'VpdiTest.php';
+require_once 'ReportTest.php';
  
 class AllTests {
   public static function suite() {
     $suite = new PHPUnit_Framework_TestSuite('OBM');
+    $suite->addTestSuite('ReportTest');
     $suite->addTestSuite('AclTest');
     $suite->addTestSuite('VpdiTest');
     return $suite;
