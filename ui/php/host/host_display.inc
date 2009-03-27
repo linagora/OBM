@@ -47,7 +47,7 @@ function dis_data_host(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == 'host_smtp_in') {
     $res['align'] = 'center';
-    if ($OD->data_set->f($fieldname) == '1') {
+    if ($OD->data_set->f($fieldname)) {
       $res['name'] = 'X';
     } else {
       $res['name'] = ' ';
@@ -56,7 +56,7 @@ function dis_data_host(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == 'host_smtp_out') {
     $res['align'] = 'center';
-    if ($OD->data_set->f($fieldname) == '1') {
+    if ($OD->data_set->f($fieldname)) {
       $res['name'] = 'X';
     } else {
       $res['name'] = ' ';
@@ -65,7 +65,7 @@ function dis_data_host(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == 'host_imap') {
     $res['align'] = 'center';
-    if ($OD->data_set->f($fieldname) == '1') {
+    if ($OD->data_set->f($fieldname)) {
       $res['name'] = 'X';
     } else {
       $res['name'] = ' ';
@@ -74,7 +74,7 @@ function dis_data_host(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == 'host_samba') {
     $res['align'] = 'center';
-    if ($OD->data_set->f($fieldname) == '1') {
+    if ($OD->data_set->f($fieldname)) {
       $res['name'] = 'X';
     } else {
       $res['name'] = ' ';
