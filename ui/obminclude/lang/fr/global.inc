@@ -101,6 +101,8 @@ $l_insert_ok = "Insertion réussie";
 $l_insert_error = "Erreur à l'insertion";
 $l_update_ok = "Mise à jour réussie";
 $l_update_error = "Erreur à la mise à jour";
+$l_valid_ok = "Mise à jour et validation réussie";
+$l_valid_error = "Erreur à la validation";
 $l_delete_ok = "Suppression réussie";
 $l_delete_error = "Erreur à la suppression";
 $l_date_inconsistency = "Incohérences de dates";
@@ -448,6 +450,8 @@ $l_document_add = "Lier des documents";
 //Profile headers
 $l_header_properties = "Propriétés";
 
+//People headers
+$l_header_wait = "En attente";
 ////////////////////////////////////////////////////////
 // Javascript error ////////////////////////////////////
 ////////////////////////////////////////////////////////

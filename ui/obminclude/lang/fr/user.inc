@@ -9,6 +9,7 @@
 
 $l_login = "Identifiant";
 $l_password = "Mot de passe";
+$l_password_update = "Modification mot de passe";
 $l_lastaccess = "Dernier accès";
 $l_phone2 = "$l_phone 2";
 $l_fax2 = "$l_fax 2";
@@ -65,11 +66,13 @@ $l_mailserver_auto = "Automatique";
 // Actions
 $l_insert = "Enregistrer l'utilisateur";
 $l_update = "Modifier l'utilisateur";
+$l_update_valid = "Modifier et Valider l'utilisateur";
 $l_update_group = "Modifier les groupes de l'utilisateur";
 $l_checkdelete = "Vérifier ou Supprimer l'utilisateur";
 $l_reset = "Préférences par défaut";
 $l_delete = "Supprimer l'utilisateur";
 $l_add = "Ajouter ces utilisateurs";
+$l_generate_passwd = "Generate";
 
 $l_add_users = "Ajouter des utilisateurs";
 
@@ -137,6 +140,7 @@ $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
 $l_change_login_confirm = "Vous avez modifié le login de l'utilisateur.\\nIl est *impératif* que l'utilisateur dont le login a été modifié soit déconnecté de toutes applications liées à OBM lors de la validation de cette modification (OBM, client de messagerie, webmail, connecteur).\\nConfirmer le changement d'identifiant ?";
 $l_j_coord_same_phone_error = "Vous devez saisir des numéros de téléphone différents !";
 $l_j_coord_same_fax_error = "Vous devez saisir des numéros de fax différents !";
+$l_change_password_confirm = "Vous allez écraser le mot de passe déjà présent. </br> Voulez-vous continuer ?";
 
 $l_user_display = "Options d'affichage des listes d'utilisateurs";
 
