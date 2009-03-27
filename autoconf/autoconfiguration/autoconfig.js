@@ -63,12 +63,12 @@ function runAutoconfiguration() {
       
       var configurationXML = _getDataHTTP(CONFIG_XML_URL.replace("%s", login));
       
-      if ( configurationXML == "error") {
+      if ( configurationXML == "failed") {
         _displayMessage("Autoconfiguration","Impossible de contacter le service d'autoconfiguration.");
         return;
       }
       
-      if ( configurationXML == "failed" ) {
+      if ( configurationXML == "error" ) {
         _displayMessage("Autoconfiguration","Erreur lors de l'autoconfiguration.");
         return;
       }
@@ -481,6 +481,17 @@ function _importCertificates(aConfigurationData) {
 
     var certificateContent = _getDataHTTP(certificate.@src);
     if ( !certificateContent ) {
+      continue;
+    }
+    if ( configurationXML == "failed" ) {
+      continue;
+    }
+
+    if ( configurationXML == "error" ) {
+      continue;
+    }
+         
+    if ( configurationXML == "" ) {
       continue;
     }
          
