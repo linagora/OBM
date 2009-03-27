@@ -281,7 +281,6 @@ function dis_people_consult($user) {
   global $display, $l_err_reference;
 
   $id = $user["user_id"];
-
   if ($id > 0) {
     $obm_q = run_query_people_detail($id);
     if ($obm_q->num_rows() == 1) {
@@ -295,6 +294,118 @@ function dis_people_consult($user) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the context about a user insertion or update
+// When similar users exists we show these and ask confirmation
+// Parameters:
+//   - $p_id     : user id
+//   - $usr_q    : user database result (at least 1 row)
+//   - $user[]   : default values
+//     keys used : login, passwd, perms, lastname, firstname, archive, email
+///////////////////////////////////////////////////////////////////////////////
+function dis_people_warn_insert($p_id, $peo_q, $people) {
+  global $l_check_sameuser, $l_confirm, $l_back;
+  global $display, $c_yes, $c_no;
+
+  // infos
+  $login = $people["login"];
+  $passwd = $people["passwd"];
+  $profile = $people["profile"];
+  $hidden = $people["hidden"];
+  $kind = $people["kind"];
+  $lname = $people["lastname"];
+  $fname = $people["firstname"];
+  $title = $people["title"];
+  $datebegin = $people["datebegin"];
+  $dateexp = $people["dateexp"];
+  $email = $people["email"];
+  $desc = $people["desc"];
+  $archive = $people["archive"];
+  $domain_id = $people["domain_id"];
+  $delegation = $people["delegation"];
+  $delegation_target = $people["delegation_target"];
+
+  // coord
+  $phone = $people["phone"];
+  $phone2 = $people["phone2"];
+  $mobile = $people["mobile"];
+  $fax = $people["fax"];
+  $fax2 = $people["fax2"];
+  $company = $people["company"];
+  $direction = $people["direction"];
+  $service = $people["service"];
+  $ad1 = $people["ad1"];
+  $ad2 = $people["ad2"];
+  $ad3 = $people["ad3"];
+  $zip = $people["zip"];
+  $town = $people["town"];
+  $cdx = $people["cdx"];
+  $country = $people["country"];
+
+  $display["msg"] .= display_warn_msg($l_check_sameuser);
+  while ($peo_q->next_record()) {
+    $id = $peo_q->f("userobm_id");
+    $samename = $peo_q->f("userobm_login");
+    $dis_same_people .= "
+        <li>
+          <a href=\"" . url_prepare("people_index.php?action=detailconsult&amp;user_id=$id") . "\">$samename</a>
+        </li>";
+  }
+
+
+  $hidden_fields = "
+  <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />
+  <input type=\"hidden\" name=\"sel_profile\" value=\"$profile\" />
+  <input type=\"hidden\" name=\"tf_kind\" value=\"$kind\" />
+  <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
+  <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
+  <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
+  <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+  <input type=\"hidden\" name=\"sel_domain_id\" value=\"$domain_id\" />
+  <input type=\"hidden\" name=\"delegation\" value=\"$delegation\" />
+
+  <input type=\"hidden\" name=\"phone\" value=\"$phone\" />
+  <input type=\"hidden\" name=\"phone2\" value=\"$phone2\" />
+  <input type=\"hidden\" name=\"mobile\" value=\"$mobile\" />
+  <input type=\"hidden\" name=\"fax\" value=\"$fax\" />
+  <input type=\"hidden\" name=\"fax2\" value=\"$fax2\" />
+  <input type=\"hidden\" name=\"company\" value=\"$company\" />
+  <input type=\"hidden\" name=\"direction\" value=\"$direction\" />
+  <input type=\"hidden\" name=\"service\" value=\"$service\" />
+  <input type=\"hidden\" name=\"ad1\" value=\"$ad1\" />
+  <input type=\"hidden\" name=\"ad2\" value=\"$ad2\" />
+  <input type=\"hidden\" name=\"ad3\" value=\"$ad3\" />
+  <input type=\"hidden\" name=\"zip\" value=\"$zip\" />
+  <input type=\"hidden\" name=\"town\" value=\"$town\" />
+  <input type=\"hidden\" name=\"cdx\" value=\"$cdx\" />
+  <input type=\"hidden\" name=\"country\" value=\"$country\" />
+
+  ";
+
+  $block = "
+  <div class=\"detail\">
+    <ul>
+    $dis_same_people
+    </ul>
+  </div>
+  <div class=\"buttons\">
+    <form method=\"post\" name=\"form_insert\"
+    action=\"" . url_prepare("people_index.php") . "\">
+    $hidden_fields
+    <input type=\"hidden\" name=\"action\" value=\"insert\" />
+    <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
+    <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
+    </form>
+    <form name=\"form_back\" method=\"post\"
+    action=\"" . url_prepare("people_index.php") . "\">
+    $hidden_fields
+    <input type=\"hidden\" name=\"action\" value=\"new\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>
+ </div>";
+
+  return $block;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display User Consultation
@@ -471,8 +582,8 @@ $mail_section
 //   - $field : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
 function html_people_form($usr_q, $user, $field='') {
-  global $l_kind, $l_lastname, $l_firstname;
-  global $l_people, $l_title, $l_update; 
+  global $l_kind, $l_lastname, $l_firstname, $l_login;
+  global $l_people, $l_title, $l_insert, $l_update; 
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_company, $l_direction, $l_service, $l_address;
   global $l_postcode, $l_town, $l_expresspostal;
@@ -511,6 +622,9 @@ function html_people_form($usr_q, $user, $field='') {
     $ctry_name = $usr_q->f("country_name");
 
     $dis_title = "$fname $lname";
+  } elseif ($action == 'new'){
+    $dom_infos = of_domain_get_domain_infos($obm['domain_id'],true);
+    $delegation = $obm['delegation'];
   }
 
   // If parameters have been given, they supercede the default action value
@@ -520,6 +634,7 @@ function html_people_form($usr_q, $user, $field='') {
   if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
   if (isset($user["title"])) { $title = stripslashes($user["title"]); }
+  if (isset($user["delegation"])) { $delegation = stripslashes($user["delegation"]); }
   if (isset($user["desc"])) { $desc = $user["desc"]; }
 
   // coord
@@ -546,7 +661,20 @@ function html_people_form($usr_q, $user, $field='') {
     $class[$field] = "error";
   }
 
-  if (($action=="detailupdate") || ($action=="update")) {
+/*  // login (can't be updated, so only on insert)
+  if (($action == "new") || ($action == "insert")) {
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' maxlength=\"32\" value=\"$login\" />";
+  } else {
+    $dis_login = "<input type=\"text\" name=\"tf_login\" size=\"24\"  id='userLogin' maxlength=\"32\" value=\"$login\" />
+                  <input type=\"hidden\" name=\"tf_old_login\" value=\"$old_login\" />";
+  }*/
+
+ // Buttons
+  if (($action == "new") || ($action == "insert")) {
+    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"submit\" value=\"$l_insert\" />";
+
+  } elseif (($action=="detailupdate") || ($action=="update")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"user_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_update\" />";
@@ -800,5 +928,61 @@ function dis_user_mail_field($values,$class) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: the User Display preference screen
+// Parameters:
+//   - $$params[] : user params
+///////////////////////////////////////////////////////////////////////////////
+function dis_people_wait_list($params) {
+  global $display, $obm;
+
+  $filter_entity = $params["filter_entity"];
+  $popup = $params["popup"];
+
+  $obm_q = run_query_people_search_wait($user);
+
+  $prefs = get_display_pref($obm["uid"], "people");
+  $nb_user = $obm_q->num_rows_total();
+  if ($nb_user == 0) {
+    $display["msg"] .= display_warn_msg($GLOBALS['l_no_found']);
+  } else {
+    $display["msg"] .= display_info_msg("$nb_user $GLOBALS[l_found]");
+    $block = html_people_wait_list($obm_q, $prefs, $user, $popup);
+  }
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display the Waiting people Search result
+// Parameters:
+//   - $obm_q    : database result (people list)
+//   - $prefs    : the fields which have to be displayed
+//   - $user[]   : user search criteria
+//     keys used : login, lastname, pemrs
+///////////////////////////////////////////////////////////////////////////////
+function html_people_wait_list($obm_q, $prefs, $user, $popup) {
+  global $l_close, $l_add;
+
+  $lname = urlencode($user["lastname"]);
+  $fname = urlencode($user["firstname"]);
+  $desc = urlencode($user["desc"]);
+
+  // User defined data
+  $url_userdata = of_userdata_get_url_search_params('user', $user);
+
+  $url = url_prepare("people_index.php?action=search&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;tf_email=$email&amp;tf_desc=$desc$url_userdata$url_ext");
+  $user_d = new OBM_DISPLAY("DATA", $prefs, "people");
+
+  $user_d->data_set = $obm_q;
+  $user_d->data_header = "both";
+  $user_d->data_url = $url;
+
+  // --- HTML Template --------------------------------------------------------
+  $block .= $user_d->display("dis_people_data");
+  $block .= $display_popup_end;
+
+  return $block;
+}
 
 ?>

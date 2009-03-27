@@ -55,14 +55,24 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
   $ext_url = $params["ext_url"];
   $ext_element = $params["ext_element"];
 
+  $status = $OD->data_set->f('userobm_status');
+
   if (($fieldname == "userobm_login")) {
     if ($OD->display_ext == "get_id") {
       $res["url"] = "javascript:check_user_get_id(".$OD->data_set->f("userobm_id").",'".addslashes($OD->data_set->f("userobm_login"))."');";
     } else if ($OD->display_ext == "get_id_url") {
       $res["url"] = "javascript:check_user_get_id_url('$ext_url',".$OD->data_set->f("userobm_id").");";
-    } else {
+    } else if ($status != 'INIT') {
       if ($link_ok && $perm->check_right($module, $cright_read_admin))
         $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
+    }
+  }
+
+  if (($fieldname == "userobm_lastname") && ($status == 'INIT')){
+    if ($OD->display_ext == "get_id") {
+      $res["url"] = "javascript:check_user_get_id(".$OD->data_set->f("userobm_id").",'".addslashes($OD->data_set->f("userobm_lastname"))."');";
+    } else {
+      $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f("userobm_id");
     }
   }
 
@@ -995,7 +1005,8 @@ function html_user_group_consult($usr_q) {
 function html_user_form($usr_q, $user, $field='') {
   global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
   global $l_user, $l_title, $l_archive, $l_datebegin, $l_dateexp, $l_noexperie, $l_insert, $l_update;
-  global $l_delegation_target, $l_hidden, $l_photo; 
+  global $l_update_valid, $l_validate, $l_change_password_confirm, $l_password_update;
+  global $l_delegation_target, $l_hidden, $l_photo, $l_generate_passwd; 
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_company, $l_direction, $l_service, $l_address;
   global $l_postcode, $l_town, $l_expresspostal;
@@ -1036,6 +1047,9 @@ function html_user_form($usr_q, $user, $field='') {
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
     $hidden = ($usr_q->f("userobm_hidden") == "1" ? " checked" : "");
     $photo_id = $usr_q->f("userobm_photo_id");
+
+    //Wait people
+    $status = $usr_q->f("userobm_status");
 
     // coord
     $phone = $usr_q->f("userobm_phone");
@@ -1127,6 +1141,9 @@ function html_user_form($usr_q, $user, $field='') {
   if (isset($user["archive"])) { $archive = ($user["archive"] == '1' ? "checked" : ""); }
   if (isset($user["hidden"])) { $hidden = ($user["hidden"] == '1' ? "checked" : ""); }
   if (isset($user["photo_id"])) { $photo_id = $user["photo_id"]; }
+
+  // wait people
+  if (isset($user["status"]) && $action != 'detailupdate') { $status = $user["status"]; }
 
   // coord
   if (isset($user["phone"])) { $phone = $user["phone"]; }
@@ -1502,10 +1519,67 @@ function html_user_form($usr_q, $user, $field='') {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
 
-  } elseif (($action=="detailupdate") || ($action=="update")) {
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"hidden\" name=\"user_id\" value=\"$id\" />
-      <input type=\"submit\" value=\"$l_update\" />";
+  } elseif (($action=="detailupdate") || ($action=="update") || ($action=="valid")) {
+    $dis_button = "<input type=\"hidden\" id=\"user_action\" name=\"action\" value=\"update\" />
+      <input type=\"hidden\" name=\"user_id\" value=\"$id\" />";
+    if ($status == 'INIT') {
+        $dis_button .= "<input type=\"button\" onclick=\"obm.popup.show('idPopupValidUser')\" value=\"$l_update\" />";
+    } else {
+        $dis_button .= "<input type=\"submit\" value=\"$l_update\" />";
+    }
+  }
+
+  //Popup password Generate
+  $pop_generate = "
+    <div id=\"popupModifPassword\" class=\"obmPopup\">
+        <h1>
+          <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
+            <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+          </a>
+          <span>$l_password_update</span>
+          </h1>
+          </br>
+          $l_change_password_confirm
+        <fieldset class=\"buttons\">
+		    	<input type=\"button\" onclick=\"javascript:generate_passwd()\" id=\"popup_confirm\" class=\"closeSticky\" value=\"$GLOBALS[l_confirm]\" />
+          <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
+				</fieldset>
+    </div>
+    ";
+
+  // Status User
+  if($status == 'INIT'){
+    $dis_status = "
+        <input type=\"hidden\" name=\"ta_status\" value=\"$status\" />
+        ";
+    $pop_up = "
+      <div id=\"idPopupValidUser\" class=\"obmPopup\">
+        <h1>
+          <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
+            <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+          </a>
+          <span>Modif User</span>
+        </h1>
+        <input name=\"cba_modif\" type=\"radio\" onclick=\"$('user_action').value='valid'\"/><span>$l_update_valid</span>
+        <input name=\"cba_modif\" type=\"radio\" checked=\"checked\" onclick=\"$('user_action').value='update'\"/><span>$l_update</span>
+        <fieldset class=\"buttons\">
+		    	<input type=\"button\" onclick=\"$('dataUser').submit()\" id=\"popup_manage\" class=\"closeSticky\" value=\"$l_validate\" />
+          <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
+				</fieldset>
+      </div>
+      ";
+    $dis_archive = "
+      <tr>
+        <td><input name=\"cba_archive\" type=\"hidden\" value=\"1\" $archive /></td>
+      </tr>
+    "; 
+  } else {
+    $dis_archive = "
+      <tr>
+        <th class=\"$class[archive]\">$l_archive</th>
+        <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
+      </tr>
+    "; 
   }
 
   // Photo
@@ -1528,6 +1602,7 @@ function html_user_form($usr_q, $user, $field='') {
     'user' => $GLOBALS['cright_write_admin'],
     //'resource' => $GLOBALS['cright_write'], 
     'host' => $GLOBALS['cright_write'],
+    'people' => $GLOBALS['cright_write'],
     'group' => $GLOBALS['cright_write_admin'],
     'mailshare' => $GLOBALS['cright_write']);
   foreach ($user['profiles'] as $k_profile => $one_profile) {
@@ -1582,7 +1657,9 @@ function html_user_form($usr_q, $user, $field='') {
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-  <form method=\"post\" name=\"f_entity\"
+    $pop_up
+    $pop_generate
+  <form id=\"dataUser\" method=\"post\" name=\"f_entity\"
     enctype=\"multipart/form-data\"
     onsubmit=\"return (check_phoneFax_number(this) && check_user(this));\"
     action=\"" . url_prepare("user_index.php") . "\">
@@ -1628,17 +1705,17 @@ function html_user_form($usr_q, $user, $field='') {
   </tr>
   <tr>
     <th class=\"$class[password]\">$l_password</th>
-    <td><input type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
+    <td><input id=\"passwd\" type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" />
+        <button type=\"button\" onclick=\"javascript:modif_password()\">$l_generate_passwd</button>
+    </td>
   </tr>
+  $dis_status
   $dis_domain
   <tr>
     <th class=\"$class[hidden]\">$l_hidden</th>
     <td><input name=\"cba_hidden\" type=\"checkbox\" value=\"1\" $hidden /></td>
   </tr>
-  <tr>
-    <th class=\"$class[archive]\">$l_archive</th>
-    <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
-  </tr>
+  $dis_archive
   <tr>
     <th class=\"$class[profile]\">$l_profile</th>
     <td><select name=\"sel_profile\" onchange='showDelegation(this);'>
@@ -2792,5 +2869,65 @@ function disp_tf_coord($name, $size, $params) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the User search result
+// Parameters:
+//   - $user[]   : user search criteria
+///////////////////////////////////////////////////////////////////////////////
+function dis_user_wait_list($user) {
+  global $l_found, $l_no_found;
+  global $display, $obm;
+  
+  $user['archive'] = 1;
+  $user['status'] = "INIT";
+  $user['delegation'] = $obm['delegation'];
 
+  $popup = $user["popup"];
+  $filter_entity = $user["filter_entity"];
+  
+  $obm_q = run_query_user_search($user);
+
+  $prefs = get_display_pref($obm["uid"], "user");
+  $nb_user = $obm_q->num_rows_total();
+  if ($nb_user == 0) {
+    $display["msg"] .= display_warn_msg($l_no_found);
+  } else {
+    $display["msg"] .= display_info_msg("$nb_user $l_found");
+    $block = html_user_wait_list($obm_q, $prefs, $user, $popup);
+  }
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display the Waiting people Search result
+// Parameters:
+//   - $obm_q    : database result (people list)
+//   - $prefs    : the fields which have to be displayed
+//   - $user[]   : user search criteria
+//     keys used : login, lastname, pemrs
+///////////////////////////////////////////////////////////////////////////////
+function html_user_wait_list($obm_q, $prefs, $user, $popup) {
+  global $l_close, $l_add;
+
+  $lname = urlencode($user["lastname"]);
+  $fname = urlencode($user["firstname"]);
+  $desc = urlencode($user["desc"]);
+
+  // User defined data
+  $url_userdata = of_userdata_get_url_search_params('user', $user);
+
+  $url = url_prepare("user_index.php?action=search&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;tf_email=$email&amp;tf_desc=$desc$url_userdata$url_ext");
+  $user_d = new OBM_DISPLAY("DATA", $prefs, "user");
+
+  $user_d->data_set = $obm_q;
+  $user_d->data_header = "both";
+  $user_d->data_url = $url;
+
+  // --- HTML Template --------------------------------------------------------
+  $block .= $user_d->display("dis_user_data");
+  $block .= $display_popup_end;
+
+  return $block;
+}
 ?>

@@ -48,6 +48,12 @@ function run_query_user_search($user) {
   $lastaccess = sql_date_format($db_type, 'userobm_timelastaccess', 'timelastaccess');
   $multidomain = sql_multidomain('userobm');
 
+  if(isset($user['status'])){
+    $status = $user['status'];
+  } else {
+    $status = 'VALID';
+  }
+
   if ($filter_entity == 'calendar') {
     $where_filter_entity = ' AND userobm_id IN ('.OBM_Acl::getAclSubselect('userobm_id', 'calendar', null, $obm['uid'], $filter_pattern).')';
   }
@@ -89,6 +95,12 @@ function run_query_user_search($user) {
   if (trim($delegation) != '') {
      if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_delegation $like '$delegation%'";
+  }
+  
+  // If a status indication has been specified, get it
+  if ($status != '') {
+    if (trim($where) != '') $where .= ' AND';
+    $where .= " userobm_status = '$status'";
   }
 
   // If an email indication has been specified, get it
@@ -2557,5 +2569,56 @@ function run_query_user_samba_properties() {
     $samba[$db->f('serviceproperty_property')] = $db->f('serviceproperty_value');
   }
   return $samba;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check user who wait to be valid
+// Parameters:
+//   - $user[] : user search criteria
+// Returns : true if some user wait or false
+///////////////////////////////////////////////////////////////////////////////
+function check_user_wait($user){
+  global $obm;
+
+  $rep = false;
+  
+  $user['archive'] = 1;
+  $user['status'] = "INIT";
+  $user['delegation'] = $obm['delegation'];
+
+  $obm_q = run_query_user_search($user);  
+  
+  if ($obm_q->num_rows() > 0){
+    $rep = true;
+  }
+
+  return $rep;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Executions - Valid a INIT user
+// Unarchive the user an update the status to VALID
+// Parameters:
+//   - $user_id : user id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_user_valid($user_id){
+  global $obm;
+
+  $status = 'VALID';
+  $archive = 0;
+
+  $query = "
+    UPDATE UserObm SET
+    userobm_status = '$status',
+    userobm_archive = $archive
+    WHERE userobm_id = $user_id
+  ";
+
+  $obm_q = new DB_OBM;
+
+  $retour = $obm_q->query($query);
+
+  return $retour;
 }
 ?>

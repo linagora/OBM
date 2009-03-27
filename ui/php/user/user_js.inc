@@ -267,6 +267,47 @@ function sambaHomeCompute() {
   var hidden = $('userSambaHiddenHome').value;
   $('userSambaHome').value = hidden.replace(/%u/g, login);
 }
+
+function random_password() {
+  var mdp = '';
+  var i = 0;
+  var length = 10;
+  var allowed_char = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ0123456789[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/])';
+  var test = false;
+  while(i<length) {
+    var nb = Math.floor(Math.random() * allowed_char.length);
+    var carac = allowed_char[nb];
+    mdp += carac;
+    i++;
+  }
+
+  return mdp;
+}
+
+function generate_passwd() {
+  /*var valid_carac = new RegExp(\"/^([a-z]|[0-9]|[A-Z]|[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/])*$/\");
+  var valid_type_carac = new RegExp(\"/^([a-z]|[A-Z]){0,4}([0-9]|[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/])([a-z]|[0-9]|[A-Z]|[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/])*$/\");
+  var valid_cinq = new RegExp(\"/^(?(?=.*[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/].*)(?(?=.*[A-Z].*).*([0-9]|[a-z]).*|(?=.*[0-9].*).*[a-z].*)|(?=.*[A-Z].*)(?=.*[0-9].*).*[a-z].*)$/\")
+  var test = true;*/
+  var i=0;
+  //while(test = true && i<1000){
+    var mdp = random_password();
+    /*test = valid_carac.test(mdp);
+    test = valid_type_carac(mdp);
+    i++;
+  }*/
+  $('passwd').setProperty('type','text');
+  $('passwd').value=mdp;
+}
+
+function modif_password() {
+  var passwd = $('passwd').value;
+  if (passwd == '') {
+    generate_passwd();
+  } else {
+    obm.popup.show('popupModifPassword');
+  }
+}
 ";
 
 ?>

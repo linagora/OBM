@@ -124,6 +124,10 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_user_consult($params);
 
+} elseif ($action == 'wait') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['result'] = dis_user_wait_list($params);
+
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_update_rights($params)) {
@@ -196,6 +200,29 @@ if ($action == "ext_get_ids") {
       set_update_state();
       $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
       $display["detail"] = dis_user_consult($params);
+    } else {
+      $display["msg"] .= display_err_msg("$l_user : $l_update_error");
+      $display["detail"] = html_user_form("", $params, $err["field"]);
+    }
+  } else {
+    $display["msg"] .= display_err_msg($err["msg"]);
+    $display["detail"] = html_user_form("", $params, $err["field"]);
+  }
+
+} elseif ($action == "valid") {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_user_defined_rules() && check_user_data_form($params["user_id"], $params)) {
+    $retour = run_query_user_update($params["user_id"], $params);
+    if ($retour) {
+      $retour = run_query_user_valid($params["user_id"]);
+      if ($retour) {
+        set_update_state();
+        $display["msg"] .= display_ok_msg("$l_user : $l_valid_ok");
+        $display["detail"] = dis_user_consult($params);
+      } else {
+        $display["msg"] .= display_err_msg("$l_user : $l_valid_error");
+        $display["detail"] = html_user_form("", $params, $err["field"]);
+      }
     } else {
       $display["msg"] .= display_err_msg("$l_user : $l_update_error");
       $display["detail"] = html_user_form("", $params, $err["field"]);
@@ -395,6 +422,7 @@ function get_user_action() {
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin,$l_header_import;
   global $l_header_upd_group,$l_header_admin, $l_header_reset, $l_header_batch;
+  global $l_header_wait;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   
   of_category_user_module_action('user');
@@ -429,6 +457,14 @@ function get_user_action() {
     'Url'      => "$path/user/user_index.php?action=new",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display','dispref_display','dispref_level', 'delete')
+                                  );
+
+// Wait
+  $actions['user']['wait'] = array (
+   'Name'     => $l_header_wait,
+   'Url'      => "$path/user/user_index.php?action=wait",
+   'Right'    => $cright_read_admin,
+   'Condition'=> array ('all')
                                   );
 
 // Search
@@ -476,6 +512,13 @@ function get_user_action() {
 // Update
   $actions['user']['update'] = array (
     'Url'      => "$path/user/user_index.php?action=update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     );
+
+// Valid
+  $actions['user']['valid'] = array (
+    'Url'      => "$path/user/user_index.php?action=valid",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
@@ -624,6 +667,9 @@ function update_user_action() {
       $actions['user']['detailupdate']['Condition'] = array('None');
       $actions['user']['detailconsult']['Condition'] = array('None');
     }
+  }
+  if(!check_user_wait($params)) {
+    $actions['user']['wait']['Condition'] = array('None');
   }
 }
 

@@ -66,7 +66,7 @@ $entities = array(
                        'local' => 1, 'timelastaccess' => 1, 'nb_login_failed' => 1, 'delegation_target' => 1, 
                        'calendar_version' => 1, 'nomade_datebegin' => 1, 'nomade_dateend' => 1, 'vacation_datebegin' => 1,
                        'vacation_dateend' => 1),
-    'rules'   => array(),
+    'rules'   => array("status" => "VALID"),
     'display' => array('firstname', 'lastname', 'email'),
     'display_format' => '%s %s <%s>'
   ),

@@ -76,9 +76,17 @@ if ($action == "ext_get_ids") {
   echo '('.$display['json'].')';
   exit();
 
+} elseif ($action == 'new') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = html_people_form('',$params);
+
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_people_consult($params);
+
+} elseif ($action == 'wait') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['result'] = dis_people_wait_list($params);
 
 } elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,6 +96,48 @@ if ($action == "ext_get_ids") {
     $display['detail'] = html_people_form($obm_q, $params);
   } else {
     $display['msg'] .= display_err_msg($l_err_reference);
+  }
+
+} elseif ($action == "insert") {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_user_defined_rules() && check_user_data_form("", $params)) {
+
+    // If the context (same user) was confirmed ok, we proceed
+    /*if ($params["confirm"] == $c_yes) {*/
+      $cid = run_query_people_insert($params);
+      if ($cid > 0) {
+        $params["user_id"] = $cid;
+        set_update_state();
+        $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
+        $display["detail"] = dis_people_consult($params);
+      } else {
+        $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
+        $display["detail"] = html_people_form("", $params);
+      }
+
+    // If it is the first try, we warn the user if some user seem similar
+    /*} else {
+      $obm_q = check_people_context("", $params);
+      if ($obm_q->num_rows() > 0) {
+        $display["detail"] = dis_people_warn_insert("", $obm_q, $params);
+      } else {
+        $cid = run_query_people_insert($params);
+        if ($cid > 0) {
+          set_update_state();
+          $params["user_id"] = $cid;
+          $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
+          $display["detail"] = dis_people_consult($params);
+        } else {
+          $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
+          $display["detail"] = html_people_form("",$params);
+        }
+      }
+    }*/
+
+  // Form data are not valid
+  } else {
+    $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err["msg"]);
+    $display["detail"] = html_people_form("", $params, $err["field"]);
   }
 
 } elseif ($action == 'update') {
@@ -198,6 +248,7 @@ function get_user_action() {
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin,$l_header_import;
   global $l_header_upd_group,$l_header_admin, $l_header_reset;
+  global $l_header_wait;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
   
   of_category_user_module_action('people');
@@ -224,6 +275,22 @@ function get_user_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('none'),
     'popup' => 1
+                                    );
+
+// New
+  $actions['people']['new'] = array (
+    'Name'     => $l_header_new,
+    'Url'      => "$path/people/people_index.php?action=new",
+    'Right'    => $cright_write,
+    'Condition'=> array ('search','wait','index','insert','update','admin','detailconsult','reset','display','dispref_display','dispref_level', 'delete')
+                                    );
+
+// Wait
+  $actions['people']['wait'] = array (
+    'Name'     => $l_header_wait,
+    'Url'      => "$path/people/people_index.php?action=wait",
+    'Right'    => $cright_write,
+    'Condition'=> array ('all')
                                     );
 
 // Search
@@ -260,6 +327,13 @@ function get_user_action() {
      'Right'    => $cright_write,
      'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update')
                                      	   );
+
+// Insert
+  $actions['people']['insert'] = array (
+    'Url'      => "$path/people/people_index.php?action=insert",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                     );
 
 // Update
   $actions['people']['update'] = array (
@@ -300,14 +374,23 @@ function update_user_action() {
 
   $id = $params['user_id'];
   if ($id > 0) {
-    // Detail Consult
-    $actions['people']['detailconsult']['Url'] = "$path/people/people_index.php?action=detailconsult&amp;user_id=$id";
-    $actions['people']['detailconsult']['Condition'][] = 'insert';
+    $u = get_user_info($id);
+    if (check_user_update_rights($params, $u)) {
+      // Detail Consult
+      $actions['people']['detailconsult']['Url'] = "$path/people/people_index.php?action=detailconsult&amp;user_id=$id";
+      $actions['people']['detailconsult']['Condition'][] = 'insert';
 
-    // Detail Update
-    $actions['people']['detailupdate']['Url'] = "$path/people/people_index.php?action=detailupdate&amp;user_id=$id";
-    $actions['people']['detailupdate']['Condition'][] = 'insert';
+      // Detail Update
+      $actions['people']['detailupdate']['Url'] = "$path/people/people_index.php?action=detailupdate&amp;user_id=$id";
+      $actions['people']['detailupdate']['Condition'][] = 'insert';
 
+    } else {
+      $actions['people']['detailupdate']['Condition'] = array('None');
+      $actions['people']['detailconsult']['Condition'] = array('None');
+    }
+  }
+  if(!check_people_wait($params)) {
+    $actions['people']['wait']['Condition'] = array('None');
   }
 }
 

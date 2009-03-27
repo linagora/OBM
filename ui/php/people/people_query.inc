@@ -299,6 +299,141 @@ function run_query_people_detail($p_id) {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// User insert query execution
+// Parameters:
+//   - $people[]   : entry values
+// Returns:
+//    $id : new user id if ok, else false
+///////////////////////////////////////////////////////////////////////////////
+function run_query_people_insert($people){
+  global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
+  global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
+
+  $uid = sql_parse_id($obm['uid']);
+//  $login = "'".strtolower($people['login'])."'";
+  $login = "'".' '."'";
+  $status = "INIT";
+  $archive = "1";
+  $delegation = $obm['delegation'];
+  
+  // infos
+  $kind = $people['kind'];
+  $lname = $people['lastname'];
+  $fname = $people['firstname'];
+  $title = $people['title'];
+  $desc = $people['desc'];
+ 
+
+  // Coord
+  $phone = $people['phone'];
+  $phone2 = $people['phone2'];
+  $mobile = $people['mobile'];
+  $fax = $people['fax'];
+  $fax2 = $people['fax2'];
+  $company = $people['company'];
+  $direction = $people['direction'];
+  $service = $people['service'];
+  $ad1 = $people['ad1'];
+  $ad2 = $people['ad2'];
+  $ad3 = $people['ad3'];
+  $zip = $people['zip'];
+  $town = $people['town'];
+  $cdx = $people['cdx'];
+  $ctry = $people['country'];
+  
+  
+  $domain_id = sql_parse_id($obm['domain_id']);
+
+  // Connect to the BD
+  $obm_q = new DB_OBM;
+
+  $query = "
+    INSERT INTO UserObm (
+       userobm_domain_id,
+       userobm_timecreate,
+       userobm_timeupdate,
+       userobm_usercreate,
+       userobm_userupdate,
+       userobm_delegation,
+       userobm_login,
+       userobm_archive,
+       userobm_kind,
+       userobm_lastname,
+       userobm_firstname,
+       userobm_status,
+       userobm_title,
+       userobm_company,
+       userobm_direction,
+       userobm_service,
+       userobm_address1,
+       userobm_address2,
+       userobm_address3,
+       userobm_zipcode,
+       userobm_town,
+       userobm_expresspostal,
+       userobm_country_iso3166,
+       userobm_phone,
+       userobm_phone2,
+       userobm_mobile,
+       userobm_fax,
+       userobm_fax2,
+       userobm_description
+     ) VALUES (
+       $domain_id,
+       NOW(),
+       NOW(),
+       $uid,
+       $uid,
+       '$delegation',
+       $login,
+       $archive,
+       '$kind',
+       '$lname',
+       '$fname',
+       '$status',
+       '$title',
+       '$company',
+       '$direction',
+       '$service',
+       '$ad1',
+       '$ad2',
+       '$ad3',
+       '$zip',
+       '$town',
+       '$cdx',
+       '$ctry',
+       '$phone',
+       '$phone2',
+       '$mobile',
+       '$fax',
+       '$fax2',
+       '$desc'
+      )
+    ";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_people_insert()');
+
+  $retour = $obm_q->query($query);
+
+  if ($retour) {
+    $id = $obm_q->lastid();
+  } else {
+    $id = false;
+  }
+  
+  if ($id > 0) {
+    $user['entity_id'] = $id;
+    $entity_id = of_entity_insert('user', $id);    
+    $entity_id = of_entity_insert('calendar', $id);    
+    $entity_id = of_entity_insert('mailbox', $id);    
+    OBM_Acl::setDefaultPublicRights('mailbox', $id);
+    OBM_Acl::setDefaultPublicRights('calendar', $id);
+    $ret = of_userdata_query_update('user', $id, $user);
+  }
+
+  return $id;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // User update query execution
@@ -372,7 +507,7 @@ function run_query_people_update($p_id, $people) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $ret = of_userdata_query_update('people', $p_id, $people);
+    $ret = of_userdata_query_update('user', $p_id, $people);
   }
 
   return $retour;
@@ -433,4 +568,142 @@ function check_user_data_form($p_id, &$people) {
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// User environment checking (same user exists ?)
+// Parameters:
+//   - $p_id   : user id
+//   - $user[] : user's values
+// Returns:
+//   - User Database object with list of similar users
+///////////////////////////////////////////////////////////////////////////////
+function check_people_context($p_id, $user) {
+
+  $login = $user['login'];
+  $profile = $user['profile'];
+  $lname = $user['lastname'];
+  $fname = $user['firstname'];
+  $phone = $user['phone'];
+  $domain_id = $user['domain_id'];
+
+  // if a user with same name exists, return false
+  $co_q = run_query_user_check_user($p_id, $user);
+
+  return $co_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// User specific rights checking (eg : delegation)
+// Parameters:
+//   - $params[] : user values
+// Returns:
+//   - true if OK, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_user_update_rights($params) {
+  global $err, $cgp_use, $l_error_delegation;
+
+  $id = $params['user_id'];
+
+  if ($id > 0) {
+
+    // Check if delegation is used
+    if ($cgp_use['property']['delegation']) {
+      $u = get_user_info($id);
+      // Check delegation update right
+      if (! of_delegation_check_update_rights($params, $u['delegation'])) {
+        $err['msg'] .= $l_error_delegation;
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the user with similar names
+// Parameters:
+//   - $p_id  : user id
+//   - $login : login
+///////////////////////////////////////////////////////////////////////////////
+function run_query_user_check_user($p_id, $user) {
+  global $cdg_sql, $obm;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
+  $multidomain = sql_multidomain('userobm');
+  $login = strtolower($user['login']);
+  $domain_id = $user['domain_id'];
+  if ($domain_id == '') $domain_id = $obm['domain_id'];
+  $domain_id = sql_parse_id($domain_id, true);
+  $where_multidomain = " AND userobm_domain_id $domain_id ";
+
+  if ($p_id) {
+    $p_id = sql_parse_id($p_id, true, true);
+    $where_user = "AND userobm_id $p_id ";
+  }
+
+  $query = "SELECT distinct userobm_id, userobm_login
+    FROM UserObm
+    WHERE userobm_login $like '$login%'
+    $where_user $where_multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_user_check_user()');
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the user waiting validation
+// Parameters:
+//   - $user[]  : user values 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_people_search_wait($user){
+  global $obm;
+  $status = 'INIT';
+  $archive=1;
+  $delegation=$obm['delegation'];
+  $domain_id = $obm['domain_id'];
+  if ($domain_id == '') $domain_id = $obm['domain_id'];
+  $domain_id = sql_parse_id($domain_id, true);
+
+  $where = "userobm_status = '$status' 
+    AND userobm_archive = $archive
+    AND userobm_delegation LIKE '$delegation%'";
+  
+  $query = "SELECT userobm_id, userobm_firstname, userobm_lastname, 'user' AS type 
+    FROM UserObm
+    WHERE $where";
+
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'run_query_user_check_user()');
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Check people who wait to be valid
+// Parameters:
+//   - $people[] : user search criteria
+// Returns : true if some people wait or false
+///////////////////////////////////////////////////////////////////////////////
+function check_people_wait($people){
+  global $obm;
+
+  $rep = false;
+  
+  $people['archive'] = 1;
+  $people['status'] = "INIT";
+  $people['delegation'] = $obm['delegation'];
+
+  $obm_q = run_query_people_search_wait($people);  
+  
+  if ($obm_q->num_rows() > 0){
+    $rep = true;
+  }
+
+  return $rep;
+}
 ?>
