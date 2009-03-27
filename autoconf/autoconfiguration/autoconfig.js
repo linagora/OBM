@@ -15,6 +15,18 @@
 //
 //  Pour réappliquer toutes les modifs il faut repasser la pref à 0.
 
+// Définition des niveaux de log
+const LOG_ALL = 6;
+const LOG_DEBUG = 5;
+const LOG_INFO = 4;
+const LOG_WARN = 3;
+const LOG_ERROR = 2;
+const LOG_FATAL = 1;
+const LOG_OFF = 0;
+const LOG_MESSAGES = ["NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG"];
+
+// Configuration du niveau de log
+const LOG_LEVEL = LOG_ALL;
 
 const PREF_LOGIN = "config.obm.login";
 const PREF_AUTOCONF = "config.obm.autoconfigStatus";
@@ -30,7 +42,19 @@ var global_config_url = _getPreference("autoadmin.global_config_url");
 global_config_url = global_config_url.replace(/autoconfig.js$/, "");
 const CONFIG_XML_URL = global_config_url + "autoconfiguration/%s";
 
+try {
+  _logToFile(LOG_INFO, "Debut de l'autoconfiguration.\n");
+} catch (e) {
+  _displayError("Autoconfiguration", "Erreur lors de l'autoconfiguration !" + "\n\n" + e);
+}
+
 runAutoconfiguration();
+
+try {
+  _logToFile(LOG_INFO, "Fin de l'autoconfiguration.\n");
+} catch (e) {
+  _displayError("Autoconfiguration", "Erreur lors de l'autoconfiguration !" + "\n\n" + e);
+}
 
 function runAutoconfiguration() {
   try {
@@ -43,6 +67,7 @@ function runAutoconfiguration() {
                              + "Veuillez entrer votre adresse email." );
       if (login == null) {
         //user canceled
+        _logToFile(LOG_WARN, "Autoconfiguration annulée par l'utilisateur.\n");
         appStartupService.quit(appStartup.eForceQuit);
         return;
       }
@@ -52,6 +77,7 @@ function runAutoconfiguration() {
     if ( !login ) {
       // utilisateur inconnu ou login non renseigné
       // -> autoconfiguration avortée
+      _logToFile(LOG_WARN, "utilisateur inconnu ou login non renseigné.\n");
       _setPreference(PREF_AUTOCONF, autoconfStatus == null ? 0 : 1);
       return;
     }
@@ -64,16 +90,19 @@ function runAutoconfiguration() {
       var configurationXML = _getDataHTTP(CONFIG_XML_URL.replace("%s", login));
       
       if ( configurationXML == "failed") {
+        _logToFile(LOG_ERROR, "Impossible de contacter le service d'autoconfiguration.\n");
         _displayMessage("Autoconfiguration","Impossible de contacter le service d'autoconfiguration.");
         return;
       }
       
       if ( configurationXML == "error" ) {
+        _logToFile(LOG_ERROR, "Erreur lors du chargement des paramètres d'autoconfiguration.\n");
         _displayMessage("Autoconfiguration","Erreur lors de l'autoconfiguration.");
         return;
       }
       
       if ( configurationXML == "" ) {
+        _logToFile(LOG_ERROR, "Erreur lors de l'autoconfiguration : pas d'adresse correspondante dans l'annuaire.\n");
         _displayError("Autoconfiguration", "Erreur lors de l'autoconfiguration :" + "\n\n"
                                          + "pas d'adresse correspondante dans l'annuaire.");
         _setPreference(PREF_LOGIN, "");
@@ -85,6 +114,9 @@ function runAutoconfiguration() {
       try {
         configurationData = new XML(configurationData.replace(/<\?xml .*\?>/, ""));
       } catch (e) {
+        _logToFile(LOG_ERROR, "Fichier XML de configuration non valide.\n");
+        _logToFile("Ficher reçu :\n");
+        _logToFile(configurationData + "\n");
         _displayError("Autoconfiguration", "Fichier XML de configuration non valide.");
         _setPreference(PREF_LOGIN, "");
         appStartupService.quit(appStartup.eForceQuit);
@@ -113,6 +145,7 @@ function runAutoconfiguration() {
     _setPreference(PREF_AUTOCONF, autoconfStatus == null ? 0 : 1);
 
   } catch (e) {
+    _logToFile(LOG_ERROR, "Erreur lors de l'autoconfiguration : " + e + "\n");
     _displayError("Autoconfiguration", "Erreur lors de l'autoconfiguration !" + "\n\n" + e);
   }
 }
@@ -148,6 +181,7 @@ function _getDataHTTP(aURL) {
   try {
       
       if (! httpChannel.requestSucceeded ) {
+        _logToFile(LOG_ERROR, "Probleme lors de la requête HTTP vers '" + aURL + "'.\n");
         return "failed";
       }
       
@@ -164,6 +198,7 @@ function _getDataHTTP(aURL) {
 
       return str;
   } catch (e) {
+    _logToFile(LOG_ERROR, "Erreur lors de la lecture de '" + aURL + "' : "+ e + "\n");
     return "error";
   }
 }
@@ -172,6 +207,8 @@ function _getDataHTTP(aURL) {
 // fichier "prefs.js" du profil Mozilla de l'utilisateur
 function _setupPreferences(aConfigurationData) {
   var preferences = aConfigurationData.*::preferences;
+
+  _logToFile(LOG_INFO, "Configuration des préférences.\n");
 
   for each ( var preference in preferences.*::preference ) {
     if ("@remove" in preference) {
@@ -211,6 +248,8 @@ function _setPreference(aName, aTypedValue, aSet) {
   var prefBranch = prefBranch_User;
 
   var prefMethod;
+
+  _logToFile(LOG_DEBUG, "Configuration de la préférence '" + aName + "' à '" + aTypedValue + "' (de type " + (typeof aTypedValue) + ") statut='" + aSet + "'.\n");
 
   if ( prefBranch_Default.prefIsLocked(aName) ) {
     prefBranch_Default.unlockPref(aName);
@@ -253,15 +292,18 @@ function _getPreference(aName, aDefaultValue) {
       value = aDefaultValue;
       break;
   }
+  _logToFile(LOG_DEBUG, "Récupération de la préférence '" + aName + "' de valeur '" + value + "'.\n");
   return value;
 }
 
 function _deletePrefBranch(aName) {
   try {
+    _logToFile(LOG_DEBUG, "Suppression de la préférence '" + aName + "'.\n");
     var prefBranch = Components.classes["@mozilla.org/preferences-service;1"]
                                .getService(Components.interfaces.nsIPrefBranch);
     prefBranch.deleteBranch(aName);
   } catch (e) {
+    _logToFile(LOG_ERROR, "Lors de la suppression de la préférence '" + aName + "' : " + e + "\n");
     //nothing
   }
 }
@@ -275,6 +317,8 @@ function _prefBranchExists(aBranchName) {
 
 function _setupProxies(aConfigurationData) {
   var proxies = aConfigurationData.*::proxies;
+
+  _logToFile(LOG_INFO, "Configuration des proxies.\n");
 
   for each ( var proxy in proxies.*::proxy ) {
     if ( proxy.@type == "auto" ) {
@@ -311,13 +355,17 @@ function _installExtensions(aConfigurationData) {
   var extensionManager = Components.classes["@mozilla.org/extensions/manager;1"]
                                    .getService(Components.interfaces.nsIExtensionManager);
 
+  _logToFile(LOG_INFO, "Installation des extensions.\n");
+
   for each ( var extension in extensions.*::extension ) {
     if ( _extensionMustBeUnInstalled(extension) ) {
       if (_extensionIsAlreadyInstalled(extension.@id)) {
+        _logToFile(LOG_DEBUG, "Suppression de l'extension '" + extension.@id + "'.\n");
         extensionManager.uninstallItem(extension.@id);
       }
     } else {
       if ( _extensionMustBeInstalled(extension) ) {
+        _logToFile(LOG_DEBUG, "Installation de l'extension '" + extension.@src.toString() + "'.\n");
         extensionsToInstall.push(extension.@src.toString());
       }
     }
@@ -390,6 +438,8 @@ function _extensionCanBeUpdated(aExtensionID, aVersion) {
 
   rdfService.UnregisterDataSource(extensionsDS);
 
+  _logToFile(LOG_DEBUG, "L'extension '" + aExtensionID + (canBeUpdated?" peut":" ne peut pas") + " être mise à jour (" + version + "->" + aVersion + ").\n");
+
   return canBeUpdated;
 }
 
@@ -412,6 +462,7 @@ function _extensionIsCompatible(aExtension) {
       && comparator.compare(targetApplication.@minVersion, appInfo.version) <= 0
       && comparator.compare(targetApplication.@maxVersion, appInfo.version) >= 0 ) {
       applicationCompatible = true;
+      _logToFile(LOG_DEBUG, "L'extension '" + aExtension.@id + "' est compatible avec l'application.\n");
       break;
     }
   }
@@ -420,10 +471,12 @@ function _extensionIsCompatible(aExtension) {
   if ( aExtension.*::targetPlatform.length() == 0 ) {
     // l'extension est compatible avec toutes les plates-formes
     platformCompatible = true;
+    _logToFile(LOG_DEBUG, "L'extension '" + aExtension.@id + "' est compatible avec la plateforme.\n");
   } else {
     for each ( var targetPlatform in aExtension.*::targetPlatform ) {
       if ( targetPlatform.@name == platform ) {
         platformCompatible = true;
+        _logToFile(LOG_DEBUG, "L'extension '" + aExtension.@id + "' est compatible avec la plateforme.\n");
         break;
       }
     }
@@ -466,6 +519,8 @@ function _importCertificates(aConfigurationData) {
 
   var certificates = aConfigurationData.*::certificates;
 
+  _logToFile(LOG_INFO, "Import des certificats.\n");
+
   for each ( var certificate in certificates.*::certificate ) {
     var fingerprint;
 
@@ -476,6 +531,7 @@ function _importCertificates(aConfigurationData) {
     }
 
     if ( _certificateIsAlreadyInstalled(fingerprint) ) {
+      _logToFile(LOG_DEBUG, "Certificat " + certificate.@src + " déjà installé.\n");
       continue;
     }
 
@@ -484,14 +540,17 @@ function _importCertificates(aConfigurationData) {
       continue;
     }
     if ( configurationXML == "failed" ) {
+      _logToFile(LOG_ERROR, "Impossible de télécharger le certificat '" + certificate.@src + "'.\n");
       continue;
     }
-
+    
     if ( configurationXML == "error" ) {
+      _logToFile(LOG_ERROR, "Erreur lors du téléchargement du certificat '" + certificate.@src + "'.\n");
       continue;
     }
-         
+    
     if ( configurationXML == "" ) {
+      _logToFile(LOG_DEBUG, "Le certificat " + certificate.@src + " est vide.\n");
       continue;
     }
          
@@ -503,7 +562,9 @@ function _importCertificates(aConfigurationData) {
     try {
       certDB.addCertFromBase64(certificateContent,
                                trustFlags, ""); // name: not taken into account, so ""!
-    } catch (e) {}
+    } catch (e) {
+      _logToFile(LOG_ERROR, "Installation du certificat " + certificate.@src + " impossible.\n");
+    }
   }
 }
 
@@ -546,9 +607,12 @@ function _setupAccounts(aConfigurationData) {
   var currentAccounts = _getPreference("mail.accountmanager.accounts", "");
   var allAccounts = (currentAccounts != "" ? currentAccounts.split(",") : []);
 
+  _logToFile(LOG_INFO, "Configuration des comptes de messagerie.\n");
+
   for each ( var account in accounts.*::account ) {
     if ( currentAccounts.indexOf(account.@id.toString()) != -1 ) {
       // compte existe déjà
+      _logToFile(LOG_DEBUG, "Le compte " + account.@id + " existe déjà.\n");
       continue;
     }
 
@@ -573,6 +637,7 @@ function _setupAccounts(aConfigurationData) {
   for each ( var identity in identities.*::identity ) {
     if ( _prefBranchExists("mail.identity." + identity.@id) ) {
       // identité existe déjà
+      _logToFile(LOG_DEBUG, "L'identité " + identity.@id + " existe déjà.\n");
       continue;
     }
 
@@ -664,6 +729,7 @@ function _setupAccounts(aConfigurationData) {
   for each ( var server in servers.*::server.(@type == "imap" || @type == "pop3" || @type == "nntp") ) {
     if ( _prefBranchExists("mail.server." + server.@id) ) {
       // serveur existe déjà
+      _logToFile(LOG_DEBUG, "Le serveur " + server.@id + " existe déjà.\n");
       continue;
     }
 
@@ -742,6 +808,7 @@ function _setupAccounts(aConfigurationData) {
 
   for each ( var server in servers.*::server.(@type == "smtp") ) {
     if ( currentServers.indexOf(server.@id.toString()) != -1 ) {
+      _logToFile(LOG_DEBUG, "Le serveur SMTP " + server.@id + " existe déjà.\n");
       // serveur existe déjà
       continue;
     }
@@ -798,9 +865,13 @@ function _setupDirectories(aConfigurationData) {
   var directories = aConfigurationData.*::directories;
 
   var autoCompleteDirectories = _getPreference("ldap_2.autoComplete.ldapServers", "");
+
+  _logToFile(LOG_INFO, "Configuration des annuaires LDAP.\n");
+
   for each ( var directory in directories.*::directory ) {
     
     if ( _getPreference("ldap_2.servers." + directory.@id + ".description") != undefined ) {
+      _logToFile(LOG_DEBUG, "L'annuaire LDAP " + directory.@id + " existe déjà.\n");
       // annuaire existe déjà
       continue;
     }
@@ -844,3 +915,32 @@ function _setupDirectories(aConfigurationData) {
   _setPreference("ldap_2.autoComplete.ldapServers", autoCompleteDirectories);
   _setPreference("ldap_2.autoComplete.useDirectory", true); 
 }
+
+//Fonctions d'enregistrement des logs
+var gLogStream = null;
+function _logToFile(aLevel, aString) {
+  try {
+    if ( !gLogStream ) {
+      var file = Components.classes["@mozilla.org/file/directory_service;1"]
+                           .getService(Components.interfaces.nsIProperties)
+                           .get("TmpD", Components.interfaces.nsIFile);
+      file.append("autoconf.log");
+      //file.createUnique(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0600);
+      gLogStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
+                             .createInstance(Components.interfaces.nsIFileOutputStream);
+      gLogStream.init(file, 0x02 | 0x08 | 0x20, 0600, 0); // XXX
+    }
+    if (LOG_LEVEL >= aLevel) {
+      var message = LOG_MESSAGES[aLevel] + " : " + aString;
+      gLogStream.write(message, message.length);
+    }
+  } catch (e) {}
+}
+
+function _logToConsole(msg) {
+  var aConsoleService = Components.classes["@mozilla.org/consoleservice;1"].
+    getService(Components.interfaces.nsIConsoleService);
+  if (msg && msg != "")
+    aConsoleService.logStringMessage(msg);
+}
+
