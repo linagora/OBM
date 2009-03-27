@@ -24,7 +24,10 @@ require_once 'report/report.php';
 class ReportTest extends OBM_Database_TestCase {
 
   protected function getDataSet() {
+    $csvDataSet = new OBM_Database_CsvDataSet(';');
+    return $csvDataSet;    
   }
+
   public function testStaticReport() {
     $report = new Report();
     $report->addRecord(new Element('John', 'Doe', 'M')); 
