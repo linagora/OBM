@@ -1,3 +1,3 @@
-"domain_id";"domain_timeupdate";"domain_timecreate";"domain_usercreate";"domain_userupdate";"domain_label";"domain_description";"domain_name";"domain_alias";"domain_mail_server_auto";"domain_global"
-"1";"2008-11-25 17:29:47";"2008-11-25 17:29:47";NULL;NULL;"Global Domain";"Virtual domain for managing domains";"global.virt";NULL;NULL;"1"
-"2";"2008-11-26 10:47:43";"2008-11-26 11:47:43";NULL;NULL;"zz.com";"zz.com";"zz.com";;"98";"0"
+"domain_id";"domain_timeupdate";"domain_timecreate";"domain_usercreate";"domain_userupdate";"domain_label";"domain_description";"domain_name";"domain_alias";"domain_global"
+"1";"2008-11-25 17:29:47";"2008-11-25 17:29:47";NULL;NULL;"Global Domain";"Virtual domain for managing domains";"global.virt";NULL;"1"
+"2";"2008-11-26 10:47:43";"2008-11-26 11:47:43";NULL;NULL;"zz.com";"zz.com";"zz.com";;"0"

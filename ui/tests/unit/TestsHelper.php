@@ -31,6 +31,7 @@ date_default_timezone_set('Europe/Paris');
 // Prepend the OBM of/, phplib/ and tests/unit/ directories to the include_path
 $path = array(
   dirname(__FILE__),
+  dirname(__FILE__).'/../..',
   dirname(__FILE__).'/../../obminclude/of',
   dirname(__FILE__).'/../../obminclude/phplib',
   get_include_path()

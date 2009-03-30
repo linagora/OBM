@@ -52,10 +52,9 @@ interface IFilter {
  * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
  * @license GPL 2.0
  */
-class GenericFilter {
-  private $_field;
-  private $_operator;
+class GenericFilter implements IFilter {
   private $_value;
+  private $_filter_cmd;
 
   /**
    * Constructor 
@@ -67,13 +66,22 @@ class GenericFilter {
    * @return void
    */
   public function __construct($field, $operator, $value) {
-    $this->_field = $field;
-
-    $this->_operator = $operator;
     $this->_value = $value;
+
+    if ($operator == '=') {
+      $operator = '==';
+    } elseif (is_bool($value)) {
+      $operator = '!=';
+    }
+
+    $this->_filter_cmd = "return (\$record->". $field ." $operator \$this->_value);";
   }
 
+  /**
+   * @see IFilter::filter
+   */
   public function filter($record) {
-    return true;
+    return eval($this->_filter_cmd);
   }
+
 }

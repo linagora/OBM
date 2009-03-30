@@ -19,56 +19,47 @@
 ?>
 <?php
 
-require_once('obminclude/of/report/formater.php');
-require_once('obminclude/of/report/filter.php');
 /**
- *  Permit to make a textual report based on obm database data.
+ * Class used to store group data
  * 
  * @package 
  * @version $id:$
- * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
- * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
+ * @author Vincent Alquier <vincent.alquier@aliasource.fr> 
  * @license GPL 2.0
  */
-class Report {
-  private $_list;
+class Group {
+  private $id;
+  private $domain_id;
+  private $domain_name;
+  private $timecreate;
+  private $timeupdate;
+  private $usercreate_id;
+  private $usercreate_login;
+  private $userupdate_id;
+  private $userupdate_login;
+  private $system;
+  private $archive;
+  private $privacy;
+  private $local;
+  private $ext_id;
+  private $samba;
+  private $gid;
+  private $mailing;
+  private $delegation;
+  private $manager_id;
+  private $name;
+  private $desc;
+  private $email;
+  private $contacts;
+  private $nb_user;
 
-  /**
-   * Constructor 
-   * 
-   * @access public
-   * @return void
-   */
-  public function __construct() {
-    $this->_list = array();
+  public function __set($var, $val) {
+    $this->$var = $val;
   }
 
-  /**
-   * add a record to the inner list 
-   * 
-   * @param mixed $record 
-   * @access public
-   * @return void
-   */
-  public function addRecord($record) {
-    $this->_list[] = $record;
+  public function __get($var) {
+    return $this->$var;
   }
 
-  /**
-   * Format inner list in the correct format
-   * 
-   * @param mixed $formater 
-   * @access public
-   * @return void
-   */
-  public function format($formater) {
-    $output = $formater->getHeader();
-    foreach($this->_list as $record) {
-      $output .= $formater->format($record);
-    }
-    $output .= $formater->getFooter();
-    return $output;
-  }
 }
-
-
