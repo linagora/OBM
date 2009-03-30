@@ -135,9 +135,33 @@ sub next {
             $self->{'currentEntity'} = $current;
 
             SWITCH: {
-                if( $self->{'updateType'} =~ /^(UPDATE_ALL|UPDATE_ENTITY|UPDATE_LINKS)$/ ) {
+                if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
+                    if( $self->_loadHostLinks() ) {
+                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                        next;
+                    }
+
                     $self->_log( 'mise à jour de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
                     $self->{'currentEntity'}->setUpdateEntity();
+                    $self->{'currentEntity'}->setUpdateLinks();
+                    last SWITCH;
+                }
+
+                if( $self->{'updateType'} eq 'UPDATE_ENTITY' ) {
+                    $self->_log( 'mise à jour de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    $self->{'currentEntity'}->setUpdateEntity();
+                    last SWITCH;
+                }
+
+                if( $self->{'updateType'} eq 'UPDATE_LINKS' ) {
+                    if( $self->_loadHostLinks() ) {
+                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                        next;
+                    }
+
+                    $self->_log( 'mise à jour des liens, '.$self->{'currentEntity'}->getDescription(), 3 );
+
+                    $self->{'currentEntity'}->setUpdateLinks();
                     last SWITCH;
                 }
 
@@ -178,11 +202,8 @@ sub _loadHosts {
     }
 
     my $query = 'SELECT '.$hostTablePrefix.'Host.*,
-                        service_id AS host_samba,
                         current.host_name as host_name_current
                  FROM '.$hostTablePrefix.'Host
-                 INNER JOIN '.$hostTablePrefix.'HostEntity ON hostentity_host_id=host_id
-                 LEFT JOIN '.$hostTablePrefix.'Service ON service_entity_id=hostentity_entity_id AND service_service=\'samba\'
                  LEFT JOIN P_Host current ON current.host_id='.$hostTablePrefix.'Host.host_id
                  WHERE '.$hostTablePrefix.'Host.host_domain_id='.$self->{'domainId'};
 
@@ -194,6 +215,54 @@ sub _loadHosts {
         $self->_log( 'chargement des hôtes depuis la BD impossible', 3 );
         return 1;
     }
+
+    return 0;
+}
+
+
+sub _loadHostLinks {
+    my $self = shift;
+
+    $self->_log( 'chargement des liens de '.$self->{'currentEntity'}->getDescription(), 2 );
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return 1;
+    }
+
+    my $entityId = $self->{'currentEntity'}->getId();
+
+    my $hostTable = 'Host';
+    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
+        my $hostTable = 'P_'.$hostTable;
+    }
+
+    my $hostEntityTable = 'HostEntity';
+    my $serviceTable = 'Service';
+    if( $self->{'updateType'} =~ /^(SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS)$/ ) {
+        $hostEntityTable = 'P_'.$hostEntityTable;
+        $serviceTable = 'P_'.$serviceTable;
+    }
+
+    my $query = 'SELECT service_id AS host_samba
+                 FROM '.$serviceTable.'
+                 INNER JOIN '.$hostEntityTable.' ON hostentity_host_id='.$entityId.'
+                 WHERE service_entity_id=hostentity_entity_id AND service_service=\'samba\'
+                 LIMIT 1';
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'chargement des liens de '.$self->{'currentEntity'}->getDescription().' depuis la BD impossible', 3 );
+        return 1;
+    }
+
+    my $links = $queryResult->fetchrow_hashref();
+    $queryResult->finish();
+
+    $self->{'currentEntity'}->setLinks( $links );
 
     return 0;
 }

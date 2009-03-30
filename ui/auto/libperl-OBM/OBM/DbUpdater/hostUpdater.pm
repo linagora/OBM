@@ -96,8 +96,10 @@ sub update {
             $self->_log( 'problème à la mise à jour '.$entity->getDescription(), 2 );
             return 1;
         }
+    }
 
-        $query = 'INSERT INTO P_Service
+    if( !$entity->getDelete() && $entity->getUpdateLinks() ) {
+        my $query = 'INSERT INTO P_Service
                  (  service_id,
                     service_service,
                     service_entity_id
@@ -152,7 +154,7 @@ sub _delete {
     }
 
 
-    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
+    if( $entity->getDelete() || $entity->getUpdateLinks() ) {
         my $query = 'DELETE FROM P_Service
                         WHERE service_entity_id IN (
                                     SELECT  hostentity_entity_id
@@ -162,8 +164,10 @@ sub _delete {
             $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
             return 1;
         }
+    }
 
-        $query = 'DELETE FROM P_HostEntity WHERE hostentity_host_id='.$entity->getId();
+    if( $entity->getDelete() || $entity->getUpdateEntity() ) {
+        my $query = 'DELETE FROM P_HostEntity WHERE hostentity_host_id='.$entity->getId();
         if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
             $self->_log( 'problème à la mise à jour BD '.$entity->getDescription(), 2 );
             return 1;

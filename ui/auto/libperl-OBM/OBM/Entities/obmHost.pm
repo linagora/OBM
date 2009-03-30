@@ -109,33 +109,23 @@ sub _init {
         delete( $hostDesc->{'host_ip'} );
     }
 
-    # Le SID du domaine
-    my $domainSid = $self->{'parent'}->getDesc('samba_sid');
-    if( !$domainSid ) {
-        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 3 );
-        if( $hostDesc->{'host_samba'} ) {
-            $self->_log( 'droit samba annulé', 2 );
-            $hostDesc->{'host_samba'} = 0;
-        }
-    }
-
-    # Les informations Samba
-    if( $OBM::Parameters::common::obmModules->{'samba'} && $hostDesc->{'host_samba'} ) {
-        $hostDesc->{'host_login'} = $hostDesc->{'system_host_name'}.'$';
-        $hostDesc->{'host_samba_sid'} = $self->_getUserSID( $domainSid, $hostDesc->{'host_uid'} );
-        $hostDesc->{'host_samba_group_sid'} = $self->_getGroupSID( $domainSid, $hostDesc->{'host_gid'} );
-        $hostDesc->{'host_samba_flags'} = '[W]';
-
-        if( $self->_getNTLMPasswd( $hostDesc->{'system_host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
-            $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 3 );
-            if( $hostDesc->{'host_samba'} ) {
-                $self->_log( 'droit samba annulé', 2 );
-                $hostDesc->{'host_samba'} = 0;
-            }
-        }
-    }else {
-        $hostDesc->{'host_samba'} = 0;
-    }
+#    # Les informations Samba
+#    if( $OBM::Parameters::common::obmModules->{'samba'} && $hostDesc->{'host_samba'} ) {
+#        $hostDesc->{'host_login'} = $hostDesc->{'system_host_name'}.'$';
+#        $hostDesc->{'host_samba_sid'} = $self->_getUserSID( $domainSid, $hostDesc->{'host_uid'} );
+#        $hostDesc->{'host_samba_group_sid'} = $self->_getGroupSID( $domainSid, $hostDesc->{'host_gid'} );
+#        $hostDesc->{'host_samba_flags'} = '[W]';
+#
+#        if( $self->_getNTLMPasswd( $hostDesc->{'system_host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
+#            $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 3 );
+#            if( $hostDesc->{'host_samba'} ) {
+#                $self->_log( 'droit samba annulé', 2 );
+#                $hostDesc->{'host_samba'} = 0;
+#            }
+#        }
+#    }else {
+#        $hostDesc->{'host_samba'} = 0;
+#    }
 
     $self->{'entityDesc'} = $hostDesc;
 
@@ -148,6 +138,40 @@ sub _init {
 sub setLinks {
     my $self = shift;
     my( $links ) = @_;
+    my $hostDesc = $self->{'entityDesc'};
+
+    if( $OBM::Parameters::common::obmModules->{'samba'} && $links->{'host_samba'} ) {
+        $hostDesc->{'host_samba'} = 1;
+    }else {
+        $hostDesc->{'host_samba'} = 0;
+    }
+
+    # Le SID du domaine
+    my $domainSid = $self->{'parent'}->getDesc('samba_sid');
+    if( !$domainSid ) {
+        $self->_log( 'pas de SID associé au domaine '.$self->{'parent'}->getDescription(), 3 );
+        if( $hostDesc->{'host_samba'} ) {
+            $self->_log( 'droit samba annulé', 2 );
+            $hostDesc->{'host_samba'} = 0;
+        }
+    }
+
+    if( $hostDesc->{'host_samba'} ) {
+        $hostDesc->{'host_login'} = $hostDesc->{'system_host_name'}.'$';
+        $hostDesc->{'host_samba_sid'} = $self->_getUserSID( $domainSid, $hostDesc->{'host_uid'} );
+        $hostDesc->{'host_samba_group_sid'} = $self->_getGroupSID( $domainSid, $hostDesc->{'host_gid'} );
+        $hostDesc->{'host_samba_flags'} = '[W]';
+
+        if( $self->_getNTLMPasswd( $hostDesc->{'system_host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
+            $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 3 );
+            if( $hostDesc->{'host_samba'} ) {
+                $self->_log( 'droit samba annulé', 2 );
+                $hostDesc->{'host_samba'} = 0;
+            }
+        }
+    }
+
+    $self->_log( $hostDesc->{'host_samba'}, 0 );
 
     return 0;
 }
@@ -371,28 +395,28 @@ sub updateLdapEntry {
     }
 
 
-    if( $self->getUpdateEntity() ) {
-        # Vérification des objectclass
-        my @deletedObjectclass;
-        my $currentObjectclass = $self->_getLdapObjectclass( $entry->get_value('objectClass', asref => 1), \@deletedObjectclass);
-        if( $self->_modifyAttrList( $currentObjectclass, $entry, 'objectClass' ) ) {
-            $update = 1;
-        }
-    
-        if( $#deletedObjectclass >= 0 ) {
-            # Pour les schémas LDAP supprimés, on détermine les attributs à
-            # supprimer.
-            # Uniquement ceux qui ne sont pas utilisés par d'autres objets.
-            my $deleteAttrs = $self->_diffObjectclassAttrs(\@deletedObjectclass, $currentObjectclass, $objectclassDesc);
-    
-            for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
-                if( $self->_modifyAttrList( undef, $entry, $deleteAttrs->[$i] ) ) {
-                    $update = 1;
-                }
+    # Vérification des objectclass
+    my @deletedObjectclass;
+    my $currentObjectclass = $self->_getLdapObjectclass( $entry->get_value('objectClass', asref => 1), \@deletedObjectclass);
+    if( $self->_modifyAttrList( $currentObjectclass, $entry, 'objectClass' ) ) {
+        $update = 1;
+    }
+
+    if( $#deletedObjectclass >= 0 ) {
+        # Pour les schémas LDAP supprimés, on détermine les attributs à
+        # supprimer.
+        # Uniquement ceux qui ne sont pas utilisés par d'autres objets.
+        my $deleteAttrs = $self->_diffObjectclassAttrs(\@deletedObjectclass, $currentObjectclass, $objectclassDesc);
+
+        for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
+            if( $self->_modifyAttrList( undef, $entry, $deleteAttrs->[$i] ) ) {
+                $update = 1;
             }
         }
+    }
     
-    
+
+    if( $self->getUpdateEntity() ) {
         # La description
         if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_description'}, $entry, 'description' ) ) {
             $update = 1;
@@ -409,7 +433,9 @@ sub updateLdapEntry {
                 $update = 1;
             }
         }
+    }
     
+    if( $self->getUpdateLinks() ) {
         # Le nom windows
         if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_login'}, $entry, 'uid' ) ) {
             $update = 1;
@@ -420,7 +446,7 @@ sub updateLdapEntry {
             if( $#currentLdapHostSambaSid < 0 ) {
                 # Si le SID de l'hôte n'est pas actuellement dans LDAP mais est
                 # dans la description de l'hôte, c'est qu'on vient de ré-activer
-                # le droit samba de l'hôte. Il faut donc placer les mots dexi
+                # le droit samba de l'hôte. Il faut donc placer les mots de
                 # passes.
                 if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_lm_passwd'}, $entry, 'sambaLMPassword' ) ) {
                     $self->_modifyAttr( $self->{'entityDesc'}->{'host_nt_passwd'}, $entry, 'sambaNTPassword' );
@@ -452,7 +478,7 @@ sub updateLdapEntry {
 sub getBdUpdate {
     my $self = shift;
 
-    if( $self->getUpdateEntity() ) {
+    if( $self->getUpdateEntity() || $self->getUpdateLinks() ) {
         return 1;
     }
 
