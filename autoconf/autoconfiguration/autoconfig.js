@@ -64,7 +64,7 @@ function runAutoconfiguration() {
     while ( login == "" ) {
       login = _displayPrompt("Demande d'identifiant",
                                "Autoconfiguration de Thunderbird." + "\n\n"
-                             + "Veuillez entrer votre adresse email." );
+                             + "Veuillez entrer votre identifiant d'autoconfiguration." );
       if (login == null) {
         //user canceled
         _logToFile(LOG_WARN, "Autoconfiguration annulée par l'utilisateur.\n");
