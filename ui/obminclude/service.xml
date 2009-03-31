@@ -10,6 +10,8 @@
     <!-- Is set if this host have a pdc server installed (Samba) -->
     <service key='samba' />
 
+    <!-- Is set if this host have an obm-sync server installed -->
+    <service key='obm_sync' />
 
   </entity>
   <entity type='domain'>
