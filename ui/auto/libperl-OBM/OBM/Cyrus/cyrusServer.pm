@@ -1,14 +1,15 @@
 package OBM::Cyrus::cyrusServer;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
+
+use OBM::Tools::obmServer;
+@ISA = ('OBM::Tools::obmServer');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(_log dump);
 
 
 sub new {
@@ -18,11 +19,12 @@ sub new {
     my $self = bless { }, $class;
 
     $self->{'serverId'} = $serverId;
-    $self->{'cyrusServerConn'} = undef;
+    $self->{'ServerConn'} = undef;
     $self->{'deadStatus'} = 0;
+    $self->{'serverType'} = 'Cyrus IMAP';
 
     if( $self->_getServerDesc() ) {
-        $self->_log( 'problème lors de l\'initialisation du serveur Cyrus', 1 );
+        $self->_log( 'problème lors de l\'initialisation du serveur '.$self->{'serverType'}, 1 );
         return undef;
     }
 
@@ -35,7 +37,7 @@ sub DESTROY {
 
     $self->_log( 'suppression de l\'objet', 4 );
 
-    eval{ $self->{'cyrusServerConn'} = undef; };
+    eval{ $self->{'ServerConn'} = undef; };
 }
 
 
@@ -114,31 +116,7 @@ sub _getServerDesc {
 }
 
 
-sub getId {
-    my $self = shift;
-
-    return $self->{'serverId'};
-}
-
-
-sub getDescription {
-    my $self = shift;
-    
-    my $description = 'serveur Cyrus d\'ID \''.$self->{'serverId'}.'\'';
-
-    if( $self->{'serverDesc'}->{'host_description'} ) {
-        $description .= ', \''.$self->{'serverDesc'}->{'host_description'}.'\'';
-    }
-
-    if( $self->{'serverDesc'}->{'host_ip'} ) {
-        $description .= ', \''.$self->{'serverDesc'}->{'host_ip'}.'\'';
-    }
-
-    return $description;
-}
-
-
-sub getCyrusConn {
+sub getConn {
     my $self = shift;
     my( $domainId ) = @_;
 
@@ -149,7 +127,7 @@ sub getCyrusConn {
     }
 
     $self->_log( 'Obtention de la connexion IMAP à '.$self->getDescription(), 3 );
-    return $self->{'cyrusServerConn'};
+    return $self->{'ServerConn'};
 }
 
 
@@ -169,7 +147,7 @@ sub _connect {
     $self->_log( 'connexion au '.$self->getDescription(), 2 );
 
     my @tempo = ( 1, 3, 5, 10, 20, 30 );
-    while( !($self->{'cyrusServerConn'} = OBM::Cyrus::cyrusAdmin->new( $self->{'serverDesc'}->{'host_ip'} )) ) {
+    while( !($self->{'ServerConn'} = OBM::Cyrus::cyrusAdmin->new( $self->{'serverDesc'}->{'host_ip'} )) ) {
         $self->_log( 'échec de connexion au '.$self->getDescription(), 0 );
 
         my $tempo = shift(@tempo);
@@ -181,8 +159,8 @@ sub _connect {
         sleep $tempo;
     }
 
-    if( !$self->{'cyrusServerConn'} ) {
-        $self->{'cyrusServerConn'} = undef;
+    if( !$self->{'ServerConn'} ) {
+        $self->{'ServerConn'} = undef;
         $self->_log( $self->getDescription().' désactivé car injoignable ', 0 );
         $self->_setDeadStatus();
         return 1;
@@ -190,7 +168,7 @@ sub _connect {
 
     $self->_log( 'authentification en tant que \''.$self->{'serverDesc'}->{'cyrus_login'}.'\' au '.$self->getDescription(), 2 );
 
-    if( !$self->{'cyrusServerConn'}->authenticate( -user=>$self->{'serverDesc'}->{'cyrus_login'}, -password=>$self->{'serverDesc'}->{'cyrus_password'}, -mechanism=>'login') ) {
+    if( !$self->{'ServerConn'}->authenticate( -user=>$self->{'serverDesc'}->{'cyrus_login'}, -password=>$self->{'serverDesc'}->{'cyrus_password'}, -mechanism=>'login') ) {
         $self->_log( 'échec d\'authentification au '.$self->getDescription(), 0 );
         return 1;
     }
@@ -204,11 +182,11 @@ sub _connect {
 sub _ping {
     my $self = shift;
 
-    if( ref( $self->{'cyrusServerConn'} ) ne 'OBM::Cyrus::cyrusAdmin' ) {
+    if( ref( $self->{'ServerConn'} ) ne 'OBM::Cyrus::cyrusAdmin' ) {
         return 0;
     }
 
-    if( !defined($self->{'cyrusServerConn'}->listmailbox('')) ) {
+    if( !defined($self->{'ServerConn'}->listmailbox('')) ) {
         $self->_log( 'la connexion à '.$self->getDescription().' a expirée', 2 );
         return 0;
     }
@@ -364,31 +342,6 @@ sub getSieveServerConn {
 
     $self->_log( 'Obtention de la connexion Sieve à '.$self->getDescription(), 2 );
     return $sieveSrvConn;
-}
-
-
-sub _setDeadStatus {
-    my $self = shift;
-
-    $self->{'deadStatus'} = 1;
-
-    return 0;
-}
-
-
-sub _unsetDeadStatus {
-    my $self = shift;
-
-    $self->{'deadStatus'} = 0;
-
-    return 0;
-}
-
-
-sub getDeadStatus {
-    my $self = shift;
-
-    return $self->{'deadStatus'};
 }
 
 

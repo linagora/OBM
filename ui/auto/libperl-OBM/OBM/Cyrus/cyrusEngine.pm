@@ -203,7 +203,7 @@ sub isMailboxExist {
         return 1;
     }
 
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
     if( !defined($cyrusSrv) ) {
         return undef;
     }
@@ -249,7 +249,7 @@ sub getMailboxQuota {
         return undef;
     }
 
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
     if( !defined($cyrusSrv) ) {
         return undef;
     }
@@ -283,7 +283,7 @@ sub getMailboxQuotaUse {
         return undef;
     }
 
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
     if( !defined($cyrusSrv) ) {
         return undef;
     }
@@ -314,7 +314,7 @@ sub _imapSetMailboxQuota {
         return 1;
     }
 
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
     if( !defined($cyrusSrv) ) {
         return 1;
     }
@@ -348,7 +348,7 @@ sub _imapGetMailboxAcls {
         return 1;
     }
 
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
     if( !defined($cyrusSrv) || !defined($entity) ) {
         return 1;
     }
@@ -411,7 +411,7 @@ sub _imapSetMailboxAcls {
         return 1;
     }
 
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
     if( !defined($cyrusSrv) || !defined($entity) ) {
         return 1;
     }
@@ -497,7 +497,7 @@ sub _deleteBox {
         return 1;
     }
 
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
     if( !defined($cyrusSrv) || !defined($entity) ) {
         return 1;
     }
@@ -548,7 +548,7 @@ sub _createMailbox {
         return 1;
     }
 
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
     if( !defined($cyrusSrv) || !defined($entity) ) {
         return 1;
     }
@@ -641,7 +641,7 @@ sub _createMailboxDefaultFolders {
         return 1;
     }
 
-    my $cyrusSrv = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    my $cyrusSrv = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
     if( !defined($cyrusSrv) || !defined($entity) ) {
         return 1;
     }
@@ -716,7 +716,7 @@ sub _imapSetMailboxAcl {
         return 1;
     }
 
-    my $cyrusSrvConn = $self->{'currentCyrusSrv'}->getCyrusConn($entity->getDomainId());
+    my $cyrusSrvConn = $self->{'currentCyrusSrv'}->getConn($entity->getDomainId());
     if( !defined($cyrusSrvConn) ) {
         return 1;
     }

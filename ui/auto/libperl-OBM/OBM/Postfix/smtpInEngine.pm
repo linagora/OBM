@@ -139,7 +139,7 @@ sub _updateSmtpInMaps {
 
     my $sth;
     if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
-        $self->_log( 'obtention du serveur IMAP impossible', 1 );
+        $self->_log( 'obtention du serveur SMTP-in impossible', 1 );
         return 1;
     }
 

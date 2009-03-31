@@ -143,7 +143,7 @@ sub _checkPasswd {
         $entityLdapServer->setDnLogin( $currentEntityDNs->[$i] );
         $entityLdapServer->setPasswd( $self->{oldPassword} );
 
-        if( !$entityLdapServer->getLdapConn() ) {
+        if( !$entityLdapServer->getConn() ) {
             $entityLdapServer->resetConn();
             return 1;
         }

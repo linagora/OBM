@@ -69,7 +69,7 @@ sub getLdapServerConn {
     }
 
     $self->_log( 'obtention de la connexion au '.$self->{'servers'}->{$serverId}->getDescription(), 3 );
-    return $self->{'servers'}->{$serverId}->getLdapConn();
+    return $self->{'servers'}->{$serverId}->getConn();
 }
 
 

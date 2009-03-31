@@ -2,15 +2,14 @@ package OBM::Cyrus::cyrusServers;
 
 $VERSION = '1.0';
 
+use OBM::Tools::obmServersList;
+@ISA = ('OBM::Tools::obmServersList', 'Class::Singleton');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use base qw( Class::Singleton );
-use OBM::Tools::commonMethods qw(_log dump);
-require OBM::Parameters::regexp;
 
 
 sub _new_instance {
@@ -24,51 +23,9 @@ sub _new_instance {
 }
 
 
-sub DESTROY {
-    my $self = shift;
-
-    $self->_log( 'suppression de l\'objet', 4 );
-}
-
-
-sub _checkCyrusServerIds {
-    my $self = shift;
-    my( $serverId, $domainId ) = @_;
-
-    if( !defined($serverId) ) {
-        $self->_log( 'identifiant de serveur non défini', 3 );
-        return 1;
-    }elsif( ref($serverId) || ($serverId !~ /$OBM::Parameters::regexp::regexp_server_id/) ) {
-        $self->_log( 'identifiant de serveur incorrect', 3 );
-        return 1;
-    }
-
-    if( !defined($domainId) ) {
-        $self->_log( 'identifiant de domain non défini', 3 );
-        return 1;
-    }elsif( ref($domainId) || ($domainId !~ /$OBM::Parameters::regexp::regexp_id/) ) {
-        $self->_log( 'identifiant de domain incorrect', 3 );
-        return 1;
-    }
-
-    if( exists($self->{'servers'}->{$serverId}) ) {
-        if( !defined($self->{'servers'}->{$serverId}) ) {
-            $self->_log( 'problème au chargement du serveur d\'identifiant \''.$serverId.'\'', 3 );
-            return 1;
-        }else {
-            $self->_log( 'serveur d\'identifiant \''.$serverId.'\' déjà chargé', 3 );
-        }
-    }elsif( !$self->_loadServer( $serverId, $domainId ) ) {
-        return 1;
-    }
-
-    return 0;
-}
-
-
 sub _loadServer {
     my $self = shift;
-    my( $serverId, $domainId ) = @_;
+    my( $serverId ) = @_;
 
     $self->_log( 'chargement du serveur IMAP d\'identifiant \''.$serverId.'\'', 2 );
 
@@ -92,7 +49,7 @@ sub getEntityCyrusServer {
         return undef;
     }
 
-    if( $self->_checkCyrusServerIds( $entity->getMailServerId(), $entity->getDomainId() ) ) {
+    if( $self->_checkServerIds( $entity->getMailServerId(), $entity->getDomainId() ) ) {
         return undef;
     }
 
@@ -106,7 +63,7 @@ sub getCyrusServerById {
     my $self = shift;
     my( $serverId, $domainId ) = @_;
 
-    if( $self->_checkCyrusServerIds( $serverId, $domainId ) ) {
+    if( $self->_checkServerIds( $serverId, $domainId ) ) {
         return undef;
     }
 
@@ -119,7 +76,7 @@ sub getCyrusServerIp {
     my $self = shift;
     my( $serverId, $domainId ) = @_;
 
-    if( $self->_checkCyrusServerIds( $serverId, $domainId ) ) {
+    if( $self->_checkServerIds( $serverId, $domainId ) ) {
         return undef;
     }
 

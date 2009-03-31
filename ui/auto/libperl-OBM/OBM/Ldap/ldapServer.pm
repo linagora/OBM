@@ -1,6 +1,10 @@
 package OBM::Ldap::ldapServer;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
+
+use OBM::Tools::obmServer;
+@ISA = ('OBM::Tools::obmServer');
+
 
 $debug = 1;
 
@@ -17,12 +21,13 @@ sub new {
 
     my $self = bless { }, $class;
 
-    $self->{'serverid'} = $serverId;
+    $self->{'serverId'} = $serverId;
     $self->{'ldapServerConn'} = undef;
     $self->{'deadStatus'} = 0;
+    $self->{'serverType'} = 'LDAP';
 
     if( $self->_getServerDesc() ) {
-        $self->_log( 'problème lors de l\'initialisation du serveur LDAP', 1 );
+        $self->_log( 'problème lors de l\'initialisation du serveur '.$self->{'serverType'}, 1 );
         return undef;
     }
 
@@ -47,18 +52,18 @@ sub DESTROY {
 sub _getServerDesc {
     my $self = shift;
 
-    if( !defined($self->{'serverid'}) ) {
+    if( !defined($self->{'serverId'}) ) {
         $self->_log( 'identifiant de serveur non défini', 3 );
         return 1;
     }
 
-    if( ref($self->{'serverid'}) || ($self->{'serverid'} !~ /$OBM::Parameters::regexp::regexp_server_id/) ) {
+    if( ref($self->{'serverId'}) || ($self->{'serverId'} !~ /$OBM::Parameters::regexp::regexp_server_id/) ) {
         $self->_log( 'identifiant de serveur incorrect', 3 );
         return 1;
     }
 
     require OBM::Parameters::common;
-    $self->{'ldap_server'} = $OBM::Parameters::common::ldapServer;
+    $self->{'host_ip'} = $OBM::Parameters::common::ldapServer;
     $self->{'ldap_admin_login'} = $OBM::Parameters::common::ldapAdminLogin;
     if( !($self->{'ldap_admin_dn'} = $self->_getAdminDn()) ) {
         $self->_log( 'obtention du DN de l\'administrateur LDAP impossible', 1 );
@@ -66,7 +71,7 @@ sub _getServerDesc {
     }
 
 
-    $self->{'ldap_description'} = $OBM::Parameters::common::ldapDescription;
+    $self->{'host_description'} = $OBM::Parameters::common::ldapDescription;
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
@@ -165,31 +170,7 @@ sub _getAdminDn {
 }
 
 
-sub getId {
-    my $self = shift;
-
-    return $self->{'serverid'};
-}
-
-
-sub getDescription {
-    my $self = shift;
-    
-    my $description = 'serveur LDAP d\'ID \''.$self->{'serverid'}.'\'';
-
-    if( $self->{'ldap_description'} ) {
-        $description .= ', \''.$self->{'ldap_description'}.'\'';
-    }
-
-    if( $self->{'ldap_server'} ) {
-        $description .= ', \''.$self->{'ldap_server'}.'\'';
-    }
-
-    return $description;
-}
-
-
-sub getLdapConn {
+sub getConn {
     my $self = shift;
 
     $self->_connect();
@@ -215,7 +196,7 @@ sub _connect {
 
     my @tempo = ( 1, 3, 5, 10, 20, 30 );
     require Net::LDAP;
-    while( !($self->{'ldapServerConn'} = Net::LDAP->new( $self->{'ldap_server'}, debug => '0', timeout => '60', version => '3' )) ) {
+    while( !($self->{'ldapServerConn'} = Net::LDAP->new( $self->{'host_ip'}, debug => '0', timeout => '60', version => '3' )) ) {
         $self->_log( 'échec de connexion au '.$self->getDescription(), 0 );
 
         my $tempo = shift(@tempo);
@@ -307,29 +288,4 @@ sub resetConn {
     $self->{'deadStatus'} = 0;
 
     return 0;
-}
-
-
-sub _setDeadStatus {
-    my $self = shift;
-
-    $self->{'deadStatus'} = 1;
-
-    return 0;
-}
-
-
-sub _unsetDeadStatus {
-    my $self = shift;
-
-    $self->{'deadStatus'} = 0;
-
-    return 0;
-}
-
-
-sub getDeadStatus {
-    my $self = shift;
-
-    return $self->{'deadStatus'};
 }
