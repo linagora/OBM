@@ -32,7 +32,8 @@
  * @license GPL 2.0
  */
 abstract class Sender {
-  private $context;
+  const context = 'abstract';
+  private $next;
 
   /**
    * Set the next sender to call
@@ -42,7 +43,7 @@ abstract class Sender {
    * @return void
    */
   public function setNext($sender) {
-    $this->context = $sender;
+    $this->next = $sender;
   }
 
   /**
@@ -54,8 +55,8 @@ abstract class Sender {
    */
   public function send($report) {
     $this->sendMessage($report);
-    if (isset($this->context)) {
-      $this->context->send($report);
+    if (isset($this->next)) {
+      $this->next->send($report);
     }
   }
 

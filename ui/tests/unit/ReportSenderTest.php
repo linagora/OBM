@@ -38,11 +38,16 @@ class ReportSenderTest extends PHPUnit_Extensions_OutputTestCase {
 }
 
 class SenderEchoUn extends Sender {
+  const context = 'test';
+
   protected function sendMessage($report) {
     echo "1:$report\n";
   }
 }
+
 class SenderEchoDeux extends Sender {
+  const context = 'test';
+
   protected function sendMessage($report) {
     echo "2:$report\n";
   }
