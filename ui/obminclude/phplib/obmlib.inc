@@ -471,7 +471,6 @@ class LDAP_Auth extends Auth {
     while ($this->db->next_record()) {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
-      $pass = $this->db->f("userobm_password");
       $domain_id = $this->db->f("userobm_domain_id");
       $delegation = $this->db->f("userobm_delegation_target");
       $dbLogin = $this->db->f("userobm_login");
@@ -480,7 +479,7 @@ class LDAP_Auth extends Auth {
 
     if (global_allow_access($perm)) {
       $unfreeze = global_unfreeze_user($uid);
-      if ($user_login = $this->auth_ldap_validatelogin($dbLogin, $password, $domain_name)) {
+      if (isset($params['auth_ticket']) || $this->auth_ldap_validatelogin($dbLogin, $password, $domain_name)) {
         if(self::$storePassword) {
           $this->db->query("UPDATE UserObm set userobm_password='$password', userobm_password_type='PLAIN', userobm_timeupdate=userobm_timeupdate WHERE userobm_id = $uid");
         }
@@ -502,6 +501,28 @@ class LDAP_Auth extends Auth {
     
   }
 
+
+  /**
+   * Check the given ticket against the OBM SSO server.
+   * If ok, get the username else return false 
+   */
+  function check_ticket_auth($ticket) {
+    $url = $GLOBALS['cgp_host']."/sso/sso_index.php?action=validate&ticket=$ticket";
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $buf = curl_exec ($ch);
+    if ( $buf === FALSE || $buf == "") {
+      return false;
+    }
+    curl_close ($ch);
+    if($buf == "invalidOBMTicket") {
+      return false;
+    }
+    parse_str($buf,$values);
+    return $values;
+  }
 
   function auth_ldap_validatelogin($login, $password, $domain){
     global $auth_ldap_server, $auth_ldap_basedn, $auth_ldap_binddn;
