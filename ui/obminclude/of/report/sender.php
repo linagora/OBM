@@ -19,55 +19,53 @@
 ?>
 <?php
 
-require_once('obminclude/of/report/formater.php');
 /**
- *  Permit to make a textual report based on obm database data.
+ * Chain-of-responsibility pattern. Define how to send the report.
+ * Note that in a 'pure' implementation of the chain of responsibility
+ * pattern, a sender would not pass responsibility further down the chain
+ * after handling a message.
  * 
  * @package 
  * @version $id:$
- * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
- * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
+ * @author Vincent Alquier <vincent.alquier@aliasource.fr> 
  * @license GPL 2.0
  */
-class Report {
-  private $_list;
+abstract class Sender {
+  private $context;
 
   /**
-   * Constructor 
-   * 
+   * Set the next sender to call
+   *
+   * @param mixed $sender next sender to call
    * @access public
    * @return void
    */
-  public function __construct() {
-    $this->_list = array();
+  public function setNext($sender) {
+    $this->context = $sender;
   }
 
   /**
-   * add a record to the inner list 
-   * 
-   * @param mixed $record 
+   * Send the report message, and call the next sender to do the same
+   *
+   * @param mixed $report report message
    * @access public
    * @return void
    */
-  public function addRecord($record) {
-    $this->_list[] = $record;
-  }
-
-  /**
-   * Format inner list in the correct format
-   * 
-   * @param mixed $formater 
-   * @access public
-   * @return void
-   */
-  public function format($formater) {
-    $output = $formater->getHeader();
-    foreach($this->_list as $record) {
-      $output .= $formater->format($record);
+  public function send($report) {
+    $this->sendMessage($report);
+    if (isset($this->context)) {
+      $this->context->send($report);
     }
-    $output .= $formater->getFooter();
-    return $output;
   }
+
+  /**
+   * Describe how the report is really send (really execute the action)
+   *
+   * @param mixed $report report message
+   * @access private
+   * @return void
+   */
+  abstract protected function sendMessage($report);
+
 }
-
-

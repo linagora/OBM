@@ -16,21 +16,62 @@
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
 */
+?>
+<?php
 
-require_once dirname(__FILE__).'/TestsHelper.php';
+require_once('obminclude/of/report/reportFactory.php');
+require_once('obminclude/of/report/sender.php');
+/**
+ * Abstract class used to describe program actions. Must be inherited for
+ * each report to generate.
+ * 
+ * @package 
+ * @version $id:$
+ * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
+ * @author Vincent Alquier <vincent.alquier@aliasource.fr> 
+ * @license GPL 2.0
+ */
+abstract class Command {
+  private $sender;
 
-require_once 'AclTest.php';
-require_once 'VpdiTest.php';
-require_once 'ReportTest.php';
-require_once 'ReportSenderTest.php';
- 
-class AllTests {
-  public static function suite() {
-    $suite = new PHPUnit_Framework_TestSuite('OBM');
-    $suite->addTestSuite('ReportTest');
-    $suite->addTestSuite('ReportSenderTest');
-    $suite->addTestSuite('AclTest');
-    $suite->addTestSuite('VpdiTest');
-    return $suite;
+  /**
+   * Called by the client. launch setup(), then execute() and then tearDown()
+   *
+   * @access public
+   * @return void
+   */
+  public function doIt() {
+    setup();
+    execute();
+    tearDown();
   }
+
+  /**
+   * Define default values (like sender to use).
+   *
+   * @access private
+   * @return void
+   */
+  private function setup() {
+  }
+
+  /**
+   * Main function of the programm.
+   *
+   * @access private
+   * @return void
+   */
+  abstract protected function execute();
+
+  /**
+   * send the report (call this->sender->send()).
+   *
+   * @access private
+   * @return void
+   */
+  private function tearDown() {
+    if (isset($this->sender))
+      $this->sender->send();
+  }
+
 }

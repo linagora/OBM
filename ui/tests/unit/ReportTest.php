@@ -16,10 +16,8 @@
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
 */
-?>
-<?php
 
-require_once 'report/reportFactory.php';
+require_once 'report/command.php';
 
 class ReportTest extends OBM_Database_TestCase {
 
@@ -28,15 +26,17 @@ class ReportTest extends OBM_Database_TestCase {
     $csvDataSet->addEntityTable('Domain', 'domain', dirname(__FILE__).'/db_data/Domain.csv');
     $csvDataSet->addEntityTable('UserObm', 'user', dirname(__FILE__).'/db_data/UserObm.csv');
     $csvDataSet->addEntityTable('UGroup', 'group', dirname(__FILE__).'/db_data/UGroup.csv');
+    $csvDataSet->addEntityTable('Host', 'host', dirname(__FILE__).'/db_data/Host.csv');
+    $csvDataSet->addEntityTable('MailShare', 'mailshare', dirname(__FILE__).'/db_data/MailShare.csv');
     $csvDataSet->addTable('of_usergroup', dirname(__FILE__).'/db_data/of_usergroup.csv');
     return $csvDataSet;
   }
 
   public function testStaticReport() {
     $report = new Report();
-    $report->addRecord(new Element('John', 'Doe', 'M')); 
-    $report->addRecord(new Element('Janne', 'Doe', 'F')); 
-    $report->addRecord(new Element('Julia', 'Doe', 'F')); 
+    $report->addRecord(new Element('1', 'John', 'Doe', 'M')); 
+    $report->addRecord(new Element('2', 'Janne', 'Doe', 'F')); 
+    $report->addRecord(new Element('3', 'Julia', 'Doe', 'F')); 
     $formater = new GenericFormater();
     $formater->addField('name');
     $formater->addField('surname');
@@ -100,6 +100,65 @@ class ReportTest extends OBM_Database_TestCase {
     $this->assertEquals($output, "id\tlogin\tlastname\tfirstname\tdomain_name\t\n");
   }
 
+  public function testStandardMailshareReport() {
+    $report = ReportFactory::getReport(array(),'mailshare');
+    $formater = new GenericFormater();
+    $formater->addField('id');
+    $formater->addField('name');
+    $formater->addField('mail_server_name');
+    $formater->addField('domain_name');
+    $output = $report->format($formater);
+    $this->assertEquals($output, "id\tname\tmail_server_name\tdomain_name\t\n"
+                                ."1\tmailshare-test\tmail-server\tzz.com\t\n");
+    unset($report);
+    $filter1 = new GenericFilter('domain_name','=','global.virt');
+    $report = ReportFactory::getReport(array($filter1),'mailshare');
+    $output = $report->format($formater);
+    $this->assertEquals($output, "id\tname\tmail_server_name\tdomain_name\t\n");
+  }
+
+  public function testReportGenericFilter() {
+    $item = new Element(10, 'toto', '', '');
+    $filter = new GenericFilter('id','=','10');
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('id','==','10');
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('id','===','10');
+    $this->assertEquals(false, $filter->filter($item));
+    $filter = new GenericFilter('id','===',10);
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('id','!=','10');
+    $this->assertEquals(false, $filter->filter($item));
+    $filter = new GenericFilter('id','=',0);
+    $this->assertEquals(false, $filter->filter($item));
+    $filter = new GenericFilter('id','!=',0);
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('id','>',5);
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('id','>=',10);
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('id','<',11);
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('id','<=',10);
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('name','=','toto');
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('name','=','titi');
+    $this->assertEquals(false, $filter->filter($item));
+    $filter = new GenericFilter('name','!=','toto');
+    $this->assertEquals(false, $filter->filter($item));
+    $filter = new GenericFilter('name','!=','titi');
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('name','>','titi');
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('name','<','titi');
+    $this->assertEquals(false, $filter->filter($item));
+    $filter = new GenericFilter('name','>=','toto');
+    $this->assertEquals(true, $filter->filter($item));
+    $filter = new GenericFilter('name','<=','toto');
+    $this->assertEquals(true, $filter->filter($item));
+  }
+
   public function testReportSender() {
 
   }
@@ -119,11 +178,13 @@ class ReportTest extends OBM_Database_TestCase {
 }
 
 class Element {
+  public $id;
   public $name;
   public $surname;
   public $gender;
 
-  public function __construct($name, $surname, $gender) {
+  public function __construct($id, $name, $surname, $gender) {
+    $this->id = $id;
     $this->name = $name;
     $this->surname = $surname;
     $this->gender = $gender;

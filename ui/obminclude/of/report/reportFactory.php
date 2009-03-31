@@ -23,6 +23,7 @@ require_once('obminclude/of/report/user.php');
 require_once('obminclude/of/report/group.php');
 require_once('obminclude/of/report/mailshare.php');
 require_once('obminclude/of/report/report.php');
+require_once('obminclude/of/report/filter.php');
 /**
  * Public class used to instantiate a new Report object. This class fill the
  * Report internal list, with data from the database, depending on the data 
@@ -38,7 +39,7 @@ class ReportFactory {
 
   /**
    * Return the Report instance from filters list and data type.
-   *
+   * 
    * @param mixed $filters array of IFilter used to filter data before adding to Report
    * @param mixed $type data type the report refers to (user, mailshare, group). The equivalent class must be defined to access data (e.g. class User for $type='user').
    * @access public
@@ -86,6 +87,7 @@ class ReportFactory {
     $query =  "SELECT
     mailshare_id,
     mailshare_domain_id,
+    domain_name AS mailshare_domain_name,
     mailshare_timecreate,
     mailshare_timeupdate,
     mailshare_usercreate AS mailshare_usercreate_id,
@@ -120,6 +122,7 @@ class ReportFactory {
     $record = new Mailshare;
     $record->id               = $obm_q->f('mailshare_id');
     $record->domain_id        = $obm_q->f('mailshare_domain_id');
+    $record->domain_name      = $obm_q->f('mailshare_domain_name');
     $record->timecreate       = $obm_q->f('mailshare_timecreate');
     $record->timeupdate       = $obm_q->f('mailshare_timeupdate');
     $record->usercreate_id    = $obm_q->f('mailshare_usercreate_id');

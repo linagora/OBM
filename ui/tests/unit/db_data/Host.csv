@@ -1,0 +1,2 @@
+"host_id";"host_domain_id";"host_timeupdate";"host_timecreate";"host_userupdate";"host_usercreate";"host_uid";"host_gid";"host_archive";"host_name";"host_fqdn";"host_ip";"host_delegation";"host_description"
+"1";"1";"2008-11-25 17:29:47";"2008-11-25 17:29:47";NULL;NULL;"1002";"515";"0";"mail-server";"";"127.0.0.1";"";"serveur de messagerie"

@@ -59,8 +59,8 @@ class GenericFilter implements IFilter {
   /**
    * Constructor 
    * 
-   * @param mixed $field Field to test
-   * @param mixed $operator Operation : =, <, >, <=,>=, !=
+   * @param string $field Field to test
+   * @param string $operator Operation : =, <, >, <=,>=, !=
    * @param mixed $value value to test with, the accepted type are boolean, string, integer, float
    * @access public
    * @return void
@@ -70,7 +70,7 @@ class GenericFilter implements IFilter {
 
     if ($operator == '=') {
       $operator = '==';
-    } elseif (is_bool($value)) {
+    } elseif (!in_array($operator,array('==','===')) && is_bool($value)) {
       $operator = '!=';
     }
 
