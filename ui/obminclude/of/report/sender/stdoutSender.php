@@ -16,55 +16,30 @@
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
 */
+?>
+<?php
 
-require_once 'PHPUnit/Extensions/OutputTestCase.php';
-require_once 'report/sender.php';
-require_once 'report/sender/stdoutSender.php';
+/**
+ * Sender used to output report on standard output.
+ * 
+ * @package 
+ * @version $id:$
+ * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
+ * @author Vincent Alquier <vincent.alquier@aliasource.fr> 
+ * @license GPL 2.0
+ */
+class StdoutSender extends Sender {
+  const context = 'console';
 
-class ReportSenderTest extends PHPUnit_Extensions_OutputTestCase {
-
-  public function testReportSingleSenderEcho() {
-    $s1 = new SenderEchoUn;
-    $this->expectOutputString("1:toto\n");
-    $s1->send("toto");
-  }
-
-  public function testReportMultipleSenderEcho() {
-    $s1 = new SenderEchoUn;
-    $s1->setNext(new SenderEchoDeux);
-    $this->expectOutputString("1:tutu\n2:tutu\n");
-    $s1->send("tutu");
-  }
-
-  public function testReportStdoutSender() {
-    $s1 = new StdoutSender;
-    $this->expectOutputString("tutu");
-    $s1->send("tutu");
-  }
-
-  public function testReportMultipleStdoutSender() {
-    $s1 = new StdoutSender;
-    $s2 = new StdoutSender;
-    $s2->setNext(new StdoutSender);
-    $s1->setNext($s2);
-    $this->expectOutputString("tutututututu");
-    $s1->send("tutu");
-  }
-
-}
-
-class SenderEchoUn extends Sender {
-  const context = 'test';
-
+  /**
+   * Print report on standard output
+   *
+   * @param mixed $report report message
+   * @access private
+   * @return void
+   */
   protected function sendMessage($report) {
-    echo "1:$report\n";
+    echo $report;
   }
-}
 
-class SenderEchoDeux extends Sender {
-  const context = 'test';
-
-  protected function sendMessage($report) {
-    echo "2:$report\n";
-  }
 }
