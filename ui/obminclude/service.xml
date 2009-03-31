@@ -9,8 +9,8 @@
     <service key='smtp_out' />
     <!-- Is set if this host have a pdc server installed (Samba) -->
     <service key='samba' />
-    <!-- Is set if this host has an obm-sync server installed -->
-    <service key='obm_sync' />
+
+
   </entity>
   <entity type='domain'>
     <!-- Is set if this domain provide mail sevices (imap, smtp) -->
@@ -73,6 +73,16 @@
         <max>1</max>        
       </property>            
     </service>
+
+    <!-- Is set if this host has an obm-sync server installed -->
+    <service key='sync'>
+      <property key="obm_sync">
+	<type>id</type>
+	<min>0</min>
+	<min>1</min>
+      </property>
+    </service>
+
   </entity>  
 
   
