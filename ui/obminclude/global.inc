@@ -1633,7 +1633,7 @@ function phonetic_key($name) {
 function phpArrayToJsArray($var) {
 
   $jsArray = 'new Array(';
-  if(is_array($var)) {
+  if(is_array($var) && !empty($var)) {
    foreach($var as $val) {
       $jsArray .= "'$val',";
     }

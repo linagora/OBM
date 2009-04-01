@@ -130,12 +130,12 @@ Obm.CalendarDayEvent = new Class({
     yUnit: 0,
     xUnit: 24*3600,
     unit : 24*3600,
-		context : 'head'
+    context : 'head'
   },
 
   initialize: function(eventData,options) {
     this.setOptions(options);
-		this.initContext();
+    this.initContext();
     this.event = eventData;
     this.size = 1;
     this.length = 1;
@@ -149,13 +149,13 @@ Obm.CalendarDayEvent = new Class({
     this.switchColor(obm.vars.conf.calendarColor);
   },
 
-	initContext: function() {
-		if(this.options.context == 'body') {
-			this.context = obm.calendarManager.bodyContext;
-		} else if(this.options.context == 'head') {
-			this.context = obm.calendarManager.headContext;
-		}
-	},
+  initContext: function() {
+    if(this.options.context == 'body') {
+      this.context = obm.calendarManager.bodyContext;
+    } else if(this.options.context == 'head') {
+      this.context = obm.calendarManager.headContext;
+    }
+  },
 
   makeDraggable: function() {
     var dragOptions = {
@@ -178,24 +178,24 @@ Obm.CalendarDayEvent = new Class({
       }.bind(this),
 
       onComplete:function() {
-				// Get event new position
-				startDate = obm.calendarManager.getEventNewPosition(this.element);
+        // Get event new position
+        startDate = obm.calendarManager.getEventNewPosition(this.element);
         time = Math.floor(startDate.getTime() / 1000);
         guessedTime = evt.guessEventTime(time);
-      	eventData = new Object();
-      	eventData.calendar_id = this.event.id;
-      	eventData.element_id = this.event.id;
-      	eventData.date_begin = new Obm.DateTime(guessedTime * 1000);
-				if (this.event.all_day) {
-					eventData.date_begin.setHours(0);
+        eventData = new Object();
+        eventData.calendar_id = this.event.id;
+        eventData.element_id = this.event.id;
+        eventData.date_begin = new Obm.DateTime(guessedTime * 1000);
+        if (this.event.all_day) {
+          eventData.date_begin.setHours(0);
         }
-				eventData.date_begin = eventData.date_begin.format('c');
-				eventData.duration = this.event.duration;
-    		new Request.JSON({
-    		  url : 'calendar_index.php',
-    		  secure : false,
-    		  onComplete : this.receiveMoveEvent.bind(this)
-    		}).post($merge({ajax : 1, action : 'check_conflict'}, eventData));
+        eventData.date_begin = eventData.date_begin.format('c');
+        eventData.duration = this.event.duration;
+        new Request.JSON({
+          url : 'calendar_index.php',
+          secure : false,
+          onComplete : this.receiveMoveEvent.bind(this)
+        }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));
       }.bind(this)
 
     };
@@ -203,7 +203,7 @@ Obm.CalendarDayEvent = new Class({
     this.drag = this.element.makeDraggable(dragOptions);
   },
 
-	receiveMoveEvent: function(response) {
+  receiveMoveEvent: function(response) {
     try {
       var resp = eval(response);
     } catch (e) {
@@ -213,18 +213,18 @@ Obm.CalendarDayEvent = new Class({
     }
 
     if (response.conflict == true) {
-		  obm.calendarManager.conflictManager.show(this);
+      obm.calendarManager.conflictManager.show(this);
     } else {
-    	this.moveComplete(true);
+      this.moveComplete(true);
     }
 
-	},
+  },
 
-	moveComplete: function(sendMail) {
+  moveComplete: function(sendMail) {
     if(obm.calendarManager.redrawLock) {
       this.element.setOpacity(1);
       obm.calendarManager.unlock();
-			var startDate = obm.calendarManager.getEventNewPosition(this.element);
+      var startDate = obm.calendarManager.getEventNewPosition(this.element);
       obm.calendarManager.moveEventTo(this.element.id, startDate, sendMail);
     }
   },
@@ -534,7 +534,7 @@ Obm.CalendarEvent = new Class({
 
   initialize: function(eventData,options) {
     this.setOptions(options);
-		this.initContext();	
+    this.initContext();  
     this.event = eventData;
     this.extensions = new Array();
     this.size = 1;
@@ -569,16 +569,16 @@ Obm.CalendarEvent = new Class({
     }
     this.setPeriodicity();
     if(this.options.resizable) {
-	/*	this.resizeHandler = new Element('img')
-	    .setProperty('src',obm.vars.images.resize)
-	    .addClass('handle')
-	    .injectInside(this.element);
-	*/
-	this.resizeHandler = new Element('div')
-	    .addClass(this.event.klass)
-	    .addClass('handle')
-	    .injectInside(this.element);
-		
+  /*  this.resizeHandler = new Element('img')
+      .setProperty('src',obm.vars.images.resize)
+      .addClass('handle')
+      .injectInside(this.element);
+  */
+  this.resizeHandler = new Element('div')
+      .addClass(this.event.klass)
+      .addClass('handle')
+      .injectInside(this.element);
+    
     }
 
     this.titleContainer = new Element('span').injectInside(this.element);
@@ -763,64 +763,64 @@ Obm.CalendarEvent = new Class({
  ******************************************************************************/
 Obm.CalendarConflictManager = new Class({
 
-	initialize: function() {
-		this.evt = null;
+  initialize: function() {
+    this.evt = null;
 
-		// Close popup and redraw event
-		$('popup_close').addEvent('click', function() {
-			this.cancel();
-		}.bind(this));
+    // Close popup and redraw event
+    $('popup_close').addEvent('click', function() {
+      this.cancel();
+    }.bind(this));
 
-		// Redirect to conflict manager form
+    // Redirect to conflict manager form
     $('popup_manage').addEvent('click', function() {
-			startDate = obm.calendarManager.getEventNewPosition(this.evt.element);
+      startDate = obm.calendarManager.getEventNewPosition(this.evt.element);
       time = Math.floor(startDate.getTime() / 1000);
       guessedTime = evt.guessEventTime(time);
       date_begin = new Obm.DateTime(guessedTime * 1000);
-			if (this.evt.event.all_day) {
-				date_begin.setHours(0);
+      if (this.evt.event.all_day) {
+        date_begin.setHours(0);
       }
-			date_begin = date_begin.format('c');
-			duration = this.evt.event.duration;
-			id = this.evt.event.id;
-			window.location=obm.vars.consts.calendarUrl+'?action=conflict_manager&calendar_id='+id+'&date_begin='+encodeURIComponent(date_begin)+'&duration='+duration;	
+      date_begin = date_begin.format('c');
+      duration = this.evt.event.duration;
+      id = this.evt.event.id;
+      window.location=obm.vars.consts.calendarUrl+'?action=conflict_manager&calendar_id='+id+'&date_begin='+encodeURIComponent(date_begin)+'&duration='+duration;  
     }.bind(this));
 
-		// Force event update
-		$('popup_force').addEvent('click', function() {
-			$('calendarConflictPopup').setStyle('display', 'none');
-			obm.popup.show('calendarSendMail');
+    // Force event update
+    $('popup_force').addEvent('click', function() {
+      $('calendarConflictPopup').setStyle('display', 'none');
+      obm.popup.show('calendarSendMail');
     }.bind(this));
 
-		// Close popup and redraw event
-		$('popup_cancel').addEvent('click', function() {
-			this.cancel();
+    // Close popup and redraw event
+    $('popup_cancel').addEvent('click', function() {
+      this.cancel();
     }.bind(this));
 
 
-		// Mail Notification actions
-		$('popup_sendmail_yes').addEvent('click', function() {
-				this.evt.moveComplete(true);
+    // Mail Notification actions
+    $('popup_sendmail_yes').addEvent('click', function() {
+        this.evt.moveComplete(true);
     }.bind(this));
 
-		$('popup_sendmail_no').addEvent('click', function() {
-				this.evt.moveComplete(false);
+    $('popup_sendmail_no').addEvent('click', function() {
+        this.evt.moveComplete(false);
     }.bind(this));
 
-		$('popup_sendmail_close').addEvent('click', function() {
-				this.evt.moveComplete(false);
+    $('popup_sendmail_close').addEvent('click', function() {
+        this.evt.moveComplete(false);
     }.bind(this));
   },
 
-	show: function(evt) {
-		this.evt = evt;
-		obm.popup.show('calendarConflictPopup');
+  show: function(evt) {
+    this.evt = evt;
+    obm.popup.show('calendarConflictPopup');
   },
 
-	cancel: function() {
-		this.evt.element.setOpacity(1);
-		this.evt.redraw();
-		obm.calendarManager.unlock();
+  cancel: function() {
+    this.evt.element.setOpacity(1);
+    this.evt.redraw();
+    obm.calendarManager.unlock();
     obm.calendarManager.redrawAllEvents();
   }
 
@@ -864,7 +864,7 @@ Obm.CalendarManager = new Class({
     this.defaultWidth = this.evidence.clientWidth;
     this.defaultHeight = this.evidence.offsetHeight;
 
-		this.conflictManager = new Obm.CalendarConflictManager(); 
+    this.conflictManager = new Obm.CalendarConflictManager(); 
   },
   
   lock: function() {
@@ -943,10 +943,10 @@ Obm.CalendarManager = new Class({
     return time1.toInt() - time2.toInt();
   },
 
-	getEventNewPosition: function(elem) {
-		var id = elem.id;
-		var left = elem.getLeft();
-		var top = elem.getTop();
+  getEventNewPosition: function(elem) {
+    var id = elem.id;
+    var left = elem.getLeft();
+    var top = elem.getTop();
     var evt = this.events.get(id);
     var xDelta = Math.round((left-evt.context.left)/this.defaultWidth);
     var yDelta = Math.round((top-evt.context.top)/this.defaultHeight);
@@ -963,7 +963,7 @@ Obm.CalendarManager = new Class({
     startDate.setMinutes(startDate.getMinutes() + minDelta);
     startDate.setSeconds(startDate.getSeconds() + secDelta);
 
-		return startDate;
+    return startDate;
   },
 
   moveEventTo: function(id, startDate, sendMail) {
@@ -979,7 +979,7 @@ Obm.CalendarManager = new Class({
       eventData.duration = evt.event.duration;
       eventData.title = evt.event.title;
       eventData.all_day = evt.event.all_day;
-			eventData.send_mail = sendMail;
+      eventData.send_mail = sendMail;
       this.sendUpdateEvent(eventData);
     } else {
       evt.setSize(evt.length);
@@ -1125,7 +1125,7 @@ Obm.CalendarManager = new Class({
         }
       }
       obm.calendarManager.redrawAllEvents();      
-			obm.calendarManager.updateLastVisitEvent(events);
+      obm.calendarManager.updateLastVisitEvent(events);
     } else {
       showErrorMessage(response.message);
       obm.calendarManager.events.each(function(evt, key) {
@@ -1171,7 +1171,7 @@ Obm.CalendarManager = new Class({
         }
       }
       obm.calendarManager.redrawAllEvents();      
-			obm.calendarManager.updateLastVisitEvent(events);
+      obm.calendarManager.updateLastVisitEvent(events);
     } else {
       showErrorMessage(response.message);
     }
@@ -1217,9 +1217,9 @@ Obm.CalendarManager = new Class({
     }
   },
 
-	updateLastVisitEvent: function(events) {
-		var id = events[0].event.id;
-		var title = events[0].event.title;
+  updateLastVisitEvent: function(events) {
+    var id = events[0].event.id;
+    var title = events[0].event.title;
     var url = obm.vars.consts.calendarDetailconsultURL+id;
     $('last_visit_calendar_event_a').setProperty('href', url);
     $('last_visit_calendar_event_title').innerHTML = title;
@@ -1620,6 +1620,250 @@ Obm.CalendarView = new Class({
     if (newView) {
       this.insert(newView);
     }
+  }
+
+});
+
+
+/*
+ * FreeBusy interface
+ */
+Obm.CalendarFreeBusy = new Class({
+
+  /*
+   * Init
+   * Build meeting slider, meeting resizer
+   * time_slots: contains all timestamps
+   * busy_time_slots: contains busy indexes (not timestamp)
+   */
+  initialize: function(nbSteps, duration, time_slots, busy_time_slots,unit) {
+
+    this.unit = unit;
+    this.stepSize = 40/this.unit;
+    this.scrollDiv = $('calendarFreeBusyScroll');
+    this.container = $('calendarFreeBusyGrid');
+    this.meeting = $('calendarFreeBusyMeeting');
+    this.resizeHandler = $('calendarFreeBusyResizeMeeting');
+    this.table = $('calendarFreeBusyTable'); 
+    this.scrollRight = $('scrollRight');
+    this.scrollLeft = $('scrollLeft');
+    this.nbSteps = nbSteps;
+    this.duration = duration;
+    this.bts = busy_time_slots;
+    this.ts = time_slots;
+    this.meeting_slots = this.duration*this.unit;
+    this.oneDayWidth = this.stepSize*this.nbSteps/7; // in px
+    this.oneDaySteps = this.nbSteps/7; // nb slots per day
+    this.limitRight = this.scrollDiv.getLeft()+this.scrollDiv.offsetWidth;
+    this.currentPosition = 0;
+    // this.previousPosition = 0;
+
+    // this.table.setStyle('width', this.nbSteps*this.stepSize+'px');  
+
+    // /!\ meeting width must be set BEFORE Slider building
+    this.meeting.setStyle('width', this.stepSize*this.meeting_slots+'px');
+
+    // Meeting
+    this.slider = new Slider(this.container, this.meeting, {
+      steps: this.nbSteps-this.meeting_slots,
+      snap: true,
+      onChange: function(pos) {
+        this.currentPosition = pos;
+        var end_pos = this.currentPosition + this.meeting_slots-1;
+        var date_begin_ts = this.ts[this.currentPosition]*1000;
+        var date_begin = new Obm.DateTime(date_begin_ts);
+        var date_end_ts = this.ts[end_pos]*1000;
+        var date_end = new Obm.DateTime(date_end_ts);
+
+        // if (this.previousPosition > this.currentPosition) {
+        //   if (date_begin.format('d') < date_end.format('d')) {
+        //      this.slider.set(end_pos-this.meeting_slots);
+        //   }
+        // } else {
+        //   if (date_end.format('d') > date_begin.format('d')) {
+        //      this.slider.set(end_pos);
+        //    }
+        // }
+
+        // Auto-Scroll
+        // FIXME: problem with onTick
+        // if (this.meeting.getLeft()+this.meeting_slots*this.stepSize>=this.limitRight
+        //   || this.meeting.getLeft() <= this.table.getLeft()+this.scrollDiv.scrollLeft) {
+        //   this.autoScroll.toElement(this.meeting);
+        // }
+
+        // Set meeting color
+        this.changeStatus(this.isBusy(end_pos));
+    
+        // Display meeting date begin and date end
+        this.displayMeetingInfo();
+
+        // Store old position
+        // this.previousPosition = this.currentPosition;        
+
+        this.forcePosition();
+      }.bind(this),
+
+      onComplete: function() {
+        var ts = this.ts[this.currentPosition] * 1000;
+        var date_begin = new Obm.DateTime(ts);
+        $('date_begin').value = date_begin.format('c');
+      }.bind(this)
+
+    });
+
+    var resizeOptions = {
+      handle: this.resizeHandler,
+      grid: {'x' : this.slider.stepWidth},
+      limit: {
+        'x': [this.stepSize],
+        'y': [this.container.offsetHeight, this.container.offsetHeight]
+      },
+      onBeforeStart: function() {
+        this.slider.drag.detach();
+      }.bind(this),
+      onDrag: function() {
+        this.meeting_slots = Math.round(this.meeting.offsetWidth/this.slider.stepWidth);
+        this.resizeHandler.setStyles({
+          'margin-left' : this.meeting.offsetWidth-this.resizeHandler.offsetWidth+'px'});
+        this.duration = this.meeting_slots/this.unit;
+        this.changeStatus(this.isBusy(this.currentPosition+this.meeting_slots-1))
+        this.displayMeetingInfo();
+      }.bind(this),
+      onComplete:function() {
+        $('duration').value = this.duration*3600;
+        var ts = this.ts[this.currentPosition] * 1000;
+        var date_begin = new Obm.DateTime(ts);
+        $('date_begin').value = date_begin.format('c');
+        this.slider.drag.attach();
+      }.bind(this)     
+    };
+    this.meeting.makeResizable(resizeOptions);
+
+    this.meeting.setStyles({
+      'top': '-'+this.container.offsetHeight+'px',
+      'height': this.container.offsetHeight+'px',
+      'width':this.slider.stepWidth*this.meeting_slots+'px'
+    });
+    this.meeting.setOpacity(.5);
+
+    this.resizeHandler.setStyles({
+      'margin-left' : this.meeting.offsetWidth-this.resizeHandler.offsetWidth+'px',
+      'height': this.container.offsetHeight+'px'
+    });
+
+    this.scrollDiv.setStyle('height',this.table.offsetHeight+20+'px');
+
+    // Is the first time_slot busy ?
+    if(this.isBusy(this.meeting_slots)) {
+      this.meeting.addClass('meetingBusy');        
+    } 
+
+    // Auto Scroll
+    this.autoScroll = new Fx.Scroll(this.scrollDiv, {
+      offset: {'x':-this.oneDayWidth/2, 'y':-$('calendarHead').offsetHeight} // Offset y : for ie7 !
+    });
+
+    // Navigation Scroll
+    this.scrollLeft.setStyle('height', this.table.offsetHeight+'px');
+    this.scrollRight.setStyle('height', this.table.offsetHeight+'px');
+
+    this.scroll = new Fx.Scroll(this.scrollDiv);
+
+    this.scrollLeft.addEvent('click', function() {
+      this.scroll.start(this.scrollDiv.scrollLeft-this.oneDayWidth/2, 0); // - 1/2 day
+    }.bind(this));
+
+    this.scrollRight.addEvent('click', function() {
+      this.scroll.start(this.scrollDiv.scrollLeft+this.oneDayWidth/2, 0); // + 1/2 day
+    }.bind(this));
+  },
+
+  /*
+   * Display meeting start and end date
+   */
+  displayMeetingInfo: function() {
+    var date_begin_ts = this.ts[this.currentPosition]*1000;
+    var date_begin = new Obm.DateTime(date_begin_ts);
+    $('meeting_start').innerHTML = date_begin.format(obm.vars.regexp.dateFormat + ' h:i');
+    var date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
+    $('meeting_end').innerHTML = date_end.format(obm.vars.regexp.dateFormat + ' h:i');
+  },
+
+  /*
+   * Check if selected slot is busy or not
+   */
+  isBusy: function(end_pos) { // TODO: test if same day
+    for(var i=this.currentPosition;i<=end_pos;i++) {
+      var index = this.bts.indexOf(i+'');
+      if (index != -1) {
+        // $('submitMeeting').setProperty('disabled', 'disabled');
+        return true;
+      }
+    }
+    // $('submitMeeting').setProperty('disabled', ''); 
+    return false;
+  },
+
+  /*
+   * Set meeting style
+   */
+  changeStatus: function(isBusy) {
+    if(isBusy) {
+      this.meeting.addClass('meetingBusy');        
+    } else {
+      this.meeting.removeClass('meetingBusy');        
+    }
+  },
+
+  /*
+   * Go to next free slot
+   */
+  autoPickNext: function() {
+    var timer = function(){
+      this.currentPosition++;
+      var end_pos = this.currentPosition + this.meeting_slots -1;
+      if (end_pos == this.currentPosition) {
+        $clear(timer);
+        this.currentPosition--;
+      }
+      if (!this.isBusy(end_pos)) {
+        this.slider.set(this.currentPosition);
+        this.autoScroll.toElement(this.meeting);
+        this.forcePosition();
+        $clear(timer);
+      }
+    }.bind(this).periodical(1);
+  },
+
+  /*
+   * Go to previous free slot
+   */
+  autoPickPrev: function() {
+    var timer = function(){
+      this.currentPosition--;
+      var end_pos = this.currentPosition + this.meeting_slots -1;
+      if (this.currentPosition == 0) {
+        $clear(timer);
+        this.currentPosition++;
+      }
+      if (!this.isBusy(end_pos)) {
+        this.slider.set(this.currentPosition);
+        this.autoScroll.toElement(this.meeting);
+        this.forcePosition();
+        $clear(timer);
+      }
+    }.bind(this).periodical(1);
+  },
+
+  /*
+   * Force meeting position
+   */
+  forcePosition: function() {
+    // this.meeting.setStyles({
+    //   'top': '-'+this.container.offsetHeight+'px', // for ie7 !
+    //   'left': this.currentPosition*this.stepSize+'px'
+    // });
   }
 
 });

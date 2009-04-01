@@ -233,6 +233,10 @@ $l_update_state_mail_subject = 'Attendees update on OBM event: %s';
 $l_resource_group_search = "Slot is free if";
 $l_resources_one_freebusy = "One resource is free by group";
 $l_resources_all_freebusy = "All resources are free";
+
+$l_freebusy_autopick_prev = "«";
+$l_freebusy_autopick_next = "AutoPick Next »";
+
   
 $l_add_event_mail_body = 
 "This email was automatically sent by OBM

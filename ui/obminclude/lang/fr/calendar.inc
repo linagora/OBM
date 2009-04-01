@@ -223,6 +223,9 @@ $l_resource_group_search = "La plage est considérée libre si";
 $l_resources_one_freebusy = "Une ressource est libre dans chaque groupe";
 $l_resources_all_freebusy = "Toutes les ressources sont libres";
 
+$l_freebusy_autopick_prev = "«";
+$l_freebusy_autopick_next = "Choix automatique »";
+
 $l_add_event_mail_body = 
 "Message automatique envoyé par OBM
 ------------------------------------------------------------------

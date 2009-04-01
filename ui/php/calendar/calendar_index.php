@@ -567,13 +567,12 @@ if ($action == 'index') {
 
 } elseif ($action == 'perform_meeting')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $cal_entity_id['user'] = run_query_calendar_get_allusers($cal_entity_id['user'], $params['sel_group_id']);
+  // $cal_entity_id['user'] = run_query_calendar_get_allusers($cal_entity_id['user'], $params['sel_group_id']);
   $entity_readable = get_calendar_entity_readable();
   $ret = get_calendar_entity_label($cal_entity_id);
   $ret['resourcegroup'] = run_query_resource_resourcegroup($cal_entity_id['resource_group']);
   $entity_store = store_calendar_entities($ret);
-  $display['features'] = html_calendar_planning_bar($params, $cal_entity_id, $entity_store, $entity_readable,$cal_view);
-  $display['detail'] = dis_calendar_free_interval($params, $entity_store);
+  $display['detail'] = dis_calendar_free_interval($params, $entity_store, $cal_entity_id);
 
 } elseif ($action == 'admin')  {
 ///////////////////////////////////////////////////////////////////////////////

@@ -1199,6 +1199,142 @@ var SmoothScroll = new Class({
 });
 
 /*
+Script: Slider.js
+	Class for creating horizontal and vertical slider controls.
+
+License:
+	MIT-style license.
+*/
+
+var Slider = new Class({
+
+	Implements: [Events, Options],
+
+	options: {/*
+		onChange: $empty,
+		onComplete: $empty,*/
+		onTick: function(position){
+			if(this.options.snap) position = this.toPosition(this.step);
+			this.knob.setStyle(this.property, position);
+		},
+		snap: false,
+		offset: 0,
+		range: false,
+		wheel: false,
+		steps: 100,
+		mode: 'horizontal'
+	},
+
+	initialize: function(element, knob, options){
+		this.setOptions(options);
+		this.element = $(element);
+		this.knob = $(knob);
+		this.previousChange = this.previousEnd = this.step = -1;
+		this.element.addEvent('mousedown', this.clickedElement.bind(this));
+		if (this.options.wheel) this.element.addEvent('mousewheel', this.scrolledElement.bindWithEvent(this));
+		var offset, limit = {}, modifiers = {'x': false, 'y': false};
+		switch (this.options.mode){
+			case 'vertical':
+				this.axis = 'y';
+				this.property = 'top';
+				offset = 'offsetHeight';
+				break;
+			case 'horizontal':
+				this.axis = 'x';
+				this.property = 'left';
+				offset = 'offsetWidth';
+		}
+		this.half = this.knob[offset] / 2;
+		this.full = this.element[offset] - this.knob[offset] + (this.options.offset * 2);
+		this.min = $chk(this.options.range[0]) ? this.options.range[0] : 0;
+		this.max = $chk(this.options.range[1]) ? this.options.range[1] : this.options.steps;
+		this.range = this.max - this.min;
+		this.steps = this.options.steps || this.full;
+		this.stepSize = Math.abs(this.range) / this.steps;
+		this.stepWidth = this.stepSize * this.full / Math.abs(this.range) ;
+		
+		this.knob.setStyle('position', 'relative').setStyle(this.property, - this.options.offset);
+		modifiers[this.axis] = this.property;
+		limit[this.axis] = [- this.options.offset, this.full - this.options.offset];
+		this.drag = new Drag(this.knob, {
+			snap: 0,
+			limit: limit,
+			modifiers: modifiers,
+			onDrag: this.draggedKnob.bind(this),
+			onStart: this.draggedKnob.bind(this),
+			onComplete: function(){
+				this.draggedKnob();
+				this.end();
+			}.bind(this)
+		});
+		if (this.options.snap) {
+			this.drag.options.grid = Math.ceil(this.stepWidth);
+			this.drag.options.limit[this.axis][1] = this.full;
+		}
+	},
+
+	set: function(step){
+		if (!((this.range > 0) ^ (step < this.min))) step = this.min;
+		if (!((this.range > 0) ^ (step > this.max))) step = this.max;
+		
+		this.step = Math.round(step);
+		this.checkStep();
+		this.end();
+		this.fireEvent('tick', this.toPosition(this.step));
+		return this;
+	},
+
+	clickedElement: function(event){
+		var dir = this.range < 0 ? -1 : 1;
+		var position = event.page[this.axis] - this.element.getPosition()[this.axis] - this.half;
+		position = position.limit(-this.options.offset, this.full -this.options.offset);
+		
+		this.step = Math.round(this.min + dir * this.toStep(position));
+		this.checkStep();
+		this.end();
+		this.fireEvent('tick', position);
+	},
+	
+	scrolledElement: function(event){
+		var mode = (this.options.mode == 'horizontal') ? (event.wheel < 0) : (event.wheel > 0);
+		this.set(mode ? this.step - this.stepSize : this.step + this.stepSize);
+		event.stop();
+	},
+
+	draggedKnob: function(){
+		var dir = this.range < 0 ? -1 : 1;
+		var position = this.drag.value.now[this.axis];
+		position = position.limit(-this.options.offset, this.full -this.options.offset);
+		this.step = Math.round(this.min + dir * this.toStep(position));
+		this.checkStep();
+	},
+
+	checkStep: function(){
+		if (this.previousChange != this.step){
+			this.previousChange = this.step;
+			this.fireEvent('change', this.step);
+		}
+	},
+
+	end: function(){
+		if (this.previousEnd !== this.step){
+			this.previousEnd = this.step;
+			this.fireEvent('complete', this.step + '');
+		}
+	},
+
+	toStep: function(position){
+		var step = (position + this.options.offset) * this.stepSize / this.full * this.steps;
+		return this.options.steps ? Math.round(step -= step % this.stepSize) : step;
+	},
+
+	toPosition: function(step){
+		return (this.full * Math.abs(this.min - step)) / (this.steps * this.stepSize) - this.options.offset;
+	}
+
+});
+
+/*
 Script: Scroller.js
 	Class which scrolls the contents of any Element (including the window) when the mouse reaches the Element's boundaries.
 
@@ -1249,6 +1385,107 @@ var Scroller = new Class({
 				change[z] = (this.page[z] - size[z] + this.options.area - pos[z]) * this.options.velocity;
 		}
 		if (change.y || change.x) this.fireEvent('change', [scroll.x + change.x, scroll.y + change.y]);
+	}
+
+});
+
+/*
+Script: Accordion.js
+	An Fx.Elements extension which allows you to easily create accordion type controls.
+
+License:
+	MIT-style license.
+*/
+
+var Accordion = new Class({
+
+	Extends: Fx.Elements,
+
+	options: {/*
+		onActive: $empty,
+		onBackground: $empty,*/
+		display: 0,
+		show: false,
+		height: true,
+		width: false,
+		opacity: true,
+		fixedHeight: false,
+		fixedWidth: false,
+		wait: false,
+		alwaysHide: false
+	},
+
+	initialize: function(){
+		var params = Array.link(arguments, {'container': Element.type, 'options': Object.type, 'togglers': $defined, 'elements': $defined});
+		this.parent(params.elements, params.options);
+		this.togglers = $$(params.togglers);
+		this.container = $(params.container);
+		this.previous = -1;
+		if (this.options.alwaysHide) this.options.wait = true;
+		if ($chk(this.options.show)){
+			this.options.display = false;
+			this.previous = this.options.show;
+		}
+		if (this.options.start){
+			this.options.display = false;
+			this.options.show = false;
+		}
+		this.effects = {};
+		if (this.options.opacity) this.effects.opacity = 'fullOpacity';
+		if (this.options.width) this.effects.width = this.options.fixedWidth ? 'fullWidth' : 'offsetWidth';
+		if (this.options.height) this.effects.height = this.options.fixedHeight ? 'fullHeight' : 'scrollHeight';
+		for (var i = 0, l = this.togglers.length; i < l; i++) this.addSection(this.togglers[i], this.elements[i]);
+		this.elements.each(function(el, i){
+			if (this.options.show === i){
+				this.fireEvent('active', [this.togglers[i], el]);
+			} else {
+				for (var fx in this.effects) el.setStyle(fx, 0);
+			}
+		}, this);
+		if ($chk(this.options.display)) this.display(this.options.display);
+	},
+
+	addSection: function(toggler, element, pos){
+		toggler = $(toggler);
+		element = $(element);
+		var test = this.togglers.contains(toggler);
+		var len = this.togglers.length;
+		this.togglers.include(toggler);
+		this.elements.include(element);
+		if (len && (!test || pos)){
+			pos = $pick(pos, len - 1);
+			toggler.inject(this.togglers[pos], 'before');
+			element.inject(toggler, 'after');
+		} else if (this.container && !test){
+			toggler.inject(this.container);
+			element.inject(this.container);
+		}
+		var idx = this.togglers.indexOf(toggler);
+		toggler.addEvent('click', this.display.bind(this, idx));
+		if (this.options.height) element.setStyles({'padding-top': 0, 'border-top': 'none', 'padding-bottom': 0, 'border-bottom': 'none'});
+		if (this.options.width) element.setStyles({'padding-left': 0, 'border-left': 'none', 'padding-right': 0, 'border-right': 'none'});
+		element.fullOpacity = 1;
+		if (this.options.fixedWidth) element.fullWidth = this.options.fixedWidth;
+		if (this.options.fixedHeight) element.fullHeight = this.options.fixedHeight;
+		element.setStyle('overflow', 'hidden');
+		if (!test){
+			for (var fx in this.effects) element.setStyle(fx, 0);
+		}
+		return this;
+	},
+
+	display: function(index){
+		index = ($type(index) == 'element') ? this.elements.indexOf(index) : index;
+		if ((this.timer && this.options.wait) || (index === this.previous && !this.options.alwaysHide)) return this;
+		this.previous = index;
+		var obj = {};
+		this.elements.each(function(el, i){
+			obj[i] = {};
+			var hide = (i != index) || (this.options.alwaysHide && (el.offsetHeight > 0));
+			this.fireEvent(hide ? 'background' : 'active', [this.togglers[i], el]);
+			for (var fx in this.effects) obj[i][fx] = hide ? 0 : el[this.effects[fx]];
+		}, this);
+		return this.start(obj);
 	}
 
 });
