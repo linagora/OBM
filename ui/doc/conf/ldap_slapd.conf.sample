@@ -52,7 +52,7 @@ _COMMENT_moduleload      back_bdb
 # The maximum number of entries that is returned for a search operation
 # You can put no limit for authenticated user - see below
 # Default 500
-#sizelimit unlimited
+sizelimit unlimited
 
 # The tool-threads parameter sets the actual amount of cpu's that is used
 # for indexing.
@@ -104,17 +104,19 @@ directory       "/var/lib/ldap"
 
 # For the Debian package we use 2MB as default but be sure to update this
 # value if you have plenty of RAM
-dbconfig set_cachesize        0  2097152  0
+dbconfig set_cachesize        0  52428800  0
 # Sven Hartge reported that he had to set this value incredibly high
 # to get slapd running at all. See http://bugs.debian.org/303057
 # for more information.
+dbconfig set_flags      DB_LOG_AUTOREMOVE
+dbconfig set_lg_bsize   1048576
 
 # Number of objects that can be locked at the same time.
-dbconfig set_lk_max_objects   1500
+dbconfig set_lk_max_objects   2000
 # Number of locks (both requested and granted)
-dbconfig set_lk_max_locks     1500
+dbconfig set_lk_max_locks     2000
 # Number of lockers
-dbconfig set_lk_max_lockers   1500
+dbconfig set_lk_max_lockers   2000
 # END DBD file environment setings
 
 
