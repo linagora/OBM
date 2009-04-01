@@ -11,20 +11,20 @@ require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
 
-function add_displayed_users(check, users, uid) {
-	if (check) {
-		for(var id in users) {
-      var sel_id = 'sel_user_id-data-user-'+id;
-      if ($(sel_id) == null) {
-				of_select_add_element(window.document, 'sel_user_id', 'data-user-'+id, users[id]);
+  function add_displayed_users(check, users, uid) {
+    if (check) {
+      for(var id in users) {
+        var sel_id = 'sel_user_id-data-user-'+id;
+        if ($(sel_id) == null) {
+          of_select_add_element(window.document, 'sel_user_id', 'data-user-'+id, users[id]);
       }
-		}
+                }
   } else {
-		for(var id in users) {
-			if (id != uid) {
-      	var sel_id = 'sel_user_id-data-user-'+id;
+    for(var id in users) {
+      if (id != uid) {
+        var sel_id = 'sel_user_id-data-user-'+id;
         if (sel_id != null) {
-					$(sel_id).destroy();
+          $(sel_id).destroy();
         }
       }
     }
@@ -119,11 +119,11 @@ function show_hide_calendar_dates(field) {
 // Check if the meeting perform is possible
 ///////////////////////////////////////////////////////////////////////////////
 function calendar_check_meeting(form) {
-  
+
   if (trim(form.sel_min_duration.options[form.sel_min_duration.selectedIndex].value) == \"00\" 
-       && trim(form.sel_time_duration.options[form.sel_time_duration.selectedIndex].value) == \"00\") {
-    alert (\"$l_interval_null\");
-    return false;
+    && trim(form.sel_time_duration.options[form.sel_time_duration.selectedIndex].value) == \"00\") {
+      alert (\"$l_interval_null\");
+      return false;
   }
   else if (form.tf_date.value == \"\") {
     alert(\"$l_datebegin\" + \" : $l_fill_date\");
@@ -143,41 +143,41 @@ function add_exdate() {
   // Create the div
   var div = new Element('div');
   div.adopt(
-            new Element('a').addEvent('click', function () {
-              remove_element(this.parentNode,'exceptionHome');
+    new Element('a').addEvent('click', function () {
+      remove_element(this.parentNode,'exceptionHome');
             }).adopt(new Element('img').setProperty('src','$ico_delete')));
   exceptionHome.adopt(div);
   // Create the date field
   var f = new Element('input').addClass('datePicker')
-                                  .setProperty('type','text');
+    .setProperty('type','text');
   div.adopt(f);
   f.setProperty('autocomplete','off');
   f.name = 'tf_date_exception[]';
 
   new Element('img').setProperty('src', obm.vars.images.datePicker)
-                              .injectAfter(f)
-                              .addEvent('click', function(e){
-                                displayDatePicker(f);
+    .injectAfter(f)
+    .addEvent('click', function(e){
+      displayDatePicker(f);
                               });
 
 }
 function repeat_form(value) {
   switch(value) {
-    case 'none' :
-      $('repeatFrequency').setStyle('display','none');
-      $('repeatEnd').setStyle('display','none');
-      $('repeatDays').setStyle('display','none');
-      $('repeatException').setStyle('display','none');
-      break;
-    case 'daily' : 
-      showRepeatBlockDisplay('".phpStringToJsString($l_daily_unit)."');
-      $('repeatDays').setStyle('display','none');
-      var dateEnd = getFieldDate($('tf_date_end').value); 
-      var repeatEnd = getFieldDate($('tf_repeat_end').value);
-      var interval = parseInt($('tf_repeatfrequency').value);
-      dateEnd.setDate(dateEnd.getDate() + interval);
-      if(repeatEnd < dateEnd) {
-        $('tf_repeat_end').value = getDateString(dateEnd);
+  case 'none' :
+    $('repeatFrequency').setStyle('display','none');
+    $('repeatEnd').setStyle('display','none');
+    $('repeatDays').setStyle('display','none');
+    $('repeatException').setStyle('display','none');
+    break;
+  case 'daily' : 
+    showRepeatBlockDisplay('".phpStringToJsString($l_daily_unit)."');
+    $('repeatDays').setStyle('display','none');
+    var dateEnd = getFieldDate($('tf_date_end').value); 
+    var repeatEnd = getFieldDate($('tf_repeat_end').value);
+    var interval = parseInt($('tf_repeatfrequency').value);
+    dateEnd.setDate(dateEnd.getDate() + interval);
+    if(repeatEnd < dateEnd) {
+      $('tf_repeat_end').value = getDateString(dateEnd);
       } 
       break;           
     case 'weekly' :
@@ -191,7 +191,7 @@ function repeat_form(value) {
         $('tf_repeat_end').value = getDateString(dateEnd);
       }       
       break;            
-     case 'monthlybydate' :
+    case 'monthlybydate' :
       showRepeatBlockDisplay('".phpStringToJsString($l_monthlybydate_unit)."');
       $('repeatDays').setStyle('display','none');
       var dateEnd = getFieldDate($('tf_date_end').value); 
@@ -226,7 +226,7 @@ function repeat_form(value) {
         $('tf_repeat_end').value = getDateString(dateEnd);
       }       
       break;
-      
+
   }
 }
 

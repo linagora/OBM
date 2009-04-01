@@ -38,7 +38,7 @@ class OBM_Mailer extends Stato_Mailer
   protected function getTemplatePath($templateName) {
     $possiblePaths = array(
       self::$templateRoot."/{$this->module}/{$this->locale}/$templateName.php",
-      self::$templateRoot."/{$this->module}/en/$templateName.php"
+      self::$templateRoot."/{$this->module}/fr/$templateName.php"
     );
     foreach ($possiblePaths as $path) {
       if (file_exists($path) && is_readable($path)) {
@@ -118,7 +118,6 @@ class OBM_Mailer extends Stato_Mailer
       WHERE $user_in
       userobm_email != ''
       $mail_filter";
-
     display_debug_msg($query, $cdg_sql, 'run_query_get_recipients()');
     $db = new DB_OBM;
     $db->query($query);

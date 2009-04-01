@@ -1,17 +1,748 @@
 <?php
+/*
+ +-------------------------------------------------------------------------+
+ |  Copyright (c) 1997-2009 OBM.org project members team                   |
+ |                                                                         |
+ | This program is free software; you can redistribute it and/or           |
+ | modify it under the terms of the GNU General Public License             |
+ | as published by the Free Software Foundation; version 2                 |
+ | of the License.                                                         |
+ |                                                                         |
+ | This program is distributed in the hope that it will be useful,         |
+ | but WITHOUT ANY WARRANTY; without even the implied warranty of          |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           |
+ | GNU General Public License for more details.                            |
+ +-------------------------------------------------------------------------+
+ | http://www.obm.org                                                      |
+ +-------------------------------------------------------------------------+
+*/
+?>
+<?php
 
-class EventObserver
-{
-  private $mailer;
+/**
+ *  
+ * 
+ * @package 
+ * @version $Id:$
+ * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
+ * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @license GPL 2.0
+ */
+class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
+
+  private $id;
+  private $title;
+  private $owner;
+  private $allday;
+  private $location;
+  private $category1;
+  private $privacy;
+  private $date_begin;
+  private $date_end;
+  private $duration;
+  private $priority;
+  private $color;
+  private $repeat_kind;
+  private $repeatfrequency;
+  private $repeat_end;
+  private $date_exception;
+  private $description;
+  private $event_duration;
+  private $repeat_days; 
+  private $user;
+  private $resource;
+  private $contact;
+
+
+  /**
+   * __construct 
+   * 
+   * @param array $properties 
+   * @access public
+   * @throw InvalidArgumentException
+   * @return void
+   */
+  public function __construct($id) {
+    $this->id = $id;
+    $this->user = array();
+    $this->resource = array();
+    $this->contact = array();
+    $this->date_exception = array();
+  }
+
+  /**
+   * __get 
+   * 
+   * @param string $property 
+   * @access public
+   * @throw InvalidArgumentException
+   * @return mixed
+   */
+  public function __get($property) {
+    if(property_exists($this, $property)) {
+      return $this->$property;
+    } else {
+      throw new InvalidArgumentException($property.' property is not supported');
+    }
+  }
+
+  /**
+   * __set 
+   * 
+   * @param string $property 
+   * @param mixed $value 
+   * @access public
+   * @throw InvalidArgumentException
+   * @return void
+   */
+  public function __set($property, $value) {
+    $fn = 'set'.ucfirst($property);
+    if(method_exists($this, $fn)) {
+      $this->$fn($property, $value);  
+    } elseif(property_exists($this, $property)) {
+      $this->$property = $value;  
+    } else {
+      throw new InvalidArgumentException($property.' property is not supported');
+    }
+  }
+
+  /**
+   * get 
+   * 
+   * @param string $property 
+   * @access public
+   * @return mixed
+   */
+  public function get($property) {
+    return $this->__get($property);
+  }
+
+  /**
+   * set 
+   * 
+   * @param string $property 
+   * @param mixed $value 
+   * @access public
+   * @return void
+   */
+  public function set($property, $value) {
+    $this->__set($property, $value);
+  }
+
+  /**
+   * add 
+   * 
+   * @param string $property 
+   * @param mixed $value 
+   * @access public
+   * @return void
+   */
+  public function add($property, $value) {
+    $fn = 'add'.ucfirst($property);
+    if(method_exists($this, $fn)) {
+      $this->$fn($property, $value);  
+    } elseif(property_exists($this, $property)) {
+      array_push($this->$property,$value);  
+    } else {
+      throw new InvalidArgumentException($property.' property is not supported');
+    }    
+  }
+
+  /**
+   * del 
+   * 
+   * @param string $property 
+   * @param mixed $value 
+   * @access public
+   * @return void
+   */
+  public function del($property, $value) {
+    $fn = 'del'.ucfirst($property);
+    if(method_exists($this, $fn)) {
+      $this->$fn($property, $value);  
+    } elseif(property_exists($this, $property)) {
+      //FIXME Doesn't work
+      $index = array_search($value, $this->$property);
+      if($index !== false) {
+        unset($this->$property[$index]);
+      }      
+    } else {
+      throw new InvalidArgumentException($property.' property is not supported');
+    }    
+  }  
+}
+
+/**
+ * Event attendees 
+ * 
+ * @package 
+ * @version $Id:$
+ * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
+ * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @license GPL 2.0
+ */
+class OBM_EventAttendee {
+
+  private $kind;
+  private $state;
+  private $label;
+  private $id;
+
+  public function __construct($id, $state, $label) {
+    $this->id = $id;
+    $this->state = $state;
+    $this->label = $label;
+  }
+
+  /**
+   * __get 
+   * 
+   * @param string $property 
+   * @access public
+   * @throw InvalidArgumentException
+   * @return mixed
+   */
+  public function __get($property) {
+    if(property_exists($this, $property)) {
+      return $this->$property;
+    } else {
+      throw new InvalidArgumentException($property.' property is not supported');
+    }
+  }
+
+  /**
+   * __toString 
+   * 
+   * @access public
+   * @return void
+   */
+  public function __toString() {
+    return $this->id;
+  }
+
+  /**
+   * cmp 
+   * 
+   * @param mixed $attendee1 
+   * @param mixed $attendee2 
+   * @static
+   * @access public
+   * @return void
+   */
+  public static function cmp($attendee1, $attendee2) {
+    if($attendee1->id == $attendee2->id) return O;
+    return strcmp($attendee1->label, $attendee2->label);
+  }
+}
+
+
+/**
+ * Factory for OBM_Event objects 
+ * 
+ * @package 
+ * @version $Id:$
+ * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
+ * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @license GPL 2.0
+ */
+class OBM_EventFactory /*Implements OBM_Subject*/{
+
+  private static $instance;
+  private $observers;
+  private $db;
+ 
+  /**
+   * __construct 
+   * 
+   * @access protected
+   * @return void
+   */
+  protected function __construct() {
+    $this->observers = array();
+    $this->db = new DB_OBM;
+  }
+ 
+  /**
+   * Singleton pattern 
+   * 
+   * @static
+   * @access public
+   * @return void
+   */
+  public static function getInstance() {
+    if (!self::$instance instanceof self) { 
+      self::$instance = new self;
+    }
+    return self::$instance;
+  }
+
+
+  /**
+   * @see OBM_Subject::attach 
+   */
+  public function attach($observer) {
+    $this->observers[] = $observer;
+  }
+
+  /**
+   * @see OBM_Subject::detach 
+   */
+  public function detach($observer) {
+    $index = array_search($observer, $this->observers);
+    if($index !== false) {
+      unset($this->observers[$index]);
+    }
+  }
+  /**
+   * @see OBM_Subject::notify 
+   */
+  public function notify($old, $new) {
+    foreach($this->observers as $observer) {
+      $observer->update($old, $new);
+    }
+  }
+
+  /**
+   * Get an OBM_Event object of the given id
+   * 
+   * @param int $id Event id
+   * @access public
+   * @return OBM_Event
+   */
+  public function getById($id) {
+    $query = 'SELECT Event.*, userobm_id, userobm_lastname, userobm_firstname FROM Event INNER JOIN UserObm ON userobm_id = event_owner WHERE event_id = '.$id.'';
+    $this->db->query($query);
+    $this->db->next_record();
+    $event = new OBM_Event($id);
+    $event->title = $this->db->f('event_title');
+    $event->owner = new OBM_EventAttendee($this->db->f('userobm_id'), null, $this->db->f('userobm_firstname').' '.$this->db->f('userobm_lastname')) ;
+    $event->location = $this->db->f('event_location');
+    $event->category1 = $this->db->f('event_category1_id');
+    $event->privacy = $this->db->f('event_privacy');
+    $event->date_begin = new Of_Date($this->db->f('event_date'),'GMT');
+    $event->date_end = clone $event->date_begin;
+    $event->date_end->addSecond($this->db->f('event_duration'));
+    $event->duration = $this->db->f('event_duration');
+    $event->priority = $this->db->f('event_priority');
+    $event->color = $this->db->f('event_color');
+    $event->repeat_kind = $this->db->f('event_repeatkind');
+    $event->repeatfrequency = $this->db->f('event_repeatfrequence');
+    $event->repeat_end = new Of_Date($this->db->f('event_endrepeat'),'GMT');
+    $event->description = $this->db->f('event_description');
+    $event->event_duration = $this->db->f('event_event_duration');
+    $event->repeat_days = $this->db->f('event_repeatdays'); 
+
+    $event->date_exception = $this->getEventExceptions($id);
+    $event->user = $this->getEventUsers($id);
+    $event->resource = $this->getEventResources($id);
+    $event->contact = $this->getEventContacts($id);
+
+    return $event;
+  }
+
+  private function getEventExceptions($id) {
+    $exceptions = array();
+    $query = 'SELECT * FROM EventException WHERE eventexception_event_id = '.$id.'';
+    $this->db->query($query);
+    while($this->db->next_record()) {
+      $exceptions[] = new Of_Date($this->db->f('eventexception_date'), 'GMT');
+    }
+    return $exceptions;
+  }
+
+  private function getEventUsers($id) {
+    $users = array();
+    $query = 'SELECT userobm_id, eventlink_state, userobm_lastname, userobm_firstname FROM UserObm INNER JOIN UserEntity ON userobm_id = userentity_user_id INNER JOIN EventLink ON eventlink_entity_id = userentity_entity_id WHERE eventlink_event_id = '.$id.'';
+    $this->db->query($query);
+    while($this->db->next_record()) {
+      $users[] = new OBM_EventAttendee($this->db->f('userobm_id'), $this->db->f('eventlink_state'), $this->db->f('userobm_firstname').' '.$this->db->f('userobm_lastname'));
+    }
+    return $users;
+  }
+
+  private function getEventResources($id) {
+    $resource = array();
+    $query = 'SELECT resource_id, eventlink_state, resource_name FROM Resource INNER JOIN ResourceEntity ON resource_id = resourceentity_resource_id INNER JOIN EventLink ON eventlink_entity_id = resourceentity_entity_id WHERE eventlink_event_id = '.$id.'';
+    $this->db->query($query);
+    while($this->db->next_record()) {
+      $resource[] = new OBM_EventAttendee($this->db->f('resource_id'), $this->db->f('eventlink_state'), $this->db->f('resource_name'));
+    }
+    return $resource;
+  }
+
+  private function getEventContacts($id) {
+    $contact = array();
+    $query = 'SELECT contact_id, eventlink_state, contact_lastname, contact_firstname FROM Contact INNER JOIN ContactEntity ON contact_id = contactentity_contact_id INNER JOIN EventLink ON eventlink_entity_id = contactentity_entity_id WHERE eventlink_event_id = '.$id.'';
+    $this->db->query($query);
+    while($this->db->next_record()) {
+      $contact[] = new OBM_EventAttendee($this->db->f('contact_id'), $this->db->f('eventlink_state'), $this->db->f('contact_firstname').' '.$this->db->f('contact_lastname'));
+    }
+    return $contact;
+  }
+
+  /**
+   * Create a new event in database. 
+   * 
+   * @param array $properties : Event properties.
+   * @access public
+   * @return OBM_Event
+   */
+  public function create($properties) {
+    $event = $this->getById($properties['id']);
+    //TODO DB create;
+    $this->notify(null, $event);
+    return $event;
+  }
+
+  /**
+   * Update an event in database. 
+   * 
+   * @param OBM_Event $event Modified event
+   * @param OBM_Event $oldEvent Old Event : because currently 
+   * the factory doesn't handle database (see TODO tags)
+   * @access public
+   * @return void
+   */
+  public function store($event, $oldEvent) {
+    //$oldEvent = $this->getById($event->id);
+    //TODO DB Store
+    //
+    $this->notify($oldEvent, $event);
+  }
+
+  /**
+   * Remove an event from database. 
+   * 
+   * @param OBM_Event $event 
+   * @access public
+   * @return void
+   */
+  public function delete($event) {
+    //TODO DB Delete
+    $this->notify($event, null);
+  }
   
-  public function __construct()
-  {
+}
+
+
+/**
+ * Observer on EventFactory to send mail when an action is
+ * done on an event.
+ * 
+ * @package 
+ * @version $Id:$
+ * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
+ * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @license GPL 2.0
+ */
+class OBM_EventMailObserver /*implements  OBM_Observer*/{
+
+  private $mailer;
+
+
+  /**
+   * __construct 
+   * 
+   * @access public
+   * @return void
+   */
+  public function __construct() {
     $this->mailer = new CalendarMailer();
     $this->userId = $GLOBALS['obm']['uid'];
   }
   
-  public function afterInsert($event)
-  {
+  /**
+   * @see OBM_Observer::update
+   */
+  public function update($old, $new) {
+    if($old === null) {
+      $attendees['new']['user'] = $new->user;
+      $attendees['new']['resource'] = $new->resource;
+      $attendees['new']['contact'] = $new->contact;
+      $attendees['old'] = array('user'=>array(), 'resource' => array(), 'contact' => array());
+      $attendees['current'] = array('user'=>array(), 'resource' => array(), 'contact' => array());        
+      $this->send($old, $new, $attendees);
+    } elseif($new === null) {
+      $attendees['old']['user'] = $old->user;
+      $attendees['old']['resource'] = $old->resource;
+      $attendees['old']['contact'] = $old->contact;
+      $attendees['new'] = array('user'=>array(), 'resource' => array(), 'contact' => array());
+      $attendees['current'] = array('user'=>array(), 'resource' => array(), 'contact' => array());        
+      $this->send($old, $new, $attendees);
+    } else {
+      $attendees = $this->diffAttendees($old, $new);
+      $exceptions = $this->diffExceptions($old, $new);
+      $this->send($old, $new, $attendees, $exceptions);
+    }
+  }
+
+  /**
+   * Perform attendee delta between old and new OBM_Event  
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @access private
+   * @return void
+   */
+  private function diffAttendees($old, $new) {
+    $attendees = array();
+    $attendees['new']['user'] = array_diff($new->user, $old->user);
+    $attendees['new']['resource'] = array_diff($new->resource, $old->resource);
+    $attendees['new']['contact'] = array_diff($new->contact, $old->contact);      
+    $attendees['current']['user'] = array_intersect($new->user, $old->user);
+    $attendees['current']['resource'] = array_intersect($new->resource, $old->resource);
+    $attendees['current']['contact'] = array_intersect($new->contact, $old->contact);
+    $attendees['old']['user'] = array_diff($old->user, $new->user);
+    $attendees['old']['resource'] = array_diff($old->resource, $new->resource);
+    $attendees['old']['contact'] = array_diff($old->contact, $new->contact);      
+    return $attendees;
+  }
+
+
+  /**
+   * Perform exception delta between old and new OBM_Event
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @access private
+   * @return void
+   */
+  private function diffExceptions($old, $new) {
+    $exceptions['new'] = array_udiff($new->date_exception, $old->date_exception, array('Of_Date', 'cmp')); 
+    $exceptions['old'] = array_udiff($old->date_exception, $new->date_exception, array('Of_Date', 'cmp')); 
+    return $exceptions;
+  }
+
+  /**
+   * Send notification 
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @param array $attendees 
+   * @param array $exceptions 
+   * @access private
+   * @return void
+   */
+  private function send($old, $new, $attendees, $exceptions=null) {
+    foreach($attendees as $state => $attendeesList) {
+      foreach($attendeesList as $kind => $recipients) {
+        if(count($recipients) > 0) {
+          $fn = 'send'.ucfirst($state).ucfirst($kind).'Mail';
+          if(method_exists($this, $fn)) {
+            $this->$fn($old, $new, $recipients, $exceptions);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Send notification for new event participation 
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @param array $recipients 
+   * @param array $exceptions 
+   * @access private
+   * @return void
+   */
+  private function sendNewUserMail($old, $new, $recipients, $exceptions=null) {
+    $recipients = array_diff($recipients, array($this->userId));
+    if (!empty($recipients)) {
+      $this->mailer->sendEventInvitation($new, $recipients);
+    } 
+  }
+
+  /**
+   * Send notification for cancelled event participation
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @param array $recipients 
+   * @param array $exceptions 
+   * @access private
+   * @return void
+   */
+  private function sendOldUserMail($old, $new, $recipients, $exceptions=null) {
+    $recipients = array_diff($recipients, array($this->userId));
+    if (!empty($recipients)) {
+      //$this->mailer->sendEventCancel($old, $recipients);
+    }       
+  }
+
+  /**
+   * Send notification for modified event participation
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @param array $recipients 
+   * @param array $exceptions 
+   * @access private
+   * @return void
+   */
+  private function sendCurrentUserMail($old, $new, $recipients, $exceptions=null) {
+    $recipients = array_diff($recipients, array($this->userId));
+    if ($this->hasEventChanged($old, $new)) {
+      //$this->mailer->sendEventUpdate($new, $old, $recipients);
+    }
+    if ($exceptions !== null && count($exceptions['new']) > 0)  {
+      //$this->mailer->sendEventNewException($new, $exceptions['new']);
+    }
+    if ($exceptions !== null && count($exceptions['old']) > 0)  {
+      //$this->mailer->sendEventOldException($new, $exceptions['old']);
+    }
+  }
+
+  /**
+   * Send notification for new resource reservation
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @param array $recipients 
+   * @param array $exceptions 
+   * @access private
+   * @return void
+   */
+  private function sendNewResourceMail($old, $new, $recipients, $exceptions=null) {
+    foreach ($recipients as $resource) {
+      $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resourceId));
+      if (!in_array($this->userId, $resourceOwners) && count($resourceOwners) > 0) {
+        //$this->mailer->sendResourceReservation($new, $resourceOwners);
+      }
+    }      
+  }
+
+  /**
+   * Send notification for cancelled resource reservation
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @param array $recipients 
+   * @param array $exceptions 
+   * @access private
+   * @return void
+   */
+  private function sendOldResourceMail($old, $new, $recipients, $exceptions=null) {
+    foreach ($recipients as $resource) {
+      $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resourceId));
+      if (!in_array($this->userId, $resourceOwners) && count($resourceOwners) > 0) {
+        //$this->mailer->sendResourceCancel($old, $resourceOwners);
+      }
+    }       
+  }
+
+  /**
+   * Send notification for updated resource reservation 
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @param array $recipients 
+   * @param array $exceptions 
+   * @access private
+   * @return void
+   */
+  private function sendCurrentResourceMail($old, $new, $recipients, $exceptions=null) {
+    if ($this->hasEventChanged($old, $new)) {
+      foreach ($recipients as $resource) {
+        $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resourceId));
+        if (!in_array($this->userId, $resourceOwners) && count($resourceOwners) > 0) {
+          //$this->mailer->sendResourceUpdate($new, $old, $resourceOwners);
+        }
+      }         
+    }
+  }  
+
+  /**
+   * Perform delta between old and new event to check if
+   * there is signifiant change between both
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @access private
+   * @return void
+   */
+  private function hasEventChanged($old, $new) {
+    return $new->location != $old->location
+      || $new->allday  != $old->allday
+      || $new->date_begin->compare($old->date_begin) != 0
+      || $new->duration != $old->duration
+      || $new->repeat_kind    != $old->repeat_kind
+      || $new->repeat_kind    != $old->repeat_kind
+      || ($new->repeat_kind == 'weekly' && $new->repeat_days != $old->repeat_days)
+      || ($new->repeat_kind != 'none' && $new->repeat_end->compareDateIso($old->repeat_end) != 0)
+      || ($new->repeat_kind != 'none' && $new->repeatfrequency != $old->repeatfrequency);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class EventObserver {
+
+  private $mailer;
+  
+  public function __construct() {
+    $this->mailer = new CalendarMailer();
+    $this->userId = $GLOBALS['obm']['uid'];
+  }
+
+
+  public function update($old, $new) {
+    $oldEvent = run_query_calendar_detail($event['calendar_id']);
+  }
+
+
+  public function afterInsert($event) {
     if (is_array($event['sel_user_id'])) {
       $attendees = array_diff($event['sel_user_id'], array($this->userId));
       if (!empty($attendees)) {
@@ -27,8 +758,7 @@ class EventObserver
     }
   }
   
-  public function afterUpdate($event)
-  {
+  public function afterUpdate($event) {
     $oldEvent = run_query_calendar_detail($event['calendar_id']);
     $oldEvent = $oldEvent->Record;
     $oldEvent['date_begin'] = new Of_Date($oldEvent['event_date'], 'GMT');
@@ -144,8 +874,7 @@ class EventObserver
     }
   }
   
-  private function hasEventChanged($event, $oldEvent)
-  {
+  private function hasEventChanged($event, $oldEvent) {
     return $event['location'] != $oldEvent['event_location']
       || $event['all_day']  != $oldEvent['event_allday']
       || $event['date_begin']->compare($oldEvent['date_begin']) != 0

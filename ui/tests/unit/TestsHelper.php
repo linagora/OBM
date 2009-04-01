@@ -89,7 +89,7 @@ class OBM_Database_CsvDataSet extends PHPUnit_Extensions_Database_DataSet_CsvDat
   protected $entityTables = array();
   
   public function addEntityTable($tableName, $entityName, $csvFile) {
-    parent::addTable($tableName, $csvFile);
+    $this->addTable($tableName, $csvFile);
     $this->entityTables[$tableName] = $entityName;
   }
   
@@ -100,7 +100,14 @@ class OBM_Database_CsvDataSet extends PHPUnit_Extensions_Database_DataSet_CsvDat
   public function getEntityName($tableName) {
     return $this->entityTables[$tableName];
   }
-  
+
+  public function addTable($tableName, $csvFile=null) {
+    if($csvFile == null) {
+      $csvFile = dirname(__FILE__).'/db_data/'.$tableName.'.csv';
+    }
+    parent::addTable($tableName, $csvFile);
+  }
+
   protected function createIterator($reverse = FALSE) {
     $innerIterator = parent::createIterator($reverse);
     return new PHPUnit_Extensions_Database_DataSet_ReplacementTableIterator($innerIterator, array('NULL' => NULL), array());
@@ -120,13 +127,16 @@ class OBM_Database_Operation_Entity_Insert extends PHPUnit_Extensions_Database_O
     foreach ($dsIterator as $table) {
       $tableName = $table->getTableMetaData()->getTableName();
       if ($dataSet->isEntityTable($tableName)) {
-        $entity = $dataSet->getEntityName($tableName);
-        for ($i = 1; $i <= $table->getRowCount(); $i++) {
-          $pdo->exec('INSERT INTO Entity (entity_mailing) VALUES (TRUE)');
-          $entityId = $pdo->lastInsertId();
-          $query = 'INSERT INTO '.ucfirst($entity).'Entity ('.$entity.'entity_entity_id, '.$entity.'entity_'.$entity.'_id )
-                    VALUES ('.$entityId.', '.$i.')';
-          $pdo->exec($query);
+        $entities = $dataSet->getEntityName($tableName);
+        if(!is_array($entities)) $entities = array($entities);
+        foreach($entities as $entity) {
+          for ($i = 1; $i <= $table->getRowCount(); $i++) {
+            $pdo->exec('INSERT INTO Entity (entity_mailing) VALUES (TRUE)');
+            $entityId = $pdo->lastInsertId();
+            $query = 'INSERT INTO '.ucfirst($entity).'Entity ('.$entity.'entity_entity_id, '.$entity.'entity_'.$entity.'_id )
+                      VALUES ('.$entityId.', '.$i.')';
+            $pdo->exec($query);
+          }
         }
       }
     }

@@ -9,7 +9,7 @@
 require("$obminclude/of/of_mailer.php");
 require('calendar_mailer.php');
 require('event_observer.php');
-$event_observer = new EventObserver();
+//$event_observer = new EventObserver();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return events details

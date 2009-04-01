@@ -21,6 +21,8 @@ require_once dirname(__FILE__).'/TestsHelper.php';
 
 require_once 'AclTest.php';
 require_once 'VpdiTest.php';
+require_once 'EventTest.php';
+require_once 'EventMailObserverTest.php';
 require_once 'ReportTest.php';
 require_once 'ReportSenderTest.php';
  
@@ -31,6 +33,8 @@ class AllTests {
     $suite->addTestSuite('ReportSenderTest');
     $suite->addTestSuite('AclTest');
     $suite->addTestSuite('VpdiTest');
+    $suite->addTestSuite('EventTest');
+    $suite->addTestSuite('EventMailObserverTest');
     return $suite;
   }
 }

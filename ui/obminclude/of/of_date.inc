@@ -1292,7 +1292,7 @@ class Of_Date extends DateTime {
    * @param string $format format of the $date param
    * @return of_Date
    */   
-  function _set($parts,$date, $format) {
+  private function _set($parts,$date, $format) {
     if(strpos(self::TIMESTAMP, $parts) !== FALSE) {
       $parts = self::ISO_8601;
     }
@@ -1336,7 +1336,7 @@ class Of_Date extends DateTime {
    * @param string $format format of the $date param
    * @return of_Date
    */   
-  function _add($parts,$date, $format) { 
+  private function _add($parts,$date, $format) { 
     $data = self::_parse($parts, $date, $format);
     $str = '';
     foreach($data as $part => $value) {
@@ -1361,7 +1361,7 @@ class Of_Date extends DateTime {
    * @param string $format format of the $date param
    * @return of_Date
    */   
-  function _sub($parts,$date, $format) { 
+  private function _sub($parts,$date, $format) { 
     $data = self::_parse($parts, $date, $format);
     $str = '';
     foreach($data as $part => $value) {
@@ -1387,7 +1387,7 @@ class Of_Date extends DateTime {
    * @param string $format format of the $date param
    * @return of_Date
    */   
-  function _compare($parts,$date, $format) { 
+  private function _compare($parts,$date, $format) { 
     $data = self::_parse($parts, $date, $format);
 
     if(isset($data['timestamp'])) {
@@ -1446,7 +1446,7 @@ class Of_Date extends DateTime {
    * @param string $format format of the $date param
    * @return of_Date
    */   
-  function _diff($parts,$date, $format) {
+  private function _diff($parts,$date, $format) {
     $data = self::_parse($parts, $date, $format);
     $diff = array();
     if(isset($data['timestamp'])) {
@@ -1622,7 +1622,7 @@ class Of_Date extends DateTime {
    * @access public
    * @return void
    */
-  function custom($string) {
+  public function custom($string) {
     $this->modify($string);
     //Seems to clear an internal cache... magical power inside
     $this->modify('');

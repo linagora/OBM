@@ -54,9 +54,9 @@ class DB_Sql {
 	$this->ifadd($this->Port, "port=").
 	$this->ifadd($this->User, "user=").
 	$this->ifadd($this->Password, "password=");
-      $this->Link_ID=pg_pconnect($cstr);
+      $this->Link_ID=pg_connect($cstr);
       if (!$this->Link_ID) {
-	$this->halt("Link-ID == false, pconnect failed");
+	$this->halt("Link-ID == false, connect failed");
       }
     }
   }
