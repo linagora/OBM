@@ -143,8 +143,14 @@
 # For Unix password sync to work on a Debian GNU/Linux system, the following
 # parameters must be set (thanks to Ian Kahan <<kahan@informatik.tu-muenchen.de> for
 # sending the correct chat script for the passwd program in Debian Sarge).
-   passwd program = /usr/bin/passwd %u
-   passwd chat = *Enter\snew\sUNIX\spassword:* %n\n *Retype\snew\sUNIX\spassword:* %n\n *password\supdated\ssuccessfully* .
+  #Configuration sample fo obm
+  passwd program = /usr/share/obm/www/auto/changePasswd.pl --login %u
+--interactiv --unix --sql --no-old --domain-id 2
+   passwd chat = *new\spassword:* %n\n *new\spassword:* %n\n
+*Password\supdate\ssuccess*
+  
+# passwd program = /usr/bin/passwd %u
+  # passwd chat = *Enter\snew\sUNIX\spassword:* %n\n *Retype\snew\sUNIX\spassword:* %n\n *password\supdated\ssuccessfully* .
 # Activer pour debugger le password chat...
    passwd chat debug = no
 
