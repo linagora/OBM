@@ -19,11 +19,8 @@
 ?>
 <?php
 
-require_once('obminclude/of/report/reportFactory.php');
-require_once('obminclude/of/report/sender.php');
 /**
- * Abstract class used to describe program actions. Must be inherited for
- * each report to generate.
+ * Sender used to propose a download to the client
  * 
  * @package 
  * @version $id:$
@@ -31,66 +28,30 @@ require_once('obminclude/of/report/sender.php');
  * @author Vincent Alquier <vincent.alquier@aliasource.fr> 
  * @license GPL 2.0
  */
-abstract class Command {
-  protected $name = 'Report';
-  protected $sender;
-  protected $filters;
-  protected $kind;
-  protected $formater;
+class DownloadSender extends Sender {
+  const context = 'web';
 
   /**
-   * Constructor 
-   * 
-   * @access public
-   * @return void
-   */
-  public function __construct() {
-    $this->filters = array();
-    $this->kind = 'user';
-  }
-
-  /**
-   * Called by the client. launch setup(), then execute() and then tearDown()
+   * Propose a download to the client
    *
-   * @access public
-   * @return void
-   */
-  public function doIt() {
-    $this->setup();
-    $this->execute();
-    if (!is_array($this->filters))
-      $this->filters = array($this->filters);
-    if (isset($this->formater) && isset($this->kind))
-      $this->tearDown();
-  }
-
-  /**
-   * Define default values (like sender to use).
-   *
+   * @param mixed $report report message
+   * @param mixed $name report command name
    * @access protected
    * @return void
    */
-  protected function setup() {
-  }
-
-  /**
-   * Main function of the programm.
-   *
-   * @access protected
-   * @return void
-   */
-  abstract protected function execute();
-
-  /**
-   * send the report (call this->sender->send()).
-   *
-   * @access private
-   * @return void
-   */
-  private function tearDown() {
-    $report = ReportFactory::getReport($this->filters, $this->kind);
-    if (isset($this->sender))
-      $this->sender->send($report->format($this->formater), $this->name);
+  protected function sendMessage($report, $name) {
+    header('Content-Description: File Transfer');
+//    header('Content-Type: application/octet-stream');
+    header('Content-Type: text/plain');
+    header('Content-Disposition: attachment; filename=report.txt');
+//    header('Content-Transfer-Encoding: binary');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+    header('Pragma: public');
+    header('Content-Length: '.strlen($report));
+    ob_clean();
+    flush();
+    echo $report;
   }
 
 }

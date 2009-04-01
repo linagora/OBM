@@ -35,10 +35,11 @@ class StdoutSender extends Sender {
    * Print report on standard output
    *
    * @param mixed $report report message
-   * @access private
+   * @param mixed $name report command name
+   * @access protected
    * @return void
    */
-  protected function sendMessage($report) {
+  protected function sendMessage($report, $name) {
     echo $report;
   }
 

@@ -20,26 +20,27 @@
 require_once 'PHPUnit/Extensions/OutputTestCase.php';
 require_once 'report/sender.php';
 require_once 'report/sender/stdoutSender.php';
+require_once 'report/sender/mailSender.php';
 
 class ReportSenderTest extends PHPUnit_Extensions_OutputTestCase {
 
   public function testReportSingleSenderEcho() {
     $s1 = new SenderEchoUn;
     $this->expectOutputString("1:toto\n");
-    $s1->send("toto");
+    $s1->send("toto","titi");
   }
 
   public function testReportMultipleSenderEcho() {
     $s1 = new SenderEchoUn;
     $s1->setNext(new SenderEchoDeux);
     $this->expectOutputString("1:tutu\n2:tutu\n");
-    $s1->send("tutu");
+    $s1->send("tutu","titi");
   }
 
   public function testReportStdoutSender() {
     $s1 = new StdoutSender;
     $this->expectOutputString("tutu");
-    $s1->send("tutu");
+    $s1->send("tutu","titi");
   }
 
   public function testReportMultipleStdoutSender() {
@@ -48,7 +49,7 @@ class ReportSenderTest extends PHPUnit_Extensions_OutputTestCase {
     $s2->setNext(new StdoutSender);
     $s1->setNext($s2);
     $this->expectOutputString("tutututututu");
-    $s1->send("tutu");
+    $s1->send("tutu","titi");
   }
 
 }
@@ -56,7 +57,7 @@ class ReportSenderTest extends PHPUnit_Extensions_OutputTestCase {
 class SenderEchoUn extends Sender {
   const context = 'test';
 
-  protected function sendMessage($report) {
+  protected function sendMessage($report,$name) {
     echo "1:$report\n";
   }
 }
@@ -64,7 +65,7 @@ class SenderEchoUn extends Sender {
 class SenderEchoDeux extends Sender {
   const context = 'test';
 
-  protected function sendMessage($report) {
+  protected function sendMessage($report,$name) {
     echo "2:$report\n";
   }
 }

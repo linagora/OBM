@@ -32,6 +32,14 @@ class ReportTest extends OBM_Database_TestCase {
     return $csvDataSet;
   }
 
+  public function setup() {
+    parent::setup();
+    $_SESSION['set_lang'] = 'fr';
+//    Stato_I18n::setLocale('fr');
+    $GLOBALS['obm']['uid'] = 3;
+    Stato_Mailer::setDefaultTransport(new Stato_StaticTransport());
+  }
+
   public function testStaticReport() {
     $report = new Report();
     $report->addRecord(new Element('1', 'John', 'Doe', 'M')); 
@@ -160,11 +168,45 @@ class ReportTest extends OBM_Database_TestCase {
   }
 
   public function testReportSender() {
+    $this->assertEquals('test', Sender::currentContext());
+  }
 
+  public function testReportReportMailer() {
+    $mailer = new ReportMailer;
+    $mailer->addRecipient('domainezz.com Admin <admin1@zz.com>');
+    $mailer->sendReportMail('toto','titi');
+    $mailData = Stato_StaticTransport::getMailQ();
+    $this->assertEquals('Rapport d\'exploitation : titi',$mailData[0]['subject']);
+    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
+    $this->assertContains("Rapport d'exploitation de la commande \"titi\" :\n"
+                         ."\n"
+                         ."toto",$mailData[0]['content']);
+  }
+
+  public function testReportMailSender() {
+    $sender = new MailSender;
+    $sender->addRecipient('domainezz.com Admin <admin1@zz.com>');
+    $sender->send('toto','titi');
+    $mailData = Stato_StaticTransport::getMailQ();
+    $this->assertEquals('Rapport d\'exploitation : titi',$mailData[0]['subject']);
+    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
+    $this->assertContains("Rapport d'exploitation de la commande \"titi\" :\n"
+                         ."\n"
+                         ."toto",$mailData[0]['content']);
   }
 
   public function testReportCommand() {
-
+    $cmd = new TestCommand();
+    $cmd->doIt();
+    $mailData = Stato_StaticTransport::getMailQ();
+    $this->assertEquals('Rapport d\'exploitation : Les utilisateurs qui ne sont pas dans global.virt',$mailData[0]['subject']);
+    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
+    $this->assertContains("Rapport d'exploitation de la commande \"Les utilisateurs qui ne sont pas dans global.virt\" :\n"
+                         ."\n"
+                         ."id\tlogin\tlastname\tfirstname\tdomain_name\t\n"
+                         ."2\tadmin1\tAdmin\tdomainezz.com\tzz.com\t\n"
+                         ."3\tuser1\tDoe\tJohn\tzz.com\t\n"
+                         ."4\tediteur1\tDoe\tJane\tzz.com\t\n",$mailData[0]['content']);
   }
 
   public function testContextualOutput() {
@@ -189,4 +231,37 @@ class Element {
     $this->surname = $surname;
     $this->gender = $gender;
   }
+}
+
+class TestCommand extends Command {
+  protected $name = 'Les utilisateurs qui ne sont pas dans global.virt';
+
+  /**
+   * Define default values (like sender to use).
+   *
+   * @access protected
+   * @return void
+   */
+  protected function setup() {
+    $this->kind = 'user';
+    $this->sender = new MailSender;
+    $this->formater = new GenericFormater;
+  }
+
+  /**
+   * Main function of the programm.
+   *
+   * @access private
+   * @return void
+   */
+  protected function execute() {
+    $this->filters[] = new GenericFilter('domain_name','!=','global.virt');
+    $this->sender->addRecipient('domainezz.com Admin <admin1@zz.com>');
+    $this->formater->addField('id');
+    $this->formater->addField('login');
+    $this->formater->addField('lastname');
+    $this->formater->addField('firstname');
+    $this->formater->addField('domain_name');
+  }
+
 }

@@ -18,12 +18,10 @@
 */
 ?>
 <?php
+require_once('obminclude/of/of_mailer.php');
 
 /**
- * Chain-of-responsibility pattern. Define how to send the report.
- * Note that in a 'pure' implementation of the chain of responsibility
- * pattern, a sender would not pass responsibility further down the chain
- * after handling a message.
+ * Sender used to send report by mail.
  * 
  * @package 
  * @version $id:$
@@ -31,72 +29,82 @@
  * @author Vincent Alquier <vincent.alquier@aliasource.fr> 
  * @license GPL 2.0
  */
-abstract class Sender {
-  const context = 'abstract';
-  private $next;
+class MailSender extends Sender {
+  const context = 'console';
+  private $_mailer;
 
   /**
-   * Set the next sender to call
-   *
-   * @param mixed $sender next sender to call
+   * Constructor 
+   * 
    * @access public
    * @return void
    */
-  public function setNext($sender) {
-    $this->next = $sender;
+  public function __construct() {
+    $this->_mailer = new ReportMailer;
   }
 
   /**
-   * Send the report message, and call the next sender to do the same
-   *
-   * @param mixed $report report message
-   * @param mixed $name report command name
-   * @access public
-   * @return void
-   */
-  public function send($report, $name='') {
-    if ($this->checkContext())
-      $this->sendMessage($report, $name);
-    if (isset($this->next))
-      $this->next->send($report);
-  }
-
-  /**
-   * Describe how the report is really sent (really execute the action)
+   * Send the report by mail
    *
    * @param mixed $report report message
    * @param mixed $name report command name
    * @access protected
    * @return void
    */
-  abstract protected function sendMessage($report, $name);
-
-  /**
-   * Used to determine current script execution context
-   *
-   * @access public
-   * @return string
-   */
-  public static function currentContext() {
-    if (isset($HTTP_SESSION_VARS))
-      return 'web';
-    //else
-    if (class_exists('PHPUnit_Framework_TestCase'))
-      return 'test';
-    //else
-    return 'console';
+  protected function sendMessage($report, $name) {
+    $this->_mailer->sendReportMail($report, $name);
   }
 
   /**
-   * Used to check the sender context corresponds to current script execution context
+   * Allow to add a mail address to mail recipients
    *
-   * @access private
-   * @return bool
+   * @param mixed $mail mail address
+   * @access public
+   * @return void
    */
-   private function checkContext() {
-     $classname = get_class($this);
-     eval("\$class_context = $classname::context;");
-     return (in_array(Sender::currentContext(),array($class_context,'test')));
+  public function addRecipient($mail) {
+    $this->_mailer->addRecipient($mail);
+  }
+
+}
+
+
+/**
+ * Utility class used by MailSender to send mails
+ * 
+ * @package 
+ * @version $id:$
+ * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
+ * @author Vincent Alquier <vincent.alquier@aliasource.fr> 
+ * @license GPL 2.0
+ */
+class ReportMailer extends OBM_Mailer {
+  protected $module = 'report';
+  const mail_sender = 'root@localhost';
+
+  /**
+   * Allow to add a mail address to mail recipients
+   *
+   * @param mixed $mail mail address
+   * @access public
+   * @return void
+   */
+  public function addRecipient($mail) {
+    $this->recipients[] = $mail;
+  }
+
+  /**
+   * Create the report mail
+   *
+   * @param mixed $report report message
+   * @param mixed $name report command name
+   * @access public
+   * @return void
+   */
+  public function reportMail($report, $name) {
+    $this->from = ReportMailer::mail_sender;
+    $this->subject = __('Exploitation report : %name%', array( '%name%' => $name));
+    $this->body = array('report' => $report, 'name' => $name);
   }
 
 }
