@@ -5263,11 +5263,11 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
 
     $this->page->setFillColor(new Zend_Pdf_Color_Html('#EEEEEE'));
     $this->page->drawRectangle(
-      $this->calendar_x0,
-      $this->calendar_y1+$this->font_height,
-      $this->calendar_x1,
-      $this->calendar_y1+2*$this->font_height+2,
-      Zend_Pdf_Page::SHAPE_DRAW_FILL);
+    $this->calendar_x0,
+    $this->calendar_y1+$this->font_height,
+    $this->calendar_x1,
+    $this->calendar_y1+2*$this->font_height+2,
+    Zend_Pdf_Page::SHAPE_DRAW_FILL);
 
     $date = clone $this->calendar['date'];
     $date->setWeekday($this->calendar_weekstart)->setHour($this->calendar_first_hour)->setMinute(0)->setSecond(0);
@@ -5278,13 +5278,13 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $i=0;
 
     while($current->compare($end) < 0) {
-        $day = $current->localize(Of_Date::OBM_DATE_WEEK_LIST);
-        $this->page->setFillColor(new Zend_Pdf_Color_Html('#3D3D3D'));
-        $this->page->drawText(
-          $day,
-          $this->calendar_x0+$i*$this->col_width+$this->col_width/2-($this->getStringWidth($day)/2),
-          $this->calendar_y1+$this->font_height+2,
-          'UTF-8');
+      $day = $current->localize(Of_Date::WEEKDAY);
+      $this->page->setFillColor(new Zend_Pdf_Color_Html('#3D3D3D'));
+      $this->page->drawText(
+        $day,
+        $this->calendar_x0+$i*$this->col_width+$this->col_width/2-($this->getStringWidth($day)/2),
+        $this->calendar_y1+$this->font_height+2,
+        'UTF-8');
       $i++;
       $current->addDay(1);
     }

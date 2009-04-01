@@ -33,8 +33,12 @@ function add_displayed_users(check, users, uid) {
 
 
 function check_calendar_pdf_options() {
-  var hour_begin = parseInt($('cal_first_hour').value);
-  var hour_end = parseInt($('cal_last_hour').value);
+  if ($('cal_first_hour')) {
+    var hour_begin = parseInt($('cal_first_hour').value);
+  }
+  if ($('cal_last_hour')) {
+    var hour_end = parseInt($('cal_last_hour').value);
+  }
   var display_days = $('display_days');
 
   if (hour_end <= hour_begin) {
