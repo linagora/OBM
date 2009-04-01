@@ -1087,31 +1087,32 @@ function display_last_visited() {
     }
   }
 
-	// Add Calendar items
+  // Add Calendar items
   // Last created|updated event
   $obm_q = new DB_OBM;
   $cal_url = "$path/calendar/calendar_index.php?action=detailconsult&calendar_id=";
-	$query = "SELECT event_id, event_timeupdate, event_title 
+  $query = "SELECT event_id, event_timeupdate, event_title 
     FROM Event 
-		WHERE event_usercreate='$uid' 
-			AND event_timeupdate = (SELECT max(event_timeupdate) FROM Event WHERE event_usercreate='$uid')";
+    WHERE event_usercreate='$uid' 
+      AND event_timeupdate = (SELECT max(event_timeupdate) FROM Event WHERE event_usercreate='$uid')";
   display_debug_msg($query, $cdg_sql, 'display_last_visited(Last created|updated event)');
   $obm_q->query($query);
-  $obm_q->next_record();
-  $id = $obm_q->f("event_id");
-  $title = $obm_q->f("event_title");
-  $dis_last .= "
-    <li>
-		  <a id=\"last_visit_calendar_event_a\" href=\"$cal_url$id\">
-		   <img src=\"$GLOBALS[ico_time]\" alt=\"Calendar\" />
-		   <span id=\"last_visit_calendar_event_title\">$title</span>
-		  </a>
-		</li>";
+  if($obm_q->next_record()) {
+    $id = $obm_q->f("event_id");
+    $title = $obm_q->f("event_title");
+    $dis_last .= "
+      <li>
+        <a id=\"last_visit_calendar_event_a\" href=\"$cal_url$id\">
+         <img src=\"$GLOBALS[ico_time]\" alt=\"Calendar\" />
+         <span id=\"last_visit_calendar_event_title\">$title</span>
+        </a>
+      </li>";
+  }
 
-	// Last calendar view
+  // Last calendar view
   $dis_last .= "
     <li><a id=\"last_calendar_view\" href=\"javascript:last_visit_calendar_view();\" >
-		<img src=\"$GLOBALS[ico_calendar]\" alt=\"Calendar\" />$GLOBALS[l_module_calendar]</a></li>";
+    <img src=\"$GLOBALS[ico_calendar]\" alt=\"Calendar\" />$GLOBALS[l_module_calendar]</a></li>";
 
   $block .= "
   <div class=\"portlet\" id=\"lastVisitPortlet\"> 
