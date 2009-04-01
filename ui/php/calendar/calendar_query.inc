@@ -897,14 +897,18 @@ function check_calendar_conflict($calendar, $sel_entity_id) {
 // Check for conflict : Only with the first occurrence of each event,
 // Parameters:
 //   - $calendar       : calendar parameters
-//   - sel_entity_id : selected entities id
 ///////////////////////////////////////////////////////////////////////////////
-function quick_check_calendar_conflict($calendar, $sel_entity_id) {
+function quick_check_calendar_conflict($calendar,$a) {
 
   $begin = clone $calendar['date_begin'];
   $end = clone $calendar['date_end'];
   $begin->setHour(0)->setMinute(0)->setSecond(0); 
   $end->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
+
+  // Event entities
+  $entities = get_calendar_event_entity($calendar['calendar_id']);
+  $sel_entity_id['user'] = $entities['user']['ids'];
+  $sel_entity_id['resource'] = $entities['resource']['ids'];
 
   $cal_entities = store_calendar_entities(get_calendar_entity_label($sel_entity_id));
   $occurrences = calendar_events_model($begin,$end,$cal_entities);
