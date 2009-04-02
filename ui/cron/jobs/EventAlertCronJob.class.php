@@ -70,8 +70,8 @@ class EventAlertCronJob extends CronJob{
     global $obm;
 
     include_once('obminclude/lang/fr/calendar.inc');
-    $delta = $this->jobDelta - 1;
-    $this->getAlerts($date, $date + $delta);
+    $date = strtotime(date('Y-m-d H:i:01', $date));
+    $this->getAlerts($date, $date + $this->jobDelta);
 
     $of = &OccurrenceFactory::getInstance();
     $occurrences = $of->getOccurrences();
@@ -80,7 +80,7 @@ class EventAlertCronJob extends CronJob{
       $event = $occurrence->event;
       $delta = $this->getAlertDelta($event->id, key($event->attendee["user"]));
       
-      if($occurrence->date > $date && $occurrence->date <= $date  + $this->jobDelta) {
+      if($occurrence->date >= $date && $occurrence->date < $date  + $this->jobDelta) {
         $this->logger->debug("Alert for event ".$event->id." will be sent");
         $consult_link = "$GLOBALS[cgp_host]/calendar/calendar_index.php?action=detailconsult&calendar_id=".$event->id;
         $events[$event->id] = array (
@@ -159,8 +159,8 @@ class EventAlertCronJob extends CronJob{
   function getAlerts($start_time, $end_time) {
     $this->logger->debug("Getting alerts between ".date("Y-m-d H:i:s",$start_time)." and ".date("Y-m-d H:i:s",$end_time));
     $of = &OccurrenceFactory::getInstance();
-    $of->setBegin($start_time - 1);
-    $of->setEnd($end_time + 1);
+    $of->setBegin($start_time);
+    $of->setEnd($end_time);
     $this->getSimpleAlerts($start_time, $end_time);
     $this->getReccurentAlerts($start_time, $end_time);
   }
