@@ -185,7 +185,6 @@ class OBM_Pdf extends Zend_Pdf{
    */
   protected function getTemplatePath($templateName, $module=null) {
     if(!$module) $module = $GLOBALS['module'];
-    self::setTemplateRoot(dirname(__FILE__).'/../../views/pdf');
     $possiblePaths = array(
       dirname(__FILE__)."/../../conf/views/pdf/$module/$_SESSION[set_lang]/$templateName.pdf",
       dirname(__FILE__)."/../../views/pdf/$module/$_SESSION[set_lang]/$templateName.pdf",
