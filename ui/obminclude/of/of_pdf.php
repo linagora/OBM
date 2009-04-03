@@ -1,0 +1,203 @@
+<?php
+/*
+ +-------------------------------------------------------------------------+
+ |  Copyright (c) 1997-2009 OBM.org project members team                   |
+ |                                                                         |
+ | This program is free software; you can redistribute it and/or           |
+ | modify it under the terms of the GNU General Public License             |
+ | as published by the Free Software Foundation; version 2                 |
+ | of the License.                                                         |
+ |                                                                         |
+ | This program is distributed in the hope that it will be useful,         |
+ | but WITHOUT ANY WARRANTY; without even the implied warranty of          |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           |
+ | GNU General Public License for more details.                            |
+ +-------------------------------------------------------------------------+
+ | http://www.obm.org                                                      |
+ +-------------------------------------------------------------------------+
+*/
+?>
+<?php
+
+require_once("$obminclude/lib/Zend/Pdf.php");
+
+/**
+ * OBM class to handle pdf files
+ * 
+ * @uses Zend_Pdf
+ * @package 
+ * @version $id:$
+ * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
+ * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @license GPL 2.0
+ */
+class OBM_Pdf extends Zend_Pdf{ 
+
+  private $fontSize;
+
+  private $interLign;
+
+  private $font;
+
+  private $currentPage;
+
+  private static $templateRoot; 
+
+  private static $subject;
+
+  private static $author;
+
+  public function __construct($source = null, $revision = null, $load = false) {
+    $this->font = Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA);
+    $this->fontSize = 6;
+    $this->interLign = 1.25;
+    parent::__construct($source, $revision,$load);
+  }
+
+  /**
+   * load 
+   * 
+   * @param mixed $source 
+   * @param mixed $revision 
+   * @static
+   * @access public
+   * @return void
+   */
+  public static function load($source = null, $revision = null, $module = null) {
+    if(!file_exists($source)) {
+      $source = self::getTemplatePath($source, $module);
+    }
+    return new OBM_Pdf($source, $revision, true);
+  }
+  /**
+   * Download PDF
+   * 
+   * @access public
+   * @return void
+   */
+  public function download($filename) {
+
+    header("Content-Type: application/pdf") ;
+    header("Content-Disposition: attachment; filename=\"$filename.pdf\";");
+    header("Cache-Control: maxage=3600");
+    header('Pragma: public');
+    echo $this->render();
+  }
+
+  /**
+   * setMetadata 
+   * 
+   * @access public
+   * @return void
+   */
+  public function setMetadata($subject) {
+    $title = $GLOBALS['l_'.$GLOBALS['module']];
+    $this->pdf->properties['Title'] = $title;
+    $this->pdf->properties['Subject'] = $this->subject;
+    $this->pdf->properties['Author'] = $this->author;
+    $this->pdf->properties['Creator'] = $this->author;
+    $this->pdf->properties['Producer'] = "$GLOBALS[l_obm_title] $GLOBALS[obm_version]";
+    $this->pdf->properties['CreationDate'] = "D:".date('YmdHis');
+  }
+  
+
+  /**
+   * Return the size of the string in point 
+   * 
+   * @param mixed $string 
+   * @access public
+   * @return void
+   */
+  public function getStringWidth($string) {
+    $drawingString = iconv('UTF-8', 'UTF-16BE//IGNORE', $string);
+    $characters = array();
+    for ($i = 0; $i < strlen($drawingString); $i++) {
+      $characters[] = (ord($drawingString[$i++]) << 8) | ord($drawingString[$i]);
+    }
+    $glyphs = $this->font->glyphNumbersForCharacters($characters);
+    $widths = $this->font->widthsForGlyphs($glyphs);
+    $stringWidth = (array_sum($widths) / $this->font->getUnitsPerEm()) * $this->font_size;
+
+    return $stringWidth;
+  }  
+
+  /**
+   * get font 
+   * 
+   * @access public
+   * @return void
+   */
+  public function getFont() {
+    return $this->font;
+  }
+
+  /**
+   * get font size 
+   * 
+   * @access public
+   * @return void
+   */
+  public function getFontSize() {
+    return $this->fontSize; 
+  }
+
+  /**
+   * get font size 
+   * 
+   * @access public
+   * @return void
+   */
+  public function setFontSize($size) {
+    $this->fontSize = $size; 
+  }
+  /**
+   * Return the size of the height in point
+   * 
+   * @access public
+   * @return void
+   */
+  public function getLineHeight() {
+    return $this->fontSize * $this->interLign;
+  }
+
+  /**
+   * add a new page
+   * with header & legend
+   * 
+   * @param mixed $header 
+   * @param mixed $legend 
+   * @access public
+   * @return void
+   */
+  public function addPage($header=true, $legend=true) {
+    $this->currentPage = $this->newPage();
+    $pdf->pages[] = $this->currentPage;
+    $this->page->setFont($this->font, $this->fontSize);
+  }
+
+  /**
+   * getTemplatePath 
+   * 
+   * @param mixed $templateName 
+   * @param mixed $module 
+   * @access protected
+   * @return void
+   */
+  protected function getTemplatePath($templateName, $module=null) {
+    if(!$module) $module = $GLOBALS['module'];
+    self::setTemplateRoot(dirname(__FILE__).'/../../views/pdf');
+    $possiblePaths = array(
+      dirname(__FILE__)."/../../conf/views/pdf/$module/$_SESSION[set_lang]/$templateName.pdf",
+      dirname(__FILE__)."/../../views/pdf/$module/$_SESSION[set_lang]/$templateName.pdf",
+      dirname(__FILE__)."/../../conf/views/pdf$module/en/$templateName.pdf",
+      dirname(__FILE__)."/../../views/pdf$module/en/$templateName.pdf"
+    );
+    foreach ($possiblePaths as $path) {
+      if (file_exists($path) && is_readable($path)) {
+        return $path;
+      }
+    }
+    return false;
+  }  
+
+}
