@@ -61,6 +61,7 @@ $l_cant_delete = 'Cet hôte est lié à un ou plusieurs domaines et ne peux donc
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
+$l_obm_sync = 'OBM Sync';
 
 $l_fqdn = 'Nom complet de la machine';
 $l_err_host_fqdn = 'Le nom complet de la machine est incorrct (nommachine.nom.domaine)';
