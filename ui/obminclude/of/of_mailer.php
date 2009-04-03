@@ -147,7 +147,9 @@ class OBM_Mailer extends Stato_Mailer
     
     while ($db->next_record()) {
       $email = $this->getEntityEmail($db->f('userobm_email'), $db->f('domain_name'));
-      $recipients[] = array($email, $db->f('userobm_firstname').' '.$db->f('userobm_lastname'));
+      if (isset($email) && $email != "") {
+        $recipients[] = array($email, $db->f('userobm_firstname').' '.$db->f('userobm_lastname'));
+      }
     }
 
     return $recipients;

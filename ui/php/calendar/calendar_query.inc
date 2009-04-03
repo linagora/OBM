@@ -9,7 +9,6 @@
 require("$obminclude/of/of_mailer.php");
 require('calendar_mailer.php');
 require('event_observer.php');
-//$event_observer = new EventObserver();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return events details
@@ -290,6 +289,8 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
 
+  $oldEvent = OBM_EventFactory::getInstance()->getById($event_id);
+
   if (!$force && ($obm['uid'] != $entity_id || $entity != 'user')) {
     if ($entity == 'user') {
       $ok = OBM_Acl::canWrite($obm['uid'], 'calendar', $entity_id);
@@ -305,11 +306,11 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
     } 
   }
 
-  $event_id = sql_parse_id($event_id, true);
+  $id = sql_parse_id($event_id, true);
   $query = "UPDATE EventLink 
             SET eventlink_state = '$state'
             WHERE eventlink_entity_id = ".of_entity_subquery($entity, $entity_id)." 
-              AND eventlink_event_id $event_id";
+              AND eventlink_event_id $id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');  
   $obm_q = new DB_OBM;
@@ -318,12 +319,16 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
   if ($retour) {
     $query = "UPDATE Event
       SET event_timeupdate = NOW()
-      WHERE event_id $event_id";
+      WHERE event_id $id";
 
     display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_occurrence_state()');
     $retour = $obm_q->query($query);
+
+    // Send mail
+    OBM_EventFactory::getInstance()->store(OBM_EventFactory::getInstance()->getById($event_id), $oldEvent);
+
   }
-  
+
   return $retour;    
 }
 
@@ -514,7 +519,7 @@ function run_query_calendar_delete_event_entity($calendar, $users = null) {
 //   - $sel_entity_id : List entitis id ['user'] ['resource']
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_add_event($calendar, $sel_entity_id) {
-  global $obm, $ccalendar_resource_admin, $ccalendar_send_ics, $event_observer;
+  global $obm, $ccalendar_resource_admin, $ccalendar_send_ics;
 
   $groups = $sel_entity_id['group'];
   // Get the final user list (merge group)
@@ -578,8 +583,33 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
   }
   
   $calendar['calendar_id'] = $event_id;
-  $event_observer->afterInsert($calendar);
-  
+
+  // Send mail
+  $data = array ( 
+    'id' => $event_id,
+    'title' => "$calendar[title]" ,
+    'owner' => "$calendar[owner]" ,
+    'location' => "$calendar[location]" ,
+    'category1' => "$calendar[category1]" ,
+    'privacy' => $calendar['privacy'],
+    'date_begin' => $calendar['date_begin'],
+    'date_end' => $calendar['date_end'],
+    'priority' => "$calendar[priority]" ,
+    'color' =>  "$calendar[color]" ,
+    'repeat_kind' => "$calendar[repeat_kind]" ,
+    'repeatfrequency' => "$calendar[repeatfrequency]" ,
+    'repeat_end' => $calendar['repeat_end'],
+    'date_exception' => $calendar['date_exception'] ,
+    'description' => "$calendar[description]" ,
+    'duration' => $calendar['duration'],
+    'repeat_days' => "$calendar[repeat_days]", 
+    'user' => $users_array,
+    'resource' => $resources_array,
+    'contact' => $contacts_array
+  );
+
+  OBM_EventFactory::getInstance()->create($data);
+
   return $event_id;
 }
 
@@ -1011,7 +1041,7 @@ function check_calendar_decision_conflict($calendar) {
 //   - $sel_entity_id : List entitis id ['user'] ['resource']
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $reset_state) {
-  global $c_use_connectors, $obm, $ccalendar_resource_admin, $event_observer;
+  global $c_use_connectors, $obm, $ccalendar_resource_admin;
 
   $datebegin = $calendar['date_begin'];
   $dateend = $calendar['date_end'];
@@ -1019,6 +1049,8 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   $groups = $sel_entity_id['group'];
   $mail = $calendar['mail'];
   $mail_title = stripslashes($calendar['title']);
+
+  $oldEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
 
   $user_group_array = array();
 
@@ -1150,7 +1182,10 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
     run_query_calendar_event_alert_insert($event_id, $obm['uid'], $calendar['alert']);
   }
   
-  $event_observer->afterUpdate($calendar);
+  // Send mail
+  OBM_EventFactory::getInstance()->store(
+    OBM_EventFactory::getInstance()->getById($calendar['calendar_id']),
+    $oldEvent);
 
 }
 
@@ -1232,6 +1267,7 @@ function run_query_calendar_update_event_data($calendar) {
   } else {
     $repeat_days = '0000000';
   }  
+
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
@@ -1256,6 +1292,7 @@ function run_query_calendar_update_event_data($calendar) {
   WHERE
     event_id $event_id"; 
 
+
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
   $obm_q->query($query);
 
@@ -1269,6 +1306,7 @@ function run_query_calendar_update_event_data($calendar) {
       run_query_calendar_event_exception_insert($calendar);
     }
   }
+
 }
 
 
@@ -1295,6 +1333,7 @@ function run_query_calendar_quick_event_update($calendar) {
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $event_duration = $dateend->diffTimestamp($datebegin);
   }  
+  $oldEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
@@ -1307,6 +1346,14 @@ function run_query_calendar_quick_event_update($calendar) {
   event_id $event_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
   $obm_q->query($query);  
+
+  
+  // Send mail
+  if ($calendar['send_mail']) {
+    $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
+    OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
+  }
+
 }
 
 
@@ -1705,10 +1752,16 @@ function run_query_calendar_delete($calendar) {
       $retour = $obm_q->query($query);
     }
   }
+
+  // Send mail
+  $event = OBM_EventFactory::getInstance()->getById($event_id);
+  OBM_EventFactory::getInstance()->delete($event);
+
   of_entity_delete('event', $event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
   $obm_q->query($query);
+
 }
 
 
