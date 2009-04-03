@@ -3,7 +3,7 @@
 return array(
   'NEEDS-ACTION' => 'mis en attente',
   'ACCEPTED' => 'accepté',
-  'REJECTED' => 'refusé',
+  'DECLINED' => 'refusé',
   'New event on OBM: %title%' => 'Nouvel événement sur OBM : %title%',
   'Event cancelled on OBM: %title%' => 'Evénement annulé sur OBM : %title%',
   'Event updated on OBM: %title%' => 'Mise à jour d\'un événement sur OBM : %title%',
