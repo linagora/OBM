@@ -269,24 +269,24 @@ auteur : domainezz.com Admin
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
     $this->assertContains("NEEDS-ACTION",$mailData[0]['content']);  
 
-    $user->set('state', 'REJECTED');
+    $user->set('state', 'DELINED');
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Participation updated on OBM: Title',$mailData[1]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[1]['to']);
-    $this->assertContains("REJECTED",$mailData[1]['content']);  
+    $this->assertContains("DELINED",$mailData[1]['content']);  
 
     $user->set('state', 'ACCEPTED');
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertNull($mailData[2]);
 
-    $res->set('state', 'REJECTED');
+    $res->set('state', 'DELINED');
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Resource participation updated on OBM: Title',$mailData[2]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[2]['to']);
-    $this->assertContains("REJECTED",$mailData[2]['content']);  
+    $this->assertContains("DELINED",$mailData[2]['content']);  
 
     $res->set('state', 'NEEDS-ACTION');
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
