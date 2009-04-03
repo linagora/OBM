@@ -1,0 +1,12 @@
+GOAL :
+
+The user.ott file is set to be a template for the 'PDF export' when modifying/creating a user.
+
+HOW TO :
+First open the user.ott file in open office.
+Modify the file to match your feet (logo, text, system admin phone, mail, ...)
+export the result as a pdf (File/Export as pdf) and save as user.pdf.
+put the user.pdf file in obm/conf/views/pdf/user/[lang]/
+
+That's it
+

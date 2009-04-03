@@ -445,16 +445,19 @@ if ($action == 'index') {
 } elseif ($action == 'check_conflict') {
 ///////////////////////////////////////////////////////////////////////////////
   $entities['user'] = $params['entity']['user'];
-	$conflicts = quick_check_calendar_conflict($params, $entities);
-	if (!$conflicts) {
-  	echo "({conflict:false})";    
+  $conflicts = quick_check_calendar_conflict($params, $entities);
+  if (!$conflicts) {
+    echo "({conflict:false})";    
   } else {
-  	echo "({conflict:true})";    
+    echo "({conflict:true})";    
   }
 	exit();
 
 } elseif ($action == 'update_decision') {
 ///////////////////////////////////////////////////////////////////////////////
+  if (empty($params['entity_id']) && $params['entity_kind'] == 'user') {
+    $params['entity_id'] = $obm['uid'];
+  }  
   if (check_calendar_event_participation($params)) {
     if (!$params['force'] && $conflicts = check_calendar_decision_conflict($params)) {
       $display['msg'] .= display_warn_msg("$l_event : $l_conflicts");

@@ -2535,40 +2535,34 @@ function dis_user_export_pdf($id) {
 
   // Apply font and draw text
   $pdf->pages[0]->setFont($pdf->getFont(), $pdf->getFontSize());
-  $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(1));
-  $pdf->pages[0]->setLineColor(new Zend_Pdf_Color_GrayScale(0.2));
-  $pdf->pages[0]->setLineDashingPattern(array(3, 2, 3, 4), 1.6);
-  $lineY = 700;
-  $pdf->pages[0]->drawRectangle(260, $lineY, 538, 578);   
   $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(0));
-  $lineY -= $pdf->getLineHeight();  
-  $pdf->pages[0]->drawText($display_name, 280, $lineY, 'UTF-8');
+  $Y = 715;
+  $X = 300;
+  $Y -= $pdf->getLineHeight();  
+  $pdf->pages[0]->drawText($display_name, $X, $Y, 'UTF-8');
   foreach($address as $address_part) {
-    $lineY -= $pdf->getLineHeight();  
-    $pdf->pages[0]->drawText($address_part, 280, $lineY, 'UTF-8');
+    $Y -= $pdf->getLineHeight();  
+    $pdf->pages[0]->drawText($address_part, $X, $Y, 'UTF-8');
   }
-  $lineY = 415;
-  $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(1));
-  $pdf->pages[0]->drawRectangle(60, $lineY, 538, 250);
-  $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(0));
-  $lineY -= $pdf->getLineHeight();  
-  $lineY -= $pdf->getLineHeight();  
-  $pdf->pages[0]->drawText("OBM : ". $GLOBALS['cgp_host'], 80, $lineY, 'UTF-8');
-  $lineY -= $pdf->getLineHeight();  
-  $pdf->pages[0]->drawText("$GLOBALS[l_login] : ". $login, 80, $lineY, 'UTF-8');
-  $lineY -= $pdf->getLineHeight();  
-  $pdf->pages[0]->drawText("$GLOBALS[l_password] : ". $password, 80, $lineY, 'UTF-8');
+  $Y = 390;
+  $X = 98;
+  $Y -= $pdf->getLineHeight();  
+  $pdf->pages[0]->drawText("$GLOBALS[l_login] : ". $login, $X, $Y, 'UTF-8');
+  $Y -= $pdf->getLineHeight();  
+  $pdf->pages[0]->drawText("$GLOBALS[l_password] : ". $password, $X, $Y, 'UTF-8');
   for($i = 0; $i < 5 && $i < count($email); $i++) {
     $mail = $email[$i];
-    $lineY -= $pdf->getLineHeight();  
-    $pdf->pages[0]->drawText("$GLOBALS[l_email] : ". $mail, 80, $lineY, 'UTF-8');  
+    $Y -= $pdf->getLineHeight();  
+    $pdf->pages[0]->drawText("$GLOBALS[l_email] : ". $mail, $X, $Y, 'UTF-8');  
     if($i == 4 && $count($email) > 4) {
-      $lineY -= $pdf->getLineHeight();  
-      $pdf->pages[0]->drawText("$GLOBALS[l_email] : [...]", 80, $lineY, 'UTF-8');  
+      $Y -= $pdf->getLineHeight();  
+      $pdf->pages[0]->drawText("$GLOBALS[l_email] : [...]", $X, $Y, 'UTF-8');  
     }
   }
-  $lineY -= $pdf->getLineHeight();  
-  $pdf->pages[0]->drawText("$GLOBALS[l_phone] : ". $phone, 80, $lineY, 'UTF-8');    
+  $Y -= $pdf->getLineHeight();  
+  $pdf->pages[0]->drawText("$GLOBALS[l_phone] : ". $phone, $X, $Y, 'UTF-8');    
+  $Y -= $pdf->getLineHeight();  
+  $pdf->pages[0]->drawText("OBM : ". $GLOBALS['cgp_host'], $X, $Y, 'UTF-8');
   $pdf->download($login);
 }
 /**

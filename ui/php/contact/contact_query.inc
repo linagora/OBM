@@ -541,7 +541,6 @@ function run_query_contact_insert($contact) {
   $retour = $obm_q->query($query);
 
   $id = $obm_q->lastid();
-
   if ($id > 0) {
     if (($cgp_show['module']['company']) && ($retour)) {
       run_query_global_company_contact_number_update($comp_id);
@@ -549,14 +548,17 @@ function run_query_contact_insert($contact) {
     $entityid = of_entity_insert($GLOBALS['module'],$id);
     $contact['contact_id'] = $id;
 
-    // Subscription support
-    $query = "INSERT INTO SynchedContact (
-	synchedcontact_user_id, 
-	synchedcontact_contact_id,
-	synchedcontact_timestamp)
-	VALUES ($uid, $id, NOW()
-    )";
-    $obm_q->query($query);
+    if($priv == 1) {
+      // Subscription support
+      $query = "INSERT INTO SynchedContact (
+          synchedcontact_user_id, 
+          synchedcontact_contact_id,
+          synchedcontact_timestamp)
+          VALUES ($uid, $id, NOW()
+      )";
+      display_debug_msg($query, $cdg_sql, 'run_query_contact_insert(1)');
+      $obm_q->query($query);
+    }
 
     // Birthday support
     $birthday = of_isodate_convert($contact['birthday'], true);

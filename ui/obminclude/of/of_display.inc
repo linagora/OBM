@@ -845,46 +845,139 @@ class OBM_DISPLAY {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_head($p_module) { 
-  global $l_obm_title, $extra_css, $extra_js, $extra_file_js,$css_obm;
+  global $l_obm_title, $extra_css, $extra_js, $extra_js_include,$ico_minus;
+  global $ico_datepicker,$l_monthsofyear,$l_daysofweekfirst,$ico_colorpicker;
+  global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
+  global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
+  global $css_print_obm, $ico_delete, $ico_update, $output_target,$l_transparent;
+  global $l_autocomplete_field, $l_fatal_server_err, $gwt_js_include;
 
-  // If a theme specif function is provided
-  if (function_exists("display_head_theme")) {
-    return display_head_theme($p_module);
+  $css = $css_obm;
+
+  if ($output_target == "print") {
+   $css = $css_print_obm;
   }
+
+  $monthShort =  phpArrayToJsArray($l_monthsofyearshort);
+  $monthLong = phpArrayToJsArray($l_monthsofyear);
+  $daysShort = phpArrayToJsArray($l_daysofweekfirst);
+  $dayMedium = phpArrayToJsArray($l_daysofweekshort);
+  $dayLong =   phpArrayToJsArray($l_daysofweek);
+
+  $headers_e = "";
+
   if (is_array($extra_css)) {
     foreach($extra_css as $css_file) {
-      $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\" />";
+      $dis_extra_css .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\" />";
     }
   } elseif (isset($extra_css)) {
     $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"$extra_css\" />";
   }
 
-  $headers_e = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
-\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
-<html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
-
-  //  if ($extra_file_js) {
-  //    $file_js = "<script language=\"JavaScript\" type=\"text/javascript\" src=\"$extra_file_js\" />";
-  //  }
-
+  if (is_array($extra_js_include)) {
+    foreach($extra_js_include as $js_file) {
+      $js_include .= "<script type=\"text/javascript\" src=\"$resources_path/js/$js_file\" ></script>\n";
+    }
+  }
+  if(is_array($GLOBALS['js']['vars'])) {
+    foreach($GLOBALS['js']['vars'] as $kind => $values) {
+      foreach($values as $label => $value) {
+        if(is_numeric($value)) {
+          $obm_vars .= "obm.vars.$kind.$label = $value;\n";
+        } elseif(is_string($value)) {
+          $obm_vars .= "obm.vars.$kind.$label = '".phpStringToJsString($value)."';\n";
+        } elseif(is_array($value)) {
+          $obm_vars .= "obm.vars.$kind.$label = new Object();\n";
+          foreach($value as $key => $string) {
+            $obm_vars .= "obm.vars.$kind.$label.$key = '".phpStringToJsString($string)."';\n";
+          }
+        } else {
+          $obm_vars .= "obm.vars.$kind.$label = '$value';\n";
+        }
+      }
+    }
+  }
   return "$headers_e
+<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
+<html xmlns=\"http://www.w3.org/1999/xhtml\">     
 <head>
-  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
+  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
   <title>$l_obm_title - $p_module</title>
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_obm\" />
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"$css\" />
   $dis_extra_css
-  $file_js
-<script type=\"text/javascript\">
+  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/mootools-1.2.1-core.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/mootools-1.2-more.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/mootools/plugins/clientcide.js\" ></script>
+  <script type=\"text/javascript\">
+  //<![CDATA[
+  var obm = Obm = {};
+  obm.vars = new Object();
+  obm.vars.labels = new Object();
+  obm.vars.images = new Object();
+  obm.vars.regexp = new Object();
+  obm.vars.consts = new Object();
+  obm.vars.conf = new Object();
+  obm.initialize = new Chain();
+  obm.resize = new Chain();
+  obm.vars.images.minus = '$ico_minus';
+  obm.vars.images.plus = '$ico_plus';
+  obm.vars.images.datePicker = '$ico_datepicker';
+  obm.vars.images.colorPicker = '$ico_colorpicker';
+  obm.vars.images.update = '$ico_update';
+  obm.vars.images.del = '$ico_delete';
+  obm.vars.regexp.dateFormat = '$_SESSION[set_date_upd]';
+  obm.vars.consts.popupHeight = '$popup_height';
+  obm.vars.consts.popupWidth = '$popup_width';
+  obm.vars.consts.weekStart = $c_week_first_day;
+  obm.vars.consts.resourcePath = '$resources_path';
+  obm.vars.consts.timeZone = '".Of_Date::getOption('timezone')."';
+  obm.vars.consts.calendarUrl = '$path/calendar/calendar_index.php';
+  obm.vars.consts.calendarDetailconsultURL = '$path/calendar/calendar_index.php?action=detailconsult&calendar_id=';
+  obm.vars.labels.monthsShort = $monthShort;
+  obm.vars.labels.months = $monthLong;
+  obm.vars.labels.dayShort = $daysShort;
+  obm.vars.labels.dayMedium = $dayMedium;
+  obm.vars.labels.dayLong = $dayLong;
+  obm.vars.labels.today = '".phpStringToJsString($l_today)."';
+  obm.vars.labels.transparent = '".phpStringToJsString($l_transparent)."';
+  obm.vars.labels.autocompleteField = '".phpStringToJsString($l_autocomplete_field)."'
+  obm.vars.labels.fatalServerErr = '".phpStringToJsString($l_fatal_server_err)."';
+  $obm_vars
+  // ]]>
+  </script> 
+  <!-- <script type=\"text/javascript\" src=\"$resources_path/js/mootools.js\" ></script> -->
+  <script type=\"text/javascript\" src=\"$resources_path/js/datepicker.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/utils.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/obm.js\" ></script>
+  <script type=\"text/javascript\" src=\"$resources_path/js/autocomplete.js\" ></script>
+  $js_include
+
+  <script type=\"text/javascript\">
+  //<![CDATA[
+  window.onresize= function() {
+    while(obm.resize.\$chain && obm.resize.\$chain.length > 0) {
+      obm.resize.callChain();
+    }
+  }
+
+  obm.initialize.chain(datePickerGenerator);
+  window.addEvent('load', function () {
+    while(obm.initialize.\$chain && obm.initialize.\$chain.length > 0) {
+      obm.initialize.callChain();
+    }
+  });
+
   $extra_js
-</script>
+  // ]]>
+  </script>
+
 </head>
 
-<body onload=\"if (document.f_search) {
+<body onload=\"if (document.f_search && document.f_search.elements[0]) {
     document.f_search.elements[0].focus();
-  } else if (document.f_entity) {
+  } else if (document.f_entity && document.f_entity.elements[0]) {
     document.f_entity.elements[0].focus();
   } \">
-
 "
 .display_debug()
 ;

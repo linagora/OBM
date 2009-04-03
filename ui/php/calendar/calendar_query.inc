@@ -289,11 +289,7 @@ function run_query_calendar_insert_decision($calendar) {
 function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state, $force = false) {
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
-  if ($entity_id == '' && $entity == 'user') {
-    $entity_id = $obm['uid'];
-  } elseif($entity_id == '')  {
-    return false;
-  }
+
   if (!$force && ($obm['uid'] != $entity_id || $entity != 'user')) {
     if ($entity == 'user') {
       $ok = OBM_Acl::canWrite($obm['uid'], 'calendar', $entity_id);
@@ -346,8 +342,7 @@ function check_calendar_event_participation($params) {
   $entity_id = $params['entity_id'];
   $state = $params['decision_event'];
 
-  $current_state = get_calendar_event_participation_state($event_id, $entity, $entity_id);
-  if ($state == $current_state) {
+  if (empty($entity_id) || $state == get_calendar_event_participation_state($event_id, $entity, $entity_id)) {
     return false;
   } else {
     return true;

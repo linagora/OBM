@@ -56,8 +56,10 @@ class OBM_Mailer extends Stato_Mailer
   
   protected function getTemplatePath($templateName) {
     $possiblePaths = array(
+      dirname(__FILE__)."/../../conf/views/mail/$module/$_SESSION[set_lang]/$templateName.pdf",
       self::$templateRoot."/{$this->module}/{$this->locale}/$templateName.php",
-      self::$templateRoot."/{$this->module}/fr/$templateName.php"
+      dirname(__FILE__)."/../../conf/views/mail$module/en/$templateName.pdf",
+      self::$templateRoot."/{$this->module}/en/$templateName.php"
     );
     foreach ($possiblePaths as $path) {
       if (file_exists($path) && is_readable($path)) {
