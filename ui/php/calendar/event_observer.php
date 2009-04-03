@@ -170,6 +170,71 @@ class OBM_Event /*Implements OBM_PropertyChangeSupport*/{
       throw new InvalidArgumentException($property.' property is not supported');
     }    
   }  
+
+  /**
+   * addUser
+   *
+   * @param string $property
+   * @param string $value
+   * @access public
+   * @return void
+   */
+  public function addUser($property, $value) {
+    $entity = get_entity_info($value, $property);
+    $user = new OBM_EventAttendee($value, null, $entity["label"]);
+    array_push($this->$property, $user);
+  }
+
+  /**
+   * delUser
+   *
+   * @param string $property
+   * @param string $value
+   * @access public
+   * @return void
+   */
+  public function delUser($property, $value) {
+    foreach($this->$property as $user) {
+      if ($value == $user->id) {
+        $index = array_search($user, $this->$property);
+        unset($this->{$property}[$index]);
+        break;
+      }
+    }
+  }
+
+  /**
+   * addResource
+   *
+   * @param string $property
+   * @param string $value
+   * @access public
+   * @return void
+   */
+  public function addResource($property, $value) {
+    $entity = get_entity_info($value, $property);
+    $res = new OBM_EventAttendee($value, null, $entity["label"]);
+    array_push($this->$property, $res);
+  }
+
+  /**
+   * delUser
+   *
+   * @param string $property
+   * @param string $value
+   * @access public
+   * @return void
+   */
+  public function delResource($property, $value) {
+    foreach($this->$property as $res) {
+      if ($value == $res->id) {
+        $index = array_search($res, $this->$property);
+        unset($this->{$property}[$index]);
+        break;
+      }
+    }
+  }
+
 }
 
 /**
@@ -189,7 +254,7 @@ class OBM_EventAttendee {
   private $id;
 
   public function __construct($id, $state, $label) {
-    $this->id = $id;
+    $this->id = $id + 0;
     $this->state = $state;
     $this->label = $label;
   }
@@ -211,13 +276,57 @@ class OBM_EventAttendee {
   }
 
   /**
+   * __set 
+   * 
+   * @param string $property 
+   * @param mixed $value 
+   * @access public
+   * @throw InvalidArgumentException
+   * @return void
+   */
+  public function __set($property, $value) {
+    $fn = 'set'.ucfirst($property);
+    if(method_exists($this, $fn)) {
+      $this->$fn($property, $value);  
+    } elseif(property_exists($this, $property)) {
+      $this->$property = $value;  
+    } else {
+      throw new InvalidArgumentException($property.' property is not supported');
+    }
+  }
+
+
+  /**
+   * get 
+   * 
+   * @param string $property 
+   * @access public
+   * @return mixed
+   */
+  public function get($property) {
+    return $this->__get($property);
+  }
+
+  /**
+   * set 
+   * 
+   * @param string $property 
+   * @param mixed $value 
+   * @access public
+   * @return void
+   */
+  public function set($property, $value) {
+    $this->__set($property, $value);
+  }
+
+  /**
    * __toString 
    * 
    * @access public
    * @return void
    */
   public function __toString() {
-    return $this->id;
+    return $this->id . '';
   }
 
   /**
@@ -232,6 +341,11 @@ class OBM_EventAttendee {
   public static function cmp($attendee1, $attendee2) {
     if($attendee1->id == $attendee2->id) return O;
     return strcmp($attendee1->label, $attendee2->label);
+  }
+
+  public static function cmpState($attendee1, $attendee2) {
+    if($attendee1->id != $attendee2->id) return O;
+    return strcmp($attendee1->state, $attendee2->state);
   }
 }
 
@@ -472,7 +586,8 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
     } else {
       $attendees = $this->diffAttendees($old, $new);
       $exceptions = $this->diffExceptions($old, $new);
-      $this->send($old, $new, $attendees, $exceptions);
+      $attendeesState = $this->diffAttendeesState($old, $new);
+      $this->send($old, $new, $attendees, $attendeesState, $exceptions);
     }
   }
 
@@ -496,6 +611,20 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
     $attendees['old']['resource'] = array_diff($old->resource, $new->resource);
     $attendees['old']['contact'] = array_diff($old->contact, $new->contact);      
     return $attendees;
+  }
+
+  /**
+   * Perform attendee state diff between old and new OBM_Event  
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @access private
+   * @return void
+   */
+  private function diffAttendeesState($old, $new) {
+    $att['user'] = array_udiff($new->user, $old->user, array('OBM_EventAttendee', 'cmpState')); 
+    $att['resource'] = array_udiff($new->resource, $old->resource, array('OBM_EventAttendee', 'cmpState')); 
+    return $att;
   }
 
 
@@ -523,7 +652,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @access private
    * @return void
    */
-  private function send($old, $new, $attendees, $exceptions=null) {
+  private function send($old, $new, $attendees, $attendeesState=null, $exceptions=null) {
     foreach($attendees as $state => $attendeesList) {
       foreach($attendeesList as $kind => $recipients) {
         if(count($recipients) > 0) {
@@ -534,6 +663,38 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
         }
       }
     }
+    if ($attendeesState != null) {
+      foreach($attendeesState['user'] as $ustate) {
+        $this->sendEventStateUpdateMail($new, $ustate);
+      }
+      foreach($attendeesState['resource'] as $rstate) {
+        $this->sendResourceStateUpdateMail($new, $rstate);
+      }
+    }
+  }
+
+  /**
+   * Send notification for user event participation 
+   * 
+   * @param OBM_Event $new 
+   * @param OBM_EventAttendee $user 
+   * @access private
+   * @return void
+   */
+  private function sendEventStateUpdateMail($new, $user) {
+    $this->mailer->sendEventStateUpdate($new, $user);
+  }
+
+  /**
+   * Send notification for resource event participation 
+   * 
+   * @param OBM_Event $new 
+   * @param OBM_EventAttendee $user 
+   * @access private
+   * @return void
+   */
+  private function sendResourceStateUpdateMail($new, $res) {
+    $this->mailer->sendResourceStateUpdate($new, $res);
   }
 
   /**
@@ -566,7 +727,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
   private function sendOldUserMail($old, $new, $recipients, $exceptions=null) {
     $recipients = array_diff($recipients, array($this->userId));
     if (!empty($recipients)) {
-      //$this->mailer->sendEventCancel($old, $recipients);
+      $this->mailer->sendEventCancel($old, $recipients);
     }       
   }
 
@@ -583,7 +744,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
   private function sendCurrentUserMail($old, $new, $recipients, $exceptions=null) {
     $recipients = array_diff($recipients, array($this->userId));
     if ($this->hasEventChanged($old, $new)) {
-      //$this->mailer->sendEventUpdate($new, $old, $recipients);
+      $this->mailer->sendEventUpdate($new, $old, $recipients);
     }
     if ($exceptions !== null && count($exceptions['new']) > 0)  {
       //$this->mailer->sendEventNewException($new, $exceptions['new']);
@@ -607,7 +768,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
     foreach ($recipients as $resource) {
       $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resourceId));
       if (!in_array($this->userId, $resourceOwners) && count($resourceOwners) > 0) {
-        //$this->mailer->sendResourceReservation($new, $resourceOwners);
+        $this->mailer->sendResourceReservation($new, $resourceOwners);
       }
     }      
   }
@@ -626,7 +787,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
     foreach ($recipients as $resource) {
       $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resourceId));
       if (!in_array($this->userId, $resourceOwners) && count($resourceOwners) > 0) {
-        //$this->mailer->sendResourceCancel($old, $resourceOwners);
+        $this->mailer->sendResourceCancel($old, $resourceOwners);
       }
     }       
   }
@@ -646,7 +807,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
       foreach ($recipients as $resource) {
         $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resourceId));
         if (!in_array($this->userId, $resourceOwners) && count($resourceOwners) > 0) {
-          //$this->mailer->sendResourceUpdate($new, $old, $resourceOwners);
+          $this->mailer->sendResourceUpdate($new, $old, $resourceOwners);
         }
       }         
     }
