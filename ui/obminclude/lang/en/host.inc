@@ -62,6 +62,7 @@ $l_cant_delete = 'This host is linked to one or more domains so it can\'t be del
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
+$l_obm_sync = 'OBM Sync';
 
 $l_fqdn = 'Fully qualified name';
 $l_err_host_fqdn = 'The fully qualified name is not well formed (computername.domaine.name)';

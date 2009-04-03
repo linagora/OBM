@@ -18,6 +18,7 @@ $fieldnames['host_samba'] = $l_smb;
 $fieldnames['host_imap'] = $l_imap;
 $fieldnames['host_smtp_in'] = $l_smtp_in;
 $fieldnames['host_smtp_out'] = $l_smtp_out;
+$fieldnames['host_obm_sync'] = $l_obm_sync;
 $fieldnames['host_description'] = $l_desc;
 $fieldnames['usercreate'] = $l_creator;
 $fieldnames['userupdate'] = $l_updater;
@@ -55,6 +56,15 @@ function dis_data_host(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == 'host_smtp_out') {
+    $res['align'] = 'center';
+    if ($OD->data_set->f($fieldname)) {
+      $res['name'] = 'X';
+    } else {
+      $res['name'] = ' ';
+    }
+  }
+
+  else if ($fieldname == 'host_obm_sync') {
     $res['align'] = 'center';
     if ($OD->data_set->f($fieldname)) {
       $res['name'] = 'X';
@@ -126,6 +136,7 @@ function html_host_search_form($host) {
   $smb = ($host['samba'] == '1' ? "checked = \"checked\"" : '');
   $smtp_in = ($host['smtp_in'] == '1' ? "checked = \"checked\"" : '');
   $smtp_out = ($host['smtp_out'] == '1' ? "checked = \"checked\"" : '');
+  $obm_sync = ($host['obm_sync'] == '1' ? "checked = \"checked\"" : '');
   $imap = ($host['imap'] == '1' ? "checked = \"checked\"" : '');
 
   $dis_delegation = of_delegation_dis_search_form($delegation);
@@ -151,6 +162,13 @@ function html_host_search_form($host) {
     </label>
     ";
   }
+  if ($cgp_use['service']['sync']) {
+    $block_sync = "
+    <label>$GLOBALS[l_obm_sync]<br />
+      <input type=\"checkbox\" name=\"cb_obm_sync\" value=\"1\" $obm_sync />
+    </label>
+    ";
+  }
 
   $block = "
     <form method=\"get\" name=\"f_search\" class=\"search\" action=\"".url_prepare("host_index.php")."\">
@@ -164,6 +182,7 @@ function html_host_search_form($host) {
       </label>
       $block_samba
       $block_mail
+      $block_sync
       <label>&nbsp;<br />
         <input name=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
@@ -233,8 +252,9 @@ function html_host_search_list($obm_q, $pref_q, $host) {
   $imap = $host['imap'];
   $smtp_in = $host['smtp_in'];
   $smtp_out = $host['smtp_out'];
+  $obm_sync = $host['obm_sync'];
 
-  $url = url_prepare("host_index.php?action=search&amp;tf_name=$namet&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_smb=$smb&amp;cb_imap=$imap&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out$url_ext");
+  $url = url_prepare("host_index.php?action=search&amp;tf_name=$namet&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_smb=$smb&amp;cb_imap=$imap&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out&amp;cb_obm_sync=$obm_sync$url_ext");
 
   $dis_host = new OBM_DISPLAY('DATA', $pref_q, $module);
 
@@ -299,6 +319,7 @@ function html_host_consult($host_q) {
   $samba = $host_q->f('host_samba');
   $imap = $host_q->f('host_imap');
   $smtp_out = $host_q->f('host_smtp_out');
+  $obm_sync = $host_q->f('host_obm_sync');
   $smtp_in = $host_q->f('host_smtp_in');
   $name = $host_q->f('host_name');
   $desc = $host_q->f('host_description');
@@ -319,6 +340,7 @@ function html_host_consult($host_q) {
   if ($imap) $imap = $l_yes; else $imap = $l_no;
   if ($smtp_in) $smtp_in = $l_yes; else $smtp_in = $l_no;
   if ($smtp_out) $smtp_out = $l_yes; else $smtp_out = $l_no;
+  if ($obm_sync) $obm_sync = $l_yes; else $obm_sync = $l_no;
   if ($user_login == '') {
     $dis_user = $l_not_assigned;
   } else {
@@ -357,6 +379,15 @@ function html_host_consult($host_q) {
       ";    
   }
 
+  if ($cgp_use['service']['sync']) {
+    $block_sync = "
+    <tr>
+      <th>$GLOBALS[l_obm_sync]</th>
+      <td>$obm_sync</td>
+    </tr>
+      ";    
+  }
+
   $block = "
     <div class=\"detail extras\">
     <h1>$l_module_host</h1>
@@ -386,6 +417,7 @@ function html_host_consult($host_q) {
     </tr>
 
     $block_mail
+    $block_sync
     </table>
     </div>";
 
@@ -422,6 +454,7 @@ function html_host_form($action, $host_q, $host, $field='') {
     $imap = $host_q->f('host_imap');
     $smtp_in = $host_q->f('host_smtp_in');
     $smtp_out = $host_q->f('host_smtp_out');
+    $obm_sync = $host_q->f('host_obm_sync');
     $desc = $host_q->f('host_description');
     $u_login = $host_q->f('userobm_login');
     $u_id = $host_q->f('userobm_id');
@@ -438,6 +471,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['imap'])) { $imap = $host['imap']; }
   if (isset($host['smtp_in'])) { $smtp_in = $host['smtp_in']; }
   if (isset($host['smtp_out'])) { $smtp_out = $host['smtp_out']; }
+  if (isset($host['obm_sync'])) { $smtp_out = $host['obm_sync']; }
   if (isset($host['desc'])) { $desc = stripslashes($host['desc']); }
   if (isset($host['domain_id'])) { $domain_id = $host['domain_id']; }
 
@@ -455,6 +489,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   $imap_state  = ($imap ? 'checked' : '');
   $smtp_in_state  = ($smtp_in ? 'checked' : '');
   $smtp_out_state  = ($smtp_out ? 'checked' : '');
+  $obm_sync_state  = ($obm_sync ? 'checked' : '');
 
 
   // Mark the error field
@@ -500,6 +535,17 @@ function html_host_form($action, $host_q, $host, $field='') {
       </td>
     </tr>";
   }
+  if($cgp_use['service']['sync']) {
+    $block_sync = "
+    <tr>
+      <th class=\"$class[obm_sync]\">$GLOBALS[l_obm_sync]</th>
+      <td>
+        <input name=\"cb_obm_sync\" type=\"checkbox\" value=\"1\" $obm_sync_state>
+      </td>
+    </tr>";
+  }
+
+
   $dis_user = "
   <tr>
   <th class=\"$class[user]\">
@@ -541,7 +587,8 @@ function html_host_form($action, $host_q, $host, $field='') {
       <input name=\"tf_fqdn\" value=\"$fqdn\" /></td>
   </tr>  
   $block_samba
-  $block_mail  
+  $block_mail
+  $block_sync  
   <tr>
     <th class=\"$class[desc]\">$l_desc</th>
     <td>

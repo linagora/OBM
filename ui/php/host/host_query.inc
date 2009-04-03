@@ -27,6 +27,7 @@ function run_query_host_search($host) {
   $samba = $host['samba'];
   $smtp_in = $host['smtp_in'];
   $smtp_out = $host['smtp_out'];
+  $obm_sync = $host['obm_sync'];
   $imap = $host['imap'];
 
   $obm_q = new DB_OBM;
@@ -56,6 +57,9 @@ function run_query_host_search($host) {
   if ($smtp_out != '') {
     $where .= ' AND smtp_out.service_id IS NOT NULL';
   }
+  if ($obm_sync != '') {
+    $where .= ' AND obm_sync.service_id IS NOT NULL';
+  }
   if ($imap != '') {
     $where .= ' AND imap.service_id IS NOT NULL';
   }
@@ -71,6 +75,7 @@ function run_query_host_search($host) {
       imap.service_id as host_imap,
       smtp_in.service_id as host_smtp_in,
       smtp_out.service_id as host_smtp_out,
+      obm_sync.service_id as host_obm_sync,
       host_id as id,
       $timecreate,
       $timeupdate,
@@ -84,24 +89,13 @@ function run_query_host_search($host) {
       LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND smtp_out.service_entity_id = hostentity_entity_id
     $whereq $multidomain 
     $orderq
     $limit";
 
-  if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Host 
-      INNER JOIN HostEntity ON hostentity_host_id = host_id
-      LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id $whereq $multidomain");
-    $obm_q->set_num_rows_total($count);
-  }
-
-  if (($count > 0) || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, 'run_query_host_search()');
-    $obm_q->query($query);
-  }
+  display_debug_msg($query, $cdg_sql, 'run_query_host_search()');
+  $obm_q->query($query);
 
   return $obm_q;
 }
@@ -128,6 +122,7 @@ function run_query_host_detail($id) {
       imap.service_id as host_imap,
       smtp_in.service_id as host_smtp_in,
       smtp_out.service_id as host_smtp_out,
+      obm_sync.service_id as host_obm_sync,
       $timecreate,
       $timeupdate,
       uo.userobm_id as userobm_id,
@@ -143,6 +138,7 @@ function run_query_host_detail($id) {
       LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
       LEFT JOIN Domain ON host_domain_id = domain_id
     WHERE host_id $id 
       $multidomain";
@@ -170,6 +166,7 @@ function run_query_host_insert($host) {
   $samba = sql_parse_int($host['samba']);
   $smtp_in = sql_parse_int($host['smtp_in']);
   $smtp_out = sql_parse_int($host['smtp_out']);
+  $obm_sync = sql_parse_int($host['obm_sync']);
   $imap = sql_parse_int($host['imap']);
   $list = $host['web_list'];
   $desc = $host['desc'];
@@ -231,6 +228,9 @@ function run_query_host_insert($host) {
   if($smtp_out > 0) {
     of_service_insert('smtp_out', $entity_id); 
   }
+  if($obm_sync > 0) {
+    of_service_insert('obm_sync', $entity_id); 
+  }
   if($imap > 0) {
     of_service_insert('imap', $entity_id); 
   }
@@ -270,6 +270,7 @@ function run_query_host_update($host) {
   $samba = sql_parse_int($host['samba']);
   $smtp_in = sql_parse_int($host['smtp_in']);
   $smtp_out = sql_parse_int($host['smtp_out']);
+  $obm_sync = sql_parse_int($host['obm_sync']);
   $imap = sql_parse_int($host['imap']);
   $desc = $host['desc'];
   $multidomain = sql_multidomain('host');
@@ -309,6 +310,11 @@ function run_query_host_update($host) {
       of_service_insert('smtp_out', $entity_id); 
     } else {
       of_service_delete('smtp_out', $entity_id); 
+    }
+    if($obm_sync > 0) {
+      of_service_insert('obm_sync', $entity_id); 
+    } else {
+      of_service_delete('obm_sync', $entity_id); 
     }
     if($imap > 0) {
       of_service_insert('imap', $entity_id); 
@@ -414,13 +420,15 @@ function get_host_info($id) {
     samba.service_id as host_samba,
       imap.service_id as host_imap,
       smtp_in.service_id as host_smtp_in,
-      smtp_out.service_id as host_smtp_out
+      smtp_out.service_id as host_smtp_out,
+      obm_sync.service_id as host_obm_sync
     FROM Host
       INNER JOIN HostEntity ON hostentity_host_id = host_id
       LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
     WHERE host_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_host_info()');
@@ -434,6 +442,7 @@ function get_host_info($id) {
   $h['samba'] = $obm_q->f('host_samba');
   $h['smtp_in'] = $obm_q->f('host_smtp_in');
   $h['smtp_out'] = $obm_q->f('host_smtp_out');
+  $h['obm_sync'] = $obm_q->f('host_obm_sync');
   $h['imap'] = $obm_q->f('host_imap');
   $h['desc'] = $obm_q->f('host_description');
 
@@ -548,6 +557,19 @@ function check_host_can_delete($id) {
     $delete_ok = false;
     $err['msg'] .= $GLOBALS['l_cant_delete'];
   }
+
+  $query = "
+    SELECT count(*) as count FROM ServiceProperty 
+    INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id
+    WHERE serviceproperty_service = 'sync' AND serviceproperty_property IN ('obm_sync')
+    AND serviceproperty_value = '$id'";
+  $obm_q = new DB_OBM;  
+  display_debug_msg($query, $cdg_sql, 'check_host_can_delete');
+  $obm_q->query($query);
+  $obm_q->next_record();
+  if($obm_q->f('count') != 0) {
+    $delete_ok = $delete_ok && true;
+  } 
 
   // Check that user has delegation rights for this host
   if (! check_host_update_rights(array('host_id' => $id))) {
@@ -690,66 +712,7 @@ function check_host_data_form($host) {
     }
   } 
 
-  if ($cgp_use['service']['firewall']) {
-    $firewall_perms = $host['firewall_perms'];
-    
-    if (!is_valid_firewall_perms($firewall_perms)) {
-      $err['msg'] = " $l_err_firewall_perms";
-      $err['field'] = 'firewall_perms';
-      return false;
-    }
-  }
-
   return true;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if string from textarea is a good candidate for firewall perms.
-// Valid if : 
-//  + port list port[-port]
-//  + IP
-//  + IP:port[-port]
-// Parameters:
-//   - $str String to be cleaned up
-// Returns:
-//   - The string cleaned up  
-///////////////////////////////////////////////////////////////////////////////
-function is_valid_firewall_perms($str) {
-  $result = true;
-  if ($str != '') {
-    $lines = explode("\r\n",$str);
-    $i = 0;
-    while ($i < count($lines) && $result) {
-      $currentline = $lines[$i];
-
-      if (!is_valid_port_list($currentline) && 
-          !is_valid_network($currentline) &&
-          !is_valid_network_port_list($currentline)) {
-          $result = false;
-      }
-      $i++;
-    }
-  }
-  return $result;
-}
-
-function is_valid_network($str) {
-  global $php_regexp_network;
-  $result = preg_match($php_regexp_network, $str);
-  return $result;
-}
-
-function is_valid_port_list($str) {
-  global $php_regexp_port_list;
-  $result = preg_match($php_regexp_port_list, $str);
-  return $result;
-}
-
-function is_valid_network_port_list($str) {
-  global $php_regexp_network_port_list;
-  $result = preg_match($php_regexp_network_port_list, $str);
-  return $result;
 }
 
 </script>
