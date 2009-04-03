@@ -203,7 +203,7 @@ class EventTest extends OBM_Database_TestCase {
   }    
 
 
-  public function testModifyPartStatMail() {
+  public function testModifyPartStat() {
   }
 
 }

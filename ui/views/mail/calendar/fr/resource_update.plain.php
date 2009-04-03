@@ -1,6 +1,6 @@
 Message automatique envoyé par OBM
 ------------------------------------------------------------------
-RENDEZ-VOUS MODIFIÉ !
+MODIFICATION D'UNE RESERVATION DE RESSOURCE !
 ------------------------------------------------------------------
 
 Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>),

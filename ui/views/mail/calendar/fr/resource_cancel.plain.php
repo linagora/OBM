@@ -1,9 +1,9 @@
 Message automatique envoyé par OBM
 ------------------------------------------------------------------
-NOUVELLE RESERVATION DE RESSOURCE !
+RESERVATION DE RESSOURCE ANNULEE !
 ------------------------------------------------------------------
 
-Une ressource dont vous êtes responsable à été réservée
+La réservation suivante à été annulée
 
 du     : <?php echo $start; ?>
 
@@ -14,7 +14,3 @@ sujet  : <?php echo $title; ?>
 lieu   : <?php echo $location; ?>
 
 auteur : <?php echo $auteur; ?>
-
-
-:: Pour accepter/refuser la réservation : 
-<?php echo $this->host; ?>/calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>

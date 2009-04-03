@@ -18,7 +18,6 @@
  */
 ?>
 <?php
-
 require_once dirname(__FILE__).'/TestsHelper.php';
 require_once 'php/calendar/calendar_query.inc';
 require_once 'of_date.inc';
@@ -99,7 +98,7 @@ sujet  : Title
 lieu   : Location
 auteur : domainezz.com Admin
 ",$mailData[0]['content']);
-    $this->assertEquals('New event on OBM: Title',$mailData[1]['subject']);
+    $this->assertEquals('New resource reservation on OBM: Title',$mailData[1]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[1]['to']);
     $this->assertContains("Message automatique envoyé par OBM
 ------------------------------------------------------------------
@@ -119,6 +118,7 @@ auteur : domainezz.com Admin
   public function testDeleteEventMail() {
     $event = OBM_EventFactory::getInstance()->getById(1);
     OBM_EventFactory::getInstance()->delete($event);
+    $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Event cancelled on OBM: Title',$mailData[0]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
     $this->assertContains("Message automatique envoyé par OBM
@@ -131,7 +131,7 @@ Le rendez-vous suivant à été annulé
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00
 sujet  : Title
-lieu   : New Location
+lieu   : Location
 auteur : domainezz.com Admin
 ",$mailData[0]['content']);    
     $this->assertEquals('Event cancelled on OBM: Title',$mailData[1]['subject']);
@@ -146,7 +146,7 @@ La réservation suivante à été annulée
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00
 sujet  : Title
-lieu   : New Location
+lieu   : Location
 auteur : domainezz.com Admin
 ",$mailData[1]['content']);    
 
@@ -157,7 +157,9 @@ auteur : domainezz.com Admin
     $event->add('user',4);
     $event->add('user',3);
     $event->del('user',2);
+    $event->location = 'New Location';
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
+    $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('New event on OBM: Title',$mailData[0]['subject']);
     $this->assertEquals("Jane Doe <editeur1@zz.com>", $mailData[0]['to']);
     $this->assertContains("Message automatique envoyé par OBM
@@ -173,22 +175,27 @@ sujet  : Title
 lieu   : New Location
 auteur : domainezz.com Admin
 ",$mailData[0]['content']);
-    $this->assertEquals('Event updated on OBM: Title',$mailData[1]['subject']);
+
+    $this->assertEquals('Resource reservation updated on OBM: Title',$mailData[1]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[1]['to']);
     $this->assertContains("Message automatique envoyé par OBM
 ------------------------------------------------------------------
 MODIFICATION D'UNE RESERVATION DE RESSOURCE !
 ------------------------------------------------------------------
 
-Une réservation d'une ressource dont vous ête responsable à été 
-modifiée
+Le rendez-vous Title, initialement prévu du 24/03/2009 08:00 au 24/03/2009 09:00, (lieu : Location),
+a été modifié et se déroulera du 24/03/2009 08:00 au 24/03/2009 09:00, (lieu : New Location).
 
-du     : 24/03/2009 08:00
-au     : 24/03/2009 09:00
-sujet  : Title
-lieu   : New Location
-auteur : domainezz.com Admin
+:: Pour plus de détails : 
+/calendar/calendar_index.php?action=detailconsult&calendar_id=1
+
+:: Pour accepter les modifications :
+/calendar/calendar_index.php?action=update_decision&calendar_id=1&entity_kind=user&rd_decision_event=ACCEPTED
+
+:: Pour refuser les modifications : 
+/calendar/calendar_index.php?action=update_decision&calendar_id=1&entity_kind=user&rd_decision_event=DECLINED
 ",$mailData[1]['content']);
+
     $this->assertEquals('Event cancelled on OBM: Title',$mailData[2]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[2]['to']);
     $this->assertContains("Message automatique envoyé par OBM
@@ -201,30 +208,36 @@ Le rendez-vous suivant à été annulé
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00
 sujet  : Title
-lieu   : New Location
+lieu   : Location
 auteur : domainezz.com Admin
-",$mailData[1]['content']);
+",$mailData[2]['content']); 
+
     $event = OBM_EventFactory::getInstance()->getById(1);
-    $event->location = 'New Location';
+    $event->location = 'New Location 2';
     $event->del('resource', 1);
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
-    $this->assertEquals('Event updated on OBM: Title',$mailData[0]['subject']);
-    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
+    $mailData = Stato_StaticTransport::getMailQ();
+    $this->assertEquals('Event updated on OBM: Title',$mailData[3]['subject']);
+    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[3]['to']);
     $this->assertContains("Message automatique envoyé par OBM
 ------------------------------------------------------------------
 RENDEZ-VOUS MODIFIÉ !
 ------------------------------------------------------------------
 
-Un rendez-vous auquel vous participez à été modifié
+Le rendez-vous Title, initialement prévu du 24/03/2009 08:00 au 24/03/2009 09:00, (lieu : Location),
+a été modifié et se déroulera du 24/03/2009 08:00 au 24/03/2009 09:00, (lieu : New Location 2).
 
-du     : 24/03/2009 08:00
-au     : 24/03/2009 09:00
-sujet  : Title
-lieu   : New Location
-auteur : domainezz.com Admin
-",$mailData[0]['content']);
-    $this->assertEquals('Event cancelled on OBM: Title',$mailData[1]['subject']);
-    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[1]['to']);
+:: Pour plus de détails : 
+/calendar/calendar_index.php?action=detailconsult&calendar_id=1
+
+:: Pour accepter les modifications :
+/calendar/calendar_index.php?action=update_decision&calendar_id=1&entity_kind=user&rd_decision_event=ACCEPTED
+
+:: Pour refuser les modifications : 
+/calendar/calendar_index.php?action=update_decision&calendar_id=1&entity_kind=user&rd_decision_event=DECLINED
+",$mailData[3]['content']);
+    $this->assertEquals('Event cancelled on OBM: Title',$mailData[4]['subject']);
+    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[4]['to']);
     $this->assertContains("Message automatique envoyé par OBM
 ------------------------------------------------------------------
 RESERVATION DE RESSOURCE ANNULEE !
@@ -235,12 +248,57 @@ La réservation suivante à été annulée
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00
 sujet  : Title
-lieu   : New Location
+lieu   : Location
 auteur : domainezz.com Admin
-",$mailData[1]['content']);    
+",$mailData[4]['content']);    
+
+
   }
 
   public function testModifyPartStatMail() {
+    $event = OBM_EventFactory::getInstance()->getById(1);
+    $users = $event->get('user');
+    $resources = $event->get('resource');
+    $user = $users[0];
+    $res = $resources[0];
+
+    $user->set('state', 'NEEDS-ACTION');
+    OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
+    $mailData = Stato_StaticTransport::getMailQ();
+    $this->assertEquals('Participation updated on OBM: Title',$mailData[0]['subject']);
+    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
+    $this->assertContains("NEEDS-ACTION",$mailData[0]['content']);  
+
+    $user->set('state', 'REJECTED');
+    OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
+    $mailData = Stato_StaticTransport::getMailQ();
+    $this->assertEquals('Participation updated on OBM: Title',$mailData[1]['subject']);
+    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[1]['to']);
+    $this->assertContains("REJECTED",$mailData[1]['content']);  
+
+    $user->set('state', 'ACCEPTED');
+    OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
+    $mailData = Stato_StaticTransport::getMailQ();
+    $this->assertNull($mailData[2]);
+
+    $res->set('state', 'REJECTED');
+    OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
+    $mailData = Stato_StaticTransport::getMailQ();
+    $this->assertEquals('Resource participation updated on OBM: Title',$mailData[2]['subject']);
+    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[2]['to']);
+    $this->assertContains("REJECTED",$mailData[2]['content']);  
+
+    $res->set('state', 'NEEDS-ACTION');
+    OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
+    $mailData = Stato_StaticTransport::getMailQ();
+    $this->assertEquals('Resource participation updated on OBM: Title',$mailData[3]['subject']);
+    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[3]['to']);
+    $this->assertContains("NEEDS-ACTION",$mailData[3]['content']);  
+
+    $res->set('state', 'ACCEPTED');
+    OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
+    $mailData = Stato_StaticTransport::getMailQ();
+    $this->assertNull($mailData[4]);
   }
 
 }

@@ -70,6 +70,7 @@ abstract class OBM_Database_TestCase extends PHPUnit_Extensions_Database_TestCas
     $db_conf = include('conf/db.php');
     extract($db_conf);
     $this->pdo = new PDO("{$obmdb_dbtype}:host={$obmdb_host};dbname={$obmdb_db}", $obmdb_user, $obmdb_password);
+    $this->pdo->exec('TRUNCATE TABLE Entity');
     $this->test_db = $obmdb_db;
   }
   
