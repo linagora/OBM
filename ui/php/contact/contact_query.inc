@@ -549,6 +549,15 @@ function run_query_contact_insert($contact) {
     $entityid = of_entity_insert($GLOBALS['module'],$id);
     $contact['contact_id'] = $id;
 
+    // Subscription support
+    $query = "INSERT INTO SynchedContact (
+	synchedcontact_user_id, 
+	synchedcontact_contact_id,
+	synchedcontact_timestamp)
+	VALUES ($uid, $id, NOW()
+    )";
+    $obm_q->query($query);
+
     // Birthday support
     $birthday = of_isodate_convert($contact['birthday'], true);
     if (!empty($birthday))
