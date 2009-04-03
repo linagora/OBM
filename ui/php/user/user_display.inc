@@ -2547,7 +2547,7 @@ function dis_user_export_pdf($id) {
     $lineY -= $pdf->getLineHeight();  
     $pdf->pages[0]->drawText($address_part, 280, $lineY, 'UTF-8');
   }
-  $lineY = 425;
+  $lineY = 415;
   $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(1));
   $pdf->pages[0]->drawRectangle(60, $lineY, 538, 250);
   $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(0));
