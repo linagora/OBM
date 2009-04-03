@@ -26,18 +26,18 @@ class CalendarMailer extends OBM_Mailer {
       );
     }
   }
-  
-  protected function resourceReservation($event, $resourceOwners) {
+
+  protected function eventCancel($event, $attendees) {
     $this->from = $this->getSender();
-    $this->recipients = $this->getRecipients($resourceOwners);
-    $this->subject = __('New resource reservation on OBM: %title%', array('%title%' => $event->title));
+    $this->recipients = $this->getRecipients($attendees);
+    $this->subject = __('Event cancelled on OBM: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
   }
   
   protected function eventUpdate($event, $oldEvent, $attendees) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($attendees);
-    $this->subject = __('New event on OBM: %title%', array('%title%' => $event->title));
+    $this->subject = __('Event updated on OBM: %title%', array('%title%' => $event->title));
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     if ($this->attachIcs) {
@@ -47,7 +47,43 @@ class CalendarMailer extends OBM_Mailer {
       );
     }
   }
+
+  protected function EventStateUpdate($event, $user) {
+    $this->from = $this->getSender();
+    $this->recipients = $this->getRecipients(array($event->owner));
+    $this->subject = __('Participation updated on OBM: %title%', array('%title%' => $event->title));
+    $this->body = $this->extractEventDetails($event, $this->from, '', $user);
+  }
+
+  protected function resourceReservation($event, $resourceOwners) {
+    $this->from = $this->getSender();
+    $this->recipients = $this->getRecipients($resourceOwners);
+    $this->subject = __('New resource reservation on OBM: %title%', array('%title%' => $event->title));
+    $this->body = $this->extractEventDetails($event, $this->from);
+  }
+
+  protected function resourceCancel($event, $resourceOwners) {
+    $this->from = $this->getSender();
+    $this->recipients = $this->getRecipients($resourceOwners);
+    $this->subject = __('Event cancelled on OBM: %title%', array('%title%' => $event->title));
+    $this->body = $this->extractEventDetails($event, $this->from);
+  }
   
+  protected function resourceUpdate($event, $oldEvent, $resourceOwners) {
+    $this->from = $this->getSender();
+    $this->recipients = $this->getRecipients($resourceOwners);
+    $this->subject = __('Resource reservation updated on OBM: %title%', array('%title%' => $event->title));
+    $this->body = array_merge($this->extractEventDetails($event, $this->from),
+                              $this->extractEventDetails($oldEvent, $this->from, 'old_'));
+  }
+
+  protected function ResourceStateUpdate($event, $res) {
+    $this->from = $this->getSender();
+    $this->recipients = $this->getRecipients(array($event->owner));
+    $this->subject = __('Resource participation updated on OBM: %title%', array('%title%' => $event->title));
+    $this->body = $this->extractEventDetails($event, $this->from, '', $res);
+  }
+
   /**
    * Perform the export meeting to the vCalendar format
    */
@@ -71,14 +107,16 @@ class CalendarMailer extends OBM_Mailer {
     return $tmpFilename;
   }
   
-  private function extractEventDetails($event, $sender, $prefix = '') {
+  private function extractEventDetails($event, $sender, $prefix = '', $target = null) {
     return array(
       $prefix.'id'       => $event->id,
       $prefix.'start'    => $event->date_begin->getOutputDateTime(),
       $prefix.'end'      => $event->date_end->getOutputDateTime(),
       $prefix.'title'    => $event->title,
       $prefix.'location' => $event->location,
-      $prefix.'auteur'   => $event->owner->label
+      $prefix.'auteur'   => $event->owner->label,
+      $prefix.'target'   => $target->label,
+      $prefix.'targetState' => __($target->state)
     );
   }
 }
