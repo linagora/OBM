@@ -89,7 +89,7 @@ function run_query_host_search($host) {
       LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND smtp_out.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
     $whereq $multidomain 
     $orderq
     $limit";

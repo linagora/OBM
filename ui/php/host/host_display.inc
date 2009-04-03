@@ -471,7 +471,7 @@ function html_host_form($action, $host_q, $host, $field='') {
   if (isset($host['imap'])) { $imap = $host['imap']; }
   if (isset($host['smtp_in'])) { $smtp_in = $host['smtp_in']; }
   if (isset($host['smtp_out'])) { $smtp_out = $host['smtp_out']; }
-  if (isset($host['obm_sync'])) { $smtp_out = $host['obm_sync']; }
+  if (isset($host['obm_sync'])) { $obm_sync = $host['obm_sync']; }
   if (isset($host['desc'])) { $desc = stripslashes($host['desc']); }
   if (isset($host['domain_id'])) { $domain_id = $host['domain_id']; }
 
