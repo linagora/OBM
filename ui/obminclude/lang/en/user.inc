@@ -64,6 +64,7 @@ $l_edit_users = "Edit users properties";
 
 $l_do_batch_processing = "Do batch processing";
 
+$l_download_user_card = 'Download user information';
 // Messages
 $l_no_display = "Fill the search fields and press < Find > to retrieve the users";
 $l_found = "users found";

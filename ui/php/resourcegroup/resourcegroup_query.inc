@@ -115,18 +115,18 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
   $multidomain = sql_multidomain("RGroup");
 
   $query = "SELECT 
-      count(*) as resultsCount
+      count(*) as resultscount
     FROM RGroup
     WHERE 
       rgroup_name LIKE '$pattern%'
       AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = $obm[uid]))
       $multidomain
-    ORDER BY rgroup_name ";
+ ";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_ext_search()");
   $obm_q->query($query);
   $obm_q->next_record();
-  $resultsCount = $obm_q->f("resultsCount");
+  $resultsCount = $obm_q->f("resultscount") + 0;
 
   $query = "SELECT 
       rgroup_id,
@@ -137,7 +137,7 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
       rgroup_name LIKE '$pattern%' 
       AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = $obm[uid]))
       $multidomain
-    ORDER BY rgroup_name";
+    ORDER BY rgroup_name,rgroup_desc,rgroup_id";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_ext_search()");
   $obm_q->query($query);

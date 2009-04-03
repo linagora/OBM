@@ -2505,7 +2505,72 @@ function dis_user_display_pref($prefs) {
   return $block;
 }
 
+/**
+ * dis_user_export_pdf 
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function dis_user_export_pdf($id) {
+  
+  $user = run_query_user_detail($id);
+  $login = $user->f('userobm_login');
+  $password = $user->f('userobm_password');
+  $domain = $user->f("domain_name");
+  $email = get_entity_email($user->f("userobm_email"), $domain, false, null);
+  $phone = $user->f("userobm_phone");
+  $lname = $user->f("userobm_lastname");
+  $fname = $user->f("userobm_firstname");
+  $display_name = $user->f("userobm_firstname").' '.$user->f("userobm_lastname");
+  if($user->f("userobm_address1")) $address[] = $user->f("userobm_address1");
+  if($user->f("userobm_address2")) $address[] = $user->f("userobm_address2");
+  if($user->f("userobm_address3")) $address[] = $user->f("userobm_address3");
+  if($user->f("userobm_address3")) $address[] = $user->f("userobm_address3");
+  if($user->f("userobm_zipcode" || $user->f("userobm_town"))) $address[] = $user->f("userobm_zipcode") . ' ' . $user->f("userobm_town");
+  if($user->f("userobm_country_name")) $address[] = $user->f("userobm_country_name");
 
+  $pdf = OBM_Pdf::load('user');
+  $pdf->setFontSize(11);
+
+  // Apply font and draw text
+  $pdf->pages[0]->setFont($pdf->getFont(), $pdf->getFontSize());
+  $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(1));
+  $pdf->pages[0]->setLineColor(new Zend_Pdf_Color_GrayScale(0.2));
+  $pdf->pages[0]->setLineDashingPattern(array(3, 2, 3, 4), 1.6);
+  $lineY = 700;
+  $pdf->pages[0]->drawRectangle(260, $lineY, 538, 578);   
+  $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(0));
+  $lineY -= $pdf->getLineHeight();  
+  $pdf->pages[0]->drawText($display_name, 280, $lineY, 'UTF-8');
+  foreach($address as $address_part) {
+    $lineY -= $pdf->getLineHeight();  
+    $pdf->pages[0]->drawText($address_part, 280, $lineY, 'UTF-8');
+  }
+  $lineY = 425;
+  $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(1));
+  $pdf->pages[0]->drawRectangle(60, $lineY, 538, 250);
+  $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(0));
+  $lineY -= $pdf->getLineHeight();  
+  $lineY -= $pdf->getLineHeight();  
+  $pdf->pages[0]->drawText("OBM : ". $GLOBALS['cgp_host'], 80, $lineY, 'UTF-8');
+  $lineY -= $pdf->getLineHeight();  
+  $pdf->pages[0]->drawText("$GLOBALS[l_login] : ". $login, 80, $lineY, 'UTF-8');
+  $lineY -= $pdf->getLineHeight();  
+  $pdf->pages[0]->drawText("$GLOBALS[l_password] : ". $password, 80, $lineY, 'UTF-8');
+  for($i = 0; $i < 5 && $i < count($email); $i++) {
+    $mail = $email[$i];
+    $lineY -= $pdf->getLineHeight();  
+    $pdf->pages[0]->drawText("$GLOBALS[l_email] : ". $mail, 80, $lineY, 'UTF-8');  
+    if($i == 4 && $count($email) > 4) {
+      $lineY -= $pdf->getLineHeight();  
+      $pdf->pages[0]->drawText("$GLOBALS[l_email] : [...]", 80, $lineY, 'UTF-8');  
+    }
+  }
+  $lineY -= $pdf->getLineHeight();  
+  $pdf->pages[0]->drawText("$GLOBALS[l_phone] : ". $phone, 80, $lineY, 'UTF-8');    
+  $pdf->download($login);
+}
 /**
  * Build a JSON array with all search results 
  * 

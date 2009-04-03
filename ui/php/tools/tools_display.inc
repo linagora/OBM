@@ -115,10 +115,9 @@ function dis_tools_update_detail() {
       <p>
       </div>
       $dis_button";
+      $block .= "$dis_domain";
     }
 
-    $block .= "
-    $dis_domain";
   }
 
   return $block;

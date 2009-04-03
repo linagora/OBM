@@ -125,18 +125,16 @@ function run_query_todo_detail($todo) {
     $timeupdate,
     $timecreate,
     $date,
-    Author.userobm_lastname as author_firstname,
-    Author.userobm_firstname as author_lastname,
+    uc.userobm_lastname as author_firstname,
+    uc.userobm_firstname as author_lastname,
     eventlink_percent
   FROM Event
     LEFT JOIN UserObm as uc ON event_usercreate = uc.userobm_id
     LEFT JOIN UserObm as uu ON event_userupdate = uu.userobm_id
-    LEFT JOIN EventLink ON eventlink_event_id = event_id,
-    UserObm as Author
+    INNER JOIN EventLink ON eventlink_event_id = event_id
   WHERE event_id $t_id
     AND event_type='VTODO'
     $multidomain
-    AND Author.userobm_id = event_usercreate
     ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_todo_detail()');

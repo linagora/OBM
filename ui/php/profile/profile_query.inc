@@ -332,52 +332,6 @@ function run_query_profilesection_list ($profile_id) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// profile insert query execution
-// Parameters:
-//   - $params[]   : entry values
-// Returns:
-//   $id : new profile id if ok, else false
-///////////////////////////////////////////////////////////////////////////////
-function run_query_profile_replace_properties($profile_id,$params) {
-  global $cdg_sql;
-  $p_id = sql_parse_id($profile_id, true);
-  $query = "DELETE FROM ProfilePropertyValue WHERE profilepropertyvalue_profile_id $p_id ";
-  display_debug_msg($query, $cdg_sql, 'run_query_profile_replace_properties(DELETE)');
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  $prop_q = run_query_profileproperty_list();
-  while($prop_q->next_record()) {
-    if ($prop_q->f('profileproperty_readonly') != 1) {
-      $id = $prop_q->f('profileproperty_id');
-      $key = $prop_q->f('profileproperty_name');
-      $value = $params[$key];
-
-      if ($value == '') {
-        $value = $prop_q->f('profileproperty_default');
-      }
-
-      if ($value != '') {
-        $profile_id = sql_parse_id($profile_id);
-        $query = "INSERT INTO ProfilePropertyValue (
-          profilepropertyvalue_profile_id,
-          profilepropertyvalue_property_id,
-          profilepropertyvalue_property_value)
-          VALUES (
-            $profile_id,
-            $id,
-            '$value'
-          )";
-        $obm_q->query($query);
-        display_debug_msg($query, $cdg_sql, 'run_query_profile_replace_properties(INSERT)');
-      }
-    }
-  }
-}
-
-
-
 /**
  * Insert a module right
  *

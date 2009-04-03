@@ -41,6 +41,27 @@ a:hover {
   text-decoration: underline;  
 }
 
+#banner a { 
+  text-decoration: none;
+}
+
+#banner a:link { 
+  color: #368397;
+}
+
+#banner a:active { 
+  color: #368397;
+}
+
+#banner a:visited { 
+  color: #368397;
+}
+
+#banner a:hover { 
+  text-decoration: underline;  
+}
+
+
 td {
   margin: 0;
   padding: 0;
@@ -567,11 +588,8 @@ fieldset.detail {
 }
 
 .infos input[type="checkbox"],.infos input[type="radio"] {
-  width: auto;
-}
-
-.infos input {
-  width: expression(this.type == "checkbox" || this.type == "radio" ? "auto" : ""); /*IE Crappy hack 2*/ 
+  width: auto !important;
+  width: 95%;
 }
 
 .multiple input, .multiple select {

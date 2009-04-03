@@ -230,7 +230,7 @@ class OBM_Challenge_Auth extends Auth {
         break;
     }
     if (global_allow_access($perm)) {
-      if ($encrypted == $pass) {
+      if (isset($params['auth_ticket']) || $encrypted == $pass) {
         $unfreeze = global_unfreeze_user($uid);
         if ($unfreeze) {
           $obm["profile"] = $perm;

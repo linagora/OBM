@@ -154,6 +154,7 @@ if ($action == "ext_get_ids") {
         $params["user_id"] = $cid;
         set_update_state();
         $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
+        $display["msg"] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
         $display["detail"] = dis_user_consult($params);
       } else {
         $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
@@ -199,6 +200,7 @@ if ($action == "ext_get_ids") {
     if ($retour) {
       set_update_state();
       $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
+      $display["msg"] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
       $display["detail"] = dis_user_consult($params);
     } else {
       $display["msg"] .= display_err_msg("$l_user : $l_update_error");
@@ -218,6 +220,7 @@ if ($action == "ext_get_ids") {
       if ($retour) {
         set_update_state();
         $display["msg"] .= display_ok_msg("$l_user : $l_valid_ok");
+        $display["msg"] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
         $display["detail"] = dis_user_consult($params);
       } else {
         $display["msg"] .= display_err_msg("$l_user : $l_valid_error");
@@ -231,7 +234,11 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_err_msg($err["msg"]);
     $display["detail"] = html_user_form("", $params, $err["field"]);
   }
-
+} elseif ($action == 'pdf') {
+///////////////////////////////////////////////////////////////////////////////
+  require_once("$obminclude/of/of_pdf.php");
+  dis_user_export_pdf($params['user_id']);
+  exit(1);
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_can_delete($params)) {
@@ -515,7 +522,12 @@ function get_user_action() {
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
-
+// Update
+  $actions['user']['pdf'] = array (
+    'Url'      => "$path/user/user_index.php?action=pdf",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     );
 // Valid
   $actions['user']['valid'] = array (
     'Url'      => "$path/user/user_index.php?action=valid",

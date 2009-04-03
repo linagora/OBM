@@ -260,7 +260,7 @@ function dis_todo_consult($params) {
 
   $id = $params['todo_id'];
   $todo_q = run_query_todo_detail($params);
-  if ($todo_q->num_rows() != 1) {
+  if ($todo_q->num_rows() == 0) {
     $display['msg'] .= display_err_msg($l_err_reference);
   } else {
     $users = get_todo_users($id);

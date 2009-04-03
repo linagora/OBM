@@ -218,7 +218,7 @@ obm.AutoComplete.Search = new Class({
   // blur event
   onBlur: function() {
     if (this.isMouseOver) {
-      if (window.ie) // FIXME because this.inputField.focus.delay(1,this.inputField) doesn't work on ie
+      if (Browser.Engine.trident) // FIXME because this.inputField.focus.delay(1,this.inputField) doesn't work on ie
         this.inputField.focus();
       else           // FIXME because this.inputField.focus() doesn't work on ff
         this.inputField.focus.delay(1,this.inputField);

@@ -419,3 +419,19 @@ if ($cgp_show["module"]["profile"]) {
 			      'Url'   => "$path/profile/profile_index.php",
 			      'Right' => $cright_read);
 }
+
+if ($cgp_show["module"]["organizationalchart"]) {
+  $modules["organizationalchart"] = array('Name'=> $l_module_organizationalchart,
+                                    'Ico' => "$ico_organizationalchart",
+                                    'Url' => "$path/organizationalchart/organizationalchart_index.php",
+			            'Right'=> $cright_read);
+}
+
+if ($cgp_show["module"]["webmail"]) {
+  $modules["webmail"] = array('Name'=> $l_webmail,
+                                    'Ico' => "$ico_organizationalchart",
+                                    'Url' => "$path/webmail/webmail_index.php",
+			            'Right'=> $cright_read);
+}
+
+

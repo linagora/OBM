@@ -2923,8 +2923,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (sizeof($users["entity"]) > 1) {
     $u = array();
     foreach($users["entity"] as $id => $user) {
-        $name = phpStringToJsString($user["label"]);
-        array_push($u, "'$id' : '$name'");
+      $name = phpStringToJsString($user["label"]);
+      array_push($u, "'$id' : '$name'");
     }
     $users_js = "{".implode(",", $u)."}";
 
@@ -2936,8 +2936,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $GLOBALS[l_add_displayed_users]
       </th>
       <td>
-        <input type=\"checkbox\" id=\"cba_add_displayed_users\" value=\"1\" 
-          $add_displayed_users_checked name=\"cba_add_displayed_users\" onclick=\"add_displayed_users(this.checked, $users_js, $uid)\"/>
+        <input type=\"checkbox\" id=\"cba_add_displayed_users\" value=\"1\" $add_displayed_users_checked name=\"cba_add_displayed_users\" onclick=\"add_displayed_users(this.checked, $users_js, $uid)\"/>
       </td>
       </tr>";
   }
@@ -2984,9 +2983,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <fieldset class=\"detail infos\">
       <legend>$l_attendees</legend>    
       <table>
-
       $block_add_displayed_users
-
       <tr>
       <th>
       $l_users / $GLOBALS[l_contacts]
@@ -3000,7 +2997,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <th>&nbsp;</th>    
       <td id=\"sel_user_id\">$dis_sel_user</td>
       </tr>
-
       <tr>
       <th>
       $GLOBALS[l_others_attendees]
@@ -3009,7 +3005,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         <textarea id=\"ta_others_attendees\" name=\"ta_others_attendees\">$others_attendees</textarea>
       </td>
       </tr>
-
       </table>
       </fieldset>
       <p class=\"LC\" />
@@ -3071,8 +3066,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     // resource select
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $r_ent) {
-  $r_name = $r_ent['label'];
-  $sel_id = "data-resource-$r_id";
+        $r_name = $r_ent['label'];
+        $sel_id = "data-resource-$r_id";
         $div_id = "sel_resource_id-$sel_id";
         $list_item = '';
         $list_item_id = '';
@@ -3114,7 +3109,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         } else {
           $block_property = '';
         }
-  $dis_sel_resource .= "
+        $dis_sel_resource .= "
           <div class=\"elementRow\" id=\"$div_id\">
             <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
             <img src=\"$ico_delete\" alt=\"[Delete]\" />
