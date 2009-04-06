@@ -52,7 +52,7 @@ function run_query_calendar_detail($calendar_id) {
     FROM
       Event
       LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
-      LEFT JOIN UserObm AS c ON event_usercreate = c.userobm_id
+      INNER JOIN UserObm AS c ON event_usercreate = c.userobm_id
       LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
       INNER JOIN UserObm AS o ON event_owner = o.userobm_id
     WHERE event_type='VEVENT'
