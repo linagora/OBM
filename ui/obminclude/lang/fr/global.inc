@@ -306,6 +306,7 @@ $l_section_user   = "Annuaire";
 $l_section_admin  = "Administration";
 $l_section_dic    = "Dictionnaire";
 $l_section_my     = "Mon compte";
+$l_section_webmail= "Webmail";
 
 $l_module_company = "Sociétés";
 $l_module_contact = "Contacts";
@@ -358,6 +359,7 @@ $l_module_password = "Mot de passe";
 $l_module_mailforward = "Redirection messagerie";
 $l_module_vacation = "Répondeur messagerie";
 $l_module_mailbox = "Boîte aux lettres";
+$l_module_webmail = "Webmail";
 
 $l_header_admin = "Administration";
 $l_header_import = "Importer";

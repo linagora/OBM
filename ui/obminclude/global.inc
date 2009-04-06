@@ -308,6 +308,7 @@ $cgp_show['section']['user']['url'] = "$path/settings/settings_index.php";
 $cgp_show['section']['admin']['url'] = "$path/admin/admin_index.php?mode=html";
 $cgp_show['section']['dic']['url'] = "$path/admin_ref/admin_ref_index.php?mode=html";
 $cgp_show['section']['my']['url'] = "$path/settings/settings_index.php";
+$cgp_show['section']['webmail']['url'] = "$path/webmail/webmail_index.php";
 
 // modules
 $cgp_show['module']['company'] = 'com';

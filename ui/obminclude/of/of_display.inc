@@ -838,13 +838,129 @@ class OBM_DISPLAY {
 
 // Themes generic display functions -----------------------------------------//
 
+///////////////////////////////////////////////////////////////////////////////
+// Display : Function that display each page
+// Parameters:
+//   - $display : (by ref) $display hash with each content object
+///////////////////////////////////////////////////////////////////////////////
+function display_page(&$display) {
+  // If a theme specif function is provided
+  if (function_exists("display_page_theme")) {
+    return display_page_theme($display);
+  }  
+  
+  global $output_target, $ico_nav_close;
+  global $ico_nav_open, $l_hide, $l_show;
+  global $l_print,  $params;
+
+  // If print activated, display only the detail
+  if ($params["output_target"] == "print") {
+    echo $display["head"] . "
+" .
+      $display["title"] .
+      $display["msg"] .
+      "
+      <div id=\"ajaxMessage\"></div>
+      &nbsp;".
+      $display["detail"] . "
+      </div>
+      " .
+      $display["end"];
+    return;
+  }
+
+  // If header is null, display only the detail (Popup windows)
+  if ($display["header"] == "") {
+    echo $display["head"] . 
+      $display["title"] .
+      $display["msg"] . 
+      "<div id=\"mainContent\">
+      <div id=\"ajaxMessage\"></div>
+      &nbsp;".
+      $display["search"] .
+      $display["detail"]." 
+       <p class=\"LC\" />
+       </div>
+      ".
+      $display["result"] . 
+      $display["end"];
+
+    return;
+  }
+
+  echo $display["head"] . $display["header"] . "
+    <!-- left panel -->
+    <div id=\"portletsPanel\"> 
+      <div id='portletsHandler'>
+       <span>
+        <img src='$ico_nav_close' alt='Hide this bar' />
+       </span>
+       <span id='portletsHandlerShow'>
+        <img src='$ico_nav_open' alt='Show this bar' />
+       </span>
+      </div>         
+     <div id=\"portlets\">          
+      $display[last]
+      $display[todo]
+      $display[features] 
+      $display[link] 
+      $display[detailInfo] 
+     </div>
+    </div>
+    <!-- left panel end -->
+    <div id=\"mainPanel\" >  
+    $display[title]
+    $display[action]
+    $display[msg]" ;
+    if($display["search"] != "" || $display["detail"] != "") {
+      echo  
+        "<div id=\"mainContent\">
+         <div id=\"ajaxMessage\"></div>
+        &nbsp;".
+      $display["search"] .
+      $display["detail"] . "
+      <p class=\"LC\" />
+      </div>";
+    }
+    echo $display["result"] ."
+    </div>
+    <script type=\"text/javascript\">
+      obm.portlets = new Obm.Portlets();
+      obm.popup = new Obm.Popup();
+    </script>  
+    <!-- center zone end -->  
+    ".$display["end"];
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display : Function that display each page
+// Parameters:
+//   - $display : (by ref) $display hash with each content object
+///////////////////////////////////////////////////////////////////////////////
+function display_outframe(&$display) {
+  // If a theme specif function is provided
+  if (function_exists("display_outframe_theme")) {
+    return display_outframe_theme($display);
+  }  
+  echo $display["head"] . $display["header"] . "
+    <div id=\"mainContent\" >  
+    $display[detail]
+    </div>
+    $display[end]
+  "; 
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: XHTML Head
 // Parameters:
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
-function display_head($p_module) { 
+function display_head($p_module, $standard=true) { 
+  // If a theme specif function is provided
+  if (function_exists("display_head_theme")) {
+    return display_head_theme($module);
+  }  
   global $l_obm_title, $extra_css, $extra_js, $extra_js_include,$ico_minus;
   global $ico_datepicker,$l_monthsofyear,$l_daysofweekfirst,$ico_colorpicker;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
@@ -897,8 +1013,13 @@ function display_head($p_module) {
       }
     }
   }
+
+  if($standard) {
+    $headers_e .= '
+    <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
+    ';
+  }
   return "$headers_e
-<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
 <html xmlns=\"http://www.w3.org/1999/xhtml\">     
 <head>
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />
@@ -984,40 +1105,118 @@ function display_head($p_module) {
 }
 
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Display : Function that display the page menu
+// Parameters:
+//   - $module : module selected
+///////////////////////////////////////////////////////////////////////////////
+function display_menu($module) {
+  
+  // If a theme specif function is provided
+  if (function_exists("display_menu_theme")) {
+    return display_menu_theme($module);
+  }  
+
+  global $path, $obm, $display, $obm_version, $cgp_show, $modules;
+  global $ico_logout, $ico_login, $ico_obm, $ico_print, $ico_scope;
+  global $l_logout, $l_profile, $l_scope_update;
+  global $perm, $cright_write_admin;
+
+
+  $obm['uid'];
+  $login = $obm['login'];
+  $profil = $obm['profile'];
+  $p = isset($GLOBALS["l_perm_$profil"]) ? $GLOBALS["l_perm_$profil"] : $profil;
+  $domain = $obm['domain_label'];
+  $domain_id = $obm['domain_id'];
+  $section = $cgp_show['module'][$module];
+  if (empty($section)) {
+    $section = $module;
+  }
+  $display['section'] = display_sections($section);
+  $display['last'] = display_last_visited();
+  $display['todo'] = display_todos();
+  $display['action'] = display_actions($section, $module);
+  $update_state = get_update_state($domain_id);
+  if (($update_state) && $cgp_show['module']['tools'] && ($perm->check_right('tools', $cright_write_admin))) {
+    $dis_scope = "<li><a href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
+  }
+  if ($display['print_url'] != "") {
+    $url = $display['print_url']."&amp;output_target=print";
+    $dis_printer = "<li><a href=\"#\" onclick=\"popup('$url');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
+  }
+  $block = "
+<!-- Bandeau -->
+<div id='banner'>
+<a href=\"$path/obm.php\" id=\"obmLogo\"><img src='$ico_obm' alt='Logo OBM'/></a>
+".
+$display['section']
+."
+<ul id='information'>
+$dis_scope
+<li> $login ($domain)</li>
+<li>$l_profile : $p</li>
+<li><a href='".$path."/obm.php?action=logout'><img src='$ico_logout' alt='$l_logout' /> $l_logout</a></li>
+$dis_printer
+</ul>
+</div>
+".$display['module']
+;
+
+//&gt;".$modules[$module]["Name"].
+  return $block;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display : Returns the section display block
 // Parameters:
 //   - $section : active section
 ///////////////////////////////////////////////////////////////////////////////
 function display_sections($section) {
-  global $cgp_show, $sections, $perm;
-  
   // If a theme specif function is provided
   if (function_exists("display_sections_theme")) {
     return display_sections_theme($section);
   }
+  global $cgp_show, $sections, $perm;
 
-  // Else
-  $ret = "<div class='section'>\n";
-  foreach ($cgp_show["section"] as $key => $show) {
+  $ret = "<ul id='section'>\n";
+  foreach ($cgp_show['section'] as $key => $show) {
     if ($show) {
       $value = $sections[$key];
-      $section_name = $value["Name"];
-      $section_target = $value["Target"];
+      $section_name = $value['Name'];
+      $section_target = $value['Target'];
       $section_right = $perm->get_section_rights($key);
       if ($section_right) {
-        if ($key == $section) {
-          $ret .= "<p class='actif'>$section_name</p>\n";
-        } else {
+        $section_modules = array_keys($cgp_show["module"],$key);
+        if (count($section_modules) > 0) {
+	  $module_block = display_modules($key, null);
+	  $mods .= $module_block;
+	  $js .= "obm.menu.addItem('section-$key');";
+	} else {
 	  if (isset($section_target)) {
 	    $target = "target='$section_target'";
-	  }
-	  $ret .= "<p class='inactif'><a $target href='".$value["Url"]."'>$section_name</a></p>\n";
+	  } else {
+            $target = "";
+          }
+          $section_name = "<a $target href=\"$show[url]\">$section_name</a>";
+        }
+        if ($key == $section) {
+          $ret .= "<li class=\"current\" id=\"section-$key\">$section_name</li>\n";
+        } else {
+          $ret .= "<li class=\"sectionItem\" id=\"section-$key\">$section_name</li>\n";
         }
       }
     }
   }
-  $ret .= "</div>";
+  $ret .= "</ul>";
+  $ret .= "
+    $mods
+    <script type=\"text/javascript\">
+      obm.menu = new Obm.Menu();
+      $js
+    </script>
+";
 
   return $ret;
 }
@@ -1030,13 +1229,12 @@ function display_sections($section) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_modules($section, $module) {
-  global $cme_txt, $cme_ico, $cme_both;
-  global $path, $perm, $modules, $cgp_show;
-
   // If a theme specif function is provided
   if (function_exists("display_modules_theme")) {
     return display_modules_theme($section, $module);
   }
+  global $cme_txt, $cme_ico, $cme_both;
+  global $path, $perm, $modules, $cgp_show;
 
   if (($_SESSION['set_menu'] == $cme_ico) || ($_SESSION['set_menu'] == $cme_both))
     $fico = true;
@@ -1046,33 +1244,40 @@ function display_modules($section, $module) {
     $ftext = true;
   else $ftext = false;
 
-  if ($section != "") {
-    $section_link = array_keys($cgp_show["module"],$section);
-    if (is_array($section_link)) {
-      $block .= "<ul class='module'>\n";
-
-      foreach ($section_link as $mod) {
-        $module_name = $modules[$mod]["Name"];
-        $module_right = $perm->get_module_rights($mod); 
-        if (($module_right & $modules[$mod]["Right"]) == $modules[$mod]["Right"]) {
-          if ($mod == $module) {
-            $block .= "<li class=\"activeModule\">";
-	  } else {
-	    $block .= "<li class=\"inactiveModule\">";
-	  }
-          if ($fico) {
-	    $ico = $modules[$mod]["Ico"];
-	    if ($ico) {
-	      $block .= "<a href='".$modules[$mod]["Url"]."' class='ico'><img src='$ico' alt='$module_name' /></a> ";
-	    }
-	  }
-	  $block .= "<a href='".$modules[$mod]["Url"]."'>";
-	  if ($ftext) $block .= $module_name;
-          $block .= "</a></li>\n";
+  $section_link = array_keys($cgp_show["module"],$section);
+  if (is_array($section_link)) {
+    $id = $section."Items";
+    $block .= "
+      <div class='module' id='section-$section-items-wrapper'>
+      <ul id='section-$section-items'>
+";
+    foreach ($section_link as $mod) {
+      $module_name = $modules[$mod]["Name"];
+      $module_tooltip = $modules[$mod]["Tooltip"];
+      $module_right = $perm->get_module_rights($mod); 
+      if (($module_right & $modules[$mod]["Right"]) == $modules[$mod]["Right"]) {
+	// XXX specifier une target au lien du module (non configurable
+	// actuellement car cgp_show[module][webmail] = valeur et non tableau
+	// Si tableau pb avec section_link = array_keys(..) 10 l plus haut
+	$module_target = $modules[$mod]['Target'];
+	if (isset($module_target)) {
+	  $target = " target='$module_target'";
+	} else {
+          $target = "";
         }
+        $block .= "<li>";
+        if ($fico) {
+          $ico = $modules[$mod]['Ico'];
+          if ($ico) {
+            $block .= "<a$target href='".$modules[$mod]["Url"]."' class='ico' title='$module_tooltip'><img src='$ico' alt='$module_name' /></a> ";
+          }
+        }
+        $block .= "<a$target href='".$modules[$mod]["Url"]."' title='$module_tooltip'>";
+        if ($ftext) $block .= $module_name;
+        $block .= "</a></li>\n";
       }
-      $block .= "</ul>";
     }
+    $block .= "</ul></div>";
   }
 
   return $block;
@@ -1086,60 +1291,62 @@ function display_modules($section, $module) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_actions($section, $module) {
-  global  $modules, $action;
-  global $actions, $perm;
-
   // If a theme specif function is provided
   if (function_exists("display_actions_theme")) {
     return display_actions_theme($section, $module);
   }
+  global $modules, $action, $display;
+  global $actions, $perm, $display;
 
-  $name = $modules[$module]["Name"];
-  $ico = $modules[$module]["Ico"];
-  if ($ico != "")
-    $dico = "<img src=\"$ico\" alt=\"\" />&nbsp;";
-  else
-    $dico = "";
+  $mod_title = $GLOBALS["l_module_$module"];
+  if(!empty($actions[$module][$action]["Title"])) {
+    $act_title = '- '.$actions[$module][$action]["Title"].' ';
+  } elseif(!empty($actions[$module][$action]["Name"])) {
+    $act_title = '- '.$actions[$module][$action]["Name"].' ';
+  }
 
-  $ret = "
-  <ul class=\"action\">
-  ";
+
+  if (empty($display['title'])) {
+    $display['title'] = "<h1 class=\"title\">$mod_title $act_title</h1>";
+  } else if ($display['title'] == strip_tags($display['title'])) {
+    $display['title'] = "<h1 class=\"title\">$mod_title $act_title: $display[title]</h1>";
+  } 
+
   if (is_array($actions[$module])) {
-    $module_right = $perm->get_module_rights($module);
-
+    $module_right = $perm->get_module_rights($module); 
+    $block = "<ul id=\"action\">"; 
     foreach ($actions[$module] as $key => $value) {
 
       // If the current action has this action in target
       if (!in_array("!$action",$value["Condition"]) 
         && (in_array("all", $value["Condition"])
-        || in_array($action, $value["Condition"]))) {
-
+	|| in_array($action, $value["Condition"]))) {
 	if (($module_right & $value["Right"]) == $value["Right"]) {
 
-	  $ret .= "<li>";
+          $tooltip = $value["Tooltip"];
+
 	  if ($value["Popup"] == 1) {
 	    if ($value["Target"]) {
 	      $wtarget = "window.name='" . $value['Target'] . "';";
 	    }
-	    $ret .= "
-              <a href=\"#\" class=\"action\" 
+	    $content = "
+              <a href=\"\" 
+              title=\"".$value["tooltip"]."\" 
               onclick=\"$wtarget popup('".$value['Url']."',''); return false;\">
 	      ".$value["Name"]."</a> &nbsp;";
 	  } else {
-	    $ret .= "
-               <a class=\"action\" href=\"".$value["Url"]."\">".$value["Name"]."</a> &nbsp;";
-	  }
-	  $ret .= "</li>";
+	    $content = "
+               <a href=\"".$value["Url"]."\" title=\"".$tooltip."\" >".$value["Name"]."</a> &nbsp;";
+          }
+          $block .= "<li onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\" >$content</li>";
 	}
       }
     }
+    $block .= "</ul>"; 
+    
   }
-   
-  $ret .= "
-  </ul>
-";
 
-  return $ret;
+  return $block;
 }
 
 
@@ -1149,14 +1356,13 @@ function display_actions($section, $module) {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_last_visited() {
-  global $obm, $cdg_sql, $path, $cgp_show, $last_v, $l_last_visit, $modules;
-
-	$uid = $obm['uid'];
-
   // If a theme specif function is provided
   if (function_exists("display_last_visited_theme")) {
-    return display_last_visited_theme($path);
+    return display_last_visited_theme();
   }
+  global $obm, $cdg_sql, $path, $cgp_show, $last_v, $l_last_visit, $modules;
+
+  $uid = $obm['uid'];
 
   foreach ($cgp_show["module"] as $module => $val) {
 
@@ -1225,9 +1431,7 @@ function display_last_visited() {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_todos($path="..") {
-  global $cgp_show, $l_module_todo;
-
-  if (! $cgp_show["module"]["todo"]) {
+  if (! $GLOBALS['cgp_show']["module"]["todo"]) {
     return "";
   }
 
@@ -1235,6 +1439,8 @@ function display_todos($path="..") {
   if (function_exists("display_todos_theme")) {
     return display_todos_theme($path);
   }
+
+  global $l_module_todo;
 
   $nb = count($_SESSION['todos']);
 
@@ -1261,6 +1467,21 @@ function display_todos($path="..") {
   return $block;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Display : end of an HTML page
+///////////////////////////////////////////////////////////////////////////////
+function display_end() { 
+  // If a theme specif function is provided
+  if (function_exists("display_end_theme")) {
+    return display_end_theme();
+  }
+
+  return "
+    </body>
+    </html>
+  ";
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display an entity dates and users creation / update infos
@@ -1301,17 +1522,6 @@ function display_record_info($obm_q) {
   return $block;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Display : end of an HTML page
-///////////////////////////////////////////////////////////////////////////////
-function display_end() { 
-
-  return "
-    </body>
-    </html>
-  ";
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////

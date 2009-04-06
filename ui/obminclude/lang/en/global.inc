@@ -299,6 +299,7 @@ $l_section_user   = "Users";
 $l_section_admin  = "Administration";
 $l_section_dic    = "Dictionary";
 $l_section_my  = "My account";
+$l_section_webmail= "Webmail";
 
 $l_module_company = "Companies";
 $l_module_contact = "Contacts";
@@ -352,6 +353,7 @@ $l_module_password = "Password";
 $l_module_mailforward = "Mail Forward";
 $l_module_vacation = "Mail Vacation";
 $l_module_mailbox = "Mailbox";
+$l_module_webmail = "Webmail";
 
 $l_header_admin = "Administration";
 $l_header_import = "Import";

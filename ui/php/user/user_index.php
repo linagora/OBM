@@ -200,7 +200,6 @@ if ($action == "ext_get_ids") {
     if ($retour) {
       set_update_state();
       $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
-      $display["msg"] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
       $display["detail"] = dis_user_consult($params);
     } else {
       $display["msg"] .= display_err_msg("$l_user : $l_update_error");

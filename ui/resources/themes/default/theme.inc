@@ -70,6 +70,7 @@ $ico_settings       = "$theme_path/ico_setting.gif";
 $ico_big_settings   = "$theme_path/ico_setting.gif";
 $ico_statistic      = "$theme_path/ico_stat.gif";
 $ico_tools          = "$theme_path/ico_tools.gif";
+$ico_webmail        = "$theme_path/ico_mailbox.gif";
 $ico_time           = "$theme_path/ico_time.gif";
 $ico_big_time       = "$theme_path/ico_big_time.gif";
 $ico_very_big_time  = "$theme_path/ico_very_big_time.png";
