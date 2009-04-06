@@ -1015,9 +1015,7 @@ function display_head($p_module, $standard=true) {
   }
 
   if($standard) {
-    $headers_e .= '
-    <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
-    ';
+    $headers_e .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
   }
   return "$headers_e
 <html xmlns=\"http://www.w3.org/1999/xhtml\">     
