@@ -54,6 +54,18 @@ class OBM_Mailer extends Stato_Mailer
     $this->userInfo = get_user_info();
   }
   
+  /**
+   * If the mail server is not properly configured and mails cannot be sent,
+   * Stato will throw an exception, but we prefer to fail silently
+   */
+  public function send($methodName, $args) {
+    try {
+      return parent::send($methodName, $args);
+    } catch (Exception $e) {
+      return false;
+    }
+  }
+  
   protected function getTemplatePath($templateName) {
     $possiblePaths = array(
       dirname(__FILE__)."/../../conf/views/mail/$module/$_SESSION[set_lang]/$templateName.pdf",
