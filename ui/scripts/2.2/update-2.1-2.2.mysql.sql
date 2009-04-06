@@ -2706,7 +2706,10 @@ DROP TABLE IF EXISTS `P_of_usergroup`;
 CREATE TABLE `P_of_usergroup` (LIKE `of_usergroup`);
 INSERT INTO P_of_usergroup SELECT of_usergroup_group_id, of_usergroup_user_id FROM of_usergroup INNER JOIN UGroup ON of_usergroup_group_id=group_id WHERE group_privacy=0;
 
-
+INSERT INTO synchedcontact (synchedcontact_contact_id,
+synchedcontact_user_id) SELECT contact_id, contact_usercreate FROM
+Contact WHERE contact_privacy = 1 AND contact_archive != 1;
 
 -- Write that the 2.1->2.2 is completed
 UPDATE ObmInfo SET obminfo_value='2.2.0' WHERE obminfo_name='db_version';
+

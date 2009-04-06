@@ -3281,5 +3281,9 @@ DROP TABLE Todo;
 DROP TABLE DeletedTodo;
 DROP TABLE TmpEntity;
 
+INSERT INTO synchedcontact (synchedcontact_contact_id,
+synchedcontact_user_id) SELECT contact_id, contact_usercreate FROM
+Contact WHERE contact_privacy = 1 AND contact_archive != 1;
+
 -- Write that the 2.1->2.2 is completed
 UPDATE ObmInfo SET obminfo_value='2.2' WHERE obminfo_name='db_version';
