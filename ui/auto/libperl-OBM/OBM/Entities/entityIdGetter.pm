@@ -187,3 +187,11 @@ sub getDomainId {
 
     return \@domainIds;
 }
+
+
+sub getDomainsId {
+    my $self = shift;
+    my( $withGlobal ) = @_;
+
+    return $self->getDomainId( $withGlobal, undef );
+}
