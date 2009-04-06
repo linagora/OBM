@@ -61,6 +61,12 @@ sub setEntitiesType {
             last SWITCH;
         }
 
+        if( $type eq 'CONTACT' ) {
+            $self->_log( 'initialisation d\'un programateur d\'entité de type contacts', 3 );
+            $self->{'entityType'} = $type;
+            last SWITCH;
+        }
+
         $self->_log( 'type d\'entité inconnu \''.$type.'\'', 3 );
         return 1;
     }
