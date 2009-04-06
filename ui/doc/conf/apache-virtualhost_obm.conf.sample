@@ -16,40 +16,49 @@ NameVirtualHost *:443
     CustomLog /var/log/apache2/obm-access.log common
     SetEnv OBM_INCLUDE_VAR obminclude
     Alias /images /usr/share/obm/www/resources
-    AddDefaultCharset ISO-8859-15
+    #OBM 2.2.x use utf8
+    #AddDefaultCharset ISO-8859-15
     DirectoryIndex obm.php
     Options -Indexes
 
     php_value include_path  ".:/usr/share/obm/www"
     php_value session.bug_compat_42  0
-    php_value session.bung_compat_warn  0
+    php_value session.bug_compat_warn  0
 #    php_value session.gc_maxlifetime 2880
     php_value magic_quotes_gpc  On
+    php_value memory_limit 128M
 
-    # Forbid access to '.inc' files
-    <Files ~ "\.inc$">
-        Order allow,deny
-        Deny from all
-    </Files>
+#obm#<Location /funambol>
+#obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/funambol
+#obm#</Location>
 
-#   <Location /funambol/ds>
-#   ProxyPass ajp://_TOMCAT_SERVER_:8009/funambol/ds
-#   </Location>
+#obm#<Location /obm-sync>
+#obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/obm-sync
+#obm#</Location>
 
-#   <Location /obm-sync>
-#   ProxyPass ajp://_TOMCAT_SERVER_:8009/obm-sync
-#   </Location>
 
-#   ProxyRequests On
+#obm#<Location /minig>
+#obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/minig
+#obm#</Location>
+#obm# alias /webmail/images /usr/lib/minig/images
 
-#   <Proxy *>
-#   AddDefaultCharset off
-#   Allow from all
-#   </Proxy>
+
+#obm#ProxyRequests On
+
+#obm#<Proxy *>
+#obm#AddDefaultCharset off
+#obm#Allow from all
+#obm#</Proxy>
+
+
+#_HORDE_BEGIN_
+#_HORDE_END_
 </VirtualHost>
 
 <IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{SERVER_PORT} !^443$
-    RewriteRule ^(.*)$ https://%{SERVER_NAME}$1 [L,R]
+    <IfModule mod_ssl.c>
+        RewriteEngine On
+        RewriteCond %{HTTPS} !=on
+	RewriteRule . https://%{SERVER_NAME}%{REQUEST_URI} [L]
+    </IfModule>
 </IfModule>
