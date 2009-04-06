@@ -2,6 +2,9 @@ package OBM::EntitiesFactory::domainFactory;
 
 $VERSION = '1.0';
 
+use OBM::EntitiesFactory::factory;
+@ISA = ('OBM::EntitiesFactory::factory');
+
 $debug = 1;
 
 use 5.006_001;
@@ -46,42 +49,6 @@ sub new {
 
 
     return $self;
-}
-
-
-sub DESTROY {
-    my $self = shift;
-
-    $self->_log( 'suppression de l\'objet', 4 );
-
-    $self->_reset();
-}
-
-
-sub _reset {
-    my $self = shift;
-
-    $self->_log( 'factory reset', 3 );
-
-    $self->{'domains'} = undef;
-    $self->{'running'} = undef;
-    $self->{'currentEntity'} = undef;
-
-    return 1;
-}
-
-
-sub isRunning {
-    my $self = shift;
-
-    if( $self->{'running'} ) {
-        $self->_log( 'la factory est en cours d\'exécution', 4 );
-        return 1;
-    }
-
-    $self->_log( 'la factory n\'est pas en cours d\'exécution', 4 );
-
-    return 0;
 }
 
 

@@ -2,6 +2,9 @@ package OBM::EntitiesFactory::userSystemFactory;
 
 $VERSION = '1.0';
 
+use OBM::EntitiesFactory::factory;
+@ISA = ('OBM::EntitiesFactory::factory');
+
 $debug = 1;
 
 use 5.006_001;
@@ -37,46 +40,10 @@ sub new {
 
     $self->{'running'} = undef;
     $self->{'currentEntity'} = undef;
-    $self->{'userDescList'} = undef;
+    $self->{'entitiesDescList'} = undef;
 
 
     return $self;
-}
-
-
-sub DESTROY {
-    my $self = shift;
-
-    $self->_log( 'suppression de l\'objet', 4 );
-
-    $self->_reset();
-}
-
-
-sub _reset {
-    my $self = shift;
-
-    $self->_log( 'factory reset', 3 );
-
-    $self->{'running'} = undef;
-    $self->{'currentEntity'} = undef;
-    $self->{'userDescList'} = undef;
-
-    return 1;
-}
-
-
-sub isRunning {
-    my $self = shift;
-
-    if( $self->{'running'} ) {
-        $self->_log( 'la factory est en cours d\'exécution', 4 );
-        return 1;
-    }
-
-    $self->_log( 'la factory n\'est pas en cours d\'exécution', 4 );
-
-    return 0;
 }
 
 
@@ -107,7 +74,7 @@ sub next {
         }
     }
 
-    while( defined($self->{'userDescList'}) && (my $userSystemDesc = $self->{'userDescList'}->fetchrow_hashref()) ) {
+    while( defined($self->{'entitiesDescList'}) && (my $userSystemDesc = $self->{'entitiesDescList'}->fetchrow_hashref()) ) {
         require OBM::Entities::obmSystemUser;
         if( !(my $current = OBM::Entities::obmSystemUser->new( $self->{'parentDomain'}, $userSystemDesc )) ) {
             next;
@@ -136,7 +103,7 @@ sub _loadUsers {
     my $query = 'SELECT *
                  FROM UserSystem';
 
-    if( !defined($dbHandler->execQuery( $query, \$self->{'userDescList'} )) ) {
+    if( !defined($dbHandler->execQuery( $query, \$self->{'entitiesDescList'} )) ) {
         $self->_log( 'chargement des utilisateurs système depuis la BD impossible', 3 );
         return undef;
     }

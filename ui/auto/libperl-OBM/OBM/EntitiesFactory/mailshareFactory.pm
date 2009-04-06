@@ -2,6 +2,9 @@ package OBM::EntitiesFactory::mailshareFactory;
 
 $VERSION = '1.0';
 
+use OBM::EntitiesFactory::factory;
+@ISA = ('OBM::EntitiesFactory::factory');
+
 $debug = 1;
 
 use 5.006_001;
@@ -59,46 +62,10 @@ sub new {
 
     $self->{'running'} = undef;
     $self->{'currentEntity'} = undef;
-    $self->{'mailshareDescList'} = undef;
+    $self->{'entitiesDescList'} = undef;
 
 
     return $self;
-}
-
-
-sub DESTROY {
-    my $self = shift;
-
-    $self->_log( 'suppression de l\'objet', 4 );
-
-    $self->_reset();
-}
-
-
-sub _reset {
-    my $self = shift;
-
-    $self->_log( 'factory reset', 3 );
-
-    $self->{'running'} = undef;
-    $self->{'currentEntity'} = undef;
-    $self->{'mailshareDescList'} = undef;
-
-    return 1;
-}
-
-
-sub isRunning {
-    my $self = shift;
-
-    if( $self->{'running'} ) {
-        $self->_log( 'la factory est en cours d\'exécution', 4 );
-        return 1;
-    }
-
-    $self->_log( 'la factory n\'est pas en cours d\'exécution', 4 );
-
-    return 0;
 }
 
 
@@ -129,7 +96,7 @@ sub next {
         }
     }
 
-    while( defined($self->{'mailshareDescList'}) && (my $mailshareDesc = $self->{'mailshareDescList'}->fetchrow_hashref()) ) {
+    while( defined($self->{'entitiesDescList'}) && (my $mailshareDesc = $self->{'entitiesDescList'}->fetchrow_hashref()) ) {
         require OBM::Entities::obmMailshare;
         if( !(my $current = OBM::Entities::obmMailshare->new( $self->{'parentDomain'}, $mailshareDesc )) ) {
             next;
@@ -215,7 +182,7 @@ sub _loadMailshare {
 
     $query .= ' ORDER BY '.$mailshareTablePrefix.'MailShare.mailshare_name';
 
-    if( !defined($dbHandler->execQuery( $query, \$self->{'mailshareDescList'} )) ) {
+    if( !defined($dbHandler->execQuery( $query, \$self->{'entitiesDescList'} )) ) {
         $self->_log( 'chargement des mailshare depuis la BD impossible', 3 );
         return 1;
     }

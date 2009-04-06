@@ -2,6 +2,9 @@ package OBM::EntitiesFactory::mailServerFactory;
 
 $VERSION = '1.0';
 
+use OBM::EntitiesFactory::factory;
+@ISA = ('OBM::EntitiesFactory::factory');
+
 $debug = 1;
 
 use 5.006_001;
@@ -48,46 +51,10 @@ sub new {
 
     $self->{'running'} = undef;
     $self->{'currentEntity'} = undef;
-    $self->{'mailServerDescList'} = undef;
+    $self->{'entitiesDescList'} = undef;
 
 
     return $self;
-}
-
-
-sub DESTROY {
-    my $self = shift;
-
-    $self->_log( 'suppression de l\'objet', 4 );
-
-    $self->_reset();
-}
-
-
-sub _reset {
-    my $self = shift;
-
-    $self->_log( 'factory reset', 3 );
-
-    $self->{'running'} = undef;
-    $self->{'currentEntity'} = undef;
-    $self->{'mailServerDescList'} = undef;
-
-    return 1;
-}
-
-
-sub isRunning {
-    my $self = shift;
-
-    if( $self->{'running'} ) {
-        $self->_log( 'la factory est en cours d\'exécution', 4 );
-        return 1;
-    }
-
-    $self->_log( 'la factory n\'est pas en cours d\'exécution', 4 );
-
-    return 0;
 }
 
 
@@ -118,7 +85,7 @@ sub next {
         }
     }
 
-    if( defined($self->{'mailServerDescList'}) && (my $mailServerDesc = $self->{'mailServerDescList'}->fetchall_arrayref({})) ) {
+    if( defined($self->{'entitiesDescList'}) && (my $mailServerDesc = $self->{'entitiesDescList'}->fetchall_arrayref({})) ) {
         require OBM::Entities::obmMailServer;
         if( my $current = OBM::Entities::obmMailServer->new( $self->{'parentDomain'}, $mailServerDesc ) ) {
             $self->{'currentEntity'} = $current;
@@ -158,7 +125,7 @@ sub next {
                 return undef;
             }
 
-            $self->{'mailServerDescList'} = undef;
+            $self->{'entitiesDescList'} = undef;
             return $self->{'currentEntity'};
         }
     }
@@ -197,7 +164,7 @@ sub _loadMailServer {
                  INNER JOIN ServiceProperty ON serviceproperty_entity_id=domainentity_entity_id
                  WHERE host_id='.$dbHandler->castAsInteger('serviceproperty_value').' AND serviceproperty_service=\'mail\'';
 
-    if( !defined($dbHandler->execQuery( $query, \$self->{'mailServerDescList'} )) ) {
+    if( !defined($dbHandler->execQuery( $query, \$self->{'entitiesDescList'} )) ) {
         $self->_log( 'chargement de la configuration des serveurs de courriers depuis la BD impossible', 3 );
         return 1;
     }
