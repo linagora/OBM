@@ -213,6 +213,8 @@ sub _loadMailshare {
         $query .= ' AND '.$mailshareTablePrefix.'MailShare.mailshare_id IN ('.join( ', ', @{$self->{'ids'}}).')';
     }
 
+    $query .= ' ORDER BY '.$mailshareTablePrefix.'MailShare.mailshare_name';
+
     if( !defined($dbHandler->execQuery( $query, \$self->{'mailshareDescList'} )) ) {
         $self->_log( 'chargement des mailshare depuis la BD impossible', 3 );
         return 1;

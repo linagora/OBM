@@ -225,6 +225,8 @@ sub _loadUsers {
         $query .= ' AND '.$userTablePrefix.'UserObm.userobm_id IN ('.join( ', ', @{$self->{'ids'}}).')';
     }
 
+    $query .= ' ORDER BY '.$userTablePrefix.'UserObm.userobm_login';
+
     if( !defined($dbHandler->execQuery( $query, \$self->{'userDescList'} )) ) {
         $self->_log( 'chargement des utilisateurs depuis la BD impossible', 3 );
         return 1;

@@ -211,6 +211,8 @@ sub _loadHosts {
         $query .= ' AND '.$hostTablePrefix.'Host.host_id IN ('.join( ', ', @{$self->{'ids'}} ).')';
     }
 
+    $query .= ' ORDER BY '.$hostTablePrefix.'Host.host_name';
+
     if( !defined($dbHandler->execQuery( $query, \$self->{'hostDescList'} )) ) {
         $self->_log( 'chargement des hôtes depuis la BD impossible', 3 );
         return 1;

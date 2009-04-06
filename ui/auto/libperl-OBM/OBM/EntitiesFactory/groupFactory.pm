@@ -211,6 +211,8 @@ sub _loadGroups {
         $query .= ' AND '.$groupTablePrefix.'UGroup.group_id IN ('.join( ', ', @{$self->{'ids'}}).')';
     }
 
+    $query .= ' ORDER BY '.$groupTablePrefix.'UGroup.group_name';
+
     if( !defined($dbHandler->execQuery( $query, \$self->{'groupDescList'} )) ) {
         $self->_log( 'chargement des groupes depuis la BD impossible', 3 );
         return 1;
