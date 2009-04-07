@@ -69,6 +69,13 @@ sub addEntities {
             $self->_initMailshareFactory();
             last SWITCH;
         }
+
+        if( $programmingObj->getEntitiesType() eq 'CONTACT' ) {
+            $self->_initContactFactory();
+            last SWITCH;
+        }
+
+        $self->_log( 'type d\'entité non supporté', 0 );
     }
 
     return 0;
@@ -156,4 +163,23 @@ sub _initUserFactory {
     }
 
     return 0;
+}
+
+
+sub _initContactFactory {
+    my $self = shift;
+    my $entitiesIds = $self->{'programmingObj'}->getEntitiesIds();
+    my $entitiesFactory = $self->{'entitiesFactory'};
+
+    if( $#{$entitiesIds} >= 0 ) {
+        my $entityFactory;
+
+        require OBM::EntitiesFactory::contactFactory;
+        if( !($entityFactory = OBM::EntitiesFactory::contactFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
+            $self->_log( 'problème au chargement de la factory des contacts', 3 );
+            return 1;
+        }
+
+        $entitiesFactory->enqueueFactory( $entityFactory );
+    }
 }
