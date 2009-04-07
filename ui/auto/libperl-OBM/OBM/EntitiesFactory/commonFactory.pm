@@ -21,7 +21,7 @@ sub _checkSource {
     my $self = shift;
 
     if( !defined($self->{'source'}) ) {
-        $self->_log( 'source de données indéfinie', 3 );
+        $self->_log( 'source de données indéfini', 3 );
         return 0;
     }
 
@@ -52,7 +52,7 @@ sub _checkUpdateType {
     my $self = shift;
 
     if( !defined($self->{'updateType'}) ) {
-        $self->_log( 'type de mise à jour indéfinie', 3 );
+        $self->_log( 'type de mise à jour indéfini', 3 );
         return 0;
     }
 
