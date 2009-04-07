@@ -53,7 +53,7 @@ sub run {
     }
 
     require OBM::Update::updatePassword;
-    my $updatePasswd = OBM::Update::updatePassword->new( \%parameters );
+    my $updatePasswd = OBM::Update::updatePassword->new( $parameters );
     my $errorCode = 0;
     if( defined($updatePasswd) ) {
         $errorCode = $updatePasswd->update();
@@ -69,7 +69,7 @@ sub run {
             print STDERR 'Password update failed'."\n";
         }
     }else {
-        $self->_log( 'mot de passe mis à jour avec succès', 0 );
+        $self->_log( 'mot de passe mis à jour avec succés', 0 );
 
         if( $parameters->{interactiv} ) {
             print STDERR 'Password update success'."\n";
