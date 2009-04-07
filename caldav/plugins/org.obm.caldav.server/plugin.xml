@@ -9,7 +9,7 @@
       </servlet>
    </extension>
    <extension
-         id="id1"
+         id="caldavapp"
          point="org.eclipse.core.runtime.applications">
       <application
             cardinality="singleton-global"
@@ -19,6 +19,18 @@
                class="org.obm.caldav.server.Application">
          </run>
       </application>
+   </extension>
+   <extension
+         id="caldavprod"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.obm.caldav.server.caldavapp"
+            name="caldav server product">
+         <property
+               name="appName"
+               value="caldav server product">
+         </property>
+      </product>
    </extension>
 
 </plugin>
