@@ -374,27 +374,9 @@ function run_query_organizationchart_ogroup_detail($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_organizationalchart_ogrouplink_detail($id) {
   global $cdgl_sql, $obm;
+
   $id = sql_parse_id($id, true);
   $query = "
-    SELECT 
-      ogrouplink_id,
-      userobm_lastname,
-      userobm_firstname,
-      userobm_login,
-      userobm_id,
-      userobm_title,
-      userobm_phone,
-      userobm_mobile,
-      userobm_description,
-      userobm_email,
-      domain_name,
-      NULL
-    FROM OGroupLink    
-      INNER JOIN UserEntity ON userentity_entity_id = ogrouplink_entity_id
-      INNER JOIN UserObm ON userobm_id = userentity_user_id
-      INNER JOIN Domain ON domain_id = userobm_domain_id
-    WHERE ogrouplink_ogroup_id $id 
-    UNION 
     SELECT 
       ogrouplink_id,
       userobm_lastname,
@@ -414,7 +396,27 @@ function run_query_organizationalchart_ogrouplink_detail($id) {
       INNER JOIN of_usergroup ON of_usergroup_group_id=groupentity_group_id 
       INNER JOIN UserObm ON userobm_id = of_usergroup_user_id
       INNER JOIN Domain ON domain_id = userobm_domain_id
-    WHERE ogrouplink_ogroup_id $id";
+    WHERE ogrouplink_ogroup_id $id
+  UNION
+    SELECT 
+      ogrouplink_id,
+      userobm_lastname,
+      userobm_firstname,
+      userobm_login,
+      userobm_id,
+      userobm_title,
+      userobm_phone,
+      userobm_mobile,
+      userobm_description,
+      userobm_email,
+      domain_name,
+      NULL
+    FROM OGroupLink    
+      INNER JOIN UserEntity ON userentity_entity_id = ogrouplink_entity_id
+      INNER JOIN UserObm ON userobm_id = userentity_user_id
+      INNER JOIN Domain ON domain_id = userobm_domain_id
+    WHERE ogrouplink_ogroup_id $id 
+";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_organizationchart_ogrouplink_detail()");
