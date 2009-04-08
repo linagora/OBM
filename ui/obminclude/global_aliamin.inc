@@ -155,7 +155,7 @@ function get_first_user_free_uid($first_id=false) {
     $uid_max_used = $obm_q->f('uid_max_used');
   }
 
-  if( is_null($uid_max_used) ) {
+  if (is_null($uid_max_used)) {
     $uid_max_used = get_first_user_free_uid_from_bd($first_id);
     $query = "
       INSERT INTO ObmInfo
@@ -180,9 +180,10 @@ function get_first_user_free_uid($first_id=false) {
 
 function get_first_user_free_uid_from_bd($first_id=false) {
   global $c_first_uid;
+
   $uids = array();
 
-  if( $first_id===false ) {
+  if ($first_id === false) {
     $first_id = $c_first_uid;
   }
   
@@ -271,14 +272,14 @@ function get_group_id_from_gid($gid) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the first gid not in use (starting at $c_first_gid_user)
+// Return the first gid not in use (starting at $c_gid_user)
 // Returns:
 //   - $gid : first free gid
 ///////////////////////////////////////////////////////////////////////////////
 function get_first_group_free_gid() {
-  global $c_first_gid_user;
+  global $cg_gid_user;
 
-  return get_first_user_free_uid($c_first_gid_user);
+  return get_first_user_free_uid($cg_gid_user);
 }
 
 

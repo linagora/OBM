@@ -107,7 +107,6 @@ if ($action == 'index' || $action == '') {
   if (check_domain_can_add_domain()) {
     if (check_user_defined_rules() && check_domain_data_form('', $params)) {
       $cid = run_query_domain_insert($params);
-      run_query_domain_init_data($cid);
       if ($cid > 0) {
 	set_update_state();
 	$params['domain_id'] = $cid;

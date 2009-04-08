@@ -312,7 +312,7 @@ function run_query_user_detail($p_id) {
 function run_query_user_insert($user) {
   //global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
-  global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
+  global $cg_gid_smb_admin, $cg_gid_smb_user, $cg_gid_user;
 
   $uid = sql_parse_id($obm['uid']);
   $login = strtolower($user['login']);
@@ -472,22 +472,16 @@ function run_query_user_insert($user) {
   // User UID/GID
   $user_uid = get_first_user_free_uid();
   if ($cgp_use['service']['samba'] && $smb_perms) {
-    // Utilisateur Samba
+    // Windows user
     if ($profile == "$perms_admin") {
       $gid = $cg_gid_smb_admin;
-    }else {
+    } else {
       $gid = $cg_gid_smb_user;
     }
-  }else {
-    if ($profile == "$perms_admin") {
-      // Utilisateur admin
-      $gid = $c_first_gid_admin;
-    }else {
-      // Utilisateur pas admin
-      $gid = $c_first_gid_user;
-    }
+  } else {
+    // Non windows user
+    $gid = $cg_gid_user;
   }
-
 
   if (isset($user['domain_id']) && $obm['domain_global']) {
     $domain_id = sql_parse_id($user['domain_id']);
@@ -683,7 +677,7 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
 function run_query_user_update($p_id, $user) {
   //global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
-  global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
+  global $cg_gid_smb_admin, $cg_gid_smb_user, $cg_gid_user;
   global $cmd_ldap_passwd;
 
   // Connect to the BD
@@ -813,7 +807,7 @@ function run_query_user_update($p_id, $user) {
       // Utilisateur etait et est admin
       if ($userDesc['samba_perms'] && !$smb_perms) {
         // Utilisateur etait Samba et n'est plus Samba
-        $gid = $c_first_gid_admin;
+        $gid = $cg_gid_user;
       } elseif (!$userDesc['samba_perms'] && $smb_perms) {
         // Utilisateur n'etait pas Samba et est Samba
         $gid = $cg_gid_smb_admin;
@@ -825,13 +819,13 @@ function run_query_user_update($p_id, $user) {
         $gid = $cg_gid_smb_user;
       } elseif ($userDesc['samba_perms'] && !$smb_perms) {
         // Utilisateur etait Samba et n'est plus Samba
-        $gid = $c_first_gid_user;
+        $gid = $cg_gid_user;
       } elseif (!$userDesc['samba_perms'] && $smb_perms) {
         // Utilisateur n'etait pas Samba et est Samba
         $gid = $cg_gid_smb_user;
       } elseif (!$userDesc['samba_perms'] && !$smb_perms) {
         // Utilisateur n'etait pas Samba et n'est pas Samba
-        $gid = $c_first_gid_user;
+        $gid = $cg_gid_user;
       }
     } elseif ($userDesc['perms'] != "$perms_admin" && $profile == "$perms_admin") {
       // Utilisateur n'etait pas et est admin
@@ -840,19 +834,19 @@ function run_query_user_update($p_id, $user) {
         $gid = $cg_gid_smb_admin;
       } elseif ($userDesc['samba_perms'] && !$smb_perms) {
         // Utilisateur etait Samba et n'est plus Samba
-        $gid = $c_first_gid_admin;
+        $gid = $cg_gid_user;
       } elseif (!$userDesc['samba_perms'] && $smb_perms) {
         // Utilisateur n'etait pas Samba et est Samba
         $gid = $cg_gid_smb_admin;
       } elseif (!$userDesc['samba_perms'] && !$smb_perms) {
         // Utilisateur n'etait pas Samba et n'est pas Samba
-        $gid = $c_first_gid_admin;
+        $gid = $cg_gid_user;
       }
     } elseif ($userDesc['perms'] != "$perms_admin" && $profile != "$perms_admin") {
       // Utilisateur n'etait pas et n'est pas admin
       if ($userDesc['samba_perms'] && !$smb_perms) {
         // Utilisateur etait Samba et n'est plus Samba
-        $gid = $c_first_gid_user;
+        $gid = $cg_gid_user;
       } elseif (!$userDesc['samba_perms'] && $smb_perms) {
         // Utilisateur n'etait pas Samba et est Samba
         $gid = $cg_gid_smb_user;
@@ -861,10 +855,10 @@ function run_query_user_update($p_id, $user) {
   } else {
     if ($userDesc['perms'] == "$perms_admin" && $profile != "$perms_admin") {
       // Utilisateur etait et n'est plus admin
-      $gid = $c_first_gid_user;
+      $gid = $cg_gid_user;
     } elseif ($userDesc['perms'] != "$perms_admin" && $profile == "$perms_admin") {
       // Utilisateur n'etait pas et est admin
-      $gid = $c_first_gid_admin;
+      $gid = $cg_gid_user;
     }
   }
 

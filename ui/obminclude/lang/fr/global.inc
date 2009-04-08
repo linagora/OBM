@@ -281,6 +281,12 @@ $l_tt_sales = "Taches Facturées";
 $l_tt_research = "Projets Internes";
 $l_tt_others = "Tâches Non Facturées";
 
+$l_gid_user = "Utilisateurs";
+// Samba groups
+$l_gid_smb_admin = "Administrateurs du domaine";
+$l_gid_smb_user = "Utilisateurs du domaine";
+$l_gid_smb_guest = "Invités du domaine";
+
 // Days and months
 $l_day = "Jour";
 $l_days = "Jours";

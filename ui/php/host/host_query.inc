@@ -440,6 +440,7 @@ function get_host_info($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   $h['name'] = $obm_q->f('host_name');
+  $h['domain_id'] = $obm_q->f('host_domain_id');
   $h['delegation'] = $obm_q->f('host_delegation');
   $h['ip'] = $obm_q->f('host_ip');
   $h['fqdn'] = $obm_q->f('host_fqdn');
@@ -654,10 +655,16 @@ function check_host_data_form($host) {
   $name = $host['name'];
   $ip = $host['ip'];
   $samba = $host['samba'];
-  $domain_id = $host['domain_id'];
   $fqdn = $host['fqdn'];
   $web_list = $host['web_list'];
-  $web_all = $host['web_all'];     
+  $web_all = $host['web_all'];
+
+  if ($id > 0) {
+    $h = get_host_info($id);
+    $domain_id = $h['domain_id'];
+  } else {
+    $domain_id = $host['domain_id'];
+  }
 
   // MANDATORY: Host name not empty
   if (trim($name) == '') {
@@ -699,7 +706,7 @@ function check_host_data_form($host) {
     // IP is in a network :
     if ($cgp_use['service']['network']) {
       if (!is_ip_in_an_internal_network($ip)) {
-        $err['msg'] = "$l_err_host_ip_not_in_lan : $ip ";
+        $err['msg'] = "$l_err_host_ip_not_in_lan : $ip";
         $err['field'] = 'ip';
         return false;
       }
@@ -715,7 +722,6 @@ function check_host_data_form($host) {
 
   // XXXXXXX verifier ici + fichiers de langue
   $d = of_domain_get_domain_infos($domain_id, true);
-
   // MANDATORY: If windows host, domain can not be global (0)
   if ($samba == '1' && $d['global'] == '1') {
     $err['msg'] = "$l_err_host_windows_not_global";

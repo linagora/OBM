@@ -308,7 +308,6 @@ function run_query_people_detail($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_people_insert($people){
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
-  global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
   $uid = sql_parse_id($obm['uid']);
 //  $login = "'".strtolower($people['login'])."'";
@@ -444,7 +443,6 @@ function run_query_people_insert($people){
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_people_update($p_id, $people) {
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
-  global $cg_gid_smb_admin, $cg_gid_smb_user, $c_first_gid_admin, $c_first_gid_user;
 
   // Connect to the BD
   $obm_q = new DB_OBM;

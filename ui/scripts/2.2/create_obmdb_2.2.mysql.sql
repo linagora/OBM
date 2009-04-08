@@ -2175,7 +2175,7 @@ CREATE TABLE `Payment` (
   `payment_checked` char(1) NOT NULL default '0',
   `payment_gap` double(10,2) NOT NULL default '0.00',
   `payment_comment` text,
-  PRIMARY KEY  (`payment_id`),
+  PRIMARY KEY (`payment_id`),
   KEY `payment_domain_id_domain_id_fkey` (`payment_domain_id`),
   KEY `payment_account_id_account_id_fkey` (`payment_account_id`),
   KEY `payment_userupdate_userobm_id_fkey` (`payment_userupdate`),
@@ -2237,7 +2237,7 @@ CREATE TABLE `PaymentKind` (
   `paymentkind_domain_id` int(8) NOT NULL,
   `paymentkind_shortlabel` varchar(3) NOT NULL default '',
   `paymentkind_label` varchar(40) NOT NULL default '',
-  PRIMARY KEY  (`paymentkind_id`),
+  PRIMARY KEY (`paymentkind_id`),
   KEY `paymentkind_domain_id_domain_id_fkey` (`paymentkind_domain_id`),
   CONSTRAINT `paymentkind_domain_id_domain_id_fkey` FOREIGN KEY (`paymentkind_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

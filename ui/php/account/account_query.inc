@@ -229,9 +229,9 @@ function run_query_account_search_expected_payments($p_account_id, $p_date_befor
   $multidomain = sql_multidomain('payment');
   $p_account_id = sql_parse_id($p_account_id, true);
 
-  $query = "select *, payment_id as id,
-    payment_date as payment_expect_date
-    from Payment where payment_account_id $p_account_id $multidomain";
+  $query = "SELECT *, payment_id as id
+    FROM Payment
+    WHERE payment_account_id $p_account_id $multidomain";
   if ($p_date_before != '') {
     $query .= " and payment_date <= '$p_date_before'";
   }

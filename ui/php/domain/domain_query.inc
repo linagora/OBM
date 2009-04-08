@@ -121,7 +121,7 @@ function run_query_domain_insert($domain) {
   $alias = $domain['alias'];
   $mail_server_auto = $domain['mail_server_auto'];
   $samba = $domain['samba'];
-  
+
   $query = "INSERT INTO Domain (
     domain_timeupdate,
     domain_timecreate,
@@ -145,8 +145,8 @@ function run_query_domain_insert($domain) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
-    $id = $obm_q->lastid();
-    $entity_id = of_entity_insert($GLOBALS['module'], $id);    
+    $domain_id = $obm_q->lastid();
+    $entity_id = of_entity_insert($GLOBALS['module'], $domain_id);    
     if ($cgp_use['service']['mail']) {
       of_service_insert('mail', $entity_id);
       of_service_property_insert('mail','imap_autoselect', $entity_id, $mail_server_auto);
@@ -160,12 +160,24 @@ function run_query_domain_insert($domain) {
         of_service_property_insert('samba', $property, $entity_id, addslashes($value));
       }
     } 
-    run_query_domain_replace_properties($id,$domain);
+
+    // Init windows default domain groups
+    if ($samba['domain'] != '') {
+      run_query_domain_init_groups($domain_id, true);
+    } else {
+      run_query_domain_init_groups($domain_id, false);
+    }
+
+    // Init domain properties
+    run_query_domain_replace_properties($domain_id, $domain);
+
+    // Init domain reference data
+    run_query_domain_init_data($domain_id);
   } else {
-    $id = false;
+    $domain_id = false;
   }
 
-  return $id;
+  return $domain_id;
 }
 
 
@@ -208,6 +220,132 @@ function run_query_domain_replace_properties($domain_id,$domain) {
       $obm_q->query($query);
     }
   }
+}
+
+
+/**
+ * Get default data from global domain and make a copy into the new domain
+ * 
+ * @param mixed $id 
+ * @access public
+ * @return void
+ */
+function run_query_domain_init_data($id) {
+  global $obm, $cdg_sql;
+
+  $db = new DB_OBM;
+  $tables = array ('CompanyNafCode', 'CompanyActivity', 'CompanyType', 'Kind', 'DealType',
+                   'DealStatus', 'EventCategory1', 'DocumentMimeType', 'TaskType', 'ContractStatus',
+                   'ContractPriority', 'IncidentStatus', 'IncidentPriority', 'PaymentKind');
+  $query = "INSERT INTO %s (%s) SELECT %s FROM %s JOIN Domain ON %s = domain_id WHERE domain_global = true GROUP BY %s";
+  foreach ($tables as $table ) {
+    $dynamicfields = array();
+    $staticfields = array();
+    $domain_field = null;
+    $fields = $db->metadata($table, false);
+    foreach ($fields as $field) {
+      if (strpos(strtolower($field['flags']),'primary') === false) {
+        if (strpos(strtolower($field['name']),'domain_id') !== false) {
+          $staticfields[$field['name']] = $id;
+          $domain_field = $field['name'];
+        } elseif (strpos(strtolower($field['name']),'timeupdate') !== false) {
+          $staticfields[$field['name']] = 'NULL';
+        } elseif (strpos(strtolower($field['name']),'timecreate') !== false) {
+          $staticfields[$field['name']] = 'NOW()';
+        } elseif (strpos(strtolower($field['name']),'userupdate') !== false) {
+          $staticfields[$field['name']] = 'NULL';
+        } elseif (strpos(strtolower($field['name']),'usercreate') !== false) {
+          $staticfields[$field['name']] = $obm['uid'];
+        } else {
+          $dynamicfields[] = $field['name'];
+        }
+      }
+    }
+    $squery = sprintf($query, $table, implode(', ',array_merge($dynamicfields,array_keys($staticfields))), 
+                                      implode(', ', array_merge($dynamicfields, array_values($staticfields))),
+                                      $table, $domain_field, implode(', ', $dynamicfields));
+    display_debug_msg($squery, $cdg_sql, 'run_query_domain_init_data()');
+    $db->query($squery);
+  }
+}
+
+
+/**
+ * Initialize default windows and user Group for a domain
+ * 
+ * @param int $domain_id domain id
+ * @param boolean $samba
+ * @access public
+ * @return void
+ */
+function run_query_domain_init_groups($domain_id, $windows=false) {
+  global $obm, $cdg_sql;
+  global $cg_gid_smb_admin, $cg_gid_smb_user, $cg_gid_smb_guest;
+  global $l_gid_smb_admin, $l_gid_smb_user, $l_gid_smb_guest;
+  global $cg_gid_user, $l_gid_user;
+
+  $obm_q = new DB_OBM;
+  $uid = sql_parse_id($obm['uid']);
+
+  if ($windows) {
+    $gids = array($cg_gid_smb_admin => $l_gid_smb_admin,
+		  $cg_gid_smb_user => $l_gid_smb_user,
+		  $cg_gid_smb_guest => $l_gid_smb_guest);
+    $samba = 1;
+  } else {
+    $gids = array($cg_gid_user => $l_gid_user);
+    $samba = 0;
+  }
+
+  foreach ($gids as $gid => $gname) {
+    if (! check_domain_group_exists($gid, $domain_id)) { 
+      $query = "INSERT INTO UGroup (group_domain_id,
+        group_usercreate,
+        group_timecreate,
+        group_samba,
+        group_gid,
+        group_name)
+      VALUES (
+        $domain_id,
+        $uid,
+        NOW(),
+        $samba,
+        $gid,
+        '$gname')";
+      display_debug_msg($query, $cdg_sql, 'run_query_domain_init_groups()');
+      $obm_q->query($query);
+    }
+  }
+}
+
+
+/**
+ * Check if a given group (bu gid) already exists in the domain
+ * 
+ * @param int $gid group gid
+ * @param int $domain_id
+ * @access public
+ * @return void
+ */
+function check_domain_group_exists($gid, $domain_id) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('group');
+
+  $gid = sql_parse_id($gid, true);
+  $query = "SELECT group_id, group_name
+    FROM UGroup
+    WHERE group_gid $gid
+      AND group_domain_id='$domain_id'";
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'check_domain_group_exists()');
+  $obm_q->query($query);
+  $nb = $obm_q->num_rows();
+
+  if ($nb >= 1) {
+    return true;
+  }
+  return false;
 }
 
 
@@ -285,7 +423,7 @@ function run_query_domain_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_domain_data_form($d_id, $domain) {
   global $err, $l_label_error,$l_alias_user_used,$l_name_in_use;
-  global $l_name_error, $cgp_use;
+  global $l_name_error, $cgp_use, $c_none;
 
   $label = $domain['label'];
   $alias = trim($domain['alias']);
@@ -303,49 +441,62 @@ function check_domain_data_form($d_id, $domain) {
     return false;
   }
   $used_name = run_query_domain_get_used_name($alias, $name, $d_id);
-  if(count($used_name) > 0) {
+  if (count($used_name) > 0) {
     $err['msg'] = "$l_name_in_use : ".implode(', ',$used_name);
     return false;
   }
   if ($d_id && !empty($alias)) {
     $users_aliases = run_query_domain_get_users_aliases($alias, $d_id);
-    if(count($users_aliases) > 0) {
+    if (count($users_aliases) > 0) {
       $err['msg'] = "$l_alias_user_used : ".implode(', ',$users_aliases);
       return false;
     }
-  } 
+  }
   if ($cgp_use['service']['samba']) {
-    if(!preg_match($GLOBALS['php_regexp_samba_sid'],$samba['sid'])) {
-      $err['msg'] = "$GLOBALS[l_samba_sid_error] : $samba[sid]";
-      return false;
-    }
-    if(!of_service_property_unique('samba', 'sid', $samba['sid'], $id)) {
-      $err['msg'] = "$GLOBALS[l_samba_sid_used] : $samba[sid]";
-      return false;
-    }
-    if(!preg_match($GLOBALS['php_regexp_samba_domain'],$samba['domain'])) {
-      $err['msg'] = "$GLOBALS[l_samba_domain_error] : $samba[domain]";
-      return false;
-    }
-    if(!of_service_property_unique('samba', 'domain', $samba['domain'], $id)) {
-      $err['msg'] = "$GLOBALS[l_samba_domain_used] : $samba[domain]";
-      return false;
-    }    
-    if($samba['profile'] != '' && !preg_match($GLOBALS['php_regexp_samba_profile'],$samba['profile'])) {
-      $err['msg'] = "$GLOBALS[l_samba_profile_error] : $samba[profile]";
-      return false;
-    }
-    if($samba['home'] != '' && !preg_match($GLOBALS['php_regexp_samba_home'],$samba['home'])) {
-      $err['msg'] = "$GLOBALS[l_samba_home_error] : $samba[home]";
-      return false;
-    }
-    if($samba['drive'] != '' && !preg_match($GLOBALS['php_regexp_samba_drive'],$samba['drive'])) {
-      $err['msg'] = "$GLOBALS[l_samba_drive_error] : $samba[drive]";
-      return false;
+    if ($samba['domain'] != '') {
+      if (!preg_match($GLOBALS['php_regexp_samba_domain'],$samba['domain'])) {
+	$err['msg'] = "$GLOBALS[l_samba_domain_error] : $samba[domain]";
+	return false;
+      }
+      if (!preg_match($GLOBALS['php_regexp_samba_sid'],$samba['sid'])) {
+	$err['msg'] = "$GLOBALS[l_samba_sid_error] : $samba[sid]";
+	return false;
+      }
+      if (!of_service_property_unique('samba', 'sid', $samba['sid'], $id)) {
+	$err['msg'] = "$GLOBALS[l_samba_sid_used] : $samba[sid]";
+	return false;
+      }
+      if (!of_service_property_unique('samba', 'domain', $samba['domain'], $id)) {
+	$err['msg'] = "$GLOBALS[l_samba_domain_used] : $samba[domain]";
+	return false;
+      }    
+      if ($samba['profile'] != '' && !preg_match($GLOBALS['php_regexp_samba_profile'],$samba['profile'])) {
+	$err['msg'] = "$GLOBALS[l_samba_profile_error] : $samba[profile]";
+	return false;
+      }
+      if ($samba['home'] != '' && !preg_match($GLOBALS['php_regexp_samba_home'],$samba['home'])) {
+	$err['msg'] = "$GLOBALS[l_samba_home_error] : $samba[home]";
+	return false;
+      }
+      if ($samba['drive'] != '' && !preg_match($GLOBALS['php_regexp_samba_drive'],$samba['drive'])) {
+	$err['msg'] = "$GLOBALS[l_samba_drive_error] : $samba[drive]";
+	return false;
+      }
+    } else {
+      // If windows domain name not filled, windows fields must be blank
+      if (($samba['sid'] != '')
+	  || ($samba['profile'] != '')
+	  || ($samba['home'] != '')
+	  || ($samba['drive'] != "$c_none")) {
+	$err['msg'] = "$GLOBALS[l_samba_domain_error] : $samba[domain]";
+	return false;
+      }
     }
   }
   return true;
 }
+
+
 /**
  * Check if aliases or domain name  are already in use
  * 
@@ -356,6 +507,7 @@ function check_domain_data_form($d_id, $domain) {
  */
 function run_query_domain_get_used_name($alias, $name=null, $id=null) {
   global $cdg_sql;
+
   $return = array();
   $aliases = array();
   if(!empty($alias)) {
@@ -387,6 +539,7 @@ function run_query_domain_get_used_name($alias, $name=null, $id=null) {
   }
   return $return;
 }
+
 
 /**
  * Check aliases integrity 
@@ -438,6 +591,7 @@ function run_query_domain_get_users_aliases($aliases, $id) {
   }
   return $return;
 }
+
 
 /**
  * Check if the domain can be deleted
@@ -671,53 +825,6 @@ function run_query_domain_properties($domain_id = NULL) {
 
 
 /**
- * Get default data from global domain and make a copy into the new domain
- * 
- * @param mixed $id 
- * @access public
- * @return void
- */
-function run_query_domain_init_data($id) {
-  global $obm, $cdg_sql;
-  $db = new DB_OBM;
-  $tables = array ('CompanyNafCode', 'CompanyActivity', 'CompanyType', 'Kind', 'DealType',
-                   'DealStatus', 'EventCategory1', 'DocumentMimeType', 'TaskType', 'ContractStatus',
-                   'ContractPriority', 'IncidentStatus', 'IncidentPriority', 'PaymentKind');
-  $query = "INSERT INTO %s (%s) SELECT %s FROM %s JOIN Domain ON %s = domain_id WHERE domain_global = true GROUP BY %s
-    ";
-  foreach ($tables as $table ) {
-    $dynamicfields = array();
-    $staticfields = array();
-    $domain_field = null;
-    $fields = $db->metadata($table, false);
-    foreach ($fields as $field) {
-      if(strpos(strtolower($field['flags']),'primary') === false) {
-        if(strpos(strtolower($field['name']),'domain_id') !==false) {
-          $staticfields[$field['name']] = $id;
-          $domain_field = $field['name'];
-        } elseif (strpos(strtolower($field['name']),'timeupdate') !==false) {
-          $staticfields[$field['name']] = 'NULL';
-        } elseif (strpos(strtolower($field['name']),'timecreate') !==false) {
-          $staticfields[$field['name']] = 'NOW()';
-        } elseif (strpos(strtolower($field['name']),'userupdate') !==false) {
-          $staticfields[$field['name']] = 'NULL';
-        } elseif (strpos(strtolower($field['name']),'usercreate') !==false) {
-          $staticfields[$field['name']] = $obm['uid'];
-        } else {
-          $dynamicfields[] = $field['name'];
-        }
-      }
-    }
-    $squery = sprintf($query, $table, implode(', ',array_merge($dynamicfields,array_keys($staticfields))), 
-                                      implode(', ', array_merge($dynamicfields, array_values($staticfields))),
-                                      $table, $domain_field, implode(', ', $dynamicfields));
-    display_debug_msg($squery, $cdg_sql, 'run_query_domain_init_data()');
-    $db->query($squery);
-  }
-
-}
-
-/**
  * Get domain samba properties 
  * 
  * @param mixed $id 
@@ -726,6 +833,7 @@ function run_query_domain_init_data($id) {
  */
 function run_query_domain_samba_properties($id) {
   global $obm, $cdg_sql;
+
   $db = new DB_OBM;
   $query = "SELECT * FROM ServiceProperty 
     INNER JOIN DomainEntity ON domainentity_entity_id = serviceproperty_entity_id

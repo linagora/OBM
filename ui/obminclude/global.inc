@@ -259,15 +259,12 @@ if ($cgp_use['service']['mail'] == false) {
   $cgp_use['service']['mail_vacation'] = false;
 }
 
-	   
 // User UID and GID
 // First UID for users
 $c_first_uid = 1001;
 
-// GID for simple users without Samba
-$c_first_gid_user = 1001;
-// GID for admin users without Samba
-$c_first_gid_admin = $c_first_gid_user;
+// GID for users (without samba)
+$cg_gid_user = 1000;
 // GID for admin users with Samba
 $cg_gid_smb_admin = 512;
 // GID for simple users with Samba

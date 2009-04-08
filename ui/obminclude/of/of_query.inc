@@ -363,9 +363,10 @@ function of_domain_get_list() {
  **/
 function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
   global $cdg_sql, $obm;
+
   if (!is_null($domain_id)) {
     $d = of_domain_get_domain_infos($domain_id);
-    if($d['global'] === false) {
+    if (! $d['global']) {
       $domain_id = sql_parse_id($domain_id, true);
       $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
     }
@@ -428,7 +429,7 @@ function of_domain_get_domain_infos($d_id, $get_properties=false) {
     domain_alias,
     domain_global
     FROM Domain
-    WHERE domain_id $d_id ";
+    WHERE domain_id $d_id";
   display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_infos()');
   $obm_q->query($query);
   $obm_q->next_record();
