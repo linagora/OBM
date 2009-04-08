@@ -19,6 +19,7 @@ public class WebdavServlet extends HttpServlet {
 	private static final long serialVersionUID = 1410911584964336424L;
 
 	private Map<String, DavMethodHandler> handlers;
+	private AuthHandler authHandler;
 	
 	/**
 	 * Handles the special WebDAV methods.
@@ -26,6 +27,12 @@ public class WebdavServlet extends HttpServlet {
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 
+		Token token = authHandler.doAuth(req);
+		if (token == null) {
+			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			return;
+		}
+		
 		String method = req.getMethod();
 
 		if (logger.isInfoEnabled()) {
@@ -34,7 +41,7 @@ public class WebdavServlet extends HttpServlet {
 
 		DavMethodHandler handler = handlers.get(method.toLowerCase());
 		if (handler != null) {
-			handler.process(req, resp);
+			handler.process(token, req, resp);
 		} else {
 			super.service(req, resp);
 		}
@@ -52,6 +59,8 @@ public class WebdavServlet extends HttpServlet {
 		handlers.put("move", new PropFindHandler());
 		handlers.put("lock", new PropFindHandler());
 		handlers.put("unlock", new PropFindHandler());
+		
+		authHandler = new AuthHandler();
 	}
 
 }
