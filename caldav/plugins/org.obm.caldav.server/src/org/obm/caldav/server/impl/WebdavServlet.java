@@ -33,8 +33,7 @@ public class WebdavServlet extends HttpServlet {
 		String method = req.getMethod();
 
 		if (logger.isInfoEnabled()) {
-			String path = getRelativePath(req);
-			logger.info("[" + method + "] " + path);
+			logger.info("[" + method + "] " + req.getRequestURI());
 		}
 
 		if (method.equals(METHOD_PROPFIND)) {
@@ -52,50 +51,30 @@ public class WebdavServlet extends HttpServlet {
 		} else if (method.equals(METHOD_UNLOCK)) {
 			doUnlock(req, resp);
 		} else {
-			// DefaultServlet processing
 			super.service(req, resp);
 		}
 
 	}
 
 	private void doUnlock(HttpServletRequest req, HttpServletResponse resp) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void doLock(HttpServletRequest req, HttpServletResponse resp) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void doMove(HttpServletRequest req, HttpServletResponse resp) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void doCopy(HttpServletRequest req, HttpServletResponse resp) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void doMkcol(HttpServletRequest req, HttpServletResponse resp) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void doProppatch(HttpServletRequest req, HttpServletResponse resp) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void doPropfind(HttpServletRequest req, HttpServletResponse resp) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private String getRelativePath(HttpServletRequest req) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
