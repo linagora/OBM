@@ -78,11 +78,17 @@ class EventAlertCronJob extends CronJob{
 
     foreach($occurrences as $occurrence) {
       $event = $occurrence->event;
-      $delta = $this->getAlertDelta($event->id, key($event->attendee["user"]));
+      $delta = $this->getAlertDelta($event->id, $occurrence->id);
       
       if($occurrence->date >= $date && $occurrence->date < $date  + $this->jobDelta) {
         $this->logger->debug("Alert for event ".$event->id." will be sent");
         $consult_link = "$GLOBALS[cgp_host]/calendar/calendar_index.php?action=detailconsult&calendar_id=".$event->id;
+        if(isset($events[$event->id])) {
+          $recipients = $events[$event->id]['recipients'];
+        } else {
+          $recipients = array();
+        }        
+        array_push($recipients, $occurrence->id);
         $events[$event->id] = array (
           "subject" => sprintf($l_alert_mail_subject,addslashes($event->title)),
           "message" => sprintf($l_alert_mail_body,
@@ -95,7 +101,7 @@ class EventAlertCronJob extends CronJob{
                           of_date_format(), date("H:i")
                           ,$GLOBALS['cgp_host']
                        ),
-          "recipents" => array_unique(array_keys($event->attendee["user"])),
+          "recipents" => array_unique($recipients),
           "owner" => $event->owner
         );
       } 
@@ -344,7 +350,7 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       AND event_repeatkind = 'none'
       AND ($event_date - eventalert_duration) >= $start
       AND ($event_date - eventalert_duration) <=  $end
-      AND  eventalert_duration > 0
+      AND  eventalert_duration >= 0
       ORDER BY event_date
 ";
 
@@ -400,7 +406,7 @@ function run_query_calendar_repeat_alerts($start, $end) {
       AND ($event_date  - eventalert_duration) <= $end 
       AND (($event_endrepeat  - eventalert_duration) >= $start
       OR $event_endrepeat = '0')
-      AND eventalert_duration > 0
+      AND eventalert_duration >= 0
     ORDER BY event_date"; 
 
   Logger::log($query,L_CORE,'eventalertcronjob');
