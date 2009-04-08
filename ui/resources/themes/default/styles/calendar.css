@@ -211,17 +211,6 @@
   border-top: rgb(102, 140, 217);
   border-bottom: rgb(102, 140, 217);
 }
-.eventOwner_W {
-  color: #fff;
-  background-color: rgb(102, 140, 217);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner_W h1, li.eventOwner_W, .eventOwner_W .handle {
-  background-color: rgb(41, 82, 163);
-}
 
 .eventOwner0 {
   color: #fff;
@@ -231,17 +220,6 @@
   background-color: rgb(163, 41, 41);
   border-top: rgb(216, 102, 102);
   border-bottom: rgb(216, 102, 102);
-}
-.eventOwner0_W {
-  color: #fff;
-  background-color: rgb(216, 102, 102);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner0_W h1, li.eventOwner0_W, .eventOwner0_W .handle {
-  background-color: rgb(163, 41, 41);
 }
 
 .eventOwner1 {
@@ -253,17 +231,6 @@
   border-top: rgb(163, 41, 41);
   border-bottom: rgb(163, 41, 41);
 }
-.eventOwner1_W {
-  color: #fff;
-  background-color: rgb(140, 102, 217);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner1_W h1, li.eventOwner1_W, .eventOwner1_W .handle {
-  background-color: rgb(82, 41, 163);
-}
 
 .eventOwner2 {
   color: #fff;
@@ -273,17 +240,6 @@
   background-color: rgb(40, 117, 78);
   border-top: rgb(101, 173, 137);
   border-bottom: rgb(101, 173, 137);
-}
-.eventOwner2_W {
-  color: #fff;
-  background-color: rgb(101, 173, 137);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner2_W h1, li.eventOwner2_W, .eventOwner2_W .handle {
-  background-color: rgb(40, 117, 78);
 }
 
 .eventOwner3 {
@@ -295,17 +251,6 @@
   border-top: rgb(191, 191, 77);
   border-bottom: rgb(191, 191, 77);
 }
-.eventOwner3_W {
-  color: #fff;
-  background-color: rgb(191, 191, 77);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner3_W h1, li.eventOwner3_W, .eventOwner3_W .handle {
-  background-color: rgb(136, 136, 14);
-}
 
 .eventOwner4 {
   color: #fff;
@@ -315,17 +260,6 @@
   background-color: rgb(177, 68, 14);
   border-top: rgb(230, 128, 77);
   border-bottom: rgb(230, 128, 77);
-}
-.eventOwner4_W {
-  color: #fff;
-  background-color: rgb(230, 128, 77);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner4_W h1, li.eventOwner4_W, .eventOwner4_W .handle {
-  background-color: rgb(177, 68, 14);
 }
 
 .eventOwner5 {
@@ -337,17 +271,6 @@
   border-top: rgb(137, 151, 165);
   border-bottom: rgb(137, 151, 165);
 }
-.eventOwner5_W {
-  color: #fff;
-  background-color: rgb(137, 151, 165);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner5_W h1, li.eventOwner5_W, .eventOwner5_W .handle {
-  background-color: rgb(78, 93, 108);
-}
 
 .eventOwner6 {
   color: #fff;
@@ -357,17 +280,6 @@
   background-color: rgb(110, 110, 65);
   border-top: rgb(167, 167, 125);
   border-bottom: rgb(167, 167, 125);
-}
-.eventOwner6_W {
-  color: #fff;
-  background-color: rgb(167, 167, 125);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner6_W h1, li.eventOwner6_W, .eventOwner6_W .handle {
-  background-color: rgb(110, 110, 65);
 }
 
 .eventOwner7 {
@@ -379,17 +291,6 @@
   border-top: rgb(163, 41, 41);
   border-bottom: rgb(163, 41, 41);
 }
-.eventOwner7_W {
-  color: #fff;
-  background-color: rgb(230, 115, 153);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner7_W h1, li.eventOwner7_W, .eventOwner7_W .handle {
-  background-color: rgb(177, 54, 95);
-}
 
 .eventOwner8 {
   color: #fff;
@@ -399,17 +300,6 @@
   background-color: rgb(41, 82, 122);
   border-top: rgb(102, 140, 179);
   border-bottom: rgb(102, 140, 179);
-}
-.eventOwner8_W {
-  color: #fff;
-  background-color: rgb(102, 140, 179);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner8_W h1, li.eventOwner8_W, .eventOwner8_W .handle {
-  background-color: rgb(41, 82, 122);
 }
 
 .eventOwner9 {
@@ -421,17 +311,6 @@
   border-top: rgb(76, 176, 82);
   border-bottom: rgb(76, 176, 82);
 }
-.eventOwner9_W {
-  color: #fff;
-  background-color: rgb(76, 176, 82);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner9_W h1, li.eventOwner9_W, .eventOwner9_W .handle {
-  background-color: rgb(13, 120, 19);
-}
 
 .eventOwner10 {
   color: #fff;
@@ -441,17 +320,6 @@
   background-color: rgb(171, 139, 0);
   border-top: rgb(224, 194, 64);
   border-bottom: rgb(224, 194, 64);
-}
-.eventOwner10_W {
-  color: #fff;
-  background-color: rgb(224, 194, 64);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner10_W h1, li.eventOwner10_W, .eventOwner10_W .handle {
-  background-color: rgb(171, 139, 0);
 }
 
 .eventOwner11 {
@@ -463,17 +331,6 @@
   border-top: rgb(190, 148, 148);
   border-bottom: rgb(190, 148, 148);
 }
-.eventOwner11_W {
-  color: #fff;
-  background-color: rgb(190, 148, 148);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner11_W h1, li.eventOwner11_W, .eventOwner11_W .handle {
-  background-color: rgb(134, 90, 90);
-}
 
 .eventOwner12 {
   color: #fff;
@@ -483,17 +340,6 @@
   background-color: rgb(90, 105, 134);
   border-top: rgb(148, 162, 190);
   border-bottom: rgb(148, 162, 190);
-}
-.eventOwner12_W {
-  color: #fff;
-  background-color: rgb(148, 162, 190);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner12_W h1, li.eventOwner12_W, .eventOwner12_W .handle {
-  background-color: rgb(90, 105, 134);
 }
 
 .eventOwner13 {
@@ -505,17 +351,6 @@
   border-top: rgb(196, 168, 131);
   border-bottom: rgb(196, 168, 131);
 }
-.eventOwner13_W {
-  color: #fff;
-  background-color: rgb(196, 168, 131);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner13_W h1, li.eventOwner13_W, .eventOwner13_W .handle {
-  background-color: rgb(141, 111, 71);
-}
 
 .eventOwner14 {
   color: #fff;
@@ -525,17 +360,6 @@
   background-color: rgb(122, 54, 122);
   border-top: rgb(163, 41, 41);
   border-bottom: rgb(163, 41, 41);
-}
-.eventOwner14_W {
-  color: #fff;
-  background-color: rgb(179, 115, 179);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner14_W h1, li.eventOwner14_W, .eventOwner14_W .handle {
-  background-color: rgb(122, 54, 122);
 }
 
 .eventOwner15 {
@@ -547,17 +371,6 @@
   border-top: rgb(89, 191, 179);
   border-bottom: rgb(89, 191, 179);
 }
-.eventOwner15_W {
-  color: #fff;
-  background-color: rgb(89, 191, 179);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner15_W h1, li.eventOwner15_W, .eventOwner15_W .handle {
-  background-color: rgb(27, 136, 122);
-}
 
 .eventOwner16 {
   color: #fff;
@@ -567,17 +380,6 @@
   background-color: rgb(82, 136, 0);
   border-top: rgb(140, 191, 64);
   border-bottom: rgb(140, 191, 64);
-}
-.eventOwner16_W {
-  color: #fff;
-  background-color: rgb(140, 191, 64);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner16_W h1, li.eventOwner16_W, .eventOwner16_W .handle {
-  background-color: rgb(82, 136, 0);
 }
 
 .eventOwner17 {
@@ -589,17 +391,6 @@
   border-top: rgb(242, 166, 64);
   border-bottom: rgb(242, 166, 64);
 }
-.eventOwner17_W {
-  color: #fff;
-  background-color: rgb(242, 166, 64);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner17_W h1, li.eventOwner17_W, .eventOwner17_W .handle {
-  background-color: rgb(190, 109, 0);
-}
 
 .eventOwner18 {
   color: #fff;
@@ -609,17 +400,6 @@
   background-color: rgb(112, 87, 112);
   border-top: rgb(169, 146, 169);
   border-bottom: rgb(169, 146, 169);
-}
-.eventOwner18_W {
-  color: #fff;
-  background-color: rgb(169, 146, 169);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner18_W h1, li.eventOwner18_W, .eventOwner18_W .handle {
-  background-color: rgb(112, 87, 112);
 }
 
 .eventOwner19 {
@@ -631,18 +411,6 @@
   border-top: rgb(133, 170, 165);
   border-bottom: rgb(133, 170, 165);
 }
-.eventOwner19_W {
-  color: #fff;
-  background-color: rgb(133, 170, 165);
-  border-left: 1px dotted;
-  border-right: 1px dotted;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-.eventOwner19_W h1, li.eventOwner19_W, .eventOwner19_W .handle {
-  background-color: rgb(74, 113, 108);
-}
-
 
 /* ------------------------------------------------------------------------- */
 /* Calendar Quick Form */

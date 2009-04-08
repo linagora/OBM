@@ -70,7 +70,7 @@ abstract class OBM_Database_TestCase extends PHPUnit_Extensions_Database_TestCas
     $db_conf = include('conf/db.php');
     extract($db_conf);
     $this->pdo = new PDO("{$obmdb_dbtype}:host={$obmdb_host};dbname={$obmdb_db}", $obmdb_user, $obmdb_password);
-    $this->pdo->exec('TRUNCATE TABLE Entity');
+    $this->pdo->exec('TRUNCATE TABLE Entity CASCADE');
     $this->test_db = $obmdb_db;
   }
   
@@ -79,8 +79,10 @@ abstract class OBM_Database_TestCase extends PHPUnit_Extensions_Database_TestCas
   }
   
   protected function getSetupOperation() {
+    $truncate = new PHPUnit_Extensions_Database_Operation_Truncate(true);
+    $truncate->setCascade(true);
     return new PHPUnit_Extensions_Database_Operation_Composite(array(
-      new PHPUnit_Extensions_Database_Operation_Truncate(true),
+      $truncate,
       new OBM_Database_Operation_Entity_Insert()
     ));
   }
@@ -120,7 +122,7 @@ class OBM_Database_Operation_Entity_Insert extends PHPUnit_Extensions_Database_O
   public function execute(PHPUnit_Extensions_Database_DB_IDatabaseConnection $connection, 
                           PHPUnit_Extensions_Database_DataSet_IDataSet $dataSet) {
     $pdo = $connection->getConnection(); // we retrieve the PDO object
-    $pdo->exec('TRUNCATE TABLE Entity');
+    $pdo->exec('TRUNCATE TABLE Entity CASCADE');
     
     parent::execute($connection, $dataSet);
     
@@ -135,7 +137,7 @@ class OBM_Database_Operation_Entity_Insert extends PHPUnit_Extensions_Database_O
             $pdo->exec('INSERT INTO Entity (entity_mailing) VALUES (TRUE)');
             $entityId = $pdo->lastInsertId();
             $query = 'INSERT INTO '.ucfirst($entity).'Entity ('.$entity.'entity_entity_id, '.$entity.'entity_'.$entity.'_id )
-                      VALUES ('.$entityId.', '.$i.')';
+                      SELECT MAX(entity_id), '.$i.' FROM Entity';
             $pdo->exec($query);
           }
         }

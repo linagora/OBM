@@ -189,13 +189,40 @@ Obm.Portlets = new Class({
  *
  */
 Obm.Popup = new Class ({
+  
+  initialize: function() {
+    this.popups = new Hash();
+  },
+  
+  add: function(id, content, buttons) {
+    if(content != undefined) {
+      var content = StickyWin.ui('the caption', 'this is the body', {
+                      width: '400px',
+                      buttons: buttons
+                    })
+
+    } else {
+      var content = $(id);
+    }
+    var sticky = new StickyWinModal({content: content, modalOptions :{hideOnClick:false}});
+    this.popups.set(id, sticky);
+  },
 
   show: function(id) {
-    $(id).setStyle('display', 'block');
-		new StickyWinModal({
-			content: $(id),
-			modalOptions :{hideOnClick:false}
-		});
+    if(this.popups.get(id)) {
+      this.popups.get(id).show();
+    } else {
+      $(id).setStyle('display','block');
+      var sticky = new StickyWinModal({content: $(id), modalOptions :{hideOnClick:false}});
+      this.popups.set(id, sticky);
+      sticky.show();
+    }
+  },
+
+  hide: function(id) {
+    if(this.popups.get(id)) {
+      this.popups.get(id).hide();
+    } 
   }
 
 });

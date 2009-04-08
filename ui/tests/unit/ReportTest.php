@@ -61,17 +61,17 @@ class ReportTest extends OBM_Database_TestCase {
     $formater->addField('domain_name');
     $formater->addField('nb_user');
     $output = $report->format($formater);
-    $this->assertEquals($output, "id\tname\tdomain_name\tnb_user\t\n"
-                                ."1\tAdmin\tglobal.virt\t0\t\n"
-                                ."2\tCommercial\tglobal.virt\t0\t\n"
-                                ."3\tProduction\tglobal.virt\t0\t\n"
-                                ."4\tDÃ©veloppeur\tzz.com\t1\t\n");
+    $this->assertContains("id\tname\tdomain_name\tnb_user\t\n", $output);
+    $this->assertContains("1\tAdmin\tglobal.virt\t0\t\n", $output);
+    $this->assertContains("2\tCommercial\tglobal.virt\t0\t\n", $output);
+    $this->assertContains("3\tProduction\tglobal.virt\t0\t\n", $output);
+    $this->assertContains("4\tDeveloppeur\tzz.com\t1\t\n", $output);
     unset($report);
     $filter1 = new GenericFilter('nb_user','>','0');
     $report = ReportFactory::getReport(array($filter1),'group');
     $output = $report->format($formater);
     $this->assertEquals($output, "id\tname\tdomain_name\tnb_user\t\n"
-                                ."4\tDÃ©veloppeur\tzz.com\t1\t\n");
+                                ."4\tDeveloppeur\tzz.com\t1\t\n");
     unset($report);
     $filter2 = new GenericFilter('domain_name','=','global.virt');
     $report = ReportFactory::getReport(array($filter1,$filter2),'group');

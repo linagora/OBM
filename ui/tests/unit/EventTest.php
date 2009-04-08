@@ -77,7 +77,7 @@ class EventTest extends OBM_Database_TestCase {
       'description' => 'Description' ,
       'duration' => 3600,
       'repeat_days' => '0000000', 
-      'user' => array (0 => '2'),
+      'user' => array (0 => '4'),
       'resource' => array(0 => 1),
       'contact' => array ()
     );
@@ -123,7 +123,7 @@ class EventTest extends OBM_Database_TestCase {
       'description' => 'Description' ,
       'duration' => 3600,
       'repeat_days' => '0000000', 
-      'user' => array (0 => '2'),
+      'user' => array (0 => '4'),
       'resource' => array(0 => 1),
       'contact' => array()
     );    
@@ -169,7 +169,7 @@ class EventTest extends OBM_Database_TestCase {
       'description' => 'Description' ,
       'duration' => 3600,
       'repeat_days' => '0000000', 
-      'user' => array (0 => '2'),
+      'user' => array (0 => '4'),
       'resource' => array(0 => 1),
       'contact' => array()
     );    

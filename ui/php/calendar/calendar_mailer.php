@@ -48,7 +48,7 @@ class CalendarMailer extends OBM_Mailer {
     }
   }
 
-  protected function EventStateUpdate($event, $user) {
+  protected function eventStateUpdate($event, $user) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients(array($event->owner));
     $this->subject = __('Participation updated on OBM: %title%', array('%title%' => $event->title));
@@ -77,7 +77,7 @@ class CalendarMailer extends OBM_Mailer {
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
   }
 
-  protected function ResourceStateUpdate($event, $res) {
+  protected function resourceStateUpdate($event, $res) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients(array($event->owner));
     $this->subject = __('Resource participation updated on OBM: %title%', array('%title%' => $event->title));

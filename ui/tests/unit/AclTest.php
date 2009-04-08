@@ -224,7 +224,7 @@ class AclTest extends OBM_Database_TestCase {
       'access' => 0, 'read' => 1, 'write' => 1, 'admin' => 0
     ));
     $consumers = OBM_Acl::getEntityConsumers('cv', 1);
-    $this->assertEquals($consumers[0], array('id' => 4, 'label' => 'DÃ©veloppeur', 'consumer' => 'group',
+    $this->assertEquals($consumers[0], array('id' => 4, 'label' => 'Developpeur', 'consumer' => 'group',
       'access' => 0, 'read' => 1, 'write' => 0, 'admin' => 0
     ));
     $this->assertEquals($consumers[1], array('id' => 2, 'label' => 'Admin domainezz.com', 'consumer' => 'user',
@@ -278,7 +278,7 @@ class AclTest extends OBM_Database_TestCase {
     $this->pdo->exec('INSERT INTO Entity (entity_mailing) VALUES (TRUE)');
     $entityId = $this->pdo->lastInsertId();
     $query = "INSERT INTO CalendarEntity (calendarentity_entity_id, calendarentity_calendar_id)
-              VALUES ($entityId, $userId)";
+              SELECT MAX(entity_id), $userId FROM Entity";
     $this->pdo->exec($query);
     return $entityId;
   }

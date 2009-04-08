@@ -1355,9 +1355,6 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $entity_state = $occurrence->entity_state;
   $all_day = ($event->all_day)?1:0;
   $entityClass = $calendar_entity[$entity][$entity_id]['class'];
-  if ($entity_state == 'NEEDS-ACTION') {
-    $entityClass .= '_W';
-  }
   $eventColor = $event->color;
   $ed[] = "id:$id";
   $ed[] = "entity:'$entity'";
@@ -2294,7 +2291,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         <td>$sel_alert</td>
         <td class=\"C\">
         <input $ACCEPTED type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_A</span>
-  <input ${'NEEDS-ACTION'} type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_W</span>
+        <input ${'NEEDS-ACTION'} type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_W</span>
         <input $DECLINED type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_R</span>
         </td>
         </tr>";
@@ -2399,7 +2396,15 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         ";
           $$state = '';
         } else {
-          $dis_resource_list .= "<tr><td>$label $property[$r_id]</td><td class=\"C\" >".$GLOBALS["l_$state"].'</td></tr>';
+          $ACCEPTED = 'class="disabled"';
+          ${'NEEDS-ACTION'} = 'class="disabled"';
+          $DECLINED = 'class="disabled"';
+          $$state = '';
+          $dis_resource_list .= "<tr><td>$label</td><td class=\"C\">
+          <input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_A</span>
+          <input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_W</span>
+          <input style='visibility:hidden;' disabled='disabled' type=\"radio\" name=\"rd_user_decision_$r_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_R</span>
+            </td></tr>";          
         }
       }
       $dis_resource_block = "
@@ -2635,6 +2640,7 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
             <h3>$l_items</h3>
           </div>
       </div>
+    </div>
     </div>
     <script type=\"text/javascript\">
       obm.calendarQuickForm = new Obm.CalendarQuickForm();
@@ -3826,6 +3832,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   }
 
   $users_id = $sel_entity_id['user'];
+  
   if (count($users_id > 0)) {
     $users = get_userobm_from_ids($users_id);
   } else {
@@ -4432,7 +4439,7 @@ function json_event_data($id,$calendar) {
         $info[] = "entity:'$entity'";
         $info[] = "entity_id:$entity_id";
         $info[] = "klass:'".$entity_data['class']."'";
-        $info[] = "state:'".$entities[$entity]['entity'][$entity_id]['state']."'";
+        $info[] = "status:'".$entities[$entity]['entity'][$entity_id]['state']."'";
         if($entity_id = $obm['uid'] && $entity == 'user') {
           $opt = array_merge($opt,$updatable);
         }

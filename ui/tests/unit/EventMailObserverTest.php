@@ -52,6 +52,7 @@ class EventMailObserverTest extends OBM_Database_TestCase {
     $this->mailObserver = new OBM_EventMailObserver();
     OBM_EventFactory::getInstance()->attach($this->mailObserver);
     Stato_Mailer::setDefaultTransport(new Stato_StaticTransport());
+    OBM_Acl::initialize();
   }
 
   public function tearDown() {
@@ -84,7 +85,7 @@ class EventMailObserverTest extends OBM_Database_TestCase {
     $event = OBM_EventFactory::getInstance()->create($data);
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('New event on OBM: Title',$mailData[0]['subject']);
-    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
+    $this->assertEquals("Jane Doe <editeur1@zz.com>", $mailData[0]['to']);
     $this->assertContains("Message automatique envoyé par OBM
 ------------------------------------------------------------------
 NOUVEAU RENDEZ-VOUS !
@@ -120,7 +121,7 @@ auteur : domainezz.com Admin
     OBM_EventFactory::getInstance()->delete($event);
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Event cancelled on OBM: Title',$mailData[0]['subject']);
-    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
+    $this->assertEquals("Jane Doe <editeur1@zz.com>", $mailData[0]['to']);
     $this->assertContains("Message automatique envoyé par OBM
 ------------------------------------------------------------------
 RENDEZ-VOUS ANNULÉ !
@@ -154,14 +155,14 @@ auteur : domainezz.com Admin
 
   public function testModifyEventMail() {
     $event = OBM_EventFactory::getInstance()->getById(1);
-    $event->add('user',4);
+    $event->add('user',2);
     $event->add('user',3);
-    $event->del('user',2);
+    $event->del('user',4);
     $event->location = 'New Location';
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('New event on OBM: Title',$mailData[0]['subject']);
-    $this->assertEquals("Jane Doe <editeur1@zz.com>", $mailData[0]['to']);
+    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
     $this->assertContains("Message automatique envoyé par OBM
 ------------------------------------------------------------------
 NOUVEAU RENDEZ-VOUS !
@@ -197,7 +198,7 @@ a été modifié et se déroulera du 24/03/2009 08:00 au 24/03/2009 09:00, (lieu
 ",$mailData[1]['content']);
 
     $this->assertEquals('Event cancelled on OBM: Title',$mailData[2]['subject']);
-    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[2]['to']);
+    $this->assertEquals("Jane Doe <editeur1@zz.com>", $mailData[2]['to']);
     $this->assertContains("Message automatique envoyé par OBM
 ------------------------------------------------------------------
 RENDEZ-VOUS ANNULÉ !
@@ -218,7 +219,7 @@ auteur : domainezz.com Admin
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Event updated on OBM: Title',$mailData[3]['subject']);
-    $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[3]['to']);
+    $this->assertEquals("Jane Doe <editeur1@zz.com>", $mailData[3]['to']);
     $this->assertContains("Message automatique envoyé par OBM
 ------------------------------------------------------------------
 RENDEZ-VOUS MODIFIÉ !

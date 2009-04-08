@@ -152,12 +152,12 @@ function run_query_resource_ext_search($resource) {
     FROM Resource
     LEFT JOIN ResourceType ON resource_rtype_id = resourcetype_id
     WHERE 
-      resource_name LIKE '$pattern%' 
+      resource_name #LIKE '$pattern%' 
       $multidomain
       $where_filter_entity";
 
   display_debug_msg($query, $cdg_sql, 'run_query_resource_ext_search()');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   $obm_q->next_record();
   $resultsCount = $obm_q->f('resultscount')+0;
   $query = "SELECT 
@@ -172,7 +172,7 @@ function run_query_resource_ext_search($resource) {
     LEFT JOIN ResourceType ON resource_rtype_id = resourcetype_id
     LEFT JOIN ResourceItem ON resourceitem_resourcetype_id = resourcetype_id
     WHERE 
-      resource_name LIKE '$pattern%' 
+      resource_name #LIKE '$pattern%' 
       $multidomain
       $where_filter_entity
     GROUP BY resource_id, resource_name, resource_qty, resource_rtype_id, resourcetype_property, resourcetype_pkind 
@@ -180,7 +180,7 @@ function run_query_resource_ext_search($resource) {
     LIMIT $limit OFFSET $first_row";
 
   display_debug_msg($query, $cdg_sql, 'run_query_resource_ext_search()');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   return array('length' => $resultsCount, 'datas' => $obm_q);
 }
 

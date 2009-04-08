@@ -311,7 +311,7 @@ class OBM_Acl {
     if ($action === null) {
       $columns = array_merge($columns, self::getRightColumns());
     }
-    $query = self::getAclQuery($columns, $entityType, $entityId, null, null, '', '', false);
+    $query = self::getAclQuery($columns, $entityType, $entityId, null, $action, '', '', false);
     self::$db->query($query);
     self::log($query, 'getEntityUsers');
     $users = array();

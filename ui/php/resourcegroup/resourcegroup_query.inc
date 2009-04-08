@@ -118,13 +118,13 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
       count(*) as resultscount
     FROM RGroup
     WHERE 
-      rgroup_name LIKE '$pattern%'
+      rgroup_name #LIKE '$pattern%'
       AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = $obm[uid]))
       $multidomain
  ";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_ext_search()");
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   $obm_q->next_record();
   $resultsCount = $obm_q->f("resultscount") + 0;
 
@@ -134,13 +134,13 @@ function run_query_resourcegroup_ext_search($resourcegroup) {
       rgroup_desc
     FROM RGroup
     WHERE 
-      rgroup_name LIKE '$pattern%' 
+      rgroup_name #LIKE '$pattern%' 
       AND (rgroup_privacy = 0  OR (rgroup_privacy = 1 AND rgroup_usercreate = $obm[uid]))
       $multidomain
     ORDER BY rgroup_name,rgroup_desc,rgroup_id";
 
   display_debug_msg($query, $cdg_sql, "run_query_resourcegroup_ext_search()");
-  $obm_q->query($query);
+  $obm_q->xquery($query);
 
   return array('length' => $resultsCount, 'datas' => $obm_q);
 }
