@@ -48,6 +48,7 @@ $l_can_delete = "Host can be delete";
 $l_err_host_name_empty = "Host name must be fill";
 $l_err_host_name_exist = "Host name already used";
 $l_err_host_name = "Invalid host name";
+$l_err_host_windows_not_global = "A windows host can not be in the Global domain !";
 $l_check_samehost = "This host seems similar to the new host";
 
 $l_err_host_ip_exist = "Host IP address already used";

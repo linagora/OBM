@@ -47,6 +47,7 @@ $l_can_delete = "L'hôte peut être supprimé";
 $l_err_host_name_empty = "Le nom de l'hôte doit être renseigné";
 $l_err_host_name_exist = "Le nom de l'hôte est déjà utilisé";
 $l_err_host_name = "Le nom de l'hôte est incorrect";
+$l_err_host_windows_not_global = "Un hôte windows ne peut pas appartenir au domaine global !";
 $l_check_samehost = "Ces hôtes semblent similaires à l'hôte saisi";
 
 $l_err_host_ip_exist = "L'adresse IP de l'hôte est déjà utilisée";

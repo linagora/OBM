@@ -366,15 +366,19 @@ function run_query_host_delete($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  // Mise a jour du lien vers user
   // If this host exists in Prod table, Insert it in Deleted table
-  $query = "SELECT host_id, host_delegation, host_domain_id FROM P_Host WHERE host_id $sel_id AND host_id NOT IN (SELECT deleted_entity_id FROM Deleted WHERE deleted_table = 'Host')";
+  $query = "SELECT host_id,
+    host_delegation,
+    host_domain_id
+  FROM P_Host
+  WHERE host_id
+    $sel_id
+    AND host_id NOT IN (SELECT deleted_entity_id FROM Deleted WHERE deleted_table = 'Host')";
   display_debug_msg($query, $cdg_sql, 'run_query_host_delete(auto)');
   $obm_q->query($query);
   $obm_q->next_record();
   $delegation = $obm_q->f('host_delegation');
   $domain_id = $obm_q->f('host_domain_id');
-
 
   if ($obm_q->num_rows() > 0) {
     $uid = sql_parse_id($obm['uid']);
@@ -532,6 +536,7 @@ function run_query_check_host($id, $name, $desc) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Host context checking (same hosts exists ?)
 // Parameters:
@@ -543,6 +548,7 @@ function run_query_check_host($id, $name, $desc) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_host_can_delete($id) {
   global $cdg_sql, $err;
+
   $delete_ok = true;
   $query = "
     SELECT count(*) as count FROM ServiceProperty 
@@ -553,7 +559,7 @@ function check_host_can_delete($id) {
   display_debug_msg($query, $cdg_sql, 'check_host_can_delete');
   $obm_q->query($query);
   $obm_q->next_record();
-  if($obm_q->f('count') != 0) {
+  if ($obm_q->f('count') != 0) {
     $delete_ok = false;
     $err['msg'] .= $GLOBALS['l_cant_delete'];
   }
@@ -567,7 +573,7 @@ function check_host_can_delete($id) {
   display_debug_msg($query, $cdg_sql, 'check_host_can_delete');
   $obm_q->query($query);
   $obm_q->next_record();
-  if($obm_q->f('count') != 0) {
+  if ($obm_q->f('count') != 0) {
     $delete_ok = $delete_ok && true;
   } 
 
@@ -575,9 +581,11 @@ function check_host_can_delete($id) {
   if (! check_host_update_rights(array('host_id' => $id))) {
     $delete_ok = false;
   }  
+
   return $delete_ok;
-  
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Host context checking (same hosts exists ?)
 // Parameters:
@@ -640,11 +648,13 @@ function check_host_data_form($host) {
   global $cgp_use, $err, $l_err_host_name;
   global $php_regexp_ip, $l_err_host_ip, $l_err_host_ip_exist,$php_regexp_fqdn;
   global $l_err_host_ip_not_in_lan, $l_err_firewall_perms, $l_err_web_all;
-  global $l_err_host_fqdn;
+  global $l_err_host_windows_not_global, $l_err_host_fqdn;
 
   $id = $host['host_id'];
   $name = $host['name'];
   $ip = $host['ip'];
+  $samba = $host['samba'];
+  $domain_id = $host['domain_id'];
   $fqdn = $host['fqdn'];
   $web_list = $host['web_list'];
   $web_all = $host['web_all'];     
@@ -695,14 +705,23 @@ function check_host_data_form($host) {
       }
     }
   }
+
   // Host FQDN correct
   if (trim($fqdn) != '' && !preg_match($php_regexp_fqdn, $fqdn)) {
     $err['msg'] = " $fqdn : $l_err_host_fqdn";
     $err['field'] = 'fqdn';
     return false;
-  }  
+  }
+
   // XXXXXXX verifier ici + fichiers de langue
   $d = of_domain_get_domain_infos($domain_id, true);
+
+  // MANDATORY: If windows host, domain can not be global (0)
+  if ($samba == '1' && $d['global'] == '1') {
+    $err['msg'] = "$l_err_host_windows_not_global";
+    $err['field'] = 'samba';
+    return false;
+  }
 
   // Les contraintes sur la delegation ne sont pas valables pour le domaine global
   if (!$d['global'] && $cgp_use['property']['delegation']) {
