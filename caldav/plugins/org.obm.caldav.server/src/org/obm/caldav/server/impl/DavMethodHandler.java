@@ -14,6 +14,6 @@ public abstract class DavMethodHandler {
 		
 	}
 
-	public abstract void process(HttpServletRequest req, HttpServletResponse resp);
+	public abstract void process(Token token, HttpServletRequest req, HttpServletResponse resp);
 	
 }
