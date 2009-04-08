@@ -48,8 +48,8 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   global $module, $cright_write_admin, $perm;
 
   if (($fieldname == 'group_name')) {
-    if ($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_group_get_id(".$OD->data_set->f("group_id").",'".addslashes($OD->data_set->f("group_name"))."');";
+    if ($OD->display_ext == 'get_id') {
+      $res['url'] = 'javascript:check_group_get_id('.$OD->data_set->f('group_id').",'".addslashes($OD->data_set->f('group_name'))."');";
     } else {
       if ($link_ok) {
         $res['url'] = "$path/group/group_index.php?action=detailconsult&amp;group_id=".$OD->data_set->f('group_id');
@@ -109,7 +109,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 
   // For User member lists
   elseif (($fieldname == 'group_user_login') && $link_ok) {
-    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f('group_user_id');
+    $res['url'] = "$path/user/user_index.php?action=detailconsult&amp;user_id=".$OD->data_set->f('group_user_id');
   }
 
   else if ($fieldname == 'group_user_email') {
@@ -118,7 +118,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
       $res['align'] = 'center';
       $res['name'] = '-';
     } elseif (strcmp($email ,'') != 0) {
-      $email = get_entity_email($email, $OD->data_set->f("domain_name"));
+      $email = get_entity_email($email, $OD->data_set->f('domain_name'));
       $res['url'] = "mailto:$email";
       $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\">$email";
       $res['txt_name'] = "$email";
@@ -129,7 +129,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == 'group_email') {
     $email = $OD->data_set->f('group_email');
     if (strcmp($email,'') != 0) {
-      $email = get_entity_email($email, $OD->data_set->f("domain_name"));
+      $email = get_entity_email($email, $OD->data_set->f('domain_name'));
       $res['url'] = "mailto:$email";
       $res['name'] = "<img src=\"$ico_mail\" alt=\"$email\" />$email";
       $res['txt_name'] = $email;
@@ -156,7 +156,7 @@ function html_group_search_form ($group) {
     $child_res = "<input name=\"child_res\" type=\"hidden\" value=\"1\">";
   }
 
-  if ($group['restriction_calendar'] == "calendar") {
+  if ($group['restriction_calendar'] == 'calendar') {
     $cal_res = "<input type=\"hidden\" name=\"restriction_calendar\" value=\"calendar\" />";
   }
   if (isset($group['iso_date'])) {
@@ -207,7 +207,7 @@ function html_group_search_form ($group) {
   // --- HTML Page display ----------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_search\" action=\"".url_prepare("group_index.php")."\" class=\"search\">
+  <form method=\"get\" name=\"f_search\" action=\"".url_prepare('group_index.php')."\" class=\"search\">
 
     <label>$l_name<br />
       <input name=\"tf_name\" size=\"16\" maxlength=\"256\" value=\"$name\" />
@@ -300,7 +300,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
   $name = urlencode(stripslashes($group['name']));
   $delegation = urlencode(stripslashes($group['delegation']));
   $user = urlencode(stripslashes($group['user']));
-  $privacy = $group["privacy"];
+  $privacy = $group['privacy'];
 
   $url = url_prepare("group_index.php?action=search&amp;tf_name=$name&amp;tf_user=$user&amp;tf_delegation=$delegation&amp;privacy=$privacy$url_ext");
   
@@ -328,10 +328,10 @@ function html_group_search_group($obm_q, $prefs, $group) {
       $dis_group->data_form_head = "
       <form onsubmit=\"of_select_fill_from_checkbox(this); return false;\" > ";
     } elseif ($ext_widget != '') {
-      $dis_group->display_ext = "get_id";
+      $dis_group->display_ext = 'get_id';
       $dis_group->data_form_head = "
       <form onsubmit=\"fill_ext_form(this); return false;\">";
-      $dis_group->data_form_end = "";
+      $dis_group->data_form_end = '';
     } else {
       $dis_group->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
@@ -343,7 +343,7 @@ function html_group_search_group($obm_q, $prefs, $group) {
 
   $dis_group->data_set = $obm_q;
   $dis_group->data_url = $url;
-  $dis_group->data_header = "both";
+  $dis_group->data_header = 'both';
 
   // --- HTML Template --------------------------------------------------------
   $block .= $dis_group->display('dis_data_group');
@@ -744,10 +744,10 @@ function html_group_form($action, $group_q, $group, $field='') {
     $dis_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"".$priv."\" />".$dis_private;
   }
 
-  $display["title"] = $dis_title;
+  $display['title'] = $dis_title;
 
   $block = "
-  <form method=\"get\" name=\"f_entity\" action=\"".url_prepare("group_index.php")."\">
+  <form method=\"get\" name=\"f_entity\" action=\"".url_prepare('group_index.php')."\">
 <fieldset class=\"detail infos\">
   <legend>$l_group</legend>
 
@@ -882,14 +882,14 @@ function dis_group_warn_insert($id, $g_q, $group) {
   </div>
   <div class=\"buttons\">
     <form method=\"post\" name=\"form_insert\"
-    action=\"" .url_prepare("group_index.php") . "\">
+    action=\"" .url_prepare('group_index.php') . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     $hidden_fields
     <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
     </form>
     <form name=\"form_back\" method=\"get\"
-    action=\"" .url_prepare("group_index.php") . "\">
+    action=\"" .url_prepare('group_index.php') . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     $hidden_fields
     <input type=\"submit\" value=\"$l_back\" />
@@ -916,7 +916,7 @@ function dis_group_admin_index() {
  **/
 function dis_group_import_index() {
   global $display, $l_group, $l_header_import;
-  global $l_name, $l_email, $l_file_format, $l_user_member;
+  global $l_name, $l_email, $l_file_format, $l_user_member, $l_login;
 
 
   $block = "
@@ -928,7 +928,7 @@ function dis_group_import_index() {
   <tr>
     <th>$l_name</th>
     <th>$l_email</th>
-    <th>$l_user_member</th>
+    <th>$l_user_member ($l_login)</th>
   </tr>
   </thead>
   <tr>
@@ -952,7 +952,7 @@ function html_group_import_file() {
   global $l_group, $l_header_import, $l_file, $l_import_file;
   global $display;
 
-  $url = url_prepare("group_index.php");
+  $url = url_prepare('group_index.php');
 
   $block = "
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
@@ -999,7 +999,7 @@ function dis_group_import_file_run($params) {
   </tr>
   </thead>";
   $obm_q = new DB_OBM;
-  $multidomain = sql_multidomain("group");
+  $multidomain = sql_multidomain('group');
   $num_line = 0;
   $fh = fopen($file, 'r');
   while ( ($row = fgetcsv($fh, 4000, $csv_sep)) ) {
@@ -1016,7 +1016,7 @@ function dis_group_import_file_run($params) {
       AND (group_privacy=0 OR group_usercreate='$obm[uid]')
       $multidomain";
 
-    display_debug_msg($query, $cdg_sql, "run_group_import_file()");
+    display_debug_msg($query, $cdg_sql, 'run_group_import_file()');
     $obm_q->query($query);
 
     if ($obm_q->num_rows() > 0) {
@@ -1024,12 +1024,12 @@ function dis_group_import_file_run($params) {
       $obm_q->next_record();
       $group['id'] = $obm_q->f('group_id');
       $group['name'] = $obm_q->f('group_name');
-      $res = "=$group[name]";
+      $res = "=$group[name] : ";
     } else {
       // Insert the group
       if (check_group_data_form($group)) {
 	$group['id'] = run_query_group_insert($group);
-	$res = '+';
+	$res = "+$group[name] : ";
       } else {
 	// Group not ok, stop for this row
 	$group['id'] = false;
@@ -1039,6 +1039,7 @@ function dis_group_import_file_run($params) {
 
     // Insert group user membership
     if ($group['id'] > 0) {
+      $coma = '';
       $login = strtok($group['users_login'],',');
       while($login) {
 	$user_id = get_user_id($login);
@@ -1048,7 +1049,7 @@ function dis_group_import_file_run($params) {
             FROM UserObmGroup
             WHERE userobmgroup_group_id='$group[id]'
               AND userobmgroup_userobm_id=$user_id";
-	  display_debug_msg($query, $cdg_sql, "run_group_import_file(2)");
+	  display_debug_msg($query, $cdg_sql, 'run_group_import_file(2)');
 	  $obm_q->query($query);
 	  $obm_q->next_record();
 	  if ($obm_q->f('nb') == '0') {
@@ -1056,12 +1057,13 @@ function dis_group_import_file_run($params) {
               userobmgroup_group_id,
               userobmgroup_userobm_id)
             VALUES ($group[id], $user_id)";
-	    display_debug_msg($query, $cdg_sql, "run_group_import_file(3)");
+	    display_debug_msg($query, $cdg_sql, 'run_group_import_file(3)');
 	    $obm_q->query($query);
-	    $res .= 'u';
+	    $res .= "$coma$login";
 	  } else {
-	    $res .= '.';
+	    $res .= "$coma(=$login)";
 	  }
+	  $coma = ',';
 	}
 	$login = strtok(',');
       }
@@ -1132,6 +1134,7 @@ function json_search_group($group,$results) {
   $display['json'] = '{length:'.$results['length'].', datas:['.implode(',',$groups).']}';
 }
 
+
 /**
  * Generate email field  
  * 
@@ -1187,15 +1190,14 @@ function dis_group_mail_field($values,$class) {
     <option value=\"\">$GLOBALS[l_all_aliases]</option>
     $sel_alias
     </select>";
-  if($GLOBALS['c_max_group_alias'] ==0 || $count < $GLOBALS['c_max_group_alias']) {
+  if ($GLOBALS['c_max_group_alias'] ==0 || $count < $GLOBALS['c_max_group_alias']) {
     $email_block .= "
       <div class=\"multiple\">
       <a onclick=\"remove_element(this.parentNode,'groupMailHome'); show_hide_add_button();return false\" href=\"\">
        <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
       </a>        
       <input name='tf_email[]' value='' /> @ $sel_alias 
-      </div>         
-      ";
+      </div>";
     $count++;
   } 
   if($GLOBALS['c_max_group_alias'] ==0 || $count < $GLOBALS['c_max_group_alias']) {
@@ -1213,8 +1215,7 @@ function dis_group_mail_field($values,$class) {
   </th>
   <td id='groupMailHome'>
   $email_block
-  </td>
-  ";
+  </td>";
 
   return $email_block;
 }

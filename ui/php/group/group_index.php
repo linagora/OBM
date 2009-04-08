@@ -49,7 +49,7 @@
 $path = '..';
 $module = 'group';
 $obminclude = getenv('OBM_INCLUDE_VAR');
-if ($obminclude == "") $obminclude = 'obminclude';
+if ($obminclude == '') $obminclude = 'obminclude';
 include("$obminclude/global.inc");
 $params = get_group_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
@@ -91,75 +91,75 @@ if (($action == 'index') || ($action == '')) {
   $display['search'] = html_group_search_form($params);
   $display['result'] = dis_group_search_group($params);
 
-} elseif ($action == "ext_search") {
+} elseif ($action == 'ext_search') {
 ///////////////////////////////////////////////////////////////////////////////
   $grp_q = run_query_group_ext_search($params);
   json_search_group($params, $grp_q);
-  echo "(".$display['json'].")";
+  echo '('.$display['json'].')';
   exit();
 
-} else if ($action == "new") {
+} else if ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_group_form($action, "", $params);
+  $display['detail'] = html_group_form($action, '', $params);
 
-} else if ($action == "detailconsult") {
+} else if ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_group_consult($params, $obm["uid"]);
+  $display['detail'] = dis_group_consult($params, $obm['uid']);
 
-} else if ($action == "detailupdate") {
+} else if ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_update_rights($params)) {
-    $obm_q = run_query_group_detail($params["group_id"]);
-    $display["detail"] = html_group_form($action, $obm_q, $params);
+    $obm_q = run_query_group_detail($params['group_id']);
+    $display['detail'] = html_group_form($action, $obm_q, $params);
   } else {
-    $display["msg"] .= display_warn_msg($err['msg']);
+    $display['msg'] .= display_warn_msg($err['msg']);
   }
 
-} else if ($action == "insert") {
+} else if ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_group_data_form($params)) {
 
     // If the context (same group) was confirmed ok, we proceed
-    if ($params["confirm"] == $c_yes) {
-      $params["group_id"] = run_query_group_insert($params);
-      if ($params["group_id"] > 0) {
+    if ($params['confirm'] == $c_yes) {
+      $params['group_id'] = run_query_group_insert($params);
+      if ($params['group_id'] > 0) {
 	if (! isset($params['privacy']) || ($params['privacy'] == '0')) {
 	  set_update_state();
 	}
-	$display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");
-	$display["detail"] = dis_group_consult($params, $obm["uid"]);
+	$display['msg'] .= display_ok_msg("$l_group : $l_insert_ok");
+	$display['detail'] = dis_group_consult($params, $obm['uid']);
       } else {
-	$display["msg"] .= display_err_msg("$l_group : $l_insert_error");
-	$display["search"] = html_group_search_form($params);
+	$display['msg'] .= display_err_msg("$l_group : $l_insert_error");
+	$display['search'] = html_group_search_form($params);
       }
       
       // If it is the first try, we warn the user if some groups seem similar
     } else {
-      $obm_q = check_group_context("", $params);
+      $obm_q = check_group_context('', $params);
       if ($obm_q->num_rows() > 0) {
-	$display["detail"] = dis_group_warn_insert("", $obm_q, $params);
+	$display['detail'] = dis_group_warn_insert('', $obm_q, $params);
       } else {
-	$params["group_id"] = run_query_group_insert($params);
-	if ($params["group_id"] > 0) {
+	$params['group_id'] = run_query_group_insert($params);
+	if ($params['group_id'] > 0) {
 	  if (! isset($params['privacy']) || ($params['privacy'] == '0')) {
 	    set_update_state();
 	  }
-	  $display["msg"] .= display_ok_msg("$l_group : $l_insert_ok");
-	  $display["detail"] = dis_group_consult($params, $obm["uid"]);
+	  $display['msg'] .= display_ok_msg("$l_group : $l_insert_ok");
+	  $display['detail'] = dis_group_consult($params, $obm['uid']);
 	} else {
-	  $display["msg"] .= display_err_msg("$l_group : $l_insert_error");
-	  $display["search"] = html_group_search_form($params);
+	  $display['msg'] .= display_err_msg("$l_group : $l_insert_error");
+	  $display['search'] = html_group_search_form($params);
 	}
       }
     }
     
     // Form data are not valid
   } else {
-    $display["msg"] .= display_err_msg($err["msg"]);
-    $display["detail"] = html_group_form($action, "", $params, $err["field"]);
+    $display['msg'] .= display_err_msg($err['msg']);
+    $display['detail'] = html_group_form($action, '', $params, $err['field']);
   }
 
-} elseif ($action == "update") {
+} elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_group_data_form($params)) {
     $retour = run_query_group_update($params);
@@ -169,88 +169,88 @@ if (($action == 'index') || ($action == '')) {
       if ($g['privacy'] == 0) {
 	set_update_state();
       }
-      $display["msg"] .= display_ok_msg("$l_group : $l_update_ok");
+      $display['msg'] .= display_ok_msg("$l_group : $l_update_ok");
     } else {
-      $display["msg"] .= display_err_msg("$l_group : $l_update_error");
+      $display['msg'] .= display_err_msg("$l_group : $l_update_error");
     }
-    $display["detail"] = dis_group_consult($params, $obm["uid"]);
+    $display['detail'] = dis_group_consult($params, $obm['uid']);
   } else {
-    $display["msg"] .= display_err_msg($err["msg"]);
-    $params_q = run_query_group_detail($params["group_id"]);
-    $display["detail"] = html_group_form($action, $params_q, $params, $err["field"]);
+    $display['msg'] .= display_err_msg($err['msg']);
+    $params_q = run_query_group_detail($params['group_id']);
+    $display['detail'] = html_group_form($action, $params_q, $params, $err['field']);
   }
 
-} elseif ($action == "check_delete") {
+} elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_group_can_delete($params["group_id"])) {
-    $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_group_can_delete($params["group_id"]);
+  if (check_group_can_delete($params['group_id'])) {
+    $display['msg'] .= display_info_msg($ok_msg, false);
+    $display['detail'] = dis_group_can_delete($params['group_id']);
   } else {
-    $display["msg"] .= display_warn_msg($err["msg"], false);
-    $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_group_consult($params, $obm["uid"]);
+    $display['msg'] .= display_warn_msg($err['msg'], false);
+    $display['msg'] .= display_warn_msg($l_cant_delete, false);
+    $display['detail'] = dis_group_consult($params, $obm['uid']);
   }
 
-} elseif ($action == "delete") {
+} elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_group_can_delete($params["group_id"])) {
-    $retour = run_query_group_delete($params["group_id"]);
+  if (check_group_can_delete($params['group_id'])) {
+    $retour = run_query_group_delete($params['group_id']);
     if ($retour) {
       // Set update state only if the deleted group is public
       $g = get_group_info($params['group_id']);
       if ($g['privacy'] == 0) {
 	set_update_state();
       }
-      $display["msg"] .= display_ok_msg("$l_group : $l_delete_ok");
+      $display['msg'] .= display_ok_msg("$l_group : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg("$l_group : $l_delete_error");
+      $display['msg'] .= display_err_msg("$l_group : $l_delete_error");
     }
-    $display["search"] = html_group_search_form("");
+    $display['search'] = html_group_search_form('');
   } else {
-    $display["msg"] .= display_warn_msg($err["msg"], false);
-    $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_group_consult($params, $obm["uid"]);
+    $display['msg'] .= display_warn_msg($err['msg'], false);
+    $display['msg'] .= display_warn_msg($l_cant_delete, false);
+    $display['detail'] = dis_group_consult($params, $obm['uid']);
   }
 
-} elseif ($action == "user_add") {
+} elseif ($action == 'user_add') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_update_rights($params)) {
-    if ($params["user_nb"] > 0) {
+    if ($params['user_nb'] > 0) {
       $nb = run_query_group_usergroup_insert($params);
       // Set update state only if updated group is public
       $g = get_group_info($params['group_id']);
       if ($g['privacy'] == 0) {
 	set_update_state();
       }
-      $display["msg"] .= display_ok_msg("$nb $l_user_added");
+      $display['msg'] .= display_ok_msg("$nb $l_user_added");
     } else {
-      $display["msg"] .= display_err_msg($l_no_user_added);
+      $display['msg'] .= display_err_msg($l_no_user_added);
     }
   } else {
-    $display["msg"] .= display_warn_msg($err['msg']);
+    $display['msg'] .= display_warn_msg($err['msg']);
   }
-  $display["detail"] = dis_group_consult($params, $obm["uid"]);
+  $display['detail'] = dis_group_consult($params, $obm['uid']);
 
-} elseif ($action == "user_del") {
+} elseif ($action == 'user_del') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_update_rights($params)) {
-    if ($params["user_nb"] > 0) {
+    if ($params['user_nb'] > 0) {
       $nb = run_query_group_usergroup_delete($params);
       // Set update state only if updated group is public
       $g = get_group_info($params['group_id']);
       if ($g['privacy'] == 0) {
 	set_update_state();
       }
-      $display["msg"] .= display_ok_msg("$nb $l_user_removed");
+      $display['msg'] .= display_ok_msg("$nb $l_user_removed");
     } else {
-      $display["msg"] .= display_err_msg($l_no_user_deleted);
+      $display['msg'] .= display_err_msg($l_no_user_deleted);
     }
   } else {
-    $display["msg"] .= display_warn_msg($err['msg']);
+    $display['msg'] .= display_warn_msg($err['msg']);
   }
-  $display["detail"] = dis_group_consult($params, $obm["uid"]);
+  $display['detail'] = dis_group_consult($params, $obm['uid']);
 
-} elseif ($action == "group_add") {
+} elseif ($action == 'group_add') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_update_rights($params)) {
     $nb_grp = run_query_group_group_checking($params);
@@ -262,87 +262,87 @@ if (($action == 'index') || ($action == '')) {
 	    set_update_state();
       }
       if ($nb_grp['diff_privacy'] == 0) {
-        $display["msg"] .= display_ok_msg("$nb $l_group_added");
+        $display['msg'] .= display_ok_msg("$nb $l_group_added");
       } else {
-        $display["msg"] .= display_warn_msg($l_warn_group_diff_privacy);
+        $display['msg'] .= display_warn_msg($l_warn_group_diff_privacy);
       }
     } else {
-      $display["msg"] .= display_err_msg($l_no_group_added);
+      $display['msg'] .= display_err_msg($l_no_group_added);
     }
   } else {
-    $display["msg"] .= display_warn_msg($err['msg']);
+    $display['msg'] .= display_warn_msg($err['msg']);
   }
-  $display["detail"] = dis_group_consult($params, $obm["uid"]);
+  $display['detail'] = dis_group_consult($params, $obm['uid']);
 
-} elseif ($action == "group_del") {
+} elseif ($action == 'group_del') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_update_rights($params)) {
-    if ($params["group_nb"] > 0) {
+    if ($params['group_nb'] > 0) {
       $nb = run_query_group_group_delete($params);
       // Set update state only if updated group is public
       $g = get_group_info($params['group_id']);
       if ($g['privacy'] == 0) {
 	set_update_state();
       }
-      $display["msg"] .= display_ok_msg("$nb $l_group_removed");
+      $display['msg'] .= display_ok_msg("$nb $l_group_removed");
     } else {
-      $display["msg"] .= display_err_msg($l_no_group_deleted);
+      $display['msg'] .= display_err_msg($l_no_group_deleted);
     }
   } else {
-    $display["msg"] .= display_warn_msg($err['msg']);
+    $display['msg'] .= display_warn_msg($err['msg']);
   }
-  $display["detail"] = dis_group_consult($params, $obm["uid"]);
+  $display['detail'] = dis_group_consult($params, $obm['uid']);
 
-} else if ($action == "display") {
+} else if ($action == 'display') {
 ///////////////////////////////////////////////////////////////////////////////
-  $prefs = get_display_pref($obm["uid"], "group", 1);
-  $prefs_u = get_display_pref($obm["uid"], "group_user", 1);
-  $display["detail"] = dis_group_display_pref($prefs, $prefs_u);
+  $prefs = get_display_pref($obm['uid'], 'group', 1);
+  $prefs_u = get_display_pref($obm['uid'], 'group_user', 1);
+  $display['detail'] = dis_group_display_pref($prefs, $prefs_u);
 
-} else if ($action == "dispref_display") {
-///////////////////////////////////////////////////////////////////////////////
-  update_display_pref($params);
-  $prefs = get_display_pref($obm["uid"], "group", 1);
-  $prefs_u = get_display_pref($obm["uid"], "group_user", 1);
-  $display["detail"] = dis_group_display_pref($prefs, $prefs_u);
-
-} else if ($action == "dispref_level") {
+} else if ($action == 'dispref_display') {
 ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($params);
-  $prefs = get_display_pref($obm["uid"], "group", 1);
-  $prefs_u = get_display_pref($obm["uid"], "group_user", 1);
-  $display["detail"] = dis_group_display_pref($prefs, $prefs_u);
+  $prefs = get_display_pref($obm['uid'], 'group', 1);
+  $prefs_u = get_display_pref($obm['uid'], 'group_user', 1);
+  $display['detail'] = dis_group_display_pref($prefs, $prefs_u);
 
-} elseif ($action == "import") {
+} else if ($action == 'dispref_level') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_group_import_index();
+  update_display_pref($params);
+  $prefs = get_display_pref($obm['uid'], 'group', 1);
+  $prefs_u = get_display_pref($obm['uid'], 'group_user', 1);
+  $display['detail'] = dis_group_display_pref($prefs, $prefs_u);
 
-} elseif ($action == "import_file") {
+} elseif ($action == 'import') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_group_import_file_run($params);
+  $display['detail'] = dis_group_import_index();
 
-} elseif ($action == "admin") {
+} elseif ($action == 'import_file') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_group_admin_index();
+  $display['detail'] = dis_group_import_file_run($params);
+
+} elseif ($action == 'admin') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_group_admin_index();
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
-} else if ($action == "ext_get_ids") {
-  $display["search"] = html_group_search_form($params);
-  if ($_SESSION['set_display'] == "yes") {
-    $display["result"] = dis_group_search_group($params);
+} else if ($action == 'ext_get_ids') {
+  $display['search'] = html_group_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_group_search_group($params);
   } else {
-    $display["msg"] .= display_info_msg($l_no_display);
+    $display['msg'] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "ext_get_id") {
+} elseif ($action == 'ext_get_id') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_group_search_form($params);
-  if ($_SESSION['set_display'] == "yes") {
-    $display["result"] = dis_group_search_group($params);
+  $display['search'] = html_group_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_group_search_group($params);
   } else {
-    $display["msg"] .= display_info_msg($l_no_display);
+    $display['msg'] .= display_info_msg($l_no_display);
   }
 
 }
@@ -354,11 +354,11 @@ of_category_user_action_switch($module, $action, $params);
 ///////////////////////////////////////////////////////////////////////////////
 // Update actions url in case some values have been updated (id after insert) 
 update_group_action();
-$display["head"] = display_head($l_group);
-if (! $params["popup"]) {
-  $display["header"] = display_menu($module);
+$display['head'] = display_head($l_group);
+if (! $params['popup']) {
+  $display['header'] = display_menu($module);
 }
-$display["end"] = display_end();
+$display['end'] = display_end();
 
 display_page($display);
 
