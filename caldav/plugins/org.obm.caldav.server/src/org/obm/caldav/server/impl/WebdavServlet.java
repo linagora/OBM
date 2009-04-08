@@ -1,6 +1,8 @@
 package org.obm.caldav.server.impl;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,14 +18,8 @@ public class WebdavServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1410911584964336424L;
 
-	private static final String METHOD_PROPFIND = "PROPFIND";
-	private static final String METHOD_PROPPATCH = "PROPPATCH";
-	private static final String METHOD_MKCOL = "MKCOL";
-	private static final String METHOD_COPY = "COPY";
-	private static final String METHOD_MOVE = "MOVE";
-	private static final String METHOD_LOCK = "LOCK";
-	private static final String METHOD_UNLOCK = "UNLOCK";
-
+	private Map<String, DavMethodHandler> handlers;
+	
 	/**
 	 * Handles the special WebDAV methods.
 	 */
@@ -36,45 +32,26 @@ public class WebdavServlet extends HttpServlet {
 			logger.info("[" + method + "] " + req.getRequestURI());
 		}
 
-		if (method.equals(METHOD_PROPFIND)) {
-			doPropfind(req, resp);
-		} else if (method.equals(METHOD_PROPPATCH)) {
-			doProppatch(req, resp);
-		} else if (method.equals(METHOD_MKCOL)) {
-			doMkcol(req, resp);
-		} else if (method.equals(METHOD_COPY)) {
-			doCopy(req, resp);
-		} else if (method.equals(METHOD_MOVE)) {
-			doMove(req, resp);
-		} else if (method.equals(METHOD_LOCK)) {
-			doLock(req, resp);
-		} else if (method.equals(METHOD_UNLOCK)) {
-			doUnlock(req, resp);
+		DavMethodHandler handler = handlers.get(method.toLowerCase());
+		if (handler != null) {
+			handler.process(req, resp);
 		} else {
 			super.service(req, resp);
 		}
-
+		
 	}
 
-	private void doUnlock(HttpServletRequest req, HttpServletResponse resp) {
-	}
-
-	private void doLock(HttpServletRequest req, HttpServletResponse resp) {
-	}
-
-	private void doMove(HttpServletRequest req, HttpServletResponse resp) {
-	}
-
-	private void doCopy(HttpServletRequest req, HttpServletResponse resp) {
-	}
-
-	private void doMkcol(HttpServletRequest req, HttpServletResponse resp) {
-	}
-
-	private void doProppatch(HttpServletRequest req, HttpServletResponse resp) {
-	}
-
-	private void doPropfind(HttpServletRequest req, HttpServletResponse resp) {
+	@Override
+	public void init() throws ServletException {
+		super.init();
+		handlers = new HashMap<String, DavMethodHandler>();
+		handlers.put("propfind", new PropFindHandler());
+		handlers.put("proppatch", new PropFindHandler());
+		handlers.put("mkcol", new PropFindHandler());
+		handlers.put("copy", new PropFindHandler());
+		handlers.put("move", new PropFindHandler());
+		handlers.put("lock", new PropFindHandler());
+		handlers.put("unlock", new PropFindHandler());
 	}
 
 }
