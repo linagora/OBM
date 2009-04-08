@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 public class PropFindHandler extends DavMethodHandler {
 
 	@Override
-	public void process(HttpServletRequest req, HttpServletResponse resp) {
+	public void process(Token t, HttpServletRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
 	}
 
