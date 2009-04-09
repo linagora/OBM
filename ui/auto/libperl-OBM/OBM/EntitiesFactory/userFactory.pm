@@ -183,9 +183,13 @@ sub _loadUsers {
     }
 
     my $query = 'SELECT '.$userTablePrefix.'UserObm.*,
-                        current.userobm_login as userobm_login_current
+                        current.userobm_login as userobm_login_current,
+                        group_gid
                  FROM '.$userTablePrefix.'UserObm
                  LEFT JOIN P_UserObm current ON current.userobm_id='.$userTablePrefix.'UserObm.userobm_id
+                 LEFT JOIN (SELECT group_gid, of_usergroup_user_id from UGroup
+                 			INNER JOIN of_usergroup ON of_usergroup_group_id = group_id WHERE group_gid = 512) AS grp
+                 			ON grp.of_usergroup_user_id = UserObm.userobm_id
                  WHERE '.$userTablePrefix.'UserObm.userobm_domain_id='.$self->{'domainId'};
 
     if( $self->{'ids'} ) {

@@ -319,7 +319,7 @@ sub _init {
             $userDesc->{'userobm_samba_group_sid'} = $self->_getGroupSID( $domainSid, $userDesc->{'userobm_gid'} );
 
             # Specific user UID
-            if( lc($userDesc->{'userobm_perms'}) eq 'admin' ) {
+            if ($userDesc->{'group_gid'}) {
                 $userDesc->{'userobm_uid'} = 0;
             }
 
