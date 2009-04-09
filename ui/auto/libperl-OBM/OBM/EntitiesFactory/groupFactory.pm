@@ -63,28 +63,7 @@ sub new {
     $self->{'entitiesDescList'} = undef;
 
     #Definition de la Description du groupe Host 515
-    $self->{'sambaHostGroup'} = {
-		'group_contacts' => undef,
-		'group_ext_id' => undef,
-		'group_samba' => '1',
-        'group_desc' => 'Host group',
-        'group_system' => '0',
-        'group_delegation' => '',
-        'group_userupdate' => undef,
-        'group_email' => '',
-        'group_mailing' => '0',
-        'group_name' => 'hosts',
-        'group_timecreate' => '',
-        'group_timeupdate' => '',
-        'group_manager_id' => undef,
-        'group_archive' => '0',
-        'group_privacy' => '0',
-        'group_usercreate' => '1',
-        'group_id' => '0',
-        'group_local' => '1',
-        'group_gid' => '515',
-        'group_name_current' => 'hosts',
-        'group_domain_id' => '2' };
+    $self->{'sambaHostGroup'} = $self->_getVirtualHost();
 
     return $self;
 }
@@ -265,4 +244,31 @@ sub _loadGroupLinks {
     $self->{'currentEntity'}->setLinks( $groupLinks->fetchall_arrayref({}) );
 
     return 0;
+}
+
+sub _getVirtualHost {
+	
+	return {
+		'group_contacts' => undef,
+		'group_ext_id' => undef,
+		'group_samba' => '1',
+        'group_desc' => 'Host group',
+        'group_system' => '0',
+        'group_delegation' => '',
+        'group_userupdate' => undef,
+        'group_email' => '',
+        'group_mailing' => '0',
+        'group_name' => 'hosts',
+        'group_timecreate' => '',
+        'group_timeupdate' => '',
+        'group_manager_id' => undef,
+        'group_archive' => '0',
+        'group_privacy' => '0',
+        'group_usercreate' => '1',
+        'group_id' => '0',
+        'group_local' => '1',
+        'group_gid' => '515',
+        'group_name_current' => 'hosts',
+        'group_domain_id' => '2' };
+	 
 }
