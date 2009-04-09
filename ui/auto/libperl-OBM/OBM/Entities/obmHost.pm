@@ -49,7 +49,7 @@ sub new {
         return undef;
     }
 
-    $self->{'objectclass'} = [ 'device', 'obmHost', 'sambaSamAccount' ];
+    $self->{'objectclass'} = [ 'device', 'obmHost', 'sambaSamAccount', 'posixAccount' ];
 
     return $self;
 }
@@ -84,6 +84,9 @@ sub _init {
         return 1;
     }
 
+    #Le gidNumber de l'hôte
+    $hostDesc->{'host_gid'} = undef;
+
     # Le nom de l'hôte
     if( !defined($hostDesc->{'host_name'}) ) {
         $self->_log( 'nom de l\'hôte non défini', 0 );
@@ -108,24 +111,6 @@ sub _init {
         $self->_log( 'ip de l\'hôte incorrecte. IP non prise en compte', 1 );
         delete( $hostDesc->{'host_ip'} );
     }
-
-#    # Les informations Samba
-#    if( $OBM::Parameters::common::obmModules->{'samba'} && $hostDesc->{'host_samba'} ) {
-#        $hostDesc->{'host_login'} = $hostDesc->{'system_host_name'}.'$';
-#        $hostDesc->{'host_samba_sid'} = $self->_getUserSID( $domainSid, $hostDesc->{'host_uid'} );
-#        $hostDesc->{'host_samba_group_sid'} = $self->_getGroupSID( $domainSid, $hostDesc->{'host_gid'} );
-#        $hostDesc->{'host_samba_flags'} = '[W]';
-#
-#        if( $self->_getNTLMPasswd( $hostDesc->{'system_host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
-#            $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 3 );
-#            if( $hostDesc->{'host_samba'} ) {
-#                $self->_log( 'droit samba annulé', 2 );
-#                $hostDesc->{'host_samba'} = 0;
-#            }
-#        }
-#    }else {
-#        $hostDesc->{'host_samba'} = 0;
-#    }
 
     $self->{'entityDesc'} = $hostDesc;
 
@@ -157,10 +142,14 @@ sub setLinks {
     }
 
     if( $hostDesc->{'host_samba'} ) {
-        $hostDesc->{'host_login'} = $hostDesc->{'system_host_name'}.'$';
+		$hostDesc->{'host_gid'} = 515;
+		$hostDesc->{'host_login'} = $hostDesc->{'system_host_name'}.'$';
         $hostDesc->{'host_samba_sid'} = $self->_getUserSID( $domainSid, $hostDesc->{'host_uid'} );
         $hostDesc->{'host_samba_group_sid'} = $self->_getGroupSID( $domainSid, $hostDesc->{'host_gid'} );
         $hostDesc->{'host_samba_flags'} = '[W]';
+        $hostDesc->{'host_homedirectory'} = '/home/'.$hostDesc->{'host_name'};
+        $hostDesc->{'host_uidnumber'} = $hostDesc->{'host_uid'};
+
 
         if( $self->_getNTLMPasswd( $hostDesc->{'system_host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
             $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 3 );
@@ -170,8 +159,6 @@ sub setLinks {
             }
         }
     }
-
-    $self->_log( $hostDesc->{'host_samba'}, 0 );
 
     return 0;
 }
@@ -302,6 +289,10 @@ sub _getLdapObjectclass {
     for( my $i=0; $i<=$#$objectclass; $i++ ) {
         if( (lc($objectclass->[$i]) eq 'sambasamaccount') && !$self->{'entityDesc'}->{'host_samba'} ) {
             push( @{$deletedObjectclass}, $objectclass->[$i] );
+            next
+        }
+        if( (lc($objectclass->[$i]) eq 'posixaccount') && !$self->{'entityDesc'}->{'host_samba'} ) {
+            push( @{$deletedObjectclass}, $objectclass->[$i] );
             next;
         }
 
@@ -312,6 +303,7 @@ sub _getLdapObjectclass {
     # nécessaires - nécessaires pour les MAJ
     if( $self->{'entityDesc'}->{'host_samba'} ) {
         $realObjectClass{'sambaSamAccount'} = 1;
+        $realObjectClass{'posixAccount'} = 1;
     }
 
     my @realObjectClass = keys(%realObjectClass);
@@ -337,6 +329,21 @@ sub createLdapEntry {
         objectClass => $self->_getLdapObjectclass(),
         cn => $self->{'entityDesc'}->{'system_host_name'}
     );
+
+	# UidNumber
+	if( $self->{'entityDesc'}->{'host_uidnumber'} ) {
+        $entry->add( uidNumber => $self->{'entityDesc'}->{'host_uidnumber'} );
+    }
+
+	# GidNumber
+	if( $self->{'entityDesc'}->{'host_gid'} ) {
+		$entry->add( gidNumber => $self->{'entityDesc'}->{'host_gid'} );
+	}
+	
+	# homeDirectory
+	if( $self->{'entityDesc'}->{'host_homedirectory'} ) {
+		$entry->add( homeDirectory => $self->{'entityDesc'}->{'host_homedirectory'} );
+	}
 
     # L'IP
     if( $self->{'entityDesc'}->{'host_ip'} ) {
@@ -457,6 +464,21 @@ sub updateLdapEntry {
     
         # Le SID de l'hôte
         if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_samba_sid'}, $entry, 'sambaSID' ) ) {
+            $update = 1;
+        }
+
+        # Le UidNumber de l'hôte
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_uidnumber'}, $entry, 'uidNumber' ) ) {
+            $update = 1;
+        }
+
+		# Le GidNumber de l'hôte
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_gid'}, $entry, 'gidNumber' ) ) {
+            $update = 1;
+        }
+
+        # homeDirectory
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_homedirectory'}, $entry, 'homeDirectory' ) ) {
             $update = 1;
         }
     
