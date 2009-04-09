@@ -411,3 +411,14 @@ sub updateLdapEntry {
     
     return $update;
 }
+
+# Needed by : hostFactory
+sub isSambaDomain {
+	my $self = shift;
+
+	if ( defined($self->{'domainDesc'}->{'samba_sid'}) ){
+		return 1;
+	}else{
+		return 0;
+	}
+}

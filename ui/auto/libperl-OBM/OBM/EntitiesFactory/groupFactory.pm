@@ -62,6 +62,29 @@ sub new {
     $self->{'currentEntity'} = undef;
     $self->{'entitiesDescList'} = undef;
 
+    #Definition de la Description du groupe Host 515
+    $self->{'sambaHostGroup'} = {
+		'group_contacts' => undef,
+		'group_ext_id' => undef,
+		'group_samba' => '1',
+        'group_desc' => 'Host group',
+        'group_system' => '0',
+        'group_delegation' => '',
+        'group_userupdate' => undef,
+        'group_email' => '',
+        'group_mailing' => '0',
+        'group_name' => 'hosts',
+        'group_timecreate' => '',
+        'group_timeupdate' => '',
+        'group_manager_id' => undef,
+        'group_archive' => '0',
+        'group_privacy' => '0',
+        'group_usercreate' => '1',
+        'group_id' => '0',
+        'group_local' => '1',
+        'group_gid' => '515',
+        'group_name_current' => 'hosts',
+        'group_domain_id' => '2' };
 
     return $self;
 }
@@ -94,7 +117,18 @@ sub next {
         }
     }
 
+    if ( (defined($self->{'sambaHostGroup'}) ) && ( $self->{'parentDomain'}->isSambaDomain() ) ) { 
+        require OBM::Entities::obmGroup;
+        my $current = OBM::Entities::obmGroup->new( $self->{'parentDomain'}, $self->{'sambaHostGroup'} );
+        $current->setUpdateEntity();
+        $current->setUpdateLinks();
+        $self->{'sambaHostGroup'} = undef;
+
+        return $current;
+    }
+
     while( defined($self->{'entitiesDescList'}) && (my $groupDesc = $self->{'entitiesDescList'}->fetchrow_hashref()) ) {
+
         require OBM::Entities::obmGroup;
         if( !(my $current = OBM::Entities::obmGroup->new( $self->{'parentDomain'}, $groupDesc )) ) {
             next;
@@ -179,6 +213,7 @@ sub _loadGroups {
     }
 
     $query .= ' ORDER BY '.$groupTablePrefix.'UGroup.group_name';
+
 
     if( !defined($dbHandler->execQuery( $query, \$self->{'entitiesDescList'} )) ) {
         $self->_log( 'chargement des groupes depuis la BD impossible', 3 );
