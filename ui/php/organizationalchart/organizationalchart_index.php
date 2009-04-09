@@ -254,13 +254,13 @@ function get_organizationalchart_action() {
   $actions["organizationalchart"]["new"] = array (
   	'Name'     => $l_header_new,
   	'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=new",
-  	'Right'    => $cright_write_admin,
+  	'Right'    => $cright_write,
   	'Condition'=> array ('search', 'index', 'detailconsult', 'insert', 'update', 'delete', 'display', 'export_ldif') );
   
   // Insert
     $actions["organizationalchart"]["insert"] = array (
       'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=insert",
-      'Right'    => $cright_write_admin,
+      'Right'    => $cright_write,
       'Condition'=> array ('None') );
   
   // Detail Consult
@@ -281,13 +281,13 @@ function get_organizationalchart_action() {
   $actions["organizationalchart"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=detailupdate&amp;organizationalchart_id=$id",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update', 'export_ldif') );  
 
   // Update
   $actions["organizationalchart"]["update"] = array (
     'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=update",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') );
 
   // Ldif export
@@ -309,13 +309,13 @@ function get_organizationalchart_action() {
   $actions["organizationalchart"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=check_delete&amp;organizationalchart_id=$id",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'export_ldif') );
 
   // Delete
   $actions["organizationalchart"]["delete"] = array (
     'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=delete",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') );
 
   // Display
