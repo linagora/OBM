@@ -147,7 +147,7 @@ sub setLinks {
         $hostDesc->{'host_samba_sid'} = $self->_getUserSID( $domainSid, $hostDesc->{'host_uid'} );
         $hostDesc->{'host_samba_group_sid'} = $self->_getGroupSID( $domainSid, $hostDesc->{'host_gid'} );
         $hostDesc->{'host_samba_flags'} = '[W]';
-        $hostDesc->{'host_homedirectory'} = '/home/'.$hostDesc->{'host_name'};
+        $hostDesc->{'host_homedirectory'} = '/dev/null';
         $hostDesc->{'host_uidnumber'} = $hostDesc->{'host_uid'};
 
 
