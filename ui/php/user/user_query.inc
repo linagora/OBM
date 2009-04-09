@@ -453,7 +453,7 @@ function run_query_user_insert($user) {
 
   // Section Samba
   if ($cgp_use['service']['samba']) {
-    $smb_perms = sql_parse_id($user['smb_perms']);
+    $smb_perms = sql_parse_int($user['smb_perms']);
     $smb_home = ($smb_perms == 1)?$user['smb_home']:'';
     $smb_home_drive = ($smb_perms == 1)?$user['smb_home_drive'] : '';
     $smb_logon = ($smb_perms == 1)?$user['smb_logon']: '';
@@ -613,7 +613,7 @@ function run_query_user_insert($user) {
   }
 
   // Subscribe the user to his default group
-  run_query_user_init_group($id, $gid, NULL);
+  run_query_user_init_group($domain_id, $id, $gid, NULL);
 
   return $id;
 }
@@ -626,16 +626,16 @@ function run_query_user_insert($user) {
 //   - $gid  : group GID (not id)
 // Return: number of usergroup inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_init_group($u_id, $gid, $oldGid) {
+function run_query_user_init_group($domain_id, $u_id, $gid, $oldGid) {
   global $cdg_sql;
 
   $sel_user = sql_parse_id($u_id, true);
   $ins_user = sql_parse_id($u_id);
   if ($oldGid != NULL) {
-    $group_id = sql_parse_id(get_group_id_from_gid($oldGid), true);
+    $group_id = sql_parse_id(get_group_id_from_gid($domain_id, $oldGid), true);
     $query = "DELETE FROM UserObmGroup
       WHERE userobmgroup_userobm_id $sel_user 
-      AND userobmgroup_group_id $group_id ";
+      AND userobmgroup_group_id $group_id";
 
     display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
     $obm_q = new DB_OBM;
@@ -643,13 +643,13 @@ function run_query_user_init_group($u_id, $gid, $oldGid) {
   }
 
   // we get the group gid from its id
-  $group_id = get_group_id_from_gid($gid);
+  $group_id = get_group_id_from_gid($domain_id, $gid);
 
   if ($group_id > 0) {
     $g_id = sql_parse_id($group_id, true);
     $query = "DELETE FROM UserObmGroup
     WHERE userobmgroup_userobm_id $sel_user 
-      and userobmgroup_group_id $g_id ";
+      and userobmgroup_group_id $g_id";
 
     display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
     $obm_q = new DB_OBM;
@@ -1281,7 +1281,8 @@ function run_query_user_update_user_group($user) {
     } else {
       $gid = $cg_gid_smb_user;
     }
-    run_query_user_init_group($u_id, $gid, NULL);
+    $domain_id = $u['domain_id'];
+    run_query_user_init_group($domain_id, $u_id, $gid, NULL);
   }
 
   return $cpt_ins;

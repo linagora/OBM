@@ -253,12 +253,12 @@ function get_first_user_free_uid_from_bd($first_id=false) {
 // Returns:
 //   - group id
 ///////////////////////////////////////////////////////////////////////////////
-function get_group_id_from_gid($gid) {
+function get_group_id_from_gid($domain_id, $gid) {
   global $cdg_sql;
 
   $query = "SELECT group_id
     FROM UGroup
-    WHERE group_gid='$gid'";
+    WHERE group_gid='$gid' AND group_domain_id=$domain_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

@@ -2866,6 +2866,7 @@ function get_all_profiles($cached = true) {
   return $profiles;    
 }
 
+
 /**
  * of_entity_insert 
  * 
@@ -2876,6 +2877,7 @@ function get_all_profiles($cached = true) {
  */
 function of_entity_insert($entity,$id) {
   global $cdg_sql;
+
   $entity = strtolower($entity);
   $query = 'INSERT INTO Entity (entity_mailing) VALUES (TRUE)';
   $obm_q = new DB_OBM;
@@ -2889,6 +2891,7 @@ function of_entity_insert($entity,$id) {
   return $eid;
 }
 
+
 /**
  * of_entity_delete 
  * 
@@ -2897,6 +2900,7 @@ function of_entity_insert($entity,$id) {
  */
 function of_entity_delete($entity,$id) {
   global $cdg_sql;
+
   $entity = strtolower($entity);
   if(is_array($id)) {
     $id = implode(',', $id);
@@ -2909,6 +2913,7 @@ function of_entity_delete($entity,$id) {
   $obm_q->query($query);
 }
 
+
 /**
  * of_entity_get 
  * 
@@ -2919,6 +2924,7 @@ function of_entity_delete($entity,$id) {
  */
 function of_entity_get($entity, $id) {
   global $cdg_sql;
+
   $entity = strtolower($entity);
   $query = 'SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id = '.$id;
   $obm_q = new DB_OBM;
@@ -2927,6 +2933,7 @@ function of_entity_get($entity, $id) {
   $obm_q->next_record();
   return $obm_q->f($entity.'entity_entity_id');
 }
+
 
 /**
  * of_entity_subquery 
@@ -2938,11 +2945,12 @@ function of_entity_get($entity, $id) {
  * @return void
  */
 function of_entity_subquery($entity, $id = NULL, $not = false) {
+
   $entity = strtolower($entity);
-  if(is_null($id)) {
+  if (is_null($id)) {
     $query = '(SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity)';
-  } elseif(is_array($id)) {
-    if($not) $NOT = 'NOT';
+  } elseif (is_array($id)) {
+    if ($not) $NOT = 'NOT';
     $id = implode(',', $id);
     $query = '(SELECT '.$entity.'entity_entity_id FROM '.ucfirst($entity).'Entity WHERE '.$entity.'entity_'.$entity.'_id '.$NOT.' IN ('.$id.'))';
   } else {
@@ -2951,6 +2959,7 @@ function of_entity_subquery($entity, $id = NULL, $not = false) {
   }
   return $query;
 }
+
 
 /**
  * of_service_insert 
@@ -2962,11 +2971,12 @@ function of_entity_subquery($entity, $id = NULL, $not = false) {
  */
 function of_service_insert($service, $id) {
   global $cdg_sql;
+
   $query = "SELECT service_id FROM Service WHERE service_service = '$service' and service_entity_id = $id";
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'of_service_insert(select)');
   $obm_q->query($query);
-  if(!$obm_q->next_record()) {
+  if (!$obm_q->next_record()) {
     $query = "INSERT INTO Service (service_service, service_entity_id) VALUES ('$service', $id)";
     display_debug_msg($query, $cdg_sql, 'of_service_insert(select)');
     $obm_q->query($query);
@@ -2987,11 +2997,13 @@ function of_service_insert($service, $id) {
  */
 function of_service_delete($service, $id) {
   global $cdg_sql;
+
   $query = "DELETE FROM Service WHERE service_service = '$service' and service_entity_id = $id";
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'of_service_delete()');
   $obm_q->query($query);
 }
+
 
 /**
  * of_service_property_insert 
@@ -3005,14 +3017,15 @@ function of_service_delete($service, $id) {
  */
 function of_service_property_insert($service, $service_property, $id, $values) {
   global $cdg_sql;
-  if(!is_array($values)) {
+
+  if (!is_array($values)) {
     $values = array($values);
   }
   $values = array_unique($values);
   $obm_q = new DB_OBM;  
   $return = true;
   foreach($values as $value) {
-    if($value != '') {
+    if ($value != '') {
       $query = "INSERT INTO ServiceProperty (serviceproperty_service, serviceproperty_property, serviceproperty_entity_id, serviceproperty_value)
         VALUES ('$service', '$service_property', $id, '$value')";
       display_debug_msg($query, $cdg_sql, 'of_service_property_insert()');
@@ -3021,6 +3034,8 @@ function of_service_property_insert($service, $service_property, $id, $values) {
   }
   return $return;
 }
+
+
 /**
  * of_service_property_replace 
  * 
@@ -3049,11 +3064,16 @@ function of_service_property_replace($service, $service_property, $id, $values) 
  */
 function of_service_property_delete($service, $service_property, $id) {
   global $cdg_sql;
+
   $obm_q = new DB_OBM;  
-  $query = "DELETE FROM ServiceProperty WHERE serviceproperty_service = '$service' AND serviceproperty_property = '$service_property' AND serviceproperty_entity_id = $id";
+  $query = "DELETE FROM ServiceProperty
+    WHERE serviceproperty_service = '$service'
+      AND serviceproperty_property = '$service_property'
+      AND serviceproperty_entity_id = $id";
   display_debug_msg($query, $cdg_sql, 'of_service_property_delete()');
   return $obm_q->query($query);
 }
+
 
 /**
  * of_service_property_unique
@@ -3066,8 +3086,9 @@ function of_service_property_delete($service, $service_property, $id) {
  * @return void
  */
 function of_service_property_unique($service, $service_property, $value, $id='') {
+
   $value = trim($value);
-  if($id) {
+  if ($id) {
     $qid = 'AND domainentity_domain_id != '.$id;
   }
   $obm_q = new DB_OBM;  

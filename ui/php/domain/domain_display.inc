@@ -564,7 +564,7 @@ function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) 
 
   if ($cgp_use['service']['samba']) {
     if (isset($samba['drive']) && $samba['drive'] != '') $drive[$samba['drive']] = 'selected="selected"';
-    $dis_drive_sel .= "<option ".$drive["$c_none"]." value='$c_none'>$l_none</option>";
+    $dis_drive_sel .= "<option ".$drive["$c_none"]." value=''>$l_none</option>";
     for($i='D'; $i< 'Z';$i++) {
       $dis_drive_sel .= "<option ".$drive["$i"]." value='$i'>$i:</option>";
     }

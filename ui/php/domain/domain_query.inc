@@ -42,7 +42,6 @@ function run_query_domain_search($domain, $restriction='') {
     domain_id as id
     FROM Domain WHERE domain_global = false $whereq";
 
-
   // ORDER construction
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'domain_label';
   $orderq .= " ORDER BY $order $sql_order_dir";
@@ -161,7 +160,7 @@ function run_query_domain_insert($domain) {
       }
     } 
 
-    // Init windows default domain groups
+    // Init default domain groups
     if ($samba['domain'] != '') {
       run_query_domain_init_groups($domain_id, true);
     } else {
@@ -352,19 +351,22 @@ function check_domain_group_exists($gid, $domain_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // domain update query execution
 // Parameters:
-//   - $p_id     : domain id
-//   - $domain[]   : entry values
+//   - $domain_id : domain id
+//   - $domain[]  : entry values
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_domain_update($d_id, $domain) {
+function run_query_domain_update($domain_id, $domain) {
   global $obm, $cdg_sql, $cgp_use;
+
+  $cur_samba = run_query_domain_samba_properties($domain_id);
 
   $uid = sql_parse_id($obm['uid']);
   $label = $domain['label'];
   $desc = $domain['desc'];
   $alias = $domain['alias'];
   $mail_server_auto = sql_parse_id($domain['mail_server_auto']);
-  $did = sql_parse_id($d_id, true);
+  $did = sql_parse_id($domain_id, true);
   $samba = $domain['samba'];
+
   $query = "UPDATE Domain SET
     domain_timeupdate=NOW(),
     domain_userupdate=$uid,
@@ -376,19 +378,50 @@ function run_query_domain_update($d_id, $domain) {
   display_debug_msg($query, $cdg_sql, 'run_query_domain_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+
   if ($cgp_use['service']['mail']) {
-    $entity_id =  of_entity_get($GLOBALS['module'], $d_id);
+    $entity_id = of_entity_get($GLOBALS['module'], $domain_id);
     of_service_property_replace('mail','imap_autoselect', $entity_id, $mail_server_auto);
     of_service_property_replace('mail','imap',$entity_id , $domain['imap']);
     of_service_property_replace('mail','smtp_in', $entity_id, $domain['smtp_in']);
     of_service_property_replace('mail','smtp_out', $entity_id, $domain['smtp_out']);
   }  
+
   if ($cgp_use['service']['samba']) {
     foreach($samba as $property => $value) {
       of_service_property_replace('samba', $property, $entity_id, addslashes($value));
     }
   }
-  run_query_domain_replace_properties($d_id,$domain);
+
+  // Init default domain groups
+  if ($samba['domain'] != '') {
+    run_query_domain_init_groups($domain_id, true);
+  } else {
+    run_query_domain_init_groups($domain_id, false);
+  }
+
+  // Purge samba infos if windows property just removed
+  if ($samba['domain'] == '') {
+    if ($cur_samba['domain'] != '') {
+
+      // Purge samba perms from users
+      $query = "UPDATE UserObm
+        SET userobm_samba_perms = 0
+        WHERE userobm_domain_id $did";
+      display_debug_msg($query, $cdg_sql, 'run_query_domain_update(purge samba users)');
+      $obm_q->query($query);
+
+      // Purge samba perms from groups
+      $query = "UPDATE UGroup
+        SET group_samba = 0
+        WHERE group_domain_id $did";
+      display_debug_msg($query, $cdg_sql, 'run_query_domain_update(purge samba groups)');
+      $obm_q->query($query);
+    }
+  }
+
+  // Init domain properties
+  run_query_domain_replace_properties($domain_id, $domain);
 
   return $retour;
 }
@@ -423,7 +456,7 @@ function run_query_domain_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_domain_data_form($d_id, $domain) {
   global $err, $l_label_error,$l_alias_user_used,$l_name_in_use;
-  global $l_name_error, $cgp_use, $c_none;
+  global $l_name_error, $cgp_use;
 
   $label = $domain['label'];
   $alias = trim($domain['alias']);
@@ -487,7 +520,7 @@ function check_domain_data_form($d_id, $domain) {
       if (($samba['sid'] != '')
 	  || ($samba['profile'] != '')
 	  || ($samba['home'] != '')
-	  || ($samba['drive'] != "$c_none")) {
+	  || ($samba['drive'] != '')) {
 	$err['msg'] = "$GLOBALS[l_samba_domain_error] : $samba[domain]";
 	return false;
       }
@@ -510,10 +543,10 @@ function run_query_domain_get_used_name($alias, $name=null, $id=null) {
 
   $return = array();
   $aliases = array();
-  if(!empty($alias)) {
+  if (!empty($alias)) {
     $aliases = explode("\r\n",$alias);
   }
-  if(!empty($id)) {
+  if (!empty($id)) {
     $d = of_domain_get_domain_infos($id);
     array_push($aliases,$d['name']);
     $id = sql_parse_id($id, true, true);
@@ -551,14 +584,15 @@ function run_query_domain_get_used_name($alias, $name=null, $id=null) {
  */
 function run_query_domain_get_users_aliases($aliases, $id) {
   global $cdg_sql;
+
   $d = of_domain_get_domain_infos($id);
   $return = array();
-  if(!empty($d['alias'])) {
+  if (!empty($d['alias'])) {
     $old_aliases = explode("\r\n",$d['alias']);
   } else {
     return array();
   }
-  if(!empty($aliases)) {
+  if (!empty($aliases)) {
     $aliases = explode("\r\n",$aliases);
     $aliases = array_diff($old_aliases,$aliases);
   } else {
