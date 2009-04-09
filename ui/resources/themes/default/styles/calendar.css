@@ -640,130 +640,143 @@ h1.hoursTitle{
 /* OBM 2.2 FreeBusy */
 
 .freeBusyContent {
-	padding: 0px 10px 20px 10px;
+  padding: 0px 0px 20px 0px;
+}
+
+.freeBusyForm {
+  margin-left: 16em;
+  padding:0;
+}
+
+#calendarFreeBusyScroll {
+  margin-left: 1em;
 }
 
 .freeBusyCalendar {
-	overflow-x:scroll;
+  margin-right: 2em;
+  position: relative;
+}
+
+#calendarFreeBusyScroll {
+  overflow-x:scroll;
   overflow-y:hidden;
-	/* margin-left:15em; */
-	background: #FFF;
-	padding: 0;
-  position:relative;
+  margin:0 1em 0 1em; 
+  background: #FFF;
+  padding: 0;
+  position: relative;
+  width: 100%;
 }
 
-.freeBusyNavLeft {
-	float: left;
+#scrollLeft {
+  position: absolute;
+  cursor: pointer;
+  width:1em;
+  background:	#35839A;
+  color:#FFF;
 }
 
-.freeBusyNavLeft input {
-	width:1em;
-	background:	#35839A;
-	color:#FFF;
-}
-
-.freeBusyNavRight {
-	float: right;
-}
-
-.freeBusyNavRight input {
-	width:1em;
-	background:	#35839A;
-	color:#FFF;
+#scrollRight {
+  text-align: right;
+  width:1em;
+  position: absolute;
+  right: 1em;
+  cursor: pointer;
+  background:	#35839A;
+  color:#FFF;
 }
 
 .freeBusyCalendar table {
-	border-spacing:0;
-	border-collapse:collapse;
-	background:#FFF;
+  border-spacing:0;
+  border-collapse:collapse;
+  background:#FFF;
 }
 
-.freeBusyCalendar td {
+.freeBusyCalendar tr {
   height: 1.5em;
 }
 
 .freeBusyCalendarColDay {
-	border-right: 1px solid black;
+  border-right: 1px solid black;
 }
 
 .freeBusyCalendarDay {
-	text-align:left;
-	font-weight: bold;
-	padding-left: 1em;
+  text-align:left;
+  font-weight: bold;
+  padding-left: 1em;
 }
 
 .freeBusyCalendarHour {
-	padding-left: 1px;
+  padding-left: 1px;
 }
 
 .freeBusyCalendarHourDisplayed {
-	border-left: 1px solid #666;
+  border-left: 1px solid #666;
 }
 
 .freeBusyEntities {
-	/*width: 15em; */
-  float: left;
+  width: 15em;
+  position: absolute;
 }
 
 .freeBusyEntities table {
-	border-spacing:0;
-	border-collapse:collapse;
-	width: 15em;
+  border-spacing:0;
+  border-collapse:collapse;
+  width: 15em;
 }
 
-.freeBusyEntities td {
-	height: 1.4em;
-
+.freeBusyEntities tr {
+  height: 1.5em;
 }
 
 .freeBusyEntities .elementRow {
-	border-bottom: 1px dotted #666;
+  height: 1.4em;
+  border-bottom: 0.1em dotted #666;
 }
 
 .freeBusyEntities .allAttendees{
-	text-align: center;
-	font-weight: bold;
+  text-align: center;
+  font-weight: bold;
 }
 
 .freeBusyEntities input {
-	font-size: 90%;
+  font-size: 90%;
 }
 
 .timeSlot {
-	border: 1px dotted #666;
+  border: 1px dotted #666;
   margin: 0;
   padding: 0;
 }
 
 .haveEvent {
-	height: 0.5em;
-	background:#990000;
+  height: 0.5em;
+  background:#990000;
 
 }
 
 .haveEventAll {
-	height: 0.5em;
-	background:#000099;
+  height: 0.5em;
+  background:#000099;
 }
 
 .meeting {
-	background: #80A9B7;
-	cursor: move;
+  background: #80A9B7;
+  cursor: move;
 }
 
 .meetingBusy {
-	background: #F00;
+  background: #F00;
 } 
 
 .meetingResize {
-	cursor: col-resize;
-	background: #000; /*#35839A;*/
-	width: 2px;
+  cursor: col-resize;
+  background: #000; /*#35839A;*/
+  width: 2px;
 }
 
 .freeBusyButtons {
-	margin-top: 1em;
-	margin-left:16em;
+  margin-top: 1em;
+  margin-left:16em;
 }
 
 input[type="submit"][disabled] {

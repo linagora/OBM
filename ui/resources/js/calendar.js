@@ -1796,7 +1796,8 @@ Obm.CalendarFreeBusy = new Class({
 
     // Navigation Scroll
     this.scrollLeft.setStyle('height', this.table.offsetHeight+'px');
-    this.scrollRight.setStyle('height', this.table.offsetHeight+'px');
+    this.scrollLeft.setStyle('line-height', this.table.offsetHeight+'px');
+    this.scrollRight.setStyle('line-height', this.table.offsetHeight+'px');
 
     this.scroll = new Fx.Scroll(this.scrollDiv);
 
@@ -1850,40 +1851,36 @@ Obm.CalendarFreeBusy = new Class({
    * Go to next free slot
    */
   autoPickNext: function() {
-    var timer = function(){
+    var initialPosition = this.currentPosition;
+    do {
       this.currentPosition++;
       var end_pos = this.currentPosition + this.meeting_slots -1;
-      if (end_pos == this.currentPosition) {
-        $clear(timer);
-        this.currentPosition--;
-      }
-      if (!this.isBusy(end_pos)) {
-        this.slider.set(this.currentPosition);
-        this.autoScroll.toElement(this.meeting);
-        this.forcePosition();
-        $clear(timer);
-      }
-    }.bind(this).periodical(1);
+    } while(this.isBusy(end_pos) && end_pos != this.nbSteps);
+    if (end_pos == this.nbSteps) {
+      this.currentPosition = initialPosition;
+    } else {
+      this.slider.set(this.currentPosition);
+      this.autoScroll.toElement(this.meeting);
+      this.forcePosition();
+    }
   },
 
   /*
    * Go to previous free slot
    */
   autoPickPrev: function() {
-    var timer = function(){
+    var initialPosition = this.currentPosition;
+    do {
       this.currentPosition--;
       var end_pos = this.currentPosition + this.meeting_slots -1;
-      if (this.currentPosition == 0) {
-        $clear(timer);
-        this.currentPosition++;
-      }
-      if (!this.isBusy(end_pos)) {
-        this.slider.set(this.currentPosition);
-        this.autoScroll.toElement(this.meeting);
-        this.forcePosition();
-        $clear(timer);
-      }
-    }.bind(this).periodical(1);
+    } while(this.isBusy(end_pos) && this.currentPosition >= 0);
+    if (this.currentPosition < 0) {
+      this.currentPosition = initialPosition;
+    } else {
+      this.slider.set(this.currentPosition);
+      this.autoScroll.toElement(this.meeting);
+      this.forcePosition();
+    }
   },
 
   /*

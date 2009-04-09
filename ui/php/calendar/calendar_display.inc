@@ -4078,39 +4078,36 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
         </table>
       </form>
     </div>
-
-    <div>
-      <div class=\"freeBusyNavLeft\">
-        <input type=\"button\" value=\"«\" id=\"scrollLeft\" />
-      </div>
-
-      <div class=\"freeBusyNavRight\">
-        <input type=\"button\" value=\"»\" id=\"scrollRight\" />
-      </div>
-
-      <div id=\"calendarFreeBusyScroll\" class=\"freeBusyCalendar\">
-        <table id=\"calendarFreeBusyTable\"> 
-          <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-          <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-          <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-          <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-          <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-          <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-          <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-          <thead id=\"calendarHead\">
-            <tr>
-              $week_day_list
-            </tr>
-            <tr>
-              $day_hours_list
-            </tr>
-          </thead>
-          <tbody id=\"calendarFreeBusyGrid\">
-            $events_calendar
-          </tbody>
-        </table>
-        <div id=\"calendarFreeBusyMeeting\" class=\"meeting\">
-          <div id=\"calendarFreeBusyResizeMeeting\" class=\"meetingResize\"></div>
+    <div title='dummy div for IE hack'></div>
+    <div class=\"freeBusyForm\">
+      <div id=\"scrollLeft\" >«</div>
+      <div title='dummy div for IE hack'></div>
+      <div id=\"scrollRight\" >»</div>
+      <div class=\"freeBusyCalendar\">
+        <div id=\"calendarFreeBusyScroll\">
+          <table id=\"calendarFreeBusyTable\"> 
+            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
+            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
+            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
+            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
+            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
+            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
+            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
+            <thead id=\"calendarHead\">
+              <tr>
+                $week_day_list
+              </tr>
+              <tr>
+                $day_hours_list
+              </tr>
+            </thead>
+            <tbody id=\"calendarFreeBusyGrid\">
+              $events_calendar
+            </tbody>
+          </table>
+          <div id=\"calendarFreeBusyMeeting\" class=\"meeting\">
+            <div id=\"calendarFreeBusyResizeMeeting\" class=\"meetingResize\"></div>
+          </div>
         </div>
       </div>
 

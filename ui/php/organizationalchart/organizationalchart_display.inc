@@ -28,7 +28,7 @@ $fieldnames['organizationalchart_archive'] = $l_archive;
 function dis_data_organizationalchart(&$OD, $fieldname, $link_ok) {
 
   if ($fieldname == 'organizationalchart_name') {
-    $res['url'] = "$path/organizationalchart/organizationalchart_index.php";
+    $res['url'] = "$GLOBALS[path]/organizationalchart/organizationalchart_index.php";
     $res['url'] .= "?action=detailconsult&amp;organizationalchart_id=".$OD->data_set->f('organizationalchart_id');
   }  else if ($fieldname == 'organizationalchart_archive') {
     $res['align'] = 'center';
@@ -238,8 +238,8 @@ function html_organizationalchart_form($action, $oc_q, $organizationalchart, $ro
       </div>
       <script type=\"text/javascript\">
         obm.initialize.chain(function () {
-          new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent1', 'user1', {defaultText:'$user_text'})
-          new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent1', 'group1', {defaultText:'$user_text'})
+          new obm.AutoComplete.Search('$GLOBALS[path]/user/user_index.php?action=ext_search&ajax=1', 'sel_ent1', 'user1', {defaultText:'$user_text'})
+          new obm.AutoComplete.Search('$GLOBALS[path]/group/group_index.php?action=ext_search&ajax=1', 'sel_ent1', 'group1', {defaultText:'$user_text'})
         });
       </script>";
   }
@@ -308,7 +308,7 @@ function dis_organizationalchart_consult($organizationalchart, $view) {
 
   $id = $organizationalchart['organizationalchart_id'];
   if ($id) {
-    $display['print_url'] = "$path/organizationalchart/organizationalchart_index.php?action= $action&amp;organizationalchart_id=$id";
+    $display['print_url'] = "$GLOBALS[path]/organizationalchart/organizationalchart_index.php?action= $action&amp;organizationalchart_id=$id";
     $oc_q = run_query_organizationalchart_detail($id);
     $root_node = run_query_organizationalchart_root_node($id);
     $block = html_organizationalchart_consult($organizationalchart, $view, $oc_q, $root_node); 
@@ -327,7 +327,7 @@ function dis_organizationalchart_consult($organizationalchart, $view) {
  * @return HTML
  */
 function html_organizationalchart_consult($organizationalchart, $view, $oc_q, $root_node) {
-  global $display, $path;
+  global $display;
   global $l_organizationalchart, $l_detail, $l_zoom_big, $l_zoom_small, $l_zoom;
   global $l_name, $l_desc, $l_archive, $l_yes, $l_no,  $l_outline, $action;
   global $ico_organizationalchart_view, $ico_organizationalchart_view_current;
@@ -365,10 +365,10 @@ function html_organizationalchart_consult($organizationalchart, $view, $oc_q, $r
   // View select
   $dis_view = "
     <div class=\"LF MN\" style=\"margin-left: 10px;\">
-    <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$oc_id&amp;view=chart\">
+    <a href=\"$GLOBALS[path]/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$oc_id&amp;view=chart\">
       <img title=\"$l_organizationalchart\" src=\"$ico_organizationnalchart\" alt=\"$l_organizationalchart\"/> 
     </a>
-    <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$oc_id&amp;view=outline\">
+    <a href=\"$GLOBALS[path]/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$oc_id&amp;view=outline\">
       <img title=\"$l_outline\" src=\"$ico_outline\" alt=\"$l_outline\"/> 
     </a>
     </div>";
@@ -422,17 +422,17 @@ function html_organizationalchart_consult($organizationalchart, $view, $oc_q, $r
  */
 function dis_can_delete_organizationalchart($id) {
   global $l_can_delete, $l_back, $l_delete;
-  global $display,$path;
+  global $display;
   
   $display['msg'] .= display_ok_msg($l_can_delete);
 
   $block .= "
-  <form action=\"$path/organizationalchart/organizationalchart_index.php\" method=\"post\" onsubmit=\"return confirm_del()\">
+  <form action=\"$GLOBALS[path]/organizationalchart/organizationalchart_index.php\" method=\"post\" onsubmit=\"return confirm_del()\">
   <input type=\"hidden\" name=\"action\" value=\"delete\" />
   <input type=\"hidden\" name=\"organizationalchart_id\" value=\"$id\" />
   <div class=\"buttons\">
   <input type=\"submit\" value=\"$l_delete\" />
-  <a href=\"$path/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$id\">$l_back</a>
+  <a href=\"$GLOBALS[path]/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$id\">$l_back</a>
   </div>";
 
   return $block;
@@ -482,7 +482,7 @@ function dis_organizationalchart_consult_chart($node_q, $output) {
   if (is_array($users)) {
     uasort($users, 'sort_node_detail');
     foreach ($users as $user_id => $one_user) {
-      $userobm_url = "$path/user/user_index.php?action=detailconsult&amp;user_id=$user_id";
+      $userobm_url = "$GLOBALS[path]/user/user_index.php?action=detailconsult&amp;user_id=$user_id";
       $userobm_name = $one_user['lastname'].' '.$one_user['firstname'];
       $is_manager = $one_user['manager'];
       $item_id = "item-${level}-${user_id}";
@@ -693,8 +693,8 @@ function dis_organizationalchart_draw_form($node_q) {
   } else {
     $dis_js = "<script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'user$level', {defaultText:'$user_text'});
-      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'group$level', {defaultText:'$user_text'});
+      new obm.AutoComplete.Search('$GLOBALS[path]/user/user_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'user$level', {defaultText:'$user_text'});
+      new obm.AutoComplete.Search('$GLOBALS[path]/group/group_index.php?action=ext_search&ajax=1', 'sel_ent$level', 'group$level', {defaultText:'$user_text'});
     });
     </script>";
   }
@@ -798,7 +798,7 @@ function organizationalchart_export_svg($organizationalchart, $view) {
     $root_node = run_query_organizationalchart_root_node($id);
 
     // Build XML
-    $xml = new DOMDocument('1.0', 'utf-8');
+    $xml = new DOMDocument('1.0', 'iso8859-1');
     $svg = $xml->createElement('svg');
     $svg->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
@@ -881,7 +881,7 @@ function organizationalchart_export_svg($organizationalchart, $view) {
  */
 function dis_organizationalchart_userdetail() {
   global $l_title, $l_phone, $l_mphone, $l_email;
-  global $ico_nophoto, $ico_load, $path; 
+  global $ico_nophoto, $ico_load; 
 
   $block = "
     <div id=\"userdetail\" class=\"userdetail\">
@@ -908,7 +908,7 @@ function dis_organizationalchart_userdetail() {
     </div>
     <script type=\"text/javascript\">
       obm.userDetail = new Obm.UserDetail();
-      obm.vars.path = '$path';
+      obm.vars.path = '$GLOBALS[path]';
       obm.vars.images.nophoto = '$ico_nophoto';
       obm.vars.images.load = '$ico_load';
     </script>";
