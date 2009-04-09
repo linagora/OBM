@@ -38,6 +38,9 @@ function run_query_people_search($people) {
   $multidomain_userobm = sql_multidomain('userobm');
   $multidomain_contact = sql_multidomain('contact');
 
+  $where_userobm = '1=1';
+  $where_contact = '1=1';
+
   if ($filter_entity == 'calendar') {
     $users = OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', $filter_pattern);
     $users_ids = array_keys($users);
@@ -52,10 +55,10 @@ function run_query_people_search($people) {
       // If no users have given $uid with read right, return empty set
       $where_filter_entity = ' AND userobm_id < 0';
     }
+    $show_contact = true;
+    $where_userobm .= " AND userobm_status = 'VALID'";
   }
 
-  $where_userobm = '1=1';
-  $where_contact = '1=1';
 
   // If a lastname indication has been specified, get it
   if (trim($lname) != '') {
@@ -167,10 +170,12 @@ function run_query_people_search($people) {
   $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query_userobm = "$select_userobm $whereq_userobm";
-  $query_contact = "$select_contact $join_contact $whereq_contact";
+  if($show_contact) {
+    $query_contact = "UNION $select_contact $join_contact $whereq_contact";
+  }
 
   // Union
-	$query = "$query_userobm UNION $query_contact $orderq $limit";
+	$query = "$query_userobm $query_contact $orderq $limit";
 
   if ($ctu_sql_limit) {
     $count_userobm = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_userdata_userobm $whereq_userobm");
