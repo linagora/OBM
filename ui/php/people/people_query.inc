@@ -127,15 +127,16 @@ function run_query_people_search($people) {
 
   $select_userobm = "SELECT distinct userobm_lastname,
     userobm_firstname,
-		userobm_title,
-		userobm_phone,
-		userobm_phone2,
-		userobm_mobile,
-		userobm_fax,
-		userobm_fax2,
-		userobm_description,
+    userobm_title,
+    userobm_phone,
+    userobm_phone2,
+    userobm_mobile,
+    userobm_fax,
+    userobm_fax2,
+    userobm_description,
     userobm_email,
     userobm_id,
+    domain_name,
     'user' as type
     FROM UserObm 
     LEFT JOIN Domain ON userobm_domain_id = domain_id
@@ -152,6 +153,7 @@ function run_query_people_search($people) {
     contact_comment,
     email_address as userobm_email,
     contact_id as userobm_id,
+    domain_name,
     'contact' as type
     FROM Contact";
 	$join_contact = "
