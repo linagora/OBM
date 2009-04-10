@@ -6,7 +6,8 @@ public class AuthHandler {
 
 	public Token doAuth(HttpServletRequest req) {
 		// TODO Auto-generated method stub
-		return null;
+		Token t = new Token("thomas@zz.com", "aliacom");
+		return t;
 	}
 
 }
