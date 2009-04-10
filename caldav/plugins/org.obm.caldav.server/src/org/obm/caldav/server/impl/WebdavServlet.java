@@ -12,6 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * WebDAV for CalDAV implementation
+ * 
+ * @author tom
+ * 
+ */
 public class WebdavServlet extends HttpServlet {
 
 	private static final Log logger = LogFactory.getLog(WebdavServlet.class);
@@ -20,7 +26,7 @@ public class WebdavServlet extends HttpServlet {
 
 	private Map<String, DavMethodHandler> handlers;
 	private AuthHandler authHandler;
-	
+
 	/**
 	 * Handles the special WebDAV methods.
 	 */
@@ -32,20 +38,24 @@ public class WebdavServlet extends HttpServlet {
 			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return;
 		}
-		
+
 		String method = req.getMethod();
 
 		if (logger.isInfoEnabled()) {
 			logger.info("[" + method + "] " + req.getRequestURI());
 		}
 
+
 		DavMethodHandler handler = handlers.get(method.toLowerCase());
 		if (handler != null) {
-			handler.process(token, req, resp);
+			
+
+			
+			handler.process(token, new DavRequest(req), resp);
 		} else {
 			super.service(req, resp);
 		}
-		
+
 	}
 
 	@Override
@@ -59,7 +69,9 @@ public class WebdavServlet extends HttpServlet {
 		handlers.put("move", new PropFindHandler());
 		handlers.put("lock", new PropFindHandler());
 		handlers.put("unlock", new PropFindHandler());
-		
+		handlers.put("options", new OptionsHandler());
+		handlers.put("report", new ReportHandler());
+
 		authHandler = new AuthHandler();
 	}
 
