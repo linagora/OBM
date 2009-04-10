@@ -270,6 +270,7 @@ function run_query_user_detail($p_id) {
   $vacation_dateend = sql_date_format($db_type, 'UserObm.userobm_vacation_dateend', 'userobm_vacation_dateend');
   $multidomain = sql_multidomain('UserObm.userobm');
   $p_id = sql_parse_id($p_id, true);	
+
   $query = "SELECT UserObm.*,
       $timeupdate,
       $timecreate,
@@ -310,9 +311,8 @@ function run_query_user_detail($p_id) {
 //   $id : new user id if ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_insert($user) {
-  //global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
-  global $cg_gid_smb_admin, $cg_gid_smb_user, $cg_gid_user;
+  global $cg_gid_smb_user, $cg_gid_user;
 
   $uid = sql_parse_id($obm['uid']);
   $login = strtolower($user['login']);
@@ -473,11 +473,7 @@ function run_query_user_insert($user) {
   $user_uid = get_first_user_free_uid();
   if ($cgp_use['service']['samba'] && $smb_perms) {
     // Windows user
-    if ($profile == "$perms_admin") {
-      $gid = $cg_gid_smb_admin;
-    } else {
-      $gid = $cg_gid_smb_user;
-    }
+    $gid = $cg_gid_smb_user;
   } else {
     // Non windows user
     $gid = $cg_gid_user;
@@ -632,14 +628,18 @@ function run_query_user_init_group($domain_id, $u_id, $gid, $oldGid) {
   $sel_user = sql_parse_id($u_id, true);
   $ins_user = sql_parse_id($u_id);
   if ($oldGid != NULL) {
-    $group_id = sql_parse_id(get_group_id_from_gid($domain_id, $oldGid), true);
+    $group_id = get_group_id_from_gid($domain_id, $oldGid);
+    $g_id = sql_parse_id($group_id, true);
     $query = "DELETE FROM UserObmGroup
       WHERE userobmgroup_userobm_id $sel_user 
-      AND userobmgroup_group_id $group_id";
+      AND userobmgroup_group_id $g_id";
 
     display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
+
+    // Update internal group membership direct mapping
+    of_usergroup_update_group_hierarchy($group_id);
   }
 
   // we get the group gid from its id
@@ -650,17 +650,19 @@ function run_query_user_init_group($domain_id, $u_id, $gid, $oldGid) {
     $query = "DELETE FROM UserObmGroup
     WHERE userobmgroup_userobm_id $sel_user 
       and userobmgroup_group_id $g_id";
-
     display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
-    $group_id = sql_parse_id($group_id);
+
+    $g_id = sql_parse_id($group_id);
     $query = "INSERT INTO UserObmGroup (userobmgroup_group_id,
       userobmgroup_userobm_id)
-    VALUES ($group_id, $ins_user)";
-
+    VALUES ($g_id, $ins_user)";
     display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
     $retour = $obm_q->query($query);
+
+    // Update internal group membership direct mapping
+    of_usergroup_update_group_hierarchy($group_id);
   }
 
   return $retour;
@@ -670,11 +672,11 @@ function run_query_user_init_group($domain_id, $u_id, $gid, $oldGid) {
 ///////////////////////////////////////////////////////////////////////////////
 // User update query execution
 // Parameters:
-//   - $p_id     : user id
+//   - $u_id     : user id
 //   - $user[]   : entry values
 //     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_update($p_id, $user) {
+function run_query_user_update($u_id, $user) {
   //global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $cg_gid_user;
@@ -699,7 +701,8 @@ function run_query_user_update($p_id, $user) {
   $multidomain = sql_multidomain('userobm');
   $photo_id = sql_parse_id($user['photo_id']);
   
-  $u = get_user_info($p_id);
+  $u = get_user_info($u_id);
+  $domain_id = $u['domain_id'];
 
   // Target Delegation handling (if updated user as delegation admin realm)
   $profiles = $user['profiles'];
@@ -799,72 +802,22 @@ function run_query_user_update($p_id, $user) {
 
 
   // User UID/GID
-  $userDesc = get_user_info($p_id);
+  $userDesc = get_user_info($u_id);
 
-  $gid = $userDesc['gid'];
+  $old_gid = $userDesc['gid'];
   if ($cgp_use['service']['samba']) {
-    if ($userDesc['perms'] == "$perms_admin" && $profile == "$perms_admin") {
-      // Utilisateur etait et est admin
-      if ($userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur etait Samba et n'est plus Samba
-        $gid = $cg_gid_user;
-      } elseif (!$userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur n'etait pas Samba et est Samba
-        $gid = $cg_gid_smb_admin;
-      }
-    } elseif ($userDesc['perms'] == "$perms_admin" && $profile != "$perms_admin") {
-      // Utilisateur etait et n'est plus admin
-      if ($userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur etait Samba et est Samba
-        $gid = $cg_gid_smb_user;
-      } elseif ($userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur etait Samba et n'est plus Samba
-        $gid = $cg_gid_user;
-      } elseif (!$userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur n'etait pas Samba et est Samba
-        $gid = $cg_gid_smb_user;
-      } elseif (!$userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur n'etait pas Samba et n'est pas Samba
-        $gid = $cg_gid_user;
-      }
-    } elseif ($userDesc['perms'] != "$perms_admin" && $profile == "$perms_admin") {
-      // Utilisateur n'etait pas et est admin
-      if ($userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur etait Samba et est Samba
-        $gid = $cg_gid_smb_admin;
-      } elseif ($userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur etait Samba et n'est plus Samba
-        $gid = $cg_gid_user;
-      } elseif (!$userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur n'etait pas Samba et est Samba
-        $gid = $cg_gid_smb_admin;
-      } elseif (!$userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur n'etait pas Samba et n'est pas Samba
-        $gid = $cg_gid_user;
-      }
-    } elseif ($userDesc['perms'] != "$perms_admin" && $profile != "$perms_admin") {
-      // Utilisateur n'etait pas et n'est pas admin
-      if ($userDesc['samba_perms'] && !$smb_perms) {
-        // Utilisateur etait Samba et n'est plus Samba
-        $gid = $cg_gid_user;
-      } elseif (!$userDesc['samba_perms'] && $smb_perms) {
-        // Utilisateur n'etait pas Samba et est Samba
-        $gid = $cg_gid_smb_user;
-      }
-    }
-  } else {
-    if ($userDesc['perms'] == "$perms_admin" && $profile != "$perms_admin") {
-      // Utilisateur etait et n'est plus admin
+    if ($userDesc['samba_perms'] && !$smb_perms) {
+      // Windows attribute just removed
       $gid = $cg_gid_user;
-    } elseif ($userDesc['perms'] != "$perms_admin" && $profile == "$perms_admin") {
-      // Utilisateur n'etait pas et est admin
-      $gid = $cg_gid_user;
+    } elseif (!$userDesc['samba_perms'] && $smb_perms) {
+      // Windows attribute just added
+      $gid = $cg_gid_smb_user;
     }
   }
 
   // If gid not set, give it an integer value
   if ($gid == '') {
-    $gid = 0;
+    $gid = $cg_gid_user;
   }
 
   $passwd = stripslashes($user['passwd']);
@@ -890,27 +843,27 @@ function run_query_user_update($p_id, $user) {
     $passwd_update = "userobm_password='$passwd_crypt', userobm_password_type='$password_encryption'";
     $passwd_update_q = $passwd_update.',';
   }
-  $id = sql_parse_id($p_id, true);
+  $id = sql_parse_id($u_id, true);
   $query = "UPDATE UserObm SET
-    userobm_timeupdate='". date('Y-m-d H:i:s')."',
-    userobm_userupdate=$obm[uid],
+    userobm_timeupdate = '". date('Y-m-d H:i:s')."',
+    userobm_userupdate = $obm[uid],
     $passwd_update_q
     $user_update_q
-    userobm_perms='$profile',
-    userobm_gid='$gid',
-    userobm_archive=$archive,
-    userobm_hidden=$hidden,
-    userobm_datebegin=$datebegin,
-    userobm_account_dateexp=$dateexp,
-    userobm_kind='$kind',
-    userobm_lastname='$lname',
-    userobm_firstname='$fname',
-    userobm_title='$title',
-    userobm_phone='$phone',
-    userobm_phone2='$phone2',
-    userobm_mobile='$mobile',
-    userobm_fax='$fax',
-    userobm_fax2='$fax2',
+    userobm_perms = '$profile',
+    userobm_gid = '$gid',
+    userobm_archive = $archive,
+    userobm_hidden = $hidden,
+    userobm_datebegin = $datebegin,
+    userobm_account_dateexp = $dateexp,
+    userobm_kind = '$kind',
+    userobm_lastname = '$lname',
+    userobm_firstname = '$fname',
+    userobm_title = '$title',
+    userobm_phone = '$phone',
+    userobm_phone2 = '$phone2',
+    userobm_mobile = '$mobile',
+    userobm_fax = '$fax',
+    userobm_fax2 = '$fax2',
     userobm_company = '$company',
     userobm_direction = '$direction',
     userobm_service = '$service',
@@ -920,8 +873,8 @@ function run_query_user_update($p_id, $user) {
     userobm_zipcode = '$zip',
     userobm_town = '$town',
     userobm_expresspostal = '$cdx',
-    userobm_email='$email',
-    userobm_description='$desc'
+    userobm_email = '$email',
+    userobm_description = '$desc'
     $q_delegation_target
     $q_delegation
     $query_web
@@ -973,18 +926,22 @@ function run_query_user_update($p_id, $user) {
         }
       }
     }
+  }
 
+  if ($old_gid != $gid) {
+    // Subscribe the user to his default group
+    run_query_user_init_group($domain_id, $u_id, $gid, $old_gid);
   }
 
   // If the user is archived, we unsubscribe it from of_usergroup table only
   if ($archive == '1' && $u['archive'] == 0) {
-    of_usergroup_delete_user_hierarchy($p_id);
+    of_usergroup_delete_user_hierarchy($u_id);
   } elseif($archive == '0' && $u['archive'] == 1) {
-    of_usergroup_update_user_hierarchy($p_id);
+    of_usergroup_update_user_hierarchy($u_id);
   }
 
   // Update photo
-  if(isset($user['file_tmp']) && $user['file_tmp'] != '') {
+  if (isset($user['file_tmp']) && $user['file_tmp'] != '') {
     $user['title'] = $user['login'];
 
     // Select user photo
@@ -995,11 +952,11 @@ function run_query_user_update($p_id, $user) {
 
     // Update user's photo
     run_query_global_delete_document($obm_q->f('userobm_photo_id'));
-    $doc_id = run_query_global_insert_document($user, $p_id, 'user');
+    $doc_id = run_query_global_insert_document($user, $u_id, 'user');
 
-    if($doc_id > 0) {
+    if ($doc_id > 0) {
       // Update userobm_photo_id
-      $query = "UPDATE UserObm SET userobm_photo_id='$doc_id' WHERE userobm_id='$p_id'"; 
+      $query = "UPDATE UserObm SET userobm_photo_id='$doc_id' WHERE userobm_id='$u_id'"; 
       display_debug_msg($query, $cdg_sql, 'run_query_user_update(3)');
       $obm_q->query($query);
      }
@@ -1022,7 +979,7 @@ function run_query_user_update($p_id, $user) {
   }
 
   if ($retour) {
-    $ret = of_userdata_query_update('user', $p_id, $user);
+    $ret = of_userdata_query_update('user', $u_id, $user);
   }
 
   if ($p_id == $obm['uid']) {
@@ -1120,6 +1077,7 @@ function run_query_user_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_user_group($p_id) {
   global $cdg_sql, $obm;
+
   $p_id = sql_parse_id($p_id, true);
   $query = "SELECT *
     FROM UGroup
@@ -1142,10 +1100,11 @@ function run_query_user_user_group($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_unsubscribe_all_groups($p_id) {
   global $cdg_sql;
+
   $p_id = sql_parse_id($p_id, true);
   $query = "DELETE
   FROM UserObmGroup
-  WHERE userobmgroup_userobm_id $p_id ";
+  WHERE userobmgroup_userobm_id $p_id";
 
   display_debug_msg($query, $cdg_sql, 'run_query_user_unsubscribe_all_groups()');
   $obm_q = new DB_OBM;
@@ -1167,6 +1126,7 @@ function run_query_user_unsubscribe_all_groups($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_public_owner_group($uid) {
   global $obm, $cdg_sql;
+
   $uid = sql_parse_id($uid, true);
   $query = "SELECT *
     FROM UGroup

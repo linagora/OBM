@@ -754,7 +754,7 @@ function html_user_consult($obm_q) {
       <th>$l_smb_perms</th>
       <td>$smb_state</td>
     </tr>";
-    if($smb_perms == '1') {
+    if ($smb_perms == '1') {
       $samba_section .= "      
       <tr>
         <th>$l_smb_home</th>
@@ -775,7 +775,7 @@ function html_user_consult($obm_q) {
   }
 
   // Photo
-  if($photo_id > 0) {
+  if ($photo_id > 0) {
     $block_photo = "<img src=\"$path/document/document_index.php?action=accessfile&document_id=$photo_id\" alt=\"[Photo]\"/ />";
   } else {
     $block_photo = '';
@@ -948,9 +948,13 @@ function html_user_group_consult($usr_q) {
   global $l_update_group, $l_user, $l_group_member, $l_group;
 
   $id = $usr_q->f('userobm_id');
+  $domain_id = $usr_q->f('userobm_domain_id');
+  $gid = $usr_q->f('userobm_gid');
   $login = $usr_q->f('userobm_login');
   $lname = $usr_q->f('userobm_lastname');
   $fname = $usr_q->f('userobm_firstname');
+
+  $default_group_id = get_group_id_from_gid($domain_id, $gid);
 
   // Liste des groupes
   $g_q = run_query_user_public_owner_group($id);
@@ -967,10 +971,16 @@ function html_user_group_consult($usr_q) {
     $grp_id = $g_q->f('group_id');
     $grp_name = $g_q->f('group_name');
     $checked = (in_array($grp_id, $groups) ? ' checked' : '' );
+    $disabled = '';
+    $default = '';
+    if ($grp_id == $default_group_id) {
+      $disabled = 'disabled="disabled" ';
+      $default = '*';
+    }
     $dis_group .= "
     <tr>
       <th>$grp_name</th>
-      <td><input name=\"data-g-$grp_id\" type=\"checkbox\" value=\"1\" $checked /></td>
+      <td><input name=\"data-g-$grp_id\" type=\"checkbox\" value=\"1\" $checked $disabled/>$default</td>
     </tr>";
   }
 
@@ -1522,13 +1532,13 @@ function html_user_form($usr_q, $user, $field='') {
     $dis_button = "<input type=\"hidden\" id=\"user_action\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"user_id\" value=\"$id\" />";
     if ($status == 'INIT') {
-        $dis_button .= "<input type=\"button\" onclick=\"obm.popup.show('idPopupValidUser')\" value=\"$l_update\" />";
+      $dis_button .= "<input type=\"button\" onclick=\"obm.popup.show('idPopupValidUser')\" value=\"$l_update\" />";
     } else {
-        $dis_button .= "<input type=\"submit\" value=\"$l_update\" />";
+      $dis_button .= "<input type=\"submit\" value=\"$l_update\" />";
     }
   }
 
-  //Popup password Generate
+  // Popup password Generate
   $pop_generate = "
     <div id=\"popupModifPassword\" class=\"obmPopup\">
         <h1>
@@ -1543,14 +1553,12 @@ function html_user_form($usr_q, $user, $field='') {
 		    	<input type=\"button\" onclick=\"javascript:generate_passwd()\" id=\"popup_confirm\" class=\"closeSticky\" value=\"$GLOBALS[l_confirm]\" />
           <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
 				</fieldset>
-    </div>
-    ";
+    </div>";
 
   // Status User
-  if($status == 'INIT'){
+  if ($status == 'INIT'){
     $dis_status = "
-        <input type=\"hidden\" name=\"ta_status\" value=\"$status\" />
-        ";
+        <input type=\"hidden\" name=\"ta_status\" value=\"$status\" />";
     $pop_up = "
       <div id=\"idPopupValidUser\" class=\"obmPopup\">
         <h1>
@@ -1565,20 +1573,17 @@ function html_user_form($usr_q, $user, $field='') {
 		    	<input type=\"button\" onclick=\"$('dataUser').submit()\" id=\"popup_manage\" class=\"closeSticky\" value=\"$l_validate\" />
           <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
 				</fieldset>
-      </div>
-      ";
+      </div>";
     $dis_archive = "
       <tr>
         <td><input name=\"cba_archive\" type=\"hidden\" value=\"1\" $archive /></td>
-      </tr>
-    "; 
+      </tr>";
   } else {
     $dis_archive = "
       <tr>
         <th class=\"$class[archive]\">$l_archive</th>
         <td><input name=\"cba_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
-      </tr>
-    "; 
+      </tr>";
   }
 
   // Photo
@@ -1608,7 +1613,7 @@ function html_user_form($usr_q, $user, $field='') {
     $selected = '';
     foreach($delegation_modules as $mdl => $rgt) {
       $section = $GLOBALS['cgp_show']['modules'][$mdl];
-      if(Perm::check_section_right($section, $k_profile) && Perm::check_module_right($mdl, $rgt, $k_profile)) {
+      if (Perm::check_section_right($section, $k_profile) && Perm::check_module_right($mdl, $rgt, $k_profile)) {
         $onselect .= "profiles['$k_profile'] = true\n";
         if (!isset($delegation_class) && $profile == $k_profile){
           $delegation_class = '';
@@ -1626,8 +1631,8 @@ function html_user_form($usr_q, $user, $field='') {
     $block_profile .= "<option value=\"$k_profile\"$selected>$dis_profile</option>";
 
   }
-  if($cgp_use['property']['delegation']) {
-    if(!isset($delegation_target)) $delegation_target = $obm['delegation'];
+  if ($cgp_use['property']['delegation']) {
+    if (!isset($delegation_target)) $delegation_target = $obm['delegation'];
     $dis_delegation_target = "
     <tr class='$delegation_class' id='delegationTargetBlock'>
       <th class=\"$class[delegation_target]\">$l_delegation_target</th>

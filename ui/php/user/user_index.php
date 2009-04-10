@@ -44,31 +44,31 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $debug = 1;
-$path = "..";
-$module = "user";
-$obminclude = getenv("OBM_INCLUDE_VAR");
-if ($obminclude == "") $obminclude = "obminclude";
+$path = '..';
+$module = 'user';
+$obminclude = getenv('OBM_INCLUDE_VAR');
+if ($obminclude == '') $obminclude = 'obminclude';
 
 include("$obminclude/global.inc");
 
 $params = get_user_params();
 
-page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
+page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
-require("../profile/profile_query.inc");
-require("user_display.inc");
-require("user_query.inc");
-require("user_js.inc");
+require('../profile/profile_query.inc');
+require('user_display.inc');
+require('user_query.inc');
+require('user_js.inc');
 require_once("$obminclude/of/of_category.inc");
 require("$obminclude/of/of_right.inc"); // needed by call from calendar
 
 // detailconsult can be accessed without user_id (-> display current user)
-if (($action == "detailconsult") && (! $params["user_id"])) $params["user_id"] = $obm["uid"];
+if (($action == 'detailconsult') && (! $params['user_id'])) $params['user_id'] = $obm['uid'];
 
 get_user_action();
 $perm->check_permissions($module, $action);
 
-update_last_visit("user", $params["user_id"], $action);
+update_last_visit('user', $params['user_id'], $action);
 
 page_close();
 
@@ -80,212 +80,212 @@ $params = get_user_params_mail_server_id($params);
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "ext_get_ids") {
-  $display["search"] = html_user_search_form($params);
-  if ($_SESSION['set_display'] == "yes") {
-    $display["result"] = dis_user_search_list($params);
+if ($action == 'ext_get_ids') {
+  $display['search'] = html_user_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_user_search_list($params);
   } else {
-    $display["msg"] .= display_info_msg($l_no_display);
+    $display['msg'] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "ext_get_id") {
-  $display["search"] = html_user_search_form($params);
-  if ($_SESSION['set_display'] == "yes") {
-    $display["result"] = dis_user_search_list($params);
+} elseif ($action == 'ext_get_id') {
+  $display['search'] = html_user_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_user_search_list($params);
   } else {
-    $display["msg"] .= display_info_msg($l_no_display);
+    $display['msg'] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "index" || $action == "") {
+} elseif ($action == 'index' || $action == '') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_user_search_form($params);
-  if ($_SESSION['set_display'] == "yes") {
-    $display["result"] = dis_user_search_list($params);
+  $display['search'] = html_user_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_user_search_list($params);
   } else {
-    $display["msg"] .= display_info_msg($l_no_display);
+    $display['msg'] .= display_info_msg($l_no_display);
   }
 
-} elseif ($action == "search") {
+} elseif ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_user_search_form($params);
-  $display["result"] = dis_user_search_list($params);
+  $display['search'] = html_user_search_form($params);
+  $display['result'] = dis_user_search_list($params);
 
-} elseif ($action == "ext_search") {
+} elseif ($action == 'ext_search') {
 ///////////////////////////////////////////////////////////////////////////////
   $user_q = run_query_user_ext_search($params);
   json_search_users($params, $user_q);
-  echo "(".$display['json'].")";
+  echo '('.$display['json'].')';
   exit();
-} elseif ($action == "new") {
+} elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_user_form("",$params);
+  $display['detail'] = html_user_form('',$params);
 
-} elseif ($action == "detailconsult") {
+} elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_user_consult($params);
+  $display['detail'] = dis_user_consult($params);
 
 } elseif ($action == 'wait') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['result'] = dis_user_wait_list($params);
 
-} elseif ($action == "detailupdate") {
+} elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_update_rights($params)) {
-    $obm_q = run_query_user_detail($params["user_id"]);
+    $obm_q = run_query_user_detail($params['user_id']);
     if ($obm_q->num_rows() == 1) {
-      $display["detailInfo"] = display_record_info($obm_q);
-      $display["detail"] = html_user_form($obm_q, $params);
+      $display['detailInfo'] = display_record_info($obm_q);
+      $display['detail'] = html_user_form($obm_q, $params);
     } else {
-      $display["msg"] .= display_err_msg($l_err_reference);
+      $display['msg'] .= display_err_msg($l_err_reference);
     }
   } else {
-    $display["msg"] .= display_warn_msg($err['msg']);
-    $display["detail"] = dis_user_consult($params);
+    $display['msg'] .= display_warn_msg($err['msg']);
+    $display['detail'] = dis_user_consult($params);
   }
 
-} elseif ($action == "insert") {
+} elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_user_defined_rules() && check_user_data_form("", $params)) {
+  if (check_user_defined_rules() && check_user_data_form('', $params)) {
 
     // If the context (same user) was confirmed ok, we proceed
-    if ($params["confirm"] == $c_yes) {
+    if ($params['confirm'] == $c_yes) {
       $cid = run_query_user_insert($params);
       if ($cid > 0) {
-        $params["user_id"] = $cid;
+        $params['user_id'] = $cid;
         set_update_state();
-        $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
-        $display["msg"] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
-        $display["detail"] = dis_user_consult($params);
+        $display['msg'] .= display_ok_msg("$l_user : $l_insert_ok");
+        $display['msg'] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
+        $display['detail'] = dis_user_consult($params);
       } else {
-        $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
-        $display["detail"] = html_user_form("", $params);
+        $display['msg'] .= display_err_msg("$l_user : $l_insert_error");
+        $display['detail'] = html_user_form('', $params);
       }
 
     // If it is the first try, we warn the user if some user seem similar
     } else {
-      $obm_q = check_user_context("", $params);
+      $obm_q = check_user_context('', $params);
       if ($obm_q->num_rows() > 0) {
-        $display["detail"] = dis_user_warn_insert("", $obm_q, $params);
+        $display['detail'] = dis_user_warn_insert('', $obm_q, $params);
       } else {
         $cid = run_query_user_insert($params);
         if ($cid > 0) {
           set_update_state();
-          $params["user_id"] = $cid;
-          $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
-          $display["detail"] = dis_user_consult($params);
+          $params['user_id'] = $cid;
+          $display['msg'] .= display_ok_msg("$l_user : $l_insert_ok");
+          $display['detail'] = dis_user_consult($params);
         } else {
-          $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
-          $display["detail"] = html_user_form("",$params);
+          $display['msg'] .= display_err_msg("$l_user : $l_insert_error");
+          $display['detail'] = html_user_form('',$params);
         }
       }
     }
 
   // Form data are not valid
   } else {
-    $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err["msg"]);
-    $display["detail"] = html_user_form("", $params, $err["field"]);
+    $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
+    $display['detail'] = html_user_form('', $params, $err['field']);
   }
 
-} elseif ($action == "reset") {
+} elseif ($action == 'reset') {
 ///////////////////////////////////////////////////////////////////////////////
-  reset_preferences_to_default($params["user_id"]);
+  reset_preferences_to_default($params['user_id']);
   session_load_user_prefs();
-  $display["msg"] .= display_ok_msg($l_reset_ok);
-  $display["detail"] = dis_user_consult($params);
+  $display['msg'] .= display_ok_msg($l_reset_ok);
+  $display['detail'] = dis_user_consult($params);
 
-} elseif ($action == "update") {
+} elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_user_defined_rules() && check_user_data_form($params["user_id"], $params)) {
-    $retour = run_query_user_update($params["user_id"], $params);
+  if (check_user_defined_rules() && check_user_data_form($params['user_id'], $params)) {
+    $retour = run_query_user_update($params['user_id'], $params);
     if ($retour) {
       set_update_state();
-      $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
-      $display["detail"] = dis_user_consult($params);
+      $display['msg'] .= display_ok_msg("$l_user : $l_update_ok");
+      $display['detail'] = dis_user_consult($params);
     } else {
-      $display["msg"] .= display_err_msg("$l_user : $l_update_error");
-      $display["detail"] = html_user_form("", $params, $err["field"]);
+      $display['msg'] .= display_err_msg("$l_user : $l_update_error");
+      $display['detail'] = html_user_form('', $params, $err['field']);
     }
   } else {
-    $display["msg"] .= display_err_msg($err["msg"]);
-    $display["detail"] = html_user_form("", $params, $err["field"]);
+    $display['msg'] .= display_err_msg($err['msg']);
+    $display['detail'] = html_user_form('', $params, $err['field']);
   }
 
-} elseif ($action == "valid") {
+} elseif ($action == 'valid') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_user_defined_rules() && check_user_data_form($params["user_id"], $params)) {
-    $retour = run_query_user_update($params["user_id"], $params);
+  if (check_user_defined_rules() && check_user_data_form($params['user_id'], $params)) {
+    $retour = run_query_user_update($params['user_id'], $params);
     if ($retour) {
-      $retour = run_query_user_valid($params["user_id"]);
+      $retour = run_query_user_valid($params['user_id']);
       if ($retour) {
         set_update_state();
-        $display["msg"] .= display_ok_msg("$l_user : $l_valid_ok");
-        $display["msg"] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
-        $display["detail"] = dis_user_consult($params);
+        $display['msg'] .= display_ok_msg("$l_user : $l_valid_ok");
+        $display['msg'] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
+        $display['detail'] = dis_user_consult($params);
       } else {
-        $display["msg"] .= display_err_msg("$l_user : $l_valid_error");
-        $display["detail"] = html_user_form("", $params, $err["field"]);
+        $display['msg'] .= display_err_msg("$l_user : $l_valid_error");
+        $display['detail'] = html_user_form('', $params, $err['field']);
       }
     } else {
-      $display["msg"] .= display_err_msg("$l_user : $l_update_error");
-      $display["detail"] = html_user_form("", $params, $err["field"]);
+      $display['msg'] .= display_err_msg("$l_user : $l_update_error");
+      $display['detail'] = html_user_form('', $params, $err['field']);
     }
   } else {
-    $display["msg"] .= display_err_msg($err["msg"]);
-    $display["detail"] = html_user_form("", $params, $err["field"]);
+    $display['msg'] .= display_err_msg($err['msg']);
+    $display['detail'] = html_user_form('', $params, $err['field']);
   }
 } elseif ($action == 'pdf') {
 ///////////////////////////////////////////////////////////////////////////////
   require_once("$obminclude/of/of_pdf.php");
   dis_user_export_pdf($params['user_id']);
   exit(1);
-} elseif ($action == "check_delete") {
+} elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_can_delete($params)) {
-    $display["msg"] .= display_info_msg($ok_msg, false);
-    $display["detail"] = dis_user_can_delete($params["user_id"]);
+    $display['msg'] .= display_info_msg($ok_msg, false);
+    $display['detail'] = dis_user_can_delete($params['user_id']);
   } else {
-    $display["msg"] .= display_warn_msg($err["msg"], false);
-    $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_user_consult($params);
+    $display['msg'] .= display_warn_msg($err['msg'], false);
+    $display['msg'] .= display_warn_msg($l_cant_delete, false);
+    $display['detail'] = dis_user_consult($params);
   }
 
-} elseif ($action == "delete") {
+} elseif ($action == 'delete') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_can_delete($params)) {
-    run_query_user_delete_profile($params["user_id"]);
-    $retour = run_query_user_delete($params["user_id"]);
+    run_query_user_delete_profile($params['user_id']);
+    $retour = run_query_user_delete($params['user_id']);
     if ($retour) {
       set_update_state();
-      $display["msg"] .= display_ok_msg("$l_user : $l_delete_ok");
+      $display['msg'] .= display_ok_msg("$l_user : $l_delete_ok");
     } else {
-      $display["msg"] .= display_err_msg("$l_user : $l_delete_error");
+      $display['msg'] .= display_err_msg("$l_user : $l_delete_error");
     }
-    $display["search"] = html_user_search_form($params);
+    $display['search'] = html_user_search_form($params);
   } else {
-    $display["msg"] .= display_warn_msg($err['msg'], false);
-    $display["msg"] .= display_warn_msg($l_cant_delete, false);
-    $display["detail"] = dis_user_consult($params);
+    $display['msg'] .= display_warn_msg($err['msg'], false);
+    $display['msg'] .= display_warn_msg($l_cant_delete, false);
+    $display['detail'] = dis_user_consult($params);
   }
 
-} elseif ($action == "group_consult") {
+} elseif ($action == 'group_consult') {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_user_detail($params["user_id"]);
+  $obm_q = run_query_user_detail($params['user_id']);
   if ($obm_q->num_rows() == 1) {
-    $display["detail"] = html_user_group_consult($obm_q);
+    $display['detail'] = html_user_group_consult($obm_q);
   } else {
-    $display["msg"] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_err_msg($l_err_reference);
   }
 
-} elseif ($action == "group_update") {
+} elseif ($action == 'group_update') {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_user_update_user_group($params);
   if ($retour >= 0) {
     set_update_state();
-    $display["msg"] .= display_ok_msg("$l_user : $l_update_ok");
+    $display['msg'] .= display_ok_msg("$l_user : $l_update_ok");
   } else {
-    $display["msg"] .= display_err_msg("$l_user : $l_update_error");
+    $display['msg'] .= display_err_msg("$l_user : $l_update_error");
   }
-  $display["detail"] = dis_user_consult($params);
+  $display['detail'] = dis_user_consult($params);
 
 } elseif ($action == 'import') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -318,21 +318,21 @@ if ($action == "ext_get_ids") {
   
 } else if ($action == 'search_batch_user') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_user_search_form($params);
-  if ($_SESSION['set_display'] == "yes") {
-    $display["result"] = dis_user_search_list($params);
+  $display['search'] = html_user_search_form($params);
+  if ($_SESSION['set_display'] == 'yes') {
+    $display['result'] = dis_user_search_list($params);
   } else {
-    $display["msg"] .= display_info_msg($l_no_display);
+    $display['msg'] .= display_info_msg($l_no_display);
   }
   
 } else if ($action == 'sel_batch_users') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_user_search_form($params);
-  $display["result"] = dis_user_search_list($params);
+  $display['search'] = html_user_search_form($params);
+  $display['result'] = dis_user_search_list($params);
   
 } else if ($action == 'edit_batch_values') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_user_batch_form($params);
+  $display['detail'] = html_user_batch_form($params);
   
 } else if ($action == 'batch_processing') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -344,15 +344,15 @@ if ($action == "ext_get_ids") {
       $display['msg'] .= display_ok_msg("$l_header_batch : $l_update_ok (".sizeof($users_id).") ");
       if (sizeof($users_id_error) > 0) {
         check_users_error_data($params, $users_id_error);
-        $display["msg"] .= display_warn_msg($err['msg'], false);
+        $display['msg'] .= display_warn_msg($err['msg'], false);
       }
     } else {
       $display['msg'] .= display_err_msg("$l_header_batch : $l_update_error");
       $display['detail'] = html_user_batch_form($params);
     }
   } else {
-    $display["msg"] .= display_err_msg($err['msg'], false);
-    $display["detail"] = html_user_batch_form($params);
+    $display['msg'] .= display_err_msg($err['msg'], false);
+    $display['detail'] = html_user_batch_form($params);
   }
 }
 

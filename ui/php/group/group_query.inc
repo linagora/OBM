@@ -407,6 +407,7 @@ function run_query_group_update($group) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Deletion query execution
 // Parameters:
@@ -516,7 +517,7 @@ function run_query_group_usergroup_insert($group) {
 //   - $group[] : group hash info : keys used : id, user_nb, userX
 // Return: number of users deleted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_group_usergroup_delete($group) {
+function run_query_group_usergroup_delete($group, $domain_id) {
   global $cdg_sql;
 
   $id = sql_parse_id($group['group_id'], true);
@@ -524,11 +525,15 @@ function run_query_group_usergroup_delete($group) {
   $cpt_del = 0;
   while ($cpt < $group['user_nb']) {
     $cpt++;
-    $u_id = sql_parse_id($group["user$cpt"], true);
+    $u_id = $group["user$cpt"];
+    $sql_u_id = sql_parse_id($u_id, true);
+
+    // BOD : to complete : prevent to delete if user default group
+    //    $group_id = get_group_id_from_gid($domain_id, $oldGid);
 
     $query = "DELETE FROM UserObmGroup
     WHERE userobmgroup_group_id $id
-    AND userobmgroup_userobm_id $u_id ";
+    AND userobmgroup_userobm_id $sql_u_id ";
     display_debug_msg($query, $cdg_sql, 'run_query_group_usergroup_delete()');
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);

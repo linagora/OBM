@@ -235,9 +235,9 @@ if (($action == 'index') || ($action == '')) {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_group_update_rights($params)) {
     if ($params['user_nb'] > 0) {
-      $nb = run_query_group_usergroup_delete($params);
-      // Set update state only if updated group is public
       $g = get_group_info($params['group_id']);
+      $nb = run_query_group_usergroup_delete($params, $g['domain_id']);
+      // Set update state only if updated group is public
       if ($g['privacy'] == 0) {
 	set_update_state();
       }

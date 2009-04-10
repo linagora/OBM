@@ -2043,6 +2043,7 @@ function get_group_info($id) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
+  $g['domain_id'] = $obm_q->f('group_domain_id');
   $g['usercreate'] = $obm_q->f('group_usercreate');
   $g['name'] = $obm_q->f('group_name');
   $g['system'] = $obm_q->f('group_system');
@@ -2306,6 +2307,7 @@ function of_usergroup_update_group_hierarchy($g_id) {
   return $ret;
 }
 
+
 /**
  * Delete a user from of_usergroup.
  * Beware if used under unchecked circuntances this might
@@ -2335,6 +2337,7 @@ function of_usergroup_delete_user_hierarchy($u_id, $is_array=false) {
   
   return $ret;
 }
+
 
 /**
  * Reset the user hierarchy and rebuild it.
