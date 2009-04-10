@@ -3612,10 +3612,10 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   
     if (is_array($res_grp['entity'])) {
       foreach ($res_grp['entity'] as $rg_id => $rg_ent) {
-  $rg_name = $rg_ent['label'];
-  $sel_id = "data-resourcegroup-$r_id";
-  $div_id = "sel_resource_group_id-$sel_id";
-  $dis_sel_resource_group .= "
+        $rg_name = $rg_ent['label'];
+        $sel_id = "data-resourcegroup-$r_id";
+        $div_id = "sel_resource_group_id-$sel_id";
+        $dis_sel_resource_group .= "
           <div class=\"elementRow\" id=\"$div_id\">
           <a href=\"javascript: remove_element('$div_id','sel_resource_group_id');\">
           <img src=\"$ico_delete\" alt=\"[Delete]\" />
@@ -3656,14 +3656,15 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
       <table>
       $dis_block_resource 
       $dis_block_resource_group
-      <tr><th>$l_resource_group_search</th><td>
-      <select name='resource_group_search'>
-      <option value='one'>$l_resources_one_freebusy</option>
-      <option value='all'>$l_resources_all_freebusy</option>
-      </select>
-      </td></tr>      
+      <input type='hidden' name='resource_group_search' value='all' />
       </table>
-      </fieldset>";      
+      </fieldset>";    
+      //  <tr><th>$l_resource_group_search</th><td>
+      //  <select name='resource_group_search'>
+      //  <option value='one'>$l_resources_one_freebusy</option>
+      //  <option value='all'>$l_resources_all_freebusy</option>
+      //  </select>
+      //  </td></tr>        
   }
   
   // group select

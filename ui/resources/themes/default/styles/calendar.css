@@ -669,20 +669,23 @@ h1.hoursTitle{
 
 #scrollLeft {
   position: absolute;
-  cursor: pointer;
+  text-align: left;
   width:1em;
+  cursor: pointer;
   background:	#35839A;
   color:#FFF;
+  z-index:100000;
 }
 
 #scrollRight {
+  position: absolute;
   text-align: right;
   width:1em;
-  position: absolute;
   right: 1em;
   cursor: pointer;
   background:	#35839A;
   color:#FFF;
+  z-index:100000;
 }
 
 .freeBusyCalendar table {
