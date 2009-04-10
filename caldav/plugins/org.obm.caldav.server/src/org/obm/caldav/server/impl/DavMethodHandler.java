@@ -1,6 +1,5 @@
 package org.obm.caldav.server.impl;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -14,6 +13,6 @@ public abstract class DavMethodHandler {
 		
 	}
 
-	public abstract void process(Token token, HttpServletRequest req, HttpServletResponse resp);
+	public abstract void process(Token token, DavRequest req, HttpServletResponse resp);
 	
 }
