@@ -22,6 +22,7 @@
    </vm>
 
    <plugins>
+      <plugin id="fr.aliasource.utils"/>
       <plugin id="fr.aliasource.webmail.log4j" fragment="true"/>
       <plugin id="javax.servlet"/>
       <plugin id="org.apache.commons.logging"/>
