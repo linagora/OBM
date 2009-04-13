@@ -233,11 +233,13 @@ if ($action == 'ext_get_ids') {
     $display['msg'] .= display_err_msg($err['msg']);
     $display['detail'] = html_user_form('', $params, $err['field']);
   }
+
 } elseif ($action == 'pdf') {
 ///////////////////////////////////////////////////////////////////////////////
   require_once("$obminclude/of/of_pdf.php");
   dis_user_export_pdf($params['user_id']);
   exit(1);
+
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_can_delete($params)) {
@@ -399,7 +401,7 @@ function get_user_params() {
     $params['type'] = $_FILES['fi_file']['type'];
   }
 
-  if(is_array($params['email'])) {
+  if (is_array($params['email'])) {
     $email_aliases = array();
     while(!empty($params['email'])) {
       $email = trim(array_shift($params['email']));
@@ -615,7 +617,7 @@ function get_user_action() {
     'Right'    => $cright_read_admin,
     'Condition'=> array ('all')
                                                  );
-                                                 
+
 // Search Batch user : Users selection
   $actions['user']['search_batch_user'] = array (
     'Name'     => $l_header_batch,
@@ -630,14 +632,14 @@ function get_user_action() {
     'Right'    => $cright_write_admin,
     'Condition'=> array('None')
     );
-    
+
 // Edit batch values
   $actions['user']['edit_batch_values'] = array (
     'Url'      => "$path/user/user_index.php?action=edit_batch_values",
     'Right'    => $cright_write_admin,
     'Condition'=> array('None')
     );
-    
+
 // Batch processing
   $actions['user']['batch_processing'] = array (
     'Url'	   => "$path/user/user_index.php?action=batch_processing",
@@ -679,7 +681,7 @@ function update_user_action() {
       $actions['user']['detailconsult']['Condition'] = array('None');
     }
   }
-  if(!check_user_wait($params)) {
+  if (!check_user_wait($params)) {
     $actions['user']['wait']['Condition'] = array('None');
   }
 }

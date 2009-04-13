@@ -677,7 +677,6 @@ function run_query_user_init_group($domain_id, $u_id, $gid, $oldGid) {
 //     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_update($u_id, $user) {
-  //global $obm, $profiles, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
   global $cg_gid_smb_admin, $cg_gid_smb_user, $cg_gid_user;
   global $cmd_ldap_passwd;
@@ -1236,11 +1235,7 @@ function run_query_user_update_user_group($user) {
   // Si c'est un amdin aliamin => Admins aliamin = Domain admins
   $u = get_user_info($u_id);
   if ($u['samba_perms'] == '1') {
-    if ($u['perms'] == $perms_admin) {
-      $gid = $cg_gid_smb_admin;
-    } else {
-      $gid = $cg_gid_smb_user;
-    }
+    $gid = $cg_gid_smb_user;
     $domain_id = $u['domain_id'];
     run_query_user_init_group($domain_id, $u_id, $gid, NULL);
   }
@@ -2012,8 +2007,8 @@ function run_query_user_delete_profile($user_id)  {
      WHERE event_id NOT IN (SELECT eventlink_event_id FROM EventLink)"; 
   display_debug_msg($query, $cdg_sql, "run_query_user_delete_profile(Orphan events)");
   $obm_q->query($query);
-
 }
+
 
 /**
  * Check if batch processing data form are not conflicting
