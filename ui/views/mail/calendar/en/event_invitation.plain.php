@@ -1,17 +1,27 @@
-Message automatique envoyé par OBM
+This email was automatically sent by OBM
 ------------------------------------------------------------------
-RENDEZ-VOUS MODIFIÉ !
+NEW APPOINTMENT
 ------------------------------------------------------------------
 
-Le rendez-vous <?php echo $title; ?>, initialement prévu du <?php echo $old_start; ?> au <?php echo $old_end; ?>, (lieu : <?php echo $old_location; ?>),
-a été modifié et se déroulera du <?php echo $start; ?> au <?php echo $end; ?>, (lieu : <?php echo $location; ?>).
+You are invited to participate to an appointment
 
-:: Pour plus de détails : 
+from     : <?php echo $start; ?>
+
+to       : <?php echo $end; ?>
+
+subject  : <?php echo $title; ?>
+
+location : <?php echo $location; ?>
+
+author   : <?php echo $auteur; ?>
+
+
+:: More information about this appointment : 
 <?php echo $this->host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>
 
 
-:: Pour accepter les modifications :
+:: To accept this appointment : 
 <?php echo $this->host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=ACCEPTED
 
-:: Pour refuser les modifications : 
+:: To refuse this appointment : 
 <?php echo $this->host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=DECLINED

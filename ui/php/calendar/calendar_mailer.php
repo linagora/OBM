@@ -109,6 +109,7 @@ class CalendarMailer extends OBM_Mailer {
   
   private function extractEventDetails($event, $sender, $prefix = '', $target = null) {
     return array(
+      'host'             => $GLOBALS['cgp_host'],
       $prefix.'id'       => $event->id,
       $prefix.'start'    => $event->date_begin->getOutputDateTime(),
       $prefix.'end'      => $event->date_end->getOutputDateTime(),

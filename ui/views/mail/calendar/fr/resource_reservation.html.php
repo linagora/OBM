@@ -5,7 +5,7 @@
         </th>
     </tr>
     <tr>
-      <td colspan="2">Une ressource dont vous êtes responsable à été réservée :</td>
+      <td colspan="2">Une ressource dont vous êtes responsable à été réservée</td>
     </tr>
     <tr>
         <td style="text-align:right; width:20%">Sujet</td><td><?php echo $title; ?></td>
@@ -24,7 +24,7 @@
     </tr>
     <tr>
         <td style="text-align:right;" colspan="2">
-          <a href="<?php echo $host; ?>/calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Accepter/refuser la réservation</a>
+          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Accepter/refuser la réservation</a>
         </td>
     </tr>
 </table>
