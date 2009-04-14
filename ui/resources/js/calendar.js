@@ -774,7 +774,7 @@ Obm.CalendarPopupManager = new Class({
   },
 
   show: function(evt) {
-    this.evt = evt;
+    this.evtId = evt.element_id;
     this.chain.chain(this.complete.bind(this));
     this.chain.callChain();
   },
@@ -787,7 +787,9 @@ Obm.CalendarPopupManager = new Class({
 
   cancel: function() {
     this.chain.clearChain();
+    this.removeEvents();
     obm.calendarManager.unlock();
+    obm.calendarManager.events.get(this.evtId).redraw();
     obm.calendarManager.redrawAllEvents();
   },
   
