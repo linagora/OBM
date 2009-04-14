@@ -187,10 +187,12 @@ sub _loadUsers {
                         group_gid
                  FROM '.$userTablePrefix.'UserObm
                  LEFT JOIN P_UserObm current ON current.userobm_id='.$userTablePrefix.'UserObm.userobm_id
-                 LEFT JOIN (SELECT group_gid, of_usergroup_user_id from UGroup
-							INNER JOIN of_usergroup ON of_usergroup_group_id = group_id WHERE group_gid = 512) AS grp
-							ON grp.of_usergroup_user_id = UserObm.userobm_id
-                 WHERE '.$userTablePrefix.'UserObm.userobm_domain_id='.$self->{'domainId'};
+                 LEFT JOIN (SELECT group_gid, of_usergroup_user_id
+                            FROM UGroup
+                            INNER JOIN of_usergroup ON of_usergroup_group_id = group_id WHERE group_gid = 512) AS grp
+                                ON grp.of_usergroup_user_id = UserObm.userobm_id
+                 WHERE '.$userTablePrefix.'UserObm.userobm_domain_id='.$self->{'domainId'}.'
+                 AND '.$userTablePrefix.'UserObm.userobm_status=\'VALID\'';
 
     if( $self->{'ids'} ) {
         $query .= ' AND '.$userTablePrefix.'UserObm.userobm_id IN ('.join( ', ', @{$self->{'ids'}}).')';
@@ -241,7 +243,7 @@ sub _loadUserLinks {
                 INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
                 INNER JOIN '.$mailboxEntity.' ON mailboxentity_entity_id = entityright_entity_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
-                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=0 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=0 AND entityright_read=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
@@ -251,7 +253,7 @@ sub _loadUserLinks {
                 INNER JOIN '.$mailboxEntity.' ON mailboxentity_entity_id = entityright_entity_id
                 INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
-                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=0 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=0 AND entityright_read=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'writeonly'}->{'compute'} = 1;
@@ -262,7 +264,7 @@ sub _loadUserLinks {
                 INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
                 INNER JOIN '.$mailboxEntity.' ON mailboxentity_entity_id = entityright_entity_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
-                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=1 AND entityright_read=0 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=1 AND entityright_read=0 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
@@ -272,7 +274,7 @@ sub _loadUserLinks {
                 INNER JOIN '.$mailboxEntity.' ON mailboxentity_entity_id = entityright_entity_id
                 INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
-                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=1 AND entityright_read=0 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=1 AND entityright_read=0 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'write'}->{'compute'} = 1;
@@ -283,7 +285,7 @@ sub _loadUserLinks {
                 INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
                 INNER JOIN '.$mailboxEntity.' ON mailboxentity_entity_id = entityright_entity_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
-                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
@@ -299,7 +301,7 @@ sub _loadUserLinks {
                 INNER JOIN '.$mailboxEntity.' ON mailboxentity_entity_id = entityright_entity_id
                 INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
-                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'admin'}->{'compute'} = 1;
@@ -310,7 +312,7 @@ sub _loadUserLinks {
                 INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
                 INNER JOIN '.$mailboxEntity.' ON mailboxentity_entity_id = entityright_entity_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
-                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_admin=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_admin=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
@@ -326,7 +328,7 @@ sub _loadUserLinks {
                 INNER JOIN '.$mailboxEntity.' ON mailboxentity_entity_id = entityright_entity_id
                 INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
-                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_admin=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailboxentity_mailbox_id = '.$entityId.' AND entityright_admin=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'public'}->{'compute'} = 0;

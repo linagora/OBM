@@ -222,7 +222,7 @@ sub _loadMailshareLinks {
                 INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
                 INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
-                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=0 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=0 AND entityright_read=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
@@ -232,7 +232,7 @@ sub _loadMailshareLinks {
                 INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
                 INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
-                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=0 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=0 AND entityright_read=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'writeonly'}->{'compute'} = 1;
@@ -243,7 +243,7 @@ sub _loadMailshareLinks {
                 INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
                 INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
-                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=0 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=0 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
@@ -253,7 +253,7 @@ sub _loadMailshareLinks {
                 INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
                 INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
-                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=0 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=0 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'write'}->{'compute'} = 1;
@@ -264,7 +264,7 @@ sub _loadMailshareLinks {
                 INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
                 INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
-                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
@@ -274,7 +274,7 @@ sub _loadMailshareLinks {
                 INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
                 INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
-                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_write=1 AND entityright_read=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'admin'}->{'compute'} = 1;
@@ -285,7 +285,7 @@ sub _loadMailshareLinks {
                 INNER JOIN '.$userEntityTable.' ON userentity_entity_id = entityright_consumer_id
                 INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = userentity_user_id
-                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_admin=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_admin=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 UNION
                 SELECT
                   userobm_id,
@@ -295,7 +295,7 @@ sub _loadMailshareLinks {
                 INNER JOIN '.$mailshareEntity.' ON mailshareentity_entity_id = entityright_entity_id
                 INNER JOIN '.$ofUserGroupTable.' ON of_usergroup_group_id = groupentity_group_id
                 INNER JOIN '.$userObmTable.' ON userobm_id = of_usergroup_user_id
-                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_admin=1 AND userobm_archive=0 AND userobm_mail_perms=1
+                WHERE mailshareentity_mailshare_id = '.$entityId.' AND entityright_admin=1 AND userobm_status=\'VALID\' AND userobm_archive=0 AND userobm_mail_perms=1
                 ORDER BY userobm_login';
 
     $rightDef{'public'}->{'compute'} = 0;

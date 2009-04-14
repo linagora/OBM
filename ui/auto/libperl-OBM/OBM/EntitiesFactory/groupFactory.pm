@@ -233,7 +233,8 @@ sub _loadGroupLinks {
                       '.$groupLinksTable.'
                  WHERE '.$groupLinksTable.'.of_usergroup_group_id='.$entityId.'
                  AND '.$groupLinksTable.'.of_usergroup_user_id='.$userTable.'.userobm_id
-                 AND '.$userTable.'.userobm_archive=0';
+                 AND '.$userTable.'.userobm_archive=0
+                 AND userobm_status=\'VALID\'';
 
     my $groupLinks;
     if( !defined($dbHandler->execQuery( $query, \$groupLinks )) ) {
