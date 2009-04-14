@@ -2396,7 +2396,7 @@ function dis_user_import_file_run($params) {
     if (in_array(trim($row[$c_mail]), $array_true)) {
       $user['mail_perms'] = 1;
     }
-    $user['email'] = addslashes(trim($row[$c_email]));
+    $user['email'] = addslashes(trim(strtolower($row[$c_email])));
 
     // If quota no a number (and a correct one) get the domain default value
     if (is_numeric(addslashes(trim($row[$c_mail_quota])))
@@ -2450,19 +2450,22 @@ function dis_user_import_file_run($params) {
       // Insert the user
       if (check_user_data_form('', $user)) {
 	$user['user_id'] = run_query_user_insert($user);
-	$res = '+';
-	// handle groups membership
-	$group = trim(strtok(strtolower($row[$c_group]),','));
-	$cpt_g = 0;
-	while ($group) {
-	  if (array_key_exists($group, $groups)) {
-	    $cpt_g++;
-	    $user["group_$cpt_g"] = $groups[$group];
-	  }
-	  $group = trim(strtok(','));
-	}
-	$user['group_nb'] = $cpt_g;
-	$nb_group_ins = run_query_user_update_user_group($user);
+        if($user['user_id'] > 0) {
+          set_update_state();
+          $res = '+';
+          // handle groups membership
+          $group = trim(strtok(strtolower($row[$c_group]),','));
+          $cpt_g = 0;
+          while ($group) {
+            if (array_key_exists($group, $groups)) {
+              $cpt_g++;
+              $user["group_$cpt_g"] = $groups[$group];
+            }
+            $group = trim(strtok(','));
+          }
+          $user['group_nb'] = $cpt_g;
+          $nb_group_ins = run_query_user_update_user_group($user);
+        }
       } else {
 	// User not ok, stop for this row
 	$user['user_id'] = false;

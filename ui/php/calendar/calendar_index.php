@@ -256,7 +256,7 @@ if ($action == 'index') {
   $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
   $entities['group'] = $params['sel_group_id'];
   $entities['resource'] = $params['sel_resource_id'];
-  $entities['user'] = $params['sel_user_id'];
+  $entities['user'] = run_query_calendar_merge_groups($params['sel_group_id'],$params['sel_user_id']);
   $entities['contact'] = $params['sel_contact_id'];
   if ($entities['contact'] == null) {
     $entities['contact'] = array();

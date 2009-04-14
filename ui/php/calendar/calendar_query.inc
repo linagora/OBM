@@ -511,7 +511,23 @@ function run_query_calendar_delete_event_entity($calendar, $users = null) {
   $obm_q->query($query);
 } 
 
-
+/**
+ * run_query_expand_groups 
+ * 
+ * @param mixed $groups 
+ * @access public
+ * @return void
+ */
+function run_query_calendar_merge_groups($groups, $users) {
+  $users = (is_array($users)?$users:array());
+  if (is_array($groups)) {
+    foreach($groups as $group_id) {
+      $users = array_merge($users, of_usergroup_get_group_users($group_id));
+    }
+    $users = array_unique($users);
+  }
+  return $users;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Insert one event
 // Parameters: 
