@@ -2537,10 +2537,21 @@ function dis_user_export_pdf($id) {
   if($user->f('userobm_zipcode' || $user->f('userobm_town'))) $address[] = $user->f('userobm_zipcode') . ' ' . $user->f('userobm_town');
   if($user->f('userobm_country_name')) $address[] = $user->f('userobm_country_name');
 
+  $admin = get_user_info();
+
   $pdf = OBM_Pdf::load('user');
   $pdf->setFontSize(11);
 
   // Apply font and draw text
+  $Y = 705;
+  $X = 50;
+  $pdf->pages[0]->setFont(Zend_Pdf_Font::fontWithName(Zend_Pdf_Font::FONT_HELVETICA_ITALIC), $pdf->getFontSize());
+  $Y -= $pdf->getLineHeight();    
+  $pdf->pages[0]->drawText($admin['firstname'].' '.$admin['lastname'], $X, $Y, 'UTF-8');
+  $Y -= $pdf->getLineHeight();    
+  $pdf->pages[0]->drawText("$GLOBALS[l_phone] : $admin[phone]", $X, $Y, 'UTF-8');  
+  $Y -= $pdf->getLineHeight();    
+  $pdf->pages[0]->drawText("$GLOBALS[l_email] : $admin[email]", $X, $Y, 'UTF-8');      
   $pdf->pages[0]->setFont($pdf->getFont(), $pdf->getFontSize());
   $pdf->pages[0]->setFillColor(new Zend_Pdf_Color_GrayScale(0));
   $Y = 715;
@@ -2551,6 +2562,7 @@ function dis_user_export_pdf($id) {
     $Y -= $pdf->getLineHeight();  
     $pdf->pages[0]->drawText($address_part, $X, $Y, 'UTF-8');
   }
+
   $Y = 390;
   $X = 98;
   $Y -= $pdf->getLineHeight();  

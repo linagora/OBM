@@ -31,8 +31,7 @@ require(dirname(__FILE__).'/../lib/Stato/i18n/i18n.php');
  * @author Raphaël Rougeron <raphael.rougeron@aliasource.fr> 
  * @license GPL 2.0
  */
-class OBM_Mailer extends Stato_Mailer
-{
+class OBM_Mailer extends Stato_Mailer {
   protected $locale;
   
   protected $host;

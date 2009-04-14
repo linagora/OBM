@@ -218,6 +218,9 @@ if ($action == 'ext_get_ids') {
       $retour = run_query_user_valid($params['user_id']);
       if ($retour) {
         set_update_state();
+        require_once('user_mailer.php');
+        $user = new UserMailer();
+        $user->sendValidateConfirmation($params['user_id']);
         $display['msg'] .= display_ok_msg("$l_user : $l_valid_ok");
         $display['msg'] .= display_ok_msg("<input type='button' onclick=\"window.location='$path/user/user_index.php?action=pdf&user_id=$params[user_id]'\" value=\"$l_download_user_card\" />", false);
         $display['detail'] = dis_user_consult($params);
