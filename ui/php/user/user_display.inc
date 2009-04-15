@@ -825,7 +825,7 @@ function html_user_consult($obm_q) {
   </tr>
   <tr>
     <th>$l_gid</th>
-    <td>$gid ($group_name)</td>
+    <td>$group_name</td>
   </tr>
   <tr>
     <th>$l_profile</th>
@@ -1288,7 +1288,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
       $g_gid = $one_group['gid'];
       $sel_gid .= "\n<option value=\"$g_gid\"";
       if ($g_gid == $gid) { $sel_gid .= " selected=\"selected\""; }
-      $sel_gid .= ">$g_gid ".$one_group['name']."</option>";
+      $sel_gid .= ">".$one_group['name']."</option>";
     }
   }
   $sel_gid .= "</select>";

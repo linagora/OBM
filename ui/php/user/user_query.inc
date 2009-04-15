@@ -612,7 +612,7 @@ function run_query_user_insert($user) {
   }
 
   // Subscribe the user to his default group
-  run_query_user_init_group($domain_id, $id, $gid, NULL);
+  run_query_user_init_group($domain_id, $id, $gid);
 
   return $id;
 }
@@ -625,25 +625,11 @@ function run_query_user_insert($user) {
 //   - $gid  : group GID (not id)
 // Return: number of usergroup inserted
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_init_group($domain_id, $u_id, $gid, $oldGid) {
+function run_query_user_init_group($domain_id, $u_id, $gid) {
   global $cdg_sql;
 
   $sel_user = sql_parse_id($u_id, true);
   $ins_user = sql_parse_id($u_id);
-  if ($oldGid != NULL) {
-    $group_id = get_group_id_from_gid($domain_id, $oldGid);
-    $g_id = sql_parse_id($group_id, true);
-    $query = "DELETE FROM UserObmGroup
-      WHERE userobmgroup_userobm_id $sel_user 
-      AND userobmgroup_group_id $g_id";
-
-    display_debug_msg($query, $cdg_sql, 'run_query_user_init_group()');
-    $obm_q = new DB_OBM;
-    $retour = $obm_q->query($query);
-
-    // Update internal group membership direct mapping
-    of_usergroup_update_group_hierarchy($group_id);
-  }
 
   // we get the group gid from its id
   $group_id = get_group_id_from_gid($domain_id, $gid);
@@ -933,7 +919,7 @@ function run_query_user_update($u_id, $user) {
 
   if ($old_gid != $gid) {
     // Subscribe the user to his default group
-    run_query_user_init_group($domain_id, $u_id, $gid, $old_gid);
+    run_query_user_init_group($domain_id, $u_id, $gid);
   }
 
   // If the user is archived, we unsubscribe it from of_usergroup table only
@@ -1241,7 +1227,7 @@ function run_query_user_update_user_group($user) {
   if ($u['samba_perms'] == '1') {
     $gid = $cg_gid_smb_user;
     $domain_id = $u['domain_id'];
-    run_query_user_init_group($domain_id, $u_id, $gid, NULL);
+    run_query_user_init_group($domain_id, $u_id, $gid);
   }
 
   return $cpt_ins;
