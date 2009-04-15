@@ -776,6 +776,7 @@ function of_delegation_check_data($delegation, $domain=false) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_display_pref($u_id, $entity, $all=0) {
   global $cdg_sql;
+
   $u_id = sql_parse_id($u_id, true);
   if ($all == 0) {
     $hide = true;
@@ -785,7 +786,7 @@ function get_display_pref($u_id, $entity, $all=0) {
     FROM DisplayPref
     WHERE (display_user_id IS NULL OR display_user_id $u_id )
     AND display_entity='$entity'
-    ORDER BY display_user_id DESC, display_fieldorder"; 
+    ORDER BY display_user_id, display_fieldorder"; 
 
   display_debug_msg($query, $cdg_sql, 'get_display_pref()');
   $obm_q = new DB_OBM;
@@ -819,7 +820,7 @@ function get_display_pref($u_id, $entity, $all=0) {
         $prefs[$fieldname]['order'] = $fieldorder;
         $prefs[$fieldname]['status'] = $fieldstatus;
       }
-      // Default values (user id = 0)
+      // Default values (user id is NULL)
     } else {
       $prefs[$fieldname]['order'] = $fieldorder;
       $prefs[$fieldname]['status'] = $fieldstatus;
@@ -1794,7 +1795,9 @@ function get_user_id($login) {
   $multidomain = sql_multidomain('userobm');
 
   if (isset($login)) {
-    $query = "SELECT userobm_id FROM UserObm WHERE userobm_login='$login' $multidomain";
+    $query = "SELECT userobm_id
+    FROM UserObm
+    WHERE userobm_login='$login' $multidomain";
 
     display_debug_msg($query, $cdg_sql, 'get_user_id()');
     $obm_q = new DB_OBM;
@@ -1838,7 +1841,7 @@ function get_user_info($id='') {
   if (is_array($obm_q->Record)) {
     foreach ($obm_q->Record as $key => $user) {
       $small_key = str_replace('userobm_', '', $key);
-      if($small_key == 'email' ) {
+      if ($small_key == 'email' ) {
         $user = get_entity_email($user, $obm_q->f('domain_name'));
       }      
       $u[$small_key] = $user;
@@ -1850,6 +1853,7 @@ function get_user_info($id='') {
 
   return $u;
 }
+
 
 /**
  * Format entities email. 
@@ -2011,6 +2015,7 @@ function run_query_userobm_responsable($table='',$fields='') {
  */
 function run_query_global_group_manager($g_id) {
   global $cdg_sql;
+
   $g_id = sql_parse_id($g_id, true);
   $query = "SELECT group_manager_id FROM UGroup
     WHERE group_id $g_id ";

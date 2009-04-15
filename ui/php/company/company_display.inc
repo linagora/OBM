@@ -914,7 +914,7 @@ function dis_company_form($action, $company) {
   }
   $users = of_usergroup_get_group_users($obm['group_com'], true, $uids, 'userobm_lastname');
   $ctry_q = run_query_global_country_for_lang();
-  if($c_id > 0) {
+  if ($c_id > 0) {
     $coords = run_query_company_coords($c_id, true);
   }
   $block = html_company_form($action, $comp_q, $dsrc_q, $types, $acts, $naf_q, $users, $ctry_q, $company, $coords);

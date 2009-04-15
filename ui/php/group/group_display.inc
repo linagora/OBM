@@ -12,6 +12,8 @@
 //------------------------------------//
 // Direct fields
 $fieldnames['group_name'] = $l_name;
+$fieldnames['domain_label'] = $l_domain;
+$fieldnames['group_gid'] = $l_gid;
 $fieldnames['group_delegation'] = $l_delegation;
 $fieldnames['group_system'] = $l_system;
 $fieldnames['group_privacy'] = $l_private;
@@ -147,8 +149,8 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 //     keys used  : name, user
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_search_form ($group) {
-  global $display, $l_name, $l_group_user, $l_email, $l_find, $l_add_groups;
-  global $l_visibility;
+  global $obm, $display, $l_domain;
+  global $l_name, $l_group_user, $l_email, $l_find, $l_add_groups,$l_visibility;
  
   $popup = $group['popup'];
 
@@ -192,10 +194,18 @@ function html_group_search_form ($group) {
   // --- Var preparation ------------------------------------------------------
 
   $name = stripslashes($group['name']);
+  $domain_id = $group['domain_id'];
   $delegation = stripslashes($group['delegation']);
   $email = stripslashes($group['email']);
   $user = stripslashes($group['user']);
   $privacy = $group['privacy'];
+
+  if ($obm['domain_global']) {
+    $sel_domain = of_domain_dis_select($domain_id, 'all');
+    $dis_domain = "<label>$l_domain<br />
+      $sel_domain
+    </label>";
+  }
 
   // User defined data
   $block_userdata .= of_userdata_dis_search('group', $group);
@@ -212,6 +222,7 @@ function html_group_search_form ($group) {
     <label>$l_name<br />
       <input name=\"tf_name\" size=\"16\" maxlength=\"256\" value=\"$name\" />
     </label>
+    $dis_domain
     $dis_delegation
     <label>$l_group_user<br />
       <input name=\"tf_user\" size=\"16\" maxlength=\"16\" value=\"$user\" />
@@ -366,9 +377,9 @@ function dis_group_consult($group, $uid) {
 
   if ($g_id > 0) {
     $group_q = run_query_group_detail($g_id);
-
+    $gid = $group_q->f('group_gid');
     $prefs_u = get_display_pref($uid, 'group_user');
-    $u_q = run_query_group_user_group($group);
+    $u_q = run_query_group_user_group($group, $gid);
     if ($ctu_sql_limit) {
       $join = "LEFT JOIN UserObm ON userobm_id=userobmgroup_userobm_id";
       $where_user_not_archive = "AND userobm_archive != 1";
@@ -407,7 +418,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $l_yes, $l_no, $ico_mail, $l_undef, $c_undef;
   global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
   global $l_system, $l_local, $l_ext_id, $l_smb, $l_no,$l_yes;
-  global $l_visibility, $l_private, $l_public, $l_manager;  
+  global $l_visibility, $l_private, $l_public, $l_manager, $l_gid;
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
   global $obm, $display, $module, $action, $cright_write;
   global $cg_gid_smb_user, $cg_gid_smb_admin;
@@ -420,6 +431,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $timeupdate = $group_q->f('timeupdate');
   $system = ($group_q->f('group_system') == 1 ? $l_yes : $l_no);
   $local = ($group_q->f('group_local') == 1 ? $l_yes : $l_no);
+  $gid = $group_q->f('group_gid');
   $privacy = $group_q->f('group_privacy');
   $dis_privacy = ($privacy == 1 ? $l_private : $l_public);
   $ext_id = $group_q->f('group_ext_id');
@@ -521,6 +533,8 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       $dis_infos->data_idfield = 'group_user_id';
       $dis_infos->data_cb_name = 'data-u-';
       $dis_infos->data_cb_field = '';
+      // If the group is the default user group, do not display the checkbox
+      $dis_infos->data_cb_show = 'gid_diff';
       $block_mu .= "<form method=\"get\" action=\"group_index.php\">";
     }
 
@@ -548,6 +562,10 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     <tr>
       <th>$l_name</th>
       <td>$name</td>
+    </tr>
+    <tr>
+      <th>$l_gid</th>
+      <td>$gid</td>
     </tr>
     $block_delegation
     <tr>

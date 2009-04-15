@@ -287,16 +287,17 @@ function run_query_domain_init_groups($domain_id, $windows=false) {
   $uid = sql_parse_id($obm['uid']);
 
   if ($windows) {
-    $gids = array($cg_gid_smb_admin => $l_gid_smb_admin,
-		  $cg_gid_smb_user => $l_gid_smb_user,
-		  $cg_gid_smb_guest => $l_gid_smb_guest);
-    $samba = 1;
+    $gids = array($cg_gid_smb_admin => array($l_gid_smb_admin, 1),
+		  $cg_gid_smb_user => array($l_gid_smb_user, 1),
+		  $cg_gid_smb_guest => array($l_gid_smb_guest, 1),
+		  $cg_gid_user => array($l_gid_user, 0));
   } else {
-    $gids = array($cg_gid_user => $l_gid_user);
-    $samba = 0;
+    $gids = array($cg_gid_user => array($l_gid_user, 0));
   }
 
-  foreach ($gids as $gid => $gname) {
+  foreach ($gids as $gid => $group_infos) {
+    $gname = $group_infos[0];
+    $samba = $group_infos[1];
     if (! check_domain_group_exists($gid, $domain_id)) { 
       $query = "INSERT INTO UGroup (group_domain_id,
         group_usercreate,

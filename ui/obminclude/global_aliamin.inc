@@ -236,8 +236,8 @@ function get_first_user_free_uid_from_bd($first_id=false) {
   // l'interface...
   $uids = array_unique($uids);
   sort($uids);
-  if( $uibBdMax = end($uids) ) {
-    if( $uibBdMax > $first_id ) {
+  if ($uibBdMax = end($uids)) {
+    if ($uibBdMax > $first_id) {
       $first_id = $uibBdMax;
     }
   }
@@ -260,7 +260,7 @@ function get_group_id_from_gid($domain_id, $gid) {
     FROM UGroup
     WHERE group_gid='$gid' AND group_domain_id=$domain_id";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, 'get_group_id_from_gid()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();

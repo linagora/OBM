@@ -15,10 +15,11 @@
 //     keys used     : name, user
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_group_search($group) {
-  global $cdg_sql, $ctu_sql_limit;
+  global $c_all, $cdg_sql, $ctu_sql_limit;
   global $c_public, $c_private;
 
   $name = sql_search_text_parse($group['name']);
+  $domain_id = $group['domain_id'];
   $delegation = sql_search_text_parse($group['delegation']);
   $email = sql_search_text_parse($group['email']);
   $privacy = $group['privacy'];
@@ -41,6 +42,11 @@ function run_query_group_search($group) {
       LEFT JOIN of_usergroup as D ON D.of_usergroup_group_id=group_id
       LEFT JOIN UserObm as C ON D.of_usergroup_user_id = C.userobm_id";
     $where .= " AND C.userobm_lastname $like '$user%'";
+  }
+  // If a user domain indication has been specified, get it
+  if (($domain_id != $c_all) && ($domain_id != '')) {
+     $domain_id = sql_parse_id($domain_id, true);
+     $where .= " AND group_domain_id $domain_id ";
   }
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
@@ -90,6 +96,7 @@ function run_query_group_search($group) {
   $timeupdate,
   A.userobm_login as usercreate,
   B.userobm_login as userupdate,
+  domain_label,
   domain_name,
   count(usergroup.of_usergroup_user_id) as group_nb_user
   FROM UGroup
@@ -520,7 +527,10 @@ function run_query_group_usergroup_insert($group) {
 function run_query_group_usergroup_delete($group, $domain_id) {
   global $cdg_sql;
 
-  $id = sql_parse_id($group['group_id'], true);
+  $g = get_group_info($group['group_id']);
+  $gid = $g['gid'];
+
+  $sql_id = sql_parse_id($group['group_id'], true);
   $cpt = 0;
   $cpt_del = 0;
   while ($cpt < $group['user_nb']) {
@@ -528,17 +538,20 @@ function run_query_group_usergroup_delete($group, $domain_id) {
     $u_id = $group["user$cpt"];
     $sql_u_id = sql_parse_id($u_id, true);
 
-    // BOD : to complete : prevent to delete if user default group
-    //    $group_id = get_group_id_from_gid($domain_id, $oldGid);
+    $u = get_user_info($u_id);
+    $u_gid = $u['gid'];
 
-    $query = "DELETE FROM UserObmGroup
-    WHERE userobmgroup_group_id $id
-    AND userobmgroup_userobm_id $sql_u_id ";
-    display_debug_msg($query, $cdg_sql, 'run_query_group_usergroup_delete()');
-    $obm_q = new DB_OBM;
-    $retour = $obm_q->query($query);
-    if ($retour) {
-      $cpt_del++;
+    // Prevent to remove an user if the group is his default group
+    if ($u_gid != $gid) {
+      $query = "DELETE FROM UserObmGroup
+      WHERE userobmgroup_group_id $sql_id
+      AND userobmgroup_userobm_id $sql_u_id ";
+      display_debug_msg($query, $cdg_sql, 'run_query_group_usergroup_delete()');
+      $obm_q = new DB_OBM;
+      $retour = $obm_q->query($query);
+      if ($retour) {
+	$cpt_del++;
+      }
     }
   }
 
@@ -652,13 +665,14 @@ function run_query_group_group_delete($group) {
 // Query Execution : Get the users of the given group
 // Parameters:
 //   - $group[] : Group parameters
+//   - $gid [optionnal] group gid, to compare with users one
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_group_user_group($group) {
+function run_query_group_user_group($group, $gid='') {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $limit = sql_limit($db_type,'', '',  'group_user');
+  $limit = sql_limit($db_type,'', '', 'group_user');
 
   $id = sql_parse_id($group['group_id'], true);
   $entity = $group['entity'];
@@ -671,20 +685,26 @@ function run_query_group_user_group($group) {
     $order = 'ORDER BY userobm_lastname';
   }
 
+  if ($gid != '') {
+    // return the difference between the group gid and the user gid
+    $field = "$gid-userobm_gid as gid_diff,";
+  }
+
   $query = "SELECT
-  userobmgroup_userobm_id as group_user_id,
-  userobmgroup_userobm_id as id,
-  userobm_timeupdate as group_user_timeupdate,
-  userobm_timecreate as group_user_timecreate,
-  userobm_userupdate as group_user_userupdate,
-  userobm_usercreate as group_user_usercreate,
-  userobm_login as group_user_login,
-  userobm_lastname as group_user_lastname,
-  userobm_firstname as group_user_firstname,
-  userobm_phone as group_user_phone,
-  userobm_email as group_user_email,
-  userobm_hidden,
-  domain_name
+    userobmgroup_userobm_id as group_user_id,
+    userobmgroup_userobm_id as id,
+    userobm_timeupdate as group_user_timeupdate,
+    userobm_timecreate as group_user_timecreate,
+    userobm_userupdate as group_user_userupdate,
+    userobm_usercreate as group_user_usercreate,
+    userobm_login as group_user_login,
+    userobm_lastname as group_user_lastname,
+    userobm_firstname as group_user_firstname,
+    userobm_phone as group_user_phone,
+    userobm_email as group_user_email,
+    userobm_hidden,
+    $field
+    domain_name
   FROM UserObmGroup LEFT JOIN UserObm ON userobmgroup_userobm_id=userobm_id
   LEFT JOIN Domain ON domain_id = userobm_domain_id
   WHERE userobmgroup_group_id $id AND userobm_archive != 1
@@ -937,7 +957,8 @@ function check_group_context($id, $group) {
  */
 function check_group_update_rights($params, $g='') {
   global $actions, $perm, $err, $cright_write_admin;
-  global $cg_gid_smb_user, $cg_gid_smb_admin, $l_cant_update_smb_group;
+  global $cg_gid_smb_user, $cg_gid_smb_admin, $cg_gid_smb_guest, $cg_gid_user;
+  global $l_cant_update_domain_group;
   global $l_err_public_rights, $l_error_permission, $l_error_delegation;
 
   // Hook : Pre
@@ -973,12 +994,15 @@ function check_group_update_rights($params, $g='') {
       return false;
     }
 
-    // We forbid to update Window system groups
+    /*    // We forbid to update Window system groups
     $gid = $g['gid'];
-    if (($gid == $cg_gid_smb_user) || ($gid == $cg_gid_smb_admin)) {
-      $err['msg'] .= $l_cant_update_smb_group;
+
+    if (($gid == $cg_gid_user) || ($gid == $cg_gid_smb_user)
+	|| ($gid == $cg_gid_smb_admin) || ($gid == $cg_gid_smb_guest)) {
+      $err['msg'] .= $l_cant_update_domain_group;
       return false;
     }
+    */
   }
 
   return true;
@@ -1136,6 +1160,8 @@ function check_group_data_form(&$group) {
 function check_group_can_delete($p_id) {
   global $obm, $perm, $err, $cright_write_admin, $ok_msg;
   global $l_warn_delete, $l_cant_delete_system, $l_err_public_rights;
+  global $cg_gid_smb_user, $cg_gid_smb_admin, $cg_gid_smb_guest, $cg_gid_user;
+  global $l_cant_delete_domain_group, $l_err_cant_delete_default_user_group;
 
   $delete_ok = true;
 
@@ -1151,20 +1177,58 @@ function check_group_can_delete($p_id) {
     $delete_ok = false;
   }
   $lgroup = get_group_info($p_id);
+  $gid = $lgroup['gid'];
+  $domain_id = $lgroup['domain_id'];
+
   if ($lgroup['system'] != '0') {
     $err['msg'] .= "$l_cant_delete_system";
     $delete_ok = false;
+
   } else if (($lgroup['privacy'] == '0') &&
-  (! $perm->check_right('group', $cright_write_admin))) {
+	     (! $perm->check_right('group', $cright_write_admin))) {
     $err['msg'] .= $l_err_public_rights;
     $err['field'] = 'privacy';
     $delete_ok = false;
+
+  } else if (($gid == $cg_gid_user) || ($gid == $cg_gid_smb_user)
+	     || ($gid == $cg_gid_smb_admin) || ($gid == $cg_gid_smb_guest)) {
+    $err['msg'] .= $l_cant_delete_domain_group;
+    $delete_ok = false;
+
+  } else if (get_users_nb_from_gid($domain_id, $gid) > 0) {
+    $err['msg'] .= $l_err_cant_delete_default_user_group;
+    $delete_ok = false;
+
   } else {
     $nb_u = get_group_nb_user($p_id);
     $ok_msg .= "$nb_u $l_warn_delete";
   }
 
   return $delete_ok;
+}
+
+
+/**
+ * Search group from a single field
+ *
+ * @param mixed $group
+ * @access public
+ * @return array of 'length' => DB query results nb, and 'datas' => DB Search results
+ */
+function get_users_nb_from_gid($domain_id, $gid) {
+  global $cdg_sql;
+
+  $query = "SELECT count(*) as nb
+    FROM UserObm
+    WHERE userobm_gid='$gid' AND userobm_domain_id=$domain_id";
+
+  display_debug_msg($query, $cdg_sql, 'get_users_nb_from_gid()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $nb = $obm_q->f('nb');
+
+  return $nb;
 }
 
 
@@ -1216,7 +1280,7 @@ function run_query_group_ext_search($group) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = $group['limit'];
-  if(isset($group['first_row'])) $first_row = $group['first_row'] - 1;
+  if (isset($group['first_row'])) $first_row = $group['first_row'] - 1;
   else $first_row = 0;
   $uid = sql_parse_id($uid, true);
   $where_privacy = "AND (group_privacy = 0 OR (group_privacy = 1 AND group_usercreate $uid ))";

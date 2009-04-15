@@ -89,6 +89,7 @@ if ($action == 'ext_get_ids') {
   }
 
 } elseif ($action == 'ext_get_id') {
+///////////////////////////////////////////////////////////////////////////////
   $display['search'] = html_user_search_form($params);
   if ($_SESSION['set_display'] == 'yes') {
     $display['result'] = dis_user_search_list($params);
@@ -116,9 +117,10 @@ if ($action == 'ext_get_ids') {
   json_search_users($params, $user_q);
   echo '('.$display['json'].')';
   exit();
+
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = html_user_form('',$params);
+  $display['detail'] = dis_user_form($action, $params);
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -131,13 +133,7 @@ if ($action == 'ext_get_ids') {
 } elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_update_rights($params)) {
-    $obm_q = run_query_user_detail($params['user_id']);
-    if ($obm_q->num_rows() == 1) {
-      $display['detailInfo'] = display_record_info($obm_q);
-      $display['detail'] = html_user_form($obm_q, $params);
-    } else {
-      $display['msg'] .= display_err_msg($l_err_reference);
-    }
+    $display['detail'] = dis_user_form($action, $params);
   } else {
     $display['msg'] .= display_warn_msg($err['msg']);
     $display['detail'] = dis_user_consult($params);
@@ -158,7 +154,7 @@ if ($action == 'ext_get_ids') {
         $display['detail'] = dis_user_consult($params);
       } else {
         $display['msg'] .= display_err_msg("$l_user : $l_insert_error");
-        $display['detail'] = html_user_form('', $params);
+        $display['detail'] = dis_user_form($action, $params);
       }
 
     // If it is the first try, we warn the user if some user seem similar
@@ -175,7 +171,7 @@ if ($action == 'ext_get_ids') {
           $display['detail'] = dis_user_consult($params);
         } else {
           $display['msg'] .= display_err_msg("$l_user : $l_insert_error");
-          $display['detail'] = html_user_form('',$params);
+          $display['detail'] = dis_user_form($action, $params);
         }
       }
     }
@@ -183,7 +179,7 @@ if ($action == 'ext_get_ids') {
   // Form data are not valid
   } else {
     $display['msg'] .= display_err_msg($l_invalid_data . ' : ' . $err['msg']);
-    $display['detail'] = html_user_form('', $params, $err['field']);
+    $display['detail'] = dis_user_form($action, $params, $err['field']);
   }
 
 } elseif ($action == 'reset') {
@@ -203,11 +199,11 @@ if ($action == 'ext_get_ids') {
       $display['detail'] = dis_user_consult($params);
     } else {
       $display['msg'] .= display_err_msg("$l_user : $l_update_error");
-      $display['detail'] = html_user_form('', $params, $err['field']);
+      $display['detail'] = dis_user_form($action, $params, $err['field']);
     }
   } else {
     $display['msg'] .= display_err_msg($err['msg']);
-    $display['detail'] = html_user_form('', $params, $err['field']);
+    $display['detail'] = dis_user_form($action, $params, $err['field']);
   }
 
 } elseif ($action == 'valid') {
@@ -226,15 +222,15 @@ if ($action == 'ext_get_ids') {
         $display['detail'] = dis_user_consult($params);
       } else {
         $display['msg'] .= display_err_msg("$l_user : $l_valid_error");
-        $display['detail'] = html_user_form('', $params, $err['field']);
+        $display['detail'] = dis_user_form($action, $params, $err['field']);
       }
     } else {
       $display['msg'] .= display_err_msg("$l_user : $l_update_error");
-      $display['detail'] = html_user_form('', $params, $err['field']);
+      $display['detail'] = dis_user_form($action, $params, $err['field']);
     }
   } else {
     $display['msg'] .= display_err_msg($err['msg']);
-    $display['detail'] = html_user_form('', $params, $err['field']);
+    $display['detail'] = dis_user_form($action, $params, $err['field']);
   }
 
 } elseif ($action == 'pdf') {

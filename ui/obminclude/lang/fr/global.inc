@@ -281,6 +281,7 @@ $l_tt_sales = "Taches Facturées";
 $l_tt_research = "Projets Internes";
 $l_tt_others = "Tâches Non Facturées";
 
+$l_gid = "Gid";
 $l_gid_user = "Utilisateurs";
 // Samba groups
 $l_gid_smb_admin = "Administrateurs du domaine";

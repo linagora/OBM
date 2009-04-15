@@ -497,7 +497,7 @@ function html_user_consult($obm_q) {
   global $l_coord, $l_address, $l_postcode, $l_town, $l_expresspostal, $l_title;
   global $l_delegation_target, $l_delegation, $l_direction, $l_service;
   global $l_company, $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_email;
-  global $l_group_member, $l_group, $l_local, $l_ext_id,$l_hidden;
+  global $l_group_member, $l_group, $l_gid, $l_local, $l_ext_id,$l_hidden;
   global $l_web, $l_web_mode, $l_web_all, $l_web_list_only;
   global $l_mail, $l_mail_ext, $l_email, $l_quota, $l_email_nomade, $l_local_copy;
   global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
@@ -516,6 +516,8 @@ function html_user_consult($obm_q) {
   $login = $obm_q->f('userobm_login');
   $local = ($obm_q->f('userobm_local') == 1 ? $l_yes : $l_no);
   $ext_id = $obm_q->f('userobm_ext_id');
+  $gid = $obm_q->f('userobm_gid');
+  $group_name = $obm_q->f('group_name');
   $profile = $obm_q->f('userobm_perms');
   $dis_profile = isset($GLOBALS["l_perm_$profile"]) ? $GLOBALS["l_perm_$profile"] : $profile;
   $kind = $obm_q->f('userobm_kind');
@@ -822,6 +824,10 @@ function html_user_consult($obm_q) {
     <td>$ext_id</td>
   </tr>
   <tr>
+    <th>$l_gid</th>
+    <td>$gid ($group_name)</td>
+  </tr>
+  <tr>
     <th>$l_profile</th>
     <td>$dis_profile</td>
   </tr>
@@ -975,7 +981,7 @@ function html_user_group_consult($usr_q) {
     $default = '';
     if ($grp_id == $default_group_id) {
       $disabled = 'disabled="disabled" ';
-      $default = '*';
+      $default = "*<input name=\"data-g-$grp_id\" type=\"hidden\" value=\"1\"/>";
     }
     $dis_group .= "
     <tr>
@@ -1004,6 +1010,43 @@ function html_user_group_consult($usr_q) {
 }
 
 
+/**
+ * Display User Form
+ *
+ * @param mixed $action action called
+ * @param mixed $user[] : default values
+ * @param mixed $field [optionnal] error field
+ * @return string XHTML user form
+ */
+function dis_user_form($action, $user, $field='') {
+  global $display, $obm, $l_err_reference;
+
+  $u_id = $user['user_id'];
+  if ($u_id > 0) {
+    $user_q = run_query_user_detail($u_id);
+    if ($user_q->num_rows() == 1) {
+      $display['detailInfo'] = display_record_info($user_q);
+    } else {
+      $display['msg'] .= display_err_msg($l_err_reference);
+    }
+
+    // User's groups
+    $groups = array();
+    $g_q = run_query_user_user_group($u_id);
+    while ($g_q->next_record()) {
+      $g_id = $g_q->f('group_id');
+      $gid = $g_q->f('group_gid');
+      $gname = $g_q->f('group_name');
+      $groups[$g_id] = array('gid'=>$gid, 'name'=>$gname);
+    }
+  }
+
+  $block = html_user_form($action, $user_q, $user, $groups, $field);
+
+  return $block;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display User Form
 // Parameters:
@@ -1011,10 +1054,11 @@ function html_user_group_consult($usr_q) {
 //   - $user  : default values or updated values (if error)
 //   - $field : [optionnal] field in error
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_form($usr_q, $user, $field='') {
+function html_user_form($action, $usr_q, $user, $groups, $field='') {
   global $l_login, $l_password, $l_profile, $l_kind, $l_lastname, $l_firstname;
-  global $l_user, $l_title, $l_archive, $l_datebegin, $l_dateexp, $l_noexperie, $l_insert, $l_update;
-  global $l_update_valid, $l_validate, $l_change_password_confirm, $l_password_update;
+  global $l_user, $l_title, $l_archive, $l_datebegin, $l_dateexp, $l_noexperie;
+  global $l_insert, $l_update, $l_validate;
+  global $l_update_valid, $l_change_password_confirm, $l_password_update;
   global $l_delegation_target, $l_hidden, $l_photo, $l_generate_passwd; 
   global $l_phone, $l_phone2, $l_mphone, $l_fax, $l_fax2, $l_desc;
   global $l_coord, $l_company, $l_direction, $l_service, $l_address;
@@ -1024,12 +1068,11 @@ function html_user_form($usr_q, $user, $field='') {
   global $l_nomade, $l_perms, $l_access, $l_host, $l_ip, $l_empty;
   global $l_vacation, $l_vacation_message, $l_vacation_datebegin;
   global $l_vacation_dateend, $l_mail_server;
-  global $l_enabled, $l_disabled, $l_web_consult_list,$path;
+  global $l_enabled, $l_disabled, $l_web_consult_list;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $l_mailserver_auto;
-  //global $path, $display, $cgp_use, $action, $profiles;
-  global $path, $display, $cgp_use, $action;
-  global $obm, $c_default_domain, $l_domain, $l_header_new, $l_hour;
+  global $path, $display, $cgp_use;
+  global $obm, $c_default_domain, $l_domain, $l_gid, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
 
   $noexperie = " checked=\"checked\" ";	
@@ -1037,6 +1080,7 @@ function html_user_form($usr_q, $user, $field='') {
   if ($action == 'detailupdate') {
     // infos
     $id = $usr_q->f('userobm_id');
+    $gid = $usr_q->f('userobm_gid');
     $domain_id = $usr_q->f('userobm_domain_id');
     $login = $usr_q->f('userobm_login');
     $old_login = $login;
@@ -1057,7 +1101,7 @@ function html_user_form($usr_q, $user, $field='') {
     $hidden = ($usr_q->f('userobm_hidden') == '1' ? ' checked' : '');
     $photo_id = $usr_q->f('userobm_photo_id');
 
-    //Wait people
+    // Wait people
     $status = $usr_q->f('userobm_status');
 
     // coord
@@ -1132,6 +1176,7 @@ function html_user_form($usr_q, $user, $field='') {
   // If parameters have been given, they supercede the default action value
   // infos
   if (isset($user['user_id'])) { $id = $user['user_id']; }
+  if (isset($user['gid'])) { $gid = $user['gid']; }
   if (isset($user['domain_id'])) { $domain_id = $user['domain_id']; }
   if (isset($user['login'])) { $login = strtolower($user['login']); }
   if (isset($user['old_login'])) { $old_login = $user['old_login']; }
@@ -1236,6 +1281,18 @@ function html_user_form($usr_q, $user, $field='') {
   </tr>";
   }
 
+  // Default group select
+  $sel_gid = "<select name=\"sel_gid\" id=\"sel_gid\">";
+  if (is_array($groups)) {
+    foreach($groups as $g_id => $one_group) {
+      $g_gid = $one_group['gid'];
+      $sel_gid .= "\n<option value=\"$g_gid\"";
+      if ($g_gid == $gid) { $sel_gid .= " selected=\"selected\""; }
+      $sel_gid .= ">$g_gid ".$one_group['name']."</option>";
+    }
+  }
+  $sel_gid .= "</select>";
+
 
   // Section Web
   if ($cgp_use['service']['web']) {
@@ -1285,7 +1342,7 @@ function html_user_form($usr_q, $user, $field='') {
       <input type=\"hidden\" name=\"sel_mail_server_id\" value=\"$mail_server_id\" />
       <input type=\"hidden\" name=\"sel_mail_server_hostname\" value=\"$mail_server_host_name\" />";
     }
-    if($mail_state) {
+    if ($mail_state) {
       $externalKlass = 'H';
       $externalEnabled = 'disabled="disabled"';
     } else {
@@ -1469,14 +1526,14 @@ function html_user_form($usr_q, $user, $field='') {
     $dis_drive_sel .= "<option ".$drive['Z']." value='Z'>Z:</option>";
     $dis_drive_sel = "<select style='width:4em;' name='sel_smb_home_drive'>$dis_drive_sel</select>";
     $smb_home = (isset($smb_home))?$smb_home:$samba['home'];
-    if($login != '') {
+    if ($login != '') {
       $smb_hidden_home = str_replace($login,'%u', $smb_home);
       $smb_home = str_replace('%u', $login, $smb_home);
     } else {
       $smb_hidden_home = $smb_home;
     }
     $smb_state  = ($smb_perms ? 'checked' : '');
-    if(!$smb_state) {
+    if (!$smb_state) {
       $sambaKlass = 'H';
     }
     $samba_section = "
@@ -1587,7 +1644,7 @@ function html_user_form($usr_q, $user, $field='') {
   }
 
   // Photo
-  if($photo_id > 0) {
+  if ($photo_id > 0) {
     $block_photo_detail = "
     <tr id=\"block_photo_detail\">
       <th>&nbsp;</th>
@@ -1720,6 +1777,11 @@ function html_user_form($usr_q, $user, $field='') {
     <td><input name=\"cba_hidden\" type=\"checkbox\" value=\"1\" $hidden /></td>
   </tr>
   $dis_archive
+  <tr>
+    <th class=\"$class[gid]\">$l_gid</th>
+    <td>$sel_gid
+    </td>
+  </tr>
   <tr>
     <th class=\"$class[profile]\">$l_profile</th>
     <td><select name=\"sel_profile\" onchange='showDelegation(this);'>

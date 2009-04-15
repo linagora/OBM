@@ -274,6 +274,7 @@ $l_tt_sales = "Billed Tasks";
 $l_tt_research = "Internal Projects";
 $l_tt_others = "Non Billed Tasks";
 
+$l_gid = "Gid";
 $l_gid_user = "Users";
 // Samba groups
 $l_gid_smb_admin = "Domain Admins";

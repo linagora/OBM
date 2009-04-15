@@ -34,7 +34,7 @@ class OBM_DISPLAY {
   var $data_cb_field = "";    // Field from which cb is filled (1=selected)
   var $data_idfield = "_id";  // Index field for the data row
   var $data_cb_show = 1;      // To set visible
-                              //   1 -> visible
+                              //   0 -> not visible (else visible)
                               //   "string" if ->f["string"] == 0 -> visible
   var $data_form_head = "";   // Form header
   var $data_form_end = "";    // Form end

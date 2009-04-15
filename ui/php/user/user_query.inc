@@ -281,6 +281,7 @@ function run_query_user_detail($p_id) {
       $vacation_dateend,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
+      group_name,
       domain_label,
       domain_name,
       ms.host_name as mailserver_hostname,
@@ -289,6 +290,8 @@ function run_query_user_detail($p_id) {
     FROM UserObm
          LEFT JOIN UserObm as c ON UserObm.userobm_usercreate=c.userobm_id
          LEFT JOIN UserObm as u ON UserObm.userobm_userupdate=u.userobm_id
+         LEFT JOIN UGroup on UserObm.userobm_gid=group_gid
+                   AND UserObm.userobm_domain_id=group_domain_id
          LEFT JOIN Domain on UserObm.userobm_domain_id=domain_id
          LEFT JOIN Host on UserObm.userobm_host_id=Host.host_id
          LEFT JOIN Host ms on UserObm.userobm_mail_server_id=ms.host_id
@@ -685,6 +688,7 @@ function run_query_user_update($u_id, $user) {
   $obm_q = new DB_OBM;
 
   // infos
+  $gid = $user['gid'];
   $profile = $user['profile'];
   $archive = sql_parse_int($user['archive']);
   $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
@@ -2534,7 +2538,7 @@ function check_user_wait($user){
   $rep = false;
   
   $user['archive'] = 1;
-  $user['status'] = "INIT";
+  $user['status'] = 'INIT';
   $user['delegation'] = $obm['delegation'];
 
   $obm_q = run_query_user_search($user);  

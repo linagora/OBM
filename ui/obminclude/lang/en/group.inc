@@ -65,4 +65,7 @@ $l_cant_delete_system = "System groups can't be deleted !";
 $l_can_delete = "The group can be deleted.";
 $l_cant_delete = "The group can't be deleted !";
 
+$l_err_cant_delete_default_user_group = "The group is the default group of some users. It can not be deleted !";
+$l_cant_delete_domain_group = "Domain groups are automatically handled by OBM and can not be deleted !";
+$l_cant_update_domain_group = "Domain groups are automatically handled by OBM and can not be updated !";
 $l_add_groups = "Add groups";
