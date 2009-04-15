@@ -77,55 +77,56 @@ function run_query_group_search($group) {
   $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query = "SELECT
-  group_id as id,
-  group_id,
-  group_domain_id,
-  group_system,
-  group_privacy,
-  group_local,
-  group_ext_id,
-  group_samba,
-  group_gid,
-  group_delegation,
-  group_manager_id,
-  group_name,
-  group_desc,
-  group_email,
-  group_contacts,
-  $timecreate,
-  $timeupdate,
-  A.userobm_login as usercreate,
-  B.userobm_login as userupdate,
-  domain_label,
-  domain_name,
-  count(usergroup.of_usergroup_user_id) as group_nb_user
+    group_id as id,
+    group_id,
+    group_domain_id,
+    group_system,
+    group_privacy,
+    group_local,
+    group_ext_id,
+    group_samba,
+    group_gid,
+    group_delegation,
+    group_manager_id,
+    group_name,
+    group_desc,
+    group_email,
+    group_contacts,
+    $timecreate,
+    $timeupdate,
+    A.userobm_login as usercreate,
+    B.userobm_login as userupdate,
+    domain_label,
+    domain_name,
+    count(usergroup.of_usergroup_user_id) as group_nb_user
   FROM UGroup
-  INNER JOIN Domain ON domain_id = group_domain_id
-  $join_userdata
-  LEFT JOIN of_usergroup usergroup ON of_usergroup_group_id=group_id
-  LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
-  LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
-  $join_user
+    INNER JOIN Domain ON domain_id = group_domain_id
+    $join_userdata
+    LEFT JOIN of_usergroup usergroup ON of_usergroup_group_id=group_id
+    LEFT JOIN UserObm as A ON UGroup.group_usercreate=A.userobm_id
+    LEFT JOIN UserObm as B ON UGroup.group_userupdate=B.userobm_id
+    $join_user
   $whereq
   GROUP BY group_id,
-  group_domain_id,
-  group_system,
-  group_privacy,
-  group_local,
-  group_ext_id,
-  group_samba,
-  group_gid,
-  group_delegation,
-  group_manager_id,
-  group_name,
-  group_desc,
-  group_email,
-  group_contacts,
-  timecreate,
-  timeupdate,
-  usercreate,
-  domain_name,
-  userupdate
+    group_domain_id,
+    group_system,
+    group_privacy,
+    group_local,
+    group_ext_id,
+    group_samba,
+    group_gid,
+    group_delegation,
+    group_manager_id,
+    group_name,
+    group_desc,
+    group_email,
+    group_contacts,
+    timecreate,
+    timeupdate,
+    usercreate,
+    userupdate,
+    domain_label,
+    domain_name
   $orderq
   $limit";
 
