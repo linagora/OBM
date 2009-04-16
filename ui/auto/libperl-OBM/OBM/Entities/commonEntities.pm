@@ -1,37 +1,19 @@
 package OBM::Entities::commonEntities;
 
+$VERSION = '1.0';
+
+use OBM::Tools::commonMethods;
+use OBM::Ldap::utils;
+use OBM::Samba::utils;
+use OBM::Password::passwd;
+@ISA = ('OBM::Tools::commonMethods', 'OBM::Ldap::utils', 'OBM::Samba::utils',
+'OBM::Password::passwd');
 
 $debug = 1;
 
-
 use 5.006_001;
+require Exporter;
 use strict;
-use vars qw( @EXPORT_OK $VERSION );
-use base qw(Exporter);
-
-
-$VERSION = '1.0';
-@EXPORT_OK = qw(    setDelete
-                    getDelete
-                    getArchive
-                    setArchive
-                    getParent
-                    setBdUpdate
-                    unsetBdUpdate
-                    getBdUpdate
-                    setUpdated
-                    unsetUpdated
-                    getUpdated
-                    getDesc
-                    _makeEntityEmail
-                    setUpdateEntity
-                    getUpdateEntity
-                    setUpdateLinks
-                    getUpdateLinks
-                    isMailAvailable
-                    isSieveAvailable
-               );
-
 
 
 sub setDelete {
