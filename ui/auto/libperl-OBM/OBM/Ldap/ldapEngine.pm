@@ -1,6 +1,6 @@
 package OBM::Ldap::ldapEngine;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 $debug = 1;
 
@@ -36,6 +36,8 @@ sub new {
 
     $self->{'currentEntity'} = undef;
     $self->{'objectclassDesc'} = undef;
+
+    $self->_log( 'démarrage du moteur LDAP', 4 );
 
     return $self;
 }
