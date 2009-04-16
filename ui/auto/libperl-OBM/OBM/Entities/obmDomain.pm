@@ -1,6 +1,9 @@
 package OBM::Entities::obmDomain;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
+
+use OBM::Entities::commonEntities;
+@ISA = ('OBM::Entities::commonEntities');
 
 $debug = 1;
 
@@ -11,21 +14,6 @@ use strict;
 use OBM::Tools::commonMethods qw(
         _log
         dump
-        );
-use OBM::Entities::commonEntities qw(
-        setDelete
-        getDelete
-        getArchive
-        setArchive
-        getParent
-        setBdUpdate
-        unsetBdUpdate
-        getBdUpdate
-        setUpdated
-        unsetUpdated
-        getUpdated
-        isMailAvailable
-        isSieveAvailable
         );
 use OBM::Ldap::utils qw(
         _modifyAttr
