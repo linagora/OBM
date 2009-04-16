@@ -114,7 +114,7 @@ class OBM_Mailer extends Stato_Mailer {
   protected function getRecipients($recipients, $setting='set_mail', $force=false) {
     global $cdg_sql;
 
-    if (($setting == 'set_mail') || ($setting == 'set_mail_participant')) {
+    if (($setting == 'set_mail') || ($setting == 'set_mail_participation')) {
       $set_mail = $setting;
     } else {
       $set_mail = 'set_mail';
@@ -153,7 +153,6 @@ class OBM_Mailer extends Stato_Mailer {
     display_debug_msg($query, $cdg_sql, 'run_query_get_recipients()');
     $db = new DB_OBM;
     $db->query($query);
-    
     $recipients = array();
     
     while ($db->next_record()) {

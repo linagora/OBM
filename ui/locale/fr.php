@@ -11,5 +11,8 @@ return array(
   'Resource reservation updated on OBM' => 'Mise à jour d\'une réservation de ressource sur OBM : %title%',
   'New resource reservation on OBM: %title%' => 'Nouvelle réservation de ressource sur OBM : %title%',
   'Exploitation report : %name%' => 'Rapport d\'exploitation : %name%',
-  '%displayname% validation confirmation' => 'Confirmation de la validation de l\'utilisateur %displayname%'
+  '%displayname% validation confirmation' => 'Confirmation de la validation de l\'utilisateur %displayname%',
+  'Resource participation updated on OBM: %title%' => 'La réservation d\'une resource à été statuée dans OBM : %title%',
+  'Participation updated on OBM: %title%' => 'Mise à jour de participation dans OBM : %title%'
+
 );

@@ -2983,7 +2983,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $block_owner .= "
     </select>
     </td>";
-
+  
+  $dis_others_attendees = dis_calendar_mail_field($others_attendees, $class);
   if ($has_access_to_other_calendars = OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access')) {
     $block_user = "
       <fieldset class=\"detail infos\">
@@ -3004,12 +3005,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <td id=\"sel_user_id\">$dis_sel_user</td>
       </tr>
       <tr>
-      <th>
-      $GLOBALS[l_others_attendees]
-      </th>
-      <td>
-        <textarea id=\"ta_others_attendees\" name=\"ta_others_attendees\">$others_attendees</textarea>
-      </td>
+      $dis_others_attendees
       </tr>
       </table>
       </fieldset>
@@ -6277,4 +6273,53 @@ Class CalendarPdfList Extends CalendarPdf{
 
 }
 
+/**
+ * Generate email field  
+ * 
+ * @param mixed $name 
+ * @param mixed $values 
+ * @access public
+ * @return void
+ */
+function dis_calendar_mail_field($emails, $class) {
+
+  if(!empty($emails) && !is_array($emails)) {
+    $emails = explode("\r\n",$emails);
+  }
+
+  $count = 0;
+  if(is_array($emails)) {
+    foreach($emails as $key => $email) {
+      $email_block .= "<div class=\"multiple\">
+        <a onclick=\"remove_element(this.parentNode,'calendarMailHome');return false\" href=\"\">
+         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+        </a>        
+        <input name='tf_email[]' value=\"$email\" />
+        </div>";
+      $count ++;
+    }
+  }
+
+  $email_block .= "
+    <div class=\"multiple\">
+    <a onclick=\"remove_element(this.parentNode,'calendarMailHome');return false\" href=\"\">
+     <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+    </a>        
+    <input name='tf_others_attendees[]' value='' />  
+    </div>         
+    ";  
+  $add_button = "<a id='addMailButton' href='' onclick=\"add_email_field();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+  
+  $email_block = "
+  <th class=\"$class[email]\" id='calendarMailLabel'>
+  $GLOBALS[l_others_attendees]
+  $add_button
+  </th>
+  <td id='calendarMailHome'>
+  $email_block
+  </td>
+  ";
+
+  return $email_block;
+}
 ?>

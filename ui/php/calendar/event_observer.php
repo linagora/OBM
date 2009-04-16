@@ -339,12 +339,12 @@ class OBM_EventAttendee {
    * @return void
    */
   public static function cmp($attendee1, $attendee2) {
-    if($attendee1->id == $attendee2->id) return O;
+    if($attendee1->id == $attendee2->id) return 1;
     return strcmp($attendee1->label, $attendee2->label);
   }
 
   public static function cmpState($attendee1, $attendee2) {
-    if($attendee1->id != $attendee2->id) return O;
+    if($attendee1->id != $attendee2->id) return 1;
     return strcmp($attendee1->state, $attendee2->state);
   }
 }
@@ -669,7 +669,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @return void
    */
   private function sendEventStateUpdateMail($new, $user) {
-    if($GLOBALS['obm']['uid'] != $user->get('id')) {
+    if($new->get('id') != $user->get('id')) {
       $this->mailer->sendEventStateUpdate($new, $user);
     }
   }

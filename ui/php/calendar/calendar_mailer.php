@@ -36,7 +36,7 @@ class CalendarMailer extends OBM_Mailer {
     if ($this->attachIcs) {
       $this->parts[] = array(
         'content' => fopen($this->generateIcs($event, $attendees), 'r'), 
-        'content_type' => 'text/calendar'
+        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
       );
       $this->attachments[] = array(
         'content' => fopen($this->generateIcs($event, $attendees), 'r'), 
@@ -59,16 +59,20 @@ class CalendarMailer extends OBM_Mailer {
     $this->body = array_merge($this->extractEventDetails($event, $this->from),
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     if ($this->attachIcs) {
+      $this->parts[] = array(
+        'content' => fopen($this->generateIcs($event, $attendees), 'r'), 
+        'filename' => 'meeting.ics', 'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
+      );
       $this->attachments[] = array(
         'content' => fopen($this->generateIcs($event, $attendees), 'r'), 
-        'filename' => 'meeting.ics', 'content_type' => 'text/calendar'
-      );
+        'filename' => 'meeting.ics', 'content_type' => 'application/ics'
+      );      
     }
   }
 
   protected function eventStateUpdate($event, $user) {
     $this->from = $this->getSender();
-    $this->recipients = $this->getRecipients(array($event->owner));
+    $this->recipients = $this->getRecipients(array($event->owner), 'set_mail_participation');
     $this->subject = __('Participation updated on OBM: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from, '', $user);
   }
@@ -97,7 +101,7 @@ class CalendarMailer extends OBM_Mailer {
 
   protected function resourceStateUpdate($event, $res) {
     $this->from = $this->getSender();
-    $this->recipients = $this->getRecipients(array($event->owner));
+    $this->recipients = $this->getRecipients(array($event->owner), 'set_mail_participation');
     $this->subject = __('Resource participation updated on OBM: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from, '', $res);
   }

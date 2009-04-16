@@ -885,6 +885,12 @@ function get_calendar_params() {
     $params['ics_type'] = $_FILES['fi_ics']['type'];
   }
 
+  if(is_array($params['others_attendees'])) {
+    foreach($params['others_attendees'] as $mail) {
+      if(trim($mail) != '') $others_attendees[] = trim($mail);
+    }
+    $params['others_attendees'] = $others_attendees;
+  }
   return $params;
 }
 

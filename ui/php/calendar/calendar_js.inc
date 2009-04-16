@@ -244,6 +244,18 @@ function showRepeatBlockDisplay(label) {
   frequency.appendText(frequencyLabel[1]);      
 }
 
+function add_email_field() {
+
+  var mailHome = $('calendarMailHome');
+  // Create the div
+  var div = new Element('div').addClass('multiple');
+  div.adopt(new Element('a').addEvent('click', function () {
+              remove_element(this.parentNode,'calendarMailHome');
+            }).adopt(new Element('img').setProperty('src','$ico_delete')));
+  mailHome.adopt(div);
+  div.appendText(' ').adopt(new Element('input').setProperty('name','tf_others_attendees[]').setProperty('type','text'));
+  
+}
 ";
 
 ?>

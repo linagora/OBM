@@ -1598,18 +1598,18 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   // Popup password Generate
   $pop_generate = "
     <div id=\"popupModifPassword\" class=\"obmPopup\">
-        <h1>
-          <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
-            <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
-          </a>
-          <span>$l_password_update</span>
-          </h1>
-          </br>
-          $l_change_password_confirm
-        <fieldset class=\"buttons\">
-		    	<input type=\"button\" onclick=\"javascript:generate_passwd()\" id=\"popup_confirm\" class=\"closeSticky\" value=\"$GLOBALS[l_confirm]\" />
-          <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
-				</fieldset>
+      <h1>
+        <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
+          <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
+        </a>
+        <span>$l_password_update</span>
+        </h1>
+        </br>
+        $l_change_password_confirm
+      <fieldset class=\"buttons\">
+        <input type=\"button\" onclick=\"javascript:generate_passwd()\" id=\"popup_confirm\" class=\"closeSticky\" value=\"$GLOBALS[l_confirm]\" />
+        <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
+      </fieldset>
     </div>";
 
   // Status User
@@ -1622,14 +1622,14 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
           <a href=\"#\" id=\"popup_close\" class=\"closeSticky\">
             <img src=\"$GLOBALS[ico_popup_close]\" alt=\"close\" />
           </a>
-          <span>Modif User</span>
+          <span>$l_update_valid</span>
         </h1>
         <input name=\"cba_modif\" type=\"radio\" onclick=\"$('user_action').value='valid'\"/><span>$l_update_valid</span>
         <input name=\"cba_modif\" type=\"radio\" checked=\"checked\" onclick=\"$('user_action').value='update'\"/><span>$l_update</span>
         <fieldset class=\"buttons\">
-		    	<input type=\"button\" onclick=\"$('dataUser').submit()\" id=\"popup_manage\" class=\"closeSticky\" value=\"$l_validate\" />
+          <input type=\"button\" onclick=\"$('dataUser').submit()\" id=\"popup_manage\" class=\"closeSticky\" value=\"$l_validate\" />
           <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
-				</fieldset>
+        </fieldset>
       </div>";
     $dis_archive = "
       <tr>
@@ -2750,7 +2750,7 @@ function dis_user_mail_field($domain_id, $values, $class) {
     $count++;
   } 
   if($GLOBALS['c_max_user_alias'] ==0 || $count < $GLOBALS['c_max_user_alias']) {
-    $add_button = "<a id='addMailButton' href=\'\' onclick=\"add_email_field(aliasSelectTemplate);show_hide_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+    $add_button = "<a id='addMailButton' href='' onclick=\"add_email_field(aliasSelectTemplate);show_hide_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
   }
   
   $email_block = "
