@@ -983,12 +983,12 @@ function quick_check_calendar_conflict($calendar, $entities) {
 function check_access_entity($calendar_ids, $resource_ids) {
   global $obm, $err;
   global $l_of_right_err_user, $l_of_right_err_resource;
-
-  if(isset($calendar_ids)) {
+  $ok = true;
+  if(isset($calendar_ids) && !empty($calendar_ids)) {
     $err['msg'] = $l_of_right_err_user;
     $ok = OBM_Acl::areAllowed($obm['uid'], 'calendar', $calendar_ids, 'access');
   }
-  if(isset($resource_ids)) {
+  if(isset($resource_ids) &&  !empty($calendar_ids)) {
     $err['msg'] = $l_of_right_err_resource;
     $ok = OBM_Acl::areAllowed($obm['uid'], 'resource', $resource_ids, 'access');
   }

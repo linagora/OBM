@@ -257,13 +257,13 @@ if ($action == 'index') {
   $entities['group'] = $params['sel_group_id'];
   $entities['resource'] = $params['sel_resource_id'];
   $entities['user'] = run_query_calendar_merge_groups($params['sel_group_id'],$params['sel_user_id']);
-  $entities['contact'] = $params['sel_contact_id'];
-  if ($entities['contact'] == null) {
-    $entities['contact'] = array();
-  }
   if (count($entities,COUNT_RECURSIVE) <= 3) {
     $entities['user']  = array($obm['uid']);
     $params['sel_user_id'] = array($obm['uid']);
+  }
+  $entities['contact'] = $params['sel_contact_id'];
+  if ($entities['contact'] == null) {
+    $entities['contact'] = array();
   }
   if (check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource'])) {
 

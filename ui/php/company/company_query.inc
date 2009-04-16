@@ -75,7 +75,7 @@ function run_query_company_search($company) {
   }
   // If a phone number has been specified, get it 
   if ($phone != '') {
-    $where .= "$and companyentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%')";
+    $where .= " $and companyentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%')";
     $and = 'AND';
   }
   // If an email indication has been specified, get it 
