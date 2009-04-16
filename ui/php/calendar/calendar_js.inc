@@ -18,7 +18,7 @@ $extra_js .= "
         if ($(sel_id) == null) {
           of_select_add_element(window.document, 'sel_user_id', 'data-user-'+id, users[id]);
       }
-                }
+    }
   } else {
     for(var id in users) {
       if (id != uid) {
@@ -46,10 +46,10 @@ function check_calendar_pdf_options() {
     return false;
   }
 
-  if(display_days) {
+  if (display_days) {
     for(var i=0;i<7;i++) {
       var day = $('cba_repeatday_'+i);
-      if(day.getProperty('checked')) {
+      if (day.getProperty('checked')) {
         return true;
       }
     }
@@ -114,6 +114,7 @@ function show_hide_calendar_dates(field) {
     begin.style.display = 'inline';
   }     
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the meeting perform is possible

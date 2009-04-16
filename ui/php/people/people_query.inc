@@ -47,8 +47,8 @@ function run_query_people_search($people) {
     if ((is_array($users_ids)) && (count($users_ids) > 0)) {
       $where_filter_entity = " AND (userobm_id IN ($obm[uid], ";
       foreach($users_ids as $u_id) {
-	    $where_filter_entity .= "$coma'$u_id'";
-	    $coma = ',';
+	$where_filter_entity .= "$coma'$u_id'";
+	$coma = ',';
       }
       $where_filter_entity .= '))';
     } else {
@@ -58,7 +58,6 @@ function run_query_people_search($people) {
     $show_contact = true;
     $where_userobm .= " AND userobm_status = 'VALID'";
   }
-
 
   // If a lastname indication has been specified, get it
   if (trim($lname) != '') {
@@ -81,7 +80,7 @@ function run_query_people_search($people) {
     // UserObm
     $where_userobm .= " AND userobm_email like '%$email%'";
     // Contact
-		$where_contact .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$email%'))";
+    $where_contact .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$email%'))";
   }
 
   // If a phone number indication has been specified, get it
@@ -90,7 +89,7 @@ function run_query_people_search($people) {
     $where_userobm .= " AND (userobm_phone like '%$phone%'
       OR userobm_phone2 like '%$phone%'
       OR userobm_mobile like '%$phone%')";
-		// Contact
+    // Contact
     $where_contact .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%'))";
   }
 
@@ -100,30 +99,30 @@ function run_query_people_search($people) {
   }
 
   // User defined data
-	// UserObm
+  // UserObm
   $userdata_userobm = of_userdata_query_search('people', $people, 'UserObm');
   if ($userdata_userobm['where'] != '') {
     if (trim($where_userobm) != '') $where_userobm .= ' AND ';
     $where_userobm .= $userdata_userobm['where'];
     $join_userdata_userobm = $userdata_userobm['join'];
   }
-	// Contact
+
+  // Contact
   $userdata_contact = of_userdata_query_search('Contact', $people);
   if ($userdata['where'] != '') {
     $where_contact .= ' AND '. $userdata_contact['where'];
     $join_userdata_contact = $userdata_contact['join'];
   }
 
-	// Where
+  // Where
   // UserObm
   if ((trim($where_userobm) != '') || (trim($where_filter_entity) != '')) {
     $whereq_userobm = " WHERE $where_userobm $where_filter_entity $multidomain_userobm";
   } else {
     $whereq_userobm = " WHERE 1=1 $multidomain_userobm";
   }
-	// Contact
+  // Contact
   $whereq_contact = " WHERE $where_contact $multidomain_contact";
-
 
   $select_userobm = "SELECT distinct userobm_lastname,
     userobm_firstname,
@@ -138,11 +137,11 @@ function run_query_people_search($people) {
     userobm_id,
     domain_name,
     'user' as type
-    FROM UserObm 
+  FROM UserObm 
     LEFT JOIN Domain ON userobm_domain_id = domain_id
     $join_userdata_userobm";
 
-	$select_contact = "select distinct contact_lastname as userobm_lastname,
+  $select_contact = "select distinct contact_lastname as userobm_lastname,
     contact_firstname as userobm_firstname,
     contact_title as userobm_title,
     p1.phone_number as userobm_phone, 
@@ -155,8 +154,9 @@ function run_query_people_search($people) {
     contact_id as userobm_id,
     domain_name,
     'contact' as type
-    FROM Contact";
-	$join_contact = "
+  FROM Contact";
+
+  $join_contact = "
     LEFT JOIN Domain ON contact_domain_id = domain_id
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id 
     LEFT JOIN Phone p1 ON p1.phone_entity_id = contactentity_entity_id AND p1.phone_label='HOME;VOICE;X-OBM-Ref1'
@@ -165,24 +165,27 @@ function run_query_people_search($people) {
     LEFT JOIN Phone p4 ON p4.phone_entity_id = contactentity_entity_id AND p4.phone_label='HOME;FAX;X-OBM-Ref1'
     LEFT JOIN Phone p5 ON p5.phone_entity_id = contactentity_entity_id AND p5.phone_label='WORK;FAX;X-OBM-Ref1'
     LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like 'PREF;INTERNET;X-OBM-Ref1%'
-		$join_userdata_contact";
+    $join_userdata_contact";
 
   // ORDER construction
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'userobm_lastname';
   $orderq .= " ORDER BY $order $sql_order_dir";
 
   $query_userobm = "$select_userobm $whereq_userobm";
-  if($show_contact) {
+  if ($show_contact) {
     $query_contact = "UNION $select_contact $join_contact $whereq_contact";
   }
 
   // Union
-	$query = "$query_userobm $query_contact $orderq $limit";
+  $query = "$query_userobm $query_contact $orderq $limit";
 
   if ($ctu_sql_limit) {
     $count_userobm = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_userdata_userobm $whereq_userobm");
     $count_contact = get_query_count("SELECT count(distinct contact_id) FROM Contact $join_userdata_contact $join_contact $whereq_contact");
-    $count = $count_userobm+$count_contact;
+    $count = $count_userobm;
+    if ($show_contact) {
+      $count += $count_contact;
+    }
     $obm_q->set_num_rows_total($count);
   }
 

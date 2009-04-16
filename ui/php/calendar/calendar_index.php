@@ -163,13 +163,13 @@ if (($params['new_sel']) || (is_array($params['sel_resource_id']))
 
 // If no user or resource selected, we select the connected user
 if ( ( (! is_array($cal_entity_id['user']))
-  || (count($cal_entity_id['user']) == 0) )
-    && ( (! is_array($cal_entity_id['resource']))
-      || (count($cal_entity_id['resource']) == 0))
-        && ( (! is_array($cal_entity_id['resource_group']))
+       || (count($cal_entity_id['user']) == 0) )
+     && ( (! is_array($cal_entity_id['resource']))
+	  || (count($cal_entity_id['resource']) == 0))
+     && ( (! is_array($cal_entity_id['resource_group']))
           || (count($cal_entity_id['resource_group']) == 0)) ) {
-            $cal_entity_id['user'] = array($obm['uid']);
-          }
+  $cal_entity_id['user'] = array($obm['uid']);
+}
 
 // Category Filter 
 if (($action == 'insert') || ($action == 'update') 
@@ -186,9 +186,9 @@ $params['category_filter'] = $cal_category_filter;
 ///////////////////////////////////////////////////////////////////////////////
 
 if ($popup) {
-  ///////////////////////////////////////////////////////////////////////////////
-  // External calls (main menu not displayed)                                  //
-  ///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// External calls (main menu not displayed)                                  //
+///////////////////////////////////////////////////////////////////////////////
   if ($action == 'calendar') {
     display_head($l_calendar);
     display_end();
@@ -818,7 +818,7 @@ function get_calendar_params() {
 
   // sel_user_id can be filled by sel_user_id or sel_ent (see below)
   if (is_array($params['user_id'])) {
-    while (list($key, $value) = each($params['user_id']) ) {
+    while (list($key, $value) = each($params['user_id'])) {
       // sel_user_id contains select infos (data-user-$id)
       if (strcmp(substr($value, 0, 10),'data-user-') == 0) {
         $data = explode('-', $value);

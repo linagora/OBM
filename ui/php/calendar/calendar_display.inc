@@ -378,7 +378,7 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       $default_view_url_params = run_query_calendar_get_bookmark_property($_SESSION['set_cal_default_view']);
       $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?$default_view_url_params\">$l_back_mono</a> -";
     } else {
-      $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?sel_category_filter=&amp;new_group=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a> -";
+      $dis_back_myview = "<a id=\"my_view\" href=\"calendar_index.php?sel_category_filter=&amp;new_sel=1&amp;group_view=$c_all&amp;sel_user_id[]=$obm[uid]&amp;date=$iso\">$l_back_mono</a> -";
     }    
   } 
   $block = "
@@ -2506,6 +2506,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   global $obm;
+
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') ) {
     $users = $entities['user'];
     $resources = $entities['resource'];
@@ -2514,6 +2515,17 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
     $alerts = get_one_event_user_alert($calendar['calendar_id'], $obm['uid']);
   } else {
     $users_id = $entities['user'];
+    // If new event, add the optionnal new users (here to get the user's infos)
+    if ($action == 'new') {
+      if (is_array($calendar['new_user_id'])) {
+	foreach ($calendar['new_user_id'] as $new_user_id) {
+	  if ($new_user_id > 0) {
+	    $users_id[] = $new_user_id;
+	  }
+	}
+      }
+      $users_id[] = $obm['uid'];
+    }
     if (count($users_id > 0)) {
       $users = get_userobm_from_ids($users_id);
     } else {
@@ -2698,8 +2710,6 @@ function dis_calendar_conflict_popup() {
 }
 
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
 // Parameters:
@@ -2840,8 +2850,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <!-- Update button -->
       <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
-      <input type=\"submit\" value=\"$l_update\" /> 
-      ";
+      <input type=\"submit\" value=\"$l_update\" />";
   } elseif (($action == 'new') || ($action == 'insert') || ($action == 'duplicate')) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
@@ -2896,10 +2905,19 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $all_day_checked = "checked=\"checked\"";
   }
 
-  if ($action == "new" && !isset($calendar['new_meeting'])) {
-    // userobm select
-    $u_name = ($users['entity'][$uid]['label']);
-    $sel_id = "data-user-$uid";
+  if ($action == 'new' && !isset($calendar['new_meeting'])) {
+    // If one new user is given in parameters, pre-select it
+    if (is_array($calendar['new_user_id']) && count($calendar['new_user_id']) == 1) {
+      $u_id = $calendar['new_user_id'][0];
+    } else if (is_array($calendar['entity']['user']) && count($calendar['entity']['user'])==1) {
+      // Else if calendar displayed was only one user, pre-select him
+      $u_id = $calendar['entity']['user'][0];
+    } else {
+      // Else auto-select the connected user
+      $u_id = "$uid";
+    }
+    $u_name = ($users['entity'][$u_id]['label']);
+    $sel_id = "data-user-$u_id";
     $div_id = "sel_user_id-$sel_id";
     $dis_sel_user = "<div class=\"elementRow\" id=\"$div_id\">
       <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
@@ -2926,9 +2944,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
   }
 
-  if (sizeof($users["entity"]) > 1) {
+  if (sizeof($users['entity']) > 1) {
     $u = array();
-    foreach($users["entity"] as $id => $user) {
+    foreach($users['entity'] as $id => $user) {
       $name = phpStringToJsString($user["label"]);
       array_push($u, "'$id' : '$name'");
     }
@@ -3009,8 +3027,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </tr>
       </table>
       </fieldset>
-      <p class=\"LC\" />
-      ";
+      <p class=\"LC\" />";
       $user_complete = "new obm.AutoComplete.Search('$path/people/people_index.php?action=ext_search', 'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
   } else {
     $block_user = "<fieldset class=\"detail infos H\"><input type='hidden' name='sel_user_id[]' value='data-user-$obm[uid]' /></fieldset>";

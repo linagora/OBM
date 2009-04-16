@@ -484,11 +484,11 @@ Obm.CalendarDayEvent = new Class({
   }
 })
 
+
 /******************************************************************************
  * Extended event with graphical representation of it's duration and which
  * could be resize
  *****************************************************************************/
-
 Obm.CalendarEvent = new Class({
 
   Extends: Obm.CalendarDayEvent,
@@ -757,7 +757,6 @@ Obm.CalendarPopupManager = new Class({
       this.cancel();
     }.bind(this));
 
-
     // Mail Notification actions
     $('popup_sendmail_yes').addEvent('click', function() {
       this.fireEvent('mail');
@@ -806,7 +805,6 @@ Obm.CalendarPopupManager = new Class({
  * Calendar Manager which redraw all events, and is a kind of home for the
  * events objects.
  ******************************************************************************/
-
 Obm.CalendarManager = new Class({
 
   initialize: function(startTime) {
@@ -906,10 +904,10 @@ Obm.CalendarManager = new Class({
 
   compareEvent: function(event1, event2) {
     diff = event1.event.time - event2.event.time;
-    if(diff != 0)
+    if (diff != 0)
       return diff;
     diff = event1.event.id - event2.event.id;
-    if(diff != 0)
+    if (diff != 0)
       return diff;
     return event1.event.entity_id - event2.event.entity_id;
   },
@@ -1067,10 +1065,10 @@ Obm.CalendarManager = new Class({
       url : 'calendar_index.php',
       secure : false,
       onComplete : function(response) {
-        if(response.conflict) {
+        if (response.conflict) {
           obm.calendarManager.popupManager.add('calendarConflictPopup');
         }
-        if(response.mail) {
+        if (response.mail) {
           obm.calendarManager.popupManager.add('calendarSendMail');
         }
         obm.calendarManager.popupManager.addEvent('mail', function () {
@@ -1102,14 +1100,14 @@ Obm.CalendarManager = new Class({
       resp.message = obm.vars.labels.fatalServerErr;
     }
     var events = response.eventsData;
-    if(response.error == 0) {
+    if (response.error == 0) {
       showOkMessage(response.message);
       var str = response.elementId.split('_');
       for(var i=0;i< events.length;i++) {
         var ivent = events[i].event;
         var id = str[0]+'_'+str[1] +'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
         var evt = obm.calendarManager.events.get(id);
-        if(ivent.status == 'ACCEPTED' || ivent.status == 'NEEDS-ACTION') {
+        if (ivent.status == 'ACCEPTED' || ivent.status == 'NEEDS-ACTION') {
           obm.calendarManager.unregister(id);
           evt.event.id = ivent.id;
           evt.event.status = ivent.status;
@@ -1141,7 +1139,7 @@ Obm.CalendarManager = new Class({
       url : 'calendar_index.php',
       secure : false,
       onComplete : function(response) {
-        if(response.mail) {
+        if (response.mail) {
           obm.calendarManager.popupManager.add('calendarSendMail');
         }
         obm.calendarManager.popupManager.addEvent('mail', function () {
@@ -1169,9 +1167,9 @@ Obm.CalendarManager = new Class({
       resp.message = obm.vars.labels.fatalServerErr;
     }    
     var events = response.eventsData;
-    if(response.error == 0) {
+    if (response.error == 0) {
       showOkMessage(response.message);
-      if(response.day == 1) {
+      if (response.day == 1) {
         for(var i=0;i< events.length;i++) {
           obm.calendarManager.lock();
           var e = obm.calendarManager.newDayEvent(events[0].event,events[0].options);
@@ -1226,7 +1224,7 @@ Obm.CalendarManager = new Class({
       resp.message = obm.vars.labels.fatalServerErr;
     }
     var events = response.eventsData;
-    if(response.error == 0) {
+    if (response.error == 0) {
       showOkMessage(response.message);
       var str = response.elementId.split('_');
       for(var i=0;i< events.length;i++) {
@@ -1262,7 +1260,6 @@ Obm.CalendarManager = new Class({
 /******************************************************************************
  * Calendar Update and creation quick form
  ******************************************************************************/
-
 Obm.CalendarQuickForm = new Class({
   initialize: function() {
     
@@ -1286,29 +1283,28 @@ Obm.CalendarQuickForm = new Class({
     this.eventData = new Object();
 
     new Obm.TabbedPane(this.data);
-
   },
   
   compute: function(ivent, context) {
     ivent = new Event(ivent)
     var target = ivent.target;
     target = $(target);
-    if(obm.calendarManager.redrawLock || target.get('tag') == 'a') {
+    if (obm.calendarManager.redrawLock || target.get('tag') == 'a') {
       return false;
     }
     while(target.id == '') {
-      if(target.get('tag') == origin) {
+      if (target.get('tag') == origin) {
         return false;
       }
       target = $(target.parentNode);
     }
     var str = target.id.split('_');
-    if(str.length <= 1) {
+    if (str.length <= 1) {
       return false;
     }
     var target = $(target);
     var type = str[0];
-    if(type == 'time' || type == 'hour') {
+    if (type == 'time' || type == 'hour') {
       this.setDefaultFormValues(str[1].toInt(),0, context);
     } else if (type == 'day') {
       this.setDefaultFormValues(str[1].toInt() + obm.calendarManager.startTime,1, context);
@@ -1319,8 +1315,8 @@ Obm.CalendarQuickForm = new Class({
     }
     this.show();    
     this.form.tf_title.focus();
-  }, 
-  
+  },
+
   setFormValues: function(evt, context) {
     var date_begin = new Obm.DateTime(evt.event.time * 1000);
     var date_end = new Obm.DateTime((evt.event.time + evt.event.duration) * 1000);    
@@ -1373,7 +1369,7 @@ Obm.CalendarQuickForm = new Class({
     }
   },
 
-  setDefaultFormValues: function(time, allDay,context) {
+  setDefaultFormValues: function(time, allDay, context) {
     var date_begin = new Obm.DateTime(time * 1000);
     var date_end = new Obm.DateTime((time + 3600) * 1000);  
     this.form.tf_title.value = '';
@@ -1386,7 +1382,7 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.duration = 3600;
     this.eventData.context = context;
     this.eventData.element_id = '';
-    this.eventData.formAction = 'quick_insert';   
+    this.eventData.formAction = 'quick_insert';
     this.gotoURI = 'action=new';
     this.editButton.value = obm.vars.labels.edit_full;
 
@@ -1395,17 +1391,16 @@ Obm.CalendarQuickForm = new Class({
     this.title.setStyle('display','none');
     this.deleteButton.setStyle('display','none');
     this.editButton.setStyle('display','');
-    this.detailButton.setStyle('display','none');    
+    this.detailButton.setStyle('display','none');
     this.entityList.setStyle('display','block');
-    if(!this.eventData.all_day) {
+    if (!this.eventData.all_day) {
       this.date.set('html',date_begin.format('Y/m/d H:i') + '-' + date_end.format('Y/m/d H:i'));
     } else {
       this.date.set('html',date_begin.format('Y/m/d') + '-' + date_end.format('Y/m/d'));
-    }    
+    }
     this.attendees.set('html','');
-
   },
-  
+
   show: function() {
     //this.popup.setStyle('display','');
     obm.popup.show('calendarQuickForm');
@@ -1422,7 +1417,7 @@ Obm.CalendarQuickForm = new Class({
     this.eventData.entity_kind = this.entityKind.value;
     this.eventData.send_mail = null;
     action = action || this.eventData.formAction;
-    if(action == 'quick_insert') {
+    if (action == 'quick_insert') {
       obm.calendarManager.sendCreateEvent(this.eventData);
     } else if (action == 'quick_delete') {
       obm.calendarManager.sendDeleteEvent(this.eventData); 
@@ -1433,10 +1428,11 @@ Obm.CalendarQuickForm = new Class({
   },
 
   goTo: function(action) {
-    if(action) {
+    if (action) {
       this.gotoURI += '&action='+action;
     }
-    this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value);
+    this.eventData.entity_id = this.entityView.get('inputValue');
+    this.gotoURI += '&utf8=1&all_day='+this.eventData.all_day+'&date_begin='+encodeURIComponent(this.eventData.date_begin)+'&duration='+this.eventData.duration+'&title='+encodeURIComponent(this.form.tf_title.value)+'&new_user_id[]='+this.eventData.entity_id;
     window.location.href = 'calendar_index.php?'+this.gotoURI;
   }
 });
@@ -1457,7 +1453,7 @@ Obm.TabbedPane = new Class({
       title.dispose();
       title.injectInside(this.tabsContainer);
       title.tabIndex = index;
-      if(index != 0) {
+      if (index != 0) {
         tabContent.setStyle('display','none');
       }
 
@@ -1479,7 +1475,6 @@ Obm.TabbedPane = new Class({
 /******************************************************************************
  * Calendar View Creation and deletion function
  ******************************************************************************/
-
 Obm.CalendarView = new Class({
   initialize: function(el) {
     this.view_id = $('view_id');
@@ -1513,7 +1508,7 @@ Obm.CalendarView = new Class({
             resp.error = 1;
             resp.message = obm.vars.labels.fatalServerErr;
           }
-          if(response.error == 0) {
+          if (response.error == 0) {
             showOkMessage(response.message);
             var obmbookmark_id = response.obmbookmark_id;
             var obmbookmark_label = response.obmbookmark_label;
@@ -1550,7 +1545,7 @@ Obm.CalendarView = new Class({
                 resp.error = 1;
                 resp.message = obm.vars.labels.fatalServerErr;
               }
-              if(response.error == 0) {
+              if (response.error == 0) {
                 showOkMessage(response.message);
                 var obmbookmark_id = response.obmbookmark_id;
                 // Delete option
@@ -1577,7 +1572,7 @@ Obm.CalendarView = new Class({
     var default_id = this.default_view_id.value;
 
     if (id != "") {
-      if(id != default_id) {
+      if (id != default_id) {
         action = 'insert_default_view';
         confirm_message = obm.vars.labels.insert_default_view;
       } else {
@@ -1586,7 +1581,7 @@ Obm.CalendarView = new Class({
       }
     } else {
       var message_error = obm.vars.labels.no_sel_default_view;
-      if(default_id != ""){
+      if (default_id != "") {
         action = 'delete_default_view';
         confirm_message = obm.vars.labels.delete_default_view;
       } else {
@@ -1594,7 +1589,7 @@ Obm.CalendarView = new Class({
       }
     }
 
-    if(action != ""){
+    if (action != "") {
       if (confirm(confirm_message)) {
         new Request.JSON({
           url :'calendar_index.php',
@@ -1608,7 +1603,7 @@ Obm.CalendarView = new Class({
                 resp.error = 1;
                 resp.message = obm.vars.labels.fatalServerErr;
               }
-              if(response.error == 0) {
+              if (response.error == 0) {
                 showOkMessage(response.message);
                 
                 if (action == 'insert_default_view') {
@@ -1618,7 +1613,7 @@ Obm.CalendarView = new Class({
                   //change visual for default view
                   $('opt_'+id).set('default','default');
                   $('my_view').set('href',$('opt_'+id).value);
-                  if(default_id != "") {
+                  if (default_id != "") {
                     $('opt_'+default_id).erase("default");
                   }
 
@@ -1630,7 +1625,7 @@ Obm.CalendarView = new Class({
                   $('opt_'+default_id).erase("default");
                   
                   //hidde option for default view
-                  if($('view_id').value == "") {
+                  if ($('view_id').value == "") {
                     $('default').set('styles',{'display':'none'});
                   }
 
