@@ -77,13 +77,8 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_domain_can_add_domain()) {
-    $prop_q = run_query_domain_properties();
-    $display['detail'] = html_domain_form('','', null, $prop_q,$params);
-  } else {
-    $display['msg'] .= display_err_msg($l_cant_add_domain_single);
-    $display['detail'] = dis_domain_consult($params);
-  }
+  $prop_q = run_query_domain_properties();
+  $display['detail'] = html_domain_form('','', null, $prop_q,$params);
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,30 +99,24 @@ if ($action == 'index' || $action == '') {
 
 } elseif ($action == 'insert') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_domain_can_add_domain()) {
-    if (check_user_defined_rules() && check_domain_data_form('', $params)) {
-      $cid = run_query_domain_insert($params);
-      if ($cid > 0) {
-	set_update_state();
-	$params['domain_id'] = $cid;
-	$display['msg'] .= display_ok_msg($l_insert_ok);
-	$display['detail'] = dis_domain_consult($params);
-      } else {
-	$display['msg'] .= display_err_msg($l_insert_error);
-	$prop_q = run_query_domain_properties();
-	$display['detail'] = html_domain_form('','', null, $prop_q,$params);
-      }
-      // Form data are not valid
+  if (check_user_defined_rules() && check_domain_data_form('', $params)) {
+    $cid = run_query_domain_insert($params);
+    if ($cid > 0) {
+      set_update_state();
+      $params['domain_id'] = $cid;
+      $display['msg'] .= display_ok_msg($l_insert_ok);
+      $display['detail'] = dis_domain_consult($params);
     } else {
-      $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+      $display['msg'] .= display_err_msg($l_insert_error);
       $prop_q = run_query_domain_properties();
       $display['detail'] = html_domain_form('','', null, $prop_q,$params);
     }
+    // Form data are not valid
   } else {
-    $display['msg'] .= display_err_msg($l_cant_add_domain_single);
-    $display['detail'] = dis_domain_consult($params);
+    $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
+    $prop_q = run_query_domain_properties();
+    $display['detail'] = html_domain_form('','', null, $prop_q,$params);
   }
-
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_domain_data_form($params['domain_id'], $params) && check_domain_can_delete_mailserver($params)) {

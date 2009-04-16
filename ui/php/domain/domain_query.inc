@@ -663,35 +663,6 @@ function check_domain_can_delete($p_id) {
 
 
 /**
- * Check if a domain can be added
- *
- * @return true if a domain can be added
- **/
-function check_domain_can_add_domain() {
-  global $c_singleNameSpace, $err, $l_cant_add_domain_single;
-
-  $add_ok = true;
-
-  if ($c_singleNameSpace) {
-    // check # domain
-    $cpt = 0;
-    $test_q = new DB_OBM;
-    $query = "SELECT count(*) as nb FROM Domain";
-    display_debug_msg($query, $cdg_sql, 'check_domain_can_add_domain()');
-    $test_q->query($query);
-    $test_q->next_record();
-    $nb = $test_q->f('nb');
-    if ($nb >= 1) {
-      $err['msg'] .= $l_cant_add_domain_single;
-      return false;
-    }
-  }
-
-  return $add_ok;
-}
-
-
-/**
  * Count number of users in a domain
  *
  * @param mixed $domain_id : domain_id
