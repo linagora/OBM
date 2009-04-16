@@ -2994,7 +2994,7 @@ function html_user_batch_form($params) {
 // Display tf_ coord function
 function disp_tf_coord($name, $size, $params) {
   
-  $field_to_update = 'to_update_$name';
+  $field_to_update = 'to_update_'.$name;
   if (!isset($params[$field_to_update])) {
     $value = 'false';
   } else {

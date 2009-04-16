@@ -2152,6 +2152,7 @@ function run_query_user_data_batch($params) {
     $query = "SELECT userobm_id FROM UserObm WHERE (".implode(' OR ', $check).") AND userobm_id IN (".implode(', ', $u_id).")";
     $obm_q = new DB_OBM;
     
+    display_debug_msg($query, $cdg_sql, 'run_query_user_data_batch()');
     $obm_q->query($query);
     while ($obm_q->next_record()) {
       $users_id_error[] = $obm_q->f('userobm_id');
@@ -2205,6 +2206,7 @@ function check_users_error_data($params, $users_id_error) {
   $msg_error = "";
   foreach ($check as $err_type => $where) {
     $query = "SELECT userobm_login, userobm_nomade_perms FROM UserObm WHERE ($where) AND userobm_id IN(".implode(', ', $users_id_error).")";
+    display_debug_msg($query, $cdg_sql, 'check_users_error_data()');
     $obm_q->query($query);
     while ($obm_q->next_record()) {
       if ($err_type == "email") { $err['msg'] = $l_email_empty; }
@@ -2321,6 +2323,7 @@ function run_query_batch_processing_update($params, $users_id) {
   if (isset($archive)) {
     $users = array();
     $query = "SELECT userobm_id FROM UserObm WHERE userobm_id IN (".implode(', ', $users_id).") AND userobm_archive != $archive";
+    display_debug_msg($query, $cdg_sql, 'run_query_batch_processing_update()');
     $obm_q->query($query);
     while($obm_q->next_record()) {
       $users[] = $obm_q->f('userobm_id');
@@ -2330,6 +2333,7 @@ function run_query_batch_processing_update($params, $users_id) {
   // Update users data
   if (sizeof($set) > 0) {
     $query = "UPDATE UserObm SET ".implode(', ', $set)." WHERE userobm_id IN (".implode(', ', $users_id).")";
+    display_debug_msg($query, $cdg_sql, 'run_query_batch_processing_update()');
     $retour = $obm_q->query($query);
   } else {
     return true;
@@ -2559,6 +2563,7 @@ function run_query_user_valid($user_id){
 
   $obm_q = new DB_OBM;
 
+  display_debug_msg($query, $cdg_sql, 'run_query_user_valid()');
   $retour = $obm_q->query($query);
 
   return $retour;
