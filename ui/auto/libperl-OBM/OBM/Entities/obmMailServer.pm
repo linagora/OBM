@@ -2,8 +2,8 @@ package OBM::Entities::obmMailServer;
 
 $VERSION = '1.0';
 
-use OBM::Entities::commonEntities;
-@ISA = ('OBM::Entities::commonEntities');
+use OBM::Entities::entities;
+@ISA = ('OBM::Entities::entities');
 
 $debug = 1;
 
@@ -11,15 +11,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
-use OBM::Ldap::utils qw(
-        _modifyAttr
-        _modifyAttrList
-        _diffObjectclassAttrs
-        );
 use OBM::Parameters::common;
 
 

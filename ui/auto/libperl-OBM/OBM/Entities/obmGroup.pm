@@ -2,8 +2,8 @@ package OBM::Entities::obmGroup;
 
 $VERSION = '1.0';
 
-use OBM::Entities::commonEntities;
-@ISA = ('OBM::Entities::commonEntities');
+use OBM::Entities::entities;
+@ISA = ('OBM::Entities::entities');
 
 $debug = 1;
 
@@ -11,19 +11,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
-use OBM::Ldap::utils qw(
-        _modifyAttr
-        _modifyAttrList
-        _diffObjectclassAttrs
-        );
-use OBM::Samba::utils qw(
-        _getUserSID
-        _getGroupSID
-        );
 use OBM::Parameters::common;
 
 
@@ -92,19 +79,21 @@ sub _init {
         return 1;
     }
 
+    # Le nom actuel du groupe, si définit
+    if( defined($groupDesc->{'group_name_current'}) ) {
+        $groupDesc->{'group_name_current'} = lc($groupDesc->{'group_name_current'});
+        if( !$groupDesc->{'group_name_current'} || $groupDesc->{'group_name_current'} !~ /$OBM::Parameters::regexp::regexp_groupname/ ) {
+            $self->_log( 'Nom actuel du groupe \''.$groupDesc->{'group_name_current'}.'\' incorrect', 4 );
+            return 1;
+        }
+    }
+
     # Le GID du groupe
     if( !defined($groupDesc->{'group_gid'}) ) {
         $self->_log( 'GID du groupe non défini', 0 );
         return 1;
     }elsif( $groupDesc->{'group_gid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
         $self->_log( 'GID \''.$groupDesc->{'group_gid'}.'\' incorrect', 0 );
-        return 1;
-    }
-
-    # Le nom actuel du groupe, si définit
-    $groupDesc->{'group_name_current'} = lc($groupDesc->{'group_name_current'});
-    if( $groupDesc->{'group_name_current'} && $groupDesc->{'group_name_current'} !~ /$OBM::Parameters::regexp::regexp_groupname/ ) {
-        $self->_log( 'Nom actuel du groupe \''.$groupDesc->{'group_name_current'}.'\' incorrect', 4 );
         return 1;
     }
 

@@ -2,8 +2,8 @@ package OBM::Entities::obmUser;
 
 $VERSION = '1.0';
 
-use OBM::Entities::commonEntities;
-@ISA = ('OBM::Entities::commonEntities');
+use OBM::Entities::entities;
+@ISA = ('OBM::Entities::entities');
 
 $debug = 1;
 
@@ -11,25 +11,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
-use OBM::Ldap::utils qw(
-        _modifyAttr
-        _modifyAttrList
-        _diffObjectclassAttrs
-        );
-use OBM::Samba::utils qw(
-        _getUserSID
-        _getGroupSID
-        );
-use OBM::Password::passwd qw(
-        _toMd5
-        _toSsha
-        _convertPasswd
-        _getNTLMPasswd
-        );
 use URI::Escape;
 use OBM::Parameters::common;
 
@@ -100,10 +81,12 @@ sub _init {
     }
 
     # Current user name, if define
-    $userDesc->{'userobm_login_current'} = lc($userDesc->{'userobm_login_current'});
-    if( $userDesc->{'userobm_login_current'} && $userDesc->{'userobm_login_current'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
-        $self->_log( 'login actuel de l\'utilisateur \''.$userDesc->{'userobm_login_current'}.'\' incorrect', 0 );
-        return 1;
+    if( defined($userDesc->{'userobm_login_current'}) ) {
+        $userDesc->{'userobm_login_current'} = lc($userDesc->{'userobm_login_current'});
+        if( !$userDesc->{'userobm_login_current'} || $userDesc->{'userobm_login_current'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
+            $self->_log( 'login actuel de l\'utilisateur \''.$userDesc->{'userobm_login_current'}.'\' incorrect', 0 );
+            return 1;
+        }
     }
 
     # Archive flag

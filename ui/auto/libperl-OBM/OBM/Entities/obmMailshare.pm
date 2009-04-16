@@ -2,8 +2,8 @@ package OBM::Entities::obmMailshare;
 
 $VERSION = '1.0';
 
-use OBM::Entities::commonEntities;
-@ISA = ('OBM::Entities::commonEntities');
+use OBM::Entities::entities;
+@ISA = ('OBM::Entities::entities');
 
 $debug = 1;
 
@@ -11,26 +11,7 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
-use OBM::Ldap::utils qw(
-        _modifyAttr
-        _modifyAttrList
-        _diffObjectclassAttrs
-        );
-use OBM::Samba::utils qw(
-        _getUserSID
-        _getGroupSID
-        );
-use OBM::Password::passwd qw(
-        _toMd5
-        _toSsha
-        _convertPasswd
-        );
 use OBM::Parameters::common;
-        
 
 
 sub new {
@@ -97,10 +78,12 @@ sub _init {
     }
 
     # Le nom actuel du mailshare, si définit
-    $mailshareDesc->{'mailshare_name_current'} = lc($mailshareDesc->{'mailshare_name_current'});
-    if( $mailshareDesc->{'mailshare_name_current'} && $mailshareDesc->{'mailshare_name_current'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
-        $self->_log( 'Nom actuel du mailshare \''.$mailshareDesc->{'mailshare_name_current'}.'\' incorrect', 0 );
-        return 1;
+    if( defined($mailshareDesc->{'mailshare_name_current'}) ) {
+        $mailshareDesc->{'mailshare_name_current'} = lc($mailshareDesc->{'mailshare_name_current'});
+        if( !$mailshareDesc->{'mailshare_name_current'} || $mailshareDesc->{'mailshare_name_current'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
+            $self->_log( 'Nom actuel du mailshare \''.$mailshareDesc->{'mailshare_name_current'}.'\' incorrect', 0 );
+            return 1;
+        }
     }
 
     SWITCH: {

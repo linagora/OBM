@@ -2,8 +2,8 @@ package OBM::Entities::obmHost;
 
 $VERSION = '1.0';
 
-use OBM::Entities::commonEntities;
-@ISA = ('OBM::Entities::commonEntities');
+use OBM::Entities::entities;
+@ISA = ('OBM::Entities::entities');
 
 $debug = 1;
 
@@ -11,22 +11,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
-use OBM::Ldap::utils qw(
-        _modifyAttr
-        _modifyAttrList
-        _diffObjectclassAttrs
-        );
-use OBM::Password::passwd qw(
-        _getNTLMPasswd
-        );
-use OBM::Samba::utils qw(
-        _getUserSID
-        _getGroupSID
-        );
 use OBM::Parameters::common;
 use OBM::Parameters::regexp;
 
@@ -100,10 +84,12 @@ sub _init {
     }
 
     # Le nom actuel de l'hôte, si définit
-    $hostDesc->{'host_name_current'} = lc($hostDesc->{'host_name_current'});
-    if( $hostDesc->{'host_name_current'} && $hostDesc->{'host_name_current'} !~ /$OBM::Parameters::regexp::regexp_hostname/ ) {
-        $self->_log( 'nom actuel de l\'hôte \''.$hostDesc->{'host_name_current'}.'\' incorrect', 0 );
-        return 1;
+    if( defined($hostDesc->{'host_name_current'}) ) {
+        $hostDesc->{'host_name_current'} = lc($hostDesc->{'host_name_current'});
+        if( !$hostDesc->{'host_name_current'} || $hostDesc->{'host_name_current'} !~ /$OBM::Parameters::regexp::regexp_hostname/ ) {
+            $self->_log( 'nom actuel de l\'hôte \''.$hostDesc->{'host_name_current'}.'\' incorrect', 0 );
+            return 1;
+        }
     }
 
     # L'adresse IP

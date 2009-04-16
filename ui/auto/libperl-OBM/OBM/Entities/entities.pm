@@ -1,4 +1,4 @@
-package OBM::Entities::commonEntities;
+package OBM::Entities::entities;
 
 $VERSION = '1.0';
 
