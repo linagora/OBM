@@ -1290,7 +1290,7 @@ function get_user_group_public_hash() {
 //   - true if found, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_user_login_in_use($domain_id, $login, $u_id='') {
-  global $cdg_sql, $obm;
+  global $cdg_sql, $obm, $c_singleNameSpace;
 
   if (! ($domain_id > 0)) {
     $domain_id = $obm['domain_id'];
@@ -1303,13 +1303,15 @@ function check_user_login_in_use($domain_id, $login, $u_id='') {
     $u_id = sql_parse_id($u_id, true, true);
     $where_uid = "AND userobm_id $u_id";
   }
-  $where_multidomain = "AND (domain_id = '$domain_id' OR domain_global = true)";
-
+  if (!$c_singleNameSpace) {
+    $join_multidomain .= ' LEFT JOIN Domain on domain_id = userobm_domain_id ';
+    $where_multidomain = "AND (domain_id = '$domain_id' OR domain_global = true)";
+  }
   $query = "SELECT
       userobm_id,
       userobm_login
     FROM UserObm
-      LEFT JOIN Domain on domain_id = userobm_domain_id
+    $join_multidomain
     WHERE userobm_login='$login' $where_multidomain 
       $where_uid";
 
