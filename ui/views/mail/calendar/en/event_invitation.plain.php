@@ -3,7 +3,7 @@ This email was automatically sent by OBM
 NEW APPOINTMENT
 ------------------------------------------------------------------
 
-You are invited to participate to an appointment
+You are invited to participate to this appointment
 
 from     : <?php echo $start; ?>
 
@@ -16,12 +16,12 @@ location : <?php echo $location; ?>
 author   : <?php echo $auteur; ?>
 
 
-:: More information about this appointment : 
-<?php echo $this->host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>
-
-
 :: To accept this appointment : 
 <?php echo $this->host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=ACCEPTED
 
 :: To refuse this appointment : 
 <?php echo $this->host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=DECLINED
+
+:: More information about this appointment : 
+<?php echo $this->host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>
+

@@ -1,7 +1,7 @@
 <table style="width:100%; border:3px solid #000;">
     <tr>
         <th style="text-align:left; background-color: blue; color:#fff; font-size:16px" colspan="2">
-          Update resource reservation
+          Resource reservation updated
         </th>
     </tr>
     <tr>

@@ -1,3 +1,3 @@
-Rapport d'exploitation de la commande "<?php echo $name ?>" :
+Batch process report : "<?php echo $name ?>" :
 
 <?php echo $report ?>

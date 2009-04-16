@@ -6,7 +6,7 @@
     </tr>
     <tr>
       <td colspan="2">
-<?php echo $target; ?> has <?php echo $targetState; ?> the event <?php echo $title; ?> schuduled on <?php echo $start; ?>.
+<?php echo $target; ?> has <?php echo $targetState; ?> the event <?php echo $title; ?> scheduled on <?php echo $start; ?>.
       </td>
     </tr>
 

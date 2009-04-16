@@ -1,3 +1,3 @@
-Report of operations for "<?php echo $name ?>" :
+Rapport d'exploitation du traitement "<?php echo $name ?>" :
 
 <?php echo $report ?>

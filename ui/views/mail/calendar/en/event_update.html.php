@@ -1,7 +1,7 @@
 <table style="width:80%; border:1px solid #000; border-collapse:collapse;background:#EFF0F2;font-size:12px;">
     <tr>
         <th style="text-align:center; background-color: #509CBC; color:#FFF; font-size:14px" colspan="2">
-          Updated appointment
+          Appointment Updated
         </th>
     </tr>
     <tr>
@@ -13,7 +13,7 @@ was updated and will take place from <?php echo $start; ?> to <?php echo $end; ?
         <td style="text-align:right;" colspan="2">
           <a href="<?php echo $host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=ACCEPTED">Accept</a>
           <a href="<?php echo $host; ?>calendar/calendar_index.php?action=update_decision&calendar_id=<?php echo $id; ?>&entity_kind=user&rd_decision_event=DECLINED">Decline</a>
-          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">Details</a>
+          <a href="<?php echo $host; ?>calendar/calendar_index.php?action=detailconsult&calendar_id=<?php echo $id; ?>">More informations</a>
         </td>
     </tr>
 </table>

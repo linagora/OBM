@@ -5,7 +5,7 @@
         </th>
     </tr>
     <tr>
-        <td colspan="2">You are invited to participate to an appointment</td>
+        <td colspan="2">You are invited to participate to this appointment</td>
     </tr>
     <tr>
         <td style="text-align:right;width:20%;padding-right:1em;">Subject</td><td style="font-weight:bold;"><?php echo $title; ?></td>
