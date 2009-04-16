@@ -1717,15 +1717,15 @@ function run_query_calendar_event_alert_delete($event_id, $user_id='') {
 function check_calendar_access($id, $right = 'write') {
   global $l_event_cant_delete, $obm, $delete_ok, $err, $l_insufficient_permission, $l_err_reference;
   
-  if(!$id) {
+  if (!$id) {
     $err['msg'] = $l_err_reference;
     return false;
   }
   $e = get_calendar_event_info($id);
-  if($e['owner'] == $obm['uid']) {
+  if ($e['owner'] == $obm['uid']) {
     return true;
   }
-  if($right == 'write') {
+  if ($right == 'write') {
     $access = OBM_Acl::canWrite($obm['uid'], 'calendar', $e['owner']);
   } else {
     if (in_array($obm['uid'], $e['attendees']['user'])) {
@@ -2290,7 +2290,7 @@ function check_calendar_data_form($calendar) {
   $repeatfrequency = $calendar['repeatfrequency'];
   $event_duration = $calendar['event_duration'];
   ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
-	$others_attendees = explode(",", str_replace(array( "\r", "\n", "%0a", "%0d"), "", $calendar['others_attendees']));
+  $others_attendees = explode(',', str_replace(array( "\r", "\n", "%0a", "%0d"), '', $calendar['others_attendees']));
 
   if (trim($title) == '') {
     $err['msg'] = $l_fill_title;
