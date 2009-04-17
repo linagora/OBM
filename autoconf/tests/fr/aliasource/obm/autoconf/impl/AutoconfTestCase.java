@@ -14,7 +14,7 @@ public abstract class AutoconfTestCase extends TestCase {
 		dse = new DataSourceEnv();
 		dse.bindPool();
 		ConstantService cs = ConstantService.getInstance();
-		dc = new DirectoryConfig("thomas@zz.com", cs);
+		dc = new DirectoryConfig("user3@dom1.local", cs);
 	}
 
 	protected void tearDown() throws Exception {

@@ -83,6 +83,10 @@ public class AutoconfService extends HttpServlet {
 		String smtpMailHost = hostIps.get("smtp");
 		String ldapHost = ConstantService.getInstance().getStringValue(
 				"ldapHostname");
+		String allowedAtt = ConstantService.getInstance().getStringValue(
+				"allowedAtt");
+		String allowedValue = ConstantService.getInstance().getStringValue(
+				"allowedValue");
 
 		SimpleDateFormat formatter = new SimpleDateFormat(
 				"EEE, dd MMM yyyy HH:mm:ss z");
@@ -109,7 +113,7 @@ public class AutoconfService extends HttpServlet {
 		TemplateLoader tl = new TemplateLoader(dc.getConfigXml(),
 				ConstantService.getInstance());
 		tl.applyTemplate(attributeSet, imapMailHost, smtpMailHost, ldapHost,
-				resp.getOutputStream());
+				resp.getOutputStream(), allowedAtt, allowedValue);
 	}
 
 	private String loadDomain(DBQueryTool dbqt, String login, String domain) {

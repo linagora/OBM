@@ -393,16 +393,24 @@ function _installExtensions(aConfigurationData) {
 // * elle peut être mise à jour
 //  et
 // * elle est compatible avec "l'environnment Mozilla d'exécution"
+//  et
+// * elle n'est pas spécifiée comme interdite
 function _extensionMustBeInstalled(aExtension) {
   return ( (!_extensionIsAlreadyInstalled(aExtension.@id)
          || _extensionCanBeUpdated(aExtension.@id, aExtension.@version))
-         && _extensionIsCompatible(aExtension));
+         && _extensionIsCompatible(aExtension)
+         && ( !aExtension.@allowed || aExtension.@allowed == "true"));
 }
 
-// vérifie si l'extension est spécifié dans le xml comme à désinstaller
-// et qu'elle est installé
+// vérifie si l'extension est spécifié dans le xml comme :
+// * à désinstaller
+// ou
+// * interdite
+// et
+// * qu'elle est installé
 function _extensionMustBeUnInstalled(aExtension) {
-  return ( aExtension.@uninstall && aExtension.@uninstall == "true"
+  return ( ((aExtension.@uninstall && aExtension.@uninstall == "true")
+  				 || (aExtension.@allowed && aExtension.@allowed == "false"))
            && _extensionIsAlreadyInstalled(aExtension.@id) );
 }
 

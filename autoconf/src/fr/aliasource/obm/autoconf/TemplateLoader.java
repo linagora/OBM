@@ -4,7 +4,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPAttributeSet;
@@ -29,23 +35,32 @@ public class TemplateLoader {
 
 	public void applyTemplate(LDAPAttributeSet attributeSet,
 			String imapMailHost, String smtpMailHost, String ldapHost,
-			OutputStream out) throws IOException {
+			OutputStream out, String allowedAtt, String allowedValue) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(configXml));
 		generateXMLConfig(reader, out, attributeSet, imapMailHost,
-				smtpMailHost, ldapHost);
+				smtpMailHost, ldapHost, allowedAtt, allowedValue);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	private void generateXMLConfig(BufferedReader reader, OutputStream out,
 			LDAPAttributeSet attributeSet, String imapMailHost,
-			String smtpMailHost, String ldapHost) throws IOException {
+			String smtpMailHost, String ldapHost, String allowedAtt, String allowedValue) throws IOException {
 		String line = null;
 		while ((line = reader.readLine()) != null) {
 			Iterator iterator = attributeSet.iterator();
+			
 			while (iterator.hasNext()) {
 				LDAPAttribute att = (LDAPAttribute) iterator.next();
-				line = line.replace("|" + att.getName() + "|", att
-						.getStringValue());
+				if (att.getName().equalsIgnoreCase(allowedAtt)) {
+					List<String> values = Arrays.asList(att.getStringValueArray());
+					if (values.contains(allowedValue)) {
+						line = line.replace("|" + att.getName() + "|", "true");
+					} else {
+						line = line.replace("|" + att.getName() + "|", "false");
+					}
+				} else {
+					line = line.replace("|" + att.getName() + "|", att.getStringValue());
+				}
 			}
 			line = line.replace("|imapMailHost|", imapMailHost);
 			line = line.replace("|smtpMailHost|", smtpMailHost);

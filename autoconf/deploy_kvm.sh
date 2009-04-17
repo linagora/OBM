@@ -3,4 +3,4 @@
 
 ant dist
 
-scp -r dist/* root@10.0.0.5:/usr/lib/obm-autoconf/
+scp -r dist/* root@10.92.0.15:/usr/lib/obm-autoconf/
