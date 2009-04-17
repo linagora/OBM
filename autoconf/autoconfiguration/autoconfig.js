@@ -399,7 +399,7 @@ function _extensionMustBeInstalled(aExtension) {
   return ( (!_extensionIsAlreadyInstalled(aExtension.@id)
          || _extensionCanBeUpdated(aExtension.@id, aExtension.@version))
          && _extensionIsCompatible(aExtension)
-         && ( !aExtension.@allowed || aExtension.@allowed == "true"));
+         && !( aExtension.@allowed && aExtension.@allowed == "false"));
 }
 
 // vérifie si l'extension est spécifié dans le xml comme :
