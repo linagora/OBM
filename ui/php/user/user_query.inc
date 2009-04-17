@@ -1562,7 +1562,7 @@ function check_user_data_form($p_id, &$user) {
   }
 
   // MANDATORY: User password on insert
-  if (($action == 'insert') && (trim($passwd) == '')) {
+  if (($action == 'insert' || $action == 'valid') && (trim($passwd) == '')) {
     $err['msg'] = $l_password_empty;
     $err['field'] = 'password';
     return false;
