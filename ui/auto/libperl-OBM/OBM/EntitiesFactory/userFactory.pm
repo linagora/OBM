@@ -190,7 +190,7 @@ sub _loadUsers {
                  LEFT JOIN (SELECT group_gid, of_usergroup_user_id
                             FROM UGroup
                             INNER JOIN of_usergroup ON of_usergroup_group_id = group_id WHERE group_gid = 512) AS grp
-                                ON grp.of_usergroup_user_id = UserObm.userobm_id
+                                ON grp.of_usergroup_user_id = '.$userTablePrefix.'UserObm.userobm_id
                  WHERE '.$userTablePrefix.'UserObm.userobm_domain_id='.$self->{'domainId'}.'
                  AND '.$userTablePrefix.'UserObm.userobm_status=\'VALID\'';
 
