@@ -13,7 +13,7 @@ import fr.aliasource.obm.utils.ConstantService;
  */
 public class DirectoryConfig {
 
-	private int ldapPort;
+	private Integer ldapPort;
 	private String ldapSearchBase;
 	private String[] ldapAtts;
 	private String ldapFilter;
@@ -22,12 +22,12 @@ public class DirectoryConfig {
 
 	private static final Log logger = LogFactory.getLog(DirectoryConfig.class);
 	
-	public DirectoryConfig(String login, ConstantService cs) {
+	public DirectoryConfig(String loginWithoutDomain, ConstantService cs) {
 		ldapHost = cs.getStringValue("ldapHost");
 		ldapPort = cs.getIntValue("ldapPort");
 		ldapSearchBase = cs.getStringValue("ldapSearchBase");
 		ldapAtts = cs.getStringValue("ldapAtts").split(",");
-		ldapFilter = "(" + cs.getStringValue("ldapFilter") + "=" + login + ")";
+		ldapFilter = "(" + cs.getStringValue("ldapFilter") + "=" + loginWithoutDomain + ")";
 		logger.info("ldap filter: "+ldapFilter);
 		configXml = cs.getStringValue("configXml");
 	}

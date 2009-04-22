@@ -22,15 +22,18 @@ public class LDAPQueryTool {
 	LDAPAttributeSet getLDAPInformations() throws LDAPException {
 		LDAPConnection ld = new LDAPConnection();
 		LDAPSearchResults searchResults;
-		LDAPAttributeSet attributeSet;
 		try {
 			ld.connect(dc.getLdapHost(), dc.getLdapPort());
 			searchResults = ld.search(dc.getLdapSearchBase(),
 					LDAPConnection.SCOPE_SUB, dc.getLdapFilter(), dc
 							.getLdapAtts(), false);
+			if (searchResults.hasMore()) {
 			LDAPEntry nextEntry = searchResults.next();
-			attributeSet = nextEntry.getAttributeSet();
+			LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
 			return attributeSet;
+			} else {
+				return null;
+			}
 		} catch (LDAPException e) {
 			logger.error("Error finding user info", e);
 			throw e;

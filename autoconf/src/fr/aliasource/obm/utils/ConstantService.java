@@ -41,18 +41,28 @@ public class ConstantService {
 
 	public String getStringValue(String prop) {
 		String val = props.getProperty(prop);
-		if (val.startsWith("\"") && val.endsWith("\"")) {
+		if (val != null && val.startsWith("\"") && val.endsWith("\"")) {
 			val = val.replace("\"", "");
 		}
 		return val;
 	}
 
-	public boolean getBooleanValue(String prop) {
-		return Boolean.valueOf(getStringValue(prop)).booleanValue();
+	public Boolean getBooleanValue(String prop) {
+		String val = getStringValue(prop);
+		if (val == null) {
+			logger.warn("No value for property "+prop);
+			return null;
+		}
+		return Boolean.valueOf(val);
 	}
 
-	public int getIntValue(String prop) {
-		return Integer.parseInt(getStringValue(prop));
+	public Integer getIntValue(String prop) {
+		String val = getStringValue(prop);
+		if (val == null) {
+			logger.warn("No value for property "+prop);
+			return null;
+		}
+		return Integer.parseInt(val);
 	}
 
 }

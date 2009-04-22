@@ -12,11 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Document;
 
 import com.novell.ldap.LDAPAttributeSet;
 import com.novell.ldap.LDAPException;
 
 import fr.aliasource.obm.utils.ConstantService;
+import fr.aliasource.obm.utils.DOMUtils;
 
 /**
  * Sends XML autoconfiguration data processed by javascript file deployed in
@@ -99,13 +101,23 @@ public class AutoconfService extends HttpServlet {
 		TemplateLoader tl = new TemplateLoader(dc.getConfigXml(),
 				ConstantService.getInstance());
 
-		SimpleDateFormat formatter = new SimpleDateFormat(
-				"EEE, dd MMM yyyy HH:mm:ss z");
-		resp.setHeader("Expires", formatter.format(new Date()));
-		resp.setContentType("application/xml");
+		Document doc = tl.applyTemplate(attributeSet, imapMailHost,
+				smtpMailHost, ldapHost, allowedAtt, allowedValue);
 
-		tl.applyTemplate(attributeSet, imapMailHost, smtpMailHost, ldapHost,
-				resp.getOutputStream(), allowedAtt, allowedValue);
+		if (doc != null) {
+			SimpleDateFormat formatter = new SimpleDateFormat(
+					"EEE, dd MMM yyyy HH:mm:ss z");
+			resp.setHeader("Expires", formatter.format(new Date()));
+			resp.setContentType("application/xml");
+
+			try {
+				DOMUtils.serialise(doc, resp.getOutputStream());
+			} catch (Exception e) {
+				logger.error("error sending xml document", e);
+				resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			}
+		}
+
 	}
 
 	private String loadDomain(DBQueryTool dbqt, String login, String domain) {

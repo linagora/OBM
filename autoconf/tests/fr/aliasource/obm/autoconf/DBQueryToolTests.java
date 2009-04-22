@@ -11,5 +11,9 @@ public class DBQueryToolTests extends AutoconfTestCase {
 		HashMap<String, String> mailHost = dqt.getDBInformation("thomas", "zz.com");
 		assertNotNull(mailHost);
 		System.out.println("mailHost: "+mailHost);
+
+		mailHost = dqt.getDBInformation("doesnotexist", "notdomain.fr");
+		assertNotNull(mailHost);
+		System.out.println("mailHost: "+mailHost);
 	}
 }

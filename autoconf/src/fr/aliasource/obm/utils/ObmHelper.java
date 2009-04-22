@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ObmHelper {
 
-	private static Log logger;
+	private static final Log logger = LogFactory.getLog(ObmHelper.class);
 
 	public static final String USER_TRANSACTION = "java:comp/UserTransaction";
 	public static final String DATA_SOURCE = "java:comp/env/jdbc/AutoConfDS";
@@ -32,8 +32,6 @@ public class ObmHelper {
 	private static UserTransaction ut;
 
 	static {
-		logger = LogFactory.getLog(ObmHelper.class);
-		logger.info("ObmHelper static init.");
 		InitialContext context;
 		try {
 			context = new InitialContext();
