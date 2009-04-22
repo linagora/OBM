@@ -116,6 +116,11 @@ if ( ($params['new_group'] == '1')
       $cal_entity_id['group'] = array();
     } else {
       $cal_entity_id['user'] = of_usergroup_get_group_users($params['group_view']);
+      if(is_array($params['sel_user_id'])) {
+        array_merge($params['sel_user_id'],$cal_entity_id['user']);
+      } else {
+        $params['sel_user_id'] = $cal_entity_id['user'];
+      }
       $cal_entity_id['group'] = array($params['group_view']);
     }
     $cal_entity_id['group_view'] = $params['group_view'];
