@@ -80,7 +80,8 @@ public class TemplateLoader {
 						e.setAttribute(at.getName(), val);
 					}
 				}
-				replaceInNode(attributeSet, imapMailHost, smtpMailHost, ldapHost, allowedAtt, allowedValue, e);
+				replaceInNode(attributeSet, imapMailHost, smtpMailHost,
+						ldapHost, allowedAtt, allowedValue, e);
 			}
 		}
 	}
@@ -88,19 +89,22 @@ public class TemplateLoader {
 	private String doAttributeExpansion(LDAPAttributeSet attributeSet,
 			String imapMailHost, String smtpMailHost, String ldapHost,
 			String allowedAtt, String allowedValue, String line) {
-		Iterator iterator = attributeSet.iterator();
-		while (iterator.hasNext()) {
-			LDAPAttribute att = (LDAPAttribute) iterator.next();
-			if (att.getName().equalsIgnoreCase(allowedAtt)) {
-				List<String> values = Arrays.asList(att.getStringValueArray());
-				if (values.contains(allowedValue)) {
-					line = line.replace("|" + att.getName() + "|", "true");
+		if (attributeSet != null) {
+			Iterator iterator = attributeSet.iterator();
+			while (iterator.hasNext()) {
+				LDAPAttribute att = (LDAPAttribute) iterator.next();
+				if (att.getName().equalsIgnoreCase(allowedAtt)) {
+					List<String> values = Arrays.asList(att
+							.getStringValueArray());
+					if (values.contains(allowedValue)) {
+						line = line.replace("|" + att.getName() + "|", "true");
+					} else {
+						line = line.replace("|" + att.getName() + "|", "false");
+					}
 				} else {
-					line = line.replace("|" + att.getName() + "|", "false");
+					line = line.replace("|" + att.getName() + "|", att
+							.getStringValue());
 				}
-			} else {
-				line = line.replace("|" + att.getName() + "|", att
-						.getStringValue());
 			}
 		}
 		if (imapMailHost != null) {
