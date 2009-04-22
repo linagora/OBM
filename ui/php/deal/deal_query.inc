@@ -1468,7 +1468,8 @@ function run_query_deal_contact($p_id) {
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
     LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id    
     WHERE contact_company_id $p_id 
-      $multidomain
+    $multidomain
+    AND contact_archive = 0
     ORDER BY contact_archive, contact_lastname $limit";
 
   display_debug_msg($query, $cdg_sql, 'run_query_deal_contact()');
