@@ -116,6 +116,9 @@ public class AutoconfService extends HttpServlet {
 				logger.error("error sending xml document", e);
 				resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			}
+		} else {
+			logger.warn("null doc or resulting config.xml is invalid.");
+			resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		}
 
 	}
