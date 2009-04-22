@@ -24,11 +24,11 @@ public class TemplateLoaderTests extends AutoconfTestCase {
 					"smtpMailHost", "ldapHost", "att", "attvalue");
 			assertNotNull(doc);
 			DOMUtils.logDom(doc);
+			System.out.println("valid template: "+tl.isValidTemplate(doc.getDocumentElement()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Error should not occur");
 		}
-
 	}
 
 }

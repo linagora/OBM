@@ -104,7 +104,7 @@ public class AutoconfService extends HttpServlet {
 		Document doc = tl.applyTemplate(attributeSet, imapMailHost,
 				smtpMailHost, ldapHost, allowedAtt, allowedValue);
 
-		if (doc != null) {
+		if (doc != null && tl.isValidTemplate(doc.getDocumentElement())) {
 			SimpleDateFormat formatter = new SimpleDateFormat(
 					"EEE, dd MMM yyyy HH:mm:ss z");
 			resp.setHeader("Expires", formatter.format(new Date()));
