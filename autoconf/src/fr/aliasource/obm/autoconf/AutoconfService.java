@@ -19,6 +19,9 @@ import com.novell.ldap.LDAPException;
 import fr.aliasource.obm.utils.ConstantService;
 
 /**
+ * Sends XML autoconfiguration data processed by javascript file deployed in
+ * thunderbird.
+ * 
  * @author nicolasl
  * 
  */
@@ -56,29 +59,17 @@ public class AutoconfService extends HttpServlet {
 
 		DBQueryTool dbqt = new DBQueryTool();
 
-		HashMap<String, String> hostIps = null;
+		HashMap<String, String> hostIps = new HashMap<String, String>();
 		try {
-			hostIps = dbqt.getDBInformation(login, loadDomain(dbqt, login,
-					domain));
+			hostIps.putAll(dbqt.getDBInformation(login, loadDomain(dbqt, login,
+					domain)));
 		} catch (Exception e) {
 			logger.error("Cannot contact DB:" + e);
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return;
 		}
 
-		if (hostIps == null) {
-			logger.warn("NULL information obtained from DBQueryTool for "
-					+ login);
-			return;
-		}
-
-		if (hostIps.get("imap") == null || hostIps.get("smtp") == null) {
-			logger.warn("No hosts found for  " + login);
-			return;
-		}
-
 		// map host ip with imap host and smtp host
-
 		String imapMailHost = hostIps.get("imap");
 		String smtpMailHost = hostIps.get("smtp");
 		String ldapHost = ConstantService.getInstance().getStringValue(
@@ -87,11 +78,6 @@ public class AutoconfService extends HttpServlet {
 				"allowedAtt");
 		String allowedValue = ConstantService.getInstance().getStringValue(
 				"allowedValue");
-
-		SimpleDateFormat formatter = new SimpleDateFormat(
-				"EEE, dd MMM yyyy HH:mm:ss z");
-		resp.setHeader("Expires", formatter.format(new Date()));
-		resp.setContentType("application/xml");
 
 		DirectoryConfig dc = new DirectoryConfig(login, ConstantService
 				.getInstance());
@@ -112,6 +98,12 @@ public class AutoconfService extends HttpServlet {
 
 		TemplateLoader tl = new TemplateLoader(dc.getConfigXml(),
 				ConstantService.getInstance());
+
+		SimpleDateFormat formatter = new SimpleDateFormat(
+				"EEE, dd MMM yyyy HH:mm:ss z");
+		resp.setHeader("Expires", formatter.format(new Date()));
+		resp.setContentType("application/xml");
+
 		tl.applyTemplate(attributeSet, imapMailHost, smtpMailHost, ldapHost,
 				resp.getOutputStream(), allowedAtt, allowedValue);
 	}

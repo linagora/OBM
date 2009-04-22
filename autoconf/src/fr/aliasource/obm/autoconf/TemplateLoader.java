@@ -4,13 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 import com.novell.ldap.LDAPAttribute;
 import com.novell.ldap.LDAPAttributeSet;
@@ -62,9 +58,15 @@ public class TemplateLoader {
 					line = line.replace("|" + att.getName() + "|", att.getStringValue());
 				}
 			}
-			line = line.replace("|imapMailHost|", imapMailHost);
-			line = line.replace("|smtpMailHost|", smtpMailHost);
-			line = line.replace("|ldapHost|", ldapHost);
+			if (imapMailHost != null) {
+				line = line.replace("|imapMailHost|", imapMailHost);
+			}
+			if (smtpMailHost != null) {
+				line = line.replace("|smtpMailHost|", smtpMailHost);
+			}
+			if (ldapHost != null) {
+				line = line.replace("|ldapHost|", ldapHost);
+			}
 
 			for (Object key : constants.getKeySet()) {
 				String k = (String) key;

@@ -9,10 +9,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Service pour des constantes basé sur un fichier
- * <code>constants.properties</code> placé dans le classpath
+ * Service pour des constantes basé sur le fichier
+ * <code>/etc/obm/obm_conf.ini</code>.
  * 
- * @author mehdi
  * 
  */
 public class ConstantService {
