@@ -52,7 +52,7 @@ if ($action == "validate") {
     $udata = run_query_validate($_REQUEST["ticket"]);
   }
   if(is_array($udata)) {
-    echo "login=$udata[login]&password=$udata[password]";
+    echo "login=".urlencode($udata['login'])."&password=".urlencode($udata['password']);
   } else {
     echo "invalidOBMTicket";
   }
