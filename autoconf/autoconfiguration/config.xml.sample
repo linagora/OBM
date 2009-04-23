@@ -167,23 +167,9 @@
 - nécessite OBM-maja
 - pour connaître les codes qui servent à construire une barre d'outils
     - configurer la préférence "config.obm.autoconf.toolbar.debug" à 1
-    - démarrer Thunderbird
-    - ouvrir la console d'erreurs
-    - le message "Toolbar debug main window load event" doit apparaître
-         ainsi que 6 autres messages qui le suivent.
-      Le groupe RDF correspond aux valeurs récupérées dans le fichier de configuration localstore.rdf
-      Le groupe DOM correspond aux valeurs récupérées dans l'arbre DOM.
-      
-      Normalement seule la valeur DOM du main toolbar est récupérable,
-      car le DOM n'est récupérable que si l'on ouvre la fenêtre qui correspond au DOM.
-      Donc pour les autres fenêtre qui ne sont pas ouvertes
-      soit le "carnet d'adresse" et "écrire un message".
-      On ouvre donc ces 2 fenêtres,
-      puis on ferme la fenêtre principale pour provoquer un event close qui déclenche
-      la deuxième partie du debug.
-      
-      Après cela un autre message "Toolbar debug main window close event" doit apparaît
-      dans la console d'erreurs. Les 3 messages DOM doivent donner les valeurs des barre d'outils.
+        -> cela permet :
+	   - d'afficher des messages dans la console
+	   - d'ouvrir automatique une fenêtre d'outils au démarrage qui permet de récupérer les codes
 
 value="button-getmsg,button-newmsg,button-address,calendar-show-todaypane-button,separator,button-reply,button-replyall,button-forward,separator,button-tag,button-delete,button-junk,button-print,separator,button-goback,button-goforward,spring,separator,calendar-week-view-button,calendar-month-view-button,search-container"
 
@@ -217,7 +203,8 @@ value="__empty"
 				          name="config.obm.autoconf.toolbar.addressbook"
 				          value="button-newcard,button-newlist,separator,button-editcard,button-newmessage,separator,button-abdelete,spring,search-container"
 				          set="user"/>
-				          
+			-->
+			
 			<!-- to set small icons on toolbar -->
 			<preference type="boolean"
 				          name="config.obm.autoconf.toolbar.main.smallicons"
@@ -337,5 +324,82 @@ value="__empty"
     <proxy type="auto"
            value="autoconfHost/proxy.pac"/>
   </proxies>
+-->
+
+<!-- PATCHS -->
+<!-- Exemples  de patchs -->
+<!--
+
+Permet d'appliquer des patchs en fonction d'un numéro de version.
+Les patchs doivent comporter un numéro de patch contenu l'attribut version,
+il n'est pas nécessaire que les numéros se suivent mais les patchs doivent être ordonnés dans la structure XML
+en respectant leur numéro de version,
+
+Lors d'une nouvelle configuration, on N'APPLIQUE AUCUN PATCH, et le numéro de patch du client
+est directement incrémenté au dernier numéro de patch trouvé.
+Si le client est déjà configuré et a des patchs à appliquer, on applique un à un les patchs de
+la dernière version du client jusqu'à la version du dernier patch de la configuration.
+
+Children supportés par add :
+- proxies
+- certificates
+- accounts
+- directories
+- preferences
+
+Children supportés par delete :
+- directories
+- preferences
+
+-->
+<!--
+<patches>
+  <patch version="2">
+    <add>
+       <directories>
+          <directory id="ldap-annuaire-aoc-personnes"
+            label="DGFIP-Personnes"
+            uri="ldap://ldap.oc.dgfip:389/ou=personnes,ou=DGCP,ou=Mefi,o=gouv,c=fr??sub?(objectclass=*)"
+            autocomplete="true"/>
+          <directory id="ldap-annuaire-aoc-structures"
+            label="DGFIP-Structures"
+            uri="ldap://ldap.oc.dgfip:389/ou=structures,ou=DGCP,ou=Mefi,o=gouv,c=fr??sub?(objectclass=*)"
+            autocomplete="true"/>
+          <directory id="ldap-annuaire-aoc-listes"
+            label="DGFIP-Listes"
+            uri="ldap://ldap.oc.dgfip:389/ou=listes,ou=DGCP,ou=Mefi,o=gouv,c=fr??sub?(objectclass=*)"
+            autocomplete="true"/>
+        </directories>
+    </add>
+    <delete>
+       <directories>
+          <directory id="ldap-annuaire-aoc"
+            label="Annuaire Outil Collaboratif"
+            uri="ldap://ldap.oc.dgfip:389/o=gouv,c=fr??sub?(objectclass=*)"
+            autocomplete="true"/>
+        </directories>
+    </delete>
+  </patch>
+  <patch version="3">
+    <delete>
+       <directories>
+          <directory id="ldap-annuaire-aoc-listes"
+            label="DGFIP-Listes"
+            uri="ldap://ldap.oc.dgfip:389/ou=listes,ou=DGCP,ou=Mefi,o=gouv,c=fr??sub?(objectclass=*)"
+            autocomplete="true"/>
+        </directories>
+    </delete>
+  </patch>
+  <patch version="5">
+    <add>
+	<preferences>
+	<preference type="integer"
+			  name="config.obm.autoconf.toolbar.debug"
+			  value="1"
+			  set="user"/>
+	</preferences>
+    </add>
+  </patch>
+</patches>
 -->
 </configuration>

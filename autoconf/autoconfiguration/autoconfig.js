@@ -136,6 +136,28 @@ function runAutoconfiguration() {
         _setupPreferences(configurationData);
       }
       
+      
+      var lastVersion = 0;
+      var  currentVersion = _getPreference('config.obm.patch.version', -1);
+      
+      for each (var patch in configurationData.*::patches.*::patch) {
+        lastVersion = parseInt(patch.@version);
+        
+        if (currentVersion != -1 && currentVersion < lastVersion) {
+          _setupProxies(patch.*::add);
+          _importCertificates(patch.*::add);
+          _setupAccounts(patch.*::add);
+          
+          _suppressDirectories(patch.*::delete);
+          _setupDirectories(patch.*::add);
+          
+          _suppressPreferences(patch.*::delete);
+          _setupPreferences(patch.*::add);
+        }
+      }
+      
+      _setPreference('config.obm.patch.version', lastVersion);
+      
       if (obm_maja_reset_pref()) {
         _deletePrefBranch("config.obm.reset.prefs");
       }
@@ -239,6 +261,15 @@ function _setupPreferences(aConfigurationData) {
   
       _setPreference(preference.@name, typedValue, preference.@set);
     }
+  }
+}
+
+// applique un patch de supression des préférences
+function _suppressPreferences(aConfigurationData) {
+  var preferences = aConfigurationData.*::preferences;
+
+  for each ( var preference in preferences.*::preference ) {
+    _deletePrefBranch(preference.@name);
   }
 }
 
@@ -875,13 +906,13 @@ function _setupAccounts(aConfigurationData) {
 // configure les annuaires LDAP listés dans les données de configuration
 function _setupDirectories(aConfigurationData) {
   var directories = aConfigurationData.*::directories;
-
   var autoCompleteDirectories = _getPreference("ldap_2.autoComplete.ldapServers", "");
 
   _logToFile(LOG_INFO, "Configuration des annuaires LDAP.\n");
-
+  
   for each ( var directory in directories.*::directory ) {
-    
+    _logToFile(LOG_INFO, "Ajout de l'annuaire " + directory.@id + "\n");
+  
     if ( _getPreference("ldap_2.servers." + directory.@id + ".description") != undefined && !obm_maja_reset_pref() ) {
       _logToFile(LOG_DEBUG, "L'annuaire LDAP " + directory.@id + " existe déjà.\n");
       // annuaire existe déjà
@@ -911,21 +942,32 @@ function _setupDirectories(aConfigurationData) {
                     directory.@id + ".mab");
     _setPreference("ldap_2.servers." + directory.@id + ".replication.lastChangeNumber"
                     , 0);                
-    
-  if ( "@autocomplete" in directory ) {
-    //extension multi-ldap : activer l'annuaire pour l'auto-complétion
-    if ( !autoCompleteDirectories.match("ldap_2.servers." + directory.@id) ) {
-      if (autoCompleteDirectories != "") {
-        autoCompleteDirectories += ",";
+      
+    if ( "@autocomplete" in directory ) {
+      //extension multi-ldap : activer l'annuaire pour l'auto-complétion
+      if ( !autoCompleteDirectories.match("ldap_2.servers." + directory.@id) ) {
+        if (autoCompleteDirectories != "") {
+          autoCompleteDirectories += ",";
+        }
+        autoCompleteDirectories += "ldap_2.servers." + directory.@id;
       }
-      autoCompleteDirectories += "ldap_2.servers." + directory.@id;
     }
+      
   }
-    
-  }
+  
   //extension multi-ldap : activer tous les annuaires pour l'auto-complétion
   _setPreference("ldap_2.autoComplete.ldapServers", autoCompleteDirectories);
   _setPreference("ldap_2.autoComplete.useDirectory", true); 
+}
+
+// supprime les annuaires LDAP listés dans les patchs de configuration
+function _suppressDirectories(aConfigurationData) {
+  var directories = aConfigurationData.*::directories;
+  
+  for each ( var directory in directories.*::directory ) {
+    _logToFile(LOG_INFO, "Suppression de l'annuaire " + directory.@id + "\n");
+    _deletePrefBranch("ldap_2.servers." + directory.@id);
+  }
 }
 
 function obm_maja_reset_pref () {
