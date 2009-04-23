@@ -97,7 +97,7 @@ public class TemplateLoader {
 				for (int j = 0; j < atts.getLength(); j++) {
 					Attr at = (Attr) atts.item(j);
 					String oldVal = at.getValue();
-					ret = oldVal.contains("|");
+					ret = oldVal.contains("${") && oldVal.contains("}");
 				}
 				ret = ret && isValidTemplate(e);
 			}
@@ -116,29 +116,29 @@ public class TemplateLoader {
 					List<String> values = Arrays.asList(att
 							.getStringValueArray());
 					if (values.contains(allowedValue)) {
-						line = line.replace("|" + att.getName() + "|", "true");
+						line = line.replace("${" + att.getName() + "}", "true");
 					} else {
-						line = line.replace("|" + att.getName() + "|", "false");
+						line = line.replace("${" + att.getName() + "}", "false");
 					}
 				} else {
-					line = line.replace("|" + att.getName() + "|", att
+					line = line.replace("${" + att.getName() + "}", att
 							.getStringValue());
 				}
 			}
 		}
 		if (imapMailHost != null) {
-			line = line.replace("|imapMailHost|", imapMailHost);
+			line = line.replace("${imapMailHost}", imapMailHost);
 		}
 		if (smtpMailHost != null) {
-			line = line.replace("|smtpMailHost|", smtpMailHost);
+			line = line.replace("${smtpMailHost}", smtpMailHost);
 		}
 		if (ldapHost != null) {
-			line = line.replace("|ldapHost|", ldapHost);
+			line = line.replace("${ldapHost}", ldapHost);
 		}
 
 		for (Object key : constants.getKeySet()) {
 			String k = (String) key;
-			line = line.replace("|" + k + "|", constants.getStringValue(k));
+			line = line.replace("${" + k + "}", constants.getStringValue(k));
 		}
 		return line;
 	}

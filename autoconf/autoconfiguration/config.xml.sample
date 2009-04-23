@@ -5,7 +5,7 @@
   Remarque: partout où noté "LDAP", des données provenant du serveur LDAP central
             viennent compléter le document XML.
             le motif est de la forme
-              |nom_attribut_LDAP|
+              ${nom_attribut_LDAP}
             qui sera remplacé par le servlet par la valeur issue de l'annuaire.
 -->
 
@@ -15,11 +15,11 @@
   <identities>
     <identity id="identite-obm"
               smtpServer="serveur-smtp-obm"
-              fullName="|cn|"
-              fromAddress="|mail|"
-              draftFolder="imap://|mailBox|@|imapMailHost|/INBOX/Brouillons"
+              fullName="${cn}"
+              fromAddress="${mail}"
+              draftFolder="imap://${mailBox}@${imapMailHost}/INBOX/Brouillons"
               draftFolder_pickerMode="1"
-              fccFolder="imap://|mailBox|@|imapMailHost|/INBOX/Envoy&amp;AOk-s"
+              fccFolder="imap://${mailBox}@${imapMailHost}/INBOX/Envoy&amp;AOk-s"
               fccFolder_pickerMode="1"
               autocompleteDirectory="serveur-ldap-obm"/>
   </identities>
@@ -29,9 +29,9 @@
   <servers>
     <server id="serveur-courrier-obm"
             type="imap"
-            label="|cn|"
-            username="|mailBox|"
-            hostname="|imapMailHost|"
+            label="${cn}"
+            username="${mailBox}"
+            hostname="${imapMailHost}"
             port="143"
             secureConnection="tls"
             trashFolder="Corbeille"
@@ -41,8 +41,8 @@
     <server id="serveur-smtp-obm"
             type="smtp"
             label="Serveur Smtp obm"
-            username="|mailBox|"
-            hostname="|smtpMailHost|"
+            username="${mailBox}"
+            hostname="${smtpMailHost}"
             port="465"
             secureConnection="ssl"/>
   </servers>
@@ -58,7 +58,7 @@
   <directories>
 	<directory id="ldap-contacts-publics"
 		label="Contacts OBM"
-		uri="ldap://|ldapHost|:389/ou=contacts,dc=zz.com,dc=local??sub?(&amp;(objectClass=*)(mail=*))"
+		uri="ldap://${ldapHost}:389/ou=contacts,dc=zz.com,dc=local??sub?(&amp;(objectClass=*)(mail=*))"
 		autocomplete="true"/>
   </directories>
 
@@ -147,7 +147,7 @@
 			<!-- login de l'utilisateur -->
 			<preference type="string"
 				          name="config.obm.login"
-				          value="|mailBox|"
+				          value="${mailBox}"
 				          set="user"/>
 			
 			<!-- Lighning synchronisation automatique de l'agenda en minutes -->
@@ -161,9 +161,8 @@
 				          set="user"/>
 			
 			<!-- Toolbar initialize -->
-<!--
 
-Configuration de l'initialisateur de Barre d'outils
+<!-- Configuration de l'initialisateur de Barre d'outils
 
 - nécessite OBM-maja
 - pour connaître les codes qui servent à construire une barre d'outils
@@ -200,6 +199,8 @@ value="button-newcard,button-newlist,separator,button-editcard,button-newmessage
 // empty default
 value="__empty"
 
+-->
+
 			<preference type="integer"
 				          name="config.obm.autoconf.toolbar.debug"
 				          value="1"
@@ -228,7 +229,7 @@ value="__empty"
 				          name="config.obm.autoconf.toolbar.main.force_after_load"
 				          value="true"
                           set="user"/>
--->
+
 			<preference type="string"
 				          name="config.obm.autoconf.toolbar.main"
 				          value="button-getmsg,button-newmsg,button-address,calendar-show-todaypane-button,separator,button-reply,button-replyall,button-forward,separator,button-tag,button-delete,button-junk,button-print,separator,button-goback,button-goforward,spring,separator,calendar-week-view-button,calendar-month-view-button,search-container"
