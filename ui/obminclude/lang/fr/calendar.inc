@@ -135,6 +135,7 @@ $l_view_delete = "Supprimer la vue";
 $l_ics = "Import" ;
 $l_ics_insert = "Importer" ;
 $l_ics_file = "Fichier ICS à importer" ;
+$l_ics_import_ok = "évènements ont été importés.";
 
 $l_cal_view = "Type d'affichage";
 $l_cal_range = "Période d'affichage";

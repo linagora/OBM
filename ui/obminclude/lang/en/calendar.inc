@@ -226,6 +226,7 @@ $l_edit_full = "Advanced";
 $l_confirm_delete_all ="This operation will remove all occurences of this event for all the users, are you sure to want to continue?";
 $l_ics_insert = 'Import';
 $l_ics_file = 'ICS file to import';
+$l_ics_import_ok = 'event(s) have been inserted.';
 $l_add_exception_mail_body = 'Updated event on OBM: %s';
 $l_delete_exception_mail_subject = 'Updated event on OBM: %s';
 $l_update_state_mail_subject = 'Attendees update on OBM event: %s';

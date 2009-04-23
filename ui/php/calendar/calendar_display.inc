@@ -4319,7 +4319,9 @@ function dis_icalendar_import($params) {
 // Import iCalendar file
 ///////////////////////////////////////////////////////////////////////////////
 function dis_icalendar_insert($result) {
-  $block = '<div>'.$result[0]." event(s) have been inserted.</div>" ;
+  global $l_ics_import_ok;
+
+  $block = '<div>'.$result[0]." ".$l_ics_import_ok."</div>" ;
   return $block ;
 }
 
