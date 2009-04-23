@@ -238,4 +238,24 @@ $profiles['admin'] = array (
 //$aliacms_link = 'http://cms.aliacom.local/';
 //$blogs_link = 'http://blogs.aliacom.local/';
 
+// Groupware configuration by default
+$cgp_show['module']['company'] = false;
+$cgp_show['module']['lead'] = false;
+$cgp_show['module']['deal'] = false;
+$cgp_show['module']['cv'] = false;
+$cgp_show['module']['publication'] = false;
+$cgp_show['module']['statistic'] = false;
+$cgp_show['module']['time'] = false;
+$cgp_show['module']['project'] = false;
+$cgp_show['module']['contract'] = false;
+$cgp_show['module']['incident'] = false;
+$cgp_show['module']['invoice'] = false;
+$cgp_show['module']['payment'] = false;
+$cgp_show['module']['account'] = false;
+$cgp_show['module']['document'] = 'com';
+
+$cgp_show['section']['prod'] = false;
+$cgp_show['section']['compta'] = false;
+
+
 </script>

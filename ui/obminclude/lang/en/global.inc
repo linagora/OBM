@@ -299,7 +299,7 @@ $l_daysofweekfirst = array ('S','M','T','W','T','F','S');
 // Theme headers lang files
 //---------------------------------------------------------------------------//
 
-$l_section_com    = "Commercial";
+$l_section_com    = "Groupware";
 $l_section_prod   = "Production";
 $l_section_compta = "Accounting";
 $l_section_user   = "Users";
