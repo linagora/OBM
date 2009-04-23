@@ -62,7 +62,7 @@ function copyField(field, storage) {
 
 function autoGenSid() {
 // the max SID is in hexa FF FF FF FF
-// in dec 4294967295
+// in dec 4294967295 = 2^32 - 1
   var sid = 'S-1-5-21';
   for(var i=0; i<3; i++) {
     sid = sid + '-'

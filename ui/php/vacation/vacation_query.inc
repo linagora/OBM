@@ -74,8 +74,8 @@ function run_query_vacation_update($params, $u_id) {
   $message_update = ", userobm_vacation_message='".addslashes($params["message"])."'";
   $time_begin = $params["time_begin"].":".$params["min_begin"].":00";
   $time_end = $params["time_end"].":".$params["min_end"].":00";
-  $vacation_datebegin = ($params['vacation_datebegin'] ? "'".of_isodate_convert($params['vacation_datebegin'])." $time_begin'" : '0');
-  $vacation_dateend = ($params['vacation_dateend'] ? "'".of_isodate_convert($params['vacation_dateend'])." $time_end'" : '0');
+  $vacation_datebegin = ($params['vacation_datebegin'] ? "'".of_isodate_convert($params['vacation_datebegin'])." $time_begin'" : 'NULL');
+  $vacation_dateend = ($params['vacation_dateend'] ? "'".of_isodate_convert($params['vacation_dateend'])." $time_end'" : 'NULL');
   $message_update .= ", userobm_vacation_datebegin=".$vacation_datebegin;
   $message_update .= ", userobm_vacation_dateend=".$vacation_dateend;
   $u_id = sql_parse_id($u_id, true);

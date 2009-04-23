@@ -93,7 +93,7 @@ class VacationCronJob extends CronJob{
     $obm_q = new DB_OBM;
     $query = "SELECT userobm_id, userobm_login, userobm_domain_id FROM UserObm
       WHERE userobm_vacation_enable = 0 AND
-      $vacation_datebegin > 0 AND
+      $vacation_datebegin IS NOT NULL AND
       $vacation_datebegin <= $date";
 
     $this->logger->core($query);
@@ -121,7 +121,7 @@ class VacationCronJob extends CronJob{
 
     $obm_q = new DB_OBM;
     $query = "SELECT userobm_id, userobm_login, userobm_domain_id FROM UserObm
-      WHERE  $vacation_dateend <= $date AND $vacation_dateend > 0";
+      WHERE  $vacation_dateend <= $date AND $vacation_dateend IS NOT NULL";
 
     $this->logger->core($query);
     $obm_q->query($query);

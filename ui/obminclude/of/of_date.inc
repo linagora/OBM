@@ -7,7 +7,7 @@ class Of_Date extends DateTime {
   const DAY_SHORT      = 'j';              // j - 1,2 digit day of month, 1-31
 
   const DAY_SUFFIX     = 'S';              // S - english suffix day of month, st-th
-  const DAYOFYEAR    = 'z';              // z - Number of day of year
+  const DAYOFYEAR      = 'z';              // z - Number of day of year
 
   const WEEKDAY        = 'l';              // l - full day name - locale aware, Monday - Sunday
   const WEEKDAY_SHORT  = 'D';              // --- 3 letter day of week - locale aware, Mon-Sun
