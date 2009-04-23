@@ -15,7 +15,7 @@
  +-------------------------------------------------------------------------+
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
-*/
+ */
 ?>
 <?php
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,8 +66,8 @@ get_campaign_action();
 
 if ($action == $_SESSION[previous_action]
   && ($action == 'new_subcampaign' || $action == 'duplicate')) {
-  $action = 'search';
-}
+    $action = 'search';
+  }
 
 $_SESSION['previous_action'] = $action;
 
@@ -77,19 +77,13 @@ update_last_visit('campaign', $params['campaign_id'], $action);
 page_close();
 
 
-// -------------------------------------------------------------------------
-// FIRST PART - PREACTIONS
-//
-
-if (false) {
-  
-} else if ($action == 'archive') {
-///////////////////////////////////////////////////////////////////////////////
+if ($action == 'archive') {
+  ///////////////////////////////////////////////////////////////////////////////
   run_query_campaign_archive($params['campaign_id']);
   $action = 'detailconsult';
-  
+
 } else if ($action == 'unarchive') {
-///////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
   run_query_campaign_unarchive($params['campaign_id']);
   $action = 'detailconsult';
 
@@ -102,7 +96,7 @@ if (false) {
       $display['msg'] .= display_ok_msg($l_insert_ok);
       $action = 'detailconsult';
       $force_action_update = true;
-      
+
     } else {
       $display['msg'] .= display_err_msg($l_insert_error);
       $action = 'new';
@@ -138,35 +132,35 @@ if (false) {
   ///////////////////////////////////////////////////////////////////////////////
   $params['campaign_id'] = run_query_campaign_insert(array('parent' => $params['campaign_id']),
     array('parent'));
-  
+
   $action = 'detailupdate';
 
 } else if ($action == 'add_list_target') {
   ///////////////////////////////////////////////////////////////////////////////
   run_query_campaign_target_insert('List', $params['ext_id'], $params['multiple_selection']);
   run_query_campaign_update(array('campaign_id' => $params['ext_id']), array());
-  
+
   $action = 'detailconsult';
 
 } else if ($action == 'add_group_target') {
   ///////////////////////////////////////////////////////////////////////////////
   run_query_campaign_target_insert('Group', $params['ext_id'], $params['multiple_selection']);
   run_query_campaign_update(array('campaign_id' => $params['ext_id']), array());
-  
+
   $action = 'detailconsult';
-  
+
 } else if ($action == 'add_user_target') {
   ///////////////////////////////////////////////////////////////////////////////
   run_query_campaign_target_insert('User', $params['ext_id'], $params['multiple_selection']);
   run_query_campaign_update(array('campaign_id' => $params['ext_id']), array());
-  
+
   $action = 'detailconsult';
-  
+
 } else if ($action == 'del_target') {
   ///////////////////////////////////////////////////////////////////////////////
   run_query_campaign_target_delete($params['campaign_id'], $params['multiple_selection']);
   run_query_campaign_update(array('campaign_id' => $params['campaign_id']), array());
-  
+
   $action = 'detailconsult';
 
 } else if ($action == 'delete') {
@@ -184,7 +178,7 @@ if (false) {
     $display['msg'] .= display_warn_msg($l_cant_delete, false);
     $action = 'detailconsult';
   }
-  
+
 } else if ($action == 'check_delete') {
   ///////////////////////////////////////////////////////////////////////////////
   if (check_campaign_can_delete($params['campaign_id'])) {
@@ -207,7 +201,7 @@ update_campaign_action($force_action_update);
 //
 
 if (false) {
-  
+
 } else if ($action == 'dispref_display') {
   ///////////////////////////////////////////////////////////////////////////////
   update_display_pref($params);
@@ -268,7 +262,7 @@ if (false) {
 } else if ($action == 'detailupdate') {
   ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_campaign_form('update',$params);
-  
+
 } else if ($action == 'admin') {
   ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_campaign_admin_index();
@@ -284,9 +278,9 @@ if (false) {
   $display['detail'] = dis_campaign_monitor($params);
 
 } else if ($action == 'test_module_admin') {
-///////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////
   require('campaign_test.inc');
-  
+
   test_campaign_module_admin();
 }
 
@@ -302,14 +296,14 @@ $display["end"] = display_end();
 
 display_page($display);
 
-  
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $params hash, campaign parameters transmited
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_campaign_params() {
   global $actions;
-  
+
   // Get global params
   $params = get_global_params("campaign");
 
@@ -320,20 +314,20 @@ function get_campaign_params() {
       $params['multiple_selection'][] = $matches[1];
     }
   }
-  
+
   if (isset($params['ext_id']))
     $params['campaign_id'] = $params['ext_id'];
-  
+
   if (isset($params['campaign_id'])) {
     $params['campaign_id'] = $params['campaign_id'] +0;
   }
-  
+
   if (isset($_FILES['fi_email']) && $_FILES['fi_email']['size'] != 0) {
     $params['fi_email']['file_tmp'] = $_FILES['fi_email']['tmp_name'];
     $params['fi_email']['file_name'] = $_FILES['fi_email']['name'];
     $params['fi_email']['size'] = $_FILES['fi_email']['size'];
   }
-  
+
   return $params;
 }
 
@@ -344,47 +338,47 @@ function get_campaign_params() {
 function get_campaign_action() {
   global $params, $actions, $path, $action;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
-  
+
   $lang = &$GLOBALS;
   //$campaign_index = "$path/campaign/campaign_index.php";
   $campaign_index = '';
-  
+
   $actions['campaign']['dispref_display'] = array (
     'Url'      => "${campaign_index}?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('none') 
   );
-  
+
   $actions['campaign']['dispref_level'] = array (
     'Url'      => "${campaign_index}?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('none') 
   );
-  
+
   $actions['campaign']['ext_get_ids'] = array (
     'Url'      => "${campaign_index}?action=ext_get_ids",
     'Right'    => $cright_read,
     'Condition'=> array ('none') 
   );
-  
+
   $actions['campaign']['insert'] = array (
     'Url'      => "${campaign_index}?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('none') 
   );
-  
+
   $actions['campaign']['ext_get_id'] = array (
     'Url'      => "${campaign_index}?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('none') 
   );
-  
+
   $actions['campaign']['update'] = array (
     'Url'      => "${campaign_index}?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('none') 
   );
-  
+
   $actions['campaign']['search'] = array (
     'Right'    => $cright_read,
     'Condition'=> array ('none') 
@@ -447,9 +441,9 @@ function get_campaign_action() {
   $actions['campaign']['add_list_target'] = array (
     'Name'     => "$lang[l_add] $lang[l_listss]",
     'Url'      => "$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title="
-      .urlencode($lang['l_add_lists'])."&amp;ext_action=add_list_target&amp;ext_url="
-      .urlencode($path."/campaign/campaign_index.php")."&amp;ext_id="
-      .$params['campaign_id']."&amp;ext_target=Lists",
+    .urlencode($lang['l_add_lists'])."&amp;ext_action=add_list_target&amp;ext_url="
+    .urlencode($path."/campaign/campaign_index.php")."&amp;ext_id="
+    .$params['campaign_id']."&amp;ext_target=Lists",
     'Popup'    => 1,
     'Target'   => $lang['l_listes'],
     'Right'    => $cright_write,
@@ -459,21 +453,21 @@ function get_campaign_action() {
   $actions['campaign']['add_user_target'] = array (
     'Name'     => "$lang[l_add] $lang[l_userss]",
     'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title="
-      .urlencode($lang['l_add_users'])."&amp;ext_action=add_user_target&amp;ext_url="
-      .urlencode($path."/campaign/campaign_index.php")."&amp;ext_id=".$params['campaign_id']
-      ."&amp;ext_target=Users",
+    .urlencode($lang['l_add_users'])."&amp;ext_action=add_user_target&amp;ext_url="
+    .urlencode($path."/campaign/campaign_index.php")."&amp;ext_id=".$params['campaign_id']
+    ."&amp;ext_target=Users",
     'Popup'    => 1,
     'Target'   => $lang['l_users'],
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
   );
-  
+
   $actions['campaign']['add_group_target'] = array (
     'Name'     => "$lang[l_add] $lang[l_groupss]",
     'Url'      => "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title="
-      .urlencode($lang['l_add_groups'])."&amp;ext_action=add_group_target&amp;ext_url="
-      .urlencode($path."/campaign/campaign_index.php")."&amp;ext_id=".$params['campaign_id']
-      ."&amp;ext_target=Groups",
+    .urlencode($lang['l_add_groups'])."&amp;ext_action=add_group_target&amp;ext_url="
+    .urlencode($path."/campaign/campaign_index.php")."&amp;ext_id=".$params['campaign_id']
+    ."&amp;ext_target=Groups",
     'Popup'    => 1,
     'Target'   => $lang['l_groups'],
     'Right'    => $cright_write,
@@ -505,24 +499,24 @@ function get_campaign_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('index','search') 
   );
-  
+
   $actions['campaign']['archive'] = array (
     'Name'     => $lang['l_campaign_archive'], 
     'Url'      => "${campaign_index}?action=archive&amp;campaign_id=$params[campaign_id]",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
   );
-  
+
   $actions['campaign']['unarchive'] = array (
     'Name'     => $lang['l_campaign_unarchive'], 
     'Url'      => "${campaign_index}?action=unarchive&amp;campaign_id=$params[campaign_id]",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
   );
-  
-  
+
+
   // TODO in developement
-  
+
   $actions['campaign']['monitor'] = array (
     'Name'     => 'Monitor', //$lang['l_monitor'], 
     'Url'      => "${campaign_index}?action=monitor&amp;campaign_id=$params[campaign_id]",
@@ -530,15 +524,15 @@ function get_campaign_action() {
     //'Condition'=> array ('none') ,
     'Condition'=> array ('detailconsult'),
   );
-  
-  
+
+
   if (isset($params['campaign_id'])) {
     $params['campaign_q'] = run_query_campaign_detail($params['campaign_id']);
-  
+
     if (!$params['campaign_q']) {
       $action == 'search';
       $display['msg'] .= display_err_msg($GLOBALS['l_campaign_not_found']);
-      
+
     } else {
       if (!can_update_campaign($params['campaign_q'])) {
         $actions['campaign']['detailupdate']['Condition'] = array('none');
@@ -546,15 +540,15 @@ function get_campaign_action() {
         $actions['campaign']['add_user_target']['Condition'] = array('none');
         $actions['campaign']['add_list_target']['Condition'] = array('none');
       }
-  	  
+
       if ($params['campaign_q']->f('campaign_status') != $GLOBALS['c_campaign_status_enum']['finished'])
         $actions['campaign']['archive']['Condition'] = array('none');
-      
+
       if ($params['campaign_q']->f('campaign_status') != $GLOBALS['c_campaign_status_enum']['archived'])
         $actions['campaign']['unarchive']['Condition'] = array('none');
     }
   }
-  
+
   of_category_user_module_action("campaign");
 }
 
@@ -565,13 +559,13 @@ function get_campaign_action() {
 function update_campaign_action($force_action_update = false) {
   global $params, $actions, $path;
   global $cright_write_admin;
-  
+
   global $c_campaign_status_enum;
-  
+
   if ($force_action_update) {
     get_campaign_action();
   }
-  
+
   /*
   $actions['campaign']['detailconsult']['Url'] = "$path/campaign/campaign_index.php?action=detailconsult&amp;campaign_id=$params[campaign_id]";
   $actions['campaign']['delete']['Url'] = "$path/campaign/campaign_index.php?action=delete&amp;campaign_id=$params[campaign_id]";
@@ -579,7 +573,7 @@ function update_campaign_action($force_action_update = false) {
   $actions['campaign']['check_delete']['Url'] = "$path/campaign/campaign_index.php?action=check_delete&amp;campaign_id=$params[campaign_id]";
   $actions['campaign']['archive']['Url'] = "$path/campaign/campaign_index.php?action=archive&amp;campaign_id=$params[campaign_id]";
   $actions['campaign']['unarchive']['Url'] = "$path/campaign/campaign_index.php?action=unarchive&amp;campaign_id=$params[campaign_id]";
-*/
+   */
 }
 
 ?>

@@ -46,8 +46,7 @@ $fieldnames['campaign_progress'] = $l_progress;
  *    - bool $link_ok : true if links must be displayed
  * Return : bool
  */
-function dis_data_campaign (&$OD, $fieldname, $link_ok)
-{
+function dis_data_campaign (&$OD, $fieldname, $link_ok) {
   global $path, $params;
   $lang = &$GLOBALS;
   
@@ -105,8 +104,7 @@ function dis_data_campaign (&$OD, $fieldname, $link_ok)
  *    - array $params : hash values
  * Return : array
  */
-function dis_campaign_form ($action, $params)
-{
+function dis_campaign_form ($action, $params) {
   global $obm;
   global $c_campaign_status_enum;
   $lang = &$GLOBALS;
@@ -231,8 +229,7 @@ function dis_campaign_form ($action, $params)
  *    - integer $p_id : campaign id
  * Return : integer
  */
-function dis_campaign_can_delete ($p_id)
-{
+function dis_campaign_can_delete ($p_id) {
   global $l_campaign_can_delete, $l_back, $l_delete;
   global $display;
 
@@ -269,8 +266,7 @@ function dis_campaign_can_delete ($p_id)
  *    - array $params :
  * Return : array
  */
-function dis_campaign_consult ($params)
-{
+function dis_campaign_consult ($params) {
   global $c_campaign_status_enum;
   $lang = &$GLOBALS;
 
@@ -460,8 +456,7 @@ function dis_campaign_monitor ($params) {
  *    - array $dataobj :  data request values for search
  * Return : array
  */
-function dis_campaign_search_form ($dataobj)
-{
+function dis_campaign_search_form ($dataobj) {
   $block .= html_campaign_search_form($dataobj);
 
   return $block;
@@ -474,8 +469,7 @@ function dis_campaign_search_form ($dataobj)
  *    - array $params :  data request values for search
  * Return : array
  */
-function html_campaign_search_form ($params)
-{
+function html_campaign_search_form ($params) {
   global $l_find;
   global $l_or;
   global $l_name, $l_status, $l_created, $l_ready, $l_running, $l_planified, $l_finished, $l_archived, $l_error_mail_format, $l_error_target, $l_error_misc, $l_start_date, $l_end_date, $l_header_consult, $l_name, $l_status, $l_created, $l_ready, $l_running, $l_planified, $l_finished, $l_archived, $l_error_mail_format, $l_error_target, $l_error_misc, $l_start_date, $l_end_date, $l_progress, $l_header_display;
@@ -554,8 +548,7 @@ function html_campaign_search_form ($params)
  *    - array $dataobj :  search criteria
  * Return : array
  */
-function dis_campaign_search_list ($dataobj)
-{
+function dis_campaign_search_list ($dataobj) {
 
   global $display, $obm;
   global $l_campaign_found, $l_campaign_no_found;
@@ -586,8 +579,7 @@ function dis_campaign_search_list ($dataobj)
  *    - bool $popup : popup flag tell if external parameters to handle
  * Return : bool
  */
-function html_campaign_search_list ($dataobj, $obm_q, $prefs, $popup)
-{
+function html_campaign_search_list ($dataobj, $obm_q, $prefs, $popup) {
   global $l_close, $l_add;
 
   $name = urlencode($dataobj["name"]);

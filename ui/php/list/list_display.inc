@@ -1265,7 +1265,7 @@ function dis_list_add_criterion_userdata_form($entity) {
       global $$cat_label;
       $cats = array();
       $sel_name = "sel_${cat_name}";
-      $url_cat = "$path/$entity/${entity}_index.php?action=ext_get_category_codes&amp;category=$cat_name&amp;popup=1&amp;ext_element=$sel_name";
+      $url_cat = "$GLOBALS[path]/$entity/${entity}_index.php?action=ext_get_category_codes&amp;category=$cat_name&amp;popup=1&amp;ext_element=$sel_name";
       $block_cat .= of_select_dis_search_select($cats, "$cat_name", $url_cat, true);
     }
   }
