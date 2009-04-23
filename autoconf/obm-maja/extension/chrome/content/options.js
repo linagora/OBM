@@ -82,6 +82,7 @@ var obmmaja = {
       }
    	}
    	utils._setPreference("config.obm.autoconfigStatus", 0, "user" );
+   	utils._setPreference("config.obm.reset.prefs", 1, "user" );
   },
   visibleValid: function() {
     var checkAutoconf = document.getElementById("resetAutoconf").getAttribute("checked");

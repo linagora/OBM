@@ -136,6 +136,10 @@ function runAutoconfiguration() {
         _setupPreferences(configurationData);
       }
       
+      if (obm_maja_reset_pref()) {
+        _deletePrefBranch("config.obm.reset.prefs");
+      }
+      
       // installer les extensions XPI
       _installExtensions(configurationData);
     }
@@ -735,7 +739,7 @@ function _setupAccounts(aConfigurationData) {
   var servers = aConfigurationData.*::servers;
 
   for each ( var server in servers.*::server.(@type == "imap" || @type == "pop3" || @type == "nntp") ) {
-    if ( _prefBranchExists("mail.server." + server.@id) ) {
+    if ( _prefBranchExists("mail.server." + server.@id) && !obm_maja_reset_pref() ) {
       // serveur existe déjà
       _logToFile(LOG_DEBUG, "Le serveur " + server.@id + " existe déjà.\n");
       continue;
@@ -878,7 +882,7 @@ function _setupDirectories(aConfigurationData) {
 
   for each ( var directory in directories.*::directory ) {
     
-    if ( _getPreference("ldap_2.servers." + directory.@id + ".description") != undefined ) {
+    if ( _getPreference("ldap_2.servers." + directory.@id + ".description") != undefined && !obm_maja_reset_pref() ) {
       _logToFile(LOG_DEBUG, "L'annuaire LDAP " + directory.@id + " existe déjà.\n");
       // annuaire existe déjà
       continue;
@@ -922,6 +926,10 @@ function _setupDirectories(aConfigurationData) {
   //extension multi-ldap : activer tous les annuaires pour l'auto-complétion
   _setPreference("ldap_2.autoComplete.ldapServers", autoCompleteDirectories);
   _setPreference("ldap_2.autoComplete.useDirectory", true); 
+}
+
+function obm_maja_reset_pref () {
+  return _prefBranchExists("config.obm.reset.prefs");
 }
 
 //Fonctions d'enregistrement des logs
