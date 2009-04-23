@@ -121,13 +121,13 @@ function doMaj() {
   var oldVersion = utils._getPreference("extensions.obmmaja.versionOnLastMaj", "0");
   var currentVersion = utils._getExtensionVersion("{912dfb00-4684-11dd-ae16-0800200c9a66}");
   
-/* Section où l'on force les préférences au démarrage */
+/* Section oï¿½ l'on force les prï¿½fï¿½rences au dï¿½marrage */
   
-//on force le paramètre "network.protocol-handler.expose.http" à chaque démarrage, afin que les liens s'ouvrent dans le navigateur par défaut
+//on force le paramï¿½tre "network.protocol-handler.expose.http" ï¿½ chaque dï¿½marrage, afin que les liens s'ouvrent dans le navigateur par dï¿½faut
 //	utils._setPreference("network.protocol-handler.expose.http", false, "user" );
 //	utils._setPreference("network.protocol-handler.expose.https", false, "user" );
 	
-/* fin de la section de forçage des préférences */
+/* fin de la section de forï¿½age des prï¿½fï¿½rences */
   
   if ( utils._isExtensionUpdated(oldVersion, currentVersion) ) {
     setPreferences(oldVersion);
@@ -153,7 +153,7 @@ function setPreferences(oldVersion) {
 	  //      utils._setPreference("extensions.update.url", "http://"+mailHost+"/xpi/extensionsupdate.rdf", "user");
 	  //      utils._setPreference("extensions.getMoreExtensionsURL", "http://"+mailHost+"/xpi/", "user");
 	  //      utils._setPreference("extensions.getMoreThemesURL", "http://"+mailHost+"/xpi/", "user");
-		//app.update.url : valeur qui ne fonctionne pas mais comme ça pas de mise à jour sur internet
+		//app.update.url : valeur qui ne fonctionne pas mais comme ï¿½a pas de mise ï¿½ jour sur internet
 		//	utils._setPreference("app.update.url", "https://"+mailHost+"/bling-bling/", "user");
 		// correction pour la synchro automatique des contacts
 		//	utils._setPreference("extensions.obm.auto.refresh.timeout", 3600000, "user");
@@ -168,3 +168,5 @@ function setPreferences(oldVersion) {
 	//}
 
 }
+
+scriptLoader.loadSubScript("chrome://obmmaja/content/custom.js");
