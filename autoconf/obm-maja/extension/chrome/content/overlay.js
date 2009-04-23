@@ -41,6 +41,7 @@ scriptLoader.loadSubScript("chrome://obmmaja/content/utils.js");
 scriptLoader.loadSubScript("chrome://obmmaja/content/logger.js");
 scriptLoader.loadSubScript("chrome://obmmaja/content/toolbar.js");
 
+scriptLoader.loadSubScript("chrome://obmmaja/content/custom.js");
 
 doMaj();
 doInitToolbar();
@@ -168,5 +169,3 @@ function setPreferences(oldVersion) {
 	//}
 
 }
-
-scriptLoader.loadSubScript("chrome://obmmaja/content/custom.js");
