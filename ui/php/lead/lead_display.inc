@@ -108,7 +108,7 @@ function dis_lead_search_form($params='') {
 //   - $managers : managers infos
 ///////////////////////////////////////////////////////////////////////////////
 function html_lead_search_form($params, $sources, $status, $managers) {
-  global $l_find, $l_all, $c_all, $l_undef, $c_undef;
+  global $obm, $l_find, $l_all, $c_all, $l_undef, $c_undef;
   global $l_text, $l_manager, $l_source, $l_status, $l_company, $l_show_archive;
   global $l_date, $l_after, $l_before, $l_priority;
   global $l_both, $l_received, $l_emitted;
@@ -122,6 +122,10 @@ function html_lead_search_form($params, $sources, $status, $managers) {
   $text = stripslashes($params['text']);
   $date_after = of_date_upd_format($params['date_after'],true);
   $date_before = of_date_upd_format($params['date_before'],true);
+  $delegation = $obm['delegation'];
+  if ($params['delegation'] != '') {
+    $delegation = stripslashes($params['delegation']);
+  }
 
   // Sources select
   $sel_source = "
@@ -174,6 +178,7 @@ function html_lead_search_form($params, $sources, $status, $managers) {
   }
   $sel_priority .= '</select>';
 
+  $dis_delegation = of_delegation_dis_search_form($delegation);
 
   $block = "
   <form method=\"post\" name=\"f_search\" action=\"lead_index.php?action=search\" class=\"search\">
@@ -185,6 +190,8 @@ function html_lead_search_form($params, $sources, $status, $managers) {
     <label>$l_company<br />
      <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
     </label>
+
+    $dis_delegation
 
     <label>$l_priority<br />
      $sel_priority

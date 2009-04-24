@@ -1,8 +1,8 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : people_display.inc                                             //
-//     - Desc : People Display functions File                                  //
-// 2008-10-08 : Vincent Bernard                                               //
+// OBM - File : people_display.inc
+//     - Desc : People Display functions File
+// 2008-10-08 : Vincent Bernard
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: people_display.inc 3103 2008-09-30 09:19:00Z benoitc $ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -624,7 +624,7 @@ function html_people_form($usr_q, $user, $field='') {
     $dis_title = "$fname $lname";
   } elseif ($action == 'new'){
     $dom_infos = of_domain_get_domain_infos($obm['domain_id'],true);
-    $delegation = $obm['delegation'];
+    $delegation = $obm['delegation_target'];
   }
 
   // If parameters have been given, they supercede the default action value

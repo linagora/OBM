@@ -61,7 +61,7 @@ function exec_tools_update_update($tools) {
   global $obm, $cdg_sql, $cdg_exe, $cmd_update;
 
   $uid = $obm['uid'];
-  $delegation = $obm['delegation'];
+  $delegation = $obm['delegation_target'];
   $domain_id = $tools['domain_id'];
 
   $state = get_update_state($domain_id);
@@ -337,6 +337,7 @@ function run_query_tools_cancel_delete($entity, $id) {
  */
 function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=false, $update = false) {
   global $obm, $obmdb_dbtype;
+
   $rules = array('update' => array('1=1'), 'delete' => array('1=1'), 'purge' => array('1=1'));
   $del_rules = array('1=1'); 
   $like = sql_casei_like($obmdb_dbtype); 
@@ -351,10 +352,10 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=fals
       $rules['purgelinks'][] = "updatedlinks_user_id $uid"; 
       break;
     case 'delegation':
-      $rules['update'][] = "Current.$metadata[prefix]_delegation $like '$obm[delegation]%'" ;
-      $rules['delete'][] = "Current.deleted_delegation $like '$obm[delegation]%'";  
-      $rules['purge'][] = "updated_delegation $like '$obm[delegation]%'";
-      $rules['purgelinks'][] = "updatedlinks_delegation $like '$obm[delegation]%'";
+      $rules['update'][] = "Current.$metadata[prefix]_delegation $like '$obm[delegation_target]%'" ;
+      $rules['delete'][] = "Current.deleted_delegation $like '$obm[delegation_target]%'";  
+      $rules['purge'][] = "updated_delegation $like '$obm[delegation_target]%'";
+      $rules['purgelinks'][] = "updatedlinks_delegation $like '$obm[delegation_target]%'";
       break;
     default:
       break;
@@ -366,9 +367,9 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=fals
     $rules['purgelinks'][] = "updatedlinks_domain_id $did"; 
   }
 
-  if(is_array($metadata['rules'])) {
+  if (is_array($metadata['rules'])) {
     foreach($metadata['rules'] as $field => $value) {
-      if(is_array($value)) {
+      if (is_array($value)) {
         $rules['update'][] ="Current.$metadata[prefix]_$field IN ('".implode("','", $value)."')";
       } else {
         $rules['update'][] ="Current.$metadata[prefix]_$field = '$value'";
@@ -377,17 +378,17 @@ function run_query_tools_perform_scope(&$metadata, $realm, $domain, $global=fals
   }
   $rules['link'] = $rules['update'];
 
-  if(is_array($metadata['link']['rules'])) {
+  if (is_array($metadata['link']['rules'])) {
     foreach($metadata['link']['rules'] as $field => $value) {
-      if(is_array($value)) {
+      if (is_array($value)) {
         $rules['link'][] ="Link.$field IN ('".implode("','", $value)."')";
       } else {
         $rules['link'][] ="Link.$field = '$value'";
       }
     }   
   }
-  if($update) {
-    $userdata = array('uid' =>  $obm['uid'], 'delegation' => $obm[delegation], 'domain' => $domain );
+  if ($update) {
+    $userdata = array('uid' =>  $obm['uid'], 'delegation' => $obm['delegation_target'], 'domain' => $domain );
     $return = run_query_tools_set_scope($metadata, $rules,$userdata);
   } else {
     $return = run_query_tools_get_scope($metadata, $rules);

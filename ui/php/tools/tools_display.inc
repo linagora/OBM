@@ -50,9 +50,9 @@ function dis_tools_update_detail() {
       $dis_row_update = '';
       $dis_detail_title = $GLOBALS["l_upd_$realm"];
       if ($realm == 'delegation') {
-        $dis_detail_title .= ' ('. $obm['delegation'] . ') ';
+        $dis_detail_title .= ' ('. $obm['delegation_target'] . ') ';
       }
-      if ($realm == 'delegation' && $obm['delegation'] == '' && in_array('domain',$admin_realm)) {
+      if ($realm == 'delegation' && $obm['delegation_target'] == '' && in_array('domain',$admin_realm)) {
         continue;
       }
       foreach ($entities as $entity=>$db_info) {

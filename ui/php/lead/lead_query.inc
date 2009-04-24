@@ -29,6 +29,7 @@ function run_query_lead_search($params) {
   $status = $params['status'];
   $manager = $params['manager'];
   $archive = $params['archive'];
+  $delegation = sql_search_text_parse($params['delegation']);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -99,6 +100,11 @@ function run_query_lead_search($params) {
     $where .= " $and lead_manager_id $manager ";
     $and = 'AND';
   }
+  // If a delegation indication has been specified, get it
+  if (trim($delegation) != '') {
+    $where .= " $and userobm_delegation $like '$delegation%'";
+    $and = 'AND';
+  }
   if ($archive != '1') {
     $where .= " $and lead_archive=0";
   } elseif($cgp_archive_only) {
@@ -113,6 +119,8 @@ function run_query_lead_search($params) {
   // Order by clause
   $field = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'lead_datealarm';
   $orderq = " ORDER BY $field $sql_order_dir";
+
+  $join_user = "LEFT JOIN UserObm ON lead_manager_id=userobm_id";
 
   $query = "SELECT
     lead_id,
@@ -141,8 +149,8 @@ function run_query_lead_search($params) {
     LEFT JOIN Contact ON lead_contact_id=contact_id
     LEFT JOIN LeadSource ON lead_source_id=leadsource_id
     LEFT JOIN LeadStatus ON lead_status_id=leadstatus_id
-    LEFT JOIN UserObm ON lead_manager_id=userobm_id
-    $whereq
+    $join_user
+  $whereq
   AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = companyentity_entity_id) OR address_id IS NULL)
   AND (phone_id IN (SELECT MIN(phone_id) FROM Phone WHERE phone_entity_id = companyentity_entity_id) OR phone_id IS NULL)
   $orderq
@@ -150,7 +158,7 @@ function run_query_lead_search($params) {
 ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Lead $join_comp $whereq");
+    $count = get_query_count("SELECT count(*) FROM Lead $join_comp $join_user $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0) || (! $ctu_sql_limit)) {

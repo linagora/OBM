@@ -7,8 +7,8 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$db_type_mysql = "MYSQL";
-$db_type_pgsql = "PGSQL";
+$db_type_mysql = 'MYSQL';
+$db_type_pgsql = 'PGSQL';
 
 ///////////////////////////////////////////////////////////////////////////////
 // Required packages                                                         //
@@ -196,6 +196,7 @@ class OBM_Challenge_Auth extends Auth {
         userobm_password,
         userobm_password_type,
         userobm_domain_id,
+        userobm_delegation,
         userobm_delegation_target
       FROM $user_table
       LEFT JOIN Domain ON userobm_domain_id = domain_id      
@@ -213,7 +214,8 @@ class OBM_Challenge_Auth extends Auth {
       // This trim for a strange behaviour while testing oea db
       $crypt = trim(strtoupper($this->db->f("userobm_password_type")));
       $domain_id = $this->db->f("userobm_domain_id");
-      $delegation = $this->db->f("userobm_delegation_target");
+      $delegation = $this->db->f('userobm_delegation');
+      $delegation_target = $this->db->f('userobm_delegation_target');
     }
 
     switch($crypt) {
@@ -233,9 +235,10 @@ class OBM_Challenge_Auth extends Auth {
       if (isset($params['auth_ticket']) || $encrypted == $pass) {
         $unfreeze = global_unfreeze_user($uid);
         if ($unfreeze) {
-          $obm["profile"] = $perm;
-          $obm["domain_id"] = $domain_id;
-          $obm["delegation"] = $delegation;
+          $obm['profile'] = $perm;
+          $obm['domain_id'] = $domain_id;
+          $obm['delegation'] = $delegation;
+          $obm['delegation_target'] = $delegation_target;
           return $uid;
         } else {
           return false;
@@ -457,6 +460,7 @@ class LDAP_Auth extends Auth {
                       domain_name,
                       userobm_perms,
                       userobm_domain_id,
+                      userobm_delegation,
                       userobm_delegation_target
                     FROM $user_table
                     LEFT JOIN Domain ON userobm_domain_id = domain_id
@@ -472,7 +476,8 @@ class LDAP_Auth extends Auth {
       $uid  = $this->db->f("userobm_id");
       $perm = $this->db->f("userobm_perms");
       $domain_id = $this->db->f("userobm_domain_id");
-      $delegation = $this->db->f("userobm_delegation_target");
+      $delegation = $this->db->f('userobm_delegation');
+      $delegation_target = $this->db->f('userobm_delegation_target');
       $dbLogin = $this->db->f("userobm_login");
       $domain_name = $this->db->f("domain_name");
     }
@@ -484,9 +489,10 @@ class LDAP_Auth extends Auth {
           $this->db->query("UPDATE UserObm set userobm_password='$password', userobm_password_type='PLAIN', userobm_timeupdate=userobm_timeupdate WHERE userobm_id = $uid");
         }
         if ($unfreeze) {
-          $obm["profile"] = $perm;
-          $obm["domain_id"] = $domain_id;
-          $obm["delegation"] = $delegation;
+          $obm['profile'] = $perm;
+          $obm['domain_id'] = $domain_id;
+          $obm['delegation'] = $delegation;
+          $obm['delegation_target'] = $delegation_target;
           return $uid;
         } else {
           return false;

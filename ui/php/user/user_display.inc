@@ -623,7 +623,7 @@ function html_user_consult($obm_q) {
   }
 
   // Target Delegation handling (if user as delegation admin realm)
-  if($cgp_use['property']['delegation']) {
+  if ($cgp_use['property']['delegation']) {
     $dis_delegation_target = "
     <tr>
       <th>$l_delegation_target</th>
@@ -1689,7 +1689,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
 
   }
   if ($cgp_use['property']['delegation']) {
-    if (!isset($delegation_target)) $delegation_target = $obm['delegation'];
+    if (!isset($delegation_target)) $delegation_target = $obm['delegation_target'];
     $dis_delegation_target = "
     <tr class='$delegation_class' id='delegationTargetBlock'>
       <th class=\"$class[delegation_target]\">$l_delegation_target</th>

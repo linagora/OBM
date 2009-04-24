@@ -322,9 +322,9 @@ function run_query_people_insert($people){
   $uid = sql_parse_id($obm['uid']);
 //  $login = "'".strtolower($people['login'])."'";
   $login = "'".' '."'";
-  $status = "INIT";
-  $archive = "1";
-  $delegation = $obm['delegation'];
+  $status = 'INIT';
+  $archive = '1';
+  $delegation = $obm['delegation_target'];
   
   // infos
   $kind = $people['kind'];
@@ -599,6 +599,7 @@ function check_people_context($p_id, $user) {
   return $co_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // User specific rights checking (eg : delegation)
 // Parameters:
@@ -669,9 +670,10 @@ function run_query_user_check_user($p_id, $user) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_people_search_wait($user){
   global $obm;
+
   $status = 'INIT';
-  $archive=1;
-  $delegation=$obm['delegation'];
+  $archive = 1;
+  $delegation = $obm['delegation_target'];
   $domain_id = $obm['domain_id'];
   if ($domain_id == '') $domain_id = $obm['domain_id'];
   $domain_id = sql_parse_id($domain_id, true);
@@ -697,14 +699,14 @@ function run_query_people_search_wait($user){
 //   - $people[] : user search criteria
 // Returns : true if some people wait or false
 ///////////////////////////////////////////////////////////////////////////////
-function check_people_wait($people){
+function check_people_wait($people) {
   global $obm;
 
   $rep = false;
   
   $people['archive'] = 1;
   $people['status'] = "INIT";
-  $people['delegation'] = $obm['delegation'];
+  $people['delegation'] = $obm['delegation_target'];
 
   $obm_q = run_query_people_search_wait($people);  
   

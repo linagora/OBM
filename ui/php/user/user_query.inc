@@ -1772,11 +1772,11 @@ function check_user_data_form($p_id, &$user) {
 
   // Les contraintes sur la delegation ne sont pas valables pour le domaine global
   if (!$d['global'] && $cgp_use['property']['delegation']) {
-    if(!of_delegation_check_data($delegation, $d['delegation'])) { 
+    if (!of_delegation_check_data($delegation, $d['delegation'])) { 
       $err['field'] = 'delegation';
       return false;
     }
-    if(!of_delegation_check_data($delegation_target, $d['delegation'])) {
+    if (!of_delegation_check_data($delegation_target, $d['delegation'])) {
       $err['field'] = 'delegation_target';
       return false;
     }
@@ -2531,7 +2531,7 @@ function check_user_wait($user){
   
   $user['archive'] = 1;
   $user['status'] = 'INIT';
-  $user['delegation'] = $obm['delegation'];
+  $user['delegation'] = $obm['delegation_target'];
 
   $obm_q = run_query_user_search($user);  
   

@@ -654,7 +654,7 @@ function of_delegation_dis_block_update($value, $class) {
     $delegation = $value;
     // Default to admin target if empty
     if ($delegation == '') {
-      $delegation = $obm['delegation'];
+      $delegation = $obm['delegation_target'];
     }
     $input_delegation = "<input name=\"tf_delegation\" id='delegationField' size=\"32\" maxlength=\"64\" value=\"$delegation\" />";
     $block = "
@@ -720,16 +720,16 @@ function of_delegation_check_update_rights($params, $current_delegation, $delega
   if ($cgp_use['property']['delegation']) {
     $id = $params['id'];
     $action = $params['action'];
-    if(!$delegation) $delegation = $params['delegation'];
+    if (!$delegation) $delegation = $params['delegation'];
     // Object (User,..) delegation must be in target delegation
-    if ($obm['delegation'] != '') {
-      if(strpos($current_delegation, $obm['delegation']) !== 0) {
+    if ($obm['delegation_target'] != '') {
+      if (strpos($current_delegation, $obm['delegation_target']) !== 0) {
         return false;
       }
       // Can not update to other delegation
       if ( (($action == 'insert') || ($action == 'update'))
-        && (strpos($delegation, $obm['delegation']) !== 0)) {
-        //&& ($delegation != $obm['delegation'])) {
+        && (strpos($delegation, $obm['delegation_target']) !== 0)) {
+        //&& ($delegation != $obm['delegation_target'])) {
           return false;
       }
     }
@@ -747,15 +747,16 @@ function of_delegation_check_update_rights($params, $current_delegation, $delega
  */
 function of_delegation_check_data($delegation, $domain=false) {
   global $obm, $cgp_use, $err;
+
   if ($cgp_use['property']['delegation']) {
-    // Verifier delegation est dans  delegation du domaine
+    // Check that delegation is in the domain delegation
     if (isset($domain) && ($domain != '') && strpos($delegation, $domain) !== 0) {
       $err['msg'] = "$GLOBALS[l_err_delegation_outside_domain] ($domain)";
       return false;
     }
-    // Verifier delegation est dans la cible de delegation de l'admin
-    if (isset($obm['delegation']) && ($obm['delegation'] != '') && strpos($delegation, $obm['delegation']) !== 0) {
-      $err['msg'] = "$GLOBALS[l_err_delegation_outside_target] ($obm[delegation])";
+    // Check that delegation is in the admin delegation target
+    if (isset($obm['delegation_target']) && ($obm['delegation_target'] != '') && strpos($delegation, $obm['delegation_target']) !== 0) {
+      $err['msg'] = "$GLOBALS[l_err_delegation_outside_target] ($obm[delegation_target])";
       return false;
     }
   }
@@ -2056,7 +2057,7 @@ function get_group_info($id) {
   $g['privacy'] = $obm_q->f('group_privacy');
   $g['samba'] = $obm_q->f('group_samba');
   $g['delegation'] = $obm_q->f('group_delegation');
-  if($GLOBALS['cgp_use']['service']['mail']) {
+  if ($GLOBALS['cgp_use']['service']['mail']) {
     $g['email'] = $obm_q->f('group_email').'@'.$obm_q->f('domain_name');
   } else {
     $g['email'] = $obm_q->f('group_email');

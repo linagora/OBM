@@ -1232,7 +1232,7 @@ function html_deal_form($action,$deal_q,$types,$regions,$tts,$sources, $users_c,
   }
   $sel_type .= '</select>';
 
-  $sel_region = of_category_html_select('', 'region', $regions, $region, 'none');
+  $sel_region = of_category_html_select('', 'region', $regions, $region, '');
 
   // Sources select
   $sel_source = "
