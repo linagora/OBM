@@ -306,7 +306,8 @@ $l_daysofweekfirst = array ('D','L','M','M','J','V','S');
 // Theme headers lang files
 //---------------------------------------------------------------------------//
 
-$l_section_com    = "Outils de groupe";
+$l_section_com    = "Commerce";
+$l_section_gw     = "Collaboratif";
 $l_section_prod   = "Production";
 $l_section_compta = "Comptabilité";
 $l_section_user   = "Annuaire";

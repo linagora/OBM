@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = '2.2.1';
+$obm_version = '2.2.2pre1';
 $l_obm_title = 'OBM';
 
 // Id of the Publication reception type dedicated to the auto subscription.
@@ -299,6 +299,7 @@ $c_mailchooser_global_hooks = array(
 //-------------------------//
 // sections -- Urls
 $cgp_show['section']['com']['url'] = "$path/company/company_index.php";
+$cgp_show['section']['gw']['url'] = "$path/calendar/calendar_index.php";
 $cgp_show['section']['prod']['url'] = "$path/time/time_index.php";
 $cgp_show['section']['compta']['url'] = "$path/invoice/invoice_index.php";
 $cgp_show['section']['user']['url'] = "$path/settings/settings_index.php";
@@ -309,15 +310,15 @@ $cgp_show['section']['webmail']['url'] = "$path/webmail/webmail_index.php";
 
 // modules
 $cgp_show['module']['company'] = 'com';
-$cgp_show['module']['contact'] = 'com';
 $cgp_show['module']['lead'] = 'com';
 $cgp_show['module']['deal'] = 'com';
-#$cgp_show['module']['list'] = 'com';
-$cgp_show['module']['calendar'] = 'com';
-$cgp_show['module']['cv'] = 'false';
-$cgp_show['module']['todo'] = 'com';
+//$cgp_show['module']['list'] = 'com';
 $cgp_show['module']['publication'] = 'com';
 $cgp_show['module']['statistic'] = 'com';
+$cgp_show['module']['cv'] = 'false';
+$cgp_show['module']['calendar'] = 'gw';
+$cgp_show['module']['contact'] = 'gw';
+$cgp_show['module']['todo'] = 'gw';
 $cgp_show['module']['time'] = 'prod';
 $cgp_show['module']['project'] = 'prod';
 $cgp_show['module']['contract'] = 'prod';
