@@ -96,10 +96,10 @@ function dis_tools_update_detail() {
           $dis_button = $l_upd_running;
         }
 
-        $dis_realm_board = html_tools_javascript($domain_id)
-            ."<a href='' onclick='return false;' id=\"link_domain_$domain_id\">$GLOBALS[l_show_details]<img src='$GLOBALS[ico_add]' alt='$GLOBALS[l_show_details]' /></a>
+        $dis_realm_board = html_tools_javascript($domain_id, $realm)
+            ."<a href='' onclick='return false;' id=\"link_domain_".$realm."_$domain_id\">$GLOBALS[l_show_details]<img src='$GLOBALS[ico_add]' alt='$GLOBALS[l_show_details]' /></a>
             <br /><br />
-            <table id=\"table_domain_$domain_id\" class=\"spreadSheet\">
+            <table id=\"table_domain_".$realm."_$domain_id\" class=\"spreadSheet\">
               $dis_row_update
             </table>";
 
@@ -199,12 +199,12 @@ function html_tools_delete_button($entity, $state, $id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Javascript
 ///////////////////////////////////////////////////////////////////////////////
-function html_tools_javascript($domain_id) {
+function html_tools_javascript($domain_id, $realm) {
   return "
     <script type=\"text/javascript\">
       obm.initialize.chain(function () {
-        $('link_domain_$domain_id').addEvent('click', function(e){
-          $('table_domain_$domain_id').getElements('tbody.detail').each(function(item, index){
+        $('link_domain_".$realm."_$domain_id').addEvent('click', function(e){
+          $('table_domain_".$realm."_$domain_id').getElements('tbody.detail').each(function(item, index){
             if (item.getStyle('display') == 'none') {
               item.setStyle('display', '');
             } else {
