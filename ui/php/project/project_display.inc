@@ -283,6 +283,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
   $member = $project['member'];
   $archive = $project['archive'];
   $company_id = $project['company_id'];
+  $type = $project['type_id']
 
   if ($popup) {
     $ext_action = $project['ext_action'];
@@ -294,7 +295,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;cba_archive=$archive&amp;company_id=$company_id$url_ext");
+  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;sel_type_id=$type&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;cba_archive=$archive&amp;company_id=$company_id$url_ext");
 
   $proj_d = new OBM_DISPLAY('DATA', $prefs, 'project');
   if ($popup) {
