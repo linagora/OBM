@@ -79,7 +79,7 @@ function addModule(storage, value) {
   line.set('class',klass);
   var label = line.getElement('td');
   var input = line.getElement('td').getElement('input');
-  label.set('html','<a onclick=\"$(\'module_' + value + '\').dispose();return false\" href=\"\"><img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\"></a> ' + modules.get(value));
+  label.set('html','<a onclick=\"$(\'module_' + value + '\').dispose();return false\" href=\"\"><img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\"></a> ' + modules.get(value) + '<input type=\"hidden\" value=\"0\" name=\"cb_rights[' + value + '][]\"/>');
   line.getElements('td').each(function (element) {
     if(element.getElement('input')) {
       element.getElement('input').set('name','cb_rights[' + value +'][]');

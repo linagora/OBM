@@ -316,7 +316,7 @@ function get_query_count($query) {
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, 'get_query_count()');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   $obm_q->next_record();
   $count = $obm_q->f(0);
 

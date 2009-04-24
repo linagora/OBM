@@ -17,6 +17,7 @@
  +-------------------------------------------------------------------------+
 */
 ?><?php
+require("$obminclude/of/of_mailer.php");
 
 class CalendarMailer extends OBM_Mailer {
   protected $module = 'calendar';
