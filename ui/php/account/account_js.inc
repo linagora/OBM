@@ -58,7 +58,7 @@ function valider_suppression() {
 
 // balance compute date checking
 function check_account_balance_form (f_acc) {
- if (f_acc.tf_balance_date.value = \"\") {
+ if ($('balance_date').value == \"\") {
   alert(\"$l_choose_balance_date\" + \" : $l_fill_date\");
   return false;
  }

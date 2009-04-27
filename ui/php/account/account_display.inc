@@ -452,17 +452,19 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   $block .= '<br><br>';
   $url = url_prepare("account_index.php?action=compute_balance&amp;account_id=".$p_account['account_id']);
   $block .= "
- <table border=\"$border\" cellspacing=\"$cellspacing\">
-  <form method=\"post\" action=\"$url\"
-  onsubmit=\"return check_account_balance_form (this);\">
-   <tr><td>
-    <font size=-2 color=\"#$col_label\">$l_choose_balance_date</font><br>
-      <script>calendar('tf_balance_date','$p_date')</script>
-   </td><td>
-    <input type=submit value=\"".$l_compute_balance."\">
-   </td></tr>
-  </form>
- </table>";
+<form method=\"post\" action=\"account_index.php\" onsubmit=\"return check_account_balance_form (this);\">
+ <table class='spreadSheet'>
+  <tbody>
+   <tr><th>$l_choose_balance_date</th>
+   <th><input type=\"text\" id=\"balance_date\" name=\"tf_balance_date\" value=\"$p_date\" class=\"datePicker\"/></th>
+   <th>
+    <input type='submit' value=\"".$l_compute_balance."\">
+    <input type='hidden' name='action' value='compute_balance' />
+    <input type='hidden' name='account_id' value='".$p_account['account_id']."' />
+    </th></tr>
+    </tbody>
+ </table>
+  </form>";
      
   // we display the result :
   $block .= "

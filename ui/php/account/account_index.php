@@ -31,11 +31,11 @@ $module = 'account';
 $obminclude = getenv('OBM_INCLUDE_VAR');
 if ($obminclude == '') $obminclude = 'obminclude';
 include("$obminclude/global.inc");
-$params = get_account_params();
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
 include("$obminclude/global_pref.inc");
 require('account_display.inc');
 require('account_query.inc');
+$params = get_account_params();
 
 update_last_visit('account', $param_account, $action);
 
@@ -156,7 +156,7 @@ if ($action == 'index') {
     //    $payments_options = run_query_display_options ($obm['uid'],'payment');
     $payments_prefs = get_display_pref ($obm['uid'], 'payment');
 
-    $display['detail'] = html_account_compute_balance ($params['account_id'], $payments_prefs, $tf_balance_date);
+    $display['detail'] = html_account_compute_balance ($params['account_id'], $payments_prefs, $params['balance_date']);
 
   } else {
     $display['msg'] = display_err_msg($l_error_permission);
@@ -209,6 +209,7 @@ function get_account_params() {
   
   // Get global params
   $params = get_global_params('Account');
+  $params['balance_date'] = of_isodate_convert($params['balance_date'], true);
   
   return $params;
 }
