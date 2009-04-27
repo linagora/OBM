@@ -93,7 +93,7 @@ class EventMailObserverTest extends OBM_Database_TestCase {
 NOUVEAU RENDEZ-VOUS !
 ------------------------------------------------------------------
 
-Vous êtes invité à participer à un rendez-vous
+Vous êtes invité à participer à ce rendez-vous
 
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00
@@ -170,7 +170,7 @@ auteur : domainezz.com Admin
 NOUVEAU RENDEZ-VOUS !
 ------------------------------------------------------------------
 
-Vous êtes invité à participer à un rendez-vous
+Vous êtes invité à participer à ce rendez-vous
 
 du     : 24/03/2009 08:00
 au     : 24/03/2009 09:00
@@ -231,13 +231,13 @@ Le rendez-vous Title, initialement prévu du 24/03/2009 08:00 au 24/03/2009 09:0
 a été modifié et se déroulera du 24/03/2009 08:00 au 24/03/2009 09:00, (lieu : New Location 2).
 
 :: Pour plus de détails : 
-/calendar/calendar_index.php?action=detailconsult&calendar_id=1
+calendar/calendar_index.php?action=detailconsult&calendar_id=1
 
 :: Pour accepter les modifications :
-/calendar/calendar_index.php?action=update_decision&calendar_id=1&entity_kind=user&rd_decision_event=ACCEPTED
+calendar/calendar_index.php?action=update_decision&calendar_id=1&entity_kind=user&rd_decision_event=ACCEPTED
 
 :: Pour refuser les modifications : 
-/calendar/calendar_index.php?action=update_decision&calendar_id=1&entity_kind=user&rd_decision_event=DECLINED
+calendar/calendar_index.php?action=update_decision&calendar_id=1&entity_kind=user&rd_decision_event=DECLINED
 ",$mailData[3]['content']);
     $this->assertEquals('Event cancelled on OBM: Title',$mailData[4]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[4]['to']);
