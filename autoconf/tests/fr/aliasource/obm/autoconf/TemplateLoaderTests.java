@@ -7,7 +7,6 @@ import com.novell.ldap.LDAPException;
 
 import fr.aliasource.obm.autoconf.impl.AutoconfTestCase;
 import fr.aliasource.obm.utils.ConstantService;
-import fr.aliasource.obm.utils.DOMUtils;
 
 public class TemplateLoaderTests extends AutoconfTestCase {
 
@@ -23,7 +22,7 @@ public class TemplateLoaderTests extends AutoconfTestCase {
 			Document doc = tl.applyTemplate(las, "imapMailhost",
 					"smtpMailHost", "ldapHost", "att", "attvalue");
 			assertNotNull(doc);
-			DOMUtils.logDom(doc);
+//			DOMUtils.logDom(doc);
 			System.out.println("valid template: "+tl.isValidTemplate(doc.getDocumentElement()));
 		} catch (Exception e) {
 			e.printStackTrace();

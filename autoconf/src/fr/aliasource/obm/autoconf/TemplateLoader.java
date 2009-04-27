@@ -86,20 +86,34 @@ public class TemplateLoader {
 		}
 	}
 	
+	/**
+	 * @param root
+	 * @return
+	 */
 	public boolean isValidTemplate(Element root) {
 		NodeList nl = root.getChildNodes();
-		boolean ret = true;
+		boolean ret = testAttributes(true, root);
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node n = nl.item(i);
 			if (n.getNodeType() == Node.ELEMENT_NODE) {
 				Element e = (Element) n;
-				NamedNodeMap atts = e.getAttributes();
-				for (int j = 0; j < atts.getLength(); j++) {
-					Attr at = (Attr) atts.item(j);
-					String oldVal = at.getValue();
-					ret = oldVal.contains("${") && oldVal.contains("}");
+				ret = testAttributes(ret, e) && isValidTemplate(e);
+				if (!ret) {
+					return ret;
 				}
-				ret = ret && isValidTemplate(e);
+			}
+		}
+		return ret;
+	}
+
+	private boolean testAttributes(boolean ret, Element e) {
+		NamedNodeMap atts = e.getAttributes();
+		for (int j = 0; j < atts.getLength(); j++) {
+			Attr at = (Attr) atts.item(j);
+			String oldVal = at.getValue();
+			ret = ret && !(oldVal.contains("${") && oldVal.contains("}"));
+			if (!ret) {
+				logger.warn("template validity check failed on attribute "+at.getName()+" with value "+oldVal);
 			}
 		}
 		return ret;
