@@ -429,7 +429,7 @@ class LDAP_Auth extends Auth {
     }
 
     $login = $params["login"];
-    $domain = $params["domain"];
+    $domain = $params["domain_id"];
     $password = stripslashes($params['password']);
     if(!$c_singleNameSpace) {
       if(strpos($login,"@") !== false) {
@@ -480,6 +480,10 @@ class LDAP_Auth extends Auth {
       $delegation_target = $this->db->f('userobm_delegation_target');
       $dbLogin = $this->db->f("userobm_login");
       $domain_name = $this->db->f("domain_name");
+    }
+
+    if( !$dbLogin ) {
+      error_log( "User '".$user_login."' unknown in OBM database" );
     }
 
     if (global_allow_access($perm)) {
@@ -535,7 +539,9 @@ class LDAP_Auth extends Auth {
     global $auth_ldap_bindpw, $auth_ldap_filter;
     global $auth_ldap_attribute, $auth_ldap_sizelimit;
 
-    if(!$login) return false;
+    if(!$login) {
+      return false;
+    }
     $auth_ldap_attribute = array("dn", "uid");
     $auth_ldap_sizelimit = 1;
     $auth_ldap_filter = str_replace('%u', $login, $auth_ldap_filter);
@@ -544,13 +550,14 @@ class LDAP_Auth extends Auth {
     $ldapconn=ldap_connect($auth_ldap_server);
     if (! ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3)) {
       ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 2) or
-        die("Echec de négociation de protocole avec le serveur LDAP");
+        error_log( 'Failed to negociate LDAP protocol version with LDAP server : '.$auth_ldap_server );
+        die('Failed to negociate LDAP protocol version with LDAP server : '.$auth_ldap_server);
     }
     	
     if (isset($auth_ldap_binddn) and strlen($auth_ldap_binddn) > 0) {
-      $ldapbindconn=ldap_bind($ldapconn,$auth_ldap_binddn,$auth_ldap_bindpw);
+      $ldapbindconn=@ldap_bind($ldapconn,$auth_ldap_binddn,$auth_ldap_bindpw);
     } else {
-      $ldapbindconn=ldap_bind($ldapconn);
+      $ldapbindconn=@ldap_bind($ldapconn);
     }
     	
     if ($ldapbindconn) {
@@ -561,16 +568,18 @@ class LDAP_Auth extends Auth {
         $ldap_userdn = $ldap_data[0]["dn"];
         $ldap_useruid = $ldap_data[0]["uid"][0];
       } else {
+        error_log( "Duplicate LDAP entry for user '".$login."', domaine '".$domain."'" );
         return false;
       }
   
       if (@ldap_bind($ldapconn, $ldap_userdn, $password)) {
         return $ldap_useruid;
       } else {
+        error_log( "Bad password for user '".$login."', domaine '".$domain."'" );
         return false;
       }
     } else {
-      echo("Echec lors de l'ouverture de la connexion au serveur d'authentification");
+      error_log( 'Connection failed to LDAP server : '.$auth_ldap_server );
       return false;
     }
   }
