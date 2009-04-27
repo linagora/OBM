@@ -234,17 +234,17 @@ function run_query_user_ext_search($user) {
       userobm_email
     FROM UserObm
     WHERE (
-      userobm_lastname LIKE '$pattern%' 
-      OR userobm_login LIKE '$pattern%' 
-      OR userobm_firstname LIKE '$pattern%' 
-      OR userobm_email LIKE  '$pattern%' )
+      userobm_lastname #LIKE '$pattern%' 
+      OR userobm_login #LIKE '$pattern%' 
+      OR userobm_firstname #LIKE '$pattern%' 
+      OR userobm_email #LIKE  '$pattern%' )
       AND userobm_archive = 0
       $multidomain
       $where_filter_entity
     ORDER BY  userobm_lastname, userobm_firstname
     LIMIT $limit OFFSET $first_row";
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
 
   return array('length' => $obm_q->nf(), 'datas' => $obm_q);
 }
