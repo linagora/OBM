@@ -447,7 +447,7 @@ function html_people_consult($obm_q) {
   $cdx = $obm_q->f("userobm_expresspostal");
   $ctry_name = $obm_q->f("country_name");
 
-  $email = $obm_q->f("userobm_email");
+  $email = get_entity_email($obm_q->f("userobm_email"),$obm_q->f('domain_name'));
   
   $block_userdata .= of_userdata_dis_entity_consult('user', $id);
 

@@ -606,6 +606,8 @@ function dis_time_group_select($time, $groups, $multi=false) {
     <legend>$l_public_group_members $group_add_button</legend>
     <input type=\"text\" name=\"group_name\" value=\"$g_public_name\" id=\"group_name\" autocomplete=\"off\" />
     <input type=\"hidden\" name=\"ext_group_id\" id=\"ext_group_id\" />
+    <div id=\"sel_group\">
+    </div>
     </fieldset>
     </form>
     </div>

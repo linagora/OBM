@@ -138,6 +138,9 @@ function get_time_stat_project($time) {
 
   $date_begin = $time['date_begin'];
   $date_end = $time['date_end'];
+  $obm_q = new DB_OBM;
+  $iftd_begin = sql_if($obm_q->type, "timetask_date < '$date_begin'", 'timetask_length', 0);
+  $iftd_end  = sql_if($obm_q->type, "timetask_date < '$date_begin' and timetask_date <= '$date_end' ", 'timetask_length', 0);
 
   $query = "
     SELECT
@@ -145,9 +148,9 @@ function get_time_stat_project($time) {
       project_name,
       tasktype_label,
       company_name,
-      FORMAT(sum(if (timetask_date < '$date_begin', timetask_length, 0)) / $c_day_fraction,3) as total_before,
-      FORMAT(sum(if (timetask_date >= '$date_begin' and timetask_date <= '$date_end', timetask_length, 0)) / $c_day_fraction,3) as total_length,
-      FORMAT(sum(timetask_length) / $c_day_fraction,3) as total_after
+      (sum($iftd_begin) / $c_day_fraction) as total_before,
+      (sum($iftd_end) / $c_day_fraction) as total_length,
+      (sum(timetask_length) / $c_day_fraction) as total_after
     FROM TimeTask, ProjectTask, Project
       LEFT JOIN Company ON project_company_id = company_id
       LEFT JOIN TaskType ON project_tasktype_id = tasktype_id
@@ -155,8 +158,8 @@ function get_time_stat_project($time) {
       AND timetask_projecttask_id = projecttask_id
       AND projecttask_project_id = project_id
       AND timetask_user_id in $uid_tab
-    GROUP BY project_id
-    having (sum(if (timetask_date >= '$date_begin' and timetask_date <= '$date_end', timetask_length, 0))) != 0
+    GROUP BY project_id,project_name,tasktype_label,company_name
+    having (sum($iftd_end)) != 0
 ";
 
   display_debug_msg($query, $cdg_sql, 'get_time_stat_project()');
@@ -170,9 +173,9 @@ function get_time_stat_project($time) {
     $p_name = $obm_q->f('project_name');
     $tt_label = $obm_q->f('tasktype_label');
     $company = $obm_q->f('company_name');
-    $time_before = $obm_q->f('total_before');
-    $time = $obm_q->f('total_length');
-    $time_after = $obm_q->f('total_after');
+    $time_before = round($obm_q->f('total_before'),3);
+    $time = round($obm_q->f('total_length'),3);
+    $time_after = round($obm_q->f('total_after'),3);
 
     $res[$p_id]['project'] = $p_name;
     $res[$p_id]['tasktype'] = $tt_label;
@@ -211,28 +214,30 @@ function get_time_stat_tasktype($time) {
   $date_begin = $time['date_begin'];
   $date_end = $time['date_end'];
 
+  $obm_q = new DB_OBM;
+  $iftd_begin = sql_if($obm_q->type, "timetask_date < '$date_begin'", 'timetask_length', 0);
+  $iftd_end  = sql_if($obm_q->type, "timetask_date < '$date_begin' and timetask_date <= '$date_end' ", 'timetask_length', 0);
   $query = "
     SELECT
       timett.tasktype_id as time_tasktype_id,
       timett.tasktype_label as time_tasktype_label,
       projtt.tasktype_id as proj_tasktype_id,
       projtt.tasktype_label as proj_tasktype_label,
-      FORMAT(sum(if (timetask_date < '$date_begin', timetask_length, 0)) / $c_day_fraction,3) as total_before,
-      FORMAT(sum(if (timetask_date >= '$date_begin' and timetask_date <= '$date_end', timetask_length, 0)) / $c_day_fraction,3) as total_length,
-      FORMAT(sum(timetask_length) / $c_day_fraction,3) as total_after
+      (sum($iftd_begin) / $c_day_fraction) as total_before,
+      (sum($iftd_end) / $c_day_fraction) as total_length,
+      (sum(timetask_length) / $c_day_fraction) as total_after
     FROM TimeTask JOIN TaskType as timett on timetask_tasktype_id=timett.tasktype_id
       LEFT JOIN ProjectTask on timetask_projecttask_id=projecttask_id 
       LEFT JOIN Project on projecttask_project_id=project_id 
       LEFT JOIN TaskType as projtt on project_tasktype_id=projtt.tasktype_id 
     WHERE timetask_date <= '$date_end'
       AND timetask_user_id in $uid_tab
-    GROUP BY projtt.tasktype_id, timett.tasktype_id
-    having (sum(if (timetask_date >= '$date_begin' and timetask_date <= '$date_end', timetask_length, 0))) != 0
+    GROUP BY projtt.tasktype_id, timett.tasktype_id, timett.tasktype_label,projtt.tasktype_id,projtt.tasktype_label
+    having (sum($iftd_end)) != 0
     ORDER BY projtt.tasktype_id";
 
   display_debug_msg($query, $cdg_sql, 'get_time_stat_tasktype');
 
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   $res = array();
@@ -241,9 +246,9 @@ function get_time_stat_tasktype($time) {
     $tt_label = $obm_q->f('time_tasktype_label');
     $proj_tt_id = $obm_q->f('proj_tasktype_id');
     $proj_tt_label = $obm_q->f('proj_tasktype_label');
-    $time_before = $obm_q->f('total_before');
-    $time = $obm_q->f('total_length');
-    $time_after = $obm_q->f('total_after');
+    $time_before = round($obm_q->f('total_before'),3);
+    $time = round($obm_q->f('total_length'),3);
+    $time_after = round($obm_q->f('total_after'),3);
     // Tasktype_id : use project tasktype id is exists, else timetask one
     if ($proj_tt_id != '') {
       $tt_id = $proj_tt_id;
@@ -762,7 +767,7 @@ function run_query_time_user_month_planning($time) {
       project_name as label,
       project_shortname as shortname,
       project_id as id,
-      sum(timetask_length) timetask_length,
+      sum(timetask_length) as timetask_length,
       $date,
       userobm_id,
       userobm_lastname,
@@ -775,13 +780,13 @@ function run_query_time_user_month_planning($time) {
     WHERE timetask_date >= '$month_begin' 
       AND timetask_date <= '$month_end'
       AND timetask_user_id IN $uid_tab
-    GROUP BY date, timetask_status, id, label,userobm_id,userobm_lastname,userobm_firstname,type
+    GROUP BY date, timetask_status, id, label,userobm_id,userobm_lastname,userobm_firstname,type, project_shortname, project_name, project_id
     UNION
     SELECT
       tasktype_label as label,
       tasktype_label as shortname,
       timetask_tasktype_id as id,
-      sum(timetask_length) timetask_length,
+      sum(timetask_length) as timetask_length,
       $date,
       userobm_id,
       userobm_lastname,
