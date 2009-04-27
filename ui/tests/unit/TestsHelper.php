@@ -70,7 +70,11 @@ abstract class OBM_Database_TestCase extends PHPUnit_Extensions_Database_TestCas
     $db_conf = include('conf/db.php');
     extract($db_conf);
     $this->pdo = new PDO("{$obmdb_dbtype}:host={$obmdb_host};dbname={$obmdb_db}", $obmdb_user, $obmdb_password);
-    $this->pdo->exec('TRUNCATE TABLE Entity CASCADE');
+    $truncate = new PHPUnit_Extensions_Database_Operation_Truncate(true);
+    $truncate->setCascade(true);
+    $dataset = new OBM_Database_CsvDataSet(';');
+    $dataset->addTable('Entity');
+    $truncate->execute($this->getDatabaseTester()->getConnection(), $dataset);
     $this->test_db = $obmdb_db;
   }
   
@@ -121,9 +125,13 @@ class OBM_Database_Operation_Entity_Insert extends PHPUnit_Extensions_Database_O
   
   public function execute(PHPUnit_Extensions_Database_DB_IDatabaseConnection $connection, 
                           PHPUnit_Extensions_Database_DataSet_IDataSet $dataSet) {
-    $pdo = $connection->getConnection(); // we retrieve the PDO object
-    $pdo->exec('TRUNCATE TABLE Entity CASCADE');
+    $truncate = new PHPUnit_Extensions_Database_Operation_Truncate(true);
+    $truncate->setCascade(true);
+    $dataset = new OBM_Database_CsvDataSet(';');
+    $dataset->addTable('Entity');
+    $truncate->execute($connection, $dataset);
     
+    $pdo = $connection->getConnection(); // we retrieve the PDO object
     parent::execute($connection, $dataSet);
     
     $dsIterator = $dataSet->getIterator();
