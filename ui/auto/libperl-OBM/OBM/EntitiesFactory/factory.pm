@@ -34,6 +34,7 @@ sub _reset {
     $self->{'running'} = undef;
     $self->{'currentEntity'} = undef;
     $self->{'entitiesDescList'} = undef;
+    $self->{'nextEntityDesc'} = undef;
 
     return 0;
 }
