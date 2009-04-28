@@ -22,9 +22,13 @@ sub _modifyAttr {
     my( $newValue, $ldapEntry, $attr ) = @_;
     my $update = 0;
 
+    if( ref($newValue) eq 'ARRAY' ) {
+        return $self->_modifyAttrList( $newValue, $ldapEntry, $attr );
+    }
+
 
     # L'attribut n'est plus renseigné
-    if( !defined( $newValue ) || ($newValue eq "") ) {
+    if( !defined( $newValue ) || ($newValue eq '') ) {
         if( defined($ldapEntry->get_value($attr)) ) {
             $self->_log( 'suppression de l\'attribut LDAP \''.$attr.'\'', 4 );
             $ldapEntry->delete( $attr => [] );
@@ -35,7 +39,7 @@ sub _modifyAttr {
         
     }elsif( !defined($ldapEntry->get_value($attr)) ) {
         # L'attribut n'existe pas
-        if( defined( $newValue ) && ($newValue ne "") ) {
+        if( defined( $newValue ) && ($newValue ne '') ) {
             $self->_log( 'mise à jour de l\'attribut LDAP \''.$attr.'\', avec la valeur \''.$newValue.'\'', 4 );
             $ldapEntry->add( $attr => $newValue );
 
@@ -71,15 +75,10 @@ sub _modifyAttrList {
 
         return $update;
 
-    }elsif( defined($newValues) && (uc(ref($newValues)) ne "ARRAY" ) ) {
+    }elsif( ref($newValues) ne 'ARRAY' ) {
         return $update;
-
     }
 
-    # On converti les nouvelles valeurs dans le bon encodage
-    for( my $i=0; $i<=$#{$newValues}; $i++ ) {
-        $newValues->[$i] = $newValues->[$i];
-    }
 
     my $ldapValues = $ldapEntry->get_value( $attr, asref => 1);
     if( $newValues && !defined( $ldapValues ) ) {
