@@ -6,14 +6,22 @@ use OBM::Tools::commonMethods;
 use OBM::Ldap::utils;
 use OBM::Samba::utils;
 use OBM::Password::passwd;
-@ISA = ('OBM::Tools::commonMethods', 'OBM::Ldap::utils', 'OBM::Samba::utils',
-'OBM::Password::passwd');
+@ISA = ('OBM::Tools::commonMethods', 'OBM::Ldap::utils', 'OBM::Samba::utils', 'OBM::Password::passwd');
 
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
+
+
+sub DESTROY {
+    my $self = shift;
+
+    $self->_log( 'suppression de l\'objet', 4 );
+
+    $self->{'parent'} = undef;
+}
 
 
 sub setDelete {
@@ -260,4 +268,99 @@ sub getCyrusQuotaUsed {
     }
 
     return $quotaUsed;
+}
+
+
+# Needed : cyrusEngine
+sub getMailboxName {
+    my $self = shift;
+
+    return undef;
+}
+
+
+# Needed : cyrusEngine
+sub getMailServerId {
+    my $self = shift;
+
+    return undef;
+}
+
+
+# Needed : cyrusEngine
+sub getMailboxPrefix {
+    my $self = shift;
+
+    return undef;
+}
+
+
+# Needed : cyrusEngine
+sub getMailboxQuota {
+    my $self = shift;
+
+    return undef;
+}
+
+
+# Needed : cyrusEngine
+sub getMailboxAcl {
+    my $self = shift;
+
+    return undef;
+}
+
+
+# Needed : cyrusEngine
+sub getMailboxPartition {
+    my $self = shift;
+
+    return undef;
+}
+
+
+# Needed : cyrusEngine
+sub getMailboxDefaultFolders {
+    my $self = shift;
+
+    return undef;
+}
+
+
+# Needed : sieveEngine
+sub isSieveAvailable {
+    my $self = shift;
+
+    return 0;
+}
+
+
+# Needed : sieveEngine
+sub getSieveVacation {
+    my $self = shift;
+
+    return undef;
+}
+
+
+# Needed : sieveEngine
+sub getSieveNomade {
+    my $self = shift;
+
+    return undef;
+}
+
+
+sub getBdUpdate {
+    my $self = shift;
+
+    return 0;
+}
+
+
+sub setLdapSambaPasswd {
+    my $self = shift;
+    my( $entry, $plainPasswd ) = @_; 
+
+    return 0;
 }
