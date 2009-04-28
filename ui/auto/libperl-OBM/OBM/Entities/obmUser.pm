@@ -1003,7 +1003,7 @@ sub getMailServerId {
 sub getMailboxPrefix {
     my $self = shift;
 
-    return 'user/'
+    return 'user/';
 }
 
 
