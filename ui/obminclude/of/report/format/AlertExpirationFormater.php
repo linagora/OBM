@@ -20,53 +20,18 @@
 <?php
 
 /**
- * Define how an element will be outputed 
+ * AlertExpirationFormater 
  * 
+ * @uses IFormater
  * @package 
  * @version $id:$
- * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
- * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @copyright Copyright (c) 1997-2009 LINAGORA GSO
+ * @author Benoît Caudesaygues <benoit.caudesaygues@linagora.com> 
  * @license GPL 2.0
  */
-interface IFormater {
-
-  /**
-   * Format the current object 
-   * 
-   * @param mixed $object 
-   * @access public
-   * @return void
-   */
-  public function format($record);
-  /**
-   * get output header 
-   * 
-   * @access public
-   * @return void
-   */
-  public function getHeader();
-  /**
-   * get output footer
-   * 
-   * @access public
-   * @return void
-   */
-  public function getFooter();
-
-}
-
-/**
- * Define a generic format, this formater will display inline
- * all the fields of the object which have been added
- * 
- * @package 
- * @version $id:$
- * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
- * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
- * @license GPL 2.0
- */
-class GenericFormater implements IFormater{
+class AlertExpirationFormater implements IFormater{
   private $_fields;
+  private $delaijour = 10;
   
   /**
    * Constructor 
@@ -94,9 +59,16 @@ class GenericFormater implements IFormater{
    * @see IFormater::format 
    **/
   public function format($object) {
+    global $l_warn_exp;
     $line = '';
     foreach($this->_fields as $field) {
        $line .=$object->$field."\t";
+    }
+    $date_limit = date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+$this->delaijour, date("Y")));
+    if($object->account_dateexp != '' && ($object->account_dateexp < $date_limit)) {
+      $line .= $l_warn_exp."\t";
+    } else {
+      $line .="\t";
     }
     $line .= "\n";
     return $line;
@@ -109,11 +81,9 @@ class GenericFormater implements IFormater{
     require "obminclude/lang/".$_SESSION['set_lang']."/report.inc";
     $head = '';
     foreach($this->_fields as $field) {
-      if(isset(${"l_".$field}))
-        $head .= ${"l_".$field}."\t";
-      else
-        $head .= $field."\t";
+      $head .= ${"l_".$field}."\t";
     }
+    $head .= $l_warn."\t";
     $head .= "\n";
     return $head;
   }

@@ -19,54 +19,20 @@
 ?>
 <?php
 
-/**
- * Define how an element will be outputed 
- * 
- * @package 
- * @version $id:$
- * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
- * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
- * @license GPL 2.0
- */
-interface IFormater {
-
-  /**
-   * Format the current object 
-   * 
-   * @param mixed $object 
-   * @access public
-   * @return void
-   */
-  public function format($record);
-  /**
-   * get output header 
-   * 
-   * @access public
-   * @return void
-   */
-  public function getHeader();
-  /**
-   * get output footer
-   * 
-   * @access public
-   * @return void
-   */
-  public function getFooter();
-
-}
 
 /**
- * Define a generic format, this formater will display inline
- * all the fields of the object which have been added
+ * AlertQuotaFormater formater for display warning quota mail 
  * 
+ * @uses IFormater
  * @package 
  * @version $id:$
- * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
- * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @copyright Copyright (c) 1997-2009 LINAGORA GSO
+ * @author Benoît Caudesaygues <benoit.caudesaygues@linagora.com> 
  * @license GPL 2.0
  */
-class GenericFormater implements IFormater{
+class AlertQuotaFormater implements IFormater{
   private $_fields;
+  private $limit = 90;
   
   /**
    * Constructor 
@@ -94,9 +60,21 @@ class GenericFormater implements IFormater{
    * @see IFormater::format 
    **/
   public function format($object) {
+    global $l_warn_quota;
+    $quota = $object->mail_quota;
+
+    $use = $object->mail_quota_use;
+    $percent = round($this->percentQuota($use,$quota),2);
+
     $line = '';
     foreach($this->_fields as $field) {
        $line .=$object->$field."\t";
+    }
+    $line .= $percent."%\t";
+    if($percent > $this->limit) {
+      $line .= $l_warn_quota."\t";
+    } else {
+      $line .= "\t";
     }
     $line .= "\n";
     return $line;
@@ -114,6 +92,8 @@ class GenericFormater implements IFormater{
       else
         $head .= $field."\t";
     }
+    $head .= $l_used_percent."\t";
+    $head .= $l_warn."\t";
     $head .= "\n";
     return $head;
   }
@@ -123,6 +103,11 @@ class GenericFormater implements IFormater{
    */
   public function getFooter() {
     return '';
+  }
+
+  private function percentQuota($use,$quota) {
+    $percent = (($use * 100)/$quota);
+    return $percent;
   }
 
 }

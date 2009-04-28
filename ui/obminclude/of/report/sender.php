@@ -78,9 +78,15 @@ abstract class Sender {
    * @return string
    */
   public static function currentContext() {
-    if (isset($HTTP_SESSION_VARS))
-      return 'web';
+    /*if (isset($HTTP_SESSION_VARS))
+      return 'web';*/
     //else
+    if(isset($GLOBALS['context'])) {
+      return $GLOBALS['context'];
+    }
+    if(!(defined('STDIN') && defined('STDOUT') && defined('STDERR'))) {
+      return 'web';
+    }
     if (class_exists('PHPUnit_Framework_TestCase'))
       return 'test';
     //else

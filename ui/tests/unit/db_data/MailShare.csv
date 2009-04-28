@@ -1,2 +1,4 @@
 "mailshare_id";"mailshare_domain_id";"mailshare_timeupdate";"mailshare_timecreate";"mailshare_userupdate";"mailshare_usercreate";"mailshare_name";"mailshare_archive";"mailshare_quota";"mailshare_mail_server_id";"mailshare_delegation";"mailshare_description";"mailshare_email"
-"1";"2";"2009-03-30 18:58:22";"2009-03-30 18:58:22";NULL;NULL;"mailshare-test";"0";"0";"1";"";"mailshare-test";"mailshare-test"
+1;2;30/03/09 18:58;30/03/09 18:58;"NULL";"NULL";"mailshare-test";0;0;1;;"mailshare-test-desc-1";"mailshare-test-email-1"
+2;2;30/03/09 18:58;30/03/09 18:58;"NULL";"NULL";"mailshare-test-name-2";0;0;1;;"mailshare-test-desc-2";"mailshare-test-email-2"
+3;2;30/03/09 18:58;30/03/09 18:58;"NULL";"NULL";"mailshare-test-name-3";0;0;1;;"mailshare-test-desc-3";"mailshare-test-email-3"

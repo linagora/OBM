@@ -19,7 +19,8 @@
 ?>
 <?php
 require_once dirname(__FILE__).'/TestsHelper.php';
-require_once 'php/calendar/calendar_query.inc';
+require_once 'php/calendar/calendar_mailer.php';
+require_once 'php/calendar/event_observer.php';
 require_once 'php/calendar/calendar_mailer.php';
 require_once 'php/calendar/event_observer.php';
 require_once 'of_date.inc';

@@ -36,11 +36,13 @@ class ReportTest extends OBM_Database_TestCase {
     parent::setup();
     $_SESSION['set_lang'] = 'fr';
 //    Stato_I18n::setLocale('fr');
+    $GLOBALS['params']['report_email'] = array('domainezz.com Admin <admin1@zz.com>');
     $GLOBALS['obm']['uid'] = 3;
     Stato_Mailer::setDefaultTransport(new Stato_StaticTransport());
   }
 
   public function testStaticReport() {
+    global $l_name, $l_surname, $l_gender;
     $report = new Report();
     $report->addRecord(new Element('1', 'John', 'Doe', 'M')); 
     $report->addRecord(new Element('2', 'Janne', 'Doe', 'F')); 
@@ -50,10 +52,11 @@ class ReportTest extends OBM_Database_TestCase {
     $formater->addField('surname');
     $formater->addField('gender');
     $output = $report->format($formater);
-    $this->assertEquals($output, "name\tsurname\tgender\t\nJohn\tDoe\tM\t\nJanne\tDoe\tF\t\nJulia\tDoe\tF\t\n");
+    $this->assertEquals($output, "$l_name\t$l_surname\t$l_gender\t\nJohn\tDoe\tM\t\nJanne\tDoe\tF\t\nJulia\tDoe\tF\t\n");
   }
 
   public function testStandardGroupReport() {
+    global $l_id, $l_name, $l_domain_name, $l_nb_user;
     $report = ReportFactory::getReport(array(),'group');
     $formater = new GenericFormater();
     $formater->addField('id');
@@ -61,7 +64,7 @@ class ReportTest extends OBM_Database_TestCase {
     $formater->addField('domain_name');
     $formater->addField('nb_user');
     $output = $report->format($formater);
-    $this->assertContains("id\tname\tdomain_name\tnb_user\t\n", $output);
+    $this->assertContains("$l_id\t$l_name\t$l_domain_name\t$l_nb_user\t\n", $output);
     $this->assertContains("1\tAdmin\tglobal.virt\t0\t\n", $output);
     $this->assertContains("2\tCommercial\tglobal.virt\t0\t\n", $output);
     $this->assertContains("3\tProduction\tglobal.virt\t0\t\n", $output);
@@ -70,16 +73,17 @@ class ReportTest extends OBM_Database_TestCase {
     $filter1 = new GenericFilter('nb_user','>','0');
     $report = ReportFactory::getReport(array($filter1),'group');
     $output = $report->format($formater);
-    $this->assertEquals($output, "id\tname\tdomain_name\tnb_user\t\n"
+    $this->assertEquals($output, "$l_id\t$l_name\t$l_domain_name\t$l_nb_user\t\n"
                                 ."4\tDeveloppeur\tzz.com\t1\t\n");
     unset($report);
     $filter2 = new GenericFilter('domain_name','=','global.virt');
     $report = ReportFactory::getReport(array($filter1,$filter2),'group');
     $output = $report->format($formater);
-    $this->assertEquals($output, "id\tname\tdomain_name\tnb_user\t\n");
+    $this->assertEquals($output, "$l_id\t$l_name\t$l_domain_name\t$l_nb_user\t\n");
   }
 
   public function testStandardUserReport() {
+    global $l_id, $l_login, $l_name, $l_firstname, $l_domain_name;
     $report = ReportFactory::getReport(array(),'user');
     $formater = new GenericFormater();
     $formater->addField('id');
@@ -88,27 +92,31 @@ class ReportTest extends OBM_Database_TestCase {
     $formater->addField('firstname');
     $formater->addField('domain_name');
     $output = $report->format($formater);
-    $this->assertEquals($output, "id\tlogin\tlastname\tfirstname\tdomain_name\t\n"
+    $this->assertEquals($output, "$l_id\t$l_login\t$l_name\t$l_firstname\t$l_domain_name\t\n"
                                 ."1\tadmin0\tAdmin Lastname\tFirstname\tglobal.virt\t\n"
                                 ."2\tadmin1\tAdmin\tdomainezz.com\tzz.com\t\n"
                                 ."3\tuser1\tDoe\tJohn\tzz.com\t\n"
-                                ."4\tediteur1\tDoe\tJane\tzz.com\t\n");
+                                ."4\tediteur1\tDoe\tJane\tzz.com\t\n"
+                                ."5\tadmin2\tAdmin Lastname\tFirstname\tglobal.virt\t\n"
+                                ."6\tadmin2\tAdmin Lastname\tFirstname\tzz.com\t\n");
     unset($report);
     $filter1 = new GenericFilter('domain_id','!=','1');
     $report = ReportFactory::getReport(array($filter1),'user');
     $output = $report->format($formater);
-    $this->assertEquals($output, "id\tlogin\tlastname\tfirstname\tdomain_name\t\n"
+    $this->assertEquals($output, "$l_id\t$l_login\t$l_name\t$l_firstname\t$l_domain_name\t\n"
                                 ."2\tadmin1\tAdmin\tdomainezz.com\tzz.com\t\n"
                                 ."3\tuser1\tDoe\tJohn\tzz.com\t\n"
-                                ."4\tediteur1\tDoe\tJane\tzz.com\t\n");
+                                ."4\tediteur1\tDoe\tJane\tzz.com\t\n"
+                                ."6\tadmin2\tAdmin Lastname\tFirstname\tzz.com\t\n");
     unset($report);
     $filter2 = new GenericFilter('domain_name','=','global.virt');
     $report = ReportFactory::getReport(array($filter1,$filter2),'user');
     $output = $report->format($formater);
-    $this->assertEquals($output, "id\tlogin\tlastname\tfirstname\tdomain_name\t\n");
+    $this->assertEquals($output, "$l_id\t$l_login\t$l_name\t$l_firstname\t$l_domain_name\t\n");
   }
 
   public function testStandardMailshareReport() {
+    global $l_id, $l_name, $l_mail_server_name, $l_domain_name;
     $report = ReportFactory::getReport(array(),'mailshare');
     $formater = new GenericFormater();
     $formater->addField('id');
@@ -116,13 +124,15 @@ class ReportTest extends OBM_Database_TestCase {
     $formater->addField('mail_server_name');
     $formater->addField('domain_name');
     $output = $report->format($formater);
-    $this->assertEquals($output, "id\tname\tmail_server_name\tdomain_name\t\n"
-                                ."1\tmailshare-test\tmail-server\tzz.com\t\n");
+    $this->assertEquals($output, "$l_id\t$l_name\t$l_mail_server_name\t$l_domain_name\t\n"
+                                ."1\tmailshare-test\tmail-server\tzz.com\t\n"
+                                ."2\tmailshare-test-name-2\tmail-server\tzz.com\t\n"
+                                ."3\tmailshare-test-name-3\tmail-server\tzz.com\t\n");
     unset($report);
     $filter1 = new GenericFilter('domain_name','=','global.virt');
     $report = ReportFactory::getReport(array($filter1),'mailshare');
     $output = $report->format($formater);
-    $this->assertEquals($output, "id\tname\tmail_server_name\tdomain_name\t\n");
+    $this->assertEquals($output, "$l_id\t$l_name\tmail_server_name\t$l_domain_name\t\n");
   }
 
   public function testReportGenericFilter() {
@@ -178,7 +188,7 @@ class ReportTest extends OBM_Database_TestCase {
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Rapport d\'exploitation : titi',$mailData[0]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
-    $this->assertContains("Rapport d'exploitation de la commande \"titi\" :\n"
+    $this->assertContains("Rapport d'exploitation du traitement \"titi\" :\n"
                          ."\n"
                          ."toto",$mailData[0]['content']);
   }
@@ -190,25 +200,28 @@ class ReportTest extends OBM_Database_TestCase {
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Rapport d\'exploitation : titi',$mailData[0]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
-    $this->assertContains("Rapport d'exploitation de la commande \"titi\" :\n"
+    $this->assertContains("Rapport d'exploitation du traitement \"titi\" :\n"
                          ."\n"
                          ."toto",$mailData[0]['content']);
   }
 
   public function testReportCommand() {
+    global $l_id, $l_login, $l_name, $l_firstname, $l_domain_name;
     $cmd = new TestCommand();
     $cmd->doIt();
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Rapport d\'exploitation : Les utilisateurs qui ne sont pas dans global.virt',$mailData[0]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
-    $this->assertContains("Rapport d'exploitation de la commande \"Les utilisateurs qui ne sont pas dans global.virt\" :\n"
+    $this->assertContains("Rapport d'exploitation du traitement \"Les utilisateurs qui ne sont pas dans global.virt\" :\n"
                          ."\n"
-                         ."id\tlogin\tlastname\tfirstname\tdomain_name\t\n"
+                         ."$l_id\t$l_login\t$l_name\t$l_firstname\t$l_domain_name\t\n"
                          ."2\tadmin1\tAdmin\tdomainezz.com\tzz.com\t\n"
                          ."3\tuser1\tDoe\tJohn\tzz.com\t\n"
-                         ."4\tediteur1\tDoe\tJane\tzz.com\t\n",$mailData[0]['content']);
+                         ."4\tediteur1\tDoe\tJane\tzz.com\t\n"
+                         ."6\tadmin2\tAdmin Lastname\tFirstname\tzz.com\t\n"
+                         ,$mailData[0]['content']);
   }
-
+  
   public function testContextualOutput() {
 
   }

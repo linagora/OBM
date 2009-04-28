@@ -49,6 +49,8 @@
       $this->filters[] = new GenericFilter('archive','==','0');
       $this->filters[] = new GenericFilter('status','==','VALID');
 
+      $this->filters[] = new GenericFilter('account_dateexp','!=','');
+
       $this->formater = new AlertExpirationFormater;
       $this->formater->addField('id');
       $this->formater->addField('login');

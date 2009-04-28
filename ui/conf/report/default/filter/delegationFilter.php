@@ -19,39 +19,38 @@
 ?>
 <?php
 
-/**
- * Sender used to propose a download to the client
- * 
- * @package 
- * @version $id:$
- * @copyright Copyright (c) 1997-2009 Aliasource - Groupe LINAGORA
- * @author Vincent Alquier <vincent.alquier@aliasource.fr> 
- * @license GPL 2.0
- */
-class DownloadSender extends Sender {
-  const context = 'web';
+class delegationFilter implements IFilter {
+  private $_value;
+  private $_filter_cmd;
 
   /**
-   * Propose a download to the client
-   *
-   * @param mixed $report report message
-   * @param mixed $name report command name
-   * @access protected
+   * Constructor 
+   * 
+   * @param string $field Field to test
+   * @param string $operator Operation : =, <, >, <=,>=, !=
+   * @param mixed $value value to test with, the accepted type are boolean, string, integer, float
+   * @access public
    * @return void
    */
-  protected function sendMessage($report, $name) {
-    header('Content-Description: File Transfer');
-//    header('Content-Type: application/octet-stream');
-    header('Content-Type: text/csv');
-    header('Content-Disposition: attachment; filename=report.csv');
-//    header('Content-Transfer-Encoding: binary');
-    header('Expires: 0');
-    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-    header('Pragma: public');
-    header('Content-Length: '.strlen($report));
-    ob_clean();
-    flush();
-    echo $report;
+  public function __construct() {
+    $this->_value = $GLOBALS['params']['report_delegation'];
+    
+    $field = 'delegation';
+
+    $pattern = "'^(".$this->_value.")'";
+
+    $this->_filter_cmd = "return (ereg($pattern,\$record->". $field ."));";
+  }
+
+  /**
+   * @see IFilter::filter
+   */
+  public function filter($record) {
+    if($this->_value != '') {
+      return eval($this->_filter_cmd);
+    } else {
+      return true;
+    }
   }
 
 }

@@ -21,6 +21,7 @@
 
 require_once('obminclude/of/report/reportFactory.php');
 require_once('obminclude/of/report/sender.php');
+require_once('obminclude/of/report/sender/mailSender.php');
 /**
  * Abstract class used to describe program actions. Must be inherited for
  * each report to generate.
@@ -37,6 +38,8 @@ abstract class Command {
   protected $filters;
   protected $kind;
   protected $formater;
+  const filter = "../../conf/report/default/filter/";
+  const sender = "../../conf/report/default/sender/";
 
   /**
    * Constructor 
@@ -56,10 +59,22 @@ abstract class Command {
    * @return void
    */
   public function doIt() {
+    
     $this->setup();
     $this->execute();
     if (!is_array($this->filters))
       $this->filters = array($this->filters);
+    if(is_dir(self::filter)) {
+      $d = dir(self::filter);
+      while(false != ($file = $d->read())) {
+        if(is_file(self::filter.$file)) {
+          require_once self::filter.$file;
+          $klass = Command::getClass($file);
+          $this->filters[] = new $klass;
+        }
+      }
+      $d->close();
+    }
     if (isset($this->formater) && isset($this->kind))
       $this->tearDown();
   }
@@ -89,8 +104,61 @@ abstract class Command {
    */
   private function tearDown() {
     $report = ReportFactory::getReport($this->filters, $this->kind);
+    
+    if(isset($this->sender)) {
+      $next = $this->sender;
+    }
+    
+    if (is_dir(self::sender)) {
+      $d = dir(self::sender);
+      while (false != ($file = $d->read())) {
+        if(is_file(self::sender.$file)) {
+          require_once self::sender.$file;
+          $klass = Command::getClass($file);
+          $this->sender = new $klass;
+          $this->sender->setNext($next);
+          $next = $this->sender;
+        }
+      }
+    }
+    
     if (isset($this->sender))
       $this->sender->send($report->format($this->formater), $this->name);
   }
 
+  /**
+   * Get a class name from file.
+   * TODO : could be getFileClassName
+   * 
+   * @param mixed $fileName 
+   * @access public
+   * @return void
+   */
+  function getClass($fileName) {
+    preg_match("/^(.*)\.php$/",$fileName,$className);
+    return $className[1];
+  }
 }
+
+class Stato_FileTransport implements Stato_IMailTransport {
+
+  private static $mailQ;
+
+  public function __construct() {
+    self::$mailQ = array();
+  }
+
+  public function send(Stato_Mail $mail) {
+    $file = fopen('/tmp/testfile.txt','wb');
+    fwrite($file,$mail->getTo());
+    fwrite($file,$mail->getSubject());
+    fwrite($file,$mail->getContent());
+    //    self::$mailQ[] = array('to' => $mail->getTo(), 'subject' => $mail->getSubject(), 'content' => $mail->getContent());
+    fclose($file);
+  }
+
+  public static function getMailQ() {
+    return self::$mailQ;
+  }
+}
+

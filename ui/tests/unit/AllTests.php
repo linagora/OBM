@@ -18,17 +18,20 @@
 */
 
 require_once dirname(__FILE__).'/TestsHelper.php';
+require_once dirname(__FILE__).'/../../obminclude/lang/fr/report.inc';
 
 require_once 'AclTest.php';
 require_once 'VpdiTest.php';
 require_once 'EventTest.php';
 require_once 'EventMailObserverTest.php';
 require_once 'ReportTest.php';
+require_once 'UserReportCommandTest.php';
 require_once 'ReportSenderTest.php';
  
 class AllTests {
   public static function suite() {
     $suite = new PHPUnit_Framework_TestSuite('OBM');
+    $suite->addTestSuite('UserReportCommandTest');
     $suite->addTestSuite('ReportTest');
     $suite->addTestSuite('ReportSenderTest');
     $suite->addTestSuite('AclTest');
