@@ -39,6 +39,7 @@ function run_query_deal_search($deal, $all='') {
   $date_before = of_isodate_convert($deal['date_before'],true);
   $role_company = sql_search_text_parse($deal['role_company']);
   $contact_id = $deal['contact_id'];
+  $delegation = sql_search_text_parse($deal['delegation']);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -55,6 +56,10 @@ function run_query_deal_search($deal, $all='') {
 
   if ($label != '') {
     $where .= " AND deal_label $like '%$label%'";
+  }
+  // If a delegation indication has been specified, get it
+  if (trim($delegation) != '') {
+    $where .= " AND userobm_delegation $like '$delegation%'";
   }
   if ($number != '') {
     $where .= " AND deal_number $like '%$number%'";
@@ -96,8 +101,8 @@ function run_query_deal_search($deal, $all='') {
                     OR deal_contact2_id $contact_id)"; 
   }
 
-  $where .= 'AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = companyentity_entity_id)';
-  if($zip != '') {
+  $where .= ' AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = companyentity_entity_id)';
+  if ($zip != '') {
     $where .= " AND companyentity_entity_id IN (SELECT address_entity_id FROM Address WHERE companyentity_entity_id = address_entity_id  AND address_zipcode $like '$zip%'))";
   } else {
     $where .= " OR address_id IS NULL)";

@@ -272,8 +272,8 @@ function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $
   global $l_manager, $l_marketing_manager,$l_technical_manager;
   global $l_number, $l_postcode, $l_region;
   global $l_date, $l_begin, $l_end, $l_proposal, $l_expected, $l_alarm;
-  global $l_all, $l_all_f, $l_find, $c_all;
-  global $display, $l_select_deal;
+  global $l_all, $l_all_f, $l_find, $c_all, $l_select_deal;
+  global $obm, $display;
 
   // --- Var preparation ------------------------------------------------------
 
@@ -296,6 +296,10 @@ function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $
   $date_before = of_date_upd_format(stripslashes($deal['date_before']),true);
   $company_id = $deal['company_id'];
   $role_company = $deal['role_company'];
+  $delegation = $obm['delegation'];
+  if ($deal['delegation'] != '') {
+    $delegation = stripslashes($deal['delegation']);
+  }
 
   // User defined data
   $block_userdata .= of_userdata_dis_search('deal', $deal);
@@ -371,6 +375,8 @@ function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $
   // Selected date field
   $s_date_field[$date_field] = "selected=\"selected\"";
 
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
   $url = url_prepare('deal_index.php');
 
   if ($popup) {
@@ -401,6 +407,7 @@ function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $
     <label>$l_label_start<br />
       <input name=\"tf_label\" size=\"16\" maxlength=\"128\" value=\"$label\" />
     </label>
+    $dis_delegation
     <label>$l_company<br />
       <input name=\"tf_company_name\" size=\"12\" maxlength=\"16\" value=\"$name\" />
     </label>
