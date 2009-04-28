@@ -135,7 +135,11 @@ class Vcalendar_Writer_ICS {
         $params[] = 'PARTSTAT=ACCEPTED';
         break;
 
-      }
+      default:
+        // Skip contact users (or $params[]'less ones)
+        continue 2; // This 'continue' is catched by switch(). With '2' we reach our foreach().
+      } 
+
       $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
       $property = $this->parseProperty($this->parseName($name).';'.implode(';',$params).':'.$value);
       $this->buffer .= $property."\n";
