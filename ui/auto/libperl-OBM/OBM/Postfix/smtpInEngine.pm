@@ -95,7 +95,7 @@ sub updateMaps {
         $self->_log( 'génération des maps SMTP-in annulée', 0 );
 
         for( my $i=0; $i<=$#{$self->{'entitiesUpdateErrorDesc'}}; $i++ ) {
-            $self->_log( $self->{'entitiesUpdateErrorDesc'}->[$i], 4 );
+            $self->_log( $self->{'entitiesUpdateErrorDesc'}->[$i], 0 );
         }
 
         return 1;
