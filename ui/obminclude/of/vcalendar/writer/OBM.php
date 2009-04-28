@@ -106,6 +106,7 @@ class Vcalendar_Writer_OBM {
     }
     $entities['user'][] = $GLOBALS['obm']['uid'];
     $entities['user'] = array_unique($entities['user']);
+    $event['ext_id'] = $vevent->get('uid');
     $event['owner'] = $this->parseOrganizer($vevent->get('organizer'));
     $event['title'] = addslashes($vevent->get('summary'));
     $dtstart = $vevent->get('dtstart');
@@ -222,9 +223,8 @@ class Vcalendar_Writer_OBM {
     if(is_null($id)) {
       return NULL;
     }
-    //FIXME : Have a unique id over all installed obm in the world
-    if(preg_match('/^obm@([0-9]+)$/',$id,$match)) {
-      return $match[1];
+    if(preg_match('/^OBM-.+@.+$/',$id)) {
+      return $id;
     }
     return NULL;
   }

@@ -207,6 +207,20 @@ class Vcalendar_Reader_ICS {
     }
   }
 
+  /**
+   * Ensures the ICS uid is a valid OBM event_ext_id.
+   *
+   * @param int $id
+   * @access public
+   * @return The id or a new one if $id is invalid
+   */
+  function parseUid($id) {
+    if(preg_match('/^OBM-.+@.+$/',$id)) {
+      return $this->parseText($id);
+    } else {
+      return genUniqueExtEventId();
+    }
+  }
 
   /**
    * parseDate

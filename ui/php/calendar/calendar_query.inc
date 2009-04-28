@@ -10,12 +10,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Return events details
 // Parameters:
-//   - $calendar_id
+//   - $calendar_id (can be Event table dependant if is_numeric(), or world-wide
+//                   unique if begins with "OBM-")
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_detail($calendar_id) {
   global $cdg_sql;
 
-  $calendar_id = sql_parse_id($calendar_id, true);
+  if(preg_match('/^OBM-/', $calendar_id)) {
+    $get_id = "event_ext_id = '".addslashes($calendar_id)."'";
+  } else {
+    $calendar_id = sql_parse_id($calendar_id, true);
+    $get_id = "event_id $calendar_id";
+  }
+
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type; 
   $timeupdate = sql_date_format($db_type, 'event_timeupdate', 'timeupdate');
@@ -23,6 +30,7 @@ function run_query_calendar_detail($calendar_id) {
   $multidomain = sql_multidomain('event');
   $query = "SELECT 
     event_id,
+    event_ext_id,
     c.userobm_login AS usercreate,
     u.userobm_login AS userupdate,
     $timeupdate,
@@ -53,7 +61,7 @@ function run_query_calendar_detail($calendar_id) {
     LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
     INNER JOIN UserObm AS o ON event_owner = o.userobm_id
     WHERE event_type='VEVENT'
-    AND event_id $calendar_id
+    AND $get_id
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_detail()');
@@ -636,6 +644,11 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
 function run_query_calendar_insert_event_data($calendar) {
   global $cdg_sql, $obm;
 
+  if(array_key_exists('ext_id', $calendar)) {
+    $ext_id = $calendar['ext_id'];
+  } else {
+    $ext_id = genUniqueExtEventId();
+  }
   if(!is_numeric($calendar['owner']) || $calendar['owner'] <= 0) {
     $owner = $obm['uid'];
   } else {
@@ -709,6 +722,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $obm_q = new DB_OBM;
 
   $query = "INSERT INTO Event (
+    event_ext_id,
     event_timeupdate,                         
     event_timecreate,                         
     event_usercreate,
@@ -733,6 +747,7 @@ function run_query_calendar_insert_event_data($calendar) {
     event_endrepeat,
     event_domain_id)
     VALUES (
+    '$ext_id',
       NOW(),
     NOW(),
     '$obm[uid]',
@@ -1394,6 +1409,7 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $event_duration = $dateend->diffTimestamp($datebegin);
   }
+  $ext_id = genUniqueExtEventId();
 
 
   $obm_q = new DB_OBM;
@@ -1419,7 +1435,8 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     event_location, 
     event_category1_id,
     event_priority,
-    event_domain_id
+    event_domain_id,
+    event_ext_id
   )
   VALUES (
     NOW(),
@@ -1443,7 +1460,8 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     '',
     NULL,
     2,
-    $obm[domain_id]
+    $obm[domain_id],
+    '$ext_id'
   )";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_insert_event_data()');
   $obm_q->query($query);
@@ -1536,8 +1554,10 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $location = $event_q->f('event_location');
     ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
     $datebegin = $calendar['date_begin'];
+    $ext_id = genUniqueExtEventId();
 
     $query = "INSERT INTO Event (
+      event_ext_id,
       event_timeupdate,                         
       event_timecreate,                         
       event_usercreate,
@@ -1563,6 +1583,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       event_domain_id
     )
     VALUES (
+      '$ext_id',
       NOW(),
       NOW(),
       $obm[uid],
@@ -2499,6 +2520,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
     && (count($calendar_entity['user']) > 0) ) {
       $select[] =  "SELECT
         event_id,
+        event_ext_id,
         event_title,
         event_privacy,
         event_priority,
@@ -2645,6 +2667,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     && (count($calendar_entity['user']) > 0) ) {
       $select[] =  "SELECT
         event_id,
+        event_ext_id,
         event_title,
         event_privacy,
         event_priority,
@@ -3993,5 +4016,54 @@ function run_query_calendar_reset($id) {
   $obm_q->query($query);
 }
 
+/**
+ * Returns the OBM product id or create a new one
+ * @access public
+ * @return unique id (21 hex chars sized)
+ */
+function get_or_create_prod_id(){
+  global $cdg_sql;
+
+  $prod_id = get_obm_info('prod_id');
+
+  if(!is_null($prod_id)) {
+    return $prod_id;
+  }
+
+  $prod_id = uniqid(dechex(rand()));
+  $obm_q = new DB_OBM;
+  $query = "INSERT INTO ObmInfo
+            (obminfo_name, obminfo_value) VALUES
+            ('prod_id', '$prod_id')";
+
+  display_debug_msg($query, $cdg_sql, 'get_or_create_prod_id()');
+  $obm_q->query($query);
+
+  return $prod_id;
+}
+
+/**
+ * Generates a world-wide unique event id. Format is :
+ * OBM-<obm version>-<obm prod id>-<hash>@domain
+ * @access public
+ * @return unique id
+ */
+function genUniqueExtEventId() {
+  global $obm_version;
+
+  $domain = $GLOBALS['obm']['domain_name'];
+  $version = 'OBM-'.substr($obm_version, 0, 15).'-'.get_or_create_prod_id();
+
+  /* 255 (max event_ext_id field) - 128 (max domain len) - 21 (prod id)
+     - 15 (max version length guess) - 7 (strlen('OBM---@'))
+     = 84
+  */
+  $max_len = 84;
+  $event_ext_id = '';
+  while(strlen($event_ext_id) < $max_len) {
+    $event_ext_id .= dechex(rand()%256);
+  }
+  return $version.'-'.$event_ext_id.'@'.$domain;
+}
 
 ?>

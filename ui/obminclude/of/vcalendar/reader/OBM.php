@@ -104,7 +104,7 @@ class Vcalendar_Reader_OBM {
     $vevent->set('location', $data['event_location']);
     $vevent->set('categories', array($data['eventcategory1_label']));
     $vevent->set('x-obm-color', $data['event_color']);
-    $vevent->set('uid', $this->parseUid($data['event_id']));
+    $vevent->set('uid', $data['event_ext_id']);
     if(!is_null($data['event_repeatkind']) && $data['event_repeatkind'] != 'none') {
       $vevent->set('rrule',$this->parseRrule($data));
     }
@@ -134,10 +134,6 @@ class Vcalendar_Reader_OBM {
     return 'PUBLIC';
   }
 
-  function parseUid($id) {
-    return 'obm@'.$id;
-  }
-  
   function parsePriority($priority) {
     if($priority == 1) {
       return 9;
