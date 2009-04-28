@@ -239,7 +239,7 @@ function dis_calendar_portal() {
   $end->addDay(6);
   // Minicalendar Head
   while($current->compare($end) <= 0) {
-    $day = $current->get(Of_Date::WEEKDAY_NARROW);
+    $day = $current->localize(Of_Date::WEEKDAY_NARROW);
     $dis_minical_head .= "<td>$day</td>\n";
     $current->addDay(1);
   }

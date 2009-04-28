@@ -283,7 +283,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
   $member = $project['member'];
   $archive = $project['archive'];
   $company_id = $project['company_id'];
-  $type = $project['type_id']
+  $type = $project['type_id'];
 
   if ($popup) {
     $ext_action = $project['ext_action'];
