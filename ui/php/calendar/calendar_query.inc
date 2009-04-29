@@ -2559,6 +2559,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
     && (count($calendar_entity['resource']) > 0) ) {
       $select[] =  "SELECT
         event_id,
+        event_ext_id,
         event_title,
         event_privacy,
         event_priority,
@@ -2598,6 +2599,7 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
 
       $select[] = "SELECT
         event_id,
+        event_ext_id,
         event_title,
         event_privacy,
         event_priority,
@@ -2710,6 +2712,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     && (count($calendar_entity['resource']) > 0) ) {
       $select[] = "SELECT
         event_id,
+        event_ext_id,
         event_title,
         event_privacy,
         event_priority,
@@ -2753,6 +2756,7 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
 
       $select[] = "SELECT
         event_id,
+        event_ext_id,
         event_title,
         event_privacy,
         event_priority,

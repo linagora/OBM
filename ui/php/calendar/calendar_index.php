@@ -751,6 +751,10 @@ function get_calendar_params() {
   if(!is_null($params['date_end'])) {
     $params['date_end'] = new Of_Date($params['date_end']);
   }
+  $params['old_date_begin'] = of_isodate_convert($params['old_date_begin'],true);
+  if(!is_null($params['old_date_begin'])) {
+    $params['old_date_begin'] = new Of_Date($params['old_date_begin']);
+  }  
   if (isset($params['time_begin']) && !is_null($params['date_begin'])) {
     $params['date_begin']->setHour($params['time_begin']);
     $params['date_begin']->setMinute($params['min_begin']);
