@@ -101,6 +101,9 @@ function html_mailshare_search_form($mailshare) {
   $name = stripslashes($mailshare['name']);
   $delegation = stripslashes($mailshare['delegation']);
   $quota = stripslashes($mailshare['quota']);
+  if ( $quota == '' ) {
+    $quota = 0;
+  }
   $email = stripslashes($mailshare['email']);
   $desc = stripslashes($mailshare['description']);
 
@@ -296,7 +299,7 @@ function html_mailshare_consult($mailshare_q) {
 function html_mailshare_form($action, $mailshare_q, $mailshare, $field='') {
   global $l_insert, $l_update, $l_back, $l_admin_permission, $l_header_new;
   global $l_mailshare, $l_name, $l_desc, $l_quota, $l_email;
-  global $cmailshare_default_quota,$obm,$l_mail_server;
+  global $cmailshare_default_quota, $obm, $l_mail_server;
   global $display, $path, $obm, $cgp_use;
   
   // if update mode and first time, values are taken from db

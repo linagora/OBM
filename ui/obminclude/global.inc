@@ -137,6 +137,12 @@ $c_day_fraction = 8;
 // Time : Worked days in a week (start at sunday)
 $c_working_days = array(0,1,1,1,1,1,0);
 
+// Mailshare : default mailshare quota
+$cmailshare_default_quota = 0;
+
+// User : default user mailbox quota
+$cuser_default_quota = 0;
+
 
 // Incident : Generic E-mail for Incident module
 $cmail_incident = '';

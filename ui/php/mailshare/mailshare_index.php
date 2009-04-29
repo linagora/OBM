@@ -342,7 +342,7 @@ function get_mailshare_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/mailshare/mailshare_index.php?action=check_delete&amp;mailshare_id=".$params['mailshare_id'],
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'showlist', 'showlist', 'detailupdate') 
+    'Condition'=> array ('detailconsult', 'showlist', 'showlist', 'update', 'detailupdate') 
                                      	   );
 
 // Delete

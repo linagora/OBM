@@ -1074,6 +1074,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   global $path, $display, $cgp_use;
   global $obm, $c_default_domain, $l_domain, $l_gid, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
+  global $cuser_default_quota;
 
   $noexperie = " checked=\"checked\" ";	
   // if update mode and first time value are taken from database
@@ -1171,6 +1172,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $smb = get_samba_info();
     $smb_home = $smb['samba_home_def'];
     $smb_home_drive = $smb['samba_home_drive_def'];
+    $mail_quota = $cuser_default_quota;
   }
 
   // If parameters have been given, they supercede the default action value
