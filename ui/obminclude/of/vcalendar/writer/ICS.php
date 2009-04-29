@@ -4,6 +4,8 @@ include_once('obminclude/of/Vcalendar.php');
 
 class Vcalendar_Writer_ICS {
 
+  var $parsed_event;
+
   var $buffer;
 
   function Vcalendar_Writer_ICS() {
@@ -26,7 +28,9 @@ class Vcalendar_Writer_ICS {
     }
     $vevents = &$document->getVevents();
     for($i=0; $i < count($vevents); $i++ ) {
+      $this->parsed_event = $vevents[$i];
       $this->writeVevent($vevents[$i]);
+      $this->parsed_event = null;
     }
     $valarms = &$document->getValarms();
     for($i=0; $i < count($valarms); $i++) {
@@ -77,7 +81,11 @@ class Vcalendar_Writer_ICS {
   }
 
   function writeDtstart($name, $value) {
-    $this->buffer .= $this->parseProperty($this->parseName($name). $this->parseTZIDedDate($value))."\n";
+    $this->writeBoundDate($name, $value);
+  }
+
+  function writeDtend($name, $value) {
+    $this->writeBoundDate($name, $value);
   }
 
   function writeOrganizer($name, $value) {
@@ -141,7 +149,7 @@ class Vcalendar_Writer_ICS {
       case 'contact' :
         $contactInfo = get_contact_from_ids(array($attendee['id']));
         $params[] = 'CUTYPE=INDIVIDUAL';
-        $value = 'MAILTO:'.$contactInfo['entity'][ $attendee['id'] ]['label'];
+        $value = 'MAILTO:'.$contactInfo['entity'][ $attendee['id'] ]['email_address'];
         break;
 
       default:
@@ -170,8 +178,18 @@ class Vcalendar_Writer_ICS {
     $this->buffer .= $this->parseProperty($this->parseName($name).':'.implode(',',$value))."\n";
   }
 
-  function writeDuration($name, $value) {
-    $this->buffer .= $this->parseProperty($this->parseName($name).':PT'.$value.'S')."\n";
+  function writeDuration($name, $seconds) {
+    // With all-day events we refers to the bound dates rather than the duration
+    if($this->parsed_event->isAllDay()) {
+      $nb_days = (int) ($seconds / 86400);
+      if($nb_days > 1) {
+        $dtend = clone $this->parsed_event->get('dtstart');
+        $dtend->addSecond($seconds);
+        $this->writeDtend('dtend', $dtend);
+      }
+    } else {
+      $this->buffer .= $this->parseProperty($this->parseName($name).':'.$this->secondsToDuration($seconds))."\n";
+    }
   }
 
   function writeExdate($name, $value) {
@@ -184,27 +202,72 @@ class Vcalendar_Writer_ICS {
   
   /**
    * @param Of_Date $date
+   * @param string $format Date format. Can be ICS_DATETIME or ICS_DATE.
    */
-  function parseDate($date) {
+  function parseDate($date, $format=Of_Date::ICS_DATETIME) {
     $date->setTimezone(new DateTimeZone('GMT'));
-    $return = $date->get(Of_Date::ICS_DATETIME).'Z';
+    $return = $date->get($format);
+    if($format == Of_Date::ICS_DATETIME) {
+      $return .= 'Z';
+    }
     $date->setDefaultTimezone();
     return $return;
   }
   
   /**
+   * Parse a date with the given format, preferably with ICS_DATETIME if possible.
+   *
    * @param Of_Date $date
+   * @param string $format Date format. Can be Of_Date::ICS_DATETIME or Of_Date::ICS_DATE.
    */
-  function parseTZIDedDate($date) {
-    if ($date->getOriginalTimeZone()) {
+  function parseTZIDedDate($date, $format=Of_Date::ICS_DATETIME) {
+    if ($date->getOriginalTimeZone() && $format == Of_Date::ICS_DATETIME) {
       $date->setTimezone(new DateTimeZone($date->getOriginalTimeZone()));
-      $res = ';TZID='. $date->getOriginalTimeZone().':'. $date->get(Of_Date::ICS_DATETIME);
+      $res = ';TZID='. $date->getOriginalTimeZone().':'. $date->get($format);
       $date->setDefaultTimezone();
     } else {
-      $res = ':'. $this->parseDate($date);
+      $res = ':'. $this->parseDate($date, $format);
     }
     
     return $res;
+  }
+
+  /**
+   * Convert a duration in seconds to the ICS DURATION format (witch can include weeks, days, etc.).
+   * See RFC 2445.
+   * @param int $seconds
+   */
+  function secondsToDuration($seconds) {
+    $divs  = array( 604800, 86400, 3600,  60,   1 );
+    $names = array(    'W',   'D',  'H', 'M', 'S' );
+    $duration = 'P';
+    $add_T = 0;
+
+    for($i = 0 ; $i < count($divs) ; $i++) {
+      $n = (int) ($seconds / $divs[$i]);
+      if($n > 0) {
+        if($divs[$i] < 86400 && $add_T == 0) {
+          $duration .= 'T';
+          $add_T = 1;
+        }
+        $duration .= $n.$names[$i];
+        $seconds -= $divs[$i] * $n;
+      }
+    }
+
+    return $duration;
+  }
+
+  /**
+   * @param string $name The ICS field name.
+   * @param Of_Date $value
+   */
+  function writeBoundDate($name, $value) {
+    if($this->parsed_event->isAllDay()) {
+      $this->buffer .= $this->parseProperty($this->parseName($name).$this->parseTZIDedDate($value, Of_Date::ICS_DATE))."\n";
+    } else {
+      $this->buffer .= $this->parseProperty($this->parseName($name).$this->parseTZIDedDate($value, Of_Date::ICS_DATETIME))."\n";
+    }
   }
 }
 ?>

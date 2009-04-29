@@ -66,6 +66,8 @@ class Of_Date extends DateTime {
   const RFC_2822       = 'r';              // DATE_RFC2822 r - RFC 2822 date string
   const TIMESTAMP      = 'U';              // U - unix timestamp
   const ICS_DATETIME   = 'Ymd\THis';       // ICS date time format
+  const ICS_DATE       = 'Ymd';            // ICS date format
+
   // additional formats
   const DATABASE_DATE  = 'Y-m-d H:i:s';
   const ERA            = 'ERA';            // --- short name of era, locale aware,
