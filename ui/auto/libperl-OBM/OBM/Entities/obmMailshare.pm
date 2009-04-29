@@ -125,6 +125,7 @@ sub _init {
     }
 
     # Cyrus quota
+    $mailshareDesc->{'mailshare_cyrus_quota'} = 0 if !defined( $mailshareDesc->{'mailshare_cyrus_quota'} );
     $mailshareDesc->{'mailshare_cyrus_quota'} = $mailshareDesc->{'mailshare_quota'}*1024;
 
     # BAL sub-folders

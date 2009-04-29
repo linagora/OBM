@@ -239,6 +239,7 @@ sub _init {
     }
 
     # Cyrus quota
+    $userDesc->{'userobm_mail_quota'} = 0 if !defined( $userDesc->{'userobm_mail_quota'} );
     $userDesc->{'userobm_mail_quota'} = $userDesc->{'userobm_mail_quota'}*1024;
 
     # BAL sub-folders
