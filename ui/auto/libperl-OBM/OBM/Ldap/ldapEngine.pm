@@ -2,19 +2,15 @@ package OBM::Ldap::ldapEngine;
 
 $VERSION = '1.0';
 
+use OBM::Ldap::utils;
+use OBM::Tools::commonMethods;
+@ISA = ('OBM::Ldap::utils', 'OBM::Tools::commonMethods');
+
 $debug = 1;
 
 use 5.006_001;
 require Exporter;
 use strict;
-
-use OBM::Tools::commonMethods qw(
-        _log
-        dump
-        );
-use OBM::Ldap::utils qw(
-        _modifyAttr
-        );
 
 
 sub new {
