@@ -403,6 +403,9 @@ sub createLdapEntry {
         obmUID => $self->{'entityDesc'}->{'contactentity_entity_id'}
     );
 
+
+    $self->_modifyAttr( $self->{'parent'}->getDesc('domain_name'), $entry, 'obmDomain' );
+
     $self->_modifyAttr( $self->{'entityDesc'}->{'contact_firstname'}, $entry, 'givenName' );
     $self->_modifyAttr( $self->{'entityDesc'}->{'contact_lastname'}, $entry, 'sn' );
     $self->_modifyAttr( $self->{'entityDesc'}->{'contact_title'}, $entry, 'title' );
@@ -475,6 +478,10 @@ sub updateLdapEntry {
     
 
     if( $self->getUpdateEntity() ) {
+        if( $self->_modifyAttr( $self->{'parent'}->getDesc('domain_name'), $entry, 'obmDomain' ) ) {
+            $update = 1;
+        }
+
         if( $self->_modifyAttr( $self->{'entityDesc'}->{'contact_firstname'}, $entry, 'givenName' ) ) {
             $update = 1;
         }
