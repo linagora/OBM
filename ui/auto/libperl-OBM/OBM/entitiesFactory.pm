@@ -264,7 +264,7 @@ sub _loadDomains {
     my( $domainFactory, $enqueueDomain ) = @_;
 
     if( !defined($domainFactory) || ref($domainFactory) ne 'OBM::EntitiesFactory::domainFactory' ) {
-        $self->_log( 'problème au chargement de la factory de domaine', 3 );
+        $self->_log( 'problème au chargement de la factory de domaine', 2 );
         return 1;
     }
 
@@ -281,9 +281,16 @@ sub _loadDomains {
     }
 
     if( !defined($self->{'domain'}) || (ref($self->{'domain'}) ne 'OBM::Entities::obmDomain') ) {
-        $self->_log( 'domain d\'identifiant '.$self->{'domainId'}.' non trouvé', 4 );
+        $self->_log( 'domain d\'identifiant '.$self->{'domainId'}.' non trouvé', 0 );
         return 1;
     }
 
     return 0;
+}
+
+
+sub getDomainEntity {
+    my $self = shift;
+
+    return $self->{'domain'};
 }
