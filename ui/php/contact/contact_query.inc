@@ -673,7 +673,6 @@ function run_query_contact_update($contact) {
   if ($archive == '1') {
     $mailok = '0';
     $newsletter = '0';
-    run_query_update_contact_deal($id);
   }
   $sql_id = sql_parse_id($id, true);
   $query = "UPDATE Contact SET
@@ -1934,43 +1933,4 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
     }
   }
 
-/**
- * run_query_update_contact_deal  
- * 
- * @param mixed $id id of archived contact
- * @access public
- * @return void
- */
-function run_query_update_contact_deal($id) {
-  global $cdg_sql;
-
-  $query = "
-    UPDATE Deal 
-    set deal_contact1_id = deal_contact2_id
-    WHERE deal_contact1_id = $id AND deal_contact1_id = deal_contact2_id;
-    ";
-
-  $obm_q = new DB_OBM();
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, 'run_query_update_contact_deal(1)');
-
-  $query = "
-    UPDATE Deal 
-    set deal_contact2_id = deal_contact1_id
-    WHERE deal_contact2_id = $id AND deal_contact1_id = deal_contact2_id
-    ";
-
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, 'run_query_update_contact_deal(2)');
-
-  $query = "
-    UPDATE Deal 
-    set deal_contact1_id = NULL,
-    deal_contact2_id = NULL
-    WHERE deal_contact2_id = $id AND deal_contact1_id = $id";
-
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql, 'run_query_update_contact_deal(2)');
-
-}
 ?>
