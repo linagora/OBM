@@ -148,7 +148,6 @@ sub _getDomain {
         if( $self->{'source'} =~ /^SYSTEM$/ ) {
             $domainEntity->unsetBdUpdate();
         }else {
-        print "ici\n";
             $domainEntity->setBdUpdate();
         }
 
