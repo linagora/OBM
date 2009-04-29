@@ -46,16 +46,6 @@ sub new {
 
 
 # Needed
-sub DESTROY {
-    my $self = shift;
-
-    $self->_log( 'suppression de l\'objet', 4 );
-
-    $self->{'parent'} = undef;
-}
-
-
-# Needed
 sub _init {
     my $self = shift;
     my( $domainDesc ) = @_;
@@ -97,10 +87,10 @@ sub _init {
         }
     }
 
-    $self->{'domainDesc'} = $domainDesc;
-
     # Est-il Global ?
     $self->{'global'} = $domainDesc->{'domain_global'};
+
+    $self->{'entityDesc'} = $domainDesc;
 
     $self->_log( 'chargement : '.$self->getDescription(), 1 );
 
@@ -108,12 +98,11 @@ sub _init {
 }
 
 
-# Needed
 sub getDescription {
     my $self = shift;
-    my $domaindesc = $self->{'domainDesc'};
+    my $domaindesc = $self->{'entityDesc'};
     
-    my $description = 'domaine d\'ID \''.$domaindesc->{'domain_id'}.'\'';
+    my $description = 'domaine d\'ID \''.$self->getId().'\'';
 
     if( $domaindesc->{'domain_label'} ) {
         $description .= ', \''.$domaindesc->{'domain_label'}.'\'';
@@ -123,20 +112,6 @@ sub getDescription {
 }
 
 
-# Needed
-sub getDesc {
-    my $self = shift;
-    my( $desc ) = @_;
-
-    if( $desc && !ref($desc) ) {
-        return $self->{'domainDesc'}->{$desc};
-    }
-
-    return undef;
-}
-
-
-# Needed
 sub getDomainId {
     my $self = shift;
 
@@ -144,15 +119,13 @@ sub getDomainId {
 }
 
 
-# Needed
 sub getId {
     my $self = shift;
 
-    return $self->{'domainDesc'}->{'domain_id'};
+    return $self->{'entityDesc'}->{'domain_id'};
 }
 
 
-# Needed
 sub getLdapServerId {
     my $self = shift;
 
@@ -164,22 +137,6 @@ sub isGlobal {
     my $self = shift;
 
     return $self->{'global'};
-}
-
-
-# Needed
-sub setParent {
-    my $self = shift;
-    my( $parent ) = @_;
-
-    if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
-        $self->_log( 'description du domaine parent incorrecte', 3 );
-        return 1;
-    }
-
-    $self->{'parent'} = $parent;
-
-    return 0;
 }
 
 
@@ -218,7 +175,7 @@ sub _getRootDnPrefix {
             $rootDnPrefix = 'dc='.$part.$rootDnPrefix;
         }
     }else {
-        $rootDnPrefix = 'dc='.$self->{'domainDesc'}->{'domain_name'}.','.$self->_getParentDn();
+        $rootDnPrefix = 'dc='.$self->{'entityDesc'}->{'domain_name'}.','.$self->_getParentDn();
     }
 
     return $rootDnPrefix;
@@ -317,11 +274,11 @@ sub createLdapEntry {
             $entry->add(
                 objectClass => $self->{'objectclass'},
                 dc => $dn[0]->[1],
-                o => $self->{'domainDesc'}->{'domain_label'}
+                o => $self->{'entityDesc'}->{'domain_label'}
             );
 
-            if( $self->{'domainDesc'}->{'domain_description'} ) {
-                $entry->add( description => $self->{'domainDesc'}->{'domain_description'} );
+            if( $self->{'entityDesc'}->{'domain_description'} ) {
+                $entry->add( description => $self->{'entityDesc'}->{'domain_description'} );
             }
 
             last SWITCH;
@@ -368,11 +325,11 @@ sub updateLdapEntry {
 
     SWITCH: {
         if( lc($dn[0]->[0]) eq 'dc' ) {
-            if( $self->_modifyAttr( $self->{'domainDesc'}->{'domain_label'}, $entry, 'o' ) ) {
+            if( $self->_modifyAttr( $self->{'entityDesc'}->{'domain_label'}, $entry, 'o' ) ) {
                 $update = 1;
             }
 
-            if( $self->_modifyAttr( $self->{'domainDesc'}->{'domain_description'}, $entry, 'description' ) ) {
+            if( $self->_modifyAttr( $self->{'entityDesc'}->{'domain_description'}, $entry, 'description' ) ) {
                 $update = 1;
             }
             last SWITCH;
@@ -395,7 +352,7 @@ sub updateLdapEntry {
 sub isSambaDomain {
 	my $self = shift;
 
-	if ( defined($self->{'domainDesc'}->{'samba_sid'}) ){
+	if ( defined($self->{'entityDesc'}->{'samba_sid'}) ){
 		return 1;
 	}else{
 		return 0;

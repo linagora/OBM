@@ -15,12 +15,86 @@ require Exporter;
 use strict;
 
 
+sub _init {
+    my $self = shift;
+    my( $entityDesc ) = @_;
+
+    return 1;
+}
+
+
 sub DESTROY {
     my $self = shift;
 
     $self->_log( 'suppression de l\'objet', 4 );
 
     $self->{'parent'} = undef;
+}
+
+
+sub getDescription {
+    my $self = shift;
+
+    my $description = 'entity ID \''.$self->getId().'\'';
+
+    return $description;
+}
+
+
+# Needed
+sub getDesc {
+    my $self = shift;
+    my( $desc ) = @_;
+
+    if( $desc && !ref($desc) ) {
+        return $self->{'entityDesc'}->{$desc};
+    }
+
+    return undef;
+}
+
+
+sub getDomainId {
+    my $self = shift;
+
+    return undef;
+}
+
+
+sub getId {
+    my $self = shift;
+
+    return undef;
+}
+
+
+sub getLdapServerId {
+    my $self = shift;
+
+    return undef;
+}
+
+
+# Needed
+sub setParent {
+    my $self = shift;
+    my( $parent ) = @_;
+
+    if( ref($parent) ne 'OBM::Entities::obmDomain' ) {
+        $self->_log( 'description du domaine parent incorrecte', 3 );
+        return 1;
+    }
+
+    $self->{'parent'} = $parent;
+
+    return 0;
+}
+
+
+sub _getParentDn {
+    my $self = shift;
+
+    return undef;
 }
 
 
@@ -119,13 +193,29 @@ sub getUpdated {
 }
 
 
-sub getDesc {
+sub getDnPrefix {
     my $self = shift;
-    my( $desc ) = @_;
 
-    if( $desc && !ref($desc) ) {
-        return $self->{'entityDesc'}->{$desc};
-    }
+    return undef;
+}
+
+
+sub getCurrentDnPrefix {
+    my $self = shift;
+
+    return undef;
+}
+
+
+sub createLdapEntry {
+    my $self = shift;
+
+    return undef;
+}
+
+
+sub updateLdapEntry {
+    my $self = shift;
 
     return undef;
 }
