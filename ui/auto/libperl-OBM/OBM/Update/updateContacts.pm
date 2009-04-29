@@ -77,13 +77,14 @@ sub update {
         return 1;
     }
 
-    if( $self->_deleteDeletedContact() ) {
-        return 1;
-    }
 
     for( my $i=0; $i<=$#{$domainIdList}; $i++ ) {
         if( $self->_updateUpdatedDomainContacts( $domainIdList->[$i] ) ) {
             delete( $self->{'entitiesFactories'}->{$domainIdList->[$i]} );
+        }
+
+        if( $self->_deleteDeletedContact( $domainIdList->[$i] ) ) {
+            return 1;
         }
     }
 
@@ -192,6 +193,7 @@ sub _updateUpdatedDomainContacts {
 
 sub _deleteDeletedContact {
     my $self = shift;
+    my( $domainId ) = @_;
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
@@ -200,13 +202,12 @@ sub _deleteDeletedContact {
         return 1;
     }
 
-    my $query = 'SELECT deletedcontact_contact_id AS contact_id
-                FROM DeletedContact';
+    my $query = 'SELECT contactentity_entity_id
+                 FROM ContactEntity
+                 INNER JOIN Contact
+                    ON contactentity_contact_id = contact_id
+                    AND contact_domain_id = '.$domainId;
 
-    if( $self->{'timestamp'} ) {
-        $query .= ' WHERE unix_timestamp(deletedcontact_timestamp) > \''.$self->{'timestamp'}.'\')';
-    }
-   
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
         return 1;
@@ -214,24 +215,18 @@ sub _deleteDeletedContact {
 
     my %contactIds;
     while( my $contact = $queryResult->fetchrow_hashref ) {
-        $contactIds{$contact->{'contact_id'}} = 1;
+        $contactIds{$contact->{'contactentity_entity_id'}} = 1;
     }
 
-    my @contactIds = keys(%contactIds);
+    my $domainEntity = $self->{'entitiesFactories'}->{$domainId}->getDomainEntity();
 
-    require OBM::EntitiesFactory::factoryProgramming;
-    my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
-    if( !defined($programmingObj) ) {
-        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
-        return 1;
-    }
-    if( $programmingObj->setEntitiesType( 'CONTACT' ) || $programmingObj->setUpdateType( 'DELETE' ) || $programmingObj->setEntitiesIds( \@contactIds )) {
-        $self->_log( 'problème lors de l\'initialisation du programmateur de f actory', 4 );
+    require OBM::Ldap::ldapContactEngine;
+    my $ldapContactEngine = OBM::Ldap::ldapContactEngine->new();
+    if( !$ldapContactEngine ) {
         return 1;
     }
 
-    if( $self->_programEntitiesFactory( $programmingObj ) ) {
-        $self->_log( 'probleme lors de la programmation  des contacts supprimés, 3' );
+    if( $ldapContactEngine->setEntitiesIds(\%contactIds) || $ldapContactEngine->deleteLdapContacts($domainEntity) ) {
         return 1;
     }
 

@@ -27,7 +27,7 @@ sub new {
     }
     $self->setParent( $parent );
 
-    if( $self->_init( $contactDesc ) ) {
+    if( defined($contactDesc) && $self->_init( $contactDesc ) ) {
         $self->_log( 'problème lors de l\'initialisation du contact', 1 );
         return undef;
     }
