@@ -114,6 +114,7 @@ class Vcalendar_Writer_ICS {
         $params[] = 'CUTYPE=INDIVIDUAL';
         $params[] = 'CN='.$this->parseText($userInfo['firstname'].' '.$userInfo['lastname']);
         $params[] = 'PARTSTAT='.$partstat;
+        $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
         break;
       case 'resource' :          
         $resourceInfo = get_entity_info($attendee['id'],'resource');
@@ -121,6 +122,7 @@ class Vcalendar_Writer_ICS {
         $params[] = 'CUTYPE=RESOURCE';
         $params[] = 'CN='.$this->parseText($resourceInfo['label']);          
         $params[] = 'PARTSTAT='.$partstat;
+        $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
         break;
       case 'group' :
         $groupInfo = get_group_info($attendee ['id']);
@@ -128,19 +130,25 @@ class Vcalendar_Writer_ICS {
         $params[] = 'CUTYPE=GROUP';
         $params[] = 'CN='.$this->parseText($groupInfo['name']);
         $params[] = 'PARTSTAT='.$partstat;
+        $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
         break;
       case 'task' :
         $mail =  'MAILTO:';
         $params[] = 'CUTYPE=X-TASK';          
         $params[] = 'PARTSTAT=ACCEPTED';
+        $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
+        break;
+      case 'contact' :
+        $contactInfo = get_contact_from_ids(array($attendee['id']));
+        $params[] = 'CUTYPE=INDIVIDUAL';
+        $value = 'MAILTO:'.$contactInfo['entity'][ $attendee['id'] ]['label'];
         break;
 
       default:
-        // Skip contact users (or $params[]'less ones)
+        // Skip $params[]'less entities
         continue 2; // This 'continue' is catched by switch(). With '2' we reach our foreach().
       } 
 
-      $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
       $property = $this->parseProperty($this->parseName($name).';'.implode(';',$params).':'.$value);
       $this->buffer .= $property."\n";
     }

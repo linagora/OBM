@@ -96,10 +96,12 @@ class Vcalendar_Writer_OBM {
     if(!is_null($attendees)) {
       if(is_array($attendees) && !array_key_exists('entity',$attendees)) {
         foreach($attendees as $attendee) {
+          $this->createUnknownContact($attendee);
           $entities[$attendee['entity']][] = $attendee['id'];
           $states[$attendee['entity']][$attendee['id']] = $attendee['state'];
         }
       } elseif(!is_null($attendees)) {
+        $this->createUnknownContact($attendees);
         $entities[$attendees['entity']][] = $attendees['id'];
         $states[$attendees['entity']][$attendees['id']] = $attendees['state'];
       }
@@ -164,6 +166,14 @@ class Vcalendar_Writer_OBM {
     $event['color'] = $vevent->get('x-obm-color');
     $event['properties'] = $vevent->get('x-obm-properties');
     return array('event' => $event, 'entities' => $entities, 'states' => $states);
+  }
+
+  function createUnknownContact(&$attendee) {
+    if(is_array($attendee['id']) && $attendee['entity'] == 'contact') {
+      list( $id ) = run_query_insert_others_attendees(
+                     array( 'others_attendees' => array($attendee['id']['email']) ));
+      $attendee['id'] = $id;
+    }
   }
 
   function parseAttendee() {

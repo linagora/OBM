@@ -400,7 +400,7 @@ class Vcalendar_Reader_ICS {
    }return NULL;
   }
 
-  function getAttendeeId($attendee, $options, $entity='user') {
+  function getAttendeeId($attendee, $options, &$entity='user') {
     if(!is_null($options['x-obm-id'])) {
       if(Vcalendar_Utils::entityExist($options['x-obm-id'], $entity)) return $options['x-obm-id'];
     }
@@ -414,7 +414,28 @@ class Vcalendar_Reader_ICS {
     }
 
     if(is_array($attendee)) {
-      return $this->getOBMId($attendee, $entity);
+      if(isset($attendee['mail'])) {
+        if(isset($this->mails[$attendee['mail']])) {
+          return $this->mails[$attendee['mail']][$entity];
+        }
+        if(isset($this->mails[$attendee['email']])) {
+          return $this->mails[$attendee['email']][$entity];
+        }
+      }
+      if(isset($attendee['cn']) && isset($this->cns[$attendee['cns']])) {
+        return $this->cns[$entity][$attendee['cns']];
+      }
+
+      $id = $this->getOBMId($attendee, $entity);
+      // If the entity is an unknown user, assume it's a contact
+      if($id === null && $entity == 'user') {
+        $entity = 'contact';
+        $id = $this->getOBMId($attendee, $entity);
+        if($id === null) {
+          return $attendee; // No luck, keep this for future contact creation
+        }
+      }
+      return $id;
     }
     return NULL;
   }
@@ -436,17 +457,8 @@ class Vcalendar_Reader_ICS {
   }
 
   function getOBMId($attendee, $entity) {
-    if(isset($attendee['mail'])) {
-      if(isset($this->mails[$attendee['mail']])) {
-        return $this->mails[$attendee['mail']][$entity];
-      }
-      if(isset($this->mails[$attendee['email']])) {
-        return $this->mails[$attendee['email']][$entity];
-      }
-    }
-    if(isset($attendee['cn']) && isset($this->cns[$attendee['cns']])) {
-      return $this->cns[$entity][$attendee['cns']];
-    }
+    global $cdg_sql;
+
     $db = new DB_OBM;
     if(!is_null($attendee['cn'])) {
       $this->cns[$entity][$attendee['cn']] = NULL;
@@ -465,6 +477,7 @@ class Vcalendar_Reader_ICS {
               FROM ('.$entityTable.') as Entity WHERE (1 = 0 '.$cn.' '.$mail.') 
               AND domain_id '.sql_parse_id($GLOBALS['obm']['domain_id'], true).'
               GROUP BY id, mail, cn';
+    display_debug_msg($query, $cdg_sql, 'getOBMId');
     $db->query($query);
     while($db->next_record()) {
       if((!is_null($attendee['cn']) && strtolower($db->f('cn')) == $attendee['cn']) ||
@@ -500,6 +513,18 @@ class Vcalendar_Reader_ICS {
         $concat[2]["value"] = "userobm_lastname";
         $label = sql_string_concat($db->type, $concat);
         return "SELECT userobm_domain_id as domain_id, $label as cn, userobm_id as id, userobm_email as mail, 'user' as kind FROM UserObm";
+        break;
+      case 'contact' :
+        $concat = array ( array( 'type' => 'field',  'value' => 'contact_firstname' ),
+                          array( 'type' => 'string', 'value' => ' ' ),
+                          array( 'type' => 'field',  'value' => 'contact_middlename' ),
+                          array( 'type' => 'string', 'value' => ' ' ),
+                          array( 'type' => 'field',  'value' => 'contact_lastname' ));
+        $cn = sql_string_concat($db->type, $concat);
+        return "SELECT contact_id AS id, contact_domain_id AS domain_id, $cn AS cn, email_address AS mail, 'user' AS kind
+                FROM Contact
+                INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+                INNER JOIN Email ON email_entity_id = contactentity_entity_id";
         break;
       default:
         return NULL;
