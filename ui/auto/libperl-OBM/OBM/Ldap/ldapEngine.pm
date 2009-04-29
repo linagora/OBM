@@ -9,14 +9,18 @@ use OBM::Tools::commonMethods;
 $debug = 1;
 
 use 5.006_001;
-require Exporter;
 use strict;
 
 
 sub new {
     my $class = shift;
+    my $self = undef;
 
-    my $self = bless { }, $class;
+    if( !ref($class) ) {
+        $self = bless { }, $class;
+    }else {
+        $self = $class;
+    }
 
     require OBM::Parameters::common;
     if( !$OBM::Parameters::common::obmModules->{'ldap'} ) {
