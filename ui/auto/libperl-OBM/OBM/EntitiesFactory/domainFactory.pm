@@ -69,7 +69,7 @@ sub _start {
     }
 
     if( !$domain->isGlobal && !$domain->getParent() ) {
-        $self->_log( 'problème lors du chargement du domaine père de '.$domain->getDescription(), 3 );
+        $self->_log( 'problème lors du chargement du domaine père de '.$domain->getDescription(), 0 );
         $self->_log( 'le domaine père (global) doit être créé dans le système avant de pouvoir créer '.$domain->getDescription(), 1 );
         return 0;
     }
@@ -148,6 +148,7 @@ sub _getDomain {
         if( $self->{'source'} =~ /^SYSTEM$/ ) {
             $domainEntity->unsetBdUpdate();
         }else {
+        print "ici\n";
             $domainEntity->setBdUpdate();
         }
 

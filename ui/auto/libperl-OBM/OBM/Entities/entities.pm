@@ -234,6 +234,7 @@ sub isMailAvailable {
 }
 
 
+# Needed : sieveEngine
 # Get if the entity can have mail permission
 sub isSieveAvailable {
     my $self = shift;
@@ -328,14 +329,6 @@ sub getMailboxDefaultFolders {
 
 
 # Needed : sieveEngine
-sub isSieveAvailable {
-    my $self = shift;
-
-    return 0;
-}
-
-
-# Needed : sieveEngine
 sub getSieveVacation {
     my $self = shift;
 
@@ -348,13 +341,6 @@ sub getSieveNomade {
     my $self = shift;
 
     return undef;
-}
-
-
-sub getBdUpdate {
-    my $self = shift;
-
-    return 0;
 }
 
 
