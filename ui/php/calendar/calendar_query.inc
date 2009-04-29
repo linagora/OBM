@@ -3558,6 +3558,7 @@ function run_query_insert_others_attendees($calendar) {
         array_push($ret, $obm_q->f('contact_id'));
       }
     } else {
+      list( $first_name, $last_name ) = guess_name_from_email($email);
       // Insert contact
       $query = "INSERT INTO Contact (contact_timeupdate,
         contact_timecreate,
@@ -3575,8 +3576,8 @@ function run_query_insert_others_attendees($calendar) {
         $uid,
         $uid,
         $domain_id,
-        '$email',
-        '',
+        '$last_name',
+        '$first_name',
         '$uid',
         '1',
         '0',
@@ -3603,6 +3604,19 @@ function run_query_insert_others_attendees($calendar) {
 
 }
 
+function guess_name_from_email($email) {
+  $first_name = '';
+  $last_name  = '';
+
+  if(preg_match('/(.+?)\.(.+?)@/', $email, $match)) {
+    $first_name = ucfirst(strtolower($match[1]));
+    $last_name  = strtoupper($match[2]);
+  } elseif(preg_match('/([^.]+)@/', $email, $match)) {
+    $last_name = ucfirst(strtolower($match[1]));
+  }
+
+  return array( $first_name, $last_name );
+}
 
 /**
  * Describe an Event 

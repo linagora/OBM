@@ -1748,7 +1748,7 @@ function get_userobm_from_ids($users) {
  * Get users infos from the uid array given
  * Used by: agenda
  * @param contacts : array of contacts id
- * @return array [ids], [entity] (label=>)
+ * @return array [ids], [entity] (label=>, email_address=>)
  **/
 function get_contact_from_ids($contacts) {
   global $cdg_sql;
@@ -1761,6 +1761,8 @@ function get_contact_from_ids($contacts) {
     $where .= ')';
     $query = "SELECT *
       FROM Contact
+      INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+      INNER JOIN Email ON email_entity_id = contactentity_entity_id
       WHERE contact_archive = 0
       AND contact_id IN $where
       ORDER by contact_lastname";
@@ -1771,8 +1773,9 @@ function get_contact_from_ids($contacts) {
       $id = $obm_q->f('contact_id');
       $lname = $obm_q->f('contact_lastname');
       $fname = $obm_q->f('contact_firstname');
+      $mail  = $obm_q->f('email_address');
       $res['ids'][] = $id;
-      $res['entity'][$id] = array('label' => "$lname $fname");
+      $res['entity'][$id] = array('label' => "$lname $fname", 'email_address' => $mail);
     }
   } else {
     $res = '';
