@@ -1,7 +1,7 @@
-# Definition des objets et attributs nécessaires a OBM
+# Objects and attributes definition, needed by OBM
 
-# Attribut : mailBoxServer
-# Le serveur hébergeant la BAL locale de l'utilisateur.
+# Attribute: mailBoxServer
+# Entity OBM domain name
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.13
     NAME 'obmDomain'
     DESC 'OBM domain for the entity'
@@ -10,10 +10,19 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.13
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
     SINGLE-VALUE )
 
-# Attribut : webAccess
-# Gestion de l'acces web de l'utilisateur. 
-#   REJECT : l'utilisateur n'a pas acces au web.
-#   PERMIT : l'utilisateur a acces au web.
+# Attribute: obmUID
+# OBM unique identifier
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.21 
+    NAME 'obmUID'
+    DESC 'OBM unique identifier'
+    EQUALITY integerMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+    SINGLE-VALUE )
+
+# Attribute: webAccess
+# Entity web access
+#   REJECT : web acces forbiden
+#   PERMIT : web access allowed
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.1
         NAME 'webAccess'
         DESC 'Web access authorization. PERMIT: ok, REJECT:nok'
@@ -22,10 +31,10 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.1
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{5}
         SINGLE-VALUE )
 
-# Attribut : mailAccess
-# Gestion de l'acces a la messagerie pour l'utilisateur.
-#   PERMIT : l'utilisateur a acces a la messagerie.
-#   REJECT : l'utilisateur n'a pas acces a la messagerie.
+# Attribute: mailAccess
+# Entity mail permission
+#   PERMIT : mail access allowed
+#   REJECT : web access forbiden
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.2
         NAME 'mailAccess'
         DESC 'Mail access authorization. PERMIT: ok, REJECT: nok'
@@ -34,10 +43,10 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.2
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{10}
         SINGLE-VALUE )
 
-# Attribut : mailLocalOnly
-# Gestion de l'acces a la messagerie pour l'utilisateur.
-#   local_only : l'utilisateur a acces a la messagerie locale uniquement ;
-#   attribut absent, acces total a la messagerie.
+# Attribute: mailLocalOnly
+# Entity mail limitation
+#   local_only : entity can send mail to local recipient only (not supported)
+#   no value : no mail restriction
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.3
         NAME 'mailLocalOnly'
         DESC 'Local mail restriction. non existent or local_only'
@@ -46,8 +55,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.3
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{20}
         SINGLE-VALUE )
 
-# Attribut : mailAlias
-# Liste des alias d'un utilisateur.
+# Attribute: mailAlias
+# Entity mail alias
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.4
     NAME 'mailAlias'
     DESC 'Alias list for users'
@@ -55,8 +64,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.4
     SUBSTR caseIgnoreIA5SubstringsMatch
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
 
-# Attribut : mailBox
-# Liste des BAL de livraisons pour un utilisateur.
+# Attribute: mailBox
+# Entity BAL name
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.5
     NAME 'mailBox'
     DESC 'RFC1274: RFC822 Mailbox'
@@ -64,8 +73,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.5
     SUBSTR caseIgnoreIA5SubstringsMatch
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
 
-# Attribut : mailBoxServer
-# Le serveur hébergeant la BAL locale de l'utilisateur.
+# Attribute: mailBoxServer
+# Cyrus IMAP backend on which entity mailbox is
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.12
     NAME 'mailBoxServer'
     DESC 'User mailbox server'
@@ -74,9 +83,10 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.12
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
     SINGLE-VALUE )
 
-# Attribut : hiddenUser
-# Attribut à utiliser dans les ACL LDAP afin de cacher tout ou partie de la
-# description de l'utilisateur (pour les requêtes anonymes par exemple)
+# Attribute: hiddenUser
+# Used by LDAP ACL to hide all or part of LDAP entity description according to
+# OBM hide entity option
+# Access to hide part can be allowed by LDAP ACLs
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.14
     NAME 'hiddenUser'
     DESC 'User must be hidden for any/some LDAP query'
@@ -84,8 +94,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.14
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
     SINGLE-VALUE )
 
-# Attribut : externalContactEmail
-# Attribut permettant de renseigner les adresses mails des contacts externes
+# Attribute: externalContactEmail
+# OBM entity external contact mail addresses
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.15
     NAME 'externalContactEmail'
     DESC 'External contact e-mail address'
@@ -93,8 +103,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.15
     SUBSTR caseIgnoreIA5SubstringsMatch
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
 
-# Attribut : delegation
-# Attribut permettant de renseigner la délégation de l'utilisateur
+# Attribute: delegation
+# OBM entity delegation
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.19
     NAME 'delegation'
     DESC 'User Delegation'
@@ -103,8 +113,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.19
     SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256}
     SINGLE-VALUE )
 
-# Attribut : direction
-# Attribut permettant de renseigner la direction de l'utilisateur
+# Attribute: direction
+# OBM entity direction
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.20
     NAME 'direction'
     DESC 'User Direction'
@@ -114,7 +124,7 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.20
     SINGLE-VALUE )
 
 # Classe d'objet: obmUser
-# complète la description d'un utilisateur avec les paramètres OBM
+# Extend OBM user LDAP description
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.1
 	NAME 'obmUser'
 	DESC 'OBM user description'
@@ -122,8 +132,8 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.1
     MUST uid
 	MAY ( webAccess $ mailAccess $ mailAlias $ mailLocalOnly $ mailBox $ mailBoxServer $ obmDomain $ personalTitle $ organizationName $ hiddenUser $direction $ delegation ) )
 
-# Objet : obmSystemUser
-# Definition de l'objet specifique a l'application OBM.
+# Object: obmSystemUser
+# Extend OBM system user LDAP description
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.5
 	NAME 'obmSystemUser'
 	DESC 'OBM system user description'
@@ -131,8 +141,8 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.5
     MUST uid
 	MAY ( obmDomain ) )
 
-# Objet : obmGroup
-# Definition de l'objet specifique a l'application OBM.
+# Object: obmGroup
+# Extend OBM group LDAP description
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.2
     NAME 'obmGroup'
     DESC 'OBM special groups description'
@@ -140,9 +150,8 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.2
     MUST cn
     MAY ( mailBox $ mail $ mailAlias $ mailAccess $ obmDomain $ externalContactEmail ) )
 
-# Objet : obmMailShare
-# Definition de l'objet permettant de stocker la description des repertoires
-# partages
+# Object: obmMailShare
+# Extend OBM mailshare LDAP description
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.3
     NAME 'obmMailShare'
     DESC 'OBM Mail Share Directory description'
@@ -150,8 +159,8 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.3
     MUST ( cn )
     MAY ( mailBox $ mailBoxServer $ mail $ description $ mailAlias $ mailAccess $ obmDomain ) )
 
-# Objet : obmHost
-# Definition de l'objet permettant ed stocker la description des hôtes
+# Object: obmHost
+# Extend OBM host LDAP description
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.7
     NAME 'obmHost'
     DESC 'OBM special hosts description'
@@ -159,9 +168,8 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.7
     MUST cn
     MAY ( obmDomain $ ipHostNumber ) )
 
-# Attribut : myDestination
-# Permet de stocker la liste des domaines locaux. plusieurs attributs
-# 'myDestination' sont possibles
+# Attribute: myDestination
+# Mail domain to an OBM domain
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.6
         NAME 'myDestination'
         DESC 'Mail local domains'
@@ -169,9 +177,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.6
         SUBSTR caseIgnoreSubstringsMatch
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
-# Attribut : myNetwork
-# Permet de stocker la liste des plages d'adresses a considerer comme locales
-# Plusieurs 'myNetworks' sont possibles
+# Attribute: myNetwork
+# Mynetwork to an OBM domain
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.7
         NAME 'myNetwork'
         DESC 'Mail local networks'
@@ -179,9 +186,9 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.7
         SUBSTR caseIgnoreSubstringsMatch
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
-# Attribut : relayhost
-# Permet de stocker le relayhost a utiliser. Il doit etre precise sous la forme proto:adresseIP
-# C'est sur ce serveur que les courriers local est dirige.
+# Attribute: relayhost
+# Relayhost to an OBM domain. All local mails are routed by this relay.
+# Syntax: proto:IP
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.8
         NAME 'relayhost'
         DESC 'Relay Host'
@@ -190,9 +197,9 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.8
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{50} 
         SINGLE-VALUE )
 
-# Attribut : smarthost
-# Permet de stocker le smarthost a utiliser. Il doit etre precise sous la forme proto:adresseIP
-# C'est sur ce serveur que les courriers non locaux sont diriges.
+# Attribute: smarthost
+# Smarthost to an OBM domain. All non local mails are routed by this relay.
+# Syntax: proto:IP
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.9
         NAME 'smarthost'
         DESC 'Smart Host'
@@ -201,9 +208,7 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.9
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{50} 
         SINGLE-VALUE )
 	
-# Attribut : localRestrictionSender
-# Permet de stocker la police par defaut a appliquer aux mails dont le champs
-# FROM fait partie d'un domaine local
+# Attribute: localRestrictionSender - not supported
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.10
         NAME 'localRestrictionSender'
         DESC 'Default policies for local sender'
@@ -212,8 +217,7 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.10
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{10} 
         SINGLE-VALUE )
 
-# Attribut : toLocalDomain
-# Permet de stocker la police par defaut a appliquer aux mails...
+# Attribute: toLocalDomain - not supported
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.11
         NAME 'toLocalDomain'
         DESC 'Default policies for local recipient'
@@ -222,8 +226,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.11
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{10} 
         SINGLE-VALUE )
 
-# Attribut : imapHost
-# Hôte(s) serveur(s) IMAP pour le domaine.
+# Attribute: imapHost
+# IMAP servers list to an OBM domain
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.16
         NAME 'imapHost'
         DESC 'IMAP Hosts for domain'
@@ -231,8 +235,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.16
         SUBSTR caseIgnoreSubstringsMatch
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
-# Attribut : smtpInHost
-# Hôte(s) serveur(s) SMTP entrant pour le domaine.
+# Attribute: smtpInHost
+# SMTP-in servers list to an OBM domain
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.17
         NAME 'smtpInHost'
         DESC 'SMTP-in Hosts for domain'
@@ -240,8 +244,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.17
         SUBSTR caseIgnoreSubstringsMatch
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
-# Attribut : smtpOutHost
-# Hôte(s) serveur(s) SMTP sortant pour le domaine.
+# Attribute: smtpOutHost
+# SMTP-out servers list to an OBM domain
 attributetype ( 1.3.6.1.4.1.25469.1.1.1.18
         NAME 'smtpOutHost'
         DESC 'SMTP-out Hosts for domain'
@@ -249,8 +253,8 @@ attributetype ( 1.3.6.1.4.1.25469.1.1.1.18
         SUBSTR caseIgnoreSubstringsMatch
         SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
-# Objet : obmMailServer
-# Definition de l'objet 'obmMailServer'
+# Object: obmMailServer
+# Mail servers configuration options to an OBM domain
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.4
     NAME 'obmMailServer'
     DESC 'Mail servers configuration for the domain'
@@ -258,10 +262,42 @@ objectclass ( 1.3.6.1.4.1.25469.1.1.2.4
     MUST ( cn )
     MAY ( myDestination $ obmDomain $ imapHost $ smtpInHost $ smtpOutHost ) )
 
-# objet : obmSamba
-# Definition de l'objet 'obmSamba'
+# Object: obmSamba
+# Extend Samba OBM entities
 objectclass ( 1.3.6.1.4.1.25469.1.1.2.6
     NAME 'obmSamba'
     DESC 'Samba OBM informations'
     SUP top AUXILIARY
     MAY ( obmDomain ) )
+
+# Attribute: workUrl
+# Contact work URL to Mozilla compatibility
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.22
+    NAME 'workUrl'
+    DESC 'OBM contact work URL (Mozilla)'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# Attribute: URL
+# Contact work URL to MS compatibility
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.23
+    NAME 'URL'
+    DESC 'Personal OBM contact work URL (MS)'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# Attribute: company
+# Contact company name to MS Outlook compatibility
+attributetype ( 1.3.6.1.4.1.25469.1.1.1.24 NAME ( 'company' )
+    DESC 'RFC2256: organization this object belongs to'
+    SUP name )
+
+# Object : obmContact
+# Extend OBM contact
+objectclass ( 1.3.6.1.4.1.25469.1.1.2.8 
+    NAME 'obmContact'
+    DESC 'OBM contacts description'
+    SUP top AUXILIARY
+    MAY ( obmDomain $ obmUID $ URL $ workUrl $ company ) )
