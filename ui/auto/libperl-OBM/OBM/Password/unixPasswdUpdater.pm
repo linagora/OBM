@@ -10,7 +10,6 @@ use OBM::Ldap::utils;
 $debug = 1;
 
 use 5.006_001;
-require Exporter;
 use strict;
 
 
