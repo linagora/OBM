@@ -216,7 +216,7 @@ function get_time_stat_tasktype($time) {
 
   $obm_q = new DB_OBM;
   $iftd_begin = sql_if($obm_q->type, "timetask_date < '$date_begin'", 'timetask_length', 0);
-  $iftd_end  = sql_if($obm_q->type, "timetask_date < '$date_begin' and timetask_date <= '$date_end' ", 'timetask_length', 0);
+  $iftd_end  = sql_if($obm_q->type, "timetask_date >= '$date_begin' and timetask_date <= '$date_end' ", 'timetask_length', 0);
   $query = "
     SELECT
       timett.tasktype_id as time_tasktype_id,
