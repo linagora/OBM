@@ -32,7 +32,7 @@ function dis_report_help($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_report_consult($mode) {
   global $l_report,$l_valid_report, $l_all_services, $l_service;
-  global $report, $service;
+  global $report, $service, $l_choose_report;
   
 
   $display["title"] = $l_report;
@@ -56,7 +56,7 @@ function html_report_consult($mode) {
     <legend>$l_report</legend>
 
     <select id=\"sel_type\" onchange=\"display_js(this.options[this.selectedIndex])\" name=\"sel_type\">
-    <option id=\"opt_choix\" value=\"\">  Choisir un type de report </option>
+    <option id=\"opt_choix\" value=\"\">  $l_choose_report </option>
     $option
     </select>
     </fieldset>

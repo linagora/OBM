@@ -65,6 +65,7 @@ $ico_profile        = "$theme_path/ico_group.gif";
 $ico_ref            = "$theme_path/ico_ref.gif";
 $ico_resource       = "$theme_path/ico_resource.gif";
 $ico_resourcegroup  = "$theme_path/ico_resourcegroup.gif";
+$ico_report         = "$theme_path/ico_report.png";
 $ico_samba          = "$theme_path/ico_samba.gif";
 $ico_settings       = "$theme_path/ico_setting.gif";
 $ico_big_settings   = "$theme_path/ico_setting.gif";

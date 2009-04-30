@@ -21,6 +21,7 @@ $l_mailredirection_report = "Affichage de la redirection de la boite mail";
 $l_vacation_report = "Affichage de l'état d'abscence des utilisateurs";
 $l_used_percent = "Pourcentage d'utilisation";
 $l_all_services = "Tous les services";
+$l_choose_report = 'Choisir un type de rapport';
 
 //User
 $l_id = "Id";

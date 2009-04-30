@@ -303,6 +303,10 @@ $modules["samba"] = array('Name'=> $l_module_samba,
                   'Ico' => "$ico_samba",
                   'Url' => "$path/samba/samba_index.php",
                   'Right'=> $cright_read_admin);
+$modules["report"] = array('Name'=> $l_module_report,
+                  'Ico' => "$ico_report",
+                  'Url' => "$path/report/report_index.php?mode=html",
+                  'Right'=> $cright_read_admin);
 
 if ($cgp_show["module"]["account"]) {
   $modules["account"] = array('Name'=> $l_module_account,

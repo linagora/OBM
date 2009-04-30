@@ -348,6 +348,7 @@ $cgp_show['module']['control'] = 'admin';
 $cgp_show['module']['admin'] = 'admin';
 $cgp_show['module']['import'] = 'admin';
 $cgp_show['module']['backup'] = 'admin';
+$cgp_show['module']['report'] = 'admin';
 if ($cgp_use['service']['samba']) {
   $cgp_show['module']['samba'] = 'admin';
 }
