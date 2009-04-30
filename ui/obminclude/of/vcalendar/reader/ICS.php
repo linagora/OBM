@@ -399,7 +399,7 @@ class Vcalendar_Reader_ICS {
         $state = null;
         break;
       default :
-        $state = 'NEEDS-ACCTION';
+        $state = 'NEEDS-ACTION';
     }
 
     $attendee = $this->getAttendeeId($value, $options, $entity);
