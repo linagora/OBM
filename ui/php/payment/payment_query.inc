@@ -43,7 +43,7 @@ function run_query_payment_search($payment) {
   $where = '1=1';
   $and = 'AND';
   if ($comment != '') {
-    $where .= "$and payment_comment $like '%$comment%'";
+    $where .= " $and payment_comment $like '%$comment%'";
     $and = 'AND';
   }
   if ($number) {
