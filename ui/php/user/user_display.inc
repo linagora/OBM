@@ -37,6 +37,8 @@ $fieldnames['userobm_mail_login_date'] = $l_date;
 $fieldnames['userobm_nomade'] = $l_access_nomade;
 $fieldnames['userobm_samba_perms'] = $l_smb_perms;
 $fieldnames['userobm_description'] = $l_desc;
+$fieldnames['userobm_delegation_target'] = $l_delegation_target;
+$fieldnames['host_name'] = $l_mail_server;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display User specific dataset fields
@@ -190,6 +192,7 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
   global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all, $l_firstname, $l_exp;
+  global $l_quota, $l_delegation_target, $l_datebegin, $l_mail_server;
   global $display, $c_all, $l_recursive, $obm;
   
   $login = $user['login'];
@@ -208,6 +211,10 @@ function html_user_search_form($user) {
   $popup = $user['popup'];
   $next_action = $user['next_action'];
   $user_action = $user['action'];
+
+  $delegation_target = $user['delegation_target'];
+  $mail_server_host_name = $user['mail_server_host_name'];
+  $quota = $user['quota'];
   
   if ($user['filter_entity']) {
     $dis_filter_entity = "<input name=\"filter_entity\" type=\"hidden\" value=\"$user[filter_entity]\" />";
@@ -263,63 +270,131 @@ function html_user_search_form($user) {
   }
 
   $dis_delegation = of_delegation_dis_search_form($delegation);
+  $display_pref = get_display_pref($obm['uid'],'user');
 
   $block = "
   <form method=\"get\" name=\"f_search\"
-    action=\"". url_prepare("user_index.php")."\" class=\"search\"> 
-
-    <label>$l_login<br />
-      <input type=\"text\" name=\"tf_login\" size=\"16\" maxlength=\"32\"
-      value=\"$login\" />
-    </label>
-    <label>$l_lastname<br />
+    action=\"". url_prepare("user_index.php")."\" class=\"search\"> ";
+  
+  if($display_pref['userobm_login']['status'] != 0) {
+    $block .= "<label>$l_login<br />
+                <input type=\"text\" name=\"tf_login\" size=\"16\" maxlength=\"32\"
+                value=\"$login\" />
+              </label>
+                ";
+  }
+  if($display_pref['userobm_lastname']['status'] != 0) {
+    $block .= "<label>$l_lastname<br />
       <input type=\"text\" name=\"tf_lastname\" size=\"16\" maxlength=\"32\"
       value=\"$lname\" />
     </label>
-    <label>$l_firstname<br />
+                ";
+  }
+  if($display_pref['userobm_firstname']['status'] != 0) {
+    $block .= "<label>$l_firstname<br />
       <input type=\"text\" name=\"tf_firstname\" size=\"16\" maxlength=\"32\"
       value=\"$fname\" />
     </label>
-    $dis_domain
-    <label>$l_profile<br />
+                ";
+  }
+  if($display_pref['domain_label']['status'] != 0) {
+    $block .= "$dis_domain
+                ";
+  }
+  if($display_pref['userobm_perms']['status'] != 0) {
+    $block .= "<label>$l_profile<br />
       <select type=\"text\" name=\"sel_profile\">
         <option value=\"$c_all\"> $l_all</option>
         $block_profile
       </select>
     </label>
-    $dis_delegation
-    <label>$l_email<br />
+                ";
+  }
+  if($display_pref['userobm_delegation']['status'] != 0) {
+    $block .= "$dis_delegation
+                ";
+  }
+  if($display_pref['userobm_email']['status'] != 0) {
+    $block .= "<label>$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" maxlength=\"32\"
       value=\"$email\" />
     </label>
-    <label>$l_phone<br />
+                ";
+  }
+  if($display_pref['userobm_phone']['status'] != 0) {
+    $block .= "<label>$l_phone<br />
       <input type=\"text\" name=\"tf_phone\" size=\"16\" maxlength=\"16\"
       value=\"$phone\" />
     </label>
-    <label>$l_desc<br />
+                ";
+  }
+  if($display_pref['userobm_description']['status'] != 0) {
+    $block .= "<label>$l_desc<br />
       <input type=\"text\" name=\"tf_desc\" size=\"16\" maxlength=\"32\"
       value=\"$desc\" />
     </label>
-    <label>$l_exp<br />
+                ";
+  }
+  if($display_pref['userobm_account_dateexp']['status'] != 0) {
+    $block .= "<label>$l_exp<br />
       <input type=\"text\" name=\"tf_exp\" size=\"16\" maxlength=\"32\"
       value=\"$exp\" />
     </label>
-    <label>$l_group<br />
+                ";
+  }
+  if($display_pref['userobm_login']['status'] != 0) {
+    $block .= "<label>$l_group<br />
       <input type=\"text\" name=\"tf_group\" size=\"16\" maxlength=\"32\"
       value=\"$group\" />
     </label>
-    $block_userdata
-    <label>$l_archive<br />
+                ";
+  }
+  if($display_pref['userobm_login']['status'] != 0) {
+    $block .= "$block_userdata
+                ";
+  }
+  if($display_pref['userobm_delegation_target']['status'] != 0) {
+    $block .= "<label>$l_delegation_target<br \>
+      <input type=\"text\" name=\"tf_delegation_target\" size=\"16\" maxlength=\"32\"
+      value=\"$delegation_target\" />
+    </label>
+                ";
+  }
+  if($display_pref['host_name']['status'] != 0) {
+    $block .= "<label>$l_mail_server<br \>
+      <input type=\"text\" name=\"tf_host_name\" size=\"16\" maxlength=\"32\"
+      value=\"$mail_server_host_name\" />
+    </label>
+                ";
+  }
+  if($display_pref['userobm_mail_quota']['status'] != 0) {
+    $block .= "<label>$l_quota<br \>
+      <input type=\"text\" name=\"tf_quota\" size=\"16\" maxlength=\"32\"
+      value=\"$quota\" />
+    </label>
+                ";
+  }
+  if($display_pref['datebegin']['status'] != 0) {
+    $block .= "<label class=\"NW\">$l_datebegin<br />
+      <input class=\"datePicker\" type=\"text\" value=\"\" name=\"tf_datebegin\" autocomplete=\"off\"/>
+    </label>
+                ";
+  }
+  if($display_pref['userobm_archive']['status'] != 0) {
+    $block .= "<label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
     </label>
-    <label>&nbsp;<br />
+                ";
+  }
+    $block .= "<label>&nbsp;<br />
       $form_action
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $dis_filter_entity
       $ext
     </label>
-    <p class=\"CL\" />
+                ";
+    $block.= "<p class=\"CL\" />
    </form>";
 
   return $block;
@@ -951,7 +1026,8 @@ $dis_group
 //   - $usr_q : user database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_group_consult($usr_q) {
-  global $l_update_group, $l_user, $l_group_member, $l_group;
+  global $l_update_group, $l_user, $l_group_member, $l_group, $l_groups;
+  global $ico_add, $ico_delete;
 
   $id = $usr_q->f('userobm_id');
   $domain_id = $usr_q->f('userobm_domain_id');
@@ -962,41 +1038,52 @@ function html_user_group_consult($usr_q) {
 
   $default_group_id = get_group_id_from_gid($domain_id, $gid);
 
-  // Liste des groupes
-  $g_q = run_query_user_public_owner_group($id);
-
   // Liste des groupes de l'utilisateur : on remplit le tableau $groups
   $gu_q = run_query_user_user_group($id);
   $groups = array();
+
   while ($gu_q->next_record()) {
     $g_id = $gu_q->f('userobmgroup_group_id');
-    array_push($groups, $g_id);
+    $grp_name = $gu_q->f('group_name');
+    $grp_desc = $gu_q->F('group_desc');
+    $dis_group .= "
+    <tr id=\"sel_accept_group-data-group-$g_id\">
+      <td><a href=\"javascript: remove_element('sel_accept_group-data-group-$g_id','perms');\">
+            <img src=\"$ico_delete\" alt=[Del]/>
+          </a>$grp_name</td>
+      <td><input id=\"sel_accept_group_$g_id\" type=\"hidden\" name=\"data-group-$g_id\" value=\"1\" />$grp_desc</td>
+    </tr>
+    ";
   }
 
-  while ($g_q->next_record()) {
-    $grp_id = $g_q->f('group_id');
-    $grp_name = $g_q->f('group_name');
-    $checked = (in_array($grp_id, $groups) ? ' checked' : '' );
-    $disabled = '';
-    $default = '';
-    if ($grp_id == $default_group_id) {
-      $disabled = 'disabled="disabled" ';
-      $default = "*<input name=\"data-g-$grp_id\" type=\"hidden\" value=\"1\"/>";
-    }
-    $dis_group .= "
+  $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group&amp;ext_container=table";
+  $popup_group_add_button = "
+    <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
+    <img src=\"$ico_add\" alt=\"[Add]\" />
+    </a>";
+
+  $block_groups = "
+  <tbody id='sel_group'>
     <tr>
-      <th>$grp_name</th>
-      <td><input name=\"data-g-$grp_id\" type=\"checkbox\" value=\"1\" $checked $disabled/>$default</td>
-    </tr>";
-  }
+      <th>$l_groups</th>
+      <th>
+        <input type=\"text\" id=\"groupSearch\" autocomplete=\"off\" />
+        $popup_group_add_button
+      </th>
+    </tr>
+  </tbody>
+  <tbody id='sel_accept_group'>
+    $dis_group
+  </tbody>
+  ";
 
   $block = "
   <form method=\"post\" name=\"f_entity\" action=\"" . url_prepare('user_index.php') . "\">
   <fieldset class=\"detail extra\">
   <legend>$l_user $login ($lname $fname) $l_group_member</legend>
-  <table>
-  $dis_group
-  </table>
+    <table class=\"spreadSheet\">
+      $block_groups
+    </table>
   </fieldset>
  
   <fieldset class=\"buttons\">
@@ -1006,6 +1093,70 @@ function html_user_group_consult($usr_q) {
   </fieldset>
   </form>";
 
+  $js = "
+    <script type =\"text/javascript\">
+
+      var resultValue = function (element, extension) {
+      var item_id = element.getProperty('id');
+      var id = item_id.substr(('item_').length,item_id.length);
+      var entity = this.selectedBox.id;
+      var tr_id = entity +'-'+ id;
+      var text = $(item_id+'_label').innerHTML;
+      if (!$(tr_id)) {
+        var result = new Element('tr');
+        result.setProperties({'id': tr_id});
+        result.injectInside(this.selectedBox);
+        if (this.selectedBox.getChildren().length % 2 != 0) {
+          result.addClass('pair');
+        }
+        new Element('td').adopt(
+          new Element('a').setProperty('href', '#').adopt(
+            new Element('img').setProperty('src', obm.vars.images.del)
+          ).addEvent('mousedown',
+            function() {
+              var item = \$(item_id);
+              if (item) { item.removeClass(\"selected\"); }
+              remove_element(tr_id, entity);
+            }.bind(this)
+          )
+        ).appendText(' ' + text).injectInside(result);
+
+        new Element('td').adopt(
+          new Element('input').setProperty('name', id)
+                              .setProperty('value', 1)
+                              .setProperty('type','hidden')
+        ).appendText('').injectInside(result);
+        
+      } else {
+        this.inputField.blur();
+        this.resetFunc();
+        this.inputField.focus();
+      }
+      eval(this.options.selectfunction);
+    }
+
+    function apply_backgroud() {
+      var tbody_blocks = new Array($('sel_accept_group'));
+      
+      for (var i=0; i < tbody_blocks.length; i++) {
+        var tbody = tbody_blocks[i];
+        var tr_elements = (tbody ? tbody.getChildren() : new Array());
+        for (var j=0; j < tr_elements.length; j++) {
+          if ( (j % 2) == 0) {
+            tr_elements[j].addClass('pair');
+          }
+        }
+      }
+    }
+
+    apply_backgroud();
+
+    obm.initialize.chain(function () {
+      new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_accept_group', 'groupSearch',{resultValue:resultValue});
+    })
+    </script>
+    ";
+  $block .= $js;
   return $block;
 }
 

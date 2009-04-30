@@ -31,6 +31,11 @@ $l_delegation_target = "Administration déléguée";
 $l_photo = "Photo";
 $l_delete_userobmphoto = "Supprimer la photo de l'utilisateur";
 
+$l_quota = "Quota";
+$l_administration = "Administration";
+$l_serv_mail = "Serveur de mail";
+$l_create_date = "Date d'entrée";
+
 $l_hidden = 'BAL cachée';
 $l_mail_ext = "Messagerie externe";
 $l_mail_server = "Serveur de boîte à lettres";

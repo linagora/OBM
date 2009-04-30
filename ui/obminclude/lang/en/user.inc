@@ -29,6 +29,11 @@ $l_delegation_target = "Delegation target";
 $l_photo = "Photo";
 $l_delete_userobmphoto = "Delete user's photo";
 
++$l_quota = "Quota";
++$l_administration = "Administration";
++$l_serv_mail = "Mail Server";
++$l_create_date = "Create date";
+
 $l_hidden = 'Hidden mailbox';
 $l_mail_server = "Mail Server";
 $l_email_nomade = "Nomad email address";

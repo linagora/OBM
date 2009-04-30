@@ -30,6 +30,14 @@ function run_query_people_search($people) {
   $email = sql_search_text_parse($people['email']);
   $desc = sql_search_text_parse($people['desc']);
   $phone = $people['phone'];
+  $adress = $people['adress'];
+  $service = $people['service'];
+  $zipcode = $people['zipcode'];
+  $cedex = $people['cedex'];
+  $direction = $people['direction'];
+  $town = $people['town'];
+  $fax = $people['fax'];
+  $company = $people['company'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -93,9 +101,53 @@ function run_query_people_search($people) {
     $where_contact .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%'))";
   }
 
+  // If a fax number indication has been specified, get it
+  if (trim($fax) != '') {
+    $where_userobm .= " AND (userobm_fax like '%$fax%'
+      OR userobm_fax2 like '%$fax%')";
+  }
+
+  // If an adress indication has been specified, get it
+  if (trim($adress) != '') {
+    // UserObm
+    $where_userobm .= " AND (userobm_address1 like '%$adress%'
+      OR userobm_address2 like '%$adress%'
+      OR userobm_address3 like '%$adress%')";
+  }
+
   // If a description indication has been specified, get it
   if (trim($desc) != '') {
      $where_userobm .= " AND userobm_description like '%$desc%'";
+  }
+
+  // If a direction indication has been specified get it
+  if (trim($direction) != '') {
+    $where_userobm .= " AND userobm_direction like '%$direction%'";
+  }
+
+  // If a service indication has been specified get it
+  if (trim($service) != '') {
+    $where_userobm .= " AND userobm_service like '%$service%'";
+  }
+
+  // If a service indication has been specified get it
+  if (trim($company) != '') {
+    $where_userobm .= " AND userobm_company like '%$company%'";
+  }
+
+  // If a town indication has been specified get it
+  if (trim($town) != '') {
+    $where_userobm .= " AND userobm_town like '%$town%'";
+  }
+
+  // If a zipcode indication has been specified get it
+  if (trim($zipcode) != '') {
+    $where_userobm .= " AND userobm_zipcode = $zipcode";
+  }
+
+  // If a cedex indication has been specified get it
+  if (trim($cedex) != '') {
+    $where_userobm .= " AND userobm_expresspostal = $cedex";
   }
 
   // User defined data

@@ -37,6 +37,10 @@ function run_query_user_search($user) {
   $archive = $user['archive'];
   $phone = $user['phone'];
   $exp = $user['exp'];
+  $delegation_target = $user['delegation_target'];
+  $quota = $user['quota'];
+  $mail_server_host_name = $user['host_name'];
+  $date_begin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : '');
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -128,7 +132,7 @@ function run_query_user_search($user) {
      if (trim($where) != '') $where .= ' AND';
      $where .= " userobm_description like '%$desc%'";
   }
-  
+
   // If a group indication has been specified, get it
   if (trim($group) != '') {
      if (trim($where) != '') $where .= ' AND';
@@ -137,6 +141,31 @@ function run_query_user_search($user) {
                   INNER JOIN UGroup ON of_usergroup_group_id=group_id';
   }
 
+  if (trim($date_begin) != '') {
+    if (trim($where) != '') $where .= ' AND';
+    $where .= " userobm_datebegin = $date_begin";
+  }
+
+  // If a quota indication has been specified, get it
+  if (trim($quota) != '') {
+    if (trim($where) != '') $where .= ' AND';
+    $where .= " userobm_mail_quota = '$quota'";
+  }
+
+  // If a delegation target indication has been specified, get it
+  if (trim($delegation_target) != '') {
+    if (trim($where) != '') $where .= ' AND';
+    $where .= " userobm_delegation_target LIKE '%$delegation_target%'";
+  }
+
+  // If a delegation target indication has been specified, get it
+  if (trim($mail_server_host_name) != '') {
+    if (trim($where) != '') $where .= ' AND';
+    $where .= " host_name LIKE '%$mail_server_host_name%'";
+    $join_host = 'INNER JOIN Host ON host_id = userobm_mail_server_id';
+  }
+
+  // If an archive indication has been specified, get it
   if ($archive != '1') {
     if (trim($where) != '') $where .= ' AND';
     $where .= " userobm_archive = 0";
@@ -170,6 +199,7 @@ function run_query_user_search($user) {
     INNER JOIN UserEntity ON userentity_user_id = userobm_id
     INNER JOIN Domain ON userobm_domain_id = domain_id
     $join_grp
+    $join_host
     $join_userdata";
 
 
@@ -189,7 +219,7 @@ function run_query_user_search($user) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_userdata $whereq");
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $whereq");
     $obm_q->set_num_rows_total($count);
   }
 

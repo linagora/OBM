@@ -383,9 +383,9 @@ function get_user_params() {
   if (isset($params)) {
     $nb_group = 0;
     while ( list( $key ) = each($params) ) {
-      if (strcmp(substr($key, 0, 7),'data-g-') == 0) {
+      if (strcmp(substr($key, 0, 11),'data-group-') == 0) {
         $nb_group++;
-        $group_num = substr($key, 7);
+        $group_num = substr($key, 11);
         $params["group_$nb_group"] = $group_num;
       }
     }
