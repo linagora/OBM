@@ -109,8 +109,28 @@ function run_query_user_search($user) {
 
   // If an email indication has been specified, get it
   if (trim($email) != '') {
-     if (trim($where) != '') $where .= ' AND';
-     $where .= " userobm_email like '%$email%'";
+    if (trim($where) != '') $where .= ' AND';
+    list($email_name,$domain) = split('@',$email);
+    $where .= "
+      ( userobm_email like '$email%'
+      OR (
+          (userobm_email = '$email_name' OR userobm_email like '$email_name\r\n%' OR userobm_email like '%\r\n$email_name\r\n%' OR userobm_email like '%\r\n$email_name' OR '$email_name' = '') 
+          AND 
+          (domain_name LIKE '$domain%' OR domain_alias = '$domain' OR domain_alias like '$domain%\r\n%' OR domain_alias like '%\r\n$domain%\r\n%' OR domain_alias like '%\r\n$domain%') 
+          AND
+          (userobm_email <> '' AND userobm_email NOT LIKE '%@%')
+        ) 
+        OR 
+        (
+          userobm_email LIKE '$email_name@$domain%' 
+          OR (
+            '$email_name' = '' AND userobm_email LIKE '%@$domain%'
+          ) 
+          OR userobm_email like '$email_name@$domain%\r\n%' OR userobm_email like '%\r\n$email_name@$domain%\r\n%' OR userobm_email like '%\r\n$email_name@$domain%'
+        )
+      )";
+    $join_domain =  "INNER JOIN UserEntity ON userentity_user_id = userobm_id
+                      INNER JOIN Domain ON userobm_domain_id = domain_id";
   }
 
   // If a phone number indication has been specified, get it
@@ -219,7 +239,7 @@ function run_query_user_search($user) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $whereq");
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $join_domain $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
