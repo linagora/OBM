@@ -184,7 +184,7 @@ class Vcalendar_Writer_ICS {
       $nb_days = (int) ($seconds / 86400);
       if($nb_days > 1) {
         $dtend = clone $this->parsed_event->get('dtstart');
-        $dtend->addSecond($seconds);
+        $dtend->addSecond($seconds)->subDay(1);
         $this->writeDtend('dtend', $dtend);
       }
     } else {
@@ -205,7 +205,9 @@ class Vcalendar_Writer_ICS {
    * @param string $format Date format. Can be ICS_DATETIME or ICS_DATE.
    */
   function parseDate($date, $format=Of_Date::ICS_DATETIME) {
-    $date->setTimezone(new DateTimeZone('GMT'));
+    if($format == Of_Date::ICS_DATETIME) {
+      $date->setTimezone(new DateTimeZone('GMT'));
+    }
     $return = $date->get($format);
     if($format == Of_Date::ICS_DATETIME) {
       $return .= 'Z';

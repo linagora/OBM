@@ -234,12 +234,22 @@ class Vcalendar_Reader_ICS {
     preg_match('/.*(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})){0,1}/', $value, $match) ;
     list($all, $year, $month, $day, $time, $hour, $minute, $second) = $match;
 
-    if($options['TZID'] || !preg_match('/^[^Z]*Z$/',$value)) {
-      $date = new Of_Date($value, $options['TZID']);
+    $date = new Of_Date();
+
+    if(isset($options['TZID']) && !preg_match('/^[^ZT]*Z$/',$value)) {
+      $date = new Of_Date(null, $options['TZID']);
+      if ($date->error() == Of_Date::ERR_INVALID_DATE) { // Bad timezone
+        $date = new Of_Date(null, 'GMT');
+      }
     } else {
-      $date = new Of_Date($value, 'GMT');
+      $date = new Of_Date(null, 'GMT');
     }
-    
+    $date->setYear($year)->setMonth($month)->setDay($day);
+
+    if($time !== null) {
+      $date->setHour($hour)->setMinute($minute)->setSecond($second);
+    }
+
     return $date;
   }
 
