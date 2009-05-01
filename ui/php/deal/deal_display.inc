@@ -296,7 +296,9 @@ function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $
   $date_before = of_date_upd_format(stripslashes($deal['date_before']),true);
   $company_id = $deal['company_id'];
   $role_company = $deal['role_company'];
-  $delegation = $obm['delegation'];
+  if (($deal['action'] != 'search') && (! isset($deal['delegation']))) { 
+    $delegation = $obm['delegation'];
+  }
   if ($deal['delegation'] != '') {
     $delegation = stripslashes($deal['delegation']);
   }
@@ -1906,7 +1908,7 @@ function dis_deal_dashboard_index($deal) {
   $view = $deal['dash_view'];
   $url_total = url_prepare('deal_index.php?action=dashboard');
   $url_year = url_prepare('deal_index.php?action=dashboard&amp;dash_view=year_detail');
-  $url_panel = url_prepare('deal_index.php?action=dashboard&amp;dash_view=panel');
+  $url_panel = url_prepare('deal_index.php?action=dashboard&amp;dash_view=deal_panel');
 
   $display['title'] = $l_header_dashboard;
 
@@ -1933,6 +1935,8 @@ function dis_deal_dashboard_view($deal) {
   $view = $deal['dash_view'];
 
   if ($view != '') {
+    global ${"l_$view"};
+    $display['title'] = ${"l_$view"};
     $func = "dis_deal_dashboard_$view";
     $block .= $func($deal);
   } else {
@@ -2109,13 +2113,24 @@ function dis_deal_dashboard_potential($deal) {
  * @param mixed $deal : deal hash infos
  **/
 function dis_deal_dashboard_year_detail($deal) {
-  global $display, $path, $ctt_sales;
-  global $l_total, $l_date, $l_amount_ht, $l_amount_ttc, $l_margin;
-  global $l_potential, $l_expected, $l_monthsofyearshort;
+  global $obm, $display, $path, $ctt_sales;
+  global $l_total, $l_date, $l_amount_ht, $l_amount_ttc, $l_margin, $l_region;
+  global $l_year_detail, $l_potential, $l_expected, $l_monthsofyearshort;
   global $l_amount, $l_deal_balanced, $l_commission, $l_commission_balanced;
   global $l_execute,$ico_previous,$ico_next;
 
   $users_id = $deal['manager'];
+  if (! isset($deal['submit'])) { 
+    $delegation = $obm['delegation'];
+  }
+  if ($deal['delegation'] != '') {
+    $delegation = stripslashes($deal['delegation']);
+  }
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
+  $regions = of_category_get_ordered('', 'region');
+  $region = $deal['region'];
+  $block_region = of_category_dis_search_select('', 'region', $regions, $region);
 
   if (isset($deal['year'])) {
     $year = $deal['year'];
@@ -2125,9 +2140,10 @@ function dis_deal_dashboard_year_detail($deal) {
   $year_prev = $year - 1;
   $year_next = $year + 1;
   $date_range = array("$year-01-01", "$year-12-31");
-  $d = get_deal_dashboard_year_detail($date_range, 'deal_dateexpected', '', $deal['tasktype']);
   $url_prev = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_prev");
   $url_next = url_prepare("deal_index.php?action=dashboard&amp;dash_view=year_detail&amp;year=$year_next");
+
+  $d = get_deal_dashboard_year_detail($date_range, 'deal_dateexpected', '', $deal['tasktype'], $region, $delegation);
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
   $tt_ids = $deal['tasktype'];
@@ -2397,9 +2413,10 @@ function dis_deal_dashboard_year_detail($deal) {
   $url_form = url_prepare('deal_index.php');
 
   $block = "
-    <form method=\"post\" name=\"f_search\" action=\"$url_form\">
+    <form class=\"search\" method=\"post\" name=\"f_search\" action=\"$url_form\">
     <fieldset class=\"detail\">
-    <legend>
+    <legend>$l_year_detail</legend>
+      <label>$l_date<br />
       <a href=\"javascript: return false;\"
           onclick=\"yearfield=\$('year');
                     newyear=Number(yearfield.innerHTML)-1;
@@ -2415,7 +2432,9 @@ function dis_deal_dashboard_year_detail($deal) {
                     document.forms.f_search.year.value=newyear;
                     return false;\">
         <img src=\"$ico_next\" alt=\"\" /></a>
-      </legend>
+      </label>
+      $block_region
+      $dis_delegation
       $block_tt
       </fieldset>
       <fieldset class=\"buttons\">
@@ -2527,15 +2546,26 @@ function dis_deal_dashboard_list($deal) {
  *
  * @param mixed $deal : deal hash infos
  **/
-function dis_deal_dashboard_panel($deal) {
+function dis_deal_dashboard_deal_panel($deal) {
   global $display, $path, $ctt_sales;
   global $l_total, $l_date, $l_hitrate, $l_marketing_manager, $l_deal;
   global $l_company, $l_amount, $l_amount_ht, $l_margin;
-  global $l_potential, $l_expected, $l_monthsofyearshort;
+  global $l_deal_panel, $l_region;
   global $l_amount, $l_deal_balanced, $l_commission, $l_commission_balanced;
   global $l_execute,$ico_previous,$ico_next;
 
   $users_id = $deal['manager'];
+  if (! isset($deal['submit'])) { 
+    $delegation = $obm['delegation'];
+  }
+  if ($deal['delegation'] != '') {
+    $delegation = stripslashes($deal['delegation']);
+  }
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
+  $regions = of_category_get_ordered('', 'region');
+  $region = $deal['region'];
+  $block_region = of_category_dis_search_select('', 'region', $regions, $region);
 
   if (isset($deal['year'])) {
     $year = $deal['year'];
@@ -2545,9 +2575,9 @@ function dis_deal_dashboard_panel($deal) {
   $year_prev = $year - 1;
   $year_next = $year + 1;
   $date_range = array("$year-01-01", "$year-12-31");
-  $d = get_deal_dashboard_panel($date_range, 'deal_dateexpected', '', $deal['tasktype']);
-  $url_prev = url_prepare("deal_index.php?action=dashboard&amp;dash_view=panel&amp;year=$year_prev");
-  $url_next = url_prepare("deal_index.php?action=dashboard&amp;dash_view=panel&amp;year=$year_next");
+  $d = get_deal_dashboard_panel($date_range, 'deal_dateexpected', '', $deal['tasktype'], $region, $delegation);
+  $url_prev = url_prepare("deal_index.php?action=dashboard&amp;dash_view=deal_panel&amp;year=$year_prev");
+  $url_next = url_prepare("deal_index.php?action=dashboard&amp;dash_view=deal_panel&amp;year=$year_next");
 
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
   $tt_ids = $deal['tasktype'];
@@ -2720,9 +2750,10 @@ function dis_deal_dashboard_panel($deal) {
   }
 
   $block = "
-    <form method=\"post\" name=\"f_search\" action=\"$url_form\">
+    <form class=\"search\" method=\"post\" name=\"f_search\" action=\"$url_form\">
     <fieldset class=\"detail\">
-    <legend>
+    <legend>$l_deal_panel</legend>
+      <label>
       <a href=\"javascript: return false;\"
           onclick=\"yearfield=\$('year');
                     newyear=Number(yearfield.innerHTML)-1;
@@ -2738,19 +2769,23 @@ function dis_deal_dashboard_panel($deal) {
                     document.forms.f_search.year.value=newyear;
                     return false;\">
         <img src=\"$ico_next\" alt=\"\" /></a>
-      </legend>
+      </label>
+      $block_region
+      $dis_delegation
+      <label>
       $block_tt
+      </label>
       </fieldset>
       <fieldset class=\"buttons\">
         <input type=\"hidden\" name=\"deal_id\" value=\"$deal_id\" />
         <input type=\"hidden\" name=\"year\" value=\"$year\" />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
-        <input name=\"dash_view\" id=\"dash_view\" type=\"hidden\" value=\"panel\" />
+        <input name=\"dash_view\" id=\"dash_view\" type=\"hidden\" value=\"deal_panel\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
       </fieldset>
     </form>
 
-    <h1>$l_potential - $l_date $l_expected</h1>
+    <h1>$l_deal_panel</h1>
 
     <table class=\"spreadSheet\">
     <thead>

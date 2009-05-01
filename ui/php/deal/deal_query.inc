@@ -1031,18 +1031,30 @@ function run_query_deal_potential($users_id='') {
  * @param $sel_tt      : [optionnal] tasktype array filter
  * @return db object
 **/
-function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpected', $users_id='', $tts='') {
-  global $cdg_sql;
+function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpected', $users_id, $tts, $region_id, $delegation='') {
+  global $cdg_sql, $c_all;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
   $dexp = sql_date_format($db_type, 'deal_dateexpected', 'dateexpected');
   $dend = sql_date_format($db_type, 'deal_dateend', 'dateend');
+  $delegation = sql_search_text_parse($delegation);
 
   if (is_array($date_range)) {
     $past = $date_range[0];
     $future = $date_range[1];
     $where_date = "AND ($target_date >= '$past' AND $target_date <= '$future')";
+  }
+
+  // Region filter
+  if (($region_id != $c_all) && ($region_id > 0)) {
+    $where_region = " AND deal_region_id=$region_id";
+  }
+
+  // Delegation filter
+  if (trim($delegation) != '') {
+    $where_delegation = " AND userobm_delegation $like '$delegation%'";
   }
 
   // Tasktype filter
@@ -1067,7 +1079,9 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
     }
     $where_market_uid .= ')';
   }
+
   $multidomain = sql_multidomain('deal');
+
   $query = "SELECT
       deal_id,
       deal_label,
@@ -1092,8 +1106,10 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
       AND deal_hitrate < 100
       AND deal_archive = '0'
       $where_market_uid
-      $where_tt
       $where_date
+      $where_region
+      $where_delegation
+      $where_tt
       $multidomain
     ORDER BY
       deal_hitrate,
@@ -1117,9 +1133,9 @@ function run_query_deal_dashboard_infos($date_range, $target_date='deal_dateexpe
  *                total in u_id=0
  *                [users_id] = array(u_id)
 **/
-function get_deal_dashboard_year_detail($date_range, $target_date='deal_dateexpected', $users_id='', $tts='') {
+function get_deal_dashboard_year_detail($date_range, $target_date='deal_dateexpected', $users_id, $tts, $region_id, $delegation='') {
 
-  $obm_q = run_query_deal_dashboard_infos('', $target_date, '', $tts);
+  $obm_q = run_query_deal_dashboard_infos('', $target_date, '', $tts, $region_id, $delegation);
 
   if (is_array($date_range)) {
     $past = $date_range[0];
@@ -1193,10 +1209,10 @@ function get_deal_dashboard_year_detail($date_range, $target_date='deal_dateexpe
  *                total in u_id=0
  *                [users_id] = array(u_id)
 **/
-function get_deal_dashboard_panel($date_range, $target_date='deal_dateexpected', $users_id='', $tts='') {
+function get_deal_dashboard_panel($date_range, $target_date='deal_dateexpected', $users_id, $tts, $region_id, $delegation='') {
   global $l_quarter;
 
-  $obm_q = run_query_deal_dashboard_infos($date_range, $target_date, '', $tts);
+  $obm_q = run_query_deal_dashboard_infos($date_range, $target_date, '', $tts, $region_id, $delegation);
 
   if (is_array($date_range)) {
     $past = $date_range[0];
@@ -1392,12 +1408,12 @@ function run_query_deal_dashboard_list($deal, $users_id='') {
       AND deal_archive = '0'
       $where_uid
       $where_date
-			$multidomain
+      $multidomain
 ";
     $count = get_query_count($query_count);
     $obm_q->set_num_rows_total($count);
   }
-  if (($count > 0)  || (! $ctu_sql_limit)) {
+  if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg($query, $cdg_sql, 'run_query_deal_dashboard_list()');
     $obm_q->query($query);
   }
@@ -1460,6 +1476,7 @@ function run_query_deal_manager($archive = false) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal_contact($p_id) {
   global $cdg_sql;
+
   $multidomain = sql_multidomain('contact');
   $p_id = sql_parse_id($p_id, true);
   $obm_q = new DB_OBM;
@@ -1644,6 +1661,7 @@ function get_deal_info($deal_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_deal_dealcompany_info($deal_id) {
   global $cdg_sql;
+
   $deal_id = sql_parse_id($deal_id, true);
   $query = "SELECT
       dealcompany_id,
