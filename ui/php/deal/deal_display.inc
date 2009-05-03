@@ -1947,15 +1947,16 @@ function dis_deal_dashboard_view($deal) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display The Deal potential block
-// Parameters:
-//   - $deal[] : hash values
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Display the deal dashboard : potential
+ *
+ * @param mixed $deal : deal hash infos
+ **/
 function dis_deal_dashboard_potential($deal) {
   global $display, $l_deal, $l_module_deal, $l_total, $l_deal_total, $l_margin;
   global $l_forecast, $l_deal_balanced, $l_commission, $l_commission_balanced;
   global $l_marketing_manager, $l_technical_manager, $l_help_deal_forecast;
+  global $l_delegation;
 
   $display['title'] = $l_forecast;
 
@@ -1969,15 +1970,43 @@ function dis_deal_dashboard_potential($deal) {
 
   $cpt = 1;
   $potentials = run_query_deal_potential($users_id);
+
+  $old_delegation = 'OBM_first_loop';
   if (is_array($potentials['market'])) {
     foreach($potentials['market'] as $u_id => $pu) {
-      if ($u_id != '0') {
+      if (($u_id != '0') && ($u_id > 0)) {
+
+	$delegation = $pu['delegation'];
+
+	// Delegation total (if changing delegation)
+	if (($old_delegation != $delegation) && ($old_delegation != 'OBM_first_loop')) {
+	  $del_am = number_format($potentials['market']["$old_delegation"]['amount']);
+	  $del_ma = number_format($potentials['market']["$old_delegation"]['margin']);
+	  $del_ab = number_format($potentials['market']["$old_delegation"]['amount_balanced']);
+	  $del_cm = number_format($potentials['market']["$old_delegation"]['commission']);
+	  $del_cb = number_format($potentials['market']["$old_delegation"]['commission_balanced']);
+	  $del_nb = $potentials['market']["$old_delegation"]['number'];
+	  $dis_market_pot .= "
+      <tr>
+        <th>$old_delegation</th>
+        <th>$l_total</th>
+        <th>$del_nb</th>
+        <th class=\"money\">$del_am&nbsp;</th>
+        <th class=\"money\">$del_ma&nbsp;</th>
+        <th class=\"money\">$del_ab&nbsp;</th>
+        <th class=\"money\">$del_cm&nbsp;</th>
+        <th class=\"money\">$del_cb&nbsp;</th>
+      </tr>";
+
+	}
         $cpt++;
-        if($cpt % 2 == 0) {
+        if ($cpt % 2 == 0) {
           $class = "class=\"pair\"";
         } else {
           $class = '';
-        }        
+        }
+
+	// One user entry
 	$amount = number_format($pu['amount']);
 	$margin = number_format($pu['margin']);
 	$balanced = number_format($pu['amount_balanced']);
@@ -1987,17 +2016,40 @@ function dis_deal_dashboard_potential($deal) {
 	$user = $pu['name'];
 	$dis_market_pot .= "
       <tr $class>
+        <td>$delegation</td>
         <td>$user</td>
         <td>$nb_potential&nbsp;</td>
-        <td>$amount&nbsp;</td>
-        <td>$margin&nbsp;</td>
-        <td>$balanced&nbsp;</td>
-        <td>$commission&nbsp;</td>
-        <td>$commission_balanced&nbsp;</td>
+        <td class=\"money\">$amount&nbsp;</td>
+        <td class=\"money\">$margin&nbsp;</td>
+        <td class=\"money\">$balanced&nbsp;</td>
+        <td class=\"money\">$commission&nbsp;</td>
+        <td class=\"money\">$commission_balanced&nbsp;</td>
       </tr>";
+
+	$old_delegation = $delegation;
       }
     }
 
+    // Last delegation total
+    $del_am = number_format($potentials['market']["$old_delegation"]['amount']);
+    $del_ma = number_format($potentials['market']["$old_delegation"]['margin']);
+    $del_ab = number_format($potentials['market']["$old_delegation"]['amount_balanced']);
+    $del_cm = number_format($potentials['market']["$old_delegation"]['commission']);
+    $del_cb = number_format($potentials['market']["$old_delegation"]['commission_balanced']);
+    $del_nb = $potentials['market']["$old_delegation"]['number'];
+    $dis_market_pot .= "
+      <tr>
+        <th>$old_delegation</th>
+        <th>$l_total</th>
+        <th>$del_nb</th>
+        <th class=\"money\">$del_am&nbsp;</th>
+        <th class=\"money\">$del_ma&nbsp;</th>
+        <th class=\"money\">$del_ab&nbsp;</th>
+        <th class=\"money\">$del_cm&nbsp;</th>
+        <th class=\"money\">$del_cb&nbsp;</th>
+      </tr>";
+
+    // Marketing totals
     $m_amount = number_format($potentials['market']['0']['amount']);
     $m_margin = number_format($potentials['market']['0']['margin']);
     $m_balanced = number_format($potentials['market']['0']['amount_balanced']);
@@ -2006,16 +2058,45 @@ function dis_deal_dashboard_potential($deal) {
     $m_nb_potential = $potentials['market']['0']['number'];
   }
 
+  // ---- Technical table
+
+  $old_delegation = 'OBM_first_loop';
   if (is_array($potentials['tech'])) {
     foreach($potentials['tech'] as $u_id => $pu) {
-      if ($u_id != '0') {
+      if (($u_id != '0') && ($u_id > 0)) {
+
+	$delegation = $pu['delegation'];
+
+	// Delegation total (if changing delegation)
+	if (($old_delegation != $delegation) && ($old_delegation != 'OBM_first_loop')) {
+	  $del_am = number_format($potentials['tech']["$old_delegation"]['amount']);
+	  $del_ma = number_format($potentials['tech']["$old_delegation"]['margin']);
+	  $del_ab = number_format($potentials['tech']["$old_delegation"]['amount_balanced']);
+	  $del_cm = number_format($potentials['tech']["$old_delegation"]['commission']);
+	  $del_cb = number_format($potentials['tech']["$old_delegation"]['commission_balanced']);
+	  $del_nb = $potentials['tech']["$old_delegation"]['number'];
+	  $dis_tech_pot .= "
+      <tr>
+        <th>$old_delegation</th>
+        <th>$l_total</th>
+        <th>$del_nb</th>
+        <th class=\"money\">$del_am&nbsp;</th>
+        <th class=\"money\">$del_ma&nbsp;</th>
+        <th class=\"money\">$del_ab&nbsp;</th>
+        <th class=\"money\">$del_cm&nbsp;</th>
+        <th class=\"money\">$del_cb&nbsp;</th>
+      </tr>";
+
+	}
 	$cpt++;
-        if($cpt % 2 == 0) {
+        if ($cpt % 2 == 0) {
           $class = "class=\"pair\"";
         } else {
           $class = '';
         }
 
+	// One user entry
+	$delegation = $pu['delegation'];
 	$amount = number_format($pu['amount']);
 	$margin = number_format($pu['margin']);
 	$balanced = number_format($pu['amount_balanced']);
@@ -2025,17 +2106,40 @@ function dis_deal_dashboard_potential($deal) {
 	$user = $pu['name'];
 	$dis_tech_pot .= "
       <tr $class>
+        <td>$delegation</td>
         <td>$user</td>
         <td>$nb_potential&nbsp;</td>
-        <td>$amount&nbsp;</td>
-        <td>$margin&nbsp;</td>
-        <td>$balanced&nbsp;</td>
-        <td>$commission&nbsp;</td>
-        <td>$commission_balanced&nbsp;</td>
+        <td class=\"money\">$amount&nbsp;</td>
+        <td class=\"money\">$margin&nbsp;</td>
+        <td class=\"money\">$balanced&nbsp;</td>
+        <td class=\"money\">$commission&nbsp;</td>
+        <td class=\"money\">$commission_balanced&nbsp;</td>
       </tr>";
+
+	$old_delegation = $delegation;
       }
     }
 
+    // Last delegation total
+    $del_am = number_format($potentials['tech']["$old_delegation"]['amount']);
+    $del_ma = number_format($potentials['tech']["$old_delegation"]['margin']);
+    $del_ab = number_format($potentials['tech']["$old_delegation"]['amount_balanced']);
+    $del_cm = number_format($potentials['tech']["$old_delegation"]['commission']);
+    $del_cb = number_format($potentials['tech']["$old_delegation"]['commission_balanced']);
+    $del_nb = $potentials['tech']["$old_delegation"]['number'];
+    $dis_tech_pot .= "
+      <tr>
+        <th>$old_delegation</th>
+        <th>$l_total</th>
+        <th>$del_nb</th>
+        <th class=\"money\">$del_am&nbsp;</th>
+        <th class=\"money\">$del_ma&nbsp;</th>
+        <th class=\"money\">$del_ab&nbsp;</th>
+        <th class=\"money\">$del_cm&nbsp;</th>
+        <th class=\"money\">$del_cb&nbsp;</th>
+      </tr>";
+
+    // Tech totals
     $t_amount = number_format($potentials['tech']['0']['amount']);
     $t_margin = number_format($potentials['tech']['0']['margin']);
     $t_balanced = number_format($potentials['tech']['0']['amount_balanced']);
@@ -2048,6 +2152,7 @@ function dis_deal_dashboard_potential($deal) {
     <table class=\"spreadSheet\">
     <thead>
     <tr>
+      <th>$l_delegation</th>
       <th>$l_marketing_manager</th>
       <th># $l_module_deal</th>
       <th>$l_deal_total</th>
@@ -2060,6 +2165,7 @@ function dis_deal_dashboard_potential($deal) {
     $dis_market_pot
     <tfoot>
     <tr>
+      <td></td>
       <td>$l_total</td>
       <td>$m_nb_potential&nbsp;</td>
       <td>$m_amount&nbsp;</td>
@@ -2074,6 +2180,7 @@ function dis_deal_dashboard_potential($deal) {
     <table class=\"spreadSheet\">
     <thead>
     <tr>
+      <th>$l_delegation</th>
       <th>$l_technical_manager</th>
       <th># $l_module_deal</th>
       <th>$l_deal_total</th>
@@ -2086,6 +2193,7 @@ function dis_deal_dashboard_potential($deal) {
     $dis_tech_pot
     <tfoot>
     <tr>
+      <th></th>
       <td>$l_total</td>
       <td>$t_nb_potential&nbsp;</td>
       <td>$t_amount&nbsp;</td>

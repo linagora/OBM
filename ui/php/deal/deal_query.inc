@@ -853,6 +853,7 @@ function run_query_deal_delete($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal_company_info($id) {
   global $cdg_sql;
+
   $id = sql_parse_id($id, true);
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -876,11 +877,11 @@ function run_query_deal_company_info($id) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Get the amount, balanced amount and number of deals for a set of users
-// Parameters:
-//   - $users_id : array of User id
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Get global Deal infos for dashboard : potential
+ * @param $users_id : array of marketing User id (empty for all deals)
+ * @return array
+**/
 function run_query_deal_potential($users_id='') {
   global $cdg_sql, $cdg_param;
 
@@ -889,9 +890,8 @@ function run_query_deal_potential($users_id='') {
     $where_tech_uid = 'AND (';
     $or = '';
     foreach ($users_id as $u_id) {
-      $u_id = sql_parse_id($u_id, true);
-      $where_market_uid .= " $or deal_marketingmanager_id $u_id"; 
-      $where_tech_uid .= " $or deal_technicalmanager_id $u_id"; 
+      $where_market_uid .= " $or deal_marketingmanager_id='$u_id'";
+      $where_tech_uid .= " $or deal_technicalmanager_id='$u_id'";
       $or = 'OR';
     }
     $where_market_uid .= ')';
@@ -909,7 +909,8 @@ function run_query_deal_potential($users_id='') {
       sum(deal_amount * deal_commission / 100) as commission,
       sum(deal_amount * deal_commission * deal_hitrate / 10000) as commission_balanced,
       userobm_lastname,
-      userobm_firstname
+      userobm_firstname,
+      userobm_delegation
     FROM Deal
       LEFT JOIN DealType ON deal_type_id = dealtype_id
       LEFT JOIN UserObm ON deal_marketingmanager_id=userobm_id
@@ -921,7 +922,9 @@ function run_query_deal_potential($users_id='') {
       $multidomain
     GROUP BY deal_marketingmanager_id,
       userobm_lastname,
-      userobm_firstname
+      userobm_firstname,
+      userobm_delegation
+    ORDER BY userobm_delegation, userobm_lastname
 ";
   
   display_debug_msg($query, $cdg_sql, 'run_query_deal_potential(1)');
@@ -937,19 +940,36 @@ function run_query_deal_potential($users_id='') {
 
   while ($obm_q->next_record()) {
     $u_id = $obm_q->f('uid');
-    $res['market']["$u_id"]['amount'] = $obm_q->f('amount');
-    $res['market']["$u_id"]['margin'] = $obm_q->f('margin');
-    $res['market']["$u_id"]['amount_balanced'] = $obm_q->f('amount_balanced');
-    $res['market']["$u_id"]['commission'] = $obm_q->f('commission');
-    $res['market']["$u_id"]['commission_balanced'] = $obm_q->f('commission_balanced');
-    $res['market']["$u_id"]['number'] = $obm_q->f('nb');
+    $delegation = $obm_q->f('userobm_delegation');
+    $amount = $obm_q->f('amount');
+    $margin = $obm_q->f('margin');
+    $amount_balanced = $obm_q->f('amount_balanced');
+    $commission = $obm_q->f('commission');
+    $commission_balanced = $obm_q->f('commission_balanced');
+    $number = $obm_q->f('nb');
+
+    $res['market']["$u_id"]['delegation'] = $delegation;
+    $res['market']["$u_id"]['amount'] = $amount;
+    $res['market']["$u_id"]['margin'] = $margin;
+    $res['market']["$u_id"]['amount_balanced'] = $amount_balanced;
+    $res['market']["$u_id"]['commission'] = $commission;
+    $res['market']["$u_id"]['commission_balanced'] = $commission_balanced;
+    $res['market']["$u_id"]['number'] = $number;
     $res['market']["$u_id"]['name'] = $obm_q->f('userobm_lastname') . ' ' . $obm_q->f('userobm_firstname');
-    $am += $res['market']["$u_id"]['amount'];
-    $ma += $res['market']["$u_id"]['margin'];
-    $ab += $res['market']["$u_id"]['amount_balanced'];
-    $cm += $res['market']["$u_id"]['commission'];
-    $cb += $res['market']["$u_id"]['commission_balanced'];
-    $nb += $res['market']["$u_id"]['number'];
+
+    $am += $amount;
+    $ma += $margin;
+    $ab += $amount_balanced;
+    $cm += $commission;
+    $cb += $commission_balanced;
+    $nb += $number;
+
+    $res['market']["$delegation"]['amount'] += $amount;
+    $res['market']["$delegation"]['margin'] += $margin;
+    $res['market']["$delegation"]['amount_balanced'] += $amount_balanced;
+    $res['market']["$delegation"]['commission'] += $commission;
+    $res['market']["$delegation"]['commission_balanced'] += $commission_balanced;
+    $res['market']["$delegation"]['number'] += $number;
   }
 
   $res['market']['0']['amount'] = $am;
@@ -969,7 +989,8 @@ function run_query_deal_potential($users_id='') {
       sum(deal_amount * deal_commission / 100) as commission,
       sum(deal_amount * deal_commission * deal_hitrate / 10000) as commission_balanced,
       userobm_lastname,
-      userobm_firstname
+      userobm_firstname,
+      userobm_delegation
     FROM Deal
       LEFT JOIN DealType ON deal_type_id = dealtype_id
       LEFT JOIN UserObm ON deal_technicalmanager_id=userobm_id
@@ -981,7 +1002,9 @@ function run_query_deal_potential($users_id='') {
       $multidomain
     GROUP BY deal_technicalmanager_id,
       userobm_lastname,
-      userobm_firstname
+      userobm_firstname,
+      userobm_delegation
+    ORDER BY userobm_delegation, userobm_lastname
 ";
 
   display_debug_msg($query, $cdg_sql, 'run_query_deal_potential(2)');
@@ -997,19 +1020,36 @@ function run_query_deal_potential($users_id='') {
 
   while ($obm_q->next_record()) {
     $u_id = $obm_q->f('uid');
-    $res['tech']["$u_id"]['amount'] = $obm_q->f('amount');
-    $res['tech']["$u_id"]['margin'] = $obm_q->f('margin');
-    $res['tech']["$u_id"]['amount_balanced'] = $obm_q->f('amount_balanced');
-    $res['tech']["$u_id"]['commission'] = $obm_q->f('commission');
-    $res['tech']["$u_id"]['commission_balanced'] = $obm_q->f('commission_balanced');
-    $res['tech']["$u_id"]['number'] = $obm_q->f('nb');
+    $delegation = $obm_q->f('userobm_delegation');
+    $amount = $obm_q->f('amount');
+    $margin = $obm_q->f('margin');
+    $amount_balanced = $obm_q->f('amount_balanced');
+    $commission = $obm_q->f('commission');
+    $commission_balanced = $obm_q->f('commission_balanced');
+    $number = $obm_q->f('nb');
+
+    $res['tech']["$u_id"]['delegation'] = $delegation;
+    $res['tech']["$u_id"]['amount'] = $amount;
+    $res['tech']["$u_id"]['margin'] = $margin;
+    $res['tech']["$u_id"]['amount_balanced'] = $amount_balanced;
+    $res['tech']["$u_id"]['commission'] = $commission;
+    $res['tech']["$u_id"]['commission_balanced'] = $commission_balanced;
+    $res['tech']["$u_id"]['number'] = $number;
     $res['tech']["$u_id"]['name'] = $obm_q->f('userobm_lastname') . ' ' . $obm_q->f('userobm_firstname');
+
     $am += $res['tech']["$u_id"]['amount'];
     $ma += $res['tech']["$u_id"]['margin'];
     $ab += $res['tech']["$u_id"]['amount_balanced'];
     $cm += $res['tech']["$u_id"]['commission'];
     $cb += $res['tech']["$u_id"]['commission_balanced'];
     $nb += $res['tech']["$u_id"]['number'];
+
+    $res['tech']["$delegation"]['amount'] += $amount;
+    $res['tech']["$delegation"]['margin'] += $margin;
+    $res['tech']["$delegation"]['amount_balanced'] += $amount_balanced;
+    $res['tech']["$delegation"]['commission'] += $commission;
+    $res['tech']["$delegation"]['commission_balanced'] += $commission_balanced;
+    $res['tech']["$delegation"]['number'] += $number;
   }
 
   $res['tech']['0']['amount'] = $am;

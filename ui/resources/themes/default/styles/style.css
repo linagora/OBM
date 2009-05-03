@@ -990,6 +990,10 @@ input.datePicker {
   width: auto;
 }
 
+.spreadSheet tbody th.money, .spreadSheet tbody td.money {
+  text-align: right;
+}
+
 .spreadSheet tfoot th, .spreadSheet tfoot .head {
   background-color: #dbdbdb;
   font-weight: bold;
