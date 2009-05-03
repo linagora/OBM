@@ -2364,19 +2364,19 @@ function dis_deal_dashboard_year_detail($deal) {
 	    $month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
 	    $url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
 	  }
-	  $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list&amp;sel_manager[]=$u_id&amp;cba_archive=1$url_date$url_sel_tt\">$dis_am</a>";
+	  $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list&amp;sel_manager[]=$u_id&amp;cba_archive=1&amp;sel_region=$region&amp;delegation=$delegation$url_date$url_sel_tt\">$dis_am</a>";
 	}
 
 	$dis_amount_row .= "
-          <td>$dis_am</td>";
+          <td class=\"money\">$dis_am</td>";
 	$dis_margin_row .= "
-          <td>$dis_ma</td>";
+          <td class=\"money\">$dis_ma</td>";
 	$dis_balanced_row .= "
-          <td>$dis_ab</td>";
+          <td class=\"money\">$dis_ab</td>";
 	$dis_commission_row .= "
-          <td>$dis_ca</td>";
+          <td class=\"money\">$dis_ca</td>";
 	$dis_commission_balanced_row .= "
-          <td>$dis_cb</td>";
+          <td class=\"money\">$dis_cb</td>";
       } else {
 	$dis_amount_row .= "<td $class_am> </td>";
 	$dis_margin_row .= "<td $class_ma> </td>";
@@ -2392,15 +2392,15 @@ function dis_deal_dashboard_year_detail($deal) {
     $dis_tca = number_format($tca, 2, ',', ' ');
     $dis_tcb = number_format($tcb, 2, ',', ' ');
 
-    $dis_amount_row .= "<td>$dis_tam</td>
+    $dis_amount_row .= "<td class=\"money\">$dis_tam</td>
       </tr>";
-    $dis_margin_row .= "<td>$dis_tma</td>
+    $dis_margin_row .= "<td class=\"money\">$dis_tma</td>
       </tr>";
-    $dis_balanced_row .= "<td>$dis_tab</td>
+    $dis_balanced_row .= "<td class=\"money\">$dis_tab</td>
       </tr>";
-    $dis_commission_row .= "<td>$dis_tca</td>
+    $dis_commission_row .= "<td class=\"money\">$dis_tca</td>
       </tr>";
-    $dis_commission_balanced_row .= "<td>$dis_tcb</td>
+    $dis_commission_balanced_row .= "<td class=\"money\">$dis_tcb</td>
       </tr>";
 
     $dis_year_detail .= "
@@ -2457,7 +2457,7 @@ function dis_deal_dashboard_year_detail($deal) {
 	$month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
 	$url_date = "&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end";
       }
-      $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list$url_sel_manager&amp;cba_archive=1$url_date$url_sel_tt\">$dis_am</a>";
+      $dis_am = "<a href=\"$path/deal/deal_index.php?action=dashboard_list$url_sel_manager&amp;cba_archive=1&amp;sel_region=$region&amp;delegation=$delegation$url_date$url_sel_tt\">$dis_am</a>";
     } else {
       $dis_am = '';
       $dis_ma = '';
@@ -2467,15 +2467,15 @@ function dis_deal_dashboard_year_detail($deal) {
     }
 
     $dis_total_row .= "
-      <td>$dis_am</td>";
+      <td class=\"money\">$dis_am</td>";
     $dis_total_margin_row .= "
-      <td>$dis_ma</td>";
+      <td class=\"money\">$dis_ma</td>";
     $dis_total_balanced_row .= "
-      <td>$dis_ab</td>";
+      <td class=\"money\">$dis_ab</td>";
     $dis_total_commission_row .= "
-      <td>$dis_ca</td>";
+      <td class=\"money\">$dis_ca</td>";
     $dis_total_commission_balanced_row .= "
-      <td>$dis_cb</td>";
+      <td class=\"money\">$dis_cb</td>";
   }
   $dis_tam = number_format($tam, 2, ',', ' ');
   $dis_tma = number_format($tma, 2, ',', ' ');
@@ -2483,15 +2483,15 @@ function dis_deal_dashboard_year_detail($deal) {
   $dis_tca = number_format($tca, 2, ',', ' ');
   $dis_tcb = number_format($tcb, 2, ',', ' ');
   $dis_total_row .= "
-      <td>&nbsp;$dis_tam</td>";
+      <td class=\"money\">&nbsp;$dis_tam</td>";
   $dis_total_margin_row .= "
-      <td>&nbsp;$dis_tma</td>";
+      <td class=\"money\">&nbsp;$dis_tma</td>";
   $dis_total_balanced_row .= "
-      <td>&nbsp;$dis_tab</td>";
+      <td class=\"money\">&nbsp;$dis_tab</td>";
   $dis_total_commission_row .= "
-      <td>&nbsp;$dis_tca</td>";
+      <td class=\"money\">&nbsp;$dis_tca</td>";
   $dis_total_commission_balanced_row .= "
-      <td>&nbsp;$dis_tcb</td>";
+      <td class=\"money\">&nbsp;$dis_tcb</td>";
 
   // Artichow Chart
   for ($month = 1; $month < 13; $month++) {
@@ -2781,15 +2781,15 @@ function dis_deal_dashboard_deal_panel($deal) {
 	  $dis_first_deal_row = "<td>$company</td>
         <td>$quarter</td>
         <td>$label</td>
-        <td style=\"text-align: right;\">$amount</td>
-        <td style=\"text-align: right;\">$margin</td>";
+        <td class=\"money\">$amount</td>
+        <td class=\"money\">$margin</td>";
 	} else {
 	  $dis_deal_rows .= "<tr $class>
         <td>$company</td>
         <td>$quarter</td>
         <td>$label</td>
-        <td style=\"text-align: right;\">$amount</td>
-        <td style=\"text-align: right;\">$margin</td>
+        <td class=\"money\">$amount</td>
+        <td class=\"money\">$margin</td>
       </tr>";
 	}
       }
@@ -2804,8 +2804,8 @@ function dis_deal_dashboard_deal_panel($deal) {
         $dis_deal_rows
         <tr class=\"highlight\">
           <td colspan=\"4\">$u_name</td>
-          <td style=\"text-align: right;\">$total_d_am</td>
-          <td style=\"text-align: right;\">$total_d_mar</td>
+          <td class=\"money\">$total_d_am</td>
+          <td class=\"money\">$total_d_mar</td>
         </tr>";
       } else {
 	$dis_user_row .= "<tr>
@@ -2815,8 +2815,8 @@ function dis_deal_dashboard_deal_panel($deal) {
         $dis_deal_rows
         <tr class=\"highlight\">
           <td colspan=\"4\">$u_name</td>
-          <td style=\"text-align: right;\">$total_d_am</td>
-          <td style=\"text-align: right;\">$total_d_mar</td>
+          <td class=\"money\">$total_d_am</td>
+          <td class=\"money\">$total_d_mar</td>
         </tr>";
       }
     }
@@ -2830,8 +2830,8 @@ function dis_deal_dashboard_deal_panel($deal) {
     $dis_user_row
     <tr>
       <th colspan=\"5\">$l_total $hr %</th>
-      <th style=\"text-align: right;\">$total_hr_am</th>
-      <th style=\"text-align: right;\">$total_hr_mar</th>
+      <th class=\"money\">$total_hr_am</th>
+      <th class=\"money\">$total_hr_mar</th>
     </tr>
 ";
   }
@@ -2852,8 +2852,8 @@ function dis_deal_dashboard_deal_panel($deal) {
     $s_ma_total = number_format($one_hr['0']['margin'], 2, ',', ' ');
     $s_row .= "<tr>
       <td>$hr</td>
-      <td style=\"text-align: right;\">$s_am_total</td>
-      <td style=\"text-align: right;\">$s_ma_total</td>
+      <td class=\"money\">$s_am_total</td>
+      <td class=\"money\">$s_ma_total</td>
     </tr>";
   }
 
@@ -2899,15 +2899,15 @@ function dis_deal_dashboard_deal_panel($deal) {
     <thead>
     <tr>
       <th>$l_hitrate</th>
-      <th style=\"text-align: right;\">$l_amount</th>
-      <th style=\"text-align: right;\">$l_margin</th>
+      <th>$l_amount</th>
+      <th>$l_margin</th>
     </tr>
     </thead>
     $s_row
     <tr class=\"highlight\">
       <td>$l_total</td>
-      <td style=\"text-align: right;\">$total_amount</td>
-      <td style=\"text-align: right;\">$total_margin</td>
+      <td class=\"money\">$total_amount</td>
+      <td class=\"money\">$total_margin</td>
     </tr>
     </table>
     <p />
@@ -2921,8 +2921,8 @@ function dis_deal_dashboard_deal_panel($deal) {
     $dis_hr_rows
     <tr class=\"highlight\">
       <td colspan=\"5\">$l_total</td>
-      <td style=\"text-align: right;\">$total_amount</td>
-      <td style=\"text-align: right;\">$total_margin</td>
+      <td class=\"money\">$total_amount</td>
+      <td class=\"money\">$total_margin</td>
     </tr>
     </table>
     <p />

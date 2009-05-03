@@ -54,6 +54,7 @@ require('invoice_display.inc');
 require('invoice_query.inc');
 require_once('invoice_js.inc');
 require_once("$obminclude/of/of_select.inc");
+require_once("$obminclude/of/of_category.inc");
 
 get_invoice_action();
 $perm->check_permissions($module, $action);

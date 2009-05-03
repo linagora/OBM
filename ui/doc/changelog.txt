@@ -26,6 +26,7 @@ To do
   * Default configuration sections and menus is now groupware oriented
   * Deal : added manager delegation and region filters in dashboards
   * Deal : display potential dashboard by delegation
+  * Invoice : added manager delegation and region filters in dashboards
 
 2009-04-17 : version 2.2.1
 

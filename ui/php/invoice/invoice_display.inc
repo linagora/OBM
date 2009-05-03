@@ -1223,20 +1223,20 @@ function dis_invoice_dashboard_index($invoice) {
   $url_supplier_year_to_year = url_prepare("invoice_index.php?action=dashboard&amp;dash_view=year_to_year&amp;dash_target=supplier");
 
   $block = "
-    <div class=\"detail infos\">
-      <h1><a href=\"$url_client_year_detail\">$l_year_detail</a></h1>
+    <fieldset class=\"detail infos\">
+      <legend><a href=\"$url_client_year_detail\">$l_year_detail</a></legend>
       <ul>
         <li><a href=\"$url_client_year_detail\">$l_client</a></li>
         <li><a href=\"$url_supplier_year_detail\">$l_supplier</a></li>
       </ul>
-    </div>
-    <div class=\"detail infos\">
-      <h1><a href=\"$url_client_year_to_year\">$l_year_to_year</a></h1>
+    </fieldset>
+    <fieldset class=\"detail infos\">
+      <legend><a href=\"$url_client_year_to_year\">$l_year_to_year</a></legend>
       <ul>
         <li><a href=\"$url_client_year_to_year\">$l_client</a></li>
         <li><a href=\"$url_supplier_year_to_year\">$l_supplier</a></li>
       </ul>
-    </div>
+    </fieldset>
 ";
 
   if (isset($invoice['year'])) {
@@ -1271,11 +1271,11 @@ function dis_invoice_dashboard_index($invoice) {
 //   - $invoice : invoice hash infos
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_dashboard($invoice) {
-  global $display, $path, $ctt_sales, $cinv_status;
+  global $obm, $display, $path, $ctt_sales, $cinv_status;
   global $l_status, $l_total, $l_invoice, $l_date, $l_amount_ht, $l_amount_ttc;
   global $l_billed, $l_order_no_bill, $l_potential, $l_monthsofyear;
   global $l_payment, $l_amount_ht, $l_amount_ttc, $l_paid, $l_waiting;
-  global $l_execute, $ico_next, $ico_previous;
+  global $l_execute, $l_year_detail, $ico_next, $ico_previous;
 
   if (isset($invoice['year'])) {
     $year = $invoice['year'];
@@ -1286,6 +1286,18 @@ function dis_invoice_dashboard($invoice) {
   $year_next = $year + 1;
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
 
+  if (! isset($invoice['submit'])) { 
+    $delegation = $obm['delegation'];
+  }
+  if ($invoice['delegation'] != '') {
+    $delegation = stripslashes($invoice['delegation']);
+  }
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
+  $regions = of_category_get_ordered('', 'region');
+  $region = $invoice['region'];
+  $block_region = of_category_dis_search_select('', 'region', $regions, $region);
+
   if ($invoice['dash_target'] == 'supplier') {
     $inout = '-';
   } else {
@@ -1293,7 +1305,7 @@ function dis_invoice_dashboard($invoice) {
   }
   $url_inout = urlencode($inout);
 
-  $inv = run_query_invoice_amounts($date_ranges, 'invoice_date', $invoice['tasktype'], $inout);
+  $inv = run_query_invoice_amounts($date_ranges, 'invoice_date', $invoice['tasktype'], $inout, $region, $delegation);
   $url_prev = url_prepare("invoice_index.php?action=dashboard&amp;year=$year_prev");
   $url_next = url_prepare("invoice_index.php?action=dashboard&amp;year=$year_next");
 
@@ -1352,13 +1364,13 @@ function dis_invoice_dashboard($invoice) {
 	$dis_amount_ht = number_format($amount_ht, 2, ',', ' ');
 	$month_start = "$year_month-01";
 	$month_end = date('Y-m-d', mktime(12,0,0,$month+1, 0, $year));
-        $dis_bil_row .= "<td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
+        $dis_bil_row .= "<td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
       } else {
         $dis_bil_row .= '<td></td>';
       }
     }
     $f_total_amount_ht = number_format($total_amount_ht, 2, ',', ' ');
-    $dis_bil_row .= "<td>&nbsp;$f_total_amount_ht</td></tr>";
+    $dis_bil_row .= "<td class=\"money\">&nbsp;$f_total_amount_ht</td></tr>";
   }
 
   // Total row
@@ -1378,15 +1390,15 @@ function dis_invoice_dashboard($invoice) {
       $month_start = "$year_month-01";
       $month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
       $dis_bil_row_total .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search$total_status_param&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
+          <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search$total_status_param&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
     } else {
       $dis_bil_row_total .= "
-          <td>&nbsp;$dis_amount_ht</td>";
+          <td class=\"money\">&nbsp;$dis_amount_ht</td>";
     }
   }
   $f_total_amount_ht = number_format($total_amount_ht, 2, ',', ' ');
   $dis_bil_row_total .= "
-      <td>&nbsp;$f_total_amount_ht</td>";
+      <td class=\"money\">&nbsp;$f_total_amount_ht</td>";
 
   // Artichow Chart
   for ($month = 1; $month < 13; $month++) {
@@ -1439,7 +1451,7 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date('Y-m-d', mktime(12,0,0,$month+1, 0, $year));
         $dis_pot_row .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
+          <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
       } else {
         $dis_pot_row .= '
           <td> </td>';
@@ -1447,7 +1459,7 @@ function dis_invoice_dashboard($invoice) {
       $labels[$month-1] = number_format($amount_ht, 0, ',', ' ');
     }
     $f_total_amount_ht = number_format($total_amount_ht, 2, ',', ' ');
-    $dis_pot_row .= "<td>&nbsp;$f_total_amount_ht</td>
+    $dis_pot_row .= "<td class=\"money\">&nbsp;$f_total_amount_ht</td>
         </tr>";
   }
   $title = "$l_potential $year";
@@ -1461,7 +1473,7 @@ function dis_invoice_dashboard($invoice) {
   // Payment infos ------------------------------------------------------------
 
   $date_ranges = array(array("$year-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges, 'invoice_expiration_date', $invoice['taskttype'], $inout, true);
+  $inv = run_query_invoice_amounts($date_ranges, 'invoice_expiration_date', $invoice['taskttype'], $inout, $region, $delegation, true);
 
   $status_pay = get_invoice_status('payment');
 
@@ -1492,14 +1504,14 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date('Y-m-d', mktime(12,0,0,$month+1, 0, $year));
         $dis_pay_row .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;date_field=expiration_date&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+          <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;date_field=expiration_date&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
       } else {
         $dis_pay_row .= '
           <td></td>';
       }
     }
     $f_total_amount_ttc = number_format($total_amount_ttc, 2, ',', ' ');
-    $dis_pay_row .= "<td>&nbsp;$f_total_amount_ttc</td>
+    $dis_pay_row .= "<td class=\"money\">&nbsp;$f_total_amount_ttc</td>
         </tr>";
   }
 
@@ -1520,15 +1532,15 @@ function dis_invoice_dashboard($invoice) {
       $month_start = "$year_month-01";
       $month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
       $dis_pay_row_total .= "
-          <td>&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;inout=$url_inout&amp;cba_archive=1&amp;date_field=expiration_date&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+        <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;inout=$url_inout&amp;cba_archive=1&amp;date_field=expiration_date&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
     } else {
       $dis_pay_row_total .= "
-          <td>&nbsp;$dis_amount_ttc</td>";
+        <td class=\"money\">&nbsp;$dis_amount_ttc</td>";
     }
   }
   $f_total_amount_ttc = number_format($total_amount_ttc, 2, ',', ' ');
   $dis_pay_row_total .= "
-      <td>&nbsp;$f_total_amount_ttc</td>";
+    <td class=\"money\">&nbsp;$f_total_amount_ttc</td>";
 
   // Artichow Chart
   for ($month = 1; $month < 13; $month++) {
@@ -1554,9 +1566,10 @@ function dis_invoice_dashboard($invoice) {
 
 
   $block = "
-  <form method=\"post\"  name=\"f_search\" action=\"$url_form\">
-  <div class=\"detail extra\">
-    <h1 id=\"year\">$year</h1>
+  <form class=\"search\" method=\"post\" name=\"f_search\" action=\"$url_form\">
+  <fieldset class=\"detail extra\">
+  <legend>$l_year_detail</legend>
+  <label>$l_date<br />
     <a href=\"javascript: return false;\"
        onclick=\"yearfield=window.document.getElementById('year');
                   newyear=Number(yearfield.innerHTML)-1;
@@ -1564,7 +1577,7 @@ function dis_invoice_dashboard($invoice) {
                   document.forms.f_search.year.value=newyear;
                   return false;\">
     <img border=\"0\" src=\"$ico_previous\" alt=\"\" /></a>
-   
+    <span id=\"year\">$year</span>
     <a href=\"javascript: return false;\"
        onclick=\"yearfield=window.document.getElementById('year');
                   newyear=Number(yearfield.innerHTML)+1;
@@ -1572,17 +1585,18 @@ function dis_invoice_dashboard($invoice) {
                   document.forms.f_search.year.value=newyear;
                   return false;\">
     <img border=\"0\" src=\"$ico_next\" alt=\"\" /></a>
-
+  </label>
+    $block_region
+    $dis_delegation
     $block_tt
     &nbsp;<br />
-    <div class=\"buttons\">
-      <input type=\"hidden\" name=\"year\" value=\"$year\" />
-      <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
-      <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
-    </div>
-  </div>
+  </fieldset>
+  <fieldset class=\"buttons\">
+    <input type=\"hidden\" name=\"year\" value=\"$year\" />
+    <input name=\"action\" id=\"action\" type=\"hidden\" value=\"dashboard\" />
+    <input name=\"submit\" type=\"submit\" value=\"$l_execute\" />
+  </fieldset>
   </form>
-
 
   <div class=\"detail extra\">
   <h1>$l_order_no_bill ($l_amount_ht)</h1>
@@ -1656,7 +1670,7 @@ function dis_invoice_dashboard($invoice) {
 //   - $invoice : invoice hash infos
 ///////////////////////////////////////////////////////////////////////////////
 function dis_invoice_dashboard_year_to_year($invoice) {
-  global $display, $path, $ctt_sales;
+  global $obm, $display, $path, $ctt_sales;
   global $l_status, $l_total, $l_invoice, $l_date, $l_amount_ht, $l_amount_ttc;
   global $l_billed, $l_order_no_bill, $l_potential, $l_monthsofyear;
   global $l_payment, $l_amount_ht, $l_amount_ttc, $l_paid, $l_waiting;
@@ -1676,6 +1690,18 @@ function dis_invoice_dashboard_year_to_year($invoice) {
     $inout = '+';
   }
 
+  if (! isset($invoice['submit'])) { 
+    $delegation = $obm['delegation'];
+  }
+  if ($invoice['delegation'] != '') {
+    $delegation = stripslashes($invoice['delegation']);
+  }
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
+  $regions = of_category_get_ordered('', 'region');
+  $region = $invoice['region'];
+  $block_region = of_category_dis_search_select('', 'region', $regions, $region);
+
   // If no tt selected set tt_ids to 0 for get_global_tasktype to return 0 lines
   $tt_ids = $invoice['tasktype'];
   if (! is_array($tt_ids) && ($tt_ids == '')) {
@@ -1694,7 +1720,7 @@ function dis_invoice_dashboard_year_to_year($invoice) {
   // Billed infos Year-1 and Year ---------------------------------------------
 
   $date_ranges = array(array("$year_prev-01-01", "$year-12-31"));
-  $inv = run_query_invoice_amounts($date_ranges, 'invoice_date', $invoice['tasktype'], $inout);
+  $inv = run_query_invoice_amounts($date_ranges, 'invoice_date', $invoice['tasktype'], $inout, $region, $delegation);
 
   // Artichow Chart
   for ($month = 1; $month < 13; $month++) {
@@ -1738,9 +1764,10 @@ function dis_invoice_dashboard_year_to_year($invoice) {
   $chart_ytoyp_params .= "&amp;title=".urlencode($title)."&amp;plots=".urlencode(serialize($plots)) . "&amp;xlabels=".urlencode(serialize($xlabels));
 
   $block = "
-  <form method=\"post\"  name=\"f_search\" action=\"$url_form\">
-  <div class=\"detail extra\">
-    <h1 id=\"year\">$year</h1>
+  <form class=\"search\" method=\"post\"  name=\"f_search\" action=\"$url_form\">
+  <fieldset class=\"detail extra\">
+  <legend>$l_year_to_year</legend>
+  <label>$l_date<br />
     <a href=\"javascript: return false;\"
        onclick=\"yearfield=window.document.getElementById('year');
                   newyear=Number(yearfield.innerHTML)-1;
@@ -1748,7 +1775,7 @@ function dis_invoice_dashboard_year_to_year($invoice) {
                   document.forms.f_search.year.value=newyear;
                   return false;\">
     <img border=\"0\" src=\"$ico_previous\" alt=\"\" /></a>
-   
+    <span id=\"year\">$year</span>
     <a href=\"javascript: return false;\"
        onclick=\"yearfield=window.document.getElementById('year');
                   newyear=Number(yearfield.innerHTML)+1;
@@ -1756,7 +1783,9 @@ function dis_invoice_dashboard_year_to_year($invoice) {
                   document.forms.f_search.year.value=newyear;
                   return false;\">
     <img border=\"0\" src=\"$ico_next\" alt=\"\" /></a>
-
+  </label>
+    $block_region
+    $dis_delegation
     $block_tt
     &nbsp;<br />
     <div class=\"buttons\">
@@ -1766,7 +1795,6 @@ function dis_invoice_dashboard_year_to_year($invoice) {
     </div>
   </div>
   </form>
-
 
   <img border=\"0\" src=\"$path/chart/chart_index.php?action=bar_multiple$chart_ytoy_params\" alt=\"\" />
   <br />

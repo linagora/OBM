@@ -605,21 +605,25 @@ function get_invoice_nb_having_number ($number, $id='') {
 // Parameters:
 //   - $date_ranges : array [range1] : [date_start, date_end]
 //   - $target_date : invoice_date, invoice_expiration_date : date to sort
-//   - $sel_tt      : [optionnal] tasktype array filter
-//   - $inout       : [optionnal] (+ || -) to get client or supplier invoices
+//   - $sel_tt      : tasktype array filter
+//   - $inout       : (+ || -) to get client or supplier invoices
+//   - $region_id   : region_id of the deal linked to the invoices
+//   - $delegation  : delegation of the user that has created the invoices
 //   - $partial_pay : [optionnal] (true || false) get payments for ppaid status
 // Returns:
 //   $res : array[date]([billed]|[paid]|[potential])([status]|[total])[$infos]
 //            $infos = label, amount_ht, amount_ttc, nb
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $sel_tt='', $inout='+', $partial_pay=false) {
+function run_query_invoice_amounts($date_ranges, $target_date, $sel_tt, $inout, $region_id, $delegation='', $partial_pay=false) {
   global $cdg_sql, $cdg_param, $cinv_status;
   global $l_total;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
   $da = sql_date_format($db_type, 'invoice_date', 'date');
   $de = sql_date_format($db_type, 'invoice_expiration_date', 'expiration_date');
+  $delegation = sql_search_text_parse($delegation);
   $multidomain = sql_multidomain('invoice');
 	
   if (is_array($date_ranges)) {
@@ -632,13 +636,24 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
     }
   }
 
+  // Region filter
+  if (($region_id != $c_all) && ($region_id > 0)) {
+    $where_region = " AND deal_region_id=$region_id";
+    $join_deal = "LEFT JOIN Deal ON invoice_deal_id=deal_id";
+  }
+
+  // Delegation filter
+  if (trim($delegation) != '') {
+    $where_delegation = " AND userobm_delegation $like '$delegation%'";
+    $join_user = "LEFT JOIN UserObm ON invoice_usercreate=userobm_id";
+  }
+
   // Tasktype filter
   if (is_array($sel_tt)) {
     $w_tt .= ' AND (';
     $or = '';
     foreach ($sel_tt as $tt_id) {
-      $tt_id = sql_parse_id($tt_id, true);
-      $w_tt .= "$or project_tasktype_id $tt_id OR deal_tasktype_id $tt_id ";
+      $w_tt .= "$or project_tasktype_id='$tt_id' OR deal_tasktype_id='$tt_id'";
       $or = ' OR';
     }
     $w_tt .= ')';
@@ -652,8 +667,7 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
     $w_st .= ' AND (';
     $or = '';
     foreach ($status as $s_id=>$s_label) {
-      $s_id = sql_parse_id($s_id, true);
-      $w_st .= "$or invoice_status_id $s_id ";
+      $w_st .= "$or invoice_status_id='$s_id'";
       $or = ' OR';
     }
     $w_st .= ')';
@@ -671,9 +685,12 @@ function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $s
     FROM Invoice
       $join_project
       $join_deal
+      $join_user
     WHERE invoice_inout = '$inout' 
       $w_st
       $w_date
+      $where_region
+      $where_delegation
       $w_tt 
       $multidomain
     ORDER BY invoice_status_id

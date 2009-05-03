@@ -1338,11 +1338,14 @@ function run_query_deal_dashboard_list($deal, $users_id='') {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, 'deal_datebegin', 'deal_datebegin');
   $datealarm = sql_date_format($db_type, 'deal_datealarm', 'deal_datealarm');
   $dateexp = sql_date_format($db_type, 'deal_dateexpected', 'deal_dateexpected');
   $dateend = sql_date_format($db_type, 'deal_dateend', 'deal_dateend');
+  $region_id = $deal['region'];
+  $delegation = sql_search_text_parse($deal['delegation']);
 
   if ((is_array($users_id)) && (count($users_id) > 0)) {
     $where_uid = 'AND (';
@@ -1365,7 +1368,16 @@ function run_query_deal_dashboard_list($deal, $users_id='') {
       $where_date .= " AND deal_dateexpected <= '$date_before'";
     }
   }
-  $multidomain = sql_multidomain('deal');
+
+  // Region filter
+  if (($region_id != $c_all) && ($region_id > 0)) {
+    $where_region = " AND deal_region_id=$region_id";
+  }
+
+  // Delegation filter
+  if (trim($delegation) != '') {
+    $where_delegation = " AND userobm_delegation $like '$delegation%'";
+  }
 
   // Tasktype filter
   if (is_array($deal['tasktype'])) {
@@ -1378,6 +1390,7 @@ function run_query_deal_dashboard_list($deal, $users_id='') {
     }
     $where_tt .= ')';
   }
+  $multidomain = sql_multidomain('deal');
 
   // Order by clause
   $sql_order_field = $deal['sql_order_field'];
@@ -1430,6 +1443,8 @@ function run_query_deal_dashboard_list($deal, $users_id='') {
       AND (address_id IN (SELECT MIN(address_id) FROM Address WHERE address_entity_id = companyentity_entity_id) OR address_id IS NULL)
       $where_uid
       $where_date
+      $where_region
+      $where_delegation
       $multidomain
       $where_tt
     $orderq
@@ -1448,6 +1463,8 @@ function run_query_deal_dashboard_list($deal, $users_id='') {
       AND deal_archive = '0'
       $where_uid
       $where_date
+      $where_region
+      $where_delegation
       $multidomain
 ";
     $count = get_query_count($query_count);
