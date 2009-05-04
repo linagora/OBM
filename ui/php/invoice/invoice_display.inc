@@ -162,7 +162,8 @@ function dis_invoice_search_form($invoice='') {
 
   $sta = get_invoice_status();
   $tts = get_global_tasktype($ctt_sales, $tt_ids);
-  $block .= html_invoice_search_form($invoice, $sta, $tts);
+  $regions = of_category_get_ordered('', 'region');
+  $block .= html_invoice_search_form($invoice, $sta, $tts, $regions);
 
   return $block;
 }
@@ -173,10 +174,11 @@ function dis_invoice_search_form($invoice='') {
 // Parameters :
 //   - $invoice : invoice hash parameters/
 //   - $sta     : Status array
-//   - $tts     : Task Type aray
+//   - $tts     : Task Type array
+//   - $regions : Regions array
 //////////////////////////////////////////////////////////////////////////////
-function html_invoice_search_form($invoice, $sta, $tts) {
-  global $display, $path, $popup, $c_all, $l_all, $ctt_sales, $l_invoice;
+function html_invoice_search_form($invoice, $sta, $tts, $regions) {
+  global $obm, $display, $path, $popup, $c_all, $l_all, $ctt_sales, $l_invoice;
   global $l_label_start, $l_number, $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_tt, $l_date, $l_after, $l_before, $l_inout;
   global $l_credit_memo, $l_company, $l_include_archive, $l_select_invoice;
@@ -199,6 +201,13 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   $comp_id = $invoice['company_id'];
   $project_new_id = $invoice['project_id'];
   $archive = ($invoice['archive']) ? 'checked' : '' ;
+  $region = $invoice['region'];
+  if (($invoice['action'] != 'search') && (! isset($invoice['delegation']))) { 
+    $delegation = $obm['delegation'];
+  }
+  if ($invoice['delegation'] != '') {
+    $delegation = stripslashes($invoice['delegation']);
+  }
 
   $url_form = url_prepare('invoice_index.php');
   $sel_status_all = ($status == $c_all ? " selected = \"selected\"" : '');
@@ -259,6 +268,11 @@ function html_invoice_search_form($invoice, $sta, $tts) {
   // Selected date field
   $s_date_field[$date_field] = "selected=\"selected\"";
 
+  // Region select construction
+  $block_region = of_category_dis_search_select('', 'region', $regions, $region);
+
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
   $block = "
     <form method=\"post\" name=\"f_search\"
         onSubmit=\"if (check_search_form(this) == false) return false;
@@ -271,6 +285,9 @@ function html_invoice_search_form($invoice, $sta, $tts) {
     <label>$l_number<br />
       <input type=\"text\" name=\"tf_number\" size=\"12\" value=\"$number\" />
     </label>
+
+    $block_region
+    $dis_delegation
 
     <label>$l_amount_ht<br />
       <input type=\"text\" name=\"tf_amount_ht\" size=\"15\" value=\"$ht\" />
@@ -415,6 +432,8 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
   $deal_id = $invoice['deal_id'];
   $comp_id = $invoice['company_id'];
   $project_new_id = $invoice['project_id'];
+  $region = $invoice['region'];
+  $delegation = $invoice['delegation'];
 
   $url = url_prepare("invoice_index.php?action=search".
 		    "&amp;tf_label=$label".
@@ -432,6 +451,8 @@ function html_invoice_search_list ($inv_q, $prefs, $invoice) {
 		    "&amp;project_id=$project_new_id".
 		    "&amp;tf_company=$company".
 		    "&amp;cba_archive=$archive".
+		    "&amp;sel_region=$region".
+		    "&amp;tf_delegation=$delegation".
                     "$url_ext"); 
 
   $dis_invoice = new OBM_DISPLAY ('DATA', $prefs, 'invoice');

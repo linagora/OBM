@@ -33,6 +33,8 @@ function run_query_invoice_search ($invoice) {
   $comp_id = $invoice['company_id'];
   $deal_id = $invoice['deal_id'];
   $project_new_id = $invoice['project_id'];
+  $region = $invoice['region'];
+  $delegation = sql_search_text_parse($invoice['delegation']);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -50,6 +52,16 @@ function run_query_invoice_search ($invoice) {
   }
   if ($number != '') {
     $where .= " AND invoice_number $like '%$number%'";
+  }
+  // If a delegation indication has been specified, get it
+  if (trim($delegation) != '') {
+    $where .= " AND userobm_delegation $like '$delegation%'";
+    $join_user = "LEFT JOIN UserObm ON invoice_usercreate=userobm_id";
+  }
+  if (($region != $c_all) && ($region != '')) {
+    $region = sql_parse_id($region, true);
+    $where .= " AND deal_region_id $region"; 
+    $join_deal = "LEFT OUTER JOIN Deal ON invoice_deal_id=deal_id";
   }
   if ($ht != '') {
     $where .= " AND invoice_amount_ht = '$ht'";
@@ -151,13 +163,14 @@ function run_query_invoice_search ($invoice) {
       LEFT OUTER JOIN Company ON invoice_company_id = company_id
       LEFT OUTER JOIN Deal ON invoice_deal_id = deal_id
       LEFT JOIN Project on invoice_project_id=project_id
+      $join_user
     $whereq
     $orderq
     $limit
 ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Invoice $join_comp $join_deal $join_project $whereq");
+    $count = get_query_count("SELECT count(*) FROM Invoice $join_comp $join_deal $join_project $join_user $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -614,7 +627,7 @@ function get_invoice_nb_having_number ($number, $id='') {
 //   $res : array[date]([billed]|[paid]|[potential])([status]|[total])[$infos]
 //            $infos = label, amount_ht, amount_ttc, nb
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_invoice_amounts($date_ranges, $target_date, $sel_tt, $inout, $region_id, $delegation='', $partial_pay=false) {
+function run_query_invoice_amounts($date_ranges, $target_date='invoice_date', $sel_tt='', $inout='+', $region_id='', $delegation='', $partial_pay=false) {
   global $cdg_sql, $cdg_param, $cinv_status;
   global $l_total;
 

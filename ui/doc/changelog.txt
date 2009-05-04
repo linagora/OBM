@@ -27,6 +27,7 @@ To do
   * Deal : added manager delegation and region filters in dashboards
   * Deal : display potential dashboard by delegation
   * Invoice : added manager delegation and region filters in dashboards
+  * Invoice : added search by manager delegation and deal region
 
 2009-04-17 : version 2.2.1
 

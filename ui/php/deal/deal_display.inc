@@ -579,6 +579,8 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
   $date_after = stripslashes($deal['date_after']);
   $date_before = stripslashes($deal['date_before']);
   $param_comp = $deal['company_id'];
+  $region = $deal['region'];
+  $delegation = $deal['delegation'];
 
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('deal', $deal);
@@ -593,7 +595,7 @@ function html_deal_search_list($deal_q, $prefs, $deal) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;tf_number=$number&amp;cba_archive=$archive&amp;sel_type_id=$type&amp;sel_region=$region&amp;sel_status_id=$status&amp;sel_tasktype=$tt&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;manager_type=$manager_type&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp$url_userdata$url_ext");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;tf_number=$number&amp;cba_archive=$archive&amp;sel_type_id=$type&amp;sel_region=$region&amp;sel_status_id=$status&amp;sel_tasktype=$tt&amp;sel_role=$role&amp;tf_role_company=$role_company&amp;sel_manager=$manager&amp;manager_type=$manager_type&amp;tf_date_after=$date_after&amp;tf_date_before=$date_before&amp;parentdeal_id=$parent&company_id=$param_comp&amp;sel_region=$region&amp;tf_delegation=$delegation$url_userdata$url_ext");
 
   $deal_d = new OBM_DISPLAY('DATA', $prefs, 'deal');
   if ($popup) {
