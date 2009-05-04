@@ -74,7 +74,7 @@ $l_closing_delete = "Supprimer la clôture";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des projets correspondants.";
-$l_found = "projet(s) trouvés.";
+$l_found = "projet(s) trouvé(s).";
 $l_no_found = "Aucun projet ne correspond à ces critères !";
 $l_no_tasks = "Pas de tâches définies";
 $l_no_members = "Pas de participants définis";
