@@ -56,6 +56,7 @@ function dis_time_data(&$OD, $fieldname, $link_ok) {
 
   if ($fieldname == 'timetask_project_name') {
     $label = ($OD->data_set->f('timetask_project_name'));
+    $res['url'] = "$path/project/project_index.php?action=detailconsult&project_id=".$OD->data_set->f('project_id');
 
     if (strlen($label) > 30)
       $res['name'] = substr($label,0,30) . '...';
