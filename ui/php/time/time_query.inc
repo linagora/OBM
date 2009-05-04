@@ -126,15 +126,14 @@ function get_time_params_date_range(&$params) {
 function get_time_stat_project($time) {
   global $c_day_fraction, $cdg_sql;
 
-  $tail = 0;
-  $uid_tab = '(';
+  $uid_tab = array();
+  $uids_str = '';
   while ($key = each($time['user_ids'])) {
-    $uid = $key['value'];
-    $uid_tab .= ($tail) ? ", $uid" : "$uid";
-    $tail = 1;
+    $uid_tab[] = $key['value'];
   }
-
-  $uid_tab .= ')';
+  if(count($uid_tab)) {
+    $uids_str = 'AND timetask_user_id IN ('.implode(', ', $uid_tab).')';
+  }
 
   $date_begin = $time['date_begin'];
   $date_end = $time['date_end'];
@@ -157,7 +156,7 @@ function get_time_stat_project($time) {
     WHERE timetask_date <= '$date_end'
       AND timetask_projecttask_id = projecttask_id
       AND projecttask_project_id = project_id
-      AND timetask_user_id in $uid_tab
+      $uids_str
     GROUP BY project_id,project_name,tasktype_label,company_name
     having (sum($iftd_end)) != 0
 ";
