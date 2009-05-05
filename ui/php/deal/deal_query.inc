@@ -1538,18 +1538,17 @@ function run_query_deal_contact($p_id) {
   $p_id = sql_parse_id($p_id, true);
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $limit = sql_limit($db_type, 0, 1);
   $query = "SELECT contact_id,
       contact_lastname,
       contact_firstname,
       phone_number as contact_phone
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id    
+    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label LIKE '%PREF%'   
     WHERE contact_company_id $p_id 
     $multidomain
     AND contact_archive = 0
-    ORDER BY contact_archive, contact_lastname $limit";
+    ORDER BY contact_archive, contact_lastname";
 
   display_debug_msg($query, $cdg_sql, 'run_query_deal_contact()');
   $obm_q->query($query);
