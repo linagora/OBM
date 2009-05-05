@@ -312,8 +312,24 @@ function run_query_domain_init_groups($domain_id, $windows=false) {
         $samba,
         $gid,
         '$gname')";
-      display_debug_msg($query, $cdg_sql, 'run_query_domain_init_groups()');
+      display_debug_msg($query, $cdg_sql, 'run_query_domain_init_groups(1)');
       $obm_q->query($query);
+
+      $multidomain = sql_multidomain('group');
+
+      $query = "SELECT MAX(group_id) as  group_id
+        FROM UGroup
+        WHERE group_name='$gname'
+        $multidomain";
+
+      display_debug_msg($query, $cdg_sql, 'run_query_domain_init_groups(2)');
+      
+      $obm_q->query($query);
+      if ($obm_q->num_rows() > 0) {
+        $obm_q->next_record();
+        $id = $obm_q->f('group_id');
+        $entity_id = of_entity_insert('group', $id);  
+      }
     }
   }
 }
