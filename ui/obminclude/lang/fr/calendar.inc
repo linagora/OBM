@@ -120,6 +120,7 @@ $l_calendar_select_group = "Sélectionner les groupes.";
 $l_A = "Accepté";
 $l_W = "Attente";
 $l_R = "Refusé";
+$l_owner_notification = "Notifier par e-mail l'organisateur de la réunion";
 
 $l_view = "Vue";
 $l_view_default =  "Vue Défaut";

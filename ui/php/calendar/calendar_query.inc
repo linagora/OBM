@@ -278,8 +278,9 @@ function run_query_calendar_insert_decision($calendar) {
   $entity = $calendar['entity_kind'];
   $event_id = $calendar['calendar_id'];
   $state = $calendar['decision_event'];
+  $owner_notification = $calendar["owner_notification"];
 
-  run_query_calendar_update_occurrence_state($event_id,$entity,$entity_id,$state);
+  run_query_calendar_update_occurrence_state($event_id,$entity,$entity_id,$state, $owner_notification);
 }
 
 
@@ -290,7 +291,7 @@ function run_query_calendar_insert_decision($calendar) {
 //   - $user_id  : User id
 //   - $state    : New state to set (ACCEPTED, NEEDS-ACTION or DECLINED)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state, $force = false) {
+function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_id,$state, $owner_notification = true, $force = false) {
   global $cdg_sql;
   global $obm, $err, $l_of_right_err_auth;
 
@@ -330,7 +331,9 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
     $retour = $obm_q->query($query);
 
     // Send mail
-    OBM_EventFactory::getInstance()->store(OBM_EventFactory::getInstance()->getById($event_id), $oldEvent);
+    if ($owner_notification == "true") {
+      OBM_EventFactory::getInstance()->store(OBM_EventFactory::getInstance()->getById($event_id), $oldEvent);
+    }
 
   }
 

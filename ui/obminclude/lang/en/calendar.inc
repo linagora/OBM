@@ -131,6 +131,7 @@ $l_R = "R";
 $l_force = "Force the event insertion";
 $l_carac = "Caracteristics";
 $l_meeting_perform = "Seek for free time slots";
+$l_owner_notification = "Notify event owner";
 
 $l_event_color_tt = "Event's colors are the ones defined during the event creation.";
 

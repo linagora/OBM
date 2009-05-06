@@ -3428,8 +3428,11 @@ function html_calendar_waiting_events($obm_wait) {
       if ($block != '') {
         $block .= '</tbody></table>';    
       }
+      $owner_notification = "";
+      if ($_GET['owner_notification'] == "true") $owner_notification = "checked=\"checked\"";
       $block .= "
       <h1>$type : $current_label</h1>
+      <input type=\"checkbox\" id=\"owner_notification\" $owner_notification \"/>$GLOBALS[l_owner_notification]
       <table class=\"spreadSheet\">
       <thead>
        <tr>
@@ -3485,9 +3488,10 @@ function html_calendar_waiting_events($obm_wait) {
        <input type=\"hidden\" name=\"calendar_id\" value=\"".$obm_wait->f('event_id')."\" />
        <input type=\"hidden\" name=\"entity_kind\" value=\"$current_entity_entity\" />
        <input type=\"hidden\" name=\"entity_id\" value=\"$current_entity\" />
-       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"ACCEPTED\"  onclick=\"this.form.submit()\" />$l_accept</span><br />
-       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"NEEDS-ACTION\" checked=\"checked\" onclick=\"this.form.submit()\" />$l_wait</span><br />
-       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"DECLINED\" onclick=\"this.form.submit()\" />$l_refuse</span>
+       <input type=\"hidden\" name=\"owner_notification\" value=\"false\" />
+       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"ACCEPTED\"  onclick=\"submitWaiting(this.form)\" />$l_accept</span><br />
+       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"NEEDS-ACTION\" checked=\"checked\" onclick=\"submitWaiting(this.form)\" />$l_wait</span><br />
+       <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"DECLINED\" onclick=\"submitWaiting(this.form)\" />$l_refuse</span>
       </form>
      </td>
     </tr>";

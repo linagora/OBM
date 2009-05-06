@@ -193,7 +193,7 @@ class Vcalendar_Writer_OBM {
     foreach($states as $entity => $stateInfo) {
       foreach($stateInfo as $entityId => $state) {
         if(!is_null($state)) {
-          run_query_calendar_update_occurrence_state($id,$entity,$entityId,$state,($this->rights === true));
+          run_query_calendar_update_occurrence_state($id,$entity,$entityId,$state, true, ($this->rights === true));
         }
       }
     }

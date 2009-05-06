@@ -257,6 +257,11 @@ function add_email_field() {
   div.appendText(' ').adopt(new Element('input').setProperty('name','tf_others_attendees[]').setProperty('type','text'));
   
 }
+
+function submitWaiting(form) {
+  form.getElement('input[name=owner_notification]').value = $('owner_notification').checked ;
+  form.submit();
+}
 ";
 
 ?>
