@@ -36,11 +36,11 @@ class CalendarMailer extends OBM_Mailer {
     $this->body = $this->extractEventDetails($event, $this->from);
     if ($this->attachIcs) {
       $this->parts[] = array(
-        'content' => fopen($this->generateIcs($event, $attendees), 'r'), 
+        'content' => fopen($this->generateIcs($event, $attendees, "request"), 'r'), 
         'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
       );
       $this->attachments[] = array(
-        'content' => fopen($this->generateIcs($event, $attendees), 'r'), 
+        'content' => fopen($this->generateIcs($event, $attendees, "request"), 'r'), 
         'filename' => 'meeting.ics', 'content_type' => 'application/ics'
       );
     }
@@ -51,6 +51,16 @@ class CalendarMailer extends OBM_Mailer {
     $this->recipients = $this->getRecipients($attendees);
     $this->subject = __('Event cancelled on OBM: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from);
+    if ($this->attachIcs) {
+      $this->parts[] = array(
+        'content' => fopen($this->generateIcs($event, $attendees, "cancel"), 'r'), 
+        'content_type' => 'text/calendar; charset=UTF-8; method=CANCEL'
+      );
+      $this->attachments[] = array(
+        'content' => fopen($this->generateIcs($event, $attendees, "cancel"), 'r'), 
+        'filename' => 'meeting.ics', 'content_type' => 'application/ics'
+      );
+    }
   }
   
   protected function eventUpdate($event, $oldEvent, $attendees) {
@@ -61,11 +71,11 @@ class CalendarMailer extends OBM_Mailer {
                               $this->extractEventDetails($oldEvent, $this->from, 'old_'));
     if ($this->attachIcs) {
       $this->parts[] = array(
-        'content' => fopen($this->generateIcs($event, $attendees), 'r'), 
-        'filename' => 'meeting.ics', 'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
+        'content' => fopen($this->generateIcs($event, $attendees, "request"), 'r'), 
+        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
       );
       $this->attachments[] = array(
-        'content' => fopen($this->generateIcs($event, $attendees), 'r'), 
+        'content' => fopen($this->generateIcs($event, $attendees, "request"), 'r'), 
         'filename' => 'meeting.ics', 'content_type' => 'application/ics'
       );      
     }
@@ -110,12 +120,12 @@ class CalendarMailer extends OBM_Mailer {
   /**
    * Perform the export meeting to the vCalendar format
    */
-  private function generateIcs($event, $attendees) {
+  private function generateIcs($event, $attendees, $method) {
     include_once('obminclude/of/vcalendar/writer/ICS.php');
     include_once('obminclude/of/vcalendar/reader/OBM.php');
     
     $reader = new Vcalendar_Reader_OBM(array('user' => array($this->userId => 'dummy')), array($event->id));
-    $document = $reader->getDocument();
+    $document = $reader->getDocument($method);
     $writer = new Vcalendar_Writer_ICS();  
     $writer->writeDocument($document);
 

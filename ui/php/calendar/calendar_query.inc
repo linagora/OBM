@@ -1808,11 +1808,10 @@ function run_query_calendar_quick_delete($calendar) {
   of_entity_delete('event', $event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
-  $obm_q->query($query);
   if($calendar['send_mail']) {
     OBM_EventFactory::getInstance()->delete($event);
   }
-
+  $obm_q->query($query);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1857,9 +1856,9 @@ function run_query_calendar_delete($calendar) {
   of_entity_delete('event', $event_id);
   $query = "DELETE FROM Event WHERE event_id = $event_id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(5)');
-  $obm_q->query($query);
-  OBM_EventFactory::getInstance()->delete($event);
 
+  OBM_EventFactory::getInstance()->delete($event);
+  $obm_q->query($query);
 }
 
 

@@ -47,9 +47,9 @@ class Vcalendar_Reader_OBM {
   /**
    * @return Vcalendar
    */
-  function & getDocument() {
+  function & getDocument($method) {
     $this->document = new Vcalendar();
-    $this->setHeaders();
+    $this->setHeaders($method);
     foreach($this->eventSets as $set) {
       $id = $set['event_id'];      
       if(is_null($this->vevents[$id])) {
@@ -79,12 +79,13 @@ class Vcalendar_Reader_OBM {
     return $this->document;
   }
 
-  function setHeaders() {
+  function setHeaders($method) {
     $vcalendar = &$this->document->vcalendar;
     $vcalendar->set('prodid','-//Aliasource Groupe LINAGORA//OBM Calendar '.$GLOBALS['obm_version'].'//FR');
     $vcalendar->set('calscale', 'GREGORIAN');
     $vcalendar->set('x-obm-time',time());
     $vcalendar->set('version','2.0');
+    $vcalendar->set('method', strtoupper($method));
   }
 
   function & addVevent(&$data) {
