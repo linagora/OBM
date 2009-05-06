@@ -41,6 +41,12 @@ NameVirtualHost *:443
 #obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/minig
 #obm#</Location>
 #obm# alias /webmail/images /usr/lib/minig/images
+#I you install minig on an other server,
+#comment alias /webmail/images, and use
+#proxyPass ajp:
+#<Location /webmail/images>
+#ProxyPass ajp://_TOMCAT_SERVER_Minig:8009/minig/images
+#</Location>
 
 
 #obm#ProxyRequests On
