@@ -1663,8 +1663,9 @@ Obm.CalendarFreeBusy = new Class({
    * time_slots: contains all timestamps
    * busy_time_slots: contains busy indexes (not timestamp)
    */
-  initialize: function(nbSteps, duration, time_slots, busy_time_slots,unit) {
+  initialize: function(nbSteps, duration, time_slots, busy_time_slots,unit,meeting_date) {
 
+    this.meeting_date = meeting_date;
     this.unit = unit;
     this.stepSize = 40/this.unit;
     this.scrollDiv = $('calendarFreeBusyScroll');
@@ -1805,6 +1806,8 @@ Obm.CalendarFreeBusy = new Class({
     this.scrollRight.addEvent('click', function() {
       this.scroll.start(this.scrollDiv.scrollLeft+this.oneDayWidth/2, 0); // + 1/2 day
     }.bind(this));
+
+    this.initPosition();
   },
 
   /*
@@ -1878,6 +1881,15 @@ Obm.CalendarFreeBusy = new Class({
       this.autoScroll.toElement(this.meeting);
       this.forcePosition();
     }
+  },
+
+  /*
+   * Initialize meeting position
+   */
+  initPosition: function() {
+    this.currentPosition = this.ts.indexOf(''+this.meeting_date);
+    this.slider.set(this.currentPosition);
+    this.autoScroll.toElement(this.meeting);
   },
 
   /*

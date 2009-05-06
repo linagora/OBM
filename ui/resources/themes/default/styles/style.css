@@ -553,6 +553,14 @@ fieldset.detail {
   text-align: left;
 }
 
+.detail h2 {
+  font-size:100%;
+  padding: 2px 0 0 2px;
+  margin: 0 0 5px ;
+  text-align: left;
+}
+
+
 .detail table {
   width: 95%;
 }

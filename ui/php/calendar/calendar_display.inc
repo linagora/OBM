@@ -2002,6 +2002,14 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   $readable['user'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read'));
   $readable['resource'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read'));
 
+  $datebegin = clone $calendar["date_begin"];
+  $dateend = clone $calendar["date_end"];
+  $h = $dateend->diffHour($datebegin);
+  $m = $dateend->diffMinute($datebegin);
+  $time_begin = $calendar["time_begin"];
+  $min_begin = $calendar["min_begin"];
+  $url = "calendar_index.php?action=perform_meeting&time_duration=$h&min_duration=$m&time_begin=$time_begin&min_begin=$min_begin&date=$datebegin&title=$calendar[title]";
+
   foreach($conflicts as $conflict) {
     $private = true;
     $id = $conflict->event->id;
@@ -2029,20 +2037,33 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
     } else {
       $begin = $begin->getOutputDateTime();
       $end = $end->getOutputDateTime();
-    }       
+    }
+    $entity = $conflict->entity;
+    $freebusy_url = $url."&sel_${entity}_id[]=data-${entity}-".key($conflict->event->attendee[$conflict->entity]);
     $dis_conflict .= "
       <tr>
         <td>$title</td>
         <td>$location</td>
         <td>$begin</td>
         <td>$end</td>
-        <td>$name</td>
+        <td>$name <a href=\"$freebusy_url\">$GLOBALS[l_show_calendar]</a> </td>
       </tr>";
   }
+
+  foreach($calendar["user_id"] as $user) {
+    $sel_user_id .="<input type=\"hidden\" name=\"sel_user_id[]\" value=\"$user\" />";
+    $url .="&sel_user_id[]=$user";
+  }
+  if (is_array($calendar["resource_id"])) {
+    foreach($calendar["resource_id"] as $res) {
+      $sel_res_id .="<input type=\"hidden\" name=\"sel_resource_id[]\" value=\"$res\" />";
+      $url .="&sel_resource_id[]=$res";
+    }
+  }
   $block = "
-  $dis_form_begin
   <div class=\"detail extra\">
   <h1>$l_conflicts</h1>
+  <h2><a href=\"$url\">$GLOBALS[l_display_entites_freebusy]</a><h2>
   <table class=\"spreadSheet\">
   <thead>
    <tr>
@@ -3791,15 +3812,21 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Free meeting performing and display
+// Free/Busy interface
 // Parameters:
 //   - $calendar       : calendar parameters
 //   - $entity_store : array of entities to display
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
-// DAVID
 
+  $title = $calendar["title"];
   $duration = $calendar['meeting_duration'];
   $date = $calendar['date'];
+  if (isset($calendar['time_begin']) && isset($calendar['min_begin'])) {
+    $date_ts = $date->setHour($calendar['time_begin'])->setMinute($calendar['min_begin'])->setSecond(0)->getTimestamp();
+  } else {
+    $date_ts = $date->setHour($GLOBALS['ccalendar_first_hour'])->setMinute(0)->setSecond(0)->getTimestamp();
+  }
   $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(7);  
@@ -3846,6 +3873,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   }
 
   $users_id = $sel_entity_id['user'];
+  if ($calendar["users"]) $users_id = $calendar["users"];
   
   if (count($users_id > 0)) {
     $users = get_userobm_from_ids($users_id);
@@ -3912,28 +3940,30 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
 
   // Users Events
   $current = clone $date;
-  foreach ($users['entity'] as $u_id => $u_ent) {
-    $class = $entity_store['user'][$u_id]['class'];
-    $events = "<tr>";
-    while($current->compare($end) < 0) {
-      $current->setHour($GLOBALS['ccalendar_first_hour']);
-      $end_day = clone $current;
-      $end_day->setHour($GLOBALS['ccalendar_last_hour']);
-      while($current->compare($end_day) < 0) {
-        $end_slot = clone $current;
-        $end_slot->addSecond($time_unit_sec);
-        if ($of->periodHaveOccurrences($current,$end_slot, array('user' => array($u_id), 'resource' => null))) {
-          $events .= $HTML_busy_time_slot['entity'];
-        } else {
-          $events .= $HTML_empty_time_slot;
+  if (is_array($users['entity'])) {
+    foreach ($users['entity'] as $u_id => $u_ent) {
+      $class = $entity_store['user'][$u_id]['class'];
+      $events = "<tr>";
+      while($current->compare($end) < 0) {
+        $current->setHour($GLOBALS['ccalendar_first_hour']);
+        $end_day = clone $current;
+        $end_day->setHour($GLOBALS['ccalendar_last_hour']);
+        while($current->compare($end_day) < 0) {
+          $end_slot = clone $current;
+          $end_slot->addSecond($time_unit_sec);
+          if ($of->periodHaveOccurrences($current,$end_slot, array('user' => array($u_id), 'resource' => null))) {
+            $events .= $HTML_busy_time_slot['entity'];
+          } else {
+            $events .= $HTML_empty_time_slot;
+          }
+          $current->addSecond($time_unit_sec);
         }
-        $current->addSecond($time_unit_sec);
-      }
-      $current->addDay(1);
-    }  
-    $current = clone $date;
-    $events .="</tr>";
-    $users_evts[$u_id] = $events;
+        $current->addDay(1);
+      }  
+      $current = clone $date;
+      $events .="</tr>";
+      $users_evts[$u_id] = $events;
+    }
   }
 
   // Resources Events
@@ -4012,7 +4042,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   }
 
   $label = $date->localize(Of_Date::OBM_DATE_WEEK) .' - '. $end->subDay(1)->localize(Of_Date::OBM_DATE_WEEK);
-  $url = "calendar_index.php?action=perform_meeting&time_duration=$time_duration&min_duration=$min_duration&date=";
+  $url = "calendar_index.php?action=perform_meeting&time_duration=$time_duration&title=$title&min_duration=$min_duration&date=";
 
   $meeting_start = $date->setHour($GLOBALS['ccalendar_first_hour'])->getOutputDateTime();
   $meeting_end = $date->addSecond($duration_ts)->getOutputDateTime();
@@ -4149,6 +4179,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
           <input type=\"hidden\" name=\"date_begin\" id=\"date_begin\" value=\"".urldecode($date->setHour($GLOBALS['ccalendar_first_hour'])->getURL())."\" />
           <input type=\"hidden\" name=\"duration\" id=\"duration\" value=\"$duration_ts\" />
           <input type=\"hidden\" name=\"new_meeting\" value=\"1\">
+          <input type=\"hidden\" name=\"title\" value=\"$title\" />
           <input type=\"hidden\" name=\"action\" value=\"new\">
         </form>
       </div>
@@ -4158,7 +4189,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
 
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
-      obm.calendarFreeBusy = new Obm.CalendarFreeBusy($colspan*7, $duration, $js_time_slots, $js_busy_time_slots, $unit);
+      obm.calendarFreeBusy = new Obm.CalendarFreeBusy($colspan*7, $duration, $js_time_slots, $js_busy_time_slots, $unit, $date_ts);
       new obm.AutoComplete.Search('$GLOBALS[path]/user/user_index.php?action=ext_search&ajax=1', 'sel_user_id', 'userSearch');
       new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch');
     });

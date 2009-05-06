@@ -237,7 +237,8 @@ $l_resources_all_freebusy = "All resources are free";
 
 $l_freebusy_autopick_prev = "«";
 $l_freebusy_autopick_next = "AutoPick Next »";
-
+$l_display_entites_freebusy = "Display busy attendees/resources";
+$l_show_calendar = "See calendar";
   
 $l_add_event_mail_body = 
 "This email was automatically sent by OBM

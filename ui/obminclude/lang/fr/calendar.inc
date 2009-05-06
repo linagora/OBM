@@ -226,6 +226,8 @@ $l_resources_all_freebusy = "Toutes les ressources sont libres";
 
 $l_freebusy_autopick_prev = "«";
 $l_freebusy_autopick_next = "Choix automatique »";
+$l_display_entites_freebusy = "Afficher les agendas des participants/ressources occupé(e)s";
+$l_show_calendar = "Voir l'agenda";
 
 $l_add_event_mail_body = 
 "Message automatique envoyé par OBM
