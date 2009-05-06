@@ -294,9 +294,6 @@ sub _init {
                 last SWITCH;
             }
 
-            # Samba password must not change
-            $userDesc->{'userobm_samba_passwd_change'} = 0;
-
             # User SID
             $userDesc->{'userobm_samba_sid'} = $self->_getUserSID( $domainSid, $userDesc->{'userobm_uid'} );
             # Group SID
@@ -680,9 +677,6 @@ sub createLdapEntry {
     # Samba user passwords
     $self->setLdapSambaPasswd( $entry );
 
-    # Samba password must change
-    $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_samba_passwd_change'}, $entry, 'sambaPwdMustChange' );
-
     # Samba session script
     if( $self->{'entityDesc'}->{'userobm_samba_logon_script'} ) {
         $entry->add( sambaLogonScript => $self->{'entityDesc'}->{'userobm_samba_logon_script'} );
@@ -907,11 +901,6 @@ sub updateLdapEntry {
 
                 # ...and 'sambaAcctFlags'...
                 if( $self->_modifyAttr( $self->{'entityDesc'}->{'userobm_samba_flags'}, $entry, 'sambaAcctFlags' ) ) {
-                    $update = 1;
-                }
-
-                # ...and 'sambaPwdMustChange'.
-                if( $self->_modifyAttr( 0, $entry, 'sambaPwdMustChange' ) ) {
                     $update = 1;
                 }
             }
