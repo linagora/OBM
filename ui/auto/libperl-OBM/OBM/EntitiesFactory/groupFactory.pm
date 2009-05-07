@@ -15,9 +15,6 @@ use OBM::Tools::commonMethods qw(
         _log
         dump
         );
-use OBM::EntitiesFactory::commonFactory qw(
-        _checkUpdateType
-        );
 use OBM::Parameters::regexp;
 
 
@@ -66,21 +63,6 @@ sub new {
     $self->{'sambaHostGroup'} = $self->_getVirtualHost();
 
     return $self;
-}
-
-
-sub _start {
-    my $self = shift;
-
-    $self->_log( 'debut de traitement', 2 );
-
-    if( $self->_loadGroups() ) {
-        $self->_log( 'problème lors de l\'obtention de la description des groupes du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
-        return 0;
-    }
-
-    $self->{'running'} = 1;
-    return $self->{'running'};
 }
 
 
@@ -163,7 +145,7 @@ sub next {
 }
 
 
-sub _loadGroups {
+sub _loadEntities {
     my $self = shift;
 
     $self->_log( 'chargement des groupes du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 2 );

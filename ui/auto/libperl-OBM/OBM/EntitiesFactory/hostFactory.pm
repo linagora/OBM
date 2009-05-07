@@ -15,9 +15,6 @@ use OBM::Tools::commonMethods qw(
         _log
         dump
         );
-use OBM::EntitiesFactory::commonFactory qw(
-        _checkUpdateType
-        );
 use OBM::Parameters::regexp;
 
 
@@ -64,21 +61,6 @@ sub new {
 
 
     return $self;
-}
-
-
-sub _start {
-    my $self = shift;
-
-    $self->_log( 'debut de traitement', 2 );
-
-    if( $self->_loadHosts() ) {
-        $self->_log( 'problème lors de l\'obtention de la description des hôtes du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
-        return 0;
-    }
-
-    $self->{'running'} = 1;
-    return $self->{'running'};
 }
 
 
@@ -150,7 +132,7 @@ sub next {
 }
 
 
-sub _loadHosts {
+sub _loadEntities {
     my $self = shift;
 
     $self->_log( 'chargement des hôtes du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 2 );

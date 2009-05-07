@@ -2,6 +2,9 @@ package OBM::EntitiesFactory::incrementalFactories;
 
 $VERSION = '1.0';
 
+use OBM::EntitiesFactory::factory;
+@ISA = ('OBM::EntitiesFactory::factory');
+
 $debug = 1;
 
 use 5.006_001;
@@ -9,9 +12,6 @@ require Exporter;
 use strict;
 
 use OBM::Tools::commonMethods qw(_log dump);
-use OBM::EntitiesFactory::commonFactory qw(
-            _checkUpdateType
-            );
 
 
 sub new {

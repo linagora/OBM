@@ -15,11 +15,6 @@ use OBM::Tools::commonMethods qw(
         _log
         dump
         );
-use OBM::EntitiesFactory::commonFactory qw(
-        _checkUpdateType
-        _getEntityRight
-        _computeRight
-        );
 use OBM::Parameters::regexp;
 
 
@@ -66,21 +61,6 @@ sub new {
 
 
     return $self;
-}
-
-
-sub _start {
-    my $self = shift;
-
-    $self->_log( 'debut de traitement', 2 );
-
-    if( $self->_loadMailshare() ) {
-        $self->_log( 'problème lors de l\'obtention de la description des mailshare du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
-        return 0;
-    }
-
-    $self->{'running'} = 1;
-    return $self->{'running'};
 }
 
 
@@ -152,7 +132,7 @@ sub next {
 }
 
 
-sub _loadMailshare {
+sub _loadEntities {
     my $self = shift;
 
     $self->_log( 'chargement des mailshare du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 2 );

@@ -15,9 +15,6 @@ use OBM::Tools::commonMethods qw(
         _log
         dump
         );
-use OBM::EntitiesFactory::commonFactory qw(
-        _checkUpdateType
-        );
 use OBM::Parameters::regexp;
 
 
@@ -55,21 +52,6 @@ sub new {
 
 
     return $self;
-}
-
-
-sub _start {
-    my $self = shift;
-
-    $self->_log( 'debut de traitement', 2 );
-
-    if( $self->_loadMailServer() ) {
-        $self->_log( 'problème lors de l\'obtention de la description de la configuration des serveurs de courriers du '.$self->{'parentDomain'}->getDescription(), 3 );
-        return 0;
-    }
-
-    $self->{'running'} = 1;
-    return $self->{'running'};
 }
 
 
@@ -134,7 +116,7 @@ sub next {
 }
 
 
-sub _loadMailServer {
+sub _loadEntities {
     my $self = shift;
 
     $self->_log( 'chargement de la configuration des serveurs de courriers du domaine '.$self->{'parentDomain'}->getDescription().'\'', 2 );

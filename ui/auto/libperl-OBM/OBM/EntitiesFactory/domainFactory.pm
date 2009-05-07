@@ -15,9 +15,6 @@ use OBM::Tools::commonMethods qw(
         _log
         dump
         );
-use OBM::EntitiesFactory::commonFactory qw(
-        _checkSource
-        );
 use OBM::Parameters::regexp;
 
 

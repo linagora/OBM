@@ -47,21 +47,6 @@ sub new {
 }
 
 
-sub _start {
-    my $self = shift;
-
-    $self->_log( 'debut de traitement', 2 );
-
-    if( $self->_loadUsers() ) {
-        $self->_log( 'problème lors de l\'obtention de la description des utilisateur système du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
-        return 0;
-    }
-
-    $self->{'running'} = 1;
-    return $self->{'running'};
-}
-
-
 sub next {
     my $self = shift;
 
@@ -87,7 +72,7 @@ sub next {
 }
 
 
-sub _loadUsers {
+sub _loadEntities {
     my $self = shift;
 
     $self->_log( 'chargement des utilisateurs système du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 2 );

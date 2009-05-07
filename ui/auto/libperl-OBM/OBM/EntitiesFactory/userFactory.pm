@@ -15,11 +15,6 @@ use OBM::Tools::commonMethods qw(
         _log
         dump
         );
-use OBM::EntitiesFactory::commonFactory qw(
-        _checkUpdateType
-        _getEntityRight
-        _computeRight
-        );
 use OBM::Parameters::regexp;
 
 
@@ -69,21 +64,6 @@ sub new {
 }
 
 
-sub _start {
-    my $self = shift;
-
-    $self->_log( 'debut de traitement', 2 );
-
-    if( $self->_loadUsers() ) {
-        $self->_log( 'problème lors de l\'obtention de la description des utilisateurs du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 3 );
-        return 0;
-    }
-
-    $self->{'running'} = 1;
-    return $self->{'running'};
-}
-
-
 sub next {
     my $self = shift;
 
@@ -98,11 +78,10 @@ sub next {
 
     while( defined($self->{'entitiesDescList'}) && (my $userDesc = $self->{'entitiesDescList'}->fetchrow_hashref()) ) {
         require OBM::Entities::obmUser;
-        if( !(my $current = OBM::Entities::obmUser->new( $self->{'parentDomain'}, $userDesc )) ) {
+        if( !($self->{'currentEntity'} = OBM::Entities::obmUser->new( $self->{'parentDomain'}, $userDesc )) ) {
             next;
-        }else {
-            $self->{'currentEntity'} = $current;
 
+        }else {
             SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
                     if( $self->_loadUserLinks() ) {
@@ -164,7 +143,7 @@ sub next {
 }
 
 
-sub _loadUsers {
+sub _loadEntities {
     my $self = shift;
 
     $self->_log( 'chargement des utilisateur du domaine d\'identifiant \''.$self->{'domainId'}.'\'', 2 );
