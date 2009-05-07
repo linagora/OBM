@@ -370,6 +370,7 @@ function run_query_people_detail($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_people_insert($people){
   global $obm, $cdg_sql, $cgp_use, $password_encryption, $perms_admin;
+  global $cg_gid_smb_admin, $cg_gid_smb_user, $cg_gid_user;
 
   $uid = sql_parse_id($obm['uid']);
 //  $login = "'".strtolower($people['login'])."'";
@@ -403,7 +404,9 @@ function run_query_people_insert($people){
   $cdx = $people['cdx'];
   $ctry = $people['country'];
   
-  
+  // User UID/GID
+  $user_uid = get_first_user_free_uid();
+
   $domain_id = sql_parse_id($obm['domain_id']);
 
   // Connect to the BD
@@ -439,7 +442,8 @@ function run_query_people_insert($people){
        userobm_mobile,
        userobm_fax,
        userobm_fax2,
-       userobm_description
+       userobm_description,
+       userobm_uid
      ) VALUES (
        $domain_id,
        NOW(),
@@ -469,7 +473,8 @@ function run_query_people_insert($people){
        '$mobile',
        '$fax',
        '$fax2',
-       '$desc'
+       '$desc',
+       '$user_uid'
       )
     ";
 
