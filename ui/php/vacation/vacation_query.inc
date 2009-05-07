@@ -70,14 +70,17 @@ function run_query_vacation_update($params, $u_id) {
     $params['vacation_datebegin'] = '0';
     $params['vacation_dateend'] = '0';
   }    
+
+  $vacation_datebegin = $params['vacation_datebegin'];
+  
+  $vacation_dateend = $params['vacation_dateend'];
+
   $enabled = sql_parse_int($params["enabled"]);
   $message_update = ", userobm_vacation_message='".addslashes($params["message"])."'";
   $time_begin = $params["time_begin"].":".$params["min_begin"].":00";
   $time_end = $params["time_end"].":".$params["min_end"].":00";
-  $vacation_datebegin = ($params['vacation_datebegin'] ? "'".of_isodate_convert($params['vacation_datebegin'])." $time_begin'" : 'NULL');
-  $vacation_dateend = ($params['vacation_dateend'] ? "'".of_isodate_convert($params['vacation_dateend'])." $time_end'" : 'NULL');
-  $message_update .= ", userobm_vacation_datebegin=".$vacation_datebegin;
-  $message_update .= ", userobm_vacation_dateend=".$vacation_dateend;
+  $message_update .= ", userobm_vacation_datebegin= '$vacation_datebegin'";
+  $message_update .= ", userobm_vacation_dateend= '$vacation_dateend'";
   $u_id = sql_parse_id($u_id, true);
 
   // Update done in real-time, so updating UserObm AND P_UserObm
@@ -96,7 +99,6 @@ function run_query_vacation_update($params, $u_id) {
     WHERE userobm_id $u_id ";
 
   display_debug_msg($query, $cdg_sql, "run_query_vacation_update()");
-  $obm_q = new DB_OBM;
   $ret = $obm_q->query($query);
  
   return $ret;

@@ -648,8 +648,13 @@ function html_user_consult($obm_q) {
   $nomade_enable = $obm_q->f('userobm_nomade_enable');
   $nomade_local_copy = $obm_q->f('userobm_nomade_local_copy');
   $vacation_enable = $obm_q->f('userobm_vacation_enable');
-  $vacation_datebegin = of_datetime_format($obm_q->f('userobm_vacation_datebegin'), 1);
-  $vacation_dateend = of_datetime_format($obm_q->f('userobm_vacation_dateend'), 1);
+  //$vacation_datebegin = of_datetime_format($obm_q->f('userobm_vacation_datebegin'), 1);
+  $vacation_datebegin = new Of_Date();
+  $vacation_datebegin->setTimestamp($obm_q->f('userobm_vacation_datebegin'));
+  $vacation_datebegin = $vacation_datebegin->getOutputDateTime();
+  $vacation_dateend = new Of_Date();
+  $vacation_dateend->setTimestamp($obm_q->f('userobm_vacation_dateend'));
+  $vacation_dateend = $vacation_dateend->getOutputDateTime();
   $vacation_message = stripslashes($obm_q->f('userobm_vacation_message'));
   $smb_perms = $obm_q->f('userobm_samba_perms');
   $smb_home = $obm_q->f('userobm_samba_home');
@@ -1230,6 +1235,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   $noexperie = " checked=\"checked\" ";	
   // if update mode and first time value are taken from database
   if ($action == 'detailupdate') {
+
     // infos
     $id = $usr_q->f('userobm_id');
     $gid = $usr_q->f('userobm_gid');
@@ -1295,14 +1301,18 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $email_nomade = $usr_q->f('userobm_email_nomade');
 
     // vacation
+    $datebegin = new Of_Date();
+    $datebegin->setTimestamp($usr_q->f('userobm_vacation_datebegin'));
+    $dateend = new Of_Date();
+    $dateend->setTimestamp($usr_q->f('userobm_vacation_dateend'));
     $vacation_enable = $usr_q->f('userobm_vacation_enable');
     $vacation_message = stripslashes($usr_q->f('userobm_vacation_message'));
     $vacation_datebegin = $usr_q->f('userobm_vacation_datebegin');
     $vacation_dateend = $usr_q->f('userobm_vacation_dateend');
-    $hourbegin = date('H',$vacation_datebegin);
-    $minbegin = date('i',$vacation_datebegin);
-    $hourend = date('H',$vacation_dateend);
-    $minend = date('i',$vacation_dateend);
+    $hourbegin = $datebegin->getHour();
+    $minbegin = $datebegin->getMinute();
+    $hourend = $dateend->getHour();
+    $minend = $dateend->getMinute();
     $vacation_datebegin = of_date_upd_format($vacation_datebegin);
     $vacation_dateend = of_date_upd_format($vacation_dateend);
 

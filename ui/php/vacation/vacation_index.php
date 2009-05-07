@@ -31,12 +31,13 @@ $module = "vacation";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
-$params = get_vacation_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require("vacation_display.inc");
 require("vacation_query.inc");
 require("vacation_js.inc");
+
+$params = get_vacation_params();
 
 if ($action == "") $action = "index";
 get_vacation_action();
@@ -106,6 +107,17 @@ function get_vacation_params() {
   // Get global params
   $params = get_global_params("vacation");
 
+  if(isset ($params['vacation_datebegin'])) {
+    $params['vacation_datebegin'] = of_isodate_convert($params['vacation_datebegin']);
+    $params['vacation_datebegin'] = new Of_Date($params['vacation_datebegin']);
+    $params['vacation_datebegin']->setHour($params["time_begin"])->setMinute($params["min_begin"])->setSecond(0);
+  }
+
+  if(isset ($params['vacation_dateend'])) {
+    $params['vacation_dateend'] = of_isodate_convert($params['vacation_dateend']);
+    $params['vacation_dateend'] = new Of_Date($params['vacation_dateend']);
+    $params['vacation_dateend']->setHour($params["time_end"])->setMinute($params["min_end"])->setSecond(0);
+  }
 
   return $params;
 }

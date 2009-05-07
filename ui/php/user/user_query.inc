@@ -491,16 +491,23 @@ function run_query_user_insert($user) {
     $nomade_enable,
     $nomade_local_copy";
   }
-
+  
   // Section Mail Vacation
   if ($cgp_use['service']['mail_vacation']) {
-    $vacation_enable = sql_parse_id($user['vacation_enable']);
+    $vacation_enable = sql_parse_int($user['vacation_enable']);
     $vacation_message = $user['vacation_message'];
-    $query_insert_mail_vacation = ',
+    $vacation_datebegin = $user['vacation_datebegin'];
+    $vacation_dateend = $user['vacation_dateend'];
+    $vacation_message = $user['vacation_message'];
+    $query_insert_mail_vacation = ",
     userobm_vacation_enable,
-    userobm_vacation_message';
+    userobm_vacation_datebegin,
+    userobm_vacation_dateend,
+    userobm_vacation_message";
     $query_values_mail_vacation = ",
     $vacation_enable,
+    '$vacation_datebegin',
+    '$vacation_dateend',
     '".addslashes($vacation_message)."'";
   }
 
@@ -816,13 +823,13 @@ function run_query_user_update($u_id, $user) {
   if ($cgp_use['service']['mail_vacation']) {
     $vacation_enable = sql_parse_int($user['vacation_enable']);
     $vacation_message = $user['vacation_message'];
-    $vacation_datebegin = ($user['vacation_datebegin'] ? "'".of_isodate_convert($user['vacation_datebegin'])." ".$user['time_begin'].":".$user['min_begin'].":00'" : 'null');
-    $vacation_dateend = ($user['vacation_dateend'] ? "'".of_isodate_convert($user['vacation_dateend'])." ".$user['time_end'].":".$user['min_end'].":00'" : 'null');
+    $vacation_datebegin = $user['vacation_datebegin'];
+    $vacation_dateend = $user['vacation_dateend'];
     $vacation_message = $user['vacation_message'];
     $query_mail_vacation = ",
     userobm_vacation_enable=$vacation_enable,
-    userobm_vacation_datebegin=$vacation_datebegin,
-    userobm_vacation_dateend=$vacation_dateend,
+    userobm_vacation_datebegin= '$vacation_datebegin',
+    userobm_vacation_dateend= '$vacation_dateend',
     userobm_vacation_message='".addslashes($vacation_message)."'";
   }
 

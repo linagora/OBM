@@ -29,8 +29,13 @@ function html_vacation_consult($usr_q) {
   } else {
     $message = "---";
   }
-  $vacation_datebegin = of_datetime_format($usr_q->f("vacation_datebegin"), 1);
-  $vacation_dateend = of_datetime_format($usr_q->f("vacation_dateend"), 1);
+
+  $vacation_datebegin = new Of_Date();
+  $vacation_datebegin->setTimestamp($usr_q->f('vacation_datebegin'));
+  $vacation_datebegin = $vacation_datebegin->getOutputDateTime();
+  $vacation_dateend = new Of_Date();
+  $vacation_dateend->setTimestamp($usr_q->f('vacation_dateend'));
+  $vacation_dateend = $vacation_dateend->getOutputDateTime();
 
   $block = "
   <div class=\"detail extra\">
@@ -75,16 +80,22 @@ function html_vacation_form($usr_q, $vacation, $field="") {
 
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
+
+    $datebegin = new Of_Date();
+    $datebegin->setTimestamp($usr_q->f('vacation_datebegin'));
+    $dateend = new Of_Date();
+    $dateend->setTimestamp($usr_q->f('vacation_dateend'));
+
     $enabled = $usr_q->f("userobm_vacation_enable");
     $message = stripslashes( $usr_q->f("userobm_vacation_message") );
     $mail_enable = $usr_q->f("userobm_mail_perms");
     $vacation_datebegin = $usr_q->f("vacation_datebegin");
     $vacation_dateend = $usr_q->f("vacation_dateend");
     $auto_enable = ($vacation_datebegin != '0');
-    $hourbegin = date("H",$vacation_datebegin);
-    $minbegin = date("i",$vacation_datebegin);
-    $hourend = date("H",$vacation_dateend);
-    $minend = date("i",$vacation_dateend);
+    $hourbegin = $datebegin->getHour();
+    $minbegin = $datebegin->getMinute();
+    $hourend = $dateend->getHour();
+    $minend = $dateend->getMinute();
     $vacation_datebegin = of_date_upd_format($vacation_datebegin);
     $vacation_dateend = of_date_upd_format($vacation_dateend);
   } else if ($action == 'update') {

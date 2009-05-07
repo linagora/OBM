@@ -400,6 +400,18 @@ function get_user_params() {
     $params['type'] = $_FILES['fi_file']['type'];
   }
 
+  if(isset ($params['vacation_datebegin'])) {
+    $params['vacation_datebegin'] = of_isodate_convert($params['vacation_datebegin']);
+    $params['vacation_datebegin'] = new Of_Date($params['vacation_datebegin']);
+    $params['vacation_datebegin']->setHour($params["time_begin"])->setMinute($params["min_begin"])->setSecond(0);
+  }
+
+  if(isset ($params['vacation_dateend'])) {
+    $params['vacation_dateend'] = of_isodate_convert($params['vacation_dateend']);
+    $params['vacation_dateend'] = new Of_Date($params['vacation_dateend']);
+    $params['vacation_dateend']->setHour($params["time_end"])->setMinute($params["min_end"])->setSecond(0);
+  } 
+
   if (is_array($params['email'])) {
     $email_aliases = array();
     while(!empty($params['email'])) {
