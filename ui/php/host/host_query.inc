@@ -94,8 +94,15 @@ function run_query_host_search($host) {
     $orderq
     $limit";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_host_search()');
-  $obm_q->query($query);
+  if ($ctu_sql_limit) {
+    $count = get_query_count("SELECT count(distinct host_id) FROM Host $whereq");
+    $obm_q->set_num_rows_total($count);
+  }
+
+  if (($count > 0) || (! $ctu_sql_limit)) {
+    display_debug_msg($query, $cdg_sql, 'run_query_user_search()');
+    $obm_q->xquery($query);
+  }
 
   return $obm_q;
 }
