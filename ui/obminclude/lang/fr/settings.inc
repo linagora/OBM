@@ -26,8 +26,8 @@ $l_set_cal_first_hour = "Calendrier : Heure de début";
 $l_set_cal_last_hour = "Calendrier : Heure de fin";
 $l_set_csv_sep = "Séparateur pour export CSV";
 $l_set_debug = "Niveau de debug";
-$l_send_mail = "Accepter les e-mail";
-$l_send_mail_participation = "E-mail de participation aux réunions";
+$l_send_mail = "Accepter les notifications d'invitation par e-mail";
+$l_send_mail_participation = "Accepter les notifications de participation par e-mail";
 
 // Dates format
 $l_da_iso = "aaaa-mm-jj";
