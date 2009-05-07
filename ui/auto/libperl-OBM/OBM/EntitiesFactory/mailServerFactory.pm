@@ -69,9 +69,7 @@ sub next {
 
     if( defined($self->{'entitiesDescList'}) && (my $mailServerDesc = $self->{'entitiesDescList'}->fetchall_arrayref({})) ) {
         require OBM::Entities::obmMailServer;
-        if( my $current = OBM::Entities::obmMailServer->new( $self->{'parentDomain'}, $mailServerDesc ) ) {
-            $self->{'currentEntity'} = $current;
-
+        if( $self->{'currentEntity'} = OBM::Entities::obmMailServer->new( $self->{'parentDomain'}, $mailServerDesc ) ) {
             SWITCH: {
                 if( $self->{'updateType'} eq 'UPDATE_ALL' ) {
                     if( $self->_loadMailServerLinks() ) {
@@ -111,6 +109,8 @@ sub next {
             return $self->{'currentEntity'};
         }
     }
+
+    $self->{'currentEntity'} = undef;
 
     return undef;
 }

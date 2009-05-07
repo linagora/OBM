@@ -125,6 +125,8 @@ sub next {
         }
     }
 
+    $self->{'currentEntity'} = undef;
+
     return undef;
 }
 
