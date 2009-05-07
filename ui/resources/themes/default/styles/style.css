@@ -1485,6 +1485,10 @@ div.overTxtDiv {
 	padding-top: 10px;
 	padding-bottom: 10px;
 	min-height: 100px;
+  height:auto!important;
+  height:100px;
+  width: 40em;
+  margin-bottom: 15px;
 }
 
 .obmPopup .content .buttons input{

@@ -465,6 +465,8 @@
   margin:0;
   padding: 0 0 5px 0;
   height: 6em;
+  padding-bottom: 10px;
+  width: auto;
 }
 
 #calendarQuickFormData div {
