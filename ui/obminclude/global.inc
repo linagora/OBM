@@ -672,7 +672,7 @@ $php_regexp_password = "/^[-\$\\\&~#{([|_`^@);\]+=}%!:\/\.,?<>\"\w0-9]{4,12}$/";
 
 $php_regexp_groupname = "/^[\w0-9]([\w0-9-._ ]{0,252}[\w0-9]){0,1}$/"; // group name
 $php_regexp_hostname = "/^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$/"; // host
-$php_regexp_fqdn = "/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,6}$/"; // Fqdn
+$php_regexp_fqdn = "/^[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,6}$/"; // Fqdn
 $php_regexp_ip = '/^([1-2]?[0-9]{1,2}\.){3}[1-2]?[0-9]{1,2}$/'; // IP
 $php_regexp_network = '/^([1-2]?[0-9]{1,2}.){3}[1-2]?[0-9]{1,2}(\/[1-2]?[0-9])?$/'; // IP[/MASK]
 $php_regexp_port_list ='/^[0-9]+(-[0-9]*){0,1}$/'; // Une liste de ports TCP/IP num[-num]
