@@ -268,7 +268,7 @@ var IframeShim = new Class({
 			 z = this.options.zindex;
 			
  		this.shim.set({
-			src: (window.location.protocol == 'https') ? '://0' : 'javascript:void(0)',
+			src: (window.location.protocol.contains('https')) ? 'javascript:"<html></html>"' : 'javascript:void(0)',
 			frameborder:'0',
 			scrolling:'no',
 			styles: {
