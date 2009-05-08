@@ -1305,7 +1305,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
 
   $event = $occurrence->event;
   $owner = $event->owner;
-  $owner_name = $event->owner_name;
+  $owner_name = phpStringToJsString($event->owner_name);
 
   if ($owner == $obm['uid'] || in_array($owner,$writable_entity['ids'])) {
     $updatable =  true;

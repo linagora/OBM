@@ -19,7 +19,7 @@ To do
  usergroup : agir lorsqu'archivage d'un user ?
 
 
-2009-05-17 : version 2.2.2
+2009-05-11 : version 2.2.2
 
   * Lead : added search by manager delegation
   * Deal : added search by manager delegation
@@ -28,6 +28,7 @@ To do
   * Deal : display potential dashboard by delegation
   * Invoice : added manager delegation and region filters in dashboards
   * Invoice : added search by manager delegation and deal region
+  * Calendar : fixed a bug with quote in calendar name (thank you SamSam)
 
 2009-04-17 : version 2.2.1
 
