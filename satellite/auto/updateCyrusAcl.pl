@@ -99,6 +99,7 @@ sub _getParameter {
         $self->_log( 'Parametre --name manquant', 0 );
         return 1;
     }else {
+        $$parameters{'name'} = lc($$parameters{'name'});
         if( ($$parameters{'type'} eq 'mailbox') && ($$parameters{'name'} !~ /$regexp_login/) ) {
             $self->_log( 'Parametre --name invalide', 0 );
             return 1;
