@@ -310,6 +310,12 @@ sub update {
         return 0;
     }
 
+    # If entity haven't be update, we do nothing and it's no an error
+    if( !$entity->getUpdateEntity() ) {
+        $self->_log( 'l\'entité '.$entity->getDescription().' n\'a pas été mise à jour, Sieve n\'a pas besoin d\'être mis à jour', 3 );
+        return 0;
+    }
+
 
     # Get user BAL server object
     my $mailServerId = $entity->getMailServerId();
