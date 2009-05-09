@@ -620,7 +620,7 @@ sub _createMailbox {
     }
 
     # On crée les répertoires par défaut si nécessaire
-    if( $self->_createMailboxDefaultFolders() ) {
+    if( ($action eq 'create') && $self->_createMailboxDefaultFolders() ) {
         return 1;
     }
 
