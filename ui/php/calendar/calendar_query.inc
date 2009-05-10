@@ -536,6 +536,8 @@ function run_query_calendar_merge_groups($groups, $users) {
   }
   return $users;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Insert one event
 // Parameters: 
@@ -647,12 +649,12 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
 function run_query_calendar_insert_event_data($calendar) {
   global $cdg_sql, $obm;
 
-  if(array_key_exists('ext_id', $calendar)) {
+  if (array_key_exists('ext_id', $calendar)) {
     $ext_id = $calendar['ext_id'];
   } else {
     $ext_id = genUniqueExtEventId();
   }
-  if(!is_numeric($calendar['owner']) || $calendar['owner'] <= 0) {
+  if (!is_numeric($calendar['owner']) || $calendar['owner'] <= 0) {
     $owner = $obm['uid'];
   } else {
     $owner = $calendar['owner'];
@@ -668,7 +670,7 @@ function run_query_calendar_insert_event_data($calendar) {
   if ($calendar['privacy']!=1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
-  if(isset($calendar['repeat_end'])) {
+  if (isset($calendar['repeat_end'])) {
     $repeat_end = "'$calendar[repeat_end]'";
   } else {
     $repeat_end = 'NULL';

@@ -33,8 +33,10 @@ To do
   * Calendar : Event Unique ID implementation
   * OBM packages now handles minig config files
   * Fixed some IE 6 srange behaviours bugs
-  * Fixed bugs 176, 178, 185, 188, 191, 192, 193, 195, 201, 202, 206, 212, 222
-  * Fixed bugs 223, 225, 230, 234
+  * E#109 : Planning view lacks link to project
+  * E#150 : Complete English referential (Payment, countries,..)
+  * Fixed bugs 13, 18, 65, 176, 178, 185, 188, 191, 192, 193, 194, 195
+  * Fixed bugs 201, 202, 206, 210, 212, 215, 220, 222, 223, 225, 230, 234
   * Calendar : fixed a bug with quote in calendar name (thank you SamSam)
 
 2009-04-17 : version 2.2.1

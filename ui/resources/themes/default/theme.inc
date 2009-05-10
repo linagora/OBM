@@ -82,10 +82,10 @@ $ico_organizationalchart = "$theme_path/ico_organizational_chart.gif";
 $ico_load            = "$theme_path/ico_load.gif";
 
 // Globals Icons
-$ico_arrow_up       = "$theme_path/arrow_up.gif";       
-$ico_arrow_down     = "$theme_path/arrow_down.gif";  
-$ico_arrow_left     = "$theme_path/arrow_left.gif";       
-$ico_arrow_right    = "$theme_path/arrow_right.gif";  
+$ico_arrow_up       = "$theme_path/arrow_up.gif";
+$ico_arrow_down     = "$theme_path/arrow_down.gif";
+$ico_arrow_left     = "$theme_path/arrow_left.gif";
+$ico_arrow_right    = "$theme_path/arrow_right.gif";
 $ico_arrow_mount    = "$theme_path/arrow_single_up.gif";
 $ico_arrow_umount   = "$theme_path/arrow_single_down.gif";
 $ico_arrow_off      = "$theme_path/arrow_off.gif";

@@ -16,7 +16,7 @@ class OBM_DISPLAY {
   var $display_entity;    // entity used (deal, contact, parentdeal,...)
   var $display_pref;      // User preferences : Array[fieldname] order,status
   var $display_link = 1;  // If false, extern links aren't displayed
-  var $display_ext = "";  // External action called (allow Special handling)
+  var $display_ext = '';  // External action called (allow Special handling)
 
   //----------- TYPE SECTION : PREFERENCES --------//
   var $pref_title;       // title of the preference panel
@@ -24,22 +24,22 @@ class OBM_DISPLAY {
 
   //----------- TYPE SECTION : DATA -----------//
   var $data_set;              // Data set :DB_OBM: data rows to be displayed
-  var $data_header = "top";   // Table header location (top|both) (+bottom)
+  var $data_header = 'top';   // Table header location (top|both) (+bottom)
   var $data_page = true;      // Page management (true | false)
-  var $data_url = "";         // Base URL (with search) used for links in Index
+  var $data_url = '';         // Base URL (with search) used for links in Index
   var $data_order = true;     // Order can be changed (click on column title)
-  var $data_cb_text = "";     // Checkbox column text
-  var $data_cb_side = "left"; // Checkbox position in the row (left|right)
-  var $data_cb_name = "";     // Base name of the checkbox element (+id)
-  var $data_cb_field = "";    // Field from which cb is filled (1=selected)
-  var $data_idfield = "_id";  // Index field for the data row
+  var $data_cb_text = '';     // Checkbox column text
+  var $data_cb_side = 'left'; // Checkbox position in the row (left|right)
+  var $data_cb_name = '';     // Base name of the checkbox element (+id)
+  var $data_cb_field = '';    // Field from which cb is filled (1=selected)
+  var $data_idfield = '_id';  // Index field for the data row
   var $data_cb_show = 1;      // To set visible
                               //   0 -> not visible (else visible)
-                              //   "string" if ->f["string"] == 0 -> visible
-  var $data_form_head = "";   // Form header
-  var $data_form_end = "";    // Form end
+                              //   'string' if ->f['string'] == 0 -> visible
+  var $data_form_head = '';   // Form header
+  var $data_form_end = '';    // Form end
   var $delimiter = '"';       // CVS field delimiter (enclosed by)
-  var $sql_order_dir = "ASC"; // SQL Sorting direction
+  var $sql_order_dir = 'ASC'; // SQL Sorting direction
 
   /////////////////////////////////////////////////////////////////////////////
   // OBM_DISPLAY Constructor
@@ -50,12 +50,12 @@ class OBM_DISPLAY {
   //   - $entity : entity to display
   //   - $name   : dataset name
   /////////////////////////////////////////////////////////////////////////////
-  function OBM_DISPLAY($type, $pref, $module, $entity="", $name="") {
+  function OBM_DISPLAY($type, $pref, $module, $entity='', $name='') {
     global $params;
 
-    if ( ($type != "PREFERENCES") && 
-	($type != "DATA") ) {
-      die("ERROR: the type MUST be PREFERENCES or DATA");
+    if ( ($type != 'PREFERENCES') && 
+	($type != 'DATA') ) {
+      die('ERROR: the type MUST be PREFERENCES or DATA');
     } else {
       $this->display_type = $type;
     }
@@ -65,7 +65,7 @@ class OBM_DISPLAY {
     if (isset($module)) {
       $this->display_module = $module;
     }
-    if (isset($entity) && ($entity != "")) {
+    if (isset($entity) && ($entity != '')) {
       $this->display_entity = $entity;
     } else {
       $this->display_entity = $this->display_module;
@@ -73,17 +73,17 @@ class OBM_DISPLAY {
     if (isset($name)) {
       $this->display_name = $name;
     }
-    $this->sql_order_dir = ($params["sql_order_dir"] == "DESC" ? "DESC" : "ASC");
+    $this->sql_order_dir = ($params['sql_order_dir'] == 'DESC' ? 'DESC' : 'ASC');
   }
   
   /////////////////////////////////////////////////////////////////////////////
   // OBM_DISPLAY main display function
   /////////////////////////////////////////////////////////////////////////////
-  function display($dis_data_entity="") {
-    if ($this->display_type == "PREFERENCES") {
+  function display($dis_data_entity='') {
+    if ($this->display_type == 'PREFERENCES') {
       $this->check_preferences_vars();
       return $this->dis_preferences();
-    } else if ($this->display_type == "DATA") {
+    } else if ($this->display_type == 'DATA') {
       $this->check_data_vars();
       return $this->dis_data($dis_data_entity);
     }
@@ -94,7 +94,7 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
   function check_data_vars() {
     if (!is_array($this->display_pref)) {
-      die("THE display_pref VARIABLE MUST BE SET");
+      die('THE display_pref VARIABLE MUST BE SET');
     }
   }
 
@@ -103,13 +103,13 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
   function check_preferences_vars() {
     if (! is_array($this->display_pref)) {
-      die("THE display_pref VARIABLE MUST BE SET");
+      die('THE display_pref VARIABLE MUST BE SET');
     }
     if (!isset($this->display_entity)) {
-      die("THE display_entity VARIABLE MUST BE SET");
+      die('THE display_entity VARIABLE MUST BE SET');
     }
     if (!isset($this->pref_title)) {
-      die("THE pref_title VARIABLE MUST BE SET");
+      die('THE pref_title VARIABLE MUST BE SET');
     }
   }
 
@@ -127,15 +127,15 @@ class OBM_DISPLAY {
     $nb_field = count($this->display_pref) - 1;
 
     // actions names
-    $action_display = "dispref_display";
-    $action_level = "dispref_level";
+    $action_display = 'dispref_display';
+    $action_level = 'dispref_level';
 
     $entity = $this->display_entity;
 
-    if ($this->display_module != "") {
-      $url = $this->display_module . "_index.php";
+    if ($this->display_module != '') {
+      $url = $this->display_module . '_index.php';
     } else {
-      $url = $this->display_entity . "_index.php";
+      $url = $this->display_entity . '_index.php';
     }
 
     $block = "
@@ -155,19 +155,19 @@ class OBM_DISPLAY {
     $i = 0;
     $nb_field_hidden = 0;
     while ( list($fieldname, $fieldinfo) = each($this->display_pref) ) {
-      $fieldstatus = $fieldinfo["status"];
-      $fieldorder = $fieldinfo["order"];
-      $fielddefault = (! $fieldinfo["notdefault"]);
+      $fieldstatus = $fieldinfo['status'];
+      $fieldorder = $fieldinfo['order'];
+      $fielddefault = (! $fieldinfo['notdefault']);
 
       if ($fielddefault) {
-        $dis_default = "=";
+        $dis_default = '=';
       } else {
         $dis_default = "&nbsp;";
       }
 
       // Check if field (or field family has to be displayed)
       // If type is hidden, hide all type_* fields
-      $pos_base = strpos($fieldname, "_");
+      $pos_base = strpos($fieldname, '_');
       if ($pos_base > 0) {
 	$fieldname_base = (substr($fieldname, 0, $pos_base));
       } else {
@@ -176,12 +176,12 @@ class OBM_DISPLAY {
 
       if ($cgp_hide[$entity][$fieldname]
 	  || $cgp_hide[$entity][$fieldname_base]) {
-	$td_class = "resultPrefHide";
+	$td_class = 'resultPrefHide';
       } 
       if($i%2 == 0) {
         $class = "class=\"pair\"";
       } else {
-        $class = "";
+        $class = '';
       }
       $block .= "
     <tr $class>
@@ -245,7 +245,7 @@ class OBM_DISPLAY {
     if ($this->pref_dis_help == 1) {
       $block .= $this->dis_pref_help();
     }
-    $block .= "</div>";
+    $block .= '</div>';
 
     return $block;
   }
@@ -269,8 +269,7 @@ class OBM_DISPLAY {
     <img src=\"$ico_lock\" alt=\"$l_help_mandatory\" /> $l_help_mandatory<br />
     <img src=\"$ico_arrow_mount\" alt=\"$l_help_down\" /> $l_help_down<br />
     <img src=\"$ico_arrow_umount\" alt=\"$l_help_down\" /> $l_help_up<br />
-    </p>
-    ";
+    </p>";
 
     return $block;
   }
@@ -291,16 +290,16 @@ class OBM_DISPLAY {
     $module = $this->display_module;
 
     // We display page management only if enabled and a search url is given
-    if (($this->data_page) && ($this->data_url != "")) {
+    if (($this->data_page) && ($this->data_url != '')) {
       $block_page = $this->dis_data_index($this->data_url, $dis_data_entity);
       $block .= $block_page;
     }
 
     $block .= $this->data_form_head;
-    $block .= "<table>";
+    $block .= '<table>';
     $block_header = $this->dis_data_header($this->data_url);
     $block .= $block_header;
-    $block .= "<tbody>";
+    $block .= '<tbody>';
     reset($this->display_pref);
     $cpt = 0;
 
@@ -309,8 +308,8 @@ class OBM_DISPLAY {
             && ( ($cpt < $_SESSION['set_rows']) || ( ! $this->data_page) ) ) {
 
       if (function_exists($dis_data_entity)) {
-	$res = $dis_data_entity($this, "row_style", $link_ok);
-	$rowstyle = $res["style"];
+	$res = $dis_data_entity($this, 'row_style', $link_ok);
+	$rowstyle = $res['style'];
       }
       if (!$rowstyle && $cpt%2 == 0) {
         $rowstyle = "class='pair'";
@@ -321,25 +320,25 @@ class OBM_DISPLAY {
 
       // If debug level Id is set, display the entity id
       if (($_SESSION['set_debug'] > 0) && (($_SESSION['set_debug'] & $cdg_id) == $cdg_id)) {
-	$dg_id = $this->data_set->f("id");
+	$dg_id = $this->data_set->f('id');
 	$block .= "<td>$dg_id</td>";
       }
 
       // If a left checkbox has to be displayed
-      if (($this->data_cb_side == "left") && ($this->data_cb_text != "")) {
+      if (($this->data_cb_side == 'left') && ($this->data_cb_text != '')) {
 	$col_show = $this->data_cb_show;
         // If cb are to be displayed or column telling visibility is true
-        if (($col_show == "1") || ($this->data_set->f($col_show))) {
+        if (($col_show == '1') || ($this->data_set->f($col_show))) {
 	  $name = $this->data_cb_name;
 	  $name .= $this->data_set->f($this->data_idfield);
 	  if ($this->data_set->f($this->data_cb_field)) {
-	    $cb_check = "checked";
+	    $cb_check = 'checked';
 	  } else {
-	    $cb_check = "";
+	    $cb_check = '';
 	  }
 	  if (function_exists($dis_data_entity)) {
-	    $data_element = $dis_data_entity($this, "data_element", $link_ok);
-	    $data_element = $data_element["name"];
+	    $data_element = $dis_data_entity($this, 'data_element', $link_ok);
+	    $data_element = $data_element['name'];
 	  }	  
 	  $block .= "<td $style>
                 <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check />$data_element </td>";
@@ -355,7 +354,7 @@ class OBM_DISPLAY {
 
 	// Check if field (or field family has to be displayed)
 	// If type is hidden, hide all type_* fields
-	$pos_base = strpos($fieldname, "_");
+	$pos_base = strpos($fieldname, '_');
 	if ($pos_base > 0) {
 	  $fieldname_base = (substr($fieldname, 0, $pos_base));
 	} else {
@@ -367,23 +366,23 @@ class OBM_DISPLAY {
 
 	  // Default values
 	  $name = $this->data_set->f($fieldname);
-	  $url = "";
+	  $url = '';
 	  $popup = false;
 	  $popup_width = 600;
 	  $popup_height = 400;
-	  $align = "left";
+	  $align = 'left';
 
 	  //--------------------------------------------------
 	  // Global field display disposition
 	  //--------------------------------------------------
 	  // Format dates
-	  if (substr($fieldname,0,4) == "date") {
+	  if (substr($fieldname,0,4) == 'date') {
 	    $name = of_date_format($this->data_set->f($fieldname), 1);
 	  }
-	  elseif ($fieldname == "timeupdate") {
+	  elseif ($fieldname == 'timeupdate') {
 	    $name = of_datetime_format($this->data_set->f($fieldname), 1);
 	  }
-	  else if ($fieldname == "timecreate") {
+	  else if ($fieldname == 'timecreate') {
 	    $name = of_datetime_format($this->data_set->f($fieldname), 1);
 	  }
 	  
@@ -392,28 +391,28 @@ class OBM_DISPLAY {
 	  //--------------------------------------------------
 	  if (function_exists($dis_data_entity)) {
 	    $res = $dis_data_entity($this, $fieldname, $link_ok);
-	    if ($res["name"] != "") $name = $res["name"];
-	    $url = $res["url"];
-	    $align = $res["align"];
-	    $style = $res["style"];
-	    $window = $res["window"];
-	    $popup = $res["popup"];
-	    $popup_width = $res["popup_width"];
-	    $popup_height = $res["popup_height"];
+	    if ($res['name'] != '') $name = $res['name'];
+	    $url = $res['url'];
+	    $align = $res['align'];
+	    $style = $res['style'];
+	    $window = $res['window'];
+	    $popup = $res['popup'];
+	    $popup_width = $res['popup_width'];
+	    $popup_height = $res['popup_height'];
 	  }
 
 	  //--------------------------------------------------
 	  // Column display
 	  //--------------------------------------------------
-	  $content = "";
+	  $content = '';
 	  
 	  // Set the style
-	  if ($style != "") {
+	  if ($style != '') {
 	    $td = "<td $style>";
-	  } else if ($align == "center") {
+	  } else if ($align == 'center') {
 	    $td = "<td class=\"C\">";
 	  } else {
-	    $td = "<td>";
+	    $td = '<td>';
 	  }
 	  
 	  // Pre cell display (open popup, link)
@@ -421,7 +420,7 @@ class OBM_DISPLAY {
 	    $content = "<a href=\"#\" onclick=\"window.name='root';popup('$url',''); return false;\">";
 	  } else if ($window) {
 	    $content = "<a href=\"#\" onclick=\"window.name='root';popup('$url',''); return false;\">";
-	  } else if ($url != "") {
+	  } else if ($url != '') {
 	    $content = "<a href=\"".url_prepare("$url")."\">";
 	  }
 	
@@ -429,8 +428,8 @@ class OBM_DISPLAY {
 	  $content .= $name;
 	  
 	  // Post cell display (close link, popup)
-	  if ($popup || ($url != "")) {
-	    $content .= "</a>";
+	  if ($popup || ($url != '')) {
+	    $content .= '</a>';
 	  }
 	  
 	  // Cell writing
@@ -439,16 +438,16 @@ class OBM_DISPLAY {
       }
 
       // If a right checkbox has to be displayed
-      if (($this->data_cb_side == "right") && ($this->data_cb_text != "")) {
+      if (($this->data_cb_side == 'right') && ($this->data_cb_text != '')) {
 	$col_show = $this->data_cb_show;
         // If cb are to be displayed or column telling visibility is true
-        if (($col_show == "1") || ($this->data_set->f($col_show))) {
+        if (($col_show == '1') || ($this->data_set->f($col_show))) {
 	  $name = $this->data_cb_name;
 	  $name .= $this->data_set->f($this->data_idfield);
 	  if ($this->data_set->f($this->data_cb_field)) {
-	    $cb_check = "checked";
+	    $cb_check = 'checked';
 	  } else {
-	    $cb_check = "";
+	    $cb_check = '';
 	  }
 	  $block .= "<td>
             <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check /></td>";
@@ -458,23 +457,23 @@ class OBM_DISPLAY {
       }
 
       reset($this->display_pref);
-      $block .= "</tr>";
+      $block .= '</tr>';
     }
 
     //--------------------------------------------------------
     // Data Set end : if header set to both, display an header
     //--------------------------------------------------------
-    $block .= "</tbody>";
-    if ($this->data_header == "both") {
+    $block .= '</tbody>';
+    if ($this->data_header == 'both') {
       $block .= $block_header;
     }
     $block .= "</table>
       " . $this->data_form_end . "
       ";
-    if ($this->data_header == "both") {
+    if ($this->data_header == 'both') {
       $block .= $block_page;
     }
-    $block .= "</div>";
+    $block .= '</div>';
     return $block;
   }
 
@@ -497,17 +496,17 @@ class OBM_DISPLAY {
     $this_name = $this->display_name;
     $sql_order_dir = $this->sql_order_dir;
     $query = $this->data_set->obm_query;
-    $have_cb = ($this->data_cb_text != "");
+    $have_cb = ($this->data_cb_text != '');
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {
       $url .= "&amp;popup=1";
     }
     // Page display management
     // If page not set or page not for this display (this entity)
-    if ((!isset($params["page"])) || ($params["page"] == "") || ($params["of_display_name"] != $this_name)) {
+    if ((!isset($params['page'])) || ($params['page'] == '') || ($params['of_display_name'] != $this_name)) {
       $lpage = 1;
     } else {
-      $lpage = $params["page"];
+      $lpage = $params['page'];
     }
 
     if ($_SESSION['set_rows'] < 1) $_SESSION['set_rows'] = $set_rows_default;
@@ -535,8 +534,7 @@ class OBM_DISPLAY {
         <span>
         <a href=\"\" onclick=\"selectAllCb(this.parentNode.parentNode.parentNode);return false;\">$l_select_all</a>
         <a href=\"\" onclick=\"unSelectAllCb(this.parentNode.parentNode.parentNode);return false;\">$l_unselect_all</a>
-        </span>
-      ";
+        </span>";
     }
     $export_url = "$path/exportcsv/exportcsv_index.php";
     $content = "<div>
@@ -643,7 +641,7 @@ class OBM_DISPLAY {
     $entity = $this->display_entity;
     $this_name = $this->display_name;
     $sql_order_dir = $this->sql_order_dir;
-    $new_sql_order_dir = ($sql_order_dir == "ASC" ? "DESC" : "ASC"); 
+    $new_sql_order_dir = ($sql_order_dir == 'ASC' ? 'DESC' : 'ASC'); 
     $block = "
       <thead>
     <tr>";
@@ -654,9 +652,9 @@ class OBM_DISPLAY {
     }
 
     // Display the checkbox title if needed (exists and left side)
-    if (($this->data_cb_side == "left")
-          && ($this->data_cb_text != "")) {
-      $block .= "<td>".$this->data_cb_text."</td>";
+    if (($this->data_cb_side == 'left')
+          && ($this->data_cb_text != '')) {
+      $block .= '<td>'.$this->data_cb_text.'</td>';
     }
 
     reset($this->display_pref);
@@ -664,7 +662,7 @@ class OBM_DISPLAY {
 
       // Check if field (or field family has to be displayed)
       // If moduletype is hidden, hide all moduletype_* fields
-      $pos_base = strpos($fieldname, "_");
+      $pos_base = strpos($fieldname, '_');
       if ($pos_base > 0) {
 	$fieldname_base = (substr($fieldname, 0, $pos_base));
       } else {
@@ -675,20 +673,20 @@ class OBM_DISPLAY {
 	     || $cgp_hide[$entity][$fieldname_base])) {
 	$label = $fieldnames[$fieldname];
   
-        $img = "";
-        $onclick = ""; 
+        $img = '';
+        $onclick = ''; 
 	if ($this->data_order) {
 	  $furl = $url;
-          if ($url != "") {
-            if ($params["sql_order_field"] == $fieldname) {
-              if ($sql_order_dir == "DESC") {
+          if ($url != '') {
+            if ($params['sql_order_field'] == $fieldname) {
+              if ($sql_order_dir == 'DESC') {
                 $img = "<img src='$ico_arrow_up' alt='sort' />";
               } else {
                 $img = "<img src='$ico_arrow_down' alt='sort' />";
               }
             }
 	    // If action on this dataset
-	    if ($this_name == $params["of_display_name"]) {
+	    if ($this_name == $params['of_display_name']) {
 	      $furl .= "&amp;page=$params[page]&amp;sql_order_field=$fieldname&amp;sql_order_dir=$new_sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
 	    } else {
 	      $furl .= "&amp;page=1&amp;sql_order_field=$fieldname&amp;sql_order_dir=$new_sql_order_dir&amp;of_display_name=$this_name&amp;entity=$entity";
@@ -701,11 +699,11 @@ class OBM_DISPLAY {
     }
 
     // Display the checkbox title if needed (exists and right side)
-    if (($this->data_cb_side == "right")
-         && ($this->data_cb_text != "")) {
-      $block .= "<td>".$this->data_cb_text."</td>";
+    if (($this->data_cb_side == 'right')
+         && ($this->data_cb_text != '')) {
+      $block .= '<td>'.$this->data_cb_text.'</td>';
     }
-    $block .= "</tr></thead>";
+    $block .= '</tr></thead>';
 
     return $block;
   }
@@ -725,7 +723,7 @@ class OBM_DISPLAY {
 
       // Check if field (or field family has to be displayed)
       // If type is hidden, hide all type_* fields
-      $pos_base = strpos($fieldname, "_");
+      $pos_base = strpos($fieldname, '_');
       if ($pos_base > 0) {
 	$fieldname_base = (substr($fieldname, 0, $pos_base));
       } else {
@@ -736,7 +734,7 @@ class OBM_DISPLAY {
 	  || $cgp_hide[$entity][$fieldname_base])) {
 	$label = $fieldnames[$fieldname];
 	// if label empty or is an image or a link, we display the column name
-	if ( ($label == "") || (preg_match("/.*<.*>.*/", $label) ) ) {
+	if ( ($label == '') || (preg_match("/.*<.*>.*/", $label) ) ) {
 	  $label = $fieldname;
 	}
 	echo "$label$sep";
@@ -772,7 +770,7 @@ class OBM_DISPLAY {
 
 	// Check if field (or field family has to be displayed)
 	// If type is hidden, hide all type_* fields
-	$pos_base = strpos($fieldname, "_");
+	$pos_base = strpos($fieldname, '_');
 	if ($pos_base > 0) {
 	  $fieldname_base = (substr($fieldname, 0, $pos_base));
 	} else {
@@ -787,13 +785,13 @@ class OBM_DISPLAY {
 	  // Global field display disposition
 	  //--------------------------------------------------
 	  // Format dates
-	  if (substr($fieldname,0,4) == "date") {
+	  if (substr($fieldname,0,4) == 'date') {
 	    $txt_name = of_date_format($this->data_set->f($fieldname));
 	  }
-	  elseif ($fieldname == "timeupdate") {
+	  elseif ($fieldname == 'timeupdate') {
 	    $txt_name = of_datetime_format($this->data_set->f($fieldname));
 	  }
-	  else if ($fieldname == "timecreate") {
+	  else if ($fieldname == 'timecreate') {
 	    $txt_name = of_datetime_format($this->data_set->f($fieldname));
 	  }
 	  
@@ -804,10 +802,10 @@ class OBM_DISPLAY {
 	    $res = $dis_data_entity($this, $fieldname, $link_ok);
 	  }	  
 
-	  if ($res["txt_name"] != "") {
-	    $name = $res["txt_name"];
-	  } else if ($res["name"] != "") {
-	    $name = $res["name"];
+	  if ($res['txt_name'] != '') {
+	    $name = $res['txt_name'];
+	  } else if ($res['name'] != '') {
+	    $name = $res['name'];
 	  } else {
 	    $name = $txt_name;
 	  }
@@ -818,7 +816,7 @@ class OBM_DISPLAY {
 	    $name = str_replace('"', '""', $name);
 	    $delimiter = '"';
 	  } else if (($sep != '') && (strstr($name, $sep))) {
-	    if ($delimiter == "") {
+	    if ($delimiter == '') {
 	      $delimiter = '"';
 	    }
 	  }
@@ -845,7 +843,7 @@ class OBM_DISPLAY {
 ///////////////////////////////////////////////////////////////////////////////
 function display_page(&$display) {
   // If a theme specif function is provided
-  if (function_exists("display_page_theme")) {
+  if (function_exists('display_page_theme')) {
     return display_page_theme($display);
   }  
   
@@ -854,41 +852,41 @@ function display_page(&$display) {
   global $l_print,  $params;
 
   // If print activated, display only the detail
-  if ($params["output_target"] == "print") {
-    echo $display["head"] . "
-" .
-      $display["title"] .
-      $display["msg"] .
+  if ($params['output_target'] == 'print') {
+    echo $display['head'] . '
+' .
+      $display['title'] .
+      $display['msg'] .
       "
       <div id=\"ajaxMessage\"></div>
       &nbsp;".
-      $display["detail"] . "
+      $display['detail'] . "
       </div>
       " .
-      $display["end"];
+      $display['end'];
     return;
   }
 
   // If header is null, display only the detail (Popup windows)
-  if ($display["header"] == "") {
-    echo $display["head"] . 
-      $display["title"] .
-      $display["msg"] . 
+  if ($display['header'] == '') {
+    echo $display['head'] . 
+      $display['title'] .
+      $display['msg'] . 
       "<div id=\"mainContent\">
       <div id=\"ajaxMessage\"></div>
       &nbsp;".
-      $display["search"] .
-      $display["detail"]." 
+      $display['search'] .
+      $display['detail']." 
        <p class=\"LC\" />
        </div>
       ".
-      $display["result"] . 
-      $display["end"];
+      $display['result'] . 
+      $display['end'];
 
     return;
   }
 
-  echo $display["head"] . $display["header"] . "
+  echo $display['head'] . $display['header'] . "
     <!-- left panel -->
     <div id=\"portletsPanel\"> 
       <div id='portletsHandler'>
@@ -912,24 +910,24 @@ function display_page(&$display) {
     $display[title]
     $display[action]
     $display[msg]" ;
-    if($display["search"] != "" || $display["detail"] != "") {
+    if ($display['search'] != '' || $display['detail'] != '') {
       echo  
         "<div id=\"mainContent\">
          <div id=\"ajaxMessage\"></div>
         &nbsp;".
-      $display["search"] .
-      $display["detail"] . "
+      $display['search'] .
+      $display['detail'] . "
       <p class=\"LC\" />
       </div>";
     }
-    echo $display["result"] ."
+    echo $display['result'] ."
     </div>
     <script type=\"text/javascript\">
       obm.portlets = new Obm.Portlets();
       obm.popup = new Obm.Popup();
     </script>  
     <!-- center zone end -->  
-    ".$display["end"];
+    ".$display['end'];
 
 }
 
@@ -940,15 +938,15 @@ function display_page(&$display) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_outframe(&$display) {
   // If a theme specif function is provided
-  if (function_exists("display_outframe_theme")) {
+  if (function_exists('display_outframe_theme')) {
     return display_outframe_theme($display);
   }  
-  echo $display["head"] . $display["header"] . "
+  echo $display['head'] . $display['header'] . "
     <div id=\"mainContent\" >  
     $display[detail]
     </div>
     $display[end]
-  "; 
+";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -956,11 +954,12 @@ function display_outframe(&$display) {
 // Parameters:
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
-function display_head($p_module, $standard=true) { 
+function display_head($p_module, $standard=true) {
+
   // If a theme specif function is provided
-  if (function_exists("display_head_theme")) {
+  if (function_exists('display_head_theme')) {
     return display_head_theme($module);
-  }  
+  }
   global $l_obm_title, $extra_css, $extra_js, $extra_js_include,$ico_minus;
   global $ico_datepicker,$l_monthsofyear,$l_daysofweekfirst,$ico_colorpicker;
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
@@ -970,7 +969,7 @@ function display_head($p_module, $standard=true) {
 
   $css = $css_obm;
 
-  if ($output_target == "print") {
+  if ($output_target == 'print') {
    $css = $css_print_obm;
   }
 
@@ -980,7 +979,7 @@ function display_head($p_module, $standard=true) {
   $dayMedium = phpArrayToJsArray($l_daysofweekshort);
   $dayLong =   phpArrayToJsArray($l_daysofweek);
 
-  $headers_e = "";
+  $headers_e = '';
 
   if (is_array($extra_css)) {
     foreach($extra_css as $css_file) {
@@ -1112,7 +1111,7 @@ function display_head($p_module, $standard=true) {
 function display_menu($module) {
   
   // If a theme specif function is provided
-  if (function_exists("display_menu_theme")) {
+  if (function_exists('display_menu_theme')) {
     return display_menu_theme($module);
   }  
 
@@ -1140,7 +1139,7 @@ function display_menu($module) {
   if (($update_state) && $cgp_show['module']['tools'] && ($perm->check_right('tools', $cright_write_admin))) {
     $dis_scope = "<li><a href=\"$path/tools/tools_index.php?action=update_index\" ><img src=\"$ico_scope\" title=\"$l_scope_update\" alt=\"Commit update\" /></a></li>";
   }
-  if ($display['print_url'] != "") {
+  if ($display['print_url'] != '') {
     $url = $display['print_url']."&amp;output_target=print";
     $dis_printer = "<li><a href=\"#\" onclick=\"popup('$url');\" ><img src=\"$ico_print\" alt=\"Print\" id='print' /></a></li>";
   }
@@ -1162,9 +1161,10 @@ $dis_printer
 ".$display['module']
 ;
 
-//&gt;".$modules[$module]["Name"].
+//&gt;".$modules[$module]['Name'].
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display : Returns the section display block
@@ -1172,8 +1172,9 @@ $dis_printer
 //   - $section : active section
 ///////////////////////////////////////////////////////////////////////////////
 function display_sections($section) {
+
   // If a theme specif function is provided
-  if (function_exists("display_sections_theme")) {
+  if (function_exists('display_sections_theme')) {
     return display_sections_theme($section);
   }
   global $cgp_show, $sections, $perm;
@@ -1186,7 +1187,7 @@ function display_sections($section) {
       $section_target = $value['Target'];
       $section_right = $perm->get_section_rights($key);
       if ($section_right) {
-        $section_modules = array_keys($cgp_show["module"],$key);
+        $section_modules = array_keys($cgp_show['module'],$key);
         if (count($section_modules) > 0) {
 	  $module_block = display_modules($key, null);
 	  $mods .= $module_block;
@@ -1195,7 +1196,7 @@ function display_sections($section) {
 	  if (isset($section_target)) {
 	    $target = "target='$section_target'";
 	  } else {
-            $target = "";
+            $target = '';
           }
           $section_name = "<a $target href=\"$show[url]\">$section_name</a>";
         }
@@ -1207,7 +1208,7 @@ function display_sections($section) {
       }
     }
   }
-  $ret .= "</ul>";
+  $ret .= '</ul>';
   $ret .= "
     $mods
     <script type=\"text/javascript\">
@@ -1227,8 +1228,9 @@ function display_sections($section) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_modules($section, $module) {
+
   // If a theme specif function is provided
-  if (function_exists("display_modules_theme")) {
+  if (function_exists('display_modules_theme')) {
     return display_modules_theme($section, $module);
   }
   global $cme_txt, $cme_ico, $cme_both;
@@ -1242,18 +1244,18 @@ function display_modules($section, $module) {
     $ftext = true;
   else $ftext = false;
 
-  $section_link = array_keys($cgp_show["module"],$section);
+  $section_link = array_keys($cgp_show['module'],$section);
   if (is_array($section_link)) {
-    $id = $section."Items";
+    $id = $section.'Items';
     $block .= "
       <div class='module' id='section-$section-items-wrapper'>
       <ul id='section-$section-items'>
 ";
     foreach ($section_link as $mod) {
-      $module_name = $modules[$mod]["Name"];
-      $module_tooltip = $modules[$mod]["Tooltip"];
+      $module_name = $modules[$mod]['Name'];
+      $module_tooltip = $modules[$mod]['Tooltip'];
       $module_right = $perm->get_module_rights($mod); 
-      if (($module_right & $modules[$mod]["Right"]) == $modules[$mod]["Right"]) {
+      if (($module_right & $modules[$mod]['Right']) == $modules[$mod]['Right']) {
 	// XXX specifier une target au lien du module (non configurable
 	// actuellement car cgp_show[module][webmail] = valeur et non tableau
 	// Si tableau pb avec section_link = array_keys(..) 10 l plus haut
@@ -1261,21 +1263,21 @@ function display_modules($section, $module) {
 	if (isset($module_target)) {
 	  $target = " target='$module_target'";
 	} else {
-          $target = "";
+          $target = '';
         }
-        $block .= "<li>";
+        $block .= '<li>';
         if ($fico) {
           $ico = $modules[$mod]['Ico'];
           if ($ico) {
-            $block .= "<a$target href='".$modules[$mod]["Url"]."' class='ico' title='$module_tooltip'><img src='$ico' alt='$module_name' /></a> ";
+            $block .= "<a$target href='".$modules[$mod]['Url']."' class='ico' title='$module_tooltip'><img src='$ico' alt='$module_name' /></a> ";
           }
         }
-        $block .= "<a$target href='".$modules[$mod]["Url"]."' title='$module_tooltip'>";
+        $block .= "<a$target href='".$modules[$mod]['Url']."' title='$module_tooltip'>";
         if ($ftext) $block .= $module_name;
         $block .= "</a></li>\n";
       }
     }
-    $block .= "</ul></div>";
+    $block .= '</ul></div>';
   }
 
   return $block;
@@ -1289,18 +1291,19 @@ function display_modules($section, $module) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_actions($section, $module) {
+
   // If a theme specif function is provided
-  if (function_exists("display_actions_theme")) {
+  if (function_exists('display_actions_theme')) {
     return display_actions_theme($section, $module);
   }
   global $modules, $action, $display;
   global $actions, $perm, $display;
 
   $mod_title = $GLOBALS["l_module_$module"];
-  if(!empty($actions[$module][$action]["Title"])) {
-    $act_title = '- '.$actions[$module][$action]["Title"].' ';
-  } elseif(!empty($actions[$module][$action]["Name"])) {
-    $act_title = '- '.$actions[$module][$action]["Name"].' ';
+  if(!empty($actions[$module][$action]['Title'])) {
+    $act_title = '- '.$actions[$module][$action]['Title'].' ';
+  } elseif(!empty($actions[$module][$action]['Name'])) {
+    $act_title = '- '.$actions[$module][$action]['Name'].' ';
   }
 
 
@@ -1316,25 +1319,25 @@ function display_actions($section, $module) {
     foreach ($actions[$module] as $key => $value) {
 
       // If the current action has this action in target
-      if (!in_array("!$action",$value["Condition"]) 
-        && (in_array("all", $value["Condition"])
-	|| in_array($action, $value["Condition"]))) {
-	if (($module_right & $value["Right"]) == $value["Right"]) {
+      if (!in_array("!$action",$value['Condition']) 
+        && (in_array('all', $value['Condition'])
+	|| in_array($action, $value['Condition']))) {
+	if (($module_right & $value['Right']) == $value['Right']) {
 
-          $tooltip = $value["Tooltip"];
+          $tooltip = $value['Tooltip'];
 
-	  if ($value["Popup"] == 1) {
-	    if ($value["Target"]) {
+	  if ($value['Popup'] == 1) {
+	    if ($value['Target']) {
 	      $wtarget = "window.name='" . $value['Target'] . "';";
 	    }
 	    $content = "
               <a href=\"\" 
-              title=\"".$value["tooltip"]."\" 
+              title=\"".$value['tooltip']."\" 
               onclick=\"$wtarget popup('".$value['Url']."',''); return false;\">
-	      ".$value["Name"]."</a> &nbsp;";
+	      ".$value['Name']."</a> &nbsp;";
 	  } else {
 	    $content = "
-               <a href=\"".$value["Url"]."\" title=\"".$tooltip."\" >".$value["Name"]."</a> &nbsp;";
+               <a href=\"".$value['Url']."\" title=\"".$tooltip."\" >".$value['Name']."</a> &nbsp;";
           }
           $block .= "<li onmouseover=\"this.className='hover'\" onmouseout=\"this.className=''\" >$content</li>";
 	}
@@ -1354,19 +1357,20 @@ function display_actions($section, $module) {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_last_visited() {
+
   // If a theme specif function is provided
-  if (function_exists("display_last_visited_theme")) {
+  if (function_exists('display_last_visited_theme')) {
     return display_last_visited_theme();
   }
   global $obm, $cdg_sql, $path, $cgp_show, $last_v, $l_last_visit, $modules;
 
   $uid = $obm['uid'];
 
-  foreach ($cgp_show["module"] as $module => $val) {
+  foreach ($cgp_show['module'] as $module => $val) {
 
-    if (($cgp_show["module"][$module]) && ($_SESSION['last_v'][$module]["text"] != "")) {
-      $id = $_SESSION['last_v'][$module]["id"];
-      $text = substr($_SESSION['last_v'][$module]["text"], 0, 30);
+    if (($cgp_show['module'][$module]) && ($_SESSION['last_v'][$module]['text'] != '')) {
+      $id = $_SESSION['last_v'][$module]['id'];
+      $text = substr($_SESSION['last_v'][$module]['text'], 0, 30);
       if(isset($GLOBALS['modules'][$module]['Ico'])) {
         $l_ico = $GLOBALS['modules'][$module]['Ico'];
       } else {
@@ -1395,8 +1399,8 @@ function display_last_visited() {
   display_debug_msg($query, $cdg_sql, 'display_last_visited(Last created|updated event)');
   $obm_q->query($query);
   if($obm_q->next_record()) {
-    $id = $obm_q->f("event_id");
-    $title = $obm_q->f("event_title");
+    $id = $obm_q->f('event_id');
+    $title = $obm_q->f('event_title');
     $dis_last .= "
       <li>
         <a id=\"last_visit_calendar_event_a\" href=\"$cal_url$id\">
@@ -1428,13 +1432,14 @@ function display_last_visited() {
 // Parameters:
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
-function display_todos($path="..") {
-  if (! $GLOBALS['cgp_show']["module"]["todo"]) {
-    return "";
+function display_todos($path='..') {
+
+  if (! $GLOBALS['cgp_show']['module']['todo']) {
+    return '';
   }
 
   // If a theme specif function is provided
-  if (function_exists("display_todos_theme")) {
+  if (function_exists('display_todos_theme')) {
     return display_todos_theme($path);
   }
 
@@ -1443,8 +1448,8 @@ function display_todos($path="..") {
   $nb = count($_SESSION['todos']);
 
   for ($i = 1; $i <= $nb; $i++) {
-    $t_id = $_SESSION['todos'][$i]["id"];
-    $t_title = $_SESSION['todos'][$i]["title"];
+    $t_id = $_SESSION['todos'][$i]['id'];
+    $t_title = $_SESSION['todos'][$i]['title'];
     $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;todo_id=$t_id");
     $todo_title = substr($t_title, 0, 30);
     $block_todo .= "
@@ -1459,7 +1464,7 @@ function display_todos($path="..") {
      </ul>
       </div>";
   } else {
-    $block = "";
+    $block = '';
   }
 
   return $block;
@@ -1470,15 +1475,16 @@ function display_todos($path="..") {
 // Display : end of an HTML page
 ///////////////////////////////////////////////////////////////////////////////
 function display_end() { 
+
   // If a theme specif function is provided
-  if (function_exists("display_end_theme")) {
+  if (function_exists('display_end_theme')) {
     return display_end_theme();
   }
 
   return "
     </body>
     </html>
-  ";
+";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1492,19 +1498,19 @@ function display_record_info($obm_q) {
   global  $ico_privacy, $ico_new ,$ico_update;
 
   if (is_object($obm_q)) {
-    $usercreate = $obm_q->f("usercreate");
-    $userupdate = $obm_q->f("userupdate");
-    $timecreate = of_datetime_format($obm_q->f("timecreate"), 1);
-    $timeupdate = of_datetime_format($obm_q->f("timeupdate"), 1);
-    $datasource = $obm_q->f("datasource_name");
-    $privacy = ($obm_q->f("privacy") == 0 ? $l_public : $l_private);
+    $usercreate = $obm_q->f('usercreate');
+    $userupdate = $obm_q->f('userupdate');
+    $timecreate = of_datetime_format($obm_q->f('timecreate'), 1);
+    $timeupdate = of_datetime_format($obm_q->f('timeupdate'), 1);
+    $datasource = $obm_q->f('datasource_name');
+    $privacy = ($obm_q->f('privacy') == 0 ? $l_public : $l_private);
     $created = "$usercreate : $timecreate";
     $updated = "$userupdate : $timeupdate";
 
-    if ($datasource != "") {
+    if ($datasource != '') {
       $dis_dsrc = "<li><img src=\"$ico_data\" alt=\"Datasource\" /> : $datasource</li>";
     } else {
-      $dis_dsrc = "";
+      $dis_dsrc = '';
     }
     
     $block = "<div class=\"portlet\" id=\"recordPortlet\"><h1>$l_infos</h1>
@@ -1562,7 +1568,7 @@ function display_debug() {
       $dis_debug_custom.
       "</div>";
   } else { 
-    return "";
+    return '';
   }
 }
 
@@ -1584,7 +1590,7 @@ function display_title($title) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_ok_msg($msg, $special=true) {
 
-  if ($msg != "") {
+  if ($msg != '') {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
@@ -1603,7 +1609,7 @@ function display_ok_msg($msg, $special=true) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_info_msg($msg, $special=true) {
 
-  if ($msg != "") {
+  if ($msg != '') {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
@@ -1622,7 +1628,7 @@ function display_info_msg($msg, $special=true) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_warn_msg($msg, $special=true) {
   
-  if ($msg != "") {
+  if ($msg != '') {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
@@ -1641,7 +1647,7 @@ function display_warn_msg($msg, $special=true) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_err_msg($msg, $special=true) {
 
-  if ($msg != "") {
+  if ($msg != '') {
     if ($special) {
       $msg = htmlspecialchars($msg);
     }
@@ -1657,14 +1663,14 @@ function display_err_msg($msg, $special=true) {
 //   - $params[] : 
 //   - $label    :  
 ///////////////////////////////////////////////////////////////////////////////
-function display_document_form($params, $label="") {
+function display_document_form($params, $label='') {
   global $l_document;
 
-  if($label == "") {
+  if($label == '') {
     $label = $l_document;
   }
 
-  if (isset($params["file"])) { $file = $params["file"]; }
+  if (isset($params['file'])) { $file = $params['file']; }
 
   $block = "<tr>
     <th class=\"$class[file]\">$label</th>
