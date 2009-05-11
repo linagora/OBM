@@ -23,7 +23,6 @@ Obm.Menu = new Class({
     sectionItem.style.top = sectionBlock.getTop() + sectionBlock.offsetHeight + 'px';
     sectionItem.style.left = sectionBlock.getLeft() + 'px';
 
-    slide.hide();
     sectionItem.style.display = 'block';
     slide.boxFix = this.menuListBoxFix.bind(slide);
     slide.xHide = function () {
@@ -32,6 +31,7 @@ Obm.Menu = new Class({
     }
     slide.hiddingTimer = new HideTimer(slide.element,{fn:slide.xHide.bind(slide),elems:[sectionBlock]});
 
+    slide.hide();
     this.menuItems[item] = slide;
     sectionBlock.addEvent('click', function(e){
       obm.menu.toggle(this.id)
