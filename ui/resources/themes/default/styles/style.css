@@ -600,6 +600,10 @@ fieldset.detail {
   width: 95%;
 }
 
+input.box {
+  width: auto;
+}
+
 .multiple input, .multiple select {
   width: auto;
 }

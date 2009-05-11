@@ -823,13 +823,13 @@ function run_query_user_update($u_id, $user) {
   if ($cgp_use['service']['mail_vacation']) {
     $vacation_enable = sql_parse_int($user['vacation_enable']);
     $vacation_message = $user['vacation_message'];
-    $vacation_datebegin = $user['vacation_datebegin'];
-    $vacation_dateend = $user['vacation_dateend'];
+    $vacation_datebegin = ($user['vacation_datebegin'] ? "'$user[vacation_datebegin]'" : 'null');
+    $vacation_dateend = ($user['vacation_dateend'] ? "'$user[vacation_dateend]'" : 'null');    
     $vacation_message = $user['vacation_message'];
     $query_mail_vacation = ",
     userobm_vacation_enable=$vacation_enable,
-    userobm_vacation_datebegin= '$vacation_datebegin',
-    userobm_vacation_dateend= '$vacation_dateend',
+    userobm_vacation_datebegin= $vacation_datebegin,
+    userobm_vacation_dateend= $vacation_dateend,
     userobm_vacation_message='".addslashes($vacation_message)."'";
   }
 

@@ -234,11 +234,11 @@ if ($perm->check_right($module, $cright_write_admin)) {
   <tr id='settings_debug'>
     <th>$l_set_debug ($_SESSION[set_debug])</th>
     <td>
-      <input type=\"checkbox\" name=\"debug_id\" value=\"$cdg_id\" $dg_id />$l_dg_id
-      <input type=\"checkbox\" name=\"debug_param\" value=\"$cdg_param\" $dg_param />$l_dg_param
-      <input type=\"checkbox\" name=\"debug_sess\" value=\"$cdg_sess\" $dg_sess />$l_dg_sess
-      <input type=\"checkbox\" name=\"debug_sql\" value=\"$cdg_sql\" $dg_sql />$l_dg_sql
-      <input type=\"checkbox\" name=\"debug_exe\" value=\"$cdg_exe\" $dg_exe />$l_dg_exe
+      <input type=\"checkbox\" class=\"box\" name=\"debug_id\" value=\"$cdg_id\" $dg_id />$l_dg_id
+      <input type=\"checkbox\" class=\"box\" name=\"debug_param\" value=\"$cdg_param\" $dg_param />$l_dg_param
+      <input type=\"checkbox\" class=\"box\" name=\"debug_sess\" value=\"$cdg_sess\" $dg_sess />$l_dg_sess
+      <input type=\"checkbox\" class=\"box\" name=\"debug_sql\" value=\"$cdg_sql\" $dg_sql />$l_dg_sql
+      <input type=\"checkbox\" class=\"box\" name=\"debug_exe\" value=\"$cdg_exe\" $dg_exe />$l_dg_exe
     </td>
   </tr>";
 }
@@ -296,14 +296,14 @@ $display['detail'] .= "
   <tr id='settings_menu'>
     <th>$l_set_menu</th>
     <td>
-      <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_txt\" $me_txt />$l_me_txt</span>
-      <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_ico\" $me_ico />$l_me_ico</span>
-      <span class=\"NW\"><input type=\"radio\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both</span>
+      <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_txt\" $me_txt />$l_me_txt</span>
+      <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_ico\" $me_ico />$l_me_ico</span>
+      <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"menu\" value=\"$cme_both\" $me_both />$l_me_both</span>
     </td>
   </tr><tr id='settings_autoDispay'>
     <th>$l_auto_display</th>
     <td>
-      <input type=\"checkbox\" name=\"display\" value=\"yes\" ";
+      <input type=\"checkbox\" class=\"box\" name=\"display\" value=\"yes\" ";
 if ($_SESSION['set_display'] == 'yes') $display['detail'] .= "checked = \"checked\"";
 $display['detail'] .= " /></td>
   </tr>
@@ -340,13 +340,13 @@ $display['detail'] .= "
   <tr id='settings_commentOrder'>
     <th>$l_set_commentorder</th>
     <td>
-      <span class=\"NW\"><input type=\"radio\" name=\"commentorder\" value=\"$cco_chro\" $co_chro />$l_co_chro</span>
-      <span class=\"NW\"><input type=\"radio\" name=\"commentorder\" value=\"$cco_rev\" $co_rev />$l_co_rev</span>
+      <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"commentorder\" value=\"$cco_chro\" $co_chro />$l_co_chro</span>
+      <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"commentorder\" value=\"$cco_rev\" $co_rev />$l_co_rev</span>
     </td>
   </tr><tr id='settings_mail'>
     <th>$l_send_mail</th>
     <td class=\"adminText\">
-      <input type=\"checkbox\" name=\"mail\" value=\"yes\" ";
+      <input type=\"checkbox\" class=\"box\" name=\"mail\" value=\"yes\" ";
 if ($_SESSION['set_mail'] == 'yes') $display['detail'] .= 'checked';
 
 $display['detail'] .= " /></td>
@@ -358,7 +358,7 @@ $display['detail'] .= "
   <tr id='settings_mailParticipation'>
     <th>$l_send_mail_participation</th>
     <td class=\"adminText\">
-      <input type=\"checkbox\" name=\"mail_participation\" value=\"yes\" ";
+      <input type=\"checkbox\" class=\"box\" name=\"mail_participation\" value=\"yes\" ";
 if ($_SESSION['set_mail_participation'] == 'yes') $display['detail'] .= 'checked';
 $display['detail'] .= " /></td>
   </tr>";
@@ -404,9 +404,9 @@ $display['detail'] .= " /></td>
   <tr id='settings_calendarInterval'>
     <th>$l_set_cal_interval</th>
     <td>
-      <span class=\"NW\"><input type=\"radio\" name=\"cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4</span>
-      <span class=\"NW\"><input type=\"radio\" name=\"cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2</span>
-      <span class=\"NW\"><input type=\"radio\" name=\"cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1</span>
+      <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4</span>
+      <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2</span>
+      <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1</span>
     </td>
   </tr>
   <tr id='settings_calendarFirstHour'>
@@ -433,8 +433,8 @@ $display['detail'] .= "
   <tr id='settings_csvSeparator'>
   <th>$l_set_csv_sep</th>
   <td>
-    <span class=\"NW\"><input type=\"radio\" name=\"csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc</span>
-    <span class=\"NW\"><input type=\"radio\" name=\"csv_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab</span>
+    <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc</span>
+    <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"csv_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab</span>
   </td>
   </tr>
   $dis_debug
@@ -446,16 +446,16 @@ $display['detail'] .= "
   <tr>
   <td>$l_set_date_upd</td>
   <td>
-    <span class=\"NW\"><input type=\"radio\" name=\"date_upd\" value=\"$cda_iso\" $da_upd_iso />$l_da_iso</span>
-    <span class=\"NW\"><input type=\"radio\" name=\"date_upd\" value=\"$cda_en\" $da_upd_en />$l_da_en</span>
-    <span class=\"NW\"><input type=\"radio\" name=\"date_upd\" value=\"$cda_fr\" $da_upd_fr />$l_da_fr</span>
+    <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"date_upd\" value=\"$cda_iso\" $da_upd_iso />$l_da_iso</span>
+    <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"date_upd\" value=\"$cda_en\" $da_upd_en />$l_da_en</span>
+    <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"date_upd\" value=\"$cda_fr\" $da_upd_fr />$l_da_fr</span>
   </td>
   <td>$l_set_date</td>
   <td>
-    <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_iso\" $da_iso />$l_da_iso</span>
-    <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_en\" $da_en />$l_da_en</span>
-    <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_fr\" $da_fr />$l_da_fr</span>
-    <span class=\"NW\"><input type=\"radio\" name=\"date\" value=\"$cda_txt\" $da_txt />$l_da_txt</span>
+    <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"date\" value=\"$cda_iso\" $da_iso />$l_da_iso</span>
+    <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"date\" value=\"$cda_en\" $da_en />$l_da_en</span>
+    <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"date\" value=\"$cda_fr\" $da_fr />$l_da_fr</span>
+    <span class=\"NW\"><input type=\"radio\" class=\"box\" name=\"date\" value=\"$cda_txt\" $da_txt />$l_da_txt</span>
   </td>
   </tr>
   <table id='settings_dateTimezone'>
