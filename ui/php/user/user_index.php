@@ -51,9 +51,9 @@ if ($obminclude == '') $obminclude = 'obminclude';
 
 include("$obminclude/global.inc");
 
-$params = get_user_params();
-
+$params = get_global_params('Entity');
 page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => 'OBM_Perm'));
+$params = get_user_params();
 include("$obminclude/global_pref.inc");
 require('../profile/profile_query.inc');
 require('user_display.inc');

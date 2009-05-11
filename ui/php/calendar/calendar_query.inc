@@ -1617,6 +1617,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data(3)');
     $obm_q->query($query);
     $new_id = $obm_q->lastid();
+    of_entity_insert('event', $new_id) ;    
     $entities = get_calendar_event_entity($id);
     foreach ($entities as $entity => $data) {
       foreach ($data['entity'] as $entity_id => $entity_data) {  

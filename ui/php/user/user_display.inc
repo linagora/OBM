@@ -649,11 +649,9 @@ function html_user_consult($obm_q) {
   $nomade_local_copy = $obm_q->f('userobm_nomade_local_copy');
   $vacation_enable = $obm_q->f('userobm_vacation_enable');
   //$vacation_datebegin = of_datetime_format($obm_q->f('userobm_vacation_datebegin'), 1);
-  $vacation_datebegin = new Of_Date();
-  $vacation_datebegin->setTimestamp($obm_q->f('userobm_vacation_datebegin'));
+  $vacation_datebegin = new Of_Date($obm_q->f('userobm_vacation_datebegin'));
   $vacation_datebegin = $vacation_datebegin->getOutputDateTime();
-  $vacation_dateend = new Of_Date();
-  $vacation_dateend->setTimestamp($obm_q->f('userobm_vacation_dateend'));
+  $vacation_dateend = new Of_Date($obm_q->f('userobm_vacation_dateend'));
   $vacation_dateend = $vacation_dateend->getOutputDateTime();
   $vacation_message = stripslashes($obm_q->f('userobm_vacation_message'));
   $smb_perms = $obm_q->f('userobm_samba_perms');
@@ -1301,10 +1299,8 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $email_nomade = $usr_q->f('userobm_email_nomade');
 
     // vacation
-    $datebegin = new Of_Date();
-    $datebegin->setTimestamp($usr_q->f('userobm_vacation_datebegin'));
-    $dateend = new Of_Date();
-    $dateend->setTimestamp($usr_q->f('userobm_vacation_dateend'));
+    $datebegin = new Of_Date($usr_q->f('userobm_vacation_datebegin'));
+    $dateend = new Of_Date($usr_q->f('userobm_vacation_dateend'));
     $vacation_enable = $usr_q->f('userobm_vacation_enable');
     $vacation_message = stripslashes($usr_q->f('userobm_vacation_message'));
     $vacation_datebegin = $usr_q->f('userobm_vacation_datebegin');

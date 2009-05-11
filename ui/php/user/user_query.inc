@@ -496,8 +496,8 @@ function run_query_user_insert($user) {
   if ($cgp_use['service']['mail_vacation']) {
     $vacation_enable = sql_parse_int($user['vacation_enable']);
     $vacation_message = $user['vacation_message'];
-    $vacation_datebegin = $user['vacation_datebegin'];
-    $vacation_dateend = $user['vacation_dateend'];
+    $vacation_datebegin = ($user['vacation_datebegin'] ? "'$user[vacation_datebegin]'" : 'null');
+    $vacation_dateend = ($user['vacation_dateend'] ? "'$user[vacation_dateend]'" : 'null');
     $vacation_message = $user['vacation_message'];
     $query_insert_mail_vacation = ",
     userobm_vacation_enable,
@@ -506,8 +506,8 @@ function run_query_user_insert($user) {
     userobm_vacation_message";
     $query_values_mail_vacation = ",
     $vacation_enable,
-    '$vacation_datebegin',
-    '$vacation_dateend',
+    $vacation_datebegin,
+    $vacation_dateend,
     '".addslashes($vacation_message)."'";
   }
 
