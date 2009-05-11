@@ -2645,7 +2645,6 @@ CREATE TABLE `Resource` (
   `resource_description` varchar(255) default NULL,
   `resource_qty` int(8) default '0',
   PRIMARY KEY  (`resource_id`),
-  UNIQUE KEY `k_label_resource` (`resource_name`),
   KEY `resource_domain_id_domain_id_fkey` (`resource_domain_id`),
   KEY `resource_userupdate_userobm_id_fkey` (`resource_userupdate`),
   KEY `resource_usercreate_userobm_id_fkey` (`resource_usercreate`),

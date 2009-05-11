@@ -616,7 +616,6 @@ Obm.CalendarEvent = new Class({
   makeResizable: function() {
     var resizeOptions = {
       handle: this.resizeHandler,
-      grid: {'y' : obm.calendarManager.defaultHeight + 1},
       limit: {
         'x': [obm.calendarManager.defaultWidth,obm.calendarManager.defaultWidth],
         'y': [obm.calendarManager.defaultHeight,this.context.bottom]

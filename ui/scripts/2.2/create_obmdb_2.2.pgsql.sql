@@ -5260,14 +5260,6 @@ ALTER TABLE ONLY resource
 
 
 --
--- Name: resource_resource_name_key; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY resource
-    ADD CONSTRAINT resource_resource_name_key UNIQUE (resource_name);
-
-
---
 -- Name: resourceentity_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -5554,13 +5546,6 @@ CREATE INDEX k_login_user_userobm_index ON userobm USING btree (userobm_login);
 --
 
 CREATE INDEX k_uid_user_userobm_index ON userobm USING btree (userobm_uid);
-
-
---
--- Name: k_name_resource_resource_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX k_name_resource_resource_index ON resource USING btree (resource_name);
 
 
 --

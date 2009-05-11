@@ -10,3 +10,4 @@
 -- 'com' section is now disabled, 'gw' is now enabled
 -- replace 'com' with 'gw' in defined profiles
 UPDATE ProfileSection SET profilesection_section_name='gw' WHERE profilesection_section_name='com';
+ALTER TABLE Resource DROP CONSTRAINT resource_resource_name_key;
