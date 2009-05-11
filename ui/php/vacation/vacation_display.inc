@@ -30,11 +30,9 @@ function html_vacation_consult($usr_q) {
     $message = "---";
   }
 
-  $vacation_datebegin = new Of_Date();
-  $vacation_datebegin->setTimestamp($usr_q->f('vacation_datebegin'));
+  $vacation_datebegin = new Of_Date($usr_q->f('vacation_datebegin'));
   $vacation_datebegin = $vacation_datebegin->getOutputDateTime();
-  $vacation_dateend = new Of_Date();
-  $vacation_dateend->setTimestamp($usr_q->f('vacation_dateend'));
+  $vacation_dateend = new Of_Date($usr_q->f('vacation_dateend'));
   $vacation_dateend = $vacation_dateend->getOutputDateTime();
 
   $block = "
@@ -81,10 +79,8 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
 
-    $datebegin = new Of_Date();
-    $datebegin->setTimestamp($usr_q->f('vacation_datebegin'));
-    $dateend = new Of_Date();
-    $dateend->setTimestamp($usr_q->f('vacation_dateend'));
+    $datebegin = new Of_Date($usr_q->f('vacation_datebegin'));
+    $dateend = new Of_Date($usr_q->f('vacation_dateend'));
 
     $enabled = $usr_q->f("userobm_vacation_enable");
     $message = stripslashes( $usr_q->f("userobm_vacation_message") );

@@ -71,16 +71,16 @@ function run_query_vacation_update($params, $u_id) {
     $params['vacation_dateend'] = '0';
   }    
 
-  $vacation_datebegin = $params['vacation_datebegin'];
   
-  $vacation_dateend = $params['vacation_dateend'];
+  $vacation_datebegin = ($user['vacation_datebegin'] ? "'$user[vacation_datebegin]'" : 'null');
+  $vacation_dateend = ($user['vacation_dateend'] ? "'$user[vacation_dateend]'" : 'null');  
 
   $enabled = sql_parse_int($params["enabled"]);
   $message_update = ", userobm_vacation_message='".addslashes($params["message"])."'";
   $time_begin = $params["time_begin"].":".$params["min_begin"].":00";
   $time_end = $params["time_end"].":".$params["min_end"].":00";
-  $message_update .= ", userobm_vacation_datebegin= '$vacation_datebegin'";
-  $message_update .= ", userobm_vacation_dateend= '$vacation_dateend'";
+  $message_update .= ", userobm_vacation_datebegin= $vacation_datebegin";
+  $message_update .= ", userobm_vacation_dateend= $vacation_dateend";
   $u_id = sql_parse_id($u_id, true);
 
   // Update done in real-time, so updating UserObm AND P_UserObm
