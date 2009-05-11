@@ -1253,6 +1253,7 @@ Obm.CalendarManager = new Class({
     var url = obm.vars.consts.calendarDetailconsultURL+id;
     $('last_visit_calendar_event_a').setProperty('href', url);
     $('last_visit_calendar_event_title').innerHTML = title;
+    $('last_visit_calendar_event_a').getParent().setStyle('display', '');
   }
 });
 

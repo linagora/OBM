@@ -1408,6 +1408,15 @@ function display_last_visited() {
          <span id=\"last_visit_calendar_event_title\">$title</span>
         </a>
       </li>";
+  } else {
+    $dis_last .= "
+      <li style=\"display:none;\">
+        <a id=\"last_visit_calendar_event_a\" href=\"\">
+         <img src=\"$GLOBALS[ico_time]\" alt=\"Calendar\" />
+         <span id=\"last_visit_calendar_event_title\"></span>
+        </a>
+      </li>";
+
   }
 
   // Last calendar view
