@@ -1773,9 +1773,8 @@ function dis_calendar_planning_day_view($date, $end, $calendar_entity, $category
         } else {
           list($entity_type,$entity_id) = each($ress);
           $entity_id = $entity_id[0];          
-          $goto = "calendar_index.php?action=new&amp;tf_date_begin=".$current_time->getURL()."&amp;new_sel=1&amp;new_group=1&amp;group_view=_ALL_&amp;sel_".$entity_type."_id[]=$entity_id";
-          $ressource_occ .= "<td onclick=\"window.location='$goto'\" onmouseover=\"this.className='hover';this.style.cursor = 'pointer';\"
-             onmouseout=\"this.className ='';\" style=\"width:$td_width%;\">&nbsp;</td>";        
+          // $goto = "calendar_index.php?action=new&amp;tf_date_begin=".$current_time->getURL()."&amp;new_sel=1&amp;new_group=1&amp;group_view=_ALL_&amp;sel_".$entity_type."_id[]=$entity_id";
+          $ressource_occ .= "<td style=\"width:$td_width%;\">&nbsp;</td>";        
         }
       }
       $ressource_occ.="</tr>";
