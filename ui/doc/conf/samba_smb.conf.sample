@@ -35,7 +35,7 @@
    server string = Controleur de domaine SMBTEST
 
 # Les admins du PDC sont les membres du groupe Admins du domaine
-   admin users = '@Administrateurs du domaine'
+   admin users = "@Administrateurs du domaine"
 
 # Paramètre permettant d'être le PDC du domaine
    domain master = yes
