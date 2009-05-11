@@ -959,7 +959,7 @@ function get_calendar_action() {
   // New   
   $actions['calendar']['new'] = array (
     'Name'     => $l_header_new_event,
-    'Url'      => "$path/calendar/calendar_index.php?action=new&amp;date_begin=".$date->getURL(),
+    'Url'      => "$path/calendar/calendar_index.php?action=new",
     'Right'    => $cright_write,
     'Condition'=> array ('index','detailconsult','insert','insert_conflict',
     'update_decision','update_ext_decision', 'update_alert','decision','update','delete', 'new_meeting',
