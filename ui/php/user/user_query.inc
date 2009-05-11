@@ -59,7 +59,7 @@ function run_query_user_search($user) {
   }
 
   if ($filter_entity == 'calendar') {
-    $where_filter_entity = ' AND userobm_id IN ('.OBM_Acl::getAclSubselect('userobm_id', 'calendar', null, $obm['uid'], $filter_pattern).')';
+    $where_filter_entity = ' AND userobm_id IN ('.OBM_Acl::getAclSubselect('calendarentity_calendar_id', 'calendar', null, $obm['uid'], $filter_pattern).')';
   }
 
   $where = '1=1';
@@ -220,7 +220,8 @@ function run_query_user_search($user) {
     INNER JOIN Domain ON userobm_domain_id = domain_id
     $join_grp
     $join_host
-    $join_userdata";
+    $join_userdata
+    ";
 
 
   // ORDER construction
@@ -238,15 +239,15 @@ function run_query_user_search($user) {
     $orderq
     $limit";
 
-  if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $join_domain $whereq");
-    $obm_q->set_num_rows_total($count);
-  }
+  //if ($ctu_sql_limit) {
+  //  $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $join_domain $whereq");
+  //  $obm_q->set_num_rows_total($count);
+  //}
 
-  if (($count > 0) || (! $ctu_sql_limit)) {
+  //if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg($query, $cdg_sql, 'run_query_user_search()');
     $obm_q->xquery($query);
-  }
+  //}
 
   return $obm_q;
 }
@@ -293,6 +294,7 @@ function run_query_user_ext_search($user) {
       $where_filter_entity
     ORDER BY  userobm_lastname, userobm_firstname
     LIMIT $limit OFFSET $first_row";
+  echo $query;
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->xquery($query);
 
