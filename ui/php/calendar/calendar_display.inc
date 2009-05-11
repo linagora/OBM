@@ -2005,8 +2005,9 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   $dateend = clone $calendar["date_end"];
   $h = $dateend->diffHour($datebegin);
   $m = $dateend->diffMinute($datebegin);
-  $time_begin = $calendar["time_begin"];
-  $min_begin = $calendar["min_begin"];
+  $time_begin = $datebegin->getHour();
+  $min_begin = $datebegin->getMinute();
+
   $url = "calendar_index.php?action=perform_meeting&time_duration=$h&min_duration=$m&time_begin=$time_begin&min_begin=$min_begin&date=$datebegin&title=$calendar[title]";
 
   foreach($conflicts as $conflict) {
@@ -2048,10 +2049,12 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
         <td>$name <a href=\"$freebusy_url\">$GLOBALS[l_show_calendar]</a> </td>
       </tr>";
   }
-
-  foreach($calendar["user_id"] as $user) {
-    $sel_user_id .="<input type=\"hidden\" name=\"sel_user_id[]\" value=\"$user\" />";
-    $url .="&sel_user_id[]=$user";
+  
+  if (is_array($calendar["user_id"])) {
+    foreach($calendar["user_id"] as $user) {
+      $sel_user_id .="<input type=\"hidden\" name=\"sel_user_id[]\" value=\"$user\" />";
+      $url .="&sel_user_id[]=$user";
+    }
   }
   if (is_array($calendar["resource_id"])) {
     foreach($calendar["resource_id"] as $res) {
@@ -3471,6 +3474,10 @@ function html_calendar_waiting_events($obm_wait) {
     $begin = new Of_Date($obm_wait->f('event_date'), 'GMT');
     $end = clone $begin;
     $end->addSecond($obm_wait->f('event_duration'));
+    $date_begin = urldecode($begin->getURL());
+    $date_end = urldecode($end->getURL());
+    $time_end = $end->getHour();
+    $min_end = $end->getMinute();
     $block .= "
     <tr>
      <td><a href=\"$path/calendar/calendar_index.php?action=detailconsult&amp;calendar_id=".$obm_wait->f('event_id')."\">".$obm_wait->f('event_title')."</a></td>
@@ -3488,6 +3495,10 @@ function html_calendar_waiting_events($obm_wait) {
        <input type=\"hidden\" name=\"entity_kind\" value=\"$current_entity_entity\" />
        <input type=\"hidden\" name=\"entity_id\" value=\"$current_entity\" />
        <input type=\"hidden\" name=\"owner_notification\" value=\"false\" />
+       <input type=\"hidden\" name=\"date_begin\" value=\"$date_begin\" />
+       <input type=\"hidden\" name=\"date_end\" value=\"$date_end\" />
+       <input type=\"hidden\" name=\"time_end\" value=\"$time_end\" />
+       <input type=\"hidden\" name=\"min_end\" value=\"$min_end\" />
        <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"ACCEPTED\"  onclick=\"submitWaiting(this.form)\" />$l_accept</span><br />
        <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"NEEDS-ACTION\" checked=\"checked\" onclick=\"submitWaiting(this.form)\" />$l_wait</span><br />
        <span class=\"NW\"><input type=\"radio\" name=\"rd_decision_event\" value=\"DECLINED\" onclick=\"submitWaiting(this.form)\" />$l_refuse</span>
