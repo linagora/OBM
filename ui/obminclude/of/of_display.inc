@@ -1395,7 +1395,8 @@ function display_last_visited() {
   $query = "SELECT event_id, event_timeupdate, event_title 
     FROM Event 
     WHERE event_usercreate='$uid' 
-      AND event_timeupdate = (SELECT max(event_timeupdate) FROM Event WHERE event_usercreate='$uid')";
+      AND event_timeupdate = (SELECT max(event_timeupdate) FROM Event WHERE event_usercreate='$uid' 
+      AND event_type='VEVENT')";
   display_debug_msg($query, $cdg_sql, 'display_last_visited(Last created|updated event)');
   $obm_q->query($query);
   if($obm_q->next_record()) {
