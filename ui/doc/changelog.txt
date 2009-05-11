@@ -35,8 +35,9 @@ To do
   * Fixed some IE 6 srange behaviours bugs
   * E#109 : Planning view lacks link to project
   * E#150 : Complete English referential (Payment, countries,..)
-  * Fixed bugs 13, 18, 65, 176, 178, 185, 188, 191, 192, 193, 194, 195
-  * Fixed bugs 201, 202, 206, 210, 212, 215, 220, 222, 223, 225, 230, 234
+  * E#231 : More clever default time for a new event
+  * Fixed bugs 13, 18, 65, 176, 178, 185, 188, 191, 192, 193, 194, 195, 201
+  * Fixed bugs 202, 206, 210, 212, 215, 220, 222, 223, 225, 229, 230, 232, 234
   * Calendar : fixed a bug with quote in calendar name (thank you SamSam)
 
 2009-04-17 : version 2.2.1
