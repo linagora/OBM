@@ -95,7 +95,7 @@ function run_query_host_search($host) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct host_id) FROM Host $whereq");
+    $count = get_query_count($query);
     $obm_q->set_num_rows_total($count);
   }
 
