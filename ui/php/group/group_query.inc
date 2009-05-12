@@ -41,7 +41,7 @@ function run_query_group_search($group) {
     $join_user = "
       LEFT JOIN of_usergroup as D ON D.of_usergroup_group_id=group_id
       LEFT JOIN UserObm as C ON D.of_usergroup_user_id = C.userobm_id";
-    $where .= " AND C.userobm_lastname $like '$user%'";
+    $where .= " AND C.userobm_lastname $like '$user%' AND C.userobm_archive = 0";
   }
   // If a user domain indication has been specified, get it
   if (($domain_id != $c_all) && ($domain_id != '')) {

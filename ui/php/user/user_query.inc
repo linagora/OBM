@@ -980,13 +980,6 @@ function run_query_user_update($u_id, $user) {
     run_query_user_init_group($domain_id, $u_id, $gid);
   }
 
-  // If the user is archived, we unsubscribe it from of_usergroup table only
-  if ($archive == '1' && $u['archive'] == 0) {
-    of_usergroup_delete_user_hierarchy($u_id);
-  } elseif($archive == '0' && $u['archive'] == 1) {
-    of_usergroup_update_user_hierarchy($u_id);
-  }
-
   // Update photo
   if (isset($user['file_tmp']) && $user['file_tmp'] != '') {
     $user['title'] = $user['login'];

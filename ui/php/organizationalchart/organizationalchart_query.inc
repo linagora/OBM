@@ -53,7 +53,7 @@ function run_query_organizationalchart_search($organizationalchart) {
       LEFT JOIN GroupEntity ON groupentity_entity_id=ogrouplink_entity_id
       LEFT JOIN of_usergroup ON of_usergroup_group_id=groupentity_group_id 
       LEFT JOIN UserEntity ON userentity_entity_id=ogrouplink_entity_id
-      LEFT JOIN UserObm as u ON (u.userobm_id=userentity_user_id OR u.userobm_id=of_usergroup_user_id)";
+      LEFT JOIN UserObm as u ON (u.userobm_id=userentity_user_id OR (u.userobm_id=of_usergroup_user_id AND u.userobm_archive = 0))";
     $where .= " $and (userobm_lastname $like '$user%' OR userobm_firstname $like '$user%')";
   }
 
@@ -396,7 +396,7 @@ function run_query_organizationalchart_ogrouplink_detail($id) {
       INNER JOIN of_usergroup ON of_usergroup_group_id=groupentity_group_id 
       INNER JOIN UserObm ON userobm_id = of_usergroup_user_id
       INNER JOIN Domain ON domain_id = userobm_domain_id
-    WHERE ogrouplink_ogroup_id $id
+    WHERE ogrouplink_ogroup_id $id AND userobm_archive = 0
   UNION
     SELECT 
       ogrouplink_id,
