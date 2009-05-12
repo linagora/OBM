@@ -294,7 +294,6 @@ function run_query_user_ext_search($user) {
       $where_filter_entity
     ORDER BY  userobm_lastname, userobm_firstname
     LIMIT $limit OFFSET $first_row";
-  echo $query;
   display_debug_msg($query, $cdg_sql, 'run_query_user_ext_search()');
   $obm_q->xquery($query);
 
