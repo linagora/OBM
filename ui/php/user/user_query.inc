@@ -239,15 +239,15 @@ function run_query_user_search($user) {
     $orderq
     $limit";
 
-  //if ($ctu_sql_limit) {
-  //  $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $join_domain $whereq");
-  //  $obm_q->set_num_rows_total($count);
-  //}
+  if ($ctu_sql_limit) {
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $join_domain $whereq");
+    $obm_q->set_num_rows_total($count);
+  }
 
-  //if (($count > 0) || (! $ctu_sql_limit)) {
+  if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg($query, $cdg_sql, 'run_query_user_search()');
     $obm_q->xquery($query);
-  //}
+  }
 
   return $obm_q;
 }
