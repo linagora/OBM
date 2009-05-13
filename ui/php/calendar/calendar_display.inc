@@ -3980,10 +3980,10 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
               $evt_end = $e->get(Of_Date::TIME_SHORT);
               $title = "";
               if($oc->event->isMeeting()) {
-                $title .= "<img src=\"$GLOBALS[ico_meeting]\" alt=\"[Meeting]\" /> ";
+                $title .= "<img src=\"$GLOBALS[ico_meeting_alt]\" alt=\"[Meeting]\" /> ";
               }
               if($oc->event->isPrivate()) {
-                $title .= "<img src=\"$GLOBALS[ico_private]\" alt=\"[Meeting]\" /> ";
+                $title .= "<img src=\"$GLOBALS[ico_private_alt]\" alt=\"[Meeting]\" /> ";
               }
               $title .= $oc->event->title;
               if($oc->event->isPrivate() && !(array_key_exists($obm['uid'],$oc->event->attendee['user']))) {
@@ -4044,10 +4044,10 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
               $evt_end = $e->get(Of_Date::TIME_SHORT);
               $title = "";
               if($oc->event->isMeeting()) {
-                $title .= "<img src=\"$GLOBALS[ico_meeting]\" alt=\"[Meeting]\" /> ";
+                $title .= "<img src=\"$GLOBALS[ico_meeting_alt]\" alt=\"[Meeting]\" /> ";
               }
               if($oc->event->isPrivate()) {
-                $title .= "<img src=\"$GLOBALS[ico_private]\" alt=\"[Meeting]\" /> ";
+                $title .= "<img src=\"$GLOBALS[ico_private_alt]\" alt=\"[Meeting]\" /> ";
               }
               $title .= $oc->event->title;
               if($oc->event->isPrivate() && !(array_key_exists($obm['uid'],$oc->event->attendee['user']))) {
