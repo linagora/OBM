@@ -81,15 +81,13 @@ sub next {
     if ( (defined($self->{'sambaHostGroup'}) ) && ( $self->{'parentDomain'}->isSambaDomain() ) ) { 
         require OBM::Entities::obmGroup;
         my $current = OBM::Entities::obmGroup->new( $self->{'parentDomain'}, $self->{'sambaHostGroup'} );
-        $current->setUpdateEntity();
-        $current->setUpdateLinks();
+        $current->unsetBdUpdate();
         $self->{'sambaHostGroup'} = undef;
 
         return $current;
     }
 
     while( defined($self->{'entitiesDescList'}) && (my $groupDesc = $self->{'entitiesDescList'}->fetchrow_hashref()) ) {
-
         require OBM::Entities::obmGroup;
         if( !(my $current = OBM::Entities::obmGroup->new( $self->{'parentDomain'}, $groupDesc )) ) {
             next;
@@ -124,6 +122,38 @@ sub next {
 
                     $self->_log( 'mise à jour des liens, '.$self->{'currentEntity'}->getDescription(), 3 );
                     $self->{'currentEntity'}->setUpdateLinks();
+                    last SWITCH;
+                }
+
+                if( $self->{'updateType'} eq 'SYSTEM_ALL' ) {
+                    if( $self->_loadGroupLinks() ) {
+                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                        next;
+                    }
+
+                    $self->_log( 'mise à jour de l\'entité et des liens, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    $self->{'currentEntity'}->setUpdateEntity();
+                    $self->{'currentEntity'}->setUpdateLinks();
+                    $self->{'currentEntity'}->unsetBdUpdate();
+                    last SWITCH;
+                }
+                
+                if( $self->{'updateType'} eq 'SYSTEM_ENTITY' ) {
+                    $self->_log( 'chargement de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
+
+                    $self->{'currentEntity'}->setUpdateEntity();
+                    $self->{'currentEntity'}->unsetBdUpdate();
+                }
+
+                if( $self->{'updateType'} eq 'SYSTEM_LINKS' ) {
+                    if( $self->_loadGroupLinks() ) {
+                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                        next;
+                    }
+
+                    $self->_log( 'mise à jour des liens, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    $self->{'currentEntity'}->setUpdateLinks();
+                    $self->{'currentEntity'}->unsetBdUpdate();
                     last SWITCH;
                 }
 

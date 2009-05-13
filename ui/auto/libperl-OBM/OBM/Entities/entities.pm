@@ -126,6 +126,10 @@ sub setArchive {
 sub getArchive {
     my $self = shift;
 
+    if( !defined($self->{'archive'}) ) {
+        $self->{'archive'} = 0;
+    }
+
     return $self->{'archive'};
 }
 
@@ -141,7 +145,7 @@ sub getParent {
 sub setBdUpdate {
     my $self = shift;
 
-    $self->{'allowBdUpdate'} = 1;
+    $self->{'disableDbupdate'} = 0;
 
     return 0;
 }
@@ -151,7 +155,7 @@ sub setBdUpdate {
 sub unsetBdUpdate {
     my $self = shift;
 
-    $self->{'allowBdUpdate'} = 0;
+    $self->{'disableDbupdate'} = 1;
 
     return 0;
 }
@@ -161,7 +165,7 @@ sub unsetBdUpdate {
 sub getBdUpdate {
     my $self = shift;
 
-    return $self->{'allowBdUpdate'};
+    return !$self->{'disableDbupdate'};
 }
 
 
@@ -437,6 +441,13 @@ sub getSieveNomade {
 sub setLdapSambaPasswd {
     my $self = shift;
     my( $entry, $plainPasswd ) = @_; 
+
+    return 0;
+}
+
+
+sub updateLinkedEntities {
+    my $self = shift;
 
     return 0;
 }

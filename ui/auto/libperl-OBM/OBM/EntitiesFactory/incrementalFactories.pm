@@ -149,6 +149,7 @@ sub _initHostFactory {
             return 1;
         }
 
+        $entityFactory->setUpdateLinkedEntities();
         $entitiesFactory->enqueueFactory( $entityFactory );
     }
 
@@ -174,6 +175,7 @@ sub _initGroupFactory {
             return 1;
         }
 
+        $entityFactory->setUpdateLinkedEntities();
         $entitiesFactory->enqueueFactory( $entityFactory );
     }
 
@@ -199,6 +201,7 @@ sub _initMailshareFactory {
             return 1;
         }
 
+        $entityFactory->setUpdateLinkedEntities();
         $entitiesFactory->enqueueFactory( $entityFactory );
     }
 
@@ -224,6 +227,7 @@ sub _initUserFactory {
             return 1;
         }
 
+        $entityFactory->setUpdateLinkedEntities();
         $entitiesFactory->enqueueFactory( $entityFactory );
     }
 

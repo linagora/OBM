@@ -325,17 +325,6 @@ sub updateLdapEntry {
 }
 
 
-sub getBdUpdate {
-    my $self = shift;
-
-    if( $self->getUpdateEntity() ) {
-        return 1;
-    }
-
-    return 0;
-}
-
-
 sub getImapServersIds {
     my $self = shift;
 

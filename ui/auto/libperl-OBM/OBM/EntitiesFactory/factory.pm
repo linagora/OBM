@@ -288,3 +288,86 @@ sub _computeRight {
 
     return $rightList;
 }
+
+
+sub _getLinkedEntities {
+    my $self = shift;
+
+    if( !$self->getUpdateLinkedEntities() ) {
+        $self->_log( 'les entités liés ne sont pas à mettre à jour', 3 );
+        return undef;
+    }
+
+    if( !defined($self->{'linkedEntitiesFactory'}) && (!defined($self->{'currentEntity'}) || !$self->{'currentEntity'}->updateLinkedEntities()) ) {
+        return undef;
+    }
+
+    if( ($self->{'updateType'} ne 'UPDATE_ALL') && ($self->{'updateType'} ne 'UPDATE_ENTITY') ) {
+        return undef;
+    }
+
+    if( !defined($self->{'linkedEntitiesFactory'}) && (!$self->_loadLinkedEntitiesFactories()) ) {
+        $self->_log( 'chargement des factories des entités liées', 3 );
+    }
+
+    if ( defined($self->{'linkedEntitiesFactory'}) && (my $currentLinkedEntity = $self->{'linkedEntitiesFactory'}->next()) ) {
+        return $currentLinkedEntity;
+    }
+
+    $self->{'linkedEntitiesFactory'} = undef;
+    return undef;
+}
+
+
+sub _loadLinkedEntitiesFactories {
+    my $self = shift;
+
+    return undef;
+}
+
+
+sub _enqueueLinkedEntitiesFactory {
+    my $self = shift;
+    my( $factoryProgramming ) = @_;
+
+    if( ref($factoryProgramming) ne 'OBM::EntitiesFactory::factoryProgramming' ) {
+        $self->_log( 'linked entities factory programmateur incorrect', 4 );
+        return 1;
+    }
+
+    if( !defined($self->{'linkedEntitiesFactory'}) ) {
+        require OBM::entitiesFactory;
+        $self->{'linkedEntitiesFactory'} = OBM::entitiesFactory->new( 'PROGRAMMABLE', $self->{'currentEntity'}->getDomainId() );
+        if( !defined($self->{'linkedEntitiesFactory'}) ) {
+            $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+            return 1;
+        }
+    }
+
+    if( $self->{'linkedEntitiesFactory'}->loadEntities($factoryProgramming) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return 1;
+    }
+
+    return 0;
+}
+
+
+sub setUpdateLinkedEntities {
+    my $self = shift;
+
+    $self->{'updateLinkedEntities'} = 1;
+
+    return 0;
+}
+
+
+sub getUpdateLinkedEntities {
+    my $self = shift;
+
+    if( !defined($self->{'updateLinkedEntities'}) ) {
+        $self->{'updateLinkedEntities'} = 0;
+    }
+
+    return $self->{'updateLinkedEntities'};
+}

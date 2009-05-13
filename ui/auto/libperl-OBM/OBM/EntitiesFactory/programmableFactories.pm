@@ -75,6 +75,11 @@ sub addEntities {
             last SWITCH;
         }
 
+        if( $programmingObj->getEntitiesType() eq 'GROUP' ) {
+            $self->_initGroupFactory();
+            last SWITCH;
+        }
+
         $self->_log( 'type d\'entité non supporté', 0 );
     }
 
@@ -94,6 +99,10 @@ sub _initHostFactory {
         if( !($entityFactory = OBM::EntitiesFactory::hostFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
             $self->_log( 'problème au chargement de la factory des hôtes', 3 );
             return 1;
+        }
+
+        if( $self->{'programmingObj'}->getUpdateLinkedEntities() ) {
+            $entityFactory->setUpdateLinkedEntities();
         }
 
         $entitiesFactory->enqueueFactory( $entityFactory );
@@ -117,6 +126,10 @@ sub _initGroupFactory {
             return 1;
         }
 
+        if( $self->{'programmingObj'}->getUpdateLinkedEntities() ) {
+            $entityFactory->setUpdateLinkedEntities();
+        }
+
         $entitiesFactory->enqueueFactory( $entityFactory );
     }
 
@@ -138,6 +151,10 @@ sub _initMailshareFactory {
             return 1;
         }
 
+        if( $self->{'programmingObj'}->getUpdateLinkedEntities() ) {
+            $entityFactory->setUpdateLinkedEntities();
+        }
+
         $entitiesFactory->enqueueFactory( $entityFactory );
     }
 
@@ -157,6 +174,10 @@ sub _initUserFactory {
         if( !($entityFactory = OBM::EntitiesFactory::userFactory->new( $self->{'updateType'}, $entitiesFactory->{'domain'}, $entitiesIds )) ) {
             $self->_log( 'problème au chargement de la factory des utilisateurs', 3 );
             return 1;
+        }
+
+        if( $self->{'programmingObj'}->getUpdateLinkedEntities() ) {
+            $entityFactory->setUpdateLinkedEntities();
         }
 
         $entitiesFactory->enqueueFactory( $entityFactory );

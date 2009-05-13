@@ -74,9 +74,9 @@ sub _init {
         return 1;
     }
     
-    $userDesc->{'system_userobm_login'} = lc($userDesc->{'userobm_login'});
-    if( $userDesc->{'system_userobm_login'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
-        $self->_log( 'login de l\'utilisateur \''.$userDesc->{'userobm_login'}.'\' incorrect', 0 );
+    $userDesc->{'userobm_login_new'} = lc($userDesc->{'userobm_login'});
+    if( $userDesc->{'userobm_login_new'} !~ /$OBM::Parameters::regexp::regexp_login/ ) {
+        $self->_log( 'login de l\'utilisateur \''.$userDesc->{'userobm_login_new'}.'\' incorrect', 0 );
         return 1;
     }
 
@@ -221,9 +221,9 @@ sub _init {
     }
 
     # LDAP BAL destination
-    $userDesc->{'userobm_ldap_mailbox'} = $userDesc->{'system_userobm_login'}.'@'.$self->{'parent'}->getDesc('domain_name');
+    $userDesc->{'userobm_ldap_mailbox'} = $userDesc->{'userobm_login_new'}.'@'.$self->{'parent'}->getDesc('domain_name');
     # Cyrus BAL destination
-    $userDesc->{'userobm_cyrus_mailbox'} = $userDesc->{'system_userobm_login'};
+    $userDesc->{'userobm_cyrus_mailbox'} = $userDesc->{'userobm_login_new'};
     # Current Cyrus BAL destination
     $userDesc->{'current_userobm_cyrus_mailbox'} = $userDesc->{'userobm_login_current'};
     if( !$OBM::Parameters::common::singleNameSpace ) {
@@ -246,7 +246,7 @@ sub _init {
     if( defined($userMailboxDefaultFolders) ) {
         foreach my $folderTree ( split( ',', $userMailboxDefaultFolders ) ) {
             if( $folderTree !~ /(^[",]$)|(^$)/ ) {
-                my $folderName = $userDesc->{'system_userobm_login'};
+                my $folderName = $userDesc->{'userobm_login_new'};
                 foreach my $folder ( split( '/', $folderTree ) ) {
                     $folder =~ s/^\s+//;
 
@@ -300,7 +300,7 @@ sub _init {
             $userDesc->{'userobm_samba_group_sid'} = $self->_getGroupSID( $domainSid, $userDesc->{'userobm_gid'} );
 
             # Specific user UID
-            if ($userDesc->{'group_gid'}) {
+            if( $userDesc->{'group_gid'} ) {
                 $userDesc->{'userobm_uid'} = 0;
             }
 
@@ -318,7 +318,7 @@ sub _init {
             # W2k+ profil share (for older version, see smb.conf)
             if( $self->{'parent'}->getDesc('samba_user_profile') ) {
                 $userDesc->{'userobm_samba_profile'} = $self->{'parent'}->getDesc('samba_user_profile');
-                $userDesc->{'userobm_samba_profile'} =~ s/\%u/$userDesc->{'system_userobm_login'}/g;
+                $userDesc->{'userobm_samba_profile'} =~ s/\%u/$userDesc->{'userobm_login_new'}/g;
             }
         }
     }else {
@@ -429,7 +429,7 @@ sub getDnPrefix {
     }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'uid='.$self->{'entityDesc'}->{'system_userobm_login'}.','.$rootDn->[$i] );
+        push( @dnPrefixes, 'uid='.$self->{'entityDesc'}->{'userobm_login_new'}.','.$rootDn->[$i] );
         $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
@@ -448,7 +448,7 @@ sub getCurrentDnPrefix {
         return undef;
     }
 
-    my $currentUserLogin = $self->{'entityDesc'}->{'system_userobm_login'};
+    my $currentUserLogin = $self->{'entityDesc'}->{'userobm_login_new'};
     if( $self->{'entityDesc'}->{'userobm_login_current'} && ($currentUserLogin ne $self->{'entityDesc'}->{'userobm_login_current'}) ) {
         $currentUserLogin = $self->{'entityDesc'}->{'userobm_login_current'};
     }
@@ -507,7 +507,7 @@ sub createLdapEntry {
 
     $entry->add(
         objectClass => $self->_getLdapObjectclass(),
-        uid => $self->{'entityDesc'}->{'system_userobm_login'},
+        uid => $self->{'entityDesc'}->{'userobm_login_new'},
         uidNumber => $self->{'entityDesc'}->{'userobm_uid'},
         gidNumber => $self->{'entityDesc'}->{'userobm_gid'},
         loginShell => '/bin/bash'
@@ -528,7 +528,7 @@ sub createLdapEntry {
     }
 
     # Home directory
-    $entry->add( homeDirectory => '/home/'.$self->{'entityDesc'}->{'system_userobm_login'} );
+    $entry->add( homeDirectory => '/home/'.$self->{'entityDesc'}->{'userobm_login_new'} );
 
     # User password
     if( my $userPasswd = $self->_convertPasswd( $self->{'entityDesc'}->{'userobm_password_type'}, $self->{'entityDesc'}->{'userobm_password'} ) ) {
@@ -760,7 +760,7 @@ sub updateLdapEntry {
         }
 
         # User home directory
-        if( $self->_modifyAttr( '/home/'.$self->{'entityDesc'}->{'system_userobm_login'}, $entry, 'homeDirectory' ) ) {
+        if( $self->_modifyAttr( '/home/'.$self->{'entityDesc'}->{'userobm_login_new'}, $entry, 'homeDirectory' ) ) {
             $update = 1;
         }
 
@@ -1133,17 +1133,6 @@ sub getSieveNomade {
 }
 
 
-sub getBdUpdate {
-    my $self = shift;
-
-    if( $self->getUpdateEntity() || $self->getUpdateLinks() ) {
-        return 1;
-    }
-
-    return 0;
-}
-
-
 sub setLdapSambaPasswd {
     my $self = shift;
     my( $entry, $plainPasswd ) = @_; 
@@ -1154,7 +1143,7 @@ sub setLdapSambaPasswd {
         return undef;
     }
 
-    if( !$OBM::Parameters::common::obmModules->{samba} ) {
+    if( !$OBM::Parameters::common::obmModules->{'samba'} ) {
         $self->_log( 'module Samba désactivé', 0 );
         return 0;
     }
@@ -1185,4 +1174,32 @@ sub setLdapSambaPasswd {
     }
 
     return $update;
+}
+
+
+sub updateLinkedEntities {
+    my $self = shift;
+
+    if( $self->{'entityDesc'}->{'userobm_login_current'} && ($self->{'entityDesc'}->{'userobm_login_new'} ne $self->{'entityDesc'}->{'userobm_login_current'}) ) {
+        $self->_log( 'le login a été modifié, les entités liées doivent être mises à jour', 3 );
+        return 1;
+    }
+
+    if( !$self->getArchive() != !$self->{'entityDesc'}->{'user_obm_archive_current'} ) {
+        $self->_log( 'changement d\'état d\'archivage de '.$self->getDescription().', les entités liées doivent être mises à jour', 3 );
+        return 1;
+    }
+
+    if( !$self->{'entityDesc'}->{'userobm_mail_perms'} != !$self->{'entityDesc'}->{'userobm_mail_perms_current'} ) {
+        $self->_log( 'changement d\'état du droit Mail de '.$self->getDescription().', les entités liées doivent être mises à jour', 3 );
+        return 1;
+    }
+
+    if( !$self->{'entityDesc'}->{'userobm_samba_perms'} != !$self->{'entityDesc'}->{'userobm_samba_perms_current'} ) {
+        $self->_log( 'changement d\'état du droit Samba de '.$self->getDescription().', les entités liées doivent être mises à jour', 3 );
+        return 1;
+    }
+
+    $self->_log( 'pas de mise à jour des entités liés nécessaire', 3 );
+    return 0;
 }

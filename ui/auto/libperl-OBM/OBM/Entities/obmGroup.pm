@@ -484,14 +484,3 @@ sub updateLdapEntry {
 
     return $update;
 }
-
-
-sub getBdUpdate {
-    my $self = shift;
-
-    if( $self->getUpdateEntity() || $self->getUpdateLinks() ) {
-        return 1;
-    }
-
-    return 0;
-}

@@ -114,6 +114,38 @@ sub next {
                     last SWITCH;
                 }
 
+                if( $self->{'updateType'} eq 'SYSTEM_ALL' ) {
+                    if( $self->_loadMailshareLinks() ) {
+                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                        next;
+                    }
+
+                    $self->_log( 'mise à jour de l\'entité et des liens, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    $self->{'currentEntity'}->setUpdateEntity();
+                    $self->{'currentEntity'}->setUpdateLinks();
+                    $self->{'currentEntity'}->unsetBdUpdate();
+                    last SWITCH;
+                }
+
+                if( $self->{'updateType'} eq 'SYSTEM_ENTITY' ) {
+                    $self->_log( 'mise à jour de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    $self->{'currentEntity'}->setUpdateEntity();
+                    $self->{'currentEntity'}->unsetBdUpdate();
+                    last SWITCH;
+                }
+
+                if( $self->{'updateType'} eq 'SYSTEM_LINKS' ) {
+                    if( $self->_loadMailshareLinks() ) {
+                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                        next;
+                    }
+
+                    $self->_log( 'mise à jour des liens, '.$self->{'currentEntity'}->getDescription(), 3 );
+                    $self->{'currentEntity'}->setUpdateLinks();
+                    $self->{'currentEntity'}->unsetBdUpdate();
+                    last SWITCH;
+                }
+
                 if( $self->{'updateType'} eq 'DELETE' ) {
                     $self->_log( 'suppression de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
                     $self->{'currentEntity'}->setDelete();

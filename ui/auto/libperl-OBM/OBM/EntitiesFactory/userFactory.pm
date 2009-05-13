@@ -76,6 +76,10 @@ sub next {
         }
     }
 
+    if( my $linkedEntities = $self->_getLinkedEntities() ) {
+        return $linkedEntities;
+    }
+
     while( defined($self->{'entitiesDescList'}) && (my $userDesc = $self->{'entitiesDescList'}->fetchrow_hashref()) ) {
         require OBM::Entities::obmUser;
         if( !($self->{'currentEntity'} = OBM::Entities::obmUser->new( $self->{'parentDomain'}, $userDesc )) ) {
@@ -113,15 +117,37 @@ sub next {
                     last SWITCH;
                 }
 
-                if( ($self->{'updateType'} eq 'SYSTEM_ALL') || ($self->{'updateType'} eq 'SYSTEM_LINKS') ) {
+                if( $self->{'updateType'} eq 'SYSTEM_ALL' ) {
                     if( $self->_loadUserLinks() ) {
                         $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
                         next;
                     }
-                }
 
+                    $self->_log( 'mise à jour de l\'entité et des liens, '.$self->{'currentEntity'}->getDescription(), 3 );
+
+                    $self->{'currentEntity'}->setUpdateEntity();
+                    $self->{'currentEntity'}->setUpdateLinks();
+                    $self->{'currentEntity'}->unsetBdUpdate();
+                }
+                
                 if( $self->{'updateType'} eq 'SYSTEM_ENTITY' ) {
                     $self->_log( 'chargement de l\'entité, '.$self->{'currentEntity'}->getDescription(), 3 );
+
+                    $self->{'currentEntity'}->setUpdateEntity();
+                    $self->{'currentEntity'}->unsetBdUpdate();
+                    last SWITCH;
+                }
+
+                if( $self->{'updateType'} eq 'SYSTEM_LINKS' ) {
+                    if( $self->_loadUserLinks() ) {
+                        $self->_log( 'probleme au chargement des liens de l\'entité '.$self->{'currentEntity'}->getDescription(), 2 );
+                        next;
+                    }
+
+                    $self->_log( 'mise à jour des liens, '.$self->{'currentEntity'}->getDescription(), 3 );
+
+                    $self->{'currentEntity'}->setUpdateLinks();
+                    $self->{'currentEntity'}->unsetBdUpdate();
                     last SWITCH;
                 }
 
@@ -165,6 +191,9 @@ sub _loadEntities {
 
     my $query = 'SELECT '.$userTablePrefix.'UserObm.*,
                         current.userobm_login as userobm_login_current,
+                        current.userobm_archive as user_obm_archive_current,
+                        current.userobm_samba_perms as userobm_samba_perms_current,
+                        current.userobm_mail_perms as userobm_mail_perms_current,
                         group_gid
                  FROM '.$userTablePrefix.'UserObm
                  LEFT JOIN P_UserObm current ON current.userobm_id='.$userTablePrefix.'UserObm.userobm_id
@@ -208,7 +237,7 @@ sub _loadUserLinks {
     my $groupEntityTable = 'GroupEntity';
     my $entityRightTable = 'EntityRight';
     my $ofUserGroupTable = 'of_usergroup';
-    if( $self->{'updateType'} =~ /^(SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS)$/ ) {
+    if( $self->{'updateType'} =~ /^(UPDATE_ENTITY|SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS)$/ ) {
         $userEntityTable = 'P_'.$userEntityTable;
         $mailboxEntity = 'P_'.$mailboxEntity;
         $groupEntityTable = 'P_'.$groupEntityTable;
@@ -323,4 +352,201 @@ sub _loadUserLinks {
     $self->{'currentEntity'}->setLinks( $self->_getEntityRight( \%rightDef ) );
 
     return 0;
+}
+
+
+sub _loadLinkedEntitiesFactories {
+    my $self = shift;
+    my @factories;
+
+    $self->_log( 'programmation de la mise à jour des entités liées à '.$self->{'currentEntity'}->getDescription(), 2 );
+
+    if( my $factoryProgramming = $self->_loadLinkedUsers() ) {
+        $self->_enqueueLinkedEntitiesFactory( $factoryProgramming );
+    }
+
+    if( my $factoryProgramming = $self->_loadLinkedGroups() ) {
+        $self->_enqueueLinkedEntitiesFactory( $factoryProgramming );
+    }
+
+    if( my $factoryProgramming = $self->_loadLinkedMailshares() ) {
+        $self->_enqueueLinkedEntitiesFactory( $factoryProgramming );
+    }
+
+    return 0;
+}
+
+
+sub _loadLinkedGroups {
+    my $self = shift;
+    my $entityId = $self->{'currentEntity'}->getId();
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return undef;
+    }
+
+    my $query = 'SELECT of_usergroup_group_id
+                 FROM P_of_usergroup
+                 WHERE of_usergroup_user_id='.$entityId;
+
+    my $linkedGroupsIds;
+    if( !defined($dbHandler->execQuery( $query, \$linkedGroupsIds )) ) {
+        $self->_log( 'chargement des groupes liés depuis la BD impossible', 3 );
+        return undef;
+    }
+
+    my %groupIds;
+    while (my $groupId = $linkedGroupsIds->fetchrow_hashref()) {
+        $groupIds{$groupId->{'of_usergroup_group_id'}} = undef;
+    }
+
+    my @groupIds = keys(%groupIds);
+    if( $#groupIds < 0 ) {
+        $self->_log( 'pas de groupes liés à '.$self->{'currentEntity'}->getDescription(), 3 );
+        return undef;
+    }
+
+    # Getting group factory programming
+    require OBM::EntitiesFactory::factoryProgramming;
+    my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
+    if( !defined($programmingObj) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return undef;
+    }
+    if( $programmingObj->setEntitiesType( 'GROUP' ) || $programmingObj->setUpdateType( 'SYSTEM_LINKS' ) || $programmingObj->setEntitiesIds( \@groupIds ) ) {
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+        return undef;
+    }
+
+    return $programmingObj;
+}
+
+
+sub _loadLinkedUsers {
+    my $self = shift;
+    my $entityId = $self->{'currentEntity'}->getId();
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return undef;
+    }
+
+    my $query = 'SELECT mailboxentity_mailbox_id AS id
+                 FROM P_MailboxEntity
+                 INNER JOIN P_EntityRight ON mailboxentity_entity_id = entityright_entity_id
+                 INNER JOIN P_UserEntity ON userentity_entity_id = entityright_consumer_id
+                 WHERE userentity_user_id = \''.$entityId.'\'
+                  AND mailboxentity_mailbox_id <> \''.$entityId.'\'
+                  AND (entityright_read = \'1\' OR entityright_write = \'1\')
+                 UNION
+                 SELECT mailboxentity_mailbox_id AS id
+                 FROM P_MailboxEntity
+                 INNER JOIN P_EntityRight ON mailboxentity_entity_id = entityright_entity_id
+                 INNER JOIN P_GroupEntity ON groupentity_entity_id = entityright_consumer_id
+                 WHERE groupentity_group_id IN (SELECT of_usergroup_group_id
+                                                FROM P_of_usergroup
+                                                WHERE of_usergroup_user_id=\''.$entityId.'\')
+                  AND mailboxentity_mailbox_id <> \''.$entityId.'\'
+                  AND (entityright_read = \'1\' OR entityright_write = \'1\')';
+
+    my $linkedUsersIds;
+    if( !defined($dbHandler->execQuery( $query, \$linkedUsersIds )) ) {
+        $self->_log( 'chargement des utilisateurs liés depuis la BD impossible', 3 );
+        return undef;
+    }
+
+    my %userIds;
+    while (my $userId = $linkedUsersIds->fetchrow_hashref()) {
+        $userIds{$userId->{'id'}} = undef;
+    }
+
+    my @userIds = keys(%userIds);
+    if( $#userIds < 0 ) {
+        $self->_log( 'pas d\'utilisateurs liés à '.$self->{'currentEntity'}->getDescription(), 3 );
+        return undef;
+    }
+
+    # Getting user factory programming
+    require OBM::EntitiesFactory::factoryProgramming;
+    my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
+    if( !defined($programmingObj) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return undef;
+    }
+    if( $programmingObj->setEntitiesType( 'USER' ) || $programmingObj->setUpdateType( 'SYSTEM_LINKS' ) || $programmingObj->setEntitiesIds( \@userIds ) ) {
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+        return undef;
+    }
+
+    return $programmingObj;
+}
+
+
+sub _loadLinkedMailshares {
+    my $self = shift;
+    my $entityId = $self->{'currentEntity'}->getId();
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return undef;
+    }
+
+    my $query = 'SELECT mailshareentity_mailshare_id AS id
+                 FROM P_MailshareEntity
+                 INNER JOIN P_EntityRight ON mailshareentity_entity_id = entityright_entity_id
+                 INNER JOIN P_UserEntity ON userentity_entity_id = entityright_consumer_id
+                 WHERE userentity_user_id = \''.$entityId.'\'
+                  AND mailshareentity_mailshare_id <> \''.$entityId.'\'
+                  AND (entityright_read = \'1\' OR entityright_write = \'1\')
+                 UNION
+                 SELECT mailshareentity_mailshare_id AS id
+                 FROM P_MailshareEntity
+                 INNER JOIN P_EntityRight ON mailshareentity_entity_id = entityright_entity_id
+                 INNER JOIN P_GroupEntity ON groupentity_entity_id = entityright_consumer_id
+                 WHERE groupentity_group_id IN (SELECT of_usergroup_group_id
+                                                FROM P_of_usergroup
+                                                WHERE of_usergroup_user_id=\''.$entityId.'\')
+                  AND mailshareentity_mailshare_id <> \''.$entityId.'\'
+                  AND (entityright_read = \'1\' OR entityright_write = \'1\')';
+
+    my $linkedMailsharesIds;
+    if( !defined($dbHandler->execQuery( $query, \$linkedMailsharesIds )) ) {
+        $self->_log( 'chargement des mailshare liés depuis la BD impossible', 3 );
+        return undef;
+    }
+
+    my %mailshareIds;
+    while (my $mailshareId = $linkedMailsharesIds->fetchrow_hashref()) {
+        $mailshareIds{$mailshareId->{'id'}} = undef;
+    }
+
+    my @mailshareIds = keys(%mailshareIds);
+    if( $#mailshareIds < 0 ) {
+        $self->_log( 'pas de mailshare liés à '.$self->{'currentEntity'}->getDescription(), 3 );
+        return undef;
+    }
+
+    # Getting mailshare factory programming
+    require OBM::EntitiesFactory::factoryProgramming;
+    my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
+    if( !defined($programmingObj) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return undef;
+    }
+    if( $programmingObj->setEntitiesType( 'MAILSHARE' ) || $programmingObj->setUpdateType( 'SYSTEM_LINKS' ) || $programmingObj->setEntitiesIds( \@mailshareIds ) ) {
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+        return undef;
+    }
+
+    return $programmingObj;
 }
