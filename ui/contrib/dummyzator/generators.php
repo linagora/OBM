@@ -128,25 +128,21 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     $next_entity_id = $this->last_entity_id + 1;
 
     $nb_priv_contacts = $nb_users * $this->priv_contact_per_user;
+    $nb_pub_contacts = $nb_users * $this->pub_contact_per_user;
+    $total_contacts = $nb_pub_contacts + $nb_priv_contacts;
     print "Inserting $this->priv_contact_per_user privates contacts for each "
       ."user (total $nb_priv_contacts contacts)... ";
-    $contacts_ids = new IntIterator(array('start' => 1,
-                                          'len' => $nb_priv_contacts));
-    $this->createAllUsersContacts(0, clone $users_ids, $contacts_ids);
+    $this->createAllUsersContacts(0, clone $users_ids, $nb_priv_contacts);
     print "done\n";
 
-    $nb_pub_contacts = $nb_users * $this->pub_contact_per_user;
     print "Inserting $this->pub_contact_per_user publics contacts for each "
       ."user (total $nb_pub_contacts contacts)... ";
-    $contacts_ids = new IntIterator(array('start' => $contacts_ids->end()+1,
-                                          'len'   => $nb_pub_contacts));
-    $this->createAllUsersContacts(1, clone $users_ids, $contacts_ids);
+    $this->createAllUsersContacts(1, clone $users_ids, $nb_pub_contacts);
     print "done\n";
 
     $extinfos_eids = new IntIterator
      ( array('start' => $next_entity_id,
              'end'   => $this->last_entity_id) );
-    $total_contacts = $nb_pub_contacts + $nb_priv_contacts;
     print "Randomly inserting informations for all the "
       ."$total_contacts contacts:\n";
     $this->createContactsExtInfos($extinfos_eids);
@@ -167,10 +163,10 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     print "done\n";
   }
   
-  public function createAllUsersContacts($is_public, $uid_iter, $ctct_iter)
+  public function createAllUsersContacts($is_public, $uid_iter, $nb_contacts)
   {
     while($uid = $uid_iter->nextInt()) {
-      $this->createContacts($is_public, $ctct_iter, $uid);
+      $this->createContacts($is_public, $nb_contacts, $uid,new Of_Date(time()));
     }
   }
 
@@ -320,9 +316,9 @@ VALUES (              '$gid',          '$entity_id')");
     }
   }
   
-  public function createContacts($is_public, $ctct_iter, $uid)
+  public function createContacts($is_public, $nb_contacts, $uid, $time)
   {
-    /* Static for each record */
+    /* Contact table */
     $statics = array
       ( 'contact_domain_id'           => "'$this->domain_id'",
         'contact_timeupdate'          => "NOW()",
@@ -342,29 +338,40 @@ VALUES (              '$gid',          '$entity_id')");
         'contact_date'                => "'$this->today_date'",
         'contact_origin'              => "'obm-dummyzator'"
         );
-    /* Dynamic stuff */
     $dyna_cols = array
-      ( 'contact_id', 'contact_kind_id', 'contact_lastname',
+      ( 'contact_kind_id', 'contact_lastname',
         'contact_firstname', 'contact_middlename', 'contact_aka',
         'contact_sound', 'contact_comment' );
-
     $contacts = $this->massInsertorStatment('Contact', $statics, $dyna_cols);
-    while($cid = $ctct_iter->nextInt()) {
+
+    /* SynchedContact table */
+    $statics = array
+      ( 'synchedcontact_user_id'    => "'$uid'",
+        'synchedcontact_timestamp'  => "'$time'" );
+    $dyna_cols = array
+      ( 'synchedcontact_contact_id' );
+    $sctct = $this->massInsertorStatment('SynchedContact', $statics,$dyna_cols);
+    
+    while($nb_contacts) {
       $lname = 'C'.randomAlphaStr(8);
       $changing = array
-        ( $cid,                                                 // sql id
-          $this->available_kinds[array_rand($this->available_kinds)], // kind
+        ( $this->available_kinds[array_rand($this->available_kinds)], // kind
           $lname, randomAlphaStr(8),                  // lastname, firstname
           randomAlphaStr(4), randomAlphaStr(5),       // middlename, aka
           metaphone($lname), 'COM'.randomAlphaStr(15) // sound, comment
           );
       $this->execute_or_die($contacts, $changing);
+      $cid = $this->lastInsertId();
+
+      $this->execute_or_die($sctct, array($cid));
 
       /* Add related entity */
       $entity_id = $this->newEntity();
       $this->query("INSERT INTO ContactEntity
        (contactentity_contact_id, contactentity_entity_id)
 VALUES (                  '$cid',            '$entity_id')");
+
+      $nb_contacts--;
     }
   }
 
