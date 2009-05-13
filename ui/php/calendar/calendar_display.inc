@@ -3435,7 +3435,7 @@ function html_calendar_waiting_events($obm_wait) {
       if ($_GET['owner_notification'] == "true") $owner_notification = "checked=\"checked\"";
       $block .= "
       <h1>$type : $current_label</h1>
-      <input type=\"checkbox\" id=\"owner_notification\" $owner_notification \"/>$GLOBALS[l_owner_notification]
+      <input type=\"checkbox\" id=\"owner_notification\" $owner_notification />$GLOBALS[l_owner_notification]
       <table class=\"spreadSheet\">
       <thead>
        <tr>
