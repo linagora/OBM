@@ -46,7 +46,7 @@ function run_query_todo_search($params) {
   if (($priority != '') && ($priority != $c_all)) {
     $where .= " AND event_priority = '$priority'";
   }
-  if ($percent != '') {
+  if ($percent != '' && is_numeric($percent)) {
     $where .= " AND eventlink_percent = '$percent'";
   }
   if ($dateafter != '') {
