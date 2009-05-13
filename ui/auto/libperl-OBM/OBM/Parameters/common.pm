@@ -41,13 +41,17 @@ if( (-d $Bin) && ($Bin =~ /^([\p{Alphabetic}0-9\/_\-\s\.]+)$/) ) {
 
 
 # Lecture du fichier ini
-if( ! -r $Bin."/../conf/obm_conf.ini" ) {
-    print STDERR "Le fichier de configuration 'obm_conf.ini' n'existe pas ou n'est pas lisible\n";
-    exit 1;
+my $obmConfIni = $Bin.'/../conf/obm_conf.ini';
+if( ! -r $obmConfIni ) {
+    $obmConfIni = '/etc/obm/obm_conf.ini';
+    if( ! -r $obmConfIni ) {
+        print STDERR "Le fichier de configuration 'obm_conf.ini' n'existe pas ou n'est pas lisible\n";
+        exit 1;
+    }
 }
 
 
-$cfgFile = Config::IniFiles->new( -file => $Bin."/../conf/obm_conf.ini" );
+$cfgFile = Config::IniFiles->new( -file => $obmConfIni );
 
 # Initialisation du moteur de random
 # srand( time ^ $$ ^ unpack "%L*", `ps auwx | gzip` );
