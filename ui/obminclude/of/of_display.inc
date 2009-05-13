@@ -925,6 +925,7 @@ function display_page(&$display) {
     <script type=\"text/javascript\">
       obm.portlets = new Obm.Portlets();
       obm.popup = new Obm.Popup();
+      new Obm.Tip($$('.obmTip'));
     </script>  
     <!-- center zone end -->  
     ".$display['end'];

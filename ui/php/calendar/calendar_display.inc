@@ -3877,7 +3877,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
     while($current->compare($end_day) < 0) {
       $label = "";
       $class= "";
-       if($current->compareMinute(0) == 0) {
+      if($current->compareMinute(0) == 0) {
         $label = $current->get(Of_Date::TIME_SHORT);
         $class = "freeBusyCalendarHourDisplayed";
         $day_hours_list .= "<td colspan=\"$unit\" class=\"$class freeBusyCalendarHour\"><span>$label</span></td>";
@@ -3895,8 +3895,6 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   } else {
     $users = array();
   }
-  $readable['user'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read'));
-  $readable['resource'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read'));
 
   $res_id = $sel_entity_id['resource'];
   if (count($res_id > 0)) {
@@ -4002,8 +4000,8 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
               </tr>";
             }
             $tip .= "</table>";
-            //$events .= $HTML_busy_time_slot['entity'];
-            $events .= "<td title='$tip' class='timeSlot tips'>
+            $tip_js = phpStringToJsString($tip);
+            $events .= "<td title=\"({content:'$tip_js'})\" class='timeSlot obmTip'>
               <div class=\"haveEvent\" style=\"width:${colWidth}px;\"></div>
             </td>";
           } else {
@@ -4066,8 +4064,8 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
               </tr>";
             }
             $tip .= "</table>";
-            //$events .= $HTML_busy_time_slot['entity'];
-            $events .= "<td title='$tip' class='timeSlot tips'>
+            $tip_js = phpStringToJsString($tip);
+            $events .= "<td title=\"({content:'$tip_js'})\" class='timeSlot obmTip'>
               <div class=\"haveEvent\" style=\"width:${colWidth}px;\"></div>
             </td>";
           } else {
@@ -4281,7 +4279,6 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
       obm.calendarFreeBusy = new Obm.CalendarFreeBusy($colspan*7, $duration, $js_time_slots, $js_busy_time_slots, $unit, $date_ts);
       new obm.AutoComplete.Search('$GLOBALS[path]/user/user_index.php?action=ext_search&ajax=1', 'sel_user_id', 'userSearch',{filter_entity:'calendar', filter_pattern:'read'});
       new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch',{filter_entity:'calendar', filter_pattern:'read'});
-      new Tips($$('.tips'));
     });
   </script>";
 

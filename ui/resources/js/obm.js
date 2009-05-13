@@ -185,6 +185,39 @@ Obm.Portlets = new Class({
 
 /*
  *
+ * OBM Tip 
+ *
+ */
+Obm.Tip = new Class({
+  Extends: Tips,
+
+  initialize: function(e) {
+    this.parent(e);
+  },
+
+	attach: function(elements) {
+		$$(elements).each(function(element){
+      var element_title = element.get('title');
+      var tip = eval(element_title); 
+			var title = element.retrieve('tip:title', tip.content);
+			var text = element.retrieve('tip:text', element.get('rel') || element.get('href'));
+			var enter = element.retrieve('tip:enter', this.elementEnter.bindWithEvent(this, element));
+			var leave = element.retrieve('tip:leave', this.elementLeave.bindWithEvent(this, element));
+			element.addEvents({mouseenter: enter, mouseleave: leave});
+			if (!this.options.fixed){
+				var move = element.retrieve('tip:move', this.elementMove.bindWithEvent(this, element));
+				element.addEvent('mousemove', move);
+			}
+			element.store('tip:native', element.get('title'));
+			element.erase('title');
+		}, this);
+		return this;
+	}
+
+});
+
+/*
+ *
  * OBM Popup
  *
  */

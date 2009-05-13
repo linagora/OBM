@@ -1500,16 +1500,11 @@ div.overTxtDiv {
 }
 
 .tip {
-  color:#FFF;
-  background: #444;
+  color:#000;
+  background: #ffffbf;
+  border: 1px solid #cfcf3d;
   padding: 2px;
 	z-index: 200000;
-}
- 
-.tip-title {
-}
- 
-.tip-text {
 }
 
 .tip ul {
