@@ -786,8 +786,7 @@ function get_display_pref($u_id, $entity, $all=0) {
   $query = "SELECT *
     FROM DisplayPref
     WHERE (display_user_id IS NULL OR display_user_id $u_id )
-    AND display_entity='$entity'
-    ORDER BY display_user_id, display_fieldorder"; 
+    AND display_entity='$entity'"; 
 
   display_debug_msg($query, $cdg_sql, 'get_display_pref()');
   $obm_q = new DB_OBM;
