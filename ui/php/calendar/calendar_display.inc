@@ -3833,8 +3833,8 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
 //   - $entity_store : array of entities to display
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
+  global $obm;
 
-  $title = $calendar["title"];
   $duration = $calendar['meeting_duration'];
   $date = $calendar['date'];
   if (isset($calendar['time_begin']) && isset($calendar['min_begin'])) {
@@ -3862,7 +3862,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
 
   $HTML_empty_time_slot = "<td class=\"timeSlot\"><div style=\"width:${colWidth}px;\">&nbsp;</div></td>";
   $HTML_busy_time_slot = array(
-    "entity" => "<td class=\"timeSlot\"><div class=\"haveEvent\" style=\"width:${colWidth}px;\"></div></td>",
+    "entity" => "<td class=\"timeSlot\"><div class=\"haveEvent tips\" style=\"width:${colWidth}px;\"></div></td>",
     "all" => "<td class=\"timeSlot\"><div class=\"haveEventAll\" style=\"width:${colWidth}px;\"></div></td>");
 
   // Days headers 
@@ -3895,6 +3895,8 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   } else {
     $users = array();
   }
+  $readable['user'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'read'));
+  $readable['resource'] = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'resource', 'read'));
 
   $res_id = $sel_entity_id['resource'];
   if (count($res_id > 0)) {
@@ -3957,6 +3959,10 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   $current = clone $date;
   if (is_array($users['entity'])) {
     foreach ($users['entity'] as $u_id => $u_ent) {
+      $canRead = false;
+      if(OBM_Acl::canRead($obm['uid'], 'calendar', $u_id)) {
+        $canRead = true;
+      }
       $class = $entity_store['user'][$u_id]['class'];
       $events = "<tr>";
       while($current->compare($end) < 0) {
@@ -3966,8 +3972,40 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
         while($current->compare($end_day) < 0) {
           $end_slot = clone $current;
           $end_slot->addSecond($time_unit_sec);
-          if ($of->periodHaveOccurrences($current,$end_slot, array('user' => array($u_id), 'resource' => null))) {
-            $events .= $HTML_busy_time_slot['entity'];
+          if ($canRead && $ocs = $of->getPeriodOccurrences($current,$end_slot, array('user' => array($u_id), 'resource' => null))) {
+            $tip = "<table>";
+            foreach($ocs as $oc) {
+              $d = $oc->date;
+              $e = clone $d;
+              $e->addTimestamp($oc->event->duration);
+              $evt_begin = $d->get(Of_Date::TIME_SHORT);
+              $evt_end = $e->get(Of_Date::TIME_SHORT);
+              $title = "";
+              if($oc->event->isMeeting()) {
+                $title .= "<img src=\"$GLOBALS[ico_meeting]\" alt=\"[Meeting]\" /> ";
+              }
+              if($oc->event->isPrivate()) {
+                $title .= "<img src=\"$GLOBALS[ico_private]\" alt=\"[Meeting]\" /> ";
+              }
+              $title .= $oc->event->title;
+              if($oc->event->isPrivate() && !(array_key_exists($obm['uid'],$oc->event->attendee['user']))) {
+                $title = "<img src=\"$GLOBALS[ico_private]\" alt=\"[Private]\"/> ".$GLOBALS['l_private'];
+              }
+              $tip .= "<tr>
+                <td class=\"B\">$evt_begin - $evt_end</td>
+              </tr><tr>
+                <td>
+                  <ul>
+                    <li>$title
+                  </ul>
+                </td>
+              </tr>";
+            }
+            $tip .= "</table>";
+            //$events .= $HTML_busy_time_slot['entity'];
+            $events .= "<td title='$tip' class='timeSlot tips'>
+              <div class=\"haveEvent\" style=\"width:${colWidth}px;\"></div>
+            </td>";
           } else {
             $events .= $HTML_empty_time_slot;
           }
@@ -3985,6 +4023,10 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   $current = clone $date;
   if (is_array($res['entity'])) {
     foreach ($res['entity'] as $r_id => $r_ent) {
+      $canRead = false;
+      if(OBM_Acl::canRead($obm['uid'], 'resource', $r_id)) {
+        $canRead = true;
+      }
       $class = $entity_store['resource'][$r_id]['class'];
       $events = "<tr>";
       while($current->compare($end) < 0) {
@@ -3994,8 +4036,40 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
         while($current->compare($end_day) < 0) {
           $end_slot = clone $current;
           $end_slot->addSecond($time_unit_sec);
-          if ($of->periodHaveOccurrences($current,$end_slot, array('user' => null, 'resource' => array($r_id)))) {
-            $events .= $HTML_busy_time_slot['entity'];
+          if ($canRead && $ocs = $of->getPeriodOccurrences($current,$end_slot, array('user' => null, 'resource' => array($r_id)))) {
+            $tip = "<table>";
+            foreach($ocs as $oc) {
+              $d = $oc->date;
+              $e = clone $d;
+              $e->addTimestamp($oc->event->duration);
+              $evt_begin = $d->get(Of_Date::TIME_SHORT);
+              $evt_end = $e->get(Of_Date::TIME_SHORT);
+              $title = "";
+              if($oc->event->isMeeting()) {
+                $title .= "<img src=\"$GLOBALS[ico_meeting]\" alt=\"[Meeting]\" /> ";
+              }
+              if($oc->event->isPrivate()) {
+                $title .= "<img src=\"$GLOBALS[ico_private]\" alt=\"[Meeting]\" /> ";
+              }
+              $title .= $oc->event->title;
+              if($oc->event->isPrivate() && !(array_key_exists($obm['uid'],$oc->event->attendee['user']))) {
+                $title = "<img src=\"$GLOBALS[ico_private]\" alt=\"[Private]\"/> ".$GLOBALS['l_private'];
+              }
+              $tip .= "<tr>
+                <td class=\"B\">$evt_begin - $evt_end</td>
+              </tr><tr>
+                <td>
+                  <ul>
+                    <li>$title
+                  </ul>
+                </td>
+              </tr>";
+            }
+            $tip .= "</table>";
+            //$events .= $HTML_busy_time_slot['entity'];
+            $events .= "<td title='$tip' class='timeSlot tips'>
+              <div class=\"haveEvent\" style=\"width:${colWidth}px;\"></div>
+            </td>";
           } else {
             $events .= $HTML_empty_time_slot;
           }
@@ -4055,7 +4129,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
       $events_calendar .= $evt;
     }
   }
-
+  $title = $calendar['title'];
   $label = $date->localize(Of_Date::OBM_DATE_WEEK) .' - '. $end->subDay(1)->localize(Of_Date::OBM_DATE_WEEK);
   $url = "calendar_index.php?action=perform_meeting&time_duration=$time_duration&title=$title&min_duration=$min_duration&date=";
 
@@ -4205,8 +4279,9 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
       obm.calendarFreeBusy = new Obm.CalendarFreeBusy($colspan*7, $duration, $js_time_slots, $js_busy_time_slots, $unit, $date_ts);
-      new obm.AutoComplete.Search('$GLOBALS[path]/user/user_index.php?action=ext_search&ajax=1', 'sel_user_id', 'userSearch');
-      new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch');
+      new obm.AutoComplete.Search('$GLOBALS[path]/user/user_index.php?action=ext_search&ajax=1', 'sel_user_id', 'userSearch',{filter_entity:'calendar', filter_pattern:'read'});
+      new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch',{filter_entity:'calendar', filter_pattern:'read'});
+      new Tips($$('.tips'));
     });
   </script>";
 

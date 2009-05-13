@@ -1498,3 +1498,23 @@ div.overTxtDiv {
 .obmPopup .content .buttons input{
 	width: 15em;
 }
+
+.tip {
+  color:#FFF;
+  background: #444;
+  padding: 2px;
+	z-index: 200000;
+}
+ 
+.tip-title {
+}
+ 
+.tip-text {
+}
+
+.tip ul {
+  padding: 0;
+  margin: 0;
+  margin-left: 5px;
+  list-style-type: none;  
+}

@@ -676,7 +676,6 @@ h1.hoursTitle{
   cursor: pointer;
   background:	#35839A;
   color:#FFF;
-  z-index:100000;
 }
 
 #scrollRight {
@@ -687,7 +686,6 @@ h1.hoursTitle{
   cursor: pointer;
   background:	#35839A;
   color:#FFF;
-  z-index:100000;
 }
 
 .freeBusyCalendar table {
