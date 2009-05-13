@@ -1,0 +1,16 @@
+=== Dummizator ===
+
+These scripts are used to fill the OBM database with as many dummy values
+as you want. You give the number of users you wanna create, and all the others
+things (such as groups, contacts, events, etc.) are calculated from this number,
+using various hardcoded scales values (in generators.php).
+
+Usage :
+1. Create a fresh install of OBM with the database only altered by the OBM
+   install script.
+2. Run do.php. It will read the database name/login/pass from the OBM conf.
+3. All all goes right, you'll get :
+   - A new domain foobar
+   - Your users with logins from 'u1' to 'u<nb_users>' and password 'password'.
+   - Users lastnames begin with 'U' and contacts lastnames with 'C'
+
