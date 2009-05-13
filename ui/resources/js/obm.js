@@ -197,9 +197,15 @@ Obm.Tip = new Class({
 
 	attach: function(elements) {
 		$$(elements).each(function(element){
-      var element_title = element.get('title');
-      var tip = eval(element_title); 
-			var title = element.retrieve('tip:title', tip.content);
+
+      try {
+        element_title = eval(element.get('title')); 
+        content = element_title.content;
+      } catch (ee) {
+        content = element.get('title');
+      }
+
+			var title = element.retrieve('tip:title', content);
 			var text = element.retrieve('tip:text', element.get('rel') || element.get('href'));
 			var enter = element.retrieve('tip:enter', this.elementEnter.bindWithEvent(this, element));
 			var leave = element.retrieve('tip:leave', this.elementLeave.bindWithEvent(this, element));
