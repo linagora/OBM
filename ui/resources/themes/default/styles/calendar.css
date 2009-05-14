@@ -676,6 +676,7 @@ h1.hoursTitle{
   cursor: pointer;
   background:	#35839A;
   color:#FFF;
+  z-index: 1000;
 }
 
 #scrollRight {
