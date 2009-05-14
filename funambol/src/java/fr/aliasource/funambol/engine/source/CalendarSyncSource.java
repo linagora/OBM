@@ -152,7 +152,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 			syncItem.getKey().setKeyValue("");
 			Calendar event = getFoundationFromSyncItem(syncItem);
 
-			keys = manager.getEventTwinKeys(event, getSourceType());
+			if (event != null) {
+				keys = manager.getEventTwinKeys(event, getSourceType());
+			}
 		} catch (OBMException e) {
 			logger.error(e.getMessage(), e);
 			throw new SyncSourceException(e);
@@ -333,6 +335,10 @@ public class CalendarSyncSource extends ObmSyncSource {
 		String content = Helper.getContentOfSyncItem(item, this.isEncode());
 		logger.info("foundFromSync:\n" + content);
 		logger.info(" ===> syncItemKey: " + item.getKey());
+
+		if (content == null || content.trim().length() == 0) {
+			return null;
+		}
 
 		if (MSG_TYPE_ICAL.equals(getSourceType())) {
 			foundationCalendar = getFoundationCalendarFromICal(content);
