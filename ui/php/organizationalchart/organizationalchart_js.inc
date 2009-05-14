@@ -24,7 +24,7 @@ function node_toggle(level) {
     $('img_'+level).src = obm.vars.images.plus;
   } else {
     $('child_'+level).setStyle('display', 'block');
-    $('img_'+level).src = obm.vars.images.minus;
+    //$('img_'+level).src = obm.vars.images.minus;
     var children_ids = $('child_'+level).getChildren().getProperty('id');
     for(i=0;i<children_ids.length;i++) {
       id = children_ids[i];
