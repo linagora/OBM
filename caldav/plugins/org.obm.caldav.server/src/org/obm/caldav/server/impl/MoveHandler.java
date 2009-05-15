@@ -18,6 +18,8 @@ package org.obm.caldav.server.impl;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.caldav.server.share.Token;
+
 public class MoveHandler extends DavMethodHandler {
 
 	@Override

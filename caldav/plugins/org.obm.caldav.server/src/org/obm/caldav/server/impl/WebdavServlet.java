@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.server.share.Token;
 
 /**
  * WebDAV for CalDAV implementation
@@ -46,19 +47,25 @@ public class WebdavServlet extends HttpServlet {
 	/**
 	 * Handles the special WebDAV methods.
 	 */
-	protected void service(HttpServletRequest req, HttpServletResponse resp)
+	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		Token token = authHandler.doAuth(req);
+		Token token = authHandler.doAuth(request);
 		if (token == null) {
-			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			String uri = request.getMethod() + " " + request.getRequestURI()
+            + " " + request.getQueryString();
+			logger.warn("invalid auth, sending http 401 (uri: " + uri + ")");
+			String s = "Basic realm=\"OBMPushService\"";
+			response.setHeader("WWW-Authenticate", s);
+
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return;
 		}
 
-		String method = req.getMethod();
+		String method = request.getMethod();
 
 		if (logger.isInfoEnabled()) {
-			logger.info("[" + method + "] " + req.getRequestURI());
+			logger.info("[" + method + "] " + request.getRequestURI());
 		}
 
 
@@ -67,9 +74,9 @@ public class WebdavServlet extends HttpServlet {
 			
 
 			
-			handler.process(token, new DavRequest(req), resp);
+			handler.process(token, new DavRequest(request), response);
 		} else {
-			super.service(req, resp);
+			super.service(request, response);
 		}
 
 	}

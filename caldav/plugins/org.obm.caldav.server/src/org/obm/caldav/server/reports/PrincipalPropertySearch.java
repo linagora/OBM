@@ -22,13 +22,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.impl.PropertyListBuilder;
-import org.obm.caldav.server.impl.Token;
+import org.obm.caldav.server.share.Token;
+import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import fr.aliasource.utils.DOMUtils;
 
 public class PrincipalPropertySearch extends ReportProvider {
 

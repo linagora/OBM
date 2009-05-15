@@ -19,10 +19,11 @@ package org.obm.caldav.server.impl;
 import java.util.Date;
 import java.util.UUID;
 
+import org.obm.caldav.server.share.Token;
+import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
 
-import fr.aliasource.utils.DOMUtils;
 
 public class DAVStore {
 	

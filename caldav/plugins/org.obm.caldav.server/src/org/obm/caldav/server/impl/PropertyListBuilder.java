@@ -20,10 +20,11 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.server.share.Token;
+import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import fr.aliasource.utils.DOMUtils;
 
 public class PropertyListBuilder {
 	

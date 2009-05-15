@@ -14,7 +14,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.server.impl;
+package org.obm.caldav.server.share;
 
 public class Token {
 

@@ -25,6 +25,7 @@ import org.obm.caldav.server.reports.CalendarMultiGet;
 import org.obm.caldav.server.reports.CalendarQuery;
 import org.obm.caldav.server.reports.PrincipalPropertySearch;
 import org.obm.caldav.server.reports.ReportProvider;
+import org.obm.caldav.server.share.Token;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

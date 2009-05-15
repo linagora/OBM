@@ -6,7 +6,9 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import fr.aliasource.utils.FileUtils;
+import org.obm.caldav.server.share.Token;
+import org.obm.caldav.utils.FileUtils;
+
 
 public class PutHandler extends DavMethodHandler {
 

@@ -16,14 +16,55 @@
 
 package org.obm.caldav.server.impl;
 
+import java.util.StringTokenizer;
+
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.server.share.Token;
+import org.obm.caldav.utils.Base64;
 
 public class AuthHandler {
 
-	public Token doAuth(HttpServletRequest req) {
-		// TODO Auto-generated method stub
-		Token t = new Token("thomas@zz.com", "aliacom");
+	private final Log logger = LogFactory.getLog(AuthHandler.class);
+
+	public Token doAuth(HttpServletRequest request) {
+		String authHeader = request.getHeader("Authorization");
+		Token t = null;
+		if (authHeader != null) {
+			StringTokenizer st = new StringTokenizer(authHeader);
+			if (st.hasMoreTokens()) {
+				String basic = st.nextToken();
+				if (basic.equalsIgnoreCase("Basic")) {
+					String credentials = st.nextToken();
+					String userPass = new String(Base64.decode(credentials
+							.toCharArray()));
+					int p = userPass.indexOf(":");
+					if (p != -1) {
+						String userId = userPass.substring(0, p);
+						String loginAtDomain = getLoginAtDomain(userId);
+						String password = userPass.substring(p + 1);
+						t = new Token(loginAtDomain, password);
+					}
+				}
+			}
+		}
 		return t;
 	}
 
+	private String getLoginAtDomain(String userID) {
+		String uid = userID;
+		int idx = uid.indexOf("\\");
+		if (idx > 0) {
+			if (!uid.contains("@")) {
+				String domain = uid.substring(0, idx);
+				logger.info("uid: " + uid + " domain: " + domain);
+				uid = uid.substring(idx + 1) + "@" + domain;
+			} else {
+				uid = uid.substring(idx + 1);
+			}
+		}
+		return uid;
+	}
 }

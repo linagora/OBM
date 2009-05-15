@@ -24,9 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 
-import fr.aliasource.utils.DOMUtils;
 
 public class DavRequest {
 
