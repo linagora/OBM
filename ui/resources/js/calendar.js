@@ -57,7 +57,22 @@ Obm.CalendarDayEventExtension = new Class({
     this.setPeriodicity();
     this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
                                           .injectInside(this.dragHandler);
-    this.titleContainer.addEvent('click', function (evt) {if(obm.calendarManager.redrawLock) evt.stop() ;});
+    this.linkContainer = this.titleContainer;
+    this.linkContainer.addEvent('mousedown', function (evt) {
+      this.linkContainer.addEvent('mouseup', 
+        function (evt) {
+          if(obm.calendarManager.redrawLock) {
+            this.linkContainer.addEvent('click',
+              function(evt) {
+                evt.preventDefault();
+                this.linkContainer.removeEvents('click');
+                this.linkContainer.removeEvents('mouseup');
+              }.bind(this)
+            );
+          }
+        }.bind(this)
+      )
+    }.bind(this));      
     this.resetTitle();
   },
 
@@ -166,7 +181,7 @@ Obm.CalendarDayEvent = new Class({
         'x': [this.context.left,this.context.right - obm.calendarManager.defaultWidth],
         'y': [this.context.top,this.context.bottom]
       },
-
+      
       onSnap:function() {
         obm.calendarManager.lock();
         this.drag.mouse.pos = {x: obm.calendarManager.defaultWidth/2, y: 10};
@@ -225,7 +240,22 @@ Obm.CalendarDayEvent = new Class({
     this.setPeriodicity();
     this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
                                           .injectInside(this.dragHandler);
-    this.titleContainer.addEvent('click', function (evt) {if(obm.calendarManager.redrawLock) evt.stop() ;});
+    this.linkContainer = this.titleContainer;
+    this.linkContainer.addEvent('mousedown', function (evt) {
+      this.linkContainer.addEvent('mouseup', 
+        function (evt) {
+          if(obm.calendarManager.redrawLock) {
+            this.linkContainer.addEvent('click',
+              function(evt) {
+                evt.preventDefault();
+                this.linkContainer.removeEvents('click');
+                this.linkContainer.removeEvents('mouseup');
+              }.bind(this)
+            );
+          }
+        }.bind(this)
+      )
+    }.bind(this));      
     this.resetTitle();
   },
 
@@ -553,7 +583,22 @@ Obm.CalendarEvent = new Class({
     this.timeContainer = new Element('a')
        .setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
        .injectInside(this.dragHandler);
-    this.timeContainer.addEvent('click', function (evt) {if(obm.calendarManager.redrawLock) evt.stop() ;});
+    this.linkContainer = this.timeContainer;
+    this.linkContainer.addEvent('mousedown', function (evt) {
+      this.linkContainer.addEvent('mouseup', 
+        function (evt) {
+          if(obm.calendarManager.redrawLock) {
+            this.linkContainer.addEvent('click',
+              function(evt) {
+                evt.preventDefault();
+                this.linkContainer.removeEvents('click');
+                this.linkContainer.removeEvents('mouseup');
+              }.bind(this)
+            );
+          }
+        }.bind(this)
+      )
+    }.bind(this));       
     this.resetTitle();
 
   },
