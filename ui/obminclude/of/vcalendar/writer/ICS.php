@@ -72,7 +72,7 @@ class Vcalendar_Writer_ICS {
   }
 
   function parseText($text) {
-    $text = addcslashes($text,"\;,\n\r");
+    $text = addcslashes($text,"\;,\r\n");
     return $text;
   }
 

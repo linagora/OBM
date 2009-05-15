@@ -101,6 +101,11 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
 
   $l_userSearch = phpStringToJsString("$l_users...");
   
+  $GLOBALS['js']['vars']['labels']['cell_perms_access'] = $GLOBALS['l_toggle_public_access'];
+  $GLOBALS['js']['vars']['labels']['cell_perms_read'] = $GLOBALS['l_toggle_public_read'];
+  $GLOBALS['js']['vars']['labels']['cell_perms_write'] = $GLOBALS['l_toggle_public_write'];
+  $GLOBALS['js']['vars']['labels']['cell_perms_admin'] = $GLOBALS['l_toggle_public_admin'];
+
   if ($public_rights['read'] == 1) {
     $disabled_read = 'disabled="true"';
     $public_read_checked = "checked=\"checked\"";
@@ -179,7 +184,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   if($cgp_default_right[$entity]['public']['read'] != -1 || ($read == 1 && $id == 0)){ 
     $block_consumer_read_public = "
       <span id=\"cb_read_public\">
-      <input onchange=\"togglePrivacy(this,'cell_perms_read');\" onclick=\"togglePrivacy(this,'cell_perms_read')\"
+      <input onchange=\"togglePrivacy(this,'cell_perms_read');\"
       name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
       </span>";
   } else {
@@ -188,7 +193,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   if($cgp_default_right[$entity]['public']['access'] != -1 || ($access == 1 && $id == 0)) { 
     $block_consumer_access_public = "
       <span id=\"cb_access_public\">
-      <input onchange=\"togglePrivacy(this,'cell_perms_access');\" onclick=\"togglePrivacy(this,'cell_perms_access')\"
+      <input onchange=\"togglePrivacy(this,'cell_perms_access');\"
       name=\"cb_access_public\" value=\"1\" type=\"checkbox\" $public_access_checked />
       </span>";
   } else {
@@ -197,7 +202,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   if($cgp_default_right[$entity]['public']['write'] != -1 || ($write == 1 && $id == 0)){ 
     $block_consumer_write_public = "
       <span id=\"cb_write_public\">
-      <input onchange=\"togglePrivacy(this,'cell_perms_write'); apply_checked_read(this, 'public_perms')\" onclick=\"togglePrivacy(this,'cell_perms_write'); apply_checked_read(this, 'public_perms')\"
+      <input onchange=\"if(togglePrivacy(this,'cell_perms_write')) apply_checked_read(this, 'public_perms');\"
       name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked style=\"$public_write_checked_visibility\" />
       </span>";
   } else {
@@ -255,14 +260,20 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   <tbody id='sel_accept_group'>
     $dis_group
   </tbody>
-";
-    
+  ";
+
   $block = "
   <script type=\"text/javascript\">
-    function togglePrivacy(formElement, dataElements) {
+    
+    function togglePrivacy(formElement, dataElements, force) {
       var elements = \$$('td.'+dataElements);
-      
       if(formElement.checked) {
+        if(obm.vars.labels[dataElements] && !force) {
+          if(!confirm(obm.vars.labels[dataElements])) {
+            formElement.checked = false;
+            return false;
+          }
+        }
         for (var i=0; i<elements.length; i++) {
           var cb_field = elements[i].getElement('input');
           cb_field.setProperty('disabled', true);
@@ -275,6 +286,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           cb_field.setStyle('visibility', 'visible');
         }
       }
+      return true;
     }
     
     function select_all_perms(tr_id) {
@@ -323,7 +335,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
         var cb_public_read = $('cb_read_public').getElement('input');
         if (cb_public_read !== false && cb_public_read.getProperty('type') == 'checkbox') {
           cb_public_read.checked = true;
-          togglePrivacy(cb_public_read,'cell_perms_read');
+          togglePrivacy(cb_public_read,'cell_perms_read',true);
         }
       }
     }

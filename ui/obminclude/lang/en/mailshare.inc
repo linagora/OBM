@@ -27,3 +27,9 @@ $l_err_mailshare_email_exist = "Mailshare E-mail already used !";
 $l_err_mailshare_uemail_exist = "Same E-mail address used several times !";
 
 $l_check_samemailshare = "This mailshare seems similar to the new mailshare";
+
+$l_toggle_public_access = "";
+$l_toggle_public_read = "This will make this mailsharereadable for everybody. Do you want to continue ?";
+$l_toggle_public_write = "This will make this mailshare writable for everybody. Do you want to continue ?";
+$l_toggle_public_admin = "This will allow everybody to update this mailshare's right. Do you want to continue ?";
+

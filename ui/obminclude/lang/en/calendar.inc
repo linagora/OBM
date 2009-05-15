@@ -420,3 +420,7 @@ $l_conflict_manage = 'Manage conflict';
 $l_conflict_force = 'Force move';
 $l_conflict_sendmail = 'Notification by email?';
 
+$l_toggle_public_access = "This will allow everybody to invite this user. Do you want to continue ?";
+$l_toggle_public_read = "This will make this calendar readable for everybody. Do you want to continue ?";
+$l_toggle_public_write = "This will allow everybody to update, accept and refuse event for this user. Do you want to continue ?";
+$l_toggle_public_admin = "This will allow everybody to update this user's calendar right. Do you want to continue ?";

@@ -59,3 +59,9 @@ $l_j_check_number = "The quantity is not valid.";
 $l_j_create_type_first = "You must create a kind of resource before item creation !";
 
 $l_resource_display = "Display options for resources lists";
+
+$l_resource_display = "Options d'affichage des listes de ressources";
+$l_toggle_public_access = "This will allow everybody to ask this resource for reservation. Do you want to continue ?";
+$l_toggle_public_read = "This will make this resource calendar for everybody. Do you want to continue ?";
+$l_toggle_public_write = "This will allow everybody to update, accept and refuse reservation for this resource. Do you want to continue ?";
+$l_toggle_public_admin = "This will allow everybody to update the resource's right. Do you want to continue ?";

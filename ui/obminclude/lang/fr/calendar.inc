@@ -431,3 +431,9 @@ $l_conflict_message = 'Certains participants ne sont pas disponibles sur ce cré
 $l_conflict_manage = 'Gérer le conflit';
 $l_conflict_force = 'Forcer le déplacement';
 $l_conflict_sendmail = 'Souhaitez-vous notifier les participants?';
+
+$l_toggle_public_access = "Ceci entrainera que tout le monde pourra inviter cette personne à un rendez-vous. Désirez-vous continuer?";
+$l_toggle_public_read = "Ceci entrainera que tout le monde pourra vous voire ce calendrier. Désirez-vous continuer?";
+$l_toggle_public_write = "Ceci entrainera que tout le monde pourra vous modifier ce rendez-vous et la participation de cette personne à un rendez-vous. Désirez-vous continuer?";
+$l_toggle_public_admin = "Ceci entrainera que tout le monde pourra modifier les droits de ce calendrier. Désirez-vous continuer?";
+

@@ -59,4 +59,7 @@ $l_add_resources = "Ajouter des ressources";
 $l_j_check_number = "La quantité renseignée n'est pas correct.";
 $l_j_create_type_first = "Vous devez créer un type de ressource avant de créer un accessoire !";
 
-$l_resource_display = "Options d'affichage des listes de ressources";
+$l_toggle_public_access = "Ceci entrainera que tout le monde pourra faire une demande de réservation pour cette ressource. Désirez-vous continuer?";
+$l_toggle_public_read = "Ceci entrainera que tout le monde pourra vous voire le calendrier de cette ressource. Désirez-vous continuer?";
+$l_toggle_public_write = "Ceci entrainera que tout le monde pourra vous modifier les demandes de réservation et accepter la réservation de cette ressource. Désirez-vous continuer?";
+$l_toggle_public_admin = "Ceci entrainera que tout le monde pourra modifier les droits de cette ressource. Désirez-vous continuer?";

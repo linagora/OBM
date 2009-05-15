@@ -31,3 +31,8 @@ $l_err_mailshare_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
 $l_err_mailshare_uemail_exist = "L'adresse E-mail est saisie plusieurs fois !";
 
 $l_check_samemailshare = "Ces partages mail semblent similaires à celui saisi";
+
+$l_toggle_public_access = "";
+$l_toggle_public_read = "Ceci entrainera que tout le monde pourra  consulter le contenu de ce partage mail. Désirez-vous continuer?";
+$l_toggle_public_write = "Ceci entrainera que tout le monde pourra modifier le contenu de ce partage mail. Désirez-vous continuer?";
+$l_toggle_public_admin = "Ceci entrainera que tout le monde pourra modifier les droits de ce partage mail. Désirez-vous continuer?";
