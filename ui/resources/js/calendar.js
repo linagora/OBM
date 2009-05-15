@@ -57,7 +57,7 @@ Obm.CalendarDayEventExtension = new Class({
     this.setPeriodicity();
     this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
                                           .injectInside(this.dragHandler);
-    this.titleContainer.onclick = function () { if(obm.calendarManager.redrawLock) return false;};
+    this.titleContainer.addEvent('click', function (evt) {if(obm.calendarManager.redrawLock) evt.stop() ;});
     this.resetTitle();
   },
 
@@ -225,7 +225,7 @@ Obm.CalendarDayEvent = new Class({
     this.setPeriodicity();
     this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
                                           .injectInside(this.dragHandler);
-    this.titleContainer.onclick = function () { if(obm.calendarManager.redrawLock) return false;};
+    this.titleContainer.addEvent('click', function (evt) {if(obm.calendarManager.redrawLock) evt.stop() ;});
     this.resetTitle();
   },
 
@@ -553,7 +553,7 @@ Obm.CalendarEvent = new Class({
     this.timeContainer = new Element('a')
        .setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
        .injectInside(this.dragHandler);
-    this.timeContainer.onclick = function () {if(obm.calendarManager.redrawLock) return false;};
+    this.timeContainer.addEvent('click', function (evt) {if(obm.calendarManager.redrawLock) evt.stop() ;});
     this.resetTitle();
 
   },
