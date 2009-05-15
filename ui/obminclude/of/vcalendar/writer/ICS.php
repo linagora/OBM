@@ -77,7 +77,7 @@ class Vcalendar_Writer_ICS {
   }
 
   function parseProperty($property) {
-    return trim(chunk_split($property,74,"\n "));
+    return trim(chunk_split($property,74,"\r\n "));
   }
 
   function writeDtstart($name, $value) {
