@@ -580,9 +580,17 @@ function html_user_consult($obm_q) {
   global $l_vacation_dateend,$l_mail_server,$perm, $cright_write_admin;
   global $l_enabled, $l_disabled, $l_web_consult_list, $l_photo, $module;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
-  //global $obm, $cgp_use, $profiles, $path, $display, $l_yes, $l_no;
   global $obm, $cgp_use, $path, $display, $l_yes, $l_no;
-  
+
+  // Check if domain is a samba domain
+  $samba_domain = false;
+  if ($cgp_use['service']['samba']) {
+    $props = of_entity_get_service_property('domain', $obm['domain_id']);
+    if (is_array($props['samba']) && (count($props['samba']) > 0)) {
+      $samba_domain = true;
+    }
+  }
+
   $profiles = get_all_profiles(false);
 
   $id = $obm_q->f('userobm_id');
@@ -824,7 +832,7 @@ function html_user_consult($obm_q) {
     </div>";
   }
 
-  if ($cgp_use['service']['samba']) {
+  if (($cgp_use['service']['samba']) && ($samba_domain)) {
     $samba_section = "
     <div class=\"detail infos\">
     <h1>$l_smb</h1>
@@ -1225,10 +1233,19 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   global $l_enabled, $l_disabled, $l_web_consult_list;
   global $l_smb, $l_smb_perms, $l_smb_home, $l_smb_home_drive, $l_smb_logon;
   global $l_mailserver_auto;
-  global $path, $display, $cgp_use;
-  global $obm, $c_default_domain, $l_domain, $l_gid, $l_header_new, $l_hour;
+  global $obm, $path, $display, $cgp_use;
+  global $c_default_domain, $l_domain, $l_gid, $l_header_new, $l_hour;
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
   global $cuser_default_quota;
+
+  // Check if domain is a samba domain
+  $samba_domain = false;
+  if ($cgp_use['service']['samba']) {
+    $props = of_entity_get_service_property('domain', $obm['domain_id']);
+    if (is_array($props['samba']) && (count($props['samba']) > 0)) {
+      $samba_domain = true;
+    }
+  }
 
   $noexperie = " checked=\"checked\" ";	
   // if update mode and first time value are taken from database
@@ -1326,9 +1343,11 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $ad3 = $dom_infos['address3'];
     $zip = $dom_infos['postcode'];
     $town = $dom_infos['town'];
-    $smb = get_samba_info();
-    $smb_home = $smb['samba_home_def'];
-    $smb_home_drive = $smb['samba_home_drive_def'];
+    if ($samba_domain) {
+      $smb = get_samba_info();
+      $smb_home = $smb['samba_home_def'];
+      $smb_home_drive = $smb['samba_home_drive_def'];
+    }
     $mail_quota = $cuser_default_quota;
   }
 
@@ -1675,7 +1694,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </fieldset>";
   }
 
-  if ($cgp_use['service']['samba']) {
+  if (($cgp_use['service']['samba']) && ($samba_domain)) {
     $samba = run_query_user_samba_properties();
     $smb_home_drive = (isset($smb_home_drive))?$smb_home_drive:$samba['drive'];
     if (isset($smb_home_drive) && $smb_home_drive != '') $drive[$smb_home_drive] = 'selected="selected"';
@@ -1731,7 +1750,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
             sambaHomeCompute();
           }
         });
-        $('userLogin').addEvent('keyup' , sambaHomeCompute);
+        $('userLogin').addEvent('keyup', sambaHomeCompute);
       </script>      
       </fieldset>";
   }

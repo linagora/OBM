@@ -737,6 +737,7 @@ function of_delegation_check_update_rights($params, $current_delegation, $delega
   return true;
 }
 
+
 /**
  * of_delegation_check_data 
  * 
@@ -2973,6 +2974,46 @@ function of_entity_subquery($entity, $id = NULL, $not = false) {
 
 
 /**
+ * of_entity_get_service_property
+ * 
+ * @param mixed $entity
+ * @param mixed $id (from the $entity table eg : host_id)
+ * @param mixed $service (optionnal)
+ * @param mixed $property (optionnal)
+ * @access public
+ * @return void
+ */
+function of_entity_get_service_property($entity, $id, $service='', $property='') {
+
+  $entity_id = of_entity_get($entity, $id);
+  if (trim($service) != '') {
+    $where_service = "AND serviceproperty_service='$service'";
+  }
+  if (trim($property) != '') {
+    $where_property = "AND serviceproperty_property='$property'";
+  }
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT * FROM ServiceProperty
+    WHERE serviceproperty_entity_id=$entity_id
+      $where_service
+      $where_property
+";
+  display_debug_msg($query, $cdg_sql, 'of_entity_get_serive_property()');
+  $obm_q->query($query);
+  $props = array();
+  while ($obm_q->next_record()) {
+    $s = $obm_q->f('serviceproperty_service');
+    $p = $obm_q->f('serviceproperty_property');
+    $v = $obm_q->f('serviceproperty_value');
+    $props[$s][$p][] = $v;
+  }
+
+  return $props;
+}
+
+
+/**
  * of_service_insert 
  * 
  * @param mixed $service 
@@ -2997,6 +3038,7 @@ function of_service_insert($service, $id) {
   }
   return $id;
 }
+
 
 /**
  * of_service_delete 
@@ -3089,10 +3131,10 @@ function of_service_property_delete($service, $service_property, $id) {
 /**
  * of_service_property_unique
  * 
- * @param mixed $service 
- * @param mixed $service_property 
- * @param mixed $value 
- * @param mixed $id 
+ * @param mixed $service
+ * @param mixed $service_property
+ * @param mixed $value
+ * @param mixed $id
  * @access public
  * @return void
  */

@@ -441,6 +441,15 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $email = $group_q->f('group_email');
   $manager = $group_q->f('userobm_lastname').' '.$group_q->f('userobm_firstname');
 
+  // Check if domain is a samba domain
+  $samba_domain = false;
+  if ($cgp_use['service']['samba']) {
+    $props = of_entity_get_service_property('domain', $obm['domain_id']);
+    if (is_array($props['samba']) && (count($props['samba']) > 0)) {
+      $samba_domain = true;
+    }
+  }
+
   $dis_email = get_entity_email($email);
 
   if ($privacy == 0) {
@@ -449,7 +458,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
       <td>$dis_email</td>
       </tr>";
 
-    if ($cgp_use['service']['samba']) {
+    if (($cgp_use['service']['samba']) && ($samba_domain)) {
       $samba = ($group_q->f('group_samba') == 1 ? $l_yes : $l_no);
       $block_samba = "
       <tr>
@@ -631,7 +640,15 @@ function html_group_form($action, $group_q, $group, $field='') {
   global $l_private, $l_public, $l_insert, $l_update, $l_back, $l_no,$l_yes;
   global $l_manager, $c_undef, $l_undef, $l_header_new;
 
-  // Load values
+  // Check if domain is a samba domain
+  $samba_domain = false;
+  if ($cgp_use['service']['samba']) {
+    $props = of_entity_get_service_property('domain', $obm['domain_id']);
+    if (is_array($props['samba']) && (count($props['samba']) > 0)) {
+      $samba_domain = true;
+    }
+  }
+
   // if update mode and first time, values are taken from db
   if ($action == 'detailupdate') {
     $id = $group_q->f('group_id');
@@ -712,7 +729,7 @@ function html_group_form($action, $group_q, $group, $field='') {
 
 
   if( ($action == 'new' || $action == 'insert') || !$priv ) {
-    if ($cgp_use['service']['samba']) {
+    if (($cgp_use['service']['samba']) && ($samba_domain)) {
       // Samba group checkbox checked value
       $samba_state  = ($samba ? 'checked' : '');
   

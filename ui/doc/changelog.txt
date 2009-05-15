@@ -1,7 +1,7 @@
 <!-- $Id$ -->
 O.B.M. 2.2 Changelog
 
-version 2.2.2 - 2009-05-11
+version 2.2.3 - 2009-05-15
 
 To do
 
@@ -18,6 +18,17 @@ To do
  projectclosing : reutiliser requete project_statlog ??
  usergroup : agir lorsqu'archivage d'un user ?
 
+
+2009-05-15 : version 2.2.3
+
+  * Calendar : Free/Busy enhancements (tooltips, ACL,..)
+  * Host, User and Group : do not display windows info if domain is not windows
+  * Host : In a samba domain the new host form preselect the windows checkbox
+  * Bug#186 : Creation of a samba host into non samba domain
+  * Bug#216 : On event date update, the resource booking should restart worflow
+  * Bug#221 : Drag and drop on title, event is not updated
+  * Bug#245 : Only one single page of results in user module
+  * Bug#248 : Js Error, adding a new node on an existing organizational chart
 
 2009-05-11 : version 2.2.2
 

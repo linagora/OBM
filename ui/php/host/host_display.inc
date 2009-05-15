@@ -103,7 +103,7 @@ function dis_data_host(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_host_search_form($host) {
   global $display, $l_name, $l_ip, $l_smb_only, $l_find;
-  global $cgp_use;
+  global $cgp_use, $obm;
 
   $popup = $host['popup'];
 
@@ -127,7 +127,16 @@ function html_host_search_form($host) {
     }
     $display['title'] = $ext_title;
   }
-  
+
+  // Check if domain is a samba domain
+  $samba_domain = false;
+  if ($cgp_use['service']['samba']) {
+    $props = of_entity_get_service_property('domain', $obm['domain_id']);
+    if (is_array($props['samba']) && (count($props['samba']) > 0)) {
+      $samba_domain = true;
+    }
+  }
+
   // --- Var preparation ------------------------------------------------------
 
   $name = stripslashes($host['name']);
@@ -143,7 +152,7 @@ function html_host_search_form($host) {
 
   // --- HTML Page display ----------------------------------------------------
 
-  if ($cgp_use['service']['samba']) {
+  if (($cgp_use['service']['samba'])  && ($samba_domain)) {
     $block_samba = "
     <label>$l_smb_only<br />
       <input type=\"checkbox\" name=\"cb_samba\" value=\"1\" $smb />
@@ -305,14 +314,19 @@ function dis_host_consult($host) {
  * @return XHTML Display block
  */
 function html_host_consult($host_q) {
-  global $cgp_use, $l_yes, $l_no;
-  global $l_module_host, $l_name, $l_ip, $l_desc, $l_smb;
-  global $display, $perm, $menu, $action, $cright_write;
-  global $l_perms;
-  global $l_enable, $l_disable, $l_empty, $l_not_assigned;
-  global $l_user, $l_fqdn;
-  global $l_system, $l_help_system,$l_domain;
+  global $cgp_use, $obm, $display, $perm, $menu, $action, $cright_write;
+  global $l_yes, $l_no, $l_module_host, $l_name, $l_ip, $l_desc, $l_smb;
+  global $l_perms, $l_enable, $l_disable, $l_empty, $l_not_assigned;
+  global $l_user, $l_fqdn, $l_system, $l_help_system,$l_domain;
 
+  // Check if domain is a samba domain
+  $samba_domain = false;
+  if ($cgp_use['service']['samba']) {
+    $props = of_entity_get_service_property('domain', $obm['domain_id']);
+    if (is_array($props['samba']) && (count($props['samba']) > 0)) {
+      $samba_domain = true;
+    }
+  }
 
   $id = $host_q->f('host_id');
   $delegation = $host_q->f('host_delegation');
@@ -354,7 +368,7 @@ function html_host_consult($host_q) {
   $display['detailInfo'] = display_record_info($host_q);
   $display['title'] = $name;
 
-  if ($cgp_use['service']['samba']) {
+  if (($cgp_use['service']['samba']) && ($samba_domain)) {
     $block_samba = "
     <tr>
       <th>$l_smb</th>
@@ -443,6 +457,15 @@ function html_host_form($action, $host_q, $host, $field='') {
   global $l_host_select_user, $l_user, $l_clear;
   global $ico_user, $display, $obm, $c_services;
   
+  // Check if domain is a samba domain
+  $samba_domain = false;
+  if ($cgp_use['service']['samba']) {
+    $props = of_entity_get_service_property('domain', $obm['domain_id']);
+    if (is_array($props['samba']) && (count($props['samba']) > 0)) {
+      $samba_domain = true;
+    }
+  }
+
   // if update mode and first time, values are taken from db
   if ($action == 'detailupdate') {
     $id = $host_q->f('host_id');
@@ -459,6 +482,11 @@ function html_host_form($action, $host_q, $host, $field='') {
     $u_login = $host_q->f('userobm_login');
     $u_id = $host_q->f('userobm_id');
     $dis_title = $name;
+  } else if ($action == 'new') {
+    // If windows domain, default check the windows checkbox
+    if ($samba_domain) {
+      $samba = 1;
+    }
   }
 
   // If parameters have been given, they supercede the default action value
@@ -501,13 +529,14 @@ function html_host_form($action, $host_q, $host, $field='') {
 
   $display['detailInfo'] = display_record_info($host_q);
   $display['title'] = $dis_title;
-  if($action != 'insert' && $action !='new') {
+  if ($action != 'insert' && $action !='new') {
     $dis_name = "$name <input type=\"hidden\" name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />";
   } else {
     $dis_name = "<input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" />";
   }
 
-  if ($cgp_use['service']['samba']) {
+  // Display windows info only if samba is active and domainis samba
+  if (($cgp_use['service']['samba']) && ($samba_domain)) {
     $block_samba = "
     <tr>
       <th class=\"$class[samba]\">$l_smb</th>
@@ -516,7 +545,7 @@ function html_host_form($action, $host_q, $host, $field='') {
       </td>
     </tr>";
   }
-  if($cgp_use['service']['mail']) {
+  if ($cgp_use['service']['mail']) {
     $block_mail = "
     <tr>
       <th class=\"$class[imap]\">$GLOBALS[l_imap]</th>
@@ -535,7 +564,7 @@ function html_host_form($action, $host_q, $host, $field='') {
       </td>
     </tr>";
   }
-  if($cgp_use['service']['sync']) {
+  if ($cgp_use['service']['sync']) {
     $block_sync = "
     <tr>
       <th class=\"$class[obm_sync]\">$GLOBALS[l_obm_sync]</th>
