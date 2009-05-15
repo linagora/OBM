@@ -1165,7 +1165,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   run_query_calendar_update_event_data($calendar); 
 
 
-  if(!$reset_state) {
+  if(!OBM_EventMailObserver::hasEventChanged($oldEvent, OBM_EventFactory::getInstance()->getById($calendar['calendar_id']))) {
     $entities = get_calendar_event_entity($event_id); 
     if(count($users_array) > 0) {
       $qusers = "AND eventlink_entity_id NOT IN ".of_entity_subquery('user',$users_array);

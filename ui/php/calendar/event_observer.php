@@ -552,6 +552,7 @@ class OBM_EventFactory /*Implements OBM_Subject*/{
 class OBM_EventMailObserver /*implements  OBM_Observer*/{
 
   private $mailer;
+  private static $cache;
 
 
   /**
@@ -799,9 +800,9 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @access private
    * @return void
    */
-  private function hasEventChanged($old, $new) {
-    if(!isset($this->changes[$old->id])) {
-      $this->changes[$old->id] =  $new->location != $old->location
+  public static function hasEventChanged($old, $new) {
+    if(!isset(self::$cache[$old->id])) {
+      self::$cache[$old->id] =  $new->location != $old->location
         || $new->allday  != $old->allday
         || $new->date_begin->compare($old->date_begin) != 0
         || $new->duration != $old->duration
@@ -813,7 +814,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
         || (count(array_udiff($new->date_exception, $old->date_exception, array('Of_Date', 'cmp'))))
         || (count(array_udiff($old->date_exception, $new->date_exception, array('Of_Date', 'cmp'))));
     }
-    return $this->changes[$old->id];
+    return self::$cache[$old->id];
   }
 }
 

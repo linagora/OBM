@@ -104,16 +104,10 @@ class Vcalendar_Writer_ICS {
     foreach($value as $attendee) {
       $params = array();
       $value = '';
-      switch($attendee['state']) {
-      case 'A' :
-        $partstat = 'ACCEPTED';
-        break;
-      case 'R' :
-        $partstat = 'DECLINED';
-        break;
-      case 'W' :
+      if($attendee['state']) {
+        $partstat = $attendee['state'];
+      } else {
         $partstat = 'NEEDS-ACTION';
-        break;
       }
       switch($attendee['entity']) {
       case 'user' :

@@ -47,7 +47,7 @@ class Vcalendar_Reader_OBM {
   /**
    * @return Vcalendar
    */
-  function & getDocument($method) {
+  function & getDocument($method='PUBLISH') {
     $this->document = new Vcalendar();
     $this->setHeaders($method);
     foreach($this->eventSets as $set) {
