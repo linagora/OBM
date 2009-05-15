@@ -68,13 +68,13 @@ class AlertQuotaFormater implements IFormater{
 
     $line = '';
     foreach($this->_fields as $field) {
-       $line .=$object->$field."\t";
+       $line .=self::escapeField($object->$field).";";
     }
-    $line .= $percent."%\t";
+    $line .= $percent."%;";
     if($percent > $this->limit) {
-      $line .= $l_warn_quota."\t";
+      $line .= self::escapeField($l_warn_quota).";";
     } else {
-      $line .= "\t";
+      $line .= ";";
     }
     $line .= "\n";
     return $line;
@@ -88,12 +88,12 @@ class AlertQuotaFormater implements IFormater{
     $head = '';
     foreach($this->_fields as $field) {
       if(isset(${"l_".$field}))
-        $head .= ${"l_".$field}."\t";
+        $head .= self::escapeField(${"l_".$field}).";";
       else
-        $head .= $field."\t";
+        $head .= $field.";";
     }
-    $head .= $l_used_percent."\t";
-    $head .= $l_warn."\t";
+    $head .= self::escapeField($l_used_percent).";";
+    $head .= self::escapeField($l_warn).";";
     $head .= "\n";
     return $head;
   }
@@ -109,5 +109,15 @@ class AlertQuotaFormater implements IFormater{
     $percent = (($use * 100)/$quota);
     return $percent;
   }
-
+  /**
+   * Escape a field
+   * 
+   * @param mixed $field 
+   * @static
+   * @access private
+   * @return void
+   */
+  private static function escapeField($field) {
+    return '"'.addcslashes($field,";\\\"").'"';
+  }
 }

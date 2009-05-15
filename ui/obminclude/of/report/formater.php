@@ -96,7 +96,7 @@ class GenericFormater implements IFormater{
   public function format($object) {
     $line = '';
     foreach($this->_fields as $field) {
-       $line .=$object->$field."\t";
+       $line .= self::escapeField($object->$field).";";
     }
     $line .= "\n";
     return $line;
@@ -110,9 +110,9 @@ class GenericFormater implements IFormater{
     $head = '';
     foreach($this->_fields as $field) {
       if(isset(${"l_".$field}))
-        $head .= ${"l_".$field}."\t";
+        $head .= self::escapeField(${"l_".$field}).";";
       else
-        $head .= $field."\t";
+        $head .= self::escapeField($field).";";
     }
     $head .= "\n";
     return $head;
@@ -125,4 +125,15 @@ class GenericFormater implements IFormater{
     return '';
   }
 
+  /**
+   * Escape a field
+   * 
+   * @param mixed $field 
+   * @static
+   * @access private
+   * @return void
+   */
+  private static function escapeField($field) {
+    return '"'.addcslashes($field,";\\\"").'"';
+  }
 }

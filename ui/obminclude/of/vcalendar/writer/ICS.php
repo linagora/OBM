@@ -17,7 +17,7 @@ class Vcalendar_Writer_ICS {
    */
   function writeDocument(&$document) {
     $vcalendar = &$document->vcalendar;
-    $this->buffer .= 'BEGIN:'.$this->parseName($vcalendar->name)."\n";
+    $this->buffer .= 'BEGIN:'.$this->parseName($vcalendar->name)."\r\n";
     $properties = get_object_vars($vcalendar);
     $name = $properties['name'];
     unset($properties['name']);
@@ -36,11 +36,11 @@ class Vcalendar_Writer_ICS {
     for($i=0; $i < count($valarms); $i++) {
       $this->writeValarm($valarms[$i]);
     }
-    $this->buffer .= 'END:'.$this->parseName($vcalendar->name)."\n";    
+    $this->buffer .= 'END:'.$this->parseName($vcalendar->name)."\r\n";    
   }
 
   function writeVevent(&$vevent) {
-    $this->buffer .= 'BEGIN:'.$this->parseName($vevent->name)."\n";
+    $this->buffer .= 'BEGIN:'.$this->parseName($vevent->name)."\r\n";
     $properties = get_object_vars($vevent);
     $name = $properties['name'];
     unset($properties['name']);
@@ -54,7 +54,7 @@ class Vcalendar_Writer_ICS {
     
     // FIXME ??? maybe a good substitute
     $this->writeProperty('dtstamp', $this->parseDate(new Of_Date()));
-    $this->buffer .= 'END:'.$this->parseName($vevent->name)."\n";
+    $this->buffer .= 'END:'.$this->parseName($vevent->name)."\r\n";
   }
 
   function writeProperty($name,$value) {
@@ -63,7 +63,7 @@ class Vcalendar_Writer_ICS {
       $this->$methodName($name,$value);
     } else {
       $this->buffer .= $this->parseProperty($this->parseName($name). ":".$this->parseText($value));
-      $this->buffer .= "\n";      
+      $this->buffer .= "\r\n";      
     }    
   }
 
@@ -72,7 +72,7 @@ class Vcalendar_Writer_ICS {
   }
 
   function parseText($text) {
-    $text = addcslashes($text,"\;,\n");
+    $text = addcslashes($text,"\;,\n\r");
     return $text;
   }
 
@@ -94,7 +94,7 @@ class Vcalendar_Writer_ICS {
     $params[] = 'CN='.$this->parseText($userInfo['firstname'].' '.$userInfo['lastname']);
     $value =  'MAILTO:'.$userInfo['email'];
     $property = $this->parseProperty($this->parseName($name).';'.implode(';',$params).':'.$value);
-    $this->buffer .= $property."\n";      
+    $this->buffer .= $property."\r\n";      
   }
 
   function writeAttendee($name,$value) {
@@ -152,7 +152,7 @@ class Vcalendar_Writer_ICS {
       } 
 
       $property = $this->parseProperty($this->parseName($name).';'.implode(';',$params).':'.$value);
-      $this->buffer .= $property."\n";
+      $this->buffer .= $property."\r\n";
     }
   }
 
@@ -165,11 +165,11 @@ class Vcalendar_Writer_ICS {
       $params[] = 'BYDAY='.strtoupper(implode(',',$value['byday']));
     }
     $property = $this->parseProperty($this->parseName($name).':'.implode(';',$params));
-    $this->buffer .= $property."\n";
+    $this->buffer .= $property."\r\n";
   }
 
   function writeCategories($name, $value) {
-    $this->buffer .= $this->parseProperty($this->parseName($name).':'.implode(',',$value))."\n";
+    $this->buffer .= $this->parseProperty($this->parseName($name).':'.implode(',',$value))."\r\n";
   }
 
   function writeDuration($name, $seconds) {
@@ -182,14 +182,14 @@ class Vcalendar_Writer_ICS {
         $this->writeDtend('dtend', $dtend);
       }
     } else {
-      $this->buffer .= $this->parseProperty($this->parseName($name).':'.$this->secondsToDuration($seconds))."\n";
+      $this->buffer .= $this->parseProperty($this->parseName($name).':'.$this->secondsToDuration($seconds))."\r\n";
     }
   }
 
   function writeExdate($name, $value) {
     if(is_array($value)) {
       foreach($value as $exdate) {
-        $this->buffer .= $this->parseProperty($this->parseName($name). $this->parseTZIDedDate($exdate))."\n";
+        $this->buffer .= $this->parseProperty($this->parseName($name). $this->parseTZIDedDate($exdate))."\r\n";
       } 
     }
   }
@@ -260,9 +260,9 @@ class Vcalendar_Writer_ICS {
    */
   function writeBoundDate($name, $value) {
     if($this->parsed_event->isAllDay()) {
-      $this->buffer .= $this->parseProperty($this->parseName($name).$this->parseTZIDedDate($value, Of_Date::ICS_DATE))."\n";
+      $this->buffer .= $this->parseProperty($this->parseName($name).$this->parseTZIDedDate($value, Of_Date::ICS_DATE))."\r\n";
     } else {
-      $this->buffer .= $this->parseProperty($this->parseName($name).$this->parseTZIDedDate($value, Of_Date::ICS_DATETIME))."\n";
+      $this->buffer .= $this->parseProperty($this->parseName($name).$this->parseTZIDedDate($value, Of_Date::ICS_DATETIME))."\r\n";
     }
   }
 }

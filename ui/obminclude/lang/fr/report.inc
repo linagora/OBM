@@ -37,6 +37,7 @@ $l_dateexp = "Date expiration";
 $l_exp = "Jour avant expiration";
 $l_noexperie = "N'expire jamais";
 $l_account_dateexp = "Date expiration";
+$l_perms = 'Permissions';
 $l_perms_user = "Utilisateur";
 $l_perms_editor = "Editeur";
 $l_perms_admin = "Administrateur";

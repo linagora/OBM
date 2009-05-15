@@ -62,13 +62,13 @@ class AlertExpirationFormater implements IFormater{
     global $l_warn_exp;
     $line = '';
     foreach($this->_fields as $field) {
-       $line .=$object->$field."\t";
+       $line .= self::escapeField($object->$field).";";
     }
     $date_limit = date('Y-m-d',mktime(0, 0, 0, date("m")  , date("d")+$this->delaijour, date("Y")));
     if($object->account_dateexp != '' && ($object->account_dateexp < $date_limit)) {
-      $line .= $l_warn_exp."\t";
+      $line .= self::escapeField($l_warn_exp).";";
     } else {
-      $line .="\t";
+      $line .=";";
     }
     $line .= "\n";
     return $line;
@@ -81,9 +81,9 @@ class AlertExpirationFormater implements IFormater{
     require "obminclude/lang/".$_SESSION['set_lang']."/report.inc";
     $head = '';
     foreach($this->_fields as $field) {
-      $head .= ${"l_".$field}."\t";
+      $head .= self::escapeField(${"l_".$field}).";";
     }
-    $head .= $l_warn."\t";
+    $head .= self::escapeField($l_warn).";";
     $head .= "\n";
     return $head;
   }
@@ -94,5 +94,15 @@ class AlertExpirationFormater implements IFormater{
   public function getFooter() {
     return '';
   }
-
+  /**
+   * Escape a field
+   * 
+   * @param mixed $field 
+   * @static
+   * @access private
+   * @return void
+   */
+  private static function escapeField($field) {
+    return '"'.addcslashes($field,";\\\"").'"';
+  }
 }
