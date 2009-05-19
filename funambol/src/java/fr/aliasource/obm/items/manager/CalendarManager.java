@@ -352,11 +352,19 @@ public class CalendarManager extends ObmManager {
 		 */
 		event.setAllDay(new Boolean(obmevent.isAllday()));
 
-		event.getSummary().setPropertyValue(obmevent.getTitle());
+		String s = obmevent.getTitle();
+		if (s != null) {
+			s = s.trim().replace("\r\n", "").replace("\n", "");
+		}
+		event.getSummary().setPropertyValue(s);
 		event.getDescription().setPropertyValue(obmevent.getDescription());
-
 		event.getCategories().setPropertyValue(obmevent.getCategory());
-		event.getLocation().setPropertyValue(obmevent.getLocation());
+
+		s = obmevent.getLocation();
+		if (s != null) {
+			s = s.trim().replace("\r\n", "").replace("\n", "");
+		}
+		event.getLocation().setPropertyValue(s);
 
 		if (obmevent.getPrivacy() == 1) {
 			event.getAccessClass().setPropertyValue(new Short((short) 2)); // olPrivate
