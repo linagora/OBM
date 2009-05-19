@@ -305,24 +305,26 @@ function run_query_people_ext_search($people) {
       $multidomain
       $where_filter_entity";
 
-	$query_contact = "SELECT
-    	contact_id as id,
+  $query_contact = "SELECT 
+      contact_id as id,
       contact_lastname as lastname,
       contact_firstname as firstname,
       email_address as email,
       'contact' as type
-		FROM Contact
-		INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-		LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like 'INTERNET;X-OBM-Ref1%'
-		WHERE (
-		  contact_lastname $like '$pattern%'
+    FROM Contact
+    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like 'PREF;%'
+    WHERE (
+      contact_lastname $like '$pattern%'
       OR contact_firstname $like '$pattern%'
-      OR email_address $like '$pattern%')
-		  AND contact_archive = 0
+      OR contactentity_entity_id IN (
+        SELECT email_entity_id FROM Email WHERE email_address LIKE '$pattern%'
+      ))
+      AND contact_archive = 0
       $multidomain_contact";
 
 
-	$query = "$query_userobm UNION $query_contact ORDER BY lastname, firstname
+  $query = "$query_userobm UNION $query_contact ORDER BY lastname, firstname
     LIMIT $limit OFFSET $first_row";
 
   display_debug_msg($query, $cdg_sql, 'run_query_people_ext_search()');
