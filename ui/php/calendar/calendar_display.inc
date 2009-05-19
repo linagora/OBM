@@ -3861,6 +3861,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   $current = clone $date;
 
   $HTML_empty_time_slot = "<td class=\"timeSlot\"><div style=\"width:${colWidth}px;\">&nbsp;</div></td>";
+  $HTML_no_calendar_slot = "<td title=\"$GLOBALS[l_calendar_not_available]\"class=\"timeSlotNoCalendar obmTip\"><div style=\"width:${colWidth}px;\">&nbsp;</div></td>";
   $HTML_busy_time_slot = array(
     "entity" => "<td class=\"timeSlot\"><div class=\"haveEvent tips\" style=\"width:${colWidth}px;\"></div></td>",
     "all" => "<td class=\"timeSlot\"><div class=\"haveEventAll\" style=\"width:${colWidth}px;\"></div></td>");
@@ -3896,6 +3897,12 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
     $users = array();
   }
 
+  $contacts_id = $sel_entity_id['contact'];
+  if (count($contacts_id) > 0) {
+    $contacts = get_contact_from_ids($contacts_id);
+  } else {
+    $contacts = array();
+  }
   $res_id = $sel_entity_id['resource'];
   if (count($res_id > 0)) {
     $res = get_calendar_resource_from_ids($res_id);
@@ -3920,13 +3927,39 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
     }
   }
 
-  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+  //$url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
   $user_add_button = "
     <a href=\"javascript: return false;\"
       onclick=\"popup('$url',''); return false;\">
       <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
     </a>";
 
+  // contact select
+  if (is_array($contacts['entity'])) {
+    foreach ($contacts['entity'] as $u_id => $u_ent) {
+      $u_name = $u_ent['label'];
+      $sel_id = "data-contact-$u_id";
+      $div_id = "sel_user_id-$sel_id";
+      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+      <img src=\"$GLOBALS[ico_contact]\"  alt=\"[User]\" />
+      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+      <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\" />
+      </a>
+      $u_name
+      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+      </div>";
+    }
+  }
+
+  $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id&amp;filter_entity=calendar&amp;filter_pattern=access";
+  $user_add_button = "
+    <a href=\"javascript: return false;\" 
+      onclick=\"popup('$url','');
+      return false;\">
+      <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
+    </a>";
+
+  // resource select
   if (is_array($res['entity'])) {
     foreach ($res['entity'] as $r_id => $r_ent) {
       $r_name = $r_ent['label'];
@@ -3951,7 +3984,8 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
      <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
     </a>";
 
-  // TODO: Optimize users & resources loops
+  // TODO: Optimize users/contacts/resources loops
+  // Ajaxification
 
   // Users Events
   $current = clone $date;
@@ -4004,6 +4038,8 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
             $events .= "<td title=\"({content:'$tip_js'})\" class='timeSlot obmTip'>
               <div class=\"haveEvent\" style=\"width:${colWidth}px;\"></div>
             </td>";
+          } else if (!$canRead){
+            $events .= $HTML_no_calendar_slot;
           } else {
             $events .= $HTML_empty_time_slot;
           }
@@ -4016,6 +4052,29 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
       $users_evts[$u_id] = $events;
     }
   }
+
+  // Contacts Events
+  $current = clone $date;
+  if (is_array($contacts['entity'])) {
+    foreach ($contacts['entity'] as $u_id => $u_ent) {
+      $events = "<tr>";
+      while($current->compare($end) < 0) {
+        $current->setHour($GLOBALS['ccalendar_first_hour']);
+        $end_day = clone $current;
+        $end_day->setHour($GLOBALS['ccalendar_last_hour']);
+        while($current->compare($end_day) < 0) {
+          $events .= $HTML_no_calendar_slot;
+          $current->addSecond($time_unit_sec);
+        }
+        $current->addDay(1);
+      }  
+      $current = clone $date;
+      $events .="</tr>";
+      $contacts_evts[$u_id] = $events;
+    }
+  }
+   
+
 
   // Resources Events
   $current = clone $date;
@@ -4068,6 +4127,8 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
             $events .= "<td title=\"({content:'$tip_js'})\" class='timeSlot obmTip'>
               <div class=\"haveEvent\" style=\"width:${colWidth}px;\"></div>
             </td>";
+          } else if (!$canRead){
+            $events .= $HTML_no_calendar_slot;
           } else {
             $events .= $HTML_empty_time_slot;
           }
@@ -4118,6 +4179,12 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
 
   if (is_array($users_evts)) {
     foreach($users_evts as $evt) {
+      $events_calendar .= $evt;
+    }
+  }
+
+  if (is_array($contacts_evts)) {
+    foreach($contacts_evts as $evt) {
       $events_calendar .= $evt;
     }
   }
@@ -4277,7 +4344,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
       obm.calendarFreeBusy = new Obm.CalendarFreeBusy($colspan*7, $duration, $js_time_slots, $js_busy_time_slots, $unit, $date_ts);
-      new obm.AutoComplete.Search('$GLOBALS[path]/user/user_index.php?action=ext_search&ajax=1', 'sel_user_id', 'userSearch',{filter_entity:'calendar', filter_pattern:'read'});
+      new obm.AutoComplete.Search('$GLOBALS[path]/people/people_index.php?action=ext_search&ajax=1', 'sel_user_id', 'userSearch',{filter_entity:'calendar', filter_pattern:'read'});
       new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch',{filter_entity:'calendar', filter_pattern:'read'});
     });
   </script>";

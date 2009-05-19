@@ -752,6 +752,14 @@ h1.hoursTitle{
   padding: 0;
 }
 
+.timeSlotNoCalendar {
+  border: 1px dotted #666;
+  margin: 0;
+  padding: 0;
+  background: #CCC;
+  background-image: url('../images/hatch.gif');
+}
+
 .haveEvent {
   height: 0.5em;
   background:#990000;

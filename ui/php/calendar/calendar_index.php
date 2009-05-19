@@ -135,6 +135,7 @@ if ($action == 'perform_meeting' &&
     $cal_entity_id['user'] = $params['sel_user_id'];
     $cal_entity_id['resource'] = $params['sel_resource_id'];    
     $cal_entity_id['group'] = $params['sel_group_id'];
+    $cal_entity_id['contact'] = $params['sel_contact_id'];
     if($params['resource_group_search'] == 'all') {
       if(!is_array($cal_entity_id['resource'])) {
         $cal_entity_id['resource'] = array();
