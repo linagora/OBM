@@ -148,7 +148,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   global $l_number,$l_label_libelle,$l_company,$l_type,$l_after,$l_before;
   global $l_find, $l_manager, $l_priority, $l_archive, $l_status;
   global $cck_customer, $cck_supplier, $l_contract_kind,$l_cck_customer,$l_cck_supplier;
-  global $c_all, $l_all;
+  global $obm, $c_all, $l_all;
  
   $popup = $contract["popup"];
   $status = $contract["status"];
@@ -162,6 +162,12 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   $num = $contract["number"]; 
   $archive = ($contract["archive"] == "1" ? "checked=\"checked\"" : ""); 
   $kind = $contract["kind"]; 
+  if (($contract['action'] != 'search') && (! isset($contract['delegation']))) { 
+    $delegation = $obm['delegation'];
+  }
+  if ($contract['delegation'] != '') {
+    $delegation = stripslashes($contract['delegation']);
+  }
   
   $dis_cont_typ  = "<select name=\"sel_type\">
     <option value=\"$c_all\">$l_all</option>";
@@ -226,6 +232,8 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
   }
   $sel_manager .= "</select>";
 
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
   if ($popup) {
     $ext_action = $contract["ext_action"];
     $ext_url = $contract["ext_url"];
@@ -257,6 +265,7 @@ function html_contract_search_form($contract, $usr_q, $type_q, $pri_q,$sta_q) {
     <label>$l_company<br />
       <input name=\"tf_company\" size=\"20\" maxlength=\"20\" value=\"$comp\" />
     </label>
+    $dis_delegation
     <label>$l_after<br />
     <input type=\"text\" name=\"tf_date_after\" value=\"$dateafter\" class=\"datePicker\"/>
    </label>
@@ -354,9 +363,10 @@ function html_contract_search_list($contract_q, $prefs, $contract, $popup) {
   $status = $contract["status"];
   $kind = $contract["kind"];
   $format = $contract["format"];
-  $archive = ($contract["archive"] == "1" ? "1" : "0"); 
+  $delegation = $project['delegation'];
+  $archive = ($contract['archive'] == '1' ? '1' : '0'); 
 
-  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_manager=$manager&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_archive=$archive$url_ext");
+  $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_num=$num&amp;tf_company=$company&amp;sel_type=$type&amp;sel_priority=$priority&amp;sel_status=$status&amp;rd_kind=$kind&amp;rd_format=$format&amp;sel_manager=$manager&amp;delegation=$delegation&amp;tf_date_after=$dateafter&amp;tf_date_before=$datebefore&amp;cba_archive=$archive$url_ext");
   
   $contract_q->seek($first_row);
   $contract_d = new OBM_DISPLAY("DATA", $prefs, "contract");

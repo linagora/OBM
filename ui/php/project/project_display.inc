@@ -109,9 +109,9 @@ function dis_project_search_form($project) {
 //     keys used  : name, company_name, tt, manager, member,
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_form ($types, $tts, $member_q, $project) {
-  global $l_name, $l_company, $l_type, $l_tasktype, $l_member;
-  global $l_all, $l_find, $l_archive;
-  global $display, $c_all, $l_select_project, $l_date;
+  global $obm, $display, $c_all;
+  global $l_name, $l_company, $l_type, $l_tasktype, $l_member, $l_date;
+  global $l_all, $l_find, $l_archive, $l_select_project;
   global $ctt_sales, $ctt_research, $ctt_others;
   global $l_tt_sales, $l_tt_research, $l_tt_others;
 
@@ -123,6 +123,12 @@ function html_project_search_form ($types, $tts, $member_q, $project) {
   $member = $project['member'];
   $archive = $project['archive'];
   $date = of_date_upd_format($project['datebegin'],true);
+  if (($project['action'] != 'search') && (! isset($project['delegation']))) { 
+    $delegation = $obm['delegation'];
+  }
+  if ($project['delegation'] != '') {
+    $delegation = stripslashes($project['delegation']);
+  }
   $company_id = $project['company_id'];
   $deal_id = $project['deal_id'];
 
@@ -179,6 +185,8 @@ function html_project_search_form ($types, $tts, $member_q, $project) {
   $checked = ($archive) ? 'checked' : '';
   $cb_archive = "<input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $checked />";
 
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
   $url = url_prepare('project_index.php');
 
   if ($popup) {
@@ -210,6 +218,7 @@ function html_project_search_form ($types, $tts, $member_q, $project) {
       <label>$l_company<br />
         <input type=\"text\" name=\"tf_company_name\" id=\"tf_company_name\" size=\"20\" value=\"$company_name\" />
       </label>
+      $dis_delegation
       <label>$l_type<br />
         $sel_type
       </label>
@@ -264,6 +273,7 @@ function dis_project_search_list($project) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML Display the Project Search result
 // Parameters:
@@ -284,6 +294,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
   $archive = $project['archive'];
   $company_id = $project['company_id'];
   $type = $project['type_id'];
+  $delegation = $project['delegation'];
 
   if ($popup) {
     $ext_action = $project['ext_action'];
@@ -295,7 +306,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;sel_type_id=$type&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;cba_archive=$archive&amp;company_id=$company_id$url_ext");
+  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;sel_type_id=$type&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;delegation=$delegation&amp;cba_archive=$archive&amp;company_id=$company_id$url_ext");
 
   $proj_d = new OBM_DISPLAY('DATA', $prefs, 'project');
   if ($popup) {

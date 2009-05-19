@@ -409,10 +409,10 @@ function html_deal_search_form($deal, $types, $regions, $tts, $roles, $stat_q, $
     <label>$l_label_start<br />
       <input name=\"tf_label\" size=\"16\" maxlength=\"128\" value=\"$label\" />
     </label>
-    $dis_delegation
     <label>$l_company<br />
       <input name=\"tf_company_name\" size=\"12\" maxlength=\"16\" value=\"$name\" />
     </label>
+    $dis_delegation
     <label>$l_postcode<br />
       <input name=\"tf_zip\" size=\"12\" value=\"$zip\" />
     </label>

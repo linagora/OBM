@@ -1,7 +1,7 @@
 <!-- $Id$ -->
 O.B.M. 2.2 Changelog
 
-version 2.2.3 - 2009-05-15
+version 2.2.3 - 2009-05-18
 
 To do
 
@@ -19,7 +19,12 @@ To do
  usergroup : agir lorsqu'archivage d'un user ?
 
 
-2009-05-15 : version 2.2.3
+2009-06-15 : version 2.2.4
+
+  * Project : added search by creator delegation
+  * Contract : added search by creator delegation
+
+2009-05-18 : version 2.2.3
 
   * Calendar : Free/Busy enhancements (tooltips, ACL,..)
   * Host, User and Group : do not display windows info if domain is not windows
@@ -37,7 +42,6 @@ To do
   * #248 Js Error, adding a new node on an existing organizational chart
   * #255 ICS sent by email uses CR instead of CRLF for long lines
 
-
 2009-05-11 : version 2.2.2
 
   * Lead : added search by manager delegation
@@ -47,11 +51,11 @@ To do
   * Deal : display potential dashboard by delegation
   * Invoice : added manager delegation and region filters in dashboards
   * Invoice : added search by manager delegation and deal region
-  * ICS added and improve on event deletion an update
+  * ICS added and improved on event deletion an update
   * Calendar event conflict enhancements
   * Calendar : Event Unique ID implementation
   * OBM packages now handles minig config files
-  * Fixed some IE 6 srange behaviours bugs
+  * Fixed some IE 6 strange behaviours bugs
   * E#109 : Planning view lacks link to project
   * E#150 : Complete English referential (Payment, countries,..)
   * E#231 : More clever default time for a new event

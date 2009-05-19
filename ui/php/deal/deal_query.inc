@@ -198,7 +198,7 @@ function run_query_deal_search($deal, $all='') {
       userobm_lastname as deal_marketingmanager
     FROM Deal
     INNER JOIN DealEntity ON dealentity_deal_id = deal_id
-      ";
+";
 
   $left_join = "
         LEFT JOIN Company as Company ON deal_company_id=Company.company_id

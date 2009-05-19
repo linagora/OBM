@@ -18,40 +18,47 @@ function run_query_contract_search($contract) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
   global $cgp_archive_only;
 
-  $sql_order_dir = $contract["sql_order_dir"];
-  $sql_order_field = $contract["sql_order_field"];
+  $sql_order_dir = $contract['sql_order_dir'];
+  $sql_order_field = $contract['sql_order_field'];
 
-  $label = sql_search_text_parse($contract["label"]);
-  $type = $contract["type"];
-  $dateafter = of_isodate_convert($contract["date_after"],true);
-  $datebefore = of_isodate_convert($contract["date_before"],true);
-  $comp = sql_search_text_parse($contract["company"]);
-  $num = sql_search_text_parse($contract["number"]);
-  $manager = $contract["manager"];
-  $deal = $contract["deal_id"];
-  $priority = $contract["priority"];
-  $status = $contract["status"];
-  $company_id = $contract["company_id"];
-  $contact_id = $contract["contact_id"];
-  $archive = $contract["archive"];
-  $contract_kind = $contract["kind"];
+  $label = sql_search_text_parse($contract['label']);
+  $type = $contract['type'];
+  $dateafter = of_isodate_convert($contract['date_after'],true);
+  $datebefore = of_isodate_convert($contract['date_before'],true);
+  $comp = sql_search_text_parse($contract['company']);
+  $num = sql_search_text_parse($contract['number']);
+  $manager = $contract['manager'];
+  $deal = $contract['deal_id'];
+  $priority = $contract['priority'];
+  $status = $contract['status'];
+  $company_id = $contract['company_id'];
+  $contact_id = $contract['contact_id'];
+  $archive = $contract['archive'];
+  $contract_kind = $contract['kind'];
+  $delegation = sql_search_text_parse($contract['delegation']);
 	
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
-  $datebegin = sql_date_format($db_type, "contract_datebegin", "contract_datebegin");
-  $dateexp = sql_date_format($db_type, "contract_dateexp", "contract_dateexp");
-  $multidomain = sql_multidomain("contract");
+  $datebegin = sql_date_format($db_type, 'contract_datebegin', 'contract_datebegin');
+  $dateexp = sql_date_format($db_type, 'contract_dateexp', 'contract_dateexp');
+  $multidomain = sql_multidomain('contract');
   
-  $where .= sql_obm_entity_privacy("contract");
+  $where .= sql_obm_entity_privacy('contract');
 
-  if (($type != $c_all) && ($type != "")){ 
+  if (($type != $c_all) && ($type != '')) { 
     $type = sql_parse_id( $type, true);
     $where .= " AND contract_type_id $type"; 
   }
   if ($num != "") {
     $where .= " AND (contract_number $like '%$num%')";
+  }
+
+  // If a delegation indication has been specified, get it
+  if (trim($delegation) != '') {
+    $where .= " AND manager.userobm_delegation $like '$delegation%'";
+    $join_delegation = 'LEFT JOIN UserObm as manager ON contract_marketmanager_id=manager.userobm_id';
   }
 
   if (($status != $c_all) && ($status != "")) {
@@ -150,13 +157,14 @@ function run_query_contract_search($contract) {
          LEFT JOIN ContractType on contract_type_id=contracttype_id
          LEFT JOIN ContractPriority on contract_priority_id=contractpriority_id
          LEFT JOIN ContractStatus on contract_status_id = contractstatus_id
+         $join_delegation
     $whereq
     $orderq
     $limit
 ";
 
   if ($ctu_sql_limit) {
-    $cq = "SELECT count(*) FROM Contract $join_comp $whereq";
+    $cq = "SELECT count(*) FROM Contract $join_comp $join_delegation $whereq";
     $count = get_query_count($cq);
     $obm_q->set_num_rows_total($count);
   }

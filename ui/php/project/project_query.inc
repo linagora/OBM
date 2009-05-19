@@ -30,6 +30,7 @@ function run_query_project_search($params) {
   $member = $params['member'];
   $archive = $params['archive'];
   $date = of_isodate_convert($params['datebegin'],true);
+  $delegation = sql_search_text_parse($params['delegation']);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -53,6 +54,12 @@ function run_query_project_search($params) {
   if ($company_name != '') {
     $where .= sql_global_company_name_advanced_search($company_name, $like);
     $join_comp = 'LEFT JOIN Company on project_company_id=company_id';
+  }
+
+  // If a delegation indication has been specified, get it
+  if (trim($delegation) != '') {
+    $where .= " AND userobm_delegation $like '$delegation%'";
+    $join_delegation = 'LEFT JOIN UserObm on project_usercreate=userobm_id';
   }
 
   if ($deal) {
@@ -126,13 +133,14 @@ function run_query_project_search($params) {
          LEFT JOIN DealType on project_type_id=dealtype_id
          LEFT JOIN TaskType on project_tasktype_id=tasktype_id
          $join_member
+         $join_delegation
     $whereq
     $orderq
     $limit
 ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM Project $join_comp $join_member $whereq");
+    $count = get_query_count("SELECT count(*) FROM Project $join_comp $join_member $join_delegation $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {
