@@ -460,7 +460,7 @@ public class CalendarManager extends ObmManager {
 		logger.info("alert export : " + event.getAlert());
 
 		if (foundation.getSummary() != null) {
-			event.setTitle(foundation.getSummary().getPropertyValueAsString());
+			event.setTitle(foundation.getSummary().getPropertyValueAsString().trim().replace("\r\n", "").replace("\n", ""));
 		} else {
 			event.setTitle("[Sans titre]");
 		}
@@ -477,7 +477,7 @@ public class CalendarManager extends ObmManager {
 
 		if (foundation.getLocation() != null) {
 			event.setLocation(foundation.getLocation()
-					.getPropertyValueAsString());
+					.getPropertyValueAsString().trim().replace("\r\n", "").replace("\n", ""));
 		}
 
 		if (foundation.getPriority() != null) {
