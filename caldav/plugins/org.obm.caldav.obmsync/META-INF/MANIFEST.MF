@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Obmsync
+Bundle-SymbolicName: org.obm.caldav.obmsync
+Bundle-Version: 1.0.0
+Bundle-Activator: org.obm.caldav.obmsync.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.obm.caldav.obmsync.lib;bundle-version="1.0.0",
+ org.apache.commons.logging;bundle-version="1.0.4",
+ org.obm.caldav.utils;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.obm.caldav.obmsync.service,
+ org.obm.caldav.obmsync.service.impl
