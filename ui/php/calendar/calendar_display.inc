@@ -3602,7 +3602,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     }
   }
 
-  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+  $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
   $user_add_button = "
     <a href=\"javascript: return false;\"
       onclick=\"popup('$url','');
@@ -3611,7 +3611,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     </a>";
   $block_user = "
     <th>
-    $l_users
+    $GLOBALS[l_users]/$GLOBALS[l_contacts]
     $user_add_button
     </th>
     <td id=\"sel_user_id\">
@@ -3619,7 +3619,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
       $dis_sel_user
     </td>";
     $user_js = "
-    new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search', 'sel_user_id', 'userSearch');
+    new obm.AutoComplete.Search('$path/people/people_index.php?action=ext_search', 'sel_user_id', 'userSearch');
     new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
 
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
@@ -3752,7 +3752,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   </td>";
   if (OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access')) {
     $dis_block_user = "<fieldset class=\"detail infos\">  
-      <legend>$l_users</legend>
+      <legend>$GLOBALS[l_attendees]</legend>
       <table>
       <tr>
         $block_user
@@ -4243,7 +4243,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
           <tbody>
             <tr>
               <td>
-                $GLOBALS[l_users] $user_add_button
+                $GLOBALS[l_users]/$GLOBALS[l_contacts] $user_add_button
               </td>
             </tr>
             <tr>
