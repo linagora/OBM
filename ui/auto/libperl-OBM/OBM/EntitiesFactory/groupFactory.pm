@@ -59,8 +59,8 @@ sub new {
     $self->{'currentEntity'} = undef;
     $self->{'entitiesDescList'} = undef;
 
-    #Definition de la Description du groupe Host 515
-    $self->{'sambaHostGroup'} = $self->_getVirtualHost();
+    # Definition de la Description du groupe Host 515
+    $self->{'sambaHostGroup'} = $self->_getVirtualGroups();
 
     return $self;
 }
@@ -78,6 +78,10 @@ sub next {
         }
     }
 
+    if( my $linkedEntities = $self->_getLinkedEntities() ) {
+        return $linkedEntities;
+    }
+
     if ( (defined($self->{'sambaHostGroup'}) ) && ( $self->{'parentDomain'}->isSambaDomain() ) ) { 
         require OBM::Entities::obmGroup;
         my $current = OBM::Entities::obmGroup->new( $self->{'parentDomain'}, $self->{'sambaHostGroup'} );
@@ -88,6 +92,18 @@ sub next {
     }
 
     while( defined($self->{'entitiesDescList'}) && (my $groupDesc = $self->{'entitiesDescList'}->fetchrow_hashref()) ) {
+        $self->_log( 'obtention des groupes enfants', 2 );
+        $groupDesc->{'child_group_ids'} = $self->_getChildGroupIds( [$groupDesc->{'group_id'}] );
+
+        $self->_log( 'obtention des contacts externes des groupes enfants', 2 );
+        if( my $childExternalContacts = $self->_getChildContacts( $groupDesc->{'child_group_ids'} ) ) {
+            $groupDesc->{'group_contacts'} .= "\r\n" if $groupDesc->{'group_contacts'};
+            $groupDesc->{'group_contacts'} .= $childExternalContacts;
+
+            $groupDesc->{'group_contacts_current'} .= "\r\n" if $groupDesc->{'group_contacts_current'};
+            $groupDesc->{'group_contacts_current'} .= $childExternalContacts;
+        }
+
         require OBM::Entities::obmGroup;
         if( !(my $current = OBM::Entities::obmGroup->new( $self->{'parentDomain'}, $groupDesc )) ) {
             next;
@@ -143,6 +159,7 @@ sub next {
 
                     $self->{'currentEntity'}->setUpdateEntity();
                     $self->{'currentEntity'}->unsetBdUpdate();
+                    last SWITCH;
                 }
 
                 if( $self->{'updateType'} eq 'SYSTEM_LINKS' ) {
@@ -196,7 +213,8 @@ sub _loadEntities {
     }
 
     my $query = 'SELECT '.$groupTablePrefix.'UGroup.*,
-                        current.group_name as group_name_current
+                        current.group_name as group_name_current,
+                        current.group_contacts as group_contacts_current
                  FROM '.$groupTablePrefix.'UGroup
                  LEFT JOIN P_UGroup current ON current.group_id='.$groupTablePrefix.'UGroup.group_id
                  WHERE '.$groupTablePrefix.'UGroup.group_domain_id='.$self->{'domainId'};
@@ -261,10 +279,9 @@ sub _loadGroupLinks {
     return 0;
 }
 
-sub _getVirtualHost {
+sub _getVirtualGroups {
 	
 	return {
-		'group_contacts' => undef,
 		'group_ext_id' => undef,
 		'group_samba' => '1',
         'group_desc' => 'Host group',
@@ -274,6 +291,7 @@ sub _getVirtualHost {
         'group_email' => '',
         'group_mailing' => '0',
         'group_name' => 'hosts',
+        'group_name_current' => 'hosts',
         'group_timecreate' => '',
         'group_timeupdate' => '',
         'group_manager_id' => undef,
@@ -283,7 +301,190 @@ sub _getVirtualHost {
         'group_id' => '0',
         'group_local' => '1',
         'group_gid' => '515',
-        'group_name_current' => 'hosts',
+		'group_contacts' => undef,
+        'group_contacts_current' => undef,
         'group_domain_id' => '2' };
 	 
+}
+
+
+sub _getChildGroupIds {
+    my $self = shift;
+    my( $groupIds ) = @_;
+
+    if( ref($groupIds) ne 'ARRAY' ) {
+        $self->_log( 'liste d\'identifiant pères incorrecte', 3 );
+        return undef;
+    }
+
+    if( $#$groupIds < 0 ) {
+        return undef;
+    }
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return undef;
+    }
+
+    my $query = 'SELECT DISTINCT(groupgroup_child_id)
+                 FROM GroupGroup
+                 WHERE groupgroup_parent_id IN ('.join( ',', @{$groupIds} ).')';
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'obtention des IDs des groupes fils impossible', 0 );
+        return undef;
+    }
+
+    my %childIds;
+    while( my $groupChild = $queryResult->fetchrow_hashref() ) {
+        $childIds{$groupChild->{'groupgroup_child_id'}} = undef;
+    }
+
+    my @childIds = keys(%childIds);
+    my $childIds = $self->_getChildGroupIds( \@childIds );
+    for( my $i=0; $i<=$#$childIds; $i++ ) {
+        $childIds{$childIds->[$i]} = undef;
+    }
+
+    @childIds = keys(%childIds);
+    return \@childIds;
+}
+
+
+sub _getChildContacts {
+    my $self = shift;
+    my( $groupChildIds ) = @_;
+
+    if( ref($groupChildIds) ne 'ARRAY' ) {
+        $self->_log( 'liste d\'identifiant pères incorrecte', 3 );
+        return undef;
+    }
+
+    if( $#$groupChildIds < 0 ) {
+        return undef;
+    }
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return undef;
+    }
+
+    my $query = 'SELECT group_contacts
+                 FROM P_UGroup
+                 WHERE group_id IN ('.join( ',', @{$groupChildIds} ).')
+                 ORDER BY group_id';
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'obtention des contacts externes des groupes fils impossible', 0 );
+        return undef;
+    }
+
+    my $childExternalContacts;
+    while( my $groupChild = $queryResult->fetchrow_hashref() ) {
+        if( $groupChild->{'group_contacts'} ) {
+            $childExternalContacts .= "\r\n" if $childExternalContacts;
+            $childExternalContacts .= $groupChild->{'group_contacts'};
+        }
+    }
+
+    return $childExternalContacts;
+}
+
+
+sub _loadLinkedEntitiesFactories {
+    my $self = shift;
+    my @factories;
+
+    $self->_log( 'programmation de la mise à jour des entités liées à '.$self->{'currentEntity'}->getDescription(), 2 );
+
+    if( my $factoryProgramming = $self->_loadParentGroups() ) {
+        $self->_enqueueLinkedEntitiesFactory( $factoryProgramming );
+    }
+
+    return 0;
+}
+
+
+sub _loadParentGroups {
+    my $self = shift;
+    my $entityId = $self->{'currentEntity'}->getId();
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return undef;
+    }
+
+    my $groupIds = $self->_getParentGroupIds( [$entityId] );
+
+    # Getting group factory programming
+    require OBM::EntitiesFactory::factoryProgramming;
+    my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
+    if( !defined($programmingObj) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return undef;
+    }
+    if( $programmingObj->setEntitiesType( 'GROUP' ) || $programmingObj->setUpdateType( 'SYSTEM_ENTITY' ) || $programmingObj->setEntitiesIds( $groupIds ) ) {
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+        return undef;
+    }
+
+    return $programmingObj;
+}
+
+
+sub _getParentGroupIds {
+    my $self = shift;
+    my( $groupIds ) = @_;
+
+    if( ref($groupIds) ne 'ARRAY' ) {
+        $self->_log( 'liste d\'identifiant enfants incorrecte', 3 );
+        return undef;
+    }
+
+    if( $#$groupIds < 0 ) {
+        return undef;
+    }
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return undef;
+    }
+
+    my $query = 'SELECT DISTINCT(groupgroup_parent_id)
+                 FROM GroupGroup
+                 WHERE groupgroup_child_id IN ('.join( ',', @{$groupIds} ).')';
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'obtention des IDs des groupes pères impossible', 0 );
+        return undef;
+    }
+
+    my %parentIds;
+    while( my $groupParent = $queryResult->fetchrow_hashref() ) {
+        $parentIds{$groupParent->{'groupgroup_parent_id'}} = undef;
+    }
+
+    my @parentIds = keys(%parentIds);
+    my $parentIds = $self->_getParentGroupIds( \@parentIds );
+    for( my $i=0; $i<=$#$parentIds; $i++ ) {
+        $parentIds{$parentIds->[$i]} = undef;
+    }
+
+    @parentIds = keys(%parentIds);
+    return \@parentIds;
 }

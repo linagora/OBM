@@ -1200,6 +1200,6 @@ sub updateLinkedEntities {
         return 1;
     }
 
-    $self->_log( 'pas de mise à jour des entités liés nécessaire', 3 );
+    $self->_log( 'pas de mise à jour des entités liés nécessaire pour '.$self->getDescription(), 3 );
     return 0;
 }

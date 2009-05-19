@@ -104,6 +104,20 @@ sub _init {
         $groupDesc->{'group_mailperms'} = 1;
     }
 
+    # External contacts
+    if( $groupDesc->{'group_contacts'} ) {
+        my @externelContacts = split( /\r\n/, $groupDesc->{'group_contacts'} );
+        my %externelContacts;
+        for( my $i=0; $i<=$#externelContacts; $i++ ) {
+            if( $externelContacts[$i] =~ /$OBM::Parameters::regexp::regexp_email/ ) {
+                $externelContacts{$externelContacts[$i]} = undef;
+            }else {
+                $self->_log( 'adresse mail du contact externe \''.$externelContacts[$i].'\' incorrecte', 2 );
+            }
+        }
+        @{$groupDesc->{'group_contacts_list'}} = keys(%externelContacts);
+    }
+
     # Le SID du domaine
     my $domainSid = $self->{'parent'}->getDesc('samba_sid');
     if( !$domainSid ) {
@@ -374,6 +388,11 @@ sub createLdapEntry {
         $entry->add( mailBox => $self->{'entityDesc'}->{'group_mailboxes'} );
     }
 
+    # Les contacts externes
+    if( $self->{'entityDesc'}->{'group_contacts_list'} ) {
+        $entry->add( externalContactEmail => $self->{'entityDesc'}->{'group_contacts_list'} );
+    }
+
     # La liste des utilisateurs Samba
     if( $self->{'entityDesc'}->{'group_samba_users'} ) {
         $entry->add( sambaSIDList => $self->{'entityDesc'}->{'group_samba_users'} );
@@ -463,6 +482,11 @@ sub updateLdapEntry {
         if( $self->_modifyAttr( $self->{'entityDesc'}->{'group_samba_name'}, $entry, 'displayName' ) ) {
             $update = 1;
         }
+
+        # Les contacts externes
+        if( $self->_modifyAttr( $self->{'entityDesc'}->{'group_contacts_list'}, $entry, 'externalContactEmail' ) ) {
+            $update = 1;
+        }
     }
 
     if( $self->getUpdateLinks() ) {
@@ -483,4 +507,17 @@ sub updateLdapEntry {
     }
 
     return $update;
+}
+
+
+sub updateLinkedEntities {
+    my $self = shift;
+
+    if( $self->{'entityDesc'}->{'group_contacts'} ne $self->{'entityDesc'}->{'group_contacts_current'} ) {
+        $self->_log( 'changement des contacts externes de '.$self->getDescription().', les groupes parents doivent être mis à jour', 3 );
+        return 1;
+    }
+
+    $self->_log( 'pas de mise à jour des entités liés nécessaire pour '.$self->getDescription(), 3 );
+    return 0;
 }
