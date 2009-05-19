@@ -14,13 +14,19 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.server.impl;
+package org.obm.caldav.server.methodHandler;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.share.Token;
 
-public class CopyHandler extends DavMethodHandler {
+public class MoveHandler extends DavMethodHandler {
+
+	public MoveHandler(IProxy proxy) {
+		super(proxy);
+	}
 
 	@Override
 	public void process(Token t, DavRequest req, HttpServletResponse resp) {

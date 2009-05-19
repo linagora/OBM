@@ -14,13 +14,19 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.server.impl;
+package org.obm.caldav.server.methodHandler;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -28,17 +34,19 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+public abstract class DavMethodHandler {
 
-public class PropFindHandler extends DavMethodHandler {
-
-	@Override
-	public void process(Token t, DavRequest req, HttpServletResponse resp) {
-		logger.info("process(req, resp)");
-
-		String depth = req.getHeader("Depth");
-		logger.info("depth: " + depth);
-
-		Document doc = req.getDocument();
+	protected Log logger = LogFactory.getLog(getClass());
+	protected Map<String,DavPropertyHandler> propertiesHandler;
+	
+	protected IProxy proxy;
+	
+	
+	public DavMethodHandler(IProxy proxy) {
+		this.proxy = proxy;
+	}
+	
+	public Set<String> getPropList(Document doc){
 		Element root = doc.getDocumentElement();
 		Element prop = DOMUtils.getUniqueElement(root, "D:prop");
 		NodeList propsToLoad = prop.getChildNodes();
@@ -52,18 +60,10 @@ public class PropFindHandler extends DavMethodHandler {
 				logger.info(name);
 			}
 		}
-
-		Document ret = new PropertyListBuilder().build(t, req, toLoad);
-
-		try {
-			DOMUtils.logDom(ret);
-
-			resp.setStatus(207); // multi status webdav
-			resp.setContentType("text/xml; charset=utf-8");
-			DOMUtils.serialise(ret, resp.getOutputStream());
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-		}
+		
+		return toLoad;
 	}
 
+	public abstract void process(Token token, DavRequest req, HttpServletResponse resp);
+	
 }

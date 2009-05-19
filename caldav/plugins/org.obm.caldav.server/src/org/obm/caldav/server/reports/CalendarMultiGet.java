@@ -16,16 +16,17 @@
 
 package org.obm.caldav.server.reports;
 
-import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.impl.PropertyListBuilder;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
-
 
 public class CalendarMultiGet extends ReportProvider {
 
@@ -42,14 +43,13 @@ public class CalendarMultiGet extends ReportProvider {
 	// </calendar-query>
 
 	@Override
-	public void process(Token token, DavRequest req, HttpServletResponse resp) {
-		// TODO Auto-generated method stub
+	public void process(Token token, DavRequest req, HttpServletResponse resp,
+			Map<String, DavPropertyHandler> propertiesHandler,
+			Set<String> propList) {
 		logger.info("process(" + token.getLoginAtDomain() + ", req, resp)");
-		HashSet<String> toLoad = new HashSet<String>();
-		toLoad.add("D:getetag");
-		toLoad.add("calendar-data");
-		
-		Document ret = new PropertyListBuilder().build(token, req, toLoad);
+
+		Document ret = new PropertyListBuilder().build(token, req,
+				propertiesHandler, propList);
 
 		try {
 			DOMUtils.logDom(ret);

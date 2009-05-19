@@ -27,6 +27,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.methodHandler.CopyHandler;
+import org.obm.caldav.server.methodHandler.DavMethodHandler;
+import org.obm.caldav.server.methodHandler.LockHandler;
+import org.obm.caldav.server.methodHandler.MkColHandler;
+import org.obm.caldav.server.methodHandler.MoveHandler;
+import org.obm.caldav.server.methodHandler.OptionsHandler;
+import org.obm.caldav.server.methodHandler.PropFindHandler;
+import org.obm.caldav.server.methodHandler.PropPatchHandler;
+import org.obm.caldav.server.methodHandler.PutHandler;
+import org.obm.caldav.server.methodHandler.ReportHandler;
+import org.obm.caldav.server.methodHandler.UnlockHandler;
 import org.obm.caldav.server.share.Token;
 
 /**
@@ -43,7 +55,8 @@ public class WebdavServlet extends HttpServlet {
 
 	private Map<String, DavMethodHandler> handlers;
 	private AuthHandler authHandler;
-
+	private IProxy proxy;
+	
 	/**
 	 * Handles the special WebDAV methods.
 	 */
@@ -51,17 +64,22 @@ public class WebdavServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		Token token = authHandler.doAuth(request);
-		if (token == null) {
+		if(token != null){
+			this.proxy = new ProxyImpl(token);
+		}
+		
+		if (proxy == null || !proxy.isConnected()) {
 			String uri = request.getMethod() + " " + request.getRequestURI()
             + " " + request.getQueryString();
 			logger.warn("invalid auth, sending http 401 (uri: " + uri + ")");
-			String s = "Basic realm=\"OBMPushService\"";
+			String s = "Basic realm=\"CalDavService\"";
 			response.setHeader("WWW-Authenticate", s);
 
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			return;
 		}
 
+		
 		String method = request.getMethod();
 
 		if (logger.isInfoEnabled()) {
@@ -71,13 +89,11 @@ public class WebdavServlet extends HttpServlet {
 
 		DavMethodHandler handler = handlers.get(method.toLowerCase());
 		if (handler != null) {
-			
-
-			
 			handler.process(token, new DavRequest(request), response);
 		} else {
 			super.service(request, response);
 		}
+		
 
 	}
 
@@ -85,17 +101,17 @@ public class WebdavServlet extends HttpServlet {
 	public void init() throws ServletException {
 		super.init();
 		handlers = new HashMap<String, DavMethodHandler>();
-		handlers.put("propfind", new PropFindHandler());
-		handlers.put("proppatch", new PropFindHandler());
-		handlers.put("mkcol", new PropFindHandler());
-		handlers.put("copy", new PropFindHandler());
-		handlers.put("move", new PropFindHandler());
-		handlers.put("lock", new PropFindHandler());
-		handlers.put("unlock", new PropFindHandler());
-		handlers.put("options", new OptionsHandler());
-		handlers.put("report", new ReportHandler());
-		handlers.put("put", new PutHandler());
-
+		handlers.put("propfind", new PropFindHandler(proxy));
+		handlers.put("proppatch", new PropPatchHandler(proxy));
+		handlers.put("mkcol", new MkColHandler(proxy));
+		handlers.put("copy", new CopyHandler(proxy));
+		handlers.put("move", new MoveHandler(proxy));
+		handlers.put("lock", new LockHandler(proxy));
+		handlers.put("unlock", new UnlockHandler(proxy));
+		handlers.put("options", new OptionsHandler(proxy));
+		handlers.put("report", new ReportHandler(proxy));
+		handlers.put("put", new PutHandler(proxy));
+		
 		authHandler = new AuthHandler();
 	}
 

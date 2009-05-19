@@ -1,4 +1,4 @@
-package org.obm.caldav.server.impl;
+package org.obm.caldav.server.methodHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -6,11 +6,17 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.FileUtils;
 
 
 public class PutHandler extends DavMethodHandler {
+
+	public PutHandler(IProxy proxy) {
+		super(proxy);
+	}
 
 	@Override
 	public void process(Token token, DavRequest req, HttpServletResponse resp) {

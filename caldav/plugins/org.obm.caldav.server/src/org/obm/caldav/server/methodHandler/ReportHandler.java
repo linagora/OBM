@@ -14,13 +14,18 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.server.impl;
+package org.obm.caldav.server.methodHandler;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.CalendarData;
+import org.obm.caldav.server.propertyHandler.DGetETag;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.reports.CalendarMultiGet;
 import org.obm.caldav.server.reports.CalendarQuery;
 import org.obm.caldav.server.reports.PrincipalPropertySearch;
@@ -33,12 +38,17 @@ public class ReportHandler extends DavMethodHandler {
 
 	Map<String, ReportProvider> providers;
 
-	public ReportHandler() {
+	public ReportHandler(IProxy proxy) {
+		super(proxy);
 		providers = new HashMap<String, ReportProvider>();
 		providers.put("D:principal-property-search",
 				new PrincipalPropertySearch());
 		providers.put("calendar-query", new CalendarQuery());
 		providers.put("calendar-multiget", new CalendarMultiGet());
+		
+		propertiesHandler = new HashMap<String, DavPropertyHandler>();
+		propertiesHandler.put("D:getetag", new DGetETag(proxy));
+		propertiesHandler.put("calendar-data", new CalendarData(proxy));
 	}
 
 	@Override
@@ -49,7 +59,7 @@ public class ReportHandler extends DavMethodHandler {
 
 		ReportProvider rp = providers.get(reportKind);
 		if (rp != null) {
-			rp.process(token, req, resp);
+			rp.process(token, req, resp, propertiesHandler, getPropList(d));
 		} else {
 			logger.error("No report provider for report kind '" + reportKind
 					+ "'");

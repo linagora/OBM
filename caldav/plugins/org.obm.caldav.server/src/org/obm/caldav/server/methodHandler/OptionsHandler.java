@@ -14,17 +14,27 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.server.impl;
+package org.obm.caldav.server.methodHandler;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.share.Token;
 
-public class LockHandler extends DavMethodHandler {
+public class OptionsHandler extends DavMethodHandler {
+
+	public OptionsHandler(IProxy proxy) {
+		super(proxy);
+	}
 
 	@Override
-	public void process(Token t, DavRequest req, HttpServletResponse resp) {
-		logger.info("process(req, resp)");
+	public void process(Token token, DavRequest req, HttpServletResponse resp) {
+
+		resp.setStatus(HttpServletResponse.SC_OK);
+		resp.addHeader("DAV", "1, calendar-access, calendar-schedule");
+		resp.addHeader("Allow", "OPTIONS, GET, HEAD, POST, DELETE, TRACE, PROPPATCH, COPY, MOVE, LOCK, UNLOCK");
+		resp.addHeader("MS-Author-Via", "DAV");
 	}
 
 }

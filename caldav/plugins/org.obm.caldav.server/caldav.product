@@ -25,6 +25,7 @@
       <plugin id="fr.aliasource.utils"/>
       <plugin id="fr.aliasource.webmail.log4j" fragment="true"/>
       <plugin id="javax.servlet"/>
+      <plugin id="org.apache.commons.codec"/>
       <plugin id="org.apache.commons.logging"/>
       <plugin id="org.eclipse.core.contenttype"/>
       <plugin id="org.eclipse.core.jobs"/>
@@ -41,7 +42,10 @@
       <plugin id="org.eclipse.osgi.services"/>
       <plugin id="org.mortbay.jetty.server"/>
       <plugin id="org.mortbay.jetty.util"/>
+      <plugin id="org.obm.caldav.obmsync"/>
+      <plugin id="org.obm.caldav.obmsync.lib"/>
       <plugin id="org.obm.caldav.server"/>
+      <plugin id="org.obm.caldav.utils"/>
    </plugins>
 
 

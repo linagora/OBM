@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Utils
-Bundle-SymbolicName: org.obm.caldav.utils
+Bundle-SymbolicName: org.obm.caldav.utils;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: org.obm.caldav.utils.Activator
 Require-Bundle: org.eclipse.core.runtime,

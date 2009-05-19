@@ -16,10 +16,12 @@
 
 package org.obm.caldav.server.impl;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -30,7 +32,7 @@ public class PropertyListBuilder {
 	
 	private Log logger = LogFactory.getLog(PropertyListBuilder.class);
 	
-	public Document build(Token t, DavRequest req, Set<String> toLoad) {
+	public Document build(Token t, DavRequest req,Map<String,DavPropertyHandler> propertiesHandler, Set<String> toLoad) {
 		try {
 			Document ret = DOMUtils.createDoc("DAV:", "D:multistatus");
 			Element r = ret.getDocumentElement();
@@ -43,10 +45,16 @@ public class PropertyListBuilder {
 			Element pStat = DOMUtils.createElement(response, "D:propstat");
 			Element p = DOMUtils.createElement(pStat, "D:prop");
 			
-			DAVStore store = new DAVStore();
+			//DAVStore store = new DAVStore();
 			for (String s : toLoad) {
 				Element val = DOMUtils.createElement(p, s);
-				store.appendPropertyValue(val, t, req);
+				DavPropertyHandler dph = propertiesHandler.get(s);
+				if(dph != null){
+					dph.appendPropertyValue(val, t, req);
+					//store.appendPropertyValue(val, t, req);
+				} else {
+					logger.warn("the Property ["+s+"] is not implemented");
+				}
 			}
 			DOMUtils.createElementAndText(pStat, "D:status", "HTTP/1.1 200 OK");
 			
