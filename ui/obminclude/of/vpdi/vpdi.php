@@ -56,16 +56,13 @@ class Vpdi {
    * Since BEGIN/END delimited entities can be nested, whe must build a tree.
    * 
    * @param array $fields
-   * @param string $current_profile recursion parameter
+   * @param string $break_profile
    * @access public
    * @return mixed
    */
-  public static function expand($fields, $current_profile = null) {
-    if ($current_profile === null) {
-      $stack = array();
-    } else {
-      $stack = self::instantiate($current_profile);
-    }
+  public static function expand($fields, $break_profile = null) {
+    $stack = array();
+    $current_profile = null;
     $current_entity = null;
     
     while (($f = array_shift($fields)) !== null) {
@@ -74,25 +71,22 @@ class Vpdi {
         if ($current_profile === null) {
           $current_entity  = self::instantiate($profile);
           $current_profile = $profile;
-          $stack[] =& $current_entity;
         } else {
-          $child = self::expand(&$fields, $profile);
+          array_unshift($fields, $f);
+          $children = self::expand(&$fields, $profile);
           if ($current_entity !== null) {
-            $current_entity->addField($child);
+            $current_entity->addField($children[0]);
           } else {
-            $stack[] = $child;
+            $stack[] = $children[0];
           }
         }
       } elseif ($f->nameEquals('END')) {
-        if (strtolower($f->value()) == $current_profile) {
-          $f = array_shift($fields);
-          if ($f !== null && $f->nameEquals('BEGIN')) {
-            array_unshift($fields, $f);
-            $stack = array_merge($stack, self::expand(&$fields));
-          } else {
-            array_unshift($fields, $f);
-            break;
-          }
+        $profile = strtolower($f->value());
+        if ($profile == $current_profile) {
+          $stack[] = $current_entity;
+          $current_profile = null;
+          $current_entity = null;
+          if ($profile == $break_profile) break;
         } else {
           throw new Vpdi_BeginEndMismatchException($current_profile.' != '.$f->value());
         }
