@@ -14,7 +14,7 @@ var projects;
 var tasks;";
 
 // to avoid a javascript error when ext_widget or ext_widget_label not defined
-if (($params["ext_widget"] != "") || ($params["ext_widget_text"] != "")) {
+if (($params['ext_widget'] != '') || ($params['ext_widget_text'] != '')) {
   
   $extra_js .= "
 
@@ -29,6 +29,7 @@ function check_get_id(valeur,text) {
     return true;
   }
 }
+
 function check_get_task_id(value_project,value_task,value_type) {
 
   if ((value_task < 1) || (value_task == null)) {
@@ -44,7 +45,7 @@ function check_get_task_id(value_project,value_task,value_type) {
 }
 ";
 }
-if ($params["ext_element"] != "") {
+if ($params['ext_element'] != '') {
   require_once("$obminclude/of/of_select.inc");
 }
 
@@ -58,7 +59,7 @@ function check_get_id_cv(id, name) {
     window.opener.newRow(id, name)
     window.close();
     return true;
-    }
+  }
 }
 
 
@@ -108,7 +109,7 @@ function check_project(form) {
     }
 
     // MANDATORY : Check that the Project soldtime is a number
-    else if (!(check_number(form.tf_soldtime.value))) {
+    else if (!(check_money(form.tf_soldtime.value))) {
       alert (\"$l_fill_soldnumber\");
       return false;
     }

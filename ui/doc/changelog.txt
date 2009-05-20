@@ -23,6 +23,7 @@ To do
 
   * Project : added search by creator delegation
   * Contract : added search by creator delegation
+  * Project : estiamted and sold time can now be float
 
 2009-05-18 : version 2.2.3
 
