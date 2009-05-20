@@ -139,7 +139,7 @@ if ($action == 'cancel_update') {
     set_update_lock();
     set_update_state($params['domain_id']);
     store_update_data($params);
-    $res = exec_tools_update_update($params);
+    //$res = exec_tools_update_update($params);
     if ($res === 0) {
       $display['msg'] .= display_ok_msg($l_upd_running);
       $display['detail'] = dis_tools_update_detail();

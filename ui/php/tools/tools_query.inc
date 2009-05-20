@@ -771,6 +771,118 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
 }
 
 
+/**
+ *
+ * FIXME : Bypass automate limitation on performing dependance update
+ * 
+ * @param mixed $userdata 
+ * @param mixed $rules 
+ * @access public
+ * @return void
+ */
+function run_query_tools_set_group_scope(&$userdata) {
+  global $obm, $cdg_sql;
+
+  $obm_qm = new DB_OBM;
+  $db_type = $obm_qm->type;
+  $like = sql_casei_like($db_type); 
+
+  $query = "SELECT UGroup.group_id FROM UGroup INNER JOIN P_UGroup ON P_UGroup.group_id = UGroup.group_id 
+    WHERE P_UGroup.group_contacts != UGroup.group_contacts 
+    OR (P_UGroup.group_contacts IS NULL AND UGroup.group_contacts IS NOT NULL) 
+    OR  (UGroup.group_contacts IS NULL AND P_UGroup.group_contacts IS NOT NULL)";
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_set_group_scope()');
+  $obm_qm->query($query);
+  while($obm_qm->next_record()) {
+    $group_id = $obm_qm->f('group_id');
+    $parents = get_all_parent_group_of_group($group_id);
+    if(count($parents) > 0) {
+      $query = "
+        INSERT INTO Updated (
+          updated_domain_id,
+          updated_user_id,
+          updated_delegation,
+          updated_table,
+          updated_entity_id,
+          updated_type
+      ) SELECT 
+        $userdata[domain],
+        $userdata[uid],
+        '$userdata[delegation]',
+        'UGroup',
+        group_id,
+        'U'
+        FROM UGroup LEFT JOIN Updated ON group_id = updated_entity_id AND updated_table = 'UGroup'
+        WHERE group_id IN (".implode(',',$parents).") AND updated_entity_id IS NULL ";
+      display_debug_msg($query, $cdg_sql, 'run_query_tools_set_group_scope()');
+      $obm_qm->query($query);
+      
+    }
+
+  }
+}
+
+/**
+ *
+ * FIXME : Bypass automate limitation on performing dependance update
+ * 
+ * @param mixed $userdata 
+ * @param mixed $rules 
+ * @access public
+ * @return void
+ */
+function run_query_tools_set_user_scope(&$userdata) {
+  global $obm, $cdg_sql;
+
+  $obm_qm = new DB_OBM;
+  $db_type = $obm_qm->type;
+  $like = sql_casei_like($db_type); 
+
+  $query = "SELECT group_id FROM UGroup INNER JOIN UpdatedLinks ON updatedlinks_entity_id = group_id AND updatedlinks_table = 'UGroup' WHERE group_gid = '512'";
+  display_debug_msg($query, $cdg_sql, 'run_query_tools_set_user_scope()');
+  $obm_qm->query($query);
+  if($obm_qm->next_record()) {
+    $group_id = $obm_qm->f('group_id');
+    $query = "
+      INSERT INTO Updated (
+        updated_domain_id,
+        updated_user_id,
+        updated_delegation,
+        updated_table,
+        updated_entity_id,
+        updated_type
+    ) SELECT 
+      $userdata[domain],
+      $userdata[uid],
+      '$userdata[delegation]',
+      'UserObm',
+      of_usergroup.of_usergroup_user_id,
+      'U'
+      FROM of_usergroup 
+      LEFT JOIN P_of_usergroup ON of_usergroup.of_usergroup_group_id = P_of_usergroup.of_usergroup_group_id 
+      AND of_usergroup.of_usergroup_user_id = P_of_usergroup.of_usergroup_user_id
+      LEFT JOIN Updated ON updated_entity_id = of_usergroup.of_usergroup_user_id AND updated_table = 'UserObm'
+      WHERE of_usergroup.of_usergroup_group_id = $group_id AND P_of_usergroup.of_usergroup_group_id IS NULL AND updated_entity_id IS NULL
+      UNION
+      SELECT 
+      $userdata[domain],
+      $userdata[uid],
+      '$userdata[delegation]',
+      'UserObm',
+      P_of_usergroup.of_usergroup_user_id,
+      'U'
+      FROM P_of_usergroup 
+      LEFT JOIN of_usergroup ON of_usergroup.of_usergroup_group_id = P_of_usergroup.of_usergroup_group_id 
+      AND of_usergroup.of_usergroup_user_id = P_of_usergroup.of_usergroup_user_id
+      LEFT JOIN Updated ON updated_entity_id = P_of_usergroup.of_usergroup_user_id AND updated_table = 'UserObm'
+      WHERE P_of_usergroup.of_usergroup_group_id = $group_id AND of_usergroup.of_usergroup_group_id IS NULL AND updated_entity_id IS NULL
+      ";
+    display_debug_msg($query, $cdg_sql, 'run_query_tools_set_user_scope()');
+    $obm_qm->query($query);
+  }
+}
+
+
 /******************************************************************************
  * Store update data in update tables
  *
@@ -778,7 +890,7 @@ function run_query_tools_set_scope(&$metadata, &$rules, &$userdata) {
  * @return true (has update), else false
  */
 function store_update_data($params) {
-  global $cgp_show, $entities;
+  global $cgp_show, $entities, $obm;
 
   // If update type is global, we do not store Updated tables
   if ($params['update_type'] == 'global') {
@@ -796,12 +908,16 @@ function store_update_data($params) {
     $field = $db_info[1];
     $exclude_fields = $db_info[2];
     if ($cgp_show['module']["$entity"]) {
-      $nb = run_query_tools_perform_scope($db_info,$realm,$domain_id, $d['global'], true); 
+      $nb = run_query_tools_perform_scope($db_info,$realm,$domain_id, $d['global'], true);       
       if($nb > 0) {
         $has_update = true;
       }
     }
   }
+  //FIXME : This is a hack to bypass an automate limitation
+  $userdata = array('uid' =>  $obm['uid'], 'delegation' => $obm['delegation_target'], 'domain' => $domain_id );
+  run_query_tools_set_user_scope($userdata);
+  run_query_tools_set_group_scope($userdata);
 
   return $has_update;
 }

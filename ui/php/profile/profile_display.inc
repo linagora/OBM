@@ -418,11 +418,11 @@ function dis_property_level_value($value, $update=false) {
     if(is_numeric($value)) {
       ${'_'.$value} = 'selected=\"selected\"';
     }
-    $return = "<select name='property[level]'><option value='0' $_0 >$GLOBALS[l_higher]</option>";
-    for($i=1; $i<10; $i++) {
+    $return = "<select name='property[level]'><option value='9' $_0 >$GLOBALS[l_lower]</option>";
+    for($i=8; $i>0; $i--) {
       $return .= '<option value="'.$i.'" '.${'_'.$i}.'>'.$i.'</option>';
     }
-    $return .= "<option value='0' $_0 >$GLOBALS[l_lower]</option></select>";
+    $return .= "<option value='0' $_0 >$GLOBALS[l_higher]</option></select>";
     return $return;
   } else {
     return ($value)?$value:0;

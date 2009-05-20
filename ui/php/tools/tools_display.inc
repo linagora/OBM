@@ -56,7 +56,7 @@ function dis_tools_update_detail() {
         continue;
       }
       foreach ($entities as $entity=>$db_info) {
-	      if ($cgp_show['module']["$entity"]) {
+        if ($cgp_show['module']["$entity"]) {
           $nb = run_query_tools_perform_scope($db_info,$realm,$domain_id, $domain['global']);
           if ( $nb['diff'] > 0 ) {
               $has_update = true;
