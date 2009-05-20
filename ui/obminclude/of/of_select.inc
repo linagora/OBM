@@ -31,12 +31,12 @@ function of_select_fill_from_checkbox(int_form, entity) {
         div_id = '$params[ext_element]'+'-data-'+entity+'-'+id;
         // If the element not already present in the caller window
         if (! get_elem(window.opener.document, div_id )) {
- 	        sel_id = 'data-'+entity+'-'+id;
+          sel_id = 'data-'+entity+'-'+id;
           // Get the label associated to the id from the int_form row
           // hidden in an hidden span
-	        span = get_elem(window.document, sel_id);
-	        if (container == '' || container == 'div') {
-	          of_select_add_element(window.opener.document, '$params[ext_element]', sel_id, span.innerHTML);
+          span = get_elem(window.document, sel_id);
+          if (container == '' || container == 'div') {
+            of_select_add_element(window.opener.document, '$params[ext_element]', sel_id, span.innerHTML);
           }
           if (container == 'table') {
             of_select_add_element_table(window.opener.document, '$params[ext_element]', sel_id, span.innerHTML);
@@ -116,110 +116,121 @@ function of_select_add_element_table(target, element_name, sel_id, fieldLabel) {
   var image = $(target.createElement('img'));
   image.src = obm.vars.images.del;
   link.appendChild(image);
-  
-  // Create the select all link
-  var sel_all_link = $(target.createElement('a'));
-  sel_all_link.href = '#';
-  sel_all_link.setProperty('onclick', 'select_all_perms(\''+element_name+'-'+sel_id+'\')');
-  sel_all_link.appendText('$l_select_all');
-  
-  // Create the unselect all link
-  unsel_all_link = $(target.createElement('a'));
-  unsel_all_link.href = '#';
-  unsel_all_link.setProperty('onclick', 'unselect_all_perms(\''+element_name+'-'+sel_id+'\')');
-  unsel_all_link.appendText('$l_unselect_all');
-  
-  // Create the access perm checkbox
-  var cb_access_public = $(target.getElementById('cb_access_public'));
-  var accept_access_disabled = false;
-  var accept_access_style = 'visible';
-  if ( (cb_access_public !== null && cb_access_public !== false) && cb_access_public.getElement('input').checked) {
-    accept_access_disabled = true;
-    accept_access_style = 'hidden';
-  }
-  var cb_access = $(target.createElement('input'));
-  cb_access.type = 'checkbox';
-  cb_access.name = 'cb_accept_access[]';
-  cb_access.value = sel_id;
-  cb_access.disabled = accept_access_disabled;
-  cb_access.style.visibility = accept_access_style;
-  
-  // Create the read perm checkbox
-  var cb_read_public = $(target.getElementById('cb_read_public'));
-  var accept_read_disabled = false;
-  var accept_read_style = 'visible';
-  if ( (cb_read_public !== null && cb_read_public !== false) && cb_read_public.getElement('input').checked) {
-    accept_read_disabled = true;
-    accept_read_style = 'hidden';
-  }
-  var cb_read = $(target.createElement('input'));
-  cb_read.type = 'checkbox';
-  cb_read.name = 'cb_accept_read[]';
-  cb_read.value = sel_id;
-  cb_read.disabled = accept_read_disabled;
-  cb_read.style.visibility = accept_read_style;
-  
-  // Create the write perm checkbox
-  var cb_write_public = $(target.getElementById('cb_write_public'));
-  var accept_write_disabled = false;
-  var accept_write_style = 'visible';
-  if ( (cb_write_public !== false && cb_write_public !== null) && cb_write_public.getElement('input').checked) {
-    accept_write_disabled = true;
-    accept_write_style = 'hidden';
-  }
-  var cb_write = $(target.createElement('input'));
-  cb_write.type = 'checkbox';
-  cb_write.name = 'cb_accept_write[]';
-  cb_write.value = sel_id;
-  cb_write.disabled = accept_write_disabled;
-  cb_write.style.visibility = accept_write_style;
-  cb_write.setProperty('onchange', 'apply_checked_read(this, \''+element_name+'-'+sel_id+'\')');
-  cb_write.setProperty('onclick', 'apply_checked_read(this, \''+element_name+'-'+sel_id+'\')');
-  
-  // Create the admin perm checkbox
-  var cb_admin = $(target.createElement('input'));
-  cb_admin.type = 'checkbox';
-  cb_admin.name = 'cb_accept_admin[]';
-  cb_admin.value = sel_id;
-  
+    
   // Create the consumer cell
   var con_cell = $(target.createElement('td'));
   con_cell.appendChild(link);
-  con_cell.appendText(fieldLabel);
-  
-  // Create the select/unselect cell
-  sel_cell = $(target.createElement('td'));
-  sel_cell.appendChild(sel_all_link);
-  sel_cell.appendText('/');
-  sel_cell.appendChild(unsel_all_link);
-  
-  // Create the access perm cell
-  var access_cell = $(target.createElement('td'));
-  access_cell.addClass('cell_perms_access');
-  access_cell.appendChild(cb_access);
-  
-  // Create the read perm cell
-  var read_cell = $(target.createElement('td'));
-  read_cell.addClass('cell_perms_read');
-  read_cell.appendChild(cb_read);
-  
-  // Create the write cell
-  var write_cell = $(target.createElement('td'));
-  write_cell.addClass('cell_perms_write');
-  write_cell.appendChild(cb_write);
-  
-  // Create the admin cell
-  var admin_cell = $(target.createElement('td'));
-  admin_cell.appendChild(cb_admin);
-
-  // Add these elements to the table row
+  con_cell.appendText(fieldLabel);  
   row.appendChild(con_cell);
-  row.appendChild(sel_cell);
-  row.appendChild(access_cell);
-  row.appendChild(read_cell);
-  row.appendChild(write_cell);
-  row.appendChild(admin_cell);
 
+  if($(target.getElementById('cb_read_public'))) {
+    // Create the select all link
+    var sel_all_link = $(target.createElement('a'));
+    sel_all_link.href = '#';
+    sel_all_link.setProperty('onclick', 'select_all_perms(\''+element_name+'-'+sel_id+'\')');
+    sel_all_link.appendText('$l_select_all');
+    
+    // Create the unselect all link
+    unsel_all_link = $(target.createElement('a'));
+    unsel_all_link.href = '#';
+    unsel_all_link.setProperty('onclick', 'unselect_all_perms(\''+element_name+'-'+sel_id+'\')');
+    unsel_all_link.appendText('$l_unselect_all');
+    
+    // Create the access perm checkbox
+    var cb_access_public = $(target.getElementById('cb_access_public'));
+    var accept_access_disabled = false;
+    var accept_access_style = 'visible';
+    if ( (cb_access_public !== null && cb_access_public !== false) && cb_access_public.getElement('input').checked) {
+      accept_access_disabled = true;
+      accept_access_style = 'hidden';
+    }
+    var cb_access = $(target.createElement('input'));
+    cb_access.type = 'checkbox';
+    cb_access.name = 'cb_accept_access[]';
+    cb_access.value = sel_id;
+    cb_access.disabled = accept_access_disabled;
+    cb_access.style.visibility = accept_access_style;
+    
+    // Create the read perm checkbox
+    var cb_read_public = $(target.getElementById('cb_read_public'));
+    var accept_read_disabled = false;
+    var accept_read_style = 'visible';
+    if ( (cb_read_public !== null && cb_read_public !== false) && cb_read_public.getElement('input').checked) {
+      accept_read_disabled = true;
+      accept_read_style = 'hidden';
+    }
+    var cb_read = $(target.createElement('input'));
+    cb_read.type = 'checkbox';
+    cb_read.name = 'cb_accept_read[]';
+    cb_read.value = sel_id;
+    cb_read.disabled = accept_read_disabled;
+    cb_read.style.visibility = accept_read_style;
+    
+    // Create the write perm checkbox
+    var cb_write_public = $(target.getElementById('cb_write_public'));
+    var accept_write_disabled = false;
+    var accept_write_style = 'visible';
+    if ( (cb_write_public !== false && cb_write_public !== null) && cb_write_public.getElement('input').checked) {
+      accept_write_disabled = true;
+      accept_write_style = 'hidden';
+    }
+    var cb_write = $(target.createElement('input'));
+    cb_write.type = 'checkbox';
+    cb_write.name = 'cb_accept_write[]';
+    cb_write.value = sel_id;
+    cb_write.disabled = accept_write_disabled;
+    cb_write.style.visibility = accept_write_style;
+    cb_write.setProperty('onchange', 'apply_checked_read(this, \''+element_name+'-'+sel_id+'\')');
+    cb_write.setProperty('onclick', 'apply_checked_read(this, \''+element_name+'-'+sel_id+'\')');
+    
+    // Create the admin perm checkbox
+    var cb_admin = $(target.createElement('input'));
+    cb_admin.type = 'checkbox';
+    cb_admin.name = 'cb_accept_admin[]';
+    cb_admin.value = sel_id;
+    
+    // Create the select/unselect cell
+    sel_cell = $(target.createElement('td'));
+    sel_cell.appendChild(sel_all_link);
+    sel_cell.appendText('/');
+    sel_cell.appendChild(unsel_all_link);
+    
+    // Create the access perm cell
+    var access_cell = $(target.createElement('td'));
+    access_cell.addClass('cell_perms_access');
+    access_cell.appendChild(cb_access);
+    
+    // Create the read perm cell
+    var read_cell = $(target.createElement('td'));
+    read_cell.addClass('cell_perms_read');
+    read_cell.appendChild(cb_read);
+    
+    // Create the write cell
+    var write_cell = $(target.createElement('td'));
+    write_cell.addClass('cell_perms_write');
+    write_cell.appendChild(cb_write);
+    
+    // Create the admin cell
+    var admin_cell = $(target.createElement('td'));
+    admin_cell.appendChild(cb_admin);
+
+    // Add these elements to the table row
+    row.appendChild(sel_cell);
+    row.appendChild(access_cell);
+    row.appendChild(read_cell);
+    row.appendChild(write_cell);
+    row.appendChild(admin_cell);
+
+  } else {
+    var val_cell = $(target.createElement('td'));
+    field = target.createElement('input');
+    field.type = 'hidden';
+    field.name = sel_id;
+    field.value = 1;
+    field.text = fieldLabel;    
+    val_cell.appendChild(field);
+    row.appendChild(val_cell);
+  }
   // Add the div row to the container
   container.appendChild(row);
   

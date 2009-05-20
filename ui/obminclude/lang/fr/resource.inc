@@ -53,6 +53,7 @@ $l_name_error = "Le nom doit être renseigné !";
 $l_check_samename = "Ces ressources semblent similaires à cette nouvelle entrée !";
 $l_exist_error = "Ce nom est déjà utilisé !";
 
+$l_resource_display = "Options d'affichage des listes de ressources";
 $l_add_resources = "Ajouter des ressources";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

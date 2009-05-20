@@ -843,7 +843,6 @@ function get_display_pref($u_id, $entity, $all=0) {
       }
     }
   }
-
   return $prefs;
 }
 
