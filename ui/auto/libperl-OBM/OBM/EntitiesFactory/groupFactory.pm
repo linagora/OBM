@@ -59,6 +59,9 @@ sub new {
     $self->{'currentEntity'} = undef;
     $self->{'entitiesDescList'} = undef;
 
+    # Update linked entities on
+    $self->{'updateLinkedEntityOn'} = 'UPDATE_ALL|UPDATE_ENTITY|UPDATE_LINKS';
+
     # Definition de la Description du groupe Host 515
     $self->{'sambaHostGroup'} = $self->_getVirtualGroups();
 
@@ -276,6 +279,30 @@ sub _loadGroupLinks {
 
     $self->{'currentEntity'}->setLinks( $groupLinks->fetchall_arrayref({}) );
 
+
+    # Needed to know all removed members
+    # Needed to update members on group 512
+    $query = 'SELECT DISTINCT(of_usergroup_user_id)
+              FROM P_of_usergroup
+              WHERE of_usergroup_group_id='.$entityId.'
+              AND of_usergroup_user_id NOT IN
+                (SELECT DISTINCT(of_usergroup_user_id)
+                 FROM '.$groupLinksTable.'
+                 WHERE of_usergroup_group_id='.$entityId.')';
+
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'obtention des IDs des membres supprimés impossible', 0 );
+        return undef;
+    }
+
+    my @removedMemberIds;
+    while( my $removeMemberId = $queryResult->fetchrow_hashref() ) {
+        push( @removedMemberIds, $removeMemberId->{'of_usergroup_user_id'} );
+    }
+
+    $self->{'currentEntity'}->setRemovedMembers( \@removedMemberIds );
+
     return 0;
 }
 
@@ -408,6 +435,9 @@ sub _loadLinkedEntitiesFactories {
     if( my $factoryProgramming = $self->_loadParentGroups() ) {
         $self->_enqueueLinkedEntitiesFactory( $factoryProgramming );
     }
+    if( ($self->{'updateType'} eq 'UPDATE_LINKS') && (my $factoryProgramming = $self->_loadMembers()) ) {
+        $self->_enqueueLinkedEntitiesFactory( $factoryProgramming );
+    }
 
     return 0;
 }
@@ -487,4 +517,53 @@ sub _getParentGroupIds {
 
     @parentIds = keys(%parentIds);
     return \@parentIds;
+}
+
+
+sub _loadMembers {
+    my $self = shift;
+
+    my $entityId = $self->{'currentEntity'}->getId();
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler = OBM::Tools::obmDbHandler->instance();
+
+    if( !$dbHandler ) {
+        $self->_log( 'connexion à la base de données impossible', 4 );
+        return undef;
+    }
+
+    my $query = 'SELECT DISTINCT(of_usergroup_user_id)
+                 FROM P_of_usergroup
+                 WHERE of_usergroup_group_id='.$entityId;
+    
+    my $queryResult;
+    if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
+        $self->_log( 'obtention des IDs des membres impossible', 0 );
+        return undef;
+    }
+
+    my @memberIds;
+    while( my $memberId = $queryResult->fetchrow_hashref() ) {
+        push( @memberIds, $memberId->{'of_usergroup_user_id'} );
+    }
+
+    my $removedMembersIds = $self->{'currentEntity'}->getRemovedMembersId();
+    for( my $i=0; $i<=$#$removedMembersIds; $i++ ) {
+        push( @memberIds, $removedMembersIds->[$i] );
+    }
+
+    # Getting user factory programming
+    require OBM::EntitiesFactory::factoryProgramming;
+    my $programmingObj = OBM::EntitiesFactory::factoryProgramming->new();
+    if( !defined($programmingObj) ) {
+        $self->_log( 'probleme lors de la programmation de la factory d\'entités', 3 );
+        return undef;
+    }
+    if( $programmingObj->setEntitiesType( 'USER' ) || $programmingObj->setUpdateType( 'SYSTEM_ENTITY' ) || $programmingObj->setEntitiesIds( \@memberIds ) ) {
+        $self->_log( 'problème lors de l\'initialisation du programmateur de factory', 4 );
+        return undef;
+    }
+
+    return $programmingObj;
 }

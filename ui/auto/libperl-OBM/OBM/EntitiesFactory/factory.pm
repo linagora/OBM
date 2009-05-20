@@ -293,16 +293,21 @@ sub _computeRight {
 sub _getLinkedEntities {
     my $self = shift;
 
+    my $updateLinkedEntityOn = $self->{'updateLinkedEntityOn'};
+    if( !$updateLinkedEntityOn ) {
+        $updateLinkedEntityOn = 'UPDATE_ALL|UPDATE_ENTITY';
+    }
+
+    if( $self->{'updateType'} !~ /^($updateLinkedEntityOn)$/ ) {
+        return undef;
+    }
+
     if( !$self->getUpdateLinkedEntities() ) {
         $self->_log( 'les entités liés ne sont pas à mettre à jour', 3 );
         return undef;
     }
 
-    if( !defined($self->{'linkedEntitiesFactory'}) && (!defined($self->{'currentEntity'}) || !$self->{'currentEntity'}->updateLinkedEntities()) ) {
-        return undef;
-    }
-
-    if( ($self->{'updateType'} ne 'UPDATE_ALL') && ($self->{'updateType'} ne 'UPDATE_ENTITY') ) {
+    if( !defined($self->{'linkedEntitiesFactory'}) && (!defined($self->{'currentEntity'}) || !$self->{'currentEntity'}->updateLinkedEntities( $self->{'updateType'} )) ) {
         return undef;
     }
 

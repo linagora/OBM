@@ -512,12 +512,40 @@ sub updateLdapEntry {
 
 sub updateLinkedEntities {
     my $self = shift;
+    my( $updateType ) = @_;
 
     if( $self->{'entityDesc'}->{'group_contacts'} ne $self->{'entityDesc'}->{'group_contacts_current'} ) {
         $self->_log( 'changement des contacts externes de '.$self->getDescription().', les groupes parents doivent être mis à jour', 3 );
         return 1;
     }
 
+    if( ($updateType eq 'UPDATE_LINKS') && ($self->{'entityDesc'}->{'group_gid'} == 512) ) {
+        $self->_log( 'les membres de '.$self->getDescription().' ont été mis à jour, ils doivent être mis à jour', 3 );
+        return 1;
+    }
+
     $self->_log( 'pas de mise à jour des entités liés nécessaire pour '.$self->getDescription(), 3 );
     return 0;
+}
+
+
+sub setRemovedMembers {
+    my $self = shift;
+    my( $removedMembers ) = @_;
+
+    if( ref($removedMembers) ne 'ARRAY' ) {
+        $self->_log( 'liste des utilisateurs supprimés incorrecte', 3 );
+        $self->{'entityDesc'}->{'group_removed_users_id'} = [];
+        return 0;
+    }
+
+    $self->{'entityDesc'}->{'group_removed_users_id'} = $removedMembers;
+    return 0;
+}
+
+
+sub getRemovedMembersId {
+    my $self = shift;
+
+    return $self->{'entityDesc'}->{'group_removed_users_id'};
 }
