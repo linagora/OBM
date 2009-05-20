@@ -44,7 +44,6 @@ function run_query_user_search($user) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   $datebegin = sql_date_format($db_type, 'userobm_datebegin', 'datebegin');
   $dateexp = sql_date_format($db_type, 'userobm_account_dateexp', 'dateexp');
@@ -67,7 +66,7 @@ function run_query_user_search($user) {
   // If a login indication has been specified, get it
   if (trim($login) != '') {
      if (trim($where) != '') $where .= ' AND';
-     $where .= " userobm_login $like '$login%'";
+     $where .= " userobm_login #LIKE '$login%'";
   }
 
   // If a user profile indication has been specified, get it
@@ -86,19 +85,19 @@ function run_query_user_search($user) {
   // If a lastname indication has been specified, get it
   if (trim($lname) != '') {
      if (trim($where) != '') $where .= ' AND';
-     $where .= " userobm_lastname $like '$lname%'";
+     $where .= " userobm_lastname #LIKE '$lname%'";
   }
 
   // If a lastname indication has been specified, get it
   if (trim($fname) != '') {
      if (trim($where) != '') $where .= ' AND';
-     $where .= " userobm_firstname $like '$fname%'";
+     $where .= " userobm_firstname #LIKE '$fname%'";
   }
 
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
      if (trim($where) != '') $where .= ' AND';
-     $where .= " userobm_delegation $like '$delegation%'";
+     $where .= " userobm_delegation #LIKE '$delegation%'";
   }
   
   // If a status indication has been specified, get it
@@ -112,21 +111,21 @@ function run_query_user_search($user) {
     if (trim($where) != '') $where .= ' AND';
     list($email_name,$domain) = split('@',$email);
     $where .= "
-      ( userobm_email like '$email%'
+      ( userobm_email #LIKE '$email%'
       OR (
-          (userobm_email = '$email_name' OR userobm_email like '$email_name\r\n%' OR userobm_email like '%\r\n$email_name\r\n%' OR userobm_email like '%\r\n$email_name' OR '$email_name' = '') 
+          (userobm_email = '$email_name' OR userobm_email #LIKE '$email_name\r\n%' OR userobm_email #LIKE '%\r\n$email_name\r\n%' OR userobm_email #LIKE '%\r\n$email_name' OR '$email_name' = '') 
           AND 
-          (domain_name LIKE '$domain%' OR domain_alias = '$domain' OR domain_alias like '$domain%\r\n%' OR domain_alias like '%\r\n$domain%\r\n%' OR domain_alias like '%\r\n$domain%') 
+          (domain_name #LIKE '$domain%' OR domain_alias = '$domain' OR domain_alias #LIKE '$domain%\r\n%' OR domain_alias #LIKE '%\r\n$domain%\r\n%' OR domain_alias #LIKE '%\r\n$domain%') 
           AND
-          (userobm_email <> '' AND userobm_email NOT LIKE '%@%')
+          (userobm_email <> '' AND userobm_email NOT #LIKE '%@%')
         ) 
         OR 
         (
-          userobm_email LIKE '$email_name@$domain%' 
+          userobm_email #LIKE '$email_name@$domain%' 
           OR (
-            '$email_name' = '' AND userobm_email LIKE '%@$domain%'
+            '$email_name' = '' AND userobm_email #LIKE '%@$domain%'
           ) 
-          OR userobm_email like '$email_name@$domain%\r\n%' OR userobm_email like '%\r\n$email_name@$domain%\r\n%' OR userobm_email like '%\r\n$email_name@$domain%'
+          OR userobm_email #LIKE '$email_name@$domain%\r\n%' OR userobm_email #LIKE '%\r\n$email_name@$domain%\r\n%' OR userobm_email #LIKE '%\r\n$email_name@$domain%'
         )
       )";
   }
@@ -134,9 +133,9 @@ function run_query_user_search($user) {
   // If a phone number indication has been specified, get it
   if (trim($phone) != '') {
      if (trim($where) != '') $where .= ' AND';
-     $where .= " (userobm_phone like '%$phone%'
-       OR userobm_phone2 like '%$phone%'
-       OR userobm_mobile like '%$phone%')";
+     $where .= " (userobm_phone #LIKE '%$phone%'
+       OR userobm_phone2 #LIKE '%$phone%'
+       OR userobm_mobile #LIKE '%$phone%')";
   }
 
 	// if a time of expiration has been specified, get it  
@@ -148,13 +147,13 @@ function run_query_user_search($user) {
   // If a description indication has been specified, get it
   if (trim($desc) != '') {
      if (trim($where) != '') $where .= ' AND';
-     $where .= " userobm_description like '%$desc%'";
+     $where .= " userobm_description #LIKE '%$desc%'";
   }
 
   // If a group indication has been specified, get it
   if (trim($group) != '') {
      if (trim($where) != '') $where .= ' AND';
-     $where .= " group_name like '$group%'";
+     $where .= " group_name #LIKE '$group%'";
      $join_grp = 'INNER JOIN of_usergroup ON userobm_id=of_usergroup_user_id
                   INNER JOIN UGroup ON of_usergroup_group_id=group_id';
   }
@@ -173,13 +172,13 @@ function run_query_user_search($user) {
   // If a delegation target indication has been specified, get it
   if (trim($delegation_target) != '') {
     if (trim($where) != '') $where .= ' AND';
-    $where .= " userobm_delegation_target LIKE '%$delegation_target%'";
+    $where .= " userobm_delegation_target #LIKE '%$delegation_target%'";
   }
 
   // If a delegation target indication has been specified, get it
   if (trim($mail_server_host_name) != '') {
     if (trim($where) != '') $where .= ' AND';
-    $where .= " host_name LIKE '%$mail_server_host_name%'";
+    $where .= " host_name #LIKE '%$mail_server_host_name%'";
     $join_host = 'INNER JOIN Host ON host_id = userobm_mail_server_id';
   }
 
@@ -1343,7 +1342,6 @@ function check_user_login_in_use($domain_id, $login, $u_id='') {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
   if ($u_id != '') {
     $u_id = sql_parse_id($u_id, true, true);
     $where_uid = "AND userobm_id $u_id";
@@ -1408,7 +1406,6 @@ function run_query_user_check_user($p_id, $user) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
   $multidomain = sql_multidomain('userobm');
   $login = strtolower($user['login']);
   $domain_id = $user['domain_id'];
@@ -1423,11 +1420,11 @@ function run_query_user_check_user($p_id, $user) {
 
   $query = "SELECT distinct userobm_id, userobm_login
     FROM UserObm
-    WHERE userobm_login $like '$login%'
+    WHERE userobm_login #LIKE '$login%'
     $where_user $where_multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_user_check_user()');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
 
   return $obm_q;
 }
