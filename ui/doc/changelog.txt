@@ -1,7 +1,7 @@
 <!-- $Id$ -->
 O.B.M. 2.2 Changelog
 
-version 2.2.3 - 2009-05-18
+version 2.2.4 - 2009-05-29
 
 To do
 
@@ -19,11 +19,24 @@ To do
  usergroup : agir lorsqu'archivage d'un user ?
 
 
-2009-06-15 : version 2.2.4
+2009-05-29 : version 2.2.4
 
   * Project : added search by creator delegation
   * Contract : added search by creator delegation
-  * Project : estiamted and sold time can now be float
+  * Project : estimated and sold time can now be float
+  * #131 (ok in 2.2.3) Archived user seems to still be in group alias
+  * #226 Minig : Bad signature "undefined"
+  * #228 Minig : UI always in english
+  * #249 (ok in 2.2.2) php include error in cronjob EventAlertCronJob
+  * #257, 276 : Samba domain admin uidNumber to 0 fixed when updated
+  * #259 Minig : Autocompletion only display displayName and not email
+  * #261 Minig : Undo after drag and drop does not work
+  * #262 Minig : Folder management (creation etc) in preferences does not work
+  * #265 Adding a user to a group from user module is buggy
+  * #266 Vacation update script set vacation date to now
+  * #269 THE pref_title VARIABLE MUST BE SET in resource module
+  * #271 TBird SYNC : subscription lost when changing calendar color
+  * #273 Pb with description search in user module
 
 2009-05-18 : version 2.2.3
 

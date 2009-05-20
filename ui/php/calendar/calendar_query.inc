@@ -278,7 +278,7 @@ function run_query_calendar_insert_decision($calendar) {
   $entity = $calendar['entity_kind'];
   $event_id = $calendar['calendar_id'];
   $state = $calendar['decision_event'];
-  $owner_notification = $calendar["owner_notification"];
+  $owner_notification = $calendar['owner_notification'];
 
   run_query_calendar_update_occurrence_state($event_id,$entity,$entity_id,$state, $owner_notification);
 }
@@ -659,23 +659,23 @@ function run_query_calendar_insert_event_data($calendar) {
   } else {
     $owner = $calendar['owner'];
   }
-  $title = $calendar['title'];
+  $title = sql_parse_text($calendar['title']);
   $category1_id = sql_parse_id( $calendar['category1']);
   $priority = sql_parse_int( $calendar['priority']);
-  $description = $calendar['description'];
-  $location = $calendar['location'];
+  $description = sql_parse_text($calendar['description']);
+  $location = sql_parse_text($calendar['location']);
   ($calendar['all_day'] != 1)? $all_day = 'FALSE' : $all_day = 'TRUE';
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['event_duration'];
-  if ($calendar['privacy']!=1) $privacy = 0; else $privacy = 1; 
+  if ($calendar['privacy']!=1) $privacy = 0; else $privacy = 1;
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
   if (isset($calendar['repeat_end'])) {
     $repeat_end = "'$calendar[repeat_end]'";
   } else {
     $repeat_end = 'NULL';
-  } 
-  $repeatfrequency = $calendar['repeatfrequency'];  
+  }
+  $repeatfrequency = $calendar['repeatfrequency'];
   $date_exception = $calendar['date_exception'];
   $item = $calendar['list-item'];
   $item_id = $calendar['list-item-id'];
@@ -697,7 +697,7 @@ function run_query_calendar_insert_event_data($calendar) {
 
       if (is_array($property_name) && isset($property_name[$key])) {
         $properties .= "<property_name>$property_name[$key]</property_name>
-          <property_value>$property[$key]</property_value>";                       
+          <property_value>$property[$key]</property_value>";
       }
       $properties .= "</resource>";
     }
@@ -1165,18 +1165,18 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   run_query_calendar_update_event_data($calendar); 
 
 
-  if(!OBM_EventMailObserver::hasEventChanged($oldEvent, OBM_EventFactory::getInstance()->getById($calendar['calendar_id']))) {
+  if (!OBM_EventMailObserver::hasEventChanged($oldEvent, OBM_EventFactory::getInstance()->getById($calendar['calendar_id']))) {
     $entities = get_calendar_event_entity($event_id); 
-    if(count($users_array) > 0) {
+    if (count($users_array) > 0) {
       $qusers = "AND eventlink_entity_id NOT IN ".of_entity_subquery('user',$users_array);
     }
-    if(count($resources_array) > 0) {
+    if (count($resources_array) > 0) {
       $rresources = "AND eventlink_entity_id NOT IN ".of_entity_subquery('resource',$resources_array);
     }
-    if(is_array($entities['user']['ids'])) {
+    if (is_array($entities['user']['ids'])) {
       $users_array = array_diff($users_array,$entities['user']['ids']);
     }
-    if(is_array($entities['resource']['ids'])) {
+    if (is_array($entities['resource']['ids'])) {
       $resources_array = array_diff($resources_array, $entities['resource']['ids']);
     }
   }
@@ -1186,7 +1186,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   $db->query($query);
 
   // User insertion
-  if(is_array($users_array)) {
+  if (is_array($users_array)) {
     foreach($users_array as $user_id) {
       if ($user_id == $obm['uid'] || OBM_Acl::canWrite($obm['uid'], 'calendar', $user_id)) {
         run_query_calendar_insert_entity_event('user', $user_id, $event_id, 'ACCEPTED');
@@ -1234,14 +1234,14 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
 function run_query_calendar_update_event_data($calendar) {
   global $cdg_sql, $obm;
 
-  $title = $calendar['title'];
-  if(is_numeric($calendar['owner']) && $calendar['owner'] >= 0) {
+  $title = sql_parse_text($calendar['title']);
+  if (is_numeric($calendar['owner']) && $calendar['owner'] >= 0) {
     $owner = "event_owner = $calendar[owner],";
   }
   $category1_id = sql_parse_id( $calendar['category1']);
   $priority = $calendar['priority'];
-  $description = $calendar['description'];
-  $location = $calendar['location'];
+  $description = sql_parse_text($calendar['description']);
+  $location = sql_parse_text($calendar['location']);
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['event_duration'];
   ($calendar['all_day'] != 1) ? $all_day = 'FALSE': $all_day = 'TRUE';
@@ -1249,7 +1249,7 @@ function run_query_calendar_update_event_data($calendar) {
   if ($calendar['privacy'] != 1) $privacy = 0; else $privacy = 1; 
   $repeat_kind = $calendar['repeat_kind'];
   $repeat_days = $calendar['repeat_days'];
-  if(isset($calendar['repeat_end'])) {
+  if (isset($calendar['repeat_end'])) {
     $repeat_end = "'$calendar[repeat_end]'";
   } else {
     $repeat_end = 'NULL';
@@ -1275,34 +1275,34 @@ function run_query_calendar_update_event_data($calendar) {
 
       if (is_array($property_name) && isset($property_name[$key])) {
         $properties .= "<property_name>$property_name[$key]</property_name>
-          <property_value>$property[$key]</property_value>";                       
+          <property_value>$property[$key]</property_value>";
       }
       $properties .= "</resource>";
     }
   }
   $properties = "<extended_desc>$properties</extended_desc>";
 
-  if($all_day == 'TRUE') {
+  if ($all_day == 'TRUE') {
     $dateend = clone $datebegin;
     $dateend->addSecond($event_duration - 1);
     $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $event_duration = $dateend->diffTimestamp($datebegin);
   }
-  if($repeat_kind == 'weekly') {
+  if ($repeat_kind == 'weekly') {
     $days = str_split($repeat_days);
     $event_day = $datebegin->getWeekday();
-    if($days[$event_day] != 1) {
+    if ($days[$event_day] != 1) {
       for($i = ($event_day +1)%7; $i != $event_day; $i = ($i+1)%7) {
-        if($days[$i] == 1) {
+        if ($days[$i] == 1) {
           $datebegin->setWeekday($i);
           break;
-        } 
-      }      
-    } 
+        }
+      }
+    }
   } else {
     $repeat_days = '0000000';
-  }  
+  }
 
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
@@ -1336,13 +1336,12 @@ function run_query_calendar_update_event_data($calendar) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data(2)');
   $obm_q->query($query);
 
-  if($repeat_kind != 'none' && is_array($date_exception)) {
+  if ($repeat_kind != 'none' && is_array($date_exception)) {
     foreach($date_exception as $key => $value) {
-      $calendar['old_date_begin'] = $value->setHour($datebegin)->setMinute($datebegin);        
+      $calendar['old_date_begin'] = $value->setHour($datebegin)->setMinute($datebegin);
       run_query_calendar_event_exception_insert($calendar);
     }
   }
-
 }
 
 
@@ -1358,38 +1357,36 @@ function run_query_calendar_quick_event_update($calendar) {
 
   $multidomain = sql_multidomain('event');
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
-  $title = $calendar['title'];
+  $title = sql_parse_text($calendar['title']);
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
-  $event_id = sql_parse_id($calendar['calendar_id'], true); 
-  if($all_day == 'TRUE') {
+  $event_id = sql_parse_id($calendar['calendar_id'], true);
+  if ($all_day == 'TRUE') {
     $dateend = clone $datebegin;
     $dateend->addSecond($event_duration - 1);
     $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
     $datebegin->setHour(0)->setMinute(0)->setSecond(0);
     $event_duration = $dateend->diffTimestamp($datebegin);
-  }  
+  }
   $oldEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
   $obm_q = new DB_OBM;
   $query = "UPDATE Event SET
     event_timeupdate = NOW(),
-      event_userupdate = $obm[uid], 
-      event_title = '$title', 
-      event_date = '$datebegin',     
+      event_userupdate = $obm[uid],
+      event_title = '$title',
+      event_date = '$datebegin',
       event_origin = '$GLOBALS[c_origin_ajax]',
       event_duration = '$event_duration'
       WHERE
       event_id $event_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_update_event_data()');
-  $obm_q->query($query);  
-
+  $obm_q->query($query);
 
   // Send mail
   if ($calendar['send_mail']) {
     $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
     OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
   }
-
 }
 
 
@@ -1403,11 +1400,11 @@ function run_query_calendar_quick_event_update($calendar) {
 function run_query_calendar_quick_event_insert($calendar,$state) {
   global $cdg_sql, $obm;
 
-  $title = $calendar['title'];
+  $title = sql_parse_text($calendar['title']);
   $datebegin = $calendar['date_begin'];
   $event_duration = $calendar['duration'];
   $all_day = ($calendar['all_day'])? 'TRUE' : 'FALSE';
-  if($all_day == 'TRUE') {
+  if ($all_day == 'TRUE') {
     $dateend = clone $datebegin;
     $dateend->addSecond($event_duration - 1);
     $dateend->setHour(0)->setMinute(0)->setSecond(0)->addDay(1);
@@ -1415,7 +1412,6 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
     $event_duration = $dateend->diffTimestamp($datebegin);
   }
   $ext_id = genUniqueExtEventId();
-
 
   $obm_q = new DB_OBM;
   $query = "INSERT INTO Event
@@ -1471,13 +1467,13 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_quick_insert_event_data()');
   $obm_q->query($query);
   $event_id = $obm_q->lastid();
-  of_entity_insert('event', $event_id) ;
+  of_entity_insert('event', $event_id);
   run_query_calendar_insert_entity_event('user', $calendar['entity_id'], $event_id, $state);
   if ($calendar['send_mail']) {
     // Send mail
-    $data = array ( 
+    $data = array (
       'id' => $event_id
-    );    
+    );
     OBM_EventFactory::getInstance()->create($data);
   }
   return $event_id;
@@ -1495,13 +1491,13 @@ function run_query_calendar_quick_event_insert($calendar,$state) {
 function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
   global $cdg_sql, $obm;
 
-  $title = $calendar['title'];
-  $id =  $calendar['calendar_id'];
+  $title = sql_parse_text($calendar['title']);
+  $id = $calendar['calendar_id'];
   $olddatebegin = $calendar['old_date_begin'];
   $event_duration = $calendar['duration'];
   $oldEvent = OBM_EventFactory::getInstance()->getById($id);
-  $obm_q = new DB_OBM;
 
+  $obm_q = new DB_OBM;
   $sql_id = sql_parse_id($id, true);
   $query = "UPDATE Event SET event_timeupdate = NOW() WHERE event_id = $id";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_event_exception_insert(0)');
@@ -1509,7 +1505,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
   $sql_id = sql_parse_id($id);
   $query = "INSERT INTO EventException (
     eventexception_usercreate,
-    eventexception_timecreate ,   
+    eventexception_timecreate,
     eventexception_userupdate,
     eventexception_timeupdate,
     eventexception_event_id,
@@ -1538,19 +1534,19 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
   if ($calendar['send_mail']) {
     $newEvent = OBM_EventFactory::getInstance()->getById($calendar['calendar_id']);
     OBM_EventFactory::getInstance()->store($newEvent,$oldEvent);
-  }  
+  }
 
-  if(is_object($event_q)) {
+  if (is_object($event_q)) {
     if ($event_q->f('event_privacy')!=1) $privacy = 0; else $privacy = 1; 
     $repeat_kind = $event_q->f('event_repeatkind');
     $repeat_days = $event_q->f('event_repeatdays');
-    if($event_q->f('event_endrepeat')) {
+    if ($event_q->f('event_endrepeat')) {
       $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
       $repeat_end = "'$repeat_end'";
     } else {
-      $repeat_end = "NULL";
+      $repeat_end = 'NULL';
     }
-    $repeatfrequency = $event_q->f('event_repeatfrequence');  
+    $repeatfrequency = $event_q->f('event_repeatfrequence');
     $category1_id = sql_parse_id( $event_q->f('event_category1_id'));
     $priority = sql_parse_int( $event_q->f('event_priority'));
     $color = $event_q->f('event_color');
@@ -1563,21 +1559,21 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
 
     $query = "INSERT INTO Event (
       event_ext_id,
-      event_timeupdate,                         
-      event_timecreate,                         
+      event_timeupdate,
+      event_timecreate,
       event_usercreate,
       event_type,
       event_origin,
       event_owner,
       event_timezone,
-      event_title, 
-      event_date,     
+      event_title,
+      event_date,
       event_description,
       event_properties,
-      event_location, 
+      event_location,
       event_category1_id,
       event_priority,
-      event_privacy, 
+      event_privacy,
       event_duration,
       event_repeatkind,
       event_repeatfrequence,
@@ -1595,7 +1591,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       'VEVENT',
       '$GLOBALS[c_origin_web]',
       $obm[uid],
-      '".Of_Date::getOption('timezone')."', 
+      '".Of_Date::getOption('timezone')."',
       '$title',
       '$datebegin',
       '$description',
@@ -1604,7 +1600,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
       $category1_id,
       $priority,
       $privacy,
-      '$event_duration',		
+      '$event_duration',
       'none',
       '$repeatfrequency',
       '$repeat_days',
@@ -1617,14 +1613,14 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     display_debug_msg($query, $cdg_sql, 'run_query_calendar_insert_event_data(3)');
     $obm_q->query($query);
     $new_id = $obm_q->lastid();
-    of_entity_insert('event', $new_id) ;    
+    of_entity_insert('event', $new_id);
     $entities = get_calendar_event_entity($id);
     foreach ($entities as $entity => $data) {
-      foreach ($data['entity'] as $entity_id => $entity_data) {  
+      foreach ($data['entity'] as $entity_id => $entity_data) {
         run_query_calendar_insert_entity_event($entity, $entity_id, $new_id, $entity_data['state']);
       }
     }
-    if($calendar['send_mail']) {
+    if ($calendar['send_mail']) {
       OBM_EventFactory::getInstance()->create(array('id' => $new_id));
     }
   }
@@ -1648,7 +1644,7 @@ function run_query_quick_attendee_update($params, $eve_q) {
   $entities = get_calendar_event_entity($event_id);
   run_query_calendar_delete_event_entity($params,array());
   foreach ($entities as $entity => $data) {
-    foreach ($data['entity'] as $entity_id => $entity_data) { 
+    foreach ($data['entity'] as $entity_id => $entity_data) {
       $entity_type = ($entity == 'user') ? 'calendar' : 'resource';
       if (OBM_Acl::canWrite($obm['uid'], $entity_type, $entity_id)) {
         run_query_calendar_insert_entity_event($entity, $entity_id, $event_id, 'ACCEPTED');

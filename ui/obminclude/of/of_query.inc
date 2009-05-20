@@ -71,6 +71,21 @@ function sql_parse_int($int) {
 }
 
 
+/**
+ * Return a formatted and checked text from text
+ * 
+ * @param mixed $text
+ * @access public
+ * @return void
+ */
+function sql_parse_text($text) {
+
+  $new_text = trim($text);
+
+  return $new_text;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return the sql word corresponding to case incensitive like
 // Parameters:
