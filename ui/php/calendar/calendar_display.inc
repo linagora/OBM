@@ -3918,7 +3918,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
       $div_id = "sel_user_id-$sel_id";
       $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
       <img src=\"$GLOBALS[ico_user]\"  alt=\"[User]\" />
-      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+      <a href=\"javascript: remove_element('$div_id','sel_user_id');$('entities_form').submit();\">
       <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\" />
       </a>
       $u_name
@@ -3942,7 +3942,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
       $div_id = "sel_user_id-$sel_id";
       $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
       <img src=\"$GLOBALS[ico_contact]\"  alt=\"[User]\" />
-      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+      <a href=\"javascript: remove_element('$div_id','sel_user_id');$('entities_form').submit();\">
       <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\" />
       </a>
       $u_name
@@ -3968,7 +3968,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
       $dis_sel_resource .= "
         <div class=\"elementRow\" id=\"$div_id\">
         <img src=\"$GLOBALS[ico_resource]\"  alt=\"[Resource]\" />
-        <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
+        <a href=\"javascript: remove_element('$div_id','sel_resource_id');$('entities_form').submit();\">
         <img src=\"$GLOBALS[ico_delete]\"  alt=\"[Delete]\" />
         </a>
         $r_name
@@ -4217,7 +4217,7 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   <div class=\"freeBusyContent\">
 
     <div class=\"freeBusyEntities\">
-      <form method=\"POST\" action=\"calendar_index.php\">
+      <form method=\"POST\" id=\"entities_form\" action=\"calendar_index.php\">
         <table id=\"freeBusyEntitiesList\"> 
           <tr>
             <td>&nbsp;</td>
@@ -4344,8 +4344,10 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
       obm.calendarFreeBusy = new Obm.CalendarFreeBusy($colspan*7, $duration, $js_time_slots, $js_busy_time_slots, $unit, $date_ts);
-      new obm.AutoComplete.Search('$GLOBALS[path]/people/people_index.php?action=ext_search&ajax=1', 'sel_user_id', 'userSearch',{filter_entity:'calendar', filter_pattern:'read'});
-      new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch',{filter_entity:'calendar', filter_pattern:'read'});
+      new obm.AutoComplete.Search('$GLOBALS[path]/people/people_index.php?action=ext_search&ajax=1', 'sel_user_id', 'userSearch',
+        {filter_entity:'calendar', filter_pattern:'read', selectfunction:'$(\"entities_form\").submit();'});
+      new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch',
+        {filter_entity:'calendar', filter_pattern:'read', selectfunction:'$(\"entities_form\").submit();'});
     });
   </script>";
 

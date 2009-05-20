@@ -1945,6 +1945,22 @@ Obm.CalendarFreeBusy = new Class({
     //   'top': '-'+this.container.offsetHeight+'px', // for ie7 !
     //   'left': this.currentPosition*this.stepSize+'px'
     // });
+  },
+
+  // TODO: add an entity dynamically
+  addEntity: function() {
+
+    var tr = new Element('tr');
+    for(i=0;i<this.nbSteps;i++) {
+      tr.adopt((new Element('td').addClass('timeSlot')));
+    }
+    this.container.adopt(tr);
+
+    var srollHeight = this.scrollLeft.offsetHeight+18;
+    this.scrollLeft.setStyle('height', srollHeight+'px');
+    this.scrollRight.setStyle('height', srollHeight+'px');
+    this.scrollDiv.setStyle('height', this.scrollDiv.offsetHeight+18+'px');
+    this.meeting.setStyle('height', this.meeting.offsetHeight+18+'px');
   }
 
 });
