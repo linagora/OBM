@@ -48,6 +48,7 @@ $l_vacation = "Message d'absence";
 $l_vacation_message = "Message";
 $l_vacation_datebegin = "Du";
 $l_vacation_dateend = "Au";
+$l_enable_auto_vacation = "Programmer l'activation automatique du message d'absence" ;
 $l_forbidden = "Interdit";
 $l_access = "Accès Internet";
 $l_host = "Hôte";

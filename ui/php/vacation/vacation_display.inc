@@ -30,10 +30,18 @@ function html_vacation_consult($usr_q) {
     $message = "---";
   }
 
-  $vacation_datebegin = new Of_Date($usr_q->f('vacation_datebegin'));
-  $vacation_datebegin = $vacation_datebegin->getOutputDateTime();
-  $vacation_dateend = new Of_Date($usr_q->f('vacation_dateend'));
-  $vacation_dateend = $vacation_dateend->getOutputDateTime();
+  $vacation_datebegin = new Of_Date($usr_q->f('userobm_vacation_datebegin'), 'GMT');
+  if($vacation_datebegin->error()) {
+    $vacation_datebegin = '---';
+  } else {
+    $vacation_datebegin = $vacation_datebegin->getOutputDateTime();
+  }
+  $vacation_dateend = new Of_Date($usr_q->f('userobm_vacation_dateend'), 'GMT');
+  if($vacation_dateend->error()) {
+    $vacation_dateend = '---';
+  } else {
+    $vacation_dateend = $vacation_dateend->getOutputDateTime();
+  }
 
   $block = "
   <div class=\"detail extra\">
@@ -79,21 +87,19 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
 
-    $datebegin = new Of_Date($usr_q->f('vacation_datebegin'));
-    $dateend = new Of_Date($usr_q->f('vacation_dateend'));
+    $vacation_datebegin = new Of_Date($usr_q->f('userobm_vacation_datebegin'), 'GMT');
+    $vacation_dateend = new Of_Date($usr_q->f('userobm_vacation_dateend'), 'GMT');
+    if(!$vacation_datebegin->error()) {
+      $auto_enable = true;
+    } else {
+      $vacation_datebegin->addHour(1)->setMinute(0)->setSecond(0);
+      $vacation_dateend = clone $vacation_datebegin;
+      $vacation_dateend->addWeek(1);
+    }
 
     $enabled = $usr_q->f("userobm_vacation_enable");
     $message = stripslashes( $usr_q->f("userobm_vacation_message") );
     $mail_enable = $usr_q->f("userobm_mail_perms");
-    $vacation_datebegin = $usr_q->f("vacation_datebegin");
-    $vacation_dateend = $usr_q->f("vacation_dateend");
-    $auto_enable = ($vacation_datebegin != '0');
-    $hourbegin = $datebegin->getHour();
-    $minbegin = $datebegin->getMinute();
-    $hourend = $dateend->getHour();
-    $minend = $dateend->getMinute();
-    $vacation_datebegin = of_date_upd_format($vacation_datebegin);
-    $vacation_dateend = of_date_upd_format($vacation_dateend);
   } else if ($action == 'update') {
     $obm_q = run_query_vacation_detail($obm['uid']);
     $mail_enable = $obm_q->f("userobm_mail_perms");
@@ -104,10 +110,6 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   if (isset($vacation["message"])) { $message = $vacation["message"]; }
   if (isset($vacation["vacation_datebegin"])) { $vacation_datebegin = $vacation["vacation_datebegin"]; }
   if (isset($vacation["vacation_dateend"])) { $vacation_dateend = $vacation["vacation_dateend"]; }
-  if (isset($vacation["time_begin"])) { $hourbegin = $vacation["time_begin"]; }
-  if (isset($vacation["min_begin"])) {$minbegin = $vacation["min_begin"]; }
-  if (isset($vacation["time_end"])) {$hourend = $vacation["time_end"]; }
-  if (isset($vacation["min_end"])) {$minend = $vacation["min_end"]; }
   if (isset($vacation["auto_enable"])) {$auto_enable = $vacation["auto_enable"]; }
 
   if (! $mail_enable) {
@@ -115,8 +117,9 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   }
     
   if($auto_enable) {
-    $auto_enable = "checked=\"checked\"";
+    $schedule_enable = "checked=\"checked\"";
   } else {
+    $schedule_disabled = "disabled=\"disabled\"";
     $display_auto = "style=\"display:none\"";
   }
   // vacation enabled checkbox
@@ -127,17 +130,17 @@ function html_vacation_form($usr_q, $vacation, $field="") {
     $enabled_checked = " " ;
   }
   // hour begin
-  $dis_hour_b = "<select name=\"sel_time_begin\" style=\"width:4em;\">";
+  $dis_hour_b = "<select $schedule_disabled name=\"sel_time_begin\" style=\"width:4em;\">";
   for ($i=$ccalendar_first_hour; $i<$ccalendar_last_hour; $i++) {
     $current_hour = substr("0$i",-2,2); 
-    if ($current_hour == $hourbegin) {
+    if ($current_hour == $vacation_datebegin->getHour()) {
       $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
     } else {
       $dis_hour_b .= "<option value=\"$current_hour\">$current_hour</option>";
     }
   }
   $dis_hour_b .= "</select>";  
-  $dis_min_b = "<select name=\"sel_min_begin\" style=\"width:4em;\">";
+  $dis_min_b = "<select $schedule_disabled name=\"sel_min_begin\" style=\"width:4em;\">";
   if ($ccalendar_hour_fraction <= 60 && $ccalendar_hour_fraction > 0) {
     $hour_fraction = $ccalendar_hour_fraction;
   } else {
@@ -146,7 +149,7 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   $step = 60 / $hour_fraction;
   for ($i=$hour_fraction; $i>=1; $i--) {
     $current_min = substr("0".round((60 - ($step*$i))),-2);
-    if ($current_min  == $minbegin) {
+    if ($current_min  == $vacation_datebegin->getMinute()) {
       $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     } else {
       $dis_min_b .= "<option value=\"$current_min\">$current_min</option>";
@@ -155,20 +158,20 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   $dis_min_b .= "</select>";
 
   // hour end
-  $dis_hour_e = "<select name=\"sel_time_end\" style=\"width:4em;\">";
+  $dis_hour_e = "<select $schedule_disabled name=\"sel_time_end\" style=\"width:4em;\">";
   for ($i=$ccalendar_first_hour; $i<=$ccalendar_last_hour; $i++) {
     $current_hour = substr("0$i",-2,2); 
-    if ($current_hour == $hourend) {
+    if ($current_hour == $vacation_dateend->getHour()) {
       $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
     } else {
       $dis_hour_e .= "<option value=\"$current_hour\">$current_hour</option>";
     }
   }
   $dis_hour_e .= "</select>";  
-  $dis_min_e = "<select name=\"sel_min_end\" style=\"width:4em;\">";
+  $dis_min_e = "<select $schedule_disabled name=\"sel_min_end\" style=\"width:4em;\">";
   for ($i=$hour_fraction; $i>=1; $i--) {
     $current_min = substr("0".round((60 - ($step*$i))),-2);
-    if ($current_min  == $minend) {
+    if ($current_min  == $vacation_dateend->getMinute()) {
       $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     } else {
       $dis_min_e .= "<option value=\"$current_min\">$current_min</option>";
@@ -185,11 +188,19 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   <script type=\"text/javascript\">
     function showHideVacationDate(elt) {
       if(elt.checked) {
+        $('vacation_datebegin').getElements('input').setProperty('disabled',false);
+        $('vacation_datebegin').getElements('select').setProperty('disabled',false);
+        $('vacation_dateend').getElements('input').setProperty('disabled',false);
+        $('vacation_dateend').getElements('select').setProperty('disabled',false);        
         $('vacation_datebegin').setStyle('display','');
         $('vacation_dateend').setStyle('display','');
       } else {
         $('vacation_datebegin').setStyle('display','none');
         $('vacation_dateend').setStyle('display','none');
+        $('vacation_datebegin').getElements('input').setProperty('disabled',true);
+        $('vacation_datebegin').getElements('select').setProperty('disabled',true);
+        $('vacation_dateend').getElements('input').setProperty('disabled',true);
+        $('vacation_dateend').getElements('select').setProperty('disabled',true);        
       }
     }
   </script>
@@ -203,20 +214,20 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   </tr>
   <tr >
     <th>$l_enable_auto_vacation</th>
-    <td><input type=\"checkbox\" name=\"cba_auto_enable\" $auto_enable value=\"1\" 
+    <td><input type=\"checkbox\" name=\"cba_auto_enable\" $schedule_enable value=\"1\" 
     onchange=\"showHideVacationDate(this);\"
   </tr>
   <tr $display_auto id=\"vacation_datebegin\">
     <th class=\"$class[vacation_datebegin]\">$l_vacation_datebegin</th>
     <td>
-      <input type=\"text\" name=\"tf_vacation_datebegin\" value=\"$vacation_datebegin\" class=\"datePicker\"/>
+    <input $schedule_disabled type=\"text\" name=\"tf_vacation_datebegin\" value=\"".$vacation_datebegin->getInputDate()."\" class=\"datePicker\"/>
       <span id=\"hour_begin\" style=\"$style\" class=\"NW\">$l_hour : $dis_hour_b : $dis_min_b</span>
     </td>
   </tr>
   <tr $display_auto id=\"vacation_dateend\">
     <th class=\"$class[vacation_datebegin]\">$l_vacation_dateend</th>
     <td>
-      <input type=\"text\" name=\"tf_vacation_dateend\" value=\"$vacation_dateend\" class=\"datePicker\"/>
+      <input $schedule_disabled type=\"text\" name=\"tf_vacation_dateend\" value=\"".$vacation_dateend->getInputDate()."\" class=\"datePicker\"/>
       <span id=\"hour_end\" style=\"$style\" class=\"NW\">$l_hour : $dis_hour_e : $dis_min_e</span>
     </td>
   </tr>

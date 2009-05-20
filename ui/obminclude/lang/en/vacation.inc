@@ -12,6 +12,7 @@ $l_vacation = "Vacation" ;
 $l_vacation_enabled = "Vacation status" ;
 $l_vacation_message = "Vacation message";
 $l_enable_vacation = "Activate my vacation message" ;
+$l_enable_auto_vacation = "Schedule my vacation activation" ;
 $l_vacation_datebegin = "Du";
 $l_vacation_dateend = "Au";
 

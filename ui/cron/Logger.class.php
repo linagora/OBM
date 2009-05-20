@@ -94,23 +94,25 @@ class Logger {
 
 function errorHandler($code, $message, $file, $line) {
     global $logger,$job;
-    /* Map the PHP error to a Log priority. */
-    switch ($code) {
-    case E_WARNING:
-      Logger::log("$message in $file at $line",L_WARN, $file);
-      break;
-    case E_ERROR:
-      Logger::log("$message in $file at $line",L_CRITICAL, $file);
-      break;
-    case E_NOTICE:
-      Logger::log("$message in $file at $line", L_CORE,$file);
-      break;     
-    case E_STRICT:
-      Logger::log("$message in $file at $line", L_DEBUG, $file);
+    if(error_reporting() & $code === $code)  {
+      /* Map the PHP error to a Log priority. */
+      switch ($code) {
+      case E_WARNING:
+        Logger::log("$message in $file at $line",L_WARN, $file);
         break;
-    default:
-      Logger::log("$message in $file at $line", L_WARN, $file);
-      break;
+      case E_ERROR:
+        Logger::log("$message in $file at $line",L_CRITICAL, $file);
+        break;
+      case E_NOTICE:
+        Logger::log("$message in $file at $line", L_CORE,$file);
+        break;     
+      case E_STRICT:
+        Logger::log("$message in $file at $line", L_DEBUG, $file);
+          break;
+      default:
+        Logger::log("$message in $file at $line", L_WARN, $file);
+        break;
+      }
     }
 }
 

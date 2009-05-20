@@ -1629,7 +1629,7 @@ function of_userdata_query_search($uentity, $params, $table='') {
       if (($cat != $c_all) && ($cat != $c_none) && ($cat != '')) {
 	$where_cat_user = '';
 	$entent = "${entitytablefield}entity";
-	$join_cat_user .= " LEFT JOIN ${uentity}Entity ON ${entitytablefield}_id=${entent}_${entitytablefield}_id
+	$join_cat_user .= "
           LEFT JOIN CategoryLink AS $tlink
           ON ${entent}_entity_id=$tlink.categorylink_entity_id
           AND $tlink.categorylink_category='$cat_name'";
@@ -1641,7 +1641,7 @@ function of_userdata_query_search($uentity, $params, $table='') {
 	$and = 'AND';
       } else if ($cat == $c_none) {
 	$entent = "${entitytablefield}entity";
-	$join_cat_user .= " LEFT JOIN ${uentity}Entity ON ${entitytablefield}_id=${entent}_${entitytablefield}_id
+	$join_cat_user .= "
           LEFT JOIN CategoryLink AS $tlink
           ON ${entent}_entity_id=$tlink.categorylink_entity_id
           AND $tlink.categorylink_category='$cat_name'";

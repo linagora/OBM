@@ -33,6 +33,7 @@ class VacationCronJob extends CronJob{
    */
   function mustExecute($date) {
     global $cgp_use;
+    return true;
     if ($cgp_use["service"]["mail"]) {
       $min = date('i');
       return ($min%15 === 0);
@@ -60,10 +61,11 @@ class VacationCronJob extends CronJob{
    */
   function execute($date) {
     $delta = $this->jobDelta - 1;
-    $end_time = $date + $this->jobDelta;
-    $this->logger->debug('Getting vacation to enable before '.date('Y-m-d H:i:s',$end_time));
+    $end_time = new Of_Date($date + $this->jobDelta);
+    $this->logger->debug('Getting vacation to enable before '.$end_time->getIso());
     $enable = $this->getVacationToInsert($end_time);
-    $this->logger->debug('Getting vacation to disable before '.date('Y-m-d H:i:s',$end_time));
+    $this->logger->debug('Getting vacation to disable before '.$end_time->getIso());
+    $date = new Of_Date($date);
     $disable = $this->getVacationToRemove($date);
     $intersec = array_intersect(array_keys($enable),array_keys($disable));
     if(count($intersec) != 0) {
@@ -88,19 +90,18 @@ class VacationCronJob extends CronJob{
     $vacation = array();
     $obm_q = new DB_OBM;
     $db_type = $obm_q->type;
-    $vacation_datebegin = sql_date_format($db_type,"userobm_vacation_datebegin");
 
     $obm_q = new DB_OBM;
-    $query = "SELECT userobm_id, userobm_login, userobm_domain_id FROM UserObm
-      WHERE userobm_vacation_enable = 0 AND
-      $vacation_datebegin IS NOT NULL AND
-      $vacation_datebegin <= $date";
+    $query = "SELECT userobm_id, userobm_login, userobm_domain_id, userobm_vacation_enable FROM UserObm
+      WHERE  userobm_mail_perms = 1 AND userobm_vacation_enable = 0 AND
+      userobm_vacation_datebegin IS NOT NULL AND
+      userobm_vacation_datebegin <= '$date'";
 
     $this->logger->core($query);
     $obm_q->query($query);
     $this->logger->info($obm_q->nf()." vacations to enable");
     while($obm_q->next_record()) {
-      $vacation[$obm_q->f('userobm_id')] = array("login" => $obm_q->f('userobm_login'), "domain" => $obm_q->f('userobm_domain_id'));
+      $vacation[$obm_q->f('userobm_id')] = array("login" => $obm_q->f('userobm_login'), "domain" => $obm_q->f('userobm_domain_id'), "enable" => $obm_q->f('userobm_vacation_enable'));
     }
     $this->logger->info('List of vacation to enable : '.implode(',', array_keys($vacation)));
     return $vacation;
@@ -120,14 +121,13 @@ class VacationCronJob extends CronJob{
     $vacation_dateend = sql_date_format($db_type,"userobm_vacation_dateend");
 
     $obm_q = new DB_OBM;
-    $query = "SELECT userobm_id, userobm_login, userobm_domain_id FROM UserObm
-      WHERE  $vacation_dateend <= $date AND $vacation_dateend IS NOT NULL";
-
+    $query = "SELECT userobm_id, userobm_login, userobm_domain_id, userobm_vacation_enable FROM UserObm
+      WHERE userobm_mail_perms = 1 AND userobm_vacation_dateend <= '$date' AND userobm_vacation_dateend IS NOT NULL";
     $this->logger->core($query);
     $obm_q->query($query);
     $this->logger->info($obm_q->nf()." vacations to disable");
     while($obm_q->next_record()) {
-      $vacation[$obm_q->f('userobm_id')] = array("login" => $obm_q->f('userobm_login'), "domain" => $obm_q->f('userobm_domain_id'));
+      $vacation[$obm_q->f('userobm_id')] = array("login" => $obm_q->f('userobm_login'), "domain" => $obm_q->f('userobm_domain_id'), "enable" => $obm_q->f('userobm_vacation_enable'));
     }
     $this->logger->info('List of vacation to disable : '.implode(',', array_keys($vacation)));
     return $vacation;
@@ -181,8 +181,17 @@ class VacationCronJob extends CronJob{
         WHERE userobm_id IN (".implode(',',array_keys($users)).")";
       $this->logger->core($query);
       $obm_q->query($query);      
+      $disable = array();
+      foreach ($users as $id => $user) {
+        if($user['enable'] == 0) {
+          $this->logger->warn("User $login domain : $domain vacation is set to be disabled but is already disabled. Noting will be done.");
+        } else {
+          $disable[$id] = $user;
+        }
+      }
       $this->logger->debug("Disabling ".count($users)."vacations in sieve");
-      $this->updateVacation($users);
+      if(count($disable) > 0)
+        $this->updateVacation($disable);
     }    
   }
   /**

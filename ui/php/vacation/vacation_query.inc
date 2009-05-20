@@ -18,13 +18,10 @@ function run_query_vacation_detail($u_id) {
 
   $obm_q = new DB_OBM;    
   $db_type = $obm_q->type;
-
-  $vacation_datebegin = sql_date_format($db_type, 'UserObm.userobm_vacation_datebegin', 'vacation_datebegin');
-  $vacation_dateend = sql_date_format($db_type, 'UserObm.userobm_vacation_dateend', 'vacation_dateend');
   $u_id = sql_parse_id($u_id, true);
   $query = "SELECT 
-    $vacation_datebegin,
-    $vacation_dateend , 
+    userobm_vacation_datebegin,
+    userobm_vacation_dateend, 
     userobm_id,
     userobm_domain_id,
     userobm_login,
@@ -72,8 +69,8 @@ function run_query_vacation_update($params, $u_id) {
   }    
 
   
-  $vacation_datebegin = ($user['vacation_datebegin'] ? "'$user[vacation_datebegin]'" : 'null');
-  $vacation_dateend = ($user['vacation_dateend'] ? "'$user[vacation_dateend]'" : 'null');  
+  $vacation_datebegin = ($params['vacation_datebegin'] ? "'$params[vacation_datebegin]'" : 'null');
+  $vacation_dateend = ($params['vacation_dateend'] ? "'$params[vacation_dateend]'" : 'null');  
 
   $enabled = sql_parse_int($params["enabled"]);
   $message_update = ", userobm_vacation_message='".addslashes($params["message"])."'";
@@ -133,7 +130,7 @@ function check_vacation_data_form($params) {
 
   // le message doit être non-vide si le renvoi est activé
   
-  if ($params["enabled"] == 0) {
+  if ($params["enabled"] == 0 && $params['auto_enable'] == 0) {
     return true;
   }
 

@@ -233,10 +233,10 @@ function run_query_contact_search($contact) {
   // if $join_userdata after join_comp, query is really slow (30s) with only
   // criteria : contactcategory1 selected
   $left_join = "
+    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id 
     $join_userdata
     LEFT JOIN Kind ON contact_kind_id = kind_id
     LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
-    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id 
     LEFT JOIN Address ON address_entity_id = contactentity_entity_id  AND address_label like 'PREF;%'
     LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
     LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label like 'PREF;%'

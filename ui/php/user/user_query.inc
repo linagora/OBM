@@ -129,8 +129,6 @@ function run_query_user_search($user) {
           OR userobm_email like '$email_name@$domain%\r\n%' OR userobm_email like '%\r\n$email_name@$domain%\r\n%' OR userobm_email like '%\r\n$email_name@$domain%'
         )
       )";
-    $join_domain =  "INNER JOIN UserEntity ON userentity_user_id = userobm_id
-                      INNER JOIN Domain ON userobm_domain_id = domain_id";
   }
 
   // If a phone number indication has been specified, get it
@@ -240,7 +238,7 @@ function run_query_user_search($user) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $join_domain $whereq");
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -317,8 +315,6 @@ function run_query_user_detail($p_id) {
   $datebegin = sql_date_format($db_type, 'UserObm.userobm_datebegin', 'datebegin');
   $dateexp = sql_date_format($db_type, 'UserObm.userobm_account_dateexp', 'dateexp');
   $lastaccess = sql_date_format($db_type, 'UserObm.userobm_timelastaccess', 'userobm_timelastaccess');
-  $vacation_datebegin = sql_date_format($db_type, 'UserObm.userobm_vacation_datebegin', 'userobm_vacation_datebegin');
-  $vacation_dateend = sql_date_format($db_type, 'UserObm.userobm_vacation_dateend', 'userobm_vacation_dateend');
   $multidomain = sql_multidomain('UserObm.userobm');
   $p_id = sql_parse_id($p_id, true);	
 
@@ -328,8 +324,6 @@ function run_query_user_detail($p_id) {
       $datebegin,
       $dateexp,
       $lastaccess,
-      $vacation_datebegin,
-      $vacation_dateend,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
       group_name,
