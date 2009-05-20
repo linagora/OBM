@@ -1179,6 +1179,7 @@ sub setLdapSambaPasswd {
 
 sub updateLinkedEntities {
     my $self = shift;
+    my( $updateType ) = @_;
 
     if( $self->{'entityDesc'}->{'userobm_login_current'} && ($self->{'entityDesc'}->{'userobm_login_new'} ne $self->{'entityDesc'}->{'userobm_login_current'}) ) {
         $self->_log( 'le login a été modifié, les entités liées doivent être mises à jour', 3 );

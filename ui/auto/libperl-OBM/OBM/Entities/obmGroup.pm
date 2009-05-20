@@ -519,7 +519,7 @@ sub updateLinkedEntities {
         return 1;
     }
 
-    if( ($updateType eq 'UPDATE_LINKS') && ($self->{'entityDesc'}->{'group_gid'} == 512) ) {
+    if( ($updateType =~ /^(UPDATE_ALL|UPDATE_LINKS)$/) && ($self->{'entityDesc'}->{'group_gid'} == 512) ) {
         $self->_log( 'les membres de '.$self->getDescription().' ont été mis à jour, ils doivent être mis à jour', 3 );
         return 1;
     }

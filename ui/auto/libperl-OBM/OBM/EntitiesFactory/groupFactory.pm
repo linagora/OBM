@@ -435,7 +435,7 @@ sub _loadLinkedEntitiesFactories {
     if( my $factoryProgramming = $self->_loadParentGroups() ) {
         $self->_enqueueLinkedEntitiesFactory( $factoryProgramming );
     }
-    if( ($self->{'updateType'} eq 'UPDATE_LINKS') && (my $factoryProgramming = $self->_loadMembers()) ) {
+    if( ($self->{'updateType'} =~ /^(UPDATE_ALL|UPDATE_LINKS)$/) && (my $factoryProgramming = $self->_loadMembers()) ) {
         $self->_enqueueLinkedEntitiesFactory( $factoryProgramming );
     }
 
