@@ -787,7 +787,7 @@ function run_query_tools_set_group_scope(&$userdata) {
   $db_type = $obm_qm->type;
   $like = sql_casei_like($db_type); 
 
-  $query = "SELECT UGroup.group_id FROM UGroup INNER JOIN P_UGroup ON P_UGroup.group_id = UGroup.group_id 
+  $query = "SELECT UGroup.group_id FROM UGroup LEFT JOIN P_UGroup ON P_UGroup.group_id = UGroup.group_id 
     WHERE P_UGroup.group_contacts != UGroup.group_contacts 
     OR (P_UGroup.group_contacts IS NULL AND UGroup.group_contacts IS NOT NULL) 
     OR  (UGroup.group_contacts IS NULL AND P_UGroup.group_contacts IS NOT NULL)";
