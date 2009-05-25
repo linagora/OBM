@@ -1625,8 +1625,9 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $dis_hour_b = "<select $schedule_disabled name=\"sel_time_begin\" style=\"width:4em;\">";
     for ($i=$ccalendar_first_hour; $i<$ccalendar_last_hour; $i++) {
       $current_hour = substr("0$i",-2,2); 
-      if ($current_hour == $vacation_datebegin->getHour()) {
+      if ($vacation_datebegin!=null && $current_hour == $vacation_datebegin->getHour()) {
         $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+        $vacation_begin_date_picker = $vacation_datebegin->getInputDate();
       } else {
         $dis_hour_b .= "<option value=\"$current_hour\">$current_hour</option>";
       }
@@ -1641,7 +1642,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $step = 60 / $hour_fraction;
     for ($i=$hour_fraction; $i>=1; $i--) {
       $current_min = substr('0'.round((60 - ($step*$i))),-2);
-      if ($current_min  == $vacation_datebegin->getMinute()) {
+      if ($vacation_datebegin!=null && $current_min  == $vacation_datebegin->getMinute()) {
         $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
       } else {
         $dis_min_b .= "<option value=\"$current_min\">$current_min</option>";
@@ -1653,8 +1654,9 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $dis_hour_e = "<select $schedule_disabled name=\"sel_time_end\" style=\"width:4em;\">";
     for ($i=$ccalendar_first_hour; $i<=$ccalendar_last_hour; $i++) {
       $current_hour = substr("0$i",-2,2); 
-      if ($current_hour == $vacation_dateend->getHour()) {
+      if ($vacation_dateend!=null && $current_hour == $vacation_dateend->getHour()) {
         $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
+        $vacation_end_date_picker = $vacation_dateend->getInputDate();
       } else {
         $dis_hour_e .= "<option value=\"$current_hour\">$current_hour</option>";
       }
@@ -1663,7 +1665,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $dis_min_e = "<select $schedule_disabled name=\"sel_min_end\" style=\"width:4em;\">";
     for ($i=$hour_fraction; $i>=1; $i--) {
       $current_min = substr('0'.round((60 - ($step*$i))),-2);
-      if ($current_min  == $vacation_dateend->getMinute()) {
+      if ($vacation_dateend!=null && $current_min  == $vacation_dateend->getMinute()) {
         $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
       } else {
         $dis_min_e .= "<option value=\"$current_min\">$current_min</option>";
@@ -1708,14 +1710,14 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <tr $display_auto id=\"vacation_datebegin\">
     <th class=\"$class[vacation_datebegin]\">$l_vacation_datebegin</th>
     <td>
-      <input $schedule_disabled type=\"text\" name=\"tf_vacation_datebegin\" value=\"".$vacation_datebegin->getInputDate()."\" class=\"datePicker\"/>
+      <input $schedule_disabled type=\"text\" name=\"tf_vacation_datebegin\" value=\"$vacation_begin_date_picker\" class=\"datePicker\"/>
       <span id=\"hour_begin\" style=\"$style\" class=\"NW\">$l_hour : $dis_hour_b : $dis_min_b</span>
     </td>
   </tr>
   <tr $display_auto id=\"vacation_dateend\">
     <th class=\"$class[vacation_dateend]\">$l_vacation_dateend</th>
     <td>
-      <input $schedule_disabled type=\"text\" name=\"tf_vacation_dateend\" value=\"".$vacation_dateend->getInputDate()."\" class=\"datePicker\"/>
+      <input $schedule_disabled type=\"text\" name=\"tf_vacation_dateend\" value=\"$vacation_end_date_picker\" class=\"datePicker\"/>
       <span id=\"hour_end\" style=\"$style\" class=\"NW\">$l_hour : $dis_hour_e : $dis_min_e</span>
     </td>
   </tr>
