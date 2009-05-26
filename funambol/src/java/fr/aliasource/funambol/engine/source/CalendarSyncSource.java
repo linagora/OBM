@@ -68,7 +68,9 @@ public class CalendarSyncSource extends ObmSyncSource {
 		try {
 			com.funambol.common.pim.calendar.Calendar calendar = getFoundationFromSyncItem(syncItem);
 
-			created = manager.addItem(calendar, getSourceType());
+			if (calendar != null) {
+				created = manager.addItem(calendar, getSourceType());
+			}
 		} catch (OBMException e) {
 			throw new SyncSourceException(e);
 		}
