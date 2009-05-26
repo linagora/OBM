@@ -1,4 +1,4 @@
-package org.obm.caldav.server.propertyHandler;
+package org.obm.caldav.server.propertyHandler.impl;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.CalDavUtils;
 import org.w3c.dom.CDATASection;
@@ -14,9 +15,9 @@ import org.w3c.dom.Element;
 
 public class CalendarData extends DavPropertyHandler {
 
-	public CalendarData(IProxy proxy) {
+	/*public CalendarData(IProxy proxy) {
 		super(proxy);
-	}
+	}*/
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req) {

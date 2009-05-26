@@ -16,6 +16,7 @@
 
 package org.obm.caldav.obmsync.provider;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -56,5 +57,5 @@ public interface ICalendarProvider {
 	
 	Set<CalendarInfo> getListCalendars(AccessToken token) throws ServerFault, AuthFault ;
 	
-	List<Event> getAllEvent(AccessToken token, String calendar) throws ServerFault, AuthFault;
+	Set<String> getAllEvent(AccessToken token, String calendar) throws ServerFault, AuthFault;
 }

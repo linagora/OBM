@@ -159,6 +159,19 @@ public final class DOMUtils {
 		NodeList list = root.getElementsByTagName(elementName);
 		return (Element) list.item(0);
 	}
+	
+	/**
+	 * Renvoie une élément qui doit être unique dans le document.
+	 * 
+	 * @param root
+	 * @param elementName
+	 * @param elementNameSpace
+	 * @return
+	 */
+	public static Element getUniqueElement(Element root, String elementName, String elementNameSpace) {
+		NodeList list = root.getElementsByTagNameNS(elementNameSpace,elementName);
+		return (Element) list.item(0);
+	}
 
 	public static Element findElementWithUniqueAttribute(Element root,
 			String elementName, String attribute, String attributeValue) {
@@ -272,4 +285,5 @@ public final class DOMUtils {
 		}
 		return ret;
 	}
+	
 }

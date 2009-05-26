@@ -1,8 +1,9 @@
-package org.obm.caldav.server.propertyHandler;
+package org.obm.caldav.server.propertyHandler.impl;
 
 
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
@@ -23,12 +24,7 @@ import org.w3c.dom.Element;
  * @author adrienp
  *
  */
-public class DOwner extends DavPropertyHandler {
-
-	public DOwner(IProxy proxy) {
-		super(proxy);
-		// TODO Auto-generated constructor stub
-	}
+public class DOwner extends DavPropertyHandler{
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req) {

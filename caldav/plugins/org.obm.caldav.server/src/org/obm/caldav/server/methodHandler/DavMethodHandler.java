@@ -26,7 +26,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -37,7 +36,7 @@ import org.w3c.dom.NodeList;
 public abstract class DavMethodHandler {
 
 	protected Log logger = LogFactory.getLog(getClass());
-	protected Map<String,DavPropertyHandler> propertiesHandler;
+	
 	
 	protected IProxy proxy;
 	

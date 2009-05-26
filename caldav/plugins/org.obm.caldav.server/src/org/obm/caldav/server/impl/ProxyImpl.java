@@ -16,7 +16,6 @@ public class ProxyImpl implements IProxy {
 		initService();
 	}
 	
-	
 	private void initService() {
 		eventService = new EventService(token.getLoginAtDomain(),token.getPassword());
 	}

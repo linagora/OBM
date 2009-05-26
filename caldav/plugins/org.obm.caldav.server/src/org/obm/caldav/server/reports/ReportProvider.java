@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
@@ -35,6 +36,6 @@ public abstract class ReportProvider {
 		
 	}
 	
-	public abstract void process(Token token, DavRequest req, HttpServletResponse resp, Map<String,DavPropertyHandler> propertiesHandler, Set<String> propList);
+	public abstract void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp, Set<String> propList);
 
 }

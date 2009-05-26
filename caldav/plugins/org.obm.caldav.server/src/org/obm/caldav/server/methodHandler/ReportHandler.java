@@ -23,9 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.propertyHandler.CalendarData;
-import org.obm.caldav.server.propertyHandler.DGetETag;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
+import org.obm.caldav.server.propertyHandler.impl.CalendarData;
 import org.obm.caldav.server.reports.CalendarMultiGet;
 import org.obm.caldav.server.reports.CalendarQuery;
 import org.obm.caldav.server.reports.PrincipalPropertySearch;
@@ -37,9 +36,11 @@ import org.w3c.dom.Element;
 public class ReportHandler extends DavMethodHandler {
 
 	Map<String, ReportProvider> providers;
-
+	private Map<String,DavPropertyHandler> propertiesHandler;
+	
 	public ReportHandler(IProxy proxy) {
 		super(proxy);
+		
 		providers = new HashMap<String, ReportProvider>();
 		providers.put("D:principal-property-search",
 				new PrincipalPropertySearch());
@@ -47,8 +48,9 @@ public class ReportHandler extends DavMethodHandler {
 		providers.put("calendar-multiget", new CalendarMultiGet());
 		
 		propertiesHandler = new HashMap<String, DavPropertyHandler>();
-		propertiesHandler.put("D:getetag", new DGetETag(proxy));
-		propertiesHandler.put("calendar-data", new CalendarData(proxy));
+		//FIXME
+		//propertiesHandler.put("D:getetag", new DGetETag());
+		propertiesHandler.put("calendar-data", new CalendarData());
 	}
 
 	@Override
@@ -59,7 +61,7 @@ public class ReportHandler extends DavMethodHandler {
 
 		ReportProvider rp = providers.get(reportKind);
 		if (rp != null) {
-			rp.process(token, req, resp, propertiesHandler, getPropList(d));
+			rp.process(token, this.proxy, req, resp, getPropList(d));
 		} else {
 			logger.error("No report provider for report kind '" + reportKind
 					+ "'");

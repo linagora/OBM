@@ -19,6 +19,7 @@ package org.obm.caldav.obmsync.service;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.obm.sync.calendar.Event;
 
@@ -39,5 +40,6 @@ public interface IEventService {
 	String getParticipationState(Event event) throws Exception ;
 	void updateParticipationState(Event event, String going) throws Exception ;
 	String getUserEmail() throws Exception;
-	List<Event> getAllEvent(String calendar) throws Exception;
+	Set<String> getAllEvent(String calendar) throws Exception;
 }
+

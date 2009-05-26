@@ -22,9 +22,10 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.impl.PropertyListBuilder;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
+import org.obm.caldav.server.resultBuilder.PropertyListBuilder;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -35,9 +36,8 @@ import org.w3c.dom.NodeList;
 public class PrincipalPropertySearch extends ReportProvider {
 
 	@Override
-	public void process(Token token, DavRequest req, HttpServletResponse resp,
-			Map<String, DavPropertyHandler> propertiesHandler,
-			Set<String> propList) {
+	public void process(Token token, IProxy proxy, DavRequest req,
+			HttpServletResponse resp, Set<String> propList) {
 		//FIXME USE proplist
 		logger.info("////////////////////////////////////////////////////");
 		logger.info("FIXME");
@@ -60,7 +60,8 @@ public class PrincipalPropertySearch extends ReportProvider {
 			}
 		}
 
-		Document ret = new PropertyListBuilder().build(token, req,
+		//FIXME
+		/*Document ret = new PropertyListBuilder().build(token, req,
 				propertiesHandler, toLoad);
 
 		try {
@@ -71,6 +72,6 @@ public class PrincipalPropertySearch extends ReportProvider {
 			DOMUtils.serialise(ret, resp.getOutputStream());
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
-		}
+		}*/
 	}
 }

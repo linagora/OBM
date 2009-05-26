@@ -1,7 +1,8 @@
-package org.obm.caldav.server.propertyHandler;
+package org.obm.caldav.server.propertyHandler.impl;
 
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
@@ -42,16 +43,11 @@ import org.w3c.dom.Element;
  * @author adrienp
  *
  */
-public class CCalendarHomeSet extends DavPropertyHandler {
-
-	public CCalendarHomeSet(IProxy proxy) {
-		super(proxy);
-	}
+public class CCalendarHomeSet extends DavPropertyHandler{
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req) {
 		DOMUtils.createElementAndText(prop, "D:href", "/"
 				+ t.getLoginAtDomain() + "/calendars/");
 	}
-
 }

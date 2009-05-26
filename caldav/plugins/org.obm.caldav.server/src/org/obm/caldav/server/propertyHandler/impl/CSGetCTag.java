@@ -1,10 +1,11 @@
-package org.obm.caldav.server.propertyHandler;
+package org.obm.caldav.server.propertyHandler.impl;
 
 
 import java.util.Date;
 
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.w3c.dom.Element;
 
@@ -45,15 +46,8 @@ import org.w3c.dom.Element;
  */
 public class CSGetCTag extends DavPropertyHandler {
 
-	public CSGetCTag(IProxy proxy) {
-		super(proxy);
-		// TODO Auto-generated constructor stub
-	}
-
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req) {
-		//TODO 
 		prop.setTextContent(new Date().getTime() + "");
 	}
-
 }
