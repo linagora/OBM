@@ -4080,7 +4080,7 @@ function genUniqueExtEventId() {
   $max_len = 84;
   $event_ext_id = '';
   while(strlen($event_ext_id) < $max_len) {
-    $event_ext_id .= dechex(rand()%256);
+    $event_ext_id .= dechex(rand()%16);
   }
   return $version.'-'.$event_ext_id.'@'.$domain;
 }
