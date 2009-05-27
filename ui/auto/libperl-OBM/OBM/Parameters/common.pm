@@ -152,7 +152,7 @@ $ldapTls = $cfgFile->val( 'automate', 'ldapTls' );
 if( $ldapServer =~ /^ldaps:/ ) {
     $ldapTls = 'none';
 }
-if( $ldapTls !~ /^(none|may|encrypt)$/ ) {
+if( !defined($ldapTls) || ($ldapTls !~ /^(none|may|encrypt)$/) ) {
     $ldapTls = 'may';
 }
 
