@@ -63,7 +63,9 @@ sub _getServerDesc {
     }
 
     require OBM::Parameters::common;
-    $self->{'host_ip'} = $OBM::Parameters::common::ldapServer;
+    $self->{'ldapUri'} = $OBM::Parameters::common::ldapServer;
+    $self->{'ldapTls'} = $OBM::Parameters::common::ldapTls;
+
     $self->{'ldap_admin_login'} = $OBM::Parameters::common::ldapAdminLogin;
     if( !($self->{'ldap_admin_dn'} = $self->_getAdminDn()) ) {
         $self->_log( 'obtention du DN de l\'administrateur LDAP impossible', 1 );
@@ -71,7 +73,7 @@ sub _getServerDesc {
     }
 
 
-    $self->{'host_description'} = $OBM::Parameters::common::ldapDescription;
+    $self->{'ldapDescription'} = $OBM::Parameters::common::ldapDescription;
 
     require OBM::Tools::obmDbHandler;
     my $dbHandler = OBM::Tools::obmDbHandler->instance();
@@ -196,7 +198,7 @@ sub _connect {
 
     my @tempo = ( 1, 3, 5, 10, 20, 30 );
     require Net::LDAP;
-    while( !($self->{'ldapServerConn'} = Net::LDAP->new( $self->{'host_ip'}, debug => '0', timeout => '60', version => '3' )) ) {
+    while( !($self->{'ldapServerConn'} = Net::LDAP->new( $self->{'ldapUri'}, debug => '0', timeout => '60', version => '3' )) ) {
         $self->_log( 'échec de connexion au '.$self->getDescription(), 0 );
 
         my $tempo = shift(@tempo);
@@ -213,6 +215,25 @@ sub _connect {
         $self->_log( $self->getDescription().' désactivé car injoignable ', 0 );
         $self->_setDeadStatus();
         return 1;
+    }
+
+    use Net::LDAP qw(LDAP_CONFIDENTIALITY_REQUIRED) ;
+    if( $self->{'ldapTls'} =~ /^(may|encrypt)$/ ) {
+        my $error = $self->{'ldapServerConn'}->start_tls( verify => 'none' );
+
+        if( $error->code && ($self->{'ldapTls'} eq 'encrypt') ) {
+            $self->_log( 'erreur fatale au start TLS : '.$error->error, 0 );
+            $self->_log( 'l\'automate (\'ldapTls\'='.$self->{'ldapTls'}.') nécessite une connexion TLS', 0 );
+            $self->_log( $self->getDescription().' désactivé', 0 );
+            $self->_setDeadStatus();
+            return 1;
+        }
+
+        if( $error->code() && ($self->{'ldapTls'} eq 'may') ) {
+            $self->_log( 'erreur au start TLS : '.$error->error, 0 );
+            $self->_log( 'TLS facultatif (\'ldapTls\'='.$self->{'ldapTls'}.'), erreur non fatale', 0 );
+            $self->{'ldapTls'} = 'none';
+        }
     }
 
     my $ldapLogin = $self->{'ldap_admin_login'};
@@ -237,12 +258,18 @@ sub _connect {
         if( !$error->code ) {
             $self->_log( 'connexion à l\'annuaire LDAP établie', 2 );
             last;
+	    }elsif( $error->code == LDAP_CONFIDENTIALITY_REQUIRED ) {
+	        $self->_log( 'erreur fatale : start TLS nécessaire pour le serveur LDAP '.$self->getDescription(), 0 );
+            $self->_log( 'l\'automate n\'a pas droit de faire du TLS (\'ldapTls\'='.$self->{'ldapTls'}.')', 0 );
+            $self->_log( $self->getDescription().' désactivé', 0 );
+            $self->_setDeadStatus();
+            return 1;
         }elsif( $error->code ) {
             $self->_log( 'echec de l\'authentification : '.$error->error, 3 );
         }
     }
 
-    if( $error->code ) {
+    if(( $error->code ) && ( $error->code ne LDAP_CONFIDENTIALITY_REQUIRED )) {
         $self->_log( 'echec de l\'authentification : '.$error->error, 0 );
         $self->{'ldapServerConn'} = undef;
     }
@@ -288,4 +315,12 @@ sub resetConn {
     $self->{'deadStatus'} = 0;
 
     return 0;
+}
+
+
+sub _setDeadStatus {
+    my $self = shift;
+
+    $self->{'ldapServerConn'} = undef;
+    return $self->SUPER::_setDeadStatus();
 }

@@ -145,7 +145,12 @@ $ldapAdminLogin = 'ldapadmin';
 # Le serveur LDAP
 $ldapServer = $cfgFile->val( 'automate', 'ldapServer' );
 if( !defined($ldapServer) ) {
-    $ldapServer = "127.0.0.1";
+    $ldapServer = 'ldap://127.0.0.1/';
+}
+# TLS LDAP conn
+$ldapTls = $cfgFile->val( 'automate', 'ldapTls' );
+if( ($ldapServer =~ /^ldaps:/) || ($ldapTls !~ /^(none|may|encrypt)$/) ) {
+    $ldapTls = 'may';
 }
 
 # Racine LDAP de l'arbre gérée pas OBM-Ldap

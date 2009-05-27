@@ -71,6 +71,9 @@ logLevel = 2
 ; LDAP server address
 ldapServer = ldap://localhost
 ;
+; LDAP use TLS [none|may|encrypt]
+ldapTls = may
+;
 ; LDAP Root
 ; Exemple : 'aliasource,local' means that the root DN is: 'dc=aliasource,dc=local' 
 ldapRoot = local
