@@ -149,7 +149,10 @@ if( !defined($ldapServer) ) {
 }
 # TLS LDAP conn
 $ldapTls = $cfgFile->val( 'automate', 'ldapTls' );
-if( ($ldapServer =~ /^ldaps:/) || ($ldapTls !~ /^(none|may|encrypt)$/) ) {
+if( $ldapServer =~ /^ldaps:/ ) {
+    $ldapTls = 'none';
+}
+if( $ldapTls !~ /^(none|may|encrypt)$/ ) {
     $ldapTls = 'may';
 }
 
