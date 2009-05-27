@@ -2,7 +2,7 @@
 
 /* run_query_domain_init_data() */
 require("$obm_root/php/domain/domain_query.inc");
-/* genUniqueExtEventId() */
+/* genUniqueExtEventId() calendar_*_repeatition() */
 require("$obm_root/php/calendar/calendar_query.inc");
 
 class DummyGenerators extends PDO
@@ -21,7 +21,11 @@ class DummyGenerators extends PDO
   var $nb_normal_events_per_user;
   var $nb_reccur_events_per_user;
   var $nb_ext_contact_infos;
+
+  /* Our stuff */
   var $today_date;
+  var $ev_manager;
+  var $available_repeatkind;
 
   public function __construct($obmpath = '.')
   {
@@ -53,7 +57,11 @@ class DummyGenerators extends PDO
     $this->nb_ext_contact_infos = array
     /* 'Email' => 2 will create rand(0,2) mails per contact */
       ('Email' => 2, 'Website' => 1, 'IM' => 1, 'Address' => 2, 'Phone' => 3);
-    $today_date = strftime("%Y-%m-%d", time()-(2*3600));
+
+    /* Our stuff */
+    $this->today_date = strftime("%Y-%m-%d", time()-(2*3600));
+    $this->ev_manager = array( /* user_id => new EventManager(time()), ... */ );
+    $this->available_repeatkind = array('daily', 'weekly', 'monthlybyday', 'monthlybydate', 'yearly');
 
     /* Set debug by default */
     $this->query("UPDATE UserObmPref
@@ -89,14 +97,13 @@ AND userobmpref_user_id IS NULL");
     $res = $this->query("
 SELECT kind_id FROM Kind
 WHERE kind_domain_id = '$this->domain_id'");
-    $kinds = $res->fetchAll(PDO::FETCH_COLUMN);
-    $this->available_kinds = array_values($kinds);
+    $this->available_kinds = $res->fetchAll(PDO::FETCH_COLUMN);
+    unset($res); // Next queries would fail otherwise
 
     $res = $this->query("
 SELECT eventcategory1_id FROM EventCategory1
 WHERE eventcategory1_domain_id = '$this->domain_id'");
-    $cats = $res->fetchAll(PDO::FETCH_COLUMN);
-    $this->available_event_cats = array_values($cats);
+    $this->available_event_cats = $res->fetchAll(PDO::FETCH_COLUMN);
   }
 
   public function genDummyData($nb_users)
@@ -148,18 +155,26 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     $this->createContactsExtInfos($extinfos_eids);
     print "done\n";
 
+    /* Events */
     print "Inserting $nb_users calendars... ";
     $this->createCalendars(clone $users_ids);
     print "done\n";
 
-    $nb_events = $nb_users * $this->nb_normal_events_per_user;
     $users_eids = new IntIterator
-      ( array('start' => $last_user_entity_id - $nb_users,
-              'end'   => $last_user_entity_id) );
-    print "Inserting $this->nb_normal_events_per_user events for each user "
-      ."(total $nb_events)... ";
+      ( array('start' => $last_user_entity_id - $nb_users + 1,
+              'end'   => $last_user_entity_id + 1) );
+    $nb_events = $nb_users * $this->nb_reccur_events_per_user;
+    print "Inserting $this->nb_reccur_events_per_user repeating events "
+      ."for each user (total $nb_events)... ";
     $this->createEvents(clone $users_ids, clone $users_eids,
-                        $this->nb_normal_events_per_user);
+                        $this->nb_reccur_events_per_user, true);
+    print "done\n";
+
+    $nb_events = $nb_users * $this->nb_normal_events_per_user;
+    print "Inserting $this->nb_normal_events_per_user non-repeating events "
+      ."for each user (total $nb_events)... ";
+    $this->createEvents(clone $users_ids, clone $users_eids,
+                        $this->nb_normal_events_per_user, false);
     print "done\n";
   }
   
@@ -209,7 +224,7 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
         break;
       }
       $changing = array
-        ( $uid, "u$uid",                          // sql id, login
+        ( $uid, 'u'.($uid-1),                     // sql id, login
           1000 + $uid, 1000 + $gid,               // uid, gid
           'U'.randomAlphaStr(), randomAlphaStr(), // lastname, firstname
           );
@@ -493,7 +508,8 @@ VALUES (                  '$cid',            '$entity_id')");
     }
   }
 
-  public function createEvents($user_iter, $user_entity_iter, $events_per_user)
+  public function createEvents($user_iter, $user_entity_iter, $events_per_user,
+                               $want_repeat)
   {
     /* Event table */
     $statics = array
@@ -504,17 +520,14 @@ VALUES (                  '$cid',            '$entity_id')");
         'event_origin'                => "'obm-dummyzator'",
         'event_timezone'              => "'Europe/Paris'",
         'event_opacity'               => "'OPAQUE'",
-        'event_repeatkind'            => "'none'",
-        'event_repeatfrequence'       => "'1'",
-        'event_repeatdays'            => "'0000000'",
-        'event_endrepeat'             => "'$this->today_date'",
         'event_properties'            => "'<extended_desc></extended_desc>'"
         );
     $dyna_cols = array
       ( 'event_usercreate', 'event_userupdate', 'event_ext_id', 'event_owner',
         'event_title', 'event_location', 'event_category1_id', 'event_priority',
         'event_privacy', 'event_date', 'event_duration', 'event_allday',
-        'event_description' );
+        'event_description', 'event_repeatfrequence', 'event_endrepeat',
+        'event_repeatkind', 'event_repeatdays' );
     $events = $this->massInsertorStatment('Event', $statics, $dyna_cols);
 
     /* EventLink table */
@@ -535,17 +548,99 @@ VALUES (                  '$cid',            '$entity_id')");
       if($uid === null || $euid === null) {
         break;
       }
-              
-      $date = new Of_Date(time());
-      // Begin one month before today
-      $date->setHour(0)->setMinute(0)->setSecond(0)->subMonth(1);
+      
+      /* For adding repeating events, we go randomly go from 0h to 24h
+         through 5 steps. For example with 100 events to insert, we make
+         100/5 = 20 repeting events, each at the same hour of the day, the
+         repeathour. Then we go back to the beginning date, inc the repeathour
+         with a pause time, and insert another 20 repeating events, and so on. */
+      if($want_repeat) {
+        $repeat_hour = 0;
+        $max_repeat_event_time  = 3; // 
+        $max_repeat_event_pause = 2; // hours
+        $repeat_steps = 5;
+        /* Ensure all the steps will hold in one day  */
+        assert($max_repeat_event_time * $repeat_steps + $max_repeat_event_pause * ($repeat_steps-1) < 24);
+      }
+
+      if(!isset($this->ev_manager[$uid])) {
+        $this->ev_manager[$uid] = new EventManager(time());
+      }
+      $evgen = $this->ev_manager[$uid];
+      $evgen->gotoInitialDate();
+
       for($i = 0 ; $i < $events_per_user ; $i++) {
-        $allday = !rand(0,15);
-        if($allday) {
-          $duration = 3600 * 24;
-          $date->setHour(0)->setMinute(0)->addDay(1);
-        } else {
-          $duration = rand(1,20) * 900; // Random from 1/4h to 5h
+        /* Generate the event properties */
+        if($want_repeat) {
+          $allday = 0;
+          $duration = rand(1,$max_repeat_event_time) * 3600;
+          $repeatkind = $this->available_repeatkind
+              [array_rand($this->available_repeatkind)];
+
+          if(($i % ($events_per_user/$repeat_steps)) == 0) {
+            /* Increase the repeathour if needed */
+            $evgen->gotoInitialDate();
+            if($i > 0) {
+              $repeat_hour += $max_repeat_event_time;
+              $repeat_hour += rand(0,$max_repeat_event_pause);
+            }
+          } else {
+            /* Goto next repeat session free time */
+            $evgen->date = clone $end;
+          }
+          $evgen->date->addDay(rand(1,10)); // little break between 2 events session
+          $end = clone $evgen->date;
+          $end->addSecond($duration);
+
+          switch ($repeatkind) {
+          case 'daily'         :
+            $end->addDay(rand(3, 20));
+            $freq = rand(1,10);
+            break;
+
+          case 'weekly'        :
+            $end->addWeek(rand(1, 5));
+            $days = '';
+            for($d = 0 ; $d < 7 ; $d++) {
+              $days .= rand(0,1);
+            }
+            $freq = rand(1,6);
+            break;
+
+          case 'monthlybyday'  :
+            $end->addMonth(rand(1, 3));
+            $freq = rand(1,2);
+            break;
+
+          case 'monthlybydate' :
+            $end->addMonth(rand(1, 3));
+            $freq = rand(1,2);
+            break;
+
+          case 'yearly'        :
+            $freq = rand(1,2);
+            $end->addYear(rand(1, 2));
+            break;
+          }
+          assert(
+            $evgen->addRepeatEvent($allday, $repeat_hour, $duration, $end, $repeatkind, $freq, $days) === true
+          );
+
+        } else { /* Non repeating event */
+          $days = '0000000';
+          $repeatkind = 'none';
+          $freq = 1;
+          $allday = !rand(0,15);
+          $duration = rand(1,5) * 3600;
+
+          /* Make the time to forward */
+          $evgen->gotoNextFreeTime();
+          $evgen->date->addHour(rand(0,48)); // little break between 2 events
+
+          assert($evgen->addEvent($allday, $duration) === true);
+
+          $end = clone $evgen->date;
+          $end->addSecond($duration); // $duration may have been changed
         }
 
         /* Insert in Event table */
@@ -556,8 +651,12 @@ VALUES (                  '$cid',            '$entity_id')");
             $this->available_event_cats
               [array_rand($this->available_event_cats)], // category1
             rand(1,3), rand(0,1),              // priority, privacy
-            $date, $duration, $allday,         // begin date, duration, allday
-            randomAlphaStr(20)                 // description
+            $evgen->date, $duration,           // begin date, duration
+            $allday, randomAlphaStr(20),       // allday, description
+            $freq,                             // repeat frequence
+            $end,                              // end repeat
+            $repeatkind,                       // repeat kind
+            $days                              // repeat days
             );
         $this->execute_or_die($events, $changing);
 
@@ -567,10 +666,6 @@ VALUES (                  '$cid',            '$entity_id')");
             $euid,rand(0,100) // event id, user's event entity id, percent state
             );
         $this->execute_or_die($evlink, $changing);
-
-        /* Make the time to forward */
-        $date->addSecond($duration);
-        $date->addSecond(rand(0,40) * 900); // Random from 0h to 10h
       }
     }
   }
