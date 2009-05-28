@@ -257,10 +257,6 @@ $cgp_show['module']['document'] = 'com';
 //$l_documentcategory1 = 'Doc cat1';
 //$cgp_user['document']['category']['documentcategory1'] = array('mode'=>'mono');
 
-// AliaSuite : Set if there is a link for Aliamin, Blogs and Aliacms
-//$aliamin_link = 'http://aliamin.aliacom.local/';
-//$aliacms_link = 'http://cms.aliacom.local/';
-//$blogs_link = 'http://blogs.aliacom.local/';
 
 
 </script>
