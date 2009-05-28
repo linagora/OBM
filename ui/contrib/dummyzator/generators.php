@@ -21,6 +21,7 @@ class DummyGenerators extends PDO
   var $nb_normal_events_per_user;
   var $nb_reccur_events_per_user;
   var $nb_ext_contact_infos;
+  var $meeting_events_ratio;
 
   /* Our stuff */
   var $today_date;
@@ -54,6 +55,7 @@ class DummyGenerators extends PDO
     $this->pub_contact_per_user      = 10;
     $this->nb_normal_events_per_user = 100;
     $this->nb_reccur_events_per_user = 100;
+    $this->meeting_events_ratio      = 1/12;
     $this->nb_ext_contact_infos = array
     /* 'Email' => 2 will create rand(0,2) mails per contact */
       ('Email' => 2, 'Website' => 1, 'IM' => 1, 'Address' => 2, 'Phone' => 3);
@@ -147,12 +149,12 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     $this->createAllUsersContacts(1, clone $users_ids, $this->pub_contact_per_user);
     print "done\n";
 
-    $extinfos_eids = new IntIterator
+    $contacts_eids = new IntIterator
      ( array('start' => $next_entity_id,
              'end'   => $this->last_entity_id) );
     print "Randomly inserting informations for all the "
       ."$total_contacts contacts:\n";
-    $this->createContactsExtInfos($extinfos_eids);
+    $this->createContactsExtInfos(clone $contacts_eids);
     print "done\n";
 
     /* Events */
@@ -165,16 +167,20 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
               'end'   => $last_user_entity_id + 1) );
     $nb_events = $nb_users * $this->nb_reccur_events_per_user;
     print "Inserting $this->nb_reccur_events_per_user repeating events "
-      ."for each user (total $nb_events)... ";
+      ."for each user (total $nb_events), with "
+      .(int)($this->meeting_events_ratio * 100)."% meetings... ";
     $this->createEvents(clone $users_ids, clone $users_eids,
-                        $this->nb_reccur_events_per_user, true);
+                        clone $contacts_eids, $this->nb_reccur_events_per_user,
+                        true);
     print "done\n";
 
     $nb_events = $nb_users * $this->nb_normal_events_per_user;
     print "Inserting $this->nb_normal_events_per_user non-repeating events "
-      ."for each user (total $nb_events)... ";
+      ."for each user (total $nb_events), with "
+      .(int)($this->meeting_events_ratio * 100)."% meetings... ";
     $this->createEvents(clone $users_ids, clone $users_eids,
-                        $this->nb_normal_events_per_user, false);
+                        clone $contacts_eids, $this->nb_normal_events_per_user,
+                        false);
     print "done\n";
   }
   
@@ -508,8 +514,8 @@ VALUES (                  '$cid',            '$entity_id')");
     }
   }
 
-  public function createEvents($user_iter, $user_entity_iter, $events_per_user,
-                               $want_repeat)
+  public function createEvents($user_iter, $user_entity_iter,$ctct_entity_iter,
+                               $events_per_user, $want_repeat)
   {
     /* Event table */
     $statics = array
@@ -531,16 +537,28 @@ VALUES (                  '$cid',            '$entity_id')");
     $events = $this->massInsertorStatment('Event', $statics, $dyna_cols);
 
     /* EventLink table */
+    $avlb_states = array( 'ACCEPTED', 'NEEDS-ACTION', 'DECLINED' );
     $statics = array
       ( 'eventlink_timeupdate' => 'NOW()',
         'eventlink_timecreate' => 'NOW()',
-        'eventlink_state'      => "'ACCEPTED'",
         'eventlink_required'   => "'REQ'"
       );
     $dyna_cols = array
       ( 'eventlink_event_id', 'eventlink_usercreate',
-        'eventlink_entity_id', 'eventlink_percent' );
+        'eventlink_entity_id', 'eventlink_percent', 'eventlink_state' );
     $evlink = $this->massInsertorStatment('EventLink', $statics, $dyna_cols);
+
+    /* Build an array with the available participants entity ids,
+       so we can easily randomly pick up one */
+    $participants = array( 'user' => array(), 'contact' => array() );
+    while($eid = $user_entity_iter->nextInt()) {
+      $participants['user'][] = $eid;
+    }
+    $user_entity_iter->gotoStart();
+    while($eid = $ctct_entity_iter->nextInt()) {
+      $participants['contact'][] = $eid;
+    }
+    $ctct_entity_iter->gotoStart();
 
     while(1) {
       $uid = $user_iter->nextInt();
@@ -661,11 +679,36 @@ VALUES (                  '$cid',            '$entity_id')");
         $this->execute_or_die($events, $changing);
 
         /* Insert in EventLink table the event creator as participant */
+        $last_id = $this->lastInsertId();
         $changing = array
-          ( $this->lastInsertId(), $uid, // event id, user's event id
-            $euid,rand(0,100) // event id, user's event entity id, percent state
+          ( $last_id, $uid,   // event id, user's event id
+            $euid,rand(0,100),// event participant entity id, percent state
+            'ACCEPTED'        // state (static here,but dynamic for other people)
             );
         $this->execute_or_die($evlink, $changing);
+
+        /* Randomly insert some other participants in EventLink */
+        if($i % (1 / $this->meeting_events_ratio) == 0) {
+          /* Note: with $nb_parts = rand(2, 5) we need at least 6 users
+             (event creator + 5 others) available, otherwise we may fall
+             in an infinite loop while looking for others users */
+          $nb_parts = rand(2, 5);
+          $parts = array( $euid );
+          for($j = 0 ; $j < $nb_parts ; $j++) {
+            $who = array_rand($participants);
+            do {
+              $part = $participants[$who][ array_rand($participants[$who]) ];
+            } while(in_array($part, $parts));
+            $parts[] = $part;
+
+            $changing = array
+              ( $last_id, $uid,   // event id, user's event id
+                $part,rand(0,100),// event participant entity id, percent state
+                $avlb_states[ array_rand($avlb_states) ] // state
+                );
+            $this->execute_or_die($evlink, $changing);
+          }
+        }
       }
     }
   }

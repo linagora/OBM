@@ -10,6 +10,10 @@ if($nb_users == 0 || !is_dir($obm_root."/conf")) {
 }
 $nb_users = $argv[1];
 
+if($nb_users < 6) { // DummyGenerators::createEvents() limitation
+  die("You may only specify at least 6 users.\n");
+}
+
 /* Our files (need $obm_root) */
 include('helpers.php');
 include('generators.php');

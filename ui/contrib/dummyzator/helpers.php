@@ -59,6 +59,12 @@ class IntIterator {
     return $i;
   }
 
+  public function gotoStart()
+  {
+    $this->iter['value'] = $this->iter['start'];
+    $this->iter['step'] = 0;
+  }
+
   public function start()
   {
     return $this->iter['start'];
