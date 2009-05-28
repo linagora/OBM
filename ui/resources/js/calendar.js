@@ -1782,6 +1782,11 @@ Obm.CalendarFreeBusy = new Class({
         this.slider.drag.detach();
       }.bind(this),
       onDrag: function() {
+
+        this.meeting.setStyles({
+          'height':this.container.offsetHeight+'px'
+        });
+
         this.meeting_slots = Math.round(this.meeting.offsetWidth/this.slider.stepWidth);
         this.resizeHandler.setStyles({
           'margin-left' : this.meeting.offsetWidth-this.resizeHandler.offsetWidth+'px'});
