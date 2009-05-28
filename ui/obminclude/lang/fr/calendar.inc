@@ -231,6 +231,7 @@ $l_freebusy_autopick_next = "Choix automatique »";
 $l_display_entites_freebusy = "Afficher les agendas des participants/ressources occupé(e)s";
 $l_show_calendar = "Voir l'agenda";
 $l_calendar_not_available = "L'agenda n'existe pas ou n'est pas partagé";
+$l_freebusy_check_availability = "Vérifier la disponibilité des participants et des ressources"; 
 
 $l_add_event_mail_body = 
 "Message automatique envoyé par OBM

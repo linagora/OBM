@@ -20,6 +20,13 @@ $extra_js .= "
     displayFreeBusy($('tf_date_begin').value, duration);
   }
 
+  function checkAvailability() {
+    var b = parseInt($('sel_time_begin').value, 10)+parseInt($('sel_min_begin').value, 10)/60;
+    var e = parseInt($('sel_time_end').value, 10)+parseInt($('sel_min_end').value, 10)/60;
+    var duration = e-b;
+    displayFreeBusy($('tf_date_begin').value, duration);
+  }
+
   function displayFreeBusy(date_begin, duration) {
     if($('fbc')) $('fbc').destroy();
     var q = new Object();

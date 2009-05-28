@@ -242,7 +242,7 @@ $l_freebusy_autopick_next = "AutoPick Next »";
 $l_display_entites_freebusy = "Display busy attendees/resources";
 $l_show_calendar = "See calendar";
 $l_calendar_not_available = "Calendar doesn't exist or isn't shared";
-  
+$l_freebusy_check_availability = "Check attendees and resources availability "; 
 $l_add_event_mail_body = 
 "This email was automatically sent by OBM
 ------------------------------------------------------------------

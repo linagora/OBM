@@ -2082,7 +2082,6 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   </div>
 
   $dis_form_end
-  <div id=\"fbcContainer\"></div>
 
 
 ";
@@ -3360,6 +3359,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </td>       
   </tr>
   <tr>
+    <th>&nbsp</th>
+    <td><a href=\"#\" onclick=\"checkAvailability()\">$GLOBALS[l_freebusy_check_availability]</a></td>
+  </tr>
+  <tr>
     <th>$l_priority</th>
     <td>$dis_sel_prio</td>
   </tr>     
@@ -3425,7 +3428,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $resource_complete
       $group_complete
     });
-  </script>"; 
+  </script>
+  <div id=\"fbcContainer\"></div>
+
+"; 
 
    return $block;
 }
