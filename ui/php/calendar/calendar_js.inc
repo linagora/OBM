@@ -11,6 +11,11 @@ require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
 
+  function changePeriod(date) {
+    var duration = $('duration').value/3600;
+    displayFreeBusy(date, duration);
+  }
+
   function performMeeting() {
     var duration = parseInt($('sel_time_duration').value, 10)+parseInt($('sel_min_duration').value, 10)/60;
     displayFreeBusy($('tf_date').value, duration);

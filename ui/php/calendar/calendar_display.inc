@@ -3935,6 +3935,14 @@ function dis_calendar_free_interval($calendar) {
   $l_calendar_not_available = phpStringToJsString($GLOBALS['l_calendar_not_available']);
   $l_allday = phpStringToJsString($GLOBALS['l_all_day']);
 
+  // Navigation
+  $current = clone $date;
+  $prev_month = $current->setDateIso($calendar['date'])->subMonth(1)->getDateIso();
+  $prev_week = $current->setDateIso($calendar['date'])->subWeek(1)->getDateIso();
+  $next_week = $current->setDateIso($calendar['date'])->addWeek(1)->getDateIso();
+  $next_month = $current->setDateIso($calendar['date'])->addMonth(1)->getDateIso();
+  $label = $date->localize(Of_Date::OBM_DATE_DAY)." - ".$date->addDay(6)->localize(Of_Date::OBM_DATE_DAY);
+
   $block = "
   <div id='fbc' class='freeBusyContent obmPopup'>
     <h1>
@@ -3943,6 +3951,13 @@ function dis_calendar_free_interval($calendar) {
     </a>
     <span>$GLOBALS[l_header_meeting]</span>
     </h1>
+    <h2>
+      <a href='#' onclick='changePeriod(\"$prev_month\")'><img src='$GLOBALS[ico_far_previous]' alt='[$GLOBALS[l_previous]'] /></a>
+      <a href='#' onclick='changePeriod(\"$prev_week\")'><img src='$GLOBALS[ico_previous]' alt='[$GLOBALS[l_previous]'] /></a>
+      $label
+      <a href='#' onclick='changePeriod(\"$next_week\")'><img src='$GLOBALS[ico_next]' alt='[$GLOBALS[l_next]'] /></a>
+      <a href='#' onclick='changePeriod(\"$next_month\")'><img src='$GLOBALS[ico_far_next]' alt='[$GLOBALS[l_next]'] /></a>
+    </h2>
     <div class='freeBusyEntities'>
       <form method='POST' id='entities_form' action='calendar_index.php'>
         <table id='freeBusyEntitiesList'> 
