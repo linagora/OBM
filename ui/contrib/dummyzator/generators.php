@@ -110,7 +110,7 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
   {
     $this->do_inits();
 
-    $nb_groups = (int)($nb_users * $this->nb_groups_ratio);
+    $nb_groups = ceil($nb_users * $this->nb_groups_ratio);
 
     print "Inserting $nb_users users... ";
     $users_ids      = new IntIterator(array('start' => 2, 'len' => $nb_users));
@@ -139,12 +139,12 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     $total_contacts = $nb_pub_contacts + $nb_priv_contacts;
     print "Inserting $this->priv_contact_per_user privates contacts for each "
       ."user (total $nb_priv_contacts contacts)... ";
-    $this->createAllUsersContacts(0, clone $users_ids, $nb_priv_contacts);
+    $this->createAllUsersContacts(0, clone $users_ids, $this->priv_contact_per_user);
     print "done\n";
 
     print "Inserting $this->pub_contact_per_user publics contacts for each "
       ."user (total $nb_pub_contacts contacts)... ";
-    $this->createAllUsersContacts(1, clone $users_ids, $nb_pub_contacts);
+    $this->createAllUsersContacts(1, clone $users_ids, $this->pub_contact_per_user);
     print "done\n";
 
     $extinfos_eids = new IntIterator
