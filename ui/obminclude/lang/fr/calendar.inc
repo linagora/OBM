@@ -35,6 +35,7 @@ $l_user_right = "Gérer les droits de";
 $l_date_repeatend = "Fin de répétition";
 $l_carac = "Propriétés";
 $l_force = "Forcer l'insertion de l'événement";
+$l_force_disabled = "(impossible car une ressource est en jeu)";
 $l_everybody = "Tout le monde";
 $l_everyresources = "Toutes les ressources";
 $l_all_day = "Toute la journée";

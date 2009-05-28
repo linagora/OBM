@@ -2756,7 +2756,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_dateend,$l_insert,$l_update,$l_repeat, $l_owner;
   global $l_repeatkind,$l_repeatdays2, $l_date_repeatend, $l_daily, $l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_calendar;
-  global $l_none,$l_force,$l_repeat_update,$l_groups;
+  global $l_none,$l_force,$l_repeat_update,$l_groups,$l_force_disabled;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time, $l_color ;
@@ -2839,6 +2839,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['repeat_end'])) $repeat_end = $calendar['repeat_end'];
   if(!isset($repeat_end)) {$repeat_end = new Of_Date();}
   if (isset($calendar['force'])) { $force = $calendar['force']; }
+  if (isset($calendar['force_disabled'])) { $force_disabled = $calendar['force_disabled']; }
   if ($repeat_kind != 'weekly') {
     $repeat_days = '000000';
     $repeatDaysDisplay = 'none';
@@ -3203,12 +3204,20 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $resource_complete = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&form=event', 'sel_resource_id', 'resourceSearch',{filter_entity:'Resource', filter_pattern:'access'});";
   }
 
-  if ($force == 1) {
-    $dis_force = "<input type=\"checkbox\" id=\"cba_force\" value=\"1\" checked=\"checked\" name=\"cba_force\" />";
-  } else {
-    $dis_force = "<input type=\"checkbox\" id=\"cba_force\" value=\"1\" name=\"cba_force\" />";
+  if ($force_disabled) {
+    $dis_force_disabled = 'disabled="disabled" ';
   }
   
+  if ($force == 1) {
+    $dis_force = "<input type=\"checkbox\" id=\"cba_force\" value=\"1\" checked=\"checked\" name=\"cba_force\" $dis_force_disabled/>";
+  } else {
+    $dis_force = "<input type=\"checkbox\" id=\"cba_force\" value=\"1\" name=\"cba_force\" $dis_force_disabled/>";
+  }
+  
+  if ($force_disabled) {
+    $dis_force .= $l_force_disabled;
+  }
+
   if ($privacy == 1) {
     $dis_privacy = "<input type=\"checkbox\" id=\"cba_privacy\" value=\"1\" checked=\"checked\" name=\"cba_privacy\" />";
   } else {

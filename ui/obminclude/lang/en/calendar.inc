@@ -129,6 +129,7 @@ $l_A = "A";
 $l_W = "W";
 $l_R = "R";
 $l_force = "Force the event insertion";
+$l_force_disabled = "(impossible because of a conflictual resource)";
 $l_carac = "Caracteristics";
 $l_meeting_perform = "Seek for free time slots";
 $l_owner_notification = "Notify event owner";

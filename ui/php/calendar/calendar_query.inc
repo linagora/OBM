@@ -4085,4 +4085,23 @@ function genUniqueExtEventId() {
   return $version.'-'.$event_ext_id.'@'.$domain;
 }
 
+/**
+ * Check if there is a conflict about a resource, and return false
+ * if we can't force its insertion.
+ */
+function can_force_resource_conflict($conflicts = array()) {
+  global $ccalendar_allow_force_with_resource;
+
+  if($ccalendar_allow_force_with_resource) {
+    return true;
+  } else {
+    foreach($conflicts as $conflict) {
+      if($conflict->entity == 'resource') {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 ?>

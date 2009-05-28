@@ -105,6 +105,10 @@ $ccalendar_last_hour = 20;
 // Calendar Resource usage
 $ccalendar_resource = true;
 
+// Set this to false if you want to forbid the insertion/update
+// of a event when a resource is one of the reasons of the conflict.
+$ccalendar_allow_force_with_resource = true;
+
 // Calendar send ics file
 $ccalendar_send_ics = true;
 

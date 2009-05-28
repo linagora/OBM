@@ -283,8 +283,12 @@ if ($action == 'index') {
       $entities['contact'] = array_merge($entities['contact'], $others_attendees);
     }
 
-    if ( (!$params['force'])
-      && ($conflicts = check_calendar_conflict($params, $entities)) ) {
+    $conflicts = check_calendar_conflict($params, $entities);
+    if ( $conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts)) ) {
+        if ($conflicts && !can_force_resource_conflict($conflicts)) {
+          $params['force_disabled'] = 1;
+          $params['force'] = 0;
+        }
         $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
         $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
         $display['detail'] = dis_calendar_event_form($action, $params, '',$entities);
@@ -354,9 +358,14 @@ if ($action == 'index') {
   if (check_calendar_access($params["calendar_id"]) && 
     check_calendar_data_form($params)) {
       $c = get_calendar_event_info($params['calendar_id'],false); 
-      if ( (!$params['force']) 
+      $conflicts = check_calendar_conflict($params, $entities);
+      if ($conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts))
         && !($c['date']->equals($params['date_begin']) && $c['event_duration'] == $params['event_duration'])
-          && ($conflicts = check_calendar_conflict($params, $entities)) ) {
+          ) {
+            if ($conflicts && !can_force_resource_conflict($conflicts)) {
+              $params['force_disabled'] = 1;
+              $params['force'] = 0;
+            }
             $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
             $display['msg'] .= display_err_msg("$l_event : $l_update_error");
             $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
