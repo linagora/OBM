@@ -211,17 +211,16 @@ sub _connect {
     }
 
     if( !$self->{'ldapServerConn'} ) {
-        $self->{'ldapServerConn'} = undef;
         $self->_log( $self->getDescription().' désactivé car injoignable ', 0 );
         $self->_setDeadStatus();
         return 1;
     }
 
-    use Net::LDAP qw(LDAP_CONFIDENTIALITY_REQUIRED) ;
+    use Net::LDAP qw(LDAP_CONFIDENTIALITY_REQUIRED);
     if( $self->{'ldapTls'} =~ /^(may|encrypt)$/ ) {
         my $error = $self->{'ldapServerConn'}->start_tls( verify => 'none' );
 
-        if( $error->code && ($self->{'ldapTls'} eq 'encrypt') ) {
+        if( $error->code() && ($self->{'ldapTls'} eq 'encrypt') ) {
             $self->_log( 'erreur fatale au start TLS : '.$error->error, 0 );
             $self->_log( 'l\'automate (\'ldapTls\'='.$self->{'ldapTls'}.') nécessite une connexion TLS', 0 );
             $self->_log( $self->getDescription().' désactivé', 0 );
