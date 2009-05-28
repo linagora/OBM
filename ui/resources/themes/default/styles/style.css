@@ -1189,7 +1189,7 @@ input.datePicker {
   list-style-type: none;  
   background: #e0e1e3;    
   border: 1px solid #368397; 
-  z-index: 1000;
+  z-index: 200000;
   padding: 0 5px;
 }
 
@@ -1499,12 +1499,15 @@ div.overTxtDiv {
 	width: 15em;
 }
 
+.obmTip {
+  z-index: 40000;
+}
+
 .tip {
   color:#000;
   background: #ffffbf;
   border: 1px solid #cfcf3d;
   padding: 2px;
-	z-index: 200000;
 }
 
 .tip ul {

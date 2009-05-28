@@ -193,32 +193,35 @@ Obm.Tip = new Class({
 
   initialize: function(e) {
     this.parent(e);
+    this.tip.addClass('obmTip');
   },
 
 	attach: function(elements) {
 		$$(elements).each(function(element){
-
-      try {
-        element_title = eval(element.get('title')); 
-        content = element_title.content;
-      } catch (ee) {
-        content = element.get('title');
-      }
-
-			var title = element.retrieve('tip:title', content);
-			var text = element.retrieve('tip:text', element.get('rel') || element.get('href'));
-			var enter = element.retrieve('tip:enter', this.elementEnter.bindWithEvent(this, element));
-			var leave = element.retrieve('tip:leave', this.elementLeave.bindWithEvent(this, element));
-			element.addEvents({mouseenter: enter, mouseleave: leave});
-			if (!this.options.fixed){
-				var move = element.retrieve('tip:move', this.elementMove.bindWithEvent(this, element));
-				element.addEvent('mousemove', move);
-			}
-			element.store('tip:native', element.get('title'));
-			element.erase('title');
+      this.add(element);
 		}, this);
 		return this;
-	}
+	},
+
+  add: function(element) {
+    try {
+      element_title = eval(element.get('title')); 
+      content = element_title.content;
+    } catch (ee) {
+      content = element.get('title');
+    }
+		var title = element.retrieve('tip:title', content);
+		var text = element.retrieve('tip:text', element.get('rel') || element.get('href'));
+		var enter = element.retrieve('tip:enter', this.elementEnter.bindWithEvent(this, element));
+		var leave = element.retrieve('tip:leave', this.elementLeave.bindWithEvent(this, element));
+		element.addEvents({mouseenter: enter, mouseleave: leave});
+		if (!this.options.fixed){
+			var move = element.retrieve('tip:move', this.elementMove.bindWithEvent(this, element));
+			element.addEvent('mousemove', move);
+		}
+		element.store('tip:native', element.get('title'));
+		element.erase('title');
+  }
 
 });
 

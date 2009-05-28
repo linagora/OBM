@@ -837,4 +837,33 @@ function get_resourcegroup_parents($id) {
 }
 
 
+function get_json_resource_group($id) {
+  global $display;
+
+  $multidomain = sql_multidomain('rgroup');
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $query = "SELECT 
+    resource_id,
+    resource_name,
+    rgroup_name, 
+    resourcegroup_rgroup_id as resource_group
+    FROM ResourceGroup LEFT JOIN Resource ON resourcegroup_resource_id=resource_id
+    LEFT JOIN RGroup ON rgroup_id = resourcegroup_rgroup_id
+    WHERE resourcegroup_rgroup_id ='$id' $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_resource_resourcegroup()');
+  $obm_q->query($query);
+  
+  $data = array();
+  while($obm_q->next_record()) {
+      $r = "{id:'".$obm_q->f('resource_id')."',label:'".phpStringToJsString($obm_q->f('resource_name'))."'}";
+      array_push($data, $r);
+  }
+
+  $display['json'] = "resources:[".implode(",", $data)."]";
+
+}
+
 ?>

@@ -345,6 +345,11 @@ if (($action == 'index') || ($action == '')) {
     $display['msg'] .= display_info_msg($l_no_display);
   }
 
+} elseif($action == 'get_json_user_group') {
+///////////////////////////////////////////////////////////////////////////////
+  get_json_user_group($params['group_id']);
+  echo '({'.$display['json'].'})';
+  exit();
 }
 
 of_category_user_action_switch($module, $action, $params);
@@ -609,6 +614,14 @@ function get_group_action() {
     'Url'      => "$path/group/group_index.php?action=admin",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('all')
+                                                 );
+
+// Get JSON user group 
+  $actions['group']['get_json_user_group'] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/group/group_index.php?action=get_json_user_group",
+    'Right'    => $cright_read_admin,
+    'Condition'=> array ('None')
                                                  );
 
 }

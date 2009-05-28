@@ -1334,4 +1334,22 @@ function run_query_group_ext_search($group) {
   return array('length' => $resultsCount, 'datas' => $obm_q);
 }
 
+
+function get_json_user_group($gid) {
+  global $display;
+
+  $users = of_usergroup_get_group_users($gid);
+  if (is_array($users)) {
+    $data = array();
+    foreach($users as $u_id) {
+      $u = get_entity_info($u_id, 'user');
+      $user = "{id:'$u_id',label:'".phpStringToJsString($u[0])."'}";
+      array_push($data, $user);
+    }
+    $display['json'] = "users:[".implode(",", $data)."]";
+  } else {
+    $display['json'] = "users:[]";
+  }
+}
+
 ?>

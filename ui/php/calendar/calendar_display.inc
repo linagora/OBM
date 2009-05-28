@@ -2008,8 +2008,7 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   $m = $dateend->diffMinute($datebegin);
   $time_begin = $datebegin->getHour();
   $min_begin = $datebegin->getMinute();
-
-  $url = "calendar_index.php?action=perform_meeting&time_duration=$h&min_duration=$m&time_begin=$time_begin&min_begin=$min_begin&date=$datebegin&title=$calendar[title]";
+  $duration = $h+$m/60;
 
   foreach($conflicts as $conflict) {
     $private = true;
@@ -2040,33 +2039,30 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
       $end = $end->getOutputDateTime();
     }
     $entity = $conflict->entity;
-    $freebusy_url = $url."&sel_${entity}_id[]=data-${entity}-".key($conflict->event->attendee[$conflict->entity]);
     $dis_conflict .= "
       <tr>
         <td>$title</td>
         <td>$location</td>
         <td>$begin</td>
         <td>$end</td>
-        <td>$name <a href=\"$freebusy_url\">$GLOBALS[l_show_calendar]</a> </td>
+        <td>$name</td>
       </tr>";
   }
   
   if (is_array($calendar["user_id"])) {
     foreach($calendar["user_id"] as $user) {
       $sel_user_id .="<input type=\"hidden\" name=\"sel_user_id[]\" value=\"$user\" />";
-      $url .="&sel_user_id[]=$user";
     }
   }
   if (is_array($calendar["resource_id"])) {
     foreach($calendar["resource_id"] as $res) {
       $sel_res_id .="<input type=\"hidden\" name=\"sel_resource_id[]\" value=\"$res\" />";
-      $url .="&sel_resource_id[]=$res";
     }
   }
   $block = "
   <div class=\"detail extra\">
   <h1>$l_conflicts</h1>
-  <h2><a href=\"$url\">$GLOBALS[l_display_entites_freebusy]</a><h2>
+  <h2><a href=\"#\" onclick=\"displayFreeBusyConflict('$duration')\">$GLOBALS[l_display_entites_freebusy]</a><h2>
   <table class=\"spreadSheet\">
   <thead>
    <tr>
@@ -2085,7 +2081,11 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
    $dis_form_button
   </div>
 
-  $dis_form_end";
+  $dis_form_end
+  <div id=\"fbcContainer\"></div>
+
+
+";
 
   return $block;
 }
@@ -2539,29 +2539,45 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
     $alerts = get_one_event_user_alert($calendar['calendar_id'], $obm['uid']);
   } else {
     $users_id = $entities['user'];
+    $contacts_id = $entities['contact'];
+    $res_id = $entities['resource'];
     // If new event, add the optionnal new users (here to get the user's infos)
     if ($action == 'new') {
       if (is_array($calendar['new_user_id'])) {
-	foreach ($calendar['new_user_id'] as $new_user_id) {
-	  if ($new_user_id > 0) {
-	    $users_id[] = $new_user_id;
-	  }
-	}
+	      foreach ($calendar['new_user_id'] as $new_user_id) {
+	        if ($new_user_id > 0) {
+	          $users_id[] = $new_user_id;
+	        }
+	      }
       }
       $users_id[] = $obm['uid'];
+      if (is_array($calendar['new_contact_id'])) {
+	      foreach ($calendar['new_contact_id'] as $new_contact_id) {
+	        if ($new_contact_id > 0) {
+	          $contacts_id[] = $new_contact_id;
+	        }
+	      }
+      }
+      if (is_array($calendar['new_resource_id'])) {
+	      foreach ($calendar['new_resource_id'] as $new_resource_id) {
+	        if ($new_resource_id > 0) {
+	          $res_id[] = $new_resource_id;
+	        }
+	      }
+      }
     }
     if (count($users_id > 0)) {
       $users = get_userobm_from_ids($users_id);
     } else {
       $users = array();
     }
-    $contacts_id = $entities['contact'];
+    if (is_array($entities['contact'])) $contacts_id = array_merge($contacts_id, $entities['contact']);
     if (count($contacts_id > 0)) {
       $contacts = get_contact_from_ids($contacts_id);
     } else {
       $contacts = array();
     }
-    $res_id = $entities['resource'];
+    if (is_array($entities['resource'])) $res_id = array_merge($res_id, $entities['resource']);
     if (count($res_id > 0)) {
       $resources = get_calendar_resource_from_ids($res_id);
     } else {
@@ -3224,8 +3240,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $dis_privacy = "<input type=\"checkbox\" id=\"cba_privacy\" value=\"1\" name=\"cba_privacy\" />";
   }
 
-  $dis_hour_b = "<select name=\"sel_time_begin\" style=\"width:4em;\">";
-  $dis_hour_e = "<select name=\"sel_time_end\" style=\"width:4em;\">";
+  $dis_hour_b = "<select id=\"sel_time_begin\" name=\"sel_time_begin\" style=\"width:4em;\">";
+  $dis_hour_e = "<select id=\"sel_time_end\" name=\"sel_time_end\" style=\"width:4em;\">";
   for ($i=0; $i<24; $i++) {
     $hour =  str_pad($i, 2, '0', STR_PAD_LEFT); 
     if ($begin->compareHour($i) == 0) {
@@ -3242,8 +3258,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $dis_hour_b .= '</select>';  
   $dis_hour_e .= '</select>';  
 
-  $dis_min_b = "<select name=\"sel_min_begin\" style=\"width:4em;\">";
-  $dis_min_e = "<select name=\"sel_min_end\" style=\"width:4em;\">";
+  $dis_min_b = "<select id=\"sel_min_begin\" name=\"sel_min_begin\" style=\"width:4em;\">";
+  $dis_min_e = "<select id=\"sel_min_end\" name=\"sel_min_end\" style=\"width:4em;\">";
   $step = 60 / $ccalendar_hour_fraction;
   for ($i=0; $i < 60; $i += $step) {
     $minute =  str_pad($i, 2, '0', STR_PAD_LEFT); 
@@ -3292,7 +3308,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-  <form method=\"post\" name=\"f_entity\"
+  <form method=\"post\" id=\"new_event_form\" name=\"f_entity\"
    onsubmit=\"if (check_calendar_calendar(this)) return true; else return false;\"
    action=\"calendar_index.php\">
   <fieldset class=\"detail infos\">  
@@ -3773,7 +3789,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
       </fieldset> ";
   }
 
-  $dis_hour_d = "<select style='width:4em;' name=\"sel_time_duration\">";
+  $dis_hour_d = "<select style='width:4em;' id=\"sel_time_duration\" name=\"sel_time_duration\">";
   for ($i=0;$i<24;$i++) {
     $current_hour = substr("0$i",-2,2); 
     if ($current_hour == $hourbegin){
@@ -3784,7 +3800,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   }
   $dis_hour_d .= '</select>';
  
-  $dis_min_d = "<select style='width:4em;' name=\"sel_min_duration\">";
+  $dis_min_d = "<select style='width:4em;' id=\"sel_min_duration\" name=\"sel_min_duration\">";
   for ($i=4;$i>=1;$i--) {
     $current_min = substr('0'.(60 - (15*$i)),-2);
     if ($current_min  == $mindur){
@@ -3808,7 +3824,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   <tr>
     <th>$l_datebegin</th>
     <td>
-      <input type=\"text\" name=\"tf_date\" value=\"".$date->getInputDate()."\" class=\"datePicker\" />
+      <input type=\"text\" id=\"tf_date\" name=\"tf_date\" value=\"".$date->getInputDate()."\" class=\"datePicker\" />
     </td>
   </tr>
   <tr>    
@@ -3820,9 +3836,10 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     $dis_block_user 
     $dis_block_resource
   <fieldset class=\"buttons\">
-    $dis_button
+    <input type=\"button\" onclick=\"performMeeting();\" value=\"$GLOBALS[l_meeting_perform]\" />
   </fieldset>    
   </form>
+  <div id=\"fbcContainer\"></div>
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
       $user_js
@@ -3841,16 +3858,12 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
 //   - $calendar       : calendar parameters
 //   - $entity_store : array of entities to display
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
-  global $obm;
+function dis_calendar_free_interval($calendar) {
+  global $obm, $display;
 
-  $duration = $calendar['meeting_duration'];
   $date = $calendar['date'];
-  if (isset($calendar['time_begin']) && isset($calendar['min_begin'])) {
-    $date_ts = $date->setHour($calendar['time_begin'])->setMinute($calendar['min_begin'])->setSecond(0)->getTimestamp();
-  } else {
-    $date_ts = $date->setHour($GLOBALS['ccalendar_first_hour'])->setMinute(0)->setSecond(0)->getTimestamp();
-  }
+  $date_ts = $date->setHour($GLOBALS['ccalendar_first_hour'])->setMinute(0)->setSecond(0)->getTimestamp();
+
   $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
   $end = clone $date;
   $end->addDay(7);  
@@ -3858,29 +3871,14 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
   $time_unit_sec = 3600 / $_SESSION['set_cal_interval']; 
   $unit = 3600/$time_unit_sec;
   $colWidth = 40/$unit - 2; // -2 => due to border !
-  if (is_array($entity_store['resourcegroup']) && count($entity_store['resourcegroup']) > 0) {
-    $have_resource_grp = true;
-  } else {
-    $have_resource_grp = false;
-  }
-
-  $status = array('ACCEPTED');
-  calendar_events_model($date,$end,$entity_store, $status);
-  $of = &OccurrenceFactory::getInstance();
-  $current = clone $date;
-
-  $HTML_empty_time_slot = "<td class=\"timeSlot\"><div style=\"width:${colWidth}px;\">&nbsp;</div></td>";
-  $HTML_no_calendar_slot = "<td title=\"$GLOBALS[l_calendar_not_available]\"class=\"timeSlotNoCalendar obmTip\"><div style=\"width:${colWidth}px;\">&nbsp;</div></td>";
-  $HTML_busy_time_slot = array(
-    "entity" => "<td class=\"timeSlot\"><div class=\"haveEvent tips\" style=\"width:${colWidth}px;\"></div></td>",
-    "all" => "<td class=\"timeSlot\"><div class=\"haveEventAll\" style=\"width:${colWidth}px;\"></div></td>");
 
   // Days headers 
+  $current = clone $date;
   $colspan = ($GLOBALS['ccalendar_last_hour'] - $GLOBALS['ccalendar_first_hour']) * $unit;
   while($current->compare($end) < 0) {
     $current->setHour($GLOBALS['ccalendar_first_hour']);
     $day = $current->localize(Of_Date::OBM_DATE_DAY);
-    $week_day_list .= "<td colspan=\"$colspan\" class=\"freeBusyCalendarDay\" >$day</td>\n";
+    $week_day_list .= "<td colspan='$colspan' class='freeBusyCalendarDay'>$day</td>\n";
     $end_day = clone $current;
     $end_day->setHour($GLOBALS['ccalendar_last_hour']);
     // Hour
@@ -3890,272 +3888,28 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
       if($current->compareMinute(0) == 0) {
         $label = $current->get(Of_Date::TIME_SHORT);
         $class = "freeBusyCalendarHourDisplayed";
-        $day_hours_list .= "<td colspan=\"$unit\" class=\"$class freeBusyCalendarHour\"><span>$label</span></td>";
+        $day_hours_list .= "<td colspan='$unit' class='$class freeBusyCalendarHour'><span>$label</span></td>";
       }
       $current->addSecond($time_unit_sec);
     }
     $current->addDay(1);
   }
 
-  $users_id = $sel_entity_id['user'];
-  if ($calendar["users"]) $users_id = $calendar["users"];
-  
-  if (count($users_id > 0)) {
-    $users = get_userobm_from_ids($users_id);
-  } else {
-    $users = array();
-  }
-
-  $contacts_id = $sel_entity_id['contact'];
-  if (count($contacts_id) > 0) {
-    $contacts = get_contact_from_ids($contacts_id);
-  } else {
-    $contacts = array();
-  }
-  $res_id = $sel_entity_id['resource'];
-  if (count($res_id > 0)) {
-    $res = get_calendar_resource_from_ids($res_id);
-  } else {
-    $res = array();
-  }
-
-  // user select
-  if (is_array($users['entity'])) {
-    foreach ($users['entity'] as $u_id => $u_ent) {
-      $u_name = $u_ent['label'];
-      $sel_id = "data-user-$u_id";
-      $div_id = "sel_user_id-$sel_id";
-      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-      <img src=\"$GLOBALS[ico_user]\"  alt=\"[User]\" />
-      <a href=\"javascript: remove_element('$div_id','sel_user_id');$('entities_form').submit();\">
-      <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\" />
-      </a>
-      $u_name
-      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-      </div>";
-    }
-  }
-
-  //$url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+  $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_attendees_id&amp;filter_entity=calendar&amp;filter_pattern=access";
   $user_add_button = "
-    <a href=\"javascript: return false;\"
-      onclick=\"popup('$url',''); return false;\">
-      <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
+    <a href='javascript: return false;' onclick='popup(\"$url\",\"\"); return false;'>
+      <img src='$GLOBALS[ico_add]' alt='[Add]' />
     </a>";
 
-  // contact select
-  if (is_array($contacts['entity'])) {
-    foreach ($contacts['entity'] as $u_id => $u_ent) {
-      $u_name = $u_ent['label'];
-      $sel_id = "data-contact-$u_id";
-      $div_id = "sel_user_id-$sel_id";
-      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-      <img src=\"$GLOBALS[ico_contact]\"  alt=\"[User]\" />
-      <a href=\"javascript: remove_element('$div_id','sel_user_id');$('entities_form').submit();\">
-      <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\" />
-      </a>
-      $u_name
-      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-      </div>";
-    }
-  }
-
-  $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id&amp;filter_entity=calendar&amp;filter_pattern=access";
-  $user_add_button = "
-    <a href=\"javascript: return false;\" 
-      onclick=\"popup('$url','');
-      return false;\">
-      <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
-    </a>";
-
-  // resource select
-  if (is_array($res['entity'])) {
-    foreach ($res['entity'] as $r_id => $r_ent) {
-      $r_name = $r_ent['label'];
-      $sel_id = "data-resource-$r_id";
-      $div_id = "sel_resource_id-$sel_id";
-      $dis_sel_resource .= "
-        <div class=\"elementRow\" id=\"$div_id\">
-        <img src=\"$GLOBALS[ico_resource]\"  alt=\"[Resource]\" />
-        <a href=\"javascript: remove_element('$div_id','sel_resource_id');$('entities_form').submit();\">
-        <img src=\"$GLOBALS[ico_delete]\"  alt=\"[Delete]\" />
-        </a>
-        $r_name
-        <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
-        </div>";
-    }
-  }
-
-  $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id";
+  $url_resource = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_attendees_id";
   $resource_add_button = "
-    <a href=\"javascript: return false;\"
-    onclick=\"popup('$url_resource',''); return false;\">
-     <img src=\"$GLOBALS[ico_add]\" alt=\"[Add]\" />
+    <a href='javascript: return false;' onclick='popup(\"$url_resource\",\"\"); return false;'>
+     <img src='$GLOBALS[ico_add]' alt='[Add]' />
     </a>";
 
-  // TODO: Optimize users/contacts/resources loops
-  // Ajaxification
-
-  // Users Events
-  $current = clone $date;
-  if (is_array($users['entity'])) {
-    foreach ($users['entity'] as $u_id => $u_ent) {
-      $canRead = false;
-      if(OBM_Acl::canRead($obm['uid'], 'calendar', $u_id)) {
-        $canRead = true;
-      }
-      $class = $entity_store['user'][$u_id]['class'];
-      $events = "<tr>";
-      while($current->compare($end) < 0) {
-        $current->setHour($GLOBALS['ccalendar_first_hour']);
-        $end_day = clone $current;
-        $end_day->setHour($GLOBALS['ccalendar_last_hour']);
-        while($current->compare($end_day) < 0) {
-          $end_slot = clone $current;
-          $end_slot->addSecond($time_unit_sec);
-          if ($canRead && $ocs = $of->getPeriodOccurrences($current,$end_slot, array('user' => array($u_id), 'resource' => null))) {
-            $tip = "<table>";
-            foreach($ocs as $oc) {
-              $d = $oc->date;
-              $e = clone $d;
-              $e->addTimestamp($oc->event->duration);
-              $evt_begin = $d->get(Of_Date::TIME_SHORT);
-              $evt_end = $e->get(Of_Date::TIME_SHORT);
-              $title = "";
-              if($oc->event->isMeeting()) {
-                $title .= "<img src=\"$GLOBALS[ico_meeting_alt]\" alt=\"[Meeting]\" /> ";
-              }
-              if($oc->event->isPrivate()) {
-                $title .= "<img src=\"$GLOBALS[ico_private_alt]\" alt=\"[Meeting]\" /> ";
-              }
-              $title .= $oc->event->title;
-              if($oc->event->isPrivate() && !(array_key_exists($obm['uid'],$oc->event->attendee['user']))) {
-                $title = "<img src=\"$GLOBALS[ico_private]\" alt=\"[Private]\"/> ".$GLOBALS['l_private'];
-              }
-              $tip .= "<tr>
-                <td class=\"B\">$evt_begin - $evt_end</td>
-              </tr><tr>
-                <td>
-                  <ul>
-                    <li>$title
-                  </ul>
-                </td>
-              </tr>";
-            }
-            $tip .= "</table>";
-            $tip_js = phpStringToJsString($tip);
-            $events .= "<td title=\"({content:'$tip_js'})\" class='timeSlot obmTip'>
-              <div class=\"haveEvent\" style=\"width:${colWidth}px;\"></div>
-            </td>";
-          } else if (!$canRead){
-            $events .= $HTML_no_calendar_slot;
-          } else {
-            $events .= $HTML_empty_time_slot;
-          }
-          $current->addSecond($time_unit_sec);
-        }
-        $current->addDay(1);
-      }  
-      $current = clone $date;
-      $events .="</tr>";
-      $users_evts[$u_id] = $events;
-    }
-  }
-
-  // Contacts Events
-  $current = clone $date;
-  if (is_array($contacts['entity'])) {
-    foreach ($contacts['entity'] as $u_id => $u_ent) {
-      $events = "<tr>";
-      while($current->compare($end) < 0) {
-        $current->setHour($GLOBALS['ccalendar_first_hour']);
-        $end_day = clone $current;
-        $end_day->setHour($GLOBALS['ccalendar_last_hour']);
-        while($current->compare($end_day) < 0) {
-          $events .= $HTML_no_calendar_slot;
-          $current->addSecond($time_unit_sec);
-        }
-        $current->addDay(1);
-      }  
-      $current = clone $date;
-      $events .="</tr>";
-      $contacts_evts[$u_id] = $events;
-    }
-  }
-   
-
-
-  // Resources Events
-  $current = clone $date;
-  if (is_array($res['entity'])) {
-    foreach ($res['entity'] as $r_id => $r_ent) {
-      $canRead = false;
-      if(OBM_Acl::canRead($obm['uid'], 'resource', $r_id)) {
-        $canRead = true;
-      }
-      $class = $entity_store['resource'][$r_id]['class'];
-      $events = "<tr>";
-      while($current->compare($end) < 0) {
-        $current->setHour($GLOBALS['ccalendar_first_hour']);
-        $end_day = clone $current;
-        $end_day->setHour($GLOBALS['ccalendar_last_hour']);
-        while($current->compare($end_day) < 0) {
-          $end_slot = clone $current;
-          $end_slot->addSecond($time_unit_sec);
-          if ($canRead && $ocs = $of->getPeriodOccurrences($current,$end_slot, array('user' => null, 'resource' => array($r_id)))) {
-            $tip = "<table>";
-            foreach($ocs as $oc) {
-              $d = $oc->date;
-              $e = clone $d;
-              $e->addTimestamp($oc->event->duration);
-              $evt_begin = $d->get(Of_Date::TIME_SHORT);
-              $evt_end = $e->get(Of_Date::TIME_SHORT);
-              $title = "";
-              if($oc->event->isMeeting()) {
-                $title .= "<img src=\"$GLOBALS[ico_meeting_alt]\" alt=\"[Meeting]\" /> ";
-              }
-              if($oc->event->isPrivate()) {
-                $title .= "<img src=\"$GLOBALS[ico_private_alt]\" alt=\"[Meeting]\" /> ";
-              }
-              $title .= $oc->event->title;
-              if($oc->event->isPrivate() && !(array_key_exists($obm['uid'],$oc->event->attendee['user']))) {
-                $title = "<img src=\"$GLOBALS[ico_private]\" alt=\"[Private]\"/> ".$GLOBALS['l_private'];
-              }
-              $tip .= "<tr>
-                <td class=\"B\">$evt_begin - $evt_end</td>
-              </tr><tr>
-                <td>
-                  <ul>
-                    <li>$title
-                  </ul>
-                </td>
-              </tr>";
-            }
-            $tip .= "</table>";
-            $tip_js = phpStringToJsString($tip);
-            $events .= "<td title=\"({content:'$tip_js'})\" class='timeSlot obmTip'>
-              <div class=\"haveEvent\" style=\"width:${colWidth}px;\"></div>
-            </td>";
-          } else if (!$canRead){
-            $events .= $HTML_no_calendar_slot;
-          } else {
-            $events .= $HTML_empty_time_slot;
-          }
-          $current->addSecond($time_unit_sec);
-        }
-        $current->addDay(1);
-      }  
-      $current = clone $date;
-      $events .="</tr>";
-      $res_evts[$r_id] = $events;
-    }
-  }
-
-  // All Events
-  $eventsAll = "<tr>";
-  $busy_time_slots = array();
+  $attendeesBar = "<tr>";
   $time_slots = array();
-  $slot = 0;
+  $current = clone $date;
   while($current->compare($end) < 0) {
     $current->setHour($GLOBALS['ccalendar_first_hour']);
     $end_day = clone $current;
@@ -4163,206 +3917,149 @@ function dis_calendar_free_interval($calendar, $entity_store, $sel_entity_id) {
     while($current->compare($end_day) < 0) {
       $end_slot = clone $current;
       $end_slot->addSecond($time_unit_sec);
-      if ($of->periodHaveOccurrences($current,$end_slot, array('user' => array(), 'resource' => array()))) {
-        $eventsAll .= $HTML_busy_time_slot['all'];
-        array_push($busy_time_slots, $slot);
-      } else {
-        $eventsAll .= $HTML_empty_time_slot;
-      }
+      $attendeesBar .= "<td class='timeSlot'><div id='".$current->getTimestamp()."' style='width:${colWidth}px;'></div></td>";
       array_push($time_slots, $current->get(Of_Date::TIMESTAMP));
       $current->addSecond($time_unit_sec);
-      $slot++;
     }
     $current->addDay(1);
   }
-  $eventsAll .= "</tr>";
+  $attendeesBar .= "</tr>";
 
-  $min_duration = $calendar['min_duration']; 
-  $time_duration = $calendar['time_duration'];
-  $duration = $time_duration + $min_duration/60 ;
-  $duration_ts = $duration*3600; 
   $js_time_slots = phpArrayToJsArray($time_slots);
-  $js_busy_time_slots = phpArrayToJsArray($busy_time_slots);
-
-  $events_calendar .= $eventsAll;
-
-  if (is_array($users_evts)) {
-    foreach($users_evts as $evt) {
-      $events_calendar .= $evt;
-    }
-  }
-
-  if (is_array($contacts_evts)) {
-    foreach($contacts_evts as $evt) {
-      $events_calendar .= $evt;
-    }
-  }
-
-  if (is_array($res_evts)) {
-    foreach($res_evts as $evt) {
-      $events_calendar .= $evt;
-    }
-  }
-  $title = $calendar['title'];
-  $label = $date->localize(Of_Date::OBM_DATE_WEEK) .' - '. $end->subDay(1)->localize(Of_Date::OBM_DATE_WEEK);
-  $url = "calendar_index.php?action=perform_meeting&time_duration=$time_duration&title=$title&min_duration=$min_duration&date=";
-
-  $meeting_start = $date->setHour($GLOBALS['ccalendar_first_hour'])->getOutputDateTime();
-  $meeting_end = $date->addSecond($duration_ts)->getOutputDateTime();
+  $l_calendar_not_available = phpStringToJsString($GLOBALS['l_calendar_not_available']);
+  $l_allday = phpStringToJsString($GLOBALS['l_all_day']);
 
   $block = "
-  <h1>
-    <a href=\"".$url.$current->setDateIso($calendar['date'])->subMonth(1)->getURL()."\">
-      <img src=\"$GLOBALS[ico_far_previous]\" alt=\"$GLOBALS[l_previous]\" /></a>     
-    <a href=\"".$url.$current->setDateIso($calendar['date'])->subWeek(1)->getURL()."\">
-      <img src=\"$GLOBALS[ico_previous]\" alt=\"$GLOBALS[l_previous]\" /></a>     
-    $label
-    <a href=\"".$url.$current->setDateIso($calendar['date'])->addWeek(1)->getURL()."\">
-      <img src=\"$GLOBALS[ico_next]\" alt=\"$GLOBALS[l_next]\" /></a>     
-    <a href=\"".$url.$current->setDateIso($calendar['date'])->addMonth(1)->getURL()."\">
-      <img src=\"$GLOBALS[ico_far_next]\" alt=\"$GLOBALS[l_next]\" /></a>     
-  </h1>
-
-  <div class=\"freeBusyContent\">
-
-    <div class=\"freeBusyEntities\">
-      <form method=\"POST\" id=\"entities_form\" action=\"calendar_index.php\">
-        <table id=\"freeBusyEntitiesList\"> 
+  <div id='fbc' class='freeBusyContent obmPopup'>
+    <h1>
+    <a href='' id='closeFreeBusy' class='closeSticky' onclick='return false;'>
+    <img src='$GLOBALS[ico_popup_close]' alt='close' />
+    </a>
+    <span>$GLOBALS[l_header_meeting]</span>
+    </h1>
+    <div class='freeBusyEntities'>
+      <form method='POST' id='entities_form' action='calendar_index.php'>
+        <table id='freeBusyEntitiesList'> 
           <tr>
             <td>&nbsp;</td>
           </tr>  
           <tr>
-            <td>&nbsp;</td>
+            <td><img id='spinner' style='display:none;' src='$GLOBALS[ico_spinner]' /></td>
           </tr>  
           <tr>
-            <td>
-              <div class=\"elementRow allAttendees\">$GLOBALS[l_attendees]</div>
-            </td>
+            <td><div class='allAttendees'>$GLOBALS[l_attendees]</div></td>
           </tr>  
           <tr>
-            <td id=\"sel_user_id\">
-              $dis_sel_user
-            </td>
-          </tr>
-          <tr>
-            <td id=\"sel_resource_id\">
-              $dis_sel_resource
-            </td>
+            <td id='sel_attendees_id'></td>
           </tr>
           <tbody>
             <tr>
-              <td>
-                $GLOBALS[l_users]/$GLOBALS[l_contacts] $user_add_button
-              </td>
+              <td>$GLOBALS[l_users]/$GLOBALS[l_contacts] $user_add_button</td>
             </tr>
             <tr>
-              <td>
-                <input type=\"text\" name=\"\" value=\"\" id=\"userSearch\" autocomplete=\"off\" />
-              </td>
+              <td><input type='text' name='' value='' id='freeBusyUserSearch' autocomplete='off' /></td>
             </tr>
             <tr>
-              <td>
-                $GLOBALS[l_resources] $resource_add_button
-              </td>
+              <td>$GLOBALS[l_resources] $resource_add_button</td>
             </tr>
             <tr>
-              <td>
-                <input type=\"text\" name=\"\" value=\"\" id=\"resourceSearch\" autocomplete=\"off\" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                 <input type=\"hidden\" name=\"action\" id=\"action\" value=\"perform_meeting\" />
-                 <input type=\"hidden\" name=\"time_duration\" id=\"time_duration\" value=\"$time_duration\" />
-                 <input type=\"hidden\" name=\"min_duration\" id=\"min_duration\" value=\"$min_duration\" />
-                 <input type=\"hidden\" name=\"date\" id=\"date\" value=\"".$date->getDateIso()."\" />
-                <fieldset class=\"buttons\">
-                  <input type=\"submit\" value=\"$GLOBALS[l_validate]\"/> 
-                </fieldset>
-              </td>
+              <td><input type='text' name='' value='' id='freeBusyResourceSearch' autocomplete='off' /></td>
             </tr>
           </tbody>
         </table>
       </form>
     </div>
     <div title='dummy div for IE hack'></div>
-    <div class=\"freeBusyForm\">
-      <div id=\"scrollLeft\" >«</div>
+    <div class='freeBusyForm'>
+      <div id='scrollLeft' >«</div>
       <div title='dummy div for IE hack'></div>
-      <div id=\"scrollRight\" >»</div>
-      <div class=\"freeBusyCalendar\">
-        <div id=\"calendarFreeBusyScroll\">
-          <table id=\"calendarFreeBusyTable\"> 
-            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-            <colgroup span=\"$colspan\" class=\"freeBusyCalendarColDay\">
-            <thead id=\"calendarHead\">
-              <tr>
-                $week_day_list
-              </tr>
-              <tr>
-                $day_hours_list
-              </tr>
+      <div id='scrollRight' >»</div>
+      <div class='freeBusyCalendar'>
+        <div id='calendarFreeBusyScroll'>
+          <table id='calendarFreeBusyTable'> 
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
+            <colgroup span='$colspan' class='freeBusyCalendarColDay'>
+            <thead id='calendarHead'>
+              <tr>$week_day_list</tr>
+              <tr>$day_hours_list</tr>
             </thead>
-            <tbody id=\"calendarFreeBusyGrid\">
-              $events_calendar
+            <tbody id='calendarFreeBusyGrid'>
+              $attendeesBar
             </tbody>
           </table>
-          <div id=\"calendarFreeBusyMeeting\" class=\"meeting\">
-            <div id=\"calendarFreeBusyResizeMeeting\" class=\"meetingResize\"></div>
+          <div id='calendarFreeBusyMeeting' class='meeting'>
+            <div id='calendarFreeBusyResizeMeeting' class='meetingResize'></div>
           </div>
         </div>
       </div>
 
-      <div class=\"freeBusyButtons\">
-        <input type=\"button\" id=\"pickPrev\" value=\"$GLOBALS[l_freebusy_autopick_prev]\" onclick=\"obm.calendarFreeBusy.autoPickPrev();\" />
-        <input type=\"button\" id=\"pickNext\" value=\"$GLOBALS[l_freebusy_autopick_next]\" onclick=\"obm.calendarFreeBusy.autoPickNext();\" />
+      <div class='freeBusyButtons'>
+        <input type='button' id='pickPrev' value='$GLOBALS[l_freebusy_autopick_prev]' onclick='obm.calendarFreeBusy.autoPickPrev();' />
+        <input type='button' id='pickNext' value='$GLOBALS[l_freebusy_autopick_next]' onclick='obm.calendarFreeBusy.autoPickNext();' />
       </div>
 
-      <div id=\"meetingInfo\" class=\"detail\">
-        <table class=\"infos\">
+      <div id='meetingInfo' class='detail'>
+        <table class='infos'>
           <tr>
             <th>$GLOBALS[l_datebegin]</th>
-            <td id=\"meeting_start\">$meeting_start</td>
+            <td id='meeting_start'></td>
           </tr>
           <tr>
             <th>$GLOBALS[l_dateend]</th>
-            <td id=\"meeting_end\">$meeting_end</td>
+            <td id='meeting_end'></td>
           </tr>
         </table>
       </div>
 
-      <div class=\"buttons\">
-        <form method=\"POST\" action=\"$GLOBALS[path]/calendar/calendar_index.php\">
-          <input id=\"submitMeeting\" type=\"submit\" value=\"$GLOBALS[l_new]\" />
-          <input type=\"hidden\" name=\"date_begin\" id=\"date_begin\" value=\"".urldecode($date->setHour($GLOBALS['ccalendar_first_hour'])->getURL())."\" />
-          <input type=\"hidden\" name=\"duration\" id=\"duration\" value=\"$duration_ts\" />
-          <input type=\"hidden\" name=\"new_meeting\" value=\"1\">
-          <input type=\"hidden\" name=\"title\" value=\"$title\" />
-          <input type=\"hidden\" name=\"action\" value=\"new\">
+      <div class='buttons'>
+        <form id='freeBusyFormId' method='POST' action='$GLOBALS[path]/calendar/calendar_index.php'>
+          <input id='submitMeeting' type='submit' value='$GLOBALS[l_new]' />
+          <input type='hidden' name='date_begin'id='date_begin' value='".urldecode($date->setHour($GLOBALS['ccalendar_first_hour'])->getURL())."' />
+          <input type='hidden' name='duration' id='duration' value='' />
+          <input type='hidden' name='time_begin' id='time_begin' value='' />
+          <input type='hidden' name='min_begin' id='min_begin' value='' />
+          <input type='hidden' name='new_meeting' value='1'>
+          <input type='hidden' name='action' value='new'>
         </form>
       </div>
     </div>
 
-  </div>
+  </div>";
 
-  <script type=\"text/javascript\">
-    obm.initialize.chain(function () {
-      obm.calendarFreeBusy = new Obm.CalendarFreeBusy($colspan*7, $duration, $js_time_slots, $js_busy_time_slots, $unit, $date_ts);
-      new obm.AutoComplete.Search('$GLOBALS[path]/people/people_index.php?action=ext_search&ajax=1', 'sel_user_id', 'userSearch',
-        {filter_entity:'calendar', filter_pattern:'read', selectfunction:'$(\"entities_form\").submit();'});
-      new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'sel_resource_id', 'resourceSearch',
-        {filter_entity:'calendar', filter_pattern:'read', selectfunction:'$(\"entities_form\").submit();'});
-    });
-  </script>";
+  $js = "
+    timestamp = $date_ts;
+    if ($('sel_time_begin') && $('sel_min_begin')) {
+      hour = parseInt($('sel_time_begin').value, 10);
+      min = parseInt($('sel_min_begin').value, 10);
+      d = new Obm.DateTime(timestamp*1000);
+      d.setHours(hour);
+      d.setMinutes(min);
+      timestamp = d.getTime()/1000;
+    }
+    obm.calendarFreeBusy = new Obm.CalendarFreeBusy($js_time_slots, $unit, timestamp);
+    obm.vars.labels.calendar_not_available = '$l_calendar_not_available';
+    obm.vars.labels.allday = '$l_allday';
+    obm.vars.images.ico_user = '$GLOBALS[ico_user]';
+    obm.vars.images.ico_resource = '$GLOBALS[ico_resource]';
+    obm.vars.images.ico_contact = '$GLOBALS[ico_contact]';
+    obm.vars.images.ico_meeting = '$GLOBALS[ico_meeting_alt]';
+    obm.vars.images.ico_private = '$GLOBALS[ico_private_alt]';
+    obm.vars.images.ico_allday = '$GLOBALS[ico_allday_alt]';
+    obm.vars.images.ico_periodic = '$GLOBALS[ico_periodic_alt]';
+    new obm.AutoComplete.Search('$GLOBALS[path]/people/people_index.php?action=ext_search&ajax=1', 'sel_attendees_id', 'freeBusyUserSearch',
+      {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});
+    new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'sel_attendees_id', 'freeBusyResourceSearch',
+      {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});";
 
-  return $block;
+  $display['json'] = "html:'".phpStringToJsString($block)."',js:'".phpStringToJsString($js)."'";
+  
+  return;
 }
-
 
 /**
  * dis_calendar_right_dis_admin

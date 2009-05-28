@@ -347,6 +347,13 @@ function html_people_search_list($obm_q, $prefs, $user, $popup) {
       $user_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     }
+
+    if ($ext_element == "sel_attendees_id") {
+      $user_d->data_cb_name = "";
+      $user_d->data_form_head = "
+      <form onsubmit=\"addFreeBusyEntities(this); return false;\">";
+    }
+
     $user_d->data_form_end = "
       <div class=\"buttons\">
         <input type=\"submit\" value=\"$l_add\" />

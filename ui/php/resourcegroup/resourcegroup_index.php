@@ -249,6 +249,12 @@ if (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
+
+} else if ($action == "get_json_resource_group") {
+///////////////////////////////////////////////////////////////////////////////
+  get_json_resource_group($params['res_id']);
+  echo '({'.$display['json'].'})';
+  exit();
 }
 
 
@@ -461,6 +467,13 @@ function get_resourcegroup_action() {
 // Display
   $actions["resourcegroup"]["dispref_level"] = array (
     'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=dispref_level",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+                                         );
+
+// JSON
+  $actions["resourcegroup"]["get_json_resource_group"] = array (
+    'Url'      => "$path/resourcegroup/resourcegroup_index.php?action=get_json_resource_group",
     'Right'    => $cright_read,
     'Condition'=> array ('None')
                                          );

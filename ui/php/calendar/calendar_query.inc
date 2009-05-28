@@ -4086,6 +4086,82 @@ function genUniqueExtEventId() {
 }
 
 /**
+ * Get events for an entity
+ */
+function get_json_entity_events($calendar, $entity_store) {
+  global $obm, $display;
+ 
+  $date = $calendar['date'];
+  $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+  $end = clone $date;
+  $end->addDay(7);  
+
+  $kind = $calendar['kind'];
+  $canRead = 0;
+
+  switch($kind) {
+    case 'user':
+      $id = $calendar['user_id'][0];
+      if(OBM_Acl::canRead($obm['uid'], 'calendar', $id)) {
+        $canRead = 1;
+        $status = array('ACCEPTED');
+        calendar_events_model($date,$end,$entity_store, $status);
+        $of = &OccurrenceFactory::getInstance();
+        $ocs = $of->getPeriodOccurrences($date, $end, array('user' => array($id), 'resource' => null));
+        $json_evts = build_json_event($ocs);
+      }
+      $display['json'] = "canRead:$canRead,events:[".implode(",", $json_evts)."]";
+      break;
+    case 'contact':
+      $display['json'] = "canRead:0"; // Calendar is unavailable for contacts
+      break;
+    case 'resource':
+      $id = $calendar['sel_resource_id'][0];
+      $json_evts = array();
+      if(OBM_Acl::canRead($obm['uid'], 'resource', $id)) {
+        $canRead = 1;
+        $status = array('ACCEPTED');
+        calendar_events_model($date,$end,$entity_store, $status);
+        $of = &OccurrenceFactory::getInstance();
+        $ocs = $of->getPeriodOccurrences($date, $end, array('user' => null, 'resource' => array($id)));
+        $json_evts = build_json_event($ocs);
+      }
+      $display['json'] = "canRead:$canRead,events:[".implode(",", $json_evts)."]";
+      break;
+  }
+
+}
+
+function build_json_event($ocs) {
+  global $obm;
+
+  $json_evts = array();
+  if (is_array($ocs)) {
+    foreach($ocs as $oc) {
+      $date = $oc->date;
+      $begin = clone $date;
+      $end = clone $date;
+      $end->addTimestamp($oc->event->duration); 
+      $evt = "{event:{";
+      $title = $oc->event->title;
+      if($oc->event->isPrivate() && !(array_key_exists($obm['uid'],$oc->event->attendee['user']))) {
+        $title = $GLOBALS['l_private'];
+      }
+      $evt .= "begin:'".$begin->getTimestamp()."',";
+      $evt .= "end:'".$end->getTimestamp()."',";
+      $evt .= "title:'".phpStringToJsString($title)."',";
+      $evt .= "meeting:".($oc->event->isMeeting()?'true':'false').",";
+      $evt .= "private:".($oc->event->isPrivate()?'true':'false').",";
+      $evt .= "allday:".($oc->event->isAllDay()?'true':'false').",";
+      $evt .= "periodic:".($oc->event->isPeriodic()?'true':'false')."";
+      $evt .= "}}";
+      array_push($json_evts, $evt);
+    }
+  }
+  return $json_evts;
+}
+
+/**
  * Check if there is a conflict about a resource, and return false
  * if we can't force its insertion.
  */

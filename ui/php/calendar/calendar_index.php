@@ -129,9 +129,9 @@ if ( ($params['new_group'] == '1')
     $cal_entity_id['resource'] = array();
   }
 // Resources groups, only on meeting
-if ($action == 'perform_meeting' &&
+if ($action == 'add_freebusy_entity' || ($action == 'perform_meeting' &&
   ($params['sel_resource_group_id'] || $params['sel_user_id'] ||
-  $params['sel_resource_id'] || $params['sel_group_id'])) { 
+  $params['sel_resource_id'] || $params['sel_group_id']))) { 
     $cal_entity_id['user'] = $params['sel_user_id'];
     $cal_entity_id['resource'] = $params['sel_resource_id'];    
     $cal_entity_id['group'] = $params['sel_group_id'];
@@ -145,7 +145,7 @@ if ($action == 'perform_meeting' &&
     } else {
       $cal_entity_id['resource_group'] = $params['sel_resource_group_id'];
     }
-  } else if ($action != 'perform_meeting') {
+  } elseif ($action != 'perform_meeting') {
     unset($cal_entity_id['resource_group']);
   }
 
@@ -200,8 +200,8 @@ if ($popup) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
   if ($action == 'calendar') {
-    display_head($l_calendar);
-    display_end();
+    // display_head($l_calendar);
+    // display_end();
   } elseif ($action == 'export') {
     dis_calendar_export_handle($params);
   }
@@ -579,12 +579,9 @@ if ($action == 'index') {
 
 } elseif ($action == 'perform_meeting')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $cal_entity_id['user'] = run_query_calendar_get_allusers($cal_entity_id['user'], $params['sel_group_id']);
-  $entity_readable = get_calendar_entity_readable();
-  $ret = get_calendar_entity_label($cal_entity_id);
-  $ret['resourcegroup'] = run_query_resource_resourcegroup($cal_entity_id['resource_group']);
-  $entity_store = store_calendar_entities($ret);
-  $display['detail'] = dis_calendar_free_interval($params, $entity_store, $cal_entity_id);
+  dis_calendar_free_interval($params);
+  echo "({".$display['json']."})";
+  exit();
 
 } elseif ($action == 'admin')  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -728,6 +725,18 @@ if (!$params['ajax']) {
   } else {
     json_error_msg("$l_view_default : $l_delete_error");
   }
+  echo "({".$display['json']."})";
+  exit();
+
+} elseif ($action == 'add_freebusy_entity') {
+///////////////////////////////////////////////////////////////////////////////
+  if ($params['kind'] == 'user') {
+    array_push($cal_entity_id['user'], $params['entity_id']);
+  }
+  $ret = get_calendar_entity_label($cal_entity_id);
+  $ret['resourcegroup'] = run_query_resource_resourcegroup($cal_entity_id['resource_group']);
+  $entity_store = store_calendar_entities($ret);
+  get_json_entity_events($params, $entity_store);
   echo "({".$display['json']."})";
   exit();
 
@@ -1214,6 +1223,12 @@ function get_calendar_action() {
     'Condition'=> array ('None')
   );
 
+  // Add freebusy entity
+  $actions['calendar']['add_freebusy_entity'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=add_freebusy_entity",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None')
+  );
 }
 
 

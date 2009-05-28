@@ -121,6 +121,44 @@ function check_resource(form) {
   return true;
 }
 
+
+  function addFreeBusyEntities(int_form) {
+    var container = '$params[ext_container]';
+    size = int_form.length;
+    for (i=0; i <size; i++) {
+      // For each checkbox of the form, if filled we send the value
+      if (int_form.elements[i].type == 'checkbox') {
+        if (int_form.elements[i].checked == true) {
+          id = $(int_form.elements[i]).getNext().id;
+          div_id = '$params[ext_element]-'+id;
+          // If the element not already present in the caller window
+          if (! get_elem(window.opener.document, div_id )) {
+   	        sel_id = 'data-'+id;
+            // Get the label associated to the id from the int_form row
+            // hidden in an hidden span
+  	        span = get_elem(window.document, id);
+            window.opener.obm.calendarFreeBusy.addAttendee(id);
+  	        if (container == '' || container == 'div') {
+  	          of_select_add_element(window.opener.document, '$params[ext_element]', id, span.innerHTML);
+            }
+            if (container == 'table') {
+              of_select_add_element_table(window.opener.document, '$params[ext_element]', id, span.innerHTML);
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+
+
+
+
+
+
+
+
 ";
 
 ?>

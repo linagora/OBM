@@ -1703,14 +1703,15 @@ Obm.CalendarView = new Class({
 Obm.CalendarFreeBusy = new Class({
 
   /*
-   * Init
-   * Build meeting slider, meeting resizer
-   * time_slots: contains all timestamps
-   * busy_time_slots: contains busy indexes (not timestamp)
+   * Initialize attributes
    */
-  initialize: function(nbSteps, duration, time_slots, busy_time_slots,unit,meeting_date) {
-
-    this.meeting_date = meeting_date;
+  initialize: function(time_slots, unit, begin_timestamp) {
+    this.timestamp = begin_timestamp;
+    // this.date = new Obm.DateTime(this.timestamp*1000).toLocaleDateString(); Doesn't work on Windows ?
+    d = new Obm.DateTime(this.timestamp*1000);
+    this.date = d.format('m/d/Y');
+    this.close = $('closeFreeBusy');
+    this.meeting_date = 0;
     this.unit = unit;
     this.stepSize = 40/this.unit;
     this.scrollDiv = $('calendarFreeBusyScroll');
@@ -1720,71 +1721,56 @@ Obm.CalendarFreeBusy = new Class({
     this.table = $('calendarFreeBusyTable'); 
     this.scrollRight = $('scrollRight');
     this.scrollLeft = $('scrollLeft');
-    this.nbSteps = nbSteps;
-    this.duration = duration;
-    this.bts = busy_time_slots;
+    this.nbSteps = time_slots.length;
+    this.duration = 1;
+    this.bts = new Array();
     this.ts = time_slots;
     this.meeting_slots = this.duration*this.unit;
     this.oneDayWidth = this.stepSize*this.nbSteps/7; // in px
     this.oneDaySteps = this.nbSteps/7; // nb slots per day
     this.limitRight = this.scrollDiv.getLeft()+this.scrollDiv.offsetWidth;
     this.currentPosition = 0;
-    // this.previousPosition = 0;
+    this.attendeesSlot = new Array();
+    this.scrollDiv.setStyle('width', $('mainContent').offsetWidth-100+'px');
+  },
 
-    // this.table.setStyle('width', this.nbSteps*this.stepSize+'px');  
+  /*
+   * build panel 
+   * Build meeting slider, meeting resizer
+   */
+  buildFreeBusyPanel: function(duration) {
+    // setStyle doesn't work here. have to setStyle in initialize function. don't know why ... 
+    // this.scrollDiv.setStyle('width', $('mainContent').offsetWidth-100+'px');
+
+    this.duration = duration;
+    $('duration').value = this.duration*3600;
+    this.meeting_slots = this.duration*this.unit;
+    this.meeting_date = this.timestamp;
 
     // /!\ meeting width must be set BEFORE Slider building
     this.meeting.setStyle('width', this.stepSize*this.meeting_slots+'px');
 
-    // Meeting
+    // Meeting slider : change date begin
     this.slider = new Slider(this.container, this.meeting, {
       steps: this.nbSteps-this.meeting_slots,
       snap: true,
       onChange: function(pos) {
         this.currentPosition = pos;
-        var end_pos = this.currentPosition + this.meeting_slots-1;
-        var date_begin_ts = this.ts[this.currentPosition]*1000;
-        var date_begin = new Obm.DateTime(date_begin_ts);
-        var date_end_ts = this.ts[end_pos]*1000;
-        var date_end = new Obm.DateTime(date_end_ts);
-
-        // if (this.previousPosition > this.currentPosition) {
-        //   if (date_begin.format('d') < date_end.format('d')) {
-        //      this.slider.set(end_pos-this.meeting_slots);
-        //   }
-        // } else {
-        //   if (date_end.format('d') > date_begin.format('d')) {
-        //      this.slider.set(end_pos);
-        //    }
-        // }
-
-        // Auto-Scroll
-        // FIXME: problem with onTick
-        // if (this.meeting.getLeft()+this.meeting_slots*this.stepSize>=this.limitRight
-        //   || this.meeting.getLeft() <= this.table.getLeft()+this.scrollDiv.scrollLeft) {
-        //   this.autoScroll.toElement(this.meeting);
-        // }
-
-        // Set meeting color
-        this.changeStatus(this.isBusy(end_pos));
-    
-        // Display meeting date begin and date end
+        this.changeStatus(this.isBusy(this.currentPosition + this.meeting_slots-1));
         this.displayMeetingInfo();
-
-        // Store old position
-        // this.previousPosition = this.currentPosition;        
-
-        this.forcePosition();
       }.bind(this),
 
       onComplete: function() {
         var ts = this.ts[this.currentPosition] * 1000;
         var date_begin = new Obm.DateTime(ts);
         $('date_begin').value = date_begin.format('c');
+        $('time_begin').value = date_begin.format('h');
+        $('min_begin').value = date_begin.format('i');
       }.bind(this)
 
     });
 
+    // Meeting resizer: change duration
     var resizeOptions = {
       handle: this.resizeHandler,
       grid: {'x' : this.slider.stepWidth},
@@ -1805,19 +1791,10 @@ Obm.CalendarFreeBusy = new Class({
       }.bind(this),
       onComplete:function() {
         $('duration').value = this.duration*3600;
-        var ts = this.ts[this.currentPosition] * 1000;
-        var date_begin = new Obm.DateTime(ts);
-        $('date_begin').value = date_begin.format('c');
         this.slider.drag.attach();
       }.bind(this)     
     };
     this.meeting.makeResizable(resizeOptions);
-
-    this.meeting.setStyles({
-      'top': '-'+this.container.offsetHeight+'px',
-      'height': this.container.offsetHeight+'px',
-      'width':this.slider.stepWidth*this.meeting_slots+'px'
-    });
     this.meeting.setOpacity(.5);
 
     this.resizeHandler.setStyles({
@@ -1825,34 +1802,29 @@ Obm.CalendarFreeBusy = new Class({
       'height': this.container.offsetHeight+'px'
     });
 
-    this.scrollDiv.setStyle('height',this.table.offsetHeight+20+'px');
-
-    // Is the first time_slot busy ?
-    if(this.isBusy(this.meeting_slots)) {
-      this.meeting.addClass('meetingBusy');        
-    } 
-
     // Auto Scroll
     this.autoScroll = new Fx.Scroll(this.scrollDiv, {
       offset: {'x':-this.oneDayWidth/2, 'y':-$('calendarHead').offsetHeight} // Offset y : for ie7 !
     });
 
     // Navigation Scroll
-    this.scrollLeft.setStyle('height', this.table.offsetHeight+'px');
-    this.scrollLeft.setStyle('line-height', this.table.offsetHeight+'px');
-    this.scrollRight.setStyle('line-height', this.table.offsetHeight+'px');
-
     this.scroll = new Fx.Scroll(this.scrollDiv);
-
     this.scrollLeft.addEvent('click', function() {
       this.scroll.start(this.scrollDiv.scrollLeft-this.oneDayWidth/2, 0); // - 1/2 day
     }.bind(this));
-
     this.scrollRight.addEvent('click', function() {
       this.scroll.start(this.scrollDiv.scrollLeft+this.oneDayWidth/2, 0); // + 1/2 day
     }.bind(this));
 
+    // Scroll to the right position
     this.initPosition();
+
+    if ($('new_event_form')) {
+      var qstring = 'calendar_index.php?'+$('new_event_form').toQueryString();
+      qstring = qstring.replace('date_begin', 'dummy');
+      qstring = qstring.replace('date_end', 'dummy');
+      $('freeBusyFormId').setProperty('action', qstring);
+    }
   },
 
   /*
@@ -1869,15 +1841,13 @@ Obm.CalendarFreeBusy = new Class({
   /*
    * Check if selected slot is busy or not
    */
-  isBusy: function(end_pos) { // TODO: test if same day
+  isBusy: function(end_pos) {
     for(var i=this.currentPosition;i<=end_pos;i++) {
       var index = this.bts.indexOf(i+'');
       if (index != -1) {
-        // $('submitMeeting').setProperty('disabled', 'disabled');
         return true;
       }
     }
-    // $('submitMeeting').setProperty('disabled', ''); 
     return false;
   },
 
@@ -1906,7 +1876,6 @@ Obm.CalendarFreeBusy = new Class({
     } else {
       this.slider.set(this.currentPosition);
       this.autoScroll.toElement(this.meeting);
-      this.forcePosition();
     }
   },
 
@@ -1924,7 +1893,6 @@ Obm.CalendarFreeBusy = new Class({
     } else {
       this.slider.set(this.currentPosition);
       this.autoScroll.toElement(this.meeting);
-      this.forcePosition();
     }
   },
 
@@ -1938,29 +1906,220 @@ Obm.CalendarFreeBusy = new Class({
   },
 
   /*
-   * Force meeting position
+   * Add an attendee dynamically
    */
-  forcePosition: function() {
-    // this.meeting.setStyles({
-    //   'top': '-'+this.container.offsetHeight+'px', // for ie7 !
-    //   'left': this.currentPosition*this.stepSize+'px'
-    // });
+  addAttendee: function(entity, label) {
+
+    s = entity.split('-');
+    var data = new Object()
+    var kind = s[1];
+    var id = s[2]
+    data.kind = kind;
+    data.entity_id = id;
+    data.date = this.date;
+
+    if (kind == 'resource') {
+      data.sel_resource_id = new Array();
+      data.sel_resource_id.push(id);
+      var ico = obm.vars.images.ico_resource;
+    } else if(kind == 'user') {
+      data.sel_user_id = new Array();
+      data.sel_user_id.push(id);
+      var ico = obm.vars.images.ico_user;
+    } else if (kind == 'contact') {
+      data.sel_contact_id = new Array();
+      data.sel_contact_id.push(id);
+      var ico = obm.vars.images.ico_contact;
+    }
+
+    var attendee = kind+'-'+id;
+
+    new Request.JSON({
+      url: 'calendar_index.php',
+      secure: false,
+      async: true,
+      onRequest: function() {
+        $('spinner').setStyle('display', 'block');
+      },
+      onComplete : function(response) {
+        resp = eval(response);
+        if (!$(attendee)) {
+          var tr = new Element('tr').setProperty('id', attendee).addClass('oneAttendee');
+          if (label) {
+            // Add attendee in attendees panel
+            var div_id = 'sel_attendees_id-data-'+attendee;
+            var div = new Element('div').setProperty('id', div_id).addClass('elementRow');
+            new Element('a').adopt(new Element('img').setProperty('src',obm.vars.images.del)).addEvent('mousedown',
+              function() {
+                remove_element(div_id,label);
+              }.bind(this)).injectInside(div);
+            div.appendText(label);
+            $('sel_attendees_id').adopt(div);
+          }
+          if (!resp.canRead) {
+            for(i=0;i<this.nbSteps;i++) {
+              tr.adopt((new Element('td').addClass('timeSlotNoCalendar').addClass('obmTip').
+                setProperty('title', obm.vars.labels.calendar_not_available)));
+            }
+            this.container.adopt(tr);
+            this.setSize();
+          } else {
+            var entitySlot = new Array();
+            var  events = resp.events;
+            this.ts.each(function(slot) {
+              entitySlot.push(slot); 
+              entitySlot[slot] = new Array();
+              tip = '<table>';
+              events.each(function(e) {
+                var begin = e.event.begin;
+                var end = e.event.end;
+                var time = e.event.time;
+                var title = '';
+                if (e.event.meeting) {
+                  title += '<img src="'+obm.vars.images.ico_meeting+'" alt="[Meeting]"/> '; 
+                }
+                if (e.event.private) {
+                  title += '<img src="'+obm.vars.images.ico_private+'" alt="[Private]"/> '; 
+                }
+                if (e.event.periodic) {
+                  title += '<img src="'+obm.vars.images.ico_periodic+'" alt="[Periodic]"/> '; 
+                }
+                if (e.event.allday) {
+                  title += '<img src="'+obm.vars.images.ico_allday+'" alt="[All day]"/> '; 
+                }
+                title += e.event.title;
+                if (begin <= slot && slot < end) {
+                  entitySlot[slot].push(time);
+                  var hour_begin = new Obm.DateTime(begin*1000).format('h:i'); 
+                  var hour_end = new Obm.DateTime(end*1000).format('h:i'); 
+                  if (e.event.allday) {
+                    tip += '<tr><td class="B">'+obm.vars.labels.allday+'</td><tr>';
+                  } else {
+                    tip += '<tr><td class="B">'+hour_begin+' - '+hour_end+'</td><tr>';
+                  }
+                  tip += '<tr><td><ul>'+title+'</ul></td></tr>';
+                  $(slot).addClass('haveEventAll');
+                  this.bts.push(''+this.ts.indexOf(''+slot));
+                }
+              }.bind(this));
+              tip += '<table>';
+              if (entitySlot[slot].length > 0) {
+                var td = new Element('td').addClass('timeSlot').addClass('obmTip')
+                  .setProperty('title', tip).adopt(new Element('div').addClass('haveEvent').addClass(slot));
+                tr.adopt(td); 
+                if (!this.attendeesSlot[attendee]) this.attendeesSlot[attendee]=new Array();
+                this.attendeesSlot[attendee].push(slot);
+                obm.tip.add(td);
+              } else {
+                tr.adopt(new Element('td').addClass('timeSlot')); 
+              }
+            }.bind(this));
+            this.container.adopt(tr);
+            this.setSize();
+          }
+
+          // Set meeting color
+          this.changeStatus(this.isBusy(this.currentPosition+this.meeting_slots-1));
+
+          var div_id = $('sel_attendees_id-data-'+attendee);
+          var a = div_id.getFirst();
+          var trash = a.getFirst();
+
+          // Add entity icon
+          var img = new Element('img').setProperty('src', ico); 
+          img.injectBefore(a);
+
+          // Add event on trash icon
+          trash.addEvent('mousedown', function() {
+            $(attendee).destroy();
+            if (this.attendeesSlot[attendee]) {
+              this.attendeesSlot[attendee].each(function(e) {
+                if (!$$('div.'+e).length) {
+                  $(e).removeClass('haveEventAll');
+                  this.bts.erase(''+this.ts.indexOf(e));
+                }
+              }.bind(this));
+              this.attendeesSlot[attendee].empty();
+            }
+            this.setSize();
+          }.bind(this));
+
+          // Fix popup top position
+          $('fbc').getParent().setStyle('top', $('fbc').getParent().offsetTop-10+'px');
+
+          var input = new Element('input').setProperties({
+            'type' : 'hidden',
+            'name':'new_'+kind+'_id[]',
+            'value' : id
+          });
+          $('freeBusyFormId').adopt(input);
+
+        }
+      }.bind(this),
+      onSuccess: function() {
+        $('spinner').setStyle('display', 'none');
+      },
+      onFailure: function() {
+        $('spinner').setStyle('display', 'none');
+      }
+    }).post($merge({ajax : 1, action : 'add_freebusy_entity'}, data));
   },
 
-  // TODO: add an entity dynamically
-  addEntity: function() {
+  /*
+   * Add users from a group
+   */
+  addUserGroup: function(group_id) {
+    data = new Object();
+    data.group_id = group_id;
+    new Request.JSON({
+      url: '/group/group_index.php',
+      secure: false,
+      async: true,
+      onComplete: function(r) {
+        resp = eval(r);
+        resp.users.each(function(u) {
+          this.addAttendee('data-user-'+u.id, u.label);
+        }.bind(this));
+      }.bind(this)
+    }).post($merge({ajax : 1, action : 'get_json_user_group'}, data));
+  },
 
-    var tr = new Element('tr');
-    for(i=0;i<this.nbSteps;i++) {
-      tr.adopt((new Element('td').addClass('timeSlot')));
-    }
-    this.container.adopt(tr);
+  /*
+   * Add resources from a resource group
+   */
+  addResourceGroup: function(res_id) {
+    data = new Object();
+    data.res_id = res_id;
+    new Request.JSON({
+      url: '/resourcegroup/resourcegroup_index.php',
+      secure: false,
+      async: true,
+      onComplete: function(r) {
+        resp = eval(r);
+        resp.resources.each(function(u) {
+          this.addAttendee('data-resource-'+u.id, u.label);
+        }.bind(this));
+      }.bind(this)
+    }).post($merge({ajax : 1, action : 'get_json_resource_group'}, data));
+  },
 
-    var srollHeight = this.scrollLeft.offsetHeight+18;
-    this.scrollLeft.setStyle('height', srollHeight+'px');
-    this.scrollRight.setStyle('height', srollHeight+'px');
-    this.scrollDiv.setStyle('height', this.scrollDiv.offsetHeight+18+'px');
-    this.meeting.setStyle('height', this.meeting.offsetHeight+18+'px');
+  /*
+   * Set table height
+   */
+  setSize: function() {
+    var newHeight = this.table.offsetHeight;
+    this.meeting.setStyles({
+      'height':this.container.offsetHeight+'px',
+      'top':'-'+this.container.offsetHeight+'px'
+    });
+    this.scrollRight.setStyles({'height':newHeight+'px','line-height':newHeight+'px'});
+    this.scrollLeft.setStyles({'height':newHeight+'px','line-height':newHeight+'px'});
+    this.scrollDiv.setStyle('height', newHeight+20+'px');
+    this.resizeHandler.setStyles({
+      'height' : this.container.offsetHeight+'px',
+      'margin-left' : this.meeting.offsetWidth-this.resizeHandler.offsetWidth+'px',
+      'height': this.container.offsetHeight+'px'
+    });
   }
 
 });

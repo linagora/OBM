@@ -642,16 +642,12 @@ h1.hoursTitle{
 /* OBM 2.2 FreeBusy */
 
 .freeBusyContent {
-  padding: 0px 0px 20px 0px;
+  padding: 0;
 }
 
 .freeBusyForm {
   margin-left: 16em;
-  padding:0;
-}
-
-#calendarFreeBusyScroll {
-  margin-left: 1em;
+  padding: 5px 0px 5px 0px;
 }
 
 .freeBusyCalendar {
@@ -662,7 +658,6 @@ h1.hoursTitle{
 #calendarFreeBusyScroll {
   overflow-x:scroll;
   overflow-y:hidden;
-  margin:0 1em 0 1em; 
   background: #FFF;
   padding: 0;
   position: relative;
@@ -720,6 +715,7 @@ h1.hoursTitle{
 .freeBusyEntities {
   width: 15em;
   position: absolute;
+  padding: 5px 0px 0px 5px;
 }
 
 .freeBusyEntities table {

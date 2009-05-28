@@ -11,6 +11,51 @@ require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
 
+  function performMeeting() {
+    var duration = parseInt($('sel_time_duration').value, 10)+parseInt($('sel_min_duration').value, 10)/60;
+    displayFreeBusy($('tf_date').value, duration);
+  }
+
+  function displayFreeBusyConflict(duration) {
+    displayFreeBusy($('tf_date_begin').value, duration);
+  }
+
+  function displayFreeBusy(date_begin, duration) {
+    if($('fbc')) $('fbc').destroy();
+    var q = new Object();
+    q.date = date_begin;
+    new Request.JSON({
+      url : 'calendar_index.php',
+      secure : false,
+      async: true,
+      onComplete: function(response) {
+        resp = eval(response);
+        $('fbcContainer').innerHTML = resp.html;
+        eval(resp.js);
+
+        obm.popup.popups.erase('fbc');
+        obm.popup.show('fbc');
+        obm.calendarFreeBusy.buildFreeBusyPanel(duration);
+
+        var elements = $$('div.elementRow');
+        elements.each(function (e) {
+          var id = e.id.split('-');
+          if (id[0] == 'sel_user_id' || id[0] == 'sel_resource_id') {
+            var entity = id[1]+'-'+id[2]+'-'+id[3];
+            var label = e.get('text').trim();
+            obm.calendarFreeBusy.addAttendee(entity, label);
+          } else if (id[0] == 'sel_group_id') {
+            obm.calendarFreeBusy.addUserGroup(id[3]);
+          } else if (id[0] == 'sel_resource_group_id') {
+            obm.calendarFreeBusy.addResourceGroup(id[3]);
+          }
+        });
+        $('fbcContainer').innerHTML = '';
+
+      }
+    }).post(\$merge({ajax : 1, action : 'perform_meeting'}, q)); 
+  }
+
   function add_displayed_users(check, users, uid) {
     if (check) {
       for(var id in users) {

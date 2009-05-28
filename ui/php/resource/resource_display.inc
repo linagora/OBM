@@ -230,6 +230,13 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
       $resource_d->data_form_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     }
+
+    if ($ext_element == "sel_attendees_id") {
+      $resource_d->data_cb_name = "";
+      $resource_d->data_form_head = "
+      <form onsubmit=\"addFreeBusyEntities(this); return false;\">";
+    }
+
     $resource_d->data_form_end = "
       <fieldset class=\"buttons\">
         <input type=\"submit\" value=\"$l_add\" />
