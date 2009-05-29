@@ -298,11 +298,16 @@ if ($action == 'index') {
         if ($params['date_begin'] < date('Y-m-d H:')) {
           $display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
         }
+
+        if (!$params['show_attendees_calendar']) {
+          $params['sel_user_id'] = "data-user-".$obm['uid']; // show my calendar only
+          $cal_entity_id['resource'] = array();
+        }
+
         $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
         $params["date"] = $params["date_begin"];
 
         $cal_entity_id['user'] = $params['sel_user_id'];
-
         $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
       }
   } else {

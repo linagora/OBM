@@ -11,6 +11,7 @@ $l_calendar = "Calendrier";
 $l_attendees = "Participants";
 $l_others_attendees = "Autres participants";
 $l_add_displayed_users = "Ajouter les utilisateurs dont les agendas sont affichés";
+$l_show_attendees_calendar = "Afficher le calendrier des participants après la création";
 $l_users = "Utilisateurs";
 $l_owner = "Organisateur";
 $l_resources = "Ressources";

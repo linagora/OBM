@@ -2791,7 +2791,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $desc = $event_q->f('event_description');
     if ($properties != '') {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'?>$properties";
+      $item = "<?xml version='1.0' encoding='$charset'? >$properties";
     } else {
       $item = '';
     }
@@ -2875,6 +2875,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['property'])) { $t_property_value = $calendar['property']; }
   if (isset($calendar['others_attendees'])) { $others_attendees = $calendar['others_attendees']; }
   if (isset($calendar['add_displayed_users'])) { $add_displayed_users = $calendar['add_displayed_users']; }
+  if (isset($calendar['show_attendees_calendar'])) { $show_attendees_calendar = $calendar['show_attendees_calendar']; }
   if (isset($calendar['alert'])) {
     // handle only one entry for now
     if (is_array($sel_alert)) {
@@ -2943,6 +2944,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if ( $all_day ) {
     $style = 'display:none;';
     $all_day_checked = "checked=\"checked\"";
+  }
+
+  if ( $show_attendees_calendar ) {
+    $show_attendees_calendar_checked = "checked=\"checked\"";
   }
 
   if ($action == 'new' && !isset($calendar['new_meeting'])) {
@@ -3064,6 +3069,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </tr>
       <tr>
       $dis_others_attendees
+      </tr>
+      <tr>
+        <th>$GLOBALS[l_show_attendees_calendar]</th>
+        <td>
+          <input type=\"checkbox\" id=\"cba_show_attendees_calendar\" value=\"1\" $show_attendees_calendar_checked name=\"cba_show_attendees_calendar\" />
+        </td>
       </tr>
       </table>
       </fieldset>
@@ -4039,7 +4050,7 @@ function dis_calendar_free_interval($calendar) {
 
       <div class='buttons'>
         <form id='freeBusyFormId' method='POST' action='$GLOBALS[path]/calendar/calendar_index.php'>
-          <input id='submitMeeting' type='submit' value='$GLOBALS[l_new]' />
+          <input id='submitMeeting' type='submit' value='$GLOBALS[l_validate]' />
           <input type='hidden' name='date_begin'id='date_begin' value='".urldecode($date->setHour($GLOBALS['ccalendar_first_hour'])->getURL())."' />
           <input type='hidden' name='duration' id='duration' value='' />
           <input type='hidden' name='time_begin' id='time_begin' value='' />
