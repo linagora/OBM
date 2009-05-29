@@ -54,8 +54,11 @@ $extra_js .= "
           var id = e.id.split('-');
           if (id[0] == 'sel_user_id' || id[0] == 'sel_resource_id') {
             var entity = id[1]+'-'+id[2]+'-'+id[3];
-            var label = e.get('text').trim();
+            var tmp = e.clone();
+            tmp.getChildren().destroy();
+            var label = tmp.get('text').trim();
             obm.calendarFreeBusy.addAttendee(entity, label);
+            tmp.destroy();
           } else if (id[0] == 'sel_group_id') {
             obm.calendarFreeBusy.addUserGroup(id[3]);
           } else if (id[0] == 'sel_resource_group_id') {
