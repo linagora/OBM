@@ -183,7 +183,140 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
   return $res;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display User search form
+// Parameters:
+//   - $user[]   : default form values
+///////////////////////////////////////////////////////////////////////////////
+function html_batch_user_search_form($user) {
+  global $l_find, $l_title, $l_profile, $l_nomade, $l_service;
+  global $l_group, $l_fax, $l_all, $l_exp;
+  global $l_quota, $l_delegation_target, $l_datebegin, $l_mail_server;
+  global $display, $c_all, $l_recursive, $obm, $l_direction, $l_service;
+  
+  $delegation = stripslashes($user['delegation']);
+  $exp = $user['exp'];
+  $exp_op = $user['exp_op'];
+  $profile = $user['profile'];
+  $title = $user['title'];
+  $fax = $user['fax'];
+  $direction = $user['direction'];
+  $service = $user['service'];
+  $group = $user['group'];
+  $nomade = ($user['nomade'] == '1' ? 'checked' : '');
+  $quota = $user['quota'];
+  $quota_op = $user['quota_op'];
 
+  if ($user['filter_entity']) {
+    $dis_filter_entity = "<input name=\"filter_entity\" type=\"hidden\" value=\"$user[filter_entity]\" />";
+    if($user['filter_pattern'])
+      $dis_filter_entity .= "<input name=\"filter_pattern\" type=\"hidden\" value=\"$user[filter_pattern]\" />";
+    else
+      $dis_filter_entity .= "<input name=\"filter_pattern\" type=\"hidden\" value=\"read\" />";
+  }
+
+  // User defined data
+  $block_userdata .= of_userdata_dis_search('user', $user);
+
+  $form_action = "<input name=\"action\" type=\"hidden\" value=\"sel_batch_users\" />";
+
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
+  foreach ($user['profiles'] as $k_profile => $one_profile) {
+    $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;
+    $block_profile .= "<option value=\"$k_profile\">$profile</option>";
+  }
+  $options = array('=' => '=', '<' => '<', '>' => '>');
+  foreach($options as $topt => $opt) {
+    if($quota_op == $topt) {
+      $block_quota_opt .= "<option selected='selected' value=\"".urlencode($opt)."\">$opt</option>";
+    } else {
+      $block_quota_opt .= "<option value=\"".urlencode($opt)."\">$opt</option>";
+    }
+  }
+  foreach($options as $topt => $opt) {
+    if($exp_op == $topt) {
+      $block_exp_opt .= "<option selected='selected' value=\"".urlencode($opt)."\">$opt</option>";
+    } else {
+      $block_exp_opt .= "<option value=\"".urlencode($opt)."\">$opt</option>";
+    }
+  }
+
+  $block = "
+  <form method=\"get\" name=\"f_search\"
+    action=\"". url_prepare("user_index.php")."\" class=\"search\"> ";
+
+    $block .= "$dis_delegation
+                ";
+    $block .= "<label<br />
+      <select type=\"text\" name=\"sel_exp_op\">
+        $block_exp_opt
+      </select>
+    </label>
+    <label>$l_exp<br />
+      <input type=\"text\" name=\"tf_exp\" size=\"16\" maxlength=\"32\"
+      value=\"$exp\" />
+    </label>
+                ";
+    $block .= "<label>$l_profile<br />
+      <select type=\"text\" name=\"sel_profile\">
+        <option value=\"$c_all\"> $l_all</option>
+        $block_profile
+      </select>
+    </label>
+                ";
+    $block .= "<label>$l_title<br />
+      <input type=\"text\" name=\"tf_title\" size=\"16\" maxlength=\"32\"
+      value=\"$title\" />
+    </label>
+                ";
+    $block .= "<label>$l_fax<br />
+      <input type=\"text\" name=\"tf_fax\" size=\"16\" maxlength=\"16\"
+      value=\"$fax\" />
+    </label>
+                ";
+    $block .= "<label>$l_direction<br />
+      <input type=\"text\" name=\"tf_direction\" size=\"16\" maxlength=\"32\"
+      value=\"$direction\" />
+    </label>
+                ";
+    $block .= "<label>$l_service<br />
+      <input type=\"text\" name=\"tf_service\" size=\"16\" maxlength=\"32\"
+      value=\"$service\" />
+    </label>
+                ";    
+    $block .= "<label>$l_group<br />
+      <input type=\"text\" name=\"tf_group\" size=\"16\" maxlength=\"32\"
+      value=\"$group\" />
+    </label>
+                ";
+    $block .= "<label>$l_nomade<br />
+      <input type=\"checkbox\" name=\"cba_nomade\" value=\"1\" $nomade />
+    </label>
+                ";
+    $block .= "<label>$l_quota<br \>
+      <select type=\"text\" name=\"sel_quota_op\">
+        $block_quota_opt
+      </select>
+      </label>
+      <label><br />
+      <input type=\"text\" name=\"tf_quota\" size=\"16\" maxlength=\"32\"
+      value=\"$quota\" />
+      </label>
+    
+                ";
+
+  $block .= "<label>&nbsp;<br />
+      $form_action
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+      $dis_filter_entity
+    </label>
+                ";
+  $block.= "<p class=\"CL\" />
+   </form>";
+
+  return $block;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Display User search form
 // Parameters:
@@ -251,11 +384,7 @@ function html_user_search_form($user) {
     $display['title'] = $ext_title;
   }
 
-  if ($user_action == 'search_batch_user' || $user_action == 'sel_batch_users') {
-    $form_action = "<input name=\"action\" type=\"hidden\" value=\"sel_batch_users\" />";
-  } else {
-    $form_action = "<input name=\"action\" type=\"hidden\" value=\"search\" />";
-  }
+  $form_action = "<input name=\"action\" type=\"hidden\" value=\"search\" />";
 
   foreach ($user['profiles'] as $k_profile => $one_profile) {
     $profile = isset($GLOBALS["l_perm_$k_profile"]) ? $GLOBALS["l_perm_$k_profile"] : $k_profile;

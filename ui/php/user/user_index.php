@@ -319,7 +319,7 @@ if ($action == 'ext_get_ids') {
   
 } else if ($action == 'search_batch_user') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['search'] = html_user_search_form($params);
+  $display['search'] = html_batch_user_search_form($params);
   if ($_SESSION['set_display'] == 'yes') {
     $display['result'] = dis_user_search_list($params);
   } else {
@@ -328,7 +328,7 @@ if ($action == 'ext_get_ids') {
   
 } else if ($action == 'sel_batch_users') {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['search'] = html_user_search_form($params);
+  $display['search'] = html_batch_user_search_form($params);
   $display['result'] = dis_user_search_list($params);
   
 } else if ($action == 'edit_batch_values') {
@@ -392,7 +392,8 @@ function get_user_params() {
     $params['group_nb'] = $nb_group;
     
   }
-  
+  if(isset($params['exp_op']))  $params['exp_op'] = urldecode($params['exp_op']);
+  if(isset($params['quota_op']))  $params['quota_op'] = urldecode($params['quota_op']);
   if (isset ($_FILES['fi_file'])) {
     $params['file_tmp'] = $_FILES['fi_file']['tmp_name'];
     $params['file_name'] = $_FILES['fi_file']['name'];

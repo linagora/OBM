@@ -35,12 +35,19 @@ function run_query_user_search($user) {
   $desc = sql_search_text_parse($user['desc']);
   $group = sql_search_text_parse($user['group']);
   $archive = $user['archive'];
+  $nomade = $user['nomade'];
   $phone = $user['phone'];
+  $fax = $user['fax'];
   $exp = $user['exp'];
+  $exp_op = $user['exp_op'];
   $delegation_target = $user['delegation_target'];
   $quota = $user['quota'];
+  $quota_op = $user['quota_op'];
   $mail_server_host_name = $user['host_name'];
   $date_begin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : '');
+  $title = $user['title'];
+  $direction = $user['direction'];
+  $service = $user['service'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -141,10 +148,25 @@ function run_query_user_search($user) {
        OR userobm_mobile #LIKE '%$phone%')";
   }
 
+  // If a fax number indication has been specified, get it
+  if (trim($fax) != '') {
+     if (trim($where) != '') $where .= ' AND';
+     $where .= " (userobm_fax #LIKE '%$fax%'
+       OR userobm_fax2 #LIKE '%$fax%')";
+  }
+
 	// if a time of expiration has been specified, get it  
   if (trim($exp) != '') {
-     if (trim($where) != '') $where .= ' AND';
-     $where .= " $diff < $exp";
+    if (trim($where) != '') $where .= ' AND';
+    switch($exp_op) {
+      case '>':
+      case '<':
+        $where .= " $diff $exp_op $exp";
+        break;
+      default :
+        $where .= " $diff = $exp";
+        break;
+    }    
   }
 
   // If a description indication has been specified, get it
@@ -169,7 +191,16 @@ function run_query_user_search($user) {
   // If a quota indication has been specified, get it
   if (trim($quota) != '') {
     if (trim($where) != '') $where .= ' AND';
-    $where .= " userobm_mail_quota = '$quota'";
+    switch($quota_op) {
+      case '>':
+      case '<':
+        $where .= " userobm_mail_quota $quota_op '$quota'";
+        break;
+      default :
+        $where .= " userobm_mail_quota = '$quota'";
+        break;
+
+    }
   }
 
   // If a delegation target indication has been specified, get it
@@ -192,6 +223,34 @@ function run_query_user_search($user) {
   } elseif($cgp_archive_only) {
     if (trim($where) != '') $where .= ' AND';
     $where .= " userobm_archive = 1";
+  }
+
+  // If a nomade indication has been specified, get it
+  if ($nomade != '1') {
+    if (trim($where) != '') $where .= ' AND';
+    $where .= " userobm_nomade_enable = 0";
+  } else {
+    if (trim($where) != '') $where .= ' AND';
+    $where .= " userobm_nomade_enable = 1";
+  }
+
+  // If a title indication has been specified, get it
+  if (trim($title) != '') {
+     if (trim($where) != '') $where .= ' AND';
+     $where .= " userobm_title #LIKE '$title%'";
+  }
+
+  // If a direction indication has been specified, get it
+  if (trim($direction) != '') {
+     if (trim($where) != '') $where .= ' AND';
+     $where .= " userobm_direction #LIKE '$direction%'";
+  }
+
+  
+  // If a service indication has been specified, get it
+  if (trim($service) != '') {
+     if (trim($where) != '') $where .= ' AND';
+     $where .= " userobm_service #LIKE '$service%'";
   }
 
   // User defined data
