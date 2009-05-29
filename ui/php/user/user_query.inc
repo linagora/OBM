@@ -767,6 +767,8 @@ function run_query_user_init_group($domain_id, $u_id, $gid) {
 
     // Update internal group membership direct mapping
     of_usergroup_update_group_hierarchy($group_id);
+  } else {
+    // What to do if default User group does not exists ??
   }
 
   return $retour;
@@ -1247,7 +1249,7 @@ function run_query_user_public_owner_group($uid) {
 // Return: number of usergroup inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_update_user_group($user) {
-  global $obm, $cdg_sql, $perms_admin, $cg_gid_smb_admin, $cg_gid_smb_user;
+  global $obm, $cdg_sql, $cg_gid_user, $cg_gid_smb_admin, $cg_gid_smb_user;
 
   // Hook : Pre
   if (function_exists('hook_pre_run_query_user_update_user_group')) {
@@ -1328,15 +1330,11 @@ function run_query_user_update_user_group($user) {
     }
   }
 
-  // Si l'utilisateur est windows on l'inscrit dans un groupe Win par defaut
-  // Si c'est un simple user => Domain users 
-  // Si c'est un amdin aliamin => Admins aliamin = Domain admins
+  // Register the user to its group GID
   $u = get_user_info($u_id);
-  if ($u['samba_perms'] == '1') {
-    $gid = $cg_gid_smb_user;
-    $domain_id = $u['domain_id'];
-    run_query_user_init_group($domain_id, $u_id, $gid);
-  }
+  $gid = $u['gid'];
+  $domain_id = $u['domain_id'];
+  run_query_user_init_group($domain_id, $u_id, $gid);
 
   return $cpt_ins;
 }

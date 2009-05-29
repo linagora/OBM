@@ -331,7 +331,7 @@ function run_query_calendar_update_occurrence_state($event_id, $entity, $entity_
     $retour = $obm_q->query($query);
 
     // Send mail
-    if ($owner_notification == "true") {
+    if ($owner_notification == 'true') {
       OBM_EventFactory::getInstance()->store(OBM_EventFactory::getInstance()->getById($event_id), $oldEvent);
     }
 

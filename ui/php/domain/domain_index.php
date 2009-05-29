@@ -117,6 +117,7 @@ if ($action == 'index' || $action == '') {
     $prop_q = run_query_domain_properties();
     $display['detail'] = html_domain_form('','', null, $prop_q,$params);
   }
+
 } elseif ($action == 'update') {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_domain_data_form($params['domain_id'], $params) && check_domain_can_delete_mailserver($params)) {

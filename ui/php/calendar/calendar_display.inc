@@ -1517,7 +1517,7 @@ function dis_calendar_month_planning($calendar, $calendar_entity, $writable_enti
                 } else {
                   $style = '';
                 }                
-                if($location != '') {
+                if ($location != '') {
                   $today_events[] = "<li style=\"$style\">".$event->title." ($location) $ad</li>";
                 } else {
                   $today_events[] = "<li style=\"$style\">".$event->title." $ad</li>";
@@ -1902,7 +1902,7 @@ function dis_calendar_planning_event(&$occurrence, &$calendar_entity, $date, $ca
     $title = $l_private;
   } else {
     $title = $occurrence->event->title;
-    if($occurrence->event->location != '') {
+    if ($occurrence->event->location != '') {
       $location = "<br />$l_location : ".$occurrence->event->location;
     }            
   }
@@ -1946,7 +1946,7 @@ function dis_calendar_planning_day_event(&$occurrence, &$calendar_entity, $date,
     $title = $l_private;
   } else {
     $title = $occurrence->event->title;
-    if($occurrence->event->location != '') {
+    if ($occurrence->event->location != '') {
       $location = "<br />$l_location : ".$occurrence->event->location;
     }            
   }
