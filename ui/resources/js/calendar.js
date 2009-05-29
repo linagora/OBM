@@ -1976,8 +1976,10 @@ Obm.CalendarFreeBusy = new Class({
           }
           if (!resp.canRead) {
             for(i=0;i<this.nbSteps;i++) {
-              tr.adopt((new Element('td').addClass('timeSlotNoCalendar').addClass('obmTip').
-                setProperty('title', obm.vars.labels.calendar_not_available)));
+              var td = new Element('td').addClass('timeSlotNoCalendar').addClass('obmTip').
+                setProperty('title', obm.vars.labels.calendar_not_available);
+              tr.adopt(td);
+                obm.tip.add(td);
             }
             this.container.adopt(tr);
             this.setSize();
