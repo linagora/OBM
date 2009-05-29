@@ -24,6 +24,8 @@ To do
   * Project : added search by creator delegation
   * Contract : added search by creator delegation
   * Project : estimated and sold time can now be float
+  * New free / busy interface, full Ajax and available from event creation
+  * Resource overbooking is now optional
   * #13 Calendar: All Day ICS Export/Import
   * #131 (ok in 2.2.3) Archived user seems to still be in group alias
   * #145 Blackberry SyncJe connections errors
