@@ -76,13 +76,13 @@ Obm.Portlets = new Class({
   initialize: function() {
     if(!$('portlets') )
       return false;
-    elements = $$('.portlet');
+    var elements = $$('.portlet');
     if (elements.length == 0) {
       $('portletsPanel').setStyle('display','none');
       $('mainPanel').setStyle('margin-left','0');
       return false;
     }
-    img = new Element('img');
+    var img = new Element('img');
     img.src = obm.vars.images.minus;
     this.close = img.src;
     img.src = obm.vars.images.plus;
@@ -117,12 +117,12 @@ Obm.Portlets = new Class({
 
   
     for(i=0;i<elements.length;i++) {
-      el = elements[i];      
-      title = el.getFirst();
-      content = title.getNext();
+      var el = elements[i];      
+      var title = el.getFirst();
+      var content = title.getNext();
       this.portlets[el.id] = new Fx.Slide(content, {duration: 150,wait:false});
       
-      img = new Element('img');
+      var img = new Element('img');
       if(Cookie.read(el.id + "Hidden")  == "true") {
         this.portlets[el.id].hide();
         img.src = this.open;

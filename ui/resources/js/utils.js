@@ -67,6 +67,7 @@ HideTimer = new Class({
 
   initialize: function(el,options) {
     this.setOptions(options);
+    this.options.fn = this.options.fn.bind(this);
     this.el = $(el);
     this.timer = null;
     if(this.options.elems.length > 0) {
