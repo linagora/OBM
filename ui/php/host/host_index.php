@@ -109,7 +109,7 @@ if ($action == 'ext_get_id') {
   if (check_user_defined_rules() && check_host_data_form($params)) {
     
     // If the context (same host) was confirmed ok, we proceed
-    if ($hd_confirm == $c_yes) {
+    if ($params['confirm'] == $c_yes) {
       $retour = run_query_host_insert($params);
       if ($retour) {
 	set_update_state();
@@ -118,7 +118,7 @@ if ($action == 'ext_get_id') {
 	$display['msg'] .= display_err_msg($l_insert_error);
       }
       $display['search'] = html_host_search_form($params);
-      
+
       // If it is the first try, we warn the user if some hosts seem similar
     } else {
       $obm_q = check_host_context('', $params);
@@ -135,7 +135,7 @@ if ($action == 'ext_get_id') {
 	$display['search'] = html_host_search_form($params);
       }
     }
-    
+
     // Form data are not valid
   } else {
     $display['msg'] .= display_err_msg($err['msg']);

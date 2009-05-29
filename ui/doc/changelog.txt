@@ -24,7 +24,10 @@ To do
   * Project : added search by creator delegation
   * Contract : added search by creator delegation
   * Project : estimated and sold time can now be float
+  * #13 Calendar: All Day ICS Export/Import
   * #131 (ok in 2.2.3) Archived user seems to still be in group alias
+  * #145 Blackberry SyncJe connections errors
+  * #214 Management of external accounts in OBM groups
   * #226 Minig : Bad signature "undefined"
   * #228 Minig : UI always in english
   * #249 (ok in 2.2.2) php include error in cronjob EventAlertCronJob
@@ -32,11 +35,20 @@ To do
   * #259 Minig : Autocompletion only display displayName and not email
   * #261 Minig : Undo after drag and drop does not work
   * #262 Minig : Folder management (creation etc) in preferences does not work
+  * #263 obmsync_conf.ini missing in minig packages
   * #265 Adding a user to a group from user module is buggy
   * #266 Vacation update script set vacation date to now
   * #269 THE pref_title VARIABLE MUST BE SET in resource module
   * #271 TBird SYNC : subscription lost when changing calendar color
   * #273 Pb with description search in user module
+  * #279 User : Creation impossible
+  * #284 User : (Mysql) Inserting user into ldap is impossible by the scope
+  * #285 persistent JVM configuration needed
+  * #289 Contact/User popup next page doesn't work
+  * #290 /var/log/minig is not created
+  * #297 strange behavior when creating host with similar hosts
+  * #298 /etc/obm-satellite/obmSatellite.cf is world readable
+  * #299 Tools : Validation impossible
 
 2009-05-18 : version 2.2.3
 

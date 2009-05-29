@@ -695,7 +695,7 @@ function check_host_data_form($host) {
   }
 
   // If IP not empty, must not already exists
-  if($ip != '') {
+  if ($ip != '') {
     // Host IP correct
     if (! preg_match($php_regexp_ip, $ip)) {
       $err['msg'] = " $ip : $l_err_host_ip";

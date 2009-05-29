@@ -734,14 +734,12 @@ function dis_host_warn_insert($id, $h_q, $host) {
     $samename = $h_q->f('host_name');
     $samedesc = $h_q->f('host_description');
     $dis_same_host .= "
-      <tr><td class=\"detailLabel\">
+      <li>
         <a href=\"" .url_prepare("host_index.php?action=detailconsult&amp;host_id=$id") . "\">$samename ($samedesc)</a>
-      </td></tr>";
+      </li>";
   }
 
   $hidden_fields = "
-    <input type=\"hidden\" name=\"action\" value=\"insert\" />
-    <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />
     <input type=\"hidden\" name=\"tf_ip\" value=\"$ip\" />
