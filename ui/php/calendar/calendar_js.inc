@@ -33,7 +33,22 @@ $extra_js .= "
   }
 
   function displayFreeBusy(date_begin, duration) {
-    if($('fbc')) $('fbc').destroy();
+
+    // Get current attendees
+    var elements = $$('div.elementRow');
+    var atts = new Array();
+    elements.each(function (e) {
+      var id = e.id.split('-');
+      if (id[0] == 'sel_attendees_id') {
+        var entity = id[1]+'-'+id[2]+'-'+id[3];
+        var tmp = e.clone();
+        tmp.getChildren().destroy();
+        var label = tmp.get('text').trim();
+        if (!atts[id[3]]) atts[id[3]] = new Array();
+        atts[id[3]]['entity'] = entity; 
+        atts[id[3]]['label'] = label; 
+      }
+    });
     var q = new Object();
     q.date = date_begin;
     new Request.JSON({
@@ -42,6 +57,7 @@ $extra_js .= "
       async: true,
       onComplete: function(response) {
         resp = eval(response);
+        if($('fbc')) $('fbc').destroy();
         $('fbcContainer').innerHTML = resp.html;
         eval(resp.js);
 
@@ -49,7 +65,12 @@ $extra_js .= "
         obm.popup.show('fbc');
         obm.calendarFreeBusy.buildFreeBusyPanel(duration);
 
-        var elements = $$('div.elementRow');
+        // TODO > 2.2.4
+        // Optimize
+        atts.each(function(k, v) {
+          obm.calendarFreeBusy.addAttendee(atts[v]['entity'], atts[v]['label']);
+        });
+
         elements.each(function (e) {
           var id = e.id.split('-');
           if (id[0] == 'sel_user_id' || id[0] == 'sel_resource_id') {
