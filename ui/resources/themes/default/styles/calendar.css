@@ -660,6 +660,7 @@ h1.hoursTitle{
   overflow-y:hidden;
   background: #FFF;
   padding: 0;
+  margin-left: 1em;
   position: relative;
   width: 100%;
 }
