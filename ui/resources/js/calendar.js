@@ -24,6 +24,14 @@ Obm.CalendarDayEventExtension = new Class({
     return true;
   },
 
+  getOpacity: function () {
+    if(this.event.status == 'NEEDS-ACTION') {
+      return .5;
+    } else {
+      return 1;
+    }
+  },
+
   setSize: function() {
     this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
   },
@@ -1158,8 +1166,8 @@ Obm.CalendarManager = new Class({
           obm.calendarManager.unregister(id);
           evt.event.id = ivent.id;
           evt.event.status = ivent.status;
-          evt.setDuration(ivent.duration);
           evt.setTime(ivent.time);
+          evt.setDuration(ivent.duration);
           obm.calendarManager.register(id);           
           evt.setTitle(ivent.title);
         } else if (evt) {
