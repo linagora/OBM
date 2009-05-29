@@ -354,7 +354,8 @@ function of_domain_get_list() {
     domain_label,
     domain_name,
     domain_global
-    FROM Domain";
+    FROM Domain
+    ORDER BY domain_global, domain_name";
   display_debug_msg($query, $cdg_sql, 'of_domain_get_list()');
   $obm_q->query($query);
 

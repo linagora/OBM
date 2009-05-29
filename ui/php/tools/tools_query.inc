@@ -201,7 +201,7 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
     WHERE ServiceProperty.serviceproperty_service = 'samba' AND 
     ((ServiceProperty.serviceproperty_value != P_ServiceProperty.serviceproperty_value 
     OR (ServiceProperty.serviceproperty_value IS NULL AND P_ServiceProperty.serviceproperty_value IS NOT NULL)
-    OR (P_ServiceProperty.serviceproperty_value IS NOT NULL AND ServiceProperty.serviceproperty_value IS NULL)))
+    OR (ServiceProperty.serviceproperty_value IS NOT NULL AND P_ServiceProperty.serviceproperty_value IS NULL)))
     $where
   ";
   display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');
@@ -227,7 +227,7 @@ function check_tools_update_need_global_update($domain_id = NULL, $domain_global
     WHERE ServiceProperty.serviceproperty_service = 'samba' AND 
     ((ServiceProperty.serviceproperty_value != P_ServiceProperty.serviceproperty_value 
     OR (ServiceProperty.serviceproperty_value IS NULL AND P_ServiceProperty.serviceproperty_value IS NOT NULL)
-    OR (P_ServiceProperty.serviceproperty_value IS NOT NULL AND ServiceProperty.serviceproperty_value IS NULL)))
+    OR (ServiceProperty.serviceproperty_value IS NOT NULL AND P_ServiceProperty.serviceproperty_value IS NULL)))
     $where
   ";
   display_debug_msg($query, $cdg_sql, 'check_tools_update_need_global_updated()');

@@ -408,6 +408,7 @@ function run_query_domain_update($domain_id, $domain) {
 
   if ($cgp_use['service']['samba']) {
     if(is_array($samba)) {
+      of_service_insert('samba', $entity_id);
       foreach($samba as $property => $value) {
         of_service_property_replace('samba', $property, $entity_id, addslashes($value));
       }
@@ -440,6 +441,12 @@ function run_query_domain_update($domain_id, $domain) {
         WHERE group_domain_id $did";
       display_debug_msg($query, $cdg_sql, 'run_query_domain_update(purge samba groups)');
       $obm_q->query($query);
+
+      $query = 'SELECT hostentity_entity_id FROM HostEntity INNER JOIN Host ON host_id = hostentity_host_id WHERE host_domain_id '.$did;
+      $obm_q->query($query);
+      while($obm_q->next_record()) {
+        of_service_delete('samba', $obm_q->f('hostentity_entity_id'));
+      }
     }
   }
 
