@@ -30,6 +30,8 @@ To do
   * #214 Management of external accounts in OBM groups
   * #226 Minig : Bad signature "undefined"
   * #228 Minig : UI always in english
+  * #236 Domain Default groups not updated to SAMBA when domain updated to Samba
+  * #238 Host: Remove samba domain attribute does not remove samba from Host
   * #249 (ok in 2.2.2) php include error in cronjob EventAlertCronJob
   * #257, 276 : Samba domain admin uidNumber to 0 fixed when updated
   * #259 Minig : Autocompletion only display displayName and not email
