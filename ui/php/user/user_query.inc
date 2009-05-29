@@ -226,12 +226,14 @@ function run_query_user_search($user) {
   }
 
   // If a nomade indication has been specified, get it
-  if ($nomade != '1') {
-    if (trim($where) != '') $where .= ' AND';
-    $where .= " userobm_nomade_enable = 0";
-  } else {
-    if (trim($where) != '') $where .= ' AND';
-    $where .= " userobm_nomade_enable = 1";
+  if (isset($nomade)) {
+    if ($nomade != '1') {
+      if (trim($where) != '') $where .= ' AND';
+      $where .= " userobm_nomade_enable = 0";
+    } else {
+      if (trim($where) != '') $where .= ' AND';
+      $where .= " userobm_nomade_enable = 1";
+    }
   }
 
   // If a title indication has been specified, get it
