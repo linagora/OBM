@@ -1194,14 +1194,16 @@ function html_user_group_consult($usr_q) {
     $g_id = $gu_q->f('userobmgroup_group_id');
     $grp_name = $gu_q->f('group_name');
     $grp_desc = $gu_q->F('group_desc');
+    if ($g_id == $default_group_id) {
+      $dis_remove = "<img src=\"$ico_delete\" style=\"visibility: hidden\"/>";
+    } else {
+      $dis_remove = "<a href=\"javascript: remove_element('sel_accept_group-data-group-$g_id','perms');\"><img src=\"$ico_delete\" alt=[Del]/></a>";
+    }
     $dis_group .= "
     <tr id=\"sel_accept_group-data-group-$g_id\">
-      <td><a href=\"javascript: remove_element('sel_accept_group-data-group-$g_id','perms');\">
-            <img src=\"$ico_delete\" alt=[Del]/>
-          </a>$grp_name</td>
+      <td>$dis_remove $grp_name</td>
       <td><input id=\"sel_accept_group_$g_id\" type=\"hidden\" name=\"data-group-$g_id\" value=\"1\" />$grp_desc</td>
-    </tr>
-    ";
+    </tr>";
   }
 
   $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group&amp;ext_container=table";
