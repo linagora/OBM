@@ -2711,6 +2711,7 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
  * @return HTML
  */
 function dis_calendar_conflict_popup() {
+
   $block = "
     <div id=\"calendarConflictPopup\" class=\"obmPopup\">
       <h1>
@@ -2743,7 +2744,11 @@ function dis_calendar_conflict_popup() {
           <input type=\"button\" id=\"popup_sendmail_no\" class=\"closeSticky\" value=\"$GLOBALS[l_no]\" />
         </fieldset>
      </div>
-   </div>  ";
+   </div>  
+    <script type=\"text/javascript\">
+      obm.vars.labels.conflict_force = '".phpStringToJsString($GLOBALS['l_conflict_force'])."';
+      obm.vars.labels.insert_force = '".phpStringToJsString($GLOBALS['l_force'])."';
+    </script>";
 
   return $block;
 }

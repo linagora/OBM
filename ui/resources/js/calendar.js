@@ -831,9 +831,11 @@ Obm.CalendarPopupManager = new Class({
   cancel: function() {
     this.chain.clearChain();
     this.removeEvents();
-    obm.calendarManager.unlock();
-    obm.calendarManager.events.get(this.evtId).redraw();
-    obm.calendarManager.redrawAllEvents();
+    if (this.evtId) {
+      obm.calendarManager.unlock();
+      obm.calendarManager.events.get(this.evtId).redraw();
+      obm.calendarManager.redrawAllEvents();
+    }
   },
   
   complete: function() {
@@ -1110,6 +1112,7 @@ Obm.CalendarManager = new Class({
       secure : false,
       onComplete : function(response) {
         if (response.conflict) {
+          $('popup_force').value = obm.vars.labels.conflict_force;
           obm.calendarManager.popupManager.add('calendarConflictPopup');
         }
         if (response.mail) {
@@ -1183,9 +1186,17 @@ Obm.CalendarManager = new Class({
       url : 'calendar_index.php',
       secure : false,
       onComplete : function(response) {
+        if (response.conflict) {
+          $('popup_force').value = obm.vars.labels.insert_force;
+          obm.calendarManager.popupManager.add('calendarConflictPopup');
+        }
         if (response.mail) {
           obm.calendarManager.popupManager.add('calendarSendMail');
         }
+        obm.calendarManager.popupManager.addEvent('conflict', function() {
+          eventData = $merge({action : 'insert'}, eventData)
+          window.location=obm.vars.consts.calendarUrl+'?'+Hash.toQueryString(eventData)+'&repeat_kind=none&repeat_end='+eventData.date_begin;
+        });
         obm.calendarManager.popupManager.addEvent('mail', function () {
           eventData.send_mail = true;
         });        
