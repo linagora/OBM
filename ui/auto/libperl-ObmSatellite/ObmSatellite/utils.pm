@@ -8,39 +8,60 @@
 #########################################################################
 package ObmSatellite::utils;
 
-require Exporter;
+$VERSION = '1.0';
+
+$debug = 1;
+
 use strict;
 
 
 sub connectLdapSrv {
     my( $ldapSrv ) = @_;
-    require Net::LDAP;
+    use Net::LDAP;
+
+    if( ref($ldapSrv->{'conn'}) eq 'Net::LDAP' ) {
+        return 1;
+    }
 
     if( !defined($ldapSrv->{server}) ) {
         return 0;
     }
 
-    $ldapSrv->{"conn"} = Net::LDAP->new(
-        $ldapSrv->{"server"},
-        port => "389",
-        debug => "0",
-        timeout => "60",
-        version => "3"
+    $ldapSrv->{'conn'} = Net::LDAP->new(
+        $ldapSrv->{'server'},
+        debug => '0',
+        timeout => '60',
+        version => '3'
     ) or return 0;
 
 
-    if( !defined($ldapSrv->{"conn"}) ) {
+    if( !defined($ldapSrv->{'conn'}) ) {
         return 0;
     }
 
+    if( $ldapSrv->{'ldap_server_tls'} =~ /^(may|encrypt)$/ ) {
+        my $errorCode = $ldapSrv->{'conn'}->start_tls( verify => 'none' );
+
+        if( $errorCode->code() && ($ldapSrv->{'ldap_server_tls'} eq 'encrypt') ) {
+            # TLS fatal error. 'ldap_server_tls' is 'encrypt', TLS must succed
+            return 0;
+        }
+
+        if( $errorCode->code() && ($ldapSrv->{'ldap_server_tls'} eq 'may') ) {
+            # TLS error. 'ldap_server_tls' is 'may', TLS may succed or not
+            $ldapSrv->{'ldap_server_tls'} = 'none';
+        }
+    }
+
+
     my $errorCode;
-    if( defined($ldapSrv->{"login"}) && defined($ldapSrv->{"password"}) ) {
-        $errorCode = $ldapSrv->{"conn"}->bind(
-            $ldapSrv->{"login"},
-            password => $ldapSrv->{"password"}
+    if( defined($ldapSrv->{'login'}) && defined($ldapSrv->{'password'}) ) {
+        $errorCode = $ldapSrv->{'conn'}->bind(
+            $ldapSrv->{'login'},
+            password => $ldapSrv->{'password'}
         );
     }else {
-        $errorCode = $ldapSrv->{"conn"}->bind();
+        $errorCode = $ldapSrv->{'conn'}->bind();
     }
 
     if( $errorCode->code ) {
