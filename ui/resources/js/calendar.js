@@ -1303,12 +1303,14 @@ Obm.CalendarManager = new Class({
   },
 
   updateLastVisitEvent: function(events) {
-    var id = events[0].event.id;
-    var title = events[0].event.title;
-    var url = obm.vars.consts.calendarDetailconsultURL+id;
-    $('last_visit_calendar_event_a').setProperty('href', url);
-    $('last_visit_calendar_event_title').innerHTML = title;
-    $('last_visit_calendar_event_a').getParent().setStyle('display', '');
+    if(events.length > 0) {
+      var id = events[0].event.id;
+      var title = events[0].event.title;
+      var url = obm.vars.consts.calendarDetailconsultURL+id;
+      $('last_visit_calendar_event_a').setProperty('href', url);
+      $('last_visit_calendar_event_title').innerHTML = title;
+      $('last_visit_calendar_event_a').getParent().setStyle('display', '');
+    }
   }
 });
 

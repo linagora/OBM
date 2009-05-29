@@ -838,7 +838,7 @@ function run_query_tools_set_user_scope(&$userdata) {
   $db_type = $obm_qm->type;
   $like = sql_casei_like($db_type); 
 
-  $query = "SELECT group_id FROM UGroup INNER JOIN UpdatedLinks ON updatedlinks_entity_id = group_id AND updatedlinks_table = 'UGroup' WHERE group_gid = '512'";
+  $query = "SELECT group_id FROM UGroup INNER JOIN Updatedlinks ON updatedlinks_entity_id = group_id AND updatedlinks_table = 'UGroup' WHERE group_gid = '512'";
   display_debug_msg($query, $cdg_sql, 'run_query_tools_set_user_scope()');
   $obm_qm->query($query);
   if($obm_qm->next_record()) {

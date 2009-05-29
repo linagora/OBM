@@ -1357,7 +1357,6 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     }
     $mail_quota = $cuser_default_quota;
   }
-
   // If parameters have been given, they supercede the default action value
   // infos
   if (isset($user['user_id'])) { $id = $user['user_id']; }
@@ -2896,7 +2895,8 @@ function json_search_users($user,$results) {
  */
 function dis_user_mail_field($domain_id, $values, $class) {
 
-  if ($domain_id != '') {
+  if (!$GLOBALS['obm']['domain_global']) {
+    if(!$domain_id) $domain_id = $GLOBALS['obm']['domain_id'];
     $d = of_domain_get_domain_infos($domain_id, true);
     if(!empty($d['alias'])) {
       $aliases = explode("\r\n",$d['alias']);
@@ -2904,7 +2904,6 @@ function dis_user_mail_field($domain_id, $values, $class) {
       $aliases = array();
     }
     array_unshift($aliases,$d['name']);
-
   } else {
     // Creation from GLOBAL, do not propose aliases as we don't know the domain
     $d = of_domain_get_domain_infos($GLOBALS['obm']['domain_id'], true);

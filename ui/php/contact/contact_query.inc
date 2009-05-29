@@ -891,7 +891,7 @@ function run_query_contact_coords_update($id, $contact) {
       if(trim($email['address']) != '' ) {
         $email['label'] = str_replace('_', ';', $email['label']);
         $cpt[$email['label']]++;
-        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '$email[address]', '$pref$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
+        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '".trim($email['address'])."', '$pref$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(Email)');
         $obm_q->query($query);
 	$pref = '';
@@ -1932,5 +1932,60 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
       break;
     }
   }
+/**
+ * Search contacts from a single field 
+ * 
+ * @param mixed $contact 
+ * @access public
+ * @return array of 'length' => DB query results nb, and 'datas' => DB Search results
+ */
+function run_query_contact_ext_search($contact) {
+  global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
+
+  $pattern = $contact['pattern'];
+  $filter_entity = $contact['filter_entity'];
+  $filter_pattern = $contact['filter_pattern'];
+  $obm_q = new DB_OBM;
+  $multidomain = sql_multidomain('Contact');
+
+
+  if ($filter_entity == 'Contact') {
+    $where_filter_entity = 'AND (1=0';
+    $f_contacts = OBM_Acl::getAllowedEntities($obm['uid'], 'contact', $filter_pattern);
+    $f_contacts_ids = array_keys($f_contacts);
+    if ((is_array($f_contacts_ids)) && (count($f_contacts_ids) > 0)) {
+      $where_filter_entity .= " OR contact_id IN (";
+      foreach($f_contacts_ids as $r_id) {
+	    $where_filter_entity .= "$coma'$r_id'";
+	    $coma = ',';
+      }
+      $where_filter_entity .= ')';
+    }
+    $where_filter_entity .= ')';
+  }
+
+  $resultsCount = $obm_q->f('resultscount')+0;
+  $query = "SELECT 
+      contact_firstname,
+      contact_lastname,
+      email_address
+    FROM Contact
+    INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+    INNER JOIN Email ON contactentity_entity_id = email_entity_id 
+    WHERE (contact_firstname #LIKE '%$pattern%' 
+      OR contact_lastname #LIKE '%$pattern%'
+      AND (email_label like 'PREF;%' OR email_address = '%$pattern%'))
+      AND (contact_privacy = 0 OR contact_usercreate = $obm[uid])      
+      $multidomain
+      $where_filter_entity
+    GROUP BY contact_firstname, contact_lastname, email_address
+    ORDER BY contact_lastname, contact_firstname
+    LIMIT 20 OFFSET 0";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_ext_search()');
+  $obm_q->xquery($query);
+  return array('length' => $resultsCount, 'datas' => $obm_q);
+}
+
 
 ?>

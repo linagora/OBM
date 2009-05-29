@@ -2347,5 +2347,29 @@ function dis_category_contact_stats($params) {
 
   return $block;
 }
+/**
+ * Build a JSON array with all search results 
+ * 
+ * @param $results array of 'length' => DB contact results nb, and 'datas' => DB User search query results
+ * @access public
+ * @return void
+ */
+function json_search_contact($contact ,$results) {
+  global $display, $module, $cright_write_admin, $perm;
 
+  $contact_q = $results['datas'];
+
+  $contacts = array();
+  while($contact_q->next_record()) {
+    $label = phpStringToJsString(trim($contact_q->f('contact_lastname').' '.$contact_q->f('contact_firstname')));
+    $email = phpStringToJsString(trim($contact_q->f('email_address')));
+    if($label != $email) {
+      $name = $label;
+    } else {
+      $name = '';
+    }
+    $contacts[] = "{name : '$name', email: '$email'}";
+  }
+  $display['json'] = "[".implode(',',$contacts)."]";
+}
 ?>

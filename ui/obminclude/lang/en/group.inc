@@ -23,6 +23,8 @@ $l_lastname = "Last name";
 $l_firstname = "First name";
 $l_function = "Function";
 
+$l_contacts = "External members";
+
 // Actions
 $l_insert = "Insert the group";
 $l_update = "Update the group";

@@ -54,9 +54,8 @@ function check_group_get_id(valeur,text) {
 }
 
 $extra_js .= "
-function add_email_field(template) {
-
-  var mailHome = $('groupMailHome');
+function add_email_field(home, name, template) {
+  var mailHome = $(home);
   // Create the div
   var div = new Element('div').addClass('multiple');
   div.adopt(new Element('a').addEvent('click', function () {
@@ -64,10 +63,13 @@ function add_email_field(template) {
               show_hide_add_button();
             }).adopt(new Element('img').setProperty('src','$ico_delete')));
   mailHome.adopt(div);
-  div.appendText(' ').adopt(new Element('input').setProperty('name','tf_email[]').setProperty('type','text'));
-  div.appendText(' @ ');
-  div.adopt(template.clone());
-  
+  var input = new Element('input').setProperty('name',name + '[]').setProperty('type','text');
+  div.appendText(' ').adopt(input);
+  if(template) {
+    div.appendText(' @ ');
+    div.adopt(template.clone());
+  }
+  return input; 
 }  
 
 function show_hide_add_button() {
@@ -79,11 +81,51 @@ function show_hide_add_button() {
       button.dispose();
    } else if(childs.length < $GLOBALS[c_max_group_alias] && !button) {
       $('groupMailLabel').adopt((new Element('a').addEvent('click', function () {
-                add_email_field(aliasSelectTemplate);
+                add_email_field('groupMailHome', 'tf_email', aliasSelectTemplate);
                 show_hide_add_button();
               }).setProperty('id','addMailButton').adopt(new Element('img').setProperty('src','$ico_add'))));     
     }
   }
+}
+
+function add_contact_autocomplete (el) {
+  
+  new Autocompleter.Ajax.Json(el, '$path/contact/contact_index.php', {
+    postVar: 'pattern',
+    postData: {action:'ext_search'},
+    ajaxOptions: {'secure': false},
+    filterSubset: true,
+    minLength: 3,
+    selectFirst: true,
+    selectMode: 'type-ahead',
+    injectChoice: function(choice) {
+      var el = new Element('li').set('html', this.markQueryValue(choice.name+'&lt;' + choice.email + '&gt;'));
+      el.inputValue = choice.email;
+      this.addChoiceEvents(el).inject(this.choices);
+    }
+  });
+  el.addEvent((Browser.Engine.trident || Browser.Engine.webkit) ? 'keydown' : 'keypress', function(e) {
+    if (e && e.key && !e.shift) {
+      switch (e.key) {
+        case 'enter':
+          e.preventDefault();
+          var input = add_email_field('groupContactMailHome', 'tf_contact'); 
+          add_contact_autocomplete(input); 
+          show_hide_add_button();
+          input.focus();
+          break;
+        case 'backspace' : 
+          if(this.get('inputValue') == '') {
+            var previous = this.getParent().getPrevious();
+            if(previous.get('class') == 'multiple') {
+              previous.getElement('input').focus();
+            }
+            this.getParent().dispose();
+          }
+          break;
+      }
+    }
+  })           
 }
 ";
 if ($params["ext_element"] != "") {

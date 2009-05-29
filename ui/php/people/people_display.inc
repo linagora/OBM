@@ -278,7 +278,6 @@ function html_people_search_form($user) {
 function dis_people_search_list($user) {
   global $display, $obm;
 
-  $filter_entity = $user["filter_entity"];
   $popup = $user["popup"];
 
   $obm_q = run_query_people_search($user);
@@ -316,6 +315,7 @@ function html_people_search_list($obm_q, $prefs, $user, $popup) {
   $url_userdata = of_userdata_get_url_search_params('user', $user);
 
   if ($popup) {
+    $filter_entity = $user["filter_entity"];
     $ext_action = $user["ext_action"];
     $ext_url = $user["ext_url"];
     $ext_id = $user["ext_id"];
@@ -324,7 +324,7 @@ function html_people_search_list($obm_q, $prefs, $user, $popup) {
     $ext_widget_text = $user["ext_widget_text"];
     $ext_element = $user["ext_element"];
     $ext_container = $user["ext_container"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;ext_container=$ext_container";
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;filter_entity=$filter_entity&amp;ext_widget_text=$ext_widget_text&amp;ext_container=$ext_container";
   }
 
   $url = url_prepare("people_index.php?action=search&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;tf_email=$email&amp;tf_desc=$desc$url_userdata$url_ext");

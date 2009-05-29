@@ -120,6 +120,12 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 ///////////////////////////////////////////////////////////////////////////////
   $display['search'] = dis_contact_search_form($params);
   $display['result'] = dis_contact_search_list($params);
+} elseif ($action == 'ext_search') {
+///////////////////////////////////////////////////////////////////////////////
+  $res_q = run_query_contact_ext_search($params);
+  json_search_contact($params, $res_q);
+  echo '('.$display['json'].')';
+  exit();
 
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -464,6 +470,13 @@ function get_contact_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	);
+
+// Search
+  $actions['contact']['ext_search'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=ext_search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
 
 // New
   $actions['contact']['new'] = array (

@@ -23,6 +23,8 @@ $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_function = "Fonction";
 
+$l_contacts = "Membres externes";
+
 // Actions
 $l_add = "Ajouter ces groupes";
 

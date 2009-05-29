@@ -1462,7 +1462,7 @@ Autocompleter.Base = new Class({
 				}
 			}).inject(document.body);
 			this.relative = false;
-			if (this.options.relative || this.element.getOffsetParent() != document.body) {
+			if (this.options.relative) {
 				this.choices.inject(this.element, 'after');
 				this.relative = this.element.getOffsetParent();
 			}

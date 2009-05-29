@@ -412,6 +412,16 @@ function get_group_params() {
     }
     $params['email'] = implode("\r\n",$email_aliases);
   } 
+  if(is_array($params['contact'])) {
+    $contact_aliases = array();
+    while(!empty($params['contact'])) {
+      $contact = trim(array_shift($params['contact']));
+      if(!empty($contact)) {
+        $contact_aliases[] = $contact;
+      }
+    }
+    $params['contact'] = implode("\r\n",$contact_aliases);
+  }   
   return $params;
 }
 

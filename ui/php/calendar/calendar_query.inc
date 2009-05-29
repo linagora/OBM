@@ -4166,9 +4166,9 @@ function build_json_event($ocs) {
  * if we can't force its insertion.
  */
 function can_force_resource_conflict($conflicts = array()) {
-  global $ccalendar_allow_force_with_resource;
+  global $ccalendar_resource_overbooking;
 
-  if($ccalendar_allow_force_with_resource) {
+  if($ccalendar_resource_overbooking) {
     return true;
   } else {
     foreach($conflicts as $conflict) {

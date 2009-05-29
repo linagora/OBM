@@ -268,6 +268,7 @@ function run_query_group_insert($group) {
   $name = $group['name'];
   $desc = $group['desc'];
   $email = $group['email'];
+  $contact = $group['contact'];
   $priv = sql_parse_int($group['privacy']);
   $domain_id = sql_parse_id($obm['domain_id']);
   if ($priv == 1) {
@@ -294,7 +295,8 @@ function run_query_group_insert($group) {
   group_name
   $q_delegation[field],
   group_desc,
-  group_email
+  group_email,
+  group_contacts
   ) VALUES (
   null,
   NOW(),
@@ -308,7 +310,8 @@ function run_query_group_insert($group) {
   '$name'
   $q_delegation[value],
   '$desc',
-  '$email'
+  '$email',
+  '$contact'
   )";
 
   display_debug_msg($query, $cdg_sql, 'run_query_group_insert()');
@@ -383,6 +386,7 @@ function run_query_group_update($group) {
   $manager = sql_parse_id($group['manager']);
   $priv = sql_parse_int($group['privacy']);
   $multidomain = sql_multidomain('group');
+  $contact = $group['contact'];
   if ($priv == 1) {
     $samba = 0;
     $email = '';
@@ -399,6 +403,7 @@ function run_query_group_update($group) {
     group_name='$name',
     group_desc='$desc',
     group_email='$email',
+    group_contacts = '$contact',
     group_manager_id=$manager
     $q_delegation
   WHERE group_id $id
@@ -688,7 +693,9 @@ function run_query_group_user_group($group, $gid='') {
 
   if ($gid != '') {
     // return the difference between the group gid and the user gid
-    $field = "$gid-userobm_gid as gid_diff,";
+    $field = "$gid != userobm_gid as gid_diff,";
+  } else {
+    $field = "TRUE as gid_diff,";
   }
 
   $query = "SELECT
@@ -1036,6 +1043,7 @@ function check_group_data_form(&$group) {
   $samba = $group['samba'];
   $desc = $group['desc'];
   $email = stripslashes($group['email']);
+  $contact = stripslashes($group['contact']);
   $priv = $group['privacy'];
   $g = get_group_info($id);
   $usercreate = $g['usercreate'];
@@ -1089,6 +1097,18 @@ function check_group_data_form(&$group) {
         $err['msg'] = "$l_email_exist : $mails ";
         $err['field'] = 'email';
         return false;
+      }
+    }
+    if ($contact != '') {
+      $em = strtok($contact, "\r\n");
+      while ($em) {
+        if (!preg_match($php_regexp_email, $em)) {
+          $err['msg'] .= "$em : $l_j_check_email";
+          $err['field'] = 'contact';
+          return false;
+        }
+
+        $em = strtok("\r\n");
       }
     }
   } else {

@@ -107,7 +107,7 @@ function errorHandler($code, $message, $file, $line) {
         Logger::log("$message in $file at $line", L_CORE,$file);
         break;     
       case E_STRICT:
-        Logger::log("$message in $file at $line", L_DEBUG, $file);
+        Logger::log("$message in $file at $line", L_CORE, $file);
           break;
       default:
         Logger::log("$message in $file at $line", L_WARN, $file);

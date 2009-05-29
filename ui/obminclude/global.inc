@@ -131,6 +131,9 @@ $ccalendar_send_ics = true;
 // Calendar hour fraction (minutes select granularity)
 $ccalendar_hour_fraction = 4;
 
+// Resource can be reserved for the same period more than once 
+$ccalendar_resource_overbooking = true;
+
 // Time : In how many parts we split up a day (Time management)
 $c_day_fraction = 8;
 

@@ -422,7 +422,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
   global $obm, $display, $module, $action, $cright_write;
   global $cg_gid_smb_user, $cg_gid_smb_admin;
-  global $cgp_use, $cgp_hide;
+  global $cgp_use, $cgp_hide,$l_contacts;
 
   $id = $group_q->f('group_id');
   $usercreate = $group_q->f('group_usercreate');
@@ -440,7 +440,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   $desc = $group_q->f('group_desc');
   $email = $group_q->f('group_email');
   $manager = $group_q->f('userobm_lastname').' '.$group_q->f('userobm_firstname');
-
+  
   // Check if domain is a samba domain
   $samba_domain = false;
   if ($cgp_use['service']['samba']) {
@@ -451,12 +451,19 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   }
 
   $dis_email = get_entity_email($email);
+  $dis_contact = get_entity_email($group_q->f('group_contacts'), null, false);
 
   if ($privacy == 0) {
     $dis_email = "<tr>
       <th>$l_email</th>
       <td>$dis_email</td>
       </tr>";
+
+    $dis_contact = "
+    <div class=\"detail infos\">
+      <h1>$l_contacts</h1>
+      $dis_contact
+    </div>";
 
     if (($cgp_use['service']['samba']) && ($samba_domain)) {
       $samba = ($group_q->f('group_samba') == 1 ? $l_yes : $l_no);
@@ -469,13 +476,14 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
   } else {
     $dis_email = '';
     $samba = '';
+    $dis_group = '';
   }
 
   $block_userdata .= of_userdata_dis_entity_consult('group', $id);
   $block_delegation = of_delegation_dis_block_consult($delegation);
 
   // Check update rights to allow to remove users
-  $g = array('group_id' => $id, 'privacy' => $privacy, '$gid' => $gid); 
+  $g = array('group_id' => $id, 'privacy' => $privacy, 'gid' => $gid); 
   $update_group = check_group_update_rights($g);
 
   // Display members groups
@@ -536,7 +544,6 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     $dis_infos->data_set = $u_q;
     $dis_infos->data_url = $url;
     $dis_infos->data_header = 'both';
-
     if ($update_group) {
       $dis_infos->data_cb_text = 'X';
       $dis_infos->data_idfield = 'group_user_id';
@@ -602,7 +609,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     </table>
     </div>
   
-    $block_userdata
+  $block_userdata
   <div class=\"detail infos\">
     <h1>$l_desc</h1>
    
@@ -613,7 +620,7 @@ function html_group_consult($group_q, $prefs_u, $u_q, $prefs_g, $g_q) {
     </tr>
     </table>
   </div>
-
+  $dis_contact
   <div class=\"detail extra\">
   $block_mg
   </div>
@@ -638,7 +645,7 @@ function html_group_form($action, $group_q, $group, $field='') {
   global $obm, $perm, $cgroup_private_default, $cgp_use, $cright_write_admin;
   global $display, $l_group, $l_name, $l_desc, $l_smb, $l_email;
   global $l_private, $l_public, $l_insert, $l_update, $l_back, $l_no,$l_yes;
-  global $l_manager, $c_undef, $l_undef, $l_header_new;
+  global $l_manager, $c_undef, $l_undef, $l_header_new, $l_contacts;
 
   // Check if domain is a samba domain
   $samba_domain = false;
@@ -659,6 +666,7 @@ function html_group_form($action, $group_q, $group, $field='') {
     $samba = $group_q->f('group_samba');
     $desc = $group_q->f('group_desc');
     $email = $group_q->f('group_email');
+    $contact = $group_q->f('group_contacts');
     $priv = $group_q->f('privacy');
     $dis_title = $name;
   } elseif ($action == 'new') {
@@ -675,6 +683,7 @@ function html_group_form($action, $group_q, $group, $field='') {
   if (isset($group['desc'])) { $desc = stripslashes($group['desc']); }
   if (isset($group['email'])) { $email = stripslashes($group['email']); }
   if (isset($group['privacy'])) { $priv = stripslashes($group['privacy']); }
+  if (isset($group['contact'])) { $contact = $group['contact']; }
 
   // Mark the error field
   if ($field != '') {
@@ -703,8 +712,14 @@ function html_group_form($action, $group_q, $group, $field='') {
           if($('emailGroup')) {
             $('emailGroup').addClass('H');
             $('groupMailHome').set('html','');
-            add_email_field(aliasSelectTemplate); 
+            add_email_field('groupMailHome', 'tf_email', aliasSelectTemplate); 
             show_hide_add_button();
+          }
+          if($('contactEmailGroup')) {
+            $('contactEmailGroup').addClass('H');
+            $('groupContactMailHome').set('html','');
+            add_email_field('groupContactMailHome', 'tf_contact'); 
+      
           }
           if($('sambaGroup')) {
             $('sambaGroup').addClass('H');
@@ -714,6 +729,9 @@ function html_group_form($action, $group_q, $group, $field='') {
           if($('emailGroup')) {
             $('emailGroup').removeClass('H')
           }
+          if($('contactEmailGroup')) {
+            $('contactEmailGroup').removeClass('H')
+          }     
           if($('sambaGroup')) {
             $('sambaGroup').removeClass('H');
           }
@@ -741,6 +759,15 @@ function html_group_form($action, $group_q, $group, $field='') {
     }
    if ($cgp_use['service']['mail']) {
      $dis_mail = dis_group_mail_field($email,$class); 
+     $dis_contact = dis_group_contact_mail_field($contact, $class);
+      $block_contact = "
+      <fieldset id=\"contactEmailGroup\" class=\"detail infos $mail_class\">
+      <legend>$l_contacts</legend>
+      <table>
+      $dis_contact
+      </table>
+      </fieldset>
+      ";
    } else {
      $dis_mail = "<th>$l_email</th>
       <td><input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>";
@@ -812,7 +839,9 @@ function html_group_form($action, $group_q, $group, $field='') {
   </tr>
   $block_userdata
   </table>
-  </fieldset>";
+  </fieldset>
+  $block_contact
+  ";
 
   if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_but = "
@@ -1236,7 +1265,7 @@ function dis_group_mail_field($values,$class) {
     $count++;
   } 
   if($GLOBALS['c_max_group_alias'] ==0 || $count < $GLOBALS['c_max_group_alias']) {
-    $add_button = "<a href=\'\' onclick=\"add_email_field(aliasSelectTemplate); show_hide_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+    $add_button = "<a href=\'\' onclick=\"add_email_field('groupMailHome', 'tf_email',aliasSelectTemplate); show_hide_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
   }
   $email_block = "
   <th class=\"$class[email]\" id='groupMailLabel'>
@@ -1250,6 +1279,58 @@ function dis_group_mail_field($values,$class) {
   </th>
   <td id='groupMailHome'>
   $email_block
+  </td>";
+
+  return $email_block;
+}
+
+
+/**
+ * Generate email field  
+ * 
+ * @param mixed $name 
+ * @param mixed $values 
+ * @access public
+ * @return void
+ */
+function dis_group_contact_mail_field($values,$class) {
+  if(!empty($values)) {
+    $emails = explode("\r\n",$values);
+  }
+  $count = 0;
+  if(is_array($emails)) {
+    foreach($emails as $key => $mail) {
+      $email_block .= "<div class=\"multiple\">
+        <a onclick=\"remove_element(this.parentNode,'groupContactMailHome'); show_hide_add_button();return false\" href=\"\">
+         <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+        </a>        
+        <input name='tf_contact[]' value=\"$mail\" />
+        </div>";
+      $count ++;
+    }
+  }
+  $email_block .= "
+    <div class=\"multiple\">
+    <a onclick=\"remove_element(this.parentNode,'groupContactMailHome'); show_hide_add_button();return false\" href=\"\">
+     <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+    </a>        
+    <input name='tf_contact[]' value='' /> 
+    </div>";
+  $add_button = "<a href=\'\' onclick=\"var input = add_email_field('groupContactMailHome', 'tf_contact'); add_contact_autocomplete(input); show_hide_add_button();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";
+  $email_block = "
+  <th class=\"$class[contact]\" id='groupContactMailLabel'>
+  $GLOBALS[l_email]
+  $add_button
+  </th>
+  <td id='groupContactMailHome'>
+  $email_block
+  <script type='text/javascript'>
+    obm.initialize.chain(function () {
+      $('groupContactMailHome').getElements('input').each(function (el) {
+        add_contact_autocomplete(el);
+      });
+    });
+  </script>
   </td>";
 
   return $email_block;
