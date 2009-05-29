@@ -2881,6 +2881,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['others_attendees'])) { $others_attendees = $calendar['others_attendees']; }
   if (isset($calendar['add_displayed_users'])) { $add_displayed_users = $calendar['add_displayed_users']; }
   if (isset($calendar['show_attendees_calendar'])) { $show_attendees_calendar = $calendar['show_attendees_calendar']; }
+  if (isset($calendar['attendees_notification'])) { $attendees_notification = $calendar['attendees_notification']; }
   if (isset($calendar['alert'])) {
     // handle only one entry for now
     if (is_array($sel_alert)) {
@@ -2892,6 +2893,23 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   
 
   if (($action == 'detailupdate') || ($action == 'update') || ($action == 'conflict_manager')) {
+    if ($attendees_notification) {
+      $attendees_notification = "checked=\"checked\"";
+    }
+
+    $dis_attendees_notification = "
+  <fieldset class=\"detail extra\">    
+  <legend>$GLOBALS[l_event_update_notification]</legend>  
+  <table>    
+  <tr>    
+    <th>$GLOBALS[l_sendamail]</th> 
+    <td>
+      <input style=\"margin:0\" type=\"checkbox\" name=\"cba_attendees_notification\" value=\"1\" $attendees_notification />
+    </td>
+  </tr>
+  </table>
+  </fieldset>";
+
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
@@ -3439,6 +3457,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <legend>$l_desc</legend>  
   <textarea id=\"ta_description\" name=\"ta_description\" rows=\"3\" cols=\"72\">$desc</textarea> 
   </fieldset>
+  $dis_attendees_notification
   <fieldset class=\"buttons\">$dis_button $hidden_repeat</fieldset>
   </form>
   <script type=\"text/javascript\">

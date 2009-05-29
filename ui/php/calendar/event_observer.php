@@ -730,7 +730,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    */
   private function sendCurrentUserMail($old, $new, $recipients) {
     $recipients = array_diff($recipients, array($GLOBALS['obm']['uid']));
-    if ($this->hasEventChanged($old, $new)) {
+    if ($this->hasEventFullyChanged($old, $new)) {
       $this->mailer->sendEventUpdate($new, $old, $recipients);
     }
   }
@@ -781,7 +781,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    * @return void
    */
   private function sendCurrentResourceMail($old, $new, $recipients) {
-    if ($this->hasEventChanged($old, $new)) {
+    if ($this->hasEventFullyChanged($old, $new)) {
       foreach ($recipients as $resource) {
         $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resourceId));
         if (!in_array($GLOBALS['obm']['uid'], $resourceOwners) && count($resourceOwners) > 0) {
@@ -815,6 +815,24 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
         || (count(array_udiff($old->date_exception, $new->date_exception, array('Of_Date', 'cmp'))));
     }
     return self::$cache[$old->id];
+  }
+
+  /**
+   * Perform delta between old and new event
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @access public 
+   * @return void
+   */
+  public static function hasEventFullyChanged($old, $new) {
+    return self::hasEventChanged($old, $new)
+      || $new->title != $old->title
+      || $new->category1 != $old->category1
+      || $new->privacy != $old->privacy
+      || $new->priority != $old->priority
+      || $new->color != $old->color
+      || $new->description != $old->description;
   }
 }
 

@@ -1219,9 +1219,11 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   }
 
   // Send mail
-  OBM_EventFactory::getInstance()->store(
-    OBM_EventFactory::getInstance()->getById($calendar['calendar_id']),
-    $oldEvent);
+  if ($calendar['attendees_notification']) {
+    OBM_EventFactory::getInstance()->store(
+      OBM_EventFactory::getInstance()->getById($calendar['calendar_id']),
+      $oldEvent);
+  }
 
 }
 
