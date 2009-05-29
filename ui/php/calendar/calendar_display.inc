@@ -2946,8 +2946,16 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $all_day_checked = "checked=\"checked\"";
   }
 
-  if ( $show_attendees_calendar ) {
-    $show_attendees_calendar_checked = "checked=\"checked\"";
+  if ($action == "new" || $action == "insert") {
+    if ( $show_attendees_calendar ) {
+      $show_attendees_calendar_checked = "checked=\"checked\"";
+    }
+    $dis_show_attendees_calendar = "<tr>
+     <th>$GLOBALS[l_show_attendees_calendar]</th>
+      <td>
+       <input type=\"checkbox\" id=\"cba_show_attendees_calendar\" value=\"1\" $show_attendees_calendar_checked name=\"cba_show_attendees_calendar\" />
+       </td>
+      </tr>";
   }
 
   if ($action == 'new' && !isset($calendar['new_meeting'])) {
@@ -3070,12 +3078,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <tr>
       $dis_others_attendees
       </tr>
-      <tr>
-        <th>$GLOBALS[l_show_attendees_calendar]</th>
-        <td>
-          <input type=\"checkbox\" id=\"cba_show_attendees_calendar\" value=\"1\" $show_attendees_calendar_checked name=\"cba_show_attendees_calendar\" />
-        </td>
-      </tr>
+      $dis_show_attendees_calendar
       </table>
       </fieldset>
       <p class=\"LC\" />";
