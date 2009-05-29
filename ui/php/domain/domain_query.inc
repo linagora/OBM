@@ -154,9 +154,11 @@ function run_query_domain_insert($domain) {
       of_service_property_insert('mail','smtp_out', $entity_id, $domain['smtp_out']);
     }
     if ($cgp_use['service']['samba']) {
-      of_service_insert('samba', $entity_id);
-      foreach($samba as $property => $value) {
-        of_service_property_insert('samba', $property, $entity_id, addslashes($value));
+      if(is_array($samba)) {
+        of_service_insert('samba', $entity_id);
+        foreach($samba as $property => $value) {
+          of_service_property_insert('samba', $property, $entity_id, addslashes($value));
+        }
       }
     } 
 
@@ -396,8 +398,8 @@ function run_query_domain_update($domain_id, $domain) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+  $entity_id = of_entity_get($GLOBALS['module'], $domain_id);
   if ($cgp_use['service']['mail']) {
-    $entity_id = of_entity_get($GLOBALS['module'], $domain_id);
     of_service_property_replace('mail','imap_autoselect', $entity_id, $mail_server_auto);
     of_service_property_replace('mail','imap',$entity_id , $domain['imap']);
     of_service_property_replace('mail','smtp_in', $entity_id, $domain['smtp_in']);
@@ -405,8 +407,12 @@ function run_query_domain_update($domain_id, $domain) {
   }  
 
   if ($cgp_use['service']['samba']) {
-    foreach($samba as $property => $value) {
-      of_service_property_replace('samba', $property, $entity_id, addslashes($value));
+    if(is_array($samba)) {
+      foreach($samba as $property => $value) {
+        of_service_property_replace('samba', $property, $entity_id, addslashes($value));
+      }
+    } else {
+      of_service_delete('samba', $entity_id);
     }
   }
 

@@ -238,7 +238,7 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q) {
     }
   }
 
-  if ($cgp_use['service']['samba']) {
+  if ($cgp_use['service']['samba'] && ($samba['drive'] || $samba['domain'] || $samba['sid'] || $samba['profile'] || $samba['home'])) {
     $dis_samba = "
       <div class=\"detail infos\">
       <h1>$GLOBALS[l_samba]</h1>
@@ -564,28 +564,34 @@ function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) 
 
   if ($cgp_use['service']['samba']) {
     if (isset($samba['drive']) && $samba['drive'] != '') $drive[$samba['drive']] = 'selected="selected"';
+    if(!($samba['drive'] || $samba['domain'] || $samba['sid'] || $samba['profile'] || $samba['home'])) {
+      $disabled_s = 'disabled="true"';
+      $style_s = 'style="display:none;"';
+    } else {
+      $checked_s = 'checked="checked"';
+    }
     $dis_drive_sel .= "<option ".$drive["$c_none"]." value=''>$l_none</option>";
     for($i='D'; $i< 'Z';$i++) {
       $dis_drive_sel .= "<option ".$drive["$i"]." value='$i'>$i:</option>";
     }
     $dis_drive_sel .= "<option ".$drive["Z"]." value='Z'>Z:</option>";
-    $dis_drive_sel = "<select style='width:4em;' name='samba[drive]'>$dis_drive_sel</select>";
+    $dis_drive_sel = "<select $disabled_s style='width:4em;' name='samba[drive]'>$dis_drive_sel</select>";
 
     $dis_samba = "
       <fieldset class=\"detail infos\">
-      <legend>$GLOBALS[l_samba]</legend>
-      <table>
+      <legend>$GLOBALS[l_samba] <input type='checkbox' $checked_s onchange=\"$('sambaHome').getElements('input, select').setProperty('disabled', !this.checked); $('sambaHome').setStyle('display', (!this.checked)?'none':'');\"</legend>
+      <table $style_s id='sambaHome'>
        <tr>
-         <th>$GLOBALS[l_samba_domain]</th><td><input type='text' name='samba[domain]' value='$samba[domain]'/></td>
+         <th>$GLOBALS[l_samba_domain]</th><td><input type='text' $disabled_s name='samba[domain]' value='$samba[domain]'/></td>
        </tr>
        <tr>
-         <th>$GLOBALS[l_samba_sid]</th><td><input type='text' name='samba[sid]' id='sambaSID' value='$samba[sid]'/>&nbsp;<input type='button' onclick='autoGenSid()' value='$GLOBALS[l_autogen_sid]' /></td>
+         <th>$GLOBALS[l_samba_sid]</th><td><input type='text' $disabled_s name='samba[sid]' id='sambaSID' value='$samba[sid]'/>&nbsp;<input type='button' onclick='autoGenSid()' value='$GLOBALS[l_autogen_sid]' /></td>
        </tr>
        <tr>
-         <th>$GLOBALS[l_samba_profile]</th><td><input type='text' name='samba[profile]' value='$samba[profile]'/></td>
+         <th>$GLOBALS[l_samba_profile]</th><td><input type='text' $disabled_s name='samba[profile]' value='$samba[profile]'/></td>
        </tr>        
        <tr>
-         <th>$GLOBALS[l_samba_home]</th><td><input type='text' name='samba[home]' value='$samba[home]'/></td>
+         <th>$GLOBALS[l_samba_home]</th><td><input type='text' $disabled_s name='samba[home]' value='$samba[home]'/></td>
        </tr>
        <tr>
          <th>$GLOBALS[l_samba_drive]</th><td>$dis_drive_sel</td>

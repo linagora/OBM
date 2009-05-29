@@ -63,7 +63,7 @@ $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 
-$l_samba = 'Windows server properties';
+$l_samba = 'Windows server';
 $l_samba_sid = 'domain SID';
 $l_samba_domain = 'Windows domain name';
 $l_samba_profile = 'Profil default path';
