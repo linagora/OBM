@@ -1,5 +1,4 @@
 #!/usr/bin/perl -w -T
-
 #+-------------------------------------------------------------------------+
 #|   Copyright (c) 1997-2009 OBM.org project members team                  |
 #|                                                                         |
@@ -45,17 +44,18 @@ sub configure_hook {
     if( defined($ObmSatellite::Parameters::obmSatelliteConf::postfixMapsDesc) ) {
         $self->{postfix_maps} = $ObmSatellite::Parameters::obmSatelliteConf::postfixMapsDesc;
     }else {
-        print "Erreur: probleme avec la descriptions des maps Postfix !\n";
+        print 'Erreur: probleme avec la descriptions des maps Postfix !'."\n";
         exit 1;
     }
 
-    $self->{server}->{name} = "obmSatellite";                               # Nom du service
-    $self->{server}->{conf_file} = $Bin."/".$self->{server}->{name}.".cf";  # Définition du fichier de configuration du service
+    $self->{server}->{name} = 'obmSatellite';                               # Nom du service
+    $self->{server}->{conf_file} = $Bin.'/'.$self->{server}->{name}.'.cf';  # Définition du fichier de configuration du service
 
 
     # Lectrure des paramètres spécifiques
     my $daemonOptions = {
         ldap_server => [],
+        ldap_server_tls => [],
         ldap_base => [],
         ldap_login => [],
         ldap_password => [],
@@ -81,8 +81,20 @@ sub configure_hook {
     $self->configure( $daemonOptions );
 
     # Option chargées depuis le fichier de configuration
-    if( defined($daemonOptions->{ldap_server}->[0]) && (($daemonOptions->{ldap_server}->[0] =~ /^([1-2]?[0-9]{1,2}\.){3}[1-2]?[0-9]{1,2}$/) || ($daemonOptions->{ldap_server}->[0] =~ /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,6}$/)) ) {
+    if( defined($daemonOptions->{ldap_server}->[0]) && (($daemonOptions->{ldap_server}->[0] =~ /^((ldap|ldaps):\/\/){0,1}([1-2]?[0-9]{1,2}\.){3}[1-2]?[0-9]{1,2}$/) || ($daemonOptions->{ldap_server}->[0] =~ /^((ldap|ldaps):\/\/){0,1}[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,6}$/)) ) {
         $self->{ldap_server}->{server} = $daemonOptions->{ldap_server}->[0];
+        if( $self->{ldap_server}->{server} !~ /^(ldap|ldaps):/ ) {
+            $self->{ldap_server}->{server} = 'ldap://'.$self->{ldap_server}->{server};
+        }
+
+        $self->{ldap_server}->{ldap_server_tls} = $daemonOptions->{ldap_server_tls}->[0];
+        if( $self->{ldap_server}->{server} =~ /^ldaps:/ ) {
+            $self->{ldap_server}->{ldap_server_tls} = 'none';
+        }
+        if( !defined($self->{ldap_server}->{ldap_server_tls}) || ($self->{ldap_server}->{ldap_server_tls} !~ /^(none|may|encrypt)$/) ) {
+            $self->{ldap_server}->{ldap_server_tls} = 'may';
+        }
+
         $self->{ldap_server}->{base} = $daemonOptions->{ldap_base}->[0];
         if( !defined($self->{ldap_server}->{base}) ) {
             $self->{ldap_server}->{base} = "";
@@ -91,7 +103,7 @@ sub configure_hook {
         $self->{ldap_server}->{login} = $daemonOptions->{ldap_login}->[0];
         $self->{ldap_server}->{password} = $daemonOptions->{ldap_password}->[0];
     }else {
-        print "Vous devez renseigner l'adresse du serveur LDAP !\n";
+        print 'Vous devez renseigner l\'adresse du serveur LDAP !'."\n";
         exit 1;
     }
 
@@ -659,21 +671,21 @@ sub processCyrusPartitions {
     my $cyrusPartitions = ObmSatellite::cyrusPartitions->new( $self, $domains );
 
     if( !defined($cyrusPartitions) ) {
-        $self->logMessage( "Echec: lors de la creation de l'objet 'cyrusPartitions'" );
+        $self->logMessage( 'Echec: lors de la creation de l\'objet \'cyrusPartitions\'' );
         $errors = 1;
     }
 
     if( !$errors ) {
         SWITCH: {
-            if( $action eq "add" ) {
+            if( $action eq 'add' ) {
                 if( $cyrusPartitions->addPartitions() ) {
-                    $self->logMessage( "Echec: lors du traitement du fichier de configuration de Cyrus" );
+                    $self->logMessage( 'Echec: lors du traitement du fichier de configuration de Cyrus' );
                     $errors = 2;
                 }
                 last SWITCH;
             }
 
-            if( $action eq "del" ) {
+            if( $action eq 'del' ) {
                 last SWITCH;
             }
         }
@@ -681,19 +693,19 @@ sub processCyrusPartitions {
 
     if( !$errors ) {
         # Re-démarrage du service Cyrus Imapd
-        my $cmd = $self->{cyrus}->{cyrus_service}." stop > /dev/null 2>&1";
-        $self->logMessage( "Execution de : '".$cmd."'" );
+        my $cmd = $self->{cyrus}->{cyrus_service}.' stop > /dev/null 2>&1';
+        $self->logMessage( 'Execution de : \''.$cmd.'\'' );
         my $ret = 0xffff & system $cmd;
     
         if( $ret ) {
-            $self->logMessage( "Echec: lors de l'arret du service Cyrus" );
+            $self->logMessage( 'Echec: lors de l\'arret du service Cyrus' );
             $errors = 3;
         }
     }
     
     if( !$errors ) {
-        my $cmd = $self->{cyrus}->{cyrus_service}." start > /dev/null 2>&1";
-        $self->logMessage( "Execution de : '".$cmd."'" );
+        my $cmd = $self->{cyrus}->{cyrus_service}.' start > /dev/null 2>&1';
+        $self->logMessage( 'Execution de : \''.$cmd.'\'' );
         my $ret = 0xffff & system $cmd;
     
         if( $ret ) {

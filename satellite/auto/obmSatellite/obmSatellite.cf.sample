@@ -1,6 +1,9 @@
-# Adresse du serveur LDAP référent
-#Ex:ldap_server         nom.server.ldap
+# Adresse du serveur LDAP référent (IP ou URI)
+# Ex:ldap_server         nom.server.ldap
+# Ex:ldap_server         ldap://nom.server.ldap
 ldap_server         _LDAPSERVER_
+# LDAP use TLS [none|may|encrypt]
+ldap_server_tls     may
 # DIT de l'annuaire LDAP - si vide, positionner 'defaultsearchbase' côté serveur
 ldap_base
 
