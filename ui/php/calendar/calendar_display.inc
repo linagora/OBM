@@ -2348,9 +2348,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         <tr>
         <td>$label</td>
         <td class=\"C\">
-        <input $ACCEPTED type=\"radio\" name=\"rd_user_decision_$c_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_A</span>
-  <input ${'NEEDS-ACTION'} type=\"radio\" name=\"rd_user_decision_$c_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_W</span>
-        <input $DECLINED type=\"radio\" name=\"rd_user_decision_$c_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_R</span>
+        <input $ACCEPTED type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_A</span>
+  <input ${'NEEDS-ACTION'} type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_W</span>
+        <input $DECLINED type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_R</span>
         </td>
         </tr>";
         $$state = '';
