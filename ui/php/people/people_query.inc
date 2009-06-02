@@ -320,7 +320,7 @@ function run_query_people_ext_search($people) {
       OR contactentity_entity_id IN (
         SELECT email_entity_id FROM Email WHERE email_address $like '$pattern%'
       ))
-      AND contact_archive = 0
+      AND contact_archive = 0 AND (contact_privacy='0' OR contact_usercreate='$obm[uid]')
       $multidomain_contact";
 
 
