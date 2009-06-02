@@ -318,7 +318,7 @@ function run_query_people_ext_search($people) {
       contact_lastname $like '$pattern%'
       OR contact_firstname $like '$pattern%'
       OR contactentity_entity_id IN (
-        SELECT email_entity_id FROM Email WHERE email_address LIKE '$pattern%'
+        SELECT email_entity_id FROM Email WHERE email_address $like '$pattern%'
       ))
       AND contact_archive = 0
       $multidomain_contact";
