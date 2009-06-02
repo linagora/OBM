@@ -3485,6 +3485,13 @@ function html_calendar_waiting_events($obm_wait) {
   global $l_wait,$l_low,$l_medium,$l_datebegin,$l_daysofweekshort,$l_update;
   global $l_carac,$l_accept,$l_refuse,$l_periodic,$l_yes,$l_no,$path;
    
+  $owner_notification = "";
+  if ($_GET['owner_notification'] == "true") $owner_notification = "checked=\"checked\"";
+
+  $block = "<div class=\"detail\">
+      <input type=\"checkbox\" id=\"owner_notification\" $owner_notification />$GLOBALS[l_owner_notification]
+  </div>";
+
   while ($obm_wait->next_record()) {
     $old_entity = $current_entity;
     $old_entity_entity = $current_entity_entity;
@@ -3500,11 +3507,8 @@ function html_calendar_waiting_events($obm_wait) {
       if ($block != '') {
         $block .= '</tbody></table>';    
       }
-      $owner_notification = "";
-      if ($_GET['owner_notification'] == "true") $owner_notification = "checked=\"checked\"";
       $block .= "
       <h1>$type : $current_label</h1>
-      <input type=\"checkbox\" id=\"owner_notification\" $owner_notification />$GLOBALS[l_owner_notification]
       <table class=\"spreadSheet\">
       <thead>
        <tr>
