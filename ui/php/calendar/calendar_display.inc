@@ -2796,7 +2796,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $desc = $event_q->f('event_description');
     if ($properties != '') {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'? >$properties";
+      $item = "<?xml version='1.0' encoding='$charset'?>$properties";
     } else {
       $item = '';
     }
