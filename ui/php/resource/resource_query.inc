@@ -24,6 +24,7 @@ function run_query_resource_search($resource) {
   $rtype = $resource['rtype'];
   $qtyinf = $resource['qtyinf'];
   $qtysup = $resource['qtysup'];
+  $delegation = sql_search_text_parse($resource['delegation']);
  
   $sql_order_dir = $resource['sql_order_dir'];
   $sql_order_field = $resource['sql_order_field'];
@@ -61,6 +62,11 @@ function run_query_resource_search($resource) {
   // If a name indication has been specified, get it
   if (trim($name) != '') {
      $where .= " AND resource_name $like '$name%'";
+  }
+
+  // If a delegation indication has been specified, get it
+  if (trim($delegation) != '') {
+    $where .= " AND resource_delegation $like '$delegation%'";
   }
 
   // If a description indication has been specified, get it
@@ -246,6 +252,7 @@ function run_query_resource_insert($resource) {
   }
   $domain_id = sql_parse_id($obm['domain_id']);
 	
+  $q_delegation = of_delegation_query_insert_clauses('resource_delegation', stripslashes($resource['delegation']));
   $query = "INSERT INTO Resource (
      resource_timeupdate,
      resource_timecreate,
@@ -253,7 +260,8 @@ function run_query_resource_insert($resource) {
      resource_usercreate,
      resource_domain_id,
      resource_rtype_id,
-     resource_name,
+     resource_name
+     $q_delegation[field],
      resource_description,
      resource_qty
    ) VALUES (
@@ -263,7 +271,8 @@ function run_query_resource_insert($resource) {
     $obm[uid],
     $domain_id,
     $rtype,
-    '$name',
+    '$name'
+    $q_delegation[value],
     '$desc',
     '$qty'
    )";
@@ -322,6 +331,8 @@ function run_query_resource_update($p_id, $resource) {
 
   $multidomain = sql_multidomain('resource');
 	
+  $q_delegation = of_delegation_query_update_clause('resource_delegation', stripslashes($resource['delegation']));
+
   $query = "UPDATE Resource SET
     resource_timeupdate='". date('Y-m-d H:i:s')."',
     resource_userupdate=$obm[uid],
@@ -329,6 +340,7 @@ function run_query_resource_update($p_id, $resource) {
     resource_description='$desc',
     resource_qty='$qty',
     resource_rtype_id=$rtype
+    $q_delegation
   WHERE resource_id $p_id 
     $multidomain";
 
@@ -399,6 +411,28 @@ function check_resource_context($p_id, $resource) {
 }
 
 
+/*
+ * Resource rights checking
+ * Parameters:
+ * @param $params : parameters values
+ * @param $g[]    : current group values
+ * @return true if OK, else false
+ */
+function check_resource_update_rights($resource) {
+  global $err, $l_error_delegation;
+
+  $r = get_resource_info($resource['resource_id']);
+  if (!of_delegation_check_update_rights($resource, $r['delegation'])) {
+    $err['msg'] .= $l_error_delegation;
+    return false;
+  }
+
+  return true;
+}
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Data checking and formatting
 // Parameters:
@@ -408,7 +442,7 @@ function check_resource_context($p_id, $resource) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_resource_data_form($p_id, &$resource) {
   global $l_exist_error, $l_name_error, $l_desc_error;
-  global $l_lname_error;
+  global $l_lname_error, $cgp_use;
   global $err, $action, $cdg_sql;
 
   // Hook : Validation
@@ -417,6 +451,14 @@ function check_resource_data_form($p_id, &$resource) {
       return false;
     }
   }
+
+  // Les contraintes sur la delegation ne sont pas valables pour le domaine global
+  if ($cgp_use['property']['delegation']) {
+    if(!of_delegation_check_data($resource['delegation'])) {
+      $err['field'] = 'delegation';
+      return false;
+    }
+  } 
 
   $id = $resource['resource_id'];
   $name = $resource['name'];

@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames['resource_name'] = $l_name;
+$fieldnames['resource_delegation'] = $l_delegation;
 $fieldnames['resource_description'] = $l_desc;
 $fieldnames['resource_qty'] = $l_qty;
 $fieldnames['resourcetype_label'] = $l_rtype;
@@ -57,7 +58,7 @@ function dis_data_resource(&$OD, $fieldname, $link_ok) {
 //     keys used : name, desc, qty, popup
 ///////////////////////////////////////////////////////////////////////////////
 function html_resource_search_form($resource) {
-  global $l_name, $l_desc, $l_qty, $l_find, $l_all;
+  global $l_name, $l_desc, $l_qty, $l_find, $l_all, $l_delegation;
   global $l_add_resources;
   global $display, $c_all, $l_rtype;
   global $l_undef, $c_undef;
@@ -68,6 +69,7 @@ function html_resource_search_form($resource) {
   $qtysup = $resource['qtysup'];
   $popup = $resource['popup'];
   $sel_rtype = $resource['rtype'];
+  $delegation = $resource['delegation'];
 
   if ($resource['filter_entity']) {
     $dis_filter_entity = "<input name=\"filter_entity\" type=\"hidden\" value=\"$resource[filter_entity]\">";
@@ -115,6 +117,8 @@ function html_resource_search_form($resource) {
   }
   $block_resourcetype .= '</select>';
 
+  $dis_delegation = of_delegation_dis_search_form($delegation);
+
   $block = "
   <form method=\"get\" name=\"f_search\"
     action=\"". url_prepare('resource_index.php')."\" class=\"search\">
@@ -123,6 +127,7 @@ function html_resource_search_form($resource) {
       <input type=\"text\" name=\"tf_name\" size=\"30\" maxlength=\"32\"
       value=\"$lname\" />
     </label>
+    $dis_delegation
     <label>$l_desc<br />
       <input type=\"text\" name=\"tf_desc\" size=\"30\" maxlength=\"32\"
       value=\"$ldesc\" />
@@ -200,6 +205,7 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
   $lqtyinf = urlencode($resource['qtyinf']);
   $lqtysup = urlencode($resource['qtysup']);
   $rtype = $resource['rtype'];
+  $delegation = $resource['delegation'];
 
   if ($popup) {
     $ext_action = $resource['ext_action'];
@@ -211,7 +217,7 @@ function html_resource_search_list($obm_q, $prefs, $resource, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget";
   }
 
-  $url = url_prepare("resource_index.php?action=search&amp;tf_name=$lname&amp;tf_desc=$ldesc&amp;tf_qtyinf=$lqtyinf&amp;tf_qtysup=$lqtysup&amp;sel_rtype=$rtype$url_ext");
+  $url = url_prepare("resource_index.php?action=search&amp;tf_name=$lname&amp;tf_delegation=$delegation&amp;tf_desc=$ldesc&amp;tf_qtyinf=$lqtyinf&amp;tf_qtysup=$lqtysup&amp;sel_rtype=$rtype$url_ext");
 
   $resource_d = new OBM_DISPLAY('DATA', $prefs, 'resource');
   if ($popup) {
@@ -282,6 +288,7 @@ function html_resource_form($usr_q, $resource) {
     $desc = $usr_q->f('resource_description');
     $rtype = $usr_q->f('resource_rtype_id');
     $qty = $usr_q->f('resource_qty');
+    $delegation = $usr_q->f('resource_delegation');
     $dis_title = $name;
   }
 
@@ -290,6 +297,9 @@ function html_resource_form($usr_q, $resource) {
   if (isset($resource['name'])) { $name = $resource['name']; }
   if (isset($resource['qty'])) { $qty = $resource['qty']; }
   if (isset($resource['rtype'])) { $rtype = $resource['rtype']; }
+  if (isset($resource['delegation'])) { $delegation = stripslashes($resource['delegation']); }
+
+  $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
   // Resource Type
   $resourcetype_q = run_query_resourcetype();
@@ -346,7 +356,7 @@ function html_resource_form($usr_q, $resource) {
     <tr>
       <th>$l_name</th>
       <td><input id=\"tf_name\" name=\"tf_name\" size=\"40\" maxlength=\"32\" value=\"$name\" /></td>
-    </tr><tr>
+    </tr>$block_delegation<tr>
       <th>$l_rtype</th>
       <td>$block_resourcetype</td>
     </tr><tr>
@@ -411,9 +421,11 @@ function html_resource_consult($obm_q) {
   $desc = $obm_q->f('resource_description');
   $qty = $obm_q->f('resource_qty');
   $rtype = ucfirst($obm_q->f('resourcetype_label'));
+  $delegation = $obm_q->f('resource_delegation');
 
   $display['detailInfo'] = display_record_info($obm_q);
   $display['title'] = $name;
+  $block_delegation = of_delegation_dis_block_consult($delegation);
 
   $block = "
   <div class=\"detail extra\">
@@ -422,7 +434,7 @@ function html_resource_consult($obm_q) {
     <tr>
       <th>$l_name</th>
       <td>$name</td>
-    </tr><tr>
+    </tr>$block_delegation<tr>
       <th>$l_rtype</th>
       <td>$rtype</td>
     </tr><tr>

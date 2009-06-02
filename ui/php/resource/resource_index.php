@@ -126,12 +126,16 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'detailupdate') {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_resource_detail($params['resource_id']);
-  if ($obm_q->num_rows() == 1) {
-    $display['detailInfo'] = display_record_info($obm_q);
-    $display['detail'] = html_resource_form($obm_q, $params);
+  if (check_resource_update_rights($params)) {
+    $obm_q = run_query_resource_detail($params['resource_id']);
+    if ($obm_q->num_rows() == 1) {
+      $display['detailInfo'] = display_record_info($obm_q);
+      $display['detail'] = html_resource_form($obm_q, $params);
+    } else {
+      $display['msg'] .= display_err_msg($l_err_reference);
+    }
   } else {
-    $display['msg'] .= display_err_msg($l_err_reference);
+    $display['msg'] .= display_warn_msg($err['msg']);
   }
 
 } elseif ($action == 'insert') {
@@ -174,13 +178,17 @@ if ($action == 'ext_get_ids') {
 
 } elseif ($action == 'check_delete') {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_resource_can_delete($params)) {
-    $display['msg'] .= display_info_msg($ok_msg, false);
-    $display['detail'] = dis_resource_can_delete($params['resource_id']);
+  if (check_resource_update_rights($params)) {
+    if (check_resource_can_delete($params)) {
+      $display['msg'] .= display_info_msg($ok_msg, false);
+      $display['detail'] = dis_resource_can_delete($params['resource_id']);
+    } else {
+      $display['msg'] .= display_warn_msg($err['msg'], false);
+      $display['msg'] .= display_warn_msg($l_cant_delete, false);
+      $display['detail'] = dis_resource_consult($params);
+    }
   } else {
-    $display['msg'] .= display_warn_msg($err['msg'], false);
-    $display['msg'] .= display_warn_msg($l_cant_delete, false);
-    $display['detail'] = dis_resource_consult($params);
+    $display['msg'] .= display_warn_msg($err['msg']);
   }
 
 } elseif ($action == 'delete') {
@@ -395,6 +403,7 @@ function get_resource_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=".$params['resource_id'],
      'Right'    => $cright_write,
+     'Privacy'  => true,
      'Condition'=> array ('detailconsult', 'insert', 'update')
                                      	   );
 
@@ -543,12 +552,17 @@ function update_resource_action() {
   // Right admin
   $actions['resource']['rights_admin']['Url'] = "$path/resource/resource_index.php?action=rights_admin&amp;entity_id=".$params['resource_id'];
 
-  // Detail Update
-  $actions['resource']['detailupdate']['Url'] = "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=".$params['resource_id'];
 
-  // Check Delete
-  $actions['resource']['check_delete']['Url'] = "$path/resource/resource_index.php?action=check_delete&amp;resource_id=".$params['resource_id'];
+  if (check_resource_update_rights($params)) {
+    // Detail Update
+    $actions['resource']['detailupdate']['Url'] = "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=".$params['resource_id'];
 
+    // Check Delete
+    $actions['resource']['check_delete']['Url'] = "$path/resource/resource_index.php?action=check_delete&amp;resource_id=".$params['resource_id'];
+  } else {
+    $actions['resource']['detailupdate']['Condition'] = array('None');
+    $actions['resource']['check_delete']['Condition'] = array('None');
+  }
 }
 
 ?>
