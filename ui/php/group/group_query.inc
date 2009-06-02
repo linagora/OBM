@@ -1216,7 +1216,7 @@ function check_group_can_delete($p_id) {
     $err['msg'] .= $l_cant_delete_domain_group;
     $delete_ok = false;
 
-  } else if (get_users_nb_from_gid($domain_id, $gid) > 0) {
+  } else if ($gid != null && get_users_nb_from_gid($domain_id, $gid) > 0) {
     $err['msg'] .= $l_err_cant_delete_default_user_group;
     $delete_ok = false;
 
