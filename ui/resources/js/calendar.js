@@ -2105,8 +2105,8 @@ Obm.CalendarFreeBusy = new Class({
             var input = new Element('input').setProperties({
               'id' : 'tf_'+attendee,
               'type' : 'hidden',
-              'name': kind+'_id[]',
-              'value' : 'data-'+attendee
+              'name': 'new_'+kind+'_id[]',
+              'value' :id 
             });
           }
           $('freeBusyFormId').adopt(input);
