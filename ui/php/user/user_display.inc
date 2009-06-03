@@ -638,7 +638,6 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
       </p>";
       
   } else if ($user['action'] == 'sel_batch_users') {
-    $user_d->display_link = false;
     $user_d->data_cb_text = 'X';
     $user_d->data_idfield = 'userobm_id';
     $user_d->data_cb_name = 'data-u-';
