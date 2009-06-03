@@ -69,6 +69,15 @@ function run_query_host_search($host) {
   $order = (strcmp($sql_order_field,'') != 0) ? $sql_order_field : 'host_name';
   $orderq .= " ORDER BY $order $sql_order_dir";
 
+  $join = "INNER JOIN HostEntity ON hostentity_host_id = host_id
+      LEFT JOIN UserObm as A ON host_usercreate=A.userobm_id
+      LEFT JOIN UserObm as B ON host_userupdate=B.userobm_id
+      LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id"; 
+
   $multidomain = sql_multidomain('host');
   $query = "SELECT DISTINCT Host.*,
       samba.service_id as host_samba,
@@ -82,25 +91,18 @@ function run_query_host_search($host) {
       A.userobm_login as usercreate,
       B.userobm_login as userupdate
     FROM Host
-      INNER JOIN HostEntity ON hostentity_host_id = host_id
-      LEFT JOIN UserObm as A ON host_usercreate=A.userobm_id
-      LEFT JOIN UserObm as B ON host_userupdate=B.userobm_id
-      LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
+    $join
     $whereq $multidomain 
     $orderq
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count($query);
+    $count = get_query_count("SELECT count(distinct host_id) From Host $join $whereq $multidomain");
     $obm_q->set_num_rows_total($count);
   }
 
   if (($count > 0) || (! $ctu_sql_limit)) {
-    display_debug_msg($query, $cdg_sql, 'run_query_user_search()');
+    display_debug_msg($query, $cdg_sql, 'run_query_host_search()');
     $obm_q->xquery($query);
   }
 
