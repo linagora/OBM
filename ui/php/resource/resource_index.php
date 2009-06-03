@@ -403,7 +403,6 @@ function get_resource_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=".$params['resource_id'],
      'Right'    => $cright_write,
-     'Privacy'  => true,
      'Condition'=> array ('detailconsult', 'insert', 'update')
                                      	   );
 
