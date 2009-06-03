@@ -38,6 +38,7 @@ function run_query_people_search($people) {
   $town = $people['town'];
   $fax = $people['fax'];
   $company = $people['company'];
+  $status = $people['status'];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -65,6 +66,10 @@ function run_query_people_search($people) {
     }
     $show_contact = true;
     $where_userobm .= " AND userobm_status = 'VALID'";
+  } else {
+    if (trim($status) != '') {
+      $where_userobm .= " AND userobm_status = '$status'";
+    }
   }
 
   // If a lastname indication has been specified, get it

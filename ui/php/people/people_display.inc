@@ -1044,8 +1044,9 @@ function dis_people_wait_list($params) {
 
   $filter_entity = $params["filter_entity"];
   $popup = $params["popup"];
+  $params["status"] = "INIT";
 
-  $obm_q = run_query_people_search_wait($user);
+  $obm_q = run_query_people_search($params);
 
   $prefs = get_display_pref($obm["uid"], "people");
   $nb_user = $obm_q->num_rows_total();
@@ -1077,7 +1078,7 @@ function html_people_wait_list($obm_q, $prefs, $user, $popup) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('user', $user);
 
-  $url = url_prepare("people_index.php?action=search&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;tf_email=$email&amp;tf_desc=$desc$url_userdata$url_ext");
+  $url = url_prepare("people_index.php?action=wait&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;tf_email=$email&amp;tf_desc=$desc$url_userdata$url_ext");
   $user_d = new OBM_DISPLAY("DATA", $prefs, "people");
 
   $user_d->data_set = $obm_q;
