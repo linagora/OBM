@@ -1742,6 +1742,8 @@ Obm.CalendarFreeBusy = new Class({
     this.table = $('calendarFreeBusyTable'); 
     this.scrollRight = $('scrollRight');
     this.scrollLeft = $('scrollLeft');
+    this.external_contact = $('external_contact');
+    this.external_contact_count = 0;
     this.nbSteps = time_slots.length;
     this.duration = 1;
     this.bts = new Array();
@@ -1851,6 +1853,15 @@ Obm.CalendarFreeBusy = new Class({
       qstring = qstring.replace('date_end', 'dummy');
       $('freeBusyFormId').setProperty('action', qstring);
     }
+
+    this.external_contact.addEvent('keypress', function(e) {
+      switch(e.key) {
+        case 'enter':
+          this.addOtherAttendee();
+          break;
+      }
+    }.bind(this));
+
   },
 
   /*
@@ -1956,10 +1967,17 @@ Obm.CalendarFreeBusy = new Class({
       data.sel_contact_id = new Array();
       data.sel_contact_id.push(id);
       var ico = obm.vars.images.ico_contact;
+    } else if (kind == 'others_attendees') {
+      data.sel_contact_id = new Array();
+      data.sel_contact_id.push(id);
+      data.kind = 'contact';
+      var ico = obm.vars.images.ico_contact;
     }
 
     var attendee = kind+'-'+id;
 
+    // TODO
+    // optimize : no request when kind == 'contact' || kind == 'others_attendees'
     new Request.JSON({
       url: 'calendar_index.php',
       secure: false,
@@ -2060,6 +2078,7 @@ Obm.CalendarFreeBusy = new Class({
           // Add event on trash icon
           trash.addEvent('mousedown', function() {
             $(attendee).destroy();
+            $('tf_'+attendee).destroy();
             if (this.attendeesSlot[attendee]) {
               this.attendeesSlot[attendee].each(function(e) {
                 if (!$$('div.'+e).length) {
@@ -2074,12 +2093,22 @@ Obm.CalendarFreeBusy = new Class({
 
           // Fix popup top position
           $('fbc').getParent().setStyle('top', $('fbc').getParent().offsetTop-10+'px');
-
-          var input = new Element('input').setProperties({
-            'type' : 'hidden',
-            'name':'new_'+kind+'_id[]',
-            'value' : id
-          });
+          
+          if (kind == 'others_attendees') {
+            var input = new Element('input').setProperties({
+              'id' : 'tf_'+attendee, 
+              'type' : 'hidden',
+              'name': kind+'[]',
+              'value' : label 
+            });
+          } else {
+            var input = new Element('input').setProperties({
+              'id' : 'tf_'+attendee,
+              'type' : 'hidden',
+              'name': kind+'_id[]',
+              'value' : 'data-'+attendee
+            });
+          }
           $('freeBusyFormId').adopt(input);
 
         }
@@ -2091,6 +2120,22 @@ Obm.CalendarFreeBusy = new Class({
         $('spinner').setStyle('display', 'none');
       }
     }).post($merge({ajax : 1, action : 'add_freebusy_entity'}, data));
+  },
+
+  addOtherAttendee: function(email) {
+    var reg = /^[a-z0-9._-]+@[a-z0-9.-]{2,}[.][a-z]{2,4}$/
+    if (email == null) {
+      email = this.external_contact.value;
+    }
+    if (email != '') {
+      if(reg.exec(email)) {
+        this.addAttendee('data-others_attendees-'+this.external_contact_count, email);
+        this.external_contact_count ++;
+        this.external_contact.value = "";
+      } else {
+        alert(obm.vars.labels.invalidEmail+' ('+email+')');
+      }
+    }
   },
 
   /*

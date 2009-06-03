@@ -3976,7 +3976,7 @@ function dis_calendar_free_interval($calendar) {
   $js_time_slots = phpArrayToJsArray($time_slots);
   $l_calendar_not_available = phpStringToJsString($GLOBALS['l_calendar_not_available']);
   $l_allday = phpStringToJsString($GLOBALS['l_all_day']);
-
+  $l_invalid_email = phpStringToJsString($GLOBALS['l_invalid_email']);
   // Navigation
   $current = clone $date;
   $prev_month = $current->setDateIso($calendar['date'])->subMonth(1)->getDateIso();
@@ -4027,6 +4027,13 @@ function dis_calendar_free_interval($calendar) {
             </tr>
             <tr>
               <td><input type='text' name='' value='' id='freeBusyResourceSearch' autocomplete='off' /></td>
+            </tr>
+            <tr>
+              <td>$GLOBALS[l_others_attendees]</td>
+            </tr>
+            <tr>
+              <td><input style='width:14em;' type='text' name='external_contact' value='' id='external_contact' />
+                <img src='$GLOBALS[ico_add]' alt='[Add]' onclick='obm.calendarFreeBusy.addOtherAttendee();'/></td>
             </tr>
           </tbody>
         </table>
@@ -4107,6 +4114,7 @@ function dis_calendar_free_interval($calendar) {
     obm.calendarFreeBusy = new Obm.CalendarFreeBusy($js_time_slots, $unit, timestamp);
     obm.vars.labels.calendar_not_available = '$l_calendar_not_available';
     obm.vars.labels.allday = '$l_allday';
+    obm.vars.labels.invalidEmail = '$l_invalid_email';
     obm.vars.images.ico_user = '$GLOBALS[ico_user]';
     obm.vars.images.ico_resource = '$GLOBALS[ico_resource]';
     obm.vars.images.ico_contact = '$GLOBALS[ico_contact]';
@@ -6269,7 +6277,7 @@ function dis_calendar_mail_field($emails, $class) {
         <a onclick=\"remove_element(this.parentNode,'calendarMailHome');return false\" href=\"\">
          <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
         </a>        
-        <input name='tf_email[]' value=\"$email\" />
+        <input name='tf_others_attendees[]' value=\"$email\" />
         </div>";
       $count ++;
     }

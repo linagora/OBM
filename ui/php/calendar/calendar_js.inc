@@ -49,6 +49,9 @@ $extra_js .= "
         atts[id[3]]['label'] = label; 
       }
     });
+
+    var othersAttendees = document.getElementsByName('tf_others_attendees[]');
+
     var q = new Object();
     q.date = date_begin;
     new Request.JSON({
@@ -86,6 +89,12 @@ $extra_js .= "
             obm.calendarFreeBusy.addResourceGroup(id[3]);
           }
         });
+
+        for(var i = 0;i<othersAttendees.length;i++) {
+          var e = othersAttendees[i].value;
+          obm.calendarFreeBusy.addOtherAttendee(e);
+        }
+
         $('fbcContainer').innerHTML = '';
 
       }
