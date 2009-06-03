@@ -795,8 +795,6 @@ function html_people_form($usr_q, $user, $field='') {
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"post\" name=\"f_entity\"
-    enctype=\"multipart/form-data\"
-    onsubmit=\"if (check_user(this)) return true; else return false;\"
     action=\"" . url_prepare("people_index.php") . "\">
   <fieldset class=\"detail infos\">
   <legend>$l_people</legend>
