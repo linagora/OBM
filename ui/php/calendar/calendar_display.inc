@@ -2550,8 +2550,8 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
 	      }
       }
       $users_id[] = $obm['uid'];
-      if (is_array($calendar['new_contact_id'])) {
-	      foreach ($calendar['new_contact_id'] as $new_contact_id) {
+      if (is_array($calendar['sel_contact_id'])) {
+	      foreach ($calendar['sel_contact_id'] as $new_contact_id) {
 	        if ($new_contact_id > 0) {
 	          $contacts_id[] = $new_contact_id;
 	        }

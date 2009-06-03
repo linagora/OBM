@@ -1851,6 +1851,8 @@ Obm.CalendarFreeBusy = new Class({
       var qstring = 'calendar_index.php?'+$('new_event_form').toQueryString();
       qstring = qstring.replace('date_begin', 'dummy');
       qstring = qstring.replace('date_end', 'dummy');
+      qstring = qstring.replace('sel_user_id', 'dummy');
+      qstring = qstring.replace('sel_resource_id', 'dummy');
       $('freeBusyFormId').setProperty('action', qstring);
     }
 
@@ -2102,11 +2104,12 @@ Obm.CalendarFreeBusy = new Class({
               'value' : label 
             });
           } else {
+            if (kind == 'contact') kind = 'user';
             var input = new Element('input').setProperties({
               'id' : 'tf_'+attendee,
               'type' : 'hidden',
-              'name': 'new_'+kind+'_id[]',
-              'value' :id 
+              'name': kind+'_id[]',
+              'value' : 'data-'+attendee 
             });
           }
           $('freeBusyFormId').adopt(input);
