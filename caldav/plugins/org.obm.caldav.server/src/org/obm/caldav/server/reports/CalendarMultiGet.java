@@ -16,39 +16,119 @@
 
 package org.obm.caldav.server.reports;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
+import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
+import org.obm.caldav.server.propertyHandler.impl.CalendarData;
+import org.obm.caldav.server.propertyHandler.impl.DGetETag;
+import org.obm.caldav.server.resultBuilder.CalendarMultiGetQueryResultBuilder;
 import org.obm.caldav.server.resultBuilder.PropertyListBuilder;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class CalendarMultiGet extends ReportProvider {
 
+	private Map<String, CalendarMultiGetPropertyHandler> properties;
+
+	public CalendarMultiGet() {
+		properties = new HashMap<String, CalendarMultiGetPropertyHandler>();
+		properties.put("D:getetag", new DGetETag());
+		properties.put("calendar-data", new CalendarData());
+	}
+
 	// <?xml version="1.0" encoding="UTF-8"?>
-	// <calendar-query xmlns="urn:ietf:params:xml:ns:caldav" xmlns:D="DAV:">
+	// <calendar-multiget xmlns="urn:ietf:params:xml:ns:caldav" xmlns:D="DAV:">
 	// <D:prop>
 	// <D:getetag/>
+	// <calendar-data/>
 	// </D:prop>
-	// <filter>
-	// <comp-filter name="VCALENDAR">
-	// <comp-filter name="VEVENT"/>
-	// </comp-filter>
-	// </filter>
-	// </calendar-query>
+	// <D:href>/adrien@zz.com/events/979.ics</D:href>
+	// </calendar-multiget>
+
+	// <D:response>
+	// <D:href>http://cal.example.com/bernard/work/979.ics</D:href>
+	// <D:propstat>
+	// <D:prop>
+	// <D:getetag>"fffff-979"</D:getetag>
+	// <C:calendar-data>BEGIN:VCALENDAR
+	// VERSION:2.0
+	// PRODID:-//Example Corp.//CalDAV Client//EN
+	// BEGIN:VTIMEZONE
+	// LAST-MODIFIED:20040110T032845Z
+	// TZID:US/Eastern
+	// BEGIN:DAYLIGHT
+	// DTSTART:20000404T020000
+	// RRULE:FREQ=YEARLY;BYDAY=1SU;BYMONTH=4
+	// TZNAME:EDT
+	// TZOFFSETFROM:-0500
+	// TZOFFSETTO:-0400
+	// END:DAYLIGHT
+	// BEGIN:STANDARD
+	// DTSTART:20001026T020000
+	// RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10
+	// TZNAME:EST
+	// TZOFFSETFROM:-0400
+	// TZOFFSETTO:-0500
+	// END:STANDARD
+	// END:VTIMEZONE
+	// BEGIN:VEVENT
+	// DTSTAMP:20060206T001102Z
+	// DTSTART;TZID=US/Eastern:20060102T100000
+	// DURATION:PT1H
+	// SUMMARY:Event #1
+	// Description:Go Steelers!
+	// UID:74855313FA803DA593CD579A@example.com
+	// END:VEVENT
+	// END:VCALENDAR
+	// </C:calendar-data>
+	// </D:prop>
+	// <D:status>HTTP/1.1 200 OK</D:status>
+	// </D:propstat>
+	// </D:response>
+	// <D:response>
+	// <D:href>http://cal.example.com/bernard/work/mtg1.ics</D:href>
+	// <D:status>HTTP/1.1 404 Not Found</D:status>
+	// </D:response>
+	// </D:multistatus>
 
 	@Override
-	public void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp,
-			Set<String> propList) {
+	public void process(Token token, IProxy proxy, DavRequest req,
+			HttpServletResponse resp, Set<String> requestPropList) {
 		logger.info("process(" + token.getLoginAtDomain() + ", req, resp)");
-		//FIXME CALDAV PropertyListBuilder
-		Document ret = new PropertyListBuilder().build(token, req,
-				null,null);
+
+		Set<CalendarMultiGetPropertyHandler> propertiesValues = new HashSet<CalendarMultiGetPropertyHandler>();
+
+		for (String s : requestPropList) {
+			CalendarMultiGetPropertyHandler dph = properties.get(s);
+			if (dph != null) {
+				propertiesValues.add(dph);
+			} else {
+				logger.warn("the Property [" + s + "] is not implemented");
+			}
+		}
+
 		try {
+			Element root = req.getDocument().getDocumentElement();
+			Set<String> listUIDEvent = getListUIDEvent(root);
+			Map<String, String> listICS = proxy.getEventService().getICSEvents(listUIDEvent);
+			
+			// FIXME CALDAV PropertyListBuilder
+			Document ret = new CalendarMultiGetQueryResultBuilder().build(req, proxy, propertiesValues, listICS);
+			
 			DOMUtils.logDom(ret);
 
 			resp.setStatus(207); // multi status webdav
@@ -59,4 +139,24 @@ public class CalendarMultiGet extends ReportProvider {
 		}
 	}
 
+	private Set<String> getListUIDEvent(Element root){
+		Set<String> listUIDEvent = new HashSet<String>();
+		if(root!= null){
+			NodeList dl = root.getElementsByTagNameNS(NameSpaceConstant.DHREF_NAMESPACE, "href");
+			for(int i = 0; i<dl.getLength(); i++ ){
+				Element dhref = (Element)dl.item(i);
+				String hrefContent = dhref.getTextContent();
+				int lastS = dhref.getTextContent().lastIndexOf("/");
+				if(lastS!=-1){
+					String icsName = hrefContent.substring(lastS+1);
+					String iudEvent = icsName.replace(".ics", "");
+					if(!"".equals(iudEvent)){
+						listUIDEvent.add(iudEvent);
+						logger.debug("iudEvent "+iudEvent);
+					}
+				}
+			}
+		}
+		return listUIDEvent;
+	}
 }

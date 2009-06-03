@@ -235,6 +235,14 @@ public final class DOMUtils {
 		parent.appendChild(el);
 		return el;
 	}
+	
+
+	public static Element createElementNS(Element parent, String nameSpaceURI, String elementName) {
+		Element el = parent.getOwnerDocument().createElementNS(nameSpaceURI,elementName);
+		parent.appendChild(el);
+		return el;
+	}
+
 
 	private static void serialise(Document doc, OutputStream out, boolean pretty)
 			throws TransformerException {

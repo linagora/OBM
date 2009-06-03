@@ -24,12 +24,11 @@ import org.obm.caldav.server.share.Token;
 
 public class PropPatchHandler extends DavMethodHandler {
 
-	public PropPatchHandler(IProxy proxy) {
-		super(proxy);
+	public PropPatchHandler() {
 	}
 
 	@Override
-	public void process(Token t, DavRequest req, HttpServletResponse resp) {
+	public void process(Token t, IProxy proxy, DavRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
 	}
 

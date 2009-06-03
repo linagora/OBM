@@ -89,7 +89,7 @@ public class WebdavServlet extends HttpServlet {
 
 		DavMethodHandler handler = handlers.get(method.toLowerCase());
 		if (handler != null) {
-			handler.process(token, new DavRequest(request), response);
+			handler.process(token, proxy,new DavRequest(request), response);
 		} else {
 			super.service(request, response);
 		}
@@ -101,16 +101,16 @@ public class WebdavServlet extends HttpServlet {
 	public void init() throws ServletException {
 		super.init();
 		handlers = new HashMap<String, DavMethodHandler>();
-		handlers.put("propfind", new PropFindHandler(proxy));
-		handlers.put("proppatch", new PropPatchHandler(proxy));
-		handlers.put("mkcol", new MkColHandler(proxy));
-		handlers.put("copy", new CopyHandler(proxy));
-		handlers.put("move", new MoveHandler(proxy));
-		handlers.put("lock", new LockHandler(proxy));
-		handlers.put("unlock", new UnlockHandler(proxy));
-		handlers.put("options", new OptionsHandler(proxy));
-		handlers.put("report", new ReportHandler(proxy));
-		handlers.put("put", new PutHandler(proxy));
+		handlers.put("propfind", new PropFindHandler());
+		handlers.put("proppatch", new PropPatchHandler());
+		handlers.put("mkcol", new MkColHandler());
+		handlers.put("copy", new CopyHandler());
+		handlers.put("move", new MoveHandler());
+		handlers.put("lock", new LockHandler());
+		handlers.put("unlock", new UnlockHandler());
+		handlers.put("options", new OptionsHandler());
+		handlers.put("report", new ReportHandler());
+		handlers.put("put", new PutHandler());
 		
 		authHandler = new AuthHandler();
 	}

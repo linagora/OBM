@@ -14,12 +14,11 @@ import org.obm.caldav.utils.FileUtils;
 
 public class PutHandler extends DavMethodHandler {
 
-	public PutHandler(IProxy proxy) {
-		super(proxy);
+	public PutHandler() {
 	}
 
 	@Override
-	public void process(Token token, DavRequest req, HttpServletResponse resp) {
+	public void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp) {
 		InputStream in;
 		try {
 			in = req.getInputStream();

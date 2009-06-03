@@ -21,8 +21,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.security.auth.login.FailedLoginException;
@@ -176,25 +179,26 @@ public class ObmSyncProvider implements ICalendarProvider {
 	}
 
 	@Override
-	public Set<String> getAllEvent(AccessToken token, String calendar)
+	public List<Event> getAllEvents(AccessToken token, String userId)
 			throws ServerFault, AuthFault {
-		Date d = new Date();
-		Calendar cal = new GregorianCalendar();
-		cal.setTime(d);
-		cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 2);
-		Date start = cal.getTime();
 
-		cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 4);
-		Date end = cal.getTime();
-		CalendarInfo c = getMyCalendar(token, calendar);
-		List<Event> le = this.cal.getListEventsFromIntervalDate(token,
-				getMyCalendar(token, calendar).getUid(), start, end);
-		
-		Set<String> isc = new HashSet<String>();
-		for(Event ev : le){
-			isc.add(this.cal.getICS(ev));
+		return this.cal.getAllEvents(token, getMyCalendar(token, userId)
+				.getUid());
+	}
+
+	@Override
+	public Map<String, String> getICSEvents(AccessToken token, String userId,
+			Set<String> listUidEvent) throws AuthFault, ServerFault {
+		Map<String, String> listICS = new HashMap<String, String>();
+
+		for (String id : listUidEvent) {
+			Event event = cal.getEventFromId(token, userId, id);
+			if (event != null) {
+				listICS.put(id, cal.getICS(event));
+			} else {
+				listICS.put(id, "");
+			}
 		}
-		return isc;
-		//return this.cal.getICS(le);
+		return listICS;
 	}
 }

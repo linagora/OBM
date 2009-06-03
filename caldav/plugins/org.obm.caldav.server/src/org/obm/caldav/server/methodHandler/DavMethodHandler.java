@@ -17,7 +17,6 @@
 package org.obm.caldav.server.methodHandler;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -38,11 +37,7 @@ public abstract class DavMethodHandler {
 	protected Log logger = LogFactory.getLog(getClass());
 	
 	
-	protected IProxy proxy;
-	
-	
-	public DavMethodHandler(IProxy proxy) {
-		this.proxy = proxy;
+	public DavMethodHandler() {
 	}
 	
 	public Set<String> getPropList(Document doc){
@@ -63,6 +58,6 @@ public abstract class DavMethodHandler {
 		return toLoad;
 	}
 
-	public abstract void process(Token token, DavRequest req, HttpServletResponse resp);
+	public abstract void process(Token token,IProxy proxy, DavRequest req, HttpServletResponse resp);
 	
 }

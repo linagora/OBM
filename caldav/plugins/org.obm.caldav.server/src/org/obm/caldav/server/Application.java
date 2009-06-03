@@ -42,6 +42,7 @@ public class Application implements IApplication {
 
 		loadBundle("org.eclipse.equinox.http.registry");
 
+		
 		return EXIT_OK;
 	}
 

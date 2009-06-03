@@ -24,12 +24,11 @@ import org.obm.caldav.server.share.Token;
 
 public class LockHandler extends DavMethodHandler {
 
-	public LockHandler(IProxy proxy) {
-		super(proxy);
+	public LockHandler() {
 	}
 
 	@Override
-	public void process(Token t, DavRequest req, HttpServletResponse resp) {
+	public void process(Token t, IProxy proxy, DavRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
 	}
 

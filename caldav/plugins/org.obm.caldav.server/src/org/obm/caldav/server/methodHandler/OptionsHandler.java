@@ -24,12 +24,11 @@ import org.obm.caldav.server.share.Token;
 
 public class OptionsHandler extends DavMethodHandler {
 
-	public OptionsHandler(IProxy proxy) {
-		super(proxy);
+	public OptionsHandler() {
 	}
 
 	@Override
-	public void process(Token token, DavRequest req, HttpServletResponse resp) {
+	public void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp) {
 
 		resp.setStatus(HttpServletResponse.SC_OK);
 		resp.addHeader("DAV", "1, calendar-access, calendar-schedule");

@@ -46,8 +46,7 @@ public class PropFindHandler extends DavMethodHandler {
 
 	private Map<String,DavPropertyHandler> propertiesHandler;
 	
-	public PropFindHandler(IProxy proxy) {
-		super(proxy);
+	public PropFindHandler() {
 		
 		propertiesHandler = new HashMap<String, DavPropertyHandler>();
 		propertiesHandler.put("D:resourcetype", new DResourceType());
@@ -63,7 +62,7 @@ public class PropFindHandler extends DavMethodHandler {
 	
 	
 	@Override
-	public void process(Token t, DavRequest req, HttpServletResponse resp) {
+	public void process(Token t, IProxy proxy, DavRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
 
 		String depth = req.getHeader("Depth");

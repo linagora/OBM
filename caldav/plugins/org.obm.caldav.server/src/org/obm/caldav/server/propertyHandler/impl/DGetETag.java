@@ -1,12 +1,15 @@
 package org.obm.caldav.server.propertyHandler.impl;
 
 import java.util.UUID;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
-import org.obm.caldav.server.share.filter.CompFilter;
+import org.obm.caldav.utils.DOMUtils;
+import org.obm.sync.calendar.Event;
 import org.w3c.dom.Element;
 
 /**
@@ -26,25 +29,23 @@ import org.w3c.dom.Element;
  * @author adrienp
  * 
  */
-public class DGetETag implements CalendarQueryPropertyHandler {
+public class DGetETag implements CalendarQueryPropertyHandler, CalendarMultiGetPropertyHandler {
 
 	protected Log logger = LogFactory.getLog(getClass());
 	
 	// FIXME implement DGetETag management
 	private String etag = UUID.randomUUID().toString();
 
-	@Override
 	public void appendCalendarQueryPropertyValue(Element prop, IProxy proxy,
-			String propTypeName) {
+			Event event) {
+		Element val = DOMUtils.createElement(prop, "D:getetag");
+		val.setTextContent("\"" + etag + "\"");
+	}
 
-		if (CompFilter.VEVENT.equalsIgnoreCase(propTypeName)) {
-			prop.setTextContent("\"" + etag + "\"");
-		} else if (CompFilter.VTODO.equalsIgnoreCase(propTypeName)) {
-			prop.setTextContent("\"" + etag + "\"");
-		} else {
-			logger.warn("the CompFilter [" + propTypeName
-					+ "] is not implemented");
-		}
-		
+	@Override
+	public void appendCalendarMultiGetPropertyValue(Element prop, IProxy proxy,
+			String eventId, String eventIcs) {
+		Element val = DOMUtils.createElement(prop, "D:getetag");
+		val.setTextContent("\"" + etag + "\"");
 	}
 }

@@ -1,40 +1,19 @@
 package org.obm.caldav.server.propertyHandler.impl;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
-
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
-import org.obm.caldav.utils.CalDavUtils;
+import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
 
-public class CalendarData extends DavPropertyHandler {
-
-	/*public CalendarData(IProxy proxy) {
-		super(proxy);
-	}*/
+public class CalendarData extends DavPropertyHandler implements CalendarMultiGetPropertyHandler {
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req) {
 		
-		Set<String> dhrefNode = CalDavUtils.getDhrefNode(req.getDocument());
-		Set<String> calendars = new HashSet<String>();
-		for(String dhref : dhrefNode){
-			StringTokenizer st = new StringTokenizer(dhref,"/");
-			
-			if(st.countTokens()>0){
-				calendars.add((String)st.nextElement());
-			}
-		}
-		
-		/*for(String cal : calendars){
-			proxy.getEventService().getAllEvent(cal);
-		}*/
 		
 		CDATASection cdata = prop.getOwnerDocument().createCDATASection(
 				"" + "BEGIN:VCALENDAR\r\n"
@@ -83,6 +62,16 @@ public class CalendarData extends DavPropertyHandler {
 													
 						+ "END:VCALENDAR\r\n");
 		prop.appendChild(cdata);
+	}
+	
+	
+
+	@Override
+	public void appendCalendarMultiGetPropertyValue(Element prop, IProxy proxy,
+			String eventId, String eventIcs) {
+		Element val = DOMUtils.createElement(prop,"calendar-data");
+		CDATASection cdata = prop.getOwnerDocument().createCDATASection(eventIcs);
+		val.appendChild(cdata);
 	}
 
 }

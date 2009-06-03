@@ -9,7 +9,7 @@ import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class ResultBuilder {
+public abstract class ResultBuilder {
 	
 	protected Log logger = LogFactory.getLog(ResultBuilder.class);
 	

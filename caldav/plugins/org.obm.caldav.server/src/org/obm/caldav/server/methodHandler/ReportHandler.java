@@ -23,8 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
-import org.obm.caldav.server.propertyHandler.impl.CalendarData;
 import org.obm.caldav.server.reports.CalendarMultiGet;
 import org.obm.caldav.server.reports.CalendarQuery;
 import org.obm.caldav.server.reports.PrincipalPropertySearch;
@@ -36,32 +34,25 @@ import org.w3c.dom.Element;
 public class ReportHandler extends DavMethodHandler {
 
 	Map<String, ReportProvider> providers;
-	private Map<String,DavPropertyHandler> propertiesHandler;
 	
-	public ReportHandler(IProxy proxy) {
-		super(proxy);
+	public ReportHandler() {
 		
 		providers = new HashMap<String, ReportProvider>();
 		providers.put("D:principal-property-search",
 				new PrincipalPropertySearch());
 		providers.put("calendar-query", new CalendarQuery());
 		providers.put("calendar-multiget", new CalendarMultiGet());
-		
-		propertiesHandler = new HashMap<String, DavPropertyHandler>();
-		//FIXME
-		//propertiesHandler.put("D:getetag", new DGetETag());
-		propertiesHandler.put("calendar-data", new CalendarData());
 	}
 
 	@Override
-	public void process(Token token, DavRequest req, HttpServletResponse resp) {
+	public void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp) {
 		Document d = req.getDocument();
 		Element r = d.getDocumentElement();
 		String reportKind = r.getNodeName();
 
 		ReportProvider rp = providers.get(reportKind);
 		if (rp != null) {
-			rp.process(token, this.proxy, req, resp, getPropList(d));
+			rp.process(token, proxy, req, resp, getPropList(d));
 		} else {
 			logger.error("No report provider for report kind '" + reportKind
 					+ "'");

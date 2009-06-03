@@ -13,7 +13,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.apache.commons.logging;bundle-version="1.0.4",
  org.eclipse.equinox.http.jetty;bundle-version="2.0.0",
  org.obm.caldav.utils;bundle-version="1.0.0",
- org.obm.caldav.obmsync;bundle-version="1.0.0"
+ org.obm.caldav.obmsync;bundle-version="1.0.0",
+ org.obm.caldav.obmsync.lib;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.obm.caldav.server.reports,

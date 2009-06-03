@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.obm.caldav.obmsync.provider.ICalendarProvider;
@@ -108,8 +109,12 @@ public class EventService implements IEventService {
 	}
 
 	@Override
-	public Set<String> getAllEvent(String calendar) throws Exception {
-		return icp.getAllEvent(token, calendar);
+	public List<Event> getAllEvents() throws Exception {
+		return icp.getAllEvents(token, login);
 	}
 
+	@Override
+	public Map<String,String> getICSEvents(Set<String> listUidEvent) throws Exception {
+		return icp.getICSEvents(token, login, listUidEvent);
+	}
 }

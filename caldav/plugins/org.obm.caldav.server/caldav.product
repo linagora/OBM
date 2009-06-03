@@ -21,6 +21,7 @@
    <vm>
    </vm>
 
+
    <plugins>
       <plugin id="fr.aliasource.utils"/>
       <plugin id="fr.aliasource.webmail.log4j" fragment="true"/>
