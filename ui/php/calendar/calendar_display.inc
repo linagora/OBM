@@ -2009,6 +2009,12 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   $time_begin = $datebegin->getHour();
   $min_begin = $datebegin->getMinute();
   $duration = $h+$m/60;
+  $d = $datebegin->getOutputDate();
+
+  $entity_id = $calendar['entity_id'];
+  $entity_kind = $calendar['entity_kind'];
+  $sel_ent = "data-$entity_kind-$entity_id";
+  $entity_info = get_entity_info($entity_id, $entity_kind);
 
   foreach($conflicts as $conflict) {
     $private = true;
@@ -2045,7 +2051,7 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
         <td>$location</td>
         <td>$begin</td>
         <td>$end</td>
-        <td>$name</td>
+        <td>$name <div style=\"display:none;\" class=\"elementRow\" id=\"sel_user_id-$sel_ent\">$entity_info[label]</div></td>
       </tr>";
   }
   
@@ -2062,7 +2068,7 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   $block = "
   <div class=\"detail extra\">
   <h1>$l_conflicts</h1>
-  <h2><a href=\"#\" onclick=\"displayFreeBusyConflict('$duration')\">$GLOBALS[l_display_entites_freebusy]</a><h2>
+  <h2><a href=\"#\" onclick=\"displayFreeBusyConflict('$duration', '$d')\">$GLOBALS[l_display_entites_freebusy]</a><h2>
   <table class=\"spreadSheet\">
   <thead>
    <tr>
@@ -2079,12 +2085,11 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   </table>
   <div class=\"buttons\">
    $dis_form_button
+   <input type='hidden' id='sel_time_begin' value='$time_begin' />
+   <input type='hidden' id='sel_min_begin' value='$min_begin' />
   </div>
-
-  $dis_form_end
-
-
-";
+  <div id=\"fbcContainer\"></div>
+  $dis_form_end";
 
   return $block;
 }
