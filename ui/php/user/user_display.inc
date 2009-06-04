@@ -579,6 +579,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
   $exp = urlencode($user['exp']);
   $group = urlencode($user['group']);
   $archive = $user['archive'];
+  $action = $user['action'];
 
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('user', $user);
@@ -595,7 +596,7 @@ function html_user_search_list($obm_q, $prefs, $user, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;ext_container=$ext_container";
   }
 
-  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_exp=$exp&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext");
+  $url = url_prepare("user_index.php?action=$action&amp;tf_login=$login&amp;tf_firstname=$fname&amp;tf_lastname=$lname&amp;sel_profile=$profile&amp;tf_email=$email&amp;tf_delegation=$delegation&amp;tf_desc=$desc&amp;tf_exp=$exp&amp;tf_group=$group&amp;cba_archive=$archive$url_userdata$url_ext");
 
   $user_d = new OBM_DISPLAY('DATA', $prefs, 'user');
   if ($popup) {
