@@ -582,6 +582,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
 
   // Insert Event contacts
   if (is_array($contacts_array)) {
+    $contacts_array = array_unique($contacts_array);
     foreach ($contacts_array as $contact_id) {
       run_query_calendar_insert_entity_event('contact', $contact_id, $event_id, 'NEEDS-ACTION');
     }
@@ -1198,6 +1199,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
 
   // Insert Event contacts
   if (is_array($contacts_array)) {
+    $contacts_array = array_unique($contacts_array);
     foreach ($contacts_array as $contact_id) {
       run_query_calendar_insert_entity_event('contact', $contact_id, $event_id, 'NEEDS-ACTION');
     }
