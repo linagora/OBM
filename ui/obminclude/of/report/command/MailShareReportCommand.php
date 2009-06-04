@@ -32,7 +32,7 @@
    * @license GPL 2.0
    */
   class MailShareReportCommand extends Command {
-    protected $name = 'Liste des comptes fonctionnels';
+    protected $name = 'mailshare';
     const kind = 'mailshare';
 
     /**

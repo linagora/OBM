@@ -33,7 +33,7 @@
    * @license GPL 2.0
    */
   class VacationReportCommand extends Command {
-    protected $name = 'Etat du message d\'absence des utilisateurs';
+    protected $name = 'vacation';
     const kind = 'user';
 
     /**

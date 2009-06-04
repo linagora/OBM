@@ -31,8 +31,8 @@
    * @author Benoît Caudesaygues <benoit.caudesaygues@aliasource.fr> 
    * @license GPL 2.0
    */
-  class UserArchiveReportCommand extends Command {
-    protected $name = 'Liste des utilisateurs en archive';
+  class ArchivedUserReportCommand extends Command {
+    protected $name = 'archiveduser';
     const kind = 'user';
 
     /**

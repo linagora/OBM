@@ -16,45 +16,47 @@
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
 */
-  require_once 'obminclude/of/report/command.php';
-  require_once 'obminclude/of/report/sender/mailSender.php';
-  require_once 'obminclude/of/report/sender/stdoutSender.php';
-  require_once 'obminclude/of/report/sender/downloadSender.php';
+
+/**
+ * ActivityFormater 
+ * 
+ * @uses GenericFormater
+ * @package 
+ * @version $id:$
+ * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
+ * @author Mehdi Rande <mehdi.rande@aliasource.fr> 
+ * @license GPL 2.0
+ */
+class ActivityFormater extends GenericFormater {
 
   /**
-   * GroupReportCommand 
-   * 
-   * @uses Command
-   * @package 
-   * @version $id:$
-   * @copyright Copyright (c) 1997-2009 LINAGORA GSO
-   * @author Benoît Caudesaygues <benoit.caudesaygues@linagora.com> 
-   * @license GPL 2.0
-   */
-  class GroupReportCommand extends Command {
-    protected $name = 'group';
-    const kind = 'group';
-
-    /**
-     * @see Command::execute 
-     */
-    protected function execute() {
-      $this->kind = 'group';
-      
-      $this->sender = new stdoutSender;
-      $this->sender->setNext(new downloadSender());
-
-      $this->formater = new GenericFormater;
-      $this->formater->addField('id');
-      $this->formater->addField('name');
-      $this->formater->addField('desc');
-      $this->formater->addField('email');
-      $this->formater->addField('nb_user');
+   *  
+   * @see IFormater::format 
+   **/
+  public function format($object) {
+    $line = '';
+    if($object->groupware_usage) {
+      $percent = (($object->groupware_usage/30) > 1)?100:round(($object->groupware_usage/30)*100).'%';
+      $line .= self::escapeField($percent).';';
+    } else {
+      $line .= 'N/A;';
     }
-
-    public function getKind() {
-      return self::kind;
-    }
-
+    $line .= parent::format($object);
+    return $line;
   }
-?>
+
+  /**
+   * @see IFormater::getHeader
+   */
+  public function getHeader() {
+    require "obminclude/lang/".$_SESSION['set_lang']."/report.inc";
+    $head = '';
+    $field = 'groupware_usage';
+    if(isset(${"l_".$field}))
+      $head .= self::escapeField(${"l_".$field}).";";
+    else
+      $head .= self::escapeField($field).";";
+    $head .= parent::getHeader(); 
+    return $head;
+  }  
+}

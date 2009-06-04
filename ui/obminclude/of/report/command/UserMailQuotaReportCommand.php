@@ -34,7 +34,7 @@
    * @license GPL 2.0
    */
   class UserMailQuotaReportCommand extends Command {
-    protected $name = 'Utilisation espace mail';
+    protected $name = 'usermailquota';
     const kind = 'user';
 
     /**

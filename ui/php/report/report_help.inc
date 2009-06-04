@@ -1,23 +1,17 @@
-3 actions are currently implemented (all are available in html and txt mode).
+Usage : /usr/bin/php report_index.php [-a action][-s]
 
-This page show some informations about the user connected to OBM and about the
-database.
-===============================================================================
-ACTIONS          | args   | Description
-===============================================================================
-help             |        | Show this help file
-===============================================================================
-index            |        | Specific to HTML version
-===============================================================================
-download_report  | report | show the return of the report. 
--------------------------------------------------------------------------------
-txt: php report_index.php -a download_report -r UserReportCommand 
-===============================================================================
+- a     : Action to execute, if not specified, the *execute* will be executed.
 
-
-txt mode Usage: php report_index.php [Options]
-where Options:
--h, --help help screen
--a action  (avalaible actions)
--r report  (avalaible reports)
--s service (available services only user)
+Action list with options
+  *help*        :       Show this help file
+  *list*        :       List all available reportings
+      -v verbose          :       More verbose mode (show report details).  
+  *execute*     :       Execute the  report
+      -r report         :       Report name to execute.
+      -s service        :       Filter report result with the given service (
+                                only available for user kind report)
+      -v verbose          :       More verbose mode (show the report result
+                                on the output).
+Exemple :
+php report_index.php -a execute -r user -v
+php report_index.php -a execute -r vacation -s myservice > /tmp/report.result

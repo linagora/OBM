@@ -175,7 +175,6 @@ $profiles['admin'] = array (
   ),
   'module' => array (
     'default' => $perm_admin,
-    'toto' =>  0,
     'domain' => 0),
   'properties' => array (
     'admin_realm' => array ('user', 'delegation', 'domain')

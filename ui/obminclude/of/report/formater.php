@@ -133,7 +133,7 @@ class GenericFormater implements IFormater{
    * @access private
    * @return void
    */
-  private static function escapeField($field) {
+  protected static function escapeField($field) {
     return '"'.addcslashes($field,";\\\"").'"';
   }
 }

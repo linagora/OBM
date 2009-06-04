@@ -32,7 +32,7 @@
    * @license GPL 2.0
    */
   class UserAliasReportCommand extends Command {
-    protected $name = 'Les alias de tous les utilisateurs';
+    protected $name = 'useralias';
     const kind = 'user';
 
     /**

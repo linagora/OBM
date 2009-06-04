@@ -31,22 +31,19 @@
    * @author Benoît Caudesaygues <benoit.caudesaygues@aliasource.fr> 
    * @license GPL 2.0
    */
-  class UserReportCommand extends Command {
-    protected $name = 'user';
+  class ActiveUserReportCommand extends Command {
+    protected $name = 'activeuser';
     const kind = 'user';
 
-    /**
-     * @see command  execute 
-     */
     protected function execute() {
       $this->kind = 'user';
-
+      
       $this->sender = new stdoutSender;
       $this->sender->setNext(new downloadSender());
 
       //Workflow Filter
-      $this->filters[] = new GenericFilter('archive','==','0');
-      $this->filters[] = new GenericFilter('status','==','VALID');
+      $this->filters[] = new GenericFilter('archive','==','1');
+      $this->filters[] = new GenericFilter('status','==','INIT');
 
       $this->formater = new GenericFormater;
       $this->formater->addField('id');
@@ -59,7 +56,5 @@
     public function getKind() {
       return self::kind;
     }
-
   }
-
 ?>

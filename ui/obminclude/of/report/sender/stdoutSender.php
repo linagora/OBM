@@ -29,7 +29,7 @@
  * @license GPL 2.0
  */
 class StdoutSender extends Sender {
-  const context = 'console';
+  protected $context = 'verbose';
 
   /**
    * Print report on standard output

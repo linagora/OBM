@@ -40,7 +40,7 @@ function html_report_consult($mode) {
   $types=get_report_kind($report);
   foreach($report as $key=>$opt){
     $type = $types[$key];
-    $option .=  "<option id=\"opt_$i\" type=\"$type\" value=\"$opt\"> $key </option>";
+    $option .=  "<option id=\"opt_$i\" type=\"$type\" value=\"$opt\"> ".$GLOBALS['l_'.$key.'_report']." </option>";
     $i++;
   }
 
@@ -71,7 +71,7 @@ function html_report_consult($mode) {
     
     <fieldset class=\"buttons\">
       <input type=\"hidden\" value=\"$mode\" name=\"mode\"/>
-      <input type=\"hidden\" value=\"download_report\" name=\"action\"/>
+      <input type=\"hidden\" value=\"execute\" name=\"action\"/>
       <input type=\"submit\" value=\"$l_valid_report\"/>
     </fieldset>
     </form>
@@ -113,13 +113,13 @@ function dis_report_index($mode) {
 }
 
 /**
- * dis_download_report run the execution of the report choose 
+ * dis_execute_report run the execution of the report choose 
  * 
  * @param mixed $reportType 
  * @access public
  * @return void
  */
-function dis_download_report($reportType) {
+function dis_execute_report($reportType) {
   global $l_err_file, $obm;
 
   if(isset($reportType) && $reportType != ''){
@@ -129,6 +129,44 @@ function dis_download_report($reportType) {
     $report->doIt();
   }
 }
+
+/**
+ * dis_execute_report run the execution of the report choose 
+ * 
+ * @param mixed $reportType 
+ * @access public
+ * @return void
+ */
+function dis_list_report($mode, $report, $verbose = false) {
+  global $l_err_file, $obm;
+  $blocl = '';
+  switch($mode)  {
+  case 'txt':
+    foreach($report as $key => $klass) {
+      echo "Name :        $key\n";
+      if($verbose) {
+        echo 'PHP Class :   '. $klass."\n";
+        echo 'Description : '.($GLOBALS['l_'.$key.'_report'])."\n";
+        echo "\n";
+      }
+    }
+    break;
+  case 'html':
+    $block =  html_report_consult($mode);
+    break;
+  default:
+    echo "Invalid Mode ! (txt | html)";
+  }
+
+
+  if(isset($reportType) && $reportType != ''){
+    require_once "obminclude/of/report/command/$reportType.php";
+    //Stato_Mailer::setDefaultTransport(new Stato_FileTransport());
+    $report = new $reportType();
+    $report->doIt();
+  }
+}
+
 
 /**
  * get_report_kind get the kind of the report 

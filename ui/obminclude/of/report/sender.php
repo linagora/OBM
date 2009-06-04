@@ -32,7 +32,7 @@
  * @license GPL 2.0
  */
 abstract class Sender {
-  const context = 'abstract';
+  protected $context = 'abstract';
   private $next;
 
   /**
@@ -78,9 +78,6 @@ abstract class Sender {
    * @return string
    */
   public static function currentContext() {
-    /*if (isset($HTTP_SESSION_VARS))
-      return 'web';*/
-    //else
     if(isset($GLOBALS['context'])) {
       return $GLOBALS['context'];
     }
@@ -99,10 +96,18 @@ abstract class Sender {
    * @access private
    * @return bool
    */
-   private function checkContext() {
-     $classname = get_class($this);
-     eval("\$class_context = $classname::context;");
-     return (in_array(Sender::currentContext(),array($class_context,'test')));
+    private function checkContext() {
+      if($GLOBALS['context'] == $this->context) return true;
+      switch ($this->context) {
+       case 'web' :
+         return !(defined('STDIN') && defined('STDOUT') && defined('STDERR'));
+       case 'console' :
+         return (defined('STDIN') && defined('STDOUT') && defined('STDERR'));
+       case 'verbose' :
+         return $GLOBALS['params']['verbose'];
+       case 'test' :
+         return class_exists('PHPUnit_Framework_TestCase');
+      }
   }
 
 }

@@ -29,7 +29,7 @@
  * @license GPL 2.0
  */
 class DownloadSender extends Sender {
-  const context = 'web';
+  protected $context = 'web';
 
   /**
    * Propose a download to the client
@@ -41,10 +41,8 @@ class DownloadSender extends Sender {
    */
   protected function sendMessage($report, $name) {
     header('Content-Description: File Transfer');
-//    header('Content-Type: application/octet-stream');
     header('Content-Type: text/csv');
     header('Content-Disposition: attachment; filename=report.csv');
-//    header('Content-Transfer-Encoding: binary');
     header('Expires: 0');
     header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
     header('Pragma: public');

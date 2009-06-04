@@ -138,6 +138,16 @@ abstract class Command {
     preg_match("/^(.*)\.php$/",$fileName,$className);
     return $className[1];
   }
+
+  /**
+   * getName 
+   * 
+   * @access public
+   * @return void
+   */
+  function getName() {
+    return $this->name;
+  }
 }
 
 class Stato_FileTransport implements Stato_IMailTransport {

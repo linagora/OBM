@@ -11,14 +11,16 @@ $l_valid_report = "Executer le rapport";
 
 //Report
 $l_user_report = "Liste des utilisateurs";
+$l_activeuser_report = 'Liste des utilisateurs actifs';
 $l_group_report = "Liste des groupes";
 $l_mailshare_report = "Liste des boites mails partagées ";
-$l_userarchive_report = "Liste des utilisateurs archivés";
-$l_alias_report = "Liste des utilisateurs avec leurs alias";
-$l_expiration_report = "Utilisateurs avec date d'expiration";
-$l_mailquota_report = "Utilisation de la boite mail";
-$l_mailredirection_report = "Affichage de la redirection de la boite mail";
+$l_archiveduser_report = "Liste des utilisateurs archivés";
+$l_useralias_report = "Liste des utilisateurs avec leurs alias";
+$l_userexpiration_report = "Utilisateurs avec date d'expiration";
+$l_usermailquota_report = "Utilisation de la boite mail";
+$l_userredirection_report = "Affichage de la redirection de la boite mail";
 $l_vacation_report = "Affichage de l'état d'abscence des utilisateurs";
+$l_useractivity_report = 'Indice d\'utilisation de la plateforme';
 $l_used_percent = "Pourcentage d'utilisation";
 $l_all_services = "Tous les services";
 $l_choose_report = 'Choisir un type de rapport';
@@ -84,6 +86,7 @@ $l_group_member = "Membre des groupes";
 $l_password_type = "Chiffrage mdp";
 $l_mailserver_auto = "Automatique";
 $l_download_user_card = 'Télécharger la fiche utilisateur';
+$l_groupware_usage = 'Indice d\'utilisation';
 
 //Group
 $l_name = "Nom";

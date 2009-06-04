@@ -250,6 +250,8 @@ class ReportFactory {
    * @return string
    */
   private static function build_user_query($obm_q) {
+    $date = new Of_Date();
+    $date->subMonth(3);
     $query =  "SELECT
     U.userobm_id,
     U.userobm_domain_id,
@@ -328,12 +330,95 @@ class ReportFactory {
     U.userobm_description,
     U.userobm_location,
     U.userobm_education,
-    (U.userobm_photo_id IS NOT NULL AND U.userobm_photo_id<>0) AS userobm_has_photo
+    (U.userobm_photo_id IS NOT NULL) AS userobm_has_photo,
+    count(EventLink.*) as groupware_usage
     FROM UserObm as U
     INNER JOIN Domain ON domain_id = U.userobm_domain_id
     LEFT JOIN Host ON U.userobm_mail_server_id=host_id
     LEFT JOIN UserObm as A ON U.userobm_usercreate=A.userobm_id
-    LEFT JOIN UserObm as B ON U.userobm_userupdate=B.userobm_id";
+    LEFT JOIN EventLink ON eventlink_userupdate = U.userobm_id OR eventlink_usercreate = U.userobm_id
+    LEFT JOIN UserObm as B ON U.userobm_userupdate=B.userobm_id
+    WHERE eventlink_timeupdate >= '$date'
+    GROUP BY  
+    U.userobm_id,
+    U.userobm_domain_id,
+    userobm_domain_name,
+    U.userobm_timecreate,
+    U.userobm_timeupdate,
+    userobm_usercreate_id,
+    userobm_usercreate_login,
+    userobm_userupdate_id,
+    userobm_userupdate_login,
+    U.userobm_local,
+    U.userobm_ext_id,
+    U.userobm_system,
+    U.userobm_archive,
+    U.userobm_status,
+    U.userobm_timelastaccess,
+    U.userobm_login,
+    U.userobm_nb_login_failed,
+    U.userobm_password_type,
+    U.userobm_password_dateexp,
+    U.userobm_account_dateexp,
+    U.userobm_perms,
+    U.userobm_delegation_target,
+    U.userobm_delegation,
+    U.userobm_calendar_version,
+    U.userobm_uid,
+    U.userobm_gid,
+    U.userobm_datebegin,
+    U.userobm_hidden,
+    U.userobm_kind,
+    U.userobm_lastname,
+    U.userobm_firstname,
+    U.userobm_title,
+    U.userobm_sound,
+    U.userobm_company,
+    U.userobm_direction,
+    U.userobm_service,
+    U.userobm_address1,
+    U.userobm_address2,
+    U.userobm_address3,
+    U.userobm_zipcode,
+    U.userobm_town,
+    U.userobm_expresspostal,
+    U.userobm_country_iso3166,
+    U.userobm_phone,
+    U.userobm_phone2,
+    U.userobm_mobile,
+    U.userobm_fax,
+    U.userobm_fax2,
+    U.userobm_web_perms,
+    U.userobm_web_list,
+    U.userobm_web_all,
+    U.userobm_mail_perms,
+    U.userobm_mail_ext_perms,
+    U.userobm_email,
+    U.userobm_mail_server_id,
+    userobm_mail_server_name,
+    U.userobm_mail_quota,
+    U.userobm_mail_quota_use,
+    U.userobm_mail_login_date,
+    U.userobm_nomade_perms,
+    U.userobm_nomade_enable,
+    U.userobm_nomade_local_copy,
+    U.userobm_nomade_datebegin,
+    U.userobm_nomade_dateend,
+    U.userobm_email_nomade,
+    U.userobm_vacation_enable,
+    U.userobm_vacation_datebegin,
+    U.userobm_vacation_dateend,
+    U.userobm_vacation_message,
+    U.userobm_samba_perms,
+    U.userobm_samba_home,
+    U.userobm_samba_home_drive,
+    U.userobm_samba_logon_script,
+    U.userobm_host_id,
+    U.userobm_description,
+    U.userobm_location,
+    U.userobm_education,
+    userobm_has_photo    
+    ";
 
     return $query;
   }
@@ -425,6 +510,7 @@ class ReportFactory {
     $record->location            = $obm_q->f('userobm_location');
     $record->education           = $obm_q->f('userobm_education');
     $record->has_photo           = $obm_q->f('userobm_has_photo');
+    $record->groupware_usage     = $obm_q->f('groupware_usage');
     return $record;
   }
 

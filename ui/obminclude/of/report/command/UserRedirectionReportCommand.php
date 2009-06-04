@@ -31,7 +31,7 @@
    * @license GPL 2.0
    */
   class UserRedirectionReportCommand extends Command {
-    protected $name = 'Etat de redirection des mails utilisateurs';
+    protected $name = 'userredirection';
     const kind = 'user';
 
     /**

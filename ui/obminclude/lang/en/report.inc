@@ -6,19 +6,22 @@
 
 // Titles
 $l_report = "Reporting";
+$l_report_exp = "Reporting";
 $l_valid_report = "Run report";
 
 //Report
-$l_user_report = "List of users";
-$l_group_report = "List of groups";
-$l_mailshare_report = "List of MailShare ";
-$l_userarchive_report = "Archived users";
-$l_alias_report = "List of user with alias";
-$l_expiration_report = "List of user with date of expiration";
-$l_mailquota_report = "Utilisation de la boite mail";
-$l_mailredirection_report = "Affichage de la redirection de la boite mail";
-$l_vacation_report = "Affichage de l'etat d'abscence des utilisateurs";
+$l_user_report = "Users list";
+$l_activeuser_report = 'Active users list';
+$l_group_report = "Groups list";
+$l_mailshare_report = "MailShare list";
+$l_archiveduser_report = "Archived users";
+$l_useralias_report = "List of user with alias";
+$l_userexpiration_report = "List of user with date of expiration";
+$l_usermailquota_report = "Mailbox usage";
+$l_userredirection_report = "Nomad email useage";
+$l_vacation_report = "Vacation usage";
 $l_used_percent = "Used Percent";
+$l_useractivity_report = 'Groupware usage percent';
 $l_all_services = "All service";
 $l_choose_report = "Choice a report";
 
@@ -44,7 +47,7 @@ $l_infos = "Information";
 $l_group = "Group";
 $l_delegation_target = "Delegation target";
 $l_photo = "Photo";
-
+$l_groupware_usage = 'Usage percent';
 $l_hidden = 'Hidden mailbox';
 $l_mail_server = "Mail Server";
 $l_email_nomade = "Nomad email address";

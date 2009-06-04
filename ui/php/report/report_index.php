@@ -15,7 +15,7 @@
  +-------------------------------------------------------------------------+
  | http://www.obm.org                                                      |
  +-------------------------------------------------------------------------+
-*/
+ */
 ?>
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,97 +37,105 @@ include("$obminclude/global.inc");
 
 require("report_display.inc");
 require("report_query.inc");
+require_once("$obminclude/of/report/command.php");
 
-$acts = array('index','download_report');
+$acts = array('index','execute','list');
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 $params = get_admin_params();
+$command_dir = '../../obminclude/of/report/command/';
+$report = array();
+if (is_dir($command_dir)) {
+  $d = dir($command_dir);
+  while (false != ($file = $d->read())) {
+    if(is_file($command_dir.$file)) {
+      $fileinfo = pathinfo($command_dir.$file);
+      if($fileinfo['extension'] == 'php') {
+        require_once $command_dir.$file;
+        $klass = Command::getClass($file);
+        $reportcommand = new $klass();
+        if($klass) {
+          $report[$reportcommand->getName()] = $klass;
+        }
+      }
+    }
+  }
+}
+
 
 switch ($params["mode"]) {
- case "txt":
-   include("$obminclude/global_pref.inc");
-   $service = get_report_user_service();
-   $delegation = get_report_delegation_user();
-   $report = array(
-    'UserReportCommand',
-    'GroupReportCommand',
-    'MailShareReportCommand',
-    'UserArchiveReportCommand',
-    'UserAliasReportCommand',
-    'UserExpirationReportCommand',
-    'UserMailQuotaReportCommand',
-    'UserRedirectionReportCommand',
-    'VacationReportCommand'
-    );
-   $retour = parse_report_arg($argv);
-   if (! $retour) { end; }
-   break;
- case "html":
-   page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-   include("$obminclude/global_pref.inc");
-   $service = get_report_user_service();
-   $report = array(
-    "$l_user_report"  => 'UserReportCommand',
-    "$l_group_report" => 'GroupReportCommand',
-    "$l_mailshare_report" => 'MailShareReportCommand',
-    "$l_userarchive_report" => 'UserArchiveReportCommand',
-    "$l_alias_report" => 'UserAliasReportCommand',
-    "$l_expiration_report" => 'UserExpirationReportCommand',
-    "$l_mailquota_report" => 'UserMailQuotaReportCommand',
-    "$l_mailredirection_report" => 'UserRedirectionReportCommand',
-    "$l_vacation_report" => 'VacationReportCommand'
-    );
-   if ($action == "") $action = "index";
-   get_control_action();
-   $perm->check_permissions($module, $action);
-   $display["head"] = display_head($module);
-   $display["header"] = display_menu($module);
-   $u = get_user_info();
-   $params['report_delegation'] = $u['delegation_target'];
-   break;
+case "txt":
+  include("$obminclude/global_pref.inc");
+  $service = get_report_user_service();
+  $delegation = get_report_delegation_user();
+  $retour = parse_report_arg($argv);
+  if ($action == "") $action = "execute";
+  if (! $retour) { end; }
+  break;
+case "html":
+  page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
+  include("$obminclude/global_pref.inc");
+  $service = get_report_user_service();
+  if ($action == "") $action = "index";
+  get_control_action();
+  $perm->check_permissions($module, $action);
+  $display["head"] = display_head($module);
+  $display["header"] = display_menu($module);
+  $u = get_user_info();
+  $params['report_delegation'] = $u['delegation_target'];
+  break;
 }
 
 switch ($action) {
-  case "help":
-    dis_report_help($params["mode"]);
-    break;
-  case "index":
-    $display['detail'] = dis_report_index($params["mode"]);
-    break;
-  case "download_report":
-    if (isset($params['type']) && $params['type'] != '') {
-      $params['domain_id'] = $obm['domain_id'];
-      $params['report_email'] = get_report_mail_admin($params);
-      dis_download_report($params['type']);
-      exit();
-    } else {
-      $display['msg'] = display_warn_msg($l_warn_download,false);
-      $display['detail'] = dis_report_index($params["mode"]);
+case "help":
+  dis_report_help($params["mode"]);
+  break;
+case "index":
+  $display['detail'] = dis_report_index($params["mode"]);
+  break;
+case "execute":
+  if (isset($params['type']) && $params['type'] != '') {
+    if($report[$params['type']]) {
+      $reportCommand = $report[$params['type']];
+    } elseif(in_array($params['type'], $report)) {
+      $reportCommand = $params['type'];
     }
-    break;
-  default:
-    echo "No action specified !";
-    break;
+  }
+  if($reportCommand != '') {
+    $params['domain_id'] = $obm['domain_id'];
+    $params['report_email'] = get_report_mail_admin($params);
+    dis_execute_report($params['type']);
+    exit();
+  } else {
+    $display['msg'] = display_warn_msg($l_warn_download,false);
+    $display['detail'] = dis_report_index($params["mode"]);
+  }
+  break;
+case "list" :
+  dis_list_report($params["mode"], $report, $params['verbose']);
+  break;
+default:
+  echo "No action specified !";
+  break;
 }
 
 
 // Program End
 switch ($params["mode"]) {
- case "txt":
-   echo "bye...\n";
-   break;
- case "html":
-   //if ($action != 'download_report' || $params['type'] =='') {
-   page_close();
-   $display["end"] = display_end();
-   $display["header"] = display_menu($module);
-   display_page($display);
+case "txt":
+  echo "bye...\n";
+  break;
+case "html":
+  page_close();
+  $display["end"] = display_end();
+  $display["header"] = display_menu($module);
+  display_page($display);
    /*} else {
      ob_clean();
-}*/
-   break;
+   }*/
+  break;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -137,7 +145,6 @@ switch ($params["mode"]) {
 function get_admin_params() {
 
   $params = get_global_params("report");
-
   if (($params["mode"] == "") || ($params["mode"] != "html")) {
     $params["mode"] = "txt";
   }
@@ -168,18 +175,26 @@ function dis_report_command_use($msg="") {
     if ($nb4 == 0) $ldelegation .= "$val4";
     else $ldelegation .= ", $val4";
   }
-
   echo "$msg
-Usage: $argv[0] [Options]
-where Options:
--h, --help help screen
--a action  ($lactions)
--r report  ($lreport)
--d delegation  ($ldelegation)
--s service ($lservice)
+Usage : /usr/bin/php report_index.php [-a action][-s]
 
-Ex: php4 admin_index.php -a index
+- a     : Action to execute, if not specified, the *execute* will be executed.
+
+Action list with options
+*help*        :       Show this help file
+*list*        :       List all available reportings
+      -v verbose          :       More verbose mode (show report details).  
+*execute*     :       Execute the  report
+  -r report         :       Report name to execute.
+  -s service        :       Filter report result with the given service (
+                            only available for user kind report)
+  -v verbose          :       More verbose mode (show the report result
+  on the output).
+  Exemple :
+  php report_index.php -a execute -r user -v
+  php report_index.php -a execute -r vacation -s myservice > /tmp/report.result 
 ";
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -205,8 +220,8 @@ function parse_report_arg($argv) {
         $params["action"] = $val2;
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       } else {
-	      dis_report_command_use("Invalid action ($val2)");
-	      return false;
+        dis_report_command_use("Invalid action ($val2)");
+        return false;
       }
       break;
     case '-r':
@@ -215,8 +230,8 @@ function parse_report_arg($argv) {
         $params["type"] = $val3;
         if ($debug > 0) { echo "-r -> \$type=$val3\n"; }
       } else {
-	      dis_report_command_use("Invalid report ($val3)");
-	      return false;
+        dis_report_command_use("Invalid report ($val3)");
+        return false;
       }
       break;
     case '-s':
@@ -225,8 +240,8 @@ function parse_report_arg($argv) {
         $params["service"] = $val4;
         if ($debug > 0) { echo "-r -> \$type=$val4\n"; }
       } else {
-	      dis_report_command_use("Invalid service ($val4)");
-	      return false;
+        dis_report_command_use("Invalid service ($val4)");
+        return false;
       }
       break;
     case '-d':
@@ -235,9 +250,11 @@ function parse_report_arg($argv) {
         $params["report_delegation"] = $val5;
         if ($debug > 0) { echo "-d -> \$type=$val5\n"; }
       } else {
-	      dis_report_command_use("Invalid delegation ($val5)");
-	      return false;
+        dis_report_command_use("Invalid delegation ($val5)");
+        return false;
       }
+    case '-v':
+      $params['verbose'] = true;
       break;
     }
   }
@@ -254,20 +271,27 @@ function get_control_action() {
   global $l_header_consult;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
-// Index
+  // Index
   $actions["report"]["index"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/report/report_index.php?action=index&amp;mode=html",
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
-                                    );
+  );
 
-  $actions["report"]["download_report"] = array (
-    'Url'      => "$path/report/report_index.php?action=download_report&amp;mode=html",
+  $actions["report"]["execute"] = array (
+    'Url'      => "$path/report/report_index.php?action=execute&amp;mode=html",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('none') 
-                                    );
-				    
+  );
+
+  $actions["report"]["list"] = array (
+    'Url'      => "$path/report/report_index.php?action=list&amp;mode=html",
+    'Right'    => $cright_read_admin,
+    'Condition'=> array ('none') 
+  );
+
+
 
 }
 </script>

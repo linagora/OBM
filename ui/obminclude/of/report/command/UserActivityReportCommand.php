@@ -20,6 +20,7 @@
   require_once 'obminclude/of/report/sender/mailSender.php';
   require_once 'obminclude/of/report/sender/stdoutSender.php';
   require_once 'obminclude/of/report/sender/downloadSender.php';
+  require_once 'obminclude/of/report/format/ActivityFormater.php';
 
   /**
    * UserReportCommand 
@@ -28,24 +29,27 @@
    * @package 
    * @version $id:$
    * @copyright Copyright (c) 1997-2007 Aliasource - Groupe LINAGORA
-   * @author Benoît Caudesaygues <benoit.caudesaygues@aliasource.fr> 
+   * @author Mehdi rande <mehdi.rande@linagora.com> 
    * @license GPL 2.0
    */
-  class UserActiveReportCommand extends Command {
-    protected $name = 'Les utilisateurs actifs';
+  class UserActivityReportCommand extends Command {
+    protected $name = 'useractivity';
     const kind = 'user';
 
+    /**
+     * @see command  execute 
+     */
     protected function execute() {
       $this->kind = 'user';
-      
+
       $this->sender = new stdoutSender;
       $this->sender->setNext(new downloadSender());
 
       //Workflow Filter
-      $this->filters[] = new GenericFilter('archive','==','1');
-      $this->filters[] = new GenericFilter('status','==','INIT');
+      $this->filters[] = new GenericFilter('archive','==','0');
+      $this->filters[] = new GenericFilter('status','==','VALID');
 
-      $this->formater = new GenericFormater;
+      $this->formater = new ActivityFormater();
       $this->formater->addField('id');
       $this->formater->addField('login');
       $this->formater->addField('lastname');
@@ -56,5 +60,7 @@
     public function getKind() {
       return self::kind;
     }
+
   }
+
 ?>

@@ -33,7 +33,7 @@
    * @license GPL 2.0
    */
   class UserExpirationReportCommand extends Command {
-    protected $name = 'Date d\'expiration des utilisateurs';
+    protected $name = 'userexpiration';
     const kind = 'user';
 
     /**

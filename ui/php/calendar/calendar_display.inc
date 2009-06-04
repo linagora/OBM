@@ -2181,7 +2181,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $owner_firstname = $event_q->f('owner_firstname');
     $priority = $event_q->f('event_priority'); 
     $properties = $event_q->f('event_properties');
-    $description = $event_q->f('event_description');
+    $description = nl2br($event_q->f('event_description'));
     if ($properties != '') {
       $charset = mb_internal_encoding();
       $item = "<?xml version='1.0' encoding='$charset'?/>".$properties;
