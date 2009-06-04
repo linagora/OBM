@@ -175,8 +175,8 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
     $datebegin = $OD->data_set->f($fieldname);
     $res['name'] = of_date_format($datebegin, 1);
   }
-  else if ($fieldname == 'dateexp') {
-    $dateexp = $OD->data_set->f($fieldname);
+  else if ($fieldname == 'userobm_account_dateexp') {
+    $dateexp = $OD->data_set->f("dateexp");
     $res['name'] = of_date_format($dateexp, 1);
   }
 
