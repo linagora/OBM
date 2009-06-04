@@ -41,7 +41,7 @@ function of_right_dis_admin($entity, $entity_id) {
 function html_entityadmin_bar($entity_id, $entity) {
   global $l_entity_right, $l_validate, $path, $module, $obm;
 
-  if(!(Perm::get_module_rights($entity) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin']) {
+  if (!(Perm::get_module_rights($entity) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin']) {
     $writable_entity = OBM_Acl::getAllowedEntities($obm['uid'], $entity, 'admin');
   } else {
     $writable_entity = getAllEntities($entity, $obm['uid']);
@@ -181,7 +181,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
       </tr>
 ";
   }
-  if($cgp_default_right[$entity]['public']['read'] != -1 || ($read == 1 && $id == 0)){ 
+  if ($cgp_default_right[$entity]['public']['read'] != -1 || ($read == 1 && $id == 0)){ 
     $block_consumer_read_public = "
       <span id=\"cb_read_public\">
       <input onchange=\"togglePrivacy(this,'cell_perms_read');\"
@@ -190,7 +190,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   } else {
     $block_consumer_read_public = "&nbsp;";
   }
-  if($cgp_default_right[$entity]['public']['access'] != -1 || ($access == 1 && $id == 0)) { 
+  if ($cgp_default_right[$entity]['public']['access'] != -1 || ($access == 1 && $id == 0)) { 
     $block_consumer_access_public = "
       <span id=\"cb_access_public\">
       <input onchange=\"togglePrivacy(this,'cell_perms_access');\"
@@ -199,7 +199,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   } else {
     $block_consumer_access_public = "&nbsp;";
   }
-  if($cgp_default_right[$entity]['public']['write'] != -1 || ($write == 1 && $id == 0)){ 
+  if ($cgp_default_right[$entity]['public']['write'] != -1 || ($write == 1 && $id == 0)){ 
     $block_consumer_write_public = "
       <span id=\"cb_write_public\">
       <input onchange=\"if(togglePrivacy(this,'cell_perms_write')) apply_checked_read(this, 'public_perms');\"
@@ -259,8 +259,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   </tbody>
   <tbody id='sel_accept_group'>
     $dis_group
-  </tbody>
-  ";
+  </tbody>";
 
   $block = "
   <script type=\"text/javascript\">
@@ -378,11 +377,11 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
       <input type=\"submit\" value=\"$l_right_validate\" />
     </fieldset>
   </form>
-  
+
   <script type=\"text/javascript\">
-  
+
     apply_backgroud();
-    
+
     var resultValue = function (element, extension) {
       var accept_read = this.name[0];
       var accept_write = this.name[1];
@@ -412,7 +411,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
             }.bind(this)
           )
         ).appendText(' ' + text).injectInside(result);
-        
+
         var cb_read = $('cb_read_public');
         var accept_read_style = 'visible';
         var accept_read_disabled = false;
@@ -420,7 +419,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           accept_read_disabled = true;
           accept_read_style = 'hidden';
         }
-        
+
         var cb_write = $('cb_write_public');
         var accept_write_style = 'visible';
         var accept_write_disabled = false;
@@ -428,7 +427,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           accept_write_disabled = true;
           accept_write_style = 'hidden';
         }
-        
+
         var cb_access = $('cb_access_public');
         var accept_access_style = 'visible';
         var accept_access_disabled = false;
@@ -436,7 +435,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           accept_access_disabled = true;
           accept_access_style = 'hidden';
         }
-        
+
         new Element('td').adopt(
           new Element('a').setProperty('href', '#')
                           .setProperty('onclick', 'select_all_perms(\''+tr_id+'\')').appendText('$l_select_all')          
@@ -444,21 +443,21 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           new Element('a').setProperty('href', '#')
                           .setProperty('onclick', 'unselect_all_perms(\''+tr_id+'\')').appendText('$l_unselect_all')
         ).injectInside(result);
-        
+
         new Element('td').addClass('cell_perms_access').adopt(
           new Element('input').setProperty('type', 'checkbox')
                               .setProperty('name', accept_access+'[]')
                               .setProperty('value', id)
                               .setProperty('disabled', accept_access_disabled)
         ).setStyle('visibility', accept_access_style).injectInside(result);
-        
+
         new Element('td').addClass('cell_perms_read').adopt(
           new Element('input').setProperty('type', 'checkbox')
                               .setProperty('name', accept_read+'[]')
                               .setProperty('value', id)
                               .setProperty('disabled', accept_read_disabled)
         ).setStyle('visibility', accept_read_style).injectInside(result);
-        
+
         new Element('td').addClass('cell_perms_write').adopt(
           new Element('input').setProperty('type', 'checkbox')
                               .setProperty('name', accept_write+'[]')
@@ -467,13 +466,13 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
                               .setProperty('onclick', 'apply_checked_read(this, \''+tr_id+'\')')
                               .setProperty('onchange', 'apply_checked_read(this, \''+tr_id+'\')')
         ).setStyle('visibility', accept_write_style).injectInside(result);
-        
+
         new Element('td').adopt(
           new Element('input').setProperty('type', 'checkbox')
                               .setProperty('name', accept_admin+'[]')
                               .setProperty('value', id)
         ).injectInside(result);
-        
+
       } else {
         this.inputField.blur();
         this.resetFunc();
@@ -481,7 +480,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
       }
       eval(this.options.selectfunction);
     }
-    
+
     var sel_perms = new Array('cb_accept_read', 'cb_accept_write', 'cb_accept_access', 'cb_accept_admin');
     obm.initialize.chain(function () {
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_accept_user', 'userSearch', {name: sel_perms, resultValue: resultValue});

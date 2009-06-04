@@ -1550,7 +1550,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $display_private = "<input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />";
   }
 
-  if(!$priv) {
+  if (!$priv) {
     $sel_usercomment = "<select name=\"sel_usercomment\">$opt_usercomment</select>";
     $sel_usercomment2 = "<select name=\"sel_usercomment2\">$opt_usercomment</select>";
     $sel_usercomment3 = "<select name=\"sel_usercomment3\">$opt_usercomment</select>";

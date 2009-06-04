@@ -31,23 +31,23 @@
  * @license GPL 2.0
  */
 class OBM_Acl {
-  
+
   const ACCESS = 'access';
-  
+
   const READ   = 'read';
-  
+
   const WRITE  = 'write';
-  
+
   const ADMIN  = 'admin';
-  
+
   private static $db;
-  
+
   private static $log;
-  
+
   private static $cache;
-  
+
   private static $actions;
-  
+
   /**
    * These entity types have no related table (i.e. one entity per user)
    */
@@ -66,7 +66,7 @@ class OBM_Acl {
     self::$cache = array();
     self::$actions = array(self::ACCESS, self::READ, self::WRITE, self::ADMIN);
   }
-  
+
   public static function possibleActions() {
     return self::$actions;
   }
@@ -370,12 +370,13 @@ class OBM_Acl {
   }
   
   /**
-   * Return entities on which the user is authorized to perform a specific action
+   * Return entities on which the user is authorized to perform an action
    * 
    * If an array of entity IDs is provided as $entityId parameter, this method
    * will only return the allowed entities whose IDs where initially present
    * in the $entityId array.
-   * 
+   *
+   * @param $action : if 'null', then all actions
    * @return array
    */
   public static function getAllowedEntities($userId, $entityType, $action, $entityId = null, $labelColumn = 'name') {
@@ -401,19 +402,19 @@ class OBM_Acl {
     }
     return $entities;
   }
-  
+
   public static function getAclSubselect($columns, $entityType, $entityId = null, $userId = null, $action = null) {
     return self::getAclQuery($columns, $entityType, $entityId, $userId, $action);
   }
-  
+
   private static function setRight($consumerType, $consumerId, $entityType, $entityId, $action, $right = 1) {
     if (!in_array($action, self::$actions)) {
       throw new Exception("Unknown action: $action");
     }
-    
+
     $realEntityId = self::getEntityId($entityType, $entityId);
     $consumerEntityId = self::getEntityId($consumerType, $consumerId);
-    
+
     $query = "SELECT * FROM EntityRight 
               WHERE entityright_consumer_id = '{$consumerEntityId}' 
               AND entityright_entity_id = '{$realEntityId}'";

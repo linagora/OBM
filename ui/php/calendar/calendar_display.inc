@@ -4145,7 +4145,7 @@ function dis_calendar_free_interval($calendar) {
  * @return mixed xhtml display
  */
 function dis_calendar_right_dis_admin($id='') {
-  global $obm, $display, $l_calendar;
+  global $obm, $display, $l_calendar, $l_rights_on_my, $l_rights_my_on;
 
   if ($id == '') {
     $id = $obm['uid'];
@@ -4153,7 +4153,13 @@ function dis_calendar_right_dis_admin($id='') {
   $infos = get_user_info($id);
   $name = $infos['firstname'] . ' ' . $infos['lastname'];
   $display['title'] = $name;
-  $block = of_right_dis_admin('calendar', $id);
+  $block = "<h1>$l_rights_on_my</h1>";
+  $block .= of_right_dis_admin('calendar', $id);
+//  $block .= "<h1>$l_rights_my_on</h1>";
+//
+//  $allowed = OBM_Acl::getAllowedEntities($id, 'calendar', 'access');
+// Get all actions for this ? update getactionclause() ?
+//  print_r($allowed);
 
   return $block;
 }
