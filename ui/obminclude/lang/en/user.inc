@@ -65,6 +65,7 @@ $l_checkdelete = "Check or Delete the User";
 $l_reset = "Reset user's preferences";
 $l_delete = "Delete the User";
 $l_add = "Add these users";
+$l_generate_passwd = "Generate";
 
 $l_edit_users = "Edit users properties";
 

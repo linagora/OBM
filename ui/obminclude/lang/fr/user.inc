@@ -79,7 +79,7 @@ $l_checkdelete = "Vérifier ou Supprimer l'utilisateur";
 $l_reset = "Préférences par défaut";
 $l_delete = "Supprimer l'utilisateur";
 $l_add = "Ajouter ces utilisateurs";
-$l_generate_passwd = "Generate";
+$l_generate_passwd = "Générer";
 
 $l_add_users = "Ajouter des utilisateurs";
 
