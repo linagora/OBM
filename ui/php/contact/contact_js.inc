@@ -200,4 +200,14 @@ function contact_copy_clip(text)
 }
 ";
 
+// Some messages and images we got from inside js code
+$l_js_sync = phpStringToJsString($l_sync);
+$l_js_desync = phpStringToJsString($l_desync);
+
+  $extra_js .= "
+obm.vars.labels.sync   = '$l_js_sync';
+obm.vars.labels.desync = '$l_js_desync';
+obm.vars.images.sync   = '$ico_sync';
+obm.vars.images.desync = '$ico_desync';
+";
 ?>

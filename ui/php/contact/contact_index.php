@@ -49,6 +49,8 @@
 // - display            --                -- display and set display parameters
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
+// - sync               -- $contact_id    -- synchronize a contact with the logged user
+// - desync             -- $contact_id    -- desynchronize a contact with the logged user
 // External API ---------------------------------------------------------------
 // - ext_get_ids        --                -- select multiple contacts (ret id) 
 // - ext_get_id         -- $title         -- select a contact (return id) 
@@ -152,6 +154,22 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
 ///////////////////////////////////////////////////////////////////////////////
   if ($params['contact_id'] > 0) {
     $display['detail'] = dis_contact_consult($params);
+  }
+  
+} elseif ($action == 'sync' || $action == 'desync') {
+///////////////////////////////////////////////////////////////////////////////
+  if ($params['contact_id'] > 0) {
+    $ok = run_query_do_contact_sync($params['contact_id'], ($action == 'sync'));
+    /*if ($ok) {
+      $display["msg"] .= display_ok_msg("$l_synchronisation : $l_update_ok");
+    } else {
+      $display["msg"] .= display_err_msg("$l_synchronisation : $l_update_error");
+    }
+    $display['detail'] = dis_contact_consult($params);*/
+
+    json_sync_contact(!$ok, $action);
+    echo "({".$display['json']."})";
+    exit();
   }
   
 } elseif ($action == 'detailupdate') {
@@ -438,7 +456,7 @@ function get_contact_params() {
 function get_contact_action() {
   global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_stats;
-  global $l_header_consult,$l_header_vcard, $l_header_display, $l_header_admin;
+  global $l_header_consult, $l_header_display, $l_header_admin;
   global $l_header_import,$l_header_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
@@ -512,14 +530,28 @@ function get_contact_action() {
     'Privacy'  => true,
     'Condition'=> array ('detailconsult','detailupdate','check_delete') 
                                     		 );
+// Contact synchronisation
+ $actions['contact']['sync']   = array (
+    'Url'      => "$path/contact/contact_index.php?action=sync&amp;contact_id=".$params['contact_id'],
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None')
+                                    		 );
+
+// Contact desynchronisation
+ $actions['contact']['desync']   = array (
+    'Url'      => "$path/contact/contact_index.php?action=desync&amp;contact_id=".$params['contact_id'],
+    'Right'    => $cright_write,
+    'Privacy'  => true,
+    'Condition'=> array ('None')
+                                    		 );
 
 // Vcard Export
   $actions['contact']['vcard'] = array (
-    'Name'     => $l_header_vcard,
     'Url'      => "$path/contact/contact_index.php?action=vcard&amp;popup=1&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_read,
     'Privacy'  => true,    
-    'Condition'=> array ('detailconsult','detailupdate','update','check_delete') 
+    'Condition'=> array ('None') 
                                        );
 
 // Detail Update

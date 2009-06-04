@@ -50,6 +50,7 @@ $fieldnames['company_aka'] = "$l_company $l_aka";
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_contact(&$OD, $fieldname, $link_ok) {
   global $path, $params, $cgp_show, $ico_mail;
+  global $l_sync, $l_desync, $ico_sync, $ico_desync;
 
   $show_date = (! $cgp_hide['contact']['contact_date']);
   $ext_url = $params['ext_url'];
@@ -86,6 +87,15 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
       $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('contact_id');
     }
     $res['name'] = $contact_lastname;
+
+    // Prepend the sync link
+    $is_synched = run_query_is_contact_synched($OD->data_set->f('contact_id'));
+    $alt = $is_synched ? $l_desync : $l_sync;
+    $ico = $is_synched ? $ico_desync : $ico_sync;
+    $iis_synched = (int) $is_synched;
+    $res['name'] = "<a x-obm-sync=\"$iis_synched\" href=\"#\" onclick=\"Obm.Contact.syncContact(".$OD->data_set->f('contact_id').", this); return false;\" title=\"$alt\"><img src=\"$ico\" /></a>
+<a href=\"$res[url]\">$res[name]</a>";
+    $res['url'] = '';
   }
 
   else if (($fieldname == 'company_name') && $link_ok) {
@@ -597,6 +607,8 @@ function html_contact_header($co_q, $funcs) {
   global $l_date, $l_no_date, $l_birthday, $l_anniversary;
   global $l_other_infos, $l_manager, $l_assistant, $l_spouse, $l_category;
   global $l_service, $l_mailing_ok, $l_newsletter;
+  global $l_download_contact_card, $l_exportation, $l_vcard;
+  global $l_sync_contact, $l_desync, $l_sync;
 
   $c_id = $co_q->f('contact_company_id');
   $c_name = $co_q->f('company_name');
@@ -737,6 +749,24 @@ function html_contact_header($co_q, $funcs) {
       <td>$newsletter</td>
     </tr>";
   }  
+
+  // Export buttons
+  $vcard_button = "
+      <input type=\"hidden\" name=\"action\" value=\"vcard\" />
+      <input type=\"hidden\" name=\"contact_id\" value=\"$id\" />
+      <input type=\"submit\" value=\"$l_download_contact_card\" />";
+
+  $is_synched = run_query_is_contact_synched($id);
+  if($is_synched) {
+    $act = 'desync';
+    $button_value = $l_desync;
+  } else {
+    $act = 'sync';
+    $button_value = $l_sync;
+  }
+  $sync_contact_button = "
+      <input type=\"submit\" x-obm-sync=\"$is_synched\" onclick=\"Obm.Contact.syncContact($id, this);\" value=\"$button_value\" />";
+
   // --- HTML Template --------------------------------------------------------
 
   $block = "
@@ -802,6 +832,26 @@ function html_contact_header($co_q, $funcs) {
     $block_anniversary
     $block_mailing
     </table>
+
+    &nbsp;
+    <h1>$l_exportation</h1>
+    <table>
+    <tr>
+      <th>$l_vcard</th>
+      <td>
+        <form method=\"get\" name=\"f_entity\" action=\"".url_prepare('contact_index.php')."\">
+        $vcard_button
+        </form>
+      </td>
+    </tr>
+    <tr>
+      <th>$l_sync_contact</th>
+      <td>
+        $sync_contact_button
+      </td>
+    </tr>
+    </table>
+
     </div>
 ";
 
@@ -1102,6 +1152,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   global $display, $path, $obm, $perm, $cgp_show, $cgp_hide, $c_undef, $l_undef;
   global $extra_js, $l_im, $l_website, $l_phone_labels, $l_email_labels, $l_number;
   global $l_remove, $l_street, $ccontact_simple_kind;
+  global $l_sync, $l_desync;
 
 
   $uid = $obm['uid'];
@@ -2371,5 +2422,29 @@ function json_search_contact($contact ,$results) {
     $contacts[] = "{name : '$name', email: '$email'}";
   }
   $display['json'] = "[".implode(',',$contacts)."]";
+}
+
+function json_sync_contact($err, $act) {
+  global $display, $l_sync, $l_desync;
+  global $l_synchronisation, $l_update_ok, $l_update_error;
+
+  if($act == 'sync') {
+    $newact = 'desync';
+  } else {
+    $newact = 'sync';
+  }
+  if($err) {
+    $msg = "$l_synchronisation : $l_update_error";
+  } else {
+    $msg = "$l_synchronisation : $l_update_ok";
+  }
+
+  $button = phpStringToJsString($button);
+  $msg = phpStringToJsString($msg);
+
+  $info[] = "error : ".(int)$err;
+  $info[] = "message : '$msg'";
+  $info[] = "newact : '$newact'";
+  $display['json'] = implode(',',$info);
 }
 ?>

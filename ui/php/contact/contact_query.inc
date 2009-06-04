@@ -550,14 +550,7 @@ function run_query_contact_insert($contact) {
 
     if($priv == 1) {
       // Subscription support
-      $query = "INSERT INTO SynchedContact (
-          synchedcontact_user_id, 
-          synchedcontact_contact_id,
-          synchedcontact_timestamp)
-          VALUES ($uid, $id, NOW()
-      )";
-      display_debug_msg($query, $cdg_sql, 'run_query_contact_insert(1)');
-      $obm_q->query($query);
+      run_query_do_contact_sync($id, true);
     }
 
     // Birthday support
@@ -1987,5 +1980,61 @@ function run_query_contact_ext_search($contact) {
   return array('length' => $resultsCount, 'datas' => $obm_q);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Check if a contact is synchronized with the given contact id
+// Parameters:
+//   - $cid : Contact id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_is_contact_synched($cid) {
+  global $cdg_sql, $obm;
+
+  $uid = sql_parse_id($obm['uid'], true);
+  $cid = sql_parse_id($cid, true);
+  $query = "SELECT count(*) as nb FROM SynchedContact
+        WHERE synchedcontact_user_id $uid
+        AND synchedcontact_contact_id $cid";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_is_contact_synched()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $nb = $obm_q->f('nb');
+
+  return ($nb > 0);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Synchronise or desyncronise a user from a contact 
+// Parameters:
+//   -    $cid : Contact id
+//   - $desync : Boolean, true if we sync, false if we desync
+///////////////////////////////////////////////////////////////////////////////
+function run_query_do_contact_sync($cid, $sync = true) {
+  global $cdg_sql, $obm;
+
+  $uid = sql_parse_id($obm['uid']);
+  $cid = sql_parse_id($cid);
+
+  if(run_query_is_contact_synched($cid) XOR !$sync) {
+    return true; // Already (de)synched
+  }
+
+  if($sync) {
+    $query = "INSERT INTO SynchedContact (
+        synchedcontact_user_id, 
+        synchedcontact_contact_id,
+        synchedcontact_timestamp)
+        VALUES ($uid, $cid, NOW()
+      )";
+  } else {
+    $query = "DELETE FROM SynchedContact
+        WHERE synchedcontact_user_id = $uid
+        AND synchedcontact_contact_id = $cid";
+  }
+
+  display_debug_msg($query, $cdg_sql, "run_query_do_contact_sync($cid, $sync)");
+  $obm_q = new DB_OBM;
+  return $obm_q->query($query);
+}
 
 ?>
