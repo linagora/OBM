@@ -2249,6 +2249,23 @@ function dis_contact_kind_links($ref) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Contact rights admin form
+// Parameters:
+//   - $id : contact id
+///////////////////////////////////////////////////////////////////////////////
+function dis_contact_right_dis_admin($id) {
+  global $display, $l_contact;
+
+  $contact_q = run_query_contact_detail($id);
+  $name = $contact_q->f('name');
+  $display['title'] = $name;
+  $block = of_right_dis_admin('contact', $id);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display the Contact Display preference screen
 // Parameters:
 //   - $prefs : Display preferences
