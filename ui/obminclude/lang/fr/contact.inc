@@ -48,6 +48,7 @@ $l_birthday = "Date de naissance";
 $l_anniversary = 'Anniversaire';
 $l_assistant = 'Assistant';
 $l_spouse = 'Conjoint';
+$l_synchronisation = "Abonnement";
 
 // Actions
 $l_j_check_date = "Remplissez la date avec une date valide";
@@ -69,6 +70,12 @@ $l_upd_comment2 = "Modifier le commentaire 2";
 $l_add_comment3 = "Ajouter un commentaire 3";
 $l_upd_comment3 = "Modifier le commentaire 3";
 $l_copy = "Copier";
+$l_exportation = "Exportation";
+$l_download_contact_card = "Télécharger la fiche contact";
+$l_vcard = "Vcard";
+$l_sync_contact = "Synchronisation PDA";
+$l_sync = "S'abonner";
+$l_desync = "Se désabonner";
 
 // Messages
 $l_check_samecontact = "Ces contacts semblent similaires à cette nouvelle entrée !";

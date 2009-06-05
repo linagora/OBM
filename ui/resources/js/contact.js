@@ -73,6 +73,40 @@ Obm.Contact.IMWidget = new Class ({
 
   Extends: Obm.CoordonateWidget
 });
+
+Obm.Contact = new Object();
+  Obm.Contact.syncContact = function(id, tag) {
+  if(tag.getProperty('x-obm-sync') == '1') {
+    act = 'desync';
+  } else {
+    act = 'sync';
+  }
+  new Request.JSON({
+    url : 'contact_index.php',
+    secure : false,
+    onComplete : function(response) {
+      if(!response.error) {
+        showOkMessage(response.message);
+        if(response.newact == 'sync') {
+          tag.setProperty('value', obm.vars.labels.sync);
+          tag.setProperty('title', obm.vars.labels.sync);
+          tag.setProperty('x-obm-sync', 0);
+          if(tag.getElement('img'))
+            tag.getElement('img').setAttribute('src', obm.vars.images.sync);
+        } else {
+          tag.setProperty('value', obm.vars.labels.desync);
+          tag.setProperty('title', obm.vars.labels.desync);
+          tag.setProperty('x-obm-sync', 1);
+          if(tag.getElement('img'))
+            tag.getElement('img').setAttribute('src', obm.vars.images.desync);
+        }
+      } else {
+        showErrorMessage(response.message);
+      }
+    }.bind(this)
+  }).post({ajax : 1, action : act, contact_id : id});
+};
+
 /*  Implements: Options,
 
   options: {

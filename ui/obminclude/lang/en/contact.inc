@@ -35,6 +35,7 @@ $l_birthday = "Birth day";
 $l_anniversary = 'Anniversary';
 $l_assistant = 'Assistant';
 $l_spouse = 'Spouse';
+$l_synchronisation = "Subscription";
 
 // Labels and texts
 $l_contact_name = "Contact Name";
@@ -66,6 +67,12 @@ $l_upd_comment2 = "Update comment 2";
 $l_add_comment3 = "Add a comment 3";
 $l_upd_comment3 = "Update comment 3";
 $l_copy = "Copy";
+$l_exportation = "Export";
+$l_download_contact_card = "Download contact informations";
+$l_vcard = "Vcard";
+$l_sync_contact = "PDA synchronisation";
+$l_sync = "Subscirbe";
+$l_desync = "Unsubscribe";
 
 // Messages
 $l_check_samecontact = "These contacts seem similar to this new entry !";

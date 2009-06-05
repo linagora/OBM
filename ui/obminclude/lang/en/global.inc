@@ -373,7 +373,6 @@ $l_header_find = "Find";
 $l_header_display = "Display";
 $l_header_global_export = "Export";
 $l_header_export = "Export";
-$l_header_vcard = "Vcard";
 $l_header_consult = "Consult";
 $l_header_duplicate = "Duplicate";
 $l_header_quickupdate = "Quick Update";
