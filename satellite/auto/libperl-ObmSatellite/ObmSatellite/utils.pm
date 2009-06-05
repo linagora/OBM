@@ -43,7 +43,7 @@ sub connectLdapSrv {
         my $errorCode = $ldapSrv->{'conn'}->start_tls( verify => 'none' );
 
         if( $errorCode->code() && ($ldapSrv->{'ldap_server_tls'} eq 'encrypt') ) {
-            # TLS fatal error. 'ldap_server_tls' is 'encrypt', TLS must succed
+            # TLS fatal error. 'ldap_server_tls' is 'encrypt', TLS must succeed
             return 0;
         }
 
