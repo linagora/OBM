@@ -683,16 +683,6 @@ function get_contact_action() {
     'Condition'=> array ('None') 
                                      	       );
 
-<<<<<<< .working
-// Rights Admin.
-  $actions['contact']['rights_admin'] = array (
-    'Name'     => $l_header_right,
-    'Url'      => "$path/contact/contact_index.php?action=rights_admin&amp;entity_id=".$params['entity_id'],
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult','rights_update','rights_admin','detailupdate','update')
-                                     );
-=======
->>>>>>> .merge-right.r4302
 
 // Display
   $actions['contact']['display'] = array (
@@ -748,25 +738,6 @@ function update_contact_action() {
     // Check Delete
     $actions['contact']['check_delete']['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;contact_id=$id";
     $actions['contact']['check_delete']['Condition'][] = 'insert';
-<<<<<<< .working
-
-    // Rights admin
-    $actions['contact']['rights_admin']['Condition'][] = 'insert';
-    $actions['contact']['rights_admin']['Url'] = "$path/contact/contact_index.php?action=rights_admin&amp;entity_id=".$id;
-
-//    if (check_contact_update_rights($params)) {
-//      // Detail Update
-//      $actions['contact']['detailupdate']['Url'] = "$path/contact/contact_index.php?action=detailupdate&amp;contact_id=".$params['contact_id'];
-//  
-//      // Check Delete
-//      $actions['contact']['check_delete']['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;contact_id=".$params['contact_id'];
-//    } else {
-//      $actions['contact']['detailupdate']['Condition'] = array('None');
-//      $actions['contact']['check_delete']['Condition'] = array('None');
-//    }
-
-=======
->>>>>>> .merge-right.r4302
   }
 }
 
