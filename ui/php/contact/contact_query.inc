@@ -548,19 +548,6 @@ function run_query_contact_insert($contact) {
     $entityid = of_entity_insert($GLOBALS['module'],$id);
     $contact['contact_id'] = $id;
 
-    // give admin rights on insert to current user
-    $contact['accept_access'] = array("data-user-$uid");
-    $contact['accept_read'] = array("data-user-$uid");
-    $contact['accept_write'] = array("data-user-$uid");
-    $contact['accept_admin'] = array("data-user-$uid");
-
-    $default_public_rights = OBM_Acl_Utils::getDefaultPublicRights('contact');
-    OBM_Acl::setPublicRights('contact', $id, $default_public_rights);
-    $default_rights = OBM_Acl_Utils::parseRightsParams($contact);
-    foreach ($default_rights['user'] as $user_id => $rights) {
-      OBM_Acl::setRights($user_id, 'contact', $id, $rights);
-    }
-
     if($priv == 1) {
       // Subscription support
       run_query_do_contact_sync($id, true);

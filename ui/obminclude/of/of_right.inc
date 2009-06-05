@@ -159,10 +159,6 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
     
     $sel_id = 'data-'.$consumer.'-'.$id;
     $tr_id = 'sel_accept_'.$consumer.'-'.$sel_id;
-    if (($consumer=='user') && ($id==$uid))
-      $disable_admin='disabled="disabled"';
-    else
-      $disable_admin='';
     ${'dis_'.$consumer} .= "
       <tr id=\"$tr_id\">
         <td>
@@ -182,7 +178,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           <input style=\"$style_write\" type=\"checkbox\" name=\"cb_accept_write[]\" onclick=\"apply_checked_read(this, '$tr_id')\" onchange=\"apply_checked_read(this, '$tr_id')\" value=\"$sel_id\" $checked_write $disabled_write/>
         </td>
         <td>
-          <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin $disable_admin />
+          <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin />
         </td>
       </tr>
 ";

@@ -683,7 +683,6 @@ function get_contact_action() {
     'Condition'=> array ('None') 
                                      	       );
 
-
 // Display
   $actions['contact']['display'] = array (
     'Name'     => $l_header_display,
