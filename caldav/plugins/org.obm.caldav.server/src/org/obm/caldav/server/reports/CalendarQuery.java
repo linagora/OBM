@@ -92,6 +92,8 @@ public class CalendarQuery extends ReportProvider {
 				List<Event> listEvents = proxy.getEventService().getAllEvents();
 				ret = new CalendarQueryResultBuilder().build(req, proxy,
 						propertiesValues, listEvents);
+				
+				
 			} else if (CompFilter.VTODO.equalsIgnoreCase(cf.getName())) {
 				List<Event> listTODO = new LinkedList<Event>();
 				// List<Event> listTODO =

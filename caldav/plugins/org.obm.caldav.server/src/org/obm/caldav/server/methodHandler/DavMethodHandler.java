@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.resultBuilder.ResultBuilderException;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -58,6 +59,15 @@ public abstract class DavMethodHandler {
 		return toLoad;
 	}
 
-	public abstract void process(Token token,IProxy proxy, DavRequest req, HttpServletResponse resp);
+	public abstract void process(Token token,IProxy proxy, DavRequest req, HttpServletResponse resp) throws ResultBuilderException;
+	
+	public void sendDom(Document doc, HttpServletResponse resp) throws ResultBuilderException{
+		resp.setContentType("text/xml; charset=utf-8");
+		try {
+			DOMUtils.serialise(doc, resp.getOutputStream());
+		} catch (Exception e1) {
+			throw new ResultBuilderException(e1);
+		} 
+	}
 	
 }

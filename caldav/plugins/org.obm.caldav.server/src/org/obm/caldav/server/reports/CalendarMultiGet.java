@@ -16,12 +16,11 @@
 
 package org.obm.caldav.server.reports;
 
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,12 +28,11 @@ import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
-import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.server.propertyHandler.impl.CalendarData;
 import org.obm.caldav.server.propertyHandler.impl.DGetETag;
 import org.obm.caldav.server.resultBuilder.CalendarMultiGetQueryResultBuilder;
-import org.obm.caldav.server.resultBuilder.PropertyListBuilder;
 import org.obm.caldav.server.share.Token;
+import org.obm.caldav.utils.CalDavUtils;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -123,8 +121,8 @@ public class CalendarMultiGet extends ReportProvider {
 
 		try {
 			Element root = req.getDocument().getDocumentElement();
-			Set<String> listUIDEvent = getListUIDEvent(root);
-			Map<String, String> listICS = proxy.getEventService().getICSEvents(listUIDEvent);
+			Set<String> listExtIDEvent = getListExtIdEvent(root);
+			Map<String, String> listICS = proxy.getEventService().getICSEventsFromExtId(listExtIDEvent);
 			
 			// FIXME CALDAV PropertyListBuilder
 			Document ret = new CalendarMultiGetQueryResultBuilder().build(req, proxy, propertiesValues, listICS);
@@ -139,24 +137,21 @@ public class CalendarMultiGet extends ReportProvider {
 		}
 	}
 
-	private Set<String> getListUIDEvent(Element root){
-		Set<String> listUIDEvent = new HashSet<String>();
+	private Set<String> getListExtIdEvent(Element root){
+		Set<String> listExtIDEvent = new HashSet<String>();
 		if(root!= null){
 			NodeList dl = root.getElementsByTagNameNS(NameSpaceConstant.DHREF_NAMESPACE, "href");
 			for(int i = 0; i<dl.getLength(); i++ ){
 				Element dhref = (Element)dl.item(i);
 				String hrefContent = dhref.getTextContent();
-				int lastS = dhref.getTextContent().lastIndexOf("/");
-				if(lastS!=-1){
-					String icsName = hrefContent.substring(lastS+1);
-					String iudEvent = icsName.replace(".ics", "");
-					if(!"".equals(iudEvent)){
-						listUIDEvent.add(iudEvent);
-						logger.debug("iudEvent "+iudEvent);
-					}
+				try {
+					String extid = CalDavUtils.getExtIdFromURL(hrefContent);
+					listExtIDEvent.add(extid);
+				} catch (MalformedURLException e) {
+					logger.error(e.getMessage(), e);
 				}
 			}
 		}
-		return listUIDEvent;
+		return listExtIDEvent;
 	}
 }

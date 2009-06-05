@@ -1,18 +1,20 @@
 package org.obm.caldav.utils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.net.MalformedURLException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public class CalDavUtils {
-	public static Set<String> getDhrefNode(Document doc){
-		Set<String> nodeList = new HashSet<String>();
-		Element root = doc.getDocumentElement();
-		String[] values = DOMUtils.getTexts(root, "D:href");
-		nodeList.addAll(Arrays.asList(values));
-		return nodeList;
+	
+	public static String getExtIdFromURL(String url) throws MalformedURLException{
+		String extId = "";
+		int indexIcs= url.lastIndexOf("/");
+		if(indexIcs != -1){
+			extId = url.substring(indexIcs+1);
+			extId = extId.replace(".ics", "");
+		}
+		if(extId == null && extId.equals("")){
+			throw new MalformedURLException("Invalid URI[ "+url+ "]");	
+		}
+		return extId;
 	}
 }

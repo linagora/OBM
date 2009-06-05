@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.caldav.obmsync.exception.AuthorizationException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
@@ -40,24 +41,23 @@ public interface ICalendarProvider {
 			ServerFault;
 
 	Event createEvent(AccessToken token, String userId, Event event) throws AuthFault, ServerFault;
-
-	void updateParticipationState(AccessToken token, String userId, Event event,
-			String participationState) throws AuthFault, ServerFault;
+	
+	Event updateOrCreateEvent(AccessToken token, String login, String ics, String extId) throws Exception ;
 
 	List<Event> getListEventsFromIntervalDate(AccessToken token, String userId, Date start,
 			Date end) throws AuthFault, ServerFault;
 
 	AccessToken login(String login, String password);
+	
 	void logout(AccessToken token);
 
-	String getParticipationState(AccessToken token, String userId, Event event) throws AuthFault,
-			ServerFault;
-	
 	String getUserEmail(AccessToken token) throws AuthFault, ServerFault;
 	
 	Set<CalendarInfo> getListCalendars(AccessToken token) throws ServerFault, AuthFault ;
 
 	List<Event> getAllEvents(AccessToken token, String calendar) throws ServerFault, AuthFault;
 
-	Map<String,String> getICSEvents(AccessToken token, String userId,Set<String> listUidEvent) throws AuthFault, ServerFault;
+	Map<String,String> getICSEventsFromExtId(AccessToken token, String userId,Set<String> listUidEvent) throws AuthFault, ServerFault;
+
+	void remove(AccessToken token, String login, String extId) throws ServerFault, AuthFault, AuthorizationException;
 }

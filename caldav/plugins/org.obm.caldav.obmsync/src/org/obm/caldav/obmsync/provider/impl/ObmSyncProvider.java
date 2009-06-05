@@ -16,6 +16,8 @@
 
 package org.obm.caldav.obmsync.provider.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -33,8 +35,10 @@ import javax.security.auth.login.FailedLoginException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.obmsync.ObmSyncConfIni;
+import org.obm.caldav.obmsync.exception.AuthorizationException;
 import org.obm.caldav.obmsync.provider.ICalendarProvider;
 import org.obm.caldav.obmsync.service.IEventService;
+import org.obm.caldav.utils.FileUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
@@ -88,21 +92,36 @@ public class ObmSyncProvider implements ICalendarProvider {
 
 	public Event createEvent(AccessToken token, String userId, Event event)
 			throws AuthFault, ServerFault {
-		CalendarInfo myCalendar = getMyCalendar(token, userId);
-		boolean find = false;
-		for (Attendee att : event.getAttendees()) {
-			if (myCalendar.getMail().equals(att.getEmail())) {
-				find = true;
-			}
-		}
-		if (!find) {
+		cal.createEvent(token, getMyCalendar(token, userId).getUid(), event);
+		return event;
+	}
+
+	@Override
+	public Event updateOrCreateEvent(AccessToken token, String login,
+			String ics, String extId) throws Exception {
+		Event event = cal.getEventFromExtId(token, login, extId);
+		if (event != null) {
+			String uid = event.getUid();
+			InputStream is = new ByteArrayInputStream(ics.getBytes());
+			event = cal.getEvent(is);
+			event.setExtId(extId);
+			event.setUid(uid);
+			
+			event = cal.modifyEvent(token, login, event, true);
+		} else {
+			InputStream is = new ByteArrayInputStream(ics.getBytes());
+			event = cal.getEvent(is);
+			event.setExtId(extId);
 			Attendee att = new Attendee();
-			att.setEmail(myCalendar.getMail());
+			att.setEmail(login);
 			att.setState(ParticipationState.NEEDSACTION);
 			att.setRequired(ParticipationRole.OPT);
 			event.addAttendee(att);
+			
+			String uid = cal.createEvent(token, login, event);
+			event.setUid(uid);
 		}
-		cal.createEvent(token, getMyCalendar(token, userId).getUid(), event);
+		
 		return event;
 	}
 
@@ -115,49 +134,6 @@ public class ObmSyncProvider implements ICalendarProvider {
 			String userId, Date start, Date end) throws AuthFault, ServerFault {
 		return cal.getListEventsFromIntervalDate(token, getMyCalendar(token,
 				userId).getUid(), start, end);
-	}
-
-	@Override
-	public void updateParticipationState(AccessToken token, String userId,
-			Event event, String participationState) throws AuthFault,
-			ServerFault {
-		for (Attendee att : event.getAttendees()) {
-			if (getMyCalendar(token, userId).getMail().equals(att.getEmail())) {
-				if (IEventService.PARTICIPATION_STATE_ACCEPTED
-						.equals(participationState)) {
-					att.setState(ParticipationState.ACCEPTED);
-				} else if (IEventService.PARTICIPATION_STATE_DECLINED
-						.equals(participationState)) {
-					att.setState(ParticipationState.DECLINED);
-				} else if (IEventService.PARTICIPATION_STATE_NEEDSACTION
-						.equals(participationState)) {
-					att.setState(ParticipationState.NEEDSACTION);
-				}
-			}
-		}
-		cal.modifyEvent(token, getMyCalendar(token, userId).getUid(), event,
-				true);
-	}
-
-	@Override
-	public String getParticipationState(AccessToken token, String userId,
-			Event event) throws AuthFault, ServerFault {
-		for (Attendee att : event.getAttendees()) {
-			if (getMyCalendar(token, userId).getMail().equals(att.getEmail())) {
-				if (ParticipationState.ACCEPTED.equals(att.getState())) {
-					return IEventService.PARTICIPATION_STATE_ACCEPTED;
-				} else if (ParticipationState.DECLINED.equals(att.getState())) {
-					return IEventService.PARTICIPATION_STATE_DECLINED;
-				} else if (ParticipationState.DELEGATED.equals(att.getState())) {
-					return IEventService.PARTICIPATION_STATE_ACCEPTED;
-				} else if (ParticipationState.TENTATIVE.equals(att.getState())) {
-					return IEventService.PARTICIPATION_STATE_ACCEPTED;
-				} else {
-					return IEventService.PARTICIPATION_STATE_NEEDSACTION;
-				}
-			}
-		}
-		return "";
 	}
 
 	public String getUserEmail(AccessToken token) throws AuthFault, ServerFault {
@@ -181,18 +157,18 @@ public class ObmSyncProvider implements ICalendarProvider {
 	@Override
 	public List<Event> getAllEvents(AccessToken token, String userId)
 			throws ServerFault, AuthFault {
-
 		return this.cal.getAllEvents(token, getMyCalendar(token, userId)
 				.getUid());
 	}
 
 	@Override
-	public Map<String, String> getICSEvents(AccessToken token, String userId,
-			Set<String> listUidEvent) throws AuthFault, ServerFault {
+	public Map<String, String> getICSEventsFromExtId(AccessToken token,
+			String userId, Set<String> listUidEvent) throws AuthFault,
+			ServerFault {
 		Map<String, String> listICS = new HashMap<String, String>();
 
 		for (String id : listUidEvent) {
-			Event event = cal.getEventFromId(token, userId, id);
+			Event event = cal.getEventFromExtId(token, userId, id);
 			if (event != null) {
 				listICS.put(id, cal.getICS(event));
 			} else {
@@ -200,5 +176,16 @@ public class ObmSyncProvider implements ICalendarProvider {
 			}
 		}
 		return listICS;
+	}
+
+	@Override
+	public void remove(AccessToken token, String login, String extId) throws AuthFault, ServerFault, AuthorizationException {
+		Event event = cal.getEventFromExtId(token, login, extId);
+		cal.removeEvent(token, login, event.getUid());
+		
+		Event ret = cal.getEventFromId(token, login, event.getUid());
+		if(ret != null){
+			throw new AuthorizationException("You don't have the right to delete this event");
+		}
 	}
 }

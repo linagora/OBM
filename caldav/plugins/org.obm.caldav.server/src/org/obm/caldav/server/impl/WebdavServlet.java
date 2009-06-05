@@ -28,8 +28,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.methodHandler.CopyHandler;
 import org.obm.caldav.server.methodHandler.DavMethodHandler;
+import org.obm.caldav.server.methodHandler.DeleteHandler;
 import org.obm.caldav.server.methodHandler.LockHandler;
 import org.obm.caldav.server.methodHandler.MkColHandler;
 import org.obm.caldav.server.methodHandler.MoveHandler;
@@ -39,6 +41,7 @@ import org.obm.caldav.server.methodHandler.PropPatchHandler;
 import org.obm.caldav.server.methodHandler.PutHandler;
 import org.obm.caldav.server.methodHandler.ReportHandler;
 import org.obm.caldav.server.methodHandler.UnlockHandler;
+import org.obm.caldav.server.resultBuilder.ResultBuilderException;
 import org.obm.caldav.server.share.Token;
 
 /**
@@ -64,11 +67,8 @@ public class WebdavServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		Token token = authHandler.doAuth(request);
-		if(token != null){
-			this.proxy = new ProxyImpl(token);
-		}
 		
-		if (proxy == null || !proxy.isConnected()) {
+		if (token == null) {
 			String uri = request.getMethod() + " " + request.getRequestURI()
             + " " + request.getQueryString();
 			logger.warn("invalid auth, sending http 401 (uri: " + uri + ")");
@@ -89,7 +89,16 @@ public class WebdavServlet extends HttpServlet {
 
 		DavMethodHandler handler = handlers.get(method.toLowerCase());
 		if (handler != null) {
-			handler.process(token, proxy,new DavRequest(request), response);
+			//CHANGER LA GESTION PAR PROXY
+			IProxy proxy = new ProxyImpl(token);
+			try {
+				handler.process(token, proxy,new DavRequest(request), response);
+			} catch (ResultBuilderException e) {
+				///rfc4791 1.3 Method Preconditions and Postconditions
+				response.sendError(StatusCodeConstant.SC_INTERNAL_SERVER_ERROR);
+				logger.error(e.getMessage(), e);
+			}
+			
 		} else {
 			super.service(request, response);
 		}
@@ -111,6 +120,7 @@ public class WebdavServlet extends HttpServlet {
 		handlers.put("options", new OptionsHandler());
 		handlers.put("report", new ReportHandler());
 		handlers.put("put", new PutHandler());
+		handlers.put("delete", new DeleteHandler());
 		
 		authHandler = new AuthHandler();
 	}

@@ -85,7 +85,6 @@ public class PropFindHandler extends DavMethodHandler {
 
 		try {
 			DOMUtils.logDom(ret);
-
 			resp.setStatus(207); // multi status webdav
 			resp.setContentType("text/xml; charset=utf-8");
 			DOMUtils.serialise(ret, resp.getOutputStream());

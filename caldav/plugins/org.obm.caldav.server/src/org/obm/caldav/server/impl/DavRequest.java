@@ -73,5 +73,9 @@ public class DavRequest {
 	public String getHref() {
 		return req.getRequestURL().toString();
 	}
+	
+	public String getURI() {
+		return req.getRequestURI().toString();
+	}
 
 }

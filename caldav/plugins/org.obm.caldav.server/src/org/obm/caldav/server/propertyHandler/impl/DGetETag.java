@@ -1,7 +1,6 @@
 package org.obm.caldav.server.propertyHandler.impl;
 
 import java.util.UUID;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,13 +38,13 @@ public class DGetETag implements CalendarQueryPropertyHandler, CalendarMultiGetP
 	public void appendCalendarQueryPropertyValue(Element prop, IProxy proxy,
 			Event event) {
 		Element val = DOMUtils.createElement(prop, "D:getetag");
-		val.setTextContent("\"" + etag + "\"");
+		val.setTextContent("\"" + etag + "-" + event.getUid() + "\"");
 	}
 
 	@Override
 	public void appendCalendarMultiGetPropertyValue(Element prop, IProxy proxy,
 			String eventId, String eventIcs) {
 		Element val = DOMUtils.createElement(prop, "D:getetag");
-		val.setTextContent("\"" + etag + "\"");
+		val.setTextContent("\"" + etag + "-" + eventId + "\"");
 	}
 }

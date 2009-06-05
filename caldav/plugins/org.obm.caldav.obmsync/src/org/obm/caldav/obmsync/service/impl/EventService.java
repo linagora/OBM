@@ -16,7 +16,6 @@
 
 package org.obm.caldav.obmsync.service.impl;
 
-import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -24,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.caldav.obmsync.exception.AuthorizationException;
 import org.obm.caldav.obmsync.provider.ICalendarProvider;
 import org.obm.caldav.obmsync.provider.impl.ObmSyncProvider;
 import org.obm.caldav.obmsync.service.IEventService;
@@ -49,6 +49,11 @@ public class EventService implements IEventService {
 			ServerFault {
 		return icp.getEventFromExtId(token, login, externalUID);
 	}
+	
+	@Override
+	public Event updateOrCreateEvent(String ics, String extId)  throws Exception {
+		return icp.updateOrCreateEvent(token, login, ics, extId);
+	}
 
 	@Override
 	public Event createEvent(Event event) throws AuthFault, ServerFault {
@@ -73,27 +78,6 @@ public class EventService implements IEventService {
 	}
 
 	@Override
-	public void updateParticipationState(Event event, String going)
-			throws AuthFault, ServerFault {
-		icp.updateParticipationState(token, login, event, going);
-	}
-
-	@Override
-	public String getParticipationState(Event event) throws AuthFault,
-			ServerFault {
-		return icp.getParticipationState(token, login, event);
-	}
-
-	@Override
-	public Event parseIcs(InputStream icsFile) throws Exception {
-		/*
-		 * ICSParser icsParser = new ICSParser(icsFile); return
-		 * icsParser.getEvent();
-		 */
-		throw new Exception("Unimplemented method");
-	}
-
-	@Override
 	public String getUserEmail() throws Exception {
 		return icp.getUserEmail(token);
 	}
@@ -114,7 +98,17 @@ public class EventService implements IEventService {
 	}
 
 	@Override
-	public Map<String,String> getICSEvents(Set<String> listUidEvent) throws Exception {
-		return icp.getICSEvents(token, login, listUidEvent);
+	public Map<String,String> getICSEventsFromExtId(Set<String> listExtIdEvent) throws Exception {
+		return icp.getICSEventsFromExtId(token, login, listExtIdEvent);
+	}
+
+	@Override
+	public String getICSName(Event event) throws Exception {
+		return event.getExtId()+".ics";
+	}
+
+	@Override
+	public void remove(String extId) throws Exception,AuthorizationException {
+		icp.remove(token, login, extId);
 	}
 }

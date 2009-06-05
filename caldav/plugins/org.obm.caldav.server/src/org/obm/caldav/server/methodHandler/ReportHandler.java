@@ -36,7 +36,6 @@ public class ReportHandler extends DavMethodHandler {
 	Map<String, ReportProvider> providers;
 	
 	public ReportHandler() {
-		
 		providers = new HashMap<String, ReportProvider>();
 		providers.put("D:principal-property-search",
 				new PrincipalPropertySearch());

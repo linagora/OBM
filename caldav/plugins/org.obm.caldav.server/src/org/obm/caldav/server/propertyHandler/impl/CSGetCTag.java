@@ -3,13 +3,14 @@ package org.obm.caldav.server.propertyHandler.impl;
 
 import java.util.Date;
 
-import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.w3c.dom.Element;
 
 /**
+ * 
+ * https://trac.calendarserver.org/browser/CalendarServer/trunk/doc/Extensions/caldav-ctag.txt
  *  Name:  getctag
  *     
  *     Purpose:  Specifies a "synchronization" token used to indicate when
@@ -49,5 +50,7 @@ public class CSGetCTag extends DavPropertyHandler {
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req) {
 		prop.setTextContent(new Date().getTime() + "");
+		//prop.setTextContent("1234567879");
+		
 	}
 }

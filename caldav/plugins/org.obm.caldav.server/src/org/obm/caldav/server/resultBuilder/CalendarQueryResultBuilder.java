@@ -56,7 +56,7 @@ public class CalendarQueryResultBuilder extends ResultBuilder {
 				for (Event event : listEvents) {
 					Element response = DOMUtils.createElement(root,
 							"D:response");
-					String href = req.getHref() + event.getUid() + ".ics";
+					String href = req.getHref() + proxy.getEventService().getICSName(event);
 					DOMUtils.createElementAndText(response, "D:href", href);
 					Element pStat = DOMUtils.createElement(response,
 							"D:propstat");

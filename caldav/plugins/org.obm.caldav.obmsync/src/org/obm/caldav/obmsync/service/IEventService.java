@@ -16,32 +16,35 @@
 
 package org.obm.caldav.obmsync.service;
 
-import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.caldav.obmsync.exception.AuthorizationException;
 import org.obm.sync.calendar.Event;
 
 
 public interface IEventService {
 	
-	final static String PARTICIPATION_STATE_ACCEPTED = "yes";
-	final static String PARTICIPATION_STATE_DECLINED = "no";
-	final static String PARTICIPATION_STATE_NEEDSACTION = "maybe";
-	
 	void logout();
 	
 	boolean isConnected();
-	Event createEvent(Event calendar) throws Exception;
-	Event parseIcs(InputStream icsFile) throws Exception;
+	
+	Event createEvent(Event event) throws Exception;
+	Event updateOrCreateEvent(String ics, String extId) throws Exception;
+	
+	String getICSName(Event event) throws Exception;
+	
 	Event getEventFromExtId(String externalUrl) throws Exception;
-	List<Event> getListEventsOfDays(Date day) throws Exception ;
-	String getParticipationState(Event event) throws Exception ;
-	void updateParticipationState(Event event, String going) throws Exception ;
-	String getUserEmail() throws Exception;
+	
 	List<Event> getAllEvents() throws Exception;
-	Map<String,String> getICSEvents(Set<String> listUidEvent) throws Exception;
+	Map<String,String> getICSEventsFromExtId(Set<String> listExtIdEvent) throws Exception;
+	
+	String getUserEmail() throws Exception;
+
+	List<Event> getListEventsOfDays(Date day) throws Exception ;
+
+	void remove(String extId) throws Exception,AuthorizationException ;
 }
 
