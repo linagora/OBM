@@ -727,6 +727,11 @@ function dis_host_warn_insert($id, $h_q, $host) {
   $ip = $host['ip'];
   $desc = $host['desc'];
   $fqdn = $host['fqdn'];
+  $imap = $host['imap'];
+  $smtp_in = $host['smtp_in'];
+  $smtp_out = $host['smtp_out'];
+  $obm_sync = $host['obm_sync'];
+  $samba = $host['samba'];
 
   $display['msg'] .= display_warn_msg($l_check_samehost);
   while ($h_q->next_record()) {
@@ -743,6 +748,11 @@ function dis_host_warn_insert($id, $h_q, $host) {
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"tf_delegation\" value=\"$delegation\" />
     <input type=\"hidden\" name=\"tf_ip\" value=\"$ip\" />
+    <input type=\"hidden\" name=\"cb_imap\" value=\"$imap\" />
+    <input type=\"hidden\" name=\"cb_smtp_in\" value=\"$smtp_in\" />
+    <input type=\"hidden\" name=\"cb_smtp_out\" value=\"$smtp_out\" />
+    <input type=\"hidden\" name=\"cb_obm_sync\" value=\"$obm_sync\" />
+    <input type=\"hidden\" name=\"cb_samba\" value=\"$samba\" />
     <input type=\"hidden\" name=\"tf_fqdn\" value=\"$fqdn\" />
     <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
 ";
