@@ -113,7 +113,7 @@ Obm.CalendarDayEventExtension = new Class({
   redraw: function() {
     hr = $(this.element.parentNode);
     this.element.setStyles({
-      'top':  hr.getTop() + hr.getStyle('padding-top').toInt() + 'px',
+      'top':  hr.parentNode.getTop() + hr.getStyle('padding-top').toInt() + 'px',
       'left': hr.getLeft() + 'px'
     });
     this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
@@ -374,7 +374,7 @@ Obm.CalendarDayEvent = new Class({
       } while (thead = thead.getNext());
       size = size * this.element.offsetHeight + 5;
       if (hr.parentNode.offsetHeight != size) {
-        hr.parentNode.setStyle('height', size + 'px');    
+        hr.parentNode.getElements('td').setStyle('height', size + 'px');
         return true
       }        
       return false;
@@ -409,7 +409,7 @@ Obm.CalendarDayEvent = new Class({
   redraw: function() {
     hr = $(this.element.parentNode);
     this.element.setStyles({
-      'top':  hr.getTop() + hr.getStyle('padding-top').toInt() + 'px',
+      'top':  hr.parentNode.getTop() + hr.getStyle('padding-top').toInt() + 'px',
       'left': (hr.getLeft() + (hr.clientLeft || 0)) + 'px'
     });
     this.setWidth(this.size * (hr.clientWidth+1) - 1);
@@ -735,7 +735,7 @@ Obm.CalendarEvent = new Class({
   redraw: function() {
     hr = $(this.element.parentNode);
     this.element.setStyles({
-      'top':  hr.getTop() + 'px',
+      'top':  hr.parentNode.getTop() + 'px',
       'left': (hr.getLeft() + (hr.clientLeft || 0)) + 'px'      
     });
     this.setHeight(this.size * obm.calendarManager.defaultHeight);
