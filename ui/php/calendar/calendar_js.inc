@@ -17,6 +17,10 @@ $extra_js .= "
   }
 
   function performMeeting() {
+    var oldies = $$('div.freeBusyContent');
+    oldies.each(function(e) {
+      e.destroy();
+    });
     var duration = parseInt($('sel_time_duration').value, 10)+parseInt($('sel_min_duration').value, 10)/60;
     displayFreeBusy($('tf_date').value, duration);
   }
@@ -33,10 +37,10 @@ $extra_js .= "
   }
 
   function displayFreeBusy(date_begin, duration) {
-
     // Get current attendees
     var elements = $$('div.elementRow');
-    var atts = new Array();
+    var atts = new Array(); // current attendees
+    var i = 0;
     elements.each(function (e) {
       var id = e.id.split('-');
       if (id[0] == 'sel_attendees_id') {
@@ -44,9 +48,8 @@ $extra_js .= "
         var tmp = e.clone();
         tmp.getChildren().destroy();
         var label = tmp.get('text').trim();
-        if (!atts[id[3]]) atts[id[3]] = new Array();
-        atts[id[3]]['entity'] = entity; 
-        atts[id[3]]['label'] = label; 
+        atts[i] = [entity, label];
+        i++;
       }
     });
 
@@ -70,29 +73,31 @@ $extra_js .= "
 
         // TODO > 2.2.4
         // Optimize
-        atts.each(function(k, v) {
-          obm.calendarFreeBusy.addAttendee(atts[v]['entity'], atts[v]['label']);
-        });
-
-        elements.each(function (e) {
-          var id = e.id.split('-');
-          if (id[0] == 'sel_user_id' || id[0] == 'sel_resource_id') {
-            var entity = id[1]+'-'+id[2]+'-'+id[3];
-            var tmp = e.clone();
-            tmp.getChildren().destroy();
-            var label = tmp.get('text').trim();
-            obm.calendarFreeBusy.addAttendee(entity, label);
-            tmp.destroy();
-          } else if (id[0] == 'sel_group_id') {
-            obm.calendarFreeBusy.addUserGroup(id[3]);
-          } else if (id[0] == 'sel_resource_group_id') {
-            obm.calendarFreeBusy.addResourceGroup(id[3]);
+        if (atts.length > 0) {
+          for(i=0;i<atts.length;i++) {
+            obm.calendarFreeBusy.addAttendee(atts[i][0], atts[i][1]);
           }
-        });
+        } else {
+          elements.each(function (e) {
+            var id = e.id.split('-');
+            if (id[0] == 'sel_user_id' || id[0] == 'sel_resource_id') {
+              var entity = id[1]+'-'+id[2]+'-'+id[3];
+              var tmp = e.clone();
+              tmp.getChildren().destroy();
+              var label = tmp.get('text').trim();
+              obm.calendarFreeBusy.addAttendee(entity, label);
+              tmp.destroy();
+            } else if (id[0] == 'sel_group_id') {
+              obm.calendarFreeBusy.addUserGroup(id[3]);
+            } else if (id[0] == 'sel_resource_group_id') {
+              obm.calendarFreeBusy.addResourceGroup(id[3]);
+            }
+          });
 
-        for(var i = 0;i<othersAttendees.length;i++) {
-          var e = othersAttendees[i].value;
-          obm.calendarFreeBusy.addOtherAttendee(e);
+          for(var i = 0;i<othersAttendees.length;i++) {
+            var e = othersAttendees[i].value;
+            obm.calendarFreeBusy.addOtherAttendee(e);
+          }
         }
 
         $('fbcContainer').innerHTML = '';

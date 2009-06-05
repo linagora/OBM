@@ -1983,7 +1983,7 @@ Obm.CalendarFreeBusy = new Class({
     new Request.JSON({
       url: 'calendar_index.php',
       secure: false,
-      async: true,
+      async: false,
       onRequest: function() {
         $('spinner').setStyle('display', 'block');
       },
@@ -1999,7 +1999,7 @@ Obm.CalendarFreeBusy = new Class({
               function() {
                 remove_element(div_id,label);
               }.bind(this)).injectInside(div);
-            div.appendText(label);
+            div.appendText(label.trim());
             $('sel_attendees_id').adopt(div);
           }
           if (!resp.canRead) {
@@ -2009,8 +2009,6 @@ Obm.CalendarFreeBusy = new Class({
               tr.adopt(td);
                 obm.tip.add(td);
             }
-            this.container.adopt(tr);
-            this.setSize();
           } else {
             var entitySlot = new Array();
             var  events = resp.events;
@@ -2062,14 +2060,17 @@ Obm.CalendarFreeBusy = new Class({
                 tr.adopt(new Element('td').addClass('timeSlot')); 
               }
             }.bind(this));
-            this.container.adopt(tr);
-            this.setSize();
           }
 
           // Set meeting color
           this.changeStatus(this.isBusy(this.currentPosition+this.meeting_slots-1));
 
           var div_id = $('sel_attendees_id-data-'+attendee);
+          if (kind == "others_attendees") {
+            div_id.addClass('contact');
+          } else {
+            div_id.addClass(kind);
+          }
           var a = div_id.getFirst();
           var trash = a.getFirst();
 
@@ -2086,6 +2087,7 @@ Obm.CalendarFreeBusy = new Class({
                 if (!$$('div.'+e).length) {
                   $(e).removeClass('haveEventAll');
                   this.bts.erase(''+this.ts.indexOf(e));
+                  this.setSize();
                 }
               }.bind(this));
               this.attendeesSlot[attendee].empty();
@@ -2114,6 +2116,11 @@ Obm.CalendarFreeBusy = new Class({
           }
           $('freeBusyFormId').adopt(input);
 
+          if (label != "") {
+            label = div_id.get('text');
+          }
+          label = label.toLowerCase();
+          this.displayAttendee(div_id, data.kind, label.trim(), tr);
         }
       }.bind(this),
       onSuccess: function() {
@@ -2178,6 +2185,44 @@ Obm.CalendarFreeBusy = new Class({
       }.bind(this)
     }).post($merge({ajax : 1, action : 'get_json_resource_group'}, data));
   },
+
+
+  displayAttendee: function(sel_attendee_id, kind, label, attendee_tr) {
+    var elems = $$('.'+kind);
+    if (elems.length>1) {
+      var sorted = elems.sort(function(a, b) {
+        var label_a = a.get('text').toLowerCase().trim();
+        var label_b = b.get('text').toLowerCase().trim();
+        if (label_a < label_b) return -1;
+        if (label_a > label_b) return 1;
+        return 0;
+      });
+
+      var newPosition = sorted.indexOf(sel_attendee_id);
+
+      if (newPosition == 0) {
+        var first = sorted[1]; 
+        var first_tr = $(kind+'-'+first.id.split('-')[3]);
+        sel_attendee_id.injectBefore(first);
+        attendee_tr.injectBefore(first_tr);
+      } else {
+        var prev = sorted[newPosition-1];
+        var prev_tr = $(kind+'-'+prev.id.split('-')[3]);
+        if (prev_tr!=null) {
+          sel_attendee_id.injectAfter(prev);
+          attendee_tr.injectAfter(prev_tr);
+        } else {
+          this.container.adopt(attendee_tr);
+        }
+      }
+
+    } else {
+      // It's the first attendee
+      this.container.adopt(attendee_tr);
+    }
+    this.setSize();
+  },
+
 
   /*
    * Set table height
