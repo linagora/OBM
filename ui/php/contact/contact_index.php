@@ -46,8 +46,6 @@
 // - kind_checklink     --                -- check if kind is used
 // - kind_delete     	-- $sel_kind      -- delete the kind
 // - statistics     	--                -- display contact statistics
-// - rights_admin       -- access rights screen
-// - rights_update      -- Update contact access rights
 // - display            --                -- display and set display parameters
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
@@ -72,22 +70,10 @@ require("$obminclude/of/of_contact.php");
 require('contact_display.inc');
 require('contact_query.inc');
 require_once('contact_js.inc');
-require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 $extra_js_include[] = 'contact.js';
 
 get_contact_action();
-
-// If user has individual admin right on the selected resource,	give access
-// if user does not have admin right on module, check for the resource right
-if (($params['contact_id'] > 0)
-  && (! $perm->check_right('contact', $cright_write_admin))) {
-  if (OBM_Acl::canAdmin($obm['uid'], 'contact', $params['contact_id'])) {
-    $actions['contact']['rights_admin']['Right'] = $cright_read;
-    $actions['contact']['rights_update']['Right'] = $cright_read;
-  }
-}
-
 $perm->check_permissions($module, $action);
 if (! check_privacy($module, 'Contact', $action, $params['contact_id'], $obm['uid'])) {
   $display['msg'] = display_err_msg($l_error_visibility);
@@ -320,19 +306,6 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $display['title'] = display_title($l_stats);
   $display['detail'] = dis_category_contact_stats($params);
 
-} elseif ($action == 'rights_admin') {
-///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_contact_right_dis_admin($params['entity_id']);
-
-} elseif ($action == 'rights_update') {
-///////////////////////////////////////////////////////////////////////////////
-  if (OBM_Acl_Utils::updateRights('contact', $params['entity_id'], $obm['uid'], $params)) {
-    $display['msg'] .= display_ok_msg($l_right_update_ok);
-  } else {
-    $display['msg'] .= display_warn_msg($l_of_right_err_auth);
-  }
-  $display['detail'] = dis_contact_right_dis_admin($params['entity_id']);
-
 } elseif ($action == 'admin') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_contact_admin_index();
@@ -462,6 +435,9 @@ function get_contact_params() {
   
   // Get contact specific params
   if (isset ($params['town'])) $params['town'] = get_format_town($params['town']);
+  if ((isset ($params['entity_id'])) && (! isset($params['contact_id']))) {
+    $params['contact_id'] = $params['entity_id'];
+  }
 
   get_global_params_document($params);
   
@@ -484,7 +460,7 @@ function get_contact_action() {
   global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_stats;
   global $l_header_consult, $l_header_display, $l_header_admin;
-  global $l_header_import,$l_header_export, $l_header_right;
+  global $l_header_import,$l_header_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   of_category_user_module_action('contact');
@@ -555,7 +531,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','detailupdate','check_delete', 'rights_admin', 'rights_update') 
+    'Condition'=> array ('detailconsult','detailupdate','check_delete') 
                                     		 );
 // Contact synchronisation
  $actions['contact']['sync']   = array (
@@ -707,20 +683,16 @@ function get_contact_action() {
     'Condition'=> array ('None') 
                                      	       );
 
+<<<<<<< .working
 // Rights Admin.
   $actions['contact']['rights_admin'] = array (
     'Name'     => $l_header_right,
-    'Url'      => "$path/contact/contact_index.php?action=rights_admin&amp;entity_id=".$params['contact_id'],
+    'Url'      => "$path/contact/contact_index.php?action=rights_admin&amp;entity_id=".$params['entity_id'],
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult','rights_update','rights_admin','detailupdate','update')
                                      );
-
-// Rights Update
-  $actions['contact']['rights_update'] = array (
-    'Url'      => "$path/contact/contact_index.php?action=rights_update&amp;entity_id=".$params['contact_id'],
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None')
-                                     );
+=======
+>>>>>>> .merge-right.r4302
 
 // Display
   $actions['contact']['display'] = array (
@@ -776,22 +748,25 @@ function update_contact_action() {
     // Check Delete
     $actions['contact']['check_delete']['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;contact_id=$id";
     $actions['contact']['check_delete']['Condition'][] = 'insert';
+<<<<<<< .working
 
     // Rights admin
     $actions['contact']['rights_admin']['Condition'][] = 'insert';
     $actions['contact']['rights_admin']['Url'] = "$path/contact/contact_index.php?action=rights_admin&amp;entity_id=".$id;
 
-    if (check_contact_update_rights($params)) {
-      // Detail Update
-      $actions['contact']['detailupdate']['Url'] = "$path/contact/contact_index.php?action=detailupdate&amp;contact_id=".$params['contact_id'];
-  
-      // Check Delete
-      $actions['contact']['check_delete']['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;contact_id=".$params['contact_id'];
-    } else {
-      $actions['contact']['detailupdate']['Condition'] = array('None');
-      $actions['contact']['check_delete']['Condition'] = array('None');
-    }
+//    if (check_contact_update_rights($params)) {
+//      // Detail Update
+//      $actions['contact']['detailupdate']['Url'] = "$path/contact/contact_index.php?action=detailupdate&amp;contact_id=".$params['contact_id'];
+//  
+//      // Check Delete
+//      $actions['contact']['check_delete']['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;contact_id=".$params['contact_id'];
+//    } else {
+//      $actions['contact']['detailupdate']['Condition'] = array('None');
+//      $actions['contact']['check_delete']['Condition'] = array('None');
+//    }
 
+=======
+>>>>>>> .merge-right.r4302
   }
 }
 

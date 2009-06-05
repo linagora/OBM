@@ -143,14 +143,6 @@ $cgp_default_right = array (
         'admin' => 0
       )
     ),
-  'contact' => array (
-      'public' => array(
-        'access' => 1,
-        'read' => 1,
-        'write' => 0,
-        'admin' => 0
-      )
-    ),
   'mailshare' => array (
       'public' => array(
         'access' => 1,

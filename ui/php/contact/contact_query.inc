@@ -548,6 +548,19 @@ function run_query_contact_insert($contact) {
     $entityid = of_entity_insert($GLOBALS['module'],$id);
     $contact['contact_id'] = $id;
 
+    // give admin rights on insert to current user
+    $contact['accept_access'] = array("data-user-$uid");
+    $contact['accept_read'] = array("data-user-$uid");
+    $contact['accept_write'] = array("data-user-$uid");
+    $contact['accept_admin'] = array("data-user-$uid");
+
+    $default_public_rights = OBM_Acl_Utils::getDefaultPublicRights('contact');
+    OBM_Acl::setPublicRights('contact', $id, $default_public_rights);
+    $default_rights = OBM_Acl_Utils::parseRightsParams($contact);
+    foreach ($default_rights['user'] as $user_id => $rights) {
+      OBM_Acl::setRights($user_id, 'contact', $id, $rights);
+    }
+
     if($priv == 1) {
       // Subscription support
       run_query_do_contact_sync($id, true);
@@ -1365,11 +1378,13 @@ function check_contact_update_rights($params, $c='') {
 //                  company_id, comp_new_id
 ///////////////////////////////////////////////////////////////////////////////
 function check_contact_data_form($cid, &$contact) {
-  global $perm, $cgp_show, $cright_write_admin;
+  global $perm, $obm, $cgp_show, $cright_write_admin, $action;
   global $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
   global $l_fill_lastname, $l_fill_company, $l_j_check_phone;
   global $l_j_check_hphone,$l_j_check_mphone, $l_j_check_fax, $l_j_check_email;
   global $err, $l_exist_error, $l_err_public_rights;
+
+  $user_id = $obm['uid'];
 
   if (!check_user_defined_rules('contact', $contact)) {
     return false;
