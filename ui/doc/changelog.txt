@@ -1,7 +1,7 @@
 <!-- $Id$ -->
 O.B.M. 2.2 Changelog
 
-version 2.2.4 - 2009-05-29
+version 2.2.5 - 2009-06-12
 
 To do
 
@@ -19,6 +19,23 @@ To do
  usergroup : agir lorsqu'archivage d'un user ?
 
 
+2009-06-12 : version 2.2.5
+
+  * Calendar, fixes in free/busy screen
+  * Improve compatibility with safari (handles safari bugs ;))
+  * #208 Display problems with some characters (accents,..)
+  * #246 People: JavaScript error on click on "Enregistrer l'utilisateur" button
+  * #247 People: JavaScript Error on submitting update form
+  * #268 Provide a report on collaborative part usage level for each user
+  * #303 SQL error when same user is invited in "User" and "Other participant"
+  * #301 Button generate is not localized
+  * #304 Host Search context lost when navigate on multiple search results page
+  * #305 SSO : adding lemonldap authentication mechanism
+  * #309 date navigation does not preserve attendee order in free/busy interface
+  * #312 obm-satellite does not update postfix maps since 2.2.4
+  * #315 host creation confirmation form losts some data
+  * #319 Contact: Phone, Mail, Address, IM, Website impossible to add
+
 2009-05-29 : version 2.2.4
 
   * Project : added search by creator delegation
@@ -34,7 +51,9 @@ To do
   * #228 Minig : UI always in english
   * #236 Domain Default groups not updated to SAMBA when domain updated to Samba
   * #238 Host: Remove samba domain attribute does not remove samba from Host
+  * #239 Samba domain properties need system global update
   * #249 (ok in 2.2.2) php include error in cronjob EventAlertCronJob
+  * #251 Minicalendar event date selector makes the bottom-left menu disappear
   * #257, 276 : Samba domain admin uidNumber to 0 fixed when updated
   * #259 Minig : Autocompletion only display displayName and not email
   * #261 Minig : Undo after drag and drop does not work
