@@ -168,7 +168,7 @@ function dis_chart_bar_multiple($chart) {
       $plot->label = $label;
     }
     $group->add($plot);
-    $group->legend->add($plot, $legends[$num_plot], LEGEND_BACKGROUND);
+    $group->legend->add($plot, utf8_decode($legends[$num_plot]), LEGEND_BACKGROUND);
   }
 
   $graph->add($group);
