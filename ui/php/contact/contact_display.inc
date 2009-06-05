@@ -79,23 +79,24 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     } else {
       $contact_lastname = $OD->data_set->f('contact_lastname');
     }
+    $res['name'] = $contact_lastname;
     if ($OD->display_ext == 'get_id') {
       $res['url'] = "javascript:check_contact_get_id(".$OD->data_set->f('contact_id').",'".phpStringToJsString($contact_lastname)."');";
     } else if ($OD->display_ext == 'get_id_url') {
       $res['url'] = "javascript:check_contact_get_id_url('$ext_url',".$OD->data_set->f('contact_id').");";
     } else {
       $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('contact_id');
+      // Prepend the sync link
+      if($GLOBALS['c_use_connectors']) {
+        $is_synched = run_query_is_contact_synched($OD->data_set->f('contact_id'));
+        $alt = $is_synched ? $l_desync : $l_sync;
+        $ico = $is_synched ? $ico_sync : $ico_desync;
+        $iis_synched = (int) $is_synched;
+        $res['name'] = "<a class=\"LF\" x-obm-sync=\"$iis_synched\" href=\"#\" onclick=\"Obm.Contact.syncContact(".$OD->data_set->f('contact_id').", this); return false;\" title=\"$alt\"><img src=\"$ico\" /></a>
+        &nbsp;<a href=\"$res[url]\">$res[name]</a>";
+        $res['url'] = '';
+      }
     }
-    $res['name'] = $contact_lastname;
-
-    // Prepend the sync link
-    $is_synched = run_query_is_contact_synched($OD->data_set->f('contact_id'));
-    $alt = $is_synched ? $l_desync : $l_sync;
-    $ico = $is_synched ? $ico_desync : $ico_sync;
-    $iis_synched = (int) $is_synched;
-    $res['name'] = "<a x-obm-sync=\"$iis_synched\" href=\"#\" onclick=\"Obm.Contact.syncContact(".$OD->data_set->f('contact_id').", this); return false;\" title=\"$alt\"><img src=\"$ico\" /></a>
-<a href=\"$res[url]\">$res[name]</a>";
-    $res['url'] = '';
   }
 
   else if (($fieldname == 'company_name') && $link_ok) {
@@ -831,25 +832,6 @@ function html_contact_header($co_q, $funcs) {
     $block_birthday
     $block_anniversary
     $block_mailing
-    </table>
-
-    &nbsp;
-    <h1>$l_exportation</h1>
-    <table>
-    <tr>
-      <th>$l_vcard</th>
-      <td>
-        <form method=\"get\" name=\"f_entity\" action=\"".url_prepare('contact_index.php')."\">
-        $vcard_button
-        </form>
-      </td>
-    </tr>
-    <tr>
-      <th>$l_sync_contact</th>
-      <td>
-        $sync_contact_button
-      </td>
-    </tr>
     </table>
 
     </div>

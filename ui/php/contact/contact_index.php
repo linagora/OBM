@@ -551,10 +551,11 @@ function get_contact_action() {
 
 // Vcard Export
   $actions['contact']['vcard'] = array (
+    'Name'     => $l_header_vcard,
     'Url'      => "$path/contact/contact_index.php?action=vcard&amp;popup=1&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_read,
     'Privacy'  => true,    
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailconsult','detailupdate','update','check_delete')    
                                        );
 
 // Detail Update

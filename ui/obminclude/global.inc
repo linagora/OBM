@@ -74,9 +74,10 @@ $cgp_cookie_domain = 'aliasource.local';
 // if the archive checkbox is checked search returns ONLY
 // archived results
 $cgp_archive_only = false;
-// authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
+// authentification : 'CAS' (SSO AliaSuite), 'LemonLDAP' (SS0) or 'standalone' (default)
 // CAS specific parameters are in conf/obm_conf.inc.
 $auth_kind = 'standalone'; 
+// $auth_kind = 'LemonLDAP';
 
 // Encyption used to store password : 'PLAIN', 'MD5' or 'CRYPT'
 $password_encryption = 'PLAIN';
@@ -522,6 +523,9 @@ if (! $cgp_use['property']['delegation']) {
 //---------------------------------------------------------------------------//
 if ($auth_kind == 'CAS') {
   $auth_class_name = 'CAS_Auth';
+} elseif (strcasecmp($auth_kind,'LemonLDAP') == 0) {
+  require_once dirname(__FILE__) . '/lib/LemonLDAP/package.inc';
+  $auth_class_name = 'LemonLDAP_Auth';
 } elseif ($auth_kind == 'standalone') {
   $auth_class_name = 'OBM_Challenge_Auth';
 } elseif ($auth_kind == 'ldap') {
@@ -941,10 +945,10 @@ function of_date_upd_format($date='', $null_empty=false) {
 function of_date_guess_format ($date) {
 
   $reg = array();
-  $reg['Y-m-d'] = "/^[0-9]{4}[-\/](0[1-9]|1[012])[-\/](0[1-9]|[1-2][0-9]|3[0-1])$/";
-  $reg['d/m/Y'] = "/^(1[3-9]|2[0-9]]|3[0-1])[-\/]?(0[1-9]|1[012])[-\/]?[0-9]{4}$/";
-  $reg['m/d/Y'] = "/^(0[1-9]|1[012])[-\/]?(1[3-9]|2[0-9]]|3[0-1])[-\/]?[0-9]{4}$/";
-  $reg['user'] = "/^(0[1-9]|1[012])[-\/]?(0[1-9]|1[012])[-\/]?[0-9]{4}$/";
+  $reg['Y-m-d'] = "/^[0-9]{4}[-\/]((0[1-9])|(1[012]))[-\/]((0[1-9])|([1-2][0-9])|(3[0-1]))$/";
+  $reg['d/m/Y'] = "/^((1[3-9])|(2[0-9])|(3[0-1]))[-\/]?((0[1-9])|(1[012]))[-\/]?[0-9]{4}$/";
+  $reg['m/d/Y'] = "/^((0[1-9])|(1[012]))[-\/]?((1[3-9])|(2[0-9])|(3[0-1]))[-\/]?[0-9]{4}$/";
+  $reg['user'] = "/^((0[1-9])|(1[012]))[-\/]?((0[1-9])|(1[012]))[-\/]?[0-9]{4}$/";
 
   foreach($reg as $format => $regexp) {
     if(preg_match($regexp,$date)) {

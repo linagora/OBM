@@ -43,7 +43,7 @@ page_open(array('sess' => 'OBM_Session', 'auth' => $auth_class_name, 'perm' => '
 if ($action == 'logout') {
   include("$obminclude/global_pref.inc");
   run_query_logout();
-  if($auth_kind == "CAS") {
+  if($auth_kind == "CAS" || strcasecmp($auth_kind,"LemonLDAP") == 0) {
     $auth->logout();
   }
   $sess->delete();

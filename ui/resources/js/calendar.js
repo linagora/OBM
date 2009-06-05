@@ -113,7 +113,7 @@ Obm.CalendarDayEventExtension = new Class({
   redraw: function() {
     hr = $(this.element.parentNode);
     this.element.setStyles({
-      'top':  hr.parentNode.getTop() + hr.getStyle('padding-top').toInt() + 'px',
+      'top':  hr.getParent().getTop() + hr.getStyle('padding-top').toInt() + 'px',
       'left': hr.getLeft() + 'px'
     });
     this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
@@ -365,7 +365,7 @@ Obm.CalendarDayEvent = new Class({
   resizeLine: function(lineElem) {
       if(!$(lineElem)) {
         var hr = $(this.options.type + '_' + this.origin);
-        var lineElem = hr.parentNode;
+        var lineElem = hr.getParent();
       }
       var thead = $(lineElem).getFirst();
       var size = 0;
@@ -373,8 +373,8 @@ Obm.CalendarDayEvent = new Class({
         if (thead.childNodes.length > size) size = thead.childNodes.length;
       } while (thead = thead.getNext());
       size = size * this.element.offsetHeight + 5;
-      if (hr.parentNode.offsetHeight != size) {
-        hr.parentNode.getElements('td').setStyle('height', size + 'px');
+      if (lineElem.offsetHeight != size) {
+        lineElem.getElements('td').setStyle('height', size + 'px');
         return true
       }        
       return false;
@@ -409,7 +409,7 @@ Obm.CalendarDayEvent = new Class({
   redraw: function() {
     hr = $(this.element.parentNode);
     this.element.setStyles({
-      'top':  hr.parentNode.getTop() + hr.getStyle('padding-top').toInt() + 'px',
+      'top':  hr.getParent().getTop() + hr.getStyle('padding-top').toInt() + 'px',
       'left': (hr.getLeft() + (hr.clientLeft || 0)) + 'px'
     });
     this.setWidth(this.size * (hr.clientWidth+1) - 1);
@@ -735,7 +735,7 @@ Obm.CalendarEvent = new Class({
   redraw: function() {
     hr = $(this.element.parentNode);
     this.element.setStyles({
-      'top':  hr.parentNode.getTop() + 'px',
+      'top':  hr.getParent().getTop() + 'px',
       'left': (hr.getLeft() + (hr.clientLeft || 0)) + 'px'      
     });
     this.setHeight(this.size * obm.calendarManager.defaultHeight);

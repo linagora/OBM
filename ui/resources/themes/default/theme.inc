@@ -184,6 +184,6 @@ $ico_folder_empty   = "$theme_path/ico_folder_empty.gif";
 $ico_file           = "$theme_path/ico_file.gif";
 
 // Contact Icons
-$ico_sync = $ico_mail;
-$ico_desync = $ico_web;
+$ico_sync           = "$theme_path/ico_sync.gif";
+$ico_desync         = "$theme_path/ico_unsync.gif";
  

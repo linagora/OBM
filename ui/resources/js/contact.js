@@ -92,13 +92,13 @@ Obm.Contact.IMWidget = new Class ({
           tag.setProperty('title', obm.vars.labels.sync);
           tag.setProperty('x-obm-sync', 0);
           if(tag.getElement('img'))
-            tag.getElement('img').setAttribute('src', obm.vars.images.sync);
+            tag.getElement('img').setAttribute('src', obm.vars.images.desync);
         } else {
           tag.setProperty('value', obm.vars.labels.desync);
           tag.setProperty('title', obm.vars.labels.desync);
           tag.setProperty('x-obm-sync', 1);
           if(tag.getElement('img'))
-            tag.getElement('img').setAttribute('src', obm.vars.images.desync);
+            tag.getElement('img').setAttribute('src', obm.vars.images.sync);
         }
       } else {
         showErrorMessage(response.message);

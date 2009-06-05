@@ -71,8 +71,8 @@ $l_exportation = "Export";
 $l_download_contact_card = "Download contact informations";
 $l_vcard = "Vcard";
 $l_sync_contact = "PDA synchronisation";
-$l_sync = "Subscirbe";
-$l_desync = "Unsubscribe";
+$l_sync = "Subscirbe for synchronisation";
+$l_desync = "Unsubscribe for synchronisation";
 
 // Messages
 $l_check_samecontact = "These contacts seem similar to this new entry !";
