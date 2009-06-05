@@ -13,11 +13,11 @@ $VERSION = '1.0';
 $debug = 1;
 
 use strict;
+require Net::LDAP;
 
 
 sub connectLdapSrv {
     my( $ldapSrv ) = @_;
-    use Net::LDAP;
 
     if( ref($ldapSrv->{'conn'}) eq 'Net::LDAP' ) {
         return 1;
@@ -75,8 +75,9 @@ sub connectLdapSrv {
 sub disconnectLdapSrv {
     my( $ldapSrv ) = @_;
 
-    if( defined($ldapSrv->{"conn"}) ) {
-        $ldapSrv->{"conn"}->unbind();
+    if( defined($ldapSrv->{'conn'}) ) {
+        $ldapSrv->{'conn'}->unbind();
+        $ldapSrv->{'conn'} = undef;
     }
 
     return 1;
@@ -85,9 +86,6 @@ sub disconnectLdapSrv {
 
 sub ldapSearch {
     my( $ldapSrv, $ldapEntries, $ldapFilter, $ldapAttributes ) = @_;
-    use Unicode::MapUTF8 qw(to_utf8 from_utf8 utf8_supported_charset);
-    use Net::LDAP::Util qw(escape_filter_value);
-    require Net::LDAP;
 
     if( !defined($ldapSrv->{conn}) ) {
         return 1;
@@ -104,7 +102,7 @@ sub ldapSearch {
 
     my $ldapResult = $ldapConn->search(
         base => $ldapSrv->{"base"},
-        filter => to_utf8( { -string => $ldapFilter, -charset => "ISO-8859-1"} ),
+        filter => $ldapFilter,
         scope => "sub",
         attrs => $ldapAttributes
     );
