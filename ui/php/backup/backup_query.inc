@@ -126,7 +126,7 @@ function run_query_backup_restore($filename) {
 
       // We exclude POSTGRES meta table (sql_xxxx)
       if (! (substr($table, 0, 4) == 'sql_')) {
-	$query = "DELETE FROM $table";
+	$query = "DROP TABLE $table CASCADE";
 	$obm_q->query($query);
       }
       $i++;
@@ -141,9 +141,8 @@ function run_query_backup_restore($filename) {
     //    exec($cmd, $output, $ret);
 
     //    $cmd = "pg_restore $disk_fullname | psql -U $obmdb_user $obmdb_db";
-    $cmd = "psql -U $obmdb_user $obmdb_db < $disk_fullname";
+    $cmd = "psql -U $obmdb_user $obmdb_db < $disk_fullname ";
     exec($cmd, $output, $ret);
-
   } else {
     $err['msg'] = "$l_err_unknown_db ($obmdb_dbtype)";
     return false;

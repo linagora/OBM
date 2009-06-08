@@ -161,10 +161,11 @@ function run_query_user_search($user) {
     switch($exp_op) {
       case '>':
       case '<':
+      case '=':
         $where .= " $diff $exp_op $exp";
         break;
       default :
-        $where .= " $diff = $exp";
+        $where .= " $diff < $exp";
         break;
     }    
   }
