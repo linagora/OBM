@@ -157,6 +157,7 @@ function run_query_user_search($user) {
 
 	// if a time of expiration has been specified, get it  
   if (trim($exp) != '') {
+    $exp = sql_parse_int($exp);
     if (trim($where) != '') $where .= ' AND';
     switch($exp_op) {
       case '>':
@@ -185,12 +186,14 @@ function run_query_user_search($user) {
   }
 
   if (trim($date_begin) != '') {
+    $date_begin = new Of_Date($date_begin);
     if (trim($where) != '') $where .= ' AND';
-    $where .= " userobm_datebegin = $date_begin";
+    $where .= " userobm_datebegin = '".$date_begin->getDateIso()."'";
   }
 
   // If a quota indication has been specified, get it
   if (trim($quota) != '') {
+    $quota = sql_parse_int($quota);
     if (trim($where) != '') $where .= ' AND';
     switch($quota_op) {
       case '>':

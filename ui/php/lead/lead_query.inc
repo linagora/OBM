@@ -72,11 +72,13 @@ function run_query_lead_search($params) {
     $where .= " $and lead_$date_field is NULL";
   } else {
     if ($date_after) {
-      $where .= " $and lead_$date_field >= '$date_after'";
+      $date_after = new Of_Date($date_after);
+      $where .= " $and lead_$date_field >= '".$date_after->getDateIso()."'";
       $and = 'AND';
     }
     if ($date_before) {
-      $where .= " $and lead_$date_field <= '$date_before'";
+      $date_before = new Of_Date($date_before);
+      $where .= " $and lead_$date_field <= '".$date_before->getDateIso()."'";
       $and = 'AND';
     }
   }

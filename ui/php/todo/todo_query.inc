@@ -50,10 +50,12 @@ function run_query_todo_search($params) {
     $where .= " AND eventlink_percent = '$percent'";
   }
   if ($dateafter != '') {
-    $where .= " AND event_$date_field > '$dateafter'";
+    $dateafter = new Of_Date($dateafter);
+    $where .= " AND event_$date_field > '".$dateafter->getDateIso()."'";
   }
   if ($datebefore != '') {
-    $where .= " AND event_$date_field < '$datebefore'";
+    $datebefore = new Of_Date($datebefore);
+    $where .= " AND event_$date_field < '".$datebefore->getDateIso()."'";
   }
 
   $fromq = 'FROM EventLink

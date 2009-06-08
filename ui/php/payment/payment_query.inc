@@ -55,11 +55,13 @@ function run_query_payment_search($payment) {
     $and = 'AND';
   }
   if ($date_after) {
-    $where .= " $and payment_date >= '$date_after'";
+    $date_after = new Of_Date($date_after);
+    $where .= " $and payment_date >= '".$date_after->getDateIso()."'";
     $and = 'AND';
   }
   if ($date_before) {
-    $where .= " $and payment_date <= '$date_before'";
+    $date_before = new Of_Date($date_before);
+    $where .= " $and payment_date <= '".$date_before->getDateIso()."'";
     $and = 'AND';
   }
   if (($inout != '') && ($inout != "$c_all")) {

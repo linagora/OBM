@@ -113,10 +113,12 @@ function run_query_deal_search($deal, $all='') {
     $where .= " AND deal_status_id $status"; 
   }
   if ($date_after != '') {
-    $where .= " AND deal_$date_field > '$date_after'";
+    $date_after = new Of_Date($date_after);
+    $where .= " AND deal_$date_field > '".$date_after->getDateIso()."'";
   }
   if ($date_before != '') {
-    $where .= " AND deal_$date_field < '$date_before'";
+    $date_before = new Of_Date($date_before);
+    $where .= " AND deal_$date_field < '".$date_before->getDateIso()."'";
   }
   if ($archive != '1') {
     $where .= " AND deal_archive=0";

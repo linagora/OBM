@@ -344,6 +344,7 @@ function html_user_search_form($user) {
   $popup = $user['popup'];
   $next_action = $user['next_action'];
   $user_action = $user['action'];
+  $datebegin = $user['datebegin'];
 
   $delegation_target = $user['delegation_target'];
   $mail_server_host_name = $user['mail_server_host_name'];
@@ -505,7 +506,7 @@ function html_user_search_form($user) {
   }
   if($display_pref['datebegin']['status'] != 0) {
     $block .= "<label class=\"NW\">$l_datebegin<br />
-      <input class=\"datePicker\" type=\"text\" value=\"\" name=\"tf_datebegin\" autocomplete=\"off\"/>
+      <input class=\"datePicker\" type=\"text\"  name=\"tf_datebegin\" value=\"$datebegin\" autocomplete=\"off\"/>
     </label>
                 ";
   }

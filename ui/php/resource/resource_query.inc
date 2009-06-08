@@ -77,17 +77,19 @@ function run_query_resource_search($resource) {
   // If a resource type has been specified, get it
   if (!empty($rtype)) {
     $rtype = sql_parse_id($rtype, true);
-     $where .= " AND resource_rtype_id $rtype ";   
+    $where .= " AND resource_rtype_id $rtype ";   
   }
 
   // If a quantity sup has been specified, get it
   if ($qtysup != '') {
-     $where .= " AND resource_qty<='$qtysup'";   
+    $qtysup = sql_parse_int($qtyinf);
+    $where .= " AND resource_qty<='$qtysup'";   
   }
 
   // If a quantity inf has been specified, get it
   if ($qtyinf != '') {
-     $where .= " AND resource_qty>='$qtyinf'";   
+    $qtyinf = sql_parse_int($qtyinf);
+    $where .= " AND resource_qty>='$qtyinf'";   
   }
 
 

@@ -101,13 +101,15 @@ function run_query_company_search($company) {
   }  
   
   if ($dateafter != '') {
-    $where .= " $and (company_timeupdate > '$dateafter'
-                     OR company_timecreate > '$dateafter')";
+    $dateafter = new Of_Date($dateafter);
+    $where .= " $and (company_timeupdate > '".$dateafter->getDateIso()."'
+                     OR company_timecreate > '".$dateafter->getDateIso()."')";
     $and = 'AND';
   }
   if ($datebefore != '') {
-    $where .= " $and (company_timeupdate < '$datebefore'
-                     AND company_timecreate < '$datebefore')";
+    $datebefore = new Of_Date($datebefore);
+    $where .= " $and (company_timeupdate < '".$datebefore->getDateIso()."'
+                     AND company_timecreate < '".$datebefore->getDateIso()."')";
     $and = 'AND';
   }
 

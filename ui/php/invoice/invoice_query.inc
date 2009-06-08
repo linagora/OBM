@@ -83,10 +83,12 @@ function run_query_invoice_search ($invoice) {
     $where .= " AND invoice_status_id = $status ";
   }
   if ($date_after != '') {
-    $where .= " AND invoice_$date_field >= '$date_after'";
+    $date_after = new Of_Date($date_after);
+    $where .= " AND invoice_$date_field >= '".$date_after->getDateIso()."'";
   }
   if ($date_before != '') {
-    $where .= " AND invoice_$date_field <= '$date_before'";
+    $date_before = new Of_Date($date_before);
+    $where .= " AND invoice_$date_field <= '".$date_before->getDateIso()."'";
   }
   if (($inout != '') && ($inout != "$c_all")) {
     $where .= " AND invoice_inout = '$inout'";

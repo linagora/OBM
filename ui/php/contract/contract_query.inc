@@ -89,11 +89,15 @@ function run_query_contract_search($contract) {
     $where .= " AND (contract_contact1_id $contact_id 
                      OR contract_contact2_id $contact_id)"; 
   }
-  if ($dateafter != "")
-    $where .= " AND (contract_dateexp >= '$dateafter')";
+  if ($dateafter != "") {
+    $dateafter = new Of_Date($dateafter);
+    $where .= " AND (contract_dateexp >= '".$dateafter->getDateIso()."')";
+  }
 
-  if ($datebefore != "")
-    $where .= " AND (contract_dateexp <= '$datebefore')";
+  if ($datebefore != "") {
+
+    $where .= " AND (contract_dateexp <= '".$datebefore->getDateIso()."')";
+  }
 
   if ($label != "")
     $where .= " AND (contract_label $like '%$label%')";

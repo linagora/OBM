@@ -45,7 +45,8 @@ function run_query_publication_search($publication) {
     $and = 'AND';
   }
   if ($year != '') {
-    $where .= " $and publication_year $like '$year%'";
+    $year = sql_parse_int($year);
+    $where .= " $and publication_year = '$year'";
     $and = 'AND';
   }
   if ($lang != '') {

@@ -71,10 +71,12 @@ function run_query_incident_search($incident) {
     $where .=" AND (Incident.incident_logger $logger ) ";
   }
   if ($dateafter !='') {
-    $where .=" AND (Incident.incident_date >= '$dateafter') ";
+    $dateafter = new Of_Date($dateafter);
+    $where .=" AND (Incident.incident_date >= '".$dateafter->getDateIso()."') ";
   }
   if ($datebefore !='') {
-    $where .=" AND (Incident.incident_date <= '$datebefore') ";
+    $datebefore = new Of_Date($datebefore);
+    $where .=" AND (Incident.incident_date <= '".$datebefore->getDateIso()."') ";
   }
   if ($contract_id != '') {
     $contract_id = sql_parse_id($contract_id, true);
