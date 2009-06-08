@@ -971,7 +971,7 @@ function of_date_guess_format ($date) {
  * @access public
  * @return void
  */
-function of_isodate_convert($date, $null_empty=false) {
+function of_isodate_convert($date, $null_empty=false, $strict=false) {
   global $c_php_isodate_format;
 
   if ($date) {
@@ -1006,6 +1006,9 @@ function of_isodate_convert($date, $null_empty=false) {
     break;
     
   default :
+    if($strict) {
+      $date = false;
+    }
   } 
   return $date;
 }

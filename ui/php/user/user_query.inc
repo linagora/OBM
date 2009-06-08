@@ -458,8 +458,10 @@ function run_query_user_insert($user) {
   $archive = sql_parse_int($user['archive']);
   $hidden = sql_parse_int($user['hidden']);
   $kind = $user['kind'];
-  $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
-  $dateexp = ($user['dateexp'] ? "'".of_isodate_convert($user['dateexp'])."'" : 'null');
+  $datebegin = of_isodate_convert($user['datebegin'], true, true);
+  $dateexp = of_isodate_convert($user['dateexp'], true, true);
+  $datebegin = ($datebegin ? "'".($user['datebegin'])."'" : 'null');
+  $dateexp = ($dateexp ? "'".($user['dateexp'])."'" : 'null');
   $lname = $user['lastname'];
   $fname = $user['firstname'];
   $title = $user['title'];
@@ -798,8 +800,10 @@ function run_query_user_update($u_id, $user) {
   $gid = $user['gid'];
   $profile = $user['profile'];
   $archive = sql_parse_int($user['archive']);
-  $datebegin = ($user['datebegin'] ? "'".of_isodate_convert($user['datebegin'])."'" : 'null');
-  $dateexp = (($user['dateexp'] && !$user['noexperie']) ? "'".of_isodate_convert($user['dateexp'])."'" : 'null');
+  $datebegin = of_isodate_convert($user['datebegin'], true, true);
+  $dateexp = of_isodate_convert($user['dateexp'], true, true);
+  $datebegin = ($datebegin ? "'".($user['datebegin'])."'" : 'null');
+  $dateexp = ($dateexp ? "'".($user['dateexp'])."'" : 'null');  
   $hidden = sql_parse_int($user['hidden']);
   $kind = $user['kind'];
   $lname = $user['lastname'];

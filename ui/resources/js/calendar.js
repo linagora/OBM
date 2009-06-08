@@ -582,7 +582,7 @@ Obm.CalendarEvent = new Class({
     this.resizeHandler = new Element('div')
       .addClass(this.event.klass)
       .addClass('handle')
-      .injectInside(this.element);
+      .injectInside(this.element)
     
     }
 
