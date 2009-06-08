@@ -4146,7 +4146,7 @@ function dis_calendar_free_interval($calendar) {
  * @return mixed xhtml display
  */
 function dis_calendar_right_dis_admin($id='') {
-  global $obm, $display, $l_calendar, $l_rights_on_my, $l_rights_my_on;
+  global $obm, $display, $l_rights, $l_calendar, $l_rights_on_my, $l_user_right;
 
   if ($id == '') {
     $id = $obm['uid'];
@@ -4154,7 +4154,12 @@ function dis_calendar_right_dis_admin($id='') {
   $infos = get_user_info($id);
   $name = $infos['firstname'] . ' ' . $infos['lastname'];
   $display['title'] = $name;
-  $block = "<h1>$l_rights_on_my</h1>";
+
+  if ($id == $obm['uid']) {
+    $block = "<h1>$l_rights_on_my</h1>";
+  } else {
+    $block = "<h1>$l_user_right $name</h1>";
+  }
   $block .= of_right_dis_admin('calendar', $id);
 //  $block .= "<h1>$l_rights_my_on</h1>";
 //
