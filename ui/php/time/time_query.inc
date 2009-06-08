@@ -925,6 +925,8 @@ function run_query_time_ra_projects($time) {
 function run_query_time_used_tasktype($uid = 0) {
   global $cdg_sql, $ctt_sales, $ctt_research, $ctt_others;
 
+  $multidomain = sql_multidomain('tasktype');
+
   if ($uid) {
     $query = "
       SELECT DISTINCT TaskType.*
@@ -943,7 +945,7 @@ function run_query_time_used_tasktype($uid = 0) {
     $query = "
       SELECT TaskType.*
       FROM TaskType
-      WHERE tasktype_internal='$ctt_others'
+      WHERE tasktype_internal='$ctt_others' $multidomain
       ORDER BY tasktype_internal, tasktype_label";
 
     display_debug_msg($query, $cdg_sql, 'run_query_time_used_tasktype');
@@ -956,6 +958,7 @@ function run_query_time_used_tasktype($uid = 0) {
     $query = "
       SELECT *
       FROM TaskType
+      WHERE 1=1 $multidomain
       ORDER BY tasktype_internal, tasktype_label";
 
     display_debug_msg($query, $cdg_sql, 'run_query_time_used_tasktype');
