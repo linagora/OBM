@@ -167,6 +167,7 @@ class Of_Date extends DateTime {
   public function __construct($time=null, $timezone=null) {
     self::loadOptions();
     if(is_numeric($time)) {
+      $time = ceil($time);
       $time = "@$time";
     }
     if(empty($time)) {

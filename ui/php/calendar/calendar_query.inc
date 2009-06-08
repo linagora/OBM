@@ -2510,6 +2510,9 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
+  $timeupdate = sql_date_format($db_type, 'event_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'event_timecreate', 'timecreate');
+
   $multidomain = sql_multidomain('event');
   if ($category_filter != '') {
     $filter = " AND eventcategory1_id = '$category_filter' ";
@@ -2525,6 +2528,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
     && (count($calendar_entity['user']) > 0) ) {
       $select[] =  "SELECT
         event_id,
+        $timeupdate,
+        $timecreate,
         event_ext_id,
         event_title,
         event_privacy,
@@ -2564,6 +2569,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
     && (count($calendar_entity['resource']) > 0) ) {
       $select[] =  "SELECT
         event_id,
+        $timeupdate,
+        $timecreate,
         event_ext_id,
         event_title,
         event_privacy,
@@ -2604,6 +2611,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
 
       $select[] = "SELECT
         event_id,
+        $timeupdate,
+        $timecreate,
         event_ext_id,
         event_title,
         event_privacy,
@@ -2659,6 +2668,9 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
+  $timeupdate = sql_date_format($db_type, 'event_timeupdate', 'timeupdate');
+  $timecreate = sql_date_format($db_type, 'event_timecreate', 'timecreate');
+
   $multidomain = sql_multidomain('event');
   if ($category_filter != '') {
     $filter = " AND eventcategory1_id = '$category_filter' ";
@@ -2674,6 +2686,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     && (count($calendar_entity['user']) > 0) ) {
       $select[] =  "SELECT
         event_id,
+        $timeupdate,
+        $timecreate,
         event_ext_id,
         event_title,
         event_privacy,
@@ -2717,6 +2731,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
     && (count($calendar_entity['resource']) > 0) ) {
       $select[] = "SELECT
         event_id,
+        $timeupdate,
+        $timecreate,
         event_ext_id,
         event_title,
         event_privacy,
@@ -2761,6 +2777,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
 
       $select[] = "SELECT
         event_id,
+        $timeupdate,
+        $timecreate,
         event_ext_id,
         event_title,
         event_privacy,

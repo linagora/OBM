@@ -90,6 +90,14 @@ class Vcalendar_Reader_OBM {
 
   function & addVevent(&$data) {
     $vevent = &$this->document->createElement('vevent');
+    $created = $this->parseDate($data['timecreate']);
+    $created->setOriginalTimeZone($data['event_timezone']);
+    $vevent->set('created', $created);
+
+    $last_modified = $this->parseDate($data['timeupdate']);
+    $last_modified->setOriginalTimeZone($data['event_timezone']);
+    $vevent->set('last-modified', $last_modified);
+
     $dtstart = $this->parseDate($data['event_date']);
     $dtstart->setOriginalTimeZone($data['event_timezone']);
     $vevent->set('dtstart', $dtstart);

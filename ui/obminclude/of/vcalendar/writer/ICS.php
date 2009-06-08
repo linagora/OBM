@@ -88,6 +88,16 @@ class Vcalendar_Writer_ICS {
     $this->writeBoundDate($name, $value);
   }
 
+  function writeCreated($name, $value) {
+    $this->buffer .= $this->parseProperty($this->parseName($name). ":".$this->parseDate($value));
+    $this->buffer .= "\r\n";      
+  }
+
+  function writeLastModified($name, $value) {
+    $this->buffer .= $this->parseProperty($this->parseName($name). ":".$this->parseDate($value));
+    $this->buffer .= "\r\n";      
+  }
+
   function writeOrganizer($name, $value) {
     $userInfo = get_user_info($value);
     $params[] = $this->parseName('x-obm-id').'='.$value;
