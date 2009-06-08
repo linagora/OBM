@@ -137,13 +137,13 @@ function check_resource(form) {
             // Get the label associated to the id from the int_form row
             // hidden in an hidden span
   	        span = get_elem(window.document, id);
-            window.opener.obm.calendarFreeBusy.addAttendee(id);
   	        if (container == '' || container == 'div') {
   	          of_select_add_element(window.opener.document, '$params[ext_element]', id, span.innerHTML);
             }
             if (container == 'table') {
               of_select_add_element_table(window.opener.document, '$params[ext_element]', id, span.innerHTML);
             }
+            window.opener.obm.calendarFreeBusy.addAttendee(id);
           }
         }
       }
