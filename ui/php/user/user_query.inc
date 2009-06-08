@@ -1708,7 +1708,7 @@ function check_user_data_form($p_id, &$user) {
     return false;
   }
 
-  if ($cgp_use['service']['mail']) {
+  if ($cgp_use['service']['mail']  && $mail_perms == 1) {
     // User email addresses (only the name before @)
     if ($email != '') {
       $um = array();

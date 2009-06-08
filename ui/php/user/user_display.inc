@@ -1692,7 +1692,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <table id=\"userExternalMail\" class='$externalKlass'>
     <tr>
       <th class=\"$class[email]\">$l_email</th>
-      <td><input type=\"text\" name=\"ta_email\" $externalEnabled value=\"$email\" /></td>
+      <td><input type=\"text\" name=\"ta_email\" $externalEnabled value=\"".((!$mail_state)?$email:'')."\" /></td>
     </tr>  
   </table>
   <script type='text/javascript'>

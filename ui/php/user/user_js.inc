@@ -241,12 +241,13 @@ function switch_mail_mode() {
     internal.injectInside($('userMail'));
 
   } else {
-    $('userMailHome').set('html','');
-    add_email_field(aliasSelectTemplate); 
-    show_hide_add_button();    
+    //$('userMailHome').set('html','');
+    //add_email_field(aliasSelectTemplate); 
+    //show_hide_add_button();    
     internal.dispose();
     internal.addClass('H');
     external.removeClass('H');
+    external.getElement('input').setProperty('disabled',false);
     external.injectInside($('userMail'));
   }
 }
