@@ -3680,7 +3680,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
     }
   }
 
-  $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+  $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id&amp;filter_entity=calendar&amp;filter_pattern=access";
   $user_add_button = "
     <a href=\"javascript: return false;\"
       onclick=\"popup('$url','');
@@ -3697,6 +3697,7 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
       $dis_sel_user
     </td>";
     $user_js = "
+    new obm.AutoComplete.Search('$path/people/people_index.php?action=ext_search', 'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});
     new obm.AutoComplete.Search('$path/people/people_index.php?action=ext_search', 'sel_user_id', 'userSearch');
     new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
 
