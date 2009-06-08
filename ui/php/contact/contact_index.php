@@ -460,7 +460,7 @@ function get_contact_action() {
   global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_stats;
   global $l_header_consult, $l_header_display, $l_header_admin;
-  global $l_header_import,$l_header_export;
+  global $l_header_import,$l_header_export, $l_header_vcard;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   of_category_user_module_action('contact');
