@@ -95,7 +95,7 @@ function run_query_contract_search($contract) {
   }
 
   if ($datebefore != "") {
-
+    $datebefore = new Of_Date($datebefore);
     $where .= " AND (contract_dateexp <= '".$datebefore->getDateIso()."')";
   }
 
