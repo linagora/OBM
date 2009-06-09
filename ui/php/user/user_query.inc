@@ -460,8 +460,8 @@ function run_query_user_insert($user) {
   $kind = $user['kind'];
   $datebegin = of_isodate_convert($user['datebegin'], true, true);
   $dateexp = of_isodate_convert($user['dateexp'], true, true);
-  $datebegin = ($datebegin ? "'".($user['datebegin'])."'" : 'null');
-  $dateexp = ($dateexp ? "'".($user['dateexp'])."'" : 'null');
+  $datebegin = ($datebegin ? "'".($datebegin)."'" : 'null');
+  $dateexp = ($dateexp ? "'".($dateexp)."'" : 'null');
   $lname = $user['lastname'];
   $fname = $user['firstname'];
   $title = $user['title'];
@@ -802,8 +802,8 @@ function run_query_user_update($u_id, $user) {
   $archive = sql_parse_int($user['archive']);
   $datebegin = of_isodate_convert($user['datebegin'], true, true);
   $dateexp = of_isodate_convert($user['dateexp'], true, true);
-  $datebegin = ($datebegin ? "'".($user['datebegin'])."'" : 'null');
-  $dateexp = ($dateexp ? "'".($user['dateexp'])."'" : 'null');  
+  $datebegin = ($datebegin ? "'".($datebegin)."'" : 'null');
+  $dateexp = ($dateexp ? "'".($dateexp)."'" : 'null');  
   $hidden = sql_parse_int($user['hidden']);
   $kind = $user['kind'];
   $lname = $user['lastname'];
