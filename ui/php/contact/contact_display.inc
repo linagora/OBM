@@ -852,7 +852,7 @@ function html_contact_view_main($co_q, $coords) {
   global $l_service, $l_coord, $l_town, $l_country;
   global $l_expresspostal, $l_comment1, $l_comment2, $l_comment3;
   global $l_email, $l_email_other, $l_mailing_ok, $l_newsletter;
-  global $ico_clipboard, $l_copy, $l_yes, $l_no,  $ico_mail;
+  global $ico_clipboard, $l_copy, $l_yes, $l_no, $ico_mail;
   global $display, $cgp_show, $cgp_hide, $cclipboard_address;
   global $l_company;
 

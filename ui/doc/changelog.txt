@@ -36,6 +36,7 @@ To do
   * #305 SSO : adding lemonldap authentication mechanism
   * #308 Inconsistent results "add user/contact" from ajax/popup on meeting form
   * #309 date navigation does not preserve attendee order in free/busy interface
+  * #311 update.pl wait on TLS and LDAPS when automate write a big entry
   * #312 obm-satellite does not update postfix maps since 2.2.4
   * #315 host creation confirmation form losts some data
   * #319 Contact: Phone, Mail, Address, IM, Website impossible to add
