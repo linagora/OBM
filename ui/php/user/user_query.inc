@@ -1027,14 +1027,14 @@ function run_query_user_update($u_id, $user) {
         if ($retour) {
           $parameters = " --unix";
 
-          if ($user['smb_perms'] && ($cgp_use['service']['samba'] || $password_encryption != "PLAIN")) {
+          if ($user['smb_perms'] && ($cgp_use['service']['samba'] || $password_encryption != 'PLAIN')) {
             $parameters .= " --samba";
           }
 
           if ($parameters) {
             $cmd = $cmd_ldap_passwd.$parameters." --login ".$user['login']." --domain-id ".$user_domain." --no-old --passwd '".$passwd."'";
 
-            display_debug_msg($cmd, $cdg_exe, "run_query_password_update()");
+            display_debug_msg($cmd, $cdg_exe, 'run_query_password_update()');
             exec($cmd);
           }
         }
@@ -1892,7 +1892,7 @@ function check_user_data_form($p_id, &$user) {
       $err['field'] = 'delegation_target';
       return false;
     }
-  }         
+  }
 
   // Check the phones and faxes number are not the same
   if (!check_user_phone_fax($user)) {

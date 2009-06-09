@@ -1378,7 +1378,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_delete_userobmphoto;
   global $cuser_default_quota, $l_enable_auto_vacation;
 
-  // Check if domain is a samba domain
+  // Check if domain is a samba domain and flag it for further info
   $samba_domain = false;
   if ($cgp_use['service']['samba']) {
     $props = of_entity_get_service_property('domain', $obm['domain_id']);
@@ -1409,7 +1409,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     $desc = $usr_q->f('userobm_description');
     $datebegin = of_date_upd_format($usr_q->f('datebegin'),true);
     $dateexp = of_date_upd_format($usr_q->f('dateexp'),true);
-    if(isset($dateexp)){$noexperie = '';};
+    if (isset($dateexp)){$noexperie = '';};
     $archive = ($usr_q->f('userobm_archive') == '1' ? ' checked' : '');
     $hidden = ($usr_q->f('userobm_hidden') == '1' ? ' checked' : '');
     $photo_id = $usr_q->f('userobm_photo_id');
@@ -1458,7 +1458,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     // vacation
     $vacation_datebegin = new Of_Date($usr_q->f('userobm_vacation_datebegin'), 'GMT');
     $vacation_dateend = new Of_Date($usr_q->f('userobm_vacation_dateend'), 'GMT');
-    if(!$vacation_datebegin->error()) {
+    if (!$vacation_datebegin->error()) {
       $auto_enable = true;
     } else {
       $vacation_datebegin->addHour(1)->setMinute(0)->setSecond(0);
@@ -1486,6 +1486,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
       $smb = get_samba_info();
       $smb_home = $smb['samba_home_def'];
       $smb_home_drive = $smb['samba_home_drive_def'];
+      $smb_perms = 1;
     }
     $mail_quota = $cuser_default_quota;
   }
@@ -1565,7 +1566,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   if (isset($vacation["auto_enable"])) {$auto_enable = $vacation["auto_enable"]; }
 
   $block_userdata = of_userdata_dis_entity_form('user', $id, $user);
-  if($auto_enable) {
+  if ($auto_enable) {
     $schedule_enable = "checked=\"checked\"";
   } else {
     $schedule_disabled = "disabled=\"disabled\"";
@@ -1600,18 +1601,29 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </tr>";
   }
 
-  // Default group select
-  $sel_gid = "<select name=\"sel_gid\" id=\"sel_gid\">";
-  if (is_array($groups)) {
-    foreach($groups as $g_id => $one_group) {
-      $g_gid = $one_group['gid'];
-      $sel_gid .= "\n<option value=\"$g_gid\"";
-      if ($g_gid == $gid) { $sel_gid .= " selected=\"selected\""; }
-      $sel_gid .= ">".$one_group['name']."</option>";
-    }
-  }
-  $sel_gid .= "</select>";
 
+  // User GID automatically set on insert (so display only on update)
+  if (($action == 'detailupdate') || ($action == 'update')) {
+
+    // Default group select
+    $sel_gid = "<select name=\"sel_gid\" id=\"sel_gid\">";
+    if (is_array($groups)) {
+      foreach($groups as $g_id => $one_group) {
+	$g_gid = $one_group['gid'];
+	$sel_gid .= "\n<option value=\"$g_gid\"";
+	if ($g_gid == $gid) { $sel_gid .= " selected=\"selected\""; }
+	$sel_gid .= ">".$one_group['name']."</option>";
+      }
+    }
+    $sel_gid .= "</select>";
+
+    $dis_gid = "
+  <tr>
+    <th class=\"$class[gid]\">$l_gid</th>
+    <td>$sel_gid
+    </td>
+  </tr>";
+  }
 
   // Section Web
   if ($cgp_use['service']['web']) {
@@ -2121,11 +2133,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     <td><input name=\"cba_hidden\" type=\"checkbox\" value=\"1\" $hidden /></td>
   </tr>
   $dis_archive
-  <tr>
-    <th class=\"$class[gid]\">$l_gid</th>
-    <td>$sel_gid
-    </td>
-  </tr>
+  $dis_gid
   <tr>
     <th class=\"$class[profile]\">$l_profile</th>
     <td><select name=\"sel_profile\" onchange='showDelegation(this);'>

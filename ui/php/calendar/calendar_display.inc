@@ -4164,6 +4164,7 @@ function dis_calendar_right_dis_admin($id='') {
 //  $block .= "<h1>$l_rights_my_on</h1>";
 //
 //  $allowed = OBM_Acl::getAllowedEntities($id, 'calendar', 'access');
+  //  $allowed = OBM_Acl::getRights($id, 'calendar', null);
 // Get all actions for this ? update getactionclause() ?
 //  print_r($allowed);
 

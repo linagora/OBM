@@ -280,7 +280,7 @@ class OBM_Acl {
     }
     return $rights;
   }
-  
+
   public static function getPublicRights($entityType, $entityId) {
     $columns = self::getRightColumns();
     $rights = self::getDefaultRights();
@@ -368,7 +368,7 @@ class OBM_Acl {
     }
     return $consumers;
   }
-  
+
   /**
    * Return entities on which the user is authorized to perform an action
    * 
@@ -454,7 +454,7 @@ class OBM_Acl {
     self::$db->query($delete);
     self::$db->query($insert);
   }
-  
+
   public static function getAclQuery($columns, $entityType, $entityId = null, $userId = null, $action = null, 
                                      $additionalJoins = '', $unions = '', $includePublicEntities = true, $includeGroups = true) {
     $entityTable = self::getEntityTable($entityType);
