@@ -296,6 +296,8 @@ function run_query_contact_detail($p_id) {
   $timecreate = sql_date_format($db_type, 'contact_timecreate', 'timecreate');
   $lang = get_lang();
   $date = sql_date_format($db_type, 'contact_date', 'contact_date');
+  $birthday = sql_date_format($db_type, 'bd.event_date', 'contact_birthday');
+  $anniversary = sql_date_format($db_type, 'an.event_date', 'contact_anniversary');
   $multidomain = sql_multidomain('contact');
 
   if ($cgp_show['module']['company']) {
@@ -318,8 +320,8 @@ function run_query_contact_detail($p_id) {
     contactfunction_label,
     datasource_name,
     $date,
-    bd.event_date as contact_birthday,
-    an.event_date as contact_anniversary,
+    $birthday,
+    $anniversary,
     contact_birthday_id,
     contact_anniversary_id,
     c.userobm_login as usercreate,

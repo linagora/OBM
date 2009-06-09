@@ -1175,13 +1175,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     
     if ($co_q->f('contact_birthday')) {
       $birthday = $co_q->f('contact_birthday');
-      $birthday = new Of_Date($birthday, 'GMT');
-      $birthday = $birthday->getOutputDate();
+      $birthday = of_date_upd_format($birthday, true);
+
     }
     if ($co_q->f('contact_anniversary')) {
       $anniversary = $co_q->f('contact_anniversary');
-      $anniversary = new Of_Date($anniversary, 'GMT');
-      $anniversary = $anniversary->getOutputDate();
+      $anniversary = of_date_upd_format($anniversary, true);
     }
     
     $lname = $co_q->f('contact_lastname');
