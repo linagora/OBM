@@ -354,6 +354,7 @@ function add_email_field() {
 }
 
 function submitWaiting(form) {
+  form = $(form);
   form.getElement('input[name=owner_notification]').value = $('owner_notification').checked ;
   form.submit();
 }
