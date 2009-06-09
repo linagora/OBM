@@ -87,7 +87,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     } else {
       $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('contact_id');
       // Prepend the sync link
-      if($GLOBALS['c_use_connectors']) {
+      if($GLOBALS['c_use_connectors'] &&  $link_ok) {
         $is_synched = run_query_is_contact_synched($OD->data_set->f('contact_id'));
         $alt = $is_synched ? $l_desync : $l_sync;
         $ico = $is_synched ? $ico_sync : $ico_desync;
