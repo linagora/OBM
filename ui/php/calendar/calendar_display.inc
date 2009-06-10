@@ -2068,7 +2068,7 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   $block = "
   <div class=\"detail extra\">
   <h1>$l_conflicts</h1>
-  <h2><a href=\"#\" onclick=\"displayFreeBusyConflict('$duration', '$d')\">$GLOBALS[l_display_entites_freebusy]</a><h2>
+  <h2><a href=\"#\" onclick=\"displayFreeBusyConflict('$duration', '$d')\">$GLOBALS[l_display_entites_freebusy]</a></h2>
   <table class=\"spreadSheet\">
   <thead>
    <tr>
@@ -2089,7 +2089,7 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
    <input type='hidden' id='sel_min_begin' value='$min_begin' />
   </div>
   <div id=\"fbcContainer\"></div>
-  $dis_form_end";
+  </div>";
 
   return $block;
 }
