@@ -3620,19 +3620,23 @@ function html_deal_parentdeal_form($action, $deal_q, $users_c, $users_p, $deal) 
 
   // Marketing manager select
   $sel_market = "<select name=\"sel_pmarket\">";
-  foreach ($users_c as $cid => $one_user) {
-    $sel_market .= "<option value=\"$cid\"";
-    if ($cid == $pmarket) $sel_market .= " selected= \" selected \"";
-    $sel_market .= '>' . $one_user['lastname'].' '.$one_user['firstname'].'</option>';
+  if (is_array($users_c)) {
+    foreach ($users_c as $cid => $one_user) {
+      $sel_market .= "<option value=\"$cid\"";
+      if ($cid == $pmarket) $sel_market .= " selected= \" selected \"";
+      $sel_market .= '>' . $one_user['lastname'].' '.$one_user['firstname'].'</option>';
+    }
   }
   $sel_market .= '</select>';
 
   // Technical manager select
   $sel_tech = "<select name=\"sel_ptech\">";
-  foreach ($users_p as $cid => $one_user) {
-    $sel_tech .= "<option value=\"$cid\"";
-    if ($cid == $ptech) $sel_tech .= "selected= \" selected \"";
-    $sel_tech .= '>' . $one_user['lastname'].' '.$one_user['firstname'].'</option>';
+  if (is_array($users_p)) {
+    foreach ($users_p as $cid => $one_user) {
+      $sel_tech .= "<option value=\"$cid\"";
+      if ($cid == $ptech) $sel_tech .= "selected= \" selected \"";
+      $sel_tech .= '>' . $one_user['lastname'].' '.$one_user['firstname'].'</option>';
+    }
   }
   $sel_tech .= '</select>';
 
