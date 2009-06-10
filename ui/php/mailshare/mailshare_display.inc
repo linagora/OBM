@@ -282,7 +282,8 @@ function html_mailshare_consult($mailshare_q) {
     <th>$l_desc</th>
     <td>$desc</td>
   </tr>
-  </table>";
+  </table>
+  </div>";
 
   return $block;
 }
