@@ -1963,7 +1963,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
         </br>
         $l_change_password_confirm
       <fieldset class=\"buttons\">
-        <input type=\"button\" onclick=\"javascript:generate_passwd()\" id=\"popup_confirm\" class=\"closeSticky\" value=\"$GLOBALS[l_confirm]\" />
+        <input type=\"button\" onclick=\"generate_passwd()\" id=\"popup_confirm\" class=\"closeSticky\" value=\"$GLOBALS[l_confirm]\" />
         <input type=\"button\" id=\"popup_cancel\" class=\"closeSticky\" value=\"$GLOBALS[l_cancel]\" />
       </fieldset>
     </div>";
@@ -2007,7 +2007,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
       <td>
         <img src=\"$path/document/document_index.php?action=accessfile&document_id=$photo_id\" alt=\"\"/ />
         <input type=\"hidden\" name=\"photo_id\" value=\"$photo_id\" />
-        <a href=\"#\" onclick=\"javascript:delete_user_photo();\" >$l_delete_userobmphoto</a>
+        <a href=\"#\" onclick=\"delete_user_photo();\" >$l_delete_userobmphoto</a>
       </td>
     </tr>";
   } else {
@@ -2123,7 +2123,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   <tr>
     <th class=\"$class[password]\">$l_password</th>
     <td><input id=\"passwd\" type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" />
-        <button type=\"button\" onclick=\"javascript:modif_password()\">$l_generate_passwd</button>
+        <button type=\"button\" onclick=\"modif_password()\">$l_generate_passwd</button>
     </td>
   </tr>
   $dis_status
@@ -2153,7 +2153,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </tr>
   <tr>
     <th class=\"$class[noexperie]\">$l_noexperie</th>
-    <td><input id=\"noexperie\" name=\"cba_noexperie\" type=\"checkbox\" value=\"1\" $noexperie onclick='javascript:showExpiration();'/></td>
+    <td><input id=\"noexperie\" name=\"cba_noexperie\" type=\"checkbox\" value=\"1\" $noexperie onclick='showExpiration();'/></td>
   </tr>
   <tr id=\"exp\" style=\"$showexp\">
     <th class=\"$class[dateexp]\">$l_dateexp</th>
@@ -3320,7 +3320,9 @@ function html_user_batch_form($params) {
         
   $js_block = "
   <script type=\"text/javascript\">
-  	fill_coords();
+    obm.initialize.chain(function () {
+      fill_coords();
+    })
   </script>
   ";
   

@@ -193,19 +193,19 @@ function fill_coords() {
             }
           }
         }
-          
-        th_element.adopt(new Element('a').setProperties(
-        {
-          'onclick' : 'disp_addRemove_button(\''+name+'\'); set_toUpdate(\''+name+'\');',
-          'id'      : 'button'+name
-        }).adopt(new Element('img').setProperties({'src': ico, 'class': 'icons'})));
+        var link = new Element('a').setProperty('id', 'button' + name).setStyle('cursor','pointer').adopt(new Element('img').setProperties({'src': ico, 'class': 'icons'}));
+        link.addEvent('click', function(evt) {
+            disp_addRemove_button(this);
+            set_toUpdate(this);
+          }.bind(link));          
+        th_element.adopt(link);
       }
     }
   }
 }
 
-function disp_addRemove_button(name) {
-  var img = $('button'+name).getElement('img');
+function disp_addRemove_button(link) {
+  var img = link.getElement('img');
   if (img.getProperty('src') == '$ico_add') {
     img.setProperty('src', '$ico_delete');
   } else {
@@ -213,8 +213,8 @@ function disp_addRemove_button(name) {
   }
 }
 
-function set_toUpdate(name) {
-  var td_element = $(name).getElement('td');
+function set_toUpdate(link) {
+  var td_element = link.getParent().getNext();
   for (var j=0; j<td_element.getChildren().length; j++) {
     var temp_element = td_element.getChildren()[j];
     if (temp_element.getProperty('type') == 'hidden') {
