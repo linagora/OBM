@@ -23,9 +23,9 @@ $params = get_user_params();
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 require_once("$obminclude/of/of_category.inc");
-require("../profile/profile_query.inc");
-require("people_display.inc");
-require("people_query.inc");
+require_once("../profile/profile_query.inc");
+require_once("people_display.inc");
+require_once("people_query.inc");
 require("people_js.inc");
 require("$obminclude/of/of_right.inc"); // needed by call from calendar
 
