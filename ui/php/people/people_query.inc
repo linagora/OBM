@@ -42,7 +42,6 @@ function run_query_people_search($people) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   $multidomain_userobm = sql_multidomain('userobm');
   $multidomain_contact = sql_multidomain('contact');
@@ -75,74 +74,74 @@ function run_query_people_search($people) {
   // If a lastname indication has been specified, get it
   if (trim($lname) != '') {
      // UserObm
-     $where_userobm .= " AND userobm_lastname $like '$lname%'";
+     $where_userobm .= " AND userobm_lastname #LIKE '$lname%'";
      // Contact
-     $where_contact .= " AND (contact_lastname $like '$lname%' or contact_aka like '$lname%')";
+     $where_contact .= " AND (contact_lastname #LIKE '$lname%' or contact_aka #LIKE '$lname%')";
   }
 
   // If a firstname indication has been specified, get it
   if (trim($fname) != '') {
      // UserObm
-     $where_userobm .= " AND userobm_firstname $like '$fname%'";
+     $where_userobm .= " AND userobm_firstname #LIKE '$fname%'";
      // Contact
-     $where_contact .= " AND contact_lastname $like '$fname%'";
+     $where_contact .= " AND contact_lastname #LIKE '$fname%'";
   }
 
   // If an email indication has been specified, get it
   if (trim($email) != '') {
     // UserObm
-    $where_userobm .= " AND userobm_email like '%$email%'";
+    $where_userobm .= " AND userobm_email #LIKE '%$email%'";
     // Contact
-    $where_contact .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$email%'))";
+    $where_contact .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address #LIKE '$email%'))";
   }
 
   // If a phone number indication has been specified, get it
   if (trim($phone) != '') {
     // UserObm
-    $where_userobm .= " AND (userobm_phone like '%$phone%'
-      OR userobm_phone2 like '%$phone%'
-      OR userobm_mobile like '%$phone%')";
+    $where_userobm .= " AND (userobm_phone #LIKE '%$phone%'
+      OR userobm_phone2 #LIKE '%$phone%'
+      OR userobm_mobile #LIKE '%$phone%')";
     // Contact
-    $where_contact .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%'))";
+    $where_contact .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number #LIKE '$phone%'))";
   }
 
   // If a fax number indication has been specified, get it
   if (trim($fax) != '') {
-    $where_userobm .= " AND (userobm_fax like '%$fax%'
-      OR userobm_fax2 like '%$fax%')";
+    $where_userobm .= " AND (userobm_fax #LIKE '%$fax%'
+      OR userobm_fax2 #LIKE '%$fax%')";
   }
 
   // If an adress indication has been specified, get it
   if (trim($adress) != '') {
     // UserObm
-    $where_userobm .= " AND (userobm_address1 like '%$adress%'
-      OR userobm_address2 like '%$adress%'
-      OR userobm_address3 like '%$adress%')";
+    $where_userobm .= " AND (userobm_address1 #LIKE '%$adress%'
+      OR userobm_address2 #LIKE '%$adress%'
+      OR userobm_address3 #LIKE '%$adress%')";
   }
 
   // If a description indication has been specified, get it
   if (trim($desc) != '') {
-     $where_userobm .= " AND userobm_description like '%$desc%'";
+     $where_userobm .= " AND userobm_description #LIKE '%$desc%'";
   }
 
   // If a direction indication has been specified get it
   if (trim($direction) != '') {
-    $where_userobm .= " AND userobm_direction like '%$direction%'";
+    $where_userobm .= " AND userobm_direction #LIKE '%$direction%'";
   }
 
   // If a service indication has been specified get it
   if (trim($service) != '') {
-    $where_userobm .= " AND userobm_service like '%$service%'";
+    $where_userobm .= " AND userobm_service #LIKE '%$service%'";
   }
 
   // If a service indication has been specified get it
   if (trim($company) != '') {
-    $where_userobm .= " AND userobm_company like '%$company%'";
+    $where_userobm .= " AND userobm_company #LIKE '%$company%'";
   }
 
   // If a town indication has been specified get it
   if (trim($town) != '') {
-    $where_userobm .= " AND userobm_town like '%$town%'";
+    $where_userobm .= " AND userobm_town #LIKE '%$town%'";
   }
 
   // If a zipcode indication has been specified get it
@@ -221,7 +220,7 @@ function run_query_people_search($people) {
     LEFT JOIN Phone p3 ON p3.phone_entity_id = contactentity_entity_id AND p3.phone_label='CELL;VOICE;X-OBM-Ref1'
     LEFT JOIN Phone p4 ON p4.phone_entity_id = contactentity_entity_id AND p4.phone_label='HOME;FAX;X-OBM-Ref1'
     LEFT JOIN Phone p5 ON p5.phone_entity_id = contactentity_entity_id AND p5.phone_label='WORK;FAX;X-OBM-Ref1'
-    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like 'PREF;INTERNET;X-OBM-Ref1%'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label LIKE 'PREF;INTERNET;X-OBM-Ref1%'
     $join_userdata_contact";
 
   // ORDER construction
