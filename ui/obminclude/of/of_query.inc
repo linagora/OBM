@@ -2835,7 +2835,7 @@ function check_user_defined_rules() {
           }
         }
       }
-      $params[$field] = stripslashes($value);
+      $params[$field] = $value;
     }
   }
 
