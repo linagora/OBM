@@ -2097,9 +2097,9 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
     function showExpiration()	{
       var Props = $('noexperie').getProperty('checked');			
       if(Props==false){
-        $('exp').setProperty('style','');
+        $('exp').setStyle('display','');
       }else{
-        $('exp').setProperty('style','display:none');
+        $('exp').setStyle('display','none');
       }	
     }
   </script>
