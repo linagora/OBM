@@ -247,7 +247,7 @@ function run_query_people_search($people) {
 
   if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg($query, $cdg_sql, 'run_query_people_search()');
-    $obm_q->query($query);
+    $obm_q->xquery($query);
   }
 
   return $obm_q;
