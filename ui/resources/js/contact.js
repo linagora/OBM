@@ -76,6 +76,7 @@ Obm.Contact.IMWidget = new Class ({
 
 //Obm.Contact = new Object();
   Obm.Contact.syncContact = function(id, tag) {
+  tag = $(tag);
   if(tag.getProperty('x-obm-sync') == '1') {
     act = 'desync';
   } else {

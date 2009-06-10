@@ -277,28 +277,19 @@ function random_password() {
   var test = false;
   while(i<length) {
     var nb = Math.floor(Math.random() * allowed_char.length);
-    var carac = allowed_char[nb];
+    var carac = allowed_char.substring((nb-1), nb);
     mdp += carac;
     i++;
   }
-
   return mdp;
 }
 
 function generate_passwd() {
-  /*var valid_carac = new RegExp(\"/^([a-z]|[0-9]|[A-Z]|[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/])*$/\");
-  var valid_type_carac = new RegExp(\"/^([a-z]|[A-Z]){0,4}([0-9]|[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/])([a-z]|[0-9]|[A-Z]|[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/])*$/\");
-  var valid_cinq = new RegExp(\"/^(?(?=.*[-&~#{(\[|`_^@)\]=+}$%>,?;.:!\/].*)(?(?=.*[A-Z].*).*([0-9]|[a-z]).*|(?=.*[0-9].*).*[a-z].*)|(?=.*[A-Z].*)(?=.*[0-9].*).*[a-z].*)$/\")
-  var test = true;*/
-  var i=0;
-  //while(test = true && i<1000){
-    var mdp = random_password();
-    /*test = valid_carac.test(mdp);
-    test = valid_type_carac(mdp);
-    i++;
-  }*/
-  $('passwd').setProperty('type','text');
-  $('passwd').value=mdp;
+  var mdp = random_password();
+  var father = $('passwd').getParent();
+  var input = new Element('input').setProperties($('passwd').getProperties('name', 'size', 'maxlength'));
+  $('passwd').dispose();
+  input.setProperties({'type': 'text', 'id' : 'passwd', 'value' : mdp}).injectTop(father);
 }
 
 function modif_password() {
