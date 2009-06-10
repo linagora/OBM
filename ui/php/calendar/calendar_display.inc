@@ -5520,6 +5520,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
 
       $this->page->drawRectangle($x0,$y0,$x1,$y0-$this->font_height,Zend_Pdf_Page::SHAPE_DRAW_FILL);
       $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
+      
       $this->page->drawText($title,
         $this->calendar_x0+$day*$this->col_width+2, 
         $y0-$this->font_height+1, 'UTF-8');
@@ -6195,18 +6196,25 @@ Class CalendarPdfList Extends CalendarPdf{
 
       // Event title
       $this->page->setFillColor(new Zend_Pdf_Color_Html("#368397"));
-      $this->page->drawText(
-         $head,
-         $this->content_x0 + 169 - $margin_left,
-         $evt_y-$key*$this->font_height,
-         'UTF-8');
+      $cellt = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
+                                 $this->calendar_x1-$this->getStringWidth($dis_people.$dis_res)
+                                 - ($this->content_x0 + 169 - $margin_left));
+      $cellt->setLocation($this->content_x0 + 169 - $margin_left,
+                          $evt_y-($key-1)*$this->font_height);
+      $cellt->addText($head, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
+      $cellt->write();
 
       // Event attendees + resources
-      $this->page->drawText(
-        $dis_people.$dis_res,
-        $this->calendar_x1-$this->getStringWidth($dis_people.$dis_res),
-        $evt_y-$key*$this->font_height,
-        'UTF-8');        
+      $celld = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
+                                 $this->getStringWidth($dis_people.$dis_res) + 10);
+      $celld->setLocation($this->calendar_x1-$this->getStringWidth($dis_people.$dis_res),
+                          $evt_y-($key-1)*$this->font_height);
+      $celld->addText($dis_people.$dis_res, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
+      $celld->write();
+
+      // Add lines cut by each cell
+      $evt_y -= max( $cellt->getLineNumber()*$this->font_height,
+                     $celld->getLineNumber()*$this->font_height  );
 
       if ($this->showdetails) {
         $repeat = $event->repeat;

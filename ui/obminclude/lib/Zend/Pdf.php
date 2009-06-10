@@ -78,6 +78,10 @@ require_once 'Zend/Pdf/Resource/Image/Png.php';
 require_once 'Zend/Memory.php';
 
 
+/** Zend_Pdf_Cell */
+require_once 'Zend/Pdf/Cell.php';
+
+
 /**
  * General entity which describes PDF document.
  * It implements document abstraction with a document level operations.
