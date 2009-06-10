@@ -1025,7 +1025,7 @@ function run_query_time_projecttask($time) {
   $a_concat[]=array('type'=>'field', 'value'=>'a.projecttask_label');
   $concat = sql_string_concat($db_type, $a_concat);
   display_debug_msg($concat, $cdg_sql, "run_query_time_projecttask : $db_type concat : ");
-  $sql_if = sql_if($db_type, 'a.projecttask_parenttask_id = 0', 'a.projecttask_label', $concat);
+  $sql_if = sql_if($db_type, 'a.projecttask_parenttask_id IS  NULL', 'a.projecttask_label', $concat);
 
   $query = "
     SELECT
