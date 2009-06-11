@@ -5840,13 +5840,14 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         }
 
         // event title
-        while($this->getStringWidth($dis_title) > $event->size*$this->col_width) {
-          $dis_title = substr($dis_title, 0, -1); 
-        }
         $this->page->setFillColor(new Zend_Pdf_Color_Html($bg_color));
         $this->page->drawRectangle($x0,$y0,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
-        $this->page->drawText($dis_title, $x0+2, $y1-2*$this->font_height, 'UTF-8');
+        $cell = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
+                                  $x1 - $x0 - 2, ($y1-2*$this->font_height) - $y0);
+        $cell->setLocation($x0+2, $y1-2*$this->font_height);
+        $cell->addText($dis_title, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
+        $cell->write();
 
         // event header
         while($this->getStringWidth($dis_header) > $event->size*$this->col_width) {

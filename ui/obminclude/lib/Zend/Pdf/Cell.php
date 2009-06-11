@@ -168,6 +168,11 @@ class Zend_Pdf_Cell {
 		} else {
 			$maxWidth=$this->_width;
 		}
+		if ($this->isAutoHeight()) {
+			$maxHeight=$this->_page->getHeight();
+		} else {
+			$maxHeight=$this->_height;
+		}
 		$lineWidth=$this->_text[$this->_lineNumber]['width'];
 		$align = null;//$this->_text[$this->_lineNumber]['alignment'];
 		$offset = 0;//$this->_text[$this->_lineNumber]['x'];
@@ -176,11 +181,18 @@ class Zend_Pdf_Cell {
 			//section of text is greater than our box's diminsions
 			$splitSection=explode(' ',$section['text']);
 			$maxTextSection=$this->_makeTextSection(array_shift($splitSection), $encoding);
-			while($maxTextSection['text']!=null && $lineWidth + $maxTextSection['width'] < $maxWidth) {
+			while($maxTextSection['text']!==null && $lineWidth + $maxTextSection['width'] < $maxWidth) {
 				$this->addText($maxTextSection['text'].' ', $align, $offset, $section['encoding']);
 				$lineWidth=$this->_text[$this->_lineNumber]['width'];
 				$maxTextSection=$this->_makeTextSection(array_shift($splitSection), $section['encoding']);
 			}
+            $textHeight = ($this->_font->getLineHeight()/$this->_font->getUnitsPerEm())
+              * $this->_fontSize * (count($this->_text)+1);
+            if($textHeight > $maxHeight) {
+              // No more space available, wipe the rest out
+              $section['text'] = '';
+              return true;
+            }
 			$this->newLine();
 			$restOfText=implode(' ',$splitSection);
 			$this->addText($maxTextSection['text'].' '.$restOfText, $align, $offset, $section['encoding']);
@@ -276,7 +288,10 @@ class Zend_Pdf_Cell {
 				$this->_text[$this->_lineNumber]['height']=($this->_font->getLineHeight()/$this->_font->getUnitsPerEm())*$this->_fontSize;
 				$this->_autoHeight=($this->_font->getLineHeight()/$this->_font->getUnitsPerEm())*$this->_fontSize;
 			}
-		}
+		} else {
+            if ($this->_lineNumber > 0)
+                $this->_text[$this->_lineNumber]['height']=($this->_font->getLineHeight()/$this->_font->getUnitsPerEm())*$this->_fontSize;
+        }
 		$this->_section++;
 	}
 	
