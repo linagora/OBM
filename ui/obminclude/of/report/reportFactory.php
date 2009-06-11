@@ -331,14 +331,13 @@ class ReportFactory {
     U.userobm_location,
     U.userobm_education,
     (U.userobm_photo_id IS NOT NULL) AS userobm_has_photo,
-    count(EventLink.*) as groupware_usage
+    count(EventLink.eventlink_event_id) as groupware_usage
     FROM UserObm as U
     INNER JOIN Domain ON domain_id = U.userobm_domain_id
     LEFT JOIN Host ON U.userobm_mail_server_id=host_id
     LEFT JOIN UserObm as A ON U.userobm_usercreate=A.userobm_id
     LEFT JOIN EventLink ON eventlink_userupdate = U.userobm_id OR eventlink_usercreate = U.userobm_id
-    LEFT JOIN UserObm as B ON U.userobm_userupdate=B.userobm_id
-    WHERE eventlink_timeupdate >= '$date'
+    LEFT JOIN UserObm as B ON U.userobm_userupdate=B.userobm_id AND (eventlink_timeupdate >= '$date' OR eventlink_timecreate  >= '$date' )
     GROUP BY  
     U.userobm_id,
     U.userobm_domain_id,

@@ -36,7 +36,7 @@ class ActivityFormater extends GenericFormater {
   public function format($object) {
     $line = '';
     if($object->groupware_usage) {
-      $percent = (($object->groupware_usage/30) > 1)?100:round(($object->groupware_usage/30)*100).'%';
+      $percent = (($object->groupware_usage/30) > 1)?"100%":round(($object->groupware_usage/30)*100).'%';
       $line .= self::escapeField($percent).';';
     } else {
       $line .= 'N/A;';
