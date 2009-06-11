@@ -363,3 +363,17 @@ sub DESTROY {
 
     $self->_log( 'suppression de l\'objet', 4 );
 }
+
+
+# Catch STDERR to drop messages print on this by Cyrus::IMAP::Admin
+sub authenticate {
+    my $self = shift;
+
+    open (OLDERR, ">&STDERR");
+    close(STDERR);
+    my $returnCode = eval{ close(STDERR); return $self->SUPER::authenticate(@_); };
+    open(STDERR, ">&OLDERR");
+    close(OLDERR);
+
+    return $returnCode;
+}
