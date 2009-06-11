@@ -50,6 +50,9 @@ sub connectLdapSrv {
         if( $errorCode->code() && ($ldapSrv->{'ldap_server_tls'} eq 'may') ) {
             # TLS error. 'ldap_server_tls' is 'may', TLS may succed or not
             $ldapSrv->{'ldap_server_tls'} = 'none';
+
+            $ldapSrv->{'conn'} = undef;
+            return connectLdapSrv( $ldapSrv );
         }
     }
 
