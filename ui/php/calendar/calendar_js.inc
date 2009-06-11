@@ -33,6 +33,7 @@ $extra_js .= "
     var b = parseInt($('sel_time_begin').value, 10)+parseInt($('sel_min_begin').value, 10)/60;
     var e = parseInt($('sel_time_end').value, 10)+parseInt($('sel_min_end').value, 10)/60;
     var duration = e-b;
+    if($('sel_attendees_id')) $('sel_attendees_id').set('html','');
     displayFreeBusy($('tf_date_begin').value, duration);
   }
 

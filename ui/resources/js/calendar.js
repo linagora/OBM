@@ -1794,6 +1794,24 @@ Obm.CalendarFreeBusy = new Class({
 
     });
 
+    // very crappy IE fix 
+    // FIXME (David)
+    this.slider.element.removeEvents();
+    this.slider.element.addEvent('mousedown', function(event) {
+      var dir = this.range < 0 ? -1 : 1;
+      if (IE4) {
+	      var position = event.page[this.slider.axis] + (-this.slider.element.getLeft()-$('calendarFreeBusyScroll').scrollLeft) - this.slider.half;
+      } else {
+	      var position = event.page[this.slider.axis] - this.slider.element.getPosition()[this.slider.axis] - this.slider.half;
+      }
+	    position = position.limit(-this.slider.options.offset, this.slider.full -this.slider.options.offset);
+	    
+	    this.slider.step = Math.round(this.slider.min + dir * this.slider.toStep(position));
+	    this.slider.checkStep();
+	    this.slider.end();
+	    this.slider.fireEvent('tick', position);
+    }.bind(this));
+
     // Meeting resizer: change duration
     var resizeOptions = {
       handle: this.resizeHandler,
@@ -1915,7 +1933,8 @@ Obm.CalendarFreeBusy = new Class({
       this.currentPosition = initialPosition;
     } else {
       this.slider.set(this.currentPosition);
-      this.autoScroll.toElement(this.meeting);
+      // this.autoScroll.toElement(this.meeting); // Doesn't work on IE !
+      this.autoScroll.set((this.currentPosition-10)*this.stepSize); // crappy IE fix
     }
   },
 
@@ -1932,7 +1951,8 @@ Obm.CalendarFreeBusy = new Class({
       this.currentPosition = initialPosition;
     } else {
       this.slider.set(this.currentPosition);
-      this.autoScroll.toElement(this.meeting);
+      // this.autoScroll.toElement(this.meeting); // Doesn't work on IE !
+      this.autoScroll.set((this.currentPosition-10)*this.stepSize); // crappy IE fix
     }
   },
 
