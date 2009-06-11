@@ -216,6 +216,13 @@ sub _connect {
         return 1;
     }
 
+    use Net::LDAP qw(LDAP_EXTENSION_START_TLS);
+    my $ldapDse = $self->{'ldapServerConn'}->root_dse();
+    if( !$ldapDse->supported_extension(LDAP_EXTENSION_START_TLS) ) {
+        $self->_log( 'le serveur LDAP ne supporte pas le TLS !', 3 );
+        $self->{'ldapTls'} = 'none';
+    }
+
     use Net::LDAP qw(LDAP_CONFIDENTIALITY_REQUIRED);
     if( $self->{'ldapTls'} =~ /^(may|encrypt)$/ ) {
         my $error = $self->{'ldapServerConn'}->start_tls( verify => 'none' );
@@ -230,8 +237,15 @@ sub _connect {
 
         if( $error->code() && ($self->{'ldapTls'} eq 'may') ) {
             $self->_log( 'erreur au start TLS : '.$error->error, 0 );
-            $self->_log( 'TLS facultatif (\'ldapTls\'='.$self->{'ldapTls'}.'), erreur non fatale', 0 );
+            $self->_log( 'TLS facultatif (\'ldapTls='.$self->{'ldapTls'}.'\'), re-connexion sans TLS', 0 );
             $self->{'ldapTls'} = 'none';
+
+            $self->{'ldapServerConn'} = undef;
+            return $self->_connect();
+        }
+
+        if( !$error->code() ) {
+            $self->_log( 'session TLS établie', 3 );
         }
     }
 
