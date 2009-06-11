@@ -417,6 +417,9 @@ class ReportFactory {
     U.userobm_location,
     U.userobm_education,
     userobm_has_photo    
+    ORDER BY 
+    U.userobm_lastname,
+    U.userobm_firstname
     ";
 
     return $query;
