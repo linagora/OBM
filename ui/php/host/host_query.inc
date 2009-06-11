@@ -191,7 +191,7 @@ function run_query_host_insert($host) {
   }
 
   // Delegation handling
-  $q_delegation = of_delegation_query_insert_clauses('host_delegation', stripslashes($host['delegation']));
+  $q_delegation = of_delegation_query_insert_clauses('host_delegation', ($host['delegation']));
 
   $query = "INSERT INTO Host (host_timeupdate,
     host_timecreate,
@@ -285,7 +285,7 @@ function run_query_host_update($host) {
   $multidomain = sql_multidomain('host');
 
   // Delegation handling
-  $q_delegation = of_delegation_query_update_clause('host_delegation', stripslashes($host['delegation']));
+  $q_delegation = of_delegation_query_update_clause('host_delegation', ($host['delegation']));
 
   $query = "UPDATE Host SET
     host_timeupdate=NOW(),

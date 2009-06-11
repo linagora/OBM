@@ -12,7 +12,7 @@ Obm.Profile.Autocompleter = new Class ({
     this.hiddenElement = $(element);
     visibleElement = this.hiddenElement.clone().set('id','').set('name','dummy'+ this.hiddenElement.get('name'));
     visibleElement.inject(this.hiddenElement, 'before');
-    this.hiddenElement.setStyle('display','none').set('type','hidden')
+    this.hiddenElement.setStyle('display','none')
     this.setOptions({overflow: true, selectMode: 'type-ahead', selectFirst: true, autoTrim: false, forceSelect: true});
     this.parent(visibleElement, tokens.getValues(), options);
     this.addEvent('selection', this.updateValue);

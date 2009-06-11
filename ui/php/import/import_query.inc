@@ -498,11 +498,7 @@ function get_import_row_mapping($row, $map) {
 ///////////////////////////////////////////////////////////////////////////////
 function import_is_row_valid($fields, $map) {
 
-  if ( ($fields["comp_name"] == "") && ($map["default"]["comp_name"] == "") ) {
-    return false;
-  } else {
     return true;
-  }
 }
 
 
@@ -567,7 +563,7 @@ function get_import_similar_company($fields, $map, &$countries) {
     INNER JOIN CompanyEntity on companyentity_company_id = company_id
     LEFT JOIN Address ON address_entity_id = companyentity_entity_id
     WHERE (company_name $like '$short_name%' OR company_aka $like '%$name%')
-      AND (company_country_iso3166 $like '$ctry' $zip_query)
+      AND (address_country $like '$ctry' $zip_query)
       $multidomain";
 
   display_debug_msg($query, $cdg_sql, "get_import_similar_company()");
@@ -1069,6 +1065,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_datasource_id,
     contact_company_id,
     contact_kind_id,
+    contact_origin,
     contact_marketingmanager_id,
     contact_lastname,
     contact_firstname,
@@ -1086,6 +1083,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     $dsrc,
     $company_id,
     $kind_id,
+    '$GLOBALS[c_origin_import]',
     $market,
     '$lname',
     '$fname',

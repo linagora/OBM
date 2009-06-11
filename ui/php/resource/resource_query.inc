@@ -34,7 +34,6 @@ function run_query_resource_search($resource) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   $multidomain = sql_multidomain('resource');
 	
@@ -61,17 +60,17 @@ function run_query_resource_search($resource) {
 
   // If a name indication has been specified, get it
   if (trim($name) != '') {
-     $where .= " AND resource_name $like '$name%'";
+     $where .= " AND resource_name #LIKE '$name%'";
   }
 
   // If a delegation indication has been specified, get it
   if (trim($delegation) != '') {
-    $where .= " AND resource_delegation $like '$delegation%'";
+    $where .= " AND resource_delegation #LIKE '$delegation%'";
   }
 
   // If a description indication has been specified, get it
   if (trim($desc) != '') {
-     $where .= " AND resource_description like '%$desc%'";
+     $where .= " AND resource_description #LIKE '%$desc%'";
   }
   
   // If a resource type has been specified, get it
@@ -113,7 +112,7 @@ function run_query_resource_search($resource) {
 
   if (($count > 0)  || (! $ctu_sql_limit)) {
     display_debug_msg($query, $cdg_sql, 'run_query_resource_search()');
-    $obm_q->query($query);
+    $obm_q->xquery($query);
   }
 
   return $obm_q;

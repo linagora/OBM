@@ -25,6 +25,7 @@ function run_query_todo_search($params) {
   $priority = $params['priority'];
   $percent = $params['percent'];
   $date_field = ($params['date_field'] ? $params['date_field'] : 'date');
+  $date_field = ($date_field == 'date_create')? 'timecreate' : $date_field;
   $dateafter = of_isodate_convert($params['date_after'],true);
   $datebefore = of_isodate_convert($params['date_before'],true);
 
@@ -202,6 +203,7 @@ function run_query_todo_insert($todo) {
     $percent = '0';
   }
   $date = of_isodate_convert($todo['date'],true);
+  $date = ($date)?"'$date'":'NULL';
   $description = $todo['description'];
   $domain_id = sql_parse_id($obm['domain_id']);
 
@@ -229,7 +231,7 @@ function run_query_todo_insert($todo) {
         $uid,
         'VTODO',
         'ui',
-        NOW(),
+        $date,
         '$priority',
         '$title',
         '$description',

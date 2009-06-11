@@ -322,67 +322,68 @@ function html_profile_form($profile) {
     </script>
     <form method='POST' action='profile_index.php'>
     <fieldset class=\"detail infos\">
-    <legend>$l_informations</legend>
-    <table>
-    <tr><th>$l_name</th><td>$dis_name</td>
-    </table>
+      <legend>$l_informations</legend>
+      <table>
+        <tr><th>$l_name</th><td>$dis_name</td>
+      </table>
     </fieldset>
     <fieldset class=\"detail infos\">
-    <legend>$l_properties</legend>
-    <table>
-    $dis_properties
-    </table>
+      <legend>$l_properties</legend>
+      <table>
+      $dis_properties
+      </table>
     </fieldset>    
     <fieldset class=\"detail extra\">
-    <legend>$l_modules_right</legend>
-    $l_add_module_rights : <input name='' type='text' id='addModuleInput' value=''/>
-    <a style='display:none;' id='addModuleButton' href=\"\" onclick=\"addModule($('moduleSheet').getElement('tbody'), $('addModuleInput').value);return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[$l_add_module_rights]\" /></a>
-    <script type='text/javascript'>
-      new Obm.Profile.Autocompleter('addModuleInput', modules, {
-      }).addEvent('change', function () {
-        if(this.isSelected) {
-          $('addModuleButton').setStyle('display','inline');
-        } else {
-          $('addModuleButton').setStyle('display','none');
-        }
-      });
-    </script>      
-    <table class='spreadSheet' id='moduleSheet'>
-    <tr><th>$l_default_settings</th><th>$l_user</th><th>$l_editor</th><th>$l_admin</th></tr>
-    <tr $class id='module_default'>
-    <td>$l_default <input type='hidden' name='cb_rights[default][]' value='0' /></td>
-    <td>".dis_module_status('read',$profile['module']['default'], 'default', true)."</td>
-    <td>".dis_module_status('write',$profile['module']['default'], 'default', true)."</td>
-    <td>".dis_module_status('admin',$profile['module']['default'], 'default', true)."</td></tr>
-    <tr><th>$l_specific_settings</th><th>$l_user</th><th>$l_editor</th><th>$l_admin</th></tr>
-    $dis_modules
-    </table>
+      <legend>$l_modules_right</legend>
+      $l_add_module_rights : <input name='' type='text' id='addModuleInput' value=''/>
+      <a style='display:none;' id='addModuleButton' href=\"\" onclick=\"addModule($('moduleSheet').getElement('tbody'), $('addModuleInput').value);return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[$l_add_module_rights]\" /></a>
+      <script type='text/javascript'>
+        new Obm.Profile.Autocompleter('addModuleInput', modules, {
+        }).addEvent('change', function () {
+          if(this.isSelected) {
+            $('addModuleButton').setStyle('display','inline');
+          } else {
+            $('addModuleButton').setStyle('display','none');
+          }
+        });
+      </script>      
+      <table class='spreadSheet' id='moduleSheet'>
+        <tr><th>$l_default_settings</th><th>$l_user</th><th>$l_editor</th><th>$l_admin</th></tr>
+        <tr $class id='module_default'>
+        <td>$l_default <input type='hidden' name='cb_rights[default][]' value='0' /></td>
+        <td>".dis_module_status('read',$profile['module']['default'], 'default', true)."</td>
+        <td>".dis_module_status('write',$profile['module']['default'], 'default', true)."</td>
+        <td>".dis_module_status('admin',$profile['module']['default'], 'default', true)."</td></tr>
+        <tr><th>$l_specific_settings</th><th>$l_user</th><th>$l_editor</th><th>$l_admin</th></tr>
+        $dis_modules
+      </table>
     </fieldset>    
     <fieldset class=\"detail extra\">
     <legend>$l_sections_right</legend>
-    $l_add_section_enabled : <input type='text' id='addSectionInput' value=''/>
-    <a style='display:none;' id='addSectionButton' onclick=\"addSection($('sectionSheet').getElement('tbody'), $('addSectionInput').value);return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[$l_add_section_rights]\" /></a>
-    <script type='text/javascript'>
-      new Obm.Profile.Autocompleter('addSectionInput', sections, {
-      }).addEvent('change', function () {
-        if(this.isSelected) {
-          $('addSectionButton').setStyle('display','');
-        } else {
-          $('addSectionButton').setStyle('display','none');
-        }
-      });
-    </script>    
-    <table class='spreadSheet' id='sectionSheet'>
-    <tr><th>$l_default_settings</th><th>$l_section_enabled</th></tr>
-    <tr $class id='section_default'>
-    <td>$l_default <input type='hidden' name='cb_enabled[default]' value='0' /></td><td>".dis_section_status($profile['section']['default'], 'default', true)."</td></tr>
-    <tr><th>$l_specific_settings</th><th>$l_section_enabled</th></tr>
-    $dis_section
-    </table>
+      $l_add_section_enabled : <input type='text' id='addSectionInput' value=''/>
+      <a style='display:none;' id='addSectionButton' onclick=\"addSection($('sectionSheet').getElement('tbody'), $('addSectionInput').value);return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[$l_add_section_rights]\" /></a>
+      <script type='text/javascript'>
+        new Obm.Profile.Autocompleter('addSectionInput', sections, {
+        }).addEvent('change', function () {
+          if(this.isSelected) {
+            $('addSectionButton').setStyle('display','');
+          } else {
+            $('addSectionButton').setStyle('display','none');
+          }
+        });
+      </script>    
+      <table class='spreadSheet' id='sectionSheet'>
+      <tr><th>$l_default_settings</th><th>$l_section_enabled</th></tr>
+      <tr $class id='section_default'>
+      <td>$l_default <input type='hidden' name='cb_enabled[default]' value='0' /></td><td>".dis_section_status($profile['section']['default'], 'default', true)."</td></tr>
+      <tr><th>$l_specific_settings</th><th>$l_section_enabled</th></tr>
+      $dis_section
+      </table>
     </fieldset> 
     <fieldset class='buttons'>
     $dis_buttons
     </fieldset>    
+    </form>
     ";
   return $block;
 
@@ -481,14 +482,17 @@ function dis_property_access_exceptions_value($value, $update=false) {
     if(is_array($value)) $value = implode(',',$value);
     return "<div><input name='property[access_exceptions]' id='accessExceptionsInput' value='$value' />
       <script type='text/javascript'>
-      new Autocompleter.Local('accessExceptionsInput', ['127.0.0.1', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'], {
-        multiple: true,
-        selectMode :'type-ahead',
-        minLength : 1,
-        relative: false,
-        overflow: true
-      });      
-      </script></div>
+        obm.initialize.chain(function() {
+          new Autocompleter.Local('accessExceptionsInput', ['127.0.0.1', '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'], {
+            multiple: true,
+            selectMode :'type-ahead',
+            minLength : 1,
+            relative: false,
+            overflow: true
+          });      
+        })
+      </script>
+      </div>
     ";
   } else {
     if(is_array($value) && count($value) > 1) {

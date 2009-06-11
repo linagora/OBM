@@ -290,6 +290,7 @@ $cg_gid_host = 515;
 $c_origin_web = 'obm-ui-web-'.$obm_version;
 $c_origin_ajax = 'obm-ui-ajax-'.$obm_version;
 $c_origin_cron = 'obm-ui-cron-'.$obm_version;
+$c_origin_import = 'obm-ui-import-'.$obm_version;
 // Mail chooser constant hooks
 $c_mailchooser_global_hooks = array(
   array(
@@ -681,6 +682,7 @@ $php_regexp_groupname = "/^[\w0-9]([\w0-9-._ ]{0,252}[\w0-9]){0,1}$/"; // group 
 $php_regexp_hostname = "/^[A-Za-z0-9][A-Za-z0-9-]{0,30}[A-Za-z0-9]$/"; // host
 $php_regexp_fqdn = "/^[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,6}$/"; // Fqdn
 $php_regexp_ip = '/^([1-2]?[0-9]{1,2}\.){3}[1-2]?[0-9]{1,2}$/'; // IP
+$php_regexp_ip = '/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/';
 $php_regexp_network = '/^([1-2]?[0-9]{1,2}.){3}[1-2]?[0-9]{1,2}(\/[1-2]?[0-9])?$/'; // IP[/MASK]
 $php_regexp_port_list ='/^[0-9]+(-[0-9]*){0,1}$/'; // Une liste de ports TCP/IP num[-num]
 $php_regexp_network_port_list = '/^([1-2]?[0-9]{1,2}.){3}[1-2]?[0-9]{1,2}:[0-9]+(-[0-9]*){0,1}$/'; // IP[:num[-num]]

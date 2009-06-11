@@ -708,6 +708,7 @@ function html_group_form($action, $group_q, $group, $field='') {
       $dis_private = "
     <script type=\"text/javascript\">
       function privacyShowHide(input) {
+        input = $(input);
         if($(input).get('inputValue')) {
           if($('emailGroup')) {
             $('emailGroup').addClass('H');
@@ -739,7 +740,7 @@ function html_group_form($action, $group_q, $group, $field='') {
       }
     </script>
     <input name=\"cba_privacy\" type=\"checkbox\" 
-    onchange=\"privacyShowHide(this)\" value=\"1\" $private_c />";
+    onclick=\"privacyShowHide(this)\" value=\"1\" $private_c />";
     }
   } else {
     $dis_private = ($priv == '1' ? $l_yes : $l_no);
