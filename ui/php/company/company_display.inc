@@ -847,6 +847,7 @@ function html_company_view_main($co_q, $coords) {
             $datas[$k] = addslashes($v);
           }
           $clipboard = implode('\r\n', $datas);
+          $clipboard = phpStringToJsString($clipboard);
           $header.= "&nbsp;<a href=\"javascript: return false;\" onclick=\"company_copy_clip('$clipboard'); return false;\" title=\"$l_copy\" ><img alt=\"$l_copy\" src=\"$ico_clipboard\" /></a>";
           $header.= "&nbsp;<a target=\"_blank\" href=\"http://maps.google.fr/maps?f=q&amp;hl=fr&amp;q=$map_address&amp;t=h&amp;z=14&amp;source=embed\"><img alt=\"Map\" src=\"$ico_google\"></a>";
           break;

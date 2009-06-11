@@ -2292,6 +2292,8 @@ function dis_contact_vcard_export($contact) {
   
   header("Content-Type: text/x-vCard");
   header("Content-Disposition: inline; filename=".str_replace(' ','_',$vcard->name->family).',_'.str_replace(' ','_',$vcard->name->given).'.vcf');
+  header('Cache-Control: maxage=3600'); 
+  header('Pragma: public');  
   header('charset=utf-8');
   echo $vcard->__toString();
 }
@@ -2309,6 +2311,8 @@ function dis_contact_vcard_export_all($contacts) {
   
   header("Content-Type: text/x-vCard");
   header("Content-Disposition: inline; filename=contacts.vcf");
+  header('Cache-Control: maxage=3600'); 
+  header('Pragma: public');  
   header('charset=utf-8');
   echo implode("\n", $vcards);
 }
