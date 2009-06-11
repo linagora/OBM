@@ -25,6 +25,9 @@ import org.obm.sync.client.calendar.CalendarClient;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.locators.CalendarLocator;
 
+import com.funambol.common.pim.calendar.ExceptionToRecurrenceRule;
+import com.funambol.common.pim.calendar.RecurrencePattern;
+
 import fr.aliasource.funambol.OBMException;
 import fr.aliasource.funambol.utils.CalendarHelper;
 import fr.aliasource.funambol.utils.Helper;
@@ -151,7 +154,7 @@ public class CalendarManager extends ObmManager {
 				logger.info("not a meeting, removing event");
 				binding.removeEvent(token, calendar, key);
 			} else {
-				logger.info("meeting removed, refusing for "+userEmail);
+				logger.info("meeting removed, refusing for " + userEmail);
 				CalendarHelper.refuseEvent(event, userEmail);
 				// event = binding.refuseEvent(token, calendar, event);
 				binding.modifyEvent(token, calendar, event, true);
@@ -385,8 +388,24 @@ public class CalendarManager extends ObmManager {
 
 		EventRecurrence obmrec = obmevent.getRecurrence();
 		if (!obmrec.getKind().equals("none")) {
-			event.setRecurrencePattern(CalendarHelper.getRecurrence(dstart,
-					dend, obmrec));
+			RecurrencePattern rp = CalendarHelper.getRecurrence(dstart, dend,
+					obmrec);
+
+			Date[] exceptions = obmrec.getExceptions();
+			if (exceptions != null) {
+				List<ExceptionToRecurrenceRule> exceps = new ArrayList<ExceptionToRecurrenceRule>(
+						exceptions.length);
+				for (Date d : exceptions) {
+					ExceptionToRecurrenceRule ex = new ExceptionToRecurrenceRule(
+							false, CalendarHelper.getUTCFormat(d));
+					exceps.add(ex);
+				}
+				rp.setExceptions(exceps);
+			} else {
+				rp.setExceptions(new ArrayList<ExceptionToRecurrenceRule>(0));
+			}
+
+			event.setRecurrencePattern(rp);
 
 		}
 		event.setMileage(new Integer(0));
@@ -468,7 +487,8 @@ public class CalendarManager extends ObmManager {
 		logger.info("alert export : " + event.getAlert());
 
 		if (foundation.getSummary() != null) {
-			event.setTitle(foundation.getSummary().getPropertyValueAsString().trim().replace("\r\n", "").replace("\n", ""));
+			event.setTitle(foundation.getSummary().getPropertyValueAsString()
+					.trim().replace("\r\n", "").replace("\n", ""));
 		} else {
 			event.setTitle("[Sans titre]");
 		}
@@ -485,7 +505,8 @@ public class CalendarManager extends ObmManager {
 
 		if (foundation.getLocation() != null) {
 			event.setLocation(foundation.getLocation()
-					.getPropertyValueAsString().trim().replace("\r\n", "").replace("\n", ""));
+					.getPropertyValueAsString().trim().replace("\r\n", "")
+					.replace("\n", ""));
 		}
 
 		if (foundation.getPriority() != null) {

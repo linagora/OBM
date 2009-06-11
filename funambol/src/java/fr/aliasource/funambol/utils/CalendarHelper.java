@@ -4,7 +4,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
@@ -15,6 +17,7 @@ import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.calendar.RecurrenceKind;
 
+import com.funambol.common.pim.calendar.ExceptionToRecurrenceRule;
 import com.funambol.common.pim.calendar.RecurrencePattern;
 import com.funambol.common.pim.calendar.RecurrencePatternException;
 
@@ -283,6 +286,18 @@ public class CalendarHelper extends Helper {
 
 		recurrence.setFrequence(rec.getInterval());
 		recurrence.setDays("");
+		
+		List<ExceptionToRecurrenceRule> recexs = rec.getExceptions();
+		if (recexs != null) {
+			Set<Date> exs = new HashSet<Date>();
+			for (ExceptionToRecurrenceRule exceptionToRecurrenceRule : recexs) {
+				exs.add(CalendarHelper.getDateFromUTCString(exceptionToRecurrenceRule.getDate()));
+			}
+			recurrence.setExceptions(exs.toArray(new Date[exs.size()]));
+		} else {
+			recurrence.setExceptions(new Date[0]);
+		}
+
 
 		java.util.Calendar cEndRec = java.util.Calendar.getInstance();
 		logger.info("recurrence: " + rec);
