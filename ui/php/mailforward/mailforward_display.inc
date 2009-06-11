@@ -60,7 +60,8 @@ function html_forward_consult($usr_q) {
       <td>$email</td>
     </tr>
     $dis_nomade
-    </table>";
+    </table>
+    </div>";
 
   return $block;
 }

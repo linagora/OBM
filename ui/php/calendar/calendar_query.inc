@@ -4132,7 +4132,9 @@ function get_json_entity_events($calendar, $entity_store) {
         $ocs = $of->getPeriodOccurrences($date, $end, array('user' => array($id), 'resource' => null));
         $json_evts = build_json_event($ocs);
       }
-      $display['json'] = "canRead:$canRead,events:[".implode(",", $json_evts)."]";
+      if(is_array($json_evts)) $json_evts = implode(",", $json_evts);
+
+      $display['json'] = "canRead:$canRead,events:[$json_evts]";
       break;
     case 'contact':
       $display['json'] = "canRead:0"; // Calendar is unavailable for contacts
