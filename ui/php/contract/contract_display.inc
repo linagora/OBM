@@ -1414,6 +1414,8 @@ function export_contract($co_q) {
 
   header("Content-Type: text/x-vCard");
   header("Content-Disposition: inline; filename=".str_replace(" ","_",$label).",_".str_replace(" ","_",$number).".txt");
+  header('Cache-Control: maxage=3600'); 
+  header('Pragma: public');  
   header("charset=utf-8"); 
 
   $export = "BEGIN:\n\n";
@@ -1423,7 +1425,7 @@ function export_contract($co_q) {
   $export .= "$export_comment\n";
   $export .= "$export_clause\n";
   $export .= "END:";
-  echo iconv("ISO-8859-15","UTF-8",$export);
+  echo $export;
 }
 
 

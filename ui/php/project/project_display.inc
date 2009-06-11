@@ -531,7 +531,7 @@ function html_project_planning($obm_q, $params) {
   $d_l
   $dis_total
   </table>
-    <div>
+  </div>
 ";
 
   return $block;

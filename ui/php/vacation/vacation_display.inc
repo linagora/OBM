@@ -64,7 +64,8 @@ function html_vacation_consult($usr_q) {
     <th>$l_vacation_message</th>
     <td>$message</td>
   </tr>
-  </table>";
+  </table>
+  </div>";
   
   return $block;
 }

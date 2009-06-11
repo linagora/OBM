@@ -433,7 +433,8 @@ function dis_can_delete_organizationalchart($id) {
   <div class=\"buttons\">
   <input type=\"submit\" value=\"$l_delete\" />
   <a href=\"$GLOBALS[path]/organizationalchart/organizationalchart_index.php?action=detailconsult&amp;organizationalchart_id=$id\">$l_back</a>
-  </div>";
+  </div>
+  </form>";
 
   return $block;
 }
