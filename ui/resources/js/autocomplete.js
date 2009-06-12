@@ -550,7 +550,7 @@ obm.AutoComplete.Search = new Class({
                         }.bind(this)
                       ).injectInside(result);
       result.appendText(' ' + text);
-      if($type(extension)) {
+      if($type(extension) && extension != '') {
         result.adopt(extension);
       }
       new Element('input').setProperty('type','hidden')
