@@ -342,13 +342,13 @@ function html_calendar_select_calendar_entity($new_action, $calendar, $calendar_
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" /> </a>";
     $dis_block_resource = "
-    </fieldset>
     <fieldset class=\"detail extra\">
     <legend>
       $l_resources
       $resource_add_button
     </legend>
-    <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />";
+    <input type=\"text\" name=\"\" value=\"\" id=\"resource\" autocomplete=\"off\" />
+    </fieldset>";
 
     $resource_complete = "new obm.AutoComplete.Search('$path/resource/resource_index.php?action=ext_search&ajax=1', 'sel_ent', 'resource', {filter_entity:'Resource', defaultText:'$resource_text'});";
   }
@@ -3873,7 +3873,6 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
   <form method=\"post\" name=\"f_entity\"
    onsubmit=\"if (calendar_check_meeting(this)) return true; else return false;\"
    action=\"calendar_index.php\">
-  </fieldset>
   <fieldset class=\"detail infos\">  
   <legend>$l_header_meeting</legend>
   <table>
@@ -3996,7 +3995,7 @@ function dis_calendar_free_interval($calendar) {
   $block = "
   <div id='fbc' class='freeBusyContent obmPopup'>
     <h1>
-    <a href='' id='closeFreeBusy' class='closeSticky' onclick='return false;'>
+    <a href='#' id='closeFreeBusy' class='closeSticky' onclick='return false;'>
     <img src='$GLOBALS[ico_popup_close]' alt='close' />
     </a>
     <span>$GLOBALS[l_header_meeting]</span>
