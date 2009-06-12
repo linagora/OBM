@@ -51,7 +51,6 @@
       $this->filters[] = new GenericFilter('status','==','VALID');
 
       $this->formater = new AlertQuotaFormater;
-      $this->filters[] = new GenericFilter('mail_quota','!=','0');
       $this->formater->addField('id');
       $this->formater->addField('login');
       $this->formater->addField('lastname');

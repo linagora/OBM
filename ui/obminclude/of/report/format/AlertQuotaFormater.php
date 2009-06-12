@@ -64,19 +64,21 @@ class AlertQuotaFormater implements IFormater{
     $quota = $object->mail_quota;
 
     $use = $object->mail_quota_use;
-    $percent = round($this->percentQuota($use,$quota),2);
+    $percent = $this->percentQuota($use,$quota);
 
     $line = '';
     foreach($this->_fields as $field) {
        $line .=self::escapeField($object->$field).";";
     }
-    $line .= $percent."%;";
-    if($percent > $this->limit) {
-      $line .= self::escapeField($l_warn_quota).";";
+    if($percent != '---') {
+      $line .= $percent."%";
+      if($percent > $this->limit) {
+        $line .= ';'.self::escapeField($l_warn_quota);
+      }
     } else {
-      $line .= ";";
+      $line .= $percent;
     }
-    $line .= "\n";
+    $line .= ";\n";
     return $line;
   }
 
@@ -106,7 +108,10 @@ class AlertQuotaFormater implements IFormater{
   }
 
   private function percentQuota($use,$quota) {
-    $percent = (($use * 100)/$quota);
+    if($quota != 0)
+      $percent = round((($use * 100)/$quota),2);
+    else
+      $percent = '---';
     return $percent;
   }
   /**
