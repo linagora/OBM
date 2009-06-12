@@ -334,10 +334,12 @@ class ReportFactory {
     count(EventLink.eventlink_event_id) as groupware_usage
     FROM UserObm as U
     INNER JOIN Domain ON domain_id = U.userobm_domain_id
+    INNER JOIN UserEntity ON userentity_user_id = userobm_id
     LEFT JOIN Host ON U.userobm_mail_server_id=host_id
     LEFT JOIN UserObm as A ON U.userobm_usercreate=A.userobm_id
-    LEFT JOIN EventLink ON eventlink_userupdate = U.userobm_id OR eventlink_usercreate = U.userobm_id
-    LEFT JOIN UserObm as B ON U.userobm_userupdate=B.userobm_id AND (eventlink_timeupdate >= '$date' OR eventlink_timecreate  >= '$date' )
+    LEFT JOIN EventLink ON (eventlink_entity_id = userentity_entity_id AND eventlink_state != 'W' AND (eventlink_timeupdate > '$date' OR eventlink_timecreate > '$date'))
+      OR (eventlink_userupdate = U.userobm_id AND eventlink_timeupdate > '$date') OR (eventlink_usercreate = U.userobm_id AND eventlink_timecreate > '$date')
+    LEFT JOIN UserObm as B ON U.userobm_userupdate=B.userobm_id 
     GROUP BY  
     U.userobm_id,
     U.userobm_domain_id,
