@@ -216,7 +216,7 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   <tr >
     <th>$l_enable_auto_vacation</th>
     <td><input type=\"checkbox\" name=\"cba_auto_enable\" $schedule_enable value=\"1\" 
-    onchange=\"showHideVacationDate(this);\"
+    onclick=\"showHideVacationDate(this);\"
   </tr>
   <tr $display_auto id=\"vacation_datebegin\">
     <th class=\"$class[vacation_datebegin]\">$l_vacation_datebegin</th>
