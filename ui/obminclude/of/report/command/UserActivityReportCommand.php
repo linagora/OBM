@@ -47,7 +47,6 @@
 
       //Workflow Filter
       $this->filters[] = new GenericFilter('archive','==','0');
-      $this->filters[] = new GenericFilter('status','==','VALID');
 
       $this->formater = new ActivityFormater();
       $this->formater->addField('id');

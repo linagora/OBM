@@ -42,8 +42,7 @@
       $this->sender->setNext(new downloadSender());
 
       //Workflow Filter
-      $this->filters[] = new GenericFilter('archive','==','1');
-      $this->filters[] = new GenericFilter('status','==','INIT');
+      $this->filters[] = new GenericFilter('archive','==','0');
 
       $this->formater = new GenericFormater;
       $this->formater->addField('id');
