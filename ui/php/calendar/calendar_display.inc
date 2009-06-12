@@ -3995,19 +3995,21 @@ function dis_calendar_free_interval($calendar) {
 
   $block = "
   <div id='fbc' class='freeBusyContent obmPopup'>
-    <h1>
-    <a href='#' id='closeFreeBusy' class='closeSticky' onclick='return false;'>
-    <img src='$GLOBALS[ico_popup_close]' alt='close' />
-    </a>
-    <span>$GLOBALS[l_header_meeting]</span>
-    </h1>
-    <h2>
-      <a href='#' onclick='changePeriod(\"$prev_month\")'><img src='$GLOBALS[ico_far_previous]' alt='[$GLOBALS[l_previous]'] /></a>
-      <a href='#' onclick='changePeriod(\"$prev_week\")'><img src='$GLOBALS[ico_previous]' alt='[$GLOBALS[l_previous]'] /></a>
-      $label
-      <a href='#' onclick='changePeriod(\"$next_week\")'><img src='$GLOBALS[ico_next]' alt='[$GLOBALS[l_next]'] /></a>
-      <a href='#' onclick='changePeriod(\"$next_month\")'><img src='$GLOBALS[ico_far_next]' alt='[$GLOBALS[l_next]'] /></a>
-    </h2>
+    <div title='crappy div for IE6 hack' style='position:relative;'>
+      <h1>
+      <a href='#' id='closeFreeBusy' class='closeSticky' onclick='return false;'>
+      <img src='$GLOBALS[ico_popup_close]' alt='close' />
+      </a>
+      <span>$GLOBALS[l_header_meeting]</span>
+      </h1>
+      <h2>
+        <a href='#' onclick='changePeriod(\"$prev_month\")'><img src='$GLOBALS[ico_far_previous]' alt='[$GLOBALS[l_previous]'] /></a>
+        <a href='#' onclick='changePeriod(\"$prev_week\")'><img src='$GLOBALS[ico_previous]' alt='[$GLOBALS[l_previous]'] /></a>
+        $label
+        <a href='#' onclick='changePeriod(\"$next_week\")'><img src='$GLOBALS[ico_next]' alt='[$GLOBALS[l_next]'] /></a>
+        <a href='#' onclick='changePeriod(\"$next_month\")'><img src='$GLOBALS[ico_far_next]' alt='[$GLOBALS[l_next]'] /></a>
+      </h2>
+    </div>
     <div class='freeBusyEntities'>
       <form method='POST' id='entities_form' action='calendar_index.php'>
         <table id='freeBusyEntitiesList'> 
