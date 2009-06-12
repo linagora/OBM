@@ -186,7 +186,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   if ($cgp_default_right[$entity]['public']['read'] != -1 || ($read == 1 && $id == 0)){ 
     $block_consumer_read_public = "
       <span id=\"cb_read_public\">
-      <input onchange=\"togglePrivacy(this,'cell_perms_read');\"
+      <input onclick=\"togglePrivacy(this,'cell_perms_read');\"
       name=\"cb_read_public\" value=\"1\" type=\"checkbox\" $public_read_checked />
       </span>";
   } else {
@@ -195,7 +195,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   if ($cgp_default_right[$entity]['public']['access'] != -1 || ($access == 1 && $id == 0)) { 
     $block_consumer_access_public = "
       <span id=\"cb_access_public\">
-      <input onchange=\"togglePrivacy(this,'cell_perms_access');\"
+      <input onclick=\"togglePrivacy(this,'cell_perms_access');\"
       name=\"cb_access_public\" value=\"1\" type=\"checkbox\" $public_access_checked />
       </span>";
   } else {
@@ -204,7 +204,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
   if ($cgp_default_right[$entity]['public']['write'] != -1 || ($write == 1 && $id == 0)){ 
     $block_consumer_write_public = "
       <span id=\"cb_write_public\">
-      <input onchange=\"if(togglePrivacy(this,'cell_perms_write')) apply_checked_read(this, 'public_perms');\"
+      <input onclick=\"if(togglePrivacy(this,'cell_perms_write')) apply_checked_read(this, 'public_perms');\"
       name=\"cb_write_public\" value=\"1\" type=\"checkbox\" $public_write_checked style=\"$public_write_checked_visibility\" />
       </span>";
   } else {

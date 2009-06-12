@@ -1698,7 +1698,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   $block = "$script";
   
   $block .= "
-    <form method=\"get\" name=\"f_entity\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare('contact_index.php')."\">
+    <form method=\"post\" name=\"f_entity\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare('contact_index.php')."\">
 
     <fieldset class=\"detail infos\">
     <legend>$l_contact</legend>

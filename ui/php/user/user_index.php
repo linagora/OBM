@@ -343,6 +343,9 @@ if ($action == 'ext_get_ids') {
     $retour = run_query_batch_processing_update($params, $users_id);
     if ($retour) {
       $display['msg'] .= display_ok_msg("$l_header_batch : $l_update_ok (".sizeof($users_id).") ");
+      if(sizeof($users_id) > 0) {
+        set_update_state();
+      }
       if (sizeof($users_id_error) > 0) {
         check_users_error_data($params, $users_id_error);
         $display['msg'] .= display_warn_msg($err['msg'], false);
