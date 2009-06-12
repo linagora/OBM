@@ -116,25 +116,26 @@ function run_query_user_search($user) {
   // If an email indication has been specified, get it
   if (trim($email) != '') {
     if (trim($where) != '') $where .= ' AND';
-    list($email_name,$domain) = split('@',$email);
+    list($left,$right) = split('@',$email);
+    if($right === null){
+      $left = $left.'%';
+      $right = $left;
+      $condition = 'OR';
+    }else {
+      $condition = 'AND';
+    }
+    if(!$left) {
+      $left = '%';
+    }
+    $right = $right.'%';
     $where .= "
-      ( userobm_email #LIKE '$email%'
-      OR (
-          (userobm_email = '$email_name' OR userobm_email #LIKE '$email_name\r\n%' OR userobm_email #LIKE '%\r\n$email_name\r\n%' OR userobm_email #LIKE '%\r\n$email_name' OR '$email_name' = '') 
-          AND 
-          (domain_name #LIKE '$domain%' OR domain_alias = '$domain' OR domain_alias #LIKE '$domain%\r\n%' OR domain_alias #LIKE '%\r\n$domain%\r\n%' OR domain_alias #LIKE '%\r\n$domain%') 
-          AND
-          (userobm_email <> '' AND userobm_email NOT #LIKE '%@%')
-        ) 
-        OR 
-        (
-          userobm_email #LIKE '$email_name@$domain%' 
+      userobm_email != '' AND (
+          ( userobm_email #LIKE '$left@$right' OR userobm_email #LIKE '$left@$right\r\n%' OR userobm_email #LIKE '%\r\n$left@$right\r\n%' OR userobm_email #LIKE '%\r\n$left@$right' )
           OR (
-            '$email_name' = '' AND userobm_email #LIKE '%@$domain%'
-          ) 
-          OR userobm_email #LIKE '$email_name@$domain%\r\n%' OR userobm_email #LIKE '%\r\n$email_name@$domain%\r\n%' OR userobm_email #LIKE '%\r\n$email_name@$domain%'
-        )
-      )";
+          ( userobm_email #LIKE '$left' OR userobm_email #LIKE '$left\r\n%' OR userobm_email #LIKE '%\r\n$left\r\n%' OR userobm_email #LIKE '%\r\n$left' )
+          $condition
+          ( domain_name #LIKE '$right' OR domain_alias #LIKE '$right' OR domain_alias #LIKE '$right\r\n%' OR domain_alias #LIKE '%\r\n$right\r\n%' OR domain_alias #LIKE '%\r\n$right' ))
+        ) ";
     $join_domain =  "INNER JOIN UserEntity ON userentity_user_id = userobm_id
                       INNER JOIN Domain ON userobm_domain_id = domain_id";
 
@@ -2404,8 +2405,11 @@ function run_query_batch_processing_update($params, $users_id) {
       $set[] = "userobm_nomade_perms=0";
       $set[] = "userobm_nomade_enable=0";
       $set[] = "userobm_nomade_local_copy=0";
+      $set[] = "userobm_mail_server_id IS NULL";
+    } else {
+      $queries[] = "UPDATE UserObm SET userobm_mail_server_id = $params[mail_server_id] WHERE userobm_mail_perms = 1 AND userobm_mail_server_id IS NULL";
     }
-  }
+  } 
   if (isset($mail_quota)) { $set[] = "userobm_mail_quota=$mail_quota"; }
   
   // Nomade
@@ -2447,6 +2451,12 @@ function run_query_batch_processing_update($params, $users_id) {
     $query = "UPDATE UserObm SET ".implode(', ', $set)." WHERE userobm_id IN (".implode(', ', $users_id).")";
     display_debug_msg($query, $cdg_sql, 'run_query_batch_processing_update()');
     $retour = $obm_q->query($query);
+    if(is_array($queries)) {
+      foreach($queries as $query) {
+        display_debug_msg($query, $cdg_sql, 'run_query_batch_processing_update()');
+        $retour = $obm_q->query($query." AND  userobm_id IN (".implode(', ', $users_id).")");
+      }
+    }
   } else {
     return true;
   }

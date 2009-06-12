@@ -3172,6 +3172,7 @@ function html_user_batch_form($params) {
   	<option value=\"0\" ".($mail_perms=='0' ? $selected : '').">$l_no</option>
   	<option value=\"1\" ".($mail_perms=='1' ? $selected : '').">$l_yes</option>
   </select>
+  <input type='hidden' name='mail_server_id' value='auto' />
   ";
   
   $mail_quota_block = "
