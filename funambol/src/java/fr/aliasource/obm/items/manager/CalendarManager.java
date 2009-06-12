@@ -391,18 +391,24 @@ public class CalendarManager extends ObmManager {
 			RecurrencePattern rp = CalendarHelper.getRecurrence(dstart, dend,
 					obmrec);
 
-			Date[] exceptions = obmrec.getExceptions();
-			if (exceptions != null) {
-				List<ExceptionToRecurrenceRule> exceps = new ArrayList<ExceptionToRecurrenceRule>(
-						exceptions.length);
-				for (Date d : exceptions) {
-					ExceptionToRecurrenceRule ex = new ExceptionToRecurrenceRule(
-							false, CalendarHelper.getUTCFormat(d));
-					exceps.add(ex);
+			if (rp != null) {
+				Date[] exceptions = obmrec.getExceptions();
+				if (exceptions != null) {
+					List<ExceptionToRecurrenceRule> exceps = new ArrayList<ExceptionToRecurrenceRule>(
+							exceptions.length);
+					for (Date d : exceptions) {
+						ExceptionToRecurrenceRule ex = new ExceptionToRecurrenceRule(
+								false, CalendarHelper.getUTCFormat(d));
+						exceps.add(ex);
+					}
+					rp.setExceptions(exceps);
+				} else {
+					rp
+							.setExceptions(new ArrayList<ExceptionToRecurrenceRule>(
+									0));
 				}
-				rp.setExceptions(exceps);
 			} else {
-				rp.setExceptions(new ArrayList<ExceptionToRecurrenceRule>(0));
+				logger.warn("null rec pattern with repeatkind=none");
 			}
 
 			event.setRecurrencePattern(rp);
