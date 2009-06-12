@@ -17,53 +17,115 @@
 #+-------------------------------------------------------------------------+
 
 
-require 5.003;
-require OBM::Tools::obmDbHandler;
-use Net::Telnet;
-use Getopt::Long;
+package testObmSatellite;
+
 use strict;
 use OBM::Tools::commonMethods qw(_log dump);
 
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV PATH)};
 
 
-# fonction de verification des parametres du script
-sub getParameter {
+use Getopt::Long;
+my %parameters;
+my $return = GetOptions( \%parameters, 'smtpinconf', 'smtpoutconf', 'cyrusPartitionsAdd', 'cyrusPartitionsDel' );
+
+if( !$return ) {
+    %parameters = undef;
+}
+
+my $testObmSatellite = testObmSatellite->new();
+exit $testObmSatellite->run(\%parameters);
+
+$|=1;
+
+
+sub new {
+    my $class = shift;
+    my $self = bless { }, $class;
+
+    return $self;
+}
+
+
+sub DESTROY {
+    my $self = shift;
+}
+
+
+sub run {
+    my $self = shift;
     my( $parameters ) = @_;
 
-    # Analyse de la ligne de commande
-    &GetOptions( $parameters, "smtpInConf", "smtpOutConf", "cyrusPartitionsAdd", "cyrusPartitionsDel", "help" );
+    if( !defined($parameters) ) {
+        $parameters->{'help'} = 1;
+    }
+
+    # Get parameters
+    $self->_log( 'Analyse des parametres du script', 3 );
+    $self->getParameter( $parameters ) or return 1;
+
+    require OBM::Tools::obmDbHandler;
+    $self->{'dbHandler'} = OBM::Tools::obmDbHandler->instance();
+    if( !defined($self->{'dbHandler'}) ) {
+        $self->_log( 'connecteur a la base de donnee invalide', 3 );
+        print STDERR 'connecteur a la base de donnee invalide'."\n";
+        return 1;
+    }
+
+    while( my( $paramName, $paramValue ) = each(%{$parameters}) ) {
+        SWITCH: {
+            if( $paramName =~ /^smtpinconf$/i ) {
+                if( $self->smtpInConf() ) {
+                    $self->_log( 'probleme lors de la mise à jour des maps des SMTP entrants', 0 );
+                    print STDERR 'probleme lors de la mise à jour des maps des SMTP entrants'."\n";
+                }else {
+                    $self->_log( 'Mise a jour des maps de SMTP entrants réussie', 0 );
+                    print STDERR 'Mise a jour des maps de SMTP entrants réussie'."\n";
+                }
+                last SWITCH;
+            }
+        }
+    }
+
+    return 0;
+}
+
+
+# fonction de verification des parametres du script
+sub getParameter {
+    my $self = shift;
+    my( $parameters ) = @_;
 
     my $goodParams = 0;
     my $helpParam = 0;
     while( my( $paramName, $paramValue ) = each(%{$parameters}) ) {
         SWITCH: {
-            if( $paramName eq "smtpInConf" ) {
-                _log( "Mise a jour des tables Postfix des serveurs SMTP-in", "W" );
+            if( $paramName =~ /^smtpinconf$/i ) {
+                $self->_log( 'Mise a jour des tables Postfix des serveurs SMTP-in', 2 );
                 $goodParams++;
                 last SWITCH;
             }
 
-            if( $paramName eq "smtpOutConf" ) {
-                _log( "Mise a jour des tables Postfix des serveurs SMTP-out", "W" );
+            if( $paramName eq /^smtpoutconf$/i ) {
+                $self->_log( 'Mise a jour des tables Postfix des serveurs SMTP-out', 2 );
                 $goodParams++;
                 last SWITCH;
             }
 
-            if( $paramName eq "cyrusPartitionsAdd" ) {
-                _log( "Mise a jour (ajout) des partitions Cyrus", "W" );
+            if( $paramName eq /^cyruspartitionsadd$/i ) {
+                $self->_log( 'Mise a jour (ajout) des partitions Cyrus', 2 );
                 $goodParams++;
                 last SWITCH;
             }
 
-            if( $paramName eq "cyrusPartitionsDel" ) {
-                _log( "Mise a jour (suppression) des partitions Cyrus", "W" );
+            if( $paramName eq /^cyruspartitionsdel$/i ) {
+                $self->_log( 'Mise a jour (suppression) des partitions Cyrus', 2 );
                 $goodParams++;
                 last SWITCH;
             }
 
-            if( $paramName eq "help" ) {
-                _log( "Affichage de l'aide", "W" );
+            if( $paramName eq 'help' ) {
+                $self->_log( 'Affichage de l\'aide', 2 );
                 $helpParam = 1;
                 last SWITCH;
             }
@@ -72,11 +134,12 @@ sub getParameter {
 
     # Affichage de l'aide
     if( !$goodParams || $helpParam ) {
-        print "Vous devez indiquer au moins un des paramètres suivants :\n";
-        print "\tsmtpInConf: permet de régénérer les tables Postfix des serveurs SMTP-in\n";
-        print "\tsmtpOutConf: permet de régénérer les tables Postfix des serveurs SMTP-out\n";
-        print "\tcyrusPartitionsAdd: permet d'ajouter les partitions Cyrus manquantes - Provoque un redémarrage du/des services Cyrus !\n";
-        print "\tcyrusPartitionsDel: permet de supprimer les partitions Cyrus non déclarées - Provoque un redémarrage du/des services Cyrus !\n\n";
+        print STDERR 'Vous devez indiquer au moins un des paramètres suivants :'."\n";
+        print STDERR "\t".'smtpInConf: permet de régénérer les tables Postfix des serveurs SMTP-in'."\n";
+        print STDERR "\t".'smtpOutConf: permet de régénérer les tables Postfix des serveurs SMTP-out'."\n";
+        print STDERR "\t".'cyrusPartitionsAdd: permet d\'ajouter les partitions Cyrus manquantes - Provoque un redémarrage du/des services Cyrus !'."\n";
+        print STDERR "\t".'cyrusPartitionsDel: permet de supprimer les partitions Cyrus
+        non déclarées - Provoque un redémarrage du/des services Cyrus !'."\n\n";
         return 0;
     }
 
@@ -84,120 +147,33 @@ sub getParameter {
 }
 
 
-sub updateServer {
-    my( $srv, $cmd ) = @_;
+sub smtpInConf {
+    my $self = shift;
 
-    if( !defined($cmd) || ($cmd eq "") ) {
+    require OBM::Postfix::smtpInEngine;
+    if( !($self->{'smtpInEngine'} = OBM::Postfix::smtpInEngine->new()) ) {
+        $self->_log( 'echec de l\'initialisation du SMTP-in maps updater', 0 );
         return 1;
     }
 
-    _log( "Connexion au serveur : '".$srv."'", "W" );
-    my $srvCon = new Net::Telnet(
-        Host => $srv,
-        Port => 30000,
-        Timeout => 60,
-        errmode => "return"
-    );
-    
-    if( !defined($srvCon) || !$srvCon->open() ) {
-        _log( "Echec : lors de la connexion au serveur : ".$srv, "W" );
+    my $query = 'SELECT domain_id
+                 FROM Domain
+                 WHERE NOT domain_global';
+
+    my $sth;
+    my $dbHandler = $self->{'dbHandler'};
+    if( !defined( $dbHandler->execQuery( $query, \$sth ) ) ) {
+        $self->_log( 'chargement des Ids de domaines depuis la BD impossible', 3 );
+        return 0;
+    }
+
+    while( my $domainId = $sth->fetchrow_hashref() ) {
+        $self->{'smtpInEngine'}->updateByDomainId( [$domainId->{'domain_id'}] );
+    }
+
+    if( $self->{'smtpInEngine'}->updateMaps() ) {
         return 1;
-    }
-    while( (!$srvCon->eof()) && (my $line = $srvCon->getline(Timeout => 1)) ) {
-        chomp($line);
-        _log( "Reponse : '".$line."'", "W" );
-    }
-
-
-    _log( "Envoi de la commande : '".$cmd."'", "W" );
-    $srvCon->print( $cmd );
-    if( (!$srvCon->eof()) && (my $line = $srvCon->getline()) ) {
-        chomp($line);
-        _log( "Reponse : '".$line."'", "W" );
-    }
-
-    _log( "Deconnexion du serveur : '".$srv."'", "W" );
-    $srvCon->print( "quit" );
-    while( !$srvCon->eof() && (my $line = $srvCon->getline(Timeout => 1)) ) {
-        chomp($line);
-        _log( "Reponse : '".$line."'", "W" );
     }
 
     return 0;
 }
-
-
-# On prepare le log
-my ($scriptname) = ($0=~'.*/([^/]+)');
-
-# Vérification des paramètres du script
-_log( "Analyse des parametres du script", "W", 3 );
-my %parameters;
-if( !getParameter( \%parameters ) ) {
-    _log( "Affichage de l'aide ou mauvais parametres...", "WC", 0 );
-    exit 1;
-}
-
-# On se connecte a la base
-my $dbHandler = OBM::Tools::obmDbHandler->instance();
-if( !defined($dbHandler) ) {
-    _log( 'Probleme lors de l\'ouverture de la base de donnees', 'WC', 0 );
-    exit 1;
-}
-
-# Obtention de la liste des serveurs SMTP
-my $query = "SELECT i.host_name, i.host_ip, j.mailserver_imap, j.mailserver_smtp_in, j.mailserver_smtp_out FROM Host i, MailServer j WHERE i.host_id=j.mailserver_host_id";
-
-# On execute la requete
-my $queryResult;
-if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
-    exit 1;
-}
-
-while( my( $serverName, $serverIp, $imapSrv, $smtpInSrv, $smtpOutSrv ) = $queryResult->fetchrow_array() ) {
-    if( !defined($serverName) || !defined($serverIp) ) {
-        next;
-    }
-
-    while( my( $paramName, $paramValue ) = each(%parameters) ) {
-        my $cmd = undef;
-
-        SWITCH: {
-            if( $smtpInSrv && ($paramName eq "smtpInConf") ) {
-                _log( "Mise a jour des tables Postfix des serveurs SMTP-in", "W" );
-                $cmd = "smtpInConf: ".$serverName;
-                last SWITCH;
-            }
-
-            if( $smtpOutSrv && ($paramName eq "smtpOutConf") ) {
-                _log( "Mise a jour des tables Postfix des serveurs SMTP-out", "W" );
-                $cmd = "smtpOutConf: ".$serverName;
-                last SWITCH;
-            }
-
-            if( $imapSrv && ($paramName eq "cyrusPartitionsAdd") ) {
-                _log( "Mise a jour des partitions Cyrus - Ajout", "W" );
-                $cmd = "cyrusPartitions: add:".$serverName;
-                last SWITCH;
-            }
-
-            if( $imapSrv && ($paramName eq "cyrusPartitionsDel") ) {
-                _log( "Mise a jour des partitions Cyrus - Suppression", "W" );
-                $cmd = "cyrusPartitions: del:".$serverName;
-                last SWITCH;
-            }
-        }
-
-        if( defined($cmd) ) {
-            updateServer( $serverIp, $cmd );
-        }
-    }
-}
-
-# Deconnexion de la BD
-$dbHandler->destroy();
-
-# Fin de MAJ des MTA
-_log( "Fin de mise a jour d'ObmSatellite", "W" );
-
-exit 0;
