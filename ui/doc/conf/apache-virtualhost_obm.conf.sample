@@ -27,6 +27,8 @@ NameVirtualHost *:443
 #    php_value session.gc_maxlifetime 2880
     php_value magic_quotes_gpc  On
     php_value memory_limit 128M
+    php_value post_max_size 10M
+    php_value upload_max_filesize 10M
 
 #obm#<Location /funambol>
 #obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/funambol
