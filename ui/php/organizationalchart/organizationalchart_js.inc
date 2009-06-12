@@ -28,6 +28,7 @@ function node_toggle(level) {
     var children_ids = $('child_'+level).getChildren().getProperty('id');
     for(i=0;i<children_ids.length;i++) {
       id = children_ids[i];
+console.log(id);
       new obm.AutoComplete.Search('$path/user/user_index.php?action=ext_search&ajax=1', 'sel_ent'+id, 'user'+id);    
       new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search&ajax=1', 'sel_ent'+id, 'group'+id);    
     }
@@ -238,6 +239,7 @@ function del_entity(level) {
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
+    container.destroy();
 
     $('nb_child_'+parent_level).value--;
     if ( $('nb_child_'+parent_level).value == 0) {
