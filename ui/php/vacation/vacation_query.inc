@@ -48,7 +48,7 @@ function run_query_vacation_detail($u_id) {
 function update_vacation($params, $vac_q) {
   $retVal = run_query_vacation_update($params, $vac_q->f("userobm_id"));
 
-  if ($retVal == 1) {
+  if ($retVal) {
     $retVal = update_sieve($params, $vac_q->f("userobm_login"), $vac_q->f("userobm_domain_id"));
   }
 
