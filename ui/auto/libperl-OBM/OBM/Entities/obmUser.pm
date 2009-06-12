@@ -186,7 +186,24 @@ sub _init {
     if( $userDesc->{'userobm_account_dateexp'} ) {
         require Time::Local;
         my @date_exp = split(/-/,$userDesc->{'userobm_account_dateexp'});
-        $userDesc->{'userobm_account_dateexp_timestamp'} = Time::Local::timelocal(0,0,0,$date_exp[2],$date_exp[1]-1,$date_exp[0]-1900);
+        SWITCH: {
+            if( $date_exp[2] < 1 || $date_exp[2] > 31 ) {
+                $self->_log( 'date d\'expiration de '.$userDesc->{'userobm_login'}.' incorrecte. Le jour doit être dans l\'intervale [1..31]. Date non prise en compte.', 0 );
+                last SWITCH;
+            }
+
+            if( $date_exp[1] < 1 || $date_exp[1] > 12 ) {
+                $self->_log( 'date d\'expiration de '.$userDesc->{'userobm_login'}.' incorrecte. Le mois doit être dans l\'intervale [1..12]. Date non prise en compte.', 0 );
+                last SWITCH;
+            }
+
+            if( $date_exp[0] < 1970 || $date_exp[0] > 2037 ) {
+                $self->_log( 'date d\'expiration de '.$userDesc->{'userobm_login'}.' incorrecte. L\'année doit être dans l\'intervale [1970..2037]. Date non prise en compte.', 0 );
+                last SWITCH;
+            }
+
+            $userDesc->{'userobm_account_dateexp_timestamp'} = Time::Local::timelocal(0,0,0,$date_exp[2],$date_exp[1]-1,$date_exp[0]);
+        }
     }
 
     # User e-mails
