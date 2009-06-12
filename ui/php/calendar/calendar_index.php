@@ -277,12 +277,6 @@ if ($action == 'index') {
   }
   if (check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource'])) {
 
-    // Insert "others attendees" as private contacts
-    if ($params['others_attendees'] != "") {
-      $others_attendees = run_query_insert_others_attendees($params);
-      $entities['contact'] = array_merge($entities['contact'], $others_attendees);
-    }
-
     $conflicts = check_calendar_conflict($params, $entities);
     if ( $conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts)) ) {
         if ($conflicts && !can_force_resource_conflict($conflicts)) {
@@ -293,6 +287,11 @@ if ($action == 'index') {
         $display['msg'] .= display_err_msg("$l_event : $l_insert_error");
         $display['detail'] = dis_calendar_event_form($action, $params, '',$entities);
       } else {
+        // Insert "others attendees" as private contacts
+        if ($params['others_attendees'] != "") {
+          $others_attendees = run_query_insert_others_attendees($params);
+          $entities['contact'] = array_merge($entities['contact'], $others_attendees);
+        }
         $event_id = run_query_calendar_add_event($params, $entities);
         $params["calendar_id"] = $event_id;
         if ($params['date_begin'] < date('Y-m-d H:')) {
