@@ -2791,9 +2791,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $repeatfrequency = 1;
   $uid = $obm['uid']; 
 
-  if (isset($calendar['new_meeting'])) $event_q = '';
-
-  if ((($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager'))  && !isset($calendar['new_meeting'])) {
+  if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager')) {
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
     $cat1 = $event_q->f('event_category1_id');
@@ -2845,6 +2843,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $dis_title = "$title ($l_header_new)";
     }
   }
+  if (isset($calendar['new_meeting'])) $event_q = '';
 
   // If parameters have been given, they supercede the default action value
   if (isset($calendar['calendar_id'])) { $id = $calendar['calendar_id']; }
