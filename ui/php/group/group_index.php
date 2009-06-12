@@ -630,7 +630,7 @@ function get_group_action() {
   $actions['group']['get_json_user_group'] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/group/group_index.php?action=get_json_user_group",
-    'Right'    => $cright_read_admin,
+    'Right'    => $cright_read,
     'Condition'=> array ('None')
                                                  );
 
