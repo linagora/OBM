@@ -2655,7 +2655,7 @@ function dis_calendar_quick_form($calendar,$calendar_entity) {
      <div class=\"content\">
         <form id=\"calendarQuickFormStore\" onsubmit=\"obm.calendarQuickForm.submit();return false;\">
           <fieldset>
-            $l_title : <input type=\"text\" name=\"tf_title\" /> 
+            $l_title : <input type=\"text\" maxlength='255' name=\"tf_title\" /> 
           </fieldset>
           <fieldset id=\"calendarListEntity\">
             $l_users : $entity_view
