@@ -387,7 +387,7 @@ public class CalendarManager extends ObmManager {
 		 */
 
 		EventRecurrence obmrec = obmevent.getRecurrence();
-		if (!obmrec.getKind().equals("none")) {
+		if (obmrec.getKind() != RecurrenceKind.none) {
 			RecurrencePattern rp = CalendarHelper.getRecurrence(dstart, dend,
 					obmrec);
 
