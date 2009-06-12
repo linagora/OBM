@@ -1,6 +1,6 @@
 package OBM::Postfix::smtpInServer;
 
-$VERSION = "1.0";
+$VERSION = '1.0';
 
 $debug = 1;
 
@@ -125,11 +125,12 @@ sub _connect {
 sub _disConnect {
     my $self = shift;
 
-    if( ref($self->{'serverConn'}) eq 'Net::Telnet' ) {
+    if( ref($self->{'serverConn'}) ne 'Net::Telnet' ) {
         $self->_log( 'connexion non établie à l\'ObmSatellite de '.$self->getDescription(), 3 );
         return 0;
     }
 
+    $self->_log( 'envoi de la commande: quit', 1 );
     $self->{'serverConn'}->print( 'quit' );
     while( !$self->{'serverConn'}->eof() && (my $line = $self->{'serverConn'}->getline(Timeout => 1)) ) {
         chomp($line);
@@ -162,6 +163,7 @@ sub disable {
 
 sub update {
     my $self = shift;
+    my $errorCode = 0;
 
     if( !$self->{'enable'} ) {
         $self->_log( 'serveur '.$self->getDescription().' désactivé, impossible d\'effectuer la mise à jour', 0 );
@@ -180,9 +182,13 @@ sub update {
     if( (!$self->{'serverConn'}->eof()) && (my $line = $self->{'serverConn'}->getline()) ) {
         chomp($line);
         $self->_log( 'réponse: '.$line, 1 );
+
+        if( $line !~ /OK$/ ) {
+            $errorCode = 1;
+        }
     }
 
     $self->_disConnect();
 
-    return 0;
+    return $errorCode;
 }

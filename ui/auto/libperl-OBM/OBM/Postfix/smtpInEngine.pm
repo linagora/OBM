@@ -87,6 +87,28 @@ sub update {
 }
 
 
+sub updateByDomainId {
+    my $self = shift;
+    my( $ids ) = @_;
+
+    if( ref($ids) ne 'ARRAY' ) {
+        $self->_log( 'listes d\'identifiant de domaines incorrecte', 3 );
+        return 1;
+    }
+
+    $self->{'entitiesUpdate'} = 1;
+
+    require OBM::Parameters::regexp;
+    for( my $i=0; $i<=$#$ids; $i++ ) {
+        if( $ids->[$i] =~ /$OBM::Parameters::regexp::regexp_id/ ) {
+            $self->{'smtpInDomainId'}->{$ids->[$i]} = '';
+        }
+    }
+
+    return 0;
+}
+
+
 sub updateMaps {
     my $self = shift;
 
