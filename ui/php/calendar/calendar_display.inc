@@ -2791,7 +2791,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $repeatfrequency = 1;
   $uid = $obm['uid']; 
 
-  if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager') ) {
+  if (isset($calendar['new_meeting'])) $event_q = '';
+
+  if ((($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager'))  && !isset($calendar['new_meeting'])) {
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
     $cat1 = $event_q->f('event_category1_id');
@@ -4101,7 +4103,7 @@ function dis_calendar_free_interval($calendar) {
           <input type='hidden' name='time_begin' id='time_begin' value='' />
           <input type='hidden' name='min_begin' id='min_begin' value='' />
           <input type='hidden' name='new_meeting' value='1'>
-          <input type='hidden' name='action' value='new'>
+          <input type='hidden' id='freebusy_action' name='action' value='new'>
         </form>
       </div>
     </div>

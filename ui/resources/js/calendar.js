@@ -1889,6 +1889,11 @@ Obm.CalendarFreeBusy = new Class({
           });
           hidden.injectInside($('freeBusyFormId'));
         }
+        if (input[0] == 'action') {
+          if (input[1] == 'update') {
+          $('freebusy_action').value = 'detailupdate';
+          }
+        } 
       });
     }
 
