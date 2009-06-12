@@ -1867,12 +1867,29 @@ Obm.CalendarFreeBusy = new Class({
     this.initPosition();
 
     if ($('new_event_form')) {
-      var qstring = 'calendar_index.php?'+$('new_event_form').toQueryString();
-      qstring = qstring.replace('date_begin', 'dummy');
-      qstring = qstring.replace('date_end', 'dummy');
-      qstring = qstring.replace('sel_user_id', 'dummy');
-      qstring = qstring.replace('sel_resource_id', 'dummy');
-      $('freeBusyFormId').setProperty('action', qstring);
+      var qstring = $('new_event_form').toQueryString().split("&");
+
+      qstring.each(function(e) {
+        var input = e.split("=");
+        if (input[0] != 'action' && 
+            input[0] != 'tf_date_begin' && 
+            input[0]!= 'tf_date_end' && 
+            input[0]!= 'sel_time_begin' && 
+            input[0]!= 'sel_min_begin' && 
+            input[0]!= 'sel_time_end' && 
+            input[0]!= 'sel_min_end' && 
+            input[0]!= 'sel_user_id' && 
+            input[0]!= 'sel_resource_id') {
+          var name = input[0];
+          var value = input[1];
+          var hidden = new Element('input').setProperties({
+            'type':'hidden',
+            'name':name,
+            'value':decodeURIComponent(value)
+          });
+          hidden.injectInside($('freeBusyFormId'));
+        }
+      });
     }
 
     this.external_contact.addEvent('keypress', function(e) {
@@ -1995,6 +2012,8 @@ Obm.CalendarFreeBusy = new Class({
       data.sel_contact_id.push(id);
       data.kind = 'contact';
       var ico = obm.vars.images.ico_contact;
+    } else {
+      return;
     }
 
     var attendee = kind+'-'+id;
