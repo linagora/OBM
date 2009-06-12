@@ -289,8 +289,7 @@ class Zend_Pdf_Cell {
 				$this->_autoHeight=($this->_font->getLineHeight()/$this->_font->getUnitsPerEm())*$this->_fontSize;
 			}
 		} else {
-            if ($this->_lineNumber > 0)
-                $this->_text[$this->_lineNumber]['height']=($this->_font->getLineHeight()/$this->_font->getUnitsPerEm())*$this->_fontSize;
+			$this->_text[$this->_lineNumber]['height']=($this->_font->getLineHeight()/$this->_font->getUnitsPerEm())*$this->_fontSize;
         }
 		$this->_section++;
 	}
@@ -598,13 +597,13 @@ class Zend_Pdf_Cell {
 			
 			//add the offset
 			$currentX+=$this->_text[$i]['x'];
-			$currentY-=$this->_text[$i]['height'];
 			//count() - 4 because of the 4 properties to this text.
 			for ($j=0;$j<count($this->_text[$i])-4;$j++) {				
 				$this->_page->setFont($this->_text[$i][$j]['font'],$this->_text[$i][$j]['fontSize']);
 				$this->_page->drawText($this->_text[$i][$j]['text'],$currentX,$currentY,$this->_text[$i][$j]['encoding']);
 				$currentX+=$this->_text[$i][$j]['width'];		
 			}
+			$currentY-=$this->_text[$i]['height'];
 		}
 	}
 	

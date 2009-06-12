@@ -6203,17 +6203,19 @@ Class CalendarPdfList Extends CalendarPdf{
       $this->page->setFillColor(new Zend_Pdf_Color_Html("#368397"));
       $cellt = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
                                  $this->calendar_x1-$this->getStringWidth($dis_people.$dis_res)
-                                 - ($this->content_x0 + 169 - $margin_left));
+                                 - ($this->content_x0 + 169 - $margin_left),
+                                 $this->font_height);
       $cellt->setLocation($this->content_x0 + 169 - $margin_left,
-                          $evt_y-($key-1)*$this->font_height);
+                          $evt_y-$key*$this->font_height);
       $cellt->addText($head, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
       $cellt->write();
 
       // Event attendees + resources
       $celld = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
-                                 $this->getStringWidth($dis_people.$dis_res) + 10);
+                                 $this->getStringWidth($dis_people.$dis_res) + 10,
+                                 $this->font_height);
       $celld->setLocation($this->calendar_x1-$this->getStringWidth($dis_people.$dis_res),
-                          $evt_y-($key-1)*$this->font_height);
+                          $evt_y-$key*$this->font_height);
       $celld->addText($dis_people.$dis_res, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
       $celld->write();
 
@@ -6261,23 +6263,25 @@ Class CalendarPdfList Extends CalendarPdf{
             $x0+5,
             $y0-$this->font_height - $i*$this->font_height,
             'UTF-8');
+          $cellinit = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
+                                        $this->calendar_x1 - ($x0+80), $this->font_height);
           if (is_array($value)){
             if (sizeof($value)==0) $i++;
             foreach($value as $array_value){
-              $this->page->drawText(
-                $array_value,
-                $x0+80,
-                $y0-$this->font_height-$i*$this->font_height,
-                'UTF-8');
-              $i++;
+              $array_value = substr($array_value, 0, 400);
+              $cell = clone $cellinit;
+              $cell->setLocation($x0+80, $y0-$this->font_height-$i*$this->font_height);
+              $cell->addText($array_value, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
+              $cell->write();
+              $i += $cell->getLineNumber()+1;
             }
           } else {
-            $this->page->drawText(
-              $value,
-              $x0+80,
-              $y0-$this->font_height-$i*$this->font_height,
-              'UTF-8');
-             $i++;
+            $value = substr($value, 0, 400); // TODO: fix php segfault when strlen($value) > 470
+            $cell = $cellinit;
+            $cell->setLocation($x0+80, $y0-$this->font_height-$i*$this->font_height);
+            $cell->addText($value, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
+            $cell->write();
+            $i += $cell->getLineNumber()+1;
           }
         }
         $evt_y -= $i*$this->font_height;
