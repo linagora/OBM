@@ -2554,7 +2554,9 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
 	        }
 	      }
       }
-      $users_id[] = $obm['uid'];
+      if (!isset($calendar['new_meeting'])) { 
+       $users_id[] = $obm['uid'];
+      }
       if (is_array($calendar['sel_contact_id'])) {
 	      foreach ($calendar['sel_contact_id'] as $new_contact_id) {
 	        if ($new_contact_id > 0) {
