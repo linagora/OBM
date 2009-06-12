@@ -123,7 +123,6 @@ function html_samba_form($samba, $smb, $field="") {
 
   $block = "
     <form method=\"post\" name=\"form_samba\"
-      onSubmit=\"if (check_samba(this)) return true; else return false;\"
       action=\"" . url_prepare("samba_index.php") . "\">
 
     <fieldset class=\"detail infos\">
