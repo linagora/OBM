@@ -33,7 +33,6 @@ class VacationCronJob extends CronJob{
    */
   function mustExecute($date) {
     global $cgp_use;
-    return true;
     if ($cgp_use["service"]["mail"]) {
       $min = date('i');
       return ($min%15 === 0);
