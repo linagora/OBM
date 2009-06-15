@@ -88,7 +88,7 @@ $l_password_error = "The password is not valid - between 4 and 12 chars (alphanu
 $l_profile_privilege_error = "Insufficients privileges to update this profile level !";
 $l_last_admin_error = "The last admin profile can't be updated !";
 $l_mail_perms_error = "The mail must be activated to allow external email !";
-$l_mail_server_error = "An email server must be set!";
+$l_mail_server_error = "This installation have no mail server, please contact the domain administrator !";
 
 $l_email_error = "The email given is not valid !";
 $l_email_empty = "An email address must be given to activate the mail !";

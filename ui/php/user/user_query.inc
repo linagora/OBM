@@ -2125,7 +2125,7 @@ function check_batch_processing_data($params) {
   
   global $err;
   global $l_batch_no_user_error, $l_nomade_without_mail_perms, $l_nomade_perms_error, $l_nomade_local_copy_error, $l_quota_error;
-  global $l_user;
+  global $l_user,$l_mail_server_error;
   global $php_regexp_quota, $php_regexp_phone, $php_regexp_fax, $php_regexp_zip,$php_regexp_number, $php_regexp_profile_name;
   global $l_phone_error, $l_fax_error, $l_zip_error, $l_expresspostal_error, $l_lname_error;
   
@@ -2214,6 +2214,12 @@ function check_batch_processing_data($params) {
     return false;
   }
   
+  // Express postal
+  if ($params['mail_perms'] == 1 && $params['mail_server_id'] == '') {
+    $err['msg'] = "$l_mail_server_error";
+    return false;
+  }
+
   // Check the phones and faxes number are not the same
   if (!check_user_phone_fax($params)) {
     return false;
