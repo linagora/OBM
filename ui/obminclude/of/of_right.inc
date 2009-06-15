@@ -217,7 +217,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
     <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
     
-  $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group&amp;ext_container=table";
+  $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_group&amp;ext_container=table&amp;filter=$GLOBALS[c_public]&amp;sel_privacy=".$GLOBALS['c_public'];
   $popup_group_add_button = "
     <a id=\"lnk_accept_admin\" href=\"#\" onclick=\"return popup('$url');\">
     <img src=\"$ico_add\" alt=\"[Add]\" />

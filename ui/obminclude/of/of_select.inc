@@ -123,7 +123,7 @@ function of_select_add_element_table(target, element_name, sel_id, fieldLabel) {
   con_cell.appendText(fieldLabel);  
   row.appendChild(con_cell);
 
-  if($(target.getElementById('cb_read_public'))) {
+  if($(target.getElementById('public_perms'))) {
     // Create the select all link
     var sel_all_link = $(target.createElement('a'));
     sel_all_link.href = '#';

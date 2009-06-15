@@ -209,8 +209,19 @@ function html_group_search_form ($group) {
 
   // User defined data
   $block_userdata .= of_userdata_dis_search('group', $group);
+  if($group['filter'] == $GLOBALS['c_public']) {
+    $block_visi = "
+      <input type='hidden' name='sel_privacy' value='$GLOBALS[c_public]' />
+      <input type='hidden' name='filter' value='$GLOBALS[c_public]' />
+      ";
+  } else {
+    $sel_privacy = dis_privacy_search_select($privacy);
+    $block_visi = "
+    <label>$l_visibility<br />
+      $sel_privacy
+    </label>";
 
-  $sel_privacy = dis_privacy_search_select($privacy);
+  }
 
   $dis_delegation = of_delegation_dis_search_form($delegation);
 
@@ -230,9 +241,7 @@ function html_group_search_form ($group) {
     <label>$l_email<br />
       <input name=\"tf_email\" size=\"24\" maxlength=\"64\" value=\"$email\" />
     </label>
-    <label>$l_visibility<br />
-      $sel_privacy
-    </label>
+    $block_visi
     $block_userdata
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
@@ -305,7 +314,8 @@ function html_group_search_group($obm_q, $prefs, $group) {
     $ext_title = urlencode(stripslashes($group['ext_title']));
     $restriction_calendar = $group['restriction_calendar'];
     $ext_container = $group['ext_container'];
-    $url_ext = "&amp;restriction_calendar=$restriction_calendar&amp;popup=1&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_titled&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;child_res=$child_res&amp;ext_container=$ext_container";
+    $filter = $group['filter'];
+    $url_ext = "&amp;restriction_calendar=$restriction_calendar&amp;popup=1&amp;filter=$filter&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_titled&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;child_res=$child_res&amp;ext_container=$ext_container";
   }
 
   $name = urlencode(stripslashes($group['name']));
