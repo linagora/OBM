@@ -284,6 +284,14 @@ sub post_accept_hook {
 }
 
 
+# Log refused requests
+sub request_denied_hook {
+    my $self = shift;
+
+    $self->logMessage( 'Connexion de : '.$self->{'server'}->{'client'}->peerhost().' on port '.$self->{'server'}->{'client'}->sockport().' refusee, les autorisation d\'acces sont elles correctement indiquee dans le fichier de configuration ?' );
+}
+
+
 # Process the request
 sub process_request {
     my $self = shift;
@@ -292,8 +300,8 @@ sub process_request {
 
         # Configuration de l'alarme
         local $SIG{ALRM} = sub {
-            $self->sendMessage( "TIMEOUT", undef );
-            die "timeOut";
+            $self->sendMessage( 'TIMEOUT', undef );
+            die 'timeOut';
         };
 
         #
@@ -355,7 +363,7 @@ sub process_request {
                 $current_badrequest++;
                 if( $current_badrequest >= $self->{server}->{max_badrequest} ) {
                     $self->sendMessage( "BADREQUESTS", undef );
-                    die "badRequest";
+                    die 'badRequest';
                 }
             }
 
@@ -382,7 +390,7 @@ sub process_request {
 sub post_process_request_hook {
     my $self = shift;
 
-    $self->sendMessage( "BYE", undef );
+    $self->sendMessage( 'BYE', undef );
 
     my $peer = $self->{server}->{client}->peerhost();
     my $logMessage = "Deconnexion";

@@ -93,7 +93,7 @@ sub getDescription {
 sub _connect {
     my $self = shift;
 
-    if( ref($self->{'serverConn'}) eq 'Net::Telnet' ) {
+    if( (ref($self->{'serverConn'}) eq 'Net::Telnet') && (!$self->{'serverConn'}->eof()) ) {
         $self->_log( 'connexion déjà établie à l\'ObmSatellite de '.$self->getDescription(), 3 );
         return 0;
     }
@@ -118,6 +118,11 @@ sub _connect {
         $self->_log( 'réponse: '.$line, 3 );
     }
 
+    if( $self->{'serverConn'}->eof() ) {
+        $self->_log( 'ObmSatellite de '.$self->getDescription().' a terminé la connexion. Vérifiez ses autorisations d\'accès', 0 );
+        return 1;
+    }
+
     return 0;
 }
 
@@ -125,7 +130,7 @@ sub _connect {
 sub _disConnect {
     my $self = shift;
 
-    if( ref($self->{'serverConn'}) ne 'Net::Telnet' ) {
+    if( (ref($self->{'serverConn'}) ne 'Net::Telnet') || ($self->{'serverConn'}->eof()) ) {
         $self->_log( 'connexion non établie à l\'ObmSatellite de '.$self->getDescription(), 3 );
         return 0;
     }
