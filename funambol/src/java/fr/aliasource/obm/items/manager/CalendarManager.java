@@ -267,10 +267,9 @@ public class CalendarManager extends ObmManager {
 
 		for (Event e : updated) {
 			logger.info("getSync: " + e.getTitle() + ", d: " + e.getDate());
-			if (e.getPrivacy() == 1
-					&& !calendar.equals(user)
-					|| (CalendarHelper.isUserRefused(userEmail, e
-							.getAttendees()))) {
+			if ((e.getPrivacy() == 1 && !calendar.equals(user))
+					|| CalendarHelper
+							.isUserRefused(userEmail, e.getAttendees())) {
 				if (d != null) {
 					deletedRest.add(("" + e.getUid()));
 				}
