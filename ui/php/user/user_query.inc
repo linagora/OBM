@@ -2042,7 +2042,7 @@ function run_query_user_delete_profile($user_id)  {
   $db_type = $obm_q->type;
 
   $u = get_user_info($user_id);
-  $name = $u['firstname'] . ' ' . $u['lastname'];
+  $name = addslashes($u['firstname'] . ' ' . $u['lastname']);
   // Unsubscribe from all groups
   $retour = run_query_user_unsubscribe_all_groups($user_id);    
   $user_id = sql_parse_id($user_id, true);
