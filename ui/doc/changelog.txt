@@ -1,7 +1,7 @@
 <!-- $Id$ -->
 O.B.M. 2.2 Changelog
 
-version 2.2.5 - 2009-06-12
+version 2.2.5 - 2009-06-15
 
 To do
 
@@ -57,8 +57,10 @@ To do
   * #323 Contact: Missing button action "Vcard" on contact consultation
   * #324 Contract: No results + php error on search field 'Expiration before'
   * #326 User: (MySQL) Dates not saved
+  * #327 Parameter ldapTls is required by update.pl 
   * #328 IE only: Error in calendar with conflicts
   * #329 IE only: Cannot accept/refuse calendar events (JS error)
+  * #331 update.pl does not detect obm-satellite failure
   * #332 IE only: Password automaticaly generated is invalid
   * #333 IE only: Cannot desactivate synchronisation of contact
   * #334 fix on field "entry date" in user module and a type of date format
@@ -68,6 +70,7 @@ To do
   * #341 pb with mailshare creation with IE
   * #342 IE only User: Impossible to fill coordinate fields in batch processing
   * #343 Deal and Import: PHP Warnings on top of page
+  * #344 Pb with reporting module
   * #345 Pb with expiration date in user module with IE 6
   * #346 Pb with mailshare management with IE 6
   * #350 IE only: timeslot (crenals ;) search error
@@ -78,10 +81,12 @@ To do
   * #356 pb with field date in todo module (IE and firefox)
   * #357 can create host with invalid ip
   * #358 quote in delegation field when creating host
+  * #359 Pb with fields search by "Creation date" in todo module
   * #360 IE Only: Calendar] Lost title event on conflict
   * #361 User: Validation never ends when expiration date is erroneous in mysql
   * #362 IE Only: Profile: Popup error on new profile
   * #363 Pb with import module
+  * #364 OrganizationalChart: Js Error on unfold node chart
   * #365 IE Only: Organizationalchart: popup error on deleting chart
   * #366 Windows PDC from Admin Section: Js error on update Form
   * #367 IE Only: Vacation: popup error on consultation
@@ -89,6 +94,7 @@ To do
   * #371 IE Only: Contacts: can't export Vcard
   * #372 IE Only: Deal: Impossible to add a company on deal creation form
   * #373 pb with private export in contact module with IE 6
+  * #376 Project: Js error on affectation and Avancement 
   * #377 IE Only: Project: Popup error on Planning view
   * #378 IE Only: Contract: Popup error on click on 'Export'
   * #380 PHP upload limit should be increased
@@ -101,9 +107,15 @@ To do
 --  * #390 IE Only: End date listbox disappear after specific use of free-busy
   * #392 Samba attributes are filled even if samba perms are false
   * #394 Modal appointment creation : no title size limit
+  * #395 User batch import does not allow mail activation
   * #396 Report of mailbox usage is not correct (some users are not listed)
+  * #403 No way to set rights on a resource for a group
   * #405 pb with vacation message with IE 6
+  * #406 Tasks of OBM are not synchronized to the PDA
   * #408 Mail vacation does not create a sieve script
+  * #409 Obm-Satellite Maps are not updated
+  * #413 User: Error on batch processing when (de)activating mail perms
+  * #421 Error deleting a user when his names contains a single quote
 
 2009-05-29 : version 2.2.4
 

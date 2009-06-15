@@ -117,14 +117,14 @@ function run_query_user_search($user) {
   if (trim($email) != '') {
     if (trim($where) != '') $where .= ' AND';
     list($left,$right) = split('@',$email);
-    if($right === null){
+    if ($right === null){
       $left = $left.'%';
       $right = $left;
       $condition = 'OR';
-    }else {
+    } else {
       $condition = 'AND';
     }
-    if(!$left) {
+    if (!$left) {
       $left = '%';
     }
     $right = $right.'%';
@@ -2345,6 +2345,7 @@ function check_users_error_data($params, $users_id_error) {
   $err['msg'] = $msg_error;
 }
 
+
 /**
  * Query execution - Update data for each selected and valid users
  *
@@ -2481,6 +2482,7 @@ function run_query_batch_processing_update($params, $users_id) {
   return $retour;
 }
 
+
 // FUNCTION - automatic mail server chooser hooks
 function has_mail_server_auto () {
   global $obm;
@@ -2495,7 +2497,6 @@ function has_mail_server_auto () {
     
     if ($obm_q->num_rows() == 1) {
       $obm_q->next_record();
-      
       if ($obm_q->f('domain_mail_server_auto')) return true;
     }
   }
@@ -2503,11 +2504,13 @@ function has_mail_server_auto () {
   return false;
 }
 
+
 // FUNCTION - automatic mail server chooser hooks
 function get_user_params_mail_server_id ($params) {
   global $cdg_sql, $obm, $path;
   global $c_mailchooser_global_hooks;
-  
+
+  // Only handles mail server 'auto'
   if ($params['mail_server_id'] != 'auto') return $params;
   
   $hooks = $c_mailchooser_global_hooks;
@@ -2526,9 +2529,11 @@ function get_user_params_mail_server_id ($params) {
   }
   
   $obm_q = new DB_OBM();
-  $query = "SELECT serviceproperty_value as domain_mail_server_auto FROM ServiceProperty
-    INNER JOIN DomainEntity ON  serviceproperty_entity_id = domainentity_entity_id
-    WHERE domainentity_domain_id = $domain_id AND serviceproperty_property = 'imap_autoselect'";
+  $query = "SELECT serviceproperty_value as domain_mail_server_auto
+  FROM ServiceProperty
+    INNER JOIN DomainEntity ON serviceproperty_entity_id=domainentity_entity_id
+  WHERE domainentity_domain_id = $domain_id
+    AND serviceproperty_property = 'imap_autoselect'";
   display_debug_msg($query, $cdg_sql, 'get_user_params_mail_server_id()');
   $obm_q->query($query);
   
@@ -2544,7 +2549,7 @@ function get_user_params_mail_server_id ($params) {
       }
     }
   }
-  
+
   if ($hook_result) {
     if (isset($hook_result['host_id'])) {
       $params['mail_server_id'] = $hook_result['host_id'];
@@ -2560,9 +2565,10 @@ function get_user_params_mail_server_id ($params) {
       }
     }
   }
-  
+
   return $params;
 }
+
 
 // FUNCTION - automatic mail server chooser static hook
 function hook_user_mailchooser_least_boxes () {
@@ -2581,16 +2587,16 @@ function hook_user_mailchooser_least_boxes () {
     WHERE serviceproperty_property = 'imap' and serviceproperty_service = 'mail'
     AND domainentity_domain_id $sel_id 
     GROUP BY host_id
-    ORDER BY mailbox_count ASC
-    ";
+    ORDER BY mailbox_count ASC";
 
   display_debug_msg($query, $cdg_sql, 'hook_user_mailchooser_least_boxes()');
   $obm_q = new DB_OBM;
   $obm_q->xquery($query);
   $obm_q->next_record();
-  
+
   return array('host_id' => $obm_q->f('host_id'));
 }
+
 
 // FUNCTION - automatic mail server chooser static hook
 function hook_user_mailchooser_least_used_memory () {
@@ -2670,6 +2676,7 @@ function check_user_wait($user){
   return $rep;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Query Executions - Valid a INIT user
 // Unarchive the user an update the status to VALID
@@ -2686,8 +2693,7 @@ function run_query_user_valid($user_id){
     UPDATE UserObm SET
     userobm_status = '$status',
     userobm_archive = $archive
-    WHERE userobm_id = $user_id
-  ";
+    WHERE userobm_id = $user_id";
 
   $obm_q = new DB_OBM;
 

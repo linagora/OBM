@@ -290,33 +290,35 @@ function html_batch_user_search_form($user) {
       value=\"$group\" />
     </label>
                 ";
-    $block .= "<label>$l_nomade<br />
-      <input type=\"checkbox\" name=\"cba_nomade\" value=\"1\" $nomade />
-    </label>
-                ";
-    $block .= "<label>$l_quota<br \>
+    $block .= "
+      <label>$l_nomade<br />
+        <input type=\"checkbox\" name=\"cba_nomade\" value=\"1\" $nomade />
+      </label>";
+
+    $block .= "
+      <label>$l_quota<br \>
       <select type=\"text\" name=\"sel_quota_op\">
         $block_quota_opt
       </select>
       </label>
       <label><br />
-      <input type=\"text\" name=\"tf_quota\" size=\"16\" maxlength=\"32\"
-      value=\"$quota\" />
-      </label>
-    
-                ";
+      <input type=\"text\" name=\"tf_quota\" size=\"16\" maxlength=\"32\" value=\"$quota\" />
+      </label>";
 
   $block .= "<label>&nbsp;<br />
       $form_action
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       $dis_filter_entity
     </label>
-                ";
+";
+
   $block.= "<p class=\"CL\" />
    </form>";
 
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display User search form
 // Parameters:
@@ -324,8 +326,8 @@ function html_batch_user_search_form($user) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_profile, $l_domain, $l_archive, $l_add_user;
-  global $l_group, $l_email, $l_phone, $l_desc, $l_find, $l_all, $l_firstname, $l_exp;
-  global $l_quota, $l_delegation_target, $l_datebegin, $l_mail_server;
+  global $l_group, $l_phone, $l_desc, $l_find, $l_all, $l_firstname, $l_exp;
+  global $l_email, $l_quota, $l_delegation_target, $l_datebegin, $l_mail_server;
   global $display, $c_all, $l_recursive, $obm;
   
   $login = $user['login'];
@@ -406,30 +408,27 @@ function html_user_search_form($user) {
   <form method=\"get\" name=\"f_search\"
     action=\"". url_prepare("user_index.php")."\" class=\"search\"> ";
   
-  if($display_pref['userobm_login']['status'] != 0) {
-    $block .= "<label>$l_login<br />
-                <input type=\"text\" name=\"tf_login\" size=\"16\" maxlength=\"32\"
-                value=\"$login\" />
-              </label>
-                ";
+  if ($display_pref['userobm_login']['status'] != 0) {
+    $block .= "
+<label>$l_login<br />
+  <input type=\"text\" name=\"tf_login\" size=\"16\" maxlength=\"32\" value=\"$login\" />
+</label>";
   }
-  if($display_pref['userobm_lastname']['status'] != 0) {
-    $block .= "<label>$l_lastname<br />
-      <input type=\"text\" name=\"tf_lastname\" size=\"16\" maxlength=\"32\"
-      value=\"$lname\" />
-    </label>
-                ";
+  if ($display_pref['userobm_lastname']['status'] != 0) {
+    $block .= "
+<label>$l_lastname<br />
+<input type=\"text\" name=\"tf_lastname\" size=\"16\" maxlength=\"32\" value=\"$lname\" />
+</label>";
   }
-  if($display_pref['userobm_firstname']['status'] != 0) {
-    $block .= "<label>$l_firstname<br />
-      <input type=\"text\" name=\"tf_firstname\" size=\"16\" maxlength=\"32\"
-      value=\"$fname\" />
-    </label>
-                ";
+  if ($display_pref['userobm_firstname']['status'] != 0) {
+    $block .= "
+<label>$l_firstname<br />
+  <input type=\"text\" name=\"tf_firstname\" size=\"16\" maxlength=\"32\" value=\"$fname\" />
+</label>";
   }
-  if($display_pref['domain_label']['status'] != 0) {
-    $block .= "$dis_domain
-                ";
+  if ($display_pref['domain_label']['status'] != 0) {
+    $block .= "
+$dis_domain";
   }
   if($display_pref['userobm_perms']['status'] != 0) {
     $block .= "<label>$l_profile<br />
@@ -504,26 +503,27 @@ function html_user_search_form($user) {
     </label>
                 ";
   }
-  if($display_pref['datebegin']['status'] != 0) {
-    $block .= "<label class=\"NW\">$l_datebegin<br />
+  if ($display_pref['datebegin']['status'] != 0) {
+    $block .= "
+    <label class=\"NW\">$l_datebegin<br />
       <input class=\"datePicker\" type=\"text\"  name=\"tf_datebegin\" value=\"$datebegin\" autocomplete=\"off\"/>
-    </label>
-                ";
+    </label>";
   }
-  if($display_pref['userobm_archive']['status'] != 0) {
-    $block .= "<label>$l_archive<br />
+  if ($display_pref['userobm_archive']['status'] != 0) {
+    $block .= "
+    <label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
-    </label>
-                ";
+    </label>";
   }
-    $block .= "<label>&nbsp;<br />
+  $block .= "
+    <label>&nbsp;<br />
       $form_action
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $dis_filter_entity
       $ext
-    </label>
-                ";
+    </label>";
+
     $block.= "<p class=\"CL\" />
    </form>";
 
@@ -2544,10 +2544,10 @@ function dis_user_admin_index() {
 function dis_user_import_index() {
   global $display, $l_user, $l_header_import, $l_enabled, $l_kind, $l_profile;
   global $l_lastname, $l_firstname, $l_login, $l_password, $l_password_type;
-  global $l_mail, $l_email, $l_quota, $l_email_nomade, $l_access_nomade;
+  global $l_mail, $l_mail_server, $l_email, $l_quota;
+  global $l_desc, $l_group, $l_delegation, $l_email_nomade, $l_access_nomade;
   global $l_title, $l_phone, $l_mphone, $l_fax, $l_company, $l_direction;
   global $l_service, $l_address, $l_postcode, $l_town, $l_expresspostal;
-  global $l_desc, $l_group, $l_delegation;
   global $l_import_msg, $l_file_format, $l_perms, $l_local_copy;
 
   $block = "
@@ -2588,8 +2588,9 @@ function dis_user_import_index() {
     <th>29</th>
     <th>30</th>
     <th>31</th>
-    <th>32</th>
-  </tr>
+    <th>32</th> 
+    <th>33</th> 
+ </tr>
   <tr>
     <th>$l_kind</th>
     <th>$l_lastname</th>
@@ -2600,6 +2601,7 @@ function dis_user_import_index() {
     <th>$l_password</th>
     <th>$l_password_type</th>
     <th>$l_mail</th>
+    <th>$l_mail_server</th>
     <th>$l_email</th>
     <th>$l_quota</th>
     <th>$l_email_nomade</th>
@@ -2635,6 +2637,7 @@ function dis_user_import_index() {
     <td>mot</td>
     <td>PLAIN</td>
     <td>X</td>
+    <td>mailserv<br />auto<br />1</td>
     <td>pierre.baud</td>
     <td>300</td>
     <td>pb@mymail.org</td>
@@ -2660,7 +2663,7 @@ function dis_user_import_index() {
     <td>Direction, Production</td>
   </tr>
   <tr>
-    <td colspan=\"35\">$l_import_msg</td>
+    <td colspan=\"33\">$l_import_msg</td>
   </tr>
   </table>
   </div>";
@@ -2704,6 +2707,7 @@ function html_user_import_file() {
 
 /**
  * Process Import file
+ * Insert new users from csv file. This does not handle user update
  **/
 function dis_user_import_file_run($params) {
   global $obm, $display, $err, $ccscd_tab, $l_user, $l_header_import, $l_group;
@@ -2734,6 +2738,7 @@ function dis_user_import_file_run($params) {
   $c_password = $cpt++;
   $c_password_type = $cpt++;
   $c_mail = $cpt++;
+  $c_mail_server = $cpt++;
   $c_email = $cpt++;
   $c_mail_quota = $cpt++;
   $c_email_nomade = $cpt++;
@@ -2776,10 +2781,21 @@ function dis_user_import_file_run($params) {
   </tr>
   </thead>";
 
+  // Groups hash
   $groups = get_user_group_public_hash();
   foreach($groups as $name => $id) {
     $groups[strtolower($name)] = $id;
   }
+
+  // Mail server hash
+  $mailservers = of_domain_get_domain_mailserver('imap');
+  foreach($mailservers as $ms_id => $one_ms_array) {
+    foreach($one_ms_array as $one_ms) {
+      $name = strtolower($one_ms['name']);
+      $ms[$name] = $ms_id;
+    }
+  }
+
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('userobm');
   $num_line = 0;
@@ -2809,7 +2825,17 @@ function dis_user_import_file_run($params) {
     //$user['passwd'] = $user['password'];
     if (in_array(trim($row[$c_mail]), $array_true)) {
       $user['mail_perms'] = 1;
+      $user['mail_server_id'] = addslashes(trim($row[$c_mail_server]));
+      // get autoselected mail server if mail server set as 'auto'
+      if ($user['mail_server_id'] == 'auto') {
+	$user = get_user_params_mail_server_id($user);
+      }
+      // If mail server is a host name, get its id
+      if (! is_numeric($user['mail_server_id'])) {
+	$user['mail_server_id'] = $ms[strtolower($user['mail_server_id'])];
+      }
     }
+
     $user['email'] = addslashes(trim(strtolower($row[$c_email])));
 
     // If quota no a number (and a correct one) get the domain default value
@@ -2864,7 +2890,7 @@ function dis_user_import_file_run($params) {
       // Insert the user
       if (check_user_data_form('', $user)) {
 	$user['user_id'] = run_query_user_insert($user);
-        if($user['user_id'] > 0) {
+        if ($user['user_id'] > 0) {
           set_update_state();
           $res = '+';
           // handle groups membership
@@ -3155,8 +3181,7 @@ function html_user_batch_form($params) {
   	<option value=\"$sel_default[value]\" ".(!isset($archive) ? $selected : "").">$sel_default[label]</option>
   	<option value=\"0\" ".($archive=='0' ? $selected : '').">$l_no</option>
   	<option value=\"1\" ".($archive=='1' ? $selected : '').">$l_yes</option>
-  </select>
-  ";
+  </select>";
   
   $profile_block = "
   <select name=\"sel_profile_name\">
@@ -3172,41 +3197,35 @@ function html_user_batch_form($params) {
   	<option value=\"0\" ".($mail_perms=='0' ? $selected : '').">$l_no</option>
   	<option value=\"1\" ".($mail_perms=='1' ? $selected : '').">$l_yes</option>
   </select>
-  <input type='hidden' name='mail_server_id' value='auto' />
-  ";
+  <input type='hidden' name='mail_server_id' value='auto' />";
   
   $mail_quota_block = "
-  <input type=\"text\" name=\"tf_mail_quota\" value=\"$mail_quota\" size=\"6\" maxlength=\"6\" />
-  ";
+  <input type=\"text\" name=\"tf_mail_quota\" value=\"$mail_quota\" size=\"6\" maxlength=\"6\" />";
   
   $nomade_perms_block = "
   <select name=\"sel_nomade_perms\">
   	<option value=\"$sel_default[value]\" ".(!isset($nomade_perms) ? $selected : "").">$sel_default[label]</option>
   	<option value=\"0\" ".($nomade_perms=='0' ? $selected : '').">$l_no</option>
   	<option value=\"1\" ".($nomade_perms=='1' ? $selected : '').">$l_yes</option>
-  </select>
-  ";
+  </select>";
   
   $nomade_enable_block = "
   <select name=\"sel_nomade_enable\">
   	<option value=\"$sel_default[value]\" ".(!isset($nomade_enable) ? $selected : "").">$sel_default[label]</option>
   	<option value=\"0\" ".($nomade_enable=='0' ? $selected : '').">$l_no</option>
   	<option value=\"1\" ".($nomade_enable=='1' ? $selected : '').">$l_yes</option>
-  </select>
-  ";
+  </select>";
   
   $nomade_local_copy_block = "
   <select name=\"sel_nomade_local_copy\">
   	<option value=\"$sel_default[value]\" ".(!isset($nomade_local_copy) ? $selected : "").">$sel_default[label]</option>
   	<option value=\"0\" ".($nomade_local_copy=='0' ? $selected : '').">$l_no</option>
   	<option value=\"1\" ".($nomade_local_copy=='1' ? $selected : '').">$l_yes</option>
-  </select>
-  ";
+  </select>";
   
   $buttons_block = "
     <input type=\"hidden\" name=\"action\" value=\"batch_processing\" />
-  	<input type=\"submit\" value=\"$l_do_batch_processing\" />
-  ";
+  	<input type=\"submit\" value=\"$l_do_batch_processing\" />";
   if (!isset($params['data-u-id'])) {
     foreach ($params as $params_name => $params_value) {
       if (! preg_match("/^data-u-[0-9]+$/", $params_name)) {
@@ -3214,56 +3233,58 @@ function html_user_batch_form($params) {
       } else if ($params_value == 'on') {
         $user_id = substr($params_name, strlen('data-u-'));
         $buttons_block .= "
-        <input type=\"hidden\" name=\"data-u-id"."[]\" value=\"$user_id\" />
-        ";
+        <input type=\"hidden\" name=\"data-u-id"."[]\" value=\"$user_id\" />";
       }
     }
   } else {
     foreach ($params['data-u-id'] as $u_id) {
       $buttons_block .= "
-      <input type=\"hidden\" name=\"data-u-id"."[]\" value=\"$u_id\" />
-      ";
+      <input type=\"hidden\" name=\"data-u-id"."[]\" value=\"$u_id\" />";
     }
   }
   
   $form_block = "
   <fieldset class=\"detail infos\">
-	<legend>$l_user</legend>
-	<table>
-	  <tr>
-	  	<th>$l_archive</th>
-	  	<td>$archive_block</td>
-	  </tr><tr>
-	    <th>$l_profile</th>
-	    <td>$profile_block</td>
-	  </tr>
-	 </table>
+  <legend>$l_user</legend>
+    <table>
+    <tr>
+      <th>$l_archive</th>
+      <td>$archive_block</td>
+    </tr>
+    <tr>
+      <th>$l_profile</th>
+      <td>$profile_block</td>
+    </tr>
+    </table>
   </fieldset>
   <fieldset class=\"detail infos\">
     <legend>$l_mail</legend>
     <table>
-      <tr>
-        <th>$l_mail</th>
-        <td>$mail_perms_block</td>
-      </tr><tr>
-        <th>$l_quota</th>
-        <td>$mail_quota_block</td>
-      </tr>
+    <tr>
+      <th>$l_mail</th>
+      <td>$mail_perms_block</td>
+    </tr>
+    <tr>
+      <th>$l_quota</th>
+      <td>$mail_quota_block</td>
+    </tr>
     </table>
   </fieldset>
   <fieldset class=\"detail infos\">
     <legend>$l_nomade</legend>
     <table>
-      <tr>
-        <th>$l_perms</th>
-        <td>$nomade_perms_block</td>
-      </tr><tr>
-        <th>$l_enabled</th>
-        <td>$nomade_enable_block</td>
-      </tr><tr>
-        <th>$l_local_copy</th>
-        <td>$nomade_local_copy_block</th>
-      </tr>
+    <tr>
+      <th>$l_perms</th>
+      <td>$nomade_perms_block</td>
+    </tr>
+    <tr>
+      <th>$l_enabled</th>
+      <td>$nomade_enable_block</td>
+    </tr>
+    <tr>
+      <th>$l_local_copy</th>
+      <td>$nomade_local_copy_block</th>
+    </tr>
     </table>
   </fieldset>
   <fieldset class=\"detail infos\">
@@ -3316,35 +3337,32 @@ function html_user_batch_form($params) {
   </fieldset>
   <fieldset class=\"buttons\">
   	$buttons_block
-  </fieldset>
-  ";
+  </fieldset>";
         
   $js_block = "
   <script type=\"text/javascript\">
     obm.initialize.chain(function () {
       fill_coords();
     })
-  </script>
-  ";
+  </script>";
   
   $style_block = "
   <style>
   	.icons {
   		padding-left: 0.3em;
   	}
-  </style>
-  ";
+  </style>";
   
   $form_block = "
   $style_block
   <form method=\"post\">
   	$form_block
   	$js_block
-  </form>
-  ";
+  </form>";
   
   return $form_block;
 }
+
 
 // Display tf_ coord function
 function disp_tf_coord($name, $size, $params) {
@@ -3358,11 +3376,11 @@ function disp_tf_coord($name, $size, $params) {
   
   $block = "
   	<input type=\"hidden\" name=\"$field_to_update\" value=\"$value\" />
-  	<input type=\"text\" name=\"tf_$name\" size=\"$size\" maxlengt=\"$size\" value=\"$params[$name]\" />
-  ";
+  	<input type=\"text\" name=\"tf_$name\" size=\"$size\" maxlengt=\"$size\" value=\"$params[$name]\" />";
   
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the User search result
@@ -3393,6 +3411,7 @@ function dis_user_wait_list($user) {
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display the Waiting people Search result
