@@ -379,8 +379,7 @@ function run_query_people_insert($people){
   global $cg_gid_smb_admin, $cg_gid_smb_user, $cg_gid_user;
 
   $uid = sql_parse_id($obm['uid']);
-//  $login = "'".strtolower($people['login'])."'";
-  $login = "'".' '."'";
+  $login = "''";
   $status = 'INIT';
   $archive = '1';
   $delegation = $obm['delegation_target'];
