@@ -1744,16 +1744,12 @@ function html_project_member_form($members_q, $project) {
 
       if ($m_manager) {
 	$rd_manager = "
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" checked
-            onchange=\"change_status($m_id, 1, f_entity)\" />$l_project_manager
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\"
-            onchange=\"change_status($m_id, 0, f_entity)\" />$l_member";
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" checked />$l_project_manager
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" />$l_member";
       } else {
 	$rd_manager = "
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\"
-            onchange=\"change_status($m_id, 1, f_entity)\" />$l_project_manager
-          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" checked
-            onchange=\"change_status($m_id, 0, f_entity)\" />$l_member";
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" />$l_project_manager
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" checked />$l_member";
       }
 
       $dis_member .= "
@@ -1912,8 +1908,7 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
   }
   
   $dis_button .= "
-     <input type=\"submit\" value=\"$l_validate\"
-        onclick=\"if(check_allo_valid(this.form, $cpt_m)) return true; else return false;\" />";
+     <input type=\"submit\" value=\"$l_validate\" />";
    
    $span = $cpt_m*2 + 1;
    
@@ -1922,7 +1917,7 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-   <form action=\"\" name=\"form_allocate\" method=\"post\">
+   <form action=\"\" id=\"formAllocate\" name=\"form_allocate\" method=\"post\">
 
     <fieldset class=\"detail extra\">
     <legend>$l_memberstimeinfos</legend>
@@ -2051,8 +2046,7 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
   }
     
   $dis_button .= "
-    <input type=\"submit\" value=\"$l_validate\"
-      onclick=\"if(check_advance_valid(this.form, $cpt_m)) return true; else return false;\" />";
+    <input type=\"submit\" value=\"$l_validate\" />";
      
   $span = $cpt_m*2 + 1;
      
@@ -2061,7 +2055,7 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form name=\"f_entity\" method=\"post\">
+  <form id=\"formAdvance\" name=\"f_entity\" method=\"post\">
   <fieldset class=\"detail extra\">
     <legend>$l_fill_advance_form</legend>
 
