@@ -151,8 +151,14 @@ public class CalendarHelper extends Helper {
 		Date endrec = dend;
 
 		if (cend != null) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTimeZone(TimeZone.getTimeZone("GMT"));
+			cal.setTime(cend);
+			if (cal.get(Calendar.YEAR) > 2017) {
+				cal.set(Calendar.YEAR, 2017);
+			}
 			noEndDate = false;
-			endrec = cend;
+			endrec = cal.getTime();
 		}
 
 		String sPatternStart = getUTCFormat(dstart);
@@ -286,18 +292,19 @@ public class CalendarHelper extends Helper {
 
 		recurrence.setFrequence(rec.getInterval());
 		recurrence.setDays("");
-		
+
 		List<ExceptionToRecurrenceRule> recexs = rec.getExceptions();
 		if (recexs != null) {
 			Set<Date> exs = new HashSet<Date>();
 			for (ExceptionToRecurrenceRule exceptionToRecurrenceRule : recexs) {
-				exs.add(CalendarHelper.getDateFromUTCString(exceptionToRecurrenceRule.getDate()));
+				exs.add(CalendarHelper
+						.getDateFromUTCString(exceptionToRecurrenceRule
+								.getDate()));
 			}
 			recurrence.setExceptions(exs.toArray(new Date[exs.size()]));
 		} else {
 			recurrence.setExceptions(new Date[0]);
 		}
-
 
 		java.util.Calendar cEndRec = java.util.Calendar.getInstance();
 		logger.info("recurrence: " + rec);
