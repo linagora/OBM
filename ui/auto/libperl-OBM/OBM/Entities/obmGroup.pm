@@ -90,7 +90,7 @@ sub _init {
 
     # Le GID du groupe
     if( !defined($groupDesc->{'group_gid'}) ) {
-        $self->_log( 'GID du groupe non défini', 0 );
+        $self->_log( 'GID du groupe \''.$groupDesc->{'group_name'}.'\' non défini', 0 );
         return 1;
     }elsif( $groupDesc->{'group_gid'} !~ /$OBM::Parameters::regexp::regexp_uid/ ) {
         $self->_log( 'GID \''.$groupDesc->{'group_gid'}.'\' incorrect', 0 );

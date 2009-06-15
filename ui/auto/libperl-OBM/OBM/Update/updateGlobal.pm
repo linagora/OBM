@@ -190,7 +190,7 @@ sub update {
 
     }elsif( $returnCode == 2 ) {
         $self->_log( 'erreur lors de la mise à jour des maps SMTP-in', 0 );
-        $self->_log( 'Il peut y avoir des incohérences dans le contenu des différents serveur SMTP-in', 0 );
+        $self->_log( 'Il peut y avoir des incohérences dans le contenu des maps des différents serveur SMTP-in', 0 );
         return 1;
     }
 
