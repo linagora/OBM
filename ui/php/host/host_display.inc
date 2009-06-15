@@ -263,7 +263,7 @@ function html_host_search_list($obm_q, $pref_q, $host) {
   $smtp_out = $host['smtp_out'];
   $obm_sync = $host['obm_sync'];
 
-  $url = url_prepare("host_index.php?action=search&amp;tf_name=$name&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_smb=$smb&amp;cb_imap=$imap&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out&amp;cb_obm_sync=$obm_sync$url_ext");
+  $url = url_prepare("host_index.php?action=search&amp;tf_name=$name&amp;tf_delegation=$delegation&amp;tf_ip=$ip&amp;cb_samba=$smb&amp;cb_imap=$imap&amp;cb_smtp_in=$smtp_in&amp;cb_smtp_out=$smtp_out&amp;cb_obm_sync=$obm_sync$url_ext");
 
   $dis_host = new OBM_DISPLAY('DATA', $pref_q, $module);
 
