@@ -165,7 +165,7 @@ sub update {
         }else {
             if( ref($entity) eq 'OBM::Entities::obmDomain' ) {
                 $self->_log( 'problème à la mise à jour de '.$entity->getDescription(), 0 );
-                $self->_log( 'erreur fatale', 1 );
+                $self->_log( 'erreur fatale', 0 );
                 return 1;
             }
         }
@@ -178,7 +178,7 @@ sub update {
         }
 
         if( $self->{'smtpInEngine'}->update($entity) ) {
-            $self->_log( 'erreur fatale', 1 );
+            $self->_log( 'erreur fatale', 0 );
             return 1;
         }
     }
