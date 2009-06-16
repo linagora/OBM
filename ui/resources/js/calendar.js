@@ -1727,7 +1727,7 @@ Obm.CalendarFreeBusy = new Class({
   /*
    * Initialize attributes
    */
-  initialize: function(time_slots, unit, begin_timestamp) {
+  initialize: function(time_slots, unit, begin_timestamp, first_hour) {
     this.timestamp = begin_timestamp;
     // this.date = new Obm.DateTime(this.timestamp*1000).toLocaleDateString(); Doesn't work on Windows ?
     d = new Obm.DateTime(this.timestamp*1000);
@@ -1746,16 +1746,17 @@ Obm.CalendarFreeBusy = new Class({
     this.external_contact = $('external_contact');
     this.external_contact_count = 0;
     this.nbSteps = time_slots.length;
-    this.duration = 1;
+//    this.duration = 1;
     this.bts = new Array();
     this.ts = time_slots;
-    this.meeting_slots = this.duration*this.unit;
+    this.meeting_slots = this.unit;
     this.oneDayWidth = this.stepSize*this.nbSteps/7; // in px
     this.oneDaySteps = this.nbSteps/7; // nb slots per day
     this.limitRight = this.scrollDiv.getLeft()+this.scrollDiv.offsetWidth;
     this.currentPosition = 0;
     this.attendeesSlot = new Array();
     this.scrollDiv.setStyle('width', $('mainContent').offsetWidth-100+'px');
+    this.firstHour = first_hour;
   },
 
   /*
@@ -1766,13 +1767,20 @@ Obm.CalendarFreeBusy = new Class({
     // setStyle doesn't work here. have to setStyle in initialize function. don't know why ... 
     // this.scrollDiv.setStyle('width', $('mainContent').offsetWidth-100+'px');
 
-    this.duration = duration;
-    $('duration').value = this.duration*3600;
-    this.meeting_slots = this.duration*this.unit;
+    //this.duration = duration;
+    var begin_slot = this.ts.indexOf(''+this.timestamp);
+    var end_slot = this.ts.indexOf(''+(this.timestamp+duration*3600));
+    $('duration').value = duration*3600;
+    this.meeting_slots = end_slot-begin_slot;
+
     this.meeting_date = this.timestamp;
 
     // /!\ meeting width must be set BEFORE Slider building
-    this.meeting.setStyle('width', this.stepSize*this.meeting_slots+'px');
+    if (Browser.Engine.trident) {
+      this.meeting.setStyle('width', this.stepSize*this.meeting_slots-(this.meeting_slots/2)+'px');
+    } else {
+      this.meeting.setStyle('width', (this.stepSize*this.meeting_slots)-(this.meeting_slots)+'px');
+    }
 
     // Meeting slider : change date begin
     this.slider = new Slider(this.container, this.meeting, {
@@ -1790,6 +1798,15 @@ Obm.CalendarFreeBusy = new Class({
         $('date_begin').value = date_begin.format('c');
         $('time_begin').value = date_begin.format('h');
         $('min_begin').value = date_begin.format('i');
+
+        var date_begin_ts = this.ts[this.currentPosition]*1000;
+        var date_end = new Obm.DateTime(this.ts[this.currentPosition+this.meeting_slots]*1000);
+        if (date_end.getHours() == this.firstHour && date_end.getMinutes() == '0') {
+          date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
+        }
+        var date_end_ts = date_end.getTime();
+        $('duration').value = (date_end_ts - date_begin_ts)/1000;
+
       }.bind(this)
 
     });
@@ -1800,16 +1817,15 @@ Obm.CalendarFreeBusy = new Class({
     this.slider.element.addEvent('mousedown', function(event) {
       var dir = this.range < 0 ? -1 : 1;
       if (IE4) {
-	      var position = event.page[this.slider.axis] + (-this.slider.element.getLeft()-$('calendarFreeBusyScroll').scrollLeft) - this.slider.half;
+        var position = event.page[this.slider.axis] + (-this.slider.element.getLeft()-$('calendarFreeBusyScroll').scrollLeft) - this.slider.half;
       } else {
-	      var position = event.page[this.slider.axis] - this.slider.element.getPosition()[this.slider.axis] - this.slider.half;
+        var position = event.page[this.slider.axis] - this.slider.element.getPosition()[this.slider.axis] - this.slider.half;
       }
-	    position = position.limit(-this.slider.options.offset, this.slider.full -this.slider.options.offset);
-	    
-	    this.slider.step = Math.round(this.slider.min + dir * this.slider.toStep(position));
-	    this.slider.checkStep();
-	    this.slider.end();
-	    this.slider.fireEvent('tick', position);
+      position = position.limit(-this.slider.options.offset, this.slider.full -this.slider.options.offset);
+      this.slider.step = Math.round(this.slider.min + dir * this.slider.toStep(position));
+      this.slider.checkStep();
+      this.slider.end();
+      this.slider.fireEvent('tick', position);
     }.bind(this));
 
     // Meeting resizer: change duration
@@ -1817,7 +1833,7 @@ Obm.CalendarFreeBusy = new Class({
       handle: this.resizeHandler,
       grid: {'x' : this.slider.stepWidth},
       limit: {
-        'x': [this.stepSize],
+        'x': [this.slider.stepWidth],
         'y': [this.container.offsetHeight, this.container.offsetHeight]
       },
       onBeforeStart: function() {
@@ -1832,12 +1848,18 @@ Obm.CalendarFreeBusy = new Class({
         this.meeting_slots = Math.round(this.meeting.offsetWidth/this.slider.stepWidth);
         this.resizeHandler.setStyles({
           'margin-left' : this.meeting.offsetWidth-this.resizeHandler.offsetWidth+'px'});
-        this.duration = this.meeting_slots/this.unit;
-        this.changeStatus(this.isBusy(this.currentPosition+this.meeting_slots-1))
+        //this.duration = this.meeting_slots/this.unit;
+        this.changeStatus(this.isBusy(this.currentPosition+this.meeting_slots-1));
         this.displayMeetingInfo();
       }.bind(this),
       onComplete:function() {
-        $('duration').value = this.duration*3600;
+        var date_begin_ts = this.ts[this.currentPosition]*1000;
+        var date_end = new Obm.DateTime(this.ts[this.currentPosition+this.meeting_slots]*1000);
+        if (date_end.getHours() == this.firstHour && date_end.getMinutes() == '0') {
+          date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
+        }
+        var date_end_ts = date_end.getTime();
+        $('duration').value = (date_end_ts - date_begin_ts)/1000;
         this.slider.drag.attach();
       }.bind(this)     
     };
@@ -1914,7 +1936,10 @@ Obm.CalendarFreeBusy = new Class({
     var date_begin_ts = this.ts[this.currentPosition]*1000;
     var date_begin = new Obm.DateTime(date_begin_ts);
     $('meeting_start').innerHTML = date_begin.format(obm.vars.regexp.dateFormat + ' h:i');
-    var date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
+    var date_end = new Obm.DateTime(this.ts[this.currentPosition+this.meeting_slots]*1000);
+    if (date_end.getHours() == this.firstHour && date_end.getMinutes() == '0') {
+      date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
+    }
     $('meeting_end').innerHTML = date_end.format(obm.vars.regexp.dateFormat + ' h:i');
   },
 

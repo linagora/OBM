@@ -2008,7 +2008,7 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
   $m = $dateend->diffMinute($datebegin);
   $time_begin = $datebegin->getHour();
   $min_begin = $datebegin->getMinute();
-  $duration = $h+$m/60;
+  $duration = ($dateend->getTimestamp() - $datebegin->getTimestamp())/3600;
   $d = $datebegin->getOutputDate();
 
   $entity_id = $calendar['entity_id'];
@@ -4123,7 +4123,7 @@ function dis_calendar_free_interval($calendar) {
       d.setMinutes(min);
       timestamp = d.getTime()/1000;
     }
-    obm.calendarFreeBusy = new Obm.CalendarFreeBusy($js_time_slots, $unit, timestamp);
+    obm.calendarFreeBusy = new Obm.CalendarFreeBusy($js_time_slots, $unit, timestamp, '$GLOBALS[ccalendar_first_hour]');
     obm.vars.labels.calendar_not_available = '$l_calendar_not_available';
     obm.vars.labels.allday = '$l_allday';
     obm.vars.labels.invalidEmail = '$l_invalid_email';

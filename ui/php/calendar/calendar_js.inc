@@ -30,9 +30,20 @@ $extra_js .= "
   }
 
   function checkAvailability() {
-    var b = parseInt($('sel_time_begin').value, 10)+parseInt($('sel_min_begin').value, 10)/60;
-    var e = parseInt($('sel_time_end').value, 10)+parseInt($('sel_min_end').value, 10)/60;
-    var duration = e-b;
+    var begin = getFieldDate($('tf_date_begin').value, false);
+    begin.setHours(parseInt($('sel_time_begin').value, 10));
+    begin.setMinutes(parseInt($('sel_min_begin').value, 10));
+
+    var end = getFieldDate($('tf_date_end').value, false);
+    end.setHours(parseInt($('sel_time_end').value, 10));
+    end.setMinutes(parseInt($('sel_min_end').value, 10));
+
+    if (begin.getTime() > end.getTime()) {
+      alert('$l_err_begin_end');
+      return false;
+    }
+
+    var duration = (end-begin)/1000/3600; // hour
     if($('sel_attendees_id')) $('sel_attendees_id').set('html','');
     displayFreeBusy($('tf_date_begin').value, duration);
   }
