@@ -2189,7 +2189,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $description = nl2br($event_q->f('event_description'));
     if ($properties != '') {
       $charset = mb_internal_encoding();
-      $item = "<?xml version='1.0' encoding='$charset'?/>".$properties;
+      $item = "<?xml version='1.0' encoding='$charset'?>".$properties;
     } else {
       $item = '';
     }
@@ -2378,7 +2378,6 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   }
 
   if ($ccalendar_resource) {
-
     // item
     if ($item != '') {
       $xml = parse_item($item);
@@ -4471,8 +4470,8 @@ function parse_item($item) {
     return false;
   }
   $p = xml_parser_create();
-  xml_parser_set_option($p, XML_OPTION_TARGET_ENCODING, 'ISO-8859-1');
-  xml_parse_into_struct($p, $item, $vals, $index);
+  xml_parser_set_option($p, XML_OPTION_TARGET_ENCODING, 'UTF-8');
+  $return = xml_parse_into_struct($p, $item, $vals, $index);
   xml_parser_free($p);
 
   $match_attribut = array('resource', 'res_id', 'res_name', 'item', 'item_id', 'property_name', 'property_value');
@@ -4493,7 +4492,6 @@ function parse_item($item) {
       }
     }
   }
-
   return $item_list;
 }
 
