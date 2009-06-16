@@ -451,7 +451,7 @@ function html_company_links($co_q) {
   global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
   global $l_module_lead, $l_module_contract, $l_module_invoice;
   global $l_module_document, $l_module_payment, $l_document_add;
-  global $l_company, $path, $cgp_show;
+  global $l_company, $l_public, $path, $cgp_show;
 
   $id = $co_q->f('company_id');
   $name = $co_q->f('company_name');
@@ -473,13 +473,13 @@ function html_company_links($co_q) {
   <h1>$l_module_contact</h1>
   <ul>
   <li><a href=\"$url_con_list\"><img src=\"$ico_contact\" /></a>
-      <a href=\"$url_con_list\">$l_module_contact ($con_num)</a></li>
+      <a href=\"$url_con_list\">$l_public : ($con_num)</a></li>
   <li><a href=\"$url_con_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
       <a href=\"$url_con_new\">$l_new</a></li>
       </ul>
 </div>";
   }
-  
+
   // Deal
   if ($cgp_show['module']['deal']) {
     $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname");
@@ -490,7 +490,7 @@ function html_company_links($co_q) {
 <h1>$l_module_deal</h1>
 <ul>
   <li><a href=\"$url_deal_list\"><img src=\"$ico_deal\" /></a>
-      $l_module_deal (
+      $l_public : (
       <a href=\"$url_deal_list\">$deal_num</a> /
       <a href=\"$url_deal_total\">$deal_total</a> )</li>
   <li><a href=\"$url_deal_new\"><img src=\"$ico_add\" alt=\"[Add]\" /></a>
@@ -501,7 +501,7 @@ function html_company_links($co_q) {
 
   // Lead
   if ($cgp_show['module']['lead']) {
-    $nb_lead = get_global_linked_element_nb('Lead', $id, 'company', 1);
+    $nb_lead = get_global_linked_element_nb('Lead', $id, 'company', 1, true);
     $url_lead_list = url_prepare("$path/lead/lead_index.php?action=search&amp;company_id=$id&amp;company_id=$id");
     $url_lead_new = url_prepare("$path/lead/lead_index.php?action=new&amp;company_id=$id&amp;company_id=$id&amp;company_name=$name");
     $block_lead = "

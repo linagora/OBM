@@ -440,12 +440,12 @@ function run_query_deal_insert($deal) {
 
   // if the deal inserted is not archived, we increment the company deal number
   if (($d_id) && ($archive == '0')) {
-    run_query_deal_company_active_deal_inc($deal['company_id']);
+    run_query_deal_company_active_deal_update($deal['company_id']);
   }
 
   // we increment the company total deal number
   if ($d_id) {
-    run_query_deal_company_total_deal_inc($deal['company_id']);
+    run_query_deal_company_total_deal_update($deal['company_id']);
   }
 
   // DealCompany relations handling
@@ -564,8 +564,6 @@ function run_query_deal_update($deal) {
   WHERE deal_id $sql_id 
     $multidomain";
 
-  $archive_old = get_deal_archive($id);
-
   display_debug_msg($query, $cdg_sql, 'run_query_deal_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -574,13 +572,10 @@ function run_query_deal_update($deal) {
     $ret = of_userdata_query_update('deal', $id, $deal);
   }
 
-  // If deal archive status has changed, update the company deal number
-  if (($retour) && ($archive != $archive_old)) {
-    if ($archive == '1') {
-      run_query_deal_company_active_deal_dec($deal['company_id']);
-    } else {
-      run_query_deal_company_active_deal_inc($deal['company_id']);
-    }
+  // update the company deal numbers (in case archive or privacy has changed)
+  if ($retour) {
+    run_query_deal_company_active_deal_update($deal['company_id']);
+    run_query_deal_company_total_deal_update($deal['company_id']);
   }
 
   // DealCompany relations handling
@@ -823,16 +818,13 @@ function run_query_deal_id($deal) {
 function run_query_deal_delete($id) {
   global $cdg_sql;
 
-  $archive = get_deal_archive($id);
   $comp_id = get_deal_company_id($id);
   $multidomain = sql_multidomain('deal');
-  // If deal archive status is off (0), update the company deal number
-  if ($archive == '0') {
-    run_query_deal_company_active_deal_dec($comp_id);
-  }
 
-  // update the company total deal number
-  run_query_deal_company_total_deal_dec($comp_id);
+  // Update the company deal numbers
+  run_query_deal_company_active_deal_update($comp_id);
+  run_query_deal_company_total_deal_update($comp_id);
+
   run_query_global_delete_document_links($id, 'deal');
 
   $ret = of_userdata_query_delete('deal', $id);
@@ -1564,111 +1556,63 @@ function run_query_deal_contact($p_id) {
 // Parameters:
 //   - $comp_id : company id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_company_active_deal_inc($comp_id) {
+function run_query_deal_company_active_deal_update($comp_id) {
   global $cdg_sql;
 
   $multidomain = sql_multidomain('company');
   $comp_id = sql_parse_id($comp_id, true);
-  $query = "UPDATE Company SET
-      company_deal_number=company_deal_number+1
-    WHERE company_id $comp_id 
-      $multidomain";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_active_deal_inc()');
+  $query = "SELECT count(*) as nb
+      FROM Deal
+      WHERE deal_company_id $comp_id 
+        AND deal_archive = '0'
+        AND deal_privacy = 0";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_active_deal_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Company active deal number decrement
-// Parameters:
-//   - $comp_id : company id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_company_active_deal_dec($comp_id) {
-  global $cdg_sql;
-
-  $multidomain = sql_multidomain('company');
-  $comp_id = sql_parse_id($comp_id, true);
-  $query = "UPDATE Company SET
-      company_deal_number=company_deal_number-1
-    WHERE company_id $comp_id $multidomain";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_active_deal_dec()');
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Company total deal number increment
-// Parameters:
-//   - $comp_id : company id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_company_total_deal_inc($comp_id) {
-  global $cdg_sql;
-
-  $multidomain = sql_multidomain('company');
-  $comp_id = sql_parse_id($comp_id, true);
-  $query = "UPDATE Company SET
-      company_deal_total=company_deal_total+1
-    WHERE company_id $comp_id 
-      $multidomain";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_total_deal_inc()');
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Company total deal number decrement
-// Parameters:
-//   - $comp_id : company id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_company_total_deal_dec($comp_id) {
-  global $cdg_sql;
-
-  $multidomain = sql_multidomain('company');
-
-  $comp_id = sql_parse_id($comp_id, true);
-  $query = "UPDATE Company SET
-      company_deal_total=company_deal_total-1
-    WHERE company_id $comp_id 
-      $multidomain";
-
-  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_total_deal_dec()');
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the deal archive status
-// Parameters:
-//   - $deal_id : deal id
-// Returns: archived status : 1 = archived, 0 = not archived
-///////////////////////////////////////////////////////////////////////////////
-function get_deal_archive($deal_id) {
-  global $cdg_sql;
-
-  $multidomain = sql_multidomain('deal');
-  $deal_id = sql_parse_id($deal_id, true);
-  $query = "SELECT deal_archive 
-    FROM Deal
-    WHERE deal_id $deal_id 
-      $multidomain";
-
-  display_debug_msg($query, $cdg_sql, 'get_deal_archive()');
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
   $obm_q->next_record();
-  $retour = $obm_q->f('deal_archive');
+  $nb = $obm_q->f('nb');
 
+  $query = "UPDATE Company SET
+      company_deal_number=$nb
+    WHERE company_id $comp_id 
+      $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_active_deal_update()');
+  $retour = $obm_q->query($query);
+  return $retour;
+}
+
+
+/**
+ * Update the company total deal number (only public deals with archived)
+ * @param $comp_id company id
+ **/
+function run_query_deal_company_total_deal_update($comp_id) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('company');
+  $comp_id = sql_parse_id($comp_id, true);
+
+  $query = "SELECT count(*) as nb
+      FROM Deal
+      WHERE deal_company_id $comp_id 
+        AND deal_privacy = 0";
+
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  $obm_q->next_record();
+  $nb = $obm_q->f('nb');
+
+  $query = "UPDATE Company SET
+      company_deal_total=$nb
+    WHERE company_id $comp_id 
+      $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_deal_company_total_deal_update()');
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
   return $retour;
 }
 

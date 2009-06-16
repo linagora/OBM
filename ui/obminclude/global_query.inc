@@ -28,18 +28,19 @@ function get_obm_info($info) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Company contact update
-// Parameters:
-//   - $comp_id : company id
-///////////////////////////////////////////////////////////////////////////////
+/**
+ * Update the company contact number stored in company (only public contacts)
+ * @param $comp_id company id
+ **/
 function run_query_global_company_contact_number_update($comp_id) {
   global $cdg_sql;
+
   $comp_id = sql_parse_id($comp_id, true);
   $query = "SELECT count(*) as nb
       FROM Contact
       WHERE contact_company_id $comp_id 
-        AND contact_archive = '0'";
+        AND contact_archive = '0'
+        AND contact_privacy = 0";
 
   display_debug_msg($query, $cdg_sql, 'run_query_global_company_contact_number_update()');
   $obm_q = new DB_OBM;
@@ -143,6 +144,7 @@ function run_query_global_contactfunction() {
  **/
 function get_global_lead_sources() {
   global $cdg_sql;
+
   $ret = array();
   $multidomain = sql_multidomain('leadsource');
   $query = "SELECT * FROM LeadSource WHERE 1=1 $multidomain ORDER BY leadsource_label";
@@ -276,20 +278,27 @@ function get_global_tasktype($tt_cat='', $tt_ids='') {
 //   - $element : element linked 'Contact, Lead,...' (table name)
 //   - $id      : Id of entity
 //   - $entity  : entity (company)
-//   - $arch    : flag to tell if archived contacts should be counted (if true)
+//   - $arch    : If true : tell archived elements should be counted too
+//   - $public  : If true : tell only public elements should be counted
 // Return:
 //   - $nb      : number of Contact
 ///////////////////////////////////////////////////////////////////////////////
-function get_global_linked_element_nb($element, $id, $entity, $arch='') {
+function get_global_linked_element_nb($element, $id, $entity, $arch='', $public=false) {
   global $cdg_sql;
+
   $id = sql_parse_id($id, true);
   $lelement = strtolower($element);
+    
   $query = "SELECT count(${lelement}_id) as nb
     FROM $element
     WHERE ${lelement}_${entity}_id $id ";
 
   if (! $arch) {
     $query .= " AND ${lelement}_archive=0";
+  }
+
+  if ($public) {
+    $query .= " AND ${lelement}_privacy=0";
   }
 
   $obm_q = new DB_OBM;
@@ -313,6 +322,7 @@ function get_global_linked_element_nb($element, $id, $entity, $arch='') {
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_linked_deal_nb($id, $entity, $arch='', $entity2='') {
   global $cdg_sql;
+
   $id = sql_parse_id($id, true);
   if ($entity2 != '') {
     $where_ent = "(deal_${entity}_id $id OR deal_${entity2}_id $id )";
