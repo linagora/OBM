@@ -26,6 +26,7 @@ To do
   * Calendar, fixes in free/busy screen
   * Improve compatibility with safari (handles safari bugs ;))
   * Control and Samba modules cleaning and "en" translation done 
+  * #72 Time management : dates abreviations, week number
   * #113 Agenda display with IE 6
   * #208 Display problems with some characters (accents,..)
   * #246 People: JavaScript error on click on "Enregistrer l'utilisateur" button
@@ -111,6 +112,7 @@ To do
   * #394 Modal appointment creation : no title size limit
   * #395 User batch import does not allow mail activation
   * #396 Report of mailbox usage is not correct (some users are not listed)
+  * #402 End date day is replaced by start date day in free/busy
   * #403 No way to set rights on a resource for a group
   * #405 pb with vacation message with IE 6
   * #406 Tasks of OBM are not synchronized to the PDA
@@ -118,6 +120,7 @@ To do
   * #409 Obm-Satellite Maps are not updated
   * #413 User: Error on batch processing when (de)activating mail perms
   * #421 Error deleting a user when his names contains a single quote
+  * #425 No possibility to see items in a calendar events
 
 2009-05-29 : version 2.2.4
 

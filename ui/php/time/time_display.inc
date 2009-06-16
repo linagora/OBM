@@ -248,6 +248,7 @@ function dis_time_date_menu($params) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_planning_week($obm_q,$time) {
   global $c_working_days, $c_day_fraction, $c_dst_err, $l_daysofweekshort;
+  global $l_monthsofyearshort;
 
   while ($obm_q->next_record())  {
     $date = $obm_q->f('date');
@@ -268,6 +269,8 @@ function dis_time_planning_week($obm_q,$time) {
     $wday = date('w', $curr_day);
     $day = date('d', $curr_day);
     $hum_wday = $l_daysofweekshort[$wday];
+    $month = date('m', $curr_day);
+    $hum_month = $l_monthsofyearshort[$month-1];
 
     if (!(isset($result[$wday]))) {
       $result[$wday] = 0;
@@ -275,7 +278,7 @@ function dis_time_planning_week($obm_q,$time) {
 
     if ($c_working_days[$wday] != 0) {
       $line1 .= "
-        <td>$hum_wday $day</td>";
+        <td>$hum_wday $day $hum_month</td>";
       if ($result[$wday] == $c_day_fraction) {
         $line2 .= "
         <td class=\"downlight\">$c_day_fraction/$c_day_fraction</td>";
