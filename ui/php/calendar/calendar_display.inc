@@ -4005,11 +4005,11 @@ function dis_calendar_free_interval($calendar) {
       <span>$GLOBALS[l_header_meeting]</span>
       </h1>
       <h2>
-        <a href='#' onclick='changePeriod(\"$prev_month\")' class='closeSticky'><img src='$GLOBALS[ico_far_previous]' alt='[$GLOBALS[l_previous]'] /></a>
-        <a href='#' onclick='changePeriod(\"$prev_week\")' class='closeSticky'><img src='$GLOBALS[ico_previous]' alt='[$GLOBALS[l_previous]'] /></a>
+        <a href='#' onclick='changePeriod(\"$prev_month\")'><img src='$GLOBALS[ico_far_previous]' alt='[$GLOBALS[l_previous]'] /></a>
+        <a href='#' onclick='changePeriod(\"$prev_week\")'><img src='$GLOBALS[ico_previous]' alt='[$GLOBALS[l_previous]'] /></a>
         $label
-        <a href='#' onclick='changePeriod(\"$next_week\")' class='closeSticky'><img src='$GLOBALS[ico_next]' alt='[$GLOBALS[l_next]'] /></a>
-        <a href='#' onclick='changePeriod(\"$next_month\")' class='closeSticky'><img src='$GLOBALS[ico_far_next]' alt='[$GLOBALS[l_next]'] /></a>
+        <a href='#' onclick='changePeriod(\"$next_week\")'><img src='$GLOBALS[ico_next]' alt='[$GLOBALS[l_next]'] /></a>
+        <a href='#' onclick='changePeriod(\"$next_month\")'><img src='$GLOBALS[ico_far_next]' alt='[$GLOBALS[l_next]'] /></a>
       </h2>
     </div>
     <div class='freeBusyEntities'>
