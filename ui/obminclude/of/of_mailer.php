@@ -99,7 +99,7 @@ class OBM_Mailer extends Stato_Mailer {
     $db->next_record();
     
     $email = $this->getEntityEmail($db->f('userobm_email'), $db->f('domain_name'));
-
+    if(!$email) $email = $this->getEntityEmail('noreply');
     return array($email, $db->f('userobm_firstname').' '.$db->f('userobm_lastname'));
   }
   
@@ -182,11 +182,8 @@ class OBM_Mailer extends Stato_Mailer {
    */
   protected function getEntityEmail($mail=null, $domain=null, $first_only=true, $separator=', ', $id=null, $entity='user') {
     global $obm;
-    if (is_null($mail)) {
-      if (is_null($id)) {
-        return false;
-      }
-      if (is_null($id)) {
+    if ($mail === null) {
+      if ($id === null) {
         $id = $obm['uid'];
       }
       $e = get_entity_info($id, $entity);
@@ -194,7 +191,7 @@ class OBM_Mailer extends Stato_Mailer {
       $domain = $e['domain_name'];
     }
 
-    if (is_null($domain) && $obm['domain_global'] === false) {
+    if ($domain === null && $obm['domain_global'] === false) {
       $domain = $obm['domain_name'];
     }    
     $mail = explode("\r\n",$mail);
@@ -209,7 +206,7 @@ class OBM_Mailer extends Stato_Mailer {
         $emails[] = $email;
       }
     }
-    if (!is_null($separator)) {
+    if ($separator !== null) {
       return implode($separator,$emails);
     } else {
       return $emails;

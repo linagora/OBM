@@ -102,7 +102,8 @@ class Vcalendar_Writer_ICS {
     $userInfo = get_user_info($value);
     $params[] = $this->parseName('x-obm-id').'='.$value;
     $params[] = 'CN='.$this->parseText($userInfo['firstname'].' '.$userInfo['lastname']);
-    $value =  'MAILTO:'.$userInfo['email'];
+    if(!$userInfo['email']) $userInfo['email'] = get_entity_email('noreply'); 
+    $value =  'MAILTO:'.$this->parseText($userInfo['email']);
     $property = $this->parseProperty($this->parseName($name).';'.implode(';',$params).':'.$value);
     $this->buffer .= $property."\r\n";      
   }
@@ -122,7 +123,8 @@ class Vcalendar_Writer_ICS {
       switch($attendee['entity']) {
       case 'user' :
         $userInfo = get_user_info($attendee['id']);
-        $value =  'MAILTO:'.$userInfo['email'];
+        if(!$userInfo['email']) $userInfo['email'] = get_entity_email('noreply'); 
+        $value =  'MAILTO:'.$this->parseText($userInfo['email']);
         $params[] = 'CUTYPE=INDIVIDUAL';
         $params[] = 'CN='.$this->parseText($userInfo['firstname'].' '.$userInfo['lastname']);
         $params[] = 'PARTSTAT='.$partstat;
@@ -130,7 +132,7 @@ class Vcalendar_Writer_ICS {
         break;
       case 'resource' :          
         $resourceInfo = get_entity_info($attendee['id'],'resource');
-        $value =  'MAILTO:';
+        $value =  'MAILTO:'.$this->parseText(get_entity_email('noreply'));
         $params[] = 'CUTYPE=RESOURCE';
         $params[] = 'CN='.$this->parseText($resourceInfo['label']);          
         $params[] = 'PARTSTAT='.$partstat;
@@ -138,6 +140,7 @@ class Vcalendar_Writer_ICS {
         break;
       case 'group' :
         $groupInfo = get_group_info($attendee ['id']);
+        if(!$groupInfo['email']) $groupInfo['email'] = get_entity_email('noreply'); 
         $value = 'MAILTO:'.$this->parseText($groupInfo['email']);
         $params[] = 'CUTYPE=GROUP';
         $params[] = 'CN='.$this->parseText($groupInfo['name']);
@@ -145,7 +148,7 @@ class Vcalendar_Writer_ICS {
         $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
         break;
       case 'task' :
-        $mail =  'MAILTO:';
+        $mail =  'MAILTO:'.$this->parseText(get_entity_email('noreply'));
         $params[] = 'CUTYPE=X-TASK';          
         $params[] = 'PARTSTAT=ACCEPTED';
         $params[] = $this->parseName('x-obm-id').'='.$attendee['id'];
@@ -153,7 +156,8 @@ class Vcalendar_Writer_ICS {
       case 'contact' :
         $contactInfo = get_contact_from_ids(array($attendee['id']));
         $params[] = 'CUTYPE=INDIVIDUAL';
-        $value = 'MAILTO:'.$contactInfo['entity'][ $attendee['id'] ]['email_address'];
+        if(!$contactInfo['entity'][ $attendee['id'] ]['email_address'])$contactInfo['entity'][ $attendee['id'] ]['email_address'] = get_entity_email('noreply');
+        $value = 'MAILTO:'.$this->parseText($contactInfo['entity'][ $attendee['id'] ]['email_address']);
         break;
 
       default:
