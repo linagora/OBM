@@ -3938,18 +3938,21 @@ function dis_calendar_free_interval($calendar) {
     $week_day_list .= "<td colspan='$colspan' class='freeBusyCalendarDay'>$day</td>\n";
     $end_day = clone $current;
     $end_day->setHour($GLOBALS['ccalendar_last_hour']);
+
     // Hour
-    while($current->compare($end_day) < 0) {
+    $d = clone $current;
+    $current->addDay(1);
+
+    while($d->compare($end_day) < 0) {
       $label = "";
       $class= "";
-      if($current->compareMinute(0) == 0) {
-        $label = $current->get(Of_Date::TIME_SHORT);
+      if($d->compareMinute(0) == 0) {
+        $label = $d->get(Of_Date::TIME_SHORT);
         $class = "freeBusyCalendarHourDisplayed";
         $day_hours_list .= "<td colspan='$unit' class='$class freeBusyCalendarHour'><span>$label</span></td>";
       }
-      $current->addSecond($time_unit_sec);
+      $d->addSecond($time_unit_sec);
     }
-    $current->addDay(1);
   }
 
   $url = "$path/people/people_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_attendees_id&amp;filter_entity=calendar&amp;filter_pattern=access";
@@ -3971,14 +3974,17 @@ function dis_calendar_free_interval($calendar) {
     $current->setHour($GLOBALS['ccalendar_first_hour']);
     $end_day = clone $current;
     $end_day->setHour($GLOBALS['ccalendar_last_hour']);
-    while($current->compare($end_day) < 0) {
-      $end_slot = clone $current;
-      $end_slot->addSecond($time_unit_sec);
-      $attendeesBar .= "<td class='timeSlot'><div id='".$current->getTimestamp()."' style='width:${colWidth}px;'></div></td>";
-      array_push($time_slots, $current->get(Of_Date::TIMESTAMP));
-      $current->addSecond($time_unit_sec);
-    }
+
+    $d = clone $current;
     $current->addDay(1);
+
+    while($d->compare($end_day) < 0) {
+      $end_slot = clone $d;
+      $end_slot->addSecond($time_unit_sec);
+      $attendeesBar .= "<td class='timeSlot'><div id='".$d->getTimestamp()."' style='width:${colWidth}px;'></div></td>";
+      array_push($time_slots, $d->get(Of_Date::TIMESTAMP));
+      $d->addSecond($time_unit_sec);
+    }
   }
   $attendeesBar .= "</tr>";
 
