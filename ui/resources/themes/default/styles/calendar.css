@@ -781,7 +781,7 @@ h1.hoursTitle{
 .meetingResize {
   cursor: col-resize;
   background: #000; /*#35839A;*/
-  width: 2px;
+  width: 3px;
 }
 
 .freeBusyButtons {

@@ -1847,7 +1847,7 @@ Obm.CalendarFreeBusy = new Class({
 
         this.meeting_slots = Math.round(this.meeting.offsetWidth/this.slider.stepWidth);
         this.resizeHandler.setStyles({
-          'margin-left' : this.meeting.offsetWidth-this.resizeHandler.offsetWidth+'px'});
+          'margin-left' : this.meeting_slots*this.slider.stepWidth+'px'});
         //this.duration = this.meeting_slots/this.unit;
         this.changeStatus(this.isBusy(this.currentPosition+this.meeting_slots-1));
         this.displayMeetingInfo();
