@@ -323,6 +323,7 @@ $l_module_publication = "Publications";
 $l_module_statistic = "Statistics";
 $l_module_domain = "Domains";
 $l_module_campaign = "Campaign";
+$l_module_report = "Report";
 
 $l_module_time = "Time management";
 $l_module_project = "Projects";
@@ -390,6 +391,7 @@ $l_header_add_deal = "Add deal";
 $l_header_list = "List";
 $l_header_closing = "Closings";
 $l_header_closing_new = "New closing";
+$l_header_tools_upd = "Update";
 
 $l_header_new_child = "New linked Deal";
 $l_header_new_parent = "New Parent Deal";

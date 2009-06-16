@@ -1552,7 +1552,6 @@ function check_user_data_form($p_id, &$user) {
   global $php_regexp_home, $php_regexp_drive, $l_err_home, $l_err_drive;
   global $php_regexp_password;
   global $err, $action, $cdg_sql, $gp_max_user, $perms_admin;
-  //global $obm, $profiles, $cgp_use, $c_imagetype;
   global $obm, $cgp_use, $c_imagetype;
   global $c_max_image_size;
   global $l_err_delegation_target_outside_domain, $l_err_delegation_target_outside_target;
@@ -1703,10 +1702,10 @@ function check_user_data_form($p_id, &$user) {
   }
 
   // If no mail server is set
-  if( ($mail_perms) && ($mail_server_id == '') ) {
+  if ( ($mail_perms) && ($mail_server_id == '') ) {
     $err['msg'] = "$l_mail_server_error";
     $err['field'] = 'mail_server';
-    //    return false;
+    return false;
   }
 
   // If mail access is granted, there must be at least one email address

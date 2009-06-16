@@ -1,7 +1,7 @@
 <!-- $Id$ -->
 O.B.M. 2.2 Changelog
 
-version 2.2.5 - 2009-06-15
+version 2.2.5 - 2009-06-16
 
 To do
 
@@ -19,12 +19,13 @@ To do
  usergroup : agir lorsqu'archivage d'un user ?
 
 
-2009-06-12 : version 2.2.5
+2009-06-16 : version 2.2.5
 
   * User creation in samba domain now defaults set the windows property
   * User creation do not display the GID selector anymore (automatically set)
   * Calendar, fixes in free/busy screen
   * Improve compatibility with safari (handles safari bugs ;))
+  * Control and Samba modules cleaning and "en" translation done 
   * #113 Agenda display with IE 6
   * #208 Display problems with some characters (accents,..)
   * #246 People: JavaScript error on click on "Enregistrer l'utilisateur" button
@@ -73,6 +74,7 @@ To do
   * #344 Pb with reporting module
   * #345 Pb with expiration date in user module with IE 6
   * #346 Pb with mailshare management with IE 6
+  * #349 "Administration" actions available in some modules
   * #350 IE only: timeslot (crenals ;) search error
   * #351 IE only: timeslot error : last user is lost
   * #352 User connected is sometime added to timeslot search

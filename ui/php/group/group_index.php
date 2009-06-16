@@ -642,7 +642,7 @@ function get_group_action() {
 ///////////////////////////////////////////////////////////////////////////////
 function update_group_action() {
   global $params, $actions, $path, $l_add_user, $l_add_group, $l_group;
-  global $cright_write_admin;
+  global $cright_write_admin, $cgp_user;
 
   $id = $params['group_id'];
 
@@ -696,6 +696,12 @@ function update_group_action() {
     }
 
   }
+
+  // Display admin menu only if no userdata defined
+  if (empty($cgp_user['group']['category'])) {
+    $actions['group']['admin']['Condition'] = array('None');
+  }
+
 }
 
 

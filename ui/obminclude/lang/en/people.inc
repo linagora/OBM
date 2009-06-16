@@ -1,8 +1,8 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : English                                                   //
-//     - File     : people.inc                                                 //
-// 2008-10-06 Vincent Bernard                                               //
+// OBM - Language : English                                                  //
+//     - File     : people.inc                                               //
+// 2008-10-06 Vincent Bernard                                                //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id: people.inc 3097 2008-09-22 14:22:46Z benoitc $ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,23 +31,7 @@ $l_photo = "Photo";
 $l_delete_userobmphoto = "Delete user's photo";
 
 $l_hidden = 'Hidden mailbox';
-$l_mail_server = "Mail Server";
-$l_email_nomade = "Nomad email address";
-$l_nomade = "Mail forwarding";
-$l_access_nomade = "Mail forwarding";
 $l_perms = "Allowed";
-$l_local_copy = "Local copy";
-$l_vacation = "Vacation message";
-$l_vacation_message = "Message";
-$l_vacation_datebegin = "From";
-$l_vacation_dateend = "To";
-$l_access = "Internet access";
-$l_web = "Web access";
-$l_smb = "Windows network";
-$l_smb_perms = "Windows user";
-$l_smb_home = "Home directory";
-$l_smb_home_drive = "Home drive";
-$l_smb_logon = "Logon script";
 $l_group_member = "Member of groups";
 $l_password_type = "Password Crypt";
 
@@ -75,28 +59,13 @@ $l_password_empty = "The password must be fill and valid - between 4 and 12 char
 $l_password_error = "The password is not valid - between 4 and 12 chars (alphanumeric or -\$\&~#{([|_`^@);]+=}%!:/.,?<>\") !";
 $l_profile_privilege_error = "Insufficients privileges to update this profile level !";
 $l_last_admin_error = "The last admin profile can't be updated !";
-$l_mail_perms_error = "The mail must be activated to allow external email !";
-$l_mail_server_error = "An email server must be set!";
-
 $l_email_error = "The email given is not valid !";
 $l_email_empty = "An email address must be given to activate the mail !";
 $l_email_exist = "The email address is already in use !";
 $l_uemail_exist = "The email address is present more than once !";
-$l_quota_error = "The email Quota is not valid !";
-$l_err_web_all = "The web access mode must be set !";
-$l_nomade_without_mail_perms = "The mail forwarding can't be allowed if the mail is not enabled !";
-$l_nomade_perms_error = "The mail forwarding must be allowed to be activated !";
-$l_nomade_local_copy_error = "The local copy can't be activated if the mail forwarding is not allowed and activated !";
-$l_email_nomad_error = "The mail forwarding email must be given to enable the mail forwarding !";
-$l_vacation_without_mail_perms = "The mail vacation can't be activated if the mail is disabled !";
-$l_empty_vacation_message = "The vacation message can't be empty if the vacation is activated !" ;
 $l_check_sameuser = "These users seem similar to this new entry !";
 $l_exist_error = "A user with that name already exists !";
 $l_lname_error = "Invalid Name !";
-$l_err_home = "The Windows home directory is incorrect !";
-$l_err_drive = "The Windows home drive is incorrect !";
-$l_err_system_samba = "Windows rights can't be updated for a system user !";
-$l_err_host_already_used_by = "The host is already affected to the user ";
 $l_image_type_error = "The photo must be an image file (gif, jpeg or png)";
 $l_image_size_error = "The photo image max size is 96px x 96px and must not exceed 100 kbytes";
 

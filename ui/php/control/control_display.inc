@@ -22,28 +22,25 @@ function html_control_consult($domain_id="") {
   global $l_global_stats, $l_private, $l_public, $l_archive;
   global $l_nb_user, $l_nb_group, $l_nb_mailshare, $l_disk_space;
   global $l_mail_stats, $l_mail_sent, $l_mail_recv, $l_mail_kb_sent, $l_mail_kb_recv;
-  global $l_web_stats, $l_proxy_stats, $l_view_proxy_stats;
-  global $l_maintenance, $l_sys_update, $l_allowed,$l_forbid;
-  global $c_yes, $c_no, $c_virus_log;
+  global $l_maintenance, $l_sys_update;
+  global $c_yes, $c_no;
   global $obm, $cgp_use, $display;
-  global $l_download_log;
 
+  $display['title'] = $l_control;
 
-  $display["title"] = $l_control;
+  if ($cgp_use['service']['mail']) {
 
-  if ($cgp_use["service"]["mail"]) {
-
-    $domain_label = $obm["domain_label"];
-    $domain_name = $obm["domain_name"];
-    $domain = of_domain_get_domain_infos($obm["domain_id"]);
+    $domain_label = $obm['domain_label'];
+    $domain_name = $obm['domain_name'];
+    $domain = of_domain_get_domain_infos($obm['domain_id']);
     $domain_alias = $domain['alias'];
 
     $mode_mail = ($mail_relay ? $l_relay : $l_server);
     if (! $mail_relay) {
-      $mail_server = "";
+      $mail_server = '';
     }
-    if ($mail_relay) $c_mail_relay = "checked";
-    if ($mail_server) $c_mail_server = "checked";
+    if ($mail_relay) $c_mail_relay = 'checked';
+    if ($mail_server) $c_mail_server = 'checked';
 
     $block_mail_info = "
     <div class=\"detail infos\">
@@ -72,12 +69,12 @@ function html_control_consult($domain_id="") {
 ";
   
     $mail_stats = get_mail_stats();
-    $mail_sdate = $mail_stats["mail_start_date"];
-    $mail_edate = $mail_stats["mail_end_date"];
-    $mail_sent = $mail_stats["mail_sent"];
-    $mail_recv = $mail_stats["mail_recv"];
-    $mail_kb_sent = $mail_stats["mail_kb_sent"];
-    $mail_kb_recv = $mail_stats["mail_kb_recv"];
+    $mail_sdate = $mail_stats['mail_start_date'];
+    $mail_edate = $mail_stats['mail_end_date'];
+    $mail_sent = $mail_stats['mail_sent'];
+    $mail_recv = $mail_stats['mail_recv'];
+    $mail_kb_sent = $mail_stats['mail_kb_sent'];
+    $mail_kb_recv = $mail_stats['mail_kb_recv'];
       
     $block_mail_stats = "
     <div class=\"detail infos\">
@@ -110,7 +107,6 @@ function html_control_consult($domain_id="") {
   $g_public = $g['nb'] - $g['nb_private'];
   $nb_mailshare = get_control_mailshare_infos($domain_id);
   $disk_use = get_sys_disk_use();
-  $virus_stats = get_virus_stats();
   
   //  $system_update = get_update_state();
   $sys_update = ($system_update ? $c_yes : $c_no);
@@ -160,11 +156,7 @@ function html_control_consult($domain_id="") {
     </table>
     </div>
 
-    $block_proxy_stats
-
     $block_mail_stats
-    
-    $block_virus_stats
     
     <div class=\"detail infos\">
     <h1>$l_maintenance</h1>
@@ -181,26 +173,4 @@ function html_control_consult($domain_id="") {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-function dis_download_log($controle) {
-  global $l_err_file;
-  $log_name = $controle["log_name"];
-  header("Content-Type: text/forcedownload");
-  header("Content-Disposition: inline; filename=$log_name");
-  if ($handle = @fopen("/var/log/aliamin/".$log_name, "rb")) {
-    $contents = '';
-    $i = 0;
-    while (!feof($handle)) {
-      $contents .= fread($handle, 8192);
-    }
-    fclose($handle); 
-  } else {
-    echo $l_err_file;
-    exit;
-  }
-  echo "$contents";
-  exit; 
-
-}
 </script>

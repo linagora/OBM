@@ -329,7 +329,7 @@ $l_module_todo    = "A faire";
 $l_module_publication  = "Publication";
 $l_module_statistic    = "Statistiques";
 $l_module_domain = "Domaines";
-$l_module_campaign= "Campagne";
+$l_module_campaign = "Campagne";
 $l_module_report = "Rapport";
 
 $l_module_time = "Gestion des temps";
@@ -397,7 +397,6 @@ $l_header_add_deal = "Ajouter affaire";
 $l_header_list = "Liste";
 $l_header_closing = "Clôtures";
 $l_header_closing_new = "Nouvelle clôture";
-$l_header_search = "Chercher";
 $l_header_tools_upd = "Mise à jour";
 $l_header_tools_remote = "Contrôle à distance";
 

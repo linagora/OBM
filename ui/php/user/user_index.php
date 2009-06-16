@@ -668,7 +668,7 @@ function get_user_action() {
 // User Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_user_action() {
-  global $params, $actions, $path;
+  global $params, $actions, $path, $cgp_user;
 
   $id = $params['user_id'];
   if ($id > 0) {
@@ -696,6 +696,12 @@ function update_user_action() {
       $actions['user']['detailconsult']['Condition'] = array('None');
     }
   }
+
+  // Display admin menu only if no userdata defined
+  if (empty($cgp_user['user']['category'])) {
+    $actions['user']['admin']['Condition'] = array('None');
+  }
+
   if (!check_user_wait($params)) {
     $actions['user']['wait']['Condition'] = array('None');
   }
