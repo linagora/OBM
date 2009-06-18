@@ -43,8 +43,8 @@ class DummyGenerators extends PDO
     $pass   = $settings['global']['password'];
     
     return parent::__construct
-      ("$dbtype:host=$host;dbname=$db", $user, $pass,
-       array(PDO::ATTR_PERSISTENT => true));
+      ("$dbtype:host=$host;dbname=$db", $user, $pass
+       );
   }
 
   public function do_inits() {
@@ -86,12 +86,15 @@ AND userobmpref_user_id IS NULL");
       NOW(),
       null,
       1,
-      'foobar',
+      '".$GLOBALS['obm']['domain_label']."',
       '',
-      'foo.bar',
+      '".$GLOBALS['obm']['domain_name']."',
       '')");
-    $this->domain_id = $this->lastInsertId();
-
+    $this->domain_id = $this->lastInsertId('domain','domain_id');
+    /* Add related entity */
+    $entity_id = $this->newEntity();
+    $this->query("INSERT INTO UserEntity (userentity_user_id, userentity_entity_id)
+    VALUES ( ".$this->domain_id.", $entity_id)");
     /* Fill it with initial data from the global domain */
     run_query_domain_init_data($this->domain_id);
 
@@ -115,8 +118,10 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     $nb_groups = ceil($nb_users * $this->nb_groups_ratio);
 
     print "Inserting $nb_users users... ";
-    $users_ids      = new IntIterator(array('start' => 2, 'len' => $nb_users));
-    $usergroups_ids = new IntIterator(array('start' => 1, 'len' => $nb_groups,
+    $start = $this->lastInsertId('userobm','userobm_id') +1 ;
+    $users_ids      = new IntIterator(array('start' => $start, 'len' => $nb_users));
+    $start = $this->lastInsertId('ugroup','group_id') +1 ;
+    $usergroups_ids = new IntIterator(array('start' => $start, 'len' => $nb_groups,
                                             'every' => 1/$this->nb_groups_ratio));
     $this->createUsers(clone $users_ids, clone $usergroups_ids);
     print "done\n";
@@ -124,7 +129,7 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
 
 
     print "Inserting $nb_groups groups... ";
-    $groups_ids     = new IntIterator(array('start' => 1, 'len' => $nb_groups));
+    $groups_ids     = new IntIterator(array('start' => $start, 'len' => $nb_groups));
     $this->createGroups(clone $groups_ids);
     print "done\n";
 
@@ -382,7 +387,7 @@ VALUES (              '$gid',          '$entity_id')");
           metaphone($lname), 'COM'.randomAlphaStr(15) // sound, comment
           );
       $this->execute_or_die($contacts, $changing);
-      $cid = $this->lastInsertId();
+      $cid = $this->lastInsertId('contact','contact_id');
 
       $this->execute_or_die($sctct, array($cid));
 
@@ -648,7 +653,7 @@ VALUES (                  '$cid',            '$entity_id')");
           $days = '0000000';
           $repeatkind = 'none';
           $freq = 1;
-          $allday = !rand(0,15);
+          $allday = intval(!rand(0,15));
           $duration = rand(1,5) * 3600;
 
           /* Make the time to forward */
@@ -679,7 +684,7 @@ VALUES (                  '$cid',            '$entity_id')");
         $this->execute_or_die($events, $changing);
 
         /* Insert in EventLink table the event creator as participant */
-        $last_id = $this->lastInsertId();
+        $last_id = $this->lastInsertId('event','event_id');
         $changing = array
           ( $last_id, $uid,   // event id, user's event id
             $euid,rand(0,100),// event participant entity id, percent state
@@ -760,8 +765,13 @@ VALUES (                  '$cid',            '$entity_id')");
 
   public function newEntity() {
     $this->query('INSERT INTO Entity (entity_mailing) VALUES (TRUE)');
-    $this->last_entity_id = $this->lastInsertId();
+    $this->last_entity_id = $this->lastInsertId('entity','entity_id');
     return $this->last_entity_id;
+  }
+
+  public function lastInsertId($table, $field) {
+    $res = $this->query("SELECT MAX($field) FROM $table");
+    return $res->fetchColumn();
   }
 }
 
