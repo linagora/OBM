@@ -368,7 +368,7 @@ function get_company_params() {
   if (isset ($params['town'])) $params['town'] = get_format_town($params['town']);
   
   get_global_params_document($params);
-  
+
   return $params;
 }
 
