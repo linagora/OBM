@@ -4959,6 +4959,195 @@ function check_conflict($column){
   return $return;
 }
 
+/**
+ * Used to keep a growing description of something that will be draw.
+ * It's used to store as many data as we want, without drawing it,
+ * and then to write it all in a row. It takes care about pages changes
+ * and header drawing, and relative positions.
+ */
+Class PdfStub {
+  const POS_RIGHT  = 1;
+  const POS_BOTTOM = 2;
+
+  private $data;
+  private $pdf;
+  private $current_x = 0;
+  private $current_y = 0;
+  private $current_color;
+  private $origin_x;
+  private $origin_y;
+  private $current_pages;
+  private $pages_size;
+  public $addpage_args;
+
+  public function __construct($pdf, $origin_x=0, $origin_y=0) {
+    $this->pdf = $pdf;
+    $this->setOrigin($origin_x, $origin_y);
+    $this->data = $this->pages_size = array();
+    $this->addpage_args = array(true, false);
+    $this->current_pages = 1;
+  }
+
+  public function setOrigin($x=0, $y=0) {
+    $this->origin_x = $x;
+    $this->origin_y = $y;
+  }
+
+  public function setPosition($x=0, $y=0) {
+    $this->current_x = $x;
+    $this->current_y = $y;
+  }
+  public function setX($x) {
+    $this->current_x = $x;
+  }
+  public function setY($y) {
+    $this->current_y = $y;
+  }
+  public function addX($x=0) {
+    $this->current_x += $x;
+  }
+  public function subY($y=0) {
+    $this->current_y -= $y;
+  }
+  public function getX() {
+    return $this->current_x;
+  }
+  public function getY() {
+    return $this->current_y;
+  }
+  public function getPosition() {
+    return array($this->current_x, $this->current_y);
+  }
+  public function setFillColor($color) {
+    $this->current_color = $color;
+  }
+
+
+  /* Pages */
+  public function addPage() {
+    return $this->addElement(-1, 'writePage');
+  }
+  private function writePage() {
+    call_user_func_array(array(&$this->pdf, 'addPage'), $this->addpage_args);
+    $this->pdf->drawHeader();
+    $this->setOrigin($this->pdf->content_x0, $this->pdf->current_y + $this->pdf->font_height);
+  }
+
+  /* Rectangle */
+  public function addRectangle($width, $height, $flags=0) {
+    return $this->insertRectangle(-1, $width, $height, $flags);
+  }
+  public function insertRectangle($idx, $width, $height, $flags=0) {
+    return $this->addElement($idx, 'writeRectangle', array($width, $height, $flags),
+                      array('width' => $width, 'height' => $height));
+  }
+  private function writeRectangle($width, $height, $flags) {
+    $x0 = $this->origin_x + $this->current_x;
+    $y0 = $this->origin_y + $this->current_y;
+    $this->pdf->page->drawRectangle($x0, $y0, $x0 + $width, $y0 + $height, $flags);
+  }
+
+  /* Bounded text */
+  public function addText($width, $height, $text, $enc,
+                          $pflags=Zend_Pdf_Cell::POSITION_LEFT, $aflags=Zend_Pdf_Cell::ALIGN_LEFT) {
+    // We use a dummy page for our text sizes calculations, beacause addElement() may
+    // detect an overflow and put it in the next page.
+    // Real page will be set in writeText().
+    $page = new Zend_Pdf_Page($this->pdf->page);
+    $page->setFont($this->pdf->font, $this->pdf->font_size);
+    $cell = new Zend_Pdf_Cell($page, $pflags, $width, $height);
+    $cell->setLocation(0, 0);
+    $cell->addText($text, $aflags, 0, $enc);
+
+    if($height == 0) {
+      $height = (1 + $cell->getLineNumber()) * $this->pdf->font_height;
+    }
+    if($width == 0) {
+      $width = $this->pdf->getStringWidth($text);
+    }
+    return $this->addElement(-1, 'writeText', array($cell),
+                             array('width' => $width, 'height' => $height));
+  }
+  private function writeText($cell) {
+    $cell->setLocation($this->origin_x + $this->current_x, $this->origin_y + $this->current_y);
+    $cell->setPage($this->pdf->page);
+    $cell->write();
+  }
+
+  private function addElement($idx, $func, $args = array(), $pos = array()) {
+    if($idx == -1)
+      $idx = count($this->data);
+
+    $params = array_merge($pos, array('action' => $func, 'args' => $args,
+                                      'x' => $this->current_x, 'y' => $this->current_y));
+
+    if(isset($this->current_color)) {
+      $params['color'] = $this->current_color;
+    }
+
+    array_splice($this->data, $idx, 0, array($params));
+    return $idx;
+  }
+
+  private function getLastElement($back = 1) {
+    $i = count($this->data) - $back;
+    if($i < 0)
+      return null;
+    else
+      return $this->data[$i];
+  }
+
+  public function getLastElementHeight() {
+    $i = 0;
+    do {
+      $last = $this->getLastElement(++$i);
+    } while($last != null && !isset($last['height']));
+    return $last['height'];
+  }
+
+  public function gotoNextSpacePosition($direction, $back=1) {
+    $i = count($this->data);
+    if($i == 0)
+      return;
+
+    do {
+      $prev = $this->data[ --$i ];
+      if(   (isset($prev['x']) && isset($prev['width'])  && $direction & PdfStub::POS_RIGHT)
+         || (isset($prev['y']) && isset($prev['height']) && $direction & PdfStub::POS_BOTTOM))
+        break;
+    } while($i >= 0);
+
+    if($direction & PdfStub::POS_RIGHT) {
+      $this->current_x += $prev['width'];
+    }
+    if($direction & PdfStub::POS_BOTTOM) {
+      $this->current_y -= $prev['height'];
+    }
+  }
+
+  public function write() {
+    foreach($this->data as $stub) {
+      if(isset($stub['y'])) {
+        $stub['y'] += array_sum($this->pages_size); // Convert to absolute coords
+        if($this->origin_y + $stub['y'] - abs($stub['height']) < $this->pdf->content_y0) {
+          $this->writePage();
+          $this->current_pages++;
+          $this->pages_size[] = -$stub['y'];
+          $stub['y'] = 0;
+        }
+        $this->current_y = $stub['y'];
+      }
+
+      if(isset($stub['x']))
+        $this->current_x = $stub['x'];
+
+      if(isset($stub['color']))
+        $this->pdf->page->setFillColor($stub['color']);
+
+      call_user_func_array(array(&$this, $stub['action']), $stub['args']);
+    }
+  }
+}
 
 /**
  * CalendarPdf Class
@@ -5969,6 +6158,7 @@ Class CalendarPdfList Extends CalendarPdf{
 
     if (is_array($ocs)) {
       ksort($ocs);
+      $stub = new PdfStub($this, $this->content_x0, $this->current_y);
       foreach($ocs as $key => $occurrence) {
         $d->setTimestamp($key);
 
@@ -5989,54 +6179,27 @@ Class CalendarPdfList Extends CalendarPdf{
 
         $day_text_evt = $d->localize(Of_Date::OBM_DATE_MONTH_LIST);
 
-        $col_height = (sizeof($occurrence) + 1)*$this->font_height;
-
-        if ($this->showdetails) {           
-          foreach($occurrence as $blocks) {
-            $datas = array(
-              ($blocks->event->repeat == 'none')?'':$blocks->event->repeat, 
-              $blocks->event->category1,
-              $blocks->event->location, 
-              $blocks->event->description,
-              (is_array($blocks->event->attendee['resource']))?implode(',',$blocks->event->attendee['resource']):'', 
-              (is_array($blocks->event->attendee['user']))?implode(',',$blocks->event->attendee['user']):'',
-              'dummy'); 
-            $datas = array_filter($datas);
-            $col_height += (sizeof($datas,COUNT_RECURSIVE) - 1  ) * $this->font_height;
-          }
-        }
-
-  $endofday = $this->current_y-$col_height;
-        if ($endofday<$this->content_y0+$this->font_height || $this->onedayperpage) {
-          $this->addPage(true, false);
-          $this->drawHeader();
-          $this->current_y = $this->calendar_y1-$this->font_height-1 ;
-          $endofday = $this->content_y0+$this->font_height;
-        }
-
-        // one day
-        $this->page->setFillColor(new Zend_Pdf_Color_Html($color));
-        $this->page->drawRectangle(
-          $this->content_x0,
-          $this->current_y+$this->font_height,
-          $this->content_x1,
-          $endofday,
-          Zend_Pdf_Page::SHAPE_DRAW_FILL);
-        $this->page->setFillColor(new Zend_Pdf_Color_Html("#368397"));
-        $this->page->drawText(
-          $day_text_evt,
-          $this->content_x0+2,
-          $this->current_y+1,
-          'UTF-8');
+        list($x0, $y0) = $stub->getPosition();
+        $stub->addX(2);
+        $stub->subY(1);
+        $stub->setFillColor(new Zend_Pdf_Color_Html("#368397"));
+        $day_rect = $stub->addText(0, 0, $day_text_evt, 'UTF-8');
+        $stub->setPosition($x0, $y0);
 
         // draw events
-        $this->addEvents($occurrence);
+        $this->addEvents($occurrence, $stub);
+        $occ_y = $stub->getY() - $y0;
 
-        // new y
-        $this->current_y -= $col_height +$this->font_height;
-
+        // one day
+        $stub->setPosition($x0, $y0 + $this->font_height);
+        $stub->setFillColor(new Zend_Pdf_Color_Html($color));
+        $stub->insertRectangle($day_rect, $this->content_x1 - $this->content_x0,
+                               $occ_y - $this->font_height*2,
+                               Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $stub->setPosition($x0, $y0 + $occ_y - $this->font_height*2);
       }
-    }
+      $stub->write($this);
+   }
   }
 
 
@@ -6083,9 +6246,10 @@ Class CalendarPdfList Extends CalendarPdf{
   
 
   /**
-   * add an event to the PDF
+   * add an event to the PDF, in the PdfStub $stub object
+   * which describes the drawing instructions.
    */
-  function addEvents($occurrences){
+  function addEvents($occurrences, $stub) {
     global $obm, $l_private;
     global $l_daily, $l_weekly, $l_monthlybydate, $l_monthlybyday, $l_yearly;
     global $l_category,$l_datebegin, $l_dateend, $l_repeat,$l_attendees, $l_title, $l_location;;
@@ -6199,36 +6363,20 @@ Class CalendarPdfList Extends CalendarPdf{
         }
       }
 
-      if ($evt_y-$key*$this->font_height < $this->content_y0+$this->font_height) {
-        $this->addPage(true, false);
-        $this->drawHeader();
-        $evt_y = $this->current_y+$key*$this->font_height;
-      }
-
       // Event title
-      $this->page->setFillColor(new Zend_Pdf_Color_Html("#368397"));
-      $cellt = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
-                                 $this->calendar_x1-$this->getStringWidth($dis_people.$dis_res)
-                                 - ($this->content_x0 + 169 - $margin_left),
-                                 $this->font_height);
-      $cellt->setLocation($this->content_x0 + 169 - $margin_left,
-                          $evt_y-$key*$this->font_height);
-      $cellt->addText($head, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
-      $cellt->write();
+      $stub->setX(169 - $margin_left);
+      $stub->setFillColor(new Zend_Pdf_Color_Html("#368397"));
+      $stub->addText($this->calendar_x1 - $this->content_x0 - (169 - $margin_left)
+                     - $this->getStringWidth($dis_people.$dis_res),
+                     0, $head, 'UTF-8');
+      $title_h = $stub->getLastElementHeight();
 
       // Event attendees + resources
-      $celld = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
-                                 $this->getStringWidth($dis_people.$dis_res) + 10,
-                                 $this->font_height);
-      $celld->setLocation($this->calendar_x1-$this->getStringWidth($dis_people.$dis_res),
-                          $evt_y-$key*$this->font_height);
-      $celld->addText($dis_people.$dis_res, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
-      $celld->write();
-
-      // Add lines cut by each cell
-      $evt_y -= max( $cellt->getLineNumber()*$this->font_height,
-                     $celld->getLineNumber()*$this->font_height  );
-
+      $stub->gotoNextSpacePosition(PdfStub::POS_RIGHT);
+      $bar_idx = $stub->addText($this->getStringWidth($dis_people.$dis_res) + 10,
+                                0, $dis_people.$dis_res, 'UTF-8');
+      $stub->subY($title_h);
+      
       if ($this->showdetails) {
         $repeat = $event->repeat;
         if ($repeat == 'none') {
@@ -6249,48 +6397,37 @@ Class CalendarPdfList Extends CalendarPdf{
           "$l_resources" => $dis_resources,
           "$l_items" => "$item_list"); 
         $details = array_filter($details);
-        $details_height = (sizeof($details,COUNT_RECURSIVE) - 2 )*$this->font_height;
-
         // left bar
-        $x0 = $this->content_x0+170;
-        $y0 = $evt_y-$key*$this->font_height;
-        $x1 = $x0+3;
-        $y1 = $y0-$this->font_height-$details_height;
-
-        $this->page->setFillColor(new Zend_Pdf_Color_Html("#B3B3B3"));
-        $this->page->drawRectangle($x0, $y0, $x1, $y1, Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $x0 = 170;
 
         // details list
-        $this->page->setFillColor(new Zend_Pdf_Color_Html("#3D3D3D"));
-        $i=0;
+        $y0_bar = $stub->getY();
+        $stub->setFillColor(new Zend_Pdf_Color_Html("#3D3D3D"));
         foreach($details as $label => $value){
-          $this->page->drawText(
-            $label,
-            $x0+5,
-            $y0-$this->font_height - $i*$this->font_height,
-            'UTF-8');
-          $cellinit = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
-                                        $this->calendar_x1 - ($x0+80), $this->font_height);
-          if (is_array($value)){
-            if (sizeof($value)==0) $i++;
-            foreach($value as $array_value){
-              $array_value = substr($array_value, 0, 400);
-              $cell = clone $cellinit;
-              $cell->setLocation($x0+80, $y0-$this->font_height-$i*$this->font_height);
-              $cell->addText($array_value, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
-              $cell->write();
-              $i += $cell->getLineNumber()+1;
-            }
-          } else {
-            $value = substr($value, 0, 400); // TODO: fix php segfault when strlen($value) > 470
-            $cell = $cellinit;
-            $cell->setLocation($x0+80, $y0-$this->font_height-$i*$this->font_height);
-            $cell->addText($value, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
-            $cell->write();
-            $i += $cell->getLineNumber()+1;
+          $stub->setX($x0+5);
+          $stub->addText(0, 0, $label, 'UTF-8');
+          if (!is_array($value)) {
+            $value = array($value);
           }
+          if (sizeof($value)==0) $stub->subY($this->font_height);
+          foreach($value as $array_value){
+            // try to keep a serious value, otherwise a single piece of text would be larger than the page
+            if(strlen($array_value) > 1000) {
+              $array_value = substr($array_value, 0, 995)."(...)";
+            }
+            $stub->setX($x0+80);
+            $stub->addText($this->calendar_x1 - ($x0+80) - $this->calendar_x0,
+                           0, $array_value, 'UTF-8');
+            $stub->gotoNextSpacePosition(PdfStub::POS_BOTTOM);
+          }
+        
         }
-        $evt_y -= $i*$this->font_height;
+        $stub->setFillColor(new Zend_Pdf_Color_Html("#B3B3B3"));
+        $stub->setX(170);
+        $desc_y1 = $stub->getY();
+        $stub->setY($y0_bar + $this->font_height);
+        $stub->insertRectangle($bar_idx, 3, $desc_y1 - $y0_bar, Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $stub->setY($desc_y1);
       }
     }
   }

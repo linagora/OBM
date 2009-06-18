@@ -180,11 +180,11 @@ class Zend_Pdf_Cell {
 		if ($lineWidth+$section['width'] > $maxWidth) {
 			//section of text is greater than our box's diminsions
 			$splitSection=explode(' ',$section['text']);
-			$maxTextSection=$this->_makeTextSection(array_shift($splitSection), $encoding);
+			$maxTextSection=$this->_makeTextSection(array_shift($splitSection).' ', $encoding);
 			while($maxTextSection['text']!==null && $lineWidth + $maxTextSection['width'] < $maxWidth) {
-				$this->addText($maxTextSection['text'].' ', $align, $offset, $section['encoding']);
+				$this->addText($maxTextSection['text'], $align, $offset, $section['encoding']);
 				$lineWidth=$this->_text[$this->_lineNumber]['width'];
-				$maxTextSection=$this->_makeTextSection(array_shift($splitSection), $section['encoding']);
+				$maxTextSection=$this->_makeTextSection(array_shift($splitSection).' ', $section['encoding']);
 			}
             $textHeight = ($this->_font->getLineHeight()/$this->_font->getUnitsPerEm())
               * $this->_fontSize * (count($this->_text)+1);
@@ -195,7 +195,7 @@ class Zend_Pdf_Cell {
             }
 			$this->newLine();
 			$restOfText=implode(' ',$splitSection);
-			$this->addText($maxTextSection['text'].' '.$restOfText, $align, $offset, $section['encoding']);
+			$this->addText($maxTextSection['text'].$restOfText, $align, $offset, $section['encoding']);
 			return true;
 		}
 		return false;
