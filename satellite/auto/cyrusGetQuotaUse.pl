@@ -143,6 +143,4 @@ TO DO -- UPDATE -- TO DO -- UPDATE
 
 This script must be run by system cron.
 
-This script will do nothing if 'obm-contact' option, from 'obm_conf.ini', is false.
-
-This script generate log via syslog.
+This script generates log via syslog.
