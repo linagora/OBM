@@ -4976,7 +4976,6 @@ Class PdfStub {
   private $current_color;
   private $origin_x;
   private $origin_y;
-  private $current_pages;
   private $pages_size;
   public $addpage_args;
 
@@ -4985,7 +4984,6 @@ Class PdfStub {
     $this->setOrigin($origin_x, $origin_y);
     $this->data = $this->pages_size = array();
     $this->addpage_args = array(true, false);
-    $this->current_pages = 1;
   }
 
   public function setOrigin($x=0, $y=0) {
@@ -5028,9 +5026,11 @@ Class PdfStub {
     return $this->addElement(-1, 'writePage');
   }
   private function writePage() {
+    $this->pages_size[] = -$this->current_y;
     call_user_func_array(array(&$this->pdf, 'addPage'), $this->addpage_args);
     $this->pdf->drawHeader();
-    $this->setOrigin($this->pdf->content_x0, $this->pdf->current_y + $this->pdf->font_height);
+    $this->setOrigin($this->pdf->content_x0, $this->pdf->current_y);
+    $this->current_y = 0;
   }
 
   /* Rectangle */
@@ -5128,14 +5128,12 @@ Class PdfStub {
   public function write() {
     foreach($this->data as $stub) {
       if(isset($stub['y'])) {
-        $stub['y'] += array_sum($this->pages_size); // Convert to absolute coords
-        if($this->origin_y + $stub['y'] - abs($stub['height']) < $this->pdf->content_y0) {
-          $this->writePage();
-          $this->current_pages++;
-          $this->pages_size[] = -$stub['y'];
-          $stub['y'] = 0;
-        }
         $this->current_y = $stub['y'];
+        $this->current_y += array_sum($this->pages_size); // Convert to absolute coords
+        if($this->origin_y + $this->current_y - abs($stub['height']) < $this->pdf->content_y0) {
+          $this->current_y -= $this->pdf->font_height;
+          $this->writePage();
+        }
       }
 
       if(isset($stub['x']))
@@ -6159,6 +6157,7 @@ Class CalendarPdfList Extends CalendarPdf{
     if (is_array($ocs)) {
       ksort($ocs);
       $stub = new PdfStub($this, $this->content_x0, $this->current_y);
+      $page = 0;
       foreach($ocs as $key => $occurrence) {
         $d->setTimestamp($key);
 
@@ -6179,6 +6178,10 @@ Class CalendarPdfList Extends CalendarPdf{
 
         $day_text_evt = $d->localize(Of_Date::OBM_DATE_MONTH_LIST);
 
+        if ($this->onedayperpage && $page > 0) {
+          $stub->addPage();
+        }
+
         list($x0, $y0) = $stub->getPosition();
         $stub->addX(2);
         $stub->subY(1);
@@ -6197,6 +6200,8 @@ Class CalendarPdfList Extends CalendarPdf{
                                $occ_y - $this->font_height*2,
                                Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $stub->setPosition($x0, $y0 + $occ_y - $this->font_height*2);
+
+        $page++;
       }
       $stub->write($this);
    }
