@@ -27,6 +27,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.methodHandler.CopyHandler;
@@ -41,7 +46,6 @@ import org.obm.caldav.server.methodHandler.PropPatchHandler;
 import org.obm.caldav.server.methodHandler.PutHandler;
 import org.obm.caldav.server.methodHandler.ReportHandler;
 import org.obm.caldav.server.methodHandler.UnlockHandler;
-import org.obm.caldav.server.resultBuilder.ResultBuilderException;
 import org.obm.caldav.server.share.Token;
 
 /**
@@ -58,19 +62,18 @@ public class WebdavServlet extends HttpServlet {
 
 	private Map<String, DavMethodHandler> handlers;
 	private AuthHandler authHandler;
-	private IProxy proxy;
-	
+
 	/**
 	 * Handles the special WebDAV methods.
 	 */
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 
 		Token token = authHandler.doAuth(request);
-		
+
 		if (token == null) {
 			String uri = request.getMethod() + " " + request.getRequestURI()
-            + " " + request.getQueryString();
+					+ " " + request.getQueryString();
 			logger.warn("invalid auth, sending http 401 (uri: " + uri + ")");
 			String s = "Basic realm=\"CalDavService\"";
 			response.setHeader("WWW-Authenticate", s);
@@ -79,30 +82,55 @@ public class WebdavServlet extends HttpServlet {
 			return;
 		}
 
-		
 		String method = request.getMethod();
 
 		if (logger.isInfoEnabled()) {
 			logger.info("[" + method + "] " + request.getRequestURI());
 		}
 
-
 		DavMethodHandler handler = handlers.get(method.toLowerCase());
 		if (handler != null) {
-			//CHANGER LA GESTION PAR PROXY
-			IProxy proxy = new ProxyImpl(token);
+			IProxy proxy = null;
 			try {
-				handler.process(token, proxy,new DavRequest(request), response);
-			} catch (ResultBuilderException e) {
-				///rfc4791 1.3 Method Preconditions and Postconditions
+				proxy = getProxy();// ProxyImpl(token);
+				proxy.login(token);
+
+				handler
+						.process(token, proxy, new DavRequest(request),
+								response);
+			} catch (Exception e) {
+				// /rfc4791 1.3 Method Preconditions and Postconditions
 				response.sendError(StatusCodeConstant.SC_INTERNAL_SERVER_ERROR);
 				logger.error(e.getMessage(), e);
+			} finally {
+				if (proxy != null) {
+					proxy.logout();
+				}
 			}
-			
 		} else {
 			super.service(request, response);
 		}
-		
+
+	}
+
+	private IProxy getProxy() throws CoreException {
+		IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
+		IExtensionPoint extPoint = extensionRegistry
+				.getExtensionPoint("org.obm.caldav.server.proxy");
+		IConfigurationElement[] configurationElements = extPoint
+				.getConfigurationElements();
+
+		for (IConfigurationElement current : configurationElements) {
+			String[] attributeNames = current.getAttributeNames();
+			for (String currentAttributeName : attributeNames) {
+				System.out.println("Attribut : " + currentAttributeName
+						+ " / Valeur : "
+						+ current.getAttribute(currentAttributeName));
+			}
+		}
+
+		return (IProxy) configurationElements[0]
+				.createExecutableExtension("IProxy");
 
 	}
 
@@ -121,7 +149,7 @@ public class WebdavServlet extends HttpServlet {
 		handlers.put("report", new ReportHandler());
 		handlers.put("put", new PutHandler());
 		handlers.put("delete", new DeleteHandler());
-		
+
 		authHandler = new AuthHandler();
 	}
 

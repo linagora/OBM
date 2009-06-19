@@ -46,13 +46,11 @@ public class PropertyListBuilder {
 			Element pStat = DOMUtils.createElement(response, "D:propstat");
 			Element p = DOMUtils.createElement(pStat, "D:prop");
 			
-			//DAVStore store = new DAVStore();
 			for (String s : toLoad) {
 				Element val = DOMUtils.createElement(p, s);
 				DavPropertyHandler dph = propertiesHandler.get(s);
 				if(dph != null){
 					dph.appendPropertyValue(val, t, req);
-					//store.appendPropertyValue(val, t, req);
 				} else {
 					logger.warn("the Property ["+s+"] is not implemented");
 				}

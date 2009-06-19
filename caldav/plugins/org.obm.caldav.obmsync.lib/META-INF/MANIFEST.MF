@@ -11,8 +11,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: commons-httpclient-3.1.jar,
  commons-lang-2.4.jar,
  obm-sync-client.jar,
- .,
- ical4j-1.0-rc1.jar
+ .
 Export-Package: org.obm.sync.auth,
  org.obm.sync.calendar,
  org.obm.sync.client.calendar,

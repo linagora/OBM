@@ -14,37 +14,38 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.obmsync.service;
+package org.obm.caldav.server;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.obm.caldav.obmsync.exception.AuthorizationException;
 import org.obm.sync.calendar.Event;
 
 
-public interface IEventService {
+public interface ICalendarService {
 	
-	void logout();
-	
-	boolean isConnected();
+	final static String PARTICIPATION_STATE_ACCEPTED = "yes";
+	final static String PARTICIPATION_STATE_DECLINED = "no";
+	final static String PARTICIPATION_STATE_NEEDSACTION = "maybe";
 	
 	Event createEvent(Event event) throws Exception;
-	Event updateOrCreateEvent(String ics, String extId) throws Exception;
+	List<Event> updateOrCreateEvent(String ics, String extId) throws Exception;
 	
 	String getICSName(Event event) throws Exception;
 	
 	Event getEventFromExtId(String externalUrl) throws Exception;
 	
 	List<Event> getAllEvents() throws Exception;
-	Map<String,String> getICSEventsFromExtId(Set<String> listExtIdEvent) throws Exception;
+	List<Event> getAllTodos()  throws Exception;
 	
+	Map<String,String> getICSFromExtId(Set<String> listExtIdEvent) throws Exception;
 	String getUserEmail() throws Exception;
 
 	List<Event> getListEventsOfDays(Date day) throws Exception ;
 
-	void remove(String extId) throws Exception,AuthorizationException ;
+	void removeOrUpdateParticipationState(String extId) throws Exception,AuthorizationException ;
+	
 }
 

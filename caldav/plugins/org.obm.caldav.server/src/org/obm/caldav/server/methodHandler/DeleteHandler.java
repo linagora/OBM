@@ -1,12 +1,11 @@
 package org.obm.caldav.server.methodHandler;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.caldav.obmsync.exception.AuthorizationException;
+import org.obm.caldav.server.AuthorizationException;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.impl.DavRequest;
@@ -35,7 +34,7 @@ public class DeleteHandler extends DavMethodHandler {
 			String extId = CalDavUtils.getExtIdFromURL(req.getURI());
 
 			logger.info("new ext id "+extId);
-			proxy.getEventService().remove(extId);
+			proxy.getCalendarService().removeOrUpdateParticipationState(extId);
 			
 			resp.setStatus(HttpServletResponse.SC_OK);
 			resp.setContentLength(0);
@@ -56,7 +55,6 @@ public class DeleteHandler extends DavMethodHandler {
 			sendDom(ret, resp);
 			logger.error("Unable to delete event", e);
 		}
-
 	}
 
 }

@@ -3,6 +3,7 @@ package org.obm.caldav.server.methodHandler;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,23 +22,20 @@ public class PutHandler extends DavMethodHandler {
 
 	@Override
 	public void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp) {
-	
-		
 		
 		InputStream in;
 		try {
 			String extId = CalDavUtils.getExtIdFromURL(req.getURI());
 
-			logger.info("new ext id "+extId);
 			in = req.getInputStream();
 			String ics = FileUtils.streamString(in, false);
 			logger.info("ics: "+ics);
-			Event event = proxy.getEventService().updateOrCreateEvent(ics, extId);
+			List<Event> event = proxy.getCalendarService().updateOrCreateEvent(ics, extId);
 			
 			resp.setStatus(HttpServletResponse.SC_CREATED);
 			resp.setContentLength(0);
 			resp.setDateHeader("Created", new Date().getTime());
-			resp.setHeader("ETag", event.getUid());
+			//resp.setHeader("ETag", event.getUid());
 		} catch (MalformedURLException e) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			resp.setContentLength(0);

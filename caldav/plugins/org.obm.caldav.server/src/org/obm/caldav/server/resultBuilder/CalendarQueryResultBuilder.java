@@ -1,7 +1,9 @@
 package org.obm.caldav.server.resultBuilder;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
@@ -47,28 +49,35 @@ public class CalendarQueryResultBuilder extends ResultBuilder {
 	// </D:multistatus>
 
 	public Document build(DavRequest req, IProxy proxy,
-			Set<CalendarQueryPropertyHandler> properties, List<Event> listEvents) {
+			Set<CalendarQueryPropertyHandler> properties, Map<String, Event> listEvents) {
 		Document doc = null;
 		try {
 			doc = createDocument();
 			Element root = doc.getDocumentElement();
 			if (listEvents.size() > 0) {
-				for (Event event : listEvents) {
-					Element response = DOMUtils.createElement(root,
-							"D:response");
-					String href = req.getHref() + proxy.getEventService().getICSName(event);
-					DOMUtils.createElementAndText(response, "D:href", href);
-					Element pStat = DOMUtils.createElement(response,
-							"D:propstat");
-					Element p = DOMUtils.createElement(pStat, "D:prop");
-					for (CalendarQueryPropertyHandler prop : properties) {
-						prop.appendCalendarQueryPropertyValue(p, proxy, event);
+				for (Entry<String, Event> entry : listEvents.entrySet()) {
+					Event event = entry.getValue();
+					if (!".ics".equals(entry.getKey())) {
+						Element response = DOMUtils.createElement(root,
+								"D:response");
+						DOMUtils.createElementAndText(response, "D:href", entry.getKey());
+						Element pStat = DOMUtils.createElement(response,
+								"D:propstat");
+						Element p = DOMUtils.createElement(pStat, "D:prop");
+						for (CalendarQueryPropertyHandler prop : properties) {
+							prop.appendCalendarQueryPropertyValue(p, proxy,
+									event);
+						}
+						Element status = DOMUtils.createElement(pStat,
+								"D:status");
+						status.setTextContent("HTTP/1.1 200 OK");
+					} else {
+						logger.error("extid of the event " + event.getUid()
+								+ " is null");
 					}
-					Element status = DOMUtils.createElement(pStat, "D:status");
-					status.setTextContent("HTTP/1.1 200 OK");
 				}
 			} else {
-				
+
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

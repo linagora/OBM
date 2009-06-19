@@ -1,4 +1,4 @@
-package org.obm.caldav.obmsync.exception;
+package org.obm.caldav.server;
 
 public class AuthorizationException extends Exception{
 	

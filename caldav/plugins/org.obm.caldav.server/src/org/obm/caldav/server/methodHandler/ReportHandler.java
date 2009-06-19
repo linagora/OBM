@@ -57,5 +57,4 @@ public class ReportHandler extends DavMethodHandler {
 					+ "'");
 		}
 	}
-
 }

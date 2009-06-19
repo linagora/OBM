@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,6 +34,7 @@ import org.obm.caldav.server.propertyHandler.impl.DGetETag;
 import org.obm.caldav.server.resultBuilder.CalendarMultiGetQueryResultBuilder;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.CalDavUtils;
+import org.obm.caldav.utils.Constants;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -121,14 +123,14 @@ public class CalendarMultiGet extends ReportProvider {
 
 		try {
 			Element root = req.getDocument().getDocumentElement();
-			Set<String> listExtIDEvent = getListExtIdEvent(root);
-			Map<String, String> listICS = proxy.getEventService().getICSEventsFromExtId(listExtIDEvent);
+			Set<String> listExtIDEvent = getListExtId(root);
 			
-			// FIXME CALDAV PropertyListBuilder
-			Document ret = new CalendarMultiGetQueryResultBuilder().build(req, proxy, propertiesValues, listICS);
-			
-			DOMUtils.logDom(ret);
+			Map<String, String> listICS = proxy.getCalendarService().getICSFromExtId(listExtIDEvent);
 
+			
+			
+			Document ret = new CalendarMultiGetQueryResultBuilder().build(req, proxy, propertiesValues, listICS);
+			DOMUtils.logDom(ret);
 			resp.setStatus(207); // multi status webdav
 			resp.setContentType("text/xml; charset=utf-8");
 			DOMUtils.serialise(ret, resp.getOutputStream());
@@ -137,7 +139,7 @@ public class CalendarMultiGet extends ReportProvider {
 		}
 	}
 
-	private Set<String> getListExtIdEvent(Element root){
+	private Set<String> getListExtId(Element root){
 		Set<String> listExtIDEvent = new HashSet<String>();
 		if(root!= null){
 			NodeList dl = root.getElementsByTagNameNS(NameSpaceConstant.DHREF_NAMESPACE, "href");

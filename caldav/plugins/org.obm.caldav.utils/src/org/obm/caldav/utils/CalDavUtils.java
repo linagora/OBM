@@ -1,6 +1,7 @@
 package org.obm.caldav.utils;
 
 import java.net.MalformedURLException;
+import java.util.UUID;
 
 
 public class CalDavUtils {
@@ -16,5 +17,10 @@ public class CalDavUtils {
 			throw new MalformedURLException("Invalid URI[ "+url+ "]");	
 		}
 		return extId;
+	}
+	
+	public static String generateExtId() {
+			
+		return "caldav-"+UUID.randomUUID();
 	}
 }

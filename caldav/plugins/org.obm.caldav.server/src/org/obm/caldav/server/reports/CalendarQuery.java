@@ -85,27 +85,29 @@ public class CalendarQuery extends ReportProvider {
 		}
 		try {
 			Document ret = null;
-
+			Map<String, Event> events = new HashMap<String, Event>();
 			CompFilter cf = compFilter.getCompFilters().get(0);
 			if (CompFilter.VEVENT.equalsIgnoreCase(cf.getName())) {
-				// FIXME MIEUX GERER LES FILTRE
-				List<Event> listEvents = proxy.getEventService().getAllEvents();
-				ret = new CalendarQueryResultBuilder().build(req, proxy,
-						propertiesValues, listEvents);
-				
-				
+				List<Event> retEvents = proxy.getCalendarService().getAllEvents();
+				for (Event event : retEvents) {
+					String href = req.getHref()
+							+ proxy.getCalendarService().getICSName(event);
+					events.put(href, event);
+				}
+
 			} else if (CompFilter.VTODO.equalsIgnoreCase(cf.getName())) {
-				List<Event> listTODO = new LinkedList<Event>();
-				// List<Event> listTODO =
-				// proxy.getEventService().getAllEvents();
-				ret = new CalendarQueryResultBuilder().build(req, proxy,
-						propertiesValues, listTODO);
-				logger.warn("the component filter [" + cf.getName()
-						+ "] is not implemented");
+				List<Event> retEvents = proxy.getCalendarService().getAllTodos();
+				for (Event event : retEvents) {
+					String href = req.getHref()
+							+ proxy.getCalendarService().getICSName(event);
+					events.put(href, event);
+				}
 			} else {
 				logger.warn("the component filter [" + cf.getName()
 						+ "] is not implemented");
 			}
+			ret = new CalendarQueryResultBuilder().build(req, proxy,
+					propertiesValues, events);
 
 			DOMUtils.logDom(ret);
 
