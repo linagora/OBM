@@ -18,15 +18,19 @@ class DummyGenerators extends PDO
   var $user_per_groups;
   var $priv_contact_per_user;
   var $pub_contact_per_user;
+  var $resource_users_ratio;
   var $nb_normal_events_per_user;
   var $nb_reccur_events_per_user;
   var $nb_ext_contact_infos;
   var $meeting_events_ratio;
+  var $rights;
 
   /* Our stuff */
   var $today_date;
   var $ev_manager;
   var $available_repeatkind;
+  var $users_eids;
+  var $contacts_eids;
 
   public function __construct($obmpath = '.')
   {
@@ -53,12 +57,30 @@ class DummyGenerators extends PDO
     $this->user_per_groups           = 2;
     $this->priv_contact_per_user     = 50;
     $this->pub_contact_per_user      = 10;
+    $this->resource_users_ratio      = 1/25;
     $this->nb_normal_events_per_user = 100;
     $this->nb_reccur_events_per_user = 100;
     $this->meeting_events_ratio      = 1/12;
     $this->nb_ext_contact_infos = array
     /* 'Email' => 2 will create rand(0,2) mails per contact */
       ('Email' => 2, 'Website' => 1, 'IM' => 1, 'Address' => 2, 'Phone' => 3);
+
+    /* The propabilities for a user/group to get each right
+       (floats between 0 and 1) */
+    $this->rights = array
+    ( 'calendar' => array
+      ( 'user' => array
+        ( 'access' => 1, 'read' => 1/10,  'write' => 1/200,  'admin' => 1/1000 ),
+        'group'   => array
+        ( 'access' => 0, 'read' => 1/100, 'write' => 1/1000, 'admin' => 0 )
+      ),
+      'resource' => array
+      ( 'user' => array
+        ( 'access' => 1/2,  'read' => 1/2,  'write' => 1/200, 'admin' => 1/400),
+        'group' => array
+        ( 'access' => 1/50, 'read' => 1/50, 'write' => 0,     'admin' => 0 )
+      )
+    );
 
     /* Our stuff */
     $this->today_date = strftime("%Y-%m-%d", time()-(2*3600));
@@ -90,7 +112,7 @@ AND userobmpref_user_id IS NULL");
       '',
       '".$GLOBALS['obm']['domain_name']."',
       '')");
-    $this->domain_id = $this->lastInsertId('domain','domain_id');
+    $this->domain_id = $this->lastInsertId('Domain','domain_id');
     /* Add related entity */
     $entity_id = $this->newEntity();
     $this->query("INSERT INTO UserEntity (userentity_user_id, userentity_entity_id)
@@ -118,9 +140,9 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     $nb_groups = ceil($nb_users * $this->nb_groups_ratio);
 
     print "Inserting $nb_users users... ";
-    $start = $this->lastInsertId('userobm','userobm_id') +1 ;
+    $start = $this->lastInsertId('UserObm','userobm_id') +1 ;
     $users_ids      = new IntIterator(array('start' => $start, 'len' => $nb_users));
-    $start = $this->lastInsertId('ugroup','group_id') +1 ;
+    $start = $this->lastInsertId('UGroup','group_id') +1 ;
     $usergroups_ids = new IntIterator(array('start' => $start, 'len' => $nb_groups,
                                             'every' => 1/$this->nb_groups_ratio));
     $this->createUsers(clone $users_ids, clone $usergroups_ids);
@@ -154,12 +176,18 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     $this->createAllUsersContacts(1, clone $users_ids, $this->pub_contact_per_user);
     print "done\n";
 
-    $contacts_eids = new IntIterator
+    $this->contacts_eids = new IntIterator
      ( array('start' => $next_entity_id,
              'end'   => $this->last_entity_id) );
     print "Randomly inserting informations for all the "
       ."$total_contacts contacts:\n";
-    $this->createContactsExtInfos(clone $contacts_eids);
+    $this->createContactsExtInfos(clone $this->contacts_eids);
+    print "done\n";
+
+    /* Resources */
+    $nb_resources = ceil($nb_users * $this->resource_users_ratio);
+    print "Inserting $nb_resources resources... ";
+    $this->createResources(clone $users_ids, $nb_resources);
     print "done\n";
 
     /* Events */
@@ -167,25 +195,21 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     $this->createCalendars(clone $users_ids);
     print "done\n";
 
-    $users_eids = new IntIterator
+    $this->users_eids = new IntIterator
       ( array('start' => $last_user_entity_id - $nb_users + 1,
               'end'   => $last_user_entity_id + 1) );
     $nb_events = $nb_users * $this->nb_reccur_events_per_user;
     print "Inserting $this->nb_reccur_events_per_user repeating events "
       ."for each user (total $nb_events), with "
       .(int)($this->meeting_events_ratio * 100)."% meetings... ";
-    $this->createEvents(clone $users_ids, clone $users_eids,
-                        clone $contacts_eids, $this->nb_reccur_events_per_user,
-                        true);
+    $this->createEvents(clone $users_ids, $this->nb_reccur_events_per_user,true);
     print "done\n";
 
     $nb_events = $nb_users * $this->nb_normal_events_per_user;
     print "Inserting $this->nb_normal_events_per_user non-repeating events "
       ."for each user (total $nb_events), with "
       .(int)($this->meeting_events_ratio * 100)."% meetings... ";
-    $this->createEvents(clone $users_ids, clone $users_eids,
-                        clone $contacts_eids, $this->nb_normal_events_per_user,
-                        false);
+    $this->createEvents(clone $users_ids, $this->nb_normal_events_per_user,false);
     print "done\n";
   }
   
@@ -313,6 +337,56 @@ VALUES (              '$gid',          '$entity_id')");
     }
   }
 
+  public function createResources($users_iter, $nb_resources) {
+    /* Resource table */
+    $statics = array
+      ( 'resource_domain_id'    => "'$this->domain_id'",
+        'resource_timeupdate'   => "NOW()",
+        'resource_timecreate'   => "NOW()",
+        'resource_delegation'   => "NULL"
+        );
+
+    $dyna_cols = array
+      ( 'resource_usercreate', 'resource_name',
+        'resource_description', 'resource_qty' );
+
+    /* EntityRight table */
+    $entr = $this->massInsertorStatment('EntityRight',
+                       array( /* No statics */),
+                       array( 'entityright_entity_id', 'entityright_consumer_id',
+                              'entityright_access', 'entityright_read',
+                              'entityright_write', 'entityright_admin' ));
+
+    $resources = $this->massInsertorStatment('Resource', $statics, $dyna_cols);
+
+    $uid_start = $users_iter->start();
+    $uid_end   = $users_iter->end()-1;
+  
+    while($nb_resources) {
+      $uid = rand($uid_start, $uid_end);
+      $changing = array
+        ( $uid, randomAlphaStr(8),        // userupdate, name
+          randomAlphaStr(30), rand(1,20)  // description, quantity
+          );
+      $this->execute_or_die($resources, $changing);
+      $rid = $this->lastInsertId('Resource', 'resource_id');
+
+      /* Add related entity */
+      $entity_id = $this->newEntity();
+      $this->query("INSERT INTO ResourceEntity
+       (resourceentity_resource_id, resourceentity_entity_id)
+VALUES (                    '$rid',             '$entity_id')");
+
+      /* Add related rights */
+      $defaults = array
+        ( $entity_id, $uid, rand(0,1), rand(0,1), rand(0,1), rand(0,1) );
+      $this->execute_or_die($entr, $defaults);
+
+
+      $nb_resources--;
+    }
+  }
+
   public function createCalendars($uid_iter)
   {
     /* Fills EntityRigtht */
@@ -337,6 +411,7 @@ VALUES (              '$gid',          '$entity_id')");
       /* Create a new right */
       $rights->execute(array
         ( $entity_id, (int)rand(0,1), (int)rand(0,1), (int)rand(0,1) ));
+
       /* Create a new CalendarEntity */
       $cals->execute(array( $entity_id, $uid ));
     }
@@ -387,7 +462,7 @@ VALUES (              '$gid',          '$entity_id')");
           metaphone($lname), 'COM'.randomAlphaStr(15) // sound, comment
           );
       $this->execute_or_die($contacts, $changing);
-      $cid = $this->lastInsertId('contact','contact_id');
+      $cid = $this->lastInsertId('Contact','contact_id');
 
       $this->execute_or_die($sctct, array($cid));
 
@@ -519,8 +594,7 @@ VALUES (                  '$cid',            '$entity_id')");
     }
   }
 
-  public function createEvents($user_iter, $user_entity_iter,$ctct_entity_iter,
-                               $events_per_user, $want_repeat)
+  public function createEvents($user_iter, $events_per_user, $want_repeat)
   {
     /* Event table */
     $statics = array
@@ -553,21 +627,9 @@ VALUES (                  '$cid',            '$entity_id')");
         'eventlink_entity_id', 'eventlink_percent', 'eventlink_state' );
     $evlink = $this->massInsertorStatment('EventLink', $statics, $dyna_cols);
 
-    /* Build an array with the available participants entity ids,
-       so we can easily randomly pick up one */
-    $participants = array( 'user' => array(), 'contact' => array() );
-    while($eid = $user_entity_iter->nextInt()) {
-      $participants['user'][] = $eid;
-    }
-    $user_entity_iter->gotoStart();
-    while($eid = $ctct_entity_iter->nextInt()) {
-      $participants['contact'][] = $eid;
-    }
-    $ctct_entity_iter->gotoStart();
-
     while(1) {
       $uid = $user_iter->nextInt();
-      $euid = $user_entity_iter->nextInt();
+      $euid = $this->users_eids->nextInt();
       if($uid === null || $euid === null) {
         break;
       }
@@ -683,29 +745,15 @@ VALUES (                  '$cid',            '$entity_id')");
             );
         $this->execute_or_die($events, $changing);
 
-        /* Insert in EventLink table the event creator as participant */
-        $last_id = $this->lastInsertId('event','event_id');
-        $changing = array
-          ( $last_id, $uid,   // event id, user's event id
-            $euid,rand(0,100),// event participant entity id, percent state
-            'ACCEPTED'        // state (static here,but dynamic for other people)
-            );
-        $this->execute_or_die($evlink, $changing);
-
-        /* Randomly insert some other participants in EventLink */
+        /* Randomly insert some other participants in EventLink, and the creator */
+        $last_id = $this->lastInsertId('Event','event_id');
         if($i % (1 / $this->meeting_events_ratio) == 0) {
           /* Note: with $nb_parts = rand(2, 5) we need at least 6 users
              (event creator + 5 others) available, otherwise we may fall
              in an infinite loop while looking for others users */
           $nb_parts = rand(2, 5);
-          $parts = array( $euid );
-          for($j = 0 ; $j < $nb_parts ; $j++) {
-            $who = array_rand($participants);
-            do {
-              $part = $participants[$who][ array_rand($participants[$who]) ];
-            } while(in_array($part, $parts));
-            $parts[] = $part;
-
+          $parts = $this->pickUpRandomPeople($nb_parts, $euid);
+          foreach($parts as $part) {
             $changing = array
               ( $last_id, $uid,   // event id, user's event id
                 $part,rand(0,100),// event participant entity id, percent state
@@ -727,6 +775,18 @@ VALUES (                  '$cid',            '$entity_id')");
       debug_print_backtrace();
       exit(1);
     }
+  }
+
+  public function query_or_die($query)
+  {
+    $res = $this->query($query);
+    if($res === false) {
+      $err = $this->errorinfo();
+      print "\nFailed to execute SQL request:\nQuery: $query\nError: $err[2]\n";
+      debug_print_backtrace();
+      exit(1);
+    }
+    return $res;
   }
 
   public function massInsertorStatment($table, $statics, $dynamic_cols)
@@ -765,12 +825,51 @@ VALUES (                  '$cid',            '$entity_id')");
 
   public function newEntity() {
     $this->query('INSERT INTO Entity (entity_mailing) VALUES (TRUE)');
-    $this->last_entity_id = $this->lastInsertId('entity','entity_id');
+    $this->last_entity_id = $this->lastInsertId('Entity','entity_id');
     return $this->last_entity_id;
   }
 
+  /**
+   * Pick up $nb random people in contacts and users, and return
+   * their entity ids in an array. If $eid is given, it's added
+   * to the returned array.
+   * Needs $this->users_eids and $this->contacts_eids to be set.
+   */
+  public function pickUpRandomPeople($nb, $eid = null) {
+    if($this->users_eids === null || $this->contacts_eids === null) {
+      return array();
+    }
+
+    $eids = array();
+    if($eid !== null) {
+      $eids[] = $eid;
+    }
+
+    /* Build a list of the available people */
+    $participants = array( 'user' => array(), 'contact' => array() );
+    while($eid = $this->users_eids->nextInt()) {
+      $participants['user'][] = $eid;
+    }
+    $this->users_eids->gotoStart();
+    while($eid = $this->contacts_eids->nextInt()) {
+      $participants['contact'][] = $eid;
+    }
+    $this->contacts_eids->gotoStart();
+
+    while($nb) {
+      $who = array_rand($participants);
+      do {
+        $i = $participants[$who][ array_rand($participants[$who]) ];
+      } while(in_array($i, $eids));
+      $eids[] = $i;
+
+      $nb--;
+    }
+    return $eids;
+  }
+
   public function lastInsertId($table, $field) {
-    $res = $this->query("SELECT MAX($field) FROM $table");
+    $res = $this->query_or_die("SELECT MAX($field) FROM $table");
     return $res->fetchColumn();
   }
 }
