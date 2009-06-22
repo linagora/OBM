@@ -159,6 +159,11 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
     
     $sel_id = 'data-'.$consumer.'-'.$id;
     $tr_id = 'sel_accept_'.$consumer.'-'.$sel_id;
+
+    if (($consumer=='user') && ($id==$uid))
+      $disabled_admin='disabled="disabled"';
+    else
+      $disabled_admin='';
     ${'dis_'.$consumer} .= "
       <tr id=\"$tr_id\">
         <td>
@@ -178,7 +183,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
           <input style=\"$style_write\" type=\"checkbox\" name=\"cb_accept_write[]\" onclick=\"apply_checked_read(this, '$tr_id')\" onchange=\"apply_checked_read(this, '$tr_id')\" value=\"$sel_id\" $checked_write $disabled_write/>
         </td>
         <td>
-          <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin />
+          <input type=\"checkbox\" name=\"cb_accept_admin[]\" value=\"$sel_id\" $checked_admin $disabled_admin />
         </td>
       </tr>
 ";
@@ -531,6 +536,16 @@ function getAllEntities($entityu, $user_id) {
     $ctt[2]['value'] = 'userobm_firstname';
     $e_label = sql_string_concat($db_type, $ctt);
     $u = get_user_info($user_id);
+  } elseif ($entity=='contact') {
+    $table_entity = 'Contact';
+    $e_id = "e.contact_id";
+    $ctt[0]['type'] = 'field';
+    $ctt[0]['value'] = 'contact_lastname';
+    $ctt[1]['type'] = 'string';
+    $ctt[1]['value'] = ' ';
+    $ctt[2]['type'] = 'field';
+    $ctt[2]['value'] = 'contact_firstname';
+    $e_label = sql_string_concat($db_type, $ctt);
   } else {
     switch($entity) {
     case 'resource':

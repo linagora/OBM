@@ -386,7 +386,11 @@ class OBM_Acl {
       $unions = "UNION SELECT userobm_id AS id, ".self::getUsernameColumns()." AS label FROM UserObm WHERE userobm_id = {$userId}";
     } else {
       $entityTable = self::getEntityTable($entityType);
-      $columns = array("{$entityType}_id AS id, {$entityType}_{$labelColumn} AS label");
+      if ($entityType=='contact') {
+        $columns = array("{$entityType}_id AS id", self::getContactnameColumns()." AS label");
+      } else {
+        $columns = array("{$entityType}_id AS id, {$entityType}_{$labelColumn} AS label");
+      }
       $additionalJoins = "INNER JOIN {$entityTable} ON {$entityType}entity_{$entityType}_id = {$entityType}_id";
       $unions = '';
     }
@@ -556,9 +560,10 @@ class OBM_Acl {
     return ucfirst($entityType).'Entity';
   }
   
-  private static function getEntityId($entityType, $id) {
+  public static function getEntityId($entityType, $id) {
+    $sql_id = sql_parse_id($id);
     $entityJoinTable = self::getEntityJoinTable($entityType);
-    $query = "SELECT {$entityType}entity_entity_id FROM {$entityJoinTable} WHERE {$entityType}entity_{$entityType}_id = '{$id}'";
+    $query = "SELECT {$entityType}entity_entity_id FROM {$entityJoinTable} WHERE {$entityType}entity_{$entityType}_id = {$sql_id}";
     self::$db->query($query);
     self::log($query, 'getEntityId');
     if (!self::$db->next_record()) {
@@ -618,6 +623,21 @@ class OBM_Acl {
     $ctt[2]['value'] = "{$prefix}userobm_firstname";
     return sql_string_concat(self::$db->type, $ctt);
   }
+
+  private static function getContactnameColumns($prefix = null) {
+    if ($prefix !== null) {
+      $prefix = $prefix.'.';
+    } else {
+      $prefix = '';
+    }
+    $ctt[0]['type'] = 'field';
+    $ctt[0]['value'] = "{$prefix}contact_lastname";
+    $ctt[1]['type'] = 'string';
+    $ctt[1]['value'] = ' ';
+    $ctt[2]['type'] = 'field';
+    $ctt[2]['value'] = "{$prefix}contact_firstname";
+    return sql_string_concat(self::$db->type, $ctt);
+  }
   
   private static function log($sql, $methodCall) {
     global $cdg_sql;
@@ -630,13 +650,20 @@ class OBM_Acl_Utils {
   private static $consumerRegex = '/^data-(user|group)-([0-9]+)$/';
  
   public static function updateRights($entityType, $entityId, $currentUserId, $params) {
-    
+
     $rights = OBM_Acl_Utils::parseRightsParams($params);
 
     if (!(Perm::get_module_rights($entityType) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin'] && !OBM_Acl::isAllowed($currentUserId, $entityType, $entityId, 'admin')) {
       return false;
     }
-    
+
+    //current user can't remove himself admin's rights
+    if (!empty($currentUserId)) {
+      if (empty($rights['user'][$currentUserId]) || !is_array($rights['user'][$currentUserId]))
+        $rights['user'][$currentUserId] = array();
+      $rights['user'][$currentUserId][OBM_Acl::ADMIN] = 1;
+    }
+
     OBM_Acl::denyAll($entityType, $entityId);
     
     OBM_Acl::setPublicRights($entityType, $entityId, $rights['public']);
