@@ -84,7 +84,7 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   global $ccalendar_first_hour, $ccalendar_last_hour, $l_hour, $l_enable_auto_vacation;
 
   $action = $vacation["action"];
-
+  
   // if update mode and first time value are taken from database
   if ($action == "detailupdate") {
 
@@ -109,8 +109,10 @@ function html_vacation_form($usr_q, $vacation, $field="") {
   // If parameters have been given, they supercede the default action value
   if (isset($vacation["enabled"])) { $enabled = $vacation["enabled"]; }
   if (isset($vacation["message"])) { $message = $vacation["message"]; }
-  if (isset($vacation["vacation_datebegin"])) { $vacation_datebegin = $vacation["vacation_datebegin"]; }
+  if (isset($vacation["vacation_datebegin"])) { $vacation_datebegin = $vacation["vacation_datebegin"]; } 
+  elseif(!$vacation_dateend) { $vacation_datebegin = new Of_Date();$vacation_datebegin->addHour(1)->setMinute(0)->setSecond(0);}
   if (isset($vacation["vacation_dateend"])) { $vacation_dateend = $vacation["vacation_dateend"]; }
+  elseif(!$vacation_dateend) { $vacation_dateend = clone $vacation_datebegin; $vacation_dateend->addWeek(1); }
   if (isset($vacation["auto_enable"])) {$auto_enable = $vacation["auto_enable"]; }
 
   if (! $mail_enable) {
