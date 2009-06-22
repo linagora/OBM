@@ -236,11 +236,9 @@ function run_query_people_search($people) {
   $query = "$query_userobm $query_contact $orderq $limit";
 
   if ($ctu_sql_limit) {
-    $count_userobm = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_userdata_userobm $whereq_userobm");
-    $count_contact = get_query_count("SELECT count(distinct contact_id) FROM Contact $join_userdata_contact $join_contact $whereq_contact");
-    $count = $count_userobm;
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_userdata_userobm $whereq_userobm");
     if ($show_contact) {
-      $count += $count_contact;
+      $count += get_query_count("SELECT count(distinct contact_id) FROM Contact $join_userdata_contact $join_contact $whereq_contact");
     }
     $obm_q->set_num_rows_total($count);
   }
@@ -294,6 +292,15 @@ function run_query_people_ext_search($people) {
     }
   }
 
+  $where_contact_acl = "AND (";
+  $where_contact_acl.= "contact_privacy = 0";
+  $f_contact_ids = run_query_people_allowed_access_contacts();
+  if ((is_array($f_contact_ids)) && (count($f_contact_ids) > 0)) {
+    $f_contact_ids = array_map(sql_parse_id,$f_contact_ids);
+    $where_contact_acl .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
+  }
+  $where_contact_acl.= ")";
+
   $query_userobm = "SELECT 
       userobm_id as id,
       userobm_lastname as lastname,
@@ -324,8 +331,9 @@ function run_query_people_ext_search($people) {
       OR contactentity_entity_id IN (
         SELECT email_entity_id FROM Email WHERE email_address $like '$pattern%'
       ))
-      AND contact_archive = 0 AND (contact_privacy='0' OR contact_usercreate='$obm[uid]')
-      $multidomain_contact";
+      AND contact_archive = 0
+      $multidomain_contact
+      $where_contact_acl";
 
 
   $query = "$query_userobm UNION $query_contact ORDER BY lastname, firstname
@@ -336,6 +344,56 @@ function run_query_people_ext_search($people) {
   $resultsCount = $obm_q->num_rows();
 
   return array('length' => $resultsCount, 'datas' => $obm_q);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get all private contacts current user has access to
+// return an array of contact ids
+///////////////////////////////////////////////////////////////////////////////
+function run_query_people_allowed_access_contacts() {
+  global $obm;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $uid = sql_parse_id($obm['uid']);
+  $search_action = OBM_Acl::ACCESS;
+
+  $allowed_contacts_query = "
+    SELECT contact_id AS id
+    FROM UserObm u1
+    INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id
+    INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
+    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+    INNER JOIN Contact ON contactentity_contact_id = contact_id
+    WHERE u1.userobm_id = $uid
+      AND entityright_$search_action = 1
+      AND contact_privacy = 1
+    UNION SELECT contact_id AS id
+    FROM EntityRight INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+    INNER JOIN Contact ON contactentity_contact_id = contact_id
+    WHERE entityright_consumer_id IS NULL
+      AND entityright_$search_action = 1
+      AND contact_privacy = 1
+    UNION SELECT contact_id AS id FROM UserObm u1
+    INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id
+    INNER JOIN of_usergroup ON userobm_id = of_usergroup_user_id
+    INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id
+    INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id
+    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+    INNER JOIN Contact ON contactentity_contact_id = contact_id
+    WHERE u1.userobm_id = $uid
+      AND entityright_$search_action = 1
+      AND contact_privacy = 1";
+
+  $f_contact_ids = array();
+  display_debug_msg($allowed_contacts_query, $cdg_sql, 'run_query_contact_allowed_access()');
+  $obm_q->query($allowed_contacts_query);
+  while ($obm_q->next_record()) {
+    $f_contact_ids[] = $obm_q->f('id');
+  }
+
+  return $f_contact_ids;
 }
 
 

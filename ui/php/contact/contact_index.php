@@ -46,6 +46,8 @@
 // - kind_checklink     --                -- check if kind is used
 // - kind_delete     	-- $sel_kind      -- delete the kind
 // - statistics     	--                -- display contact statistics
+// - rights_admin       -- access rights screen
+// - rights_update      -- Update contact access rights
 // - display            --                -- display and set display parameters
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
@@ -70,17 +72,19 @@ require("$obminclude/of/of_contact.php");
 require('contact_display.inc');
 require('contact_query.inc');
 require_once('contact_js.inc');
+require("$obminclude/of/of_right.inc");
 require_once("$obminclude/of/of_category.inc");
 $extra_js_include[] = 'contact.js';
 
 get_contact_action();
+
 $perm->check_permissions($module, $action);
-if (! check_privacy($module, 'Contact', $action, $params['contact_id'], $obm['uid'])) {
-  $display['msg'] = display_err_msg($l_error_visibility);
-  $action = 'index';
-} else {
-  update_last_visit('contact', $params['contact_id'], $action);
-}
+//if (! check_privacy($module, 'Contact', $action, $params['contact_id'], $obm['uid'])) {
+//  $display['msg'] = display_err_msg($l_error_visibility);
+//  $action = 'index';
+//} else {
+update_last_visit('contact', $params['contact_id'], $action);
+//}
 page_close();
 
 
@@ -306,6 +310,19 @@ if (($action == 'ext_get_ids') || ($action == 'ext_get_id')) {
   $display['title'] = display_title($l_stats);
   $display['detail'] = dis_category_contact_stats($params);
 
+} elseif ($action == 'rights_admin') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] = dis_contact_right_dis_admin($params['contact_id']);
+
+} elseif ($action == 'rights_update') {
+///////////////////////////////////////////////////////////////////////////////
+  if (OBM_Acl_Utils::updateRights('contact', $params['entity_id'], $obm['uid'], $params)) {
+    $display['msg'] .= display_ok_msg($l_right_update_ok);
+  } else {
+    $display['msg'] .= display_warn_msg($l_of_right_err_auth);
+  }
+  $display['detail'] = dis_contact_right_dis_admin($params['entity_id']);
+
 } elseif ($action == 'admin') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_contact_admin_index();
@@ -460,7 +477,7 @@ function get_contact_action() {
   global $params, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_stats;
   global $l_header_consult, $l_header_display, $l_header_admin;
-  global $l_header_import,$l_header_export, $l_header_vcard;
+  global $l_header_import,$l_header_export, $l_header_vcard, $l_header_right;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   of_category_user_module_action('contact');
@@ -504,7 +521,7 @@ function get_contact_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','index','search','insert','new','detailconsult','update','statistics','check_delete','delete','admin','display') 
+    'Condition'=> array ('','index','search','insert','new','detailconsult','detailupdate','update','rights_update','rights_admin','statistics','check_delete','delete','admin','display') 
                                      );
                                      
 // Import VCard
@@ -513,7 +530,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=import",
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('','index','search','insert','new','detailconsult','update','statistics','check_delete','delete','admin','display')
+    'Condition'=> array ('','index','search','new','statistics','admin','display')
                                      		 );
                                      		 
 // Export all contacts as VCards
@@ -522,7 +539,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=export",
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('','index','search','insert','new','detailconsult','update','statistics','check_delete','delete','admin','display')
+    'Condition'=> array ('','index','search','new','statistics','admin','display')
                                      		 );
 
 // Detail Consult
@@ -531,8 +548,9 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult','detailupdate','check_delete') 
-                                    		 );
+    'Condition'=> array ('detailconsult','detailupdate','check_delete','rights_admin','rights_update','check_delete') 
+                                                 );
+
 // Contact synchronisation
  $actions['contact']['sync']   = array (
     'Url'      => "$path/contact/contact_index.php?action=sync&amp;contact_id=".$params['contact_id'],
@@ -555,7 +573,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=vcard&amp;popup=1&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_read,
     'Privacy'  => true,    
-    'Condition'=> array ('detailconsult','detailupdate','update','check_delete')    
+    'Condition'=> array ('detailconsult','detailupdate','update','rights_admin','rights_update','check_delete')    
                                        );
 
 // Detail Update
@@ -564,7 +582,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'update','check_delete')
+    'Condition'=> array ('detailconsult','update','rights_admin','rights_update','check_delete')
                                      		 );
 
 // Insert
@@ -581,14 +599,7 @@ function get_contact_action() {
     'Privacy'  => true,
     'Condition'=> array ('None') 
                                      	);
-// Statistics
-  $actions['contact']['statistics'] = array (
-    'Name'     => $l_header_stats,
-    'Url'      => "$path/contact/contact_index.php?action=statistics",
-    'Right'    => $cright_read,
-    'Condition'=> array ('all')
-                                        );
-                                        
+  
 // VCard insert
   $actions['contact']['vcard_insert'] = array (
     'Url'      => "$path/contact/contact_index.php?action=vcard_insert",
@@ -609,7 +620,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;contact_id=".$params['contact_id'],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update','check_delete') 
+    'Condition'=> array ('detailconsult','detailupdate','rights_admin','rights_update','update','check_delete') 
                                      	      );
 
 // Delete
@@ -619,6 +630,28 @@ function get_contact_action() {
     'Privacy'  => true,
     'Condition'=> array ('None') 
                                      	);
+
+// Rights Admin.
+  $actions['contact']['rights_admin'] = array (
+    'Name'     => $l_header_right,
+    'Url'      => "$path/contact/contact_index.php?action=rights_admin&amp;entity_id=".$params['entity_id'],
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('detailconsult','detailupdate','rights_admin','rights_update','detailupdate','update','check_delete')
+                                     );
+
+// Rights Update
+  $actions['contact']['rights_update'] = array (
+    'Url'      => "$path/contact/contact_index.php?action=rights_update&amp;entity_id=".$params['contact_id'],
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None')
+                                     );
+// Statistics
+  $actions['contact']['statistics'] = array (
+    'Name'     => $l_header_stats,
+    'Url'      => "$path/contact/contact_index.php?action=statistics",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all')
+                                        );
 
 // Admin
   $actions['contact']['admin'] = array (
@@ -704,8 +737,9 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
-                                      		 );
+                                                );
 
+  update_action_rights();
 }
 
 
@@ -713,7 +747,42 @@ function get_contact_action() {
 // Contact Actions updates (after processing, before displaying menu)
 ///////////////////////////////////////////////////////////////////////////////
 function update_contact_action() {
-  global $params, $actions, $path, $cright_write_admin;
+  global $params, $actions, $path, $cright_read, $cright_write_admin, $obm, $profiles;
+
+  $id = $params['contact_id'];
+  if ($id > 0) {
+
+    // Detail Consult
+    $actions['contact']['detailconsult']['Url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$id";
+    
+    // Detail Update
+    $actions['contact']['detailupdate']['Url'] = "$path/contact/contact_index.php?action=detailupdate&amp;contact_id=$id";
+    $actions['contact']['detailupdate']['Condition'][] = 'insert';
+    
+    // Check Delete
+    $actions['contact']['check_delete']['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;contact_id=$id";
+    $actions['contact']['check_delete']['Condition'][] = 'insert';
+
+    // Rights admin
+    $actions['contact']['rights_admin']['Url'] = "$path/contact/contact_index.php?action=rights_admin&amp;entity_id=".$id;
+    $actions['contact']['rights_admin']['Condition'][] = 'insert';
+
+    update_action_rights();
+
+  } else {
+    $actions['contact']['import']['Condition'][] = 'insert';
+    $actions['contact']['export']['Condition'][] = 'insert';
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Contact entity rights actions updates
+///////////////////////////////////////////////////////////////////////////////
+function update_action_rights() {
+  global $params, $actions, $path, $cright_read, $cright_write_admin, $obm, $profiles;
+
+  $cright_forbidden = 32;
 
   $id = $params['contact_id'];
   if ($id > 0) {
@@ -726,19 +795,47 @@ function update_contact_action() {
       $actions['contact']['insert']['Right'] = $cright_write_admin;
       $actions['contact']['check_delete']['Right'] = $cright_write_admin;
       $actions['contact']['delete']['Right'] = $cright_write_admin;
+
+    } else {
+      // update the admin rights on the current contact
+      if (OBM_Acl::canAdmin($obm['uid'], 'contact', $id)) {
+        $actions['contact']['rights_admin']['Right'] = $cright_read;
+        $actions['contact']['rights_update']['Right'] = $cright_read;
+      } else {
+        $actions['contact']['rights_admin']['Right'] = $cright_write_admin;
+        $actions['contact']['rights_update']['Right'] = $cright_write_admin;
+      }
+
+      // update the update rights on the current contact
+      if (OBM_Acl::canWrite($obm['uid'], 'contact', $id)) {
+        $actions['contact']['update']['Right'] = $cright_read;
+        $actions['contact']['delete']['Right'] = $cright_read;
+        $actions['contact']['detailupdate']['Right'] = $cright_read;
+        $actions['contact']['check_delete']['Right'] = $cright_read;
+      } else {
+        $actions['contact']['update']['Right'] = $cright_forbidden;
+        $actions['contact']['delete']['Right'] = $cright_forbidden;
+        $actions['contact']['detailupdate']['Right'] = $cright_forbidden;
+        $actions['contact']['check_delete']['Right'] = $cright_forbidden;
+      }
+
+      // update the read rights on the current contact
+      if (OBM_Acl::canRead($obm['uid'], 'contact', $id)) {
+        $actions['contact']['detailconsult']['Right'] = $cright_read;
+      } else {
+        $actions['contact']['detailconsult']['Right'] = $cright_forbidden;
+      }
+
+      // update the access rights on the current contact
+      // (actually useless)
+      //if (OBM_Acl::canAccess($obm['uid'], 'contact', $id)) {
+      //} else {
+      //}
+
     }
 
-    // Detail Consult
-    $actions['contact']['detailconsult']['Url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=$id";
-    
-    // Detail Update
-    $actions['contact']['detailupdate']['Url'] = "$path/contact/contact_index.php?action=detailupdate&amp;contact_id=$id";
-    $actions['contact']['detailupdate']['Condition'][] = 'insert';
-    
-    // Check Delete
-    $actions['contact']['check_delete']['Url'] = "$path/contact/contact_index.php?action=check_delete&amp;contact_id=$id";
-    $actions['contact']['check_delete']['Condition'][] = 'insert';
   }
+
 }
 
 

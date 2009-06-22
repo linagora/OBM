@@ -2030,7 +2030,7 @@ function check_user_can_delete($params) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query Executions - Purge a deleted user
 // Delete all references to the user (UserObmPref, DisplayPref, acl)
-// Move all user private contact to public 
+// Delete all user private contact
 // Parameters:
 //   - $user_id : user id
 ///////////////////////////////////////////////////////////////////////////////

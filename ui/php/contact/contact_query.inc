@@ -17,6 +17,12 @@ function run_query_contact_search($contact) {
   global $cgp_archive_only,$obm;
   global $c_public, $c_private;
 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $uid = sql_parse_id($obm['uid']);
+  $search_action = OBM_Acl::ACCESS;
+
   $sql_order_dir = $contact['sql_order_dir'];
   $sql_order_field = $contact['sql_order_field'];
 
@@ -43,15 +49,50 @@ function run_query_contact_search($contact) {
   $archive = $contact['archive'];
   $lang = get_lang();
 
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
   $date = sql_date_format($db_type, 'contact_date', 'contact_date');
   $multidomain = sql_multidomain('contact');
 
-  // only the one which are allowed (ie. publics )
-  $where .= sql_obm_entity_privacy('contact');
+  // Now we play with ACLs
+  $allowed_contacts_query = "
+    SELECT contact_id AS id
+    FROM UserObm u1
+    INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id
+    INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
+    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+    INNER JOIN Contact ON contactentity_contact_id = contact_id
+    WHERE u1.userobm_id = $uid
+      AND entityright_$search_action = 1
+      AND contact_privacy = 1
+    UNION SELECT contact_id AS id
+    FROM EntityRight INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+    INNER JOIN Contact ON contactentity_contact_id = contact_id
+    WHERE entityright_consumer_id IS NULL
+      AND entityright_$search_action = 1
+      AND contact_privacy = 1
+    UNION SELECT contact_id AS id FROM UserObm u1
+    INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id
+    INNER JOIN of_usergroup ON userobm_id = of_usergroup_user_id
+    INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id
+    INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id
+    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+    INNER JOIN Contact ON contactentity_contact_id = contact_id
+    WHERE u1.userobm_id = $uid
+      AND entityright_$search_action = 1
+      AND contact_privacy = 1";
+  display_debug_msg($allowed_contacts_query, $cdg_sql, 'contact_search(0)');
+  $obm_q->query($allowed_contacts_query);
+  $f_contact_ids = array();
+  while ($obm_q->next_record()) {
+    $f_contact_ids[] = sql_parse_id($obm_q->f('id'));
+  }
+  $where = "(";
+  $where.= "contact_privacy = 0";
+  if (count($f_contact_ids) > 0) {
+    $where .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
+  }
+  $where.= ")";
 
   // If company module used (external from Contact)
   if ($cgp_show['module']['company']) {
@@ -173,6 +214,7 @@ function run_query_contact_search($contact) {
     $join_userdata = $userdata['join'];
   }
 
+  // Construct the where statement
   $whereq = "WHERE $where $multidomain";
   if ($where_name != '') {
     $whereq .= " AND $where_name";
@@ -241,7 +283,6 @@ function run_query_contact_search($contact) {
     LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
     LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label like 'PREF;%'
     LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like 'PREF;%'";
-
 
   if ((! $fuzzy) || ($lname == '')) {
     if ($ctu_sql_limit) {
@@ -547,10 +588,13 @@ function run_query_contact_insert($contact) {
     if (($cgp_show['module']['company']) && ($retour)) {
       run_query_global_company_contact_number_update($comp_id);
     }    
-    $entityid = of_entity_insert($GLOBALS['module'],$id);
+    $entityid = of_entity_insert('contact',$id);
     $contact['contact_id'] = $id;
 
-    if($priv == 1) {
+    if($priv == 1) { 
+      // Acl
+      run_query_contact_init_rights($id);
+
       // Subscription support
       run_query_do_contact_sync($id, true);
     }
@@ -587,6 +631,42 @@ function run_query_contact_insert($contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Set initial rights when switching from public to private (or when inserting
+// new contact)
+// Parameters:
+//   - $contact_id
+//   - $usercreate_id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contact_init_rights($contact_id, $usercreate_id='') {
+  $uid = $obm['uid'];
+  $all_rights = array(
+    OBM_Acl::ACCESS => 1,
+    OBM_Acl::READ   => 1,
+    OBM_Acl::WRITE  => 1,
+    OBM_Acl::ADMIN  => 1
+  );
+
+  $default_public_rights = OBM_Acl_Utils::getDefaultPublicRights('contact');
+  OBM_Acl::setPublicRights('contact', $contact_id, $default_public_rights);
+  OBM_Acl::setRights($uid, 'contact', $contact_id, $all_rights);
+  if (($uid != $usercreate_id) && (!empty($usercreate_id))) {
+    OBM_Acl::setRights($usercreate_id, 'contact', $contact_id, $all_rights);
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Set initial rights when switching from public to private (or when inserting
+// new contact)
+// Parameters:
+//   - $contact_id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contact_remove_rights($contact_id) {
+  OBM_Acl::denyAll('contact', $contact_id);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Contact update query execution
 // Parameters:
 //   - $contact[] : Entry's values
@@ -601,6 +681,9 @@ function run_query_contact_update($contact) {
   $id =  $contact['contact_id'];
   $comp_old_id =  $contact['company_id'];
   $comp_new_id =  $contact['company_new_id'];
+
+  $lc = get_contact_info($id);
+  $old_priv = ($lc['privacy'] == '0') ? '0' : '1';
 
   $comp_id = $contact['company_new_id'];
   if ($comp_id < 1) {
@@ -712,6 +795,17 @@ function run_query_contact_update($contact) {
     if (($retour) && ($comp_new_id > 0) && ($comp_new_id != $comp_old_id)) {
       run_query_global_company_contact_number_update($comp_new_id);
       run_query_global_company_contact_number_update($comp_old_id);
+    }
+  }
+
+  if ($priv!=$old_priv) {
+    if ($priv == 0) {
+      // Acl are removed if contact is updated from private to public
+      run_query_contact_remove_rights($id);
+    }
+    if ($priv == 1) {
+      // Acl are initialized if contact is updated from public to private
+      run_query_contact_init_rights($id);
     }
   }
 
@@ -1139,7 +1233,7 @@ function run_query_contact_delete($p_id) {
   run_query_contact_birthday_update('anniversary', null, null, $anniversary_id, null, null, null);
   // END birthday and anniversary support
 
-  of_entity_delete($GLOBALS['module'], $p_id);
+  of_entity_delete('contact', $p_id);
 
   $query = "DELETE FROM Contact WHERE contact_id $sql_id $multidomain";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_delete(1)');
