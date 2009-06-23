@@ -5283,9 +5283,8 @@ Class CalendarPdf{
 
     // Date creation
     $today = new Of_Date();
-    $today->getDateIso();
     $this->page->drawText(
-      $today,
+      $today->getOutputDateTime(),
       $this->content_x0+90,
       $this->content_y1-2*$this->font_height,
       'UTF-8');
