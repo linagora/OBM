@@ -1900,8 +1900,9 @@ Obm.CalendarFreeBusy = new Class({
             input[0]!= 'sel_min_begin' && 
             input[0]!= 'sel_time_end' && 
             input[0]!= 'sel_min_end' && 
-            input[0]!= 'sel_user_id' && 
-            input[0]!= 'sel_resource_id') {
+            input[0]!= 'sel_user_id[]' && 
+            input[0]!= 'sel_resource_id[]' &&
+            input[0] != 'tf_others_attendees[]') {
           var name = input[0];
           var value = input[1];
           var hidden = new Element('input').setProperties({
@@ -2190,7 +2191,7 @@ Obm.CalendarFreeBusy = new Class({
             label = div_id.get('text');
           }
           label = label.toLowerCase();
-          this.displayAttendee(div_id, data.kind, label.trim(), tr);
+          this.displayAttendee(div_id, kind, label.trim(), tr);
         }
       }.bind(this),
       onSuccess: function() {
