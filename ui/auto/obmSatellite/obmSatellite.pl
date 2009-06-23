@@ -49,7 +49,14 @@ sub configure_hook {
     }
 
     $self->{server}->{name} = 'obmSatellite';                               # Nom du service
-    $self->{server}->{conf_file} = $Bin.'/'.$self->{server}->{name}.'.cf';  # Définition du fichier de configuration du service
+    $self->{server}->{conf_file} = '/etc/obm/'.$self->{server}->{name}.'.cf';   # Définition du fichier de configuration du service
+    if( ! -r $self->{server}->{conf_file} ) {
+        $self->{server}->{conf_file} = $Bin.'/'.$self->{server}->{name}.'.cf';  # Définition du fichier de configuration du service
+        if( ! -r $self->{server}->{conf_file} ) {
+            print 'Le fichier de configuration \'obm_conf.ini\' n\'existe pas ou n\'est pas lisible'."\n";
+            exit 1;
+        }
+    }
 
 
     # Lectrure des paramètres spécifiques

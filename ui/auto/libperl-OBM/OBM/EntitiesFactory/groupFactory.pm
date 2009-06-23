@@ -220,7 +220,8 @@ sub _loadEntities {
                         current.group_contacts as group_contacts_current
                  FROM '.$groupTablePrefix.'UGroup
                  LEFT JOIN P_UGroup current ON current.group_id='.$groupTablePrefix.'UGroup.group_id
-                 WHERE '.$groupTablePrefix.'UGroup.group_domain_id='.$self->{'domainId'};
+                 WHERE '.$groupTablePrefix.'UGroup.group_domain_id='.$self->{'domainId'}.'
+                 AND NOT group_privacy';
 
     if( $self->{'ids'} ) {
         $query .= ' AND '.$groupTablePrefix.'UGroup.group_id IN ('.join( ', ', @{$self->{'ids'}}).')';

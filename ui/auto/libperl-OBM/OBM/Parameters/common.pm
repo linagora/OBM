@@ -41,9 +41,9 @@ if( (-d $Bin) && ($Bin =~ /^([\p{Alphabetic}0-9\/_\-\s\.]+)$/) ) {
 
 
 # Lecture du fichier ini
-my $obmConfIni = $Bin.'/../conf/obm_conf.ini';
+my $obmConfIni = '/etc/obm/obm_conf.ini';
 if( ! -r $obmConfIni ) {
-    $obmConfIni = '/etc/obm/obm_conf.ini';
+    $obmConfIni = $Bin.'/../conf/obm_conf.ini';
     if( ! -r $obmConfIni ) {
         print STDERR "Le fichier de configuration 'obm_conf.ini' n'existe pas ou n'est pas lisible\n";
         exit 1;
