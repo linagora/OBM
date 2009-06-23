@@ -638,12 +638,14 @@ function run_query_contact_insert($contact) {
 //   - $usercreate_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_init_rights($contact_id, $usercreate_id='') {
+  global $obm;
+
   $uid = $obm['uid'];
   $all_rights = array(
-    OBM_Acl::ACCESS => 1,
-    OBM_Acl::READ   => 1,
-    OBM_Acl::WRITE  => 1,
-    OBM_Acl::ADMIN  => 1
+    OBM_Acl::ACCESS => true,
+    OBM_Acl::READ   => true,
+    OBM_Acl::WRITE  => true,
+    OBM_Acl::ADMIN  => true
   );
 
   $default_public_rights = OBM_Acl_Utils::getDefaultPublicRights('contact');
