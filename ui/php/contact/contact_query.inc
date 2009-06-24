@@ -16,7 +16,6 @@ function run_query_contact_search($contact) {
   global $cgp_show, $cdg_sql, $c_all, $ctu_sql_limit;
   global $cgp_archive_only,$obm;
   global $c_public, $c_private;
-
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
@@ -54,45 +53,37 @@ function run_query_contact_search($contact) {
   $date = sql_date_format($db_type, 'contact_date', 'contact_date');
   $multidomain = sql_multidomain('contact');
 
-  // Now we play with ACLs
-  $allowed_contacts_query = "
-    SELECT contact_id AS id
-    FROM UserObm u1
-    INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id
-    INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
-    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
-    INNER JOIN Contact ON contactentity_contact_id = contact_id
-    WHERE u1.userobm_id = $uid
-      AND entityright_$search_action = 1
-      AND contact_privacy = 1
-    UNION SELECT contact_id AS id
-    FROM EntityRight INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
-    INNER JOIN Contact ON contactentity_contact_id = contact_id
-    WHERE entityright_consumer_id IS NULL
-      AND entityright_$search_action = 1
-      AND contact_privacy = 1
-    UNION SELECT contact_id AS id FROM UserObm u1
-    INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id
-    INNER JOIN of_usergroup ON userobm_id = of_usergroup_user_id
-    INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id
-    INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id
-    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
-    INNER JOIN Contact ON contactentity_contact_id = contact_id
-    WHERE u1.userobm_id = $uid
-      AND entityright_$search_action = 1
-      AND contact_privacy = 1";
-  display_debug_msg($allowed_contacts_query, $cdg_sql, 'contact_search(0)');
-  $obm_q->query($allowed_contacts_query);
-  $f_contact_ids = array();
-  while ($obm_q->next_record()) {
-    $f_contact_ids[] = sql_parse_id($obm_q->f('id'));
+  if ($privacy != $c_public) {
+    // Now we play with ACLs
+    $allowed_contacts_query = "
+      SELECT contactentity_contact_id AS id
+      FROM UserEntity
+      INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
+      INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+      WHERE userentity_user_id = $uid
+        AND entityright_$search_action = 1
+      UNION ALL SELECT contactentity_contact_id AS id FROM UserEntity
+      INNER JOIN of_usergroup ON userentity_user_id = of_usergroup_user_id
+      INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id
+      INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id
+      INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+      WHERE userentity_user_id = $uid
+        AND entityright_$search_action = 1
+      UNION ALL SELECT contact_id as id FROM Contact 
+      WHERE contact_usercreate = $uid";
+    display_debug_msg($allowed_contacts_query, $cdg_sql, 'contact_search(0)');
+    $obm_q->query($allowed_contacts_query);
+    $f_contact_ids = array();
+    while ($obm_q->next_record()) {
+      $f_contact_ids[] = sql_parse_id($obm_q->f('id'));
+    }
+    $where = "(";
+    $where.= "contact_privacy = 0";
+    if (count($f_contact_ids) > 0) {
+      $where .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
+    }
+    $where.= ")";
   }
-  $where = "(";
-  $where.= "contact_privacy = 0";
-  if (count($f_contact_ids) > 0) {
-    $where .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
-  }
-  $where.= ")";
 
   // If company module used (external from Contact)
   if ($cgp_show['module']['company']) {
@@ -284,40 +275,42 @@ function run_query_contact_search($contact) {
     LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label like 'PREF;%'
     LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like 'PREF;%'";
 
+
   if ((! $fuzzy) || ($lname == '')) {
-    if ($ctu_sql_limit) {
-      $count = get_query_count("SELECT count(distinct contact_id) FROM Contact $join_comp $left_join $whereq");
-      $obm_q->set_num_rows_total($count);
-    }
+    $count = get_query_count("SELECT count(contact_id) FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq");
+    $obm_q->set_num_rows_total($count);
     // If any results (from limited) or result not limited, we get the data
-    if (($count > 0) || (! $ctu_sql_limit)) {
-      $query = "$select $left_join $whereq $orderq $limit";
+    if ($count > 0) {
+      $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq $orderq $limit";
       display_debug_msg($query, $cdg_sql, 'contact_search(1)');
       $obm_q->query($query);
-      if (! $ctu_sql_limit) {
-        $count = $obm_q->num_rows();
+      $ids = array();
+      while($obm_q->next_record()) {
+        $ids[] = $obm_q->f('contact_id');
       }
-    }
-  }
-
-  // if fuzzy or unsuccessful search (meaningful only if name has been entered)
-  if ( ( ($fuzzy) || ($count == 0) ) && ($lname != '') ) {
-    $auto_aka = format_name($lname, 0, true, true);
-    $sound = phonetic_key($lname);
-    $where_name = " AND ($where_name OR contact_aka $like '%$auto_aka%'
-      OR contact_sound = '$sound')";
-    $whereq = " WHERE $where $where_name";
-    if ($ctu_sql_limit) {
-      $count = get_query_count("SELECT count(distinct contact_id) FROM Contact $join_comp $left_join $whereq");
-      $obm_q->set_num_rows_total($count);
-    }
-    if (($count > 0) || (! $ctu_sql_limit)) {
+      $whereq = " WHERE contact_id IN (".implode(',',$ids).")";
       $query = "$select $left_join $whereq $orderq $limit";
       display_debug_msg($query, $cdg_sql, 'contact_search(2)');
       $obm_q->query($query);
     }
   }
-
+  // if fuzzy or unsuccessful search (meaningful only if name has been entered)
+  //if ( ( ($fuzzy) || ($count == 0) ) && ($lname != '') ) {
+  //  $auto_aka = format_name($lname, 0, true, true);
+  //  $sound = phonetic_key($lname);
+  //  $where_name = " AND ($where_name OR contact_aka $like '%$auto_aka%'
+  //    OR contact_sound = '$sound')";
+  //  $whereq = " WHERE $where $where_name";
+  //  if ($ctu_sql_limit) {
+  //    $count = get_query_count("SELECT count(distinct contact_id) FROM Contact $join_comp $left_join $whereq");
+  //    $obm_q->set_num_rows_total($count);
+  //  }
+  //  if (($count > 0) || (! $ctu_sql_limit)) {
+  //    $query = "$select $left_join $whereq $orderq $limit";
+  //    display_debug_msg($query, $cdg_sql, 'contact_search(2)');
+  //    $obm_q->query($query);
+  //  }
+  //}
   return $obm_q;
 }
 
@@ -639,21 +632,7 @@ function run_query_contact_insert($contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_init_rights($contact_id, $usercreate_id='') {
   global $obm;
-
-  $uid = $obm['uid'];
-  $all_rights = array(
-    OBM_Acl::ACCESS => true,
-    OBM_Acl::READ   => true,
-    OBM_Acl::WRITE  => true,
-    OBM_Acl::ADMIN  => true
-  );
-
-  $default_public_rights = OBM_Acl_Utils::getDefaultPublicRights('contact');
-  OBM_Acl::setPublicRights('contact', $contact_id, $default_public_rights);
-  OBM_Acl::setRights($uid, 'contact', $contact_id, $all_rights);
-  if (($uid != $usercreate_id) && (!empty($usercreate_id))) {
-    OBM_Acl::setRights($usercreate_id, 'contact', $contact_id, $all_rights);
-  }
+  // default right setting must be coded here
 }
 
 
@@ -1621,7 +1600,8 @@ function get_contact_info($con_id) {
   $con_id = sql_parse_id($con_id, true);
   $query = "SELECT
     contact_company_id,
-    contact_privacy
+    contact_privacy,
+    contact_usercreate
     FROM Contact
     WHERE contact_id $con_id $multidomain";
 
@@ -1631,6 +1611,7 @@ function get_contact_info($con_id) {
   $obm_q->next_record();
   $c['company_id'] = $obm_q->f('contact_company_id');
   $c['privacy'] = $obm_q->f('contact_privacy');
+  $c['usercreate'] = $obm_q->f('contact_usercreate');
 
   return $c;
 }
@@ -2090,17 +2071,14 @@ function run_query_is_contact_synched($cid) {
 
   $uid = sql_parse_id($obm['uid'], true);
   $cid = sql_parse_id($cid, true);
-  $query = "SELECT count(*) as nb FROM SynchedContact
+  $query = "SELECT synchedcontact_contact_id FROM SynchedContact
         WHERE synchedcontact_user_id $uid
         AND synchedcontact_contact_id $cid";
 
   display_debug_msg($query, $cdg_sql, 'run_query_is_contact_synched()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  $obm_q->next_record();
-  $nb = $obm_q->f('nb');
-
-  return ($nb > 0);
+  return $obm_q->next_record();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

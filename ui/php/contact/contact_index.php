@@ -798,7 +798,8 @@ function update_action_rights() {
 
     } else {
       // update the admin rights on the current contact
-      if (OBM_Acl::canAdmin($obm['uid'], 'contact', $id)) {
+      var_dump($c['usercreate']);
+      if ($c['usercreate'] == $obm['uid'] || OBM_Acl::canAdmin($obm['uid'], 'contact', $id)) {
         $actions['contact']['rights_admin']['Right'] = $cright_read;
         $actions['contact']['rights_update']['Right'] = $cright_read;
       } else {
@@ -807,7 +808,7 @@ function update_action_rights() {
       }
 
       // update the update rights on the current contact
-      if (OBM_Acl::canWrite($obm['uid'], 'contact', $id)) {
+      if ($c['usercreate'] == $obm['uid'] || OBM_Acl::canWrite($obm['uid'], 'contact', $id)) {
         $actions['contact']['update']['Right'] = $cright_read;
         $actions['contact']['delete']['Right'] = $cright_read;
         $actions['contact']['detailupdate']['Right'] = $cright_read;
@@ -820,7 +821,7 @@ function update_action_rights() {
       }
 
       // update the read rights on the current contact
-      if (OBM_Acl::canRead($obm['uid'], 'contact', $id)) {
+      if ($c['usercreate'] == $obm['uid'] || OBM_Acl::canRead($obm['uid'], 'contact', $id)) {
         $actions['contact']['detailconsult']['Right'] = $cright_read;
       } else {
         $actions['contact']['detailconsult']['Right'] = $cright_forbidden;
