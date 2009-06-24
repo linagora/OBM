@@ -1125,8 +1125,9 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         } else {
     $dis_repeat = ${"l_$repeat"};
         }
-
-        if ($event->privacy == 1 && !(array_key_exists($obm['uid'],$attendee['user']))) {
+        
+        $privatized_event = $event->privacy == 1 && !(array_key_exists($obm['uid'],$attendee['user']));
+        if ($privatized_event) {
     $title = $l_private;
     $description = $title;
         } else {
@@ -1223,11 +1224,10 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
     slides[$j].toggle();
        });
       ";
-      $dis_events .= "<div id=\"evt_${date}_$ev_id\" >
-          <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_people $dis_res</span>
-          $hour - <strong>$title</strong></a>
-          <div id=\"eventDetail_${date}_$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
-            <table>
+  
+      $event_details = '';
+      if (!$privatized_event) {
+      	$event_details = "<table>
               <tr>
                 <th colspan='2'>$date_begin - $date_end</th>
               </tr>
@@ -1257,6 +1257,13 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
               </tr>
             </table>
             <a href=\"calendar_index.php?action=detailconsult&amp;calendar_id=$ev_id\"><img src=\"$ico_search\" title=\"[Info]\"/></a>
+          ";
+      }
+      $dis_events .= "<div id=\"evt_${date}_$ev_id\" >
+          <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_people $dis_res</span>
+          $hour - <strong>$title</strong></a>
+          <div id=\"eventDetail_${date}_$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
+            $event_details
           </div>
           </div>";
       }
@@ -5707,8 +5714,8 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
       if (!$occurrence->event->all_day){
         $title .= $occurrence->date->get(Of_Date::TIME_SHORT).' - ';
       }
-
-      if ($occurrence->event->privacy && !(in_array($obm['uid'],$attendee['user']))) {
+      
+      if ($occurrence->event->privacy && !(array_key_exists($obm['uid'],$attendee['user']))) {
         $title = $l_private;
       } else {
         $title .= $occurrence->event->title;
@@ -5993,8 +6000,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $bg_color = $class["background"];
         $title_color = $class["title"];
       } 
-
-      if ($event->event->privacy && !(in_array($obm['uid'],$attendee['user']))) {
+      if ($event->event->privacy && !(array_key_exists($obm['uid'],$attendee['user']))) {
         $title = $l_private;
       } else {
         $title = $event->event->title;
@@ -6086,6 +6092,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $cell = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
                                   $x1 - $x0 - 2, ($y1-2*$this->font_height) - $y0);
         $cell->setLocation($x0+2, $y1-2*$this->font_height);
+        // XXX if $dis_title is too long, do not display anything
         $cell->addText($dis_title, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
         $cell->write();
 
@@ -6247,7 +6254,7 @@ Class CalendarPdfList Extends CalendarPdf{
         $page++;
       }
       $stub->write($this);
-   }
+    }
   }
 
 
@@ -6343,6 +6350,10 @@ Class CalendarPdfList Extends CalendarPdf{
         $margin_left = $this->getStringWidth($head);
         $head .= ' - '. $title;
       }
+      
+      // bug on privacy fix
+      $title = $head;
+      
       $end = clone $occurrence->end;
       $attendee = $event->attendee;
       $properties = $event->properties;
@@ -6351,8 +6362,10 @@ Class CalendarPdfList Extends CalendarPdf{
       $dis_res = "";
       $dis_resources = array();
       $separator = "";
-
-      if ($event->privacy && !(in_array($obm['uid'],$attendee['user']))) {
+      
+      $private_event = $event->privacy && !(array_key_exists($obm['uid'],$attendee['user']));
+      
+      if ($private_event) {
         $title = $l_private;
       }
 
@@ -6362,7 +6375,10 @@ Class CalendarPdfList Extends CalendarPdf{
 
       if ($event->isPeriodic()) {
         $title = "R $title";
-      } 
+      }
+      
+      // bug on privacy fix
+      $head = $title;
 
       if (is_array($attendee['user']))
       foreach($attendee['user'] as $at_id => $at_name) {
@@ -6425,7 +6441,7 @@ Class CalendarPdfList Extends CalendarPdf{
                                 0, $dis_people.$dis_res, 'UTF-8');
       $stub->subY($title_h);
       
-      if ($this->showdetails) {
+      if ($this->showdetails && !$private_event) {
         $repeat = $event->repeat;
         if ($repeat == 'none') {
     $dis_repeat = '';
