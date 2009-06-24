@@ -1316,9 +1316,11 @@ Obm.CalendarManager = new Class({
       var id = events[0].event.id;
       var title = events[0].event.title;
       var url = obm.vars.consts.calendarDetailconsultURL+id;
-      $('last_visit_calendar_event_a').setProperty('href', url);
-      $('last_visit_calendar_event_title').innerHTML = title;
-      $('last_visit_calendar_event_a').getParent().setStyle('display', '');
+      if($('last_visit_calendar_event_a')) {
+        $('last_visit_calendar_event_a').setProperty('href', url);
+        $('last_visit_calendar_event_title').innerHTML = title;
+        $('last_visit_calendar_event_a').getParent().setStyle('display', '');
+      }
     }
   }
 });
@@ -1755,7 +1757,7 @@ Obm.CalendarFreeBusy = new Class({
     this.limitRight = this.scrollDiv.getLeft()+this.scrollDiv.offsetWidth;
     this.currentPosition = 0;
     this.attendeesSlot = new Array();
-    this.scrollDiv.setStyle('width', $('mainContent').offsetWidth-100+'px');
+    this.scrollDiv.setStyle('width', $(document.body).offsetWidth - 400 +'px');
     this.firstHour = first_hour;
   },
 
