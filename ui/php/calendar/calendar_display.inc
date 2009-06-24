@@ -3116,7 +3116,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <p class=\"LC\" />";
       $user_complete = "new obm.AutoComplete.Search('$path/people/people_index.php?action=ext_search', 'sel_user_id', 'userSearch', {filter_entity:'calendar',filter_pattern:'access'});";
   } else {
-    $block_user = "<fieldset class=\"detail infos H\"><input type='hidden' name='sel_user_id[]' value='data-user-$obm[uid]' /></fieldset>";
+    $block_user = "<fieldset class=\"detail infos H\"><div class='elementRow' id='sel_user_id-data-user-$obm[uid]'><input type='hidden' name='sel_user_id[]' value='data-user-$obm[uid]' />".$users['entity'][$obm['uid']]['label']."</div></fieldset>";
   }
 
   // group select
@@ -3869,6 +3869,19 @@ function dis_calendar_meeting_form($calendar, $sel_entity_id) {
         </tr>
       </table>
       </fieldset> ";
+  } else {
+    $dis_block_user = "<fieldset style='display:none;' 'class=\"detail infos\">  
+      <legend>$GLOBALS[l_attendees]</legend>
+      <table>
+      <tr>
+        $block_user
+      </tr>
+      <tr>
+        $block_group
+        </tr>
+      </table>
+      </fieldset> ";
+    $user_js = '';
   }
 
   $dis_hour_d = "<select style='width:4em;' id=\"sel_time_duration\" name=\"sel_time_duration\">";
@@ -4023,10 +4036,15 @@ function dis_calendar_free_interval($calendar) {
   $next_week = $current->setDateIso($calendar['date'])->addWeek(1)->getDateIso();
   $next_month = $current->setDateIso($calendar['date'])->addMonth(1)->getDateIso();
   $label = $date->localize(Of_Date::OBM_DATE_DAY)." - ".$date->addDay(6)->localize(Of_Date::OBM_DATE_DAY);
-
+  if (!OBM_Acl::hasAllowedEntities($obm['uid'], 'calendar', 'access')) {
+    $visiblityU = "style='visibility:hidden;'";
+  }
+  if (!OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
+    $visiblityR = "style='visibility:hidden;'";
+  }
   $block = "
   <div id='fbc' class='freeBusyContent obmPopup'>
-    <div title='crappy div for IE6 hack' style='position:relative;'>
+    <div  style='position:relative;'>
       <h1>
       <a href='#' id='closeFreeBusy' class='closeSticky' onclick='return false;'>
       <img src='$GLOBALS[ico_popup_close]' alt='close' />
@@ -4056,7 +4074,7 @@ function dis_calendar_free_interval($calendar) {
           <tr>
             <td id='sel_attendees_id'></td>
           </tr>
-          <tbody>
+          <tbody $visiblityU>
             <tr>
               <td>$GLOBALS[l_users]/$GLOBALS[l_contacts] $user_add_button</td>
             </tr>
@@ -4064,26 +4082,28 @@ function dis_calendar_free_interval($calendar) {
               <td><input type='text' name='' value='' id='freeBusyUserSearch' autocomplete='off' /></td>
             </tr>
             <tr>
-              <td>$GLOBALS[l_resources] $resource_add_button</td>
-            </tr>
-            <tr>
-              <td><input type='text' name='' value='' id='freeBusyResourceSearch' autocomplete='off' /></td>
-            </tr>
-            <tr>
               <td>$GLOBALS[l_others_attendees]</td>
             </tr>
             <tr>
               <td><input style='width:14em;' type='text' name='external_contact' value='' id='external_contact' />
                 <img src='$GLOBALS[ico_add]' alt='[Add]' onclick='obm.calendarFreeBusy.addOtherAttendee();'/></td>
+            </tr>            
+          </tbody>
+          <tbody $visiblityR>
+            <tr>
+              <td>$GLOBALS[l_resources] $resource_add_button</td>
+            </tr>
+            <tr>
+              <td><input type='text' name='' value='' id='freeBusyResourceSearch' autocomplete='off' /></td>
             </tr>
           </tbody>
         </table>
       </form>
     </div>
-    <div title='dummy div for IE hack'></div>
+    <div ></div>
     <div class='freeBusyForm'>
       <div id='scrollLeft' >«</div>
-      <div title='dummy div for IE hack'></div>
+      <div ></div>
       <div id='scrollRight' >»</div>
       <div class='freeBusyCalendar'>
         <div id='calendarFreeBusyScroll'>
