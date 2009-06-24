@@ -63,7 +63,11 @@ if ($action == "validate") {
     echo "ticket=$ticket";
   } else {
     if(isset($params['service'])) {
-      header("location:$params[service]?ticket=$ticket");
+	if (strrpos($params[service], "?") > 0) {
+      		header("location:$params[service]&ticket=$ticket");
+	} else {
+      		header("location:$params[service]?ticket=$ticket");
+	}
     } elseif(isset($params['section']) && isset($cgp_show["section"][$params['section']]['url'])) {
       header("location:".$cgp_show["section"][$params['section']]['url']."?ticket=$ticket");
     } else {
