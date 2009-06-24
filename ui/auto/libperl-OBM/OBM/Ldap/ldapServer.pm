@@ -218,8 +218,12 @@ sub _connect {
 
     use Net::LDAP qw(LDAP_EXTENSION_START_TLS);
     my $ldapDse = $self->{'ldapServerConn'}->root_dse();
-    if( !$ldapDse->supported_extension(LDAP_EXTENSION_START_TLS) ) {
-        $self->_log( 'le serveur LDAP ne supporte pas le TLS !', 3 );
+    if( !defined($ldapDse) ) {
+        $self->_log( 'impossible d\'interroger le root DSE de '.$self->getDescription().'. Vérifiez vos ACLs', 0 );
+        $self->_log( 'impossible de vérifier que '.$self->getDescription().' a été compilé avec le support du TLS/SSL', 0 );
+
+    }elsif( !$ldapDse->supported_extension(LDAP_EXTENSION_START_TLS) ) {
+        $self->_log( 'le serveur LDAP n\'a pas été compilé avec le support du TLS/SSL !', 3 );
         $self->{'ldapTls'} = 'none';
     }
 
