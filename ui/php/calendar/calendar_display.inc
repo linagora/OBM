@@ -3522,7 +3522,7 @@ function html_calendar_waiting_events($obm_wait) {
   if ($_GET['owner_notification'] == "true") $owner_notification = "checked=\"checked\"";
 
   $block = "<div class=\"detail\">
-      <input type=\"checkbox\" id=\"owner_notification\" $owner_notification />$GLOBALS[l_owner_notification]
+      <input type=\"checkbox\" id=\"owner_notification\" $owner_notification /><label for=\"owner_notification\">$GLOBALS[l_owner_notification]</label>
   </div>";
 
   while ($obm_wait->next_record()) {
