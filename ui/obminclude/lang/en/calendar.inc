@@ -11,6 +11,7 @@ $l_calendar = "Calendar";
 $l_attendees = "Attendees";
 $l_others_attendees = "Others attendees";
 $l_add_displayed_users = "Add displayed users";
+$l_add_displayed_resources = "Add displayed resources";
 $l_show_attendees_calendar = "Show attendees calendar after event creation";
 $l_users = "Users";
 $l_owner = "Organizer";

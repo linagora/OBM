@@ -2882,6 +2882,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $repeatDisplay = 'none';
     $frequency_block = "<input type=\"text\" size=\"4\" style=\"width:3em;\" id=\"tf_repeatfrequency\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />";
   }
+
+  if ($action == 'detailupdate') {
+    $attendees_notification  = 'checked';
+  }
+
   if (isset($calendar['date_exception'])) { $date_exception = $calendar['date_exception']; }
   if (isset($calendar['list-item'])) { $t_list_item = $calendar['list-item']; }
   if (isset($calendar['list-item-id'])) { $t_list_item_id = $calendar['list-item-id']; }
@@ -2890,7 +2895,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['others_attendees'])) { $others_attendees = $calendar['others_attendees']; }
   if (isset($calendar['add_displayed_users'])) { $add_displayed_users = $calendar['add_displayed_users']; }
   if (isset($calendar['show_attendees_calendar'])) { $show_attendees_calendar = $calendar['show_attendees_calendar']; }
-  if (isset($calendar['attendees_notification'])) { $attendees_notification = $calendar['attendees_notification']; }
+  if (isset($calendar['attendees_notification'])) { $attendees_notification = ($calendar['attendees_notification'] == 1 ? 'checked' : ''); }
   if (isset($calendar['alert'])) {
     // handle only one entry for now
     if (is_array($sel_alert)) {
@@ -2900,20 +2905,15 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
   }
   
-
   if (($action == 'detailupdate') || ($action == 'update') || ($action == 'conflict_manager')) {
-    if ($attendees_notification) {
-      $attendees_notification = "checked=\"checked\"";
-    }
-
     $dis_attendees_notification = "
   <fieldset class=\"detail extra\">    
   <legend>$GLOBALS[l_event_update_notification]</legend>  
   <table>    
   <tr>    
-    <th>$GLOBALS[l_sendamail]</th> 
+    <th><label for=\"cba_attendees_notification\">$GLOBALS[l_sendamail]</label></th> 
     <td>
-      <input style=\"margin:0\" type=\"checkbox\" name=\"cba_attendees_notification\" value=\"1\" $attendees_notification />
+      <input style=\"margin:0\" type=\"checkbox\" id=\"cba_attendees_notification\" name=\"cba_attendees_notification\" value=\"1\" $attendees_notification />
     </td>
   </tr>
   </table>
@@ -2983,7 +2983,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $show_attendees_calendar_checked = "checked=\"checked\"";
     }
     $dis_show_attendees_calendar = "<tr>
-     <th>$GLOBALS[l_show_attendees_calendar]</th>
+     <th><label for=\"cba_show_attendees_calendar\">$GLOBALS[l_show_attendees_calendar]</label></th>
       <td>
        <input type=\"checkbox\" id=\"cba_show_attendees_calendar\" value=\"1\" $show_attendees_calendar_checked name=\"cba_show_attendees_calendar\" />
        </td>
@@ -3045,7 +3045,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $GLOBALS[l_add_displayed_users]
       </th>
       <td>
-        <input type=\"checkbox\" id=\"cba_add_displayed_users\" value=\"1\" $add_displayed_users_checked name=\"cba_add_displayed_users\" onclick=\"add_displayed_users(this.checked, $users_js, $uid)\"/>
+        <input type=\"checkbox\" id=\"cba_add_displayed_users\" value=\"1\" $add_displayed_users_checked name=\"cba_add_displayed_users\" onclick=\"add_displayed_attendee(this.checked, $users_js, $uid, 'user')\"/>
       </td>
       </tr>";
   }
@@ -3169,6 +3169,28 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
     // resource select
+    if ($action == 'new' && !isset($calendar['new_meeting'])) {
+      if (is_array($res['entity']) && sizeof($res['entity']) >= 1) {
+        $u = array();
+        foreach($res['entity'] as $id => $res) {
+          $name = phpStringToJsString($res["label"]);
+          array_push($u, "'$id' : '$name'");
+        }
+        $res_js = "{".implode(",", $u)."}";
+
+        if ( $add_displayed_res ) {
+          $add_displayed_res_checked = "checked=\"checked\"";
+        }
+        $block_add_displayed_res = "<tr>
+          <th>
+          $GLOBALS[l_add_displayed_resources]
+          </th>
+          <td>
+            <input type=\"checkbox\" id=\"cba_add_displayed_res\" value=\"1\" $add_displayed_res_checked name=\"cba_add_displayed_res\" onclick=\"add_displayed_attendee(this.checked, $res_js, $uid, 'resource')\"/>
+          </td>
+          </tr>";
+      }
+    } else {
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $r_ent) {
         $r_name = $r_ent['label'];
@@ -3233,6 +3255,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
           </div>";
       }
     }
+  }
 
     $url = "$path/resource/resource_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_resource_id&amp;filter_entity=Resource&amp;filter_pattern=access";
     $resource_add_button = "
@@ -3246,6 +3269,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <fieldset class=\"detail infos\">
     <legend>$l_resources</legend>    
     <table>
+      $block_add_displayed_res
     <tr>
     <th>
     $l_resources
@@ -3372,7 +3396,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   </tr> 
     $block_category1
   <tr>
-    <th>$l_force</th>
+    <th><label for=\"cba_force\">$l_force</label></th>
     <td>$dis_force</td>
   </tr>   
   </table>

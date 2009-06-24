@@ -118,18 +118,18 @@ $extra_js .= "
     }).post(\$merge({ajax : 1, action : 'perform_meeting'}, q)); 
   }
 
-  function add_displayed_users(check, users, uid) {
-    if (check) {
-      for(var id in users) {
-        var sel_id = 'sel_user_id-data-user-'+id;
-        if ($(sel_id) == null) {
-          of_select_add_element(window.document, 'sel_user_id', 'data-user-'+id, users[id]);
+function add_displayed_attendee(check, attendee, uid, kind) {
+  if (check) {
+    for(var id in attendee) {
+      var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
+      if ($(sel_id) == null) {
+        of_select_add_element(window.document, 'sel_'+kind+'_id', 'data-'+kind+'-'+id, attendee[id]);
       }
     }
   } else {
-    for(var id in users) {
+    for(var id in attendee) {
       if (id != uid) {
-        var sel_id = 'sel_user_id-data-user-'+id;
+        var sel_id = 'sel_'+kind+'_id-data-'+kind+'-'+id;
         if (sel_id != null) {
           $(sel_id).destroy();
         }
@@ -137,7 +137,6 @@ $extra_js .= "
     }
   }
 }
-
 
 function check_calendar_pdf_options() {
   if ($('cal_first_hour')) {

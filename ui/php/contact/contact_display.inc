@@ -1275,6 +1275,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   if (isset($contact['websites'])) { $websites = $contact['websites'];}
   if (isset($contact['emails'])) { $emails = $contact['emails'];}
   if (isset($contact['mailok'])) { $mailok = ($contact['mailok'] == 1 ? 'checked' : ''); }
+  if (isset($contact['newsletter'])) { $newsletter = ($contact['newsletter'] == 1 ? 'checked' : ''); }
   if (isset($contact['comment'])) { $comment = stripslashes($contact['comment']); }
   if (isset($contact['add_comment'])) { $add_comment = stripslashes($contact['add_comment']); }
   if (isset($contact['usercomment'])) { $usercomment = $contact['usercomment']; }
