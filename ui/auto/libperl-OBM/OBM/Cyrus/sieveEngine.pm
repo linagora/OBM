@@ -13,9 +13,6 @@ use OBM::Tools::commonMethods qw(
         _log
         dump
         );
-use OBM::Ldap::utils qw(
-        _modifyAttr
-        );
 use Cyrus::SIEVE::managesieve;
 
 
