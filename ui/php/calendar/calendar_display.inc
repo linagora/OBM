@@ -3029,18 +3029,19 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $users = $calendar['user_id'];
     foreach($users as $u) {
       $id = explode("-", $u);
-      $infos = get_user_info($id[2]);
-      $u_name = $infos['firstname']." ".$infos['lastname'];
-      $sel_id = $u;
-      $div_id = "sel_user_id-$sel_id";
-      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-      <img src=\"$ico_delete\" alt=\"[Delete]\" />
-      </a>
-      $u_name
-      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-      </div>";
-
+      if ($id[1] == 'user') {
+        $infos = get_user_info($id[2]);
+        $u_name = $infos['firstname']." ".$infos['lastname'];
+        $sel_id = $u;
+        $div_id = "sel_user_id-$sel_id";
+        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+        <img src=\"$ico_delete\" alt=\"[Delete]\" />
+        </a>
+        $u_name
+        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+        </div>";
+      }
     }
   } else {
     // user select
@@ -3081,18 +3082,40 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </tr>";
   }
 
-  if (is_array($contacts['entity'])) {
-    foreach ($contacts['entity'] as $u_id => $u_ent) {
-      $u_name = $u_ent['label'];
-      $sel_id = "data-contact-$u_id";
-      $div_id = "sel_user_id-$sel_id";
-      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
-      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
-      <img src=\"$ico_delete\" alt=\"[Delete]\" />
-      </a>
-      $u_name
-      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
-      </div>";
+
+
+  if ($action == 'detailupdate' && isset($calendar['new_meeting']) && $calendar['new_meeting']==1) {
+    $users = $calendar['user_id'];
+    foreach($users as $u) {
+      $id = explode("-", $u);
+      if ($id[1] == 'contact') {
+        $infos = get_contact_info($id[2]);
+        $u_name = $infos['firstname']." ".$infos['lastname'];
+        $sel_id = $u;
+        $div_id = "sel_user_id-$sel_id";
+        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+        <img src=\"$ico_delete\" alt=\"[Delete]\" />
+        </a>
+        $u_name
+        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+        </div>";
+      }
+    }
+  } else {
+    if (is_array($contacts['entity'])) {
+      foreach ($contacts['entity'] as $u_id => $u_ent) {
+        $u_name = $u_ent['label'];
+        $sel_id = "data-contact-$u_id";
+        $div_id = "sel_user_id-$sel_id";
+        $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+        <img src=\"$ico_delete\" alt=\"[Delete]\" />
+        </a>
+        $u_name
+        <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+        </div>";
+      }
     }
   }
 

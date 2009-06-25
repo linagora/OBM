@@ -1875,6 +1875,39 @@ function get_user_info($id='') {
 
 
 /**
+ * Get the contact infos
+ * @param $con_id : contact id
+ * @return : $c hash with contact infos
+ **/
+function get_contact_info($con_id) {
+  global $cdg_sql;
+
+  $multidomain = sql_multidomain('contact');
+  $con_id = sql_parse_id($con_id, true);
+  $query = "SELECT
+    contact_company_id,
+    contact_privacy,
+    contact_usercreate,
+    contact_lastname,
+    contact_firstname
+    FROM Contact
+    WHERE contact_id $con_id $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'get_contact_info()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $c['company_id'] = $obm_q->f('contact_company_id');
+  $c['privacy'] = $obm_q->f('contact_privacy');
+  $c['usercreate'] = $obm_q->f('contact_usercreate');
+  $c['lastname'] = $obm_q->f('contact_lastname');
+  $c['firstname'] = $obm_q->f('contact_firstname');
+
+  return $c;
+}
+
+
+/**
  * Format entities email. 
  * 
  * @param mixed $mail Brut email(s) (if not set use id and entity to retrieve
