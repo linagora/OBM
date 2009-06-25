@@ -16,6 +16,7 @@ function run_query_contact_search($contact) {
   global $cgp_show, $cdg_sql, $c_all, $ctu_sql_limit;
   global $cgp_archive_only,$obm;
   global $c_public, $c_private;
+  $ctu_sql_limit = true;
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
 
@@ -49,10 +50,11 @@ function run_query_contact_search($contact) {
   $lang = get_lang();
 
   $like = sql_casei_like($db_type);
-  $limit = sql_limit($db_type);
+  //$limit = sql_limit($db_type, '', '', '', true);
   $date = sql_date_format($db_type, 'contact_date', 'contact_date');
   $multidomain = sql_multidomain('contact');
-
+  $start = microtime(true);
+  $startt = $start;
   if ($privacy != $c_public) {
     // Now we play with ACLs
     $allowed_contacts_query = "
@@ -73,6 +75,9 @@ function run_query_contact_search($contact) {
       WHERE contact_usercreate = $uid";
     display_debug_msg($allowed_contacts_query, $cdg_sql, 'contact_search(0)');
     $obm_q->query($allowed_contacts_query);
+    $end = microtime(true);
+    echo "Right Query : ".($end - $start)."<br/>";
+    $start = microtime(true);
     $f_contact_ids = array();
     while ($obm_q->next_record()) {
       $f_contact_ids[] = sql_parse_id($obm_q->f('id'));
@@ -84,6 +89,8 @@ function run_query_contact_search($contact) {
     }
     $where.= ")";
   }
+  $end = microtime(true);
+  echo "Build Ids ".($end - $start)."<br/>";
 
   // If company module used (external from Contact)
   if ($cgp_show['module']['company']) {
@@ -277,23 +284,38 @@ function run_query_contact_search($contact) {
 
 
   if ((! $fuzzy) || ($lname == '')) {
-    $count = get_query_count("SELECT count(contact_id) FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq");
-    $obm_q->set_num_rows_total($count);
-    // If any results (from limited) or result not limited, we get the data
-    if ($count > 0) {
-      $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq $orderq $limit";
-      display_debug_msg($query, $cdg_sql, 'contact_search(1)');
-      $obm_q->query($query);
-      $ids = array();
-      while($obm_q->next_record()) {
-        $ids[] = $obm_q->f('contact_id');
-      }
-      $whereq = " WHERE contact_id IN (".implode(',',$ids).")";
-      $query = "$select $left_join $whereq $orderq $limit";
-      display_debug_msg($query, $cdg_sql, 'contact_search(2)');
-      $obm_q->query($query);
+    if (($contact['page'] > 0) && ($name == $contact['of_display_name'])) {
+      $off = ($contact['page'] - 1) * $num;
+    } else {
+      $off = '0';
     }
+    if ($_SESSION['set_rows'] != '') {
+      $limit = $_SESSION['set_rows'];
+    } else {
+      $limit = $set_rows_default;
+    }
+    $start = microtime(true);
+    $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq $orderq";
+    display_debug_msg($query, $cdg_sql, 'contact_search(1)');
+    $obm_q->query($query);
+    $end = microtime(true);
+    echo "Ids query ".($end - $start)."<br/>";
+    $obm_q->set_num_rows_total($obm_q->nf());
+    $ids = array();
+    $obm_q->seek($off);
+    while($obm_q->next_record() && $i < $limit) {
+      $ids[] = $obm_q->f('contact_id');
+      $i++;
+    }
+    $whereq = " WHERE contact_id IN (".implode(',',$ids).")";
+    $query = "$select $left_join $whereq $orderq";
+    $start = microtime(true);
+    display_debug_msg($query, $cdg_sql, 'contact_search(2)');
+    $obm_q->query($query);
+    $end = microtime(true);
+    echo "Final query : ".($end - $start)."<br/>";
   }
+  echo "Total : ".($end - $startt)."<br/>";
   // if fuzzy or unsuccessful search (meaningful only if name has been entered)
   //if ( ( ($fuzzy) || ($count == 0) ) && ($lname != '') ) {
   //  $auto_aka = format_name($lname, 0, true, true);
