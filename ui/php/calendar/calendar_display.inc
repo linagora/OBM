@@ -4664,7 +4664,16 @@ function dis_calendar_pdf_options($calendar, $p_range, $p_view) {
       <td>
         <input type=\"checkbox\" id=\"cba_onedayperpage\" name=\"cba_onedayperpage\" value=\"1\">
       </td>
-    </tr>"; 
+    </tr>";
+    
+  } else if ($p_range != 'month') {
+    $block_detail = "
+      <tr>
+        <th>$l_display_details</th>
+        <td>
+          <input type=\"checkbox\" name=\"cba_showdetails\" value=\"1\">
+        </td>
+      </tr>";
   }
 
   if ($p_view == 'agenda' && $p_range != 'month') {
@@ -4719,7 +4728,7 @@ function dis_calendar_pdf_options($calendar, $p_range, $p_view) {
       </tr>";
     }
 
-    $block_detail = "
+    $block_detail .= "
       <tr>
         <th>$l_first_hour</th>
         <td>$dis_hour_b</td>
@@ -5351,7 +5360,7 @@ Class CalendarPdf{
 
     $userinfo = get_entity_info($obm['uid'], 'user');
     $this->editor = $userinfo['label'];
-
+    $this->showdetails = $calendar['showdetails'];
   }
 
 
@@ -5513,6 +5522,36 @@ Class CalendarPdf{
     $stringWidth = (array_sum($widths) / $this->font->getUnitsPerEm()) * $this->font_size;
 
     return $stringWidth;
+  }
+  
+  // infinite recursive loop protection
+  var $_cutLongWords_rec_i = 0;
+  
+  function cutLongWords ($string, $max_width) {
+    if ($this->_cutLongWords_rec_i > 20) return $string;
+    $this->_cutLongWords_rec_i += 1;
+    
+    $vowels = '/[aeiouy]/';
+    
+    $words = split(' ', $string);
+    foreach ($words as $k => $v) {
+      if ($this->getStringWidth($v) > $max_width) {
+        $letters = str_split($v, 1);
+        for ($i = round(count($letters) / 2), $n = count($letters); $i < $n; $i += 1) {
+          if (preg_match($vowels, $letters[$i]) && !preg_match($vowels, $letters[$i + 1])) {
+            $insert_pos = $i - 1;
+            break;
+          }
+        }
+        
+        $words[$k] = $this->cutLongWords(substr($v, 0, $insert_pos), $max_width). '- '
+          . $this->cutLongWords(substr($v, $insert_pos), $max_width);
+      }
+    }
+    
+    $this->_cutLongWords_rec_i -= 1;
+    
+    return join(' ', $words);
   }
 
 }
@@ -6066,7 +6105,10 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $bg_color = $class["background"];
         $title_color = $class["title"];
       } 
-      if ($event->event->privacy && !(array_key_exists($obm['uid'],$attendee['user']))) {
+      
+      $privatized_event = $event->event->privacy && !(array_key_exists($obm['uid'],$attendee['user']));
+      
+      if ($privatized_event) {
         $title = $l_private;
       } else {
         $title = $event->event->title;
@@ -6148,18 +6190,33 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
           $dis_title = "";
         } else {
           $dis_header = $date;
-          $dis_title = $title;
+          $event_body = $title;
+          
+          if (!$privatized_event) {
+            if (!empty($event->event->location)) {
+              $event_body .= ' ('. $event->event->location. ')';
+            }
+            
+            if ($this->showdetails && !empty($event->event->description)) {
+              $event_body .= " : ". $event->event->description;
+            }
+          }
         }
 
         // event title
         $this->page->setFillColor(new Zend_Pdf_Color_Html($bg_color));
         $this->page->drawRectangle($x0,$y0,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
+        
+        $text_cell_width = ($x1 - $x0 - 2);
         $cell = new Zend_Pdf_Cell($this->page, Zend_Pdf_Cell::POSITION_LEFT,
-                                  $x1 - $x0 - 2, ($y1-2*$this->font_height) - $y0);
+                                  $text_cell_width, ($y1-2*$this->font_height) - $y0);
         $cell->setLocation($x0+2, $y1-2*$this->font_height);
-        // XXX if $dis_title is too long, do not display anything
-        $cell->addText($dis_title, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
+        
+        // if $dis_title contains long words, Zend_Pdf_Cell do not display them
+        $event_body = $this->cutLongWords($event_body, $text_cell_width);
+        
+        $cell->addText($event_body, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
         $cell->write();
 
         // event header
@@ -6255,7 +6312,6 @@ Class CalendarPdfList Extends CalendarPdf{
     }
 
     $this->onedayperpage = $calendar['onedayperpage'];
-    $this->showdetails = $calendar['showdetails'];
 
     $this->addPage(true, false);
   }
