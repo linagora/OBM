@@ -380,6 +380,10 @@ if ($action == 'index') {
               $entities['contact'] = array_merge($entities['contact'], $others_attendees);
             }
             run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
+            if (!$params['show_attendees_calendar']) {
+              $params['sel_user_id'] = "data-user-".$obm['uid']; // show my calendar only
+              $cal_entity_id['resource'] = array();
+            }
             $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
             $params["date"] = $params["date_begin"];
             $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);

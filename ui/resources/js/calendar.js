@@ -2272,7 +2272,6 @@ Obm.CalendarFreeBusy = new Class({
       });
 
       var newPosition = sorted.indexOf(sel_attendee_id);
-
       if (newPosition == 0) {
         var first = sorted[1]; 
         var first_tr = $(kind+'-'+first.id.split('-')[3]);

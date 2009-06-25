@@ -2992,7 +2992,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $all_day_checked = "checked=\"checked\"";
   }
 
-  if ($action == "new" || $action == "insert") {
+  //if ($action == "new" || $action == "insert") {
     if ( $show_attendees_calendar ) {
       $show_attendees_calendar_checked = "checked=\"checked\"";
     }
@@ -3002,7 +3002,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
        <input type=\"checkbox\" id=\"cba_show_attendees_calendar\" value=\"1\" $show_attendees_calendar_checked name=\"cba_show_attendees_calendar\" />
        </td>
       </tr>";
-  }
+  //}
 
   if ($action == 'new' && !isset($calendar['new_meeting'])) {
     // If one new user is given in parameters, pre-select it
@@ -3025,6 +3025,23 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $u_name
       <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
       </div>";
+  } else if ($action == 'detailupdate' && isset($calendar['new_meeting']) && $calendar['new_meeting']==1) {
+    $users = $calendar['user_id'];
+    foreach($users as $u) {
+      $id = explode("-", $u);
+      $infos = get_user_info($id[2]);
+      $u_name = $infos['firstname']." ".$infos['lastname'];
+      $sel_id = $u;
+      $div_id = "sel_user_id-$sel_id";
+      $dis_sel_user .= "<div class=\"elementRow\" id=\"$div_id\">
+      <a href=\"javascript: remove_element('$div_id','sel_user_id');\">
+      <img src=\"$ico_delete\" alt=\"[Delete]\" />
+      </a>
+      $u_name
+      <input value=\"$sel_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+      </div>";
+
+    }
   } else {
     // user select
     if (is_array($users['entity'])) {
@@ -3056,7 +3073,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
     $block_add_displayed_users = "<tr>
       <th>
-      $GLOBALS[l_add_displayed_users]
+      <label for=\"cba_add_displayed_users\">$GLOBALS[l_add_displayed_users]</label>
       </th>
       <td>
         <input type=\"checkbox\" id=\"cba_add_displayed_users\" value=\"1\" $add_displayed_users_checked name=\"cba_add_displayed_users\" onclick=\"add_displayed_attendee(this.checked, $users_js, $uid, 'user')\"/>
@@ -3197,12 +3214,31 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         }
         $block_add_displayed_res = "<tr>
           <th>
-          $GLOBALS[l_add_displayed_resources]
+          <label for=\"cba_add_displayed_res\">$GLOBALS[l_add_displayed_resources]</label>
           </th>
           <td>
             <input type=\"checkbox\" id=\"cba_add_displayed_res\" value=\"1\" $add_displayed_res_checked name=\"cba_add_displayed_res\" onclick=\"add_displayed_attendee(this.checked, $res_js, $uid, 'resource')\"/>
           </td>
           </tr>";
+      }
+    } else if ($action == 'detailupdate' && isset($calendar['new_meeting']) && $calendar['new_meeting']==1) {
+      $res = $calendar['resource_id'];
+      if (is_array($res)) {
+        foreach($res as $u) {
+          $id = explode("-", $u);
+          $infos = get_resource_info($id[2]);
+          $u_name = $infos['name'];
+          $sel_id = $u;
+          $div_id = "sel_resource_id-$sel_id";
+          $dis_sel_resource .= "<div class=\"elementRow\" id=\"$div_id\">
+          <a href=\"javascript: remove_element('$div_id','sel_resource_id');\">
+          <img src=\"$ico_delete\" alt=\"[Delete]\" />
+          </a>
+          $u_name
+          <input value=\"$sel_id\" name=\"sel_resource_id[]\" type=\"hidden\" />
+          </div>";
+
+        }
       }
     } else {
     if (is_array($res['entity'])) {
@@ -3419,13 +3455,13 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <legend>$l_carac</legend>
   <table>
   <tr>
-    <th>$l_private</th>
+    <th><label for=\"cba_privacy\">$l_private</label></th>
     <td>$dis_privacy</td>
   </tr> 
   <tr>
-    <th>$l_all_day</th>
+    <th><label for=\"cba_all_day\">$l_all_day</label></th>
     <td>
-      <input onchange=\"show_hide_calendar_dates(this)\" onclick=\"show_hide_calendar_dates(this)\" type=\"checkbox\" name=\"cba_all_day\" value=\"1\" $all_day_checked />
+      <input onchange=\"show_hide_calendar_dates(this)\" onclick=\"show_hide_calendar_dates(this)\" type=\"checkbox\" id=\"cba_all_day\" name=\"cba_all_day\" value=\"1\" $all_day_checked />
     </td>
   </tr>   
   <tr>
@@ -4596,14 +4632,14 @@ function dis_calendar_pdf_options($calendar, $p_range, $p_view) {
   if ($p_view == 'list') {
     $block_detail = "
     <tr>
-      <th>$l_display_details</th>
+      <th><label for=\"cba_showdetails\">$l_display_details</label></th>
       <td>
-        <input type=\"checkbox\" name=\"cba_showdetails\" value=\"1\">
+        <input type=\"checkbox\" id=\"cba_showdetails\" name=\"cba_showdetails\" value=\"1\">
       </td>
     </tr><tr>
-      <th>$l_one_day_per_page</th>
+      <th><label for=\"cba_onedayperpage\">$l_one_day_per_page</label></th>
       <td>
-        <input type=\"checkbox\" name=\"cba_onedayperpage\" value=\"1\">
+        <input type=\"checkbox\" id=\"cba_onedayperpage\" name=\"cba_onedayperpage\" value=\"1\">
       </td>
     </tr>"; 
   }
@@ -4650,9 +4686,9 @@ function dis_calendar_pdf_options($calendar, $p_range, $p_view) {
 
       $block_week = "
       <tr>
-        <th>$l_one_day_per_page</th>
+        <th><label for=\"cba_onedayperpage\">$l_one_day_per_page</label></th>
         <td>
-          <input type=\"checkbox\" name=\"cba_onedayperpage\" value=\"1\">
+          <input type=\"checkbox\" id=\"cba_onedayperpage\" name=\"cba_onedayperpage\" value=\"1\">
         </td>
       </tr><tr id=\"display_days\">  
         <th>$l_display_days</th>
