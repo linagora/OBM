@@ -4669,11 +4669,11 @@ function dis_calendar_pdf_options($calendar, $p_range, $p_view) {
   } else if ($p_range != 'month') {
     $block_detail = "
       <tr>
-        <th>$l_display_details</th>
-        <td>
-          <input type=\"checkbox\" name=\"cba_showdetails\" value=\"1\">
-        </td>
-      </tr>";
+      <th><label for=\"cba_showdetails\">$l_display_details</label></th>
+      <td>
+        <input type=\"checkbox\" id=\"cba_showdetails\" name=\"cba_showdetails\" value=\"1\">
+      </td>
+    </tr>";
   }
 
   if ($p_view == 'agenda' && $p_range != 'month') {
