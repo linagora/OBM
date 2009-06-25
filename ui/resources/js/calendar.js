@@ -2193,7 +2193,7 @@ Obm.CalendarFreeBusy = new Class({
             label = div_id.get('text');
           }
           label = label.toLowerCase();
-          this.displayAttendee(div_id, kind, label.trim(), tr);
+          this.displayAttendee(div_id, data.kind, label.trim(), tr);
         }
       }.bind(this),
       onSuccess: function() {
