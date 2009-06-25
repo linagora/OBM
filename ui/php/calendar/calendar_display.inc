@@ -2073,9 +2073,7 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
     }
   }
 
-  $owner_notification = "";
-  if ($_GET['owner_notification'] == "true") $owner_notification = "checked=\"checked\"";
-
+  $owner_notification = "checked";
   $block = "<div class=\"detail\">
       <input type=\"checkbox\" id=\"cb_notification\" name=\"cb_notification\" $owner_notification onchange=\"$('owner_notification').value = $('cb_notification').checked;\" /><label for=\"cb_notification\">$GLOBALS[l_owner_notification]</label>
   </div>";
@@ -2129,7 +2127,7 @@ function html_calendar_conflict_form($calendar) {
    <input type=\"hidden\" name=\"user_id\" value=\"$user_id\" />
    <input type=\"hidden\" name=\"cba_force\" value=\"1\" />
    <input type=\"hidden\" name=\"rd_decision_event\" value=\"\" />
-   <input type=\"hidden\" id=\"owner_notification\" name=\"owner_notification\" value=\"0\" />
+   <input type=\"hidden\" id=\"owner_notification\" name=\"owner_notification\" value=\"true\" />
    <div class=\"detailButton\">
     <input type=\"submit\" value=\"$l_force_insert\" onclick=\"this.form.rd_decision_event.value='ACCEPTED';\"/>
     <input type=\"submit\" value=\"$l_refuse_insert\" onclick=\"this.form.rd_decision_event.value='DECLINED';\"/> 
@@ -3533,8 +3531,8 @@ function html_calendar_waiting_events($obm_wait) {
   global $l_wait,$l_low,$l_medium,$l_datebegin,$l_daysofweekshort,$l_update;
   global $l_carac,$l_accept,$l_refuse,$l_periodic,$l_yes,$l_no,$path;
    
-  $owner_notification = "";
-  if ($_GET['owner_notification'] == "true") $owner_notification = "checked=\"checked\"";
+  $owner_notification = "checked";
+  if (isset($_GET['owner_notification'])) {$owner_notification =  ($_GET['owner_notification'] == "true" ? "checked":"");}
 
   $block = "<div class=\"detail\">
       <input type=\"checkbox\" id=\"owner_notification\" $owner_notification /><label for=\"owner_notification\">$GLOBALS[l_owner_notification]</label>
@@ -3616,7 +3614,7 @@ function html_calendar_waiting_events($obm_wait) {
        <input type=\"hidden\" name=\"calendar_id\" value=\"".$obm_wait->f('event_id')."\" />
        <input type=\"hidden\" name=\"entity_kind\" value=\"$current_entity_entity\" />
        <input type=\"hidden\" name=\"entity_id\" value=\"$current_entity\" />
-       <input type=\"hidden\" name=\"owner_notification\" value=\"false\" />
+       <input type=\"hidden\" name=\"owner_notification\" value=\"true\" />
        <input type=\"hidden\" name=\"date_begin\" value=\"$date_begin\" />
        <input type=\"hidden\" name=\"date_end\" value=\"$date_end\" />
        <input type=\"hidden\" name=\"time_end\" value=\"$time_end\" />
