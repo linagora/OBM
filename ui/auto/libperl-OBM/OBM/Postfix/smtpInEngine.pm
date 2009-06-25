@@ -63,6 +63,10 @@ sub update {
             last SWITCH;
         }
 
+        if( ref($entity) eq 'OBM::Entities::obmMailServer' ) {
+            last SWITCH;
+        }
+
         $self->_log( 'l\'entité '.$entity->getDescription().' n\'a pas d\'impact sur le contenu des maps postfix', 3 );
         return 0;
     }
@@ -117,7 +121,7 @@ sub updateMaps {
         $self->_log( 'génération des maps SMTP-in annulée', 0 );
 
         for( my $i=0; $i<=$#{$self->{'entitiesUpdateErrorDesc'}}; $i++ ) {
-            $self->_log( $self->{'entitiesUpdateErrorDesc'}->[$i], 0 );
+            $self->_log( 'erreur: '.$self->{'entitiesUpdateErrorDesc'}->[$i], 0 );
         }
 
         return 1;

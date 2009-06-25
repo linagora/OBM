@@ -64,28 +64,55 @@ sub _init {
         push( @{$self->{'entityDesc'}->{'mailDomains'}}, $domainAlias->[$i] );
     }
 
+    my %imapServer;
+    my %imapServerId;
+    my %smtpInServer;
+    my %smtpInServerId;
+    my %smtpOutServer;
+    my %smtpOutServerId;
     for( my $i=0; $i<=$#$mailServerDesc; $i++ ) {
         my $currentSrv = $mailServerDesc->[$i];
 
         SWITCH: {
             if( $currentSrv->{'server_role'} =~ /^imap$/i ) {
-                push( @{$self->{'entityDesc'}->{'imapServerId'}}, $currentSrv->{'server_id'} );
-                push( @{$self->{'entityDesc'}->{'imapServer'}}, $currentSrv->{'server_name'} );
+                $imapServerId{$currentSrv->{'server_id'}} = '';
+                $imapServer{$currentSrv->{'server_name'}} = '';
                 last SWITCH;
             }
 
             if( $currentSrv->{'server_role'} =~ /^smtp_in$/i ) {
-                push( @{$self->{'entityDesc'}->{'smtpInServerId'}}, $currentSrv->{'server_id'} );
-                push( @{$self->{'entityDesc'}->{'smtpInServer'}}, $currentSrv->{'server_name'} );
+                $smtpInServerId{$currentSrv->{'server_id'}} = '';
+                $smtpInServer{$currentSrv->{'server_name'}} = '';
                 last SWITCH;
             }
 
             if( $currentSrv->{'server_role'} =~ /^smtp_out$/i ) {
-                push( @{$self->{'entityDesc'}->{'smtpOutServerId'}}, $currentSrv->{'server_id'} );
-                push( @{$self->{'entityDesc'}->{'smtpOutServer'}}, $currentSrv->{'server_name'} );
+                $smtpOutServerId{$currentSrv->{'server_id'}} = '';
+                $smtpOutServer{$currentSrv->{'server_name'}} = '';
                 last SWITCH;
             }
         }
+    }
+
+    @{$self->{'entityDesc'}->{'imapServerId'}} = keys(%imapServerId);
+    @{$self->{'entityDesc'}->{'imapServer'}} = keys(%imapServer);
+    if( $#{$self->{'entityDesc'}->{'imapServerId'}} < 0 ) {
+        delete( $self->{'entityDesc'}->{'imapServerId'} );
+        delete( $self->{'entityDesc'}->{'imapServer'} );
+    }
+
+    @{$self->{'entityDesc'}->{'smtpInServerId'}} = keys(%smtpInServerId);
+    @{$self->{'entityDesc'}->{'smtpInServer'}} = keys(%smtpInServer);
+    if( $#{$self->{'entityDesc'}->{'smtpInServerId'}} < 0 ) {
+        delete( $self->{'entityDesc'}->{'smtpInServerId'} );
+        delete( $self->{'entityDesc'}->{'smtpInServer'} );
+    }
+
+    @{$self->{'entityDesc'}->{'smtpOutServerId'}} = keys(%smtpOutServerId);
+    @{$self->{'entityDesc'}->{'smtpOutServer'}} = keys(%smtpOutServer);
+    if( $#{$self->{'entityDesc'}->{'smtpOutServerId'}} ) {
+        delete( $self->{'entityDesc'}->{'smtpOutServerId'} );
+        delete( $self->{'entityDesc'}->{'smtpOutServer'} );
     }
 
     return 0;
