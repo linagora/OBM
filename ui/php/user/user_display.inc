@@ -2017,7 +2017,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   // Profiles
   $delegation_modules = array(
     'user' => $GLOBALS['cright_write_admin'],
-    //'resource' => $GLOBALS['cright_write'], 
+    'resource' => $GLOBALS['cright_write'], 
     'host' => $GLOBALS['cright_write'],
     'people' => $GLOBALS['cright_write'],
     'group' => $GLOBALS['cright_write_admin'],
@@ -2025,7 +2025,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   foreach ($user['profiles'] as $k_profile => $one_profile) {
     $selected = '';
     foreach($delegation_modules as $mdl => $rgt) {
-      $section = $GLOBALS['cgp_show']['modules'][$mdl];
+      $section = $GLOBALS['cgp_show']['module'][$mdl];
       if (Perm::check_section_right($section, $k_profile) && Perm::check_module_right($mdl, $rgt, $k_profile)) {
         $onselect .= "profiles['$k_profile'] = true\n";
         if (!isset($delegation_class) && $profile == $k_profile){

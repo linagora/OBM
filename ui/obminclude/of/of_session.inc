@@ -445,7 +445,6 @@ class Perm {
     global $profiles, $obm;
 	
     if(!$profile) $profile = $obm["profile"];
-    $profile = $obm["profile"];
 
     if (isset($profiles[$profile]['module'][$module])) {
       return hexdec($profiles[$profile]['module'][$module]);
@@ -494,7 +493,6 @@ class Perm {
 
   function check_module_right($module, $right, $profile = false) {
     $module_right = self::get_module_rights($module, $profile);
-
     // If action right not defined or user has not access rights
     if ( ( ($module_right & $right) != $right)
          || ($right == "") ) {
@@ -505,7 +503,7 @@ class Perm {
   }
 
   function check_section_right($section, $profile = false) {
-    $section_right = self::get_section_rights($module, $profile);
+    $section_right = self::get_section_rights($section, $profile);
 
     if ($section_right) {
       return true;
