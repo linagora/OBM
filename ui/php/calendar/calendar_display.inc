@@ -2072,7 +2072,15 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
       $sel_res_id .="<input type=\"hidden\" name=\"sel_resource_id[]\" value=\"$res\" />";
     }
   }
-  $block = "
+
+  $owner_notification = "";
+  if ($_GET['owner_notification'] == "true") $owner_notification = "checked=\"checked\"";
+
+  $block = "<div class=\"detail\">
+      <input type=\"checkbox\" id=\"cb_notification\" name=\"cb_notification\" $owner_notification onchange=\"$('owner_notification').value = $('cb_notification').checked;\" /><label for=\"cb_notification\">$GLOBALS[l_owner_notification]</label>
+  </div>";
+
+  $block .= "
   <div class=\"detail extra\">
   <h1>$l_conflicts</h1>
   <h2><a href=\"#\" onclick=\"displayFreeBusyConflict('$duration', '$d')\">$GLOBALS[l_display_entites_freebusy]</a></h2>
@@ -2091,7 +2099,6 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
     </tbody>
   </table>
   <div class=\"buttons\">
-   $dis_form_button
    <input type='hidden' id='sel_time_begin' value='$time_begin' />
    <input type='hidden' id='sel_min_begin' value='$min_begin' />
   </div>
@@ -2122,6 +2129,7 @@ function html_calendar_conflict_form($calendar) {
    <input type=\"hidden\" name=\"user_id\" value=\"$user_id\" />
    <input type=\"hidden\" name=\"cba_force\" value=\"1\" />
    <input type=\"hidden\" name=\"rd_decision_event\" value=\"\" />
+   <input type=\"hidden\" id=\"owner_notification\" name=\"owner_notification\" value=\"0\" />
    <div class=\"detailButton\">
     <input type=\"submit\" value=\"$l_force_insert\" onclick=\"this.form.rd_decision_event.value='ACCEPTED';\"/>
     <input type=\"submit\" value=\"$l_refuse_insert\" onclick=\"this.form.rd_decision_event.value='DECLINED';\"/> 
