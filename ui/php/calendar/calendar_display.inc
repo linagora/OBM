@@ -2073,10 +2073,11 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
     }
   }
 
-  $owner_notification = "checked";
-  $block = "<div class=\"detail\">
-      <input type=\"checkbox\" id=\"cb_notification\" name=\"cb_notification\" $owner_notification onchange=\"$('owner_notification').value = $('cb_notification').checked;\" /><label for=\"cb_notification\">$GLOBALS[l_owner_notification]</label>
-  </div>";
+  if($calendar['action'] == 'decision') {
+    $owner_notification = "checked";
+    $block = "<div class=\"detail\">
+    <input type=\"checkbox\" id=\"cb_notification\" name=\"cb_notification\" $owner_notification onchange=\"$('owner_notification').value = $('cb_notification').checked;\" /><label for=\"cb_notification\">$GLOBALS[l_owner_notification]</label></div>";
+  }
 
   $block .= "
   <div class=\"detail extra\">
