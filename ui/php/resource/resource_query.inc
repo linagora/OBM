@@ -387,7 +387,12 @@ function run_query_resource_delete($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  if (!$retour) return $retour;
+  // Hook : Post
+  if (function_exists('hook_post_run_query_resource_delete')) {
+    if (! hook_post_run_query_resource_delete($p_id)) {
+      return false;
+    }
+  }
 
   return $retour;
 }
