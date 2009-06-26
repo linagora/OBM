@@ -300,13 +300,14 @@ if ($action == 'index') {
 
         if (!$params['show_attendees_calendar']) {
           $params['sel_user_id'] = "data-user-".$obm['uid']; // show my calendar only
-          $cal_entity_id['resource'] = array();
+          $params['sel_resource_id'] = array();
         }
 
         $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
         $params["date"] = $params["date_begin"];
 
         $cal_entity_id['user'] = $params['sel_user_id'];
+        $cal_entity_id['resource'] = $params['sel_resource_id'];
         $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
       }
   } else {
@@ -383,12 +384,13 @@ if ($action == 'index') {
 
             if (!$params['show_attendees_calendar']) { // show my calendar only
               $params['sel_user_id'] = "data-user-".$obm['uid'];
-              $cal_entity_id['resource'] = array();
+              $params['sel_resource_id'] = array();
             }
 
             $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
             $params["date"] = $params["date_begin"];
             $cal_entity_id['user'] = $params['sel_user_id'];
+            $cal_entity_id['resource'] = $params['sel_resource_id'];
             $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
           }
     } else {
