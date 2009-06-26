@@ -2897,7 +2897,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $frequency_block = "<input type=\"text\" size=\"4\" style=\"width:3em;\" id=\"tf_repeatfrequency\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />";
   }
 
-  if ($action == 'detailupdate') {
+  if ($action == 'detailupdate' || $action == 'conflict_manager') {
     $attendees_notification  = 'checked';
   }
 
@@ -2908,7 +2908,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['property'])) { $t_property_value = $calendar['property']; }
   if (isset($calendar['others_attendees'])) { $others_attendees = $calendar['others_attendees']; }
   if (isset($calendar['add_displayed_users'])) { $add_displayed_users = $calendar['add_displayed_users']; }
-  if (isset($calendar['show_attendees_calendar'])) { $show_attendees_calendar= ($calendar['show_attendees_calendar'] == 1 ? 'checked' : ''); }
+  if (isset($calendar['show_attendees_calendar'])) { $show_attendees_calendar = ($calendar['show_attendees_calendar'] == 1 ? 'checked' : ''); }
   if (isset($calendar['attendees_notification'])) { $attendees_notification = ($calendar['attendees_notification'] == 1 ? 'checked' : ''); }
   if (isset($calendar['alert'])) {
     // handle only one entry for now
