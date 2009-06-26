@@ -5521,7 +5521,7 @@ Class CalendarPdf{
   
   // infinite recursive loop protection
   var $_cutLongWords_rec_i = 0;
-  
+
   function cutLongWords ($string, $max_width) {
     if ($this->_cutLongWords_rec_i > 20) return $string;
     $this->_cutLongWords_rec_i += 1;
@@ -5532,11 +5532,16 @@ Class CalendarPdf{
     foreach ($words as $k => $v) {
       if ($this->getStringWidth($v) > $max_width) {
         $letters = str_split($v, 1);
-        for ($i = round(count($letters) / 2), $n = count($letters); $i < $n; $i += 1) {
+        $insert_pos = -1;
+        for ($i = round(count($letters) / 2), $n = count($letters); $i < $n - 1; $i += 1) {
           if (preg_match($vowels, $letters[$i]) && !preg_match($vowels, $letters[$i + 1])) {
             $insert_pos = $i - 1;
             break;
           }
+        }
+        
+        if ($insert_pos == -1) {
+          $insert_pos = round(count($letters) / 2);
         }
         
         $words[$k] = $this->cutLongWords(substr($v, 0, $insert_pos), $max_width). '- '
@@ -6209,7 +6214,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $cell->setLocation($x0+2, $y1-2*$this->font_height);
         
         // if $dis_title contains long words, Zend_Pdf_Cell do not display them
-        $event_body = $this->cutLongWords($event_body, $text_cell_width);
+        $event_body = $this->cutLongWords($event_body, $text_cell_width - 2);
         
         $cell->addText($event_body, Zend_Pdf_Cell::ALIGN_LEFT, 0, 'UTF-8');
         $cell->write();
