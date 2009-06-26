@@ -2908,7 +2908,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['property'])) { $t_property_value = $calendar['property']; }
   if (isset($calendar['others_attendees'])) { $others_attendees = $calendar['others_attendees']; }
   if (isset($calendar['add_displayed_users'])) { $add_displayed_users = $calendar['add_displayed_users']; }
-  if (isset($calendar['show_attendees_calendar'])) { $show_attendees_calendar = $calendar['show_attendees_calendar']; }
+  if (isset($calendar['show_attendees_calendar'])) { $show_attendees_calendar= ($calendar['show_attendees_calendar'] == 1 ? 'checked' : ''); }
   if (isset($calendar['attendees_notification'])) { $attendees_notification = ($calendar['attendees_notification'] == 1 ? 'checked' : ''); }
   if (isset($calendar['alert'])) {
     // handle only one entry for now
@@ -2992,17 +2992,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $all_day_checked = "checked=\"checked\"";
   }
 
-  //if ($action == "new" || $action == "insert") {
-    if ( $show_attendees_calendar ) {
-      $show_attendees_calendar_checked = "checked=\"checked\"";
-    }
-    $dis_show_attendees_calendar = "<tr>
-     <th><label for=\"cba_show_attendees_calendar\">$GLOBALS[l_show_attendees_calendar]</label></th>
-      <td>
-       <input type=\"checkbox\" id=\"cba_show_attendees_calendar\" value=\"1\" $show_attendees_calendar_checked name=\"cba_show_attendees_calendar\" />
-       </td>
-      </tr>";
-  //}
+  $dis_show_attendees_calendar = "<tr>
+   <th><label for=\"cba_show_attendees_calendar\">$GLOBALS[l_show_attendees_calendar]</label></th>
+    <td>
+     <input type=\"checkbox\" id=\"cba_show_attendees_calendar\" value=\"1\" $show_attendees_calendar name=\"cba_show_attendees_calendar\" />
+     </td>
+    </tr>";
 
   if ($action == 'new' && !isset($calendar['new_meeting'])) {
     // If one new user is given in parameters, pre-select it
