@@ -40,7 +40,7 @@ function check_group_get_id(valeur,text) {
     } else {
       window.opener.document.$params[ext_widget].value=valeur;
       window.opener.document.$params[ext_widget_text].value=text;
-      if ('$params[restriction_calendar]' == 'calendar') {
+      if ('$params[ext_target]' == 'Calendar') {
         window.opener.location=('../calendar/calendar_index.php?date=$params[date]&group_id='+valeur+'&new_group=1');
       }
       if ('$params[ext_target]' == '$l_time') {
