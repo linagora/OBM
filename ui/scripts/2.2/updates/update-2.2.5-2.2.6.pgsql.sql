@@ -5,11 +5,14 @@
 -- $Id:$
 -- /////////////////////////////////////////////////////////////////////////////
 
+-- module 'resource'
+
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'resource', 'resource_delegation', 5, 1);
+
 -- contact query optimization
 --
 -- Name: contact_privacy_key; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
-
 CREATE INDEX contact_privacy_key ON Contact (contact_privacy);
 
 -- foreign key child key
