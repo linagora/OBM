@@ -835,15 +835,6 @@ function organizationalchart_export_svg($organizationalchart, $view) {
     $name->appendChild($xml->createTextNode("$l_organizationalchart : $oc_name"));
     $svg->appendChild($name);
 
-    // OBM Logo
-    // $logo = $xml->createElement('image');
-    // $logo->setAttribute('x', 0);
-    // $logo->setAttribute('y', 0);
-    // $logo->setAttribute('width', 100);
-    // $logo->setAttribute('height', 100);
-    // $logo->setAttribute('href', 'ico_outline_current.png');
-    // $svg->appendChild($logo);
-
     $function_export = "export_svg_${view}";
     $export = $function_export($root_node, $xml, $svg);
 
@@ -918,15 +909,6 @@ function organizationalchart_export_pdf($organizationalchart, $view) {
     $name->appendChild($xml->createTextNode("$l_organizationalchart : $oc_name"));
     $svg->appendChild($name);
 
-    // OBM Logo
-    // $logo = $xml->createElement('image');
-    // $logo->setAttribute('x', 0);
-    // $logo->setAttribute('y', 0);
-    // $logo->setAttribute('width', 100);
-    // $logo->setAttribute('height', 100);
-    // $logo->setAttribute('href', 'ico_outline_current.png');
-    // $svg->appendChild($logo);
-
     $function_export = "export_svg_${view}";
     $export = $function_export($root_node, $xml, $svg);
 
@@ -938,25 +920,16 @@ function organizationalchart_export_pdf($organizationalchart, $view) {
       echo $xml->saveXML();
 
     } else {
-      // Write SVG
-      //$tmpfname = tempnam('/tmp', 'obm_') ;
-      //$xml->save($tmpfname);
-
       // Download file
       $file = fopen($tmpfname, 'r');
       header('Content-Type: application/pdf') ;
-      header("Content-Disposition: attachment; filename=\"$oc_name.svg\";") ;
+      header("Content-Disposition: attachment; filename=\"$oc_name.pdf\";") ;
       header('Cache-Control: maxage=3600');
       header('Pragma: public');
       $pdf = new Imagick();
-      $pdf->readImage($xml->saveXML());
+      $pdf->readImageBlob($xml->saveXML());
       $pdf->setImageFormat('pdf');
-      echo $pdf->render();
-      //fpassthru($file) ;
-      //fclose($file) ;
-
-      //// Delete temp file.
-      //unlink($tmpfname);
+      echo $pdf->getImageBlob();
     }
   }
 }

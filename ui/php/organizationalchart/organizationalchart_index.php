@@ -153,7 +153,7 @@ if ($action == "index" || $action == "") {
   organizationalchart_export_svg($params, $view);
   exit();
 
-} elseif ($action == "export_svg") {
+} elseif ($action == "export_pdf") {
 ///////////////////////////////////////////////////////////////////////////////
   organizationalchart_export_pdf($params, $view);
   exit();
