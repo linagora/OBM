@@ -1792,6 +1792,7 @@ function run_query_calendar_quick_delete($calendar) {
   $obm_q->next_record();
   $title = $obm_q->f('event_title');
 
+  $obm_qm = new DB_OBM;
   // If connectors in use
   if ($c_use_connectors) {
     $query = "SELECT userentity_user_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id WHERE eventlink_event_id = $event_id";
@@ -1802,7 +1803,7 @@ function run_query_calendar_quick_delete($calendar) {
       $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_origin, deletedevent_type, deletedevent_timestamp)
         VALUES ($event_id, ".$obm_q->f('userentity_user_id').",'$GLOBALS[c_origin_web]', 'VEVENT', NOW())";
       display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
-      $retour = $obm_q->query($query);
+      $retour = $obm_qm->query($query);
     }
   }
 
@@ -1842,6 +1843,7 @@ function run_query_calendar_delete($calendar) {
 
   // If connectors in use
   if ($c_use_connectors) {
+    $obm_qm = new DB_OBM;
     $query = "SELECT userentity_user_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id WHERE eventlink_event_id = $event_id";
     $obm_q->query($query);
     $users = array();
@@ -1850,7 +1852,7 @@ function run_query_calendar_delete($calendar) {
       $query = "INSERT INTO DeletedEvent (deletedevent_event_id, deletedevent_user_id, deletedevent_origin, deletedevent_type, deletedevent_timestamp)
         VALUES ($event_id, ".$obm_q->f('userentity_user_id').",'$GLOBALS[c_origin_web]', 'VEVENT', NOW())";
       display_debug_msg($query, $cdg_sql, 'run_query_calendar_delete(2)');
-      $retour = $obm_q->query($query);
+      $retour = $obm_qm->query($query);
     }
   }
 

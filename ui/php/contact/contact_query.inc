@@ -49,7 +49,6 @@ function run_query_contact_search($contact) {
   $archive = $contact['archive'];
   $lang = get_lang();
 
-  $like = sql_casei_like($db_type);
   //$limit = sql_limit($db_type, '', '', '', true);
   $date = sql_date_format($db_type, 'contact_date', 'contact_date');
   $multidomain = sql_multidomain('contact');
@@ -77,8 +76,7 @@ function run_query_contact_search($contact) {
     while ($obm_q->next_record()) {
       $f_contact_ids[] = sql_parse_id($obm_q->f('id'));
     }
-    $where = "(";
-    $where.= "contact_privacy = 0";
+    $where = "((contact_privacy = 0 $multidomain) ";
     if (count($f_contact_ids) > 0) {
       $where .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
     }
@@ -98,35 +96,35 @@ function run_query_contact_search($contact) {
 
   // If a lastname has been specified, get it 
   if ($lname != '') {
-    $where_name .= "(contact_lastname $like '$lname%' or contact_aka like '$lname%')";
+    $where_name .= "(contact_lastname #LIKE '$lname%' or contact_aka #LIKE '$lname%')";
   }
   // If a firstname has been specified, get it 
   if ($fname != '') {
-    $where .= " AND contact_firstname $like '$fname%'";
+    $where .= " AND contact_firstname #LIKE '$fname%'";
   }
   // If a phone number has been specified, get it 
   if ($phone != '') {
-    $where .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%')";
+    $where .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number #LIKE '$phone%')";
     if ($cgp_show['module']['company']) {
-      $where .= "OR companyentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number $like '$phone%')";
+      $where .= "OR companyentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number #LIKE '$phone%')";
     }
     $where .= ')';
   }
   // If an email indication has been specified, get it 
   if ($email != '') {
-    $where .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$email%')";
+    $where .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address #LIKE '$email%')";
     if ($cgp_show['module']['company']) {
-      $where .= " OR companyentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address $like '$email%')";
+      $where .= " OR companyentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address #LIKE '$email%')";
     }
     $where .= ')';
   }
   // If a post code has been specified, get it
   if ($zip != '') {
-    $addr .= " AND address_zipcode $like '$zip%'";
+    $addr .= " AND address_zipcode #LIKE '$zip%'";
   }
   // If a town has been specified, get it 
   if ($town != '') {
-    $addr .= " AND address_town $like '$town%'";
+    $addr .= " AND address_town #LIKE '$town%'";
   }
   // If a country has been set
   if (($ctry != $c_all) && ($ctry != '')) {
@@ -143,9 +141,9 @@ function run_query_contact_search($contact) {
   // If a company name indication has been specified (without id) get it 
   if (($company != '') && ($company_id == '')) {
     if ($cgp_show['module']['company']) {
-      $where .= sql_global_company_name_advanced_search($company, $like);
+      $where .= sql_global_company_name_advanced_search($company, '#LIKE');
     } else {
-      $where .= " AND contact_company $like '$company%'";
+      $where .= " AND contact_company #LIKE '$company%'";
     }
   }
   // If a company was sent as parameter, get it
@@ -166,7 +164,7 @@ function run_query_contact_search($contact) {
   }
   // If a title has been specified, get it 
   if ($title != '') {
-    $where .= " AND contact_title $like '$title%'";
+    $where .= " AND contact_title #LIKE '$title%'";
   }
   // If a datasource has been specified, get it 
   if (($dsrc != $c_all) && ($dsrc != '')) { 
@@ -206,7 +204,7 @@ function run_query_contact_search($contact) {
   }
 
   // Construct the where statement
-  $whereq = "WHERE $where $multidomain";
+  $whereq = "WHERE $where";
   if ($where_name != '') {
     $whereq .= " AND $where_name";
   }
@@ -270,10 +268,10 @@ function run_query_contact_search($contact) {
     $join_userdata
     LEFT JOIN Kind ON contact_kind_id = kind_id
     LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
-    LEFT JOIN Address ON address_entity_id = contactentity_entity_id  AND address_label like 'PREF;%'
+    LEFT JOIN Address ON address_entity_id = contactentity_entity_id  AND address_label #LIKE 'PREF;%'
     LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
-    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label like 'PREF;%'
-    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label like 'PREF;%'";
+    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label #LIKE 'PREF;%'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label #LIKE 'PREF;%'";
 
 
   if ((! $fuzzy) || ($lname == '')) {
@@ -309,7 +307,7 @@ function run_query_contact_search($contact) {
   if ( ( ($fuzzy) || ($count == 0) ) && ($lname != '') ) {
     $auto_aka = format_name($lname, 0, true, true);
     $sound = phonetic_key($lname);
-    $where_name = " AND ($where_name OR contact_aka $like '%$auto_aka%'
+    $where_name = " AND ($where_name OR contact_aka #LIKE '%$auto_aka%'
       OR contact_sound = '$sound')";
     $whereq = " WHERE $where $where_name";
     $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq $orderq";
@@ -324,7 +322,7 @@ function run_query_contact_search($contact) {
       $whereq = " WHERE contact_id IN (".implode(',',$ids).")";
       $query = "$select $left_join $whereq $orderq";
       display_debug_msg($query, $cdg_sql, 'contact_search(2)');
-      $obm_q->query($query);
+      $obm_q->xquery($query);
     }    
   }
   return $obm_q;
@@ -2004,28 +2002,43 @@ function run_query_contact_ext_search($contact) {
   global $obm, $c_all, $cdg_sql, $ctu_sql_limit;
 
   $pattern = $contact['pattern'];
-  $filter_entity = $contact['filter_entity'];
-  $filter_pattern = $contact['filter_pattern'];
+  $filter_pattern = (isset($contact['filter_pattern']))?$contact['filter_pattern'] : 'access';
+
+  $uid = $obm['uid'];
   $obm_q = new DB_OBM;
   $multidomain = sql_multidomain('Contact');
 
-
-  if ($filter_entity == 'Contact') {
-    $where_filter_entity = 'AND (1=0';
-    $f_contacts = OBM_Acl::getAllowedEntities($obm['uid'], 'contact', $filter_pattern);
-    $f_contacts_ids = array_keys($f_contacts);
-    if ((is_array($f_contacts_ids)) && (count($f_contacts_ids) > 0)) {
-      $where_filter_entity .= " OR contact_id IN (";
-      foreach($f_contacts_ids as $r_id) {
-	    $where_filter_entity .= "$coma'$r_id'";
-	    $coma = ',';
-      }
-      $where_filter_entity .= ')';
-    }
-    $where_filter_entity .= ')';
+ // Now we play with ACLs
+  $query = "
+    SELECT contactentity_contact_id AS id
+    FROM UserEntity
+    INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
+    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+    WHERE userentity_user_id = $uid
+      AND entityright_$filter_pattern = 1
+    UNION ALL SELECT contactentity_contact_id AS id FROM UserEntity
+    INNER JOIN of_usergroup ON userentity_user_id = of_usergroup_user_id
+    INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id
+    INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id
+    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+    WHERE userentity_user_id = $uid
+      AND entityright_$filter_pattern = 1
+    UNION ALL SELECT contact_id as id FROM Contact 
+    WHERE contact_usercreate = $uid";
+  display_debug_msg($query, $cdg_sql, 'run_query_contact_ext_search(0)');
+  $obm_q->query($query);
+  $f_contact_ids = array();
+  while ($obm_q->next_record()) {
+    $f_contact_ids[] = sql_parse_id($obm_q->f('id'));
   }
+  $where = "AND ((contact_privacy = 0 $multidomain)";
+  if (count($f_contact_ids) > 0) {
+    $where .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
+  }
+  $where.= ")";
 
   $resultsCount = $obm_q->f('resultscount')+0;
+
   $query = "SELECT 
       contact_firstname,
       contact_lastname,
@@ -2033,16 +2046,13 @@ function run_query_contact_ext_search($contact) {
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
     INNER JOIN Email ON contactentity_entity_id = email_entity_id 
-    WHERE (contact_firstname #LIKE '%$pattern%' 
-      OR contact_lastname #LIKE '%$pattern%'
-      AND (email_label like 'PREF;%' OR email_address = '%$pattern%'))
-      AND (contact_privacy = 0 OR contact_usercreate = $obm[uid])      
-      $multidomain
-      $where_filter_entity
+    WHERE (((contact_firstname #LIKE '%$pattern%' 
+      OR contact_lastname #LIKE '%$pattern%')
+      AND email_label #LIKE 'PREF;%') OR email_address #LIKE '%$pattern%')
+      $where
     GROUP BY contact_firstname, contact_lastname, email_address
     ORDER BY contact_lastname, contact_firstname
     LIMIT 20 OFFSET 0";
-
   display_debug_msg($query, $cdg_sql, 'run_query_contact_ext_search()');
   $obm_q->xquery($query);
   return array('length' => $resultsCount, 'datas' => $obm_q);

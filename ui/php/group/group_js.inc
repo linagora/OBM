@@ -97,7 +97,7 @@ function add_contact_autocomplete (el) {
     filterSubset: true,
     minLength: 3,
     selectFirst: true,
-    selectMode: 'type-ahead',
+    delay: 750,
     injectChoice: function(choice) {
       var el = new Element('li').set('html', this.markQueryValue(choice.name+'&lt;' + choice.email + '&gt;'));
       el.inputValue = choice.email;
