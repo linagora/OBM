@@ -300,7 +300,7 @@ function run_query_contact_search($contact) {
       $whereq = " WHERE contact_id IN (".implode(',',$ids).")";
       $query = "$select $left_join $whereq $orderq";
       display_debug_msg($query, $cdg_sql, 'contact_search(2)');
-      $obm_q->query($query);
+      $obm_q->xquery($query);
     }
   }
   // if fuzzy or unsuccessful search (meaningful only if name has been entered)
