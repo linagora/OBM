@@ -192,6 +192,10 @@ function run_query_people_search($people) {
     userobm_email,
     userobm_id,
     domain_name,
+    userobm_vacation_enable,
+    userobm_vacation_datebegin,
+    userobm_vacation_dateend,
+    userobm_delegation,
     'user' as type
   FROM UserObm 
     LEFT JOIN Domain ON userobm_domain_id = domain_id
@@ -360,31 +364,21 @@ function run_query_people_allowed_access_contacts() {
   $search_action = OBM_Acl::ACCESS;
 
   $allowed_contacts_query = "
-    SELECT contact_id AS id
-    FROM UserObm u1
-    INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id
-    INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
-    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
-    INNER JOIN Contact ON contactentity_contact_id = contact_id
-    WHERE u1.userobm_id = $uid
-      AND entityright_$search_action = 1
-      AND contact_privacy = 1
-    UNION SELECT contact_id AS id
-    FROM EntityRight INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
-    INNER JOIN Contact ON contactentity_contact_id = contact_id
-    WHERE entityright_consumer_id IS NULL
-      AND entityright_$search_action = 1
-      AND contact_privacy = 1
-    UNION SELECT contact_id AS id FROM UserObm u1
-    INNER JOIN UserEntity ON u1.userobm_id = userentity_user_id
-    INNER JOIN of_usergroup ON userobm_id = of_usergroup_user_id
-    INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id
-    INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id
-    INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
-    INNER JOIN Contact ON contactentity_contact_id = contact_id
-    WHERE u1.userobm_id = $uid
-      AND entityright_$search_action = 1
-      AND contact_privacy = 1";
+      SELECT contactentity_contact_id AS id
+      FROM UserEntity
+      INNER JOIN EntityRight ON userentity_entity_id = entityright_consumer_id
+      INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+      WHERE userentity_user_id = $uid
+        AND entityright_$search_action = 1
+      UNION ALL SELECT contactentity_contact_id AS id FROM UserEntity
+      INNER JOIN of_usergroup ON userentity_user_id = of_usergroup_user_id
+      INNER JOIN GroupEntity ON of_usergroup_group_id = groupentity_group_id
+      INNER JOIN EntityRight ON groupentity_entity_id = entityright_consumer_id
+      INNER JOIN ContactEntity ON contactentity_entity_id = entityright_entity_id
+      WHERE userentity_user_id = $uid
+        AND entityright_$search_action = 1
+      UNION ALL SELECT contact_id as id FROM Contact 
+      WHERE contact_usercreate = $uid    ";
 
   $f_contact_ids = array();
   display_debug_msg($allowed_contacts_query, $cdg_sql, 'run_query_contact_allowed_access()');
@@ -835,5 +829,26 @@ function check_people_wait($people) {
   }
 
   return $rep;
+}
+///////////////////////////////////////////////////////////////////////////////
+// User Groups query execution
+// Parameters:
+//   - $p_id : user id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_people_user_group($p_id) {
+  global $cdg_sql, $obm;
+
+  $p_id = sql_parse_id($p_id, true);
+  $query = "SELECT *
+    FROM UGroup
+      LEFT JOIN UserObmGroup ON group_id = userobmgroup_group_id
+    WHERE userobmgroup_userobm_id $p_id 
+      AND (group_privacy=0 OR group_usercreate=$obm[uid])";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_people_user_group()');
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $obm_q;
 }
 ?>

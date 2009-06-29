@@ -28,6 +28,8 @@ $fieldnames["userobm_adress"] = $l_address;
 $fieldnames["userobm_zipcode"] = $l_postcode;
 $fieldnames["userobm_cedex"] = $l_expresspostal;
 $fieldnames["userobm_town"] = $l_town;
+$fieldnames['userobm_delegation'] = $l_delegation;
+$fieldnames['userobm_vacation'] = $l_vacation;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display User specific dataset fields
@@ -68,7 +70,7 @@ function dis_people_data(&$OD, $fieldname, $link_ok) {
     $OD->data_set->f("userobm_lastname")." ".$OD->data_set->f("userobm_firstname")."</span>";
   }
 
-  else if ($fieldname == "userobm_email") {
+  if ($fieldname == "userobm_email") {
     $email = $OD->data_set->f("userobm_email");
     if($OD->data_set->f("hidden") == 1 && !$perm->check_right($module, $cright_write_admin)) {
       $res["align"] = "center";
@@ -79,6 +81,20 @@ function dis_people_data(&$OD, $fieldname, $link_ok) {
       $res["name"] = "<img src=\"$ico_mail\" alt=\"$email\">$email";
       $res["txt_name"] = "$email";
     }
+  } 
+
+  if ($fieldname == "userobm_vacation") {
+    $vacation = $OD->data_set->f("userobm_vacation");
+    $datebegin = $OD->data_set->f('userobm_vacation_datebegin');
+    $dateend = $OD->data_set->f('userobm_vacation_dateend');
+    $res['align'] = 'center';
+    if ($vacation) {
+      $res['name'] = 'X';
+    } elseif($datebegin) {
+      $res['name'] = "$datebegin - $dateend";
+    } else {
+      $res['name'] = '';
+    } 
   } 
 
   return $res;
@@ -530,7 +546,7 @@ function html_people_consult($obm_q) {
   global $l_mail, $l_mail_ext, $l_email;
   global $l_perms, $l_empty;
   global $perm, $cright_write_admin;
-  global $l_enabled, $l_disabled, $module;
+  global $l_enabled, $l_disabled, $module, $l_group,$l_group_member;
   global $obm, $cgp_use, $path, $display, $l_yes, $l_no;
   
   $id = $obm_q->f("userobm_id");
@@ -557,6 +573,28 @@ function html_people_consult($obm_q) {
   $ctry_name = $obm_q->f("country_name");
 
   $email = get_entity_email($obm_q->f("userobm_email"),$obm_q->f('domain_name'));
+
+  // Liste des groupes de l'utilisateur
+  $g_q = run_query_people_user_group($id);
+  if ($g_q->num_rows() > 0) {
+    $dis_group = "
+    <div class=\"detail infos\">
+    <h1>$l_group_member</h1>
+    <table>
+    <tr><td>";
+    while ($g_q->next_record()) {
+      $grp_id = $g_q->f('group_id');
+      $grp_name = $g_q->f('group_name');
+      $dis_group .= "
+    </td></tr><tr>
+      <th>$l_group</th>
+      <td><a href=\"$path/group/group_index.php?action=detailconsult&amp;group_id=$grp_id\">$grp_name</a></td>";
+    }
+    $dis_group .= "
+    </tr>
+    </table></div>";
+  }
+
   
   $block_userdata .= of_userdata_dis_entity_consult('user', $id);
 
@@ -677,6 +715,7 @@ function html_people_consult($obm_q) {
 </div>
 $block_userdata
 $mail_section
+$dis_group
 ";
 
   return $block;
