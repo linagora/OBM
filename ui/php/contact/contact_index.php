@@ -798,7 +798,6 @@ function update_action_rights() {
 
     } else {
       // update the admin rights on the current contact
-      var_dump($c['usercreate']);
       if ($c['usercreate'] == $obm['uid'] || OBM_Acl::canAdmin($obm['uid'], 'contact', $id)) {
         $actions['contact']['rights_admin']['Right'] = $cright_read;
         $actions['contact']['rights_update']['Right'] = $cright_read;
