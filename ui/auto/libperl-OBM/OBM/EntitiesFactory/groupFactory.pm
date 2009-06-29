@@ -221,7 +221,7 @@ sub _loadEntities {
                  FROM '.$groupTablePrefix.'UGroup
                  LEFT JOIN P_UGroup current ON current.group_id='.$groupTablePrefix.'UGroup.group_id
                  WHERE '.$groupTablePrefix.'UGroup.group_domain_id='.$self->{'domainId'}.'
-                 AND '.$groupTablePrefix.'UGroup.group_privacy=1';
+                 AND '.$groupTablePrefix.'UGroup.group_privacy=0';
 
     if( $self->{'ids'} ) {
         $query .= ' AND '.$groupTablePrefix.'UGroup.group_id IN ('.join( ', ', @{$self->{'ids'}}).')';
