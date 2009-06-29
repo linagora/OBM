@@ -1581,6 +1581,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   // Default exp is hidden
   if (!isset($dateexp))	{
     $showexp='display:none';
+    $disabled='disabled="disabled"';
   }
 
   // login (can't be updated, so only on insert)
@@ -2098,8 +2099,10 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
       var Props = $('noexperie').getProperty('checked');			
       if(Props==false){
         $('exp').setStyle('display','');
+        $('exp').getElement('input').setProperty('disabled',false);
       }else{
         $('exp').setStyle('display','none');
+        $('exp').getElement('input').setProperty('disabled',true);
       }	
     }
   </script>
@@ -2157,7 +2160,7 @@ function html_user_form($action, $usr_q, $user, $groups, $field='') {
   </tr>
   <tr id=\"exp\" style=\"$showexp\">
     <th class=\"$class[dateexp]\">$l_dateexp</th>
-    <td><input type=\"text\" name=\"tf_dateexp\" value=\"$dateexp\" class=\"datePicker\"/></td>
+    <td><input type=\"text\" name=\"tf_dateexp\" $disabled value=\"$dateexp\" class=\"datePicker\"/></td>
   </tr>
   $block_photo
   $block_photo_detail
