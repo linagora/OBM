@@ -153,6 +153,10 @@ if ($action == "index" || $action == "") {
   organizationalchart_export_svg($params, $view);
   exit();
 
+} elseif ($action == "export_svg") {
+///////////////////////////////////////////////////////////////////////////////
+  organizationalchart_export_pdf($params, $view);
+  exit();
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_can_delete_organizationalchart($params["organizationalchart_id"])) {
@@ -232,7 +236,7 @@ function get_organizationalchart_params() {
 function get_organizationalchart_action() {
   global $params, $actions, $path, $view;
   global $l_header_find, $l_header_new, $l_header_display, $l_header_consult;
-  global $l_header_update, $l_header_delete, $l_ldif_export, $l_svg_export;
+  global $l_header_update, $l_header_delete, $l_ldif_export, $l_svg_export, $l_pdf_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   $id = $params["organizationalchart_id"];
@@ -297,13 +301,21 @@ function get_organizationalchart_action() {
       'Right'    => $cright_read,
       'Condition'=> array ('detailconsult', 'insert', 'update') );
 
-  // SVG export
+  if(class_exists('Imagick')) {
+    // SVG export
+    $actions["organizationalchart"]["export_pdf"]  = array (
+      'Name'     => $l_pdf_export,
+      'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=export_pdf&amp;organizationalchart_id=$id&amp;view=$view",
+      'Right'    => $cright_read,
+      'Condition'=> array ('detailconsult', 'insert', 'update') );
+  } else {
+    // SVG export
     $actions["organizationalchart"]["export_svg"]  = array (
       'Name'     => $l_svg_export,
       'Url'      => "$path/organizationalchart/organizationalchart_index.php?action=export_svg&amp;organizationalchart_id=$id&amp;view=$view",
       'Right'    => $cright_read,
-      'Condition'=> array ('detailconsult', 'insert', 'update') );
-
+      'Condition'=> array ('detailconsult', 'insert', 'update') );    
+  }
 
   // Check Delete
   $actions["organizationalchart"]["check_delete"] = array (

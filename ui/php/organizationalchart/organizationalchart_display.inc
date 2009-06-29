@@ -854,26 +854,112 @@ function organizationalchart_export_svg($organizationalchart, $view) {
       header('Content-Type: text/xml');
       echo $xml->saveXML();
     } else {
-      // Write SVG
-      $tmpfname = tempnam('/tmp', 'obm_') ;
-      $xml->save($tmpfname);
-
-      // Download file
-      $file = fopen($tmpfname, 'r');
-      header('Content-Type: application/octet-stream') ;
+      //// Download file
+      header('Content-Type: image/svg+xml') ;
       header("Content-Disposition: attachment; filename=\"$oc_name.svg\";") ;
       header('Cache-Control: maxage=3600');
       header('Pragma: public');
-      fpassthru($file) ;
-      fclose($file) ;
-
-      // Delete temp file.
-      unlink($tmpfname);
+      echo $xml->saveXML();
     }
   }
 }
 
 
+/**
+ * Export OrganizationalChart to SVG 
+ * @params
+ * @access public
+ * @return XML 
+ */
+function organizationalchart_export_pdf($organizationalchart, $view) {
+  global $l_organizationalchart;
+
+  $id = $organizationalchart['organizationalchart_id'];
+  if ($id) {
+    $mode = $organizationalchart['mode'];
+    $oc_q = run_query_organizationalchart_detail($id);
+    $oc_name = trim($oc_q->f('organizationalchart_name'));
+    $root_node = run_query_organizationalchart_root_node($id);
+
+    // Build XML
+    $xml = new DOMDocument('1.0', 'iso8859-1');
+    $svg = $xml->createElement('svg');
+    $svg->setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    if ($view == 'chart') {
+      // gradient
+      $linearGradient = $xml->createElement('linearGradient');
+      $linearGradient->setAttribute('id', 'NodeTitleStyle');
+      $linearGradient->setAttribute('x1', '0%');
+      $linearGradient->setAttribute('y1', '0%');
+      $linearGradient->setAttribute('x2', '0%');
+      $linearGradient->setAttribute('y2', '100%');
+      
+      // top color
+      $top = $xml->createElement('stop');
+      $top->setAttribute('offset', '35%'); 
+      $top->setAttribute('stop-color', '#509CBC'); 
+      $linearGradient->appendChild($top);
+ 
+      // bottom color
+      $bottom = $xml->createElement('stop');
+      $bottom->setAttribute('offset', '65%'); 
+      $bottom->setAttribute('stop-color', '#378299'); 
+      $linearGradient->appendChild($bottom);   
+
+      $svg->appendChild($linearGradient);
+    }
+   
+    // OrganizationalChart name
+    $name = $xml->createElement('text');
+    $name->setAttribute('style', 'font-size:22px;font-weight:bold;fill:#636466');
+    $name->setAttribute('x', 10);
+    $name->setAttribute('y', 30);
+    $name->appendChild($xml->createTextNode("$l_organizationalchart : $oc_name"));
+    $svg->appendChild($name);
+
+    // OBM Logo
+    // $logo = $xml->createElement('image');
+    // $logo->setAttribute('x', 0);
+    // $logo->setAttribute('y', 0);
+    // $logo->setAttribute('width', 100);
+    // $logo->setAttribute('height', 100);
+    // $logo->setAttribute('href', 'ico_outline_current.png');
+    // $svg->appendChild($logo);
+
+    $function_export = "export_svg_${view}";
+    $export = $function_export($root_node, $xml, $svg);
+
+    $xml->appendChild($export);
+
+    if ($mode == 'html') {
+      // Display XML on browser
+      header('Content-Type: text/xml');
+      echo $xml->saveXML();
+
+    } else {
+      // Write SVG
+      //$tmpfname = tempnam('/tmp', 'obm_') ;
+      //$xml->save($tmpfname);
+
+      // Download file
+      $file = fopen($tmpfname, 'r');
+      header('Content-Type: application/pdf') ;
+      header("Content-Disposition: attachment; filename=\"$oc_name.svg\";") ;
+      header('Cache-Control: maxage=3600');
+      header('Pragma: public');
+      $pdf = new Imagick();
+      $pdf->readImage($xml->saveXML());
+      $pdf->setImageFormat('pdf');
+      echo $pdf->render();
+      //fpassthru($file) ;
+      //fclose($file) ;
+
+      //// Delete temp file.
+      //unlink($tmpfname);
+    }
+  }
+}
 /**
  * User detail popup
  * @params
