@@ -287,7 +287,7 @@ function run_query_contact_search($contact) {
     }
     $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq $orderq";
     display_debug_msg($query, $cdg_sql, 'contact_search(1)');
-    $obm_q->query($query);
+    $obm_q->xquery($query);
     $count = $obm_q->nf();
     $obm_q->set_num_rows_total($count);
     if($count != 0) {
@@ -311,7 +311,7 @@ function run_query_contact_search($contact) {
       OR contact_sound = '$sound')";
     $whereq = " WHERE $where $where_name";
     $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq $orderq";
-    $obm_q->query($query);
+    $obm_q->xquery($query);
     if($count != 0) {
       $ids = array();
       $obm_q->seek($off);
