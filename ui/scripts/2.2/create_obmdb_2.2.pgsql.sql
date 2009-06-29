@@ -5661,56 +5661,7 @@ CREATE INDEX calendarentity_calendar_id_fkey ON calendarentity (calendarentity_c
 --
 
 CREATE INDEX calendarentity_entity_id_fkey ON calendarentity (calendarentity_entity_id);
---
--- Name: campaign_parent_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
 
-CREATE INDEX campaign_parent_fkey ON campaign (campaign_parent);
---
--- Name: campaign_email_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX campaign_email_fkey ON campaign (campaign_email);
---
--- Name: campaigndisabledentity_campaign_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX campaigndisabledentity_campaign_id_fkey ON campaigndisabledentity (campaigndisabledentity_campaign_id);
---
--- Name: campaigndisabledentity_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX campaigndisabledentity_entity_id_fkey ON campaigndisabledentity (campaigndisabledentity_entity_id);
---
--- Name: campaignentity_campaign_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX campaignentity_campaign_id_fkey ON campaignentity (campaignentity_campaign_id);
---
--- Name: campaignentity_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX campaignentity_entity_id_fkey ON campaignentity (campaignentity_entity_id);
---
--- Name: campaignmailtarget_campaign_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX campaignmailtarget_campaign_id_fkey ON campaignmailtarget (campaignmailtarget_campaign_id);
---
--- Name: campaignmailtarget_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX campaignmailtarget_entity_id_fkey ON campaignmailtarget (campaignmailtarget_entity_id);
---
--- Name: campaigntarget_campaign_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX campaigntarget_campaign_id_fkey ON campaigntarget (campaigntarget_campaign_id);
---
--- Name: campaigntarget_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX campaigntarget_entity_id_fkey ON campaigntarget (campaigntarget_entity_id);
 --
 -- Name: category_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
@@ -7332,21 +7283,6 @@ CREATE INDEX resourcegroupentity_resourcegroup_id_fkey ON resourcegroupentity (r
 
 CREATE INDEX resourcegroupentity_entity_id_fkey ON resourcegroupentity (resourcegroupentity_entity_id);
 --
--- Name: ssoticket_user_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX ssoticket_user_id_fkey ON ssoticket (ssoticket_user_id);
---
--- Name: service_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX service_entity_id_fkey ON service (service_entity_id);
---
--- Name: serviceproperty_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX serviceproperty_entity_id_fkey ON serviceproperty (serviceproperty_entity_id);
---
 -- Name: subscription_reception_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
@@ -7401,16 +7337,6 @@ CREATE INDEX subscriptionreception_domain_id_fkey ON subscriptionreception (subs
 --
 
 CREATE INDEX subscriptionreception_userupdate_fkey ON subscriptionreception (subscriptionreception_userupdate);
---
--- Name: taskevent_task_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX taskevent_task_id_fkey ON taskevent (taskevent_task_id);
---
--- Name: taskevent_event_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
---
-
-CREATE INDEX taskevent_event_id_fkey ON taskevent (taskevent_event_id);
 --
 -- Name: tasktype_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
@@ -10792,6 +10718,82 @@ CREATE TABLE campaignpushtarget (
 );
 
 
+--
+-- Name: campaign_parent_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX campaign_parent_fkey ON campaign (campaign_parent);
+--
+-- Name: campaign_email_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX campaign_email_fkey ON campaign (campaign_email);
+--
+-- Name: campaigndisabledentity_campaign_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX campaigndisabledentity_campaign_id_fkey ON campaigndisabledentity (campaigndisabledentity_campaign_id);
+--
+-- Name: campaigndisabledentity_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX campaigndisabledentity_entity_id_fkey ON campaigndisabledentity (campaigndisabledentity_entity_id);
+--
+-- Name: campaignentity_campaign_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX campaignentity_campaign_id_fkey ON campaignentity (campaignentity_campaign_id);
+--
+-- Name: campaignentity_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX campaignentity_entity_id_fkey ON campaignentity (campaignentity_entity_id);
+--
+-- Name: campaignmailtarget_campaign_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX campaignmailtarget_campaign_id_fkey ON campaignmailtarget (campaignmailtarget_campaign_id);
+--
+-- Name: campaignmailtarget_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX campaignmailtarget_entity_id_fkey ON campaignmailtarget (campaignmailtarget_entity_id);
+--
+-- Name: campaigntarget_campaign_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX campaigntarget_campaign_id_fkey ON campaigntarget (campaigntarget_campaign_id);
+--
+-- Name: campaigntarget_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX campaigntarget_entity_id_fkey ON campaigntarget (campaigntarget_entity_id);
+--
+-- Name: ssoticket_user_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX ssoticket_user_id_fkey ON ssoticket (ssoticket_user_id);
+
+--
+-- Name: service_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX service_entity_id_fkey ON service (service_entity_id);
+--
+-- Name: serviceproperty_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX serviceproperty_entity_id_fkey ON serviceproperty (serviceproperty_entity_id);
+--
+-- Name: taskevent_task_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX taskevent_task_id_fkey ON taskevent (taskevent_task_id);
+--
+-- Name: taskevent_event_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX taskevent_event_id_fkey ON taskevent (taskevent_event_id);
 
 --
 -- Table structure for table P_Domain
