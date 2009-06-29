@@ -123,6 +123,8 @@ class Stato_Mailer
                 $mail->setText($this->render($template.'.plain', $this->body));
             if (file_exists($this->getTemplatePath($template.'.html')))
                 $mail->setHtmlText($this->render($template.'.html', $this->body));
+        } else {
+            $mail->setText($this->body);
         }
         
         foreach ($this->parts as $p) {
