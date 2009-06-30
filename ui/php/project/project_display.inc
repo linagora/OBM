@@ -549,7 +549,7 @@ function html_project_links($p_q) {
   global  $ico_document, $ico_add, $ico_invoice;
   global $l_new, $l_module_invoice, $l_module_document;
   global $l_document_add, $l_project;
-  global $path, $cgp_show;
+  global $path, $cgp_show, $perm;
 
   $id = $p_q->f('project_id');
   $name = $p_q->f('project_name');
@@ -562,7 +562,7 @@ function html_project_links($p_q) {
   $udlabel = urlencode($dlabel);
 
   // Document
-  if ($cgp_show['module']['document']) {
+  if ($perm->check_module_rights('document')) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;entity_id=$id&amp;entity=project");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;entity_id=$id&amp;entity=project");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=$id&amp;ext_target=$l_project";
@@ -585,7 +585,7 @@ function html_project_links($p_q) {
   }
 
   // Invoice
-  if ($cgp_show['module']['invoice']) {
+  if ($perm->check_module_rights('invoice')) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;project_id=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;project_id=$id&amp;cba_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;project_id=$id&amp;project_name=$uname&amp;company_id=$cid&amp;company_name=$ucname&amp;deal_id=$did&amp;deal_label=$udlabel");

@@ -665,7 +665,7 @@ function html_deal_links($deal_q) {
   $url_pdeal_upd = url_prepare("$path/deal/deal_index.php?action=affect&amp;parentdeal_id=$pid&amp;deal_id=$id");
 
   // Project
-  if ($cgp_show['module']['project']) {
+  if ($perm->check_module_rights('project')) {
     $nb_pro = get_global_linked_project_nb ($id, 'deal');
     $nb_pro_arch = get_global_linked_project_nb ($id, 'deal', 1);
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;deal_id=$id");
@@ -683,19 +683,21 @@ function html_deal_links($deal_q) {
     }
     
     $block_project = "
+    <div id=\"dealProject\" class=\"portlet\">
      <h1>$l_module_project</h1>
      <ul>
        $dis_ico_project
-     </ul>";
+     </ul></div>";
   }
 
   // Contract
-  if ($cgp_show['module']['contract']) {
+  if ($perm->check_module_rights('contract')) {
     $contract_active = get_global_linked_contract_nb($id, 'deal');
     $contract_total = get_global_linked_contract_nb($id, 'deal', 1);
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id");
     $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
     $dis_contract = "
+  <div id=\"dealContract\" class=\"portlet\">
     <li><a href=\"$url_contract\"><img src=\"$ico_contract\" alt=\"\" /></a>
         $l_module_contract (
         <a href=\"$url_contract\">$contract_active</a> /
@@ -712,16 +714,17 @@ function html_deal_links($deal_q) {
      <h1> $l_module_contract</h1>
      <ul>
        $dis_contract
-     </ul>";
+     </ul></div>";
   }
 
   // Invoice
-  if ($cgp_show['module']['invoice']) {
+  if ($perm->check_module_rights('invoice')) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;deal_id=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
     $nb_inv_tot = get_global_linked_invoice_nb($id, 'deal', 1);
     $nb_inv = get_global_linked_invoice_nb($id, 'deal');
     $dis_invoice = "
+  <div id=\"dealInvoice\" class=\"portlet\">
     <li><a href=\"$url_inv\"><img src=\"$ico_invoice\" alt=\"\" /></a>
         $l_module_invoice (<a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a>)</li>";
@@ -737,16 +740,17 @@ function html_deal_links($deal_q) {
   <h1> $l_module_invoice</h1>
   <ul>
     $dis_invoice
-  </ul>";
+  </ul></div>";
   }
 
   // Document
-  if ($cgp_show['module']['document']) {
+  if ($perm->check_module_rights('document')) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;entity_id=$id&amp;entity=deal");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;entity_id=$id&amp;entity=deal");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";
     $nb_document = run_query_global_document_nb($id, 'deal');
     $block_doc = "
+  <div id=\"dealDocument\" class=\"portlet\">
   <h1> $l_module_document</h1>
   <ul>
     <li><a href=\"$url_doc\"><img src=\"$ico_document\" alt=\"\" /></a>
@@ -758,7 +762,7 @@ function html_deal_links($deal_q) {
 	 \"><img src=\"$ico_add\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_deal'; popup('$url_doc_add',''); return false;\">
 	 $l_document_add</a></li>
-  </ul>";
+  </ul></div>";
   }
 
   // Links Template  
@@ -771,18 +775,10 @@ function html_deal_links($deal_q) {
         <a href=\"$url_pdeal_upd\">$l_affect_deal</a></li>
   </ul>
   </div>
-  <div id=\"dealProject\" class=\"portlet\">
   $block_project
-  </div>
-  <div id=\"dealContract\" class=\"portlet\">
   $block_contract
-  </div>
-  <div id=\"dealInvoice\" class=\"portlet\">
   $block_invoice
-  </div>
-  <div id=\"dealDocument\" class=\"portlet\">
   $block_doc
-  </div>      
  ";
 
   return $block;

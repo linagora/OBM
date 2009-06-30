@@ -410,7 +410,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   global $l_module_incident, $l_incident_list, $l_incident_new, $l_last;
   global $l_module_deal, $l_module_document, $l_contract;
   global $l_document_new,$l_document_add,$l_add_document,$l_deal;
-  global $path, $cgp_show;
+  global $path, $cgp_show, $perm;
   
   $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;contract_id=$id");
   $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;contract_id=$id&amp;sel_owner=$tech_id&amp;tf_lcontract=$con_label");
@@ -423,7 +423,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   }
 
   // Deal
-  if ($cgp_show["module"]["deal"] && $deal_id > 0) {
+  if ($perm->check_module_rights("deal") && $deal_id > 0) {
     $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;deal_id=$deal_id");
     $block_deal = "
     <div  class=\"portlet\" id=\"contractDeal\">
@@ -438,7 +438,7 @@ function html_contract_links($id, $con_label, $tech_id, $deal_id, $inc_nb, $last
   }
 
   // Document  
-  if ($cgp_show["module"]["document"]) {
+  if ($perm->check_module_rights("document")) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;entity_id=$id&amp;entity=Contract");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;entity_id=$id&amp;entity=Contract");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contract/contract_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contract";

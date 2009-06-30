@@ -232,7 +232,7 @@ function run_query_todo_insert($todo) {
         $uid,
         $uid,
         'VTODO',
-        'ui',
+        '$GLOBALS[c_origin_web]',
         $date,
         '$priority',
         '$title',
@@ -406,7 +406,7 @@ function run_query_todo_delete($parms) {
             VALUES (
                       $ins_id,
                       $uid,
-                      'ui',
+                      '$GLOBALS[c_origin_web]',
                       'VTODO',
                       NOW())";
 	  display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(2)');
@@ -447,7 +447,7 @@ function run_query_todo_delete_unique($t_id) {
             VALUES (
                       $id,
                       $uid,
-                      'ui',
+                      '$GLOBALS[c_origin_web]',
                       'VTODO',
                       NOW())";
     display_debug_msg($query, $cdg_sql, 'run_query_todo_delete(2)');

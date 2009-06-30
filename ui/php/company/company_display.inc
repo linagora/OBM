@@ -451,7 +451,7 @@ function html_company_links($co_q) {
   global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
   global $l_module_lead, $l_module_contract, $l_module_invoice;
   global $l_module_document, $l_module_payment, $l_document_add;
-  global $l_company, $l_public, $path, $cgp_show;
+  global $l_company, $l_public, $path, $cgp_show, $perm;
 
   $id = $co_q->f('company_id');
   $name = $co_q->f('company_name');
@@ -465,7 +465,7 @@ function html_company_links($co_q) {
   $uname = urlencode($name);
 
   // Contact
-  if ($cgp_show['module']['contact']) {
+  if ($perm->check_module_rights('contact')) {
     $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;company_id=$id&amp;tf_company=$uname");
     $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;company_id=$id&amp;sel_market=$market&amp;sel_country=$ctry&amp;tf_email=$email");
     $block_contact = "
@@ -481,7 +481,7 @@ function html_company_links($co_q) {
   }
 
   // Deal
-  if ($cgp_show['module']['deal']) {
+  if ($perm->check_module_rights('deal')) {
     $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname");
     $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;company_id=$id&amp;tf_company_name=$uname&amp;cba_archive=1");
     $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;company_id=$id&amp;tf_company_name=$uname");
@@ -500,7 +500,7 @@ function html_company_links($co_q) {
   }
 
   // Lead
-  if ($cgp_show['module']['lead']) {
+  if ($perm->check_module_rights('lead')) {
     $nb_lead = get_global_linked_element_nb('Lead', $id, 'company', 1, true);
     $url_lead_list = url_prepare("$path/lead/lead_index.php?action=search&amp;company_id=$id&amp;company_id=$id");
     $url_lead_new = url_prepare("$path/lead/lead_index.php?action=new&amp;company_id=$id&amp;company_id=$id&amp;company_name=$name");
@@ -517,7 +517,7 @@ function html_company_links($co_q) {
   }
 
   // Document
-  if ($cgp_show['module']['document']) {
+  if ($perm->check_module_rights('document')) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;entity_id=$id&amp;entity=company");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;entity_id=$id&amp;entity=company");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path.'/company/company_index.php')."&amp;ext_id=$id&amp;ext_target=$l_company";
@@ -540,7 +540,7 @@ function html_company_links($co_q) {
   }
 
   // Project
-  if ($cgp_show['module']['project']) {
+  if ($perm->check_module_rights('project')) {
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;company_id=$id");
     $url_pro_tot = url_prepare("$path/project/project_index.php?action=search&amp;company_id=$id&amp;cba_archive=1");
     $nb_pro = get_global_linked_project_nb($id, 'company');
@@ -560,7 +560,7 @@ function html_company_links($co_q) {
   }
 
   // Contract
-  if ($cgp_show['module']['contract']) {
+  if ($perm->check_module_rights('contract')) {
     $nb_ctra = get_global_linked_contract_nb($id, 'company');
     $nb_ctra_total = get_global_linked_contract_nb($id, 'company', 1);
     $url_ctra = url_prepare("$path/contract/contract_index.php?action=search&amp;company_id=$id");
@@ -581,7 +581,7 @@ function html_company_links($co_q) {
   }
 
   // Invoice
-  if ($cgp_show['module']['invoice']) {
+  if ($perm->check_module_rights('invoice')) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;company_id=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;company_id=$id&amp;cba_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;company_id=$id&amp;company_name=$uname");
@@ -601,7 +601,7 @@ function html_company_links($co_q) {
   }
 
   // Payment
-  if ($cgp_show['module']['payment']) {
+  if ($perm->check_module_rights('payment')) {
     $url_pay = url_prepare("$path/payment/payment_index.php?action=search&amp;company_id=$id");
     $url_pay_new = url_prepare("$path/payment/payment_index.php?action=new&amp;company_id=$id&amp;company_name=$uname");
     $nb_pay = get_global_linked_payment_nb($id, 'company');
