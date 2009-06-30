@@ -72,8 +72,11 @@ function get_contact_list_ids($company_id='') {
     $obm_q = run_query_contact_search($params) ;
   }
 
-  while ($obm_q->next_record()) {
-    $datas[] = $obm_q->f('id') ;
+  // if there are some contacts
+  if ($obm_q->num_rows() > 0) {
+    while ($obm_q->next_record()) {
+      $datas[] = $obm_q->f('id') ;
+    }
   }
 
   return $datas ;

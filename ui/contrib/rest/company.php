@@ -65,8 +65,11 @@ function get_company_list_ids() {
 
   $obm_q = run_query_company_search($params) ;
 
-  while ($obm_q->next_record()) {
-    $datas[] = $obm_q->f('id') ;
+  // if there are some companies
+  if ($obm_q->num_rows() > 0) {
+    while ($obm_q->next_record()) {
+      $datas[] = $obm_q->f('id') ;
+    }
   }
 
   return $datas ;
