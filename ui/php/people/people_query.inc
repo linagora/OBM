@@ -213,6 +213,10 @@ function run_query_people_search($people) {
     email_address as userobm_email,
     contact_id as userobm_id,
     domain_name,
+    0 as userobm_vacation_enable,
+    NOW() as userobm_vacation_datebegin,
+    NOW() as userobm_vacation_dateend,
+    '' as userobm_delegation,
     'contact' as type
   FROM Contact";
 
