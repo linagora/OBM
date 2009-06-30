@@ -1343,13 +1343,18 @@ class Of_Date extends DateTime {
     $data = self::_parse($parts, $date, $format);
     $str = '';
     foreach($data as $part => $value) {
+      // Needed because of 'next week' behavior modification (bug ?) in, at
+      // least, PHP 5.2.[8|9|10]
       if($part == 'weekday') {
         $part = self::$DAY_LIST[$value];
-        $value = 1;
-      } elseif ($part == 'timestamp') {
+        $value = 'next';
+      } else {
+        $value = '+'.$value;
+      }
+      if ($part == 'timestamp') {
         $part = 'second';
       } 
-      $str .= " +$value $part";
+      $str .= " $value $part";
     }
     $this->custom($str);
     return $this;

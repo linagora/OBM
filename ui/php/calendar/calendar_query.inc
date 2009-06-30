@@ -3209,7 +3209,14 @@ function calendar_monthlybyday_repeatition($date,$start,$end,$repeatfrequence,$e
   $pattern = ($position == 5)? "-1 ".$date->get(Of_Date::WEEKDAY): "+$position ".$date->get(Of_Date::WEEKDAY);
   while ($current->compareDateIso($end) < 0) {
     $current->setDay(1);
-    if($position == 5) $current->addMonth(1); else $current->subDay(1);
+    if($position == 5) $current->addMonth(1); else {
+      $current->subDay(1);
+      // Needed because of 'next week' behavior modification (bug ?) in, at
+      // least, PHP 5.2.[8|9|10]
+      if ($current->get(Of_Date::WEEKDAY) == $date->get(Of_Date::WEEKDAY)) {
+        $current->addDay(1);
+      }
+    }
     $current->custom($pattern);
     $of = &OccurrenceFactory::getInstance();
     $of->addOccurrence($event, clone $current, $entity, $entity_id, $entity_state);
