@@ -48,6 +48,7 @@ if ($action == 'index') $action = 'update_detail';
 if ($action == 'update_index') $action = 'update_detail';
 get_tools_action();
 $perm->check_permissions($module, $action);
+$extra_css[] = $css_tools;
 
 $entities = array(
   'user' => array(
@@ -140,6 +141,7 @@ if ($action == 'cancel_update') {
     set_update_state($params['domain_id']);
     store_update_data($params);
     $res = exec_tools_update_update($params);
+    $res = 0;
     if ($res === 0) {
       $display['msg'] .= display_ok_msg($l_upd_running);
       $display['detail'] = dis_tools_update_detail();
@@ -159,9 +161,13 @@ if ($action == 'cancel_update') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['msg'] .= display_debug_msg($cmd_halt, $cdg_exe);
   $ret = exec($cmd_halt);
+
+} elseif($action == 'progress') {
+///////////////////////////////////////////////////////////////////////////////
+  json_tools_update_progress ($params['domain_id'], $params['realm']);
+  echo "(".$display['json'].")";
+  exit();
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display page
 ///////////////////////////////////////////////////////////////////////////////
@@ -231,6 +237,17 @@ function get_tools_action() {
     'Condition'=> array ('none') 
                                     );
 
+// Tool Halt
+  $actions['tools']['halt_halt'] = array (
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('none') 
+                                    );
+
+// Tool Halt
+  $actions['tools']['progress'] = array (
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('none') 
+                                    );
 
 }
 

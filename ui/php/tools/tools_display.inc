@@ -15,7 +15,7 @@ function dis_tools_update_detail() {
   global $display, $cgp_show, $profiles, $obm, $entities;
   global $l_upd, $l_upd_needed, $l_upd_not_needed, $l_upd_running;
   global $l_upd_run;
-  global $l_upd_need_domain_update;
+  global $l_upd_need_domain_update, $l_progress;
   global $l_header_tools_upd,$l_js_validate_global_update;
   global $l_validate, $l_cancel, $l_error_permission;
 
@@ -107,6 +107,7 @@ function dis_tools_update_detail() {
         set_update_state($domain_id, 0);
         $dis_button = "$l_upd_not_needed";
       }
+
       $dis_domain = "
       <div class=\"detail extra\">
       <h1>$domain[label] : $dis_detail_title</h1>
@@ -119,10 +120,63 @@ function dis_tools_update_detail() {
     }
 
   }
+  $running = check_tools_update_running();
+  if(!$running) {
+    $steps = run_query_tools_get_steps();
+    $progress = run_query_tools_get_progress();
+    $progress = 0;
+    if($steps > 0) $percent = round(($progress/$steps) * 100);
+    $div_state = "
+      <div class=\"detail extra\"> 
+      <h1>$l_progress</h1>
+      <div id='scopeProgressContainer'>
+      <div id='scopeProgressBar' style='width:$percent%'>&nbsp;</div>
+      <span id='scopeProgressPercent'>$percent%</span>
+      </div>
+      </div>
+      <script type='text/javascript'>
+        obm.initialize.chain(function () {
+          var steps = $steps;
+          var request = new Request.JSON({
+            url : 'tools_index.php',
+            secure : false,
+            onComplete : function(response) {
+              var progress = response.steps;
+              var completed = response.completed;
+              if(progress >= steps || steps == 0 || completed == 1) {
+                window.location.href = 'tools_index.php';
+              }
+              var percent = Math.round((progress / steps) * 100);
+              if(percent > 100) percent = 100;
+              $('scopeProgressPercent').set('html',percent + '%');
+              $('scopeProgressBar').setStyle('width', percent + '%');
+            }
+          });
+          request.post.periodical(3000, request, {action:'progress'});
+        });
+      </script>
+    ";
+  }
 
-  return $block;
+  return $div_state.$block;
 }
 
+/**
+ * json_tools_update_progress 
+ * 
+ * @param mixed $domain_id 
+ * @param mixed $realm 
+ * @access public
+ * @return void
+ */
+function json_tools_update_progress ($domain_id, $realm) {
+  global $entities;
+
+  $complete = intval(check_tools_update_running());
+  $steps = run_query_tools_get_progress();
+
+  $GLOBALS['display']['json'] = "{steps:$steps, completed: $complete}" ;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Entity updates table
 ///////////////////////////////////////////////////////////////////////////////

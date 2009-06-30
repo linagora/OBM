@@ -129,8 +129,15 @@ function check_tools_update_context_ok($params) {
       return false;
     }
   }
-  
+
+  return check_tools_update_running();
+
+}
+
+function check_tools_update_running() {
+  global $err, $l_upd_already_running;
   // Check if update is locked
+  $update_ok = true;
   $update_lock = get_update_lock();
   if ($update_lock == '1') {
     $err['msg'] = $l_upd_already_running;
@@ -145,7 +152,7 @@ function check_tools_update_context_ok($params) {
     return false;
   }
 
-  return $update_ok;
+  return true;
 }
 
 
@@ -922,5 +929,32 @@ function store_update_data($params) {
   return $has_update;
 }
 
-
+/**
+ * run_query_tools_get_steps
+ * 
+ * @access public
+ * @return void
+ */
+function run_query_tools_get_steps() {
+  $query = "SELECT COUNT(*) as steps FROM (SELECT updated_id FROM Updated UNION SELECT deleted_id FROM Deleted UNION SELECT updatedlinks_id FROM Updatedlinks) as progress";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q->f('steps');
+  
+}
+/**
+ * run_query_tools_get_progress 
+ * 
+ * @access public
+ * @return void
+ */
+function run_query_tools_get_progress() {
+  $query = "SELECT obminfo_value as progress FROM ObmInfo where obminfo_name='scope-progress'";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q->f('progress');
+  
+}
 </script>
