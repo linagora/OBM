@@ -610,33 +610,31 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
   }
 
   $calendar['calendar_id'] = $event_id;
-
-  // Send mail
-  $data = array ( 
-    'id' => $event_id,
-    'title' => "$calendar[title]" ,
-    'owner' => "$calendar[owner]" ,
-    'location' => "$calendar[location]" ,
-    'category1' => "$calendar[category1]" ,
-    'privacy' => $calendar['privacy'],
-    'date_begin' => $calendar['date_begin'],
-    'date_end' => $calendar['date_end'],
-    'priority' => "$calendar[priority]" ,
-    'color' =>  "$calendar[color]" ,
-    'repeat_kind' => "$calendar[repeat_kind]" ,
-    'repeatfrequency' => "$calendar[repeatfrequency]" ,
-    'repeat_end' => $calendar['repeat_end'],
-    'date_exception' => $calendar['date_exception'] ,
-    'description' => "$calendar[description]" ,
-    'duration' => $calendar['duration'],
-    'repeat_days' => "$calendar[repeat_days]", 
-    'user' => $users_array,
-    'resource' => $resources_array,
-    'contact' => $contacts_array
-  );
-
-  OBM_EventFactory::getInstance()->create($data);
-
+  if ($calendar['attendees_notification']) {
+    $data = array ( 
+      'id' => $event_id,
+      'title' => "$calendar[title]" ,
+      'owner' => "$calendar[owner]" ,
+      'location' => "$calendar[location]" ,
+      'category1' => "$calendar[category1]" ,
+      'privacy' => $calendar['privacy'],
+      'date_begin' => $calendar['date_begin'],
+      'date_end' => $calendar['date_end'],
+      'priority' => "$calendar[priority]" ,
+      'color' =>  "$calendar[color]" ,
+      'repeat_kind' => "$calendar[repeat_kind]" ,
+      'repeatfrequency' => "$calendar[repeatfrequency]" ,
+      'repeat_end' => $calendar['repeat_end'],
+      'date_exception' => $calendar['date_exception'] ,
+      'description' => "$calendar[description]" ,
+      'duration' => $calendar['duration'],
+      'repeat_days' => "$calendar[repeat_days]", 
+      'user' => $users_array,
+      'resource' => $resources_array,
+      'contact' => $contacts_array
+    );
+    OBM_EventFactory::getInstance()->create($data);
+  }
   return $event_id;
 }
 

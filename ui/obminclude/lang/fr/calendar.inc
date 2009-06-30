@@ -126,7 +126,7 @@ $l_A = "Accepté";
 $l_W = "Attente";
 $l_R = "Refusé";
 $l_owner_notification = "Notifier par e-mail l'organisateur de la réunion";
-$l_event_update_notification =  "Notifier la mise à jour de l'événement";
+$l_notification =  "Notification";
 
 $l_view = "Vue";
 $l_view_default =  "Vue Défaut";

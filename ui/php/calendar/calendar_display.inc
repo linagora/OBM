@@ -2897,10 +2897,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $frequency_block = "<input type=\"text\" size=\"4\" style=\"width:3em;\" id=\"tf_repeatfrequency\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />";
   }
 
-  if ($action == 'detailupdate' || $action == 'conflict_manager') {
-    $attendees_notification  = 'checked';
-  }
-
+  $attendees_notification  = 'checked';
   if (isset($calendar['date_exception'])) { $date_exception = $calendar['date_exception']; }
   if (isset($calendar['list-item'])) { $t_list_item = $calendar['list-item']; }
   if (isset($calendar['list-item-id'])) { $t_list_item_id = $calendar['list-item-id']; }
@@ -2918,11 +2915,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $selected_alert = $calendar['alert'];
     }
   }
-  
-  if (($action == 'detailupdate') || ($action == 'update') || ($action == 'conflict_manager')) {
-    $dis_attendees_notification = "
+
+  $dis_attendees_notification = "
   <fieldset class=\"detail extra\">    
-  <legend>$GLOBALS[l_event_update_notification]</legend>  
+  <legend>$GLOBALS[l_notification]</legend>  
   <table>    
   <tr>    
     <th><label for=\"cba_attendees_notification\">$GLOBALS[l_sendamail]</label></th> 
@@ -2933,6 +2929,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   </table>
   </fieldset>";
 
+  if (($action == 'detailupdate') || ($action == 'update') || ($action == 'conflict_manager')) {
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />

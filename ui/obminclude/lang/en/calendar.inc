@@ -135,7 +135,7 @@ $l_force_disabled = "(impossible because of a conflictual resource)";
 $l_carac = "Caracteristics";
 $l_meeting_perform = "Seek for free time slots";
 $l_owner_notification = "Notify event owner";
-$l_event_update_notification =  "Notify event update";
+$l_notification =  "Notify";
 
 $l_event_color_tt = "Event's colors are the ones defined during the event creation.";
 
@@ -149,7 +149,7 @@ $l_insert_error = "Conflicts have been detected, insertion cancelled";
 $l_view_type = "View type";
 
 // Messages
-$l_sendamail = "Force notification by mail.";
+$l_sendamail = "Attendees Notification";
 $l_select_contacts = "You have to select a user or group.";
 $l_select_repeat_day = "You have to select the repetition days.";
 $l_select_pdf_day = "You have to select one day";
