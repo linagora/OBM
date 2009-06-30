@@ -1668,6 +1668,23 @@ function get_entity_info($id, $entity) {
     $c_domain = 'mailshare_domain_id';
     $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, $c_id as entitydata_id, 'mailshare' as entity_kind
       FROM MailShare WHERE mailshare_id $id";
+  } elseif ($entity == 'contact') {
+    $table_entity = 'Contact';
+    $c_id = 'contact_id';
+    $ctt[0]['type'] = 'field';
+    $ctt[0]['value'] = 'contact_lastname';
+    $ctt[1]['type'] = 'string';
+    $ctt[1]['value'] = ' ';
+    $ctt[2]['type'] = 'field';
+    $ctt[2]['value'] = 'contact_firstname';
+    $c_label = sql_string_concat($db_type, $ctt);
+    $c_email = 'email_address';
+    $c_domain = 'contact_domain_id';
+    $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, $c_id as entitydata_id, 'mailshare' as entity_kind
+      FROM Contact
+      INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
+      LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label #LIKE 'PREF;%'
+      WHERE contact_id $id";
   }
 
   $query = "SELECT Entity.*, domain_name as entity_domain
@@ -1676,7 +1693,7 @@ function get_entity_info($id, $entity) {
     WHERE entitydata_id $id ";
 
   display_debug_msg($query, $cdg_sql, 'get_entity_info()');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   $obm_q->next_record();
   if (is_array($obm_q->Record)) {
     foreach ($obm_q->Record as $key => $user) {

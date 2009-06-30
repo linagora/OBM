@@ -88,6 +88,10 @@ class CalendarMailer extends OBM_Mailer {
     $this->body = $this->extractEventDetails($event, $this->from, '', $user);
   }
 
+
+  /////////////////////////////////////////////////////////////////////////////
+  // RESOURCE
+  /////////////////////////////////////////////////////////////////////////////
   protected function resourceReservation($event, $resourceOwners) {
     $this->from = $this->getSender();
     $this->recipients = $this->getRecipients($resourceOwners);
@@ -116,6 +120,92 @@ class CalendarMailer extends OBM_Mailer {
     $this->subject = __('Resource participation updated on OBM: %title%', array('%title%' => $event->title));
     $this->body = $this->extractEventDetails($event, $this->from, '', $res);
   }
+
+
+  /////////////////////////////////////////////////////////////////////////////
+  // CONTACT
+  /////////////////////////////////////////////////////////////////////////////
+  protected function contactInvitation($event, $contacts) {
+    $this->from = $this->getSender();
+    $recips = array();
+    foreach($contacts as $contact) {
+      $contact_info = get_entity_info($contact->id, 'contact');
+      $label = $contact_info['label']; 
+      $email = $contact_info['email'];
+      if (trim($email) != "") {
+        array_push($recips, array($email, $label));
+      }
+    }
+    $this->recipients = $recips;
+    $this->subject = __('New event on OBM: %title%', array('%title%' => $event->title));
+    $this->body = $this->extractEventDetails($event, $this->from);
+    if ($this->attachIcs) {
+      $this->parts[] = array(
+        'content' => fopen($this->generateIcs($event, $contacts, "request"), 'r'), 
+        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
+      );
+      $this->attachments[] = array(
+        'content' => fopen($this->generateIcs($event, $contacts, "request"), 'r'), 
+        'filename' => 'meeting.ics', 'content_type' => 'application/ics'
+      );
+    }
+  }
+
+
+  protected function contactCancel($event, $contacts) {
+    $this->from = $this->getSender();
+    $recips = array();
+    foreach($contacts as $contact) {
+      $contact_info = get_entity_info($contact->id, 'contact');
+      $label = $contact_info['label']; 
+      $email = $contact_info['email'];
+      if (trim($email) != "") {
+        array_push($recips, array($email, $label));
+      }
+    }
+    $this->recipients = $recips;
+    $this->subject = __('Event cancelled on OBM: %title%', array('%title%' => $event->title));
+    $this->body = $this->extractEventDetails($event, $this->from);
+    if ($this->attachIcs) {
+      $this->parts[] = array(
+        'content' => fopen($this->generateIcs($event, $contacts, "cancel"), 'r'), 
+        'content_type' => 'text/calendar; charset=UTF-8; method=CANCEL'
+      );
+      $this->attachments[] = array(
+        'content' => fopen($this->generateIcs($event, $contacts, "cancel"), 'r'), 
+        'filename' => 'meeting.ics', 'content_type' => 'application/ics'
+      );
+    }
+  }
+
+
+  protected function contactUpdate($event, $oldEvent, $contacts) {
+    $this->from = $this->getSender();
+    $recips = array();
+    foreach($contacts as $contact) {
+      $contact_info = get_entity_info($contact->id, 'contact');
+      $label = $contact_info['label']; 
+      $email = $contact_info['email'];
+      if (trim($email) != "") {
+        array_push($recips, array($email, $label));
+      }
+    }
+    $this->recipients = $recips;
+    $this->subject = __('Event updated on OBM: %title%', array('%title%' => $event->title));
+    $this->body = array_merge($this->extractEventDetails($event, $this->from),
+                              $this->extractEventDetails($oldEvent, $this->from, 'old_'));
+    if ($this->attachIcs) {
+      $this->parts[] = array(
+        'content' => fopen($this->generateIcs($event, $contacts, "request"), 'r'), 
+        'content_type' => 'text/calendar; charset=UTF-8; method=REQUEST'
+      );
+      $this->attachments[] = array(
+        'content' => fopen($this->generateIcs($event, $contacts, "request"), 'r'), 
+        'filename' => 'meeting.ics', 'content_type' => 'application/ics'
+      );      
+    }
+  }
+
 
   /**
    * Perform the export meeting to the vCalendar format

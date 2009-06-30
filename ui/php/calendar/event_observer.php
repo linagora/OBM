@@ -736,6 +736,54 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
   }
 
   /**
+   * [CONTACT] Send notification for new event participation 
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @param array $recipients 
+   * @access private
+   * @return void
+   */
+  private function sendNewContactMail($old, $new, $recipients) {
+    if (!empty($recipients)) {
+      $this->mailer->sendContactInvitation($new, $recipients);
+    } 
+  }
+
+
+  /**
+   * [CONTACT] Send notification for cancelled event participation
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @param array $recipients 
+   * @access private
+   * @return void
+   */
+  private function sendOldContactMail($old, $new, $recipients) {
+    if (!empty($recipients)) {
+      $this->mailer->sendContactCancel($old, $recipients);
+    }       
+  }
+
+  /**
+   * [CONTACT] Send notification for modified event participation
+   * 
+   * @param OBM_Event $old 
+   * @param OBM_Event $new 
+   * @param array $recipients 
+   * @access private
+   * @return void
+   */
+  private function sendCurrentContactMail($old, $new, $recipients) {
+    if ($this->hasEventFullyChanged($old, $new)) {
+      $this->mailer->sendContactUpdate($new, $old, $recipients);
+    }
+  }
+
+
+
+  /**
    * Send notification for new resource reservation
    * 
    * @param OBM_Event $old 
