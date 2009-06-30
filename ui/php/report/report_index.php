@@ -132,9 +132,6 @@ case "html":
   $display["end"] = display_end();
   $display["header"] = display_menu($module);
   display_page($display);
-   /*} else {
-     ob_clean();
-   }*/
   break;
 }
 
@@ -175,26 +172,8 @@ function dis_report_command_use($msg="") {
     if ($nb4 == 0) $ldelegation .= "$val4";
     else $ldelegation .= ", $val4";
   }
-  echo "$msg
-Usage : /usr/bin/php report_index.php [-a action][-s]
-
-- a     : Action to execute, if not specified, the *execute* will be executed.
-
-Action list with options
-*help*        :       Show this help file
-*list*        :       List all available reportings
-      -v verbose          :       More verbose mode (show report details).  
-*execute*     :       Execute the  report
-  -r report         :       Report name to execute.
-  -s service        :       Filter report result with the given service (
-                            only available for user kind report)
-  -v verbose          :       More verbose mode (show the report result
-  on the output).
-  Exemple :
-  php report_index.php -a execute -r user -v
-  php report_index.php -a execute -r vacation -s myservice > /tmp/report.result 
-";
-
+  echo "$msg";
+  dis_report_help($params["mode"]);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -226,7 +205,9 @@ function parse_report_arg($argv) {
       break;
     case '-r':
       list($nb3, $val3) = each ($argv);
-      if (in_array($val3, $report)) {
+      if (isset($report[$val3])) {
+	$params['type'] = $report[$val3];
+      } elseif (in_array($val3, $report)) {
         $params["type"] = $val3;
         if ($debug > 0) { echo "-r -> \$type=$val3\n"; }
       } else {
