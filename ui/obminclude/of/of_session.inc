@@ -457,6 +457,19 @@ class Perm {
     return $module_right;
   }
 
+    //-------------------------------------------------------------------------//
+  // Return true if the profile can access to module given as parameter        //
+  // false else
+  // Parameters:
+  //   - $module : module to return the right
+  //-------------------------------------------------------------------------//
+  function check_module_rights($module, $profile = false) {
+    global $profiles, $obm, $modules, $perm;
+	
+    if(!$profile) $profile = $obm["profile"];
+    return ($GLOBALS['cgp_show']['module'][$module] && (($perm->get_module_rights($module) & $modules[$mod]['Right']) == $modules[$mod]['Right'])); 
+  }
+
   //-------------------------------------------------------------------------//
   // Check profile permissions for the module and action given as parameters //
   // Parameters:
