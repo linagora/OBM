@@ -101,39 +101,18 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_user_defined_rules() && check_user_data_form("", $params)) {
-
-    // If the context (same user) was confirmed ok, we proceed
-    /*if ($params["confirm"] == $c_yes) {*/
-      $cid = run_query_people_insert($params);
-      if ($cid > 0) {
-        $params["user_id"] = $cid;
-        set_update_state();
-        $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
-        $display["detail"] = dis_people_consult($params);
-      } else {
-        $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
-        $display["detail"] = html_people_form("", $params);
+    $cid = run_query_people_insert($params);
+    if ($cid > 0) {
+      $params["user_id"] = $cid;
+      require_once('people_mailer.php');
+      $people = new PeopleMailer();
+      $people->sendCreationNotice($params['user_id']);      
+      $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
+      $display["detail"] = dis_people_consult($params);
+    } else {
+      $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
+      $display["detail"] = html_people_form("", $params);
       }
-
-    // If it is the first try, we warn the user if some user seem similar
-    /*} else {
-      $obm_q = check_people_context("", $params);
-      if ($obm_q->num_rows() > 0) {
-        $display["detail"] = dis_people_warn_insert("", $obm_q, $params);
-      } else {
-        $cid = run_query_people_insert($params);
-        if ($cid > 0) {
-          set_update_state();
-          $params["user_id"] = $cid;
-          $display["msg"] .= display_ok_msg("$l_user : $l_insert_ok");
-          $display["detail"] = dis_people_consult($params);
-        } else {
-          $display["msg"] .= display_err_msg("$l_user : $l_insert_error");
-          $display["detail"] = html_people_form("",$params);
-        }
-      }
-    }*/
-
   // Form data are not valid
   } else {
     $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err["msg"]);

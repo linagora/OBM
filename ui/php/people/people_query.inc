@@ -855,4 +855,47 @@ function run_query_people_user_group($p_id) {
 
   return $obm_q;
 }
+
+/**
+ * run_query_people_get_admin 
+ * 
+ * @access public
+ * @return void
+ */
+function run_query_people_get_admin($delegation) {
+  if($delegation == '') return array(); 
+  $query = "SELECT profile_name, userperms.profilemodule_right as userperms, defaultperms.profilemodule_right as defaultperms FROM Profile 
+              INNER JOIN ProfileModule defaultperms ON defaultperms.profilemodule_profile_id = profile_id AND defaultperms.profilemodule_module_name = 'default'
+              LEFT JOIN ProfileModule userperms ON userperms.profilemodule_profile_id = profile_id AND userperms.profilemodule_module_name = 'user'
+            WHERE 1=1 $multidomain"; 
+  display_debug_msg($query, $cdg_sql, 'run_query_people_get_admin(0)');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $profile = array();
+  while($obm_q->next_record()) {
+    if($obm_q->f('userperms') !== NULL) {
+      if(intval($obm_q->f('userperms')) & $GLOBALS['cright_write_admin'] == $GLOBALS['cright_write_admin'] ) {
+        $profiles[] = $obm_q->f('profile_name');
+      }
+    } else {
+      if(intval($obm_q->f('defaultperms')) & $GLOBALS['cright_write_admin'] == $GLOBALS['cright_write_admin'] ) {
+        $profiles[] = $obm_q->f('profile_name');
+      }
+    }
+  }
+  $admins = array();
+  if(count($profiles) > 0) {
+    $query = "SELECT userobm_id, userobm_delegation_target FROM UserObm 
+      WHERE '$delegation' #LIKE #CONCAT(userobm_delegation_target ,'%') AND userobm_perms IN ('".implode("','", $profiles)."') $multidomain
+      ORDER BY userobm_delegation DESC";
+    $obm_q->xquery($query);
+    while($obm_q->next_record()) {
+      if(!$minDelegation) $minDelegation = $obm_q->f('userobm_delegation_target');
+      elseif ($obm_q->f('userobm_delegation_target') != $minDelegation) break;
+      if($minDelegation == '') return array();
+      $admins[] = $obm_q->f('userobm_id');
+    }
+  }
+  return $admins;
+}
 ?>
