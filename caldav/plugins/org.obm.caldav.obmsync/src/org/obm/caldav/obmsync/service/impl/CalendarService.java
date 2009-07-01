@@ -1,13 +1,9 @@
 package org.obm.caldav.obmsync.service.impl;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-
 
 import org.obm.caldav.obmsync.provider.impl.AbstractObmSyncProvider;
 import org.obm.caldav.obmsync.provider.impl.ObmSyncEventProvider;
@@ -18,6 +14,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventType;
+import org.obm.sync.items.EventChanges;
 
 
 public class CalendarService implements ICalendarService{
@@ -25,12 +22,13 @@ public class CalendarService implements ICalendarService{
 	private AbstractObmSyncProvider provider;
 	private AccessToken token;
 	private String calendar;
+	private String userEmail;
 	
-	
-	public CalendarService(AccessToken token, String calendarName) {
+	public CalendarService(AccessToken token, String calendar, String userEmail) {
 		this.provider = ObmSyncEventProvider.getInstance();
 		this.token = token;
-		this.calendar = calendarName;
+		this.calendar = calendar;
+		this.userEmail = userEmail;
 	}
 
 	public Event getEventFromExtId(String externalUID) throws AuthFault,
@@ -51,37 +49,17 @@ public class CalendarService implements ICalendarService{
 		return provider.createEvent(token, calendar, event);
 	}
 
-	public List<Event> getListEventsOfDays(Date day) throws AuthFault,
-			ServerFault {
-		Calendar cal = new GregorianCalendar();
-		cal.setTime(day);
-		cal.set(Calendar.MILLISECOND, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.HOUR, 0);
-		Date start = cal.getTime();
-		cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) + 1);
-		Date end = cal.getTime();
-
-		return provider.getListEventsFromIntervalDate(token, calendar, start, end);
-	}
-
-	public String getUserEmail() throws Exception {
-		return provider.getUserEmail(token);
-	}
-
 	public boolean isConnected() {
 		return this.token != null && this.token.getSessionId() != null;
 	}
 
-	
-	public Map<String,String> getICSFromExtId(Set<String> listExtIdEvent) throws Exception {
+	public Map<Event,String> getICSFromExtId(Set<String> listExtIdEvent) throws Exception {
 		return provider.getICSEventsFromExtId(token, calendar, listExtIdEvent);
 	}
 
 	public void removeOrUpdateParticipationState(String extId) throws Exception{
 		Event event = provider.getEventFromExtId(token, calendar, extId);
-		if(getUserEmail().equals(event.getOwnerEmail())){
+		if(userEmail.equals(event.getOwnerEmail())){
 			provider.remove(token, calendar, event);
 		} else {
 			provider.updateParticipationState(token, calendar, event, Constants.PARTICIPATION_STATE_DECLINED);
@@ -100,5 +78,11 @@ public class CalendarService implements ICalendarService{
 	@Override
 	public List<Event> getAllTodos() throws Exception {
 		return provider.getAll(token, calendar, EventType.VTODO);
+	}
+
+	@Override
+	public EventChanges getSync(Date lastSync)
+			throws Exception {
+		return provider.getSync(token, calendar, lastSync);
 	}
 }

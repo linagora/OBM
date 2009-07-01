@@ -21,8 +21,10 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
+import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -33,14 +35,14 @@ public class PropertyListBuilder {
 	
 	private Log logger = LogFactory.getLog(PropertyListBuilder.class);
 	
-	public Document build(Token t, DavRequest req,Map<String,DavPropertyHandler> propertiesHandler, Set<String> toLoad) {
+	public Document build(Token t, DavRequest req,Map<String, PropfindPropertyHandler> propertiesHandler, Set<String> toLoad, IProxy proxy) {
 		try {
-			Document ret = DOMUtils.createDoc("DAV:", "D:multistatus");
+			Document ret = DOMUtils.createDoc(NameSpaceConstant.DAV_NAMESPACE, "D:multistatus");
 			Element r = ret.getDocumentElement();
-			r.setAttribute("xmlns:D", "DAV:");
-			r.setAttribute("xmlns:CS", "http://calendarserver.org/ns/");
-			r.setAttribute("xmlns:C", "urn:ietf:params:xml:ns:caldav");
-			r.setAttribute("xmlns", "urn:ietf:params:xml:ns:caldav");
+			r.setAttribute("xmlns:D", NameSpaceConstant.DAV_NAMESPACE);
+			r.setAttribute("xmlns:CS", NameSpaceConstant.CALENDARSERVER_NAMESPACE);
+			r.setAttribute("xmlns:C", NameSpaceConstant.CALDAV_NAMESPACE);
+			r.setAttribute("xmlns", NameSpaceConstant.CALDAV_NAMESPACE);
 			Element response = DOMUtils.createElement(r, "D:response");
 			DOMUtils.createElementAndText(response, "D:href", req.getHref());
 			Element pStat = DOMUtils.createElement(response, "D:propstat");
@@ -48,9 +50,9 @@ public class PropertyListBuilder {
 			
 			for (String s : toLoad) {
 				Element val = DOMUtils.createElement(p, s);
-				DavPropertyHandler dph = propertiesHandler.get(s);
+				PropfindPropertyHandler dph = propertiesHandler.get(s);
 				if(dph != null){
-					dph.appendPropertyValue(val, t, req);
+					dph.appendPropertyValue(val, t, req, proxy);
 				} else {
 					logger.warn("the Property ["+s+"] is not implemented");
 				}

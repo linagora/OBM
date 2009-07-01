@@ -18,13 +18,31 @@ package org.obm.caldav.server.share;
 
 public class Token {
 
+	private String login;
+	private String domain;
 	private String loginAtDomain;
 	private String password;
 
 	public Token(String loginAtDomain, String password) {
 		super();
 		this.loginAtDomain = loginAtDomain;
+		if(loginAtDomain.contains("@")){
+			String[] tab = loginAtDomain.split("@");
+			login = tab[0];
+			domain = tab[1];
+		} else {
+			this.login = loginAtDomain;
+		}
+		
 		this.password = password;
+	}
+
+	public String getLogin() {
+		return login;
+	}
+
+	public String getDomain() {
+		return domain;
 	}
 
 	public String getLoginAtDomain() {

@@ -5,12 +5,12 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.obm.caldav.server.AuthorizationException;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.StatusCodeConstant;
+import org.obm.caldav.server.exception.AuthorizationException;
+import org.obm.caldav.server.exception.ResultBuilderException;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.resultBuilder.ErreurBuiler;
-import org.obm.caldav.server.resultBuilder.ResultBuilderException;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.CalDavUtils;
 import org.w3c.dom.Document;

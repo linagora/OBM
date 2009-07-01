@@ -24,8 +24,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.StatusCodeConstant;
+import org.obm.caldav.server.exception.ResultBuilderException;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.resultBuilder.ResultBuilderException;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
@@ -66,7 +67,7 @@ public abstract class DavMethodHandler {
 		try {
 			DOMUtils.serialise(doc, resp.getOutputStream());
 		} catch (Exception e1) {
-			throw new ResultBuilderException(e1);
+			throw new ResultBuilderException(StatusCodeConstant.SC_INTERNAL_SERVER_ERROR);
 		} 
 	}
 	

@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.obm.caldav.server.exception.AuthorizationException;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.items.EventChanges;
 
 
 public interface ICalendarService {
@@ -40,12 +42,11 @@ public interface ICalendarService {
 	List<Event> getAllEvents() throws Exception;
 	List<Event> getAllTodos()  throws Exception;
 	
-	Map<String,String> getICSFromExtId(Set<String> listExtIdEvent) throws Exception;
-	String getUserEmail() throws Exception;
-
-	List<Event> getListEventsOfDays(Date day) throws Exception ;
+	Map<Event,String> getICSFromExtId(Set<String> listExtIdEvent) throws Exception;
 
 	void removeOrUpdateParticipationState(String extId) throws Exception,AuthorizationException ;
+	
+	EventChanges getSync(Date lastSync) throws Exception;
 	
 }
 

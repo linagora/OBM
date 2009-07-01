@@ -92,7 +92,7 @@ public class WebdavServlet extends HttpServlet {
 		if (handler != null) {
 			IProxy proxy = null;
 			try {
-				proxy = getProxy();// ProxyImpl(token);
+				proxy = getProxy();
 				proxy.login(token);
 
 				handler

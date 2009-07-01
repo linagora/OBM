@@ -38,7 +38,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.obmsync.ObmSyncConfIni;
 import org.obm.caldav.obmsync.provider.ICalendarProvider;
-import org.obm.caldav.server.AuthorizationException;
+import org.obm.caldav.server.exception.AuthorizationException;
 import org.obm.caldav.utils.CalDavUtils;
 import org.obm.caldav.utils.FileUtils;
 import org.obm.sync.auth.AccessToken;
@@ -56,7 +56,6 @@ import org.obm.sync.locators.CalendarLocator;
 @SuppressWarnings("unused")
 public class ObmSyncEventProvider extends AbstractObmSyncProvider implements ICalendarProvider {
 
-
 	private static AbstractObmSyncProvider instance;
 	
 	public static AbstractObmSyncProvider getInstance(){
@@ -66,7 +65,6 @@ public class ObmSyncEventProvider extends AbstractObmSyncProvider implements ICa
 		return instance;
 	}
 	
-	
 	protected ObmSyncEventProvider() {
 		super(); 
 	}
@@ -75,5 +73,4 @@ public class ObmSyncEventProvider extends AbstractObmSyncProvider implements ICa
 	protected AbstractEventSyncClient initObmSyncProvider(String url) {
 		return new CalendarClient(url);
 	}
-
 }

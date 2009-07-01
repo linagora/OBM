@@ -21,46 +21,55 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.obm.caldav.server.AuthorizationException;
+import org.obm.caldav.server.exception.AuthorizationException;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventType;
+import org.obm.sync.items.EventChanges;
 
 /**
  * 
  * @author adrienp
- *
+ * 
  */
 public interface ICalendarProvider {
 
-	CalendarInfo getMyCalendar(AccessToken token, String userId) throws ServerFault, AuthFault;
+	CalendarInfo getMyCalendar(AccessToken token, String userId)
+			throws ServerFault, AuthFault;
 
-	Event getEventFromExtId(AccessToken token, String userId, String UID) throws AuthFault,
-			ServerFault;
+	Event getEventFromExtId(AccessToken token, String userId, String UID)
+			throws AuthFault, ServerFault;
 
-	Event createEvent(AccessToken token, String userId, Event event) throws AuthFault, ServerFault;
-	
-	List<Event> getListEventsFromIntervalDate(AccessToken token, String userId, Date start,
-			Date end) throws AuthFault, ServerFault;
+	Event createEvent(AccessToken token, String userId, Event event)
+			throws AuthFault, ServerFault;
 
 	String getUserEmail(AccessToken token) throws AuthFault, ServerFault;
-	
-	Set<CalendarInfo> getListCalendars(AccessToken token) throws ServerFault, AuthFault ;
 
-	List<Event> getAll(AccessToken token, String calendar, EventType eventType) throws ServerFault, AuthFault;
+	Set<CalendarInfo> getListCalendars(AccessToken token) throws ServerFault,
+			AuthFault;
 
-	Map<String,String> getICSEventsFromExtId(AccessToken token, String userId,Set<String> listUidEvent) throws AuthFault, ServerFault;
+	List<Event> getAll(AccessToken token, String calendar, EventType eventType)
+			throws ServerFault, AuthFault;
 
-	void remove(AccessToken token, String login, Event event) throws ServerFault, AuthFault, AuthorizationException;
-	
-	void updateParticipationState(AccessToken token, String userId, Event event, String participationState) throws AuthFault, ServerFault;
+	Map<Event, String> getICSEventsFromExtId(AccessToken token, String userId,
+			Set<String> listUidEvent) throws AuthFault, ServerFault;
 
-	List<Event> createEventsFromICS(AccessToken token, String login, String ics, String extId)
-			throws Exception;
+	void remove(AccessToken token, String login, Event event)
+			throws ServerFault, AuthFault, AuthorizationException;
+
+	void updateParticipationState(AccessToken token, String userId,
+			Event event, String participationState) throws AuthFault,
+			ServerFault;
+
+	List<Event> createEventsFromICS(AccessToken token, String login,
+			String ics, String extId) throws Exception;
 
 	List<Event> updateEventFromICS(AccessToken token, String login, String ics,
 			Event event) throws Exception;
+
+	EventChanges getSync(AccessToken token, String calendar, Date lastSync)
+			throws AuthFault, ServerFault;
 }

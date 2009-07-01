@@ -1,8 +1,10 @@
 package org.obm.caldav.server.propertyHandler.impl;
 
 
+import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
+import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
@@ -18,10 +20,10 @@ import org.w3c.dom.Element;
  * @author adrienp
  *
  */
-public class DResourceType extends DavPropertyHandler{
+public class ResourceType extends DavPropertyHandler implements PropfindPropertyHandler{
 
 	@Override
-	public void appendPropertyValue(Element prop, Token t, DavRequest req) {
+	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
 		DOMUtils.createElement(prop, "D:collection");
 		DOMUtils.createElement(prop, "C:calendar");
 	}

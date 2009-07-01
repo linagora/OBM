@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,12 +29,12 @@ import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.impl.CalendarData;
-import org.obm.caldav.server.propertyHandler.impl.DGetETag;
+import org.obm.caldav.server.propertyHandler.impl.GetETag;
 import org.obm.caldav.server.resultBuilder.CalendarMultiGetQueryResultBuilder;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.CalDavUtils;
-import org.obm.caldav.utils.Constants;
 import org.obm.caldav.utils.DOMUtils;
+import org.obm.sync.calendar.Event;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -46,7 +45,7 @@ public class CalendarMultiGet extends ReportProvider {
 
 	public CalendarMultiGet() {
 		properties = new HashMap<String, CalendarMultiGetPropertyHandler>();
-		properties.put("D:getetag", new DGetETag());
+		properties.put("D:getetag", new GetETag());
 		properties.put("calendar-data", new CalendarData());
 	}
 
@@ -125,7 +124,7 @@ public class CalendarMultiGet extends ReportProvider {
 			Element root = req.getDocument().getDocumentElement();
 			Set<String> listExtIDEvent = getListExtId(root);
 			
-			Map<String, String> listICS = proxy.getCalendarService().getICSFromExtId(listExtIDEvent);
+			Map<Event, String> listICS = proxy.getCalendarService().getICSFromExtId(listExtIDEvent);
 
 			
 			

@@ -16,4 +16,5 @@ Export-Package: org.obm.sync.auth,
  org.obm.sync.calendar,
  org.obm.sync.client.calendar,
  org.obm.sync.client.impl,
+ org.obm.sync.items,
  org.obm.sync.locators

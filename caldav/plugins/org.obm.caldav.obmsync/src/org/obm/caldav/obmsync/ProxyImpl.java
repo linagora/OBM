@@ -9,8 +9,9 @@ import org.obm.sync.auth.AccessToken;
 
 public class ProxyImpl implements IProxy {
 
-	private  AccessToken token;
-	private String calendarName;
+	private AccessToken token;
+	private String userId;
+	private String calendar;
 	private ICalendarService calendarService;
 	
 	
@@ -18,33 +19,15 @@ public class ProxyImpl implements IProxy {
 	}
 	
 	private void initService() {
-		calendarService = new CalendarService(token,calendarName);
-		//todoService = new TodoService(token, calendarName);
+		calendarService = new CalendarService(token,calendar,userId);
 	}
-
-	/*@Override
-	public IEventService getEventService() {
-		if(this.eventService == null){
-			throw new RuntimeException("You must be logged");
-		}
-		return this.eventService;
-	}
-	
-	@Override
-	public ITodoService getTodoService() {
-		if(this.eventService == null){
-			throw new RuntimeException("You must be logged");
-		}
-		return todoService;
-	}*/
-	
-	
-	
 	
 	@Override
 	public void login(Token token) {
-		this.calendarName = token.getLoginAtDomain();
-		this.token = AbstractObmSyncProvider.login(token.getLoginAtDomain(), token.getPassword());
+		
+		this.userId = token.getLoginAtDomain();
+		this.calendar = token.getLogin();
+		this.token = AbstractObmSyncProvider.login(userId, token.getPassword());
 		this.initService();
 	}
 

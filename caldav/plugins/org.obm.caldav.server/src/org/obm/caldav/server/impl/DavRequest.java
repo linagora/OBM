@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,6 +77,10 @@ public class DavRequest {
 	
 	public String getURI() {
 		return req.getRequestURI().toString();
+	}
+	
+	public HttpSession getSession(){
+		return this.req.getSession();
 	}
 
 }

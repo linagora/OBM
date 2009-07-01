@@ -5,11 +5,14 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.exception.CalDavException;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.utils.DOMUtils;
+import org.obm.sync.calendar.Event;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class CalendarMultiGetQueryResultBuilder extends ResultBuilder {
 
@@ -47,31 +50,49 @@ public class CalendarMultiGetQueryResultBuilder extends ResultBuilder {
 	// </D:multistatus>
 
 	public Document build(DavRequest req, IProxy proxy,
-			Set<CalendarMultiGetPropertyHandler> properties, Map<String,String> listEvents) {
+			Set<CalendarMultiGetPropertyHandler> properties,
+			Map<Event, String> listEvents) {
 		Document doc = null;
 		try {
 			doc = createDocument();
 			Element root = doc.getDocumentElement();
 			if (listEvents.size() > 0) {
-				for (Entry<String, String> entry : listEvents.entrySet()) {
-					String eventId = entry.getKey();
-					String eventICS = entry.getValue();
-					
+				for (Entry<Event, String> entry : listEvents.entrySet()) {
 					Element response = DOMUtils.createElement(root,
 							"D:response");
-					String href = req.getHref() + eventId + ".ics";
-					DOMUtils.createElementAndText(response, "D:href", href);
-					Element pStat = DOMUtils.createElement(response,
-							"D:propstat");
-					Element p = DOMUtils.createElement(pStat, "D:prop");
-					for (CalendarMultiGetPropertyHandler property : properties) {
-						property.appendCalendarMultiGetPropertyValue(p, proxy, eventId, eventICS);
+					Event event = entry.getKey();
+					String eventICS = entry.getValue();
+					String href = req.getHref()
+							+ proxy.getCalendarService().getICSName(event);
+
+					try {
+						DOMUtils.createElementAndText(response, "D:href", href);
+						Element pStat = DOMUtils.createElement(response,
+								"D:propstat");
+						Element p = DOMUtils.createElement(pStat, "D:prop");
+						for (CalendarMultiGetPropertyHandler property : properties) {
+							property.appendCalendarMultiGetPropertyValue(p,
+									proxy, event, eventICS);
+						}
+						Element status = DOMUtils.createElement(pStat,
+								"D:status");
+						status.setTextContent("HTTP/1.1 200 OK");
+					} catch (CalDavException e) {
+						
+						NodeList nl = response.getChildNodes();
+						for (int i = 0; i < nl.getLength(); i++) {
+							response.removeChild(nl.item(i));
+						}
+						DOMUtils.createElementAndText(response, "D:href", href);
+						
+						Element status = DOMUtils.createElement(response,
+								"D:status");
+						status.setTextContent("HTTP/1.1 "+e.getHttpStatusCode()+" "+e.getMessage());
+
 					}
-					Element status = DOMUtils.createElement(pStat, "D:status");
-					status.setTextContent("HTTP/1.1 200 OK");
 				}
 			} else {
-				
+
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

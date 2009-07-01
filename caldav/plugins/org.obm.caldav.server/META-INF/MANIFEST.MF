@@ -17,6 +17,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.obm.caldav.server,
+ org.obm.caldav.server.exception,
  org.obm.caldav.server.reports,
  org.obm.caldav.server.share,
  org.obm.caldav.server.share.filter

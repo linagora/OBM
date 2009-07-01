@@ -2,10 +2,15 @@ package org.obm.caldav.server.propertyHandler.impl;
 
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
+import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
+import org.obm.sync.items.EventChanges;
 import org.w3c.dom.Element;
 
 /**
@@ -45,12 +50,39 @@ import org.w3c.dom.Element;
  * @author adrienp
  *
  */
-public class CSGetCTag extends DavPropertyHandler {
+public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandler{
 
+	private static Map<String,Date> lastChangeByUser;
+	static{
+		lastChangeByUser = new HashMap<String, Date>();
+	}
+	
 	@Override
-	public void appendPropertyValue(Element prop, Token t, DavRequest req) {
-		prop.setTextContent(new Date().getTime() + "");
-		//prop.setTextContent("1234567879");
+	public synchronized void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
+		Date lastChange = lastChangeByUser.get(t.getLoginAtDomain());
 		
+		if(lastChange == null){
+			lastChange = new Date();
+			
+		} else {
+			try {
+				EventChanges ec = proxy.getCalendarService().getSync(lastChange);
+				if(ec.getUpdated().length != 0 || ec.getRemoved().length != 0){
+					lastChange = new Date();
+				} else {
+					logger.info("Calendar is already synchronized");
+				}
+			} catch (Exception e) {
+				lastChange = new Date();
+				
+			}
+		}
+		prop.setTextContent(getCTagValue(t, lastChange));
+		
+		lastChangeByUser.put(t.getLoginAtDomain(), lastChange);
+	}
+	
+	private String getCTagValue(Token t, Date lastSync){
+		return t.getLoginAtDomain()+"-"+lastSync.getTime();
 	}
 }

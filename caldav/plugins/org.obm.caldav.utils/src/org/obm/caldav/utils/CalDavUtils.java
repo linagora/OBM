@@ -13,7 +13,7 @@ public class CalDavUtils {
 			extId = url.substring(indexIcs+1);
 			extId = extId.replace(".ics", "");
 		}
-		if(extId == null && extId.equals("")){
+		if(extId == null && "".equals(extId)){
 			throw new MalformedURLException("Invalid URI[ "+url+ "]");	
 		}
 		return extId;

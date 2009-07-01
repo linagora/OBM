@@ -24,15 +24,16 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
-import org.obm.caldav.server.propertyHandler.impl.CCalendarHomeSet;
-import org.obm.caldav.server.propertyHandler.impl.CCalendarUserAddressSet;
-import org.obm.caldav.server.propertyHandler.impl.CSGetCTag;
-import org.obm.caldav.server.propertyHandler.impl.CScheduleInboxURL;
-import org.obm.caldav.server.propertyHandler.impl.CScheduleOutboxURL;
-import org.obm.caldav.server.propertyHandler.impl.DOwner;
-import org.obm.caldav.server.propertyHandler.impl.DResourceType;
+import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
+import org.obm.caldav.server.propertyHandler.impl.CalendarHomeSet;
+import org.obm.caldav.server.propertyHandler.impl.CalendarUserAddressSet;
+import org.obm.caldav.server.propertyHandler.impl.GetCTag;
+import org.obm.caldav.server.propertyHandler.impl.ScheduleInboxURL;
+import org.obm.caldav.server.propertyHandler.impl.ScheduleOutboxURL;
+import org.obm.caldav.server.propertyHandler.impl.Owner;
+import org.obm.caldav.server.propertyHandler.impl.ResourceType;
 import org.obm.caldav.server.resultBuilder.PropertyListBuilder;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
@@ -44,19 +45,19 @@ import org.w3c.dom.NodeList;
 
 public class PropFindHandler extends DavMethodHandler {
 
-	private Map<String,DavPropertyHandler> propertiesHandler;
+	private Map<String,PropfindPropertyHandler> propertiesHandler;
 	
 	public PropFindHandler() {
 		
-		propertiesHandler = new HashMap<String, DavPropertyHandler>();
-		propertiesHandler.put("D:resourcetype", new DResourceType());
-		propertiesHandler.put("D:owner", new DOwner());
-		propertiesHandler.put("CS:getctag", new CSGetCTag());
+		propertiesHandler = new HashMap<String, PropfindPropertyHandler>();
+		propertiesHandler.put("D:resourcetype", new ResourceType());
+		propertiesHandler.put("D:owner", new Owner());
+		propertiesHandler.put("CS:getctag", new GetCTag());
 		
-		propertiesHandler.put("C:calendar-home-set", new CCalendarHomeSet());
-		propertiesHandler.put("C:calendar-user-address-set", new CCalendarUserAddressSet());
-		propertiesHandler.put("C:schedule-inbox-URL", new CScheduleInboxURL());
-		propertiesHandler.put("C:schedule-outbox-URL", new CScheduleOutboxURL());
+		propertiesHandler.put("C:calendar-home-set", new CalendarHomeSet());
+		propertiesHandler.put("C:calendar-user-address-set", new CalendarUserAddressSet());
+		propertiesHandler.put("C:schedule-inbox-URL", new ScheduleInboxURL());
+		propertiesHandler.put("C:schedule-outbox-URL", new ScheduleOutboxURL());
 	}
 
 	
@@ -65,13 +66,10 @@ public class PropFindHandler extends DavMethodHandler {
 	public void process(Token t, IProxy proxy, DavRequest req, HttpServletResponse resp) {
 		logger.info("process(req, resp)");
 
-		String depth = req.getHeader("Depth");
-		logger.info("depth: " + depth);
-		
 		Set<String> toLoad = new HashSet<String>();
 		Document doc = req.getDocument();
 		Element root = doc.getDocumentElement();
-		Element prop = DOMUtils.getUniqueElement(root, "D:prop");
+		Element prop = DOMUtils.getUniqueElement(root, "prop", NameSpaceConstant.DPROP_NAMESPACE);
 		NodeList propsToLoad = prop.getChildNodes();
 
 		for (int i = 0; i < propsToLoad.getLength(); i++) {
@@ -81,7 +79,7 @@ public class PropFindHandler extends DavMethodHandler {
 			}
 		}
 		
-		Document ret = new PropertyListBuilder().build(t, req,propertiesHandler, toLoad);
+		Document ret = new PropertyListBuilder().build(t, req,propertiesHandler, toLoad, proxy);
 
 		try {
 			DOMUtils.logDom(ret);
