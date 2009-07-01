@@ -16,6 +16,8 @@ sub new {
 
     my $self = bless { }, $class;
 
+    $self->{'counter'} = 0;
+
     return $self;
 }
 
@@ -24,6 +26,13 @@ sub DESTROY {
     my $self = shift;
 
     $self->_log( 'suppression de l\'objet', 4 );
+}
+
+
+sub reset {
+    my $self = shift;
+
+    $self->{'counter'} = 0;
 }
 
 
@@ -61,8 +70,30 @@ sub update {
             last SWITCH;
         }
     }
+    
+    $self->_updateCounter();
 
     return $returnCode;
+}
+
+
+sub _updateCounter {
+    my $self = shift;
+
+    require OBM::Tools::obmDbHandler;
+    my $dbHandler;
+    if( !($dbHandler = OBM::Tools::obmDbHandler->instance()) ) {
+        $self->_log( 'connexion à la base de données impossible', 3 );
+        return 1;
+    }
+
+    $self->{'counter'}++;
+    my $query = 'UPDATE ObmInfo SET obminfo_value='.$self->{'counter'}.' WHERE obminfo_name=\'scope-progress\'';
+
+    my $sth;
+    $dbHandler->execQuery( $query, \$sth );
+    
+    return 0;
 }
 
 
