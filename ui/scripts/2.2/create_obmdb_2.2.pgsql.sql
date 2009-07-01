@@ -1627,7 +1627,7 @@ CREATE TABLE profilesection (
     profilesection_domain_id integer NOT NULL,
     profilesection_profile_id integer,
     profilesection_section_name character varying(64) DEFAULT ''::character varying NOT NULL,
-    profilesection_show smallint
+    profilesection_show boolean 
 );
 
 

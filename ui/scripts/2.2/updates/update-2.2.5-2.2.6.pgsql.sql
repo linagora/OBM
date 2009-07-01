@@ -13,6 +13,11 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id, display_entity, display_fieldname, display_fieldorder, display_display) values (null, 'people', 'userobm_delegation', 11, 1);
 INSERT INTO DisplayPref (display_user_id, display_entity, display_fieldname, display_fieldorder, display_display) values (null, 'people', 'userobm_vacation', 12, 1);
 
+-- Fix profile section datatype
+ALTER TABLE ProfileSection ALTER COLUMN profilesection_show DROP DEFAULT;
+ALTER TABLE ProfileSection ALTER COLUMN profilesection_show TYPE BOOLEAN USING CASE profilesection_show WHEN 1 THEN TRUE ELSE FALSE END;
+ALTER TABLE ProfileSection ALTER COLUMN profilesection_show SET DEFAULT NULL;
+
 -- contact query optimization
 --
 -- Name: contact_privacy_key; Type: INDEX; Schema: public; Owner: -; Tablespace:
