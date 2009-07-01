@@ -26,7 +26,7 @@ $extra_js .= "
   }
 
   function displayFreeBusyConflict(duration, d) {
-    displayFreeBusy(d, duration);
+    displayFreeBusy(d, duration, true);
   }
 
   function checkAvailability() {
@@ -48,7 +48,7 @@ $extra_js .= "
     displayFreeBusy($('tf_date_begin').value, duration);
   }
 
-  function displayFreeBusy(date_begin, duration) {
+  function displayFreeBusy(date_begin, duration, readOnly) {
     // Get current attendees
     var elements = $$('div.elementRow');
     var atts = new Array(); // current attendees
@@ -81,7 +81,7 @@ $extra_js .= "
 
         obm.popup.popups.erase('fbc');
         obm.popup.show('fbc');
-        obm.calendarFreeBusy.buildFreeBusyPanel(duration);
+        obm.calendarFreeBusy.buildFreeBusyPanel(duration, readOnly);
 
         // TODO > 2.2.4
         // Optimize

@@ -4117,11 +4117,11 @@ function dis_calendar_free_interval($calendar) {
       <span>$GLOBALS[l_header_meeting]</span>
       </h1>
       <h2>
-        <a href='#' onclick='changePeriod(\"$prev_month\")'><img src='$GLOBALS[ico_far_previous]' alt='[$GLOBALS[l_previous]'] /></a>
-        <a href='#' onclick='changePeriod(\"$prev_week\")'><img src='$GLOBALS[ico_previous]' alt='[$GLOBALS[l_previous]'] /></a>
+        <a href='#' class='readable' onclick='changePeriod(\"$prev_month\")'><img src='$GLOBALS[ico_far_previous]' alt='[$GLOBALS[l_previous]'] /></a>
+        <a href='#' class='readable' onclick='changePeriod(\"$prev_week\")'><img src='$GLOBALS[ico_previous]' alt='[$GLOBALS[l_previous]'] /></a>
         $label
-        <a href='#' onclick='changePeriod(\"$next_week\")'><img src='$GLOBALS[ico_next]' alt='[$GLOBALS[l_next]'] /></a>
-        <a href='#' onclick='changePeriod(\"$next_month\")'><img src='$GLOBALS[ico_far_next]' alt='[$GLOBALS[l_next]'] /></a>
+        <a href='#' class='readable' onclick='changePeriod(\"$next_week\")'><img src='$GLOBALS[ico_next]' alt='[$GLOBALS[l_next]'] /></a>
+        <a href='#' class='readable' onclick='changePeriod(\"$next_month\")'><img src='$GLOBALS[ico_far_next]' alt='[$GLOBALS[l_next]'] /></a>
       </h2>
     </div>
     <div class='freeBusyEntities'>
@@ -4139,7 +4139,7 @@ function dis_calendar_free_interval($calendar) {
           <tr>
             <td id='sel_attendees_id'></td>
           </tr>
-          <tbody $visiblityU>
+          <tbody class='readable' $visiblityU>
             <tr>
               <td>$GLOBALS[l_users]/$GLOBALS[l_contacts] $user_add_button</td>
             </tr>
@@ -4154,7 +4154,7 @@ function dis_calendar_free_interval($calendar) {
                 <img src='$GLOBALS[ico_add]' alt='[Add]' onclick='obm.calendarFreeBusy.addOtherAttendee();'/></td>
             </tr>            
           </tbody>
-          <tbody $visiblityR>
+          <tbody class='readable' $visiblityR>
             <tr>
               <td>$GLOBALS[l_resources] $resource_add_button</td>
             </tr>
@@ -4167,9 +4167,9 @@ function dis_calendar_free_interval($calendar) {
     </div>
     <div ></div>
     <div class='freeBusyForm'>
-      <div id='scrollLeft' >«</div>
+      <div class='readable' id='scrollLeft' >«</div>
       <div ></div>
-      <div id='scrollRight' >»</div>
+      <div class='readable' id='scrollRight' >»</div>
       <div class='freeBusyCalendar'>
         <div id='calendarFreeBusyScroll'>
           <table id='calendarFreeBusyTable'> 
@@ -4194,7 +4194,7 @@ function dis_calendar_free_interval($calendar) {
         </div>
       </div>
 
-      <div class='freeBusyButtons'>
+      <div class='freeBusyButtons readable'>
         <input type='button' id='pickPrev' value='$GLOBALS[l_freebusy_autopick_prev]' onclick='obm.calendarFreeBusy.autoPickPrev();' />
         <input type='button' id='pickNext' value='$GLOBALS[l_freebusy_autopick_next]' onclick='obm.calendarFreeBusy.autoPickNext();' />
       </div>
@@ -4214,7 +4214,8 @@ function dis_calendar_free_interval($calendar) {
 
       <div class='buttons'>
         <form id='freeBusyFormId' method='POST' action='$GLOBALS[path]/calendar/calendar_index.php'>
-          <input id='submitMeeting' type='submit' value='$GLOBALS[l_validate]' />
+          <input class='readable' id='submitMeeting' type='submit' value='$GLOBALS[l_validate]' />
+          <input class='closeSticky' style='display:none;' id='formClose' type='button' value='$GLOBALS[l_close]' />
           <input type='hidden' name='date_begin'id='date_begin' value='".urldecode($date->setHour($GLOBALS['ccalendar_first_hour'])->getURL())."' />
           <input type='hidden' name='duration' id='duration' value='' />
           <input type='hidden' name='time_begin' id='time_begin' value='' />

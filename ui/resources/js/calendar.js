@@ -1765,7 +1765,7 @@ Obm.CalendarFreeBusy = new Class({
    * build panel 
    * Build meeting slider, meeting resizer
    */
-  buildFreeBusyPanel: function(duration) {
+  buildFreeBusyPanel: function(duration, readOnly) {
     // setStyle doesn't work here. have to setStyle in initialize function. don't know why ... 
     // this.scrollDiv.setStyle('width', $('mainContent').offsetWidth-100+'px');
 
@@ -1831,41 +1831,43 @@ Obm.CalendarFreeBusy = new Class({
     }.bind(this));
 
     // Meeting resizer: change duration
-    var resizeOptions = {
-      handle: this.resizeHandler,
-      grid: {'x' : this.slider.stepWidth},
-      limit: {
-        'x': [this.slider.stepWidth],
-        'y': [this.container.offsetHeight, this.container.offsetHeight]
-      },
-      onBeforeStart: function() {
-        this.slider.drag.detach();
-      }.bind(this),
-      onDrag: function() {
+    if (!readOnly) {
+      var resizeOptions = {
+        handle: this.resizeHandler,
+        grid: {'x' : this.slider.stepWidth},
+        limit: {
+          'x': [this.slider.stepWidth],
+          'y': [this.container.offsetHeight, this.container.offsetHeight]
+        },
+        onBeforeStart: function() {
+          this.slider.drag.detach();
+        }.bind(this),
+        onDrag: function() {
 
-        this.meeting.setStyles({
-          'height':this.container.offsetHeight+'px'
-        });
+          this.meeting.setStyles({
+            'height':this.container.offsetHeight+'px'
+          });
 
-        this.meeting_slots = Math.round(this.meeting.offsetWidth/this.slider.stepWidth);
-        this.resizeHandler.setStyles({
-          'margin-left' : this.meeting_slots*this.slider.stepWidth+'px'});
-        //this.duration = this.meeting_slots/this.unit;
-        this.changeStatus(this.isBusy(this.currentPosition+this.meeting_slots-1));
-        this.displayMeetingInfo();
-      }.bind(this),
-      onComplete:function() {
-        var date_begin_ts = this.ts[this.currentPosition]*1000;
-        var date_end = new Obm.DateTime(this.ts[this.currentPosition+this.meeting_slots]*1000);
-        if (date_end.getHours() == this.firstHour && date_end.getMinutes() == '0') {
-          date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
-        }
-        var date_end_ts = date_end.getTime();
-        $('duration').value = (date_end_ts - date_begin_ts)/1000;
-        this.slider.drag.attach();
-      }.bind(this)     
-    };
-    this.meeting.makeResizable(resizeOptions);
+          this.meeting_slots = Math.round(this.meeting.offsetWidth/this.slider.stepWidth);
+          this.resizeHandler.setStyles({
+            'margin-left' : this.meeting_slots*this.slider.stepWidth+'px'});
+          //this.duration = this.meeting_slots/this.unit;
+          this.changeStatus(this.isBusy(this.currentPosition+this.meeting_slots-1));
+          this.displayMeetingInfo();
+        }.bind(this),
+        onComplete:function() {
+          var date_begin_ts = this.ts[this.currentPosition]*1000;
+          var date_end = new Obm.DateTime(this.ts[this.currentPosition+this.meeting_slots]*1000);
+          if (date_end.getHours() == this.firstHour && date_end.getMinutes() == '0') {
+            date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
+          }
+          var date_end_ts = date_end.getTime();
+          $('duration').value = (date_end_ts - date_begin_ts)/1000;
+          this.slider.drag.attach();
+        }.bind(this)     
+      };
+      this.meeting.makeResizable(resizeOptions);
+    }
     this.meeting.setOpacity(.5);
 
     this.resizeHandler.setStyles({
@@ -1929,6 +1931,15 @@ Obm.CalendarFreeBusy = new Class({
           break;
       }
     }.bind(this));
+
+    if (readOnly) {
+      $$('.readable').each(function(e) {
+        e.setStyle('display', 'none');
+      });
+      this.slider.knob.removeEvents();
+      this.slider.element.removeEvents();
+      $('formClose').setStyle('display', '');
+    }
 
   },
 
