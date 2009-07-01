@@ -115,7 +115,7 @@ AND userobmpref_user_id IS NULL");
     $this->domain_id = $this->lastInsertId('Domain','domain_id');
     /* Add related entity */
     $entity_id = $this->newEntity();
-    $this->query("INSERT INTO UserEntity (userentity_user_id, userentity_entity_id)
+    $this->query("INSERT INTO DomainEntity (domainentity_domain_id, domainentity_entity_id)
     VALUES ( ".$this->domain_id.", $entity_id)");
     /* Fill it with initial data from the global domain */
     run_query_domain_init_data($this->domain_id);
