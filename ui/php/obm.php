@@ -55,6 +55,16 @@ if ($action == 'logout') {
   $action = '';
   display_page($display);
   exit;
+} elseif($action == 'ext_get_entities') {
+
+  $entities = searchWritablesEntities($params['entity'], $obm['uid'], $params['pattern'], true);
+  $users = array();
+  foreach($entities as $id => $entity) {
+    $users[] = "{id:'$id', label:'$entity'}";
+  }
+  $display['json'] = "{length:".count($entities).", datas:[".implode(',',$users)."]}";  
+  echo $display['json'];
+  exit();
 } else {
   include("$obminclude/global_pref.inc");
   $uid = $obm['uid'];

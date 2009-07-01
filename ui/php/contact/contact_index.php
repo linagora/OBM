@@ -539,7 +539,7 @@ function get_contact_action() {
     'Url'      => "$path/contact/contact_index.php?action=export",
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('','index','search','new','statistics','admin','display')
+    'Condition'=> array ('index','search','new','statistics','admin','display')
                                      		 );
 
 // Detail Consult
@@ -825,12 +825,6 @@ function update_action_rights() {
       } else {
         $actions['contact']['detailconsult']['Right'] = $cright_forbidden;
       }
-
-      // update the access rights on the current contact
-      // (actually useless)
-      //if (OBM_Acl::canAccess($obm['uid'], 'contact', $id)) {
-      //} else {
-      //}
 
     }
 

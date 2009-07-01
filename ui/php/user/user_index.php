@@ -320,17 +320,15 @@ if ($action == 'ext_get_ids') {
 } else if ($action == 'search_batch_user') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['search'] = html_batch_user_search_form($params);
-  if ($_SESSION['set_display'] == 'yes') {
-    $display['result'] = dis_user_search_list($params);
-  } else {
-    $display['msg'] .= display_info_msg($l_no_display);
-  }
+  $display['msg'] .= display_info_msg($l_no_display);
   
 } else if ($action == 'sel_batch_users') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['search'] = html_batch_user_search_form($params);
+  $setrows = $_SESSION['set_rows'];
+  $_SESSION['set_rows'] = 250;   
   $display['result'] = dis_user_search_list($params);
-  
+  $_SESSION['set_rows'] = $setrows;  
 } else if ($action == 'edit_batch_values') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = html_user_batch_form($params);

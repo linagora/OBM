@@ -135,7 +135,7 @@ function check_tools_update_context_ok($params) {
 }
 
 function check_tools_update_running() {
-  global $err, $l_upd_already_running;
+  global $err, $l_upd_already_running, $cmd_check_update;
   // Check if update is locked
   $update_ok = true;
   $update_lock = get_update_lock();
@@ -146,7 +146,6 @@ function check_tools_update_running() {
 
   // An update must not already running
   $ps = shell_exec($cmd_check_update);
-
   if ($ps) {
     $err['msg'] = $l_upd_already_running;
     return false;
@@ -951,6 +950,21 @@ function run_query_tools_get_steps() {
  */
 function run_query_tools_get_progress() {
   $query = "SELECT obminfo_value as progress FROM ObmInfo where obminfo_name='scope-progress'";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q->f('progress');
+  
+}
+
+/**
+ * run_query_tools_get_progress 
+ * 
+ * @access public
+ * @return void
+ */
+function run_query_tools_init_progress() {
+  $query = "UPDATE ObmInfo SET obminfo_value = '0' where obminfo_name='scope-progress'";
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();

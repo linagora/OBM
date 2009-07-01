@@ -961,10 +961,10 @@ function html_contact_links($id) {
   global $l_module_deal, $l_module_list, $l_module_contract;
   global $l_document_new,$l_document_add;
   global $l_subscription_new, $l_subscription, $l_subscription_list;
-  global $path, $cgp_show;
+  global $path, $cgp_show, $perm;
 
   // Deal
-  if ($cgp_show['module']['deal']) {
+  if ($perm->check_module_rights('deal')) {
     $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;contact_id=$id");
     $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;contact_id=$id&amp;cba_archive=1");
     $deal_active = get_global_linked_deal_nb($id, 'contact1', false, 'contact2');
@@ -982,7 +982,7 @@ function html_contact_links($id) {
   }
 
   // List
-  if ($cgp_show['module']['list']) {
+  if ($perm->check_module_rights('list')) {
     $url_list = url_prepare("$path/list/list_index.php?action=search&amp;contact_id=$id");
     $list_nb = get_linked_contact_list_nb($id);
     $block_list = "
@@ -996,7 +996,7 @@ function html_contact_links($id) {
   }
 
   // Contract
-  if ($cgp_show['module']['contract']) {
+  if ($perm->check_module_rights('contract')) {
     $contract_active = get_global_linked_contract_nb($id,'contact1',false,'contact2');
     $contract_total = get_global_linked_contract_nb($id,'contact1',true,'contact2');
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;contact_id=$id");
@@ -1014,7 +1014,7 @@ function html_contact_links($id) {
   }
 
   // Document  
-  if ($cgp_show['module']['document']) {
+  if ($perm->check_module_rights('document')) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=contact");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=contact");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
@@ -1037,7 +1037,7 @@ function html_contact_links($id) {
   }
 
   // Publication
-  if ($cgp_show['module']['publication']) {
+  if ($perm->check_module_rights('publication')) {
     $nb_subscription = run_query_contact_subscription_nb($id);
     $url_subscription = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;view=publication&amp;contact_id=$id");
     $url = urlencode($url_subscription);
@@ -2239,7 +2239,7 @@ function dis_contact_right_dis_admin($id) {
   global $display, $l_contact;
 
   $contact_q = run_query_contact_detail($id);
-  $name = $contact_q->f('name');
+  $name = $contact_q->f('contact_firstname').' '.$contact_q->f('contact_lastname');
   $display['title'] = $name;
   $block = of_right_dis_admin('contact', $id);
 

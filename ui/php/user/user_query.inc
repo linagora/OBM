@@ -304,7 +304,6 @@ function run_query_user_search($user) {
     $whereq
     $orderq
     $limit";
-
   if ($ctu_sql_limit) {
     $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $join_domain $whereq");
     $obm_q->set_num_rows_total($count);

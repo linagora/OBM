@@ -41,46 +41,32 @@ function of_right_dis_admin($entity, $entity_id) {
 function html_entityadmin_bar($entity_id, $entity) {
   global $l_entity_right, $l_validate, $path, $module, $obm;
 
-  if (!(Perm::get_module_rights($entity) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin']) {
-    $writable_entity = OBM_Acl::getAllowedEntities($obm['uid'], $entity, 'admin');
-  } else {
-    $writable_entity = getAllEntities($entity, $obm['uid']);
-  }
-
   if ($module != '') {
     $uri = $path.'/'.$module.'/'.$module.'_index.php';
   }
   // Entity Selection
-  if (count($writable_entity) > 0) {
-    $dis_sel .= "<select name=\"entity_id\">";
-    foreach ($writable_entity as $id => $label) {
-      $dis_sel .= "\n<option value=\"$id\"";
-      if ($id == $entity_id ) {
-        $tag = " selected=\"selected\"";
-      }
-      $dis_sel .= " $tag>$label</option>";
-      $tag = '';
-    }
-    $dis_sel .= "</select>
-      <br />
-      $dis_duration";
-
-    $block = "
-      <div class=\"portlet\" id=\"rightManagerPortlet\">
-      <h1>$l_entity_right</h1>
-      <div>
-      <form action=\"$uri\" method=\"get\" $check_sel_user>
-      <fieldset class=\"detail\">
-      $dis_sel
-      </fieldset>
-      <fieldset class=\"buttons\">
-      <input type=\"hidden\" name=\"action\" value=\"rights_admin\" />
-      <input type=\"submit\" value=\"$l_validate\" />
-      </fieldset>
-      </form>
-      </div>  
-      </div>";
-  }
+  $dis_sel = "<input type=\"text\" name=\"entity_label\" value=\"\" onfocus=\"\" onblur=\"\" id=\"entity\" autocomplete=\"off\" />";
+  $block = "
+    <div class=\"portlet\" id=\"rightManagerPortlet\">
+    <h1>$l_entity_right</h1>
+    <div>
+    <form action=\"$uri\" method=\"get\" $check_sel_user>
+    <fieldset class=\"detail\">
+    $dis_sel
+    </fieldset>
+    <fieldset class=\"buttons\">
+    <input type=\"hidden\" name=\"entity_id\" value=\"$entity_id\" id=\"entity_id\" />
+    <input type=\"hidden\" name=\"action\" value=\"rights_admin\" />
+    <input type=\"submit\" value=\"$l_validate\" />
+    </fieldset>
+    </form>
+    <script type=\"text/javascript\">
+      obm.initialize.chain(function () {
+        new obm.AutoComplete.Search('$path/obm.php?action=ext_get_entities&entity=$entity&ajax=1', 'entity_id', 'entity', {mode: 'mono', locked: true});
+      });
+      </script>       
+    </div>  
+    </div>";
 
   return $block;
 }
@@ -512,7 +498,7 @@ function html_dis_right_admin(&$consumers, $public_rights, $entity_id, $entity) 
 // Returns:
 //   array ("ids"=>(id1, id2, id3), "entity"=>((id1,label1), (id2,label2)))
 ///////////////////////////////////////////////////////////////////////////////
-function getAllEntities($entityu, $user_id) {
+function searchWritablesEntities($entityu, $user_id, $pattern = false, $limit = false) {
   global $cdg_sql, $obm;
 
   // GLOBAL - superman has all rights on entities
@@ -524,7 +510,6 @@ function getAllEntities($entityu, $user_id) {
   $id_array = array();
 
   $entity = strtolower($entityu);
-
   if (OBM_Acl::isSpecialEntity($entityu)) {
     $table_entity = 'UserObm';
     $e_id = 'e.userobm_id';
@@ -546,6 +531,7 @@ function getAllEntities($entityu, $user_id) {
     $ctt[2]['type'] = 'field';
     $ctt[2]['value'] = 'contact_firstname';
     $e_label = sql_string_concat($db_type, $ctt);
+    $where = "AND contact_privacy = 1";
   } else {
     switch($entity) {
     case 'resource':
@@ -560,14 +546,21 @@ function getAllEntities($entityu, $user_id) {
     $e_id = "e.${entity}_id";
     $e_label = "e.${entity}_name";
   }
-  
+  if($limit) $sqllimit = 'LIMIT 24 OFFSET 0' ;
+  if($pattern !== false) $where .= "AND $e_label #LIKE '%$pattern%'";
+
+  if (!(Perm::get_module_rights($entity) & $GLOBALS['cright_write_admin']) == $GLOBALS['cright_write_admin']) {
+    $where_filter_entity = " AND $e_id IN (".OBM_Acl::getAclSubselect($entity.'entity_'.$entity.'_id', $entity, null, $obm['uid'], $filter_pattern).")";
+  }    
+
+
   $multidomain = sql_multidomain(strtolower($table_entity));
-  $query = "SELECT $e_id AS id, $e_label AS label, '$entity' as entityright_entity FROM $table_entity AS e WHERE 1=1 $multidomain";
+  $query = "SELECT $e_id AS id, $e_label AS label, '$entity' as entityright_entity FROM $table_entity AS e WHERE 1=1 $where $where_filter_entity $multidomain $sqllimit";
   
   // END - superman has all rights on entities
 
   display_debug_msg($query, $cdg_sql, 'of_right_entity_for_user()');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   $ret_array = array();
 
   while($obm_q->next_record()) {
