@@ -1790,11 +1790,11 @@ function run_query_calendar_quick_delete($calendar) {
   $obm_q->next_record();
   $title = $obm_q->f('event_title');
 
-  $obm_qm = new DB_OBM;
   // If connectors in use
   if ($c_use_connectors) {
     $query = "SELECT userentity_user_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id WHERE eventlink_event_id = $event_id";
     $obm_q->query($query);
+    $obm_qm = new DB_OBM;
     $users = array();
     while ($obm_q->next_record()) {
       // We note the event deletion
@@ -3203,7 +3203,7 @@ function calendar_monthlybyday_repeatition($date,$start,$end,$repeatfrequence,$e
     if ($diff > 0) {
       $diff = $diff  % $repeatfrequence;
     }
-    $current->setMonth($start)->subMonth($diff);
+    $current->setYear($start)->setMonth($start)->subMonth($diff);
   }
   $position = ceil($date->getDay() / 7);
   $pattern = ($position == 5)? "-1 ".$date->get(Of_Date::WEEKDAY): "+$position ".$date->get(Of_Date::WEEKDAY);
@@ -3239,7 +3239,7 @@ function calendar_monthlybydate_repeatition($date,$start,$end,$repeatfrequence,$
     if ($diff > 0) {
       $diff = $diff  % $repeatfrequence;
     }
-    $current->setMonth($start)->subMonth($diff);    
+    $current->setYear($start)->setMonth($start)->subMonth($diff);    
   }	
   while ($current->compareDateIso($end) < 0) {
     $of = &OccurrenceFactory::getInstance();
