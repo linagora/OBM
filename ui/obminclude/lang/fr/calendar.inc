@@ -7,7 +7,6 @@
 // $Id$ //
 //////////////////////////////////////////////////////////////////////////////
 
-$l_calendar = "Calendrier";
 $l_attendees = "Participants";
 $l_others_attendees = "Autres participants";
 $l_add_displayed_users = "Ajouter les utilisateurs dont les agendas sont affichés";

@@ -194,6 +194,7 @@ $l_publication = "Publication";
 $l_todo = "To Do";
 $l_stats = "Stats";
 $l_time = "Time management";
+$l_calendar = "Calendar";
 $l_cv = "CV";
 $l_project = "Project";
 $l_projects = "Projects";

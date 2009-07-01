@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_calendar = "Calendar";
 $l_attendees = "Attendees";
 $l_others_attendees = "Others attendees";
 $l_add_displayed_users = "Add displayed users";
