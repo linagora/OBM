@@ -634,7 +634,7 @@ function html_deal_links($deal_q) {
   global $l_new, $l_parentdeal, $l_affect_deal, $l_module_contract;
   global $l_module_project, $l_module_invoice;
   global $l_module_document,$ico_document, $l_deal;
-  global $l_document_add;
+  global $l_document_add, $perm;
   global $path, $cgp_show;
 
   $id = $deal_q->f('deal_id');
