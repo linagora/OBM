@@ -13,6 +13,6 @@ return array(
   'Exploitation report : %name%' => 'Rapport d\'exploitation : %name%',
   '%displayname% validation confirmation' => 'Confirmation de la validation de l\'utilisateur %displayname%',
   'Resource participation updated on OBM: %title%' => 'La réservation d\'une resource à été statuée dans OBM : %title%',
-  'Participation updated on OBM: %title%' => 'Mise à jour de participation dans OBM : %title%'
-
+  'Participation updated on OBM: %title%' => 'Mise à jour de participation dans OBM : %title%',
+  'User %displayname% is to be validated' => 'L\'utilisateur %displayname doit être validé'
 );

@@ -2411,7 +2411,7 @@ function run_query_batch_processing_update($params, $users_id) {
       $set[] = "userobm_nomade_perms=0";
       $set[] = "userobm_nomade_enable=0";
       $set[] = "userobm_nomade_local_copy=0";
-      $set[] = "userobm_mail_server_id IS NULL";
+      $set[] = "userobm_mail_server_id=NULL";
     } else {
       $queries[] = "UPDATE UserObm SET userobm_mail_server_id = $params[mail_server_id] WHERE userobm_mail_perms = 1 AND userobm_mail_server_id IS NULL";
     }

@@ -21,10 +21,12 @@
 function run_query_admin_count_passive_sess($delay) {
   global $cdg_sql;
 
+  $multidomain = sql_multidomain('UserObm');
   $time_pass = date("Y-m-d H:i:s",time() - $delay);
   $query = "select count(*) as num
     from ActiveUserObm
-    where ActiveUserObm.activeuserobm_timeupdate <= '$time_pass'";
+    INNER JOIN UserObm ON activeuserobm_userobm_id = userobm_id
+    where ActiveUserObm.activeuserobm_timeupdate <= '$time_pass' $multidomain";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -41,7 +43,8 @@ function run_query_admin_count_passive_sess($delay) {
 function get_admin_usersession_number() {
   global $cdg_sql;
 
-  $query = "select count(*) as num from ActiveUserObm";
+  $multidomain = sql_multidomain('UserObm');
+  $query = "select count(*) as num from ActiveUserObm INNER JOIN UserObm ON activeuserobm_userobm_id = userobm_id WHERE 1=1 $multidomain";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -70,6 +73,7 @@ function run_query_admin_active_user($delay) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
+  $multidomain = sql_multidomain('UserObm');
 
   $timeupdate = sql_date_format($db_type, "activeuserobm_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "activeuserobm_timecreate", "timecreate");
@@ -81,7 +85,7 @@ function run_query_admin_active_user($delay) {
       $timeupdate
     from UserObm, ActiveUserObm
     where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
-      $where_date";
+      $where_date $multidomain";
   display_debug_msg($query,$cdg_sql);
   $obm_q->query($query);
   return $obm_q;
@@ -98,12 +102,13 @@ function run_query_admin_active_user($delay) {
 function run_query_admin_passive_user($delay) {
   global $cdg_sql;
 
+  $multidomain = sql_multidomain('UserObm');
   $date_limit = date("Y-m-d H:i:s",time() - $delay);
   $query = "select UserObm.userobm_login,
                    ActiveUserObm.*
             from UserObm, ActiveUserObm
             where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
-              and ActiveUserObm.activeuserobm_timeupdate < '$date_limit'";
+              and ActiveUserObm.activeuserobm_timeupdate < '$date_limit' $multidomain";
   display_debug_msg($query,$cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);

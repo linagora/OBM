@@ -29,6 +29,8 @@ $l_group = "Group";
 $l_delegation_target = "Delegation target";
 $l_photo = "Photo";
 $l_delete_userobmphoto = "Delete user's photo";
+$l_delegation = 'Delegation';
+$l_vacation = 'Vacation';
 
 $l_hidden = 'Hidden mailbox';
 $l_perms = "Allowed";

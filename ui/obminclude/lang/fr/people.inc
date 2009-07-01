@@ -29,6 +29,8 @@ $l_group = "Groupe";
 $l_delegation_target = "Administration déléguée";
 $l_photo = "Photo";
 $l_delete_userobmphoto = "Supprimer la photo de l'utilisateur";
+$l_delegation = 'Délégation';
+$l_vacation = 'Absent';
 
 $l_perms = "Autorisé";
 $l_forbidden = "Interdit";

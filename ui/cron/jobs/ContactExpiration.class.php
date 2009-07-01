@@ -35,7 +35,7 @@ class ContactExpiration extends CronJob {
     if (self::EXPIRATION_TIME == 0) return false;
     
     $hours = date('G');
-    return ($hours == 6) || 1 == 1;
+    return ($hours == 6);
   }
 
   function execute($date) {

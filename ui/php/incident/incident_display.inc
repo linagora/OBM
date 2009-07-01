@@ -499,13 +499,13 @@ function html_incident_consult($inc_q) {
 function html_incident_links($inc_q) {
   global  $ico_document, $ico_add;
   global $l_new, $l_incident, $l_module_document, $l_document_add;
-  global $path, $cgp_show;
+  global $path, $cgp_show, $perm;
 
   $id = $inc_q->f("incident_id");
   $entity = "incident";
 
   // Document
-  if ($cgp_show["module"]["document"]) {
+  if ($perm->check_module_rights("document")) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;entity_id=$id&amp;entity=$entity");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;entity_id=$id&amp;entity=$entity");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/incident/incident_index.php")."&amp;ext_id=$id&amp;ext_target=$l_incident";

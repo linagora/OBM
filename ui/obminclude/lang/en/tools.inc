@@ -24,6 +24,7 @@ $l_upd_ok = "System configuration is applied";
 $l_upd_error = "System configuration failed !";
 $l_upd_cancel_ok = "Cancelling updates";
 $l_upd_cancel_error = "Cancelling system updates failed !";
+$l_progress = 'System update progress';
 
 $l_created = "Creates";
 $l_updated = "Updates";

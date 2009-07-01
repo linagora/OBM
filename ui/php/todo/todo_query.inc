@@ -299,10 +299,9 @@ function run_query_todo_update($todo) {
   }
   $description = $todo['description'];
   $percent = $todo['percent'];
-  if ($percent == '') {
+  if (!$percent) {
     $percent = '0';
   }
-
   $multidomain = sql_multidomain('event');
 		
   $query = "UPDATE Event SET
@@ -362,11 +361,9 @@ function run_query_todo_update($todo) {
   }
   
   // XXXXX Update the existing users (if percent has changed)
-  if($percent != 0) {
-    $query = 'UPDATE EventLink SET eventlink_percent = '.$percent.' WHERE eventlink_event_id = '.$todo_id;
-    display_debug_msg($query, $cdg_sql, 'run_query_todo_update_percent_update()');
-    $retour = $obm_q->query($query);  
-  }
+  $query = 'UPDATE EventLink SET eventlink_percent = '.$percent.' WHERE eventlink_event_id = '.$todo_id;
+  display_debug_msg($query, $cdg_sql, 'run_query_todo_update_percent_update()');
+  $retour = $obm_q->query($query);  
   return $retour;
 }
 

@@ -673,7 +673,7 @@ $php_regexp_number = "/^[-]?[0-9]*$/"; // only numbers
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
 $php_regexp_amount = "/^[0-9]+(\.[0-9][0-9]?)?$/";
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
-$php_regexp_percent = "/^[1]?[0-9]?[0-9]$/"; // 0-100
+$php_regexp_percent = "/^100$|^(\d{0,2})$/"; // 0-100
 $php_regexp_backup = "/^obmdb-[0-9]{8}:[0-9]{6}-[0-9]{1,2}.[0-9]{1,2}(.[0-9]{1,2})?.dump$/";
 
 $php_regexp_password = "/^[-\$\\\&~#{([|_`^@);\]+=}%!:\/\.,?<>\"\w0-9]{4,12}$/";
