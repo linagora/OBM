@@ -1,0 +1,20 @@
+#scopeProgressBar {
+  background-color: #CACAFA; 
+  line-height: 1.8em;
+}
+
+#scopeProgressPercent {
+  position:absolute;
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-top : -1.3em;
+
+}
+
+#scopeProgressContainer {
+  width:100%; 
+  border:1px solid #9F9F9F; 
+  background-color:#DFDFDF;
+  margin: auto;
+  text-align: center;
+}
