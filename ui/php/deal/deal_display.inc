@@ -697,7 +697,6 @@ function html_deal_links($deal_q) {
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id");
     $url_contract_total = url_prepare("$path/contract/contract_index.php?action=search&amp;deal_id=$id&amp;cba_archive=1");
     $dis_contract = "
-  <div id=\"dealContract\" class=\"portlet\">
     <li><a href=\"$url_contract\"><img src=\"$ico_contract\" alt=\"\" /></a>
         $l_module_contract (
         <a href=\"$url_contract\">$contract_active</a> /
@@ -711,6 +710,7 @@ function html_deal_links($deal_q) {
         <a href=\"$url_contract_new\">$l_new</a></li>";
     }
     $block_contract = "
+  <div id=\"dealContract\" class=\"portlet\">
      <h1> $l_module_contract</h1>
      <ul>
        $dis_contract
@@ -724,7 +724,6 @@ function html_deal_links($deal_q) {
     $nb_inv_tot = get_global_linked_invoice_nb($id, 'deal', 1);
     $nb_inv = get_global_linked_invoice_nb($id, 'deal');
     $dis_invoice = "
-  <div id=\"dealInvoice\" class=\"portlet\">
     <li><a href=\"$url_inv\"><img src=\"$ico_invoice\" alt=\"\" /></a>
         $l_module_invoice (<a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a>)</li>";
@@ -737,6 +736,7 @@ function html_deal_links($deal_q) {
         <a href=\"$url_inv_new\">$l_new</a></li>";
     }
     $block_invoice = "
+  <div id=\"dealInvoice\" class=\"portlet\">
   <h1> $l_module_invoice</h1>
   <ul>
     $dis_invoice
