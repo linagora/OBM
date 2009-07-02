@@ -89,8 +89,26 @@ function run_query_people_search($people) {
 
   // If an email indication has been specified, get it
   if (trim($email) != '') {
-    // UserObm
-    $where_userobm .= " AND userobm_email #LIKE '%$email%'";
+    list($left,$right) = split('@',$email);
+    if ($right === null){
+      $left = $left.'%';
+      $right = $left;
+      $condition = 'OR';
+    } else {
+      $condition = 'AND';
+    }
+    if (!$left) {
+      $left = '%';
+    }
+    $right = $right.'%';
+    $where_userobm .= " AND
+      userobm_email != '' AND (
+          ( userobm_email #LIKE '$left@$right' OR userobm_email #LIKE '$left@$right\r\n%' OR userobm_email #LIKE '%\r\n$left@$right\r\n%' OR userobm_email #LIKE '%\r\n$left@$right' )
+          OR (
+          ( userobm_email #LIKE '$left' OR userobm_email #LIKE '$left\r\n%' OR userobm_email #LIKE '%\r\n$left\r\n%' OR userobm_email #LIKE '%\r\n$left' )
+          $condition
+          ( domain_name #LIKE '$right' OR domain_alias #LIKE '$right' OR domain_alias #LIKE '$right\r\n%' OR domain_alias #LIKE '%\r\n$right\r\n%' OR domain_alias #LIKE '%\r\n$right' ))
+        ) ";
     // Contact
     $where_contact .= " AND (contactentity_entity_id IN (SELECT email_entity_id FROM Email WHERE email_address #LIKE '$email%'))";
   }
@@ -198,7 +216,7 @@ function run_query_people_search($people) {
     userobm_delegation,
     'user' as type
   FROM UserObm 
-    LEFT JOIN Domain ON userobm_domain_id = domain_id
+    INNER JOIN Domain ON userobm_domain_id = domain_id
     $join_userdata_userobm";
 
   $select_contact = "select distinct contact_lastname as userobm_lastname,
@@ -244,7 +262,7 @@ function run_query_people_search($people) {
   $query = "$query_userobm $query_contact $orderq $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_userdata_userobm $whereq_userobm");
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm INNER JOIN Domain ON domain_id = userobm_domain_id $join_userdata_userobm $whereq_userobm");
     if ($show_contact) {
       $count += get_query_count("SELECT count(distinct contact_id) FROM Contact $join_userdata_contact $join_contact $whereq_contact");
     }
