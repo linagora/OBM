@@ -165,6 +165,7 @@ function make_profiles() {
       $data['section'] = array('default' => 0, 'com' => 1, 'prod' => 1, 'user' => 1, 'my' => 1);
     }
     foreach ($data['section'] as $section_name => $section) {
+      $section = ($section == 1)?'TRUE':'FALSE';
       echo "**** Right on section $section_name : $section \n";
       $query = "INSERT INTO ProfileSection (
             profilesection_section_name,

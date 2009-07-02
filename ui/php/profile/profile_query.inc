@@ -140,6 +140,7 @@ function run_query_profile_replace_dataset($params) {
   $obm_q->query($query);
   if(is_array($params['section'])) {
     foreach($params['section'] as $section => $show) {
+      $show = ($show == 1)? 'TRUE':'FALSE';
       $query = "INSERT INTO ProfileSection 
         (profilesection_domain_id, profilesection_profile_id, profilesection_section_name, profilesection_show)
         VALUES 
