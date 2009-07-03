@@ -53,6 +53,7 @@ import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventRecurrence;
+import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
@@ -63,7 +64,7 @@ import org.obm.sync.items.EventChanges;
 import org.obm.sync.locators.CalendarLocator;
 
 @SuppressWarnings("unused")
-public abstract class AbstractObmSyncProvider {
+public abstract class AbstractObmSyncProvider implements ICalendarProvider{
 
 	private static final Log logger = LogFactory
 			.getLog(AbstractObmSyncProvider.class);
@@ -90,10 +91,10 @@ public abstract class AbstractObmSyncProvider {
 		ObmSyncConfIni obmCalendarParameters = new ObmSyncConfIni();
 		String url = obmCalendarParameters
 				.getPropertyValue("obmsync.server.url");
-		this.client = initObmSyncProvider(url);
+		this.client = getObmSyncClient(url);
 	}
 
-	protected abstract AbstractEventSyncClient initObmSyncProvider(String url);
+	protected abstract AbstractEventSyncClient getObmSyncClient(String url);
 
 	protected AbstractObmSyncProvider(AbstractEventSyncClient client) {
 		ObmSyncConfIni obmCalendarParameters = new ObmSyncConfIni();
@@ -168,6 +169,8 @@ public abstract class AbstractObmSyncProvider {
 							|| "".equals(exception.getExtId())) {
 						exception.setExtId(CalDavUtils.generateExtId());
 					}
+					
+					exception.setAttendees(eventOrigin.getAttendees());
 				}
 			}
 			fixPrioriryForObm(event);
@@ -268,10 +271,7 @@ public abstract class AbstractObmSyncProvider {
 		client.modifyEvent(token, ci.getUid(), event, true);
 	}
 
-	public EventChanges getSync(AccessToken token, String userId, Date lastSync)
-			throws AuthFault, ServerFault {
-		return client.getSync(token, userId, lastSync);
-	}
+	
 
 	protected Attendee getAttendee(String email) {
 		Attendee att = new Attendee();
@@ -299,5 +299,19 @@ public abstract class AbstractObmSyncProvider {
 		} else if (event.getPriority() == 3) {
 			event.setPriority(1);
 		}
+	}
+
+	public List<EventTimeUpdate> getAllEventTimeUpdate(AccessToken token,
+			String calendar, EventType et) throws ServerFault, AuthFault {
+		
+		List<EventTimeUpdate> events = client.getAllEventTimeUpdate(token, calendar, et);
+
+		for (Iterator<EventTimeUpdate> it = events.iterator(); it.hasNext();) {
+			EventTimeUpdate ev = it.next();
+			if (ev.getParentId() != 0) {
+				it.remove();
+			}
+		}
+		return events;
 	}
 }

@@ -7,8 +7,9 @@ import java.util.Map.Entry;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
+import org.obm.caldav.server.propertyHandler.impl.GetETag;
 import org.obm.caldav.utils.DOMUtils;
-import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -48,35 +49,36 @@ public class CalendarQueryResultBuilder extends ResultBuilder {
 	// </D:multistatus>
 
 	public Document build(DavRequest req, IProxy proxy,
-			Set<CalendarQueryPropertyHandler> properties, Map<String, Event> listEvents) {
+			Set<String> properties,
+			Map<String, EventTimeUpdate> listEvents) {
 		Document doc = null;
 		try {
 			doc = createDocument();
 			Element root = doc.getDocumentElement();
-			if (listEvents.size() > 0) {
-				for (Entry<String, Event> entry : listEvents.entrySet()) {
-					Event event = entry.getValue();
-					if (!".ics".equals(entry.getKey())) {
-						Element response = DOMUtils.createElement(root,
-								"D:response");
-						DOMUtils.createElementAndText(response, "D:href", entry.getKey());
-						Element pStat = DOMUtils.createElement(response,
-								"D:propstat");
-						Element p = DOMUtils.createElement(pStat, "D:prop");
-						for (CalendarQueryPropertyHandler prop : properties) {
-							prop.appendCalendarQueryPropertyValue(p, proxy,
-									event);
+			for (Entry<String, EventTimeUpdate> entry : listEvents.entrySet()) {
+				EventTimeUpdate event = entry.getValue();
+				if (!".ics".equals(entry.getKey())) {
+					Element response = DOMUtils.createElement(root,
+							"D:response");
+					DOMUtils.createElementAndText(response, "D:href", entry
+							.getKey());
+					Element pStat = DOMUtils.createElement(response,
+							"D:propstat");
+					Element p = DOMUtils.createElement(pStat, "D:prop");
+					for (String prop : properties) {
+						if("D:getetag".equals(prop)){
+							GetETag getETag = new GetETag();
+							getETag.appendCalendarQueryPropertyValue(p, proxy, event);
 						}
-						Element status = DOMUtils.createElement(pStat,
-								"D:status");
-						status.setTextContent("HTTP/1.1 200 OK");
-					} else {
-						logger.error("extid of the event " + event.getUid()
-								+ " is null");
+						
+						//prop.appendCalendarQueryPropertyValue(p, proxy, event);
 					}
+					Element status = DOMUtils.createElement(pStat, "D:status");
+					status.setTextContent("HTTP/1.1 200 OK");
+				} else {
+					logger.error("extid of the event " + event.getUid()
+							+ " is null");
 				}
-			} else {
-
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

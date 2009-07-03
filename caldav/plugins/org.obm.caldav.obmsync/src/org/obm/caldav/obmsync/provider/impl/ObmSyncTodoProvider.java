@@ -53,28 +53,29 @@ import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.obm.sync.client.calendar.CalendarClient;
+import org.obm.sync.client.calendar.TodoClient;
 import org.obm.sync.items.EventChanges;
 import org.obm.sync.locators.CalendarLocator;
 
 @SuppressWarnings("unused")
-public class ObmSyncEventProvider extends AbstractObmSyncProvider  {
+public class ObmSyncTodoProvider extends AbstractObmSyncProvider  {
 
-	private static AbstractObmSyncProvider instance;
+	private static ICalendarProvider instance;
 	
 	public static ICalendarProvider getInstance(){
 		if(instance == null){
-			instance = new ObmSyncEventProvider();
+			instance = new ObmSyncTodoProvider();
 		}
 		return instance;
 	}
 	
-	protected ObmSyncEventProvider() {
+	protected ObmSyncTodoProvider() {
 		super(); 
 	}
 	
 	@Override
 	protected AbstractEventSyncClient getObmSyncClient(String url) {
-		return new CalendarClient(url);
+		return new TodoClient(url);
 	}
 	
 	@Override
@@ -86,12 +87,12 @@ public class ObmSyncEventProvider extends AbstractObmSyncProvider  {
 	@Override
 	public List<Event> getAll(AccessToken token, String calendar)
 			throws ServerFault, AuthFault {
-		return super.getAll(token, calendar, EventType.VEVENT);
+		return super.getAll(token, calendar, EventType.VTODO);
 	}
-	
+
 	@Override
 	public List<EventTimeUpdate> getAllEventTimeUpdate(AccessToken token,
 			String calendar) throws ServerFault, AuthFault {
-		return super.getAllEventTimeUpdate(token, calendar, EventType.VEVENT);
+		return super.getAllEventTimeUpdate(token, calendar, EventType.VTODO);
 	}
 }

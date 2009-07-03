@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.exception.ResultBuilderException;
 import org.obm.caldav.server.impl.DavRequest;
@@ -44,7 +45,7 @@ public abstract class DavMethodHandler {
 	
 	public Set<String> getPropList(Document doc){
 		Element root = doc.getDocumentElement();
-		Element prop = DOMUtils.getUniqueElement(root, "D:prop");
+		Element prop = DOMUtils.getUniqueElement(root, "prop", NameSpaceConstant.DAV_NAMESPACE);
 		NodeList propsToLoad = prop.getChildNodes();
 		Set<String> toLoad = new HashSet<String>();
 
@@ -56,7 +57,6 @@ public abstract class DavMethodHandler {
 				logger.info(name);
 			}
 		}
-		
 		return toLoad;
 	}
 

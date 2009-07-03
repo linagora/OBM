@@ -10,7 +10,6 @@ import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
-import org.obm.sync.items.EventChanges;
 import org.w3c.dom.Element;
 
 /**
@@ -66,8 +65,8 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 			
 		} else {
 			try {
-				EventChanges ec = proxy.getCalendarService().getSync(lastChange);
-				if(ec.getUpdated().length != 0 || ec.getRemoved().length != 0){
+				boolean change = proxy.getCalendarService().getSync(lastChange);
+				if(change) {
 					lastChange = new Date();
 				} else {
 					logger.info("Calendar is already synchronized");

@@ -16,6 +16,7 @@
 
 package org.obm.caldav.server.reports;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.caldav.server.share.filter.Filter;
 import org.obm.caldav.utils.DOMUtils;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Document;
 
 /**
@@ -44,11 +46,9 @@ import org.w3c.dom.Document;
  */
 public class CalendarQuery extends ReportProvider {
 
-	private Map<String, CalendarQueryPropertyHandler> properties;
-
 	public CalendarQuery() {
-		properties = new HashMap<String, CalendarQueryPropertyHandler>();
-		properties.put("D:getetag", new GetETag());
+//		properties = new 
+//		properties.put("D:getetag", new GetETag());
 	}
 
 	// Request
@@ -72,7 +72,7 @@ public class CalendarQuery extends ReportProvider {
 		Filter filter = FilterParser.parse(req.getDocument());
 		CompFilter compFilter = filter.getCompFilter();
 
-		Set<CalendarQueryPropertyHandler> propertiesValues = new HashSet<CalendarQueryPropertyHandler>();
+		/*Set<CalendarQueryPropertyHandler> propertiesValues = new HashSet<CalendarQueryPropertyHandler>();
 
 		for (String s : requestPropList) {
 			CalendarQueryPropertyHandler dph = properties.get(s);
@@ -81,22 +81,24 @@ public class CalendarQuery extends ReportProvider {
 			} else {
 				logger.warn("the Property [" + s + "] is not implemented");
 			}
-		}
+		}*/
+		
+		
 		try {
 			Document ret = null;
-			Map<String, Event> events = new HashMap<String, Event>();
+			Map<String, EventTimeUpdate> events = new HashMap<String, EventTimeUpdate>();
 			CompFilter cf = compFilter.getCompFilters().get(0);
 			if (CompFilter.VEVENT.equalsIgnoreCase(cf.getName())) {
-				List<Event> retEvents = proxy.getCalendarService().getAllEvents();
-				for (Event event : retEvents) {
+				List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdateEvents();
+				for (EventTimeUpdate event : retEvents) {
 					String href = req.getHref()
 							+ proxy.getCalendarService().getICSName(event);
 					events.put(href, event);
 				}
 
 			} else if (CompFilter.VTODO.equalsIgnoreCase(cf.getName())) {
-				List<Event> retEvents = proxy.getCalendarService().getAllTodos();
-				for (Event event : retEvents) {
+				List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdateTodos();
+				for (EventTimeUpdate event : retEvents) {
 					String href = req.getHref()
 							+ proxy.getCalendarService().getICSName(event);
 					events.put(href, event);
@@ -106,7 +108,7 @@ public class CalendarQuery extends ReportProvider {
 						+ "] is not implemented");
 			}
 			ret = new CalendarQueryResultBuilder().build(req, proxy,
-					propertiesValues, events);
+					requestPropList, events);
 
 			DOMUtils.logDom(ret);
 

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.obm.caldav.server.exception.AuthorizationException;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.items.EventChanges;
 
 
@@ -35,18 +36,23 @@ public interface ICalendarService {
 	Event createEvent(Event event) throws Exception;
 	List<Event> updateOrCreateEvent(String ics, String extId) throws Exception;
 	
-	String getICSName(Event event) throws Exception;
+	String getICSName(Event event) ;
+	String getICSName(EventTimeUpdate etu) ;
 	
 	Event getEventFromExtId(String externalUrl) throws Exception;
 	
 	List<Event> getAllEvents() throws Exception;
+	List<EventTimeUpdate>getAllLastUpdateEvents() throws Exception;
+	
 	List<Event> getAllTodos()  throws Exception;
+	List<EventTimeUpdate> getAllLastUpdateTodos() throws Exception;
 	
 	Map<Event,String> getICSFromExtId(Set<String> listExtIdEvent) throws Exception;
 
 	void removeOrUpdateParticipationState(String extId) throws Exception,AuthorizationException ;
 	
-	EventChanges getSync(Date lastSync) throws Exception;
+	boolean getSync(Date lastSync) throws Exception;
+	
 	
 }
 

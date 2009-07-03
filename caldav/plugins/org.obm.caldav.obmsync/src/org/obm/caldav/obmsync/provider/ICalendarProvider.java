@@ -27,6 +27,7 @@ import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.items.EventChanges;
 
@@ -51,8 +52,11 @@ public interface ICalendarProvider {
 	Set<CalendarInfo> getListCalendars(AccessToken token) throws ServerFault,
 			AuthFault;
 
-	List<Event> getAll(AccessToken token, String calendar, EventType eventType)
+	List<Event> getAll(AccessToken token, String calendar)
 			throws ServerFault, AuthFault;
+	
+	List<EventTimeUpdate> getAllEventTimeUpdate(AccessToken token,
+			String calendar) throws ServerFault, AuthFault;
 
 	Map<Event, String> getICSEventsFromExtId(AccessToken token, String userId,
 			Set<String> listUidEvent) throws AuthFault, ServerFault;

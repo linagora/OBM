@@ -10,6 +10,7 @@ import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.utils.DOMUtils;
 import org.obm.sync.calendar.Event;
+import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Element;
 
 /**
@@ -34,23 +35,22 @@ public class GetETag implements CalendarQueryPropertyHandler, CalendarMultiGetPr
 	protected Log logger = LogFactory.getLog(getClass());
 	
 	public void appendCalendarQueryPropertyValue(Element prop, IProxy proxy,
-			Event event) {
+			EventTimeUpdate event) {
 		Element val = DOMUtils.createElement(prop, "D:getetag");
-		appendValue(val, event);
+		appendValue(val, event.getExtId() , event.getTimeUpdate());
 	}
 
 	@Override
 	public void appendCalendarMultiGetPropertyValue(Element prop, IProxy proxy,
 			Event event, String eventIcs) throws AppendPropertyException{
 		Element val = DOMUtils.createElement(prop, "D:getetag");
-		appendValue(val, event);
+		appendValue(val, event.getExtId(), event.getTimeUpdate() );
 	}
 	
-	private void appendValue(Element e, Event event){
-		Date dateupdate = new Date();
-		if(event.getTimeUpdate() != null){
-			dateupdate = event.getTimeUpdate();
+	private void appendValue(Element e, String extId, Date dateupdate){
+		if(dateupdate == null){
+			dateupdate = new Date();
 		}
-		e.setTextContent("\"" + event.getExtId() + "-" + dateupdate.getTime() + "\"");
+		e.setTextContent("\"" + extId + "-" + dateupdate.getTime() + "\"");
 	}
 }

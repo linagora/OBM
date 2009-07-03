@@ -100,7 +100,7 @@ public class WebdavServlet extends HttpServlet {
 								response);
 			} catch (Exception e) {
 				// /rfc4791 1.3 Method Preconditions and Postconditions
-				response.sendError(StatusCodeConstant.SC_INTERNAL_SERVER_ERROR);
+				response.setStatus(StatusCodeConstant.SC_INTERNAL_SERVER_ERROR);
 				logger.error(e.getMessage(), e);
 			} finally {
 				if (proxy != null) {

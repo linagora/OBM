@@ -37,7 +37,7 @@ public class ReportHandler extends DavMethodHandler {
 	
 	public ReportHandler() {
 		providers = new HashMap<String, ReportProvider>();
-		providers.put("D:principal-property-search",
+		providers.put("principal-property-search",
 				new PrincipalPropertySearch());
 		providers.put("calendar-query", new CalendarQuery());
 		providers.put("calendar-multiget", new CalendarMultiGet());
@@ -47,8 +47,9 @@ public class ReportHandler extends DavMethodHandler {
 	public void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp) {
 		Document d = req.getDocument();
 		Element r = d.getDocumentElement();
-		String reportKind = r.getNodeName();
-
+		
+		String reportKind = r.getLocalName();
+		
 		ReportProvider rp = providers.get(reportKind);
 		if (rp != null) {
 			rp.process(token, proxy, req, resp, getPropList(d));

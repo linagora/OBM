@@ -229,6 +229,19 @@ public final class DOMUtils {
 		el.appendChild(txt);
 		return el;
 	}
+	
+	public static Element createElementAndText(Element parent,
+			String elementName, String text, String nameSpaceURI) {
+		if (text == null) {
+			throw new NullPointerException("null text");
+		}
+		Element el = parent.getOwnerDocument().createElementNS(nameSpaceURI, elementName);
+		parent.appendChild(el);
+		Text txt = el.getOwnerDocument().createTextNode(
+				stripNonValidXMLCharacters(text));
+		el.appendChild(txt);
+		return el;
+	}
 
 	public static Element createElement(Element parent, String elementName) {
 		Element el = parent.getOwnerDocument().createElement(elementName);
@@ -237,7 +250,7 @@ public final class DOMUtils {
 	}
 	
 
-	public static Element createElementNS(Element parent, String nameSpaceURI, String elementName) {
+	public static Element createElement(Element parent, String nameSpaceURI, String elementName) {
 		Element el = parent.getOwnerDocument().createElementNS(nameSpaceURI,elementName);
 		parent.appendChild(el);
 		return el;
