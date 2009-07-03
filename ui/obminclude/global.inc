@@ -517,7 +517,15 @@ if (! $cgp_use['property']['delegation']) {
   $cgp_hide['host']['host_delegation'] = true;
 }
 
-
+// Public right on contact is not possible
+$cgp_default_right['contact'] = array (
+      'public' => array(
+        'access' => -1,
+        'read' => -1,
+        'write' => -1,
+        'admin' => 0
+      )
+    );
 //---------------------------------------------------------------------------//
 // OBM authentication Management : 
 // Just change $cas_version according to your phpCAS lib
