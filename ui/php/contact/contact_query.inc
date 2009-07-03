@@ -81,6 +81,8 @@ function run_query_contact_search($contact) {
       $where .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
     }
     $where.= ")";
+  } else {
+    $where = " 1=1 ";
   }
 
   // If company module used (external from Contact)

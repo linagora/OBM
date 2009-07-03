@@ -122,7 +122,7 @@ CREATE TABLE ProfileSection (
 	profilesection_domain_id	integer NOT NULL,
 	profilesection_profile_id	integer default NULL,
 	profilesection_section_name	varchar(64) NOT NULL default '',
-	profilesection_show	        boolean default NULL,
+	profilesection_show	        smallint default NULL,
 	PRIMARY KEY (profilesection_id)
 );
 

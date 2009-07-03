@@ -20,3 +20,6 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id, display_entity, display_fieldname, display_fieldorder, display_display) values (null, 'people', 'userobm_delegation', 11, 1);
 INSERT INTO DisplayPref (display_user_id, display_entity, display_fieldname, display_fieldorder, display_display) values (null, 'people', 'userobm_vacation', 12, 1);
 
+
+-- update userobm_delegation target according to the new delegation management
+UPDATE UserObm SET userobm_delegation_target = userobm_delegation WHERE userobm_delegation_target = '';

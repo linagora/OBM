@@ -53,7 +53,20 @@ function run_query_group_search($group) {
     $where .= " AND group_delegation $like '$delegation%'";
   }
   if ($email != '') {
-    $where .= " AND group_email $like '%$email%'";
+    list($left,$right) = split('@',$email);
+    if ($right === null){
+      $left = $left.'%';
+      $right = $left;
+      $condition = 'OR';
+    } else {
+      $condition = 'AND';
+    }
+    if (!$left) {
+      $left = '%';
+    }
+    $right = $right.'%';
+    $where .= " AND
+      group_email != '' AND (( group_email #LIKE '$left') $condition ( domain_name #LIKE '$right' OR domain_alias #LIKE '$right' OR domain_alias #LIKE '$right\r\n%' OR domain_alias #LIKE '%\r\n$right\r\n%' OR domain_alias #LIKE '%\r\n$right' )) ";    
   }
   if ($privacy == $c_public) {
     $where .= ' AND group_privacy = 0';
@@ -131,13 +144,13 @@ function run_query_group_search($group) {
   $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(*) FROM UGroup $join_userdata $join_user $whereq");
+    $count = get_query_count("SELECT count(*) FROM UGroup INNER JOIN Domain ON domain_id = group_domain_id $join_userdata $join_user $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
   if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg($query, $cdg_sql, 'run_query_group_search()');
-    $obm_q->query($query);
+    $obm_q->xquery($query);
   }
 
   return $obm_q;

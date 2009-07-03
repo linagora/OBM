@@ -794,7 +794,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    */
   private function sendNewResourceMail($old, $new, $recipients) {
     foreach ($recipients as $resource) {
-      $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resourceId));
+      $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resource->id));
       if (!in_array($GLOBALS['obm']['uid'], $resourceOwners) && count($resourceOwners) > 0) {
         $this->mailer->sendResourceReservation($new, $resourceOwners);
       }
@@ -812,7 +812,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    */
   private function sendOldResourceMail($old, $new, $recipients) {
     foreach ($recipients as $resource) {
-      $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resourceId));
+      $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resource->id));
       if (!in_array($GLOBALS['obm']['uid'], $resourceOwners) && count($resourceOwners) > 0) {
         $this->mailer->sendResourceCancel($old, $resourceOwners);
       }
@@ -831,7 +831,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
   private function sendCurrentResourceMail($old, $new, $recipients) {
     if ($this->hasEventFullyChanged($old, $new)) {
       foreach ($recipients as $resource) {
-        $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resourceId));
+        $resourceOwners = array_keys(OBM_Acl::getEntityWriters('resource', $resource->id));
         if (!in_array($GLOBALS['obm']['uid'], $resourceOwners) && count($resourceOwners) > 0) {
           $this->mailer->sendResourceUpdate($new, $old, $resourceOwners);
         }

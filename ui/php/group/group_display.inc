@@ -321,9 +321,10 @@ function html_group_search_group($obm_q, $prefs, $group) {
   $name = urlencode(stripslashes($group['name']));
   $delegation = urlencode(stripslashes($group['delegation']));
   $user = urlencode(stripslashes($group['user']));
+  $email = urlencode(stripslashes($group['email']));
   $privacy = $group['privacy'];
 
-  $url = url_prepare("group_index.php?action=search&amp;tf_name=$name&amp;tf_user=$user&amp;tf_delegation=$delegation&amp;privacy=$privacy$url_ext");
+  $url = url_prepare("group_index.php?action=search&amp;tf_name=$name&amp;tf_email=$email&amp;tf_user=$user&amp;tf_delegation=$delegation&amp;privacy=$privacy$url_ext");
   
   $dis_group = new OBM_DISPLAY('DATA', $prefs, 'group');
   if ($popup) {

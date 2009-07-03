@@ -18,6 +18,10 @@ ALTER TABLE ProfileSection ALTER COLUMN profilesection_show DROP DEFAULT;
 ALTER TABLE ProfileSection ALTER COLUMN profilesection_show TYPE BOOLEAN USING CASE profilesection_show WHEN 1 THEN TRUE ELSE FALSE END;
 ALTER TABLE ProfileSection ALTER COLUMN profilesection_show SET DEFAULT NULL;
 
+
+-- update userobm_delegation target according to the new delegation management
+UPDATE UserObm SET userobm_delegation_target = userobm_delegation WHERE userobm_delegation_target = '';
+
 -- contact query optimization
 --
 -- Name: contact_privacy_key; Type: INDEX; Schema: public; Owner: -; Tablespace:
