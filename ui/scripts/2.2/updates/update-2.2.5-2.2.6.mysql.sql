@@ -12,6 +12,10 @@ CREATE INDEX contact_privacy_key ON Contact (contact_privacy);
 -- contact collected data type fix
 ALTER TABLE Contact MODIFY COLUMN contact_collected BOOLEAN DEFAULT FALSE;
 
+-- Scope progress
+DELETE FROM ObmInfo WHERE obminfo_name = 'scope-progress';
+INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('scope-progress', '0');
+
 -- module 'resource'
 
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (NULL,'resource', 'resource_delegation', 5, 1);
