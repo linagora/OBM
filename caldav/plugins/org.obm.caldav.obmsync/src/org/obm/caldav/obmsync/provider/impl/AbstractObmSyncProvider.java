@@ -143,10 +143,8 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider{
 			event.setExtId(extId);
 			event.addAttendee(getAttendee(login));
 			fixPrioriryForObm(event);
-
 			String uid = client.createEvent(token, login, event);
 			event.setUid(uid);
-
 		}
 
 		return events;
@@ -214,7 +212,6 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider{
 		Map<Event, String> listICS = new HashMap<Event, String>();
 
 		for (String id : listUidEvent) {
-			try {
 				Event event = null;
 				if (id != null && !"".equals(id)) {
 					event = client.getEventFromExtId(token, calendar, id);
@@ -229,9 +226,6 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider{
 					event.setTimeUpdate(new Date());
 					listICS.put(event, "");
 				}
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
 		}
 		return listICS;
 	}
