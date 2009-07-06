@@ -1,0 +1,97 @@
+# Utility functions to run equinox based applications
+# without the X server dependencies of eclipse generated launchers
+# 
+# @author: Thomas Cataldo <thomas.cataldo@aliasource.fr>
+
+if [ -f '/etc/minig/mem_conf.ini' ] ; then
+  source /etc/minig/mem_conf.ini
+else
+  MEM=1024
+fi
+
+
+JVM_OPTS="-server -Xms${MEM}m -Xmx${MEM}m -Xmn128m"
+
+epackage=org.eclipse.equinox.launcher
+equinox_main_class=${epackage}.Main
+
+function aliasource_equinox_run_server_appid() {
+    test $# -ge 2 || {
+	aliasource_equinox_usage
+	exit 1
+    }
+    test -d $1 || {
+	aliasource_equinox_usage
+	exit 1
+    }
+    app_install_dir="$1"
+    appid_to_run="$2"
+    shift 2
+
+    aliasource_equinox_get_jar ${app_install_dir}
+    
+    test -f ${equinox_jar} || {
+	echo "equinox jar not found (${equinox_jar})."
+	exit 1
+    }
+
+    exec $JAVA_HOME/bin/java ${JVM_OPTS} -Dosgi.noShutdown=true -cp ${equinox_jar} ${equinox_main_class} \
+    -application $appid_to_run "$@"
+}
+
+function aliasource_equinox_profile_server_appid() {
+    test $# -ge 2 || {
+	aliasource_equinox_usage
+	exit 1
+    }
+    test -d $1 || {
+	aliasource_equinox_usage
+	exit 1
+    }
+    app_install_dir="$1"
+    appid_to_run="$2"
+    shift 2
+
+    aliasource_equinox_get_jar ${app_install_dir}
+    
+    test -f ${equinox_jar} || {
+	echo "equinox jar not found (${equinox_jar})."
+	exit 1
+    }
+    export LD_LIBRARY_PATH=/home/tom/java/yjp/bin/linux-x86-64
+    exec $JAVA_HOME/bin/java -agentlib:yjpagent ${JVM_OPTS} -Dosgi.noShutdown=true -cp ${equinox_jar} ${equinox_main_class} \
+    -application $appid_to_run "$@"
+}
+
+function aliasource_equinox_run_appid() {
+    test $# -ge 2 || {
+	aliasource_equinox_usage
+	exit 1
+    }
+    test -d $1 || {
+	aliasource_equinox_usage
+	exit 1
+    }
+    app_install_dir="$1"
+    appid_to_run="$2"
+    shift 2
+
+    aliasource_equinox_get_jar ${app_install_dir}
+    
+    test -f ${equinox_jar} || {
+	echo "equinox jar not found (${equinox_jar})."
+	exit 1
+    }
+
+    exec $JAVA_HOME/bin/java -cp ${equinox_jar} ${equinox_main_class} \
+    -application $appid_to_run "$@"
+}
+
+function aliasource_equinox_get_jar() {
+    equinox_jar=`find ${1}/plugins -name "${epackage}_*.jar"`
+    return 0
+}
+
+function aliasource_equinox_usage() {
+	echo "usage: <platform base dir> <equinox appid>"
+}
