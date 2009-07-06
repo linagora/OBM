@@ -33,7 +33,6 @@ public class DeleteHandler extends DavMethodHandler {
 		try {
 			String extId = CalDavUtils.getExtIdFromURL(req.getURI());
 
-			logger.info("new ext id "+extId);
 			proxy.getCalendarService().removeOrUpdateParticipationState(extId);
 			
 			resp.setStatus(HttpServletResponse.SC_OK);

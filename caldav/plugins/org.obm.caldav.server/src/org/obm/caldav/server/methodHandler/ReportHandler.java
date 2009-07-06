@@ -45,6 +45,7 @@ public class ReportHandler extends DavMethodHandler {
 
 	@Override
 	public void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp) {
+		logger.info("process(req, resp)");
 		Document d = req.getDocument();
 		Element r = d.getDocumentElement();
 		

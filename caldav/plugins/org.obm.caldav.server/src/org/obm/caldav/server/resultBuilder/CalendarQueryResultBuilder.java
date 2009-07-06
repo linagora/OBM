@@ -50,7 +50,7 @@ public class CalendarQueryResultBuilder extends ResultBuilder {
 
 	public Document build(DavRequest req, IProxy proxy,
 			Set<String> properties,
-			Map<String, EventTimeUpdate> listEvents) {
+			Map<String, EventTimeUpdate> listEvents, Set<CalendarQueryPropertyHandler> propertiesValues) {
 		Document doc = null;
 		try {
 			doc = createDocument();
@@ -65,13 +65,8 @@ public class CalendarQueryResultBuilder extends ResultBuilder {
 					Element pStat = DOMUtils.createElement(response,
 							"D:propstat");
 					Element p = DOMUtils.createElement(pStat, "D:prop");
-					for (String prop : properties) {
-						if("D:getetag".equals(prop)){
-							GetETag getETag = new GetETag();
-							getETag.appendCalendarQueryPropertyValue(p, proxy, event);
-						}
-						
-						//prop.appendCalendarQueryPropertyValue(p, proxy, event);
+					for (CalendarQueryPropertyHandler prop : propertiesValues) {
+						prop.appendCalendarQueryPropertyValue(p, proxy, event);
 					}
 					Element status = DOMUtils.createElement(pStat, "D:status");
 					status.setTextContent("HTTP/1.1 200 OK");

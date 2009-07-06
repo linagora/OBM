@@ -41,7 +41,7 @@ public interface ICalendarProvider {
 	CalendarInfo getMyCalendar(AccessToken token, String userId)
 			throws ServerFault, AuthFault;
 
-	Event getEventFromExtId(AccessToken token, String userId, String UID)
+	Event getEventFromExtId(AccessToken token, String userId, String extId)
 			throws AuthFault, ServerFault;
 
 	Event createEvent(AccessToken token, String userId, Event event)

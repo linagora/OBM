@@ -44,7 +44,7 @@ public class DavRequest {
 		while (headerNames.hasMoreElements()) {
 			String hn = (String) headerNames.nextElement();
 			String val = req.getHeader(hn);
-			logger.info(hn + ": " + val);
+			logger.debug(hn + ": " + val);
 		}
 
 		if (req.getHeader("Content-Type") != null
@@ -52,7 +52,9 @@ public class DavRequest {
 			try {
 				InputStream in = req.getInputStream();
 				document = DOMUtils.parse(in);
-				DOMUtils.logDom(document);
+				if(logger.isDebugEnabled()){
+					DOMUtils.logDom(document);
+				}
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}

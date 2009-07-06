@@ -11,7 +11,7 @@ public class StatusCodeConstant {
 		messages = new HashMap<Integer, String>();
 		messages.put(207, "Multi-Status");
 		
-		messages.put(403, "Internal Server Error");
+		messages.put(403, "Forbidden");
 		messages.put(404, "Not Found");
 		messages.put(424, "Method failure");
 

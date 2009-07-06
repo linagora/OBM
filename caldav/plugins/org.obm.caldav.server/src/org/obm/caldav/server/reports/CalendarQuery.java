@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.server.propertyHandler.impl.GetETag;
 import org.obm.caldav.server.resultBuilder.CalendarQueryResultBuilder;
@@ -46,9 +47,11 @@ import org.w3c.dom.Document;
  */
 public class CalendarQuery extends ReportProvider {
 
+	private Map<String, CalendarQueryPropertyHandler> properties;
+	
 	public CalendarQuery() {
-//		properties = new 
-//		properties.put("D:getetag", new GetETag());
+		properties = new HashMap<String, CalendarQueryPropertyHandler>();
+		properties.put("D:getetag", new GetETag());
 	}
 
 	// Request
@@ -63,7 +66,6 @@ public class CalendarQuery extends ReportProvider {
 	// </comp-filter>
 	// </filter>
 	// </calendar-query>
-
 	@Override
 	public void process(Token token, IProxy proxy, DavRequest req,
 			HttpServletResponse resp, Set<String> requestPropList) {
@@ -72,7 +74,7 @@ public class CalendarQuery extends ReportProvider {
 		Filter filter = FilterParser.parse(req.getDocument());
 		CompFilter compFilter = filter.getCompFilter();
 
-		/*Set<CalendarQueryPropertyHandler> propertiesValues = new HashSet<CalendarQueryPropertyHandler>();
+		Set<CalendarQueryPropertyHandler> propertiesValues = new HashSet<CalendarQueryPropertyHandler>();
 
 		for (String s : requestPropList) {
 			CalendarQueryPropertyHandler dph = properties.get(s);
@@ -81,7 +83,7 @@ public class CalendarQuery extends ReportProvider {
 			} else {
 				logger.warn("the Property [" + s + "] is not implemented");
 			}
-		}*/
+		}
 		
 		
 		try {
@@ -108,9 +110,11 @@ public class CalendarQuery extends ReportProvider {
 						+ "] is not implemented");
 			}
 			ret = new CalendarQueryResultBuilder().build(req, proxy,
-					requestPropList, events);
-
-			DOMUtils.logDom(ret);
+					requestPropList, events, propertiesValues);
+			
+			if(logger.isDebugEnabled()){
+				DOMUtils.logDom(ret);
+			}
 
 			resp.setStatus(207); // multi status webdav
 			resp.setContentType("text/xml; charset=utf-8");

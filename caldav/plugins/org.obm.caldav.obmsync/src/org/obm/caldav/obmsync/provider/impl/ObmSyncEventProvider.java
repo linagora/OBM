@@ -59,6 +59,9 @@ import org.obm.sync.locators.CalendarLocator;
 @SuppressWarnings("unused")
 public class ObmSyncEventProvider extends AbstractObmSyncProvider  {
 
+	protected static final Log logger = LogFactory
+	.getLog(ObmSyncEventProvider.class);
+	
 	private static AbstractObmSyncProvider instance;
 	
 	public static ICalendarProvider getInstance(){
@@ -80,18 +83,21 @@ public class ObmSyncEventProvider extends AbstractObmSyncProvider  {
 	@Override
 	public EventChanges getSync(AccessToken token, String userId, Date lastSync)
 	throws AuthFault, ServerFault {
+		logger.info("Get sync["+lastSync+"] from obm-sync");
 		return client.getSync(token, userId, lastSync);
 	}
 
 	@Override
 	public List<Event> getAll(AccessToken token, String calendar)
 			throws ServerFault, AuthFault {
+		logger.info("Get all Event from obm-sync");
 		return super.getAll(token, calendar, EventType.VEVENT);
 	}
 	
 	@Override
 	public List<EventTimeUpdate> getAllEventTimeUpdate(AccessToken token,
 			String calendar) throws ServerFault, AuthFault {
+		logger.info("Get all EventTimeUpdate from obm-sync");
 		return super.getAllEventTimeUpdate(token, calendar, EventType.VEVENT);
 	}
 }

@@ -3,7 +3,6 @@
 
 <product name="caldav server product" id="org.obm.caldav.server.caldavprod" application="org.obm.caldav.server.caldavapp" useFeatures="false" includeLaunchers="true">
 
-
    <configIni use="default">
    </configIni>
 
@@ -14,14 +13,12 @@
 
    <windowImages/>
 
-
    <launcher>
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
@@ -45,6 +42,7 @@
       <plugin id="org.eclipse.osgi.services"/>
       <plugin id="org.mortbay.jetty.server"/>
       <plugin id="org.mortbay.jetty.util"/>
+      <plugin id="org.obm.caldav.log4j"/>
       <plugin id="org.obm.caldav.obmsync"/>
       <plugin id="org.obm.caldav.obmsync.lib"/>
       <plugin id="org.obm.caldav.server"/>

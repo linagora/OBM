@@ -51,7 +51,7 @@ import org.obm.caldav.server.share.Token;
 /**
  * WebDAV for CalDAV implementation
  * 
- * @author tom
+ * @author tom, adrien
  * 
  */
 public class WebdavServlet extends HttpServlet {
@@ -74,7 +74,7 @@ public class WebdavServlet extends HttpServlet {
 		if (token == null) {
 			String uri = request.getMethod() + " " + request.getRequestURI()
 					+ " " + request.getQueryString();
-			logger.warn("invalid auth, sending http 401 (uri: " + uri + ")");
+			logger.debug("invalid auth, sending http 401 (uri: " + uri + ")");
 			String s = "Basic realm=\"CalDavService\"";
 			response.setHeader("WWW-Authenticate", s);
 
@@ -94,7 +94,6 @@ public class WebdavServlet extends HttpServlet {
 			try {
 				proxy = getProxy();
 				proxy.login(token);
-
 				handler
 						.process(token, proxy, new DavRequest(request),
 								response);

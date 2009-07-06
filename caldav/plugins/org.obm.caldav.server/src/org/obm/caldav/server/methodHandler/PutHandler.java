@@ -20,21 +20,22 @@ public class PutHandler extends DavMethodHandler {
 
 	@Override
 	public void process(Token token, IProxy proxy, DavRequest req, HttpServletResponse resp) {
-		
+		logger.info("process(req, resp)");
 		InputStream in;
 		try {
 			String extId = CalDavUtils.getExtIdFromURL(req.getURI());
 
 			in = req.getInputStream();
 			String ics = FileUtils.streamString(in, false);
-			logger.info("ics: "+ics);
+			if(logger.isDebugEnabled()){
+				logger.debug("ics: "+ics);
+			}
 			proxy.getCalendarService().updateOrCreateEvent(ics, extId);
 			
 			resp.setStatus(HttpServletResponse.SC_CREATED);
 			resp.setContentLength(0);
 			resp.setDateHeader("Created", new Date().getTime());
 			
-			//resp.setHeader("ETag", event.getUid());
 		} catch (MalformedURLException e) {
 			resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			resp.setContentLength(0);
