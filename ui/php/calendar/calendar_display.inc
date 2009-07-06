@@ -2422,7 +2422,21 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $res = $entities['resource'];
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $entity) {
-        $label = $entity['label'];
+        $label = "";
+        $admins = OBM_Acl::getEntityAdmins('resource', $r_id);
+        if (is_array($admins)) {
+          $emails = array();
+          foreach($admins as $admin) {
+            $user = get_entity_info($admin['id'], 'user'); 
+            if ($user['email'] != '') {
+              array_push($emails, $user['email']."@".$user['entity_domain']);
+            }
+          }
+          if (sizeof($emails) > 1) {
+            $label = "<a href='mailto:".implode(',', $emails)."'><img src='$GLOBALS[ico_mail]' /></a> ";
+          }
+        }
+        $label .= $entity['label'];
         $state = $entity['state'];
         if (OBM_Acl::canWrite($obm['uid'], 'resource', $r_id)) {
           $$state = "checked=\"checked\"";
