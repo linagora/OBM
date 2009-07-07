@@ -337,7 +337,7 @@ function run_query_people_ext_search($people) {
     WHERE (
       userobm_lastname $like '$pattern%' 
       OR userobm_firstname $like '$pattern%' 
-      OR userobm_email $like  '$pattern%' )
+      OR userobm_email $like  '%$pattern%' )
       AND userobm_archive = 0
       $multidomain
       $where_filter_entity";
