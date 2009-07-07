@@ -298,6 +298,7 @@ function html_resource_form($usr_q, $resource) {
   if (isset($resource['qty'])) { $qty = $resource['qty']; }
   if (isset($resource['rtype'])) { $rtype = $resource['rtype']; }
   if (isset($resource['delegation'])) { $delegation = stripslashes($resource['delegation']); }
+  if (isset($resource['desc'])) { $desc = stripslashes($resource['desc']); }
 
   $block_delegation = of_delegation_dis_block_update($delegation, $class['delegation']);
 
