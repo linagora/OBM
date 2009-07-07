@@ -111,12 +111,13 @@ function dis_project_search_form($project) {
 function html_project_search_form ($types, $tts, $member_q, $project) {
   global $obm, $display, $c_all;
   global $l_name, $l_company, $l_type, $l_tasktype, $l_member, $l_date;
-  global $l_all, $l_find, $l_archive, $l_select_project;
+  global $l_all, $l_find, $l_archive, $l_select_project, $l_shortname;
   global $ctt_sales, $ctt_research, $ctt_others;
   global $l_tt_sales, $l_tt_research, $l_tt_others;
 
   $popup = $project['popup'];
   $name = $project['name'];
+  $shortname = $project['shortname'];
   $company_name = $project['company_name'];
   $type = $project['type_id'];
   $tt = $project['tt'];
@@ -215,6 +216,9 @@ function html_project_search_form ($types, $tts, $member_q, $project) {
       <label>$l_name<br />
         <input type=\"text\" name=\"tf_name\" size=\"20\" value=\"$name\" />
       </label>
+      <label>$l_shortname<br />
+        <input type=\"text\" name=\"tf_shortname\" size=\"16\" value=\"$shortname\" />
+      </label>
       <label>$l_company<br />
         <input type=\"text\" name=\"tf_company_name\" id=\"tf_company_name\" size=\"20\" value=\"$company_name\" />
       </label>
@@ -287,6 +291,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
 
   $popup = $project['popup'];
   $name = $project['name'];
+  $shortname = $project['shortname'];
   $company_name = $project['company_name'];
   $tt = $project['tt'];
   $manager = $project['manager'];
@@ -306,7 +311,7 @@ function html_project_search_list($proj_q, $prefs, $project) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;sel_type_id=$type&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;delegation=$delegation&amp;cba_archive=$archive&amp;company_id=$company_id$url_ext");
+  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_shortname=$shortname&amp;sel_type_id=$type&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_member=$member&amp;sel_manager=$manager&amp;delegation=$delegation&amp;cba_archive=$archive&amp;company_id=$company_id$url_ext");
 
   $proj_d = new OBM_DISPLAY('DATA', $prefs, 'project');
   if ($popup) {

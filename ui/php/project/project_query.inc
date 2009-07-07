@@ -21,6 +21,7 @@ function run_query_project_search($params) {
   $sql_order_field = $params['sql_order_field'];
 
   $name = sql_search_text_parse($params['name']);
+  $shortname = sql_search_text_parse($params['shortname']);
   $type_id = $params['type_id'];
   $tt = $params['tt'];
   $company_name = sql_search_text_parse($params['company_name']);
@@ -44,6 +45,10 @@ function run_query_project_search($params) {
 
   if ($name != '') {
     $where .= " AND project_name $like '$name%'";
+  }
+
+  if ($shortname != '') {
+    $where .= " AND project_shortname $like '$shortname%'";
   }
 
   if ($company) {

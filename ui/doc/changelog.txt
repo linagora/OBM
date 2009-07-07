@@ -1,7 +1,7 @@
 <!-- $Id$ -->
 O.B.M. 2.2 Changelog
 
-version 2.2.6 - 2009-07-03
+version 2.2.6 - 2009-07-07
 
 To do
 
@@ -19,8 +19,9 @@ To do
  usergroup : agir lorsqu'archivage d'un user ?
 
 
-2009-07-03 : version 2.2.6
+2009-07-07 : version 2.2.6
 
+  * Project search by shortname added
   * fixes in Calendar PDF printing (complete list view,..)
 --  * #390 IE Only: End date listbox disappear after specific use of free-busy
   * #424 pb with former group or user selection in calendar module
