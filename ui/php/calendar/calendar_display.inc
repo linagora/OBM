@@ -2072,17 +2072,18 @@ function html_calendar_dis_conflict($calendar, $conflicts) {
       $sel_res_id .="<input type=\"hidden\" name=\"sel_resource_id[]\" value=\"$res\" />";
     }
   }
-
+    $freeBusy_read_only = false;
   if($calendar['action'] == 'decision') {
     $owner_notification = "checked";
     $block = "<div class=\"detail\">
     <input type=\"checkbox\" id=\"cb_notification\" name=\"cb_notification\" $owner_notification onchange=\"$('owner_notification').value = $('cb_notification').checked;\" /><label for=\"cb_notification\">$GLOBALS[l_owner_notification]</label></div>";
+    $freeBusy_read_only = true;
   }
 
   $block .= "
   <div class=\"detail extra\">
   <h1>$l_conflicts</h1>
-  <h2><a href=\"#\" onclick=\"displayFreeBusyConflict('$duration', '$d')\">$GLOBALS[l_display_entites_freebusy]</a></h2>
+  <h2><a href=\"#\" onclick=\"displayFreeBusyConflict('$duration', '$d', '$freeBusy_read_only')\">$GLOBALS[l_display_entites_freebusy]</a></h2>
   <table class=\"spreadSheet\">
   <thead>
    <tr>

@@ -25,8 +25,8 @@ $extra_js .= "
     displayFreeBusy($('tf_date').value, duration);
   }
 
-  function displayFreeBusyConflict(duration, d) {
-    displayFreeBusy(d, duration, true);
+  function displayFreeBusyConflict(duration, d, ro) {
+    displayFreeBusy(d, duration, ro);
   }
 
   function checkAvailability() {
