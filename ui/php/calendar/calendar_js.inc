@@ -174,12 +174,13 @@ function sel_public_group(date, element, label) {
 }
 
 function display_list_detail(display) {
-
   slides.each(function(slide) {
-    if (display == 'show') {
-      slide.show();
-    } else {
-      slide.hide();
+    if (slide != null) {
+      if (display == 'show') {
+        slide.show();
+      } else {
+        slide.hide();
+      }
     }
   });
 }
