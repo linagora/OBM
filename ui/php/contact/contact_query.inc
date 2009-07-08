@@ -1462,7 +1462,7 @@ function check_contact_data_form($cid, &$contact) {
   global $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
   global $l_fill_lastname, $l_fill_company, $l_j_check_phone;
   global $l_j_check_hphone,$l_j_check_mphone, $l_j_check_fax, $l_j_check_email;
-  global $err, $l_exist_error, $l_err_public_rights;
+  global $err, $l_exist_error, $l_err_public_rights, $l_err_length_express_postal;
 
   $user_id = $obm['uid'];
 
@@ -1477,6 +1477,7 @@ function check_contact_data_form($cid, &$contact) {
   $c_new_id = $contact['company_new_id'];
   $phones = $contact['phones'];
   $emails = $contact['emails'];
+  $addresses = $contact['addresses'];
 
   // MANDATORY: Contact name
   $lname = strtoupper($lname);
@@ -1522,6 +1523,17 @@ function check_contact_data_form($cid, &$contact) {
     $err['field'] = 'privacy';
     return false;
   }
+
+  // Check if express postal is not too long
+  if (is_array($addresses)){
+    foreach ($addresses as $addresse){
+      $express_postal = $addresse['expresspostal'];
+      if(strlen($express_postal)>16){
+        $err['msg'] = $l_err_length_express_postal;
+        return false;
+      }
+    }
+  } 
 
   return true;
 }

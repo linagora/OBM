@@ -131,3 +131,6 @@ $l_phone_labels = array ('HOME_VOICE' => 'Home phone', 'WORK_VOICE' => 'Work pho
 $l_email_labels = array ('INTERNET' => 'Home', 'OTHER' => 'Other');
 $l_address_labels = array ('HOME' => 'Home', 'WORK' => 'Work', 'OTHER' => 'Other');
 $l_website_labels = array ('URL' => 'Homepage', 'BLOG' => 'Blog', 'OTHER' => 'Other');
+
+// Error Messages
+$l_err_length_express_postal = "Field 'EXPRESS POSTAL' has 16 characters max";

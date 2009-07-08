@@ -172,18 +172,36 @@ function run_query_account_update($account) {
   $account_id = sql_parse_id( $account['account_id'], true);
   $multidomain = sql_multidomain('account');
 
+  //Get initial value
+  $query = "SELECT account_today,
+            account_balance
+            FROM Account
+            WHERE account_id $account_id $multidomain";
+   
+  display_debug_msg ($query, $cdg_sql, 'run_query_account_update(0)');
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);  
+  $obm_q->next_record();
+  $init_balance=$obm_q->f('account_balance');
+  $today=$obm_q->f('account_today');
+  
+  $diff = $balance - $init_balance;
+  $today = $today + $diff;
+
   $query = "UPDATE Account SET 
     account_label='$label',
     account_bank='$bank',
     account_number='$number',
+    account_today='$today',
     account_balance=$balance,
     account_comment='$comment',
     account_userupdate=$uid,
     account_timeupdate=NOW()
     WHERE account_id $account_id $multidomain";  
 
-  display_debug_msg ($query, $cdg_sql, 'run_query_account_update()');
-  $obm_q = new DB_OBM;
+  display_debug_msg ($query, $cdg_sql, 'run_query_account_update(1)');
+  
   $retour = $obm_q->query($query);  
 
   return $retour;

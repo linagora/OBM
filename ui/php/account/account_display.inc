@@ -434,7 +434,7 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   $p_date = ($p_date =='') ? date('Y-m-d') : $p_date;
 
   // let's compute balance now : 
-  $data = account_compute_balance ($p_account['account_id'], $p_date);
+  $data = account_compute_balance ($p_account, $p_date);
   $q_payments = $data['payments'];
   $q_expected = $data['expected'];
   $nb = $q_expected->nf();
@@ -445,12 +445,12 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   $url = url_prepare("account_index.php?action=compute_balance&amp;account_id=".$p_account['account_id']);
 
   // we display all account data :
-  $q_account = run_query_account_detail ($p_account['account_id']);
+  $q_account = run_query_account_detail ($p_account);
   html_account_consult ($q_account, 'compute_balance');
 
   // the form allowing a date input :
   $block .= '<br><br>';
-  $url = url_prepare("account_index.php?action=compute_balance&amp;account_id=".$p_account['account_id']);
+  $url = url_prepare("account_index.php?action=compute_balance&amp;account_id=".$p_account);
   $block .= "
 <form method=\"post\" action=\"account_index.php\" onsubmit=\"return check_account_balance_form (this);\">
  <table class='spreadSheet'>
@@ -460,7 +460,7 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
    <th>
     <input type='submit' value=\"".$l_compute_balance."\">
     <input type='hidden' name='action' value='compute_balance' />
-    <input type='hidden' name='account_id' value='".$p_account['account_id']."' />
+    <input type='hidden' name='account_id' value='".$p_account."' />
     </th></tr>
     </tbody>
  </table>
@@ -558,7 +558,7 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   if ($q_expected->nf() != 0) { 
     $q_expected->seek(0);
     $url_expect = url_prepare ("account_index.php?action=compute_balance".
-			      "&amp;account_id=".$p_account['account_id']);
+			      "&amp;account_id=".$p_account);
 
     $dis_expect  = new OBM_DISPLAY ('DATA', $payments_options, 'account');
     $dis_expect->data_set = $q_expected;
@@ -573,7 +573,7 @@ function html_account_compute_balance ($p_account, $payments_options, $p_date) {
   if ($q_payments->nf() != 0) { 
     $q_payments->seek(0);
     $url_done = url_prepare ("account_index.php?action=compute_balance".
-			      "&amp;account_id=".$p_account['account_id']);
+			      "&amp;account_id=".$p_account);
 
     $dis_done  = new OBM_DISPLAY ('DATA', $payments_options, 'account');
     $dis_done->data_set = $q_payments;

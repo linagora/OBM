@@ -138,3 +138,6 @@ $l_phone_labels = array ('HOME_VOICE' => 'Téléphone (domicile)', 'WORK_VOICE' 
 $l_email_labels = array ('INTERNET' => 'Internet', 'OTHER' => 'Autre');
 $l_address_labels = array ('HOME' => 'Domicile', 'WORK' => 'Bureau', 'OTHER' => 'Autre');
 $l_website_labels = array ('URL' => 'Site web', 'BLOG' => 'Log internet', 'OTHER' => 'Autre');
+
+// Error Messages
+$l_err_length_express_postal = "Le champs 'CEDEX' doit etre au maximum de 16 charactères.";
