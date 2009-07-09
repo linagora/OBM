@@ -52,7 +52,7 @@ include('host_display.inc');
 include('host_query.inc');
 require('host_js.inc');  
 
-$extra_css[] = '/images/themes/default/styles/host.css';
+$extra_css[] = $css_host;
 $extra_js_include[] = 'host.js';
 
 if ($action == '') $action = 'index';

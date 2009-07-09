@@ -23,8 +23,7 @@ if (($params["ext_widget"] != "") || ($params["ext_widget_text"] != "")) {
       window.close();
       return true;
     }
-  } 
-  ";
+  }";
 }
 
 
