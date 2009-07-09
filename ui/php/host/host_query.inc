@@ -647,7 +647,7 @@ function write_munin_conf(){
    while ($obm_q->next_record()) {
      $muninContentConf .= 
     	"[".$obm_q->f('host_fqdn')."]\n".
-		"\tadresse ".$obm_q->f('host_ip')."\n".
+		"\taddress ".$obm_q->f('host_ip')."\n".
 		"\tuse_node_name yes\n";
    }
 
