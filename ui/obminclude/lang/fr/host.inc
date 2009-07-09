@@ -44,6 +44,7 @@ $l_delete_ok = "La suppression de l'hôte a été correctement effectuée.";
 $l_delete_error = "La suppression de l'hôte a échoué !";
 $l_can_delete = "L'hôte peut être supprimé";
 
+$l_err_host_monitoring = "Un hôte requiert une adresse ip et un nom complet pour être supervisé";
 $l_err_host_name_empty = "Le nom de l'hôte doit être renseigné";
 $l_err_host_name_exist = "Le nom de l'hôte est déjà utilisé";
 $l_err_host_name = "Le nom de l'hôte est incorrect";
@@ -63,6 +64,8 @@ $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM Sync';
+$l_monitor = 'Supervison';
+
 
 $l_fqdn = 'Nom complet de la machine';
 $l_err_host_fqdn = 'Le nom complet de la machine est incorrct (nommachine.nom.domaine)';

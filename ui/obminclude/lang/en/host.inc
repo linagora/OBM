@@ -45,6 +45,7 @@ $l_delete_ok = "Host delete successful.";
 $l_delete_error = "Host delete fail !";
 $l_can_delete = "Host can be delete";
 
+$l_err_host_monitoring = "Host must have ip adress and full qualified name to be monitor";
 $l_err_host_name_empty = "Host name must be fill";
 $l_err_host_name_exist = "Host name already used";
 $l_err_host_name = "Invalid host name";
@@ -64,6 +65,7 @@ $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
 $l_obm_sync = 'OBM Sync';
+$l_monitor = 'Monitoring';
 
 $l_fqdn = 'Fully qualified name';
 $l_err_host_fqdn = 'The fully qualified name is not well formed (computername.domaine.name)';

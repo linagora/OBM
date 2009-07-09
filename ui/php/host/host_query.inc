@@ -28,6 +28,7 @@ function run_query_host_search($host) {
   $smtp_in = $host['smtp_in'];
   $smtp_out = $host['smtp_out'];
   $obm_sync = $host['obm_sync'];
+  $monitor = $host['monitor'];
   $imap = $host['imap'];
 
   $obm_q = new DB_OBM;
@@ -60,6 +61,9 @@ function run_query_host_search($host) {
   if ($obm_sync != '') {
     $where .= ' AND obm_sync.service_id IS NOT NULL';
   }
+  if ($monitor != '') {
+    $where .= ' AND monitor.service_id IS NOT NULL';
+  }
   if ($imap != '') {
     $where .= ' AND imap.service_id IS NOT NULL';
   }
@@ -76,7 +80,8 @@ function run_query_host_search($host) {
       LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
-      LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id"; 
+      LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id"; 
 
   $multidomain = sql_multidomain('host');
   $query = "SELECT DISTINCT Host.*,
@@ -85,6 +90,7 @@ function run_query_host_search($host) {
       smtp_in.service_id as host_smtp_in,
       smtp_out.service_id as host_smtp_out,
       obm_sync.service_id as host_obm_sync,
+      monitor.service_id as host_monitor,
       host_id as id,
       $timecreate,
       $timeupdate,
@@ -132,6 +138,7 @@ function run_query_host_detail($id) {
       smtp_in.service_id as host_smtp_in,
       smtp_out.service_id as host_smtp_out,
       obm_sync.service_id as host_obm_sync,
+      monitor.service_id as host_monitor,
       $timecreate,
       $timeupdate,
       uo.userobm_id as userobm_id,
@@ -148,6 +155,7 @@ function run_query_host_detail($id) {
       LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
       LEFT JOIN Domain ON host_domain_id = domain_id
     WHERE host_id $id 
       $multidomain";
@@ -176,6 +184,7 @@ function run_query_host_insert($host) {
   $smtp_in = sql_parse_int($host['smtp_in']);
   $smtp_out = sql_parse_int($host['smtp_out']);
   $obm_sync = sql_parse_int($host['obm_sync']);
+  $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
   $list = $host['web_list'];
   $desc = $host['desc'];
@@ -240,6 +249,9 @@ function run_query_host_insert($host) {
   if($obm_sync > 0) {
     of_service_insert('obm_sync', $entity_id); 
   }
+  if($monitor > 0) {
+    of_service_insert('monitor', $entity_id); 
+  }
   if($imap > 0) {
     of_service_insert('imap', $entity_id); 
   }
@@ -280,6 +292,7 @@ function run_query_host_update($host) {
   $smtp_in = sql_parse_int($host['smtp_in']);
   $smtp_out = sql_parse_int($host['smtp_out']);
   $obm_sync = sql_parse_int($host['obm_sync']);
+  $monitor = sql_parse_int($host['monitor']);
   $imap = sql_parse_int($host['imap']);
   $desc = $host['desc'];
   $multidomain = sql_multidomain('host');
@@ -324,6 +337,11 @@ function run_query_host_update($host) {
       of_service_insert('obm_sync', $entity_id); 
     } else {
       of_service_delete('obm_sync', $entity_id); 
+    }
+    if($monitor > 0) {
+      of_service_insert('monitor', $entity_id); 
+    } else {
+      of_service_delete('monitor', $entity_id); 
     }
     if($imap > 0) {
       of_service_insert('imap', $entity_id); 
@@ -434,7 +452,8 @@ function get_host_info($id) {
       imap.service_id as host_imap,
       smtp_in.service_id as host_smtp_in,
       smtp_out.service_id as host_smtp_out,
-      obm_sync.service_id as host_obm_sync
+      obm_sync.service_id as host_obm_sync,
+      monitor.service_id as host_monitor
     FROM Host
       INNER JOIN HostEntity ON hostentity_host_id = host_id
       LEFT JOIN Service as samba ON samba.service_service = 'samba' AND samba.service_entity_id = hostentity_entity_id
@@ -442,6 +461,7 @@ function get_host_info($id) {
       LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id
       LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id
+      LEFT JOIN Service as monitor ON monitor.service_service = 'monitor' AND monitor.service_entity_id = hostentity_entity_id
     WHERE host_id $id $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'get_host_info()');
@@ -457,6 +477,7 @@ function get_host_info($id) {
   $h['smtp_in'] = $obm_q->f('host_smtp_in');
   $h['smtp_out'] = $obm_q->f('host_smtp_out');
   $h['obm_sync'] = $obm_q->f('host_obm_sync');
+  $h['monitor'] = $obm_q->f('host_monitor');
   $h['imap'] = $obm_q->f('host_imap');
   $h['desc'] = $obm_q->f('host_description');
 
@@ -658,7 +679,7 @@ function check_host_data_form($host) {
   global $cgp_use, $err, $l_err_host_name;
   global $php_regexp_ip, $l_err_host_ip, $l_err_host_ip_exist,$php_regexp_fqdn;
   global $l_err_host_ip_not_in_lan, $l_err_firewall_perms, $l_err_web_all;
-  global $l_err_host_windows_not_global, $l_err_host_fqdn;
+  global $l_err_host_windows_not_global, $l_err_host_fqdn, $l_err_host_monitoring;
 
   $id = $host['host_id'];
   $name = $host['name'];
@@ -667,6 +688,8 @@ function check_host_data_form($host) {
   $fqdn = $host['fqdn'];
   $web_list = $host['web_list'];
   $web_all = $host['web_all'];
+  $monitor = $host['monitor'];
+
 
   if ($id > 0) {
     $h = get_host_info($id);
@@ -745,7 +768,12 @@ function check_host_data_form($host) {
       return false;
     }
   } 
-
+  //ip + fqdn to add host monitor
+  if ( $monitor == '1' && ( $fqdn == '' || $ip == '') ){
+	$err['field'] = 'supervision' ;
+	$err['msg'] = "$l_err_host_monitoring";
+	return false;
+  }
   return true;
 }
 

@@ -12,6 +12,8 @@
 
     <!-- Is set if this host have an obm-sync server installed -->
     <service key='obm_sync' />
+    <!-- Is set if this host is monitoring by munin -->
+    <service key='monitor' />
 
   </entity>
   <entity type='domain'>
