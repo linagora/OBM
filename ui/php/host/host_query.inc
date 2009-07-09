@@ -749,4 +749,36 @@ function check_host_data_form($host) {
   return true;
 }
 
+/**
+ * get_host_graph_list
+ * return an array of graph
+ *
+ * $host_fqdn string of host fqdn
+ * @return array $graph_list
+ */
+function get_host_graph_list($host_fqdn) {
+  
+  $host_domain_explode = explode('.', $host_fqdn, 2 );
+  $host_domain = $host_domain_explode[1];
+  $host_name = $host_domain_explode[0];
+  $munin_folder = '/var/www/munin/'.$host_domain;
+  
+  $graph_list = array();
+  if (is_dir($munin_folder) ) {
+    if ($munin_handler = opendir($munin_folder)) {
+      while (($file = readdir($munin_handler)) !==false) {
+        if (preg_match('/'.$host_fqdn.'.*day.*/', $file)){
+          $desc_stat_extension = explode('-day.png', $file, -1);
+          $desc_stat =  explode('-', $desc_stat_extension[0]);
+          array_push( $graph_list, end($desc_stat));
+        }
+      }
+    }
+    sort($graph_list);
+    return $graph_list;
+  }else{
+    return $graph_list;
+  }
+}
+
 </script>

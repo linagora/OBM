@@ -342,6 +342,7 @@ $l_module_resource = "Resources";
 $l_module_group = "Groups";
 $l_module_resourcegroup = "Resources group";
 $l_module_host = "Hosts";
+$l_module_monitoring = "Monitoring";
 $l_module_mailshare = "Mail shares";
 $l_module_organizationalchart = "Organizational chart";
 

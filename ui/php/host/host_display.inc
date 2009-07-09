@@ -318,7 +318,7 @@ function html_host_consult($host_q) {
   global $l_yes, $l_no, $l_module_host, $l_name, $l_ip, $l_desc, $l_smb;
   global $l_perms, $l_enable, $l_disable, $l_empty, $l_not_assigned;
   global $l_user, $l_fqdn, $l_system, $l_help_system,$l_domain;
-  global $ico_day_view, $ico_week_view, $ico_month_view ;
+  global $l_module_monitoring, $ico_day_view, $ico_week_view, $ico_month_view ;
 
   // Check if domain is a samba domain
   $samba_domain = false;
@@ -405,37 +405,25 @@ function html_host_consult($host_q) {
 
   $host_domain_explode = explode('.', $fqdn, 2 );
   $host_domain = $host_domain_explode[1];
-  $host_name = $host_domain_explode[0];
-  $img_stat_path = '/stats/'.$host_domain.'/'.$fqdn;
-  $munin_folder = '/var/www/munin/'.$host_domain;
-  //Test if munin folder exsit
-  if ( is_dir($munin_folder) ) {
-    if ($munin_handler = opendir($munin_folder)) {
-    
-      $block_stat_menu .=  "
+  $graph_list = get_host_graph_list($fqdn);
+  
+  if ( $graph_list[0] !== NULL ){
+    $block_stat_menu .=  "
       <div id='stat_menu'>
       <ul>
       ";
-      $last_img;
-      while (($file = readdir($munin_handler)) !==false) {
-        if (preg_match('/'.$fqdn.'.*day.*/', $file)){
-          $last_img=$file;
-          $desc_stat_extension = explode('-day.png', $file, -1);
-          $desc_stat =  explode('-', $desc_stat_extension[0]);
-          $block_stat_menu .= "
-          <li> <a href=# title='".end($desc_stat)."'>".end($desc_stat)."</a></li>
-          ";
-        }
-      }  
+    foreach ( $graph_list as $graph){
       $block_stat_menu .= "
+        <li> <a href=# title='".$graph."'>".$graph."</a></li>
+        ";
+    }
+    $block_stat_menu .= "
       </ul>
       </div>
       ";
-    }
- 
-    if ( $last_img !== NULL ) {
-      $block_stat = "
-      <h1>STAT</h1>
+
+    $block_stat = "
+      <h1>$l_module_monitoring</h1>
       <div id=\"menuDay\" >
         <a href=# title='day'>
           <img src=\"$ico_day_view\" />
@@ -449,13 +437,10 @@ function html_host_consult($host_q) {
       </div> 
       ".$block_stat_menu."
       <div id='stat_img'>
-        <img src=/stats/$host_domain/$last_img>
+        <img src=/stats/$host_domain/$fqdn-$graph_list[0]-day.png>
       </div>
       ";
     }
-  }else{
-    $block_stat = "";
-  }
 
 
 
