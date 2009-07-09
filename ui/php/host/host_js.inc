@@ -27,38 +27,6 @@ if (($params["ext_widget"] != "") || ($params["ext_widget_text"] != "")) {
   ";
 }
 
-//
-//      }); 
-//  }
-//
-//";
-
-
-
-
-
-
-
-//window.addEvent('domready', function()
-//{
-//        var drop = $('large');
-//        var dropFx = drop.effect('background-color', {wait: false}); // wait is needed so that to toggle the effect,
-//
-//        $$('.item').each(function(item)
-//        {
-//                item.addEvent('click', function(e)
-//                {
-//                        drop.removeEvents();
-//                        drop.empty();
-//                        var a = item.clone();
-//                        a.inject(drop);
-//                        dropFx.start('7389AE').chain(dropFx.start.pass('ffffff', dropFx));
-//
-//                });
-//
-//        });
-//});
-
 
 
 </script>

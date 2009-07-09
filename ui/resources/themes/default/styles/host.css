@@ -6,8 +6,13 @@
 // $Id$
 /////////////////////////////////////////////////////////////////////////////*/
 
+#menuDay {
+  margin-left: 200px;
+}
+
 #stat_menu {
-  float : left;
+  float: left;
+  width: 200px;
 }
 
 #stat_menu ul li {
@@ -15,12 +20,7 @@
 }
 
 #stat_img {
-  float : center;
-  text-align: center;
-}
-
-#stat_img ul li {
-  display: inline;
-  list-style: none;
+  float: left;
+  margin-top: 12px;
 }
 
