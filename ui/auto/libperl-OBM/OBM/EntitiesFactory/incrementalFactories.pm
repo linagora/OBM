@@ -66,7 +66,7 @@ sub _initDeleteFactory {
     }
 
     if( defined($entitiesFactory->{'delegation'}) ) {
-        $query .= ' AND deleted_delegation='.$entitiesFactory->{'delegation'};
+        $query .= ' AND deleted_delegation=\''.$entitiesFactory->{'delegation'}.'\'';
     }
 
 
