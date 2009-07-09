@@ -153,6 +153,7 @@ $ico_month_view             = "$theme_path/ico_calendar_month_view.gif";
 $ico_day_view_current       = "$theme_path/ico_calendar_day_view_current.gif";
 $ico_week_view_current      = "$theme_path/ico_calendar_week_view_current.gif";
 $ico_month_view_current     = "$theme_path/ico_calendar_month_view_current.gif";
+$ico_year_view_current      = "$theme_path/ico_calendar_year_view_current.gif";
 $ico_list_view              = "$theme_path/ico_calendar_list.gif";
 $ico_agenda_view            = "$theme_path/ico_calendar_agenda.gif";
 $ico_planning_view          = "$theme_path/ico_calendar_planning.gif";
