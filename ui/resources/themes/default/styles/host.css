@@ -1,0 +1,74 @@
+/*/////////////////////////////////////////////////////////////////////////////
+// OBM - File : host.css                                                     //
+//     - Desc : CSS style file                                               //
+// 2009-05-20 Sylvain Garcia                                                 //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+/////////////////////////////////////////////////////////////////////////////*/
+
+#stat_menu {
+  float : left;
+}
+#stat_img {
+  float : center;
+  text-align: center;
+}
+
+#stat_img td {
+  width: 200;
+}
+
+.summaryBox h1 {
+  margin: 0 0 5px 0;
+  font-size: 140%;
+  height: 1.6em;
+  line-height: 1.6em;
+  background-image: url('../images/tab_current_border.png');
+  background-repeat: repeat-x;
+  background-position: 0 0.8em;
+  background-color: #eff0f2;
+  border-bottom: 1px solid #b3b3b3;  
+}
+
+.summaryBox h1 img{
+  float: left;
+}
+
+.summaryBox h2 {
+  text-align: center;
+  font-size: 140%;
+}
+
+.summaryBox .link {
+  display: block;
+  clear: left;
+  position: relative;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.summaryBox dl {
+  margin-left: 5px;
+}
+
+.summaryBox table {
+  margin: 0 0 5px;
+}
+
+.summaryBox dt {
+  font-weight: bold;
+  float: left;
+  clear: left;
+  width: 13em;
+  overflow: show;
+  margin-bottom: 5px;
+  height: 1em;
+}
+
+.summaryBox dd {
+  margin: 0;
+  height: 1em;
+  margin-bottom: 5px;
+}

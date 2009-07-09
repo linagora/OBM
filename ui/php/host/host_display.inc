@@ -407,32 +407,63 @@ function html_host_consult($host_q) {
   $host_domain = $host_domain_explode[1];
   $host_name = $host_domain_explode[0];
   $img_stat_path = '/stats/'.$host_domain.'/'.$fqdn;
-  $test_img = $img_stat_path.'-cpu-year.png';
+  //$test_img = $img_stat_path.'-cpu-year.png';
   $munin_folder = '/var/www/munin/'.$host_domain;
   if ($munin_handler = opendir($munin_folder)) {
-  $block_stat_img .=  "
-    <div id='ici'>
+  //$block_stat_img .=  "
+  //  <div id='ici'>
+  //  ";
+  //  while (($file = readdir($munin_handler)) !==false) {
+  //    if (preg_match('/'.$fqdn.'.*week.*/', $file)) {
+  //      $block_stat_img .=  "
+  //          <img src=/stats/$host_domain/$file class=\"toto\">
+  //        ";
+  //    }
+  //  }
+  //  $block_stat_img .=  "
+  //    </div>
+  //    ";
+  //}
+  
+    $block_stat_menu .=  "
+    <div id='stat_menu'>
+    <table>
     ";
+    $last_img;
     while (($file = readdir($munin_handler)) !==false) {
-      if (preg_match('/'.$fqdn.'.*week.*/', $file)) {
-        $block_stat_img .=  "
-            <img src=/stats/$host_domain/$file class=\"toto\">
-          ";
+      if (preg_match('/'.$fqdn.'.*day.*/', $file)){
+        $last_img=$file;
+        $desc_stat_extension = explode('-day.png', $file, -1);
+        $desc_stat =  explode('-', $desc_stat_extension[0]);
+        $block_stat_menu .= "
+        <tr>
+        <td> <a href=# onClick=change_stat_cat('".end($desc_stat)."')>".end($desc_stat)."</a></td>
+        </tr>
+        ";
       }
+
     }
-    $block_stat_img .=  "
-      </div>
-      ";
+    $block_stat_menu .= "
+    </table>
+    </div>
+    ";
   }
 
-  $block_stat = "
+  $block_stat = $block_stat_menu."
   <h1>STAT</h1>
-  <div class='SB LF NM'>
-  <img src=$ico_day_view alt='toto' onClick=modify_stat()>
-  <img src=$ico_week_view alt='toto'>
-  <img src=$ico_month_view alt='toto'>
+  <div id='stat_img'>
+    <table>
+      <tr>
+      <td><a href=# onClick=modify_stat_interval('day')>day </a></td>
+      <td><a href=# onClick=modify_stat_interval('week')>week </a></td>
+      <td><a href=# onClick=modify_stat_interval('month')>month </a></td>
+      <td><a href=# onClick=modify_stat_interval('year')>year </a></td>
+      </tr>
+    </table>
+    <img src=/stats/$host_domain/$last_img>
   </div>
-  ".$block_stat_img;
+
+  ";
 
 
 

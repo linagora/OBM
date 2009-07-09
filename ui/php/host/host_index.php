@@ -52,6 +52,8 @@ include('host_display.inc');
 include('host_query.inc');
 require('host_js.inc');  
 
+$extra_css[] = '/images/themes/default/styles/host.css';
+
 if ($action == '') $action = 'index';
 get_host_action();
 $perm->check_permissions($module, $action);
