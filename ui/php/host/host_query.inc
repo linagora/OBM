@@ -270,6 +270,10 @@ function run_query_host_insert($host) {
     display_debug_msg($query, $cdg_sql, 'run_query_host_insert(3)');
     $retour = $obm_q->query($query);
   }
+ 
+  if ( !(write_munin_conf()) ){
+	$retour = false;
+  }
 
   return $retour;
 }
@@ -371,8 +375,11 @@ function run_query_host_update($host) {
       $retour = $obm_q->query($query);
     }
   }
-
+  if ( !(write_munin_conf()) ){
+	$retour = false;
+  }
   return $retour;
+
 }
 
 
@@ -616,6 +623,43 @@ function check_host_can_delete($id) {
   return $delete_ok;
 }
 
+function write_munin_conf(){
+  global $cdg_sql, $err;
+  $muninFile = "/etc/munin/munin.conf";
+  $muninContentConf = "#This is generate by OBM\n".
+	"dbdir /var/lib/munin\n".
+	"htmldir /var/www/munin\n".
+	"logdir /var/log/munin\n".
+	"rundir /var/run/munin\n".
+	"tmpldir /etc/munin/templates\n\n";
+
+  $query = "
+    SELECT DISTINCT host_fqdn, host_ip, host_id, hostentity_host_id, hostentity_entity_id, service_entity_id from host
+	  LEFT JOIN hostentity ON host_id=hostentity_host_id
+	  LEFT JOIN service ON hostentity_entity_id=service_entity_id
+	  WHERE service_service = 'monitor' 
+		AND host_fqdn != '' AND host_ip != ''
+		AND host_ip is not null AND host_fqdn is not null";
+   $obm_q = new DB_OBM;
+   //FIXME
+   display_debug_msg($query, $cdg_sql, "MARCHE PAS FIXME");
+   $obm_q->query($query);
+   while ($obm_q->next_record()) {
+     $muninContentConf .= 
+    	"[".$obm_q->f('host_fqdn')."]\n".
+		"\tadresse ".$obm_q->f('host_ip')."\n".
+		"\tuse_node_name yes\n";
+   }
+
+	if ( ($fh=fopen($muninFile, 'w')) ) {
+	  fwrite($fh, $muninContentConf);
+	  fclose($fh);
+		return true;
+	}else{
+		return false;
+	}
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Host context checking (same hosts exists ?)

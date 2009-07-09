@@ -505,7 +505,6 @@ function html_host_consult($host_q) {
     $block_stat
     </div>";
 
-
   return $block;
 }
 
