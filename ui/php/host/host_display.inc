@@ -19,7 +19,6 @@ $fieldnames['host_imap'] = $l_imap;
 $fieldnames['host_smtp_in'] = $l_smtp_in;
 $fieldnames['host_smtp_out'] = $l_smtp_out;
 $fieldnames['host_obm_sync'] = $l_obm_sync;
-//FIXME
 $fieldnames['host_monitor'] = $l_monitor;
 $fieldnames['host_description'] = $l_desc;
 $fieldnames['usercreate'] = $l_creator;

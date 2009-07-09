@@ -641,8 +641,7 @@ function write_munin_conf(){
 		AND host_fqdn != '' AND host_ip != ''
 		AND host_ip is not null AND host_fqdn is not null";
    $obm_q = new DB_OBM;
-   //FIXME
-   display_debug_msg($query, $cdg_sql, "MARCHE PAS FIXME");
+   display_debug_msg($query, $cdg_sql, 'write_munin_conf');
    $obm_q->query($query);
    while ($obm_q->next_record()) {
      $muninContentConf .= 
