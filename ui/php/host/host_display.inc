@@ -427,7 +427,7 @@ function html_host_consult($host_q) {
   
     $block_stat_menu .=  "
     <div id='stat_menu'>
-    <table>
+    <ul>
     ";
     $last_img;
     while (($file = readdir($munin_handler)) !==false) {
@@ -436,30 +436,27 @@ function html_host_consult($host_q) {
         $desc_stat_extension = explode('-day.png', $file, -1);
         $desc_stat =  explode('-', $desc_stat_extension[0]);
         $block_stat_menu .= "
-        <tr>
-        <td> <a href=# onClick=change_stat_cat('".end($desc_stat)."')>".end($desc_stat)."</a></td>
-        </tr>
+        <li> <a href=# onClick=change_stat_cat('".end($desc_stat)."')>".end($desc_stat)."</a></li>
         ";
       }
 
     }
     $block_stat_menu .= "
-    </table>
+    </ul>
     </div>
     ";
   }
 
-  $block_stat = $block_stat_menu."
+  $block_stat = "
   <h1>STAT</h1>
+  ".$block_stat_menu."
   <div id='stat_img'>
-    <table>
-      <tr>
-      <td><a href=# onClick=modify_stat_interval('day')>day </a></td>
-      <td><a href=# onClick=modify_stat_interval('week')>week </a></td>
-      <td><a href=# onClick=modify_stat_interval('month')>month </a></td>
-      <td><a href=# onClick=modify_stat_interval('year')>year </a></td>
-      </tr>
-    </table>
+      <ul>
+      <li><a href=# onClick=modify_stat_interval('day')>day</a></li>
+      <li><a href=# onClick=modify_stat_interval('week')>week</a></li>
+      <li><a href=# onClick=modify_stat_interval('month')>month</a></li>
+      <li><a href=# onClick=modify_stat_interval('year')>year</a></li>
+      </ul>
     <img src=/stats/$host_domain/$last_img>
   </div>
 
