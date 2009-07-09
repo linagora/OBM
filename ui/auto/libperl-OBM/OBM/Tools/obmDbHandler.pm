@@ -113,8 +113,7 @@ sub execQuery {
     my $rv = $$sth->execute();
 
     if( !defined($rv) ) {
-        $self->_log( 'requete executée : \''.$query.'\'', 0 );
-        $self->_log( 'erreur lors de l\'execution de la requete', 3 );
+        $self->_log( 'erreur lors de l\'execution de la requete \''.$query.'\'', 0 );
         if( defined($$sth) ) {
             $self->_log( $$sth->err().' - '.$$sth->errstr(), 0 );
         }
