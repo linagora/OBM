@@ -318,6 +318,7 @@ function html_host_consult($host_q) {
   global $l_yes, $l_no, $l_module_host, $l_name, $l_ip, $l_desc, $l_smb;
   global $l_perms, $l_enable, $l_disable, $l_empty, $l_not_assigned;
   global $l_user, $l_fqdn, $l_system, $l_help_system,$l_domain;
+  global $ico_day_view, $ico_week_view, $ico_month_view ;
 
   // Check if domain is a samba domain
   $samba_domain = false;
@@ -402,6 +403,39 @@ function html_host_consult($host_q) {
       ";    
   }
 
+  $host_domain_explode = explode('.', $fqdn, 2 );
+  $host_domain = $host_domain_explode[1];
+  $host_name = $host_domain_explode[0];
+  $img_stat_path = '/stats/'.$host_domain.'/'.$fqdn;
+  $test_img = $img_stat_path.'-cpu-year.png';
+  $munin_folder = '/var/www/munin/'.$host_domain;
+  if ($munin_handler = opendir($munin_folder)) {
+  $block_stat_img .=  "
+    <div id='ici'>
+    ";
+    while (($file = readdir($munin_handler)) !==false) {
+      if (preg_match('/'.$fqdn.'.*week.*/', $file)) {
+        $block_stat_img .=  "
+            <img src=/stats/$host_domain/$file class=\"toto\">
+          ";
+      }
+    }
+    $block_stat_img .=  "
+      </div>
+      ";
+  }
+
+  $block_stat = "
+  <h1>STAT</h1>
+  <div class='SB LF NM'>
+  <img src=$ico_day_view alt='toto' onClick=modify_stat()>
+  <img src=$ico_week_view alt='toto'>
+  <img src=$ico_month_view alt='toto'>
+  </div>
+  ".$block_stat_img;
+
+
+
   $block = "
     <div class=\"detail extras\">
     <h1>$l_module_host</h1>
@@ -433,6 +467,7 @@ function html_host_consult($host_q) {
     $block_mail
     $block_sync
     </table>
+    $block_stat
     </div>";
 
 
