@@ -1383,9 +1383,9 @@ function dis_invoice_dashboard($invoice) {
 	$nb = $status_info['nb'];
 	$total_amount_ht += $amount_ht;
 	$dis_amount_ht = number_format($amount_ht, 2, ',', ' ');
-	$month_start = "$year_month-01";
+  $month_start = "$year_month-01";
 	$month_end = date('Y-m-d', mktime(12,0,0,$month+1, 0, $year));
-        $dis_bil_row .= "<td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
+        $dis_bil_row .= "<td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;sel_region=$region&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
       } else {
         $dis_bil_row .= '<td></td>';
       }
@@ -1411,7 +1411,7 @@ function dis_invoice_dashboard($invoice) {
       $month_start = "$year_month-01";
       $month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
       $dis_bil_row_total .= "
-          <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search$total_status_param&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
+          <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search$total_status_param&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;sel_region=$region&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ht</a></td>";
     } else {
       $dis_bil_row_total .= "
           <td class=\"money\">&nbsp;$dis_amount_ht</td>";
@@ -1472,7 +1472,7 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date('Y-m-d', mktime(12,0,0,$month+1, 0, $year));
         $dis_pot_row .= "
-          <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
+          <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;tf_date_after=$month_start&amp;sel_region=$region&amp;tf_date_before=$month_end$url_sel_tt\">$f_amount_ht</a></td>";
       } else {
         $dis_pot_row .= '
           <td> </td>';
@@ -1525,7 +1525,7 @@ function dis_invoice_dashboard($invoice) {
 	$month_start = "$year_month-01";
 	$month_end = date('Y-m-d', mktime(12,0,0,$month+1, 0, $year));
         $dis_pay_row .= "
-          <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;date_field=expiration_date&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+          <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;sel_status=$s_id&amp;inout=$url_inout&amp;cba_archive=1&amp;date_field=expiration_date&amp;tf_date_after=$month_start&amp;sel_region=$region&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
       } else {
         $dis_pay_row .= '
           <td></td>';
@@ -1553,7 +1553,7 @@ function dis_invoice_dashboard($invoice) {
       $month_start = "$year_month-01";
       $month_end = date('Y-m-d', mktime(0,0,0,$month+1, 0, $year));
       $dis_pay_row_total .= "
-        <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;inout=$url_inout&amp;cba_archive=1&amp;date_field=expiration_date&amp;tf_date_after=$month_start&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
+        <td class=\"money\">&nbsp;<a href=\"$path/invoice/invoice_index.php?action=search&amp;inout=$url_inout&amp;cba_archive=1&amp;date_field=expiration_date&amp;tf_date_after=$month_start&amp;sel_region=$region&amp;tf_date_before=$month_end$url_sel_tt\">$dis_amount_ttc</a></td>";
     } else {
       $dis_pay_row_total .= "
         <td class=\"money\">&nbsp;$dis_amount_ttc</td>";

@@ -456,6 +456,9 @@ $l_document_add = "Link some documents";
 //Profile headers
 $l_header_properties = "Properties";
 
+//People headers
+$l_header_wait = "Waiting";
+
 //---------------------------------------------------------------------------//
 // Category labels
 //---------------------------------------------------------------------------//

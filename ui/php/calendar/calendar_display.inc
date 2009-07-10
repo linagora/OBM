@@ -2309,75 +2309,96 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
 
   $ie6_radio_fix = "style='border:none; padding:0;margin:0;width:auto;'";
 
-  $attendee = $entities['user'];
-  if (is_array($attendee['entity'])) {
-    foreach ($attendee['entity'] as $u_id => $entity) {
-      $label = $entity['label'];
-      $state = $entity['state'];
-      $ACCEPTED = '';
-      ${'NEEDS-ACTION'} = '';
-      $DECLINED = '';
-      if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id)) {
-        $$state = "checked=\"checked\"";
-        $urld = "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
-        $urla = "$path/calendar/calendar_index.php?action=update_alert&calendar_id=$id&user_id=$u_id";
-        $sel_alert = '';
-        foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
-          if($alerts[$u_id] == $alert_sec) {
-            $sel_alert .= "<option value=\"$alert_sec\" selected=\"selected\">$alert_label</option>";
-          } else {
-            $sel_alert .= "<option value=\"$alert_sec\">$alert_label</option>";
+  if ($event_q->f('event_privacy') == 0 || 
+      $event_q->f('event_owner') == $obm['uid'] ||
+      in_array($obm['uid'],$entities['user']['ids'])) {
+
+    $attendee = $entities['user'];
+    if (is_array($attendee['entity'])) {
+      foreach ($attendee['entity'] as $u_id => $entity) {
+        $label = $entity['label'];
+        $state = $entity['state'];
+        $ACCEPTED = '';
+        ${'NEEDS-ACTION'} = '';
+        $DECLINED = '';
+        if (OBM_Acl::canWrite($obm['uid'], 'calendar', $u_id)) {
+          $$state = "checked=\"checked\"";
+          $urld = "$path/calendar/calendar_index.php?action=update_decision&calendar_id=$id&entity_kind=user&entity_id=$u_id";
+          $urla = "$path/calendar/calendar_index.php?action=update_alert&calendar_id=$id&user_id=$u_id";
+          $sel_alert = '';
+          foreach ($ccalendar_alerts as $alert_sec => $alert_label) {
+            if($alerts[$u_id] == $alert_sec) {
+              $sel_alert .= "<option value=\"$alert_sec\" selected=\"selected\">$alert_label</option>";
+            } else {
+              $sel_alert .= "<option value=\"$alert_sec\">$alert_label</option>";
+            }
           }
+          $sel_alert = "<select name=\"sel_alert\" onchange=\"window.location='$urla&sel_alert='+this.options[this.selectedIndex].value\"><option value=\"$c_none\">$l_none</option>$sel_alert</select>";        
+          $dis_user_list .= "
+          <tr>
+          <td>$label</td>
+          <td>$sel_alert</td>
+          <td class=\"C\">
+          <input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_A</span>
+          <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_W</span>
+          <input $DECLINED type=\"radio\" $ie6_radio_fix name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_R</span>
+          </td>
+          </tr>";
+          $$state = '';
+        } else {
+          $ACCEPTED = 'class="disabled"';
+          ${'NEEDS-ACTION'} = 'class="disabled"';
+          $DECLINED = 'class="disabled"';
+          $$state = '';
+          $dis_user_list .= "<tr><td>$label</td><td></td><td class=\"C\">
+          <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_A</span>
+    <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_W</span>
+          <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_R</span>
+            </td></tr>";
         }
-        $sel_alert = "<select name=\"sel_alert\" onchange=\"window.location='$urla&sel_alert='+this.options[this.selectedIndex].value\"><option value=\"$c_none\">$l_none</option>$sel_alert</select>";        
-        $dis_user_list .= "
-        <tr>
-        <td>$label</td>
-        <td>$sel_alert</td>
-        <td class=\"C\">
-        <input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_A</span>
-        <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_W</span>
-        <input $DECLINED type=\"radio\" $ie6_radio_fix name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_R</span>
-        </td>
-        </tr>";
-        $$state = '';
-      } else {
-        $ACCEPTED = 'class="disabled"';
-        ${'NEEDS-ACTION'} = 'class="disabled"';
-        $DECLINED = 'class="disabled"';
-        $$state = '';
-        $dis_user_list .= "<tr><td>$label</td><td></td><td class=\"C\">
-        <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span $ACCEPTED>$l_A</span>
-  <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span ${'NEEDS-ACTION'}>$l_W</span>
-        <input style='visibility:hidden;' disabled='disabled' $ie6_radio_fix type=\"radio\" name=\"rd_user_decision_$u_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span $DECLINED>$l_R</span>
-          </td></tr>";
+      }
+    }
+
+    $attendee = $entities['contact'];
+    if (is_array($attendee['entity'])) {
+      foreach ($attendee['entity'] as $c_id => $entity) {
+        $label = $entity['label'];
+        $state = $entity['state'];
+        $ACCEPTED = '';
+        ${'NEEDS-ACTION'} = '';
+        $DECLINED = '';
+          $$state = "checked=\"checked\"";
+          $urld = "$path/calendar/calendar_index.php?action=update_ext_decision&calendar_id=$id&entity_kind=contact&entity_id=$c_id";
+
+          $dis_contact_list .= "
+          <tr>
+          <td>$label</td>
+          <td class=\"C\">
+          <input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_A</span>
+    <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_W</span>
+          <input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_R</span>
+          </td>
+          </tr>";
+          $$state = '';
       }
     }
   }
 
-  $attendee = $entities['contact'];
-  if (is_array($attendee['entity'])) {
-    foreach ($attendee['entity'] as $c_id => $entity) {
-      $label = $entity['label'];
-      $state = $entity['state'];
-      $ACCEPTED = '';
-      ${'NEEDS-ACTION'} = '';
-      $DECLINED = '';
-        $$state = "checked=\"checked\"";
-        $urld = "$path/calendar/calendar_index.php?action=update_ext_decision&calendar_id=$id&entity_kind=contact&entity_id=$c_id";
-
-        $dis_contact_list .= "
-        <tr>
-        <td>$label</td>
-        <td class=\"C\">
-        <input $ACCEPTED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"ACCEPTED\" onclick=\"window.location='$urld&rd_decision_event=ACCEPTED'\" /><span>$l_A</span>
-  <input ${'NEEDS-ACTION'} $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"NEEDS-ACTION\" onclick=\"window.location='$urld&rd_decision_event=NEEDS-ACTION'\" /><span>$l_W</span>
-        <input $DECLINED $ie6_radio_fix type=\"radio\" name=\"rd_contact_decision_$c_id\" value=\"DECLINED\" onclick=\"window.location='$urld&rd_decision_event=DECLINED'\" /><span>$l_R</span>
-        </td>
-        </tr>";
-        $$state = '';
-    }
+  if ($dis_user_list != "") {
+    $dis_users_block ="
+      <div class=\"detail infos\">
+      <h1>$l_users</h1>
+      <table  class=\"spreadSheet\">
+      <thead>
+      <tr>
+      <td>$l_users</td><td>$l_alerts</td><td>$l_state</td>
+      </tr>
+      </thead>
+      $dis_user_list
+      </table>
+      </div>";
   }
+
   if ($dis_contact_list != "") {
    $dis_contacts_block ="  <div class=\"detail infos\">
     <h1>$GLOBALS[l_contacts]</h1>
@@ -2526,17 +2547,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
    </table>
    </div>
   $repeat_block
-  <div class=\"detail infos\">
-  <h1>$l_users</h1>
-  <table  class=\"spreadSheet\">
-  <thead>
-  <tr>
-  <td>$l_users</td><td>$l_alerts</td><td>$l_state</td>
-  </tr>
-  </thead>
-  $dis_user_list
-  </table>
-  </div>
+  $dis_users_block
 
   <p class=\"LC\" />
   $dis_contacts_block
