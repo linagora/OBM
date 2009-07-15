@@ -4105,6 +4105,7 @@ function genUniqueExtEventId() {
   /* 255 (max event_ext_id field) - 128 (max domain len) - 21 (prod id)
      - 15 (max version length guess) - 7 (strlen('OBM---@'))
      = 84
+     = (the Answer to the Ultimate Question of Life, the Universe, and Everything) * 2
   */
   $max_len = 84;
   $event_ext_id = '';
@@ -4119,54 +4120,69 @@ function genUniqueExtEventId() {
  */
 function get_json_entity_events($calendar, $entity_store) {
   global $obm, $display;
- 
-  $date = $calendar['date'];
-  $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
-  $end = clone $date;
-  $end->addDay(7);  
 
-  $kind = $calendar['kind'];
-  $canRead = 0;
+  $json = array();
+  if (is_array($calendar['resource_id']) || is_array($calendar['user_id'])) {
+    $date = $calendar['date'];
+    $date->setWeekday($GLOBALS['ccalendar_weekstart'])->setHour(0)->setMinute(0)->setSecond(0);
+    $end = clone $date;
+    $end->addDay(7);  
 
-  switch($kind) {
-    case 'user':
-      $id = $calendar['user_id'][0];
-      if(OBM_Acl::canRead($obm['uid'], 'calendar', $id)) {
-        $canRead = 1;
-        $status = array('ACCEPTED');
-        calendar_events_model($date,$end,$entity_store, $status);
-        $of = &OccurrenceFactory::getInstance();
-        $ocs = $of->getPeriodOccurrences($date, $end, array('user' => array($id), 'resource' => null));
-        $json_evts = build_json_event($ocs);
+    $canRead = 0;
+    $status = array('ACCEPTED');
+    $of = &OccurrenceFactory::getInstance();
+    calendar_events_model($date,$end,$entity_store, $status);
+    $json_attendees = array();
+    $user = array();
+    if (is_array($calendar['user_id'])) {
+      foreach($calendar['user_id'] as $u_id) {
+        if(OBM_Acl::canRead($obm['uid'], 'calendar', $u_id)) {
+          array_push($user, $u_id);
+          $json_attendees['user'][$u_id] = array();
+        } else {
+          $entity_info = get_entity_info($u_id, 'user');
+          array_push($json, "{entity:'user', entity_id:'$u_id', entity_label:'".phpStringToJsString($entity_info['label'])."', data:{canRead:0}}");
+        }
       }
-      if(is_array($json_evts)) $json_evts = implode(",", $json_evts);
+    }
 
-      $display['json'] = "canRead:$canRead,events:[$json_evts]";
-      break;
-    case 'contact':
-      $display['json'] = "canRead:0"; // Calendar is unavailable for contacts
-      break;
-    case 'resource':
-      $id = $calendar['sel_resource_id'][0];
-      $json_evts = array();
-      if(OBM_Acl::canRead($obm['uid'], 'resource', $id)) {
-        $canRead = 1;
-        $status = array('ACCEPTED');
-        calendar_events_model($date,$end,$entity_store, $status);
-        $of = &OccurrenceFactory::getInstance();
-        $ocs = $of->getPeriodOccurrences($date, $end, array('user' => null, 'resource' => array($id)));
-        $json_evts = build_json_event($ocs);
+    $resource = array();
+    if (is_array($calendar['resource_id'])) {
+      foreach($calendar['resource_id'] as $r_id) {
+        if(OBM_Acl::canRead($obm['uid'], 'resource', $r_id)) {
+          array_push($resource, $r_id);
+          $json_attendees['resource'][$r_id] = array();
+        } else {
+          $entity_info = get_entity_info($r_id, 'resource');
+          array_push($json, "{entity:'resource', entity_id:'$r_id', entity_label:'".phpStringToJsString($entity_info['label'])."', data:{canRead:0}}");
+        }
       }
-      $display['json'] = "canRead:$canRead,events:[".implode(",", $json_evts)."]";
-      break;
+    }
+
+    $ocs = $of->getPeriodOccurrences($date, $end, array('user' => $user, 'resource' => $resource));
+    $json_evts = build_json_event($ocs, $json_attendees);
+    foreach($json_evts as $entity => $entity_ids) {
+      foreach($entity_ids as $entity_id => $events) {
+        $events = implode(",", $events);
+        $entity_info = get_entity_info($entity_id, $entity);
+        array_push($json, "{entity:'$entity', entity_id:'$entity_id',entity_label:'".phpStringToJsString($entity_info['label'])."', data:{canRead:1,events:[$events]}}");
+      }
+    }
   }
 
+  if (is_array($calendar['contact_id'])) {
+    foreach($calendar['contact_id'] as $c_id) {
+      $entity_info = get_entity_info($c_id, 'contact');
+      array_push($json, "{entity:'contact', entity_id:'$c_id',entity_label:'".phpStringToJsString($entity_info['label'])."', data:{canRead:0}}");
+    }
+  }
+
+  $display['json'] = "listEvents:[".implode(',', $json)."]";
 }
 
-function build_json_event($ocs) {
+function build_json_event($ocs, $json_evts) {
   global $obm;
 
-  $json_evts = array();
   if (is_array($ocs)) {
     foreach($ocs as $oc) {
       $date = $oc->date;
@@ -4175,6 +4191,9 @@ function build_json_event($ocs) {
       $end->addTimestamp($oc->event->duration); 
       $evt = "{event:{";
       $title = $oc->event->title;
+      $entity = $oc->entity;
+      $entity_id = $oc->id;
+      if (!is_array($json_evts[$entity][$entity_id])) $json_evts[$entity][$entity_id] = array();
       if($oc->event->isPrivate() && !(array_key_exists($obm['uid'],$oc->event->attendee['user']))) {
         $title = $GLOBALS['l_private'];
       }
@@ -4186,7 +4205,7 @@ function build_json_event($ocs) {
       $evt .= "allday:".($oc->event->isAllDay()?'true':'false').",";
       $evt .= "periodic:".($oc->event->isPeriodic()?'true':'false')."";
       $evt .= "}}";
-      array_push($json_evts, $evt);
+      array_push($json_evts[$entity][$entity_id], $evt);
     }
   }
   return $json_evts;

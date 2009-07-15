@@ -4060,6 +4060,7 @@ function dis_calendar_free_interval($calendar) {
   // Days headers 
   $current = clone $date;
   $colspan = ($GLOBALS['ccalendar_last_hour'] - $GLOBALS['ccalendar_first_hour']) * $unit;
+  $time_slots = array();
   while($current->compare($end) < 0) {
     $current->setHour($GLOBALS['ccalendar_first_hour']);
     $day = $current->localize(Of_Date::OBM_DATE_DAY);
@@ -4072,13 +4073,12 @@ function dis_calendar_free_interval($calendar) {
     $current->addDay(1);
 
     while($d->compare($end_day) < 0) {
-      $label = "";
-      $class= "";
       if($d->compareMinute(0) == 0) {
         $label = $d->get(Of_Date::TIME_SHORT);
-        $class = "freeBusyCalendarHourDisplayed";
-        $day_hours_list .= "<td colspan='$unit' class='$class freeBusyCalendarHour'><span>$label</span></td>";
+        $day_hours_list .= "<td colspan='$unit' class='freeBusyCalendarHourDisplayed' freeBusyCalendarHour'><span>$label</span></td>";
       }
+      $attendeesBar .= "<td class='timeSlot'><div id='".$d->getTimestamp()."' style='width:${colWidth}px;'></div></td>";
+      array_push($time_slots, $d->get(Of_Date::TIMESTAMP));
       $d->addSecond($time_unit_sec);
     }
   }
@@ -4095,31 +4095,11 @@ function dis_calendar_free_interval($calendar) {
      <img src='$GLOBALS[ico_add]' alt='[Add]' />
     </a>";
 
-  $attendeesBar = "<tr>";
-  $time_slots = array();
-  $current = clone $date;
-  while($current->compare($end) < 0) {
-    $current->setHour($GLOBALS['ccalendar_first_hour']);
-    $end_day = clone $current;
-    $end_day->setHour($GLOBALS['ccalendar_last_hour']);
-
-    $d = clone $current;
-    $current->addDay(1);
-
-    while($d->compare($end_day) < 0) {
-      $end_slot = clone $d;
-      $end_slot->addSecond($time_unit_sec);
-      $attendeesBar .= "<td class='timeSlot'><div id='".$d->getTimestamp()."' style='width:${colWidth}px;'></div></td>";
-      array_push($time_slots, $d->get(Of_Date::TIMESTAMP));
-      $d->addSecond($time_unit_sec);
-    }
-  }
-  $attendeesBar .= "</tr>";
-
   $js_time_slots = phpArrayToJsArray($time_slots);
   $l_calendar_not_available = phpStringToJsString($GLOBALS['l_calendar_not_available']);
   $l_allday = phpStringToJsString($GLOBALS['l_all_day']);
   $l_invalid_email = phpStringToJsString($GLOBALS['l_invalid_email']);
+
   // Navigation
   $current = clone $date;
   $prev_month = $current->setDateIso($calendar['date'])->subMonth(1)->getDateIso();
@@ -4137,7 +4117,7 @@ function dis_calendar_free_interval($calendar) {
   <div id='fbc' class='freeBusyContent obmPopup'>
     <div  style='position:relative;'>
       <h1>
-      <a href='#' id='closeFreeBusy' class='closeSticky' onclick='return false;'>
+      <a href='#' id='closeFreeBusy' class='close closeSticky' onclick='return false;'>
       <img src='$GLOBALS[ico_popup_close]' alt='close' />
       </a>
       <span>$GLOBALS[l_header_meeting]</span>
@@ -4151,52 +4131,51 @@ function dis_calendar_free_interval($calendar) {
       </h2>
     </div>
     <div class='freeBusyEntities'>
-      <form method='POST' id='entities_form' action='calendar_index.php'>
-        <table id='freeBusyEntitiesList'> 
+      <table id='freeBusyEntitiesList'> 
+        <tr>
+          <td>&nbsp;</td>
+        </tr>  
+        <tr>
+          <td><img id='spinner' style='display:none;' src='$GLOBALS[ico_spinner]' /></td>
+        </tr>  
+        <tr>
+          <td><div class='allAttendees'>$GLOBALS[l_attendees]</div></td>
+        </tr>  
+        <tr>
+          <td id='sel_attendees_id'></td>
+        </tr>
+      </table>
+      <table>
+        <tbody class='readable' $visiblityU>
           <tr>
-            <td>&nbsp;</td>
-          </tr>  
-          <tr>
-            <td><img id='spinner' style='display:none;' src='$GLOBALS[ico_spinner]' /></td>
-          </tr>  
-          <tr>
-            <td><div class='allAttendees'>$GLOBALS[l_attendees]</div></td>
-          </tr>  
-          <tr>
-            <td id='sel_attendees_id'></td>
+            <td>$GLOBALS[l_users]/$GLOBALS[l_contacts] $user_add_button</td>
           </tr>
-          <tbody class='readable' $visiblityU>
-            <tr>
-              <td>$GLOBALS[l_users]/$GLOBALS[l_contacts] $user_add_button</td>
-            </tr>
-            <tr>
-              <td><input type='text' name='' value='' id='freeBusyUserSearch' autocomplete='off' /></td>
-            </tr>
-            <tr>
-              <td>$GLOBALS[l_others_attendees]</td>
-            </tr>
-            <tr>
-              <td><input style='width:14em;' type='text' name='external_contact' value='' id='external_contact' />
-                <img src='$GLOBALS[ico_add]' alt='[Add]' onclick='obm.calendarFreeBusy.addOtherAttendee();'/></td>
-            </tr>            
-          </tbody>
-          <tbody class='readable' $visiblityR>
-            <tr>
-              <td>$GLOBALS[l_resources] $resource_add_button</td>
-            </tr>
-            <tr>
-              <td><input type='text' name='' value='' id='freeBusyResourceSearch' autocomplete='off' /></td>
-            </tr>
-          </tbody>
-        </table>
-      </form>
+          <tr>
+            <td><input type='text' name='' value='' id='freeBusyUserSearch' autocomplete='off' /></td>
+          </tr>
+          <tr>
+            <td>$GLOBALS[l_others_attendees]</td>
+          </tr>
+          <tr>
+            <td><input style='width:14em;' type='text' name='external_contact' value='' id='external_contact' />
+              <img src='$GLOBALS[ico_add]' alt='[Add]' onclick='obm.calendarFreeBusy.addOtherAttendee();'/></td>
+          </tr>            
+        </tbody>
+        <tbody class='readable' $visiblityR>
+          <tr>
+            <td>$GLOBALS[l_resources] $resource_add_button</td>
+          </tr>
+          <tr>
+            <td><input type='text' name='' value='' id='freeBusyResourceSearch' autocomplete='off' /></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div ></div>
-    <div class='freeBusyForm'>
-      <div class='readable' id='scrollLeft' >«</div>
-      <div ></div>
-      <div class='readable' id='scrollRight' >»</div>
+    <div id='freeBusyForm' class='freeBusyForm'>
       <div class='freeBusyCalendar'>
+      <div class='readable' id='scrollLeft'>«</div>
+      <div ></div>
         <div id='calendarFreeBusyScroll'>
           <table id='calendarFreeBusyTable'> 
             <colgroup span='$colspan' class='freeBusyCalendarColDay'>
@@ -4211,13 +4190,14 @@ function dis_calendar_free_interval($calendar) {
               <tr>$day_hours_list</tr>
             </thead>
             <tbody id='calendarFreeBusyGrid'>
-              $attendeesBar
+              <tr>$attendeesBar</tr>
             </tbody>
           </table>
           <div id='calendarFreeBusyMeeting' class='meeting'>
             <div id='calendarFreeBusyResizeMeeting' class='meetingResize'></div>
           </div>
         </div>
+      <div class='readable' id='scrollRight'>»</div>
       </div>
 
       <div class='freeBusyButtons readable'>
@@ -4240,8 +4220,8 @@ function dis_calendar_free_interval($calendar) {
 
       <div class='buttons'>
         <form id='freeBusyFormId' method='POST' action='$GLOBALS[path]/calendar/calendar_index.php'>
-          <input class='readable' id='submitMeeting' type='submit' value='$GLOBALS[l_validate]' />
-          <input class='closeSticky' style='display:none;' id='formClose' type='button' value='$GLOBALS[l_close]' />
+          <input class='close readable' id='submitMeeting' type='submit' value='$GLOBALS[l_validate]' />
+          <input class='close closeSticky' style='display:none;' id='formClose' type='button' value='$GLOBALS[l_close]' />
           <input type='hidden' name='date_begin'id='date_begin' value='".urldecode($date->setHour($GLOBALS['ccalendar_first_hour'])->getURL())."' />
           <input type='hidden' name='duration' id='duration' value='' />
           <input type='hidden' name='time_begin' id='time_begin' value='' />
@@ -4251,18 +4231,17 @@ function dis_calendar_free_interval($calendar) {
         </form>
       </div>
     </div>
-
+    <div id='dummy' style='display:none;'/>
   </div>";
 
   $js = "
     timestamp = $date_ts;
     if ($('sel_time_begin') && $('sel_min_begin')) {
-      hour = parseInt($('sel_time_begin').value, 10);
-      min = parseInt($('sel_min_begin').value, 10);
-      d = new Obm.DateTime(timestamp*1000);
-      d.setHours(hour);
-      d.setMinutes(min);
+      var d = new Obm.DateTime(timestamp*1000);
+      d.setHours(parseInt($('sel_time_begin').value, 10));
+      d.setMinutes(parseInt($('sel_min_begin').value, 10));
       timestamp = d.getTime()/1000;
+      d = null;
     }
     obm.calendarFreeBusy = new Obm.CalendarFreeBusy($js_time_slots, $unit, timestamp, '$GLOBALS[ccalendar_first_hour]');
     obm.vars.labels.calendar_not_available = '$l_calendar_not_available';
@@ -4275,10 +4254,10 @@ function dis_calendar_free_interval($calendar) {
     obm.vars.images.ico_private = '$GLOBALS[ico_private_alt]';
     obm.vars.images.ico_allday = '$GLOBALS[ico_allday_alt]';
     obm.vars.images.ico_periodic = '$GLOBALS[ico_periodic_alt]';
-    new obm.AutoComplete.Search('$GLOBALS[path]/people/people_index.php?action=ext_search&ajax=1', 'sel_attendees_id', 'freeBusyUserSearch',
-      {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});
-    new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'sel_attendees_id', 'freeBusyResourceSearch',
-      {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee(id);'});";
+    new obm.AutoComplete.Search('$GLOBALS[path]/people/people_index.php?action=ext_search&ajax=1', 'dummy', 'freeBusyUserSearch',
+      {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee([id]);'});
+    new obm.AutoComplete.Search('$GLOBALS[path]/resource/resource_index.php?action=ext_search', 'dummy', 'freeBusyResourceSearch',
+      {filter_entity:'calendar', filter_pattern:'read', selectfunction:'obm.calendarFreeBusy.addAttendee([id]);'});";
 
   $display['json'] = "html:'".phpStringToJsString($block)."',js:'".phpStringToJsString($js)."'";
   
@@ -6665,7 +6644,7 @@ function dis_calendar_mail_field($emails, $class) {
         <a onclick=\"remove_element(this.parentNode,'calendarMailHome');return false\" href=\"\">
          <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
         </a>        
-        <input name='tf_others_attendees[]' value=\"$email\" />
+        <input class='otherAttendee' name='tf_others_attendees[]' value=\"$email\" />
         </div>";
       $count ++;
     }
@@ -6676,7 +6655,7 @@ function dis_calendar_mail_field($emails, $class) {
     <a onclick=\"remove_element(this.parentNode,'calendarMailHome');return false\" href=\"\">
      <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
     </a>        
-    <input name='tf_others_attendees[]' value='' />  
+    <input  class='otherAttendee' name='tf_others_attendees[]' value='' />  
     </div>         
     ";  
   $add_button = "<a id='addMailButton' href='' onclick=\"add_email_field();return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add email field]\" /></a>";

@@ -663,27 +663,30 @@ h1.hoursTitle{
   padding: 0;
   margin-left: 1em;
   position: relative;
-  width: 100%;
 }
 
 #scrollLeft {
   position: absolute;
-  text-align: left;
+  text-align: center;
   width:1em;
   cursor: pointer;
   background:	#35839A;
   color:#FFF;
-  z-index: 1000;
+  text-align: center;
+  height: 100%;
 }
 
 #scrollRight {
   position: absolute;
-  text-align: right;
-  width:1em;
-  right: 1em;
+  text-align: center;
+  width: 1em;
+  right: -1em;
   cursor: pointer;
   background:	#35839A;
   color:#FFF;
+  text-align: center;
+  height: 100%;
+  top: 0;
 }
 
 .freeBusyCalendar table {
@@ -772,6 +775,7 @@ h1.hoursTitle{
 .meeting {
   background: #80A9B7;
   cursor: move;
+  height: 100%;
 }
 
 .meetingBusy {
@@ -782,6 +786,7 @@ h1.hoursTitle{
   cursor: col-resize;
   background: #000; /*#35839A;*/
   width: 3px;
+  height: 100%;
 }
 
 .freeBusyButtons {

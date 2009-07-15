@@ -82,30 +82,16 @@ $extra_js .="
 
 
   function addFreeBusyEntities(int_form) {
-    var container = '$params[ext_container]';
-    size = int_form.length;
-    for (i=0; i <size; i++) {
-      // For each checkbox of the form, if filled we send the value
+    var people = new Array();
+    for (i=0; i < int_form.length; i++) {
       if (int_form.elements[i].type == 'checkbox') {
         if (int_form.elements[i].checked == true) {
-          id = $(int_form.elements[i]).getNext().id;
-          div_id = '$params[ext_element]-'+id;
-          // If the element not already present in the caller window
-          if (! get_elem(window.opener.document, div_id )) {
-   	        sel_id = 'data-'+id;
-            // Get the label associated to the id from the int_form row
-            // hidden in an hidden span
-  	        span = get_elem(window.document, id);
-  	        if (container == '' || container == 'div') {
-  	          of_select_add_element(window.opener.document, '$params[ext_element]', id, span.innerHTML);
-            }
-            if (container == 'table') {
-              of_select_add_element_table(window.opener.document, '$params[ext_element]', id, span.innerHTML);
-            }
-            window.opener.obm.calendarFreeBusy.addAttendee(id);
-          }
+          people.push($(int_form.elements[i]).getNext().id);
         }
       }
+    }
+    if (people.length > 0) {
+      window.opener.obm.calendarFreeBusy.addAttendee(people);
     }
   }
 

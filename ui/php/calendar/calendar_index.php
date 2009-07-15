@@ -129,7 +129,8 @@ if ( ($params['new_group'] == '1')
     $cal_entity_id['resource'] = array();
   }
 // Resources groups, only on meeting
-if ($action == 'add_freebusy_entity' || ($action == 'perform_meeting' &&
+if ($action == 'add_freebusy_entity' || $action == 'new_meeting' || 
+  ($action == 'new' && $params['new_meeting'] == 1) || ($action == 'perform_meeting' &&
   ($params['sel_resource_group_id'] || $params['sel_user_id'] ||
   $params['sel_resource_id'] || $params['sel_group_id']))) { 
     $cal_entity_id['user'] = $params['sel_user_id'];
@@ -590,12 +591,6 @@ if ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_calendar_meeting_form($params, $cal_entity_id);
 
-} elseif ($action == 'perform_meeting')  {
-///////////////////////////////////////////////////////////////////////////////
-  dis_calendar_free_interval($params);
-  echo "({".$display['json']."})";
-  exit();
-
 } elseif ($action == 'admin')  {
 ///////////////////////////////////////////////////////////////////////////////
   $display['detail'] = dis_calendar_admin_index();
@@ -743,13 +738,17 @@ if (!$params['ajax']) {
 
 } elseif ($action == 'add_freebusy_entity') {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($params['kind'] == 'user') {
-    array_push($cal_entity_id['user'], $params['entity_id']);
-  }
+  $cal_entity_id['user'] = $params['user_id'];
   $ret = get_calendar_entity_label($cal_entity_id);
   $ret['resourcegroup'] = run_query_resource_resourcegroup($cal_entity_id['resource_group']);
   $entity_store = store_calendar_entities($ret);
   get_json_entity_events($params, $entity_store);
+  echo "({".$display['json']."})";
+  exit();
+
+} elseif ($action == 'perform_meeting')  {
+///////////////////////////////////////////////////////////////////////////////
+  dis_calendar_free_interval($params);
   echo "({".$display['json']."})";
   exit();
 

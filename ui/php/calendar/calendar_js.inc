@@ -11,112 +11,116 @@ require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
 
-  function changePeriod(date) {
-    var duration = $('duration').value/3600;
-    displayFreeBusy(date, duration);
-  }
+/////////////////////////////////////////////////////////////////////////////
+function changePeriod(date) {
+  var entities = new Array();
+  var otherAttendee = new Array();
+  var contacts = new Array();
+  $$('input.currentAttendee').each(function(e) {
+    entities.push(e.value);
+  });
 
-  function performMeeting() {
-    var oldies = $$('div.freeBusyContent');
-    oldies.each(function(e) {
-      e.destroy();
-    });
-    var duration = parseInt($('sel_time_duration').value, 10)+parseInt($('sel_min_duration').value, 10)/60;
-    displayFreeBusy($('tf_date').value, duration);
-  }
+  var otherAttendee = new Array();
+  $$('input.currentOtherAttendee').each(function(e) {
+    otherAttendee.push(e.value);
+  });
 
-  function displayFreeBusyConflict(duration, d, ro) {
-    displayFreeBusy(d, duration, ro);
-  }
+  displayFreeBusy(date, $('duration').value/3600, entities, false, otherAttendee);
+}
 
-  function checkAvailability() {
-    var begin = getFieldDate($('tf_date_begin').value, false);
-    begin.setHours(parseInt($('sel_time_begin').value, 10));
-    begin.setMinutes(parseInt($('sel_min_begin').value, 10));
 
-    var end = getFieldDate($('tf_date_end').value, false);
-    end.setHours(parseInt($('sel_time_end').value, 10));
-    end.setMinutes(parseInt($('sel_min_end').value, 10));
+/////////////////////////////////////////////////////////////////////////////
+function performMeeting() {
+  $$('div.freeBusyContent').each(function(e) {
+    e.destroy();
+  });
 
-    if (begin.getTime() > end.getTime()) {
-      alert('$l_err_begin_end');
-      return false;
+  var entities = new Array();
+  $$('div.elementRow').each(function(e) {
+    var id = e.id.split('-');
+      var entity = id[1]+'-'+id[2]+'-'+id[3];
+      entities.push(entity);
+  });
+
+  var duration = parseInt($('sel_time_duration').value, 10)+parseInt($('sel_min_duration').value, 10)/60;
+  displayFreeBusy($('tf_date').value, duration, entities, false, new Array());
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+function displayFreeBusyConflict(duration, d, ro) {
+  var entities = new Array();
+  $$('div.elementRow').each(function(e) {
+    var id = e.id.split('-');
+    if (id[0] == 'sel_user_id' || id[0] == 'sel_resource_id') {
+      var entity = id[1]+'-'+id[2]+'-'+id[3];
+      entities.push(entity);
     }
+  });
+  displayFreeBusy(d, duration, entities, ro, new Array());
+}
 
-    var duration = (end-begin)/1000/3600; // hour
-    if($('sel_attendees_id')) $('sel_attendees_id').set('html','');
-    displayFreeBusy($('tf_date_begin').value, duration);
+
+/////////////////////////////////////////////////////////////////////////////
+function checkAvailability() {
+  var begin = getFieldDate($('tf_date_begin').value, false);
+  begin.setHours(parseInt($('sel_time_begin').value, 10));
+  begin.setMinutes(parseInt($('sel_min_begin').value, 10));
+
+  var end = getFieldDate($('tf_date_end').value, false);
+  end.setHours(parseInt($('sel_time_end').value, 10));
+  end.setMinutes(parseInt($('sel_min_end').value, 10));
+
+  if (begin.getTime() > end.getTime()) {
+    alert('$l_err_begin_end');
+    return false;
   }
 
-  function displayFreeBusy(date_begin, duration, readOnly) {
-    // Get current attendees
-    var elements = $$('div.elementRow');
-    var atts = new Array(); // current attendees
-    var i = 0;
-    elements.each(function (e) {
-      var id = e.id.split('-');
-      if (id[0] == 'sel_attendees_id') {
-        var entity = id[1]+'-'+id[2]+'-'+id[3];
-        var tmp = e.clone();
-        tmp.getChildren().destroy();
-        var label = tmp.get('text').trim();
-        atts[i] = [entity, label];
-        i++;
-      }
-    });
+  var entities = new Array();
+  $$('div.elementRow').each(function(e) {
+    var id = e.id.split('-');
+    if (id[0] == 'sel_user_id' || id[0] == 'sel_resource_id' || id[0] == 'sel_group_id') {
+      var entity = id[1]+'-'+id[2]+'-'+id[3];
+      entities.push(entity);
+    }
+  });
 
-    var othersAttendees = document.getElementsByName('tf_others_attendees[]');
+  var otherAttendee = new Array();
+  $$('input.otherAttendee').each(function(e) {
+    if (e.value != '') otherAttendee.push(e.value);
+  });
 
-    var q = new Object();
-    q.date = date_begin;
-    new Request.JSON({
-      url : 'calendar_index.php',
-      secure : false,
-      async: true,
-      onComplete: function(response) {
-        resp = eval(response);
-        if($('fbc')) $('fbc').destroy();
-        $('fbcContainer').innerHTML = resp.html;
-        eval(resp.js);
+  if($('sel_attendees_id')) $('sel_attendees_id').set('html','');
+  displayFreeBusy($('tf_date_begin').value, (end-begin)/1000/3600, entities, false, otherAttendee);
+}
 
-        obm.popup.popups.erase('fbc');
-        obm.popup.show('fbc');
-        obm.calendarFreeBusy.buildFreeBusyPanel(duration, readOnly);
 
-        // TODO > 2.2.4
-        // Optimize
-        if (atts.length > 0) {
-          for(i=0;i<atts.length;i++) {
-            obm.calendarFreeBusy.addAttendee(atts[i][0], atts[i][1]);
-          }
-        } else {
-          elements.each(function (e) {
-            var id = e.id.split('-');
-            if (id[0] == 'sel_user_id' || id[0] == 'sel_resource_id') {
-              var entity = id[1]+'-'+id[2]+'-'+id[3];
-              var tmp = e.clone();
-              tmp.getChildren().destroy();
-              var label = tmp.get('text').trim();
-              obm.calendarFreeBusy.addAttendee(entity, label);
-              tmp.destroy();
-            } else if (id[0] == 'sel_group_id') {
-              obm.calendarFreeBusy.addUserGroup(id[3]);
-            } else if (id[0] == 'sel_resource_group_id') {
-              obm.calendarFreeBusy.addResourceGroup(id[3]);
-            }
-          });
+/////////////////////////////////////////////////////////////////////////////
+function displayFreeBusy(date_begin, duration, entities, readOnly, otherAttendee) {
+  var q = new Object();
+  q.date = date_begin;
+  new Request.JSON({
+    url : 'calendar_index.php',
+    secure : false,
+    onComplete: function(resp) {
+      if($('fbc')) $('fbc').destroy();
+      $('fbcContainer').innerHTML = resp.html;
+      eval(resp.js);
+      obm.popup.popups.erase('fbc');
+      obm.popup.show('fbc');
+      obm.calendarFreeBusy.buildFreeBusyPanel(duration, readOnly);
+      obm.calendarFreeBusy.addAttendee(entities);
+      var id = 0;
+      otherAttendee.each(function(e) {
+        obm.calendarFreeBusy.addAttendee(['data-others_attendees-'+id], e);
+        id++;
+      });
+      $('fbcContainer').innerHTML = '';
 
-          for(var i = 0;i<othersAttendees.length;i++) {
-            var e = othersAttendees[i].value;
-            obm.calendarFreeBusy.addOtherAttendee(e);
-          }
-        }
+    }
+  }).post(\$merge({ajax : 1, action : 'perform_meeting'}, q)); 
+}
 
-        $('fbcContainer').innerHTML = '';
-
-      }
-    }).post(\$merge({ajax : 1, action : 'perform_meeting'}, q)); 
-  }
 
 function add_displayed_attendee(check, attendee, uid, kind) {
   if (check) {
@@ -361,7 +365,7 @@ function add_email_field() {
               remove_element(this.parentNode,'calendarMailHome');
             }).adopt(new Element('img').setProperty('src','$ico_delete')));
   mailHome.adopt(div);
-  div.appendText(' ').adopt(new Element('input').setProperty('name','tf_others_attendees[]').setProperty('type','text'));
+  div.appendText(' ').adopt(new Element('input').addClass('otherAttendee').setProperty('name','tf_others_attendees[]').setProperty('type','text'));
   
 }
 

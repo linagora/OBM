@@ -1732,33 +1732,27 @@ Obm.CalendarFreeBusy = new Class({
   initialize: function(time_slots, unit, begin_timestamp, first_hour) {
     this.timestamp = begin_timestamp;
     // this.date = new Obm.DateTime(this.timestamp*1000).toLocaleDateString(); Doesn't work on Windows ?
-    d = new Obm.DateTime(this.timestamp*1000);
+    var d = new Obm.DateTime(this.timestamp*1000);
     this.date = d.format(obm.vars.regexp.dateFormat);
-    this.close = $('closeFreeBusy');
-    this.meeting_date = 0;
+    d = null;
     this.unit = unit;
     this.stepSize = 40/this.unit;
-    this.scrollDiv = $('calendarFreeBusyScroll');
-    this.container = $('calendarFreeBusyGrid');
-    this.meeting = $('calendarFreeBusyMeeting');
-    this.resizeHandler = $('calendarFreeBusyResizeMeeting');
-    this.table = $('calendarFreeBusyTable'); 
-    this.scrollRight = $('scrollRight');
-    this.scrollLeft = $('scrollLeft');
-    this.external_contact = $('external_contact');
     this.external_contact_count = 0;
     this.nbSteps = time_slots.length;
-//    this.duration = 1;
     this.bts = new Array();
     this.ts = time_slots;
     this.meeting_slots = this.unit;
     this.oneDayWidth = this.stepSize*this.nbSteps/7; // in px
-    this.oneDaySteps = this.nbSteps/7; // nb slots per day
-    this.limitRight = this.scrollDiv.getLeft()+this.scrollDiv.offsetWidth;
     this.currentPosition = 0;
     this.attendeesSlot = new Array();
-    this.scrollDiv.setStyle('width', $(document.body).offsetWidth - 400 +'px');
+    $('calendarFreeBusyScroll').setStyle('width', $(document.body).offsetWidth - 400 +'px'); // FIXME: POPUP SIZE
     this.firstHour = first_hour;
+    this.timeSlotNoCalendar = new Element('tr').addClass('oneAttendee');
+    this.timeSlotNoEvents = new Element('tr').addClass('oneAttendee');
+    this.ts.each(function() {
+      this.timeSlotNoCalendar.adopt(new Element('td').addClass('timeSlotNoCalendar'));
+      this.timeSlotNoEvents.adopt(new Element('td').addClass('timeSlot'));
+    }.bind(this));
   },
 
   /*
@@ -1766,26 +1760,18 @@ Obm.CalendarFreeBusy = new Class({
    * Build meeting slider, meeting resizer
    */
   buildFreeBusyPanel: function(duration, readOnly) {
-    // setStyle doesn't work here. have to setStyle in initialize function. don't know why ... 
-    // this.scrollDiv.setStyle('width', $('mainContent').offsetWidth-100+'px');
-
-    //this.duration = duration;
-    var begin_slot = this.ts.indexOf(''+this.timestamp);
-    var end_slot = this.ts.indexOf(''+(this.timestamp+duration*3600));
     $('duration').value = duration*3600;
-    this.meeting_slots = end_slot-begin_slot;
-
-    this.meeting_date = this.timestamp;
+    this.meeting_slots = this.ts.indexOf(''+(this.timestamp+duration*3600))-this.ts.indexOf(''+this.timestamp);
 
     // /!\ meeting width must be set BEFORE Slider building
     if (Browser.Engine.trident) {
-      this.meeting.setStyle('width', this.stepSize*this.meeting_slots-(this.meeting_slots/2)+'px');
+      $('calendarFreeBusyMeeting').setStyle('width', this.stepSize*this.meeting_slots-(this.meeting_slots/2)+'px');
     } else {
-      this.meeting.setStyle('width', (this.stepSize*this.meeting_slots)-(this.meeting_slots)+'px');
+      $('calendarFreeBusyMeeting').setStyle('width', (this.stepSize*this.meeting_slots)-(this.meeting_slots)+'px');
     }
 
     // Meeting slider : change date begin
-    this.slider = new Slider(this.container, this.meeting, {
+    this.slider = new Slider($('calendarFreeBusyGrid'), $('calendarFreeBusyMeeting'), {
       steps: this.nbSteps-this.meeting_slots,
       snap: true,
       onChange: function(pos) {
@@ -1806,9 +1792,12 @@ Obm.CalendarFreeBusy = new Class({
         if (date_end.getHours() == this.firstHour && date_end.getMinutes() == '0') {
           date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
         }
-        var date_end_ts = date_end.getTime();
-        $('duration').value = (date_end_ts - date_begin_ts)/1000;
+        $('duration').value = (date_end.getTime() - date_begin_ts)/1000;
 
+        ts = null;
+        date_begin = null;
+        date_begin_ts = null;
+        date_end = null;
       }.bind(this)
 
     });
@@ -1828,30 +1817,35 @@ Obm.CalendarFreeBusy = new Class({
       this.slider.checkStep();
       this.slider.end();
       this.slider.fireEvent('tick', position);
+    
+      dir = null;
+      position = null;
     }.bind(this));
 
     // Meeting resizer: change duration
     if (!readOnly) {
-      var resizeOptions = {
-        handle: this.resizeHandler,
+      $('calendarFreeBusyMeeting').makeResizable({
+        handle: $('calendarFreeBusyResizeMeeting'),
         grid: {'x' : this.slider.stepWidth},
         limit: {
           'x': [this.slider.stepWidth],
-          'y': [this.container.offsetHeight, this.container.offsetHeight]
+          'y': [$('calendarFreeBusyGrid').offsetHeight, $('calendarFreeBusyGrid').offsetHeight]
         },
         onBeforeStart: function() {
           this.slider.drag.detach();
         }.bind(this),
         onDrag: function() {
 
-          this.meeting.setStyles({
-            'height':this.container.offsetHeight+'px'
+          $('calendarFreeBusyMeeting').setStyles({
+            'height':$('calendarFreeBusyGrid').offsetHeight+'px'
           });
 
-          this.meeting_slots = Math.round(this.meeting.offsetWidth/this.slider.stepWidth);
-          this.resizeHandler.setStyles({
-            'margin-left' : this.meeting_slots*this.slider.stepWidth+'px'});
-          //this.duration = this.meeting_slots/this.unit;
+          this.meeting_slots = Math.round($('calendarFreeBusyMeeting').offsetWidth/this.slider.stepWidth);
+
+          $('calendarFreeBusyResizeMeeting').setStyles({
+            'margin-left' : $('calendarFreeBusyMeeting').offsetWidth-$('calendarFreeBusyResizeMeeting').offsetWidth+'px'
+          });
+
           this.changeStatus(this.isBusy(this.currentPosition+this.meeting_slots-1));
           this.displayMeetingInfo();
         }.bind(this),
@@ -1861,32 +1855,35 @@ Obm.CalendarFreeBusy = new Class({
           if (date_end.getHours() == this.firstHour && date_end.getMinutes() == '0') {
             date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
           }
-          var date_end_ts = date_end.getTime();
-          $('duration').value = (date_end_ts - date_begin_ts)/1000;
+          $('duration').value = (date_end.getTime() - date_begin_ts)/1000;
           this.slider.drag.attach();
-        }.bind(this)     
-      };
-      this.meeting.makeResizable(resizeOptions);
-    }
-    this.meeting.setOpacity(.5);
 
-    this.resizeHandler.setStyles({
-      'margin-left' : this.meeting.offsetWidth-this.resizeHandler.offsetWidth+'px',
-      'height': this.container.offsetHeight+'px'
+          date_begin_ts = null;
+          date_end = null;
+        }.bind(this)     
+      });
+    }
+    $('calendarFreeBusyMeeting').setOpacity(.5);
+    $('calendarFreeBusyMeeting').setStyles({
+      'position': 'absolute',
+      'top' : $('calendarHead').offsetHeight+'px'
+    });
+    $('calendarFreeBusyResizeMeeting').setStyles({
+      'margin-left' : $('calendarFreeBusyMeeting').offsetWidth-$('calendarFreeBusyResizeMeeting').offsetWidth+'px'
     });
 
     // Auto Scroll
-    this.autoScroll = new Fx.Scroll(this.scrollDiv, {
+    this.autoScroll = new Fx.Scroll($('calendarFreeBusyScroll'), {
       offset: {'x':-this.oneDayWidth/2, 'y':-$('calendarHead').offsetHeight} // Offset y : for ie7 !
     });
 
     // Navigation Scroll
-    this.scroll = new Fx.Scroll(this.scrollDiv);
-    this.scrollLeft.addEvent('click', function() {
-      this.scroll.start(this.scrollDiv.scrollLeft-this.oneDayWidth/2, 0); // - 1/2 day
+    var scroll = new Fx.Scroll($('calendarFreeBusyScroll'));
+    $('scrollLeft').addEvent('click', function() {
+      scroll.start($('calendarFreeBusyScroll').scrollLeft-this.oneDayWidth/2, 0); // - 1/2 day
     }.bind(this));
-    this.scrollRight.addEvent('click', function() {
-      this.scroll.start(this.scrollDiv.scrollLeft+this.oneDayWidth/2, 0); // + 1/2 day
+    $('scrollRight').addEvent('click', function() {
+      scroll.start($('calendarFreeBusyScroll').scrollLeft+this.oneDayWidth/2, 0); // + 1/2 day
     }.bind(this));
 
     // Scroll to the right position
@@ -1922,9 +1919,14 @@ Obm.CalendarFreeBusy = new Class({
           }
         } 
       });
+      input = null;
+      qstring = null;
+      name = null;
+      value = null;
+      hidden = null;
     }
 
-    this.external_contact.addEvent('keypress', function(e) {
+    $('external_contact').addEvent('keypress', function(e) {
       switch(e.key) {
         case 'enter':
           this.addOtherAttendee();
@@ -1941,6 +1943,15 @@ Obm.CalendarFreeBusy = new Class({
       $('formClose').setStyle('display', '');
     }
 
+    this.destroyAction();
+  },
+
+  destroyAction: function() {
+    $$('.close').each(function(e) {
+      e.addEvent('click', function() {
+        obm.calendarFreeBusy = null;
+      });
+    });
   },
 
   /*
@@ -1955,6 +1966,9 @@ Obm.CalendarFreeBusy = new Class({
       date_end = new Obm.DateTime(date_begin_ts+(this.meeting_slots/this.unit)*3600*1000);
     }
     $('meeting_end').innerHTML = date_end.format(obm.vars.regexp.dateFormat + ' h:i');
+    date_begin_ts = null;
+    date_begin = null;
+    date_end = null;
   },
 
   /*
@@ -1964,9 +1978,13 @@ Obm.CalendarFreeBusy = new Class({
     for(var i=this.currentPosition;i<=end_pos;i++) {
       var index = this.bts.indexOf(i+'');
       if (index != -1) {
+        var i = null;
+        var index = null;
         return true;
       }
     }
+    var i = null;
+    var index = null;
     return false;
   },
 
@@ -1975,9 +1993,9 @@ Obm.CalendarFreeBusy = new Class({
    */
   changeStatus: function(isBusy) {
     if(isBusy) {
-      this.meeting.addClass('meetingBusy');        
+      $('calendarFreeBusyMeeting').addClass('meetingBusy');        
     } else {
-      this.meeting.removeClass('meetingBusy');        
+      $('calendarFreeBusyMeeting').removeClass('meetingBusy');        
     }
   },
 
@@ -1997,6 +2015,8 @@ Obm.CalendarFreeBusy = new Class({
       // this.autoScroll.toElement(this.meeting); // Doesn't work on IE !
       this.autoScroll.set((this.currentPosition-10)*this.stepSize); // crappy IE fix
     }
+    initialPosition = null;
+    end_pos = null;
   },
 
   /*
@@ -2015,221 +2035,192 @@ Obm.CalendarFreeBusy = new Class({
       // this.autoScroll.toElement(this.meeting); // Doesn't work on IE !
       this.autoScroll.set((this.currentPosition-10)*this.stepSize); // crappy IE fix
     }
+    initialPosition = null;
+    end_pos = null;
   },
 
   /*
    * Initialize meeting position
    */
   initPosition: function() {
-    this.currentPosition = this.ts.indexOf(''+this.meeting_date);
+    this.currentPosition = this.ts.indexOf(''+this.timestamp);
     this.slider.set(this.currentPosition);
-    this.autoScroll.toElement(this.meeting);
+    this.autoScroll.toElement($('calendarFreeBusyMeeting'));
   },
 
   /*
    * Add an attendee dynamically
    */
-  addAttendee: function(entity, label) {
-
-    s = entity.split('-');
-    var data = new Object()
-    var kind = s[1];
-    var id = s[2]
-    data.kind = kind;
-    data.entity_id = id;
+  addAttendee: function(entities, label) {
+    var data = new Object();
+    data.sel_user_id = new Array();
+    data.sel_contact_id = new Array();
+    data.sel_resource_id = new Array();
     data.date = this.date;
+    entities.each(function(entity) {
+      var s = entity.split('-');
+      var kind = s[1];
+      var id = s[2];
+      if (!$(kind+'-'+id)) { // Check if attendee already in free-busy interface
+        if (kind == 'resource') {
+          data.sel_resource_id.push(id);
+        } else if (kind == 'user') {
+          data.sel_user_id.push(id);
+        } else if (kind == 'group') {
+          this.addUserGroup(id).each(function(u) {
+            data.sel_user_id.push(u.id);
+          });
+        } else if (kind == 'resourcegroup') {
+          this.addResourceGroup(id).each(function(r) {
+            data.sel_resource_id.push(r.id);
+          });
+        } else if (kind == 'others_attendees') {
+          // Calendar is not available for "contact" and "others attendees"
+          var attendee = 'others_attendees-'+id;
+          var tr = this.buildNotAvailableCalendar(attendee);
+          this.displayAttendee(attendee, kind, tr, label);
+          $('fbc').getParent().setStyle('top', $('fbc').getParent().offsetTop-8+'px');
+          this.external_contact_count++;
+        } else if (kind == 'contact') {
+          data.sel_contact_id.push(id);
+        }
+      }
+    }.bind(this));
 
-    if (kind == 'resource') {
-      data.sel_resource_id = new Array();
-      data.sel_resource_id.push(id);
-      var ico = obm.vars.images.ico_resource;
-    } else if(kind == 'user') {
-      data.sel_user_id = new Array();
-      data.sel_user_id.push(id);
-      var ico = obm.vars.images.ico_user;
-    } else if (kind == 'contact') {
-      data.sel_contact_id = new Array();
-      data.sel_contact_id.push(id);
-      var ico = obm.vars.images.ico_contact;
-    } else if (kind == 'others_attendees') {
-      data.sel_contact_id = new Array();
-      data.sel_contact_id.push(id);
-      data.kind = 'contact';
-      var ico = obm.vars.images.ico_contact;
-    } else {
-      return;
-    }
-
-    var attendee = kind+'-'+id;
-
-    // TODO
-    // optimize : no request when kind == 'contact' || kind == 'others_attendees'
-    new Request.JSON({
-      url: 'calendar_index.php',
-      secure: false,
-      async: false,
-      onRequest: function() {
-        $('spinner').setStyle('display', 'block');
-      },
-      onComplete : function(response) {
-        resp = eval(response);
-        if (!$(attendee)) {
-          var tr = new Element('tr').setProperty('id', attendee).addClass('oneAttendee');
-          if (label) {
-            // Add attendee in attendees panel
-            var div_id = 'sel_attendees_id-data-'+attendee;
-            var div = new Element('div').setProperty('id', div_id).addClass('elementRow');
-            new Element('a').adopt(new Element('img').setProperty('src',obm.vars.images.del)).addEvent('mousedown',
-              function() {
-                remove_element(div_id,label);
-              }.bind(this)).injectInside(div);
-            div.appendText(label.trim());
-            $('sel_attendees_id').adopt(div);
-          }
-          if (!resp.canRead) {
-            for(i=0;i<this.nbSteps;i++) {
-              var td = new Element('td').addClass('timeSlotNoCalendar').addClass('obmTip').
-                setProperty('title', obm.vars.labels.calendar_not_available);
-              tr.adopt(td);
-                obm.tip.add(td);
-            }
-          } else {
-            var entitySlot = new Array();
-            var  events = resp.events;
-            this.ts.each(function(slot) {
-              entitySlot.push(slot); 
-              entitySlot[slot] = new Array();
-              tip = '<table>';
-              events.each(function(e) {
-                var begin = e.event.begin;
-                var end = e.event.end;
-                var time = e.event.time;
-                var title = '';
-                if (e.event.meeting) {
-                  title += '<img src="'+obm.vars.images.ico_meeting+'" alt="[Meeting]"/> '; 
-                }
-                if (e.event.private) {
-                  title += '<img src="'+obm.vars.images.ico_private+'" alt="[Private]"/> '; 
-                }
-                if (e.event.periodic) {
-                  title += '<img src="'+obm.vars.images.ico_periodic+'" alt="[Periodic]"/> '; 
-                }
-                if (e.event.allday) {
-                  title += '<img src="'+obm.vars.images.ico_allday+'" alt="[All day]"/> '; 
-                }
-                title += e.event.title;
-                if (begin <= slot && slot < end) {
-                  entitySlot[slot].push(time);
-                  var hour_begin = new Obm.DateTime(begin*1000).format('h:i'); 
-                  var hour_end = new Obm.DateTime(end*1000).format('h:i'); 
-                  if (e.event.allday) {
-                    tip += '<tr><td class="B">'+obm.vars.labels.allday+'</td><tr>';
-                  } else {
-                    tip += '<tr><td class="B">'+hour_begin+' - '+hour_end+'</td><tr>';
-                  }
-                  tip += '<tr><td><ul>'+title+'</ul></td></tr>';
-                  $(slot).addClass('haveEventAll');
-                  this.bts.push(''+this.ts.indexOf(''+slot));
-                }
-              }.bind(this));
-              tip += '<table>';
-              if (entitySlot[slot].length > 0) {
-                var td = new Element('td').addClass('timeSlot').addClass('obmTip')
-                  .setProperty('title', tip).adopt(new Element('div').addClass('haveEvent').addClass(slot));
-                tr.adopt(td); 
-                if (!this.attendeesSlot[attendee]) this.attendeesSlot[attendee]=new Array();
-                this.attendeesSlot[attendee].push(slot);
-                obm.tip.add(td);
+    if (data.sel_user_id.length > 0 || data.sel_resource_id.length > 0 || data.sel_contact_id.length > 0) {
+      new Request.JSON({
+        url: 'calendar_index.php',
+        secure: false,
+        onRequest: function() {
+          $('spinner').setStyle('display', 'block');
+        },
+        onComplete : function(response) {
+          response.listEvents.each(function(resp) {
+            var kind = resp.entity;
+            var attendee = kind+'-'+resp.entity_id;
+            var label = resp.entity_label;
+            if (!$(attendee)) {
+              if (!resp.data.canRead) {
+                var tr = this.buildNotAvailableCalendar(attendee);
               } else {
-                tr.adopt(new Element('td').addClass('timeSlot')); 
+                var events = resp.data.events;
+                if (events.length > 0) {
+                  var tr = new Element('tr').setProperty('id', attendee).addClass('oneAttendee');
+                  var entitySlot = new Array();
+                  var events = resp.data.events;
+                  this.ts.each(function(slot) {
+                    entitySlot[slot] = new Array();
+                    var tip = '<table>';
+                    events.each(function(e) {
+                      if (e != null) {
+                        var begin = e.event.begin;
+                        var end = e.event.end;
+                        var time = e.event.time;
+                        var title = '';
+                        if (e.event.meeting) {
+                          title += '<img src="'+obm.vars.images.ico_meeting+'" alt="[Meeting]"/> '; 
+                        }
+                        if (e.event.private) {
+                          title += '<img src="'+obm.vars.images.ico_private+'" alt="[Private]"/> '; 
+                        }
+                        if (e.event.periodic) {
+                          title += '<img src="'+obm.vars.images.ico_periodic+'" alt="[Periodic]"/> '; 
+                        }
+                        if (e.event.allday) {
+                          title += '<img src="'+obm.vars.images.ico_allday+'" alt="[All day]"/> '; 
+                        }
+                        title += e.event.title;
+                        if (begin <= slot && slot < end) {
+                          entitySlot[slot].push(time);
+                          if (e.event.allday) {
+                            tip += '<tr><td class="B">'+obm.vars.labels.allday+'</td><tr>';
+                          } else {
+                            tip += '<tr><td class="B">'+new Obm.DateTime(begin*1000).format('h:i')+
+                              ' - '+new Obm.DateTime(end*1000).format('h:i')+'</td><tr>';
+                          }
+                          tip += '<tr><td><ul>'+title+'</ul></td></tr>';
+                          $(slot).addClass('haveEventAll');
+                          this.bts.push(''+this.ts.indexOf(''+slot));
+                        }
+                        if (slot == end) {
+                          events.erase(e);
+                        }
+                        begin = null;
+                        end = null;
+                        time = null;
+                        title = null;
+                      }
+                    }.bind(this));
+                    tip += '<table>';
+
+                    if (entitySlot[slot].length > 0) {
+                      // timeSlot is busy 
+                      var td = new Element('td').addClass('timeSlot')
+                        .setProperty('title', tip).adopt(new Element('div').addClass('haveEvent '+slot));
+                      tr.adopt(td); 
+                      if (!this.attendeesSlot[attendee]) this.attendeesSlot[attendee]=new Array();
+                      this.attendeesSlot[attendee].push(slot);
+                      obm.tip.add(td);
+
+                      tip = null;
+                      td = null;
+                    } else {
+                      // timeSlot is free
+                      tr.adopt(new Element('td').addClass('timeSlot')); 
+                    }
+
+                  }.bind(this));
+                } else {
+                  var tr = this.buildNoEvents(attendee);
+                }
               }
-            }.bind(this));
-          }
+
+              this.displayAttendee(attendee, kind, tr, label);
+
+              tr = null;
+            }
+          }.bind(this));
+
+          // Fix popup top position
+          $('fbc').getParent().setStyle('top', $('fbc').getParent().offsetTop-(response.listEvents.length*8)+'px');
 
           // Set meeting color
           this.changeStatus(this.isBusy(this.currentPosition+this.meeting_slots-1));
 
-          var div_id = $('sel_attendees_id-data-'+attendee);
-          if (kind == "others_attendees") {
-            div_id.addClass('contact');
-          } else {
-            div_id.addClass(kind);
-          }
-          var a = div_id.getFirst();
-          var trash = a.getFirst();
+          attendee = null;
+          label = null;
+        }.bind(this),
 
-          // Add entity icon
-          var img = new Element('img').setProperty('src', ico); 
-          img.injectBefore(a);
+        onSuccess: function() {
+          this.fixHeight();
+          $('spinner').setStyle('display', 'none');
+        }.bind(this),
 
-          // Add event on trash icon
-          trash.addEvent('mousedown', function() {
-            $(attendee).destroy();
-            $('tf_'+attendee).destroy();
-            if (this.attendeesSlot[attendee]) {
-              this.attendeesSlot[attendee].each(function(e) {
-                if (!$$('div.'+e).length) {
-                  $(e).removeClass('haveEventAll');
-                  this.bts.erase(''+this.ts.indexOf(e));
-                  this.setSize();
-                }
-              }.bind(this));
-              this.attendeesSlot[attendee].empty();
-            }
-            this.setSize();
-          }.bind(this));
-
-          // Fix popup top position
-          $('fbc').getParent().setStyle('top', $('fbc').getParent().offsetTop-10+'px');
-          
-          if (kind == 'others_attendees') {
-            var input = new Element('input').setProperties({
-              'id' : 'tf_'+attendee, 
-              'type' : 'hidden',
-              'name': kind+'[]',
-              'value' : label 
-            });
-          } else {
-            if (kind == 'contact') kind = 'user';
-            var input = new Element('input').setProperties({
-              'id' : 'tf_'+attendee,
-              'type' : 'hidden',
-              'name': kind+'_id[]',
-              'value' : 'data-'+attendee 
-            });
-          }
-          $('freeBusyFormId').adopt(input);
-
-          if (label != "") {
-            label = div_id.get('text');
-          }
-          label = label.toLowerCase();
-          this.displayAttendee(div_id, data.kind, label.trim(), tr);
+        onFailure: function() {
+          $('spinner').setStyle('display', 'none');
         }
-      }.bind(this),
-      onSuccess: function() {
-        $('spinner').setStyle('display', 'none');
-      },
-      onFailure: function() {
-        $('spinner').setStyle('display', 'none');
-      }
-    }).post($merge({ajax : 1, action : 'add_freebusy_entity'}, data));
+      }).post($merge({ajax : 1, action : 'add_freebusy_entity'}, data));
+    }
   },
 
+  /*
+   * Add new attendee
+   */
   addOtherAttendee: function(email) {
-    var reg = /^[a-z0-9._-]+@[a-z0-9.-]{2,}[.][a-z]{2,4}$/
+    var emailRegexp = /^[a-z0-9._-]+@[a-z0-9.-]{2,}[.][a-z]{2,4}$/;
     if (email == null) {
-      email = this.external_contact.value;
+      email = $('external_contact').value;
     }
     if (email != '') {
-      if(reg.exec(email)) {
-        this.addAttendee('data-others_attendees-'+this.external_contact_count, email);
+      if(emailRegexp.exec(email)) {
+        this.addAttendee(['data-others_attendees-'+this.external_contact_count], email);
         this.external_contact_count ++;
-        this.external_contact.value = "";
+        $('external_contact').value = "";
       } else {
         alert(obm.vars.labels.invalidEmail+' ('+email+')');
       }
     }
+    emailRegexp = null;
   },
 
   /*
@@ -2238,17 +2229,16 @@ Obm.CalendarFreeBusy = new Class({
   addUserGroup: function(group_id) {
     data = new Object();
     data.group_id = group_id;
+    var users = new Array();
     new Request.JSON({
       url: '/group/group_index.php',
       secure: false,
-      async: true,
+      async: false,
       onComplete: function(r) {
-        resp = eval(r);
-        resp.users.each(function(u) {
-          this.addAttendee('data-user-'+u.id, u.label);
-        }.bind(this));
-      }.bind(this)
+        users = r.users;
+      }
     }).post($merge({ajax : 1, action : 'get_json_user_group'}, data));
+    return users;
   },
 
   /*
@@ -2257,21 +2247,22 @@ Obm.CalendarFreeBusy = new Class({
   addResourceGroup: function(res_id) {
     data = new Object();
     data.res_id = res_id;
+    var resources = new Array();
     new Request.JSON({
       url: '/resourcegroup/resourcegroup_index.php',
       secure: false,
-      async: true,
+      async: false,
       onComplete: function(r) {
-        resp = eval(r);
-        resp.resources.each(function(u) {
-          this.addAttendee('data-resource-'+u.id, u.label);
-        }.bind(this));
-      }.bind(this)
+        resources = r.resources;
+      }
     }).post($merge({ajax : 1, action : 'get_json_resource_group'}, data));
+    return resources;
   },
 
 
-  displayAttendee: function(sel_attendee_id, kind, label, attendee_tr) {
+  displayAttendee: function(attendee, kind, tr, label) {
+    var sel_attendee_id = this.addToAttendeePanel(attendee, label, kind, label);
+    $('sel_attendees_id').adopt(sel_attendee_id);
     var elems = $$('.'+kind);
     if (elems.length>1) {
       var sorted = elems.sort(function(a, b) {
@@ -2284,46 +2275,98 @@ Obm.CalendarFreeBusy = new Class({
 
       var newPosition = sorted.indexOf(sel_attendee_id);
       if (newPosition == 0) {
-        var first = sorted[1]; 
-        var first_tr = $(kind+'-'+first.id.split('-')[3]);
-        sel_attendee_id.injectBefore(first);
-        attendee_tr.injectBefore(first_tr);
+        sel_attendee_id.injectBefore(sorted[1]);
+        tr.injectBefore($(kind+'-'+sorted[1].id.split('-')[3]));
       } else {
-        var prev = sorted[newPosition-1];
-        var prev_tr = $(kind+'-'+prev.id.split('-')[3]);
-        if (prev_tr!=null) {
-          sel_attendee_id.injectAfter(prev);
-          attendee_tr.injectAfter(prev_tr);
+        if ($(kind+'-'+sorted[newPosition-1].id.split('-')[3])!=null) {
+          sel_attendee_id.injectAfter(sorted[newPosition-1]);
+          tr.injectAfter($(kind+'-'+sorted[newPosition-1].id.split('-')[3]));
         } else {
-          this.container.adopt(attendee_tr);
+          $('calendarFreeBusyGrid').adopt(tr);
         }
       }
-
+ 
+      sorted = null;
+      newPosition = null;
+      
     } else {
       // It's the first attendee
-      this.container.adopt(attendee_tr);
+      $('calendarFreeBusyGrid').adopt(tr);
     }
-    this.setSize();
+    elems = null;
+
+    this.addToAttendeeForm(attendee, label, kind);
+    this.fixHeight();
   },
 
+  addToAttendeePanel: function(attendee, label, kind, label) {
+    var klass = kind;
+    if (kind == 'resource') {
+      var ico = obm.vars.images.ico_resource;
+    } else if (kind == 'user') {
+      var ico = obm.vars.images.ico_user;
+    } else if (kind == 'contact' || kind == 'others_attendees') {
+      var ico = obm.vars.images.ico_contact;
+    }
+    var div = new Element('div').setProperty('id', 'sel_attendees_id-data-'+attendee).addClass('elementRow '+klass);
+    new Element('img').setProperty('src', ico).injectInside(div); 
+    new Element('img').setProperty('src',obm.vars.images.del).addEvent('mousedown', function() {
+      $(attendee).destroy();
+      $('sel_attendees_id-data-'+attendee).destroy();
+      $('tf_'+attendee).destroy();
+      if (this.attendeesSlot[attendee]) {
+        this.attendeesSlot[attendee].each(function(e) {
+          if (!$$('div.'+e).length) {
+            $(e).removeClass('haveEventAll');
+            this.bts.erase(''+this.ts.indexOf(e));
+          }
+        }.bind(this));
+        this.attendeesSlot[attendee].empty();
+      }
+      this.fixHeight();
+    }.bind(this)).injectInside(div);
 
-  /*
-   * Set table height
-   */
-  setSize: function() {
-    var newHeight = this.table.offsetHeight;
-    this.meeting.setStyles({
-      'height':this.container.offsetHeight+'px',
-      'top':'-'+this.container.offsetHeight+'px'
-    });
-    this.scrollRight.setStyles({'height':newHeight+'px','line-height':newHeight+'px'});
-    this.scrollLeft.setStyles({'height':newHeight+'px','line-height':newHeight+'px'});
-    this.scrollDiv.setStyle('height', newHeight+20+'px');
-    this.resizeHandler.setStyles({
-      'height' : this.container.offsetHeight+'px',
-      'margin-left' : this.meeting.offsetWidth-this.resizeHandler.offsetWidth+'px',
-      'height': this.container.offsetHeight+'px'
-    });
+    div.appendText(label.trim());
+
+    return div;
+  },
+
+  addToAttendeeForm: function(attendee, label, kind) {
+    if (kind == 'others_attendees') {
+      var input = new Element('input').setProperties({
+        'id' : 'tf_'+attendee, 
+        'type' : 'hidden',
+        'name': 'others_attendees[]',
+        'value' : label 
+      }).addClass('currentOtherAttendee');
+    } else {
+      if (kind == 'contact') kind = 'user';
+      var input = new Element('input').setProperties({
+        'id' : 'tf_'+attendee,
+        'type' : 'hidden',
+        'name': kind+'_id[]',
+        'value' : 'data-'+attendee 
+      }).addClass('currentAttendee');
+    }
+    $('freeBusyFormId').adopt(input);
+    input = null;
+  },
+
+  buildNotAvailableCalendar: function(attendee) {
+    var tr = this.timeSlotNoCalendar.clone();
+    tr.setProperties({'id':attendee, 'title':obm.vars.labels.calendar_not_available});
+    return tr;
+  },
+  
+  buildNoEvents: function(attendee) {
+    var tr = this.timeSlotNoEvents.clone();
+    tr.setProperties({'id':attendee});
+    return tr;
+  },
+
+  fixHeight: function() {
+    $('calendarFreeBusyScroll').setStyles({'height':$('calendarFreeBusyTable').offsetHeight+16+'px'});
+    $('calendarFreeBusyMeeting').setStyles({'height':$('calendarFreeBusyTable').offsetHeight+16+'px'});
   }
 
 });
