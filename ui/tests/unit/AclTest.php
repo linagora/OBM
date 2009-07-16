@@ -44,7 +44,7 @@ class AclTest extends OBM_Database_TestCase {
     $csvDataSet->addEntityTable('Domain', 'domain', dirname(__FILE__).'/db_data/Domain.csv');
     $csvDataSet->addEntityTable('UserObm', 'user', dirname(__FILE__).'/db_data/UserObm.csv');
     $csvDataSet->addEntityTable('UGroup', 'group', dirname(__FILE__).'/db_data/UGroup.csv');
-    $csvDataSet->addEntityTable('Cv', 'cv', dirname(__FILE__).'/db_data/Cv.csv');
+    $csvDataSet->addEntityTable('CV', 'cv', dirname(__FILE__).'/db_data/Cv.csv');
     $csvDataSet->addTable('of_usergroup', dirname(__FILE__).'/db_data/of_usergroup.csv');
     return $csvDataSet;
   }

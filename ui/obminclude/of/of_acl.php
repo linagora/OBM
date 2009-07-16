@@ -551,6 +551,8 @@ class OBM_Acl {
         return 'UGroup';
       case 'mailshare':
         return 'MailShare';
+      case 'cv':
+        return 'CV';
       default:
         return ucfirst($entityType);
     }
