@@ -118,15 +118,11 @@ function run_query_people_search($people) {
     // UserObm
     $where_userobm .= " AND (userobm_phone #LIKE '%$phone%'
       OR userobm_phone2 #LIKE '%$phone%'
-      OR userobm_mobile #LIKE '%$phone%')";
+      OR userobm_mobile #LIKE '%$phone%'
+      OR userobm_fax #LIKE '%$phone%'
+      OR userobm_fax2 #LIKE '%$phone%')";
     // Contact
     $where_contact .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number #LIKE '$phone%'))";
-  }
-
-  // If a fax number indication has been specified, get it
-  if (trim($fax) != '') {
-    $where_userobm .= " AND (userobm_fax #LIKE '%$fax%'
-      OR userobm_fax2 #LIKE '%$fax%')";
   }
 
   // If an adress indication has been specified, get it

@@ -113,7 +113,6 @@ function html_people_search_form($user) {
   $fname = stripslashes($user["firstname"]);
   $email = $user["email"];
   $phone = $user["phone"];
-  $fax = $user["fax"];
   $desc = $user["desc"];
   $popup = $user["popup"];
   $direction = $user["direction"];
@@ -121,7 +120,6 @@ function html_people_search_form($user) {
   $adress = $user["adress"];
   $zipcode = $user["zipcode"];
   $town = $user["town"];
-  $cedex = $user["cedex"];
   $company = $user["company"];
   
   if ($user["filter_entity"]) {
@@ -133,7 +131,7 @@ function html_people_search_form($user) {
 
   }
 
-  // User defined data
+  // User defined data : XXX to do userdata from 'user' or 'people'
   $block_userdata .= of_userdata_dis_search('user', $user);
   $display_pref = get_display_pref($obm['uid'],'people');
 
@@ -163,112 +161,84 @@ function html_people_search_form($user) {
 
   $block = "
   <form method=\"get\" name=\"f_search\"
-    action=\"". url_prepare("people_index.php")."\" class=\"search\">
-  ";
+    action=\"". url_prepare("people_index.php")."\" class=\"search\">";
   
   if ($display_pref['userobm_lastname']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_lastname]<br />
       <input type=\"text\" name=\"tf_lastname\" size=\"16\" maxlength=\"32\"
       value=\"$lname\" />
-    </label>
-    ";
+    </label>";
   }
   if ($display_pref['userobm_firstname']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_firstname]<br />
       <input type=\"text\" name=\"tf_firstname\" size=\"16\" maxlength=\"32\"
       value=\"$fname\" />
-    </label>
-    ";
+    </label>";
   }
   if ($display_pref['userobm_email']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_email]<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" maxlength=\"32\"
       value=\"$email\" />
-    </label>
-    ";
+    </label>";
   }
   if ($display_pref['userobm_phone']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_phone]<br />
       <input type=\"text\" name=\"tf_phone\" size=\"16\" maxlength=\"16\"
       value=\"$phone\" />
-    </label>
-    ";
-  }
-  if ($display_pref['userobm_fax']['status'] != 0) {
-    $block .= "
-    <label>$GLOBALS[l_fax]<br />
-      <input type=\"text\" name=\"tf_fax\" size=\"16\" maxlength=\"16\"
-      value=\"$fax\" />
-    </label>
-    ";
+    </label>";
   }
   if ($display_pref['userobm_description']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_desc]<br />
       <input type=\"text\" name=\"tf_desc\" size=\"16\" maxlength=\"32\"
       value=\"$desc\" />
-    </label>
-    ";
+    </label>";
   }
   if ($display_pref['userobm_direction']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_direction]<br />
       <input type=\"text\" name=\"tf_direction\" size=\"16\" maxlength=\"32\"
       value=\"$direction\" />
-    </label>
-    ";
+    </label>";
   }
   if ($display_pref['userobm_service']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_service]<br />
       <input type=\"text\" name=\"tf_service\" size=\"16\" maxlength=\"32\"
       value=\"$service\" />
-    </label>
-    ";
+    </label>";
   }
   if ($display_pref['userobm_adress']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_address]<br />
       <input type=\"text\" name=\"tf_adress\" size=\"16\" maxlength=\"32\"
       value=\"$adress\" />
-    </label>
-    ";
+    </label>";
   }
   if ($display_pref['userobm_zipcode']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_postcode]<br />
       <input type=\"text\" name=\"tf_zipcode\" size=\"16\" maxlength=\"32\"
       value=\"$zipcode\" />
-    </label>
-    ";
+    </label>";
   }
   if ($display_pref['userobm_town']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_town]<br />
       <input type=\"text\" name=\"tf_town\" size=\"16\" maxlength=\"32\"
       value=\"$town\" />
-    </label>
-    ";
-  }
-  if ($display_pref['userobm_cedex']['status'] != 0) {
-    $block .= "
-    <label>$GLOBALS[l_expresspostal]<br />
-      <input type=\"text\" name=\"tf_cedex\" size=\"16\" maxlength=\"32\"
-      value=\"$cedex\" />
-    </label>
-    ";
+    </label>";
   }
   if ($display_pref['userobm_company']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_company]<br />
       <input type=\"text\" name=\"tf_company\" size=\"16\" maxlength=\"32\"
       value=\"$company\" />
-    </label>
-    ";
+    </label>";
   }
     $block .= "
     $block_userdata
