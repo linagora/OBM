@@ -555,11 +555,15 @@ class OBM_DISPLAY {
           form.submit();
           return false;
         }
-      </script>
-    <a href=\"#\" onclick=\"return exportResultSet_$this_entity('$first_row','$export_rows');\" >$l_export</a>      
-    <a href=\"#\" onclick=\"return exportResultSet_$this_entity('0','$nb_rows');\" >$l_export_all</a>   
-            
-      $l_entries $nb_rows | $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
+      </script>";
+
+    if ($module != 'people') {
+      $content .="
+        <a href=\"#\" onclick=\"return exportResultSet_$this_entity('$first_row','$export_rows');\" >$l_export</a>      
+        <a href=\"#\" onclick=\"return exportResultSet_$this_entity('0','$nb_rows');\" >$l_export_all</a>";
+    } 
+
+    $content .= "$l_entries $nb_rows | $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
 
     // Rewind to 1st page
     if ($lpage > 1) {

@@ -548,19 +548,20 @@ function update_resource_action() {
   // Detail Consult
   $actions['resource']['detailconsult']['Url'] = "$path/resource/resource_index.php?action=detailconsult&amp;resource_id=".$params['resource_id'];
 
-  // Right admin
-  $actions['resource']['rights_admin']['Url'] = "$path/resource/resource_index.php?action=rights_admin&amp;entity_id=".$params['resource_id'];
-
-
   if (check_resource_update_rights($params)) {
     // Detail Update
     $actions['resource']['detailupdate']['Url'] = "$path/resource/resource_index.php?action=detailupdate&amp;resource_id=".$params['resource_id'];
 
     // Check Delete
     $actions['resource']['check_delete']['Url'] = "$path/resource/resource_index.php?action=check_delete&amp;resource_id=".$params['resource_id'];
+
+    // Right admin
+    $actions['resource']['rights_admin']['Url'] = "$path/resource/resource_index.php?action=rights_admin&amp;entity_id=".$params['resource_id'];
+
   } else {
     $actions['resource']['detailupdate']['Condition'] = array('None');
     $actions['resource']['check_delete']['Condition'] = array('None');
+    $actions['resource']['rights_admin']['Condition'] = array('None');
   }
 }
 

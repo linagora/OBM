@@ -2445,7 +2445,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     if (is_array($res['entity'])) {
       foreach ($res['entity'] as $r_id => $entity) {
         $label = "";
-        $admins = OBM_Acl::getEntityAdmins('resource', $r_id);
+        $admins = OBM_Acl::getEntityWriters('resource', $r_id);
         if (is_array($admins)) {
           $emails = array();
           foreach($admins as $admin) {
@@ -2454,7 +2454,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
               array_push($emails, $user['email']."@".$user['entity_domain']);
             }
           }
-          if (sizeof($emails) > 1) {
+          if (sizeof($emails) > 0) {
             $label = "<a href='mailto:".implode(',', $emails)."'><img src='$GLOBALS[ico_mail]' /></a> ";
           }
         }
