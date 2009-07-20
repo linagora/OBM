@@ -730,7 +730,7 @@ class OBM_EventMailObserver /*implements  OBM_Observer*/{
    */
   private function sendCurrentUserMail($old, $new, $recipients) {
     $recipients = array_diff($recipients, array($GLOBALS['obm']['uid']));
-    if ($this->hasEventFullyChanged($old, $new)) {
+    if (!empty($recipients) && $this->hasEventFullyChanged($old, $new)) {
       $this->mailer->sendEventUpdate($new, $old, $recipients);
     }
   }
