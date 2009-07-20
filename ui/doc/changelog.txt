@@ -32,3 +32,4 @@ To do
   * #513 It must be possible to suppress the export buttons from people list
 --  * #390 IE Only: End date listbox disappear after specific use of free-busy
   * #516 pb with postfix map when adding a contact to a group
+  * #518 French label for "New Event" should be "Nouvel Evt"
