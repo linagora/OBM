@@ -28,7 +28,6 @@ import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventTimeUpdate;
-import org.obm.sync.calendar.EventType;
 import org.obm.sync.items.EventChanges;
 
 /**

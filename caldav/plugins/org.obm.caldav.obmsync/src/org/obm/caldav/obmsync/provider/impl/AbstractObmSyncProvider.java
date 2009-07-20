@@ -16,12 +16,6 @@
 
 package org.obm.caldav.obmsync.provider.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.channels.GatheringByteChannel;
-import java.security.acl.LastOwnerException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,10 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-
-import javax.naming.event.EventContext;
-import javax.security.auth.login.FailedLoginException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,25 +35,20 @@ import org.obm.caldav.obmsync.provider.ICalendarProvider;
 import org.obm.caldav.server.exception.AuthorizationException;
 import org.obm.caldav.utils.CalDavUtils;
 import org.obm.caldav.utils.Constants;
-import org.obm.caldav.utils.FileUtils;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
 import org.obm.sync.auth.ServerFault;
 import org.obm.sync.calendar.Attendee;
 import org.obm.sync.calendar.CalendarInfo;
 import org.obm.sync.calendar.Event;
-import org.obm.sync.calendar.EventRecurrence;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.obm.sync.calendar.EventType;
 import org.obm.sync.calendar.ParticipationRole;
 import org.obm.sync.calendar.ParticipationState;
-import org.obm.sync.calendar.RecurrenceKind;
 import org.obm.sync.client.calendar.AbstractEventSyncClient;
 import org.obm.sync.client.calendar.CalendarClient;
-import org.obm.sync.items.EventChanges;
 import org.obm.sync.locators.CalendarLocator;
 
-@SuppressWarnings("unused")
 public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 
 	protected static final Log logger = LogFactory

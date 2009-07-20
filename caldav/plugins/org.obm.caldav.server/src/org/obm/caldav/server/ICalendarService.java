@@ -24,7 +24,6 @@ import java.util.Set;
 import org.obm.caldav.server.exception.AuthorizationException;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventTimeUpdate;
-import org.obm.sync.items.EventChanges;
 
 
 public interface ICalendarService {

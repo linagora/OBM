@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
-import org.obm.caldav.server.propertyHandler.impl.GetETag;
 import org.obm.caldav.utils.DOMUtils;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Document;

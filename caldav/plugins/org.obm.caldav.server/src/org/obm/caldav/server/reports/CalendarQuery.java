@@ -16,7 +16,6 @@
 
 package org.obm.caldav.server.reports;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.server.propertyHandler.impl.GetETag;
 import org.obm.caldav.server.resultBuilder.CalendarQueryResultBuilder;
@@ -35,7 +33,6 @@ import org.obm.caldav.server.share.Token;
 import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.caldav.server.share.filter.Filter;
 import org.obm.caldav.utils.DOMUtils;
-import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Document;
 

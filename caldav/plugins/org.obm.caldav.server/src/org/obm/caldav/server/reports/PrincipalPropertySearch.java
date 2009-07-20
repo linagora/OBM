@@ -39,7 +39,7 @@ public class PrincipalPropertySearch extends ReportProvider {
 		Element r = doc.getDocumentElement();
 
 		// search criteria
-		 NodeList pSearch = r.getElementsByTagName("D:property-search");
+		// NodeList pSearch = r.getElementsByTagName("D:property-search");
 
 		NodeList children = r.getChildNodes();
 		// last element is a text node, take the one before
