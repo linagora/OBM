@@ -21,7 +21,7 @@ import org.obm.caldav.utils.IniFile;
 
 public class ObmSyncConfIni extends IniFile{
 
-	public static final String OBM_SYNC_CONF = "/etc/minig/obmsync_conf.ini";
+	public static final String OBM_SYNC_CONF = "/etc/obm-caldav/obmsync_conf.ini";
 	
 	public ObmSyncConfIni() {
 		super(OBM_SYNC_CONF);

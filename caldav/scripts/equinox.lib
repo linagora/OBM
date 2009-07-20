@@ -3,8 +3,8 @@
 # 
 # @author: Thomas Cataldo <thomas.cataldo@aliasource.fr>
 
-if [ -f '/etc/minig/mem_conf.ini' ] ; then
-  source /etc/minig/mem_conf.ini
+if [ -f '/etc/obm-caldav/mem_conf.ini' ] ; then
+  source /etc/obm-caldav/mem_conf.ini
 else
   MEM=1024
 fi
