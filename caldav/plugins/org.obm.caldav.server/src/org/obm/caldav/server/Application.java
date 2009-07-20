@@ -18,6 +18,8 @@ package org.obm.caldav.server;
 
 import java.util.Hashtable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -28,11 +30,15 @@ import org.osgi.framework.BundleException;
 
 public class Application implements IApplication {
 
+	private static final Log logger = LogFactory.getLog(Application.class);
+
+	private static final int CALDAV_PORT = 8083;
+
 	@Override
 	public Object start(IApplicationContext context) throws Exception {
-		System.out.println("CalDAV server started...");
+		logger.info("CalDAV server starting...");
 		Hashtable<String, Object> settings = new Hashtable<String, Object>();
-		settings.put(JettyConstants.HTTP_PORT, 8083);
+		settings.put(JettyConstants.HTTP_PORT, CALDAV_PORT);
 		settings.put(JettyConstants.CONTEXT_PATH, "");
 
 		System.setProperty("org.mortbay.http.HttpRequest.maxFormContentSize",
@@ -42,7 +48,8 @@ public class Application implements IApplication {
 
 		loadBundle("org.eclipse.equinox.http.registry");
 
-		
+		logger.info("CalDAV server started on port " + CALDAV_PORT);
+
 		return EXIT_OK;
 	}
 
@@ -57,8 +64,7 @@ public class Application implements IApplication {
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
-
+		logger.info("CalDAV server stopped.");
 	}
 
 }
