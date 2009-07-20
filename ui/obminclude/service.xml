@@ -78,12 +78,13 @@
       </property>            
     </service>
 
-    <!-- Is set if this host has an obm-sync server installed -->
+    <!-- Is set if this domain has an obm-sync server -->
     <service key='sync'>
+      <!-- Domain obm_sync host(s) id(s), those host must have the obm_sync service -->
       <property key="obm_sync">
 	<type>id</type>
 	<min>0</min>
-	<min>1</min>
+	<max>1</max>
       </property>
     </service>
 
