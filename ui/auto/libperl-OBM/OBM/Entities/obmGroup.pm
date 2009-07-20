@@ -549,3 +549,10 @@ sub getRemovedMembersId {
 
     return $self->{'entityDesc'}->{'group_removed_users_id'};
 }
+
+
+sub smtpInUpdateMap {
+    my $self = shift;
+
+    return 1;
+}

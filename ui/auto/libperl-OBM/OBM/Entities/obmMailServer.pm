@@ -371,3 +371,15 @@ sub getSmtpOutServersIds {
 
     return $self->{'entityDesc'}->{'smtpOutServerId'};
 }
+
+
+sub smtpInUpdateMap {
+    my $self = shift;
+
+    # If entity is not updated (but only links)
+    if( !$self->getUpdateEntity() ) {
+        return 0;
+    }
+
+    return 1;
+}

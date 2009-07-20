@@ -514,3 +514,15 @@ sub getMailboxDefaultFolders {
 
     return $self->{'entityDesc'}->{'mailbox_folders'};
 }
+
+
+sub smtpInUpdateMap {
+    my $self = shift;
+
+    # If entity is not updated (but only links)
+    if( !$self->getUpdateEntity() ) {
+        return 0;
+    }
+
+    return 1;
+}

@@ -49,30 +49,9 @@ sub update {
         return 1;
     }
 
-    # Is entity need postfix maps regeneration ?
-    SWITCH: {
-        if( ref($entity) eq 'OBM::Entities::obmUser' ) {
-            last SWITCH;
-        }
-
-        if( ref($entity) eq 'OBM::Entities::obmMailshare' ) {
-            last SWITCH;
-        }
-
-        if( ref($entity) eq 'OBM::Entities::obmGroup' ) {
-            last SWITCH;
-        }
-
-        if( ref($entity) eq 'OBM::Entities::obmMailServer' ) {
-            last SWITCH;
-        }
-
-        $self->_log( 'l\'entité '.$entity->getDescription().' n\'a pas d\'impact sur le contenu des maps postfix', 3 );
-        return 0;
-    }
  
     # If entity is not updated (but only links)
-    if( !$entity->getUpdateEntity() ) {
+    if( !$entity->smtpInUpdateMap() ) {
         $self->_log( 'entité '.$entity->getDescription().' mise à jour mais pas d\'impact sur les maps postfix', 1 );
         return 0;
     }

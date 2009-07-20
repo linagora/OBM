@@ -1223,3 +1223,15 @@ sub updateLinkedEntities {
     $self->_log( 'pas de mise à jour des entités liés nécessaire pour '.$self->getDescription(), 3 );
     return 0;
 }
+
+
+sub smtpInUpdateMap {
+    my $self = shift;
+
+    # If entity is not updated (but only links)
+    if( !$self->getUpdateEntity() ) {
+        return 0;
+    }
+
+    return 1;
+}

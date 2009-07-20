@@ -6,7 +6,8 @@ use OBM::Tools::commonMethods;
 use OBM::Ldap::utils;
 use OBM::Samba::utils;
 use OBM::Password::passwd;
-@ISA = ('OBM::Tools::commonMethods', 'OBM::Ldap::utils', 'OBM::Samba::utils', 'OBM::Password::passwd');
+use OBM::Entities::Interfaces::entitiesSmtpIn;
+@ISA = ('OBM::Tools::commonMethods', 'OBM::Ldap::utils', 'OBM::Samba::utils', 'OBM::Password::passwd', 'OBM::Entities::Interfaces::entitiesSmtpIn');
 
 $debug = 1;
 
