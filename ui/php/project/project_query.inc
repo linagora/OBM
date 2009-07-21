@@ -665,7 +665,7 @@ function get_project_code($project_q) {
   // Tasktype (skill)
   $shortname = $project_q->f('project_shortname');
   
-  $code = "$dis_internal-$dis_type-$dis_tasktype-$shortname";
+  $code = "$dis_internal-$dis_tasktype-$dis_type-$shortname";
 
   return $code;
 }

@@ -142,6 +142,7 @@ function get_company_detail_by_id($id) {
 		 'country_name' =>  'company_country',
 		 'company_phone' => 'company_phone',
 		 'company_fax' => 'company_fax',
+		 'company_email' => 'company_email',
 		 'company_web' => 'company_web') ;
   $datas = array() ;
 
@@ -190,6 +191,7 @@ function get_company_search() {
 		 'country_name' =>  'company_country',
 		 'company_phone' => 'company_phone',
 		 'company_fax' => 'company_fax',
+		 'company_email' => 'company_email',
 		 'company_web' => 'company_web'
    );
 
