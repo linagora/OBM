@@ -11,7 +11,7 @@ $l_domain_name = "Domain name";
 $l_alias = "Alias";
 $l_mail_server = "Mail server choice";
 $l_mail_servers = "Mail servers";
-$l_mail_servers = "Synchronized servers";
+$l_sync_servers = "Synchronized servers";
 
 // Mail chooser labels
 $l_mailboxchoice_least_boxes = "having less mailboxes";

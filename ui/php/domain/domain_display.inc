@@ -237,8 +237,6 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncs
       </div>";
       }
     }
-
-
   }
   
   if ($cgp_use['service']['sync']) {
@@ -506,13 +504,7 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $samba, $pr
     $serversynclist = get_domain_syncservers($id);
     if (is_array($obm_sync)) {
       foreach($obm_sync as $obm_sync_id) {
-        $obm_sync_servers .= "
-          <div class=\"multiple\">
-          <a onclick=\"remove_element(this.parentNode,'obm_syncServer');show_hide_add_button();return false\" href=\"\">
-           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
-          </a>        
-          ".$serversynclist[$obm_sync_id]['name']."<input type=\"hidden\" name=\"sel_obm_sync[]\" value=\"$obm_sync_id\" />  
-          </div>";
+        $obm_sync_sel = $obm_sync_id;
       }
     }
     $imap_list = '<option value="">---</option>';
@@ -536,7 +528,11 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $samba, $pr
     foreach($serversynclist as $host_id => $serverinfos) {
       if ($serverinfos['obm_sync'] > 0) {
         $have_obm_sync = true;
-        $obm_sync_list .= "<option value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_obm_sync])</option>";
+        if(isset($obm_sync_sel) && $obm_sync_sel == $host_id){
+          $obm_sync_list .= "<option selected='selected' value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_obm_sync])</option>";
+        } else {
+          $obm_sync_list .= "<option value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_obm_sync])</option>";
+        }
       }  
     }
     if ($have_imap) {
@@ -620,13 +616,9 @@ function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $samba, $pr
           <legend>$GLOBALS[l_obm_sync] $l_syncserver</legend>
         <table>
         <tr>
-        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('obm_syncServer').getLast(), $('obm_syncServer'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add obm_sync syncserver]\" /></a></th>
+        <th>$GLOBALS[l_header_select_syncserver]</th>
         <td id='obm_syncServer'>
-          $obm_sync_servers
           <div class=\"multiple\">
-          <a onclick=\"remove_element(this.parentNode,'obm_syncServer');show_hide_add_button();return false\" href=\"\">
-           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
-          </a>        
           <select name='sel_obm_sync[]'>$obm_sync_list</select> 
           </div>              
         </td>
