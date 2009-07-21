@@ -134,9 +134,10 @@ function dis_domain_consult($domain) {
   $obm_q = run_query_domain_detail($id);
   $properties_q = run_query_domain_properties($id);
   $mailservers = of_domain_get_domain_mailserver('', $id);
+  $syncservers = of_domain_get_domain_syncserver($id);
   $samba = run_query_domain_samba_properties($id);
   if ($obm_q->num_rows() == 1) {
-    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q);
+    $block = html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers);
   } else {
     $display['msg'] .= display_err_msg($l_query_error);
   }
@@ -151,8 +152,8 @@ function dis_domain_consult($domain) {
 //   - $obm_q       : domain database result
 //   - $mailservers : domain mailservers array
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_consult($obm_q, $mailservers, $samba, $properties_q) {
-  global $display, $ico_delete, $l_mail_server, $cgp_use, $l_properties;
+function html_domain_consult($obm_q, $mailservers, $samba, $properties_q, $syncservers=NULL) {
+  global $display, $ico_delete, $l_mail_server, $l_sync_servers, $cgp_use, $l_properties;
   global $l_label, $l_domain, $l_desc, $l_domain_name, $l_alias;
   global $l_host, $l_ip, $l_role, $l_mail_servers, $l_header_delete;
 
@@ -236,6 +237,47 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q) {
       </div>";
       }
     }
+
+
+  }
+  
+  if ($cgp_use['service']['sync']) {
+    // Domain syncservers
+    // Get the domain syncservers
+    $block_s = '';
+    if (is_array($syncservers)) {
+      foreach ($syncservers as $s_id => $syncserver_info) {
+	      // $mailserver_info is an array of info rows about this mail server
+	      foreach ($syncserver_info as $server_info) {
+	        $name = $server_info['name'];
+	        $ip = $server_info['ip'];
+	        $role = $server_info['role'];
+	        $block_s .= "
+              <tr>
+              <td>$name</td>
+              <td>$ip</td>
+              <td>$role</td>
+              </tr>";
+	      }
+      }
+      if ($block_s != '') {
+	      $block_sync = "
+            <div class=\"detail infos\">
+            <h1>$l_sync_servers</h1>
+
+            <table class=\"spreadSheet\">
+            <thead>
+            <tr>
+              <th>$l_host</th>
+              <th>$l_ip</th>
+              <th>$l_role</th>
+            </tr>
+            </thead>
+            $block_s
+            </table>
+            </div>";
+      }
+    }
   }
 
   if ($cgp_use['service']['samba'] && ($samba['drive'] || $samba['domain'] || $samba['sid'] || $samba['profile'] || $samba['home'])) {
@@ -315,6 +357,7 @@ function html_domain_consult($obm_q, $mailservers, $samba, $properties_q) {
   </table>
   </div>
 $block_ms
+$block_sync
 $dis_samba
 $properties_block    
 ";
@@ -330,7 +373,7 @@ $properties_block
 //   - $domain      : default values or updated values (if error)
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
-function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) {
+function html_domain_form($dom_q, $mailservers, $syncservers = NULL, $samba, $properties_q, $domain) {
   global $l_label, $l_desc, $l_domain, $l_archive, $l_domain_name, $l_alias;
   global $l_insert, $l_update,$l_mail_server, $l_header_add_mailserver;
   global $display, $cgp_use, $c_none, $l_none, $l_properties;
@@ -352,6 +395,9 @@ function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) 
         ${$server['role']}[] = $mailserver_id;
       }
     }
+    foreach($syncservers as $syncserver_id => $syncserver) {
+      $obm_sync[] = $syncserver_id;
+    }
   }
 
   // If parameters have been given, they supercede the default action value
@@ -364,6 +410,7 @@ function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) 
   if (isset($domain['imap'])) { $imap = $domain['imap'];}
   if (isset($domain['smtp_in'])) { $smtp_in = $domain['smtp_in'];}
   if (isset($domain['smtp_out'])) { $smtp_out = $domain['smtp_out'];}
+  if (isset($domain['obm_sync'])) { $obm_sync = $domain['obm_sync'];}
   if (isset($domain['samba'])) { $samba = $domain['samba'];}
 
   while($properties_q->next_record()) {
@@ -456,9 +503,22 @@ function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) 
           </div>";
       }
     }
+    $serversynclist = get_domain_syncservers($id);
+    if (is_array($obm_sync)) {
+      foreach($obm_sync as $obm_sync_id) {
+        $obm_sync_servers .= "
+          <div class=\"multiple\">
+          <a onclick=\"remove_element(this.parentNode,'obm_syncServer');show_hide_add_button();return false\" href=\"\">
+           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+          </a>        
+          ".$serversynclist[$obm_sync_id]['name']."<input type=\"hidden\" name=\"sel_obm_sync[]\" value=\"$obm_sync_id\" />  
+          </div>";
+      }
+    }
     $imap_list = '<option value="">---</option>';
     $smtp_in_list = '<option value="">---</option>';
     $smtp_out_list = '<option value="">---</option>';
+    $obm_sync_list = '<option value="">---</option>';
     foreach($serverlist as $host_id => $serverinfos) {
       if ($serverinfos['imap'] > 0) {
         $have_imap = true;
@@ -471,6 +531,12 @@ function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) 
       if ($serverinfos['smtp_out'] > 0) {
         $have_smtp_out = true;
         $smtp_out_list .= "<option value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_smtp_out])</option>";
+      }  
+    }
+    foreach($serversynclist as $host_id => $serverinfos) {
+      if ($serverinfos['obm_sync'] > 0) {
+        $have_obm_sync = true;
+        $obm_sync_list .= "<option value=\"$host_id\">$serverinfos[name] ($GLOBALS[l_obm_sync])</option>";
       }  
     }
     if ($have_imap) {
@@ -548,11 +614,38 @@ function html_domain_form($dom_q, $mailservers, $samba, $properties_q, $domain) 
           <legend class='warning'>$GLOBALS[l_smtp_out] $l_mailserver : $GLOBALS[l_mailserver_warn]</legend>
         </fieldset>";
     }
+    if ($have_obm_sync) {
+      $dis_obm_sync = "
+        <fieldset class=\"detail infos\">
+          <legend>$GLOBALS[l_obm_sync] $l_syncserver</legend>
+        <table>
+        <tr>
+        <th>$GLOBALS[l_header_add_mailserver] <a href=\'\' onclick=\"copyField($('obm_syncServer').getLast(), $('obm_syncServer'));return false;\"><img src=\"$GLOBALS[ico_add]\" alt=\"[Add obm_sync syncserver]\" /></a></th>
+        <td id='obm_syncServer'>
+          $obm_sync_servers
+          <div class=\"multiple\">
+          <a onclick=\"remove_element(this.parentNode,'obm_syncServer');show_hide_add_button();return false\" href=\"\">
+           <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+          </a>        
+          <select name='sel_obm_sync[]'>$obm_sync_list</select> 
+          </div>              
+        </td>
+        </tr>
+        </table>
+        </fieldset>";
+    } else {
+      $dis_obm_sync = "
+        <fieldset class=\"detail infos\">
+          <legend class='warning'>$GLOBALS[l_obm_sync] $l_mailserver : $GLOBALS[l_syncserver_warn]</legend>
+        </fieldset>";
+    }
+
 
     $dis_mailserver = "
     $dis_imap
     $dis_smtp_in
-    $dis_smtp_out";
+    $dis_smtp_out
+    $dis_obm_sync";
     $dis_alias = "
      <fieldset class=\"detail infos\">
     <legend>$l_alias</legend>

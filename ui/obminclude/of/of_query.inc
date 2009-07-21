@@ -425,6 +425,55 @@ function of_domain_get_domain_mailserver($role = 'imap', $domain_id = NULL) {
   return $m;
 }
 
+/**
+ * Get one domain syncservers
+ *
+ * @param mixed $domain_id : domain_id
+ * @return syncserver array
+ **/
+function of_domain_get_domain_syncserver($domain_id = NULL) {
+  global $cdg_sql, $obm;
+
+  if (!is_null($domain_id)) {
+    $d = of_domain_get_domain_infos($domain_id);
+    if (! $d['global']) {
+      $domain_id = sql_parse_id($domain_id, true);
+      $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
+    }
+  }
+  $where = "AND serviceproperty_property = 'obm_sync'";
+
+  $query = "SELECT 
+    serviceproperty_property,
+    host_id,
+    host_name,
+    host_ip
+    FROM Domain
+    INNER JOIN DomainEntity ON domainentity_domain_id = domain_id
+    LEFT JOIN ServiceProperty ON serviceproperty_entity_id = domainentity_entity_id
+    LEFT JOIN Host ON host_id = #CAST(serviceproperty_value,INTEGER)
+    WHERE 
+    serviceproperty_service = 'sync'
+    $where
+    $where_domain
+    GROUP BY serviceproperty_property, host_id, host_name, host_ip
+";
+
+  display_debug_msg($query, $cdg_sql, 'of_domain_get_domain_syncserver()');
+  $obm_q = new DB_OBM;
+  $obm_q->xquery($query);
+
+  $m = array();
+  while ($obm_q->next_record()) {
+    $m_id = $obm_q->f('host_id');
+    $role = $obm_q->f('serviceproperty_property');
+    $name = $obm_q->f('host_name');
+    $ip = $obm_q->f('host_ip');
+    $m[$m_id][] = array ('name' => $name, 'ip' => $ip, 'role' => $role);
+  }
+
+  return $m;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return a domain infos

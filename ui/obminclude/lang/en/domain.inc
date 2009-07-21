@@ -11,6 +11,7 @@ $l_domain_name = "Domain name";
 $l_alias = "Alias";
 $l_mail_server = "Mail server choice";
 $l_mail_servers = "Mail servers";
+$l_mail_servers = "Synchronized servers";
 
 // Mail chooser labels
 $l_mailboxchoice_least_boxes = "having less mailboxes";
@@ -58,10 +59,12 @@ $l_fill_title = "You have to fill the Title before submitting.";
 $l_domain_confirm_delete = "CAUTION : You will delete a profile ! This operation is irreversible.\\nContinue anyway ?";
 
 $l_mailserver_warn = "You have to create an host of this kind first";
+$l_syncserver_warn = "You have to create an host of this kind first";
 $l_mailserver = "Mail server";
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
+$l_obm_sync = 'OBM sync';
 
 $l_samba = 'Windows server';
 $l_samba_sid = 'domain SID';

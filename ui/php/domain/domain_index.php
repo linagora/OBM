@@ -78,7 +78,7 @@ if ($action == 'index' || $action == '') {
 } elseif ($action == 'new') {
 ///////////////////////////////////////////////////////////////////////////////
   $prop_q = run_query_domain_properties();
-  $display['detail'] = html_domain_form('','', null, $prop_q,$params);
+  $display['detail'] = html_domain_form('','','', null, $prop_q,$params);
 
 } elseif ($action == 'detailconsult') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,10 +89,11 @@ if ($action == 'index' || $action == '') {
   $obm_q = run_query_domain_detail($params['domain_id']);
   $prop_q = run_query_domain_properties($params['domain_id']);
   $ms_q = of_domain_get_domain_mailserver('', $params['domain_id']);
+  $sync_q = of_domain_get_domain_syncserver($params['domain_id']);
   $samba = run_query_domain_samba_properties($params['domain_id']);
   if ($obm_q->num_rows() == 1) {
     $display['detailInfo'] = display_record_info($obm_q);
-    $display['detail'] = html_domain_form($obm_q, $ms_q, $samba, $prop_q, $params);
+    $display['detail'] = html_domain_form($obm_q, $ms_q, $sync_q, $samba, $prop_q, $params);
   } else {
     $display['msg'] .= display_err_msg($l_query_error . ' - ' . $query . ' !');
   }
@@ -109,13 +110,13 @@ if ($action == 'index' || $action == '') {
     } else {
       $display['msg'] .= display_err_msg($l_insert_error);
       $prop_q = run_query_domain_properties();
-      $display['detail'] = html_domain_form('','', null, $prop_q,$params);
+      $display['detail'] = html_domain_form('','','', null, $prop_q,$params);
     }
     // Form data are not valid
   } else {
     $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
     $prop_q = run_query_domain_properties();
-    $display['detail'] = html_domain_form('','', null, $prop_q,$params);
+    $display['detail'] = html_domain_form('','','', null, $prop_q,$params);
   }
 
 } elseif ($action == 'update') {
@@ -132,7 +133,7 @@ if ($action == 'index' || $action == '') {
   } else {
     $display['msg'] .= display_err_msg($err['msg']);
     $prop_q = run_query_domain_properties($params['domain_id']);
-    $display['detail'] = html_domain_form('','', null, $prop_q, $params);
+    $display['detail'] = html_domain_form('','','', null, $prop_q, $params);
   }
 
 } elseif ($action == 'check_delete') {

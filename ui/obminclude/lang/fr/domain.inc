@@ -11,6 +11,7 @@ $l_domain_name = "Nom de domaine";
 $l_alias = "Alias";
 $l_mail_server = "Choix du serveur de mail";
 $l_mail_servers = "Serveurs de mail";
+$l_sync_servers = "Serveurs de synchronisation";
 
 $l_update_state = "Etat de mise à jour";
 
@@ -58,9 +59,11 @@ $l_domain_confirm_delete = "ATTENTION : Vous allez supprimer un profil : Cette o
 $l_mailserver = "Serveur de mail";
 
 $l_mailserver_warn = 'Vous devez créer un hôte de ce type';
+$l_syncserver_warn = 'Vous devez créer un hôte de ce type';
 $l_imap = 'IMAP';
 $l_smtp_in = 'SMTP in';
 $l_smtp_out = 'SMTP out';
+$l_obm_sync = 'OBM sync';
 
 $l_samba = 'Serveur windows';
 $l_samba_sid = 'SID du domaine';

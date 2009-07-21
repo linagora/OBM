@@ -153,6 +153,10 @@ function run_query_domain_insert($domain) {
       of_service_property_insert('mail','smtp_in', $entity_id, $domain['smtp_in']);
       of_service_property_insert('mail','smtp_out', $entity_id, $domain['smtp_out']);
     }
+    if ($cgp_use['service']['sync']) {
+      of_service_insert('sync', $entity_id);
+      of_service_property_insert('sync','obm_sync', $entity_id, $domain['obm_sync']);
+    }
     if ($cgp_use['service']['samba']) {
       if(is_array($samba)) {
         of_service_insert('samba', $entity_id);
@@ -397,7 +401,6 @@ function run_query_domain_update($domain_id, $domain) {
   display_debug_msg($query, $cdg_sql, 'run_query_domain_update()');
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-
   $entity_id = of_entity_get($GLOBALS['module'], $domain_id);
   if ($cgp_use['service']['mail']) {
     of_service_property_replace('mail','imap_autoselect', $entity_id, $mail_server_auto);
@@ -405,7 +408,9 @@ function run_query_domain_update($domain_id, $domain) {
     of_service_property_replace('mail','smtp_in', $entity_id, $domain['smtp_in']);
     of_service_property_replace('mail','smtp_out', $entity_id, $domain['smtp_out']);
   }  
-
+  if ($cgp_use['service']['sync']) {
+    of_service_property_replace('sync','obm_sync', $entity_id, $domain['obm_sync']);
+  }
   if ($cgp_use['service']['samba']) {
     if(is_array($samba)) {
       of_service_insert('samba', $entity_id);
@@ -801,13 +806,15 @@ function get_domain_mailservers($role = NULL, $domain_id= NULL) {
       Host.*,
       imap.service_id as host_imap,
       smtp_in.service_id as host_smtp_in,
-      smtp_out.service_id as host_smtp_out
+      smtp_out.service_id as host_smtp_out,
+      obm_sync.service_id as host_obm_sync
     FROM Host 
     INNER JOIN HostEntity ON hostentity_host_id = host_id
     LEFT JOIN Domain ON domain_id = host_domain_id
     LEFT JOIN Service as imap ON imap.service_service = 'imap' AND imap.service_entity_id = hostentity_entity_id
     LEFT JOIN Service as smtp_in ON smtp_in.service_service = 'smtp_in' AND smtp_in.service_entity_id = hostentity_entity_id
     LEFT JOIN Service as smtp_out ON smtp_out.service_service = 'smtp_out' AND smtp_out.service_entity_id = hostentity_entity_id    
+    LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id    
     WHERE 1 = 1
     $where_role  
     $where_domain";
@@ -822,6 +829,53 @@ function get_domain_mailservers($role = NULL, $domain_id= NULL) {
     $m[$id]['imap'] = $obm_q->f('host_imap');
     $m[$id]['smtp_in'] = $obm_q->f('host_smtp_in');
     $m[$id]['smtp_out'] = $obm_q->f('host_smtp_out');
+    $m[$id]['obm_sync'] = $obm_q->f('host_obm_sync');
+  }
+
+  return $m;
+}
+
+/**
+ * Get the syncserver list candidate for a domain
+ * where syncserver host_domain_id matches or from domain 0)
+ * @param $role : restrict list to sync server role
+ * @param $domain_id : restrict list to sync server in this domain
+ *   if doma
+ * @return array with sync servers
+ **/
+function get_domain_syncservers($domain_id= NULL) {
+  global $cdg_sql;
+
+  if ($domain_id > 0) {
+    $domain_id = sql_parse_id($domain_id, true);
+    // For one domain specified (domain update), global or domain syncserver
+    $where_domain = "AND (domain_id $domain_id OR domain_global = true)";
+  } else {
+    // New domain (no id specified), host from domain 0
+    $where_domain = "AND (domain_global = true)";
+  }
+  $where = " AND (obm_sync.service_id IS NOT NULL) ";
+
+  $obm_q = new DB_OBM;
+  $query = "SELECT 
+      Host.*,
+      obm_sync.service_id as host_obm_sync
+    FROM Host 
+    INNER JOIN HostEntity ON hostentity_host_id = host_id
+    LEFT JOIN Domain ON domain_id = host_domain_id
+    LEFT JOIN Service as obm_sync ON obm_sync.service_service = 'obm_sync' AND obm_sync.service_entity_id = hostentity_entity_id    
+    WHERE 1 = 1
+    $where
+    $where_domain";
+  display_debug_msg($query, $cdg_sql, 'get_domain_syncservers()');
+  $obm_q->query($query);
+
+  $m = array();
+  while($obm_q->next_record()) {
+    $id = $obm_q->f('host_id');
+    $m[$id]['id'] = $id;
+    $m[$id]['name'] = $obm_q->f('host_name');
+    $m[$id]['obm_sync'] = $obm_q->f('host_obm_sync');
   }
 
   return $m;
