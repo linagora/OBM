@@ -634,9 +634,9 @@ function write_munin_conf(){
 	"tmpldir /etc/munin/templates\n\n";
 
   $query = "
-    SELECT DISTINCT host_fqdn, host_ip, host_id, hostentity_host_id, hostentity_entity_id, service_entity_id from host
-	  LEFT JOIN hostentity ON host_id=hostentity_host_id
-	  LEFT JOIN service ON hostentity_entity_id=service_entity_id
+    SELECT DISTINCT host_fqdn, host_ip, host_id, hostentity_host_id, hostentity_entity_id, service_entity_id from Host
+	  LEFT JOIN HostEntity ON host_id=hostentity_host_id
+	  LEFT JOIN Service ON hostentity_entity_id=service_entity_id
 	  WHERE service_service = 'monitor' 
 		AND host_fqdn != '' AND host_ip != ''
 		AND host_ip is not null AND host_fqdn is not null";
