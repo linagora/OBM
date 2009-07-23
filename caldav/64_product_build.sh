@@ -1,4 +1,6 @@
 #!/bin/bash
+set -x
+set -e
 # Author: Thomas Cataldo <thomas.cataldo@aliasource.fr>
 #
 # Uses an headless eclipse to build ${product_name}
@@ -26,11 +28,8 @@ test -f `whoami`.product_build.properties && {
 }
 
 # files to use in the build
-pde=org.eclipse.pde.build_${pdev}/scripts/productBuild/productBuild.xml
-equi=org.eclipse.equinox.launcher_${equiv}.jar
-product_build_file=${eclipse_home}/plugins/${pde}
-equinox_launcher=${eclipse_home}/plugins/${equi}
-
+product_build_file=`find ${eclipse_home} -name 'productBuild.xml'`
+equinox_launcher=`find ${eclipse_home} -name 'org.eclipse.equinox.launcher_*'`
 test -f $equinox_launcher || {
     echo "$equinox_launcher not found."
     exit 1
@@ -84,7 +83,8 @@ echo $product_build_file
 $JAVA_HOME/bin/java -cp ${equinox_launcher} org.eclipse.equinox.launcher.Main \
 -application org.eclipse.ant.core.antRunner \
 -buildfile $product_build_file \
--Dbuilder=`pwd`/build_conf_dir >/dev/null 2>&1
+-Dbuilder=`pwd`/build_conf_dir
+#-Dbuilder=`pwd`/build_conf_dir >/dev/null 2>&1
 test -f build_directory/svn_build/${product_name}-svn-linux.gtk.x86_64.zip || {
     echo "FAILED: Cannot find `pwd`/build_directory/svn_build/${product_name}-svn-linux.gtk.x86_64.zip."
     exit 1
@@ -100,12 +100,12 @@ mkdir zip_update_dir
 pushd zip_update_dir >/dev/null 2>&1
 unzip ../${product_name}-svn-linux.gtk.x86_64.zip >/dev/null 2>&1
 pushd ${product_name} >/dev/null 2>&1
-rm -f webmail about.html libcairo-swt.so
+rm -f obm-caldav about.html libcairo-swt.so
 cp ../../scripts/equinox.lib .
 cp ../../scripts/obm-caldav .
-cp ../../scripts/obm-caldav-profile .
+#cp ../../scripts/obm-caldav-profile .
 popd >/dev/null 2>&1
-tar cfj ../${product_name}-svn-linux.tar.bz2 ${product_name}
+tar cfj ../${product_name}.tar.bz2 ${product_name}
 rm ../${product_name}-svn-linux.gtk.x86_64.zip
 popd >/dev/null 2>&1
 rm -fr zip_update_dir
