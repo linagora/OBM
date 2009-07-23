@@ -111,7 +111,7 @@ popd >/dev/null 2>&1
 rm -fr zip_update_dir
 echo "Done."
 
-echo "Product is in '${product_name}-svn-linux.tar.bz2'"
+echo "Product is in '${product_name}.tar.bz2'"
 
 echo "Build finished."
 
