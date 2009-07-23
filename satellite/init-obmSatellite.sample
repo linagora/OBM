@@ -11,9 +11,9 @@
 # config: /path/to/obm/auto/obmSatellite/obmSatellite.cf
 # pidfile: /var/run/obmSatellite.pid
 
-OBMPATH="/opt/obm/current"
+OBMPATH="/opt/obm-satellite/current"
 
-daemon_path="$OBMPATH/auto/obmSatellite/obmSatellite.pl"
+daemon_path="$OBMPATH/obmSatellite.pl"
 
 daemon_dir="/var/run/obm"
 daemon_pid=$daemon_dir"/obmSatellite.pid"
