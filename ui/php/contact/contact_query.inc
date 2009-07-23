@@ -277,15 +277,15 @@ function run_query_contact_search($contact) {
 
 
   if ((! $fuzzy) || ($lname == '')) {
-    if (($contact['page'] > 0) && ($name == $contact['of_display_name'])) {
-      $off = ($contact['page'] - 1) * $num;
-    } else {
-      $off = '0';
-    }
     if ($_SESSION['set_rows'] != '') {
       $limit = $_SESSION['set_rows'];
     } else {
       $limit = $set_rows_default;
+    }
+    if (($contact['page'] > 0) && ($name == $contact['of_display_name'])) {
+      $off = ($contact['page'] - 1) * $limit;
+    } else {
+      $off = '0';
     }
     $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq $orderq";
     display_debug_msg($query, $cdg_sql, 'contact_search(1)');
