@@ -1400,7 +1400,7 @@ function run_query_project_members($p_id = 0) {
   
   $multidomain = sql_multidomain('userobm');
   $p_id = sql_parse_id($p_id, true); 
-  if ($p_id) {
+  if ($p_id > 0) {
     $query = "
       SELECT
         userobm_id as member_id,
