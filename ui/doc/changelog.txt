@@ -1,7 +1,7 @@
 <!-- $Id$ -->
 O.B.M. 2.3 Changelog
 
-version 2.3.0 - 2009-10-08
+version 2.3.0 - 2009-10-17
 
 To do
 
@@ -34,4 +34,5 @@ To do
   * #516 pb with postfix map when adding a contact to a group
   * #518 French label for "New Event" should be "Nouvel Evt"
   * #531 Can't change page on result of contact search
+  * #547 Not possible to change fields displayed in a search result (mysql)
   * #549 Member list is empty in project search

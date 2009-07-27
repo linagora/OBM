@@ -219,6 +219,36 @@ function sql_if($db_type, $expr, $iftrue, $iffalse) {
 }
 
 
+/**
+ * Return the correct order clause to have NULL first
+ * 
+ * @param mixed $db_type
+ * @access public
+ * @return string ('ASC' or 'DESC')
+ */
+function sql_order_null_first($db_type, $null_first=true) {
+  global $db_type_mysql, $db_type_pgsql;
+
+  if ($db_type == $db_type_mysql) {
+    if ($null_first) {
+      $ret = 'ASC';
+    } else {
+      $ret = 'DESC';
+    }      
+  } elseif ($db_type == $db_type_pgsql) {
+    if ($null_first) {
+      $ret = 'DESC';
+    } else {
+      $ret = 'ASC';
+    }      
+  } else {
+    $ret = 'ASC';
+  }
+
+  return $ret;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return the sql string corresponding to the limit clause
 // If number and count not given, user preferences values are used
@@ -849,10 +879,15 @@ function get_display_pref($u_id, $entity, $all=0) {
     $hide = true;
   }
 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $order_dir = sql_order_null_first($db_type, true);
+
   $query = "SELECT *
     FROM DisplayPref
     WHERE (display_user_id IS NULL OR display_user_id $u_id )
-    AND display_entity='$entity'"; 
+    AND display_entity='$entity'
+    ORDER BY display_user_id $order_dir";
 
   display_debug_msg($query, $cdg_sql, 'get_display_pref()');
   $obm_q = new DB_OBM;
