@@ -52,36 +52,75 @@ class DummyGenerators extends PDO
   }
 
   public function do_inits() {
-    /* Define scales */
-    $this->nb_groups_ratio           = 1/5;
-    $this->user_per_groups           = 2;
-    $this->priv_contact_per_user     = 50;
-    $this->pub_contact_per_user      = 10;
-    $this->resource_users_ratio      = 1/25;
-    $this->nb_normal_events_per_user = 100;
-    $this->nb_reccur_events_per_user = 100;
-    $this->meeting_events_ratio      = 1/12;
-    $this->nb_ext_contact_infos = array
+    /* read scales from conf.ini*/
+    if(file_exists($GLOBALS['confFile'])) {
+      $ratios = parse_ini_file($GLOBALS['confFile'],true);
+    } else {
+      echo "\nPlease edit conf.ini.sample and save it as conf.ini\n";
+      exit(1);
+    }
+    $this->nb_groups_ratio           = floatval($ratios['entity.group']['ratio']);
+    $this->user_per_groups           = floatval($ratios['entity.group.user']['ratio']);
+    $this->priv_contact_per_user     = floatval($ratios['entity.contact.private']['ratio']);
+    $this->pub_contact_per_user      = floatval($ratios['entity.contact.public']['ratio']);
+    $this->resource_users_ratio      = floatval($ratios['entity.resource']['ratio']);
+    $this->nb_normal_events_per_user = floatval($ratios['entity.event.normal']['ratio']);
+    $this->nb_reccur_events_per_user = floatval($ratios['entity.event.recurring']['ratio']);
+    $this->meeting_events_ratio      = floatval($ratios['entity.event.meeting']['ratio']);
     /* 'Email' => 2 will create rand(0,2) mails per contact */
-      ('Email' => 2, 'Website' => 1, 'IM' => 1, 'Address' => 2, 'Phone' => 3);
+    $this->nb_ext_contact_infos = array (
+      'Email'   => floatval($ratios['entity.contact.coords']['email']),
+      'Website' => floatval($ratios['entity.contact.coords']['website']),
+      'IM'      => floatval($ratios['entity.contact.coords']['address']),
+      'Address' => floatval($ratios['entity.contact.coords']['phone']),
+      'Phone'   => floatval($ratios['entity.contact.coords']['im'])
+    );
 
     /* The propabilities for a user/group to get each right
        (floats between 0 and 1) */
-    $this->rights = array
-    ( 'calendar' => array
-      ( 'user' => array
-        ( 'access' => 1, 'read' => 1/10,  'write' => 1/200,  'admin' => 1/1000 ),
-        'group'   => array
-        ( 'access' => 0, 'read' => 1/100, 'write' => 1/1000, 'admin' => 0 )
+    $this->rights = array ( 'calendar' => array ( 
+        'user' => array ( 
+          'access'      => floatval($ratios['right.contact.user']['access']), 
+          'read'        => floatval($ratios['right.contact.user']['read']),  
+          'write'       => floatval($ratios['right.contact.user']['write']),  
+          'admin'       => floatval($ratios['right.contact.user']['admin'])
+        ),
+        'group'         => array ( 
+          'access'      => floatval($ratios['right.contact.group']['access']), 
+          'read'        => floatval($ratios['right.contact.group']['read']),  
+          'write'       => floatval($ratios['right.contact.group']['write']),  
+          'admin'       => floatval($ratios['right.contact.group']['admin'])          
+        ),
       ),
-      'resource' => array
-      ( 'user' => array
-        ( 'access' => 1/2,  'read' => 1/2,  'write' => 1/200, 'admin' => 1/400),
-        'group' => array
-        ( 'access' => 1/50, 'read' => 1/50, 'write' => 0,     'admin' => 0 )
+      'resource' => array ( 
+        'user' => array(
+          'access'      => floatval($ratios['right.resource.user']['access']), 
+          'read'        => floatval($ratios['right.resource.user']['read']),  
+          'write'       => floatval($ratios['right.resource.user']['write']),  
+          'admin'       => floatval($ratios['right.resource.user']['admin'])
+          ),
+          'group' => array (
+            'access'      => floatval($ratios['right.resource.group']['access']), 
+            'read'        => floatval($ratios['right.resource.group']['read']),  
+            'write'       => floatval($ratios['right.resource.group']['write']),  
+            'admin'       => floatval($ratios['right.resource.group']['admin'])          
+        )
+      ),
+      'contact' => array ( 
+        'user' => array(
+          'access'      => floatval($ratios['right.contact.user']['access']), 
+          'read'        => floatval($ratios['right.contact.user']['read']),  
+          'write'       => floatval($ratios['right.contact.user']['write']),  
+          'admin'       => floatval($ratios['right.contact.user']['admin'])
+        ),
+        'group' => array (
+          'access'      => floatval($ratios['right.contact.group']['access']), 
+          'read'        => floatval($ratios['right.contact.group']['read']),  
+          'write'       => floatval($ratios['right.contact.group']['write']),  
+          'admin'       => floatval($ratios['right.contact.group']['admin'])        
+        )
       )
     );
-
     /* Our stuff */
     $this->today_date = strftime("%Y-%m-%d", time()-(2*3600));
     $this->ev_manager = array( /* user_id => new EventManager(time()), ... */ );
@@ -168,12 +207,12 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     $total_contacts = $nb_pub_contacts + $nb_priv_contacts;
     print "Inserting $this->priv_contact_per_user privates contacts for each "
       ."user (total $nb_priv_contacts contacts)... ";
-    $this->createAllUsersContacts(0, clone $users_ids, $this->priv_contact_per_user);
+    $this->createAllUsersContacts(1, clone $users_ids, $this->priv_contact_per_user);
     print "done\n";
 
     print "Inserting $this->pub_contact_per_user publics contacts for each "
       ."user (total $nb_pub_contacts contacts)... ";
-    $this->createAllUsersContacts(1, clone $users_ids, $this->pub_contact_per_user);
+    $this->createAllUsersContacts(0, clone $users_ids, $this->pub_contact_per_user);
     print "done\n";
 
     $this->contacts_eids = new IntIterator
@@ -213,10 +252,10 @@ WHERE eventcategory1_domain_id = '$this->domain_id'");
     print "done\n";
   }
   
-  public function createAllUsersContacts($is_public, $uid_iter, $nb_contacts)
+  public function createAllUsersContacts($is_private, $uid_iter, $nb_contacts)
   {
     while($uid = $uid_iter->nextInt()) {
-      $this->createContacts($is_public, $nb_contacts, $uid,new Of_Date(time()));
+      $this->createContacts($is_private, $nb_contacts, $uid,new Of_Date(time()));
     }
   }
 
@@ -417,7 +456,7 @@ VALUES (                    '$rid',             '$entity_id')");
     }
   }
   
-  public function createContacts($is_public, $nb_contacts, $uid, $time)
+  public function createContacts($is_private, $nb_contacts, $uid, $time)
   {
     /* Contact table */
     $statics = array
@@ -435,7 +474,7 @@ VALUES (                    '$rid',             '$entity_id')");
         'contact_assistant'           => "''",
         'contact_mailing_ok'          => "'1'",
         'contact_newsletter'          => "'1'",
-        'contact_privacy'             => "'$is_public'",
+        'contact_privacy'             => "'$is_private'",
         'contact_date'                => "'$this->today_date'",
         'contact_origin'              => "'obm-dummyzator'"
         );

@@ -28,6 +28,7 @@ $obm = array( 'uid' => 1 );// run_query_domain_init_data() needs this
 
 /* Hack to include obm's includes files */
 $path = 'php';                          // dummy value, useless
+$GLOBALS['confFile'] = realpath('.').'/conf.ini';
 chdir($obm_root);
 $obminclude = "./obminclude";
 require("$obminclude/global.inc");
