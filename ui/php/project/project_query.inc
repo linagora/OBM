@@ -1399,7 +1399,7 @@ function run_query_project_members($p_id = 0) {
   global $cdg_sql;
   
   $multidomain = sql_multidomain('userobm');
-  $p_id = sql_parse_id($p_id, true); 
+  $pid = sql_parse_id($p_id, true); 
   if ($p_id > 0) {
     $query = "
       SELECT
@@ -1409,7 +1409,7 @@ function run_query_project_members($p_id = 0) {
         projectuser_manager as member_manager
       FROM ProjectUser
      LEFT JOIN UserObm ON projectuser_user_id = userobm_id
-     WHERE projectuser_project_id $p_id 
+     WHERE projectuser_project_id $pid 
         AND projectuser_projecttask_id is null
 	$multidomain
      GROUP BY member_id, member_firstname, member_lastname, member_manager
