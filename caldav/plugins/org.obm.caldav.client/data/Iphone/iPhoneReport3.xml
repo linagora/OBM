@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<x0:calendar-query xmlns:x0="urn:ietf:params:xml:ns:caldav"
+	xmlns:x1="DAV:">
+	<x1:prop>
+		<x1:getetag />
+		<x1:resourcetype />
+	</x1:prop>
+	<x0:filter>
+		<x0:comp-filter name="VCALENDAR">
+			<x0:comp-filter name="VEVENT">
+				<x0:time-range end="20110723T220000Z" start="20090622T220000Z" />
+			</x0:comp-filter>
+		</x0:comp-filter>
+	</x0:filter>
+</x0:calendar-query>
