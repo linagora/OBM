@@ -143,7 +143,7 @@ public class CalendarMultiGet extends ReportProvider {
 	private Set<String> getListExtId(Element root){
 		Set<String> listExtIDEvent = new HashSet<String>();
 		if(root!= null){
-			NodeList dl = root.getElementsByTagNameNS(NameSpaceConstant.DHREF_NAMESPACE, "href");
+			NodeList dl = root.getElementsByTagName(NameSpaceConstant.DAV_NAMESPACE_PREFIX+"href");
 			for(int i = 0; i<dl.getLength(); i++ ){
 				Element dhref = (Element)dl.item(i);
 				String hrefContent = dhref.getTextContent();

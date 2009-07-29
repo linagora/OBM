@@ -41,5 +41,4 @@ public class CalendarData extends DavPropertyHandler implements
 				eventIcs);
 		val.appendChild(cdata);
 	}
-
 }

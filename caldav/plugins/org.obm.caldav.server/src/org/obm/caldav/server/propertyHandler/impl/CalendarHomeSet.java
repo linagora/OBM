@@ -17,6 +17,7 @@
 package org.obm.caldav.server.propertyHandler.impl;
 
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
@@ -52,7 +53,7 @@ import org.w3c.dom.Element;
  *        <!ELEMENT calendar-home-set (DAV:href*)>
  *        
  * Example:
- * 		<C:calendar-home-set xmlns:D="DAV:"xmlns:C="urn:ietf:params:xml:ns:caldav">
+ * 		<C:calendar-home-set xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">
  * 			<D:href>http://cal.example.com/home/bernard/calendars/</D:href>
  * 		</C:calendar-home-set>
  * 
@@ -64,7 +65,13 @@ public class CalendarHomeSet extends DavPropertyHandler implements PropfindPrope
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
-		DOMUtils.createElementAndText(prop, "D:href", "/"
+		Element elem = DOMUtils.createElement(prop, NameSpaceConstant.CALDAV_NAMESPACE_PREFIX+"calendar-home-set");
+		DOMUtils.createElementAndText(elem, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"href", "/"
 				+ t.getLoginAtDomain() + "/events/");
+	}
+
+	@Override
+	public boolean isUsed() {
+		return true;
 	}
 }

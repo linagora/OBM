@@ -23,4 +23,5 @@ import org.w3c.dom.Element;
 
 public interface PropfindPropertyHandler {
 	void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy);
+	boolean isUsed();
 }

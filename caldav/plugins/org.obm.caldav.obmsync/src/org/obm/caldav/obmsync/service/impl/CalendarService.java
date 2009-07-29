@@ -16,7 +16,10 @@
 
 package org.obm.caldav.obmsync.service.impl;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +28,7 @@ import org.obm.caldav.obmsync.provider.ICalendarProvider;
 import org.obm.caldav.obmsync.provider.impl.ObmSyncEventProvider;
 import org.obm.caldav.obmsync.provider.impl.ObmSyncTodoProvider;
 import org.obm.caldav.server.ICalendarService;
+import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.caldav.utils.Constants;
 import org.obm.sync.auth.AccessToken;
 import org.obm.sync.auth.AuthFault;
@@ -100,10 +104,39 @@ public class CalendarService implements ICalendarService{
 	}
 	
 	@Override
-	public List<EventTimeUpdate> getAllLastUpdateEvents() throws Exception{
-		return providerEvent.getAllEventTimeUpdate(token, calendar);
-	}
+	public List<EventTimeUpdate> getAllLastUpdateEvents(CompFilter cf) throws Exception{
+		if(cf.getTimeRange() != null && (cf.getTimeRange().getStart() != null || cf.getTimeRange().getEnd() != null)){
+			Date start = cf.getTimeRange().getStart();
+			Date end = cf.getTimeRange().getEnd();
+			if(start == null){
+				GregorianCalendar gc = new GregorianCalendar();
+				gc.set(Calendar.YEAR, gc.get(Calendar.YEAR)-1);
+				start = gc.getTime();
+			}
+			
+			if(end == null){
+				GregorianCalendar gc = new GregorianCalendar();
+				gc.set(Calendar.YEAR, gc.get(Calendar.YEAR)+1);
+				end = gc.getTime();
+			}
 
+			
+			List<Event> events = providerEvent.getListEventsFromIntervalDate(token, calendar, cf.getTimeRange().getStart(), end);
+			List<EventTimeUpdate> allEvent = new LinkedList<EventTimeUpdate>();
+			for(Event e : events){
+				EventTimeUpdate etu = new EventTimeUpdate();
+				etu.setExtId(e.getExtId());
+				etu.setParentId(e.getParentId());
+				etu.setTimeUpdate(e.getTimeUpdate());
+				etu.setUid(e.getUid());
+				allEvent.add(etu);
+			}
+			
+			return allEvent;
+			
+		}
+		return providerEvent.getAllEventTimeUpdate(token, calendar); 
+	}
 
 	@Override
 	public List<Event> getAllTodos() throws Exception {
@@ -129,5 +162,4 @@ public class CalendarService implements ICalendarService{
 		}
 		return false;
 	}
-
 }

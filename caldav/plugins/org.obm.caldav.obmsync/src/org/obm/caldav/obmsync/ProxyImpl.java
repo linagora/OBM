@@ -40,7 +40,6 @@ public class ProxyImpl implements IProxy {
 	
 	@Override
 	public void login(Token token) {
-		
 		this.userId = token.getLoginAtDomain();
 		this.calendar = token.getLogin();
 		this.token = AbstractObmSyncProvider.login(userId, token.getPassword());
@@ -58,6 +57,20 @@ public class ProxyImpl implements IProxy {
 			throw new RuntimeException("You must be logged");
 		}
 		return calendarService;
+	}
+
+	@Override
+	public boolean validateToken(Token token) {
+		if(token == null){
+			return false;
+		}
+		AccessToken at = AbstractObmSyncProvider.login(token.getLoginAtDomain(), token.getPassword());
+		if(at == null || at.getSessionId() == null || "".equals(at.getSessionId())){
+			return false;
+		} else {
+			AbstractObmSyncProvider.logout(at);
+			return true;
+		}
 	}
 
 }

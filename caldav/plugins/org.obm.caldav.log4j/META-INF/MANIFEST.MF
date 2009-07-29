@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.obm.caldav.Log4j
 Bundle-SymbolicName: org.obm.caldav.log4j
 Bundle-Version: 1.0.0
-Fragment-Host: org.apache.commons.logging;bundle-version="1.0.4.v200904062259"
+Fragment-Host: org.apache.commons.logging;bundle-version="1.0.4"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: log4j-1.2.15.jar,
  .

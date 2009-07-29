@@ -29,6 +29,7 @@ public class StatusCodeConstant {
 		
 		messages.put(403, "Forbidden");
 		messages.put(404, "Not Found");
+		messages.put(405, "Not Allowed");
 		messages.put(424, "Method failure");
 
 		messages.put(500, "Internal Server Error");
@@ -40,6 +41,7 @@ public class StatusCodeConstant {
 	
 	public static int SC_FORBIDDEN = 403;
 	public static int SC_NOT_FOUND = 404;
+	public static int SC_NOT_ALLOWED = 405;
 	public static int SC_METHOD_FAILURE = 424;
 	
 	public static int SC_INTERNAL_SERVER_ERROR = 500;

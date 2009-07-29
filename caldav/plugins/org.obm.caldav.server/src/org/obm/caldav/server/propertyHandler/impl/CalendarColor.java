@@ -14,22 +14,24 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.server.methodHandler;
-
-import javax.servlet.http.HttpServletResponse;
+package org.obm.caldav.server.propertyHandler.impl;
 
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
+import org.w3c.dom.Element;
 
-public class CopyHandler extends DavMethodHandler {
+public class CalendarColor implements PropfindPropertyHandler {
 
-	public CopyHandler() {
+	@Override
+	public void appendPropertyValue(Element prop, Token t, DavRequest req,
+			IProxy proxy) {
 	}
 
 	@Override
-	public void process(Token t, IProxy proxy, DavRequest req, HttpServletResponse resp) {
-		logger.info("process(req, resp)");
+	public boolean isUsed() {
+		return false;
 	}
 
 }

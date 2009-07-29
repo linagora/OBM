@@ -43,24 +43,22 @@ public abstract class DavMethodHandler {
 	public DavMethodHandler() {
 	}
 	
-	public Set<String> getPropList(Document doc){
+	public Set<Element> getPropList(Document doc){
 		Element root = doc.getDocumentElement();
 		Element prop = DOMUtils.getUniqueElement(root, "prop", NameSpaceConstant.DAV_NAMESPACE);
 		NodeList propsToLoad = prop.getChildNodes();
-		Set<String> toLoad = new HashSet<String>();
+		Set<Element> toLoad = new HashSet<Element>();
 
 		for (int i = 0; i < propsToLoad.getLength(); i++) {
 			Node n = propsToLoad.item(i);
 			if (n.getNodeType() == Node.ELEMENT_NODE) {
-				String name = n.getNodeName();
-				toLoad.add(name);
-				logger.info(name);
+				toLoad.add((Element)n);
 			}
 		}
 		return toLoad;
 	}
 
-	public abstract void process(Token token,IProxy proxy, DavRequest req, HttpServletResponse resp) throws ResultBuilderException;
+	public abstract void process(Token token,IProxy proxy, DavRequest req, HttpServletResponse resp) throws Exception;
 	
 	public void sendDom(Document doc, HttpServletResponse resp) throws ResultBuilderException{
 		resp.setContentType("text/xml; charset=utf-8");

@@ -294,4 +294,8 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 		}
 		return events;
 	}
+	
+	public List<Event> getListEventsFromIntervalDate(AccessToken token,String calendar,Date start, Date end) throws AuthFault, ServerFault{
+		return client.getListEventsFromIntervalDate(token, calendar, start, end);
+	}
 }

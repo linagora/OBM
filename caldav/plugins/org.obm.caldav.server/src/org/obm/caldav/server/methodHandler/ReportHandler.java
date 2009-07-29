@@ -17,7 +17,9 @@
 package org.obm.caldav.server.methodHandler;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -53,7 +55,11 @@ public class ReportHandler extends DavMethodHandler {
 		
 		ReportProvider rp = providers.get(reportKind);
 		if (rp != null) {
-			rp.process(token, proxy, req, resp, getPropList(d));
+			Set<String> propToLoad = new HashSet<String>();
+			for(Element e : getPropList(d)){
+				propToLoad.add(e.getLocalName());
+			}
+			rp.process(token, proxy, req, resp, propToLoad);
 		} else {
 			logger.error("No report provider for report kind '" + reportKind
 					+ "'");

@@ -72,7 +72,7 @@ public class CalendarQueryResultBuilder extends ResultBuilder {
 			Element root = doc.getDocumentElement();
 			for (Entry<String, EventTimeUpdate> entry : listEvents.entrySet()) {
 				EventTimeUpdate event = entry.getValue();
-				if (!".ics".equals(entry.getKey())) {
+				if (!entry.getKey().endsWith("/.ics")) {
 					Element response = DOMUtils.createElement(root,
 							"D:response");
 					DOMUtils.createElementAndText(response, "D:href", entry

@@ -28,6 +28,7 @@ import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.server.propertyHandler.impl.GetETag;
+import org.obm.caldav.server.propertyHandler.impl.ResourceType;
 import org.obm.caldav.server.resultBuilder.CalendarQueryResultBuilder;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.server.share.filter.CompFilter;
@@ -48,7 +49,8 @@ public class CalendarQuery extends ReportProvider {
 	
 	public CalendarQuery() {
 		properties = new HashMap<String, CalendarQueryPropertyHandler>();
-		properties.put("D:getetag", new GetETag());
+		properties.put("getetag", new GetETag());
+		properties.put("resourcetype", new ResourceType());
 	}
 
 	// Request
@@ -88,7 +90,7 @@ public class CalendarQuery extends ReportProvider {
 			Map<String, EventTimeUpdate> events = new HashMap<String, EventTimeUpdate>();
 			CompFilter cf = compFilter.getCompFilters().get(0);
 			if (CompFilter.VEVENT.equalsIgnoreCase(cf.getName())) {
-				List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdateEvents();
+				List<EventTimeUpdate> retEvents = proxy.getCalendarService().getAllLastUpdateEvents(cf);
 				for (EventTimeUpdate event : retEvents) {
 					String href = req.getHref()
 							+ proxy.getCalendarService().getICSName(event);

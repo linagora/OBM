@@ -22,10 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
+import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -74,6 +76,7 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 	
 	@Override
 	public synchronized void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
+		Element elem = DOMUtils.createElement(prop, NameSpaceConstant.CALENDARSERVER_NAMESPACE_PREFIX+"getctag");
 		Date lastChange = lastChangeByUser.get(t.getLoginAtDomain());
 		
 		if(lastChange == null){
@@ -92,12 +95,17 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 				
 			}
 		}
-		prop.setTextContent(getCTagValue(t, lastChange));
+		elem.setTextContent(getCTagValue(t, lastChange));
 		
 		lastChangeByUser.put(t.getLoginAtDomain(), lastChange);
 	}
 	
 	private String getCTagValue(Token t, Date lastSync){
 		return t.getLoginAtDomain()+"-"+lastSync.getTime();
+	}
+
+	@Override
+	public boolean isUsed() {
+		return true;
 	}
 }

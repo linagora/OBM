@@ -18,11 +18,13 @@ package org.obm.caldav.server.propertyHandler.impl;
 
 
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
-import org.obm.caldav.utils.DOMUtils;
+import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Element;
 
 /**
@@ -36,11 +38,29 @@ import org.w3c.dom.Element;
  * @author adrienp
  *
  */
-public class ResourceType extends DavPropertyHandler implements PropfindPropertyHandler{
+public class ResourceType extends DavPropertyHandler implements PropfindPropertyHandler, CalendarQueryPropertyHandler{
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
-		DOMUtils.createElement(prop, "D:collection");
-		DOMUtils.createElement(prop, "C:calendar");
+		Element elem =appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
+		
+		appendElement(elem,"collection", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
+		appendElement(elem,"calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+		/*Element elem = DOMUtils.createElement(prop, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"resourcetype");
+		DOMUtils.createElement(elem, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"collection");
+		DOMUtils.createElement(elem, NameSpaceConstant.CALDAV_NAMESPACE_PREFIX+"calendar");*/
+	}
+
+	@Override
+	public void appendCalendarQueryPropertyValue(Element prop, IProxy proxy,
+			EventTimeUpdate event) {
+		Element elem =appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
+		appendElement(elem,"collection", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
+		appendElement(elem,"calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+	}
+
+	@Override
+	public boolean isUsed() {
+		return true;
 	}
 }

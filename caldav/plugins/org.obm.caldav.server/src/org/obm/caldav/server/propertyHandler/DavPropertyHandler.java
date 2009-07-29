@@ -19,9 +19,14 @@ package org.obm.caldav.server.propertyHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.utils.DOMUtils;
+import org.w3c.dom.Element;
 
 public abstract class DavPropertyHandler {
 
 	protected Log logger = LogFactory.getLog(getClass());
 	
+	protected Element appendElement(Element root, String elementName, String nameSpacePrefix){
+		return DOMUtils.createElement(root, nameSpacePrefix+elementName);
+	}
 }

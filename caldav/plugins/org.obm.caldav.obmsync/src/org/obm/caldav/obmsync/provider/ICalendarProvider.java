@@ -51,9 +51,9 @@ public interface ICalendarProvider {
 	Set<CalendarInfo> getListCalendars(AccessToken token) throws ServerFault,
 			AuthFault;
 
-	List<Event> getAll(AccessToken token, String calendar)
-			throws ServerFault, AuthFault;
-	
+	List<Event> getAll(AccessToken token, String calendar) throws ServerFault,
+			AuthFault;
+
 	List<EventTimeUpdate> getAllEventTimeUpdate(AccessToken token,
 			String calendar) throws ServerFault, AuthFault;
 
@@ -75,4 +75,8 @@ public interface ICalendarProvider {
 
 	EventChanges getSync(AccessToken token, String calendar, Date lastSync)
 			throws AuthFault, ServerFault;
+
+	List<Event> getListEventsFromIntervalDate(AccessToken token,
+			String calendar, Date start, Date end) throws AuthFault,
+			ServerFault;
 }

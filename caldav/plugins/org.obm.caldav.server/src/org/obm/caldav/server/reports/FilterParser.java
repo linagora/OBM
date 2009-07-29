@@ -41,8 +41,6 @@ public class FilterParser {
 
 	private final static String patternUTC = "yyyyMMdd'T'HHmmss'Z'";
 
-	Document doc;
-
 	public static Filter parse(Document doc) {
 		Filter filter = null;
 
@@ -150,7 +148,7 @@ public class FilterParser {
 			df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 			String start = timeRange.getAttribute("start");
-			if (start != null) {
+			if (start != null && "".equals(start)) {
 				try {
 					Date dStart = df.parse(start);
 					tr.setStart(dStart);
@@ -160,7 +158,7 @@ public class FilterParser {
 			}
 
 			String end = timeRange.getAttribute("end");
-			if (end != null) {
+			if (end != null && "".equals(start)) {
 				try {
 					Date dEnd = df.parse(end);
 					tr.setEnd(dEnd);

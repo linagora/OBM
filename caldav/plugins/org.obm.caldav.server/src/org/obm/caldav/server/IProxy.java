@@ -22,10 +22,8 @@ import org.obm.caldav.server.share.Token;
 
 public interface IProxy {
 	
-	/*IEventService getEventService();
-	ITodoService getTodoService();*/
-	
 	ICalendarService getCalendarService();
+	boolean validateToken(Token token);
 	void login(Token token);
 
 	void logout();

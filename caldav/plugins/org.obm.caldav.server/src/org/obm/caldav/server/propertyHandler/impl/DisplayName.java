@@ -16,39 +16,36 @@
 
 package org.obm.caldav.server.propertyHandler.impl;
 
-
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
-import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
 
 /**
+ * Name:
+ *     displayname
+ * Namespace:
+ *     DAV:
+ * Purpose:
+ *     Provides a name for the resource that is suitable for presentation to a user.
+ * Description:
+ *     The displayname property should be defined on all DAV compliant resources. If present, the property contains a description of the resource that is suitable for presentation to a user.
  * 
- * This property identifies a particular principal as being the "owner" of the resource.
- * Since the owner of a resource often has special access control capabilities
- * (e.g., the owner frequently has permanent DAV:write-acl privilege), clients might 
- * display the resource owner in their user interface.
- * 
- * Servers MAY implement DAV:owner as protected property 
- * and MAY return an empty DAV:owner element as property value 
- * in case no owner information is available.
- * 
- * <!ELEMENT owner (href?)>
+ *    <!ELEMENT displayname (#PCDATA) >
  * 
  * @author adrienp
  *
  */
-public class Owner extends DavPropertyHandler implements PropfindPropertyHandler{
+
+public class DisplayName implements PropfindPropertyHandler {
 
 	@Override
-	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
-		Element elem = DOMUtils.createElement(prop, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"owner");
-		DOMUtils.createElementAndText(elem, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"href", "/"
-				+ t.getLoginAtDomain() + "/events");
+	public void appendPropertyValue(Element prop, Token t, DavRequest req,
+			IProxy proxy) {
+		DOMUtils.createElementAndText(prop, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"displayname", "OBM CalDav "+t.getLoginAtDomain());
 	}
 
 	@Override

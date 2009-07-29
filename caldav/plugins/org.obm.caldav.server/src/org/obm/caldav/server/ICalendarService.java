@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.obm.caldav.server.exception.AuthorizationException;
+import org.obm.caldav.server.share.filter.CompFilter;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventTimeUpdate;
 
@@ -41,7 +42,7 @@ public interface ICalendarService {
 	Event getEventFromExtId(String externalUrl) throws Exception;
 	
 	List<Event> getAllEvents() throws Exception;
-	List<EventTimeUpdate>getAllLastUpdateEvents() throws Exception;
+	List<EventTimeUpdate> getAllLastUpdateEvents(CompFilter cf) throws Exception;
 	
 	List<Event> getAllTodos()  throws Exception;
 	List<EventTimeUpdate> getAllLastUpdateTodos() throws Exception;
@@ -51,6 +52,7 @@ public interface ICalendarService {
 	void removeOrUpdateParticipationState(String extId) throws Exception,AuthorizationException ;
 	
 	boolean getSync(Date lastSync) throws Exception;
+	
 	
 	
 }

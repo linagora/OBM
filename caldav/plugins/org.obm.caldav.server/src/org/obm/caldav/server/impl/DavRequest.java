@@ -84,5 +84,4 @@ public class DavRequest {
 	public HttpSession getSession(){
 		return this.req.getSession();
 	}
-
 }
