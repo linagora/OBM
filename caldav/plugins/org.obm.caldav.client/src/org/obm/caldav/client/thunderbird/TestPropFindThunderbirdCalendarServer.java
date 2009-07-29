@@ -14,18 +14,27 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.client.iPhone;
+package org.obm.caldav.client.thunderbird;
 
 import java.io.InputStream;
 
-import org.obm.caldav.client.ObmCalDavCaldavPushTest;
+import org.obm.caldav.client.CalendarServerPushTest;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 
-public class TestPropFindIPhoneObmCalDav extends ObmCalDavCaldavPushTest{
+public class TestPropFindThunderbirdCalendarServer extends CalendarServerPushTest{
 	
 	public void testCalSync() throws Exception {
 		InputStream in = loadDataFile("thunderbird/thunderbirdPropFind1.xml");
+		Document doc = DOMUtils.parse(in);
+		Document ret = propFindQuery(doc);
+		assertNotNull(ret);
+
+		DOMUtils.logDom(ret);
+	}
+	
+	public void testCalSync2() throws Exception {
+		InputStream in = loadDataFile("thunderbird/thunderbirdPropFind2.xml");
 		Document doc = DOMUtils.parse(in);
 		Document ret = propFindQuery(doc);
 		assertNotNull(ret);

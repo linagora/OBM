@@ -1,8 +1,23 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: GPL 2.0
+ *
+ * The contents of this file are subject to the GNU General Public
+ * License Version 2 or later (the "GPL").
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Initial Developer of the Original Code is
+ *   obm.org project members
+ *
+ * ***** END LICENSE BLOCK ***** */
+
 package org.obm.caldav.client;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -17,11 +32,13 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.obm.caldav.client.httpmethod.PropfindMethod;
 import org.obm.caldav.client.httpmethod.ReportMethod;
 import org.obm.caldav.utils.DOMUtils;
+import org.obm.caldav.utils.FileUtils;
 import org.w3c.dom.Document;
 
 public abstract class AbstractPushTest extends TestCase {
@@ -44,7 +61,7 @@ public abstract class AbstractPushTest extends TestCase {
 		this.login = confValue("login");
 		this.password = confValue("password");
 		this.url = confValue("obm-caldav_url");
-
+		this.userAgent = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.22) Gecko/20090608 Lightning/0.9 Thunderbird/2.0.0.22";
 		this.hc = createHttpClient();
 	}
 
@@ -77,10 +94,19 @@ public abstract class AbstractPushTest extends TestCase {
 		appendHeader(pfq, out);
 		appendBody(pfq, out);
 		Document ret = doRequest(pfq);
-		if(ret == null && authenticate!=null && !"".equals(authenticate)){
+		if (ret == null && authenticate != null && !"".equals(authenticate)) {
 			ret = propFindQuery(doc);
 		}
-		return ret; 
+		return ret;
+	}
+
+	protected void optionQuery() throws Exception {
+		OptionsMethod pfq = new OptionsMethod(url);
+		appendHeader(pfq, new ByteArrayOutputStream());
+		doRequest(pfq);
+		pfq = new OptionsMethod(url);
+		appendHeader(pfq, new ByteArrayOutputStream());
+		doRequest(pfq);
 	}
 
 	protected Document deleteQuery(Document doc) throws Exception {
@@ -120,13 +146,22 @@ public abstract class AbstractPushTest extends TestCase {
 						+ h.getValue());
 			}
 			if (ret == HttpStatus.SC_UNAUTHORIZED) {
-				UsernamePasswordCredentials upc = new UsernamePasswordCredentials(login, password);
-				authenticate = hm.getHostAuthState().getAuthScheme().authenticate(upc, hm);
+				UsernamePasswordCredentials upc = new UsernamePasswordCredentials(
+						login, password);
+				authenticate = hm.getHostAuthState().getAuthScheme()
+						.authenticate(upc, hm);
 				return null;
-			} else if (ret == HttpStatus.SC_OK || ret == HttpStatus.SC_MULTI_STATUS) {
+			} else if (ret == HttpStatus.SC_OK
+					|| ret == HttpStatus.SC_MULTI_STATUS) {
 				InputStream is = hm.getResponseBodyAsStream();
-				xml = DOMUtils.parse(is);
-				DOMUtils.logDom(xml);
+				if (is != null) {
+					if ("text/xml".equals(hm.getRequestHeader("Content-Type"))) {
+						xml = DOMUtils.parse(is);
+						DOMUtils.logDom(xml);
+					} else {
+						System.out.println(FileUtils.streamString(is, false));
+					}
+				}
 			} else {
 				System.err.println("method failed:\n" + hm.getStatusLine()
 						+ "\n" + hm.getResponseBodyAsString());
@@ -146,13 +181,13 @@ public abstract class AbstractPushTest extends TestCase {
 
 	private void appendHeader(HttpMethod hm, ByteArrayOutputStream out) {
 		hm.setRequestHeader("Host", "lemurien.tlse.lng:8008");
-		hm.setRequestHeader("User-Agent", "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.22) Gecko/20090608 Lightning/0.9 Thunderbird/2.0.0.22");
+		hm.setRequestHeader("User-Agent", userAgent);
 		hm.setRequestHeader("Accept", "text/xml");
 		hm.setRequestHeader("Accept-Charset", "utf-8,*;q=0.1");
 		hm.setRequestHeader("Content-Length", "" + out.size());
 		hm.setRequestHeader("Content-Type", "text/xml; charset=utf-8");
 		hm.setRequestHeader("Depth", "0");
-		if(authenticate != null && !"".equals(authenticate)){
+		if (authenticate != null && !"".equals(authenticate)) {
 			hm.setRequestHeader("Authorization", authenticate);
 		}
 	}
@@ -171,6 +206,6 @@ public abstract class AbstractPushTest extends TestCase {
 			return null;
 		}
 	}
-	
+
 	protected abstract InputStream getConf();
 }
