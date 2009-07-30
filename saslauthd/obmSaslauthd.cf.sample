@@ -4,7 +4,7 @@ proto       unix
 max_servers 5
 max_requests 500
 
-log_level   4
+log_level   2
 log_file    /var/log/obm/obmSaslauthd.log
 pid_file    /var/run/saslauthd/obmSaslauthd.pid
 
