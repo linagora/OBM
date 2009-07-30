@@ -1,0 +1,26 @@
+port        /var/run/saslauthd/mux|unix
+proto       unix
+
+max_servers 5
+max_requests 500
+
+log_level   4
+log_file    /var/log/obm/obmSaslauthd.log
+pid_file    /var/run/obm/obmSaslauthd.pid
+
+# LDAP server
+ldap_server ldap://ldap.obm.local
+# LDAP use TLS [none|may|encrypt]
+ldap_server_tls may
+# LDAP DIT. If emtpy, set 'defaultsearchbase' LDAP server option
+ldap_base   dc=local
+# Query user DN - anonymous by default
+ldap_login  uid=ldapadmin,ou=sysusers,dc=local
+# Query user password - anonymous by default
+ldap_password   mdp3PaAL
+# LDAP query filter
+# %u = login@realm
+# %U = login
+# %d = realm
+# Single name space - ldap_filter: (|(&(|(mailBox=%u)(uid=%u))(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus*)(objectClass=posixAccount)))
+ldap_filter (|(&(mailBox=%U@%d)(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus*)(objectClass=posixAccount)))
