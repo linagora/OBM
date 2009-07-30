@@ -287,7 +287,7 @@ function run_query_contact_search($contact) {
     } else {
       $off = '0';
     }
-    $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq $orderq";
+    $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_userdata $join_comp $whereq $orderq";
     display_debug_msg($query, $cdg_sql, 'contact_search(1)');
     $obm_q->xquery($query);
     $count = $obm_q->nf();

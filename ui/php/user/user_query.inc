@@ -136,8 +136,7 @@ function run_query_user_search($user) {
           $condition
           ( domain_name #LIKE '$right' OR domain_alias #LIKE '$right' OR domain_alias #LIKE '$right\r\n%' OR domain_alias #LIKE '%\r\n$right\r\n%' OR domain_alias #LIKE '%\r\n$right' ))
         ) ";
-    $join_domain =  "INNER JOIN UserEntity ON userentity_user_id = userobm_id
-                      INNER JOIN Domain ON userobm_domain_id = domain_id";
+    $join_domain =  "INNER JOIN Domain ON userobm_domain_id = domain_id";
 
   }
 
@@ -305,7 +304,7 @@ function run_query_user_search($user) {
     $orderq
     $limit";
   if ($ctu_sql_limit) {
-    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm $join_grp $join_host $join_userdata $join_domain $whereq");
+    $count = get_query_count("SELECT count(distinct userobm_id) FROM UserObm INNER JOIN UserEntity ON userentity_user_id = userobm_id $join_grp $join_host $join_userdata $join_domain $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
