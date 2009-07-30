@@ -17,10 +17,16 @@ sub process_request {
     my $self = shift;
 
     $self->{'request'} = ObmSaslauthd::Server::request->new( $self );
-    if( !$self->{'ldapCheckPasswd'}->checkPasswd( $self->{'request'} ) ) {
-        print SASL_FAIL_RESP;
+
+    if( $self->{'ldapCheckPasswd'}->checkPasswd( $self->{'request'} ) ) {
+        print SASL_SUCC_RESP;
         return;
     }
 
-    print SASL_SUCC_RESP;
+    if( $self->{'ssoCheckTicket'}->checkTicket( $self->{'request'} ) ) {
+        print SASL_SUCC_RESP;
+        return;
+    }
+
+    print SASL_FAIL_RESP;
 }

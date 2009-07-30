@@ -24,3 +24,6 @@ ldap_password   mdp3PaAL
 # %d = realm
 # Single name space - ldap_filter: (|(&(|(mailBox=%u)(uid=%u))(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus*)(objectClass=posixAccount)))
 ldap_filter (|(&(mailBox=%U@%d)(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus*)(objectClass=posixAccount)))
+
+# Check SSO ticket
+check_sso_uri   https://obm.obm.local/sso/sso_index.php?action=validate&ticket=%t

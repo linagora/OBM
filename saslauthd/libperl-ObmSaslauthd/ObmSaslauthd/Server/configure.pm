@@ -9,6 +9,7 @@ require Exporter;
 use strict;
 
 use ObmSaslauthd::Ldap::ldapCheckPasswd;
+use ObmSaslauthd::SSO::ssoCheckTicket;
 
 
 sub configure_hook {
@@ -22,6 +23,11 @@ sub configure_hook {
     if( $self->_configureLdap() ) {
         $self->log( 0, 'ldap configuration error' );
         die 'ldap configuration error';
+    }
+
+    if( $self->_configureSSO() ) {
+        $self->log( 0, 'SSO configuration error' );
+        die 'SSO configuration error';
     }
 }
 
@@ -52,6 +58,23 @@ sub _configureLdap {
     } );
 
     if( !defined($self->{'ldapCheckPasswd'}) ) {
+        return 1;
+    }
+
+    return 0;
+}
+
+
+sub _configureSSO {
+    my $self = shift;
+    my $daemonOptions;
+
+    $daemonOptions->{'check_sso_uri'} = $self->_loadOption('check_sso_uri');
+    $self->{'ssoCheckTicket'} = ObmSaslauthd::SSO::ssoCheckTicket->new( $self, {
+        check_sso_uri => shift( @{$daemonOptions->{'check_sso_uri'}} )
+    } );
+
+    if( !defined($self->{'ssoCheckTicket'} ) ) {
         return 1;
     }
 

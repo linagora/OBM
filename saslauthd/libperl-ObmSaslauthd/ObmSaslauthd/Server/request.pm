@@ -105,3 +105,19 @@ sub getDn {
 
     return $self->{'ldap_dn'};
 }
+
+
+sub getFullLogin {
+    my $self = shift;
+
+    if( !$self->getLogin() ) {
+        return undef;
+    }
+
+    my $fullLogin = $self->getLogin();
+    if( $self->getRealm() ) {
+        $fullLogin .= '@'.$self->getRealm();
+    }
+
+    return $fullLogin;
+}
