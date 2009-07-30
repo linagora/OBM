@@ -22,12 +22,14 @@ sub configure_hook {
 
     if( $self->_configureLdap() ) {
         $self->log( 0, 'ldap configuration error' );
-        die 'ldap configuration error';
+        print 'ldap configuration error';
+        exit 1;
     }
 
     if( $self->_configureSSO() ) {
         $self->log( 0, 'SSO configuration error' );
-        die 'SSO configuration error';
+        print 'SSO configuration error';
+        exit 1;
     }
 }
 
