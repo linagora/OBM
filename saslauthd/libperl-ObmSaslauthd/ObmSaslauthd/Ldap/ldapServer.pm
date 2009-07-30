@@ -202,7 +202,7 @@ sub checkAuthentication {
 
     my $returnCode = 0;
     if( !$error->code ) {
-        $self->{'daemon'}->log( 2, 'LDAP authentication sucess for user '.$request->getDn() );
+        $self->{'daemon'}->log( 2, 'LDAP authentication success for user '.$request->getDn() );
         $returnCode = 1;
     }else {
         $self->{'daemon'}->log( 0, 'LDAP authentication fail for user '.$request->getDn() );

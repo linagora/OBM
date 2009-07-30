@@ -19,6 +19,10 @@ sub new {
 
     $self->{'daemon'} = $daemon;
     $self->{'ldapFilter'} = $ldapDesc->{'ldap_filter'};
+    if( !$self->{'ldapFilter'} ) {
+        $self->{'daemon'}->log( 0, 'Invalid LDAP filter' );
+        return undef;
+    }
 
     $self->{'ldapBase'} = $ldapDesc->{'ldap_base'};
     if( !defined($self->{'ldapBase'}) ) {
