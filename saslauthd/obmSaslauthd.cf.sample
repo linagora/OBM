@@ -1,5 +1,4 @@
 port        /var/run/saslauthd/mux|unix
-proto       unix
 
 max_servers 5
 max_requests 500
@@ -26,4 +25,5 @@ ldap_password   mdp3PaAL
 ldap_filter (|(&(mailBox=%U@%d)(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus*)(objectClass=posixAccount)))
 
 # Check SSO ticket
-check_sso_uri   https://obm.obm.local/sso/sso_index.php?action=validate&ticket=%t
+# %t = ticket
+check_sso_uri   https://external-url/sso/sso_index.php?action=validate&ticket=%t
