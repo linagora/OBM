@@ -246,6 +246,7 @@ sub _ping {
 
     my $result = $ldapServerConn->search(
                     scope => 'base',
+                    filter => '(objectclass=*)',
                     sizelimit => 1
                     );
 
