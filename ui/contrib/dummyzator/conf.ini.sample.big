@@ -1,74 +1,72 @@
-; For small amount of user (~2.5s per user);
+; Arround 0.3s per user... must be improved
 ;
 ;Amount of group per user
 [entity.group]
-ratio=0.2
+ratio=0.005
 ;Amount of user per group
 [entity.group.user]
 ratio=2
 ;Amount of private contact per user
 [entity.contact.private]
-ratio=50
+ratio=5
 ;Amount of public contact per user
 [entity.contact.public]
-ratio=10
+ratio=1
 ;Max amount of each coords per contact (example : email=2 will create 0, 1 or 2 email(s) for each contact)
 [entity.contact.data]
-email=2
+email=1
 website=1
-address=2
-phone=3
+address=1
+phone=1
 im=1
 ;Amount of resource per user
 [entity.resource]
-ratio=0.04
+ratio=0.005
 ;Amount of non recurring event per user
 [entity.event.normal]
-ratio=100
+ratio=30
 ;Amount of recurring event per user
 [entity.event.recurring]
-ratio=100
+ratio=20
 ;Ratio of meeting kind event (in per one).
 [entity.event.meeting]
-ratio=0.1
+ratio=0.02
 [entity.event.allday]
 ratio=0.05
 [entity.event.data]
 ;Maximum duration of an event
 duration=3
 ;Maximum attendees at a meeting
-attendees=5
+attendees=2
 ;For a right.X.Y : Probability that any X kind entity (user, group) will 
 ;have a right on any Y kind entity
 [right.calendar.user]
 access=1
-read=0.1
-write=0.005
-admin=0.001
+read=1
+write=0.001
+admin=0
 [right.calendar.group]
 access=0
-read=0.01
-write=0.001
-admin=0
-[right.resource.user]
-access=0.5
-read=0.5
-write=0.005
-admin=0.002
-[right.resource.group]
-access=0.02
-read=0.002
+read=0.001
 write=0
 admin=0
-;Not yet implemented
-[right.contact.user]
-access=0.01
-read=0.01
-write=0.001
-admin=0.0005
-;Not yet implemented
+[right.resource.user]
+access=1
+read=1
+write=0
+admin=0
 [right.resource.group]
-access=0.01
-read=0.01
+access=0
+read=0
+write=0
+admin=0
+[right.contact.user]
+access=0.005
+read=0.005
+write=0.001
+admin=0
+[right.contact.group]
+access=0
+read=0
 write=0
 admin=0

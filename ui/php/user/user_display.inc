@@ -1176,7 +1176,7 @@ $dis_group
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_group_consult($usr_q) {
   global $l_update_group, $l_user, $l_group_member, $l_group, $l_groups;
-  global $ico_add, $ico_delete;
+  global $ico_add, $ico_delete,$path;
 
   $id = $usr_q->f('userobm_id');
   $domain_id = $usr_q->f('userobm_domain_id');

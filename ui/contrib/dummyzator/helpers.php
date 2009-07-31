@@ -1,7 +1,7 @@
 <?php
 
-class IntIterator {
-  var $iter = array
+class IdIterator {
+  var $iterator = array
     (/*
       'start' => i,
       'value' => n,
@@ -12,284 +12,212 @@ class IntIterator {
       )
      */);
 
-  public function __construct($iter) {
-    if(!isset($iter['start'])) {
-      $iter['start'] = 0;
+  /**
+   * __construct 
+   * 
+   * @param mixed $iterator 
+   * @access public
+   * @return void
+   */
+  public function __construct($iterator) {
+    if(!isset($iterator['start'])) {
+      $iterator['start'] = 0;
     }
-    if(!isset($iter['every'])) {
-      $iter['every'] = 1;
+    if(!isset($iterator['every'])) {
+      $iterator['every'] = 1;
     }
-    if(!isset($iter['inc'])) {
-      $iter['inc'] = 1;
+    if(!isset($iterator['inc'])) {
+      $iterator['inc'] = 1;
     }
-    if(!isset($iter['loop'])) {
-      $iter['loop'] = false;
+    if(!isset($iterator['loop'])) {
+      $iterator['loop'] = false;
     }
-    $iter['value'] = $iter['start'];
-    $iter['step'] = 0;
+    $iterator['value'] = $iterator['start'];
+    $iterator['step'] = 0;
 
-    if(isset($iter['len']) && !isset($iter['end'])) {
-      $iter['end'] = $iter['start'] + $iter['len'];
+    if(isset($iterator['len']) && !isset($iterator['end'])) {
+      $iterator['end'] = $iterator['start'] + ($iterator['len'] * $iterator['inc']);
+    } elseif(!isset($iterator['len']) && isset($iterator['end'])) {
+      $iterator['len'] = ($iterator['end'] - $iterator['start']) / $iterator['inc'];
     }
-    $this->iter = $iter;
+    $this->iterator = $iterator;
   }
 
-  public function currentInt() {
-    if($this->iter['value'] >= $this->iter['end']) {
-      if($iter['loop']) {
-        $this->iter['value'] = $this->iter['start'];
-        $this->iter['step'] = 0;
+  /**
+   * currentInt 
+   * 
+   * @access public
+   * @return void
+   */
+  public function current() {
+    if($this->iterator['value'] >= $this->iterator['end']) {
+      if($iterator['loop']) {
+        $this->iterator['value'] = $this->iterator['start'];
+        $this->iterator['step'] = 0;
       } else {
         return null;
       }
     }
-    return $this->iter['value'];
+    return $this->iterator['value'];
   }
 
-  public function nextInt()
-  {
-    $i = $this->currentInt();
+  /**
+   * seek 
+   * 
+   * @access public
+   * @return void
+   */
+  public function seek($position) {
+    $this->reset();
+    $this->iterator['step'] = $position;
+    $this->iterator['value'] += $position * $this->iterator['inc'];
+    return $this->current();
+  }
+
+  /**
+   * nextInt 
+   * 
+   * @access public
+   * @return void
+   */
+  public function next() {
+    $i = $this->current();
     if($i !== null) {
-      $this->iter['step']++;
-      if($this->iter['step'] >= $this->iter['every']) {
-        $this->iter['step'] = 0;
-        $this->iter['value'] += $this->iter['inc'];
+      $this->iterator['step']++;
+      if($this->iterator['step'] >= $this->iterator['every']) {
+        $this->iterator['step'] = 0;
+        $this->iterator['value'] += $this->iterator['inc'];
       }
     }
     return $i;
   }
 
-  public function gotoStart()
-  {
-    $this->iter['value'] = $this->iter['start'];
-    $this->iter['step'] = 0;
+  /**
+   * gotoStart 
+   * 
+   * @access public
+   * @return void
+   */
+  public function reset() {
+    $this->iterator['value'] = $this->iterator['start'];
+    $this->iterator['step'] = 0;
   }
 
-  public function start()
-  {
-    return $this->iter['start'];
+  /**
+   * start 
+   * 
+   * @access public
+   * @return void
+   */
+  public function start() {
+    return $this->iterator['start'];
   }
 
-  public function end()
-  {
-    return $this->iter['end'];
+  /**
+   * end 
+   * 
+   * @access public
+   * @return void
+   */
+  public function end() {
+    return $this->iterator['end'];
   }
 
-  public function every()
-  {
-    return $this->iter['every'];
+  /**
+   * getSize 
+   * 
+   * @access public
+   * @return void
+   */
+  public function getSize() {
+    return $this->iterator['len'];
   }
+
 }
 
-class EventManager {
-  var $date;
-  var $initial_date;
-  var $events = array(/*
-      '2009-05-14' => array(
-        '1', '2', '10', '11', ... // hours taken
-      ),
-      ...
-*/);
+class RandomData {
 
-  public function __construct($current_time = null)
-  {
-    if($current_time === null) {
-      $current_time = time();
+  
+  /**
+   * getInstance 
+   * 
+   * @static
+   * @access public
+   * @return void
+   */
+  static function getInstance() {
+    static $singleton = null;
+    if (is_null($singleton)) {
+      $singleton = new RandomData();
     }
-    $this->date = new Of_Date($current_time, 'Europe/Paris');
-    // Begin one month before today
-    $this->date->setHour(0)->setMinute(0)->setSecond(0)->subMonth(1);
-    $this->initial_date = clone $this->date;
+    return $singleton;
   }
 
-  public function gotoInitialDate()
-  {
-    $this->date = clone $this->initial_date;
+  /**
+   * __construct 
+   * 
+   * @access public
+   * @return void
+   */
+  public function __construct() {
+    include $GLOBALS['realPath']."/firstnames.php";
+    $this->firstnames = $firstnames;
+    include $GLOBALS['realPath']."/lastnames.php";
+    $this->lastnames = $lastnames;
+    include $GLOBALS['realPath']."/texts.php";
+    $this->texts = $texts;
+    include $GLOBALS['realPath']."/words.php";
+    $this->words = $words;
   }
 
-  public function addRepeatEvent($allday, $hour, $duration, $end, $repeatkind, $freq, $repeatdays)
-  {
-    /* We use $event and $of only for occurences calculations */
-    $event = new Event(0, $duration,
-                       /* title */null, /* location */null, /* category1 */null,
-                       /* privacy */0, /* desc */null, /* properties */null,
-                       $allday, $repeatkind, /* owner */0,
-                       /* owner name */null, /* color*/null);
-    //$of = new OccurrenceFactory();
-    $of = &OccurrenceFactory::getInstance();
-    // setBegin() and setEnd() takes their dates with hour 0
-    $this->date->setHour(0);
-    $end->setHour(0);
-    $of->setBegin($this->date);
-    $of->setEnd($end);
-
-    $this->date->setHour($hour);
-    $end->setHour($hour);
-
-    //$of->setBegin(2009-05-17 22:00:00);
-    //$of->setEnd(2009-05-24 22:00:00);
-    //calendar_daily_repeatition(2009-05-14 06:00:00,2009-05-17 06:00:00,2009-05-22 07:00:00,2,$event,5,user, ACCEPTED)
-    switch ($repeatkind) {
-      case 'daily' :
-        calendar_daily_repeatition
-          ($this->date,$this->date, $end, $freq, $event, 0, 'user', 'ACCEPTED');
-        break;
-      case 'weekly' :
-        calendar_weekly_repeatition
-          ($this->date,$this->date, $end, $repeatdays, $freq, $event, 0, 'user', 'ACCEPTED');
-        break;
-      case 'monthlybyday' :
-        calendar_monthlybyday_repeatition
-          ($this->date,$this->date, $end, $freq, $event, 0, 'user', 'ACCEPTED');
-        break;
-      case 'monthlybydate' :
-        calendar_monthlybydate_repeatition
-          ($this->date,$this->date, $end, $freq, $event, 0, 'user', 'ACCEPTED');
-        break;
-      case 'yearly' :
-        calendar_yearly_repeatition
-          ($this->date,$this->date, $end, $freq, $event, 0, 'user', 'ACCEPTED');
-        break;
-    }
-
-    /* Get the generated events back in your data */
-    $occurences = $of->getOccurrences();
-    $of->reset();
-    foreach($occurences as $oc) {
-      $this->date = clone $oc->date;
-      if(!$this->addEvent($allday, $oc->event->duration, false)) {
-        return false;
-      }
-    }
-    return true;
+  /**
+   * getRandomFirstname 
+   * 
+   * @access public
+   * @return void
+   */
+  public function getRandomFirstname() {
+    return $this->getRandomFileData($this->firstnames); 
   }
 
-  public function addEvent($allday, &$duration, $do_mangle = true, $pretend = false)
-  {
-    if($allday) {
-      $duration = 3600 * 24;
-      $this->date->setHour(0);
-    }
-    $hours = clone $this->date;
-    $hours->setMinute(0)->setSecond(0);
-
-    $endhour = clone $hours;
-    $endhour->addSecond($duration);
-
-    $is_busy = 1;
-    while(Of_Date::cmp($hours, $endhour) < 0) {
-      $is_busy = $this->isDateTimeBusy($hours);
-      if($is_busy)
-        break;
-
-      $hours->addHour(1);
-    }
-
-    if(!$is_busy) {
-      /* All right, insert the event */
-      if(!$pretend) {
-        $this->registerEvent($duration);
-      }
-      return true;
-    }
-    if(!$do_mangle) {
-      return false;
-    }
-
-    /* Try to mangle the event to make it not to conflict */ 
-    if(!$allday) {
-      /* Decrease the endtime */
-      $dur = $duration;
-      while($dur > 0) {
-        if($this->addEvent($allday, $dur, false)) {
-          $duration = $dur;
-          return true;
-        }
-        $dur -= 3600;
-      }
-    }
-
-    /* Increase the starttime */
-    $bak_date = clone $this->date;
-    while(1) {
-      if($allday) {
-        $this->date->addDay(1);
-      } else {
-        $this->date->addHour(1);
-      }
-      /* This call may mangle the event trying, to decrease its duration */
-      if($this->addEvent($allday, $duration, true)) {
-        return true;
-      }
-    }
-    $this->date = $bak_date;
-
-    return false;
+  /**
+   * getRandomLastname 
+   * 
+   * @access public
+   * @return void
+   */
+  public function getRandomLastname() {
+    return $this->getRandomFileData($this->lastnames); 
   }
 
-  private function registerEvent($duration)
-  {
-    $starthour = clone $this->date;
-    $endhour   = clone $this->date;
-    $endhour->addSecond($duration);
-
-    while(Of_Date::cmp($starthour, $endhour) < 0) {
-      $date = $starthour->getDateIso();
-      $this->ensureArray($this->events, $date);
-
-      if(assert(!in_array($starthour->getHour(), $this->events[$date])))
-        array_push($this->events[$date], $starthour->getHour());
-
-      $starthour->addHour(1);
-    }
+  /**
+   * getRandomText 
+   * 
+   * @access public
+   * @return void
+   */
+  public function getRandomText($maxSize=null) {
+     if($maxSize)
+       return mb_substr($this->getRandomFileData($this->texts),0,$maxSize, 'UTF-8'); 
+     else
+       return $this->getRandomFileData($this->texts); 
   }
 
-  public function gotoNextFreeTime()
-  {
-    while($this->isDateTimeBusy()) {
-      $this->date->addHour(1);
-    }
+  /**
+   * getRandomWord 
+   * 
+   * @access public
+   * @return void
+   */
+  public function getRandomWord($maxSize=null) {
+    if($maxSize)
+      return mb_substr($this->getRandomFileData($this->words),0,$maxSize, 'UTF-8'); 
+    else
+      return $this->getRandomFileData($this->words);
   }
 
-  public function isDateTimeBusy($date = null)
-  {
-    if($date === null) {
-      $date = $this->date;
-    }
-    $day = $date->getDateIso();
-    $hour = $date->getHour();
-    if(array_key_exists($day, $this->events)) {
-      return in_array($hour, $this->events[$day]);
-    } else {
-      return false;
-    }
+  public function getRandomFileData($handle) {
+    $pos = rand(0, (count($handle) - 1));
+    return $handle[$pos];
   }
-
-  private function ensureArray(&$arr, $key)
-  {
-    if(!isset($arr[$key])) {
-      $arr[$key] = array();
-    }
-  }
-}
-
-function randomAsciiStr($len = 8)
-{
-  $str = '';
-  while($len--) {
-    $str .= chr(rand(33, 126));
-  }
-  return $str;
-}
-
-function randomAlphaStr($len = 8)
-{
-  $str = '';
-  while($len--) {
-    do {
-      $i = rand(48, 122);
-      } while(($i > 90 && $i < 97) || ($i > 57 && $i < 65));
-    $str .= chr($i);
-  }
-  return $str;
 }
