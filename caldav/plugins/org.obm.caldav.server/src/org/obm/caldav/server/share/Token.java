@@ -22,8 +22,9 @@ public class Token {
 	private String domain;
 	private String loginAtDomain;
 	private String password;
+	private String calendarName;
 
-	public Token(String loginAtDomain, String password) {
+	public Token(String loginAtDomain, String password, String calendarName) {
 		super();
 		this.loginAtDomain = loginAtDomain;
 		if(loginAtDomain.contains("@")){
@@ -35,6 +36,13 @@ public class Token {
 		}
 		
 		this.password = password;
+		
+		if(calendarName.contains("@")){
+			String[] tab = calendarName.split("@");
+			this.calendarName = tab[0];
+		} else {
+			this.calendarName = calendarName;
+		}
 	}
 
 	public String getLogin() {
@@ -59,6 +67,10 @@ public class Token {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public String getCalendarName() {
+		return calendarName;
 	}
 	
 }

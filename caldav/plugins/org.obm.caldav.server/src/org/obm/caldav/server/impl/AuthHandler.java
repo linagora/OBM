@@ -18,8 +18,6 @@ package org.obm.caldav.server.impl;
 
 import java.util.StringTokenizer;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.share.Token;
@@ -29,7 +27,7 @@ public class AuthHandler {
 
 	private final Log logger = LogFactory.getLog(AuthHandler.class);
 
-	public Token doAuth(HttpServletRequest request) {
+	public Token doAuth(DavRequest request) {
 		String authHeader = request.getHeader("Authorization");
 		Token t = null;
 		if (authHeader != null) {
@@ -45,7 +43,7 @@ public class AuthHandler {
 						String userId = userPass.substring(0, p);
 						String loginAtDomain = getLoginAtDomain(userId);
 						String password = userPass.substring(p + 1);
-						t = new Token(loginAtDomain, password);
+						t = new Token(loginAtDomain, password, request.getCalendarComponantName());
 					}
 				}
 			}

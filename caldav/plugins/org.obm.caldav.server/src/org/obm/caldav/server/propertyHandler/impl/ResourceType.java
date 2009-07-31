@@ -42,21 +42,16 @@ public class ResourceType extends DavPropertyHandler implements PropfindProperty
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
-		Element elem =appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
+		Element elem = appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		
 		appendElement(elem,"collection", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		appendElement(elem,"calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
-		/*Element elem = DOMUtils.createElement(prop, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"resourcetype");
-		DOMUtils.createElement(elem, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"collection");
-		DOMUtils.createElement(elem, NameSpaceConstant.CALDAV_NAMESPACE_PREFIX+"calendar");*/
 	}
 
 	@Override
 	public void appendCalendarQueryPropertyValue(Element prop, IProxy proxy,
 			EventTimeUpdate event) {
-		Element elem =appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
-		appendElement(elem,"collection", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
-		appendElement(elem,"calendar", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+		appendElement(prop,"resourcetype", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 	}
 
 	@Override

@@ -19,6 +19,8 @@ package org.obm.caldav.server.methodHandler;
 import javax.servlet.http.HttpServletResponse;
 
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.StatusCodeConstant;
+import org.obm.caldav.server.exception.CalDavException;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.share.Token;
 
@@ -28,8 +30,9 @@ public class PropPatchHandler extends DavMethodHandler {
 	}
 
 	@Override
-	public void process(Token t, IProxy proxy, DavRequest req, HttpServletResponse resp) {
+	public void process(Token t, IProxy proxy, DavRequest req, HttpServletResponse resp) throws CalDavException {
 		logger.info("process(req, resp)");
+		throw new CalDavException(StatusCodeConstant.SC_NOT_IMPLEMENTED);
 	}
 
 }

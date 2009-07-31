@@ -14,36 +14,25 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.server.exception;
+package org.obm.caldav.server.methodHandler;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.StatusCodeConstant;
+import org.obm.caldav.server.exception.CalDavException;
+import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.share.Token;
 
-/**
- * rfc4918 9. HTTP Methods for Distributed Authoring
- * 
- * 
- * @author adrienp
- *
- */
-public class CalDavException extends Exception{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7956416583930247999L;
-	
-	private int httpStatusCode;
-	
-	public CalDavException(int httpStatusCode) {
-		this.httpStatusCode = httpStatusCode;
+public class LockHandler extends DavMethodHandler {
+
+	public LockHandler() {
 	}
-	
-	public int getHttpStatusCode() {
-		return httpStatusCode;
-	}
-	
-	public String getMessage(){
-		return StatusCodeConstant.getStatusMessage(httpStatusCode);
+
+	@Override
+	public void process(Token t, IProxy proxy, DavRequest req, HttpServletResponse resp) throws CalDavException {
+		logger.info("process(req, resp)");
+		throw new CalDavException(StatusCodeConstant.SC_NOT_IMPLEMENTED);
 	}
 
 }

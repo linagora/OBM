@@ -19,43 +19,41 @@ package org.obm.caldav.server.propertyHandler.impl;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
-import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
-
 
 /**
  * CALDAV:calendar-description Property
  * 
- * Name:  calendar-description
- * Namespace:  urn:ietf:params:xml:ns:caldav
- *
- * Purpose:  Provides a human-readable description of the calendar
- *    collection.
- *
- * Conformance:  This property MAY be defined on any calendar
- *    collection.  If defined, it MAY be protected and SHOULD NOT be
- *    returned by a PROPFIND DAV:allprop request (as defined in Section
- *    12.14.1 of [RFC2518]).  An xml:lang attribute indicating the human
- *    language of the description SHOULD be set for this property by
- *    clients or through server provisioning.  Servers MUST return any
- *    xml:lang attribute if set for the property.
-
- * Description:  If present, the property contains a description of the
- *    calendar collection that is suitable for presentation to a user.
- *    If not present, the client should assume no description for the
- *    calendar collection.
- *
+ * Name: calendar-description Namespace: urn:ietf:params:xml:ns:caldav
+ * 
+ * Purpose: Provides a human-readable description of the calendar collection.
+ * 
+ * Conformance: This property MAY be defined on any calendar collection. If
+ * defined, it MAY be protected and SHOULD NOT be returned by a PROPFIND
+ * DAV:allprop request (as defined in Section 12.14.1 of [RFC2518]). An xml:lang
+ * attribute indicating the human language of the description SHOULD be set for
+ * this property by clients or through server provisioning. Servers MUST return
+ * any xml:lang attribute if set for the property.
+ * 
+ * Description: If present, the property contains a description of the calendar
+ * collection that is suitable for presentation to a user. If not present, the
+ * client should assume no description for the calendar collection.
+ * 
  * @author adrienp
- *
+ * 
  */
-public class CalendarDescription implements PropfindPropertyHandler {
+public class CalendarDescription extends DavPropertyHandler implements
+		PropfindPropertyHandler {
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
 			IProxy proxy) {
-		DOMUtils.createElementAndText(prop, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"calendar-description", "Calendar from OBM-CalDav");
+		appendElement(prop, "calendar-description",
+				NameSpaceConstant.DAV_NAMESPACE_PREFIX).setTextContent(
+				"Calendar " + t.getCalendarName() + " from OBM-CalDav");
 	}
 
 	@Override

@@ -6,7 +6,7 @@
          point="org.eclipse.equinox.http.registry.servlets">
       <servlet
             alias="/"
-            class="org.obm.caldav.server.impl.WebdavServlet">
+            class="org.obm.caldav.server.WebdavServlet">
       </servlet>
    </extension>
    <extension

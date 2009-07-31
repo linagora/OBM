@@ -21,10 +21,11 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IProxy;
+import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.exception.AppendPropertyException;
 import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.CalendarQueryPropertyHandler;
-import org.obm.caldav.utils.DOMUtils;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.sync.calendar.Event;
 import org.obm.sync.calendar.EventTimeUpdate;
 import org.w3c.dom.Element;
@@ -46,20 +47,20 @@ import org.w3c.dom.Element;
  * @author adrienp
  * 
  */
-public class GetETag implements CalendarQueryPropertyHandler, CalendarMultiGetPropertyHandler {
+public class GetETag extends DavPropertyHandler implements CalendarQueryPropertyHandler, CalendarMultiGetPropertyHandler {
 
 	protected Log logger = LogFactory.getLog(getClass());
 	
 	public void appendCalendarQueryPropertyValue(Element prop, IProxy proxy,
 			EventTimeUpdate event) {
-		Element val = DOMUtils.createElement(prop, "D:getetag");
+		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		appendValue(val, event.getExtId() , event.getTimeUpdate());
 	}
 
 	@Override
 	public void appendCalendarMultiGetPropertyValue(Element prop, IProxy proxy,
 			Event event, String eventIcs) throws AppendPropertyException{
-		Element val = DOMUtils.createElement(prop, "D:getetag");
+		Element val = appendElement(prop, "getetag", NameSpaceConstant.DAV_NAMESPACE_PREFIX);
 		appendValue(val, event.getExtId(), event.getTimeUpdate() );
 	}
 	

@@ -22,46 +22,45 @@ import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
-import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
 
-
 /**
- * Name:  calendar-user-address-set
+ * Name: calendar-user-address-set
  * 
- * Namespace:  urn:ietf:params:xml:ns:caldav
+ * Namespace: urn:ietf:params:xml:ns:caldav
  * 
- * Purpose:  	Identify the calendar addresses of the associated principal
- * 			 	resource.
+ * Purpose: Identify the calendar addresses of the associated principal
+ * resource.
  * 
- * Conformance:  	This property MAY be protected and SHOULD NOT be
- * 					returned by a PROPFIND allprop request (as defined in Section 14.2
- * 					of [RFC4918]).  Support for this property is REQUIRED.  This
- * 					property SHOULD be searchable using the DAV:principal-property-
- * 					search REPORT.  The DAV:principal-search-property-set REPORT
- * 					SHOULD identify this property as such.
+ * Conformance: This property MAY be protected and SHOULD NOT be returned by a
+ * PROPFIND allprop request (as defined in Section 14.2 of [RFC4918]). Support
+ * for this property is REQUIRED. This property SHOULD be searchable using the
+ * DAV:principal-property- search REPORT. The DAV:principal-search-property-set
+ * REPORT SHOULD identify this property as such.
  * 
- * Description:  This property is needed to map calendar user addresses
- * 				 in iCalendar data to principal resources and their associated
- * 				 scheduling Inbox and Outbox collections.  In the event that a user 
- * 				 has no well defined identifier for their calendar user address,
- * 				 the URI of their principal resource can be used.
- * Definition:
- * 		<!ELEMENT calendar-user-address-set (DAV:href*)>
+ * Description: This property is needed to map calendar user addresses in
+ * iCalendar data to principal resources and their associated scheduling Inbox
+ * and Outbox collections. In the event that a user has no well defined
+ * identifier for their calendar user address, the URI of their principal
+ * resource can be used. Definition: <!ELEMENT calendar-user-address-set
+ * (DAV:href*)>
  * 
  * 
  * @author adrienp
- *
+ * 
  */
-public class CalendarUserAddressSet extends DavPropertyHandler implements PropfindPropertyHandler{
+public class CalendarUserAddressSet extends DavPropertyHandler implements
+		PropfindPropertyHandler {
 
 	@Override
-	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
-		Element elem = DOMUtils.createElement(prop, NameSpaceConstant.CALDAV_NAMESPACE_PREFIX+"calendar-user-address-set");
-		DOMUtils.createElementAndText(elem, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"href", "/"
-				+ t.getLoginAtDomain() + "/events/");
+	public void appendPropertyValue(Element prop, Token t, DavRequest req,
+			IProxy proxy) {
+		Element elem = appendElement(prop, "calendar-user-address-set",
+				NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+		appendElement(elem, "href", NameSpaceConstant.DAV_NAMESPACE_PREFIX)
+				.setTextContent("/" + t.getLoginAtDomain() + "/events/");
 	}
-	
+
 	@Override
 	public boolean isUsed() {
 		return true;

@@ -53,7 +53,7 @@ public interface ICalendarService {
 	
 	boolean getSync(Date lastSync) throws Exception;
 	
-	
+	boolean hasRightsOnCalendar(String calendarName)throws Exception;
 	
 }
 

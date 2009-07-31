@@ -21,7 +21,6 @@ import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.exception.AppendPropertyException;
 import org.obm.caldav.server.propertyHandler.CalendarMultiGetPropertyHandler;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
-import org.obm.caldav.utils.DOMUtils;
 import org.obm.sync.calendar.Event;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
@@ -36,7 +35,7 @@ public class CalendarData extends DavPropertyHandler implements
 			throw new AppendPropertyException(StatusCodeConstant.SC_NOT_FOUND);
 		}
 		
-		Element val = DOMUtils.createElement(prop, "calendar-data");
+		Element val = appendElement(prop, "calendar-data", ""); 
 		CDATASection cdata = prop.getOwnerDocument().createCDATASection(
 				eventIcs);
 		val.appendChild(cdata);

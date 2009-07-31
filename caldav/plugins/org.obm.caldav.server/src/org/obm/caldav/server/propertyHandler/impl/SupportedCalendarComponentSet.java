@@ -19,9 +19,9 @@ package org.obm.caldav.server.propertyHandler.impl;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
-import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -69,21 +69,16 @@ import org.w3c.dom.Element;
  * @author adrienp
  * 
  */
-public class SupportedCalendarComponentSet implements PropfindPropertyHandler {
+public class SupportedCalendarComponentSet extends DavPropertyHandler implements PropfindPropertyHandler {
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
 			IProxy proxy) {
-		Element elem = DOMUtils.createElement(prop,
-				NameSpaceConstant.CALDAV_NAMESPACE_PREFIX
-						+ "supported-calendar-component-set");
-		DOMUtils.createElement(elem,
-				NameSpaceConstant.CALDAV_NAMESPACE_PREFIX + "comp")
-				.setAttribute("name", "VEVENT");
-		DOMUtils.createElement(elem,
-				NameSpaceConstant.CALDAV_NAMESPACE_PREFIX + "comp")
-				.setAttribute("name", "VTODO");
-
+		Element elem = appendElement(prop, "supported-calendar-component-set", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+		appendElement(elem, "comp", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX).setAttribute("name", "VEVENT");
+		appendElement(elem, "comp", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX).setAttribute("name", "VTODO");
+		appendElement(elem, "comp", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX).setAttribute("name", "VFREEBUSY");
+		appendElement(elem, "comp", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX).setAttribute("name", "VTIMEZONE");
 	}
 	
 	@Override

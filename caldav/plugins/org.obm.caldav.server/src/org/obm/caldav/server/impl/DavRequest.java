@@ -25,6 +25,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.obm.caldav.server.StatusCodeConstant;
+import org.obm.caldav.server.exception.CalDavException;
 import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 
@@ -34,11 +36,11 @@ public class DavRequest {
 	private static final Log logger = LogFactory.getLog(DavRequest.class);
 
 	private Document document;
-
+	private String calendarName;
 	private HttpServletRequest req;
 
 	@SuppressWarnings("unchecked")
-	public DavRequest(HttpServletRequest req) {
+	public DavRequest(HttpServletRequest req) throws CalDavException {
 		this.req = req;
 		Enumeration headerNames = req.getHeaderNames();
 		while (headerNames.hasMoreElements()) {
@@ -47,6 +49,11 @@ public class DavRequest {
 			logger.debug(hn + ": " + val);
 		}
 
+		initRequest();
+	}
+	
+	private void initRequest() throws CalDavException {
+		
 		if (req.getHeader("Content-Type") != null
 				&& !req.getContentType().contains("calendar")) {
 			try {
@@ -59,8 +66,19 @@ public class DavRequest {
 				logger.error(e.getMessage(), e);
 			}
 		}
+		
+		String uri = req.getRequestURI(); 
+		if(uri.startsWith("/")){
+			uri = uri.substring(1);
+		}
+		String[] comp = uri.split("/");
+		if(comp.length == 0 || !comp[0].contains("@")){
+			throw new CalDavException(StatusCodeConstant.SC_NOT_FOUND);
+		} else {
+			this.calendarName = comp[0];
+		}
 	}
-	
+
 	public InputStream getInputStream() throws IOException {
 		return req.getInputStream();
 	}
@@ -78,7 +96,11 @@ public class DavRequest {
 	}
 	
 	public String getURI() {
-		return req.getRequestURI().toString();
+		return req.getRequestURI();
+	}
+	
+	public String getCalendarComponantName(){
+		return this.calendarName;
 	}
 	
 	public HttpSession getSession(){

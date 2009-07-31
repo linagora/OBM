@@ -22,7 +22,6 @@ import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
-import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
 
 
@@ -52,8 +51,8 @@ public class ScheduleOutboxURL extends DavPropertyHandler implements PropfindPro
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
-		Element elem = DOMUtils.createElement(prop, NameSpaceConstant.CALDAV_NAMESPACE_PREFIX+"schedule-outbox-URL");
-		DOMUtils.createElementAndText(elem, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"href", "/"
+		Element elem = appendElement(prop, "schedule-outbox-URL", NameSpaceConstant.CALDAV_NAMESPACE_PREFIX);
+		appendElement(elem, "href", NameSpaceConstant.DAV_NAMESPACE_PREFIX).setTextContent("/"
 				+ t.getLoginAtDomain() + "/events/outbox");
 	}
 

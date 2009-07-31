@@ -162,4 +162,9 @@ public class CalendarService implements ICalendarService{
 		}
 		return false;
 	}
+
+	@Override
+	public boolean hasRightsOnCalendar(String calendarName) throws Exception {
+		return providerEvent.hasRightsOnCalendar(token, calendarName);
+	}
 }

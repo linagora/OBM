@@ -33,6 +33,7 @@ public class StatusCodeConstant {
 		messages.put(424, "Method failure");
 
 		messages.put(500, "Internal Server Error");
+		messages.put(501, "Not Implemented");
 	}
 	
 	
@@ -45,6 +46,7 @@ public class StatusCodeConstant {
 	public static int SC_METHOD_FAILURE = 424;
 	
 	public static int SC_INTERNAL_SERVER_ERROR = 500;
+	public static int SC_NOT_IMPLEMENTED= 501;
 
 
 	public static String getStatusMessage(int code){

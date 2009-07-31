@@ -19,33 +19,33 @@ package org.obm.caldav.server.propertyHandler.impl;
 import org.obm.caldav.server.IProxy;
 import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
-import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
 
 /**
- * Name:
- *     displayname
- * Namespace:
- *     DAV:
- * Purpose:
- *     Provides a name for the resource that is suitable for presentation to a user.
- * Description:
- *     The displayname property should be defined on all DAV compliant resources. If present, the property contains a description of the resource that is suitable for presentation to a user.
+ * Name: displayname Namespace: DAV: Purpose: Provides a name for the resource
+ * that is suitable for presentation to a user. Description: The displayname
+ * property should be defined on all DAV compliant resources. If present, the
+ * property contains a description of the resource that is suitable for
+ * presentation to a user.
  * 
- *    <!ELEMENT displayname (#PCDATA) >
+ * <!ELEMENT displayname (#PCDATA) >
  * 
  * @author adrienp
- *
+ * 
  */
 
-public class DisplayName implements PropfindPropertyHandler {
+public class DisplayName extends DavPropertyHandler implements
+		PropfindPropertyHandler {
 
 	@Override
 	public void appendPropertyValue(Element prop, Token t, DavRequest req,
 			IProxy proxy) {
-		DOMUtils.createElementAndText(prop, NameSpaceConstant.DAV_NAMESPACE_PREFIX+"displayname", "OBM CalDav "+t.getLoginAtDomain());
+		appendElement(prop, "displayname",
+				NameSpaceConstant.DAV_NAMESPACE_PREFIX).setTextContent(
+				"OBM CalDav " + req.getCalendarComponantName());
 	}
 
 	@Override

@@ -21,7 +21,6 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.obm.caldav.server.IProxy;
-import org.obm.caldav.server.NameSpaceConstant;
 import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
@@ -29,7 +28,7 @@ import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class PropertyListBuilder {
+public class PropertyListBuilder extends ResultBuilder{
 
 	private Log logger = LogFactory.getLog(PropertyListBuilder.class);
 
@@ -37,14 +36,17 @@ public class PropertyListBuilder {
 			Set<PropfindPropertyHandler> toLoad, Set<Element> notUsed,
 			IProxy proxy) {
 		try {
-			Document ret = DOMUtils.createDoc(NameSpaceConstant.DAV_NAMESPACE,
-					"D:multistatus");
+//			Document ret = DOMUtils.createDoc(NameSpaceConstant.DAV_NAMESPACE,
+//					"D:multistatus");
+//			Element r = ret.getDocumentElement();
+//			r.setAttribute("xmlns:D", NameSpaceConstant.DAV_NAMESPACE);
+//			r.setAttribute("xmlns:CS",
+//					NameSpaceConstant.CALENDARSERVER_NAMESPACE);
+//			r.setAttribute("xmlns:C", NameSpaceConstant.CALDAV_NAMESPACE);
+//			r.setAttribute("xmlns", NameSpaceConstant.CALDAV_NAMESPACE);
+			
+			Document ret = createDocument();
 			Element r = ret.getDocumentElement();
-			r.setAttribute("xmlns:D", NameSpaceConstant.DAV_NAMESPACE);
-			r.setAttribute("xmlns:CS",
-					NameSpaceConstant.CALENDARSERVER_NAMESPACE);
-			r.setAttribute("xmlns:C", NameSpaceConstant.CALDAV_NAMESPACE);
-			r.setAttribute("xmlns", NameSpaceConstant.CALDAV_NAMESPACE);
 			Element response = DOMUtils.createElement(r, "D:response");
 			DOMUtils.createElementAndText(response, "D:href", req.getHref());
 

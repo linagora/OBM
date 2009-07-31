@@ -14,7 +14,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package org.obm.caldav.server.impl;
+package org.obm.caldav.server;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -32,17 +32,22 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.obm.caldav.server.IProxy;
-import org.obm.caldav.server.StatusCodeConstant;
 import org.obm.caldav.server.exception.CalDavException;
+import org.obm.caldav.server.impl.AuthHandler;
+import org.obm.caldav.server.impl.DavRequest;
+import org.obm.caldav.server.methodHandler.CopyHandler;
 import org.obm.caldav.server.methodHandler.DavMethodHandler;
 import org.obm.caldav.server.methodHandler.DeleteHandler;
 import org.obm.caldav.server.methodHandler.GetHandler;
+import org.obm.caldav.server.methodHandler.LockHandler;
+import org.obm.caldav.server.methodHandler.MkColHandler;
+import org.obm.caldav.server.methodHandler.MoveHandler;
 import org.obm.caldav.server.methodHandler.OptionsHandler;
 import org.obm.caldav.server.methodHandler.PropFindHandler;
 import org.obm.caldav.server.methodHandler.PropPatchHandler;
 import org.obm.caldav.server.methodHandler.PutHandler;
 import org.obm.caldav.server.methodHandler.ReportHandler;
+import org.obm.caldav.server.methodHandler.UnlockHandler;
 import org.obm.caldav.server.share.Token;
 
 /**
@@ -67,7 +72,11 @@ public class WebdavServlet extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		IProxy proxy = null;
 		try {
-			Token token = authHandler.doAuth(request);
+			String method = request.getMethod();
+
+			logger.info("[" + method + "] " + request.getRequestURI());
+			DavRequest dr = new DavRequest(request);
+			Token token = authHandler.doAuth(dr);
 			proxy = getProxy();
 
 			if (!proxy.validateToken(token)) {
@@ -83,23 +92,16 @@ public class WebdavServlet extends HttpServlet {
 				return;
 			}
 
-			String method = request.getMethod();
-
-			if (logger.isInfoEnabled()) {
-				logger.info("[" + method + "] " + request.getRequestURI());
-			}
-
 			DavMethodHandler handler = handlers.get(method.toLowerCase());
 			if (handler != null) {
 				proxy.login(token);
-				DavRequest dr = new DavRequest(request);
 				handler.process(token, proxy, dr, response);
 
 			} else {
 				super.service(request, response);
 			}
 		} catch (CalDavException e) {
-			logger.error(e.getMessage());
+			logger.error(e.getMessage(),e);
 			response.sendError(e.getHttpStatusCode());
 		} catch (Exception e) {
 			// rfc4791 1.3 Method Preconditions and Postconditions
@@ -121,11 +123,8 @@ public class WebdavServlet extends HttpServlet {
 //		head[Cache-Control] => private, max-age=0
 //		head[X-Content-Type-Options] => nosniff
 //		head[DAV] => 1, calendar-access, calendar-schedule, calendar-proxy
-		
 		response.setHeader("DAV", "1, calendar-access, calendar-schedule, calendar-proxy");
 		response.setHeader("Cache-Control", "private, max-age=0");
-		
-		
 	}
 
 	private IProxy getProxy() throws CoreException {
@@ -160,6 +159,11 @@ public class WebdavServlet extends HttpServlet {
 		handlers.put("report", new ReportHandler());
 		handlers.put("put", new PutHandler());
 		handlers.put("delete", new DeleteHandler());
+		handlers.put("mkcol", new MkColHandler());
+		handlers.put("copy", new CopyHandler());
+		handlers.put("move", new MoveHandler());
+		handlers.put("lock", new LockHandler());
+		handlers.put("unlock", new UnlockHandler());
 
 		authHandler = new AuthHandler();
 	}

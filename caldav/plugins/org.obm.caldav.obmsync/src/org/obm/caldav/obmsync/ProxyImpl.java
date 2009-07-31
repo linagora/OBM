@@ -41,7 +41,7 @@ public class ProxyImpl implements IProxy {
 	@Override
 	public void login(Token token) {
 		this.userId = token.getLoginAtDomain();
-		this.calendar = token.getLogin();
+		this.calendar = token.getCalendarName();
 		this.token = AbstractObmSyncProvider.login(userId, token.getPassword());
 		this.initService();
 	}
@@ -60,17 +60,19 @@ public class ProxyImpl implements IProxy {
 	}
 
 	@Override
-	public boolean validateToken(Token token) {
-		if(token == null){
+	public boolean validateToken(Token t) throws Exception {
+		if(t == null){
 			return false;
 		}
-		AccessToken at = AbstractObmSyncProvider.login(token.getLoginAtDomain(), token.getPassword());
-		if(at == null || at.getSessionId() == null || "".equals(at.getSessionId())){
+		this.login(t);
+		
+		if(this.token == null || this.token.getSessionId() == null || "".equals(this.token.getSessionId())){
 			return false;
-		} else {
-			AbstractObmSyncProvider.logout(at);
-			return true;
 		}
+		
+		boolean hasRightsOnCalendar = calendarService.hasRightsOnCalendar(this.calendar);
+		this.logout();
+		return hasRightsOnCalendar;
 	}
 
 }

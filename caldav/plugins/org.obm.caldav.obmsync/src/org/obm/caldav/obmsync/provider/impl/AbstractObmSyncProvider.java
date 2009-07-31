@@ -223,7 +223,8 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 
 	public void remove(AccessToken token, String login, Event event)
 			throws AuthFault, ServerFault, AuthorizationException {
-		logger.info("delete event with uid " + event.getUid() + " from obm-sync");
+		logger.info("delete event with uid " + event.getUid()
+				+ " from obm-sync");
 		client.removeEvent(token, login, event.getUid());
 
 		Event ret = client.getEventFromId(token, login, event.getUid());
@@ -294,8 +295,25 @@ public abstract class AbstractObmSyncProvider implements ICalendarProvider {
 		}
 		return events;
 	}
-	
-	public List<Event> getListEventsFromIntervalDate(AccessToken token,String calendar,Date start, Date end) throws AuthFault, ServerFault{
-		return client.getListEventsFromIntervalDate(token, calendar, start, end);
+
+	public List<Event> getListEventsFromIntervalDate(AccessToken token,
+			String calendar, Date start, Date end) throws AuthFault,
+			ServerFault {
+		return client
+				.getListEventsFromIntervalDate(token, calendar, start, end);
 	}
+	
+
+	@Override
+	public boolean hasRightsOnCalendar(AccessToken token, String calendarName) throws AuthFault,
+			ServerFault {
+		CalendarInfo[] listCalInfo = client.listCalendars(token);
+		for (CalendarInfo calInfo : listCalInfo) {
+			if (calInfo.getUid().equals(calendarName)) {
+				return calInfo.isWrite();
+			}
+		}
+		return false;
+	}
+
 }

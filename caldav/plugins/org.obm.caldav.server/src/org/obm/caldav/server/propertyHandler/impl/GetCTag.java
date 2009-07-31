@@ -27,7 +27,6 @@ import org.obm.caldav.server.impl.DavRequest;
 import org.obm.caldav.server.propertyHandler.DavPropertyHandler;
 import org.obm.caldav.server.propertyHandler.PropfindPropertyHandler;
 import org.obm.caldav.server.share.Token;
-import org.obm.caldav.utils.DOMUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -76,7 +75,7 @@ public class GetCTag extends DavPropertyHandler implements PropfindPropertyHandl
 	
 	@Override
 	public synchronized void appendPropertyValue(Element prop, Token t, DavRequest req, IProxy proxy) {
-		Element elem = DOMUtils.createElement(prop, NameSpaceConstant.CALENDARSERVER_NAMESPACE_PREFIX+"getctag");
+		Element elem = appendElement(prop, "getctag", NameSpaceConstant.CALENDARSERVER_NAMESPACE_PREFIX); 
 		Date lastChange = lastChangeByUser.get(t.getLoginAtDomain());
 		
 		if(lastChange == null){
