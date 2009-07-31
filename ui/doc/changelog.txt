@@ -36,4 +36,5 @@ To do
   * #531 Can't change page on result of contact search
   * #547 Not possible to change fields displayed in a search result (mysql)
   * #549 Member list is empty in project search
+  * #554 Document creation from Project or other module do not link the document
   * #556 Project consult displays all the users as members

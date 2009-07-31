@@ -166,7 +166,8 @@ function run_query_document_insert(&$document) {
   $url = $document["url"];
   $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
   $entity = $document["entity"];
-  $entity_id = sql_parse_id($document["entity_id"]);
+  $link_id = sql_parse_id($document['entity_id']);
+  $link_entity_id = of_entity_get($entity, $link_id);
 
   if ($size == "") $size = 0;
   
@@ -241,7 +242,7 @@ function run_query_document_insert(&$document) {
         documentlink_entity_id,
         documentlink_document_id
       ) VALUES (
-        $entity_id,
+        $link_entity_id,
         $doc_id
       )";
       display_debug_msg($query, $cdg_sql, "run_query_document_insert(links)");
