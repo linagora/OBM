@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames['company_name'] = $l_name;
+$fieldnames['company_aka'] = $l_aka;
 $fieldnames['company_number'] = $l_number;
 $fieldnames['company_vat'] = $l_vat;
 $fieldnames['company_siret'] = $l_siret;

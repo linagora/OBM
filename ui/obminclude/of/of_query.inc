@@ -1165,6 +1165,9 @@ function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_l
 
   while ($obm_q->next_record()) {
     $user_id = $obm_q->f('display_user_id');
+    if ($user_id == '') {
+      $user_id = 0;
+    }
     $fieldname = $obm_q->f('display_fieldname');
     $fieldstatus = $obm_q->f('display_display');
     $current[$user_id]['name'] = $fieldname;
