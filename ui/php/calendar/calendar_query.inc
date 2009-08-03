@@ -3540,8 +3540,9 @@ function run_query_calendar_insert_view($calendar) {
 //   - $calendar : hashed calendar params
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_delete_view($calendar) {
-  global $cdg_sql;
+  global $cdg_sql, $obm;
 
+  $user_id = sql_parse_id($obm['uid']);
   $obm_q = new DB_OBM;
 
   of_entity_delete('obmbookmark', $calendar['view_id']);
@@ -3549,6 +3550,14 @@ function run_query_calendar_delete_view($calendar) {
 
   // Delete view
   $query = "DELETE FROM ObmBookmark WHERE obmbookmark_id $id"; 
+  $obm_q->query($query);
+
+  // Delete default view (if the default view is the deleted one)
+  $query = "DELETE FROM UserObmPref
+    WHERE userobmpref_user_id=$user_id
+    AND userobmpref_option='set_cal_default_view'
+    AND userobmpref_value $id
+    ";
   $obm_q->query($query);
 
   $message = "\"obmbookmark_id\": \"$calendar[view_id]\"";
