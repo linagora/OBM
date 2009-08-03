@@ -8,8 +8,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use ObmSaslauthd::SSO::ssoCheckTicket;
-
 
 sub configure_hook {
     my $self = shift;
@@ -72,23 +70,6 @@ sub _loadAuthenticationModules {
 
     if( $#{$self->{'authenticationModules'}} < 0 ) {
         $self->log( 0, 'No authentication module loaded !' );
-        return 1;
-    }
-
-    return 0;
-}
-
-
-sub _configureSSO {
-    my $self = shift;
-    my $daemonOptions;
-
-    $daemonOptions->{'check_sso_uri'} = $self->loadOption('check_sso_uri');
-    $self->{'ssoCheckTicket'} = ObmSaslauthd::SSO::ssoCheckTicket->new( $self, {
-        check_sso_uri => shift( @{$daemonOptions->{'check_sso_uri'}} )
-    } );
-
-    if( !defined($self->{'ssoCheckTicket'} ) ) {
         return 1;
     }
 
