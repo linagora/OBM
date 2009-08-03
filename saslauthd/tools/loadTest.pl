@@ -42,6 +42,11 @@ sub spawn {
         confess "usage: spawn CODEREF";
     }
 
+    while( $fork >= $parameters{'fork'} ) {
+        next;
+    }
+
+    $fork++;
     my $pid;
     if (!defined($pid = fork)) {
         print STDERR 'cannot fork: '.$!."\n";
@@ -140,47 +145,27 @@ my $ssoAuthCount = 0;
 my $ldapTime = 0;
 my $ssoTime = 0;
 
-while( $i < $parameters{'loop'} ) {
-    if( $fork >= $parameters{'fork'} ) {
-        next;
-    }
 
-    my $ldapAuth;
-
-    if( $parameters{'authType'} == AUTH_RANDOM ) {
-        $ldapAuth = int(rand(2));
-    }elsif( $parameters{'authType'} == AUTH_LDAP ) {
-        $ldapAuth = 1;
+my $ldapAuthIter = 0;
+my $ssoAuthIter = 0;
+if( $parameters{'authType'} == AUTH_LDAP ) {
+    $ldapAuthIter = $parameters{'loop'};
+}elsif( $parameters{'authType'} == AUTH_SSO ) {
+    $ssoAuthIter = $parameters{'loop'};
+}else {
+    if( int(rand(2)) ) {
+        $ldapAuthIter++;
     }else {
-        $ldapAuth = 0;
+        $ssoAuthIter++;
     }
-
-    if( $ldapAuth ) {
-        my $begin = new Benchmark;
-        spawn( sub { ldapAuth } );
-        my $end = new Benchmark;
-
-        $ldapTime += timestr(timediff( $end, $begin ), 'all');
-
-        $ldapAuthCount++;
-    }else {
-        my $begin = new Benchmark;
-        spawn( sub { ssoAuth } );
-        my $end = new Benchmark;
-
-        $ssoTime += timestr(timediff( $end, $begin ), 'all');
-
-        $ssoAuthCount++;
-    }
-
-    $i++;
-    $fork++;
 }
 
-print 'LDAP auth: '.$ldapAuthCount.' in '.$ldapTime.'s. ';
-print $ldapAuthCount/$ldapTime.' LDAP authentication/s' if $ldapTime;
-print "\n";
+my $ldapBenchmark;
+if( $ldapAuthIter ) {
+    $ldapBenchmark = timethis( $ldapAuthIter, sub{ spawn( sub { ldapAuth } ) } );
+}
 
-print 'SSO auth: '.$ssoAuthCount.' in '.$ssoTime.'s. ';
-print $ssoAuthCount/$ssoTime.' SSO authentication/s' if $ssoTime;
-print "\n";
+my $ssoBenchmark;
+if( $ssoAuthIter ) {
+    $ssoBenchmark = timethis( $ssoAuthIter, sub{ spawn( sub { ssoAuth } ) } );
+}

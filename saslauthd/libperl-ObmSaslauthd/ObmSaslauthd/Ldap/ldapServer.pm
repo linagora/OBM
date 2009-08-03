@@ -192,7 +192,7 @@ sub checkAuthentication {
     my $self = shift;
     my( $request ) = @_;
 
-    my $ldapConn = $self->_connect();
+    my $ldapConn = $self->getConn();
 
     # LDAP authentication
     my $error = $ldapConn->bind(
@@ -204,11 +204,18 @@ sub checkAuthentication {
     if( !$error->code ) {
         $self->{'daemon'}->log( 2, 'LDAP authentication success for user '.$request->getDn() );
         $returnCode = 1;
+    
+    }elsif( $error->code == LDAP_CONFIDENTIALITY_REQUIRED ) {
+        $self->{'daemon'}->log( 0, 'start_tls needed by LDAP server. Check your configuration' );
+        $self->{'daemon'}->log( 0, 'disabling LDAP server' );
+        $self->_setDeadStatus();
+        $self->{'ldapServerConn'} = undef;
+
     }else {
         $self->{'daemon'}->log( 0, 'LDAP authentication fail for user '.$request->getDn() );
     }
 
-    $ldapConn->disconnect();
+    $self->_searchAuthenticate();
     return $returnCode;
 }
 
