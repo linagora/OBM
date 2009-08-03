@@ -366,18 +366,20 @@ Obm.CalendarDayEvent = new Class({
   resizeLine: function(lineElem) {
       if(!$(lineElem)) {
         var hr = $(this.options.type + '_' + this.origin);
-        var lineElem = hr.getParent();
+        var lineElem = hr.getParent('#calendarHead');
       }
-      var thead = $(lineElem).getFirst();
-      var size = 0;
-      do {
-        if (thead.childNodes.length > size) size = thead.childNodes.length;
-      } while (thead = thead.getNext());
-      size = size * this.element.offsetHeight + 5;
-      if (lineElem.offsetHeight != size) {
-        lineElem.getElements('td').setStyle('height', size + 'px');
-        return true
-      }        
+      if ($(lineElem)) {
+        var thead = $(lineElem).getFirst();
+        var size = 0;
+        do {
+          if (thead.childNodes.length > size) size = thead.childNodes.length;
+        } while (thead = thead.getNext());
+        size = size * this.element.offsetHeight + 5;
+        if (lineElem.offsetHeight != size) {
+          lineElem.getElements('td').setStyle('height', size + 'px');
+          return true
+        }        
+      }
       return false;
   },
 
