@@ -484,7 +484,7 @@ class OBM_DISPLAY {
   //   - $url             : URL with search fields to link to index pages
   //   - $dis_data_entity : function to call (module formatting fields)
   /////////////////////////////////////////////////////////////////////////////
-    function dis_data_index($url, $dis_data_entity) {
+  function dis_data_index($url, $dis_data_entity) {
     global $path, $params, $ctu_sql_limit;
     global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
     global $set_rows_default,$module, $l_select_all, $l_unselect_all;
@@ -970,7 +970,7 @@ function display_head($p_module, $standard=true) {
   global $l_monthsofyearshort,$l_daysofweek,$l_daysofweekshort,$ico_plus, $c_week_first_day;
   global $l_today, $l_close, $css_obm, $popup_height,$popup_width,$resources_path;
   global $css_print_obm, $ico_delete, $ico_update, $output_target,$l_transparent;
-  global $l_autocomplete_field, $l_fatal_server_err, $gwt_js_include;
+  global $l_autocomplete_field, $l_fatal_server_err, $gwt_js_include, $path;
 
   $css = $css_obm;
 
@@ -1054,6 +1054,7 @@ function display_head($p_module, $standard=true) {
   obm.vars.consts.weekStart = $c_week_first_day;
   obm.vars.consts.resourcePath = '$resources_path';
   obm.vars.consts.timeZone = '".Of_Date::getOption('timezone')."';
+  obm.vars.consts.obmUrl = '$path';
   obm.vars.consts.calendarUrl = '$path/calendar/calendar_index.php';
   obm.vars.consts.calendarDetailconsultURL = '$path/calendar/calendar_index.php?action=detailconsult&calendar_id=';
   obm.vars.labels.monthsShort = $monthShort;

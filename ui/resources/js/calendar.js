@@ -1117,7 +1117,7 @@ Obm.CalendarManager = new Class({
 
   sendUpdateEvent: function(eventData) {
     new Request.JSON({
-      url : 'calendar_index.php',
+      url: obm.vars.consts.calendarUrl,
       secure : false,
       onComplete : function(response) {
         if (response.conflict) {
@@ -1136,7 +1136,7 @@ Obm.CalendarManager = new Class({
         });
         obm.calendarManager.popupManager.addEvent('complete', function () {
           new Request.JSON({
-            url : 'calendar_index.php',
+            url: obm.vars.consts.calendarUrl,
             secure : false,
             onComplete : this.receiveUpdateEvent.bind(this)
           }).post($merge({ajax : 1, action : 'quick_update'}, eventData));
@@ -1192,7 +1192,7 @@ Obm.CalendarManager = new Class({
 
   sendCreateEvent: function(eventData) {
     new Request.JSON({
-      url : 'calendar_index.php',
+      url: obm.vars.consts.calendarUrl,
       secure : false,
       onComplete : function(response) {
         if (response.conflict) {
@@ -1211,7 +1211,7 @@ Obm.CalendarManager = new Class({
         });        
         obm.calendarManager.popupManager.addEvent('complete', function () {
           new Request.JSON({
-            url : 'calendar_index.php',
+            url: obm.vars.consts.calendarUrl,
             secure : false,
             onComplete : this.receiveCreateEvent
           }).post($merge({ajax : 1, action : 'quick_insert'}, eventData));          
@@ -1257,7 +1257,7 @@ Obm.CalendarManager = new Class({
 
   sendDeleteEvent: function(eventData) {
     new Request.JSON({
-      url : 'calendar_index.php',
+      url: obm.vars.consts.calendarUrl,
       secure : false,
       onComplete : function(response) {
         if(response.mail) {
@@ -1268,7 +1268,7 @@ Obm.CalendarManager = new Class({
         });        
         obm.calendarManager.popupManager.addEvent('complete', function () {
           new Request.JSON({
-            url : 'calendar_index.php',
+            url: obm.vars.consts.calendarUrl,
             secure : false,
             onComplete : this.receiveDeleteEvent
           }).post($merge({ajax : 1, action : 'quick_delete'}, eventData));             
@@ -1567,7 +1567,7 @@ Obm.CalendarView = new Class({
       alert(obm.vars.labels.conflict_view_label);
     } else {
       new Request.JSON({
-        url : 'calendar_index.php',
+        url: obm.vars.consts.calendarUrl,
         secure : false,
         onComplete : function(response){
           try {
@@ -1603,7 +1603,7 @@ Obm.CalendarView = new Class({
     if (this.view_id.value != "") {
       if (confirm(obm.vars.labels.delete_view)) {
         new Request.JSON({
-          url :'calendar_index.php',
+          url: obm.vars.consts.calendarUrl,
           secure : false,
           onComplete : 
             function(response){
@@ -1661,7 +1661,7 @@ Obm.CalendarView = new Class({
     if (action != "") {
       if (confirm(confirm_message)) {
         new Request.JSON({
-          url :'calendar_index.php',
+          url: obm.vars.consts.calendarUrl,
           secure : false,
           onComplete : 
             function(response){
@@ -2089,7 +2089,7 @@ Obm.CalendarFreeBusy = new Class({
 
     if (data.sel_user_id.length > 0 || data.sel_resource_id.length > 0 || data.sel_contact_id.length > 0) {
       new Request.JSON({
-        url: 'calendar_index.php',
+        url: obm.vars.consts.calendarUrl,
         secure: false,
         onRequest: function() {
           $('spinner').setStyle('display', 'block');
@@ -2231,7 +2231,7 @@ Obm.CalendarFreeBusy = new Class({
     data.group_id = group_id;
     var users = new Array();
     new Request.JSON({
-      url: '/group/group_index.php',
+      url: obm.vars.consts.obmUrl+'/group/group_index.php',
       secure: false,
       async: false,
       onComplete: function(r) {
@@ -2249,7 +2249,7 @@ Obm.CalendarFreeBusy = new Class({
     data.res_id = res_id;
     var resources = new Array();
     new Request.JSON({
-      url: '/resourcegroup/resourcegroup_index.php',
+      url: obm.vars.consts.obmUrl+'/resourcegroup/resourcegroup_index.php',
       secure: false,
       async: false,
       onComplete: function(r) {
