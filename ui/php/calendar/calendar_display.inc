@@ -958,15 +958,15 @@ function dis_calendar_day_list($calendar, $calendar_entity, $writable_entity) {
   $end = clone $date;
   $end->addDay(1);
 
-  $label = $date->localize(Of_Date::OBM_DATE_WEEK);
+  $label = $date->localize(Of_Date::OBM_DATE_DAY);
   $current = new Of_Date();
   $block = "
   <h1>
-    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subMonth(1)->getURL()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
-    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getURL()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subWeek(1)->getURL()."\"><img src=\"$ico_far_previous\" alt=\"[$l_previous]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->subDay(1)->getURL()."\"><img src=\"$ico_previous\" alt=\"[$l_previous]\" /></a>     
     $label
-    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getURL()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
-    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addMonth(1)->getURL()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addDay(1)->getURL()."\"><img src=\"$ico_next\" alt=\"[$l_next]\" /></a>     
+    <a href=\"calendar_index.php?date=".$current->setDateIso($calendar['date'])->addWeek(1)->getURL()."\"><img src=\"$ico_far_next\" alt=\"[$l_next]\" /></a>     
   </h1>";
   $block .= dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $date, $end);
 
@@ -1091,9 +1091,10 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   // Sort occurrences by date (cause repeat and no repeat events)
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
-      $d = $occurrence->date->get(Of_Date::DATE_MEDIUM);
-      if(!is_array($ocs[$d])) { $ocs[$d] = array();}
-      array_push($ocs[$d],$occurrence);
+      $id = clone $occurrence->date;
+      $id->setHour(0)->setMinute(0)->setSecond(0);
+      if(!is_array($ocs[$id->getTimestamp()])) { $ocs[$id->getTimestamp()] = array();}
+      array_push($ocs[$id->getTimestamp()],$occurrence);
     }
   }
   if (is_array($ocs)) {
@@ -1102,8 +1103,8 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
       $current = new Of_Date($key);  
       if ($i%2 == 0) $klass = "pair"; else $klass = '';
       $i ++;
-      $label = $current->localize(Of_Date::OBM_DATE_WEEK_LONG);
-      if ($current->isToday())$klass="highlight";
+      $label = $current->localize(Of_Date::OBM_DATE_MONTH_LIST);
+      if ($current->isToday()) $klass="highlight";
       $dis_events .= "
         <tr class=\"$klass\">
           <td><a href=\"calendar_index.php?cal_range=day&amp;date=".$current->getURL()."\">$label</a></td>
@@ -1114,6 +1115,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         $date = $v->date;
         $hour = $v->date->get(Of_Date::TIME_SHORT);
         $end = clone $v->end;
+        $hour_end = $end->get(Of_Date::TIME_SHORT);
         $ev_id = $event->id;
         $title = $event->title;
         $location = $event->location;
@@ -1121,18 +1123,18 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         $category = $event->category1;
         $repeat = $event->repeat;
         if ($repeat == 'none') {
-    $dis_repeat = '';
+          $dis_repeat = '';
         } else {
-    $dis_repeat = ${"l_$repeat"};
+          $dis_repeat = ${"l_$repeat"};
         }
         
         $privatized_event = $event->privacy == 1 && !(array_key_exists($obm['uid'],$attendee['user']));
         if ($privatized_event) {
-    $title = $l_private;
-    $description = $title;
+          $title = $l_private;
+          $description = $title;
         } else {
-    $title = $event->title;
-    $description = $event->description;
+          $title = $event->title;
+          $description = $event->description;
           $properties = $event->properties;
           $item_list = '';
           if ($properties != '') {
@@ -1206,14 +1208,14 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
           }
         }        
         if ($event->all_day == 1) {
-    $date_begin = $date->getOutputDate();
-    $date_end = $end->subSecond(1)->getOutputDate(); 
-  } else {
-    $date_begin = $date->getOutputDateTime();
-    $date_end = $end->getOutputDateTime(); 
-  }
+          $date_begin = $date->getOutputDate();
+          $date_end = $end->subSecond(1)->getOutputDate(); 
+        } else {
+          $date_begin = $date->getOutputDateTime();
+          $date_end = $end->getOutputDateTime(); 
+        }
         $j++;
-  $js .= "
+        $js .= "
   div = $('evt_${date}_$ev_id');
   a = div.getFirst();
         info = $('eventDetail_${date}_$ev_id');
@@ -1223,14 +1225,11 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
   a.addEvent('click', function(e){
     slides[$j].toggle();
        });
-      ";
+        ";
   
-      $event_details = '';
-      if (!$privatized_event) {
-      	$event_details = "<table>
-              <tr>
-                <th colspan='2'>$date_begin - $date_end</th>
-              </tr>
+        $event_details = '';
+        if (!$privatized_event) {
+          $event_details = "<table>
               <tr>
                 <th>$l_repeat</th><td>$dis_repeat</td>
               </tr>
@@ -1258,10 +1257,24 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
             </table>
             <a href=\"calendar_index.php?action=detailconsult&amp;calendar_id=$ev_id\"><img src=\"$ico_search\" title=\"[Info]\"/></a>
           ";
-      }
-      $dis_events .= "<div id=\"evt_${date}_$ev_id\" >
+        }
+        if($event->all_day) {
+          if($end->subSecond(1)->compareDateIso($date) != 0) {
+            $diff = ceil($end->diff($date)/86400);
+            $schedule = $GLOBALS['l_all_day']." ($diff $GLOBALS[l_days])";
+          } else {
+            $schedule = $GLOBALS['l_all_day']; 
+          } 
+        } else {
+          if($date->compareDateIso($end) != 0) {
+            $schedule = "$date_begin - $date_end";
+          } else {
+            $schedule = "$hour - $hour_end";
+          }
+        }
+        $dis_events .= "<div id=\"evt_${date}_$ev_id\" >
           <a href=\"javascript: void(0);\"><span style=\"float: right;\">$dis_people $dis_res</span>
-          $hour - <strong>$title</strong></a>
+          $schedule - <strong>$title</strong></a>
           <div id=\"eventDetail_${date}_$ev_id\" class=\"eventDetail detail\" style=\"display: none;\">
             $event_details
           </div>
