@@ -93,7 +93,8 @@ function run_query_contact_search($contact) {
       company_aka,";
 
   } else {
-    $company_fields = 'contact_company as company_name,';
+    $company_fields = "contact_company as company_name,
+      '' as company_aka,";
   }
 
   // If a lastname has been specified, get it 
@@ -223,6 +224,10 @@ function run_query_contact_search($contact) {
     $order_next = ', address_zipcode, address_town';
   } else if (strcmp($sql_order_field,'country_name') == 0) {
     $order = 'country_name';
+  } else if (strcmp($sql_order_field,'contact_displayname') == 0) {
+    $order = sql_casei_sort($db_type, 'contact_firstname');
+    $order_next_field = sql_casei_sort($db_type, 'contact_lastname');
+    $order_next = ", $order_next_field $sql_order_dir";
   }
   $orderq = " ORDER BY $order $sql_order_dir $order_next";
   $selectFields = "
@@ -287,7 +292,7 @@ function run_query_contact_search($contact) {
     } else {
       $off = '0';
     }
-    $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_userdata $join_comp $whereq $orderq";
+    $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_userdata $join_comp $whereq";
     display_debug_msg($query, $cdg_sql, 'contact_search(1)');
     $obm_q->xquery($query);
     $count = $obm_q->nf();
@@ -312,7 +317,7 @@ function run_query_contact_search($contact) {
     $where_name = " AND ($where_name OR contact_aka #LIKE '%$auto_aka%'
       OR contact_sound = '$sound')";
     $whereq = " WHERE $where $where_name";
-    $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq $orderq";
+    $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq";
     $obm_q->xquery($query);
     if($count != 0) {
       $ids = array();
