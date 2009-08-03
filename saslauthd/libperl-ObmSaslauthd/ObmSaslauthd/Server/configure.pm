@@ -8,7 +8,6 @@ use 5.006_001;
 require Exporter;
 use strict;
 
-use ObmSaslauthd::Ldap::ldapCheckPasswd;
 use ObmSaslauthd::SSO::ssoCheckTicket;
 
 
@@ -19,47 +18,60 @@ sub configure_hook {
     $self->{'server'}->{'conf_file'} = '/etc/obm/'.$self->{'server'}->{'name'}.'.cf';
     
     $self->{'server'}->{'setsid'} = 1;
+}
 
-    if( $self->_configureLdap() ) {
-        $self->log( 0, 'ldap configuration error' );
-        print 'ldap configuration error';
-        exit 1;
-    }
 
-    if( $self->_configureSSO() ) {
-        $self->log( 0, 'SSO configuration error' );
-        print 'SSO configuration error';
-        exit 1;
+sub post_configure_hook {
+    my $self = shift;
+
+    if( $self->_loadAuthenticationModules() ) {
+        $self->log( 2, 'Authentication modules initialization fail' );
+        $self->server_close();
     }
 }
 
 
-sub _configureLdap {
+sub _loadAuthenticationModules {
     my $self = shift;
 
-    my $daemonOptions = {
-        ldap_server => [],
-        ldap_server_tls => [],
-        ldap_base => [],
-        ldap_login => [],
-        ldap_password => [],
-        ldap_filter => []
-        };
-    $self->configure( $daemonOptions );
+    my $authenticationModules = $self->loadOption( 'auth_mods' );
+    if( !$authenticationModules->[0] ) {
+        $self->log( 0, 'No authentication modules defined, see \'auth_mods\' configuration option' );
+        return 1;
+    }
 
-    $daemonOptions->{'ldap_filter'} = $self->_loadOption( 'ldap_filter' );
+    $self->{'authenticationModules'} = [];
 
+    $authenticationModules->[0] =~ s/ //g;
+    my @authenticationModules = split( ',', $authenticationModules->[0] );
 
-    $self->{'ldapCheckPasswd'} = ObmSaslauthd::Ldap::ldapCheckPasswd->new( $self, {
-        ldap_server => shift( @{$daemonOptions->{'ldap_server'}} ),
-        ldap_server_tls => shift( @{$daemonOptions->{'ldap_server_tls'}} ),
-        ldap_base => shift( @{$daemonOptions->{'ldap_base'}} ),
-        ldap_login => shift( @{$daemonOptions->{'ldap_login'}} ),
-        ldap_password => shift( @{$daemonOptions->{'ldap_password'}} ),
-        ldap_filter => shift( @{$daemonOptions->{'ldap_filter'}} )
-    } );
+    for( my $i=0; $i<=$#authenticationModules; $i++ ) {
+        my $moduleInternalName = $authenticationModules[$i];
+        $moduleInternalName =~ s/-/_/g;
+        my $modulePath = 'ObmSaslauthd/AuthMods/'.$moduleInternalName.'.pm';
+        my $moduleClass = 'ObmSaslauthd::AuthMods::'.$moduleInternalName;
 
-    if( !defined($self->{'ldapCheckPasswd'}) ) {
+        eval {
+            require $modulePath;
+        } or ($self->log( 0, 'Unknow authentication module \''.$authenticationModules[$i].'\'' ) && next);
+
+        my $authMod = $moduleClass->new( $self );
+        if( !defined($authMod) ) {
+            $self->log( 0, 'loading authentication module \''.$authenticationModules[$i].'\' failed' );
+            next;
+        }
+
+        if( $authMod->init( $self ) ) {
+            $self->log( 0, 'authentication module \''.$authenticationModules[$i].'\' initialization failed' );
+            next;
+        }
+
+        $self->log( 0, 'loading authentication module \''.$authenticationModules[$i].'\' success' );
+        push( @{$self->{'authenticationModules'}}, $authMod );
+    }
+
+    if( $#{$self->{'authenticationModules'}} < 0 ) {
+        $self->log( 0, 'No authentication module loaded !' );
         return 1;
     }
 
@@ -71,7 +83,7 @@ sub _configureSSO {
     my $self = shift;
     my $daemonOptions;
 
-    $daemonOptions->{'check_sso_uri'} = $self->_loadOption('check_sso_uri');
+    $daemonOptions->{'check_sso_uri'} = $self->loadOption('check_sso_uri');
     $self->{'ssoCheckTicket'} = ObmSaslauthd::SSO::ssoCheckTicket->new( $self, {
         check_sso_uri => shift( @{$daemonOptions->{'check_sso_uri'}} )
     } );
@@ -84,7 +96,7 @@ sub _configureSSO {
 }
 
 
-sub _loadOption {
+sub loadOption {
     my $self = shift;
     my( $option ) = @_;
     my $args = $self->{'server'}->{'conf_file_args'};

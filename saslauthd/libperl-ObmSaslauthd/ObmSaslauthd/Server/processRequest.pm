@@ -18,14 +18,11 @@ sub process_request {
 
     $self->{'request'} = ObmSaslauthd::Server::request->new( $self );
 
-    if( $self->{'ldapCheckPasswd'}->checkPasswd( $self->{'request'} ) ) {
-        print SASL_SUCC_RESP;
-        return;
-    }
-
-    if( $self->{'ssoCheckTicket'}->checkTicket( $self->{'request'} ) ) {
-        print SASL_SUCC_RESP;
-        return;
+    for( my $i=0; $i<=$#{$self->{'authenticationModules'}}; $i++ ) {
+        if( $self->{'authenticationModules'}->[$i]->checkAuth( $self->{'request'} ) ) {
+            print SASL_SUCC_RESP;
+            return;
+        }
     }
 
     print SASL_FAIL_RESP;

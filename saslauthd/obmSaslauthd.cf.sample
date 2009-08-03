@@ -7,6 +7,11 @@ log_level   2
 log_file    /var/log/obm/obmSaslauthd.log
 pid_file    /var/run/saslauthd/obmSaslauthd.pid
 
+# Authentication modules
+# ldap : ldap authentication
+# obm-ticket : OBM SSO ticket
+auth_mods   ldap,obm-ticket
+
 # LDAP server
 ldap_server ldap://ldap.obm.local
 # LDAP use TLS [none|may|encrypt]
@@ -24,6 +29,6 @@ ldap_password   mdp3PaAL
 # Single name space - ldap_filter: (|(&(|(mailBox=%u)(uid=%u))(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus*)(objectClass=posixAccount)))
 ldap_filter (|(&(mailBox=%U@%d)(objectClass=obmUser)(mailAccess=PERMIT))(&(uid=%U)(cn=Administrator Cyrus*)(objectClass=posixAccount)))
 
-# Check SSO ticket
+# Check OBM SSO ticket
 # %t = ticket
 check_sso_uri   https://external-url/sso/sso_index.php?action=validate&ticket=%t

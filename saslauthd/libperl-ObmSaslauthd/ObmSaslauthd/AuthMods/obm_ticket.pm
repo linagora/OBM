@@ -1,6 +1,9 @@
-package ObmSaslauthd::SSO::ssoCheckTicket;
+package ObmSaslauthd::AuthMods::obm_ticket;
 
 $VERSION = '1.0';
+
+use ObmSaslauthd::AuthMods::abstract;
+@ISA = ('ObmSaslauthd::AuthMods::abstract');
 
 $debug = 1;
 
@@ -12,30 +15,33 @@ use LWP::UserAgent;
 require HTTP::Request;
 
 
-sub new {
-    my $class = shift;
-    my( $daemon, $ldapDesc ) = @_;
+sub init {
+    my $self = shift;
 
-    my $self = bless { }, $class;
+    my $daemonOptions;
+    $daemonOptions->{'check_sso_uri'} = $self->{'daemon'}->loadOption('check_sso_uri');
 
-    $self->{'daemon'} = $daemon;
-    $self->{'check_sso_uri'} = $ldapDesc->{'check_sso_uri'};
+    my $ssoDesc = {
+        check_sso_uri => shift( @{$daemonOptions->{'check_sso_uri'}} )
+    };
+
+    $self->{'check_sso_uri'} = $ssoDesc->{'check_sso_uri'};
     if( !$self->{'check_sso_uri'} ) {
         $self->{'daemon'}->log( 0, 'Invalid SSO ticket checking URL' );
-        return undef;
+        return 1;
     }
 
     $self->{'userAgent'} = LWP::UserAgent->new();
     if( !defined($self->{'userAgent'}) ) {
         $self->{'daemon'}->log( 0, 'can\'t initialize HTTP user agent' );
-        return undef;
+        return 1;
     }
 
-    return $self;
+    return 0;
 }
 
 
-sub checkTicket {
+sub checkAuth {
     my $self = shift;
     my( $request ) = @_;
 

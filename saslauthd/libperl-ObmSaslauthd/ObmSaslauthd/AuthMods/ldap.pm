@@ -1,6 +1,9 @@
-package ObmSaslauthd::Ldap::ldapCheckPasswd;
+package ObmSaslauthd::AuthMods::ldap;
 
 $VERSION = '1.0';
+
+use ObmSaslauthd::AuthMods::abstract;
+@ISA = ('ObmSaslauthd::AuthMods::abstract');
 
 $debug = 1;
 
@@ -11,17 +14,35 @@ use strict;
 use ObmSaslauthd::Ldap::ldapServer;
 
 
-sub new {
-    my $class = shift;
-    my( $daemon, $ldapDesc ) = @_;
+sub init {
+    my $self = shift;
 
-    my $self = bless { }, $class;
+    my $daemonOptions = {
+        ldap_server => [],
+        ldap_server_tls => [],
+        ldap_base => [],
+        ldap_login => [],
+        ldap_password => [],
+        ldap_filter => []
+        };
+    $self->{'daemon'}->configure( $daemonOptions );
 
-    $self->{'daemon'} = $daemon;
+    $daemonOptions->{'ldap_filter'} = $self->{'daemon'}->loadOption( 'ldap_filter' );
+
+
+    my $ldapDesc = {
+        ldap_server => shift( @{$daemonOptions->{'ldap_server'}} ),
+        ldap_server_tls => shift( @{$daemonOptions->{'ldap_server_tls'}} ),
+        ldap_base => shift( @{$daemonOptions->{'ldap_base'}} ),
+        ldap_login => shift( @{$daemonOptions->{'ldap_login'}} ),
+        ldap_password => shift( @{$daemonOptions->{'ldap_password'}} ),
+        ldap_filter => shift( @{$daemonOptions->{'ldap_filter'}} )
+    };
+
     $self->{'ldapFilter'} = $ldapDesc->{'ldap_filter'};
     if( !$self->{'ldapFilter'} ) {
         $self->{'daemon'}->log( 0, 'Invalid LDAP filter' );
-        return undef;
+        return 1;
     }
 
     $self->{'ldapBase'} = $ldapDesc->{'ldap_base'};
@@ -32,10 +53,24 @@ sub new {
 
     $self->{'ldapServer'} = ObmSaslauthd::Ldap::ldapServer->new( $self->{'daemon'}, $ldapDesc );
     if( !defined($self->{'ldapServer'}) ) {
-        return undef;
+        return 1;
     }
 
-    return $self;
+    return 0;
+}
+
+
+sub checkAuth {
+    my $self = shift;
+    my( $request ) = @_;
+
+    $request->setDn( $self->_searchDn( $request ) );
+    if( !defined($request->getDn()) ) {
+        return 0;
+    }
+
+    $self->{'daemon'}->log( 2, 'Checking password to LDAP server for user '.$request->getLogin().', DN '.$request->getDn() );
+    return $self->{'ldapServer'}->checkAuthentication( $request );
 }
 
 
@@ -78,18 +113,4 @@ sub _searchDn {
 
     my $entry = $result->entry(0);
     return $entry->dn();
-}
-
-
-sub checkPasswd {
-    my $self = shift;
-    my( $request ) = @_;
-
-    $request->setDn( $self->_searchDn( $request ) );
-    if( !defined($request->getDn()) ) {
-        return 0;
-    }
-
-    $self->{'daemon'}->log( 2, 'Checking password to LDAP server for user '.$request->getLogin().', DN '.$request->getDn() );
-    return $self->{'ldapServer'}->checkAuthentication( $request );
 }
