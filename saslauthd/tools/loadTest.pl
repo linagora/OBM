@@ -153,19 +153,23 @@ if( $parameters{'authType'} == AUTH_LDAP ) {
 }elsif( $parameters{'authType'} == AUTH_SSO ) {
     $ssoAuthIter = $parameters{'loop'};
 }else {
-    if( int(rand(2)) ) {
-        $ldapAuthIter++;
-    }else {
-        $ssoAuthIter++;
+    for( my $i=0; $i<$parameters{'loop'}; $i++ ) {
+        if( int(rand(2)) ) {
+            $ldapAuthIter++;
+        }else {
+            $ssoAuthIter++;
+        }
     }
 }
 
 my $ldapBenchmark;
 if( $ldapAuthIter ) {
+    print 'LDAP auth ('.$ldapAuthIter.' loops) : ';
     $ldapBenchmark = timethis( $ldapAuthIter, sub{ spawn( sub { ldapAuth } ) } );
 }
 
 my $ssoBenchmark;
 if( $ssoAuthIter ) {
+    print 'SSO auth ('.$ssoAuthIter.' loops) : ';
     $ssoBenchmark = timethis( $ssoAuthIter, sub{ spawn( sub { ssoAuth } ) } );
 }
