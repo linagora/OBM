@@ -135,6 +135,10 @@ $ccalendar_hour_fraction = 4;
 // Resource can be reserved for the same period more than once 
 $ccalendar_resource_overbooking = true;
 
+// Allow to set wheter calendar event creation happend on simple or double click
+// onClick or onDblClick (default is onDblClick)
+$ccalendar_invocation_method = 'onDblClick';
+
 // Time : In how many parts we split up a day (Time management)
 $c_day_fraction = 8;
 

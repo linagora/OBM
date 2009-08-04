@@ -115,6 +115,10 @@ $ccalendar_send_ics = true;
 // Calendar hour fraction (minutes select granularity)
 $ccalendar_hour_fraction = 4;
 
+// Allow to set wheter calendar event creation happend on simple or double click
+// onClick or onDblClick (default is onDblClick)
+$ccalendar_invocation_method = 'onDblClick';
+
 // Time : Worked days in a week (start at sunday)
 $c_working_days = array(0,1,1,1,1,1,0);
 

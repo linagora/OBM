@@ -651,6 +651,11 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
   $GLOBALS['js']['vars']['images']['private'] = $ico_private;
   $GLOBALS['js']['vars']['images']['all_day'] = $ico_allday;
   $GLOBALS['js']['vars']['images']['extension'] = $ico_extension;
+  
+  $invocation_action = 'onDblClick';
+  if (in_array($GLOBALS['ccalendar_invocation_method'], array('onClick', 'onDblClick'))) {
+    $invocation_action = $GLOBALS['ccalendar_invocation_method'];
+  }
 
   $date = clone $calendar['date'];
   $date->setDay(1)->addDay(1)->subWeekday($ccalendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
@@ -723,7 +728,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
     <tr><td id=\"calendarHourCol\"></td>$dis_month_head</tr>
     </tr>
     </thead>
-    <tbody id=\"calendarBody\" onDblClick=\"obm.calendarQuickForm.compute(event, 'month');\">
+    <tbody id=\"calendarBody\" $invocation_action=\"obm.calendarQuickForm.compute(event, 'month');\">
     $dis_month_cal
     </tbody>
   </table>
@@ -763,6 +768,11 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
   $GLOBALS['js']['vars']['images']['all_day'] = $ico_allday;
   $GLOBALS['js']['vars']['images']['extension'] = $ico_extension;
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
+
+  $invocation_action = 'onDblClick';
+  if (in_array($GLOBALS['ccalendar_invocation_method'], array('onClick', 'onDblClick'))) {
+    $invocation_action = $GLOBALS['ccalendar_invocation_method'];
+  }
 
   $display_days = $_SESSION['set_cal_display_days'];
   if (empty($display_days)) $display_days = '1111111';
@@ -833,7 +843,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
   <table class=\"calendar week\">
     <colgroup />
     <colgroup span=\"7\" id=\"calendarEventContext\" />
-    <thead onDblClick=\"obm.calendarQuickForm.compute(event, 'week');\">
+    <thead $invocation_action=\"obm.calendarQuickForm.compute(event, 'week');\">
     <tr>
     <td id=\"calendarHourCol\">".$date->get(Of_Date::WEEK)."</td>
     $week_day_list
@@ -843,7 +853,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
     $week_day_event_list
     </tr>    
     </thead>
-    <tbody id=\"calendarBody\" onDblClick=\"obm.calendarQuickForm.compute(event, 'week');\">
+    <tbody id=\"calendarBody\" $invocation_action=\"obm.calendarQuickForm.compute(event, 'week');\">
     $week_cal
     </tbody>
   </table>
@@ -878,6 +888,11 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
   $GLOBALS['js']['vars']['images']['all_day'] = $ico_allday;
   $GLOBALS['js']['vars']['images']['extension'] = $ico_extension;
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
+
+  $invocation_action = 'onDblClick';
+  if (in_array($GLOBALS['ccalendar_invocation_method'], array('onClick', 'onDblClick'))) {
+    $invocation_action = $GLOBALS['ccalendar_invocation_method'];
+  }
 
   $category_filter = $calendar['category_filter'];
   $date = $calendar['date'];
@@ -917,12 +932,12 @@ function dis_calendar_day_agenda($calendar, $calendar_entity,$writable_entity) {
   <table class=\"calendar day\">
     <colgroup span=\"1\" />
     <colgroup span=\"1\" id=\"calendarEventContext\" />
-    <thead onDblClick=\"obm.calendarQuickForm.compute(event, 'day');\">
+    <thead $invocation_action=\"obm.calendarQuickForm.compute(event, 'day');\">
     <tr id=\"calendarHead\">
     <td id=\"calendarHourCol\">".$date->get(Of_Date::WEEK)."</td><th id=\"day_0\"></th>
     </tr>    
     </thead>
-    <tbody id=\"calendarBody\" onDblClick=\"obm.calendarQuickForm.compute(event, 'day');\">
+    <tbody id=\"calendarBody\" $invocation_action=\"obm.calendarQuickForm.compute(event, 'day');\">
     $day_cal
     </tbody>
   </table>
