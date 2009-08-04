@@ -5303,7 +5303,7 @@ Class CalendarPdf{
   public $editor;
 
   function __construct($calendar, $calendar_entity){
-    global $ccalendar_weekstart, $ico_obm_org, $path;
+    global $ccalendar_weekstart, $ico_printable_logo, $path;
 
     // Page orientation
     $page_layout = $calendar['pagelayout'];
@@ -5360,8 +5360,7 @@ Class CalendarPdf{
     ); 
     $this->waiting_alpha = 0.5;
 
-    // FIXME : obm_logo path $ico_obm_org !!
-    $this->obm_logo = Zend_Pdf_Image::imageWithPath("$path/../resources/themes/default/images/logo_obm_org.jpg");
+    $this->obm_logo = Zend_Pdf_Image::imageWithPath($ico_printable_logo);
 
     $this->calendar_weekstart = $ccalendar_weekstart;
     $this->tmp_filename = tempnam("/tmp", "obm_") ;

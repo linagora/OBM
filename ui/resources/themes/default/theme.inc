@@ -23,6 +23,9 @@ $css_host = "$resources_path/themes/default/styles/host.css";
 // Templates 
 $login_template = "$path/../resources/themes/default/templates/login.tpl";
 
+// Internal resources
+$ico_printable_logo = "$path/../resources/themes/default/images/logo_obm_org.jpg";
+
 // Menus Icons
 $ico_account        = "$theme_path/ico_account.gif";
 $ico_admin          = "$theme_path/ico_admin.gif";
