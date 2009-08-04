@@ -5170,6 +5170,20 @@ Class PdfStub {
     $this->current_y = 0;
   }
 
+  /* Image */
+  public function addImage($width, $height, $image) {
+    return $this->insertImage(-1, $width, $height, $image);
+  }
+  public function insertImage($idx, $width, $height, $image) {
+    return $this->addElement($idx, 'writeImage', array($width, $height, $image),
+                      array('width' => $width, 'height' => $height));
+  }
+  private function writeImage($width, $height, $image) {
+    $x0 = $this->origin_x + $this->current_x;
+    $y0 = $this->origin_y + $this->current_y -1;
+    $this->pdf->page->drawImage($image, $x0, $y0, $x0 + $width, $y0 + $height);
+  }
+
   /* Rectangle */
   public function addRectangle($width, $height, $flags=0) {
     return $this->insertRectangle(-1, $width, $height, $flags);
@@ -5303,7 +5317,8 @@ Class CalendarPdf{
   public $editor;
 
   function __construct($calendar, $calendar_entity){
-    global $ccalendar_weekstart, $ico_printable_logo, $path;
+    global $ccalendar_weekstart, $ico_pdf_logo, $path;
+    global $ico_pdf_private, $ico_pdf_meeting, $ico_pdf_periodic, $ico_pdf_allday;
 
     // Page orientation
     $page_layout = $calendar['pagelayout'];
@@ -5360,7 +5375,12 @@ Class CalendarPdf{
     ); 
     $this->waiting_alpha = 0.5;
 
-    $this->obm_logo = Zend_Pdf_Image::imageWithPath($ico_printable_logo);
+    $this->obm_logo = Zend_Pdf_Image::imageWithPath($ico_pdf_logo);
+    $this->icon_size = 6;
+    $this->ico_private = Zend_Pdf_Image::imageWithPath($ico_pdf_private);
+    $this->ico_meeting = Zend_Pdf_Image::imageWithPath($ico_pdf_meeting);
+    $this->ico_periodic = Zend_Pdf_Image::imageWithPath($ico_pdf_periodic);
+    $this->ico_allday = Zend_Pdf_Image::imageWithPath($ico_pdf_allday);
 
     $this->calendar_weekstart = $ccalendar_weekstart;
     $this->tmp_filename = tempnam("/tmp", "obm_") ;
@@ -5821,6 +5841,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $cur = 0;
 
     foreach($occurrences as $occurrence){
+      $event = $occurrence->event;
       $title = "";
       $id = $occurrence->id;
       $color = $occurrence->event->color;
@@ -5828,9 +5849,21 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
       $class = $this->class[$entity["class"]];
       $attendee = $occurrence->event->attendee;
 
-      if ($occurrence->event->isMeeting()){
-        $title = "ii ";
+
+      $icons = array();
+      if($event->isPrivate()) {
+        $icons[] = $this->ico_private;
       }
+      if($event->isMeeting()) {
+        $icons[] = $this->ico_meeting;
+      }
+      if ($event->isPeriodic()) {
+        $icons[] = $this->ico_periodic;
+      }
+      if ($event->isAllDay()) {
+        $icons[] = $this->ico_allday;
+      }
+
       if (!$occurrence->event->all_day){
         $title .= $occurrence->date->get(Of_Date::TIME_SHORT).' - ';
       }
@@ -5880,16 +5913,22 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
         $this->page->setAlpha(1);
       }
 
-      while($this->getStringWidth($title) > $x1-$x0) {
+      $icon_width = count($icons)*$this->icon_size;
+      while($this->getStringWidth($title) > $x1-$x0 -$icon_width) {
          $title = substr($title, 0, -1); 
       }
       if ($x1 > $this->calendar_x1) $x1 = $this->calendar_x1;
 
       $this->page->drawRectangle($x0,$y0,$x1,$y0-$this->font_height,Zend_Pdf_Page::SHAPE_DRAW_FILL);
       $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
-      
+
+      foreach ($icons as $i => $ico) {
+        $x = $x0 + $i*$this->icon_size;
+        $y = $y0 - $this->font_height;
+        $this->page->drawImage($ico, $x, $y, $x + $this->icon_size, $y + $this->icon_size);
+      }
       $this->page->drawText($title,
-        $this->calendar_x0+$day*$this->col_width+2, 
+        $this->calendar_x0+$day*$this->col_width+1 + $icon_width, 
         $y0-$this->font_height+1, 'UTF-8');
       $cur++;
     }
@@ -6121,6 +6160,20 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $title_color = $class["title"];
       } 
       
+      $icons = array();
+      if($event->event->isPrivate()) {
+        $icons[] = $this->ico_private;
+      }
+      if($event->event->isMeeting()) {
+        $icons[] = $this->ico_meeting;
+      }
+      if ($event->event->isPeriodic()) {
+        $icons[] = $this->ico_periodic;
+      }
+      if ($event->event->isAllDay()) {
+        $icons[] = $this->ico_allday;
+      }
+
       $privatized_event = $event->event->privacy && !(array_key_exists($obm['uid'],$attendee['user']));
       
       if ($privatized_event) {
@@ -6169,13 +6222,19 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
          }
         }
 
-        while($this->getStringWidth($title) > $x1-$x0) {
+        $icon_width = count($icons)*$this->icon_size;
+        while($this->getStringWidth($title) > $x1-$x0 -$icon_width) {
           $title = substr($title, 0, -1); 
         }
         $this->page->setFillColor(new Zend_Pdf_Color_Html($title_color));
         $this->page->drawRectangle($x0, $y0, $x1, $y1, Zend_Pdf_Page::SHAPE_DRAW_FILL);
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
-        $this->page->drawText($title, $x0+2, $y1+1, 'UTF-8');
+        foreach ($icons as $i => $ico) {
+          $x = $x0 + $i*$this->icon_size;
+          $y = $y0 - $this->font_height;
+          $this->page->drawImage($ico, $x, $y, $x + $this->icon_size, $y + $this->icon_size);
+        }
+        $this->page->drawText($title, $x0+1 +$icon_width, $y1+1, 'UTF-8');
         $this->current_out_event++;
 
       } else {
@@ -6235,13 +6294,19 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $cell->write();
 
         // event header
-        while($this->getStringWidth($dis_header) > $event->size*$this->col_width) {
+        $icon_width = count($icons)*$this->icon_size;
+        while($this->getStringWidth($dis_header) > $event->size*$this->col_width -$icon_width) {
           $dis_header = substr($dis_header, 0, -1); 
         }
         $this->page->setFillColor(new Zend_Pdf_Color_Html($title_color));
         $this->page->drawRectangle($x0,$y1-$this->font_height-2,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        foreach ($icons as $i => $ico) {
+          $x = $x0 + $i*$this->icon_size;
+          $y = $y1 - $this->font_height -1;
+          $this->page->drawImage($ico, $x, $y, $x + $this->icon_size, $y + $this->icon_size);
+        }
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
-        $this->page->drawText($dis_header, $x0+2, $y1-$this->font_height, 'UTF-8');
+        $this->page->drawText($dis_header, $x0+1 +$icon_width, $y1-$this->font_height, 'UTF-8');
       }
 
     }
@@ -6307,8 +6372,15 @@ Class CalendarPdfList Extends CalendarPdf{
 
   function __construct($range, $calendar, $calendar_entity, $occurrences){
     global $ccalendar_first_hour;
+    global $ico_pdf_private_alt, $ico_pdf_meeting_alt, $ico_pdf_periodic_alt;
+    global $ico_pdf_allday_alt;
 
     parent::__construct($calendar, $calendar_entity);
+
+    $this->ico_private = Zend_Pdf_Image::imageWithPath($ico_pdf_private_alt);
+    $this->ico_meeting = Zend_Pdf_Image::imageWithPath($ico_pdf_meeting_alt);
+    $this->ico_periodic = Zend_Pdf_Image::imageWithPath($ico_pdf_periodic_alt);
+    $this->ico_allday = Zend_Pdf_Image::imageWithPath($ico_pdf_allday_alt);
 
     $this->calendar_x0 = $this->content_x0;
     $this->calendar_y0 = $this->content_y0;
@@ -6506,12 +6578,18 @@ Class CalendarPdfList Extends CalendarPdf{
         $title = $l_private;
       }
 
-      if ($event->isMeeting()) {
-        $title = "&& $title";
+      $icons = array();
+      if($event->isPrivate()) {
+        $icons[] = $this->ico_private;
       }
-
+      if($event->isMeeting()) {
+        $icons[] = $this->ico_meeting;
+      }
       if ($event->isPeriodic()) {
-        $title = "R $title";
+        $icons[] = $this->ico_periodic;
+      }
+      if ($event->isAllDay()) {
+        $icons[] = $this->ico_allday;
       }
       
       // bug on privacy fix
@@ -6565,11 +6643,14 @@ Class CalendarPdfList Extends CalendarPdf{
       }
 
       // Event title
-      $stub->setX(169 - $margin_left);
+      foreach ($icons as $i => $ico) {
+        $stub->setX(168 - $margin_left - $this->icon_size*($i+1));
+        $stub->addImage($this->icon_size, $this->icon_size, $ico);
+      }
       $stub->setFillColor(new Zend_Pdf_Color_Html("#368397"));
+      $stub->setX(169 - $margin_left);
       $stub->addText($this->calendar_x1 - $this->content_x0 - (169 - $margin_left)
-                     - $this->getStringWidth($dis_people.$dis_res),
-                     0, $head, 'UTF-8');
+                     - $this->getStringWidth($dis_people.$dis_res), 0, $head, 'UTF-8');
       $title_h = $stub->getLastElementHeight();
 
       // Event attendees + resources

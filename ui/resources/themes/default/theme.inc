@@ -10,6 +10,7 @@
 global $path, $resources_path;
 
 $theme_path = "$resources_path/themes/default/images";
+$internal_theme_path = "$path/../resources/themes/default/images";
 
 // CSS
 $css_obm = "$resources_path/themes/default/styles/style.css";
@@ -24,7 +25,15 @@ $css_host = "$resources_path/themes/default/styles/host.css";
 $login_template = "$path/../resources/themes/default/templates/login.tpl";
 
 // Internal resources
-$ico_printable_logo = "$path/../resources/themes/default/images/logo_obm_org.jpg";
+$ico_pdf_logo         = "$internal_theme_path/logo_obm_org.jpg";
+$ico_pdf_private      = "$internal_theme_path/ico_pdf_private.png";
+$ico_pdf_private_alt  = "$internal_theme_path/ico_pdf_private_alt.png";
+$ico_pdf_meeting      = "$internal_theme_path/ico_pdf_meeting.png";
+$ico_pdf_meeting_alt  = "$internal_theme_path/ico_pdf_meeting_alt.png";
+$ico_pdf_periodic     = "$internal_theme_path/ico_pdf_calendar_repeat.png";
+$ico_pdf_periodic_alt = "$internal_theme_path/ico_pdf_calendar_repeat_alt.png";
+$ico_pdf_allday       = "$internal_theme_path/ico_pdf_allday.png";
+$ico_pdf_allday_alt   = "$internal_theme_path/ico_pdf_allday_alt.png";
 
 // Menus Icons
 $ico_account        = "$theme_path/ico_account.gif";
