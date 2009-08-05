@@ -409,8 +409,8 @@ sub _getObjectclassDesc {
             #   syntax)
     
             my $ldapSchema = $ldapServerConn->schema;
-            @{$objectclassDesc->{$objectObjectclass->[$i]}} = $ldapSchema->must($objectObjectclass->[$i]);
-            push( @{$objectclassDesc->{$objectObjectclass->[$i]}}, $ldapSchema->may($objectObjectclass->[$i]) );
+            @{$objectclassDesc->{lc($objectObjectclass->[$i])}} = $ldapSchema->must($objectObjectclass->[$i]);
+            push( @{$objectclassDesc->{lc($objectObjectclass->[$i])}}, $ldapSchema->may($objectObjectclass->[$i]) );
 
             $self->{'objectclassDesc'} = $objectclassDesc;
         }
