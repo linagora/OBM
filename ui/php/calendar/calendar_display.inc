@@ -651,7 +651,7 @@ function dis_calendar_month_agenda($calendar, $calendar_entity,$writable_entity)
   $GLOBALS['js']['vars']['images']['private'] = $ico_private;
   $GLOBALS['js']['vars']['images']['all_day'] = $ico_allday;
   $GLOBALS['js']['vars']['images']['extension'] = $ico_extension;
-  
+
   $invocation_action = 'onDblClick';
   if (in_array($GLOBALS['ccalendar_invocation_method'], array('onClick', 'onDblClick'))) {
     $invocation_action = $GLOBALS['ccalendar_invocation_method'];
@@ -5049,6 +5049,7 @@ function check_conflict($column){
   //Evénement à mettre à jour
   $updated = array();
   foreach($column as $date => $cell) {
+
     //Positions utilisées dans le groupe d'événement en cours de traitement
     $usedPositions = array();
     //Position de l'événement en cours de traitement
@@ -5792,7 +5793,6 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
 
 
   function drawEvents() {
-
     $this->current_y = 0;
     $page = 0;
     $this->page = $this->pdf->pages[$page];
@@ -5802,13 +5802,13 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $end->setDay(1)->addMonth(1)->subDay(1)->addWeekday($this->calendar_weekstart)->setHour(0)->setMinute(0)->setSecond(0);
     $current = clone $date;
 
-    $w = 0;
     while($current->compare($end) < 0) {
       if ($current->compareWeekday($this->calendar_weekstart) == 0) {
         $nb_events=0;
-        $end_week_time = $current->getTimestamp() + ((6 * 24 + $this->calendar_last_hour) * 3600);
+        $end_week_time = clone $current;
+        $end_week_time->addDay(6);
 
-        for($s=$current->getTimestamp();$s<=$end_week_time;$s+=86400){
+        for($s=$current->getTimestamp();$s<=$end_week_time->getTimestamp();$s+=86400){
           $nb_events = max($nb_events, sizeof($this->updated[$s])); // max events per day
         }
 
@@ -5827,23 +5827,20 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
 
         // Draw current week events
         $day=0;
-        $this_w = clone $current;
-        $end_week_time = clone $current;
-        $end_week_time->addDay(6);
-
-        for($s=$this_w->getTimestamp();$s<=$end_week_time->getTimestamp();$s+=86400){
+        for($s=$current->getTimestamp();$s<=$end_week_time->getTimestamp();$s+=86400){
+          $pending = $this->_get_pending_multi_days_events($s);
+          if ($pending) {
+            $this->addEvents($pending, $day, $end_week_time->getTimestamp()+86400);
+          }
           if(is_array($this->updated[$s])){
-            $this->addEvents($this->updated[$s], $day);
+            $this->addEvents($this->updated[$s], $day, $end_week_time->getTimestamp()+86400);
           }
           $day++;
         }
-        $w++;
-
       }
 
       $current->addDay(1);
     }
-
 
   }
 
@@ -5851,7 +5848,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
   /**
    * add an event
    */
-  function addEvents($occurrences, $day){
+  function addEvents($occurrences, $day, $ts_start_next_week){
     global $l_private, $obm;
     $cur = 0;
 
@@ -5863,7 +5860,6 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
       $entity = $this->calendar_entity[$occurrence->entity][$id];
       $class = $this->class[$entity["class"]];
       $attendee = $occurrence->event->attendee;
-
 
       $icons = array();
       if($event->isPrivate()) {
@@ -5910,17 +5906,25 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
 
       if ($this->is_multi_days_event($occurrence)) {
         $begin = clone $occurrence->date;
-        while($begin->compare($occurrence->end) < 0) {
+        if (!is_array($this->usedPosition[$begin->getDay()])) {
+          $this->usedPosition[$begin->getDay()] = array();
+        }
+        array_push($this->usedPosition[$begin->getDay()], $cur);
+        $begin->addDay(1);
+        while(($begin->compare($occurrence->end) < 0) && ($begin->getTimeStamp() < $ts_start_next_week)) {
           $x1 +=$this->col_width;
-          $begin->addDay(1);
           if (!is_array($this->usedPosition[$begin->getDay()])) {
             $this->usedPosition[$begin->getDay()] = array();
           }
           array_push($this->usedPosition[$begin->getDay()], $cur);
+          $begin->addDay(1);
+        }
+        if ($occurrence->end->getTimestamp()>$ts_start_next_week) {
+          $pending_event = clone $occurrence;
+          $pending_event->date->set($ts_start_next_week,Of_Date::TIMESTAMP);
+          $this->_add_pending_multi_days_event($pending_event,$ts_start_next_week);
         }
       }
-
-
 
       if ($occurrence->entity_state == "NEEDS-ACTION") {
         $this->page->setAlpha($this->waiting_alpha);
@@ -5953,13 +5957,26 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
     $day_begin = $occurrence->date;
     $day_end = $occurrence->end;
     if ($day_begin->getDay() != $day_end->getDay() 
-      && $day_end->get(Of_Date::TIME_SHORT) != "00:00") {
+      && ($day_end->get(Of_Date::TIME_SHORT) != "00:00" || $occurrence->event->isAllDay())) {
       return true;
     }
 
     return false;
   }
 
+  private function _add_pending_multi_days_event($occurence,$day) {
+    if (!is_array($this->pending_multi_days))
+      $this->pending_multi_days = array();
+    if (!is_array($this->pending_multi_days[$day]))
+      $this->pending_multi_days[$day] = array();
+    $this->pending_multi_days[$day][] = $occurence;
+  }
+
+  private function _get_pending_multi_days_events($day) {
+    if (is_array($this->pending_multi_days) && is_array($this->pending_multi_days[$day]))
+      return $this->pending_multi_days[$day];
+    return false;
+  }
 }
 
 
@@ -6011,6 +6028,13 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
       $end->addDay(7);
       $this->display_date = $begin->localize(Of_Date::OBM_DATE_WEEK).' - '
         .$end->subDay(1)->localize(Of_Date::OBM_DATE_WEEK);
+
+      foreach ($this->updated as $col_date => $column) {
+        if ($col_date < $begin->getTimestamp()) {
+          $this->updated[$begin->getTimestamp()] = array_merge($this->updated[$begin->getTimestamp()], $column);
+          unset($this->updated[$col_date]);
+        }
+      }
     } else { 
       $end = clone $date;
       $end->addDay(1);
@@ -6077,7 +6101,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
       $this->page->drawText($this_date_l, $this->calendar_x0+$this->day_x+10, $this->calendar_y1+2, 'UTF-8');
 
       // draw events
-      $this->addEvents($column);
+      $this->addEvents($column, $date);
       $this->day_x+=$this->col_width;
 
       if ($this->onedayperpage && sizeof($this->pdf->pages)<sizeof($this->updated)) {
@@ -6153,7 +6177,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
   /**
    * add an event to the PDF
    */
-  function addEvents($events) {
+  function addEvents($events, $column_ts) {
     global $l_private, $obm;
 
     foreach($events as $event){
@@ -6206,7 +6230,9 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
       if ($all_day || $this->isOutOfTimeInterval($event)) {
         $x0 = $this->calendar_x0+$this->day_x;
 
-        $curday = $event->date->getDay();
+        $curdate = clone $event->date;
+        $curdate->set($column_ts,Of_date::TIMESTAMP);
+        $curday = $curdate->getDay();
         if (is_array($this->usedPosition[$curday])) {
           while (in_array($this->current_out_event, $this->usedPosition[$curday])) {
             $this->current_out_event++;
@@ -6222,7 +6248,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         // event width on multiple days
         // only if next days are displayed
         if (!$this->onedayperpage){
-         $begin = clone $event->date;
+         $begin = clone $curdate;
          while($begin->compare($event->end) < 0) {
            $begin->addDay(1)->setHour(0)->setMinute(0)->setSecond(0);
            if (array_key_exists($begin->getTimestamp(), $this->updated)) {
