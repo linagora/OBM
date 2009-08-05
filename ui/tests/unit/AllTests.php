@@ -24,16 +24,16 @@ require_once 'AclTest.php';
 require_once 'VpdiTest.php';
 require_once 'EventTest.php';
 require_once 'EventMailObserverTest.php';
-require_once 'ReportTest.php';
-require_once 'UserReportCommandTest.php';
-require_once 'ReportSenderTest.php';
+//require_once 'ReportTest.php';
+//require_once 'UserReportCommandTest.php';
+//require_once 'ReportSenderTest.php';
  
 class AllTests {
   public static function suite() {
     $suite = new PHPUnit_Framework_TestSuite('OBM');
-    $suite->addTestSuite('UserReportCommandTest');
-    $suite->addTestSuite('ReportTest');
-    $suite->addTestSuite('ReportSenderTest');
+    //$suite->addTestSuite('UserReportCommandTest');
+    //$suite->addTestSuite('ReportTest');
+    //$suite->addTestSuite('ReportSenderTest');
     $suite->addTestSuite('AclTest');
     $suite->addTestSuite('VpdiTest');
     $suite->addTestSuite('EventTest');

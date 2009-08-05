@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../tests/TestsHelper.php';
+require_once dirname(__FILE__) . '/../../test/TestsHelper.php';
 
 require_once 'mime/mime.php';
 require_once 'mime/entity.php';
@@ -10,14 +10,14 @@ require_once 'mail.php';
 
 require_once dirname(__FILE__).'/files/dummy_transport.php';
 
-class Stato_MailTest extends PHPUnit_Framework_TestCase
+class SMailTest extends PHPUnit_Framework_TestCase
 {
     public function setup()
     {
         $this->date = new DateTime('2009-02-13 15:47:25', new DateTimeZone('Europe/Paris'));
     }
     
-    public function testSimpleMessage()
+    public function test_simple_message()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -30,23 +30,23 @@ Content-Transfer-Encoding: 8bit
 
 test
 EOT;
-        $mail = new Stato_Mail($this->date);
-        $mail->setFrom('foo.bar@dummy.com', 'Foo Bar');
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->setSubject('Stop these useless meetings...');
-        $mail->setText('test');
+        $mail = new SMail($this->date);
+        $mail->set_from('foo.bar@dummy.com', 'Foo Bar');
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $mail->set_subject('Stop these useless meetings...');
+        $mail->set_text('test');
         $this->assertEquals($message, (string) $mail);
     }
     
-    public function testMessageWithoutAContentShouldThrow()
+    public function test_message_without_a_content_should_throw()
     {
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $this->setExpectedException('Stato_MailException', 'No body specified');
-        $mail->getContent();
+        $mail = new SMail($this->date);
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $this->setExpectedException('SMailException', 'No body specified');
+        $mail->get_content();
     }
     
-    public function testRecipients()
+    public function test_recipients()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -61,40 +61,40 @@ Content-Transfer-Encoding: 8bit
 
 test
 EOT;
-        $mail = new Stato_Mail($this->date);
-        $mail->setFrom('foo.bar@dummy.com', 'Foo Bar');
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->addCc('jane.doe@fake.net');
-        $mail->addCc('not.real@ofcourse.net', 'Raphaël Rougeron'); // is the above encoded name correct ? not sure...
-        $mail->addBcc('bureaucratic.director@bigbrother.com');
-        $mail->setSubject('Stop these useless meetings...');
-        $mail->setText('test');
+        $mail = new SMail($this->date);
+        $mail->set_from('foo.bar@dummy.com', 'Foo Bar');
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $mail->add_cc('jane.doe@fake.net');
+        $mail->add_cc('not.real@ofcourse.net', 'Raphaël Rougeron'); // is the above encoded name correct ? not sure...
+        $mail->add_bcc('bureaucratic.director@bigbrother.com');
+        $mail->set_subject('Stop these useless meetings...');
+        $mail->set_text('test');
         $this->assertEquals($message, (string) $mail);
     }
     
-    public function testGetHeaderValue()
+    public function test_get_header_value()
     {
-        $mail = new Stato_Mail($this->date);
-        $mail->setFrom('foo.bar@dummy.com', 'Foo Bar');
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->addCc('jane.doe@fake.net');
-        $mail->addCc('not.real@ofcourse.net', 'Raphael Rougeron');
-        $mail->setSubject('Stop these useless meetings...');
-        $this->assertEquals('John Doe <john.doe@fake.net>', $mail->getTo());
-        $this->assertEquals('Foo Bar <foo.bar@dummy.com>', $mail->getFrom());
-        $this->assertEquals('jane.doe@fake.net, Raphael Rougeron <not.real@ofcourse.net>', $mail->getCc());
-        $this->assertEquals('', $mail->getBcc());
-        $this->assertEquals('Stop these useless meetings...', $mail->getSubject());
+        $mail = new SMail($this->date);
+        $mail->set_from('foo.bar@dummy.com', 'Foo Bar');
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $mail->add_cc('jane.doe@fake.net');
+        $mail->add_cc('not.real@ofcourse.net', 'Raphael Rougeron');
+        $mail->set_subject('Stop these useless meetings...');
+        $this->assertEquals('John Doe <john.doe@fake.net>', $mail->get_to());
+        $this->assertEquals('Foo Bar <foo.bar@dummy.com>', $mail->get_from());
+        $this->assertEquals('jane.doe@fake.net, Raphael Rougeron <not.real@ofcourse.net>', $mail->get_cc());
+        $this->assertEquals('', $mail->get_bcc());
+        $this->assertEquals('Stop these useless meetings...', $mail->get_subject());
     }
     
-    public function testMessageWithoutAToShouldThrow()
+    public function test_message_without_a_to_should_throw()
     {
-        $mail = new Stato_Mail($this->date);
-        $this->setExpectedException('Stato_MailException', 'To: recipient is not specified');
-        $mail->getTo();
+        $mail = new SMail($this->date);
+        $this->setExpectedException('SMailException', 'To: recipient is not specified');
+        $mail->get_to();
     }
     
-    public function testHtmlMessage()
+    public function test_html_message()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -106,14 +106,14 @@ Content-Transfer-Encoding: 8bit
 
 <b>test</b>
 EOT;
-        $mail = new Stato_Mail($this->date);
-        $mail->setFrom('foo.bar@dummy.com', 'Foo Bar');
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->setHtmlText('<b>test</b>');
+        $mail = new SMail($this->date);
+        $mail->set_from('foo.bar@dummy.com', 'Foo Bar');
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $mail->set_html_text('<b>test</b>');
         $this->assertEquals($message, (string) $mail);
     }
     
-    public function testAutomaticMultipartMessage()
+    public function test_automatic_multipart_message()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -134,15 +134,15 @@ Content-Transfer-Encoding: 8bit
 <b>test</b>
 --c67476988f320ca04d61815bcfd14360--
 EOT;
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->setText('test');
-        $mail->setHtmlText('<b>test</b>');
-        $mail->setBoundary('c67476988f320ca04d61815bcfd14360');
+        $mail = new SMail($this->date);
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $mail->set_text('test');
+        $mail->set_html_text('<b>test</b>');
+        $mail->set_boundary('c67476988f320ca04d61815bcfd14360');
         $this->assertEquals($message, (string) $mail);
     }
     
-    public function testAddPart()
+    public function test_add_part()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -176,15 +176,15 @@ END:VEVENT
 END:VCALENDAR
 --c67476988f320ca04d61815bcfd14360--
 EOT;
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->setText('test');
-        $mail->addPart(fopen(dirname(__FILE__).'/files/dummy.ics', 'r'), 'text/calendar', 'quoted-printable');
-        $mail->setBoundary('c67476988f320ca04d61815bcfd14360');
+        $mail = new SMail($this->date);
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $mail->set_text('test');
+        $mail->add_part(fopen(dirname(__FILE__).'/files/dummy.ics', 'r'), 'text/calendar', 'quoted-printable');
+        $mail->set_boundary('c67476988f320ca04d61815bcfd14360');
         $this->assertEquals($message, (string) $mail);
     }
     
-    public function testAddAttachment()
+    public function test_add_attachment()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -210,15 +210,15 @@ WcQJEPRaA9qNDqxuS12Ks8bboTb3tSQpRC+e34ckKf9k/0z2U5WS04y3f1Gr1jEZi8Oca3rk
 B3WXTGfs7Y8kAAAAAElFTkSuQmCC
 --c67476988f320ca04d61815bcfd14360--
 EOT;
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->setText('test');
-        $mail->addAttachment(file_get_contents(dirname(__FILE__).'/files/image.png'), 'hello.png', 'image/png');
-        $mail->setBoundary('c67476988f320ca04d61815bcfd14360');
+        $mail = new SMail($this->date);
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $mail->set_text('test');
+        $mail->add_attachment(file_get_contents(dirname(__FILE__).'/files/image.png'), 'hello.png', 'image/png');
+        $mail->set_boundary('c67476988f320ca04d61815bcfd14360');
         $this->assertEquals($message, (string) $mail);
     }
     
-    public function testAddAttachmentToMultipartMessage()
+    public function test_add_attachment_to_multipart_message()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -254,19 +254,19 @@ WcQJEPRaA9qNDqxuS12Ks8bboTb3tSQpRC+e34ckKf9k/0z2U5WS04y3f1Gr1jEZi8Oca3rk
 B3WXTGfs7Y8kAAAAAElFTkSuQmCC
 --c67476988f320ca04d61815bcfd14361--
 EOT;
-        $mp = new Stato_MimeMultipart();
-        $mp->setBoundary('c67476988f320ca04d61815bcfd14360');
-        $mp->addPart(new Stato_MimePart('test'));
-        $mp->addPart(new Stato_MimePart('<b>test</b>', 'text/html'));
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->setContent($mp);
-        $mail->addAttachment(file_get_contents(dirname(__FILE__).'/files/image.png'), 'hello.png', 'image/png');
-        $mail->setBoundary('c67476988f320ca04d61815bcfd14361');
+        $mp = new SMimeMultipart();
+        $mp->set_boundary('c67476988f320ca04d61815bcfd14360');
+        $mp->add_part(new SMimePart('test'));
+        $mp->add_part(new SMimePart('<b>test</b>', 'text/html'));
+        $mail = new SMail($this->date);
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $mail->set_content($mp);
+        $mail->add_attachment(file_get_contents(dirname(__FILE__).'/files/image.png'), 'hello.png', 'image/png');
+        $mail->set_boundary('c67476988f320ca04d61815bcfd14361');
         $this->assertEquals($message, (string) $mail);
     }
     
-    public function testAddEmbeddedImage()
+    public function test_add_embedded_image()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -292,15 +292,15 @@ WcQJEPRaA9qNDqxuS12Ks8bboTb3tSQpRC+e34ckKf9k/0z2U5WS04y3f1Gr1jEZi8Oca3rk
 B3WXTGfs7Y8kAAAAAElFTkSuQmCC
 --c67476988f320ca04d61815bcfd14360--
 EOT;
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->setText('test');
-        $mail->addEmbeddedImage(file_get_contents(dirname(__FILE__).'/files/image.png'), 'hello', 'hello.png', 'image/png');
-        $mail->setBoundary('c67476988f320ca04d61815bcfd14360');
+        $mail = new SMail($this->date);
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $mail->set_text('test');
+        $mail->add_embedded_image(file_get_contents(dirname(__FILE__).'/files/image.png'), 'hello', 'hello.png', 'image/png');
+        $mail->set_boundary('c67476988f320ca04d61815bcfd14360');
         $this->assertEquals($message, (string) $mail);
     }
     
-    public function testSend()
+    public function test_send()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -311,9 +311,9 @@ Content-Transfer-Encoding: 8bit
 
 test
 EOT;
-        $mail = new Stato_Mail($this->date);
-        $mail->addTo('john.doe@fake.net', 'John Doe');
-        $mail->setText('test');
-        $this->assertEquals($message, $mail->send(new Stato_DummyTransport()));
+        $mail = new SMail($this->date);
+        $mail->add_to('john.doe@fake.net', 'John Doe');
+        $mail->set_text('test');
+        $this->assertEquals($message, $mail->send(new SDummyTransport()));
     }
 }

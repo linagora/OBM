@@ -24,6 +24,7 @@ require_once 'php/calendar/event_observer.php';
 require_once 'php/calendar/calendar_mailer.php';
 require_once 'php/calendar/event_observer.php';
 require_once 'of_date.inc';
+require_once 'of_acl.php';
 require_once 'obmlib.inc';
 
 class EventMailObserverTest extends OBM_Database_TestCase {
@@ -54,7 +55,7 @@ class EventMailObserverTest extends OBM_Database_TestCase {
     $GLOBALS['obm']['uid'] = 3;
     $this->mailObserver = new OBM_EventMailObserver();
     OBM_EventFactory::getInstance()->attach($this->mailObserver);
-    Stato_Mailer::setDefaultTransport(new Stato_StaticTransport());
+    SMailer::set_default_transport(new Stato_StaticTransport());
     OBM_Acl::initialize();
   }
 
@@ -259,7 +260,7 @@ auteur : domainezz.com Admin
 
   }
 
-  public function testModifyPartStatMail() {
+  public function testModifyParticipationStateMail() {
     $event = OBM_EventFactory::getInstance()->getById(1);
     $users = $event->get('user');
     $resources = $event->get('resource');
@@ -271,26 +272,26 @@ auteur : domainezz.com Admin
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Participation updated on OBM: Title',$mailData[0]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[0]['to']);
-    $this->assertContains("NEEDS-ACTION",$mailData[0]['content']);  
+    $this->assertContains("NEEDS-ACTION",$mailData[0]['content']);
 
-    $user->set('state', 'DELINED');
+    $user->set('state', 'DECLINED');
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Participation updated on OBM: Title',$mailData[1]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[1]['to']);
-    $this->assertContains("DELINED",$mailData[1]['content']);  
+    $this->assertContains("DECLINED",$mailData[1]['content']);  
 
     $user->set('state', 'ACCEPTED');
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertNull($mailData[2]);
 
-    $res->set('state', 'DELINED');
+    $res->set('state', 'DECLINED');
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
     $mailData = Stato_StaticTransport::getMailQ();
     $this->assertEquals('Resource participation updated on OBM: Title',$mailData[2]['subject']);
     $this->assertEquals("domainezz.com Admin <admin1@zz.com>", $mailData[2]['to']);
-    $this->assertContains("DELINED",$mailData[2]['content']);  
+    $this->assertContains("DECLINED",$mailData[2]['content']);  
 
     $res->set('state', 'NEEDS-ACTION');
     OBM_EventFactory::getInstance()->store($event,OBM_EventFactory::getInstance()->getById(1));
@@ -307,7 +308,7 @@ auteur : domainezz.com Admin
 
 }
 
-class Stato_StaticTransport implements Stato_IMailTransport {
+class Stato_StaticTransport implements SIMailTransport {
 
   private static $mailQ;
 
@@ -315,8 +316,8 @@ class Stato_StaticTransport implements Stato_IMailTransport {
     self::$mailQ = array();
   }
 
-  public function send(Stato_Mail $mail) {
-    self::$mailQ[] = array('to' => $mail->getTo(), 'subject' => $mail->getSubject(), 'content' => $mail->getContent());
+  public function send(SMail $mail) {
+    self::$mailQ[] = array('to' => $mail->get_to(), 'subject' => $mail->get_subject(), 'content' => $mail->get_content());
   }
 
   public static function getMailQ() {

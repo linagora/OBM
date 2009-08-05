@@ -5,36 +5,35 @@
  * 
  * This class allows you to send emails using templates :
  * <code>
- * Stato_Mailer::setTemplateRoot('/path/to/msg/templates');
+ * SMailer::set_template_root('/path/to/msg/templates');
  * 
- * class UserMailer extends Stato_Mailer
+ * class UserMailer extends SMailer
  * {
- *     public function welcomeEmail($user) {
- *         $mail = new Stato_Mail();
- *         $mail->setTo($user->email_address);
- *         $mail->setBody($this->renderMessage('welcome', array('username' => $user->name)));
+ *     public function welcome_email($user) {
+ *         $this->to = $user->email_address;
+ *         $this->body = array('username' => $user->name);
  *     }
  * }
  * </code>
- * In the mail defined above, the template at /path/to/msg/templates/welcome.php 
+ * In the mail defined above, the template at /path/to/msg/templates/welcome_email.php 
  * would be used to render the mail body. Parameters passed as second argument 
  * would be available as variables in the template :
  * <code>
  * Hello <?php echo $username; ?>
  * </code>
  * 
- * By default, mails are sent with the Stato_SendmailTransport class which 
+ * By default, mails are sent with the SSendmailTransport class which 
  * uses mail() PHP function, but you can use another transport implementing 
- * the Stato_IMailTransport interface :
+ * the SIMailTransport interface :
  * <code>
- * $transport = new Stato_SmtpTransport();
- * Stato_Mailer::setDefaultTransport($transport);
+ * $transport = new SSmtpTransport();
+ * SMailer::set_default_transport($transport);
  * </code>
  *
  * @package Stato
  * @subpackage mailer
  */
-class Stato_Mailer
+class SMailer
 {
     protected $recipients;
     protected $from;
@@ -44,29 +43,29 @@ class Stato_Mailer
     protected $parts;
     protected $attachments;
     
-    protected static $templateRoot;
+    protected static $template_root;
     protected static $transport;
     
-    protected static $partDefaults = array(
+    protected static $part_defaults = array(
         'content' => null,
         'content_type' => 'text/plain',
         'encoding' => '8bit',
         'charset' => 'UTF-8'
     );
     
-    protected static $attachmentDefaults = array(
+    protected static $attachment_defaults = array(
         'content' => null,
         'content_type' => 'application/octet-stream',
         'encoding' => 'base64',
         'filename' => null
     );
     
-    public static function setTemplateRoot($path)
+    public static function set_template_root($path)
     {
-        self::$templateRoot = $path;
+        self::$template_root = $path;
     }
     
-    public static function setDefaultTransport(Stato_IMailTransport $transport)
+    public static function set_default_transport(SIMailTransport $transport)
     {
         self::$transport = $transport;
     }
@@ -76,65 +75,68 @@ class Stato_Mailer
         $this->reset();
     }
     
-    public function __call($methodName, $args)
+    public function __call($method_name, $args)
     {
-        if (preg_match('/^send([a-zA-Z0-9_]*)$/', $methodName, $m))
+        if (preg_match('/^send([a-zA-Z0-9_]*)$/', $method_name, $m))
             return $this->send($m[1], $args);
-        elseif (preg_match('/^prepare([a-zA-Z0-9_]*)$/', $methodName, $m))
+        elseif (preg_match('/^prepare([a-zA-Z0-9_]*)$/', $method_name, $m))
             return $this->prepare($m[1], $args);
         
-        throw new Stato_MailException(get_class($this)."::$methodName() method does not exist");
+        throw new SMailException(get_class($this)."::$method_name() method does not exist");
     }
     
-    public function prepare($methodName, $args)
+    public function prepare($method_name, $args)
     {
-        if (!method_exists($this, $methodName))
-            throw new Stato_MailException(get_class($this)."::$methodName() method does not exist");
+        if (strpos($method_name, '_') === 0)
+            $method_name = substr($method_name, 1);
         
-        $mail = call_user_func_array(array($this, $methodName), $args);
-        if (!($mail instanceof Stato_Mail)) $mail = $this->create($methodName, $args);
+        if (!method_exists($this, $method_name))
+            throw new SMailException(get_class($this)."::$method_name() method does not exist");
+        
+        $mail = call_user_func_array(array($this, $method_name), $args);
+        if (!($mail instanceof SMail)) $mail = $this->create($method_name, $args);
         return $mail;
     }
     
-    public function send($methodName, $args)
+    public function send($method_name, $args)
     {
-        $mail = $this->prepare($methodName, $args);
-        return $mail->send($this->getTransport());
+        $mail = $this->prepare($method_name, $args);
+        return $mail->send($this->get_transport());
     }
     
-    protected function create($methodName, $args)
+    protected function create($method_name, $args)
     {
-        $mail = new Stato_Mail($this->date);
+        $mail = new SMail($this->date);
         
-        if (is_array($this->from)) $mail->setFrom($this->from[0], $this->from[1]);
-        else $mail->setFrom($this->from);
+        if (is_array($this->from)) $mail->set_from($this->from[0], $this->from[1]);
+        else $mail->set_from($this->from);
         
         if (!is_array($this->recipients)) $this->recipients = array($this->recipients);
         foreach ($this->recipients as $to) {
-            if (is_array($to)) $mail->addTo($to[0], $to[1]);
-            else $mail->addTo($to);
+            if (is_array($to)) $mail->add_to($to[0], $to[1]);
+            else $mail->add_to($to);
         }
         
-        $mail->setSubject($this->subject);
+        $mail->set_subject($this->subject);
         
         if (is_array($this->body)) {
-            $template = $this->getTemplateName($methodName);
-            if (file_exists($this->getTemplatePath($template.'.plain')))
-                $mail->setText($this->render($template.'.plain', $this->body));
-            if (file_exists($this->getTemplatePath($template.'.html')))
-                $mail->setHtmlText($this->render($template.'.html', $this->body));
-        } else {
-            $mail->setText($this->body);
+            $template = $this->get_template_name($method_name);
+            if (file_exists($this->get_template_path($template.'.plain')))
+                $mail->set_text($this->render($template.'.plain', $this->body));
+            if (file_exists($this->get_template_path($template.'.html')))
+                $mail->set_html_text($this->render($template.'.html', $this->body));
+        } elseif (is_string($this->body) && !empty($this->body)) {
+            $mail->set_text($this->body);
         }
         
         foreach ($this->parts as $p) {
-            $p = array_merge(self::$partDefaults, $p);
-            $mail->addPart($p['content'], $p['content_type'], $p['encoding'], $p['charset']);
+            $p = array_merge(self::$part_defaults, $p);
+            $mail->add_part($p['content'], $p['content_type'], $p['encoding'], $p['charset']);
         }
         
         foreach ($this->attachments as $a) {
-            $a = array_merge(self::$attachmentDefaults, $a);
-            $mail->addAttachment($a['content'], $a['filename'], $a['content_type'], $a['encoding']);
+            $a = array_merge(self::$attachment_defaults, $a);
+            $mail->add_attachment($a['content'], $a['filename'], $a['content_type'], $a['encoding']);
         }
         
         $this->reset();
@@ -142,10 +144,10 @@ class Stato_Mailer
         return $mail;
     }
     
-    protected function getTemplateName($methodName)
+    protected function get_template_name($method_name)
     {
         return strtolower(preg_replace('/([a-z\d])([A-Z])/', '\1_\2', 
-                          preg_replace('/([A-Z]+)([A-Z][a-z])/', '\1_\2', $methodName)));
+                          preg_replace('/([A-Z]+)([A-Z][a-z])/', '\1_\2', $method_name)));
     }
     
     /**
@@ -157,16 +159,16 @@ class Stato_Mailer
      * @param array $locals 
      * @return string
      */
-    protected function render($templateName, $locals = array())
+    protected function render($template_name, $locals = array())
     {
-        $templatePath = $this->getTemplatePath($templateName);
+        $template_path = $this->get_template_path($template_name);
         
-        if (!file_exists($templatePath) || !is_readable($templatePath))
-            throw new Stato_MailException("Missing template $templatePath");
+        if (!file_exists($template_path) || !is_readable($template_path))
+            throw new SMailException("Missing template $template_path");
             
         extract($locals);
         ob_start();
-        include $templatePath;
+        include $template_path;
         return ob_get_clean();
     }
     
@@ -176,21 +178,21 @@ class Stato_Mailer
      * @param string $templateName
      * @return string
      */
-    protected function getTemplatePath($templateName)
+    protected function get_template_path($template_name)
     {
-        if (file_exists($templateName)) return $templateName;
+        if (file_exists($template_name)) return $template_name;
         
-        if (!isset(self::$templateRoot))
-            throw new Stato_MailException('Template root not set');
+        if (!isset(self::$template_root))
+            throw new SMailException('Template root not set');
             
-        $templatePath = self::$templateRoot.'/'.$templateName.'.php';
+        $template_path = self::$template_root.'/'.$template_name.'.php';
             
-        return $templatePath;
+        return $template_path;
     }
     
-    protected function getTransport()
+    protected function get_transport()
     {
-        return (isset(self::$transport)) ? self::$transport : new Stato_SendmailTransport();
+        return (isset(self::$transport)) ? self::$transport : new SSendmailTransport();
     }
     
     protected function reset()

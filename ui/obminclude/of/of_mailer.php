@@ -31,7 +31,7 @@ require(dirname(__FILE__).'/../lib/Stato/i18n/i18n.php');
  * @author Raphaël Rougeron <raphael.rougeron@aliasource.fr> 
  * @license GPL 2.0
  */
-class OBM_Mailer extends Stato_Mailer {
+class OBM_Mailer extends SMailer {
   protected $locale;
   
   protected $host;
@@ -47,9 +47,9 @@ class OBM_Mailer extends Stato_Mailer {
     $this->userId = $GLOBALS['obm']['uid'];
     // to move somewhere else...
     mb_internal_encoding("UTF-8");
-    Stato_I18n::setLocale($this->locale);
-    Stato_I18n::addDataPath(dirname(__FILE__).'/../../locale');
-    self::setTemplateRoot(dirname(__FILE__).'/../../views/mail');
+    SI18n::set_locale($this->locale);
+    SI18n::add_data_path(dirname(__FILE__).'/../../locale');
+    self::set_template_root(dirname(__FILE__).'/../../views/mail');
     $this->userInfo = get_user_info();
   }
   
@@ -57,22 +57,22 @@ class OBM_Mailer extends Stato_Mailer {
    * If the mail server is not properly configured and mails cannot be sent,
    * Stato will throw an exception, but we prefer to fail silently
    */
-  public function send($methodName, $args) {
+  public function send($method_name, $args) {
     try {
-      return parent::send($methodName, $args);
+      return parent::send($method_name, $args);
     } catch (Exception $e) {
       return false;
     }
   }
   
-  protected function getTemplatePath($templateName) {
-    $possiblePaths = array(
-      dirname(__FILE__)."/../../conf/views/mail/$module/$_SESSION[set_lang]/$templateName.pdf",
-      self::$templateRoot."/{$this->module}/{$this->locale}/$templateName.php",
-      dirname(__FILE__)."/../../conf/views/mail$module/fr/$templateName.pdf",
-      self::$templateRoot."/{$this->module}/fr/$templateName.php"
+  protected function get_template_path($template_name) {
+    $possible_paths = array(
+      dirname(__FILE__)."/../../conf/views/mail/$module/{$this->locale}/$template_name.php",
+      self::$template_root."/{$this->module}/{$this->locale}/$template_name.php",
+      dirname(__FILE__)."/../../conf/views/mail/$module/fr/$template_name.php",
+      self::$template_root."/{$this->module}/fr/$template_name.php"
     );
-    foreach ($possiblePaths as $path) {
+    foreach ($possible_paths as $path) {
       if (file_exists($path) && is_readable($path)) {
         return $path;
       }

@@ -1,49 +1,49 @@
 <?php
 
-class Stato_MimePart extends Stato_MimeEntity
+class SMimePart extends SMimeEntity
 {
-    public function __construct($content = '', $contentType = 'text/plain', $encoding = '8bit', $charset = 'UTF-8')
+    public function __construct($content = '', $content_type = 'text/plain', $encoding = '8bit', $charset = 'UTF-8')
     {
         parent::__construct();
         $this->content = $content;
         $this->charset = $charset;
-        $this->setContentType($contentType, array('charset' => $charset));
-        $this->setEncoding($encoding);
+        $this->set_content_type($content_type, array('charset' => $charset));
+        $this->set_encoding($encoding);
     }
     
     public function __toString()
     {
-        return $this->getAllHeaderLines()
-        .$this->eol.$this->eol.$this->getContent();
+        return $this->get_all_header_lines()
+        .$this->eol.$this->eol.$this->get_content();
     }
     
-    public function getContent()
+    public function get_content()
     {
-        return Stato_Mime::encode($this->content, $this->getEncoding(), $this->lineLength, $this->eol);
+        return SMime::encode($this->content, $this->get_encoding(), $this->line_length, $this->eol);
     }
     
-    public function setContent($content, $contentType = 'text/plain')
+    public function set_content($content, $content_type = 'text/plain')
     {
         $this->content = $content;
-        $this->setContentType($contentType);
+        $this->set_content_type($content_type);
     }
     
-    public function setContentType($contentType, $options = array())
+    public function set_content_type($content_type, $options = array())
     {
-        $value = $contentType;
+        $value = $content_type;
         foreach ($options as $k => $v) {
             if ($v !== null) $value.= "; $k=\"$v\"";
         }
-        $this->setHeader('Content-Type', $value, false);
+        $this->set_header('Content-Type', $value, false);
     }
     
-    public function setEncoding($encoding)
+    public function set_encoding($encoding)
     {
-        $this->setHeader('Content-Transfer-Encoding', $encoding);
+        $this->set_header('Content-Transfer-Encoding', $encoding);
     }
     
-    public function getEncoding()
+    public function get_encoding()
     {
-        return $this->getHeader('Content-Transfer-Encoding');
+        return $this->get_header('Content-Transfer-Encoding');
     }
 }

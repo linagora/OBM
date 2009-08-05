@@ -1,24 +1,24 @@
 <?php
 
-class Stato_MailException extends Exception {}
+class SMailException extends Exception {}
 
 /**
  * Class representing an email message
  * 
  * 
  * <code>
- * $mail = new Stato_Mail();
+ * $mail = new SMail();
  * $mail->addTo('foo@bar.net');
  * $mail->setText('hello world');
- * $mail->send(new Stato_SendmailTransport());
+ * $mail->send(new SSendmailTransport());
  * </code>
  *
  * @package Stato
  * @subpackage mailer
  */
-class Stato_Mail extends Stato_MimeEntity
+class SMail extends SMimeEntity
 {   
-    protected $mimeVersion = '1.0';
+    protected $mime_version = '1.0';
     
     protected $date;
     
@@ -36,188 +36,188 @@ class Stato_Mail extends Stato_MimeEntity
         $this->date = $date;
         $this->charset = $charset;
         $this->recipients = array();
-        $this->setDefaultHeaders();
+        $this->set_default_headers();
     }
     
-    public function send(Stato_IMailTransport $transport)
+    public function send(SIMailTransport $transport)
     {
         return $transport->send($this);
     }
     
-    public function addTo($adress, $name = null)
+    public function add_to($adress, $name = null)
     {
-        $this->addRecipient('To', $adress, $name);
+        $this->add_recipient('To', $adress, $name);
     }
     
-    public function addCc($adress, $name = null)
+    public function add_cc($adress, $name = null)
     {
-        $this->addRecipient('Cc', $adress, $name);
+        $this->add_recipient('Cc', $adress, $name);
     }
     
-    public function addBcc($adress, $name = null)
+    public function add_bcc($adress, $name = null)
     {
-        $this->addRecipient('Bcc', $adress, $name);
+        $this->add_recipient('Bcc', $adress, $name);
     }
     
-    public function setFrom($adress, $name = null)
+    public function set_from($adress, $name = null)
     {
         $this->from = $adress;
-        $this->addRecipient('From', $adress, $name);
+        $this->add_recipient('From', $adress, $name);
     }
     
-    public function setSubject($text)
+    public function set_subject($text)
     {
-        $this->addHeader('Subject', $text);
+        $this->add_header('Subject', $text);
     }
     
-    public function setText($text, $contentType = 'text/plain')
+    public function set_text($text, $content_type = 'text/plain')
     {
         if ($this->content === null) 
-            $this->setContent(new Stato_MimePart($text, $contentType));
+            $this->set_content(new SMimePart($text, $content_type));
         else 
-            $this->addPart($text, $contentType);
+            $this->add_part($text, $content_type);
     }
     
-    public function setHtmlText($text, $contentType = 'text/html')
+    public function set_html_text($text, $content_type = 'text/html')
     {
-        $this->setText($text, $contentType);
+        $this->set_text($text, $content_type);
     }
     
-    public function addPart($content, $contentType = 'text/plain', $encoding = '8bit', $charset = 'UTF-8')
+    public function add_part($content, $content_type = 'text/plain', $encoding = '8bit', $charset = 'UTF-8')
     {
-        $content = new Stato_MimePart($content, $contentType, $encoding, $charset);
-        if ($this->isMultipart()) 
-            $this->content->addPart($content);
+        $content = new SMimePart($content, $content_type, $encoding, $charset);
+        if ($this->is_multipart()) 
+            $this->content->add_part($content);
         elseif ($this->content === null)
-            $this->setContent($content);
+            $this->set_content($content);
         else 
-            $this->setContent(new Stato_MimeMultipart(Stato_MimeMultipart::ALTERNATIVE, array($this->content, $content)));
+            $this->set_content(new SMimeMultipart(SMimeMultipart::ALTERNATIVE, array($this->content, $content)));
     }
     
-    public function addAttachment($content, $filename = null, $contentType = 'application/octet-stream', $encoding = 'base64')
+    public function add_attachment($content, $filename = null, $content_type = 'application/octet-stream', $encoding = 'base64')
     {
-        $content = new Stato_MimeAttachment($content, $filename, $contentType, $encoding);
-        if ($this->isMultipart() && $this->content->getSubtype() == Stato_MimeMultipart::MIXED)
-            $this->content->addPart($content);
+        $content = new SMimeAttachment($content, $filename, $content_type, $encoding);
+        if ($this->is_multipart() && $this->content->get_subtype() == SMimeMultipart::MIXED)
+            $this->content->add_part($content);
         else 
-            $this->setContent(new Stato_MimeMultipart(Stato_MimeMultipart::MIXED, array($this->content, $content)));
+            $this->set_content(new SMimeMultipart(SMimeMultipart::MIXED, array($this->content, $content)));
     }
     
-    public function addEmbeddedImage($content, $contentId, $filename = null, $contentType = 'application/octet-stream', $encoding = 'base64')
+    public function add_embedded_image($content, $content_id, $filename = null, $content_type = 'application/octet-stream', $encoding = 'base64')
     {
-        $content = new Stato_MimePart($content, $contentType, $encoding);
-        if ($filename !== null) $content->setContentType($contentType, array('name' => $filename));
-        $content->setHeader('Content-ID', '<'.$contentId.'>');
-        if ($this->isMultipart() && $this->content->getSubtype() == Stato_MimeMultipart::RELATED)
-            $this->content->addPart($content);
+        $content = new SMimePart($content, $content_type, $encoding);
+        if ($filename !== null) $content->set_content_type($content_type, array('name' => $filename));
+        $content->set_header('Content-ID', '<'.$content_id.'>');
+        if ($this->is_multipart() && $this->content->get_subtype() == SMimeMultipart::RELATED)
+            $this->content->add_part($content);
         else 
-            $this->setContent(new Stato_MimeMultipart(Stato_MimeMultipart::RELATED, array($this->content, $content)));
+            $this->set_content(new SMimeMultipart(SMimeMultipart::RELATED, array($this->content, $content)));
     }
     
-    public function setContent($content, $contentType = 'text/plain')
+    public function set_content($content, $content_type = 'text/plain')
     {
-        if ($content instanceof Stato_MimePart || $content instanceof Stato_MimeMultipart)
+        if ($content instanceof SMimePart || $content instanceof SMimeMultipart)
             $this->content = $content;
         else
-            $this->content = new Stato_MimePart($content, $contentType);
+            $this->content = new SMimePart($content, $content_type);
     }
     
-    public function setBoundary($boundary)
+    public function set_boundary($boundary)
     {
-        if (!$this->isMultipart())
-            throw new Stato_MailException('This message is not multipart, you can\'t set boundaries');
+        if (!$this->is_multipart())
+            throw new SMailException('This message is not multipart, you can\'t set boundaries');
             
-        $this->content->setBoundary($boundary);
+        $this->content->set_boundary($boundary);
     }
     
-    public function getAllHeaderLines()
+    public function get_all_header_lines()
     {
-        return parent::getAllHeaderLines();
+        return parent::get_all_header_lines();
     }
     
-    public function getMatchingHeaderLines(array $names)
+    public function get_matching_header_lines(array $names)
     {
-        $lines = parent::getMatchingHeaderLines($names);
+        $lines = parent::get_matching_header_lines($names);
         if (is_object($this->content)) 
-            $lines.= $this->eol.$this->content->getMatchingHeaderLines($names);
+            $lines.= $this->eol.$this->content->get_matching_header_lines($names);
         return $lines;
     }
     
-    public function getNonMatchingHeaderLines(array $names)
+    public function get_non_matching_header_lines(array $names)
     {
-        $lines = parent::getNonMatchingHeaderLines($names);
+        $lines = parent::get_non_matching_header_lines($names);
         if (is_object($this->content)) 
-            $lines.= $this->eol.$this->content->getNonMatchingHeaderLines($names);
+            $lines.= $this->eol.$this->content->get_non_matching_header_lines($names);
         return $lines;
     }
     
-    public function getContent()
+    public function get_content()
     {
         if ($this->content === null)
-            throw new Stato_MailException('No body specified');
+            throw new SMailException('No body specified');
         
-        return $this->content->getContent();
+        return $this->content->get_content();
     }
     
-    public function getTo()
+    public function get_to()
     {
         if (!array_key_exists('To', $this->headers))
-            throw new Stato_MailException('To: recipient is not specified');
+            throw new SMailException('To: recipient is not specified');
         
-        return $this->getHeader('To');
+        return $this->get_header('To');
     }
     
-    public function getFrom()
+    public function get_from()
     {
-        return $this->getHeader('From');
+        return $this->get_header('From');
     }
     
-    public function getCc()
+    public function get_cc()
     {
-        return $this->getHeader('Cc');
+        return $this->get_header('Cc');
     }
     
-    public function getBcc()
+    public function get_bcc()
     {
-        return $this->getHeader('Bcc');
+        return $this->get_header('Bcc');
     }
     
-    public function getSubject()
+    public function get_subject()
     {
-        return $this->getHeader('Subject');
+        return $this->get_header('Subject');
     }
     
-    public function getReturnPath()
+    public function get_return_path()
     {
         return $this->from;
     }
     
-    public function getRecipients()
+    public function get_recipients()
     {
         return $this->recipients;
     }
     
-    public function isMultipart()
+    public function is_multipart()
     {
-        return ($this->content instanceof Stato_MimeMultipart);
+        return ($this->content instanceof SMimeMultipart);
     }
     
-    private function addRecipient($header, $address, $name)
+    private function add_recipient($header, $address, $name)
     {
         $address = strtr($address, "\r\n\t", '???');
         if (!in_array($address, $this->recipients)) $this->recipients[] = $address;
-        if ($name !== null) $address = $this->encodeHeader($name)." <$address>";
-        $this->addHeader($header, $address, false);
+        if ($name !== null) $address = $this->encode_header($name)." <$address>";
+        $this->add_header($header, $address, false);
     }
     
-    private function setDefaultHeaders()
+    private function set_default_headers()
     {
         $this->headers['Date'] = $this->date->format(DateTime::RFC822);
-        $this->headers['MIME-Version'] = $this->mimeVersion;
+        $this->headers['MIME-Version'] = $this->mime_version;
     }
 }
 
-interface Stato_IMailTransport
+interface SIMailTransport
 {
-    public function send(Stato_Mail $mail);
+    public function send(SMail $mail);
 }

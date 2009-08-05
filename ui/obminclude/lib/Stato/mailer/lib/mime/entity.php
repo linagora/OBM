@@ -1,10 +1,10 @@
 <?php
 
-class Stato_MimeEntity
+class SMimeEntity
 {
     protected $eol = "\n";
     
-    protected $lineLength = 72;
+    protected $line_length = 72;
     
     protected $headers;
     
@@ -21,67 +21,67 @@ class Stato_MimeEntity
     
     public function __toString()
     {
-        return $this->getAllHeaderLines()
-        .$this->eol.$this->eol.$this->getContent();
+        return $this->get_all_header_lines()
+        .$this->eol.$this->eol.$this->get_content();
     }
     
-    public function getContent()
+    public function get_content()
     {
         return $this->content;
     }
     
-    public function getHeader($name, $delimiter = ',')
+    public function get_header($name, $delimiter = ',')
     {
         if (!array_key_exists($name, $this->headers)) return '';
-        return $this->implodeHeaderValue($this->headers[$name], $delimiter);
+        return $this->implode_header_value($this->headers[$name], $delimiter);
     }
     
-    public function setHeader($name, $value, $encode = true)
+    public function set_header($name, $value, $encode = true)
     {
-        if ($encode) $value = $this->encodeHeader($value);
+        if ($encode) $value = $this->encode_header($value);
         $this->headers[$name] = $value;
     }
     
-    public function addHeader($name, $value, $encode = true)
+    public function add_header($name, $value, $encode = true)
     {
-        if ($encode) $value = $this->encodeHeader($value);
+        if ($encode) $value = $this->encode_header($value);
         if (isset($this->headers[$name])) $this->headers[$name][] = $value;
         else $this->headers[$name] = array($value);
     }
     
-    public function getAllHeaderLines()
+    public function get_all_header_lines()
     {
-        return $this->getNonMatchingHeaderLines(array());
+        return $this->get_non_matching_header_lines(array());
     }
     
-    public function getMatchingHeaderLines(array $names)
+    public function get_matching_header_lines(array $names)
     {
         $h = array();
         foreach ($names as $name)
             if (array_key_exists($name, $this->headers))
-                $h[] = "$name: ".$this->getHeader($name);
+                $h[] = "$name: ".$this->get_header($name);
         
         return implode($this->eol, $h);
     }
     
-    public function getNonMatchingHeaderLines(array $names)
+    public function get_non_matching_header_lines(array $names)
     {
         $h = array();
         foreach (array_keys($this->headers) as $name)
             if (!in_array($name, $names))
-                $h[] = "$name: ".$this->getHeader($name);
+                $h[] = "$name: ".$this->get_header($name);
         
         return implode($this->eol, $h);
     }
     
-    protected function implodeHeaderValue($value, $delimiter = ',')
+    protected function implode_header_value($value, $delimiter = ',')
     {
         if (!is_array($value)) return $value;
         if (count($value) == 1) return array_pop($value);
         return implode($delimiter.' ', $value);
     }
     
-    protected function encodeHeader($text)
+    protected function encode_header($text)
     {
         return mb_encode_mimeheader($text, $this->charset, 'Q', $this->eol);
     }

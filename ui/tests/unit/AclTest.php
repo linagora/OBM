@@ -275,11 +275,12 @@ class AclTest extends OBM_Database_TestCase {
   }
   
   private function addCalendar($userId) {
-    $this->pdo->exec('INSERT INTO Entity (entity_mailing) VALUES (TRUE)');
-    $entityId = $this->pdo->lastInsertId();
+    $pdo = $this->getConnection();
+    $pdo->exec('INSERT INTO Entity (entity_mailing) VALUES (TRUE)');
+    $entityId = $pdo->lastInsertId();
     $query = "INSERT INTO CalendarEntity (calendarentity_entity_id, calendarentity_calendar_id)
               SELECT MAX(entity_id), $userId FROM Entity";
-    $this->pdo->exec($query);
+    $pdo->exec($query);
     return $entityId;
   }
 }

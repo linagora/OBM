@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../tests/TestsHelper.php';
+require_once dirname(__FILE__) . '/../../test/TestsHelper.php';
 
 require_once 'mime/mime.php';
 require_once 'mime/entity.php';
@@ -12,44 +12,50 @@ require_once 'mailer.php';
 require_once dirname(__FILE__).'/files/user_mailer.php';
 require_once dirname(__FILE__).'/files/dummy_transport.php';
 
-class Stato_MailerTest extends PHPUnit_Framework_TestCase
+class SMailerTest extends PHPUnit_Framework_TestCase
 {
     public function setup()
     {
-        Stato_Mailer::setTemplateRoot(dirname(__FILE__).'/files');
-        Stato_Mailer::setDefaultTransport(new Stato_DummyTransport());
+        SMailer::set_template_root(dirname(__FILE__).'/files');
+        SMailer::set_default_transport(new SDummyTransport());
         $this->user = new stdClass;
         $this->user->name = 'John Doe';
         $this->user->mail = 'john.doe@fake.net';
         $this->mailer = new UserMailer();
     }
     
-    public function testRenderPlainMessage()
+    public function test_render_plain_message()
+    {
+        $mail = $this->mailer->prepare_welcome_message($this->user);
+        $this->assertEquals('Welcome John Doe', $mail->get_content());
+    }
+    
+    public function test_prepare_with_camelcase_method()
     {
         $mail = $this->mailer->prepareWelcomeMessage($this->user);
-        $this->assertEquals('Welcome John Doe', $mail->getContent());
+        $this->assertEquals('Welcome John Doe', $mail->get_content());
     }
     
-    public function testRenderHtmlMessage()
+    public function test_render_html_message()
     {
-        $mail = $this->mailer->prepareGreetingsMessage($this->user);
-        $this->assertEquals('Greetings <b>John Doe</b>', $mail->getContent());
+        $mail = $this->mailer->prepare_greetings_message($this->user);
+        $this->assertEquals('Greetings <b>John Doe</b>', $mail->get_content());
     }
     
-    public function testRenderMissingTemplateShouldThrow()
+    public function test_render_missing_template_should_throw()
     {
-        $this->setExpectedException('Stato_MailException');
-        $mail = $this->mailer->prepareForgotPasswordMessage($this->user);
+        $this->setExpectedException('SMailException');
+        $mail = $this->mailer->prepare_forgot_password_message($this->user);
     }
     
-    public function testRenderBodyWhenTemplateRootNotSetShouldThrow()
+    public function test_render_body_when_template_root_not_set_should_throw()
     {
-        $this->setExpectedException('Stato_MailException', 'Template root not set');
-        Stato_Mailer::setTemplateRoot(null);
-        $mail = $this->mailer->prepareGreetingsMessage($this->user);
+        $this->setExpectedException('SMailException', 'Template root not set');
+        SMailer::set_template_root(null);
+        $mail = $this->mailer->prepare_greetings_message($this->user);
     }
     
-    public function testSend()
+    public function test_send()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -60,10 +66,10 @@ Content-Transfer-Encoding: 8bit
 
 test
 EOT;
-        $this->assertEquals($message, $this->mailer->sendTestMessage());
+        $this->assertEquals($message, $this->mailer->send_test_message());
     }
     
-    public function testTextShortcuts()
+    public function test_text_shortcuts()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -86,12 +92,12 @@ Content-Transfer-Encoding: 8bit
 Welcome <b>John Doe</b>
 --c67476988f320ca04d61815bcfd14360--
 EOT;
-        $mail = $this->mailer->prepareSignupNotification($this->user);
-        $mail->setBoundary('c67476988f320ca04d61815bcfd14360');
+        $mail = $this->mailer->prepare_signup_notification($this->user);
+        $mail->set_boundary('c67476988f320ca04d61815bcfd14360');
         $this->assertEquals($message, $mail->__toString());
     }
     
-    public function testPartShortcuts()
+    public function test_part_shortcuts()
     {
         $message = <<<EOT
 Date: Fri, 13 Feb 09 15:47:25 +0100
@@ -121,8 +127,8 @@ WcQJEPRaA9qNDqxuS12Ks8bboTb3tSQpRC+e34ckKf9k/0z2U5WS04y3f1Gr1jEZi8Oca3rk
 B3WXTGfs7Y8kAAAAAElFTkSuQmCC
 --c67476988f320ca04d61815bcfd14360--
 EOT;
-        $mail = $this->mailer->prepareContactNotification($this->user);
-        $mail->setBoundary('c67476988f320ca04d61815bcfd14360');
+        $mail = $this->mailer->prepare_contact_notification($this->user);
+        $mail->set_boundary('c67476988f320ca04d61815bcfd14360');
         $this->assertEquals($message, $mail->__toString());
     }
 }

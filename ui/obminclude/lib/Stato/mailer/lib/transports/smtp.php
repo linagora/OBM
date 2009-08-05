@@ -1,8 +1,8 @@
 <?php
 
-class Stato_SmtpTransportException extends Exception {}
+class SSmtpTransportException extends Exception {}
 
-class Stato_SmtpTransport implements Stato_IMailTransport
+class SSmtpTransport implements SIMailTransport
 {
     const EOL = "\r\n";
     
@@ -26,7 +26,7 @@ class Stato_SmtpTransport implements Stato_IMailTransport
     
     private $log;
     
-    private $defaultConfig = array(
+    private $default_config = array(
         'port' => 25,
         'ssl' => false,
         'auth' => false,
@@ -37,7 +37,7 @@ class Stato_SmtpTransport implements Stato_IMailTransport
     
     public function __construct($host, $config = array())
     {
-        $config = array_merge($this->defaultConfig, $config);
+        $config = array_merge($this->default_config, $config);
         $this->host = $host;
         $this->port = $config['port'];
         $this->name = $config['name'];
@@ -48,7 +48,7 @@ class Stato_SmtpTransport implements Stato_IMailTransport
         $this->transport = ($this->ssl) ? 'ssl' : 'tcp';
         
         if (!in_array($config['auth'], array('plain', 'login', 'cram_md5', false)))
-            throw new Stato_SmtpTransportException("Unknown authentication type: {$config['auth']}");
+            throw new SSmtpTransportException("Unknown authentication type: {$config['auth']}");
         
         $this->auth = $config['auth'];
         $this->log = '';
@@ -59,7 +59,7 @@ class Stato_SmtpTransport implements Stato_IMailTransport
         $this->disconnect();
     }
     
-    public function send(Stato_Mail $mail)
+    public function send(SMail $mail)
     {
         if (!isset($this->socket)) {
             $this->connect();
@@ -67,8 +67,8 @@ class Stato_SmtpTransport implements Stato_IMailTransport
         } else {
             $this->rset();
         }
-        $this->mail($mail->getReturnPath());
-        foreach ($mail->getRecipients() as $recipient) $this->rcpt($recipient);
+        $this->mail($mail->get_return_path());
+        foreach ($mail->get_recipients() as $recipient) $this->rcpt($recipient);
         return $this->data($mail->__toString());
     }
     
@@ -76,20 +76,20 @@ class Stato_SmtpTransport implements Stato_IMailTransport
     {
         $remote = $this->transport.'://'.$this->host.':'.$this->port;
         $timeout = 30;
-        $errorNum = 0;
-        $errorStr = '';
+        $error_num = 0;
+        $error_str = '';
 
-        $socket = @stream_socket_client($remote, $errorNum, $errorStr, $timeout);
+        $socket = @stream_socket_client($remote, $error_num, $error_str, $timeout);
 
         if ($socket === false) {
-            if ($errorNum == 0) $errorStr = 'Could not open socket';
-            throw new Stato_SmtpTransportException($errorStr);
+            if ($error_num == 0) $error_str = 'Could not open socket';
+            throw new SSmtpTransportException($error_str);
         }
         if (($result = stream_set_timeout($socket, $timeout)) === false)
-            throw new Stato_SmtpTransportException('Could not set stream timeout');
+            throw new SSmtpTransportException('Could not set stream timeout');
 
         $this->socket = $socket;
-        $this->getResponse();
+        $this->get_response();
         return $result;
     }
     
@@ -110,7 +110,7 @@ class Stato_SmtpTransport implements Stato_IMailTransport
      */
     public function helo($timeout = 300)
     {
-        $this->sendCommand('HELO '.$this->name, 250, $timeout);
+        $this->send_command('HELO '.$this->name, 250, $timeout);
         return $this->auth();
     }
     
@@ -120,22 +120,22 @@ class Stato_SmtpTransport implements Stato_IMailTransport
         
         switch ($this->auth) {
             case 'plain':
-                return $this->plainAuth();
+                return $this->plain_auth();
             case 'login':
-                return $this->loginAuth();
+                return $this->login_auth();
             case 'cram_md5':
-                return $this->cramMd5Auth();
+                return $this->cram_md5_auth();
         }
     }
     
     public function rset()
     {
-        return $this->sendCommand('RSET', array(250, 220));
+        return $this->send_command('RSET', array(250, 220));
     }
     
     public function mail($from)
     {
-        return $this->sendCommand('MAIL FROM:<'.$from.'>', 250);
+        return $this->send_command('MAIL FROM:<'.$from.'>', 250);
     }
     
     /**
@@ -146,7 +146,7 @@ class Stato_SmtpTransport implements Stato_IMailTransport
      */
     public function rcpt($to)
     {
-        return $this->sendCommand('RCPT TO:<'.$to.'>', array(250, 251));
+        return $this->send_command('RCPT TO:<'.$to.'>', array(250, 251));
     }
     
     /**
@@ -157,16 +157,16 @@ class Stato_SmtpTransport implements Stato_IMailTransport
      */
     public function data($data)
     {
-        $this->sendCommand('DATA', 354, 120);
+        $this->send_command('DATA', 354, 120);
 
         $lines = explode("\r\n", $data);
         foreach ($lines as $line) {
             // Escape lines beginning with a '.'
             if (strpos($line, '.') === 0) $line = '.'.$line;
-            $this->sendCommand($line);
+            $this->send_command($line);
         }
 
-        return $this->sendCommand('.', 250, 600);
+        return $this->send_command('.', 250, 600);
     }
     
     /**
@@ -180,29 +180,29 @@ class Stato_SmtpTransport implements Stato_IMailTransport
      * @param integer $timeout
      * @return boolean
      */
-    public function sendCommand($command, $expectedCode = null, $timeout = null)
+    public function send_command($command, $expected_code = null, $timeout = null)
     {
         if (!is_resource($this->socket))
-            throw new Stato_SmtpTransportException('No connection has been established to '.$this->host);
+            throw new SSmtpTransportException('No connection has been established to '.$this->host);
         
-        $result = fwrite($this->socket, $command.self::EOL);
+        $result = fwrite($this->socket, $command.self::eol);
 
-        $this->log.= $command.self::EOL;
+        $this->log.= $command.self::eol;
 
         if ($result === false)
-            throw new Stato_SmtpTransportException('Could not send command');
+            throw new SSmtpTransportException('Could not send command');
 
         if ($timeout !== null) {
            stream_set_timeout($this->socket, $timeout);
         }
         
-        if ($expectedCode === null) return true;
+        if ($expected_code === null) return true;
         
-        list($code, $msg) = $this->getResponse();
+        list($code, $msg) = $this->get_response();
         
-        if (!is_array($expectedCode)) $expectedCode = array($expectedCode);
-        if (!in_array($code, $expectedCode))
-            throw new Stato_SmtpTransportException("Unexpected server response: $code $msg");
+        if (!is_array($expected_code)) $expected_code = array($expected_code);
+        if (!in_array($code, $expected_code))
+            throw new SSmtpTransportException("Unexpected server response: $code $msg");
         
         return true;
     }
@@ -212,7 +212,7 @@ class Stato_SmtpTransport implements Stato_IMailTransport
      *
      * @return array an array composed of the return code and message string
      */
-    public function getResponse()
+    public function get_response()
     {
         $code = '';
         $msg = '';
@@ -223,38 +223,38 @@ class Stato_SmtpTransport implements Stato_IMailTransport
         $info = stream_get_meta_data($this->socket);
 
         if (!empty($info['timed_out']))
-            throw new Stato_SmtpTransportException($this->host.' has timed out');
+            throw new SSmtpTransportException($this->host.' has timed out');
 
         if ($response === false)
-            throw new Stato_SmtpTransportException('Could not read response');
+            throw new SSmtpTransportException('Could not read response');
         
         sscanf($response, '%d%s', $code, $msg);
 
         return array($code, $msg);
     }
     
-    public function getLog()
+    public function get_log()
     {
         return $this->log;
     }
     
-    protected function plainAuth()
+    protected function plain_auth()
     {
-        $this->sendCommand('AUTH PLAIN', 334);
-        $this->sendCommand(base64_encode(chr(0).$this->username.chr(0).$this->password), 235);
+        $this->send_command('AUTH PLAIN', 334);
+        $this->send_command(base64_encode(chr(0).$this->username.chr(0).$this->password), 235);
         return true;
     }
     
-    protected function loginAuth()
+    protected function login_auth()
     {
-        $this->sendCommand('AUTH LOGIN', 334);
-        $this->sendCommand(base64_encode($this->username), 334);
-        $this->sendCommand(base64_encode($this->password), 235);
+        $this->send_command('AUTH LOGIN', 334);
+        $this->send_command(base64_encode($this->username), 334);
+        $this->send_command(base64_encode($this->password), 235);
         return true;
     }
     
-    protected function cramMd5Auth()
+    protected function cram_md5_auth()
     {
-        throw new Stato_SmtpTransportException('Cram MD5 auth not implemented');
+        throw new SSmtpTransportException('Cram MD5 auth not implemented');
     }
 }

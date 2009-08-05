@@ -1,8 +1,8 @@
 <?php
 
-abstract class Stato_I18n_AbstractBackend
+abstract class SAbstractBackend
 {
-    private static $pluralRules = array
+    private static $plural_rules = array
     (
         '0' => array('hu','ja','ko','tr'),
         '$c == 1 ? 0 : 1' => array('da','nl','en','de','no','sv','et','fi','fr','el','he','it','pt','es','eo'),
@@ -14,37 +14,50 @@ abstract class Stato_I18n_AbstractBackend
         '$c%100 == 1 ? 0 : ($c%100 == 2 ? 1 : ($c%100 == 3 || $c%100 == 4 ? 2 : 3))' => array('sl')
     );
     
-    public function translate($locale, $key, $options = array())
+    public function translate($locale, $key, $values = array())
     {
-        if (array_key_exists('count', $options)) $count = $options['count'];
-        $values = array_diff_key($options, array('count' => null));
-        
         $entry = $this->lookup($locale, $key);
-        if (isset($count)) $entry = $this->pluralize($locale, $entry, $count);
         if (!empty($values)) $entry = $this->interpolate($locale, $entry, $values);
         return $entry;
     }
     
+    public function translatef($locale, $key, $values = array())
+    {
+        $entry = $this->lookup($locale, $key);
+        return vsprintf($entry, $values);
+    }
+    
+    public function translate_and_pluralize($locale, $key, $count = 0)
+    {
+        $entry = $this->lookup($locale, $key);
+        return $this->pluralize($locale, $entry, $count);
+    }
+    
     protected function interpolate($locale, $entry, $values)
     {
-        return str_replace(array_keys($values), array_values($values), $entry);
+        $p_values = array();
+        foreach ($values as $k => $v) {
+            if (!preg_match('/%[a-zA-Z0-9_\-]+%/', $k)) $k = '%'.$k.'%';
+            $p_values[$k] = $v;
+        }
+        return str_replace(array_keys($p_values), array_values($p_values), $entry);
     }
     
     protected function pluralize($locale, $entry, $c)
     {
         if (!is_array($entry)) return $entry;
         if ($c == 0 && array_key_exists('zero', $entry)) $key = 'zero';
-        else $key = eval($this->getPluralRule($locale));
+        else $key = eval($this->get_plural_rule($locale));
         
         if (!array_key_exists($key, $entry))
-            throw new Stato_I18nException('Invalid pluralization data: '.var_export($entry, true)."\n count: $c");
+            throw new SI18nException('Invalid pluralization data: '.var_export($entry, true)."\n count: $c");
         
         return sprintf($entry[$key], $c);
     }
     
-    protected function getPluralRule($locale)
+    protected function get_plural_rule($locale)
     {
-        foreach (self::$pluralRules as $rule => $locales)
+        foreach (self::$plural_rules as $rule => $locales)
             if (in_array($locale, $locales)) return 'return '.$rule.';';
     }
     

@@ -24,6 +24,10 @@
           <target>%d messages</target>
         </trans-unit>
     </group>
+    <trans-unit id="4">
+        <source>%s is required.</source>
+        <target>Le champ %s est requis.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

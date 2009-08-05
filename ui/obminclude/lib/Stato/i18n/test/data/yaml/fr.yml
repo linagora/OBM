@@ -1,5 +1,6 @@
 Stato is a PHP5 framework.: Stato est un cadre de travail PHP5.
 Today's date is %date%: La date d'aujourd'hui est %date%
+%s is required.: Le champ %s est requis.
 inbox:
     zero: pas de message
     '0': 1 message

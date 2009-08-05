@@ -1,6 +1,6 @@
 <?php
 
-class Stato_MimeMultipart extends Stato_MimeEntity
+class SMimeMultipart extends SMimeEntity
 {
     const MIXED = 'mixed';
     
@@ -22,55 +22,55 @@ class Stato_MimeMultipart extends Stato_MimeEntity
         $this->subtype = $subtype;
         $this->parts = $parts;
         $this->preamble = 'This is a multi-part message in MIME format.';
-        $this->setBoundary($boundary);
+        $this->set_boundary($boundary);
     }
     
-    public function getContent()
+    public function get_content()
     {
         $body = $this->preamble;
         
         foreach ($this->parts as $part)
-            $body.= $this->boundaryLine().$part->__toString();
+            $body.= $this->boundary_line().$part->__toString();
             
-        return $body.$this->boundaryEnd();
+        return $body.$this->boundary_end();
     }
     
-    public function addPart($part)
+    public function add_part($part)
     {
-        if ($part instanceof Stato_MimePart || $part instanceof Stato_MimeMultipart)
+        if ($part instanceof SMimePart || $part instanceof SMimeMultipart)
             $this->parts[] = $part;
         else
-            throw new Stato_MailException('Parts added to a Stato_MimeMultipart must be Stato_MimePart or Stato_MimeMultipart instances');
+            throw new SMailException('Parts added to a SMimeMultipart must be SMimePart or SMimeMultipart instances');
     }
     
-    public function setSubtype($subtype)
+    public function set_subtype($subtype)
     {
         $this->subtype = $subtype;
     }
     
-    public function setBoundary($boundary = null)
+    public function set_boundary($boundary = null)
     {
         if ($boundary === null) $boundary = md5(uniqid(time()));
         $this->boundary = $boundary;
-        $this->setHeader('Content-Type', "multipart/{$this->subtype}; boundary=\"{$this->boundary}\"", false);
+        $this->set_header('Content-Type', "multipart/{$this->subtype}; boundary=\"{$this->boundary}\"", false);
     }
     
-    public function setPreamble($preamble)
+    public function set_preamble($preamble)
     {
         $this->preamble = $preamble;
     }
     
-    public function getSubtype()
+    public function get_subtype()
     {
         return $this->subtype;
     }
     
-    protected function boundaryLine()
+    protected function boundary_line()
     {
         return $this->eol.'--'.$this->boundary.$this->eol;
     }
     
-    protected function boundaryEnd()
+    protected function boundary_end()
     {
         return $this->eol.'--'.$this->boundary.'--';
     }

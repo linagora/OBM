@@ -21,6 +21,7 @@ require_once 'PHPUnit/Framework.php';
 require_once 'PHPUnit/Extensions/Database/TestCase.php';
 require_once 'PHPUnit/Extensions/Database/DataSet/CsvDataSet.php';
 require_once 'PHPUnit/Extensions/Database/DataSet/ReplacementDataSet.php';
+require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
 
 // It would be great to run these tests in E_STRICT mode, but that's not
 // currently possible because of unitialized variables
@@ -49,24 +50,12 @@ $obmdb_dbtype = strtoupper($obmdb_dbtype);
 // Fake function
 function display_debug_msg() { }
 
-/**
- * OBM Database TestCase base class
- * 
- * This abstract class takes care of DB connection.
- * 
- * @package 
- * @version $Id:$
- * @copyright Copyright (c) 1997-2008 Aliasource - Groupe LINAGORA
- * @author Raphaël Rougeron <raphael.rougeron@aliasource.fr> 
- * @license GPL 2.0
- */
-abstract class OBM_Database_TestCase extends PHPUnit_Extensions_Database_TestCase {
+class OBM_FixtureLoader {
   
   protected $pdo;
   protected $test_db;
   
-  public function __construct($name = NULL, array $data = array(), $dataName = '') {
-    parent::__construct($name, $data, $dataName);
+  public function __construct() {
     $db_conf = include('conf/db.php');
     extract($db_conf);
     $this->pdo = new PDO("{$obmdb_dbtype}:host={$obmdb_host};dbname={$obmdb_db}", $obmdb_user, $obmdb_password);
@@ -78,8 +67,36 @@ abstract class OBM_Database_TestCase extends PHPUnit_Extensions_Database_TestCas
     $this->test_db = $obmdb_db;
   }
   
+  public function setUp($dataset) {
+    $this->getDatabaseTester()->setSetUpOperation($this->getSetUpOperation());
+    $this->getDatabaseTester()->setDataSet($dataset);
+    $this->getDatabaseTester()->onSetUp();
+  }
+
+  public function tearDown($dataset) {
+    $this->getDatabaseTester()->setTearDownOperation($this->getTearDownOperation());
+    $this->getDatabaseTester()->setDataSet($dataset);
+    $this->getDatabaseTester()->onTearDown();
+    $this->databaseTester = NULL;
+  }
+  
+  public function getPDOConnection() {
+    return $this->pdo;
+  }
+  
+  protected function getDatabaseTester() {
+    if (empty($this->databaseTester)) {
+        $this->databaseTester = new PHPUnit_Extensions_Database_DefaultTester($this->getConnection());
+    }
+    return $this->databaseTester;
+  }
+  
   protected function getConnection() {
     return $this->createDefaultDBConnection($this->pdo, $this->test_db);
+  }
+  
+  protected function createDefaultDBConnection(PDO $connection, $schema) {
+    return new PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection($connection, $schema);
   }
   
   protected function getSetupOperation() {
@@ -89,6 +106,95 @@ abstract class OBM_Database_TestCase extends PHPUnit_Extensions_Database_TestCas
       $truncate,
       new OBM_Database_Operation_Entity_Insert()
     ));
+  }
+  
+  protected function getTearDownOperation() {
+    return PHPUnit_Extensions_Database_Operation_Factory::NONE();
+  }
+}
+
+/**
+ * OBM Database TestCase base class
+ * 
+ * This abstract class takes care of DB fixtures loading.
+ * 
+ * @package 
+ * @version $Id:$
+ * @copyright Copyright (c) 1997-2008 Aliasource - Groupe LINAGORA
+ * @author Raphaël Rougeron <raphael.rougeron@aliasource.fr> 
+ * @license GPL 2.0
+ */
+abstract class OBM_Database_TestCase extends PHPUnit_Framework_TestCase {
+  protected $fixtureLoader;
+  
+  public function __construct($name = NULL, array $data = array(), $dataName = '') {
+    parent::__construct($name, $data, $dataName);
+    $this->fixtureLoader = new OBM_FixtureLoader();
+  }
+  
+  protected abstract function getDataSet();
+  
+  protected function getConnection() {
+    return $this->fixtureLoader->getPDOConnection();
+  }
+  
+  protected function setUp() {
+    $this->fixtureLoader->setUp($this->getDataSet());
+  }
+  
+  protected function tearDown() {
+    $this->fixtureLoader->tearDown($this->getDataSet());
+  }
+}
+
+/**
+ * OBM Selenium TestCase base class
+ * 
+ * This abstract class takes care of DB fixtures loading.
+ * 
+ * @package 
+ * @version $Id:$
+ * @copyright Copyright (c) 1997-2008 Aliasource - Groupe LINAGORA
+ * @author Raphaël Rougeron <raphael.rougeron@aliasource.fr> 
+ * @license GPL 2.0
+ */
+abstract class OBM_Selenium_TestCase extends PHPUnit_Extensions_SeleniumTestCase {
+  protected $fixtureLoader;
+  protected $dataset;
+  
+  public function __construct($name = NULL, array $data = array(), $dataName = '', array $browser = array()) {
+    parent::__construct($name, $data, $dataName, $browser);
+    $this->fixtureLoader = new OBM_FixtureLoader();
+    $this->dataset = new OBM_Database_CsvDataSet(';');
+  }
+  
+  protected function setUp() {
+    $this->declareFixtures();
+    $this->fixtureLoader->setUp($this->dataset);
+    
+    $this->setBrowser('*firefox');
+    $this->setBrowserUrl('http://obm/');
+  }
+  
+  protected function tearDown() {
+    $this->fixtureLoader->tearDown($this->dataset);
+  }
+  
+  protected function declareFixtures() {
+    
+  }
+  
+  protected function addFixture($tableName) {
+    $this->dataset->addTable($tableName, dirname(__FILE__)."/db_data/$tableName.csv");
+  }
+  
+  protected function addEntityFixture($tableName, $entityName = null) {
+    if (is_null($entityName)) $entityName = strtolower($tableName);
+    $this->dataset->addEntityTable($tableName, $entityName, dirname(__FILE__)."/db_data/$tableName.csv");
+  }
+  
+  protected function getConnection() {
+    return $this->fixtureLoader->getPDOConnection();
   }
 }
 

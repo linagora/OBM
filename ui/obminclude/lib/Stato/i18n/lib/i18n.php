@@ -1,10 +1,20 @@
 <?php
 
-class Stato_I18nException extends Exception {}
+class SI18nException extends Exception {}
 
-function __($key, $options = array())
+function __($key, $values = array())
 {
-    return Stato_I18n::translate($key, $options);
+    return SI18n::translate($key, $values);
+}
+
+function _f($key, $values = array())
+{
+    return SI18n::translatef($key, $values);
+}
+
+function _p($key, $count = 0)
+{
+    return SI18n::translate_and_pluralize($key, $count);
 }
 
 /**
@@ -13,65 +23,77 @@ function __($key, $options = array())
  * @package Stato
  * @subpackage i18n
  */
-class Stato_I18n
+class SI18n
 {
     private static $backend;
     
     private static $locale;
     
-    private static $defaultLocale = 'en';
+    private static $default_locale = 'en';
     
-    private static $dataPaths = array();
+    private static $data_paths = array();
     
-    public static function setBackend(Stato_I18n_AbstractBackend $backend)
+    public static function set_backend(SAbstractBackend $backend)
     {
         self::$backend = $backend;
     }
     
-    public static function getBackend()
+    public static function get_backend()
     {
         if (!isset(self::$backend)) 
-            self::setBackend(new Stato_I18n_SimpleBackend());
+            self::set_backend(new SSimpleBackend(self::$data_paths));
         
         return self::$backend;
     }
     
-    public static function setDefaultLocale($locale)
+    public static function set_default_locale($locale)
     {
-        self::$defaultLocale = $locale;
+        self::$default_locale = $locale;
     }
     
-    public static function getDefaultLocale()
+    public static function get_default_locale()
     {
-        return self::$defaultLocale;
+        return self::$default_locale;
     }
     
-    public static function setLocale($locale)
+    public static function set_locale($locale)
     {
         self::$locale = $locale;
     }
     
-    public static function getLocale()
+    public static function get_locale()
     {
         if (!isset(self::$locale))
-            return self::getDefaultLocale();
+            return self::get_default_locale();
         
         return self::$locale;
     }
     
-    public static function addDataPath($path)
+    public static function add_data_path($path)
     {
-        self::$dataPaths[] = $path;
+        self::$data_paths[] = $path;
     }
     
-    public static function getDataPaths()
+    public static function get_data_paths()
     {
-        return self::$dataPaths;
+        return self::$data_paths;
     }
     
-    public static function translate($key, $options = array())
+    public static function translate($key, $values = array())
     {
-        $locale = self::getLocale();
-        return self::getBackend()->translate($locale, $key, $options);
+        $locale = self::get_locale();
+        return self::get_backend()->translate($locale, $key, $values);
+    }
+    
+    public static function translatef($key, $values = array())
+    {
+        $locale = self::get_locale();
+        return self::get_backend()->translatef($locale, $key, $values);
+    }
+    
+    public static function translate_and_pluralize($key, $count = 0)
+    {
+        $locale = self::get_locale();
+        return self::get_backend()->translate_and_pluralize($locale, $key, $count);
     }
 }

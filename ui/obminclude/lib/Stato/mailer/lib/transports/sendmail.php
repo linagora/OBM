@@ -1,13 +1,13 @@
 <?php
 
-class Stato_SendmailTransport implements Stato_IMailTransport
+class SSendmailTransport implements SIMailTransport
 {
-    public function send(Stato_Mail $mail)
+    public function send(SMail $mail)
     {
-        $to = $mail->getTo();
-        $subject = $mail->getSubject();
+        $to = $mail->get_to();
+        $subject = $mail->get_subject();
         
-        $result = mail($to, $subject, $mail->getContent(), $mail->getNonMatchingHeaderLines(array('To', 'Subject')));
+        $result = mail($to, $subject, $mail->get_content(), $mail->get_non_matching_header_lines(array('To', 'Subject')));
         
         if (!$result) throw new Exception('Unable to send mail');
     }
