@@ -1,20 +1,13 @@
 package OBM::Ldap::utils;
 
+$VERSION = '1.0';
 
 $debug = 1;
 
 
 use 5.006_001;
+require Exporter;
 use strict;
-use vars qw( @EXPORT_OK $VERSION );
-use base qw(Exporter);
-
-$VERSION = '1.0';
-@EXPORT_OK = qw(    _modifyAttr
-                    _modifyAttrList
-                    _diffObjectclassAttrs
-               );
-
 
 
 sub _modifyAttr {
@@ -144,15 +137,15 @@ sub _diffObjectclassAttrs {
     my %origAttrs;
     my %diffAttrs;
 
-    if( ref($deleteObjectclass) ne "ARRAY" ) {
+    if( ref($deleteObjectclass) ne 'ARRAY' ) {
         return undef;
     }
 
-    if( ref($origObjectclass) ne "ARRAY" ) {
+    if( ref($origObjectclass) ne 'ARRAY' ) {
         return undef;
     }
 
-    if( ref($objectclassDesc) ne "HASH" ) {
+    if( ref($objectclassDesc) ne 'HASH' ) {
         return undef;
     }
 
