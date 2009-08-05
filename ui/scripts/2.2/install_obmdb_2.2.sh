@@ -8,6 +8,8 @@
 source `dirname $0`/obm-sh.lib
 
 # Lecture des parametres de connexion a la BD
+get_val host
+H=$VALUE
 get_val dbtype
 DBTYPE=`echo $VALUE | tr A-Z a-z`
 get_val user
@@ -20,6 +22,7 @@ get_val lang
 OBM_LANG=$VALUE
 
 echo "*** Parameters used"
+echo "database host  = $H"
 echo "database type  = $DBTYPE"
 echo "database = $DB"
 echo "database user = $U"
@@ -32,7 +35,7 @@ locate_php_interp
 echo "*** Document repository creation"
 $PHP install_document_2.2.php || (echo $?; exit $?)
 
-./install_obmdb_${DBTYPE}_2.2.sh ${DB} ${U} ${P} ${OBM_LANG}
+./install_obmdb_${DBTYPE}_2.2.sh ${DB} ${U} ${P} ${OBM_LANG} ${H}
 
 echo "*** Data checking and validation"
 

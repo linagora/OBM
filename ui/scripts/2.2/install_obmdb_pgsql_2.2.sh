@@ -1,7 +1,7 @@
 #!/bin/su postgres
 
-test $# -eq 4 || {
-    echo "usage: $0 db user password lang"
+test $# -eq 5 || {
+    echo "usage: $0 db user password lang dbhost"
     exit 1
 }
 
@@ -9,6 +9,7 @@ db=$1
 user=$2
 pw=$3
 obm_lang=$4
+host=$5
 
 
 echo "  Delete old database"
@@ -35,21 +36,24 @@ ALTER DATABASE ${db} SET TIMEZONE='GMT';
 \q
 EOF
 
-psql -U ${user} ${db} -f \
+PGPASSWORD=${pw}
+export PGPASSWORD
+
+psql -h ${host} -U ${user} ${db} -f \
 create_obmdb_2.2.pgsql.sql > /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
     exit 1
 }
 
-psql -U ${user} ${db} -f \
+psql -h ${host} -U ${user} ${db} -f \
 obmdb_default_values_2.2.sql >> /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
     exit 1
 }
 
-psql -U ${user} ${db} -f \
+psql -h ${host} -U ${user} ${db} -f \
 obmdb_triggers_2.2.pgsql.sql >> /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
@@ -57,7 +61,7 @@ grep -i error /tmp/data_insert.log && {
 }
 
 echo "  Dictionnary data insertion"
-psql -U ${user} ${db} -f \
+psql -h ${host} -U ${user} ${db} -f \
 data-${obm_lang}/obmdb_ref_2.2.sql >> /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
@@ -65,7 +69,7 @@ grep -i error /tmp/data_insert.log && {
 }
 
 echo "  Company Naf Code data insertion"
-psql -U ${user} ${db} -f \
+psql -h ${host} -U ${user} ${db} -f \
 data-${obm_lang}/obmdb_nafcode_2.2.sql >> /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
@@ -73,14 +77,14 @@ grep -i error /tmp/data_insert.log && {
 }
 
 echo "  Default preferences data insertion"
-psql -U ${user} ${db} -f \
+psql -h ${host} -U ${user} ${db} -f \
 obmdb_prefs_values_2.2.sql >> /tmp/data_insert.log 2>&1
 grep -i error /tmp/data_insert.log && {
     echo "error in pg script"
     exit 1
 }
 
-psql -U ${user} -q ${db} <<EOF
+psql -h ${host} -U ${user} -q ${db} <<EOF
 UPDATE UserObmPref SET userobmpref_value='${obm_lang}' WHERE userobmpref_option='set_lang'
 \q
 EOF
