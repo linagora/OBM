@@ -33,7 +33,21 @@ sub new {
         return undef;
     }
 
-    $self->{'objectclass'} = [ 'device', 'obmHost', 'sambaSamAccount', 'posixAccount' ];
+    $self->{'ldapMappingScope'} = {
+        'updateLinks' => [
+            'host_login',
+            'host_samba_sid',
+            'host_uidnumber',
+            'host_gid',
+            'host_homedirectory',
+            'host_samba_group_sid',
+            'host_samba_flags'
+        ],
+        'updateSambaPasswd' => [
+            'host_lm_passwd',
+            'host_nt_passwd'
+        ]
+    };
 
     return $self;
 }
@@ -77,8 +91,8 @@ sub _init {
         return 1;
     }
     
-    $hostDesc->{'system_host_name'} = lc($hostDesc->{'host_name'});
-    if( $hostDesc->{'system_host_name'} !~ /$OBM::Parameters::regexp::regexp_hostname/ ) {
+    $hostDesc->{'host_name_new'} = lc($hostDesc->{'host_name'});
+    if( $hostDesc->{'host_name_new'} !~ /$OBM::Parameters::regexp::regexp_hostname/ ) {
         $self->_log( 'nom de l\'hôte \''.$hostDesc->{'host_name'}.'\' incorrect', 0 );
         return 1;
     }
@@ -96,6 +110,11 @@ sub _init {
     if( $hostDesc->{'host_ip'} && $hostDesc->{'host_ip'} !~ /$regexp_ip/ ) {
         $self->_log( 'ip de l\'hôte incorrecte. IP non prise en compte', 1 );
         delete( $hostDesc->{'host_ip'} );
+    }
+
+    # OBM Domain
+    if( defined($self->{'parent'}) ) {
+        $hostDesc->{'host_obm_domain'} = $self->{'parent'}->getDesc('domain_name');
     }
 
     $self->{'entityDesc'} = $hostDesc;
@@ -129,7 +148,7 @@ sub setLinks {
 
     if( $hostDesc->{'host_samba'} ) {
 		$hostDesc->{'host_gid'} = 515;
-		$hostDesc->{'host_login'} = $hostDesc->{'system_host_name'}.'$';
+		$hostDesc->{'host_login'} = $hostDesc->{'host_name_new'}.'$';
         $hostDesc->{'host_samba_sid'} = $self->_getUserSID( $domainSid, $hostDesc->{'host_uid'} );
         $hostDesc->{'host_samba_group_sid'} = $self->_getGroupSID( $domainSid, $hostDesc->{'host_gid'} );
         $hostDesc->{'host_samba_flags'} = '[W]';
@@ -137,7 +156,7 @@ sub setLinks {
         $hostDesc->{'host_uidnumber'} = $hostDesc->{'host_uid'};
 
 
-        if( $self->_getNTLMPasswd( $hostDesc->{'system_host_name'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
+        if( $self->_getNTLMPasswd( $hostDesc->{'host_name_new'}, \$hostDesc->{'host_lm_passwd'}, \$hostDesc->{'host_nt_passwd'} ) ) {
             $self->_log( 'probleme lors de la generation du mot de passe windows de l\'hote : '.$self->getDescription(), 3 );
             if( $hostDesc->{'host_samba'} ) {
                 $self->_log( 'droit samba annulé', 2 );
@@ -218,85 +237,6 @@ sub _getParentDn {
 }
 
 
-# Needed by : LdapEngine
-sub getDnPrefix {
-    my $self = shift;
-    my $rootDn;
-    my @dnPrefixes;
-
-    if( !($rootDn = $self->_getParentDn()) ) {
-        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
-        return undef;
-    }
-
-    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'system_host_name'}.','.$rootDn->[$i] );
-        $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
-    }
-
-    return \@dnPrefixes;
-}
-
-
-# Needed by : LdapEngine
-sub getCurrentDnPrefix {
-    my $self = shift;
-    my $rootDn;
-    my @dnPrefixes;
-
-    if( !($rootDn = $self->_getParentDn()) ) {
-        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
-        return undef;
-    }
-
-    my $currentHostName = $self->{'entityDesc'}->{'system_host_name'};
-    if( $self->{'entityDesc'}->{'host_name_current'} && ($currentHostName ne $self->{'entityDesc'}->{'host_name_current'}) ) {
-        $currentHostName = $self->{'entityDesc'}->{'host_name_current'};
-    }
-
-    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'cn='.$currentHostName.','.$rootDn->[$i] );
-        $self->_log( 'DN de l\'entité : '.$dnPrefixes[$i], 4 );
-    }
-
-    return \@dnPrefixes;
-}
-
-
-sub _getLdapObjectclass {
-    my $self = shift;
-    my ($objectclass, $deletedObjectclass) = @_;
-    my %realObjectClass;
-
-    if( !defined($objectclass) || (ref($objectclass) ne "ARRAY") ) {
-        $objectclass = $self->{'objectclass'};
-    }
-
-    for( my $i=0; $i<=$#$objectclass; $i++ ) {
-        if( (lc($objectclass->[$i]) eq 'sambasamaccount') && !$self->{'entityDesc'}->{'host_samba'} ) {
-            push( @{$deletedObjectclass}, $objectclass->[$i] );
-            next
-        }
-        if( (lc($objectclass->[$i]) eq 'posixaccount') && !$self->{'entityDesc'}->{'host_samba'} ) {
-            push( @{$deletedObjectclass}, $objectclass->[$i] );
-            next;
-        }
-
-        $realObjectClass{$objectclass->[$i]} = 1;
-    }
-
-    # Si le droit Samba est actif, on s'assure de la présence des classes
-    # nécessaires - nécessaires pour les MAJ
-    if( $self->{'entityDesc'}->{'host_samba'} ) {
-        $realObjectClass{'sambaSamAccount'} = 1;
-        $realObjectClass{'posixAccount'} = 1;
-    }
-
-    my @realObjectClass = keys(%realObjectClass);
-    return \@realObjectClass;
-}
-
-
 sub createLdapEntry {
     my $self = shift;
     my ( $entryDn, $entry ) = @_;
@@ -311,68 +251,16 @@ sub createLdapEntry {
         return 1;
     }
 
-    $entry->add(
-        objectClass => $self->_getLdapObjectclass(),
-        cn => $self->{'entityDesc'}->{'system_host_name'}
-    );
+    $entry->add( objectClass => $self->_getLdapObjectclass() );
 
-	# UidNumber
-	if( $self->{'entityDesc'}->{'host_uidnumber'} ) {
-        $entry->add( uidNumber => $self->{'entityDesc'}->{'host_uidnumber'} );
-    }
+    require OBM::Ldap::ldapMapping;
+    my $ldapMapping = OBM::Ldap::ldapMapping->instance();
 
-	# GidNumber
-	if( $self->{'entityDesc'}->{'host_gid'} ) {
-		$entry->add( gidNumber => $self->{'entityDesc'}->{'host_gid'} );
-	}
-	
-	# homeDirectory
-	if( $self->{'entityDesc'}->{'host_homedirectory'} ) {
-		$entry->add( homeDirectory => $self->{'entityDesc'}->{'host_homedirectory'} );
-	}
-
-    # L'IP
-    if( $self->{'entityDesc'}->{'host_ip'} ) {
-        $entry->add( ipHostNumber => $self->{'entityDesc'}->{'host_ip'} );
+    my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self );
+    for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
+        $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} );
     }
 
-    # La description
-    if( $self->{'entityDesc'}->{'host_description'} ) {
-        $entry->add( description => $self->{'entityDesc'}->{'host_description'} );
-    }
-    
-    # Le domaine OBM
-    if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
-        $entry->add( obmDomain => $domainName );
-    }
-
-    # Le nom windows
-    if( $self->{'entityDesc'}->{'host_login'} ) {
-        $entry->add( uid => $self->{'entityDesc'}->{'host_login'} );
-    }
-
-    # Le SID de l'hôte
-    if( $self->{'entityDesc'}->{'host_samba_sid'} ) {
-        $entry->add( sambaSID => $self->{'entityDesc'}->{'host_samba_sid'} );
-    }
-
-    # Le groupe de l'hôte
-    if( $self->{'entityDesc'}->{'host_samba_group_sid'} ) {
-        $entry->add( sambaPrimaryGroupSID => $self->{'entityDesc'}->{'host_samba_group_sid'} );
-    }
-
-    # Les flags de l'hôte Samba
-    if( $self->{'entityDesc'}->{'host_samba_flags'} ) {
-        $entry->add( sambaAcctFlags => $self->{'entityDesc'}->{'host_samba_flags'} );
-    }
-
-    # Les mots de passes windows
-    if( $self->{'entityDesc'}->{'host_lm_passwd'} ) {
-        $entry->add( sambaLMPassword => $self->{'entityDesc'}->{'host_lm_passwd'} );
-    }
-    if( $self->{'entityDesc'}->{'host_nt_passwd'} ) {
-        $entry->add( sambaNTPassword => $self->{'entityDesc'}->{'host_nt_passwd'} );
-    }
 
     return 0;
 }
@@ -389,51 +277,43 @@ sub updateLdapEntry {
 
 
     # Vérification des objectclass
-    my @deletedObjectclass;
-    my $currentObjectclass = $self->_getLdapObjectclass( $entry->get_value('objectClass', asref => 1), \@deletedObjectclass);
-    if( $self->_modifyAttrList( $currentObjectclass, $entry, 'objectClass' ) ) {
+    my $deletedObjectclass;
+    my $currentObjectclass = $self->_getLdapObjectclass( $entry->get_value('objectClass', asref => 1), \$deletedObjectclass);
+    if( $self->_modifyAttr( $currentObjectclass, $entry, 'objectClass' ) ) {
         $update = 1;
     }
 
-    if( $#deletedObjectclass >= 0 ) {
+    if( $#{$deletedObjectclass} >= 0 ) {
         # Pour les schémas LDAP supprimés, on détermine les attributs à
         # supprimer.
         # Uniquement ceux qui ne sont pas utilisés par d'autres objets.
-        my $deleteAttrs = $self->_diffObjectclassAttrs(\@deletedObjectclass, $currentObjectclass, $objectclassDesc);
+        my $deleteAttrs = $self->_diffObjectclassAttrs($deletedObjectclass, $currentObjectclass, $objectclassDesc);
 
         for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
-            if( $self->_modifyAttrList( undef, $entry, $deleteAttrs->[$i] ) ) {
+            if( $self->_modifyAttr( undef, $entry, $deleteAttrs->[$i] ) ) {
                 $update = 1;
             }
         }
     }
     
 
+    require OBM::Ldap::ldapMapping;
+    my $ldapMapping = OBM::Ldap::ldapMapping->instance();
+
     if( $self->getUpdateEntity() ) {
-        # La description
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_description'}, $entry, 'description' ) ) {
-            $update = 1;
-        }
-    
-        # L'adresse IP
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_ip'}, $entry, 'ipHostNumber' ) ) {
-            $update = 1;
-        }
-    
-        # Le domaine OBM
-        if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
-            if( $self->_modifyAttr( $domainName, $entry, 'obmDomain' ) ) {
+        my @exceptions;
+        push( @exceptions, @{$self->{'ldapMappingScope'}->{'updateLinks'}}, @{$self->{'ldapMappingScope'}->{'updateSambaPasswd'}} );
+        my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self, \@exceptions );
+
+        for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
+            if( $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
                 $update = 1;
             }
         }
     }
+
     
     if( $self->getUpdateLinks() ) {
-        # Le nom windows
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_login'}, $entry, 'uid' ) ) {
-            $update = 1;
-        }
-    
         if( $self->{'entityDesc'}->{'host_samba_sid'} ) {
             my @currentLdapHostSambaSid = $entry->get_value( 'sambaSID', asref => 1 );
             if( $#currentLdapHostSambaSid < 0 ) {
@@ -441,43 +321,23 @@ sub updateLdapEntry {
                 # dans la description de l'hôte, c'est qu'on vient de ré-activer
                 # le droit samba de l'hôte. Il faut donc placer les mots de
                 # passes.
-                if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_lm_passwd'}, $entry, 'sambaLMPassword' ) ) {
-                    $self->_modifyAttr( $self->{'entityDesc'}->{'host_nt_passwd'}, $entry, 'sambaNTPassword' );
-                    $update = 1;
+                my $attrsMapping = $ldapMapping->getAttrsMapping( $self, $self->{'ldapMappingScope'}->{'updateSambaPasswd'} );
+                for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
+                    if( $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
+                        $update = 1;
+                    }
                 }
             }
         }
-    
-        # Le SID de l'hôte
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_samba_sid'}, $entry, 'sambaSID' ) ) {
-            $update = 1;
-        }
 
-        # Le UidNumber de l'hôte
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_uidnumber'}, $entry, 'uidNumber' ) ) {
-            $update = 1;
-        }
-
-		# Le GidNumber de l'hôte
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_gid'}, $entry, 'gidNumber' ) ) {
-            $update = 1;
-        }
-
-        # homeDirectory
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_homedirectory'}, $entry, 'homeDirectory' ) ) {
-            $update = 1;
-        }
-    
-        # Le groupe de l'hôte
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_samba_group_sid'}, $entry, 'sambaPrimaryGroupSID' ) ) {
-            $update = 1;
-        }
-    
-        # Les flags de l'hôte Samba
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'host_samba_flags'}, $entry, 'sambaAcctFlags' ) ) {
-            $update = 1;
+        my $attrsMapping = $ldapMapping->getAttrsMapping( $self, $self->{'ldapMappingScope'}->{'updateLinks'} );
+        for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
+            if( $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
+                $update = 1;
+            }
         }
     }
+    
 
     return $update;
 }

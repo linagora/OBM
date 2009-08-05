@@ -31,7 +31,9 @@ sub new {
         return undef;
     }
 
-    $self->{'objectclass'} = [ 'obmMailShare' ];
+    $self->{'ldapMappingScope'} = {
+        'updateLinks' => []
+    };
 
     return $self;
 }
@@ -71,8 +73,8 @@ sub _init {
         return 1;
     }
     
-    $mailshareDesc->{'system_mailshare_name'} = lc($mailshareDesc->{'mailshare_name'});
-    if( $mailshareDesc->{'system_mailshare_name'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
+    $mailshareDesc->{'mailshare_name_new'} = lc($mailshareDesc->{'mailshare_name'});
+    if( $mailshareDesc->{'mailshare_name_new'} !~ /$OBM::Parameters::regexp::regexp_mailsharename/ ) {
         $self->_log( 'Nom du mailshare \''.$mailshareDesc->{'mailshare_name'}.'\' incorrect', 0 );
         return 1;
     }
@@ -86,14 +88,23 @@ sub _init {
         }
     }
 
+    # OBM Domain
+    if( defined($self->{'parent'}) ) {
+        $mailshareDesc->{'mailshare_obm_domain'} = $self->{'parent'}->getDesc('domain_name');
+    }
+
     SWITCH: {
         require OBM::Cyrus::cyrusServers;
         my $cyrusSrvList = OBM::Cyrus::cyrusServers->instance();
         if( !(my $cyrusHostName = $cyrusSrvList->getCyrusServerIp( $mailshareDesc->{'mailshare_mail_server_id'}, $mailshareDesc->{'mailshare_domain_id'} ) ) ) {
             $self->_log( 'droit mail du répertoire partagé d\'ID '.$mailshareDesc->{'mailshare_id'}.' annulé, serveur inconnu', 2 );
             $mailshareDesc->{'mailshare_mail_perms'} = 0;
+            $mailshareDesc->{'mailshare_mailperms_access'} = 'REJECT';
             last SWITCH;
+
         }else {
+            $mailshareDesc->{'mailshare_mailperms_access'} = 'PERMIT';
+
             $mailshareDesc->{'mailshare_mail_server'} = 'lmtp:'.$cyrusHostName.':24';
         }
 
@@ -103,13 +114,16 @@ sub _init {
             last SWITCH;
         }
 
+        $mailshareDesc->{'mailshare_main_email'} = $self->{'email'};
+        $mailshareDesc->{'mailshare_alias_email'} = $self->{'emailAlias'};
+
         $mailshareDesc->{'mailshare_mail_perms'} = 1;
     }
 
     # LDAP BAL destination
-    $mailshareDesc->{'mailshare_ldap_mailbox'} = '+'.$mailshareDesc->{'system_mailshare_name'}.'@'.$self->{'parent'}->getDesc('domain_name');
+    $mailshareDesc->{'mailshare_ldap_mailbox'} = '+'.$mailshareDesc->{'mailshare_name_new'}.'@'.$self->{'parent'}->getDesc('domain_name');
     # Cyrus BAL destination
-    $mailshareDesc->{'mailshare_cyrus_mailbox'} = $mailshareDesc->{'system_mailshare_name'};
+    $mailshareDesc->{'mailshare_cyrus_mailbox'} = $mailshareDesc->{'mailshare_name_new'};
     # Current Cyrus BAL destination
     $mailshareDesc->{'current_mailshare_cyrus_mailbox'} = $mailshareDesc->{'mailshare_name_current'};
     if( !$OBM::Parameters::common::singleNameSpace ) {
@@ -132,7 +146,7 @@ sub _init {
     if( defined($OBM::Parameters::common::shareMailboxDefaultFolders) ) {
         foreach my $folderTree ( split( ',', $OBM::Parameters::common::shareMailboxDefaultFolders ) ) {
             if( $folderTree !~ /(^[",]$)|(^$)/ ) {
-                my $folderName = $mailshareDesc->{'system_mailshare_name'};
+                my $folderName = $mailshareDesc->{'mailshare_name_new'};
                 foreach my $folder ( split( '/', $folderTree ) ) {
                     $folder =~ s/^\s+//;
 
@@ -251,60 +265,6 @@ sub _getParentDn {
 }
 
 
-
-# Needed by : LdapEngine
-sub getDnPrefix {
-    my $self = shift;
-    my $rootDn;
-    my @dnPrefixes;
-
-    if( !($rootDn = $self->_getParentDn()) ) {
-        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
-        return undef;
-    }
-
-    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'cn='.$self->{'entityDesc'}->{'system_mailshare_name'}.','.$rootDn->[$i] );
-        $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
-    }
-
-    return \@dnPrefixes;
-}
-
-
-# Needed by : LdapEngine
-sub getCurrentDnPrefix {
-    my $self = shift;
-    my $rootDn;
-    my @dnPrefixes;
-
-    if( !($rootDn = $self->_getParentDn()) ) {
-        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
-        return undef;
-    }
-
-    my $currentMailshareName = $self->{'entityDesc'}->{'system_mailshare_name'};
-    if( $self->{'entityDesc'}->{'mailshare_name_current'} && ($currentMailshareName ne $self->{'entityDesc'}->{'mailshare_name_current'}) ) {
-        $currentMailshareName = $self->{'entityDesc'}->{'mailshare_name_current'};
-    }
-
-    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, 'cn='.$currentMailshareName.','.$rootDn->[$i] );
-        $self->_log( 'DN de l\'entité : '.$dnPrefixes[$i], 4 );
-    }
-
-    return \@dnPrefixes;
-}
-
-
-sub _getLdapObjectclass {
-    my $self = shift;
-    my ($objectclass, $deletedObjectclass) = @_;
-
-    return $self->{'objectclass'};
-}
-
-
 sub createLdapEntry {
     my $self = shift;
     my ( $entryDn, $entry ) = @_;
@@ -319,41 +279,16 @@ sub createLdapEntry {
         return 1;
     }
 
-    $entry->add(
-        objectClass => $self->_getLdapObjectclass(),
-        cn => $self->{'entityDesc'}->{'system_mailshare_name'}
-    );
+    $entry->add( objectClass => $self->_getLdapObjectclass() );
 
-    if( $self->{'entityDesc'}->{'mailshare_ldap_mailbox'} ) {
-        $entry->add( mailBox => $self->{'entityDesc'}->{'mailshare_ldap_mailbox'} );
+    require OBM::Ldap::ldapMapping;
+    my $ldapMapping = OBM::Ldap::ldapMapping->instance();
+
+    my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self );
+    for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
+        $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} );
     }
 
-    if( $self->{'entityDesc'}->{'mailshare_description'} ) {
-        $entry->add( description => $self->{'entityDesc'}->{'mailshare_description'} );
-    }
-
-    if( $self->{'entityDesc'}->{'mailshare_mail_server'} ) {
-        $entry->add( mailBoxServer => $self->{'entityDesc'}->{'mailshare_mail_server'} );
-    }
-
-    if( $self->{'email'} ) {
-        $entry->add( mail => $self->{'email'} );
-    }
-
-    if( $self->{'emailAlias'} ) {
-        $entry->add( mailAlias => $self->{'emailAlias'} );
-    }
-
-    if( $self->{'entityDesc'}->{'mailshare_mail_perms'} ) {
-        $entry->add( mailAccess => 'PERMIT' );
-    }else {
-        $entry->add( mailAccess => 'REJECT' );
-    }
-
-    # Le domaine OBM
-    if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
-        $entry->add( obmDomain => $domainName );
-    }
 
     return 0;
 }
@@ -369,55 +304,37 @@ sub updateLdapEntry {
     }
 
 
-    if( $self->getUpdateEntity() ) {
-        # Vérification des objectclass
-        my @deletedObjectclass;
-        my $currentObjectclass = $self->_getLdapObjectclass( $entry->get_value('objectClass', asref => 1), \@deletedObjectclass );
-        if( $self->_modifyAttrList( $currentObjectclass, $entry, 'objectClass' ) ) {
-            $update = 1;
-        }
+    # Vérification des objectclass
+    my $deletedObjectclass;
+    my $currentObjectclass = $self->_getLdapObjectclass( $entry->get_value('objectClass', asref => 1), \$deletedObjectclass);
+    if( $self->_modifyAttr( $currentObjectclass, $entry, 'objectClass' ) ) {
+        $update = 1;
+    }
 
-        if( $#deletedObjectclass >= 0 ) {
-            # Pour les schémas LDAP supprimés, on détermine les attributs à
-            # supprimer.
-            # Uniquement ceux qui ne sont pas utilisés par d'autres objets.
-            my $deleteAttrs = $self->_diffObjectclassAttrs(\@deletedObjectclass, $currentObjectclass, $objectclassDesc);
+    if( $#{$deletedObjectclass} >= 0 ) {
+        # Pour les schémas LDAP supprimés, on détermine les attributs à
+        # supprimer.
+        # Uniquement ceux qui ne sont pas utilisés par d'autres objets.
+        my $deleteAttrs = $self->_diffObjectclassAttrs($deletedObjectclass, $currentObjectclass, $objectclassDesc);
 
-            for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
-                if( $self->_modifyAttrList( undef, $entry, $deleteAttrs->[$i] ) ) {
-                    $update = 1;
-                }
+        for( my $i=0; $i<=$#$deleteAttrs; $i++ ) {
+            if( $self->_modifyAttr( undef, $entry, $deleteAttrs->[$i] ) ) {
+                $update = 1;
             }
         }
+    }
+    
 
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'mailshare_ldap_mailbox'}, $entry, 'mailbox' ) ) {
-            $update = 1;
-        }
+    require OBM::Ldap::ldapMapping;
+    my $ldapMapping = OBM::Ldap::ldapMapping->instance();
 
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'mailshare_description'}, $entry, 'description' ) ) {
-            $update = 1;
-        }
+    if( $self->getUpdateEntity() ) {
+        my @exceptions;
+        push( @exceptions, @{$self->{'ldapMappingScope'}->{'updateLinks'}} );
+        my $attrsMapping = $ldapMapping->getAllAttrsMapping( $self, \@exceptions );
 
-        if( $self->_modifyAttr( $self->{'entityDesc'}->{'mailshare_mail_server'}, $entry, 'mailBoxServer' ) ) {
-            $update = 1;
-        }
-
-        if( $self->_modifyAttrList( $self->{'email'}, $entry, 'mail' ) ) {
-            $update = 1;
-        }
-
-        if( $self->_modifyAttrList( $self->{'emailAlias'}, $entry, 'mailAlias' ) ) {
-            $update = 1;
-        }
-
-        if( $self->{'entityDesc'}->{'mailshare_mail_perms'} && $self->_modifyAttr( 'PERMIT', $entry, 'mailAccess' ) ) {
-            $update = 1;
-        }elsif( !$self->{'entityDesc'}->{'mailshare_mail_perms'} && $self->_modifyAttr( 'REJECT', $entry, 'mailAccess' ) ) {
-            $update = 1;
-        }
-
-        if( defined($self->{'parent'}) && (my $domainName = $self->{'parent'}->getDesc('domain_name')) ) {
-            if( $self->_modifyAttr( $domainName, $entry, 'obmDomain' ) ) {
+        for( my $i=0; $i<=$#{$attrsMapping}; $i++ ) {
+            if( $self->_modifyAttr( $self->getDesc( $attrsMapping->[$i]->{'desc'}->{'name'} ), $entry, $attrsMapping->[$i]->{'ldap'}->{'name'} ) ) {
                 $update = 1;
             }
         }
