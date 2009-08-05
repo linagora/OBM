@@ -86,6 +86,7 @@ $l_text = "Text";
 $l_name = "Name";
 $l_kind = "Kind";
 $l_displayname = 'Display name';
+$l_displayname_alternative = "[Show details]";
 $l_lastname = "Last name";
 $l_firstname = "First name";
 $l_title = "Title";

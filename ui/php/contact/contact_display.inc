@@ -59,7 +59,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   if ($fieldname == 'contact_displayname') {
      $displayname = $OD->data_set->f('contact_firstname').' '.$OD->data_set->f('contact_lastname');
     if(trim($displayname) == '') {
-      $displayname = $GLOBALS['l_data_unfilled'];
+      $displayname = $GLOBALS['l_displayname_alternative'];
     }
     if ($OD->display_ext == 'get_id') {
       $res['url'] = "javascript:check_contact_get_id(".$OD->data_set->f('contact_id').",'".phpStringToJsString($displayname)."');";

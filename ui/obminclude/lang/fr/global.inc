@@ -83,6 +83,7 @@ $l_text = "Texte";
 $l_name = "Nom";
 $l_kind = "Genre";
 $l_displayname = 'Nom complet';
+$l_displayname_alternative = "[Afficher les informations détaillées]";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_title = "Titre";
