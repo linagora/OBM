@@ -41,15 +41,9 @@ sub update {
         return 0;
     }
 
-    if( !($passwd = $self->_convertPasswd( 'PLAIN', $passwd)) ) {
-        $self->_log( 'echec de conversion du mot de passe Unix', 3 );
-        return 1;
-    }
 
-
-    # Obtention des DNs de l'entité mise à jour
+    # Get updated entity DN's
     my $currentEntityDNs = $entity->getCurrentDnPrefix();
-
     for( my $i=0; $i<=$#{$currentEntityDNs}; $i++ ) {
         my $updateLdapEntity = $self->_searchLdapEntityByDN( $currentEntityDNs->[$i] );
 
@@ -57,14 +51,20 @@ sub update {
             return 1;
         }
 
-        if( $self->_modifyAttr( $passwd , $updateLdapEntity, 'userPassword' ) ) {
+        my $update = $entity->setLdapUnixPasswd( $updateLdapEntity, $passwd );
+
+        if( $update ) {
             if( $self->_ldapUpdateEntity($updateLdapEntity) ) {
                 $self->_log( 'échec de mise à jour de l\'entrée LDAP', 3 );
                 return 1;
             }
-        }else {
+
+        }elsif( !defined($update) ) {
             $self->_log( 'échec de mise à jour du mot de passe Unix', 3 );
             return 1;
+        }elsif( !$update ) {
+            $self->_log( 'pas de mise à jour du mot de passe Unix nécessaire', 3 );
+            return 0;
         }
     }
 

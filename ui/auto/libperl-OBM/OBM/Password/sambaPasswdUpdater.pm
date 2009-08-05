@@ -52,9 +52,8 @@ sub update {
     }
 
 
-    # Obtention des DNs de l'entité mise à jour
+    # Get updated entity DN's
     my $currentEntityDNs = $entity->getCurrentDnPrefix();
-
     for( my $i=0; $i<=$#{$currentEntityDNs}; $i++ ) {
         my $updateLdapEntity = $self->_searchLdapEntityByDN( $currentEntityDNs->[$i] );
 
