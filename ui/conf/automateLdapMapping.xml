@@ -1,0 +1,358 @@
+<entitiesMapping>
+    <entity name='OBM::Entities::obmUser'>
+        <objectclass name='posixAccount'/>
+        <objectclass name='shadowAccount'/>
+        <objectclass name='inetOrgPerson'/>
+        <objectclass name='obmUser'/>
+        <objectclass name='sambaSamAccount' condition='userobm_samba_perms'/>
+        <rdn>
+            <ldap name='uid'/>
+            <desc name='userobm_login_current'/>
+        </rdn>
+        <map>
+            <ldap name='uid'/>
+            <desc name='userobm_login_new'/>
+        </map>
+        <map>
+            <ldap name='uidNumber'/>
+            <desc name='userobm_uid'/>
+        </map>
+        <map>
+            <ldap name='gidNumber'/>
+            <desc name='userobm_gid'/>
+        </map>
+        <map>
+            <ldap name='loginShell'/>
+            <desc name='userobm_loginshell'/>
+        </map>
+        <map>
+            <ldap name='cn'/>
+            <desc name='userobm_fullname'/>
+        </map>
+        <map>
+            <ldap name='displayName'/>
+            <desc name='userobm_fullname'/>
+        </map>
+        <map>
+            <ldap name='sn'/>
+            <desc name='userobm_lastname'/>
+        </map>
+        <map>
+            <ldap name='givenName'/>
+            <desc name='userobm_firstname'/>
+        </map>
+        <map>
+            <ldap name='homeDirectory'/>
+            <desc name='userobm_homedirectory'/>
+        </map>
+        <map>
+            <ldap name='userPassword'/>
+            <desc name='userobm_password_crypt'/>
+        </map>
+        <map>
+            <ldap name='telephoneNumber'/>
+            <desc name='userobm_phone_list'/>
+        </map>
+        <map>
+            <ldap name='facsimileTelephoneNumber'/>
+            <desc name='userobm_fax_list'/>
+        </map>
+        <map>
+            <ldap name='mobile'/>
+            <desc name='userobm_mobile'/>
+        </map>
+        <map>
+            <ldap name='title'/>
+            <desc name='userobm_title'/>
+        </map>
+        <map>
+            <ldap name='personalTitle'/>
+            <desc name='userobm_kind'/>
+        </map>
+        <map>
+            <ldap name='ou'/>
+            <desc name='userobm_service'/>
+        </map>
+        <map>
+            <ldap name='o'/>
+            <desc name='userobm_company'/>
+        </map>
+        <map>
+            <ldap name='description'/>
+            <desc name='userobm_description'/>
+        </map>
+        <map>
+            <ldap name='direction'/>
+            <desc name='userobm_direction'/>
+        </map>
+        <map>
+            <ldap name='delegation'/>
+            <desc name='userobm_delegation'/>
+        </map>
+        <map>
+            <ldap name='jpegPhoto'/>
+            <desc name='userobm_photo'/>
+        </map>
+        <map>
+            <ldap name='shadowExpire'/>
+            <desc name='userobm_account_dateexp_timestamp'/>
+        </map>
+        <map>
+            <ldap name='webAccess'/>
+            <desc name='userobm_web_access'/>
+        </map>
+        <map>
+            <ldap name='mailBox'/>
+            <desc name='userobm_ldap_mailbox'/>
+        </map>
+        <map>
+            <ldap name='mailBoxServer'/>
+            <desc name='userobm_mailbox_server'/>
+        </map>
+        <map>
+            <ldap name='mailAccess'/>
+            <desc name='userobm_mail_access'/>
+        </map>
+        <map>
+            <ldap name='mail'/>
+            <desc name='userobm_main_email'/>
+        </map>
+        <map>
+            <ldap name='mailAlias'/>
+            <desc name='userobm_alias_email'/>
+        </map>
+        <map>
+            <!-- Thunderbird, Icedove... use only this attribute -->
+            <ldap name='street'/>
+            <desc name='userobm_full_address'/>
+        </map>
+        <map>
+            <!-- Outlook use only this attribute -->
+            <!-- Outlook express prefer this attribute -->
+            <ldap name='postalAddress'/>
+            <desc name='userobm_full_address'/>
+        </map>
+        <map>
+            <ldap name='postalCode'/>
+            <desc name='userobm_zipcode'/>
+        </map>
+        <map>
+            <ldap name='l'/>
+            <desc name='userobm_town'/>
+        </map>
+        <map>
+            <ldap name='hiddenUser'/>
+            <desc name='userobm_hidden_access'/>
+        </map>
+        <map>
+            <ldap name='obmDomain'/>
+            <desc name='userobm_obm_domain'/>
+        </map>
+        <map>
+            <ldap name='sambaSID'/>
+            <desc name='userobm_samba_sid'/>
+        </map>
+        <map>
+            <ldap name='sambaPrimaryGroupSID'/>
+            <desc name='userobm_samba_group_sid'/>
+        </map>
+        <map>
+            <ldap name='sambaAcctFlags'/>
+            <desc name='userobm_samba_flags'/>
+        </map>
+        <map>
+            <ldap name='sambaLogonScript'/>
+            <desc name='userobm_samba_logon_script'/>
+        </map>
+        <map>
+            <ldap name='sambaHomeDrive'/>
+            <desc name='userobm_samba_home_drive'/>
+        </map>
+        <map>
+            <ldap name='sambaHomePath'/>
+            <desc name='userobm_samba_home'/>
+        </map>
+        <map>
+            <ldap name='sambaProfilePath'/>
+            <desc name='userobm_samba_profile'/>
+        </map>
+        <map>
+            <ldap name='sambaNTPassword'/>
+            <desc name='userobm_samba_nt_password'/>
+        </map>
+        <map>
+            <ldap name='sambaLMPassword'/>
+            <desc name='userobm_samba_lm_password'/>
+        </map>
+        <map>
+            <ldap name='sambaPwdLastSet'/>
+            <desc name='userobm_pwd_lastset_time'/>
+        </map>
+    </entity>
+    <entity name='OBM::Entities::obmGroup'>
+        <objectclass name='posixGroup'/>
+        <objectclass name='obmGroup'/>
+        <objectclass name='sambaGroupMapping' condition='group_samba'/>
+        <rdn>
+            <ldap name='cn'/>
+            <desc name='group_name_current'/>
+        </rdn>
+        <map>
+            <ldap name='cn'/>
+            <desc name='group_name_new'/>
+        </map>
+        <map>
+            <ldap name='gidNumber'/>
+            <desc name='group_gid'/>
+        </map>
+        <map>
+            <ldap name='description'/>
+            <desc name='group_desc'/>
+        </map>
+        <map>
+            <ldap name='mailAccess'/>
+            <desc name='group_mailperms_access'/>
+        </map>
+        <map>
+            <ldap name='mail'/>
+            <desc name='group_main_email'/>
+        </map>
+        <map>
+            <ldap name='emailAlias'/>
+            <desc name='group_alias_email'/>
+        </map>
+        <map>
+            <ldap name='obmDomain'/>
+            <desc name='group_obm_domain'/>
+        </map>
+        <map>
+            <ldap name='sambaSID'/>
+            <desc name='group_samba_sid'/>
+        </map>
+        <map>
+            <ldap name='sambaGroupType'/>
+            <desc name='group_samba_type'/>
+        </map>
+        <map>
+            <ldap name='displayName'/>
+            <desc name='group_samba_name'/>
+        </map>
+        <map>
+            <ldap name='memberUid'/>
+            <desc name='group_users'/>
+        </map>
+        <map>
+            <ldap name='mailBox'/>
+            <desc name='group_mailboxes'/>
+        </map>
+        <map>
+            <ldap name='externalContactEmail'/>
+            <desc name='group_contacts_list'/>
+        </map>
+        <map>
+            <ldap name='sambaSIDList'/>
+            <desc name='group_samba_users'/>
+        </map>
+    </entity>
+    <entity name='OBM::Entities::obmHost'>
+        <objectclass name='device'/>
+        <objectclass name='obmHost'/>
+        <objectclass name='posixAccount' condition='host_samba'/>
+        <objectclass name='sambaSamAccount' condition='host_samba'/>
+        <rdn>
+            <ldap name='cn'/>
+            <desc name='host_name_current'/>
+        </rdn>
+        <map>
+            <ldap name='cn'/>
+            <desc name='host_name_new'/>
+        </map>
+        <map>
+            <ldap name='uidNumber'/>
+            <desc name='host_uidnumber'/>
+        </map>
+        <map>
+            <ldap name='gidNumber'/>
+            <desc name='host_gid'/>
+        </map>
+        <map>
+            <ldap name='homeDirectory'/>
+            <desc name='host_homedirectory'/>
+        </map>
+        <map>
+            <ldap name='ipHostNumber'/>
+            <desc name='host_ip'/>
+        </map>
+        <map>
+            <ldap name='description'/>
+            <desc name='host_description'/>
+        </map>
+        <map>
+            <ldap name='obmDomain'/>
+            <desc name='host_obm_domain'/>
+        </map>
+        <map>
+            <ldap name='uid'/>
+            <desc name='host_login'/>
+        </map>
+        <map>
+            <ldap name='sambaSID'/>
+            <desc name='host_samba_sid'/>
+        </map>
+        <map>
+            <ldap name='sambaPrimaryGroupSID'/>
+            <desc name='host_samba_group_sid'/>
+        </map>
+        <map>
+            <ldap name='sambaAcctFlags'/>
+            <desc name='host_samba_flags'/>
+        </map>
+        <map>
+            <ldap name='sambaLMPassword'/>
+            <desc name='host_lm_passwd'/>
+        </map>
+        <map>
+            <ldap name='sambaNTPassword'/>
+            <desc name='host_nt_passwd'/>
+        </map>
+    </entity>
+    <entity name='OBM::Entities::obmMailshare'>
+        <objectclass name='obmMailShare'/>
+        <rdn>
+            <ldap name='cn'/>
+            <desc name='mailshare_name_current'/>
+        </rdn>
+        <map>
+            <ldap name='cn'/>
+            <desc name='mailshare_name_new'/>
+        </map>
+        <map>
+            <ldap name='mailBox'/>
+            <desc name='mailshare_ldap_mailbox'/>
+        </map>
+        <map>
+            <ldap name='description'/>
+            <desc name='mailshare_description'/>
+        </map>
+        <map>
+            <ldap name='mailBoxServer'/>
+            <desc name='mailshare_mail_server'/>
+        </map>
+        <map>
+            <ldap name='mail'/>
+            <desc name='mailshare_main_email'/>
+        </map>
+        <map>
+            <ldap name='mailAlias'/>
+            <desc name='mailshare_alias_email'/>
+        </map>
+        <map>
+            <ldap name='mailAccess'/>
+            <desc name='mailshare_mailperms_access'/>
+        </map>
+        <map>
+            <ldap name='obmDomain'/>
+            <desc name='mailshare_obm_domain'/>
+        </map>
+    </entity>
+ </entitiesMapping>
