@@ -5876,7 +5876,7 @@ Class CalendarPdfMonthAgenda Extends CalendarPdf{
       }
 
       if (!$occurrence->event->all_day){
-        $title .= $occurrence->date->get(Of_Date::TIME_SHORT).' - ';
+        $title .= $occurrence->date->get(Of_Date::TIME_SHORT).' ';
       }
       
       if ($occurrence->event->privacy && !(array_key_exists($obm['uid'],$attendee['user']))) {
