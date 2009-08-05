@@ -200,15 +200,70 @@ sub getUpdated {
 
 sub getDnPrefix {
     my $self = shift;
+    my $rootDn;
+    my @dnPrefixes;
 
-    return undef;
+    if( !($rootDn = $self->_getParentDn()) ) {
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        return undef;
+    }
+
+    require OBM::Ldap::ldapMapping;
+    my $ldapMapping = OBM::Ldap::ldapMapping->instance();
+    my $rdnMapping = $ldapMapping->getRdn($self);
+    if( !defined($rdnMapping) ) {
+        $self->_log( 'mapping du RDN de l\'entité '.$self->getDescription().' incorrect', 2 );
+        return undef;
+    }
+
+    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
+        push( @dnPrefixes, $rdnMapping->{'ldap'}->{'name'}.'='.$self->getDesc( $rdnMapping->{'desc'}->{'name'} ).','.$rootDn->[$i] );
+        $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
+    }
+
+    return \@dnPrefixes;
 }
 
 
 sub getCurrentDnPrefix {
     my $self = shift;
+    my $rootDn;
+    my @dnPrefixes;
 
-    return undef;
+    if( !($rootDn = $self->_getParentDn()) ) {
+        $self->_log( 'DN de la racine du domaine parent non déterminée', 3 );
+        return undef;
+    }
+
+    require OBM::Ldap::ldapMapping;
+    my $ldapMapping = OBM::Ldap::ldapMapping->instance();
+    my $rdnMapping = $ldapMapping->getCurrentRdn($self);
+    if( !defined($rdnMapping) ) {
+        $self->_log( 'mapping du RDN de l\'entité '.$self->getDescription().' incorrect', 2 );
+        return undef;
+    }
+
+
+    for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
+        push( @dnPrefixes, $rdnMapping->{'ldap'}->{'name'}.'='.$self->getDesc( $rdnMapping->{'desc'}->{'name'} ).','.$rootDn->[$i] );
+        $self->_log( 'DN de l\'entité : '.$dnPrefixes[$i], 4 );
+    }
+
+    return \@dnPrefixes;
+}
+
+
+sub _getLdapObjectclass {
+    my $self = shift;
+    my ($objectclass, $deletedObjectclass) = @_;
+
+    require OBM::Ldap::ldapMapping;
+    my $ldapMapping = OBM::Ldap::ldapMapping->instance();
+
+    my $newObjectClass = $ldapMapping->getObjectClass($self, $objectclass);
+
+    $$deletedObjectclass = $newObjectClass->{'deletedObjectclass'};
+    return $newObjectClass->{'objectClass'};
 }
 
 
@@ -436,6 +491,14 @@ sub getSieveNomade {
     my $self = shift;
 
     return undef;
+}
+
+
+sub setLdapUnixPasswd {
+    my $self = shift;
+    my( $entry, $plainPasswd ) = @_;
+
+    return 0;
 }
 
 
