@@ -282,7 +282,7 @@ sub _connect {
             $self->_setDeadStatus();
             return 1;
         }elsif( $error->code ) {
-            $self->_log( 'echec de l\'authentification : '.$error->error, 3 );
+            $self->_log( 'echec de l\'authentification : '.$error->error, 0 );
         }
     }
 
