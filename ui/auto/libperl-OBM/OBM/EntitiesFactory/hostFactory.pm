@@ -188,11 +188,6 @@ sub _loadHostLinks {
 
     my $entityId = $self->{'currentEntity'}->getId();
 
-    my $hostTable = 'Host';
-    if( $self->{'updateType'} !~ /^(UPDATE_ALL|UPDATE_ENTITY)$/ ) {
-        my $hostTable = 'P_'.$hostTable;
-    }
-
     my $hostEntityTable = 'HostEntity';
     my $serviceTable = 'Service';
     if( $self->{'updateType'} =~ /^(SYSTEM_ALL|SYSTEM_ENTITY|SYSTEM_LINKS)$/ ) {
