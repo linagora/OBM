@@ -259,6 +259,9 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     $fuzzy = '';
   }
   $company_id = $contact['company_id'];
+  $expanded = $contact['expanded'];
+  $searchMore_expanded = ($expanded ? 'inline' : 'none');
+  $expand_link = ($expanded ? $GLOBALS['l_less_fields'] : $GLOBALS['l_more_fields']);
 
   $show_func = (! $cgp_hide['contact']['function']);
   $show_title = (! $cgp_hide['contact']['contact_title']);
@@ -379,7 +382,7 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" value=\"$email\" />
     </label>      
-    <div id='searchMore' style=\"display:none\">
+    <div id='searchMore' style=\"display:$searchMore_expanded\">
     <label>$l_phone<br />
       <input type=\"text\" name=\"tf_phone\" size=\"12\" maxlength=\"24\" value=\"$phone\" />
     </label>      
@@ -425,14 +428,15 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"hd_company_id\" type=\"hidden\" value=\"$company_id\" />
+      <input id=\"hd_expanded\" name=\"hd_expanded\" type=\"hidden\" value=\"$expanded\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext &nbsp;
     </label>
     <label>
     <br />
-    <a href='#' onclick=\"if($('searchMore').getStyle('display') == 'none') { $('searchMore').setStyle('display',''); this.innerHTML = '".phpStringToJsString($GLOBALS['l_less_fields'])."'} else { $('searchMore').setStyle('display','none'); this.innerHTML = '".phpStringToJsString($GLOBALS['l_more_fields'])."'} return false;\">
-    $GLOBALS[l_more_fields] 
+    <a href='#' onclick=\"if($('searchMore').getStyle('display') == 'none') { $('searchMore').setStyle('display',''); $('hd_expanded').value='1'; this.innerHTML = '".phpStringToJsString($GLOBALS['l_less_fields'])."'} else { $('searchMore').setStyle('display','none'); $('hd_expanded').value=''; this.innerHTML = '".phpStringToJsString($GLOBALS['l_more_fields'])."'} return false;\">
+    $expand_link 
     </a>
     </label>
     <p class=\"CL\" />
