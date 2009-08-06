@@ -6293,8 +6293,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $begin = $datebegin->getHour()+$datebegin->getMinute()/60; 
 
         $dateend = clone $event->end;
-        $dateend->setMinute($dateend->getMinute() + ($dateend->getMinute()%$time_unit))->setSecond(0);
-        $end = $dateend->getHour()+$dateend->getMinute()/60; 
+        $end = $dateend->getHour()+($dateend->getMinute() + ($dateend->getMinute()%$time_unit))/60; 
         if($end > $this->calendar_last_hour) $end = $this->calendar_last_hour;
 
         $y1 = $this->calendar_y1-$this->allday_height-($begin - $this->calendar_first_hour)*$this->col_height;
