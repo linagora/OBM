@@ -2895,7 +2895,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $repeat_days = $event_q->f('event_repeatdays');
     $repeatfrequency = $event_q->f('event_repeatfrequence');
     if ($repeat_kind != 'none') {
-      $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
+      $event_endrepeat = $event_q->f('event_endrepeat');
+      if (!empty($event_endrepeat))
+        $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
     }
     $id = $event_q->f('event_id');
 
@@ -2934,7 +2936,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['repeat_kind'])) { $repeat_kind = $calendar['repeat_kind']; }
   if (isset($calendar['repeat_days']) && $calendar['repeat_days'] != '000000') { $repeat_days = $calendar['repeat_days'];}
   if (isset($calendar['repeat_end'])) $repeat_end = $calendar['repeat_end'];
-  if(!isset($repeat_end)) {$repeat_end = new Of_Date();}
   if (isset($calendar['force'])) { $force = $calendar['force']; }
   if (isset($calendar['force_disabled'])) { $force_disabled = $calendar['force_disabled']; }
   if ($repeat_kind != 'weekly') {
@@ -2995,6 +2996,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
+  $repeat_end_value = isset($repeat_end) ? $repeat_end->getInputDate() : '';
   $$repeat_kind .= "selected=\"selected\" ";
   $dis_sel_kind .= "
     <select onchange=\"repeat_form($(this).get('inputValue'))\" name=\"sel_repeat_kind\">
@@ -3031,9 +3033,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $day = $week->localize(Of_Date::WEEKDAY_NARROW) ;
     $j = $week->getWeekday();
     if (strcmp(substr($repeat_days,$j,1),'1') ==0) {
-      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" name=\"cba_repeatday_".$j."\" value=\"1\" checked = \"checked\"/>$day</span> ";
+      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" id=\"cba_repeatday_".$j."\" name=\"cba_repeatday_".$j."\" value=\"1\" checked = \"checked\"/><label for=\"cba_repeatday_".$j."\">$day</label></span> ";
     } else {
-      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" name=\"cba_repeatday_".$j."\" value=\"1\" />$day</span> ";
+      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" id=\"cba_repeatday_".$j."\" name=\"cba_repeatday_".$j."\" value=\"1\" /><label for=\"cba_repeatday_".$j."\">$day</label></span> ";
     }
     $week->addDay(1);
   }
@@ -3575,7 +3577,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <tr id=\"repeatEnd\" style=\"display:$repeatDisplay\">    
     <th>$l_date_repeatend</th> 
     <td>
-      <input type=\"text\" name=\"tf_repeat_end\" id=\"tf_repeat_end\" value=\"".$repeat_end->getInputDate()."\" class=\"datePicker\" />
+      <input type=\"text\" name=\"tf_repeat_end\" id=\"tf_repeat_end\" value=\"$repeat_end_value\" class=\"datePicker\" />
     </td>
   </tr>
   <tr id=\"repeatDays\" style=\"display:$repeatDaysDisplay\">  
@@ -4737,7 +4739,7 @@ function dis_calendar_pdf_options($calendar, $p_range, $p_view) {
         if (strcmp(substr($display_days,$i,1),'1')==0) {
           $dis_list_day .= " checked = \"checked\"";
         }
-        $dis_list_day .= " /> $day";
+        $dis_list_day .= " /><label for=\"$cba_id\">$day</label> ";
 
         $start_week_day = strtotime('+1 day', $start_week_day); 
       }

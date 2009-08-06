@@ -203,10 +203,6 @@ function check_calendar_calendar(form) {
     alert(\"$l_dateend\" + \" : $l_fill_date\");
     return false;
   }
-  else if ((form.tf_repeat_end.value == \"\") && (trim(form.sel_repeat_kind.value) != \"none\") ) {
-    alert(\"$l_date_repeatend\" + \" : $l_fill_date\");
-    return false;
-  }
   return true;
 }
 

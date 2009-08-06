@@ -2354,9 +2354,11 @@ function check_calendar_data_form($calendar) {
   // Repeatition check
   if ($kind != 'none') {
     // End repeat Date check
-    if ($repeat_end->error() != Of_Date::WARN_EMPTY_DATE && $repeat_end->error() == Of_Date::ERR_INVALID_DATE) {
-      $err['msg'] = "$l_date_repeatend : $l_invalid_date"; 
-      return false;
+    if (!is_null($repeat_end)) {
+      if ($repeat_end->error() != Of_Date::WARN_EMPTY_DATE && $repeat_end->error() == Of_Date::ERR_INVALID_DATE) {
+        $err['msg'] = "$l_date_repeatend : $l_invalid_date"; 
+        return false;
+      }
     }
 
     if (!is_numeric($repeatfrequency) || $repeatfrequency < 1) {
@@ -2370,9 +2372,11 @@ function check_calendar_data_form($calendar) {
     return false;
   } 
 
-  if ($repeat_end->error() != Of_Date::WARN_EMPTY_DATE && $end->compare($repeat_end) > 0 && $kind != 'none') {
-    $err['msg'] =  $l_err_end_repeat;
-    return false;
+  if (!is_null($repeat_end)) {
+    if ($repeat_end->error() != Of_Date::WARN_EMPTY_DATE && $end->compare($repeat_end) > 0 && $kind != 'none') {
+      $err['msg'] =  $l_err_end_repeat;
+      return false;
+    }
   }
 
   // If repeat kind is weekly, repeat days must be set
@@ -2383,19 +2387,19 @@ function check_calendar_data_form($calendar) {
 
   $clone = clone $end;
   // Weekly repetition end >= date end + 1 week
-  if ($kind == 'weekly' && $clone->addWeek(1)->compare($repeat_end) > 0) {
+  if ($kind == 'weekly' && !is_null($repeat_end) && $clone->addWeek(1)->compare($repeat_end) > 0) {
     $err['msg'] = $l_err_weekly_repeat;
     return false;
   }
 
   // Monthly repetition end >= date end + 1 month
-  if ((($kind == 'monthlybydate') || ($kind == 'monthlybyday')) && $clone->addWeek(1)->compare($repeat_end) > 0) {
+  if ((($kind == 'monthlybydate') || ($kind == 'monthlybyday')) && !is_null($repeat_end) && $clone->addWeek(1)->compare($repeat_end) > 0) {
     $err['msg'] = $l_err_monthly_dateend_repeat;
     return false;
   }
 
   // Yearly repetition end >= date end + 1 year
-  if ($kind == 'yearly' && $clone->addYear(1)->compare($repeat_end) > 0) {
+  if ($kind == 'yearly' && !is_null($repeat_end) && $clone->addYear(1)->compare($repeat_end) > 0) {
     $err['msg'] = $l_err_yearly_dateend_repeat;
     return false;
   }
