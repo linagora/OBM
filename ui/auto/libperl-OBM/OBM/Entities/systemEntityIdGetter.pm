@@ -11,6 +11,15 @@ use 5.006_001;
 use strict;
 
 
-my $domain = 'Domain';
-my $userObmTable = 'P_UserObm';
-my $mailShareTable = 'P_MailShare';
+sub _userObmTable {
+    my $self = shift;
+
+    return 'P_UserObm';
+}
+
+
+sub _mailShareTable {
+    my $self = shift;
+
+    return 'P_MailShare';
+}

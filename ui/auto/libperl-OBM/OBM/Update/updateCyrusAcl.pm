@@ -137,7 +137,7 @@ sub update {
     my $self = shift;
 
     require OBM::Cyrus::cyrusUpdateAclEngine;
-    $self->_log( 'initialisation du moteur ide mise à jour des ACLs et mise à jour des ACLs', 2 );
+    $self->_log( 'initialisation du moteur de mise à jour des ACLs et mise à jour des ACLs', 2 );
     my $cyrusUpdateAclEngine;
     if( !($cyrusUpdateAclEngine = OBM::Cyrus::cyrusUpdateAclEngine->new()) ) {
         $self->_log( 'problème à l\'initialisation du moteur de mise à jour des ACLs Cyrus', 0 );

@@ -8,9 +8,25 @@ use 5.006_001;
 use strict;
 
 
-my $domain = 'Domain';
-my $userObmTable = 'UserObm';
-my $mailShareTable = 'MailShare';
+sub _domainTable {
+    my $self = shift;
+
+    return 'Domain';
+}
+
+
+sub _userObmTable {
+    my $self = shift;
+
+    return 'UserObm';
+}
+
+
+sub _mailShareTable {
+    my $self = shift;
+
+    return 'MailShare';
+}
 
 
 sub _getUserIdFromUserLoginDomain {
@@ -37,7 +53,7 @@ sub _getUserIdFromUserLoginDomain {
     }
 
     my $query = 'SELECT userobm_id
-                 FROM '.$userObmTable.'
+                 FROM '.$self->_userObmTable().'
                  WHERE userobm_login='.$dbHandler->quote(lc($userLogin)).' AND userobm_domain_id='.$domainId;
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
@@ -73,7 +89,7 @@ sub getUserIdByDomainId {
 
     my $query = 'SELECT userobm_id,
                         userobm_domain_id
-                 FROM '.$userObmTable;
+                 FROM '.$self->_userObmTable();
 
     if( $domainList ) {
         $query .= ' WHERE userobm_domain_id IN ('.join(', ', @{$domainList}).')';
@@ -117,7 +133,7 @@ sub _getMailShareIdFromUserLoginDomain {
     }
 
     my $query = 'SELECT mailshare_id
-                 FROM '.$mailShareTable.'
+                 FROM '.$self->_mailShareTable().'
                  WHERE mailshare_name='.$dbHandler->quote(lc($mailShareName)).' AND mailshare_domain_id='.$domainId;
     my $queryResult;
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
@@ -156,7 +172,7 @@ sub getDomainId {
     }
 
     my $query = 'SELECT domain_id
-                 FROM '.$domain;
+                 FROM '.$self->_domainTable();
 
     my $whereClause = '';
     if( !$withGlobal ) {
