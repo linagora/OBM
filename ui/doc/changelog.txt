@@ -39,3 +39,5 @@ To do
   * #549 Member list is empty in project search
   * #554 Document creation from Project or other module do not link the document
   * #556 Project consult displays all the users as members
+  * #520 Better log message on applying ACL on mailbox or mailshare before creation
+  * LDAP attribute mapping
