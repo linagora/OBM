@@ -636,15 +636,20 @@ function html_contact_header($co_q, $funcs) {
   $aka = $co_q->f('contact_aka');
   $service = $co_q->f('contact_service');
   $archive = ($co_q->f('contact_archive') == 1 ? $l_yes : $l_no);
-  $date = $co_q->f('contact_date');
-  $date = ($date != 0) ? of_date_format($date) : $l_no_date;
   $manager = $co_q->f('contact_manager');
   $assistant = $co_q->f('contact_assistant');
   $spouse = $co_q->f('contact_spouse');
   $category = $co_q->f('contact_category');
   $mailok = ($co_q->f('contact_mailing_ok') == 1 ? $l_yes : $l_no);
   $newsletter = ($co_q->f('contact_newsletter') == 1 ? $l_yes : $l_no);
-  
+
+  if ($co_q->f('contact_date')) {
+    $date = new Of_Date($co_q->f('contact_date'), 'GMT');
+    $date = $date->getOutputDate();
+  } else {
+    $date = $l_no_date;
+  }
+
   if ($co_q->f('contact_birthday')) {
     $birthday = new Of_Date($co_q->f('contact_birthday'), 'GMT');
     $birthday = $birthday->getOutputDate();
@@ -1174,19 +1179,22 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $dsrc = $co_q->f('contact_datasource_id');
     $kind = $co_q->f('contact_kind_id');
     $mark = $co_q->f('contact_marketingmanager_id');
-    $date = $co_q->f('contact_date');
-    $date = of_date_upd_format($date, true);
-    
-    if ($co_q->f('contact_birthday')) {
-      $birthday = $co_q->f('contact_birthday');
-      $birthday = of_date_upd_format($birthday, true);
 
+    if ($co_q->f('contact_date')) {
+      $date = new Of_Date($co_q->f('contact_date'), 'GMT');
+      $date = $date->getInputDate();
     }
+
+    if ($co_q->f('contact_birthday')) {
+      $birthday = new Of_Date($co_q->f('contact_birthday'), 'GMT');
+      $birthday = $birthday->getInputDate();
+    }
+
     if ($co_q->f('contact_anniversary')) {
-      $anniversary = $co_q->f('contact_anniversary');
-      $anniversary = of_date_upd_format($anniversary, true);
+      $anniversary = new Of_Date($co_q->f('contact_anniversary'), 'GMT');
+      $anniversary = $anniversary->getInputDate();
     }
-    
+
     $lname = $co_q->f('contact_lastname');
     $fname = $co_q->f('contact_firstname');
     $mname = $co_q->f('contact_middlename');

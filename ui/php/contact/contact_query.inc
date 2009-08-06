@@ -374,9 +374,9 @@ function run_query_contact_detail($p_id) {
     m.userobm_firstname as market_fname,
     contactfunction_label,
     datasource_name,
-    $date,
-    $birthday,
-    $anniversary,
+    contact_date,
+    bd.event_date as contact_birthday,
+    an.event_date as contact_anniversary,
     contact_birthday_id,
     contact_anniversary_id,
     c.userobm_login as usercreate,
@@ -820,9 +820,8 @@ function run_query_contact_update($contact) {
     $birthday = null;
   }
   $old_contact = run_query_contact_detail($id);
-  $old_birthday = $old_contact->f('contact_birthday');
-  if ($old_birthday) {
-    $old_birthday = new Of_Date($old_birthday);
+  if ($old_contact->f('contact_birthday')) {
+    $old_birthday = new Of_Date($old_contact->f('contact_birthday'),'GMT');
   } else {
     $old_birthday = null;
   }
@@ -837,9 +836,8 @@ function run_query_contact_update($contact) {
   } else {
     $anniversary = null;
   }
-  $old_anniversary = $old_contact->f('contact_anniversary');
-  if ($old_anniversary) {
-    $old_anniversary = new Of_Date($old_anniversary);
+  if ($old_contact->f('contact_anniversary')) {
+    $old_anniversary = new Of_Date($old_contact->f('contact_anniversary'),'GMT');
   } else {
     $old_anniversary = null;
   }
