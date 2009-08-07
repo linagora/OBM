@@ -10,17 +10,32 @@ class OBM_Contact {
   public $id;
   public $lastname;
   public $firstname;
+  public $mname;//middlename
   public $kind;
   public $title;
-  public $company;
-  public $birthday;
   public $function;
+  public $company_id;
+  public $company;
+  public $market;//marketingmanager_id
+  public $suffix;
+  public $aka;
+  public $sound;
+  public $manager;
+  public $assistant;
+  public $spouse;
+  public $category;
+  public $service;
+  public $mailok;//mailing_ok
+  public $newsletter;
+  public $date;
+  public $birthday;
+  public $anniversary;
   public $phone = array();
   public $email = array();
   public $address = array();
   public $im = array();
   public $website = array();
-  
+ 
   private static $kinds = null;
   
   public static function get($id, $domain = null) {
@@ -70,8 +85,28 @@ class OBM_Contact {
         $contact['kind'] = $kind_id;
       }
     }
+
+    // x-obm-* (OBM specific fields)
+    $obmSpecificFields = array('mname','company_id','company','market','suffix',
+      'aka','sound','manager','assistant','spouse','category','service',
+      'mailok','newsletter');
+    foreach ($obmSpecificFields as $field) {
+      $value = $vcard->getValue("x-obm-{$field}");
+      if (!empty($value)) {
+        $contact[$field] = $value;
+      }
+    }
+    $date = $vcard->getValue("x-obm-date");
+    if (!empty($date)) {
+      $contact['date'] = $date;
+    }
+    $anniversary = $vcard->getValue("x-obm-anniversary");
+    if (!empty($anniversary)) {
+      $contact['anniversary'] = $anniversary;
+    }
+
     if ($vcard->bday !== null) {
-      $contact['birthday'] = $vcard->bday->format('U');
+      $contact['birthday'] = $vcard->bday->format(Of_date::DATE_ISO);
     }
     foreach ($vcard->addresses as $add) {
       $contact['addresses'][] = array(
@@ -128,13 +163,29 @@ class OBM_Contact {
         $card->addField(new Vpdi_Field($v, $this->$db));
       }
     }
-    
+
+    // x-obm-* (OBM specific fields)
+    $obmSpecificFields = array('mname','company_id','company','market','suffix',
+      'aka','sound','manager','assistant','spouse','category','service',
+      'mailok','newsletter');
+    foreach ($obmSpecificFields as $field) {
+      if (!empty($this->$field)) {
+        $card->addField(new Vpdi_Field("x-obm-{$field}", $this->$field));
+      }
+    }
+    if (!empty($this->date)) {
+      $card->addField(new Vpdi_Field('x-obm-date', $this->date->get(Of_date::DATE_ISO)));
+    }
+    if (!empty($this->anniversary)) {
+      $card->addField(new Vpdi_Field('x-obm-anniversary', $this->anniversary->get(Of_date::DATE_ISO)));
+    }
+
     //$card->addField(new Vpdi_Field('org', $this->company));
     
     if (!empty($this->birthday)) {
-      $card->addField(new Vpdi_Field('bday', date('Y-m-d', $this->birthday)));
+      $card->addField(new Vpdi_Field('bday', $this->birthday->get(Of_date::DATE_ISO)));
     }
-    
+
     foreach ($this->phone as $phone) {
       $ph = new Vpdi_VCard_Phone($phone['number']);
       $ph->location[] = $phone['label'];
@@ -169,32 +220,68 @@ class OBM_Contact {
 
     $db_type = $db->type;
     $birthday = sql_date_format($db_type, 'bd.event_date', 'contact_birthday');
+    $anniversary = sql_date_format($db_type, 'an.event_date', 'contact_anniversary');
     $contacts = array();
 
-    $query = "SELECT contact_id, contact_lastname,
+    $query = "SELECT contact_id,
+      contact_lastname,
       contact_firstname,
-      contact_title,
-      $birthday,
+      contact_middlename,
       kind_minilabel as contact_kind,
-      contactfunction_label as contact_function 
-    FROM Contact 
+      contact_title,
+      contactfunction_label as contact_function,
+      contact_company_id,
+      contact_company,
+      contact_marketingmanager_id,
+      contact_suffix,
+      contact_aka,
+      contact_sound,
+      contact_manager,
+      contact_assistant,
+      contact_spouse,
+      contact_category,
+      contact_service,
+      contact_mailing_ok,
+      contact_newsletter,
+      contact_date,
+      bd.event_date as contact_birthday,
+      an.event_date as contact_anniversary
+    FROM Contact
          LEFT JOIN Kind ON kind_id = contact_kind_id
-         LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id 
+         LEFT JOIN Event as bd ON contact_birthday_id = bd.event_id
+         LEFT JOIN Event as an ON contact_anniversary_id = an.event_id
          LEFT JOIN ContactFunction ON contact_function_id = contactfunction_id
     WHERE {$where}";
 
     $db->query($query);
     while ($db->next_record()) {
       $contact = new OBM_Contact;
-      $contact->id        = $db->f('contact_id');
-      $contact->lastname  = $db->f('contact_lastname');
-      $contact->firstname = $db->f('contact_firstname');
-      $contact->kind      = $db->f('contact_kind');
-      //$contact->company   = $db->f('contact_company');
-      $contact->function  = $db->f('contact_function');
-      $contact->title     = $db->f('contact_title');
-      $contact->birthday  = $db->f('contact_birthday');
-      
+      $contact->id          = $db->f('contact_id');
+      $contact->lastname    = $db->f('contact_lastname');
+      $contact->firstname   = $db->f('contact_firstname');
+      $contact->mname       = $db->f('contact_middlename');
+      $contact->kind        = $db->f('contact_kind');
+      $contact->title       = $db->f('contact_title');
+      $contact->function    = $db->f('contact_function');
+      $contact->company_id  = $db->f('contact_company_id');
+      $contact->company     = $db->f('contact_company');
+      $contact->market      = $db->f('contact_marketingmanager_id');
+      $contact->suffix      = $db->f('contact_suffix');
+      $contact->aka         = $db->f('contact_aka');
+      $contact->sound       = $db->f('contact_sound');
+      $contact->manager     = $db->f('contact_manager');
+      $contact->assistant   = $db->f('contact_assistant');
+      $contact->spouse      = $db->f('contact_spouse');
+      $contact->category    = $db->f('contact_category');
+      $contact->service     = $db->f('contact_service');
+      $contact->mailok      = $db->f('contact_mailing_ok');
+      $contact->newsletter  = $db->f('contact_newsletter');
+      if ($db->f('contact_date'))
+        $contact->date        = new Of_Date($db->f('contact_date'), 'GMT');
+      if ($db->f('contact_birthday'))
+        $contact->birthday    = new Of_Date($db->f('contact_birthday'), 'GMT');
+      if ($db->f('contact_anniversary'))
+        $contact->anniversary = new Of_Date($db->f('contact_anniversary'), 'GMT');
       $contacts[$contact->id] = $contact;
     }
     return $contacts;
