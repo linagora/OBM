@@ -649,7 +649,7 @@ function write_munin_conf(){
 		"\taddress ".$obm_q->f('host_ip')."\n".
 		"\tuse_node_name yes\n";
    }
-    if (file_exists($muninfile)) {
+    if (file_exists($muninFile)) {
       if($fh=fopen($muninFile, 'w')) {
         fwrite($fh, $muninContentConf);
         fclose($fh);
