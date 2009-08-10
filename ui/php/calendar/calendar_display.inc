@@ -3033,9 +3033,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $day = $week->localize(Of_Date::WEEKDAY_NARROW) ;
     $j = $week->getWeekday();
     if (strcmp(substr($repeat_days,$j,1),'1') ==0) {
-      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" id=\"cba_repeatday_".$j."\" name=\"cba_repeatday_".$j."\" value=\"1\" checked = \"checked\"/><label for=\"cba_repeatday_".$j."\">$day</label></span> ";
+      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" id=\"cba_repeatday_".$j."\" name=\"cba_repeatday_".$j."\" value=\"1\" checked = \"checked\"/><label for=\"cba_repeatday_".$j."\">$day</label></span>&nbsp;&nbsp; ";
     } else {
-      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" id=\"cba_repeatday_".$j."\" name=\"cba_repeatday_".$j."\" value=\"1\" /><label for=\"cba_repeatday_".$j."\">$day</label></span> ";
+      $dis_repeat_day .= "<span class=\"NW\"><input type=\"checkbox\" id=\"cba_repeatday_".$j."\" name=\"cba_repeatday_".$j."\" value=\"1\" /><label for=\"cba_repeatday_".$j."\">$day</label></span>&nbsp;&nbsp; ";
     }
     $week->addDay(1);
   }
@@ -4735,11 +4735,11 @@ function dis_calendar_pdf_options($calendar, $p_range, $p_view) {
         $day_num = date('w', $start_week_day);
         $day = $l_daysofweekshort[$day_num];
         $cba_id = "cba_repeatday_$i";
-        $dis_list_day .= "<input type=\"checkbox\" id=\"$cba_id\" name=\"$cba_id\" value=\"1\"";
+        $dis_list_day .= "<span class=\"NW\"><input type=\"checkbox\" id=\"$cba_id\" name=\"$cba_id\" value=\"1\"";
         if (strcmp(substr($display_days,$i,1),'1')==0) {
           $dis_list_day .= " checked = \"checked\"";
         }
-        $dis_list_day .= " /><label for=\"$cba_id\">$day</label> ";
+        $dis_list_day .= " /><label for=\"$cba_id\">$day</label></span>&nbsp;&nbsp; ";
 
         $start_week_day = strtotime('+1 day', $start_week_day); 
       }
@@ -6561,6 +6561,8 @@ Class CalendarPdfList Extends CalendarPdf{
     global $l_category,$l_datebegin, $l_dateend, $l_repeat,$l_attendees, $l_title, $l_location;;
     global $l_resources, $l_items, $l_desc;
 
+    $uid = $obm['uid'];
+
     $sel_user = $this->calendar_entity['user'];
     $sel_user_id = array();
     if (is_array($sel_user)) {
@@ -6637,7 +6639,9 @@ Class CalendarPdfList Extends CalendarPdf{
       // bug on privacy fix
       $head = $title;
 
-      if (is_array($attendee['user']))
+      if ( is_array($attendee['user']) &&
+           ( (count($attendee['user']) > 1) || (count($attendee['contact']) > 0) || !array_key_exists($obm['uid'],$attendee['user']) )
+         )
       foreach($attendee['user'] as $at_id => $at_name) {
         if (array_key_exists($at_id, $sel_user_id)) {
           $dis_people .= "$separator$at_name";
