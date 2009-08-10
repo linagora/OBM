@@ -442,7 +442,7 @@ Obm.CalendarDayEvent = new Class({
   },
 
   conflict: function(size, position) {
-    this.element.setStyle('margin-top',position * this.element.offsetHeight + 'px');
+    this.element.setStyle('margin-top',position * (this.element.offsetHeight+1) + 'px');
     this.extensions.each( function (extension) {
       extension.conflict(size, position);
     }.bind(this));
