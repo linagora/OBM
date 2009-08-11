@@ -166,8 +166,6 @@ function run_query_document_insert(&$document) {
   $url = $document["url"];
   $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
   $entity = $document["entity"];
-  $link_id = sql_parse_id($document['entity_id']);
-  $link_entity_id = of_entity_get($entity, $link_id);
 
   if ($size == "") $size = 0;
   
@@ -238,6 +236,8 @@ function run_query_document_insert(&$document) {
 
     // We insert links if entity given
     if ($entity != "") {
+      $link_id = sql_parse_id($document['entity_id']);
+      $link_entity_id = of_entity_get($entity, $link_id);
       $query = "INSERT INTO DocumentLink (
         documentlink_entity_id,
         documentlink_document_id
