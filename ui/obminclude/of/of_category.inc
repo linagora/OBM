@@ -1621,6 +1621,7 @@ function of_userdata_query_search($uentity, $params, $table='') {
   if (is_array($cgp_user[$entity]['category'])) {
     foreach($cgp_user[$entity]['category'] as $cat_name => $one_cat) {
       $cat = $params[$cat_name];
+      if(is_array($cat)) $cat = array_pop($cat);
       $cat_tree = $params["${cat_name}_tree"];
       $cat_code = $params["${cat_name}_code"];
       $tlink = "${cat_name}_link";

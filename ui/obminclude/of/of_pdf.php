@@ -189,7 +189,7 @@ class OBM_Pdf extends Zend_Pdf{
       dirname(__FILE__)."/../../conf/views/pdf/$module/$_SESSION[set_lang]/$templateName.pdf",
       dirname(__FILE__)."/../../views/pdf/$module/$_SESSION[set_lang]/$templateName.pdf",
       dirname(__FILE__)."/../../conf/views/pdf$module/en/$templateName.pdf",
-      dirname(__FILE__)."/../../views/pdf$module/en/$templateName.pdf"
+      dirname(__FILE__)."/../../views/pdf/$module/en/$templateName.pdf"
     );
     foreach ($possiblePaths as $path) {
       if (file_exists($path) && is_readable($path)) {
