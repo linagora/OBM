@@ -237,6 +237,8 @@ $l_show_calendar = "Voir l'agenda";
 $l_calendar_not_available = "L'agenda n'existe pas ou n'est pas partagé";
 $l_freebusy_check_availability = "Vérifier la disponibilité des participants et des ressources"; 
 
+$l_no_end_repeat = "Pas de date de fin";
+
 $l_add_event_mail_body = 
 "Message automatique envoyé par OBM
 ------------------------------------------------------------------

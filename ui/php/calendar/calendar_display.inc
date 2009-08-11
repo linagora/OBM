@@ -2283,7 +2283,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       $repeat_end = new Of_Date($event_q->f('event_endrepeat'), 'GMT');
       $repeat_end = $repeat_end->getOutputDate();
     } else {
-      $repeat_end = '';
+      $repeat_end = $GLOBALS['l_no_end_repeat'];
     }
     if( $event_q->f('event_repeatfrequence') == 1 ) {
       $repeatfrequency = sprintf($kind_unit,'');
@@ -2946,7 +2946,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   }
   if (isset($repeat_kind) && $repeat_kind != 'none') {
     $repeatDisplay = "''";
-    $frequency_block = sprintf($GLOBALS['l_'.$repeat_kind.'_unit'], "<input type=\"text\" size=\"4\" style=\"width:3em;\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />");
+    $frequency_block = sprintf($GLOBALS['l_'.$repeat_kind.'_unit'], "<input type=\"text\" size=\"4\" style=\"width:3em;\" id=\"tf_repeatfrequency\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />");
   } else {
     $repeatDisplay = 'none';
     $frequency_block = "<input type=\"text\" size=\"4\" style=\"width:3em;\" id=\"tf_repeatfrequency\" name=\"tf_repeatfrequency\" value=\"$repeatfrequency\" />";
@@ -2999,7 +2999,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   $repeat_end_value = isset($repeat_end) ? $repeat_end->getInputDate() : '';
   $$repeat_kind .= "selected=\"selected\" ";
   $dis_sel_kind .= "
-    <select onchange=\"repeat_form($(this).get('inputValue'))\" name=\"sel_repeat_kind\">
+    <select onchange=\"repeat_form($(this).get('inputValue'))\" name=\"sel_repeat_kind\" id=\"sel_repeat_kind\">
       <option value=\"none\">$l_none</option>
       <option value=\"daily\" $daily>$l_daily</option>
       <option value=\"weekly\" $weekly>$l_weekly</option>
@@ -3545,7 +3545,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   <tr>
     <th>$l_dateend</th>
     <td>
-      <input type=\"text\" name=\"tf_date_end\" id=\"tf_date_end\" value=\"".$end->getInputDate()."\" class=\"datePicker\" />
+      <input type=\"text\" name=\"tf_date_end\" id=\"tf_date_end\" value=\"".$end->getInputDate()."\" class=\"datePicker\" onkeypress=\"repeatEndAuto=false;\" />
       <span id=\"hour_end\" style=\"$style\"  class=\"NW\">$l_hour : $dis_hour_e : $dis_min_e</span>
     </td>       
   </tr>
@@ -3574,6 +3574,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <th>$l_repeatfrequency</th> 
     <td>$frequency_block</td>
   </tr>    
+  <tr id=\"noRepeatEnd\">    
+    <th>Pas de date de fin</th> 
+    <td><input type=\"checkbox\" id=\"cbx_no_repeatend\" onclick=\"toggleDisplay($('repeatEnd'));\" /></td>
+  </tr>
   <tr id=\"repeatEnd\" style=\"display:$repeatDisplay\">    
     <th>$l_date_repeatend</th> 
     <td>
@@ -3620,6 +3624,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $resource_complete
       $group_complete
     });
+    if ($('tf_repeat_end').value == '') {
+      $('cbx_no_repeatend').checked = true;
+    }
+    repeat_form($('sel_repeat_kind').value);
   </script>
   <div id=\"fbcContainer\"></div>
 
@@ -5572,12 +5580,10 @@ Class CalendarPdf{
     return $stringWidth;
   }
   
-  // infinite recursive loop protection
-  var $_cutLongWords_rec_i = 0;
-
-  function cutLongWords ($string, $max_width) {
-    if ($this->_cutLongWords_rec_i > 20) return $string;
-    $this->_cutLongWords_rec_i += 1;
+  function cutLongWords ($string, $max_width, $depth = 0) {
+    // infinite recursive loop protection
+    $depth += 1;
+    if ($depth > 20) return $string;
     
     $vowels = '/[aeiouy]/';
     
@@ -5597,12 +5603,10 @@ Class CalendarPdf{
           $insert_pos = round(count($letters) / 2);
         }
         
-        $words[$k] = $this->cutLongWords(substr($v, 0, $insert_pos), $max_width). '- '
-          . $this->cutLongWords(substr($v, $insert_pos), $max_width);
+        $words[$k] = $this->cutLongWords(substr($v, 0, $insert_pos), $max_width, $depth). '- '
+          . $this->cutLongWords(substr($v, $insert_pos), $max_width, $depth);
       }
     }
-    
-    $this->_cutLongWords_rec_i -= 1;
     
     return join(' ', $words);
   }
