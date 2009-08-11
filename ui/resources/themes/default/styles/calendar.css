@@ -798,3 +798,7 @@ input[type="submit"][disabled] {
   background:#666;
   color: #CCC;
 }
+
+#calendarToolbar {
+  margin-top: -10px;
+}

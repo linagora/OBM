@@ -76,7 +76,7 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action) {
   }
 
   $block = "
-  <div style=\"margin-top:-10px;\">
+  <div id=\"calendarToolbar\">
   <div class=\"SB LF NM\" style=\"margin-left:10px;\">
   <a href=\"$path/calendar/calendar_index.php?cal_view=agenda&amp;date=".$date->getURL()."\">
   <img 
