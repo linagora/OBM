@@ -304,6 +304,7 @@ function run_query_contact_search($contact) {
         $ids[] = $obm_q->f('contact_id');
         $i++;
       }
+      $ids = array_unique($ids);
       $whereq = " WHERE contact_id IN (".implode(',',$ids).")";
       $query = "$select $left_join $whereq $orderq";
       display_debug_msg($query, $cdg_sql, 'contact_search(2)');
@@ -319,7 +320,9 @@ function run_query_contact_search($contact) {
     $whereq = " WHERE $where $where_name";
     $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_comp $whereq $multidomain $orderq";
     $obm_q->xquery($query);
-    if($count != 0) {
+    $count = $obm_q->nf();
+    $obm_q->set_num_rows_total($count);    
+    if ($count != 0) {
       $ids = array();
       $obm_q->seek($off);
       while($obm_q->next_record() && $i < $limit) {

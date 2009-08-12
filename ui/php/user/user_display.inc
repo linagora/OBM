@@ -190,11 +190,12 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_batch_user_search_form($user) {
   global $l_find, $l_title, $l_profile, $l_nomade, $l_service;
-  global $l_group, $l_fax, $l_all, $l_exp;
+  global $l_group, $l_fax, $l_all, $l_exp, $obm, $cgp_use, $obm;
   global $l_quota, $l_delegation_target, $l_datebegin, $l_mail_server;
   global $display, $c_all, $l_recursive, $obm, $l_direction, $l_service;
   
   $delegation = stripslashes($user['delegation']);
+  if ($cgp_use['property']['delegation'] && !($delegation)) $delegation = $obm['delegation_target'];
   $exp = $user['exp'];
   $exp_op = $user['exp_op'];
   $profile = $user['profile'];

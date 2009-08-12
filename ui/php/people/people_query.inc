@@ -65,6 +65,16 @@ function run_query_people_search($people) {
     }
     $show_contact = true;
     $where_userobm .= " AND userobm_status = 'VALID'";
+    $where_contact .= "AND (";
+    $where_contact .= "contact_privacy = 0";
+    $f_contact_ids = run_query_people_allowed_access_contacts();
+    if ((is_array($f_contact_ids)) && (count($f_contact_ids) > 0)) {
+      $f_contact_ids = array_map(sql_parse_id,$f_contact_ids);
+      $where_contact .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
+    }
+    $where_contact .= ")";
+
+    
   } else {
     if (trim($status) != '') {
       $where_userobm .= " AND userobm_status = '$status'";
@@ -84,7 +94,7 @@ function run_query_people_search($people) {
      // UserObm
      $where_userobm .= " AND userobm_firstname #LIKE '$fname%'";
      // Contact
-     $where_contact .= " AND contact_lastname #LIKE '$fname%'";
+     $where_contact .= " AND contact_firstname #LIKE '$fname%'";
   }
 
   // If an email indication has been specified, get it

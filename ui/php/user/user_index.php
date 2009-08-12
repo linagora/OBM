@@ -324,6 +324,9 @@ if ($action == 'ext_get_ids') {
   
 } else if ($action == 'sel_batch_users') {
 ///////////////////////////////////////////////////////////////////////////////
+  if($cgp_use['property']['delegation'] && !of_delegation_check_data($params['delegation'], $obm['delegation_target'])) {   
+    $params['delegation'] = $obm['delegation_target'];
+  }
   $display['search'] = html_batch_user_search_form($params);
   $setrows = $_SESSION['set_rows'];
   $_SESSION['set_rows'] = 250;   
