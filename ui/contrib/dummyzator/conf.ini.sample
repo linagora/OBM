@@ -1,9 +1,9 @@
-; For small amount of user (~2.5s per user);
+; For small amount of user (0.2s per user on postgresql, tested for 6 to 1000 users) + ~ 1 min for data init;
 ;
 ;Amount of group per user
 [entity.group]
 ratio=0.2
-;Amount of user per group
+;Average amount of user per group
 [entity.group.user]
 ratio=2
 ;Amount of private contact per user
@@ -43,7 +43,7 @@ attendees=5
 [right.calendar.user]
 access=1
 read=0.1
-write=0.005
+write=0.01
 admin=0.001
 [right.calendar.group]
 access=0

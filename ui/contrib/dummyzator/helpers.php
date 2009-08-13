@@ -3,13 +3,13 @@
 class IdIterator {
   var $iterator = array
     (/*
-      'start' => i,
-      'value' => n,
-      'end'   => j,
-      'len'   => l,
-      'every' => k,
-      'loop'  => bool
-      )
+    'start' => i,
+    'value' => n,
+    'end'   => j,
+    'len'   => l,
+    'every' => k,
+    'loop'  => bool
+  )
      */);
 
   /**
@@ -124,6 +124,16 @@ class IdIterator {
   }
 
   /**
+   * end 
+   * 
+   * @access public
+   * @return void
+   */
+  public function last() {
+    return $this->iterator['end'] - $this->iterator['inc'];
+  }
+
+  /**
    * getSize 
    * 
    * @access public
@@ -137,7 +147,7 @@ class IdIterator {
 
 class RandomData {
 
-  
+
   /**
    * getInstance 
    * 
@@ -161,13 +171,30 @@ class RandomData {
    */
   public function __construct() {
     include $GLOBALS['realPath']."/firstnames.php";
-    $this->firstnames = $firstnames;
+    $db = new DB_OBM;
+    foreach($firstnames as $key => $firstname) {
+      $db->query("INSERT INTO firstnames (data1,data2,data3) VALUES ('".addslashes($firstname)."','".addslashes($firstnames[$key+1])."','".addslashes($firstnames[$key-1])."')");
+      if($key > 4998) break;
+    }
     include $GLOBALS['realPath']."/lastnames.php";
-    $this->lastnames = $lastnames;
-    include $GLOBALS['realPath']."/texts.php";
-    $this->texts = $texts;
+    foreach($lastnames as $key =>  $lastname){
+      $db->query("INSERT INTO lastnames (data1,data2,data3) VALUES ('".addslashes($lastname)."','".addslashes($lastnames[$key+1])."','".addslashes($lastnames[$key-1])."')");
+      if($key > 4998) break;
+    }
     include $GLOBALS['realPath']."/words.php";
-    $this->words = $words;
+    foreach($words as $key => $word) {
+      $db->query("INSERT INTO words (data1,data2,data3) VALUES ('".addslashes($word)."','".addslashes($words[$key+1])."','".addslashes($words[$key-1])."')");
+      if($key > 4998) break;
+    }
+    include $GLOBALS['realPath']."/texts.php";
+    foreach($texts as $key => $text){
+      $db->query("INSERT INTO texts (data1,data2,data3) VALUES ('".addslashes($text)."','".addslashes($texts[$key+1])."','".addslashes($texts[$key-1])."')");
+      if($key > 4998) break;
+    }
+    $this->firstnames = array('firstnames', 5000);
+    $this->lastnames = array('lastnames', 841);
+    $this->texts = array('texts',101);
+    $this->words = array('words', 241);
   }
 
   /**
@@ -197,10 +224,10 @@ class RandomData {
    * @return void
    */
   public function getRandomText($maxSize=null) {
-     if($maxSize)
-       return mb_substr($this->getRandomFileData($this->texts),0,$maxSize, 'UTF-8'); 
-     else
-       return $this->getRandomFileData($this->texts); 
+    if($maxSize)
+      return DummyGenerators::substr($this->getRandomFileData($this->texts),1,$maxSize); 
+    else
+      return $this->getRandomFileData($this->texts); 
   }
 
   /**
@@ -211,12 +238,13 @@ class RandomData {
    */
   public function getRandomWord($maxSize=null) {
     if($maxSize)
-      return mb_substr($this->getRandomFileData($this->words),0,$maxSize, 'UTF-8'); 
+      return DummyGenerators::substr($this->getRandomFileData($this->words),1,$maxSize); 
     else
       return $this->getRandomFileData($this->words);
   }
 
   public function getRandomFileData($handle) {
+    return "(SELECT data".rand(1,3)." FROM $handle[0] WHERE ids.id = ids.id LIMIT 1 OFFSET ".DummyGenerators::random(0,$handle[1]).')';
     $pos = rand(0, (count($handle) - 1));
     return $handle[$pos];
   }

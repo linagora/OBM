@@ -12,5 +12,3 @@ Usage :
 3. All all goes right, you'll get :
    - A new domain foobar
    - Your users with logins from 'u1' to 'u<nb_users>' and password 'password'.
-   - Users lastnames begin with 'U' and contacts lastnames with 'C'
-

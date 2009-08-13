@@ -99,8 +99,8 @@ $texts[] = "&lt;anamexis&gt; oh man
 &lt;anamexis&gt; ALMOST all over my keyboard
 &lt;anamexis&gt; but I got it away just in time
 &lt;-- Beefpile has quit (sick fuckers)
-&lt;anamexis&gt; :&lt;
-* ab is away - gone, if anyone talks in the next 25 minutes as me it's bm
+&lt;anamexis&gt; :&lt;";
+$texts[] = "* ab is away - gone, if anyone talks in the next 25 minutes as me it's bm
   being an asshole -          
 &lt;ab&gt; HAHAHA DISREGARD THAT, I SUCK COCKS";
 $texts[] = "DragonflyBlade21: A woman has a close male friend. This means that he is probably interested in her, which is why he hangs around so much. She sees him strictly as a friend. This always starts out with, you're a great guy, but I don't like you in that way. This is roughly the equivalent for the guy of going to a job interview and the company saying, You have a great resume, you have all the qualifications we are looking for, but we're not going to hire you. We will, however, use your resume as the basis for comparison for all other applicants. But, we're going to hire somebody who is far less qualified and is probably an alcoholic. And if he doesn't work out, we'll hire somebody else, but still not you. In fact, we will never hire you. But we will call you from time to time to complain about the person that we hired.";
@@ -273,28 +273,28 @@ $texts[] = "*** Topic in #doghouse is 'Our hearts are extended to the 17 victims
 &lt;Anubis&gt; no?
 &lt;Kadmium&gt; You can read the full story at http://www.tubgirl.com
 &lt;Anubis&gt; omg wtf!
-*** Kadmium changes topic to 'Our hearts are extended to the 18 victims of the recent internet fraud'
-&lt;wolf&gt; 1. Save every Free Credit Card Offer you get";
-$texts[] = "&lt;wolf&gt; 2. Save every Free Coupon You get";
-$texts[] = "&lt;wolf&gt; 3. Now open the credit card mail from pile A and find the Business";
-$texts[] = "Reply Mail Envelope.";
-$texts[] = "&lt;wolf&gt; 4. Take the coupons from pile B and stuff them in the envelope you hold";
-$texts[] = "in your hand.";
-$texts[] = "&lt;wolf&gt; 5. Drop the stuffed to the brim envelopes in your mail and walk away";
-$texts[] = "whistling.";
-$texts[] = "&lt;wolf&gt; I have now received two phone calls from the credit card companies";
-$texts[] = "telling me that they received a stuffed envelope with coupons rather";
-$texts[] = "then my application. They informed me that it they are not pleased that";
-$texts[] = "they footed the bill for the crap I sent them. I reply with  It says";
-$texts[] = "Business Reply Mail  I'm suggesting coupons to you to ensure that your";
-$texts[] = "business is more successful. They promptly hang up on me.";
-$texts[] = "&lt;wolf&gt; Now";
-$texts[] = "added idea! I added exactly 33 cents worth of pennies to the envelope";
-$texts[] = "so they paid EXTRA due to the weight. I got a call informing me about";
-$texts[] = "the money";
-$texts[] = "yelling at the clerk and then to the supervisor they agreed to my";
-$texts[] = "demands and cut me a check for the money. I hold in my hand at this";
-$texts[] = "very moment a check from GTE Visa for exactly 33 cents.&quot;";
+*** Kadmium changes topic to 'Our hearts are extended to the 18 victims of the recent internet fraud'";
+$text[] = "&lt;wolf&gt; 1. Save every Free Credit Card Offer you get
+&lt;wolf&gt; 2. Save every Free Coupon You get
+&lt;wolf&gt; 3. Now open the credit card mail from pile A and find the Business
+Reply Mail Envelope.
+&lt;wolf&gt; 4. Take the coupons from pile B and stuff them in the envelope you hold
+in your hand.
+&lt;wolf&gt; 5. Drop the stuffed to the brim envelopes in your mail and walk away
+whistling.
+&lt;wolf&gt; I have now received two phone calls from the credit card companies
+telling me that they received a stuffed envelope with coupons rather
+then my application. They informed me that it they are not pleased that
+they footed the bill for the crap I sent them. I reply with  It says
+Business Reply Mail  I'm suggesting coupons to you to ensure that your
+business is more successful. They promptly hang up on me.
+&lt;wolf&gt; Now
+added idea! I added exactly 33 cents worth of pennies to the envelope
+so they paid EXTRA due to the weight. I got a call informing me about
+the money
+yelling at the clerk and then to the supervisor they agreed to my
+demands and cut me a check for the money. I hold in my hand at this
+very moment a check from GTE Visa for exactly 33 cents.&quot;";
 $texts[] = "&lt;Reverend&gt; IRC is just multiplayer notepad.";
 $texts[] = "&lt;Patrician|Away&gt; what does your robot do, sam
 &lt;bovril&gt; it collects data about the surrounding environment, then discards it and drives into walls";

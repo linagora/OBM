@@ -1,43 +1,39 @@
-; Arround 0.3s per user... must be improved
-;
+; (0.03s per user on postgresql, , tested for 1 000 to 10 000 users, very fiew rights and meetings) + ~ 1 min for data init;
+
 ;Amount of group per user
 [entity.group]
-ratio=0.005
+ratio=0.01
 ;Amount of user per group
 [entity.group.user]
 ratio=2
 ;Amount of private contact per user
 [entity.contact.private]
-ratio=5
+ratio=20
 ;Amount of public contact per user
 [entity.contact.public]
 ratio=1
 ;Max amount of each coords per contact (example : email=2 will create 0, 1 or 2 email(s) for each contact)
 [entity.contact.data]
 email=1
-website=1
-address=1
-phone=1
-im=1
+website=0
+address=0
+phone=0
+im=0
 ;Amount of resource per user
 [entity.resource]
 ratio=0.005
 ;Amount of non recurring event per user
 [entity.event.normal]
-ratio=30
+ratio=20
 ;Amount of recurring event per user
 [entity.event.recurring]
-ratio=20
+ratio=10
 ;Ratio of meeting kind event (in per one).
 [entity.event.meeting]
-ratio=0.02
-[entity.event.allday]
-ratio=0.05
+ratio=0.01
 [entity.event.data]
 ;Maximum duration of an event
 duration=3
-;Maximum attendees at a meeting
-attendees=2
 ;For a right.X.Y : Probability that any X kind entity (user, group) will 
 ;have a right on any Y kind entity
 [right.calendar.user]
@@ -47,26 +43,26 @@ write=0.001
 admin=0
 [right.calendar.group]
 access=0
-read=0.001
-write=0
+read=0
+write=0.001
 admin=0
 [right.resource.user]
 access=1
 read=1
-write=0
-admin=0
+write=0.001
+admin=1
 [right.resource.group]
 access=0
 read=0
 write=0
 admin=0
 [right.contact.user]
-access=0.005
-read=0.005
-write=0.001
+access=0.001
+read=0.001
+write=0.0001
 admin=0
 [right.contact.group]
-access=0
-read=0
-write=0
+access=0.001
+read=0.001
+write=0.001
 admin=0
