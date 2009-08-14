@@ -88,6 +88,7 @@ $l_task = "Task";
 $l_category_filter = "Filter by category";
 $l_events = "Events";
 $l_days = 'days';
+$l_more = 'more';
 
 // PDF Options
 $l_display_details = "Display details";

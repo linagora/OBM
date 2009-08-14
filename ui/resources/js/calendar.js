@@ -1,220 +1,751 @@
-// Extension : when an event is on more than one day, other days displays are
-// considered as display extensions (eg month view)
-Obm.CalendarDayEventExtension = new Class({
-  initialize: function(parentEvent,size,origin) {
-    this.event = parentEvent.event;
-    this.options = parentEvent.options;
-    this.context = parentEvent.context;
-    this.parentEvent = parentEvent;
-    this.buildExtension();
-    this.size = size;
-    this.setOrigin(origin);
-    this.setSize(size);
-    if (this.options.draggable) {
-      this.dragHandler.addEvent('mousedown',this.parentEvent.drag.bound.start)
+/******************************************************************************
+ * Manager class
+ *****************************************************************************/
+Obm.CalendarManager = new Class({
+
+  /**
+   * Constructor
+   */
+  initialize: function(time) {
+    this.redraw = new Hash();
+    this.redrawAllDay = new Hash();
+    this.events = new Hash();
+    this.eventGrid = new Array();
+    this.alldayEventGrid = new Array();
+    this.maxHeight = 1;
+    this.startTime = time;
+    this.forceRedraw = false;
+    this.tips = new Obm.Tip(null, 'calTip'); 
+
+    var current = new Obm.DateTime(obm.vars.consts.startTime);
+
+    for(i=0;i<obm.vars.consts.nbDisplayedDays;i++) {
+      current.setTime(obm.vars.consts.startTime.getTime());
+      current.setDate(obm.vars.consts.startTime.getDate() + i);
+      this.eventGrid[current.format('Y-m-d')] = new Hash();
     }
-  },
 
-  setOrigin: function(origin) {
-    var hr = $(this.options.type+'_'+origin);
-    this.origin = origin;
-    this.element.dispose();
-    hr.adopt(this.element);
-    this.redraw();
-    return true;
-  },
+    // Window height observer 
+    new Obm.Observer(new Window(window), {onStop:this.resizeGrid, property:'innerHeight'});
 
-  getOpacity: function () {
-    if(this.event.status == 'NEEDS-ACTION') {
-      return .5;
+    this.popupManager = new Obm.CalendarPopupManager(); 
+
+    if ($('calendarBody')) {
+      this.defaultHeight = $('calendarBody').getElement('div').offsetHeight;    
+      this.scroll = new Obm.Scroller($('calendarBody'), {area: this.defaultHeight, velocity: 1});
+    }
+
+    if ($('todayHourMarker')) {
+      // Set hourMarker initial position
+      this.updateHourMarker();
+      this.updateHourMarker.periodical(120000, this);
+    }
+
+
+    if ($('calendarBody')) {
+      this.resizeGrid();
+      $('calendarBody').scrollTo(0, obm.vars.consts.firstHour*this.defaultHeight*(3600/obm.vars.consts.timeUnit));
     } else {
-      return 1;
+      // month view
+      $$('div.dayColMonth').each(function(element) {
+        new Obm.Observer(element, {onStop:this.resizeAlldayCell, property:'offsetHeight'});
+      }.bind(this)); 
+      this.resizeGrid();
     }
+
+    // Initialize search field
+    if ($('event_search')) {
+      $('event_search').addEvent('keypress', function(e) {
+        switch (e.key) {
+        case 'enter' :
+          obm.calendarManager.search(this.value);
+          break;
+        case 'esc' : 
+          this.value = '';
+          obm.calendarManager.search(this.value);
+          break;
+        }
+      });
+    }
+
   },
 
-  setSize: function() {
-    this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
+
+  /**
+   * Update hour marker (left panel & in-day) 
+   */ 
+  updateHourMarker: function() {
+    var now = new Date();
+    $('todayHourMarker').style.top = (now.getHours()*3600 + now.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
+    // $('hourMarker').style.top = (now.getHours()*3600 + now.getMinutes()*60)/obm.vars.consts.timeUnit * this.defaultHeight + 'px';
   },
 
 
-  buildExtension: function() {
-    id = this.parentEvent.element.id+'_extension_'+origin;
-    this.element = new Element('div').addClass('event')
-                                     .addClass(this.event.klass)
-                                     .setProperty('id',id)
-                                     .setProperty('title', this.event.title)
-                                     .setOpacity(this.getOpacity())
-                                    .injectInside(document.body);
-    this.dragHandler = new Element('h1')
-                                 .setProperty('style','cursor: move;')
-                                 .injectInside(this.element);     
-    this.extension = new Element('img').setProperty('src',obm.vars.images.extension)
-                                       .injectInside(this.dragHandler);
-    if (this.event.meeting) {                                 
-      this.meeting = new Element('img').setProperty('src',obm.vars.images.meeting)
-                                       .injectInside(this.dragHandler);
-    }
-    if (this.event.private) {
-      this.private = new Element('img').setProperty('src',obm.vars.images.private)
-                                       .injectInside(this.dragHandler);
-    }
-    if (this.event.all_day) {
-      this.all_day = new Element('img').setProperty('src',obm.vars.images.all_day)
-                                       .injectInside(this.dragHandler);
-    }
-    this.setPeriodicity();
-    this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
-                                          .injectInside(this.dragHandler);
-    this.linkContainer = this.titleContainer;
-    this.linkContainer.addEvent('mousedown', function (evt) {
-      this.linkContainer.addEvent('mouseup', 
-        function (evt) {
-          if(obm.calendarManager.redrawLock) {
-            this.linkContainer.addEvent('click',
-              function(evt) {
-                evt.preventDefault();
-                this.linkContainer.removeEvents('click');
-                this.linkContainer.removeEvents('mouseup');
-              }.bind(this)
-            );
+  /**
+   * Register an event
+   */
+  register: function(evt) {
+    this.events.set(evt.event.id, evt);
+    var index = new Obm.DateTime(evt.event.time * 1000).format('Y-m-d');
+    if (evt.kind == 'all_day') {
+      var current = new Obm.DateTime(evt.event.time*1000);
+      var beginDay = current.getTime();
+      var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000).getTime();
+      var size = Math.ceil((endDay - beginDay)/86400000);
+      for(var i=0;i<size;i++) {
+        current.setTime(beginDay);
+        current.setDate(current.getDate()+ i);
+        var index = current.format('Y-m-d');
+        this.redrawAllDay.set(index, true);
+
+        if(!this.alldayEventGrid[index]) {
+          this.alldayEventGrid[index] = new Array();
+        }
+
+        this.alldayEventGrid[index].push(evt); 
+
+        // add tip
+        var more = $('more_'+index);
+        if (more) {
+
+          var title = '<b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title;
+	  var color = evt.content.getStyle('backgroundColor');
+          if (evt.event.colors.event) color = evt.event.colors.event;
+          var style = 'style="color:'+color+'"';
+
+          if (evt.event.all_day) {
+            title = evt.event.title;
+            color = "#fff";
+            klass='class="'+evt.event.klass+'"';
+            style = 'style="background:'+evt.event.colors.event+'; color:'+color+'" '+klass ;
           }
-        }.bind(this)
-      )
-    }.bind(this));      
-    this.resetTitle();
-  },
 
-  resetTitle: function() {
-    var title = this.event.title + ' ';
-    // Display the location only if set
-    if (this.event.location != '') {
-      title = title + ' (' + this.event.location + ')'; 
-    }
-    this.element.setProperty('title', title)
-    this.titleContainer.set('html',title);
-  },
 
-  setPeriodicity: function() {
-    if (this.event.periodic) {                                 
-      this.periodic = new Element('img').setProperty('src',obm.vars.images.periodic)
-                        .injectInside(this.dragHandler);
-    } else if (this.periodic) {
-      this.periodic.dispose();
-    }
-  },
+          more.set('title', more.get('title')+'<div '+style+'>'+ title+'</div>');
+        }
+      }
 
-  setWidth: function(width) {
-    if( (this.element.offsetLeft + width) > this.context.right ) {
-      width = this.context.right - this.element.offsetLeft;
-    }
-    this.element.setStyle('width',width + 'px');
-  },
 
-  redraw: function() {
-    hr = $(this.element.parentNode);
-    this.element.setStyles({
-      'top':  hr.getParent().getTop() + hr.getStyle('padding-top').toInt() + 'px',
-      'left': hr.getLeft() + 'px'
-    });
-    this.setWidth(this.size * (obm.calendarManager.defaultWidth +1) - 1);
-  },
-
-  destroy: function() {
-    this.element.dispose();
-  },
-
-  conflict: function(size, position) {
-    this.element.setStyle('margin-top',position * this.element.offsetHeight + 'px');
-  },
-
-  setColor: function(color) {
-    if(color) {
-      this.element.setStyle('backgroundColor',color);
-      this.dragHandler.setStyle('backgroundColor',color);
+      if (this.forceRedraw) {
+        this.redrawAllDayGrid();
+        this.resizeGrid();
+      }
     } else {
-      this.element.setStyle('backgroundColor','');
-      this.dragHandler.setStyle('backgroundColor','');
+      var begin = evt.element.offsetTop.toFloat();
+      var end = begin + evt.element.getStyle('height').toFloat();
+      for(var i=begin;i<end;i++) {
+        if(!this.eventGrid[index].get(i)) {
+          this.eventGrid[index].set(i,new Array());
+        }
+        this.eventGrid[index].get(i).push(evt);
+      }
+      this.redraw.set(index, true);
+      if (this.forceRedraw) {
+        this.redrawGrid();
+      }
+    }
+  },
+
+
+  /**
+   * Unregister an event
+   */
+  unregister: function(evt) {
+    if (evt.kind == 'all_day') {
+      var current = new Obm.DateTime(evt.event.time*1000);
+      var beginDay = current.getTime();
+      var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000).getTime();
+      var size = Math.ceil((endDay - beginDay)/86400000);
+      for(var i=0;i<size;i++) {
+        current.setTime(beginDay);
+        current.setDate(current.getDate()+ i);
+        var index = current.format('Y-m-d');
+        this.alldayEventGrid[index].erase(evt); 
+      }
+    } else {
+      var event_date = new Obm.DateTime(evt.event.time * 1000);
+      var day = event_date.format('Y-m-d');
+      var begin = evt.element.offsetTop.toFloat();
+      var end = begin + evt.element.getStyle('height').toFloat();
+      for(var i=begin;i<end;i++) {
+        this.eventGrid[day].get(i).erase(evt);
+      }
+      this.redraw.set(day, true);
+      this.redrawGrid();
+    }
+  },
+
+
+  /**
+   * Add an all day event
+   */
+  newDayEvent: function(eventData,options) {
+    obmEvent = new Obm.CalendarAllDayEvent(eventData,options);
+    this.register(obmEvent);
+    return obmEvent;
+  },
+
+
+  /**
+   * Add an in-day event
+   */
+  newEvent: function(eventData,options) {
+    var obmEvent = new Obm.CalendarInDayEvent(eventData,options);
+    this.register(obmEvent);
+    return obmEvent;
+  },
+
+
+  /**
+   * Resize viewport
+   */
+  resizeGrid: function() {
+    if ($('calendarBody')) {
+      $('calendarBody').setStyle('height',window.innerHeight - $('calendarBody').offsetTop -80) ;
+    } else {
+      $('mainContent').setStyle('height',window.innerHeight - $('mainContent').offsetTop -50) ;
+      $('calendarHeaderGrid').setStyle('height',window.innerHeight - $('calendarHeaderGrid').offsetTop -50) ;
+    }
+  },
+
+
+  /**
+   * Ajust displayd events on month view 
+   */
+  resizeAlldayCell: function(element) {
+    var str = element.id.split('_');
+    if (obm.calendarManager.alldayEventGrid[str[1]]) {
+      var evts = obm.calendarManager.alldayEventGrid[str[1]];
+      if ((evts.length+2)*14 > element.offsetHeight) {
+        // hide undisplayable events
+        var canBeDisplayed = Math.floor(element.offsetHeight/13 - 3);
+        var undisplayed = evts.length - canBeDisplayed;
+        for(i=0;i<evts.length;i++) { 
+          if (i<canBeDisplayed) {
+            evts[i].element.setStyle('display', '');
+          } else {
+            evts[i].element.setStyle('display', 'none');
+          }
+        }
+        // display +more link
+        var more = $('more_'+str[1]);
+        more.style.top = canBeDisplayed*15+'px';
+        more.style.display = '';
+        more.set('html','+'+undisplayed+' '+obm.vars.labels.more);
+        obm.calendarManager.tips.add(more);
+      } else {
+        $('more_'+str[1]).style.display = 'none';
+        for(i=0;i<evts.length;i++) {
+          evts[i].element.setStyle('display', '');
+        }
+      }
+    }
+  },
+
+
+  /**
+   * Redraw events grid (conflicts)
+   * algo powered by MRA.
+   */ 
+  redrawGrid: function() {
+    var updated = new Hash();
+    this.redraw.each (function(redraw, columnIndex){
+      if(!redraw) return;
+      var unit;
+      this.eventGrid[columnIndex].each(function(cell, key) {
+        cell.sort(function(evt1, evt2) {
+          var diff = evt1.event.time - evt2.event.time;
+          if(diff != 0) return diff;
+          diff = evt1.event.id - evt2.event.id;
+          if(diff != 0) return diff;
+          return evt1.event.entity_id - evt2.event.entity_id;      
+        });
+
+        var usedPositions = new Hash();
+        var position = 0;
+
+        cell.each(function (evt, index) {
+          var updatedId = evt.event.id+'-'+evt.event.entity_id;
+          var coords;
+          if(!(coords = updated.get(updatedId))) {
+            if(usedPositions.getLength() == 0) {
+              unit = {'value' : 1};
+            }
+            while(usedPositions.get(position)) {
+              position ++;
+            }
+            var end = {'value' : position};
+            if((index + 1) == cell.length) {
+              while(end.value < unit.value && !usedPositions.get(end.value)) {
+                end.value++;
+              }
+            }
+            if(end.value == unit.value) {
+              end = unit;
+            }
+            coords = {'position': position, 'unit': unit, 'end': end, 'column': columnIndex, 'occurence': evt};
+            updated.set(updatedId, coords);
+          } 
+          usedPositions.set(coords.position, true);        
+          if(cell.length > unit.value) {
+            unit.value = cell.length;
+          }
+          //FIXME : if new event have position < current event, and end != unit this must not occur
+          if((coords.position + 1) < cell.length && (index + 1) < cell.length) {
+            coords.end = {'value' : coords.position + 1};
+          }
+        });
+
+      });
+    }.bind(this));
+
+    this.redraw = new Hash();
+
+    updated.each(function(coords, key) {
+        var size = coords.end.value - coords.position;
+        coords.occurence.updatePosition(coords.unit.value, coords.position, size, coords.column);
+    }.bind(this));
+
+  },
+
+
+  /**
+   * Redraw all-day grid (top position & size)
+   */
+  redrawAllDayGrid: function() {
+    var updated = new Array();
+      var usedPosition = new Array(); 
+
+    this.redrawAllDay.each (function(redraw, columnIndex){
+      // if(!redraw) return;
+
+      var position = 0;
+
+      this.alldayEventGrid[columnIndex].each(function(evt) {
+        var beginDay = evt.event.date.getTime(); 
+        var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000).getTime();
+        var size = Math.ceil((endDay - beginDay)/86400000);
+        if (!evt.event.all_day && evt.event.duration < 86400) {
+          // size = size + 1;
+        }
+
+        var current = new Obm.DateTime(evt.event.time*1000);
+
+        // Left extension
+        if (evt.event.date < obm.vars.consts.startTime) {
+          columnIndex = obm.vars.consts.startTime.format('Y-m-d');
+          size = Math.ceil((endDay - obm.vars.consts.startTime.getTime())/86400000);
+          current = new Obm.DateTime(obm.vars.consts.startTime);
+          evt.leftExtension.setStyle('display', '');
+          beginDay = obm.vars.consts.startTime; 
+        }
+
+        // Right extension
+        // TODO : add right icon
+        if ((evt.event.date+evt.event.duration*1000) > obm.vars.consts.startTime.getTime() + (86400000 * obm.vars.consts.nbDisplayedDays)) {
+          size = Math.ceil((obm.vars.consts.startTime.getTime() + (86400000 * obm.vars.consts.nbDisplayedDays) - beginDay)/86400000);
+          evt.rightExtension.setStyle('display', '');
+        }
+
+        var coords = {'column': columnIndex, 'position': position, 'size': size,  'occurence': evt};
+        var currentTime = current.getTime();
+        for(var i=0;i<size;i++) {
+          current.setTime(currentTime);
+          current.setDate(current.getDate()+i);
+          var index = current.format('Y-m-d');
+
+          if (!updated[index]) {
+            updated.push(index);
+            updated[index] = new Array();
+          }
+          updated[index].push(coords);
+        }
+
+        updated[index].each(function(e) {
+          if (!usedPosition[index]) {
+            usedPosition.push(index);
+            usedPosition[index] = new Hash();
+          }
+          usedPosition[index].set(e.position, true);
+        });
+
+        // while(usedPosition[index].get(position)) {
+        //   coords.position = position;
+        //   position++;
+        // }
+        coords.position = position;
+        position++;
+
+      });
+    }.bind(this));
+
+    //this.redrawAllDay = new Hash();
+    updated.each(function(col, i) {
+      updated[col].each(function(coords) {
+        this.maxHeight = Math.max(this.maxHeight, coords.position);
+        coords.occurence.updatePosition(coords.position, coords.size, coords.column);
+      }.bind(this));
+    }.bind(this));
+
+    this.updateHeight(this.maxHeight);
+  },
+
+
+  /**
+   * Update calendarHeader height // FIXME: allday event height instead of this.defaultHeight
+   * (all day event)
+   */
+  updateHeight: function(size) {
+    if ($('calendarBody')) {
+      $('calendarHeaderGrid').style.height = 14*(size+2)+'px';
+    }
+  },
+
+
+  /**
+   *  Show last month events // TODO
+   */
+  subMonth: function() {
+   this.clearGrid();
+
+  },
+
+
+  /**
+   *  Show last week events // TODO
+   */
+  subWeek: function() {
+   this.clearGrid();
+
+  },
+
+
+  /**
+   *  Show last day events // TODO
+   */
+  subDay: function() {
+   this.clearGrid();
+
+  },
+
+
+  /**
+   *  Show next month events // TODO
+   */
+  addMonth: function() {
+   this.clearGrid();
+
+  },
+
+
+  /**
+   * Show next week events  // TODO
+   */
+  addWeek: function() {
+   this.clearGrid();
+
+  },
+
+
+  /**
+   * Show next day events  // TODO
+   */
+  addDay: function() {
+   this.clearGrid();
+
+  },
+
+  /**
+   * Search event by title // TODO
+   */
+  search: function(title) {
+    this.events.each(function(evt) {
+      if (evt.event.title.contains(title)) {
+        evt.element.setStyle('display', '');
+      } else {
+        evt.element.setStyle('display', 'none');
+      }
+    });
+  },
+  
+
+  /**
+   * Reset the calendar grid
+   */
+  clearGrid: function() {
+    this.events.each(function(evt) {
+      evt.element.destroy();
+    });
+    this.events = new Hash();
+    this.eventGrid = new Hash();
+    this.alldayEventGrid = new Hash();
+    for(i=0;i<obm.vars.consts.nbDisplayedDays;i++) {
+      this.eventGrid[i] = new Hash();
+      this.alldayEventGrid[i] = new Hash();
+    }
+    $('calendarHeaderGrid').style.height  = this.defaultHeight+'px';
+  },
+
+
+  /**
+   * Create an object compatible with OBM server
+   */
+  prepareEventForUpdate: function(evt) {
+    var eventData = new Object();
+    eventData.calendar_id = evt.event.id;
+    eventData.element_id = evt.element.id;
+    eventData.date_begin = evt.event.date.format('c');
+    eventData.old_date_begin = eventData.date_begin;
+    eventData.duration = evt.event.duration;
+    eventData.title = evt.event.title;
+    eventData.all_day = evt.event.all_day;
+    return eventData;
+  },
+
+
+  //
+  // TODO: REWRITE AJAX CALLS
+  //
+
+
+  // **************************************************************************
+  // CREATE 
+  // **************************************************************************
+
+  /**
+   * Create the event on OBM server 
+   */
+  sendCreateEvent: function(eventData) {
+    new Request.JSON({
+      url: obm.vars.consts.calendarUrl,
+      secure : false,
+      onComplete : function(response) {
+        if (response.conflict) {
+          $('popup_force').value = obm.vars.labels.insert_force;
+          obm.calendarManager.popupManager.add('calendarConflictPopup');
+        }
+        if (response.mail) {
+          obm.calendarManager.popupManager.add('calendarSendMail');
+        }
+        obm.calendarManager.popupManager.addEvent('conflict', function() {
+          eventData = $merge({action : 'insert'}, eventData)
+          window.location=obm.vars.consts.calendarUrl+'?'+Hash.toQueryString(eventData)+'&repeat_kind=none&repeat_end='+eventData.date_begin;
+        });
+        obm.calendarManager.popupManager.addEvent('mail', function () {
+          eventData.send_mail = true;
+        });        
+        obm.calendarManager.popupManager.addEvent('complete', function () {
+          new Request.JSON({
+            url: obm.vars.consts.calendarUrl,
+            secure : false,
+            onComplete : this.receiveCreateEvent
+          }).post($merge({ajax : 1, action : 'quick_insert'}, eventData));          
+        }.bind(this));
+        obm.calendarManager.popupManager.show(eventData);
+      }.bind(this)
+    }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));
+
+  },
+
+
+  /**
+   * Create the event on OBM server 
+   */
+  receiveCreateEvent: function(response) {
+    try {
+      var resp = eval(response);
+    } catch (e) {
+      resp = new Object();
+      resp.error = 1;
+      resp.message = obm.vars.labels.fatalServerErr;
+    }    
+    var events = response.eventsData;
+    if (response.error == 0) {
+      showOkMessage(response.message);
+
+      if (response.day == 1) {
+        obm.calendarManager.newDayEvent(events[0].event,events[0].options);
+      } else {
+        obm.calendarManager.newEvent(events[0].event,events[0].options);
+      }
+
+    } else {
+      showErrorMessage(response.message);
+    }
+  }, 
+
+
+
+  // **************************************************************************
+  // UPDATE
+  // **************************************************************************
+
+  /**
+   * Update the event on OBM server 
+   */
+  sendUpdateEvent: function(evt) {
+    var eventData = this.prepareEventForUpdate(evt);
+
+    new Request.JSON({
+      url: obm.vars.consts.calendarUrl,
+      secure : false,
+      onComplete : function(response) {
+        if (response.conflict) {
+          $('popup_force').value = obm.vars.labels.conflict_force;
+          obm.calendarManager.popupManager.add('calendarConflictPopup');
+        }
+        if (response.mail) {
+          obm.calendarManager.popupManager.add('calendarSendMail');
+        }
+        obm.calendarManager.popupManager.addEvent('mail', function () {
+          eventData.send_mail = true;
+        });        
+        obm.calendarManager.popupManager.addEvent('conflict', function() {
+          eventData = $merge({action : 'conflict_manager'}, eventData)
+          window.location=obm.vars.consts.calendarUrl+'?'+Hash.toQueryString(eventData);
+        });
+        obm.calendarManager.popupManager.addEvent('complete', function () {
+          new Request.JSON({
+            url: obm.vars.consts.calendarUrl,
+            secure : false,
+            onComplete : this.receiveUpdateEvent.bind(this)
+          }).post($merge({ajax : 1, action : 'quick_update'}, eventData));
+        }.bind(this));
+        obm.calendarManager.popupManager.show(eventData);
+      }.bind(this)
+    }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));    
+
+    Obm.calendarManager.register(evt);
+  },
+
+
+  /**
+   * Update the event on OBM server 
+   */
+  receiveUpdateEvent: function(response) {
+    try {
+      var resp = eval(response);
+    } catch (e) {
+      resp = new Object();
+      resp.error = 1;
+      resp.message = obm.vars.labels.fatalServerErr;
+    }
+    var events = response.eventsData;
+    if (response.error == 0) {
+      showOkMessage(response.message);
+      var str = response.elementId.split('_');
+      for(var i=0;i< events.length;i++) {
+        var ivent = events[i].event;
+        var id = str[0]+'_'+str[1] +'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
+        var evt = obm.calendarManager.events.get(id);
+        if (ivent.status == 'ACCEPTED' || ivent.status == 'NEEDS-ACTION') {
+          obm.calendarManager.unregister(id);
+          evt.event.id = ivent.id;
+          evt.event.status = ivent.status;
+          evt.setTime(ivent.time);
+          evt.setDuration(ivent.duration);
+          obm.calendarManager.register(id);           
+          evt.setTitle(ivent.title);
+        } else if (evt) {
+          obm.calendarManager.unregister(id);
+          obm.calendarManager.events.erase(id);
+          evt.destroy();
+          delete evt;
+        }
+      }
+    } else {
+      showErrorMessage(response.message);
+      // obm.calendarManager.events.each(function(evt, key) {
+      //   evt.redraw(); 
+      // });      
+    }
+    
+  },
+
+
+  // **************************************************************************
+  // DELETE
+  // **************************************************************************
+
+
+  /**
+   * Delete the event on OBM server 
+   */
+  sendDeleteEvent: function(eventData) {
+    new Request.JSON({
+      url: obm.vars.consts.calendarUrl,
+      secure : false,
+      onComplete : function(response) {
+        if(response.mail) {
+          obm.calendarManager.popupManager.add('calendarSendMail');
+        }
+        obm.calendarManager.popupManager.addEvent('mail', function () {
+          eventData.send_mail = true;
+        });        
+        obm.calendarManager.popupManager.addEvent('complete', function () {
+          new Request.JSON({
+            url: obm.vars.consts.calendarUrl,
+            secure : false,
+            onComplete : this.receiveDeleteEvent
+          }).post($merge({ajax : 1, action : 'quick_delete'}, eventData));             
+        }.bind(this));
+        obm.calendarManager.popupManager.show(eventData);
+      }.bind(this)
+    }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));    
+ 
+  },
+
+
+  /**
+   * Delete the event on OBM server 
+   */
+  receiveDeleteEvent: function(response) {
+    try {
+      var resp = eval(response);
+    } catch (e) {
+      resp = new Object();
+      resp.error = 1;
+      resp.message = obm.vars.labels.fatalServerErr;
+    }
+    var events = response.eventsData;
+    if (response.error == 0) {
+      showOkMessage(response.message);
+      var str = response.elementId.split('_');
+      for(var i=0;i< events.length;i++) {
+        var evt = obm.calendarManager.events.get(str[1]);
+        if (evt) {
+          obm.calendarManager.unregister(evt);
+          obm.calendarManager.events.erase(str[1]);
+          evt.element.destroy();
+          delete evt;
+        }
+      }
+    } else {
+      showErrorMessage(response.message);
+      // obm.calendarManager.events.each(function(evt, key) {
+      //   evt.redraw(); 
+      // });      
     }
   }
 
-})
+});
 
 
 /******************************************************************************
- * Calendar event object, can be dragged but have no graphical representation
- * of it's duration (eg bar in month view or all day event)
+ * Event class
  *****************************************************************************/
-Obm.CalendarDayEvent = new Class({
+Obm.CalendarEvent = new Class({
 
   Implements: Options,
 
   options: {
-    draggable: false,
-    type: 'day',
-    yUnit: 0,
-    xUnit: 24*3600,
-    unit : 24*3600,
-    context : 'head'
+    updatable: false
   },
 
-  initialize: function(eventData,options) {
-    this.setOptions(options);
-    this.initContext();
-    this.event = eventData;
-    this.size = 1;
-    this.length = 1;
-    this.hidden = 0;
-    this.extensions = new Array();
-    this.buildEvent();
-    if(this.options.draggable)
-      this.makeDraggable();    
-    this.setTime(this.event.time);
-    this.setDuration(this.event.duration);
-    this.switchColor(obm.vars.conf.calendarColor);
-  },
-  
-  initContext: function() {
-    if(this.options.context == 'body') {
-      this.context = obm.calendarManager.bodyContext;
-    } else if(this.options.context == 'head') {
-      this.context = obm.calendarManager.headContext;
-    }
-  },
 
-  makeDraggable: function() {
-    var dragOptions = {
-      preventDefault: true,
-      handle: this.dragHandler,
-      //grid: {'y' : obm.calendarManager.defaultHeight + 1, 'x' : obm.calendarManager.defaultWidth - 1},
-      limit: {
-        'x': [this.context.left,this.context.right - obm.calendarManager.defaultWidth],
-        'y': [this.context.top,this.context.bottom]
-      },
-      
-      onSnap:function() {
-        obm.calendarManager.lock();
-        this.drag.mouse.pos = {x: obm.calendarManager.defaultWidth/2, y: 10};
-        this.element.setStyles({
-          'width' : obm.calendarManager.defaultWidth + 'px',
-          'margin-left' : 0
-        });
-        this.element.setOpacity(.7);
-        this.trashExtensions();
-      }.bind(this),
-
-      onComplete:function() {
-        if(obm.calendarManager.redrawLock) {
-          this.element.setOpacity(this.getOpacity());
-          obm.calendarManager.unlock();
-          obm.calendarManager.moveEventTo(this.element.id,this.element.getLeft(),this.element.getTop());
-        }        
-      }.bind(this)
-
-    };
-
-    this.drag = this.element.makeDraggable(dragOptions);
-  },
-
+  /**
+   * Return event opacity 
+   */
   getOpacity: function () {
     if(this.event.status == 'NEEDS-ACTION') {
       return .5;
@@ -223,275 +754,31 @@ Obm.CalendarDayEvent = new Class({
     }
   },
 
-  buildEvent: function() {
-    id = this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
-    this.element = new Element('div').addClass('event')
-                                     .addClass(this.event.klass)
-                                     .setProperty('id','event_'+id)
-                                     .setProperty('title', this.event.title)
-                                     .setOpacity(this.getOpacity())
-                                     .injectInside(document.body);
-    this.dragHandler = new Element('h1')
-                                 .setProperty('style','cursor: move;')
-                                 .injectInside(this.element);
-    if (this.event.meeting) {
-      this.meeting = new Element('img').setProperty('src',obm.vars.images.meeting)
-                        .injectInside(this.dragHandler);
-    }
-    if (this.event.private) {
-      this.private = new Element('img').setProperty('src',obm.vars.images.private)
-                                       .injectInside(this.dragHandler);
-    }
+
+  /**
+   * Display event icons 
+   */
+  setTitleIcons: function() {
     if (this.event.all_day) {
-      this.all_day = new Element('img').setProperty('src',obm.vars.images.all_day)
-                                       .injectInside(this.dragHandler);
+      new Element('img').setProperty('src',obm.vars.images.all_day).injectInside(this.dragHandler);
     }
-    this.setPeriodicity();
-    this.titleContainer = new Element('a').setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
-                                          .injectInside(this.dragHandler);
-    this.linkContainer = this.titleContainer;
-    this.linkContainer.addEvent('mousedown', function (evt) {
-      this.linkContainer.addEvent('mouseup', 
-        function (evt) {
-          if(obm.calendarManager.redrawLock) {
-            this.linkContainer.addEvent('click',
-              function(evt) {
-                evt.preventDefault();
-                this.linkContainer.removeEvents('click');
-                this.linkContainer.removeEvents('mouseup');
-              }.bind(this)
-            );
-          }
-        }.bind(this)
-      )
-    }.bind(this));      
-    this.resetTitle();
-  },
-
-  // Add extension (arrow) to event extensions
-  setExtension: function(time) {
-    var eventTime = time * 1000;
-    var calendarStartTime = obm.calendarManager.startTime * 1000;
-    if (new Obm.DateTime(eventTime).format('Ymd') < new Obm.DateTime(calendarStartTime).format('Ymd')) {
-      this.extension = new Element('img').setProperty('src',obm.vars.images.extension).injectTop(this.titleContainer);
-    }
-  },
-
-  setPeriodicity: function() {
     if (this.event.periodic) {
       this.periodic = new Element('img').setProperty('src',obm.vars.images.periodic).injectInside(this.dragHandler);
     } else if (this.periodic) {
       this.periodic.dispose();
     }
-  },
-
-  resetTitle: function() {
-    var title = this.event.title + ' ';
-    if (!this.event.all_day) {
-      title = new Obm.DateTime(this.event.time * 1000).format("H:i") + ' ' + title;
+    if(this.event.meeting) {                                 
+      new Element('img').setProperty('src',obm.vars.images.meeting).injectInside(this.dragHandler);
     }
-    // Display the location only if set
-    if (this.event.location != '') {
-      title = title + ' (' + this.event.location + ')';
-    }
-    this.element.setProperty('title', title)
-    this.titleContainer.set('html',title);
-    this.setExtension(this.event.time);
-  },
-
-  setTitle: function(title) {
-    this.event.title = title;
-    this.resetTitle();
-    this.extensions.each(function (extension) {
-      extension.resetTitle();
-    })
-  },
-
-  setTime: function(time) {
-    var myDate = new Obm.DateTime(time * 1000);
-    var startDate = new Obm.DateTime(obm.calendarManager.startTime * 1000);
-    startDate.setHours(0);
-    startDate.setMinutes(0);
-    startDate.setSeconds(0)
-    myDate.setHours(0);
-    myDate.setMinutes(0);
-    myDate.setSeconds(0);
-
-    origin = Math.floor((myDate.getTime() - startDate.getTime())/1000);
-    if (this.setOrigin(origin)) {
-      this.event.time = this.guessEventTime(time);
-    } else {
-      if(obm.calendarManager.lock()) {
-        this.redraw();
-        obm.calendarManager.unlock();
-      }
-    }
-  },
-  
-  guessEventTime: function(time) {
-    if (this.event.time) {
-      var time = new Obm.DateTime(time * 1000);
-      d = new Obm.DateTime(this.event.time * 1000);
-      time.setHours(d.getHours());
-      time.setMinutes(d.getMinutes());
-      time = Math.floor(time.getTime()/1000);
-    }
-    return time;
-  },
-
-
-  setOrigin: function(origin) {
-    if (origin < 0) {   
-      this.hidden = -(origin / this.options.xUnit);
-      this.hidden = Math.ceil(this.hidden);
-      origin = 0;
-    } else if(this.hidden != 0) {
-      this.hidden = 0;
-      this.setSize(this.size);
-    }
-    var hr = $(this.options.type+'_'+origin);
-    this.origin = origin;
-    this.element.dispose();
-    hr.adopt(this.element);
-    if (obm.calendarManager.lock()) {
-      this.redraw();
-      obm.calendarManager.unlock();
-      if (this.resizeLine()) {
-        obm.calendarManager.resizeWindow();
-      }      
-    }
-    return true;
-  },
-
-  resizeLine: function(lineElem) {
-      if(!$(lineElem)) {
-        var hr = $(this.options.type + '_' + this.origin);
-        var lineElem = hr.getParent('#calendarHead');
-      }
-      if ($(lineElem)) {
-        var thead = $(lineElem).getFirst();
-        var size = 0;
-        do {
-          if (thead.childNodes.length > size) size = thead.childNodes.length;
-        } while (thead = thead.getNext());
-        size = size * this.element.offsetHeight + 5;
-        if (lineElem.offsetHeight != size) {
-          lineElem.getElements('td').setStyle('height', size + 'px');
-          return true
-        }        
-      }
-      return false;
-  },
-
-  setDuration: function(duration) {
-    this.event.duration = duration;
-    startTime = new Obm.DateTime(this.event.time * 1000);
-    startTime.setHours(0);
-    startTime = startTime.getTime()/1000;
-    endTime = new Obm.DateTime((this.event.time + this.event.duration)*1000);
-    endTime = endTime.getTime()/1000;
-    var dayDuration = Math.ceil((endTime - startTime) / 86400);
-    this.setSize(dayDuration);
-  },
-
-  setSize: function(size) {
-    hr = $(this.element.parentNode);
-    this.trashExtensions();
-    this.size = size - this.hidden;
-    this.length = this.size;
-    this.drawExtensions();
-    if (obm.calendarManager.lock()) {
-      this.setWidth(this.size * (hr.clientWidth+1) - 1);
-      if (this.drag) {
-        this.drag.options.xMax = this.context.right - obm.calendarManager.defaultWidth;
-      }
-      obm.calendarManager.unlock();
+    if (this.event.private) {
+      new Element('img').setProperty('src',obm.vars.images.private).injectInside(this.dragHandler);
     }
   },
 
-  redraw: function() {
-    hr = $(this.element.parentNode);
-    this.element.setStyles({
-      'top':  hr.getParent().getTop() + hr.getStyle('padding-top').toInt() + 'px',
-      'left': (hr.getLeft() + (hr.clientLeft || 0)) + 'px'
-    });
-    this.setWidth(this.size * (hr.clientWidth+1) - 1);
-    if (this.options.draggable) {
-      this.drag.options.limit = {
-        'x': [this.context.left,this.context.right - obm.calendarManager.defaultWidth],
-        'y': [this.context.top,this.context.bottom - this.element.offsetHeight]};      
-    }   
-    this.extensions.each( function (extension) {
-      extension.redraw();
-    });
-  },
 
-  setWidth: function(width) {
-    if( (this.element.offsetLeft + width) > this.context.right ) {
-      width = this.context.right - this.element.offsetLeft;
-    }
-    // Waiting events add a border
-    status = this.event.status;
-    if (status == 'W') {
-      status_size = 2;
-    } else {
-      status_size = 0;
-    }
-    width -= status_size;
-    this.element.setStyle('width',width + 'px');
-  },
-
-  conflict: function(size, position) {
-    this.element.setStyle('margin-top',position * (this.element.offsetHeight+1) + 'px');
-    this.extensions.each( function (extension) {
-      extension.conflict(size, position);
-    }.bind(this));
-  },
-
-  toQueryString: function() {
-    date_begin = new Obm.DateTime(this.event.time * 1000);
-    date_end = new Obm.DateTime(this.event.time * 1000 + this.event.duration * 1000);    
-    query = 'calendar_id=' + this.event.id;
-    query += '&date_begin=' + date_begin.format('O');
-    query += '&duration=' + this.event.duration;
-    query += '&title=' + this.event.title;
-    return query;
-  },
-  
-  drawExtensions: function() {
-    if(this.size != 1) {
-      dayBegin = (new Obm.DateTime(this.event.time * 1000).getDay() + this.hidden - obm.vars.consts.weekStart + 7) % 7; 
-      dayEnd = (dayBegin + this.size + 6) % 7;
-      var startDate = new Obm.DateTime((obm.calendarManager.startTime + this.origin) * 1000);
-      while(dayEnd < dayBegin || this.size > 7) {
-        var extensionSize = dayEnd + 1;
-        this.size -= extensionSize;
-        var extensionDate = new Obm.DateTime(startDate.getTime());
-        extensionDate.setDate(startDate.getDate() + this.size);
-        var extensionOrigin = Math.floor(extensionDate.getTime()/1000) - obm.calendarManager.startTime;
-        dayEnd = 6;
-        if($(this.options.type+'_'+extensionOrigin)) {
-          this.extensions.push(new Obm.CalendarDayEventExtension(this,extensionSize, extensionOrigin));
-        } else {
-          this.length -= extensionSize;
-        }
-      }
-    }
-  },
-                 
-  trashExtensions: function() {
-    this.extensions.each( function (extension) {
-      extension.destroy();
-      delete extension;
-    }.bind(this))
-    this.extensions = new Array();
-  },
-
-  destroy: function() {
-    this.element.dispose();
-    this.trashExtensions();
-  },
-
+  /**
+   * Select custom color
+   */
   switchColor: function(colorTemplate) {
     switch(colorTemplate) {
       case "event":
@@ -511,271 +798,392 @@ Obm.CalendarDayEvent = new Class({
     }
   },
 
+
+  /**
+   * Fill event with custom color
+   */
   setColor: function(color) {
-    if(color) {
-      this.element.setStyle('backgroundColor',color);
+    if (color) {
+      this.content.setStyle('backgroundColor',color);
       this.dragHandler.setStyle('backgroundColor',color);
     } else {
-      this.element.setStyle('backgroundColor','');
+      this.content.setStyle('backgroundColor','');
       this.dragHandler.setStyle('backgroundColor','');
     }
-    this.extensions.each(function (extension) {
-      extension.setColor(color);
-    })
   }
-})
+
+});
 
 
 /******************************************************************************
- * Extended event with graphical representation of it's duration and which
- * could be resize
+ * In-day event 
  *****************************************************************************/
-Obm.CalendarEvent = new Class({
+Obm.CalendarInDayEvent = new Class({
 
-  Extends: Obm.CalendarDayEvent,
+  Extends: Obm.CalendarEvent,
 
-  options: {
-    draggable: false,
-    resizable: false,
-    type: 'time',
-    yUnit: obm.vars.consts.timeUnit,
-    xUnit: (3600*24),
-    unit : obm.vars.consts.timeUnit,
-    context: 'body'
-  },
-
+  /**
+   * Constructor
+   */
   initialize: function(eventData,options) {
+    this.kind = 'in_day';
     this.setOptions(options);
-    this.initContext();  
     this.event = eventData;
-    this.extensions = new Array();
-    this.size = 1;
-    this.length = 1;
-    this.buildEvent();
+    this.event.date =  new Obm.DateTime(this.event.time * 1000);
+    this.draw();
+    this.setPosition();
     this.switchColor(obm.vars.conf.calendarColor);
-    if (this.options.resizable)
-      this.makeResizable(options);
-    if (this.options.draggable)
-      this.makeDraggable();
-    this.setTime(this.event.time);
-    this.setDuration(this.event.duration);
+    if (this.event.updatable) this.makeUpdatable();
   },
+
   
-  buildEvent: function() {
-    id = this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
+  /**
+   * Draw event and inject it into calendarGrid
+   */
+  draw: function() {
+    var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
     this.element = new Element('div').addClass('event')
-                                     .addClass(this.event.klass)
-                                     .setProperty('id','event_'+id)
-                                     .setProperty('title', this.event.title)
-                                     .setOpacity(this.getOpacity())
-                                     .injectInside(document.body);
-    this.dragHandler = new Element('h1')
-                                 .setProperty('style','cursor: move;')
-                                 .injectInside(this.element);     
-    if(this.event.meeting) {                                 
-      new Element('img').setProperty('src',obm.vars.images.meeting)
-                        .injectInside(this.dragHandler);
-    }
-    if (this.event.private) {
-      this.private = new Element('img').setProperty('src',obm.vars.images.private)
-                                       .injectInside(this.dragHandler);
-    }
-    this.setPeriodicity();
-    if(this.options.resizable) {
+                                     .setProperties({'id':id,'title':this.event.title})
+                                     .setOpacity(this.getOpacity());
+
+
+    this.content = new Element('dl').addClass(this.event.klass).injectInside(this.element);
+    var dt = new Element('dt').injectInside(this.content);
+    var dd = new Element('dd').injectInside(this.content);
+
+    this.dragHandler = new Element('h1').injectInside(dt);     
+    this.setTitleIcons();
+
+    if(this.event.updatable) {
+    this.dragHandler.setProperty('style','cursor: move;');
     this.resizeHandler = new Element('div')
-      .addClass(this.event.klass)
       .addClass('handle')
       .injectInside(this.element)
-    
     }
 
-    this.titleContainer = new Element('span').injectInside(this.element);
-    this.locationContainer = new Element('span').injectInside(this.element);
+    this.titleContainer = new Element('span').injectInside(dd);
+    this.locationContainer = new Element('span').injectInside(dd);
     this.timeContainer = new Element('a')
-       .setProperty('href','calendar_index.php?action=detailconsult&calendar_id='+this.event.id)
+       .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
        .injectInside(this.dragHandler);
-    this.linkContainer = this.timeContainer;
+
+    this.linkContainer = this.titleContainer;
     this.linkContainer.addEvent('mousedown', function (evt) {
       this.linkContainer.addEvent('mouseup', 
         function (evt) {
-          if(obm.calendarManager.redrawLock) {
-            this.linkContainer.addEvent('click',
-              function(evt) {
-                evt.preventDefault();
-                this.linkContainer.removeEvents('click');
-                this.linkContainer.removeEvents('mouseup');
-              }.bind(this)
-            );
-          }
+          this.linkContainer.addEvent('click',
+            function(evt) {
+              evt.preventDefault();
+              this.linkContainer.removeEvents('click');
+              this.linkContainer.removeEvents('mouseup');
+            }.bind(this)
+          );
         }.bind(this)
       )
     }.bind(this));       
-    this.resetTitle();
 
+    this.setTitle();
+    this.element.injectInside($('calendarGrid'));
   },
 
-  resetTitle: function() {
+
+  /**
+   * Set event date, title & location
+   */
+  setTitle: function() {
     var location = '';
     if (this.event.location != '') {
       location = '(' + this.event.location + ')';
     }
     var title = this.event.title + ' ';
-    if (this.event.duration <= this.options.unit) {
-      var time = new Obm.DateTime(this.event.time * 1000).format("H:i") + ' ' + title; 
+    if (this.event.duration <= obm.vars.consts.timeUnit) {
+      var time = this.event.date.format("H:i") + ' ' + title; 
       var title = '';
+      this.locationContainer.set('html', '');
     } else {
-      var time = new Obm.DateTime(this.event.time * 1000).format("H:i");
+      var end =  new Obm.DateTime((this.event.time+this.event.duration) * 1000);
+      var time = this.event.date.format("H:i") + ' - ' + end.format("H:i");
+      this.locationContainer.set('html',location);
     }
+
     this.element.setProperty('title', this.event.title + ' ' + location);
     this.timeContainer.set('html',time);
     this.titleContainer.set('html',title);
-    this.locationContainer.set('html',location);
   },
 
-  setDuration: function(duration) {
-    this.event.duration = duration;
-    size = Math.ceil(duration/this.options.yUnit);
-    this.setSize(size);
-  },
 
-  setSize: function(size) {
-    this.size = size;
-    this.length = size;
-    if (obm.calendarManager.lock()) {  
-      height = size * obm.calendarManager.defaultHeight;
-      this.setHeight(height);
-      if (this.resize) {
-        this.resize.options.yMax = this.context.bottom - this.element.getTop();
-      }
-      if (this.drag) {
-        this.drag.options.yMax = this.context.bottom - this.element.offsetHeight;
-      }
-      obm.calendarManager.unlock();
-    }
-  },
-
-  setHeight: function(height) {
-    if((this.element.getTop() + height) > this.context.bottom) {
-      height = this.context.bottom - this.element.getTop();
-    }
-    // Waiting events add a border
-    status = this.event.status;
-    if (status == 'W') {
-      status_size = 2;
-    } else {
-      status_size = 0;
-    }
-    height -= status_size;
-    this.element.setStyle('height',height + 'px');
-  },
-
-  makeResizable: function() {
+  /**
+   * Event is updatable. Make it resizable and draggable
+   */
+  makeUpdatable: function() {
     var resizeOptions = {
       handle: this.resizeHandler,
-      limit: {
-        'x': [obm.calendarManager.defaultWidth,obm.calendarManager.defaultWidth],
-        'y': [obm.calendarManager.defaultHeight,this.context.bottom]
-      },
+      grid: obm.calendarManager.defaultHeight,
+      modifiers: {'y' : 'height', 'x' : false},
+      limit: {'y': [obm.calendarManager.defaultHeight,false]},
+      overflow: $('calendarBody')
+    };
+    var dragOptions = {
+      handle: this.dragHandler,
+      preventDefault: true,
+      units: {'x':'%', 'y':'px'},
+      grid: {'x': obm.vars.consts.cellWidth, 'y': obm.calendarManager.defaultHeight},
+      container: $('calendarGrid'),
+      overflow: $('calendarBody')
+    };
 
-      onStart:function() {
-        obm.calendarManager.lock();
-        this.element.setStyle('margin-left', '0');
-        this.element.setOpacity(.7);
-      },
-      
-      onComplete:function() {
-        this.element.setOpacity(this.getOpacity());
-        obm.calendarManager.resizeEventTo(this.element.id,this.element.offsetHeight);
-        obm.calendarManager.unlock();
-      }.bind(this)     
-    };       
+    this.drag = new Obm.Drag(this.element, dragOptions);
+    this.resize = new Obm.Drag(this.element, resizeOptions);
 
-    this.resize = this.element.makeResizable(resizeOptions);
+    // Add drag events
+    this.drag.addEvent('start', function() {
+      this.element.setStyles({
+        'width': obm.vars.consts.cellWidth+'%',
+        'z-index' : 1000
+      });
+      this.element.setOpacity(.7);
+      obm.calendarManager.unregister(this);
+
+      // Enable scroller
+      obm.calendarManager.scroll.start();
+
+    }.bind(this));
+    this.drag.addEvent('drag', this.updateTime.bind(this));
+    this.drag.addEvent('complete', function() {
+      this.element.setOpacity(this.getOpacity());
+      this.element.setStyles({
+        'z-index' : 'auto' 
+      });
+      obm.calendarManager.scroll.stop();
+      obm.calendarManager.sendUpdateEvent(this);
+    }.bind(this));
+
+
+    // Add resize events
+    this.resize.addEvent('start', function() {
+      this.element.setStyles({
+        'z-index' : 1000
+      });
+      this.element.setOpacity(.7);
+      obm.calendarManager.unregister(this);
+
+      // Enable scroller
+      obm.calendarManager.scroll.start();
+
+    }.bind(this));
+    this.resize.addEvent('drag', this.updateDuration.bind(this));
+    this.resize.addEvent('complete', function() {
+      this.element.setOpacity(this.getOpacity());
+      this.element.setStyles({
+        'z-index' : 'auto' 
+      });
+      obm.calendarManager.scroll.stop();
+      obm.calendarManager.sendUpdateEvent(this);
+    }.bind(this));
   },
 
-  setMargin: function(margin) {
-    this.element.setStyle('margin-left',margin + 'px');
-  },
- 
 
-  setTime: function(time) {
-    origin = time - (time - obm.calendarManager.startTime)%this.options.yUnit;
-    if(this.setOrigin(origin)) {
-      this.event.time = this.guessEventTime(time);
-      this.resetTitle(); 
+  /**
+   * Set initial html event position
+   */
+  setPosition: function() {
+    this.element.style.top = (this.event.date.getHours()*3600 + this.event.date.getMinutes()*60)/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight + 'px';
+    if (this.event.duration < obm.vars.consts.timeUnit) {
+      this.element.style.height = obm.calendarManager.defaultHeight+'px';
     } else {
-      if(obm.calendarManager.lock()) {
-        this.redraw();
-        obm.calendarManager.unlock();
-      }
+      this.element.style.height = this.event.duration/obm.vars.consts.timeUnit * obm.calendarManager.defaultHeight+'px';
     }
   },
 
-  guessEventTime: function(time) {
-    return time;
+
+  /**
+   * Update event position when redrawGrid (to prevent conflict)
+   */
+  updatePosition: function(unit, position, size, column) {
+    this.element.style.width = (obm.vars.consts.cellWidth/unit*size) + '%';
+    this.element.style.left = ($('day_'+column).style.left.toFloat()) + ((obm.vars.consts.cellWidth/unit) * position) + '%';
   },
 
-  setOrigin: function(origin) {
-    hr = $(this.options.type+'_'+origin);
-    if(hr) {
-      this.origin = origin;
-      this.element.dispose();
-      hr.adopt(this.element);
-      if(obm.calendarManager.lock()) {
-        this.redraw();
-        obm.calendarManager.unlock();
-      }
-      return true;
-    } else {
-      return false;
-    }
+
+  /**
+   * Update event time on drag 
+   */
+  updateTime: function() {
+    var top = this.element.getStyle('top').toFloat();
+    var delta = Math.floor(this.element.getStyle('left').toFloat()/obm.vars.consts.cellWidth);
+    this.event.date.setTime(obm.vars.consts.startTime.getTime());
+    this.event.date.setDate(obm.vars.consts.startTime.getDate() + delta);    
+    this.event.date.setHours(top/obm.calendarManager.defaultHeight * obm.vars.consts.timeUnit/3600);
+    this.event.date.setMinutes((top/obm.calendarManager.defaultHeight * obm.vars.consts.timeUnit)%3600 / 60);
+    this.event.time = Math.floor(this.event.date.getTime() / 1000);
+    this.setTitle();
   },
 
-  resizeLine: function(lineElem) {
-    return false;
-  },
 
-  redraw: function() {
-    hr = $(this.element.parentNode);
-    this.element.setStyles({
-      'top':  hr.getParent().getTop() + 'px',
-      'left': (hr.getLeft() + (hr.clientLeft || 0)) + 'px'      
-    });
-    this.setHeight(this.size * obm.calendarManager.defaultHeight);
-    if (this.options.draggable) {
-      this.drag.options.limit = {
-        'x': [this.context.left,this.context.right - obm.calendarManager.defaultWidth],
-        'y': [this.context.top,this.context.bottom - this.element.offsetHeight]};         
-    }    
-    if (this.options.resizable) {
-      this.resize.options.limit = {
-        'x': [obm.calendarManager.defaultWidth,obm.calendarManager.defaultWidth],
-        'y': [obm.calendarManager.defaultHeight,this.context.bottom - this.element.getTop()]};      
-    }
-  },
-
-  conflict: function(size, position) {
-    hr = $(this.element.parentNode);
-    var modulo       = hr.clientWidth%size;
-    var correctWidth = (modulo > position ? 1 : 0);
-    var correctPos   = (modulo > position ? position : modulo);
-    if (size > 1)
-      this.setWidth(Math.floor(hr.clientWidth/size)+correctWidth);
-    else
-      this.setWidth(hr.clientWidth);
-    this.setMargin(Math.floor(hr.clientWidth/size)*position+correctPos);
-  },
-
-  setColor: function(color) {
-    if (color) {
-      this.element.setStyle('backgroundColor',color);
-      this.dragHandler.setStyle('backgroundColor',color);
-    } else {
-      this.element.setStyle('backgroundColor','');
-      this.dragHandler.setStyle('backgroundColor','');
-    }
+  /**
+   * Update event duration on resize
+   */
+  updateDuration: function() {
+    var height = this.element.getStyle('height').toFloat()/obm.calendarManager.defaultHeight;
+    this.event.duration = height * obm.vars.consts.timeUnit;
+    this.setTitle();
   }
 
+
+});
+
+
+/******************************************************************************
+ * Allday event 
+ *****************************************************************************/
+Obm.CalendarAllDayEvent = new Class({
+
+  Extends: Obm.CalendarEvent,
+
+  /**
+   * Constructor
+   */
+  initialize: function(eventData,options) {
+    this.kind = 'all_day';
+    this.setOptions(options);
+    this.event = eventData;
+    this.event.date =  new Obm.DateTime(this.event.time * 1000);
+    this.draw();
+    this.setPosition();
+    this.switchColor(obm.vars.conf.calendarColor);
+    if (this.event.updatable) this.makeUpdatable();
+  },
+
+  
+  /**
+   * Draw event and inject it into calendarGrid
+   */
+  draw: function() {
+    var id = 'event_'+this.event.id+'_'+this.event.entity+'_'+this.event.entity_id+'_'+this.event.time;
+    this.element = new Element('div').addClass('event')
+                                     .setProperties({'id':id,'title':this.event.title})
+                                     .setOpacity(this.getOpacity());
+
+    this.content = new Element('dl').addClass(this.event.klass+' allDay').injectInside(this.element);
+    var dt = new Element('dt').injectInside(this.content);
+    var dd = new Element('dd').injectInside(this.content);
+
+    this.leftExtension = new Element('img').setProperty('src', obm.vars.images.extension_left).setStyle('display', 'none').injectInside(dt);
+    this.rightExtension = new Element('img').setProperty('src', obm.vars.images.extension_right).setStyles({'display':'none', 'float':'right'}).injectInside(dt);
+    this.dragHandler = new Element('h1').addClass('allDay').injectInside(dt);     
+
+    this.setTitleIcons();
+
+    if(this.event.updatable) {
+      this.dragHandler.setProperty('style','cursor: move;');
+    }
+
+    this.timeContainer = new Element('a')
+       .setProperty('href',obm.vars.consts.calendarDetailconsultURL+this.event.id)
+       .injectInside(this.dragHandler);
+
+    this.linkContainer = this.timeContainer;
+    this.linkContainer.addEvent('mousedown', function (evt) {
+      this.linkContainer.addEvent('mouseup', 
+        function (evt) {
+          this.linkContainer.addEvent('click',
+            function(evt) {
+              evt.preventDefault();
+              this.linkContainer.removeEvents('click');
+              this.linkContainer.removeEvents('mouseup');
+            }.bind(this)
+          );
+        }.bind(this)
+      )
+    }.bind(this));       
+
+    this.setTitle();
+
+    if (this.event.date.getTime() < obm.vars.consts.startTime.getTime()) {
+      this.element.injectInside($('allday_'+obm.vars.consts.startTime.format('Y-m-d')));
+    } else {
+      this.element.injectInside($('allday_'+this.event.date.format('Y-m-d')));
+    }
+
+  },
+
+
+  /**
+   * Set event date, title & location
+   */
+  setTitle: function() {
+    var title = this.event.title;
+    var time = this.event.date.format("H:i") + ' ' + title; 
+    if (this.event.all_day) {
+      time = title;
+    }
+
+    this.element.setProperty('title', this.event.title);
+    this.timeContainer.set('html',time);
+  },
+
+
+  /**
+   * Event is updatable. Make it draggable
+   */
+  makeUpdatable: function() {
+    var dragOptions = {
+      handle: this.dragHandler,
+      preventDefault: true,
+      units: {'x':'%', 'y':'px'},
+      grid: {'x': 100, 'y': obm.calendarManager.defaultHeight},
+      container: $('calendarHeaderGrid')
+    };
+
+    this.drag = new Obm.Drag(this.element, dragOptions);
+
+    // Add drag events
+    this.drag.addEvent('start', function() {
+      this.element.setStyles({
+        'z-index' : 1000
+      });
+      this.element.setOpacity(.7);
+      Obm.calendarManager.unregister(this);
+    }.bind(this));
+    this.drag.addEvent('complete', function() {
+      this.updateTime();
+      this.element.setOpacity(this.getOpacity());
+      this.element.setStyles({
+        'z-index' : 'auto' 
+      });
+      obm.calendarManager.sendUpdateEvent(this);
+    }.bind(this));
+
+  },
+
+
+  /**
+   * Set initial html event position .. or not
+   */
+  setPosition: function() {
+    // this.element.style.left = Math.floor((this.event.date.getTime() - obm.vars.consts.startTime.getTime())/86400000) * obm.vars.consts.cellWidth + '%';
+    // this.element.style.width = obm.vars.consts.cellWidth+'%';
+  },
+
+
+  /**
+   * Update event position when redrawGrid (to prevent conflict)
+   */
+  updatePosition: function(position, size, column) {
+    this.element.style.top = position * this.element.offsetHeight+'px';
+    this.element.style.width = size*100+'%';
+  },
+
+
+  /**
+   * Update event time on drag 
+   */
+  updateTime: function() {
+    var delta = Math.floor(this.element.getStyle('left').toFloat()/100);
+    this.event.date.setDate(this.event.date.getDate() + delta);    
+    this.event.time = Math.floor(this.event.date.getTime() / 1000);
+    this.setTitle();
+  },
 
 });
 
@@ -843,9 +1251,7 @@ Obm.CalendarPopupManager = new Class({
     this.chain.clearChain();
     this.removeEvents();
     if (this.evtId) {
-      obm.calendarManager.unlock();
-      obm.calendarManager.events.get(this.evtId).redraw();
-      obm.calendarManager.redrawAllEvents();
+      obm.calendarManager.redrawGrid();
     }
   },
   
@@ -855,476 +1261,6 @@ Obm.CalendarPopupManager = new Class({
     this.removeEvents();
   }
 
-});
-
-
-/******************************************************************************
- * Calendar Manager which redraw all events, and is a kind of home for the
- * events objects.
- ******************************************************************************/
-Obm.CalendarManager = new Class({
-
-  initialize: function(startTime) {
-    this.startTime = startTime;
-    this.events = new Hash();
-    this.times = new Hash();
-    this.redrawLock = false;
-
-    head = $('calendarHead');
-    body = $('calendarBody');
-    zoneWidth = $$('table.calendar')[0].offsetWidth - $('calendarHourCol').offsetWidth ;//$('calendarEventContext').offsetWidth;
-    this.evidence = body.getElement('td');
-
-    this.headContext = new Object();
-    if (head) {
-      this.headContext.top = head.getTop();
-      this.headContext.right = this.evidence.getLeft() + zoneWidth;
-      this.headContext.left = this.evidence.getLeft();
-      this.headContext.bottom = head.getTop() + head.offsetHeight;    
-    }
-
-    this.bodyContext = new Object();
-    this.bodyContext.top = body.getTop();
-    this.bodyContext.right = this.evidence.getLeft() + zoneWidth;
-    this.bodyContext.left = this.evidence.getLeft();
-    this.bodyContext.bottom = body.getTop() + body.offsetHeight;
-    this.evidence.observe({onStop:this.resizeWindow.bind(this), property:'offsetWidth'});
-    this.evidence.observe({onStop:this.resizeWindow.bind(this), property:'offsetTop'});
-
-    this.defaultWidth = this.evidence.clientWidth;
-    this.defaultHeight = this.evidence.offsetHeight;
-
-    this.popupManager = new Obm.CalendarPopupManager(); 
-  },
-  
-  lock: function() {
-    if(!this.redrawLock)
-      return (this.redrawLock = true);
-    else
-      return false;
-  },
-
-  unlock: function() {
-    this.redrawLock = false;
-  },
-
-  newDayEvent: function(eventData,options) {
-    obmEvent = new Obm.CalendarDayEvent(eventData,options);
-    this.events.set(obmEvent.element.id,obmEvent);
-    this.register(obmEvent.element.id);
-    return obmEvent;
-  },
-
-  newEvent: function(eventData,options) {
-    obmEvent = new Obm.CalendarEvent(eventData,options);
-    this.events.set(obmEvent.element.id,obmEvent);
-    this.register(obmEvent.element.id);
-    return obmEvent;
-  },
-
-  resizeWindow: function() {
-    if(this.lock()) {
-
-      head = $('calendarHead');
-      body = $('calendarBody');
-      zoneWidth = $$('table.calendar')[0].offsetWidth - $('calendarHourCol').offsetWidth ;//$('calendarEventContext').offsetWidth;
-
-      if(head) {
-        this.headContext.top = head.getTop();
-        this.headContext.right = this.evidence.getLeft() + zoneWidth;
-        this.headContext.left = this.evidence.getLeft();
-        this.headContext.bottom = head.getTop() + head.offsetHeight;    
-      }
-
-      this.bodyContext.top = body.getTop();
-      this.bodyContext.right = this.evidence.getLeft() + zoneWidth;
-      this.bodyContext.left = this.evidence.getLeft();
-      this.bodyContext.bottom = body.getTop() + body.offsetHeight;      
-  
-      
-      this.defaultWidth = this.evidence.clientWidth;
-      this.defaultHeight = this.evidence.offsetHeight;    
-
-      this.events.each(function(evt, key) {
-        evt.resizeLine(); 
-      });
-
-      this.events.each(function(evt, key) {
-        evt.redraw(); 
-      });
-      
-      this.redrawAllEvents();
-      this.unlock();
-   }
-  },
-
-
-  compareEvent: function(event1, event2) {
-    diff = event1.event.time - event2.event.time;
-    if (diff != 0)
-      return diff;
-    diff = event1.event.id - event2.event.id;
-    if (diff != 0)
-      return diff;
-    return event1.event.entity_id - event2.event.entity_id;
-  },
-
-  compareTime: function(time1, time2) {
-    return time1.toInt() - time2.toInt();
-  },
-
-  getEventNewPosition: function(elem) {
-    var id = elem.id;
-    var left = elem.getLeft();
-    var top = elem.getTop();
-    var evt = this.events.get(id);
-    var xDelta = Math.round((left-evt.context.left)/this.defaultWidth);
-    var yDelta = Math.round((top-evt.context.top)/this.defaultHeight);
-    var secDelta = xDelta*evt.options.xUnit + yDelta*evt.options.yUnit;
-    var dayDelta = Math.floor(secDelta / 86400);
-    secDelta = secDelta - (dayDelta * 86400);
-    var hourDelta = Math.floor(secDelta / 3600);
-    secDelta = secDelta - (hourDelta * 3600);
-    var minDelta = Math.floor(secDelta / 60);
-    secDelta = secDelta - (minDelta * 60);
-    var startDate = new Obm.DateTime(this.startTime * 1000);
-    startDate.setDate(startDate.getDate() + dayDelta);
-    startDate.setHours(startDate.getHours() + hourDelta);
-    startDate.setMinutes(startDate.getMinutes() + minDelta);
-    startDate.setSeconds(startDate.getSeconds() + secDelta);
-
-    return startDate;
-  },
-
-  moveEventTo: function(id) {
-    var evt = this.events.get(id);
-    startDate = obm.calendarManager.getEventNewPosition(evt.element);
-    time = Math.floor(startDate.getTime() / 1000);
-    guessedTime = evt.guessEventTime(time);
-    if (evt.event.time != guessedTime) {
-      eventData = new Object();
-      eventData.calendar_id = evt.event.id;
-      eventData.element_id = id;
-      eventData.date_begin = new Obm.DateTime(guessedTime * 1000).format('c');
-      eventData.old_date_begin = new Obm.DateTime(evt.event.time * 1000).format('c');
-      eventData.duration = evt.event.duration;
-      eventData.title = evt.event.title;
-      eventData.all_day = evt.event.all_day;
-      this.sendUpdateEvent(eventData);
-    } else {
-      evt.setSize(evt.length);
-      evt.redraw();
-      this.redrawAllEvents(evt.event.time);
-    }
-  },
-
-  resizeEventTo: function(id,size) {
-    size = Math.round(size/this.defaultHeight);
-    evt = this.events.get(id);
-    if (size != evt.length) {
-      eventData = new Object();
-      eventData.calendar_id = evt.event.id;
-      eventData.element_id = id;
-      eventData.date_begin = new Obm.DateTime(evt.event.time * 1000).format('c');
-      eventData.old_date_begin = eventData.date_begin;
-      eventData.duration = size*evt.options.yUnit;
-      eventData.title = evt.event.title;
-      eventData.all_day = evt.event.all_day;
-      this.sendUpdateEvent(eventData);
-    } else {
-      evt.redraw();
-      this.redrawAllEvents(evt.event.time);
-    }
-  },
-
-  register: function(id) {
-    evt = this.events.get(id);
-    size = evt.length;
-    for(var i=0;i < size;i++) {
-      t = evt.origin + i*evt.options.unit;
-      if(!this.times.get(t)) {
-        this.times.set(t.toInt(),new Array());
-      }
-      this.times.get(t).push(evt);
-    }   
-  },
-
-  unregister: function(id) {
-    evt = this.events.get(id);
-    size = evt.length;
-    for(var i=0;i < size;i++) {
-      t = evt.origin + i*evt.options.unit;
-      this.times.get(t).erase(evt);
-      if(this.times.get(t).length == 0) {
-        this.times.erase(t);
-      }
-    }
-  },
-
-  redrawAllEvents: function() {
-    keys = this.times.getKeys().sort(this.compareTime);
-    this.redrawEvents(keys);
-  }, 
-
-  redrawEvents: function(keys) {
-    resize = new Object();
-    end = 0;
-    for(var k=0;k < keys.length; k++) {
-      time = this.times.get(keys[k]);
-      if (time.length == 0)
-        continue;
-      if (end == 0) {
-        unit = new Object()
-        unit.size = 1;
-      }
-      if (unit.size < time.length) {
-        unit.size = time.length;
-      }
-      time.sort(this.compareEvent);
-      free = new Array;
-      for(var i=0;i<time.length;i++) {
-        free.push(i);
-      }
-      // PERFORMING Event position
-      for(var i=0;i<time.length;i++) {
-        evt = time[i];
-        id = evt.element.id;        
-        if (keys[k] == evt.origin) {
-          size = evt.length;
-          resize[id] = new Object;
-          resize[id].position = free.splice(0, 1)[0];
-          resize[id].unit = unit;      
-          if (size > end) {
-            end = size;
-          }
-        } else  {
-          free.erase(resize[id].position);
-        }
-      }
-      end --;
-    }
-    // REDRAWING EVENTS
-    for(var i in resize) {
-      evt = this.events.get(i);
-      evt.conflict(resize[i].unit.size,resize[i].position);
-    }
-  },
- 
-  colorize: function () {
-    this.events.each(function(evt, key) {
-      evt.switchColor(obm.vars.conf.calendarColor); 
-    });    
-  },
-
-
-  sendUpdateEvent: function(eventData) {
-    new Request.JSON({
-      url: obm.vars.consts.calendarUrl,
-      secure : false,
-      onComplete : function(response) {
-        if (response.conflict) {
-          $('popup_force').value = obm.vars.labels.conflict_force;
-          obm.calendarManager.popupManager.add('calendarConflictPopup');
-        }
-        if (response.mail) {
-          obm.calendarManager.popupManager.add('calendarSendMail');
-        }
-        obm.calendarManager.popupManager.addEvent('mail', function () {
-          eventData.send_mail = true;
-        });        
-        obm.calendarManager.popupManager.addEvent('conflict', function() {
-          eventData = $merge({action : 'conflict_manager'}, eventData)
-          window.location=obm.vars.consts.calendarUrl+'?'+Hash.toQueryString(eventData);
-        });
-        obm.calendarManager.popupManager.addEvent('complete', function () {
-          new Request.JSON({
-            url: obm.vars.consts.calendarUrl,
-            secure : false,
-            onComplete : this.receiveUpdateEvent.bind(this)
-          }).post($merge({ajax : 1, action : 'quick_update'}, eventData));
-        }.bind(this));
-        obm.calendarManager.popupManager.show(eventData);
-      }.bind(this)
-    }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));    
-  }, 
-
-  
-  receiveUpdateEvent: function(response) {
-    try {
-      var resp = eval(response);
-    } catch (e) {
-      resp = new Object();
-      resp.error = 1;
-      resp.message = obm.vars.labels.fatalServerErr;
-    }
-    var events = response.eventsData;
-    if (response.error == 0) {
-      showOkMessage(response.message);
-      var str = response.elementId.split('_');
-      for(var i=0;i< events.length;i++) {
-        var ivent = events[i].event;
-        var id = str[0]+'_'+str[1] +'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
-        var evt = obm.calendarManager.events.get(id);
-        if (ivent.status == 'ACCEPTED' || ivent.status == 'NEEDS-ACTION') {
-          obm.calendarManager.unregister(id);
-          evt.event.id = ivent.id;
-          evt.event.status = ivent.status;
-          evt.setTime(ivent.time);
-          evt.setDuration(ivent.duration);
-          obm.calendarManager.register(id);           
-          evt.setTitle(ivent.title);
-        } else if (evt) {
-          obm.calendarManager.unregister(id);
-          obm.calendarManager.events.erase(id);
-          evt.destroy();
-          delete evt;
-        }
-      }
-      obm.calendarManager.redrawAllEvents();      
-      obm.calendarManager.updateLastVisitEvent(events);
-    } else {
-      showErrorMessage(response.message);
-      obm.calendarManager.events.each(function(evt, key) {
-        evt.redraw(); 
-      });      
-      obm.calendarManager.redrawAllEvents();      
-    }
-    
-  },
-
-  sendCreateEvent: function(eventData) {
-    new Request.JSON({
-      url: obm.vars.consts.calendarUrl,
-      secure : false,
-      onComplete : function(response) {
-        if (response.conflict) {
-          $('popup_force').value = obm.vars.labels.insert_force;
-          obm.calendarManager.popupManager.add('calendarConflictPopup');
-        }
-        if (response.mail) {
-          obm.calendarManager.popupManager.add('calendarSendMail');
-        }
-        obm.calendarManager.popupManager.addEvent('conflict', function() {
-          eventData = $merge({action : 'insert'}, eventData)
-          window.location=obm.vars.consts.calendarUrl+'?'+Hash.toQueryString(eventData)+'&repeat_kind=none&repeat_end='+eventData.date_begin;
-        });
-        obm.calendarManager.popupManager.addEvent('mail', function () {
-          eventData.send_mail = true;
-        });        
-        obm.calendarManager.popupManager.addEvent('complete', function () {
-          new Request.JSON({
-            url: obm.vars.consts.calendarUrl,
-            secure : false,
-            onComplete : this.receiveCreateEvent
-          }).post($merge({ajax : 1, action : 'quick_insert'}, eventData));          
-        }.bind(this));
-        obm.calendarManager.popupManager.show(eventData);
-      }.bind(this)
-    }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));
-
-  },
-
-  receiveCreateEvent: function(response) {
-    try {
-      var resp = eval(response);
-    } catch (e) {
-      resp = new Object();
-      resp.error = 1;
-      resp.message = obm.vars.labels.fatalServerErr;
-    }    
-    var events = response.eventsData;
-    if (response.error == 0) {
-      showOkMessage(response.message);
-      if (response.day == 1) {
-        for(var i=0;i< events.length;i++) {
-          obm.calendarManager.lock();
-          var e = obm.calendarManager.newDayEvent(events[0].event,events[0].options);
-          obm.calendarManager.unlock();
-          e.redraw();          
-        }
-      } else {
-        for(var i=0;i< events.length;i++) {        
-          obm.calendarManager.lock();
-          var e = obm.calendarManager.newEvent(events[0].event,events[0].options);
-          obm.calendarManager.unlock();
-          e.redraw();                
-        }
-      }
-      obm.calendarManager.redrawAllEvents();      
-      obm.calendarManager.updateLastVisitEvent(events);
-    } else {
-      showErrorMessage(response.message);
-    }
-  }, 
-
-  sendDeleteEvent: function(eventData) {
-    new Request.JSON({
-      url: obm.vars.consts.calendarUrl,
-      secure : false,
-      onComplete : function(response) {
-        if(response.mail) {
-          obm.calendarManager.popupManager.add('calendarSendMail');
-        }
-        obm.calendarManager.popupManager.addEvent('mail', function () {
-          eventData.send_mail = true;
-        });        
-        obm.calendarManager.popupManager.addEvent('complete', function () {
-          new Request.JSON({
-            url: obm.vars.consts.calendarUrl,
-            secure : false,
-            onComplete : this.receiveDeleteEvent
-          }).post($merge({ajax : 1, action : 'quick_delete'}, eventData));             
-        }.bind(this));
-        obm.calendarManager.popupManager.show(eventData);
-      }.bind(this)
-    }).post($merge({ajax : 1, action : 'check_conflict'}, eventData));    
- 
-  },
-  
-  receiveDeleteEvent: function(response) {
-    try {
-      var resp = eval(response);
-    } catch (e) {
-      resp = new Object();
-      resp.error = 1;
-      resp.message = obm.vars.labels.fatalServerErr;
-    }
-    var events = response.eventsData;
-    if (response.error == 0) {
-      showOkMessage(response.message);
-      var str = response.elementId.split('_');
-      for(var i=0;i< events.length;i++) {
-        ivent = events[i].event;
-        var id = str[0]+'_'+str[1] +'_'+ivent.entity+'_'+ivent.entity_id+'_'+str[4];
-        var evt = obm.calendarManager.events.get(id);
-        if (evt) {
-          obm.calendarManager.unregister(id);
-          obm.calendarManager.events.erase(id);
-          evt.destroy();
-          delete evt;
-        }
-      }
-      obm.calendarManager.redrawAllEvents();      
-    } else {
-      showErrorMessage(response.message);
-      obm.calendarManager.events.each(function(evt, key) {
-        evt.redraw(); 
-      });      
-    }
-  },
-
-  updateLastVisitEvent: function(events) {
-    if(events.length > 0) {
-      var id = events[0].event.id;
-      var title = events[0].event.title;
-      var url = obm.vars.consts.calendarDetailconsultURL+id;
-      if($('last_visit_calendar_event_a')) {
-        $('last_visit_calendar_event_a').setProperty('href', url);
-        $('last_visit_calendar_event_title').innerHTML = title;
-        $('last_visit_calendar_event_a').getParent().setStyle('display', '');
-      }
-    }
-  }
 });
 
 
@@ -1357,33 +1293,32 @@ Obm.CalendarQuickForm = new Class({
   },
   
   compute: function(ivent, context) {
-    ivent = new Event(ivent)
+    var ivent = new Event(ivent);
     var target = ivent.target;
     target = $(target);
-    if (obm.calendarManager.redrawLock || target.get('tag') == 'a') {
+    if (target.get('tag') == 'a') {
       return false;
     }
     while(target.id == '') {
-      if (target.get('tag') == origin) {
-        return false;
-      }
       target = $(target.parentNode);
     }
     var str = target.id.split('_');
     if (str.length <= 1) {
       return false;
     }
-    var target = $(target);
+
     var type = str[0];
-    if (type == 'time' || type == 'hour') {
-      this.setDefaultFormValues(str[1].toInt(),0, context);
-    } else if (type == 'day') {
-      this.setDefaultFormValues(str[1].toInt() + obm.calendarManager.startTime,1, context);
+    if (type == 'time') {
+      var d = obm.calendarManager.startTime + str[1].toInt() + Math.floor(ivent.event.layerX/($('calendarGrid').offsetWidth/100*obm.vars.consts.cellWidth))*86400;
+      this.setDefaultFormValues(d,0, context);
+    } else if (type == 'allday') {
+      var d = obm.calendarManager.startTime + Math.floor($('allday_'+str[1]).style.left.toInt()/obm.vars.consts.cellWidth.toInt())*86400;
+      this.setDefaultFormValues(d,1, context);
     } else {
-      var elId = 'event_' + str[1] + '_' + str[2] + '_' + str[3] + '_' + str[4];
-      var evt = obm.calendarManager.events.get(elId);
+      var evt = obm.calendarManager.events.get(str[1]);
       this.setFormValues(evt,context);
     }
+
     this.show();    
     this.form.tf_title.focus();
   },

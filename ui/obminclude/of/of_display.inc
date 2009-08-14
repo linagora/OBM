@@ -1057,6 +1057,8 @@ function display_head($p_module, $standard=true) {
   obm.vars.consts.obmUrl = '$path';
   obm.vars.consts.calendarUrl = '$path/calendar/calendar_index.php';
   obm.vars.consts.calendarDetailconsultURL = '$path/calendar/calendar_index.php?action=detailconsult&calendar_id=';
+  obm.vars.consts.firstHour = $GLOBALS[ccalendar_first_hour];
+  obm.vars.consts.lastHour = $GLOBALS[ccalendar_last_hour];
   obm.vars.labels.monthsShort = $monthShort;
   obm.vars.labels.months = $monthLong;
   obm.vars.labels.dayShort = $daysShort;

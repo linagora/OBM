@@ -80,6 +80,8 @@ $l_from = "du";
 $l_to = "au";
 $l_periodic = "Périodique";
 $l_days = 'jours';
+$l_more = 'de plus';
+
 // PDF Options
 $l_display_details = "Afficher les détails";
 $l_one_day_per_page = "Un jour par page";

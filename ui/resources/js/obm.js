@@ -191,17 +191,21 @@ Obm.Portlets = new Class({
 Obm.Tip = new Class({
   Extends: Tips,
 
-  initialize: function(e) {
+  initialize: function(e, klass) {
     this.parent(e);
-    this.tip.addClass('obmTip');
+    if (klass) {
+      this.tip.addClass(klass);
+    } else {
+      this.tip.addClass('obmTip');
+    }
   },
 
-	attach: function(elements) {
-		$$(elements).each(function(element){
+  attach: function(elements) {
+    $$(elements).each(function(element){
       this.add(element);
-		}, this);
-		return this;
-	},
+    }, this);
+    return this;
+  },
 
   add: function(element) {
     try {
@@ -210,20 +214,21 @@ Obm.Tip = new Class({
     } catch (ee) {
       content = element.get('title');
     }
-		var title = element.retrieve('tip:title', content);
-		var text = element.retrieve('tip:text', element.get('rel') || element.get('href'));
-		var enter = element.retrieve('tip:enter', this.elementEnter.bindWithEvent(this, element));
-		var leave = element.retrieve('tip:leave', this.elementLeave.bindWithEvent(this, element));
-		element.addEvents({mouseenter: enter, mouseleave: leave});
-		if (!this.options.fixed){
-			var move = element.retrieve('tip:move', this.elementMove.bindWithEvent(this, element));
-			element.addEvent('mousemove', move);
-		}
-		element.store('tip:native', element.get('title'));
-		element.erase('title');
+    var title = element.retrieve('tip:title', content);
+    var text = element.retrieve('tip:text', element.get('rel') || element.get('href'));
+    var enter = element.retrieve('tip:enter', this.elementEnter.bindWithEvent(this, element));
+    var leave = element.retrieve('tip:leave', this.elementLeave.bindWithEvent(this, element));
+    element.addEvents({mouseenter: enter, mouseleave: leave});
+    if (!this.options.fixed){
+      var move = element.retrieve('tip:move', this.elementMove.bindWithEvent(this, element));
+      element.addEvent('mousemove', move);
+    }
+    element.store('tip:native', element.get('title'));
+    element.erase('title');
   }
 
 });
+
 
 /*
  *
@@ -267,6 +272,176 @@ Obm.Popup = new Class ({
     } 
   }
 
+});
+
+
+
+/*
+ *
+ * OBM Drag
+ *
+ * Extends Mootools Drag.Move class
+ * Support overflow & x/y units 
+ *
+ */
+Obm.Drag = new Class ({ 
+
+  Extends: Drag.Move,
+
+  options: {
+    overflow:false,
+    units: {'x':'px', 'y':'px'}
+  },
+
+  start: function(event){
+    this.parent(event);
+
+    this.pixelUnitSize = new Object();
+    if (this.options.preventDefault) event.preventDefault();
+    this.fireEvent('beforeStart', this.element);
+    this.mouse.start = event.page;
+    var limit = this.options.limit;
+    this.limit = {'x': [], 'y': []};
+    for (var z in this.options.modifiers){
+      if (!this.options.modifiers[z]) continue;
+      if(this.element.getStyle(this.options.modifiers[z]).toFloat() == 0) {
+        this.element.setStyle(this.options.modifiers[z], '1' + this.options.units[z]);
+        this.pixelUnitSize[z] = this.element[('offset-'+this.options.modifiers[z]).camelCase()] / this.element.getStyle(this.options.modifiers[z]).toFloat();
+        this.element.setStyle(this.options.modifiers[z], '0' + this.options.units[z]);
+      } else {
+        this.pixelUnitSize[z] = this.element[('offset-'+this.options.modifiers[z]).camelCase()] / this.element.getStyle(this.options.modifiers[z]).toFloat();
+      }
+      if (this.options.style) this.value.now[z] = this.element.getStyle(this.options.modifiers[z]).toInt();
+      else this.value.now[z] = this.element[this.options.modifiers[z]];
+      if (this.options.invert) this.value.now[z] *= -1;
+      this.mouse.pos[z] = event.page[z] - (this.value.now[z] * this.pixelUnitSize[z]);
+      if (this.options.overflow) {
+        this.mouse.pos[z] += this.options.overflow.getScroll()[z];
+      }
+      if (limit && limit[z]){
+        for (var i = 2; i--; i){
+          if ($chk(limit[z][i])) this.limit[z][i] = $lambda(limit[z][i])();
+        }
+      }
+    }
+    if ($type(this.options.grid) == 'number') this.options.grid = {'x': this.options.grid, 'y': this.options.grid};
+    this.document.addEvents({mousemove: this.bound.check, mouseup: this.bound.cancel});
+    this.document.addEvent(this.selection, this.bound.eventStop);
+  },
+
+  drag: function(event) {
+    if (this.options.preventDefault) event.preventDefault();
+    this.mouse.now = event.page;
+    for (var z in this.options.modifiers){
+      if (!this.options.modifiers[z]) continue;
+      this.value.now[z] = this.mouse.now[z] - this.mouse.pos[z];
+      if (this.options.overflow) {
+        this.value.now[z] += this.options.overflow.getScroll()[z];
+      }
+      if (this.options.invert) this.value.now[z] *= -1;
+      if (this.options.limit && this.limit[z]){
+        if ($chk(this.limit[z][1]) && (this.value.now[z] > this.limit[z][1])){
+          this.value.now[z] = this.limit[z][1];
+        } else if ($chk(this.limit[z][0]) && (this.value.now[z] < this.limit[z][0])){
+          this.value.now[z] = this.limit[z][0];
+        }
+      }
+
+      this.value.now[z] = this.value.now[z]/this.pixelUnitSize[z];
+      if (this.options.grid[z]) this.value.now[z] -= (this.value.now[z] % this.options.grid[z]);
+      if (this.options.style) this.element.setStyle(this.options.modifiers[z], this.value.now[z] + this.options.units[z]);
+      else this.element[this.options.modifiers[z]] = this.value.now[z];
+    }
+    this.fireEvent('drag', this.element);
+  }
+
+});
+
+
+/*
+ *
+ * OBM Scroller 
+ *
+ * Extends Mootools Scroller class
+ * Fix mootools bug
+ *   see https://mootools.lighthouseapp.com/projects/2706/tickets/94-scroller-doesn-t-work-in-1-2dev-1555
+ *
+ */
+Obm.Scroller = new Class({
+
+  Extends: Scroller,
+
+  getCoords: function(event){
+    this.page = (this.listener.get('tag') == 'body') ? event.client : event.page;
+    if (!this.timer) this.timer = this.scroll.pass([event], this).periodical(50, this);
+  },
+
+  scroll: function(event){
+    var size = this.element.getSize(), scroll = this.element.getScroll(), pos = this.element.getOffsets(), scrollSize = this.element.getScrollSize(), change = {'x': 0, 'y': 0};
+    for (var z in this.page){
+      if (this.page[z] < (this.options.area + pos[z]) && scroll[z] != 0)
+        change[z] = (this.page[z] - this.options.area - pos[z]) * this.options.velocity;
+      else if (this.page[z] + this.options.area > (size[z] + pos[z]) && scroll[z] + size[z] != scrollSize[z])
+        change[z] = (this.page[z] - size[z] + this.options.area - pos[z]) * this.options.velocity;
+    }
+    if (change.y || change.x) this.fireEvent('change', [scroll.x + change.x, scroll.y + change.y, event]);
+  }
+
+});
+
+
+/*
+ *
+ * OBM Observer
+ *
+ * Add element property observer
+ *
+ */
+Obm.Observer = new Class({ 
+
+  Implements: Options,   
+
+  options: {
+    property: 'width',
+    frequency: '500',
+    onStart: $empty,
+    onChange: $empty,
+    onStop: $empty
+  },
+
+  initialize: function(el, options) {
+    this.setOptions(options);
+    this.el = $(el);
+    this.lastValue = this.setValue();
+    this.change = false; 
+    this.timer = this.check.periodical(this.options.frequency, this);
+  },
+  
+  setValue: function() {
+    v = this.el[this.options.property];
+    if(!v) 
+      v = this.el.getStyle(this.options.property);
+    return v;
+  },
+  
+  check: function() {
+    var v = this.setValue(); 
+    if(this.lastValue == v) {
+      if(this.change) {
+        this.options.onStop(this.el, v);
+        this.change = false;
+      }
+      return;
+    }
+    this.lastValue = v; 
+    if(!this.change) {
+      this.options.onStart(this.el, v);
+      this.change = true;
+    }
+    if(this.change) {
+      this.options.onChange(this.el, v);
+    }
+  }
 });
 
 
@@ -369,8 +544,8 @@ function unSelectAllCb(container) {
 }
 
 function change_view(url) {
-	Cookie.write('calendar_view', url,{path: '/'});
-	window.location=url;
+  Cookie.write('calendar_view', url,{path: '/'});
+  window.location=url;
 }
 
 function last_visit_calendar_view() {
@@ -378,5 +553,5 @@ function last_visit_calendar_view() {
   if (Cookie.read('calendar_view') != null) {
     url = '/calendar/'+Cookie.read('calendar_view');
   }
-	window.location=url;
+  window.location=url;
 }

@@ -11,7 +11,7 @@
 /* ------------------------------------------------------------------------- */
 /* Calendar common styles */
 /* ------------------------------------------------------------------------- */
-
+/*
 .calendar {
   width: 100%;
   margin-left: auto;
@@ -61,97 +61,113 @@
 }
 
 /* ------------------------------------------------------------------------- */
-/* Week view styles */
+/* Calendar styles                                                           */
 /* ------------------------------------------------------------------------- */
-
-.week tbody td{
-  height: 1.8em;
-  width: 14%;
-  overflow: visible;
-  margin:0;
-  padding: 0;
-  background-color: #fff;
+.dayColLabel {
+  border-bottom:1px solid #CCC;
+  position:absolute;
+  text-align:center;
+  background:#EFF0F2;
+  height: 100%;
+  vertical-align:middle;
 }
 
-.week thead th  {
-  background-color: #fff;
-  background-image: url('../images/ico_calendar_head_border.png');
-  background-repeat: repeat-x;
-  background-position: bottom;
-  border-left: 1px dotted #ddd; 
-  border-top: 1px solid #ccc;
-  padding-bottom: 9px;
-}
-
-.week tbody tr.hover th { 
-  border-color: #FF0000;
+.dayCol {
+  border-left:1px solid #CCC;
+  position:absolute;
+  height:100%;
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* Month view styles */
-/* ------------------------------------------------------------------------- */
-
-.month tbody td{
-  vertical-align: top;
-  height: 10.5em;
-  width: 14%;
-  overflow: visible;
-  margin:0;
-  padding-top: 10px;
-  background-color: #fff;
+.monthRow {
+  height: 100%
 }
 
-.month tbody td h2{
+.dayColMonth {
+  border-left:1px solid #CCC;
+  border-bottom:1px solid #CCC;
+  position:absolute;
+}
+
+.alldayCell {
+  position: relative;
+}
+
+.dayMonthLabel {
+  background: #CCC;
+  text-align: right;
+  padding-right: 4px;
+}
+
+.hourFull {
+  border-top:1px solid #CCC;
+  text-align:center;
+}
+
+.hourPartial {
+  border-top:1px dotted #CCC;
+}
+
+#today {
+  background:#FFFFCC;
+  height:100%;
+  position:absolute;
+}
+
+#todayHourMarker {
+  border-top:2px solid red;
+  position:absolute;
+  opacity:0.4;
+  z-index:1000;
+}
+
+#hourMarker {
+  position:absolute;
+  opacity:0.4;
+  z-index:1000;
+  left: -3em;
+  background-image: url(../images/hour_marker.gif);
+}
+
+#calendarBody {
+  border:1px solid #AAAAAA;
+  overflow-y:scroll;
+  overflow-x:hidden;
+}
+
+.calendarTable {
+  width:100%;
+  border-collapse:collapse;
+  background:#FFF;
+}
+
+#calendarHeaderGrid {
+  height: 20px;
   position:relative;
-  height:10px;
-  line-height: 10px;
-  top:-10px;
-  margin:0;
-  padding:0;
-  font-size: 9px;
-  background-color: #ccc;
 }
 
-.month tbody td h3{
-  height:10px;
-  line-height: 10px;
-  margin:0;
-  margin-top: -10px;
-  padding:0;
-  font-size: 9px;
-  background-color: #ccc;
+#calendarGrid {
+  position:relative;
 }
 
-
-.month tbody td.highlight{
-  background-color: #fddaa4;
+.calTip {
+  z-index: 400000;
 }
 
-.month tbody td.downlight{
-  background-color: #eff0f2;
-}
-/* ------------------------------------------------------------------------- */
-/* Month view styles */
-/* ------------------------------------------------------------------------- */
-
-.day tbody td{
-  height: 1.8em;
-  width: 90%;
-  overflow: visible;
-  margin:0;
+.calTip h1 {
+  background: #CCC;
+  font-size: 90%;
+  font-weight: bold;
+  margin: 0;
   padding: 0;
-  background-color: #fff;
+  white-space: nowrap;
 }
 
-.day thead th, .printableDay thead th {
-  background-color: #fff;
-  background-image: url('../images/ico_calendar_head_border.png');
-  background-repeat: repeat-x;
-  background-position: bottom;
-  border-left: 1px dotted #ddd; 
-  border-top: 1px solid #ccc;
-  padding-bottom: 9px;
+.calTip .tip {
+  background: #FFF;
+  border: 1px solid #666;
+  margin: 0;
+  padding: 0;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -160,7 +176,7 @@
 
 .event {
   position: absolute;
-  overflow: hidden;
+  z-index:10;
 }
 
 .printableCalendar .printableEvent {
@@ -175,6 +191,13 @@
   margin: 0;
   padding: 0;
   white-space: nowrap;
+}
+
+.event h1.allDay {
+  text-align:left;
+  padding-left: 2px;
+  background: none;
+  display: inline;
 }
 
 .event h1 a, .printableEvent h1 a  {
@@ -203,9 +226,38 @@
   background-position: center center;
 }
 
+.event dl {
+  margin: 0;
+  height: 100%;
+  overflow:hidden;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.event dl.allDay {
+  margin: 0;
+  height: auto;
+  overflow:hidden;
+}
+
+.event dt {
+  white-space: nowrap;
+}
+
+.event dd {
+  margin: 0;
+  margin-left: 1px;
+}
+
+.event span {
+  height:100%;
+}
+
 .eventOwner {
   color: #fff;
   background-color: rgb(102, 140, 217);
+  border: 1px solid rgb(41, 82, 163);
 }
 .eventOwner h1, li.eventOwner, .eventOwner .handle {
   background-color: rgb(41, 82, 163);
@@ -216,6 +268,7 @@
 .eventOwner0 {
   color: #fff;
   background-color: rgb(216, 102, 102);
+  border: 1px solid rgb(163, 41, 41);
 }
 .eventOwner0 h1, li.eventOwner0, .eventOwner0 .handle {
   background-color: rgb(163, 41, 41);
@@ -226,6 +279,7 @@
 .eventOwner1 {
   color: #fff;
   background-color: rgb(140, 102, 217);
+  border: 1px solid rgb(82, 41, 163);
 }
 .eventOwner1 h1, li.eventOwner1, .eventOwner1 .handle {
   background-color: rgb(82, 41, 163);
@@ -236,6 +290,7 @@
 .eventOwner2 {
   color: #fff;
   background-color: rgb(101, 173, 137);
+  border: 1px solid rgb(40, 117, 78)
 }
 .eventOwner2 h1, li.eventOwner2, .eventOwner2 .handle {
   background-color: rgb(40, 117, 78);
@@ -246,6 +301,7 @@
 .eventOwner3 {
   color: #fff;
   background-color: rgb(191, 191, 77);
+  border: 1px solid rgb(136, 136, 14);
 }
 .eventOwner3 h1, li.eventOwner3, .eventOwner3 .handle {
   background-color: rgb(136, 136, 14);
@@ -256,6 +312,7 @@
 .eventOwner4 {
   color: #fff;
   background-color: rgb(230, 128, 77);
+  border: 1px solid rgb(177, 68, 14);
 }
 .eventOwner4 h1, li.eventOwner4, .eventOwner4 .handle {
   background-color: rgb(177, 68, 14);
@@ -266,6 +323,7 @@
 .eventOwner5 {
   color: #fff;
   background-color: rgb(137, 151, 165);
+  border: 1px solid rgb(78, 93, 108);
 }
 .eventOwner5 h1, li.eventOwner5, .eventOwner5 .handle {
   background-color: rgb(78, 93, 108);
@@ -276,6 +334,7 @@
 .eventOwner6 {
   color: #fff;
   background-color: rgb(167, 167, 125);
+  border: 1px solid rgb(110, 110, 65);
 }
 .eventOwner6 h1, li.eventOwner6, .eventOwner6 .handle {
   background-color: rgb(110, 110, 65);
@@ -286,6 +345,7 @@
 .eventOwner7 {
   color: #fff;
   background-color: rgb(230, 115, 153);
+  border: 1px solid rgb(177, 54, 95);
 }
 .eventOwner7 h1, li.eventOwner7, .eventOwner7 .handle {
   background-color: rgb(177, 54, 95);
@@ -296,6 +356,7 @@
 .eventOwner8 {
   color: #fff;
   background-color: rgb(102, 140, 179);
+  border: 1px solid rgb(41, 82, 122);
 }
 .eventOwner8 h1, li.eventOwner8, .eventOwner8 .handle {
   background-color: rgb(41, 82, 122);
@@ -306,6 +367,7 @@
 .eventOwner9 {
   color: #fff;
   background-color: rgb(76, 176, 82);
+  border: 1px solid rgb(13, 120, 19);
 }
 .eventOwner9 h1, li.eventOwner9, .eventOwner9 .handle {
   background-color: rgb(13, 120, 19);
@@ -316,6 +378,7 @@
 .eventOwner10 {
   color: #fff;
   background-color: rgb(224, 194, 64);
+  border: 1px solid rgb(171, 139, 0);
 }
 .eventOwner10 h1, li.eventOwner10, .eventOwner10 .handle {
   background-color: rgb(171, 139, 0);
@@ -326,6 +389,7 @@
 .eventOwner11 {
   color: #fff;
   background-color: rgb(190, 148, 148);
+  border: 1px solid rgb(134, 90, 90);
 }
 .eventOwner11 h1, li.eventOwner11, .eventOwner11 .handle {
   background-color: rgb(134, 90, 90);
@@ -336,6 +400,7 @@
 .eventOwner12 {
   color: #fff;
   background-color: rgb(148, 162, 190);
+  border: 1px solid rgb(90, 105, 134);
 }
 .eventOwner12 h1, li.eventOwner12, .eventOwner12 .handle {
   background-color: rgb(90, 105, 134);
@@ -346,6 +411,7 @@
 .eventOwner13 {
   color: #fff;
   background-color: rgb(196, 168, 131);
+  border: 1px solid rgb(141, 111, 71);
 }
 .eventOwner13 h1, li.eventOwner13, .eventOwner13 .handle {
   background-color: rgb(141, 111, 71);
@@ -356,6 +422,7 @@
 .eventOwner14 {
   color: #fff;
   background-color: rgb(179, 115, 179);
+  border: 1px solid rgb(122, 54, 122);
 }
 .eventOwner14 h1, li.eventOwner14, .eventOwner14 .handle {
   background-color: rgb(122, 54, 122);
@@ -366,6 +433,7 @@
 .eventOwner15 {
   color: #fff;
   background-color: rgb(89, 191, 179);
+  border: 1px solid rgb(27, 136, 122);
 }
 .eventOwner15 h1, li.eventOwner15, .eventOwner15 .handle {
   background-color: rgb(27, 136, 122);
@@ -376,6 +444,7 @@
 .eventOwner16 {
   color: #fff;
   background-color: rgb(140, 191, 64);
+  border: 1px solid rgb(82, 136, 0);
 }
 .eventOwner16 h1, li.eventOwner16, .eventOwner16 .handle {
   background-color: rgb(82, 136, 0);
@@ -386,6 +455,7 @@
 .eventOwner17 {
   color: #fff;
   background-color: rgb(242, 166, 64);
+  border: 1px solid rgb(190, 109, 0);
 }
 .eventOwner17 h1, li.eventOwner17, .eventOwner17 .handle {
   background-color: rgb(190, 109, 0);
@@ -396,6 +466,7 @@
 .eventOwner18 {
   color: #fff;
   background-color: rgb(169, 146, 169);
+  border: 1px solid rgb(112, 87, 112); 
 }
 .eventOwner18 h1, li.eventOwner18, .eventOwner18 .handle {
   background-color: rgb(112, 87, 112);
@@ -406,12 +477,14 @@
 .eventOwner19 {
   color: #fff;
   background-color: rgb(133, 170, 165);
+  border: 1px solid rgb(74, 113, 108);
 }
 .eventOwner19 h1, li.eventOwner19, .eventOwner19 .handle {
   background-color: rgb(74, 113, 108);
   border-top: rgb(133, 170, 165);
   border-bottom: rgb(133, 170, 165);
 }
+
 
 /* ------------------------------------------------------------------------- */
 /* Calendar Quick Form */
@@ -482,7 +555,7 @@
 /* ------------------------------------------------------------------------- */
 /* Free/Busy view styles */
 /* ------------------------------------------------------------------------- */
-
+/*
 li.freeBusy {
   background-color: #97bdec; 
 }
