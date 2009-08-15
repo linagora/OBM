@@ -63,6 +63,11 @@
 /* ------------------------------------------------------------------------- */
 /* Calendar styles                                                           */
 /* ------------------------------------------------------------------------- */
+
+#calendarNavBar {
+  vertical-align:middle;
+}
+
 .dayColLabel {
   border-bottom:1px solid #CCC;
   position:absolute;
@@ -152,6 +157,7 @@
 
 .calTip {
   z-index: 400000;
+  cursor:pointer;
 }
 
 .calTip h1 {

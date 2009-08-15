@@ -671,6 +671,7 @@ function dis_calendar_week_agenda($calendar, $calendar_entity,$writable_entity) 
   $end = clone $date;
   $end->addDay(7);
 
+  // $block = dis_calendar_html_form('week', $date);
   $block = dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, $date, $end);
 
   return $block;
@@ -725,11 +726,17 @@ function dis_calendar_html_form($range, $date) {
   // } 
 
   $block = "
-    <a href='$GLOBALS[path]/calendar/calendar_index.php?date=$sub_date'>«</a>
-    <a href='$GLOBALS[path]/calendar/calendar_index.php?cal_range=day&amp;date=".$date->getURL()."'>".$GLOBALS['l_day']."</a>
-    <a href='$GLOBALS[path]/calendar/calendar_index.php?cal_range=week&amp;date=".$date->getURL()."'>".$GLOBALS['l_week']."</a>
-    <a href='$GLOBALS[path]/calendar/calendar_index.php?cal_range=month&amp;date=".$date->getURL()."'>".$GLOBALS['l_month']."</a>
-    <a href='$GLOBALS[path]/calendar/calendar_index.php?date=$add_date'>»</a>
+    <div id='calendarNavBar'>
+    <input type='button' value='«'/>
+    <input type='button' value=\"$GLOBALS[l_day]\"/>
+    <input type='button' value=\"$GLOBALS[l_week]\"/>
+    <input type='button' value=\"$GLOBALS[l_month]\"/>
+    <input type='button' value='»'/>
+    <input type='button' value=\"$GLOBALS[l_today]\"/>
+    <b>Aôut 2009</b>
+    </div>
+
+
     <a href='$GLOBALS[path]/calendar/calendar_index.php?date='>".$GLOBALS['l_today']."</a>
     <input id='event_search' type='text' />";
 
@@ -921,37 +928,30 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
   $GLOBALS['js']['vars']['images']['extension_right'] = $GLOBALS['ico_extension_right'];
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
 
-  $weeks = $end->diffWeek($date); 
+
+  $status = array('ACCEPTED', 'NEEDS-ACTION');
+  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
+  if (is_array($occurrences)) {
+    foreach($occurrences as $occurrence) {
+      $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
+    }
+  }
 
   $category_filter = $calendar['category_filter'];
   $start_time = $date->getTimestamp();
-  $end = clone $date;
-  $end->addDay(7);
 
+  $weeks = $end->diffWeek($date); 
   $width = round(100/7, 2);
   $height = round(100/$weeks, 2);
-  $today_marker = "";
-  $today_left = 0;
   $current = clone $date;
-  $step = 0;
 
-  // days header
+  // calendar grid
   while($current->compare($end) < 0) {
-    $day = $current->localize(Of_Date::WEEKDAY);
-    $iso = $current->getURL();
-    $week_day_left = $step*$width;
-    $week_day_list .= "<div class='dayColLabel' style='width:$width%;left:$week_day_left%;line-height:20px'>$day</div>";
-    $step++;
-    $current->addDay(1);
-  }
-
-  $current = clone $date;
-  $end = clone $date;
-  for($i=0;$i<$weeks;$i++) {
-    $week_day_event_list .= "<div class='monthRow' style='height:{$height}%'>";
-    $end->addDay(7);
     $step = 0;
-    while($current->compare($end) < 0) {
+    $week_day_event_list .= "<div class='monthRow' style='height:{$height}%'>";
+    $endWeek = clone $current;
+    $endWeek->addDay(7);
+    while($current->compare($endWeek) < 0) {
       $today = "";
       if ($current->isToday()) {
         $today = "background:#FFFFCC;";
@@ -965,21 +965,28 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
         <div id='container_$date_iso' class='dayColMonth' style='height:{$height}%;width:$width%;left:$week_day_left%;$today'>
           <div class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
           <div id='allday_$date_iso' class='alldayCell'>
-            <div id='more_$date_iso' class='calTip' title='<h1>$tip_title</h1>' style='cursor:pointer;position:absolute;display:none;text-align:center;width:100%;'></div>
+            <div id='more_$date_iso' class='calTip' title='<h1>$tip_title</h1>' style='text-align:center;position:absolute;display;none;width:100%;'></div>
           </div>
         </div>";
       $step++;
       $current->addDay(1);
     }
     $week_day_event_list .= "</div>";
+
   }
 
-  $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
-  if (is_array($occurrences)) {
-    foreach($occurrences as $occurrence) {
-      $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
-    }
+  // days header
+  $current = clone $date;
+  $end = clone $date;
+  $end->addDay(7);
+  $step = 0;
+  while($current->compare($end) < 0) {
+    $day = $current->localize(Of_Date::WEEKDAY);
+    $iso = $current->getURL();
+    $week_day_left = $step*$width;
+    $week_day_list .= "<div class='dayColLabel' style='width:$width%;left:$week_day_left%;line-height:20px'>$day</div>";
+    $step++;
+    $current->addDay(1);
   }
 
   $date = clone $calendar['date'];
@@ -1017,9 +1024,7 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
       obm.calendarManager.redrawAllDayGrid();
       obm.calendarManager.forceRedraw = true;
     });
-  </script>
-
-";
+  </script>";
 
   return $block;
 }
