@@ -217,9 +217,10 @@ function run_query_contact_search($contact) {
   if (($order == 'contact_lastname') || ($order == 'contact_firstname')) {
     $order = sql_casei_sort($db_type, $order);
   }
-
+  if (strcmp($sql_order_field,'phone_number') == 0) {
+    $order = 'WorkPhone.phone_number';
   // Order exceptions (order on calculated rows)
-  if (strcmp($sql_order_field,'contact_address') == 0) {
+  } if (strcmp($sql_order_field,'contact_address') == 0) {
     $order = 'address_street';
     $order_next = ', address_zipcode, address_town';
   } else if (strcmp($sql_order_field,'country_name') == 0) {
@@ -240,10 +241,11 @@ function run_query_contact_search($contact) {
     address_zipcode,
     address_town,
     address_expresspostal,
-    WorkPhone.phone_number as 'WorkPhone.phone_number',
-    MobilePhone.phone_number as 'MobilePhone.phone_number',
-    FaxPhone.phone_number as 'FaxPhone.phone_number',
-    HomePhone.phone_number as 'HomePhone.phone_number',
+    WorkPhone.phone_number,
+    WorkPhone.phone_number as \"WorkPhone.phone_number\",
+    MobilePhone.phone_number as \"MobilePhone.phone_number\",
+    FaxPhone.phone_number as \"FaxPhone.phone_number\",
+    HomePhone.phone_number as \"HomePhone.phone_number\",
     email_address,
     country_name,
     contact_usercreate,

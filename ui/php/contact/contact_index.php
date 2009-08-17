@@ -554,7 +554,7 @@ function get_contact_action() {
 // Contact synchronisation
  $actions['contact']['sync']   = array (
     'Url'      => "$path/contact/contact_index.php?action=sync&amp;contact_id=".$params['contact_id'],
-    'Right'    => $cright_write,
+    'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('None')
                                     		 );
@@ -562,7 +562,7 @@ function get_contact_action() {
 // Contact desynchronisation
  $actions['contact']['desync']   = array (
     'Url'      => "$path/contact/contact_index.php?action=desync&amp;contact_id=".$params['contact_id'],
-    'Right'    => $cright_write,
+    'Right'    => $cright_read,
     'Privacy'  => true,
     'Condition'=> array ('None')
                                     		 );
