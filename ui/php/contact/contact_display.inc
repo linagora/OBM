@@ -29,6 +29,10 @@ $fieldnames['address_town'] = $l_town;
 $fieldnames['address_expresspostal'] = $l_expresspostal;
 $fieldnames['country_name'] = $l_country;
 $fieldnames['phone_number'] = $l_phone;
+$fieldnames['FaxPhone.phone_number'] = $l_phone_labels['WORK_FAX'];
+$fieldnames['HomePhone.phone_number'] = $l_phone_labels['HOME_VOICE'];
+$fieldnames['WorkPhone.phone_number'] = $l_phone_labels['WORK_VOICE'];
+$fieldnames['MobilePhone.phone_number'] = $l_phone_labels['CELL_VOICE'];
 $fieldnames['email_address'] = $l_email;
 $fieldnames['contact_archive'] = $l_archive_first;
 $fieldnames['contact_date'] = $l_date;
@@ -189,6 +193,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
       $res['align'] = 'center';
     }
   }
+
 
   return $res;
 }

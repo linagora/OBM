@@ -240,7 +240,10 @@ function run_query_contact_search($contact) {
     address_zipcode,
     address_town,
     address_expresspostal,
-    phone_number,
+    WorkPhone.phone_number as 'WorkPhone.phone_number',
+    MobilePhone.phone_number as 'MobilePhone.phone_number',
+    FaxPhone.phone_number as 'FaxPhone.phone_number',
+    HomePhone.phone_number as 'HomePhone.phone_number',
     email_address,
     country_name,
     contact_usercreate,
@@ -270,15 +273,23 @@ function run_query_contact_search($contact) {
   // XXX Really strange Postgres (8.1.5) behaviour here !
   // if $join_userdata after join_comp, query is really slow (30s) with only
   // criteria : contactcategory1 selected
+  $coords_join = "
+    LEFT JOIN Phone as WorkPhone ON WorkPhone.phone_entity_id = contactentity_entity_id AND WorkPhone.phone_label = 'WORK;VOICE;X-OBM-Ref1'
+    LEFT JOIN Phone as MobilePhone ON MobilePhone.phone_entity_id = contactentity_entity_id  AND MobilePhone.phone_label = 'CELL;VOICE;X-OBM-Ref1'
+    LEFT JOIN Phone as FaxPhone ON FaxPhone.phone_entity_id = contactentity_entity_id  AND FaxPhone.phone_label = 'WORK;FAX;X-OBM-Ref1'
+    LEFT JOIN Phone as HomePhone ON HomePhone.phone_entity_id = contactentity_entity_id  AND HomePhone.phone_label = 'HOME;VOICE;X-OBM-Ref1'
+    LEFT JOIN Address ON address_entity_id = contactentity_entity_id AND address_label #LIKE 'PREF;%'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label #LIKE 'PREF;%'
+  
+  ";
   $left_join = "
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id 
     $join_userdata
+    $coords_join
     LEFT JOIN Kind ON contact_kind_id = kind_id
     LEFT JOIN ContactFunction ON contact_function_id=contactfunction_id
-    LEFT JOIN Address ON address_entity_id = contactentity_entity_id  AND address_label #LIKE 'PREF;%'
     LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR' 
-    LEFT JOIN Phone ON phone_entity_id = contactentity_entity_id AND phone_label #LIKE 'PREF;%'
-    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label #LIKE 'PREF;%'";
+    ";
 
 
   if ((! $fuzzy) || ($lname == '')) {
@@ -292,7 +303,7 @@ function run_query_contact_search($contact) {
     } else {
       $off = '0';
     }
-    $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_userdata $join_comp $whereq $multidomain $orderq";
+    $query = "SELECT contact_id FROM Contact INNER JOIN ContactEntity ON contactentity_contact_id = contact_id $join_userdata $coords_join $join_comp $whereq $multidomain $orderq";
     display_debug_msg($query, $cdg_sql, 'contact_search(1)');
     $obm_q->xquery($query);
     $count = $obm_q->nf();
@@ -887,15 +898,13 @@ function run_query_contact_coords_update($id, $contact) {
   $obm_q->query($query);
   if(is_array($phones)) {
     $cpt = array();
-    $pref = 'PREF;';
     foreach($phones as $phone) {
       if(trim($phone['number']) != '' ) {
         $phone['label'] = str_replace('_', ';', $phone['label']);
         $cpt[$phone['label']]++;
-        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$pref$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
+        $query = "INSERT INTO Phone (phone_entity_id, phone_number, phone_label) VALUES ($id, '$phone[number]', '$phone[label];X-OBM-Ref".$cpt[$phone['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(phone)');
         $obm_q->query($query);
-	$pref = '';
       }
     }
   }

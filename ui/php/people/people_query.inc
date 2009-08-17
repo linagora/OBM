@@ -252,7 +252,7 @@ function run_query_people_search($people) {
     LEFT JOIN Phone p3 ON p3.phone_entity_id = contactentity_entity_id AND p3.phone_label='CELL;VOICE;X-OBM-Ref1'
     LEFT JOIN Phone p4 ON p4.phone_entity_id = contactentity_entity_id AND p4.phone_label='HOME;FAX;X-OBM-Ref1'
     LEFT JOIN Phone p5 ON p5.phone_entity_id = contactentity_entity_id AND p5.phone_label='WORK;FAX;X-OBM-Ref1'
-    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label LIKE 'PREF;INTERNET;X-OBM-Ref1%'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label LIKE 'PREF;INTERNET;X-OBM-Ref1'
     $join_userdata_contact";
 
   // ORDER construction

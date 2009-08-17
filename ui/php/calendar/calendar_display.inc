@@ -1225,6 +1225,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
           $description = $title;
         } else {
           $title = $event->title;
+          if($location != '') $title .= " ($location)";
           $description = $event->description;
           $properties = $event->properties;
           $item_list = '';
@@ -6688,6 +6689,9 @@ Class CalendarPdfList Extends CalendarPdf{
       
       // bug on privacy fix
       $head = $title;
+      if (!$this->showdetails && !$private_event && $event->location != '') {
+        $head .= " ($event->location)";
+      }
 
       if ( is_array($attendee['user']) &&
            ( (count($attendee['user']) > 1) || (count($attendee['contact']) > 0) || !array_key_exists($obm['uid'],$attendee['user']) )
