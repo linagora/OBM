@@ -149,6 +149,7 @@
 #calendarHeaderGrid {
   height: 20px;
   position:relative;
+  border : 1px solid orange;
 }
 
 #calendarGrid {

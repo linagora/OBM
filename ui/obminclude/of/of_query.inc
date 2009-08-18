@@ -1770,7 +1770,7 @@ function get_entity_info($id, $entity) {
     $entity_table = "Select $c_label as entitydata_label, $c_email as entitydata_email, $c_domain as entitydata_domain_id, $c_id as entitydata_id, 'mailshare' as entity_kind
       FROM Contact
       INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-      LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label #LIKE 'PREF;%'
+      LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
       WHERE contact_id $id";
   }
 

@@ -3634,7 +3634,7 @@ function run_query_insert_others_attendees($calendar) {
       $entityid = of_entity_insert('contact',$id);
 
       $query = "INSERT INTO Email (email_entity_id, email_address, email_label) 
-        VALUES ($entityid, '$email', 'PREF;INTERNET;X-OBM-Ref1')";
+        VALUES ($entityid, '$email', 'INTERNET;X-OBM-Ref1')";
       display_debug_msg($query, $cdg_sql,"'run_query_insert_others_attendees($email)");
       $obm_q->query($query);
 

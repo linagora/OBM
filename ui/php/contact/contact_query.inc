@@ -217,10 +217,7 @@ function run_query_contact_search($contact) {
   if (($order == 'contact_lastname') || ($order == 'contact_firstname')) {
     $order = sql_casei_sort($db_type, $order);
   }
-  if (strcmp($sql_order_field,'phone_number') == 0) {
-    $order = 'WorkPhone.phone_number';
-  // Order exceptions (order on calculated rows)
-  } if (strcmp($sql_order_field,'contact_address') == 0) {
+  if (strcmp($sql_order_field,'contact_address') == 0) {
     $order = 'address_street';
     $order_next = ', address_zipcode, address_town';
   } else if (strcmp($sql_order_field,'country_name') == 0) {
@@ -241,7 +238,6 @@ function run_query_contact_search($contact) {
     address_zipcode,
     address_town,
     address_expresspostal,
-    WorkPhone.phone_number,
     WorkPhone.phone_number as \"WorkPhone.phone_number\",
     MobilePhone.phone_number as \"MobilePhone.phone_number\",
     FaxPhone.phone_number as \"FaxPhone.phone_number\",
@@ -280,8 +276,8 @@ function run_query_contact_search($contact) {
     LEFT JOIN Phone as MobilePhone ON MobilePhone.phone_entity_id = contactentity_entity_id  AND MobilePhone.phone_label = 'CELL;VOICE;X-OBM-Ref1'
     LEFT JOIN Phone as FaxPhone ON FaxPhone.phone_entity_id = contactentity_entity_id  AND FaxPhone.phone_label = 'WORK;FAX;X-OBM-Ref1'
     LEFT JOIN Phone as HomePhone ON HomePhone.phone_entity_id = contactentity_entity_id  AND HomePhone.phone_label = 'HOME;VOICE;X-OBM-Ref1'
-    LEFT JOIN Address ON address_entity_id = contactentity_entity_id AND address_label #LIKE 'PREF;%'
-    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label #LIKE 'PREF;%'
+    LEFT JOIN Address ON address_entity_id = contactentity_entity_id AND address_label = 'WORK;X-OBM-Ref1'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'
   
   ";
   $left_join = "
@@ -916,7 +912,6 @@ function run_query_contact_coords_update($id, $contact) {
   $obm_q->query($query);
   if(is_array($addresses)) {
     $cpt = array();
-    $pref = 'PREF;';
     foreach($addresses as $address) {
       if(trim($address['street']) != '' || (trim($address['country']) != '' && trim($address['country']) != 'none') || trim($address['zipcode']) != ''
          || trim($address['expresspostal']) != '') {
@@ -938,11 +933,10 @@ function run_query_contact_coords_update($id, $contact) {
           '$address[town]',
           '$address[expresspostal]',
           '$address[country]',
-          '$pref$address[label];X-OBM-Ref".$cpt[$address['label']]."'
+          '$address[label];X-OBM-Ref".$cpt[$address['label']]."'
         )";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(address)');
         $obm_q->query($query);
-	$pref = '';
       }
     }
   }
@@ -953,15 +947,13 @@ function run_query_contact_coords_update($id, $contact) {
 
   if(is_array($websites)) {
     $cpt = array();
-    $pref = 'PREF;';
     foreach($websites as $website) {
       if(trim($website['url']) != '' ) {
         $website['label'] = str_replace('_', ';', $website['label']);
         $cpt[$website['label']]++;
-        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$pref$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
+        $query = "INSERT INTO Website (website_entity_id, website_url, website_label) VALUES ($id, '$website[url]', '$website[label];X-OBM-Ref".$cpt[$website['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(website)');
         $obm_q->query($query);
-	$pref = '';
       }
     }
   }
@@ -972,13 +964,11 @@ function run_query_contact_coords_update($id, $contact) {
 
   if(is_array($ims)) {
     $cpt = array();
-    $pref = 'PREF;';
     foreach($ims as $im) {
       if(trim($im['address']) != '' ) {
-        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$pref$im[label]')";
+        $query = "INSERT INTO IM (im_entity_id, im_address, im_protocol, im_label) VALUES ($id, '$im[address]', '$im[protocol]', '$im[label]')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(IM)');
         $obm_q->query($query);
-	$pref = '';
       }
     }
   }
@@ -989,15 +979,13 @@ function run_query_contact_coords_update($id, $contact) {
 
   if(is_array($emails)) {
     $cpt = array();
-    $pref = 'PREF;';
     foreach($emails as $email) {
       if(trim($email['address']) != '' ) {
         $email['label'] = str_replace('_', ';', $email['label']);
         $cpt[$email['label']]++;
-        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '".trim($email['address'])."', '$pref$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
+        $query = "INSERT INTO Email (email_entity_id, email_address, email_label) VALUES ($id, '".trim($email['address'])."', '$email[label];X-OBM-Ref".$cpt[$email['label']]."')";
         display_debug_msg($query, $cdg_sql, 'run_query_contact_coords_update(Email)');
         $obm_q->query($query);
-	$pref = '';
       }
     }
   }
@@ -1039,10 +1027,6 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
     $label = explode(';',$obm_q->f('phone_label'));
     // Remove the X-OBM mark
     array_pop($label);
-    // Remove the PREF mark
-    if ($label[0] == 'PREF') {
-      unset($label[0]);
-    }
     $label = implode('_',$label);
     $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
   }
@@ -1066,10 +1050,6 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('email_label'));
     array_pop($label);
-    // Remove the PREF mark
-    if ($label[0] == 'PREF') {
-      unset($label[0]);
-    }
     $label = implode('_',$label);
     $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
   }
@@ -1101,10 +1081,6 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('address_label'));
     array_pop($label);
-    // Remove the PREF mark
-    if ($label[0] == 'PREF') {
-      unset($label[0]);
-    }
     $label = implode('_',$label);
     if($update) {
       $country =  $obm_q->f('address_country');
@@ -1147,10 +1123,6 @@ function run_query_contact_coords($id, $inherit=false, $update=false) {
   while($obm_q->next_record()) {
     $label = explode(';',$obm_q->f('website_label'));
     array_pop($label);
-    // Remove the PREF mark
-    if ($label[0] == 'PREF') {
-      unset($label[0]);
-    }
     $label = implode('_',$label);
     $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
@@ -2079,7 +2051,7 @@ function run_query_contact_ext_search($contact) {
     INNER JOIN Email ON contactentity_entity_id = email_entity_id 
     WHERE (((contact_firstname #LIKE '%$pattern%' 
       OR contact_lastname #LIKE '%$pattern%')
-      AND email_label #LIKE 'PREF;%') OR email_address #LIKE '%$pattern%')
+      AND email_label #LIKE 'INTERNET;X-OBM-Ref1') OR email_address #LIKE '%$pattern%')
       $where
     GROUP BY contact_firstname, contact_lastname, email_address
     ORDER BY contact_lastname, contact_firstname

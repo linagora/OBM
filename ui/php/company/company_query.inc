@@ -158,7 +158,8 @@ function run_query_company_search($company) {
       address_zipcode,
       address_town,
       address_expresspostal,
-      phone_number,
+      WorkPhone.phone_number as \"WorkPhone.phone_number\",
+      FaxPhone.phone_number as \"FaxPhone.phone_number\",
       email_address,
       website_url,
       country_name,      
@@ -179,13 +180,17 @@ function run_query_company_search($company) {
     FROM Company
 ";
 
+  $coords_join = "
+    LEFT JOIN Website ON website_entity_id = companyentity_entity_id AND website_label = 'URL;X-OBM-Ref1'
+    LEFT JOIN Phone as WorkPhone ON WorkPhone.phone_entity_id = companyentity_entity_id AND WorkPhone.phone_label = 'WORK;VOICE;X-OBM-Ref1'
+    LEFT JOIN Phone as FaxPhone ON FaxPhone.phone_entity_id = companyentity_entity_id  AND FaxPhone.phone_label = 'WORK;FAX;X-OBM-Ref1'
+    LEFT JOIN Address ON address_entity_id = companyentity_entity_id AND address_label = 'HQ;X-OBM-Ref1'
+    LEFT JOIN Email ON email_entity_id = companyentity_entity_id AND email_label = 'INTERNET;X-OBM-Ref1'";
+
   $left_join = "
          INNER JOIN CompanyEntity ON companyentity_company_id = company_id
-         LEFT JOIN Address ON address_entity_id = companyentity_entity_id AND address_label like 'PREF;%'
+         $coords_join
          LEFT JOIN Country ON country_iso3166 = address_country AND country_lang='FR'  
-         LEFT JOIN Phone ON phone_entity_id = companyentity_entity_id AND phone_label like 'PREF;%'
-         LEFT JOIN Email ON email_entity_id = companyentity_entity_id AND email_label like 'PREF;%'        
-         LEFT JOIN Website ON website_entity_id = companyentity_entity_id AND website_label like 'PREF;%'
          LEFT JOIN CompanyType ON company_type_id=companytype_id
          $join_userdata
          LEFT JOIN CompanyActivity ON company_activity_id=companyactivity_id
@@ -201,7 +206,7 @@ function run_query_company_search($company) {
     if (($count > 0) || (! $ctu_sql_limit)) {
       $query = "$select $left_join $whereq $orderq $limit";
       display_debug_msg($query, $cdg_sql, 'company_search(1)');
-      $obm_q->query($query);
+      $obm_q->xquery($query);
       if (! $ctu_sql_limit) {
 	$count = $obm_q->num_rows();
       }
@@ -222,7 +227,7 @@ function run_query_company_search($company) {
     if (($count > 0) || (! $ctu_sql_limit)) {
       $query = "$select $left_join $whereq $orderq $limit";
       display_debug_msg($query, $cdg_sql, 'company_search(2)');
-      $obm_q->query($query);
+      $obm_q->xquery($query);
     }
   }
   
@@ -297,10 +302,6 @@ function run_query_company_coords($id, $update=false) {
     $label = explode(';',$obm_q->f('phone_label'));
     // Remove the X-OBM mark
     array_pop($label);
-    // Remove the PREF mark
-    if ($label[0] == 'PREF') {
-      unset($label[0]);
-    }
     $label = implode('_',$label);
     $coords['phone'][] = array('label' => $label, 'number' => $obm_q->f('phone_number'));
   }
@@ -317,10 +318,6 @@ function run_query_company_coords($id, $update=false) {
     $label = explode(';',$obm_q->f('email_label'));
     // Remove the X-OBM mark
     array_pop($label);
-    // Remove the PREF mark
-    if ($label[0] == 'PREF') {
-      unset($label[0]);
-    }
     $label = implode('_',$label);
     $coords['email'][] = array('label' => $label, 'address' => $obm_q->f('email_address'));
   }
@@ -337,10 +334,6 @@ function run_query_company_coords($id, $update=false) {
     $label = explode(';',$obm_q->f('website_label'));
     // Remove the X-OBM mark
     array_pop($label);
-    // Remove the PREF mark
-    if ($label[0] == 'PREF') {
-      unset($label[0]);
-    }
     $label = implode('_',$label);
     $coords['website'][] = array('label' => $label, 'url' => $obm_q->f('website_url'));
   }
@@ -361,10 +354,6 @@ function run_query_company_coords($id, $update=false) {
     $label = explode(';',$obm_q->f('address_label'));
     // Remove the X-OBM mark
     array_pop($label);
-    // Remove the PREF mark
-    if ($label[0] == 'PREF') {
-      unset($label[0]);
-    }
     $label = implode('_',$label);
     if ($update) {
       $country =  $obm_q->f('address_country');

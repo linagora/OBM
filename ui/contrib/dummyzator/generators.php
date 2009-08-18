@@ -580,14 +580,14 @@ class DummyGenerators extends PDO {
       'address_street' => RandomData::getInstance()->getRandomText(64),
       'address_zipcode' => $this->random(1000,99999),
       'address_town' => RandomData::getInstance()->getRandomWord(12),
-      'address_label' => "'PREF;WORK;X-OBM-Ref1'"
+      'address_label' => "'WORK;X-OBM-Ref1'"
     );
     
     if($randmax > 0) {
       $this->massiveInsert('Address', $staticsColumns, 1, 1, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
       $randmax --;
     }
-    $staticsColumns['address_label'] = "'WORK;X-OBM-Ref1'";
+    $staticsColumns['address_label'] = "'WORK;X-OBM-Ref2'";
     $this->massiveInsert('Address', $staticsColumns, 1 , $randmax, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
 
   }
@@ -604,14 +604,14 @@ class DummyGenerators extends PDO {
     $staticsColumns = array ( 
       'email_entity_id' => 'contactentity_entity_id', 
       'email_address' => RandomData::getInstance()->getRandomText(64), 
-      'email_label' => "'PREF;INTERNET;X-OBM-Ref1'"
+      'email_label' => "'INTERNET;X-OBM-Ref1'"
     );
     
     if($randmax > 0) {
       $this->massiveInsert('Email', $staticsColumns, 1, 1, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
       $randmax --;
     }
-    $staticsColumns['email_label'] = "'INTERNET;X-OBM-Ref1'";
+    $staticsColumns['email_label'] = "'INTERNET;X-OBM-Ref2'";
     $this->massiveInsert('Email', $staticsColumns, 1 , $randmax, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
     
   }
@@ -629,13 +629,13 @@ class DummyGenerators extends PDO {
       'im_entity_id' => 'contactentity_entity_id', 
       'im_address' => $this->concat(RandomData::getInstance()->getRandomWord(8),"'@jabber.fr'") ,
       'im_protocol' => "'XMPP'", 
-      'im_label'  => "'PREF;XMPP;X-OBM-Ref1'" 
+      'im_label'  => "'XMPP;X-OBM-Ref1'" 
     );
     if($randmax > 0) {
       $this->massiveInsert('IM', $staticsColumns, 1, 1, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
       $randmax --;
     }
-    $staticsColumns['im_label'] = "'INTERNET;X-OBM-Ref1'";
+    $staticsColumns['im_label'] = "'XMPP;X-OBM-Ref2'";
     $this->massiveInsert('IM', $staticsColumns, 1 , $randmax, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
 
   }
@@ -652,7 +652,7 @@ class DummyGenerators extends PDO {
     $staticsColumns = array( 
       'website_entity_id' => 'contactentity_entity_id',
       'website_url' => $this->concat("'http://www.'",RandomData::getInstance()->getRandomWord(10),"'.org'"), 
-      'website_label' => "'PREF;URL;X-OBM-Ref1'"
+      'website_label' => "'URL;X-OBM-Ref1'"
     );
     if($randmax > 0) {
       $this->massiveInsert('Website', $staticsColumns, 1, 1, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
@@ -675,7 +675,7 @@ class DummyGenerators extends PDO {
     $staticsColumns = array ( 
       'phone_entity_id' => 'contactentity_entity_id',
       'phone_number' => $this->random(0, 9999999999),
-      'phone_label' => "'PREF;HOME;VOICE;X-OBM-Ref1'"
+      'phone_label' => "'HOME;VOICE;X-OBM-Ref1'"
     );
     if($randmax > 0) {
       $this->massiveInsert('Phone', $staticsColumns, 1, 1, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));

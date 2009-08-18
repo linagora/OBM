@@ -28,7 +28,6 @@ $fieldnames['address_zipcode'] = $l_postcode;
 $fieldnames['address_town'] = $l_town;
 $fieldnames['address_expresspostal'] = $l_expresspostal;
 $fieldnames['country_name'] = $l_country;
-$fieldnames['phone_number'] = $l_phone;
 $fieldnames['FaxPhone.phone_number'] = $l_phone_labels['WORK_FAX'];
 $fieldnames['HomePhone.phone_number'] = $l_phone_labels['HOME_VOICE'];
 $fieldnames['WorkPhone.phone_number'] = $l_phone_labels['WORK_VOICE'];
