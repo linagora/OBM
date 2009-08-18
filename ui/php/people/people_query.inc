@@ -356,7 +356,7 @@ function run_query_people_ext_search($people) {
       'contact' as type
     FROM Contact
     INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
-    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label 'INTERNET;X-OBM-Ref1'
+    LEFT JOIN Email ON email_entity_id = contactentity_entity_id AND email_label LIKE 'INTERNET;X-OBM-Ref1'
     WHERE (
       contact_lastname $like '$pattern%'
       OR contact_firstname $like '$pattern%'
