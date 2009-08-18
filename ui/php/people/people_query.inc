@@ -65,7 +65,7 @@ function run_query_people_search($people) {
     }
     $show_contact = true;
     $where_userobm .= " AND userobm_status = 'VALID'";
-    $where_contact .= "AND (";
+    $where_contact .= " AND (";
     $where_contact .= "contact_privacy = 0";
     $f_contact_ids = run_query_people_allowed_access_contacts();
     if ((is_array($f_contact_ids)) && (count($f_contact_ids) > 0)) {
