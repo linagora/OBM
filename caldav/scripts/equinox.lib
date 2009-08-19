@@ -10,7 +10,7 @@ else
 fi
 
 
-JVM_OPTS="-server -Xms${MEM}m -Xmx${MEM}m -Xmn128m"
+JVM_OPTS="-server -Xms${MEM}m -Xmx${MEM}m"
 
 epackage=org.eclipse.equinox.launcher
 equinox_main_class=${epackage}.Main
