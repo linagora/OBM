@@ -478,6 +478,7 @@ CREATE TABLE `Contact` (
   KEY `contact_birthday_id_fkey` (`contact_birthday_id`),
   KEY `contact_anniversary_id_fkey` (`contact_anniversary_id`),
   KEY `contact_photo_id_document_id_fkey` (`contact_photo_id`),
+  KEY `contact_privacy_key` (`contact_privacy`),
   CONSTRAINT `contact_function_id_contactfunction_id_fkey` FOREIGN KEY (`contact_function_id`) REFERENCES `ContactFunction` (`contactfunction_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `contact_company_id_company_id_fkey` FOREIGN KEY (`contact_company_id`) REFERENCES `Company` (`company_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `contact_datasource_id_datasource_id_fkey` FOREIGN KEY (`contact_datasource_id`) REFERENCES `DataSource` (`datasource_id`) ON DELETE SET NULL ON UPDATE CASCADE,

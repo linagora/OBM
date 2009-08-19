@@ -5,6 +5,8 @@
 -- $Id: $
 -- /////////////////////////////////////////////////////////////////////////////
 
+UPDATE ObmInfo SET obminfo_value = 'pre-2.2.9' WHERE obminfo_name = 'db_version';
+
 -- Remove tag Pref for coordinate
 UPDATE Phone SET phone_label = REPLACE(phone_label , 'PREF;', '') WHERE phone_label like 'PREF%';
 UPDATE Email SET email_label = REPLACE(email_label , 'PREF;', '') WHERE email_label like 'PREF%';
@@ -42,4 +44,5 @@ SELECT display_user_id, 'company', 'FaxPhone.phone_number', display_fieldorder +
 WHERE display_fieldname = 'phone_number' AND display_entity = 'company';
 UPDATE DisplayPref SET display_fieldname = 'WorkPhone.phone_number' WHERE display_fieldname = 'phone_number' AND display_entity = 'company';
 
+UPDATE ObmInfo SET obminfo_value = '2.2.9' WHERE obminfo_name = 'db_version';
 

@@ -5837,6 +5837,12 @@ CREATE INDEX contact_anniversary_id_fkey ON contact (contact_anniversary_id);
 --
 
 CREATE INDEX contact_photo_id_fkey ON contact (contact_photo_id);
+
+--
+-- Name: contact_privacy_key; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+CREATE INDEX contact_privacy_key ON Contact (contact_privacy);
+
 --
 -- Name: contactentity_contact_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
