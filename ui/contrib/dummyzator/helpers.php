@@ -263,8 +263,10 @@ class RandomData {
   }
 
   public function getRandomFileData($handle) {
-    return "(SELECT data".rand(1,3)." FROM $handle[0] WHERE ids.id = ids.id LIMIT 1 OFFSET ".DummyGenerators::random(0,$handle[1]).')';
-    $pos = rand(0, (count($handle) - 1));
-    return $handle[$pos];
+    if(DBTYPE == 'pgsql') {
+      return "(SELECT data".rand(1,3)." FROM $handle[0] WHERE ids.id = ids.id LIMIT 1 OFFSET ".DummyGenerators::random(0,$handle[1]).')';
+    } else {
+      return "IF(@val:=".DummyGenerators::random(1,$handle[1]+1).",(SELECT data".rand(1,3)." FROM $handle[0] WHERE ids.id = ids.id LIMIT 1), '$handle[0]')";
+    }
   }
 }

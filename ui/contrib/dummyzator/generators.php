@@ -584,11 +584,11 @@ class DummyGenerators extends PDO {
     );
     
     if($randmax > 0) {
-      $this->massiveInsert('Address', $staticsColumns, 1, 1, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
+      $this->massiveInsert('Address', $staticsColumns, 1, 1, array('ContactEntity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
       $randmax --;
     }
     $staticsColumns['address_label'] = "'WORK;X-OBM-Ref2'";
-    $this->massiveInsert('Address', $staticsColumns, 1 , $randmax, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
+    $this->massiveInsert('Address', $staticsColumns, 1 , $randmax, array('ContactEntity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
 
   }
 
@@ -608,11 +608,11 @@ class DummyGenerators extends PDO {
     );
     
     if($randmax > 0) {
-      $this->massiveInsert('Email', $staticsColumns, 1, 1, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
+      $this->massiveInsert('Email', $staticsColumns, 1, 1, array('ContactEntity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
       $randmax --;
     }
     $staticsColumns['email_label'] = "'INTERNET;X-OBM-Ref2'";
-    $this->massiveInsert('Email', $staticsColumns, 1 , $randmax, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
+    $this->massiveInsert('Email', $staticsColumns, 1 , $randmax, array('ContactEntity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
     
   }
 
@@ -632,11 +632,11 @@ class DummyGenerators extends PDO {
       'im_label'  => "'XMPP;X-OBM-Ref1'" 
     );
     if($randmax > 0) {
-      $this->massiveInsert('IM', $staticsColumns, 1, 1, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
+      $this->massiveInsert('IM', $staticsColumns, 1, 1, array('ContactEntity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
       $randmax --;
     }
     $staticsColumns['im_label'] = "'XMPP;X-OBM-Ref2'";
-    $this->massiveInsert('IM', $staticsColumns, 1 , $randmax, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
+    $this->massiveInsert('IM', $staticsColumns, 1 , $randmax, array('ContactEntity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
 
   }
 
@@ -655,11 +655,11 @@ class DummyGenerators extends PDO {
       'website_label' => "'URL;X-OBM-Ref1'"
     );
     if($randmax > 0) {
-      $this->massiveInsert('Website', $staticsColumns, 1, 1, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
+      $this->massiveInsert('Website', $staticsColumns, 1, 1, array('ContactEntity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
       $randmax --;
     }
     $staticsColumns['website_label'] = "'URL;X-OBM-Ref1'";
-    $this->massiveInsert('Website', $staticsColumns, 1 , $randmax, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
+    $this->massiveInsert('Website', $staticsColumns, 1 , $randmax, array('ContactEntity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
 
   }
 
@@ -678,11 +678,11 @@ class DummyGenerators extends PDO {
       'phone_label' => "'HOME;VOICE;X-OBM-Ref1'"
     );
     if($randmax > 0) {
-      $this->massiveInsert('Phone', $staticsColumns, 1, 1, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
+      $this->massiveInsert('Phone', $staticsColumns, 1, 1, array('ContactEntity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
       $randmax --;
     }
     $staticsColumns['phone_label'] = "'HOME;VOICE;X-OBM-Ref1'";
-    $this->massiveInsert('Phone', $staticsColumns, 1 , $randmax, array('contactentity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
+    $this->massiveInsert('Phone', $staticsColumns, 1 , $randmax, array('ContactEntity'), false, array('contactentity_entity_id >= '.$this->contactEntityIdSet->start(), 'contactentity_entity_id <= '.$this->contactEntityIdSet->last()));
 
   }
 
@@ -965,14 +965,6 @@ class DummyGenerators extends PDO {
         }
         $total = ($this->{$entity.'EntityIdSet'}->getSize())* ($max) * 6 ;
         $this->massiveInsert('TmpEntityRight', $staticsColumns, 1, $total);
-       // 
-       // $query = "INSERT INTO TmpEntityRight (entityright_entity_id, entityright_consumer_id, ".implode(',',$keys).") 
-       //   SELECT ${entity}entity_entity_id, ".$this->random($this->{$entity.'EntityIdSet'}->start(), $this->{$entity.'EntityIdSet'}->last()).", 
-       //   ".implode(',',$values)." FROM ".ucfirst($entity)."Entity INNER JOIN ".ucfirst($consumer)."Entity 
-       //   ON ".$consumer."entity_entity_id = ".$consumer."entity_entity_id + ".$this->random(0,1/$max)."
-       //   WHERE ".$entity."entity_entity_id >= ".$this->{$entity.'EntityIdSet'}->start()." 
-       //   AND ".$entity."entity_entity_id <=". $this->{$entity.'EntityIdSet'}->last();
-       // $this->query($query);
       } 
     }
     $query = "INSERT INTO EntityRight (entityright_entity_id, entityright_consumer_id, entityright_access, entityright_read, entityright_write, entityright_admin)
@@ -1042,10 +1034,10 @@ class DummyGenerators extends PDO {
       return $sqlDate;
     } else {
       $sqlDate = "'$date'"; 
-      $sqlDate .=" + INTERVAL ".self::random(-5,6)." *  MONTH";
-      $sqlDate .=" + INTERVAL ".self::random(-15,13)." *  DAY";
-      $sqlDate .=" + INTERVAL ".self::random(-8,8)." *  HOUR";
-      $sqlDate .=" + INTERVAL ".self::random(0,3)." *  MINUTE";
+      $sqlDate .=" + INTERVAL ".self::random(-5,6)." * 1 MONTH";
+      $sqlDate .=" + INTERVAL ".self::random(-15,13)." * 1 DAY";
+      $sqlDate .=" + INTERVAL ".self::random(-8,8)." * 1 HOUR";
+      $sqlDate .=" + INTERVAL ".self::random(0,3)." * 15 MINUTE";
       return $sqlDate;
     }
   }
@@ -1054,10 +1046,10 @@ class DummyGenerators extends PDO {
     $this->query('DROP TABLE TmpEntityRight');
     $this->query('DROP TABLE TmpEventLink');
     $this->query('DROP TABLE ids');
-    //$this->query('DROP TABLE firstnames');
-    //$this->query('DROP TABLE texts');
-    //$this->query('DROP TABLE lastnames');
-    //$this->query('DROP TABLE words');
+    $this->query('DROP TABLE firstnames');
+    $this->query('DROP TABLE texts');
+    $this->query('DROP TABLE lastnames');
+    $this->query('DROP TABLE words');
 
     if($this->_dbtype == 'pgsql') {
       $this->query("ALTER TABLE Account ENABLE TRIGGER ALL");
