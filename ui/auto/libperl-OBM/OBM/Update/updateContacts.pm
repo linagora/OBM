@@ -22,6 +22,12 @@ sub new {
     my $self = bless { }, $class;
 
 
+    require OBM::Parameters::common;
+    if( !$OBM::Parameters::common::obmModules->{'contact'} ) {
+        $self->_log( 'module OBM-Contact désactivé, mise à jour annulée', 2 );
+        return 'O but true';
+    }
+
     if( !defined($parameters) ) {
         $self->_log( 'paramètres d\'initialisation non définis', 0 );
         return undef;

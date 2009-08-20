@@ -61,11 +61,12 @@ sub run {
     my $updateContacts = OBM::Update::updateContacts->new( $parameters );
 
     my $errorCode = 0;
-    if( defined($updateContacts) ) {
-        $errorCode = $updateContacts->update();
-    }else {
+    if( !defined($updateContacts) ) {
         $self->_log( 'problème à l\'initialisation du contact updater', 0 );
         $errorCode = 1;
+
+    }elsif( ref($updateContacts) ) {
+        $errorCode = $updateContacts->update();
     }
 
     if( $errorCode ) {

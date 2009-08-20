@@ -198,7 +198,7 @@ sub _ldapPostalAddressFormatting {
     
     my $town = $address->{'address_town'};
     if( $town && $address->{'address_zipcode'} ) {
-    $town .= ', ';
+        $town .= ', ';
     }
     $town .= $address->{'address_zipcode'};
     push( @address, $town ) if $town;
