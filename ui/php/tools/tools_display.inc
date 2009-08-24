@@ -126,6 +126,7 @@ function dis_tools_update_detail() {
     $progress = run_query_tools_get_progress();
     $progress = 0;
     if($steps > 0) $percent = round(($progress/$steps) * 100);
+    else $percent = 100;
     $div_state = "
       <div class=\"detail extra\"> 
       <h1>$l_progress</h1>
@@ -147,6 +148,7 @@ function dis_tools_update_detail() {
                 window.location.href = 'tools_index.php';
               }
               var percent = Math.round((progress / steps) * 100);
+
               if(percent > 100) percent = 100;
               $('scopeProgressPercent').set('html',percent + '%');
               $('scopeProgressBar').setStyle('width', percent + '%');
@@ -215,7 +217,7 @@ function html_tools_update_detail_list($entity, $entities) {
   $block = '';
   $cpt = count($entities['created_entities']) | count($entities['updated_entities']) | count($entities['deleted_entities']) ;
   if($cpt > 0) {
-    for($i=0; $i < $cpt; $i++) {
+    for($i=0; ($i < $cpt && $i < 100); $i++) {
       if($i%2 == 0) {
         $klass = 'pair';
       } else {
@@ -225,6 +227,9 @@ function html_tools_update_detail_list($entity, $entities) {
       $updated = (isset($entities['updated_entities'][$i]))?$entities['updated_entities'][$i]['repr'].' '.html_tools_delete_button($entity, 'updated', $entities['updated_entities'][$i]['id']):'';
       $deleted = (isset($entities['deleted_entities'][$i]))?$entities['deleted_entities'][$i]['repr'].' '.html_tools_delete_button($entity, 'deleted', $entities['deleted_entities'][$i]['id']):'';
       $block .= "<tr class='$klass'><td>$created</td><td>$updated</td><td>$deleted</td><td></td><tr>";
+    }
+    if($i < $cpt) {
+      $block .= "<tr class='$klass'><td>...</td><td>...</td><td>...</td><td></td><tr>";
     }
     $block = '
       <tbody style="display:none;" class="detail">

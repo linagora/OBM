@@ -67,6 +67,7 @@ class Logger {
   // TODO set log handler
   static function log($message,$level, $caller) {
     if($level <= L_LEVEL) {
+      if($level == L_CORE) $message = DB_OBM::xParser($message);
       echo date("Y-m-d H:i:s")." [".Logger::getLevelLabel($level)."] [$caller] : $message \n";
     }
   }

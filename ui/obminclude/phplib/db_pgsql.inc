@@ -376,8 +376,9 @@ class DB_Sql {
    */
   static function ADDSECONDS($args) {
     $date = current($args);
+    if(strpos($date,"'") !== FALSE) $date = "TIMESTAMP $date";
     $seconds = next($args);
-    return "(TIMESTAMP $date + INTERVAL '1 SECOND' * $seconds)";
+    return "($date + INTERVAL '1 SECOND' * $seconds)";
   }
 
   /**
@@ -389,8 +390,9 @@ class DB_Sql {
    */
   static function SUBSECONDS($args) {
     $date = current($args);
+    if(strpos($date,"'") !== FALSE) $date = "TIMESTAMP $date";
     $seconds = next($args);
-    return "(TIMESTAMP $date - INTERVAL '1 SECOND' * $seconds)";
+    return "($date - INTERVAL '1 SECOND' * $seconds)";
   }  
   
   /**

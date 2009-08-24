@@ -44,6 +44,8 @@ class EventAlertCronJob extends CronJob{
    * @return void
    */
   function mustExecute($date) {
+    return true;
+    $date = new Of_Date($date);
     $min = date("i");
     $modulo = $this->jobDelta / 60;
     return ($min%$modulo === 0);
@@ -69,9 +71,15 @@ class EventAlertCronJob extends CronJob{
   function execute($date) {
     global $obm;
 
-    include_once('obminclude/lang/fr/calendar.inc');
-    $date = strtotime(date('Y-m-d H:i:01', $date));
-    $this->getAlerts($date, $date + $this->jobDelta);
+    include('obminclude/lang/fr/calendar.inc');
+    $lang_file = 'conf/lang/fr/calendar.inc';
+    if (file_exists("{$includePath}/{$lang_file}")) {
+      include("$lang_file");
+    }    
+    $date = new Of_Date($date);
+    $end = clone $date;
+    $end = $end->addSecond($this->jobDelta);    
+    $this->getAlerts($date, $end);
 
     $of = &OccurrenceFactory::getInstance();
     $occurrences = $of->getOccurrences();
@@ -80,7 +88,8 @@ class EventAlertCronJob extends CronJob{
       $event = $occurrence->event;
       $delta = $this->getAlertDelta($event->id, $occurrence->id);
       
-      if($occurrence->date >= $date && $occurrence->date < $date  + $this->jobDelta) {
+      if($occurrence->date->compare($date)>=0 && $occurrence->date->compare($end)<0) {
+        $current = clone $occurrence->date;
         $this->logger->debug("Alert for event ".$event->id." will be sent");
         $consult_link = "$GLOBALS[cgp_host]/calendar/calendar_index.php?action=detailconsult&calendar_id=".$event->id;
         if(isset($events[$event->id])) {
@@ -93,12 +102,12 @@ class EventAlertCronJob extends CronJob{
           "subject" => sprintf($l_alert_mail_subject,addslashes($event->title)),
           "message" => sprintf($l_alert_mail_body,
                           addslashes($event->title), 
-                          date('d/m/Y H:i',$occurrence->date + $delta), 
-                          date('d/m/Y H:i',$occurrence->date + $delta + $event->duration), 
+                          $current->addSecond($delta)->getOutputDateTime(), 
+                          $current->addSecond($event->duration)->getOutputDateTime(), 
                           ($delta/60),
                           $event->location,
                           $consult_link,
-                          of_date_format(), date("H:i")
+                          Of_Date::today()->getOutputDate(), Of_Date::today()->get(Of_Date::TIME_SHORT)
                           ,$GLOBALS['cgp_host']
                        ),
           "recipents" => array_unique($recipients),
@@ -114,8 +123,8 @@ class EventAlertCronJob extends CronJob{
         $this->logger->info("Alert sent to ".implode(",",$event["recipents"])." about $event[subject] by $obm[uid]");
       }
     }    
-
-    $this->deleteDeprecatedAlerts($date + $this->jobDelta);
+    $current = clone $date;
+    $this->deleteDeprecatedAlerts($current->addSecond($this->jobDelta));
 
     return true;
   }
@@ -131,20 +140,17 @@ class EventAlertCronJob extends CronJob{
     $obm_q = new DB_OBM;
     $obm2_q = new DB_OBM;
     $db_type = $obm_q->type;
-    $event_endrepeat = sql_date_format($db_type,"event_endrepeat");
-    $event_date = sql_date_format($db_type,"event_date");
-
-    $this->logger->debug("Deleting alerts older than ".date("Y-m-d H:i:s",$date));
+    $this->logger->debug("Deleting alerts older than $date");
     $query = "
       SELECT eventalert_user_id, eventalert_event_id FROM EventAlert
       LEFT JOIN Event ON event_id = eventalert_event_id 
       WHERE 
       event_id IS NULL 
-      OR ($event_date - eventalert_duration <= $date AND event_repeatkind = 'none')
-      OR ($event_endrepeat - eventalert_duration <= $date AND event_repeatkind != 'none')";
+      OR (#SUBSECONDS(event_date , eventalert_duration) <= '$date' AND event_repeatkind = 'none')
+      OR (#SUBSECONDS(event_endrepeat , eventalert_duration) <= '$date' AND event_repeatkind != 'none')";
     $obm_q = new DB_OBM;
     $this->logger->core($query);
-    $obm_q->query($query);
+    $obm_q->xquery($query);
     while($obm_q->next_record()) {
       $query = "DELETE FROM EventAlert WHERE eventalert_event_id = ".$obm_q->f('eventalert_event_id')."
                 AND eventalert_user_id = ".$obm_q->f('eventalert_user_id');
@@ -157,32 +163,32 @@ class EventAlertCronJob extends CronJob{
   /**
    * getAlerts 
    * 
-   * @param mixed $start_time 
-   * @param mixed $end_time 
+   * @param mixed $start
+   * @param mixed $end
    * @access public
    * @return void
    */
-  function getAlerts($start_time, $end_time) {
-    $this->logger->debug("Getting alerts between ".date("Y-m-d H:i:s",$start_time)." and ".date("Y-m-d H:i:s",$end_time));
+  function getAlerts($start, $end) {
+    $this->logger->debug("Getting alerts between $start and $end");
     $of = &OccurrenceFactory::getInstance();
-    $of->setBegin($start_time);
-    $of->setEnd($end_time);
-    $this->getSimpleAlerts($start_time, $end_time);
-    $this->getReccurentAlerts($start_time, $end_time);
+    $of->setBegin($start);
+    $of->setEnd($end);
+    $this->getSimpleAlerts($start, $end);
+    $this->getReccurentAlerts($start, $end);
   }
 
   /**
    * getSimpleAlerts 
    * 
-   * @param mixed $start_time 
-   * @param mixed $end_time 
+   * @param mixed $start
+   * @param mixed $end
    * @access public
    * @return void
    */
-  function getSimpleAlerts($start_time, $end_time) {
+  function getSimpleAlerts($start, $end) {
     $of = &OccurrenceFactory::getInstance();
-    $this->logger->debug("Getting alerts on non-reccurent events between ".date("Y-m-d H:i:s",$start_time)." and ".date("Y-m-d H:i:s",$end_time));
-    $nr_q = run_query_calendar_no_repeat_alerts($start_time,$end_time);
+    $this->logger->debug("Getting alerts on non-reccurent events between $start and $end");
+    $nr_q = run_query_calendar_no_repeat_alerts($start,$end);
     $this->logger->debug($nr_q->nf()." potentials alerts founded on non-reccurent event");
     while ($nr_q->next_record()) {
       $id = $nr_q->f("event_id");
@@ -193,7 +199,7 @@ class EventAlertCronJob extends CronJob{
       $location = $nr_q->f("event_location"); 
       $category1 = $nr_q->f("eventcategory1_label");
       $priority = $nr_q->f("event_priority");
-      $date = $nr_q->f("event_date");
+      $date = new Of_Date($nr_q->f("event_date"),'GMT');
       $duration = $nr_q->f("event_duration");
       $state = $nr_q->f("eventlink_state");
       $all_day = $nr_q->f("event_allday");
@@ -203,7 +209,7 @@ class EventAlertCronJob extends CronJob{
       if (isset($of->events[$id])) {
         $event = &$of->events[$id];
       } else {
-        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$color);
+        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner, '',$color);
       }
       $this->logger->debug("$entity $entity_id ($entity_label) added on event ".$event->id);
       $event->addAttendee($entity,$entity_id,$entity_label,$state);
@@ -214,81 +220,85 @@ class EventAlertCronJob extends CronJob{
   /**
    * getReccurentAlerts 
    * 
-   * @param mixed $start_time 
-   * @param mixed $end_time 
+   * @param mixed $start 
+   * @param mixed $end 
    * @access public
    * @return void
    */
-  function getReccurentAlerts($start_time, $end_time) {
+  function getReccurentAlerts($start, $end) {
     $of = &OccurrenceFactory::getInstance();
-    $this->logger->debug("Getting alerts on reccurent events between ".date("Y-m-d H:i:s",$start_time)." and ".date("Y-m-d H:i:s",$end_time));
-    $r_q = run_query_calendar_repeat_alerts($start_time,$end_time);
-    $this->logger->debug($r_q->nf()." potentials alerts founded on reccurent events");
+    $this->logger->debug("Getting alerts on reccurent events between $start and $end");
+    $r_q = run_query_calendar_repeat_alerts($start,$end);
+    $this->logger->debug($r_q->nf().' potentials alerts founded on reccurent events');
     while ($r_q->next_record()) {
-      $d = $r_q->f("event_date");
-      $id = $r_q->f("event_id");
-      $title = $r_q->f("event_title");
-      $privacy = $r_q->f("event_privacy");
-      $description = $r_q->f("event_description"); 
-      $location = $r_q->f("event_location"); 
-      $category1 = $r_q->f("eventcategory1_label");
-      $date = $r_q->f("event_date");
-      $duration = $r_q->f("event_duration");
-      $repeatkind = $r_q->f("event_repeatkind");
-      $endrepeat = $r_q->f("event_endrepeat");
-      $all_day = $r_q->f("event_allday");     
-      $repeatfrequence = $r_q->f("event_repeatfrequence");
-      $repeatdays = $r_q->f("event_repeatdays");
-      $entity = $r_q->f("eventlink_entity");
-      $entity_id = $r_q->f("eventlink_entity_id");    
-      $entity_label = $r_q->f("userobm_lastname") ." ".$r_q->f("userobm_firstname");
-      $state = $r_q->f("eventlink_state");
-      $all_day = $r_q->f("event_allday");       
-      $owner = $r_q->f("event_owner");
-      if (!$endrepeat) {
-        $endrepeat = $end_time;
+      $id = $r_q->f('event_id');
+      $title = $r_q->f('event_title');
+      $privacy = $r_q->f('event_privacy');
+      $description = $r_q->f('event_description');
+      $properties = $r_q->f('event_properties');
+      $location = $r_q->f('event_location'); 
+      $category1 = $r_q->f('eventcategory1_label');
+      $date = new Of_Date($r_q->f('event_date'), 'GMT');
+      $duration = $r_q->f('event_duration');
+      $repeatkind = $r_q->f('event_repeatkind');
+      $endrepeat = new Of_Date($r_q->f('event_endrepeat'),'GMT');
+      $entity = $r_q->f('eventlink_entity');
+      $all_day = $r_q->f('event_allday');
+      $color = $r_q->f('event_color');
+      $repeatfrequence = $r_q->f('event_repeatfrequence');
+      $repeatdays = $r_q->f('event_repeatdays');
+      $entity_id = $r_q->f('eventlink_entity_id');    
+      $entity_state = $r_q->f('eventlink_state');
+      $owner = $r_q->f('event_owner');
+      $entity_label = $r_q->f('userobm_lastname') .' '.$r_q->f('userobm_firstname');
+      $state = $r_q->f('eventlink_state');
+      $timezone = $r_q->f('event_timezone');
+      if ($endrepeat->error() == Of_Date::WARN_EMPTY_DATE) {
+        $endrepeat = $end;
       }
       if (isset($of->events[$id])) {
-        $event = &$of->events[$id];
+        $event = $of->events[$id];
       } else {
-        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$color);
+        $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,'',$color);
+        $event->setTimezone($timezone);
       }
       $this->logger->debug("$entity $entity_id ($entity_label) added on event ".$event->id);
+      $tz = new DateTimeZone($timezone);
+      $date->setTimezone($tz);
       $event->addAttendee($entity,$entity_id,$entity_label,$state);      
-      $event_start =  $start_time ;
-      $delta = date("H",$date) * 3600 + date("i",$date) * 60 + date("s",$date) + $duration;
-      $delta = floor($delta/DAY_DURATION);
-      $event_start -= $delta * DAY_DURATION;
-      $end_date = ($endrepeat < $end_time) ? $endrepeat : $end_time;
-      $end_date += DAY_DURATION;
+      $event_start = clone $start;
+      $event_start->setTimezone($tz); 
+      $event_start->subSecond($duration)->setHour($date)->setMinute($date)->setSecond($date);
+      $event_end = ($end->compare($endrepeat) > 0)? clone $endrepeat: clone $end; 
+      $event_end->setTimezone($tz);
+      $event_end->setHour($date)->setMinute($date)->setSecond($date)->addSecond($duration);
       switch ($repeatkind) {
-        case "daily" :
-          calendar_daily_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity);	
-          break; 
-        case "weekly" :
-          calendar_weekly_repeatition($date,$event_start,$end_date,$repeatdays,$repeatfrequence,$event,$entity_id,$entity); 
-          break;
-        case "monthlybyday" :
-          $stored = calendar_monthlybyday_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity); 
-          break;
-        case "monthlybydate" :
-          $stored = calendar_monthlybydate_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity);
-          break;
-        case "yearly" :
-          $stored = calendar_yearly_repeatition($date,$event_start,$end_date,$repeatfrequence,$event,$entity_id,$entity);
-          break;	
+      case 'daily' :
+        calendar_daily_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+        break;
+      case 'weekly' :
+        calendar_weekly_repeatition($date,$event_start,$event_end,$repeatdays,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+        break;
+      case 'monthlybyday' :
+        $stored = calendar_monthlybyday_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+        break;
+      case 'monthlybydate' :
+        $stored = calendar_monthlybydate_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+        break;
+      case 'yearly' :
+        $stored = calendar_yearly_repeatition($date,$event_start,$event_end,$repeatfrequence,$event,$entity_id,$entity, $entity_state);
+        break;
       }
     }
-
     $this->logger->debug("Removing exceptions");
     if (count($of->events) > 0) {
-      $exception_q = run_query_get_events_exception(array_keys($of->events),$start_time,$end_time);
+      $exception_q = run_query_get_events_exception(array_keys($of->events),$start,$end);
       $this->logger->debug($exception_q->nf()." exceptions founded");
       while($exception_q->next_record()) {
-        $of->removeOccurrences($exception_q->f('eventexception_event_id'), $exception_q->f('eventexception_date'));
+        $of->removeOccurrences($exception_q->f('eventexception_event_id'), new Of_Date($exception_q->f('eventexception_date'), 'GMT'));
       }
     }
-  }
+  }    
 
   /**
    * getAlertDelta 
@@ -320,9 +330,6 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $event_date = sql_date_format($db_type,"event_date");
-  $event_date_l = sql_date_format($db_type,"event_date");
-
 
   $query = "SELECT
       event_id,
@@ -335,11 +342,12 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       userentity_entity_id as eventlink_entity_id,
       'user' as eventlink_entity,
       eventlink_state,
-      $event_date_l - eventalert_duration as event_date,
+      #SUBSECONDS(event_date,eventalert_duration) as event_date,
       eventalert_duration,
       event_duration,
       event_allday,
       userobm_lastname,
+      event_timezone,
       userobm_firstname
     FROM EventAlert
       INNER JOIN Event ON event_id = eventalert_event_id  
@@ -348,14 +356,14 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       INNER JOIN UserObm ON userobm_id = eventlink_entity_id
     WHERE eventlink_state = 'ACCEPTED'
       AND event_repeatkind = 'none'
-      AND ($event_date - eventalert_duration) >= $start
-      AND ($event_date - eventalert_duration) <=  $end
+      AND #SUBSECONDS(event_date,eventalert_duration) >= '$start'
+      AND #SUBSECONDS(event_date,eventalert_duration) <=  '$end'
       AND  eventalert_duration >= 0
       ORDER BY event_date
 ";
 
   Logger::log($query,L_CORE,"eventalertcronjob");
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   return $obm_q;
 }
 
@@ -371,10 +379,6 @@ function run_query_calendar_repeat_alerts($start, $end) {
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
-  $event_endrepeat = sql_date_format($db_type,"event_endrepeat");
-  $event_date = sql_date_format($db_type,"event_date");
-  $event_date_l = sql_date_format($db_type,"event_date");
-  $event_endrepeat_l = sql_date_format($db_type,"event_endrepeat","event_endrepeat");
 
   $query = "SELECT
       event_id,
@@ -382,11 +386,11 @@ function run_query_calendar_repeat_alerts($start, $end) {
       event_privacy,
       event_description, 
       event_location, 
-      $event_date_l - eventalert_duration as event_date,
+      #SUBSECONDS(event_date, eventalert_duration) as event_date,
       eventalert_duration,
       event_duration,
       event_repeatkind,
-      $event_endrepeat_l,
+      event_endrepeat,
       event_repeatfrequence,
       event_owner,
       'user' as eventlink_entity,
@@ -394,6 +398,7 @@ function run_query_calendar_repeat_alerts($start, $end) {
       eventlink_state,
       event_repeatdays,
       event_allday,
+      event_timezone,
       userobm_lastname,
       userobm_firstname
     FROM EventAlert
@@ -403,14 +408,14 @@ function run_query_calendar_repeat_alerts($start, $end) {
       INNER JOIN UserObm ON userobm_id = eventlink_entity_id
     WHERE event_repeatkind != 'none'
       AND eventlink_state = 'ACCEPTED'
-      AND ($event_date  - eventalert_duration) <= $end 
-      AND (($event_endrepeat  - eventalert_duration) >= $start
-      OR $event_endrepeat = '0')
+      AND #SUBSECONDS(event_date  , eventalert_duration) <= '$end' 
+      AND (#SUBSECONDS(event_endrepeat  , eventalert_duration) >='$start' 
+      OR event_endrepeat IS NULL)
       AND eventalert_duration >= 0
     ORDER BY event_date"; 
 
   Logger::log($query,L_CORE,'eventalertcronjob');
-  $obm_q->query($query);
+  $obm_q->xquery($query);
   return $obm_q;
 }
 ?>

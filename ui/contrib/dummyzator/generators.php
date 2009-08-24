@@ -362,6 +362,7 @@ class DummyGenerators extends PDO {
       'userobm_id' => '%id', 
       'userobm_login' => $this->concat("'u'","id"), 
       'userobm_uid' => '%id + 1000',
+      'userobm_email' => $this->concat("'u'","id"),
       'userobm_gid' => '%id '.$diffIds,
       'userobm_lastname' => RandomData::getInstance()->getRandomLastname(), //lastname
       'userobm_firstname' => RandomData::getInstance()->getRandomFirstname() //firstname      
@@ -398,6 +399,7 @@ class DummyGenerators extends PDO {
       'group_userupdate'  => "'1'",
       'group_usercreate'  => "'1'",
       'group_id' => '%id',
+      'group_gid' => 'group_id',
       'group_name' => $this->concat("'group'",'%id'),
       'group_desc' => RandomData::getInstance()->getRandomWord(60),
       'group_email' => $this->concat("'group'",'%id')
