@@ -151,7 +151,7 @@ sub _loadContacts {
                  INNER JOIN ContactEntity ON ContactEntity.contactentity_contact_id=Contact.contact_id
                  LEFT JOIN Company ON Company.company_id=Contact.contact_company_id
                  WHERE Contact.contact_domain_id='.$self->{'domainId'}.'
-                 AND contact_privacy = 0';
+                 AND Contact.contact_privacy = 0';
 
     if( $self->{'ids'} ) {
         $query .= ' AND Contact.contact_id IN ('.join( ', ', @{$self->{'ids'}}).')';
