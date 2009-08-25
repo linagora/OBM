@@ -80,7 +80,6 @@ sub _loadAuthenticationModules {
 sub loadOption {
     my $self = shift;
     my( $option ) = @_;
-    my $args = $self->{'server'}->{'conf_file_args'};
 
     if( not open(_CONF, "<".$self->{'server'}->{'conf_file'}) ) {
         die 'Couldn\'t open conf \''.$self->{'server'}->{'conf_file'}.'\' [$!]';
