@@ -432,10 +432,10 @@ if ($cgp_show["module"]["organizationalchart"]) {
 }
 
 if ($cgp_show["module"]["webmail"]) {
-  $modules["webmail"] = array('Name'=> $l_webmail,
-                                    'Ico' => "$ico_webmail",
-                                    'Url' => "$path/webmail/webmail_index.php",
-			            'Right'=> $cright_read);
+#  $modules["webmail"] = array('Name'=> $l_webmail,
+#                                    'Ico' => "$ico_webmail",
+#                                    'Url' => "$path/webmail/webmail_index.php",
+#			            'Right'=> $cright_read);
 }
 
 
