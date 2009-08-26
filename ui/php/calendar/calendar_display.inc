@@ -1225,7 +1225,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
           $description = $title;
         } else {
           $title = $event->title;
-          if($location != '') $title .= " ($location)";
+          if($location != '') $title .= " ($l_location : $location)";
           $description = $event->description;
           $properties = $event->properties;
           $item_list = '';
@@ -1264,8 +1264,10 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         $br = '';
         $dis_people = '';
         $separator = '';
+        $single = true;
         if (is_array($attendee['user'])) {
           foreach($attendee['user'] as $at_id => $at_name) {
+            if($at_id != $obm['uid']) $single = false;
             if (array_key_exists($at_id, $sel_user_id)) {
               $dis_people .= "$separator$at_name";
               $separator = ', ';
@@ -1277,6 +1279,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
 
         if (is_array($attendee['contact'])) {
           foreach($attendee['contact'] as $at_id => $at_name) {
+            $single = false;
             if (array_key_exists($at_id, $sel_user_id)) {
               $dis_people .= "$separator$at_name";
               $separator = ', ';
@@ -1291,6 +1294,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         $br = '';
         if(is_array($attendee['resource'])) {
           foreach($attendee['resource'] as $at_id => $at_name) {
+            $single = false;
             if (array_key_exists($at_id, $sel_res_id)) {
               $dis_res .= "$separator$at_name";
               $separator = ', ';
@@ -1318,16 +1322,18 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
     slides[$j].toggle();
        });
         ";
-  
+        if($category) $dis_category = "<tr><th>$l_category</th><td>$category</td></tr>";
+        else $dis_category = '';
+        if($single) $dis_attendees = '';
+        else  $dis_attendees = "<tr><th>$l_attendees</th><td>$dis_attendees</td></tr>";
+
         $event_details = '';
         if (!$privatized_event) {
           $event_details = "<table>
               <tr>
                 <th>$l_repeat</th><td>$dis_repeat</td>
               </tr>
-              <tr>
-                <th>$l_category</th><td>$category</td>
-              </tr>
+                $dis_category
               <tr>
                 <th>$l_location</th><td>$location</td>
               </tr>
@@ -1337,9 +1343,7 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
               <tr>
                 <th>$l_owner</th><td>$dis_owner</td>
               </tr>
-              <tr>
-                <th>$l_attendees</th><td>$dis_attendees</td>
-              </tr>
+              $dis_attendees
               <tr>
                 <th>$l_resources</th><td>$dis_resources</td>
               </tr>
@@ -6690,7 +6694,7 @@ Class CalendarPdfList Extends CalendarPdf{
       // bug on privacy fix
       $head = $title;
       if (!$this->showdetails && !$private_event && $event->location != '') {
-        $head .= " ($event->location)";
+        $head .= " ($l_location : $event->location)";
       }
 
       if ( is_array($attendee['user']) &&
