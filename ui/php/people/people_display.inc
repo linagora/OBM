@@ -1054,6 +1054,7 @@ function dis_people_wait_list($params) {
 
   $filter_entity = $params["filter_entity"];
   $popup = $params["popup"];
+  $params['delegation'] = $obm['delegation_target'];
   $params["status"] = "INIT";
 
   $obm_q = run_query_people_search($params);

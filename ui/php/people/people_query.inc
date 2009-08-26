@@ -34,6 +34,7 @@ function run_query_people_search($people) {
   $service = $people['service'];
   $zipcode = $people['zipcode'];
   $cedex = $people['cedex'];
+  $delegation = $people['delegation'];
   $direction = $people['direction'];
   $town = $people['town'];
   $fax = $people['fax'];
@@ -176,6 +177,11 @@ function run_query_people_search($people) {
   // If a cedex indication has been specified get it
   if (trim($cedex) != '') {
     $where_userobm .= " AND userobm_expresspostal = $cedex";
+  }
+
+  // If a cedex indication has been specified get it
+  if (trim($delegation) != '') {
+    $where_userobm .= " AND userobm_delegation #LIKE '$delegation%'";
   }
 
   // User defined data
