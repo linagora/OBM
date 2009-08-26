@@ -487,7 +487,7 @@ function overListBoxFix(overObject, forceDisplay) {
         .injectInside($(document.body));
     }
     overObject = $(overObject);
-    if(overObject.getStyle("zIndex") == 0) {
+    if(overObject.getStyle("zIndex") == 0 || overObject.getStyle("zIndex") == 'auto' ) {
       overObject.setStyle("zIndex","1000");
     }
     $('listBoxHider').setStyles({
