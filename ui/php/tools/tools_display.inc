@@ -122,7 +122,7 @@ function dis_tools_update_detail() {
   }
   $running = check_tools_update_running();
   if(!$running) {
-    $steps = run_query_tools_get_steps();
+    $steps = run_query_tools_get_steps($GLOBALS['params']['update_type'],$GLOBALS['params']['domain_id']);
     $progress = run_query_tools_get_progress();
     $progress = 0;
     if($steps > 0) $percent = round(($progress/$steps) * 100);

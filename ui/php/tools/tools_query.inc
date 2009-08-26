@@ -934,8 +934,21 @@ function store_update_data($params) {
  * @access public
  * @return void
  */
-function run_query_tools_get_steps() {
-  $query = "SELECT COUNT(*) as steps FROM (SELECT updated_id FROM Updated UNION SELECT deleted_id FROM Deleted UNION SELECT updatedlinks_id FROM Updatedlinks) as progress";
+function run_query_tools_get_steps($global=false, $domain = null) {
+  if(!$global !== 'global') {
+    $query = "SELECT COUNT(*) as steps FROM (SELECT updated_id FROM Updated UNION SELECT deleted_id FROM Deleted UNION SELECT updatedlinks_id FROM Updatedlinks) as progress";
+  } else {
+    $query = "
+      SELECT SUM(total) as steps FROM (
+      SELECT COUNT(*) total FROM UserObm where userobm_domain_id = $domain 
+      UNION ALL
+      SELECT COUNT(*) total FROM UGroup WHERE group_domain_id = $domain 
+      UNION ALL
+      SELECT COUNT(*) total FROM MailShare WHERE mailshare_domain_id = $domain
+      UNION ALL
+      SELECT count(*) total FROM Host WHERE host_domain_id = $domain) progress";
+    
+  }
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
