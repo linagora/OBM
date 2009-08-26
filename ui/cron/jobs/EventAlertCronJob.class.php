@@ -136,18 +136,20 @@ class EventAlertCronJob extends CronJob{
    * @access public
    * @return void
    */
-  function deleteDeprecatedAlerts($date) {
+  function deleteDeprecatedAlerts($datetime) {
     $obm_q = new DB_OBM;
     $obm2_q = new DB_OBM;
     $db_type = $obm_q->type;
-    $this->logger->debug("Deleting alerts older than $date");
+    $this->logger->debug("Deleting alerts older than $datetime");
+    $date = clone $datetime;
+    $date = $date->setHour(0)->setMinute(0)->setSecond(0);
     $query = "
       SELECT eventalert_user_id, eventalert_event_id FROM EventAlert
       LEFT JOIN Event ON event_id = eventalert_event_id 
       WHERE 
       event_id IS NULL 
-      OR (#SUBSECONDS(event_date , eventalert_duration) <= '$date' AND event_repeatkind = 'none')
-      OR (#SUBSECONDS(event_endrepeat , eventalert_duration) <= '$date' AND event_repeatkind != 'none')";
+      OR (#SUBSECONDS(event_date , eventalert_duration) <= '$datetime' AND event_repeatkind = 'none')
+      OR (event_endrepeat < '$date' AND event_repeatkind != 'none')";
     $obm_q = new DB_OBM;
     $this->logger->core($query);
     $obm_q->xquery($query);
