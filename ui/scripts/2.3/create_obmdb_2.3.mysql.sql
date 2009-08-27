@@ -82,10 +82,51 @@ CREATE TABLE `Address` (
   CONSTRAINT `address_entity_id_entity_id_fkey` FOREIGN KEY (`address_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+--
+-- Table structure for table `addressbook`
+--
+DROP TABLE IF EXISTS `addressbook`;
+CREATE TABLE `addressbook` (
+  `id`         int(8) NOT NULL auto_increment,
+  `domain_id`  int(8) NOT NULL,
+  `timeupdate` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `timecreate` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `userupdate` int(8) default NULL,
+  `usercreate` int(8) default NULL,
+  `origin`     varchar(255) NOT NULL,
+  `owner`      int(8) default NULL,
+  `name`       varchar(64) NOT NULL,
+  `default`    int(1) default 0,
+  `syncable`   int(1) default 1,
+  PRIMARY KEY (`id`),
+  KEY `addressbook_domain_id_domain_id_fkey` (`domain_id`),
+  KEY `addressbook_userupdate_userobm_id_fkey` (`userupdate`),
+  KEY `addressbook_usercreate_userobm_id_fkey` (`usercreate`),
+  KEY `addressbook_owner_userobm_id_fkey` (`owner`),
+  CONSTRAINT `addressbook_domain_id_domain_id_fkey` FOREIGN KEY (`domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `addressbook_userupdate_userobm_id_fkey` FOREIGN KEY (`userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `addressbook_usercreate_userobm_id_fkey` FOREIGN KEY (`usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `addressbook_owner_userobm_id_fkey` FOREIGN KEY (`owner`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `addressbookEntity`
+--
+DROP TABLE IF EXISTS `AddressbookEntity`;
+CREATE TABLE `AddressbookEntity` (
+  `addressbookentity_entity_id`      int(8) NOT NULL,
+  `addressbookentity_addressbook_id` int(8) NOT NULL,
+  PRIMARY KEY (`addressbookentity_entity_id`,`addressbookentity_addressbook_id`),
+  KEY `addressbookentity_addressbook_id_addressbook_id_fkey` (`addressbookentity_addressbook_id`),
+  CONSTRAINT addressbookentity_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbookentity_addressbook_id) REFERENCES addressbook (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `addressbookentity_entity_id_entity_id_fkey` FOREIGN KEY (`addressbookentity_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 --
 -- Table structure for table `CV`
 --
-
 DROP TABLE IF EXISTS `CV`;
 CREATE TABLE `CV` (
   `cv_id` int(8) NOT NULL auto_increment,
@@ -436,6 +477,7 @@ CREATE TABLE `Contact` (
   `contact_userupdate`          int(8) default NULL,
   `contact_usercreate`          int(8) default NULL,
   `contact_datasource_id`       int(8) default NULL,
+  `contact_addressbook_id`      int(8) default NULL,
   `contact_company_id`          int(8) default NULL,
   `contact_company`             varchar(64) default NULL,
   `contact_kind_id`             int(8) default NULL,
@@ -456,7 +498,6 @@ CREATE TABLE `Contact` (
   `contact_mailing_ok`          char(1) default '0',
   `contact_newsletter`          char(1) default '0',
   `contact_archive`             char(1) default '0',
-  `contact_privacy`             int(2) NOT NULL default '0',
   `contact_date`                timestamp NOT NULL default '0000-00-00 00:00:00',
   `contact_birthday_id`         int(8) default NULL,
   `contact_anniversary_id`      int(8) default NULL,
@@ -472,6 +513,7 @@ CREATE TABLE `Contact` (
   KEY `contact_userupdate_userobm_id_fkey` (`contact_userupdate`),
   KEY `contact_usercreate_userobm_id_fkey` (`contact_usercreate`),
   KEY `contact_datasource_id_datasource_id_fkey` (`contact_datasource_id`),
+  KEY `contact_addressbook_id_addressbook_id_fkey` (`contact_addressbook_id`),
   KEY `contact_kind_id_kind_id_fkey` (`contact_kind_id`),
   KEY `contact_marketingmanager_id_userobm_id_fkey` (`contact_marketingmanager_id`),
   KEY `contact_function_id_contactfunction_id_fkey` (`contact_function_id`),
@@ -481,6 +523,7 @@ CREATE TABLE `Contact` (
   CONSTRAINT `contact_function_id_contactfunction_id_fkey` FOREIGN KEY (`contact_function_id`) REFERENCES `ContactFunction` (`contactfunction_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `contact_company_id_company_id_fkey` FOREIGN KEY (`contact_company_id`) REFERENCES `Company` (`company_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `contact_datasource_id_datasource_id_fkey` FOREIGN KEY (`contact_datasource_id`) REFERENCES `DataSource` (`datasource_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `contact_addressbook_id_addressbook_id_fkey` FOREIGN KEY (`contact_addressbook_id`) REFERENCES `addressbook` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `contact_domain_id_domain_id_fkey` FOREIGN KEY (`contact_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `contact_kind_id_kind_id_fkey` FOREIGN KEY (`contact_kind_id`) REFERENCES `Kind` (`kind_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `contact_marketingmanager_id_userobm_id_fkey` FOREIGN KEY (`contact_marketingmanager_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
@@ -968,10 +1011,23 @@ CREATE TABLE `Deleted` (
   CONSTRAINT `deleted_user_id_userobm_id_fkey` FOREIGN KEY (`deleted_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+--
+-- Table structure for table `DeletedAddressbook`
+--
+DROP TABLE IF EXISTS `DeletedAddressbook`;
+CREATE TABLE `DeletedAddressbook` (
+  `addressbook_id` int(8) NOT NULL,
+  `user_id`        int(8) NOT NULL,
+  `timestamp`      timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `origin`         varchar(255) NOT NULL,
+  PRIMARY KEY (`addressbook_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 --
 -- Table structure for table `DeletedContact`
 --
-
 DROP TABLE IF EXISTS `DeletedContact`;
 CREATE TABLE `DeletedContact` (
   `deletedcontact_contact_id` int(8) NOT NULL,
@@ -2862,24 +2918,24 @@ CREATE TABLE `SubscriptionReception` (
 
 
 --
--- Table structure for table `SyncedContact`
+-- Table structure for table `SyncedAddressbook`
 --
-DROP TABLE IF EXISTS `SynchedContact`;
-CREATE TABLE `SynchedContact` (
-  `synchedcontact_user_id` int(8) NOT NULL,
-  `synchedcontact_contact_id` int(8) NOT NULL,
-  `synchedcontact_timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`synchedcontact_user_id`, `synchedcontact_contact_id`),
-  KEY `synchedcontact_user_id_user_id_fkey` (`synchedcontact_user_id`),
-  KEY `synchedcontact_contact_id_contact_id_fkey` (`synchedcontact_contact_id`),
-  CONSTRAINT `synchedcontact_user_id_userobm_id_fkey` FOREIGN KEY (`synchedcontact_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `synchedcontact_contact_id_contact_id_fkey` FOREIGN KEY (`synchedcontact_contact_id`) REFERENCES `Contact` (`contact_id`) ON DELETE CASCADE ON UPDATE CASCADE
+DROP TABLE IF EXISTS `SyncedAddressbook`;
+CREATE TABLE `SyncedAddressbook` (
+  `user_id`        int(8) NOT NULL,
+  `addressbook_id` int(8) NOT NULL,
+  `timestamp`      timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`user_id`, `addressbook_id`),
+  KEY `syncedaddressbook_user_id_user_id_fkey` (`user_id`),
+  KEY `syncedaddressbook_addressbook_id_addressbook_id_fkey` (`addressbook_id`),
+  CONSTRAINT `syncedaddressbook_user_id_userobm_id_fkey` FOREIGN KEY (user_id) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT syncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES addressbook (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 
 --
 -- Table structure for table `TaskEvent`
 --
-
 DROP TABLE IF EXISTS `TaskEvent`;
 CREATE TABLE `TaskEvent` (
   `taskevent_task_id` int(8) NOT NULL,

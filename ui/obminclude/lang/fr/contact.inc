@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
+$l_addressbook = "Carnet d'adresse";
 $l_middlename = 'Deuxième prénom';
 $l_suffix = 'Suffixe';
 $l_market = "Responsable";

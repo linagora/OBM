@@ -48,7 +48,7 @@ class OBM_Contact {
   }
   
   public static function fetchPrivate($userId) {
-    $where = "contact_privacy = 1 AND contact_usercreate = {$userId} ";
+    $where = "contact_usercreate = {$userId} ";
     $where.= sql_multidomain('contact');
     return self::fetchAll($where);
   }
@@ -66,7 +66,6 @@ class OBM_Contact {
     $contact = array(
       'lname' => $vcard->name->family,
       'fname' => $vcard->name->given,
-      'privacy' => 1,
       'function' => $vcard->role,
       'title' => $vcard->title,
       'addresses' => array(),

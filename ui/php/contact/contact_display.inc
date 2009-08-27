@@ -15,7 +15,7 @@ $fieldnames['contact_displayname'] = $l_displayname;
 $fieldnames['contact_lastname'] = $l_lastname;
 $fieldnames['contact_firstname'] = $l_firstname;
 $fieldnames['contact_aka'] = $l_aka;
-$fieldnames['contact_privacy'] = $l_private;
+$fieldnames['addressbook_name'] = $l_addressbook;
 $fieldnames['function_label'] = $l_function;
 $fieldnames['contact_title'] = $l_title;
 $fieldnames['kind_minilabel'] = $l_kind;
@@ -90,12 +90,12 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     } else {
       $res['url'] = "$path/contact/contact_index.php?action=detailconsult&amp;contact_id=".$OD->data_set->f('contact_id');
       // Prepend the sync link
-      if($GLOBALS['c_use_connectors'] &&  $link_ok) {
-        $is_synched = run_query_is_contact_synched($OD->data_set->f('contact_id'));
-        $alt = $is_synched ? $l_desync : $l_sync;
-        $ico = $is_synched ? $ico_sync : $ico_desync;
-        $iis_synched = (int) $is_synched;
-        $res['name'] = "<a class=\"LF\" x-obm-sync=\"$iis_synched\" href=\"#\" onclick=\"Obm.Contact.syncContact(".$OD->data_set->f('contact_id').", this); return false;\" title=\"$alt\"><img src=\"$ico\" /></a>
+      if($GLOBALS['c_use_connectors'] && $link_ok) {
+        $is_synced = get_contact_is_synced($OD->data_set->f('contact_addressbook_id'));
+        $alt = $is_synced ? $l_desync : $l_sync;
+        $ico = $is_synced ? $ico_sync : $ico_desync;
+        $iis_synced = (int) $is_synced;
+        $res['name'] = "<a class=\"LF\" x-obm-sync=\"$iis_synced\" href=\"#\" onclick=\"Obm.Contact.syncContact(".$OD->data_set->f('contact_id').", this); return false;\" title=\"$alt\"><img src=\"$ico\" /></a>
         &nbsp;<a href=\"$res[url]\">$res[name]</a>";
         $res['url'] = '';
       }
@@ -130,15 +130,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
       $res['txt_name'] = ' ';
     }
   }
-  else if ($fieldname == 'contact_privacy') {
-    $res['align'] = 'center';
-    if ($OD->data_set->f($fieldname)) {
-      $res['name'] = 'X';
-    } else {
-      $res['name'] = '&nbsp;';
-      $res['txt_name'] = ' ';
-    }
-  }
+
   else if ($fieldname == 'email_address') {
     $email = $OD->data_set->f('email_address');
     if (strcmp($email,'') != 0) {
@@ -253,7 +245,6 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
   $dateafter = of_date_upd_format(stripslashes($contact['date_after']),true);
   $datebefore = of_date_upd_format(stripslashes($contact['date_before']),true);
   $mailing_ok_only = ($contact['mailing_ok_only'] == '1' ? "checked = \"checked\"" : '');
-  $privacy = $contact['privacy'];
   $newsletter = ($contact['newsletter'] == '1' ? "checked = \"checked\"" : '');
   $archive = ($contact['archive'] == '1' ? "checked = \"checked\"" : '');
   if (($contact['fuzzy'] == '1') ||
@@ -275,7 +266,6 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
 
   // User defined data
   $block_userdata .= of_userdata_dis_search('contact', $contact);
-  $sel_privacy = dis_privacy_search_select($privacy);
 
   // Selected date field
   $s_date_field[$date_field] = "selected=\"selected\"";
@@ -401,9 +391,6 @@ function html_contact_search_form($contact, $usr_q, $funcs, $ctry_q, $dsrc_q) {
     <label>$l_country<br />
       $sel_ctry
       </label>
-    <label>$l_visibility<br />
-      $sel_privacy
-    </label>            
     $block_datasource
     $block_function
     $block_title
@@ -503,7 +490,6 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   $archive = $contact['archive'];
   $advanced = $contact['fuzzy'];
   $mailing_ok_only = $contact['mailing_ok_only'];
-  $privacy = $contact['privacy'];
   $lname = urlencode(stripslashes($contact['lname']));
   $fname = stripslashes($contact['fname']);
   $phone = urlencode(stripslashes($contact['phone']));
@@ -522,7 +508,7 @@ function html_contact_search_list($obm_q, $prefs, $contact, $popup) {
   // User defined data
   $url_userdata = of_userdata_get_url_search_params('contact', $contact);
 
-  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;sel_privacy=$privacy&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("contact_index.php?action=search$url_userdata&amp;datasource=$datasource&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_country=$ctry&amp;tf_company=$company&amp;cba_archive=$archive&amp;cba_fuzzy=$advanced&amp;cba_mailing_ok_only=$mailing_ok_only&amp;cba_newsletter=$newsletter&amp;company_id=$company_id&amp;sel_function=$func&amp;tf_title=$title&amp;sel_market=$mark$url_ext");
 
   $dis_contact = new OBM_DISPLAY('DATA', $prefs, 'contact');
   if ($popup) {
@@ -770,8 +756,9 @@ function html_contact_header($co_q, $funcs) {
       <input type=\"hidden\" name=\"contact_id\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_download_contact_card\" />";
 
-  $is_synched = run_query_is_contact_synched($id);
-  if($is_synched) {
+  // XXXXX addressbook $ab_id to set
+  $is_synced = get_contact_is_synced($ab_id);
+  if($is_synced) {
     $act = 'desync';
     $button_value = $l_desync;
   } else {
@@ -779,7 +766,7 @@ function html_contact_header($co_q, $funcs) {
     $button_value = $l_sync;
   }
   $sync_contact_button = "
-      <input type=\"submit\" x-obm-sync=\"$is_synched\" onclick=\"Obm.Contact.syncContact($id, this);\" value=\"$button_value\" />";
+      <input type=\"submit\" x-obm-sync=\"$is_synced\" onclick=\"Obm.Contact.syncContact($id, this);\" value=\"$button_value\" />";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -1131,7 +1118,7 @@ function dis_contact_form($action, $co_q, $contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ctry_q, $contact, $coords) {
   global $ico_company, $l_company, $ico_add, $ico_crow, $l_header_new, $l_add;
-  global $cgp_mailing_default, $ccontact_private_default, $cright_write_admin;
+  global $cgp_mailing_default, $cright_write_admin;
   global $l_lastname, $l_firstname, $l_middlename, $l_suffix, $l_aka;
   global $l_kind, $l_title, $l_letter;
   global $l_phone, $l_postcode,$l_expresspostal;
@@ -1210,7 +1197,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $mailok = ($co_q->f('contact_mailing_ok') == 1 ? ' checked' : '');
     $newsletter = ($co_q->f('contact_newsletter') == 1 ? ' checked' : '');
     $archive = ($co_q->f('contact_archive') == 1 ? ' checked' : '');
-    $priv = $co_q->f('privacy');
     $manager = $co_q->f('contact_manager');
     $assistant = $co_q->f('contact_assistant');
     $spouse = $co_q->f('contact_spouse');
@@ -1243,9 +1229,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
     $datecomment2 = of_date_upd_format();
     $usercomment3 = $uid;
     $datecomment3 = of_date_upd_format();
-    if ($ccontact_private_default) {
-      $private_c = ' checked';
-    }
     if ($cgp_mailing_default) {
       $mailok = ' checked';
       $newsletter = ' checked';
@@ -1304,7 +1287,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
   if (isset($contact['add_comment3'])) { $add_comment3 = stripslashes($contact['add_comment3']); }
   if (isset($contact['usercomment3'])) { $usercomment3 = $contact['usercomment3']; }
   if (isset($contact['datecomment3'])) { $datecomment3 = of_date_upd_format($contact['datecomment3']); }
-  if (isset($contact['privacy'])) { $priv = stripslashes($contact['privacy']); }
   if (isset($contact['archive'])) { $archive = ($contact['archive'] == 1 ? 'checked' : ''); }
 
   // Conditionnal fields
@@ -1533,29 +1515,13 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       $opt_usercomment .= ">$cname</option>\n";
     }
   }
-  // Check
-  if (! $perm->check_right('contact', $cright_write_admin)) {
-    $display_private = "<input name=\"cba_privacy\" type=\"hidden\" value=\"1\" />$l_yes";
-    $priv = 1;
 
-  // If new contact or contact update and user is owner, display visibility
-  } else if ( ($action == 'new') || ($action == 'insert') ||
-       ( (($action == 'detailupdate') || ($action == 'update')) &&
-         ($usercreate == $obm['uid']) ) ) {
-    if ($priv == '1') {
-      $private_c = ' checked';
-    }
-    $display_private = "<input name=\"cba_privacy\" type=\"checkbox\" value=\"1\" $private_c />";
-  }
-
-  if (!$priv) {
-    $sel_usercomment = "<select name=\"sel_usercomment\">$opt_usercomment</select>";
-    $sel_usercomment2 = "<select name=\"sel_usercomment2\">$opt_usercomment</select>";
-    $sel_usercomment3 = "<select name=\"sel_usercomment3\">$opt_usercomment</select>";
-    $date_comment = "<input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>";
-    $date_comment2 = "<input type=\"text\" name=\"tf_datecomment2\" value=\"$datecomment2\" class=\"datePicker\"/>";
-    $date_comment3 = "<input type=\"text\" name=\"tf_datecomment3\" value=\"$datecomment3\" class=\"datePicker\"/>";
-  }
+  $sel_usercomment = "<select name=\"sel_usercomment\">$opt_usercomment</select>";
+  $sel_usercomment2 = "<select name=\"sel_usercomment2\">$opt_usercomment</select>";
+  $sel_usercomment3 = "<select name=\"sel_usercomment3\">$opt_usercomment</select>";
+  $date_comment = "<input type=\"text\" name=\"tf_datecomment\" value=\"$datecomment\" class=\"datePicker\"/>";
+  $date_comment2 = "<input type=\"text\" name=\"tf_datecomment2\" value=\"$datecomment2\" class=\"datePicker\"/>";
+  $date_comment3 = "<input type=\"text\" name=\"tf_datecomment3\" value=\"$datecomment3\" class=\"datePicker\"/>";
 
   if (($action == 'detailupdate') || ($action == 'update')) {
     $dis_comment = "
@@ -1761,10 +1727,6 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
       <td><input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive /></td>
     </tr>
     <tr>
-      <th>$l_private</th>
-      <td>$display_private</td>
-    </tr>
-    <tr>
       <th>$l_manager</th>
       <td><input type=\"text\" id=\"tf_manager\" name=\"tf_manager\" maxlength=\"64\" size=\"30\" value=\"$manager\" /></td>
     </tr>
@@ -1854,7 +1816,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $funcs, $users, $ct
 //   - $co_q      : contact database result (at least 1 row)
 //   - $contact[] : values for insertion/update (if confirmation)
 //     keys used  : company_id, kind, lname, fname ad1, ad2, ad3, zip, town,cdx
-//                : ctry, func, phone, email, com, priv
+//                : ctry, func, phone, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $l_check_samecontact, $l_confirm, $l_back;
@@ -1867,7 +1829,6 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $suffix = stripslashes($contact['suffix']);
   $kind = $contact['kind'];
   $dsrc = $contact['datasource'];
-  $privacy = $contact['privacy'];
   $func = $contact['function'];
   $title = stripslashes($contact['title']);
   $mark = $contact['market'];
@@ -1961,7 +1922,6 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_suffix\" value=\"$suffix\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"sel_datasource\" value=\"$dsrc\" />
-    <input type=\"hidden\" name=\"cba_privacy\" value=\"$privacy\" />
     <input type=\"hidden\" name=\"sel_function\" value=\"$func\" />
     <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
     <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
@@ -2332,6 +2292,7 @@ function dis_contact_vcard_export($contact) {
   echo $vcard->__toString();
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Export all private contacts to VCards
 ///////////////////////////////////////////////////////////////////////////////
@@ -2350,6 +2311,7 @@ function dis_contact_vcard_export_all($contacts) {
   header('charset=utf-8');
   echo implode("\n", $vcards);
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About Contact number evolution by date

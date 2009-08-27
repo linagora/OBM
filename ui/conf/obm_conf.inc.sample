@@ -85,9 +85,6 @@ $csearch_advanced_default = false;
 // Contact : is mailing enabled by default for a new contact
 $cgp_mailing_default = true;
 
-// Contact : is a new contact private by default
-$ccontact_private_default = true;
-
 // Calendar : show public groups
 $ccalendar_public_groups = true;
 

@@ -24,6 +24,7 @@ To do
   * Add munin framework integration for stats and allow stats for hosts
   * Automate: fix update by delegation
   * #310 fax, desc, categories criteria not ok in people module for user+contact
+  * #330 obmSatellite.cf is not handled by debconf
   * #412 Calendar: Private Events : list of attendees are visible
   * #449 Account : pb on "solde"
   * #450 Account : pb on "calculate solde"

@@ -79,6 +79,33 @@ CREATE TABLE address (
 
 
 --
+-- Table structure for table `addressbook`
+--
+CREATE TABLE addressbook (
+  id         integer NOT NULL,
+  domain_id  integer NOT NULL,
+  timeupdate timestamp without time zone,
+  timecreate timestamp without time zone,
+  userupdate integer default NULL,
+  usercreate integer default NULL,
+  origin     varchar(255) NOT NULL,
+  owner      integer default NULL,
+  name       varchar(64) NOT NULL,
+  default    boolean default false,
+  syncable   boolean default true,
+);
+
+
+--
+-- Table structure for table `addressbookentity`
+--
+CREATE TABLE addressbookentity (
+  addressbookentity_entity_id      integer NOT NULL,
+  addressbookentity_addressbook_id integer NOT NULL
+);
+
+
+--
 -- Name: calendarentity; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -217,6 +244,7 @@ CREATE TABLE contact (
     contact_userupdate          integer DEFAULT NULL,
     contact_usercreate          integer DEFAULT NULL,
     contact_datasource_id       integer,
+    contact_addressbook_id      integer,
     contact_company_id          integer,
     contact_company             character varying(64),
     contact_kind_id             integer,
@@ -237,7 +265,6 @@ CREATE TABLE contact (
     contact_mailing_ok          smallint DEFAULT 0,
     contact_newsletter          smallint DEFAULT 0,
     contact_archive             smallint DEFAULT 0 NOT NULL,
-    contact_privacy             integer DEFAULT 0,
     contact_date                timestamp without time zone,
     contact_birthday_id         integer,
     contact_anniversary_id      integer,
@@ -600,6 +627,13 @@ CREATE TABLE deletedcontact (
   deletedcontact_origin     varchar(255) NOT NULL
 );
 
+
+CREATE TABLE deletedaddressbook (
+  addressbook_id integer NOT NULL,
+  user_id        integer NOT NULL,
+  timestamp      timestamp without time zone,
+  origin         varchar(255) NOT NULL
+);
 
 --
 -- Name: vcomponent; Type: TYPE; Schema: public; Owner: -
@@ -1966,15 +2000,16 @@ CREATE TABLE subscriptionreception (
     subscriptionreception_label character(12)
 );
 
---
--- Name: synchedcontact; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
 
-CREATE TABLE synchedcontact(
-  synchedcontact_user_id integer NOT NULL,
-  synchedcontact_contact_id integer NOT NULL,
-  synchedcontact_timestamp timestamp  without time zone NOT NULL DEFAULT now()
+--
+-- Table structure for table SyncedAddressbook
+--
+CREATE TABLE syncedaddressbook (
+  user_id        integer NOT NULL,
+  addressbook_id integer NOT NULL,
+  timestamp      timestamp without time zone NOT NULL DEFAULT now()
 );
+
 
 --
 -- Name: tasktype; Type: TABLE; Schema: public; Owner: -; Tablespace: 
@@ -2277,6 +2312,19 @@ CREATE SEQUENCE address_address_id_seq
 --
 
 ALTER SEQUENCE address_address_id_seq OWNED BY address.address_id;
+
+
+--
+-- Addressbook id sequence
+--
+CREATE SEQUENCE addressbook_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE addressbook_id_seq OWNED BY addressbook.id;
 
 
 --
@@ -3780,6 +3828,10 @@ ALTER SEQUENCE website_website_id_seq OWNED BY website.website_id;
 ALTER TABLE account ALTER COLUMN account_id SET DEFAULT nextval('account_account_id_seq'::regclass);
 
 
+
+ALTER TABLE addressbook ALTER COLUMN id SET DEFAULT nextval('addressbook_id_seq'::regclass);
+
+
 --
 -- Name: address_id; Type: DEFAULT; Schema: public; Owner: -
 --
@@ -4357,6 +4409,17 @@ ALTER TABLE ONLY account
 
 
 --
+-- addressbook indexes
+--
+ALTER TABLE ONLY addressbook
+    ADD CONSTRAINT addressbook_pkey PRIMARY KEY (id);
+
+
+ALTER TABLE ONLY addressbookentity
+    ADD CONSTRAINT addressbookentity_pkey PRIMARY KEY (addressbookentity_entity_id, addressbookentity_addressbook_id);
+
+
+--
 -- Name: accountentity_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -4605,11 +4668,11 @@ ALTER TABLE ONLY deleted
 
 
 --
--- Name: deletedcontact_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: deletedaddressbook_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY deletedcontact
-    ADD CONSTRAINT deletedcontact_pkey PRIMARY KEY (deletedcontact_contact_id);
+ALTER TABLE ONLY deletedaddressbook
+    ADD CONSTRAINT deletedaddressbook_pkey PRIMARY KEY (deletedaddressbook_addressbook_id);
 
 
 --
@@ -5331,11 +5394,11 @@ ALTER TABLE ONLY subscriptionreception
     ADD CONSTRAINT subscriptionreception_pkey PRIMARY KEY (subscriptionreception_id);
 
 --
--- Name: synchedcontact_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: syncedaddressbook_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY synchedcontact
-    ADD CONSTRAINT synchedcontact_pkey PRIMARY KEY (synchedcontact_user_id, synchedcontact_contact_id);
+ALTER TABLE ONLY syncedaddressbook
+  ADD CONSTRAINT syncedaddressbook_pkey PRIMARY KEY (user_id, addressbook_id);
 
 --
 -- Name: tasktype_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
@@ -5629,12 +5692,22 @@ CREATE INDEX activeuserobm_userobm_id_fkey ON activeuserobm (activeuserobm_usero
 --
 -- Name: address_entity_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
-
 CREATE INDEX address_entity_id_fkey ON address (address_entity_id);
+
+
+CREATE INDEX addressbook_domain_id_fkey ON addressbook (domain_id);
+CREATE INDEX addressbook_userupdate_fkey ON addressbook (userupdate);
+CREATE INDEX addressbook_usercreate_fkey ON addressbook (usercreate);
+CREATE INDEX addressbook_usercreate_fkey ON addressbook (usercreate);
+CREATE INDEX addressbook_owner_fkey ON addressbook (owner);
+
+
+CREATE INDEX addressbookentity_addressbook_id_addressbook_id_fkey ON addressbookentity (addressbookentity_addressbook_id);
+CREATE INDEX addressbookentity_entity_id_entity_id_fkey ON addressbookentity (addressbookentity_entity_id);
+
 --
 -- Name: cv_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
-
 CREATE INDEX cv_usercreate_fkey ON cv (cv_usercreate);
 --
 -- Name: cv_domain_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
@@ -5797,6 +5870,10 @@ CREATE INDEX contact_company_id_fkey ON contact (contact_company_id);
 --
 
 CREATE INDEX contact_datasource_id_fkey ON contact (contact_datasource_id);
+
+CREATE INDEX contact_addressbook_id_addressbook_id_fkey ON contact (contact_addressbook_id);
+
+
 --
 -- Name: contact_domain_id_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
@@ -7549,6 +7626,26 @@ ALTER TABLE ONLY address
     ADD CONSTRAINT address_entity_id_entity_id_fkey FOREIGN KEY (address_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
+
+--
+-- addressbook fkey
+--
+ALTER TABLE ONLY addressbook
+    ADD CONSTRAINT addressbook_domain_id_domain_id_fkey FOREIGN KEY (domain_id) REFERENCES domain(domain_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY addressbook
+    ADD CONSTRAINT addressbook_userupdate_userobm_id_fkey FOREIGN KEY (userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY addressbook
+    ADD CONSTRAINT addressbook_usercreate_userobm_id_fkey FOREIGN KEY (usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY addressbook
+    ADD CONSTRAINT addressbook_owner_userobm_id_fkey FOREIGN KEY (owner) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+ALTER TABLE ONLY addressbookentity
+    ADD CONSTRAINT addressbookentity_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbookentity_addressbook_id) REFERENCES adressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY addressbookentity
+    ADD CONSTRAINT addressbookentity_entity_id_entity_id_fkey FOREIGN KEY (addressbookentity_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
 --
 -- Name: calendarentity_calendar_id_calendar_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
@@ -7794,6 +7891,9 @@ ALTER TABLE ONLY contact
 
 ALTER TABLE ONLY contact
     ADD CONSTRAINT contact_datasource_id_datasource_id_fkey FOREIGN KEY (contact_datasource_id) REFERENCES datasource(datasource_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+ALTER TABLE ONLY contact
+   ADD CONSTRAINT contact_addressbook_id_addressbook_id_fkey FOREIGN KEY (contact_addressbook_id) REFERENCES addressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -10298,20 +10398,22 @@ ALTER TABLE ONLY subscriptionentity
 ALTER TABLE ONLY subscriptionentity
     ADD CONSTRAINT subscriptionentity_subscription_id_subscription_id_fkey FOREIGN KEY (subscriptionentity_subscription_id) REFERENCES subscription(subscription_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
---
--- Name: synchedcontact_entity_id_entity_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY synchedcontact
-    ADD CONSTRAINT synchedcontact_contact_id_contact_id_fkey FOREIGN KEY (synchedcontact_contact_id) REFERENCES contact(contact_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
 
 --
--- Name: synchedcontact_subscription_id_subscription_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: syncedaddressbook_user_id_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY synchedcontact
-    ADD CONSTRAINT synchedcontact_user_id_userobm_id_fkey FOREIGN KEY (synchedcontact_user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY syncedaddressbook
+    ADD CONSTRAINT syncedaddressbook_user_id_userobm_id_fkey FOREIGN KEY (user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: syncedaddressbook_addressbook_id_addressbook_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY syncedaddressbook
+    ADD CONSTRAINT syncedaddressbook_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbook_id) REFERENCES addressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
 
 --
 -- Name: subscriptionreception_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -

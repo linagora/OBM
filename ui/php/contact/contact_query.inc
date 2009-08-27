@@ -16,6 +16,7 @@ function run_query_contact_search($contact) {
   global $cgp_show, $cdg_sql, $c_all, $ctu_sql_limit;
   global $cgp_archive_only,$obm;
   global $c_public, $c_private;
+
   $ctu_sql_limit = true;
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -44,7 +45,6 @@ function run_query_contact_search($contact) {
   $dateafter = of_isodate_convert($contact['date_after'],true);
   $datebefore = of_isodate_convert($contact['date_before'],true);
   $mailing_ok_only = $contact['mailing_ok_only'];
-  $privacy = $contact["privacy"];
   $newsletter = $contact['newsletter'];
   $archive = $contact['archive'];
   $lang = get_lang();
@@ -52,6 +52,8 @@ function run_query_contact_search($contact) {
   //$limit = sql_limit($db_type, '', '', '', true);
   $date = sql_date_format($db_type, 'contact_date', 'contact_date');
   $multidomain = sql_multidomain('contact');
+
+  // XXXXXX Migrate the access right to the Addressbook
   if ($privacy != $c_public) {
     // Now we play with ACLs
     $allowed_contacts_query = "
@@ -76,7 +78,7 @@ function run_query_contact_search($contact) {
     while ($obm_q->next_record()) {
       $f_contact_ids[] = sql_parse_id($obm_q->f('id'));
     }
-    $where = "((contact_privacy = 0 $multidomain) ";
+    $where = "((1=1 $multidomain) ";
     if (count($f_contact_ids) > 0) {
       $where .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
     }
@@ -184,11 +186,6 @@ function run_query_contact_search($contact) {
   if ($mailing_ok_only == '1') {
     $where .= ' AND contact_mailing_ok=1';
   }
-  if ($privacy == $c_public) {
-    $where .= ' AND contact_privacy = 0';
-  } elseif ($privacy == $c_private) { 
-    $where .= ' AND contact_privacy = 1';
-  }  
   if ($newsletter == '1') {
     $where .= ' AND contact_newsletter=1';
   }
@@ -260,7 +257,6 @@ function run_query_contact_search($contact) {
     contact_mailing_ok,
     contact_newsletter,
     contact_archive,
-    contact_privacy,
     $date,
     $company_fields
     contactfunction_label as function_label
@@ -375,7 +371,6 @@ function run_query_contact_detail($p_id) {
   }
 
   $query = "SELECT Contact.*,
-    contact_privacy as privacy,
     $timeupdate,
     $timecreate,
     $company_fields,
@@ -536,7 +531,6 @@ function run_query_contact_insert($contact) {
   }
 
   $archive = ($contact['archive'] == '1' ? '1' : '0');
-  $priv = (isset($contact['privacy']) ? $contact['privacy'] : '0');
 
   $query = "INSERT INTO Contact (contact_timeupdate,
     contact_timecreate,
@@ -564,7 +558,6 @@ function run_query_contact_insert($contact) {
     contact_mailing_ok,
     contact_newsletter,
     contact_archive,
-    contact_privacy,
     contact_date,
     contact_comment,
     contact_comment2,
@@ -597,7 +590,6 @@ function run_query_contact_insert($contact) {
     $mailok,
     $newsletter,
     $archive,
-    $priv,
     $date,
     '$comment',
     '$comment2',
@@ -616,14 +608,6 @@ function run_query_contact_insert($contact) {
     }    
     $entityid = of_entity_insert('contact',$id);
     $contact['contact_id'] = $id;
-
-    if($priv == 1) { 
-      // Acl
-      run_query_contact_init_rights($id);
-
-      // Subscription support
-      run_query_do_contact_sync($id, true);
-    }
 
     // Birthday support
     $birthday = of_isodate_convert($contact['birthday'], true);
@@ -661,19 +645,6 @@ function run_query_contact_insert($contact) {
 // new contact)
 // Parameters:
 //   - $contact_id
-//   - $usercreate_id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_init_rights($contact_id, $usercreate_id='') {
-  global $obm;
-  // default right setting must be coded here
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Set initial rights when switching from public to private (or when inserting
-// new contact)
-// Parameters:
-//   - $contact_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_remove_rights($contact_id) {
   OBM_Acl::denyAll('contact', $contact_id);
@@ -695,9 +666,6 @@ function run_query_contact_update($contact) {
   $id =  $contact['contact_id'];
   $comp_old_id =  $contact['company_id'];
   $comp_new_id =  $contact['company_new_id'];
-
-  $lc = get_contact_info($id);
-  $old_priv = ($lc['privacy'] == '0') ? '0' : '1';
 
   $comp_id = $contact['company_new_id'];
   if ($comp_id < 1) {
@@ -759,7 +727,6 @@ function run_query_contact_update($contact) {
     $comment3 .= "\n$datecomment3:$usercomment3:$add_comment3";
   }
   $archive = ($contact['archive'] == '1' ? '1' : '0');
-  $priv = (isset($contact['privacy']) ? $contact['privacy'] : '0');
 
   // Archived contact unsubscribed from mailings
   if ($archive == '1') {
@@ -791,7 +758,6 @@ function run_query_contact_update($contact) {
     contact_mailing_ok=$mailok,
     contact_newsletter=$newsletter,
     contact_archive=$archive,
-    contact_privacy=$priv,
     $query_date
     contact_comment='$comment',
     contact_comment2='$comment2',
@@ -809,17 +775,6 @@ function run_query_contact_update($contact) {
     if (($retour) && ($comp_new_id > 0) && ($comp_new_id != $comp_old_id)) {
       run_query_global_company_contact_number_update($comp_new_id);
       run_query_global_company_contact_number_update($comp_old_id);
-    }
-  }
-
-  if ($priv!=$old_priv) {
-    if ($priv == 0) {
-      // Acl are removed if contact is updated from private to public
-      run_query_contact_remove_rights($id);
-    }
-    if ($priv == 1) {
-      // Acl are initialized if contact is updated from public to private
-      run_query_contact_init_rights($id);
     }
   }
 
@@ -1296,6 +1251,7 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
     $select_comp = ', company_name';
   }
 
+  // XXXXX check access to the contact addressbook ?
   $query = "SELECT DISTINCT contact_id,
     contact_company_id,
     contact_lastname,
@@ -1305,7 +1261,6 @@ function run_query_contact_check($cid, $comp_id, $lname, $fname) {
     $join_comp
     WHERE $where_id
     ((contact_lastname='$lname' AND contact_firstname='$fname') $where_comp)
-    AND ((contact_privacy = 1 AND contact_usercreate $uid) OR contact_privacy = 0)
     $multidomain";
 
   display_debug_msg($query, $cdg_sql, 'run_query_contact_check()');
@@ -1326,8 +1281,7 @@ function run_query_vcard_insert($params) {
   try {
     $vcards = Vpdi::decode($file_content, 'VCARD');
   } catch (Exception $e) {
-    return false;
-  }
+    return false;  }
   $ids = array();
   foreach ($vcards as $vcard) {
     $contact = OBM_Contact::import($vcard);
@@ -1425,12 +1379,7 @@ function check_contact_update_rights($params, $c='') {
       return false;
     }
 
-    // Allow public contact handling only if write_admin right
-    if (($c['privacy'] != 1)
-      && (! $perm->check_right('contact', $cright_write_admin))) {
-        $err['msg'] .= $l_err_public_rights;
-        return false;
-      }
+    // XXXXX Check addressbook write_access ?
 
   }
 
@@ -1461,7 +1410,6 @@ function check_contact_data_form($cid, &$contact) {
 
   $lname = $contact['lname'];
   $fname = $contact['fname'];
-  $priv = $contact['privacy'];
   $c_id = $contact['company_id'];
   $c_new_id = $contact['company_new_id'];
   $phones = $contact['phones'];
@@ -1506,13 +1454,6 @@ function check_contact_data_form($cid, &$contact) {
     }
   }
 
-  // Allow public contact handling only if write_admin right
-  if (($priv != 1) && (! $perm->check_right('contact', $cright_write_admin))) {
-    $err['msg'] = $l_err_public_rights;
-    $err['field'] = 'privacy';
-    return false;
-  }
-
   // Check if express postal is not too long
   if (is_array($addresses)){
     foreach ($addresses as $addresse){
@@ -1550,14 +1491,7 @@ function check_can_delete_contact($p_id) {
     }
   }
 
-  // Allow public contact handling only if write_admin right
-  $lc = get_contact_info($p_id);
-  if (($lc['privacy'] == '0') &&
-    (! $perm->check_right('contact', $cright_write_admin))) {
-      $err['msg'] .= $l_err_public_rights;
-      $delete_ok = false;
-      return false;
-    }
+  // XXXXX Check addressbook write_access ?
 
   // Links from deals
   if ($cgp_show['module']['deal']) {
@@ -1994,6 +1928,8 @@ function run_query_contact_birthday_update ($date='birthday', $contact_id, $cont
       break;
     }
   }
+
+
 /**
  * Search contacts from a single field 
  * 
@@ -2034,7 +1970,7 @@ function run_query_contact_ext_search($contact) {
   while ($obm_q->next_record()) {
     $f_contact_ids[] = sql_parse_id($obm_q->f('id'));
   }
-  $where = "AND ((contact_privacy = 0 $multidomain)";
+  $where = "AND ((1=1 $multidomain)";
   if (count($f_contact_ids) > 0) {
     $where .= " OR contact_id IN (".implode(',',$f_contact_ids).")";
   }
@@ -2058,28 +1994,32 @@ function run_query_contact_ext_search($contact) {
     LIMIT 20 OFFSET 0";
   display_debug_msg($query, $cdg_sql, 'run_query_contact_ext_search()');
   $obm_q->xquery($query);
+
   return array('length' => $resultsCount, 'datas' => $obm_q);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Check if a contact is synchronized with the given contact id
-// Parameters:
-//   - $cid : Contact id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_is_contact_synched($cid) {
+
+/**
+ * Check if a contact (its addressbook) is synchronized
+ * @param Integer $ab_id addressbook_id
+ * @return true or false
+ **/
+// XXXX Try to check only once for an addressbook
+function get_contact_is_synced($ab_id) {
   global $cdg_sql, $obm;
 
   $uid = sql_parse_id($obm['uid'], true);
   $cid = sql_parse_id($cid, true);
-  $query = "SELECT synchedcontact_contact_id FROM SynchedContact
-        WHERE synchedcontact_user_id $uid
-        AND synchedcontact_contact_id $cid";
+  $query = "SELECT addressbook_id FROM SyncedAddressbook
+        WHERE user_id $uid
+        AND addressbook_id $ab_id";
 
-  display_debug_msg($query, $cdg_sql, 'run_query_is_contact_synched()');
+  display_debug_msg($query, $cdg_sql, 'get_contact_is_synced()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q->next_record();
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Synchronise or desyncronise a user from a contact 
@@ -2087,30 +2027,30 @@ function run_query_is_contact_synched($cid) {
 //   -    $cid : Contact id
 //   - $desync : Boolean, true if we sync, false if we desync
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_do_contact_sync($cid, $sync = true) {
+function run_query_do_addressbook_sync($ab_id, $sync = true) {
   global $cdg_sql, $obm;
 
   $uid = sql_parse_id($obm['uid']);
-  $cid = sql_parse_id($cid);
+  $ab_id = sql_parse_id($ab_id);
 
-  if(run_query_is_contact_synched($cid) XOR !$sync) {
-    return true; // Already (de)synched
+  // XXXXX change contact to addressbook
+  if (get_contact_is_synced($ab_id) XOR !$sync) {
+
   }
 
-  if($sync) {
-    $query = "INSERT INTO SynchedContact (
-        synchedcontact_user_id, 
-        synchedcontact_contact_id,
-        synchedcontact_timestamp)
-        VALUES ($uid, $cid, NOW()
-      )";
+  if ($sync) {
+    $query = "INSERT INTO SyncedAddressbook (
+        user_id, 
+        addressbook_id,
+        timestamp)
+        VALUES ($uid, $ab_id, NOW())";
   } else {
-    $query = "DELETE FROM SynchedContact
-        WHERE synchedcontact_user_id = $uid
-        AND synchedcontact_contact_id = $cid";
+    $query = "DELETE FROM SyncedAddressbook
+        WHERE user_id = $uid
+        AND addressbook_id = $ab_id";
   }
 
-  display_debug_msg($query, $cdg_sql, "run_query_do_contact_sync($cid, $sync)");
+  display_debug_msg($query, $cdg_sql, "run_query_do_addressbook_sync($ab_id, $sync)");
   $obm_q = new DB_OBM;
   return $obm_q->query($query);
 }

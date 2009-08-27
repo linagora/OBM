@@ -1990,7 +1990,6 @@ function get_contact_info($con_id) {
   $con_id = sql_parse_id($con_id, true);
   $query = "SELECT
     contact_company_id,
-    contact_privacy,
     contact_usercreate,
     contact_lastname,
     contact_firstname
@@ -2002,7 +2001,6 @@ function get_contact_info($con_id) {
   $obm_q->query($query);
   $obm_q->next_record();
   $c['company_id'] = $obm_q->f('contact_company_id');
-  $c['privacy'] = $obm_q->f('contact_privacy');
   $c['usercreate'] = $obm_q->f('contact_usercreate');
   $c['lastname'] = $obm_q->f('contact_lastname');
   $c['firstname'] = $obm_q->f('contact_firstname');

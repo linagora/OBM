@@ -10,7 +10,7 @@ UPDATE ObmInfo SET obminfo_value = 'pre-2.2.9' WHERE obminfo_name = 'db_version'
 UPDATE Phone SET phone_label = REPLACE(phone_label , 'PREF;', '') WHERE phone_label like 'PREF%';
 UPDATE IM SET im_label = REPLACE(im_label , 'PREF;', '') WHERE im_label like 'PREF%';
 UPDATE Email SET email_label = REPLACE(email_label , 'PREF;', '') WHERE email_label like 'PREF%';
-UPDATE Address SET adress_label = REPLACE(adress_label , 'PREF;', '') WHERE adress_label like 'PREF%';
+UPDATE Address SET address_label = REPLACE(address_label , 'PREF;', '') WHERE address_label like 'PREF%';
 UPDATE Website SET website_label = REPLACE(website_label , 'PREF;', '') WHERE website_label like 'PREF%';
 UPDATE DisplayPref SET display_fieldname = 'WorkPhone.phone_number' WHERE display_fieldname = 'phone_number';
 
