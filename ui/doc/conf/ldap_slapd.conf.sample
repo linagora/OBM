@@ -139,10 +139,13 @@ checkpoint                    1024      30
 # Database Index
 index           uidNumber,gidNumber     eq
 index           default                 sub
-# Sans Samba
+# Mail
+index           mailBox                 eq
+index           mailAccess              eq
+# Without Samba
 index           cn,sn,uid               pres,sub,eq
 index           objectClass eq
-# Avec Samba
+# With Samba
 #index           cn,sn,uid,displayName   pres,sub,eq
 #index           sambaSID                eq
 #index           sambaPrimaryGroupSID    eq
