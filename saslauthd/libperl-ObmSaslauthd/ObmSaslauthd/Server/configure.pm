@@ -13,7 +13,7 @@ sub configure_hook {
     my $self = shift;
 
     $self->{'server'}->{'name'} = 'obmSaslauthd';
-    $self->{'server'}->{'conf_file'} = '/etc/obm/'.$self->{'server'}->{'name'}.'.cf';
+    $self->{'server'}->{'conf_file'} = '/etc/obm-saslauthd/'.$self->{'server'}->{'name'}.'.cf';
     
     $self->{'server'}->{'setsid'} = 1;
 }
