@@ -19,9 +19,11 @@
 package obmSaslauthd;
 
 use ObmSaslauthd::Server::configure;
+use ObmSaslauthd::Server::bind;
 use ObmSaslauthd::Server::processRequest;
 use Net::Server::PreForkSimple;
-@ISA = qw(ObmSaslauthd::Server::configure ObmSaslauthd::Server::processRequest Net::Server::PreForkSimple);
+use ObmSaslauthd::Tools::commonMethods;
+@ISA = qw(ObmSaslauthd::Server::configure ObmSaslauthd::Server::bind ObmSaslauthd::Server::processRequest Net::Server::PreForkSimple ObmSaslauthd::Tools::commonMethods);
 use strict;
 
 
