@@ -317,68 +317,70 @@ Obm.CalendarManager = new Class({
    */
   redrawAllDayGrid: function() {
     var updated = new Array();
-      var usedPosition = new Array(); 
+    var usedPosition = new Array(); 
+    var passed = new Hash(); 
 
     this.redrawAllDay.each (function(redraw, columnIndex){
       // if(!redraw) return;
 
-      var position = 0;
-
       this.alldayEventGrid[columnIndex].each(function(evt) {
-        var beginDay = evt.event.date.getTime(); 
-        var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000).getTime();
-        var size = Math.ceil((endDay - beginDay)/86400000);
-        if (!evt.event.all_day && evt.event.duration < 86400) {
-          // size = size + 1;
-        }
-
-        var current = new Obm.DateTime(evt.event.time*1000);
-
-        // Left extension
-        if (evt.event.date < obm.vars.consts.startTime) {
-          columnIndex = obm.vars.consts.startTime.format('Y-m-d');
-          size = Math.ceil((endDay - obm.vars.consts.startTime.getTime())/86400000);
-          current = new Obm.DateTime(obm.vars.consts.startTime);
-          evt.leftExtension.setStyle('display', '');
-          beginDay = obm.vars.consts.startTime; 
-        }
-
-        // Right extension
-        // TODO : add right icon
-        if ((evt.event.date+evt.event.duration*1000) > obm.vars.consts.startTime.getTime() + (86400000 * obm.vars.consts.nbDisplayedDays)) {
-          size = Math.ceil((obm.vars.consts.startTime.getTime() + (86400000 * obm.vars.consts.nbDisplayedDays) - beginDay)/86400000);
-          evt.rightExtension.setStyle('display', '');
-        }
-
-        var coords = {'column': columnIndex, 'position': position, 'size': size,  'occurence': evt};
-        var currentTime = current.getTime();
-        for(var i=0;i<size;i++) {
-          current.setTime(currentTime);
-          current.setDate(current.getDate()+i);
-          var index = current.format('Y-m-d');
-
-          if (!updated[index]) {
-            updated.push(index);
-            updated[index] = new Array();
+        var passedId = evt.element.uid;
+        if (!passed.get(passedId)) {
+          var beginDay = evt.event.date.getTime(); 
+          var endDay = new Obm.DateTime((evt.event.time+evt.event.duration)*1000).getTime();
+          var size = Math.ceil((endDay - beginDay)/86400000);
+          if (!evt.event.all_day && evt.event.duration < 86400) {
+            size = size + 1;
           }
-          updated[index].push(coords);
+
+          var current = new Obm.DateTime(evt.event.time*1000);
+
+          // Left extension
+          if (evt.event.date < obm.vars.consts.startTime) {
+            columnIndex = obm.vars.consts.startTime.format('Y-m-d');
+            size = Math.ceil((endDay - obm.vars.consts.startTime.getTime())/86400000);
+            current = new Obm.DateTime(obm.vars.consts.startTime);
+            evt.leftExtension.setStyle('display', '');
+            beginDay = obm.vars.consts.startTime; 
+          }
+
+          // Right extension
+          if ((evt.event.date+evt.event.duration*1000) > obm.vars.consts.startTime.getTime() + (86400000 * obm.vars.consts.nbDisplayedDays)) {
+            size = Math.ceil((obm.vars.consts.startTime.getTime() + (86400000 * obm.vars.consts.nbDisplayedDays) - beginDay)/86400000);
+            evt.rightExtension.setStyle('display', '');
+          }
+
+          var coords = {'position': position, 'size': size,  'occurence': evt};
+          var currentTime = current.getTime();
+
+          for(var i=0;i<size;i++) {
+            current.setTime(currentTime);
+            current.setDate(current.getDate()+i);
+            var index = current.format('Y-m-d');
+            if (!updated[index]) {
+              updated.push(index);
+              updated[index] = new Array();
+            }
+            updated[index].push(coords);
+          }
+
+          updated[columnIndex].each(function(e) {
+            if (!usedPosition[columnIndex]) {
+              usedPosition.push(columnIndex);
+              usedPosition[columnIndex] = new Hash();
+            }
+            usedPosition[columnIndex].set(e.position, true);
+          });
+
+          var position = 0;
+          while(usedPosition[columnIndex].get(position)) {
+            position++;
+          }
+
+          coords.position = position;
+
+          passed.set(passedId, true);
         }
-
-        // updated[index].each(function(e) {
-        //   if (!usedPosition[index]) {
-        //     usedPosition.push(index);
-        //     usedPosition[index] = new Hash();
-        //   }
-        //   usedPosition[index].set(e.position, true);
-        // });
-
-        // while(usedPosition[index].get(position)) {
-        //   coords.position = position;
-        //   position++;
-        // }
-
-        coords.position = position;
-        position++;
 
       });
     }.bind(this));
