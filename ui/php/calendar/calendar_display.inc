@@ -476,6 +476,7 @@ function html_calendar_bar_date_selector($calendar) {
     if ($current->compareWeekday($ccalendar_weekstart) == 0) $dis_minical .= "<tr>\n";
     $day = $current->get(Of_Date::DAY);
     $iso = $current->getURL();
+    $id = $current->getDateIso();
     if ($current->isToday()) {
       $klass = 'highlight';
     } elseif ($current->compareMonth($date)!= 0) {
@@ -483,7 +484,7 @@ function html_calendar_bar_date_selector($calendar) {
     } else {
       $klass = '';
     }
-    $dis_minical .= "<td class=\"$klass\" onclick=\"window.location.href='calendar_index.php?cal_range=day&amp;date=$iso'\"
+    $dis_minical .= "<td id='minical_$id' class=\"$klass\" onclick=\"window.location.href='calendar_index.php?cal_range=day&amp;date=$iso'\"
       onmouseout=\"this.className='$klass'\" onmouseover=\"this.className='hover'\">
       $day
       </td>";
@@ -928,7 +929,6 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
   $GLOBALS['js']['vars']['images']['extension_right'] = $GLOBALS['ico_extension_right'];
   $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
 
-
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
   if (is_array($occurrences)) {
@@ -955,6 +955,10 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
       $today = "";
       if ($current->isToday()) {
         $today = "background:#FFFFCC;";
+      } elseif ($current->compareMonth($calendar['date']) != 0) {
+        $klass = 'downlight';
+      } else {
+        $klass = '';
       }
       $day = $current->localize(Of_Date::OBM_DATE_WEEK_JUMP);
       $tip_title = $current->localize(Of_Date::OBM_DATE_DAY);
@@ -962,10 +966,10 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
       $date_iso = $current->getDateIso();
       $week_day_left = $step*$width;
       $week_day_event_list .= "
-        <div id='container_$date_iso' class='dayColMonth' style='height:{$height}%;width:$width%;left:$week_day_left%;$today'>
+        <div id='dayContainer_".($current->getTimestamp() - $start_time)."_$date_iso' class='dayColMonth $klass' style='height:{$height}%;width:$width%;left:$week_day_left%;$today'>
           <div class='dayMonthLabel'><a href=\"calendar_index.php?cal_range=day&amp;date=$iso\">$day</a></div>
           <div id='allday_$date_iso' class='alldayCell'>
-            <div id='more_$date_iso' class='calTip' title='<h1>$tip_title</h1>' style='text-align:center;position:absolute;display;none;width:100%;'></div>
+            <div id='more_".($current->getTimestamp() - $start_time)."_$date_iso' class='calTip' title='<h1>$tip_title</h1>' style='text-align:center;position:absolute;display;none;width:100%;'></div>
           </div>
         </div>";
       $step++;

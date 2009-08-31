@@ -4,54 +4,6 @@ Element.implement({
   } 
 }); 
 
-Obm.Observer = new Class({ 
-
-  Implements: Options,   
-
-  options: {
-    property: 'width',
-    frequency: '500',
-    onStart: $empty,
-    onChange: $empty,
-    onStop: $empty
-  },
-
-  initialize: function(el, options) {
-    this.setOptions(options);
-    this.el = $(el);
-    this.lastValue = this.setValue();
-    this.change = false; 
-    this.timer = this.check.periodical(this.options.frequency, this);
-  },
-  
-  setValue: function() {
-    v = this.el[this.options.property];
-    if(!v) 
-      v = this.el.getStyle(this.options.property);
-    return v;
-  },
-  
-  check: function() {
-    var v = this.setValue(); 
-    if(this.lastValue == v) {
-      if(this.change) {
-        this.options.onStop(this.el, v);
-        this.change = false;
-      }
-      return;
-    }
-    this.lastValue = v; 
-    if(!this.change) {
-      this.options.onStart(this.el, v);
-      this.change = true;
-    }
-    if(this.change) {
-      this.options.onChange(this.el, v);
-    }
-  }
-});
-
-
 HideTimer = new Class({
   Implements: Options,   
 

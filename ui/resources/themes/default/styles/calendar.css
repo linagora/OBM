@@ -84,14 +84,19 @@
 }
 
 
-.monthRow {
-  height: 100%
+.monthRow{
+  height: 100%;
 }
 
 .dayColMonth {
-  border-left:1px solid #CCC;
-  border-bottom:1px solid #CCC;
+  border-left:1px solid #AAA;
+  border-top:1px solid #AAA;
+  border-bottom:1px solid #AAA;
   position:absolute;
+}
+
+.downlight {
+  background: #F0F0F0;;
 }
 
 .alldayCell {
@@ -99,7 +104,7 @@
 }
 
 .dayMonthLabel {
-  background: #CCC;
+  background: #DDD;
   text-align: right;
   padding-right: 4px;
 }
@@ -157,7 +162,7 @@
 }
 
 .calTip {
-  z-index: 400000;
+  z-index: 100;
   cursor:pointer;
 }
 
