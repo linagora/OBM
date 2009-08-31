@@ -1,2 +1,2 @@
 //https not supported !!
-pref("autoadmin.global_config_url", "http://melamel-sync.sga.defense.gouv.fr/obm-autoconf/autoconfig.js");
+pref("autoadmin.global_config_url", "http://localhost/obm-autoconf/autoconfig.js");
