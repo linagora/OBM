@@ -1,0 +1,286 @@
+/*
+ * Copyright (C) 2006-2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Processes the incoming vcard items and adds the missing tokens.
+ * Handles large objects.
+ * Replaces TEL;PREF: and TEL;PREF;VOICE: with token TEL;VOICE: so the
+ * information is stored like Other Telephone number.
+ * Replaces LABEL fields with a proper address token. And if no labels are
+ * found, new empty ADR:HOME and ADR:WORK are added
+ *
+ * Calendars:
+ * ==========
+ * Handles large objects.
+ * Removes the PRODID field.
+ *
+ * @version $Id: Nokia6200in.bsh,v 1.6 2007/06/18 13:34:04 luigiafassina Exp $
+ */
+ 
+// ------------------------------------------------------------------- Constants
+private final String PATTERN_LABEL   = "LABEL"          ;
+private final String ADDR_HOME       = "ADR;HOME"       ;
+private final String ADDR_WORK       = "ADR;WORK"       ;
+private final String VCARD_END       = "END:VCARD"      ;
+private final String EMPTY_ADDR_HOME = "ADR;HOME:;;;;;;";
+private final String EMPTY_ADDR_WORK = "ADR;WORK:;;;;;;";
+
+private Map missingCardTokens = null;
+
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Nokia6200.preProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+    processPIMItems(mapItems, pimItemsHandler);
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ *
+ */
+void processPIMItems(Map mapItems, PIMItemsHandler pimItemsHandler) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        preProcessContacts(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessCalendar(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vtodo list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VTODO)) {
+        preProcessCalendar(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Processes incoming contacts. We do the follwing:
+ *
+ * 1) Replace TEL;PREF: and TEL;PREF;VOICE: with token TEL;VOICE:
+ *    so the information is stored like Other Telephone number.
+ * 2) Replace LABEL fields with a proper address token
+ * 3) If no labels are found, new empty ADR:HOME and ADR:WORK are added
+ *
+ * @param i the item to be processed
+ *
+ */
+void preProcessContacts(Item i) {
+    data = i.data.data;
+    //
+    // Replace TEL;PREF: and TEL;PREF;VOICE: with token TEL;VOICE:
+    // so the information is stored like Other Telephone number.
+    //
+    data = data.replaceAll("TEL;PREF:"      , "TEL;VOICE:");
+    data = data.replaceAll("TEL;PREF;VOICE:", "TEL;VOICE:");
+
+    //
+    // Replace TEL;PREF;WORK;VOICE: with token TEL;WORK;VOICE:
+    //
+    data = data.replaceAll("TEL;PREF;WORK;VOICE:", "TEL;WORK;VOICE:");
+
+    //
+    // Replace TEL;FAX: with token TEL;FAX;HOME:
+    // so the information is stored like Home Fax number.
+    //
+    data = data.replaceAll("TEL;FAX:", "TEL;FAX;HOME:");
+
+    i.data.setData(data);
+
+    s = e = 0;
+    count = 1;
+    while ((e = data.indexOf(PATTERN_LABEL, s)) >= 0) {
+        s = e + PATTERN_LABEL.length();
+        //
+        // Search next label or end
+        //
+        nextLabel = data.indexOf(PATTERN_LABEL, s);
+        if (nextLabel >= 0) {
+            data = replaceLabel(data, e, nextLabel, count);
+        } else {
+            endData = data.indexOf(VCARD_END);
+            data = replaceLabel(data, e, endData, count);
+        }
+
+        i.data.setData(data);
+        ++count;
+    }
+
+    //
+    // If count is still 1, no LABELs were found, therefore we add two
+    // ampty addresses
+    //
+    if (count < 3) {
+        endData = data.indexOf(VCARD_END);
+        String s1 = data.substring(0, endData);
+        String s2 = data.substring(endData);
+        i.data.data = s1
+                    + ((count == 1) ? (EMPTY_ADDR_HOME + "\r\n") : "")
+                    + EMPTY_ADDR_WORK + "\r\n"
+                    + s2
+                    ;
+    }
+
+    //
+    // Adds void tokens if they are missing in VCARD item
+    //
+    i.data.data = addVoidTokens(i.data.data, "END:VCARD", missingCardTokens);
+}
+
+/**
+ * Processes the incoming item.
+ * Removes the PRODID field.
+ *
+ * @param i the calendar item to be processed
+ */
+void preProcessCalendar(Item i) {
+    data = i.data.data;
+    i.data.data = data.replaceAll("PRODID:[^\r\n]+\r\n", "");
+}
+
+/**
+ * Process and manipulate the item.
+ *
+ * @param data the item content
+ * @param indStart the index of pattern start
+ * @param indEnd the index of pattern end
+ * @param count the count of pattern
+ *
+ * @return String the data with replaced pattern
+ */
+String replaceLabel(String data, int indStart, int indEnd, int count) {
+    StringBuffer start = new StringBuffer(data.substring(0,indStart));
+    int patternLength = PATTERN_LABEL.length();
+    int colon = data.indexOf(":",indStart + patternLength);
+    String params = data.substring(indStart + patternLength, colon) + ":";
+    String labelValue =
+        data.substring(indStart + patternLength + params.length() ,indEnd);
+    labelValue = labelValue.replaceAll("\r\n",";");
+    labelValue = labelValue.replaceAll("\n",";");
+    labelValue = labelValue.substring(0,labelValue.length() -1);
+
+    switch (count) {
+        //
+        // This phone does not send the post office box and the extended address
+        // so we add ;; (as default) before labelValue
+        //
+        case 1:
+            //
+            // If the pattern is found for the first time, then it is the
+            // home address
+            //
+            start.append(ADDR_HOME)
+                 .append(params)
+                 .append(";;")
+                 .append(labelValue)
+                 .append(";;;;\r\n");
+            break;
+        case 2:
+            //
+            // If the pattern is found for the second time, then it is the
+            // business address
+            //
+            start.append(ADDR_WORK)
+                 .append(params)
+                 .append(";;")
+                 .append(labelValue)
+                 .append(";;;;\r\n");
+            break;
+        case 3:
+            //
+            // If the pattern is found for the third time, then it is the
+            // other address
+            //
+            start.append("ADR")
+                 .append(params)
+                 .append(";;")
+                 .append(labelValue)
+                 .append(";;;;\r\n");
+            break;
+        default:
+            //
+            //Ignore pattern
+            //
+    }
+    return start.append(data.substring(indEnd,data.length())).toString();
+}
+
+/**
+ * Initializes hashmap of contact properties.
+ */
+void init() {
+    missingCardTokens = new HashMap();
+    
+    missingCardTokens.put("\nTEL;VOICE:"          , "TEL;VOICE:"          );
+    missingCardTokens.put("\nTEL;PREF;HOME;VOICE:", "TEL;PREF;HOME;VOICE:");
+    missingCardTokens.put("\nTEL;CELL;VOICE:"     , "TEL;CELL;VOICE:"     );
+    missingCardTokens.put("\nTEL;WORK;VOICE:"     , "TEL;WORK;VOICE:"     );
+    missingCardTokens.put("\nTEL;FAX;HOME:"       , "TEL;FAX;HOME:"       );
+}

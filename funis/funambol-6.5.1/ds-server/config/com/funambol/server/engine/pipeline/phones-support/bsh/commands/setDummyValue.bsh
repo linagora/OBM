@@ -1,0 +1,69 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.regex.Pattern;
+
+/**
+ * This synclet sets, into the data input, the dummy value for the specified
+ * token.
+ * For example, if the server should be return a \r\nEMAIL:\r\n, this synclet
+ * replaces it with \r\nEMAIL;INTERNET:-\r\n.
+ *
+ * There are some phones (like SonyEricsson K800i, Motorola KRZR K1, and so on)
+ * that are not able to understand the empty tokens (like TEL:) and so is not
+ * possible delete the value of the field on phone by server.
+ *
+ * @version $Id: setDummyValue.bsh,v 1.3 2007/07/25 13:29:09 luigiafassina Exp $
+ */
+// ------------------------------------------------------------------- Constants
+private final String DUMMY_VALUE = "-"   ;
+private final String EOL_LENIENT = "(\\r)?\\n";
+
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Replaces the 'oldToken' with the 'newToken' set its value as dash into data.
+ *
+ * @param data the data to modify
+ * @param oldToken the token to search
+ * @param newToken the token to use into replacement which value is '-'.
+ *
+ * @return the modified data
+ */
+String setDummyValue(String data, String oldToken, String newToken) {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Set dummy value for " + oldToken);
+    }
+    
+    //
+    // If the token is present and is empty then set its the value with the
+    // dummy value.
+    //
+	String regexp = EOL_LENIENT + oldToken + "(;ENCODING=[^;]*)?(;CHARSET=[^;]*)?:";
+	if (Pattern.compile(regexp + EOL_LENIENT).matcher(data).find()) {
+        data = replaceOutProperty(data, oldToken + ':', newToken + ':' + DUMMY_VALUE);
+    
+	} else if (!Pattern.compile(regexp).matcher(data).find()) {
+        //
+        // If the token does not exist, added it at the end of data with dummy
+        // value.
+        //
+        data = addProperty(data, newToken + ':' + DUMMY_VALUE);
+    }
+    return data;
+}

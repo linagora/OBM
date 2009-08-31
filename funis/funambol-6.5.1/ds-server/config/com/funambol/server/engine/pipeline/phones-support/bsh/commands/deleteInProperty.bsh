@@ -1,0 +1,40 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * Deletes every occurrence of a specified property from an input data.
+ * This method takes care of finding out the beginning and the end of the property 
+ * to delete from the input data.
+ *  
+ * Usage example:
+ *  the following statement deletes every TEL: property with its value
+ *
+ *  deleteInProperty(data, "TEL:");
+ *   
+ * @param data the data to modify
+ * @param property the property to delete
+ *
+ * @return the modified data
+ *
+ * @version $Id: deleteInProperty.bsh,v 1.2 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+String deleteInProperty(String data, String property) {
+
+    data = data.replaceAll("\n" + property + ".*\n", "\n"); 
+    return data;
+} 

@@ -1,0 +1,71 @@
+/*
+ * Copyright (C) 2006-2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+/**
+ * This synclet set the MaxMsgSize to 3200 because the Siemens S55 crashes if
+ * the server send more than 95 delete commands in a single message.
+ *
+ * @version $Id: SiemensS55Xin.bsh,v 1.4 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+
+// ------------------------------------------------------------------- Constants
+
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+       log.trace("SiemensS55Xin.preProcessMessage(...)");
+    }
+    
+    //
+    // The Siemens S55 crashes if the server send more than 95 delete commands
+    // in a single message. In order to avoid this behaviour setting the
+    // the MaxMsgSize to 3200
+    //
+    message.SyncHdr.meta.setMaxMsgSize(3200);
+
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

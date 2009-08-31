@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.5.0_08" class="java.beans.XMLDecoder"> 
+ <object class="com.funambol.foundation.synclet.BeanShellSynclet"> 
+  <void property="header"> 
+   <string>user-agent</string> 
+  </void> 
+  <void property="pattern"> 
+   <string>SonyEricssonZ52</string> 
+  </void> 
+  <void property="script"> 
+   <string>com/funambol/server/engine/pipeline/phones-support/bsh/SonyEricssonZ52Xout.bsh</string> 
+  </void> 
+ </object> 
+</java> 

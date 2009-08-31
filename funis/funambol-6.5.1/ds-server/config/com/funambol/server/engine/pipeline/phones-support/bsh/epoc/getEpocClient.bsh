@@ -1,0 +1,74 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+
+/**
+ * Checks if the device which is synchronizing corresponds 
+ * to the an Epoc Client and return the client type
+ *
+ * @version $Id: getEpocClient.bsh,v 1.1 2007/08/31 09:51:01 luigiafassina Exp $
+ */
+private String MOTOROLA = "Moto";
+private String SONY_ERICSSON = "SE";
+private String UNKNOWN = "Unknown";
+private String[] motorolaEpoc = {
+        // development name of Motorola A1000 Epoc client
+        "Symbian_1"      
+        //...Add here other Motorola clients compliant with this synclet 
+    };
+    
+private String[] sonyEricssonEpoc = {
+        // development name of sony Ericsson P900 Epoc client
+        "Sony Ericsson_P910i"      
+        //...Add here other Sony Ericsson clients compliant with related synclet 
+    };
+    
+
+/**
+ * Checks whether a given model is a Motorola Epoc Client.
+ *
+ * @param model as retrieved from the device capabilities
+ * @param
+ * @return true only if the model is a Motorola Epoc Client
+ */
+String getEpocClient(String manufacturer, String model) {
+    
+    //Model and Manufacturer are not already 
+    if (model==null||manufacturer==null) {
+        return UNKNOWN;
+    }
+    
+    String client = manufacturer + "_" + model;
+    
+    //Return true if the given Epoc client matches
+    for (String motoClient : motorolaEpoc) {
+        if (client.matches(motoClient)) {
+            return MOTOROLA;
+        }
+    }
+    
+    //Return true if the given Epoc client matches
+    for (String seClient : sonyEricssonEpoc) {
+        if (client.matches(seClient)) {
+            return SONY_ERICSSON;
+        }
+    }
+    
+    //... Otherwise return "Unknown"
+    return UNKNOWN;
+}

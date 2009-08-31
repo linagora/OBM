@@ -1,0 +1,298 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * Identifies each Status within the message and replaces the ALREADY_EXISTS
+ * (418) status code to OK (200).
+ *
+ * Contacts:
+ * =========
+ * Changes the format of the BDAY field as in the following example:
+ * from: BDAY:2007-02-19 
+ * to:   BDAY:20070219 
+ * Removes TEL;FAX;HOME:, TEL;WORK;PREF: and ADR;HOME: fields.
+ * Replaces field EMAIL;INTERNET: with EMAIL: token.
+ * 
+ * Calendars:    
+ * ==========
+ * . Event
+ *   Replaces each occurrence of the string "BEGIN:VEVENT" with
+ *   "VERSION:1.0\r\nBEGIN:VEVENT".
+ *   The Palm Treo recognizes an all day event only if it starts at 8 AM and
+ *   ends at 6 PM; so the synclet must check if the event is an all day; if so
+ *   it replaces the time values of DTSTART and DTEND with 080000 and 180000
+ *   respectively.
+ *
+ * @version $Id: SynthesisOut.bsh,v 1.7 2007/07/25 13:44:18 luigiafassina Exp $
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+// ------------------------------------------------------------------- Constants
+
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+
+/**
+ * Processes and manipulates the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Synthesis.postProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems);
+    
+    // Handles ALREADY_EXISTS (418) status code
+    processStatusAlreadyExists(message);  
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ *
+ */
+void processPIMItems(Map mapItems) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessContacts(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        postProcessEvents(i);
+    }
+}
+
+/**
+ * Processes outgoing contacts.
+ *
+ * Changes the format of the BDAY field.
+ * Removes TEL;FAX;HOME:, TEL;WORK;PREF: and ADR;HOME: fields.
+ * Replaces field EMAIL;INTERNET: with EMAIL: token.
+ *
+ * @param i the Item to be processed
+ *
+ */
+void postProcessContacts(Item i) {
+    data = i.data.data;
+
+    data = checkBirthday(data);
+    data = checkField(data);
+    data = changeEmailField(data);
+
+    i.data.setData(data);
+}
+
+/**
+ * Processes outgoing events.
+ *
+ * Replaces BEGIN:VEVENT with VERSION:1.0\r\nBEGIN:VEVENT token.
+ * Replaces T000000 with T080000 in the start date and replaces T235900 with
+ * T180000 in the end date of an all day event.
+ *
+ * @param i the Item to be processed
+ *
+ */
+void postProcessEvents(Item i) {
+    data = i.data.data;
+    data = data.replaceAll("BEGIN:VEVENT", "VERSION:1.0\r\nBEGIN:VEVENT");
+    data = fixAllDay(data);
+
+    i.data.data = data;
+}
+
+/**
+ * Changes the format of the outcoming birthday field as in the following example:
+ * from: BDAY:2007-02-19 
+ * to:   BDAY:20070219 
+ *
+ * @param data the contact item
+ *
+ * @return the changed data
+ */
+String checkBirthday(String data){
+    int indexBithday = data.indexOf("\r\nBDAY:");
+    if(indexBithday != -1){
+        if(data.charAt(indexBithday + 11) == '-'){
+            data = data.substring(0, indexBithday + 11) +
+               data.substring(indexBithday + 12, indexBithday + 14) +
+               data.substring(indexBithday + 15);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * Removes in the contact the information of the field TEL;FAX;HOME,
+ * TEL;WORK;PREF: and ADR;HOME: because they are not correctly handled by
+ * the device
+ *
+ * @param data the contact item
+ *
+ * @return the changed data
+ */
+String checkField(String data){
+
+    int beginField, endField;
+
+    // removes TEL;FAX;HOME: field
+    beginField = data.indexOf("\r\nTEL;FAX;HOME:");
+
+    if(beginField != -1){
+        endField = data.substring(beginField +1).indexOf("\r\n");
+        data = data.substring(0, beginField) +
+               data.substring(beginField + endField + 2);
+    }
+
+    // removes TEL;WORK;PREF: field
+    beginField = data.indexOf("\r\nTEL;WORK;PREF:");
+
+    if(beginField != -1){
+        endField = data.substring(beginField +1).indexOf("\r\n");
+        data = data.substring(0, beginField) +
+               data.substring(beginField + endField + 2);
+    }
+
+    // removes ADR;HOME: field
+    beginField = data.indexOf("\r\nADR;HOME:");
+
+    if(beginField != -1){
+        endField = data.substring(beginField +1).indexOf("\r\n");
+        data = data.substring(0, beginField) +
+               data.substring(beginField + endField + 2);
+    }
+
+    return data;
+}
+
+/**
+ * Replaces field EMAIL;INTERNET: with EMAIL: token.
+ *
+ * @param data the contact item
+ *
+ * @return the changed data
+ */
+String changeEmailField(String data){
+    int begin;
+
+    begin = data.indexOf("\r\nEMAIL;INTERNET:");
+
+    if(begin != -1){
+        data = data.replaceAll("\r\nEMAIL;INTERNET:", "\r\nEMAIL:");
+    }
+
+    return data;
+}
+
+/**
+ * Replaces T000000 with T080000 in the start date and replaces T235900 with
+ * T180000 in the end date of an all day event.
+ * The Palm Treo recognizes all day only if the event starts at 8 AM and ends
+ * at 6 PM.
+ *
+ * @param data the event item
+ *
+ * @return the changed data
+ */
+String fixAllDay(String data) {
+
+  s = e = 0;
+  if ((s = data.indexOf("DTSTART")) != -1 &&
+      (e = data.indexOf("DTEND")  ) != -1   ) {
+
+      dtStart = data.substring(s, data.indexOf("\r\n", s));
+      dtEnd   = data.substring(e, data.indexOf("\r\n", e));
+
+      if (dtStart.endsWith("T000000") &&
+          dtEnd.endsWith("T235900")     ) {
+
+          dtStart = dtStart.replaceAll("T000000", "T080000");
+          dtEnd   = dtEnd.replaceAll("T235900", "T180000");
+
+          StringBuffer sb = new StringBuffer(data.substring(0, s));
+          sb.append(dtStart).append(data.substring(s + dtStart.length()));
+
+          sb = new StringBuffer(data.substring(0, e));
+          sb.append(dtEnd).append(data.substring(e + dtEnd.length()));
+
+          data = sb.toString();
+      }
+  }
+  return data;
+}
+
+/**
+ * Identifies each Status within the message and replaces the ALREADY_EXISTS 
+ * (418) status code to OK (200).
+ *  
+ * @param message the message to be processed
+ */
+void processStatusAlreadyExists(SyncML message){
+
+    cmds = message.syncBody.commands;
+    
+    for (bodyc : (List)cmds) {
+        if (bodyc instanceof Status){
+            
+            data = ((Status)bodyc).data;
+            statusCode = data.data;
+            if (Integer.toString(StatusCode.ALREADY_EXISTS).equals(statusCode)){            
+                data.setData(Integer.toString(StatusCode.OK));
+            }
+        }
+    }            
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

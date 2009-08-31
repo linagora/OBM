@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.5.0_08" class="java.beans.XMLDecoder"> 
+ <object class="org.apache.log4j.RollingFileAppender"> 
+  <void property="file"> 
+   <string>/var/log/obm-tomcat/funambol_ds.log</string> 
+  </void> 
+  <void property="append">
+   <boolean>true</boolean>
+  </void>
+  <void property="layout"> 
+   <object class="org.apache.log4j.PatternLayout"> 
+    <void property="conversionPattern"> 
+     <string>[%d{yyyy-MM-dd HH:mm:ss,SSS}] [%c] [%p] [%X{sessionId}] [%X{deviceId}] [%X{userName}] [%X{sourceURI}] %m%n</string> 
+    </void> 
+   </object> 
+  </void> 
+  <void property="maxBackupIndex"> 
+   <int>5</int> 
+  </void> 
+  <void property="maximumFileSize"> 
+   <long>104857600</long> 
+  </void> 
+  <void property="name"> 
+   <string>funambol.logfile</string> 
+  </void> 
+ </object> 
+</java> 

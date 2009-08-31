@@ -1,0 +1,355 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.server.Capabilities;
+import com.funambol.framework.server.Sync4jDevice;
+import com.funambol.framework.server.inventory.*;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Processes the incoming VCARD items and adds the missing tokens.
+ * Handles large objects.
+ * May remap one of the EMAIL;INTERNET;HOME fields to EMAIL;INTERNET.
+ * Differentiates pairs of similar TEL properties.
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Processes the incoming vevent items and adds the missing tokens.
+ *   Handles large objects.
+ *   Drops 'Z' from start date and end date.
+ *   Replaces T240000 with T235900 in the end date of an all-day event.
+ *
+ * @version $Id: SonyEricssonEPOCXin.bsh,v 1.1 2007/08/31 09:51:01 luigiafassina Exp $
+ */
+ 
+// ------------------------------------------------------------------- Constants
+private final String DTSTART = "DTSTART:";
+private final String DTEND   = "DTEND:"  ;
+private String CLIENT_MANUFACTURER = "Epoc Manufacturer";
+private String CLIENT_MODEL = "Epoc Model"  ;
+
+// ---------------------------------------------------------------- Private data
+//Addresses the correct EPOC Client that is in use
+private String clientMan = null;
+private String clientMod = null;
+
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+private Map missingCardTokens  = null;
+private Map missingEventTokens = null;
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/epoc");
+
+/**
+ * Process input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+    if (log.isTraceEnabled()) {
+        log.trace("SonyEricssonEPOCXin.preProcessMessage(...)");
+    }
+    
+    clientMan = (String) processingContext.getSessionProperty(CLIENT_MANUFACTURER);
+    clientMod = (String) processingContext.getSessionProperty(CLIENT_MODEL);
+    
+    if (clientMan==null||clientMod==null) {
+        if (setEpocProperties(processingContext, message)==-1) {
+            return;
+        }
+        return;
+    } 
+    
+    if (log.isTraceEnabled()) {
+        log.trace("Manufacturer: " + clientMan);
+        log.trace("Model: " + clientMod);
+    }
+    
+    //Returns to the system if the device is not a Sony Ericsson
+    if (!getEpocClient(clientMan, clientMod).equals("SE")) {
+        log.trace("Client model:" + getEpocClient(clientMan, clientMod));
+        if (log.isTraceEnabled()) {
+            log.trace("Sony Ericsson EPOC Client not found: exit synclet (...)");
+        }
+        return;
+    } else {
+        if (log.isTraceEnabled()) {
+            log.trace("Sony Ericsson EPOC Client found: processing (...)");
+        }
+    }
+    
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+    processPIMItems(mapItems, pimItemsHandler);
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ *
+ */
+void processPIMItems(Map mapItems, PIMItemsHandler pimItemsHandler) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        preProcessContact(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessEvent(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Adds missing fields.
+ * Converts EMAIL;INTERNET;HOME to EMAIL;INTERNET if it's not in the 2nd slot
+ * (reserved for the "true" EMAIL;INTERNET;HOME).
+ * Differentiates pairs of similar TEL properties into different kinds of phone
+ * numbers on the basis of the slot used.
+ *
+ * @param i the item content
+ */
+void preProcessContact(Item i) {
+
+    data = i.data.data;
+    
+    //Some EPOC client sends the field for video email address: 
+    //This is not supported by ds-server. The field is removed 
+    //by the following command:
+    data = data.replaceAll("\n" + "EMAIL;VIDEO:" + ".*\n", "\n");
+    
+    Matcher emailFinder = 
+            Pattern.compile("\\nEMAIL;INTERNET;HOME[^:]*;X-SYNCMLREF[13]:").matcher(data);
+    if (emailFinder.find()) {
+        StringBuffer sb = new StringBuffer();
+        String emailOther =
+                emailFinder.group().replaceAll("\\nEMAIL;INTERNET;HOME", "\nEMAIL;INTERNET");
+        emailFinder.appendReplacement(sb, emailOther);
+        emailFinder.appendTail(sb);
+        data = sb.toString();
+        
+    } else { // it means that there's no "other" email address saved in the device
+        data = addProperty(data, "EMAIL;INTERNET:");
+    }
+
+    data = replaceInProperty   (data, "TEL;WORK;VOICE;X-SYNCMLREF[1|3]:", "TEL;VOICE;WORK:");
+    data = replaceInProperty   (data, "TEL;WORK;VOICE;X-SYNCMLREF2:",     "TEL;WORK;PREF:" );
+        
+    data = replaceInProperty   (data, "TEL;HOME;VOICE;X-SYNCMLREF[1|2]:", "TEL;VOICE;HOME:");
+
+    data = replaceInProperty   (data, "TEL;VOICE;X-SYNCMLREF1:",          "TEL;VOICE:"     );
+    data = replaceInProperty   (data, "TEL;VOICE;X-SYNCMLREF2:",          "TEL;PREF;VOICE:");
+    
+    //
+    // Adds void tokens if they are missing in VCARD item
+    //
+    data = addVoidTokens(data, "END:VCARD", missingCardTokens);
+    
+    i.data.data = data;
+    
+
+}
+
+/**
+ * Initializes hashmap of contact and event properties.
+ */
+void init() {
+    missingCardTokens  = new HashMap();
+    missingEventTokens = new HashMap();
+    
+    missingCardTokens.put("\r\nN"                   , "N:;;;;"              );
+    missingCardTokens.put("\r\nADR;HOME"            , "ADR;HOME:;;;;;;"     );
+    missingCardTokens.put("\r\nADR;WORK"            , "ADR;WORK:;;;;;;"     );
+    missingCardTokens.put("\r\nTITLE"               , "TITLE:"              );
+    missingCardTokens.put("\r\nTEL;VOICE;WORK:"     , "TEL;VOICE;WORK:"     );
+    missingCardTokens.put("\r\nTEL;VOICE;HOME"      , "TEL;VOICE;HOME:"     );
+    missingCardTokens.put("\r\nTEL;CELL"            , "TEL;VOICE;CELL:"     );
+    missingCardTokens.put("\r\nEMAIL;INTERNET;WORK" , "EMAIL;INTERNET;WORK:");
+    missingCardTokens.put("\r\nEMAIL;INTERNET;HOME" , "EMAIL;INTERNET;HOME:");
+    missingCardTokens.put("\r\nTEL;WORK;FAX"        , "TEL;WORK;FAX:"       );
+    missingCardTokens.put("\r\nTEL;PAGER;WORK"      , "TEL;PAGER;WORK:"     );
+    missingCardTokens.put("\r\nTEL;HOME;FAX"        , "TEL;HOME;FAX:"       );
+    missingCardTokens.put("\r\nTEL;PREF;VOICE:"     , "TEL;PREF;VOICE:"     );
+    missingCardTokens.put("\r\nTEL;VOICE:"          , "TEL;VOICE:"          );
+    missingCardTokens.put("\r\nTEL;WORK;PREF"       , "TEL;WORK;PREF:"      );
+    missingCardTokens.put("\r\nURL;WORK"            , "URL:"                );
+    missingCardTokens.put("\r\nORG"                 , "ORG:"                );
+    missingCardTokens.put("\r\nNOTE"                , "NOTE:"               );
+
+    missingEventTokens.put("\r\nCLASS"       , "CLASS:"      );
+    missingEventTokens.put("\r\nDESCRIPTION" , "DESCRIPTION:");
+    missingEventTokens.put("\r\nLOCATION"    , "LOCATION:"   );
+    missingEventTokens.put("\r\nPRIORITY"    , "PRIORITY:"   );
+    missingEventTokens.put("\r\nSUMMARY"     , "SUMMARY:"    );
+    missingEventTokens.put("\r\nDTEND"       , "DTEND:"      );
+    missingEventTokens.put("\r\nDTSTART"     , "DTSTART:"    );
+    missingEventTokens.put("\r\nORGANIZER"   , "ORGANIZER:"  );
+    missingEventTokens.put("\r\nRRULE"       , "RRULE:"      );
+    missingEventTokens.put("\r\nSEQUENCE"    , "SEQUENCE:"   );
+    missingEventTokens.put("\r\nAALARM"      , "AALARM:;;;"  );
+}
+
+/**
+ * Replaces a pattern string.
+ *
+ * @param str the string to be modified
+ * @param pattern the pattern to be searche
+ * @param replace the replace substring
+ */
+String replace(String str, String pattern, String replace) {
+    int s = 0;
+    int e = 0;
+    StringBuffer result = new StringBuffer();
+
+    while ((e = str.indexOf(pattern, s)) >= 0) {
+        result.append(str.substring(s, e));
+        result.append(replace);
+        s = e+pattern.length();
+    }
+    result.append(str.substring(s));
+    return result.toString();
+}
+
+/**
+ * Drops 'Z' from start date and end date.
+ * If the event is an allday event, the phone sends the DTEND in the format
+ * "T240000": the parser is not able to interpret it and so it will be replaced
+ * with "T235900".
+ *
+ * Adds missing fields.
+ *
+ * @param i the icalendar item
+ */
+void preProcessEvent(Item i) {
+
+    data = i.data.data;
+
+    //
+    // Drop 'Z' from start date and end date
+    //
+    data = dropZ(data, DTSTART);
+    data = dropZ(data, DTEND  );
+    data = fixAllDay(data);
+
+    i.data.data = data;
+    
+    //
+    // Adds void tokens if they are missing in VEVENT item
+    //
+    content = addVoidTokens(i.data.data, "END:VEVENT", missingEventTokens);
+
+    i.data.data = content + "END:VCALENDAR\r\n";
+
+}
+
+/**
+ * Drops 'Z' in the date.
+ *
+ * @param event the event content
+ * @param date the token date to search
+ *
+ * @return the replaced event content
+ */
+String dropZ(String event, String date) {
+
+  ind = 0;
+  if ((ind = event.indexOf(date)) != -1) {
+      endline = event.indexOf("\r\n", ind);
+      value = event.substring(ind, endline);
+
+      indz = 0;
+      if ((indz = value.indexOf("Z")) != -1) {
+          value = event.substring(ind, endline - 1);
+      }
+
+      StringBuffer sb = new StringBuffer(event.substring(0, ind));
+      sb.append(value).append(event.substring(endline));
+
+      event = sb.toString();
+  }
+
+  return event;
+}
+
+/**
+ * Replaces T240000 with T235900 in the end date of an all day event.
+ *
+ * @param event the event content
+ *
+ * @return event with fixed all day
+ */
+String fixAllDay(String event) {
+
+  s = e = 0;
+  if ((s = event.indexOf(DTSTART)) != -1 &&
+      (e = event.indexOf(DTEND)  ) != -1   ) {
+
+      dtStart = event.substring(s, event.indexOf("\r\n", s));
+      dtEnd   = event.substring(e, event.indexOf("\r\n", e));
+
+      if (dtStart.indexOf("T000000") != -1 &&
+          dtEnd.indexOf("T240000")   != -1   ) {
+
+          dtEnd = dtEnd.replaceAll("T240000", "T235900");
+
+          StringBuffer sb = new StringBuffer(event.substring(0, e));
+          sb.append(dtEnd).append(event.substring(e + dtEnd.length()));
+
+          event = sb.toString();
+      }
+  }
+  return event;
+}
+

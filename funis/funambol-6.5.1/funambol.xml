@@ -1,0 +1,16 @@
+<!--
+    Context configuration file for the Tomcat Funambol DS Web App
+-->
+<Context path="/funambol" docBase="/usr/lib/funambol-6.5.1/funambol" debug="0" 
+	 privileged="true" verbosity="4" unpackWAR="false" 
+	 antiJARLocking="true"
+	 antiResourceLocking="true">
+  
+  <Resource name="jdbc/fnblds" auth="Container" 
+	    type="javax.sql.DataSource" 
+	    username="funambol" password="funambol"
+	    driverClassName="com.mysql.jdbc.Driver"   
+	    url="jdbc:mysql://localhost/funambol?relaxAutocommit=true&amp;zeroDateTimeBehavior=convertToNull"	
+	    />
+
+</Context>

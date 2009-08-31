@@ -1,0 +1,135 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts
+ * ========
+ * Replaces field TEL;VOICE;WORK: with TEL;WORK: token.
+ * Replaces field TEL;VOICE;HOME:", "TEL;HOME:
+ * Removes field TEL;VOICE:\r\n
+ * Removes field ADR;HOME:;;;;;;
+ * Removes field TITLE:\r\n
+ * Removes field TEL;FAX:\r\n
+ * Removes field TEL:\r\n
+ * Removes field TEL;WORK;PREF:\r\n
+ * Removes field FN:\r\n
+ *
+ * @version $Id: SiemensSK65Xout.bsh,v 1.2 2007/08/31 10:03:24 luigiafassina Exp $
+ */
+ 
+// ------------------------------------------------------------------- Constants
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("SiemesSK65Xout.postProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems);
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param device the Sync4jDevice
+ *
+ */
+void processPIMItems(Map mapItems) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessContacts(i);
+    }
+}
+
+
+/**
+ * Processes outgoing contacts.
+ *
+ * Replaces field TEL;VOICE;WORK: with TEL;WORK: token.
+ * Replaces field TEL;VOICE;HOME:", "TEL;HOME:
+ * Removes field TEL;VOICE:\r\n
+ * Removes field ADR;HOME:;;;;;;
+ * Removes field TITLE:\r\n
+ * Removes field TEL:\r\n
+ * Removes field TEL;WORK;PREF:\r\n
+ * Removes field FN:\r\n
+ *
+ * @param i the Item to be processed
+ *
+ */
+void postProcessContacts(Item i) {
+    if (log.isTraceEnabled()) {
+        log.trace("SiemensSK65Xout.postProcessContacts(...)");
+    }
+
+    s = i.data.data;
+    s = s.replaceAll("TEL;VOICE;HOME:", "TEL;HOME:");
+    s = s.replaceAll("TEL;VOICE;WORK:", "TEL;WORK:");
+    s = s.replaceAll("ADR;HOME:;;;;;;\r\n", "");
+    s = s.replaceAll("TITLE:[^\r\n]*\r\n", "");
+    s = s.replaceAll("TEL:[^\r\n]*\r\n", "");
+    s = s.replaceAll("TEL;FAX:[^\r\n]*\r\n", "");
+    s = s.replaceAll("TEL;WORK;PREF:[^\r\n]*\r\n", "");
+    //
+    // Note that FN makes the contact be refused on the S56
+    //
+    s = s.replaceAll("FN:[^\r\n]*\r\n", "");
+
+    i.data.data = s;
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

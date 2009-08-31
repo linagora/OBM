@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.6.0_01" class="java.beans.XMLDecoder"> 
+ <object class="com.funambol.server.update.UpdateDiscovery"> 
+  <void property="checkIntervalInHours"> 
+   <double>24.0</double> 
+  </void> 
+  <void property="lastCheckTimestamp"> 
+   <long>1190195779003</long> 
+  </void> 
+  <void property="updateCenter"> 
+   <string>http://www.funambol.com/opensource/download/updates</string> 
+  </void> 
+ </object> 
+</java> 

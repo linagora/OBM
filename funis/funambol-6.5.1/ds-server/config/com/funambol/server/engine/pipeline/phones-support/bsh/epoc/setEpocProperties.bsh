@@ -1,0 +1,61 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * This command retrieves and returns the Sync4jDevice corresponding to the
+ * device which is synchronizing. It returns null if the device could not be
+ * found.
+ *
+ * @version $Id: setEpocProperties.bsh,v 1.1 2007/08/31 09:51:01 luigiafassina Exp $
+ */
+import com.funambol.framework.core.*;
+import com.funambol.framework.server.Capabilities;
+import com.funambol.framework.server.inventory.*;
+import com.funambol.server.config.*;
+
+// ------------------------------------------------------------------- Constants
+//Properties' name
+private String MANUFACTURER = "Epoc Manufacturer";
+private String MODEL = "Epoc Model"  ;
+//Error codes
+private static final int ERROR_CODE = -1;
+private static final int PROPERTIES_SET = 0;
+
+int setEpocProperties(MessageProcessingContext processingContext, 
+                      SyncML                   message          ) {
+
+    // Retrieves the device model from the DB
+    Capabilities capabilities = deviceCapabilitiesLookup(
+            message.syncHdr.source.locURI);
+
+    //First message doesn't need any processing action 
+    if (capabilities.getDevInf()==null) {
+        return ERROR_CODE;
+    }
+
+    try {
+        //Set session properties for Motorola EPOC client
+        //1) Manufacturer
+        processingContext.setSessionProperty(MANUFACTURER, capabilities.getDevInf().getMan());
+        //2) Model
+        processingContext.setSessionProperty(MODEL, capabilities.getDevInf().getMod());
+    } catch (Throwable t) {
+        return ERROR_CODE;
+    }
+    return PROPERTIES_SET;
+}

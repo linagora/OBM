@@ -1,0 +1,150 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.io.File;
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.server.Capabilities;
+import com.funambol.framework.server.Sync4jDevice;
+import com.funambol.framework.server.inventory.*;
+import com.funambol.framework.tools.SyncMLUtil;
+import com.funambol.framework.tools.IOTools;
+
+import com.funambol.server.config.*;
+
+/**
+ * This bsh save the capabilities of the device into a deviceID.xml file
+ * (for example IMEI12345678.xml) in capabilities dir under Funambol home.
+ *
+ * @version $Id: saveDevInf.bsh,v 1.1 2007/07/25 13:21:15 luigiafassina Exp $
+ */
+
+// ------------------------------------------------------------------- Constants
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+private String capabilitiesPath =
+    Configuration.getConfiguration().getSync4jHome() + "/capabilities";
+
+// ------------------------------------------------------ Synclet implementation
+
+/**
+ * Process input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("saveDevInf.preProcessMessage(...)");
+    }
+
+    saveDevInf(message);
+}
+
+void saveDevInf(SyncML message) {
+
+    deviceId = message.syncHdr.source.locURI;
+    
+    if (log.isTraceEnabled()) {
+        log.trace("Save DevInf of " + deviceId);
+    }
+    
+    boolean foundCapsCmd = false;
+    
+    //
+    // Checks if the client sends the capabilities into Put or Results command
+    //
+    List cmds = (ArrayList)message.getSyncBody().getCommands();
+    AbstractCommand bodycmd = null;
+    DevInfData devInfData = null;
+    for (int i=0; cmds != null && i<cmds.size(); i++) {
+        bodycmd = (AbstractCommand)cmds.get(i);
+        
+        if (bodycmd instanceof Put || bodycmd instanceof Results) {
+            foundCapsCmd = true;
+            List items = (ArrayList)bodycmd.items;
+            devInfData = ((DevInfItem)items.get(0)).devInfData;
+            break;
+        }
+    }
+    
+    if (!foundCapsCmd) {
+        return;
+    }
+    
+    File capsPath = null;
+    try {
+        capsPath = new File(capabilitiesPath);
+        
+        //
+        // Creates the directory capabilities if it doesn't exist
+        //
+        if (!capsPath.isDirectory()) {
+            capsPath.mkdirs();
+        }
+    } catch(IOException e) {
+        log.error("Error during creation of capabilities directory", e);
+    }
+
+    File deviceIdFile =
+        new File(capsPath + "/" + deviceId.replaceAll(":","") + ".xml");
+        
+    if (deviceIdFile.exists()) {
+        log.trace("The file with the capabilities for " +
+                  deviceId +
+                  " already exists.");
+        return;
+    } else {
+        //
+        // If the file with capabilities doesn't exist and the client sends its
+        // capabilities into SyncML message, than stores this DevInf into file.
+        //
+        if (foundCapsCmd) {
+            IOTools.writeFile(SyncMLUtil.toXML(devInfData.devInf), deviceIdFile);
+        } else {
+            //
+            // If the file doesn't exist and the client doesn't send its
+            // capabilities, than it is not possible for this command to force
+            // the request of this information: to force it the id_caps into
+            // database should be set to null, but this is not allowed.
+            //
+        }
+    }
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

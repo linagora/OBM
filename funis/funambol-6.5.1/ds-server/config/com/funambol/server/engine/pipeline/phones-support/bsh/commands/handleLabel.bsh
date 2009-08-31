@@ -1,0 +1,220 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+/**
+ * This synclet handles the LABEL token.
+ *
+ * Replaces the LABEL tokens with the corrispondent ADR tokens.
+ * If the pattern is found for the first time, then it is the home address and
+ * so the LABEL will be replaced with ADR;HOME.
+ * If the pattern is found for the second time, then it is the business address
+ * and so the LABEL will be replaced with ADR;WORK.
+ * If the pattern is found for the third time, then it is the other address and
+ * so the LABEL will be replaced with ADR.
+ * All the other LABEL will be ignored.
+ * To handle the labels, the value of this token will be write in the place of
+ * the street value and all separator will be replaced with ;.
+ * In this way, the server side is able to understand the address.
+ * Adds the empty addresses if there is no LABEL.
+ *
+ * @version $Id: handleLabel.bsh,v 1.2 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+// ------------------------------------------------------------------- Constants
+private final String PATTERN_LABEL     = "\nLABEL"          ;
+private final String PATTERN_ADR_HOME  = "\nADR;HOME"       ;
+private final String PATTERN_ADR_WORK  = "\nADR;WORK"       ;
+private final String PATTERN_ADR       = "\nADR"            ;
+private final String PATTERN_END_VCARD = "\nEND:VCARD"      ;
+private final String EMPTY_ADR_HOME    = "\nADR;HOME:;;;;;;";
+private final String EMPTY_ADR_WORK    = "\nADR;WORK:;;;;;;";
+private final String EMPTY_ADR         = "\nADR:;;;;;;"     ;
+
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Handles LABEL tokens.
+ *
+ * @param data the data item
+ *
+ * @return the data with address fields.
+ */
+String handleLabel(String data) {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Start the handling of LABEL token...");
+    }
+    
+    int start, end = 0;
+    String line = null;
+    int count = 0;
+    while ((start = data.indexOf(PATTERN_LABEL, end)) != -1) {
+        end = data.indexOf("\r", start + 1);
+
+        String line = data.substring(start, end);
+        if (line.contains("ENCODING=QUOTED-PRINTABLE")) {
+            for (; data.charAt(end - 1) == '='; end = data.indexOf("\r", end + 1));
+            line = data.substring(start, end);
+        } else {
+            for (; data.charAt(end + 1) == ' '; end = data.indexOf("\r", end + 1));
+            line = data.substring(start, end);
+        }
+        
+        ++count;
+        line = replaceLabel(start, end, line, count);
+
+        data = data.substring(0, start)
+             + line
+             + data.substring(end, data.length())
+             ;
+    }
+
+    if (count < 3) {
+        StringBuffer dataItem = new StringBuffer();
+        
+        //
+        // Adds the empty addresses if there is no LABEL
+        //
+        end = data.indexOf(PATTERN_END_VCARD);
+        String s1 = data.substring(0, end);
+        String s2 = data.substring(end);
+
+        switch (count) {
+            //
+            // The post office box and the extended address are not considered as
+            // default because the phones with LABEL don't send these information.
+            //
+            case 0:
+                dataItem.append(s1)
+                        .append(EMPTY_ADR_HOME)
+                        .append("\r").append(EMPTY_ADR_WORK)
+                        .append("\r").append(EMPTY_ADR)
+                        .append("\r").append(s2);
+                break;
+            case 1:
+                dataItem.append(s1)
+                        .append(EMPTY_ADR_WORK)
+                        .append("\r").append(EMPTY_ADR)
+                        .append("\r").append(s2);
+                break;
+            case 2:
+                dataItem.append(s1)
+                        .append(EMPTY_ADR)
+                        .append("\r").append(s2);
+                break;
+            default:
+             // do nothing
+        }
+        data = dataItem.toString();
+    }
+
+    return data;
+}
+
+/**
+ * Replaces the LABEL tokens with the corrispondent ADR tokens.
+ * If the pattern is found for the first time, then it is the home address and
+ * so the LABEL will be replaced with ADR;HOME.
+ * If the pattern is found for the second time, then it is the business address
+ * and so the LABEL will be replaced with ADR;WORK.
+ * If the pattern is found for the third time, then it is the other address and
+ * so the LABEL will be replaced with ADR.
+ * All the other LABEL will be ignored.
+ * To handle the labels, the value of this token will be write in the place of
+ * the street value and all separator will be replaced with ;.
+ * In this way, the server side is able to understand the address.
+ *
+ * For example:
+ *     LABEL;ENCODING=QUOTED-PRINTABLE:123 Street=0ACity=0A94063=0ACA=0AUsa
+ * will become
+ *     ADR;HOME;ENCODING=QUOTED-PRINTABLE:;;123 Street;City;94063;CA;Usa;;;;
+ *
+ * @param startValue the index at which the label's value starts
+ * @param endValue the index at which the label's value ends
+ * @param line the linel with the LABEL token
+ * @param count the number of LABEL token found
+ *
+ * @return the line with ADR tokens
+ */
+private String replaceLabel(int startValue, int endValue, String line, int count) {
+
+    StringBuffer data = new StringBuffer();
+    String params = line.substring(6, line.indexOf(":"));
+
+    if (params.contains("ENCODING=QUOTED-PRINTABLE")) {
+        line = line.replaceAll("=0D[=\r\n]?=0A",";");
+        line = line.replaceAll("=0A",";");
+    } else {
+        line = line.replaceAll("\r\n",";");
+        line = line.replaceAll("\n",";");
+    }
+
+    switch (count) {
+        //
+        // The post office box and the extended address are not considered as
+        // default because the phones with LABEL don't send these information.
+        //
+        case 1:
+            //
+            // If the pattern is found for the first time, then it is the
+            // home address
+            //
+            data.append(PATTERN_ADR_HOME)
+                .append(params)
+                .append(":;;")
+                .append(line.substring(line.indexOf(":", 0) +1))
+                .append(";;;;");
+            break;
+        case 2:
+            //
+            // If the pattern is found for the second time, then it is the
+            // business address
+            //
+            data.append(PATTERN_ADR_WORK)
+                .append(params)
+                .append(":;;")
+                .append(line.substring(line.indexOf(":", 0) +1))
+                .append(";;;;");
+            break;
+        case 3:
+            //
+            // If the pattern is found for the third time, then it is the
+            // other address
+            //
+            data.append(PATTERN_ADR)
+                .append(params)
+                .append(":;;")
+                .append(line.substring(line.indexOf(":", 0) + 1))
+                .append(";;;;");
+            break;
+        default:
+            //
+            //Ignore pattern
+            //
+    }
+    return data.toString();
+}

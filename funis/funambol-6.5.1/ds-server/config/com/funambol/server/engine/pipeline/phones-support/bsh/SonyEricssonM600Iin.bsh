@@ -1,0 +1,284 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Processes the incoming vCard items and adds the missing tokens.
+ * Sets the Type text/x-vcard in the meta for each contact item, if it
+ * does not exists. 
+ * Corrects the mapping.
+ * Removes the command size. 
+ *    
+ * Calendars:
+ * ==========
+ * .Event 
+ *  Sets the Type text/x-vcalendar in the meta for each calendar item, if it
+ *  does not exists. 
+ *  Removes the command size.
+ *
+ * .Todo   
+ *  Sets the Type text/x-vcalendar in the meta for each calendar item, if it
+ *  does not exists. 
+ *  Removes the command size.
+ *
+ * @version $Id: SonyEricssonM600Iin.bsh,v 1.4 2007/08/31 10:06:26 luigiafassina Exp $
+ */
+// ------------------------------------------------------------------- Constants
+private final String TIMEZERO      = "T000000";
+private final String TIMEENDALLDAY = "T235900";
+
+// ---------------------------------------------------------------- Private data
+private Map missingCardTokens  = null;
+private Map missingEventTokens  = null;
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Processes input message and set MessageProcessingContext property.
+ *
+ * @param mpc the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                             )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("SonyEricssonM600i.preProcessMessage(...)");
+    }
+
+    // The output synclet inflates the message size very often, so the limit
+    // must be reduced from 10000 to 8000 in order to avoid the postprocessed
+    // message to overflow 10000.
+    message.SyncHdr.meta.setMaxMsgSize(8000);
+
+    removeCommandSize(message);
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+    processPIMItems(mapItems, pimItemsHandler);
+    
+    throw new StopProcessingException("SonyEricssonM600Iin Synclet finished");
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ */
+void processPIMItems(Map             mapItems       ,
+                     PIMItemsHandler pimItemsHandler) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {    
+        preProcessVCard(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+    
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessVEvent(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vtodo list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VTODO)) {
+        preProcessVTodo(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Processes incoming contacts.
+ *
+ * Sets the Type text/x-vcard in the meta for each contact item, if it
+ * does not exists.
+ * Remaps some TEL fields.
+ * Adds missing fields.
+ *                                                                       
+ * @param i the item to be processed
+ *
+ */
+void preProcessVCard(Item i) {
+    setItemType(i, "text/x-vcard");
+   
+    data = i.data.data;
+
+    data = replaceInProperty(data, "TEL;WORK;VOICE;X-SYNCMLREF1:",      "TEL;VOICE:"     );
+    data = replaceInProperty(data, "TEL;WORK;VOICE;X-SYNCMLREF2:",      "TEL;WORK;PREF:" );
+    data = replaceInProperty(data, "TEL;WORK;VOICE;CELL;X-SYNCMLREF1:", "TEL;CELL:"      );
+    data = replaceInProperty(data, "TEL;WORK;VOICE;CELL;X-SYNCMLREF2:", "TEL;VOICE;WORK:");
+    data = replaceInProperty(data, "TEL;HOME;VOICE;CELL:",              "TEL;PREF;VOICE:");
+    
+    //
+    // Adds void tokens if they are missing in VCARD item
+    //
+    data = addVoidTokens(data, "END:VCARD", missingCardTokens);
+    
+    i.data.data = data;
+}
+
+/**
+ * Processes incoming evdents.
+ *
+ * Sets the Type text/x-vcalendar in the meta for each event item, if it
+ * does not exists.
+ * Sets the correct X-FUNAMBOL-ALLDAY flag and fixes the end date for events of
+ * type Anniversary.
+ *  
+ * @param i the vevent item to be processed
+ */
+void preProcessVEvent(Item i) {
+    setItemType(i, "text/x-vcalendar");
+    
+    data = i.data.data;
+    
+    if (data.indexOf("X-EPOCAGENDAENTRYTYPE:ANNIVERSARY") != -1) {
+        data = replaceInProperty(data, "X-EPOCAGENDAENTRYTYPE:ANNIVERSARY", "X-FUNAMBOL-ALLDAY:1");
+        data = moveEndDateTo235900(data);
+    } else {
+        data = replaceInProperty(data, "X-EPOCAGENDAENTRYTYPE:REMINDER",    "X-FUNAMBOL-ALLDAY:0");
+        data = replaceInProperty(data, "X-EPOCAGENDAENTRYTYPE:APPOINTMENT", "X-FUNAMBOL-ALLDAY:0");
+        data = replaceInProperty(data, "X-EPOCAGENDAENTRYTYPE:EVENT",       "X-FUNAMBOL-ALLDAY:1");
+    }
+    
+    //
+    // Adds void tokens if they are missing in VEVENT item
+    //
+    data = addVoidTokens(data, "END:VEVENT", missingEventTokens);
+    
+    i.data.data = data + "END:VCALENDAR\r\n";
+}
+
+/**
+ * Processes incoming vtodo.
+ *
+ * Sets the Type text/x-vcalendar in the meta for each todo item, if it
+ * does not exists.
+ *   
+ * @param i the vtodo item to be processed
+ */
+void preProcessVTodo(Item i) {
+    setItemType(i, "text/x-vcalendar");
+}
+
+/**
+ * Sets the given Type in the meta of the given item.
+ *  
+ * @param i item to be managed
+ * @param type string representing item type to add
+ */
+void setItemType(Item i, String type){
+    meta = i.getMeta();
+    
+    if (meta == null){
+        meta = new Meta();
+        i.setMeta(meta);
+    }
+
+    if (meta.getType() == null) {
+        meta.setType(type);
+    }
+}
+
+/**
+ * Changes the DTEND time to 23:59:00 local time if it's set to 00:00:00.
+ */
+String moveEndDateTo235900(data) {
+    
+    Pattern p = Pattern.compile("\\nDTEND:[0-9]{8}" + TIMEZERO + "(\\r)?\\n");
+    Matcher m = p.matcher(data);
+    StringBuffer sb = new StringBuffer();
+    if (m.find()) {
+        String almostMidnight = m.group().replaceFirst(TIMEZERO, TIMEENDALLDAY);
+        m.appendReplacement(sb, almostMidnight);
+    }
+    m.appendTail(sb);
+    
+    return sb.toString();
+}
+
+/**
+ * Initializations
+ */
+void init() {
+    missingCardTokens  = new HashMap();
+    missingEventTokens = new HashMap();
+
+    missingCardTokens.put("\nN",                                 "N:;;;;"              );
+    missingCardTokens.put("\nTITLE",                             "TITLE:"              );
+    missingCardTokens.put("\nORG",                               "ORG:;"               );
+    missingCardTokens.put("\nTEL;WORK;VOICE;CELL;X-SYNCMLREF1:", "TEL;CELL:"           );
+    missingCardTokens.put("\nTEL;WORK;VOICE;CELL;X-SYNCMLREF2:", "TEL;VOICE;WORK:"     );
+    missingCardTokens.put("TEL;WORK;VOICE;X-SYNCMLREF1:",        "TEL;VOICE:"          );
+    missingCardTokens.put("TEL;WORK;VOICE;X-SYNCMLREF2:",        "TEL;WORK;PREF:"      );
+    missingCardTokens.put("TEL;HOME;VOICE;CELL:",                "TEL;PREF;VOICE:"     );
+    missingCardTokens.put("\nTEL;HOME;VOICE:",                   "TEL;HOME:"           );
+    missingCardTokens.put("\nEMAIL;INTERNET;X-SYNCMLREF1:",      "EMAIL;INTERNET:"     );
+    missingCardTokens.put("\nEMAIL;INTERNET;HOME;X-SYNCMLREF2:", "EMAIL;INTERNET;HOME:");
+    missingCardTokens.put("\nEMAIL;INTERNET;WORK;X-SYNCMLREF3:", "EMAIL;INTERNET;WORK:");
+    missingCardTokens.put("\nURL;X-SYNCMLREF1",                  "URL:"                );
+    missingCardTokens.put("\nURL;HOME",                          "URL;HOME:"           );
+    missingCardTokens.put("\nURL;WORK;X-SYNCMLREF2",             "URL;WORK:"           );
+    missingCardTokens.put("\nADR;HOME",                          "ADR;HOME:;;;;;;"     );
+    missingCardTokens.put("\nADR;WORK",                          "ADR;WORK:;;;;;;"     );
+    missingCardTokens.put("\nNOTE",                              "NOTE:"               );
+    missingCardTokens.put("\nBDAY:",                             "BDAY:"               );
+    missingCardTokens.put("\nTEL;FAX:",                          "TEL;FAX:"            );
+    missingCardTokens.put("\nTEL;WORK;FAX:",                     "TEL;WORK;FAX:"       );
+    missingCardTokens.put("\nTEL;HOME;FAX:",                     "TEL;HOME;FAX:"       );
+    
+    missingEventTokens.put("\nSUMMARY",                          "SUMMARY:"    );
+    missingEventTokens.put("\nDESCRIPTION",                      "DESCRIPTION:");
+    missingEventTokens.put("\nLOCATION",                         "LOCATION:"   );
+    missingEventTokens.put("\nAALARM",                           "AALARM:"     );
+    missingEventTokens.put("\nRRULE:",                           "RRULE:"      );
+}

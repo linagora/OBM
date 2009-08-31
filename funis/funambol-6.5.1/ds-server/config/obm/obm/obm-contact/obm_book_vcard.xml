@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.6.0_01" class="java.beans.XMLDecoder"> 
+ <object class="fr.aliasource.funambol.engine.source.ContactSyncSource"> 
+  <void property="encode"> 
+   <boolean>false</boolean> 
+  </void> 
+  <void property="info"> 
+   <object class="com.funambol.framework.engine.source.SyncSourceInfo"> 
+    <void property="supportedTypes"> 
+     <array class="com.funambol.framework.engine.source.ContentType" length="2"> 
+      <void index="0"> 
+       <object class="com.funambol.framework.engine.source.ContentType"> 
+        <void property="type"> 
+         <string>text/x-vcard</string> 
+        </void> 
+        <void property="version"> 
+         <string>2.1</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void index="1"> 
+       <object class="com.funambol.framework.engine.source.ContentType"> 
+        <void property="type"> 
+         <string>text/vcard</string> 
+        </void> 
+        <void property="version"> 
+         <string>3.0</string> 
+        </void> 
+       </object> 
+      </void> 
+     </array> 
+    </void> 
+   </object> 
+  </void> 
+  <void property="name"> 
+   <string>obm_book_vcard</string> 
+  </void> 
+  <void property="obmAddress"> 
+   <string>http://localhost:8080/obm-sync/services/AddressBook</string> 
+  </void> 
+  <void property="sourceURI"> 
+   <string>obm_book_vcard</string> 
+  </void> 
+ </object> 
+</java> 

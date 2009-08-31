@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.1_01" class="java.beans.XMLDecoder">
+ <object class="com.funambol.server.store.ClientMappingPersistentStore">
+  <void property="jndiDataSourceName">
+   <string>jdbc/fnblds</string>
+  </void>
+  <void property="sql">
+   <array class="java.lang.String" length="4">
+    <!-- SQL_INSERT_CLIENT_MAPPING  -->
+    <void index="0">
+     <string>insert into fnbl_client_mapping (principal, sync_source, guid, luid, last_anchor) values(?, ?, ?, ?,?)</string>
+    </void>
+    <!-- SQL_UPDATE_CLIENT_MAPPING  -->
+    <void index="1">
+     <string>update fnbl_client_mapping set luid=?, last_anchor=? where principal=? and sync_source=? and guid=?</string>
+    </void>
+    <!-- SQL_SELECT_CLIENT_MAPPING  -->
+    <void index="2">
+     <string>select luid,guid,last_anchor from fnbl_client_mapping where principal=? and sync_source=? order by guid</string>
+    </void>
+    <!-- SQL_DELETE_CLIENT_MAPPING  -->
+    <void index="3">
+     <string>delete from fnbl_client_mapping where principal=? and sync_source=? and luid=?</string>
+    </void>
+   </array>
+  </void>
+ </object>
+</java>

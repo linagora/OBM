@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.5.0_08" class="java.beans.XMLDecoder"> 
+ <object class="com.funambol.foundation.synclet.BeanShellSynclet"> 
+  <void property="header"> 
+   <string>x-wap-profile</string> 
+  </void> 
+  <void property="pattern"> 
+   <string>http://motorola.handango.com</string> 
+  </void> 
+  <void property="script"> 
+   <string>com/funambol/server/engine/pipeline/phones-support/bsh/MotorolaXout.bsh</string> 
+  </void> 
+ </object> 
+</java> 

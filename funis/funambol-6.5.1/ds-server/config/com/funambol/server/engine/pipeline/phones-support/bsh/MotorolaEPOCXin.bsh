@@ -1,0 +1,246 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.ArrayList;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.server.Capabilities;
+import com.funambol.framework.server.Sync4jDevice;
+import com.funambol.framework.server.inventory.*;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Processes the incoming VCARD items and adds the missing tokens.
+ * Handles large objects.
+ * May remap one of the EMAIL;INTERNET;HOME fields to EMAIL;INTERNET.
+ * Differentiates pairs of similar TEL properties.
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Processes the incoming vevent items and adds the missing tokens.
+ *   Handles large objects.
+ *   Drops 'Z' from start date and end date.
+ *   Replaces T240000 with T235900 in the end date of an all-day event.
+ *
+ * @version $Id: MotorolaEPOCXin.bsh,v 1.1 2007/08/31 09:51:01 luigiafassina Exp $
+ */
+ 
+// ------------------------------------------------------------------- Constants
+private final String DTSTART = "DTSTART:";
+private final String DTEND   = "DTEND:"  ;
+private String CLIENT_MANUFACTURER = "Epoc Manufacturer";
+private String CLIENT_MODEL = "Epoc Model"  ;
+
+// ---------------------------------------------------------------- Private data
+//Addresses the correct EPOC Client that is in use
+private String clientMan = null;
+private String clientMod = null;
+
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/epoc");
+
+/**
+ * Process input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+    if (log.isTraceEnabled()) {
+        log.trace("MotorolaEPOCXin.preProcessMessage(...)");
+    }
+    
+    clientMan = (String) processingContext.getSessionProperty(CLIENT_MANUFACTURER);
+    clientMod = (String) processingContext.getSessionProperty(CLIENT_MODEL);
+    
+    if (clientMan==null||clientMod==null) {
+        if (setEpocProperties(processingContext, message)==-1) {
+            return;
+        }
+        return;
+    } 
+    
+    if (log.isTraceEnabled()) {
+        log.trace("Manufacturer: " + clientMan);
+        log.trace("Model: " + clientMod);
+    }
+    
+    //Returns to the system if the device is not a Motorola A1000
+    if (!getEpocClient(clientMan, clientMod).equals("Moto")) {
+        log.trace("Client model:" + getEpocClient(clientMan, clientMod));
+        if (log.isTraceEnabled()) {
+            log.trace("Motorola EPOC Client not found: exit synclet (...)");
+        }
+        return;
+    } else {
+        if (log.isTraceEnabled()) {
+            log.trace("Motorola EPOC Client found: processing (...)");
+        }
+    }
+    
+    
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+    processPIMItems(mapItems, pimItemsHandler);
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ *
+ */
+void processPIMItems(Map mapItems, PIMItemsHandler pimItemsHandler) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        preProcessContact(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessEvent(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Adds missing fields.
+ * Converts EMAIL;INTERNET;HOME to EMAIL;INTERNET if it's not in the 2nd slot
+ * (reserved for the "true" EMAIL;INTERNET;HOME).
+ * Differentiates pairs of similar TEL properties into different kinds of phone
+ * numbers on the basis of the slot used.
+ *
+ * @param i the item content
+ */
+void preProcessContact(Item i) {
+    
+    i.data.data = deleteOutProperty(i.data.data, "EMAIL;VIDEO:");
+    i.data.data = replaceFirstOutProperty(i.data.data, "TEL;WORK;VOICE:", "TEL;VOICE:");
+    i.data.data = replaceFirstOutProperty(i.data.data, "TEL;HOME;VOICE:", "TEL;HOME:");
+    i.data.data = deleteOutProperty(i.data.data, "TEL;VOICE;PREF;WORK:");
+    
+}
+
+/**
+ * Initializes hashmap of contact and event properties.
+ */
+void init() {
+}
+
+/**
+ * Replaces a pattern string.
+ *
+ * @param str the string to be modified
+ * @param pattern the pattern to be searche
+ * @param replace the replace substring
+ */
+String replace(String str, String pattern, String replace) {
+    int s = 0;
+    int e = 0;
+    StringBuffer result = new StringBuffer();
+
+    while ((e = str.indexOf(pattern, s)) >= 0) {
+        result.append(str.substring(s, e));
+        result.append(replace);
+        s = e+pattern.length();
+    }
+    result.append(str.substring(s));
+    return result.toString();
+}
+
+/**
+ * Drops 'Z' from start date and end date.
+ * If the event is an allday event, the phone sends the DTEND in the format
+ * "T240000": the parser is not able to interpret it and so it will be replaced
+ * with "T235900".
+ *
+ * Adds missing fields.
+ *
+ * @param i the icalendar item
+ */
+void preProcessEvent(Item i) {
+
+    data = i.data.data;
+
+    data = fixAllDay(data);
+
+    i.data.data = data;
+}
+
+/**
+ * Replaces T240000 with T235900 in the end date of an all day event.
+ *
+ * @param event the event content
+ *
+ * @return event with fixed all day
+ */
+String fixAllDay(String event) {
+
+  s = e = 0;
+  if ((s = event.indexOf(DTSTART)) != -1 &&
+      (e = event.indexOf(DTEND)  ) != -1   ) {
+
+      dtStart = event.substring(s, event.indexOf("\r\n", s));
+      dtEnd   = event.substring(e, event.indexOf("\r\n", e));
+
+      if (dtStart.indexOf("T000000") != -1 &&
+          dtEnd.indexOf("T000000")   != -1   ) {
+
+          dtEnd = dtEnd.replaceAll("T000000", "T235900");
+
+          StringBuffer sb = new StringBuffer(event.substring(0, e));
+          sb.append(dtEnd).append(event.substring(e + dtEnd.length()));
+
+          event = sb.toString();
+      }
+  }
+  return event;
+}
+

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.1_01" class="java.beans.XMLDecoder">
+ <object class="com.funambol.server.inventory.PSDeviceInventory">
+  <void property="jndiDataSourceName">
+    <string>jdbc/fnblds</string>
+  </void>
+  <void property="devicePersistentStore">
+    <object class="com.funambol.server.store.DevicePersistentStore">
+        <void property="defaultNotificationBuilder">
+            <string>com/funambol/server/notification/DSNotificationBuilder.xml</string>
+        </void>
+        <void property="defaultNotificationSender">
+            <string>com/funambol/server/notification/PushSender.xml</string>
+        </void>
+        <void property="sql">
+            <array class="java.lang.String" length="7">
+                <!--  SQL_SELECT_ALL_DEVICES   -->
+                <void index="0">
+                    <string>select id, description, type, client_nonce, server_nonce, server_password, timezone, convert_date, charset, id_caps, address, msisdn, notification_builder, notification_sender from fnbl_device</string>
+                </void>
+                <!--  SQL_GET_DEVICE   -->
+                <void index="1">
+                    <string>select sd.description, sd.type, sd.client_nonce, sd.server_nonce, sd.server_password, sd.timezone, sd.convert_date, sd.charset, sd.id_caps, sd.address, sd.msisdn, sd.notification_builder, sd.notification_sender from fnbl_device sd  where sd.id=?</string>
+                </void>
+                <!--  SQL_INSERT_DEVICE   -->
+                <void index="2">
+                    <string>insert into fnbl_device (id, description, type, client_nonce, server_nonce, server_password, id_caps, timezone, convert_date, charset, address, msisdn, notification_builder, notification_sender) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)</string>
+                </void>
+                <!--  SQL_UPDATE_DEVICE   -->
+                <void index="3">
+                    <string>update fnbl_device set description=?, type=?, client_nonce=?, server_nonce=?, server_password=?, timezone=?, convert_date=?, charset=?, id_caps=?, address=?, msisdn=?, notification_builder=?, notification_sender=? where id=?</string>
+                </void>
+                <!--  SQL_DELETE_DEVICE   -->
+                <void index="4">
+                    <string>delete from fnbl_device where id=?</string>
+                </void>
+                <!--  SQL_COUNT_DEVICES   -->
+                <void index="5">
+                    <string>select count(*) as devices from fnbl_device</string>
+                </void>
+                <!--  SQL_UPDATE_DEVICE_ID_CAPS   -->
+                <void index="6">
+                    <string>update fnbl_device set id_caps=? where id=?</string>
+                </void>
+                
+            </array>
+        </void>
+    </object>
+  </void>
+  <void property="capabilitiesPersistentStore">
+     <object class="com.funambol.server.store.CapabilitiesPersistentStore">
+      <void property="sql">
+       <array class="java.lang.String" length="29">
+        <void index="0">
+         <string>INSERT INTO fnbl_device_caps(id,version,man,model,fwv,swv,hwv,utc,lo,noc) VALUES(?,?,?,?,?,?,?,?,?,?)</string>
+        </void>
+        <void index="1">
+         <string>UPDATE fnbl_device_caps SET man=?,model=?,fwv=?,swv=?,hwv=?,utc=?,lo=?,noc=? WHERE id=?</string>
+        </void>
+        <void index="2">
+         <string>SELECT * FROM fnbl_device_caps where id=?</string>
+        </void>
+        <void index="3">
+         <string>insert into fnbl_device_datastore(id,caps,sourceref,label,maxguidsize,dsmem,shs,synccap) values(?,?,?,?,?,?,?,?)</string>
+        </void>
+        <void index="4">
+         <string>insert into fnbl_ds_cttype_rx(datastore,type,version,preferred) values(?,?,?,?)</string>
+        </void>
+        <void index="5">
+         <string>insert into fnbl_ds_cttype_tx(datastore,type,version,preferred) values(?,?,?,?)</string>
+        </void>
+        <void index="6">
+         <string>insert into fnbl_ds_filter_rx(datastore,type,version) values(?,?,?)</string>
+        </void>
+        <void index="7">
+         <string>insert into fnbl_ds_filter_cap(datastore,type,version,keywords,properties) values(?,?,?,?,?)</string>
+        </void>
+        <void index="8">
+         <string>insert into fnbl_ds_mem(datastore,shared,maxmem,maxid) values(?,?,?,?)</string>
+        </void>
+        <void index="9">
+         <string>insert into fnbl_ds_ctcap(id,datastore,type,version,field) values(?,?,?,?,?)</string>
+        </void>
+        <void index="10">
+         <string>insert into fnbl_ds_ctcap_prop(id,ctcap,name,label,type,maxoccur,maxsize,truncated,valenum) values(?,?,?,?,?,?,?,?,?)</string>
+        </void>
+        <void index="11">
+         <string>insert into fnbl_ds_ctcap_prop_param(property,name,label,type,valenum) values(?,?,?,?,?)</string>
+        </void>
+        <void index="12">
+         <string>this is for CTCAP vers 1.1 </string>
+        </void>
+        <void index="13">
+         <string>UPDATE fnbl_device_datastore SET sourceref=?,label=?,maxguidsize=?,dsmem=?,shs=?,synccap=? WHERE caps=?</string>
+        </void>
+        <void index="14">
+         <string>delete FROM fnbl_device_caps where id=?</string>
+        </void>
+        <void index="15">
+         <string>SELECT * from fnbl_device_datastore where caps=?</string>
+        </void>
+        <void index="16">
+         <string>SELECT * FROM fnbl_ds_cttype_rx where datastore=?</string>
+        </void>
+        <void index="17">
+         <string>SELECT * FROM fnbl_ds_cttype_tx where datastore=?</string>
+        </void>
+        <void index="18">
+         <string>SELECT * FROM fnbl_ds_filter_rx where datastore=?</string>
+        </void>
+        <void index="19">
+         <string>SELECT * FROM fnbl_ds_filter_cap where datastore=?</string>
+        </void>
+        <void index="20">
+         <string>SELECT * FROM fnbl_ds_mem where datastore=?</string>
+        </void>
+        <void index="21">
+         <string>SELECT * FROM fnbl_ds_ctcap where datastore=?</string>
+        </void>
+        <void index="22">
+         <string>SELECT * FROM fnbl_ds_ctcap_prop where ctcap=?</string>
+        </void>
+        <void index="23">
+         <string>SELECT * FROM fnbl_ds_ctcap_prop_param where property=?</string>
+        </void>
+        <void index="24">
+         <string>SELECT id FROM fnbl_device_caps where man=? and model=? and fwv=? and swv=?</string>
+        </void>
+        <void index="25">
+         <string>SELECT id FROM fnbl_device_caps </string>
+        </void>
+        <void index="26">
+         <string>SELECT COUNT(id) FROM fnbl_device_caps</string>
+        </void>
+        <void index="27">
+         <string>insert into fnbl_device_ext(id,caps,xname,xvalue) values(?,?,?,?)</string>
+        </void>
+        <void index="28">
+         <string>select * from fnbl_device_ext where caps=?</string>
+        </void>        
+       </array>
+      </void>
+     </object>
+  </void>
+ </object>
+</java>

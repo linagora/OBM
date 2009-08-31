@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.1_01" class="java.beans.XMLDecoder">
+ <object class="com.funambol.server.store.PrincipalPersistentStore">
+  <void property="jndiDataSourceName">
+   <string>jdbc/fnblds</string>
+  </void>
+  <void property="sql">
+   <array class="java.lang.String" length="9">
+    <!-- SQL_INSERT_PRINCIPAL -->
+    <void index="0">
+     <string>insert into fnbl_principal (id, username, device) values(?,?,?)</string>
+    </void>
+    <!-- SQL_GET_PRINCIPAL -->
+    <void index="1">
+     <string>select id, username, device from fnbl_principal where id=?</string>
+    </void>
+    <!-- SQL_SELECT_PRINCIPAL -->
+    <void index="2">
+     <string>select id, username, device from fnbl_principal where username=? and device=?</string>
+    </void>
+    <!-- SQL_UPDATE_PRINCIPAL -->
+    <void index="3">
+     <string>update fnbl_principal set username=?, device=? where id=?</string>
+    </void>
+    <!-- SQL_SELECT_ALL_PRINCIPALS -->
+    <void index="4">
+     <string>select id, username, device from fnbl_principal</string>
+    </void>
+    <!-- SQL_DELETE_PRINCIPAL -->
+    <void index="5">
+     <string>delete from fnbl_principal where id=?</string>
+    </void>
+    <!-- SQL_DELETE_CLIENT_MAPPING -->
+    <void index="6">
+     <string>delete from fnbl_client_mapping where principal=?</string>
+    </void>
+    <!-- SQL_DELETE_LAST_SYNC -->
+    <void index="7">
+     <string>delete from fnbl_last_sync where principal=?</string>
+    </void>
+    <!-- SQL_COUNT_PRINCIPALS -->
+    <void index="8">
+     <string>select count(*) as principals from fnbl_principal </string>
+    </void>
+   </array>
+  </void>
+ </object>
+</java>

@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * Replaces every occurrence of a specified property with a new one in an input 
+ * item, without modify the property value.
+ *  
+ * This method takes care of finding out the beginning of the property to replace
+ * for an input data.
+ *  
+ * Usage example:
+ *  the following vcard fragment:
+ *      ...
+ *      TEL:1234 
+ *      ..
+ *      TEL:6789  
+ *      ...    
+ *  is changed by the statement: 
+ *      replaceInProperty(data, "TEL:", "TEL;VOICE:");
+ *  as follows:
+ *      ...
+ *      TEL;VOICE:1234 
+ *      ...    
+ *      TEL;VOICE:6789 
+ *      ...    
+ *
+ * @param data the data to modify
+ * @param oldProperty the property to replace
+ * @param newProperty the replacement property
+ *
+ * @return the modified data
+ *
+ * @version $Id: replaceInProperty.bsh,v 1.2 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+String replaceInProperty(String data, String oldProperty, String newProperty) {
+
+    data = data.replaceAll("\n" + oldProperty, "\n" + newProperty);
+    return data;
+}

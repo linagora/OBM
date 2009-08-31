@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.1_01" class="java.beans.XMLDecoder">
+ <object class="com.funambol.server.store.ModulesPersistentStore">
+  <void property="jndiDataSourceName">
+   <string>jdbc/fnblds</string>
+  </void>
+  <void property="sql">
+   <array class="java.lang.String" length="6">
+    <!-- SQL_SELECT_ALL_MODULES_NAME -->
+    <void index="0">
+     <string>select id, name, description from fnbl_module</string>
+    </void>
+    <!-- SQL_GET_MODULE -->
+    <void index="1">
+     <string>select id, name, description from fnbl_module where id=?</string>
+    </void>
+    <!-- SQL_SELECT_MODULE_CONNECTOR -->
+    <void index="2">
+     <string>select smc.connector, sc.name, sc.description, sc.admin_class from fnbl_module_connector smc, fnbl_connector sc where smc.module=? and smc.connector=sc.id</string>
+    </void>
+    <!-- SQL_SELECT_CONNECTOR_SYNCSOURCETYPE -->
+    <void index="3">
+     <string>select ssst.id, ssst.description, ssst.class, ssst.admin_class from fnbl_sync_source_type ssst, fnbl_connector_source_type scsst where scsst.connector=? and ssst.id=scsst.sourcetype</string>
+    </void>
+    <!-- SQL_SELECT_SYNCSOURCETYPE_SYNCSOURCE -->
+    <void index="4">
+     <string>select sss.uri, sss.config, sss.sourcetype, sss.name from fnbl_sync_source sss, fnbl_sync_source_type ssst where sss.sourcetype=? and sss.sourcetype=ssst.id</string>
+    </void>
+    <!-- SQL_SELECT_SYNCSOURCETYPE -->
+    <void index="5">
+     <string>select ssst.id, ssst.description, ssst.class, ssst.admin_class from fnbl_sync_source_type ssst where ssst.id=?</string>
+    </void>
+   </array>
+  </void>
+ </object>
+</java>
+
+
+

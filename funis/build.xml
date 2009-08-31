@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- this runs from ".." -->
+
+<project name="obm-funambol" default="dist" basedir=".">
+
+  <target name="dist">
+    <echo>Preparing ${ant.project.name} distribution...</echo>
+
+    <property name="dd" 
+	      value="debian/${ant.project.name}/usr/share/funambol-6.5.1"/>
+    <mkdir dir="${dd}"/>
+
+    
+
+    <copy todir="${dd}">
+      <fileset dir="funambol/funambol-6.5.1"/>
+    </copy>
+
+    <echo>${ant.project.name} distribution done.</echo>
+  </target>
+  
+</project>

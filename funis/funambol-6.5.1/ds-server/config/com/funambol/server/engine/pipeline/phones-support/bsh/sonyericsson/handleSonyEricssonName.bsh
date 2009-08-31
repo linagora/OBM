@@ -1,0 +1,137 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * This synclet handles the N token. SonyEricsson phones like W800i, W850i have
+ * only the field Name instead of first name and last name.
+ * Of course, having just one field, it's not easy to split that value in first
+ * and last name.
+ * Moreover, in these phones there is an advanced option "Sync/Sort order" by
+ * "first name" or by "last name"; based on the selected value, the vcards sent
+ * by the phone are different.
+ * To certify the phone it's need to select "Sync/sort order by last name" so
+ * the phone sends for example N:Bill Prey; (writting on Phone Bill Prey in the
+ * Name field). In this case, all chars after the first space (Prey) will be
+ * considered the last name and all chars before the first space (Bill) will be
+ * considered the first name.
+ * The token sent by the client will be changed by the synclet into N:Prey;Bill
+ * in order to create a right contact on server.
+ * When the contact is sent by the server, it sends N:Prey;Bill and on the phone
+ * the contact is shown as Prey, Bill.
+ * If the phone resends that contact it sends "N:Prey;Bill" (note that this is
+ * correct!!) and the synclet doesn't perform any changes because the server is
+ * able to handle correctly this format (indeed this is the one specified in the
+ * VCard specs).
+ *
+ * Said that, on the phone, creating a contact, the user could insert:
+ * 1) Name: Bill Prey  (the phone sends N:Bill Prey;)
+ * 2) Name: Prey Bill  (the phone sends N:Prey Bill;)
+ * 3) Name: Prey, Bill (the phone sends N:Prey;Bill)
+ * The first and the last case are handled correctly, the second one inverts the
+ * first name with the last name because there is not a way to discriminate
+ * between 1 and 2.
+ *
+ * Other problem can raise writting just the first name:
+ * Name: Bill
+ * the phone sends N:Bill; and the server handles it as last name (by specs).
+ *
+ * With:
+ * Name: Susan Mary Martinez
+ * the phone sends N:Susan Mary Martinez; and the synclet replaces it with
+ * N:Mary Martinez;Susan. This is wrong because Mary Martinez is not the last
+ * name so on the server the contact is wrong. BTW, changing the contact on the
+ * server according to the right last and first name, the contact is updated on
+ * the phone correctly and shown as "Martinez, Susan Mary"
+ *
+ * With:
+ * Name: Susan Prey Martinez
+ * the phone sends N:Susan Prey Martinez; and the synclet replaces it with
+ * N:Prey Martinez;Susan. This is right because Prey Martinez is the last name.
+ * Moreover,changing the contact on the server and syncing, the contact is shown
+ * as "Prey Martinez, Susan"
+ *
+ * @version $Id: handleSonyEricssonName.bsh,v 1.1 2007/07/25 13:15:14 luigiafassina Exp $
+ */
+
+// ------------------------------------------------------ Synclet implementation
+/**
+ * Handles name token
+ *
+ * @param data the data to be processed
+ * @return the modified data
+ */
+String handleSonyEricssonName(String data) {
+    int start, end, indColon = 0;
+    start = data.indexOf("\nN");
+
+    if (start != -1) {
+        end  = data.indexOf("\r\n", start + 2);
+
+        String property = data.substring(start, end);
+        if (property.contains("ENCODING=QUOTED-PRINTABLE")) {
+            for (; data.charAt(end-1) == '='; end = data.indexOf("\r", end+1));
+            property = data.substring(start, end);
+        } else {
+            for (; data.charAt(end+1) == ' '; end = data.indexOf("\r", end+1));
+            property = data.substring(start, end);
+        }
+
+        indColon = data.indexOf(":", start);
+
+        StringBuffer sb = new StringBuffer(data.substring(0, indColon + 1));
+        String value = data.substring(indColon + 1, end);
+
+        // Matches ";" if not preceded by "\\".
+        Pattern p = Pattern.compile("(?<!\\\\);");
+        String[] values = p.split(value);
+        if (values.length == 1) {
+
+            //there is only lastname
+            String tmpLN = values[0];
+            String[] names = tmpLN.split(" ");
+
+            if (names.length == 1) {
+                // there is only firstname
+                sb.append(names[0]).append(";");
+            } else if (names.length >= 2) {
+                String firstname = null;
+                StringBuffer lastname = new StringBuffer();
+
+                for (int j=0; j<names.length; j++) {
+                    if (j == 0) {
+                        firstname = names[j];
+                    } else {
+                        lastname.append(names[j]);
+                        if (j < names.length - 1) {
+                            lastname.append(" ");
+                        }
+                    }
+                }
+                sb.append(lastname).append(";").append(firstname);
+            }
+
+        } else {
+            //there are both last and first name or only one
+            sb.append(value);
+        }
+
+        sb.append(data.substring(end, data.length()));
+        data = sb.toString();
+    }
+    return data;
+}

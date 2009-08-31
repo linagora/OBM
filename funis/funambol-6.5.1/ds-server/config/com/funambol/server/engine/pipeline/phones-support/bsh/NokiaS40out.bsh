@@ -1,0 +1,533 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Handles Status commands with data 500. When on server side there is an error
+ * on Item sent by client, the server responses at the client command with a
+ * Status 500 that contains an Item in which the data explain the cause of the
+ * error. The Nokia series 40 are not able to understand this Status command and
+ * so these phones interrupt the sync. It needs to remove the data and to add
+ * the SourceRef into Status command.
+ * Note: the device is not able to understand also a Status with Item in which
+ * the data is empty, but it is able to send commands with empty data (that are
+ * the cause of the Status 500 server side).
+ *
+ * Contacts:
+ * =========
+ * Handles the fax tokens in order to send always three fax number (in the case
+ * in which exists almost one fax number) at the device. The fax tokens must be
+ * sorted: first fax HOME, then fax WORK and then fax OTHER. In the phone is
+ * not possible to specify the fax type, and so this is a workaround in order
+ * not to lose the information.
+ * Removes all information from N token except for the first name and last name
+ * because the device is not able to handle a N token in the format
+ * N:Firstname;Lastname;;; .
+ * Handles the address tokens in order to send always three address (in the case
+ * in which exists almost one address) at the device. The address tokens must be
+ * sorted: first ADR:HOME, then ADR:WORK and then ADR: . In the phone is
+ * not possible to specify the addresses type, and so this is a workaround in
+ * order not to lose the information. In the phone is only possible to insert
+ * one address.
+ * Fixes the BDAY token format.
+ *
+ * Calendars:
+ * ==========
+ * Removes all information from AALARM token except the date/time because the
+ * device is not able to understand an AALARM in the format
+ * AALARM:20070601T084500;;; (the device ignores the token in this format).
+ *
+ * @version $Id: NokiaS40out.bsh,v 1.4 2007/07/25 13:34:10 luigiafassina Exp $
+ */
+ 
+// ------------------------------------------------------------------- Constants
+private final String USER_AGENT_N6101 = "Nokia6101";
+private final String USER_AGENT_N602X = "Nokia602";
+private final String USER_AGENT_N623X = "Nokia623";
+
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param mpc the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext mpc,
+                        SyncML message              )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("NokiaS40out.postProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    
+    //
+    // Find the user-agent from http request header
+    //
+    String userAgent = getUserAgent(mpc);
+    
+    processPIMItems(mapItems, userAgent);
+    
+    //
+    // Handle Status commands with data 500.
+    //
+    AbstractCommand[] cmds =
+        (AbstractCommand[])message.syncBody.commands.toArray(new AbstractCommand[0]);
+    handleStatusError(message, cmds);
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param userAgent the user-agent from http request header
+ */
+void processPIMItems(Map mapItems, String userAgent) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        postProcessVCard(i, userAgent);
+    }
+    
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        postProcessVEvent(i);
+    }
+ 
+    //
+    // Cycle on vtodo list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VTODO)) {
+        postProcessVTodo(i);
+    }   
+}
+
+/**
+ * Processes outgoing contacts.
+ * 
+ * Handles fax tokens.
+ * Handles N token.
+ * Handles ADR tokens.
+ * Fixes BDAY token format.
+ *
+ * @param i the item to be processed
+ * @param userAgent the user-agent from http request header
+ */
+void postProcessVCard(Item i, String userAgent) {
+
+    data = i.data.data;
+    
+    data = handleName(data);
+    data = handleFax (data);
+    data = handleAdr (data);
+
+    if (userAgent.startsWith(USER_AGENT_N602X) ||
+        userAgent.startsWith(USER_AGENT_N623X) ||
+        userAgent.startsWith(USER_AGENT_N6101)  ) {
+
+        data = addDashInAdrToken(data);
+    }
+    
+    i.data.data = fixBDayFormat(data);
+}
+
+/**
+ * Processes outgoing vevent.
+ *
+ * Handles AALARM token.
+ *
+ * @param i the item to be processed
+ *
+ */
+void postProcessVEvent(Item i) {
+    i.data.data = handleAAlarm(i.data.data);
+}
+
+/**
+ * Processes outgoing vtodo.
+ *
+ * Handles AALARM token.
+ *
+ * @param i the item to be processed
+ *
+ */
+void postProcessVTodo(Item i) {
+    i.data.data = handleAAlarm(i.data.data);
+}
+
+/**
+ * Handles the fax tokens.
+ * If at least one fax number exists then all 3 fax numbers (home, work, other)
+ * must be present in the data item into established order (home, work, other).
+ * If at least one fax number is not specified then it must be added with an
+ * empty value.
+ *
+ * @param data the data item
+ *
+ * @return the data with fax numbers (if needs)
+ */
+String handleFax(String data) {
+    int found = data.indexOf("\r\nTEL;FAX");
+    if (found != -1) {
+
+        StringBuffer sb =
+            new StringBuffer(data.substring(0, data.indexOf("\r\nEND:VCARD")));
+
+        addToken(sb, "TEL;FAX;HOME:");
+        addToken(sb, "TEL;FAX;WORK:");
+        addToken(sb, "TEL;FAX:"     );
+
+        sb.append("\r\nEND:VCARD\r\n");
+        data = sb.toString();
+    }
+    return data;
+}
+
+/**
+ * Handles the ADR tokens.
+ *
+ * If at least one address exists then all 3 addresses (home, work, other)
+ * must be present in the data item into established order (home, work, other).
+ * The order of the ADR tokens is more important because there are some phones
+ * (like Nokia 61xx) that handle only one address and this address must be the
+ * ADR;HOME.
+ * If at least one address is not specified then it must be added with an
+ * empty value.
+ *   
+ * @param data the data item
+ *
+ * @return the data with adr (if needs)
+ */
+String handleAdr(String data) {
+    int found = data.indexOf("\r\nADR");
+    if (found != -1) {
+
+        StringBuffer sb =
+            new StringBuffer(data.substring(0, data.indexOf("\r\nEND:VCARD")));
+
+        addToken(sb, "ADR;HOME");
+        addToken(sb, "ADR;WORK");
+
+        String[] exclude = {"HOME", "WORK"};         
+        addOtherToken(sb, "ADR", exclude);
+
+        sb.append("\r\nEND:VCARD\r\n");
+        data = sb.toString();
+    }
+    return data;
+}
+
+/**
+ * Adds or moves at the end of data item the token specified in input.
+ * If the token doesn't exist into data, adding it else move it at the end of
+ * data.
+ *
+ * @param data the data item
+ * @param token the token to search
+ */
+void addToken(StringBuffer data, String token) {
+    start = data.indexOf("\r\n" + token);
+    if (start != -1) {
+        end   = data.indexOf("\r\n", start + 2);
+        value = data.substring(start, end);
+
+        data.delete(start, end);
+        data.append(value);
+    } else {
+        data.append("\r\n")
+            .append(token )
+            .append(token.charAt(token.length() - 1) == ':' ? "" : ":");
+    }
+}
+
+/**
+ * Adds dash (-) in ADR token when the information doesn't exist.
+ * For example:
+ *  instead of ADR;HOME:;;2730 Liberty Street;;;
+ *  will be sent ADR;HOME:;;2730 Liberty Street;-;-;-
+ * If the ADR;HOME has empty all information, then nothing dash will be added.
+ * This is a workaround for the Nokia 602x, Nokia 623x and Nokia 6101 that have
+ * a label as Postal Address field and not the single fields in which write the
+ * street, the country and so on.
+ *
+ * @param data the data item
+ *
+ * @return the modified data
+ */
+String addDashInAdrToken(String data) {
+
+    int start, end, indColon = 0;
+    start = data.indexOf("\nADR;HOME");
+
+    if (start != -1) {
+        end  = data.indexOf("\r\n", start + 2);
+
+        String line = data.substring(start, end);
+        if (line.contains("ENCODING=QUOTED-PRINTABLE")) {
+            for (; data.charAt(end - 1) == '='; end = data.indexOf("\r", end + 1));
+            line = data.substring(start, end);
+        } else {
+            for (; data.charAt(end + 1) == ' '; end = data.indexOf("\r", end + 1));
+            line = data.substring(start, end);
+        }
+
+        indColon = data.indexOf(":", start);
+
+        StringBuffer sb = new StringBuffer(data.substring(0, indColon));
+
+        value = data.substring(indColon, end);
+
+        if (!":;;;;;;".equals(value)) {
+
+            count = 0;
+            for (int i=0; i<value.length(); i++) {
+                char c = value.charAt(i);
+                if (c == ';') {
+                    char before = value.charAt(i - 1);
+                    if (before == '\\') {
+                        sb.append(c);
+                    } else {
+                        ++count;
+                        if (before == ';' && count > 2 && (value.charAt(i - 2) != '\\')) {
+                            sb.append('-').append(c);
+                        } else {
+                            sb.append(c);
+                        }
+                    }
+                } else {
+                    sb.append(c);
+                }
+            }
+
+            if (value.endsWith(";") && value.charAt(value.length() - 2) != '\\') {
+                sb.append('-');
+            }
+
+        } else {
+            sb.append(value);
+        }
+
+        sb.append(data.substring(end, data.length()));
+        data = sb.toString();
+    }
+
+    return data;
+}
+
+/**
+ * Adds or moves at the end of item data the token specified in input. Token
+ * specified in input is intended to be of type "other".
+ * If the token doesn't exists into data, adding it else move it at the end of
+ * data.
+ *
+ * @param data the data item
+ * @param token the token to search
+ * @param exclude string array which contains the non-other tokens to be excluded 
+ */    
+void addOtherToken(StringBuffer data, String token, String[] exclude){
+    start = data.indexOf("\r\n" + token);
+    
+    boolean isAdr = true;
+    if (start != -1) {
+        
+        startParam = start + 2 + token.length();
+        endParam   = data.indexOf(":", startParam);
+        
+        if (data.charAt(startParam) == ';'){
+            
+            params = data.substring(startParam, endParam);                       
+            
+            for (int i = 0; i < exclude.length; i++) {
+                if (params.indexOf(exclude[i]) != -1){
+                    isAdr = false;
+                    break;
+                }
+            }
+        }
+        
+        if (isAdr){
+            end   = data.indexOf("\r\n", start + 2);
+            value = data.substring(start, end);                
+            data.delete(start, end);
+            data.append(value);
+        }
+    }
+    
+    if (start != -1 && isAdr == false){
+        data.append("\r\n")
+            .append(token )
+            .append(':'   );
+    }
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}
+
+/**
+ * Removes information from N token except for the first name and last name 
+ * since device is not able to handle correctly a token in the format
+ * N:Firstname;Lastname;;; 
+ *
+ * @param data item data to process
+ *
+ * @return new item data  
+ *
+ */    
+String handleName(String data) {
+
+    int nameTokenStart = data.indexOf("\nN");
+    if (nameTokenStart != -1) {
+        
+        nameTokenValueStart = data.indexOf(':', nameTokenStart) + 1; 
+
+        nameTokenParams =
+            data.substring(nameTokenStart, nameTokenValueStart - 1);
+        nameTokenValueEnd = data.indexOf('\r', nameTokenStart);
+        nameTokenValue = data.substring(nameTokenValueStart, nameTokenValueEnd);
+        tail = data.substring(nameTokenValueEnd);
+
+        n   = 0;
+        end = 0;
+        String newNameTokenValue = null;
+        
+        for (int i = 0; i < nameTokenValue.length(); i++) {
+            if (nameTokenValue.charAt(i) == ';'){
+            
+                /**
+                 * The first value for N: token could be the empty value.
+                 *                  
+                 * Example:
+                 * N:Someone;Something;;; <-- first value is "Someone"
+                 * N:;Something;;;        <-- first value is the empty value
+                 * 
+                 * In this case the counter for the values to be passed to the 
+                 * device (that is: the variable n) must be immediatly increased.                                                                                     
+                 */                                                                   
+                if (i == 0){
+                    ++n;
+                    continue;
+                }
+            
+                if (nameTokenValue.charAt(i - 1) != '\\'){
+                    if (++n == 2){
+                        newNameTokenValue = 
+                                data.substring(nameTokenValueStart, nameTokenValueStart + i);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        newData = new StringBuffer();
+        newData.append(data.substring(0, nameTokenStart))
+               .append(nameTokenParams                  )
+               .append(':'                              )
+               .append(newNameTokenValue                )
+               .append(tail                             );
+        return newData.toString();
+    }
+    return data;
+}
+
+/**
+ * Removes information from AALARM token except the date/time because the
+ * device is not able to understand an AALARM in the format
+ * AALARM:20070601T084500;;; (the device ignores the token in this format).
+ *
+ * @param data the item data to process
+ * 
+ * @return the modified item data
+ */  
+String handleAAlarm(String data){
+
+    startAlarm = data.indexOf("\nAALARM");
+    
+    if (startAlarm != -1){
+        
+        endAlarm        = data.indexOf("\r", startAlarm);
+        alarmValueStart = data.indexOf(":" , startAlarm) + 1;
+        alarmValue      = data.substring(alarmValueStart, endAlarm);
+        alarmNewValue   = alarmValue.substring(0, alarmValue.indexOf(';'));
+                    
+        StringBuffer newData = new StringBuffer();
+                
+        newData.append(data.substring(0, startAlarm))
+               .append("\nAALARM:"                  )
+               .append(alarmNewValue                )
+               .append(data.substring(endAlarm)     )
+               ;
+        
+        return newData.toString();
+    }
+    
+    return data;
+}
+
+/**
+ * Fixes the BDAY token format.
+ * The server sends BDAY:yyyy-mm-dd but the device is not able to understand it.
+ * So, it is necessary to remove the - from BDAY token.
+ *
+ * @param data the item data to process
+ *
+ * @return the modified item data
+ */
+String fixBDayFormat(String data) {
+
+    startBDay = data.indexOf("\nBDAY");
+
+    if (startBDay != -1) {
+        endBDay   = data.indexOf("\r", startBDay);
+        bdayValue = data.substring(startBDay, endBDay);
+        fixedBDayValue = bdayValue.replaceAll("-", "");
+        data = data.replace(bdayValue, fixedBDayValue);
+    }
+    return data;
+}

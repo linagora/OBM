@@ -1,0 +1,376 @@
+/*
+ * Copyright (C) 2006-2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.io.UnsupportedEncodingException;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.net.QuotedPrintableCodec;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.OutputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.server.Sync4jDevice;
+import com.funambol.framework.server.inventory.*;
+
+import com.funambol.server.config.*;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Verifies the software version of the device and if it starts with
+ * 'R374_G_0E.40.', replaces EMAIL;INTERNET:\r\n with EMAIL;INTERNET:-\r\n
+ * introducing a '-' in case the mail is empty in order to avoid further
+ * restarts of Motorola.
+ * Removes characters not manageable by phone from phone number fields
+ * (manageable characters mean number and +).
+ * Switches the second with the third value in the address tokens (home, work or
+ * other type).
+ *
+ * @version $Id: MotorolaXout.bsh,v 1.7 2007/06/18 13:34:04 luigiafassina Exp $
+ */
+// ------------------------------------------------------------------- Constants
+private final String PRINTABLE_CHARS = ";ENCODING=QUOTED-PRINTABLE;CHARSET=";
+
+// ---------------------------------------------------------------- Private data
+private QuotedPrintableCodec qp = new QuotedPrintableCodec();
+
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process and manipulate the output message.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+
+ * @throws Sync4jException
+ */
+void postProcessMessage(MessageProcessingContext processingContext,
+                        SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("MotorolaXout.postProcessMessage(...)");
+    }
+
+    if (message.syncHdr.target.locURI != null) {
+        this.deviceId = message.syncHdr.target.locURI;
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractOutgoingPIMItems(message);
+    processPIMItems(mapItems, message.syncHdr.target.locURI);
+
+    throw new StopProcessingException("MotorolaXout Synclet finished");
+}
+
+/**
+ * Processes outgoing items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param deviId the device identifier
+ *
+ */
+void processPIMItems(Map mapItems, String deviceId) {
+    String softwareVersion = null;
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        if (softwareVersion == null && deviceId != null) {
+            softwareVersion = getSoftwareVersion(deviceId);
+        }
+        if (log.isTraceEnabled()) {
+            log.trace("MotorolaXout.processPIMItems(...) with software version: " +
+                      softwareVersion);
+        }
+        postProcessContact(i, softwareVersion);
+    }
+}
+
+/**
+ * Processes outgoing contacts.
+ *
+ * Switches the second with the third value in the address tokens (home, work or
+ * other type).
+ * Verifies the software version of the device and if it starts with
+ * 'R374_G_0E.40.', insert a blank space in the mail field to avoid a phone bug.
+ * Removes unnecessary characters from fields.
+ *
+ * @param i the item to process
+ * @param softwareVersion the software version
+ *
+ */
+void postProcessContact(Item i, String softwareVersion) {
+
+    data = i.data.data;
+    
+    data = switchAdrValues(data, false);
+    data = checkNecessaryFields(data);
+
+    if (softwareVersion != null &&
+        softwareVersion.startsWith("R374_G_0E.40.")) {
+
+        data = replaceMail(data);
+    }
+
+    data = removeNotNeededChars(data);
+
+    i.data.data = data;
+}
+
+/**
+ * Replaces EMAIL;INTERNET:\r\n with EMAIL;INTERNET:-\r\n token in order to
+ * avoid further restarts of Motorola.
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ */
+String replaceMail(String data) {
+    data = data.replaceAll("EMAIL;INTERNET:\r\n", "EMAIL;INTERNET:-\r\n");
+    return data;
+}
+
+/**
+ * Removes characters not needed from phone numbers.
+ * We split the data into lines and then process them removing not manageable
+ * chars.
+ *
+ * @param data the data to process
+ *
+ * @return the modified data
+ *
+ */
+private String removeNotNeededChars(String data) {
+
+    String tmp = "";
+    StringBuffer sb = new StringBuffer();
+    int startIndex = 0;
+    int endLineIndex = data.indexOf("\r\n");
+
+    while (endLineIndex != -1) {
+        String line = data.substring(startIndex, endLineIndex);
+
+        if (line.startsWith("TEL")) {
+            tmp = fixPhoneNumberContent(line, sb);
+            sb.append(tmp).append("\r\n");
+        } else {
+            sb.append(line).append("\r\n");
+        }
+
+        startIndex   = endLineIndex + 2;
+        endLineIndex = data.indexOf("\r\n", endLineIndex + 2);
+    }
+    return sb.toString();
+}
+
+/**
+ * Removes characters not needed from phone numbers.
+ * Takes a line from a contact and removes not manageable characters
+ * (manageable characters mean number and +).
+ *
+ * @param line the line to process
+ * @param sb the buffer in which save the result of the processing operation
+ *
+ * @return the modified line
+ *
+ */
+private String fixPhoneNumberContent(String line, StringBuffer sb) {
+
+    int printableDataIndex = line.indexOf(PRINTABLE_CHARS);
+    int dotsIndex = line.indexOf(':');
+
+    if (printableDataIndex != -1) {
+        String encoding = line.substring(printableDataIndex + 35, dotsIndex);
+        dotsIndex = line.indexOf(':');
+        line = line.substring(0,printableDataIndex) + line.substring(dotsIndex);
+        dotsIndex = line.indexOf(':');
+        sb.append(line.substring(0, dotsIndex + 1));
+        line = line.substring(dotsIndex);
+        line = decodePrintableCharacters(line, encoding);
+    } else {
+        sb.append(line.substring(0, dotsIndex + 1));
+        line = line.substring(dotsIndex);
+    }
+    line = line.replaceAll("[^0123456789+\r\n]", "");
+    return line;
+}
+
+/**
+ * Decodes printable characters and removes them.
+ * Takes the data that represents the phone number for a contact and
+ * decodes the printable characters
+ *
+ * @param line the line to process
+ * @param sb the buffer containing the result of the processing operation
+ *
+ * @return the modified line
+ *
+ */
+private String decodePrintableCharacters(String line, String encoding) {
+    try {
+        line = qp.decode(line, encoding);
+    } catch (DecoderException e) {
+
+        throw new Sync4jException("Error of decoding data into MotorolaXout.bsh " + e.getMessage());
+
+    } catch (UnsupportedEncodingException e) {
+
+        throw new Sync4jException("The character encoding (" + encoding + ") is not supported.");
+
+    }
+    return line;
+}
+
+/**
+ * Checks which is the software version of the device
+ *
+ * @param deviceId the id of the device
+ *
+ * @return the software version
+ *
+ */
+private String getSoftwareVersion(String deviceId) {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Get the software version of: " + deviceId);
+    }
+
+    if (deviceId == null) {
+        return "";
+        // returns an empty string because the null value is used to check if
+        // the version has already searched
+    }
+
+    String swv = "";
+    Sync4jDevice device = null;
+
+    try {
+        DevInf devInf = getDevInf(deviceId);
+
+        if (devInf != null) {
+            swv = devInf.getSwV();
+        }
+
+    } catch (Exception e) {
+        String msg = "Error getting the software version ("
+                   + e.toString() + ")";
+        log.error(msg, e);
+   }
+   return swv;
+}
+
+/**
+ * Checks if the data item has all the necessary fields.
+ *
+ * @param data the data item
+ * @return the modified data
+ */
+String checkNecessaryFields(String data) {
+
+    int endPos = data.indexOf("END:VCARD");
+    data = data.substring (0, endPos);
+    StringBuffer missing = new StringBuffer(data);
+
+    // checks if there is field that starts with TEL with a correct value
+    String tmpString =
+        data.substring(data.indexOf("\r\nTEL") + 1, data.length());
+
+    String tmpTel;
+    boolean initializedTel = false;
+    if(data.indexOf("\r\nTEL") != -1 ) {
+
+        // cycles through all the recurrences of the fields that start with TEL
+        while(true){
+
+            // this string represents the value of a field that starts with TEL
+            tmpTel = tmpString.substring(tmpString.indexOf(":") + 1,
+                                         tmpString.indexOf("\r\n") );
+
+            //if tmpTel is null the vcard is not correct
+            if(tmpTel == null){
+                initializedTel = false;
+                break;
+            }
+
+            //
+            // if the length of tmpTel without spaces is not zero, then the
+            // field is initialized with a correct value
+            //
+            if(tmpTel.trim().length() != 0){
+                initializedTel = true;
+                break;
+            }
+
+            // if there are not any other recurrencies of TEL then exit
+            if(tmpString.indexOf("\r\nTEL") == -1){
+                initializedTel = false;
+                break;
+            }
+
+            tmpString = tmpString.substring(tmpString.indexOf("\r\nTEL") + 1,
+                                            tmpString.length()              );
+        }
+    }
+
+    //
+    // Checks if there is not any correct value for a field that starts with TEL
+    // and than checks if there is EMAIL;INTERNET with empty value. If so a
+    // dummy EMAIL;INTERNET field is added
+    if(!initializedTel) {
+
+        if (data.indexOf("\r\nEMAIL;INTERNET:\r\n") != -1) {
+			// if there is the field EMAIL;INTERNET but the value is empty
+			// it's necessary to add it
+            data = data.substring(0, data.indexOf("\r\nEMAIL;INTERNET:") + 17) +
+                   "-" +
+                   data.substring(data.indexOf("\r\nEMAIL;INTERNET:") + 18,
+                                  endPos);
+        } else if (data.indexOf("\r\nEMAIL;INTERNET:") == -1) {
+            missing.append("EMAIL;INTERNET:-").append("\r\n");
+            data = missing.toString();
+        }
+    }
+
+    data = data + "END:VCARD\r\n";
+    
+    return data;
+}
+
+/**
+ * Called initializing the synclet
+ */
+void init() {
+    // do nothing
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.0" class="java.beans.XMLDecoder">
+ <object class="com.funambol.server.engine.Sync4jStrategy">
+  <void property="defaultConflictResolution">
+  
+   <!-- ================================== -->
+   <!-- 0: CONFLICT_RESOLUTION_SERVER_WINS -->
+   <!-- 1: CONFLICT_RESOLUTION_CLIENT_WINS -->
+   <!-- 2: CONFLICT_RESOLUTION_MERGE_DATA  -->   
+   <!-- ================================== -->
+   
+   <int>1</int>  <!-- Client wins -->
+  </void>
+ </object>
+</java>

@@ -1,0 +1,78 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.text.*;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.funambol.framework.core.*;
+
+/**
+ * This synclet replaces wrongly-converted UTC dates into their proper value.
+ *
+ * @version $Id: fixSummerTime.bsh,v 1.2 2007/06/18 13:34:05 luigiafassina Exp $
+ */
+// ---------------------------------------------------------------- Private data
+private final SimpleDateFormat utcFormatter =
+    new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
+
+// ------------------------------------------------------ Synclet implementation
+
+/**
+ * Replaces wrongly-converted UTC dates into their proper value.
+ *
+ * @param str the data item
+ * @param field the name of the (datetime) property to check
+ * @param summerTime true if summer time has been enabled on the device
+ * @param tz the device time zone (this must not be null)
+ *
+ * @return the data item
+ */
+String fixSummerTime(String str, String field, boolean summerTime, TimeZone tz) {
+        
+    String fieldNameAndColon = field + ':';
+    Pattern pattern = Pattern.compile(fieldNameAndColon + "[0-9]{8}T[0-9]{6}Z");
+    Matcher matcher = pattern.matcher(str);
+    if (matcher.find()) {
+        try {
+            utcFormatter.setLenient(true);
+            Date date = utcFormatter.parse(matcher.group().substring(fieldNameAndColon.length()));
+            int diff = 0;
+            if (summerTime) {
+                diff = +3600000;
+            }
+            if (tz.inDaylightTime(date)) {
+                diff -= tz.getOffset(date.getTime()) - tz.getRawOffset();
+            }
+            if (diff != 0) {
+                date = new Date(date.getTime() + diff);
+                String fixedProperty =
+                    fieldNameAndColon + utcFormatter.format(date);
+                StringBuffer sb = new StringBuffer();
+                matcher.appendReplacement(sb, fixedProperty);
+                matcher.appendTail(sb);
+                
+                return sb.toString();
+            }
+        } catch (ParseException e) {
+            // do nothing
+        }
+    }
+    return str; // unchanged
+}

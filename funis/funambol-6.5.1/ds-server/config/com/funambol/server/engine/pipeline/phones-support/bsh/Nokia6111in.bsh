@@ -1,0 +1,314 @@
+/*
+ * Copyright (C) 2007 Funambol
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Processes the incoming VCARDs and adds the missing tokens.
+ * Handles large objects.
+ * Sets item size to null if the size is 0.
+ * Replaces ADR token with ADR;HOME prefix.
+ * Reduces the phone numbers to one for each of five different number types
+ * used by the device (main phone, cell phone, home phone, work phone, fax),
+ * removing all TEL properties but the first one for each type.
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Processes the incoming VEVENTs and adds the missing tokens.
+ *   Handles large objects.
+ *   Sets item size to null if the size is 0.
+ *   Replaces with T235900 (like for all day event) the time of the end date
+ *   when it is T000000 and it is equals at the time of the start date.
+ *   Modifies VEVENTs of the Memo and Birthday subtypes in order to apply the
+ *   all-day format on their DTSTART property.
+ *
+ * . Todo
+ *   Processes the incoming vtodo items and adds the missing tokens.
+ *   Handles large objects.
+ *   Sets item size to null if the size is 0.
+ *   Adjusts the AALARM token so it can be correctly understood by the server.
+ *
+ * @version $Id: Nokia6111in.bsh,v 1.1 2007/07/25 13:21:14 luigiafassina Exp $
+ */
+// ------------------------------------------------------------------- Constants
+
+private final String TIMEZERO      = "T000000";
+private final String TIMEENDALLDAY = "T235900";
+
+private Map missingCardTokens      = null;
+private Map missingEventTokens     = null;
+private Map missingTodoTokens      = null;
+
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Processes input message and set MessageProcessingContext property.
+ *
+ * @param mpc the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext mpc,
+                       SyncML message              )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Nokia6111in.preProcessMessage(...)");
+    }
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems = pimItemsHandler.extractIncomingPIMItems(mpc, message);
+   
+    processPIMItems(mapItems, pimItemsHandler);
+    
+    throw new StopProcessingException("Nokia6111in Synclet finished");
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ * @param userAgent the user-agent from http request header
+ */
+void processPIMItems(Map             mapItems       ,
+                     PIMItemsHandler pimItemsHandler) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {    
+        preProcessVCard(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+    
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessVEvent(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vtodo list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VTODO)) {
+        preProcessVTodo(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Processes incoming contacts.
+ *
+ * Sets item size to null if the size is 0.
+ * Replaces TEL;PREF prefix with TEL;
+ * Handles fax numbers.
+ * Replaces the ADR token with ADR;HOME prefix for Nokia 61xx 3rd Ed. token
+ * (these phones can handle only one address).
+ * Adds missing tokens.
+ *  
+ * @param i the item to be processed
+ * @param userAgent the user-agent from http request header
+ *
+ */
+void preProcessVCard(Item i) {
+
+    removeSize(i);
+    
+    data = i.data.data;
+    data = replaceInProperty(data, "ADR", "ADR;HOME");
+    
+    data = keepFirstProperty(data, "TEL(;PREF)?;VOICE"     , "TEL;VOICE"     );
+    data = keepFirstProperty(data, "TEL(;PREF)?;CELL;VOICE", "TEL;CELL"      );
+    data = keepFirstProperty(data, "TEL(;PREF)?;HOME;VOICE", "TEL;VOICE;HOME");
+    data = keepFirstProperty(data, "TEL(;PREF)?;WORK;VOICE", "TEL;VOICE;WORK");
+    data = keepFirstProperty(data, "TEL(;PREF)?;FAX"       , "TEL;FAX;HOME"  );
+   
+    //
+    // Adds void standard tokens if they are missing in VCARD item
+    //
+    data = addVoidTokens(data, "END:VCARD", missingCardTokens);
+    
+    i.data.data = data;
+}
+
+/**
+ * Processes incoming calendars.
+ *
+ * Sets item size to null if the size is 0.
+ * Fixes Memo and Birthday subtypes.
+ * Adds missing tokens.
+ *  
+ * @param i the vevent item to be processed
+ */
+void preProcessVEvent(Item i) {
+   
+    removeSize(i);
+    if (isMemoOrBirthday(i)) {
+        moveStartDateTo0000(i);
+        i.data.data = addProperty(i.data.data, "X-FUNAMBOL-ALLDAY:1");
+    }
+    
+    //
+    // Adds void tokens if they are missing in VEVENT item
+    //
+    content = addVoidTokens(i.data.data, "END:VEVENT", missingEventTokens);
+
+    i.data.data = content + "END:VCALENDAR\r\n";
+}
+
+/**
+ * Processes incoming vtodo.
+ *
+ * Sets item size to null if the size is 0.
+ * Adds missing tokens.
+ *  
+ * @param i the vtodo item to be processed
+ */
+void preProcessVTodo(Item i) {
+    removeSize(i);
+    
+    //
+    // Adds void tokens if they are missing in VTODO item
+    //
+    content = addVoidTokens(i.data.data, "END:VTODO", missingTodoTokens);
+
+    i.data.data = content + "END:VCALENDAR\r\n";
+}
+
+
+/**
+ * Sets item size to null if the size is 0.
+ * The device sends size 0 even if the data is not empty and is not a large
+ * object.
+ *
+ * @param i the item to be processed
+ */   
+void removeSize(Item i) {
+    meta = i.meta;
+    if (meta != null && meta.size == 0) {
+        i.meta.setSize(null);
+    }
+}
+
+/**
+ * Checks whether the VEVENT belongs to the Memo or Birthday subtype.
+ */
+boolean isMemoOrBirthday(Item i) {
+    
+    Pattern p = Pattern.compile(
+            "\\nCATEGORIES:(MISCELLANEOUS|SPECIAL OCCASION)(\\r)?\\n");
+    Matcher m = p.matcher(i.data.data);
+    return m.find();
+    
+}
+
+/**
+ * Changes the DTSTART time to 00:00:00 local time if it's set to
+ * 23:59:00.
+ */
+void moveStartDateTo0000(i) {
+    
+    Pattern p = Pattern.compile("\\nDTSTART:[0-9]{8}" + TIMEENDALLDAY + "(\\r)?\\n");
+    Matcher m = p.matcher(i.data.data);
+    StringBuffer sb = new StringBuffer();
+    if (m.find()) {
+        String midnight = m.group().replaceFirst(TIMEENDALLDAY, TIMEZERO);
+        m.appendReplacement(sb, midnight);
+    }
+    m.appendTail(sb);
+    
+    i.data.data = sb.toString();
+}
+
+/**
+ * Initializes the hashmaps with the properties for contact.
+ */
+void init() {
+    missingCardTokens  = new HashMap();
+    missingEventTokens = new HashMap();
+    missingTodoTokens  = new HashMap();
+    initPropsVCard ();
+    initPropsVEvent();
+    initPropsVTodo ();
+}
+
+/**
+ * Initializes hashmap of contact properties.
+ */
+void initPropsVCard() {
+    missingCardTokens.put("\nN"             , "N:;"            );
+    missingCardTokens.put("\nTEL;VOICE"     , "TEL;VOICE:"     );
+    missingCardTokens.put("\nTEL;CELL"      , "TEL;CELL:"      );
+    missingCardTokens.put("\nTEL;VOICE;HOME", "TEL;VOICE;HOME:");
+    missingCardTokens.put("\nTEL;VOICE;WORK", "TEL;VOICE;WORK:");
+    missingCardTokens.put("\nTEL;FAX;HOME"  , "TEL;FAX;HOME:"  );
+    missingCardTokens.put("\nEMAIL"         , "EMAIL:"         );
+    missingCardTokens.put("\nNOTE"          , "NOTE:"          );
+    missingCardTokens.put("\nURL"           , "URL:"           );
+    missingCardTokens.put("\nADR"           , "ADR;HOME:;;;;;;");
+}
+
+/**
+ * Initializes hashmap of vevent properties.
+ */
+void initPropsVEvent() {
+    missingEventTokens.put("\nDTSTART"   , "DTSTART:"   );
+    missingEventTokens.put("\nDTEND"     , "DTEND:"     );
+    missingEventTokens.put("\nRRULE"     , "RRULE:"     );
+    missingEventTokens.put("\nCATEGORIES", "CATEGORIES:");
+    missingEventTokens.put("\nSUMMARY"   , "SUMMARY:"   );
+    missingEventTokens.put("\nLOCATION"  , "LOCATION:"  );
+    missingEventTokens.put("\nAALARM"    , "AALARM:"    );
+}
+
+/**
+ * Initializes hashmap of vtodo properties.
+ */
+void initPropsVTodo() {
+    missingTodoTokens.put("\r\nDUE"     , "DUE:"     );
+    missingTodoTokens.put("\r\nAALARM"  , "AALARM:"  );
+    missingTodoTokens.put("\r\nPRIORITY", "PRIORITY:");
+    missingTodoTokens.put("\r\nSTATUS"  , "STATUS:"  );
+    missingTodoTokens.put("\r\nSUMMARY" , "SUMMARY:" );
+}

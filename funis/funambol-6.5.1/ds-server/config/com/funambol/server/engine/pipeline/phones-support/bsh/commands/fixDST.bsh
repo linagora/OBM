@@ -1,0 +1,53 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * This command fixes a date's DST so that it reflects the correct DST for the
+ * day it represents. Some devices have a bug so that dates are converted in UTC
+ * with the DST of when the conversion is done instead of the DST active at the
+ * time of such date.
+ * The "direction" of the fix (should the date moved forward or backword) is 
+ * different if the date comes from the phone or goes to the phone. This is
+ * indicated by the parameter direction, which must be +1 when processing 
+ * incoming items, -1 when processing outgoing items.
+ *
+ * The given date shall be in the form yyyyMMdd'T'hhmmss.
+ */
+
+import java.util.*;
+import java.text.*;
+
+final SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
+final TimeZone utc = TimeZone.getTimeZone("UTC");
+
+String fixDST(String value, String tzID, int direction) {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Fix date's DST for " + value);
+    }
+    TimeZone tz = TimeZone.getTimeZone(tzID);
+
+    int todayDST = tz.getOffset(System.currentTimeMillis())-tz.rawOffset;
+
+    format.timeZone = utc;
+    date = format.parse(value);
+
+    int dateDST = tz.getOffset(date.time)-tz.rawOffset;
+
+    return format.format(date.time + direction*(todayDST - dateDST));
+}

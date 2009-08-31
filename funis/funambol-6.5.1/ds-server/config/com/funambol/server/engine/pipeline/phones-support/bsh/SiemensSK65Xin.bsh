@@ -1,0 +1,186 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Contacts:
+ * =========
+ * Processes the incoming vcard items and adds the missing tokens.
+ * Handles large objects.
+ *
+ *
+ * Calendars:
+ * ==========
+ * . Event
+ *   Processes the incoming vevent items and adds the missing tokens.
+ *   Fixes a wrong-format issue with the EXDATE and RDATE properties.
+ *   Handles large objects.
+ *
+ * @version $Id: SiemensSK65Xin.bsh,v 1.7 2007/08/31 09:59:51 luigiafassina Exp $
+ */
+ 
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+private Map missingCardTokens  = null;
+private Map missingEventTokens = null;
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+
+/**
+ * Process input message and set MessageProcessingContext property.
+ *
+ * @param processingContext the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("SiemensSK65Xin.preProcessMessage(...)");
+    }
+
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+    processPIMItems(mapItems, pimItemsHandler);
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ *
+ */
+void processPIMItems(Map mapItems, PIMItemsHandler pimItemsHandler) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {
+        preProcessContact(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessEvent(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Adds missing fields.
+ *
+ * @param i the item content
+ */
+void preProcessContact(Item i) {
+    if (log.isTraceEnabled()) {
+        log.trace("SiemensSK65Xin.preProcessContact(...)");
+    }
+    
+    data = i.data.data;
+    
+    //
+    // Adds void tokens if they are missing in VCARD item
+    //
+    data = addVoidTokens(data, "END:VCARD", missingCardTokens);
+}
+
+/**
+ * Turns EXDATE's and RDATE's encoding into Quoted-Printable in order to have 
+ * the soft line breaks (wrongly sent by the device in the QP style) correctly 
+ * interpreted as such.
+ * Adds missing fields.
+ *
+ * @param i the item content
+ */
+void preProcessEvent(Item i) {
+    if (log.isTraceEnabled()) {
+        log.trace("SiemensSK65Xin.preProcessEvent(...)");
+    }
+    
+    //
+    // Specifies Quoted-Printable as the encoding of properties EXDATE and RDATE
+    //
+    data = replaceInProperty(i.data.data, 
+                             "EXDATE:", 
+                             "EXDATE;ENCODING=QUOTED-PRINTABLE:");
+    data = replaceInProperty(data, 
+                             "RDATE:", 
+                             "RDATE;ENCODING=QUOTED-PRINTABLE:");
+    
+    //
+    // Adds void tokens if they are missing in VEVENT item
+    //
+    data = addVoidTokens(data, "END:VEVENT", missingEventTokens);
+
+    i.data.data = data + "END:VCALENDAR\r\n";
+}
+
+/**
+ * Initializes hashmap of contact and event properties.
+ */
+void init() {
+    missingCardTokens  = new HashMap();
+    missingEventTokens = new HashMap();
+
+    missingCardTokens.put("\r\nN"                  , "N:;;;;"              );
+    missingCardTokens.put("\r\nADR;HOME"           , "ADR;HOME:;;;;;;"     );
+    missingCardTokens.put("\r\nORG"                , "ORG:"                );
+    missingCardTokens.put("\r\nTEL;VOICE"           , "TEL;VOICE:"         );
+    missingCardTokens.put("\r\nTEL;HOME"           , "TEL;HOME:"           );
+    missingCardTokens.put("\r\nTEL;WORK"           , "TEL;WORK:"           );
+    missingCardTokens.put("\r\nTEL;CELL"           , "TEL;CELL:"           );
+    missingCardTokens.put("\r\nTEL;FAX"            , "TEL;FAX:"            );
+    missingCardTokens.put("\r\nTEL;FAX;HOME"       , "TEL;FAX;HOME:"       );
+    missingCardTokens.put("\r\nEMAIL;INTERNET"     , "EMAIL;INTERNET:"     );
+    missingCardTokens.put("\r\nEMAIL;HOME;INTERNET", "EMAIL;HOME;INTERNET:");
+    missingCardTokens.put("\r\nURL"                , "URL:"                );
+    missingCardTokens.put("\r\nBDAY"               , "BDAY:"               );
+
+    missingEventTokens.put("\r\nSUMMARY" , "SUMMARY:" );
+    missingEventTokens.put("\r\nLOCATION", "LOCATION:");
+    missingEventTokens.put("\r\nDTSTART" , "DTSTART:" );
+    missingEventTokens.put("\r\nDTEND"   , "DTEND:"   );
+    missingEventTokens.put("\r\nDALARM"  , "DALARM:"  );
+    missingEventTokens.put("\r\nAALARM"  , "AALARM:"  );
+    missingEventTokens.put("\r\nRRULE"   , "RRULE:"   );
+}

@@ -1,0 +1,50 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+/**
+ * This command retrieves and returns the Sync4jDevice corresponding to the
+ * device which is synchronizing. It returns null if the device could not be
+ * found.
+ *
+ * @version $Id: deviceLookup.bsh,v 1.3 2007/07/25 13:27:30 luigiafassina Exp $
+ */
+
+import com.funambol.framework.server.Sync4jDevice;
+import com.funambol.server.admin.AdminManager;
+
+Sync4jDevice deviceLookup(String deviceId) {
+
+    if (log.isTraceEnabled()) {
+        log.trace("Get device with identifier " + deviceId);
+    }
+    
+    if (deviceId == null) {
+        return null;
+    }
+
+    Sync4jDevice device = null;
+
+    try {
+        device = new AdminManager().getDevice(deviceId);
+    } catch (Exception e) {
+        String msg = "Error getting device (" + e.toString() + ")";
+        log.error(msg, e);
+    }
+
+    return device;
+}

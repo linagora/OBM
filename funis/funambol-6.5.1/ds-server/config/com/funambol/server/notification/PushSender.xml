@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java version="1.4.2_01" class="java.beans.XMLDecoder">
+    <object class="com.funambol.server.notification.sender.TCPIPSender">
+    
+        <!-- Connection timeout in seconds -->
+        <void property="timeout">
+            <int>60</int>
+        </void>
+        
+        <!-- Numbers of attempts  -->
+        <void property="attempts">
+            <int>3</int>
+        </void>
+        
+        <!-- Waiting time between the attempts in seconds  -->        
+        <void property="waitingTime">
+            <int>20</int>
+        </void>  
+                
+        <!-- Default port  -->        
+        <void property="defaultPort">
+            <int>745</int>
+        </void>          
+        
+    </object>
+</java>

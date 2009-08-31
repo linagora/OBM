@@ -1,0 +1,481 @@
+/*
+ * Copyright (C) 2007 Funambol, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the Honest Public License, as published by
+ * Funambol, either version 1 or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY, TITLE, NONINFRINGEMENT or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the Honest Public License for more details.
+ *
+ * You should have received a copy of the Honest Public License
+ * along with this program; if not, write to Funambol,
+ * 643 Bair Island Road, Suite 305 - Redwood City, CA 94063, USA
+ */
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.funambol.framework.core.*;
+import com.funambol.framework.core.Sync4jException;
+import com.funambol.framework.engine.pipeline.InputMessageProcessor;
+import com.funambol.framework.engine.pipeline.MessageProcessingContext;
+import com.funambol.framework.engine.pipeline.StopProcessingException;
+import com.funambol.framework.logging.FunambolLogger;
+import com.funambol.framework.logging.FunambolLoggerFactory;
+import com.funambol.framework.server.Sync4jDevice;
+
+import com.funambol.foundation.synclet.PIMItemsHandler;
+
+/**
+ * Handles anchors for every source to sync.
+ *  
+ * Contacts:
+ * =========
+ * Processes the incoming vcard items and adds the missing tokens.
+ * Handles large objects.
+ * Replaces token TEL;FAX  with TEL;FAX;HOME    token. 
+ * Replaces token TEL:     with TEL;VOICE:      token. 
+ * Replaces token TEL:WORK with TEL;VOICE;WORK: token. 
+ * Removes empty line.
+ *  
+ * Calendars:
+ * ==========
+ * . Event
+ *   Processes the incoming vevent items and adds the missing tokens.
+ *   Handles large objects.
+ *   Fixes wrong summer time conversions by the device.
+ *   Removes empty line.
+ *   Removes the dummy values.
+ *
+ * . Todo
+ *   Processes the incoming vtodo items and adds the missing tokens.
+ *   Handles large objects.
+ *   Removes empty line.
+ *   Removes the dummy value.
+ *     
+ * @version $Id: SonyEricssonK750Iin.bsh,v 1.1 2007/07/25 13:21:14 luigiafassina Exp $
+ */
+// ------------------------------------------------------------------- Constants
+private Map missingCardTokens  = null;
+private Map missingEventTokens = null;
+private Map missingVTodoTokens = null;
+
+// ---------------------------------------------------------------- Private data
+private final FunambolLogger log =
+    FunambolLoggerFactory.getLogger("engine.pipeline");
+
+// ------------------------------------------------------ Synclet implementation
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/commands");
+importCommands("/com/funambol/server/engine/pipeline/phones-support/bsh/sonyericsson");
+
+/**
+ * Processes input message and set MessageProcessingContext property.
+ *
+ * @param mpc the message processing context
+ * @param message the message to be processed
+ *
+ * @throws Sync4jException
+ */
+void preProcessMessage(MessageProcessingContext processingContext,
+                       SyncML message                            )
+throws Sync4jException {
+
+    if (log.isTraceEnabled()) {
+        log.trace("SonyEricssonK750Iin.preProcessMessage(...)");
+    }
+    
+    saveFastSyncLastAnchorMapEntry(message, processingContext);
+    
+    // This map contains the three lists of items separated based on their type
+    PIMItemsHandler pimItemsHandler = new PIMItemsHandler();
+    Map mapItems =
+        pimItemsHandler.extractIncomingPIMItems(processingContext, message);
+
+    //
+    // Retrieves the device from the db
+    //
+    Sync4jDevice device = deviceLookup(message.syncHdr.source.locURI);
+
+    processPIMItems(mapItems, pimItemsHandler, device);
+    
+    throw new StopProcessingException("SonyEricssonK750Iin Synclet finished");
+}
+
+/**
+ * Processes incoming items.
+ *
+ * @param mapItems the map that contains the three lists of items separated
+ *                 based on their type
+ * @param pimItemsHandler the object to handle the large object
+ * @param device the device information
+ */
+void processPIMItems(Map             mapItems       ,
+                     PIMItemsHandler pimItemsHandler,
+                     Sync4jDevice    device         ) {
+
+    //
+    // Cycle on vcard list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VCARD)) {    
+        preProcessVCard(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+    
+    TimeZone tz;
+    if ((device != null) && (device.timeZone != null)) {
+        tz = TimeZone.getTimeZone(device.timeZone);
+    } else {
+        tz = null;
+    }
+    
+    //
+    // Cycle on vevent list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VEVENT)) {
+        preProcessVEvent(i, tz);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+    
+    //
+    // Cycle on vtodo list
+    //
+    for (i: (List)mapItems.get(PIMItemsHandler.KEY_VTODO)) {
+        preProcessVTodo(i);
+        pimItemsHandler.fixLargeObjectSize(i);
+    }
+}
+
+/**
+ * Processes incoming contacts.
+ * 
+ * Replaces token TEL;FAX  with TEL;FAX;HOME    token. 
+ * Replaces token TEL:     with TEL;VOICE:      token. 
+ * Replaces token TEL:WORK with TEL;VOICE;WORK: token. 
+ * Removes empty lines.
+ * Adds missing fields.
+ *                                                                          
+ * @param i the item to be processed
+ *
+ */
+void preProcessVCard(Item i) {
+    
+    data = i.data.data;
+    
+    data = replaceInProperty(data, "TEL;FAX:" , "TEL;FAX;HOME:"  );
+    data = replaceInProperty(data, "TEL:"     , "TEL;VOICE:"     );
+    data = replaceInProperty(data, "TEL;WORK:", "TEL;VOICE;WORK:");
+
+    //
+    // Removes empty lines
+    // 
+    data = removeEmptyLines(data);
+
+    //
+    // Adds void tokens if they are missing in VCARD item
+    //
+    data = addVoidTokens(data, "END:VCARD", missingCardTokens);
+    
+    i.data.data = data;
+}
+
+/**
+ * Processes incoming events.
+ *
+ * Remove dummy values for location and description.
+ * Removes the dummy values.
+ * Removes empty lines.
+ * Adds missing fields
+ *
+ * @param i the item to be processed
+ * @param tz the device timezone
+ */
+void preProcessVEvent(Item i, TimeZone tz) {
+
+    data = i.data.data;
+    //
+    // The "summerTime" is true if the conversion is on: this conversion is not
+    // properly implemented by these devices, since they convert all times into
+    // DST (Daylight Saving Time) or standard time irrespective of the
+    // corresponding date.
+    //
+    boolean summerTime = isSonyEricssonDST(data);
+
+    if (log.isTraceEnabled()) {
+        log.trace("Using device time zone " + tz);
+    }
+    
+    if ((tz != null) && (tz.useDaylightTime())) {
+        data = fixSummerTime(data, "DTSTART"      , summerTime, tz);
+        data = fixSummerTime(data, "DTEND"        , summerTime, tz);
+        data = fixSummerTime(data, "LAST-MODIFIED", summerTime, tz);
+        data = fixSummerTime(data, "AALARM"       , summerTime, tz);
+        data = fixSummerTime(data, "DALARM"       , summerTime, tz);
+    }
+    
+    //
+    // Replaces dummy values.
+    //
+    data = removeDummyValue(data, "SUMMARY;CHARSET=UTF-8:"    , "SUMMARY:"    );
+    data = removeDummyValue(data, "LOCATION;CHARSET=UTF-8:"   , "LOCATION:"   );
+    data = removeDummyValue(data, "DESCRIPTION;CHARSET=UTF-8:", "DESCRIPTION:");
+    
+    //
+    // Removes empty lines
+    // 
+    data = removeEmptyLines(data);
+    
+    //
+    // Adds void tokens if they are missing in VEVENT item
+    //
+    data = addVoidTokens(data, "END:VEVENT", missingEventTokens);
+    
+    i.data.data = data + "END:VCALENDAR\r\n";
+}
+
+/**
+ * Processes incoming vtodo.
+ * 
+ * Removes the dummy value.
+ * Removes empty lines.
+ * Adds missing fields. 
+ *
+ * @param i the item to be processed
+ */
+void preProcessVTodo(Item i) {    
+    
+    data = i.data.data;
+    
+    //
+    // Removes the dummy value.
+    //
+    data = removeDummyValue(data, "SUMMARY;CHARSET=UTF-8:", "SUMMARY:");
+
+    //
+    // Removes empty lines
+    // 
+    data = removeEmptyLines(data);
+
+    //
+    // Adds void tokens if they are missing in VTODO item
+    //
+    data = addVoidTokens(data, "END:VTODO", missingVTodoTokens);
+    
+    i.data.data = data + "END:VCALENDAR\r\n";
+}
+
+/**
+ * Saves pairs (sourceURI, last anchors) in the fast sync map.
+ *  
+ * Notes about device
+ * ==================
+ *
+ * It may happen that at synchronization "i" device sends anchors with the same
+ * values (that is: last anchor == next anchor) and at synchronization "i+1" 
+ * it sends anchors that are different (last anchor != next anchor). >From the 
+ * first time that this behaviour is seen, this will be true for every "i".
+ *   
+ * Thus: at synchronization "i+1" every modification made on the server between 
+ * sync i and i+1 are not sent to the device, while every modification made 
+ * between i+1 and i+2 are sent to the device. 
+ *  
+ * By now it is not clear which are all the conditions that triggers such behavior
+ * and the ones that restore a correct behavior.
+ *  
+ * Examples:
+ *  
+ * (1) assume that:
+ *      device is working correctly 
+ *      only contact are being synchronized
+ *      device contains at least one contact
+ *
+ *  then do the following:
+ *  - reset all contact from the server
+ *  - sync from device
+ *  - modify a contact on server
+ *  - sync from the phone; 
+ *      equals anchors are sent, modification are sent to the device
+ *  - modify a contact on server
+ *  - sync from the phone  
+ *      different anchors are sent, modification are not sent to the device
+ *  - modify a contact on server
+ *  - sync from the phone; 
+ *      equals anchors are sent, modification are sent to the device
+ *  ...and so on....
+ *  
+ * (2) assume that:
+ *      device is working the previuos way   
+ *  then do the following:
+ *  - delete all contacts on the server
+ *  - sync
+ *  - add a contact on server
+ *  - sync from the phone  
+ *      different anchors are sent, item is sent to the device
+ *  - modify the contact on server
+ *  - sync from the phone  
+ *      different anchors are sent, modification are sent to the device
+ *  - modify the contact on server
+ *  - sync from the phone  
+ *      different anchors are sent, modification are sent to the device
+ *  ...and so on....
+ *    
+ * In order to avoid such behavior:
+ * at the end of each sync the last_anchor of every item exchanged between
+ * device and server is set to -1, so at the subsequent fast sync that items will 
+ * be sent to the device, if they have been modified. This has not to be
+ * done in case of slow sync.
+ * 
+ * More precisely:
+ * 
+ * input:
+ *  for every Alert command sent by the device requesting a fast sync, the pair
+ *  (sourceURI, last_anchor) is stored in the session context into HashMap
+ *  (FAST_SYNC_LAST_ANCHOR_MAP).
+ *  
+ * output: 
+ *  - server could request a slow sync to the device for a source already present 
+ *    in the FAST_SYNC_LAST_ANCHOR_MAP map. That entry must be removed.
+ *  - when the last message of the sync is sent, the last anchor for every item
+ *    exchanged between device and server is set to -1.
+ *
+ * @param message the SyncML message to be processed
+ * @param mpc the message processing context
+ */
+void saveFastSyncLastAnchorMapEntry(SyncML                   message,
+                                    MessageProcessingContext mpc    ){
+
+    //
+    // Checks if the msgID is <= 3.
+    //
+    // All the alerts are sent by the device within the first 3 messages, so it
+    // is not necessary to check the subsequent ones. 
+    //
+    msgID = Integer.parseInt(message.syncHdr.msgID);
+    if (msgID > 3) {
+        return;
+    }
+
+    List cmds = message.syncBody.commands;
+    
+    Map map = null;
+    map = (Map)mpc.getSessionProperty("FAST_SYNC_LAST_ANCHOR_MAP");
+    if (map == null) {
+        map = new HashMap();
+        mpc.setSessionProperty("FAST_SYNC_LAST_ANCHOR_MAP", map);
+    }
+    
+    for (AbstractCommand bodyc : cmds) {
+    
+        if (bodyc instanceof Alert) {
+            
+            Alert alert = (Alert)bodyc;
+            
+            //
+            // Checks the type of sync because if a slow sync is required, then
+            // the source for this alert has not to be considered.
+            //
+            syncType = alert.data;
+            if (syncType != AlertCode.TWO_WAY) {
+                continue;
+            } 
+            
+            List items = alert.items;
+            for (Item item : items) {
+
+                //
+                // Extracts source uri.
+                //
+                sourceURI = item.target.locURI;
+                
+                //
+                // Extracts last anchor
+                //
+                Meta meta = item.meta;
+                if (meta == null) {
+                    continue;
+                }
+                Anchor anchor = meta.anchor;
+                
+                last = anchor.last;
+                
+                //                
+                // Put entry (sourceURI, last anchor) into the map.
+                //                
+                map.put(sourceURI, last);
+                
+                if (log.isTraceEnabled()) {
+                    log.trace("Added entry into FAST_SYNC_LAST_ANCHOR_MAP " +
+                              "(source: " + sourceURI +
+                              ", last_anchor: " + last + ")");
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Removes empty lines that could appear in item data.
+ * 
+ * Notes about device
+ * ==================
+ * 
+ * If a large object is sent it can happen that a line, which terminates with
+ * the sequence "\r\n", is splitted as follows: the first message ends with the
+ * "\r" character and the second one starts with "\n". Then the process that
+ * performs the conversion from the wbxml message to a SyncML object adds
+ * a "\n", so the sequence "\r\n\n" is generated, and an "empty line" appears.
+ *  
+ * This method replaces the wrong sequence "\r\n\n" with "\r\n".
+ * 
+ * @param data the data to be processed
+ * @return the modified data
+ */ 
+String removeEmptyLines(data) {
+    newData = data.replaceAll("\\r\\n\\n","\r\n");
+    return newData;
+}   
+
+/**
+ * Initializes hashmap of contact, event and todo properties.
+ */
+void init() {
+    missingCardTokens  = new HashMap();
+    missingEventTokens = new HashMap();
+    missingVTodoTokens = new HashMap();
+    
+    missingCardTokens.put("\r\nN"              , "N:;;;;"         );
+    missingCardTokens.put("\r\nORG"            , "ORG:;"          );
+    missingCardTokens.put("\r\nTITLE"          , "TITLE:"         );
+    missingCardTokens.put("\r\nTEL;HOME:"      , "TEL;HOME:"      );
+    missingCardTokens.put("\r\nTEL;VOICE;WORK:", "TEL;VOICE;WORK:");
+    missingCardTokens.put("\r\nTEL;CELL:"      , "TEL;CELL:"      );
+    missingCardTokens.put("\r\nTEL;FAX;HOME:"  , "TEL;FAX;HOME:"  );
+    missingCardTokens.put("\r\nTEL;VOICE:"     , "TEL;VOICE:"     );
+    missingCardTokens.put("\r\nEMAIL;INTERNET" , "EMAIL;INTERNET:");
+    missingCardTokens.put("\r\nURL"            , "URL:"           );
+    missingCardTokens.put("\r\nADR;HOME"       , "ADR;HOME:;;;;;;");
+    missingCardTokens.put("\r\nNOTE"           , "NOTE:"          );
+    missingCardTokens.put("\r\nBDAY:"          , "BDAY:"          ); 
+
+    missingEventTokens.put("\r\nDTSTART:"      , "DTSTART:"      );
+    missingEventTokens.put("\r\nDTEND:"        , "DTEND:"        );
+    missingEventTokens.put("\r\nSUMMARY"       , "SUMMARY:"      );
+    missingEventTokens.put("\r\nLOCATION"      , "LOCATION:"     );
+    missingEventTokens.put("\r\nDALARM:"       , "DALARM:"       );
+    missingEventTokens.put("\r\nAALARM:"       , "AALARM:"       );
+    missingEventTokens.put("\r\nLAST-MODIFIED:", "LAST-MODIFIED:");
+    
+    missingVTodoTokens.put("\r\nSUMMARY"   , "SUMMARY:"   );
+    missingVTodoTokens.put("\r\nDTSTART:"  , "DTSTART:"   );
+    missingVTodoTokens.put("\r\nDTEND:"    , "DTEND:"     );
+    missingVTodoTokens.put("\r\nCATEGORIES", "CATEGORIES:");
+    missingVTodoTokens.put("\r\nPRIORITY"  , "PRIORITY:"  );
+    missingVTodoTokens.put("\r\nSTATUS"    , "STATUS:"    );
+    missingVTodoTokens.put("\r\nCLASS"     , "CLASS:"     );
+    missingVTodoTokens.put("\r\nAALARM:"   , "AALARM:"    );
+    missingVTodoTokens.put("\r\nDALARM:"   , "DALARM:"    );
+}
