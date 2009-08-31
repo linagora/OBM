@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- this runs from ".." -->
+
+<project name="obm-tomcat" default="dist" basedir=".">
+
+  <target name="dist">
+    <echo>Preparing ${ant.project.name} distribution...</echo>
+
+    <!-- destination directory -->
+    <property name="dd" 
+	      value="debian/${ant.project.name}/usr/share"/>
+
+    <!-- tomcat home -->
+    <property name="t_home" 
+	      value="${dd}/apache-tomcat-6.0.20/"/>
+
+    <property name="varlib"
+	      value="debian/${ant.project.name}/var/lib/obm-tomcat"/>
+    <property name="tlogs"
+	      value="debian/${ant.project.name}/var/log/obm-tomcat"/>
+
+    <mkdir dir="${dd}"/>
+
+    <mkdir dir="${varlib}/temp"/>
+    <mkdir dir="${varlib}/work"/>
+    <mkdir dir="${tlogs}"/>
+
+    <exec executable="tar" failonerror="true">
+      <arg line="xfj obm-tomcat-6.0.20.tar.bz2 -C ${dd}"/>
+    </exec>
+
+    <copy todir="${t_home}/conf" 
+	  file="conf/server.xml"/>
+    <copy todir="${t_home}/bin" 
+	  file="catalina.sh"/>
+    <chmod file="${t_home}/bin/catalina.sh" perm="ugo+x"/>
+
+    <copy todir="${t_home}/lib">
+      <fileset dir="aliapool" includes="*jar"/>
+    </copy>
+    <copy todir="${t_home}/lib" 
+	  file="aliapool/log4j.properties"/>
+
+    <echo>${ant.project.name} distribution done.</echo>
+  </target>
+  
+</project>
