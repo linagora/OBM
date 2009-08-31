@@ -107,20 +107,16 @@ Obm.CalendarManager = new Class({
         // add tip
         var more = $('more_'+index);
         if (more) {
-
           var title = '<b>'+evt.event.date.format('H:i')+'</b> -  '+evt.event.title;
-	  var color = evt.content.getStyle('backgroundColor');
+	        var color = evt.content.getStyle('backgroundColor');
           if (evt.event.colors.event) color = evt.event.colors.event;
           var style = 'style="color:'+color+'"';
-
           if (evt.event.all_day) {
             title = evt.event.title;
             color = "#fff";
             klass='class="'+evt.event.klass+'"';
             style = 'style="background:'+evt.event.colors.event+'; color:'+color+'" '+klass ;
           }
-
-
           more.set('title', more.get('title')+'<div '+style+'>'+ title+'</div>');
         }
       }
@@ -265,7 +261,7 @@ Obm.CalendarManager = new Class({
         var position = 0;
 
         cell.each(function (evt, index) {
-          var updatedId = evt.event.id+'-'+evt.event.entity_id;
+          var updatedId = evt.event.id+'-'+evt.event.entity_id+'-'+evt.event.time;
           var coords;
           if(!(coords = updated.get(updatedId))) {
             if(usedPositions.getLength() == 0) {
