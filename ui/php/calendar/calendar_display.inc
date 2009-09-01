@@ -901,6 +901,7 @@ function dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, 
   <script type=\"text/javascript\">
     obm.vars.consts.cellWidth = $width;
     obm.vars.consts.nbDisplayedDays = $display_days;
+    obm.vars.consts.calendarView = 'day';
     obm.initialize.chain(function () {
       obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
       obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
@@ -920,22 +921,9 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
   global $ico_next, $ico_previous, $l_previous, $l_next;
   global $ico_far_next, $ico_far_previous, $ico_allday;
  
-  $GLOBALS['js']['vars']['images']['resize'] = $GLOBALS['ico_resize'];
-  $GLOBALS['js']['vars']['images']['periodic'] = $GLOBALS['ico_periodic'];
-  $GLOBALS['js']['vars']['images']['meeting'] = $GLOBALS['ico_meeting'];
-  $GLOBALS['js']['vars']['images']['private'] = $GLOBALS['ico_private'];
-  $GLOBALS['js']['vars']['images']['all_day'] = $GLOBALS['ico_allday'];
-  $GLOBALS['js']['vars']['images']['extension_left'] = $GLOBALS['ico_extension_left'];
-  $GLOBALS['js']['vars']['images']['extension_right'] = $GLOBALS['ico_extension_right'];
-  $GLOBALS['js']['vars']['consts']['timeUnit'] = (3600/$_SESSION['set_cal_interval']);    
-
   $status = array('ACCEPTED', 'NEEDS-ACTION');
-  $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
-  if (is_array($occurrences)) {
-    foreach($occurrences as $occurrence) {
-      $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
-    }
-  }
+  calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
+  $of = &OccurrenceFactory::getInstance();
 
   $category_filter = $calendar['category_filter'];
   $start_time = $date->getTimestamp();
@@ -944,6 +932,7 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
   $width = round(100/7, 2);
   $height = round(100/$weeks, 2);
   $current = clone $date;
+  $dis_week_time = "obm.vars.consts.weekTime = new Array();";
 
   // calendar grid
   while($current->compare($end) < 0) {
@@ -951,6 +940,17 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
     $week_day_event_list .= "<div class='monthRow' style='height:{$height}%'>";
     $endWeek = clone $current;
     $endWeek->addDay(7);
+
+    $dis_week_time .= "obm.vars.consts.weekTime[".$current->getWeek()."] = new Array('".$current->getTimestamp()."','".$endWeek->getTimestamp()."');";
+
+    $occurrences = $of->getPeriodOccurrences($current,$endWeek);
+    if (is_array($occurrences)) {
+      foreach($occurrences as $occurrence) {
+        $occurrence->week = $current->getWeek();
+        $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
+      }
+    }
+
     while($current->compare($endWeek) < 0) {
       $today = "";
       if ($current->isToday()) {
@@ -1021,6 +1021,8 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
   </div>
   <script type=\"text/javascript\">
     obm.vars.labels.more = '".phpStringToJsString($GLOBALS['l_more'])."';
+    obm.vars.consts.calendarView = 'month';
+    $dis_week_time
     obm.initialize.chain(function () {
       obm.vars.consts.startTime = new Obm.DateTime($start_time * 1000);
       obm.calendarManager = new Obm.CalendarManager(".$date->setHour(0)->getTimestamp().",'".$date->getOption('timezone')."');
@@ -1507,6 +1509,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
       if ($updatable) {
         $options[] = 'draggable:true';
       }
+      $ed[] = "week:".$occurrence->week;
       break;
     case 'hour' :
       $day = ($all_day) || ($end->compareDateIso($date)!=0 && ($end->getHour()>0 || $end->getMinute()>0 || $end->getSecond()>0));
@@ -4640,6 +4643,7 @@ function json_event_data($id,$calendar) {
   $ed[] = "location:''";
   $ed[] = "category:''";
   $ed[] = "colors:{}";
+  $ed[] = 'week:'.$date->getWeek();
   
   $entity_readable = get_calendar_entity_readable();
   $sel_entity_id = slice_calendar_entities($cal_entity_id, $ccalendar_max_users, $entity_readable);
