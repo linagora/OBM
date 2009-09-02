@@ -44,7 +44,6 @@ class EventAlertCronJob extends CronJob{
    * @return void
    */
   function mustExecute($date) {
-    return true;
     $date = new Of_Date($date);
     $min = date("i");
     $modulo = $this->jobDelta / 60;
@@ -86,6 +85,7 @@ class EventAlertCronJob extends CronJob{
 
     foreach($occurrences as $occurrence) {
       $event = $occurrence->event;
+
       $delta = $this->getAlertDelta($event->id, $occurrence->id);
       
       if($occurrence->date->compare($date)>=0 && $occurrence->date->compare($end)<0) {
@@ -341,7 +341,7 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       event_location,
       event_repeatfrequence,
       event_owner,
-      userentity_entity_id as eventlink_entity_id,
+      userentity_user_id as eventlink_entity_id,
       'user' as eventlink_entity,
       eventlink_state,
       #SUBSECONDS(event_date,eventalert_duration) as event_date,
@@ -355,7 +355,7 @@ function run_query_calendar_no_repeat_alerts($start,$end) {
       INNER JOIN Event ON event_id = eventalert_event_id  
       INNER JOIN UserEntity ON userentity_user_id = eventalert_user_id
       INNER JOIN EventLink ON event_id = eventlink_event_id AND eventlink_entity_id = userentity_entity_id 
-      INNER JOIN UserObm ON userobm_id = eventlink_entity_id
+      INNER JOIN UserObm ON userobm_id = userentity_user_id 
     WHERE eventlink_state = 'ACCEPTED'
       AND event_repeatkind = 'none'
       AND #SUBSECONDS(event_date,eventalert_duration) >= '$start'
@@ -407,12 +407,10 @@ function run_query_calendar_repeat_alerts($start, $end) {
       INNER JOIN Event ON event_id = eventalert_event_id
       INNER JOIN UserEntity ON userentity_user_id = eventalert_user_id
       INNER JOIN EventLink ON event_id = eventlink_event_id AND eventlink_entity_id = userentity_entity_id 
-      INNER JOIN UserObm ON userobm_id = eventlink_entity_id
+      INNER JOIN UserObm ON userobm_id = userentity_user_id 
     WHERE event_repeatkind != 'none'
       AND eventlink_state = 'ACCEPTED'
       AND #SUBSECONDS(event_date  , eventalert_duration) <= '$end' 
-      AND (#SUBSECONDS(event_endrepeat  , eventalert_duration) >='$start' 
-      OR event_endrepeat IS NULL)
       AND eventalert_duration >= 0
     ORDER BY event_date"; 
 

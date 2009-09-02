@@ -1477,7 +1477,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $entity_state = $occurrence->entity_state;
   $all_day = ($event->all_day)?1:0;
   $entityClass = $calendar_entity[$entity][$entity_id]['class'];
-  $eventColor = $event->color;
+  $eventColor = get_color_data($event->color);
   $ed[] = "id:$id";
   $ed[] = "entity:'$entity'";
   $ed[] = "entity_id:$entity_id"; 
@@ -1491,7 +1491,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "owner_name:'$owner_name'";
   $ed[] = "location:'$location'";
   $ed[] = "category:'$category'";
-  $ed[] = "colors: {event:'$eventColor'}";
+  $ed[] = "colors: {event: {body:'$eventColor[body]', header:'$eventColor[header]'}}";
   $ed[] = "status:'$entity_state'";
   $attendees = array();
   foreach ($attendee as $entity => $entities) {
@@ -6253,12 +6253,12 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
       $background = $class["background"];
       $duration = $event->event->duration;
       $date = $event->date->get(Of_Date::TIME_SHORT);
-      $color = $event->event->color;
+      $color = get_color_data($event->event->color);
       $attendee = $event->event->attendee;
       
       if (!empty($color) && sizeof($this->calendar_entity)==1) {
-        $bg_color = $color;
-        $title_color = $color;
+        $bg_color = $color['body'];
+        $title_color = $color['header'];
       } else {
         $bg_color = $class["background"];
         $title_color = $class["title"];
@@ -6364,6 +6364,7 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         $y1 = $this->calendar_y1-$this->allday_height-($begin - $this->calendar_first_hour)*$this->col_height;
         $y0 = $y1-($end-$begin)*$this->col_height;
 
+        $event_body = '';
         if ($event->event->duration < 2700) {
           $dis_header = "$date $title";
           $dis_title = "";
@@ -6383,8 +6384,9 @@ Class CalendarPdfDayAgenda Extends CalendarPdf{
         }
 
         // event title
+        $this->page->setLineColor(new Zend_Pdf_Color_Html($title_color));
         $this->page->setFillColor(new Zend_Pdf_Color_Html($bg_color));
-        $this->page->drawRectangle($x0,$y0,$x1,$y1,Zend_Pdf_Page::SHAPE_DRAW_FILL);
+        $this->page->drawRectangle($x0,$y0,$x1,$y1);
         $this->page->setFillColor(new Zend_Pdf_Color_Html('#FFFFFF'));
         
         $text_cell_width = ($x1 - $x0 - 2);
@@ -6774,9 +6776,9 @@ Class CalendarPdfList Extends CalendarPdf{
       if ($this->showdetails && !$private_event) {
         $repeat = $event->repeat;
         if ($repeat == 'none') {
-    $dis_repeat = '';
+          $dis_repeat = '';
         } else {
-    $dis_repeat = ${"l_$repeat"};
+          $dis_repeat = ${"l_$repeat"};
         }
         $location = $event->location;
         $category = $event->category1;

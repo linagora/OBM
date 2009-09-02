@@ -41,7 +41,6 @@ if($action == "ticket") {
 
   include("$obminclude/global_pref.inc");
   get_sso_action();
-  $perm->check_permissions($module, $action);
 
   page_close();
 }
@@ -64,14 +63,18 @@ if ($action == "validate") {
   } else {
     if(isset($params['service'])) {
 	if (strrpos($params[service], "?") > 0) {
-      		header("location:$params[service]&ticket=$ticket");
+          header("location:$params[service]&ticket=$ticket");
+          echo "<html><body onload=\"document.location='$params[service]&ticket=$ticket'\"></body></html>";
 	} else {
-      		header("location:$params[service]?ticket=$ticket");
+          header("location:$params[service]?ticket=$ticket");
+          echo "<html><body onload=\"document.location='$params[service]?ticket=$ticket'\"></body></html>";
 	}
     } elseif(isset($params['section']) && isset($cgp_show["section"][$params['section']]['url'])) {
       header("location:".$cgp_show["section"][$params['section']]['url']."?ticket=$ticket");
+      echo "<html><body onload=\"document.location='".$cgp_show["section"][$params['section']]['url']."?ticket=$ticket'\"></body></html>";
     } else {
       header("location:".$cgp_show["section"]["webmail"]["url"]."/login.php?ticket=$ticket");
+      echo "<html><body onload=\"document.location='".$cgp_show["section"]["webmail"]["url"]."/login.php?ticket=$ticket'\"></body></html>";
     }
   }
 } elseif ($action == "logout") {

@@ -198,7 +198,6 @@ Obm.CalendarManager = new Class({
     return obmEvent;
   },
 
-
   /**
    * Resize viewport
    */
@@ -545,7 +544,6 @@ Obm.CalendarManager = new Class({
     return eventData;
   },
 
-
   //
   // TODO: REWRITE AJAX CALLS
   //
@@ -853,9 +851,9 @@ Obm.CalendarEvent = new Class({
    * Fill event with custom color
    */
   setColor: function(color) {
-    if (color) {
-      this.content.setStyle('backgroundColor',color);
-      this.dragHandler.setStyle('backgroundColor',color);
+    if(color) {
+      this.element.setStyle('backgroundColor',color.body);
+      this.dragHandler.setStyle('backgroundColor',color.header);
     } else {
       this.content.setStyle('backgroundColor','');
       this.dragHandler.setStyle('backgroundColor','');
@@ -1238,7 +1236,6 @@ Obm.CalendarAllDayEvent = new Class({
     this.element.style.top = position * this.element.offsetHeight+'px';
     this.element.style.width = size*100+'%';
   },
-
 
   /**
    * Update event time on drag 

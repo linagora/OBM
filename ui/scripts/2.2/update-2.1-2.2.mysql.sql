@@ -881,7 +881,7 @@ ALTER TABLE Contact ADD COLUMN contact_anniversary_id int(8) default NULL AFTER 
 ALTER TABLE Contact ADD COLUMN contact_photo_id int(8) default NULL AFTER contact_anniversary_id;
 ALTER TABLE Contact ADD COLUMN contact_collected int(1) default false;
 ALTER TABLE Contact ADD COLUMN contact_origin VARCHAR(255);
-UPDATE Contact SET contact_origin='obm21';
+UPDATE Contact SET contact_origin='obm21', contact_timeupdate = contact_timeupdate;
 ALTER TABLE Contact MODIFY COLUMN contact_origin VARCHAR(255) NOT NULL;
 
 -- PublicationType (correct an error in MySQL 2.1 creation script)
@@ -1008,7 +1008,7 @@ ALTER TABLE UGroup MODIFY COLUMN group_manager_id int(8) DEFAULT NULL;
 UPDATE Company set company_archive='0' where company_archive != '1';
 ALTER TABLE Company MODIFY COLUMN company_archive int(1) DEFAULT 0 NOT NULL;
 
-UPDATE Contact set contact_archive='0' where contact_archive != '1';
+UPDATE Contact set contact_archive='0', contact_timeupdate = contact_timeupdate where contact_archive != '1';
 ALTER TABLE Contact MODIFY COLUMN contact_archive int(1) DEFAULT 0 NOT NULL;
 
 UPDATE Deal set deal_archive='0' where deal_archive != '1';
