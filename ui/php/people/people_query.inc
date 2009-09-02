@@ -30,7 +30,7 @@ function run_query_people_search($people) {
   $email = sql_search_text_parse($people['email']);
   $desc = sql_search_text_parse($people['desc']);
   $phone = $people['phone'];
-  $adress = $people['adress'];
+  $address = $people['address'];
   $service = $people['service'];
   $zipcode = $people['zipcode'];
   $cedex = $people['cedex'];
@@ -136,12 +136,12 @@ function run_query_people_search($people) {
     $where_contact .= " AND (contactentity_entity_id IN (SELECT phone_entity_id FROM Phone WHERE phone_number #LIKE '$phone%'))";
   }
 
-  // If an adress indication has been specified, get it
-  if (trim($adress) != '') {
+  // If an address indication has been specified, get it
+  if (trim($address) != '') {
     // UserObm
-    $where_userobm .= " AND (userobm_address1 #LIKE '%$adress%'
-      OR userobm_address2 #LIKE '%$adress%'
-      OR userobm_address3 #LIKE '%$adress%')";
+    $where_userobm .= " AND (userobm_address1 #LIKE '%$address%'
+      OR userobm_address2 #LIKE '%$address%'
+      OR userobm_address3 #LIKE '%$address%')";
   }
 
   // If a description indication has been specified, get it
@@ -221,6 +221,13 @@ function run_query_people_search($people) {
     userobm_description,
     userobm_email,
     userobm_id,
+    userobm_direction,
+    userobm_service,
+    userobm_zipcode,
+    userobm_town,
+    userobm_address1,
+    userobm_address2,
+    userobm_address3,
     domain_name,
     userobm_vacation_enable,
     userobm_vacation_datebegin,

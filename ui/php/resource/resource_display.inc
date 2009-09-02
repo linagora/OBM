@@ -60,7 +60,7 @@ function dis_data_resource(&$OD, $fieldname, $link_ok) {
 function html_resource_search_form($resource) {
   global $l_name, $l_desc, $l_qty, $l_find, $l_all, $l_delegation;
   global $l_add_resources;
-  global $display, $c_all, $l_rtype;
+  global $obm, $display, $c_all, $l_rtype;
   global $l_undef, $c_undef;
 
   $lname = $resource['name'];
@@ -118,6 +118,7 @@ function html_resource_search_form($resource) {
   $block_resourcetype .= '</select>';
 
   $dis_delegation = of_delegation_dis_search_form($delegation);
+  $display_pref = get_display_pref($obm['uid'],'resource');
 
   $block = "
   <form method=\"get\" name=\"f_search\"
@@ -128,10 +129,6 @@ function html_resource_search_form($resource) {
       value=\"$lname\" />
     </label>
     $dis_delegation
-    <label>$l_desc<br />
-      <input type=\"text\" name=\"tf_desc\" size=\"30\" maxlength=\"32\"
-      value=\"$ldesc\" />
-    </label>
     <label>$l_rtype<br />
       $block_resourcetype
     </label>
@@ -146,6 +143,18 @@ function html_resource_search_form($resource) {
     <label>&nbsp;<br />
       <input type=\"text\" name=\"tf_qtysup\" size=\"4\" maxlength=\"8\" value=\"$qtysup\" />
     </label>
+    ";
+    
+  if ($display_pref['resource_description']['status'] != 0) {
+    $block .= "
+    <label>$l_desc<br />
+      <input type=\"text\" name=\"tf_desc\" size=\"30\" maxlength=\"32\"
+      value=\"$ldesc\" />
+    </label>
+    ";
+  }
+  
+  $block .= "
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />

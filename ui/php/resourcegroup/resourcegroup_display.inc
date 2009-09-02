@@ -79,7 +79,7 @@ function dis_data_resourcegroup(&$OD, $fieldname, $link_ok) {
 //     keys used  : name, user
 ///////////////////////////////////////////////////////////////////////////////
 function html_resourcegroup_search_form ($group) {
-  global $display, $l_name, $l_resourcegroup_resource, $l_find;
+  global $obm, $display, $l_name, $l_resourcegroup_resource, $l_find;
   global $l_visibility, $l_add_resourcegroup;
 
   $popup = $group["popup"];
@@ -115,11 +115,14 @@ function html_resourcegroup_search_form ($group) {
   $name = stripslashes($group["name"]);
   $resource = stripslashes($group["resource"]);
   $privacy = $group["privacy"];
+  $desc = stripslashes($group['desc']);
 
   $sel_privacy = dis_privacy_search_select($privacy);
 
   // --- HTML Page display ----------------------------------------------------
 
+  $display_pref = get_display_pref($obm['uid'],'resourcegroup');
+  
   $block = "
   <form method=\"get\" name=\"f_search\" action=\"".url_prepare("resourcegroup_index.php")."\" class=\"search\">
 
@@ -132,6 +135,17 @@ function html_resourcegroup_search_form ($group) {
     <label>$l_visibility<br />
       $sel_privacy
     </label>
+    ";
+
+  if ($display_pref['rgroup_desc']['status'] != 0) {
+    $block .= "
+    <label>$GLOBALS[l_desc]<br />
+      <input name=\"tf_desc\" size=\"16\" maxlength=\"256\" value=\"$desc\" />
+    </label>
+    ";
+  }
+  
+  $block .= "
     <label>&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />

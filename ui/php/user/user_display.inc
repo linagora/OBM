@@ -39,6 +39,8 @@ $fieldnames['userobm_samba_perms'] = $l_smb_perms;
 $fieldnames['userobm_description'] = $l_desc;
 $fieldnames['userobm_delegation_target'] = $l_delegation_target;
 $fieldnames['host_name'] = $l_mail_server;
+$fieldnames["userobm_direction"] = $l_direction;
+$fieldnames["userobm_service"] = $l_service;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display User specific dataset fields
@@ -178,6 +180,9 @@ function dis_user_data(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == 'userobm_account_dateexp') {
     $dateexp = $OD->data_set->f("dateexp");
     $res['name'] = of_date_format($dateexp, 1);
+  }
+  else if ($fieldname == 'userobm_direction') {
+    $res['name'] = $OD->data_set->f($fieldname);
   }
 
   return $res;
@@ -348,6 +353,8 @@ function html_user_search_form($user) {
   $next_action = $user['next_action'];
   $user_action = $user['action'];
   $datebegin = $user['datebegin'];
+  $direction = $user["direction"];
+  $service = $user["service"];
 
   $delegation_target = $user['delegation_target'];
   $mail_server_host_name = $user['mail_server_host_name'];
@@ -514,6 +521,20 @@ $dis_domain";
     $block .= "
     <label>$l_archive<br />
       <input type=\"checkbox\" name=\"cba_archive\" value=\"1\" $archive />
+    </label>";
+  }
+  if ($display_pref['userobm_direction']['status'] != 0) {
+    $block .= "
+    <label>$GLOBALS[l_direction]<br />
+      <input type=\"text\" name=\"tf_direction\" size=\"16\" maxlength=\"32\"
+      value=\"$direction\" />
+    </label>";
+  }
+  if ($display_pref['userobm_service']['status'] != 0) {
+    $block .= "
+    <label>$GLOBALS[l_service]<br />
+      <input type=\"text\" name=\"tf_service\" size=\"16\" maxlength=\"32\"
+      value=\"$service\" />
     </label>";
   }
   $block .= "

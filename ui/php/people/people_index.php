@@ -233,6 +233,9 @@ function get_user_params() {
 
     $params['email'] = implode("\r\n", $email_aliases);
   }
+  
+  // retrocompability with address with bad language syntax
+  $params['adress'] = $params['address'];
 
   return $params;
 }

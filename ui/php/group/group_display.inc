@@ -199,6 +199,8 @@ function html_group_search_form ($group) {
   $email = stripslashes($group['email']);
   $user = stripslashes($group['user']);
   $privacy = $group['privacy'];
+  $desc = $group['desc'];
+  $samba = $group['samba'];
 
   if ($obm['domain_global']) {
     $sel_domain = of_domain_dis_select($domain_id, 'all');
@@ -222,6 +224,8 @@ function html_group_search_form ($group) {
     </label>";
 
   }
+  
+  $display_pref = get_display_pref($obm['uid'],'group');
 
   $dis_delegation = of_delegation_dis_search_form($delegation);
 
@@ -229,18 +233,55 @@ function html_group_search_form ($group) {
 
   $block = "
   <form method=\"get\" name=\"f_search\" action=\"".url_prepare('group_index.php')."\" class=\"search\">
-
+";
+  
+  if ($display_pref['group_name']['status'] != 0) {
+    $block .= "
     <label>$l_name<br />
       <input name=\"tf_name\" size=\"16\" maxlength=\"256\" value=\"$name\" />
     </label>
-    $dis_domain
-    $dis_delegation
+    ";
+  }
+  
+  if ($display_pref['domain_label']['status'] != 0) {
+    $block .= $dis_domain;
+  }
+  
+  if ($display_pref['group_delegation']['status'] != 0) {
+    $block .= $dis_delegation;
+  }
+  
+  $block .= "
     <label>$l_group_user<br />
       <input name=\"tf_user\" size=\"16\" maxlength=\"16\" value=\"$user\" />
     </label>
+    ";
+  
+  if ($display_pref['group_email']['status'] != 0) {
+    $block .= "
     <label>$l_email<br />
       <input name=\"tf_email\" size=\"24\" maxlength=\"64\" value=\"$email\" />
     </label>
+    ";
+  }
+  
+  if ($display_pref['group_desc']['status'] != 0) {
+    $block .= "
+    <label>$GLOBALS[l_desc]<br />
+      <input name=\"tf_desc\" size=\"24\" maxlength=\"128\" value=\"$desc\" />
+    </label>
+    ";
+  }
+  
+  if ($display_pref['group_samba']['status'] != 0) {
+    $block .= "
+    <label>$GLOBALS[l_smb]<br />
+      <input name=\"tf_samba\" size=\"24\" maxlength=\"128\" value=\"$samba\" />
+    </label>
+    ";
+  }
+  
+  $block .= "
     $block_visi
     $block_userdata
     <label>&nbsp;<br />

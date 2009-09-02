@@ -31,6 +31,7 @@ function run_query_resourcegroup_search($group) {
   $timeupdate = sql_date_format($db_type,"RGroup.rgroup_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type,"RGroup.rgroup_timecreate", "timecreate");
   $multidomain = sql_multidomain("rgroup");
+  $desc = sql_search_text_parse($group['desc']);
 	
   $where = "rgroup_name $like '$name%' $multidomain";
 
@@ -48,7 +49,11 @@ function run_query_resourcegroup_search($group) {
   }
   // only the one which are allowed (ie. publics )
   $where .=  " and " .sql_obm_entity_privacy("rgroup");
-    
+  
+  if (trim($desc) != '') {
+    $where .= " AND rgroup_desc $like '%$desc%'";
+  }
+  
   $whereq = "where $where";
 
   // ORDER construction

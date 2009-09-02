@@ -24,7 +24,7 @@ $fieldnames["userobm_email"] = $l_email;
 $fieldnames["userobm_description"] = $l_desc;
 $fieldnames["userobm_direction"] = $l_direction;
 $fieldnames["userobm_service"] = $l_service;
-$fieldnames["userobm_adress"] = $l_address;
+$fieldnames["userobm_address"] = $l_address;
 $fieldnames["userobm_zipcode"] = $l_postcode;
 $fieldnames["userobm_cedex"] = $l_expresspostal;
 $fieldnames["userobm_town"] = $l_town;
@@ -96,6 +96,14 @@ function dis_people_data(&$OD, $fieldname, $link_ok) {
       $res['name'] = '';
     } 
   } 
+  
+  if ($fieldname == "userobm_address") {
+      $res['name'] = join(' ', array($OD->data_set->f('userobm_address1'),
+      	$OD->data_set->f('userobm_address2'),
+      	$OD->data_set->f('userobm_address3'),
+      ));
+  	
+  }
 
   return $res;
 }
@@ -117,7 +125,7 @@ function html_people_search_form($user) {
   $popup = $user["popup"];
   $direction = $user["direction"];
   $service = $user["service"];
-  $adress = $user["adress"];
+  $address = $user["address"];
   $zipcode = $user["zipcode"];
   $town = $user["town"];
   $company = $user["company"];
@@ -212,11 +220,11 @@ function html_people_search_form($user) {
       value=\"$service\" />
     </label>";
   }
-  if ($display_pref['userobm_adress']['status'] != 0) {
+  if ($display_pref['userobm_address']['status'] != 0) {
     $block .= "
     <label>$GLOBALS[l_address]<br />
-      <input type=\"text\" name=\"tf_adress\" size=\"16\" maxlength=\"32\"
-      value=\"$adress\" />
+      <input type=\"text\" name=\"tf_address\" size=\"16\" maxlength=\"32\"
+      value=\"$address\" />
     </label>";
   }
   if ($display_pref['userobm_zipcode']['status'] != 0) {
