@@ -30,6 +30,8 @@ NameVirtualHost *:443
     php_value post_max_size 10M
     php_value upload_max_filesize 10M
 
+    LimitRequestBody 20971520
+
     Alias /stats /var/www/munin
 #obm#<Location /funambol>
 #obm#ProxyPass ajp://_TOMCAT_SERVER_:8009/funambol
