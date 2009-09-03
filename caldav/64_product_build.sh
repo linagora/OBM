@@ -52,7 +52,7 @@ cp -r plugins/* build_directory
 find build_directory -name "svn" -type d |xargs rm -fr
 rm -fr build_directory/*/bin
 rm -fr build_directory/*.tests
-cp log4j.properties.prod build_directory/org.obm.caldav.log4j
+cp log4j.properties.prod build_directory/org.obm.caldav.log4j/log4j.properties
 
 cat > build_conf_dir/build.properties <<EOF
 product=${product_file}
