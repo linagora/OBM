@@ -299,16 +299,26 @@ if ($action == 'index') {
           $display['msg'] .= display_warn_msg("$l_event : $l_warn_date_past");
         }
 
-        if (!$params['show_attendees_calendar']) {
-          $params['sel_user_id'] = "data-user-".$obm['uid']; // show my calendar only
-          $params['sel_resource_id'] = array();
-        }
+        if ($params['add_displayed_users']) {
+          if ($params['show_attendees_calendar']) {
+            // Display attendees
+            $cal_entity_id['user'] = $params['sel_user_id'];
+            $cal_entity_id['resource'] = $params['sel_resource_id'];
+          } else {
+            // Display calendars
+          }
+        } else {
+          if ($params['show_attendees_calendar']) {
+            // Display attendees
+            $cal_entity_id['user'] = $params['sel_user_id'];
+            $cal_entity_id['resource'] = $params['sel_resource_id'];
+          } else {
+            // Display calendars
 
+          }
+        }
         $display['msg'] .= display_ok_msg("$l_event : $l_insert_ok");
         $params["date"] = $params["date_begin"];
-
-        $cal_entity_id['user'] = $params['sel_user_id'];
-        $cal_entity_id['resource'] = $params['sel_resource_id'];
         $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
       }
   } else {
@@ -383,15 +393,27 @@ if ($action == 'index') {
             }
             run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
 
-            if (!$params['show_attendees_calendar']) { // show my calendar only
-              $params['sel_user_id'] = "data-user-".$obm['uid'];
-              $params['sel_resource_id'] = array();
+            if ($params['add_displayed_users']) {
+              if ($params['show_attendees_calendar']) {
+                // Display attendees
+                $cal_entity_id['user'] = $params['sel_user_id'];
+                $cal_entity_id['resource'] = $params['sel_resource_id'];
+              } else {
+                // Display calendars
+              }
+            } else {
+              if ($params['show_attendees_calendar']) {
+                // Display attendees
+                $cal_entity_id['user'] = $params['sel_user_id'];
+                $cal_entity_id['resource'] = $params['sel_resource_id'];
+              } else {
+                // Display calendars
+
+              }
             }
 
             $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
             $params["date"] = $params["date_begin"];
-            $cal_entity_id['user'] = $params['sel_user_id'];
-            $cal_entity_id['resource'] = $params['sel_resource_id'];
             $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
           }
     } else {
