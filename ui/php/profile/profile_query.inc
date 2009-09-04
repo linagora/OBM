@@ -13,7 +13,8 @@ $c_profile_properties = array(
     'level_managepeers' ,
     'access_restriction' ,
     'access_exceptions' ,
-    'admin_realm' 
+    'admin_realm',
+    'default_right' 
 );
 
 $c_perms_admin = 24;

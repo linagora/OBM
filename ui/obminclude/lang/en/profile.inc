@@ -61,6 +61,9 @@ $l_informations = "Informations";
 $l_add_module_rights = "Add specifics right for a module";
 $l_add_section_enabled = "Add specifics settings for a section";
 
+$l_default_right = "Default status of the public checkbox right in right management screens";
+$l_checked = 'Checked';
+$l_unchecked = 'Unchecked';
 // Properties label
 $l_level = "Level";
 $l_help_level = "An user with this profil will not be allowed to modify user with a profile having a lesser level than this one";

@@ -194,6 +194,9 @@ function get_profile_params() {
       }
     }
   }
+  if(is_array($property['default_right'])) {
+
+  }
   return $params;
 }
 

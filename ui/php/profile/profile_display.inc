@@ -184,6 +184,7 @@ function html_profile_consult($profile) {
     }
   }
   foreach($profile['property'] as $name => $value) {
+    if($name != 'default_right')
     $dis_properties .= "
       <tr $class>
       <th><dfn title='".$GLOBALS["l_help_$name"]."' class='helpTooltip'>".$GLOBALS["l_$name"]."</dfn></th>
@@ -203,6 +204,10 @@ function html_profile_consult($profile) {
     $dis_properties
     </table>
     </div>    
+    <div class=\"detail extra\">
+      <h1>$GLOBALS[l_default_right]</h1>
+        ".dis_property_default_right($profile['property']['default_right'])."
+    </div>      
     <div class=\"detail extra\">
     <h1>$l_modules_right</h1>
     <table class='spreadSheet'>
@@ -298,6 +303,7 @@ function html_profile_form($profile) {
     }
   }
   foreach($profile['property'] as $name => $value) {
+    if($name != 'default_right')
     $dis_properties .= "
       <tr >
       <th><dfn title='".$GLOBALS["l_help_$name"]."' class='helpTooltip'>".$GLOBALS["l_$name"]."</dfn></th>
@@ -307,11 +313,13 @@ function html_profile_form($profile) {
 
   $js_modules = "var modules = new Hash();\n";
   foreach($GLOBALS['cgp_show']['module'] as $module => $section) {
+    $options .= "<option value='$module'>".$GLOBALS["l_module_$module"]."</option>";
     $label = phpStringToJsString($GLOBALS["l_module_$module"]);
     $js_modules .= "modules.set('$module', '$label');\n";
   }
   $js_sections = "var sections = new Hash();\n";
   foreach($GLOBALS['cgp_show']['section'] as $section => $enabled) {
+    $options .= "<option value='$section'>".$GLOBALS["l_section_$section"]."</option>";
     $label = phpStringToJsString($GLOBALS["l_section_$section"]);
     $js_sections .= "sections.set('$section','$label');\n";
   }  
@@ -333,6 +341,10 @@ function html_profile_form($profile) {
       $dis_properties
       </table>
     </fieldset>    
+    <fieldset class=\"detail extra\">
+      <legend>$GLOBALS[l_default_right]</legend>
+        ".dis_property_default_right($profile['property']['default_right'], true)."
+    </fieldset>        
     <fieldset class=\"detail extra\">
       <legend>$l_modules_right</legend>
       $l_add_module_rights : <input name='' type='text' id='addModuleInput' value=''/>
@@ -429,6 +441,8 @@ function dis_property_level_value($value, $update=false) {
     return ($value)?$value:0;
   }
 }
+
+
 
 /**
  * dis_property_level_managepeers_value 
@@ -533,6 +547,95 @@ function dis_property_admin_realm_value($value, $update=false) {
       return implode(', ', $realms);
     }
     return ($GLOBALS["l_realm_$value"])?$GLOBALS["l_realm_$value"]:$GLOBALS['l_all'];
+  }
+}
+
+/**
+ * dis_property_default_right 
+ * 
+ * @param mixed $value 
+ * @param mixed $update 
+ * @access public
+ * @return void
+ */
+function dis_property_default_right($value, $update = false) {
+  $modules = array('calendar', 'mailbox', 'mailshare', 'resource');
+  $rights = array('access', 'read', 'write');
+  if($update) {
+    $i=0;
+    foreach($modules as $module) {
+      $select = '';
+      foreach($rights as $right) {
+        if($value[$i]) $current = $value[$i];
+        else $current = 0;
+        $i++;        
+        $checked = '';
+        $unchecked = '';
+        $disabled = '';
+        switch($current) {
+          case 1 :
+            $checked = "selected='selected'";
+            break;
+          case -1:
+            $disabled = "selected='selected'";
+            break;
+          case 0 :
+          default :
+            $unchecked = "selected='selected'";
+        }
+        $select .="<td>
+          <select name='property[default_right][]'>
+          <option $unchecked value='0'>$GLOBALS[l_unchecked]</option>
+          <option $checked value='1'>$GLOBALS[l_checked]</option>
+          <option $disabled value='-1'>$GLOBALS[l_disabled]</option>
+          </select>
+          </td>";    
+
+      }
+      $table .= "<tr><th>".$GLOBALS["l_$module"]."</th>$select</tr>";
+    }
+    return "<table class='spreadSheet'>
+      <thead>
+      <tr><th></th><th>Accès publique</th><th>Lecture publique</th><th>Ecriture publique</th></tr>
+      </thead>
+      <tbody>
+      $table
+      </tbody>
+      </table>";
+  } else {
+    $i=0;
+    foreach($modules as $module) {
+      $select = '';
+      foreach($rights as $right) {
+        if($value[$i]) $current = $value[$i];
+        else $current = 0;
+        $i++;
+        $label = '';
+        switch($current) {
+          case 1 :
+            $label = $GLOBALS['l_checked'];
+            break;
+          case -1:
+            $label = $GLOBALS['l_disabled'];
+            break;
+          case 0 :
+          default :
+            $label = $GLOBALS['l_unchecked'];
+        }
+        $select .="<td>$label</td>";    
+
+      }
+      $table .= "<tr><th>".$GLOBALS["l_$module"]."</th>$select</tr>";
+    }
+    return "<table class='spreadSheet'>
+      <thead>
+      <tr><th></th><th>Accès publique</th><th>Lecture publique</th><th>Ecriture publique</th></tr>
+      </thead>
+      <tbody>
+      $table
+      </tbody>
+      </table>";
+
   }
 }
 

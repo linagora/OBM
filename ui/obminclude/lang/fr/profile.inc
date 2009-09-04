@@ -50,6 +50,9 @@ $l_informations = "Informations";
 $l_add_module_rights = "Ajouter des droits spécifiques à un module";
 $l_add_section_enabled = "Ajouter un réglage pour une section";
 
+$l_default_right = "Statut par défaut de la case à cocher 'Publique' dans l'écran de gestion des droits";
+$l_checked = 'Cochée';
+$l_unchecked = 'Décochée';
 // Labels des propriétés
 $l_level = "Niveau de gestion";
 $l_help_level = "Un utilisateur avec ce profil ne pourra modifier que les utilisateurs ayant un profil de niveau supérieur à celui de son profil";
