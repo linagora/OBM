@@ -18,6 +18,7 @@ $l_resources = "Resources";
 $l_groups = "Groups";
 $l_title = "Title";
 $l_location = "Location";
+$l_documents = "Documents";
 $l_private_description = "This is a private event, you cannot see the details";
 $l_back_mono = "Back to your own view";
 $l_free_resources = "Free resources";

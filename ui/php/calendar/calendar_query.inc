@@ -2247,6 +2247,30 @@ function get_calendar_event_entity($calendar_id) {
     $entities[$entity]['entity'][$entity_id] = array('label'=> $label,
       'state' => $state);
   }
+  
+  $multidomain = sql_multidomain('document');
+  $query = "SELECT 
+    document_id,
+    document_title,
+    document_name
+    FROM Document
+    INNER JOIN DocumentLink ON document_id = documentlink_document_id
+    INNER JOIN EventEntity ON documentlink_entity_id = evententity_entity_id
+    WHERE 
+    evententity_event_id $calendar_id 
+    $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'get_calendar_event_entity(document)');
+  $u_q = new DB_OBM;
+  $u_q->query($query);
+  while ($u_q->next_record()) {
+    $entity_id = $u_q->f('document_id');
+    $title = $u_q->f('document_title');
+    $name = $u_q->f('document_name');
+    $entities['document']['ids'][] = $entity_id;
+    $entities['document']['entity'][$entity_id] = array('title'=> $title,
+      'name' => $name);
+  }
 
   return $entities;
 }

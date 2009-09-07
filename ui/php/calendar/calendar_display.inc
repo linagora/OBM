@@ -2338,6 +2338,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_wait, $l_exception, $l_yes, $l_no, $path;
   global $l_carac,$l_module_calendar, $l_items, $ccalendar_alerts;
   global $l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
+  global $l_documents,$l_title,$l_name;
   global $l_A, $l_R, $l_W;
 
   $id = $event_q->f('event_id');
@@ -2653,6 +2654,32 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
         </div>";
     }
   }
+  
+  $docs = $entities['document'];
+  if (is_array($docs['entity'])) {
+    foreach ($docs['entity'] as $d_id => $entity) {
+      $link = "$path/document/document_index.php?action=accessfile&document_id=$d_id&popup=1";
+      $title = $entity['title'];
+      $name = $entity['name'];
+      $dis_document_list .= "
+        <tr>
+        <td><a href=\"$link\">$title</a></td>
+        <td>$name</td>
+        </tr>";
+    }
+    $dis_document_block = "
+      <div class=\"detail infos\">
+      <h1>$l_documents</h1>
+      <table class=\"spreadSheet\">
+      <thead>
+      <tr>
+      <td>$l_title</td><td>$l_name</td>
+      </tr>
+      </thead>
+      $dis_document_list
+      </table>
+      </div>";
+  }
 
 
   // --- HTML Template --------------------------------------------------------
@@ -2701,6 +2728,8 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
    </div>
   $repeat_block
   $dis_users_block
+  
+  $dis_document_block
 
   <p class=\"LC\" />
   $dis_contacts_block

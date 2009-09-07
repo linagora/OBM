@@ -19,6 +19,7 @@ $l_free_resources = "Resources libres : ";
 $l_groups = "Groupes";
 $l_title = "Titre";
 $l_location = "Lieu";
+$l_documents = "Documents";
 $l_details = "Consulter";
 $l_private_description = "Cet événement est personnel. Impossible de voir le détail.";
 $l_high = "Haute";
