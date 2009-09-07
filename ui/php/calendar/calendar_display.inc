@@ -2270,6 +2270,7 @@ function dis_calendar_event_consult($id) {
       $exception_q = run_query_get_one_event_exception($id);
       $alerts = get_one_event_user_alert($id);
       $display['detailInfo'] = display_record_info($eve_q);
+      $display['features'] = html_calendar_documents_portlet($eve_q);
       $block = html_calendar_event_consult($eve_q, $exception_q, $entities, $alerts);
     } else {
       $display['msg'] .= display_err_msg($l_err_reference);
@@ -2281,6 +2282,44 @@ function dis_calendar_event_consult($id) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// XHTML : Display Event Documents Portlet
+// Parameters:
+//   - $event_q : event_query result
+///////////////////////////////////////////////////////////////////////////////
+function html_calendar_documents_portlet($event_q) {
+  global $ico_document, $ico_add;
+  global $l_new, $l_module_document;
+  global $l_document_add, $l_calendar;
+  global $path, $perm;
+  
+  if (!$perm->check_module_rights('document')) {
+    return;
+  }
+  
+  $id = $event_q->f('event_id');
+  
+  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;entity_id=$id&amp;entity=event");
+  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;entity_id=$id&amp;entity=event");
+  $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/calendar/calendar_index.php")."&amp;ext_id=$id&amp;ext_target=$l_calendar";
+  $nb_document = run_query_global_document_nb($id, 'event');
+  return "
+    <div  class=\"portlet\" id=\"projectDocument\">
+    <h1>$l_module_document</h1>
+    <ul>
+      <li><a href=\"$url_doc\"><img src=\"$ico_document\" /></a>
+          <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
+      <li><a href=\"$url_doc_new\"><img src=\"$ico_add\" /></a>
+          <a href=\"$url_doc_new\">$l_new</a></li>
+      <li><a href=\"#\" 
+     onclick=\"popup('$url_doc_add',''); return false;
+     \"><img src=\"$ico_add\" /></a>
+    <a href=\"#\" onclick=\"window.name='$l_calendar'; popup('$url_doc_add',''); return false;\">
+     $l_document_add</a></li>
+    </ul>
+    </div>";
+    
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // XHTML : Display Calendar Event Consult

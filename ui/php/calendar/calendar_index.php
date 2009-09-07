@@ -650,6 +650,17 @@ if ($action == 'index') {
     $display['msg'] .= display_err_msg("$l_category1 : $l_delete_error");
   }
   $display['detail'] .= dis_calendar_admin_index();
+  
+} elseif ($action == 'document_add') {
+///////////////////////////////////////////////////////////////////////////////
+  $params['event_id'] = $params['ext_id'];
+  if ($params['doc_nb'] > 0) {
+    $nb = run_query_global_insert_documents_links($params, 'event');
+    $display['msg'] .= display_ok_msg("$nb $l_document_added");
+  } else {
+    $display['msg'] .= display_err_msg($l_no_document_added);
+  }
+  $display['detail'] .= dis_calendar_event_consult($params['event_id']);
 
 } elseif ($action == 'reset')  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -958,6 +969,9 @@ function get_calendar_params() {
     }
     $params['others_attendees'] = $others_attendees;
   }
+  
+  get_global_params_document($params);
+  
   return $params;
 }
 
@@ -1261,6 +1275,12 @@ function get_calendar_action() {
   $actions['calendar']['add_freebusy_entity'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=add_freebusy_entity",
     'Right'    => $cright_read,
+    'Condition'=> array ('None')
+  );
+  
+  // Document add
+  $actions['calendar']['document_add'] = array (
+    'Right'    => $cright_write,
     'Condition'=> array ('None')
   );
 }
