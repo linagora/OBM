@@ -275,8 +275,8 @@ sub _connect {
         if( !$error->code ) {
             $self->_log( 'connexion à l\'annuaire LDAP établie', 2 );
             last;
-	    }elsif( $error->code == LDAP_CONFIDENTIALITY_REQUIRED ) {
-	        $self->_log( 'erreur fatale : start TLS nécessaire pour le serveur LDAP '.$self->getDescription(), 0 );
+        }elsif( $error->code == LDAP_CONFIDENTIALITY_REQUIRED ) {
+            $self->_log( 'erreur fatale : start TLS nécessaire pour le serveur LDAP '.$self->getDescription(), 0 );
             $self->_log( 'l\'automate n\'a pas droit de faire du TLS (\'ldapTls\'='.$self->{'ldapTls'}.')', 0 );
             $self->_log( $self->getDescription().' désactivé', 0 );
             $self->_setDeadStatus();

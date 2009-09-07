@@ -216,8 +216,11 @@ sub getDnPrefix {
         return undef;
     }
 
+    my $rdnDescValue = $self->getDesc( $rdnMapping->{'desc'}->{'name'} );
+    return undef if !defined($rdnDescValue);
+
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, $rdnMapping->{'ldap'}->{'name'}.'='.$self->getDesc( $rdnMapping->{'desc'}->{'name'} ).','.$rootDn->[$i] );
+        push( @dnPrefixes, $rdnMapping->{'ldap'}->{'name'}.'='.$rdnDescValue.','.$rootDn->[$i] );
         $self->_log( 'nouveau DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
@@ -243,9 +246,15 @@ sub getCurrentDnPrefix {
         return undef;
     }
 
+    my $rdnDescValue = $self->getDesc( $rdnMapping->{'desc'}->{'name'} );
+    if( !defined($rdnDescValue) ) {
+        $rdnMapping = $ldapMapping->getRdn($self);
+        $rdnDescValue = $self->getDesc( $rdnMapping->{'desc'}->{'name'} );
+        return undef if !defined($rdnDescValue);
+    }
 
     for( my $i=0; $i<=$#{$rootDn}; $i++ ) {
-        push( @dnPrefixes, $rdnMapping->{'ldap'}->{'name'}.'='.$self->getDesc( $rdnMapping->{'desc'}->{'name'} ).','.$rootDn->[$i] );
+        push( @dnPrefixes, $rdnMapping->{'ldap'}->{'name'}.'='.$rdnDescValue.','.$rootDn->[$i] );
         $self->_log( 'DN de l\'entité : '.$dnPrefixes[$i], 4 );
     }
 
