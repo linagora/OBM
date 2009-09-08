@@ -68,8 +68,9 @@ sub getConn {
     my $self = shift;
 
     if( ref( $self->{'ldapServerConn'} ) ne 'Net::LDAP' ) {
-        $self->{'ldapServerConn'} = $self->_connect();
-        $self->_searchAuthenticate();
+        if( $self->{'ldapServerConn'} = $self->_connect() ) {
+            $self->_searchAuthenticate();
+        }
     }elsif( !$self->_ping($self->{'ldapServerConn'}) ) {
         $self->{'daemon'}->log( 4, 'LDAP server ping failed. Try to reconnect...' );
         $self->{'ldapServerConn'}->disconnect();
