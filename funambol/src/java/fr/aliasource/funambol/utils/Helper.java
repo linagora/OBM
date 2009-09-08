@@ -62,13 +62,14 @@ public class Helper {
 	}
 
 	public static Integer getPriorityFromFoundation(String priority) {
+		Integer value = 1;
 		if ( !nullToEmptyString(priority).equals("") ) {
-			Integer value = new Integer(priority + 1);
-			return value;
-		} else {
-			return new Integer(1);
+			try {
+			value = Integer.parseInt(priority)+1;
+			} catch (NumberFormatException nfe) {
+			}
 		}
-		
+		return value;
 	}
 
 
