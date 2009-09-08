@@ -3012,7 +3012,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time, $l_color;
-  global $l_documents;
+  global $l_documents, $l_allow_documents;
 
   $repeatfrequency = 1;
   $uid = $obm['uid']; 
@@ -3443,6 +3443,12 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     }
   }
   
+  if ($allow_documents == 1) {
+    $dis_allow_documents = "<input type=\"checkbox\" id=\"cba_allow_documents\" value=\"1\" checked=\"checked\" name=\"cba_allow_documents\" />";
+  } else {
+    $dis_allow_documents = "<input type=\"checkbox\" id=\"cba_allow_documents\" value=\"1\" name=\"cba_allow_documents\" />";
+  }
+  
   $url = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_document_id";
   $document_add_button = "
     <a href=\"javascript: return false;\" 
@@ -3450,24 +3456,36 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       return false;\">
       <img src=\"$ico_add\" alt=\"[Add]\" />
     </a>";
+    
+  $dis_other_files = dis_calendar_file_block();
   
   $block_document = "
     <fieldset class=\"detail infos\">
     <legend>$l_documents</legend>    
     <table>
     <tr>
-    <th>
-    $l_documents
-    $document_add_button
-    </th>
-    <td>
-      <input type=\"text\" name=\"\" value=\"\" id=\"documentSearch\" autocomplete=\"off\" />
-    </td>
+      <th>
+      $l_allow_documents
+      </th>
+      <td>
+        $dis_allow_documents
+      </td>
     </tr>
-
     <tr>
-    <th>&nbsp;</th>
-    <td id=\"sel_document_id\">$dis_sel_document</td>
+      <th>
+      $l_documents
+      $document_add_button
+      </th>
+      <td>
+        <input type=\"text\" name=\"\" value=\"\" id=\"documentSearch\" autocomplete=\"off\" />
+      </td>
+    </tr>
+    <tr>
+      $dis_other_files
+    </tr>
+    <tr>
+      <th>&nbsp;</th>
+      <td id=\"sel_document_id\">$dis_sel_document</td>
     </tr>
     </table>
     </fieldset>";
@@ -3703,7 +3721,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-  <form method=\"post\" id=\"new_event_form\" name=\"f_entity\"
+  <form method=\"post\" enctype=\"multipart/form-data\" id=\"new_event_form\" name=\"f_entity\"
    onsubmit=\"if (check_calendar_calendar(this)) return true; else return false;\"
    action=\"calendar_index.php\">
   <fieldset class=\"detail infos\">  
@@ -7092,4 +7110,29 @@ function dis_calendar_mail_field($emails, $class) {
 
   return $email_block;
 }
+
+/**
+ * Generate file upload block
+ * 
+ * @return string
+ */
+function dis_calendar_file_block() {
+  return "
+  <th class=\"\" id='calendarFileBlock'>
+    $GLOBALS[l_other_files]
+    <a id='addFileButton' href='' onclick=\"add_file_field();return false;\">
+      <img src=\"$GLOBALS[ico_add]\" alt=\"[Add file field]\" />
+    </a>
+  </th>
+  <td id='calendarFileHome'>
+    <div class=\"multiple\">
+      <a onclick=\"remove_element(this.parentNode,'calendarFileHome');return false\" href=\"\">
+       <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
+      </a>        
+      <input type=\"file\" class=\"otherFile\" name=\"fi_other_files[]\" />  
+    </div>
+  </td>
+  ";
+}
+
 ?>

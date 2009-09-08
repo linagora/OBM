@@ -270,7 +270,7 @@ function run_query_document_insert(&$document) {
   $retour = $obm_q->query($query);
 
   $doc_id = $obm_q->lastid();
-  $entity_id = of_entity_insert($GLOBALS['module'], $doc_id);  
+  $entity_id = of_entity_insert('document', $doc_id);  
   $document["document_id"] = $doc_id;
 
   // If the document is correctly inserted in db

@@ -406,6 +406,19 @@ function add_email_field() {
   
 }
 
+function add_file_field() {
+
+  var fileHome = $('calendarFileHome');
+  // Create the div
+  var div = new Element('div').addClass('multiple');
+  div.adopt(new Element('a').addEvent('click', function () {
+              remove_element(this.parentNode,'calendarFileHome');
+            }).adopt(new Element('img').setProperty('src','$ico_delete')));
+  fileHome.adopt(div);
+  div.appendText(' ').adopt(new Element('input').addClass('otherFile').setProperty('name','fi_other_files[]').setProperty('type','file'));
+  
+}
+
 function submitWaiting(form) {
   form = $(form);
   form.getElement('input[name=owner_notification]').value = $('owner_notification').checked ;

@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_attendees = "Attendees";
-$l_others_attendees = "Others attendees";
+$l_others_attendees = "Other attendees";
 $l_add_displayed_users = "Add displayed users";
 $l_add_displayed_resources = "Add displayed resources";
 $l_show_attendees_calendar = "Show attendees calendar after event creation";
@@ -19,6 +19,8 @@ $l_groups = "Groups";
 $l_title = "Title";
 $l_location = "Location";
 $l_documents = "Documents";
+$l_other_files = "Other files";
+$l_allow_documents = "Allow attendees to attach documents";
 $l_private_description = "This is a private event, you cannot see the details";
 $l_back_mono = "Back to your own view";
 $l_free_resources = "Free resources";

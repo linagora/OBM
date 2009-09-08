@@ -295,6 +295,11 @@ if ($action == 'index') {
           $others_attendees = run_query_insert_others_attendees($params);
           $entities['contact'] = array_merge($entities['contact'], $others_attendees);
         }
+        // Insert "other files" as private documents
+        if (is_array($params['other_files'])) {
+          $other_files = run_query_insert_other_files($params);
+          $entities['document'] = array_merge($entities['document'], $other_files);
+        }
         $event_id = run_query_calendar_add_event($params, $entities);
         $params["calendar_id"] = $event_id;
         if ($params['date_begin'] < date('Y-m-d H:')) {
@@ -379,46 +384,51 @@ if ($action == 'index') {
       $c = get_calendar_event_info($params['calendar_id'],false); 
       $conflicts = check_calendar_conflict($params, $entities);
       if ($conflicts && (!$params['force'] || !can_force_resource_conflict($conflicts))
-        && !($c['date']->equals($params['date_begin']) && $c['event_duration'] == $params['event_duration'])
-          ) {
-            if ($conflicts && !can_force_resource_conflict($conflicts)) {
-              $params['force_disabled'] = 1;
-              $params['force'] = 0;
-            }
-            $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
-            $display['msg'] .= display_err_msg("$l_event : $l_update_error");
-            $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
+        && !($c['date']->equals($params['date_begin']) && $c['event_duration'] == $params['event_duration'])) 
+      {
+        if ($conflicts && !can_force_resource_conflict($conflicts)) {
+          $params['force_disabled'] = 1;
+          $params['force'] = 0;
+        }
+        $display['search'] .= html_calendar_dis_conflict($params,$conflicts) ;
+        $display['msg'] .= display_err_msg("$l_event : $l_update_error");
+        $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
+      } else {
+        // Insert "others attendees" as private contacts
+        if ($params['others_attendees'] != "") {
+          $others_attendees = run_query_insert_others_attendees($params);
+          $entities['contact'] = array_merge($entities['contact'], $others_attendees);
+        }
+        // Insert "other files" as private documents
+        if (is_array($params['other_files'])) {
+          $other_files = run_query_insert_other_files($params);
+          $entities['document'] = array_merge($entities['document'], $other_files);
+        }
+        run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
+
+        if ($params['add_displayed_users']) {
+          if ($params['show_attendees_calendar']) {
+            // Display attendees
+            $cal_entity_id['user'] = $params['sel_user_id'];
+            $cal_entity_id['resource'] = $params['sel_resource_id'];
           } else {
-            // Insert "others attendees" as private contacts
-            if ($params['others_attendees'] != "") {
-              $others_attendees = run_query_insert_others_attendees($params);
-              $entities['contact'] = array_merge($entities['contact'], $others_attendees);
-            }
-            run_query_calendar_event_update($params, $entities, $event_id, $mail_data['reset_state']);
-
-            if ($params['add_displayed_users']) {
-              if ($params['show_attendees_calendar']) {
-                // Display attendees
-                $cal_entity_id['user'] = $params['sel_user_id'];
-                $cal_entity_id['resource'] = $params['sel_resource_id'];
-              } else {
-                // Display calendars
-              }
-            } else {
-              if ($params['show_attendees_calendar']) {
-                // Display attendees
-                $cal_entity_id['user'] = $params['sel_user_id'];
-                $cal_entity_id['resource'] = $params['sel_resource_id'];
-              } else {
-                // Display calendars
-
-              }
-            }
-
-            $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
-            $params["date"] = $params["date_begin"];
-            $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
+            // Display calendars
           }
+        } else {
+          if ($params['show_attendees_calendar']) {
+            // Display attendees
+            $cal_entity_id['user'] = $params['sel_user_id'];
+            $cal_entity_id['resource'] = $params['sel_resource_id'];
+          } else {
+            // Display calendars
+
+          }
+        }
+
+        $display['msg'] .= display_ok_msg("$l_event : $l_update_ok");
+        $params["date"] = $params["date_begin"];
+        $display['detail'] = dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
+      }
     } else {
       $display['msg'] .= display_warn_msg($l_invalid_data . ' : ' . $err['msg']);
       $display['detail'] = dis_calendar_event_form($action, $params, '', $entities);
@@ -988,6 +998,18 @@ function get_calendar_params() {
     $params['ics_name'] = $_FILES['fi_ics']['name'];
     $params['ics_size'] = $_FILES['fi_ics']['size'];
     $params['ics_type'] = $_FILES['fi_ics']['type'];
+  }
+  
+  if (isset ($_FILES['fi_other_files'])) {
+    $params['other_files'] = array();
+    foreach ($_FILES['fi_other_files']['name'] as $k => $name) {
+      $params['other_files'][] = array(
+        'file_tmp' => $_FILES['fi_other_files']['tmp_name'][$k],
+        'name' => $_FILES['fi_other_files']['name'][$k],
+        'size' => $_FILES['fi_other_files']['size'][$k],
+        'type' => $_FILES['fi_other_files']['type'][$k],
+      );
+    }
   }
 
   if(is_array($params['others_attendees'])) {

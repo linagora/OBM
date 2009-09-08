@@ -3734,6 +3734,31 @@ function run_query_insert_others_attendees($calendar) {
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Insert other files as private files
+// Parameters:
+//   - $params : POSTed params
+///////////////////////////////////////////////////////////////////////////////
+function run_query_insert_other_files($params) {
+  global $obm, $default_path;
+  
+  require(dirname(__FILE__).'/../document/document_query.inc');
+  
+  $doc_ids = array();
+  foreach ($params['other_files'] as $document) {
+    $document['title'] = $document['name'];
+    $document['author'] = $obm['login'];
+    $document['mime'] = get_document_auto_mime_type($document);
+    $document['path'] = $default_path.'/';
+    $document['kind'] = 1;
+    $document['privacy'] = 1;
+    
+    $doc_ids[] = run_query_document_insert($document);
+  }
+  
+  return $doc_ids;
+}
+
 function guess_name_from_email($email) {
   $first_name = '';
   $last_name  = '';
