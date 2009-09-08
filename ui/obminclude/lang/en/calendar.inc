@@ -230,9 +230,20 @@ $l_view_month_desc = 'Month_view';
 $l_expand_all = "Expand All";
 $l_edit_full = "Advanced";
 $l_confirm_delete_all ="This operation will remove all occurences of this event for all the users, are you sure to want to continue?";
+
 $l_ics_insert = 'Import';
 $l_ics_file = 'ICS file to import';
 $l_ics_import_ok = 'event(s) have been inserted.';
+
+//Export calendar
+$l_all_calendar = "All calendar";
+$l_event_before_date = "Only events before : ";
+$l_delete_event = "Delete appointement";
+$l_delete_meeting = "Delete meeting";
+$l_ics_export_ok = 'Event(s) have been exported.';
+$l_confirm_delete_export ="This operation will remove some event in calendar, are you sure to want to continue?";
+$l_purge_popup_title = "Purge on your calendar";
+
 $l_add_exception_mail_body = 'Updated event on OBM: %s';
 $l_delete_exception_mail_subject = 'Updated event on OBM: %s';
 $l_update_state_mail_subject = 'Attendees update on OBM event: %s';

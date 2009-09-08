@@ -411,6 +411,21 @@ function submitWaiting(form) {
   form.getElement('input[name=owner_notification]').value = $('owner_notification').checked ;
   form.submit();
 }
+
+function disable(id){
+  var elem = $(id);
+  if(elem.disabled) {
+    elem.disabled=false;
+  } else {
+    elem.disabled=true;
+  }
+}
+
+function updateExportForm(){
+  $('del_action').setProperty('value','reset');
+  $('del_popup').setProperty('value','0');
+  $('del_force').setProperty('value','1');
+}
 ";
 
 ?>

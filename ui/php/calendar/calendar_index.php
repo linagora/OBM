@@ -203,7 +203,7 @@ if ($popup) {
   if ($action == 'calendar') {
     // display_head($l_calendar);
     // display_end();
-  } elseif ($action == 'export') {
+  } elseif ($action == 'ics_export') {
     dis_calendar_export_handle($params);
   }
   exit();
@@ -667,9 +667,13 @@ if ($action == 'index') {
   if(!$params['force']) {
     $display['detail'] .= dis_calendar_reset($params);
   } else {
-    run_query_calendar_reset($obm['uid']);
+    run_query_calendar_reset($obm['uid'],$params);
     $display['detail'] .= dis_calendar_calendar_view($params, $cal_entity_id, $cal_view, $cal_range);
   }
+
+} elseif ($action == 'export')  {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] .= dis_icalendar_export($params);
 
 } elseif ($action == 'import')  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -809,6 +813,10 @@ function get_calendar_params() {
   $params['repeat_end'] = of_isodate_convert($params['repeat_end'],true);
   if(!is_null($params['repeat_end'])) {
     $params['repeat_end'] = new Of_Date($params['repeat_end']);
+  }
+  $params['event_before_date'] = of_isodate_convert($params['event_before_date']);
+  if(!is_null($params['event_before_date'])) {
+    $params['event_before_date'] = new Of_Date($params['event_before_date']);
   }
   $params['date_begin'] = of_isodate_convert($params['date_begin'],true);
   if(!is_null($params['date_begin'])) {
@@ -1206,7 +1214,7 @@ function get_calendar_action() {
   // Export
   $actions['calendar']['export'] = array (
     'Name'     => $l_header_export,
-    'Url'      => "$path/calendar/calendar_index.php?action=export&amp;popup=1",
+    'Url'      => "$path/calendar/calendar_index.php?action=export",
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
   );
@@ -1222,6 +1230,13 @@ function get_calendar_action() {
   $actions['calendar']['reset'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=reset",
     'Right'    => $cright_write,
+    'Condition'=> array ('none') 
+  );
+
+  // Export_ics
+  $actions['calendar']['ics_export'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=ics_export&amp;popup=1",
+    'Right'    => $cright_read,
     'Condition'=> array ('none') 
   );
 

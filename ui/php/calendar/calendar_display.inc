@@ -4540,14 +4540,19 @@ function dis_calendar_admin_index() {
 function dis_calendar_export_handle($calendar) {
   global $obm, $obm_version, $ccalendar_weekstart;
 
-  $date = $calendar['date'];
-
-  $start_time = strtotime('-10 year', $ts_date);
-  $end_time = strtotime('+10 year', $ts_date);
-  $start = clone $date;
-  $start = $start->subYear(10);
-  $end = clone $date;
-  $end->addYear(10);
+  if($calendar[export] == "date") {
+    $date = $calendar['event_before_date'];
+    $start = clone $date;
+    $start = $start->subYear(100);
+    $end = clone $date;
+  } else {
+    $date = new Of_date() ;
+    $start = clone $date;
+    $start = $start->subYear(100);
+    $end = clone $date;
+    $end->addYear(100);
+  }
+  
   include_once('obminclude/of/vcalendar/writer/ICS.php');
   include_once('obminclude/of/vcalendar/reader/OBM.php');
 
@@ -4583,6 +4588,93 @@ function dis_calendar_reset() {
 
   return $block ;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Export iCalendar file
+///////////////////////////////////////////////////////////////////////////////
+function dis_icalendar_export($params) {
+  global $display;
+  global $l_all_calendar, $l_event_before_date, $l_delete_meeting, $l_delete_event;
+  global $l_ics_export_ok, $l_insert, $l_calendar , $l_validate, $l_purge_popup_title;
+  global $l_export, $l_cancel, $l_confirm, $l_confirm_delete_export;
+
+  $date =new Of_Date();
+
+  // --- HTML Template --------------------------------------------------------
+  $dis_combo_box = "
+    <tr>
+      <th><input id=\"rd_all_calendar\" type=\"radio\" checked=\"checked\" onClick=\"$(tf_event_before_date).disabled=true\" value=\"all\" name=\"rd_export\" /></th>
+      <td>$l_all_calendar</td>
+    </tr>
+    <tr>
+      <th><input id=\"rd_date_post_event\" type=\"radio\" value=\"date\" onClick=\"$(tf_event_before_date).disabled=false\" name=\"rd_export\" /></th>
+      <td>$l_event_before_date</td>
+    </tr>
+    <tr>
+      <th></td>
+      <td><input disabled type=\"text\" name=\"tf_event_before_date\" id=\"tf_event_before_date\" value=\"".$date->getInputDate()."\" class=\"datePicker\" /></td>
+    </tr>
+    ";
+
+  $dis_checkbox = "
+    <tr>
+      <th><input type=\"checkbox\" id=\"cb_delete_event\" onClick=\"disable('cb_delete_meeting')\" name=\"cb_delete_event\" /></th>
+      <td>$l_delete_event</td>
+    </tr>
+    <tr>
+      <th><input disabled=\"disabled\" type=\"checkbox\" id=\"cb_delete_meeting\" name=\"cb_delete_meeting\" /></th>
+      <td>$l_delete_meeting</td>
+    </tr>
+    ";
+
+  $dis_popup = "
+    <div id=\"exportPopupCalendar\" class=\"obmPopup\">
+      <h1>
+      <span>$l_purge_popup_title</span>
+      </h1>
+      <h2>
+        $l_ics_export_ok
+        <br/>
+        $l_confirm_delete_export
+        <br/>
+      </h2>
+      <fieldset class=\"buttons\">
+        <input type=\"submit\" onclick=\"obm.popup.hide('exportPopupCalendar')\" value=\"$l_cancel\"/>
+        <input type=\"submit\" onclick=\"updateExportForm();$('f_entity').submit()\" value=\"$l_confirm\"/>
+      </fieldset>
+    </div>
+    ";
+
+  // --- HTML Template --------------------------------------------------------
+  $dis_button = "<input id=\"del_action\" type=\"hidden\" name=\"action\" value=\"ics_export\">
+          <input id=\"del_popup\" type=\"hidden\" name=\"popup\" value=\"1\">
+          <input id=\"del_force\" type=\"hidden\" name=\"force\" value=\"0\">
+          <input type=\"submit\" onclick=\"$('cb_delete_event').checked?obm.popup.show('exportPopupCalendar'):0;\" value=\"$l_export\">";
+
+  $block = "
+    <form id=\"f_entity\" method=\"post\" name=\"f_entity\" enctype=\"multipart/form-data\"
+      action=\"calendar_index.php\">
+    <fieldset class=\"detail\">
+      <legend></legend>
+      <table>
+      <tbody>
+        $dis_combo_box
+        $dis_date_before
+        $dis_checkbox
+      </tbody>
+      </table>
+    </fieldset>
+    <fieldset class=\"buttons\">
+      $dis_button
+    </fieldset>
+    </form>
+    $dis_popup
+    <p class=\"LC\" />
+    " ;
+
+  return $block ;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Import iCalendar file
 ///////////////////////////////////////////////////////////////////////////////

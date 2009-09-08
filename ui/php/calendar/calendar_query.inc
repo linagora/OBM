@@ -4061,44 +4061,64 @@ function occurrenceDateSort($occA, $occB) {
  * @access public
  * @return void
  */
-function run_query_calendar_reset($id) {
+function run_query_calendar_reset($id,$params) {
   global $cdg_sql, $obm;
 
   $obm_q = new DB_OBM;
   $calendar['mail'] = false;
   $writable = array_keys(OBM_Acl::getAllowedEntities($obm['uid'], 'calendar', 'write'));
+
+  $meeting = $params['delete_meeting'];
+  $export = $params['export'];
+  $date = $params['event_before_date'];
+
+  if(is_null($date)){
+    $date = new Of_date();
+  }
+
+  if($export != 'date'){
+    $date->addYear(100);
+  }
+
   # Delete all events where the user is the owner and an attendee and all events where the owner
   # is writable and the user is the only attendee
   $query = "SELECT event_id FROM Event
     INNER JOIN EventLink ON event_id = eventlink_event_id
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
-    WHERE (event_type='VEVENT' AND event_owner = $id AND userentity_user_id = $id)
+    WHERE (event_type='VEVENT' AND event_owner = $id AND userentity_user_id = $id AND event_date < '$date')
+    GROUP BY event_id HAVING COUNT(*) = 1
     UNION
     SELECT event_id FROM Event
     INNER JOIN EventLink ON event_id = eventlink_event_id
     INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id
-    WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).")
+    WHERE event_type='VEVENT' AND event_owner IN  (".implode(',',$writable).") AND event_date < '$date'
     GROUP BY event_id HAVING COUNT(*) = 1";
   display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset()');
   $obm_q->query($query);
 
   while($obm_q->next_record()) {
     $calendar['calendar_id'] = $obm_q->f('event_id');
+    $event[] = $calendar['calendar_id'];
     run_query_calendar_delete($calendar);
   }
 
-  # Refuse all other events
-  $query = "SELECT eventlink_event_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id WHERE userentity_user_id = $id 
-    AND eventlink_state != 'DECLINED'";
-  $obm_q->query($query);
-  while($obm_q->next_record()) {
-    run_query_calendar_update_occurrence_state($obm_q->f('eventlink_event_id'), 'user', $id, 'DECLINED');
+  if(!is_null($meeting)){
+    # Refuse all other events
+    $query = "SELECT eventlink_event_id FROM EventLink INNER JOIN UserEntity ON userentity_entity_id = eventlink_entity_id INNER JOIN Event ON event_id = eventlink_event_id WHERE userentity_user_id = $id 
+      AND eventlink_state != 'DECLINED' AND event_date < '$date'";
+    $obm_q->query($query);
+    while($obm_q->next_record()) {
+      $event[] = $obm_q->f('eventlink_event_id');
+      run_query_calendar_update_occurrence_state($obm_q->f('eventlink_event_id'), 'user', $id, 'DECLINED');
+    }
   }
-  # Delete all alerts
 
-  $query = "DELETE FROM EventAlert WHERE eventalert_user_id = $id"; 
-  display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset()');
-  $obm_q->query($query);
+  # Delete all alerts
+  if(!is_null($event)) {
+    $query = "DELETE FROM EventAlert WHERE eventalert_user_id = $id AND eventalert_event_id IN (".implode(',',$event).")"; 
+    display_debug_msg($query, $cdg_sql, 'run_query_calendar_reset()');
+    $obm_q->query($query);
+  }
 }
 
 /**
