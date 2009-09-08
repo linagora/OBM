@@ -260,7 +260,7 @@ sub _initUpdateFactory {
     }
 
     if( defined($entitiesFactory->{'delegation'}) ) {
-        $query .= ' AND updated_delegation='.$entitiesFactory->{'delegation'};
+        $query .= ' AND updated_delegation=\''.$entitiesFactory->{'delegation'}.'\'';
     }
 
     my $queryResult;
@@ -340,7 +340,7 @@ sub _initUpdateFactory {
     }
 
     if( defined($entitiesFactory->{'delegation'}) ) {
-        $query .= ' AND updatedlinks_delegation='.$entitiesFactory->{'delegation'};
+        $query .= ' AND updatedlinks_delegation=\''.$entitiesFactory->{'delegation'}.'\'';
     }
 
     if( !defined($dbHandler->execQuery( $query, \$queryResult )) ) {
