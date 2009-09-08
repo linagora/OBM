@@ -55,6 +55,7 @@ $l_all_f = "Toutes";
 $l_none = "Aucun";
 $l_undef = "---";
 $l_without = "Sans";
+$l_selection = "Sélection";
 $l_enabled = "Activé";
 $l_disabled = "Désactivé";
 $l_id = "Id";

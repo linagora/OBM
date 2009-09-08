@@ -58,6 +58,7 @@ $l_all_f = "All";
 $l_none = "---";
 $l_undef = "---";
 $l_without = "Without";
+$l_selection = "Selection";
 $l_enabled = "Enabled";
 $l_disabled = "Disabled";
 $l_id = "Id";

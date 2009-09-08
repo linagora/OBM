@@ -188,6 +188,43 @@ function get_time_stat_project($time) {
     $res[0]['time_after_total'] += $time_after;
   }
 
+  $keys = array_keys($res);
+  if (count($keys) > 0) {
+    $projects = implode(',', $keys);
+    $query = "
+    SELECT
+      projecttask_project_id,
+      (sum($iftd_begin) / $c_day_fraction) as total_before,
+      (sum($iftd_end) / $c_day_fraction) as total_length,
+      (sum(timetask_length) / $c_day_fraction) as total_after
+    FROM ProjectTask
+      INNER JOIN TimeTask
+    WHERE timetask_date <= '$date_end'
+      AND timetask_projecttask_id = projecttask_id
+      AND projecttask_project_id IN ($projects)
+    GROUP BY projecttask_project_id
+    having (sum($iftd_end)) != 0
+";
+
+    display_debug_msg($query, $cdg_sql, 'get_time_stat_project(project)');
+    $obm_q->query($query);
+    $p = array();
+    while ($obm_q->next_record()) {
+      $p_id = $obm_q->f('projecttask_project_id');
+      $time_before = round($obm_q->f('total_before'),3);
+      $time = round($obm_q->f('total_length'),3);
+      $time_after = round($obm_q->f('total_after'),3);
+
+      $res[$p_id]['all_time'] = $time;
+      $res[$p_id]['all_time_before'] = $time_before;
+      $res[$p_id]['all_time_after'] = $time_after;
+
+      $res[0]['all_time_total'] += $time;
+      $res[0]['all_time_before_total'] += $time_before;
+      $res[0]['all_time_after_total'] += $time_after;
+    }
+  }
+
   return $res;
 }
 

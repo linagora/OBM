@@ -339,7 +339,7 @@ function dis_time_planning($time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_user_planning($obm_q, $time) {
   global $path, $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
-  global $l_daysofweekfirst;
+  global $l_total, $l_daysofweekfirst;
 
   $col_nwday = 'A0A0A0';
   $iso_date = $time['date'];
@@ -1116,6 +1116,7 @@ function dis_time_stats_project($statp, $time) {
   global $cdg_param, $obm;
   global $l_proj_stats, $l_no_proj_stats, $l_project, $l_tt, $l_company;
   global $l_total,$l_total_period, $l_total_before, $l_total_after;
+  global $l_all, $l_selection;
 
   if (is_array($statp)) {
     foreach($statp as $p_id => $p) {
@@ -1132,14 +1133,20 @@ function dis_time_stats_project($statp, $time) {
 	$time = $p['time'];
 	$time_before = $p['time_before'];
 	$time_after = $p['time_after'];
+	$all_time = $p['all_time'];
+	$all_time_before = $p['all_time_before'];
+	$all_time_after = $p['all_time_after'];
 	$dis_p_array .= "
       <tr $class>
         <td>$name</td>
         <td>$tasktype</td>
         <td>$company</td>
         <td style=\"text-align: right;\">$time&nbsp;</td>
+        <td style=\"text-align: right;\">$all_time</td>
         <td style=\"text-align: right;\">$time_before&nbsp;</td>
+        <td style=\"text-align: right;\">$all_time_before</td>
         <td style=\"text-align: right;\">$time_after&nbsp;</td>
+        <td style=\"text-align: right;\">$all_time_after</td>
       </tr>";
       }
     }
@@ -1147,18 +1154,30 @@ function dis_time_stats_project($statp, $time) {
     $total_time = $statp[0]['time_total'];
     $total_time_before = $statp[0]['time_before_total'];
     $total_time_after = $statp[0]['time_after_total'];
+
+    $all_total_time = $statp[0]['all_time_total'];
+    $all_total_time_before = $statp[0]['all_time_before_total'];
+    $all_total_time_after = $statp[0]['all_time_after_total'];
     
     $dis_stat_p = "
     <h1>$l_proj_stats</h1>
     <table class=\"spreadSheet\">
     <thead>
     <tr>
-      <th>$l_project</th>
-      <th>$l_tt</th>
-      <th>$l_company</th>
-      <th>$l_total_period</th>
-      <th>$l_total_before</th>
-      <th>$l_total_after</th>
+      <th rowspan=\"2\">$l_project</th>
+      <th rowspan=\"2\">$l_tt</th>
+      <th rowspan=\"2\">$l_company</th>
+      <th colspan=\"2\">$l_total_period</th>
+      <th colspan=\"2\">$l_total_before</th>
+      <th colspan=\"2\">$l_total_after</th>
+    </tr>
+    <tr>
+      <th>$l_selection</th>
+      <th>$l_all</th>
+      <th>$l_selection</th>
+      <th>$l_all</th>
+      <th>$l_selection</th>
+      <th>$l_all</th>
     </tr>
     </thead>
     $dis_p_array
@@ -1166,8 +1185,11 @@ function dis_time_stats_project($statp, $time) {
     <tr>
       <td colspan=\"3\">$l_total</td>
       <td>$total_time&nbsp;</td>
+      <td>$all_total_time</td>
       <td>$total_time_before&nbsp;</td>
+      <td>$all_total_time_before</td>
       <td>$total_time_after&nbsp;</td>
+      <td>$all_total_time_after</td>
     </tr>
     </tfoot>
     </table>";
