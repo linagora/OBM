@@ -276,6 +276,8 @@ if ($action == 'index') {
   if ($entities['contact'] == null) {
     $entities['contact'] = array();
   }
+  $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
+  
   if (check_calendar_data_form($params) && check_access_entity($entities['user'], $entities['resource'])) {
 
     $conflicts = check_calendar_conflict($params, $entities);
@@ -367,6 +369,7 @@ if ($action == 'index') {
   $entities['user'] = $params['sel_user_id'];
   $entities['resource'] = $params['sel_resource_id'];
   $entities['contact'] = $params['sel_contact_id'];
+  $entities['document'] = $params['sel_document_id'];
   if ($entities['contact'] == null) {
     $entities['contact'] = array();
   }
@@ -932,6 +935,7 @@ function get_calendar_params() {
       }
     }
   }
+  
   // sel_resource_id can be filled by sel_resource_id or sel_ent (see below)
   if (is_array($params['resource_group_id'])) {
     while (list($key, $value) = each($params['resource_group_id']) ) {
@@ -946,6 +950,21 @@ function get_calendar_params() {
       }
     }
   }  
+  
+  if (is_array($params['document_id'])) {
+    while (list($key, $value) = each($params['document_id']) ) {
+      // sel_document_id contains select infos (data-document-$id)
+      if (strcmp(substr($value, 0, 14),'data-document-') == 0) {
+        $data = explode('-', $value);
+        $id = $data[2];
+        $params['sel_document_id'][] = $id;
+      } else {
+        // direct id
+        $params['sel_document_id'][] = $value;
+      }
+    }
+  }
+  
   // feature params (user & resource)
   if (is_array($params['ent'])) {
     $nb_data = 0;

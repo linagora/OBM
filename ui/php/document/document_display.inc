@@ -31,10 +31,15 @@ $fieldnames["documentmimetype_label"] = $l_mimetype;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_document(&$OD, $fieldname, $link_ok) {
-  global $path ;
+  global $path, $params;
 
   if (($fieldname == "document_title") && $link_ok) {
     $res["url"] = "$path/document/document_index.php?action=detailconsult&amp;document_id=".$OD->data_set->f("document_id");
+  }
+  
+  if (($fieldname == 'data_element') && $params['ext_element'] != '') {
+    $res['name'] = "<span id=\"data-document-".$OD->data_set->f('document_id')."\" style=\"display:none;\">".
+    $OD->data_set->f('document_name').'</span>';
   }
 
   return $res;
@@ -80,11 +85,13 @@ function html_document_search_form ($document, $mime_q) {
     $ext_url = $document["ext_url"];
     $ext_id = $document["ext_id"];
     $ext_target = $document["ext_target"];
+    $ext_element =  $document["ext_element"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
-            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">
+            <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">";
     $display["title"] = $ext_title;
   }
   
@@ -181,6 +188,7 @@ function html_document_search_list($doc_q, $prefs, $document) {
     $ext_url = $document["ext_url"];
     $ext_id = $document["ext_id"];
     $ext_target = $document["ext_target"];
+    $ext_element = $document["ext_element"];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id";
   }
  if ($entity != "document") {
@@ -195,9 +203,17 @@ function html_document_search_list($doc_q, $prefs, $document) {
     $doc_d->display_link = false;
     $doc_d->data_cb_text = "X";
     $doc_d->data_idfield = "document_id";
-    $doc_d->data_cb_name = "cb_d";
-    $doc_d->data_form_head = "
-      <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    
+    if ($ext_element != '') {
+      $doc_d->data_cb_name = '';
+      $doc_d->data_form_head = "
+      <form onsubmit=\"of_select_fill_from_checkbox(this); return false;\" > ";
+    } else {
+      $doc_d->data_cb_name = "cb_d";
+      $doc_d->data_form_head = "
+        <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    }
+    
     $doc_d->data_form_end = "
       <fieldset class=\"buttons\">
         <input type=\"submit\" value=\"$l_add\" />

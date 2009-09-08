@@ -2762,6 +2762,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
     $users = $entities['user'];
     $resources = $entities['resource'];
     $contacts = $entities['contact'];
+    $documents = $entities['document'];
     $exception_q = run_query_get_one_event_exception($calendar['calendar_id']);
     $alerts = get_one_event_user_alert($calendar['calendar_id'], $obm['uid']);
   } else {
@@ -2824,7 +2825,7 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   );
   $possible_owners = $possible_owners['entity'];
   $cats1 = of_category_get_ordered('event', 'category1');
-  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts);
+  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $documents);
 
   return $block;
 }
@@ -2994,8 +2995,9 @@ function dis_calendar_conflict_popup() {
 //   - $res          : Array : Event resources or selected res [ids] [entity]
 //   - $groups       : Array : selected groups [ids] [entity]
 //   - $cats1        : Array : Calendar categories1
+//   - $documents    : Array : Attached documents
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts) {
+function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts, $documents) {
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ccalendar_hour_fraction;
   global $ico_mini_cal, $ico_add,$ico_delete, $ico_project, $l_header_new;
@@ -3009,7 +3011,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_none,$l_force,$l_repeat_update,$l_groups,$l_force_disabled;
   global $l_calendar_select_group, $l_hour,$l_all_day,$l_repeatfrequency;
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
-  global $l_alerts, $l_alerts_time, $l_color ;
+  global $l_alerts, $l_alerts_time, $l_color;
+  global $l_documents;
 
   $repeatfrequency = 1;
   $uid = $obm['uid']; 
@@ -3423,6 +3426,52 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       </fieldset>";
     $group_complete = "new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
   }
+  
+  if (is_array($documents['entity'])) {
+    foreach ($documents['entity'] as $d_id => $d_ent) {
+      $d_name = $d_ent['name'];
+      $sel_id = "data-document-$d_id";
+      $div_id = "sel_document_id-$sel_id";
+      $dis_sel_document .= "
+        <div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_document_id');\">
+        <img src=\"$ico_delete\" alt=\"[Delete]\" />
+        </a>
+        $d_name
+        <input value=\"$sel_id\" name=\"sel_document_id[]\" type=\"hidden\" />
+        </div>";
+    }
+  }
+  
+  $url = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_document_id";
+  $document_add_button = "
+    <a href=\"javascript: return false;\" 
+      onclick=\"popup('$url','');
+      return false;\">
+      <img src=\"$ico_add\" alt=\"[Add]\" />
+    </a>";
+  
+  $block_document = "
+    <fieldset class=\"detail infos\">
+    <legend>$l_documents</legend>    
+    <table>
+    <tr>
+    <th>
+    $l_documents
+    $document_add_button
+    </th>
+    <td>
+      <input type=\"text\" name=\"\" value=\"\" id=\"documentSearch\" autocomplete=\"off\" />
+    </td>
+    </tr>
+
+    <tr>
+    <th>&nbsp;</th>
+    <td id=\"sel_document_id\">$dis_sel_document</td>
+    </tr>
+    </table>
+    </fieldset>";
+  
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
     // resource select
     if ($action == 'new' && !isset($calendar['new_meeting'])) {
@@ -3764,6 +3813,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   </tr>
   </table>
   </fieldset>
+  $block_document
 
   <fieldset class=\"detail extra\">    
   <legend>$l_desc</legend>  

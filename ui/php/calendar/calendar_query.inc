@@ -567,9 +567,11 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
 
   // Get contacts list
   $contacts_array = $sel_entity_id['contact'];
+  
+  $documents_array = $sel_entity_id['document'];
 
   // Insert the Event
-  $event_id = run_query_calendar_insert_event_data($calendar);
+  list($event_id, $event_entity_id) = run_query_calendar_insert_event_data($calendar);
 
   // Insert Event users
   foreach ($users_array as $user_id) {
@@ -601,6 +603,14 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
         run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'NEEDS-ACTION');
       }
       array_push($resources_writable, $res_id);
+    }
+  }
+  
+  // Insert Event documents
+  if (is_array($documents_array)) {
+    $documents_array = array_unique($documents_array);
+    foreach ($documents_array as $document_id) {
+      run_query_calendar_attach_document($document_id, $event_entity_id);
     }
   }
 
@@ -643,7 +653,7 @@ function run_query_calendar_add_event($calendar, $sel_entity_id) {
 // Insert an event data
 // Parameters:
 //   - $calendar : hashed calendar params
-// Returns: Event id inserted
+// Returns: array(event id inserted, event entity id inserted)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_calendar_insert_event_data($calendar) {
   global $cdg_sql, $obm;
@@ -781,7 +791,7 @@ function run_query_calendar_insert_event_data($calendar) {
 
   $id = $obm_q->lastid();
   $calendar['calendar_id'] = $id;
-  of_entity_insert('event',$id);
+  $eid = of_entity_insert('event',$id);
   if($repeat_kind != 'none' && is_array($date_exception)) {
     foreach($date_exception as $key => $value) {
       $calendar['old_date_begin'] = $value->setHour($datebegin)->setMinute($datebegin);        
@@ -789,7 +799,7 @@ function run_query_calendar_insert_event_data($calendar) {
     }
   }
 
-  return $id;
+  return array($id, $eid);
 }
 
 
@@ -823,6 +833,33 @@ function run_query_calendar_insert_entity_event($entity, $entity_id,$event_id, $
     '$state')";
 
   display_debug_msg($query, $cdg_sql, 'run_query_entity_user_event()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q; 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Attach a document to an event
+// Parameters: 
+//   - $document_id :
+//   - $event_id  :
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_attach_document($document_id, $event_id) {
+  global $cdg_sql, $obm;
+
+  $event_id = $event_id;
+  $document_id = sql_parse_id($document_id);
+  $uid = sql_parse_id($obm['uid']);
+  $query = "INSERT INTO DocumentLink (
+    documentlink_document_id,
+    documentlink_entity_id,
+    documentlink_usercreate)
+    VALUES (
+    $document_id,
+    $event_id,
+    $uid)";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_attach_document()');
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q; 
@@ -1081,6 +1118,7 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
   $datebegin = $calendar['date_begin'];
   $dateend = $calendar['date_end'];
   $event_id =  $calendar['calendar_id'];
+  $event_entity_id = of_entity_get('event', $event_id);
   $groups = $sel_entity_id['group'];
   $mail = $calendar['mail'];
   $mail_title = stripslashes($calendar['title']);
@@ -1106,6 +1144,14 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
     $resources_array = array_unique($resources_array);
   } else {
     $resources_array = array();
+  }
+  
+  // Get the final document list
+  $documents_array = $sel_entity_id['document'];
+  if ((is_array($documents_array)) && (count($documents_array) > 0) ) {
+    $documents_array = array_unique($documents_array);
+  } else {
+    $documents_array = array();
   }
 
   // Get contacts list
@@ -1172,15 +1218,25 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
     if (count($resources_array) > 0) {
       $rresources = "AND eventlink_entity_id NOT IN ".of_entity_subquery('resource',$resources_array);
     }
+    if (count($documents_array) > 0) {
+      $qdocs = "AND documentlink_document_id NOT IN (".implode(',', $documents_array).")";
+    }
     if (is_array($entities['user']['ids'])) {
       $users_array = array_diff($users_array,$entities['user']['ids']);
     }
     if (is_array($entities['resource']['ids'])) {
       $resources_array = array_diff($resources_array, $entities['resource']['ids']);
     }
+    if (is_array($entities['document']['ids'])) {
+      $documents_array = array_diff($documents_array, $entities['document']['ids']);
+    }
   }
 
   $query = "DELETE FROM EventLink WHERE 1=1 $qusers $rresources AND eventlink_event_id = $event_id";
+  $db = new DB_OBM;
+  $db->query($query);
+  
+  $query = "DELETE FROM DocumentLink WHERE 1=1 $qdocs AND documentlink_entity_id = $event_entity_id";
   $db = new DB_OBM;
   $db->query($query);
 
@@ -1210,6 +1266,13 @@ function run_query_calendar_event_update($calendar, $sel_entity_id, $event_id, $
       } else {
         run_query_calendar_insert_entity_event('resource', $res_id, $event_id, 'NEEDS-ACTION');
       }
+    }
+  }
+  
+  // Insert Event documents
+  if (is_array($documents_array)) {
+    foreach ($documents_array as $document_id) {
+      run_query_calendar_attach_document($document_id, $event_entity_id);
     }
   }
 
