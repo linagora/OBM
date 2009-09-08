@@ -101,6 +101,13 @@ elseif ($action == "ext_get_ids") {
   $display["search"] = dis_document_search_form($params);
   $display["result"] = dis_document_search_list($params);
   
+} elseif ($action == "ext_search") {
+///////////////////////////////////////////////////////////////////////////////
+  $doc_q = run_query_document_ext_search($params);
+  json_search_document($params, $doc_q);
+  echo '('.$display['json'].')';
+  exit();
+  
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_document_form($action, $params, "");
@@ -375,6 +382,12 @@ function get_document_action() {
 // Search
   $actions["document"]["search"] = array (
     'Url'      => "$path/document/document_index.php?action=search",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                    	 );
+                                       
+  $actions["document"]["ext_search"] = array (
+    'Url'      => "$path/document/document_index.php?action=ext_search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );

@@ -1232,6 +1232,7 @@ function dis_group_display_pref($prefs_g, $prefs_u) {
 /**
  * Build a JSON array with all search results 
  * 
+ * @param $group POST params
  * @param $results array of 'length' => DB query results nb, and 'datas' => DB Group search query results
  * @access public
  * @return void

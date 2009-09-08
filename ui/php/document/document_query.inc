@@ -107,6 +107,60 @@ function run_query_document_search($document) {
   return $obm_q;
 }
 
+/**
+ * Search document from a single field
+ *
+ * @param mixed $params
+ * @access public
+ * @return array of 'length' => DB query results nb, and 'datas' => DB Search results
+ */
+function run_query_document_ext_search($params) {
+  global $c_all, $cdg_sql, $obm, $ctu_sql_limit, $cdoc_kind_dir;
+  
+  $pattern = $params['pattern'];
+  $limit = $params['limit'];
+  
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
+  if (isset($params['first_row'])) $first_row = $params['first_row'] - 1;
+  else $first_row = 0;
+  $multidomain = sql_multidomain("document");
+  
+  $where = "(document_title $like '$pattern%' OR document_name $like '$pattern%')";
+  $where.= ' AND '.sql_obm_entity_privacy("document");
+  $where.= " AND document_kind != $cdoc_kind_dir";
+  
+  $query = "SELECT
+    count(*) as resultscount
+  FROM Document
+  WHERE
+    $where
+    $multidomain";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_document_ext_search()');
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $resultsCount = $obm_q->f('resultscount');
+  
+  $query = "SELECT
+    document_id as id,
+    document_id,
+    document_title,
+    document_name
+  FROM Document
+  WHERE
+    $where
+    $multidomain
+  ORDER BY document_title
+  LIMIT $limit OFFSET $first_row";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_document_ext_search()');
+  $obm_q->query($query);
+
+  return array('length' => $resultsCount, 'datas' => $obm_q);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Detail query execution

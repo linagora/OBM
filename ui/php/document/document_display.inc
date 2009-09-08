@@ -236,6 +236,29 @@ function html_document_search_list($doc_q, $prefs, $document) {
   return $block;
 }
 
+/**
+ * Build a JSON array with all search results 
+ * 
+ * @param $params POST params
+ * @param $results array of 'length' => DB query results nb, and 'datas' => DB Document search query results
+ * @access public
+ * @return void
+ */
+function json_search_document($params, $results) {
+  global $display, $l_title;
+
+  $doc_q = $results['datas'];
+
+  $docs = array();
+  while ($doc_q->next_record()) {
+    $id = $doc_q->f('document_id');
+    $label = phpStringToJsString($doc_q->f('document_name'));
+    $extra = phpStringToJsString("$l_title : ".$doc_q->f('document_title'));
+    $docs[] = "{id:'data-document-$id', label:'$label', extra:'$extra'}";
+  }
+  $display['json'] = '{length:'.$results['length'].', datas:['.implode(',',$docs).']}';
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Document Detail

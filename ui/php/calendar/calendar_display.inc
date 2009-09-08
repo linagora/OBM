@@ -3471,6 +3471,8 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     </tr>
     </table>
     </fieldset>";
+    
+  $document_complete = "new obm.AutoComplete.Search('$path/document/document_index.php?action=ext_search', 'sel_document_id', 'documentSearch');";
   
   if ($ccalendar_resource && OBM_Acl::hasAllowedEntities($obm['uid'], 'resource', 'access')) {
     // resource select
@@ -3827,6 +3829,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $user_complete
       $resource_complete
       $group_complete
+      $document_complete
     });
     if ($('tf_repeat_end').value == '') {
       $('cbx_no_repeatend').checked = true;
