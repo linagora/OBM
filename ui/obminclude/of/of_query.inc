@@ -1022,7 +1022,8 @@ function update_display_pref($params) {
   }
   // if order is updated, update other field concerned too (with current order)
   if ($sql_order_field != '') {
-    run_query_display_pref_level_update($uid, $entity, $sql_order_field, $current_order);
+    run_query_display_pref_level_update2($uid, $entity, $sql_order_field, $current_order);
+    return;
   } else {
     $sql_order_field = $current_order;
   }
@@ -1137,6 +1138,29 @@ function run_query_display_pref_insert($u_id, $entity, $fieldname, $status, $ord
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query Execution - Delete a display value for the entity, user, field
+// Parameters:
+//   - $u_id      : user id
+//   - $entity    : entity affected
+//   - $fieldname : fieldname to change the display value
+///////////////////////////////////////////////////////////////////////////////
+function run_query_display_pref_delete($u_id, $entity, $fieldname) {
+  global $cdg_sql;
+
+  $query = "DELETE FROM DisplayPref
+    WHERE display_user_id = '$u_id'
+      AND display_entity = '$entity'
+      AND display_fieldname = '$fieldname'
+    ";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_display_pref_delete()');
+  $obm_q = new DB_OBM; 
+  $obm_q->query($query);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// DEPRECATED
 // Update the level of the field in the entity given identified by the order
 // Parameters:
 //   - $u_id       : user id
@@ -1235,6 +1259,80 @@ function run_query_display_pref_level_update($u_id, $entity, $fieldorder, $new_l
   display_debug_msg($query, $cdg_sql, 'run_query_display_pref_level_update()');
   $obm_q->query($query);
 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Update the level of the field in the entity given identified by the order
+// Parameters:
+//   - $u_id       : user id
+//   - $entity     : entity affected
+//   - $fieldorder : actual position
+//   - $new_level  : new position
+///////////////////////////////////////////////////////////////////////////////
+function run_query_display_pref_level_update2($u_id, $entity, $fieldorder, $new_level) {
+  global $cdg_sql;
+  
+  $query = "SELECT
+        display_user_id,
+        display_fieldname,
+        display_display,
+        display_fieldorder
+      FROM DisplayPref
+      WHERE (display_user_id = '$u_id' OR display_user_id IS NULL)
+        AND display_entity = '$entity'
+  ";
+
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, 'run_query_display_pref_level_update2()');
+  $obm_q->query($query);
+  
+  $prefs[$u_id] = array();
+  $prefs[0] = array();
+  while ($obm_q->next_record()) {
+  	$user_id = $obm_q->f('display_user_id');
+  	if (!$user_id > 0) {
+  	  $user_id = 0;
+  	}
+  	
+    $row = array(
+      'order' => $obm_q->f('display_fieldorder'),
+      'name' => $obm_q->f('display_fieldname'),
+      'status' => $obm_q->f('display_display'),
+    );
+    
+    $prefs[$user_id][$obm_q->f('display_fieldorder')] = $row;
+    $prefs[$user_id][$obm_q->f('display_fieldname')] = $row;
+  }
+  
+  foreach (array(
+    array($fieldorder, $new_level),
+    array($new_level, $fieldorder),
+  ) as $swap) {
+    
+    $current = $prefs[$u_id][$swap[0]];
+    $default = $prefs[0][$swap[0]];
+    
+    // If a specific user entry exists
+    if (!empty($current)) {
+      $default = $prefs[0][$current['name']];
+      
+      // If new values to set same as default values, we drop specific user value
+      if (!empty($default)
+      && $current['name'] == $default['name']
+  	  && $current['status'] == $default['status']
+  	  && $default['order'] == $swap[1] ) {
+        run_query_display_pref_delete($u_id, $entity, $current['name']);
+  
+      // Else we update the specific user value
+      } else  {
+        run_query_display_pref_update($u_id, $entity, $current['name'], '', $swap[1]);
+      }
+  
+    } else if (!empty($default) && empty($prefs[$u_id][$default['name']])) {
+      run_query_display_pref_insert($u_id, $entity, $default['name'], $default['status'], $swap[1]);
+    }
+  }
 }
 
 
