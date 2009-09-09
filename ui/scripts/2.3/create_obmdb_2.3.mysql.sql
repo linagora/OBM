@@ -1314,16 +1314,19 @@ CREATE TABLE `Event` (
   `event_url` text,
   `event_description` text,
   `event_properties` text,
+	`event_tag_id` int(8) default NULL,
   PRIMARY KEY  (`event_id`),
   KEY `event_domain_id_domain_id_fkey` (`event_domain_id`),
   KEY `event_owner_userobm_id_fkey` (`event_owner`),
   KEY `event_userupdate_userobm_id_fkey` (`event_userupdate`),
   KEY `event_usercreate_userobm_id_fkey` (`event_usercreate`),
   KEY `event_category1_id_eventcategory1_id_fkey` (`event_category1_id`),
+	KEY `event_tag_id_eventtag_id_fkey` (`event_tag_id`),
   CONSTRAINT `event_category1_id_eventcategory1_id_fkey` FOREIGN KEY (`event_category1_id`) REFERENCES `EventCategory1` (`eventcategory1_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `event_domain_id_domain_id_fkey` FOREIGN KEY (`event_domain_id`) REFERENCES `Domain` (`domain_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `event_owner_userobm_id_fkey` FOREIGN KEY (`event_owner`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `event_usercreate_userobm_id_fkey` FOREIGN KEY (`event_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `event_tag_id_eventtag_id_fkey` FOREIGN KEY (`event_tag_id`) REFERENCES `EventTag` (`eventtag_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+	CONSTRAINT `event_usercreate_userobm_id_fkey` FOREIGN KEY (`event_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `event_userupdate_userobm_id_fkey` FOREIGN KEY (`event_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1432,6 +1435,22 @@ CREATE TABLE `EventLink` (
   CONSTRAINT `eventlink_event_id_event_id_fkey` FOREIGN KEY (`eventlink_event_id`) REFERENCES `Event` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `eventlink_userupdate_userobm_id_fkey` FOREIGN KEY (`eventlink_userupdate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `EventTag`
+--
+
+DROP TABLE IF EXISTS `EventTag` ;
+CREATE TABLE `EventTag` ( 
+  `eventtag_id` int(8) NOT NULL auto_increment, 
+  `eventtag_user_id` int(8) NOT NULL, 
+  `eventtag_label` varchar(128) default NULL, 
+  `eventtag_color` char(7) default NULL, 
+  PRIMARY KEY  (`eventtag_id`), 
+  KEY `eventtag_label_fkey` (`eventtag_label`),
+	KEY `eventtag_user_id_userobm_id_fkey` (`eventtag_user_id`), 
+  CONSTRAINT `eventtag_user_id_userobm_id_fkey` FOREIGN KEY (`eventtag_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
 
 --
 -- Table structure for table `GroupEntity`

@@ -81,6 +81,27 @@ CREATE TABLE `SyncedAddressbook` (
 
 DROP TABLE IF EXISTS `SynchedContact`;
 
+-- 
+-- Table structure for table `EventTag`
+-- 
+DROP TABLE IF EXISTS `EventTag` ;
+CREATE TABLE `EventTag` ( 
+  `eventtag_id` int(8) NOT NULL auto_increment, 
+  `eventtag_user_id` int(8) NOT NULL, 
+  `eventtag_label` varchar(128) default NULL, 
+  `eventtag_color` char(7) default NULL, 
+  PRIMARY KEY  (`eventtag_id`), 
+  KEY `eventtag_label_fkey` (`eventtag_label`),
+	KEY `eventtag_user_id_userobm_id_fkey` (`eventtag_user_id`), 
+  CONSTRAINT `eventtag_user_id_userobm_id_fkey` FOREIGN KEY (`eventtag_user_id`) REFERENCES `UserObm` (`userobm_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;
+
+-- 
+-- Alter table `Event` to add tag infos
+-- 
+ALTER TABLE `Event` ADD COLUMN `event_tag_id` int(8) ; 
+ALTER TABLE `Event` ADD KEY `event_tag_id_eventtag_id_fkey` (`event_tag_id`) ;
+ALTER TABLE `Event` ADD CONSTRAINT `event_tag_id_eventtag_id_fkey` FOREIGN KEY (`event_tag_id`) REFERENCES `EventTag` (`eventtag_id`) ON DELETE SET NULL ON UPDATE CASCADE ;
 
 -- ----------------------------------------------------------------------------
 -- Write that the 2.2->2.3 is completed
