@@ -425,6 +425,73 @@ function submitWaiting(form) {
   form.submit();
 }
 
+obm.initialize.chain(function() {	
+  // pour chaque label, dans l'onglet administration
+  $$('.extColorPicker').each(function(element) {
+	var startColor = element.getElement('input').getProperty('value');
+	// affiche la couleur de depart
+	element.getElement('div').setStyle('background-color', startColor);
+	// cree un colorPicker
+    var r = new MooRainbow( element,
+		{'startColor': startColor.hexToRgb(true),
+		'id': element.getProperty('id') + '-rainbow',
+		'imgPath': '/images/themes/default/images/',
+		'onChange': function(color, colorPicker) {
+				colorPicker.element.getElement('div').setStyle('background-color', color.hex);
+				colorPicker.element.getElement('input').setProperty('value', color.hex) ;
+			}
+		}) ;
+  });
+	
+	// pour le champs display_mycolor, de la fenetre de modif d'evenement
+	if ($('display_tag_color')) {
+		obm.calendarColorPicker = new MooRainbow('display_tag_color',
+			{'startColor': $('display_tag_color').getStyle('background-color').hexToRgb(true),
+			 'id': 'display_mycolor-rainbow',
+			 'imgPath': '/images/themes/default/images/',
+			 'onChange': function(color) {
+					$('display_tag_color').setStyle('background-color', color.hex);
+					$('tf_tag_color').set('value', color.hex) ;
+					//this.setProperty('value', color.hex) ;
+				}
+			}) ;
+	}
+});
+
+function add_label_autocomplete (el) { 
+  new Autocompleter.Ajax.Json(el, '$path/calendar/calendar_index.php', {
+    postVar: 'label',
+    postData: {action:'tag_search'},
+    ajaxOptions: {'secure': false},
+    filterSubset: true,
+    minLength: 2,
+    selectFirst: true,
+    selectMode: 'type-ahead',
+    injectChoice: function(choice) {
+				var el = new Element('li').set('html', this.markQueryValue(choice.label));
+				new Element('div').inject(el, 'top').set('html','&nbsp;').setStyle('background-color',choice.color).addClass('colorHint') ;
+				el.inputValue = choice.label;
+				// hack, we nedd these values later to update
+				el.suggColor = choice.color ;
+				el.tag_id = choice.id ;
+				this.addChoiceEvents(el).inject(this.choices);
+			},
+		onSelection: function(theinput, thesel, curval, suggval) {
+			  $('display_tag_color').setStyle('background-color', thesel.suggColor) ;
+				$('tf_tag_id').set('value', thesel.tag_id) ;
+				$('tf_tag_color').set('value', thesel.suggColor) ;
+				obm.calendarColorPicker.manualSet(thesel.suggColor, 'hex') ;
+			}
+  });       
+}
+
+function tag_reset() {
+	$('tf_tag_id').set('value', '-1') ; // equal to \$c_none
+	$('tf_tag_color').set('value', '') ;
+	$('tf_tag_label').set('value', '') ;
+	$('display_tag_color').setStyle('background-color', '#eff0f2') ;
+}
+
 function disable(id){
   var elem = $(id);
   if(elem.disabled) {
@@ -439,6 +506,7 @@ function updateExportForm(){
   $('del_popup').setProperty('value','0');
   $('del_force').setProperty('value','1');
 }
+
 ";
 
 ?>

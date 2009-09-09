@@ -1492,6 +1492,7 @@ function dis_calendar_event($occurrence, $unit, $calendar_entity,$writable_entit
   $ed[] = "location:'$location'";
   $ed[] = "category:'$category'";
   $ed[] = "colors: {event: {body:'$eventColor[body]', header:'$eventColor[header]'}}";
+  //$ed[] = "colors: {event: {body:'".$event->color."'}}";
   $ed[] = "status:'$entity_state'";
   $attendees = array();
   foreach ($attendee as $entity => $entities) {
@@ -2825,7 +2826,8 @@ function dis_calendar_event_form($action, $calendar, $event_q, $entities) {
   );
   $possible_owners = $possible_owners['entity'];
   $cats1 = of_category_get_ordered('event', 'category1');
-  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $documents);
+
+  $block = html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $resources, $groups, $cats1, $alerts, $tags_q, $documents);
 
   return $block;
 }
@@ -2997,10 +2999,11 @@ function dis_calendar_conflict_popup() {
 //   - $cats1        : Array : Calendar categories1
 //   - $documents    : Array : Attached documents
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts, $documents) {
+function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $possible_owners, $users, $contacts, $res, $groups, $cats1, $alerts, $tags_q, $documents) {
   global $obm, $path, $display, $cgp_show, $ccalendar_alerts;
   global $ccalendar_resource, $ccalendar_weekstart, $ccalendar_hour_fraction;
   global $ico_mini_cal, $ico_add,$ico_delete, $ico_project, $l_header_new;
+	global $ico_cancel;
   global $ccalendar_first_hour, $ccalendar_last_hour;
   // -- Labels
   global $l_users, $l_attendees, $l_title, $l_location, $l_priority, $l_private, $l_desc;
@@ -3013,14 +3016,20 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   global $l_resources,$l_daysofweekshort, $l_exception, $l_items;
   global $l_alerts, $l_alerts_time, $l_color;
   global $l_documents, $l_allow_documents;
+	global $l_tag ;
+	global $c_none ;
 
   $repeatfrequency = 1;
   $uid = $obm['uid']; 
+	$tagcolor = "#eff0f2" ; // backcolor by default
 
   if (($action == 'detailupdate') || ($action == 'duplicate') || ($action == 'conflict_manager')) {
     $title = htmlspecialchars($event_q->f('event_title'));
     $location = htmlspecialchars($event_q->f('event_location'));
     $cat1 = $event_q->f('event_category1_id');
+		$tagid = $event_q->f('event_tag_id');
+		$taglabel = $event_q->f('eventtag_label');
+		$tagcolor = $event_q->f('eventtag_color');
     $owner = $event_q->f('event_owner');
     $owner_lastname = $event_q->f('owner_lastname');
     $owner_firstname = $event_q->f('owner_firstname');
@@ -3046,7 +3055,6 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     if($all_day) {
       $end->subMinute(1);
     }
-    $color = $event_q->f('event_color');
     $privacy = $event_q->f('event_privacy');
     $repeat_kind = $event_q->f('event_repeatkind');
     $repeat_days = $event_q->f('event_repeatdays');
@@ -3082,7 +3090,9 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
   if (isset($calendar['priority'])) { $priority = $calendar['priority']; }
   if (isset($calendar['description'])) { $desc = stripslashes($calendar['description']); }
   if (isset($calendar['all_day'])) { $all_day = $calendar['all_day']; }
-  if (isset($calendar['color'])) { $color = $calendar['color']; }
+  if (isset($calendar['tag_id'])) { $tagid = $calendar['tag_id']; }
+  if (isset($calendar['tag_label'])) { $tagid = $calendar['tag_label']; }
+  if (isset($calendar['tag_color'])) { $tagid = $calendar['tag_color']; }
   if (isset($calendar['repeatfrequency'])) { $repeatfrequency = $calendar['repeatfrequency']; }  
   if (isset($calendar['item'])) { $item = $calendar['item']; } 
   if (!is_object($event_q)) {$begin = $calendar['date_begin']; }
@@ -3127,6 +3137,10 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $selected_alert = $calendar['alert'];
     }
   }
+	if ($tagid == '') {
+		$tagid = $c_none ;
+		$tagcolor = "#eff0f2" ;
+	}
 
   $dis_attendees_notification = "
   <fieldset class=\"detail extra\">    
@@ -3781,8 +3795,23 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     <td>$dis_sel_prio</td>
   </tr>     
   <tr>
-    <th>$l_color</th>
-    <td><input type=\"text\" name=\"tf_color\" value=\"$color\" class=\"colorPicker\" /></td>
+    <th>$l_tag</th>
+    <td>
+		  <div id=\"tag_wrapper\">
+			  <input type=\"text\" value=\"$taglabel\" name=\"tf_tag_label\" id=\"tf_tag_label\" style=\"width:70%;\">
+			  <div id=\"display_tag_color\">&nbsp;</div>
+				<a href=\"#\" onclick=\"tag_reset();return false\"><img alt=\"reset\" title=\"reset\" src=\"$ico_cancel\"></a>
+			</div>
+		  <script type=\"text/javascript\" langage=\"javascript\">
+				obm.initialize.chain(function () {
+					$('display_tag_color').setStyle('background-color', '$tagcolor') ;
+					obm.calendarColorPicker.manualSet('$tagcolor', 'hex') ;
+					add_label_autocomplete('tf_tag_label');
+				});
+			</script>
+			<input type=\"hidden\" name=\"tf_tag_color\" id=\"tf_tag_color\" value=\"$tagcolor\">
+			<input type=\"hidden\" name=\"tf_tag_id\" id=\"tf_tag_id\" value=\"$tagid\">
+		</td>
   </tr>     
   </table>
   </fieldset>
@@ -4594,10 +4623,113 @@ function html_calendar_ressource_list($groupLabel,$resource_group,$free=false) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the calendar administration index
 ///////////////////////////////////////////////////////////////////////////////
-function dis_calendar_admin_index() {
+function dis_calendar_admin_index($tags_q) {
+  global $ico_delete, $ico_ok ;
+  global $l_label, $l_c_new, $l_c_checkdelete, $l_c_update, $l_c_insert ;
+	global $l_tag_management ;
 
+  // category1
   $cats1 = of_category_get_ordered('event', 'category1');
   $block = of_category_dis_admin_form('category1', $cats1);
+
+  // tags , poubelle et input
+  if ($tags_q->num_rows() > 0) {
+	$block .= "<div class=\"detail admin\" >
+    <form id=\"form_tags_update\" action=\"?action=tags_update\" method=\"post\">
+    <input type=\"hidden\" name=\"tf_tag_id\" value=\"\" />
+	<input type=\"hidden\" name=\"tf_tag_label\" value=\"\" />
+	<input type=\"hidden\" name=\"tf_tag_color\" value=\"\" />
+    </form>    
+    <h1>$l_tag_management</h1>
+    <div class=\"overflow\">
+    <table>
+      <thead>
+        <tr>
+        <td>&nbsp;</td>
+        <td>$l_label</td>
+        <td>&nbsp;</td>        
+      </tr>    
+      </thead>
+      <tbody>" ;
+	$flip = 1 ;
+    while ($tags_q->next_record()) {
+		$class = "" ;
+		if ($flip == 1) {
+			$class = "class=\"pair\"" ;
+		}
+		$flip *= -1 ;
+		$tagid = $tags_q->f('eventtag_id') ;
+		$taglabel = $tags_q->f('eventtag_label') ;
+		$tagcolor = $tags_q->f('eventtag_color') ;
+		$block .= "<tr $class>
+          <td>
+          <input type=\"hidden\" id=\"tf_tag_id_$tagid\" value=\"$tagid\" />
+          <a href=\"?action=tag_delete&amp;tag_id=$tagid\">
+          <img src=\"$ico_delete\" alt=\"$l_c_checkdelete\" title=\"$l_c_checkdelete\" />
+          </a></td>
+          <td> 
+		  
+		  <div class=\"extColorPickerWrapper\">
+		  <input type=\"text\" id=\"tf_tag_label_$tagid\" value=\"$taglabel\" />
+		  
+		  <div id=\"cp_$tagid\" class=\"extColorPicker\">
+		    <div id=\"cp_back_$tagid\">&nbsp;</div>
+			<input type=\"hidden\" id=\"tf_tag_color_$tagid\" value=\"$tagcolor\">
+			<img src=\"/images/themes/default/images/ext_pick.gif\" alt=\"\" title=\"\" /></a>
+		  </div>
+		  
+		  </div>
+		  
+		  </td>
+          <td>
+          <a href=\"#\" onclick=\"updateLine($tagid,'tags')\">
+          <img src=\"$ico_ok\" alt=\"$l_c_update\" title=\"$l_c_update\" />
+          </a>
+	      </td>
+        </tr>" ;
+	} ;
+	// tag, ajout
+	$block .= "</tbody>
+    </table>
+    </div>
+    <form id=\"form_tag_new\" action=\"\" method=\"post\">
+    <table>
+    <thead>
+      <tr>
+        <td colspan=\"2\">$l_c_new</td>
+      </tr>
+    <tbody>   
+      <tr>
+        <td>$l_label</td>    
+      </tr>       
+      <tr>
+        <td>
+		
+		  <div class=\"extColorPickerWrapper\">
+		  <input type=\"text\" name=\"tf_tag_label\" id=\"tf_tag_label\" value=\"\" />
+		  
+		  <div id=\"cp\" class=\"extColorPicker\">
+		    <div id=\"cp_back\">&nbsp;</div>
+			<input type=\"hidden\" name=\"tf_tag_color\" id=\"tf_tag_color\" value=\"#eff0f2\">
+			<img src=\"/images/themes/default/images/ext_pick.gif\" alt=\"\" title=\"\" /></a>
+		  </div>
+		  
+		  </div>
+		  
+		</td>    
+      </tr>  
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan=\"2\"><input type=\"submit\" value=\"$l_c_insert\" /></td>
+      </tr>
+    </tfoot>
+    </table>
+    <input type=\"hidden\" name=\"action\" value=\"tag_insert\" />
+    <input type=\"hidden\" name=\"category\" value=\"tag_name\" />
+    </form>
+    </div>" ;
+  }
 
   return $block;
 }
@@ -4822,6 +4954,16 @@ function json_error_msg($msg) {
 
 }
 
+function json_tag_search($tags_q) {
+	$json_tags = "" ;
+	if ($tags_q->num_rows() > 0) {
+		while($tags_q->next_record()) {
+			$json_tags .= "{'id':".$tags_q->f('eventtag_id').",'label':'".$tags_q->f('eventtag_label')."','color':'".$tags_q->f('eventtag_color')."'}," ;
+		}
+		$json_tags = rtrim($json_tags, ',') ;
+	}
+	return "[".$json_tags."]" ;
+}
 
 /**
  * Build a JSON message with all the event data

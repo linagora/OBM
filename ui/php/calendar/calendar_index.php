@@ -92,9 +92,12 @@ if (isset($params['cal_range'])) {
 ///////////////////////////////////////////////////////////////////////////////
 
 $extra_css[] = $css_calendar;
+$extra_css[] = $css_ext_color_picker ;
 $extra_js_include[] = 'date.js';
 $extra_js_include[] = 'calendar.js';
 $extra_js_include[] = 'colorpicker.js';
+
+$extra_js_include[] = 'mootools/plugins/mooRainbow.1.2b2.js' ;
 
 require('calendar_display.inc');
 require_once('calendar_js.inc');
@@ -347,7 +350,7 @@ if ($action == 'index') {
     if (check_calendar_access($params['calendar_id'], 'read')) {
       $eve_q = run_query_calendar_detail($params['calendar_id']);
       $entities = get_calendar_event_entity($params['calendar_id']);
-      $display['detailInfo'] = display_record_info($eve_q);
+			$display['detailInfo'] = display_record_info($eve_q);
       $display['detail'] = dis_calendar_event_form($action, $params, $eve_q, $entities);
     } else {
       $display['msg'] .= display_err_msg($err['msg']);
@@ -628,7 +631,56 @@ if ($action == 'index') {
 
 } elseif ($action == 'admin')  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display['detail'] = dis_calendar_admin_index();
+  $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
+  $display['detail'] = dis_calendar_admin_index($tags_q);
+
+} elseif ($action == 'tags_update')  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_tag_form($params)) {
+    $retour = run_query_tag_update($obm['uid'], $params);
+    if ($retour) {
+      $display['msg'] .= display_ok_msg("Tag : $l_update_ok");
+    } else {
+      $display['msg'] .= display_err_msg("Tag : $l_update_error");
+    }
+  }
+  else {
+    $display['msg'] .= display_err_msg($err['msg']);
+  }
+	$tags_q = run_query_calendar_get_alltags($obm['uid']) ;
+  $display['detail'] .= dis_calendar_admin_index($tags_q);
+} elseif ($action == 'tag_insert')  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_tag_form($params)) {
+    $retour = run_query_tag_insert($obm['uid'], $params);
+    if ($retour) {
+      $display['msg'] .= display_ok_msg("Tag : $l_insert_ok");
+    } else {
+      $display['msg'] .= display_err_msg("Tag : $l_insert_error");
+    }
+  }
+  else {
+    $display['msg'] .= display_err_msg($err['msg']);
+  }
+	$tags_q = run_query_calendar_get_alltags($obm['uid']) ;
+  $display['detail'] .= dis_calendar_admin_index($tags_q);
+} elseif ($action == 'tag_delete')  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_tag_delete($obm['uid'], $params);
+  if ($retour) {
+    $display['msg'] .= display_ok_msg("Tag : $l_delete_ok");
+  } else {
+    $display['msg'] .= display_err_msg("Tag : $l_delete_error");
+  }
+  $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
+  $display['detail'] .= dis_calendar_admin_index($tags_q);
+
+} elseif ($action == 'tag_search')  {
+///////////////////////////////////////////////////////////////////////////////
+  $tags_q = run_query_tag_search($obm['uid'], $params);
+	$json = json_tag_search($tags_q) ;
+	echo "(".$json.")" ;
+	exit() ;
 
 } elseif ($action == 'category1_insert')  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -638,7 +690,8 @@ if ($action == 'index') {
   } else {
     $display['msg'] .= display_err_msg("$l_category1 : $l_insert_error");
   }
-  $display['detail'] .= dis_calendar_admin_index();
+  $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
+  $display['detail'] .= dis_calendar_admin_index($tags_q);
 
 } elseif ($action == 'category1_update')  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -648,7 +701,8 @@ if ($action == 'index') {
   } else {
     $display['msg'] .= display_err_msg("$l_category1 : $l_update_error");
   }
-  $display['detail'] .= dis_calendar_admin_index();
+  $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
+  $display['detail'] .= dis_calendar_admin_index($tags_q);
 
 } elseif ($action == 'category1_checklink')  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -662,7 +716,8 @@ if ($action == 'index') {
   } else {
     $display['msg'] .= display_err_msg("$l_category1 : $l_delete_error");
   }
-  $display['detail'] .= dis_calendar_admin_index();
+  $tags_q = run_query_calendar_get_alltags($obm['uid']) ;
+  $display['detail'] .= dis_calendar_admin_index($tags_q);
   
 } elseif ($action == 'document_add') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -1222,6 +1277,34 @@ function get_calendar_action() {
     'Url'      => "$path/calendar/calendar_index.php?action=admin",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
+  );
+
+  // Tag Update
+  $actions['calendar']['tags_update'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=tag_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+  );
+
+  // Tag Insert
+  $actions['calendar']['tag_insert'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=tag_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+  );
+
+  // Tag Delete
+  $actions['calendar']['tag_delete'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=tag_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+  );
+
+  // Tag Search
+  $actions['calendar']['tag_search'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=tag_search",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
   );
 
   // Kind Insert
