@@ -409,7 +409,7 @@ class DB_Sql {
 
   function xquery($query, $hide_error='') {
     $query = self::xParser($query);
-    $this->query($query, $hide_error);
+		$this->query($query, $hide_error);
   }
   
   static function xParser($query) {

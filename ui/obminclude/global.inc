@@ -1950,27 +1950,36 @@ function random_color($nb) {
 }
 
 function get_color_data($color) {
-  $colors['#cc3333'] = array('body' => '#d96666', 'header' => '#a32929'); 
-  $colors['#dd4477'] = array('body' => '#e67399', 'header' => '#b1365f'); 
-  $colors['#994499'] = array('body' => '#b373b3', 'header' => '#7a367a'); 
-  $colors['#6633cc'] = array('body' => '#8c66d9', 'header' => '#5229a3'); 
-  $colors['#336699'] = array('body' => '#668cb3', 'header' => '#29527a'); 
-  $colors['#3366cc'] = array('body' => '#668cd9', 'header' => '#2952a3'); 
-  $colors['#22aa99'] = array('body' => '#59bfb3', 'header' => '#1b887a'); 
-  $colors['#329262'] = array('body' => '#65ad89', 'header' => '#28754e'); 
-  $colors['#109618'] = array('body' => '#4cb052', 'header' => '#0d7813'); 
-  $colors['#66aa00'] = array('body' => '#8cbf40', 'header' => '#528800'); 
-  $colors['#aaaa11'] = array('body' => '#bfbf4d', 'header' => '#88880e'); 
-  $colors['#d6ae00'] = array('body' => '#e0c240', 'header' => '#ab8b00'); 
-  $colors['#ee8800'] = array('body' => '#f2a640', 'header' => '#be6d00'); 
-  $colors['#dd5511'] = array('body' => '#e6804d', 'header' => '#b1440e'); 
-  $colors['#a87070'] = array('body' => '#be9494', 'header' => '#865a5a'); 
-  $colors['#8c6d8c'] = array('body' => '#a992a9', 'header' => '#705770'); 
-  $colors['#627487'] = array('body' => '#8997a5', 'header' => '#4e5d6c'); 
-  $colors['#7083a8'] = array('body' => '#94a2be', 'header' => '#5a6986'); 
-  $colors['#5c8d87'] = array('body' => '#85aaa5', 'header' => '#4a716c'); 
-  $colors['#898951'] = array('body' => '#a7a77d', 'header' => '#6e6e41'); 
-  $colors['#b08b59'] = array('body' => '#c4a883', 'header' => '#8d6f47'); 
-  return $colors[$color];
+  $color = str_replace('#','', $color);
+  return array('body' => '#'.$color, 'header' => '#'.changeBrightness($color));
 }
+
+function changeBrightness ($hex, $adjust=-50) {
+    $red   = hexdec( $hex[0] . $hex[1] );
+    $green = hexdec( $hex[2] . $hex[3] );
+    $blue  = hexdec( $hex[4] . $hex[5] );
+
+    $cb = $red + $green + $blue;
+    $adjust = $cb + $adjust;
+    if ( $cb > $adjust ) {
+        $db = ( $cb - $adjust ) % 255;
+
+        $red -= $db; $green -= $db; $blue -= $db;
+        if ( $red < 0 ) $red = 0;
+        if ( $green < 0 ) $green = 0;
+        if ( $blue < 0 ) $blue = 0;
+    } else {
+        $db = ( $adjust - $cb ) % 255;
+
+        $red += $db; $green += $db; $blue += $db;
+        if ( $red > 255 ) $red = 255;
+        if ( $green > 255 ) $green = 255;
+        if ( $blue > 255 ) $blue = 255;
+    }
+
+    return str_pad( dechex( $red ), 2, '0', 0 )
+         . str_pad( dechex( $green ), 2, '0', 0 )
+         . str_pad( dechex( $blue ), 2, '0', 0 );
+}
+
 </script>

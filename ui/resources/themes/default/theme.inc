@@ -18,6 +18,7 @@ $css_print_obm = "$resources_path/themes/default/styles/print.css";
 $css_calendar = "$resources_path/themes/default/styles/calendar.css";
 $css_organizationalchart = "$resources_path/themes/default/styles/organizationalchart.css";
 $css_portal = "$resources_path/themes/default/styles/portal.css";
+$css_ext_color_picker = "$resources_path/themes/default/styles/mooRainbow.css" ;
 $css_tools = "$resources_path/themes/default/styles/tools.css";
 $css_host = "$resources_path/themes/default/styles/host.css";
 

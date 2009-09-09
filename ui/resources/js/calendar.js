@@ -852,7 +852,7 @@ Obm.CalendarEvent = new Class({
    */
   setColor: function(color) {
     if(color) {
-      this.element.setStyle('backgroundColor',color.body);
+      this.content.setStyle('backgroundColor',color.body);
       this.dragHandler.setStyle('backgroundColor',color.header);
     } else {
       this.content.setStyle('backgroundColor','');

@@ -887,3 +887,66 @@ input[type="submit"][disabled] {
 #calendarToolbar {
   margin-top: -10px;
 }
+
+/* ------------------------------------------------------------------------- */
+/* Extended color picker */
+/* ------------------------------------------------------------------------- */
+div.extColorPickerWrapper {
+  width: 20em;
+  margin: auto;
+}
+
+.extColorPickerWrapper input {
+  float: left;
+  width: 15em;
+}
+
+div.extColorPicker {
+  float: left;
+  border: 1px solid #d2d2d2 ;
+  width: 30px ;
+  height:  16px ;
+  line-height: 16px ;
+  text-align: left;
+}
+
+div.extColorPicker div {
+  float: left;
+  height: 14px ;  
+  width: 14px ;
+  line-height: 100%;
+  margin: 1px ; 
+}
+
+div.extColorPicker img {
+  margin-top: 5px;
+  vertical-align: top;
+  float: left;
+}
+
+div#tag_wrapper {
+  width: 95%;
+}
+
+div#tag_wrapper input {
+  width: 70%;
+	float: left;
+}
+
+div#tag_wrapper div {
+  width: 10% ;
+	float: left;
+	border: 1px solid #d2d2d2;
+}
+
+div.colorHint {
+  width: 14px ;
+	height: 14px ;
+	line-height: 14px;
+	float: right ;
+	margin: 2px;
+}
+
+#display_tag_color {
+  background-color: #EFF0F2 ;
+}
