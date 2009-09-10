@@ -114,7 +114,7 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action, $calendar) {
     ${'ico_'.$p_range.'_view'} = ${'ico_'.$p_range.'_view_current'};
   }
   $search_form = dis_calendar_html_search_form($calendar);
-  if ($action == 'index' || $action == 'waiting_events') {
+  if ($action == 'index' || $action == 'waiting_events' || $action == 'insert' || $action == 'update') {
     $navbar = dis_calendar_navbar($calendar, $p_range);
   }
 
