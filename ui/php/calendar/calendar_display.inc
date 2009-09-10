@@ -874,9 +874,9 @@ function dis_calendar_html_search_form($calendar) {
   }
   $sel_tags .= "</select>";
 
-  $block = "<div style='padding-left:1em;padding-right:1em;float:right;'>
+  $block = "<div style='padding-left:1em;padding-right:1em;'>
 
-    <div id='basicSearch' style='display:$basic;'>
+    <div id='basicSearch' style='float:right;display:$basic;'>
       <form id='eventSearchForm' action='calendar_index.php' onsubmit='return checkSearchForm();'>
         <input type='text' id='tf_pattern' name='tf_pattern' value='$pattern' />
         <input type='submit' value='$GLOBALS[l_search]' />
