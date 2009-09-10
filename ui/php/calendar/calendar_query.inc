@@ -695,7 +695,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $res_id = $calendar['res-id'];
   $property = $calendar['property'];
 	$event_tag_id = $calendar['tag_id'] ;
-	if ($event_tag_id == $c_none) $event_tag_id = 'NULL' ;
+	if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
   $property_name = $calendar['property-name'];
   if (is_array($res_name)) {
     foreach($res_name as $key=>$res) {
