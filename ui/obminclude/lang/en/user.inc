@@ -100,6 +100,7 @@ $l_nomade_without_mail_perms = "The mail forwarding can't be allowed if the mail
 $l_nomade_perms_error = "The mail forwarding must be allowed to be activated !";
 $l_nomade_local_copy_error = "The local copy can't be activated if the mail forwarding is not allowed and activated !";
 $l_email_nomad_error = "The mail forwarding email must be given to enable the mail forwarding !";
+$l_email_nomad_error_loop = "The mail forwarding email must not be one of the user emails !";
 $l_vacation_without_mail_perms = "The mail vacation can't be activated if the mail is disabled !";
 $l_empty_vacation_message = "The vacation message can't be empty if the vacation is activated !" ;
 $l_check_sameuser = "These users seem similar to this new entry !";

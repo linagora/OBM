@@ -115,6 +115,7 @@ $l_nomade_without_mail_perms = "L'E-mail nomade ne peut pas être autorisé si l
 $l_nomade_perms_error = "L'E-mail nomade ne peut pas être activé s'il n'est pas autorisé !";
 $l_nomade_local_copy_error = "La copie locale ne peut-être activée si l'E-mail nomade n'est pas autorisé et activé";
 $l_email_nomad_error = "L'E-mail nomade ne peut pas être activé si l'adresse E-mail nomade n'est pas renseignée !";
+$l_email_nomad_error_loop = "L'E-mail nomade ne doit pas correspondre à une adresse email de l'utilisateur !";
 $l_vacation_without_mail_perms = "Le message d'absence ne peut pas être activé si la messagerie n'est pas autorisée !";
 $l_empty_vacation_message = "Le message d'absence ne peut être vide quand l'envoi est activé !" ;
 $l_check_sameuser = "Ces utilisateurs semblent similaires à cette nouvelle entrée !";

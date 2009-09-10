@@ -1543,7 +1543,8 @@ function check_user_data_form($p_id, &$user) {
   global $l_email_exist, $l_uemail_exist;
   global $l_quota_error, $l_nomade_perms_error, $l_nomade_without_mail_perms;
   global $l_nomade_local_copy_error, $l_err_system_samba,$l_err_web_all;
-  global $l_email_empty, $l_mail_perms_error, $l_email_nomad_error;
+  global $l_email_empty, $l_mail_perms_error;
+  global $l_email_nomad_error, $l_email_nomad_error_loop;
   global $l_vacation_without_mail_perms, $l_empty_vacation_message;
   global $php_regexp_login;
   global $php_regexp_email, $php_regexp_email_name, $php_regexp_quota;
@@ -1615,7 +1616,7 @@ function check_user_data_form($p_id, &$user) {
       return false;
     }
   }
-  
+
   if ($action == 'update') {
     $u = get_user_info($id);
     $domain_id = $u['domain_id'];
@@ -1630,6 +1631,14 @@ function check_user_data_form($p_id, &$user) {
     }
   }
 
+  // Get domain infos for further use
+  $d = of_domain_get_domain_infos($domain_id, true);
+  $domain_aliases = array($d['name']);
+  $one_dom = strtok($d['alias'], "\r\n");
+  while ($one_dom) {
+    $domain_aliases[] = $one_dom; 
+    $one_dom = strtok("\r\n");
+  }
 
   if ($action == 'update') {
 
@@ -1713,6 +1722,7 @@ function check_user_data_form($p_id, &$user) {
     return false;
   }
 
+  // If Mail service activated
   if ($cgp_use['service']['mail']  && $mail_perms == 1) {
     // User email addresses (only the name before @)
     if ($email != '') {
@@ -1740,12 +1750,38 @@ function check_user_data_form($p_id, &$user) {
       }
       $mails = get_email_used($emails, $id);
 
-      if(!empty($mails)) {
+      if (!empty($mails)) {
         $err['msg'] = "$l_email_exist : $mails ";
         $err['field'] = 'email';
         return false;
       }
     }
+
+    // If nomad email, check if it doesn't loop to one of the user email
+    // $um is the array of the user emails
+    if ( ($email_nomade != '')
+	 && ($nomade_enable) ) {
+
+      foreach ($um as $one_email) {
+	if (strpos($one_email, '@')) {
+	  if (strcasecmp($one_email, $email_nomade) == 0) {
+	    $err['msg'] = "$l_email_nomad_error_loop";
+	    $err['field'] = 'email_nomade';
+	    return false;
+	  }
+	} else {
+	  // email name (@ left side), check with all domain aliases
+	  foreach ($domain_aliases as $one_dom) {
+	    if (strcasecmp($one_email.'@'.$one_dom, $email_nomade) == 0) {
+	      $err['msg'] = "$l_email_nomad_error_loop";
+	      $err['field'] = 'email_nomade';
+	      return false;
+	    }
+	  }	    
+	}
+      }
+    }
+
   } else {
     // OBM-Mail disabled, email must be full (user@domain)
     if (($email != '') && (preg_match($php_regexp_email, $email) == 0)) {

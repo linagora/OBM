@@ -17,6 +17,7 @@ $l_local_copy = "Copie locale";
 $l_err_email = "L'adresse email n'est pas valide !";
 $l_nomade_not_allowed = "Le renvoi de messagerie n'est pas autorisé.";
 $l_err_nomade_local_copy = "La copie locale ne peut-être activée si l'E-mail nomade n'est pas autorisé et activé";
+$l_email_nomad_error_loop = "L'E-mail nomade ne doit pas correspondre à une de vos adresses email !";
 
 // Javascript
 $l_j_err_email = "L\'adresse email n\'est pas valide !";
