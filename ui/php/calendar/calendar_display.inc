@@ -163,6 +163,28 @@ function dis_calendar_view_bar($p_kind, $p_range, $date, $action, $calendar) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// XHTML Display tag legend portlet 
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function html_calendar_tag_legend($tags) {
+  global $display, $obm;
+
+  $block = "<div class=\"portlet\">
+    <h1>$GLOBALS[l_tag]</h1>";
+
+  $tags_q = run_query_calendar_get_alltags($obm['uid']);
+  while($tags_q->next_record()) {
+    if (in_array($tags_q->f('eventtag_id'), $tags)) {
+      $block .= "<div style='color:#FFF;background:".$tags_q->f('eventtag_color')."'>".$tags_q->f('eventtag_label')."</div>";
+    }
+  }
+
+  $block .= "</div>";
+  $display['features'] = $block.$display['features'];
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // XHTML Display the navigation bar
 // Parameters:
 //   - $calendar: calendar parameters
@@ -986,7 +1008,6 @@ function dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, 
   $display_days = ($end->getTimestamp() - $date->getTimestamp())/86400;
 
   if ($display_days > 14) {
-    $date = clone $calendar['date'];
     $block .= dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_entity, $date, $end);
     return $block;
   }
@@ -1054,10 +1075,17 @@ function dis_calendar_html_agenda($calendar, $calendar_entity,$writable_entity, 
 
   $status = array('ACCEPTED', 'NEEDS-ACTION');
   $occurrences = calendar_events_model($date,$end,$calendar_entity, $status, $category_filter);
+  $tags = array();
   if (is_array($occurrences)) {
     foreach($occurrences as $occurrence) {
+      if($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
       $dis_event .= dis_calendar_event($occurrence, 'hour', $calendar_entity, $writable_entity);
     }
+  }
+
+  $tags = array_unique($tags);
+  if (sizeof($tags) > 0) {
+    html_calendar_tag_legend($tags);
   }
 
   $block .= "
@@ -1132,6 +1160,7 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
   $height = round(100/$weeks, 2);
   $current = clone $date;
   $dis_week_time = "obm.vars.consts.weekTime = new Array();";
+  $tags = array();
 
   // calendar grid
   while($current->compare($end) < 0) {
@@ -1145,6 +1174,7 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
     $occurrences = $of->getPeriodOccurrences($current,$endWeek);
     if (is_array($occurrences)) {
       foreach($occurrences as $occurrence) {
+        if ($occurrence->event->tag) array_push($tags, $occurrence->event->tag);
         $occurrence->week = $current->getWeek();
         $dis_event .= dis_calendar_event($occurrence, 'day', $calendar_entity, $writable_entity);
       }
@@ -1176,6 +1206,11 @@ function dis_calendar_html_month_agenda($calendar, $calendar_entity,$writable_en
     }
     $week_day_event_list .= "</div>";
 
+  }
+
+  $tags = array_unique($tags);
+  if (sizeof($tags) > 0) {
+    html_calendar_tag_legend($tags);
   }
 
   // days header

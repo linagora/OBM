@@ -2700,7 +2700,7 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
             array_push($filter, "a.userobm_lastname $like '%$w%' OR a.userobm_firstname $like '%$w%'");
           }
         } elseif($field =='event_tag_id') {
-            if ($words[0] != $GLOBALS['cnone']) {
+            if ($words[0] != $GLOBALS['c_none']) {
               array_push($filter, "event_tag_id='$words[0]'");
             }
         } else {
@@ -2784,6 +2784,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         event_date,
         event_duration,
         eventtag_color AS event_color,
+        eventtag_label as tag,
+        eventtag_id,
         event_allday
         FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
@@ -2828,6 +2830,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         event_date,
         event_duration,
         eventtag_color AS event_color,
+        eventtag_label as tag,
+        eventtag_id,
         event_allday
         FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
@@ -2872,6 +2876,8 @@ function run_query_calendar_no_repeat_events($start,$end, $calendar_entity, $sta
         event_date,
         event_duration,
         eventtag_color AS event_color,
+        eventtag_label as tag,
+        eventtag_id,
         event_allday
         FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
@@ -2963,6 +2969,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         eventlink_state,
         event_repeatdays,
         eventtag_color AS event_color,
+        eventtag_label as tag,
+        eventtag_id,
         event_allday
         FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
@@ -3010,6 +3018,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         eventlink_state,
         event_repeatdays,
         eventtag_color AS event_color,
+        eventtag_label as tag,
+        eventtag_id,
         event_allday
         FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
@@ -3057,6 +3067,8 @@ function run_query_calendar_repeat_events($start, $end, $calendar_entity, $statu
         eventlink_state,
         event_repeatdays,
         eventtag_color AS event_color,
+        eventtag_label as tag,
+        eventtag_id,
         event_allday
         FROM Event
         LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
@@ -3284,13 +3296,14 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $owner = $nr_q->f('event_owner');
     $owner_name = $nr_q->f('userobm_lastname').' '.$nr_q->f('userobm_firstname');
     $timezone = $nr_q->f('event_timezone');
+    $tag = $nr_q->f('eventtag_id');
     if (isset($of->events[$id])) {
       $event = $of->events[$id];
       if (!$unique) {
         $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
       }
     } else {
-      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color);
+      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,'none',$owner,$owner_name,$color, $tag);
       $of->addOccurrence($event, $date, $entity, $entity_id, $entity_state);
     }
   }
@@ -3320,6 +3333,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
     $owner = $r_q->f('event_owner');
     $owner_name = $r_q->f('userobm_lastname').' '.$r_q->f('userobm_firstname');
     $timezone = $r_q->f('event_timezone');
+    $tag = $r_q->f('eventtag_id');
     if ($endrepeat->error() == Of_Date::WARN_EMPTY_DATE) {
       $endrepeat = $end;
     }
@@ -3330,7 +3344,7 @@ function calendar_events_model($start, $end, $calendar_entity, $status=array('AC
         $addOcc = false;
       }
     } else {
-      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color);
+      $event = new Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeatkind,$owner,$owner_name,$color, $tag);
       $event->setTimezone($timezone);
     }
     $tz = new DateTimeZone($timezone);
@@ -4089,7 +4103,7 @@ Class Event {
   var $owner;
   var $owner_name;
   var $color;
-  var $event_tag_id ;
+  var $tag ;
   var $timezone;
 
   /**
@@ -4111,7 +4125,7 @@ Class Event {
    * @access public
    * @return void
    */
-  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color) {
+  function Event($id,$duration,$title,$location,$category1,$privacy,$description,$properties,$all_day,$repeat,$owner,$owner_name,$color, $tag) {
     $this->id = $id;
     $this->duration = $duration;
     $this->title = $title;
@@ -4126,6 +4140,7 @@ Class Event {
     $this->owner = $owner;
     $this->owner_name = $owner_name;
     $this->color = $color;
+    $this->tag = $tag;
   }
 
   /**
