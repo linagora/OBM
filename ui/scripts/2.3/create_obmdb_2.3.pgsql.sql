@@ -723,7 +723,8 @@ CREATE TABLE documententity (
 
 CREATE TABLE documentlink (
     documentlink_document_id integer NOT NULL,
-    documentlink_entity_id integer NOT NULL
+    documentlink_entity_id integer NOT NULL,
+    documentlink_usercreate integer DEFAULT NULL
 );
 
 
@@ -874,6 +875,7 @@ CREATE TABLE event (
     event_color character varying(7),
     event_completed timestamp without time zone,
     event_url text,
+    event_allow_documents boolean DEFAULT false,
     event_description text,
     event_properties text,
     event_tag_id integer default NULL
@@ -6358,6 +6360,11 @@ CREATE INDEX documentlink_document_id_fkey ON documentlink (documentlink_documen
 
 CREATE INDEX documentlink_entity_id_fkey ON documentlink (documentlink_entity_id);
 --
+-- Name: documentlink_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
+--
+
+CREATE INDEX documentlink_usercreate_fkey ON documentlink (documentlink_usercreate);
+--
 -- Name: documentmimetype_usercreate_fkey; Type: INDEX; Schema: public; Owner: -; Tablespace:
 --
 
@@ -8658,6 +8665,13 @@ ALTER TABLE ONLY documentlink
 ALTER TABLE ONLY documentlink
     ADD CONSTRAINT documentlink_entity_id_entity_id_fkey FOREIGN KEY (documentlink_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+
+--
+-- Name: documentlink_usercreate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY documentlink 
+    ADD CONSTRAINT documentlink_usercreate_userobm_id_fkey FOREIGN KEY (documentlink_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 --
 -- Name: documentmimetype_domain_id_domain_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -

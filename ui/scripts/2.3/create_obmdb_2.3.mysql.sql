@@ -1138,10 +1138,13 @@ DROP TABLE IF EXISTS `DocumentLink`;
 CREATE TABLE `DocumentLink` (
   `documentlink_document_id` int(8) NOT NULL,
   `documentlink_entity_id` int(8) NOT NULL,
+  `documentlink_usercreate` int(8) default NULL,
   PRIMARY KEY  (`documentlink_document_id`,`documentlink_entity_id`),
   KEY `documentlink_entity_id_entity_id_fkey` (`documentlink_entity_id`),
+  KEY `documentlink_usercreate_userobm_id_fkey` (`documentlink_usercreate`),
   CONSTRAINT `documentlink_document_id_document_id_fkey` FOREIGN KEY (`documentlink_document_id`) REFERENCES `Document` (`document_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `documentlink_entity_id_entity_id_fkey` FOREIGN KEY (`documentlink_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `documentlink_entity_id_entity_id_fkey` FOREIGN KEY (`documentlink_entity_id`) REFERENCES `Entity` (`entity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `documentlink_usercreate_userobm_id_fkey` FOREIGN KEY (`documentlink_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -1312,6 +1315,7 @@ CREATE TABLE `Event` (
   `event_color` varchar(7) default NULL,
   `event_completed` datetime default NULL,
   `event_url` text,
+  `event_allow_documents` tinyint(1) NULL DEFAULT '0',
   `event_description` text,
   `event_properties` text,
 	`event_tag_id` int(8) default NULL,
