@@ -97,7 +97,7 @@ CREATE TABLE `addressbook` (
   `origin`     varchar(255) NOT NULL,
   `owner`      int(8) default NULL,
   `name`       varchar(64) NOT NULL,
-  `default`    int(1) default 0,
+  `is_default`    int(1) default 0,
   `syncable`   int(1) default 1,
   PRIMARY KEY (`id`),
   KEY `addressbook_domain_id_domain_id_fkey` (`domain_id`),

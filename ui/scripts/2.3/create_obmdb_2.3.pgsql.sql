@@ -91,8 +91,8 @@ CREATE TABLE addressbook (
   origin     varchar(255) NOT NULL,
   owner      integer default NULL,
   name       varchar(64) NOT NULL,
-  default    boolean default false,
-  syncable   boolean default true,
+  is_default    boolean default false,
+  syncable   boolean default true
 );
 
 
@@ -4672,7 +4672,7 @@ ALTER TABLE ONLY deleted
 --
 
 ALTER TABLE ONLY deletedaddressbook
-    ADD CONSTRAINT deletedaddressbook_pkey PRIMARY KEY (deletedaddressbook_addressbook_id);
+    ADD CONSTRAINT deletedaddressbook_pkey PRIMARY KEY (addressbook_id);
 
 
 --
@@ -5697,7 +5697,6 @@ CREATE INDEX address_entity_id_fkey ON address (address_entity_id);
 
 CREATE INDEX addressbook_domain_id_fkey ON addressbook (domain_id);
 CREATE INDEX addressbook_userupdate_fkey ON addressbook (userupdate);
-CREATE INDEX addressbook_usercreate_fkey ON addressbook (usercreate);
 CREATE INDEX addressbook_usercreate_fkey ON addressbook (usercreate);
 CREATE INDEX addressbook_owner_fkey ON addressbook (owner);
 
@@ -7641,7 +7640,7 @@ ALTER TABLE ONLY addressbook
 
 
 ALTER TABLE ONLY addressbookentity
-    ADD CONSTRAINT addressbookentity_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbookentity_addressbook_id) REFERENCES adressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT addressbookentity_addressbook_id_addressbook_id_fkey FOREIGN KEY (addressbookentity_addressbook_id) REFERENCES addressbook(id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY addressbookentity
     ADD CONSTRAINT addressbookentity_entity_id_entity_id_fkey FOREIGN KEY (addressbookentity_entity_id) REFERENCES entity(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
