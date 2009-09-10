@@ -22,6 +22,9 @@ function checkSearchForm() {
 function toggleSearchForm(show, hide) {
   $(hide).setStyle('display', 'none');
   $(show).setStyle('display', '');
+  if (obm.calendarManager) {
+    obm.calendarManager.resizeGrid();
+  }
 }
 
 function setAdvancedSearchDate(rd) {
