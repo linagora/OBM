@@ -388,6 +388,7 @@ if ($action == 'search') {
   if ($entities['contact'] == null) {
     $entities['contact'] = array();
   }
+  $entities['document'] = is_array($params['sel_document_id']) ? $params['sel_document_id'] : array();
 
   if (check_calendar_access($params["calendar_id"]) && 
     check_calendar_data_form($params)) {

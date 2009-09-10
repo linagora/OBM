@@ -3856,10 +3856,11 @@ function run_query_insert_others_attendees($calendar) {
 
   foreach($attendees as $email) {
     //// Check if exists
+    // XXXXXX Migrate the access right to the Addressbook
     $query = "SELECT contact_id FROM Contact
     	INNER JOIN ContactEntity ON contactentity_contact_id = contact_id
         INNER JOIN Email ON email_entity_id = contactentity_entity_id 
-    	WHERE (contact_privacy = '0' OR contact_usercreate='$uid') AND contact_archive='0' and email_address = '$email'";
+    	WHERE /*(contact_privacy = '0' OR contact_usercreate='$uid') AND*/ contact_archive='0' and email_address = '$email'";
     display_debug_msg($query, $cdg_sql,"'run_query_insert_others_attendees($email)");
     $obm_q->query($query);    
 
@@ -3878,7 +3879,6 @@ function run_query_insert_others_attendees($calendar) {
         contact_lastname,
         contact_firstname,
         contact_marketingmanager_id,
-        contact_privacy,
         contact_archive,
         contact_origin) VALUES (
           NOW(),
@@ -3889,7 +3889,6 @@ function run_query_insert_others_attendees($calendar) {
         '$last_name',
         '$first_name',
         '$uid',
-        '1',
         '0',
         '$GLOBALS[c_origin_web]')";
 
