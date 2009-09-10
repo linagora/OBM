@@ -31,6 +31,7 @@ function run_query_calendar_detail($calendar_id) {
   $query = "SELECT 
     event_id,
     event_ext_id,
+    e.evententity_entity_id AS event_entity_id,
     c.userobm_login AS usercreate,
     u.userobm_login AS userupdate,
     $timeupdate,
@@ -55,9 +56,11 @@ function run_query_calendar_detail($calendar_id) {
 		eventtag_color,
 		eventtag_label,
 		event_endrepeat,
+    event_allow_documents,
     event_date
     FROM
     Event
+    INNER JOIN EventEntity AS e ON event_id = evententity_event_id
     LEFT JOIN EventCategory1 ON event_category1_id = eventcategory1_id
     INNER JOIN UserObm AS c ON event_usercreate = c.userobm_id
     LEFT JOIN UserObm AS u ON event_userupdate = u.userobm_id
@@ -696,6 +699,7 @@ function run_query_calendar_insert_event_data($calendar) {
   $property = $calendar['property'];
 	$event_tag_id = $calendar['tag_id'] ;
 	if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
+  if ($calendar['allow_documents'] != 1) $allow_documents = 0; else $allow_documents = 1; 
   $property_name = $calendar['property-name'];
   if (is_array($res_name)) {
     foreach($res_name as $key=>$res) {
@@ -762,6 +766,7 @@ function run_query_calendar_insert_event_data($calendar) {
     event_repeatdays,
     event_allday,
 		event_tag_id, 
+    event_allow_documents,
     event_endrepeat,
     event_domain_id)
     VALUES (
@@ -787,6 +792,7 @@ function run_query_calendar_insert_event_data($calendar) {
     '$repeat_days',
     $all_day,
 		$event_tag_id,
+    '$allow_documents',
     $repeat_end,
     $obm[domain_id])";
 
@@ -867,6 +873,27 @@ function run_query_calendar_attach_document($document_id, $event_id) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q; 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Detach a document from an event
+// Parameters: 
+//   - $document_id :
+//   - $event_id  :
+///////////////////////////////////////////////////////////////////////////////
+function run_query_calendar_detach_document($document_id, $event_id) {
+  global $cdg_sql, $obm;
+
+  $event_id = sql_parse_id($event_id);
+  $document_id = sql_parse_id($document_id);
+  $query = "DELETE FROM DocumentLink 
+    WHERE documentlink_document_id = $document_id
+    AND documentlink_entity_id = $event_id";
+
+  display_debug_msg($query, $cdg_sql, 'run_query_calendar_detach_document()');
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
 }
 
 
@@ -1361,8 +1388,10 @@ function run_query_calendar_update_event_data($calendar) {
     $repeat_end = 'NULL';
   }    
   $frequency = $calendar['repeatfrequency']; 
+  $color = $calendar['color'];
+  if ($calendar['allow_documents'] != 1) $allow_documents = 0; else $allow_documents = 1; 
   $event_tag_id = $calendar['tag_id'] ;
-	if ($event_tag_id == $c_none) $event_tag_id = 'NULL' ;
+  if ($event_tag_id == $c_none) $event_tag_id = 'NULL' ;
   $date_exception = $calendar['date_exception'];
   $item = $calendar['list-item'];
   $item_id = $calendar['list-item-id'];
@@ -1427,6 +1456,7 @@ function run_query_calendar_update_event_data($calendar) {
       event_duration = '$event_duration',
       event_allday = $all_day, 
       event_tag_id = $event_tag_id,
+      event_allow_documents = '$allow_documents',
       event_origin = '$GLOBALS[c_origin_web]',
       event_repeatkind = '$repeat_kind',
       event_repeatfrequence = '$frequency',
@@ -2272,7 +2302,7 @@ function get_calendar_event_entity($calendar_id) {
 
   $calendar_id = sql_parse_id( $calendar_id, true);
 
-  // XXXX Optimisation possible : 1 seule requete pour toutes les entites
+  // XXXX Optimisation possible : 1 seule requete pour toutes les entites (sauf les documents...)
   $multidomain = sql_multidomain('userobm');
   $query = "SELECT DISTINCT
     userobm_id,
@@ -2360,7 +2390,9 @@ function get_calendar_event_entity($calendar_id) {
   $query = "SELECT 
     document_id,
     document_title,
-    document_name
+    document_name,
+    document_privacy,
+    documentlink_usercreate
     FROM Document
     INNER JOIN DocumentLink ON document_id = documentlink_document_id
     INNER JOIN EventEntity ON documentlink_entity_id = evententity_entity_id
@@ -2373,11 +2405,13 @@ function get_calendar_event_entity($calendar_id) {
   $u_q->query($query);
   while ($u_q->next_record()) {
     $entity_id = $u_q->f('document_id');
-    $title = $u_q->f('document_title');
-    $name = $u_q->f('document_name');
     $entities['document']['ids'][] = $entity_id;
-    $entities['document']['entity'][$entity_id] = array('title'=> $title,
-      'name' => $name);
+    $entities['document']['entity'][$entity_id] = array(
+      'title'=> $u_q->f('document_title'),
+      'name' => $u_q->f('document_name'),
+      'private' => ($u_q->f('document_privacy') == 1),
+      'user' => $u_q->f('documentlink_usercreate')
+    );
   }
 
   return $entities;

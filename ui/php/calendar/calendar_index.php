@@ -615,6 +615,13 @@ if ($action == 'search') {
       $display['msg'] .= display_err_msg($err['msg']);
     } 
   }
+  
+} elseif ($action == 'detach_document') {
+///////////////////////////////////////////////////////////////////////////////
+  run_query_calendar_detach_document($params['document_id'], $params['event_entity_id']);
+  json_ok_msg("$l_document : $l_delete_ok");
+  echo "({".$display['json']."})";
+  exit();
 
 } elseif ($action == 'rights_admin') {
 ///////////////////////////////////////////////////////////////////////////////
@@ -1062,6 +1069,9 @@ function get_calendar_params() {
   if (isset ($_FILES['fi_other_files'])) {
     $params['other_files'] = array();
     foreach ($_FILES['fi_other_files']['name'] as $k => $name) {
+      if ($_FILES['fi_other_files']['error'][$k] !== UPLOAD_ERR_OK) {
+        continue;
+      }
       $params['other_files'][] = array(
         'file_tmp' => $_FILES['fi_other_files']['tmp_name'][$k],
         'name' => $_FILES['fi_other_files']['name'][$k],
@@ -1429,6 +1439,12 @@ function get_calendar_action() {
   
   // Document add
   $actions['calendar']['document_add'] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+  );
+  
+  // Detach document
+  $actions['calendar']['detach_document'] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None')
   );

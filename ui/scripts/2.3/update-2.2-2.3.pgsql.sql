@@ -155,6 +155,11 @@ ALTER TABLE event ADD COLUMN event_tag_id integer default NULL;
 ALTER TABLE ONLY event ADD CONSTRAINT event_tag_id_eventtag_id_fkey FOREIGN KEY (event_tag_id) REFERENCES eventtag(eventtag_id) ON UPDATE CASCADE ON DELETE SET NULL;
 ALTER TABLE ONLY eventtag ADD CONSTRAINT eventtag_user_id_userobm_id_fkey FOREIGN KEY (eventtag_user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
+-- Event's document attachments
+ALTER TABLE event ADD COLUMN event_allow_documents boolean default false;
+ALTER TABLE documentlink ADD COLUMN documentlink_usercreate integer DEFAULT NULL;
+CREATE INDEX documentlink_usercreate_fkey ON documentlink (documentlink_usercreate);
+ALTER TABLE ONLY documentlink ADD CONSTRAINT documentlink_usercreate_userobm_id_fkey FOREIGN KEY (documentlink_usercreate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 -- -----------------------------------------------------------------------------
 
 

@@ -461,7 +461,7 @@ function add_file_field() {
               remove_element(this.parentNode,'calendarFileHome');
             }).adopt(new Element('img').setProperty('src','$ico_delete')));
   fileHome.adopt(div);
-  div.appendText(' ').adopt(new Element('input').addClass('otherFile').setProperty('name','fi_other_files[]').setProperty('type','file'));
+  div.appendText(' ').adopt(new Element('input').addClass('otherFile').setProperty('name','fi_other_files[]').setProperty('type','file').setProperty('size',7));
   
 }
 
@@ -551,6 +551,22 @@ function updateExportForm(){
   $('del_action').setProperty('value','reset');
   $('del_popup').setProperty('value','0');
   $('del_force').setProperty('value','1');
+}
+
+function detachDocument(documentId, eventEntityId, el) {
+  var req = new Request({
+    url: '$path/calendar/calendar_index.php',
+    data: 'action=detach_document&document_id='+documentId+'&event_entity_id='+eventEntityId,
+    onRequest: function() {
+      el.setProperty('style', 'display:none');
+      var spinner = new Element('img').setProperty('src','$ico_spinner');
+      spinner.inject(el, 'before');
+    },
+    onSuccess: function(responseText, responseXML) {
+      el.getParent().destroy();
+    }
+  });
+  req.send();
 }
 
 ";

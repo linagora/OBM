@@ -103,6 +103,14 @@ ALTER TABLE `Event` ADD COLUMN `event_tag_id` int(8) ;
 ALTER TABLE `Event` ADD KEY `event_tag_id_eventtag_id_fkey` (`event_tag_id`) ;
 ALTER TABLE `Event` ADD CONSTRAINT `event_tag_id_eventtag_id_fkey` FOREIGN KEY (`event_tag_id`) REFERENCES `EventTag` (`eventtag_id`) ON DELETE SET NULL ON UPDATE CASCADE ;
 
+-- 
+-- Alter `Event` and `DocumentLink` for document attachment
+-- 
+ALTER TABLE `Event` ADD COLUMN `event_allow_documents` tinyint(1) NULL DEFAULT '0' AFTER `event_url`;
+ALTER TABLE `DocumentLink` ADD COLUMN `documentlink_usercreate` int(8) NULL DEFAULT NULL;
+ALTER TABLE `DocumentLink` ADD KEY `documentlink_usercreate_userobm_id_fkey` (`documentlink_usercreate`) ;
+ALTER TABLE `DocumentLink` ADD CONSTRAINT `documentlink_usercreate_userobm_id_fkey` FOREIGN KEY (`documentlink_usercreate`) REFERENCES `UserObm` (`userobm_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
 -- ----------------------------------------------------------------------------
 -- Write that the 2.2->2.3 is completed
 UPDATE ObmInfo SET obminfo_value='2.3.0' WHERE obminfo_name='db_version';

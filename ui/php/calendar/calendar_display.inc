@@ -2469,6 +2469,7 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
   global $l_daysofweekshort,$l_update,$l_accept,$l_refuse,$l_repeatfrequency;
   global $l_documents,$l_title,$l_name;
   global $l_A, $l_R, $l_W;
+  global $ico_add, $ico_delete, $ico_spinner;
 
   $id = $event_q->f('event_id');
   
@@ -2528,8 +2529,9 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     $end = $end->getOutputDateTime();
   }     
   $privacy = $event_q->f('event_privacy') == 1? $l_yes : $l_no;
-
-
+  
+  $allow_documents = ($event_q->f('event_allow_documents') == 1);
+  
   if ($event_q->f('event_repeatkind') != 'none') {
     $kind = $GLOBALS['l_'.$event_q->f('event_repeatkind')];
     $kind_unit = $GLOBALS['l_'.$event_q->f('event_repeatkind').'_unit'];
@@ -2784,19 +2786,55 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
     }
   }
   
+  $display_documents_form = ($event_q->f('event_owner') == $obm['uid'] 
+    || ($allow_documents && in_array($obm['uid'], $entities['user']['ids'])));
+  
   $docs = $entities['document'];
   if (is_array($docs['entity'])) {
-    foreach ($docs['entity'] as $d_id => $entity) {
+    /*foreach ($docs['entity'] as $d_id => $entity) {
       $link = "$path/document/document_index.php?action=accessfile&document_id=$d_id&popup=1";
-      $title = $entity['title'];
-      $name = $entity['name'];
       $dis_document_list .= "
         <tr>
-        <td><a href=\"$link\">$title</a></td>
-        <td>$name</td>
+        <td><a href=\"$link\">$entity[title]</a></td>
+        <td>$entity[name]</td>
         </tr>";
+    }*/
+    $dis_document_list = '';
+    $event_entity_id = $event_q->f('event_entity_id');
+    foreach ($docs['entity'] as $d_id => $entity) {
+      if (!$entity['private'] || in_array($obm['uid'], $entities['user']['ids'])) {
+        $content = "<a href=\"$path/document/document_index.php?action=accessfile&document_id=$d_id&popup=1\">$entity[title]</a>";
+        if ($event_q->f('event_owner') == $obm['uid'] || $entity['user'] == $obm['uid']) {
+          $content = "
+            <a onclick=\"detachDocument('$d_id', '$event_entity_id', this);\" id='test'>
+              <img src=\"$ico_delete\" alt=\"[Delete]\" />
+            </a>".$content;
+        }
+        $dis_document_list.= "<li>$content</li>";
+      }
     }
-    $dis_document_block = "
+    
+    if ($display_documents_form) {
+      $dis_document_form = "
+        <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_entity\" action=\"calendar_index.php\">
+        <fieldset class=\"detail\">
+        <legend>Ajouter des documents</legend>
+        <table>
+          ".html_calendar_documents_form_fieldset()."
+        </table>
+        <script type=\"text/javascript\">
+          obm.initialize.chain(function () {
+            new obm.AutoComplete.Search('$path/document/document_index.php?action=ext_search', 'sel_document_id', 'documentSearch');
+          });
+        </script>
+        </fieldset>
+        <fieldset class=\"buttons\">
+          <input type=\"hidden\" name=\"calendar_id\" id=\"calendar_id\" value=\"$id\" />
+          <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
+          <input type=\"submit\" value=\"$l_update\" />
+        </fieldset>";
+    }
+    /*$dis_document_block = "
       <div class=\"detail infos\">
       <h1>$l_documents</h1>
       <table class=\"spreadSheet\">
@@ -2807,6 +2845,15 @@ function html_calendar_event_consult($event_q, $exception_q, $entities, $alerts)
       </thead>
       $dis_document_list
       </table>
+      $dis_document_form
+      </div>";*/
+    $dis_document_block = "
+      <div class=\"detail infos\">
+      <h1>$l_documents</h1>
+      <ul>
+      $dis_document_list
+      </ul>
+      $dis_document_form
       </div>";
   }
 
@@ -3184,6 +3231,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
       $end->subMinute(1);
     }
     $privacy = $event_q->f('event_privacy');
+    $allow_documents = $event_q->f('event_allow_documents');
     $repeat_kind = $event_q->f('event_repeatkind');
     $repeat_days = $event_q->f('event_repeatdays');
     $repeatfrequency = $event_q->f('event_repeatfrequence');
@@ -3569,37 +3617,11 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
     $group_complete = "new obm.AutoComplete.Search('$path/group/group_index.php?action=ext_search', 'sel_group_id', 'groupSearch');";
   }
   
-  if (is_array($documents['entity'])) {
-    foreach ($documents['entity'] as $d_id => $d_ent) {
-      $d_name = $d_ent['name'];
-      $sel_id = "data-document-$d_id";
-      $div_id = "sel_document_id-$sel_id";
-      $dis_sel_document .= "
-        <div class=\"elementRow\" id=\"$div_id\">
-        <a href=\"javascript: remove_element('$div_id','sel_document_id');\">
-        <img src=\"$ico_delete\" alt=\"[Delete]\" />
-        </a>
-        $d_name
-        <input value=\"$sel_id\" name=\"sel_document_id[]\" type=\"hidden\" />
-        </div>";
-    }
-  }
-  
   if ($allow_documents == 1) {
     $dis_allow_documents = "<input type=\"checkbox\" id=\"cba_allow_documents\" value=\"1\" checked=\"checked\" name=\"cba_allow_documents\" />";
   } else {
     $dis_allow_documents = "<input type=\"checkbox\" id=\"cba_allow_documents\" value=\"1\" name=\"cba_allow_documents\" />";
   }
-  
-  $url = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_document_id";
-  $document_add_button = "
-    <a href=\"javascript: return false;\" 
-      onclick=\"popup('$url','');
-      return false;\">
-      <img src=\"$ico_add\" alt=\"[Add]\" />
-    </a>";
-    
-  $dis_other_files = dis_calendar_file_block();
   
   $block_document = "
     <fieldset class=\"detail infos\">
@@ -3613,22 +3635,7 @@ function html_calendar_event_form($action, $calendar, $event_q, $exception_q, $p
         $dis_allow_documents
       </td>
     </tr>
-    <tr>
-      <th>
-      $l_documents
-      $document_add_button
-      </th>
-      <td>
-        <input type=\"text\" name=\"\" value=\"\" id=\"documentSearch\" autocomplete=\"off\" />
-      </td>
-    </tr>
-    <tr>
-      $dis_other_files
-    </tr>
-    <tr>
-      <th>&nbsp;</th>
-      <td id=\"sel_document_id\">$dis_sel_document</td>
-    </tr>
+    ".html_calendar_documents_form_fieldset($documents['entity'])."
     </table>
     </fieldset>";
     
@@ -4707,12 +4714,6 @@ function dis_calendar_right_dis_admin($id='') {
     $block = "<h1>$l_user_right $name</h1>";
   }
   $block .= of_right_dis_admin('calendar', $id);
-//  $block .= "<h1>$l_rights_my_on</h1>";
-//
-//  $allowed = OBM_Acl::getAllowedEntities($id, 'calendar', 'access');
-  //  $allowed = OBM_Acl::getRights($id, 'calendar', null);
-// Get all actions for this ? update getactionclause() ?
-//  print_r($allowed);
 
   return $block;
 }
@@ -7386,7 +7387,7 @@ function dis_calendar_mail_field($emails, $class) {
  * 
  * @return string
  */
-function dis_calendar_file_block() {
+function html_calendar_file_block() {
   return "
   <th class=\"\" id='calendarFileBlock'>
     $GLOBALS[l_other_files]
@@ -7399,10 +7400,57 @@ function dis_calendar_file_block() {
       <a onclick=\"remove_element(this.parentNode,'calendarFileHome');return false\" href=\"\">
        <img src=\"$GLOBALS[ico_delete]\" alt=\"[Delete]\">
       </a>        
-      <input type=\"file\" class=\"otherFile\" name=\"fi_other_files[]\" />  
+      <input type=\"file\" size=\"7\" class=\"otherFile\" name=\"fi_other_files[]\" />  
     </div>
   </td>
   ";
+}
+
+/**
+ * Generate document attachment form block
+ * 
+ * @return string
+ */
+function html_calendar_documents_form_fieldset($documents = null) {
+  global $ico_add, $ico_delete, $l_documents;
+  
+  if (is_array($documents)) {
+    foreach ($documents as $d_id => $d_ent) {
+      $d_name = $d_ent['name'];
+      $sel_id = "data-document-$d_id";
+      $div_id = "sel_document_id-$sel_id";
+      $dis_sel_document .= "
+        <div class=\"elementRow\" id=\"$div_id\">
+        <a href=\"javascript: remove_element('$div_id','sel_document_id');\">
+        <img src=\"$ico_delete\" alt=\"[Delete]\" />
+        </a>
+        $d_name
+        <input value=\"$sel_id\" name=\"sel_document_id[]\" type=\"hidden\" />
+        </div>";
+    }
+  }
+  
+  return "
+    <tr>
+      <th>
+      $l_documents
+        <a href=\"javascript: return false;\" 
+          onclick=\"popup('$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_document_id','');
+          return false;\">
+          <img src=\"$ico_add\" alt=\"[Add]\" />
+        </a>
+      </th>
+      <td>
+        <input type=\"text\" name=\"\" value=\"\" id=\"documentSearch\" autocomplete=\"off\" />
+      </td>
+    </tr>
+    <tr>
+      <th>&nbsp;</th>
+      <td id=\"sel_document_id\">$dis_sel_document</td>
+    </tr>
+    <tr>
+      ".html_calendar_file_block()."
+    </tr>";
 }
 
 ?>
