@@ -1950,8 +1950,10 @@ function random_color($nb) {
 }
 
 function get_color_data($color) {
-  $color = str_replace('#','', $color);
-  return array('body' => '#'.$color, 'header' => '#'.changeBrightness($color));
+  if ($color) {
+    $color = str_replace('#','', $color);
+    return array('body' => '#'.$color, 'header' => '#'.changeBrightness($color));
+  }
 }
 
 function changeBrightness ($hex, $adjust=-50) {
