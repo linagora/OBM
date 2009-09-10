@@ -133,6 +133,27 @@ ALTER TABLE ONLY syncedaddressbook
 
 DROP TABLE IF EXISTS SynchedContact;
 
+-- EventTag
+CREATE TABLE eventtag ( 
+  eventtag_id integer NOT NULL, 
+  eventtag_user_id integer NOT NULL, 
+  eventtag_label character varying(128) DEFAULT ''::character varying,
+  eventtag_color character(7) default NULL 
+);
+
+CREATE SEQUENCE eventtag_eventtag_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+ALTER SEQUENCE eventtag_eventtag_id_seq OWNED BY eventtag.eventtag_id;
+ALTER TABLE eventtag ALTER COLUMN eventtag_id SET DEFAULT nextval('eventtag_eventtag_id_seq'::regclass);
+ALTER TABLE ONLY eventtag ADD CONSTRAINT eventtag_pkey PRIMARY KEY (eventtag_id);
+ALTER TABLE event ADD COLUMN event_tag_id integer default NULL;
+ALTER TABLE ONLY event ADD CONSTRAINT event_tag_id_eventtag_id_fkey FOREIGN KEY (event_tag_id) REFERENCES eventtag(eventtag_id) ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE ONLY eventtag ADD CONSTRAINT eventtag_user_id_userobm_id_fkey FOREIGN KEY (eventtag_user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 -- -----------------------------------------------------------------------------
 

@@ -875,7 +875,8 @@ CREATE TABLE event (
     event_completed timestamp without time zone,
     event_url text,
     event_description text,
-    event_properties text
+    event_properties text,
+    event_tag_id integer default NULL
 );
 
 
@@ -976,6 +977,18 @@ CREATE TABLE eventlink (
     eventlink_state vpartstat DEFAULT 'NEEDS-ACTION'::vpartstat,
     eventlink_required vrole DEFAULT 'REQ'::vrole,
     eventlink_percent double precision DEFAULT 0
+);
+
+
+--
+-- Table structure for table `EventTag`
+--
+
+CREATE TABLE eventtag ( 
+  eventtag_id integer NOT NULL, 
+  eventtag_user_id integer NOT NULL, 
+  eventtag_label character varying(128) DEFAULT ''::character varying,
+  eventtag_color character(7) default NULL 
 );
 
 
@@ -2884,6 +2897,23 @@ ALTER SEQUENCE eventcategory1_eventcategory1_id_seq OWNED BY eventcategory1.even
 
 
 --
+-- Name: event_event_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE eventtag_eventtag_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+--
+-- Name: event_event_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE eventtag_eventtag_id_seq OWNED BY eventtag.eventtag_id;
+--
 -- Name: host_host_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -4044,6 +4074,13 @@ ALTER TABLE event ALTER COLUMN event_id SET DEFAULT nextval('event_event_id_seq'
 
 
 --
+-- Name: eventtag_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE eventtag ALTER COLUMN eventtag_id SET DEFAULT nextval('eventtag_eventtag_id_seq'::regclass);
+
+
+--
 -- Name: eventcategory1_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4825,6 +4862,13 @@ ALTER TABLE ONLY eventexception
 
 ALTER TABLE ONLY eventlink
     ADD CONSTRAINT eventlink_pkey PRIMARY KEY (eventlink_event_id, eventlink_entity_id);
+
+--
+-- Name: eventtag_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY eventtag
+    ADD CONSTRAINT eventtag_pkey PRIMARY KEY (eventtag_id);
 
 
 --
@@ -8744,6 +8788,14 @@ ALTER TABLE ONLY event
 
 
 --
+-- Name: event_userupdate_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY event
+    ADD CONSTRAINT event_tag_id_eventtag_id_fkey FOREIGN KEY (event_tag_id) REFERENCES eventtag(eventtag_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
 -- Name: eventalert_event_id_event_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -8869,6 +8921,14 @@ ALTER TABLE ONLY eventlink
 
 ALTER TABLE ONLY eventlink
     ADD CONSTRAINT eventlink_userupdate_userobm_id_fkey FOREIGN KEY (eventlink_userupdate) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+
+--
+-- Name: eventtag_user_id_userobm_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY eventtag
+    ADD CONSTRAINT eventtag_user_id_userobm_id_fkey FOREIGN KEY (eventtag_user_id) REFERENCES userobm(userobm_id) ON UPDATE CASCADE ON DELETE SET NULL;
 
 
 --
