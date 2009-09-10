@@ -1658,7 +1658,7 @@ function run_query_calendar_event_exception_insert( $calendar, $event_q = '') {
     $priority = sql_parse_int( $event_q->f('event_priority'));
     //$color = $event_q->f('event_color');
 		$event_tag_id = $event_q->f('tag_id') ;
-		if ($event_tag_id == $c_none) $event_tag_id = 'NULL' ;
+		if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
     $description = $event_q->f('event_description');
     $properties = $event_q->f('event_properties');
     $location = $event_q->f('event_location');
