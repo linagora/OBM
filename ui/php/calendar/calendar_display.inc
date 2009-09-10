@@ -81,6 +81,7 @@ function dis_calendar_search_result($calendar, &$sel_entity_id, $p_view, $p_rang
     $pattern['eventcategory1_label'] = of_category_get_label('event', 'category1', $calendar['category_filter']);
     $pattern['owner'] = $calendar['owner'];
     $pattern['attendees'] = $calendar['attendees'];
+    $pattern['event_tag_id'] = $calendar['tag'];
     $begin = $calendar['date_begin'];
     $end = $calendar['date_end'];
   }
@@ -807,6 +808,7 @@ function dis_calendar_navbar($calendar, $range) {
  * Basic and advanced form
  */
 function dis_calendar_html_search_form($calendar) {
+  global $obm;
 
   $pattern = $calendar['pattern'];
   $title = $calendar['title'];
@@ -816,6 +818,7 @@ function dis_calendar_html_search_form($calendar) {
   $attendees = $calendar['attendees'];
   $category_filter = $calendar['category_filter'];
   $period = $calendar['period'];
+  $tag = $calendar['tag'];
   if (!isset($period)) $period = 'today';
   if (!isset($calendar['searchType']) || $calendar['searchType'] == 'basic') {
     $basic = '';
@@ -860,6 +863,17 @@ function dis_calendar_html_search_form($calendar) {
   $date_end = $calendar['date_end'];
   if (!$date_end) $date_end = new Of_Date();
 
+  // Tag selection
+  $tags_q = run_query_calendar_get_alltags($obm['uid']);
+  $sel_tags = "<select id='sel_tag' name='sel_tag'>
+    <option value='".$GLOBALS['cnone']."'>$GLOBALS[l_none]</option>";
+  while($tags_q->next_record()) {
+    $selected = "";
+    if ($tags_q->f('eventtag_id') == $tag) $selected = "selected";
+    $sel_tags .= "<option value='".$tags_q->f('eventtag_id')."' $selected>".$tags_q->f('eventtag_label')."</option>";
+  }
+  $sel_tags .= "</select>";
+
   $block = "<div style='padding-left:1em;padding-right:1em;float:right;'>
 
     <div id='basicSearch' style='display:$basic;'>
@@ -895,6 +909,8 @@ function dis_calendar_html_search_form($calendar) {
           <td>$GLOBALS[l_attendees]</td>
           <td><input type='text' id='tf_attendees' name='tf_attendees' value='$attendees' /></td>
         <tr></tr>
+          <td>$GLOBALS[l_tag]</td>
+          <td>$sel_tags</td>
           <td>$GLOBALS[l_datebegin]</td>
 					<td><input type='text' id='tf_date_begin' name='tf_date_begin' value='".$date_begin->getOutputDate()."' class='datePicker' /></td>
           <td>
@@ -906,6 +922,8 @@ function dis_calendar_html_search_form($calendar) {
             <label for='rd_tomorrow'>$GLOBALS[l_tomorrow]</label>
           </td>
         </tr><tr>
+          <td></td>
+          <td></td>
           <td>$GLOBALS[l_dateend]</td>
           <td><input type='text' id='tf_date_end' name='tf_date_end' value='".$date_end->getOutputDate()."' class='datePicker' /></td>
           <td>
@@ -917,6 +935,8 @@ function dis_calendar_html_search_form($calendar) {
             <label for='rd_next_week'>$GLOBALS[l_next_week]</label>
           </td>
         </tr><tr>
+          <td></td>
+          <td></td>
           <td></td>
           <td></td>
           <td>

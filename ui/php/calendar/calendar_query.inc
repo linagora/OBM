@@ -2699,6 +2699,10 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
           foreach($words as $w) {
             array_push($filter, "a.userobm_lastname $like '%$w%' OR a.userobm_firstname $like '%$w%'");
           }
+        } elseif($field =='event_tag_id') {
+            if ($words[0] != $GLOBALS['cnone']) {
+              array_push($filter, "event_tag_id='$words[0]'");
+            }
         } else {
           foreach($words as $w) {
             array_push($filter, "$field $like '%$w%'");
