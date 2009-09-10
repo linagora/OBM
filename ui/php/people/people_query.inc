@@ -66,8 +66,9 @@ function run_query_people_search($people) {
     }
     $show_contact = true;
     $where_userobm .= " AND userobm_status = 'VALID'";
+    // XXXXXX Migrate the access right to the Addressbook
     $where_contact .= " AND (";
-    $where_contact .= "contact_privacy = 0";
+    $where_contact .= "1 = 1";
     $f_contact_ids = run_query_people_allowed_access_contacts();
     if ((is_array($f_contact_ids)) && (count($f_contact_ids) > 0)) {
       $f_contact_ids = array_map(sql_parse_id,$f_contact_ids);
@@ -336,9 +337,9 @@ function run_query_people_ext_search($people) {
       $where_filter_entity = ' AND userobm_id < 0';
     }
   }
-
+  // XXXXXX Migrate the access right to the Addressbook
   $where_contact_acl = "AND (";
-  $where_contact_acl.= "contact_privacy = 0";
+  $where_contact_acl.= "1 = 1";
   $f_contact_ids = run_query_people_allowed_access_contacts();
   if ((is_array($f_contact_ids)) && (count($f_contact_ids) > 0)) {
     $f_contact_ids = array_map(sql_parse_id,$f_contact_ids);
