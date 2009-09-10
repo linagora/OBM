@@ -1516,3 +1516,61 @@ div.overTxtDiv {
   margin-left: 5px;
   list-style-type: none;  
 }
+
+#basicSearch a {
+  font-size: 90%;
+}
+
+
+#advancedSearch {
+}
+
+#advancedSearch .header {
+  border:3px solid #74dd82;
+  border-bottom: none;
+  background:#74dd82;
+  margin-left:33%;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-top-right-radius: 5px;
+}
+
+#advancedSearch .header span.title {
+  color: #636466;
+  font-size:100%;
+  font-weight:bold;
+}
+
+#advancedSearch .header span.link {
+  color: #636466;
+  font-size:90%;
+  float: right;
+}
+
+#advancedSearch .content {
+  border:3px solid #74dd82;
+  background:#b5edbc;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+}
+
+#advancedSearch table {
+  width: 100%;
+}
+
+#advancedSearch colgroup.label {
+  font-weight:bold;
+  text-align:right;
+}
+
+.searchPattern {
+  background-color:#b5edbc;
+  display:inline;
+}
+
+

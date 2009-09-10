@@ -213,9 +213,13 @@ if ($popup) {
 }
 
 
-$display['search'] = dis_calendar_view_bar($cal_view, $cal_range, $params['date'],$action);
+$display['search'] = dis_calendar_view_bar($cal_view, $cal_range, $params['date'],$action, $params);
 
-if ($action == 'index') {
+if ($action == 'search') {
+///////////////////////////////////////////////////////////////////////////////
+  $display['detail'] .= dis_calendar_search_result($params, $cal_entity_id, $cal_view, $cal_range);
+
+} elseif ($action == 'index') {
 ///////////////////////////////////////////////////////////////////////////////
   if(!$cal_view) {
     $obm_wait = run_query_calendar_waiting_events();
@@ -1096,6 +1100,12 @@ function get_calendar_action() {
   // Index
   $actions['calendar']['index'] = array (
     'Url'      => "$path/calendar/calendar_index.php?action=index",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+  );
+
+  $actions['calendar']['search'] = array (
+    'Url'      => "$path/calendar/calendar_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );

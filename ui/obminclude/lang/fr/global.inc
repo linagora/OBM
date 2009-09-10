@@ -46,6 +46,10 @@ $l_select_all = "Sélectionner tout";
 $l_generate = "Générer";
 $l_autocomplete_field = "Rechercher ...";
 $l_fatal_server_err = "Erreur fatale du serveur, veuillez recharger la page";
+$l_search = "Rechercher";
+$l_advanced_search = "Recherche avancée";
+$l_hide_advanced_search = "Masquer les options de recherche";
+$l_basic_search = "Recherche simple";
 
 // Common messages
 $l_yes = "Oui";
@@ -301,6 +305,11 @@ $l_month = "Mois";
 $l_year = "Année";
 $l_today = "Aujourd'hui";
 $l_period = "Période";
+$l_tomorrow = "Demain";
+$l_this_week = "Cette semaine";
+$l_next_week = "La semaine prochaine";
+$l_this_month = "Ce mois";
+$l_next_month = "Le mois prochain";
 $l_monthsofyear = array ('Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août', 'Septembre','Octobre','Novembre', 'Décembre');
 $l_monthsofyearshort = array ('janv','févr','mars','avril','mai','juin','juil','août','sept','oct','nov','déc');
 $l_daysofweek = array ('Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi');

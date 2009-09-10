@@ -32,7 +32,8 @@ $l_details = "Details";
 
 $l_occupied_day = "Whole day";
 $l_user_right = "Manage rights for";
-
+$l_search_my_calendar = "Search in my calendar";
+$l_basic_search_result = "Search result for future events";
 $l_exception = "Exceptions";
 $l_alerts = "Alerts";
 $l_alerts_time = "Alerts (minutes before)";

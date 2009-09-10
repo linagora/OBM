@@ -84,6 +84,8 @@ $l_to = "au";
 $l_periodic = "Périodique";
 $l_days = 'jours';
 $l_more = 'de plus';
+$l_search_my_calendar = "Rechercher dans mon agenda";
+$l_basic_search_result = "Résultat de recherche pour les évenements à venir";
 
 // PDF Options
 $l_display_details = "Afficher les détails";

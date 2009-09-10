@@ -11,6 +11,52 @@ require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
 
+function checkSearchForm() {
+  if (trim($('tf_pattern').value) == '') {
+    showErrorMessage('".phpStringToJsString($GLOBALS['l_invalid_data'])."');
+    return false;
+  }
+  return true;
+}
+
+function toggleSearchForm(show, hide) {
+  $(hide).setStyle('display', 'none');
+  $(show).setStyle('display', '');
+}
+
+function setAdvancedSearchDate(rd) {
+  switch(rd.value) {
+    case 'today':
+      $('tf_date_begin').value = obm.vars.consts.today_begin;
+      $('tf_date_end').value = obm.vars.consts.today_end;
+     break;
+    case 'tomorrow':
+      $('tf_date_begin').value = obm.vars.consts.tomorrow_begin;
+      $('tf_date_end').value = obm.vars.consts.tomorrow_end;
+     break;
+    case 'this_week':
+      $('tf_date_begin').value = obm.vars.consts.this_week_begin;
+      $('tf_date_end').value = obm.vars.consts.this_week_end;
+     break;
+    case 'next_week':
+      $('tf_date_begin').value = obm.vars.consts.next_week_begin;
+      $('tf_date_end').value = obm.vars.consts.next_week_end;
+     break;
+    case 'this_month':
+      $('tf_date_begin').value = obm.vars.consts.this_month_begin;
+      $('tf_date_end').value = obm.vars.consts.this_month_end;
+     break;
+    case 'next_month':
+      $('tf_date_begin').value = obm.vars.consts.next_month_begin;
+      $('tf_date_end').value = obm.vars.consts.next_month_end;
+     break;
+  }
+}
+
+function clearPeriodSelection(period) {
+alert('toto');
+}
+
 /////////////////////////////////////////////////////////////////////////////
 function changePeriod(date) {
   var entities = new Array();

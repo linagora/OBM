@@ -64,8 +64,18 @@
 /* Calendar styles                                                           */
 /* ------------------------------------------------------------------------- */
 
+
 #calendarNavBar {
-  vertical-align:middle;
+  padding-left: 1em;
+  font-weight: bold;
+  padding-top:4px;
+  font-size: 110%;
+}
+
+#calendarNavBar input {
+  font-weight: normal;
+  font-size: 100%;
+  padding: 0;
 }
 
 .dayColLabel {
@@ -88,7 +98,7 @@
   height: 100%;
 }
 
-.dayColMonth {
+.alldayContainer {
   border-left:1px solid #AAA;
   border-top:1px solid #AAA;
   border-bottom:1px solid #AAA;
@@ -154,7 +164,6 @@
 #calendarHeaderGrid {
   height: 20px;
   position:relative;
-  border : 1px solid orange;
 }
 
 #calendarGrid {
@@ -180,6 +189,10 @@
   border: 1px solid #666;
   margin: 0;
   padding: 0;
+}
+
+.calendarDayOver {
+  background: #c3d9ff;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -562,75 +575,6 @@
   border-left: 1px solid #358399;
   border-right: 1px solid #358399;
   border-bottom: 1px solid #358399;
-}
-
-/* ------------------------------------------------------------------------- */
-/* Free/Busy view styles */
-/* ------------------------------------------------------------------------- */
-/*
-li.freeBusy {
-  background-color: #97bdec; 
-}
-
-.freeBusy tbody td {
-  background-color: #97bdec; 
-  border-top: 1px dashed #6a90c3;
-  border-right: 1px dashed #6a90c3;      
-
-}
-
-.freeBusy tbody td.hover 	{ 
-  background-color: #ffde01; 
-  border-top: 1px dashed #6a90c3;
-  border-right: 1px dashed #6a90c3;    
-}
-
-.freeBusy tbody td.busy, .busy   { 
-  background-color: #b3b3b3;
-  border-top: 1px dashed #6a90c3;
-  border-right: 1px dashed #6a90c3;    
-}
-
-.freeBusy tbody td.free, .free { 
-  background-color: #cee1ed;  
-  border-top: 1px dashed #a0b3c4;
-  border-right: 1px dashed #a0b3c4;     
-}
-
-.infoPopup {
-  display: none;
-  position: absolute;
-  background-color: #fff;
-  width: 20em;
-}
-
-.infoPopup h1{
-  margin: 0;
-  background-color: #d1d2d4;
-  font-weight: bold;
-  font-size: 100%;
-  background-image: url('../images/popup_title_border.png');
-  background-repeat: repeat-x;
-  background-position: 0 0.5em; 
-}
-
-.infoPopup h2{
-  background-color: #ebebeb;
-  font-weight: bold;
-  border-left: 1px solid #b3b3b3;
-  border-right: 1px solid #b3b3b3;
-  font-size: 100%;  
-  margin: 0;
-}
-
-.infoPopup ul{
-  margin: 0;
-  padding:0;
-  list-style: none;
-}
-
-.infoPopup li{
-  padding-left: 1.5em;
 }
 
 /* Planning list view */

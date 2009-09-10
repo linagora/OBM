@@ -184,6 +184,10 @@ $l_hour = "Time";
 $l_type ="Type";
 $l_autocomplete_field = "Search...";
 $l_fatal_server_err = "Fatal server error, please reload";
+$l_search = "Search";
+$l_advanced_search = "Advanced search";
+$l_hide_advanced_search = "Hide search options";
+$l_basic_search = "Basic search";
 
 // Entities
 $l_company = "Company";
@@ -294,6 +298,11 @@ $l_month = "Month";
 $l_year = "Year";
 $l_today = "Today";
 $l_period = "Period";
+$l_tomorrow = "Tomorrow";
+$l_this_week = "This week";
+$l_next_week = "This week";
+$l_this_month = "This month";
+$l_next_month = "Next month";
 $l_monthsofyear = array('January','February', 'March','April','May','June','July','August','September','October','November','December');
 $l_monthsofyearshort = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 $l_daysofweek = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
