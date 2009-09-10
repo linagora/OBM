@@ -1013,7 +1013,7 @@ Obm.CalendarInDayEvent = new Class({
       overflow: $('calendarBody')
     };
     var dragOptions = {
-      handle: this.dragHandler,
+      handle: this.content,
       preventDefault: true,
       units: {'x':'%', 'y':'px'},
       grid: {'x': obm.vars.consts.cellWidth, 'y': obm.calendarManager.defaultHeight},
