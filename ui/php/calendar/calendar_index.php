@@ -378,10 +378,13 @@ if ($action == 'search') {
 ///////////////////////////////////////////////////////////////////////////////
   $params['sel_user_id']= (is_array($params['sel_user_id']))?$params['sel_user_id']:array();
   $entities['group'] = $params['sel_group_id'];
-  $entities['user'] = $params['sel_user_id'];
   $entities['resource'] = $params['sel_resource_id'];
+  $entities['user'] = run_query_calendar_merge_groups($params['sel_group_id'],$params['sel_user_id']);
+  if (count($entities,COUNT_RECURSIVE) <= 3) {
+    $entities['user']  = array($obm['uid']);
+    $params['sel_user_id'] = array($obm['uid']);
+  }
   $entities['contact'] = $params['sel_contact_id'];
-  $entities['document'] = $params['sel_document_id'];
   if ($entities['contact'] == null) {
     $entities['contact'] = array();
   }
