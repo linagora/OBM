@@ -398,6 +398,7 @@ sub _init {
         $userDesc->{'userobm_samba_perms'} = 0;
         delete( $userDesc->{'userobm_samba_home_drive'} );
         delete( $userDesc->{'userobm_samba_home'} );
+        delete( $userDesc->{'userobm_samba_logon_script'} );
     }
 
 
