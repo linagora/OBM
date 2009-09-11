@@ -258,6 +258,9 @@
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   border-radius: 5px;
+  background-image: url('../images/event_background.png');
+  background-repeat : repeat-x;
+  background-position: top center;
 }
 
 .event dl.allDay {
@@ -273,6 +276,7 @@
 .event dd {
   margin: 0;
   margin-left: 1px;
+  font-weight:bold;
 }
 
 .event span {

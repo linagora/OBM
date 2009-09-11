@@ -238,6 +238,13 @@ $l_ics_insert = 'Import';
 $l_ics_file = 'ICS file to import';
 $l_ics_import_ok = 'event(s) have been inserted.';
 
+
+$l_tag = "Tag" ;
+$l_tags = "Tags" ;
+$l_tag_management = "Tags management" ;
+$l_tag_fill_label = "You have to fill the label." ;
+$l_tag_fill_color = "You have to choose a color." ;
+
 //Export calendar
 $l_all_calendar = "All calendar";
 $l_event_before_date = "Only events before : ";

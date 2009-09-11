@@ -170,7 +170,7 @@ function html_calendar_tag_legend($tags) {
   global $display, $obm;
 
   $block = "<div class=\"portlet\">
-    <h1>$GLOBALS[l_tag]</h1>";
+    <h1>$GLOBALS[l_tags]</h1>";
 
   $tags_q = run_query_calendar_get_alltags($obm['uid']);
   while($tags_q->next_record()) {
