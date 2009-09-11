@@ -697,7 +697,43 @@ function run_query_calendar_insert_event_data($calendar) {
   $res_name = $calendar['res-name'];
   $res_id = $calendar['res-id'];
   $property = $calendar['property'];
+
+	$tagcolor = $calendar['tag_color'] ;
+	if ($tagcolor == '') {
+		$tagcolor = "#eff0f2" ; // default background ;
+	}
+	$taglabel = $calendar['tag_label'] ;
+	  $obm_q = new DB_OBM;
+	if ($taglabel != '') {
+		$query = "SELECT eventtag_id FROM EventTag 
+							WHERE eventtag_label = '$taglabel' and eventtag_user_id = ".$obm['uid']." ;" ;
+		$obm_q->query($query);
+		if ($obm_q->num_rows() > 0) {
+			// update
+			$query = "UPDATE EventTag SET 
+								eventtag_color = '$tagcolor '
+								WHERE eventtag_label = '$taglabel'
+								AND eventtag_user_id = ".$obm['uid']." ;" ;
+			$obm_q->query($query) ; 
+		}
+		else {
+			$query = "INSERT INTO EventTag 
+								(eventtag_label, eventtag_color, eventtag_user_id) 
+								VALUES ('$taglabel', '$tagcolor', ".$obm['uid'].") ;" ;
+			$obm_q->query($query) ;
+			// get back the last inserted eventtag_id
+			$query = "SELECT eventtag_id FROM EventTag 
+								WHERE eventtag_label = '$taglabel' and eventtag_user_id = ".$obm['uid']." ;" ;
+			$obm_q->query($query) ;
+			$obm_q->next_record() ;
+			$tagid = $obm_q->f('eventtag_id') ;
+			
+			// tweak
+			$calendar['tag_id'] = $tagid ; 
+		}
+	}
 	$event_tag_id = $calendar['tag_id'] ;
+
 	if ($event_tag_id == $GLOBALS['c_none']) $event_tag_id = 'NULL' ;
   if ($calendar['allow_documents'] != 1) $allow_documents = 0; else $allow_documents = 1; 
   $property_name = $calendar['property-name'];
@@ -741,7 +777,6 @@ function run_query_calendar_insert_event_data($calendar) {
   } else {
     $repeat_days = '0000000';
   }
-  $obm_q = new DB_OBM;
 
   $query = "INSERT INTO Event (
     event_ext_id,
