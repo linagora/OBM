@@ -217,7 +217,7 @@ Obm.CalendarManager = new Class({
    */
   resizeGrid: function() {
     if (obm.vars.consts.calendarView == 'day') {
-      $('calendarBody').setStyle('height',window.innerHeight - $('calendarBody').offsetTop -80);
+      $('calendarBody').setStyle('height',window.innerHeight - $('calendarBody').offsetTop -60);
     } else {
       $('mainContent').setStyle('height',window.innerHeight - $('mainContent').offsetTop -50);
       $('calendarHeaderGrid').setStyle('height',window.innerHeight - $('calendarHeaderGrid').offsetTop -50);

@@ -203,7 +203,7 @@ form {
   z-index:100;
   min-width: 120px;
   margin: 0 0px 20px 17.5em;
-  padding: 2em 1em 1em;
+  padding: 2em 1em 0em;
 /*IE workaround*/
   height: auto!important;
   height: 1px;
