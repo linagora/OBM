@@ -1405,7 +1405,9 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         $hour_end = $end->get(Of_Date::TIME_SHORT);
         $ev_id = $event->id;
         $title = $event->title;
-
+        $tags_q = run_query_calendar_get_alltags($event->owner, $event->tag);
+        $tags_q->next_record();
+        $tag = $tags_q->f('eventtag_label');
         $item_list = phpStringToJsString(str_replace("\n\r", ', ', $item_list));
         $location = $event->location;
 
@@ -1555,6 +1557,9 @@ function dis_calendar_list_view($calendar, $calendar_entity, $writable_entity, $
         $event_details = '';
         if (!$privatized_event) {
           $event_details = "<table>
+              <tr>
+                <th>$GLOBALS[l_tag]</th><td>$tag</td>
+              </tr>
               <tr>
                 <th>$l_repeat</th><td>$dis_repeat</td>
               </tr>

@@ -2678,6 +2678,7 @@ function run_query_calendar_build_search_filters($pattern, $type, $like) {
       event_location $like '%$w%' OR 
       event_description $like '%$w%' OR
       eventcategory1_label $like '%$w%'OR
+      eventtag_label $like '%$w%'OR
       u.userobm_lastname $like '%$w%' OR
       u.userobm_firstname $like '%$w%' OR
       a.userobm_lastname $like '%$w%' OR
@@ -3918,12 +3919,16 @@ function run_query_insert_others_attendees($calendar) {
 // Parameters:
 //   - $obmUserId : int obmuser identifier
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_calendar_get_alltags($obmUserId) {
+function run_query_calendar_get_alltags($obmUserId,$tag_id=null) {
+  global $cdg_sql;
+
   $obm_q = new DB_OBM ;
   
-  $obmUserId = intval($obmUserId) ;
-  $query = "SELECT * FROM EventTag WHERE eventtag_user_id = ".$obmUserId ;
+  if ($tag_id) $where = "AND eventtag_id=$tag_id";
+  $query = "SELECT * FROM EventTag WHERE eventtag_user_id = $obmUserId $where 
+    ORDER BY eventtag_label";
   $obm_q->query($query) ;
+  display_debug_msg($query, $cdg_sql,"run_query_calendar_get_alltags()");
   
   return $obm_q ;
 }
